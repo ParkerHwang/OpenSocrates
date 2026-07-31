@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-reasoning-positive-01
+    kind: positive
+    prompt: "두 병원이 비슷한 조건에서 한 곳만 예약 알림 전화를 도입했고 그곳의 불참이 줄었다. 전화가 변화를 만들었는지 판단해 달라."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "개입이 결과를 바꾸었는지 묻고 시간 순서·비교·대안 설명을 확인해야 하는 질문이다."
+  - id: causal-reasoning-positive-02
+    kind: positive
+    prompt: "결제 화면을 바꾼 뒤 여러 독립 집단에서 완료율이 올랐다. 계절적 수요가 아니라 화면 변경이 원인인지 알고 싶다."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, testable_claim, confounding]
+    rationale: "반복된 개입과 결과의 관계라도 메커니즘·반사실·교란변수를 점검해야 한다."
+  - id: causal-reasoning-positive-03
+    kind: positive
+    prompt: "관리자가 주 4일제가 유지율을 높였는지 묻는다. 시작일, 비교 팀, 업무량이라는 교란 가능성이 있다."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "인과 대상과 시간·비교·교란 가능성이 명시되어 범위를 정한 인과 설명이 가능하다."
+  - id: causal-reasoning-negative-01
+    kind: negative
+    prompt: "지원 적체가 6개월 동안 커졌고 인력·수요·응답 지연이 서로 영향을 준다. 왜 패턴이 지속되는지 묻는다."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty]
+    rationale: "핵심 대상은 지연이 있는 반복 피드백 패턴이므로 단일 효과보다 시스템 설명이 앞선다."
+  - id: causal-reasoning-negative-02
+    kind: negative
+    prompt: "여러 인수인계 뒤 공장 결함이 반복된다. 증상·과정 원인·빠진 통제를 나누어 달라는 요청이다."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "출력은 노출 효과가 아니라 재발 방지 담당자가 있는 운영 진단과 인과 사슬이다."
+  - id: causal-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "정책 변화와 결과를 설명하는 문장을 인과 여부를 평가하지 말고 한국어로 번역해 달라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "인과 표현이 들어 있어도 번역은 기계적 작업이므로 개입하지 않는다."
+  - id: causal-reasoning-explicit-01
+    kind: explicit
+    prompt: "causal-reasoning을 사용해 새 온보딩 이메일이 활성화를 바꾸었는지 평가하고 필요한 비교를 보여 달라."
+    expected_route: causal-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, causal_question]
+    rationale: "사용자가 판단 대상에 사용할 방법을 명시했으므로 근거 계약을 지키며 주 방법으로 쓴다."
+  - id: causal-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "직원 한 명이 보충제를 먹고 회복했다. 보충제가 원인이라고 결론 내리고 팀 전체에 권하라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [causal_question, decisive_input_missing]
+    rationale: "통제되지 않은 한 사례에는 방어 가능한 비교가 없어 인과나 위험한 권고를 지지할 수 없다."

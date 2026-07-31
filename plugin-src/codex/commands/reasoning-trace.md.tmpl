@@ -1,0 +1,14 @@
+# Reasoning trace
+
+Render only the public trace projection through the injected trace service.
+The host runtime invokes the compatibility dispatcher with the exact command
+name `reasoning-trace`; no chain-of-thought, transcript, or raw tool data is
+read.
+
+Fixed control boundary:
+
+`${PLUGIN_ROOT}/bin/launch.sh control codex`
+
+The source seam is:
+
+`opensocrates.application.compatibility.dispatch_compatibility("reasoning-trace", services=...)`

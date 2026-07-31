@@ -1,0 +1,58 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "game-theory-positive-1"
+    kind: positive
+    prompt: "If we cut our subscription price, the main competitor can match the cut or keep its price, and its response will change our retention and margin. Compare the credible responses before recommending a move."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "The prompt names interdependent pricing actions and asks for a response analysis. The route should expose the evidence for margins and retention rather than inventing a payoff table or probability."
+  - id: "game-theory-positive-2"
+    kind: positive
+    prompt: "We are negotiating a multi-year supply contract. Our volume commitment may lower the supplier's cost, but the supplier can prioritize another buyer if our forecast is weak. Map the incentives, information, and credible commitments."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "Both parties can adapt and their payoffs depend on the other party's commitment. The prompt provides a structural hypothesis, not verified costs, so the method must label assumptions and uncertainty."
+  - id: "game-theory-positive-3"
+    kind: positive
+    prompt: "Two platforms are considering a shared interoperability standard. Adoption creates value for both, but either platform may delay until the other bears the integration cost. Analyze the possible responses and the design move that could make cooperation credible."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "The decision depends on reciprocal adoption and the cost of moving first. A conditional stable outcome may be useful, but the route must not call it an equilibrium without supported incentives."
+  - id: "game-theory-negative-1"
+    kind: negative
+    prompt: "Choose an internal database by comparing latency, storage cost, and our engineering capacity. No other actor can change the outcome."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [no_meaningful_interdependence]
+    rationale: "The environment is treated as fixed and no player's response affects the outcome. This is not a strategic interdependence case, so the method should not route."
+  - id: "game-theory-negative-2"
+    kind: negative
+    prompt: "Assess the political, economic, social, technological, environmental, and legal forces that could affect our entry into this market."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features: [macro_environment, forecast]
+    rationale: "The request may influence a strategy, but its decisive output is an external-factor scan rather than player responses or incentives. This is a likely family confusion; no game-theoretic equilibrium should be invented."
+  - id: "game-theory-mechanical-1"
+    kind: mechanical
+    prompt: "Calculate the weighted average of these four contract prices using the supplied volumes."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "The requested result is a mechanical calculation with supplied inputs. It does not require modeling another actor's response."
+  - id: "game-theory-explicit-1"
+    kind: explicit
+    prompt: "Use game theory to analyze this procurement auction. Show the players, actions, information, timing, and any conditional stable outcome, but do not invent missing payoffs."
+    expected_route: "game-theory"
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, interacting_actors]
+    rationale: "The user explicitly names the method and requests its public structure. The method remains primary while preserving missing payoff information and avoiding fabricated probabilities."
+  - id: "game-theory-insufficiency-1"
+    kind: insufficiency
+    prompt: "Should we threaten the competitor with a price response? I have not identified the competitor's feasible actions, our consequences, the information each side has, or whether the relationship repeats."
+    expected_route: "game-theory"
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, interacting_actors]
+    rationale: "The question is strategically interdependent, but the missing structure determines whether the threat is credible. The method should hold and request only decisive facts instead of predicting a response."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deduction-positive-01
+    kind: positive
+    prompt: "이 정책 전제와 명시된 예외 규칙에서 결론이 필연적으로 따라오나요?"
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "명시적 전제와 규칙에서 형식적 결과를 묻는 요청입니다."
+  - id: deduction-positive-02
+    kind: positive
+    prompt: "이 계약 논증이 타당한지, 전제가 실제로 지지되는지도 나누어 확인해 주세요."
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "명시적인 규칙 논증에서 타당성과 건전성을 분리해야 합니다."
+  - id: deduction-positive-03
+    kind: positive
+    prompt: "이 컴플라이언스 결론이 따라오는 것처럼 보이게 만든 숨은 전제를 찾아 주세요."
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "표준화, 숨은 전제 공개, 형식 타당성 점검이 필요한 과제입니다."
+  - id: deduction-negative-01
+    kind: negative
+    prompt: "장애를 설명하는 가설이 여러 개입니다. 가장 나은 것을 고르고 다음 구별 시험을 제안해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "경쟁 원인과 구별 증거가 핵심이므로 함의보다 귀추가 맞습니다."
+  - id: deduction-negative-02
+    kind: negative
+    prompt: "이 관찰들이 미래 사용자에 대한 일반 주장을 얼마나 넓게 지지하는지 추정해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "표본 대표성에 달린 귀납적 확장을 요청한 경우입니다."
+  - id: deduction-mechanical-01
+    kind: mechanical
+    prompt: "제공한 전제 목록에 번호를 붙이고 문구는 그대로 보존해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "제공된 목록에 번호를 붙이는 일은 기계 작업입니다."
+  - id: deduction-explicit-01
+    kind: explicit
+    prompt: "이 자격 규칙이 해당 사례 결과를 함의하는지 deduction을 명시적으로 사용해 점검해 주세요."
+    expected_route: deduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, explicit_rules]
+    rationale: "사용자가 규칙 적용과 함의 점검을 위해 방법을 직접 지정했습니다."
+  - id: deduction-insufficiency-01
+    kind: insufficiency
+    prompt: "결론이 타당한지 말해 주세요. 전제, 규칙, 범위, 결론 문장은 주지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [explicit_rules, decisive_input_missing]
+    rationale: "논증 형식과 전제가 없으면 타당성을 평가할 수 없습니다."

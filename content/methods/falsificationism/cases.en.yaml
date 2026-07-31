@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: falsificationism-positive-01
+    kind: positive
+    prompt: "What observation would decisively count against this favored product hypothesis?"
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "The claim needs a risky prediction and an observable falsifier rather than more confirming anecdotes."
+  - id: falsificationism-positive-02
+    kind: positive
+    prompt: "Turn this explanation into a forecast, separate auxiliary assumptions, and define the failure threshold before testing."
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "The requested output is a pre-specified disproof attempt with measurement conditions."
+  - id: falsificationism-positive-03
+    kind: positive
+    prompt: "Did the failed prediction weaken the theory, the measurement, or an auxiliary setup assumption?"
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "The method must localize what a failed test actually challenges."
+  - id: falsificationism-negative-01
+    kind: negative
+    prompt: "Generate several explanations for the anomaly and compare which best accounts for the observed facts."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Candidate explanation generation is abductive when no risky prediction is specified."
+  - id: falsificationism-negative-02
+    kind: negative
+    prompt: "Rank these sources by design rigor and adjust the claim strength to their applicability."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "The task calibrates evidence hierarchy rather than attempting disproof."
+  - id: falsificationism-mechanical-01
+    kind: mechanical
+    prompt: "Copy the preregistered prediction and threshold into the test form."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copying a supplied test specification is mechanical."
+  - id: falsificationism-explicit-01
+    kind: explicit
+    prompt: "Explicitly invoke falsificationism to challenge the claim that this intervention always improves retention."
+    expected_route: falsificationism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, testable_claim]
+    rationale: "The user explicitly selects a disproof-oriented test of a universal claim."
+  - id: falsificationism-insufficiency-01
+    kind: insufficiency
+    prompt: "Use falsificationism on a claim that makes no observable prediction and cannot state what would count against it."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [testable_claim]
+    rationale: "The frozen contraindication applies: without a testable implication, the method must refuse rather than fabricate a falsifier."

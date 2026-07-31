@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: triz-positive-01
+    kind: positive
+    prompt: "배송 드론의 배터리를 늘리면 무게 때문에 항속거리가 줄어든다. 모순을 분리하거나 없애는 개념을 찾아 달라."
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "한 속성 개선이 다른 속성을 악화시키므로 이상 결과·분리·발명적 이동이 필요하다."
+  - id: triz-positive-02
+    kind: positive
+    prompt: "병실은 강한 개인정보 보호와 쉬운 관찰을 동시에 필요로 한다. 시간·공간·조건·인터페이스 분리를 탐색하라."
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "안전 제약이 있는 물리·기술 모순을 분리 조건으로 풀어야 한다."
+  - id: triz-positive-03
+    kind: positive
+    prompt: "포장 라인은 손상을 늘리지 않고 빨라져야 한다. 시간·공간·정보·물질 자원으로 타협 없는 설계를 찾아 달라."
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "한 변수 최적화가 아니라 설계 상충을 없애는 발명 개념을 요구한다."
+  - id: triz-negative-01
+    kind: negative
+    prompt: "두 공공 가치 중 어느 권리와 의무가 우선인지가 문제다. 기술 설계 모순은 아니다."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [value_conflict, duties_rights]
+    rationale: "발명적 이동보다 규범 권위와 권리 판단이 경로를 정한다."
+  - id: triz-negative-02
+    kind: negative
+    prompt: "시스템에 상호작용하는 피드백과 지연된 부작용이 있다. 국소 개념 전에 전체 구조와 지렛대를 지도화하라."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "주된 필요는 국소 모순 해결보다 시스템 동학과 지렛대 분석이다."
+  - id: triz-mechanical-01
+    kind: mechanical
+    prompt: "기존 제품 매개변수를 모순을 찾거나 개념을 제안하지 말고 요청한 순서로 나열하라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "나열은 발명적 문제 해결을 요구하지 않는 기계적 작업이다."
+  - id: triz-explicit-01
+    kind: explicit
+    prompt: "triz를 사용해 가벼운 포장과 강한 충격 보호의 모순을 다루고 되돌릴 수 있는 시험을 제안하라."
+    expected_route: triz
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, technical_contradiction]
+    rationale: "기술적 모순과 시험에 방법을 명시적으로 적용해 달라고 요청했다."
+  - id: triz-insufficiency-01
+    kind: insufficiency
+    prompt: "개선·악화되는 속성을 모른다. 이상 설계가 달성되었고 성능 향상이 보장된다고 선언하라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [technical_contradiction, decisive_input_missing]
+    rationale: "모순과 시험이 정의되지 않아 이상성과 개선을 정직하게 확립할 수 없다."

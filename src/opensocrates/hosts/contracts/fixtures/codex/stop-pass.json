@@ -1,0 +1,28 @@
+{
+  "fixture_id": "TEST-CDX-stop-pass",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-07-15",
+  "host": "codex_cli",
+  "native_event": "Stop",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "Stop",
+    "turn_id": "TEST-turn-006",
+    "permission_mode": "default",
+    "stop_hook_active": false,
+    "last_assistant_message": "<synthetic-public-message>"
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {}
+  },
+  "adapter_expectation": {
+    "normalized_event": "completion_candidate",
+    "status": "accepted",
+    "projection": {
+      "stop_already_continued": false,
+      "native_stop_reason": null
+    }
+  },
+  "redaction": "The final message is a marker only; no transcript or response content is present."
+}

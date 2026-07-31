@@ -1,0 +1,28 @@
+{
+  "fixture_id": "TEST-CDX-stop-repeat",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-07-15",
+  "host": "codex_cli",
+  "native_event": "Stop",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "Stop",
+    "turn_id": "TEST-turn-008",
+    "permission_mode": "default",
+    "stop_hook_active": true,
+    "last_assistant_message": "<synthetic-public-message>"
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {}
+  },
+  "adapter_expectation": {
+    "normalized_event": "completion_candidate",
+    "status": "accepted_without_continuation",
+    "projection": {
+      "stop_already_continued": true,
+      "repair_count": 1
+    }
+  },
+  "redaction": "The active flag is synthetic; the adapter must not emit a second block."
+}

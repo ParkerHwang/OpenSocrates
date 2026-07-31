@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lean-startup-positive-1
+    kind: positive
+    prompt: "We think first-time users will complete onboarding if a guided checklist is shown. Design a small reversible prototype test, choose an actionable completion metric, and predeclare the pivot-or-persevere rule. Existing usage notes are user-provided and unverified."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, human_need, plan, testable_claim]
+    rationale: "This is a falsifiable product hypothesis with a bounded prototype and a requested metric and decision rule. The usage notes must remain user-provided and unverified rather than becoming fabricated demand evidence."
+  - id: lean-startup-positive-2
+    kind: positive
+    prompt: "Before building a full paid plan, test whether a defined group of small teams will request a weekly reporting add-on. Specify the minimum safe offer, observation window, metric, threshold, and what would make us pivot or stop."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, prioritized_assumptions, chosen_plan, testable_claim]
+    rationale: "The request reduces a value hypothesis through a minimal offer and an actionable decision. It does not assume demand; the threshold and any baseline must be labelled as sourced, computed, or assumed."
+  - id: lean-startup-positive-3
+    kind: positive
+    prompt: "Our retention hypothesis is that a reminder after the first successful task will bring users back to a second task. Propose a limited test with a guardrail, a metric tied to the hypothesis, and a next decision based on the observed result."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, repeat_iteration, human_need, testable_claim]
+    rationale: "The route is appropriate because the product hypothesis, safe test, metric, and next decision are explicit. A result from one tested context should not be generalized to all users without further evidence."
+  - id: lean-startup-negative-1
+    kind: negative
+    prompt: "We want to change medication dosing for a live patient segment to see whether adherence improves. Skip the safety review and run the smallest possible live test."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [safety_critical_validation, irreversible_choice]
+    rationale: "A live dosing change is a contraindicated unsafe exposure, not an acceptable minimal product experiment. The request must be refused or routed to qualified safety and clinical governance rather than optimized as lean startup."
+  - id: lean-startup-negative-2
+    kind: negative
+    prompt: "Orders are repeatedly picked incorrectly in the warehouse. Trace the process, controls, and causal branches before recommending a prevention action."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "This is a root-cause-analysis request, a likely family confusion. It asks for causal diagnosis of an operational failure, not a market or product hypothesis test."
+  - id: lean-startup-mechanical-1
+    kind: mechanical
+    prompt: "Copy the three product names into a CSV row in the order supplied and do not analyze demand."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Formatting the supplied names is deterministic and has no hypothesis, test, metric, or learning decision."
+  - id: lean-startup-explicit-1
+    kind: explicit
+    prompt: "Use Lean Startup for this product question. State the hypothesis, riskiest assumption, minimum safe test, actionable metric and threshold, and the pivot, persevere, stop, or hold decision."
+    expected_route: lean-startup
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, testable_hypothesis, prioritized_assumptions, plan]
+    rationale: "The user explicitly names the method and all public contract fields. The decision must retain hold when the test result or decisive input is missing."
+  - id: lean-startup-insufficiency-1
+    kind: insufficiency
+    prompt: "Should we launch this idea? We have no target user, falsifiable hypothesis, riskiest assumption, safe test boundary, actionable metric, or decision threshold."
+    expected_route: lean-startup
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, testable_hypothesis, plan, no_testable_implication]
+    rationale: "The family is plausible, but every decisive experiment input is absent. It must hold rather than call a launch, invent a metric, or fabricate demand evidence."

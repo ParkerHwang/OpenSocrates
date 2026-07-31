@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: reflective-equilibrium-positive-01
+    kind: positive
+    prompt: "공정성 원칙이 맞아 보여도 세 어려운 사례에 적용하면 문제가 생긴다. 남은 긴장을 보이며 원칙이나 판단을 수정하라."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "숙고된 판단·원칙·어려운 사례를 서로 조정하는 요청이다."
+  - id: reflective-equilibrium-positive-02
+    kind: positive
+    prompt: "기관이 개인정보와 책임성을 모두 중시하지만 어려운 사건에서 충돌한다. 가능한 한 둘을 보존하는 수정안을 비교하라."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "재량이 있는 가치 충돌에서 원칙·사례·수정·남은 긴장을 명시해야 한다."
+  - id: reflective-equilibrium-positive-03
+    kind: positive
+    prompt: "전문가 팀의 받아들인 사례 판단과 명시한 원칙이 충돌한다. 반례를 시험하고 어떤 배경 가정을 바꿀지 찾아 달라."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "사례·원칙·배경 가정을 오가며 수정해야 하는 판단이다."
+  - id: reflective-equilibrium-negative-01
+    kind: negative
+    prompt: "명시된 규정이 제안 행동을 분명히 금지하고 재량이 없다. 허용되는 대안을 정하라."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "구속 규칙이 원칙과 사례의 상호 수정 없이 상태를 정한다."
+  - id: reflective-equilibrium-negative-02
+    kind: negative
+    prompt: "팀이 이해관계자의 반론을 가장 강한 전제와 근거를 확인하지 않고 무시했다."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute]
+    rationale: "즉시 필요한 것은 숙고된 원칙 충돌보다 검토하지 않은 반대 사례의 강철화다."
+  - id: reflective-equilibrium-mechanical-01
+    kind: mechanical
+    prompt: "원칙과 사례 설명을 비교하거나 수정하지 말고 검토 문서에 복사하라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "복사는 규범적 정합성 판단을 요구하지 않는 기계적 작업이다."
+  - id: reflective-equilibrium-explicit-01
+    kind: explicit
+    prompt: "reflective-equilibrium을 사용해 공정성 원칙을 이 어려운 사례들과 검토하고 남은 긴장을 말해 달라."
+    expected_route: reflective-equilibrium
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, value_conflict, argument_dispute]
+    rationale: "사례와 원칙의 반복적 조정을 명시적으로 요청했다."
+  - id: reflective-equilibrium-insufficiency-01
+    kind: insufficiency
+    prompt: "구속력 있는 안전 규칙이 적용되지만 한 사례가 불공정해 보인다고 규칙을 무시하고 균형을 맞추라."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [value_conflict, binding_rule_without_discretion]
+    rationale: "재량을 만들어 안전 규칙을 덮는 것은 이 방법의 범위를 벗어난다."

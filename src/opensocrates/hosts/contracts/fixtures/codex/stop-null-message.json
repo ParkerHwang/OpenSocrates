@@ -1,0 +1,27 @@
+{
+  "fixture_id": "TEST-CDX-stop-null-message",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-07-15",
+  "host": "codex_cli",
+  "native_event": "Stop",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "Stop",
+    "turn_id": "TEST-turn-009",
+    "permission_mode": "default",
+    "stop_hook_active": false,
+    "last_assistant_message": null
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {}
+  },
+  "adapter_expectation": {
+    "normalized_event": "completion_candidate",
+    "status": "degraded",
+    "projection": {
+      "native_stop_reason": "missing-final-message"
+    }
+  },
+  "redaction": "No final content is supplied and no transcript fallback is allowed."
+}

@@ -1,0 +1,86 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: decision-tree-analysis-positive-1
+    kind: positive
+    prompt: "We can launch a pilot now or wait, and the measured pilot result determines whether to expand, revise, or stop. The historical programme record bounds the branch outcomes and the decision owner can act at the stated review point."
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - sequential_choice
+      - unknown_probability
+    rationale: "The sequence and conditional next actions are material, and the historical record provides probability and outcome provenance that can be checked."
+  - id: decision-tree-analysis-positive-2
+    kind: positive
+    prompt: "For a staged rollout, choose between expanding immediately and collecting a test result first. Each result has a documented range of outcomes, and later actions differ depending on that observation; show the rollback point and the source for each branch."
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - multiple_options
+      - sensitive_inputs
+    rationale: "This is a sequential choice with chance outcomes and a meaningful rollback point. The prompt asks for provenance and ranges rather than unsupported precision."
+  - id: decision-tree-analysis-positive-3
+    kind: positive
+    prompt: "A supplier decision can be made now, or a documented inspection can occur before the contract is locked. Inspection findings lead to different suppliers or a stop, and the contract owner has stated outcome values and a review date."
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - irreversible_choice
+      - information_purchase
+    rationale: "The inspection changes later options before an irreversible commitment. The tree can show conditional actions and a rollback point without inventing branch probabilities."
+  - id: decision-tree-analysis-negative-1
+    kind: negative
+    prompt: "Rank three software products against price, accessibility, support, and reliability. There is no later observation or conditional action; the requester wants an explicit criteria comparison with stakeholder weights."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "The likely family confusion is trade-off-analysis: this is a static multi-criteria comparison, not a sequential tree."
+  - id: decision-tree-analysis-negative-2
+    kind: negative
+    prompt: "A policy says every eligible request must be approved when its documented conditions are met. Decide whether the team may choose a cheaper alternative instead; there is no discretion once the rule applies."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "A binding rule decides the action and there is no genuine decision node. A tree must not be used to evade the rule."
+  - id: decision-tree-analysis-mechanical-1
+    kind: mechanical
+    prompt: "Follow this fixed if-then flowchart with verified inputs and return the terminal label. There are no chance nodes, uncertain outcomes, or discretionary choices."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "This is deterministic execution of a supplied procedure, not a judgment about sequential uncertainty."
+  - id: decision-tree-analysis-explicit-1
+    kind: explicit
+    prompt: "Use decision-tree-analysis for the staged rollout. Show decision and chance nodes, use only the documented branch ranges, and identify the point where we can roll back."
+    expected_route: decision-tree-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - sequential_choice
+      - multiple_options
+    rationale: "The user explicitly invokes this method and supplies its public output needs. Unsupported branch values must remain unverified rather than being filled in."
+  - id: decision-tree-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "Should we launch now or wait? The later actions are unclear, no source bounds the possible outcomes, and nobody has stated what observation would permit a rollback."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - unknown_probability
+      - decisive_input_missing
+    rationale: "The sequence, branch basis, and rollback condition are all decision-changing gaps. The method must hold instead of inventing probabilities or a strategy."

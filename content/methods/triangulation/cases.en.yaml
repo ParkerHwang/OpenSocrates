@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: triangulation-positive-01
+    kind: positive
+    prompt: "Can independent survey, behavioral, and administrative data corroborate this retention claim?"
+    expected_route: triangulation
+    expected_behavior: route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "Different evidence streams must be checked for independence, convergence, conflict, and gaps."
+  - id: triangulation-positive-02
+    kind: positive
+    prompt: "These stakeholders cite different methods; determine whether their evidence really converges on the same outcome."
+    expected_route: triangulation
+    expected_behavior: route
+    decisive_features: [reconcile_evidence, conflicting_sources]
+    rationale: "The task is to compare streams and prevent repeated upstream data from masquerading as corroboration."
+  - id: triangulation-positive-03
+    kind: positive
+    prompt: "Our qualitative interviews and experiment disagree; what additional independent check would resolve the material conflict?"
+    expected_route: triangulation
+    expected_behavior: route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "Material disagreement requires an independence check and a targeted next stream."
+  - id: triangulation-negative-01
+    kind: negative
+    prompt: "Rank each source by design quality, directness, and applicability to the target population."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "The task evaluates individual source quality rather than cross-stream independence."
+  - id: triangulation-negative-02
+    kind: negative
+    prompt: "Update the prior confidence in these hypotheses after the new test result."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "A defined prior-to-posterior update is Bayesian updating, not triangulation."
+  - id: triangulation-mechanical-01
+    kind: mechanical
+    prompt: "Merge the three supplied evidence tables into one table and preserve all rows."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Merging tables is mechanical; it does not assess independence or convergence."
+  - id: triangulation-explicit-01
+    kind: explicit
+    prompt: "Explicitly use triangulation to verify whether the customer-impact claim survives independent checks."
+    expected_route: triangulation
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, reconcile_evidence]
+    rationale: "The user explicitly invokes cross-stream corroboration for a material claim."
+  - id: triangulation-insufficiency-01
+    kind: insufficiency
+    prompt: "Report corroboration, but all sources repeat one unknown upstream dataset and no independent stream is available."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [reconcile_evidence, source_quality, decisive_input_missing]
+    rationale: "Dependent repeated sources cannot establish triangulation, so corroboration must be held."

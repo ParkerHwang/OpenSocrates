@@ -1,0 +1,28 @@
+{
+  "fixture_id": "TEST-CDX-pre-compact-auto",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-07-15",
+  "host": "codex_cli",
+  "native_event": "PreCompact",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "PreCompact",
+    "turn_id": "TEST-turn-011",
+    "trigger": "auto"
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {
+      "systemMessage": "<synthetic-compaction-message>"
+    }
+  },
+  "adapter_expectation": {
+    "normalized_event": "pre_compaction",
+    "status": "accepted",
+    "projection": {
+      "trigger": "auto",
+      "active_task": false
+    }
+  },
+  "redaction": "Only the documented trigger and a synthetic warning marker are present."
+}

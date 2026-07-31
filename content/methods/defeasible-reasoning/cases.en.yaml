@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: defeasible-reasoning-positive-01
+    kind: positive
+    prompt: "Normally this policy applies, but what exceptions or new facts would retract the current recommendation?"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "The judgment uses a default rule and needs explicit defeaters and withdrawal conditions."
+  - id: defeasible-reasoning-positive-02
+    kind: positive
+    prompt: "Separate the evidence that directly contradicts the conclusion from evidence that weakens the rule supporting it."
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "The user asks for rebutting versus undercutting defeaters in a revisable judgment."
+  - id: defeasible-reasoning-positive-03
+    kind: positive
+    prompt: "A general rule and a more specific exception both apply; what is the current provisional status?"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "Specificity and unresolved exceptions must be handled without pretending to have an unconditional result."
+  - id: defeasible-reasoning-negative-01
+    kind: negative
+    prompt: "Apply the strict retention rule to every record and report the deterministic result."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "An exception-free rule is a deduction or mechanical application task."
+  - id: defeasible-reasoning-negative-02
+    kind: negative
+    prompt: "Rank these sources by design quality and adjust the claim strength to the strongest applicable source."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "The task is evidence hierarchy, not default-rule defeat management."
+  - id: defeasible-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Copy the default rule and exception list into the policy template."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copying supplied policy text is mechanical."
+  - id: defeasible-reasoning-explicit-01
+    kind: explicit
+    prompt: "Use defeasible-reasoning explicitly to assess this normally-valid approval rule and its exceptions."
+    expected_route: defeasible-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, exception_prone_rule]
+    rationale: "The user explicitly requests default-rule, defeater, and withdrawal-condition analysis."
+  - id: defeasible-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "Apply the default rule, but provide no rule source, triggering facts, scope, or possible exceptions."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [exception_prone_rule, decisive_input_missing]
+    rationale: "Without the default and trigger facts, a provisional conclusion would be arbitrary."

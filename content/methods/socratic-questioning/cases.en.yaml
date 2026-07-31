@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: socratic-questioning-positive-01
+    kind: positive
+    prompt: "Ask me only the questions that would change whether we should launch this service this quarter."
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "The user requests a bounded set of decision-changing questions rather than an open interview."
+  - id: socratic-questioning-positive-02
+    kind: positive
+    prompt: "Help me examine the assumptions behind my claim, but ask no more than three questions and explain why each matters."
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "The task explicitly needs a small, consequence-linked question set to clarify a judgment."
+  - id: socratic-questioning-positive-03
+    kind: positive
+    prompt: "I am unsure what ‘good evidence’ means here; ask the few questions that would change the review standard."
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "Missing answers can change the evidence standard and should be surfaced without question overload."
+  - id: socratic-questioning-negative-01
+    kind: negative
+    prompt: "Use the supplied requirements to check whether the implementation is complete and list any missing fields."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [review_completion, explicit_rules]
+    rationale: "The task has a fixed rule and asks for direct completion checking, not clarification-led judgment."
+  - id: socratic-questioning-negative-02
+    kind: negative
+    prompt: "Define the contested term by comparing positive, negative, and boundary cases."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [ambiguous_terms]
+    rationale: "The user asks for conceptual analysis itself rather than a bounded question sequence."
+  - id: socratic-questioning-mechanical-01
+    kind: mechanical
+    prompt: "Turn these five questions into a numbered Markdown list."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Formatting supplied questions is mechanical and must not trigger further questioning."
+  - id: socratic-questioning-explicit-01
+    kind: explicit
+    prompt: "Explicitly invoke socratic-questioning to test whether my decision rests on a hidden premise."
+    expected_route: socratic-questioning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions]
+    rationale: "The user explicitly names the method and requests premise-testing questions."
+  - id: socratic-questioning-insufficiency-01
+    kind: insufficiency
+    prompt: "Ask the decisive questions, but do not reveal the decision, claim, scope, or consequence they should affect."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing]
+    rationale: "Without a target decision or consequence, the method cannot bound questions or know what is decisive."

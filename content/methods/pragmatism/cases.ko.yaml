@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pragmatism-positive-01
+    kind: positive
+    prompt: "두 프로젝트 관리 프레임워크가 회의·우선순위·피드백을 다르게 만든다. 하나를 고르기 전에 관찰 가능한 결과를 비교하라."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "해석이 행동에 다른 영향을 만들며 범위가 정해진 실천 결과로 판단할 수 있다."
+  - id: pragmatism-positive-02
+    kind: positive
+    prompt: "도시가 두 홍보 정책 중 하나를 골라야 하고 합의한 관찰 기간과 안전 제약이 있는 되돌릴 수 있는 시범을 할 수 있다."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose, value_conflict]
+    rationale: "안전한 학습 시험이 있는 실천적 정책 선택이 중심이다."
+  - id: pragmatism-positive-03
+    kind: positive
+    prompt: "두 명칭을 둘러싼 긴 논쟁이 결정이나 예측을 바꾸지 않는다. 이 맥락에서 실질적으로 같은지 확인하라."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "논쟁이 관찰 가능한 실천 차이를 만드는지 확인하는 것이 핵심이다."
+  - id: pragmatism-negative-01
+    kind: negative
+    prompt: "정책 출처가 보고 의무와 공개 금지를 정한다. 허용된 행동만 비교하라."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "구속 의무·금지가 실천 결과 비교 전에 행동 집합을 제한한다."
+  - id: pragmatism-negative-02
+    kind: negative
+    prompt: "제품 팀이 해결안을 고르기 전에 사용자의 힘든 순간·기능적·정서적·사회적 과업·전환 힘을 찾아야 한다."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "병목은 이미 정해진 해석의 결과 비교가 아니라 사용자 진전 발견이다."
+  - id: pragmatism-mechanical-01
+    kind: mechanical
+    prompt: "두 정책 설명을 결과를 비교하거나 하나를 권하지 말고 인접한 두 열에 배치하라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "열 서식은 기계적 작업이다."
+  - id: pragmatism-explicit-01
+    kind: explicit
+    prompt: "pragmatism을 사용해 두 사건 대응 지침이 실제로 만드는 차이를 비교하고 되돌릴 수 있는 모의 시험을 제안하라."
+    expected_route: pragmatism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, practical_consequence, choose]
+    rationale: "맥락이 정해진 결과 비교와 시험을 방법과 함께 명시적으로 요청했다."
+  - id: pragmatism-insufficiency-01
+    kind: insufficiency
+    prompt: "선택지와 성공 기준을 주지 않고 마음이 편하고 유용해 보이는 해석이 참이라고 선언하라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [practical_consequence, decisive_input_missing]
+    rationale: "선택지·기준·관찰 결과가 없으면 유용성을 판단할 수 없다."

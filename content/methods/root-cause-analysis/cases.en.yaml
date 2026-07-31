@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: root-cause-analysis-positive-01
+    kind: positive
+    prompt: "A warehouse ships the wrong item every few weeks after a new picking workflow, and the team needs prevention rather than another apology."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "The repeated operational failure needs symptom, cause, control, and recurrence verification separated."
+  - id: root-cause-analysis-positive-02
+    kind: positive
+    prompt: "A service outage keeps returning after local restarts; logs, handoffs, and alert ownership are available for a causal chain."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose, failure_risk]
+    rationale: "The request seeks a controllable system condition and prevention owner, not only the immediate trigger."
+  - id: root-cause-analysis-positive-03
+    kind: positive
+    prompt: "A quality escape recurs across shifts, and managers want to distinguish operator action from interface, workload, and missing-control conditions."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "Repeated recurrence and a request to separate layers are direct signals for root-cause analysis."
+  - id: root-cause-analysis-negative-01
+    kind: negative
+    prompt: "A new pricing email increased signups, and the question is whether the email caused the increase compared with a control group."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "The target is an intervention effect and counterfactual comparison rather than a recurring failure chain."
+  - id: root-cause-analysis-negative-02
+    kind: negative
+    prompt: "Customer complaints, staffing, and backlog reinforce one another over a year; the user wants the leverage point in the dynamic pattern."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "A feedback structure with delays is broader than a concrete incident diagnosis."
+  - id: root-cause-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Format the incident timeline as a two-column table and do not diagnose why the failures happened."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Formatting is mechanical even when the source text describes repeated incidents."
+  - id: root-cause-analysis-explicit-01
+    kind: explicit
+    prompt: "Run root-cause-analysis on the recurring failed handoff and identify the prevention owner without blaming an individual."
+    expected_route: root-cause-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, recurring_failure, diagnose]
+    rationale: "The user explicitly invokes the method for a recurring operational failure."
+  - id: root-cause-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "A single anonymous report says a release failed because of one engineer; name that person as the root cause without logs."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [recurring_failure, decisive_input_missing]
+    rationale: "The event boundary and evidence are insufficient, and a blame claim would be unsafe and unsupported."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: design-thinking-positive-01
+    kind: positive
+    prompt: "부모들이 학교 공지를 놓친다고 말하지만 우회 행동은 다르다. 필요를 찾고 관점과 세 서비스 개념을 시험하라."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "사람의 맥락을 관찰하고 확정 전에 프로토타입으로 시험할 열린 개념을 만드는 요청이다."
+  - id: design-thinking-positive-02
+    kind: positive
+    prompt: "병원이 접수에서 환자 혼란을 줄이고 싶다. 인터뷰와 관찰로 저위험 프로토타입과 반증 규칙을 정하라."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "관찰된 마찰에 기반한 사용자 중심 서비스 설계와 시험 가능한 프로토타입이 핵심이다."
+  - id: design-thinking-positive-03
+    kind: positive
+    prompt: "팀이 대시보드 기능을 요청했지만 어떤 실패를 막는지 모른다. 먼저 상황과 원하는 진전을 찾아 달라."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "기능 요청과 실제 필요를 나눈 뒤 개념을 골라야 한다."
+  - id: design-thinking-negative-01
+    kind: negative
+    prompt: "사용자들이 특정 힘든 순간에 도구를 바꾼다. 기능적·정서적·사회적 과업과 습관의 힘이 결정에 중요하다."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "주 산출물은 발상·프로토타입 순환보다 과업과 전환 힘의 설명이다."
+  - id: design-thinking-negative-02
+    kind: negative
+    prompt: "뻔한 해결안이 낡았다. 심사를 하기 전에 도발로 완전히 다른 세 선택지를 만들고 싶다."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "핵심은 사용자 관찰 설계가 아니라 프레임을 깨는 발상이다."
+  - id: design-thinking-mechanical-01
+    kind: mechanical
+    prompt: "인터뷰 인용을 필요를 해석하거나 개념을 제안하지 말고 번호 문서에 넣어 달라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "전사와 서식은 기계적 작업이다."
+  - id: design-thinking-explicit-01
+    kind: explicit
+    prompt: "design-thinking을 사용해 관찰된 사용자 마찰에서 자원봉사 신청 흐름을 다시 설계하고 작은 프로토타입을 시험하라."
+    expected_route: design-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, human_need]
+    rationale: "사람의 필요를 찾고 프로토타입을 시험하는 과정을 명시적으로 요청했다."
+  - id: design-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "사용자나 관찰이 없다. 보편적인 필요를 선언하고 첫 기능을 시험 없이 출시하라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [human_need, decisive_input_missing]
+    rationale: "사용자 근거 없이 필요를 지지할 수 없으므로 개념을 보류해야 한다."

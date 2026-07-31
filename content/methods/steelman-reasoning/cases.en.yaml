@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: steelman-reasoning-positive-01
+    kind: positive
+    prompt: "A board dismisses a privacy objection as fearmongering; reconstruct the strongest fair version and say whether it changes the launch decision."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute, critique]
+    rationale: "The opposing concern is being dismissed and may contain a material risk that deserves its strongest fair form."
+  - id: steelman-reasoning-positive-02
+    kind: positive
+    prompt: "Two teams disagree about remote work, and each side has a coherent goal and evidence; identify the strongest version of the other side before responding."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute]
+    rationale: "A genuine opposing position needs charitable reconstruction, support requirements, and a fair response."
+  - id: steelman-reasoning-positive-03
+    kind: positive
+    prompt: "A policy critic is quoted only by a hostile label; recover the actual claim, its best premises, and the part the proposal should change."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, critique]
+    rationale: "The task explicitly separates the public claim from a weak characterization and tests its consequences."
+  - id: steelman-reasoning-negative-01
+    kind: negative
+    prompt: "A principle conflicts with several considered hard cases, and the group must revise the principle or judgments for greater coherence."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "Mutual revision among principles and cases is the main output, not reconstruction of an opponent."
+  - id: steelman-reasoning-negative-02
+    kind: negative
+    prompt: "A report contains claims, grounds, objections, and replies that need a neutral map before anyone evaluates the opposing side."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "The structural claim map should be established before a steelman is selected."
+  - id: steelman-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Translate the quoted opposition into Korean and preserve its tone without evaluating or strengthening the position."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Translation is mechanical and must not trigger reconstruction of the argument."
+  - id: steelman-reasoning-explicit-01
+    kind: explicit
+    prompt: "Use steelman-reasoning on the strongest case against our merger and tell me what evidence would make us change course."
+    expected_route: steelman-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, dismissed_opposition, argument_dispute]
+    rationale: "The user explicitly requests a fair opposing case for a consequential decision."
+  - id: steelman-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "No opposing statement exists; invent a sophisticated opponent and attribute it to the community so we can defeat it."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [dismissed_opposition, decisive_input_missing]
+    rationale: "There is no genuine public position, and inventing one would misrepresent people rather than steelman them."

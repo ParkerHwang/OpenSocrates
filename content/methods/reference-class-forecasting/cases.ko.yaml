@@ -1,0 +1,79 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: reference-class-forecasting-positive-1
+    kind: positive
+    prompt: "지역 철도 사업의 완공일을 추정하고 있습니다. 범위·조달·지형이 비슷한 완료 사업들의 실제 결과가 출처와 함께 정리되어 있습니다. 내부 일정과 관찰된 완료 분포를 비교하고, 확률을 꾸미지 않은 조정 근거를 설명해 주세요."
+    expected_route: reference-class-forecasting
+    expected_behavior: route
+    decisive_features:
+      - forecast
+      - reference_cases
+      - source_quality
+    rationale: "예측 목표와 단위가 있고 방어 가능한 참조집단과 완료 결과가 제공됩니다. 외부 관점의 범위를 요구하므로 라우팅하되, 출처가 관찰 결과를 지지할 뿐 꾸며낸 확률을 허용하지 않는다는 점을 보존해야 합니다."
+  - id: reference-class-forecasting-positive-2
+    kind: positive
+    prompt: "새 플랫폼으로 고객을 이전하는 데 걸릴 시간과 비용을 우리 팀이 낙관적으로 추정한 것 같습니다. 다른 팀이 완료한 비교 가능한 이전 사례와 실제 결과가 있습니다. 외부 관점으로 내부 계획을 점검하고 무엇이 범위를 바꿀지 밝혀 주세요."
+    expected_route: reference-class-forecasting
+    expected_behavior: route
+    decisive_features:
+      - forecast
+      - reference_cases
+      - hidden_assumptions
+    rationale: "완료된 비교 사례에 비추어 내부 전망을 보정하는 과제이며 원인 진단이나 선호 시나리오 작성이 아닙니다. 조정 근거와 전환 조건을 요구하지만 기준율이나 확률을 새로 만들지는 않습니다."
+  - id: reference-class-forecasting-positive-3
+    kind: positive
+    prompt: "비영리기관의 첫해 프로그램 참여 인원을 전망하려 합니다. 여러 이전 출시의 참여 결과, 대상 집단, 출시 조건이 기록되어 있지만 포괄 범위가 고르지 않습니다. 외부 관점의 범위를 만들고 포괄성 한계를 표시한 뒤 우리 계획과 비교해 주세요."
+    expected_route: reference-class-forecasting
+    expected_behavior: route
+    decisive_features:
+      - forecast
+      - reference_cases
+      - weak_sample
+    rationale: "목표와 완료 사례가 있으며 누락 범위가 중요한 불확실성으로 명시되었습니다. 관찰 분포를 사용하되 누락이 결정을 막으면 결론을 낮추거나 보류해야 하므로 이 방법이 적합합니다."
+  - id: reference-class-forecasting-negative-1
+    kind: negative
+    prompt: "이 독특한 과학 장비에는 완료된 비교 사례가 없습니다. 일정이 늦어진 원인이 어떤 공학적 선택이었는지 설명하고 교정 실험을 제안해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - no_defensible_reference_class
+      - diagnose
+    rationale: "방어 가능한 참조집단이 없다고 명시했고 요청도 원인 설명입니다. 외부 분포 없이 이 방법을 선택하면 내부 설명을 반복하게 되므로 라우팅하지 않습니다."
+  - id: reference-class-forecasting-negative-2
+    kind: negative
+    prompt: "5년 전략을 위해 서로 다른 외부 미래 네 가지를 구성하고 각 미래의 이름, 조기 신호, 행동을 제시해 주세요. 과거 사례로 납기나 비용 목표를 추정하지는 마세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - plan
+    rationale: "과거 결과 분포가 아니라 분기하는 미래와 조기 신호를 요구하는 시나리오 플래닝 요청입니다. 가까운 가족을 혼동하기 쉬운 부정 사례이므로 이 방법은 선택하지 않습니다."
+  - id: reference-class-forecasting-mechanical-1
+    kind: mechanical
+    prompt: "검증된 청구 금액 다섯 개를 지정한 통화로 합산해 총액만 알려 주세요. 예측, 비교 집단, 의사결정은 필요 없습니다."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "범위가 정해진 산술 계산입니다. 불확실한 예측 목표나 참조집단 판단이 없으므로 이 방법은 개입하지 않습니다."
+  - id: reference-class-forecasting-explicit-1
+    kind: explicit
+    prompt: "소프트웨어 출시일의 주 방법으로 reference-class-forecasting을 사용해 주세요. 비교 가능한 출시의 출처 있는 결과가 있으니 그 분포와 내부 계획을 비교하고, 집단을 방어할 수 없으면 결론을 보류해 주세요."
+    expected_route: reference-class-forecasting
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - forecast
+      - reference_cases
+    rationale: "사용자가 방법을 명시했고 목표, 비교 결과, 보류 규칙도 제공합니다. 명시 호출이어도 근거 상태를 표시하고 확률을 꾸미지 않아야 하므로 주 방법으로 실행합니다."
+  - id: reference-class-forecasting-insufficiency-1
+    kind: insufficiency
+    prompt: "이 프로젝트가 언제 끝나는지 말해 주세요. 내부 목표일만 있고 완료된 비교 사례도, 합의된 결과 정의도, 일정 판단에 필요한 경계도 없습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - no_defensible_reference_class
+      - boundary_sensitive
+      - decisive_input_missing
+    rationale: "결정적인 참조집단, 결과 정의, 판단 경계가 모두 빠져 있습니다. 정직한 결과는 필요한 입력을 제한적으로 요청하며 보류하는 것이지 분포를 만들어 권고하는 것이 아닙니다."

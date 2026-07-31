@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: mece-positive-01
+    kind: positive
+    prompt: "Are these customer segments mutually exclusive and collectively exhaustive for this single purchase decision?"
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "The user asks for separate overlap and coverage checks under one classification axis."
+  - id: mece-positive-02
+    kind: positive
+    prompt: "Redesign these risk categories so no case belongs to two categories and no material case is left out."
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "The requested output is a classification rule with overlap, gap, and granularity checks."
+  - id: mece-positive-03
+    kind: positive
+    prompt: "Check whether our issue-tree branches use one axis, have consistent granularity, and cover the stated universe."
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "This is a focused ME/CE audit rather than a broad recursive diagnostic."
+  - id: mece-negative-01
+    kind: negative
+    prompt: "Recursively decompose the causes of the outage and attach a test to every terminal branch."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "The task needs a complete logic tree, not only a classification-quality check."
+  - id: mece-negative-02
+    kind: negative
+    prompt: "Keep these overlapping labels because the overlap itself represents a meaningful customer identity."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [ambiguous_terms, human_need]
+    rationale: "Natural overlap is intentional, so forcing mutual exclusivity would distort the phenomenon."
+  - id: mece-mechanical-01
+    kind: mechanical
+    prompt: "Sort the supplied categories alphabetically and preserve their descriptions."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Alphabetical sorting is mechanical and does not evaluate category logic."
+  - id: mece-explicit-01
+    kind: explicit
+    prompt: "Explicitly use mece to audit the ownership buckets in this operating model."
+    expected_route: mece
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, category_overlap]
+    rationale: "The user explicitly names a single-axis overlap and coverage audit."
+  - id: mece-insufficiency-01
+    kind: insufficiency
+    prompt: "Tell me whether the categories are MECE, but do not state the universe, classification purpose, or category rules."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [category_overlap, decisive_input_missing]
+    rationale: "ME and CE cannot be assessed without a bounded universe, purpose, and membership rules."

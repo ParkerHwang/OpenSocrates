@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: evidence-hierarchy-positive-01
+    kind: positive
+    prompt: "Which of these studies directly supports the effect claim, and how strong should our wording be?"
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence, conflicting_sources]
+    rationale: "The task needs claim-to-source mapping, quality limits, and calibrated evidence strength."
+  - id: evidence-hierarchy-positive-02
+    kind: positive
+    prompt: "Compare expert opinion, a user survey, and the controlled experiment for applicability to this policy decision."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Different evidence designs must be weighed by directness, bias, and context fit."
+  - id: evidence-hierarchy-positive-03
+    kind: positive
+    prompt: "The sources disagree about the mechanism; identify the quality limits and whether the claim should be held."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, conflicting_sources, reconcile_evidence]
+    rationale: "A material source conflict requires evidence-state calibration rather than a simple vote."
+  - id: evidence-hierarchy-negative-01
+    kind: negative
+    prompt: "Use independent data and methods to see whether the conflicting sources converge on the same claim."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "The primary task is independence and convergence across streams, which is triangulation."
+  - id: evidence-hierarchy-negative-02
+    kind: negative
+    prompt: "Choose between these options based on which outcome best matches our stated values."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [value_conflict, choose]
+    rationale: "A value preference does not become an evidence hierarchy problem merely because sources exist."
+  - id: evidence-hierarchy-mechanical-01
+    kind: mechanical
+    prompt: "Sort the provided citations by publication date and preserve their titles."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Sorting citations is mechanical and does not assess quality or applicability."
+  - id: evidence-hierarchy-explicit-01
+    kind: explicit
+    prompt: "Explicitly use evidence-hierarchy to calibrate this medical-style claim to the available study designs."
+    expected_route: evidence-hierarchy
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, source_quality]
+    rationale: "The user explicitly invokes evidence-strength calibration for mixed sources."
+  - id: evidence-hierarchy-insufficiency-01
+    kind: insufficiency
+    prompt: "Say whether the claim is strongly supported, but provide no claim scope, sources, designs, or target context."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [source_quality, decisive_input_missing]
+    rationale: "Without claim-to-source inputs and applicability context, a strength label would be arbitrary."

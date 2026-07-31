@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: bayesian-updating-positive-01
+    kind: positive
+    prompt: "How should this positive test change the odds of the competing diagnoses given their different base rates?"
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "The task requires a prior, evidence direction, posterior change, and sensitivity to base rates."
+  - id: bayesian-updating-positive-02
+    kind: positive
+    prompt: "Update our confidence in the two launch hypotheses as these signals arrive sequentially."
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "Sequential evidence should update competing hypotheses without double-counting signals."
+  - id: bayesian-updating-positive-03
+    kind: positive
+    prompt: "Show whether the recommendation flips when the prior rate and likelihood assumptions vary within credible ranges."
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability]
+    rationale: "Sensitivity of a posterior and action threshold is the requested evidence judgment."
+  - id: bayesian-updating-negative-01
+    kind: negative
+    prompt: "Rank these sources by directness and study quality before deciding how strongly the claim may be stated."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "The task calibrates source quality rather than updating a defined hypothesis set."
+  - id: bayesian-updating-negative-02
+    kind: negative
+    prompt: "List the competing explanations for this anomaly and propose a test that separates them."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Explanation generation and discriminating tests belong to abduction when no prior update is requested."
+  - id: bayesian-updating-mechanical-01
+    kind: mechanical
+    prompt: "Copy the supplied prior values into the analysis worksheet."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copying values is mechanical and must not trigger probabilistic reasoning."
+  - id: bayesian-updating-explicit-01
+    kind: explicit
+    prompt: "Use bayesian-updating explicitly to revise confidence after this new fraud signal."
+    expected_route: bayesian-updating
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, new_evidence]
+    rationale: "The user explicitly selects evidence-driven confidence updating."
+  - id: bayesian-updating-insufficiency-01
+    kind: insufficiency
+    prompt: "Give the posterior probability, but provide no competing hypotheses, prior basis, or likelihood information."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [new_evidence, unknown_probability, decisive_input_missing]
+    rationale: "A numeric posterior without hypotheses and input provenance would be fabricated precision."

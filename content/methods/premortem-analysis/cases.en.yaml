@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: premortem-analysis-positive-01
+    kind: positive
+    prompt: "The team is about to migrate customer data and wants to imagine the migration failed, gather independent reasons, and set early warnings."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "A concrete chosen plan needs a failure narrative, leading signals, mitigations, and stop conditions."
+  - id: premortem-analysis-positive-02
+    kind: positive
+    prompt: "Before opening a new clinic, identify how the plan could fail across staffing, demand, operations, and regulation without assigning fake probabilities."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "The plan-level counterfactual failure exercise is explicit and should remain ordinal and evidence-aware."
+  - id: premortem-analysis-positive-03
+    kind: positive
+    prompt: "A unanimous launch team wants a structured challenge to surface silent assumptions, leading indicators, and pause conditions before commitment."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, hidden_assumptions, failure_risk]
+    rationale: "The request targets conformity and optimistic planning around a selected action."
+  - id: premortem-analysis-negative-01
+    kind: negative
+    prompt: "For each workflow step, list failure modes, effects, causes, controls, and owners in a forward risk register."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "A process-level failure and control inventory is more specific than an imagined plan retrospective."
+  - id: premortem-analysis-negative-02
+    kind: negative
+    prompt: "A defect has recurred for months and the team needs to find the controllable system condition that prevents recurrence."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "An existing recurrence calls for causal diagnosis rather than a pre-commitment exercise."
+  - id: premortem-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Copy the approved launch plan into the risk template without adding failure scenarios or recommendations."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copying is mechanical and does not ask for a judgment about the chosen plan."
+  - id: premortem-analysis-explicit-01
+    kind: explicit
+    prompt: "Run a premortem on the hiring plan and list the earliest signals that would make us pause."
+    expected_route: premortem-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, chosen_plan, failure_risk]
+    rationale: "The user explicitly names the method for a concrete plan before commitment."
+  - id: premortem-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "There is no chosen plan, but invent a failure retrospective and declare which option will fail with 90% certainty."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [chosen_plan, decisive_input_missing]
+    rationale: "Without a plan or defensible reference class, the exercise cannot support a probability or recommendation."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: assumption-mapping-positive-1
+    kind: positive
+    prompt: "공유 식사 계획 서비스를 검토하고 있습니다. 성공에 필요한 가정을 나누고 중요도와 근거를 분리한 뒤 첫 번째 안전한 확인을 고르세요. 인터뷰 메모는 사용자가 제공했지만 아직 독립적으로 확인하지 않았습니다."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, testable_claim, plan]
+    rationale: "가정 등록부, 중요도·근거 축, 가장 위험한 집합, 다음 확인이 모두 필요한 요청입니다. 인터뷰 메모는 검증된 출처가 아닌 사용자 제공 자료이므로 확률을 만들지 않고 그 상태를 공개해야 합니다."
+  - id: assumption-mapping-positive-2
+    kind: positive
+    prompt: "송장 검토를 자동화하려고 하지만 병목이 고객의 바람직성인지, 데이터 실현가능성인지, 규정 준수 실행가능성인지 모릅니다. 조달 전에 가정을 매핑하고 노출이 낮은 확인 단계를 고르세요."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, irreversible_choice, testable_claim]
+    rationale: "서로 다른 가정 영역과 사전 약속 결정이 있습니다. 아직은 우선순위화 문제이므로 출처가 있는 사실, 가정, 빠진 준수 근거를 구분해 다음 확인으로 연결해야 합니다."
+  - id: assumption-mapping-positive-3
+    kind: positive
+    prompt: "자원봉사자 일정 변경을 위한 실험안이 다섯 개 있습니다. 결정 중요도와 근거 강도로 가정을 우선순위화하고, 계획을 바꿀 판정 규칙과 안전한 관찰을 붙이세요."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [prioritized_assumptions, testable_claim, chosen_plan]
+    rationale: "완료된 실험이 아니라 이 방법의 핵심 우선순위 표면을 요구합니다. 숫자를 꾸미지 않고 서열형 표기와 검증됨·미검증·가정함·충돌됨 상태를 쓸 수 있습니다."
+  - id: assumption-mapping-negative-1
+    kind: negative
+    prompt: "결제 서비스가 이번 주에 세 번 실패했습니다. 인과 사슬과 통제 약점을 찾아 예방 담당자를 정하세요. 가정 지도는 만들지 마세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "이는 가정 매핑과 혼동하기 쉬운 근본 원인 분석 요청입니다. 필요한 결과는 원인 진단과 통제 조치이지, 검증할 믿음의 우선순위 목록이 아닙니다."
+  - id: assumption-mapping-negative-2
+    kind: negative
+    prompt: "목표 고객과 랜딩 페이지 실험은 이미 정했습니다. 실행 가능한 지표, 관찰 기간, 피벗 또는 지속 판정 규칙을 정의하세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, chosen_plan, plan]
+    rationale: "가정 선택은 이미 끝났고 시장 실험의 운영화를 요청합니다. 이 경우 매핑을 반복하지 말고 린 스타트업에서 테스트와 지표를 정의해야 합니다."
+  - id: assumption-mapping-mechanical-1
+    kind: mechanical
+    prompt: "다음 가정 라벨 여섯 개를 가나다순으로 정렬해 번호 목록으로 반환하세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "라벨 정렬에는 판단, 불확실성, 실험 우선순위가 필요하지 않습니다. 직접 수행하는 기계적 응답이 맞습니다."
+  - id: assumption-mapping-explicit-1
+    kind: explicit
+    prompt: "이 아이디어에 가정 매핑을 사용하세요. 가정, 중요도·근거 축, 가장 위험한 집합, 다음 안전한 확인을 보여 주고 근거 없는 주장은 미검증으로 표시하세요."
+    expected_route: assumption-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions, prioritized_assumptions, testable_claim]
+    rationale: "사용자가 방법과 공개 결과를 직접 지정했습니다. 요구한 근거 상태 표기가 출처와 불확실성의 경계를 함께 보존합니다."
+  - id: assumption-mapping-insufficiency-1
+    kind: insufficiency
+    prompt: "제안의 가정을 우선순위화하고 무엇을 먼저 확인할지 말해 주세요. 아직 결정 질문, 바라는 결과, 후보 가정, 확인 제약이 없습니다."
+    expected_route: assumption-mapping
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, hidden_assumptions, prioritized_assumptions, no_testable_implication]
+    rationale: "방법은 맞지만 결정적인 입력이 빠졌습니다. 가정이나 확인을 임의로 만들지 말고 멈춘 뒤, 결정과 권한 있는 안전 경계를 먼저 정해야 합니다."

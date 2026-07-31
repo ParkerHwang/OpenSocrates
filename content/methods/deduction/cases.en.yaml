@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deduction-positive-01
+    kind: positive
+    prompt: "Does the conclusion follow necessarily from these policy premises and the stated exception rule?"
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "The user asks for formal consequence from explicit premises and rules."
+  - id: deduction-positive-02
+    kind: positive
+    prompt: "Check whether this contract argument is valid and whether its premises are actually supported."
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Validity and soundness must be separated for an explicit rule-based argument."
+  - id: deduction-positive-03
+    kind: positive
+    prompt: "Find the hidden premise that makes this compliance conclusion appear to follow."
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "The task calls for standardization, hidden-premise exposure, and formal validity checking."
+  - id: deduction-negative-01
+    kind: negative
+    prompt: "Several explanations fit the outage; choose the best one and name the next discriminating test."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Competing causes and discriminating evidence call for abduction, not entailment."
+  - id: deduction-negative-02
+    kind: negative
+    prompt: "Estimate how broadly these observations support a general claim about future users."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "The requested extension is inductive and depends on sample representativeness."
+  - id: deduction-mechanical-01
+    kind: mechanical
+    prompt: "Number the supplied premises and preserve their wording."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Numbering a supplied list is mechanical."
+  - id: deduction-explicit-01
+    kind: explicit
+    prompt: "Use deduction explicitly to test whether the stated eligibility rule entails this case outcome."
+    expected_route: deduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, explicit_rules]
+    rationale: "The user explicitly invokes formal rule application and entailment checking."
+  - id: deduction-insufficiency-01
+    kind: insufficiency
+    prompt: "Say whether the conclusion is valid, but provide no premises, rule, scope, or conclusion text."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [explicit_rules, decisive_input_missing]
+    rationale: "Validity cannot be assessed without the argument form and material premises."

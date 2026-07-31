@@ -1,0 +1,86 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: decision-tree-analysis-positive-1
+    kind: positive
+    prompt: "지금 파일럿을 시작하거나 기다릴 수 있고, 측정된 파일럿 결과에 따라 확대·수정·중단 중 다음 행동이 달라집니다. 과거 사업 기록이 가지 결과의 범위를 정하고 결정권자는 정해진 검토 시점에 행동할 수 있습니다."
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - sequential_choice
+      - unknown_probability
+    rationale: "순서와 조건부 다음 행동이 핵심이며 과거 기록에서 확률과 결과의 출처를 확인할 수 있습니다."
+  - id: decision-tree-analysis-positive-2
+    kind: positive
+    prompt: "단계적 출시에서 즉시 확대할지 먼저 검사 결과를 모을지 선택해야 합니다. 각 결과에는 문서화된 결과 범위가 있고 관찰에 따라 다음 행동이 달라집니다. 각 가지의 출처와 되돌림 지점을 보여 주세요."
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - multiple_options
+      - sensitive_inputs
+    rationale: "순차 선택과 우연 결과, 의미 있는 되돌림 지점이 있습니다. 근거 없는 정밀함이 아니라 출처와 범위를 요구합니다."
+  - id: decision-tree-analysis-positive-3
+    kind: positive
+    prompt: "공급업체 계약을 지금 결정하거나 계약 확정 전에 문서화된 검사를 할 수 있습니다. 검사 결과에 따라 다른 업체를 고르거나 중단하며, 계약 담당자는 결과 값과 검토일을 정해 두었습니다."
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - irreversible_choice
+      - information_purchase
+    rationale: "검사가 되돌리기 어려운 약속 전에 다음 선택지를 바꿉니다. 지점별 확률을 꾸미지 않고 조건부 행동과 되돌림 지점을 보일 수 있습니다."
+  - id: decision-tree-analysis-negative-1
+    kind: negative
+    prompt: "가격, 접근성, 지원, 신뢰성을 기준으로 소프트웨어 세 개를 순위 매겨 주세요. 이후 관찰이나 조건부 행동은 없고, 이해관계자 가중치를 사용한 명시적 기준 비교를 원합니다."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "가족 혼동 가능성이 큰 trade-off-analysis 사례입니다. 순차 나무가 아니라 정적인 다기준 비교가 필요합니다."
+  - id: decision-tree-analysis-negative-2
+    kind: negative
+    prompt: "정책상 문서화된 조건을 충족한 모든 적격 신청은 승인해야 합니다. 팀이 더 싼 대안을 고를 수 있는지 결정해 주세요. 규정이 적용되면 재량은 없습니다."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "구속력 있는 규정이 행동을 정하므로 실제 결정 노드가 없습니다. 규정을 피하기 위해 나무를 사용해서는 안 됩니다."
+  - id: decision-tree-analysis-mechanical-1
+    kind: mechanical
+    prompt: "검증된 입력을 고정된 if-then 흐름도에 넣고 끝 결과의 라벨만 반환해 주세요. 우연 노드, 불확실한 결과, 재량 있는 선택은 없습니다."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "제공된 절차를 결정론적으로 실행하는 일이며 순차적 불확실성에 대한 판단이 아닙니다."
+  - id: decision-tree-analysis-explicit-1
+    kind: explicit
+    prompt: "이 단계적 출시에는 decision-tree-analysis를 사용해 주세요. 결정·우연 노드를 보이고 문서화된 가지 범위만 사용하며 되돌릴 수 있는 지점을 밝혀 주세요."
+    expected_route: decision-tree-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - sequential_choice
+      - multiple_options
+    rationale: "사용자가 방법을 명시적으로 호출하고 공개 출력 요구도 지정했습니다. 근거 없는 가지 값은 채우지 말고 검증되지 않음으로 남겨야 합니다."
+  - id: decision-tree-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "지금 출시할지 기다릴지 정해 주세요. 이후 행동은 불분명하고 가능한 결과의 범위를 정하는 출처도 없으며, 어떤 관찰이 되돌림을 허용하는지도 정해지지 않았습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - unknown_probability
+      - decisive_input_missing
+    rationale: "순서, 가지의 근거, 되돌림 조건이 모두 결정을 바꾸는 공백입니다. 확률이나 전략을 꾸미지 말고 보류해야 합니다."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: logic-tree-positive-01
+    kind: positive
+    prompt: "고객 이탈이 왜 늘었는지, 겹치지 않는 시험 가능한 가지로 원인을 어떻게 나눌까요?"
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, diagnose, plan]
+    rationale: "명시적 축, MECE 점검, 말단 시험이 필요한 why 트리 진단입니다."
+  - id: logic-tree-positive-02
+    kind: positive
+    prompt: "온보딩 실패를 줄이기 위한 이슈 트리를 만들고 모든 말단에 확인 단계를 붙여 주세요."
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, plan]
+    rationale: "커버리지와 실행 가능한 계층 분해가 요청한 결과입니다."
+  - id: logic-tree-positive-03
+    kind: positive
+    prompt: "이 넓은 위험 질문을 운영팀이 배정하고 시험할 수 있는 겹치지 않는 가지로 나눠 주세요."
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "계층 가지, 커버리지 점검, 실행 가능한 말단이 필요합니다."
+  - id: logic-tree-negative-01
+    kind: negative
+    prompt: "기존 범주가 겹치는지, 빠진 사례가 있는지만 확인해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "좁은 분류 감사는 재귀적인 트리 작성이 아니라 MECE 과제입니다."
+  - id: logic-tree-negative-02
+    kind: negative
+    prompt: "이 변수들 사이의 피드백 고리를 그리고 강화·균형 동학을 찾아 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "상호 의존하는 피드백은 계층과 맞지 않아 시스템 방법이 더 적합합니다."
+  - id: logic-tree-mechanical-01
+    kind: mechanical
+    prompt: "제공한 제목을 예시에 나온 동일한 트리 구조로 들여쓰기해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "지정된 들여쓰기 적용은 기계적 형식 작업입니다."
+  - id: logic-tree-explicit-01
+    kind: explicit
+    prompt: "logic-tree를 명시적으로 사용해 출시 지연의 원인을 구조화해 주세요."
+    expected_route: logic-tree
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, tangled_hierarchy]
+    rationale: "사용자가 계층적 진단 구조를 직접 선택했습니다."
+  - id: logic-tree-insufficiency-01
+    kind: insufficiency
+    prompt: "완전한 이슈 트리를 만들어 주세요. 루트 질문, 범위, 성공 지표는 주지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [tangled_hierarchy, decisive_input_missing]
+    rationale: "범위가 정해진 루트가 없으면 커버리지와 말단의 실행 가능성을 안전하게 판단할 수 없습니다."

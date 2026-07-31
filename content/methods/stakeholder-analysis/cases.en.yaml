@@ -1,0 +1,74 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "stakeholder-analysis-positive-1"
+    kind: positive
+    prompt: "We are rolling out a scheduling change that affects frontline staff, managers, customers, and a labor representative. Map their stakes, decision rights, likely concerns, consent needs, and engagement owners."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "The request requires an actor map tied to implementation, not a generic contact list. Concerns and effects are hypotheses until supported by records or conversations, so the route should expose their uncertainty."
+  - id: "stakeholder-analysis-positive-2"
+    kind: positive
+    prompt: "A public policy will affect residents who are not in the formal decision group. Identify the decision maker, affected-but-unrepresented groups, power and impact, conflict points, and an accountable participation plan."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "The prompt explicitly makes representation and implementation material. The map should distinguish formal authority from influence and should not infer harm or consent without evidence."
+  - id: "stakeholder-analysis-positive-3"
+    kind: positive
+    prompt: "Several organizations must adopt a shared data standard. Analyze who can approve, block, benefit from, or bear the cost, then assign the engagement owner and the response that would change our rollout plan."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "Adoption depends on distributed authority and implementation support. The route should publish evidence states for interests and impacts rather than treating organizational roles as proof of agreement."
+  - id: "stakeholder-analysis-negative-1"
+    kind: negative
+    prompt: "All decision participants agree on the objective and the affected group is not material. Compare the two feasible vendors against cost, reliability, and delivery time."
+    expected_route: "trade-off-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "multiple_options"
+      - "multiple_objectives"
+    rationale: "The people question is settled; the remaining judgment is a trade-off comparison. Stakeholder analysis would add a decorative map instead of resolving the choice."
+  - id: "stakeholder-analysis-negative-2"
+    kind: negative
+    prompt: "Scan the political, economic, social, technological, environmental, and legal changes that could affect our product strategy."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "The request may concern strategy, but its decisive output is an external factor register. This is a likely family confusion with PESTEL analysis, not a stakeholder map."
+  - id: "stakeholder-analysis-mechanical-1"
+    kind: mechanical
+    prompt: "Remove duplicate names from this contact list and sort the remaining names alphabetically."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - "mechanical"
+      - "mechanical"
+    rationale: "The task only transforms supplied text. It does not require assessing stakes, power, consent, or implementation."
+  - id: "stakeholder-analysis-explicit-1"
+    kind: explicit
+    prompt: "Use stakeholder analysis for this hospital workflow change. Show decision rights, affected groups, power and impact evidence, conflicts, engagement owners, and a flip condition."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: explicit_primary
+    decisive_features:
+      - "explicit_method"
+      - "stakeholder_conflict"
+    rationale: "The user directly names the method and its public fields, so it remains primary. The response must still label inferred concerns and unverified effects instead of presenting them as settled."
+  - id: "stakeholder-analysis-insufficiency-1"
+    kind: insufficiency
+    prompt: "Should we proceed with the new attendance policy? I have not identified the decision owner, affected groups, authority path, time horizon, or evidence about the policy's effects."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: hold
+    decisive_features:
+      - "decisive_input_missing"
+      - "interacting_actors"
+    rationale: "Implementation support may be decisive, but the actor boundary and authority are absent. The method should hold and ask for the smallest missing facts rather than declare consent or opposition."

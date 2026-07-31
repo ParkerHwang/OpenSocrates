@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pyramid-principle-positive-01
+    kind: positive
+    prompt: "검증된 분석을 권고부터 제시하고 묶은 근거와 상세를 뒤에 두는 임원용 메모로 바꿔 주세요."
+    expected_route: pyramid-principle
+    expected_behavior: route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "기초 판단은 준비됐고 병목은 결론 우선 전달 구조입니다."
+  - id: pyramid-principle-positive-02
+    kind: positive
+    prompt: "보고서의 핵심 생각을 맨 위에 두고 각 절이 겹치지 않게 이를 뒷받침하도록 다시 구성해 주세요."
+    expected_route: pyramid-principle
+    expected_behavior: route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "최상위 답, 묶은 근거, 수직 요약, 수평 순서가 필요한 요청입니다."
+  - id: pyramid-principle-positive-03
+    kind: positive
+    prompt: "긴 의사결정 분석을 임원이 빠르게 읽게 만들되 불확실성과 대안은 숨기지 마세요."
+    expected_route: pyramid-principle
+    expected_behavior: route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "이미 판단된 분석을 구조화하면서 중요한 불확실성을 보존해야 합니다."
+  - id: pyramid-principle-negative-01
+    kind: negative
+    prompt: "권고를 지지하는 전제와 아직 풀리지 않은 가장 강한 반론을 찾아 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [argument_dispute, critique]
+    rationale: "답의 순서를 바꾸는 일이 아니라 논증 지지를 점검하는 과제입니다."
+  - id: pyramid-principle-negative-02
+    kind: negative
+    prompt: "이 권고가 지지되는지 결정해 주세요. 아직 증거와 대안은 검토하지 않았습니다."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, critique]
+    rationale: "전달 구조로 아직 끝나지 않은 판단을 대신할 수 없습니다."
+  - id: pyramid-principle-mechanical-01
+    kind: mechanical
+    prompt: "사내 스타일 제목을 적용하고 모든 문장은 현재 순서를 유지해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "고정 형식 지침의 적용은 기계 작업입니다."
+  - id: pyramid-principle-explicit-01
+    kind: explicit
+    prompt: "결론부터 나오는 이사회 업데이트로 다시 쓰기 위해 pyramid-principle을 명시적으로 사용해 주세요."
+    expected_route: pyramid-principle
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, explain]
+    rationale: "결론 우선 임원 커뮤니케이션을 위해 사용자가 방법을 직접 지정했습니다."
+  - id: pyramid-principle-insufficiency-01
+    kind: insufficiency
+    prompt: "결론을 먼저 배치해 주세요. 지배 질문, 결론, 증거, 독자 결정은 주지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [explain, decisive_input_missing]
+    rationale: "안정된 판단과 독자 결정이 없으면 최상위 답을 만들어내게 됩니다."

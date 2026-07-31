@@ -1,0 +1,59 @@
+{
+  "schema": "opensocrates.method-authoring/1.0.0",
+  "id": "trade-off-analysis",
+  "family": "decision_optimization",
+  "content_revision": 1,
+  "display_name": {
+    "en": "Trade-off Analysis",
+    "ko": "\ud2b8\ub808\uc774\ub4dc\uc624\ud504 \ubd84\uc11d"
+  },
+  "plain_action": {
+    "en": "Compare the viable options against the criteria that can change the choice.",
+    "ko": "\uc120\ud0dd\uc744 \ubc14\uafc0 \uc218 \uc788\ub294 \uae30\uc900\uc73c\ub85c \uc2e4\ud589 \uac00\ub2a5\ud55c \ub300\uc548\uc744 \ube44\uad50\ud569\ub2c8\ub2e4."
+  },
+  "participation": {
+    "judgment_only": true,
+    "allowed_answer_shapes": [
+      "decision_memo",
+      "direct_judgment"
+    ]
+  },
+  "routing": {
+    "positive_features": {
+      "multiple_options": 3,
+      "multiple_objectives": 3,
+      "choose": 2
+    },
+    "negative_features": {
+      "single_feasible_option": 2
+    },
+    "minimum_score": 4,
+    "contraindications": [
+      "binding_rule_without_discretion"
+    ]
+  },
+  "output_contract": {
+    "required_sections": [
+      "criteria",
+      "options",
+      "tradeoffs",
+      "recommendation",
+      "flip_condition"
+    ],
+    "max_questions": 2
+  },
+  "complements": {
+    "preferred": [
+      "sensitivity-analysis"
+    ],
+    "incompatible_secondary": []
+  },
+  "locales": [
+    "en",
+    "ko"
+  ],
+  "source_provenance": {
+    "predecessor_slug": "trade-off-analysis",
+    "reviewed_by": "pending"
+  }
+}

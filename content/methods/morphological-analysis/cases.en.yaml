@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: morphological-analysis-positive-01
+    kind: positive
+    prompt: "A public program can vary access channel, eligibility, timing, staffing, and feedback; build a coherent matrix and screen combinations before choosing a model."
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "Several independent dimensions create a structured qualitative option space with pairwise compatibility checks."
+  - id: morphological-analysis-positive-02
+    kind: positive
+    prompt: "A service redesign keeps optimizing one channel; explore combinations of delivery mode, cadence, ownership, and support level."
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "The team needs non-obvious combinations across coherent dimensions rather than another single-variable tweak."
+  - id: morphological-analysis-positive-03
+    kind: positive
+    prompt: "A strategy workshop needs conventional, extreme, and balanced configurations across four independent choices, with incompatible pairs shown."
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, choose]
+    rationale: "The required output is a parameter matrix, combination space, coherence screen, and representative concepts."
+  - id: morphological-analysis-negative-01
+    kind: negative
+    prompt: "The team cannot define dimensions independently and the main uncertainty is which conventional assumptions are truly irreducible constraints."
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, no_coherent_dimensions]
+    rationale: "Foundational constraint discovery must precede a morphological combination space."
+  - id: morphological-analysis-negative-02
+    kind: negative
+    prompt: "Only two feasible options exist and the decision turns on explicit criteria and trade-offs rather than exploring combinations."
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features: [multiple_options, choose]
+    rationale: "A compact comparison is sufficient when there is no meaningful dimension space to explore."
+  - id: morphological-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Export the existing parameter matrix as CSV and do not interpret or combine any values."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Exporting is mechanical."
+  - id: morphological-analysis-explicit-01
+    kind: explicit
+    prompt: "Use morphological-analysis to generate service configurations across channel, timing, ownership, and intensity, then screen them."
+    expected_route: morphological-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, combinable_dimensions]
+    rationale: "The user explicitly names the method and its dimension-combination task."
+  - id: morphological-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "There is only one inseparable dimension and no coherent values; create a large matrix and select a precise best combination."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [combinable_dimensions, no_coherent_dimensions]
+    rationale: "Without coherent dimensions or values, a matrix would create false structure and precision."

@@ -1,0 +1,74 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "pestel-analysis-positive-1"
+    kind: positive
+    prompt: "이 나라에 진입하기 전에 선거 의제, 인플레이션과 환율, 인구 변화, 플랫폼 기술, 배출 규정, 인허가 요건 중 출시 계획을 바꿀 수 있는 요인을 조사해 주세요."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "범위가 있는 외부 요인 조사와 전략 결정을 함께 요청합니다. 출처 날짜와 관할을 보존하고 확인하지 않은 정책이나 예측을 확정된 사실처럼 말하지 않아야 합니다."
+  - id: "pestel-analysis-positive-2"
+    kind: positive
+    prompt: "제품 확장이 고령 고객, 개인정보 보호 규칙, 클라우드 비용, 예상되는 에너지 가격 충격에 달려 있습니다. 투자 선택을 바꿀 수 있는 중요한 요인, 작동 경로, 신호를 찾아 주세요."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "일반적인 추세 목록이 아니라 중요한 외부 요인과 전략 함의를 요청합니다. 제시된 내용은 가설이므로 확인됨, 추론됨, 미검증 상태를 구분해야 합니다."
+  - id: "pestel-analysis-positive-3"
+    kind: positive
+    prompt: "우리의 5년 전략을 위해 근거 있는 외부 환경을 만들고, 어떤 변화가 기회·위협·관찰 신호인지와 각 함의를 뒤집을 조건을 보여 주세요."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "요인 기록을 전략 기간과 연결하고 증거 상태와 관찰 신호를 요구합니다. 근거 없는 전망이나 확률을 만들어서는 안 됩니다."
+  - id: "pestel-analysis-negative-1"
+    kind: negative
+    prompt: "우리 창고에서 반복되는 피킹 오류가 있습니다. 현지 공정을 추적해 실패 원인을 찾고 시정 조치를 제안해 주세요."
+    expected_route: "root-cause-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "recurring_failure"
+      - "diagnose"
+    rationale: "거시 환경이 아니라 지역 공정 내부의 원인이 문제입니다. 외부 요인 칸을 채우기보다 인과적 실패 분석으로 넘기는 것이 맞습니다."
+  - id: "pestel-analysis-negative-2"
+    kind: negative
+    prompt: "새 정책이 직원, 계약자, 고객, 대표되지 않은 지역 공동체에 영향을 줍니다. 이들의 권력, 이해, 예상 우려, 참여 책임자를 지도화해 주세요."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "정책이라는 외부 맥락은 있지만 필요한 산출물은 행위자와 참여 지도입니다. 여섯 환경 범주를 채우는 요청이 아니라 이해관계자 분석과 혼동하기 쉬운 사례입니다."
+  - id: "pestel-analysis-mechanical-1"
+    kind: mechanical
+    prompt: "제공된 여섯 요인 설명을 문구를 바꾸지 않고 P, E, S, T, E, L 열에 넣어 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - "mechanical"
+      - "mechanical"
+    rationale: "제공된 내용을 형식에 맞게 옮기는 작업일 뿐 중요도나 증거 상태를 판단할 필요가 없습니다."
+  - id: "pestel-analysis-explicit-1"
+    kind: explicit
+    prompt: "PESTEL 분석을 사용해 시장 진입 결정을 검토해 주세요. 중요한 요인만 남기고 증거 상태와 시간 범위를 표시하며 기회 또는 위협 함의를 말해 주세요."
+    expected_route: "pestel-analysis"
+    expected_behavior: explicit_primary
+    decisive_features:
+      - "explicit_method"
+      - "macro_environment"
+    rationale: "사용자가 방법과 공개 산출물을 직접 요청하므로 우선 방법으로 유지합니다. 확인하지 않은 최신 규칙에 의존하는 함의는 보류해야 합니다."
+  - id: "pestel-analysis-insufficiency-1"
+    kind: insufficiency
+    prompt: "이 시장에 진입해야 할까요? 국가나 관할, 판단 기간, 제품 범위, 기준 상태, 현재 외부 조건의 출처를 아직 주지 않았습니다."
+    expected_route: "pestel-analysis"
+    expected_behavior: hold
+    decisive_features:
+      - "boundary_sensitive"
+      - "decisive_input_missing"
+    rationale: "외부 환경 조사에 적합한 질문이지만 빠진 범위와 출처 날짜가 함의를 바꿀 수 있습니다. 시장 맥락을 지어내지 말고 결정적인 범위 사실만 확인하며 보류해야 합니다."

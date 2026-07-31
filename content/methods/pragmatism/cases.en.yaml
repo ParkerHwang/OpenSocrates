@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pragmatism-positive-01
+    kind: positive
+    prompt: "Two project-management frameworks make different meeting, prioritization, and feedback choices; compare their observable consequences before selecting one."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "The interpretations differ in action and can be judged by bounded practical consequences."
+  - id: pragmatism-positive-02
+    kind: positive
+    prompt: "A city must choose between two outreach policies and can run a reversible pilot with an agreed observation window and safety constraints."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose, value_conflict]
+    rationale: "A practical policy choice with a safe learning test is the central need."
+  - id: pragmatism-positive-03
+    kind: positive
+    prompt: "A long argument about two labels changes no decision or prediction; determine whether the labels are practically equivalent in this context."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "The method should test whether the disagreement has any observable practical difference."
+  - id: pragmatism-negative-01
+    kind: negative
+    prompt: "A policy source imposes a reporting duty and prohibits disclosure; compare only the actions that remain permitted."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "Binding duties and prohibitions constrain the action set before practical consequences are compared."
+  - id: pragmatism-negative-02
+    kind: negative
+    prompt: "A product team needs to identify the user’s struggling moment, functional/emotional/social job, and switching forces before choosing a solution."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "The bottleneck is user progress discovery rather than consequence comparison of known interpretations."
+  - id: pragmatism-mechanical-01
+    kind: mechanical
+    prompt: "Put the two policy descriptions into adjacent columns without comparing their consequences or recommending one."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Column formatting is mechanical."
+  - id: pragmatism-explicit-01
+    kind: explicit
+    prompt: "Use pragmatism to compare these two incident-response playbooks by what they change in practice, with a reversible tabletop test."
+    expected_route: pragmatism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, practical_consequence, choose]
+    rationale: "The user explicitly requests a context-bound consequence comparison and test."
+  - id: pragmatism-insufficiency-01
+    kind: insufficiency
+    prompt: "The options and success criterion are unspecified; declare the comforting interpretation true because it feels useful."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [practical_consequence, decisive_input_missing]
+    rationale: "Usefulness cannot be assessed without options, a criterion, or observable consequences."

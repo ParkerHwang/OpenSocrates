@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: systems-thinking-positive-01
+    kind: positive
+    prompt: "A moderation backlog grows as delays increase user frustration, which creates more duplicate reports; the team wants the structure behind the pattern."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question, deep_uncertainty]
+    rationale: "The recurring pattern contains interacting flows, feedback, and delay rather than one isolated cause."
+  - id: systems-thinking-positive-02
+    kind: positive
+    prompt: "A conservation subsidy raises planting at first, then water scarcity and enforcement responses produce oscillating results across seasons."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "Seasonal behavior and policy resistance call for stocks, flows, balancing loops, and delays."
+  - id: systems-thinking-positive-03
+    kind: positive
+    prompt: "Customer trust accumulates slowly, referrals reinforce growth, and a support cut creates a delayed decline; find a leverage point."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "The request explicitly targets accumulation, reinforcing effects, delayed outcomes, and intervention leverage."
+  - id: systems-thinking-negative-01
+    kind: negative
+    prompt: "Two matched groups received different training, and the user asks whether the training changed test scores after one month."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "A bounded intervention comparison is sufficient; a full dynamic system is not required."
+  - id: systems-thinking-negative-02
+    kind: negative
+    prompt: "A single database outage has a clear timestamped trigger and the team needs the proximate and controllable root condition."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [diagnose, recurring_failure]
+    rationale: "A bounded incident diagnosis should lead unless evidence later reveals a recurring feedback pattern."
+  - id: systems-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Convert the stock and flow notes into Markdown bullets without explaining the system."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Reformatting is mechanical and does not ask for a judgment about system structure."
+  - id: systems-thinking-explicit-01
+    kind: explicit
+    prompt: "Use systems-thinking to explain why our local staffing fix is repeatedly offset by longer-term backlog growth."
+    expected_route: systems-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay, causal_question]
+    rationale: "The user explicitly invokes the method for a delayed, recurring system pattern."
+  - id: systems-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "A single complaint happened yesterday; draw a reinforcing loop and recommend a system-wide intervention without a time pattern."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "A one-off observation cannot establish dynamic behavior or loop direction."

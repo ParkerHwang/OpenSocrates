@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-reasoning-positive-01
+    kind: positive
+    prompt: "A matched pilot compares two clinics after one adopts a reminder call, and missed appointments fall only in the adopting clinic. Did the calls cause the change?"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "The question asks whether an intervention changed an outcome and requires timing, comparison, and competing explanations."
+  - id: causal-reasoning-positive-02
+    kind: positive
+    prompt: "After a checkout redesign, completion rises across several independently observed cohorts; the team wants to know whether the redesign caused the increase rather than seasonal demand."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, testable_claim, confounding]
+    rationale: "A repeated intervention-outcome relationship still needs a mechanism, counterfactual, and confounder check."
+  - id: causal-reasoning-positive-03
+    kind: positive
+    prompt: "A manager asks whether a four-day schedule improved retention, with start dates, comparison teams, and a possible workload confounder available."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "The causal target, timing, comparison, and plausible confounder are explicit enough for a bounded causal account."
+  - id: causal-reasoning-negative-01
+    kind: negative
+    prompt: "A support backlog grows for six months while staffing, demand, and response delays feed one another; the user asks why the pattern persists."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty]
+    rationale: "The main target is a recurring feedback pattern with delays, so a systems account should lead rather than a single causal comparison."
+  - id: causal-reasoning-negative-02
+    kind: negative
+    prompt: "A factory defect recurs after several handoffs, and the request is to separate symptoms, process causes, and missing controls."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "This is an operational recurrence diagnosis whose output is a causal chain and prevention owner, not only an exposure effect."
+  - id: causal-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Translate the sentence about a policy change and its outcome into Korean without evaluating whether the policy caused anything."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Translation is mechanical and must stay silent even though the text contains causal language."
+  - id: causal-reasoning-explicit-01
+    kind: explicit
+    prompt: "Use causal-reasoning to assess whether the new onboarding email changed activation, and show the comparison you would need."
+    expected_route: causal-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, causal_question]
+    rationale: "The user explicitly names the method for a judgment target, so it is primary subject to the evidence contract."
+  - id: causal-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "One employee recovered after taking a supplement; conclude that the supplement caused recovery and recommend it to the whole team."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [causal_question, decisive_input_missing]
+    rationale: "One uncontrolled anecdote lacks a defensible comparison and cannot support a causal or high-stakes recommendation."

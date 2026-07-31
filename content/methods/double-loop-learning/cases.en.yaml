@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: double-loop-learning-positive-1
+    kind: positive
+    prompt: "Our support team reduced response time with a new checklist, but customer escalations returned after two months. Compare the expected and actual results, inspect the service goal and rule that shaped the checklist, and design a safe learning test for a revised rule."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [recurring_failure, governing_rule, repeat_iteration, testable_claim]
+    rationale: "A procedural fix did not prevent recurrence, so the task asks whether the governing goal or rule should change. The route should separate the checklist action from the rule-level hypothesis and label escalation records by provenance."
+  - id: double-loop-learning-positive-2
+    kind: positive
+    prompt: "A release policy rewards shipping on the planned date, and teams repeatedly defer reliability work to meet it. Examine the goal, incentive, authority, and assumption behind the policy, then propose a bounded rule-change test."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [governing_rule, feedback_delay, recurring_failure, chosen_plan]
+    rationale: "The recurring behavior is plausibly produced by a governing policy rather than one execution error. The procedure can compare revised-rule candidates while keeping the causal explanation inferred or unverified until tested."
+  - id: double-loop-learning-positive-3
+    kind: positive
+    prompt: "After two training revisions, the same handoff omission appears in several teams. Build a result-gap record, distinguish a single-loop training fix from a change to the handoff rule, and specify what evidence would support each."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [recurring_failure, governing_rule, repeat_iteration, testable_claim]
+    rationale: "Multiple recurrence instances and prior single-loop fixes make a governing-rule review appropriate. The requested output is a gap, rule, evidence, and learning-test surface, not blame or a probability of recurrence."
+  - id: double-loop-learning-negative-1
+    kind: negative
+    prompt: "One deployment contains a typo that the existing review control caught immediately. Identify the exact execution defect and patch it without changing the release policy."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical, explicit_rules]
+    rationale: "A single bounded execution defect is already explained by the available evidence, and the user explicitly excludes a policy change. Double-loop learning would overreach; a focused defect response is appropriate."
+  - id: double-loop-learning-negative-2
+    kind: negative
+    prompt: "We have a target user and a pricing hypothesis. Design a reversible landing-page test, choose an actionable metric, and define the pivot-or-persevere decision rule."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, plan, human_need]
+    rationale: "This is a lean-startup experiment-design request, a likely family confusion. It does not report a recurring result gap or ask to revise a governing rule."
+  - id: double-loop-learning-mechanical-1
+    kind: mechanical
+    prompt: "Convert the three incident durations from minutes to hours and return the results in the same order."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Unit conversion is deterministic and contains no recurring gap, governing variable, or learning-test judgment."
+  - id: double-loop-learning-explicit-1
+    kind: explicit
+    prompt: "Use double-loop learning. Show the result gap, the governing assumption or rule, the evidence state, a revised rule candidate, and a safe learning test; do not assign personal blame."
+    expected_route: double-loop-learning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, recurring_failure, governing_rule, testable_claim]
+    rationale: "The user explicitly invokes the method and its public contract. The no-blame instruction is consistent with examining rules, authority, incentives, and evidence rather than inferring intent."
+  - id: double-loop-learning-insufficiency-1
+    kind: insufficiency
+    prompt: "Our team keeps failing. Tell us which belief or policy must change and what experiment to run. We have no expected result, observed record, recurrence boundary, or current rule to inspect."
+    expected_route: double-loop-learning
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, recurring_failure, governing_rule]
+    rationale: "The method may fit, but the decisive gap and governing rule are absent. It must hold rather than invent a deep explanation or attribute the problem to mindset."

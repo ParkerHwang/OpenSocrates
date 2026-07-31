@@ -1,0 +1,87 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: cost-benefit-analysis-positive-1
+    kind: positive
+    prompt: "We must choose between a new service and the current baseline. The finance ledger gives implementation and operating costs, the pilot report gives measured uptake, and the main question is whether benefits justify the costs over the stated horizon."
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "A baseline and multiple options are explicit, and the material benefits and costs have identifiable provenance. Non-monetary effects may remain separate, but the comparison is decision-relevant."
+  - id: cost-benefit-analysis-positive-2
+    kind: positive
+    prompt: "Compare two public-health programmes against doing nothing. Administrative records describe delivery costs, an evaluation reports measured outcomes, and the decision must show who pays, who benefits, and which safety or equity effects cannot be reduced to money."
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - practical_consequence
+    rationale: "The task asks for a baseline economic comparison with distribution and non-compensable values. The outcome evidence is labelled by source rather than treated as guaranteed."
+  - id: cost-benefit-analysis-positive-3
+    kind: positive
+    prompt: "A replacement project has upfront costs and benefits arriving at different times. Use the approved planning horizon and the organisation's documented discount rule, then show how the implication changes if the documented assumptions move within their supported range."
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - sensitive_inputs
+    rationale: "Timing, a real calculation boundary, and sensitivity to sourced assumptions make this a cost-benefit comparison. The prompt supplies provenance rather than inviting a default rate or invented certainty."
+  - id: cost-benefit-analysis-negative-1
+    kind: negative
+    prompt: "A safety regulation mandates one inspection step for every facility, and the team asks whether it is legally permissible to skip it. No discretionary option remains; the controlling text is the decisive evidence."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "This is a duties-and-rules question with no genuine choice. A net-benefit calculation must not be used to trade away a binding requirement."
+  - id: cost-benefit-analysis-negative-2
+    kind: negative
+    prompt: "Choose the best of three designs using reliability, accessibility, ecological impact, and user dignity. The requester explicitly rejects monetising dignity and has no defensible prices for the other criteria; they want a transparent criteria comparison instead."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - no_coherent_dimensions
+    rationale: "The likely family confusion is trade-off-analysis: the decision needs explicit criteria and non-compensable constraints, not a forced monetary total."
+  - id: cost-benefit-analysis-mechanical-1
+    kind: mechanical
+    prompt: "Apply the supplied spreadsheet formula to these already verified costs and benefits and return the arithmetic total. No option, baseline judgment, uncertainty, or recommendation is requested."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "This is a fixed calculation with no discretionary comparison. The method should stay silent while a mechanical calculation path handles the formula."
+  - id: cost-benefit-analysis-explicit-1
+    kind: explicit
+    prompt: "Use cost-benefit-analysis for this grant decision. Compare the funded option with the documented baseline, keep distributional effects visible, and hold any unsupported valuation rather than filling it in."
+    expected_route: cost-benefit-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - choose
+      - multiple_options
+    rationale: "The user explicitly invokes this method and states its required comparison surface. It remains primary while unsupported values stay assumed or unverified."
+  - id: cost-benefit-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "Tell me which of these two projects is better. I have no agreed baseline, no time horizon, no cost records, and only promotional claims about benefits."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - decisive_input_missing
+    rationale: "The decision-changing baseline and material inputs are absent and the available benefit claims have no provenance. The method must hold and request only the smallest decisive repair."

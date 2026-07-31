@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-loop-diagramming-positive-01
+    kind: positive
+    prompt: "대기열이 대기 시간을 늘리고, 긴 대기가 이탈을 만들며, 이탈이 다음 인력 수요를 바꾼다. 부호가 있는 루프와 지연을 그려 달라."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "이름 있는 변수·부호 연결·루프 유형·패턴을 바꾸는 지연을 요구한다."
+  - id: causal-loop-diagramming-positive-02
+    kind: positive
+    prompt: "사용자 증가가 리뷰를 늘리고 리뷰가 더 많은 사용자를 부르지만, 용량 한계가 균형 반응을 만든다. 두 루프를 찾아 달라."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "여러 방향성 루프와 균형 제약을 명시적으로 표현해야 한다."
+  - id: causal-loop-diagramming-positive-03
+    kind: positive
+    prompt: "정책이 단기 완화를 만들지만 집행이 행동을 바꾸는 데 오래 걸려 나중에 반등한다. 피드백 설명을 그려 달라."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "하나의 효과 추정이 아니라 지연된 정책 저항의 부호 루프 설명을 요구한다."
+  - id: causal-loop-diagramming-negative-01
+    kind: negative
+    prompt: "조직에 행위자·저량·부작용이 많다. 간결한 루프를 그리기 전에 최고의 지렛대를 정하고 싶다."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "집중된 루프 전에 넓은 시스템 경계와 지렛대를 정해야 한다."
+  - id: causal-loop-diagramming-negative-02
+    kind: negative
+    prompt: "반복 동학 없이 대조군과 비교해 한 약물이 측정 결과를 만들었는지 묻는 시험이 있다."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "범위가 정해진 반사실 효과 질문에는 피드백 루프가 필요하지 않다."
+  - id: causal-loop-diagramming-mechanical-01
+    kind: mechanical
+    prompt: "기존 루프 라벨을 평가하지 말고 발표 자료에 순서 그대로 복사해 달라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "복사와 서식은 인과 판단을 요구하지 않는다."
+  - id: causal-loop-diagramming-explicit-01
+    kind: explicit
+    prompt: "causal-loop-diagramming을 적용해 할인으로 수요가 늘지만 나중에 품절과 신뢰 하락이 생기는 이유를 보여 달라."
+    expected_route: causal-loop-diagramming
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay]
+    rationale: "사용자가 방법을 지정했고 반복되는 강화·균형 패턴을 제시했다."
+  - id: causal-loop-diagramming-insufficiency-01
+    kind: insufficiency
+    prompt: "두 변수가 한 번 함께 움직였지만 방향·시점·반복 여부를 모른다. 검증된 강화 루프를 그려 달라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "방향과 시간 정보 없는 단일 동반 변화로 부호 루프를 지지할 수 없다."

@@ -1,0 +1,112 @@
+name: OpenSocrates release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+
+jobs:
+  release:
+    name: Build and publish release
+    if: >-
+      startsWith(github.ref, 'refs/tags/') ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event.head_commit.message == 'Release OpenSocrates v1.0.0'
+    runs-on: macos-14
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Resolve and validate release identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < VERSION)"
+          tag="v${version}"
+          if [[ "${GITHUB_REF}" == refs/tags/* && "${GITHUB_REF_NAME}" != "${tag}" ]]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match VERSION ${version}" >&2
+            exit 1
+          fi
+          echo "RELEASE_VERSION=${version}" >> "${GITHUB_ENV}"
+          echo "RELEASE_TAG=${tag}" >> "${GITHUB_ENV}"
+
+      - name: Bootstrap locked environment
+        run: make bootstrap
+      - name: Activate locked native build toolchain
+        run: uv sync --locked --no-install-project --group build
+      - name: Run complete release gate
+        run: make release-check
+
+      - name: Create and verify release checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          asset="opensocrates-${RELEASE_VERSION}-codex-plugin.zip"
+          (
+            cd dist
+            shasum -a 256 "${asset}" > "${asset}.sha256"
+          )
+          node installer/opensocrates.mjs verify \
+            --asset "dist/${asset}" \
+            --checksum "dist/${asset}.sha256"
+
+      - name: Upload release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-check-${{ github.run_id }}
+          path: |
+            dist/
+            build/evidence/
+          if-no-files-found: warn
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          asset="dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip"
+          checksum="${asset}.sha256"
+          manifest="dist/opensocrates-${RELEASE_VERSION}-release-manifest.json"
+          limitations="dist/opensocrates-${RELEASE_VERSION}-limitations.json"
+          sbom="dist/opensocrates-${RELEASE_VERSION}-sbom.spdx.json"
+          release_assets=(
+            "${asset}"
+            "${checksum}"
+            "${manifest}"
+            "${limitations}"
+            "${sbom}"
+            "installer/opensocrates.mjs"
+          )
+          if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
+            gh release upload "${RELEASE_TAG}" "${release_assets[@]}" --clobber
+            gh release edit "${RELEASE_TAG}" \
+              --title "OpenSocrates ${RELEASE_VERSION}" \
+              --notes-file ".github/release-notes/v${RELEASE_VERSION}.md"
+          else
+            gh release create "${RELEASE_TAG}" "${release_assets[@]}" \
+              --target "${GITHUB_SHA}" \
+              --title "OpenSocrates ${RELEASE_VERSION}" \
+              --notes-file ".github/release-notes/v${RELEASE_VERSION}.md"
+          fi

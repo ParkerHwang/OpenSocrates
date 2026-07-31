@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: conceptual-analysis-positive-01
+    kind: positive
+    prompt: "What should our team mean by a safe release when engineers and compliance use the term differently?"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms, argument_dispute]
+    rationale: "Competing meanings and boundary cases must be tested before the release criterion can guide action."
+  - id: conceptual-analysis-positive-02
+    kind: positive
+    prompt: "Is this policy fair if employees disagree about whether fairness means equal treatment or equal opportunity?"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms, argument_dispute]
+    rationale: "The decision depends on competing operational meanings and their consequences for cases."
+  - id: conceptual-analysis-positive-03
+    kind: positive
+    prompt: "Define ‘ready for launch’ so the product and support teams can classify borderline cases consistently."
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms]
+    rationale: "A usable definition requires necessary and sufficient conditions plus tests of boundary cases."
+  - id: conceptual-analysis-negative-01
+    kind: negative
+    prompt: "Use the published API specification to check whether this request meets the documented required fields."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "The operational definition is already authoritative; the task is direct rule application."
+  - id: conceptual-analysis-negative-02
+    kind: negative
+    prompt: "Rank these three studies by design quality and explain which one directly supports the effect claim."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "The bottleneck is evidence quality and applicability, not the meaning of a contested term."
+  - id: conceptual-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Replace every occurrence of ‘launch-ready’ with ‘ready for launch’ in this file."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "A literal text replacement is mechanical and does not require conceptual analysis."
+  - id: conceptual-analysis-explicit-01
+    kind: explicit
+    prompt: "Explicitly use conceptual-analysis to define what ‘trustworthy’ means for this customer report."
+    expected_route: conceptual-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, ambiguous_terms]
+    rationale: "The user explicitly invokes the method for an ambiguous term with a reporting consequence."
+  - id: conceptual-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "Decide whether the disputed concept is satisfied, but provide no context, cases, or decision it controls."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [ambiguous_terms, decisive_input_missing]
+    rationale: "Without context and cases, an operational meaning would be arbitrary and cannot safely control a decision."

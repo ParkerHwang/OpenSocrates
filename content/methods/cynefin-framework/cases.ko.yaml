@@ -1,0 +1,58 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "cynefin-framework-positive-1"
+    kind: positive
+    prompt: "고객센터의 청구 오류는 정해진 의사결정표대로 처리하면 같은 입력에서 같은 해결책이 반복해서 나옵니다. 예외를 관찰하면서 응답을 표준화할지 판단해 주세요."
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, diagnose]
+    rationale: "사용자가 안정적인 관계와 대응 방식 선택을 설명했으므로 상황의 성격을 분류할 근거가 있습니다. 관찰은 사용자 제공 정보이므로 모든 미래 사례가 명확하다고 단정하지 않아야 합니다."
+  - id: "cynefin-framework-positive-2"
+    kind: positive
+    prompt: "여러 팀이 번아웃을 줄이려 하지만 각 개입이 업무량, 신뢰, 행동을 바꾸어 예상하지 못한 결과를 냅니다. 작은 탐색을 하고 결과를 관찰하며 다음 시도를 정할 방법을 골라 주세요."
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, deep_uncertainty]
+    rationale: "고정 절차보다 적응적인 패턴을 설명하므로 복합적 상황의 행동 방식과 학습 신호를 드러내야 합니다. 각 탐색의 성공 확률을 만들어 내서는 안 됩니다."
+  - id: "cynefin-framework-positive-3"
+    kind: positive
+    prompt: "생산 서비스가 여러 지역에서 지금 장애를 일으켜 고객이 접속하지 못하고 있습니다. 즉시 장애를 통제한 뒤 새 관찰에 따라 복구 방식을 조정하는 대응을 정해 주세요."
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, diagnose]
+    rationale: "즉시 행동 방식과 이후 재평가 신호를 정해야 하는 요청입니다. 여기서 장애 사실을 독립적으로 확인한 것은 아니므로 그 불확실성을 보존해야 합니다."
+  - id: "cynefin-framework-negative-1"
+    kind: negative
+    prompt: "이미 승인된 운영 단계를 문구를 바꾸지 않고 번호 매긴 체크리스트로만 바꿔 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "고정된 지시를 형식화하는 작업이므로 상황 분류 판단이 필요하지 않습니다. 방법 라우팅이나 추가 근거를 붙이지 않아야 합니다."
+  - id: "cynefin-framework-negative-2"
+    kind: negative
+    prompt: "우리의 확장 계획에 영향을 줄 정치, 경제, 사회, 기술, 환경, 법적 변화를 훑어 주세요."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features: [macro_environment, forecast]
+    rationale: "전략적 불확실성을 다룬다는 점은 가깝지만, 필요한 산출물은 상황 분류가 아니라 중요한 외부 요인 기록입니다. 같은 가족 안에서 혼동하기 쉬운 인접 사례입니다."
+  - id: "cynefin-framework-mechanical-1"
+    kind: mechanical
+    prompt: "이 장애 시각 목록을 시간순으로 정렬해 CSV로 반환해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "상황이나 행동 방식에 관한 판단이 없는 기계 작업이므로 방법 라우팅 없이 처리해야 합니다."
+  - id: "cynefin-framework-explicit-1"
+    kind: explicit
+    prompt: "Cynefin framework를 사용해 우리 서비스 장애가 즉시 행동, 전문가 분석, 안전한 탐색 중 무엇을 필요로 하는지 판단해 주세요. 분류 근거와 바뀌는 신호도 보여 주세요."
+    expected_route: "cynefin-framework"
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, context_disorder]
+    rationale: "사용자가 방법과 공개 산출물을 직접 지정했으므로 이 방법을 우선합니다. 다만 관찰이 사용자 제공인지 표시하고 분류를 확정 사실처럼 말하지 않아야 합니다."
+  - id: "cynefin-framework-insufficiency-1"
+    kind: insufficiency
+    prompt: "이 문제를 표준화할지 실험할지 정해 주세요. 문제의 내용, 원인, 시간 압박, 현재 근거는 아직 설명하지 않았습니다."
+    expected_route: "cynefin-framework"
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, context_disorder]
+    rationale: "대응 방식 선택이라는 질문 자체는 적합하지만 결정을 바꿀 관찰이 빠져 있습니다. 최소 사실을 묻고 보류할 수 있으며, 영역이나 확률을 만들어 내서는 안 됩니다."

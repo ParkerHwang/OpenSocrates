@@ -1,0 +1,26 @@
+{
+  "fixture_id": "TEST-CDX-post-compact-manual",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-07-15",
+  "host": "codex_cli",
+  "native_event": "PostCompact",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "PostCompact",
+    "turn_id": "TEST-turn-012",
+    "trigger": "manual"
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {}
+  },
+  "adapter_expectation": {
+    "normalized_event": "post_compaction",
+    "status": "accepted",
+    "projection": {
+      "trigger": "manual",
+      "active_task": false
+    }
+  },
+  "redaction": "No compacted content is present; only the documented trigger is used."
+}

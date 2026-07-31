@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: defeasible-reasoning-positive-01
+    kind: positive
+    prompt: "이 정책은 보통 적용됩니다. 현재 권고를 철회하게 할 예외나 새 사실은 무엇인가요?"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "디폴트 규칙에 따른 판단을 명시적 패배자와 철회 조건으로 관리해야 합니다."
+  - id: defeasible-reasoning-positive-02
+    kind: positive
+    prompt: "결론과 직접 모순되는 증거와 결론을 지지하는 규칙을 약화하는 증거를 구분해 주세요."
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "수정 가능한 판단에서 반박형과 근거약화형 패배자를 분리하는 요청입니다."
+  - id: defeasible-reasoning-positive-03
+    kind: positive
+    prompt: "일반 규칙과 더 구체적인 예외가 동시에 적용될 때 현재 잠정 상태는 무엇인가요?"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "특정성과 미해결 예외를 다루면서 무조건적 결론을 피해야 합니다."
+  - id: defeasible-reasoning-negative-01
+    kind: negative
+    prompt: "엄격한 보존 규칙을 모든 기록에 적용하고 결정적인 결과를 보고해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "예외 없는 규칙의 적용은 연역 또는 기계 작업입니다."
+  - id: defeasible-reasoning-negative-02
+    kind: negative
+    prompt: "출처를 설계 품질 순으로 정렬하고 가장 적합한 출처에 맞춰 주장의 강도를 조정해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "디폴트 규칙의 패배자보다 증거 위계가 핵심인 과제입니다."
+  - id: defeasible-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "디폴트 규칙과 예외 목록을 정책 템플릿에 복사해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "제공된 정책 문구 복사는 기계 작업입니다."
+  - id: defeasible-reasoning-explicit-01
+    kind: explicit
+    prompt: "일반적으로 유효한 승인 규칙과 예외를 평가하기 위해 defeasible-reasoning을 명시적으로 사용해 주세요."
+    expected_route: defeasible-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, exception_prone_rule]
+    rationale: "디폴트 규칙, 패배자, 철회 조건 분석을 사용자가 직접 요청했습니다."
+  - id: defeasible-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "디폴트 규칙을 적용해 주세요. 규칙 출처, 발동 사실, 범위, 가능한 예외는 주지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [exception_prone_rule, decisive_input_missing]
+    rationale: "디폴트와 발동 사실이 없으면 잠정 결론도 임의적이 됩니다."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: evidence-hierarchy-positive-01
+    kind: positive
+    prompt: "이 연구들 중 효과 주장을 직접 지지하는 것은 무엇이며 표현을 얼마나 강하게 해야 하나요?"
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence, conflicting_sources]
+    rationale: "주장-출처 연결, 품질 한계, 조정된 증거 강도가 필요합니다."
+  - id: evidence-hierarchy-positive-02
+    kind: positive
+    prompt: "전문가 의견, 사용자 설문, 통제 실험을 이 정책 결정에 적용할 수 있는지 비교해 주세요."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "서로 다른 설계를 직접성·편향·맥락 적합성으로 평가해야 합니다."
+  - id: evidence-hierarchy-positive-03
+    kind: positive
+    prompt: "메커니즘에 대해 출처가 충돌합니다. 품질 한계와 주장을 보류해야 하는지 알려 주세요."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, conflicting_sources, reconcile_evidence]
+    rationale: "중요한 출처 충돌을 단순 다수결이 아니라 증거 상태로 조정해야 합니다."
+  - id: evidence-hierarchy-negative-01
+    kind: negative
+    prompt: "독립적인 데이터와 방법으로 충돌하는 출처가 같은 주장에 수렴하는지 확인해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "핵심은 흐름의 독립성과 수렴 확인이므로 삼각검증이 맞습니다."
+  - id: evidence-hierarchy-negative-02
+    kind: negative
+    prompt: "우리의 명시된 가치에 더 잘 맞는 결과를 기준으로 선택지 중 하나를 골라 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [value_conflict, choose]
+    rationale: "출처가 있더라도 가치 선호가 중심이면 증거 위계 문제가 아닙니다."
+  - id: evidence-hierarchy-mechanical-01
+    kind: mechanical
+    prompt: "제공한 인용을 발행일 순으로 정렬하고 제목은 보존해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "인용 정렬은 품질이나 적용 가능성을 평가하지 않는 기계 작업입니다."
+  - id: evidence-hierarchy-explicit-01
+    kind: explicit
+    prompt: "가용한 연구 설계에 맞춰 이 의학적 주장 강도를 조정하기 위해 evidence-hierarchy를 명시적으로 사용해 주세요."
+    expected_route: evidence-hierarchy
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, source_quality]
+    rationale: "혼합 출처의 증거 강도 조정을 사용자가 직접 지정했습니다."
+  - id: evidence-hierarchy-insufficiency-01
+    kind: insufficiency
+    prompt: "주장이 강하게 지지되는지 말해 주세요. 범위, 출처, 설계, 대상 맥락은 주지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [source_quality, decisive_input_missing]
+    rationale: "주장-출처 입력과 적용 맥락이 없으면 강도 라벨은 임의적입니다."

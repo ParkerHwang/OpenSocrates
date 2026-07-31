@@ -1,0 +1,24 @@
+{
+  "fixture_id": "TEST-CDX-wrong-type",
+  "fixture_kind": "negative_input",
+  "captured_at": "2026-07-15",
+  "host": "codex_cli",
+  "native_event": "Stop",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "Stop",
+    "turn_id": "TEST-turn-014",
+    "stop_hook_active": "<synthetic-not-bool>",
+    "last_assistant_message": "<synthetic-public-message>"
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {}
+  },
+  "adapter_expectation": {
+    "normalized_event": null,
+    "status": "pass_through",
+    "diagnostic": "native_wrong_type"
+  },
+  "redaction": "The wrong type is synthetic and must not trigger a continuation or completion claim."
+}

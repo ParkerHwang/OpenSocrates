@@ -1,0 +1,31 @@
+{
+  "fixture_id": "TEST-CDX-session-start-resume",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-07-15",
+  "host": "codex_cli",
+  "native_event": "SessionStart",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "SessionStart",
+    "source": "resume",
+    "model": "synthetic-model",
+    "permission_mode": "default"
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {
+      "hookSpecificOutput": {
+        "hookEventName": "SessionStart",
+        "additionalContext": "<synthetic-resume-context>"
+      }
+    }
+  },
+  "adapter_expectation": {
+    "normalized_event": "session_started",
+    "status": "accepted",
+    "projection": {
+      "native_source": "resume"
+    }
+  },
+  "redaction": "Synthetic metadata only; no prior conversation or identity data."
+}

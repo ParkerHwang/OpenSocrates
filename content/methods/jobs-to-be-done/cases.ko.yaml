@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: jobs-to-be-done-positive-01
+    kind: positive
+    prompt: "작은 사업자가 세금 마감의 스트레스 뒤 회계사를 고용한다. 진전·정서적 안심·사회적 신호·대안을 찾아 달라."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "기능이나 인구통계보다 구체적인 힘든 순간과 여러 과업 차원이 고용을 설명한다."
+  - id: jobs-to-be-done-positive-02
+    kind: positive
+    prompt: "사용자가 새 도구 대신 느린 스프레드시트를 계속 쓴다. 밀고 당기는 힘·습관·불안·원하는 진전을 지도화하라."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "전환의 힘·비소비·이루려는 진전이 질문의 중심이다."
+  - id: jobs-to-be-done-positive-03
+    kind: positive
+    prompt: "교통 서비스가 늦은 밤 이동에서 승객이 이루려는 일을 알고 성공을 어떻게 관찰할지 정하고 싶다."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "상황별 기능·정서·사회적 진전과 성공 신호가 필요하다."
+  - id: jobs-to-be-done-negative-01
+    kind: negative
+    prompt: "관찰된 사용자 불편을 세 프로토타입 개념으로 만들고 제품 확정 전에 안전한 시험을 하고 싶다."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "주된 필요는 과업 힘 분석보다 관찰 기반 개념 생성과 프로토타입이다."
+  - id: jobs-to-be-done-negative-02
+    kind: negative
+    prompt: "제품 팀이 두 온보딩 선택지를 되돌릴 수 있는 시범에서 측정 결과로 비교하고 싶다."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "병목은 숨은 과업 발견이 아니라 실천 결과를 통한 선택지 비교이다."
+  - id: jobs-to-be-done-mechanical-01
+    kind: mechanical
+    prompt: "고객 인터뷰 전사를 파일별로 나누되 과업이나 동기를 추론하지 말라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "입력이 인터뷰여도 파일 정리는 기계적이다."
+  - id: jobs-to-be-done-explicit-01
+    kind: explicit
+    prompt: "jobs-to-be-done을 사용해 늦은 교대 시간에 통근자가 버스에서 전동 킥보드로 바꾸는 이유를 설명하라."
+    expected_route: jobs-to-be-done
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, user_progress]
+    rationale: "상황과 전환 힘 분석을 방법과 함께 명시적으로 요청했다."
+  - id: jobs-to-be-done-insufficiency-01
+    kind: insufficiency
+    prompt: "기능 목록만 있다. 모든 고객에게 통하는 보편적 과업과 시장 전체 성공률을 선언하라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [user_progress, decisive_input_missing]
+    rationale: "기능 목록만으로 상황별 과업이나 시장 전체 비율을 확립할 수 없다."

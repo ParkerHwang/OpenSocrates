@@ -1,0 +1,24 @@
+{
+  "fixture_id": "TEST-CDX-unknown-field",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-07-15",
+  "host": "codex_cli",
+  "native_event": "SessionStart",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "SessionStart",
+    "source": "startup",
+    "permission_mode": "default",
+    "synthetic_unknown_field": true
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {}
+  },
+  "adapter_expectation": {
+    "normalized_event": "session_started",
+    "status": "accepted_with_diagnostic",
+    "diagnostic": "native_unknown_field_ignored"
+  },
+  "redaction": "The additive field is synthetic and must not cross into the closed domain payload."
+}

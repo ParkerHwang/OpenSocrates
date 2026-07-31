@@ -1,0 +1,82 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: robust-decision-making-positive-1
+    kind: positive
+    prompt: "We must choose a flood-protection design for infrastructure that will operate for decades. Rainfall, land use, and funding conditions are deeply uncertain, and we need the option that stays above a published safety floor across plausible worlds rather than the option that wins under one forecast."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - irreversible_choice
+      - choose
+      - failure_risk
+    rationale: "The decision is consequential and hard to reverse, several uncertainties interact, and the user requests an acceptable action across plausible worlds. No probability-weighted optimum is required."
+  - id: robust-decision-making-positive-2
+    kind: positive
+    prompt: "Our supply-chain strategy must survive uncertain tariffs, demand, and supplier reliability over the next eight years. Compare the feasible strategies against failure and regret criteria, make the trade-offs visible, and add monitoring triggers for adaptive actions."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - irreversible_choice
+      - failure_risk
+      - feedback_delay
+    rationale: "The prompt asks for scenario-by-strategy stress testing, explicit failure criteria, and adaptive triggers. Those are the public outputs of robust decision making under deep uncertainty."
+  - id: robust-decision-making-positive-3
+    kind: positive
+    prompt: "We have three options for a regional transit investment, but the future mix of remote work, fuel prices, and public funding is not credible enough for one forecast. Identify a first move that remains acceptable, state its residual weaknesses, and say what evidence would change it."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - multiple_options
+      - choose
+      - new_evidence
+    rationale: "The user has a real choice, deep uncertainty, and a request for an acceptable rather than most-likely strategy. The requested residual weakness and flip condition prevent overclaiming robustness."
+  - id: robust-decision-making-negative-1
+    kind: negative
+    prompt: "The base-case demand forecast is well validated, the pilot can be reversed next month at negligible cost, and management only wants the action with the highest expected return under that case."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - source_quality
+      - sequential_choice
+      - choose
+    rationale: "The prompt says a single expected case is reliable and reversal is trivial, which is an explicit avoid condition. Robust stress testing would add no necessary decision value here."
+  - id: robust-decision-making-negative-2
+    kind: negative
+    prompt: "Create four named external futures about the energy market, describe how each could arise, and list early signals. Do not compare a current action against failure or regret criteria."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - plan
+    rationale: "This is a likely family confusion with scenario planning. It requests future construction and signposts but deliberately omits strategy stress testing and acceptance criteria."
+  - id: robust-decision-making-mechanical-1
+    kind: mechanical
+    prompt: "Calculate the annualized return from these verified cash flows using the stated formula and show the arithmetic. Do not choose among strategies."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "This is a bounded calculation with a supplied formula and no uncertain decision set. The method must not turn arithmetic into a robustness judgment."
+  - id: robust-decision-making-explicit-1
+    kind: explicit
+    prompt: "Use robust-decision-making as the primary method for our coastal adaptation choice. Test the options across plausible climate and budget worlds, use our minimum service level as the failure threshold, and hold if the worlds or threshold are missing."
+    expected_route: robust-decision-making
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - deep_uncertainty
+      - irreversible_choice
+      - failure_risk
+    rationale: "The user explicitly invokes the method and supplies its core decision frame, world testing, acceptance floor, and hold rule. Explicit invocation does not remove evidence and uncertainty constraints."
+  - id: robust-decision-making-insufficiency-1
+    kind: insufficiency
+    prompt: "Tell me which long-term strategy is robust. I have not listed the feasible actions, what failure means, the time horizon, or any uncertainties that should be tested."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - decisive_input_missing
+    rationale: "The action set, acceptance floor, horizon, and uncertainty register are decisive inputs. A robust recommendation cannot be supported, so the correct behavior is to hold and request only the missing decision inputs."

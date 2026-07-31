@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deontic-reasoning-positive-01
+    kind: positive
+    prompt: "A data-sharing proposal may be useful, but consent terms and a privacy policy determine what the team must, may, or must not do."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "The decision is constrained by duties, permission, prohibition, consent, and an identifiable policy source."
+  - id: deontic-reasoning-positive-02
+    kind: positive
+    prompt: "A clinician asks whether two obligations conflict under the named professional code and what interim actions are permitted."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "The requested output is sourced normative status and conflict handling, not outcome optimization alone."
+  - id: deontic-reasoning-positive-03
+    kind: positive
+    prompt: "A workplace policy appears to require reporting, allow an exception with consent, and prohibit sharing a sensitive detail; clarify the permitted options."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "The action set includes required, permitted, prohibited, and exception states from a policy."
+  - id: deontic-reasoning-negative-01
+    kind: negative
+    prompt: "Two service strategies should be compared by observable consequences and a reversible pilot, while no rule constrains the choice."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "The question is practical option comparison without a normative authority bottleneck."
+  - id: deontic-reasoning-negative-02
+    kind: negative
+    prompt: "A principle and several hard cases conflict, and the team wants to revise them for greater coherence where discretion exists."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "Mutual adjustment among principles and judgments is the more specific route."
+  - id: deontic-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Copy the policy clauses into a checklist without interpreting whether any action is required or permitted."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copying policy text is mechanical and does not ask for normative interpretation."
+  - id: deontic-reasoning-explicit-01
+    kind: explicit
+    prompt: "Use deontic-reasoning to separate what this contract permits, requires, prohibits, and leaves unresolved."
+    expected_route: deontic-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, duties_rights, explicit_rules]
+    rationale: "The user explicitly requests sourced normative classification."
+  - id: deontic-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "No governing policy, role, jurisdiction, or consent condition is supplied; declare the action legally required."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [duties_rights, decisive_input_missing]
+    rationale: "Authority and scope are missing, so a binding duty cannot be invented."

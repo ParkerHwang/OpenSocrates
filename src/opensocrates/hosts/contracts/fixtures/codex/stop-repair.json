@@ -1,0 +1,31 @@
+{
+  "fixture_id": "TEST-CDX-stop-repair",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-07-15",
+  "host": "codex_cli",
+  "native_event": "Stop",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "Stop",
+    "turn_id": "TEST-turn-007",
+    "permission_mode": "default",
+    "stop_hook_active": false,
+    "last_assistant_message": "<synthetic-public-message-with-repairable-marker>"
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {
+      "decision": "block",
+      "reason": "<synthetic-completion-repair-1-of-1>"
+    }
+  },
+  "adapter_expectation": {
+    "normalized_event": "completion_candidate",
+    "status": "continue_once",
+    "projection": {
+      "stop_already_continued": false,
+      "repair_count": 1
+    }
+  },
+  "redaction": "The reason is a marker only; Codex Stop output is JSON and never plain text."
+}

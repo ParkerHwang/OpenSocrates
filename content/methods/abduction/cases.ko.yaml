@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: abduction-positive-01
+    kind: positive
+    prompt: "전환율이 갑자기 떨어진 원인이 여러 가지라면 관찰된 사실에 가장 잘 맞는 설명은 무엇인가요?"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "이상 현상에 여러 설명이 맞으므로 잠정 최선 설명과 구별 증거가 필요합니다."
+  - id: abduction-positive-02
+    kind: positive
+    prompt: "일부 지역에서만 서비스가 실패합니다. 가능한 설명을 비교하고 어느 쪽을 가를 다음 관찰을 제안해 주세요."
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "불완전한 정보에서 진단하고 구별 가능한 확인을 제안하는 과제입니다."
+  - id: abduction-positive-03
+    kind: positive
+    prompt: "예상 밖의 검사 결과에 대한 현재 최선의 설명은 무엇이며 무엇이 생각을 바꾸게 하나요?"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "후보 설명을 비교하고 결론을 잠정으로 유지해야 합니다."
+  - id: abduction-negative-01
+    kind: negative
+    prompt: "이 명시된 전제와 규칙에서 결론이 필연적으로 따라오는지 확인해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules, explain]
+    rationale: "확정 전제와 규칙이 있으므로 최선의 설명 탐색보다 연역이 맞습니다."
+  - id: abduction-negative-02
+    kind: negative
+    prompt: "반복된 표본 관찰로 모집단에서 이 패턴이 얼마나 자주 나타나는지 추정해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "경쟁 원인을 비교하는 대신 표본에서 일반화하는 요청입니다."
+  - id: abduction-mechanical-01
+    kind: mechanical
+    prompt: "제공한 세 가설을 조사 템플릿에 복사해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "가설 복사는 진단을 활성화하지 않는 기계 작업입니다."
+  - id: abduction-explicit-01
+    kind: explicit
+    prompt: "구성 변경 뒤 배포가 실패한 이유를 진단하기 위해 abduction을 명시적으로 호출해 주세요."
+    expected_route: abduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, competing_explanations]
+    rationale: "이상 결과의 진단을 위해 사용자가 방법을 직접 지정했습니다."
+  - id: abduction-insufficiency-01
+    kind: insufficiency
+    prompt: "최선의 설명을 골라 주세요. 관찰, 대안, 시험 가능한 증거는 주지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [competing_explanations, decisive_input_missing]
+    rationale: "관찰과 경쟁 후보가 없으면 설명 선택은 추론이 아니라 이야기가 됩니다."

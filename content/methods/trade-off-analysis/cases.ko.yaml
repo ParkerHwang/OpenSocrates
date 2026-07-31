@@ -1,0 +1,90 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: trade-off-analysis-positive-1
+    kind: positive
+    prompt: "배송 속도, 신뢰성, 접근성, 총비용을 기준으로 세 공급업체 중 하나를 골라야 합니다. 조달팀은 거부 조건인 요건을 문서화했고 각 이해관계자는 나머지 기준의 선호를 날짜와 함께 제시했습니다."
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - stakeholder_conflict
+    rationale: "여러 선택지가 명시적 기준에서 경쟁하고 제약과 가중치의 출처가 분리되어 있습니다. 모든 가치가 서로 바뀐다고 가정하지 않고 포기 항목을 드러낼 수 있습니다."
+  - id: trade-off-analysis-positive-2
+    kind: positive
+    prompt: "제품팀이 성능, 유지보수성, 개인정보 보호, 이용자 노력을 균형 있게 고려해 설계를 골라야 합니다. 일부 평점은 시험 데이터가, 일부는 이용자 인터뷰가 지지하며 개인정보 보호는 점수가 아니라 최소 조건입니다."
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - source_quality
+    rationale: "서로 다른 기준과 근거를 출처와 함께 비교하고 개인정보 보호를 보상 불가 제약으로 유지해야 합니다. 혼합된 근거를 한 점수로 뭉개지 않을 수 있습니다."
+  - id: trade-off-analysis-positive-3
+    kind: positive
+    prompt: "두 인력 배치안이 커버리지, 연속성, 비용, 업무량에 서로 다른 영향을 줍니다. 팀은 순서형 선호만 합의했고 정밀한 수치 척도는 없습니다. 그 순서에서 어떤 안이 우세한지와 무엇이 바꾸면 추천이 뒤집히는지 보여 주세요."
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - sensitive_inputs
+    rationale: "순서형 상충 비교와 전환 조건이 요청되었습니다. 거짓 정밀함 없이 선택을 공개할 수 있습니다."
+  - id: trade-off-analysis-negative-1
+    kind: negative
+    prompt: "건축 규정이 특정 화재 안전 기준을 요구합니다. 적합한 설계는 하나뿐인데, 편의성 점수가 더 높다는 이유로 더 싼 부적합 설계를 선호해도 되는지 묻습니다."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "구속력 있는 요건을 보상 가능한 기준으로 취급하고 있습니다. trade-off-analysis가 아니라 deontic-reasoning 또는 자격 있는 준수 검토가 필요합니다."
+  - id: trade-off-analysis-negative-2
+    kind: negative
+    prompt: "설계를 고르기 전에 고객 조사를 할지 고민 중입니다. 오늘 설계를 비교하는 방법이 아니라 조사가 결정을 얼마나 바꿀 수 있고 지연을 감수할 가치가 있는지가 질문입니다."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - new_evidence
+      - sensitive_inputs
+    rationale: "가족 혼동 가능성이 큰 value-of-information 사례입니다. 현재 선택지에 가중치를 부여하기보다 추가 정보의 가치를 판단해야 합니다."
+  - id: trade-off-analysis-mechanical-1
+    kind: mechanical
+    prompt: "이미 검증된 기록을 제공된 단일 열 점수로 정렬하고 순서만 반환해 주세요. 기준 선택, 선호 충돌, 추천 설명은 요청하지 않습니다."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "고정 정렬이며 재량 있는 상충 기준이 없습니다."
+  - id: trade-off-analysis-explicit-1
+    kind: explicit
+    prompt: "이 입지 결정에는 trade-off-analysis를 사용해 주세요. 거부 조건과 선호를 분리하고 모든 평점의 출처를 보존하며 추천이 무엇을 포기하는지 보여 주세요."
+    expected_route: trade-off-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "사용자가 방법을 명시적으로 호출하고 공개 비교 계약을 요청했습니다. 근거 없는 평점은 가정됨 또는 검증되지 않음으로 남깁니다."
+  - id: trade-off-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "이름도 정하지 않은 대안 중 최선의 것을 골라 주세요. 기준, 최소 허용 조건, 누구의 우선순위를 반영할지 아직 합의하지 않았습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - decisive_input_missing
+    rationale: "실행 가능한 선택지, 결정 기준, 선호의 출처가 빠져 있습니다. 사후 점수화를 막기 위해 비교를 보류해야 합니다."

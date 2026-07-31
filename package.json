@@ -1,0 +1,40 @@
+{
+  "name": "opensocrates-installer",
+  "version": "1.0.0",
+  "description": "GitHub and npx installer for the OpenSocrates Codex reasoning framework.",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "opensocrates": "installer/opensocrates.mjs"
+  },
+  "files": [
+    "installer/",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "VERSION"
+  ],
+  "scripts": {
+    "test": "node --test installer/opensocrates.test.mjs && npm run test:npx",
+    "test:npx": "archive=$(npm pack --silent) && npx --yes --package=./$archive opensocrates help",
+    "pack:check": "npm pack --dry-run"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ParkerHwang/OpenSocrates.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ParkerHwang/OpenSocrates/issues"
+  },
+  "homepage": "https://github.com/ParkerHwang/OpenSocrates#readme",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "codex",
+    "reasoning",
+    "agent",
+    "installer"
+  ]
+}

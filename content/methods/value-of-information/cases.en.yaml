@@ -1,0 +1,83 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: value-of-information-positive-1
+    kind: positive
+    prompt: "We can launch now or run a user study first. A result about adoption would trigger different launch actions, the study method and direct cost are known, and the team has a fixed date after which delay is no longer acceptable."
+    expected_route: value-of-information
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - new_evidence
+      - sensitive_inputs
+    rationale: "The information has a stated action-changing path and a bounded collection burden. The case does not require an invented success probability or monetary value."
+  - id: value-of-information-positive-2
+    kind: positive
+    prompt: "Before signing a supplier contract, we can inspect a failure-risk variable that may change the supplier choice. The inspection source, cost, delay, and decision threshold are documented; decide whether inspection is worth doing."
+    expected_route: value-of-information
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - irreversible_choice
+      - sensitive_inputs
+    rationale: "The information arrives before an irreversible decision and maps to a different action. Provenance and delay can be shown without fabricating a posterior probability."
+  - id: value-of-information-positive-3
+    kind: positive
+    prompt: "A policy team must decide whether to scale a programme or pause for a targeted evaluation. The evaluation can distinguish a result that would scale from a result that would stop the programme, and the exposure and evaluation deadline are stated."
+    expected_route: value-of-information
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - testable_hypothesis
+      - feedback_delay
+    rationale: "The question is whether a feasible test can change the action before a stated deadline. It is not an open-ended request for more research."
+  - id: value-of-information-negative-1
+    kind: negative
+    prompt: "Find everything interesting about remote work and provide a literature summary. No decision, action threshold, uncertain variable, or deadline is specified."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - explain
+      - source_quality
+    rationale: "This is open-ended research without an action-changing decision. Information value cannot be assessed until a decision and threshold are supplied."
+  - id: value-of-information-negative-2
+    kind: negative
+    prompt: "A safety rule requires the approved protective equipment. Decide whether more research could justify using unapproved equipment because it is cheaper; the rule leaves no discretion."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - binding_rule_without_discretion
+      - single_feasible_option
+    rationale: "The likely family confusion is deontic-reasoning or qualified safety review: new information cannot authorise trading away a binding rule."
+  - id: value-of-information-mechanical-1
+    kind: mechanical
+    prompt: "Use the supplied sample-size equation and verified inputs to return the required sample size. Do not choose whether to run the study or interpret its decision value."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "This is a fixed calculation, not a judgment about whether information can change an action."
+  - id: value-of-information-explicit-1
+    kind: explicit
+    prompt: "Use value-of-information to decide whether this inspection is worth its cost and delay. State what finding would change the supplier decision and where the inspection stops."
+    expected_route: value-of-information
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - information_purchase
+      - irreversible_choice
+    rationale: "The user explicitly invokes the method and asks for its threshold, action-change, cost, delay, and stopping contract."
+  - id: value-of-information-insufficiency-1
+    kind: insufficiency
+    prompt: "Should we investigate further before acting? The current action, alternative action, uncertain variable, possible test, and tolerable delay have not been stated."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - information_purchase
+      - decisive_input_missing
+    rationale: "Without an action threshold and feasible information path, no action-changing value can be established. The method must hold and request the smallest safe clarification."

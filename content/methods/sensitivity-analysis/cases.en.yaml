@@ -1,0 +1,79 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: sensitivity-analysis-positive-1
+    kind: positive
+    prompt: "Our business case compares two warehouse designs using demand, labor cost, and energy assumptions. The baseline formula and decision threshold are documented, but the inputs have defensible ranges. Test the ranges, show switching values, and identify whether the choice is robust or fragile."
+    expected_route: sensitivity-analysis
+    expected_behavior: route
+    decisive_features:
+      - sensitive_inputs
+      - multiple_objectives
+      - choose
+    rationale: "A model, comparison, documented baseline, input ranges, and a choice threshold are present. The request is specifically to perturb inputs and expose a decision flip, not to invent probabilities."
+  - id: sensitivity-analysis-positive-2
+    kind: positive
+    prompt: "We have a staffing model for a service center with a published response-time target. Test the effects of arrival volume, handling time, and staffing assumptions within source-backed ranges, respecting their dependency, and prioritize the research that could change the staffing decision."
+    expected_route: sensitivity-analysis
+    expected_behavior: route
+    decisive_features:
+      - sensitive_inputs
+      - unknown_probability
+      - choose
+      - information_purchase
+    rationale: "The task has a model, threshold, uncertain inputs, and an explicit need to preserve dependency and prioritize information. Sensitivity analysis can report computed or ordinal changes without fabricating probabilities."
+  - id: sensitivity-analysis-positive-3
+    kind: positive
+    prompt: "An investment committee scores three projects across cost, impact, and execution risk. The weights are documented but disputed, and the recommendation may flip. Vary the weights and input scores over justified ranges, record the switching values, and state the fragile assumptions."
+    expected_route: sensitivity-analysis
+    expected_behavior: route
+    decisive_features:
+      - sensitive_inputs
+      - multiple_objectives
+      - choose
+    rationale: "This is a structured comparison with uncertain weights and a possible recommendation flip. The method should expose model sensitivity before a trade-off recommendation treats the weights as settled."
+  - id: sensitivity-analysis-negative-1
+    kind: negative
+    prompt: "We have no model or decision threshold. Review these conflicting studies, judge which source is credible, and reconcile their evidence about the safety claim."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - conflicting_sources
+      - source_quality
+      - decisive_input_missing
+    rationale: "This is a likely family confusion with evidence-hierarchy or evidence reconciliation. Without a model, rule, or threshold there is no input relationship to perturb."
+  - id: sensitivity-analysis-negative-2
+    kind: negative
+    prompt: "Explore four distinct ten-year external futures for our organization and describe preparations for each. There is no quantitative model, option score, or variable relationship to vary."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - decisive_input_missing
+    rationale: "The request is scenario construction under deep uncertainty, and it explicitly lacks a model or relationship. Sensitivity analysis would manufacture a baseline it cannot test."
+  - id: sensitivity-analysis-mechanical-1
+    kind: mechanical
+    prompt: "Multiply each verified quantity by the stated unit conversion factor and return the converted list. No model, comparison, or decision threshold is involved."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "This is deterministic unit conversion. There is no uncertain input range or decision result whose fragility could be analyzed."
+  - id: sensitivity-analysis-explicit-1
+    kind: explicit
+    prompt: "Use sensitivity-analysis as the primary method for our pricing decision. The baseline contribution model, disputed volume and margin ranges, and the minimum acceptable margin are documented; find the switching values and hold if any range is missing provenance."
+    expected_route: sensitivity-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - sensitive_inputs
+      - choose
+    rationale: "The user explicitly invokes the method and supplies its baseline, uncertain ranges, threshold, and provenance hold rule. The output must remain computed or labeled rather than probabilistic."
+  - id: sensitivity-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "Tell me whether the recommendation is sensitive. I have not supplied the baseline model, the inputs, their ranges, the decision threshold, or the formula used to make the recommendation."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - decisive_input_missing
+    rationale: "The baseline, perturbable inputs, ranges, and threshold are all decisive. The method must hold and request those bounded inputs instead of producing a generic sensitivity claim."

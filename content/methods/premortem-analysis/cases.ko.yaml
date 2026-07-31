@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: premortem-analysis-positive-01
+    kind: positive
+    prompt: "팀이 고객 데이터 이전을 앞두고 있다. 이전이 실패했다고 상상해 독립적인 이유와 조기 경보를 정하고 싶다."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "구체적인 선택 계획에 실패 서사·조기 신호·완화책·중단 조건이 필요하다."
+  - id: premortem-analysis-positive-02
+    kind: positive
+    prompt: "새 진료소를 열기 전에 인력·수요·운영·규제 측면의 실패 경로를 가짜 확률 없이 찾고 싶다."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "계획 수준의 실패 반사실 연습을 명시했고 순서형·근거 중심으로 다뤄야 한다."
+  - id: premortem-analysis-positive-03
+    kind: positive
+    prompt: "만장일치인 출시 팀이 확정 전에 숨은 가정·조기 지표·일시 중단 조건을 구조적으로 찾고 싶다."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, hidden_assumptions, failure_risk]
+    rationale: "선택 행동을 둘러싼 동조와 낙관적 계획을 도전하는 요청이다."
+  - id: premortem-analysis-negative-01
+    kind: negative
+    prompt: "업무 단계마다 실패 유형·영향·원인·통제·담당을 앞으로의 위험 목록으로 정리하라."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "과정 수준의 실패·통제 목록은 상상한 계획 회고보다 구체적인 방법이 필요하다."
+  - id: premortem-analysis-negative-02
+    kind: negative
+    prompt: "결함이 몇 달째 반복된다. 재발을 막는 통제 가능한 시스템 조건을 찾고 싶다."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "이미 발생한 반복을 진단하는 요청이지 확정 전 부검 연습이 아니다."
+  - id: premortem-analysis-mechanical-01
+    kind: mechanical
+    prompt: "승인된 출시 계획을 실패 시나리오나 권고를 추가하지 말고 위험 양식에 복사하라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "복사는 선택 계획에 대한 판단을 요구하지 않는 기계적 작업이다."
+  - id: premortem-analysis-explicit-01
+    kind: explicit
+    prompt: "premortem-analysis를 사용해 채용 계획을 검토하고 멈춰야 할 가장 이른 신호를 알려 달라."
+    expected_route: premortem-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, chosen_plan, failure_risk]
+    rationale: "확정 전 구체 계획에 방법을 명시적으로 요청했다."
+  - id: premortem-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "선택한 계획이 없는데도 실패 회고를 만들고 어떤 선택이 90% 확률로 실패한다고 선언하라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [chosen_plan, decisive_input_missing]
+    rationale: "계획과 방어 가능한 비교 사례가 없어 확률이나 권고를 지지할 수 없다."

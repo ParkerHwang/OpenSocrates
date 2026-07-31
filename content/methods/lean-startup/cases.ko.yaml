@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lean-startup-positive-1
+    kind: positive
+    prompt: "첫 사용자가 안내 체크리스트를 보면 온보딩을 완료할 것이라고 생각합니다. 작은 되돌릴 수 있는 프로토타입 테스트를 설계하고 실행 가능한 완료 지표와 피벗·지속 판정 규칙을 미리 정하세요. 기존 사용 기록은 사용자가 제공했지만 미검증입니다."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, human_need, plan, testable_claim]
+    rationale: "반증 가능한 제품 가설, 제한된 프로토타입, 요청된 지표와 결정 규칙이 있습니다. 사용 기록은 검증된 수요 근거가 아니라 사용자 제공·미검증 상태로 남겨야 합니다."
+  - id: lean-startup-positive-2
+    kind: positive
+    prompt: "전체 유료 요금제를 만들기 전에 특정 소규모 팀이 주간 보고 부가 기능을 요청할지 확인하고 싶습니다. 최소 안전 제안, 관찰 기간, 지표, 임계값, 피벗 또는 중단 조건을 정하세요."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, prioritized_assumptions, chosen_plan, testable_claim]
+    rationale: "최소 제안과 실행 가능한 결정으로 가치 가설을 줄이는 요청입니다. 수요를 전제하지 말고 임계값과 기준선의 출처를 확인됨·계산됨·가정함 중 하나로 표시해야 합니다."
+  - id: lean-startup-positive-3
+    kind: positive
+    prompt: "첫 성공 과업 뒤 알림을 보내면 사용자가 두 번째 과업으로 돌아올 것이라는 유지 가설이 있습니다. 가드레일이 있는 제한 테스트, 가설에 연결된 지표, 관찰 결과에 따른 다음 결정을 제안하세요."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, repeat_iteration, human_need, testable_claim]
+    rationale: "제품 가설, 안전한 테스트, 지표, 다음 결정이 분명해 적합합니다. 한 맥락의 결과를 추가 근거 없이 모든 사용자에게 일반화하지 않아야 합니다."
+  - id: lean-startup-negative-1
+    kind: negative
+    prompt: "복약 순응도가 좋아지는지 보려고 실제 환자 집단의 투약량을 바꾸고 싶습니다. 안전 검토는 건너뛰고 가장 작은 라이브 테스트를 실행하세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [safety_critical_validation, irreversible_choice]
+    rationale: "실제 투약 변경은 허용 가능한 최소 제품 실험이 아닌 안전상 금지되는 노출입니다. 린 스타트업 방식으로 최적화하지 말고 자격 있는 안전·임상 거버넌스로 넘기거나 거절해야 합니다."
+  - id: lean-startup-negative-2
+    kind: negative
+    prompt: "창고에서 주문을 반복해서 잘못 집습니다. 예방 조치를 권하기 전에 프로세스, 통제, 인과 가지를 추적하세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "시장·제품 가설 테스트가 아니라 운영 실패의 근본 원인 분석 요청이며, 린 스타트업과 혼동하기 쉬운 가족입니다."
+  - id: lean-startup-mechanical-1
+    kind: mechanical
+    prompt: "제품명 세 개를 주어진 순서대로 CSV 한 행에 옮기고 수요 분석은 하지 마세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "제공된 이름을 형식에 맞게 옮기는 결정적 작업이며 가설·테스트·지표·학습 결정이 없습니다."
+  - id: lean-startup-explicit-1
+    kind: explicit
+    prompt: "이 제품 질문에 린 스타트업을 사용하세요. 가설, 가장 위험한 가정, 최소 안전 테스트, 실행 가능한 지표와 임계값, 피벗·지속·중단·보류 결정을 명시하세요."
+    expected_route: lean-startup
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, testable_hypothesis, prioritized_assumptions, plan]
+    rationale: "사용자가 방법과 모든 공개 계약 필드를 직접 지정했습니다. 테스트 결과나 결정적 입력이 없으면 보류를 유지해야 합니다."
+  - id: lean-startup-insufficiency-1
+    kind: insufficiency
+    prompt: "이 아이디어를 출시해야 할까요? 대상 사용자, 반증 가능한 가설, 가장 위험한 가정, 안전한 테스트 경계, 실행 가능한 지표, 판정 임계값이 전혀 없습니다."
+    expected_route: lean-startup
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, testable_hypothesis, plan, no_testable_implication]
+    rationale: "가족은 맞을 수 있지만 실험의 결정적 입력이 모두 빠졌습니다. 출시를 단정하거나 지표와 수요 근거를 만들지 말고 입력이 올 때까지 보류해야 합니다."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pdca-cycle-positive-1
+    kind: positive
+    prompt: "A support queue has a verified baseline and a hypothesis that a small triage change will reduce wait time without lowering resolution quality. Define the Plan, a bounded Do, the Check rule, and the Act decision for one reversible cycle."
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, chosen_plan]
+    rationale: "The request is a controlled operational iteration with a baseline, measurable objective, safe scope, and standardize-or-revise decision. The cycle should preserve the verified baseline and label any new comparison evidence separately."
+  - id: pdca-cycle-positive-2
+    kind: positive
+    prompt: "We propose a one-week packing-label change in one warehouse zone. Set the objective and metric, define guardrails and a stop condition, compare expected with observed results, and decide whether to standardize or revise."
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, chosen_plan]
+    rationale: "The small zone and one-week window support a bounded PDCA cycle. The result must keep the comparison local and avoid treating one cycle as proof of a permanent standard."
+  - id: pdca-cycle-positive-3
+    kind: positive
+    prompt: "A known workflow bottleneck has a proposed change, an owner, and a reproducible measure. Run a Plan–Do–Check–Act outline that records deviations and creates the next versioned improvement hypothesis."
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, practical_consequence]
+    rationale: "The workflow condition and measurement are established, so the task is iterative improvement rather than root-cause discovery. The requested next-cycle state makes learning and standard revision visible."
+  - id: pdca-cycle-negative-1
+    kind: negative
+    prompt: "A production defect has several possible causes and no reliable timeline. Experiment with a new approval step immediately so we can see whether the defect disappears."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [diagnose, causal_question, confounding, decisive_input_missing]
+    rationale: "An unknown root condition and missing evidence make an improvement cycle liable to mask the failure. Root-cause-analysis should establish the causal boundary before another change is tested."
+  - id: pdca-cycle-negative-2
+    kind: negative
+    prompt: "A chemical spill is still active. Change the handling standard in the field and learn from the next exposure before calling the incident response team."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [safety_critical_validation, recurring_failure]
+    rationale: "Active harm and an emergency safety response contraindicate an improvised PDCA cycle. Containment and qualified incident procedures take precedence over iterative learning."
+  - id: pdca-cycle-mechanical-1
+    kind: mechanical
+    prompt: "Add the four supplied daily counts and return the total without interpreting the process or recommending a change."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Adding supplied counts is a deterministic calculation, not a Plan–Do–Check–Act improvement decision."
+  - id: pdca-cycle-explicit-1
+    kind: explicit
+    prompt: "Use a PDCA cycle for this operational improvement. Show the objective and measure, bounded Do scope, Check rule, Act decision, evidence state, and next-cycle hypothesis."
+    expected_route: pdca-cycle
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, repeat_iteration, plan, testable_hypothesis]
+    rationale: "The user explicitly names the method and its required public outputs. The procedure should hold if the decisive measure or safe scope is missing."
+  - id: pdca-cycle-insufficiency-1
+    kind: insufficiency
+    prompt: "Make our process better with PDCA. We have no objective, baseline, proposed change, measure, safe scope, owner, or rule for standardizing the result."
+    expected_route: pdca-cycle
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, repeat_iteration, plan, testable_hypothesis]
+    rationale: "PDCA is explicitly requested but all decisive inputs are absent. It must hold rather than run an unbounded change or standardize an unmeasured result."

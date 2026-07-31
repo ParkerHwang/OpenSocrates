@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deontic-reasoning-positive-01
+    kind: positive
+    prompt: "데이터 공유가 유용해 보여도 동의 조건과 개인정보 정책이 해야 할 일·해도 될 일·금지된 일을 정한다."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "식별 가능한 정책 출처에 의무·허용·금지·동의가 걸린 결정이다."
+  - id: deontic-reasoning-positive-02
+    kind: positive
+    prompt: "임상 담당자가 명시된 전문 규정 아래 두 의무가 충돌하는지와 임시로 허용되는 행동을 묻는다."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "단순 결과 최적화가 아니라 출처 있는 규범 상태와 충돌 처리가 필요한 질문이다."
+  - id: deontic-reasoning-positive-03
+    kind: positive
+    prompt: "직장 정책이 보고를 요구하고 동의가 있으면 예외를 허용하지만 민감한 세부 공유는 금지하는 것 같다. 허용 선택을 정리하라."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "정책에 요구·허용·금지·예외 상태가 함께 있는 행동 집합이다."
+  - id: deontic-reasoning-negative-01
+    kind: negative
+    prompt: "규정 제약 없이 두 서비스 전략을 관찰 가능한 결과와 되돌릴 수 있는 시범으로 비교하고 싶다."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "규범 권위보다 실천 결과로 선택지를 비교하는 질문이다."
+  - id: deontic-reasoning-negative-02
+    kind: negative
+    prompt: "원칙과 어려운 사례가 충돌한다. 재량이 있는 범위에서 더 정합적으로 수정하고 싶다."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "원칙과 판단의 상호 조정이 더 구체적인 경로다."
+  - id: deontic-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "정책 조항을 행동의무나 허용을 해석하지 말고 점검표에 복사해 달라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "정책 문장 복사는 규범 해석을 요청하지 않는 기계적 작업이다."
+  - id: deontic-reasoning-explicit-01
+    kind: explicit
+    prompt: "deontic-reasoning을 사용해 이 계약이 허용·요구·금지하고 미해결로 남기는 것을 나눠 달라."
+    expected_route: deontic-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, duties_rights, explicit_rules]
+    rationale: "출처 있는 규범 분류를 방법과 함께 명시적으로 요청했다."
+  - id: deontic-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "적용 정책·역할·관할·동의 조건을 주지 않고 행동이 법적으로 의무라고 선언하라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [duties_rights, decisive_input_missing]
+    rationale: "권위와 범위가 없으므로 구속 의무를 만들어낼 수 없다."

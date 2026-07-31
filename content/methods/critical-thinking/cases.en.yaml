@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: critical-thinking-positive-01
+    kind: positive
+    prompt: "A vendor report claims a 40% productivity gain from its own survey; assess the source, framing, missing comparison, and inference before procurement."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, source_quality]
+    rationale: "The claim bundle needs source, framing, logic, and alternative checks rather than a single citation lookup."
+  - id: critical-thinking-positive-02
+    kind: positive
+    prompt: "An executive memo says one pilot proves the policy works everywhere; identify the strongest claim, assumptions, omissions, and counterargument."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, argument_dispute]
+    rationale: "The request explicitly asks for broad critical evaluation of a claim bundle and its generalization."
+  - id: critical-thinking-positive-03
+    kind: positive
+    prompt: "Two credible commentators disagree about whether a safety program is effective, and the user wants a fair verdict without treating disagreement as proof of either side."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, conflicting_sources, argument_dispute]
+    rationale: "Separate source credibility, framing, logical support, and unresolved conflict are all material."
+  - id: critical-thinking-negative-01
+    kind: negative
+    prompt: "A debate contains a central claim, supporting grounds, objections, and replies that need a visible map of their links."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "The specific need is structural claim-ground-objection mapping, not a broad three-axis critique."
+  - id: critical-thinking-negative-02
+    kind: negative
+    prompt: "A source hierarchy must determine whether a clinical claim is directly supported by primary evidence or only by a summary."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Source quality and claim-to-source support are the decisive output."
+  - id: critical-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Copy the quoted claim and its source names into a review template without judging truth or relevance."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copying into a template is mechanical despite the content being a claim."
+  - id: critical-thinking-explicit-01
+    kind: explicit
+    prompt: "Use critical-thinking to review this investment memo and state what is verified, missing, and still uncertain."
+    expected_route: critical-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, critique]
+    rationale: "The method is explicitly requested for a judgment about a claim bundle."
+  - id: critical-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "The source is an unattributed screenshot with no date or underlying data; declare the headline true because it sounds plausible."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [critique, source_quality, decisive_input_missing]
+    rationale: "The central source and premise cannot be checked, so the verdict must remain held rather than become acceptance."

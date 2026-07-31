@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: boundary-critique-positive-01
+    kind: positive
+    prompt: "Should our city judge a bus redesign only by average commute time for current riders?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "The conclusion changes if non-riders, accessibility, neighborhoods, or the time horizon enter the boundary."
+  - id: boundary-critique-positive-02
+    kind: positive
+    prompt: "Who should count when we decide whether the workplace surveillance pilot succeeded?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "The requested success judgment depends on included workers, excluded contractors, ownership, and measured outcomes."
+  - id: boundary-critique-positive-03
+    kind: positive
+    prompt: "Does the coastal flood plan still make sense if we include renters and the next thirty years of relocation costs?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "Changing affected actors and time horizon can reverse who benefits, who pays, and which option is preferred."
+  - id: boundary-critique-negative-01
+    kind: negative
+    prompt: "Compare the two explicitly scoped vendors against the three fixed price and latency criteria."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [multiple_options, choose]
+    rationale: "The boundary, owner, horizon, and criteria are already explicit; the remaining task is option comparison."
+  - id: boundary-critique-negative-02
+    kind: negative
+    prompt: "Which paragraph has the stronger citation for the stated claim?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "This is a source-support question, not a question about who or what belongs inside the system boundary."
+  - id: boundary-critique-mechanical-01
+    kind: mechanical
+    prompt: "Move the listed stakeholders into a CSV with columns for name and role."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Formatting a supplied list is mechanical and must not trigger a judgment method."
+  - id: boundary-critique-explicit-01
+    kind: explicit
+    prompt: "Use boundary-critique to review whether our climate pledge excludes supply-chain workers."
+    expected_route: boundary-critique
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, boundary_sensitive]
+    rationale: "The user explicitly invokes the method for an affected-actor and scope question."
+  - id: boundary-critique-insufficiency-01
+    kind: insufficiency
+    prompt: "Tell me whether the recommendation changes when you include anyone affected, but do not provide the decision, population, or time horizon."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [boundary_sensitive, decisive_input_missing]
+    rationale: "The boundary-defining inputs are decisive and absent, so the method must hold rather than invent an affected set."

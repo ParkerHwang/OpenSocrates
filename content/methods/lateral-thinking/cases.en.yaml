@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lateral-thinking-positive-01
+    kind: positive
+    prompt: "The team has optimized the same delivery route repeatedly and wants to challenge the assumption that every order must pass through a central warehouse."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "The option set is stale and a frame-changing provocation is requested before evaluation."
+  - id: lateral-thinking-positive-02
+    kind: positive
+    prompt: "A public-service queue has no more room for faster processing; generate concepts by reversing who travels, when service occurs, or what counts as the queue."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "The task explicitly seeks a different frame and several concepts, followed by screening."
+  - id: lateral-thinking-positive-03
+    kind: positive
+    prompt: "A product team keeps adding features to solve declining engagement; challenge the frame and create alternatives that do not add features."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "The existing optimization frame is blocking new options and should be deliberately broken."
+  - id: lateral-thinking-negative-01
+    kind: negative
+    prompt: "Interview evidence is incomplete and the team needs to discover the human need, prototype a service, and test user behavior safely."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "Need discovery and user testing are primary; provocation alone would skip essential evidence."
+  - id: lateral-thinking-negative-02
+    kind: negative
+    prompt: "A machine guard must meet a mandatory safety specification, and the team asks whether the design passes the required tests."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, explicit_rules]
+    rationale: "Safety-critical validation should use disciplined evidence and the authoritative specification, not open-ended provocation."
+  - id: lateral-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Alphabetize the existing option list and preserve every description without creating new alternatives."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Sorting is mechanical and does not ask to challenge the frame."
+  - id: lateral-thinking-explicit-01
+    kind: explicit
+    prompt: "Use lateral-thinking to find three non-obvious ways to reduce conference waste without changing the safety rules."
+    expected_route: lateral-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, stale_options, choose]
+    rationale: "The user explicitly requests frame-breaking alternatives with a protected constraint."
+  - id: lateral-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "The problem and non-negotiable constraints are unknown; invent a radical option and recommend it immediately."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [stale_options, decisive_input_missing]
+    rationale: "Without a frame or protected constraints, provocation cannot be screened safely."

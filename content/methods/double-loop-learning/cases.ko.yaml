@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: double-loop-learning-positive-1
+    kind: positive
+    prompt: "지원팀이 새 체크리스트로 응답 시간을 줄였지만 두 달 뒤 고객 에스컬레이션이 다시 늘었습니다. 기대·실제 결과를 비교하고 체크리스트를 만든 서비스 목표와 규칙을 살핀 뒤 수정 규칙을 위한 안전한 학습 확인을 설계하세요."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [recurring_failure, governing_rule, repeat_iteration, testable_claim]
+    rationale: "절차 조치 뒤에도 재발했으므로 지배 목표나 규칙을 바꿀지 검토해야 합니다. 에스컬레이션 기록의 출처 상태를 표시하고 체크리스트 조치와 규칙 수준 가설을 분리해야 합니다."
+  - id: double-loop-learning-positive-2
+    kind: positive
+    prompt: "릴리스 정책이 예정일 준수를 보상하면서 팀이 신뢰성 작업을 계속 미루고 있습니다. 정책의 목표, 인센티브, 권한, 가정을 살피고 제한된 규칙 변경 확인을 제안하세요."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [governing_rule, feedback_delay, recurring_failure, chosen_plan]
+    rationale: "반복 행동이 한 번의 실행 오류보다 지배 정책에서 생겼을 가능성이 있습니다. 수정 규칙 후보를 비교하되 확인 전 인과 설명은 추론됨 또는 미검증으로 남겨야 합니다."
+  - id: double-loop-learning-positive-3
+    kind: positive
+    prompt: "교육을 두 번 고쳤는데도 여러 팀에서 같은 인수인계 누락이 나타납니다. 결과 차이 기록을 만들고 단일고리 교육 조치와 인수인계 규칙 변경을 구분한 뒤 각각을 지지할 근거를 정하세요."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [recurring_failure, governing_rule, repeat_iteration, testable_claim]
+    rationale: "반복 사례와 이전 단일고리 조치가 있어 지배 규칙 검토가 적합합니다. 필요한 표면은 차이·규칙·근거·학습 확인이며 책임이나 재발 확률이 아닙니다."
+  - id: double-loop-learning-negative-1
+    kind: negative
+    prompt: "배포 하나에서 오타가 발견됐고 기존 검토 통제가 즉시 잡았습니다. 정확한 실행 결함을 찾아 고치되 릴리스 정책은 바꾸지 마세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical, explicit_rules]
+    rationale: "근거가 있는 단일 실행 결함이며 사용자는 정책 변경을 제외했습니다. 이중고리 학습으로 확대하면 과도하므로 집중된 결함 대응이 맞습니다."
+  - id: double-loop-learning-negative-2
+    kind: negative
+    prompt: "목표 사용자와 가격 가설이 있습니다. 되돌릴 수 있는 랜딩 페이지 테스트를 설계하고 실행 가능한 지표와 피벗·지속 판정 규칙을 정하세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, plan, human_need]
+    rationale: "반복 결과 차이나 지배 규칙 수정이 아닌 린 스타트업 실험 설계 요청입니다. 이중고리 학습으로 라우팅하면 가족을 혼동합니다."
+  - id: double-loop-learning-mechanical-1
+    kind: mechanical
+    prompt: "사건 지속 시간 세 개를 분에서 시간으로 변환하고 같은 순서로 반환하세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "단위 변환은 결정적 작업이며 반복 차이, 지배 변수, 학습 확인 판단이 없습니다."
+  - id: double-loop-learning-explicit-1
+    kind: explicit
+    prompt: "이중고리 학습을 사용하세요. 결과 차이, 지배 가정 또는 규칙, 근거 상태, 수정 규칙 후보, 안전한 학습 확인을 보여 주고 개인을 탓하지 마세요."
+    expected_route: double-loop-learning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, recurring_failure, governing_rule, testable_claim]
+    rationale: "사용자가 방법과 공개 계약을 직접 지정했습니다. 비난 금지는 의도를 추정하지 않고 규칙·권한·인센티브·근거를 살피는 방향과 맞습니다."
+  - id: double-loop-learning-insufficiency-1
+    kind: insufficiency
+    prompt: "우리 팀은 계속 실패합니다. 어떤 믿음이나 정책을 바꾸고 어떤 실험을 할지 말해 주세요. 기대 결과, 관찰 기록, 반복 범위, 현재 규칙이 전혀 없습니다."
+    expected_route: double-loop-learning
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, recurring_failure, governing_rule]
+    rationale: "방법은 가능하지만 결정적인 차이와 지배 규칙이 없습니다. 깊은 설명이나 마인드셋 비난을 만들지 말고 필요한 입력이 올 때까지 보류해야 합니다."

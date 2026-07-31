@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: jobs-to-be-done-positive-01
+    kind: positive
+    prompt: "Small businesses hire an accountant after a stressful tax deadline; discover the progress, emotional reassurance, social signal, and alternatives involved."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "A specific struggling moment and multiple job dimensions explain hiring better than features or demographics."
+  - id: jobs-to-be-done-positive-02
+    kind: positive
+    prompt: "Users keep a slow spreadsheet instead of adopting the new tool; map the push, pull, habit, anxiety, and desired progress."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "The question centers on switching forces, non-consumption, and the progress a person is trying to make."
+  - id: jobs-to-be-done-positive-03
+    kind: positive
+    prompt: "A transit service wants to know what riders are hiring it to accomplish during a late-night trip and how success should be observed."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Situation-specific functional, emotional, and social progress plus a success measure are required."
+  - id: jobs-to-be-done-negative-01
+    kind: negative
+    prompt: "Observed user frustration should become three prototype concepts and a safe test before any product commitment."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "The main need is observation-led concept generation and prototyping rather than job-force analysis alone."
+  - id: jobs-to-be-done-negative-02
+    kind: negative
+    prompt: "A product team needs to compare two onboarding options by measurable consequences over a reversible pilot."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "A practical option comparison, not discovery of an underlying job, is the decision bottleneck."
+  - id: jobs-to-be-done-mechanical-01
+    kind: mechanical
+    prompt: "Put the customer interview transcripts into separate files and do not infer any job or motive."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "File organization is mechanical even though the inputs are user interviews."
+  - id: jobs-to-be-done-explicit-01
+    kind: explicit
+    prompt: "Use jobs-to-be-done to explain why commuters switch from buses to scooters during a late shift."
+    expected_route: jobs-to-be-done
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, user_progress]
+    rationale: "The user explicitly requests a situation and switching-force analysis."
+  - id: jobs-to-be-done-insufficiency-01
+    kind: insufficiency
+    prompt: "Only a feature list is available; declare the universal job for every customer and set a market-wide success rate."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [user_progress, decisive_input_missing]
+    rationale: "A feature list cannot establish a situation-specific job or market-wide rate."

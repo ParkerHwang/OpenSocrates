@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: steelman-reasoning-positive-01
+    kind: positive
+    prompt: "이사회가 개인정보 우려를 과장이라고 무시한다. 가장 공정하고 강한 형태로 다시 세우고 출시 결정을 바꾸는지 말해 달라."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute, critique]
+    rationale: "무시된 반대 우려가 중요한 위험을 품을 수 있어 강한 공정한 형태가 필요하다."
+  - id: steelman-reasoning-positive-02
+    kind: positive
+    prompt: "재택근무를 두 팀이 다르게 본다. 각자 일관된 목표와 근거가 있으니 응답 전에 상대의 가장 강한 입장을 찾아 달라."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute]
+    rationale: "실제 반대 입장을 공정하게 재구성하고 필요한 근거와 응답을 만들어야 한다."
+  - id: steelman-reasoning-positive-03
+    kind: positive
+    prompt: "정책 비판자가 적대적인 낙인으로만 인용되었다. 실제 주장·최선의 전제·제안이 바꿔야 할 부분을 복원해 달라."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, critique]
+    rationale: "공개 주장과 약한 묘사를 분리하고 결과를 시험하는 요청이다."
+  - id: steelman-reasoning-negative-01
+    kind: negative
+    prompt: "원칙이 여러 숙고된 어려운 사례와 충돌한다. 더 정합적으로 원칙이나 판단을 수정해야 한다."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "핵심 산출물은 상대 구성보다 원칙과 사례의 상호 수정이다."
+  - id: steelman-reasoning-negative-02
+    kind: negative
+    prompt: "보고서의 주장·근거·반론·응답을 먼저 중립적인 지도로 정리한 뒤 반대편을 평가하고 싶다."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "강철화 대상을 고르기 전에 구조적 주장 지도를 만드는 것이 우선이다."
+  - id: steelman-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "인용된 반대 주장을 평가하거나 강화하지 말고 어조를 보존해 한국어로 번역하라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "번역은 기계적 작업이므로 논증 재구성을 시작하지 않는다."
+  - id: steelman-reasoning-explicit-01
+    kind: explicit
+    prompt: "steelman-reasoning을 사용해 우리 합병에 반대하는 가장 강한 사례를 만들고 어떤 근거가 방향을 바꾸는지 알려 달라."
+    expected_route: steelman-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, dismissed_opposition, argument_dispute]
+    rationale: "중요한 결정에 공정한 반대 사례를 명시적으로 요청했다."
+  - id: steelman-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "공개된 반대 발언이 없다. 정교한 상대를 만들어 공동체의 주장이라고 하고 반박하라."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [dismissed_opposition, decisive_input_missing]
+    rationale: "실제 공개 입장이 없으므로 사람을 잘못 대표하는 창작은 강철화가 아니다."

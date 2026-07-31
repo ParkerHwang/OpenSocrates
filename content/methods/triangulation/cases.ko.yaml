@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: triangulation-positive-01
+    kind: positive
+    prompt: "독립적인 설문·행동·행정 데이터가 이 유지율 주장을 교차 확인할 수 있나요?"
+    expected_route: triangulation
+    expected_behavior: route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "증거 흐름의 독립성, 수렴, 충돌, 공백을 점검해야 합니다."
+  - id: triangulation-positive-02
+    kind: positive
+    prompt: "이해관계자들이 서로 다른 방법을 인용합니다. 증거가 실제로 같은 결과에 수렴하는지 확인해 주세요."
+    expected_route: triangulation
+    expected_behavior: route
+    decisive_features: [reconcile_evidence, conflicting_sources]
+    rationale: "흐름을 비교하고 같은 상위 자료가 확증처럼 반복되는 것을 막아야 합니다."
+  - id: triangulation-positive-03
+    kind: positive
+    prompt: "정성 인터뷰와 실험 결과가 다릅니다. 중요한 충돌을 풀 독립 점검은 무엇인가요?"
+    expected_route: triangulation
+    expected_behavior: route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "중요한 불일치에는 독립성 점검과 목표가 분명한 다음 흐름이 필요합니다."
+  - id: triangulation-negative-01
+    kind: negative
+    prompt: "각 출처를 대상 모집단에 대한 설계 품질, 직접성, 적용 가능성으로 순위를 매겨 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "개별 출처 품질 평가가 중심이지 흐름 간 독립성 비교가 아닙니다."
+  - id: triangulation-negative-02
+    kind: negative
+    prompt: "새 검사 결과 뒤 이 가설들의 사전 신뢰도를 갱신해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "사전에서 사후로의 갱신은 삼각검증이 아니라 베이즈 갱신입니다."
+  - id: triangulation-mechanical-01
+    kind: mechanical
+    prompt: "제공한 세 증거 표를 하나로 합치고 모든 행을 보존해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "표 병합은 독립성이나 수렴을 평가하지 않는 기계 작업입니다."
+  - id: triangulation-explicit-01
+    kind: explicit
+    prompt: "고객 영향 주장이 독립 점검을 견디는지 확인하기 위해 triangulation을 명시적으로 사용해 주세요."
+    expected_route: triangulation
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, reconcile_evidence]
+    rationale: "중요한 주장의 흐름 간 교차 확인을 사용자가 직접 요청했습니다."
+  - id: triangulation-insufficiency-01
+    kind: insufficiency
+    prompt: "모든 출처가 하나의 정체불명 상위 데이터셋을 반복하고 독립 흐름은 없습니다. 확증이라고 보고해 주세요."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [reconcile_evidence, source_quality, decisive_input_missing]
+    rationale: "의존적인 반복 출처만으로는 삼각검증이 되지 않으므로 확증을 보류해야 합니다."

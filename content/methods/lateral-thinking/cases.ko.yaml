@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lateral-thinking-positive-01
+    kind: positive
+    prompt: "팀이 같은 배송 경로만 반복 최적화한다. 모든 주문이 중앙 창고를 거쳐야 한다는 가정을 도전하고 싶다."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "선택지가 낡았고 평가 전에 프레임을 바꾸는 도발이 필요하다."
+  - id: lateral-thinking-positive-02
+    kind: positive
+    prompt: "공공 서비스 대기열은 처리 속도를 더 높일 여지가 없다. 이동 주체·서비스 시점·대기 정의를 뒤집어 개념을 만들어 달라."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "다른 프레임과 여러 개념을 만든 뒤 심사하라는 요청이다."
+  - id: lateral-thinking-positive-03
+    kind: positive
+    prompt: "제품 팀이 참여 하락을 기능 추가로만 해결한다. 프레임을 깨고 기능을 늘리지 않는 대안을 만들어 달라."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "현재 최적화 프레임이 새 선택지를 막으므로 의도적으로 깨야 한다."
+  - id: lateral-thinking-negative-01
+    kind: negative
+    prompt: "인터뷰 근거가 부족하다. 사람의 필요를 찾고 서비스를 프로토타입으로 만들어 안전하게 행동을 시험하고 싶다."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "필요 발견과 사용자 시험이 먼저이며 도발만으로 핵심 근거를 건너뛸 수 없다."
+  - id: lateral-thinking-negative-02
+    kind: negative
+    prompt: "기계 가드는 의무 안전 규격을 따라야 한다. 설계가 필수 시험을 통과하는지 판단하고 싶다."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, explicit_rules]
+    rationale: "안전이 중요한 검증은 자유 발상보다 권위 있는 규격과 규율 있는 근거 점검이 우선이다."
+  - id: lateral-thinking-mechanical-01
+    kind: mechanical
+    prompt: "기존 선택지 목록을 새 대안을 만들지 말고 알파벳순으로 정렬해 설명을 보존하라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "정렬은 프레임을 도전하지 않는 기계적 작업이다."
+  - id: lateral-thinking-explicit-01
+    kind: explicit
+    prompt: "lateral-thinking을 사용해 안전 규칙은 바꾸지 않고 회의 폐기물을 줄이는 낯선 방법 세 가지를 찾아 달라."
+    expected_route: lateral-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, stale_options, choose]
+    rationale: "보호할 제약이 있는 프레임 전환 대안을 명시적으로 요청했다."
+  - id: lateral-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "문제와 양보할 수 없는 제약을 모른다. 급진적인 선택지를 만들어 즉시 권하라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [stale_options, decisive_input_missing]
+    rationale: "프레임과 보호할 제약이 없으면 도발 결과를 안전하게 심사할 수 없다."

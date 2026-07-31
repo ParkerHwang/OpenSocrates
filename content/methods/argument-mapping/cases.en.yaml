@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: argument-mapping-positive-01
+    kind: positive
+    prompt: "Map the claim, grounds, objections, and rebuttals in this policy argument so we can see which links are unsupported."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique, tangled_hierarchy]
+    rationale: "The task explicitly needs claim-ground-objection structure and unsupported-link detection."
+  - id: argument-mapping-positive-02
+    kind: positive
+    prompt: "Which premise actually supports the recommendation, and which counterarguments remain unanswered?"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "Several support and attack relationships must be disentangled before the recommendation can be judged."
+  - id: argument-mapping-positive-03
+    kind: positive
+    prompt: "Build an argument map for the contract position, including shared assumptions and the strongest rebuttal."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, tangled_hierarchy]
+    rationale: "The requested public output is a structured map of claims, shared premises, and objections."
+  - id: argument-mapping-negative-01
+    kind: negative
+    prompt: "Compare the evidence quality of these two studies and say which one applies to our population."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "The central bottleneck is source design and applicability, which belongs to evidence verification."
+  - id: argument-mapping-negative-02
+    kind: negative
+    prompt: "Write the executive recommendation first, followed by three grouped reasons and supporting detail."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "The request is for top-down communication structure rather than testing support links."
+  - id: argument-mapping-mechanical-01
+    kind: mechanical
+    prompt: "Convert this supplied list of premises into Markdown bullets."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Formatting a supplied list does not require argument analysis."
+  - id: argument-mapping-explicit-01
+    kind: explicit
+    prompt: "Use argument-mapping explicitly to review the strongest objection to this investment memo."
+    expected_route: argument-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, argument_dispute]
+    rationale: "The user explicitly invokes the method for an objection and support-structure review."
+  - id: argument-mapping-insufficiency-01
+    kind: insufficiency
+    prompt: "Map the argument and judge its weakest link, but provide no conclusion, premises, or source text."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [argument_dispute, decisive_input_missing]
+    rationale: "No argument material is available to map, so the method must hold instead of inventing premises."

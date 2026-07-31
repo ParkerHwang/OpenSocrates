@@ -1,0 +1,82 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: robust-decision-making-positive-1
+    kind: positive
+    prompt: "수십 년 동안 운영할 기반시설의 홍수 방어 설계를 골라야 합니다. 강수량, 토지 이용, 재원 조건이 깊이 불확실하므로 하나의 전망에서 이기는 안이 아니라 그럴듯한 여러 세계에서 공개한 안전 기준을 넘는 안이 필요합니다."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - irreversible_choice
+      - choose
+      - failure_risk
+    rationale: "중요하고 되돌리기 어려운 결정이며 여러 불확실성이 얽혀 있습니다. 확률로 최적화하지 않고 여러 세계에서 수용 가능한 선택을 찾으므로 강건한 의사결정에 적합합니다."
+  - id: robust-decision-making-positive-2
+    kind: positive
+    prompt: "향후 8년의 공급망 전략이 관세, 수요, 공급자 신뢰도의 불확실성을 견뎌야 합니다. 실행 가능한 전략을 실패·후회 기준으로 비교하고 상충을 보인 뒤 적응 행동을 위한 감시 신호를 추가해 주세요."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - irreversible_choice
+      - failure_risk
+      - feedback_delay
+    rationale: "전략을 여러 조건에서 시험하고 실패 기준과 적응 발동 신호를 공개하라는 요청입니다. 이는 깊은 불확실성에서의 강건한 의사결정이 제공해야 할 출력입니다."
+  - id: robust-decision-making-positive-3
+    kind: positive
+    prompt: "지역 교통 투자에 세 가지 대안이 있지만 원격근무, 연료 가격, 공공 재원의 미래를 하나의 전망으로 신뢰하기 어렵습니다. 여러 조건에서 받아들일 수 있는 첫 조치, 남은 취약성, 선택을 바꿀 근거를 밝혀 주세요."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - multiple_options
+      - choose
+      - new_evidence
+    rationale: "실제 대안 선택과 깊은 불확실성이 있고 가장 가능성이 큰 안이 아니라 수용 가능한 안을 요구합니다. 남은 취약성과 전환 조건을 요구해 강건성을 과장하지 않습니다."
+  - id: robust-decision-making-negative-1
+    kind: negative
+    prompt: "기준 수요 전망은 충분히 검증되었고 다음 달에 거의 비용 없이 되돌릴 수 있는 파일럿입니다. 경영진은 그 기준 시나리오에서 기대 수익이 가장 큰 행동만 원합니다."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - source_quality
+      - sequential_choice
+      - choose
+    rationale: "단일 기준 사례를 신뢰할 수 있고 되돌리기도 쉽다는 명시적 회피 조건입니다. 강건성 시험을 추가하면 결정에 필요한 범위를 넘어섭니다."
+  - id: robust-decision-making-negative-2
+    kind: negative
+    prompt: "에너지 시장의 외부 미래 네 가지에 이름을 붙이고 각각의 전개 경로와 조기 신호를 설명해 주세요. 현재 행동을 실패·후회 기준으로 비교하지는 마세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - plan
+    rationale: "미래 구성과 신호만 요청하고 전략 시험과 수용 기준은 제외한 시나리오 플래닝 요청입니다. 가까운 가족 혼동 사례이므로 강건한 의사결정으로 라우팅하지 않습니다."
+  - id: robust-decision-making-mechanical-1
+    kind: mechanical
+    prompt: "검증된 현금 흐름에 지정된 공식만 적용해 연환산 수익률을 계산하고 산술을 보여 주세요. 전략 선택은 하지 않습니다."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "공식이 주어진 제한된 계산이며 불확실한 선택 집합이 없습니다. 산술을 강건성 판단으로 확장하지 않으므로 라우팅하지 않습니다."
+  - id: robust-decision-making-explicit-1
+    kind: explicit
+    prompt: "해안 적응 선택의 주 방법으로 robust-decision-making을 사용해 주세요. 가능한 기후·예산 세계에서 대안을 시험하고 최소 서비스 수준을 실패 기준으로 삼되, 세계나 기준이 없으면 보류해 주세요."
+    expected_route: robust-decision-making
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - deep_uncertainty
+      - irreversible_choice
+      - failure_risk
+    rationale: "사용자가 방법을 명시했고 결정 범위, 세계 시험, 수용 바닥선, 보류 규칙을 제공합니다. 명시 호출이어도 근거와 불확실성 규칙은 그대로 적용합니다."
+  - id: robust-decision-making-insufficiency-1
+    kind: insufficiency
+    prompt: "장기 전략 중 무엇이 강건한지 말해 주세요. 실행 가능한 행동, 실패의 의미, 기간, 시험할 불확실성을 아직 정하지 않았습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - decisive_input_missing
+    rationale: "행동 집합, 수용 기준, 기간, 불확실성 목록이 결정적인데 빠져 있습니다. 강건한 권고를 지지할 수 없으므로 필요한 입력만 요청하고 보류해야 합니다."

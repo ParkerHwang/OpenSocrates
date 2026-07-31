@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: reflective-equilibrium-positive-01
+    kind: positive
+    prompt: "A fairness principle seems right until it is applied to three hard cases; revise the principle or judgments while keeping the remaining tension visible."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "The task asks for mutual adjustment between considered judgments, principles, and hard cases."
+  - id: reflective-equilibrium-positive-02
+    kind: positive
+    prompt: "An institution values privacy and accountability, but a difficult incident creates a conflict; compare revisions that preserve both as far as possible."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "A value conflict with discretion requires explicit principles, cases, revisions, and remaining tension."
+  - id: reflective-equilibrium-positive-03
+    kind: positive
+    prompt: "A professional team’s accepted case judgments conflict with its stated principle; test counterexamples and identify which background assumption should change."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "The decision depends on iterating among cases, principles, and background assumptions."
+  - id: reflective-equilibrium-negative-01
+    kind: negative
+    prompt: "A named regulation clearly prohibits the proposed action and leaves no discretion; determine the permitted alternative."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "A binding rule decides the status without a reflective adjustment among principles."
+  - id: reflective-equilibrium-negative-02
+    kind: negative
+    prompt: "A team has dismissed a stakeholder’s objection without reconstructing its strongest fair premises or evidence needs."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute]
+    rationale: "The immediate gap is an untested opposing case, not a conflict among considered principles and judgments."
+  - id: reflective-equilibrium-mechanical-01
+    kind: mechanical
+    prompt: "Copy the listed principles and case descriptions into a review document without comparing or revising them."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copying is mechanical and does not ask for normative coherence."
+  - id: reflective-equilibrium-explicit-01
+    kind: explicit
+    prompt: "Use reflective-equilibrium to examine our fairness principle against these hard cases and state what remains in tension."
+    expected_route: reflective-equilibrium
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, value_conflict, argument_dispute]
+    rationale: "The user explicitly requests iterative case-principle adjustment."
+  - id: reflective-equilibrium-insufficiency-01
+    kind: insufficiency
+    prompt: "A binding safety rule applies, but ask the assistant to balance it away because one case feels unfair."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [value_conflict, binding_rule_without_discretion]
+    rationale: "The method must not manufacture discretion or override a binding safety rule."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: bayesian-updating-positive-01
+    kind: positive
+    prompt: "서로 다른 기저율을 가진 경쟁 진단에서 이 양성 검사 결과가 가능성을 어떻게 바꿔야 하나요?"
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "사전 근거, 증거 방향, 사후 변화, 기저율 민감도가 필요한 과제입니다."
+  - id: bayesian-updating-positive-02
+    kind: positive
+    prompt: "신호가 순차적으로 들어올 때 두 출시 가설에 대한 신뢰도를 갱신해 주세요."
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "의존 신호를 두 번 세지 않고 경쟁 가설을 순차 갱신해야 합니다."
+  - id: bayesian-updating-positive-03
+    kind: positive
+    prompt: "신뢰할 수 있는 범위에서 사전율과 우도 가정을 바꿀 때 권고가 뒤집히는지 보여 주세요."
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability]
+    rationale: "사후확률과 행동 임계값의 민감도를 묻는 증거 판단입니다."
+  - id: bayesian-updating-negative-01
+    kind: negative
+    prompt: "주장을 얼마나 강하게 말할지 정하기 전에 출처를 직접성과 연구 품질로 평가해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "정의된 가설 갱신보다 출처 품질 조정이 중심입니다."
+  - id: bayesian-updating-negative-02
+    kind: negative
+    prompt: "이상 현상의 경쟁 설명을 나열하고 서로를 가르는 시험을 제안해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "사전 갱신이 아니라 설명 생성과 구별 시험을 요청했습니다."
+  - id: bayesian-updating-mechanical-01
+    kind: mechanical
+    prompt: "제공한 사전값을 분석 워크시트에 복사해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "값 복사는 확률적 추론이 필요 없는 기계 작업입니다."
+  - id: bayesian-updating-explicit-01
+    kind: explicit
+    prompt: "새 사기 신호 뒤 신뢰도를 수정하기 위해 bayesian-updating을 명시적으로 사용해 주세요."
+    expected_route: bayesian-updating
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, new_evidence]
+    rationale: "증거에 따른 신뢰도 갱신을 사용자가 직접 지정했습니다."
+  - id: bayesian-updating-insufficiency-01
+    kind: insufficiency
+    prompt: "사후확률을 계산해 주세요. 경쟁 가설, 사전 근거, 우도 정보는 주지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [new_evidence, unknown_probability, decisive_input_missing]
+    rationale: "가설과 입력 근거 없는 숫자 사후확률은 거짓 정밀도입니다."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: failure-mode-effects-analysis-positive-01
+    kind: positive
+    prompt: "Before releasing a medication-dispensing workflow, list failure modes, effects, causes, existing controls, and which controls need an owner."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "A defined process needs a forward-looking failure register and control ownership without fabricated scores."
+  - id: failure-mode-effects-analysis-positive-02
+    kind: positive
+    prompt: "A data pipeline redesign may fail at ingestion, validation, or alerting; prioritize the modes using an ordinal rule and propose controls."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan]
+    rationale: "The task asks for failure modes, effects, causes, ordinal priority, and controls for a planned design."
+  - id: failure-mode-effects-analysis-positive-03
+    kind: positive
+    prompt: "Review the checkout process before launch for ways users could be charged incorrectly and how the team would prevent or detect each mode."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "Pre-release process review and control assignment are the specific method outputs."
+  - id: failure-mode-effects-analysis-negative-01
+    kind: negative
+    prompt: "The product launch plan is chosen; imagine it already failed and identify plausible causes, leading signals, and mitigations."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "The requested perspective is a plan-level imagined failure before commitment."
+  - id: failure-mode-effects-analysis-negative-02
+    kind: negative
+    prompt: "A production defect recurs and the team needs to separate symptoms, proximate causes, and controllable system conditions."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "The immediate need is recurrence diagnosis rather than a forward FMEA register."
+  - id: failure-mode-effects-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Sort the existing failure-mode rows alphabetically and preserve every field without evaluating priority."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Sorting is mechanical even though the rows describe risks."
+  - id: failure-mode-effects-analysis-explicit-01
+    kind: explicit
+    prompt: "Use failure-mode-effects-analysis for this launch checklist and avoid inventing severity, occurrence, or detectability scores."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, failure_risk, plan]
+    rationale: "The user explicitly requests the method and its false-precision safeguard."
+  - id: failure-mode-effects-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "There is no process boundary or intended function; assign exact risk-priority numbers to the imagined failures anyway."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [failure_risk, decisive_input_missing]
+    rationale: "Without a defined function and defensible scale, the assessment must be held rather than quantified."

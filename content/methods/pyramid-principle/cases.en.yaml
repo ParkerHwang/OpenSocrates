@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pyramid-principle-positive-01
+    kind: positive
+    prompt: "Turn this validated analysis into an executive memo that gives the recommendation first, then grouped reasons and detail."
+    expected_route: pyramid-principle
+    expected_behavior: route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "The underlying judgment is ready and the requested bottleneck is conclusion-first communication."
+  - id: pyramid-principle-positive-02
+    kind: positive
+    prompt: "Reorganize the report so its governing thought is at the top and each section supports it without overlap."
+    expected_route: pyramid-principle
+    expected_behavior: route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "The task requires top-line answer, grouped reasons, vertical summary, and horizontal order."
+  - id: pyramid-principle-positive-03
+    kind: positive
+    prompt: "Make this long decision analysis scannable for executives without hiding its uncertainty or alternatives."
+    expected_route: pyramid-principle
+    expected_behavior: route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "The method structures an already judged analysis while preserving material uncertainty."
+  - id: pyramid-principle-negative-01
+    kind: negative
+    prompt: "Which premise supports the recommendation, and what is the strongest unresolved objection?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [argument_dispute, critique]
+    rationale: "The task is to inspect argument support, not to reorder a settled answer."
+  - id: pyramid-principle-negative-02
+    kind: negative
+    prompt: "Decide whether this recommendation is supported, but the evidence and alternatives have not been reviewed yet."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, critique]
+    rationale: "Communication structure must not substitute for an unresolved underlying judgment."
+  - id: pyramid-principle-mechanical-01
+    kind: mechanical
+    prompt: "Apply the house style headings and keep every sentence in its current order."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Applying fixed formatting instructions is mechanical."
+  - id: pyramid-principle-explicit-01
+    kind: explicit
+    prompt: "Use pyramid-principle explicitly to rewrite this board update with the conclusion first."
+    expected_route: pyramid-principle
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, explain]
+    rationale: "The user explicitly requests the method for conclusion-first executive communication."
+  - id: pyramid-principle-insufficiency-01
+    kind: insufficiency
+    prompt: "Put the conclusion first, but do not provide a governing question, conclusion, evidence, or audience decision."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [explain, decisive_input_missing]
+    rationale: "Without a stable judgment and audience decision, a top-line answer would be invented."

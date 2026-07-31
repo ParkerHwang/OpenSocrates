@@ -1,0 +1,90 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: trade-off-analysis-positive-1
+    kind: positive
+    prompt: "Choose between three vendors using delivery speed, reliability, accessibility, and total cost. The procurement group has documented which requirement is a veto and each stakeholder has supplied a dated preference for the remaining criteria."
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - stakeholder_conflict
+    rationale: "Several options compete across explicit criteria, with a separated constraint and weight provenance. The comparison can expose concessions without pretending all values are interchangeable."
+  - id: trade-off-analysis-positive-2
+    kind: positive
+    prompt: "A product team must select a design that balances performance, maintainability, privacy, and user effort. Test data supports some ratings, user interviews support others, and privacy is a minimum condition rather than a score."
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - source_quality
+    rationale: "The task needs a provenance-aware comparison of competing criteria and a non-compensable privacy constraint. Mixed evidence can be labelled instead of flattened."
+  - id: trade-off-analysis-positive-3
+    kind: positive
+    prompt: "Two staffing plans have different coverage, continuity, cost, and workload effects. The team has agreed on an ordinal preference order but not a precise numeric scale; show which plan wins under that order and what change would reverse it."
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - sensitive_inputs
+    rationale: "An ordinal trade-off is explicitly requested and a flip condition matters. The method can avoid false precision while keeping the choice visible."
+  - id: trade-off-analysis-negative-1
+    kind: negative
+    prompt: "A building code requires a specific fire-safety standard. Only one compliant design remains, and the requester asks whether a cheaper non-compliant design can be preferred because it scores better on convenience."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "A binding requirement is being treated as a compensable criterion. The likely family is deontic-reasoning or qualified compliance review, not trade-off analysis."
+  - id: trade-off-analysis-negative-2
+    kind: negative
+    prompt: "We are unsure whether to run a customer study before choosing a design. The question is how much the study could change the decision and whether its delay is worth it, not how to compare the designs today."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - new_evidence
+      - sensitive_inputs
+    rationale: "The likely family confusion is value-of-information: the immediate task is to value additional information, not to weight the current options."
+  - id: trade-off-analysis-mechanical-1
+    kind: mechanical
+    prompt: "Sort these already verified records by the supplied single-column score and return the ordered list. No criteria choice, preference conflict, or recommendation explanation is requested."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "A fixed sort is mechanical and has no discretionary trade-off surface."
+  - id: trade-off-analysis-explicit-1
+    kind: explicit
+    prompt: "Use trade-off-analysis for this location decision. Separate veto constraints from preferences, preserve the source of every rating, and show what the recommendation gives up."
+    expected_route: trade-off-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "The user explicitly names the method and requests its public comparison contract. Unsupported ratings remain assumed or unverified."
+  - id: trade-off-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "Pick the best option from these unnamed alternatives. We have not agreed on the criteria, the minimum acceptable conditions, or whose priorities should count."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - decisive_input_missing
+    rationale: "The feasible set, decisive criteria, and preference provenance are missing. A recommendation would be post-hoc scoring, so the comparison must be held."

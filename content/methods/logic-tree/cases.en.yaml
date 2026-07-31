@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: logic-tree-positive-01
+    kind: positive
+    prompt: "Why did customer churn rise, and how can we decompose the causes into testable branches without overlap?"
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, diagnose, plan]
+    rationale: "The broad diagnostic needs a why-tree with an explicit axis, MECE checks, and leaf tests."
+  - id: logic-tree-positive-02
+    kind: positive
+    prompt: "Build a complete issue tree for reducing onboarding failures, with a verification step at every leaf."
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, plan]
+    rationale: "Coverage and actionable decomposition are the requested output."
+  - id: logic-tree-positive-03
+    kind: positive
+    prompt: "Break this broad risk question into non-overlapping branches that an operations team can assign and test."
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "The task requires hierarchical branches, coverage checks, and executable leaves."
+  - id: logic-tree-negative-01
+    kind: negative
+    prompt: "Check whether the existing categories overlap and whether any case is missing."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "The narrow classification audit is a MECE task, not recursive tree construction."
+  - id: logic-tree-negative-02
+    kind: negative
+    prompt: "Draw the feedback loops between these variables and identify reinforcing and balancing dynamics."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Interdependent feedback loops are a poor fit for a hierarchy and need a systems method."
+  - id: logic-tree-mechanical-01
+    kind: mechanical
+    prompt: "Indent these supplied headings into the same tree structure shown in the example."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Applying supplied indentation is a mechanical formatting task."
+  - id: logic-tree-explicit-01
+    kind: explicit
+    prompt: "Use logic-tree explicitly to structure the causes of our delayed release."
+    expected_route: logic-tree
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, tangled_hierarchy]
+    rationale: "The user explicitly selects a hierarchical diagnostic structure."
+  - id: logic-tree-insufficiency-01
+    kind: insufficiency
+    prompt: "Create the complete issue tree, but do not state the root question, scope, or success measure."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [tangled_hierarchy, decisive_input_missing]
+    rationale: "Without a bounded root, coverage and leaf actionability cannot be judged safely."

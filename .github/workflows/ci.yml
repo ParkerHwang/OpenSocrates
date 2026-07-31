@@ -1,0 +1,108 @@
+name: OpenSocrates CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: opensocrates-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+
+jobs:
+  python-quality:
+    name: Python quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
+      - name: Bootstrap locked environment
+        run: make bootstrap
+      - name: Check formatting
+        run: make format-check
+      - name: Run Ruff, mypy, and import-boundary checks
+        run: make lint
+
+  product-contracts:
+    name: Product contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
+      - name: Bootstrap locked environment
+        run: make bootstrap
+      - name: Check generated schemas and content
+        run: make generated-check
+      - name: Validate content and locale parity
+        run: make content-check
+      - name: Check documentation
+        run: make docs-check
+      - name: Run source security and dependency scans
+        run: make security-scan
+      - name: Run product smoke tests
+        run: make smoke
+      - name: Upload source-level evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-evidence-${{ github.run_id }}
+          path: build/evidence/
+          if-no-files-found: warn
+
+  installer:
+    name: GitHub and npx installer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Test installer
+        run: npm test
+      - name: Inspect npm package contents
+        run: npm pack --dry-run
+
+  package:
+    name: Native package (darwin-arm64)
+    if: github.event_name != 'pull_request'
+    needs:
+      - python-quality
+      - product-contracts
+      - installer
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
+      - name: Bootstrap locked environment
+        run: make bootstrap
+      - name: Activate locked native build toolchain
+        run: uv sync --locked --no-install-project --group build
+      - name: Build and validate native package
+        run: make package
+      - name: Upload native package evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-darwin-arm64-${{ github.run_id }}
+          path: |
+            dist/
+            build/evidence/
+          if-no-files-found: warn

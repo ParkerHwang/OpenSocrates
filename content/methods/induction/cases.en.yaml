@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: induction-positive-01
+    kind: positive
+    prompt: "Do these repeated observations support a general claim about most users, and how strong is the generalization?"
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "The task moves from observed cases to a bounded population claim and needs sample and counterexample checks."
+  - id: induction-positive-02
+    kind: positive
+    prompt: "Assess whether this survey sample justifies the claim that customers prefer the new workflow."
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "Representativeness, selection bias, and generalization strength are central."
+  - id: induction-positive-03
+    kind: positive
+    prompt: "What can we reasonably infer about next quarter from these past incidents, including plausible counterexamples?"
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "The requested forecast extends repeated cases and must state scope and counterexample risk."
+  - id: induction-negative-01
+    kind: negative
+    prompt: "A strict rule says every eligible record receives approval; determine whether this case follows the rule."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules, explain]
+    rationale: "The task is deductive rule application, not sample-based generalization."
+  - id: induction-negative-02
+    kind: negative
+    prompt: "Several explanations fit the failure; compare them and identify the observation that would discriminate among them."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "This is an abductive diagnosis rather than an extension from sample to population."
+  - id: induction-mechanical-01
+    kind: mechanical
+    prompt: "Append these new observations to the existing dataset without changing any values."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Appending supplied data is mechanical."
+  - id: induction-explicit-01
+    kind: explicit
+    prompt: "Use induction explicitly to evaluate whether this small experiment supports a broader product claim."
+    expected_route: induction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, repeated_observations]
+    rationale: "The user explicitly selects sample-to-generalization analysis."
+  - id: induction-insufficiency-01
+    kind: insufficiency
+    prompt: "Generalize from the sample, but provide no target population, sampling process, observations, or measurement definition."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [repeated_observations, weak_sample, decisive_input_missing]
+    rationale: "Without the sample basis and target scope, the generalization cannot be bounded."

@@ -1,0 +1,79 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: reference-class-forecasting-positive-1
+    kind: positive
+    prompt: "We are estimating the delivery date for a regional rail project. We have source-linked records for many completed projects with comparable scope, procurement, and terrain. Compare the internal schedule with the observed completion distribution and explain the adjustments without inventing a probability."
+    expected_route: reference-class-forecasting
+    expected_behavior: route
+    decisive_features:
+      - forecast
+      - reference_cases
+      - source_quality
+    rationale: "A forecast target and unit are stated, a defensible reference class is available, and the request asks for an outside-view range. The source records support observed outcomes; they do not authorize fabricated probabilities."
+  - id: reference-class-forecasting-positive-2
+    kind: positive
+    prompt: "Our product team has an optimistic estimate for the time and cost of migrating customers to a new platform. We can identify comparable migrations completed by other teams and have their actual outcomes. Use those cases to test whether our inside view is credible and state what evidence would change the range."
+    expected_route: reference-class-forecasting
+    expected_behavior: route
+    decisive_features:
+      - forecast
+      - reference_cases
+      - hidden_assumptions
+    rationale: "The task is calibration against completed comparable cases, not a causal diagnosis or a preferred scenario. The prompt requests provenance-aware adjustments and a flip condition rather than a made-up base rate."
+  - id: reference-class-forecasting-positive-3
+    kind: positive
+    prompt: "A nonprofit is forecasting first-year program enrollment. Several prior launches have documented enrollment outcomes, target populations, and launch conditions, although coverage is uneven. Build an outside-view range, show the coverage limitation, and compare it with our plan."
+    expected_route: reference-class-forecasting
+    expected_behavior: route
+    decisive_features:
+      - forecast
+      - reference_cases
+      - weak_sample
+    rationale: "A target and completed cases exist, while uneven coverage is an explicit uncertainty to preserve. The method should use the observed distribution and hold or lower the conclusion if the missingness is decisive."
+  - id: reference-class-forecasting-negative-1
+    kind: negative
+    prompt: "We have no completed comparable cases for this one-off scientific instrument. Please explain which engineering choice caused the schedule slip and propose a corrective experiment."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - no_defensible_reference_class
+      - diagnose
+    rationale: "The prompt explicitly lacks a defensible reference class and asks for causal explanation. Routing here would repeat an inside view without an outside distribution."
+  - id: reference-class-forecasting-negative-2
+    kind: negative
+    prompt: "Please construct four distinct external futures for our five-year strategy, name each future, and identify early signals and actions. Do not estimate a delivery or cost target from past cases."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - plan
+    rationale: "This is a likely family confusion with scenario planning: the task requests branching futures and signposts, not a reference distribution for a forecast."
+  - id: reference-class-forecasting-mechanical-1
+    kind: mechanical
+    prompt: "Add these five verified invoice amounts and return the total in the stated currency. No forecast, comparison class, or decision is needed."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "The task is a bounded calculation. It has no uncertain forecast target or reference-class judgment, so the method must remain inactive."
+  - id: reference-class-forecasting-explicit-1
+    kind: explicit
+    prompt: "Use reference-class forecasting as the primary method for our software launch date. We have source-linked outcomes from comparable launches; compare that distribution with the internal plan and hold the conclusion if the class is not defensible."
+    expected_route: reference-class-forecasting
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - forecast
+      - reference_cases
+    rationale: "The user names the method explicitly and supplies the method-specific target, comparable outcomes, and hold rule. Explicit invocation still requires evidence labels and does not permit fabricated probabilities."
+  - id: reference-class-forecasting-insufficiency-1
+    kind: insufficiency
+    prompt: "Tell me when this project will finish. I have only an internal target date, no completed comparable cases, no agreed outcome definition, and no stated deadline decision."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - no_defensible_reference_class
+      - boundary_sensitive
+      - decisive_input_missing
+    rationale: "The decisive reference class, target definition, and decision boundary are missing. The honest outcome is a hold and a bounded request for the missing inputs, not an invented distribution."

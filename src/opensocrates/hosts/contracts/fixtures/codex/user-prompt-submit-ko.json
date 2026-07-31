@@ -1,0 +1,31 @@
+{
+  "fixture_id": "TEST-CDX-user-prompt-submit-ko",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-07-15",
+  "host": "codex_cli",
+  "native_event": "UserPromptSubmit",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "UserPromptSubmit",
+    "turn_id": "TEST-turn-002",
+    "permission_mode": "default",
+    "prompt": "<synthetic-ko-prompt>"
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {
+      "hookSpecificOutput": {
+        "hookEventName": "UserPromptSubmit",
+        "additionalContext": "<synthetic-prompt-context-ko>"
+      }
+    }
+  },
+  "adapter_expectation": {
+    "normalized_event": "user_prompt_submitted",
+    "status": "accepted",
+    "projection": {
+      "is_direct_skill_invocation": false
+    }
+  },
+  "redaction": "The prompt value is a marker only; locale is represented by the fixture name."
+}

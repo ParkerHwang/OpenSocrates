@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: assumption-mapping-positive-1
+    kind: positive
+    prompt: "We are considering a shared meal-planning service. List the assumptions that must be true, separate importance from evidence, and identify the first safe test. Interview notes are user-provided and have not been independently checked."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, testable_claim, plan]
+    rationale: "The request explicitly needs an assumption register, importance/evidence axes, a riskiest set, and a next test. The interview notes are user-provided rather than verified, so the route must expose that uncertainty without assigning probabilities."
+  - id: assumption-mapping-positive-2
+    kind: positive
+    prompt: "A team wants to automate invoice review, but it is unclear whether the bottleneck is customer desirability, data feasibility, or compliance viability. Map the assumptions and choose a low-exposure validation step before procurement."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, irreversible_choice, testable_claim]
+    rationale: "Several assumption domains and a precommitment decision are present. The requested validation is still a prioritization problem; the result should label source-backed facts, assumptions, and any missing compliance evidence."
+  - id: assumption-mapping-positive-3
+    kind: positive
+    prompt: "We have five proposed experiments for a volunteer scheduling change. Rank the assumptions by decision importance and evidence strength, then attach a safe observation and a rule for what would change the plan."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [prioritized_assumptions, testable_claim, chosen_plan]
+    rationale: "The user asks for the method's core prioritization surface rather than a completed experiment. The output can use ordinal labels and mark evidence as verified, unverified, assumed, or conflicted without fabricated scores."
+  - id: assumption-mapping-negative-1
+    kind: negative
+    prompt: "Our checkout service failed three times this week. Trace the causal chain, identify control weaknesses, and assign a prevention owner; do not propose a product assumption map."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "This is a root-cause-analysis request, a likely family confusion with assumption mapping. The required output is a causal diagnosis and control action, not a prioritized set of testable beliefs."
+  - id: assumption-mapping-negative-2
+    kind: negative
+    prompt: "We already selected a target customer and a landing-page experiment. Define the actionable metric, observation window, and pivot-or-persevere rule for the test."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, chosen_plan, plan]
+    rationale: "The assumption has already been selected and the user asks to operationalize a market experiment. That is lean-startup work; routing here would repeat the mapping instead of defining the test and metric."
+  - id: assumption-mapping-mechanical-1
+    kind: mechanical
+    prompt: "Sort these six assumption labels alphabetically and return them as a numbered list."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Sorting labels has no judgment, uncertainty, or experiment-prioritization requirement. It should receive a direct mechanical response."
+  - id: assumption-mapping-explicit-1
+    kind: explicit
+    prompt: "Use assumption mapping for this idea. Show the assumptions, importance/evidence axes, riskiest set, and the next safe test; keep unsupported claims visibly unverified."
+    expected_route: assumption-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions, prioritized_assumptions, testable_claim]
+    rationale: "The user explicitly names the method and its public outputs. The explicit invocation is primary, while the requested evidence labels preserve the provenance boundary."
+  - id: assumption-mapping-insufficiency-1
+    kind: insufficiency
+    prompt: "Prioritize the assumptions behind our proposal and tell us which one to test first. No decision question, desired outcome, candidate assumptions, or test constraints are available yet."
+    expected_route: assumption-mapping
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, hidden_assumptions, prioritized_assumptions, no_testable_implication]
+    rationale: "The method fits, but decisive inputs are absent. It must hold rather than invent assumptions or a test; the next request should establish the decision and authorized safe boundary."

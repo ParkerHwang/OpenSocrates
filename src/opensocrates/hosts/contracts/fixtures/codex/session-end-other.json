@@ -1,0 +1,25 @@
+{
+  "fixture_id": "TEST-CDX-session-end-other",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-07-24",
+  "host": "codex_cli",
+  "native_event": "SessionEnd",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "SessionEnd",
+    "session_id": "TEST-session-closed",
+    "reason": "other"
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {}
+  },
+  "adapter_expectation": {
+    "normalized_event": "session_ended",
+    "status": "accepted",
+    "projection": {
+      "reason": "other"
+    }
+  },
+  "redaction": "Only the documented session end reason is retained."
+}

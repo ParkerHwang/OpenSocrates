@@ -1,0 +1,34 @@
+{
+  "schema": "opensocrates.participation-policy/1.0.0",
+  "version": "1.0.0",
+  "modes": [
+    "mechanical",
+    "judgment",
+    "mixed"
+  ],
+  "gate_order": [
+    "classify_target",
+    "mechanical_no_route",
+    "mixed_isolate_judgment",
+    "explicit_method_after_gate"
+  ],
+  "mechanical": {
+    "creates_task": false,
+    "creates_record": false,
+    "creates_trace": false,
+    "visible_apparatus": false
+  },
+  "mixed": {
+    "route_only_judgment_segment": true,
+    "preserve_mechanical_segment": true
+  },
+  "explicit": {
+    "allowed_for": [
+      "judgment",
+      "mixed"
+    ],
+    "refuse_mechanical": true,
+    "refuse_unknown_method": true
+  }
+}
+

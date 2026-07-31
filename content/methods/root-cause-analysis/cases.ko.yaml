@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: root-cause-analysis-positive-01
+    kind: positive
+    prompt: "새 피킹 과정 뒤 창고에서 몇 주마다 다른 물건이 배송된다. 또 사과하는 대신 재발 방지를 찾고 싶다."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "반복되는 운영 실패에서 증상·원인·통제·재발 확인을 나누어야 한다."
+  - id: root-cause-analysis-positive-02
+    kind: positive
+    prompt: "서비스 중단이 임시 재시작 뒤에도 다시 발생한다. 인과 사슬을 만들 로그·인수인계·알림 담당 자료가 있다."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose, failure_risk]
+    rationale: "요청은 즉시 촉발 요인뿐 아니라 통제 가능한 시스템 조건과 예방 담당자를 찾는다."
+  - id: root-cause-analysis-positive-03
+    kind: positive
+    prompt: "교대조가 달라도 품질 누출이 반복된다. 작업자 행동과 인터페이스·업무량·통제 누락을 구분하고 싶다."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "재발과 원인 층위 분리가 명시되어 근본원인분석에 맞는다."
+  - id: root-cause-analysis-negative-01
+    kind: negative
+    prompt: "새 가격 이메일 뒤 가입이 늘었다. 대조군과 비교해 이메일이 증가를 만들었는지 묻는다."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "대상은 반복 실패 사슬이 아니라 개입 효과와 반사실 비교이다."
+  - id: root-cause-analysis-negative-02
+    kind: negative
+    prompt: "고객 불만·인력·적체가 1년 동안 서로를 강화한다. 이 동적 패턴의 지렛대를 찾고 싶다."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "지연이 있는 피드백 구조는 구체적인 한 사건의 진단보다 넓은 시스템 분석이 필요하다."
+  - id: root-cause-analysis-mechanical-01
+    kind: mechanical
+    prompt: "사건 시간표를 두 열 표로 정리하고 실패 원인은 진단하지 말라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "반복 사건이 언급되어도 서식 정리는 기계적 작업이다."
+  - id: root-cause-analysis-explicit-01
+    kind: explicit
+    prompt: "root-cause-analysis를 사용해 반복된 인수인계를 분석하고 개인을 탓하지 않는 예방 담당자를 정해 달라."
+    expected_route: root-cause-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, recurring_failure, diagnose]
+    rationale: "반복되는 운영 실패에 방법을 명시적으로 적용해 달라고 요청했다."
+  - id: root-cause-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "익명 제보 하나가 출시 실패를 한 엔지니어 탓이라고 한다. 로그 없이 그 사람을 근본 원인으로 지목하라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [recurring_failure, decisive_input_missing]
+    rationale: "사건 경계와 근거가 부족하고 책임 주장은 안전하지도 지지되지도 않는다."

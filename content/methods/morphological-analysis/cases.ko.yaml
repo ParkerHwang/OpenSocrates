@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: morphological-analysis-positive-01
+    kind: positive
+    prompt: "공공 프로그램은 접근 채널·자격·시점·인력·피드백을 바꿀 수 있다. 모델을 고르기 전에 일관된 행렬과 조합 심사를 만들어 달라."
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "여러 독립 차원이 질적 선택 공간을 만들고 쌍별 양립성 확인이 필요하다."
+  - id: morphological-analysis-positive-02
+    kind: positive
+    prompt: "서비스 재설계가 한 채널만 계속 최적화한다. 전달 방식·주기·소유·지원 수준을 조합해 보고 싶다."
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "한 변수 조정이 아니라 일관된 차원 사이의 낯선 조합을 탐색해야 한다."
+  - id: morphological-analysis-positive-03
+    kind: positive
+    prompt: "전략 워크숍에서 독립적인 네 선택의 관습적·극단적·균형 구성을 만들고 양립 불가 쌍을 표시하라."
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, choose]
+    rationale: "매개변수 행렬·조합 공간·일관성 심사·대표 개념이 필요한 요청이다."
+  - id: morphological-analysis-negative-01
+    kind: negative
+    prompt: "차원을 독립적으로 정의할 수 없다. 어떤 관습적 가정이 정말 줄일 수 없는 제약인지 먼저 알고 싶다."
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, no_coherent_dimensions]
+    rationale: "형태학적 조합 전에 근본 제약을 찾는 일이 먼저다."
+  - id: morphological-analysis-negative-02
+    kind: negative
+    prompt: "실행 가능한 선택지가 두 개뿐이고 조합 탐색보다 명시적 기준과 상충으로 결정해야 한다."
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features: [multiple_options, choose]
+    rationale: "의미 있는 차원 공간이 없으면 간결한 비교가 충분하다."
+  - id: morphological-analysis-mechanical-01
+    kind: mechanical
+    prompt: "기존 매개변수 행렬을 값을 해석하거나 조합하지 말고 CSV로 내보내라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "내보내기는 기계적 작업이다."
+  - id: morphological-analysis-explicit-01
+    kind: explicit
+    prompt: "morphological-analysis를 사용해 채널·시점·소유·강도별 서비스 구성을 만들고 심사하라."
+    expected_route: morphological-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, combinable_dimensions]
+    rationale: "차원 조합 과제를 방법과 함께 명시적으로 요청했다."
+  - id: morphological-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "분리할 수 없는 차원 하나뿐이고 일관된 값도 없다. 큰 행렬을 만들어 정밀한 최선 조합을 고르라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [combinable_dimensions, no_coherent_dimensions]
+    rationale: "일관된 차원과 값이 없으면 행렬은 허위 구조와 정밀함을 만든다."

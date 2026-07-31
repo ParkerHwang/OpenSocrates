@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: triz-positive-01
+    kind: positive
+    prompt: "A delivery drone needs more battery capacity, but added weight reduces range; find a concept that separates or removes the contradiction."
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "A technical improvement worsens another parameter and invites ideal-result, separation, and inventive moves."
+  - id: triz-positive-02
+    kind: positive
+    prompt: "A hospital room needs stronger privacy and easier observation at the same time; explore time, space, condition, and interface separation."
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "The problem describes a physical or technical contradiction with separable conditions and safety constraints."
+  - id: triz-positive-03
+    kind: positive
+    prompt: "A packaging line must be faster without increasing damage; search existing time, space, information, and material resources for a non-compromise design."
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "The user wants inventive concepts that remove a design trade-off rather than optimize a single parameter."
+  - id: triz-negative-01
+    kind: negative
+    prompt: "The decision is between two public values and the issue is whose rights or duties take precedence, not a technical design contradiction."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [value_conflict, duties_rights]
+    rationale: "Normative authority and rights, not inventive moves, determine the route."
+  - id: triz-negative-02
+    kind: negative
+    prompt: "A system has interacting feedback loops and delayed side effects; map the wider structure and leverage point before choosing a local concept."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "The dominant need is system dynamics and leverage, not local contradiction resolution."
+  - id: triz-mechanical-01
+    kind: mechanical
+    prompt: "List the existing product parameters in the requested order without identifying contradictions or proposing concepts."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Listing is mechanical and does not ask for inventive problem solving."
+  - id: triz-explicit-01
+    kind: explicit
+    prompt: "Use triz to address the contradiction between lighter packaging and stronger impact protection, then propose a reversible test."
+    expected_route: triz
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, technical_contradiction]
+    rationale: "The user explicitly invokes the method for a technical contradiction and test."
+  - id: triz-insufficiency-01
+    kind: insufficiency
+    prompt: "The improving and worsening properties are unknown; declare the ideal design achieved and claim a guaranteed performance gain."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [technical_contradiction, decisive_input_missing]
+    rationale: "Without a defined contradiction or test, ideality and improvement cannot be established honestly."

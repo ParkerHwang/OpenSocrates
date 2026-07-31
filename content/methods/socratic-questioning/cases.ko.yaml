@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: socratic-questioning-positive-01
+    kind: positive
+    prompt: "이번 분기에 이 서비스를 출시할지 바꿀 수 있는 질문만 해 주세요."
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "열린 인터뷰가 아니라 결정을 바꾸는 제한된 질문을 요청한 경우입니다."
+  - id: socratic-questioning-positive-02
+    kind: positive
+    prompt: "내 주장의 가정을 점검하도록 도와주세요. 질문은 세 개 이하로 하고 각각 왜 중요한지도 설명해 주세요."
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "판단을 명료하게 하기 위해 결과와 연결된 소수의 질문이 필요한 과제입니다."
+  - id: socratic-questioning-positive-03
+    kind: positive
+    prompt: "여기서 ‘좋은 증거’가 무엇인지 모르겠습니다. 검토 기준을 바꿀 질문만 몇 개 해 주세요."
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "빠진 답이 증거 기준을 바꿀 수 있고 질문 폭격 없이 드러내야 합니다."
+  - id: socratic-questioning-negative-01
+    kind: negative
+    prompt: "제공한 요구사항으로 구현이 완료됐는지 확인하고 빠진 필드를 나열해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [review_completion, explicit_rules]
+    rationale: "고정된 규칙에 따른 완료 점검이지 질문으로 판단을 이끄는 과제가 아닙니다."
+  - id: socratic-questioning-negative-02
+    kind: negative
+    prompt: "긍정·부정·경계 사례를 비교해 논쟁 중인 용어를 정의해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [ambiguous_terms]
+    rationale: "제한된 질문보다 개념 분석 자체를 요청한 경우입니다."
+  - id: socratic-questioning-mechanical-01
+    kind: mechanical
+    prompt: "이 다섯 질문을 번호가 있는 Markdown 목록으로 바꿔 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "제공된 질문의 형식 변환은 추가 질문이 필요 없는 기계 작업입니다."
+  - id: socratic-questioning-explicit-01
+    kind: explicit
+    prompt: "socratic-questioning을 명시적으로 호출해 내 결정이 숨은 전제에 기대는지 점검해 주세요."
+    expected_route: socratic-questioning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions]
+    rationale: "전제 점검 질문을 위해 사용자가 방법을 명시적으로 지정했습니다."
+  - id: socratic-questioning-insufficiency-01
+    kind: insufficiency
+    prompt: "결정적인 질문을 해 주세요. 어떤 결정·주장·범위·결과에 영향을 주는지는 말하지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing]
+    rationale: "목표 결정과 결과가 없으면 질문의 범위와 결정성을 정할 수 없습니다."

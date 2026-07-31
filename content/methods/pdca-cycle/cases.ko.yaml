@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pdca-cycle-positive-1
+    kind: positive
+    prompt: "지원 대기열에 검증된 기준선이 있고 작은 분류 변경으로 해결 품질을 낮추지 않으면서 대기 시간을 줄일 것이라는 가설이 있습니다. 되돌릴 수 있는 한 순환의 Plan, 제한된 Do, Check 규칙, Act 결정을 정하세요."
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, chosen_plan]
+    rationale: "기준선, 측정 가능한 목표, 안전한 범위, 표준화 또는 수정 결정이 있는 통제된 운영 순환입니다. 검증된 기준선을 보존하고 새 비교 근거는 별도 상태로 표시해야 합니다."
+  - id: pdca-cycle-positive-2
+    kind: positive
+    prompt: "창고 한 구역에서 일주일 동안 포장 라벨을 바꾸려 합니다. 목표와 지표, 가드레일과 중단 조건을 정하고 기대·관찰 결과를 비교한 뒤 표준화 또는 수정을 결정하세요."
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, chosen_plan]
+    rationale: "작은 구역과 일주일의 기간이 제한된 PDCA 순환에 맞습니다. 결과는 해당 맥락에 남겨 한 번의 순환을 영구 표준의 증거로 과장하지 않아야 합니다."
+  - id: pdca-cycle-positive-3
+    kind: positive
+    prompt: "알려진 업무 흐름 병목에 제안 변경, 담당자, 재현 가능한 측정이 있습니다. 이 개선을 Plan–Do–Check–Act로 정리하고 이탈을 기록하며 다음 버전의 개선 가설을 만드세요."
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, practical_consequence]
+    rationale: "업무 조건과 측정이 정해져 있어 근본 원인 발견보다 반복 개선이 과제입니다. 다음 순환 상태를 요구하므로 학습과 표준 수정이 보이게 됩니다."
+  - id: pdca-cycle-negative-1
+    kind: negative
+    prompt: "생산 결함의 원인이 여러 개일 수 있고 신뢰할 시간 순서가 없습니다. 결함이 사라지는지 보려고 즉시 승인 단계를 바꾸며 실험하세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [diagnose, causal_question, confounding, decisive_input_missing]
+    rationale: "근본 조건이 알려지지 않고 근거가 부족해 개선 순환이 실패를 가릴 수 있습니다. 다음 변경 전에 근본 원인 분석으로 인과 경계를 정해야 합니다."
+  - id: pdca-cycle-negative-2
+    kind: negative
+    prompt: "화학물질 유출이 아직 진행 중입니다. 사건 대응팀을 부르기 전에 현장 취급 표준을 바꾸고 다음 노출에서 배우세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [safety_critical_validation, recurring_failure]
+    rationale: "진행 중인 피해와 긴급 안전 대응이 있으므로 임의의 PDCA 순환은 금지됩니다. 반복 학습보다 격리와 자격 있는 사건 절차가 먼저입니다."
+  - id: pdca-cycle-mechanical-1
+    kind: mechanical
+    prompt: "제공된 일일 수치 네 개를 더해 총합만 반환하고 프로세스를 해석하거나 변경을 권하지 마세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "제공된 수치를 더하는 것은 결정적 계산이며 Plan–Do–Check–Act 개선 판단이 아닙니다."
+  - id: pdca-cycle-explicit-1
+    kind: explicit
+    prompt: "이 운영 개선에 PDCA 순환을 사용하세요. 목표와 측정, 제한된 Do 범위, Check 규칙, Act 결정, 근거 상태, 다음 순환 가설을 보여 주세요."
+    expected_route: pdca-cycle
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, repeat_iteration, plan, testable_hypothesis]
+    rationale: "사용자가 방법과 필수 공개 결과를 직접 지정했습니다. 결정적인 측정이나 안전한 범위가 빠지면 절차는 보류해야 합니다."
+  - id: pdca-cycle-insufficiency-1
+    kind: insufficiency
+    prompt: "PDCA로 우리 프로세스를 개선하세요. 목표, 기준선, 제안 변경, 측정, 안전한 범위, 담당자, 결과를 표준화할 규칙이 없습니다."
+    expected_route: pdca-cycle
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, repeat_iteration, plan, testable_hypothesis]
+    rationale: "PDCA를 명시했지만 결정적인 입력이 모두 없습니다. 범위 없는 변경을 실행하거나 측정하지 않은 결과를 표준화하지 말고 보류해야 합니다."

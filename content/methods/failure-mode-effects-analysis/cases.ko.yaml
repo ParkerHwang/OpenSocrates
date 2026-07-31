@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: failure-mode-effects-analysis-positive-01
+    kind: positive
+    prompt: "약품 분배 과정을 출시하기 전에 실패 유형·영향·원인·현재 통제와 통제 담당자를 정하고 싶다."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "정해진 과정에 미래 실패 목록과 통제 담당을 만들되 꾸며낸 점수는 피해야 한다."
+  - id: failure-mode-effects-analysis-positive-02
+    kind: positive
+    prompt: "데이터 파이프라인 변경이 수집·검증·알림에서 실패할 수 있다. 순서형 규칙으로 우선순위를 정하고 통제를 제안하라."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan]
+    rationale: "계획된 설계에서 실패 유형·영향·원인·순서형 우선순위·통제를 요구한다."
+  - id: failure-mode-effects-analysis-positive-03
+    kind: positive
+    prompt: "출시 전 결제 과정에서 잘못 청구될 수 있는 방식과 각 방식을 예방·탐지하는 방법을 검토하라."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "출시 전 과정 검토와 통제 배정이 이 방법의 구체적인 산출물이다."
+  - id: failure-mode-effects-analysis-negative-01
+    kind: negative
+    prompt: "제품 출시 계획을 정했다. 이미 실패했다고 보고 원인·조기 신호·완화책을 찾아 달라."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "확정 전 계획을 실패한 것으로 상상하는 관점이 요청되었다."
+  - id: failure-mode-effects-analysis-negative-02
+    kind: negative
+    prompt: "운영 결함이 반복된다. 증상·근접 원인·통제 가능한 시스템 조건을 분리하고 싶다."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "당장의 필요는 미래형 목록이 아니라 재발 진단이다."
+  - id: failure-mode-effects-analysis-mechanical-01
+    kind: mechanical
+    prompt: "기존 실패 유형 행을 우선순위를 평가하지 말고 알파벳순으로 정렬해 모든 필드를 보존하라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "위험을 설명하는 행이어도 정렬은 기계적 작업이다."
+  - id: failure-mode-effects-analysis-explicit-01
+    kind: explicit
+    prompt: "failure-mode-effects-analysis를 사용해 이 출시 점검표를 검토하되 심각도·발생·탐지 가능성 점수를 만들지 말라."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, failure_risk, plan]
+    rationale: "방법과 허위 정밀도 방지 조건을 명시적으로 요청했다."
+  - id: failure-mode-effects-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "과정 경계와 의도한 기능이 없다. 그래도 상상한 실패에 정확한 위험 우선순위 숫자를 부여하라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [failure_risk, decisive_input_missing]
+    rationale: "기능과 방어 가능한 척도가 없으므로 수치화하지 말고 평가를 보류해야 한다."

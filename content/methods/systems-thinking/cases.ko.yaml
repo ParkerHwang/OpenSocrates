@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: systems-thinking-positive-01
+    kind: positive
+    prompt: "검토 적체가 커지며 지연이 사용자 불만을 키우고 중복 신고를 만든다. 이 패턴의 구조를 알고 싶다."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question, deep_uncertainty]
+    rationale: "고립된 원인보다 상호작용하는 흐름·피드백·지연이 있는 반복 패턴이다."
+  - id: systems-thinking-positive-02
+    kind: positive
+    prompt: "보전 보조금으로 처음에는 식재가 늘었지만 계절별 물 부족과 단속 반응 때문에 결과가 진동한다."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "계절 행동과 정책 저항을 저량·유량·균형 루프·지연으로 설명해야 한다."
+  - id: systems-thinking-positive-03
+    kind: positive
+    prompt: "고객 신뢰는 천천히 쌓이고 추천이 성장을 강화하지만 지원 축소 뒤 늦게 하락한다. 지렛대를 찾아 달라."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "축적·강화 효과·지연 결과·개입 지점을 명시적으로 묻는 질문이다."
+  - id: systems-thinking-negative-01
+    kind: negative
+    prompt: "비슷한 두 집단에 다른 교육을 했고 한 달 뒤 교육이 시험 점수를 바꾸었는지 묻는다."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "범위가 정해진 개입 비교로 충분하고 전체 동적 시스템이 필요하지 않다."
+  - id: systems-thinking-negative-02
+    kind: negative
+    prompt: "단일 데이터베이스 중단에 명확한 시각의 촉발 요인이 있다. 근접 원인과 통제 가능한 근본 조건을 찾고 싶다."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [diagnose, recurring_failure]
+    rationale: "근거가 반복 피드백을 보이지 않는 한 범위가 정해진 사건 진단이 앞선다."
+  - id: systems-thinking-mechanical-01
+    kind: mechanical
+    prompt: "저량과 유량 메모를 시스템 설명 없이 마크다운 글머리표로 바꿔 달라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "서식 변경은 시스템 구조 판단을 요구하지 않는 기계적 작업이다."
+  - id: systems-thinking-explicit-01
+    kind: explicit
+    prompt: "systems-thinking을 사용해 국소적인 인력 조정이 장기 적체 증가로 계속 상쇄되는 이유를 설명해 달라."
+    expected_route: systems-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay, causal_question]
+    rationale: "지연이 있고 반복되는 시스템 패턴에 방법을 명시적으로 요청했다."
+  - id: systems-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "어제 민원 하나가 있었다. 시간 패턴 없이 강화 루프를 그리고 시스템 전체 개입을 권하라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "단일 관찰로는 동적 행동이나 루프 방향을 확립할 수 없다."

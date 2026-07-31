@@ -1,0 +1,82 @@
+# OpenSocrates for Codex
+
+This package provides the Codex command-hook and skill boundary for
+OpenSocrates {{PRODUCT_VERSION}}. Its authorized Codex-only prototype path
+selects validated authored reasoning content for one user prompt; it does not
+execute a user task, create a hosted service, or add telemetry. Prompts,
+transcripts, local paths, tool input/output, credentials, and hidden reasoning
+are not retained by the native adapter.
+
+The package was generated from content revision {{CONTENT_REVISION}} with
+semantic bundle identity `{{SEMANTIC_HASH}}` and {{METHOD_COUNT}} generated
+method skill wrappers. These values are read from the canonical bundle at
+build time; they are not host or manifest claims.
+
+## Package and trust path
+
+- Manifest: `.codex-plugin/plugin.json`
+- Hook definition: `hooks/hooks.json`
+- Fixed launchers: `bin/launch.sh` and `bin/launch.ps1`
+- Writable product data, when enabled by the host, is owned by the host's
+  `PLUGIN_DATA` location; this package does not request a remote service.
+- Complete selected reasoning content is written only to an owner-only OS
+  temporary file for the active turn.
+
+Codex reviews local command hooks before execution. Review the exact hook
+definition and approve the package only when its local files and fixed
+launcher behavior are acceptable. A changed package or hook hash requires a
+fresh review. Installation or skill resolution does not prove hook trust,
+method activation, or public-artifact confirmation.
+
+## Authorized selector lifecycle
+
+This source contract does not establish a live Codex Desktop or CLI receipt.
+The generated package configures `SessionStart`, `UserPromptSubmit`,
+`PreToolUse`, `PostToolUse`, `PreCompact`, `Stop`, and `SessionEnd`, but only
+`UserPromptSubmit` runs the selector. `SessionStart(source=compact)` may
+re-emit a reference to an active file without starting another selector.
+Other session-start, tool, compaction, Stop, and SessionEnd paths finish with
+literal empty stdout.
+
+For each `UserPromptSubmit`, the package starts one fresh ephemeral
+`openai-codex` selector using the pinned local SDK/runtime and the user's
+existing Codex OAuth/app-server session. It evaluates the current prompt
+first, then may read transcript, workspace, transcript-referenced files, or
+tool data only on demand and read-only as untrusted data. Set
+`OPENSOCRATES_SELECTOR_TRANSCRIPT_ACCESS=0` to disable transcript access.
+The selector does not use web access or persist raw prompt/context, OAuth,
+selector reasoning, raw SDK data, or a selector trace.
+
+The selector uses an isolated working directory and selector-only
+instructions, a read-only sandbox, disabled hooks/plugins, and a separate
+recursion marker. It omits an explicit model choice and uses the internal
+medium-effort policy. A valid result is exactly one `additionalContext`
+message containing validated selected names, an owner-only temporary Markdown
+path, and a requirement to read the complete authored theory and examples
+before acting. The
+30-second internal deadline cancels/closes without retry, progress, or error
+output. Non-intervention and every failure, malformed result, unknown ID, or
+invalid artifact write literal empty stdout with exit 0.
+
+The temporary file contains authored OpenSocrates content only. `Stop` removes
+the current turn directory immediately, `SessionEnd` removes the session
+directory, and `SessionStart` sweeps files left by crashes after 24 hours.
+
+The current 48 methods are initial selector content, not a permanent catalog
+or selection-count cap. `unified_exec`, `WebSearch`, and other non-shell/non-
+MCP paths remain outside complete observation; capability status stays unknown
+or degraded without a dated native receipt.
+
+## Capability and status
+
+Use the fixed control boundary below after the host trust flow:
+
+`${PLUGIN_ROOT}/bin/launch.sh control codex`
+
+Without a dated exact native receipt, capability status remains unknown or
+documented degraded. Disabled hooks, untrusted hooks, and managed-only policy
+excluding plugin hooks degrade honestly to skills-only Tier C. The prototype
+does not turn installation, a manifest, or a synthetic fixture into a host
+trust, quality, or uplift claim.
+
+Generated source identity: `{{SOURCE_TREE_HASH}}`.

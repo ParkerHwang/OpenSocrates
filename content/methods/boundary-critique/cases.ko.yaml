@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: boundary-critique-positive-01
+    kind: positive
+    prompt: "우리 도시는 현재 버스 이용자의 평균 통근 시간만으로 노선 개편의 성공을 판단해도 될까요?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "비이용자, 접근성, 지역, 시간 범위를 포함하면 결론이 달라질 수 있습니다."
+  - id: boundary-critique-positive-02
+    kind: positive
+    prompt: "직장 감시 시범사업의 성공을 판단할 때 누구를 포함해야 하나요?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "포함할 노동자, 제외된 계약직, 소유권, 측정 결과에 따라 성공 판단이 달라집니다."
+  - id: boundary-critique-positive-03
+    kind: positive
+    prompt: "세입자와 향후 30년의 이주 비용까지 포함하면 해안 홍수 계획이 여전히 타당한가요?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "영향받는 사람과 시간 범위를 바꾸면 누가 이익을 얻고 비용을 지는지, 선택지가 무엇인지 뒤집힐 수 있습니다."
+  - id: boundary-critique-negative-01
+    kind: negative
+    prompt: "범위가 명시된 두 공급업체를 세 가지 고정된 가격·지연 기준으로 비교해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [multiple_options, choose]
+    rationale: "경계, 결정권자, 시간 범위, 기준이 이미 정해져 있어 남은 일은 선택지 비교입니다."
+  - id: boundary-critique-negative-02
+    kind: negative
+    prompt: "제시된 주장에 어느 문단의 인용이 더 강하게 뒷받침하나요?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "누가 시스템 안에 들어오는지보다 출처의 지지 정도를 묻는 질문입니다."
+  - id: boundary-critique-mechanical-01
+    kind: mechanical
+    prompt: "제공한 이해관계자 목록을 이름과 역할 열이 있는 CSV로 옮겨 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "주어진 목록의 형식 변환은 기계 작업이므로 판단 방법을 활성화하지 않습니다."
+  - id: boundary-critique-explicit-01
+    kind: explicit
+    prompt: "boundary-critique를 사용해 우리 기후 공약이 공급망 노동자를 제외하는지 검토해 주세요."
+    expected_route: boundary-critique
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, boundary_sensitive]
+    rationale: "영향받는 행위자와 범위 문제에 대해 사용자가 방법을 명시적으로 호출했습니다."
+  - id: boundary-critique-insufficiency-01
+    kind: insufficiency
+    prompt: "영향받는 사람을 모두 포함하면 권고가 바뀌는지 말해 주세요. 결정, 집단, 시간 범위는 주지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [boundary_sensitive, decisive_input_missing]
+    rationale: "경계를 정하는 결정적 입력이 없으므로 영향을 받는 집단을 지어내지 말고 보류해야 합니다."

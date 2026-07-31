@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-loop-diagramming-positive-01
+    kind: positive
+    prompt: "A queue causes longer waits, longer waits cause abandonment, and abandonment changes future staffing demand; map the signed loop and delay."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "The task asks for named variables, signed links, a loop type, and the delayed effect that shapes the pattern."
+  - id: causal-loop-diagramming-positive-02
+    kind: positive
+    prompt: "User growth increases reviews, reviews attract more users, while capacity limits create a balancing response; identify both loops."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Multiple directional loops and a balancing constraint must be represented explicitly."
+  - id: causal-loop-diagramming-positive-03
+    kind: positive
+    prompt: "A policy produces quick relief but later rebounds because enforcement changes behavior with a long delay; draw the feedback explanation."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "The requested output is a signed loop account of delayed policy resistance, not a single effect estimate."
+  - id: causal-loop-diagramming-negative-01
+    kind: negative
+    prompt: "A broad organization has many actors, stocks, and side effects; decide the best leverage point before choosing a compact loop diagram."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "The wider system boundary and leverage question should be established before a focused loop diagram."
+  - id: causal-loop-diagramming-negative-02
+    kind: negative
+    prompt: "A trial asks whether one medication caused a measured outcome compared with a control, with no recurring dynamic pattern."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "A bounded counterfactual effect question does not need a feedback loop."
+  - id: causal-loop-diagramming-mechanical-01
+    kind: mechanical
+    prompt: "Copy the existing loop labels into a presentation and preserve their order without evaluating any relationship."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copying and formatting do not require causal judgment."
+  - id: causal-loop-diagramming-explicit-01
+    kind: explicit
+    prompt: "Apply causal-loop-diagramming to show why discounting increases demand but later creates stockouts and lost trust."
+    expected_route: causal-loop-diagramming
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay]
+    rationale: "The user names the method and gives a recurring reinforcing and balancing pattern."
+  - id: causal-loop-diagramming-insufficiency-01
+    kind: insufficiency
+    prompt: "Two variables moved together once, but their direction, timing, and repeat pattern are unknown; draw a verified reinforcing loop."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "A single co-movement without direction or timing cannot support a signed loop."

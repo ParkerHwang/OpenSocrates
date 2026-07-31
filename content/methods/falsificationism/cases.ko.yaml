@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: falsificationism-positive-01
+    kind: positive
+    prompt: "이 선호하는 제품 가설을 결정적으로 반박할 관찰은 무엇인가요?"
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "확증 일화가 아니라 위험한 예측과 관찰 가능한 반증 조건이 필요합니다."
+  - id: falsificationism-positive-02
+    kind: positive
+    prompt: "이 설명을 예측으로 바꾸고 보조 가정을 분리한 뒤 시험 전에 실패 임계값을 정해 주세요."
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "사전에 정한 반증 시도와 측정 조건이 필요한 요청입니다."
+  - id: falsificationism-positive-03
+    kind: positive
+    prompt: "실패한 예측이 이론, 측정, 보조 설정 가정 중 무엇을 약화했나요?"
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "시험 실패가 실제로 무엇을 겨냥하는지 구분해야 합니다."
+  - id: falsificationism-negative-01
+    kind: negative
+    prompt: "이상 현상의 설명을 몇 가지 만들고 관찰된 사실을 가장 잘 설명하는 것을 비교해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "위험한 예측이 없는 후보 설명 생성은 귀추법 과제입니다."
+  - id: falsificationism-negative-02
+    kind: negative
+    prompt: "출처를 설계 엄밀성 순으로 정렬하고 적용 가능성에 맞춰 주장 강도를 조정해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "반증 시도보다 증거 위계에 따른 조정이 핵심입니다."
+  - id: falsificationism-mechanical-01
+    kind: mechanical
+    prompt: "사전 등록한 예측과 임계값을 시험 양식에 복사해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "제공된 시험 사양 복사는 기계 작업입니다."
+  - id: falsificationism-explicit-01
+    kind: explicit
+    prompt: "이 개입이 항상 유지율을 높인다는 주장을 시험하기 위해 falsificationism을 명시적으로 호출해 주세요."
+    expected_route: falsificationism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, testable_claim]
+    rationale: "보편 주장을 반증 지향적으로 시험하도록 사용자가 방법을 지정했습니다."
+  - id: falsificationism-insufficiency-01
+    kind: insufficiency
+    prompt: "관찰 가능한 예측이 없고 무엇이 반박인지 말할 수 없는 주장에 falsificationism을 적용해 주세요."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [testable_claim]
+    rationale: "시험 가능한 함의가 없다는 고정 금지 조건이므로 반증 조건을 꾸미지 말고 거부해야 합니다."

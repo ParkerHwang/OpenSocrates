@@ -1,0 +1,764 @@
+{
+  "schema": "opensocrates.routing-policy/1.0.0",
+  "version": "1.0.0",
+  "global_negative_features": {
+    "mechanical": 3
+  },
+  "global_contraindications": [
+    "mechanical"
+  ],
+  "feature_vocabulary": {
+    "participation": [
+      "judgment",
+      "mechanical",
+      "mixed",
+      "explicit_method"
+    ],
+    "answer_need": [
+      "choose",
+      "diagnose",
+      "explain",
+      "critique",
+      "forecast",
+      "reconcile_evidence",
+      "plan",
+      "review_completion"
+    ],
+    "structure": [
+      "ambiguous_terms",
+      "boundary_sensitive",
+      "tangled_hierarchy",
+      "category_overlap",
+      "argument_dispute"
+    ],
+    "logical_form": [
+      "competing_explanations",
+      "explicit_rules",
+      "exception_prone_rule",
+      "repeated_observations"
+    ],
+    "evidence": [
+      "source_quality",
+      "conflicting_sources",
+      "new_evidence",
+      "weak_sample",
+      "testable_claim"
+    ],
+    "causality": [
+      "causal_question",
+      "recurring_failure",
+      "feedback_delay",
+      "confounding"
+    ],
+    "decision": [
+      "multiple_options",
+      "multiple_objectives",
+      "single_feasible_option",
+      "sequential_choice",
+      "information_purchase",
+      "irreversible_choice"
+    ],
+    "uncertainty": [
+      "deep_uncertainty",
+      "sensitive_inputs",
+      "reference_cases",
+      "unknown_probability"
+    ],
+    "challenge": [
+      "chosen_plan",
+      "failure_risk",
+      "dismissed_opposition",
+      "hidden_assumptions"
+    ],
+    "creation": [
+      "stale_options",
+      "human_need",
+      "technical_contradiction",
+      "combinable_dimensions"
+    ],
+    "purpose": [
+      "duties_rights",
+      "value_conflict",
+      "practical_consequence",
+      "user_progress"
+    ],
+    "learning": [
+      "testable_hypothesis",
+      "repeat_iteration",
+      "governing_rule",
+      "prioritized_assumptions"
+    ],
+    "strategy": [
+      "interacting_actors",
+      "macro_environment",
+      "stakeholder_conflict",
+      "context_disorder"
+    ],
+    "contraindication": [
+      "binding_rule_without_discretion",
+      "no_defensible_reference_class",
+      "no_testable_implication",
+      "no_meaningful_interdependence",
+      "no_coherent_dimensions",
+      "safety_critical_validation",
+      "decisive_input_missing"
+    ]
+  },
+  "scoring": {
+    "minimum_score_inclusive": true,
+    "contraindication_penalty": 12,
+    "weights_strength_range": [
+      1,
+      3
+    ]
+  },
+  "tie_break": [
+    "explicit_method",
+    "exact_answer_shape",
+    "fewer_contraindications",
+    "smaller_prompt_token_cost",
+    "lexicographically_smaller_method_id"
+  ],
+  "secondary": {
+    "minimum_primary_score_ratio": 0.8,
+    "different_family": true,
+    "compatible_with_preferred_edge": true,
+    "nonredundant_output": true,
+    "max_methods": 2
+  },
+  "fallback": {
+    "direct_judgment": [
+      "critical-thinking",
+      null
+    ],
+    "decision_memo": [
+      "trade-off-analysis",
+      "sensitivity-analysis_if_uncertainty_explicit"
+    ],
+    "diagnostic": [
+      "root-cause-analysis",
+      null
+    ],
+    "critique": [
+      "argument-mapping",
+      "critical-thinking"
+    ],
+    "risk_assessment": [
+      "premortem-analysis",
+      "failure-mode-effects-analysis"
+    ],
+    "evidence_reconciliation": [
+      "evidence-hierarchy",
+      "triangulation"
+    ],
+    "structured_plan": [
+      "logic-tree",
+      "premortem-analysis"
+    ],
+    "completion_review": [
+      "critical-thinking",
+      null
+    ]
+  },
+  "matrix": {
+    "boundary-critique": {
+      "positive_features": {
+        "boundary_sensitive": 3,
+        "stakeholder_conflict": 1
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "stakeholder-analysis"
+    },
+    "conceptual-analysis": {
+      "positive_features": {
+        "ambiguous_terms": 3,
+        "argument_dispute": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "argument-mapping"
+    },
+    "first-principles": {
+      "positive_features": {
+        "hidden_assumptions": 3,
+        "stale_options": 2
+      },
+      "negative_features": {
+        "explicit_rules": 1
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "morphological-analysis"
+    },
+    "socratic-questioning": {
+      "positive_features": {
+        "decisive_input_missing": 3,
+        "ambiguous_terms": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "assumption-mapping"
+    },
+    "argument-mapping": {
+      "positive_features": {
+        "argument_dispute": 3,
+        "critique": 2,
+        "tangled_hierarchy": 1
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "evidence-hierarchy"
+    },
+    "logic-tree": {
+      "positive_features": {
+        "tangled_hierarchy": 3,
+        "diagnose": 2,
+        "plan": 1
+      },
+      "negative_features": {
+        "feedback_delay": 2
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "root-cause-analysis"
+    },
+    "mece": {
+      "positive_features": {
+        "category_overlap": 3,
+        "tangled_hierarchy": 2
+      },
+      "negative_features": {
+        "feedback_delay": 2
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "logic-tree"
+    },
+    "pyramid-principle": {
+      "positive_features": {
+        "explain": 3,
+        "tangled_hierarchy": 2
+      },
+      "negative_features": {
+        "hidden_assumptions": 1
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "argument-mapping"
+    },
+    "abduction": {
+      "positive_features": {
+        "competing_explanations": 3,
+        "diagnose": 2
+      },
+      "negative_features": {
+        "explicit_rules": 2
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "value-of-information"
+    },
+    "deduction": {
+      "positive_features": {
+        "explicit_rules": 3,
+        "explain": 2
+      },
+      "negative_features": {
+        "unknown_probability": 2
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "conceptual-analysis"
+    },
+    "defeasible-reasoning": {
+      "positive_features": {
+        "exception_prone_rule": 3,
+        "explicit_rules": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "premortem-analysis"
+    },
+    "induction": {
+      "positive_features": {
+        "repeated_observations": 3,
+        "weak_sample": 2
+      },
+      "negative_features": {
+        "causal_question": 2
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "evidence-hierarchy"
+    },
+    "bayesian-updating": {
+      "positive_features": {
+        "new_evidence": 3,
+        "unknown_probability": 2,
+        "competing_explanations": 1
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "abduction"
+    },
+    "evidence-hierarchy": {
+      "positive_features": {
+        "source_quality": 3,
+        "reconcile_evidence": 2,
+        "conflicting_sources": 1
+      },
+      "negative_features": {
+        "value_conflict": 2
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "triangulation"
+    },
+    "falsificationism": {
+      "positive_features": {
+        "testable_claim": 3,
+        "critique": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [
+        "no_testable_implication"
+      ],
+      "preferred_complement": "lean-startup"
+    },
+    "triangulation": {
+      "positive_features": {
+        "reconcile_evidence": 3,
+        "conflicting_sources": 2,
+        "source_quality": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "evidence-hierarchy"
+    },
+    "causal-reasoning": {
+      "positive_features": {
+        "causal_question": 3,
+        "confounding": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "falsificationism"
+    },
+    "root-cause-analysis": {
+      "positive_features": {
+        "recurring_failure": 3,
+        "diagnose": 3
+      },
+      "negative_features": {
+        "macro_environment": 1
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "failure-mode-effects-analysis"
+    },
+    "systems-thinking": {
+      "positive_features": {
+        "feedback_delay": 3,
+        "causal_question": 2,
+        "deep_uncertainty": 1
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "causal-loop-diagramming"
+    },
+    "causal-loop-diagramming": {
+      "positive_features": {
+        "feedback_delay": 3,
+        "recurring_failure": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "systems-thinking"
+    },
+    "critical-thinking": {
+      "positive_features": {
+        "critique": 3,
+        "hidden_assumptions": 2,
+        "argument_dispute": 1
+      },
+      "negative_features": {},
+      "minimum_score": 4,
+      "contraindications": [],
+      "preferred_complement": "argument-mapping"
+    },
+    "failure-mode-effects-analysis": {
+      "positive_features": {
+        "failure_risk": 3,
+        "plan": 2,
+        "review_completion": 1
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "premortem-analysis"
+    },
+    "premortem-analysis": {
+      "positive_features": {
+        "chosen_plan": 3,
+        "failure_risk": 3
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "failure-mode-effects-analysis"
+    },
+    "steelman-reasoning": {
+      "positive_features": {
+        "dismissed_opposition": 3,
+        "argument_dispute": 2,
+        "critique": 1
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "reflective-equilibrium"
+    },
+    "design-thinking": {
+      "positive_features": {
+        "human_need": 3,
+        "user_progress": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "jobs-to-be-done"
+    },
+    "lateral-thinking": {
+      "positive_features": {
+        "stale_options": 3,
+        "choose": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [
+        "safety_critical_validation"
+      ],
+      "preferred_complement": "trade-off-analysis"
+    },
+    "morphological-analysis": {
+      "positive_features": {
+        "combinable_dimensions": 3,
+        "stale_options": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [
+        "no_coherent_dimensions"
+      ],
+      "preferred_complement": "first-principles"
+    },
+    "triz": {
+      "positive_features": {
+        "technical_contradiction": 3,
+        "plan": 2
+      },
+      "negative_features": {
+        "value_conflict": 1
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "systems-thinking"
+    },
+    "deontic-reasoning": {
+      "positive_features": {
+        "duties_rights": 3,
+        "explicit_rules": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "reflective-equilibrium"
+    },
+    "jobs-to-be-done": {
+      "positive_features": {
+        "user_progress": 3,
+        "human_need": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "design-thinking"
+    },
+    "pragmatism": {
+      "positive_features": {
+        "practical_consequence": 3,
+        "choose": 2,
+        "value_conflict": 1
+      },
+      "negative_features": {
+        "duties_rights": 2
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "lean-startup"
+    },
+    "reflective-equilibrium": {
+      "positive_features": {
+        "value_conflict": 3,
+        "argument_dispute": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
+      "preferred_complement": "steelman-reasoning"
+    },
+    "cost-benefit-analysis": {
+      "positive_features": {
+        "multiple_objectives": 3,
+        "multiple_options": 2,
+        "choose": 1
+      },
+      "negative_features": {
+        "duties_rights": 2
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "sensitivity-analysis"
+    },
+    "decision-tree-analysis": {
+      "positive_features": {
+        "sequential_choice": 3,
+        "unknown_probability": 2,
+        "choose": 1
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "scenario-planning"
+    },
+    "trade-off-analysis": {
+      "positive_features": {
+        "multiple_options": 3,
+        "multiple_objectives": 3,
+        "choose": 2
+      },
+      "negative_features": {
+        "single_feasible_option": 2
+      },
+      "minimum_score": 4,
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
+      "preferred_complement": "sensitivity-analysis"
+    },
+    "value-of-information": {
+      "positive_features": {
+        "information_purchase": 3,
+        "unknown_probability": 2,
+        "choose": 2
+      },
+      "negative_features": {
+        "irreversible_choice": 1
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "bayesian-updating"
+    },
+    "reference-class-forecasting": {
+      "positive_features": {
+        "forecast": 3,
+        "reference_cases": 3
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [
+        "no_defensible_reference_class"
+      ],
+      "preferred_complement": "sensitivity-analysis"
+    },
+    "robust-decision-making": {
+      "positive_features": {
+        "deep_uncertainty": 3,
+        "irreversible_choice": 2,
+        "choose": 1
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "scenario-planning"
+    },
+    "scenario-planning": {
+      "positive_features": {
+        "deep_uncertainty": 3,
+        "macro_environment": 2,
+        "forecast": 1
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "pestel-analysis"
+    },
+    "sensitivity-analysis": {
+      "positive_features": {
+        "sensitive_inputs": 3,
+        "unknown_probability": 2,
+        "multiple_objectives": 1
+      },
+      "negative_features": {
+        "deep_uncertainty": 1
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "trade-off-analysis"
+    },
+    "assumption-mapping": {
+      "positive_features": {
+        "hidden_assumptions": 3,
+        "prioritized_assumptions": 3
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "lean-startup"
+    },
+    "double-loop-learning": {
+      "positive_features": {
+        "governing_rule": 3,
+        "recurring_failure": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "root-cause-analysis"
+    },
+    "lean-startup": {
+      "positive_features": {
+        "testable_hypothesis": 3,
+        "prioritized_assumptions": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [
+        "safety_critical_validation"
+      ],
+      "preferred_complement": "jobs-to-be-done"
+    },
+    "pdca-cycle": {
+      "positive_features": {
+        "repeat_iteration": 3,
+        "plan": 2
+      },
+      "negative_features": {
+        "diagnose": 1
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "root-cause-analysis"
+    },
+    "cynefin-framework": {
+      "positive_features": {
+        "context_disorder": 3,
+        "diagnose": 2,
+        "deep_uncertainty": 1
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "scenario-planning"
+    },
+    "game-theory": {
+      "positive_features": {
+        "interacting_actors": 3,
+        "choose": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [
+        "no_meaningful_interdependence"
+      ],
+      "preferred_complement": "stakeholder-analysis"
+    },
+    "pestel-analysis": {
+      "positive_features": {
+        "macro_environment": 3,
+        "forecast": 2
+      },
+      "negative_features": {
+        "recurring_failure": 2
+      },
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "scenario-planning"
+    },
+    "stakeholder-analysis": {
+      "positive_features": {
+        "stakeholder_conflict": 3,
+        "interacting_actors": 2
+      },
+      "negative_features": {},
+      "minimum_score": 5,
+      "contraindications": [],
+      "preferred_complement": "game-theory"
+    }
+  },
+  "complement_graph": {
+    "boundary-critique": "stakeholder-analysis",
+    "conceptual-analysis": "argument-mapping",
+    "first-principles": "morphological-analysis",
+    "socratic-questioning": "assumption-mapping",
+    "argument-mapping": "evidence-hierarchy",
+    "logic-tree": "root-cause-analysis",
+    "mece": "logic-tree",
+    "pyramid-principle": "argument-mapping",
+    "abduction": "value-of-information",
+    "deduction": "conceptual-analysis",
+    "defeasible-reasoning": "premortem-analysis",
+    "induction": "evidence-hierarchy",
+    "bayesian-updating": "abduction",
+    "evidence-hierarchy": "triangulation",
+    "falsificationism": "lean-startup",
+    "triangulation": "evidence-hierarchy",
+    "causal-reasoning": "falsificationism",
+    "root-cause-analysis": "failure-mode-effects-analysis",
+    "systems-thinking": "causal-loop-diagramming",
+    "causal-loop-diagramming": "systems-thinking",
+    "critical-thinking": "argument-mapping",
+    "failure-mode-effects-analysis": "premortem-analysis",
+    "premortem-analysis": "failure-mode-effects-analysis",
+    "steelman-reasoning": "reflective-equilibrium",
+    "design-thinking": "jobs-to-be-done",
+    "lateral-thinking": "trade-off-analysis",
+    "morphological-analysis": "first-principles",
+    "triz": "systems-thinking",
+    "deontic-reasoning": "reflective-equilibrium",
+    "jobs-to-be-done": "design-thinking",
+    "pragmatism": "lean-startup",
+    "reflective-equilibrium": "steelman-reasoning",
+    "cost-benefit-analysis": "sensitivity-analysis",
+    "decision-tree-analysis": "scenario-planning",
+    "trade-off-analysis": "sensitivity-analysis",
+    "value-of-information": "bayesian-updating",
+    "reference-class-forecasting": "sensitivity-analysis",
+    "robust-decision-making": "scenario-planning",
+    "scenario-planning": "pestel-analysis",
+    "sensitivity-analysis": "trade-off-analysis",
+    "assumption-mapping": "lean-startup",
+    "double-loop-learning": "root-cause-analysis",
+    "lean-startup": "jobs-to-be-done",
+    "pdca-cycle": "root-cause-analysis",
+    "cynefin-framework": "scenario-planning",
+    "game-theory": "stakeholder-analysis",
+    "pestel-analysis": "scenario-planning",
+    "stakeholder-analysis": "game-theory"
+  }
+}
+

@@ -1,0 +1,34 @@
+{
+  "fixture_id": "TEST-CDX-post-tool-use-success",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-07-15",
+  "host": "codex_cli",
+  "native_event": "PostToolUse",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "PostToolUse",
+    "turn_id": "TEST-turn-004",
+    "permission_mode": "default",
+    "tool_name": "apply_patch",
+    "tool_use_id": "TEST-tool-006"
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {
+      "hookSpecificOutput": {
+        "hookEventName": "PostToolUse",
+        "additionalContext": "<synthetic-observation-context>"
+      }
+    }
+  },
+  "adapter_expectation": {
+    "normalized_event": "tool_succeeded",
+    "status": "accepted",
+    "projection": {
+      "tool_category": "write",
+      "result_present": true,
+      "tool_use_key": "derived-hmac"
+    }
+  },
+  "redaction": "Tool arguments and response are omitted; the tool and TEST-prefixed use id are synthetic."
+}

@@ -1,0 +1,35 @@
+{
+  "fixture_id": "TEST-CDX-pre-tool-use-bash",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-07-15",
+  "host": "codex_cli",
+  "native_event": "PreToolUse",
+  "source_ids": ["X-HOOKS"],
+  "native_input": {
+    "hook_event_name": "PreToolUse",
+    "turn_id": "TEST-turn-003",
+    "permission_mode": "default",
+    "tool_name": "Bash",
+    "tool_use_id": "TEST-tool-005",
+    "tool_input": {
+      "command": "<synthetic-command>"
+    }
+  },
+  "native_output": {
+    "exit_code": 0,
+    "stdout": {
+      "hookSpecificOutput": {
+        "hookEventName": "PreToolUse",
+        "additionalContext": "<synthetic-pre-tool-context>"
+      }
+    }
+  },
+  "adapter_expectation": {
+    "normalized_event": null,
+    "status": "no_op",
+    "projection": {
+      "reasoning_intervention": false
+    }
+  },
+  "redaction": "The command is a marker only; PreToolUse never denies or rewrites for reasoning quality."
+}

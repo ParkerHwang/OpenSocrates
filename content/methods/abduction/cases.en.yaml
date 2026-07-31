@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: abduction-positive-01
+    kind: positive
+    prompt: "Several causes could explain the sudden drop in conversion; which explanation best fits the observed facts?"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Multiple explanations fit an anomaly and need discriminating evidence before a provisional best explanation."
+  - id: abduction-positive-02
+    kind: positive
+    prompt: "The service is failing only for some regions. Compare plausible explanations and propose the next observation that separates them."
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "The task is diagnosis under incomplete information with a request for a discriminating check."
+  - id: abduction-positive-03
+    kind: positive
+    prompt: "What is the best current explanation for this unexpected lab result, and what would change your mind?"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "The answer must compare candidate explanations and remain explicitly provisional."
+  - id: abduction-negative-01
+    kind: negative
+    prompt: "Given these explicit premises and rule, does the conclusion necessarily follow?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Settled premises and a rule call for deduction rather than best-explanation search."
+  - id: abduction-negative-02
+    kind: negative
+    prompt: "Use the repeated sample observations to estimate how often this pattern occurs in the population."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "The task generalizes from a sample instead of comparing competing explanations."
+  - id: abduction-mechanical-01
+    kind: mechanical
+    prompt: "Copy the three supplied hypotheses into the investigation template."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copying hypotheses is mechanical and should not trigger diagnosis."
+  - id: abduction-explicit-01
+    kind: explicit
+    prompt: "Explicitly invoke abduction to diagnose why the deployment is failing after the configuration change."
+    expected_route: abduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, competing_explanations]
+    rationale: "The user explicitly names the method for an anomalous outcome and diagnosis."
+  - id: abduction-insufficiency-01
+    kind: insufficiency
+    prompt: "Choose the best explanation, but provide only the conclusion and no observation, alternatives, or testable evidence."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [competing_explanations, decisive_input_missing]
+    rationale: "Without an observation and competing candidates, selecting a best explanation would be a story rather than an inference."

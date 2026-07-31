@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: mece-positive-01
+    kind: positive
+    prompt: "이 단일 구매 결정에서 고객 세그먼트가 서로 겹치지 않고 전체를 빠짐없이 덮나요?"
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "하나의 분류 축 아래 중복과 커버리지를 따로 점검해 달라는 요청입니다."
+  - id: mece-positive-02
+    kind: positive
+    prompt: "어떤 사례도 두 범주에 들어가지 않고 중요한 사례도 빠지지 않도록 위험 범주를 다시 설계해 주세요."
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "중복·누락·입도 점검을 포함한 분류 규칙이 필요한 과제입니다."
+  - id: mece-positive-03
+    kind: positive
+    prompt: "이슈 트리 가지가 하나의 축을 쓰고 입도가 맞으며 제시된 전체 집합을 덮는지 확인해 주세요."
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "넓은 진단보다 집중적인 ME/CE 감사가 필요한 요청입니다."
+  - id: mece-negative-01
+    kind: negative
+    prompt: "장애 원인을 재귀적으로 나누고 모든 말단 가지에 시험을 붙여 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "분류 품질 점검을 넘어 완전한 로직 트리가 필요한 과제입니다."
+  - id: mece-negative-02
+    kind: negative
+    prompt: "겹침 자체가 의미 있는 고객 정체성이므로 이 중첩 라벨을 그대로 유지해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [ambiguous_terms, human_need]
+    rationale: "중첩이 의도된 현상이므로 배타성을 강요하면 왜곡됩니다."
+  - id: mece-mechanical-01
+    kind: mechanical
+    prompt: "제공한 범주를 알파벳순으로 정렬하고 설명은 그대로 보존해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "알파벳 정렬은 범주 논리를 평가하지 않는 기계 작업입니다."
+  - id: mece-explicit-01
+    kind: explicit
+    prompt: "운영 모델의 소유권 묶음을 감사하기 위해 mece를 명시적으로 사용해 주세요."
+    expected_route: mece
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, category_overlap]
+    rationale: "사용자가 하나의 축으로 중복과 커버리지를 점검하는 방법을 직접 지정했습니다."
+  - id: mece-insufficiency-01
+    kind: insufficiency
+    prompt: "범주가 MECE인지 말해 주세요. 전체 집합, 분류 목적, 범주 규칙은 주지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [category_overlap, decisive_input_missing]
+    rationale: "제한된 전체, 목적, 소속 규칙 없이는 ME와 CE를 평가할 수 없습니다."

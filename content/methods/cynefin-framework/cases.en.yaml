@@ -1,0 +1,58 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "cynefin-framework-positive-1"
+    kind: positive
+    prompt: "Our billing support team follows a documented decision tree, and the same input reliably produces the same fix. Should we standardize the response and monitor exceptions?"
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, diagnose]
+    rationale: "The user describes a stable relationship and asks for the appropriate response mode. The observations are user-provided, so the route should classify the situation without claiming that every future case is clear."
+  - id: "cynefin-framework-positive-2"
+    kind: positive
+    prompt: "Several teams are trying to reduce burnout, but each intervention changes workload, trust, and behavior in unexpected ways. Help us choose small probes, observe the results, and decide what to try next."
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, deep_uncertainty]
+    rationale: "The prompt describes an adaptive pattern rather than a fixed procedure. The route should make the complex context and learning signals explicit; it should not invent a success probability for any probe."
+  - id: "cynefin-framework-positive-3"
+    kind: positive
+    prompt: "A production service is failing across regions and customers are losing access now. We need a response that contains the incident immediately and then uses new observations to adjust the recovery."
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, diagnose]
+    rationale: "The request depends on choosing an urgent action mode and a later reassessment signal. The incident facts are not independently verified here, so the route should preserve that uncertainty while supporting containment."
+  - id: "cynefin-framework-negative-1"
+    kind: negative
+    prompt: "Convert these already approved operating steps into a numbered checklist and preserve the wording exactly."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "This is a formatting task with a fixed instruction, not a situation-classification judgment. No method route is needed and no evidence claim should be added."
+  - id: "cynefin-framework-negative-2"
+    kind: negative
+    prompt: "Scan the political, economic, social, technological, environmental, and legal changes that could affect our expansion plan."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features: [macro_environment, forecast]
+    rationale: "The request is close because it concerns strategic uncertainty, but its decisive output is a material external-factor register rather than a domain classification and response mode. This is a likely family-level confusion."
+  - id: "cynefin-framework-mechanical-1"
+    kind: mechanical
+    prompt: "Sort these incident timestamps in chronological order and return them as CSV."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "The task has a mechanical output and no meaningful decision about context or action. It should remain silent on method routing."
+  - id: "cynefin-framework-explicit-1"
+    kind: explicit
+    prompt: "Use the Cynefin framework to decide whether our service outage needs immediate action, expert analysis, or safe experiments. Show the evidence and the signal that would change the classification."
+    expected_route: "cynefin-framework"
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, context_disorder]
+    rationale: "The user names the method and requests its public outputs, so it remains primary. The response must still mark user-supplied observations and avoid presenting the classification as certainty."
+  - id: "cynefin-framework-insufficiency-1"
+    kind: insufficiency
+    prompt: "Should we standardize this problem or run experiments? I have not described the problem, its causes, its time pressure, or what evidence we have."
+    expected_route: "cynefin-framework"
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, context_disorder]
+    rationale: "The decision is a genuine response-mode question, but the decisive observations are absent. The method may hold and ask for the smallest missing facts; it must not fabricate a domain or probability."

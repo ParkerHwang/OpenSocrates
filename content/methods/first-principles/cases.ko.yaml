@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: first-principles-positive-01
+    kind: positive
+    prompt: "좌석당 가격에서 정말 필요한 부분과 오래된 영업 절차에서 물려받은 부분은 무엇인가요?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "재설계는 근본 요구와 관행·상속된 가정을 분리해야 가능합니다."
+  - id: first-principles-positive-02
+    kind: positive
+    prompt: "현재 순서를 그대로 복사하지 말고 실제 안전 제약에서 승인 절차를 다시 설계할 수 있을까요?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "워크플로를 분해하고 필수성을 확인한 뒤 다시 구성하라는 요청입니다."
+  - id: first-principles-positive-03
+    kind: positive
+    prompt: "기존 공급업체 아키텍처를 전제하지 않고 데이터 파이프라인을 다시 만들 때 무엇이 반드시 유지되어야 하나요?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "상속된 아키텍처에 의문을 제기한 뒤 살아남는 제약을 찾는 질문입니다."
+  - id: first-principles-negative-01
+    kind: negative
+    prompt: "의무 보존 규칙을 각 기록에 적용하고 위반을 보고해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "구속 규칙을 재검토하는 것이 아니라 적용하는 과제입니다."
+  - id: first-principles-negative-02
+    kind: negative
+    prompt: "고정된 매개변수의 조합 다섯 개를 만들고 실행 가능성을 심사해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "요구사항이 이미 고정되어 있어 남은 일은 조합 탐색입니다."
+  - id: first-principles-mechanical-01
+    kind: mechanical
+    prompt: "기존 배포 체크리스트를 내용 변경 없이 새 템플릿에 복사해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "제공된 체크리스트 복사는 재설계 추론이 필요 없는 기계 작업입니다."
+  - id: first-principles-explicit-01
+    kind: explicit
+    prompt: "first-principles를 사용해 모든 지원 티켓에 사람 검토가 필요하다는 가정에 도전해 주세요."
+    expected_route: first-principles
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions]
+    rationale: "관행적 가정을 분해하고 확인하기 위해 사용자가 방법을 명시적으로 호출했습니다."
+  - id: first-principles-insufficiency-01
+    kind: insufficiency
+    prompt: "first-principles로 시스템을 다시 만들어 주세요. 목표, 양보할 수 없는 제약, 안전 규칙은 주지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [hidden_assumptions, decisive_input_missing]
+    rationale: "목표와 강한 경계가 없으면 가능성과 안전한 실행 설계를 혼동하게 됩니다."

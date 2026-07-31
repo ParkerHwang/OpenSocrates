@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: argument-mapping-positive-01
+    kind: positive
+    prompt: "이 정책 논증의 주장·근거·반론·재반론을 지도처럼 정리해 근거 없는 연결을 보여 주세요."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique, tangled_hierarchy]
+    rationale: "주장-근거-반론 구조와 지지되지 않은 연결을 공개해야 하는 과제입니다."
+  - id: argument-mapping-positive-02
+    kind: positive
+    prompt: "권고를 실제로 지지하는 전제는 무엇이고 아직 답하지 않은 반론은 무엇인가요?"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "권고를 판단하기 전에 지지·공격 관계를 분리해야 합니다."
+  - id: argument-mapping-positive-03
+    kind: positive
+    prompt: "계약 입장을 논증 지도로 만들고 공동 가정과 가장 강한 재반론을 포함해 주세요."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, tangled_hierarchy]
+    rationale: "주장, 공동 전제, 반론을 구조화한 공개 결과가 필요한 요청입니다."
+  - id: argument-mapping-negative-01
+    kind: negative
+    prompt: "두 연구의 증거 품질을 비교하고 어느 연구가 우리 모집단에 적용되는지 말해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "핵심 병목이 논증 구조가 아니라 출처 설계와 적용 가능성입니다."
+  - id: argument-mapping-negative-02
+    kind: negative
+    prompt: "임원용 권고를 먼저 쓰고 세 묶음의 근거와 상세를 뒤에 배치해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "지지 연결 점검보다 하향식 전달 구조를 요청한 경우입니다."
+  - id: argument-mapping-mechanical-01
+    kind: mechanical
+    prompt: "제공한 전제 목록을 Markdown 글머리표로 바꿔 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "제공된 목록의 형식 변환은 논증 분석이 필요 없습니다."
+  - id: argument-mapping-explicit-01
+    kind: explicit
+    prompt: "argument-mapping을 명시적으로 사용해 이 투자 메모의 가장 강한 반론을 검토해 주세요."
+    expected_route: argument-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, argument_dispute]
+    rationale: "반론과 지지 구조를 검토하기 위해 사용자가 방법을 명시했습니다."
+  - id: argument-mapping-insufficiency-01
+    kind: insufficiency
+    prompt: "논증을 지도화하고 가장 약한 연결을 판단해 주세요. 결론·전제·출처 내용은 주지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [argument_dispute, decisive_input_missing]
+    rationale: "지도화할 논증 자료가 없으므로 전제를 만들어내지 말고 보류해야 합니다."

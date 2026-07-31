@@ -1,0 +1,13 @@
+# Evidence audit
+
+Audit public claims against the injected evidence/card service. The host
+runtime invokes the compatibility dispatcher with the exact command name
+`evidence-audit`; it does not read a transcript or private ledger.
+
+Fixed control boundary:
+
+`${PLUGIN_ROOT}/bin/launch.sh control codex`
+
+The source seam is:
+
+`opensocrates.application.compatibility.dispatch_compatibility("evidence-audit", services=...)`

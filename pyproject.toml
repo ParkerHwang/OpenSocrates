@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opensocrates"
+version = "1.0.0"
+description = "A local, evidence-grounded reasoning control plane for AI-agent hosts."
+requires-python = ">=3.12,<3.13"
+keywords = ["ai", "agents", "codex", "reasoning", "decision-support"]
+dependencies = [
+  "openai-codex==0.144.4",
+  # Keep the SDK's platform-specific app-server binary explicit in the
+  # application contract.  It must remain version-matched with the SDK.
+  "openai-codex-cli-bin==0.144.4",
+  # The SDK requires Pydantic 2.12+.  Do not allow a future major version
+  # without an explicit compatibility review.
+  "pydantic>=2.12,<3",
+]
+authors = [{ name = "OpenSocrates contributors" }]
+license = { file = "LICENSE" }
+readme = "README.md"
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS :: MacOS X",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Homepage = "https://github.com/ParkerHwang/OpenSocrates"
+Repository = "https://github.com/ParkerHwang/OpenSocrates.git"
+Issues = "https://github.com/ParkerHwang/OpenSocrates/issues"
+Changelog = "https://github.com/ParkerHwang/OpenSocrates/blob/main/CHANGELOG.md"
+
+[project.scripts]
+opensocrates = "opensocrates.__main__:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tools"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "C90"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tools/compile_prompts.py" = ["E402"]
+"tools/generate_schemas.py" = ["E402"]
+"tools/validate_content.py" = ["E402"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src"]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[dependency-groups]
+dev = [
+  "mypy==2.3.0",
+  "ruff==0.15.22",
+]
+build = [
+  "pyinstaller==6.21.0",
+]

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: first-principles-positive-01
+    kind: positive
+    prompt: "Which parts of our per-seat pricing are truly required, and which are inherited from the old sales process?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "The redesign depends on separating irreducible requirements from conventions and inherited assumptions."
+  - id: first-principles-positive-02
+    kind: positive
+    prompt: "Can we redesign this approval workflow from its actual safety constraints instead of copying the current sequence?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "The request asks to decompose the workflow, verify necessities, and reconstruct it."
+  - id: first-principles-positive-03
+    kind: positive
+    prompt: "What must remain true if we rebuild this data pipeline without assuming the existing vendor architecture?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "The central question is which constraints survive after inherited architecture is challenged."
+  - id: first-principles-negative-01
+    kind: negative
+    prompt: "Apply the mandatory retention rule to each record and report any violations."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "A binding rule is being applied, not reconsidered or reconstructed."
+  - id: first-principles-negative-02
+    kind: negative
+    prompt: "Generate five combinations of the fixed parameters and screen them for feasibility."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "The requirements are already fixed and the task is combination exploration."
+  - id: first-principles-mechanical-01
+    kind: mechanical
+    prompt: "Copy the existing deployment checklist into the new template without changing its content."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copying a supplied checklist is mechanical and should not trigger redesign reasoning."
+  - id: first-principles-explicit-01
+    kind: explicit
+    prompt: "Use first-principles to challenge the assumption that every support ticket needs a human review."
+    expected_route: first-principles
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions]
+    rationale: "The user explicitly invokes the method to decompose and verify a conventional assumption."
+  - id: first-principles-insufficiency-01
+    kind: insufficiency
+    prompt: "Rebuild the system from first principles, but do not state the target outcome, non-negotiable constraints, or governing safety rules."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [hidden_assumptions, decisive_input_missing]
+    rationale: "Without the target and hard boundaries, reconstruction would confuse possibility with a viable safe design."

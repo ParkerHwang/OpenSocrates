@@ -1,0 +1,74 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "pestel-analysis-positive-1"
+    kind: positive
+    prompt: "Before entering this country, scan the current election agenda, inflation and currency conditions, demographic shifts, platform technology, emissions rules, and licensing requirements that could change our launch plan."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "The prompt names a scoped external scan and a strategic decision. The route should preserve source dates and jurisdiction, and should not claim that an unverified policy or forecast is settled."
+  - id: "pestel-analysis-positive-2"
+    kind: positive
+    prompt: "Our product expansion depends on aging customers, data-protection rules, cloud costs, and a possible energy-price shock. Identify the material factors, mechanisms, and signals that should change the investment choice."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "The request asks for material external factors and their strategic implications rather than a generic trend list. The prompt supplies hypotheses, so the analysis must label them as checked, inferred, or unverified."
+  - id: "pestel-analysis-positive-3"
+    kind: positive
+    prompt: "Build an evidence-based external context for our five-year strategy, showing which changes are opportunities, threats, or monitoring signals and what would flip each implication."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "The requested output is a material-factor register connected to a strategic horizon. It calls for evidence status and observable signposts, not fabricated forecasts or probabilities."
+  - id: "pestel-analysis-negative-1"
+    kind: negative
+    prompt: "Our warehouse has a recurring picking error. Trace the local process, identify the failure cause, and propose a corrective action."
+    expected_route: "root-cause-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "recurring_failure"
+      - "diagnose"
+    rationale: "The problem is inside a local process rather than a macro environment. A causal failure analysis is the closer route; external factors should not be added merely to fill categories."
+  - id: "pestel-analysis-negative-2"
+    kind: negative
+    prompt: "A new policy will affect employees, contractors, customers, and an unrepresented community. Map their power, interests, likely concerns, and engagement owners."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "The policy context is external, but the decisive output is an actor and engagement map. This is a likely family confusion with stakeholder analysis, not a request for six environmental categories."
+  - id: "pestel-analysis-mechanical-1"
+    kind: mechanical
+    prompt: "Put these six supplied factor descriptions into the P, E, S, T, E, and L columns without changing their wording."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - "mechanical"
+      - "mechanical"
+    rationale: "The user asks only for formatting supplied content. It does not require judgment about materiality, evidence, or strategy."
+  - id: "pestel-analysis-explicit-1"
+    kind: explicit
+    prompt: "Use PESTEL analysis to review our market-entry decision. Keep only material factors, identify the evidence status and time horizon, and state the opportunity or threat implication."
+    expected_route: "pestel-analysis"
+    expected_behavior: explicit_primary
+    decisive_features:
+      - "explicit_method"
+      - "macro_environment"
+    rationale: "The method is explicitly requested with its public output contract. The analysis should remain source-aware and should hold any implication that depends on an unchecked current rule."
+  - id: "pestel-analysis-insufficiency-1"
+    kind: insufficiency
+    prompt: "Should we enter the market? I have not provided the country or jurisdiction, decision horizon, product scope, baseline, or sources for the current external conditions."
+    expected_route: "pestel-analysis"
+    expected_behavior: hold
+    decisive_features:
+      - "boundary_sensitive"
+      - "decisive_input_missing"
+    rationale: "The question is appropriate for an external scan, but the missing boundary and source date can change the implication. The method should hold and ask only for decisive scope facts rather than inventing a market context."

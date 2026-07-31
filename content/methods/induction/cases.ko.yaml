@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: induction-positive-01
+    kind: positive
+    prompt: "이 반복 관찰이 대부분의 사용자에 대한 일반 주장을 지지하나요? 일반화 강도도 말해 주세요."
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "관찰 사례에서 제한된 모집단 주장으로 나아가며 표본과 반례를 점검해야 합니다."
+  - id: induction-positive-02
+    kind: positive
+    prompt: "이 설문 표본으로 고객이 새 업무 흐름을 선호한다는 주장을 정당화할 수 있는지 평가해 주세요."
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "대표성, 선택 편향, 일반화 강도가 핵심입니다."
+  - id: induction-positive-03
+    kind: positive
+    prompt: "과거 장애에서 다음 분기에 무엇을 합리적으로 추정할 수 있나요? 가능한 반례도 포함해 주세요."
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "반복 사례를 미래로 확장하므로 범위와 반례 위험을 밝혀야 합니다."
+  - id: induction-negative-01
+    kind: negative
+    prompt: "엄격한 규칙에 따르면 자격 있는 모든 기록은 승인됩니다. 이 사례가 규칙을 따르는지 확인해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules, explain]
+    rationale: "표본 일반화가 아니라 연역적 규칙 적용입니다."
+  - id: induction-negative-02
+    kind: negative
+    prompt: "실패를 설명하는 가설이 여러 개입니다. 비교하고 구별할 관찰을 찾아 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "표본에서 일반화하는 대신 귀추적 진단을 요청했습니다."
+  - id: induction-mechanical-01
+    kind: mechanical
+    prompt: "이 새 관찰을 값을 바꾸지 않고 기존 데이터셋에 추가해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "제공된 데이터 추가는 기계 작업입니다."
+  - id: induction-explicit-01
+    kind: explicit
+    prompt: "이 작은 실험이 더 넓은 제품 주장을 지지하는지 평가하기 위해 induction을 명시적으로 사용해 주세요."
+    expected_route: induction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, repeated_observations]
+    rationale: "사용자가 표본에서 일반화하는 분석을 직접 선택했습니다."
+  - id: induction-insufficiency-01
+    kind: insufficiency
+    prompt: "표본에서 일반화해 주세요. 목표 모집단, 표집 과정, 관찰, 측정 정의는 주지 않겠습니다."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [repeated_observations, weak_sample, decisive_input_missing]
+    rationale: "표본 근거와 목표 범위가 없으면 일반화를 제한할 수 없습니다."

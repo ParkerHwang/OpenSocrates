@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: critical-thinking-positive-01
+    kind: positive
+    prompt: "판매업체 보고서가 자체 설문으로 생산성이 40% 올랐다고 한다. 구매 전에 출처·프레이밍·빠진 비교·추론을 평가해 달라."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, source_quality]
+    rationale: "단순 인용 조회가 아니라 주장 묶음의 출처·프레이밍·논리·대안을 점검해야 한다."
+  - id: critical-thinking-positive-02
+    kind: positive
+    prompt: "임원 메모가 파일럿 하나로 정책이 어디서나 효과 있다고 말한다. 핵심 주장·가정·누락·반론을 찾아 달라."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, argument_dispute]
+    rationale: "일반화가 포함된 주장 묶음에 대한 넓은 비판 평가를 명시적으로 요청했다."
+  - id: critical-thinking-positive-03
+    kind: positive
+    prompt: "신뢰할 만한 해설자 둘이 안전 프로그램의 효과를 두고 다툰다. 이견이 어느 쪽의 증명도 아니게 공정한 판정을 원한다."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, conflicting_sources, argument_dispute]
+    rationale: "출처 신뢰성·프레이밍·논리 지지·미해결 충돌을 분리하는 것이 중요하다."
+  - id: critical-thinking-negative-01
+    kind: negative
+    prompt: "논쟁의 핵심 주장·근거·반론·응답을 연결 관계가 보이는 지도로 정리하고 싶다."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "넓은 세 축 비평보다 구조적인 주장-근거-반론 지도가 핵심이다."
+  - id: critical-thinking-negative-02
+    kind: negative
+    prompt: "임상 주장이 원자료에 직접 지지되는지 요약 자료에만 기대는지 출처 위계로 판단하고 싶다."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "결정적 산출물은 출처 품질과 주장-출처 지지 관계이다."
+  - id: critical-thinking-mechanical-01
+    kind: mechanical
+    prompt: "인용된 주장과 출처 이름을 진위나 관련성을 판단하지 말고 검토 양식에 복사해 달라."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "주장 내용이 있어도 양식에 복사하는 일은 기계적이다."
+  - id: critical-thinking-explicit-01
+    kind: explicit
+    prompt: "critical-thinking을 사용해 이 투자 메모를 검토하고 검증됨·빠짐·아직 불확실함을 알려 달라."
+    expected_route: critical-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, critique]
+    rationale: "주장 묶음에 대한 판단에 방법을 명시적으로 요청했다."
+  - id: critical-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "출처 없는 화면 캡처라 날짜와 원자료가 없다. 그럴듯하니 제목이 참이라고 선언하라."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [critique, source_quality, decisive_input_missing]
+    rationale: "핵심 출처와 전제를 확인할 수 없어 받아들이는 판정을 보류해야 한다."

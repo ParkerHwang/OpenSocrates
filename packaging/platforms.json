@@ -1,0 +1,29 @@
+{
+  "schema": "opensocrates.packaging-platform-candidates/1.0.0",
+  "decision_gate": "DG-01",
+  "candidate_platforms": [
+    "darwin-arm64",
+    "darwin-x64",
+    "linux-x64",
+    "windows-x64"
+  ],
+  "observed_local_platforms": [
+    "darwin-arm64"
+  ],
+  "release_claim_status": "pending_product_owner_approval",
+  "unvalidated_platforms": [
+    "darwin-x64",
+    "linux-x64",
+    "windows-x64"
+  ],
+  "startup_budget": {
+    "darwin-arm64": {
+      "status": "pass",
+      "p50_ms": 39.953,
+      "p95_ms": 57.679,
+      "evidence": "build/evidence/dg-01-macos.json"
+    }
+  },
+  "signing_status": "unvalidated",
+  "notes": "This manifest names candidates only. tools/measure_packaging.py produces observed local evidence; no platform is supported by this file alone."
+}

@@ -1,0 +1,58 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "game-theory-positive-1"
+    kind: positive
+    prompt: "우리가 구독 가격을 내리면 주요 경쟁사가 따라 내리거나 가격을 유지할 수 있고, 그 반응이 우리의 유지율과 마진을 바꿉니다. 행동을 추천하기 전에 가능한 대응을 비교해 주세요."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "가격 행동이 상호의존되어 있고 상대의 대응 분석을 요청합니다. 마진과 유지율에 관한 근거를 드러내야 하며 보수표나 확률을 임의로 만들면 안 됩니다."
+  - id: "game-theory-positive-2"
+    kind: positive
+    prompt: "다년 공급 계약을 협상하고 있습니다. 우리의 물량 약속은 공급자의 비용을 낮출 수 있지만, 수요 예측이 약하면 공급자가 다른 구매자를 우선할 수 있습니다. 인센티브, 정보, 신뢰할 수 있는 약속을 정리해 주세요."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "양쪽이 적응할 수 있고 보수가 상대의 약속에 달려 있습니다. 구조는 제시되었지만 비용은 확인되지 않았으므로 가정과 불확실성을 표시해야 합니다."
+  - id: "game-theory-positive-3"
+    kind: positive
+    prompt: "두 플랫폼이 공동 상호운용 표준을 검토합니다. 도입하면 양쪽에 가치가 생기지만 어느 한쪽이 통합 비용을 부담할 때까지 다른 쪽이 기다릴 수 있습니다. 가능한 대응과 협력을 신뢰할 수 있게 만드는 설계 행동을 분석해 주세요."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "결정이 상호 도입과 선행 비용에 달려 있습니다. 조건부 안정 결과는 제시할 수 있지만 인센티브 근거 없이 균형이라고 부르면 안 됩니다."
+  - id: "game-theory-negative-1"
+    kind: negative
+    prompt: "지연 시간, 저장 비용, 우리 개발 역량을 비교해 내부 데이터베이스를 선택해 주세요. 다른 행위자가 결과를 바꿀 수는 없습니다."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [no_meaningful_interdependence]
+    rationale: "환경이 고정되어 있고 상대의 대응이 결과에 영향을 주지 않습니다. 상호의존적 게임이 아니므로 이 방법으로 라우팅하지 않습니다."
+  - id: "game-theory-negative-2"
+    kind: negative
+    prompt: "이 시장 진입에 영향을 줄 정치, 경제, 사회, 기술, 환경, 법적 요인을 평가해 주세요."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features: [macro_environment, forecast]
+    rationale: "전략에 영향을 주는 질문이지만 필요한 산출물은 행위자 대응이나 인센티브가 아니라 외부 요인 기록입니다. 게임 이론과 혼동하기 쉬운 같은 가족의 사례이며 균형을 만들어 내면 안 됩니다."
+  - id: "game-theory-mechanical-1"
+    kind: mechanical
+    prompt: "제공된 물량을 사용해 네 계약 가격의 가중평균을 계산해 주세요."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "입력이 주어진 기계적 계산이므로 다른 행위자의 반응을 모델링할 필요가 없습니다."
+  - id: "game-theory-explicit-1"
+    kind: explicit
+    prompt: "게임 이론으로 이 조달 경매를 분석해 주세요. 행위자, 행동, 정보, 순서, 조건부 안정 결과를 보여 주되 빠진 보수는 만들지 마세요."
+    expected_route: "game-theory"
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, interacting_actors]
+    rationale: "사용자가 방법과 공개 구조를 직접 지정했으므로 우선 방법으로 유지합니다. 빠진 보수 정보를 보존하고 허위 확률을 만들지 않아야 합니다."
+  - id: "game-theory-insufficiency-1"
+    kind: insufficiency
+    prompt: "경쟁사에 가격 대응을 하겠다고 위협해야 할까요? 경쟁사의 가능한 행동, 우리 결과, 양쪽이 가진 정보, 관계의 반복 여부를 아직 정하지 않았습니다."
+    expected_route: "game-theory"
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, interacting_actors]
+    rationale: "전략적 상호의존 질문이지만 빠진 구조가 위협의 신뢰성을 결정합니다. 대응을 예측하지 말고 결정적인 사실을 확인할 때까지 보류해야 합니다."

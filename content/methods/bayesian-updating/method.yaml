@@ -1,0 +1,54 @@
+{
+  "schema": "opensocrates.method-authoring/1.0.0",
+  "id": "bayesian-updating",
+  "family": "evidence_verification",
+  "content_revision": 1,
+  "display_name": {
+    "en": "Bayesian Updating",
+    "ko": "\ubca0\uc774\uc988 \ucd94\ub860"
+  },
+  "plain_action": {
+    "en": "Use Bayesian Updating to produce the declared public output.",
+    "ko": "\ud310\ub2e8\uc5d0 \ud544\uc694\ud55c \uacf5\uac1c \uacb0\uacfc\ub97c \ubca0\uc774\uc988 \ucd94\ub860 \uad00\uc810\uc73c\ub85c \uc815\ub9ac\ud569\ub2c8\ub2e4."
+  },
+  "participation": {
+    "judgment_only": true,
+    "allowed_answer_shapes": [
+      "evidence_reconciliation",
+      "direct_judgment"
+    ]
+  },
+  "routing": {
+    "positive_features": {
+      "new_evidence": 3,
+      "unknown_probability": 2,
+      "competing_explanations": 1
+    },
+    "negative_features": {},
+    "minimum_score": 5,
+    "contraindications": []
+  },
+  "output_contract": {
+    "required_sections": [
+      "prior_basis",
+      "evidence_direction",
+      "posterior_change",
+      "sensitivity"
+    ],
+    "max_questions": 2
+  },
+  "complements": {
+    "preferred": [
+      "abduction"
+    ],
+    "incompatible_secondary": []
+  },
+  "locales": [
+    "en",
+    "ko"
+  ],
+  "source_provenance": {
+    "predecessor_slug": "bayesian-updating",
+    "reviewed_by": "pending"
+  }
+}

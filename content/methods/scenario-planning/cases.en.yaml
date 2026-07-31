@@ -1,0 +1,76 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: scenario-planning-positive-1
+    kind: positive
+    prompt: "Our city must prepare a ten-year housing strategy while migration and construction technology could move in independent directions. Define two critical uncertainties, build four coherent futures without probabilities, and identify no-regret actions, contingent actions, and signposts."
+    expected_route: scenario-planning
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - forecast
+    rationale: "The long horizon and external drivers call for structured branching rather than one forecast. The prompt explicitly requests independent axes, four scenarios, actions, and signposts with probabilities excluded."
+  - id: scenario-planning-positive-2
+    kind: positive
+    prompt: "A five-year public-health program may face different combinations of trust in institutions and pathogen mobility. Construct a 2×2 scenario matrix, explain how each world could arise, test the current plan, and define observable signals for revisiting it."
+    expected_route: scenario-planning
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - new_evidence
+    rationale: "The user asks for coherent external futures, a matrix, wind-tunnel testing of a current plan, and signposts. It is not a request for a likelihood-ranked forecast."
+  - id: scenario-planning-positive-3
+    kind: positive
+    prompt: "We are deciding how to prepare a decade-long education platform investment. Regulation and learner behavior are high-impact but difficult to predict. Keep predictable premises common, choose independent axes, and separate robust preparations from actions triggered by future signals."
+    expected_route: scenario-planning
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - irreversible_choice
+      - plan
+    rationale: "This is a long-horizon preparation decision with high-impact external uncertainties and a request to separate common and contingent actions. The method should avoid assigning probabilities."
+  - id: scenario-planning-negative-1
+    kind: negative
+    prompt: "Our quarterly revenue model has one baseline formula. Change the conversion rate and price assumptions across defensible ranges, show the threshold where the choice flips, and rank which input deserves more research."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - sensitive_inputs
+    rationale: "This is a likely family confusion with sensitivity analysis: it has a model, input ranges, and switching thresholds, not independent external axes and coherent futures."
+  - id: scenario-planning-negative-2
+    kind: negative
+    prompt: "Using a well-defined reference class of completed product launches, estimate the likely delivery range for our next launch and compare it with the internal date."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - forecast
+      - reference_cases
+    rationale: "The task requests an outside-view forecast from completed reference cases, which belongs to reference-class forecasting rather than branching scenarios."
+  - id: scenario-planning-mechanical-1
+    kind: mechanical
+    prompt: "Sort these twelve dated milestones chronologically and return the ordered list. No future uncertainty or preparation decision is involved."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "The request is a deterministic ordering operation. It has no external uncertainty or strategic choice for scenario planning to structure."
+  - id: scenario-planning-explicit-1
+    kind: explicit
+    prompt: "Use scenario-planning as the primary method for our ten-year energy transition strategy. Keep probabilities out, use two independent critical uncertainties, describe four named futures, and attach no-regret actions and signposts."
+    expected_route: scenario-planning
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - deep_uncertainty
+      - macro_environment
+    rationale: "The method is explicitly named and the required non-probabilistic scenario outputs are supplied. The route remains subject to evidence, scope, and hold rules."
+  - id: scenario-planning-insufficiency-1
+    kind: insufficiency
+    prompt: "Give me four scenarios for the future. I have not said what decision they should inform, the time horizon, the system boundary, or which external uncertainties matter."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - decisive_input_missing
+    rationale: "Without a focal question, horizon, boundary, and decision, four narratives would be decorative and unconstrained. The method should hold and request only the missing frame."
