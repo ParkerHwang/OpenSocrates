@@ -3,6 +3,7 @@
 **English** | [한국어](README.ko.md)
 
 [![CI](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml/badge.svg)](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
 [![Release](https://img.shields.io/github/v/release/ParkerHwang/OpenSocrates)](https://github.com/ParkerHwang/OpenSocrates/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -22,10 +23,28 @@ validated.
 Before installing, sign in to Codex with OAuth and make sure the `codex`
 command is available.
 
-### Option 1: npx from GitHub
+### Option 1: npx from npm
+
+Requires Node.js 20 or later. The npm package is a small, dependency-free
+installer; it downloads and verifies the matching package from GitHub
+Releases.
+
+```bash
+npx --yes opensocrates@1.0.0 install
+```
+
+Lifecycle commands:
+
+```bash
+npx --yes opensocrates@1.0.0 status
+npx --yes opensocrates@1.0.0 update
+npx --yes opensocrates@1.0.0 remove
+```
+
+### Option 2: npx from GitHub
 
 Requires Node.js 20 or later. This command installs directly from the tagged
-GitHub repository; no npm-registry package is required.
+GitHub repository and remains available without the npm registry.
 
 ```bash
 npx --yes github:ParkerHwang/OpenSocrates#v1.0.0 install
@@ -43,7 +62,7 @@ The installer downloads the matching GitHub Release asset, verifies both the
 release checksum and every checksum inside the package, and then registers a
 private managed marketplace under the current Codex home.
 
-### Option 2: download from GitHub Releases
+### Option 3: download from GitHub Releases
 
 Download `opensocrates.mjs` from the
 [v1.0.0 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.0.0),
@@ -64,7 +83,7 @@ node opensocrates.mjs install \
   --checksum opensocrates-1.0.0-codex-plugin.zip.sha256
 ```
 
-### Option 3: build and install from source
+### Option 4: build and install from source
 
 Requires [uv](https://docs.astral.sh/uv/) and Python 3.12.
 

@@ -16,6 +16,8 @@ All notable changes to OpenSocrates are documented here. This project follows
   SBOM generation, security scanning, and release gates.
 - GitHub Release and dependency-free Node.js installation paths, including
   `npx github:ParkerHwang/OpenSocrates#v1.0.0 install`.
+- The public `opensocrates` npm package for the shorter
+  `npx opensocrates@1.0.0 install` path.
 - English and Korean README files and standard open-source community health
   documents.
 

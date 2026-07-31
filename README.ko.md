@@ -3,6 +3,7 @@
 [English](README.md) | **한국어**
 
 [![CI](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml/badge.svg)](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
 [![Release](https://img.shields.io/github/v/release/ParkerHwang/OpenSocrates)](https://github.com/ParkerHwang/OpenSocrates/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -20,7 +21,24 @@ OpenSocrates는 AI 에이전트 호스트를 위한 로컬 추론 프레임워�
 설치 전에 OAuth로 Codex에 로그인하고 `codex` 명령을 사용할 수 있는지
 확인하세요.
 
-### 방법 1: GitHub에서 npx로 설치
+### 방법 1: npm에서 npx로 설치
+
+Node.js 20 이상이 필요합니다. npm 패키지는 외부 의존성이 없는 작은 설치
+프로그램이며, 일치하는 패키지를 GitHub Releases에서 내려받아 검증합니다.
+
+```bash
+npx --yes opensocrates@1.0.0 install
+```
+
+라이프사이클 명령:
+
+```bash
+npx --yes opensocrates@1.0.0 status
+npx --yes opensocrates@1.0.0 update
+npx --yes opensocrates@1.0.0 remove
+```
+
+### 방법 2: GitHub에서 npx로 설치
 
 Node.js 20 이상이 필요합니다. npm 레지스트리에 별도 패키지를 게시하지 않아도
 태그가 고정된 GitHub 저장소에서 직접 설치합니다.
@@ -41,7 +59,7 @@ npx --yes github:ParkerHwang/OpenSocrates#v1.0.0 remove
 패키지 내부의 모든 체크섬을 검증한 다음, 현재 Codex 홈 아래의 비공개 관리형
 마켓플레이스에 등록합니다.
 
-### 방법 2: GitHub Releases에서 직접 다운로드
+### 방법 3: GitHub Releases에서 직접 다운로드
 
 [v1.0.0 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.0.0)에서
 `opensocrates.mjs`를 내려받은 뒤 실행합니다.
@@ -61,7 +79,7 @@ node opensocrates.mjs install \
   --checksum opensocrates-1.0.0-codex-plugin.zip.sha256
 ```
 
-### 방법 3: 소스에서 빌드해 설치
+### 방법 4: 소스에서 빌드해 설치
 
 [uv](https://docs.astral.sh/uv/)와 Python 3.12가 필요합니다.
 

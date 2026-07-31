@@ -1,0 +1,58 @@
+name: Publish npm package
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: opensocrates-npm-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish opensocrates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+
+      - name: Install package metadata
+        run: npm ci --ignore-scripts
+      - name: Validate package and installer
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const { readFileSync } = require("node:fs");
+          const pkg = JSON.parse(readFileSync("package.json", "utf8"));
+          const version = readFileSync("VERSION", "utf8").trim();
+          const releaseTag = process.env.RELEASE_TAG;
+          if (pkg.name !== "opensocrates") {
+            throw new Error(`Unexpected npm package name: ${pkg.name}`);
+          }
+          if (pkg.version !== version) {
+            throw new Error(`package.json ${pkg.version} does not match VERSION ${version}`);
+          }
+          if (releaseTag && releaseTag !== `v${version}`) {
+            throw new Error(`Release tag ${releaseTag} does not match v${version}`);
+          }
+          NODE
+          npm test
+          npm pack --dry-run
+
+      - name: Publish to npm with trusted publishing
+        run: npm publish --access public
