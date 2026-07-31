@@ -23,8 +23,6 @@ pyz = PYZ(a.pure)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [],
     name="opensocrates-probe",
     exclude_binaries=True,
