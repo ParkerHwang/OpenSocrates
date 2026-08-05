@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync, readdirSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -342,6 +342,36 @@ test("claude: legacy registration still blocks install", async () => {
     );
     assert.notEqual(result.error, undefined, "install proceeded despite a legacy registration");
     assert.match(result.error.message, /legacy Claude marketplace/);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("claude: canonicalizes a host-reported marketplace path through a symlink", async () => {
+  const box = makeSandbox("claude");
+  try {
+    const homeAlias = join(box.root, "claude-home-alias");
+    symlinkSync(box.home, homeAlias, "dir");
+    process.env.CLAUDE_CONFIG_DIR = homeAlias;
+
+    const pkg = buildPackage(box.root, "claude");
+    const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    await withDarwinArm64(async () => {
+      const install = await quiet(() => main(["install", ...args]));
+      assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+    });
+
+    const state = box.state();
+    state.marketplaces[0].path = join(homeAlias, "managed-marketplaces", MARKETPLACE);
+    writeFileSync(box.statePath, JSON.stringify(state));
+
+    const status = await quiet(() => main(["status", "--host", "claude"]));
+    assert.equal(status.error, undefined, `status rejected an equivalent path: ${status.error?.message}`);
+    assert.match(status.output, new RegExp(`OpenSocrates ${PRODUCT_VERSION} is installed`));
+
+    const remove = await quiet(() => main(["remove", "--host", "claude"]));
+    assert.equal(remove.error, undefined, `remove rejected an equivalent path: ${remove.error?.message}`);
+    assert.equal(existsSync(box.managedRoot), false, "managed root survived remove");
   } finally {
     box.cleanup();
   }

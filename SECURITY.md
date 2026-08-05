@@ -52,6 +52,11 @@ login, so model requests remain subject to Anthropic's service and data-handling
 terms. The Codex selector uses the pinned Codex SDK and existing OAuth session in
 its own isolated worker.
 
+The selector environment is default-deny. `CLAUDE_CONFIG_DIR` is one of the
+small set of allowed path variables because the child needs it to locate the
+user's existing Claude login when a non-default config directory is in use.
+OpenSocrates does not copy, inspect, or log credentials from that directory.
+
 Managed policy settings are part of the host trust boundary and are not disabled.
 Anthropic's [CLI reference](https://code.claude.com/docs/en/cli-reference) states
 that under `--safe-mode` "managed settings policy still applies, including

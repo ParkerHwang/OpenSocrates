@@ -692,7 +692,16 @@ function entryRoot(entry, host) {
   if (typeof value !== "string" || value.trim().length === 0) {
     fail(`${host} marketplace ${MARKETPLACE_NAME} has no usable root`);
   }
-  return resolve(value);
+  const resolved = resolve(value);
+  try {
+    // Host CLIs may report an equivalent canonical path even when the user
+    // configured a symlinked home (for example /var versus /private/var on
+    // macOS). Compare canonical existing paths without weakening ownership
+    // checks for missing or unmanaged roots.
+    return realpathSync(resolved);
+  } catch {
+    return resolved;
+  }
 }
 
 function removeRegistration(host, entry, state) {
@@ -871,7 +880,8 @@ async function installVerifiedPackage(pluginSource, action, host) {
       );
       console.error(`error: your previous files are preserved at: ${backup}`);
       console.error(
-        `error: move that directory to ${paths.root}, then rerun ` +
+        `error: remove ${paths.root} if it still exists, move the preserved directory ` +
+          `to ${paths.root}, then rerun ` +
           `\`opensocrates install --host ${host}\`.`,
       );
     }

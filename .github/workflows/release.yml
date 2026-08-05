@@ -56,7 +56,8 @@ jobs:
           if [[ "${GITHUB_EVENT_NAME}" == "push" && "${GITHUB_REF}" != refs/tags/* ]]; then
             subject="$(printf '%s' "${HEAD_COMMIT_MESSAGE}" | head -n 1)"
             if [[ "${subject}" != "Release OpenSocrates v${version}" ]]; then
-              echo "Refusing to publish: commit subject ${subject@Q} does not exactly match" >&2
+              printf 'Refusing to publish: commit subject "%s" does not exactly match\n' \
+                "${subject}" >&2
               echo "\"Release OpenSocrates v${version}\" from VERSION." >&2
               exit 1
             fi

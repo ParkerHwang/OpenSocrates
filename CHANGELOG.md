@@ -7,8 +7,9 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Added
 
-- Claude Code CLI, Claude Code desktop, and Cowork integration through native
-  Claude plugin hooks and generated reasoning skills.
+- Claude Code CLI integration through native Claude plugin hooks and generated
+  reasoning skills. Claude Code desktop and Cowork use the same implemented
+  mechanism, but live delivery on those surfaces remains unvalidated.
 - A bounded `claude --safe-mode -p` selector that uses the existing Claude login,
   disables tools and project/plugin context, accepts only structured output,
   and fails open after the existing 30-second deadline.
