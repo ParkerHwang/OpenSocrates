@@ -47,6 +47,38 @@ from .sdk_worker import (
 )
 
 _EXPECTED_CANDIDATE_FIELDS = frozenset({"intervene", "selected_reasoning_systems", "instructions"})
+_TERMINATE_GRACE_SECONDS = 0.25
+
+
+class SelectorOutcome:
+    """Content-free labels for one selector attempt.
+
+    These are the only selector facts OpenSocrates records.  No prompt,
+    catalog, stdout, stderr, argv, environment value, credential, transcript,
+    or model reasoning is ever attached to an outcome.
+    """
+
+    EXECUTABLE_MISSING = "executable_missing"
+    REQUEST_REJECTED = "request_rejected"
+    SPAWN_FAILED = "spawn_failed"
+    TIMEOUT = "timeout"
+    NONZERO_EXIT = "nonzero_exit"
+    INVALID_OUTPUT = "invalid_output"
+    SELECTOR_CLOSED = "selector_closed"
+    NO_INTERVENTION = "no_intervention"
+    SELECTED = "selected"
+
+    ALL = (
+        EXECUTABLE_MISSING,
+        REQUEST_REJECTED,
+        SPAWN_FAILED,
+        TIMEOUT,
+        NONZERO_EXIT,
+        INVALID_OUTPUT,
+        SELECTOR_CLOSED,
+        NO_INTERVENTION,
+        SELECTED,
+    )
 _MAX_SELECTION_CATALOG_BYTES = 512 * 1024
 _MAX_CLI_RESPONSE_BYTES = 512 * 1024
 _ENVIRONMENT_ALLOWLIST = frozenset(
@@ -131,24 +163,49 @@ def _candidate_from_cli_output(raw: bytes) -> dict[str, object] | None:
     return dict(candidate)
 
 
-def _terminate_process(process: subprocess.Popen[bytes]) -> None:
-    try:
-        if process.poll() is not None:
-            return
-        if os.name == "posix":
-            os.killpg(process.pid, signal.SIGTERM)
-        else:
-            process.terminate()
+def _close_pipes(process: subprocess.Popen[bytes]) -> None:
+    """Close every pipe this process owns so no descriptor is leaked."""
+
+    for stream in (process.stdin, process.stdout, process.stderr):
+        if stream is None:
+            continue
         try:
-            process.wait(timeout=0.25)
-        except subprocess.TimeoutExpired:
+            stream.close()
+        except (OSError, ValueError):
+            continue
+
+
+def _terminate_process(process: subprocess.Popen[bytes]) -> None:
+    """Terminate and definitively reap one selector child process.
+
+    SIGKILL cannot be blocked, so the post-kill wait is unbounded: a bounded
+    wait that expires would leave a zombie behind in a long-lived host.
+    """
+
+    try:
+        if process.poll() is None:
             if os.name == "posix":
-                os.killpg(process.pid, signal.SIGKILL)
+                os.killpg(process.pid, signal.SIGTERM)
             else:
-                process.kill()
-            process.wait(timeout=0.25)
+                process.terminate()
+            try:
+                process.wait(timeout=_TERMINATE_GRACE_SECONDS)
+            except subprocess.TimeoutExpired:
+                if os.name == "posix":
+                    os.killpg(process.pid, signal.SIGKILL)
+                else:
+                    process.kill()
+                process.wait()
     except (OSError, ProcessLookupError, subprocess.SubprocessError):
-        return
+        pass
+    finally:
+        # The child may have exited between poll() and the signal; reap it
+        # unconditionally so no path leaves an unwaited process.
+        try:
+            process.wait(timeout=_TERMINATE_GRACE_SECONDS)
+        except (OSError, subprocess.SubprocessError):
+            pass
+        _close_pipes(process)
 
 
 class ClaudeCliReasoningSelector:
@@ -168,10 +225,24 @@ class ClaudeCliReasoningSelector:
         self._lock = threading.Lock()
         self._active: set[subprocess.Popen[bytes]] = set()
         self._closed = False
+        self._outcomes: dict[str, int] = {}
 
     @property
     def available(self) -> bool:
         return self._executable is not None
+
+    def _record(self, outcome: str) -> str:
+        """Count one content-free selector outcome."""
+
+        with self._lock:
+            self._outcomes[outcome] = self._outcomes.get(outcome, 0) + 1
+        return outcome
+
+    def outcome_counts(self) -> dict[str, int]:
+        """Return a copy of the content-free outcome counters."""
+
+        with self._lock:
+            return dict(self._outcomes)
 
     def _command(self) -> list[str] | None:
         if self._executable is None:
@@ -213,22 +284,28 @@ class ClaudeCliReasoningSelector:
         if not isinstance(request, SelectorRequest) or not isinstance(
             context, SelectorContextHandles
         ):
+            self._record(SelectorOutcome.REQUEST_REJECTED)
             return None
         if (
             type(deadline_seconds) is not int
             or not 1 <= deadline_seconds <= MAX_SELECTOR_DEADLINE_SECONDS
         ):
+            self._record(SelectorOutcome.REQUEST_REJECTED)
             return None
         try:
             approved_effort = self._effort_policy.effort_for(request)
         except Exception:
+            self._record(SelectorOutcome.REQUEST_REJECTED)
             return None
         if approved_effort != "medium" or reasoning_effort != approved_effort:
+            self._record(SelectorOutcome.REQUEST_REJECTED)
             return None
         if not _context_matches_request(request, context):
+            self._record(SelectorOutcome.REQUEST_REJECTED)
             return None
         command = self._command()
         if command is None:
+            self._record(SelectorOutcome.EXECUTABLE_MISSING)
             return None
         worker_input = _worker_request(request, selection_catalog=self._selection_catalog)
         payload = _selector_turn_input(worker_input).encode("utf-8")
@@ -247,23 +324,43 @@ class ClaudeCliReasoningSelector:
                     start_new_session=os.name == "posix",
                 )
             except (OSError, subprocess.SubprocessError, ValueError):
+                self._record(SelectorOutcome.SPAWN_FAILED)
                 return None
             with self._lock:
                 if self._closed:
-                    _terminate_process(process)
-                    return None
-                self._active.add(process)
+                    closed = True
+                else:
+                    closed = False
+                    self._active.add(process)
+            if closed:
+                _terminate_process(process)
+                self._record(SelectorOutcome.SELECTOR_CLOSED)
+                return None
             try:
                 try:
                     stdout, _stderr = process.communicate(payload, timeout=deadline_seconds)
                 except subprocess.TimeoutExpired:
                     _terminate_process(process)
+                    self._record(SelectorOutcome.TIMEOUT)
                     return None
                 if process.returncode != 0:
+                    _close_pipes(process)
+                    self._record(SelectorOutcome.NONZERO_EXIT)
                     return None
-                return _candidate_from_cli_output(stdout)
+                candidate = _candidate_from_cli_output(stdout)
+                _close_pipes(process)
+                if candidate is None:
+                    self._record(SelectorOutcome.INVALID_OUTPUT)
+                    return None
+                self._record(
+                    SelectorOutcome.SELECTED
+                    if candidate.get("intervene") is True
+                    else SelectorOutcome.NO_INTERVENTION
+                )
+                return candidate
             except (OSError, subprocess.SubprocessError, ValueError):
                 _terminate_process(process)
+                self._record(SelectorOutcome.INVALID_OUTPUT)
                 return None
             finally:
                 with self._lock:
@@ -286,4 +383,4 @@ class ClaudeCliReasoningSelector:
         return "ClaudeCliReasoningSelector(<isolated>)"
 
 
-__all__ = ["ClaudeCliReasoningSelector"]
+__all__ = ["ClaudeCliReasoningSelector", "SelectorOutcome"]

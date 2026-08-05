@@ -512,7 +512,11 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
                 capability_profile=profiles[name],
                 installation_key=getattr(turn_store, "installation_key", None),
                 locale=selected_locale,
-                selector_mode=name == host and name in {"claude", "codex"},
+                # Defense in depth: every selector-capable adapter stays on the
+                # selector-only path even when it is not the selected host, so
+                # a mis-wired caller can never fall through to the legacy
+                # projection path that handles prompt, path, and model data.
+                selector_mode=name in {"claude", "codex"},
                 selector_application=selector_application if name == host else None,
                 selector_config=selector_config if name == host else None,
                 instruction_file_store=instruction_file_store if name == host else None,
