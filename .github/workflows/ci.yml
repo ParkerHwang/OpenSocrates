@@ -78,8 +78,10 @@ jobs:
         run: npm pack --dry-run
 
   package:
+    # Runs on pull requests too. Skipping it here let CI go green while every
+    # new packaging surface -- the Claude and Codex native packages and the
+    # Claude Chat skills ZIP -- remained unbuilt and unverified.
     name: Native package (darwin-arm64)
-    if: github.event_name != 'pull_request'
     needs:
       - python-quality
       - product-contracts

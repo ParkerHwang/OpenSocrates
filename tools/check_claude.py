@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import json
 import os
-import signal
 import subprocess
 import tempfile
 from collections.abc import Callable
@@ -429,9 +428,7 @@ def test_cancel_and_close() -> None:
     selector.cancel()  # no active process; must not raise
     selector.close()
     with patch("opensocrates.selector.claude_cli.subprocess.Popen", BlockingProcess):
-        result = selector.select(
-            effective, context, deadline_seconds=30, reasoning_effort="medium"
-        )
+        result = selector.select(effective, context, deadline_seconds=30, reasoning_effort="medium")
     require(result is None, "closed selector produced a decision")
     require(
         selector.outcome_counts().get(SelectorOutcome.SELECTOR_CLOSED) == 1,

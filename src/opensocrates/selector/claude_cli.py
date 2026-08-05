@@ -79,6 +79,8 @@ class SelectorOutcome:
         NO_INTERVENTION,
         SELECTED,
     )
+
+
 _MAX_SELECTION_CATALOG_BYTES = 512 * 1024
 _MAX_CLI_RESPONSE_BYTES = 512 * 1024
 _ENVIRONMENT_ALLOWLIST = frozenset(

@@ -1198,6 +1198,43 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
     }
 
 
+_CLAUDE_CHAT_ALLOWED_ROOTS = frozenset({".claude-plugin", "LICENSE", "skills"})
+_CLAUDE_CHAT_FORBIDDEN_SUFFIXES = (
+    ".pem",
+    ".key",
+    ".p12",
+    ".pfx",
+    "hooks.json",
+    "launch.sh",
+    "launch.ps1",
+    "opensocrates-runtime",
+)
+
+
+def _claude_chat_archive_errors(archive: Path) -> set[str]:
+    """Assert the published Chat ZIP carries only its manifest and skills.
+
+    Checked against the archive itself rather than the staged tree so nothing
+    can be introduced between assembly and packaging.
+    """
+
+    errors: set[str] = set()
+    with zipfile.ZipFile(archive) as bundle:
+        entries = [name for name in bundle.namelist() if not name.endswith("/")]
+    for entry in entries:
+        if entry.split("/", 1)[0] not in _CLAUDE_CHAT_ALLOWED_ROOTS:
+            errors.add("claude_chat_archive_unexpected_entry")
+        if entry.startswith("/") or ".." in entry.split("/"):
+            errors.add("claude_chat_archive_unsafe_path")
+        if entry.lower().endswith(_CLAUDE_CHAT_FORBIDDEN_SUFFIXES):
+            errors.add("claude_chat_archive_forbidden_file")
+    if ".claude-plugin/plugin.json" not in entries:
+        errors.add("claude_chat_archive_manifest_missing")
+    if not any(entry.startswith("skills/") for entry in entries):
+        errors.add("claude_chat_archive_skills_missing")
+    return errors
+
+
 def _verify_claude_chat_skills(
     root: Path, version: str, bundle: Mapping[str, Any]
 ) -> dict[str, Any]:
@@ -1235,7 +1272,8 @@ def _verify_claude_chat_skills(
         errors.add("claude_chat_skill_set_invalid")
     if not (package / "LICENSE").is_file():
         errors.add("claude_chat_license_missing")
-    if any((package / name).exists() for name in ("bin", "content", "hooks", "runtime", "schemas")):
+    forbidden_trees = ("bin", "commands", "content", "hooks", "runtime", "schemas")
+    if any((package / name).exists() for name in forbidden_trees):
         errors.add("claude_chat_runtime_surface_present")
     if not archive.is_file() or not zipfile.is_zipfile(archive):
         errors.add("claude_chat_archive_missing_or_invalid")
@@ -1244,6 +1282,7 @@ def _verify_claude_chat_skills(
         archive_bytes = archive.stat().st_size
         if archive_bytes > 16 * 1024 * 1024:
             errors.add("claude_chat_archive_too_large")
+        errors |= _claude_chat_archive_errors(archive)
     return {
         "status": "fail" if errors else "pass",
         "skill_count": len(actual_skills),
