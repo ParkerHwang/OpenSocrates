@@ -33,7 +33,8 @@ Node.js 20 or later is also required when changing the GitHub/npx installer.
   theory, public-output, evidence, stop-condition, and example boundaries
   explicit.
 - Canonical schemas belong under `schemas/source/`.
-- Codex package templates belong under `plugin-src/codex/`.
+- Claude package templates belong under `plugin-src/claude/`; Codex package
+  templates belong under `plugin-src/codex/`.
 - Do not edit generated files in `schemas/v1/`,
   `content/compiled-*.json`, `build/`, or `dist/` by hand.
 - Keep English and Korean user-facing documentation semantically aligned.

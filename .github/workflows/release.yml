@@ -21,7 +21,7 @@ jobs:
     if: >-
       startsWith(github.ref, 'refs/tags/') ||
       github.event_name == 'workflow_dispatch' ||
-      github.event.head_commit.message == 'Release OpenSocrates v1.0.0'
+      startsWith(github.event.head_commit.message, 'Release OpenSocrates v')
     runs-on: macos-14
     permissions:
       contents: write
@@ -57,18 +57,26 @@ jobs:
       - name: Run complete release gate
         run: make release-check
 
-      - name: Create and verify release checksum
+      - name: Create and verify release checksums
         shell: bash
         run: |
           set -euo pipefail
-          asset="opensocrates-${RELEASE_VERSION}-codex-plugin.zip"
+          for host in claude codex; do
+            asset="opensocrates-${RELEASE_VERSION}-${host}-plugin.zip"
+            (
+              cd dist
+              shasum -a 256 "${asset}" > "${asset}.sha256"
+            )
+            node installer/opensocrates.mjs verify \
+              --host "${host}" \
+              --asset "dist/${asset}" \
+              --checksum "dist/${asset}.sha256"
+          done
+          chat_asset="opensocrates-${RELEASE_VERSION}-claude-chat-skills.zip"
           (
             cd dist
-            shasum -a 256 "${asset}" > "${asset}.sha256"
+            shasum -a 256 "${chat_asset}" > "${chat_asset}.sha256"
           )
-          node installer/opensocrates.mjs verify \
-            --asset "dist/${asset}" \
-            --checksum "dist/${asset}.sha256"
 
       - name: Upload release evidence
         if: always()
@@ -86,14 +94,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          asset="dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip"
-          checksum="${asset}.sha256"
+          claude_asset="dist/opensocrates-${RELEASE_VERSION}-claude-plugin.zip"
+          chat_asset="dist/opensocrates-${RELEASE_VERSION}-claude-chat-skills.zip"
+          codex_asset="dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip"
           manifest="dist/opensocrates-${RELEASE_VERSION}-release-manifest.json"
           limitations="dist/opensocrates-${RELEASE_VERSION}-limitations.json"
           sbom="dist/opensocrates-${RELEASE_VERSION}-sbom.spdx.json"
           release_assets=(
-            "${asset}"
-            "${checksum}"
+            "${claude_asset}"
+            "${claude_asset}.sha256"
+            "${chat_asset}"
+            "${chat_asset}.sha256"
+            "${codex_asset}"
+            "${codex_asset}.sha256"
             "${manifest}"
             "${limitations}"
             "${sbom}"

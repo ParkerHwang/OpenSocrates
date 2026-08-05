@@ -7,121 +7,145 @@
 [![Release](https://img.shields.io/github/v/release/ParkerHwang/OpenSocrates)](https://github.com/ParkerHwang/OpenSocrates/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-OpenSocrates is a local reasoning framework for AI-agent hosts. It detects
-requests that benefit from deliberate reasoning, selects relevant reasoning
-systems in a separate Codex context, and adds their authored theory and
-examples to the active task. Straightforward factual and mechanical work can
-pass through unchanged.
+OpenSocrates is a local integration and authored reasoning framework for
+Claude and Codex. It detects requests that benefit from deliberate reasoning,
+uses a fresh host-native selector to choose relevant systems, and adds their
+complete theory and examples to the active task. Straightforward factual and
+mechanical work can pass through unchanged.
 
-Version `1.0.0` includes 48 reasoning systems and supports Codex Desktop and
-Codex CLI on Apple-silicon macOS (`darwin-arm64`). Other platforms, binary
-signing, notarization, and clean-machine installation are not yet claimed as
-validated.
+Version `1.1.0` includes 48 reasoning systems and release packages for Claude
+and Codex on Apple-silicon macOS (`darwin-arm64`). It uses your existing host
+login and does not require an API key or an OpenSocrates backend.
+
+## Host support
+
+| Host surface | Automatic selection | Reasoning skills | Status |
+| --- | --- | --- | --- |
+| Claude Code CLI | Yes, through `UserPromptSubmit` | Yes | Supported on `darwin-arm64` |
+| Claude Code desktop app | Yes, where Claude Code plugins run | Yes | Supported on `darwin-arm64` |
+| Claude Cowork | Yes, when the local plugin runtime is available | Yes | Supported on `darwin-arm64` |
+| Claude web and Desktop Chat | No hooks | Yes, through plugin skills | Skills-only; not live-release-validated |
+| Codex CLI and Desktop | Yes | Yes | Supported on `darwin-arm64` |
+
+Claude Chat surfaces do not run plugin hooks. They can use the generated
+skills, but automatic per-prompt selection is available only on Claude Code
+and Cowork surfaces that execute the plugin runtime. OpenSocrates fails open
+if a hook or selector is unavailable.
 
 ## Install
 
-Before installing, sign in to Codex with OAuth and make sure the `codex`
-command is available.
+Before installing, sign in to the host and make sure its command is available:
 
-### Option 1: npx from npm
+- Claude: Claude Code `2.1.205` or later and the `claude` command;
+- Codex: an OAuth-authenticated `codex` command.
 
-Requires Node.js 20 or later. The npm package is a small, dependency-free
-installer; it downloads and verifies the matching package from GitHub
-Releases.
+Node.js 20 or later is required. The published `opensocrates` npm package is a
+small, dependency-free installer. It downloads the matching package from
+GitHub Releases and verifies the release checksum and every file checksum
+before registering an owner-marked managed marketplace.
+
+### Claude Code and Cowork
 
 ```bash
-npx --yes opensocrates@1.0.0 install
+npx --yes opensocrates@1.1.0 install --host claude
 ```
 
 Lifecycle commands:
 
 ```bash
-npx --yes opensocrates@1.0.0 status
-npx --yes opensocrates@1.0.0 update
-npx --yes opensocrates@1.0.0 remove
+npx --yes opensocrates@1.1.0 status --host claude
+npx --yes opensocrates@1.1.0 update --host claude
+npx --yes opensocrates@1.1.0 remove --host claude
 ```
 
-### Option 2: npx from GitHub
+### Codex
 
-Requires Node.js 20 or later. This command installs directly from the tagged
-GitHub repository and remains available without the npm registry.
+Codex remains the default host for backward compatibility:
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.0.0 install
+npx --yes opensocrates@1.1.0 install
+# Equivalent: npx --yes opensocrates@1.1.0 install --host codex
 ```
 
 Lifecycle commands:
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.0.0 status
-npx --yes github:ParkerHwang/OpenSocrates#v1.0.0 update
-npx --yes github:ParkerHwang/OpenSocrates#v1.0.0 remove
+npx --yes opensocrates@1.1.0 status --host codex
+npx --yes opensocrates@1.1.0 update --host codex
+npx --yes opensocrates@1.1.0 remove --host codex
 ```
 
-The installer downloads the matching GitHub Release asset, verifies both the
-release checksum and every checksum inside the package, and then registers a
-private managed marketplace under the current Codex home.
+To use both hosts, run both install commands. Their managed marketplaces live
+under their respective Claude and Codex configuration homes.
 
-### Option 3: download from GitHub Releases
+### Claude web and Desktop Chat skills
 
-Download `opensocrates.mjs` from the
-[v1.0.0 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.0.0),
-then run:
+These surfaces support plugin skills but not hooks. Download
+`opensocrates-1.1.0-claude-chat-skills.zip` from the release and upload it from
+Claude's plugin customization UI. The 48 method skills and three shared skills
+remain available in a small, runtime-free package, while automatic selection
+is absent because Chat does not execute plugin hooks. See Anthropic's
+[plugin surface guide](https://support.claude.com/en/articles/13837440-use-plugins-in-claude).
+
+### Install from a tagged GitHub source
+
+The same host option works without the npm registry:
 
 ```bash
-node opensocrates.mjs install
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.0 install --host claude
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.0 install --host codex
 ```
 
-For a fully manual download and checksum check:
+### Manual release verification
+
+Download `opensocrates.mjs`, the host package, and its `.sha256` file from the
+[v1.1.0 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.0).
+For Claude, for example:
 
 ```bash
-curl -fLO https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.0.0/opensocrates-1.0.0-codex-plugin.zip
-curl -fLO https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.0.0/opensocrates-1.0.0-codex-plugin.zip.sha256
-shasum -a 256 -c opensocrates-1.0.0-codex-plugin.zip.sha256
-node opensocrates.mjs install \
-  --asset opensocrates-1.0.0-codex-plugin.zip \
-  --checksum opensocrates-1.0.0-codex-plugin.zip.sha256
+shasum -a 256 -c opensocrates-1.1.0-claude-plugin.zip.sha256
+node opensocrates.mjs install --host claude \
+  --asset opensocrates-1.1.0-claude-plugin.zip \
+  --checksum opensocrates-1.1.0-claude-plugin.zip.sha256
 ```
 
-### Option 4: build and install from source
+Replace `claude` with `codex` for the Codex package.
 
-Requires [uv](https://docs.astral.sh/uv/) and Python 3.12.
+### Migrating a pre-1.0 Claude plugin
+
+Some development builds used a case-sensitive marketplace named
+`OpenSocrates`. The new marketplace is `opensocrates`. The installer detects
+the old registration and refuses to remove it automatically. After reviewing
+what is installed, remove it explicitly:
 
 ```bash
-git clone https://github.com/ParkerHwang/OpenSocrates.git
-cd OpenSocrates
-uv python install 3.12
-uv sync --locked --all-groups
-make release-check
-uv run --locked --no-sync python tools/codex_plugin.py install
+claude plugin uninstall opensocrates@OpenSocrates --scope user
+claude plugin marketplace remove OpenSocrates --scope user
+npx --yes opensocrates@1.1.0 install --host claude
 ```
-
-`make release-check` builds the native runtime and installable package locally.
-Generated files are written to ignored `build/` and `dist/` directories.
 
 ## Use
 
-Use Codex normally. Before each submitted prompt, OpenSocrates may intervene
-when the request needs judgment, interpretation, diagnosis, explanation,
-planning, evidence reconciliation, or another structured reasoning process.
-When it intervenes, it:
+Use Claude or Codex normally. Before a submitted prompt, OpenSocrates may
+intervene when the request needs judgment, interpretation, diagnosis,
+explanation, planning, evidence reconciliation, or another structured
+reasoning process. When it intervenes, it:
 
-1. uses a fresh, ephemeral selector thread;
+1. starts a fresh, non-persistent selector in the current host;
 2. chooses from the authored 48-system catalog;
 3. writes the complete selected content to an owner-only temporary Markdown
    file; and
-4. adds one hidden context message telling the active task to read that file.
+4. adds a small hidden context message telling the active task to read it.
 
-There is no fixed selection-count limit. The hook message stays small while
-the full selected theory and examples remain uncompressed in the referenced
-file.
+There is no fixed selection-count limit. The selector has a 30-second internal
+deadline, does not retry, and fails open. A timeout, host error, invalid output,
+non-intervention decision, unsafe context, or unavailable hook produces no
+injection and does not block the user's task.
 
-The selector has a 30-second internal deadline, does not retry, and fails open.
-A timeout, SDK error, invalid output, non-intervention decision, unsafe
-context, or unavailable hook produces no injection and does not block the
-user's task.
-
-To prevent the selector from requesting bounded transcript context:
+The Claude selector uses one `claude --safe-mode -p` process with no session
+persistence, project instructions, plugins, hooks, MCP servers, or tools. It
+receives only the current prompt and the authored selection catalog. The Codex
+selector can additionally use bounded transcript context unless disabled:
 
 ```bash
 export OPENSOCRATES_SELECTOR_TRANSCRIPT_ACCESS=0
@@ -129,24 +153,26 @@ export OPENSOCRATES_SELECTOR_TRANSCRIPT_ACCESS=0
 
 ## Privacy and security
 
-OpenSocrates runs locally through the Codex app-server and the user's existing
-Codex OAuth session. It does not require an API key, host a backend, execute
-the user's requested task, or add telemetry.
+OpenSocrates runs its integration locally and uses the existing Claude or
+Codex login. Host model requests are still processed by the selected host
+service under that service's terms. OpenSocrates does not host a backend, add
+telemetry, store an API key, or execute the user's requested task.
 
 Temporary instruction files contain authored OpenSocrates content only. Raw
-prompts, transcripts, workspace files, tool data, OAuth credentials, and
-selector reasoning are not written to records, logs, metrics, diagnostics, or
-temporary instruction files. Turn files are removed on `Stop`, remaining
-session files on `SessionEnd`, and crash leftovers older than 24 hours on
+prompts, transcripts, workspace files, tool data, credentials, and selector
+reasoning are not written to OpenSocrates records, logs, metrics, diagnostics,
+or instruction files. Turn files are removed on `Stop`, remaining session
+files on `SessionEnd`, and crash leftovers older than 24 hours on
 `SessionStart`.
 
-See [SECURITY.md](SECURITY.md) for vulnerability reporting and the current
+See [SECURITY.md](SECURITY.md) for vulnerability reporting and the measured
 support boundary.
 
 ## Develop
 
 The source repository intentionally excludes native binaries and intermediate
-build output. Install the locked development environment and run:
+build output. Install [uv](https://docs.astral.sh/uv/), Python 3.12, and Node.js
+20 or later, then run:
 
 ```bash
 make bootstrap
@@ -162,12 +188,11 @@ npm pack --dry-run
 make release-check
 ```
 
-Repository layout:
-
 | Path | Purpose |
 | --- | --- |
-| `src/opensocrates/` | Python 3.12 runtime and selector source |
+| `src/opensocrates/` | Shared Python 3.12 runtime and host-native selectors |
 | `content/` | Policies, localized messages, methods, theory, and examples |
+| `plugin-src/claude/` | Claude plugin templates |
 | `plugin-src/codex/` | Codex plugin templates |
 | `schemas/source/` | Canonical schema definitions |
 | `schemas/v1/` | Generated, versioned public schemas |
@@ -177,8 +202,8 @@ Repository layout:
 | `build/`, `dist/` | Generated locally and published as release assets |
 
 Generated schemas and compiled content must be changed through their canonical
-sources and generators. Release binaries belong in GitHub Releases, not in the
-Git history.
+sources and generators. Release binaries belong in GitHub Releases, not in Git
+history.
 
 ## Contributing
 
@@ -191,3 +216,6 @@ requests. The project follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 OpenSocrates is available under the [MIT License](LICENSE). You may use,
 modify, distribute, sublicense, and sell copies, provided the copyright and
 license notice are preserved.
+
+OpenSocrates is an independent open-source project and is not affiliated with
+or endorsed by Anthropic or OpenAI.

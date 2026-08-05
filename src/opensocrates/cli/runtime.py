@@ -36,6 +36,7 @@ from ..persistence import (
 )
 from ..rendering.messages import LocaleCatalog
 from ..selector import InstructionFileStore, SelectorApplication, SelectorConfig
+from ..selector.claude_cli import ClaudeCliReasoningSelector
 from ..selector.sdk import CodexReasoningSelector
 
 DEFAULT_BUNDLE_FILENAME = "compiled-content.bundle.json"
@@ -261,6 +262,7 @@ class RuntimeServices:
     selector_config: SelectorConfig | None = None
     instruction_file_store: InstructionFileStore | None = None
     codex_reasoning_selector: CodexReasoningSelector | None = None
+    claude_reasoning_selector: ClaudeCliReasoningSelector | None = None
     selector_application: SelectorApplication | None = None
     adapters: dict[str, Any] | None = None
     capability_profiles: dict[str, CapabilityProfile] | None = None
@@ -275,25 +277,27 @@ class RuntimeServices:
     def close(self) -> None:
         """Best-effort terminal cancellation for selector workers owned by this runtime."""
 
-        selector = self.codex_reasoning_selector
-        if selector is None:
-            return
-        try:
-            selector.cancel()
-        except Exception:
-            pass
-        try:
-            selector.close()
-        except Exception:
-            pass
+        for selector in (self.codex_reasoning_selector, self.claude_reasoning_selector):
+            if selector is None:
+                continue
+            try:
+                selector.cancel()
+            except Exception:
+                pass
+            try:
+                selector.close()
+            except Exception:
+                pass
 
 
 def _profiles() -> dict[str, CapabilityProfile]:
     from ..domain.enums import HostId
+    from ..hosts.claude.capability import default_capability_profile as claude_profile
     from ..hosts.codex.capability import default_capability_profile as codex_profile
     from ..hosts.prompt_only.capability import default_capability_profile as prompt_profile
 
     return {
+        "claude": claude_profile(HostId.CLAUDE_CODE),
         "codex": codex_profile(HostId.CODEX_CLI),
         "prompt_only": prompt_profile(host=HostId.PROMPT_ONLY),
     }
@@ -318,6 +322,38 @@ def _compose_codex_selector(
         projections = load_reasoning_content_projections(reasoning_content_path)
         assembler = ProjectionInstructionAssembler(projections)
         selector = CodexReasoningSelector(projections.selection_catalog)
+        application = SelectorApplication(
+            selector=selector,
+            assembler=assembler,
+            config=config,
+            artifact_store=instruction_file_store,
+        )
+    except Exception:
+        return None, None, None, None
+    return projections, assembler, selector, application
+
+
+def _compose_claude_selector(
+    *,
+    reasoning_content_path: Path,
+    instruction_file_store: InstructionFileStore | None,
+    config: SelectorConfig,
+) -> tuple[
+    Any | None,
+    ProjectionInstructionAssembler | None,
+    ClaudeCliReasoningSelector | None,
+    SelectorApplication | None,
+]:
+    """Compose the fail-open Claude Code CLI selector dependency graph."""
+
+    if instruction_file_store is None:
+        return None, None, None, None
+    try:
+        projections = load_reasoning_content_projections(reasoning_content_path)
+        assembler = ProjectionInstructionAssembler(projections)
+        selector = ClaudeCliReasoningSelector(projections.selection_catalog)
+        if not selector.available:
+            return None, None, None, None
         application = SelectorApplication(
             selector=selector,
             assembler=assembler,
@@ -392,24 +428,42 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
     projection_instruction_assembler: ProjectionInstructionAssembler | None = None
     instruction_file_store: InstructionFileStore | None = None
     codex_reasoning_selector: CodexReasoningSelector | None = None
+    claude_reasoning_selector: ClaudeCliReasoningSelector | None = None
     selector_application: SelectorApplication | None = None
-    if host == "codex":
+    if host in {"claude", "codex"}:
         try:
             selector_config = _selector_config_from_environment()
+            if host == "claude":
+                selector_config = SelectorConfig(
+                    deadline_seconds=selector_config.deadline_seconds,
+                    transcript_access_enabled=False,
+                )
             installation_key = getattr(turn_store, "installation_key", None)
             if isinstance(installation_key, bytes) and len(installation_key) == 32:
                 instruction_file_store = InstructionFileStore(installation_key=installation_key)
                 instruction_file_store.sweep_expired()
-            (
-                reasoning_content_projections,
-                projection_instruction_assembler,
-                codex_reasoning_selector,
-                selector_application,
-            ) = _compose_codex_selector(
-                reasoning_content_path=selected_reasoning_content_path,
-                instruction_file_store=instruction_file_store,
-                config=selector_config,
-            )
+            if host == "codex":
+                (
+                    reasoning_content_projections,
+                    projection_instruction_assembler,
+                    codex_reasoning_selector,
+                    selector_application,
+                ) = _compose_codex_selector(
+                    reasoning_content_path=selected_reasoning_content_path,
+                    instruction_file_store=instruction_file_store,
+                    config=selector_config,
+                )
+            else:
+                (
+                    reasoning_content_projections,
+                    projection_instruction_assembler,
+                    claude_reasoning_selector,
+                    selector_application,
+                ) = _compose_claude_selector(
+                    reasoning_content_path=selected_reasoning_content_path,
+                    instruction_file_store=instruction_file_store,
+                    config=selector_config,
+                )
         except Exception:
             # An unavailable sidecar, OAuth seam, artifact store, or SDK selector is a
             # Codex prototype no-op, never permission to resume static injection.
@@ -444,7 +498,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
             dispatcher = None
 
     adapters: dict[str, Any] = {}
-    for name in ("codex", "prompt_only"):
+    for name in ("claude", "codex", "prompt_only"):
         try:
             adapters[name] = build_adapter(
                 name,
@@ -458,10 +512,10 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
                 capability_profile=profiles[name],
                 installation_key=getattr(turn_store, "installation_key", None),
                 locale=selected_locale,
-                selector_mode=name == "codex",
-                selector_application=selector_application if name == "codex" else None,
-                selector_config=selector_config if name == "codex" else None,
-                instruction_file_store=instruction_file_store if name == "codex" else None,
+                selector_mode=name == host and name in {"claude", "codex"},
+                selector_application=selector_application if name == host else None,
+                selector_config=selector_config if name == host else None,
+                instruction_file_store=instruction_file_store if name == host else None,
             )
         except Exception:
             # A host adapter is optional for a command that did not select it;
@@ -487,6 +541,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
         selector_config=selector_config,
         instruction_file_store=instruction_file_store,
         codex_reasoning_selector=codex_reasoning_selector,
+        claude_reasoning_selector=claude_reasoning_selector,
         selector_application=selector_application,
         adapters=adapters,
         capability_profiles=profiles,

@@ -34,14 +34,23 @@ severity, and the availability of a safe fix.
 
 ## Security boundary
 
-OpenSocrates 1.0:
+OpenSocrates 1.x:
 
-- runs locally through Codex and uses the user's existing OAuth session;
-- does not require or store an OpenAI API key;
+- runs its integration locally through Claude or Codex and uses the user's
+  existing host login;
+- does not require or store an Anthropic or OpenAI API key;
 - does not host an OpenSocrates backend or add telemetry;
 - verifies downloadable packages with SHA-256 release and package manifests;
 - fails open when the selector cannot safely complete.
 
+The Claude selector runs a bounded, non-persistent `claude --safe-mode -p` process
+with tools, MCP configuration, project instructions, plugins, and hooks
+disabled. It receives the current prompt and authored selection catalog only.
+The process uses the user's Claude login, so model requests remain subject to
+Anthropic's service and data-handling terms. The Codex selector uses the pinned
+Codex SDK and existing OAuth session in its own isolated worker.
+
 Signing, notarization, clean-machine installation, platforms other than
-`darwin-arm64`, and actual host hook delivery are not claimed as validated.
-See the release limitations file for the complete measured boundary.
+`darwin-arm64`, Claude Chat automatic hooks, and live delivery on every host
+surface are not claimed as validated. See the release limitations file for the
+complete measured boundary.

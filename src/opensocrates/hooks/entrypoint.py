@@ -14,10 +14,11 @@ import sys
 from collections.abc import Mapping, Sequence
 from typing import Any, BinaryIO, TextIO
 
+from ..hosts.claude.commands import NATIVE_TO_NORMALIZED as CLAUDE_EVENTS
 from ..hosts.codex.commands import NATIVE_TO_NORMALIZED as CODEX_EVENTS
 
 MAX_HOOK_INPUT_BYTES = 4 * 1024 * 1024
-_HOSTS = frozenset({"codex"})
+_HOSTS = frozenset({"claude", "codex"})
 _NORMALIZED_EVENTS = frozenset(
     {
         "session_started",
@@ -37,10 +38,11 @@ _NORMALIZED_EVENTS = frozenset(
 def _native_for_lane(host: str, lane: str, native: object) -> str | None:
     if not isinstance(native, str):
         return None
-    if CODEX_EVENTS.get(native) != lane:
+    events = CLAUDE_EVENTS if host == "claude" else CODEX_EVENTS
+    if events.get(native) != lane:
         # Codex PreToolUse is intentionally mapped to the tool_succeeded
         # launcher lane even though its mapping value is None.
-        if not (native == "PreToolUse" and lane == "tool_succeeded"):
+        if not (host == "codex" and native == "PreToolUse" and lane == "tool_succeeded"):
             return None
     return native
 

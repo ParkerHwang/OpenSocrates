@@ -22,22 +22,46 @@ import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 
-export const PRODUCT_VERSION = "1.0.0";
+export const PRODUCT_VERSION = "1.1.0";
 export const REPOSITORY = "ParkerHwang/OpenSocrates";
 export const MARKETPLACE_NAME = "opensocrates";
 export const PLUGIN_NAME = "opensocrates";
 export const PLUGIN_ID = `${PLUGIN_NAME}@${MARKETPLACE_NAME}`;
-export const ASSET_NAME = `opensocrates-${PRODUCT_VERSION}-codex-plugin.zip`;
+export const DEFAULT_HOST = "codex";
+export const SUPPORTED_HOSTS = Object.freeze(["claude", "codex"]);
+export function assetNameFor(host = DEFAULT_HOST) {
+  if (!SUPPORTED_HOSTS.includes(host)) {
+    fail(`unsupported host ${JSON.stringify(host)}`);
+  }
+  return `opensocrates-${PRODUCT_VERSION}-${host}-plugin.zip`;
+}
+export const ASSET_NAME = assetNameFor(DEFAULT_HOST);
 export const CHECKSUM_NAME = `${ASSET_NAME}.sha256`;
 
 const MARKER_NAME = ".opensocrates-managed.json";
-const MARKER = Object.freeze({
+const CODEX_MARKER = Object.freeze({
   schemaVersion: 1,
   marketplaceName: MARKETPLACE_NAME,
   pluginName: PLUGIN_NAME,
 });
-const MARKETPLACE_RELATIVE = join(".agents", "plugins", "marketplace.json");
-const PLUGIN_RELATIVE = join("build", "generated", "plugins", "codex");
+const CLAUDE_MARKER = Object.freeze({
+  schemaVersion: 1,
+  marketplaceName: MARKETPLACE_NAME,
+  pluginName: PLUGIN_NAME,
+  host: "claude",
+});
+const HOST_LAYOUTS = Object.freeze({
+  claude: {
+    marketplaceRelative: join(".claude-plugin", "marketplace.json"),
+    pluginRelative: join("plugins", PLUGIN_NAME),
+    manifestRelative: join(".claude-plugin", "plugin.json"),
+  },
+  codex: {
+    marketplaceRelative: join(".agents", "plugins", "marketplace.json"),
+    pluginRelative: join("build", "generated", "plugins", "codex"),
+    manifestRelative: join(".codex-plugin", "plugin.json"),
+  },
+});
 const MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024 * 1024;
 const MAX_ARCHIVE_ENTRIES = 10_000;
 
@@ -65,12 +89,16 @@ function jsonEqual(left, right) {
   );
 }
 
-export function markerMatches(value) {
+function markerFor(host) {
+  return host === "claude" ? CLAUDE_MARKER : CODEX_MARKER;
+}
+
+export function markerMatches(value, host = DEFAULT_HOST) {
   return (
     value !== null &&
     typeof value === "object" &&
     !Array.isArray(value) &&
-    jsonEqual(value, MARKER)
+    jsonEqual(value, markerFor(host))
   );
 }
 
@@ -120,11 +148,19 @@ export function parseCli(argv) {
   if (!actions.has(action)) {
     fail(`unknown action ${JSON.stringify(action)}`);
   }
-  const options = { action, asset: null, checksum: null };
+  const options = { action, host: DEFAULT_HOST, asset: null, checksum: null };
   while (args.length > 0) {
     const flag = args.shift();
     if (flag === "--help" || flag === "-h") {
       options.action = "help";
+      continue;
+    }
+    if (flag === "--host") {
+      const host = args.shift();
+      if (!SUPPORTED_HOSTS.includes(host)) {
+        fail(`--host must be one of: ${SUPPORTED_HOSTS.join(", ")}`);
+      }
+      options.host = host;
       continue;
     }
     if (flag !== "--asset" && flag !== "--checksum") {
@@ -149,33 +185,49 @@ function showHelp() {
   console.log(`OpenSocrates ${PRODUCT_VERSION}
 
 Usage:
-  opensocrates install [--asset ZIP --checksum SHA256]
-  opensocrates status
-  opensocrates update [--asset ZIP --checksum SHA256]
-  opensocrates remove
-  opensocrates verify [--asset ZIP --checksum SHA256]
+  opensocrates install [--host codex|claude] [--asset ZIP --checksum SHA256]
+  opensocrates status [--host codex|claude]
+  opensocrates update [--host codex|claude] [--asset ZIP --checksum SHA256]
+  opensocrates remove [--host codex|claude]
+  opensocrates verify [--host codex|claude] [--asset ZIP --checksum SHA256]
 
 Without --asset, install, update, and verify download the v${PRODUCT_VERSION}
-package and checksum from GitHub Releases.
+package and checksum from GitHub Releases. The default host is codex.
 `);
 }
 
-function managedPaths() {
-  const configured = process.env.CODEX_HOME;
-  const codexHome = resolve(configured ? configured : join(homedir(), ".codex"));
-  const root = join(codexHome, "managed-marketplaces", MARKETPLACE_NAME);
+function managedPaths(host) {
+  const configured =
+    host === "claude" ? process.env.CLAUDE_CONFIG_DIR : process.env.CODEX_HOME;
+  const configuredHome = resolve(
+    configured ? configured : join(homedir(), host === "claude" ? ".claude" : ".codex"),
+  );
+  let hostHome = configuredHome;
+  try {
+    hostHome = realpathSync(configuredHome);
+  } catch {
+    // The installer creates a missing host home below after validating its
+    // explicit, non-recursive target. Lexical resolution is the only
+    // available normalization until then.
+  }
+  const root = join(hostHome, "managed-marketplaces", MARKETPLACE_NAME);
+  const layout = HOST_LAYOUTS[host];
   return {
-    codexHome,
+    hostHome,
     root,
     parent: dirname(root),
     marker: join(root, MARKER_NAME),
-    marketplace: join(root, MARKETPLACE_RELATIVE),
-    plugin: join(root, PLUGIN_RELATIVE),
+    marketplace: join(root, layout.marketplaceRelative),
+    plugin: join(root, layout.pluginRelative),
   };
 }
 
 function codexBinary() {
   return process.env.CODEX_BIN || "codex";
+}
+
+function claudeBinary() {
+  return process.env.CLAUDE_BIN || "claude";
 }
 
 function run(command, args, { allowFailure = false } = {}) {
@@ -197,47 +249,97 @@ function run(command, args, { allowFailure = false } = {}) {
   return result;
 }
 
-function runCodexJson(args) {
-  const result = run(codexBinary(), args);
+function runJson(command, args, label) {
+  const result = run(command, args);
   try {
     const payload = JSON.parse(result.stdout);
-    if (payload === null || typeof payload !== "object" || Array.isArray(payload)) {
-      fail("Codex returned a non-object JSON value");
+    if (payload === null || typeof payload !== "object") {
+      fail(`${label} returned a non-container JSON value`);
     }
     return payload;
   } catch (error) {
     if (error instanceof InstallerError) {
       throw error;
     }
-    fail(`Codex returned invalid JSON for ${args.join(" ")}: ${error.message}`);
+    fail(`${label} returned invalid JSON for ${args.join(" ")}: ${error.message}`);
   }
 }
 
-function requireCodex() {
+function runCodexJson(args) {
+  const payload = runJson(codexBinary(), args, "Codex");
+  if (Array.isArray(payload)) {
+    fail("Codex returned an unexpected JSON array");
+  }
+  return payload;
+}
+
+function runClaudeJson(args) {
+  return runJson(claudeBinary(), args, "Claude Code");
+}
+
+function versionAtLeast(value, minimum) {
+  const match = String(value).match(/(\d+)\.(\d+)\.(\d+)/u);
+  if (!match) {
+    return false;
+  }
+  const current = match.slice(1).map(Number);
+  for (let index = 0; index < minimum.length; index += 1) {
+    if (current[index] > minimum[index]) return true;
+    if (current[index] < minimum[index]) return false;
+  }
+  return true;
+}
+
+function requireHost(host) {
+  if (host === "claude") {
+    const result = run(claudeBinary(), ["--version"]);
+    if (!versionAtLeast(result.stdout, [2, 1, 205])) {
+      fail(
+        `Claude Code 2.1.205 or later is required for structured selector output; got ${result.stdout.trim()}`,
+      );
+    }
+    return;
+  }
   run(codexBinary(), ["--version"]);
 }
 
-function marketplaceEntry() {
-  const payload = runCodexJson(["plugin", "marketplace", "list", "--json"]);
-  const entries = payload.marketplaces;
+function marketplaceEntries(host) {
+  const payload =
+    host === "claude"
+      ? runClaudeJson(["plugin", "marketplace", "list", "--json"])
+      : runCodexJson(["plugin", "marketplace", "list", "--json"]).marketplaces;
+  const entries = payload;
   if (!Array.isArray(entries)) {
-    fail("Codex marketplace list returned an unexpected schema");
+    fail(`${host} marketplace list returned an unexpected schema`);
   }
+  return entries;
+}
+
+function marketplaceEntry(host) {
+  const entries = marketplaceEntries(host);
   const matches = entries.filter((entry) => entry?.name === MARKETPLACE_NAME);
   if (matches.length > 1) {
-    fail(`Codex reported duplicate marketplaces named ${MARKETPLACE_NAME}`);
+    fail(`${host} reported duplicate marketplaces named ${MARKETPLACE_NAME}`);
   }
   return matches[0] ?? null;
 }
 
-function pluginState() {
+function pluginState(host) {
+  if (host === "claude") {
+    const installed = runClaudeJson(["plugin", "list", "--json"]);
+    if (!Array.isArray(installed)) {
+      fail("Claude Code plugin list returned an unexpected schema");
+    }
+    const matches = installed.filter((entry) => entry?.id === PLUGIN_ID);
+    if (matches.length > 1) {
+      fail(`Claude Code reported duplicate entries for ${PLUGIN_ID}`);
+    }
+    return matches.length === 1
+      ? { kind: "installed", version: matches[0].version ?? null }
+      : { kind: "missing", version: null };
+  }
   const payload = runCodexJson([
-    "plugin",
-    "list",
-    "--marketplace",
-    MARKETPLACE_NAME,
-    "--available",
-    "--json",
+    "plugin", "list", "--marketplace", MARKETPLACE_NAME, "--available", "--json",
   ]);
   const installed = Array.isArray(payload.installed) ? payload.installed : null;
   const available = Array.isArray(payload.available) ? payload.available : null;
@@ -258,6 +360,31 @@ function pluginState() {
   return { kind: "missing", version: null };
 }
 
+function requireNoLegacyClaudeInstallation() {
+  const legacyMarketplaces = marketplaceEntries("claude").filter(
+    (entry) =>
+      typeof entry?.name === "string" &&
+      entry.name !== MARKETPLACE_NAME &&
+      entry.name.toLowerCase() === MARKETPLACE_NAME,
+  );
+  const plugins = runClaudeJson(["plugin", "list", "--json"]);
+  const legacyPlugins = Array.isArray(plugins)
+    ? plugins.filter(
+        (entry) =>
+          typeof entry?.id === "string" &&
+          entry.id !== PLUGIN_ID &&
+          entry.id.toLowerCase() === PLUGIN_ID,
+      )
+    : [];
+  if (legacyMarketplaces.length || legacyPlugins.length) {
+    const names = legacyMarketplaces.map((entry) => entry.name).join(", ") || "OpenSocrates";
+    fail(
+      `a legacy Claude marketplace (${names}) is installed; OpenSocrates will not remove it automatically. ` +
+        "Uninstall its plugin and marketplace explicitly, then rerun this command. See the README migration section.",
+    );
+  }
+}
+
 async function readJsonObject(target) {
   let payload;
   try {
@@ -271,13 +398,13 @@ async function readJsonObject(target) {
   return payload;
 }
 
-async function requireOwnedRoot(root) {
+async function requireOwnedRoot(root, host) {
   const info = await lstat(root);
   if (!info.isDirectory() || info.isSymbolicLink()) {
     fail(`managed marketplace path is not an owned directory: ${root}`);
   }
   const marker = await readJsonObject(join(root, MARKER_NAME));
-  if (!markerMatches(marker)) {
+  if (!markerMatches(marker, host)) {
     fail(`managed marketplace path has no valid ownership marker: ${root}`);
   }
 }
@@ -321,16 +448,18 @@ async function resolveAssetInputs(options, scratch) {
     return { asset: options.asset, checksum: options.checksum };
   }
   const base = `https://github.com/${REPOSITORY}/releases/download/v${PRODUCT_VERSION}`;
-  const asset = join(scratch, ASSET_NAME);
-  const checksum = join(scratch, CHECKSUM_NAME);
+  const assetName = assetNameFor(options.host);
+  const checksumName = `${assetName}.sha256`;
+  const asset = join(scratch, assetName);
+  const checksum = join(scratch, checksumName);
   console.log(`Downloading OpenSocrates ${PRODUCT_VERSION} from GitHub Releases...`);
-  await downloadFile(`${base}/${ASSET_NAME}`, asset);
-  await downloadFile(`${base}/${CHECKSUM_NAME}`, checksum);
+  await downloadFile(`${base}/${assetName}`, asset);
+  await downloadFile(`${base}/${checksumName}`, checksum);
   return { asset, checksum };
 }
 
-async function verifyOuterChecksum(asset, checksum) {
-  const expected = parseChecksumText(await readFile(checksum, "utf8"));
+async function verifyOuterChecksum(asset, checksum, host) {
+  const expected = parseChecksumText(await readFile(checksum, "utf8"), assetNameFor(host));
   const actual = await sha256File(asset);
   if (actual !== expected) {
     fail(`release checksum mismatch: expected ${expected}, got ${actual}`);
@@ -420,8 +549,8 @@ async function verifyPackageChecksums(pluginRoot) {
   return declared.size;
 }
 
-async function verifyExtractedPackage(pluginRoot) {
-  const manifest = await readJsonObject(join(pluginRoot, ".codex-plugin", "plugin.json"));
+async function verifyExtractedPackage(pluginRoot, host) {
+  const manifest = await readJsonObject(join(pluginRoot, HOST_LAYOUTS[host].manifestRelative));
   if (manifest.name !== PLUGIN_NAME || manifest.version !== PRODUCT_VERSION) {
     fail(
       `plugin manifest mismatch: expected ${PLUGIN_NAME} ${PRODUCT_VERSION}, ` +
@@ -431,7 +560,7 @@ async function verifyExtractedPackage(pluginRoot) {
   const release = await readJsonObject(join(pluginRoot, "release-manifest.json"));
   if (
     release.product_version !== PRODUCT_VERSION ||
-    release.host !== "codex" ||
+    release.host !== host ||
     release.schema !== "opensocrates.plugin-release-manifest/1.0.0"
   ) {
     fail("package release manifest does not match this installer");
@@ -454,10 +583,10 @@ async function prepareVerifiedPackage(options) {
   const scratch = await mkdtemp(join(tmpdir(), "opensocrates-install-"));
   try {
     const { asset, checksum } = await resolveAssetInputs(options, scratch);
-    await verifyOuterChecksum(asset, checksum);
+    await verifyOuterChecksum(asset, checksum, options.host);
     const pluginRoot = join(scratch, "plugin");
     await extractArchive(asset, pluginRoot);
-    const checkedFiles = await verifyExtractedPackage(pluginRoot);
+    const checkedFiles = await verifyExtractedPackage(pluginRoot, options.host);
     return { scratch, pluginRoot, checkedFiles };
   } catch (error) {
     await rm(scratch, { recursive: true, force: true });
@@ -465,7 +594,26 @@ async function prepareVerifiedPackage(options) {
   }
 }
 
-function expectedMarketplace() {
+function expectedMarketplace(host) {
+  if (host === "claude") {
+    return {
+      name: MARKETPLACE_NAME,
+      owner: { name: "Parker Hwang" },
+      metadata: {
+        description: "OpenSocrates reasoning support for Claude Code and Cowork",
+        version: PRODUCT_VERSION,
+      },
+      plugins: [
+        {
+          name: PLUGIN_NAME,
+          source: `./plugins/${PLUGIN_NAME}`,
+          description:
+            "Local reasoning-system selection for Claude Code and Cowork, plus reusable Claude skills.",
+          category: "workflow",
+        },
+      ],
+    };
+  }
   return {
     name: MARKETPLACE_NAME,
     interface: { displayName: "OpenSocrates" },
@@ -486,23 +634,24 @@ function expectedMarketplace() {
   };
 }
 
-async function buildStagingTree(parent, pluginSource) {
+async function buildStagingTree(parent, pluginSource, host) {
+  const layout = HOST_LAYOUTS[host];
   const staging = await mkdtemp(join(parent, ".opensocrates.staging-"));
   try {
-    const marketplace = join(staging, MARKETPLACE_RELATIVE);
-    const plugin = join(staging, PLUGIN_RELATIVE);
+    const marketplace = join(staging, layout.marketplaceRelative);
+    const plugin = join(staging, layout.pluginRelative);
     await mkdir(dirname(marketplace), { recursive: true, mode: 0o700 });
     await mkdir(dirname(plugin), { recursive: true, mode: 0o700 });
     await cp(pluginSource, plugin, { recursive: true, preserveTimestamps: true });
-    await writeFile(marketplace, `${JSON.stringify(expectedMarketplace(), null, 2)}\n`, {
+    await writeFile(marketplace, `${JSON.stringify(expectedMarketplace(host), null, 2)}\n`, {
       encoding: "utf8",
       mode: 0o600,
     });
-    await writeFile(join(staging, MARKER_NAME), `${JSON.stringify(MARKER, null, 2)}\n`, {
+    await writeFile(join(staging, MARKER_NAME), `${JSON.stringify(markerFor(host), null, 2)}\n`, {
       encoding: "utf8",
       mode: 0o600,
     });
-    await verifyExtractedPackage(plugin);
+    await verifyExtractedPackage(plugin, host);
     return staging;
   } catch (error) {
     await rm(staging, { recursive: true, force: true });
@@ -510,17 +659,29 @@ async function buildStagingTree(parent, pluginSource) {
   }
 }
 
-function entryRoot(entry) {
+function entryRoot(entry, host) {
   if (entry === null) {
     return null;
   }
-  if (typeof entry.root !== "string" || entry.root.trim().length === 0) {
-    fail(`Codex marketplace ${MARKETPLACE_NAME} has no usable root`);
+  const value = host === "claude" ? entry.path ?? entry.installLocation : entry.root;
+  if (typeof value !== "string" || value.trim().length === 0) {
+    fail(`${host} marketplace ${MARKETPLACE_NAME} has no usable root`);
   }
-  return resolve(entry.root);
+  return resolve(value);
 }
 
-function removeRegistration(entry, state) {
+function removeRegistration(host, entry, state) {
+  if (host === "claude") {
+    if (state.kind === "installed") {
+      run(claudeBinary(), ["plugin", "uninstall", PLUGIN_ID, "--scope", "user"]);
+    }
+    if (entry !== null) {
+      run(claudeBinary(), [
+        "plugin", "marketplace", "remove", MARKETPLACE_NAME, "--scope", "user",
+      ]);
+    }
+    return;
+  }
   if (state.kind === "installed") {
     runCodexJson(["plugin", "remove", PLUGIN_ID, "--json"]);
   }
@@ -529,7 +690,14 @@ function removeRegistration(entry, state) {
   }
 }
 
-function addRegistration(root, installPlugin) {
+function addRegistration(host, root, installPlugin) {
+  if (host === "claude") {
+    run(claudeBinary(), ["plugin", "marketplace", "add", root, "--scope", "user"]);
+    if (installPlugin) {
+      run(claudeBinary(), ["plugin", "install", PLUGIN_ID, "--scope", "user"]);
+    }
+    return null;
+  }
   runCodexJson(["plugin", "marketplace", "add", root, "--json"]);
   if (installPlugin) {
     return runCodexJson(["plugin", "add", PLUGIN_ID, "--json"]);
@@ -537,10 +705,10 @@ function addRegistration(root, installPlugin) {
   return null;
 }
 
-function removeRegistrationBestEffort() {
+function removeRegistrationBestEffort(host) {
   const entry = (() => {
     try {
-      return marketplaceEntry();
+      return marketplaceEntry(host);
     } catch {
       return null;
     }
@@ -549,36 +717,48 @@ function removeRegistrationBestEffort() {
     return;
   }
   try {
-    const state = pluginState();
+    const state = pluginState(host);
     if (state.kind === "installed") {
-      run(codexBinary(), ["plugin", "remove", PLUGIN_ID, "--json"], { allowFailure: true });
+      const binary = host === "claude" ? claudeBinary() : codexBinary();
+      const args =
+        host === "claude"
+          ? ["plugin", "uninstall", PLUGIN_ID, "--scope", "user"]
+          : ["plugin", "remove", PLUGIN_ID, "--json"];
+      run(binary, args, { allowFailure: true });
     }
   } catch {
     // Rollback continues with marketplace cleanup.
   }
-  run(codexBinary(), ["plugin", "marketplace", "remove", MARKETPLACE_NAME, "--json"], {
-    allowFailure: true,
-  });
+  const binary = host === "claude" ? claudeBinary() : codexBinary();
+  const args =
+    host === "claude"
+      ? ["plugin", "marketplace", "remove", MARKETPLACE_NAME, "--scope", "user"]
+      : ["plugin", "marketplace", "remove", MARKETPLACE_NAME, "--json"];
+  run(binary, args, { allowFailure: true });
 }
 
-async function installVerifiedPackage(pluginSource, action) {
-  requireCodex();
-  const paths = managedPaths();
+async function installVerifiedPackage(pluginSource, action, host) {
+  requireHost(host);
+  if (host === "claude") {
+    requireNoLegacyClaudeInstallation();
+  }
+  const paths = managedPaths(host);
   await mkdir(paths.parent, { recursive: true, mode: 0o700 });
 
-  const previousEntry = marketplaceEntry();
-  if (previousEntry !== null && entryRoot(previousEntry) !== paths.root) {
+  const previousEntry = marketplaceEntry(host);
+  if (previousEntry !== null && entryRoot(previousEntry, host) !== paths.root) {
     fail(
-      `marketplace ${MARKETPLACE_NAME} is already registered at ${entryRoot(previousEntry)}; ` +
+      `marketplace ${MARKETPLACE_NAME} is already registered at ${entryRoot(previousEntry, host)}; ` +
         "refusing to overwrite an unmanaged location",
     );
   }
-  const previousState = previousEntry === null ? { kind: "missing", version: null } : pluginState();
+  const previousState =
+    previousEntry === null ? { kind: "missing", version: null } : pluginState(host);
   if (await exists(paths.root)) {
-    await requireOwnedRoot(paths.root);
+    await requireOwnedRoot(paths.root, host);
   }
 
-  const staging = await buildStagingTree(paths.parent, pluginSource);
+  const staging = await buildStagingTree(paths.parent, pluginSource, host);
   const backup = join(paths.parent, `.opensocrates.backup-${randomUUID()}`);
   let registrationRemoved = false;
   let backupCreated = false;
@@ -586,7 +766,7 @@ async function installVerifiedPackage(pluginSource, action) {
   try {
     if (previousEntry !== null) {
       registrationRemoved = true;
-      removeRegistration(previousEntry, previousState);
+      removeRegistration(host, previousEntry, previousState);
     }
     if (await exists(paths.root)) {
       await rename(paths.root, backup);
@@ -594,37 +774,41 @@ async function installVerifiedPackage(pluginSource, action) {
     }
     await rename(staging, paths.root);
     newRootActive = true;
-    const result = addRegistration(paths.root, true);
-    const state = pluginState();
+    const result = addRegistration(host, paths.root, true);
+    const state = pluginState(host);
     if (
-      result?.pluginId !== PLUGIN_ID ||
-      result?.version !== PRODUCT_VERSION ||
+      (host === "codex" &&
+        (result?.pluginId !== PLUGIN_ID || result?.version !== PRODUCT_VERSION)) ||
       state.kind !== "installed" ||
       state.version !== PRODUCT_VERSION
     ) {
-      fail("Codex did not confirm the expected installed plugin and version");
+      fail(`${host} did not confirm the expected installed plugin and version`);
     }
     if (backupCreated) {
-      await requireOwnedRoot(backup);
+      await requireOwnedRoot(backup, host);
       await rm(backup, { recursive: true });
     }
     const verb = action === "update" ? "updated" : "installed";
     console.log(`OpenSocrates ${PRODUCT_VERSION} ${verb} successfully.`);
     console.log(`Managed marketplace: ${paths.root}`);
-    console.log("Start a new Codex task to load the updated skills and hooks.");
+    console.log(
+      host === "claude"
+        ? "Start a new Claude Code or Cowork task to load the updated skills and hooks."
+        : "Start a new Codex task to load the updated skills and hooks.",
+    );
   } catch (error) {
-    removeRegistrationBestEffort();
+    removeRegistrationBestEffort(host);
     if (newRootActive && (await exists(paths.root))) {
-      await requireOwnedRoot(paths.root);
+      await requireOwnedRoot(paths.root, host);
       await rm(paths.root, { recursive: true });
     }
     if (backupCreated && (await exists(backup))) {
-      await requireOwnedRoot(backup);
+      await requireOwnedRoot(backup, host);
       await rename(backup, paths.root);
     }
     if (registrationRemoved && previousEntry !== null) {
       try {
-        addRegistration(paths.root, previousState.kind === "installed");
+        addRegistration(host, paths.root, previousState.kind === "installed");
       } catch (rollbackError) {
         fail(`${error.message}; rollback also failed: ${rollbackError.message}`);
       }
@@ -637,24 +821,27 @@ async function installVerifiedPackage(pluginSource, action) {
   }
 }
 
-async function showStatus() {
-  requireCodex();
-  const paths = managedPaths();
-  const entry = marketplaceEntry();
+async function showStatus(host) {
+  requireHost(host);
+  if (host === "claude") {
+    requireNoLegacyClaudeInstallation();
+  }
+  const paths = managedPaths(host);
+  const entry = marketplaceEntry(host);
   if (entry === null) {
     if (await exists(paths.root)) {
-      await requireOwnedRoot(paths.root);
+      await requireOwnedRoot(paths.root, host);
       console.log(`OpenSocrates files are present but not registered: ${paths.root}`);
     } else {
       console.log("OpenSocrates is not installed.");
     }
     return;
   }
-  if (entryRoot(entry) !== paths.root) {
-    fail(`OpenSocrates is registered at an unmanaged location: ${entryRoot(entry)}`);
+  if (entryRoot(entry, host) !== paths.root) {
+    fail(`OpenSocrates is registered at an unmanaged location: ${entryRoot(entry, host)}`);
   }
-  await requireOwnedRoot(paths.root);
-  const state = pluginState();
+  await requireOwnedRoot(paths.root, host);
+  const state = pluginState(host);
   if (state.kind === "installed") {
     console.log(`OpenSocrates ${state.version ?? "unknown"} is installed.`);
   } else if (state.kind === "available") {
@@ -664,20 +851,23 @@ async function showStatus() {
   }
 }
 
-async function removeInstalled() {
-  requireCodex();
-  const paths = managedPaths();
-  const entry = marketplaceEntry();
-  if (entry !== null && entryRoot(entry) !== paths.root) {
-    fail(`OpenSocrates is registered at an unmanaged location: ${entryRoot(entry)}`);
+async function removeInstalled(host) {
+  requireHost(host);
+  if (host === "claude") {
+    requireNoLegacyClaudeInstallation();
   }
-  const state = entry === null ? { kind: "missing", version: null } : pluginState();
-  removeRegistration(entry, state);
+  const paths = managedPaths(host);
+  const entry = marketplaceEntry(host);
+  if (entry !== null && entryRoot(entry, host) !== paths.root) {
+    fail(`OpenSocrates is registered at an unmanaged location: ${entryRoot(entry, host)}`);
+  }
+  const state = entry === null ? { kind: "missing", version: null } : pluginState(host);
+  removeRegistration(host, entry, state);
   if (await exists(paths.root)) {
-    await requireOwnedRoot(paths.root);
+    await requireOwnedRoot(paths.root, host);
     await rm(paths.root, { recursive: true });
   }
-  console.log("OpenSocrates was removed from Codex.");
+  console.log(`OpenSocrates was removed from ${host === "claude" ? "Claude" : "Codex"}.`);
 }
 
 export async function main(argv = process.argv.slice(2)) {
@@ -687,11 +877,11 @@ export async function main(argv = process.argv.slice(2)) {
     return 0;
   }
   if (options.action === "status") {
-    await showStatus();
+    await showStatus(options.host);
     return 0;
   }
   if (options.action === "remove") {
-    await removeInstalled();
+    await removeInstalled(options.host);
     return 0;
   }
   if (
@@ -712,7 +902,7 @@ export async function main(argv = process.argv.slice(2)) {
     if (options.action === "verify") {
       return 0;
     }
-    await installVerifiedPackage(prepared.pluginRoot, options.action);
+    await installVerifiedPackage(prepared.pluginRoot, options.action, options.host);
     return 0;
   } finally {
     await rm(prepared.scratch, { recursive: true, force: true });

@@ -45,6 +45,7 @@ from opensocrates.domain.models import (
     SelectionCatalogEntry,
 )
 from opensocrates.domain.validation import model_from_dict
+from opensocrates.version import PRODUCT_VERSION
 
 _POLICY_FILES = {
     "participation": "participation-policy.yaml",
@@ -352,7 +353,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="optional output path for the canonical OpenSocrates selector-content projection",
     )
-    parser.add_argument("--product-version", default="1.0.0")
+    parser.add_argument("--product-version", default=PRODUCT_VERSION)
     return parser
 
 

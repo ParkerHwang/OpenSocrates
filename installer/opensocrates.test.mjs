@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   ASSET_NAME,
   InstallerError,
+  assetNameFor,
   isSafeArchivePath,
   markerMatches,
   parseChecksumText,
@@ -29,6 +30,12 @@ test("parses the expected release checksum", () => {
   );
 });
 
+test("derives host-specific release assets", () => {
+  assert.match(assetNameFor("codex"), /-codex-plugin\.zip$/u);
+  assert.match(assetNameFor("claude"), /-claude-plugin\.zip$/u);
+  assert.throws(() => assetNameFor("unknown"), (error) => error instanceof InstallerError);
+});
+
 test("accepts only the exact ownership marker", () => {
   assert.equal(
     markerMatches({
@@ -36,6 +43,18 @@ test("accepts only the exact ownership marker", () => {
       marketplaceName: "opensocrates",
       pluginName: "opensocrates",
     }),
+    true,
+  );
+  assert.equal(
+    markerMatches(
+      {
+        schemaVersion: 1,
+        marketplaceName: "opensocrates",
+        pluginName: "opensocrates",
+        host: "claude",
+      },
+      "claude",
+    ),
     true,
   );
   assert.equal(
@@ -50,10 +69,21 @@ test("accepts only the exact ownership marker", () => {
 });
 
 test("parses lifecycle actions and paired local asset options", () => {
-  assert.deepEqual(parseCli([]), { action: "install", asset: null, checksum: null });
-  assert.deepEqual(parseCli(["status"]), { action: "status", asset: null, checksum: null });
+  assert.deepEqual(parseCli([]), {
+    action: "install",
+    host: "codex",
+    asset: null,
+    checksum: null,
+  });
+  assert.deepEqual(parseCli(["status", "--host", "claude"]), {
+    action: "status",
+    host: "claude",
+    asset: null,
+    checksum: null,
+  });
   const parsed = parseCli(["verify", "--asset", "bundle.zip", "--checksum", "bundle.sha256"]);
   assert.equal(parsed.action, "verify");
+  assert.equal(parsed.host, "codex");
   assert.equal(parsed.asset.endsWith("bundle.zip"), true);
   assert.equal(parsed.checksum.endsWith("bundle.sha256"), true);
   assert.throws(
@@ -62,6 +92,10 @@ test("parses lifecycle actions and paired local asset options", () => {
   );
   assert.throws(
     () => parseCli(["remove", "--asset", "bundle.zip", "--checksum", "bundle.sha256"]),
+    (error) => error instanceof InstallerError,
+  );
+  assert.throws(
+    () => parseCli(["install", "--host", "web"]),
     (error) => error instanceof InstallerError,
   );
 });

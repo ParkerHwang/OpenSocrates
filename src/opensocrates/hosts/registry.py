@@ -6,10 +6,11 @@ from pathlib import Path
 from typing import Any
 
 from .base import HostAdapter
+from .claude.adapter import ClaudeAdapter, ClaudeAdapterConfig
 from .codex.adapter import CodexAdapter, CodexAdapterConfig
 from .prompt_only.adapter import PromptOnlyAdapter
 
-HOST_NAMES = ("codex", "prompt_only")
+HOST_NAMES = ("claude", "codex", "prompt_only")
 
 
 class HostRegistryError(ValueError):
@@ -47,6 +48,25 @@ def build_adapter(
     if selected == "codex":
         return CodexAdapter(
             CodexAdapterConfig(
+                bundle_path=bundle_path or Path("content/compiled-content.bundle.json"),
+                content_repository=content_repository,
+                turn_repository=turn_repository,
+                settings_repository=settings_repository,
+                capability_profile=capability_profile,
+                control_application=control_application,
+                dispatcher=dispatcher,
+                installation_key=installation_key,
+                locale=locale,
+                selector_mode=selector_mode,
+                selector_application=selector_application,
+                selector_config=selector_config,
+                instruction_file_store=instruction_file_store,
+                **kwargs,
+            )
+        )
+    if selected == "claude":
+        return ClaudeAdapter(
+            ClaudeAdapterConfig(
                 bundle_path=bundle_path or Path("content/compiled-content.bundle.json"),
                 content_repository=content_repository,
                 turn_repository=turn_repository,

@@ -25,6 +25,7 @@ typecheck:
 generate:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host claude --runtime-root "$(ROOT)/dist/runtime" --output "$(ROOT)/build/generated/plugins/claude" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host codex --runtime-root "$(ROOT)/dist/runtime" --output "$(ROOT)/build/generated/plugins/codex" >/dev/null
 
 generated-check:
@@ -49,12 +50,13 @@ docs-check:
 		--report build/evidence/links.json
 
 security-scan: generate
-	@set -eu; set -- --artifact content/compiled-content.bundle.json --artifact content/compiled-reasoning-content.bundle.json; for artifact in $$(find "$(ROOT)/dist/runtime" -type f -name opensocrates-runtime -perm -111 2>/dev/null); do set -- "$$@" --artifact "$${artifact#$(ROOT)/}"; done; for artifact in "$(ROOT)"/dist/opensocrates-*-plugin.zip; do if [ -f "$$artifact" ]; then set -- "$$@" --artifact "$${artifact#$(ROOT)/}"; fi; done; PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_sbom.py --root "$(ROOT)" --output build/evidence/sbom.spdx.json --report build/evidence/sbom.json "$$@"
+	@set -eu; set -- --artifact content/compiled-content.bundle.json --artifact content/compiled-reasoning-content.bundle.json; for artifact in $$(find "$(ROOT)/dist/runtime" -type f -name opensocrates-runtime -perm -111 2>/dev/null); do set -- "$$@" --artifact "$${artifact#$(ROOT)/}"; done; for artifact in "$(ROOT)"/dist/opensocrates-*.zip; do if [ -f "$$artifact" ]; then set -- "$$@" --artifact "$${artifact#$(ROOT)/}"; fi; done; PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_sbom.py --root "$(ROOT)" --output build/evidence/sbom.spdx.json --report build/evidence/sbom.json "$$@"
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/security_scan.py --root "$(ROOT)" --report build/evidence/security-scan.json
 
 smoke:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/smoke_product.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_selector.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_claude.py
 
 installer-check:
 	@npm test

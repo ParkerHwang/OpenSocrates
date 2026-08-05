@@ -1,0 +1,84 @@
+# OpenSocrates for Claude
+
+This package provides the Claude plugin boundary for OpenSocrates
+{{PRODUCT_VERSION}}. It contains {{METHOD_COUNT}} generated reasoning skills
+and a fail-open selector hook for supported local Claude surfaces. It does not
+execute the user's requested task, host a service, add telemetry, or require an
+Anthropic API key.
+
+The package was generated from content revision {{CONTENT_REVISION}} with
+semantic bundle identity `{{SEMANTIC_HASH}}`. Those values come from the
+canonical OpenSocrates bundle at build time; they are not quality or host
+compatibility claims.
+
+## Surface support
+
+| Claude surface | OpenSocrates behavior |
+| --- | --- |
+| Claude Code CLI | Automatic `UserPromptSubmit` selection and all plugin skills |
+| Claude Code in Desktop | Same Claude Code hook and skill contract |
+| Cowork, local execution | Automatic hook when local command hooks are allowed; skills remain available |
+| Cowork, remote execution | Skills are available; the packaged local runtime may be unavailable, so automatic selection fails open |
+| Claude Chat on web or Desktop | Skills are available; Anthropic does not run plugin hooks in Chat |
+
+See Anthropic's [hooks reference](https://code.claude.com/docs/en/hooks) and
+[Claude plugin surface guide](https://support.claude.com/en/articles/13837440-use-plugins-in-claude)
+for the host-owned behavior behind this matrix.
+
+## Authorized selector lifecycle
+
+The generated package configures `SessionStart`, `UserPromptSubmit`, `Stop`,
+and `SessionEnd`. Only `UserPromptSubmit` starts a selector. A compact-restored
+`SessionStart` can re-inject the current temporary-file reference. `Stop` and
+`SessionEnd` remove temporary artifacts.
+
+For each submitted prompt, the runtime starts one non-persistent
+`claude --safe-mode -p` process using the user's existing Claude login. The process:
+
+- receives only the current prompt and canonical selection catalog;
+- has built-in tools, MCP tools, plugins, skills, hooks, project instructions,
+  and session persistence disabled;
+- runs in a new owner-only temporary working directory;
+- returns a JSON-schema-constrained selection candidate; and
+- is supervised by a 30-second OpenSocrates deadline with no application-level
+  retry.
+
+The candidate chooses IDs only. OpenSocrates discards candidate instruction
+text and deterministically assembles the selected authored theory and examples.
+Complete content is written to an owner-only temporary Markdown file. Claude
+receives one hidden `additionalContext` message naming that file and requiring
+it to be read before acting.
+
+Non-intervention, an unavailable Claude CLI, authentication failure, timeout,
+malformed output, unknown method ID, unavailable local runtime, or artifact
+failure all produce literal empty hook output and do not block the user's task.
+
+Raw prompts, transcripts, workspace files, tool values, credentials, selector
+reasoning, and raw CLI output are not written to OpenSocrates records, logs,
+metrics, diagnostics, or instruction files. This Claude selector does not read
+transcripts or workspace files. Temporary instruction files contain authored
+OpenSocrates content only; `Stop` removes the active turn, `SessionEnd` removes
+the session, and `SessionStart` sweeps crash leftovers older than 24 hours.
+
+## Package contents
+
+- Manifest: `.claude-plugin/plugin.json`
+- Hook definition: `hooks/hooks.json`
+- Fixed launchers: `bin/launch.sh` and `bin/launch.ps1`
+- Shared controller skills: `skills/opensocrates`, `skills/rigor`, and
+  `skills/trace`
+- Generated method skills: `skills/<method-id>`
+
+Validate a generated package with:
+
+```bash
+claude plugin validate . --strict
+```
+
+For local development, start Claude Code with:
+
+```bash
+claude --plugin-dir .
+```
+
+Generated source identity: `{{SOURCE_TREE_HASH}}`.

@@ -8,9 +8,8 @@ pass_through() {
     code=$1
     launch_mode=${2:-}
     launch_host=${3:-}
-    if [ "$launch_mode" = hook ] && [ "$launch_host" = codex ]; then
-        # The Codex selector contract makes every launcher/runtime failure a
-        # literal empty hook response.
+    if [ "$launch_mode" = hook ] && { [ "$launch_host" = codex ] || [ "$launch_host" = claude ]; }; then
+        # Selector hook failures are always literal empty stdout.
         exit 0
     fi
     case "$code" in
@@ -35,7 +34,7 @@ event=${3:-}
 case "$mode" in
     hook)
         case "$host" in
-            codex) ;;
+            claude|codex) ;;
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         case "$event" in
@@ -49,7 +48,7 @@ case "$mode" in
             pass_through invalid_arguments "$mode" "$host"
         fi
         case "$host" in
-            codex) ;;
+            claude|codex) ;;
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         ;;

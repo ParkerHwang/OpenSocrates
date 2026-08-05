@@ -15,7 +15,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 function Pass-Through([string]$Code, [string]$LaunchMode = "", [string]$LaunchHost = "") {
-    if ($LaunchMode -eq "hook" -and $LaunchHost -eq "codex") {
+    if ($LaunchMode -eq "hook" -and $LaunchHost -in @("claude", "codex")) {
         # Selector hook failures are deliberately literal empty stdout.
         exit 0
     }
@@ -35,7 +35,7 @@ if ($null -ne $Extra -and $Extra.Count -gt 0) {
 if ([string]::IsNullOrEmpty($Mode) -or [string]::IsNullOrEmpty($HostName)) {
     Pass-Through "invalid_arguments" $Mode $HostName
 }
-if ($Mode -notin @("hook", "control") -or $HostName -ne "codex") {
+if ($Mode -notin @("hook", "control") -or $HostName -notin @("claude", "codex")) {
     Pass-Through "invalid_arguments" $Mode $HostName
 }
 

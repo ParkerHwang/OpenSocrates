@@ -3,6 +3,38 @@
 All notable changes to OpenSocrates are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - Unreleased
+
+### Added
+
+- Claude Code CLI, Claude Code desktop, and Cowork integration through native
+  Claude plugin hooks and generated reasoning skills.
+- A bounded `claude --safe-mode -p` selector that uses the existing Claude login,
+  disables tools and project/plugin context, accepts only structured output,
+  and fails open after the existing 30-second deadline.
+- Host-specific `npx` lifecycle support through `--host claude` while keeping
+  Codex as the backward-compatible default.
+- A separate Claude release package, checksum verification, security boundary
+  checks, and offline integration contracts.
+- A compact, runtime-free Claude Chat ZIP containing 48 method skills and
+  three shared skills for custom-plugin upload.
+- A support matrix that distinguishes automatic local hooks from skills-only
+  Claude web and Desktop Chat use.
+
+### Changed
+
+- Release assembly, SBOM input, security scans, and GitHub Release publishing
+  now cover both Claude and Codex packages.
+- The installer detects case-sensitive pre-1.0 Claude marketplace
+  registrations and requires an explicit migration instead of deleting them.
+
+### Security and privacy
+
+- Claude selection receives only the current prompt and authored catalog; it
+  cannot read the transcript, workspace, MCP servers, or tools.
+- Claude CLI stdout is parsed in memory, stderr is discarded, prompt history
+  is disabled, and the process group is terminated on timeout or shutdown.
+
 ## [1.0.0] - 2026-07-31
 
 ### Added
@@ -36,3 +68,4 @@ All notable changes to OpenSocrates are documented here. This project follows
   delivery remain explicitly unvalidated.
 
 [1.0.0]: https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.0.0
+[1.1.0]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.0.0...v1.1.0
