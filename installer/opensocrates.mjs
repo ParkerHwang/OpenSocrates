@@ -360,8 +360,8 @@ function pluginState(host) {
   return { kind: "missing", version: null };
 }
 
-function requireNoLegacyClaudeInstallation() {
-  const legacyMarketplaces = marketplaceEntries("claude").filter(
+function detectLegacyClaudeInstallation() {
+  const marketplaces = marketplaceEntries("claude").filter(
     (entry) =>
       typeof entry?.name === "string" &&
       entry.name !== MARKETPLACE_NAME &&
@@ -376,11 +376,36 @@ function requireNoLegacyClaudeInstallation() {
           entry.id.toLowerCase() === PLUGIN_ID,
       )
     : [];
-  if (legacyMarketplaces.length || legacyPlugins.length) {
-    const names = legacyMarketplaces.map((entry) => entry.name).join(", ") || "OpenSocrates";
+  const names = marketplaces.map((entry) => entry.name).join(", ") || "OpenSocrates";
+  return { found: marketplaces.length > 0 || legacyPlugins.length > 0, names };
+}
+
+// Install and update write into the managed root, so a case-variant pre-1.0
+// registration must be resolved by the user first. Status and remove are
+// diagnostic and scoped to the root this installer owns, so they only warn:
+// blocking them would strand a user who needs to inspect or back out.
+function requireNoLegacyClaudeInstallation() {
+  const legacy = detectLegacyClaudeInstallation();
+  if (legacy.found) {
     fail(
-      `a legacy Claude marketplace (${names}) is installed; OpenSocrates will not remove it automatically. ` +
+      `a legacy Claude marketplace (${legacy.names}) is installed; OpenSocrates will not remove it automatically. ` +
         "Uninstall its plugin and marketplace explicitly, then rerun this command. See the README migration section.",
+    );
+  }
+}
+
+function warnLegacyClaudeInstallation() {
+  let legacy;
+  try {
+    legacy = detectLegacyClaudeInstallation();
+  } catch {
+    return;
+  }
+  if (legacy.found) {
+    console.warn(
+      `warning: a legacy Claude marketplace (${legacy.names}) is also registered. ` +
+        "OpenSocrates never removes it automatically; this command only affects the root it owns. " +
+        "See the README migration section.",
     );
   }
 }
@@ -737,6 +762,18 @@ function removeRegistrationBestEffort(host) {
   run(binary, args, { allowFailure: true });
 }
 
+async function recoveryStep(label, action) {
+  try {
+    await action();
+    return true;
+  } catch (recoveryError) {
+    const detail =
+      recoveryError instanceof Error ? recoveryError.message : String(recoveryError);
+    console.error(`warning: rollback step failed (${label}): ${detail}`);
+    return false;
+  }
+}
+
 async function installVerifiedPackage(pluginSource, action, host) {
   requireHost(host);
   if (host === "claude") {
@@ -797,21 +834,41 @@ async function installVerifiedPackage(pluginSource, action, host) {
         : "Start a new Codex task to load the updated skills and hooks.",
     );
   } catch (error) {
-    removeRegistrationBestEffort(host);
+    // Every recovery stage is independently guarded: one failing stage must
+    // never prevent the later stages from running, because the stage that
+    // restores the user's previous installation comes last.
+    let restored = false;
+    await recoveryStep("unregister the failed installation", async () => {
+      removeRegistrationBestEffort(host);
+    });
     if (newRootActive && (await exists(paths.root))) {
-      await requireOwnedRoot(paths.root, host);
-      await rm(paths.root, { recursive: true });
+      await recoveryStep("remove the failed installation root", async () => {
+        // requireOwnedRoot stays inside the guarded step so an unowned or
+        // unmarked root is never deleted, even during rollback.
+        await requireOwnedRoot(paths.root, host);
+        await rm(paths.root, { recursive: true });
+      });
     }
     if (backupCreated && (await exists(backup))) {
-      await requireOwnedRoot(backup, host);
-      await rename(backup, paths.root);
+      restored = await recoveryStep("restore the previous installation", async () => {
+        await requireOwnedRoot(backup, host);
+        await rename(backup, paths.root);
+      });
     }
-    if (registrationRemoved && previousEntry !== null) {
-      try {
+    if (registrationRemoved && previousEntry !== null && (restored || !backupCreated)) {
+      await recoveryStep("re-register the previous installation", async () => {
         addRegistration(host, paths.root, previousState.kind === "installed");
-      } catch (rollbackError) {
-        fail(`${error.message}; rollback also failed: ${rollbackError.message}`);
-      }
+      });
+    }
+    if (backupCreated && !restored) {
+      console.error(
+        "error: the previous OpenSocrates installation could not be restored automatically.",
+      );
+      console.error(`error: your previous files are preserved at: ${backup}`);
+      console.error(
+        `error: move that directory to ${paths.root}, then rerun ` +
+          `\`opensocrates install --host ${host}\`.`,
+      );
     }
     throw error;
   } finally {
@@ -824,7 +881,7 @@ async function installVerifiedPackage(pluginSource, action, host) {
 async function showStatus(host) {
   requireHost(host);
   if (host === "claude") {
-    requireNoLegacyClaudeInstallation();
+    warnLegacyClaudeInstallation();
   }
   const paths = managedPaths(host);
   const entry = marketplaceEntry(host);
@@ -854,7 +911,9 @@ async function showStatus(host) {
 async function removeInstalled(host) {
   requireHost(host);
   if (host === "claude") {
-    requireNoLegacyClaudeInstallation();
+    // Warn only. A legacy registration must never block removal of the root
+    // this installer owns, and removal never touches the legacy installation.
+    warnLegacyClaudeInstallation();
   }
   const paths = managedPaths(host);
   const entry = marketplaceEntry(host);
