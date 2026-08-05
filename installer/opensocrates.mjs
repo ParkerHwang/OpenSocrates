@@ -843,10 +843,15 @@ async function installVerifiedPackage(pluginSource, action, host) {
     });
     if (newRootActive && (await exists(paths.root))) {
       await recoveryStep("remove the failed installation root", async () => {
-        // requireOwnedRoot stays inside the guarded step so an unowned or
-        // unmarked root is never deleted, even during rollback.
-        await requireOwnedRoot(paths.root, host);
-        await rm(paths.root, { recursive: true });
+        // This run created paths.root by renaming staging into place, so its
+        // provenance is known directly and the ownership marker is redundant
+        // here. Requiring the marker would let a host that corrupted or
+        // removed it while failing block recovery entirely, because the
+        // surviving directory then also blocks the backup rename below.
+        // Roots this run did not create remain guarded by requireOwnedRoot
+        // before staging begins, and the backup restore below still verifies
+        // ownership.
+        await rm(paths.root, { recursive: true, force: true });
       });
     }
     if (backupCreated && (await exists(backup))) {
