@@ -84,17 +84,28 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
 // Fake host binaries. State lives in a JSON file so registration survives
 // across separate invocations, exactly like the real hosts.
 // ---------------------------------------------------------------------------
-function writeFakeHost(root, name, { kind = name, failInstall = false, corruptMarkerOnInstall = false } = {}) {
+function writeFakeHost(
+  root,
+  name,
+  {
+    kind = name,
+    failInstall = false,
+    corruptMarkerOnInstall = false,
+    corruptBackupOnInstall = false,
+  } = {},
+) {
   const host = kind;
   const statePath = join(root, `${name}-state.json`);
   writeFileSync(statePath, JSON.stringify({ marketplaces: [], plugins: [] }));
   const binary = join(root, name);
   const script = `#!/usr/bin/env node
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 const STATE = ${JSON.stringify(statePath)};
 const HOST = ${JSON.stringify(host)};
 const FAIL_INSTALL = ${JSON.stringify(failInstall)};
 const CORRUPT_MARKER = ${JSON.stringify(corruptMarkerOnInstall)};
+const CORRUPT_BACKUP = ${JSON.stringify(corruptBackupOnInstall)};
 const VERSION = ${JSON.stringify(PRODUCT_VERSION)};
 const MARKETPLACE = ${JSON.stringify(MARKETPLACE)};
 const PLUGIN_ID = ${JSON.stringify(PLUGIN_ID)};
@@ -124,6 +135,14 @@ if (HOST === "claude") {
       // rollback stage itself throws.
       const entry = state.marketplaces[state.marketplaces.length - 1];
       if (entry && entry.path) writeFileSync(entry.path + "/.opensocrates-managed.json", "{ not json");
+    }
+    if (CORRUPT_BACKUP) {
+      const entry = state.marketplaces[state.marketplaces.length - 1];
+      if (entry && entry.path) {
+        const parent = dirname(entry.path);
+        const backup = readdirSync(parent).find((item) => item.startsWith(".opensocrates.backup-"));
+        if (backup) writeFileSync(join(parent, backup, ".opensocrates-managed.json"), "{ not json");
+      }
     }
     if (FAIL_INSTALL) { process.stderr.write("refused by strictKnownMarketplaces\\n"); process.exit(1); }
     state.plugins.push({ id: PLUGIN_ID, version: VERSION }); save(); process.exit(0);
@@ -537,10 +556,15 @@ test("an unrecoverable rollback prints the preserved backup path", async () => {
     await withDarwinArm64(async () => {
       await quiet(() => main(["install", ...args]));
     });
-    // Corrupt the marker of the *backup* by corrupting the live root before the
-    // update renames it, so restore cannot verify ownership.
-    writeFileSync(join(box.managedRoot, ".opensocrates-managed.json"), "{ not json");
-    const failing = writeFakeHost(box.root, "claude-failing2", { kind: "claude", failInstall: true });
+    // Corrupt the backup only after update has moved the valid previous root
+    // there, then fail plugin registration. Restore must refuse the corrupted
+    // backup, preserve it, and print instructions that account for a failed
+    // root-removal stage leaving the destination occupied.
+    const failing = writeFakeHost(box.root, "claude-failing2", {
+      kind: "claude",
+      failInstall: true,
+      corruptBackupOnInstall: true,
+    });
     writeFileSync(
       failing.binary,
       readFileSync(failing.binary, "utf8").replace(
@@ -553,11 +577,9 @@ test("an unrecoverable rollback prints the preserved backup path", async () => {
 
     const result = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
     assert.notEqual(result.error, undefined, "update reported success");
-    // requireOwnedRoot rejects the corrupted marker before anything is renamed,
-    // so nothing is stranded; if a backup ever is, the path must be printed.
-    if (box.backups().length > 0) {
-      assert.match(result.output, /your previous files are preserved at:/);
-    }
+    assert.equal(box.backups().length, 1, "the unrecoverable backup was not preserved");
+    assert.match(result.output, /your previous files are preserved at:/);
+    assert.match(result.output, /remove .* if it still exists, move the preserved directory/);
   } finally {
     box.cleanup();
   }

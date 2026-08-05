@@ -97,6 +97,19 @@ class FakeProcess:
 
 @check("CLAUDE-01-plugin-hook-contract")
 def test_plugin_hook_contract() -> None:
+    manifest = json.loads(
+        (ROOT / "plugin-src" / "claude" / ".claude-plugin" / "plugin.json.tmpl").read_text(
+            encoding="utf-8"
+        )
+    )
+    require(
+        "hooks" not in manifest,
+        "Claude manifest redeclares the standard auto-loaded hooks/hooks.json file",
+    )
+    require(
+        (ROOT / "plugin-src" / "claude" / "hooks" / "hooks.json.tmpl").is_file(),
+        "standard Claude hooks file is missing",
+    )
     hooks = build_hooks()
     require(
         set(hooks["hooks"]) == {"SessionStart", "UserPromptSubmit", "Stop", "SessionEnd"},

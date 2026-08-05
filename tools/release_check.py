@@ -1168,6 +1168,16 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         generated / "bin" / "launch.sh", os.X_OK
     ):
         errors.add("posix_launcher_not_executable")
+    if host == "claude":
+        plugin_manifest = _load_json(generated / ".claude-plugin" / "plugin.json")
+        if plugin_manifest is None:
+            errors.add("claude_plugin_manifest_missing")
+        elif "hooks" in plugin_manifest:
+            # Claude auto-loads the standard hooks/hooks.json path. Declaring
+            # it again in plugin.json leaves every install in a permanent
+            # duplicate-hooks error state even though the fallback auto-load
+            # still happens to execute the hooks.
+            errors.add("claude_plugin_manifest_duplicates_standard_hooks")
     embedded = [path for path in generated.rglob("compiled-content.bundle.json") if path.is_file()]
     if not embedded or any(path.read_bytes() != bundle_bytes for path in embedded):
         errors.add("embedded_bundle_mismatch")
