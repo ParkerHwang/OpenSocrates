@@ -18,18 +18,34 @@ OpenSocrates는 Claude와 Codex를 위한 로컬 연동 및 저작 추론 프레
 
 ## 호스트 지원 범위
 
-| 호스트 화면 | 자동 선택 | 추론 스킬 | 상태 |
+| 호스트 화면 | 자동 선택 | 추론 스킬 | 검증 상태 |
 | --- | --- | --- | --- |
-| Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | 지원 | `darwin-arm64` 지원 |
-| Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 지원 | 지원 | `darwin-arm64` 지원 |
-| Claude Cowork | 로컬 플러그인 런타임을 사용할 수 있을 때 지원 | 지원 | `darwin-arm64` 지원 |
-| Claude 웹 및 Desktop Chat | 훅 미지원 | 플러그인 스킬로 지원 | 스킬 전용, 실제 릴리스 검증 전 |
-| Codex CLI 및 Desktop | 지원 | 지원 | `darwin-arm64` 지원 |
+| Codex CLI 및 Desktop | 지원 | 지원 | `darwin-arm64` 릴리스 검증 완료 |
+| Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | 지원 | `darwin-arm64` 로컬 검증 완료 |
+| Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 구현됨 | 지원 | 구현 완료, 실측 수신 기록 없음 |
+| Claude Cowork | 로컬 플러그인 런타임을 사용할 수 있을 때 구현됨 | 지원 | 실험적, 실측 수신 기록 없음 |
+| Claude 웹 및 Desktop Chat | 훅 미지원 | 플러그인 스킬로 지원 | 스킬 전용, 업로드 경로 미검증 |
+
+상태 열은 서로 다른 네 단계를 뜻하며 같은 의미로 읽으면 안 됩니다.
+
+- **구현 완료** — 코드에 존재하고 패키지에 포함됩니다.
+- **로컬 검증 완료** — 관리자 장비에서 전 구간을 실행했지만 매 빌드마다
+  검증하지는 않습니다.
+- **릴리스 검증 완료** — 릴리스 게이트가 매 빌드마다 실행합니다.
+- **실험적 / 실측 수신 기록 없음** — 구현은 되어 있지만 호스트가 실제로 훅을
+  전달했다는 기록이 없습니다. `os capabilities show`는 이 항목들을 사용 가능이
+  아니라 `unknown`으로 보고합니다.
 
 Claude Chat 화면은 플러그인 훅을 실행하지 않습니다. 생성된 스킬은 사용할 수
 있지만, 프롬프트마다 자동으로 선택하는 기능은 플러그인 런타임을 실행하는 Claude
 Code와 Cowork 화면에서만 작동합니다. 훅이나 셀렉터를 사용할 수 없으면
 OpenSocrates는 작업을 막지 않고 통과합니다.
+
+Cowork에는 아직 확인되지 않은 전제가 하나 더 있습니다. OpenSocrates는
+`claude plugin marketplace add --scope user`로 마켓플레이스를 등록하며 이는
+Claude Code 사용자 설정에 기록됩니다. Anthropic 문서는 Cowork에서 플러그인 훅이
+실행된다고 밝히지만, Claude Code CLI로 등록한 마켓플레이스가 Cowork에서 보인다는
+내용은 없습니다. 실측 기록이 생기기 전까지 Cowork는 실험적 상태로 두세요.
 
 ## 설치
 
@@ -138,10 +154,26 @@ Claude나 Codex를 평소처럼 사용하세요. 요청에 판단, 해석, 진�
 않으며 실패 시 통과합니다. 타임아웃, 호스트 오류, 잘못된 출력, 미개입 결정,
 안전하지 않은 컨텍스트 또는 사용할 수 없는 훅은 모두 주입 없이 끝납니다.
 
-Claude 셀렉터는 세션 저장, 프로젝트 지침, 플러그인, 훅, MCP 서버와 도구를 모두
-끈 단일 `claude --safe-mode -p` 프로세스를 사용합니다. 현재 프롬프트와 저작된 선택
-카탈로그만 전달합니다. Codex 셀렉터는 제한된 대화 기록 컨텍스트를 추가로 사용할
-수 있으며 다음 설정으로 막을 수 있습니다.
+Claude 셀렉터는 세션을 저장하지 않는 단일 `claude --safe-mode -p` 프로세스를
+사용합니다. 안전 모드는 사용자, 프로젝트, 플러그인 커스터마이즈를 끕니다.
+`CLAUDE.md`, 스킬, 플러그인, 훅, MCP 서버, 사용자 정의 명령과 에이전트가 여기에
+해당합니다. OpenSocrates는 여기에 더해 `--tools ""`, `--disallowedTools "mcp__*"`,
+`--strict-mcp-config`를 전달해 기본 도구와 MCP 도구가 남지 않도록 합니다.
+셀렉터에는 현재 프롬프트와 저작된 선택 카탈로그만 전달합니다.
+
+관리형 정책(managed policy) 설정은 호스트 신뢰 경계의 일부이며 안전 모드로
+비활성화되지 **않습니다**. Anthropic
+[CLI 참조 문서](https://code.claude.com/docs/en/cli-reference)는 `--safe-mode`에서도
+"관리형 설정 정책은 계속 적용되며 여기에는 정책으로 구성된 훅이 포함된다"고
+명시합니다. 관리자가 관리형 `UserPromptSubmit` 훅을 구성한 장비에서는 그 훅이
+셀렉터 프로세스 안에서 실행되고, 현재 프롬프트를 표준 입력으로 받으며,
+`additionalContext`를 돌려주어 선택에 개입할 수 있습니다. 관리형 플러그인,
+관리형 스킬, 관리형 `CLAUDE.md`, 정책으로 구성된 MCP 서버는 로드되지 않습니다.
+조직이 관리형 훅을 구성한다면 셀렉터 프롬프트가 그 훅에 노출된다고 보고,
+허용할 수 없다면 OpenSocrates 선택 기능을 끄세요.
+
+Codex 셀렉터는 제한된 대화 기록 컨텍스트를 추가로 사용할 수 있으며 다음 설정으로
+막을 수 있습니다.
 
 ```bash
 export OPENSOCRATES_SELECTOR_TRANSCRIPT_ACCESS=0

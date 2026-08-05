@@ -43,12 +43,31 @@ OpenSocrates 1.x:
 - verifies downloadable packages with SHA-256 release and package manifests;
 - fails open when the selector cannot safely complete.
 
-The Claude selector runs a bounded, non-persistent `claude --safe-mode -p` process
-with tools, MCP configuration, project instructions, plugins, and hooks
-disabled. It receives the current prompt and authored selection catalog only.
-The process uses the user's Claude login, so model requests remain subject to
-Anthropic's service and data-handling terms. The Codex selector uses the pinned
-Codex SDK and existing OAuth session in its own isolated worker.
+The Claude selector runs a bounded, non-persistent `claude --safe-mode -p`
+process. Safe mode disables user, project, and plugin customizations, and
+OpenSocrates additionally passes `--tools ""`, `--disallowedTools "mcp__*"`, and
+`--strict-mcp-config` so no built-in or MCP tool remains. It receives the current
+prompt and authored selection catalog only. The process uses the user's Claude
+login, so model requests remain subject to Anthropic's service and data-handling
+terms. The Codex selector uses the pinned Codex SDK and existing OAuth session in
+its own isolated worker.
+
+Managed policy settings are part of the host trust boundary and are not disabled.
+Anthropic's [CLI reference](https://code.claude.com/docs/en/cli-reference) states
+that under `--safe-mode` "managed settings policy still applies, including
+policy-configured hooks". Consequences on an organization-managed machine:
+
+- a managed `UserPromptSubmit` hook executes inside the selector process,
+  receives the current prompt on standard input, and can return
+  `additionalContext` that enters selection;
+- managed plugins, managed skills, managed `CLAUDE.md`, and policy-configured
+  MCP servers do not load.
+
+OpenSocrates does not detect or override managed policy. Selection remains
+bounded regardless: the model's returned instruction text is discarded, and only
+authored catalog content assembled by OpenSocrates is ever injected. Operators
+who cannot accept managed-hook visibility of the selector prompt should not
+enable OpenSocrates selection on those machines.
 
 Signing, notarization, clean-machine installation, platforms other than
 `darwin-arm64`, Claude Chat automatic hooks, and live delivery on every host

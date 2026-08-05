@@ -1,9 +1,22 @@
 """Bounded Claude Code CLI selector with no API-key dependency.
 
 The selector starts one non-persistent ``claude -p`` process for each prompt.
-Claude Code's safe mode prevents project instructions, plugins, hooks, skills,
-and MCP configuration from entering the selector context while retaining the
-user's existing OAuth login. Built-in and MCP tools are disabled explicitly.
+Claude Code's safe mode prevents *user, project, and plugin* customizations --
+project instructions, plugins, hooks, skills, and MCP configuration -- from
+entering the selector context while retaining the user's existing OAuth login.
+Built-in and MCP tools are disabled explicitly.
+
+Managed settings policy is NOT disabled by safe mode and remains part of the
+host trust boundary.  Anthropic documents that under ``--safe-mode`` "managed
+settings policy still applies, including policy-configured hooks"
+(https://code.claude.com/docs/en/cli-reference).  On an organization-managed
+machine a managed ``UserPromptSubmit`` hook therefore runs inside this child
+process, receives the current prompt on stdin, and may return
+``additionalContext``.  Managed plugins, managed skills, managed CLAUDE.md, and
+policy-configured MCP servers do not load.  Selection stays bounded regardless:
+``SelectorApplication`` discards the model's instruction text and injects only
+authored catalog content.
+
 Raw prompt/catalog data travel over stdin and captured stdout is parsed in
 memory; neither stream is logged or persisted by OpenSocrates.
 """

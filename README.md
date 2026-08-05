@@ -19,18 +19,35 @@ login and does not require an API key or an OpenSocrates backend.
 
 ## Host support
 
-| Host surface | Automatic selection | Reasoning skills | Status |
+| Host surface | Automatic selection | Reasoning skills | Validation status |
 | --- | --- | --- | --- |
-| Claude Code CLI | Yes, through `UserPromptSubmit` | Yes | Supported on `darwin-arm64` |
-| Claude Code desktop app | Yes, where Claude Code plugins run | Yes | Supported on `darwin-arm64` |
-| Claude Cowork | Yes, when the local plugin runtime is available | Yes | Supported on `darwin-arm64` |
-| Claude web and Desktop Chat | No hooks | Yes, through plugin skills | Skills-only; not live-release-validated |
-| Codex CLI and Desktop | Yes | Yes | Supported on `darwin-arm64` |
+| Codex CLI and Desktop | Yes | Yes | Release-validated on `darwin-arm64` |
+| Claude Code CLI | Yes, through `UserPromptSubmit` | Yes | Locally validated on `darwin-arm64` |
+| Claude Code desktop app | Implemented, where Claude Code plugins run | Yes | Implemented; no live probe receipt |
+| Claude Cowork | Implemented, when the local plugin runtime is available | Yes | Experimental; no live probe receipt |
+| Claude web and Desktop Chat | No hooks | Yes, through plugin skills | Skills-only; upload path unvalidated |
+
+The status column uses four distinct levels. Do not read them as
+interchangeable:
+
+- **Implemented** — the integration exists in code and ships in the package.
+- **Locally validated** — exercised end to end on a maintainer machine, but
+  not on every build.
+- **Release-validated** — exercised by the release gate on every build.
+- **Experimental / no live probe receipt** — implemented, but no captured
+  receipt shows the host actually delivering the hook. `os capabilities show`
+  reports these capabilities as `unknown`, not as available.
 
 Claude Chat surfaces do not run plugin hooks. They can use the generated
 skills, but automatic per-prompt selection is available only on Claude Code
 and Cowork surfaces that execute the plugin runtime. OpenSocrates fails open
 if a hook or selector is unavailable.
+
+Cowork carries one further unverified assumption. OpenSocrates registers its
+marketplace with `claude plugin marketplace add --scope user`, which writes
+Claude Code user settings. Anthropic documents that plugin hooks run in Cowork,
+but does not document that a marketplace registered through the Claude Code CLI
+is visible to Cowork. Until a receipt exists, treat Cowork as experimental.
 
 ## Install
 
@@ -143,9 +160,26 @@ non-intervention decision, unsafe context, or unavailable hook produces no
 injection and does not block the user's task.
 
 The Claude selector uses one `claude --safe-mode -p` process with no session
-persistence, project instructions, plugins, hooks, MCP servers, or tools. It
-receives only the current prompt and the authored selection catalog. The Codex
-selector can additionally use bounded transcript context unless disabled:
+persistence. Safe mode disables user, project, and plugin customizations:
+`CLAUDE.md`, skills, plugins, hooks, MCP servers, custom commands, and agents.
+OpenSocrates additionally passes `--tools ""`, `--disallowedTools "mcp__*"`,
+and `--strict-mcp-config` so that no built-in or MCP tool remains available. It
+receives only the current prompt and the authored selection catalog.
+
+Managed policy settings are part of the host trust boundary and are **not**
+disabled by safe mode. Anthropic's
+[CLI reference](https://code.claude.com/docs/en/cli-reference) states that under
+`--safe-mode` "managed settings policy still applies, including
+policy-configured hooks". On a machine where an administrator configures a
+managed `UserPromptSubmit` hook, that hook runs inside the selector process,
+receives the current prompt on standard input, and can return
+`additionalContext` that enters selection. Managed plugins, managed skills,
+managed `CLAUDE.md`, and policy-configured MCP servers do not load. If your
+organization configures managed hooks, treat the selector prompt as visible to
+them and disable OpenSocrates selection if that is unacceptable.
+
+The Codex selector can additionally use bounded transcript context unless
+disabled:
 
 ```bash
 export OPENSOCRATES_SELECTOR_TRANSCRIPT_ACCESS=0
