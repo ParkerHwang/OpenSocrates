@@ -142,7 +142,10 @@ def _stage(package: Path, target: str, *, runtime_parent: str | None) -> tuple[P
     identical file shipped in the generated package.
     """
 
-    stage = Path(tempfile.mkdtemp(prefix="opensocrates-launcher-"))
+    # macOS exposes /var as a symlink to /private/var. The launcher resolves
+    # its directory physically with ``pwd -P``, so keep the staged root in the
+    # same canonical form before comparing the runtime's recorded argv[0].
+    stage = Path(tempfile.mkdtemp(prefix="opensocrates-launcher-")).resolve()
     shutil.copytree(package / "bin", stage / "bin")
     launcher = stage / Path(*LAUNCHER)
     if launcher.read_bytes() != (package / Path(*LAUNCHER)).read_bytes():
