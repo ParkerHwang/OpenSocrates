@@ -1520,13 +1520,20 @@ def _full_check(
             "error_codes": ["package_assembly_not_available"],
         }
     )
-    # The generated package's own launcher is the artifact users receive, so it
-    # is executed against the assembled package trees.
+    # The generated package's own launcher and README are the artifacts users
+    # receive, so both are exercised against the assembled package trees.
     checks["packaged_launcher"] = _package_tool_check(
         root,
         "check_packaged_launcher.py",
         "build/evidence/packaged-launcher.json",
         "packaged_launcher",
+        assembly_status,
+    )
+    checks["package_docs"] = _package_tool_check(
+        root,
+        "check_package_docs.py",
+        "build/evidence/package-docs.json",
+        "package_docs",
         assembly_status,
     )
     checks["docs"] = _run_tool_check(

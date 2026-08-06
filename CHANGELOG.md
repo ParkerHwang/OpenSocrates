@@ -35,8 +35,15 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 - The release gate now executes the generated packages' own launchers against
   the packaged runtime layout for Claude and Codex, covering hook dispatch,
-  control mode, and the fail-open paths
-  ([#16](https://github.com/ParkerHwang/OpenSocrates/issues/16)).
+  control mode, and the fail-open paths, and it inspects the generated Claude
+  package README for its trust-boundary and validation limitations
+  ([#16](https://github.com/ParkerHwang/OpenSocrates/issues/16),
+  [#22](https://github.com/ParkerHwang/OpenSocrates/issues/22)).
+- The Claude package README now states that safe mode leaves managed settings
+  policy in force, that policy-configured hooks can still observe the selector
+  prompt and influence selection, and it grades Claude Code Desktop, Cowork,
+  and Claude Chat validation the same way the repository README does
+  ([#22](https://github.com/ParkerHwang/OpenSocrates/issues/22)).
 - Release assembly, SBOM input, security scans, and GitHub Release publishing
   now cover both Claude and Codex packages.
 - The installer detects case-sensitive pre-1.0 Claude marketplace
