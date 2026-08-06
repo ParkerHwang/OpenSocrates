@@ -1520,6 +1520,15 @@ def _full_check(
             "error_codes": ["package_assembly_not_available"],
         }
     )
+    # The generated package's own launcher is the artifact users receive, so it
+    # is executed against the assembled package trees.
+    checks["packaged_launcher"] = _package_tool_check(
+        root,
+        "check_packaged_launcher.py",
+        "build/evidence/packaged-launcher.json",
+        "packaged_launcher",
+        assembly_status,
+    )
     checks["docs"] = _run_tool_check(
         root,
         [
@@ -1589,6 +1598,25 @@ def _full_check(
     }
     exit_code = 0 if status == "pass" else 1 if status == "fail" else 2
     return exit_code, report
+
+
+def _package_tool_check(
+    root: Path, tool: str, report: str, name: str, assembly_status: str
+) -> dict[str, Any]:
+    """Run a generated-package check, or record why it could not run."""
+
+    if assembly_status != "pass":
+        return {
+            "status": assembly_status
+            if assembly_status in {"fail", "unavailable"}
+            else "unavailable",
+            "error_codes": ["package_assembly_not_available"],
+        }
+    return _run_tool_check(
+        root,
+        [str(root / "tools" / tool), "--root", str(root), "--report", report],
+        name,
+    )
 
 
 def _run_tool_check(root: Path, command: Sequence[str], name: str) -> dict[str, Any]:

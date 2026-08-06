@@ -22,8 +22,21 @@ All notable changes to OpenSocrates are documented here. This project follows
 - A support matrix that distinguishes automatic local hooks from skills-only
   Claude web and Desktop Chat use.
 
+### Fixed
+
+- The packaged POSIX and PowerShell launchers now resolve the native runtime
+  from the plugin root (`runtime/<target>/...`) instead of from their own
+  `bin/` directory. Previously every packaged Claude and Codex hook took the
+  fail-open `missing_runtime` path, so `UserPromptSubmit` selection and
+  `Stop`/`SessionEnd` cleanup were silent no-ops in the generated packages
+  ([#16](https://github.com/ParkerHwang/OpenSocrates/issues/16)).
+
 ### Changed
 
+- The release gate now executes the generated packages' own launchers against
+  the packaged runtime layout for Claude and Codex, covering hook dispatch,
+  control mode, and the fail-open paths
+  ([#16](https://github.com/ParkerHwang/OpenSocrates/issues/16)).
 - Release assembly, SBOM input, security scans, and GitHub Release publishing
   now cover both Claude and Codex packages.
 - The installer detects case-sensitive pre-1.0 Claude marketplace

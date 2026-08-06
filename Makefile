@@ -2,7 +2,7 @@ PYTHON ?= $(shell if command -v uv >/dev/null 2>&1; then uv python find 3.12; el
 PYTHONPATH := src
 ROOT := $(CURDIR)
 
-.PHONY: bootstrap format format-check lint typecheck generate generated-check content-check docs-check security-scan smoke installer-check package release-check version
+.PHONY: bootstrap format format-check lint typecheck generate generated-check content-check docs-check package-check security-scan smoke installer-check package release-check version
 
 bootstrap:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" -c 'import pathlib,sys,tomllib; assert sys.version_info[:2] == (3, 12), sys.version; root=pathlib.Path("."); project=tomllib.loads((root/"pyproject.toml").read_text()); lock=tomllib.loads((root/"uv.lock").read_text()); expected=("openai-codex==0.144.4", "openai-codex-cli-bin==0.144.4", "pydantic>=2.12,<3"); assert tuple(project["project"].get("dependencies", [])) == expected; packages={item.get("name"): item for item in lock.get("package", []) if isinstance(item, dict) and isinstance(item.get("name"), str)}; assert packages.get("openai-codex", {}).get("version") == "0.144.4"; assert packages.get("openai-codex-cli-bin", {}).get("version") == "0.144.4"; pydantic=packages.get("pydantic", {}).get("version", ""); assert pydantic.startswith("2.") and tuple(map(int, pydantic.split(".")[:2])) >= (2, 12); assert packages.get("pydantic-core", {}).get("version"); opensocrates=packages.get("opensocrates", {}); direct={item.get("name") for item in opensocrates.get("dependencies", []) if isinstance(item, dict)}; assert {"openai-codex", "openai-codex-cli-bin", "pydantic"} <= direct; print("Python 3.12 and locked Codex SDK/runtime metadata ready")'
@@ -48,6 +48,9 @@ docs-check:
 		--path CODE_OF_CONDUCT.md \
 		--path .github/release-notes \
 		--report build/evidence/links.json
+
+package-check: generate
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_packaged_launcher.py --root "$(ROOT)" --report build/evidence/packaged-launcher.json
 
 security-scan: generate
 	@set -eu; set -- --artifact content/compiled-content.bundle.json --artifact content/compiled-reasoning-content.bundle.json; for artifact in $$(find "$(ROOT)/dist/runtime" -type f -name opensocrates-runtime -perm -111 2>/dev/null); do set -- "$$@" --artifact "$${artifact#$(ROOT)/}"; done; for artifact in "$(ROOT)"/dist/opensocrates-*.zip; do if [ -f "$$artifact" ]; then set -- "$$@" --artifact "$${artifact#$(ROOT)/}"; fi; done; PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_sbom.py --root "$(ROOT)" --output build/evidence/sbom.spdx.json --report build/evidence/sbom.json "$$@"
