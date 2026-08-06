@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Any
 
 SCHEMA = "opensocrates.release-check-evidence/1.0.0"
-HOSTS = ("codex",)
+HOSTS = ("claude", "codex")
 EXPECTED_SCHEMA_COUNT = 32
 EXPECTED_METHOD_COUNT = 48
 LEGACY_CONTENT_BUNDLE = "content/compiled-content.bundle.json"
@@ -443,10 +443,13 @@ def _determinism_check(root: Path) -> dict[str, Any]:
                 first / REASONING_CONTENT_BUNDLE,
                 second / REASONING_CONTENT_BUNDLE,
             ),
-            (
-                "plugins/codex",
-                first / "plugins" / "codex",
-                second / "plugins" / "codex",
+            *(
+                (
+                    f"plugins/{host}",
+                    first / "plugins" / host,
+                    second / "plugins" / host,
+                )
+                for host in HOSTS
             ),
         )
         total_files = 0
@@ -492,9 +495,12 @@ def _generated_output_check(root: Path) -> dict[str, Any]:
                 root / REASONING_CONTENT_BUNDLE,
                 output / REASONING_CONTENT_BUNDLE,
             ),
-            (
-                root / "build" / "generated" / "plugins" / "codex",
-                output / "plugins" / "codex",
+            *(
+                (
+                    root / "build" / "generated" / "plugins" / host,
+                    output / "plugins" / host,
+                )
+                for host in HOSTS
             ),
         )
         total_files = 0
@@ -772,6 +778,35 @@ def _copy_packages(root: Path) -> None:
         shutil.copytree(source, destination, symlinks=False)
 
 
+def _build_claude_chat_skills(root: Path, version: str) -> Path:
+    """Build a portable skills-only plugin for Claude web and Desktop Chat."""
+
+    source = root / "build" / "generated" / "plugins" / "claude"
+    destination = root / "dist" / "claude-chat-skills"
+    if destination.exists():
+        _safe_remove(destination, root / "dist")
+    manifest = _load_json(source / ".claude-plugin" / "plugin.json")
+    if manifest is None or not (source / "skills").is_dir():
+        raise ReleaseCheckError("claude_chat_source_missing")
+    destination.mkdir(parents=True)
+    shutil.copytree(source / "skills", destination / "skills", symlinks=False)
+    shutil.copy2(root / "LICENSE", destination / "LICENSE", follow_symlinks=False)
+    portable_manifest = dict(manifest)
+    portable_manifest.pop("hooks", None)
+    portable_manifest["displayName"] = "OpenSocrates Skills"
+    portable_manifest["description"] = (
+        "Portable OpenSocrates reasoning skills for Claude web and Desktop Chat."
+    )
+    portable_manifest["version"] = version
+    keywords = portable_manifest.get("keywords", [])
+    if isinstance(keywords, list):
+        portable_manifest["keywords"] = sorted(
+            {str(value) for value in keywords if isinstance(value, str)} | {"claude-chat"}
+        )
+    _write_json(destination / ".claude-plugin" / "plugin.json", portable_manifest)
+    return destination
+
+
 def _write_package_checksums(directory: Path) -> Path:
     destination = directory / "checksums.sha256"
     rows: list[str] = []
@@ -858,12 +893,15 @@ def _assemble(root: Path) -> dict[str, Any]:
     _generate_plugins(root)
     _copy_packages(root)
     dist = root / "dist"
+    claude_chat_package = _build_claude_chat_skills(root, version)
     package_checksums = {host: _write_package_checksums(dist / host) for host in HOSTS}
     archives: dict[str, Path] = {}
     for host in HOSTS:
         archive = dist / f"opensocrates-{version}-{host}-plugin.zip"
         _write_deterministic_zip(dist / host, archive)
         archives[host] = archive
+    claude_chat_archive = dist / f"opensocrates-{version}-claude-chat-skills.zip"
+    _write_deterministic_zip(claude_chat_package, claude_chat_archive)
     runtime_artifact = str(runtime_report["artifact"])
     sbom_arguments = [
         str(root / "tools" / "build_sbom.py"),
@@ -882,6 +920,7 @@ def _assemble(root: Path) -> dict[str, Any]:
     ]
     for host in HOSTS:
         sbom_arguments.extend(["--artifact", _relative(root, archives[host])])
+    sbom_arguments.extend(["--artifact", _relative(root, claude_chat_archive)])
     sbom_result = _run(sbom_arguments, root, interpreter=sys.executable, timeout=300.0)
     if sbom_result.status != "pass":
         raise ReleaseCheckError(f"sbom_generation_{sbom_result.code}")
@@ -933,6 +972,15 @@ def _assemble(root: Path) -> dict[str, Any]:
             }
             for host in HOSTS
         },
+        "portable_plugins": {
+            "claude_chat_skills": {
+                "package_tree": claude_chat_package.relative_to(dist).as_posix(),
+                "package_file_count": len(_snapshot(claude_chat_package)),
+                "archive": claude_chat_archive.relative_to(dist).as_posix(),
+                "archive_sha256": f"sha256:{_sha256(claude_chat_archive)}",
+                "automatic_hooks": False,
+            }
+        },
         "sbom": {
             "path": sbom_destination.relative_to(dist).as_posix(),
             "sha256": f"sha256:{_sha256(sbom_destination)}",
@@ -968,6 +1016,10 @@ def _assemble(root: Path) -> dict[str, Any]:
                 "archive": archives[host].relative_to(dist).as_posix(),
             }
             for host in HOSTS
+        },
+        "claude_chat_skills": {
+            "package_file_count": len(_snapshot(claude_chat_package)),
+            "archive": claude_chat_archive.relative_to(dist).as_posix(),
         },
         "sbom": sbom_destination.relative_to(dist).as_posix(),
         "checksums": root_checksums.relative_to(dist).as_posix(),
@@ -1116,6 +1168,16 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         generated / "bin" / "launch.sh", os.X_OK
     ):
         errors.add("posix_launcher_not_executable")
+    if host == "claude":
+        plugin_manifest = _load_json(generated / ".claude-plugin" / "plugin.json")
+        if plugin_manifest is None:
+            errors.add("claude_plugin_manifest_missing")
+        elif "hooks" in plugin_manifest:
+            # Claude auto-loads the standard hooks/hooks.json path. Declaring
+            # it again in plugin.json leaves every install in a permanent
+            # duplicate-hooks error state even though the fallback auto-load
+            # still happens to execute the hooks.
+            errors.add("claude_plugin_manifest_duplicates_standard_hooks")
     embedded = [path for path in generated.rglob("compiled-content.bundle.json") if path.is_file()]
     if not embedded or any(path.read_bytes() != bundle_bytes for path in embedded):
         errors.add("embedded_bundle_mismatch")
@@ -1142,6 +1204,100 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         "embedded_bundle_count": len(embedded),
         "generated_file_count": len(_snapshot(generated)),
         "package_file_count": len(_snapshot(dist_package)),
+        "error_codes": sorted(errors),
+    }
+
+
+_CLAUDE_CHAT_ALLOWED_ROOTS = frozenset({".claude-plugin", "LICENSE", "skills"})
+_CLAUDE_CHAT_FORBIDDEN_SUFFIXES = (
+    ".pem",
+    ".key",
+    ".p12",
+    ".pfx",
+    "hooks.json",
+    "launch.sh",
+    "launch.ps1",
+    "opensocrates-runtime",
+)
+
+
+def _claude_chat_archive_errors(archive: Path) -> set[str]:
+    """Assert the published Chat ZIP carries only its manifest and skills.
+
+    Checked against the archive itself rather than the staged tree so nothing
+    can be introduced between assembly and packaging.
+    """
+
+    errors: set[str] = set()
+    with zipfile.ZipFile(archive) as bundle:
+        entries = [name for name in bundle.namelist() if not name.endswith("/")]
+    for entry in entries:
+        if entry.split("/", 1)[0] not in _CLAUDE_CHAT_ALLOWED_ROOTS:
+            errors.add("claude_chat_archive_unexpected_entry")
+        if entry.startswith("/") or ".." in entry.split("/"):
+            errors.add("claude_chat_archive_unsafe_path")
+        if entry.lower().endswith(_CLAUDE_CHAT_FORBIDDEN_SUFFIXES):
+            errors.add("claude_chat_archive_forbidden_file")
+    if ".claude-plugin/plugin.json" not in entries:
+        errors.add("claude_chat_archive_manifest_missing")
+    if not any(entry.startswith("skills/") for entry in entries):
+        errors.add("claude_chat_archive_skills_missing")
+    return errors
+
+
+def _verify_claude_chat_skills(
+    root: Path, version: str, bundle: Mapping[str, Any]
+) -> dict[str, Any]:
+    package = root / "dist" / "claude-chat-skills"
+    archive = root / "dist" / f"opensocrates-{version}-claude-chat-skills.zip"
+    errors: set[str] = set()
+    manifest = _load_json(package / ".claude-plugin" / "plugin.json")
+    if manifest is None:
+        errors.add("claude_chat_manifest_missing")
+    elif (
+        manifest.get("name") != "opensocrates"
+        or manifest.get("version") != version
+        or manifest.get("skills") != "./skills/"
+        or "hooks" in manifest
+    ):
+        errors.add("claude_chat_manifest_invalid")
+    raw_method_ids = bundle.get("method_ids", [])
+    method_ids = (
+        {value for value in raw_method_ids if isinstance(value, str)}
+        if isinstance(raw_method_ids, list)
+        else set()
+    )
+    expected_skills = method_ids | {"opensocrates", "rigor", "trace"}
+    skills = package / "skills"
+    actual_skills = (
+        {
+            path.name
+            for path in skills.iterdir()
+            if skills.is_dir() and path.is_dir() and (path / "SKILL.md").is_file()
+        }
+        if skills.is_dir()
+        else set()
+    )
+    if actual_skills != expected_skills:
+        errors.add("claude_chat_skill_set_invalid")
+    if not (package / "LICENSE").is_file():
+        errors.add("claude_chat_license_missing")
+    forbidden_trees = ("bin", "commands", "content", "hooks", "runtime", "schemas")
+    if any((package / name).exists() for name in forbidden_trees):
+        errors.add("claude_chat_runtime_surface_present")
+    if not archive.is_file() or not zipfile.is_zipfile(archive):
+        errors.add("claude_chat_archive_missing_or_invalid")
+        archive_bytes = 0
+    else:
+        archive_bytes = archive.stat().st_size
+        if archive_bytes > 16 * 1024 * 1024:
+            errors.add("claude_chat_archive_too_large")
+        errors |= _claude_chat_archive_errors(archive)
+    return {
+        "status": "fail" if errors else "pass",
+        "skill_count": len(actual_skills),
+        "archive_size_bytes": archive_bytes,
+        "automatic_hooks": False,
         "error_codes": sorted(errors),
     }
 
@@ -1354,6 +1510,32 @@ def _full_check(
             for host in HOSTS
         }
     )
+    checks["claude_chat_skills"] = (
+        _verify_claude_chat_skills(root, version, bundle)
+        if assembly_status == "pass"
+        else {
+            "status": assembly_status
+            if assembly_status in {"fail", "unavailable"}
+            else "unavailable",
+            "error_codes": ["package_assembly_not_available"],
+        }
+    )
+    # The generated package's own launcher and README are the artifacts users
+    # receive, so both are exercised against the assembled package trees.
+    checks["packaged_launcher"] = _package_tool_check(
+        root,
+        "check_packaged_launcher.py",
+        "build/evidence/packaged-launcher.json",
+        "packaged_launcher",
+        assembly_status,
+    )
+    checks["package_docs"] = _package_tool_check(
+        root,
+        "check_package_docs.py",
+        "build/evidence/package-docs.json",
+        "package_docs",
+        assembly_status,
+    )
     checks["docs"] = _run_tool_check(
         root,
         [
@@ -1423,6 +1605,25 @@ def _full_check(
     }
     exit_code = 0 if status == "pass" else 1 if status == "fail" else 2
     return exit_code, report
+
+
+def _package_tool_check(
+    root: Path, tool: str, report: str, name: str, assembly_status: str
+) -> dict[str, Any]:
+    """Run a generated-package check, or record why it could not run."""
+
+    if assembly_status != "pass":
+        return {
+            "status": assembly_status
+            if assembly_status in {"fail", "unavailable"}
+            else "unavailable",
+            "error_codes": ["package_assembly_not_available"],
+        }
+    return _run_tool_check(
+        root,
+        [str(root / "tools" / tool), "--root", str(root), "--report", report],
+        name,
+    )
 
 
 def _run_tool_check(root: Path, command: Sequence[str], name: str) -> dict[str, Any]:

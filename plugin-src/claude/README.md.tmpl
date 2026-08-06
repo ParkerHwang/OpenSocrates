@@ -1,0 +1,124 @@
+# OpenSocrates for Claude
+
+This package provides the Claude plugin boundary for OpenSocrates
+{{PRODUCT_VERSION}}. It contains {{METHOD_COUNT}} generated reasoning skills
+and a fail-open selector hook for supported local Claude surfaces. It does not
+execute the user's requested task, host a service, add telemetry, or require an
+Anthropic API key.
+
+The package was generated from content revision {{CONTENT_REVISION}} with
+semantic bundle identity `{{SEMANTIC_HASH}}`. Those values come from the
+canonical OpenSocrates bundle at build time; they are not quality or host
+compatibility claims.
+
+## Surface support
+
+| Claude surface | OpenSocrates behavior | Validation status |
+| --- | --- | --- |
+| Claude Code CLI | Automatic `UserPromptSubmit` selection and all plugin skills | This package's own launcher dispatch is exercised by the release gate on `darwin-arm64` |
+| Claude Code in Desktop | Same Claude Code hook and skill contract; mechanism and package contract are implemented | Implemented; no live hook-delivery probe receipt |
+| Cowork, local execution | The local hook mechanism is packaged and runs where local command hooks are allowed; skills remain available | Experimental; CLI marketplace visibility and live hook delivery are unvalidated |
+| Cowork, remote execution | Skills are available; the packaged local runtime may be unavailable, so automatic selection fails open | Experimental; no live probe receipt |
+| Claude Chat on web or Desktop | Skills only; Anthropic does not run plugin hooks in Chat | Skills-only; the customization ZIP upload path is unvalidated |
+
+Read the status column strictly. The levels are not interchangeable:
+
+- **Implemented** — the integration exists in code and ships in this package.
+- **Exercised by the release gate** — the generated package's own launcher is
+  executed against the packaged runtime layout on every build for the released
+  target. It is not a receipt of live host delivery.
+- **Experimental / no live probe receipt** — implemented, but no captured
+  receipt shows the host actually delivering the hook.
+- **Unvalidated** — no receipt exists for that path.
+
+This package's native runtime is released for Apple-silicon macOS
+(`darwin-arm64`) only. Binary signing, notarization, clean-machine
+installation, other platforms, and live hook delivery on Claude Code Desktop,
+Cowork, and Claude Chat are not claimed as validated.
+
+See Anthropic's [hooks reference](https://code.claude.com/docs/en/hooks) and
+[Claude plugin surface guide](https://support.claude.com/en/articles/13837440-use-plugins-in-claude)
+for the host-owned behavior behind this matrix.
+
+## Authorized selector lifecycle
+
+The generated package configures `SessionStart`, `UserPromptSubmit`, `Stop`,
+and `SessionEnd`. Only `UserPromptSubmit` starts a selector. A compact-restored
+`SessionStart` can re-inject the current temporary-file reference. `Stop` and
+`SessionEnd` remove temporary artifacts.
+
+For each submitted prompt, the runtime starts one non-persistent
+`claude --safe-mode -p` process using the user's existing Claude login. The process:
+
+- receives only the current prompt and canonical selection catalog;
+- runs under safe mode, which disables user-, project-, and plugin-sourced
+  customizations, including the hooks those sources define, together with
+  built-in tools, MCP tools, skills, project instructions, and session
+  persistence;
+- runs in a new owner-only temporary working directory;
+- returns a JSON-schema-constrained selection candidate; and
+- is supervised by a 30-second OpenSocrates deadline with no application-level
+  retry.
+
+### Managed policy is not disabled
+
+Safe mode does not disable managed settings policy. Anthropic's
+[CLI reference](https://code.claude.com/docs/en/cli-reference) states that under
+`--safe-mode` "managed settings policy still applies, including
+policy-configured hooks". Not every hook is disabled inside the selector.
+
+On an organization-managed machine:
+
+- a policy-configured `UserPromptSubmit` hook still runs inside the selector
+  process, receives the current prompt on standard input, and can return
+  `additionalContext` that influences selection;
+- managed plugins, managed skills, managed `CLAUDE.md`, and policy-configured
+  MCP servers do not load.
+
+OpenSocrates does not detect or override managed policy. Selection stays
+bounded either way: the model's returned instruction text is discarded and only
+authored OpenSocrates content is assembled and injected. Operators who cannot
+accept managed-hook visibility of the selector prompt should not enable
+OpenSocrates selection on those machines.
+
+The candidate chooses IDs only. OpenSocrates discards candidate instruction
+text and deterministically assembles the selected authored theory and examples.
+Complete content is written to an owner-only temporary Markdown file. Claude
+receives one hidden `additionalContext` message naming that file and requiring
+it to be read before acting.
+
+Non-intervention, an unavailable Claude CLI, authentication failure, timeout,
+malformed output, unknown method ID, unavailable local runtime, or artifact
+failure all produce literal empty hook output and do not block the user's task.
+
+Raw prompts, transcripts, workspace files, tool values, credentials, selector
+reasoning, and raw CLI output are not written to OpenSocrates records, logs,
+metrics, diagnostics, or instruction files. This Claude selector does not read
+transcripts or workspace files. Temporary instruction files contain authored
+OpenSocrates content only; `Stop` removes the active turn, `SessionEnd` removes
+the session, and `SessionStart` sweeps crash leftovers older than 24 hours.
+
+## Package contents
+
+- Manifest: `.claude-plugin/plugin.json`
+- Hook definition: `hooks/hooks.json`
+- Fixed launchers: `bin/launch.sh` and `bin/launch.ps1`
+- Native runtime: `runtime/<target>/opensocrates-runtime/`, resolved by
+  the launcher relative to the plugin root
+- Shared controller skills: `skills/opensocrates`, `skills/rigor`, and
+  `skills/trace`
+- Generated method skills: `skills/<method-id>`
+
+Validate a generated package with:
+
+```bash
+claude plugin validate . --strict
+```
+
+For local development, start Claude Code with:
+
+```bash
+claude --plugin-dir .
+```
+
+Generated source identity: `{{SOURCE_TREE_HASH}}`.

@@ -8,9 +8,8 @@ pass_through() {
     code=$1
     launch_mode=${2:-}
     launch_host=${3:-}
-    if [ "$launch_mode" = hook ] && [ "$launch_host" = codex ]; then
-        # The Codex selector contract makes every launcher/runtime failure a
-        # literal empty hook response.
+    if [ "$launch_mode" = hook ] && { [ "$launch_host" = codex ] || [ "$launch_host" = claude ]; }; then
+        # Selector hook failures are always literal empty stdout.
         exit 0
     fi
     case "$code" in
@@ -35,7 +34,7 @@ event=${3:-}
 case "$mode" in
     hook)
         case "$host" in
-            codex) ;;
+            claude|codex) ;;
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         case "$event" in
@@ -49,7 +48,7 @@ case "$mode" in
             pass_through invalid_arguments "$mode" "$host"
         fi
         case "$host" in
-            codex) ;;
+            claude|codex) ;;
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         ;;
@@ -75,9 +74,30 @@ case "$system_name/$machine_name" in
         ;;
 esac
 
+# The generated host package places the launcher and the native runtime in
+# sibling directories under the plugin root:
+#
+#   <plugin-root>/bin/launch.sh
+#   <plugin-root>/runtime/<target>/opensocrates-runtime/opensocrates-runtime
+#
+# The runtime must therefore be resolved from the plugin root rather than from
+# the launcher's own directory. Candidates are probed in package-layout order:
+# the launcher's parent directory first (the generated layout), then the
+# launcher's own directory (a launcher placed at the plugin root). The
+# launcher directory itself is never treated as a runtime root, so a stray
+# tree under bin/ cannot satisfy the lookup.
 launcher_dir=$(CDPATH= cd -P "$(dirname "$0")" 2>/dev/null && pwd -P) || pass_through missing_runtime "$mode" "$host"
-runtime_path=$launcher_dir/$relative_binary
-if [ ! -f "$runtime_path" ] || [ ! -x "$runtime_path" ]; then
+plugin_root=$(CDPATH= cd -P "$launcher_dir/.." 2>/dev/null && pwd -P) || plugin_root=$launcher_dir
+
+runtime_path=
+for runtime_root in "$plugin_root/runtime" "$launcher_dir/runtime"; do
+    candidate=$runtime_root/$relative_binary
+    if [ -f "$candidate" ] && [ -x "$candidate" ]; then
+        runtime_path=$candidate
+        break
+    fi
+done
+if [ -z "$runtime_path" ]; then
     pass_through missing_runtime "$mode" "$host"
 fi
 

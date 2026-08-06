@@ -461,7 +461,10 @@ class CodexAdapter:
                 transcript_path=native.transcript_path,
                 cwd=native.cwd,
                 session_id=native.session_id,
-                turn_id=native.turn_id,
+                # Claude Code does not expose a turn_id in its hook contract.
+                # Reuse the bounded session identifier as a turn-directory key;
+                # Stop deletes that directory before the next user prompt.
+                turn_id=native.turn_id or native.session_id,
                 model=native.model,
             )
         except Exception:
@@ -566,14 +569,16 @@ class CodexAdapter:
             result = self._selector_response_result(native, decision, diagnostics=diagnostics)
             if result.literal_empty and artifact_store is not None:
                 try:
-                    artifact_store.delete_turn(native.session_id, native.turn_id)
+                    artifact_store.delete_turn(
+                        native.session_id, native.turn_id or native.session_id
+                    )
                 except Exception:
                     pass
             return result
 
         if native.native_event == "Stop" and artifact_store is not None:
             try:
-                artifact_store.delete_turn(native.session_id, native.turn_id)
+                artifact_store.delete_turn(native.session_id, native.turn_id or native.session_id)
             except Exception:
                 pass
         if native.native_event == "SessionEnd" and artifact_store is not None:

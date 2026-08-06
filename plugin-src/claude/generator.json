@@ -1,0 +1,76 @@
+{
+  "host": "claude",
+  "template_revision": "1",
+  "launcher_host": "claude",
+  "manifest_template": ".claude-plugin/plugin.json.tmpl",
+  "manifest_output": ".claude-plugin/plugin.json",
+  "hooks_builder": "opensocrates.hosts.claude.commands:build_hooks",
+  "hooks_template": "hooks/hooks.json.tmpl",
+  "hooks_output": "hooks/hooks.json",
+  "shared_templates": [
+    {
+      "template": "skills/opensocrates/SKILL.md.tmpl",
+      "output": "skills/opensocrates/SKILL.md"
+    },
+    {
+      "template": "skills/rigor/SKILL.md.tmpl",
+      "output": "skills/rigor/SKILL.md"
+    },
+    {
+      "template": "skills/trace/SKILL.md.tmpl",
+      "output": "skills/trace/SKILL.md"
+    }
+  ],
+  "method_template": "skills/method/SKILL.md.tmpl",
+  "method_output": "skills/{method_id}/SKILL.md",
+  "command_templates": [
+    {
+      "template": "commands/auto.md.tmpl",
+      "output": "commands/auto.md"
+    },
+    {
+      "template": "commands/evidence-audit.md.tmpl",
+      "output": "commands/evidence-audit.md"
+    },
+    {
+      "template": "commands/reasoning-trace.md.tmpl",
+      "output": "commands/reasoning-trace.md"
+    },
+    {
+      "template": "commands/opensocrates-status.md.tmpl",
+      "output": "commands/opensocrates-status.md"
+    },
+    {
+      "template": "commands/status.md.tmpl",
+      "output": "commands/status.md"
+    },
+    {
+      "template": "README.md.tmpl",
+      "output": "README.md"
+    },
+    {
+      "template": "THIRD_PARTY_NOTICES.md.tmpl",
+      "output": "THIRD_PARTY_NOTICES.md"
+    }
+  ],
+  "copy_files": [
+    {
+      "source": "packaging/launchers/launch.sh",
+      "output": "bin/launch.sh"
+    },
+    {
+      "source": "packaging/launchers/launch.ps1",
+      "output": "bin/launch.ps1"
+    },
+    {
+      "source": "schemas/v1",
+      "output": "schemas/v1"
+    },
+    {
+      "source": "LICENSE",
+      "output": "LICENSE"
+    }
+  ],
+  "bundle_output": "content/compiled-content.bundle.json",
+  "runtime_output": "runtime"
+}

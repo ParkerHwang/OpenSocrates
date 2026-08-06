@@ -111,6 +111,8 @@ class CapabilityStatus(StrEnum):
 class HostId(StrEnum):
     CODEX_DESKTOP = "codex_desktop"
     CODEX_CLI = "codex_cli"
+    CLAUDE_CODE = "claude_code"
+    CLAUDE_COWORK = "claude_cowork"
     PROMPT_ONLY = "prompt_only"
 
 

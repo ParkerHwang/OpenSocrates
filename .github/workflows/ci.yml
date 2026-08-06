@@ -52,6 +52,8 @@ jobs:
         run: make content-check
       - name: Check documentation
         run: make docs-check
+      - name: Execute generated package launcher and documentation checks
+        run: make package-check
       - name: Run source security and dependency scans
         run: make security-scan
       - name: Run product smoke tests
@@ -78,8 +80,10 @@ jobs:
         run: npm pack --dry-run
 
   package:
+    # Runs on pull requests too. Skipping it here let CI go green while every
+    # new packaging surface -- the Claude and Codex native packages and the
+    # Claude Chat skills ZIP -- remained unbuilt and unverified.
     name: Native package (darwin-arm64)
-    if: github.event_name != 'pull_request'
     needs:
       - python-quality
       - product-contracts

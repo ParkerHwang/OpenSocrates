@@ -53,8 +53,12 @@ NORMALIZED_TO_NATIVE = {
     "session_ended": frozenset({"SessionEnd"}),
 }
 _START_SOURCES = frozenset({"startup", "resume", "clear", "compact"})
+_CLAUDE_START_SOURCES = _START_SOURCES | {"fork"}
 _COMPACTION_TRIGGERS = frozenset({"manual", "auto"})
 _SESSION_END_REASONS = frozenset({"other"})
+_CLAUDE_SESSION_END_REASONS = frozenset(
+    {"clear", "resume", "logout", "prompt_input_exit", "bypass_permissions_disabled", "other"}
+)
 _FAILURE_CLASSES = frozenset({"permission", "timeout", "api_error", "interrupted", "unknown"})
 
 
@@ -386,7 +390,12 @@ def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     diagnostics = ("native_unknown_field_ignored",) if ignored else ()
     if native_name == "SessionStart":
         source = _text(document, "source", required=True, max_bytes=32)
-        if source not in _START_SOURCES:
+        allowed_sources = (
+            _CLAUDE_START_SOURCES
+            if host in {HostId.CLAUDE_CODE, HostId.CLAUDE_COWORK}
+            else _START_SOURCES
+        )
+        if source not in allowed_sources:
             raise NativeWrongType("SessionStart.source is not a closed value")
         return CodexNativeEvent(
             native_event=native_name,
@@ -505,7 +514,12 @@ def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
         )
     if native_name == "SessionEnd":
         reason = _text(document, "reason", required=True, max_bytes=32)
-        if reason not in _SESSION_END_REASONS:
+        allowed_reasons = (
+            _CLAUDE_SESSION_END_REASONS
+            if host in {HostId.CLAUDE_CODE, HostId.CLAUDE_COWORK}
+            else _SESSION_END_REASONS
+        )
+        if reason not in allowed_reasons:
             raise NativeWrongType("SessionEnd.reason is not a closed value")
         return CodexNativeEvent(
             native_event=native_name,
