@@ -41,6 +41,11 @@ OpenSocrates 1.x:
 - does not require or store an Anthropic or OpenAI API key;
 - does not host an OpenSocrates backend or add telemetry;
 - verifies downloadable packages with SHA-256 release and package manifests;
+- keeps cross-host activation transactional and restores prior managed
+  registrations when a coordinated activation fails;
+- leaves scheduled updates disabled until explicitly enabled and stores only
+  owner-readable desired state, a single-instance lock, and content-free update
+  receipts;
 - fails open when the selector cannot safely complete.
 
 The Claude selector runs a bounded, non-persistent `claude --safe-mode -p`
@@ -73,6 +78,14 @@ bounded regardless: the model's returned instruction text is discarded, and only
 authored catalog content assembled by OpenSocrates is ever injected. Operators
 who cannot accept managed-hook visibility of the selector prompt should not
 enable OpenSocrates selection on those machines.
+
+The optional macOS LaunchAgent invokes the selected published npm channel and
+then uses the same verified installer path as a manual update. It does not read
+or terminate active Claude or Codex sessions. Its receipt contains only the
+checked version, timestamp, per-host result, and an error category; prompts,
+transcripts, workspace paths, credentials, and raw error output are excluded.
+Automatic major-version upgrades are disabled unless the user explicitly
+changes that policy.
 
 Signing, notarization, clean-machine installation, platforms other than
 `darwin-arm64`, Claude Chat automatic hooks, and live delivery on every host

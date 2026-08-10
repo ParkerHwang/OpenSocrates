@@ -1,8 +1,9 @@
 # OpenSocrates for Claude
 
 This package provides the Claude plugin boundary for OpenSocrates
-{{PRODUCT_VERSION}}. It contains {{METHOD_COUNT}} generated reasoning skills
-and a fail-open selector hook for supported local Claude surfaces. It does not
+{{PRODUCT_VERSION}}. It exposes one `/opensocrates` skill backed by
+{{METHOD_COUNT}} internal reasoning-system references and a fail-open selector
+hook for supported local Claude surfaces. It does not
 execute the user's requested task, host a service, add telemetry, or require an
 Anthropic API key.
 
@@ -15,11 +16,11 @@ compatibility claims.
 
 | Claude surface | OpenSocrates behavior | Validation status |
 | --- | --- | --- |
-| Claude Code CLI | Automatic `UserPromptSubmit` selection and all plugin skills | This package's own launcher dispatch is exercised by the release gate on `darwin-arm64` |
-| Claude Code in Desktop | Same Claude Code hook and skill contract; mechanism and package contract are implemented | Implemented; no live hook-delivery probe receipt |
-| Cowork, local execution | The local hook mechanism is packaged and runs where local command hooks are allowed; skills remain available | Experimental; CLI marketplace visibility and live hook delivery are unvalidated |
-| Cowork, remote execution | Skills are available; the packaged local runtime may be unavailable, so automatic selection fails open | Experimental; no live probe receipt |
-| Claude Chat on web or Desktop | Skills only; Anthropic does not run plugin hooks in Chat | Skills-only; the customization ZIP upload path is unvalidated |
+| Claude Code CLI | Automatic `UserPromptSubmit` selection and one `/opensocrates` entry | This package's own launcher dispatch is exercised by the release gate on `darwin-arm64` |
+| Claude Code in Desktop | Same Claude Code hook and single-skill contract; mechanism and package contract are implemented | Implemented; no live hook-delivery probe receipt |
+| Cowork, local execution | The local hook mechanism is packaged and runs where local command hooks are allowed; `/opensocrates` remains available | Experimental; CLI marketplace visibility and live hook delivery are unvalidated |
+| Cowork, remote execution | `/opensocrates` is available; the packaged local runtime may be unavailable, so automatic selection fails open | Experimental; no live probe receipt |
+| Claude Chat on web or Desktop | One `/opensocrates` skill only; Anthropic does not run plugin hooks in Chat | Skills-only; the customization ZIP upload path is unvalidated |
 
 Read the status column strictly. The levels are not interchangeable:
 
@@ -105,9 +106,9 @@ the session, and `SessionStart` sweeps crash leftovers older than 24 hours.
 - Fixed launchers: `bin/launch.sh` and `bin/launch.ps1`
 - Native runtime: `runtime/<target>/opensocrates-runtime/`, resolved by
   the launcher relative to the plugin root
-- Shared controller skills: `skills/opensocrates`, `skills/rigor`, and
-  `skills/trace`
-- Generated method skills: `skills/<method-id>`
+- One user-facing controller skill: `skills/opensocrates/SKILL.md`
+- Internal routing catalog and method procedures:
+  `skills/opensocrates/references/`
 
 Validate a generated package with:
 

@@ -16,19 +16,20 @@ OpenSocrates는 Claude와 Codex를 위한 로컬 연동 및 저작 추론 프레
 추론 시스템을 고른 뒤, 이론과 예제 전체를 활성 작업에 추가합니다. 단순한 사실
 확인과 기계적인 작업은 그대로 통과할 수 있습니다.
 
-버전 `1.1.0`에는 48개의 추론 시스템과 Apple Silicon macOS
-(`darwin-arm64`)용 Claude 및 Codex 릴리스 패키지가 들어 있습니다. 기존 호스트
-로그인을 사용하므로 API 키나 OpenSocrates 백엔드가 필요하지 않습니다.
+버전 `1.1.1`에는 48개의 추론 시스템, Claude의 단일 사용자 진입점,
+Claude/Codex 통합 라이프사이클, 선택형 자동 업데이트가 들어 있습니다. 현재
+릴리스 플랫폼은 Apple Silicon macOS(`darwin-arm64`)입니다. 기존 호스트 로그인을
+사용하므로 API 키나 OpenSocrates 백엔드가 필요하지 않습니다.
 
 ## 호스트 지원 범위
 
-| 호스트 화면 | 자동 선택 | 추론 스킬 | 검증 상태 |
+| 호스트 화면 | 자동 선택 | 사용자 진입점 | 검증 상태 |
 | --- | --- | --- | --- |
-| Codex CLI 및 Desktop | 지원 | 지원 | `darwin-arm64` 릴리스 검증 완료 |
-| Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | 지원 | `darwin-arm64` 로컬 검증 완료 |
-| Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 구현됨 | 지원 | 구현 완료, 실측 수신 기록 없음 |
-| Claude Cowork | 로컬 플러그인 런타임을 사용할 수 있을 때 구현됨 | 지원 | 실험적, 실측 수신 기록 없음 |
-| Claude 웹 및 Desktop Chat | 훅 미지원 | 플러그인 스킬로 지원 | 스킬 전용, 업로드 경로 미검증 |
+| Codex CLI 및 Desktop | 지원 | OpenSocrates 플러그인 | `darwin-arm64` 릴리스 검증 완료 |
+| Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | `/opensocrates` | `darwin-arm64` 로컬 검증 완료 |
+| Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 구현됨 | `/opensocrates` | 구현 완료, 실측 수신 기록 없음 |
+| Claude Cowork | 로컬 플러그인 런타임을 사용할 수 있을 때 구현됨 | `/opensocrates` | 실험적, 실측 수신 기록 없음 |
+| Claude 웹 및 Desktop Chat | 훅 미지원 | `/opensocrates` | 스킬 전용, 업로드 경로 미검증 |
 
 상태 열은 서로 다른 네 단계를 뜻하며 같은 의미로 읽으면 안 됩니다.
 
@@ -63,47 +64,74 @@ Node.js 20 이상이 필요합니다. npm에 게시된 `opensocrates` 패키지�
 내려받고 릴리스 체크섬과 모든 파일 체크섬을 검증한 뒤, 소유권 표식이 있는 관리형
 마켓플레이스를 등록합니다.
 
-### Claude Code와 Cowork
+### 준비된 모든 호스트에 설치
 
 ```bash
-npx --yes opensocrates@1.1.0 install --host claude
+npx --yes opensocrates@1.1.1 install --host all
 ```
 
-라이프사이클 명령:
+모든 호스트 경로는 지원되는 인증 완료 CLI를 찾고, 어느 호스트도 바꾸기 전에
+전체 사전점검을 끝냅니다. 두 패키지를 모두 검증·스테이징한 다음 한 릴리스를
+트랜잭션으로 활성화합니다. 한 호스트의 활성화가 실패하면 이번 트랜잭션에서 이미
+바뀐 호스트도 이전 관리형 등록으로 되돌립니다.
+
+전체 라이프사이클에서 같은 호스트 값을 사용할 수 있습니다.
 
 ```bash
-npx --yes opensocrates@1.1.0 status --host claude
-npx --yes opensocrates@1.1.0 update --host claude
-npx --yes opensocrates@1.1.0 remove --host claude
+npx --yes opensocrates@1.1.1 status --host all
+npx --yes opensocrates@1.1.1 update --host all
+npx --yes opensocrates@1.1.1 remove --host all
 ```
 
-### Codex
+소유자 전용 `~/.opensocrates/desired-state.json`에는 선택 채널, 설치된 호스트,
+원하는 활성 버전이 기록됩니다. `status --host all`은 원하는 버전과 사용 가능한
+버전, 마지막 확인, 마지막 성공 자동 업데이트, 호스트별 버전 차이를 보여 줍니다.
+
+### 호스트 하나를 명시적으로 설치
 
 기존 사용자와의 호환성을 위해 기본 호스트는 계속 Codex입니다.
 
 ```bash
-npx --yes opensocrates@1.1.0 install
-# 같은 명령: npx --yes opensocrates@1.1.0 install --host codex
+npx --yes opensocrates@1.1.1 install
+# 같은 명령: npx --yes opensocrates@1.1.1 install --host codex
+npx --yes opensocrates@1.1.1 install --host claude
 ```
 
-라이프사이클 명령:
+기존 `--host codex` 및 `--host claude` 라이프사이클은 그대로 지원합니다. 호스트별
+업데이트는 의도적으로 버전 차이를 만들 수 있고, 이후 `update --host all` 또는
+성공한 자동 조정이 desired state에 기록된 모든 호스트를 다시 한 버전으로 맞춥니다.
+
+### 선택형 자동 업데이트
 
 ```bash
-npx --yes opensocrates@1.1.0 status --host codex
-npx --yes opensocrates@1.1.0 update --host codex
-npx --yes opensocrates@1.1.0 remove --host codex
+npx --yes opensocrates@1.1.1 auto-update enable --host all
+npx --yes opensocrates@1.1.1 auto-update status
+npx --yes opensocrates@1.1.1 auto-update disable
 ```
 
-두 호스트를 모두 사용하려면 설치 명령을 각각 실행하세요. 관리형 마켓플레이스는
-Claude와 Codex 설정 홈에 따로 저장됩니다.
+자동 업데이트는 명시적으로 켜기 전까지 비활성화되어 있습니다. macOS LaunchAgent는
+한 시간마다 가벼운 확인을 시작하고, desired state는 기본 24시간 간격과 지터,
+단일 실행 잠금을 적용합니다. 작업은 선택한 npm 채널을 호출하고 릴리스 및 패키지
+체크섬을 검증하며 모든 관리 호스트를 스테이징한 뒤 한 트랜잭션으로 조정합니다.
+메이저 버전 자동 업그레이드는 기본적으로 차단되며, 정책을 바꾸려면
+`--allow-major`를 명시해야 합니다.
+
+`auto-update enable`에 호스트 하나를 지정하면 자동 업데이트 대상만 좁아집니다.
+다른 설치 호스트를 desired state에서 제거하지 않으므로 `status --host all`은 모든
+설치를 계속 추적하고, 이후 `update --host all`도 전체 설치 집합을 다시 조정합니다.
+
+업데이터 영수증에는 버전, 시간, 호스트별 결과, 오류 범주만 기록됩니다. 프롬프트,
+대화 기록, 자격 증명, 작업공간 경로는 기록하지 않습니다. `auto-update disable`은
+LaunchAgent를 언로드하고 삭제하며, `remove --host all`도 관리 호스트를 지우기 전에
+같은 정리를 수행합니다.
 
 ### Claude 웹 및 Desktop Chat 스킬
 
 이 화면들은 플러그인 스킬은 지원하지만 훅은 실행하지 않습니다. 릴리스에서
-`opensocrates-1.1.0-claude-chat-skills.zip`을 내려받아 Claude의 플러그인 사용자
-설정 화면에서 업로드하세요. 작고 런타임이 없는 패키지에서 48개 방법 스킬과 3개
-공용 스킬을 사용할 수 있지만 Chat은 플러그인 훅을 실행하지 않으므로 자동 선택은
-없습니다. Anthropic의
+`opensocrates-1.1.1-claude-chat-skills.zip`을 내려받아 Claude의 플러그인 사용자
+설정 화면에서 업로드하세요. 패키지는 `/opensocrates` 스킬 하나만 노출하고, 48개
+방법 절차와 엄격도·근거·추적 제어는 내부 참조로 둡니다. Chat은 플러그인 훅을
+실행하지 않으므로 자동 선택은 없습니다. Anthropic의
 [플러그인 화면 안내](https://support.claude.com/en/articles/13837440-use-plugins-in-claude)를
 참고하세요.
 
@@ -112,20 +140,21 @@ Claude와 Codex 설정 홈에 따로 저장됩니다.
 npm 레지스트리를 거치지 않을 때도 같은 호스트 옵션을 사용합니다.
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.0 install --host claude
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.0 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.1 install --host all
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.1 install --host claude
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.1 install --host codex
 ```
 
 ### 릴리스 파일 직접 검증
 
-[v1.1.0 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.0)에서
+[v1.1.1 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.1)에서
 `opensocrates.mjs`, 호스트 패키지, `.sha256` 파일을 내려받습니다. Claude의 예:
 
 ```bash
-shasum -a 256 -c opensocrates-1.1.0-claude-plugin.zip.sha256
+shasum -a 256 -c opensocrates-1.1.1-claude-plugin.zip.sha256
 node opensocrates.mjs install --host claude \
-  --asset opensocrates-1.1.0-claude-plugin.zip \
-  --checksum opensocrates-1.1.0-claude-plugin.zip.sha256
+  --asset opensocrates-1.1.1-claude-plugin.zip \
+  --checksum opensocrates-1.1.1-claude-plugin.zip.sha256
 ```
 
 Codex 패키지는 `claude`를 `codex`로 바꾸면 됩니다.
@@ -140,8 +169,12 @@ Codex 패키지는 `claude`를 `codex`로 바꾸면 됩니다.
 ```bash
 claude plugin uninstall opensocrates@OpenSocrates --scope user
 claude plugin marketplace remove OpenSocrates --scope user
-npx --yes opensocrates@1.1.0 install --host claude
+npx --yes opensocrates@1.1.1 install --host claude
 ```
+
+관리형 v1.1.0 Claude 설치를 업데이트하면 패키지 트리 전체가 교체됩니다. 따라서
+예전의 최상위 방법 스킬 48개, `rigor`, `trace`, 중복 명령은 오래된 항목으로 남지
+않고 함께 제거됩니다.
 
 ## 사용법
 
@@ -157,6 +190,18 @@ Claude나 Codex를 평소처럼 사용하세요. 요청에 판단, 해석, 진�
 선택 수에는 고정 제한이 없습니다. 셀렉터의 내부 제한 시간은 30초이고 재시도하지
 않으며 실패 시 통과합니다. 타임아웃, 호스트 오류, 잘못된 출력, 미개입 결정,
 안전하지 않은 컨텍스트 또는 사용할 수 없는 훅은 모두 주입 없이 끝납니다.
+
+Claude에서는 필요할 때 같은 컨트롤러를 명시적으로 호출할 수 있습니다.
+
+```text
+/opensocrates <요청>
+/opensocrates auto <요청>
+/opensocrates trace
+/opensocrates status
+```
+
+Claude의 스킬·명령 UI에는 `/opensocrates` 하나만 나타납니다. 컨트롤러가 내부 방법
+참조를 선택해 읽으므로 사용자가 48개 구현 카탈로그를 직접 탐색할 필요가 없습니다.
 
 Claude 셀렉터는 세션을 저장하지 않는 단일 `claude --safe-mode -p` 프로세스를
 사용합니다. 안전 모드는 사용자, 프로젝트, 플러그인 커스터마이즈를 끕니다.
@@ -196,6 +241,11 @@ OpenSocrates 기록, 로그, 메트릭, 진단 또는 instruction 파일에 쓰�
 `Stop`에서 현재 turn 파일을, `SessionEnd`에서 남은 세션 파일을,
 `SessionStart`에서 24시간이 지난 비정상 종료 잔여 파일을 삭제합니다.
 
+자동 업데이트를 켜면 앞서 설명한 desired state와 간결한 영수증만 소유자 전용
+권한으로 저장합니다. 실행 중인 Claude나 Codex 세션을 검사하거나 종료하지 않습니다.
+이미 실행 중인 작업은 로드한 플러그인을 계속 쓰고, 새 작업이 조정된 버전을 자연스럽게
+불러옵니다.
+
 취약점 신고와 측정된 지원 경계는 [SECURITY.md](SECURITY.md)를 확인하세요.
 
 ## 개발
@@ -203,6 +253,11 @@ OpenSocrates 기록, 로그, 메트릭, 진단 또는 instruction 파일에 쓰�
 소스 저장소에는 네이티브 바이너리와 중간 빌드 결과를 넣지 않습니다.
 [uv](https://docs.astral.sh/uv/), Python 3.12, Node.js 20 이상을 설치한 뒤 다음을
 실행합니다.
+
+릴리스 후보를 병합하기 전에는
+[새 Apple Silicon Mac 인수 테스트 절차](docs/clean-machine-acceptance.ko.md)를 따라
+인증된 실제 Claude Code 및 Codex 홈에서 검증하고 개인정보를 뺀 근거 묶음을
+확보하세요.
 
 ```bash
 make bootstrap

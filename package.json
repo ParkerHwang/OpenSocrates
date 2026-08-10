@@ -1,6 +1,6 @@
 {
   "name": "opensocrates",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Install and manage OpenSocrates for Claude Code, Cowork, and Codex.",
   "type": "module",
   "bin": {
@@ -13,7 +13,7 @@
     "VERSION"
   ],
   "scripts": {
-    "test": "node --test installer/opensocrates.test.mjs installer/lifecycle.test.mjs && npm run test:npx",
+    "test": "node --test installer/opensocrates.test.mjs installer/lifecycle.test.mjs tools/clean_machine_acceptance.test.mjs && npm run test:npx",
     "test:npx": "node installer/package-smoke.mjs",
     "pack:check": "npm pack --dry-run",
     "prepublishOnly": "npm test"

@@ -69,9 +69,13 @@ or degraded without a dated native receipt.
 
 ## Capability and status
 
-Use the fixed control boundary below after the host trust flow:
+The fixed control boundary below is invoked only by the host integration after
+the host trust flow. It is not a command for a model or user to run directly:
 
 `${PLUGIN_ROOT}/bin/launch.sh control codex`
+
+Direct shell execution has no host-issued typed stdin payload and therefore
+cannot establish a native receipt.
 
 Without a dated exact native receipt, capability status remains unknown or
 documented degraded. Disabled hooks, untrusted hooks, and managed-only policy

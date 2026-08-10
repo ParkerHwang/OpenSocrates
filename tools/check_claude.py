@@ -549,6 +549,42 @@ def test_two_turns_in_one_session() -> None:
         )
 
 
+@check("CLAUDE-10-single-user-facing-entry")
+def test_single_user_facing_entry() -> None:
+    source = ROOT / "plugin-src" / "claude"
+    metadata = json.loads((source / "generator.json").read_text(encoding="utf-8"))
+    require(
+        metadata.get("public_skills") == ["opensocrates"],
+        "Claude generator does not declare exactly one public skill",
+    )
+    require(
+        metadata.get("method_output") == "skills/opensocrates/references/methods/{method_id}.md",
+        "Claude methods are not routed to non-discoverable supporting references",
+    )
+    command_outputs = {
+        str(item.get("output"))
+        for item in metadata.get("command_templates", [])
+        if isinstance(item, dict)
+    }
+    require(
+        not any(output.startswith("commands/") for output in command_outputs),
+        "Claude generator still publishes a duplicate command surface",
+    )
+    skill_entries = sorted(
+        path.relative_to(source).as_posix() for path in (source / "skills").glob("*/SKILL.md.tmpl")
+    )
+    require(
+        skill_entries == ["skills/opensocrates/SKILL.md.tmpl"],
+        f"Claude source exposes unexpected top-level skills: {skill_entries}",
+    )
+    skill = (source / "skills" / "opensocrates" / "SKILL.md.tmpl").read_text(encoding="utf-8")
+    require("$ARGUMENTS" in skill, "explicit /opensocrates arguments are not forwarded")
+    require(
+        "references/catalog.md" in skill,
+        "the single Claude skill does not route to its internal catalog",
+    )
+
+
 def main() -> int:
     failures: list[tuple[str, str]] = []
     for name, function in CHECKS:

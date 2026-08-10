@@ -94,6 +94,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
       - uses: astral-sh/setup-uv@v5
       - name: Bootstrap locked environment
         run: make bootstrap
@@ -101,6 +104,8 @@ jobs:
         run: uv sync --locked --no-install-project --group build
       - name: Build and validate native package
         run: make package
+      - name: Exercise all-host install in a fresh macOS runner
+        run: npm test
       - name: Upload native package evidence
         if: always()
         uses: actions/upload-artifact@v4

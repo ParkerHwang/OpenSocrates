@@ -158,6 +158,36 @@ def _method_values(method: Mapping[str, Any], common: Mapping[str, str]) -> dict
     return values
 
 
+def _method_reference_index(methods: list[Any]) -> str:
+    """Render a compact, non-discoverable catalog for the single Claude skill."""
+
+    sections: list[str] = []
+    for raw in methods:
+        if not isinstance(raw, Mapping) or not isinstance(raw.get("id"), str):
+            raise PluginBuildError("compiled method has no valid id")
+        method_id = raw["id"]
+        display = raw.get("display_name", {})
+        plain_action = raw.get("plain_action", {})
+        display_en = display.get("en", method_id) if isinstance(display, Mapping) else method_id
+        display_ko = display.get("ko", "") if isinstance(display, Mapping) else ""
+        action_en = plain_action.get("en", "") if isinstance(plain_action, Mapping) else ""
+        action_ko = plain_action.get("ko", "") if isinstance(plain_action, Mapping) else ""
+        sections.extend(
+            [
+                f"## `{method_id}` — {display_en}",
+                "",
+                f"- Korean name: {display_ko}",
+                f"- Family: `{raw.get('family', '')}`",
+                f"- Use for: {action_en}",
+                f"- 한국어: {action_ko}",
+                f"- Routing metadata: `{_json_token(raw.get('routing', {}))}`",
+                f"- Procedure: [methods/{method_id}.md](methods/{method_id}.md)",
+                "",
+            ]
+        )
+    return "\n".join(sections).rstrip()
+
+
 def _common_values(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     bundle: Mapping[str, Any], *, host: str, template_revision: str
 ) -> dict[str, str]:
@@ -189,6 +219,7 @@ def _common_values(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0
         "METHOD_COUNT": str(len(methods)),
         "METHOD_IDS_JSON": _json_token(method_ids),
         "METHODS_JSON": _json_token(methods),
+        "METHOD_REFERENCE_INDEX": _method_reference_index(methods),
         "LOCALE_MESSAGES_JSON": _json_token(messages),
         "PROMPT_FRAGMENTS_JSON": _json_token(fragments),
         "POLICY_VERSIONS_JSON": _json_token(policies),
