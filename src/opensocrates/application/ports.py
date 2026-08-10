@@ -121,6 +121,8 @@ class InstructionArtifactStore(Protocol):
 
     def latest_for_session(self, session_id: str | None) -> "InstructionArtifact | None": ...
 
+    def accepts_artifact_path(self, file_path: str | Path | None) -> bool: ...
+
     def record_complete_read(
         self,
         session_id: str | None,

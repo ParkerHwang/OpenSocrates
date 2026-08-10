@@ -13,11 +13,12 @@ from unittest.mock import patch
 
 from opensocrates.constants import INSTRUCTION_ARTIFACT_END_MARKER
 from opensocrates.content import ProjectionInstructionAssembler, load_reasoning_content_projections
+from opensocrates.content.injection import _procedure_section
 from opensocrates.domain.enums import HostId
 from opensocrates.hooks.entrypoint import parse_hook_arguments
 from opensocrates.hosts.claude.adapter import ClaudeAdapter, ClaudeAdapterConfig
 from opensocrates.hosts.claude.commands import build_hooks
-from opensocrates.hosts.codex.native import parse_codex_event
+from opensocrates.hosts.codex.native import parse_codex_event, try_parse_codex_event
 from opensocrates.selector import (
     InstructionFileStore,
     SelectorApplication,
@@ -130,6 +131,10 @@ def test_plugin_hook_contract() -> None:
         "grounding receipt hook uses the wrong lane",
     )
     require(
+        read_handler["hooks"][0]["timeout"] == 3,
+        "grounding receipt hook cannot cover the bounded cold-start path",
+    )
+    require(
         parse_hook_arguments(("claude", "user_prompt_submitted"))
         == ("claude", "user_prompt_submitted"),
         "Claude launcher form is not registered",
@@ -191,6 +196,22 @@ class FakeSelector:
             "selected_reasoning_systems": ["critical-thinking"],
             "instructions": "canonical_assembly_required",
         }
+
+
+def _structured_read_response(path: Path) -> dict[str, object]:
+    """Mirror Claude Code's structured Read PostToolUse response."""
+
+    content = path.read_text(encoding="utf-8")
+    line_count = len(content.splitlines())
+    return {
+        "type": "text",
+        "file": {
+            "filePath": str(path),
+            "content": content,
+            "numLines": line_count,
+            "totalLines": line_count,
+        },
+    }
 
 
 @check("CLAUDE-04-adapter-injection-and-cleanup")
@@ -288,7 +309,7 @@ def test_adapter_injection_and_cleanup() -> None:
                 "tool_name": "Read",
                 "tool_use_id": "tool-complete",
                 "tool_input": {"file_path": str(artifact.path)},
-                "tool_response": artifact.path.read_text(encoding="utf-8"),
+                "tool_response": _structured_read_response(artifact.path),
             },
             event_name="PostToolUse",
         )
@@ -371,6 +392,42 @@ def test_issue_32_grounding_specifics() -> None:
             "triangulation method/revision audit line drifted",
         )
 
+        require(
+            store.record_complete_read(
+                "session-grounding",
+                "turn-grounding",
+                file_path=artifact.path,
+                tool_use_id="tool-first-artifact",
+                offset=None,
+                limit=None,
+                end_marker_seen=True,
+            ),
+            "first artifact did not produce a complete-read receipt",
+        )
+        require(
+            store.has_complete_read_receipt(artifact),
+            "first artifact's receipt did not validate",
+        )
+        replay_target = store.create("session-grounding", "turn-grounding", assembled)
+        require(replay_target.path != artifact.path, "artifact path was not randomized")
+        require(
+            replay_target.path.read_bytes() == artifact.path.read_bytes(),
+            "same selection did not reproduce the replay precondition",
+        )
+        require(
+            not store.has_complete_read_receipt(replay_target),
+            "a prior artifact's receipt replayed against byte-identical content",
+        )
+
+    require(
+        _procedure_section(
+            "Prefix containing ### Do not use when\nlatent text\n\n## Stop conditions\nstop",
+            "Do not use when",
+        )
+        is None,
+        "a latent level-three heading was accepted as a canonical procedure section",
+    )
+
     parsed = parse_codex_event(
         {
             "hook_event_name": "PostToolUse",
@@ -386,6 +443,71 @@ def test_issue_32_grounding_specifics() -> None:
     require(
         parsed.tool_read_end_marker_seen,
         "a complete Read response above the generic hook bound lost its terminal marker",
+    )
+
+    oversized_stop = json.dumps(
+        {
+            "hook_event_name": "Stop",
+            "session_id": "session-grounding",
+            "last_assistant_message": "x" * (40 * 1024),
+        }
+    )
+    with patch(
+        "opensocrates.hosts.codex.native.json.loads",
+        side_effect=AssertionError("oversized non-PostToolUse input was decoded"),
+    ) as loads:
+        rejected = try_parse_codex_event(
+            oversized_stop,
+            event_name="Stop",
+            host=HostId.CLAUDE_CODE,
+        )
+    require(rejected.error_code == "input_too_large", "oversized Stop was not rejected")
+    require(loads.call_count == 0, "oversized Stop reached json.loads")
+
+    with patch("opensocrates.hosts.codex.native.json.loads", side_effect=RecursionError):
+        recursive = try_parse_codex_event(
+            '{"hook_event_name":"Stop"}',
+            event_name="Stop",
+            host=HostId.CLAUDE_CODE,
+        )
+    require(recursive.error_code == "native_invalid", "recursive JSON failure escaped the parser")
+
+    pre_tool = parse_codex_event(
+        {
+            "hook_event_name": "PreToolUse",
+            "session_id": "session-grounding",
+            "tool_name": "Read",
+            "tool_input": ["malformed", "but irrelevant"],
+        },
+        event_name="PreToolUse",
+        host=HostId.CLAUDE_CODE,
+    )
+    require(pre_tool.tool_file_path is None, "PreToolUse consumed Read receipt metadata")
+    permission = parse_codex_event(
+        {
+            "hook_event_name": "PermissionRequest",
+            "session_id": "session-grounding",
+            "tool_name": "Read",
+            "tool_input": "malformed but irrelevant",
+        },
+        event_name="PermissionRequest",
+        host=HostId.CLAUDE_CODE,
+    )
+    require(permission.tool_file_path is None, "PermissionRequest consumed Read receipt metadata")
+    degraded_post = parse_codex_event(
+        {
+            "hook_event_name": "PostToolUse",
+            "session_id": "session-grounding",
+            "tool_name": "Read",
+            "tool_input": {"file_path": "relative.md", "offset": "invalid"},
+            "tool_response": {"type": "text", "file": {"content": "partial"}},
+        },
+        event_name="PostToolUse",
+        host=HostId.CLAUDE_CODE,
+    )
+    require(
+        degraded_post.tool_file_path is None,
+        "malformed optional Read metadata invalidated PostToolUse",
     )
 
 
@@ -626,19 +748,13 @@ def _referenced_path(additional_context: str) -> Path:
 
 @check("CLAUDE-09-two-turns-in-one-session")
 def test_two_turns_in_one_session() -> None:
-    """Two prompts in one session, with no intervening Stop.
-
-    Claude Code exposes no turn_id, so the adapter reuses session_id as the
-    turn key. This asserts that the second turn cannot be served the first
-    turn's artifact, and that Stop remains the normal cleanup path with the
-    24-hour TTL sweep as fallback rather than the mechanism.
-    """
+    """Claude prompt IDs isolate identical selections and their read receipts."""
 
     value = projections()
     assembler = ProjectionInstructionAssembler(value)
     with tempfile.TemporaryDirectory(prefix="opensocrates-claude-turns-") as name:
         store = InstructionFileStore(installation_key=b"d" * 32, directory=Path(name) / "artifacts")
-        selector = SequencedSelector(("critical-thinking", "first-principles"))
+        selector = SequencedSelector(("critical-thinking", "critical-thinking"))
         adapter = ClaudeAdapter(
             ClaudeAdapterConfig(
                 selector_mode=True,
@@ -653,10 +769,11 @@ def test_two_turns_in_one_session() -> None:
             )
         )
 
-        def submit(prompt: str) -> Path:
+        def submit(prompt: str, prompt_id: str) -> Path:
             payload = {
                 "hook_event_name": "UserPromptSubmit",
                 "session_id": "session-shared",
+                "prompt_id": prompt_id,
                 "cwd": str(ROOT),
                 "prompt": prompt,
             }
@@ -664,38 +781,98 @@ def test_two_turns_in_one_session() -> None:
             body = json.loads(result.stdout)
             return _referenced_path(body["hookSpecificOutput"]["additionalContext"])
 
-        first = submit("Critique this proposal")
-        second = submit("Now weigh the alternative")
+        first = submit("Critique this proposal", "prompt-1")
+        first_artifact = store.latest_for_session("session-shared")
+        require(first_artifact is not None, "first turn artifact metadata is unavailable")
+        first_read = adapter.handle(
+            {
+                "hook_event_name": "PostToolUse",
+                "session_id": "session-shared",
+                "prompt_id": "prompt-1",
+                "tool_name": "Read",
+                "tool_use_id": "tool-prompt-1",
+                "tool_input": {"file_path": str(first)},
+                "tool_response": _structured_read_response(first),
+            },
+            event_name="PostToolUse",
+        )
+        require(first_read.stdout == "", "first complete Read emitted user-facing output")
+        require(
+            store.has_complete_read_receipt(first_artifact),
+            "first prompt did not receive a valid receipt",
+        )
+
+        second = submit("Now critique the same proposal again", "prompt-2")
+        second_artifact = store.latest_for_session("session-shared")
+        require(second_artifact is not None, "second turn artifact metadata is unavailable")
 
         require(first.is_file(), "first turn artifact was not created")
         require(second.is_file(), "second turn artifact is missing")
         require(first != second, "second turn reused the first turn's artifact path")
+        require(first.parent != second.parent, "Claude prompt IDs did not isolate turn directories")
+        require(first.read_bytes() == second.read_bytes(), "identical selection bytes drifted")
         require(selector.calls == 2, "second prompt did not reach the selector")
 
         second_text = second.read_text(encoding="utf-8")
         require(
-            "first-principles" in second_text,
+            "critical-thinking" in second_text,
             "second turn artifact does not carry the second turn's selection",
         )
-        require(
-            "critical-thinking" not in second_text,
-            "second turn artifact leaked the first turn's selection",
-        )
-
-        adapter.handle(
+        stale_stop = adapter.handle(
             {
                 "hook_event_name": "Stop",
                 "session_id": "session-shared",
-                "stop_hook_active": True,
-                "last_assistant_message": "Done",
+                "prompt_id": "prompt-2",
+                "stop_hook_active": False,
+                "last_assistant_message": f"Done\n\n{second_artifact.grounding_footer()}",
             },
             event_name="Stop",
         )
+        require(
+            json.loads(stale_stop.stdout).get("decision") == "block",
+            "the first prompt's receipt satisfied the second prompt's Stop gate",
+        )
+
+        second_read = adapter.handle(
+            {
+                "hook_event_name": "PostToolUse",
+                "session_id": "session-shared",
+                "prompt_id": "prompt-2",
+                "tool_name": "Read",
+                "tool_use_id": "tool-prompt-2",
+                "tool_input": {"file_path": str(second)},
+                "tool_response": _structured_read_response(second),
+            },
+            event_name="PostToolUse",
+        )
+        require(second_read.stdout == "", "second complete Read emitted user-facing output")
+        grounded_stop = adapter.handle(
+            {
+                "hook_event_name": "Stop",
+                "session_id": "session-shared",
+                "prompt_id": "prompt-2",
+                "stop_hook_active": False,
+                "last_assistant_message": f"Done\n\n{second_artifact.grounding_footer()}",
+            },
+            event_name="Stop",
+        )
+        require(grounded_stop.stdout == "", "grounded second Stop was not literal-empty")
+        require(first.is_file(), "second Stop deleted the first prompt's artifact")
+        require(not second.exists(), "second Stop did not delete its own artifact")
+
+        ended = adapter.handle(
+            {
+                "hook_event_name": "SessionEnd",
+                "session_id": "session-shared",
+                "reason": "other",
+            },
+            event_name="SessionEnd",
+        )
+        require(ended.stdout == "", "SessionEnd emitted user-facing output")
         leftovers = sorted(store.directory.rglob("instruction-*.md"))
         require(
             not leftovers,
-            f"Stop left {len(leftovers)} artifact(s); TTL sweep must be the fallback, "
-            "not the normal cleanup path",
+            f"SessionEnd left {len(leftovers)} artifact(s) from completed prompts",
         )
 
 

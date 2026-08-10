@@ -462,9 +462,8 @@ class CodexAdapter:
                 transcript_path=native.transcript_path,
                 cwd=native.cwd,
                 session_id=native.session_id,
-                # Claude Code does not expose a turn_id in its hook contract.
-                # Reuse the bounded session identifier as a turn-directory key;
-                # Stop deletes that directory before the next user prompt.
+                # Claude's prompt_id is projected into native.turn_id. The
+                # session fallback is retained for hosts that expose neither.
                 turn_id=native.turn_id or native.session_id,
                 model=native.model,
             )
@@ -535,7 +534,11 @@ class CodexAdapter:
             or native.native_event != "PostToolUse"
             or native.tool_name != "Read"
             or not native.result_present
+            or not native.tool_read_end_marker_seen
         ):
+            return
+        path_filter = getattr(self.config.instruction_file_store, "accepts_artifact_path", None)
+        if not callable(path_filter) or not path_filter(native.tool_file_path):
             return
         recorder = getattr(self.config.instruction_file_store, "record_complete_read", None)
         if not callable(recorder):

@@ -188,6 +188,7 @@ _COMMON_FIELDS = frozenset(
         "version",
         "host_version",
         "turn_id",
+        "prompt_id",
     }
 )
 _KNOWN_FIELDS = {
@@ -225,12 +226,23 @@ def _decode(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     value: Mapping[str, Any] | str | bytes | bytearray,
     event_name: str | None,
 ) -> tuple[dict[str, Any], str, tuple[str, ...]]:
+    requested = event_name
+    if requested is not None and not isinstance(requested, str):
+        raise NativeWrongType("event_name must be text")
+    if (
+        requested is not None
+        and requested not in KNOWN_EVENTS
+        and requested not in NORMALIZED_TO_NATIVE
+    ):
+        raise NativeUnknownEvent(f"unsupported Codex event lane {requested!r}")
     raw = _json_bytes(value)
     if len(raw) > MAX_POST_TOOL_NATIVE_BYTES:
         raise NativeInputTooLarge(f"native event exceeds {MAX_POST_TOOL_NATIVE_BYTES} bytes")
+    if len(raw) > MAX_NATIVE_BYTES and requested != "PostToolUse":
+        raise NativeInputTooLarge(f"native event exceeds {MAX_NATIVE_BYTES} bytes")
     try:
         decoded = json.loads(raw.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+    except (UnicodeDecodeError, json.JSONDecodeError, RecursionError) as exc:
         # S07 uses a marker for the deliberately non-object malformed case.
         if isinstance(value, str) and value.startswith("<synthetic-non-object>"):
             raise NativeInputNotObject("native input must be an object") from exc
@@ -238,7 +250,6 @@ def _decode(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     if not isinstance(decoded, Mapping):
         raise NativeInputNotObject("native input must be an object")
     document = dict(decoded)
-    requested = event_name
     candidate = document.get("hook_event_name")
     post_tool_envelope = candidate == "PostToolUse" or requested == "PostToolUse"
     read_response_envelope = post_tool_envelope and document.get("tool_name") == "Read"
@@ -251,14 +262,6 @@ def _decode(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
         # the metadata that this boundary consumes.
         shape_document["tool_response"] = None
     _depth_and_shape(shape_document)
-    if requested is not None and not isinstance(requested, str):
-        raise NativeWrongType("event_name must be text")
-    if (
-        requested is not None
-        and requested not in KNOWN_EVENTS
-        and requested not in NORMALIZED_TO_NATIVE
-    ):
-        raise NativeUnknownEvent(f"unsupported Codex event lane {requested!r}")
     selected: str | None
     if requested in NORMALIZED_TO_NATIVE:
         if not isinstance(candidate, str):
@@ -350,27 +353,32 @@ def _read_tool_input(
     document: Mapping[str, Any],
     tool_name: str,
 ) -> tuple[Path | None, int | None, int | None]:
+    """Return optional receipt metadata without invalidating the host event."""
+
     if tool_name != "Read":
         return None, None, None
     value = document.get("tool_input")
     if not isinstance(value, Mapping):
-        raise NativeWrongType("Read.tool_input must be an object")
+        return None, None, None
     raw_path = value.get("file_path")
-    if (
-        not isinstance(raw_path, str)
-        or not raw_path
-        or "\x00" in raw_path
-        or len(raw_path.encode("utf-8")) > 4096
-    ):
-        raise NativeWrongType("Read.file_path must be bounded text")
-    path = Path(raw_path)
-    if not path.is_absolute():
-        raise NativeWrongType("Read.file_path must be absolute")
-    return (
-        path,
-        _optional_read_integer(value, "offset"),
-        _optional_read_integer(value, "limit"),
-    )
+    try:
+        if (
+            not isinstance(raw_path, str)
+            or not raw_path
+            or "\x00" in raw_path
+            or len(raw_path.encode("utf-8")) > 4096
+        ):
+            return None, None, None
+        path = Path(raw_path)
+        if not path.is_absolute():
+            return None, None, None
+        return (
+            path,
+            _optional_read_integer(value, "offset"),
+            _optional_read_integer(value, "limit"),
+        )
+    except (NativeWrongType, UnicodeError):
+        return None, None, None
 
 
 def _size(value: object) -> int | None:
@@ -433,7 +441,19 @@ def _read_end_marker_seen(document: Mapping[str, Any], tool_name: str) -> bool:
     if tool_name != "Read":
         return False
     response = document.get("tool_response")
-    return isinstance(response, str) and INSTRUCTION_ARTIFACT_END_MARKER in response
+    if isinstance(response, str):
+        return INSTRUCTION_ARTIFACT_END_MARKER in response
+    if not isinstance(response, Mapping):
+        return False
+    file_payload = response.get("file")
+    candidates = (
+        response.get("content"),
+        file_payload.get("content") if isinstance(file_payload, Mapping) else None,
+    )
+    return any(
+        isinstance(candidate, str) and INSTRUCTION_ARTIFACT_END_MARKER in candidate
+        for candidate in candidates
+    )
 
 
 def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
@@ -444,6 +464,8 @@ def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
 ) -> CodexNativeEvent:
     session_id = _text(document, "session_id", max_bytes=256)
     turn_id = _text(document, "turn_id", max_bytes=256)
+    if turn_id is None and host in {HostId.CLAUDE_CODE, HostId.CLAUDE_COWORK}:
+        turn_id = _text(document, "prompt_id", max_bytes=256)
     transcript_path = _path(document, "transcript_path")
     cwd = _path(document, "cwd")
     model = _text(document, "model", max_bytes=512)
@@ -489,7 +511,6 @@ def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     if native_name in {"PreToolUse", "PermissionRequest"}:
         name = _tool_name(document)
         use_id = _text(document, "tool_use_id", max_bytes=256)
-        file_path, read_offset, read_limit = _read_tool_input(document, name)
         return CodexNativeEvent(
             native_event=native_name,
             host=host,
@@ -501,9 +522,6 @@ def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
             model=model,
             tool_name=name,
             tool_use_id=use_id,
-            tool_file_path=file_path,
-            tool_read_offset=read_offset,
-            tool_read_limit=read_limit,
             diagnostics=diagnostics,
             ignored_fields=ignored,
         )

@@ -219,16 +219,14 @@ def _method_block(content: InjectableReasoningContent, locale: InjectionLocale) 
 def _procedure_section(theory: str, heading: str) -> str | None:
     """Return one exact canonical procedure section without summarizing it."""
 
-    marker = f"## {heading}\n"
-    start = theory.find(marker)
-    if start < 0:
+    match = re.search(
+        rf"^## {re.escape(heading)}\n+(.*?)(?=^## |\Z)",
+        theory,
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    if match is None:
         return None
-    body_start = start + len(marker)
-    while body_start < len(theory) and theory[body_start] == "\n":
-        body_start += 1
-    end = theory.find("\n## ", body_start)
-    body = theory[body_start:] if end < 0 else theory[body_start:end]
-    normalized = body.strip()
+    normalized = match.group(1).strip()
     return normalized or None
 
 

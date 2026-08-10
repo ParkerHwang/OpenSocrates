@@ -29,7 +29,7 @@ MAX_INSTRUCTION_FILE_BYTES = 1024 * 1024
 _MAX_HEADER_BYTES = 64 * 1024
 _MAX_RECEIPT_BYTES = 16 * 1024
 _ARTIFACT_SCHEMA = "opensocrates.instruction-artifact/2"
-_RECEIPT_SCHEMA = "opensocrates.instruction-read-receipt/1"
+_RECEIPT_SCHEMA = "opensocrates.instruction-read-receipt/2"
 _RECEIPT_FILENAME = ".grounding-receipt.json"
 _HEADER_PREFIX = b"<!-- OPENSOCRATES_ARTIFACT_V2 "
 _HEADER_SUFFIX = b" -->"
@@ -579,6 +579,41 @@ class InstructionFileStore:
                 continue
         return None
 
+    def accepts_artifact_path(self, file_path: str | Path | None) -> bool:
+        """Return whether a path can name one artifact owned by this store."""
+
+        try:
+            candidate = Path(file_path) if isinstance(file_path, (str, Path)) else None
+            if candidate is None or not candidate.is_absolute():
+                return False
+            relative = candidate.relative_to(self._directory)
+        except (TypeError, ValueError):
+            return False
+        parts = relative.parts
+        return (
+            len(parts) == 3
+            and _TAG_RE.fullmatch(parts[0]) is not None
+            and _TAG_RE.fullmatch(parts[1]) is not None
+            and _FILE_RE.fullmatch(parts[2]) is not None
+        )
+
+    def _artifact_instance_tag(self, artifact: InstructionArtifact) -> str:
+        """Bind a receipt to one randomized artifact path without disclosing it."""
+
+        if not self.accepts_artifact_path(artifact.path):
+            raise InstructionArtifactError("instruction artifact path is outside its store")
+        try:
+            relative = artifact.path.relative_to(self._directory).as_posix()
+        except ValueError as error:
+            raise InstructionArtifactError(
+                "instruction artifact path is outside its store"
+            ) from error
+        return _tag(
+            self._installation_key,
+            b"instruction-artifact-instance",
+            relative,
+        )
+
     @staticmethod
     def _receipt_path(artifact: InstructionArtifact) -> Path:
         return artifact.path.parent / _RECEIPT_FILENAME
@@ -593,11 +628,13 @@ class InstructionFileStore:
     def _receipt_core(
         artifact: InstructionArtifact,
         artifact_sha256: str,
+        artifact_instance_tag: str,
         tool_use_tag: str,
     ) -> dict[str, object]:
         return {
             "schema": _RECEIPT_SCHEMA,
             "artifact_sha256": artifact_sha256,
+            "artifact_instance_tag": artifact_instance_tag,
             "content_revision": artifact.content_revision,
             "selected_reasoning_systems": list(artifact.selected_reasoning_systems),
             "tool_use_tag": tool_use_tag,
@@ -684,7 +721,13 @@ class InstructionFileStore:
                 b"instruction-read-tool-use",
                 tool_use,
             )
-            core = self._receipt_core(artifact, artifact_sha256, tool_use_tag)
+            artifact_instance_tag = self._artifact_instance_tag(artifact)
+            core = self._receipt_core(
+                artifact,
+                artifact_sha256,
+                artifact_instance_tag,
+                tool_use_tag,
+            )
             receipt = {
                 **core,
                 "authentication_tag": _receipt_authentication_tag(
@@ -711,6 +754,7 @@ class InstructionFileStore:
             expected_fields = {
                 "schema",
                 "artifact_sha256",
+                "artifact_instance_tag",
                 "content_revision",
                 "selected_reasoning_systems",
                 "tool_use_tag",
@@ -729,16 +773,27 @@ class InstructionFileStore:
             methods = _validate_method_ids(decoded["selected_reasoning_systems"])
             if methods != artifact.selected_reasoning_systems:
                 return False
+            artifact_instance_tag = decoded["artifact_instance_tag"]
             tool_use_tag = decoded["tool_use_tag"]
             authentication_tag = decoded["authentication_tag"]
             if (
-                not isinstance(tool_use_tag, str)
+                not isinstance(artifact_instance_tag, str)
+                or _TAG_RE.fullmatch(artifact_instance_tag) is None
+                or not isinstance(tool_use_tag, str)
                 or _TAG_RE.fullmatch(tool_use_tag) is None
                 or not isinstance(authentication_tag, str)
                 or _TAG_RE.fullmatch(authentication_tag) is None
             ):
                 return False
-            core = self._receipt_core(artifact, artifact_sha256, tool_use_tag)
+            expected_instance_tag = self._artifact_instance_tag(artifact)
+            if not hmac.compare_digest(artifact_instance_tag, expected_instance_tag):
+                return False
+            core = self._receipt_core(
+                artifact,
+                artifact_sha256,
+                expected_instance_tag,
+                tool_use_tag,
+            )
             expected_tag = _receipt_authentication_tag(self._installation_key, core)
             return hmac.compare_digest(authentication_tag, expected_tag)
         except (

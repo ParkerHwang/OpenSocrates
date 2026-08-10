@@ -40,11 +40,11 @@ def hook_command(native_event: str) -> dict[str, Any]:
     }
     if native_event == "UserPromptSubmit":
         command["timeout"] = 35
-    elif native_event == "Stop":
+    elif native_event in {"PostToolUse", "Stop"}:
         # Claude Code's Stop default is 600s and Stop has no shared budget.
         # One second cannot cover launcher dispatch plus frozen-runtime cold
-        # start, so turn-artifact deletion would silently miss its deadline and
-        # fall through to the 24-hour TTL sweep.  Three seconds matches Codex.
+        # start. PostToolUse also validates and persists a receipt, while Stop
+        # validates it and removes the turn artifact. Three seconds matches Codex.
         command["timeout"] = 3
     elif native_event == "SessionEnd":
         # SessionEnd hooks share a 1.5-second budget; stay inside it.
