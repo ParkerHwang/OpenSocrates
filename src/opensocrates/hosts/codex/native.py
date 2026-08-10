@@ -16,14 +16,15 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from ...constants import MAX_CONTROL_DEPTH
+from ...constants import INSTRUCTION_ARTIFACT_END_MARKER, MAX_CONTROL_DEPTH
 from ...domain.enums import HostId
 
-# Codex hook envelopes are deliberately kept below the host-control limit.
-# A final-message declaration is checked independently so a large body never
-# reaches normalization.  Tool payloads are not needed by the adapter, so the
-# same bounded envelope applies to every event in this boundary.
+# Native hook envelopes are deliberately kept below the host-control limit.
+# A successful Read callback may carry one complete bounded instruction
+# artifact; only that envelope gets the larger bound, and its response is
+# reduced to a terminal-marker boolean before leaving this parser.
 MAX_NATIVE_BYTES = 32 * 1024
+MAX_POST_TOOL_NATIVE_BYTES = 2 * 1024 * 1024
 MAX_FINAL_MESSAGE_BYTES = 256 * 1024
 MAX_NATIVE_OBJECT_MEMBERS = 128
 MAX_NATIVE_COLLECTION_ITEMS = 256
@@ -108,6 +109,10 @@ class CodexNativeEvent:
     source: str | None = None
     tool_name: str | None = field(default=None, repr=False)
     tool_use_id: str | None = field(default=None, repr=False)
+    tool_file_path: Path | None = field(default=None, repr=False)
+    tool_read_offset: int | None = field(default=None, repr=False)
+    tool_read_limit: int | None = field(default=None, repr=False)
+    tool_read_end_marker_seen: bool = field(default=False, repr=False)
     result_present: bool = False
     result_size: int | None = field(default=None, repr=False)
     failure_class: str | None = None
@@ -205,6 +210,7 @@ _KNOWN_FIELDS = {
         "error_class",
         "is_interrupt",
         "error",
+        "duration_ms",
     },
     "PermissionRequest": _COMMON_FIELDS | {"tool_name", "tool_input", "description"},
     "PreCompact": _COMMON_FIELDS | {"trigger"},
@@ -220,8 +226,8 @@ def _decode(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     event_name: str | None,
 ) -> tuple[dict[str, Any], str, tuple[str, ...]]:
     raw = _json_bytes(value)
-    if len(raw) > MAX_NATIVE_BYTES:
-        raise NativeInputTooLarge(f"native event exceeds {MAX_NATIVE_BYTES} bytes")
+    if len(raw) > MAX_POST_TOOL_NATIVE_BYTES:
+        raise NativeInputTooLarge(f"native event exceeds {MAX_POST_TOOL_NATIVE_BYTES} bytes")
     try:
         decoded = json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -231,10 +237,20 @@ def _decode(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
         raise NativeParseError("native input is not strict UTF-8 JSON") from exc
     if not isinstance(decoded, Mapping):
         raise NativeInputNotObject("native input must be an object")
-    _depth_and_shape(decoded)
     document = dict(decoded)
     requested = event_name
     candidate = document.get("hook_event_name")
+    post_tool_envelope = candidate == "PostToolUse" or requested == "PostToolUse"
+    read_response_envelope = post_tool_envelope and document.get("tool_name") == "Read"
+    if len(raw) > MAX_NATIVE_BYTES and not read_response_envelope:
+        raise NativeInputTooLarge(f"native event exceeds {MAX_NATIVE_BYTES} bytes")
+    shape_document = dict(document)
+    if read_response_envelope:
+        # A successful Read callback can contain the complete bounded instruction
+        # artifact.  Its result is never retained or projected; shape-check only
+        # the metadata that this boundary consumes.
+        shape_document["tool_response"] = None
+    _depth_and_shape(shape_document)
     if requested is not None and not isinstance(requested, str):
         raise NativeWrongType("event_name must be text")
     if (
@@ -321,6 +337,42 @@ def _tool_name(document: Mapping[str, Any]) -> str:
     return value
 
 
+def _optional_read_integer(tool_input: Mapping[str, Any], key: str) -> int | None:
+    value = tool_input.get(key)
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise NativeWrongType(f"Read.{key} must be a nonnegative integer")
+    return value
+
+
+def _read_tool_input(
+    document: Mapping[str, Any],
+    tool_name: str,
+) -> tuple[Path | None, int | None, int | None]:
+    if tool_name != "Read":
+        return None, None, None
+    value = document.get("tool_input")
+    if not isinstance(value, Mapping):
+        raise NativeWrongType("Read.tool_input must be an object")
+    raw_path = value.get("file_path")
+    if (
+        not isinstance(raw_path, str)
+        or not raw_path
+        or "\x00" in raw_path
+        or len(raw_path.encode("utf-8")) > 4096
+    ):
+        raise NativeWrongType("Read.file_path must be bounded text")
+    path = Path(raw_path)
+    if not path.is_absolute():
+        raise NativeWrongType("Read.file_path must be absolute")
+    return (
+        path,
+        _optional_read_integer(value, "offset"),
+        _optional_read_integer(value, "limit"),
+    )
+
+
 def _size(value: object) -> int | None:
     if value is None:
         return None
@@ -373,6 +425,15 @@ def _post_tool_failed(document: Mapping[str, Any], tool_name: str) -> bool:
     # The synthetic S07 non-zero fixture deliberately omits the raw result and
     # uses Bash as the documented failure path.  No other tool name is inferred.
     return tool_name == "Bash" and response is None
+
+
+def _read_end_marker_seen(document: Mapping[str, Any], tool_name: str) -> bool:
+    """Confirm transiently that a successful Read response reached the artifact terminator."""
+
+    if tool_name != "Read":
+        return False
+    response = document.get("tool_response")
+    return isinstance(response, str) and INSTRUCTION_ARTIFACT_END_MARKER in response
 
 
 def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
@@ -428,6 +489,7 @@ def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     if native_name in {"PreToolUse", "PermissionRequest"}:
         name = _tool_name(document)
         use_id = _text(document, "tool_use_id", max_bytes=256)
+        file_path, read_offset, read_limit = _read_tool_input(document, name)
         return CodexNativeEvent(
             native_event=native_name,
             host=host,
@@ -439,16 +501,21 @@ def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
             model=model,
             tool_name=name,
             tool_use_id=use_id,
+            tool_file_path=file_path,
+            tool_read_offset=read_offset,
+            tool_read_limit=read_limit,
             diagnostics=diagnostics,
             ignored_fields=ignored,
         )
     if native_name == "PostToolUse":
         name = _tool_name(document)
         use_id = _text(document, "tool_use_id", max_bytes=256)
+        file_path, read_offset, read_limit = _read_tool_input(document, name)
         failed = _post_tool_failed(document, name)
         result_size = _size(document.get("output_size"))
         if result_size is None:
             result_size = _size(document.get("result_size"))
+        end_marker_seen = _read_end_marker_seen(document, name) and not failed
         return CodexNativeEvent(
             native_event=native_name,
             host=host,
@@ -460,6 +527,10 @@ def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
             model=model,
             tool_name=name,
             tool_use_id=use_id,
+            tool_file_path=file_path,
+            tool_read_offset=read_offset,
+            tool_read_limit=read_limit,
+            tool_read_end_marker_seen=end_marker_seen,
             result_present=not failed,
             result_size=result_size,
             failure_class=_failure_class(document) if failed else None,
@@ -614,6 +685,7 @@ __all__ = [
     "MAX_NATIVE_BYTES",
     "MAX_NATIVE_COLLECTION_ITEMS",
     "MAX_NATIVE_OBJECT_MEMBERS",
+    "MAX_POST_TOOL_NATIVE_BYTES",
     "NativeInputNotObject",
     "NativeInputTooLarge",
     "NativeParseError",

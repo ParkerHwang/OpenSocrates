@@ -43,10 +43,12 @@ for the host-owned behavior behind this matrix.
 
 ## Authorized selector lifecycle
 
-The generated package configures `SessionStart`, `UserPromptSubmit`, `Stop`,
-and `SessionEnd`. Only `UserPromptSubmit` starts a selector. A compact-restored
-`SessionStart` can re-inject the current temporary-file reference. `Stop` and
-`SessionEnd` remove temporary artifacts.
+The generated package configures `SessionStart`, `UserPromptSubmit`, a
+Read-only `PostToolUse`, `Stop`, and `SessionEnd`. Only `UserPromptSubmit`
+starts a selector. A compact-restored `SessionStart` can re-inject the current
+temporary-file reference. A successful `PostToolUse` for `Read` can record a
+grounding receipt. `Stop` verifies grounding before cleanup, and `SessionEnd`
+removes remaining temporary artifacts.
 
 For each submitted prompt, the runtime starts one non-persistent
 `claude --safe-mode -p` process using the user's existing Claude login. The process:
@@ -85,8 +87,19 @@ OpenSocrates selection on those machines.
 The candidate chooses IDs only. OpenSocrates discards candidate instruction
 text and deterministically assembles the selected authored theory and examples.
 Complete content is written to an owner-only temporary Markdown file. Claude
-receives one hidden `additionalContext` message naming that file and requiring
-it to be read before acting.
+receives one hidden `additionalContext` message naming that file, identifying
+each selection as `method-id@content-revision`, requiring a complete read before
+acting, and requiring the same identifiers in a final grounding audit line.
+When the selected methods' authored `Do not use when` and `Stop conditions` fit
+the hook context budget, those exact sections are also inlined as immediately
+binding rules; they do not replace the complete file read.
+
+The Read-only `PostToolUse` hook accepts a grounding read only when it targets
+the exact current-turn file, starts at the first line, succeeds, and returns the
+file's terminal marker. It then stores an authenticated owner-only receipt.
+At `Stop`, a missing receipt or mismatched final audit line requests one bounded
+repair pass. `stop_hook_active` prevents a continuation loop; if a hook or
+receipt operation is unavailable, the integration fails open.
 
 Non-intervention, an unavailable Claude CLI, authentication failure, timeout,
 malformed output, unknown method ID, unavailable local runtime, or artifact
@@ -95,9 +108,14 @@ failure all produce literal empty hook output and do not block the user's task.
 Raw prompts, transcripts, workspace files, tool values, credentials, selector
 reasoning, and raw CLI output are not written to OpenSocrates records, logs,
 metrics, diagnostics, or instruction files. This Claude selector does not read
-transcripts or workspace files. Temporary instruction files contain authored
-OpenSocrates content only; `Stop` removes the active turn, `SessionEnd` removes
-the session, and `SessionStart` sweeps crash leftovers older than 24 hours.
+transcripts or workspace files. The complete Read response is checked only in
+memory for the terminal marker and is not retained. A grounding receipt contains
+only the artifact digest, content revision, selected method IDs, and keyed
+authentication/tool-use tags; it contains no prompt, tool output, workspace
+path, or artifact path. Temporary instruction files contain authored
+OpenSocrates content only; `Stop` removes the active turn and its receipt,
+`SessionEnd` removes the session, and `SessionStart` sweeps crash leftovers
+older than 24 hours.
 
 ## Package contents
 

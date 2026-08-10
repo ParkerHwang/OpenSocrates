@@ -7,6 +7,7 @@ from typing import Any
 NATIVE_TO_NORMALIZED = {
     "SessionStart": "session_started",
     "UserPromptSubmit": "user_prompt_submitted",
+    "PostToolUse": "tool_succeeded",
     "Stop": "completion_candidate",
     "SessionEnd": "session_ended",
 }
@@ -16,6 +17,7 @@ CLAUDE_NATIVE_EVENTS = tuple(NATIVE_TO_NORMALIZED)
 _MATCHERS = {
     "SessionStart": "startup|resume|clear|compact|fork",
     "UserPromptSubmit": "",
+    "PostToolUse": "Read",
     "Stop": "",
     "SessionEnd": "clear|resume|logout|prompt_input_exit|bypass_permissions_disabled|other",
 }
@@ -61,7 +63,9 @@ def build_hooks() -> dict[str, Any]:
             entry["matcher"] = matcher
         hooks[native_event] = [entry]
     return {
-        "description": "Fail-open OpenSocrates prompt selection and artifact cleanup.",
+        "description": (
+            "Fail-open OpenSocrates prompt selection, grounding-read receipt, and cleanup."
+        ),
         "hooks": hooks,
     }
 

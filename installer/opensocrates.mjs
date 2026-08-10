@@ -24,7 +24,7 @@ import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 
-export const PRODUCT_VERSION = "1.1.1";
+export const PRODUCT_VERSION = "1.1.2";
 export const REPOSITORY = "ParkerHwang/OpenSocrates";
 export const MARKETPLACE_NAME = "opensocrates";
 export const PLUGIN_NAME = "opensocrates";

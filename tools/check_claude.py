@@ -11,10 +11,13 @@ from collections.abc import Callable
 from pathlib import Path
 from unittest.mock import patch
 
+from opensocrates.constants import INSTRUCTION_ARTIFACT_END_MARKER
 from opensocrates.content import ProjectionInstructionAssembler, load_reasoning_content_projections
+from opensocrates.domain.enums import HostId
 from opensocrates.hooks.entrypoint import parse_hook_arguments
 from opensocrates.hosts.claude.adapter import ClaudeAdapter, ClaudeAdapterConfig
 from opensocrates.hosts.claude.commands import build_hooks
+from opensocrates.hosts.codex.native import parse_codex_event
 from opensocrates.selector import (
     InstructionFileStore,
     SelectorApplication,
@@ -112,13 +115,20 @@ def test_plugin_hook_contract() -> None:
     )
     hooks = build_hooks()
     require(
-        set(hooks["hooks"]) == {"SessionStart", "UserPromptSubmit", "Stop", "SessionEnd"},
+        set(hooks["hooks"])
+        == {"SessionStart", "UserPromptSubmit", "PostToolUse", "Stop", "SessionEnd"},
         "unexpected Claude hook set",
     )
     handler = hooks["hooks"]["UserPromptSubmit"][0]["hooks"][0]
     require(handler["command"] == "${CLAUDE_PLUGIN_ROOT}/bin/launch.sh", "unsafe command")
     require(handler["args"] == ["hook", "claude", "user_prompt_submitted"], "unsafe args")
     require(handler["timeout"] == 35, "host hook deadline is not explicit")
+    read_handler = hooks["hooks"]["PostToolUse"][0]
+    require(read_handler["matcher"] == "Read", "grounding receipt hook is not Read-only")
+    require(
+        read_handler["hooks"][0]["args"] == ["hook", "claude", "tool_succeeded"],
+        "grounding receipt hook uses the wrong lane",
+    )
     require(
         parse_hook_arguments(("claude", "user_prompt_submitted"))
         == ("claude", "user_prompt_submitted"),
@@ -214,7 +224,15 @@ def test_adapter_injection_and_cleanup() -> None:
         specific = response["hookSpecificOutput"]
         require(specific["hookEventName"] == "UserPromptSubmit", "wrong response event")
         require("File path:" in specific["additionalContext"], "artifact reference missing")
+        require(
+            "Blocking rules: Critical Thinking" in specific["additionalContext"]
+            and "Do not use when" in specific["additionalContext"]
+            and "critical-thinking@1" in specific["additionalContext"],
+            "selected method guardrails or revision audit were not inlined",
+        )
         require(any(store.directory.rglob("instruction-*.md")), "artifact was not created")
+        artifact = store.latest_for_session("session-a")
+        require(artifact is not None, "artifact metadata is unavailable")
 
         stop = adapter.handle(
             {
@@ -225,7 +243,99 @@ def test_adapter_injection_and_cleanup() -> None:
             },
             event_name="Stop",
         )
-        require(stop.stdout == "", "Stop was not literal-empty")
+        blocked = json.loads(stop.stdout)
+        require(blocked.get("decision") == "block", "ungrounded Stop was not continued")
+        require(artifact.path.is_file(), "blocked Stop deleted the grounding artifact")
+
+        partial = adapter.handle(
+            {
+                "hook_event_name": "PostToolUse",
+                "session_id": "session-a",
+                "tool_name": "Read",
+                "tool_use_id": "tool-partial",
+                "tool_input": {"file_path": str(artifact.path), "offset": 2},
+                "tool_response": "partial",
+            },
+            event_name="PostToolUse",
+        )
+        require(partial.stdout == "", "PostToolUse emitted user-facing output")
+        require(
+            not store.has_complete_read_receipt(artifact),
+            "partial Read produced a complete grounding receipt",
+        )
+
+        truncated = adapter.handle(
+            {
+                "hook_event_name": "PostToolUse",
+                "session_id": "session-a",
+                "tool_name": "Read",
+                "tool_use_id": "tool-truncated",
+                "tool_input": {"file_path": str(artifact.path)},
+                "tool_response": "first lines only",
+            },
+            event_name="PostToolUse",
+        )
+        require(truncated.stdout == "", "truncated PostToolUse emitted user-facing output")
+        require(
+            not store.has_complete_read_receipt(artifact),
+            "Read response without the terminal marker produced a complete receipt",
+        )
+
+        read = adapter.handle(
+            {
+                "hook_event_name": "PostToolUse",
+                "session_id": "session-a",
+                "tool_name": "Read",
+                "tool_use_id": "tool-complete",
+                "tool_input": {"file_path": str(artifact.path)},
+                "tool_response": artifact.path.read_text(encoding="utf-8"),
+            },
+            event_name="PostToolUse",
+        )
+        require(read.stdout == "", "successful grounding Read emitted output")
+        require(
+            store.has_complete_read_receipt(artifact),
+            "complete grounding Read did not produce a receipt",
+        )
+
+        receipt_path = artifact.path.parent / ".grounding-receipt.json"
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        receipt["artifact_sha256"] = "sha256:" + "0" * 64
+        receipt_path.write_text(
+            json.dumps(receipt, sort_keys=True, separators=(",", ":")),
+            encoding="utf-8",
+        )
+        require(
+            not store.has_complete_read_receipt(artifact),
+            "tampered grounding receipt was accepted",
+        )
+        restored = adapter.handle(
+            {
+                "hook_event_name": "PostToolUse",
+                "session_id": "session-a",
+                "tool_name": "Read",
+                "tool_use_id": "tool-complete-restored",
+                "tool_input": {"file_path": str(artifact.path)},
+                "tool_response": artifact.path.read_text(encoding="utf-8"),
+            },
+            event_name="PostToolUse",
+        )
+        require(restored.stdout == "", "receipt restoration emitted user-facing output")
+        require(
+            store.has_complete_read_receipt(artifact),
+            "valid Read did not replace a tampered receipt",
+        )
+
+        grounded_stop = adapter.handle(
+            {
+                "hook_event_name": "Stop",
+                "session_id": "session-a",
+                "stop_hook_active": False,
+                "last_assistant_message": f"Done\n\n{artifact.grounding_footer()}",
+            },
+            event_name="Stop",
+        )
+        require(grounded_stop.stdout == "", "grounded Stop was not literal-empty")
         require(not any(store.directory.rglob("instruction-*.md")), "Stop did not clean turn")
 
         forked = adapter.handle(
@@ -237,6 +347,46 @@ def test_adapter_injection_and_cleanup() -> None:
             event_name="SessionStart",
         )
         require(forked.stdout == "", "fork SessionStart was rejected")
+
+
+@check("CLAUDE-04A-issue-32-grounding-specifics")
+def test_issue_32_grounding_specifics() -> None:
+    value = projections()
+    assembler = ProjectionInstructionAssembler(value)
+    assembled = assembler.assemble(("triangulation",), requested_locale="en")
+    with tempfile.TemporaryDirectory(prefix="opensocrates-grounding-check-") as name:
+        store = InstructionFileStore(installation_key=b"g" * 32, directory=Path(name) / "artifacts")
+        artifact = store.create("session-grounding", "turn-grounding", assembled)
+        context = artifact.reference_message()
+        require(
+            "all sources repeat one underlying dataset" in context,
+            "triangulation's dependent-source exclusion was not in trusted context",
+        )
+        require(
+            "all streams share one unverified source" in context,
+            "triangulation's shared-source stop condition was not in trusted context",
+        )
+        require(
+            artifact.grounding_footer() == "OpenSocrates grounding: triangulation@1",
+            "triangulation method/revision audit line drifted",
+        )
+
+    parsed = parse_codex_event(
+        {
+            "hook_event_name": "PostToolUse",
+            "session_id": "session-grounding",
+            "tool_name": "Read",
+            "tool_use_id": "tool-large-read",
+            "tool_input": {"file_path": "/tmp/instruction-large.md"},
+            "tool_response": "x" * (40 * 1024) + INSTRUCTION_ARTIFACT_END_MARKER,
+        },
+        event_name="PostToolUse",
+        host=HostId.CLAUDE_CODE,
+    )
+    require(
+        parsed.tool_read_end_marker_seen,
+        "a complete Read response above the generic hook bound lost its terminal marker",
+    )
 
 
 @check("CLAUDE-05-environment-allowlist-is-exact")
@@ -536,7 +686,7 @@ def test_two_turns_in_one_session() -> None:
             {
                 "hook_event_name": "Stop",
                 "session_id": "session-shared",
-                "stop_hook_active": False,
+                "stop_hook_active": True,
                 "last_assistant_message": "Done",
             },
             event_name="Stop",

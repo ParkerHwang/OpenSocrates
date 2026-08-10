@@ -3,6 +3,34 @@
 All notable changes to OpenSocrates are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.1.2] - 2026-08-11
+
+### Added
+
+- A Claude `PostToolUse` grounding receipt that is created only after a
+  successful `Read` starts at the first line, reaches the instruction
+  artifact's terminal marker, and targets the current turn's exact file.
+- One bounded `Stop` repair pass when Claude attempts to finish without a
+  verified read receipt or the exact public method/revision audit line.
+
+### Fixed
+
+- Selected reasoning methods can no longer silently pass the Claude completion
+  gate when the model skips their required reference read and substitutes
+  prior knowledge. Each selected method is identified as
+  `method-id@content-revision`, and its authored `Do not use when` and
+  `Stop conditions` are inlined when they fit the trusted context budget
+  ([#32](https://github.com/ParkerHwang/OpenSocrates/issues/32)).
+
+### Security and privacy
+
+- Grounding receipts are owner-only and authenticated. They contain only the
+  instruction artifact digest, content revision, selected method IDs, and
+  keyed tags; they never contain prompts, transcripts, tool output, credentials,
+  or workspace and artifact paths, and they are removed with the turn artifact.
+- The complete `Read` response is inspected transiently for the terminal marker
+  and is neither retained nor projected into OpenSocrates records.
+
 ## [1.1.1] - 2026-08-10
 
 ### Added
@@ -127,3 +155,4 @@ All notable changes to OpenSocrates are documented here. This project follows
 [1.0.0]: https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.0.0
 [1.1.0]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.0.0...v1.1.0
 [1.1.1]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.0...v1.1.1
+[1.1.2]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.1...v1.1.2
