@@ -3,6 +3,41 @@
 All notable changes to OpenSocrates are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.1.1] - 2026-08-10
+
+### Added
+
+- One-command `--host all` support for install, status, update, remove, and
+  verification, backed by one desired-state manifest for the selected channel,
+  installed hosts, and active version.
+- Cross-host preflight, package verification, staging, activation, and reverse
+  rollback so a partial Claude/Codex activation cannot leave a newly selected
+  version on only one host.
+- Opt-in macOS LaunchAgent updates through `auto-update enable`, `status`,
+  `disable`, and the internal scheduled reconciliation command. Checks use a
+  bounded interval with jitter, a single-instance lock, compatible-version
+  policy, and concise local receipts.
+
+### Changed
+
+- Claude now exposes one `/opensocrates` skill. The 48 method procedures,
+  rigor, evidence audit, trace, and status behavior are internal supporting
+  references or subcommands instead of separate top-level skills and commands.
+- Updating a managed v1.1.0 Claude installation replaces the old multi-skill
+  package tree, removing stale top-level method and helper entries.
+- `status --host all` reports the desired and available version, last check,
+  last successful update, and per-host drift.
+
+### Security and privacy
+
+- Automatic updates remain disabled until explicitly enabled, verify both the
+  outer release checksum and complete package manifest before activation, and
+  preserve the previous registrations on preflight, verification, staging, or
+  activation failure.
+- Desired state, locks, and receipts use owner-only permissions. Receipts keep
+  only version, time, per-host result, and error category; no prompts,
+  transcripts, credentials, or workspace paths are stored.
+
 ## [1.1.0] - 2026-08-06
 
 ### Added
@@ -90,3 +125,4 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 [1.0.0]: https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.0.0
 [1.1.0]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.0.0...v1.1.0
+[1.1.1]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.0...v1.1.1

@@ -1,6 +1,6 @@
 {
   "host": "claude",
-  "template_revision": "1",
+  "template_revision": "2",
   "launcher_host": "claude",
   "manifest_template": ".claude-plugin/plugin.json.tmpl",
   "manifest_output": ".claude-plugin/plugin.json",
@@ -13,37 +13,14 @@
       "output": "skills/opensocrates/SKILL.md"
     },
     {
-      "template": "skills/rigor/SKILL.md.tmpl",
-      "output": "skills/rigor/SKILL.md"
-    },
-    {
-      "template": "skills/trace/SKILL.md.tmpl",
-      "output": "skills/trace/SKILL.md"
+      "template": "skills/opensocrates/references/catalog.md.tmpl",
+      "output": "skills/opensocrates/references/catalog.md"
     }
   ],
-  "method_template": "skills/method/SKILL.md.tmpl",
-  "method_output": "skills/{method_id}/SKILL.md",
+  "public_skills": ["opensocrates"],
+  "method_template": "skills/opensocrates/references/method.md.tmpl",
+  "method_output": "skills/opensocrates/references/methods/{method_id}.md",
   "command_templates": [
-    {
-      "template": "commands/auto.md.tmpl",
-      "output": "commands/auto.md"
-    },
-    {
-      "template": "commands/evidence-audit.md.tmpl",
-      "output": "commands/evidence-audit.md"
-    },
-    {
-      "template": "commands/reasoning-trace.md.tmpl",
-      "output": "commands/reasoning-trace.md"
-    },
-    {
-      "template": "commands/opensocrates-status.md.tmpl",
-      "output": "commands/opensocrates-status.md"
-    },
-    {
-      "template": "commands/status.md.tmpl",
-      "output": "commands/status.md"
-    },
     {
       "template": "README.md.tmpl",
       "output": "README.md"

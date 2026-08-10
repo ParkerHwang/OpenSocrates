@@ -1864,9 +1864,21 @@ def _launcher_check(root: Path) -> dict[str, Any]:  # noqa: C901  # Branch-expli
             invalid += sum(not _launcher_command(value, host) for value in values)
         if host == "codex" and not _codex_user_prompt_timeout_omitted(document):
             errors.add("generated_codex_user_prompt_timeout_not_omitted")
-        for path in (base / host / "commands", base / host / "skills"):
+        generator = _load_json(root / "plugin-src" / host / "generator.json")
+        command_templates = generator.get("command_templates", []) if generator else []
+        commands_expected = any(
+            isinstance(item, Mapping)
+            and isinstance(item.get("output"), str)
+            and str(item["output"]).startswith("commands/")
+            for item in command_templates
+        )
+        for surface, path in (
+            ("commands", base / host / "commands"),
+            ("skills", base / host / "skills"),
+        ):
             if not path.is_dir():
-                errors.add("generated_launcher_surface_missing")
+                if surface == "skills" or commands_expected:
+                    errors.add("generated_launcher_surface_missing")
                 continue
             for candidate in path.rglob("*.md"):
                 try:

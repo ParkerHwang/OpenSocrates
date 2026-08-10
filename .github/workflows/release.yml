@@ -82,11 +82,12 @@ jobs:
               cd dist
               shasum -a 256 "${asset}" > "${asset}.sha256"
             )
-            node installer/opensocrates.mjs verify \
-              --host "${host}" \
-              --asset "dist/${asset}" \
-              --checksum "dist/${asset}.sha256"
           done
+          node installer/opensocrates.mjs verify --host all \
+            --asset-claude "dist/opensocrates-${RELEASE_VERSION}-claude-plugin.zip" \
+            --checksum-claude "dist/opensocrates-${RELEASE_VERSION}-claude-plugin.zip.sha256" \
+            --asset-codex "dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip" \
+            --checksum-codex "dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip.sha256"
           chat_asset="opensocrates-${RELEASE_VERSION}-claude-chat-skills.zip"
           (
             cd dist

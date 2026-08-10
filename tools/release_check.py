@@ -1114,20 +1114,17 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
     else:
         errors.add("bundle_method_ids_invalid")
     skills = generated / "skills"
-    method_dirs = (
-        {
-            path.name
-            for path in skills.iterdir()
-            if skills.is_dir()
-            and path.is_dir()
-            and (path / "SKILL.md").is_file()
-            and path.name in method_ids
-        }
-        if skills.is_dir()
+    method_output = metadata.get("method_output")
+    method_outputs = (
+        {str(method_output).replace("{method_id}", method_id) for method_id in method_ids}
+        if isinstance(method_output, str)
         else set()
     )
-    if method_dirs != method_ids:
-        errors.add("method_wrapper_count_or_set_invalid")
+    existing_method_outputs = {
+        output for output in method_outputs if (generated / output).is_file()
+    }
+    if existing_method_outputs != method_outputs:
+        errors.add("method_content_count_or_set_invalid")
     shared_templates = metadata.get("shared_templates", [])
     shared_outputs = {
         str(item.get("output"))
@@ -1137,6 +1134,26 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
     missing_shared = [output for output in shared_outputs if not (generated / output).is_file()]
     if missing_shared:
         errors.add("shared_skill_missing")
+    top_level_shared_skills = {
+        Path(output).parts[1]
+        for output in shared_outputs
+        if len(Path(output).parts) == 3
+        and Path(output).parts[0] == "skills"
+        and Path(output).parts[2] == "SKILL.md"
+    }
+    configured_public_skills = metadata.get("public_skills")
+    expected_public_skills = (
+        {str(value) for value in configured_public_skills if isinstance(value, str)}
+        if isinstance(configured_public_skills, list)
+        else method_ids | top_level_shared_skills
+    )
+    actual_public_skills = (
+        {path.name for path in skills.iterdir() if path.is_dir() and (path / "SKILL.md").is_file()}
+        if skills.is_dir()
+        else set()
+    )
+    if actual_public_skills != expected_public_skills:
+        errors.add("public_skill_set_invalid")
     command_templates = metadata.get("command_templates", [])
     command_outputs = {
         str(item.get("output"))
@@ -1147,6 +1164,8 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
     }
     if any(not (generated / output).is_file() for output in command_outputs):
         errors.add("command_surface_missing")
+    if host == "claude" and any((generated / "commands").glob("*.md")):
+        errors.add("claude_duplicate_command_surface_present")
     if len(list((generated / "schemas" / "v1").glob("*.json"))) != EXPECTED_SCHEMA_COUNT:
         errors.add("package_schema_count_invalid")
     for required in (
@@ -1197,8 +1216,9 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         errors.add("runtime_target_missing_from_manifest")
     return {
         "status": "fail" if errors else "pass",
-        "method_count": len(method_dirs),
-        "shared_skill_count": len(shared_outputs),
+        "method_count": len(existing_method_outputs),
+        "shared_skill_count": len(top_level_shared_skills),
+        "public_skill_count": len(actual_public_skills),
         "command_count": len(command_outputs),
         "schema_count": len(list((generated / "schemas" / "v1").glob("*.json"))),
         "embedded_bundle_count": len(embedded),
@@ -1267,7 +1287,7 @@ def _verify_claude_chat_skills(
         if isinstance(raw_method_ids, list)
         else set()
     )
-    expected_skills = method_ids | {"opensocrates", "rigor", "trace"}
+    expected_skills = {"opensocrates"}
     skills = package / "skills"
     actual_skills = (
         {
@@ -1280,6 +1300,16 @@ def _verify_claude_chat_skills(
     )
     if actual_skills != expected_skills:
         errors.add("claude_chat_skill_set_invalid")
+    method_references = {
+        method_id
+        for method_id in method_ids
+        if (skills / "opensocrates" / "references" / "methods" / f"{method_id}.md").is_file()
+    }
+    if (
+        method_references != method_ids
+        or not (skills / "opensocrates" / "references" / "catalog.md").is_file()
+    ):
+        errors.add("claude_chat_internal_method_references_invalid")
     if not (package / "LICENSE").is_file():
         errors.add("claude_chat_license_missing")
     forbidden_trees = ("bin", "commands", "content", "hooks", "runtime", "schemas")
