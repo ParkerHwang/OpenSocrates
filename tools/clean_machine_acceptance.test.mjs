@@ -6,10 +6,15 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 
 import {
+  inspectManagedLayout,
   makeReport,
   packExisting,
   writeReports,
 } from "./clean_machine_acceptance.mjs";
+
+function writeJson(target, value) {
+  writeFileSync(target, `${JSON.stringify(value, null, 2)}\n`);
+}
 
 function acceptanceFixture() {
   const root = mkdtempSync(join(tmpdir(), "opensocrates-acceptance-test-"));
@@ -67,5 +72,53 @@ test("clean-machine evidence: free-form manual text is rejected", () => {
     assert.equal(existsSync(`${fixture.directory}.zip`), false);
   } finally {
     fixture.cleanup();
+  }
+});
+
+test("clean-machine layout: resolves each plugin from its managed marketplace metadata", () => {
+  const root = mkdtempSync(join(tmpdir(), "opensocrates-layout-test-"));
+  try {
+    const roots = {
+      claude: join(root, "claude", "managed-marketplaces", "opensocrates"),
+      codex: join(root, "codex", "managed-marketplaces", "opensocrates"),
+    };
+    const claudePlugin = join(roots.claude, "plugins", "opensocrates");
+    const codexPlugin = join(roots.codex, "build", "generated", "plugins", "codex");
+    mkdirSync(join(roots.claude, ".claude-plugin"), { recursive: true });
+    mkdirSync(join(roots.codex, ".agents", "plugins"), { recursive: true });
+    mkdirSync(join(claudePlugin, "skills", "opensocrates"), { recursive: true });
+    mkdirSync(join(codexPlugin, "skills", "opensocrates"), { recursive: true });
+    writeJson(join(roots.claude, ".claude-plugin", "marketplace.json"), {
+      plugins: [{ name: "opensocrates", source: "./plugins/opensocrates" }],
+    });
+    writeJson(join(roots.codex, ".agents", "plugins", "marketplace.json"), {
+      plugins: [
+        {
+          name: "opensocrates",
+          source: { source: "local", path: "./build/generated/plugins/codex" },
+        },
+      ],
+    });
+    for (const host of ["claude", "codex"]) {
+      writeJson(join(roots[host], ".opensocrates-managed.json"), {
+        marketplaceName: "opensocrates",
+        pluginName: "opensocrates",
+      });
+    }
+    writeFileSync(join(claudePlugin, "skills", "opensocrates", "SKILL.md"), "# controller\n");
+    writeFileSync(join(codexPlugin, "skills", "opensocrates", "SKILL.md"), "# controller\n");
+
+    assert.deepEqual(inspectManagedLayout(roots), {
+      claudePublicSkills: ["opensocrates"],
+      claudeCommandsPresent: false,
+      codexControllerPresent: true,
+    });
+
+    writeJson(join(roots.claude, ".claude-plugin", "marketplace.json"), {
+      plugins: [{ name: "opensocrates", source: "./../../outside-owned-root" }],
+    });
+    assert.throws(() => inspectManagedLayout(roots), /plugin source escapes its owned root/u);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
   }
 });

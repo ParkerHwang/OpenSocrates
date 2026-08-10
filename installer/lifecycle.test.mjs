@@ -14,6 +14,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { PRODUCT_VERSION, main, withOperationLock } from "./opensocrates.mjs";
+import { inspectManagedLayout } from "../tools/clean_machine_acceptance.mjs";
 
 const MARKETPLACE = "opensocrates";
 const PLUGIN_ID = `opensocrates@${MARKETPLACE}`;
@@ -47,6 +48,7 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
   const manifestDir = host === "claude" ? ".claude-plugin" : ".codex-plugin";
   mkdirSync(join(tree, manifestDir), { recursive: true });
   mkdirSync(join(tree, "runtime", "darwin-arm64", "opensocrates-runtime"), { recursive: true });
+  mkdirSync(join(tree, "skills", "opensocrates"), { recursive: true });
 
   const files = {};
   files[`${manifestDir}/plugin.json`] = JSON.stringify(
@@ -60,6 +62,7 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
     2,
   );
   files["runtime/darwin-arm64/opensocrates-runtime/opensocrates-runtime"] = "#!/bin/sh\nexit 0\n";
+  files["skills/opensocrates/SKILL.md"] = "# OpenSocrates controller\n";
 
   for (const [name, body] of Object.entries(files)) {
     writeFileSync(join(tree, ...name.split("/")), body);
@@ -501,6 +504,11 @@ test("all hosts: fresh install uses one desired version and one manifest", async
     const desired = box.desired();
     assert.deepEqual(desired.installedHosts, ["claude", "codex"]);
     assert.equal(desired.activeVersion, PRODUCT_VERSION);
+    assert.deepEqual(inspectManagedLayout(box.managedRoots), {
+      claudePublicSkills: ["opensocrates"],
+      claudeCommandsPresent: false,
+      codexControllerPresent: true,
+    });
 
     const status = await quiet(() => main(["status", "--host", "all"]));
     assert.equal(status.error, undefined);

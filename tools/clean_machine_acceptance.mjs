@@ -16,7 +16,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -172,6 +172,85 @@ function requireOwnerOnly(target, category, label) {
 
 function managedRoot(host) {
   return join(homedir(), host === "claude" ? ".claude" : ".codex", "managed-marketplaces", "opensocrates");
+}
+
+function installedPluginRoot(host, root) {
+  const marketplacePath = join(
+    root,
+    ...(host === "claude"
+      ? [".claude-plugin", "marketplace.json"]
+      : [".agents", "plugins", "marketplace.json"]),
+  );
+  if (!pathPresent(marketplacePath)) {
+    fail("post-install", `${host} managed marketplace metadata is missing`);
+  }
+  const marketplace = parseJson(
+    readFileSync(marketplacePath, "utf8"),
+    "post-install",
+    `${host} managed marketplace metadata is invalid JSON`,
+  );
+  const plugins = Array.isArray(marketplace?.plugins) ? marketplace.plugins : [];
+  const matches = plugins.filter((entry) => entry?.name === "opensocrates");
+  if (matches.length !== 1) {
+    fail("post-install", `${host} managed marketplace does not declare one OpenSocrates plugin`);
+  }
+  const source = host === "claude" ? matches[0].source : matches[0].source?.path;
+  if (typeof source !== "string" || !source.startsWith("./")) {
+    fail("post-install", `${host} managed marketplace has an invalid local plugin source`);
+  }
+  const pluginRoot = resolve(root, source);
+  const local = relative(root, pluginRoot);
+  if (local === "" || local === ".." || local.startsWith(`..${sep}`)) {
+    fail("post-install", `${host} managed marketplace plugin source escapes its owned root`);
+  }
+  const info = pathPresent(pluginRoot) ? lstatSync(pluginRoot) : null;
+  if (!info?.isDirectory() || info.isSymbolicLink()) {
+    fail("post-install", `${host} managed marketplace plugin root is missing or unsafe`);
+  }
+  return pluginRoot;
+}
+
+function inspectManagedLayout(
+  roots = { claude: managedRoot("claude"), codex: managedRoot("codex") },
+) {
+  const claudePlugin = installedPluginRoot("claude", roots.claude);
+  const codexPlugin = installedPluginRoot("codex", roots.codex);
+  const claudeSkillsPath = join(claudePlugin, "skills");
+  if (!pathPresent(claudeSkillsPath)) {
+    fail("post-install", "Claude's installed plugin has no skills directory");
+  }
+  const claudeSkills = readdirSync(claudeSkillsPath);
+  if (!sameStrings(claudeSkills, ["opensocrates"])) {
+    fail("post-install", "Claude exposes more than the single OpenSocrates controller skill");
+  }
+  if (
+    pathPresent(join(claudePlugin, "commands")) ||
+    !pathPresent(join(claudeSkillsPath, "opensocrates", "SKILL.md"))
+  ) {
+    fail("post-install", "Claude's public controller layout is not canonical");
+  }
+  if (!pathPresent(join(codexPlugin, "skills", "opensocrates", "SKILL.md"))) {
+    fail("post-install", "Codex's OpenSocrates controller skill is missing");
+  }
+  for (const host of HOSTS) {
+    const markerPath = join(roots[host], ".opensocrates-managed.json");
+    if (!pathPresent(markerPath)) {
+      fail("post-install", `${host} ownership marker is missing`);
+    }
+    const marker = parseJson(
+      readFileSync(markerPath, "utf8"),
+      "post-install",
+      `${host} has an invalid ownership marker`,
+    );
+    if (marker?.marketplaceName !== "opensocrates" || marker?.pluginName !== "opensocrates") {
+      fail("post-install", `${host} has the wrong ownership marker`);
+    }
+  }
+  return {
+    claudePublicSkills: claudeSkills,
+    claudeCommandsPresent: false,
+    codexControllerPresent: true,
+  };
 }
 
 function marketplaceEntries(host) {
@@ -901,40 +980,9 @@ async function runAcceptance() {
       "managed-layout",
       "Verify the installed managed trees and Claude's single public skill",
       () => {
-        const claudeRoot = managedRoot("claude");
-        const codexRoot = managedRoot("codex");
-        const claudeSkills = readdirSync(join(claudeRoot, "skills"));
-        if (!sameStrings(claudeSkills, ["opensocrates"])) {
-          fail("post-install", "Claude exposes more than the single OpenSocrates controller skill");
-        }
-        if (
-          pathPresent(join(claudeRoot, "commands")) ||
-          !pathPresent(join(claudeRoot, "skills", "opensocrates", "SKILL.md"))
-        ) {
-          fail("post-install", "Claude's public controller layout is not canonical");
-        }
-        if (!pathPresent(join(codexRoot, "skills", "opensocrates", "SKILL.md"))) {
-          fail("post-install", "Codex's OpenSocrates controller skill is missing");
-        }
-        for (const host of HOSTS) {
-          const marker = parseJson(
-            readFileSync(join(managedRoot(host), ".opensocrates-managed.json"), "utf8"),
-            "post-install",
-            `${host} has an invalid ownership marker`,
-          );
-          if (
-            marker?.marketplaceName !== "opensocrates" ||
-            marker?.pluginName !== "opensocrates"
-          ) {
-            fail("post-install", `${host} has the wrong ownership marker`);
-          }
-        }
-        report.assertions.managedLayout = {
-          claudePublicSkills: claudeSkills,
-          claudeCommandsPresent: false,
-          codexControllerPresent: true,
-        };
-        return { claudePublicSkills: claudeSkills };
+        const layout = inspectManagedLayout();
+        report.assertions.managedLayout = layout;
+        return { claudePublicSkills: layout.claudePublicSkills };
       },
       scratch,
     );
@@ -1064,7 +1112,14 @@ for the real authenticated Claude Code and Codex homes. The second command adds
 manual observations and creates a privacy-safe ZIP for review.`);
 }
 
-export { AcceptanceError, makeReport, manualTemplate, packExisting, writeReports };
+export {
+  AcceptanceError,
+  inspectManagedLayout,
+  makeReport,
+  manualTemplate,
+  packExisting,
+  writeReports,
+};
 
 export async function main(args = process.argv.slice(2)) {
   try {
