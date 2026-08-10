@@ -1166,6 +1166,20 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         errors.add("command_surface_missing")
     if host == "claude" and any((generated / "commands").glob("*.md")):
         errors.add("claude_duplicate_command_surface_present")
+    if host == "codex":
+        host_only_notice = "Never execute that control command directly"
+        controller = generated / "skills" / "opensocrates" / "SKILL.md"
+        rigor = generated / "skills" / "rigor" / "SKILL.md"
+        guarded_surfaces = [controller, rigor, *(generated / output for output in method_outputs)]
+        for surface in guarded_surfaces:
+            try:
+                contents = surface.read_text(encoding="utf-8")
+            except (OSError, UnicodeError):
+                errors.add("codex_control_boundary_notice_missing")
+                break
+            if host_only_notice not in contents:
+                errors.add("codex_control_boundary_notice_missing")
+                break
     if len(list((generated / "schemas" / "v1").glob("*.json"))) != EXPECTED_SCHEMA_COUNT:
         errors.add("package_schema_count_invalid")
     for required in (
