@@ -71,6 +71,10 @@ Native release work additionally requires Apple-silicon macOS:
 make release-check
 ```
 
+Release candidates that change installation or host packaging should also use
+the [clean-machine acceptance procedure](docs/clean-machine-acceptance.md) on a
+separate Mac and attach its privacy-safe result bundle to the pull request.
+
 If a platform-dependent check cannot be run, state that clearly in the pull
 request instead of claiming it passed.
 

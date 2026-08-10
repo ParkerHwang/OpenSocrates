@@ -121,6 +121,7 @@ function defaultDesiredState() {
     },
     autoUpdate: {
       enabled: false,
+      hosts: [],
       nextCheckAt: null,
     },
     availableVersion: null,
@@ -160,6 +161,23 @@ function normalizeDesiredState(value) {
   ) {
     fail("the OpenSocrates desired-state manifest has an invalid update policy");
   }
+  const autoUpdateHosts =
+    value.autoUpdate.hosts === undefined
+      ? value.autoUpdate.enabled
+        ? installedHosts
+        : []
+      : value.autoUpdate.hosts;
+  if (
+    !Array.isArray(autoUpdateHosts) ||
+    autoUpdateHosts.some(
+      (host) => !SUPPORTED_HOSTS.includes(host) || !installedHosts.includes(host),
+    ) ||
+    new Set(autoUpdateHosts).size !== autoUpdateHosts.length ||
+    (value.autoUpdate.enabled && autoUpdateHosts.length === 0) ||
+    (!value.autoUpdate.enabled && autoUpdateHosts.length > 0)
+  ) {
+    fail("the OpenSocrates desired-state manifest has an invalid automatic-update host set");
+  }
   return {
     ...defaultDesiredState(),
     ...value,
@@ -170,6 +188,7 @@ function normalizeDesiredState(value) {
     },
     autoUpdate: {
       enabled: value.autoUpdate.enabled,
+      hosts: [...autoUpdateHosts].sort(),
       nextCheckAt: value.autoUpdate.nextCheckAt ?? null,
     },
   };
@@ -279,13 +298,22 @@ async function acquireOperationLock() {
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
       const handle = await open(paths.lock, "wx", 0o600);
-      await handle.writeFile(
-        `${JSON.stringify({ pid: process.pid, startedAt: nowIso() })}\n`,
-        "utf8",
-      );
+      try {
+        await handle.writeFile(
+          `${JSON.stringify({ pid: process.pid, startedAt: nowIso() })}\n`,
+          "utf8",
+        );
+      } catch (writeError) {
+        await handle.close().catch(() => undefined);
+        await rm(paths.lock, { force: true }).catch(() => undefined);
+        throw writeError;
+      }
       return async () => {
-        await handle.close();
-        await rm(paths.lock, { force: true });
+        try {
+          await handle.close();
+        } finally {
+          await rm(paths.lock, { force: true });
+        }
       };
     } catch (error) {
       if (error?.code !== "EEXIST") {
@@ -1788,7 +1816,7 @@ async function disableAutoUpdateState(desired) {
   await disableLaunchAgent();
   return {
     ...desired,
-    autoUpdate: { enabled: false, nextCheckAt: null },
+    autoUpdate: { enabled: false, hosts: [], nextCheckAt: null },
   };
 }
 
@@ -1797,25 +1825,63 @@ async function runRemove(options) {
   const preflights = await preflightSelectedHosts(options, "remove", desired);
   const removedHosts = preflights.map((item) => item.host);
   const remainingHosts = desired.installedHosts.filter((host) => !removedHosts.includes(host));
-  let nextDesired = {
+  const remainingAutoUpdateHosts = desired.autoUpdate.hosts.filter(
+    (host) => !removedHosts.includes(host),
+  );
+  const keepAutoUpdate = desired.autoUpdate.enabled && remainingAutoUpdateHosts.length > 0;
+  const nextDesired = {
     ...desired,
     installedHosts: remainingHosts,
     activeVersion: remainingHosts.length === 0 ? null : desired.activeVersion,
+    autoUpdate: keepAutoUpdate
+      ? { ...desired.autoUpdate, hosts: remainingAutoUpdateHosts }
+      : { enabled: false, hosts: [], nextCheckAt: null },
   };
-  if (options.host === ALL_HOST || remainingHosts.length === 0) {
-    nextDesired = await disableAutoUpdateState(nextDesired);
-  }
+  const launchAgentPresent = await exists(statePaths().launchAgent);
+  const schedulerNeedsChange =
+    options.host === ALL_HOST ||
+    remainingHosts.length === 0 ||
+    launchAgentPresent !== keepAutoUpdate ||
+    desired.autoUpdate.hosts.some((host) => removedHosts.includes(host));
   const transactions = preflights.map(removalTransaction);
+  let schedulerTouched = false;
   try {
     for (const transaction of transactions) await activateRemoval(transaction);
+    if (schedulerNeedsChange) {
+      schedulerTouched = true;
+      if (keepAutoUpdate) {
+        await installLaunchAgent(desired.channel, remainingAutoUpdateHosts);
+      } else {
+        await disableLaunchAgent();
+      }
+    }
     await writeDesiredState(nextDesired);
   } catch (error) {
     for (const transaction of [...transactions].reverse()) await rollbackRemoval(transaction);
-    if (!nextDesired.autoUpdate.enabled && desired.autoUpdate.enabled) {
+    if (schedulerTouched) {
+      const schedulerRestored = await recoveryStep(
+        "restore the automatic updater after removal failure",
+        async () => {
+          if (desired.autoUpdate.enabled) {
+            await installLaunchAgent(desired.channel, desired.autoUpdate.hosts);
+          } else {
+            await disableLaunchAgent();
+          }
+        },
+      );
+      if (!schedulerRestored && desired.autoUpdate.enabled) {
+        await recoveryStep("record the disabled updater after removal failure", async () => {
+          await writeDesiredState({
+            ...desired,
+            autoUpdate: { enabled: false, hosts: [], nextCheckAt: null },
+          });
+        });
+      }
+    } else if (!nextDesired.autoUpdate.enabled && desired.autoUpdate.enabled) {
       await recoveryStep("record the disabled updater after removal failure", async () => {
         await writeDesiredState({
           ...desired,
-          autoUpdate: { enabled: false, nextCheckAt: null },
+          autoUpdate: { enabled: false, hosts: [], nextCheckAt: null },
         });
       });
     }
@@ -1830,31 +1896,49 @@ async function runRemove(options) {
 
 async function enableAutoUpdate(options) {
   const previous = await readDesiredState();
-  let hosts = previous.installedHosts;
-  if (options.host !== ALL_HOST) hosts = [options.host];
-  if (hosts.length === 0) {
+  const preflights = new Map();
+  let installedHosts = [...previous.installedHosts];
+  if (installedHosts.length === 0) {
     const discoveryOptions = { ...options, host: ALL_HOST };
     const discovered = await preflightSelectedHosts(discoveryOptions, "update", previous);
-    hosts = discovered
-      .filter((item) => item.previousState.kind === "installed")
-      .map((item) => item.host);
+    for (const item of discovered) {
+      if (item.previousState.kind === "installed") {
+        preflights.set(item.host, item);
+        installedHosts.push(item.host);
+      }
+    }
   }
-  if (hosts.length === 0) {
+  let updateHosts = options.host === ALL_HOST ? [...installedHosts] : [options.host];
+  if (updateHosts.length === 0) {
     fail("install OpenSocrates on at least one host before enabling automatic updates");
   }
-  const observedVersions = new Set();
-  for (const host of hosts) {
-    const preflight = await preflightHost(host, "update");
+  for (const host of updateHosts) {
+    const preflight = preflights.get(host) ?? (await preflightHost(host, "update"));
     if (preflight.previousState.kind !== "installed") {
       fail(`OpenSocrates is not installed on ${host}`);
     }
     if (typeof preflight.previousState.version !== "string") {
       fail(`cannot determine the installed OpenSocrates version on ${host}`);
     }
-    observedVersions.add(preflight.previousState.version);
+    preflights.set(host, preflight);
+    installedHosts.push(host);
   }
+  installedHosts = [...new Set(installedHosts)].sort();
+  updateHosts = [...new Set(updateHosts)].sort();
   let activeVersion = previous.activeVersion;
   if (activeVersion === null) {
+    const observedVersions = new Set();
+    for (const host of installedHosts) {
+      const preflight = preflights.get(host) ?? (await preflightHost(host, "update"));
+      if (
+        preflight.previousState.kind !== "installed" ||
+        typeof preflight.previousState.version !== "string"
+      ) {
+        fail(`cannot determine the installed OpenSocrates version on ${host}`);
+      }
+      preflights.set(host, preflight);
+      observedVersions.add(preflight.previousState.version);
+    }
     if (observedVersions.size !== 1) {
       fail(
         "installed hosts do not share one known version; run update --host all before enabling automatic updates",
@@ -1865,7 +1949,7 @@ async function enableAutoUpdate(options) {
   const desired = {
     ...previous,
     channel: options.channel,
-    installedHosts: [...new Set(hosts)].sort(),
+    installedHosts,
     activeVersion,
     updatePolicy: {
       intervalHours: options.intervalHours,
@@ -1873,18 +1957,19 @@ async function enableAutoUpdate(options) {
     },
     autoUpdate: {
       enabled: true,
+      hosts: updateHosts,
       nextCheckAt: nowIso(),
     },
   };
   await writeDesiredState(desired);
   try {
-    await installLaunchAgent(options.channel, desired.installedHosts);
+    await installLaunchAgent(options.channel, desired.autoUpdate.hosts);
   } catch (error) {
     await writeDesiredState(previous);
     throw error;
   }
   console.log(
-    `Automatic updates enabled for ${desired.installedHosts.join(", ")} on the ` +
+    `Automatic updates enabled for ${desired.autoUpdate.hosts.join(", ")} on the ` +
       `${desired.channel} channel every ${desired.updatePolicy.intervalHours} hours with jitter.`,
   );
   console.log(
@@ -1900,7 +1985,8 @@ async function showAutoUpdateStatus() {
   console.log(`Automatic updates: ${desired.autoUpdate.enabled ? "enabled" : "disabled"}`);
   console.log(`LaunchAgent: ${agentPresent ? "installed" : "not installed"}`);
   console.log(`Channel: ${desired.channel}`);
-  console.log(`Hosts: ${desired.installedHosts.join(", ") || "none"}`);
+  console.log(`Installed hosts: ${desired.installedHosts.join(", ") || "none"}`);
+  console.log(`Automatic-update hosts: ${desired.autoUpdate.hosts.join(", ") || "none"}`);
   console.log(`Interval: ${desired.updatePolicy.intervalHours} hours with jitter`);
   console.log(`Major upgrades: ${desired.updatePolicy.allowMajor ? "allowed" : "blocked"}`);
   console.log(`Next check: ${desired.autoUpdate.nextCheckAt ?? "not scheduled"}`);
@@ -1916,7 +2002,7 @@ async function disableAutoUpdate() {
 
 async function runScheduledUpdate(options) {
   let desired = await readDesiredState();
-  if (!desired.autoUpdate.enabled && !options.force) {
+  if (!desired.autoUpdate.enabled) {
     console.log("Automatic updates are disabled.");
     return;
   }
@@ -1926,9 +2012,9 @@ async function runScheduledUpdate(options) {
     return;
   }
   const checkedAt = nowIso();
-  const hosts = desired.installedHosts;
+  const hosts = desired.autoUpdate.hosts;
   if (hosts.length === 0) {
-    fail("the automatic updater has no installed hosts in desired state");
+    fail("the automatic updater has no selected hosts in desired state");
   }
   const next = nextCheckAt(desired.updatePolicy.intervalHours);
   const currentMajor = majorVersion(desired.activeVersion);
@@ -1965,7 +2051,16 @@ async function runScheduledUpdate(options) {
           item.previousState.kind === "installed" && item.previousState.version === PRODUCT_VERSION,
       );
     if (!alreadyCurrent) {
-      await runInstallOrUpdate({ ...options, host: ALL_HOST }, "update");
+      if (hosts.length === SUPPORTED_HOSTS.length) {
+        await runInstallOrUpdate({ ...options, host: ALL_HOST }, "update");
+      } else {
+        const [host] = hosts;
+        const local = localAssetInputs(options, host);
+        await runInstallOrUpdate(
+          { ...options, host, asset: local.asset, checksum: local.checksum },
+          "update",
+        );
+      }
     }
     const refreshed = await readDesiredState();
     desired = await writeDesiredState({

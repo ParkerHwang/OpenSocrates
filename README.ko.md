@@ -116,6 +116,10 @@ npx --yes opensocrates@1.1.1 auto-update disable
 메이저 버전 자동 업그레이드는 기본적으로 차단되며, 정책을 바꾸려면
 `--allow-major`를 명시해야 합니다.
 
+`auto-update enable`에 호스트 하나를 지정하면 자동 업데이트 대상만 좁아집니다.
+다른 설치 호스트를 desired state에서 제거하지 않으므로 `status --host all`은 모든
+설치를 계속 추적하고, 이후 `update --host all`도 전체 설치 집합을 다시 조정합니다.
+
 업데이터 영수증에는 버전, 시간, 호스트별 결과, 오류 범주만 기록됩니다. 프롬프트,
 대화 기록, 자격 증명, 작업공간 경로는 기록하지 않습니다. `auto-update disable`은
 LaunchAgent를 언로드하고 삭제하며, `remove --host all`도 관리 호스트를 지우기 전에
@@ -249,6 +253,11 @@ OpenSocrates 기록, 로그, 메트릭, 진단 또는 instruction 파일에 쓰�
 소스 저장소에는 네이티브 바이너리와 중간 빌드 결과를 넣지 않습니다.
 [uv](https://docs.astral.sh/uv/), Python 3.12, Node.js 20 이상을 설치한 뒤 다음을
 실행합니다.
+
+릴리스 후보를 병합하기 전에는
+[새 Apple Silicon Mac 인수 테스트 절차](docs/clean-machine-acceptance.ko.md)를 따라
+인증된 실제 Claude Code 및 Codex 홈에서 검증하고 개인정보를 뺀 근거 묶음을
+확보하세요.
 
 ```bash
 make bootstrap

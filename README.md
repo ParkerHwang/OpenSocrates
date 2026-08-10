@@ -121,6 +121,11 @@ the selected npm channel, verifies release and package checksums, stages every
 managed host, and reconciles them as one transaction. Major-version upgrades
 are blocked by default; use `--allow-major` only when that policy is intended.
 
+Passing one host to `auto-update enable` narrows only the automatic-update
+scope. It never removes another installed host from desired state;
+`status --host all` continues to track every installation, and a later
+`update --host all` still reconciles the complete installed set.
+
 The updater keeps a private receipt with version, time, per-host result, and an
 error category only. It never records prompts, transcripts, credentials, or
 workspace paths. `auto-update disable` unloads and removes the LaunchAgent;
@@ -262,6 +267,11 @@ support boundary.
 The source repository intentionally excludes native binaries and intermediate
 build output. Install [uv](https://docs.astral.sh/uv/), Python 3.12, and Node.js
 20 or later, then run:
+
+Before merging a release candidate, follow the
+[clean Apple-silicon Mac acceptance procedure](docs/clean-machine-acceptance.md)
+to exercise the real authenticated Claude Code and Codex homes and return a
+privacy-safe evidence bundle.
 
 ```bash
 make bootstrap

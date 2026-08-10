@@ -667,6 +667,7 @@ test("auto-update: enable is opt-in and remove all cannot orphan the LaunchAgent
     assert.match(plist, new RegExp(npx.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
     assert.doesNotMatch(plist, /prompt|transcript|workspace/iu);
     assert.equal(box.desired().autoUpdate.enabled, true);
+    assert.deepEqual(box.desired().autoUpdate.hosts, ["claude", "codex"]);
     assert.equal(box.desired().updatePolicy.intervalHours, 12);
     assert.equal(statSync(box.launchAgent).mode & 0o777, 0o600);
     assert.equal(statSync(join(box.root, "state")).mode & 0o777, 0o700);
@@ -676,8 +677,97 @@ test("auto-update: enable is opt-in and remove all cannot orphan the LaunchAgent
     assert.equal(existsSync(box.launchAgent), false, "remove all left an orphaned LaunchAgent");
     assert.deepEqual(box.desired().installedHosts, []);
     assert.equal(box.desired().autoUpdate.enabled, false);
+    assert.deepEqual(box.desired().autoUpdate.hosts, []);
     assert.equal(existsSync(box.managedRoots.claude), false);
     assert.equal(existsSync(box.managedRoots.codex), false);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("auto-update: a single-host scope preserves the complete installed-host set", async () => {
+  const box = makeAllSandbox();
+  try {
+    const packages = {
+      claude: buildPackage(box.root, "claude"),
+      codex: buildPackage(box.root, "codex"),
+    };
+    await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
+    configureFakeNpx(box);
+    const enabled = await withDarwinArm64(() =>
+      quiet(() => main(["auto-update", "enable", "--host", "claude"])),
+    );
+    assert.equal(enabled.error, undefined, `single-host enable failed: ${enabled.error?.message}`);
+    assert.deepEqual(box.desired().installedHosts, ["claude", "codex"]);
+    assert.deepEqual(box.desired().autoUpdate.hosts, ["claude"]);
+
+    const initialStatus = await quiet(() => main(["status", "--host", "all"]));
+    assert.equal(initialStatus.error, undefined);
+    assert.match(initialStatus.output, /claude: installed .* \(in sync\)/);
+    assert.match(initialStatus.output, /codex: installed .* \(in sync\)/);
+    assert.match(initialStatus.output, /Overall: no detected drift/);
+
+    for (const host of ["claude", "codex"]) {
+      const state = box.state(host);
+      state.plugins[0].version = "1.1.0";
+      writeFileSync(box.hosts[host].statePath, JSON.stringify(state));
+    }
+    const previous = box.desired();
+    previous.activeVersion = "1.1.0";
+    writeFileSync(
+      join(box.root, "state", "desired-state.json"),
+      `${JSON.stringify(previous, null, 2)}\n`,
+    );
+
+    const scheduled = await withDarwinArm64(() =>
+      quiet(() => main(["auto-update", "run", "--force", ...allAssetArgs(packages)])),
+    );
+    assert.equal(scheduled.error, undefined, `single-host update failed: ${scheduled.error?.message}`);
+    assert.equal(box.state("claude").plugins[0].version, PRODUCT_VERSION);
+    assert.equal(box.state("codex").plugins[0].version, "1.1.0");
+    assert.deepEqual(box.desired().installedHosts, ["claude", "codex"]);
+    assert.deepEqual(box.desired().autoUpdate.hosts, ["claude"]);
+    assert.deepEqual(box.receipt().hosts, [{ host: "claude", result: "updated" }]);
+
+    const reconciled = await withDarwinArm64(() =>
+      quiet(() => main(["update", ...allAssetArgs(packages)])),
+    );
+    assert.equal(reconciled.error, undefined, `all-host reconciliation failed: ${reconciled.error?.message}`);
+    assert.equal(box.state("codex").plugins[0].version, PRODUCT_VERSION);
+    const finalStatus = await quiet(() => main(["status", "--host", "all"]));
+    assert.match(finalStatus.output, /Overall: no detected drift/);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("auto-update: partial removal rewrites the remaining scheduler scope", async () => {
+  const box = makeAllSandbox();
+  try {
+    const packages = {
+      claude: buildPackage(box.root, "claude"),
+      codex: buildPackage(box.root, "codex"),
+    };
+    await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
+    configureFakeNpx(box);
+    await withDarwinArm64(() => quiet(() => main(["auto-update", "enable", "--host", "all"])));
+
+    const removed = await withDarwinArm64(() =>
+      quiet(() => main(["remove", "--host", "claude"])),
+    );
+    assert.equal(removed.error, undefined, `partial remove failed: ${removed.error?.message}`);
+    assert.deepEqual(box.desired().installedHosts, ["codex"]);
+    assert.equal(box.desired().autoUpdate.enabled, true);
+    assert.deepEqual(box.desired().autoUpdate.hosts, ["codex"]);
+    assert.equal(existsSync(box.managedRoots.claude), false);
+    assert.equal(existsSync(box.managedRoots.codex), true);
+    const plist = readFileSync(box.launchAgent, "utf8");
+    assert.doesNotMatch(plist, /<key>CLAUDE_BIN<\/key>/);
+    assert.match(plist, /<key>CODEX_BIN<\/key>/);
+
+    const status = await quiet(() => main(["status", "--host", "all"]));
+    assert.equal(status.error, undefined);
+    assert.match(status.output, /Overall: no detected drift/);
   } finally {
     box.cleanup();
   }

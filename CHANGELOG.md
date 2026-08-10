@@ -16,7 +16,8 @@ All notable changes to OpenSocrates are documented here. This project follows
 - Opt-in macOS LaunchAgent updates through `auto-update enable`, `status`,
   `disable`, and the internal scheduled reconciliation command. Checks use a
   bounded interval with jitter, a single-instance lock, compatible-version
-  policy, and concise local receipts.
+  policy, concise local receipts, and an update-target set kept separate from
+  the complete installed-host set.
 
 ### Changed
 
