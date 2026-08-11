@@ -49,6 +49,19 @@ RUNTIME_NOTICE_REQUIRED_TOKENS = frozenset(
         "license",
     }
 )
+CLAUDE_RUNTIME_NOTICE_REQUIRED_TOKENS = frozenset(
+    {
+        "claude code cli",
+        "excludes the openai codex sdk",
+        "pydantic",
+        "sbom",
+        "license",
+    }
+)
+# Cowork documents these limits in decimal MB.  Use the conservative byte
+# interpretation until the product exposes an exact binary-unit contract.
+CLAUDE_ARCHIVE_COMPRESSED_LIMIT_BYTES = 50_000_000
+CLAUDE_ARCHIVE_UNCOMPRESSED_LIMIT_BYTES = 200_000_000
 _SAFE_ENVIRONMENT = {
     "PATH",
     "HOME",
@@ -403,7 +416,7 @@ def _generation_run(root: Path, output_root: Path) -> CommandResult:
                 "--host",
                 host,
                 "--runtime-root",
-                str(root / "dist" / "runtime"),
+                str(root / "dist" / "runtime" / host),
                 "--output",
                 str(output_root / "plugins" / host),
             ],
@@ -676,7 +689,11 @@ def _discover_build_python() -> str | None:  # noqa: C901  # Branch-explicit con
     return None
 
 
-def _runtime_build(root: Path) -> tuple[dict[str, Any], str]:
+def _runtime_build(  # noqa: C901  # Explicit host release build validation.
+    root: Path, host: str
+) -> tuple[dict[str, Any], str]:
+    if host not in HOSTS:
+        raise ReleaseCheckError("runtime_host_invalid")
     build_python = _discover_build_python()
     if build_python is None:
         raise AssemblyUnavailable("pyinstaller_unavailable")
@@ -688,17 +705,19 @@ def _runtime_build(root: Path) -> tuple[dict[str, Any], str]:
             str(root),
             "--target",
             "auto",
+            "--runtime-profile",
+            host,
             "--smoke-test",
             "--measure-runs",
             "10",
             "--report",
-            "build/evidence/runtime-build.json",
+            f"build/evidence/runtime-build-{host}.json",
         ],
         root,
         interpreter=build_python,
         timeout=900.0,
     )
-    report = _load_json(root / "build" / "evidence" / "runtime-build.json")
+    report = _load_json(root / "build" / "evidence" / f"runtime-build-{host}.json")
     if result.status != "pass":
         reason = result.code
         if report is not None and isinstance(report.get("status"), str):
@@ -710,6 +729,8 @@ def _runtime_build(root: Path) -> tuple[dict[str, Any], str]:
         )
     if report is None or report.get("status") != "pass":
         raise ReleaseCheckError("runtime_evidence_not_passing")
+    if report.get("runtime_profile") != host:
+        raise ReleaseCheckError("runtime_profile_evidence_invalid")
     artifact = report.get("artifact")
     target = report.get("target")
     runtime_dependencies = report.get("runtime_dependencies")
@@ -747,7 +768,7 @@ def _generate_plugins(root: Path) -> None:
                 "--host",
                 host,
                 "--runtime-root",
-                str(root / "dist" / "runtime"),
+                str(root / "dist" / "runtime" / host),
                 "--output",
                 str(root / "build" / "generated" / "plugins" / host),
             ],
@@ -873,7 +894,9 @@ def _write_root_checksums(directory: Path, version: str) -> Path:
     return destination
 
 
-def _assemble(root: Path) -> dict[str, Any]:
+def _assemble(  # noqa: C901  # Explicit two-host release assembly.
+    root: Path,
+) -> dict[str, Any]:
     version = _read_version(root)
     bundle, bundle_bytes = _load_bundle(root)
     reasoning_content_bundle, reasoning_content_bytes = _load_reasoning_content_bundle(root)
@@ -888,7 +911,15 @@ def _assemble(root: Path) -> dict[str, Any]:
     )
     if reasoning_content_shape["status"] != "pass":
         raise ReleaseCheckError("reasoning_content_bundle_shape_invalid")
-    runtime_report, target = _runtime_build(root)
+    runtime_reports: dict[str, dict[str, Any]] = {}
+    targets: set[str] = set()
+    for host in HOSTS:
+        runtime_report, runtime_target = _runtime_build(root, host)
+        runtime_reports[host] = runtime_report
+        targets.add(runtime_target)
+    if targets != {RELEASE_TARGET}:
+        raise AssemblyUnavailable("native_release_target_unavailable")
+    target = RELEASE_TARGET
     _generate_plugins(root)
     _copy_packages(root)
     dist = root / "dist"
@@ -901,7 +932,7 @@ def _assemble(root: Path) -> dict[str, Any]:
         archives[host] = archive
     claude_chat_archive = dist / f"opensocrates-{version}-claude-chat-skills.zip"
     _write_deterministic_zip(claude_chat_package, claude_chat_archive)
-    runtime_artifact = str(runtime_report["artifact"])
+    runtime_artifacts = {host: str(runtime_reports[host]["artifact"]) for host in HOSTS}
     sbom_arguments = [
         str(root / "tools" / "build_sbom.py"),
         "--root",
@@ -911,12 +942,12 @@ def _assemble(root: Path) -> dict[str, Any]:
         "--report",
         "build/evidence/sbom.json",
         "--artifact",
-        runtime_artifact,
-        "--artifact",
         LEGACY_CONTENT_BUNDLE,
         "--artifact",
         REASONING_CONTENT_BUNDLE,
     ]
+    for host in HOSTS:
+        sbom_arguments.extend(["--artifact", runtime_artifacts[host]])
     for host in HOSTS:
         sbom_arguments.extend(["--artifact", _relative(root, archives[host])])
     sbom_arguments.extend(["--artifact", _relative(root, claude_chat_archive)])
@@ -955,13 +986,17 @@ def _assemble(root: Path) -> dict[str, Any]:
             "size_bytes": len(reasoning_content_bytes),
             "sha256": f"sha256:{hashlib.sha256(reasoning_content_bytes).hexdigest()}",
         },
-        "runtime": {
-            "target": target,
-            "artifact": runtime_artifact,
-            "artifact_size_bytes": runtime_report.get("artifact_size_bytes"),
-            "artifact_sha256": f"sha256:{_sha256(_resolve(root, runtime_artifact))}",
-            "signing_status": "unvalidated",
-            "dependencies": runtime_report["runtime_dependencies"],
+        "runtimes": {
+            host: {
+                "target": target,
+                "artifact": runtime_artifacts[host],
+                "artifact_size_bytes": runtime_reports[host].get("artifact_size_bytes"),
+                "artifact_sha256": (f"sha256:{_sha256(_resolve(root, runtime_artifacts[host]))}"),
+                "signing_status": "unvalidated",
+                "dependencies": runtime_reports[host]["runtime_dependencies"],
+                "dependency_inventory": runtime_reports[host].get("runtime_dependency_inventory"),
+            }
+            for host in HOSTS
         },
         "hosts": {
             host: {
@@ -1008,7 +1043,7 @@ def _assemble(root: Path) -> dict[str, Any]:
         "source_tree_hash": bundle["source_tree_hash"],
         "normalized_semantic_hash": bundle["normalized_semantic_hash"],
         "runtime_target": target,
-        "runtime_artifact": runtime_artifact,
+        "runtime_artifacts": runtime_artifacts,
         "runtime_version_smoke": "pass",
         "hosts": {
             host: {
@@ -1095,8 +1130,17 @@ def _verify_third_party_notice(package: Path, host: str) -> set[str]:
     except (OSError, UnicodeError):
         return {"third_party_notice_unreadable"}
     errors: set[str] = set()
-    if not all(token in text for token in RUNTIME_NOTICE_REQUIRED_TOKENS):
+    required = (
+        CLAUDE_RUNTIME_NOTICE_REQUIRED_TOKENS
+        if host == "claude"
+        else RUNTIME_NOTICE_REQUIRED_TOKENS
+    )
+    if not all(token in text for token in required):
         errors.add("third_party_notice_runtime_disclosure_invalid")
+    if host == "claude" and any(
+        token in text for token in ("`openai-codex`", "`openai-codex-cli-bin`")
+    ):
+        errors.add("claude_third_party_notice_claims_excluded_runtime")
     return errors
 
 
@@ -1234,6 +1278,38 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
     archive = root / "dist" / f"opensocrates-{bundle.get('product_version')}-{host}-plugin.zip"
     if not archive.is_file() or not zipfile.is_zipfile(archive):
         errors.add("package_archive_missing_or_invalid")
+        archive_compressed_bytes = 0
+        archive_uncompressed_bytes = 0
+    else:
+        archive_compressed_bytes = archive.stat().st_size
+        with zipfile.ZipFile(archive) as package_archive:
+            archive_uncompressed_bytes = sum(
+                item.file_size for item in package_archive.infolist() if not item.is_dir()
+            )
+    excluded_runtime_entries = {
+        path.relative_to(generated).as_posix()
+        for path in generated.rglob("*")
+        if path.is_file()
+        and any(
+            part in {"openai_codex", "codex_cli_bin"}
+            or part.startswith(("openai_codex-", "openai_codex_cli_bin-"))
+            for part in path.parts
+        )
+    }
+    nested_zip_entries = {
+        path.relative_to(generated).as_posix()
+        for path in generated.rglob("*")
+        if path.is_file() and path.suffix.casefold() == ".zip"
+    }
+    if host == "claude":
+        if excluded_runtime_entries:
+            errors.add("claude_package_contains_codex_runtime")
+        if nested_zip_entries:
+            errors.add("claude_package_contains_nested_zip")
+        if archive_compressed_bytes > CLAUDE_ARCHIVE_COMPRESSED_LIMIT_BYTES:
+            errors.add("claude_archive_compressed_limit_exceeded")
+        if archive_uncompressed_bytes > CLAUDE_ARCHIVE_UNCOMPRESSED_LIMIT_BYTES:
+            errors.add("claude_archive_uncompressed_limit_exceeded")
     runtime_targets = _load_json(generated / "release-manifest.json")
     listed_targets = runtime_targets.get("runtime_targets", []) if runtime_targets else []
     if target != RELEASE_TARGET or listed_targets != [RELEASE_TARGET]:
@@ -1248,6 +1324,10 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         "embedded_bundle_count": len(embedded),
         "generated_file_count": len(_snapshot(generated)),
         "package_file_count": len(_snapshot(dist_package)),
+        "archive_compressed_bytes": archive_compressed_bytes,
+        "archive_uncompressed_bytes": archive_uncompressed_bytes,
+        "excluded_runtime_entry_count": len(excluded_runtime_entries),
+        "nested_zip_entry_count": len(nested_zip_entries),
         "error_codes": sorted(errors),
     }
 
@@ -1384,13 +1464,18 @@ def _verify_checksums(directory: Path, checksum_file: Path) -> dict[str, Any]:
     }
 
 
-def _evidence_check(root: Path, version: str, *, assembly_status: str) -> dict[str, Any]:
+def _evidence_check(  # noqa: C901  # Explicit release evidence matrix.
+    root: Path, version: str, *, assembly_status: str
+) -> dict[str, Any]:
     errors: set[str] = set()
     unavailable: set[str] = set()
     security = _load_json(root / "build" / "evidence" / "security-scan.json")
     sbom = _load_json(root / "build" / "evidence" / "sbom.json")
     spdx = _load_json(root / "build" / "evidence" / "sbom.spdx.json")
-    runtime = _load_json(root / "build" / "evidence" / "runtime-build.json")
+    runtimes = {
+        host: _load_json(root / "build" / "evidence" / f"runtime-build-{host}.json")
+        for host in HOSTS
+    }
     if security is None:
         unavailable.add("security_evidence_missing")
     elif (
@@ -1410,19 +1495,24 @@ def _evidence_check(root: Path, version: str, *, assembly_status: str) -> dict[s
         # Do not treat an older runtime report as evidence for a build that
         # could not run in this environment.
         unavailable.add("runtime_build_unavailable")
-    elif runtime is None:
-        unavailable.add("runtime_evidence_missing")
-    elif (
-        runtime.get("schema") != "opensocrates.runtime-build-evidence/1.0.0"
-        or runtime.get("status") != "pass"
-        or runtime.get("version") != version
-    ):
-        errors.add("runtime_evidence_invalid")
+    else:
+        for host, runtime in runtimes.items():
+            if runtime is None:
+                unavailable.add(f"runtime_evidence_missing:{host}")
+            elif (
+                runtime.get("schema") != "opensocrates.runtime-build-evidence/1.0.0"
+                or runtime.get("status") != "pass"
+                or runtime.get("version") != version
+                or runtime.get("runtime_profile") != host
+            ):
+                errors.add(f"runtime_evidence_invalid:{host}")
     return {
         "status": "fail" if errors else "unavailable" if unavailable else "pass",
         "security_status": security.get("status") if security else None,
         "sbom_status": sbom.get("status") if sbom else None,
-        "runtime_status": runtime.get("status") if runtime else None,
+        "runtime_statuses": {
+            host: runtime.get("status") if runtime else None for host, runtime in runtimes.items()
+        },
         "error_codes": sorted(errors | unavailable),
     }
 
@@ -1507,15 +1597,21 @@ def _full_check(
         "content": _content_validator(root, bundle_bytes, reasoning_content_bytes),
         "deterministic_generation": _determinism_check(root),
     }
-    runtime_report: Mapping[str, Any] | None = None
+    runtime_reports: dict[str, Mapping[str, Any] | None] = {host: None for host in HOSTS}
     if assembly_result is not None:
         checks["package_assembly"] = dict(assembly_result)
-        runtime_report = _load_json(root / "build" / "evidence" / "runtime-build.json")
+        runtime_reports = {
+            host: _load_json(root / "build" / "evidence" / f"runtime-build-{host}.json")
+            for host in HOSTS
+        }
     else:
         try:
             assembly = _assemble(root)
             checks["package_assembly"] = assembly
-            runtime_report = _load_json(root / "build" / "evidence" / "runtime-build.json")
+            runtime_reports = {
+                host: _load_json(root / "build" / "evidence" / f"runtime-build-{host}.json")
+                for host in HOSTS
+            }
         except AssemblyUnavailable as exc:
             checks["package_assembly"] = {
                 "status": "unavailable",
@@ -1524,7 +1620,8 @@ def _full_check(
         except ReleaseCheckError as exc:
             checks["package_assembly"] = {"status": "fail", "error_codes": [str(exc)]}
     assembly_status = str(checks["package_assembly"].get("status", "unavailable"))
-    target = runtime_report.get("target") if runtime_report else None
+    primary_runtime = runtime_reports.get("codex")
+    target = primary_runtime.get("target") if primary_runtime else None
     if not isinstance(target, str):
         target = "unavailable"
     checks["generated_outputs"] = (
@@ -1537,7 +1634,26 @@ def _full_check(
             "error_codes": ["package_assembly_not_available"],
         }
     )
-    checks["runtime_version"] = _runtime_version_smoke(root, runtime_report, version)
+    runtime_versions = {
+        host: _runtime_version_smoke(root, runtime_reports[host], version) for host in HOSTS
+    }
+    checks["runtime_version"] = {
+        "status": (
+            "fail"
+            if any(value["status"] == "fail" for value in runtime_versions.values())
+            else "unavailable"
+            if any(value["status"] == "unavailable" for value in runtime_versions.values())
+            else "pass"
+        ),
+        "hosts": runtime_versions,
+        "error_codes": sorted(
+            {
+                str(code)
+                for value in runtime_versions.values()
+                for code in value.get("error_codes", [])
+            }
+        ),
+    }
     checks["hosts"] = (
         {host: _verify_host_surface(root, host, bundle, bundle_bytes, target) for host in HOSTS}
         if assembly_status == "pass"

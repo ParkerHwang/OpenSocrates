@@ -22,6 +22,21 @@ MAX_SAFE_TEXT = 4096
 MAX_REVIEWED_PROCEDURE_TEXT = 16_384
 INSTRUCTION_ARTIFACT_END_MARKER = "<!-- OPENSOCRATES_INSTRUCTION_END -->"
 
+# Content-free selector outcome vocabulary.  This is shared by the transient
+# selector and the bounded aggregate store so persistence cannot accept a
+# label that the selector did not author.
+SELECTOR_OUTCOME_LABELS = (
+    "executable_missing",
+    "request_rejected",
+    "spawn_failed",
+    "timeout",
+    "nonzero_exit",
+    "invalid_output",
+    "selector_closed",
+    "no_intervention",
+    "selected",
+)
+
 # The current capability registry is intentionally closed.  Keep this list in
 # one place so profiles, schemas, and downstream adapters cannot drift.
 CAPABILITY_KEYS = (

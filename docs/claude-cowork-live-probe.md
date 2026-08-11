@@ -14,7 +14,7 @@ macOS/architecture, installation path kind, and categorical observations. It
 must not retain prompts, transcripts, credentials, local paths, artifact
 content, raw payloads, or selector reasoning.
 
-## 2026-08-11 result
+## 2026-08-11 results
 
 Claude Code CLI 2.1.226 confirmed that the `opensocrates` marketplace is
 registered in CLI user scope. No path was retained. After authenticating that
@@ -36,14 +36,35 @@ is also 50 MB compressed.
 Repository sync was tested separately and rejected because this repository does
 not contain `.claude-plugin/marketplace.json`.
 
-Because no Cowork-native OpenSocrates plugin could be installed, the declared
-UserPromptSubmit, PostToolUse(Read), and Stop hooks were not active in the
-Cowork task. No instruction artifact or grounding receipt was created, so hook
-delivery and cleanup cannot be credited. The exact blocker is now
-`cowork_plugin_archive_exceeds_upload_limits`; the validated support level is
-the standalone skill path only. No prompt, transcript, credential, local path,
-artifact content, raw payload, selector reasoning, or user identity was
-retained.
+That result remains the historical v1.1.2 receipt. Pull request #61 then built a
+clean Claude-specific v1.1.3 candidate without the Codex SDK or CLI. The first
+13.5 MB candidate exposed a second Cowork constraint: its PyInstaller runtime
+contained `base_library.zip`, and Cowork rejected nested ZIP files. Rebuilding
+the Claude runtime in no-archive mode removed that nested file and added a
+release gate that rejects any future nested ZIP.
 
-The categorical blocked receipt is
-[`docs/evidence/claude-cowork-live-probe-v1.1.2.json`](evidence/claude-cowork-live-probe-v1.1.2.json).
+The corrected candidate was 13,827,377 bytes compressed and 34,093,317 bytes
+uncompressed, with zero Codex runtime entries and zero nested ZIP entries.
+Cowork accepted it through Customize's local plugin upload and replaced the
+existing OpenSocrates installation. After reopening Customize, Cowork showed
+OpenSocrates 1.1.3 enabled and displayed the UserPromptSubmit,
+PostToolUse(Read), Stop, SessionStart, and SessionEnd declarations.
+
+Two local task turns selected a method, read the injected grounding artifact
+and repository README, and completed with the expected public grounding line.
+During the second task, a bounded wait after Read exposed exactly one
+instruction artifact and one matching HMAC-authenticated grounding receipt.
+After Stop, the artifact, receipt, and all remaining files in that private
+temporary tree were zero. The selector aggregate increased by two `selected`
+outcomes and no failure outcome.
+
+This validates Cowork native hook delivery for the pull-request candidate.
+Version 1.1.4 is the first release to carry the reviewed runtime shape. This
+does not claim Cowork marketplace availability or repository sync; installation
+still uses the local plugin upload path. No prompt, transcript, credential,
+local path, artifact content, raw payload, selector reasoning, or user identity
+was retained.
+
+The categorical receipts are the historical
+[`v1.1.2 blocked probe`](evidence/claude-cowork-live-probe-v1.1.2.json) and the
+[`v1.1.3 candidate pass`](evidence/claude-cowork-live-probe-v1.1.3.json).

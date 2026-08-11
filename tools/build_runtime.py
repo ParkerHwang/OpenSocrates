@@ -56,6 +56,7 @@ RUNTIME_CONTENT_ASSETS = (
     "content/compiled-content.bundle.json",
     "content/compiled-reasoning-content.bundle.json",
 )
+RUNTIME_PROFILES = ("codex", "claude")
 
 
 class BuildError(RuntimeError):
@@ -197,9 +198,12 @@ def _distribution_files(name: str) -> set[str] | None:
 
 
 def _runtime_dependency_manifest(  # noqa: C901  # Explicit release policy.
-    root: Path, target: Target, *, require_installed: bool
+    root: Path, target: Target, *, require_installed: bool, runtime_profile: str
 ) -> dict[str, Any]:
-    """Validate the locked SDK/runtime pair without exposing install paths."""
+    """Validate one host runtime dependency closure without exposing paths."""
+
+    if runtime_profile not in RUNTIME_PROFILES:
+        raise BuildError("runtime profile is not supported")
 
     errors: list[str] = []
     try:
@@ -221,14 +225,16 @@ def _runtime_dependency_manifest(  # noqa: C901  # Explicit release policy.
     cli_runtime = packages.get(CODEX_CLI_RUNTIME_PACKAGE)
     pydantic = packages.get("pydantic")
     pydantic_core = packages.get("pydantic-core")
-    if sdk is None or sdk.get("version") != CODEX_SDK_VERSION:
-        errors.append("openai_codex_pin_invalid")
-    if cli_runtime is None or cli_runtime.get("version") != CODEX_SDK_VERSION:
-        errors.append("codex_cli_runtime_pin_invalid")
-    if sdk is not None and not {CODEX_CLI_RUNTIME_PACKAGE, "pydantic"} <= _locked_dependency_names(
-        sdk
-    ):
-        errors.append("openai_codex_closure_invalid")
+    if runtime_profile == "codex":
+        if sdk is None or sdk.get("version") != CODEX_SDK_VERSION:
+            errors.append("openai_codex_pin_invalid")
+        if cli_runtime is None or cli_runtime.get("version") != CODEX_SDK_VERSION:
+            errors.append("codex_cli_runtime_pin_invalid")
+        if sdk is not None and not {
+            CODEX_CLI_RUNTIME_PACKAGE,
+            "pydantic",
+        } <= _locked_dependency_names(sdk):
+            errors.append("openai_codex_closure_invalid")
     pydantic_version = pydantic.get("version") if pydantic is not None else None
     if not isinstance(pydantic_version, str) or not _version_at_least(pydantic_version, (2, 12)):
         errors.append("pydantic_bound_invalid")
@@ -248,18 +254,22 @@ def _runtime_dependency_manifest(  # noqa: C901  # Explicit release policy.
     )
     wheel_markers = CODEX_RUNTIME_WHEEL_MARKERS[target.name]
     target_wheel_locked = all(any(marker in url for url in wheel_urls) for marker in wheel_markers)
-    if not target_wheel_locked:
+    if runtime_profile == "codex" and not target_wheel_locked:
         errors.append("target_cli_runtime_wheel_missing")
 
     installed: dict[str, bool] = {}
-    cli_resources_present: bool | None = None
+    cli_resources_present: bool | str | None = None
     if require_installed:
         expected_versions = {
-            "openai-codex": CODEX_SDK_VERSION,
-            CODEX_CLI_RUNTIME_PACKAGE: CODEX_SDK_VERSION,
             "pydantic": pydantic_version,
             "pydantic-core": pydantic_core.get("version") if pydantic_core is not None else None,
         }
+        if runtime_profile == "codex":
+            expected_versions = {
+                "openai-codex": CODEX_SDK_VERSION,
+                CODEX_CLI_RUNTIME_PACKAGE: CODEX_SDK_VERSION,
+                **expected_versions,
+            }
         for name, expected_version in expected_versions.items():
             try:
                 installed_version = importlib.metadata.version(name)
@@ -270,26 +280,41 @@ def _runtime_dependency_manifest(  # noqa: C901  # Explicit release policy.
             installed[name] = installed_version == expected_version
             if not installed[name]:
                 errors.append(f"installed_distribution_version_mismatch:{name}")
-        cli_files = _distribution_files(CODEX_CLI_RUNTIME_PACKAGE)
-        binary_name = "codex.exe" if target.name.startswith("windows-") else "codex"
-        required_files = {
-            "codex_cli_bin/__init__.py",
-            "codex_cli_bin/codex-package.json",
-            f"codex_cli_bin/bin/{binary_name}",
-        }
-        cli_resources_present = cli_files is not None and required_files <= cli_files
-        if not cli_resources_present:
-            errors.append("installed_cli_runtime_resources_missing")
+        if runtime_profile == "codex":
+            cli_files = _distribution_files(CODEX_CLI_RUNTIME_PACKAGE)
+            binary_name = "codex.exe" if target.name.startswith("windows-") else "codex"
+            required_files = {
+                "codex_cli_bin/__init__.py",
+                "codex_cli_bin/codex-package.json",
+                f"codex_cli_bin/bin/{binary_name}",
+            }
+            cli_resources_present = cli_files is not None and required_files <= cli_files
+            if not cli_resources_present:
+                errors.append("installed_cli_runtime_resources_missing")
+        else:
+            cli_resources_present = "not_required"
 
     status = "blocked" if errors else "ready" if require_installed else "locked"
     return {
         "status": status,
-        "sdk": {"name": "openai-codex", "version": CODEX_SDK_VERSION},
+        "runtime_profile": runtime_profile,
+        "sdk": {
+            "name": "openai-codex",
+            "version": CODEX_SDK_VERSION,
+            "bundling": "included" if runtime_profile == "codex" else "excluded",
+        },
         "cli_runtime": {
             "name": CODEX_CLI_RUNTIME_PACKAGE,
             "version": CODEX_SDK_VERSION,
-            "target_wheel": "locked" if target_wheel_locked else "missing",
-            "artifact_verification": "not_attempted",
+            "target_wheel": (
+                "locked"
+                if runtime_profile == "codex" and target_wheel_locked
+                else "missing"
+                if runtime_profile == "codex"
+                else "not_required"
+            ),
+            "artifact_verification": "pending",
+            "bundling": "included" if runtime_profile == "codex" else "excluded",
         },
         "pydantic": {
             "version": pydantic_version,
@@ -299,7 +324,7 @@ def _runtime_dependency_manifest(  # noqa: C901  # Explicit release policy.
         "installed_distributions": installed if require_installed else "not_checked",
         "cli_runtime_resources_present": cli_resources_present,
         "bundling": {
-            "method": "PyInstaller collect_all in the runtime spec",
+            "method": "PyInstaller host-specific runtime profile",
             "cross_platform_status": "not_supported_by_this_native_builder",
         },
         "error_codes": sorted(set(errors)),
@@ -381,11 +406,15 @@ def _ensure_python() -> None:
         )
 
 
-def _spec_for(root: Path, mode: str, explicit: str | None) -> Path:
+def _spec_for(
+    root: Path, mode: str, explicit: str | None, *, runtime_profile: str | None = None
+) -> Path:
     if explicit:
         spec = _rooted(root, explicit)
     elif mode == "probe":
         spec = root / "packaging" / "pyinstaller" / "opensocrates-probe.spec"
+    elif runtime_profile == "claude":
+        spec = root / "packaging" / "pyinstaller" / "opensocrates-runtime-claude.spec"
     else:
         spec = root / "packaging" / "pyinstaller" / "opensocrates-runtime.spec"
     if not spec.is_file():
@@ -560,6 +589,7 @@ def _build_report(
     artifact: Path,
     runtime_dependencies: dict[str, Any] | None,
     content_assets: dict[str, dict[str, int | str]] | None,
+    runtime_profile: str | None,
 ) -> dict[str, Any]:
     artifact_layout = "onedir"
     report = {
@@ -577,6 +607,7 @@ def _build_report(
         "output": _relative_or_outside(root, output_dir),
         "artifact": _relative_or_outside(root, artifact),
         "artifact_layout": artifact_layout,
+        "runtime_profile": runtime_profile,
         "signing_status": "not_attempted",
         "status": "planned" if args.dry_run else "started",
     }
@@ -585,6 +616,54 @@ def _build_report(
     if content_assets is not None:
         report["content_assets"] = {"source": content_assets, "packaged": "not_checked"}
     return report
+
+
+def _runtime_profile_inventory(  # noqa: C901  # Closed host dependency inventory.
+    artifact: Path, runtime_profile: str
+) -> dict[str, Any]:
+    """Verify the host-specific frozen dependency surface by closed counts."""
+
+    if runtime_profile not in RUNTIME_PROFILES:
+        raise BuildError("runtime profile is not supported")
+    root = artifact.parent
+    codex_sdk_count = 0
+    codex_cli_count = 0
+    try:
+        candidates = tuple(root.rglob("*"))
+    except OSError as exc:
+        raise BuildError("runtime dependency inventory is unreadable") from exc
+    for candidate in candidates:
+        try:
+            relative_parts = candidate.relative_to(root).parts
+        except ValueError:
+            continue
+        if any(
+            part == "openai_codex" or part.startswith("openai_codex-") for part in relative_parts
+        ):
+            codex_sdk_count += 1
+        if any(
+            part == "codex_cli_bin" or part.startswith("openai_codex_cli_bin-")
+            for part in relative_parts
+        ):
+            codex_cli_count += 1
+    errors: list[str] = []
+    if runtime_profile == "claude":
+        if codex_sdk_count:
+            errors.append("claude_runtime_contains_openai_codex")
+        if codex_cli_count:
+            errors.append("claude_runtime_contains_codex_cli_bin")
+    else:
+        if codex_sdk_count == 0:
+            errors.append("codex_runtime_missing_openai_codex")
+        if codex_cli_count == 0:
+            errors.append("codex_runtime_missing_codex_cli_bin")
+    return {
+        "status": "fail" if errors else "pass",
+        "runtime_profile": runtime_profile,
+        "openai_codex_entry_count": codex_sdk_count,
+        "codex_cli_bin_entry_count": codex_cli_count,
+        "error_codes": errors,
+    }
 
 
 def _finish_status(
@@ -630,7 +709,7 @@ def _dry_run_result(
     return 0
 
 
-def _run_pyinstaller(
+def _run_pyinstaller(  # noqa: C901  # Explicit build evidence sequence.
     args: argparse.Namespace,
     root: Path,
     target: Target,
@@ -640,6 +719,7 @@ def _run_pyinstaller(
     report_path: Path,
     report: dict[str, Any],
     content_assets: dict[str, dict[str, int | str]] | None,
+    runtime_profile: str | None,
 ) -> int:
     try:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -659,6 +739,16 @@ def _run_pyinstaller(
         report["artifact_size_bytes"] = artifact.stat().st_size
         report["artifact_sha256"] = _sha256(artifact)
         _record_packaged_runtime_content(report, artifact, content_assets)
+        if args.mode == "runtime" and runtime_profile is not None:
+            inventory = _runtime_profile_inventory(artifact, runtime_profile)
+            report["runtime_dependency_inventory"] = inventory
+            dependencies = report.get("runtime_dependencies")
+            if isinstance(dependencies, dict):
+                cli_runtime = dependencies.get("cli_runtime")
+                if isinstance(cli_runtime, dict):
+                    cli_runtime["artifact_verification"] = inventory["status"]
+            if inventory["status"] != "pass":
+                raise BuildError("host runtime dependency inventory is invalid")
         if args.smoke_test:
             response, elapsed_ms, error = _run_binary(artifact, mode=args.mode)
             report["smoke_test"] = {
@@ -698,18 +788,29 @@ def _build(args: argparse.Namespace) -> int:
     current = _detect_target()
     report_path = _report_path(root, args.report, "runtime-build.json")
     version, version_source = _version(root, required=args.mode == "runtime")
+    runtime_profile = getattr(args, "runtime_profile", None) if args.mode == "runtime" else None
     try:
         target = _target_from_name(args.target, current)
     except BuildError as exc:
         return _target_unavailable_report(report_path, args, current, version, version_source, exc)
     entrypoint = _entrypoint(root, args.mode)
-    spec = _spec_for(root, args.mode, args.spec)
-    output_dir = _rooted(root, args.output_dir or Path("dist") / "runtime" / target.name)
+    spec = _spec_for(root, args.mode, args.spec, runtime_profile=runtime_profile)
+    default_output = (
+        Path("dist") / "runtime" / (runtime_profile or "codex") / target.name
+        if args.mode == "runtime"
+        else Path("dist") / "runtime" / target.name
+    )
+    output_dir = _rooted(root, args.output_dir or default_output)
     artifact_name = "opensocrates-probe" if args.mode == "probe" else "opensocrates-runtime"
     artifact = _artifact_path(output_dir, artifact_name, target)
     buildable_here = current is not None and current.name == target.name
     runtime_dependencies = (
-        _runtime_dependency_manifest(root, target, require_installed=not args.dry_run)
+        _runtime_dependency_manifest(
+            root,
+            target,
+            require_installed=not args.dry_run,
+            runtime_profile=runtime_profile or "codex",
+        )
         if args.mode == "runtime"
         else None
     )
@@ -727,6 +828,7 @@ def _build(args: argparse.Namespace) -> int:
         artifact,
         runtime_dependencies,
         content_assets,
+        runtime_profile,
     )
     if runtime_dependencies is not None:
         expected_status = "locked" if args.dry_run else "ready"
@@ -778,6 +880,7 @@ def _build(args: argparse.Namespace) -> int:
         report_path,
         report,
         content_assets,
+        runtime_profile,
     )
 
 
@@ -793,7 +896,10 @@ def _add_common_arguments(parser: argparse.ArgumentParser) -> None:
         ),
     )
     parser.add_argument(
-        "--output-dir", help="artifact directory; defaults to dist/runtime/<target>"
+        "--output-dir",
+        help=(
+            "artifact directory; runtime builds default to dist/runtime/<runtime-profile>/<target>"
+        ),
     )
     parser.add_argument("--work-dir", help="PyInstaller work directory")
     parser.add_argument("--report", help="machine-readable evidence JSON path")
@@ -819,6 +925,13 @@ def build_parser() -> argparse.ArgumentParser:
     for mode in ("probe", "runtime"):
         subparser = subparsers.add_parser(mode, help=f"build the {mode} executable")
         _add_common_arguments(subparser)
+        if mode == "runtime":
+            subparser.add_argument(
+                "--runtime-profile",
+                choices=RUNTIME_PROFILES,
+                default="codex",
+                help="host-specific frozen dependency profile (default: codex)",
+            )
     return parser
 
 

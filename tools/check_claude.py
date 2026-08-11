@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import io
 import json
 import os
 import subprocess
@@ -13,14 +14,23 @@ from collections.abc import Callable
 from pathlib import Path
 from unittest.mock import patch
 
-from opensocrates.constants import INSTRUCTION_ARTIFACT_END_MARKER
+from opensocrates.application.diagnose import build_diagnose
+from opensocrates.cli.runtime import build_runtime_services
+from opensocrates.constants import INSTRUCTION_ARTIFACT_END_MARKER, SELECTOR_OUTCOME_LABELS
 from opensocrates.content import ProjectionInstructionAssembler, load_reasoning_content_projections
 from opensocrates.content.injection import _procedure_section
 from opensocrates.domain.enums import HostId
-from opensocrates.hooks.entrypoint import parse_hook_arguments
+from opensocrates.hooks.entrypoint import parse_hook_arguments, run_hook
 from opensocrates.hosts.claude.adapter import ClaudeAdapter, ClaudeAdapterConfig
 from opensocrates.hosts.claude.commands import build_hooks
 from opensocrates.hosts.codex.native import parse_codex_event, try_parse_codex_event
+from opensocrates.persistence import (
+    DataRootConfig,
+    SelectorOutcomeStore,
+    SelectorOutcomeStoreError,
+    ensure_data_root,
+)
+from opensocrates.persistence.selector_outcome_store import SELECTOR_OUTCOME_SCHEMA
 from opensocrates.selector import (
     InstructionFileStore,
     SelectorApplication,
@@ -829,6 +839,154 @@ def test_selector_failure_diagnostics() -> None:
         set(repeated.outcome_counts()) <= set(SelectorOutcome.ALL),
         "selector recorded a label outside the fixed vocabulary",
     )
+
+
+@check("CLAUDE-06A-persisted-content-free-selector-diagnostics")
+def test_persisted_selector_diagnostics() -> None:
+    """Make one fail-open hook outcome observable without retaining its input."""
+
+    fixture = json.loads(
+        (
+            ROOT
+            / "src"
+            / "opensocrates"
+            / "hosts"
+            / "contracts"
+            / "fixtures"
+            / "claude"
+            / "user-prompt-submit-turn-1.json"
+        ).read_text(encoding="utf-8")
+    )
+    payload = json.dumps(fixture["native_input"], separators=(",", ":")).encode("utf-8")
+    with tempfile.TemporaryDirectory(prefix="opensocrates-selector-outcomes-") as name:
+        data_root = ensure_data_root(
+            DataRootConfig(
+                development=True,
+                development_manifest=True,
+                override=Path(name),
+            )
+        )
+        with patch("opensocrates.selector.claude_cli.shutil.which", return_value=None):
+            services = build_runtime_services(host="claude", data_root=data_root)
+        require(
+            services.claude_reasoning_selector is not None,
+            "missing Claude executable was discarded before a diagnosable attempt",
+        )
+        stdout = io.StringIO()
+        require(
+            run_hook(
+                ("hook", "claude", "user_prompt_submitted"),
+                stdin=io.BytesIO(payload),
+                stdout=stdout,
+                services=services,
+            )
+            == 0,
+            "missing selector executable blocked the host hook",
+        )
+        require(stdout.getvalue() == "", "selector failure was not literal-empty fail-open")
+        store = SelectorOutcomeStore(data_root)
+        counts = store.read()
+        require(
+            counts[SelectorOutcome.EXECUTABLE_MISSING] == 1 and sum(counts.values()) == 1,
+            "content-free executable-missing outcome was not persisted exactly once",
+        )
+        services.flush_selector_outcomes()
+        require(store.read() == counts, "selector outcome flush double-counted one attempt")
+        snapshot = build_diagnose(selector_outcomes=counts).to_dict()
+        selector = snapshot.get("selector")
+        require(
+            isinstance(selector, dict)
+            and selector.get("status") == "observed"
+            and selector.get("attempt_count") == 1
+            and selector.get("outcome_counts") == counts,
+            "diagnose did not expose the bounded selector aggregate",
+        )
+        stored = store.path.read_text(encoding="utf-8")
+        require(
+            set(counts) == set(SELECTOR_OUTCOME_LABELS)
+            and "<synthetic-prompt>" not in stored
+            and "transcript" not in stored
+            and "session" not in stored
+            and str(Path(name)) not in stored,
+            "selector diagnostics persisted content or an identifier",
+        )
+
+
+@check("CLAUDE-06B-unavailable-selector-diagnostics-self-heal")
+def test_unavailable_selector_diagnostics_self_heal() -> None:
+    """Expose an invalid aggregate, then replace it on the next real outcome."""
+
+    with tempfile.TemporaryDirectory(prefix="opensocrates-selector-recovery-") as name:
+        data_root = ensure_data_root(
+            DataRootConfig(
+                development=True,
+                development_manifest=True,
+                override=Path(name),
+            )
+        )
+        store = SelectorOutcomeStore(data_root)
+        store.increment({SelectorOutcome.SELECTED: 3})
+
+        # A future additive label change must treat a canonical older subset
+        # as zero for the missing labels, then migrate it on the next write.
+        partial = {
+            "schema": SELECTOR_OUTCOME_SCHEMA,
+            "counts": {SelectorOutcome.SELECTED: 3},
+        }
+        store.path.write_text(
+            json.dumps(partial, sort_keys=True, separators=(",", ":")) + "\n",
+            encoding="utf-8",
+        )
+        migrated = store.read()
+        require(
+            migrated[SelectorOutcome.SELECTED] == 3 and sum(migrated.values()) == 3,
+            "canonical older selector labels did not migrate additively",
+        )
+
+        future_document = {
+            "schema": "opensocrates.selector-outcome-aggregate/2.0.0",
+            "counts": {SelectorOutcome.SELECTED: 4},
+        }
+        future_bytes = (
+            json.dumps(future_document, sort_keys=True, separators=(",", ":")) + "\n"
+        ).encode("utf-8")
+        store.path.write_bytes(future_bytes)
+        try:
+            store.increment({SelectorOutcome.SELECTED: 1})
+        except SelectorOutcomeStoreError:
+            pass
+        else:
+            raise AssertionError("older runtime overwrote a future selector schema")
+        require(
+            store.path.read_bytes() == future_bytes,
+            "future selector schema changed after a rejected update",
+        )
+
+        store.path.write_bytes(b"{")
+        services = build_runtime_services(host="claude", data_root=data_root)
+        unavailable = services.selector_outcome_counts()
+        require(unavailable is None, "invalid selector diagnostics were reported as zero")
+        snapshot = build_diagnose(
+            selector_outcomes=unavailable,
+            selector_outcomes_available=unavailable is not None,
+        ).to_dict()
+        selector = snapshot.get("selector")
+        require(
+            isinstance(selector, dict)
+            and selector.get("status") == "unavailable"
+            and selector.get("attempt_count") is None
+            and selector.get("outcome_counts") is None,
+            "diagnose asserted a selector count for an unreadable aggregate",
+        )
+
+        recovered = store.increment({SelectorOutcome.SELECTED: 1})
+        require(
+            recovered[SelectorOutcome.SELECTED] == 1
+            and sum(recovered.values()) == 1
+            and store.read() == recovered,
+            "next selector outcome did not replace the invalid aggregate",
+        )
+        services.close()
 
 
 @check("CLAUDE-07-real-process-termination-and-reaping")
@@ -1778,7 +1936,7 @@ def test_desktop_live_probe_validates_authenticated_lifecycle() -> None:
     )
 
 
-@check("CLAUDE-16-cowork-live-probe-records-native-install-limits")
+@check("CLAUDE-16A-cowork-live-probe-records-native-install-limits")
 def test_cowork_live_probe_records_native_install_limits() -> None:
     report = json.loads(
         (ROOT / "docs" / "evidence" / "claude-cowork-live-probe-v1.1.2.json").read_text(
@@ -1842,6 +2000,92 @@ def test_cowork_live_probe_records_native_install_limits() -> None:
     require(
         isinstance(privacy, dict) and not any(privacy.values()),
         "Cowork probe contains private evidence",
+    )
+
+
+@check("CLAUDE-16B-cowork-live-probe-validates-native-hooks")
+def test_cowork_live_probe_validates_native_hooks() -> None:
+    report = json.loads(
+        (ROOT / "docs" / "evidence" / "claude-cowork-live-probe-v1.1.3.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    require(
+        report.get("status") == "pass"
+        and report.get("blocker") is None
+        and report.get("distribution_status") == "pull_request_candidate_not_published",
+        "Cowork candidate probe is not a passing, distribution-bounded result",
+    )
+    environment = report.get("environment")
+    require(
+        isinstance(environment, dict)
+        and environment.get("macos_version") == "26.5.2"
+        and environment.get("architecture") == "arm64"
+        and environment.get("plugin_version") == "1.1.3"
+        and environment.get("claude_code_cli_version") == "2.1.226"
+        and environment.get("cowork_claude_code_runtime_version") == "2.1.222"
+        and environment.get("cowork_version") == "1.26832.0"
+        and environment.get("candidate_pull_request") == 61
+        and environment.get("cowork_native_plugin_install_path_kind")
+        == "customize_local_upload_replace",
+        "Cowork candidate probe lost its product or installation identity",
+    )
+    archive = report.get("archive")
+    require(
+        isinstance(archive, dict)
+        and archive.get("compressed_size_bytes") == 13827377
+        and archive.get("uncompressed_size_bytes") == 34093317
+        and archive.get("documented_compressed_limit_mb") == 50
+        and archive.get("observed_uncompressed_limit_mb") == 200
+        and archive.get("codex_runtime_entry_count") == 0
+        and archive.get("nested_zip_entry_count") == 0
+        and archive.get("upload_accepted") is True
+        and archive.get("rejection") is None,
+        "Cowork candidate probe lost its accepted archive evidence",
+    )
+    observations = report.get("observations")
+    require(
+        isinstance(observations, dict)
+        and observations.get("cowork_native_plugin_installed") is True
+        and observations.get("installed_plugin_version_visible") is True
+        and observations.get("plugin_enabled") is True
+        and observations.get("hook_declarations_visible") is True
+        and observations.get("user_prompt_submit_delivered") is True
+        and observations.get("selector_selected_delta") == 2
+        and observations.get("selector_failure_delta") == 0
+        and observations.get("read_tool_completed") is True
+        and observations.get("post_tool_use_read_delivered") is True
+        and observations.get("grounding_receipt_created") is True
+        and observations.get("grounding_receipt_authenticated") is True
+        and observations.get("stop_delivered") is True
+        and observations.get("artifact_cleanup_verified") is True
+        and observations.get("local_session_completed") is True,
+        "Cowork candidate probe lost a native hook lifecycle observation",
+    )
+    lifecycle = report.get("lifecycle_counts")
+    during = lifecycle.get("during_read_hold") if isinstance(lifecycle, dict) else None
+    after = lifecycle.get("after_stop") if isinstance(lifecycle, dict) else None
+    require(
+        during
+        == {
+            "instruction_artifacts": 1,
+            "grounding_receipts": 1,
+            "authenticated_receipts": 1,
+        }
+        and after
+        == {
+            "instruction_artifacts": 0,
+            "grounding_receipts": 0,
+            "remaining_files": 0,
+        }
+        and report.get("support_claim")
+        == "cowork_native_hooks_locally_validated_candidate_distribution_pending",
+        "Cowork candidate probe lost authenticated receipt creation or cleanup",
+    )
+    privacy = report.get("privacy")
+    require(
+        isinstance(privacy, dict) and not any(privacy.values()),
+        "Cowork candidate probe contains private evidence",
     )
 
 

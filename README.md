@@ -17,7 +17,7 @@ uses a fresh host-native selector to choose relevant systems, and adds their
 complete theory and examples to the active task. Straightforward factual and
 mechanical work can pass through unchanged.
 
-Version `1.1.3` includes 48 reasoning systems, one user-facing Claude entry, a
+Version `1.1.4` includes 48 reasoning systems, one user-facing Claude entry, a
 Claude grounding gate that verifies selected procedures were read, coordinated
 Claude/Codex lifecycle management, and opt-in automatic updates on
 Apple-silicon macOS (`darwin-arm64`). It uses your existing host login and does
@@ -27,11 +27,11 @@ The native plugin archives intentionally ship only `bin/launch.sh`. That
 launcher accepts `darwin-arm64` only; macOS Intel, Linux, and Windows launchers
 and runtimes are not shipped or supported in this release.
 
-> **Latest release: [OpenSocrates 1.1.3](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.3).**
-> It adds authenticated live-host validation, installer and cleanup hardening,
-> strict package support boundaries, and an uploadable Claude Chat skills ZIP.
+> **Latest release: [OpenSocrates 1.1.4](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.4).**
+> It adds a Cowork-uploadable native Claude package, host-split runtimes, and
+> content-free selector diagnostics that distinguish unavailable data from zero.
 > Upgrade both managed hosts together with
-> `npx --yes opensocrates@1.1.3 update --host all`.
+> `npx --yes opensocrates@1.1.4 update --host all`.
 
 ## Host support
 
@@ -40,7 +40,7 @@ and runtimes are not shipped or supported in this release.
 | Codex CLI and Desktop | Yes | OpenSocrates plugin | Release-validated on `darwin-arm64` |
 | Claude Code CLI | Yes, through `UserPromptSubmit` | `/opensocrates` | Locally validated on `darwin-arm64` |
 | Claude Code desktop app | Yes, where Claude Code plugins run | `/opensocrates` | [Authenticated hook lifecycle locally validated](docs/claude-desktop-live-probe.md) |
-| Claude Cowork | No automatic hooks in the tested install | `/opensocrates` standalone skill | [Skill locally validated; native plugin blocked by archive limits](docs/claude-cowork-live-probe.md) |
+| Claude Cowork | Yes, in the tested local plugin upload | `/opensocrates` | [Native hook lifecycle locally validated; direct release upload, no marketplace sync](docs/claude-cowork-live-probe.md) |
 | Claude web and Desktop Chat | No hooks | `/opensocrates` | [Live upload and invocation validated](docs/claude-chat-upload-probe.md) |
 
 The status column uses four distinct levels. Do not read them as
@@ -59,13 +59,15 @@ skills, but automatic per-prompt selection is available only on Claude Code
 and Cowork surfaces that execute the plugin runtime. OpenSocrates fails open
 if a hook or selector is unavailable.
 
-Cowork does not import the Claude Code CLI user-marketplace registration as a
-native Cowork plugin in the current live UI. A separately uploaded
-`/opensocrates` skill is locally validated, but the published v1.1.2 Claude
-plugin archive exceeds Cowork's documented compressed limit and observed
-uncompressed limit. The repository also lacks a Cowork marketplace manifest.
-Until a Cowork-native plugin can be installed and its hooks re-probed, treat
-Cowork as a standalone-skill-only surface.
+The published v1.1.2 Claude plugin archive exceeded Cowork's documented
+compressed limit and observed uncompressed limit. A pre-release v1.1.3
+candidate was 13.8 MB compressed and 34.1 MB uncompressed, contained neither
+the Codex runtime nor a nested ZIP, and passed Cowork's local upload. Its
+UserPromptSubmit, PostToolUse(Read), authenticated grounding receipt, Stop, and
+cleanup lifecycle is locally validated. Version 1.1.4 is the first release to
+ship that reviewed package boundary. The repository still has no Cowork
+marketplace manifest, so Cowork installation uses the local plugin upload path
+rather than repository sync.
 
 ## Install
 
@@ -82,7 +84,7 @@ before registering an owner-marked managed marketplace.
 ### Install every ready host
 
 ```bash
-npx --yes opensocrates@1.1.3 install --host all
+npx --yes opensocrates@1.1.4 install --host all
 ```
 
 The all-host path detects supported, authenticated host CLIs, completes every
@@ -94,9 +96,9 @@ registration.
 Use the same host value for the complete lifecycle:
 
 ```bash
-npx --yes opensocrates@1.1.3 status --host all
-npx --yes opensocrates@1.1.3 update --host all
-npx --yes opensocrates@1.1.3 remove --host all
+npx --yes opensocrates@1.1.4 status --host all
+npx --yes opensocrates@1.1.4 update --host all
+npx --yes opensocrates@1.1.4 remove --host all
 ```
 
 A private `~/.opensocrates/desired-state.json` manifest records the selected
@@ -109,9 +111,9 @@ automatic update, and per-host drift.
 Codex remains the default host for backward compatibility:
 
 ```bash
-npx --yes opensocrates@1.1.3 install
-# Equivalent: npx --yes opensocrates@1.1.3 install --host codex
-npx --yes opensocrates@1.1.3 install --host claude
+npx --yes opensocrates@1.1.4 install
+# Equivalent: npx --yes opensocrates@1.1.4 install --host codex
+npx --yes opensocrates@1.1.4 install --host claude
 ```
 
 Existing `--host codex` and `--host claude` lifecycle commands remain
@@ -131,9 +133,9 @@ commands. The privacy-safe 2.1.226 fixture is under
 ### Opt-in automatic updates
 
 ```bash
-npx --yes opensocrates@1.1.3 auto-update enable --host all
-npx --yes opensocrates@1.1.3 auto-update status
-npx --yes opensocrates@1.1.3 auto-update disable
+npx --yes opensocrates@1.1.4 auto-update enable --host all
+npx --yes opensocrates@1.1.4 auto-update status
+npx --yes opensocrates@1.1.4 auto-update disable
 ```
 
 Automatic updates are disabled until explicitly enabled. The macOS LaunchAgent
@@ -156,7 +158,7 @@ workspace paths. `auto-update disable` unloads and removes the LaunchAgent;
 ### Claude web and Desktop Chat skills
 
 These surfaces support plugin skills but not hooks. Download
-`opensocrates-1.1.3-claude-chat-skills.zip` from the release and upload it from
+`opensocrates-1.1.4-claude-chat-skills.zip` from the release and upload it from
 Claude's **Customize → Skills → Upload skill** UI. The ZIP contains one
 top-level `opensocrates/` folder with `SKILL.md` directly inside, as required by
 the skill uploader. The package exposes exactly one
@@ -170,22 +172,22 @@ because Chat does not execute plugin hooks. See Anthropic's
 The same host option works without the npm registry:
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.3 install --host all
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.3 install --host claude
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.3 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.4 install --host all
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.4 install --host claude
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.4 install --host codex
 ```
 
 ### Manual release verification
 
 Download `opensocrates.mjs`, the host package, and its `.sha256` file from the
-[v1.1.3 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.3).
+[v1.1.4 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.4).
 For Claude, for example:
 
 ```bash
-shasum -a 256 -c opensocrates-1.1.3-claude-plugin.zip.sha256
+shasum -a 256 -c opensocrates-1.1.4-claude-plugin.zip.sha256
 node opensocrates.mjs install --host claude \
-  --asset opensocrates-1.1.3-claude-plugin.zip \
-  --checksum opensocrates-1.1.3-claude-plugin.zip.sha256
+  --asset opensocrates-1.1.4-claude-plugin.zip \
+  --checksum opensocrates-1.1.4-claude-plugin.zip.sha256
 ```
 
 Replace `claude` with `codex` for the Codex package.
@@ -200,7 +202,7 @@ what is installed, remove it explicitly:
 ```bash
 claude plugin uninstall opensocrates@OpenSocrates --scope user
 claude plugin marketplace remove OpenSocrates --scope user
-npx --yes opensocrates@1.1.3 install --host claude
+npx --yes opensocrates@1.1.4 install --host claude
 ```
 
 Updating a managed v1.1.0 Claude installation replaces the complete package
@@ -299,6 +301,17 @@ arrives, the next `UserPromptSubmit` in the same session removes every prior
 `prompt_id` tree before selecting for the new turn while preserving the new
 active tree. `SessionEnd` removes anything still left in the session, and the
 next `SessionStart` removes crash leftovers older than 24 hours.
+
+Claude selector attempts increment one owner-only local aggregate using only
+the fixed labels `executable_missing`, `request_rejected`, `spawn_failed`,
+`timeout`, `nonzero_exit`, `invalid_output`, `selector_closed`,
+`no_intervention`, and `selected`. `diagnose` reports those cumulative counts.
+The aggregate contains no timestamp, prompt, transcript, session or turn ID,
+path, model output, credential, or reasoning, and is never uploaded.
+If the aggregate is unreadable, `diagnose` reports it as `unavailable` instead
+of asserting zero attempts. The next valid selector outcome replaces a
+malformed current-schema aggregate with a fresh bounded count document; an
+unknown future schema is preserved for the newer runtime that owns it.
 
 When enabled, the updater stores only desired lifecycle state and the concise
 receipt described above, under owner-only permissions. It does not inspect or
