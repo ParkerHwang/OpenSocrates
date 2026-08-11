@@ -2,6 +2,8 @@
   "host": "claude",
   "template_revision": "2",
   "launcher_host": "claude",
+  "release_targets": ["darwin-arm64"],
+  "launchers": ["bin/launch.sh"],
   "manifest_template": ".claude-plugin/plugin.json.tmpl",
   "manifest_output": ".claude-plugin/plugin.json",
   "hooks_builder": "opensocrates.hosts.claude.commands:build_hooks",
@@ -34,10 +36,6 @@
     {
       "source": "packaging/launchers/launch.sh",
       "output": "bin/launch.sh"
-    },
-    {
-      "source": "packaging/launchers/launch.ps1",
-      "output": "bin/launch.ps1"
     },
     {
       "source": "schemas/v1",

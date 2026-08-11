@@ -454,6 +454,8 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
         "schema": "opensocrates.plugin-release-manifest/1.0.0",
         "host": host,
         "launcher_host": metadata.get("launcher_host", host),
+        "release_targets": metadata.get("release_targets", []),
+        "launchers": metadata.get("launchers", []),
         "product_version": raw_bundle.get("product_version"),
         "content_revision": raw_bundle.get("content_revision"),
         "source_tree_hash": raw_bundle.get("source_tree_hash"),

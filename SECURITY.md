@@ -117,5 +117,7 @@ executable recovery commands naming only those two managed paths.
 
 Signing, notarization, clean-machine installation, platforms other than
 `darwin-arm64`, Claude Chat automatic hooks, and live delivery on every host
-surface are not claimed as validated. See the release limitations file for the
-complete measured boundary.
+surface are not claimed as validated. Native plugin archives ship only
+`bin/launch.sh`; it rejects macOS Intel, Linux, Windows, and every other target,
+and no PowerShell launcher is included. See the release limitations file for
+the complete measured boundary.

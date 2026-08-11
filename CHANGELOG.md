@@ -7,6 +7,11 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Added
 
+- Native plugin packages now expose one honest `darwin-arm64` boundary: the
+  unvalidated PowerShell launcher is removed, the POSIX launcher rejects every
+  other target, and package manifests and docs distinguish unshipped build
+  candidates from the released platform
+  ([#12](https://github.com/ParkerHwang/OpenSocrates/issues/12)).
 - A Claude Chat upload probe records the exact verified v1.1.2 skills ZIP
   shape and hash separately from the still-blocked live UI acceptance; no
   upload success is claimed ([#5](https://github.com/ParkerHwang/OpenSocrates/issues/5)).

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Fixed, platform-selecting launcher for macOS/Linux package hooks.
+# Fixed launcher for the released Apple-silicon macOS package hooks.
 # The host package supplies only literal mode/host/event arguments.
 
 set -eu
@@ -62,12 +62,6 @@ machine_name=$(uname -m 2>/dev/null || printf '%s' unknown)
 case "$system_name/$machine_name" in
     Darwin/arm64|Darwin/aarch64)
         relative_binary=darwin-arm64/opensocrates-runtime/opensocrates-runtime
-        ;;
-    Darwin/x86_64|Darwin/amd64)
-        relative_binary=darwin-x64/opensocrates-runtime/opensocrates-runtime
-        ;;
-    Linux/x86_64|Linux/amd64)
-        relative_binary=linux-x64/opensocrates-runtime/opensocrates-runtime
         ;;
     *)
         pass_through unsupported_platform "$mode" "$host"

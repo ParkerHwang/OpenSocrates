@@ -37,6 +37,8 @@ REASONING_CONTENT_BUNDLE = "content/compiled-reasoning-content.bundle.json"
 RUNTIME_ENTRY = "packaging/pyinstaller/runtime_entry.py"
 RUNTIME_ENTRY_APPROVED_IMPORTS = frozenset({"json", "multiprocessing", "opensocrates", "sys"})
 THIRD_PARTY_NOTICE = "THIRD_PARTY_NOTICES.md"
+RELEASE_TARGET = "darwin-arm64"
+RELEASE_LAUNCHERS = ["bin/launch.sh"]
 RUNTIME_NOTICE_REQUIRED_TOKENS = frozenset(
     {
         "openai-codex",
@@ -714,6 +716,8 @@ def _runtime_build(root: Path) -> tuple[dict[str, Any], str]:
     content_assets = report.get("content_assets")
     if not isinstance(artifact, str) or not isinstance(target, str):
         raise ReleaseCheckError("runtime_evidence_shape_invalid")
+    if target != RELEASE_TARGET:
+        raise AssemblyUnavailable("native_release_target_unavailable")
     if (
         not isinstance(runtime_dependencies, Mapping)
         or runtime_dependencies.get("status") != "ready"
@@ -846,17 +850,24 @@ def _candidate_platforms(root: Path, target: str) -> dict[str, str]:
     document = _load_json(root / "packaging" / "platforms.json") or {}
     candidates = document.get("candidate_platforms", [])
     observed = document.get("observed_local_platforms", [])
+    released = document.get("release_targets", [])
     if not isinstance(candidates, list):
         candidates = []
     if not isinstance(observed, list):
         observed = []
+    if not isinstance(released, list):
+        released = []
     result = {
-        str(value): "observed_local" if value == target or value in observed else "unvalidated"
+        str(value): (
+            "observed_local"
+            if value == target and value in observed and value in released
+            else "not_shipped"
+        )
         for value in candidates
         if isinstance(value, str)
     }
     if target not in result:
-        result[target] = "observed_local"
+        result[target] = "observed_local" if target in released else "not_shipped"
     return dict(sorted(result.items()))
 
 
@@ -932,6 +943,8 @@ def _assemble(root: Path) -> dict[str, Any]:
     limitations = {
         "schema": "opensocrates.limitations/1.0.0",
         "product_version": version,
+        "native_release_targets": [RELEASE_TARGET],
+        "native_launchers": RELEASE_LAUNCHERS,
         "platforms": _candidate_platforms(root, target),
         "signing_status": "unvalidated",
         "live_host_probe_status": {host: "unvalidated" for host in HOSTS},
@@ -965,6 +978,8 @@ def _assemble(root: Path) -> dict[str, Any]:
         "hosts": {
             host: {
                 "package_tree": host,
+                "release_targets": [RELEASE_TARGET],
+                "launchers": RELEASE_LAUNCHERS,
                 "package_file_count": len(_snapshot(dist / host)),
                 "package_checksum_file": package_checksums[host].relative_to(dist).as_posix(),
                 "archive": archives[host].relative_to(dist).as_posix(),
@@ -1038,6 +1053,10 @@ def _verify_release_manifest(root: Path, host: str, bundle: Mapping[str, Any]) -
         }
     if metadata.get("product_version") != bundle.get("product_version"):
         errors.add("manifest_version_mismatch")
+    if metadata.get("release_targets") != [RELEASE_TARGET]:
+        errors.add("manifest_release_targets_invalid")
+    if metadata.get("launchers") != RELEASE_LAUNCHERS:
+        errors.add("manifest_launchers_invalid")
     for field in ("source_tree_hash", "normalized_semantic_hash"):
         if metadata.get(field) != bundle.get(field):
             errors.add(f"manifest_{field}_mismatch")
@@ -1186,10 +1205,13 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         "LICENSE",
         THIRD_PARTY_NOTICE,
         "bin/launch.sh",
-        "bin/launch.ps1",
     ):
         if not (generated / required).is_file():
             errors.add("package_license_notice_or_launcher_missing")
+    if (generated / "bin" / "launch.ps1").exists() or (
+        dist_package / "bin" / "launch.ps1"
+    ).exists():
+        errors.add("unvalidated_powershell_launcher_present")
     errors.update(_verify_third_party_notice(generated, host))
     generated_notice = generated / THIRD_PARTY_NOTICE
     dist_notice = dist_package / THIRD_PARTY_NOTICE
@@ -1226,8 +1248,8 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         errors.add("package_archive_missing_or_invalid")
     runtime_targets = _load_json(generated / "release-manifest.json")
     listed_targets = runtime_targets.get("runtime_targets", []) if runtime_targets else []
-    if target not in listed_targets:
-        errors.add("runtime_target_missing_from_manifest")
+    if target != RELEASE_TARGET or listed_targets != [RELEASE_TARGET]:
+        errors.add("runtime_target_boundary_invalid")
     return {
         "status": "fail" if errors else "pass",
         "method_count": len(existing_method_outputs),

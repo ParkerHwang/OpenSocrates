@@ -54,28 +54,23 @@ def normalized_hook_event(native_event: str) -> str:
     return normalized
 
 
-def fixed_launcher_command(native_event: str, *, windows: bool = False) -> str:
+def fixed_launcher_command(native_event: str) -> str:
     """Return a literal S09 launcher invocation with no shell wrapper."""
 
     normalized = normalized_hook_event(native_event)
-    launcher = "${PLUGIN_ROOT}/bin/launch.ps1" if windows else "${PLUGIN_ROOT}/bin/launch.sh"
-    if windows:
-        return f'powershell -NoProfile -ExecutionPolicy Bypass -File "{launcher}" hook codex {normalized}'
-    return f"{launcher} hook codex {normalized}"
+    return f"${{PLUGIN_ROOT}}/bin/launch.sh hook codex {normalized}"
 
 
-def fixed_control_command(*, windows: bool = False) -> str:
-    if windows:
-        return 'powershell -NoProfile -ExecutionPolicy Bypass -File "${PLUGIN_ROOT}/bin/launch.ps1" control codex'
+def fixed_control_command() -> str:
     return "${PLUGIN_ROOT}/bin/launch.sh control codex"
 
 
-def hook_command(native_event: str, *, windows: bool = False) -> dict[str, Any]:
+def hook_command(native_event: str) -> dict[str, Any]:
     if native_event not in CODEX_NATIVE_EVENTS:
         raise ValueError(f"unknown Codex hook event: {native_event}")
     command: dict[str, Any] = {
         "type": "command",
-        "command": fixed_launcher_command(native_event, windows=windows),
+        "command": fixed_launcher_command(native_event),
     }
     # The prototype's one synchronous selector call is bounded internally at
     # thirty seconds.  Deliberately omit the host timeout so Codex applies its

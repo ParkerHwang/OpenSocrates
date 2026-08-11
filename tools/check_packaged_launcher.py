@@ -32,18 +32,16 @@ CONTROL_EXIT_CODE = 7
 # Kept in sync with the platform table in packaging/launchers/launch.sh.
 TARGET_UNAME: dict[str, tuple[str, str]] = {
     "darwin-arm64": ("Darwin", "arm64"),
-    "darwin-x64": ("Darwin", "x86_64"),
-    "linux-x64": ("Linux", "x86_64"),
 }
 NATIVE_TARGET: dict[tuple[str, str], str] = {
     ("Darwin", "arm64"): "darwin-arm64",
     ("Darwin", "aarch64"): "darwin-arm64",
-    ("Darwin", "x86_64"): "darwin-x64",
-    ("Darwin", "amd64"): "darwin-x64",
-    ("Linux", "x86_64"): "linux-x64",
-    ("Linux", "amd64"): "linux-x64",
 }
-UNSUPPORTED_UNAME = ("Linux", "aarch64")
+UNSUPPORTED_UNAMES = (
+    ("Darwin", "x86_64"),
+    ("Linux", "x86_64"),
+    ("Linux", "aarch64"),
+)
 
 # Automatic selection and both cleanup events must never silently no-op.
 REQUIRED_EVENTS = frozenset({"user_prompt_submitted", "completion_candidate", "session_ended"})
@@ -179,8 +177,15 @@ def _stage(package: Path, target: str, *, runtime_parent: str | None) -> tuple[P
 def _environment(stage: Path, target: str | None) -> dict[str, str]:
     """Return a launcher environment, optionally pinning the reported platform."""
 
+    reported = TARGET_UNAME.get(target or "", UNSUPPORTED_UNAMES[-1])
+    return _environment_for_uname(stage, reported)
+
+
+def _environment_for_uname(stage: Path, reported: tuple[str, str]) -> dict[str, str]:
+    """Return a launcher environment with an exact synthetic uname pair."""
+
     env = dict(os.environ)
-    system, machine = TARGET_UNAME.get(target or "", UNSUPPORTED_UNAME)
+    system, machine = reported
     shim = stage / "shim"
     _write_executable(
         shim / "uname",
@@ -354,9 +359,24 @@ def _assert_control_diagnostic(package: Path, host: str, target: str) -> None:
 def _assert_unsupported_platform(package: Path, host: str, *, runtime_output: str) -> None:
     stage, _runtime = _stage(package, "darwin-arm64", runtime_parent=runtime_output)
     try:
-        result = _run(stage, ["hook", host, "user_prompt_submitted"], _environment(stage, None))
-        _require(result.returncode == 0, f"unsupported-platform hook exited {result.returncode}")
-        _require(result.stdout == b"", f"unsupported-platform hook wrote {result.stdout!r}")
+        for reported in UNSUPPORTED_UNAMES:
+            result = _run(
+                stage,
+                ["hook", host, "user_prompt_submitted"],
+                _environment_for_uname(stage, reported),
+            )
+            _require(
+                result.returncode == 0,
+                f"unsupported-platform {reported} hook exited {result.returncode}",
+            )
+            _require(
+                result.stdout == b"",
+                f"unsupported-platform {reported} hook wrote {result.stdout!r}",
+            )
+            _require(
+                not (stage / "marker.txt").exists(),
+                f"unsupported-platform {reported} reached the runtime",
+            )
     finally:
         shutil.rmtree(stage, ignore_errors=True)
 
@@ -385,12 +405,7 @@ def _manifest_targets(package: Path) -> list[str]:
 
 
 def _exercised_targets() -> list[str]:
-    """Cover every target the packaged launcher can select, native or not.
-
-    A uname shim lets a Linux runner exercise the released ``darwin-arm64``
-    selection and an Apple-silicon runner exercise the Linux selection, so the
-    shared launcher contract is covered wherever the gate runs.
-    """
+    """Cover the one target the released launcher is allowed to select."""
 
     return sorted(TARGET_UNAME)
 
@@ -421,6 +436,10 @@ def _assert_runtime_output_mismatch_fails(
 
 def _check_package(package: Path, host: str, *, runtime_output: str) -> dict[str, Any]:
     targets = _exercised_targets()
+    _require(
+        not (package / "bin" / "launch.ps1").exists(),
+        "package ships an unvalidated PowerShell launcher",
+    )
     _assert_package_layout(
         package,
         _manifest_targets(package),
@@ -459,6 +478,9 @@ def _check_package(package: Path, host: str, *, runtime_output: str) -> dict[str
         "runtime_output_mismatch_rejected_without_native_targets": True,
         "bin_runtime_never_selected": True,
         "targets": targets,
+        "unsupported_platforms_rejected": [
+            f"{system}/{machine}" for system, machine in UNSUPPORTED_UNAMES
+        ],
         "native_target": _native_target(),
         "events": events,
     }

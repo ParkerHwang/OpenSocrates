@@ -33,7 +33,9 @@ Read the status column strictly. The levels are not interchangeable:
 - **Unvalidated** — no receipt exists for that path.
 
 This package's native runtime is released for Apple-silicon macOS
-(`darwin-arm64`) only. Binary signing, notarization, clean-machine
+(`darwin-arm64`) only. It ships only `bin/launch.sh`, and that launcher rejects
+macOS Intel, Linux, Windows, and every other target before runtime dispatch.
+No PowerShell launcher is included. Binary signing, notarization, clean-machine
 installation, other platforms, and live hook delivery on Claude Code Desktop,
 Cowork, and Claude Chat are not claimed as validated.
 
@@ -126,8 +128,8 @@ older than 24 hours.
 
 - Manifest: `.claude-plugin/plugin.json`
 - Hook definition: `hooks/hooks.json`
-- Fixed launchers: `bin/launch.sh` and `bin/launch.ps1`; this exact `bin/`
-  placement is required and no root-level launcher fallback is supported
+- Fixed launcher: `bin/launch.sh`; this exact `bin/` placement is required and
+  no root-level or PowerShell launcher is shipped
 - Native runtime: `runtime/<target>/opensocrates-runtime/`, resolved by
   the launcher relative to the plugin root
 - One user-facing controller skill: `skills/opensocrates/SKILL.md`

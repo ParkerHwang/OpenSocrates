@@ -22,6 +22,10 @@ OpenSocrates는 Claude와 Codex를 위한 로컬 연동 및 저작 추론 프레
 macOS(`darwin-arm64`)입니다. 기존 호스트 로그인을 사용하므로 API 키나
 OpenSocrates 백엔드가 필요하지 않습니다.
 
+네이티브 플러그인 아카이브에는 의도적으로 `bin/launch.sh`만 포함됩니다. 이
+런처는 `darwin-arm64`만 허용하며, Intel Mac·Linux·Windows용 런처와 런타임은
+이번 릴리스에 포함되거나 지원되지 않습니다.
+
 > **최신 릴리스: [OpenSocrates 1.1.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.2).**
 > 인증된 Claude 접지 영수증, 한 번으로 제한된 보정, 아티팩트 인스턴스에 결합된
 > 재사용 방지를 추가했습니다. `npx --yes opensocrates@1.1.2 update --host all`로

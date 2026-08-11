@@ -2,6 +2,8 @@
   "host": "codex",
   "template_revision": "1",
   "launcher_host": "codex",
+  "release_targets": ["darwin-arm64"],
+  "launchers": ["bin/launch.sh"],
   "manifest_template": ".codex-plugin/plugin.json.tmpl",
   "manifest_output": ".codex-plugin/plugin.json",
   "hooks_builder": "opensocrates.hosts.codex.commands:build_hooks",
@@ -57,10 +59,6 @@
     {
       "source": "packaging/launchers/launch.sh",
       "output": "bin/launch.sh"
-    },
-    {
-      "source": "packaging/launchers/launch.ps1",
-      "output": "bin/launch.ps1"
     },
     {
       "source": "schemas/v1",

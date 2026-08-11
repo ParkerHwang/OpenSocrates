@@ -23,6 +23,10 @@ Claude/Codex lifecycle management, and opt-in automatic updates on
 Apple-silicon macOS (`darwin-arm64`). It uses your existing host login and does
 not require an API key or an OpenSocrates backend.
 
+The native plugin archives intentionally ship only `bin/launch.sh`. That
+launcher accepts `darwin-arm64` only; macOS Intel, Linux, and Windows launchers
+and runtimes are not shipped or supported in this release.
+
 > **Latest release: [OpenSocrates 1.1.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.2).**
 > It adds authenticated Claude grounding receipts, one bounded repair pass,
 > and artifact-instance-bound replay protection. Upgrade both managed hosts
