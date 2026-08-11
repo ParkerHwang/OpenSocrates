@@ -2,12 +2,11 @@
 """Execute the generated package launchers against the generated package layout.
 
 The generated host packages ship the POSIX launcher at ``<plugin-root>/bin``
-and the native runtime at ``<plugin-root>/runtime/<target>/...``.  A launcher
-that resolves the runtime relative to its own directory therefore never finds
-it, and because hook mode fails open with literal-empty stdout the breakage is
-silent.  This check runs the *actual* launcher shipped in each generated
-package, dispatching the *actual* hook arguments declared in that package's
-``hooks/hooks.json``, and proves the runtime is reached from ``runtime/``.
+and the native runtime under the host generator's canonical ``runtime_output``.
+A launcher that resolves a different root therefore never finds it, and because
+hook mode fails open with literal-empty stdout the breakage is silent. This
+check runs the *actual* launcher shipped in each generated package, dispatching
+the *actual* hook arguments declared in that package's ``hooks/hooks.json``.
 """
 
 from __future__ import annotations
@@ -25,7 +24,6 @@ from pathlib import Path
 from typing import Any
 
 HOSTS = ("claude", "codex")
-RUNTIME_DIR = "runtime"
 RUNTIME_LEAF = ("opensocrates-runtime", "opensocrates-runtime")
 LAUNCHER = ("bin", "launch.sh")
 STDOUT_TOKEN = "opensocrates-packaged-launcher-stdout\n"
@@ -98,6 +96,18 @@ def _load_json(path: Path) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
         raise CheckFailure(f"{path.name} is not a JSON object")
     return value
+
+
+def _runtime_output(root: Path, host: str) -> str:
+    """Read one safe canonical runtime root from the host generator metadata."""
+
+    value = _load_json(root / "plugin-src" / host / "generator.json").get("runtime_output")
+    if not isinstance(value, str) or not value:
+        raise CheckFailure(f"{host} generator runtime_output is missing")
+    relative = Path(value)
+    if relative.is_absolute() or any(part in {"", ".", ".."} for part in relative.parts):
+        raise CheckFailure(f"{host} generator runtime_output is unsafe")
+    return relative.as_posix()
 
 
 def _launcher_argv(entry: Mapping[str, Any]) -> list[str] | None:
@@ -193,7 +203,7 @@ def _run(stage: Path, argv: Sequence[str], env: Mapping[str, str]) -> subprocess
 
 def _marker_fields(marker: Path) -> dict[str, str]:
     if not marker.is_file():
-        raise CheckFailure("the packaged launcher never invoked the runtime under runtime/")
+        raise CheckFailure("the packaged launcher never invoked the canonical runtime root")
     fields: dict[str, str] = {}
     for line in marker.read_text(encoding="utf-8").splitlines():
         key, _, value = line.partition(":")
@@ -227,11 +237,13 @@ def _assert_dispatch(
     (stage / "marker.txt").unlink()
 
 
-def _check_hook_dispatch(package: Path, host: str, target: str) -> list[str]:
+def _check_hook_dispatch(
+    package: Path, host: str, target: str, *, runtime_output: str
+) -> list[str]:
     """Dispatch every declared hook through the real launcher for one target."""
 
     specs = _dispatch_specs(package / "hooks" / "hooks.json")
-    stage, runtime = _stage(package, target, runtime_parent=RUNTIME_DIR)
+    stage, runtime = _stage(package, target, runtime_parent=runtime_output)
     assert runtime is not None
     events: list[str] = []
     try:
@@ -249,10 +261,10 @@ def _check_hook_dispatch(package: Path, host: str, target: str) -> list[str]:
     return sorted(set(events))
 
 
-def _check_control_mode(package: Path, host: str, target: str) -> None:
+def _check_control_mode(package: Path, host: str, target: str, *, runtime_output: str) -> None:
     """Control mode must exec the runtime and propagate its exit status."""
 
-    stage, runtime = _stage(package, target, runtime_parent=RUNTIME_DIR)
+    stage, runtime = _stage(package, target, runtime_parent=runtime_output)
     assert runtime is not None
     try:
         _write_executable(
@@ -288,7 +300,7 @@ def _assert_fail_open(package: Path, host: str, target: str, runtime_parent: str
         _require(result.stdout == b"", f"fail-open hook wrote stdout {result.stdout!r}")
         _require(
             not (stage / "marker.txt").is_file(),
-            "the launcher invoked a runtime outside runtime/",
+            "the launcher invoked a runtime outside its canonical root",
         )
     finally:
         shutil.rmtree(stage, ignore_errors=True)
@@ -311,8 +323,8 @@ def _assert_control_diagnostic(package: Path, host: str, target: str) -> None:
         shutil.rmtree(stage, ignore_errors=True)
 
 
-def _assert_unsupported_platform(package: Path, host: str) -> None:
-    stage, _runtime = _stage(package, "darwin-arm64", runtime_parent=RUNTIME_DIR)
+def _assert_unsupported_platform(package: Path, host: str, *, runtime_output: str) -> None:
+    stage, _runtime = _stage(package, "darwin-arm64", runtime_parent=runtime_output)
     try:
         result = _run(stage, ["hook", host, "user_prompt_submitted"], _environment(stage, None))
         _require(result.returncode == 0, f"unsupported-platform hook exited {result.returncode}")
@@ -321,14 +333,14 @@ def _assert_unsupported_platform(package: Path, host: str) -> None:
         shutil.rmtree(stage, ignore_errors=True)
 
 
-def _assert_package_layout(package: Path, targets: Sequence[str]) -> None:
-    """The shipped package must carry its runtime under runtime/, never bin/."""
+def _assert_package_layout(package: Path, targets: Sequence[str], *, runtime_output: str) -> None:
+    """The shipped package must use the generator runtime root, never bin/."""
 
     for target in targets:
-        expected = package.joinpath(RUNTIME_DIR, target, *RUNTIME_LEAF)
+        expected = package.joinpath(runtime_output, target, *RUNTIME_LEAF)
         _require(
             expected.is_file() and os.access(expected, os.X_OK),
-            f"package is missing the executable runtime at {RUNTIME_DIR}/{target}",
+            f"package is missing the executable runtime at {runtime_output}/{target}",
         )
         _require(
             not package.joinpath("bin", target).exists(),
@@ -355,21 +367,62 @@ def _exercised_targets() -> list[str]:
     return sorted(TARGET_UNAME)
 
 
-def _check_package(package: Path, host: str) -> dict[str, Any]:
+def _assert_runtime_output_mismatch_fails(
+    package: Path, host: str, target: str, *, runtime_output: str
+) -> None:
+    """Prove a wrong generator root fails without relying on native targets."""
+
+    mismatched_output = f"{runtime_output}-mismatch"
+    stage, runtime = _stage(package, target, runtime_parent=mismatched_output)
+    assert runtime is not None
+    try:
+        try:
+            _assert_dispatch(
+                stage,
+                runtime,
+                ["hook", host, "user_prompt_submitted"],
+                ["hook", "user_prompt_submitted", "--host", host],
+                target,
+            )
+        except CheckFailure:
+            return
+        raise CheckFailure("generator/runtime-root mismatch unexpectedly reached the runtime")
+    finally:
+        shutil.rmtree(stage, ignore_errors=True)
+
+
+def _check_package(package: Path, host: str, *, runtime_output: str) -> dict[str, Any]:
     targets = _exercised_targets()
-    _assert_package_layout(package, _manifest_targets(package))
+    _assert_package_layout(
+        package,
+        _manifest_targets(package),
+        runtime_output=runtime_output,
+    )
+    _assert_runtime_output_mismatch_fails(
+        package,
+        host,
+        targets[0],
+        runtime_output=runtime_output,
+    )
     events: list[str] = []
     for target in targets:
-        events = _check_hook_dispatch(package, host, target)
-        _check_control_mode(package, host, target)
+        events = _check_hook_dispatch(
+            package,
+            host,
+            target,
+            runtime_output=runtime_output,
+        )
+        _check_control_mode(package, host, target, runtime_output=runtime_output)
         _assert_fail_open(package, host, target, runtime_parent=None)
         # The pre-fix launcher probed <plugin-root>/bin/<target>/...; a runtime
         # planted there must not satisfy the lookup.
         _assert_fail_open(package, host, target, runtime_parent="bin")
         _assert_control_diagnostic(package, host, target)
-    _assert_unsupported_platform(package, host)
+    _assert_unsupported_platform(package, host, runtime_output=runtime_output)
     return {
         "package": package.name,
+        "runtime_output": runtime_output,
+        "runtime_output_mismatch_rejected_without_native_targets": True,
         "targets": targets,
         "native_target": _native_target(),
         "events": events,
@@ -390,6 +443,12 @@ def check_root(root: Path) -> dict[str, Any]:
     results: dict[str, Any] = {"hosts": {}, "error_codes": []}
     errors: list[str] = []
     for host in HOSTS:
+        try:
+            runtime_output = _runtime_output(root, host)
+        except CheckFailure as failure:
+            results["hosts"][host] = {"generator": {"error": str(failure)}}
+            errors.append(f"{host}_generator_runtime_output_invalid")
+            continue
         trees = list(_package_trees(root, host))
         if not trees:
             errors.append(f"{host}_package_launcher_missing")
@@ -397,7 +456,11 @@ def check_root(root: Path) -> dict[str, Any]:
         host_result: dict[str, Any] = {}
         for label, package in trees:
             try:
-                host_result[label] = _check_package(package, host)
+                host_result[label] = _check_package(
+                    package,
+                    host,
+                    runtime_output=runtime_output,
+                )
             except CheckFailure as failure:
                 host_result[label] = {"error": str(failure)}
                 errors.append(f"{host}_{label}_packaged_launcher_unreachable")
