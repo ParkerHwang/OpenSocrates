@@ -21,6 +21,12 @@ All notable changes to OpenSocrates are documented here. This project follows
   `method-id@content-revision`, and its authored `Do not use when` and
   `Stop conditions` are inlined when they fit the trusted context budget
   ([#32](https://github.com/ParkerHwang/OpenSocrates/issues/32)).
+- A grounding read is recognized whatever shape the host uses to deliver the
+  `Read` response. The terminator search no longer depends on envelope key
+  names, which are not a stable host contract, so a host that wraps the body
+  differently no longer looks like an incomplete read and no longer costs a
+  compliant turn a repair pass. The search is bounded by an explicit depth limit
+  and the existing collection limits.
 
 ### Security and privacy
 
@@ -30,6 +36,12 @@ All notable changes to OpenSocrates are documented here. This project follows
   or workspace and artifact paths, and they are removed with the turn artifact.
 - The complete `Read` response is inspected transiently for the terminal marker
   and is neither retained nor projected into OpenSocrates records.
+- The gate's scope is documented rather than implied. A receipt establishes that
+  a successful `Read` callback for the exact current-turn artifact returned
+  content reaching the terminal marker; it does not cryptographically prove that
+  every artifact byte was returned. A synthetic marker-only payload would
+  satisfy the marker test, which the model cannot produce because it does not
+  author `tool_response`.
 
 ## [1.1.1] - 2026-08-10
 

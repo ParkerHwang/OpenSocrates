@@ -320,6 +320,32 @@ def test_adapter_injection_and_cleanup() -> None:
         )
 
         receipt_path = artifact.path.parent / ".grounding-receipt.json"
+        # A host that wraps the body under keys this boundary does not name must
+        # still ground the turn end to end, not just pass the parser.
+        receipt_path.unlink()
+        require(
+            not store.has_complete_read_receipt(artifact),
+            "receipt survived its own deletion",
+        )
+        unfamiliar = adapter.handle(
+            {
+                "hook_event_name": "PostToolUse",
+                "session_id": "session-a",
+                "tool_name": "Read",
+                "tool_use_id": "tool-unfamiliar-envelope",
+                "tool_input": {"file_path": str(artifact.path)},
+                "tool_response": {
+                    "result": [{"body": artifact.path.read_text(encoding="utf-8")}]
+                },
+            },
+            event_name="PostToolUse",
+        )
+        require(unfamiliar.stdout == "", "unfamiliar Read envelope emitted user-facing output")
+        require(
+            store.has_complete_read_receipt(artifact),
+            "an unfamiliar Read response envelope did not ground the turn",
+        )
+
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
         receipt["artifact_sha256"] = "sha256:" + "0" * 64
         receipt_path.write_text(
@@ -444,6 +470,62 @@ def test_issue_32_grounding_specifics() -> None:
         parsed.tool_read_end_marker_seen,
         "a complete Read response above the generic hook bound lost its terminal marker",
     )
+
+    # Read envelope key names are not a stable host contract, so the terminator
+    # search is shape-agnostic. Naming the expected keys would make a host that
+    # wraps the body differently look like an incomplete read, costing a
+    # compliant turn a repair pass.
+    complete = "x" * 512 + INSTRUCTION_ARTIFACT_END_MARKER
+    for label, response in (
+        ("plain string", complete),
+        ("file.content envelope", {"type": "text", "file": {"content": complete}}),
+        ("flat content key", {"type": "text", "content": complete}),
+        ("unfamiliar wrapper key", {"type": "text", "payload": {"blob": complete}}),
+        ("list of content blocks", [{"type": "text", "text": complete}]),
+        ("nested list envelope", {"result": [{"body": {"data": complete}}]}),
+    ):
+        shaped = parse_codex_event(
+            {
+                "hook_event_name": "PostToolUse",
+                "session_id": "session-grounding",
+                "tool_name": "Read",
+                "tool_use_id": "tool-shaped-read",
+                "tool_input": {"file_path": "/tmp/instruction-large.md"},
+                "tool_response": response,
+            },
+            event_name="PostToolUse",
+            host=HostId.CLAUDE_CODE,
+        )
+        require(
+            shaped.tool_read_end_marker_seen,
+            f"a Read response delivered as a {label} lost its terminal marker",
+        )
+
+    # A body that never reaches the terminator is still refused, whatever shape
+    # carries it, and the walk stays bounded rather than following one forever.
+    too_deep: dict[str, object] = {"a": {"b": {"c": {"d": {"e": complete}}}}}
+    for label, response in (
+        ("truncated file envelope", {"type": "text", "file": {"content": "first lines only"}}),
+        ("marker-free object", {"a": {"b": {"c": "no terminator here"}}}),
+        ("marker-free list", [{"type": "text", "text": "no terminator here"}]),
+        ("terminator past the depth bound", too_deep),
+    ):
+        refused = parse_codex_event(
+            {
+                "hook_event_name": "PostToolUse",
+                "session_id": "session-grounding",
+                "tool_name": "Read",
+                "tool_use_id": "tool-shaped-partial",
+                "tool_input": {"file_path": "/tmp/instruction-large.md"},
+                "tool_response": response,
+            },
+            event_name="PostToolUse",
+            host=HostId.CLAUDE_CODE,
+        )
+        require(
+            not refused.tool_read_end_marker_seen,
+            f"a {label} was accepted as a complete grounding read",
+        )
 
     oversized_stop = json.dumps(
         {

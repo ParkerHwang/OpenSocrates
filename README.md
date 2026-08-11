@@ -208,6 +208,11 @@ one bounded repair pass; `stop_hook_active` prevents a continuation loop. A
 partial, truncated, failed, or wrong-file read is not accepted. Claude Chat
 does not run these hooks, so its grounding contract remains skills-only.
 
+The receipt records that a successful `Read` callback for that exact file
+returned content reaching the terminal marker. It is not a proof that every byte
+was delivered, and the gate fails open. See [SECURITY.md](SECURITY.md) for the
+boundary this does and does not defend.
+
 There is no fixed selection-count limit. The selector has a 30-second internal
 deadline, does not retry, and fails open. A timeout, host error, invalid output,
 non-intervention decision, unsafe context, or unavailable hook produces no

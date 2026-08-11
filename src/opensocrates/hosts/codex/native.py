@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
+from itertools import islice
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +29,10 @@ MAX_POST_TOOL_NATIVE_BYTES = 2 * 1024 * 1024
 MAX_FINAL_MESSAGE_BYTES = 256 * 1024
 MAX_NATIVE_OBJECT_MEMBERS = 128
 MAX_NATIVE_COLLECTION_ITEMS = 256
+# A Read response is one plain string or a file envelope whose key names are not
+# a stable host contract.  The terminator search walks it shape-agnostically and
+# stays bounded by this depth plus the collection limits above.
+_MAX_READ_RESPONSE_DEPTH = 4
 
 KNOWN_EVENTS = (
     "SessionStart",
@@ -435,25 +440,55 @@ def _post_tool_failed(document: Mapping[str, Any], tool_name: str) -> bool:
     return tool_name == "Bash" and response is None
 
 
+def _marker_in_read_response(response: object, *, depth: int = 0) -> bool:
+    """Search one Read response for the artifact terminator, whatever its shape.
+
+    A host may return the read body as one plain string or wrap it in a file
+    envelope, and the envelope's key names are not a stable host contract.
+    Naming the keys this boundary expects would make an unfamiliar wrapper look
+    like an incomplete read, which costs a compliant turn a repair pass.  The
+    walk is therefore shape-agnostic, and bounded by an explicit depth limit
+    plus the collection limits the rest of this boundary already uses, so an
+    adversarial response object cannot drive unbounded work.
+
+    Searching every string is safe rather than permissive here: the caller has
+    already required this callback to be a successful Read of the artifact's own
+    absolute path, and the terminator is an OpenSocrates constant that only that
+    artifact carries.
+    """
+
+    if isinstance(response, str):
+        return INSTRUCTION_ARTIFACT_END_MARKER in response
+    if depth >= _MAX_READ_RESPONSE_DEPTH:
+        return False
+    if isinstance(response, Mapping):
+        for value in islice(response.values(), MAX_NATIVE_OBJECT_MEMBERS):
+            if _marker_in_read_response(value, depth=depth + 1):
+                return True
+        return False
+    if isinstance(response, Sequence) and not isinstance(response, (str, bytes, bytearray)):
+        for value in islice(response, MAX_NATIVE_COLLECTION_ITEMS):
+            if _marker_in_read_response(value, depth=depth + 1):
+                return True
+    return False
+
+
 def _read_end_marker_seen(document: Mapping[str, Any], tool_name: str) -> bool:
-    """Confirm transiently that a successful Read response reached the artifact terminator."""
+    """Confirm transiently that a successful Read response reached the artifact terminator.
+
+    This is a terminator test, not a proof of delivery.  It establishes that a
+    successful Read callback naming the exact artifact path returned content
+    reaching the authored terminator; it does not cryptographically prove that
+    every artifact byte was returned, and a synthetic marker-only payload would
+    satisfy it.  That is not model-reachable: the terminator is the artifact's
+    last line, so any truncation removes it, and the model does not author
+    ``tool_response``.  Anything able to forge this envelope already controls
+    the hook's stdin and is outside the boundary this gate defends.
+    """
 
     if tool_name != "Read":
         return False
-    response = document.get("tool_response")
-    if isinstance(response, str):
-        return INSTRUCTION_ARTIFACT_END_MARKER in response
-    if not isinstance(response, Mapping):
-        return False
-    file_payload = response.get("file")
-    candidates = (
-        response.get("content"),
-        file_payload.get("content") if isinstance(file_payload, Mapping) else None,
-    )
-    return any(
-        isinstance(candidate, str) and INSTRUCTION_ARTIFACT_END_MARKER in candidate
-        for candidate in candidates
-    )
+    return _marker_in_read_response(document.get("tool_response"))
 
 
 def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.

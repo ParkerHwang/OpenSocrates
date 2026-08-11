@@ -101,6 +101,11 @@ At `Stop`, a missing receipt or mismatched final audit line requests one bounded
 repair pass. `stop_hook_active` prevents a continuation loop; if a hook or
 receipt operation is unavailable, the integration fails open.
 
+The receipt records that a successful `Read` callback for that exact file
+returned content reaching the terminal marker. It does not prove that every
+artifact byte was delivered; the model does not author the tool response, and
+anything able to forge that callback already controls the hook's input.
+
 Non-intervention, an unavailable Claude CLI, authentication failure, timeout,
 malformed output, unknown method ID, unavailable local runtime, or artifact
 failure all produce literal empty hook output and do not block the user's task.
