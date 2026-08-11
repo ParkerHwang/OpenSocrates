@@ -317,9 +317,9 @@ to exercise the real authenticated Claude Code and Codex homes and return a
 privacy-safe evidence bundle.
 
 The selector's authenticated Claude subprocess contract has a separate
-[opt-in check](docs/real-claude-selector.md). It is never run by the offline
-suite and reports a categorical blocker when the local Claude profile is not
-authenticated.
+[opt-in check](docs/real-claude-selector.md). The authenticated v1.1.2 receipt
+passes the real subprocess isolation and structured-output contract; the live
+call is never rerun by the ordinary offline suite.
 
 Repeated `--max-turns 1` structured-output behavior has a separate
 [aggregate reliability matrix](docs/claude-structured-output-reliability.md).

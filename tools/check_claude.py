@@ -1608,6 +1608,42 @@ def test_real_selector_is_opt_in() -> None:
         )
 
 
+@check("CLAUDE-13A-authenticated-real-selector-evidence")
+def test_authenticated_real_selector_evidence() -> None:
+    report = json.loads(
+        (ROOT / "docs" / "evidence" / "real-claude-selector-v1.1.2.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    require(
+        report.get("schema") == "opensocrates.real-claude-selector/1.0.0"
+        and report.get("status") == "pass"
+        and report.get("cli_version") == "2.1.226"
+        and report.get("live_outcome") == "selected",
+        "authenticated real Claude receipt has the wrong identity or outcome",
+    )
+    for contract_name in ("command_contract", "environment_contract", "workspace_contract"):
+        contract = report.get(contract_name)
+        require(
+            isinstance(contract, dict) and contract and all(contract.values()),
+            f"authenticated real Claude receipt failed {contract_name}",
+        )
+    require(
+        report.get("failure_diagnostics")
+        == {
+            "nonzero_exit": "nonzero_exit",
+            "timeout": "timeout",
+            "unparseable_output": "invalid_output",
+        },
+        "authenticated real Claude receipt lost a subprocess diagnostic",
+    )
+    privacy = report.get("privacy")
+    require(
+        isinstance(privacy, dict) and not any(privacy.values()),
+        "authenticated real Claude receipt persisted private content",
+    )
+
+
 @check("CLAUDE-14-packaged-hook-timing-evidence")
 def test_packaged_hook_timing_evidence() -> None:
     report = json.loads(

@@ -43,9 +43,9 @@ All notable changes to OpenSocrates are documented here. This project follows
   ([#8](https://github.com/ParkerHwang/OpenSocrates/issues/8)).
 - An opt-in, privacy-safe real Claude selector contract verifies the exact
   isolation command, environment allowlist, temporary workspace, and real
-  subprocess failure categories before attempting one authenticated,
-  non-sensitive structured-output selection. The first local run on Claude
-  Code 2.1.226 is honestly blocked by `claude_not_authenticated`
+  subprocess failure categories. An authenticated, non-sensitive live call on
+  Claude Code 2.1.226 returned `selected`, removed its temporary workspace, and
+  retained no prompt, raw output, credential, or selector reasoning
   ([#7](https://github.com/ParkerHwang/OpenSocrates/issues/7)).
 - Sanitized Claude Code payload receipts for the complete v1.1.2 hook
   lifecycle — `SessionStart`, `UserPromptSubmit`, `PostToolUse`, `Stop`, and

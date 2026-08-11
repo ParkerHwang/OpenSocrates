@@ -300,8 +300,9 @@ OpenSocrates 기록, 로그, 메트릭, 진단 또는 instruction 파일에 쓰�
 확보하세요.
 
 셀렉터의 인증된 Claude 하위 프로세스 계약은 별도의
-[선택형 검사](docs/real-claude-selector.md)로 검증합니다. 오프라인 테스트에는 포함되지
-않으며, 로컬 Claude 프로필이 인증되지 않았으면 범주형 차단 사유만 보고합니다.
+[선택형 검사](docs/real-claude-selector.md)로 검증합니다. 인증된 v1.1.2 영수증은 실제
+하위 프로세스 격리 및 구조화 출력 계약을 통과했으며, 일반 오프라인 테스트는 이
+실제 호출을 다시 실행하지 않습니다.
 
 `--max-turns 1` 구조화 출력의 반복 동작은 별도의
 [집계 신뢰성 매트릭스](docs/claude-structured-output-reliability.md)로 검증합니다. 인증된
