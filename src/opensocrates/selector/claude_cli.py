@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import signal
 import subprocess
@@ -50,6 +51,7 @@ from .sdk_worker import (
 
 _EXPECTED_CANDIDATE_FIELDS = frozenset({"intervene", "selected_reasoning_systems", "instructions"})
 _TERMINATE_GRACE_SECONDS = 0.25
+_MODEL_IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}")
 
 
 class SelectorOutcome:
@@ -313,10 +315,14 @@ class ClaudeCliReasoningSelector:
         catalog: SelectionCatalog,
         *,
         executable: str | None = None,
+        model: str | None = None,
         effort_policy: ReasoningEffortPolicy | None = None,
     ) -> None:
+        if model is not None and _MODEL_IDENTIFIER.fullmatch(model) is None:
+            raise ValueError("model must be one bounded CLI identifier")
         requested = executable or os.environ.get("CLAUDE_BIN", "claude")
         self._executable = shutil.which(requested)
+        self._model = model
         self._selection_catalog = _serialized_catalog(catalog)
         self._effort_policy = effort_policy or MediumReasoningEffortPolicy()
         self._lock = threading.Lock()
@@ -346,7 +352,7 @@ class ClaudeCliReasoningSelector:
             return None
         instructions = f"{_BASE_INSTRUCTIONS}\n\n{_DEVELOPER_INSTRUCTIONS}"
         schema = json.dumps(_OUTPUT_SCHEMA, separators=(",", ":"), sort_keys=True)
-        return [
+        command = [
             self._executable,
             "--safe-mode",
             "-p",
@@ -366,9 +372,11 @@ class ClaudeCliReasoningSelector:
             "1",
             "--effort",
             "medium",
-            "--system-prompt",
-            instructions,
         ]
+        if self._model is not None:
+            command.extend(["--model", self._model])
+        command.extend(["--system-prompt", instructions])
+        return command
 
     def select(  # noqa: C901  # Explicit fail-open process lifecycle.
         self,

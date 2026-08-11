@@ -315,6 +315,11 @@ The selector's authenticated Claude subprocess contract has a separate
 suite and reports a categorical blocker when the local Claude profile is not
 authenticated.
 
+Repeated `--max-turns 1` structured-output behavior has a separate
+[aggregate reliability matrix](docs/claude-structured-output-reliability.md).
+No CLI/model row is claimed supported until an authenticated run meets its
+documented threshold.
+
 ```bash
 make bootstrap
 make format-check

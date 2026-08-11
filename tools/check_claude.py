@@ -199,6 +199,28 @@ def test_cli_selector_contract() -> None:
     # environment; a bare "key not present" check here would pass even if the
     # allowlist itself were widened.
 
+    model_selector = ClaudeCliReasoningSelector(
+        value.selection_catalog,
+        executable="/usr/bin/true",
+        model="claude-test-model-1",
+    )
+    model_command = model_selector._command()
+    require(
+        model_command is not None
+        and model_command[model_command.index("--model") + 1] == "claude-test-model-1",
+        "explicit reliability-matrix model was not passed as one argv value",
+    )
+    try:
+        ClaudeCliReasoningSelector(
+            value.selection_catalog,
+            executable="/usr/bin/true",
+            model="unsafe model value",
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("unsafe model identifier was accepted")
+
 
 @check("CLAUDE-03-output-envelope-rejection")
 def test_output_rejection() -> None:
@@ -1556,6 +1578,33 @@ def test_real_selector_is_opt_in() -> None:
         require(
             set(evidence) == {"schema", "status", "blocker", "privacy"},
             "skipped real Claude evidence contains unexpected data",
+        )
+
+        matrix_report = Path(name) / "matrix.json"
+        matrix_environment = dict(environment)
+        matrix_environment.pop("OPENSOCRATES_CLAUDE_RELIABILITY", None)
+        matrix = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "tools" / "check_claude_reliability.py"),
+                "--report",
+                str(matrix_report),
+            ],
+            cwd=ROOT,
+            env=matrix_environment,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=10,
+            check=False,
+        )
+        require(matrix.returncode == 0, "Claude reliability matrix did not skip without opt-in")
+        matrix_evidence = json.loads(matrix_report.read_text(encoding="utf-8"))
+        require(
+            matrix_evidence.get("status") == "skipped"
+            and matrix_evidence.get("blocker") == "opt_in_required"
+            and matrix_evidence.get("rows") == [],
+            "Claude reliability matrix crossed its opt-in gate or invented a row",
         )
 
 
