@@ -404,6 +404,63 @@ def _manifest_targets(package: Path) -> list[str]:
     return [item for item in targets if isinstance(item, str)] if isinstance(targets, list) else []
 
 
+def _runtime_integrity_diagnose(
+    package: Path,
+    host: str,
+    target: str,
+    *,
+    runtime_output: str,
+) -> Mapping[str, Any]:
+    runtime = package.joinpath(runtime_output, target, *RUNTIME_LEAF)
+    _require(runtime.is_file(), "integrity diagnose runtime is missing")
+    with tempfile.TemporaryDirectory(prefix="opensocrates-integrity-data-") as data_name:
+        environment = dict(os.environ)
+        environment["XDG_DATA_HOME"] = data_name
+        completed = subprocess.run(
+            (str(runtime), "diagnose", "--host", host, "--json"),
+            cwd=package,
+            env=environment,
+            capture_output=True,
+            text=True,
+            timeout=90,
+            check=False,
+        )
+    _require(completed.returncode == 0, "packaged integrity diagnose failed")
+    try:
+        decoded = json.loads(completed.stdout)
+    except (TypeError, ValueError) as error:
+        raise CheckFailure("packaged integrity diagnose returned invalid JSON") from error
+    _require(isinstance(decoded, Mapping), "packaged integrity diagnose returned no object")
+    manifest = decoded.get("manifest")
+    _require(isinstance(manifest, Mapping), "packaged integrity diagnose omitted manifest status")
+    return manifest
+
+
+def _assert_integrity_tamper_detection(
+    package: Path,
+    host: str,
+    target: str,
+    *,
+    runtime_output: str,
+) -> None:
+    with tempfile.TemporaryDirectory(prefix="opensocrates-integrity-tamper-") as name:
+        staged = Path(name) / package.name
+        shutil.copytree(package, staged, symlinks=False)
+        readme = staged / "README.md"
+        _require(readme.is_file(), "tamper probe README is missing")
+        readme.write_bytes(readme.read_bytes() + b"\nsynthetic-integrity-tamper\n")
+        manifest = _runtime_integrity_diagnose(
+            staged,
+            host,
+            target,
+            runtime_output=runtime_output,
+        )
+        _require(
+            manifest.get("status") == "verified" and manifest.get("checksum_status") == "mismatch",
+            "packaged runtime did not report a staged checksum mismatch",
+        )
+
+
 def _exercised_targets() -> list[str]:
     """Cover the one target the released launcher is allowed to select."""
 
@@ -518,6 +575,28 @@ def check_root(root: Path) -> dict[str, Any]:
                     host,
                     runtime_output=runtime_output,
                 )
+                if label == "distributable":
+                    target = _exercised_targets()[0]
+                    integrity = _runtime_integrity_diagnose(
+                        package,
+                        host,
+                        target,
+                        runtime_output=runtime_output,
+                    )
+                    _require(
+                        integrity.get("status") == "verified"
+                        and integrity.get("checksum_status") == "verified",
+                        f"{host} distributable integrity was not verified",
+                    )
+                    host_result[label]["integrity"] = dict(integrity)
+                    if host == "claude":
+                        _assert_integrity_tamper_detection(
+                            package,
+                            host,
+                            target,
+                            runtime_output=runtime_output,
+                        )
+                        host_result[label]["tamper_mismatch_detected"] = True
             except CheckFailure as failure:
                 host_result[label] = {"error": str(failure)}
                 errors.append(f"{host}_{label}_packaged_launcher_unreachable")

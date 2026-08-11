@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import os
@@ -15,6 +16,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from opensocrates.application.diagnose import build_diagnose
+from opensocrates.cli.integrity import verify_runtime_integrity
 from opensocrates.cli.runtime import build_runtime_services
 from opensocrates.constants import INSTRUCTION_ARTIFACT_END_MARKER, SELECTOR_OUTCOME_LABELS
 from opensocrates.content import ProjectionInstructionAssembler, load_reasoning_content_projections
@@ -51,6 +53,7 @@ from opensocrates.selector.claude_cli import (
     _terminate_process,
 )
 from opensocrates.selector.sdk_worker import SELECTOR_RECURSION_ENV
+from opensocrates.version import CONTENT_REVISION, PRODUCT_VERSION
 
 ROOT = Path(__file__).resolve().parents[1]
 CHECKS: list[tuple[str, Callable[[], None]]] = []
@@ -2131,6 +2134,80 @@ def test_chat_archive_live_upload_evidence() -> None:
         report.get("support_claim") == "skills_only_upload_path_validated",
         "Chat support claim is not backed by the live receipt",
     )
+
+
+@check("CLAUDE-18-runtime-manifest-and-checksum-verification")
+def test_runtime_integrity_verification() -> None:
+    with tempfile.TemporaryDirectory(prefix="opensocrates-integrity-check-") as name:
+        package = Path(name) / "claude"
+        binary = (
+            package / "runtime" / "darwin-arm64" / "opensocrates-runtime" / "opensocrates-runtime"
+        )
+        binary.parent.mkdir(parents=True)
+        binary.write_bytes(b"synthetic-runtime")
+        readme = package / "README.md"
+        readme.write_text("synthetic package", encoding="utf-8")
+        manifest = package / "release-manifest.json"
+        manifest.write_text(
+            json.dumps(
+                {
+                    "schema": "opensocrates.plugin-release-manifest/1.0.0",
+                    "host": "claude",
+                    "product_version": PRODUCT_VERSION,
+                    "content_revision": CONTENT_REVISION,
+                },
+                sort_keys=True,
+            ),
+            encoding="utf-8",
+        )
+
+        def write_checksums() -> None:
+            rows = []
+            for path in sorted(
+                candidate for candidate in package.rglob("*") if candidate.is_file()
+            ):
+                if path.name == "checksums.sha256":
+                    continue
+                digest = hashlib.sha256(path.read_bytes()).hexdigest()
+                rows.append(f"{digest}  {path.relative_to(package).as_posix()}\n")
+            (package / "checksums.sha256").write_text("".join(rows), encoding="utf-8")
+
+        write_checksums()
+        verified = verify_runtime_integrity(host="claude", executable=binary)
+        require(
+            verified.manifest_status == "verified"
+            and verified.manifest_version == PRODUCT_VERSION
+            and verified.checksum_status == "verified",
+            "untampered package integrity was not verified",
+        )
+        readme.write_text("tampered package", encoding="utf-8")
+        require(
+            verify_runtime_integrity(host="claude", executable=binary).checksum_status
+            == "mismatch",
+            "tampered package checksum was not rejected",
+        )
+        readme.write_text("synthetic package", encoding="utf-8")
+        write_checksums()
+        (package / "unexpected.txt").write_text("unexpected", encoding="utf-8")
+        require(
+            verify_runtime_integrity(host="claude", executable=binary).checksum_status
+            == "mismatch",
+            "unexpected package file was not rejected",
+        )
+        (package / "unexpected.txt").unlink()
+        (package / "checksums.sha256").unlink()
+        unavailable = verify_runtime_integrity(host="claude", executable=binary)
+        require(
+            unavailable.manifest_status == "unavailable"
+            and unavailable.checksum_status == "unavailable",
+            "missing checksum inventory did not fail closed",
+        )
+        snapshot = build_diagnose(manifest_status="mismatch", checksum_status="mismatch")
+        require(
+            snapshot.manifest["status"] == "mismatch"
+            and snapshot.manifest["checksum_status"] == "mismatch",
+            "diagnose did not preserve package mismatch states",
+        )
 
 
 def main() -> int:

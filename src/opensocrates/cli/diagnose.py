@@ -66,14 +66,18 @@ def diagnose_main(
     selected = snapshot
     if selected is None:
         services = build_runtime_services()
+        from .integrity import verify_runtime_integrity
+
+        integrity = verify_runtime_integrity()
         selector_outcome_reader = getattr(services, "selector_outcome_counts", None)
         selector_outcomes = selector_outcome_reader() if callable(selector_outcome_reader) else {}
         selected = build_diagnose(
             profiles=services.capability_profiles,
             bundle=services.bundle,
             health=services.health,
-            manifest_status="verified" if services.bundle is not None else "unavailable",
-            checksum_status="verified" if services.bundle is not None else "unavailable",
+            manifest_status=integrity.manifest_status,
+            manifest_version=integrity.manifest_version,
+            checksum_status=integrity.checksum_status,
             platform_name=__import__("platform").system(),
             architecture=__import__("platform").machine(),
             selector_outcomes=selector_outcomes,

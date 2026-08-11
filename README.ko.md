@@ -16,7 +16,7 @@ OpenSocrates는 Claude와 Codex를 위한 로컬 연동 및 저작 추론 프레
 추론 시스템을 고른 뒤, 이론과 예제 전체를 활성 작업에 추가합니다. 단순한 사실
 확인과 기계적인 작업은 그대로 통과할 수 있습니다.
 
-버전 `1.1.4`에는 48개의 추론 시스템, Claude의 단일 사용자 진입점, 선택된 절차를
+버전 `1.1.5`에는 48개의 추론 시스템, Claude의 단일 사용자 진입점, 선택된 절차를
 실제로 읽었는지 확인하는 Claude 접지 게이트, Claude/Codex 통합 라이프사이클,
 선택형 자동 업데이트가 들어 있습니다. 현재 릴리스 플랫폼은 Apple Silicon
 macOS(`darwin-arm64`)입니다. 기존 호스트 로그인을 사용하므로 API 키나
@@ -26,17 +26,17 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 런처는 `darwin-arm64`만 허용하며, Intel Mac·Linux·Windows용 런처와 런타임은
 이번 릴리스에 포함되거나 지원되지 않습니다.
 
-> **최신 릴리스: [OpenSocrates 1.1.4](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.4).**
-> Cowork에 업로드할 수 있는 Claude 네이티브 패키지, 호스트별 런타임 분리, 사용할 수
-> 없는 집계와 0회를 구분하는 내용 없는 셀렉터 진단을 추가했습니다.
-> `npx --yes opensocrates@1.1.4 update --host all`로 관리 중인 두 호스트를 함께
+> **최신 릴리스: [OpenSocrates 1.1.5](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.5).**
+> Claude 접지 파일을 추가 디렉터리 권한 없이 읽을 수 있게 하고, `diagnose`에서
+> 설치 패키지를 실제로 검증하며, Codex의 최초 훅 승인 경계를 명확히 했습니다.
+> `npx --yes opensocrates@1.1.5 update --host all`로 관리 중인 두 호스트를 함께
 > 업데이트할 수 있습니다.
 
 ## 호스트 지원 범위
 
 | 호스트 화면 | 자동 선택 | 사용자 진입점 | 검증 상태 |
 | --- | --- | --- | --- |
-| Codex CLI 및 Desktop | 지원 | OpenSocrates 플러그인 | `darwin-arm64` 릴리스 검증 완료 |
+| Codex CLI 및 Desktop | 앱에서 훅을 한 번 승인한 뒤 지원 | OpenSocrates 플러그인 | `darwin-arm64` 패키지·런처 릴리스 검증 완료, 실제 Codex 훅 전달 영수증 없음 |
 | Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | `/opensocrates` | `darwin-arm64` 로컬 검증 완료 |
 | Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 지원 | `/opensocrates` | [인증된 훅 생명주기 로컬 검증 완료](docs/claude-desktop-live-probe.md) |
 | Claude Cowork | 실측 로컬 플러그인 업로드에서 지원 | `/opensocrates` | [네이티브 훅 생명주기 로컬 검증 완료, 릴리스 직접 업로드 지원, 마켓플레이스 동기화 없음](docs/claude-cowork-live-probe.md) |
@@ -47,7 +47,8 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 - **구현 완료** — 코드에 존재하고 패키지에 포함됩니다.
 - **로컬 검증 완료** — 관리자 장비에서 전 구간을 실행했지만 매 빌드마다
   검증하지는 않습니다.
-- **릴리스 검증 완료** — 릴리스 게이트가 매 빌드마다 실행합니다.
+- **릴리스 검증 완료** — 릴리스 게이트가 매 빌드마다 실행합니다. 현재 Codex는
+  패키지와 런처를 검증하며 실제 훅 전달까지 검증했다는 뜻은 아닙니다.
 - **실험적 / 실측 수신 기록 없음** — 구현은 되어 있지만 호스트가 실제로 훅을
   전달했다는 기록이 없습니다. `os capabilities show`는 이 항목들을 사용 가능이
   아니라 `unknown`으로 보고합니다.
@@ -80,7 +81,7 @@ Node.js 20 이상이 필요합니다. npm에 게시된 `opensocrates` 패키지�
 ### 준비된 모든 호스트에 설치
 
 ```bash
-npx --yes opensocrates@1.1.4 install --host all
+npx --yes opensocrates@1.1.5 install --host all
 ```
 
 모든 호스트 경로는 지원되는 인증 완료 CLI를 찾고, 어느 호스트도 바꾸기 전에
@@ -91,9 +92,9 @@ npx --yes opensocrates@1.1.4 install --host all
 전체 라이프사이클에서 같은 호스트 값을 사용할 수 있습니다.
 
 ```bash
-npx --yes opensocrates@1.1.4 status --host all
-npx --yes opensocrates@1.1.4 update --host all
-npx --yes opensocrates@1.1.4 remove --host all
+npx --yes opensocrates@1.1.5 status --host all
+npx --yes opensocrates@1.1.5 update --host all
+npx --yes opensocrates@1.1.5 remove --host all
 ```
 
 소유자 전용 `~/.opensocrates/desired-state.json`에는 선택 채널, 설치된 호스트,
@@ -105,9 +106,9 @@ npx --yes opensocrates@1.1.4 remove --host all
 기존 사용자와의 호환성을 위해 기본 호스트는 계속 Codex입니다.
 
 ```bash
-npx --yes opensocrates@1.1.4 install
-# 같은 명령: npx --yes opensocrates@1.1.4 install --host codex
-npx --yes opensocrates@1.1.4 install --host claude
+npx --yes opensocrates@1.1.5 install
+# 같은 명령: npx --yes opensocrates@1.1.5 install --host codex
+npx --yes opensocrates@1.1.5 install --host claude
 ```
 
 기존 `--host codex` 및 `--host claude` 라이프사이클은 그대로 지원합니다. 호스트별
@@ -124,9 +125,9 @@ Claude 상태는 활성 설치와 설치됐지만 비활성화된 플러그인�
 ### 선택형 자동 업데이트
 
 ```bash
-npx --yes opensocrates@1.1.4 auto-update enable --host all
-npx --yes opensocrates@1.1.4 auto-update status
-npx --yes opensocrates@1.1.4 auto-update disable
+npx --yes opensocrates@1.1.5 auto-update enable --host all
+npx --yes opensocrates@1.1.5 auto-update status
+npx --yes opensocrates@1.1.5 auto-update disable
 ```
 
 자동 업데이트는 명시적으로 켜기 전까지 비활성화되어 있습니다. macOS LaunchAgent는
@@ -148,7 +149,7 @@ LaunchAgent를 언로드하고 삭제하며, `remove --host all`도 관리 호�
 ### Claude 웹 및 Desktop Chat 스킬
 
 이 화면들은 플러그인 스킬은 지원하지만 훅은 실행하지 않습니다. 릴리스에서
-`opensocrates-1.1.4-claude-chat-skills.zip`을 내려받아 Claude의 **사용자 지정 →
+`opensocrates-1.1.5-claude-chat-skills.zip`을 내려받아 Claude의 **사용자 지정 →
 스킬 → 스킬 업로드** 화면에서 업로드하세요. ZIP은 업로더 요구사항에 맞춰
 최상위 `opensocrates/` 폴더 바로 아래에 `SKILL.md`를 둡니다. 패키지는
 `/opensocrates` 스킬 하나만 노출하고, 48개
@@ -162,21 +163,21 @@ LaunchAgent를 언로드하고 삭제하며, `remove --host all`도 관리 호�
 npm 레지스트리를 거치지 않을 때도 같은 호스트 옵션을 사용합니다.
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.4 install --host all
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.4 install --host claude
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.4 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.5 install --host all
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.5 install --host claude
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.5 install --host codex
 ```
 
 ### 릴리스 파일 직접 검증
 
-[v1.1.4 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.4)에서
+[v1.1.5 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.5)에서
 `opensocrates.mjs`, 호스트 패키지, `.sha256` 파일을 내려받습니다. Claude의 예:
 
 ```bash
-shasum -a 256 -c opensocrates-1.1.4-claude-plugin.zip.sha256
+shasum -a 256 -c opensocrates-1.1.5-claude-plugin.zip.sha256
 node opensocrates.mjs install --host claude \
-  --asset opensocrates-1.1.4-claude-plugin.zip \
-  --checksum opensocrates-1.1.4-claude-plugin.zip.sha256
+  --asset opensocrates-1.1.5-claude-plugin.zip \
+  --checksum opensocrates-1.1.5-claude-plugin.zip.sha256
 ```
 
 Codex 패키지는 `claude`를 `codex`로 바꾸면 됩니다.
@@ -191,7 +192,7 @@ Codex 패키지는 `claude`를 `codex`로 바꾸면 됩니다.
 ```bash
 claude plugin uninstall opensocrates@OpenSocrates --scope user
 claude plugin marketplace remove OpenSocrates --scope user
-npx --yes opensocrates@1.1.4 install --host claude
+npx --yes opensocrates@1.1.5 install --host claude
 ```
 
 관리형 v1.1.0 Claude 설치를 업데이트하면 패키지 트리 전체가 교체됩니다. 따라서
@@ -206,11 +207,24 @@ Claude나 Codex를 평소처럼 사용하세요. 요청에 판단, 해석, 진�
 
 1. 현재 호스트에서 새로운 비영구 셀렉터를 시작합니다.
 2. 저작된 48개 시스템 카탈로그에서 적합한 시스템을 선택합니다.
-3. 선택된 전체 콘텐츠를 소유자 전용 임시 Markdown 파일에 씁니다.
+3. 선택된 전체 콘텐츠를 소유자 전용 Markdown 파일에 씁니다.
 4. 각 방법 ID와 콘텐츠 리비전, 크기 한도 안에 들면 정확한 `Do not use when` 및
    `Stop conditions`를 작은 숨김 컨텍스트에 추가합니다.
 5. 활성 작업이 방법을 적용하기 전에 전체 파일을 읽고, 접지된 답변의 마지막에
    `OpenSocrates grounding: triangulation@1`과 같은 정확한 감사 줄을 남기게 합니다.
+
+Codex에 설치한 뒤에는 대화형 Codex 세션을 한 번 열어 OpenSocrates 훅을 승인해야
+자동 선택을 신뢰할 수 있습니다. 이 승인이 끝나기 전에는 `codex exec` 같은 비대화형
+화면이 신뢰되지 않은 훅을 조용히 건너뛸 수 있습니다.
+
+Claude 훅 화면은 추가 디렉터리 권한 없이 선택 콘텐츠를 읽을 수 있도록 현재
+워크스페이스 안의 소유자 전용 `.opensocrates` artifact 영역을 우선 사용합니다.
+내부 `.gitignore`가 이 영역을 `git status`에서 숨기고 turn·세션 정리 시 파일을
+삭제합니다. 워크스페이스를 사용할 수 없으면 소유자 전용 OS 임시 디렉터리로
+대체합니다. 다만 `.gitignore`나 숨김 디렉터리를 무시하지 않는 별도 백업·동기화
+도구는 artifact가 존재하는 동안 저작된 OpenSocrates 콘텐츠를 볼 수 있습니다.
+artifact에는 원시 프롬프트, 대화 기록, 워크스페이스 콘텐츠, 자격 증명, 셀렉터
+추론이 들어가지 않습니다.
 
 Claude 훅 화면에서는 Read 전용 `PostToolUse` 훅이 현재 turn의 정확한 파일을 첫
 줄부터 종료 표식까지 읽은 경우에만 인증된 영수증을 만듭니다. `Stop` 시 영수증이나
@@ -293,6 +307,13 @@ Claude 셀렉터 시도는 `executable_missing`, `request_rejected`, `spawn_fail
 집계를 읽을 수 없으면 `diagnose`는 시도 0회라고 단정하지 않고 `unavailable`로
 표시합니다. 다음 유효한 셀렉터 결과가 현재 스키마의 손상된 집계를 새로운 제한된
 카운트 문서로 교체하며, 알 수 없는 미래 스키마는 해당 새 런타임을 위해 보존합니다.
+
+패키지의 `diagnose` 명령은 설치 파일 목록을 `checksums.sha256`과 대조하고 릴리스
+manifest가 실행 중인 버전·호스트·콘텐츠 리비전을 가리키는지도 확인합니다. 단순한
+파일 존재 여부로 성공을 추정하지 않고 `verified`, `mismatch`, `unavailable`,
+`unverified`를 표시합니다. 이 해시는 로컬 변경이나 손상을 찾지만 manifest와
+checksum 파일 자체는 서명되지 않았으므로 패키지 전체를 바꿀 수 있는 공격자에 대한
+진본성 증명은 아닙니다.
 
 자동 업데이트를 켜면 앞서 설명한 desired state와 간결한 영수증만 소유자 전용
 권한으로 저장합니다. 실행 중인 Claude나 Codex 세션을 검사하거나 종료하지 않습니다.

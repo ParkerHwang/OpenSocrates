@@ -487,6 +487,12 @@ for (const host of ["claude", "codex"]) {
       await withDarwinArm64(async () => {
         const install = await quiet(() => main(["install", ...args]));
         assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+        if (host === "codex") {
+          assert.match(install.output, /open one interactive Codex session/);
+          assert.match(install.output, /codex exec silently skips hooks/);
+        } else {
+          assert.doesNotMatch(install.output, /Codex approval required/);
+        }
       });
       assert.equal(box.state().plugins.length, 1, "plugin was not registered");
       assert.ok(existsSync(join(box.managedRoot, ".opensocrates-managed.json")), "ownership marker missing");

@@ -88,7 +88,12 @@ OpenSocrates selection on those machines.
 
 The candidate chooses IDs only. OpenSocrates discards candidate instruction
 text and deterministically assembles the selected authored theory and examples.
-Complete content is written to an owner-only temporary Markdown file. Claude
+Complete content is written to an owner-only Markdown file. Claude hook
+surfaces prefer a self-ignored `.opensocrates` area inside the current
+workspace so the host can read it without another directory permission; an
+owner-only OS temporary directory remains the fail-open fallback. A backup or
+sync tool that does not honor `.gitignore` or hidden-directory conventions can
+observe this authored artifact while it exists. Claude
 receives one hidden `additionalContext` message naming that file, identifying
 each selection as `method-id@content-revision`, requiring a complete read before
 acting, and requiring the same identifiers in a final grounding audit line.

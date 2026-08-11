@@ -31,6 +31,9 @@ _MAX_RECEIPT_BYTES = 16 * 1024
 _ARTIFACT_SCHEMA = "opensocrates.instruction-artifact/2"
 _RECEIPT_SCHEMA = "opensocrates.instruction-read-receipt/2"
 _RECEIPT_FILENAME = ".grounding-receipt.json"
+_WORKSPACE_CONTAINER = ".opensocrates"
+_WORKSPACE_IGNORE_FILENAME = ".gitignore"
+_WORKSPACE_IGNORE_BYTES = b"*\n"
 _HEADER_PREFIX = b"<!-- OPENSOCRATES_ARTIFACT_V2 "
 _HEADER_SUFFIX = b" -->"
 _TAG_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -284,28 +287,55 @@ class InstructionFileStore:
         *,
         installation_key: bytes,
         directory: Path | None = None,
+        workspace: Path | None = None,
         clock: Clock | None = None,
     ) -> None:
         self._installation_key = _require_key(installation_key)
         self._clock = clock or SystemClock()
-        if directory is None:
+        root_tag = _tag(self._installation_key, b"instruction-artifact-root")
+        self._workspace_container: Path | None = None
+        if directory is not None:
+            selected = Path(directory)
+            if not selected.is_absolute():
+                raise InstructionArtifactError("instruction artifact directory must be absolute")
+            directories = [selected]
+        else:
             try:
                 temporary_root = Path(tempfile.gettempdir()).resolve(strict=True)
             except OSError as error:
                 raise InstructionArtifactError(
                     "system temporary directory is unavailable"
                 ) from error
-            root_tag = _tag(self._installation_key, b"instruction-artifact-root")
-            directory = temporary_root / f"opensocrates-{root_tag}"
-        if not isinstance(directory, Path):
-            directory = Path(directory)
-        if not directory.is_absolute():
-            raise InstructionArtifactError("instruction artifact directory must be absolute")
-        self._directory = directory
+            directories = []
+            workspace_root = self._workspace_root(workspace, root_tag)
+            if workspace_root is not None:
+                self._workspace_container = workspace_root.parent
+                directories.append(workspace_root)
+            directories.append(temporary_root / f"opensocrates-{root_tag}")
+        self._directories = tuple(dict.fromkeys(directories))
+        self._directory = self._directories[0]
 
     @property
     def directory(self) -> Path:
         return self._directory
+
+    @staticmethod
+    def _workspace_root(workspace: Path | None, root_tag: str) -> Path | None:
+        if workspace is None:
+            return None
+        try:
+            candidate = Path(workspace)
+            if not candidate.is_absolute():
+                return None
+            resolved = candidate.resolve(strict=True)
+            info = resolved.lstat()
+        except (OSError, TypeError, ValueError):
+            return None
+        if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
+            return None
+        if os.name != "nt" and info.st_uid != os.geteuid():
+            return None
+        return resolved / _WORKSPACE_CONTAINER / root_tag
 
     def _ensure_owned_directory(self, path: Path) -> None:
         try:
@@ -335,15 +365,99 @@ class InstructionFileStore:
                     "instruction artifact directory permissions are unsafe"
                 )
 
-    def _ensure_root(self) -> None:
-        parent = self._directory.parent
+    @staticmethod
+    def _write_workspace_ignore(path: Path) -> None:
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+        descriptor: int | None = None
+        try:
+            descriptor = os.open(path, flags, 0o600)
+            if hasattr(os, "fchmod"):
+                os.fchmod(descriptor, 0o600)
+            os.write(descriptor, _WORKSPACE_IGNORE_BYTES)
+            os.fsync(descriptor)
+        finally:
+            if descriptor is not None:
+                os.close(descriptor)
+
+    def _ensure_workspace_container(  # noqa: C901  # Branch-explicit path safety checks.
+        self, container: Path
+    ) -> None:
+        workspace = container.parent
+        try:
+            workspace_info = workspace.lstat()
+        except OSError as error:
+            raise InstructionArtifactError("workspace directory cannot be inspected") from error
+        if stat.S_ISLNK(workspace_info.st_mode) or not stat.S_ISDIR(workspace_info.st_mode):
+            raise InstructionArtifactError("workspace directory is unsafe")
+        if os.name != "nt" and workspace_info.st_uid != os.geteuid():
+            raise InstructionArtifactError("workspace directory has the wrong owner")
+        self._ensure_owned_directory(container)
+        try:
+            children = tuple(container.iterdir())
+        except OSError as error:
+            raise InstructionArtifactError("workspace artifact directory is unavailable") from error
+        for child in children:
+            if child.name == _WORKSPACE_IGNORE_FILENAME:
+                continue
+            if _TAG_RE.fullmatch(child.name) is None:
+                raise InstructionArtifactError("workspace artifact directory contains foreign data")
+            try:
+                info = child.lstat()
+            except OSError as error:
+                raise InstructionArtifactError("workspace artifact directory is unsafe") from error
+            if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
+                raise InstructionArtifactError("workspace artifact directory is unsafe")
+            if os.name != "nt" and info.st_uid != os.geteuid():
+                raise InstructionArtifactError("workspace artifact directory has the wrong owner")
+        ignore = container / _WORKSPACE_IGNORE_FILENAME
+        try:
+            if ignore.exists() or ignore.is_symlink():
+                info = self._inspect_regular_file(ignore)
+                if (
+                    info.st_size != len(_WORKSPACE_IGNORE_BYTES)
+                    or self._read_owner_file(ignore, maximum=len(_WORKSPACE_IGNORE_BYTES))
+                    != _WORKSPACE_IGNORE_BYTES
+                ):
+                    raise InstructionArtifactError("workspace ignore sentinel is unsafe")
+            else:
+                self._write_workspace_ignore(ignore)
+                self._inspect_regular_file(ignore)
+        except OSError as error:
+            raise InstructionArtifactError("workspace ignore sentinel is unavailable") from error
+
+    def _ensure_root(self, root: Path) -> None:
+        parent = root.parent
+        if self._workspace_container is not None and parent == self._workspace_container:
+            self._ensure_workspace_container(parent)
         try:
             parent_info = parent.lstat()
         except OSError as error:
             raise InstructionArtifactError("temporary directory cannot be inspected") from error
         if not stat.S_ISDIR(parent_info.st_mode) or stat.S_ISLNK(parent_info.st_mode):
             raise InstructionArtifactError("temporary directory is unsafe")
-        self._ensure_owned_directory(self._directory)
+        self._ensure_owned_directory(root)
+
+    def _cleanup_root(self, root: Path) -> None:
+        try:
+            root.rmdir()
+        except OSError:
+            return
+        if self._workspace_container is None or root.parent != self._workspace_container:
+            return
+        container = self._workspace_container
+        ignore = container / _WORKSPACE_IGNORE_FILENAME
+        try:
+            children = tuple(container.iterdir())
+            if children == (ignore,):
+                self._inspect_regular_file(ignore)
+                if (
+                    self._read_owner_file(ignore, maximum=len(_WORKSPACE_IGNORE_BYTES))
+                    == _WORKSPACE_IGNORE_BYTES
+                ):
+                    ignore.unlink()
+                    container.rmdir()
+        except (OSError, InstructionArtifactError):
+            return
 
     def _session_tag(self, session_id: str | None) -> str:
         session = _bounded_identity(session_id, "session_id")
@@ -354,11 +468,13 @@ class InstructionFileStore:
         turn = _bounded_identity(turn_id, "turn_id")
         return _tag(self._installation_key, b"instruction-artifact-turn", session, turn)
 
-    def _session_directory(self, session_id: str | None) -> Path:
-        return self._directory / self._session_tag(session_id)
+    def _session_directory(self, session_id: str | None, *, root: Path | None = None) -> Path:
+        return (root or self._directory) / self._session_tag(session_id)
 
-    def _turn_directory(self, session_id: str | None, turn_id: str | None) -> Path:
-        return self._session_directory(session_id) / self._turn_tag(session_id, turn_id)
+    def _turn_directory(
+        self, session_id: str | None, turn_id: str | None, *, root: Path | None = None
+    ) -> Path:
+        return self._session_directory(session_id, root=root) / self._turn_tag(session_id, turn_id)
 
     @staticmethod
     def _metadata(assembled: AssembledInstruction) -> dict[str, object]:
@@ -448,10 +564,29 @@ class InstructionFileStore:
         if not isinstance(assembled, AssembledInstruction):
             raise InstructionArtifactError("instruction artifact requires canonical content")
         data = self._encode(assembled)
-        self._ensure_root()
-        session_directory = self._session_directory(session_id)
+        failure: Exception | None = None
+        for root in self._directories:
+            try:
+                return self._create_in_root(root, session_id, turn_id, assembled, data)
+            except Exception as error:
+                failure = error
+                self._cleanup_root(root)
+        if failure is not None:
+            raise failure
+        raise InstructionArtifactError("instruction artifact has no available directory")
+
+    def _create_in_root(
+        self,
+        root: Path,
+        session_id: str | None,
+        turn_id: str | None,
+        assembled: AssembledInstruction,
+        data: bytes,
+    ) -> InstructionArtifact:
+        self._ensure_root(root)
+        session_directory = self._session_directory(session_id, root=root)
         self._ensure_owned_directory(session_directory)
-        turn_directory = self._turn_directory(session_id, turn_id)
+        turn_directory = self._turn_directory(session_id, turn_id, root=root)
         self._ensure_owned_directory(turn_directory)
         fd: int | None = None
         path: Path | None = None
@@ -540,36 +675,34 @@ class InstructionFileStore:
     ) -> InstructionArtifact | None:
         """Return the newest live artifact in a session without reading its instruction body."""
 
-        try:
-            session_directory = self._session_directory(session_id)
-            info = session_directory.lstat()
-        except (OSError, InstructionArtifactError):
-            return None
-        if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
-            return None
         candidates: list[tuple[int, Path]] = []
-        try:
-            turn_directories = tuple(session_directory.iterdir())
-        except OSError:
-            return None
-        for turn_directory in turn_directories:
-            if _TAG_RE.fullmatch(turn_directory.name) is None:
-                continue
+        for root in self._directories:
             try:
-                turn_info = turn_directory.lstat()
-                if stat.S_ISLNK(turn_info.st_mode) or not stat.S_ISDIR(turn_info.st_mode):
+                session_directory = self._session_directory(session_id, root=root)
+                info = session_directory.lstat()
+                if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
                     continue
-                files = tuple(turn_directory.iterdir())
-            except OSError:
+                turn_directories = tuple(session_directory.iterdir())
+            except (OSError, InstructionArtifactError):
                 continue
-            for path in files:
-                if _FILE_RE.fullmatch(path.name) is None:
+            for turn_directory in turn_directories:
+                if _TAG_RE.fullmatch(turn_directory.name) is None:
                     continue
                 try:
-                    file_info = self._inspect_regular_file(path)
-                except InstructionArtifactError:
+                    turn_info = turn_directory.lstat()
+                    if stat.S_ISLNK(turn_info.st_mode) or not stat.S_ISDIR(turn_info.st_mode):
+                        continue
+                    files = tuple(turn_directory.iterdir())
+                except OSError:
                     continue
-                candidates.append((file_info.st_mtime_ns, path))
+                for path in files:
+                    if _FILE_RE.fullmatch(path.name) is None:
+                        continue
+                    try:
+                        file_info = self._inspect_regular_file(path)
+                    except InstructionArtifactError:
+                        continue
+                    candidates.append((file_info.st_mtime_ns, path))
         for _mtime, path in sorted(candidates, reverse=True):
             try:
                 artifact = self._decode_header(path)
@@ -586,7 +719,8 @@ class InstructionFileStore:
             candidate = Path(file_path) if isinstance(file_path, (str, Path)) else None
             if candidate is None or not candidate.is_absolute():
                 return False
-            relative = candidate.relative_to(self._directory)
+            root = self._root_for(candidate)
+            relative = candidate.relative_to(root)
         except (TypeError, ValueError):
             return False
         parts = relative.parts
@@ -597,13 +731,24 @@ class InstructionFileStore:
             and _FILE_RE.fullmatch(parts[2]) is not None
         )
 
+    def _root_for(self, path: Path) -> Path:
+        for root in self._directories:
+            try:
+                relative = path.relative_to(root)
+            except ValueError:
+                continue
+            if len(relative.parts) == 3:
+                return root
+        raise ValueError("instruction artifact path is outside its stores")
+
     def _artifact_instance_tag(self, artifact: InstructionArtifact) -> str:
         """Bind a receipt to one randomized artifact path without disclosing it."""
 
         if not self.accepts_artifact_path(artifact.path):
             raise InstructionArtifactError("instruction artifact path is outside its store")
         try:
-            relative = artifact.path.relative_to(self._directory).as_posix()
+            root = self._root_for(artifact.path)
+            relative = artifact.path.relative_to(root).as_posix()
         except ValueError as error:
             raise InstructionArtifactError(
                 "instruction artifact path is outside its store"
@@ -694,7 +839,8 @@ class InstructionFileStore:
                 return False
             if end_marker_seen is not True:
                 return False
-            expected_directory = self._turn_directory(session_id, turn_id)
+            root = self._root_for(artifact.path)
+            expected_directory = self._turn_directory(session_id, turn_id, root=root)
             candidate = Path(file_path) if isinstance(file_path, (str, Path)) else None
             if (
                 candidate is None
@@ -806,11 +952,11 @@ class InstructionFileStore:
         ):
             return False
 
-    def _remove_tree(self, path: Path) -> int:
+    def _remove_tree(self, path: Path, *, root: Path) -> int:
         """Remove an exact artifact subtree without following symlinks."""
 
         try:
-            path.relative_to(self._directory)
+            path.relative_to(root)
             info = path.lstat()
         except (ValueError, OSError):
             return 0
@@ -828,7 +974,7 @@ class InstructionFileStore:
         except OSError:
             return 0
         for child in children:
-            removed += self._remove_tree(child)
+            removed += self._remove_tree(child, root=root)
         try:
             path.rmdir()
         except OSError:
@@ -840,120 +986,133 @@ class InstructionFileStore:
     def delete_turn(self, session_id: str | None, turn_id: str | None) -> int:
         """Best-effort immediate cleanup for every artifact created by one turn."""
 
-        try:
-            turn_directory = self._turn_directory(session_id, turn_id)
-            session_directory = turn_directory.parent
-        except InstructionArtifactError:
-            return 0
-        removed = self._remove_tree(turn_directory)
-        try:
-            session_directory.rmdir()
-        except OSError:
-            pass
-        else:
-            removed += 1
-        return removed
-
-    def delete_superseded_turns(self, session_id: str | None, active_turn_id: str | None) -> int:
-        """Remove prior turn trees while preserving the exact active turn tree."""
-
-        try:
-            active_directory = self._turn_directory(session_id, active_turn_id)
-            session_directory = active_directory.parent
-            children = tuple(session_directory.iterdir())
-        except (OSError, InstructionArtifactError):
-            return 0
         removed = 0
-        for child in children:
-            if child.name == active_directory.name or _TAG_RE.fullmatch(child.name) is None:
-                continue
-            removed += self._remove_tree(child)
-        return removed
-
-    def delete_session(self, session_id: str | None) -> int:
-        """Best-effort cleanup for every artifact in one completed session."""
-
-        try:
-            session_directory = self._session_directory(session_id)
-        except InstructionArtifactError:
-            return 0
-        return self._remove_tree(session_directory)
-
-    def sweep_expired(  # noqa: C901  # Branch-explicit best-effort cleanup.
-        self,
-    ) -> int:
-        """Delete artifact files older than the confirmed 24-hour crash-recovery TTL."""
-
-        try:
-            self._ensure_root()
-            sessions = tuple(self._directory.iterdir())
-        except (OSError, InstructionArtifactError):
-            return 0
-        cutoff_ns = (_now_seconds(self._clock) - INSTRUCTION_FILE_TTL_SECONDS) * 1_000_000_000
-        removed = 0
-        for session_directory in sessions:
-            if _TAG_RE.fullmatch(session_directory.name) is None:
-                continue
+        for root in self._directories:
             try:
-                session_info = session_directory.lstat()
-                if stat.S_ISLNK(session_info.st_mode) or not stat.S_ISDIR(session_info.st_mode):
-                    continue
-                turns = tuple(session_directory.iterdir())
-            except OSError:
+                turn_directory = self._turn_directory(session_id, turn_id, root=root)
+                session_directory = turn_directory.parent
+            except InstructionArtifactError:
                 continue
-            for turn_directory in turns:
-                if _TAG_RE.fullmatch(turn_directory.name) is None:
-                    continue
-                try:
-                    turn_info = turn_directory.lstat()
-                    if stat.S_ISLNK(turn_info.st_mode) or not stat.S_ISDIR(turn_info.st_mode):
-                        continue
-                    files = tuple(turn_directory.iterdir())
-                except OSError:
-                    continue
-                for path in files:
-                    if _FILE_RE.fullmatch(path.name) is None:
-                        continue
-                    try:
-                        info = path.lstat()
-                        if (
-                            stat.S_ISREG(info.st_mode)
-                            and not stat.S_ISLNK(info.st_mode)
-                            and info.st_mtime_ns <= cutoff_ns
-                        ):
-                            path.unlink()
-                            removed += 1
-                    except OSError:
-                        continue
-                try:
-                    remaining_instructions = any(
-                        _FILE_RE.fullmatch(path.name) is not None
-                        and path.is_file()
-                        and not path.is_symlink()
-                        for path in turn_directory.iterdir()
-                    )
-                    receipt_path = turn_directory / _RECEIPT_FILENAME
-                    if not remaining_instructions and receipt_path.exists():
-                        receipt_info = receipt_path.lstat()
-                        if stat.S_ISREG(receipt_info.st_mode) and not stat.S_ISLNK(
-                            receipt_info.st_mode
-                        ):
-                            receipt_path.unlink()
-                            removed += 1
-                except OSError:
-                    pass
-                try:
-                    turn_directory.rmdir()
-                except OSError:
-                    pass
-                else:
-                    removed += 1
+            removed += self._remove_tree(turn_directory, root=root)
             try:
                 session_directory.rmdir()
             except OSError:
                 pass
             else:
                 removed += 1
+            self._cleanup_root(root)
+        return removed
+
+    def delete_superseded_turns(self, session_id: str | None, active_turn_id: str | None) -> int:
+        """Remove prior turn trees while preserving the exact active turn tree."""
+
+        removed = 0
+        for root in self._directories:
+            try:
+                active_directory = self._turn_directory(session_id, active_turn_id, root=root)
+                session_directory = active_directory.parent
+                children = tuple(session_directory.iterdir())
+            except (OSError, InstructionArtifactError):
+                continue
+            for child in children:
+                if child.name == active_directory.name or _TAG_RE.fullmatch(child.name) is None:
+                    continue
+                removed += self._remove_tree(child, root=root)
+            self._cleanup_root(root)
+        return removed
+
+    def delete_session(self, session_id: str | None) -> int:
+        """Best-effort cleanup for every artifact in one completed session."""
+
+        removed = 0
+        for root in self._directories:
+            try:
+                session_directory = self._session_directory(session_id, root=root)
+            except InstructionArtifactError:
+                continue
+            removed += self._remove_tree(session_directory, root=root)
+            self._cleanup_root(root)
+        return removed
+
+    def sweep_expired(  # noqa: C901  # Branch-explicit best-effort cleanup.
+        self,
+    ) -> int:
+        """Delete artifact files older than the confirmed 24-hour crash-recovery TTL."""
+
+        cutoff_ns = (_now_seconds(self._clock) - INSTRUCTION_FILE_TTL_SECONDS) * 1_000_000_000
+        removed = 0
+        for root in self._directories:
+            try:
+                if not root.exists():
+                    continue
+                self._ensure_root(root)
+                sessions = tuple(root.iterdir())
+            except (OSError, InstructionArtifactError):
+                continue
+            for session_directory in sessions:
+                if _TAG_RE.fullmatch(session_directory.name) is None:
+                    continue
+                try:
+                    session_info = session_directory.lstat()
+                    if stat.S_ISLNK(session_info.st_mode) or not stat.S_ISDIR(session_info.st_mode):
+                        continue
+                    turns = tuple(session_directory.iterdir())
+                except OSError:
+                    continue
+                for turn_directory in turns:
+                    if _TAG_RE.fullmatch(turn_directory.name) is None:
+                        continue
+                    try:
+                        turn_info = turn_directory.lstat()
+                        if stat.S_ISLNK(turn_info.st_mode) or not stat.S_ISDIR(turn_info.st_mode):
+                            continue
+                        files = tuple(turn_directory.iterdir())
+                    except OSError:
+                        continue
+                    for path in files:
+                        if _FILE_RE.fullmatch(path.name) is None:
+                            continue
+                        try:
+                            info = path.lstat()
+                            if (
+                                stat.S_ISREG(info.st_mode)
+                                and not stat.S_ISLNK(info.st_mode)
+                                and info.st_mtime_ns <= cutoff_ns
+                            ):
+                                path.unlink()
+                                removed += 1
+                        except OSError:
+                            continue
+                    try:
+                        remaining_instructions = any(
+                            _FILE_RE.fullmatch(path.name) is not None
+                            and path.is_file()
+                            and not path.is_symlink()
+                            for path in turn_directory.iterdir()
+                        )
+                        receipt_path = turn_directory / _RECEIPT_FILENAME
+                        if not remaining_instructions and receipt_path.exists():
+                            receipt_info = receipt_path.lstat()
+                            if stat.S_ISREG(receipt_info.st_mode) and not stat.S_ISLNK(
+                                receipt_info.st_mode
+                            ):
+                                receipt_path.unlink()
+                                removed += 1
+                    except OSError:
+                        pass
+                    try:
+                        turn_directory.rmdir()
+                    except OSError:
+                        pass
+                    else:
+                        removed += 1
+                try:
+                    session_directory.rmdir()
+                except OSError:
+                    pass
+                else:
+                    removed += 1
+            self._cleanup_root(root)
         return removed
 
     def __repr__(self) -> str:

@@ -27,7 +27,7 @@ from ..version import (
 
 _SAFE_CODE = re.compile(r"^[a-z0-9][a-z0-9._:-]{0,63}$")
 _SAFE_LABEL = re.compile(r"^[a-z0-9][a-z0-9._-]{0,31}$")
-_MANIFEST_STATES = frozenset({"verified", "unverified", "unavailable", "unknown"})
+_MANIFEST_STATES = frozenset({"verified", "unverified", "mismatch", "unavailable", "unknown"})
 
 
 def _code(value: object, *, fallback: str = "unknown") -> str:

@@ -48,6 +48,13 @@ OpenSocrates 1.x:
   receipts;
 - fails open when the selector cannot safely complete.
 
+The installed `diagnose` command verifies the exact package inventory against
+`checksums.sha256` and validates release-manifest identity for the running
+version, host, and content revision. A mismatch is reported explicitly. These
+files are not signed, so this is local integrity and damage detection, not an
+authenticity guarantee against an attacker able to replace the complete
+package and its checksum metadata.
+
 The Claude selector runs a bounded, non-persistent `claude --safe-mode -p`
 process. Safe mode disables user, project, and plugin customizations, and
 OpenSocrates additionally passes `--tools ""`, `--disallowedTools "mcp__*"`, and
