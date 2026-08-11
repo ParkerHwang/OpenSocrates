@@ -56,7 +56,11 @@ jobs:
           # would let any commit whose message merely starts with that prefix
           # publish with contents:write under whatever VERSION happens to hold.
           if [[ "${GITHUB_EVENT_NAME}" == "push" && "${GITHUB_REF}" != refs/tags/* ]]; then
-            subject="$(printf '%s' "${HEAD_COMMIT_MESSAGE}" | head -n 1)"
+            # Pure parameter expansion, not "printf | head -n 1": under
+            # `set -o pipefail` a long commit body makes head exit first, so
+            # printf takes SIGPIPE and the step dies with status 141 and no
+            # diagnostic at all. Still fail-closed, but unactionable.
+            subject="${HEAD_COMMIT_MESSAGE%%$'\n'*}"
             if [[ "${subject}" != "Release OpenSocrates v${version}" ]]; then
               printf 'Refusing to publish: commit subject "%s" does not exactly match\n' \
                 "${subject}" >&2
