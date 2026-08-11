@@ -866,6 +866,20 @@ def test_real_process_stdout_stream_limit() -> None:
     )
     _close_pipes(ordinary)
 
+    early_exit = subprocess.Popen(
+        [sys.executable, "-c", "import sys; sys.exit(7)"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        start_new_session=os.name == "posix",
+    )
+    require(
+        _communicate_bounded(early_exit, b"x" * (1024 * 1024), timeout=5) == b"",
+        "early nonzero exit returned unexpected output",
+    )
+    require(early_exit.returncode == 7, "early nonzero exit lost its return code")
+    _close_pipes(early_exit)
+
     sleeper = subprocess.Popen(
         [sys.executable, "-c", "import time; time.sleep(30)"],
         stdin=subprocess.PIPE,

@@ -292,6 +292,8 @@ def _communicate_bounded(  # noqa: C901  # Explicit cross-platform pipe lifecycl
         remaining_seconds = deadline - time.monotonic()
         if remaining_seconds <= 0 or not writer_done.wait(timeout=remaining_seconds):
             raise _SelectorTimeout
+        if process.returncode != 0:
+            return bytes(output)
         if reader_errors or writer_errors:
             raise OSError("selector pipe transfer failed")
         return bytes(output)
