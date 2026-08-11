@@ -514,7 +514,8 @@ class CodexAdapter:
             return self._selector_empty_result(native, diagnostics=diagnostics)
         # The response contains only a bounded temporary-file reference.  The
         # complete canonical content stays in the owner-only artifact until
-        # Stop, SessionEnd, or the 24-hour crash-recovery sweep removes it.
+        # Stop, a later prompt in the same session, SessionEnd, or the 24-hour
+        # crash-recovery sweep removes it.
         return CodexHandleResult(
             native_event_name=native.native_event,
             normalized_event=None,
@@ -638,6 +639,15 @@ class CodexAdapter:
             request = self._selector_user_prompt_request(native)
             if request is None:
                 return self._selector_empty_result(native, diagnostics=diagnostics)
+            if artifact_store is not None:
+                supersede = getattr(artifact_store, "delete_superseded_turns", None)
+                if callable(supersede):
+                    try:
+                        supersede(request.session_id, request.turn_id)
+                    except Exception:
+                        # Cleanup is privacy hardening, not a reason to block the
+                        # host prompt or delete the active turn tree.
+                        pass
             try:
                 decision = application.select_for_user_prompt_submit(request)
             except Exception:

@@ -276,9 +276,11 @@ or instruction files. The complete Read response is inspected only in memory
 for its terminal marker and is not retained. The owner-only grounding receipt
 stores only an artifact digest, content revision, selected method IDs, and
 keyed authentication/tool-use tags—never a prompt, tool output, workspace path,
-or artifact path. Turn files and receipts are removed on `Stop`, remaining
-session files on `SessionEnd`, and crash leftovers older than 24 hours on
-`SessionStart`.
+or artifact path. Turn files and receipts are removed on `Stop`. If `Stop` never
+arrives, the next `UserPromptSubmit` in the same session removes every prior
+`prompt_id` tree before selecting for the new turn while preserving the new
+active tree. `SessionEnd` removes anything still left in the session, and the
+next `SessionStart` removes crash leftovers older than 24 hours.
 
 When enabled, the updater stores only desired lifecycle state and the concise
 receipt described above, under owner-only permissions. It does not inspect or

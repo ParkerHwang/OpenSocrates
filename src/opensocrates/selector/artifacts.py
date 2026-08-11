@@ -854,6 +854,22 @@ class InstructionFileStore:
             removed += 1
         return removed
 
+    def delete_superseded_turns(self, session_id: str | None, active_turn_id: str | None) -> int:
+        """Remove prior turn trees while preserving the exact active turn tree."""
+
+        try:
+            active_directory = self._turn_directory(session_id, active_turn_id)
+            session_directory = active_directory.parent
+            children = tuple(session_directory.iterdir())
+        except (OSError, InstructionArtifactError):
+            return 0
+        removed = 0
+        for child in children:
+            if child.name == active_directory.name or _TAG_RE.fullmatch(child.name) is None:
+                continue
+            removed += self._remove_tree(child)
+        return removed
+
     def delete_session(self, session_id: str | None) -> int:
         """Best-effort cleanup for every artifact in one completed session."""
 
