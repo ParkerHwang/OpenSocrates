@@ -21,7 +21,7 @@ const GATE_STEP_NAME = "Resolve and validate release identity";
 
 // The version under test is fixed so the fixtures stay meaningful regardless of
 // what VERSION happens to hold on the branch running these tests.
-const VERSION = "1.1.2";
+const VERSION = "1.1.3";
 const EXACT_SUBJECT = `Release OpenSocrates v${VERSION}`;
 
 // Pinned rather than inherited: `sh`, `zsh`, or a Homebrew Bash 5 would not
@@ -255,13 +255,13 @@ for (const [label, message] of [
 // --------------------------------------------------------------------------
 
 for (const [label, subjectVersion] of [
-  ["patch bump ahead of VERSION", "1.1.3"],
-  ["patch bump behind VERSION", "1.1.1"],
-  ["digit-extended version", "1.1.20"],
+  ["patch bump ahead of VERSION", "1.1.4"],
+  ["patch bump behind VERSION", "1.1.2"],
+  ["digit-extended version", "1.1.30"],
   ["truncated version", "1.1"],
   ["major bump", "2.0.0"],
-  ["zero-padded version", "1.01.2"],
-  ["version with prerelease", "1.1.2-rc.1"],
+  ["zero-padded version", "1.01.3"],
+  ["version with prerelease", "1.1.3-rc.1"],
 ]) {
   test(`release gate: rejects mismatched VERSION -- ${label}`, () => {
     const label_ = `subject v${subjectVersion} vs VERSION ${VERSION}`;
@@ -285,12 +285,12 @@ test("release gate: the rejection diagnostic names the subject and the expectati
 // --------------------------------------------------------------------------
 
 for (const [label, refName] of [
-  ["tag ahead of VERSION", "v1.1.3"],
-  ["tag behind VERSION", "v1.1.1"],
-  ["digit-extended tag", "v1.1.20"],
-  ["tag without the v prefix", "1.1.2"],
-  ["tag with a prerelease suffix", "v1.1.2-rc1"],
-  ["tag with a trailing dot", "v1.1.2."],
+  ["tag ahead of VERSION", "v1.1.4"],
+  ["tag behind VERSION", "v1.1.2"],
+  ["digit-extended tag", "v1.1.30"],
+  ["tag without the v prefix", "1.1.3"],
+  ["tag with a prerelease suffix", "v1.1.3-rc1"],
+  ["tag with a trailing dot", "v1.1.3."],
   ["major-only tag", "v1"],
 ]) {
   test(`release gate: rejects mismatched tag -- ${label}`, () => {

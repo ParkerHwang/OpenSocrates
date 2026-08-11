@@ -4,13 +4,14 @@ Use this procedure to test the current pull request on a real, newly configured
 Mac before merging. It installs into the authenticated user's default Claude
 Code and Codex homes; it is not a sandbox test.
 
-This is a pre-release acceptance path. Version 1.1.2 is not yet available from
-the public npm and GitHub Release endpoints, so the harness downloads the
-successful macOS package artifact built from the exact pull-request commit and
-passes those archives to the real packed npm installer. It proves the package,
-installer, two-host transaction, registration, managed layout, and status
-contract. It does not prove the final public registry and release download path;
-run the published one-line install separately after release.
+This is a pre-release acceptance path. The candidate version may not yet be
+available from the public npm and GitHub Release endpoints, so the harness
+downloads the successful macOS package artifact built from the exact
+pull-request commit and passes those archives to the real packed npm installer.
+It proves the package, installer, two-host transaction, registration, managed
+layout, and status contract. It does not prove the final public registry and
+release download path; run the published one-line install separately after
+release.
 
 ## Before you start
 
