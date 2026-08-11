@@ -7,6 +7,9 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Added
 
+- A Claude Chat upload probe records the exact verified v1.1.2 skills ZIP
+  shape and hash separately from the still-blocked live UI acceptance; no
+  upload success is claimed ([#5](https://github.com/ParkerHwang/OpenSocrates/issues/5)).
 - A privacy-safe Cowork probe distinguishes confirmed Claude CLI user-scope
   registration from still-blocked Cowork visibility and hook delivery; the
   support claim remains experimental ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).

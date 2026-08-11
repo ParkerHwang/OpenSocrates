@@ -52,6 +52,7 @@ docs-check:
 		--path docs/claude-hook-timing.md \
 		--path docs/claude-desktop-live-probe.md \
 		--path docs/claude-cowork-live-probe.md \
+		--path docs/claude-chat-upload-probe.md \
 		--path .github/release-notes \
 		--report build/evidence/links.json
 
