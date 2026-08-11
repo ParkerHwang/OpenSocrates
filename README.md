@@ -40,7 +40,7 @@ and runtimes are not shipped or supported in this release.
 | Claude Code CLI | Yes, through `UserPromptSubmit` | `/opensocrates` | Locally validated on `darwin-arm64` |
 | Claude Code desktop app | Implemented, where Claude Code plugins run | `/opensocrates` | [Blocked live probe](docs/claude-desktop-live-probe.md); no delivery receipt |
 | Claude Cowork | Implemented, when the local plugin runtime is available | `/opensocrates` | [CLI registered; Cowork probe blocked](docs/claude-cowork-live-probe.md) |
-| Claude web and Desktop Chat | No hooks | `/opensocrates` | [Archive verified; UI upload blocked](docs/claude-chat-upload-probe.md) |
+| Claude web and Desktop Chat | No hooks | `/opensocrates` | [Live upload and invocation validated](docs/claude-chat-upload-probe.md) |
 
 The status column uses four distinct levels. Do not read them as
 interchangeable:
@@ -154,7 +154,9 @@ workspace paths. `auto-update disable` unloads and removes the LaunchAgent;
 
 These surfaces support plugin skills but not hooks. Download
 `opensocrates-1.1.2-claude-chat-skills.zip` from the release and upload it from
-Claude's plugin customization UI. The package exposes exactly one
+Claude's **Customize → Skills → Upload skill** UI. The ZIP contains one
+top-level `opensocrates/` folder with `SKILL.md` directly inside, as required by
+the skill uploader. The package exposes exactly one
 `/opensocrates` skill; its 48 method procedures, rigor, evidence, and trace
 controls are internal supporting references. Automatic selection is absent
 because Chat does not execute plugin hooks. See Anthropic's

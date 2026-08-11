@@ -39,7 +39,7 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 | Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | `/opensocrates` | `darwin-arm64` 로컬 검증 완료 |
 | Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 구현됨 | `/opensocrates` | [실측 probe 차단](docs/claude-desktop-live-probe.md), 수신 기록 없음 |
 | Claude Cowork | 로컬 플러그인 런타임을 사용할 수 있을 때 구현됨 | `/opensocrates` | [CLI 등록 확인, Cowork probe 차단](docs/claude-cowork-live-probe.md) |
-| Claude 웹 및 Desktop Chat | 훅 미지원 | `/opensocrates` | [아카이브 검증, UI 업로드 차단](docs/claude-chat-upload-probe.md) |
+| Claude 웹 및 Desktop Chat | 훅 미지원 | `/opensocrates` | [실제 업로드 및 호출 검증 완료](docs/claude-chat-upload-probe.md) |
 
 상태 열은 서로 다른 네 단계를 뜻하며 같은 의미로 읽으면 안 됩니다.
 
@@ -145,8 +145,10 @@ LaunchAgent를 언로드하고 삭제하며, `remove --host all`도 관리 호�
 ### Claude 웹 및 Desktop Chat 스킬
 
 이 화면들은 플러그인 스킬은 지원하지만 훅은 실행하지 않습니다. 릴리스에서
-`opensocrates-1.1.2-claude-chat-skills.zip`을 내려받아 Claude의 플러그인 사용자
-설정 화면에서 업로드하세요. 패키지는 `/opensocrates` 스킬 하나만 노출하고, 48개
+`opensocrates-1.1.2-claude-chat-skills.zip`을 내려받아 Claude의 **사용자 지정 →
+스킬 → 스킬 업로드** 화면에서 업로드하세요. ZIP은 업로더 요구사항에 맞춰
+최상위 `opensocrates/` 폴더 바로 아래에 `SKILL.md`를 둡니다. 패키지는
+`/opensocrates` 스킬 하나만 노출하고, 48개
 방법 절차와 엄격도·근거·추적 제어는 내부 참조로 둡니다. Chat은 플러그인 훅을
 실행하지 않으므로 자동 선택은 없습니다. Anthropic의
 [플러그인 화면 안내](https://support.claude.com/en/articles/13837440-use-plugins-in-claude)를

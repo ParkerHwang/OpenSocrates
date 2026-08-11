@@ -782,32 +782,20 @@ def _copy_packages(root: Path) -> None:
         shutil.copytree(source, destination, symlinks=False)
 
 
-def _build_claude_chat_skills(root: Path, version: str) -> Path:
-    """Build a portable skills-only plugin for Claude web and Desktop Chat."""
+def _build_claude_chat_skills(root: Path) -> Path:
+    """Build the single-root ZIP shape accepted by Claude's skill uploader."""
 
     source = root / "build" / "generated" / "plugins" / "claude"
     destination = root / "dist" / "claude-chat-skills"
     if destination.exists():
         _safe_remove(destination, root / "dist")
-    manifest = _load_json(source / ".claude-plugin" / "plugin.json")
-    if manifest is None or not (source / "skills").is_dir():
+    source_skill = source / "skills" / "opensocrates"
+    if not (source_skill / "SKILL.md").is_file():
         raise ReleaseCheckError("claude_chat_source_missing")
     destination.mkdir(parents=True)
-    shutil.copytree(source / "skills", destination / "skills", symlinks=False)
-    shutil.copy2(root / "LICENSE", destination / "LICENSE", follow_symlinks=False)
-    portable_manifest = dict(manifest)
-    portable_manifest.pop("hooks", None)
-    portable_manifest["displayName"] = "OpenSocrates Skills"
-    portable_manifest["description"] = (
-        "Portable OpenSocrates reasoning skills for Claude web and Desktop Chat."
-    )
-    portable_manifest["version"] = version
-    keywords = portable_manifest.get("keywords", [])
-    if isinstance(keywords, list):
-        portable_manifest["keywords"] = sorted(
-            {str(value) for value in keywords if isinstance(value, str)} | {"claude-chat"}
-        )
-    _write_json(destination / ".claude-plugin" / "plugin.json", portable_manifest)
+    skill_root = destination / "opensocrates"
+    shutil.copytree(source_skill, skill_root, symlinks=False)
+    shutil.copy2(root / "LICENSE", skill_root / "LICENSE", follow_symlinks=False)
     return destination
 
 
@@ -904,7 +892,7 @@ def _assemble(root: Path) -> dict[str, Any]:
     _generate_plugins(root)
     _copy_packages(root)
     dist = root / "dist"
-    claude_chat_package = _build_claude_chat_skills(root, version)
+    claude_chat_package = _build_claude_chat_skills(root)
     package_checksums = {host: _write_package_checksums(dist / host) for host in HOSTS}
     archives: dict[str, Path] = {}
     for host in HOSTS:
@@ -1264,7 +1252,7 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
     }
 
 
-_CLAUDE_CHAT_ALLOWED_ROOTS = frozenset({".claude-plugin", "LICENSE", "skills"})
+_CLAUDE_CHAT_SKILL_ROOT = "opensocrates"
 _CLAUDE_CHAT_FORBIDDEN_SUFFIXES = (
     ".pem",
     ".key",
@@ -1278,7 +1266,7 @@ _CLAUDE_CHAT_FORBIDDEN_SUFFIXES = (
 
 
 def _claude_chat_archive_errors(archive: Path) -> set[str]:
-    """Assert the published Chat ZIP carries only its manifest and skills.
+    """Assert the Chat ZIP is one directly uploadable skill folder.
 
     Checked against the archive itself rather than the staged tree so nothing
     can be introduced between assembly and packaging.
@@ -1288,16 +1276,16 @@ def _claude_chat_archive_errors(archive: Path) -> set[str]:
     with zipfile.ZipFile(archive) as bundle:
         entries = [name for name in bundle.namelist() if not name.endswith("/")]
     for entry in entries:
-        if entry.split("/", 1)[0] not in _CLAUDE_CHAT_ALLOWED_ROOTS:
+        if entry.split("/", 1)[0] != _CLAUDE_CHAT_SKILL_ROOT:
             errors.add("claude_chat_archive_unexpected_entry")
         if entry.startswith("/") or ".." in entry.split("/"):
             errors.add("claude_chat_archive_unsafe_path")
         if entry.lower().endswith(_CLAUDE_CHAT_FORBIDDEN_SUFFIXES):
             errors.add("claude_chat_archive_forbidden_file")
-    if ".claude-plugin/plugin.json" not in entries:
-        errors.add("claude_chat_archive_manifest_missing")
-    if not any(entry.startswith("skills/") for entry in entries):
-        errors.add("claude_chat_archive_skills_missing")
+    if f"{_CLAUDE_CHAT_SKILL_ROOT}/SKILL.md" not in entries:
+        errors.add("claude_chat_archive_top_level_skill_missing")
+    if any("/.claude-plugin/" in f"/{entry}" for entry in entries):
+        errors.add("claude_chat_archive_plugin_manifest_present")
     return errors
 
 
@@ -1307,46 +1295,32 @@ def _verify_claude_chat_skills(
     package = root / "dist" / "claude-chat-skills"
     archive = root / "dist" / f"opensocrates-{version}-claude-chat-skills.zip"
     errors: set[str] = set()
-    manifest = _load_json(package / ".claude-plugin" / "plugin.json")
-    if manifest is None:
-        errors.add("claude_chat_manifest_missing")
-    elif (
-        manifest.get("name") != "opensocrates"
-        or manifest.get("version") != version
-        or manifest.get("skills") != "./skills/"
-        or "hooks" in manifest
-    ):
-        errors.add("claude_chat_manifest_invalid")
     raw_method_ids = bundle.get("method_ids", [])
     method_ids = (
         {value for value in raw_method_ids if isinstance(value, str)}
         if isinstance(raw_method_ids, list)
         else set()
     )
-    expected_skills = {"opensocrates"}
-    skills = package / "skills"
-    actual_skills = (
+    actual_skill_roots = (
         {
             path.name
-            for path in skills.iterdir()
-            if skills.is_dir() and path.is_dir() and (path / "SKILL.md").is_file()
+            for path in package.iterdir()
+            if package.is_dir() and path.is_dir() and (path / "SKILL.md").is_file()
         }
-        if skills.is_dir()
+        if package.is_dir()
         else set()
     )
-    if actual_skills != expected_skills:
+    if actual_skill_roots != {_CLAUDE_CHAT_SKILL_ROOT}:
         errors.add("claude_chat_skill_set_invalid")
+    skill = package / _CLAUDE_CHAT_SKILL_ROOT
     method_references = {
         method_id
         for method_id in method_ids
-        if (skills / "opensocrates" / "references" / "methods" / f"{method_id}.md").is_file()
+        if (skill / "references" / "methods" / f"{method_id}.md").is_file()
     }
-    if (
-        method_references != method_ids
-        or not (skills / "opensocrates" / "references" / "catalog.md").is_file()
-    ):
+    if method_references != method_ids or not (skill / "references" / "catalog.md").is_file():
         errors.add("claude_chat_internal_method_references_invalid")
-    if not (package / "LICENSE").is_file():
+    if not (skill / "LICENSE").is_file():
         errors.add("claude_chat_license_missing")
     forbidden_trees = ("bin", "commands", "content", "hooks", "runtime", "schemas")
     if any((package / name).exists() for name in forbidden_trees):
@@ -1361,7 +1335,8 @@ def _verify_claude_chat_skills(
         errors |= _claude_chat_archive_errors(archive)
     return {
         "status": "fail" if errors else "pass",
-        "skill_count": len(actual_skills),
+        "skill_count": len(actual_skill_roots),
+        "skill_upload_root": _CLAUDE_CHAT_SKILL_ROOT,
         "archive_size_bytes": archive_bytes,
         "automatic_hooks": False,
         "error_codes": sorted(errors),
