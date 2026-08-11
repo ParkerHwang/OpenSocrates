@@ -18,6 +18,11 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Fixed
 
+- The installer now accepts only explicit Claude list JSON variants, rejects
+  malformed, duplicate, or conflicting managed entries, surfaces disabled
+  plugins as drift, re-enables them on install/update, preserves their state on
+  rollback, and emits executable recovery commands after a secondary root
+  removal failure ([#11](https://github.com/ParkerHwang/OpenSocrates/issues/11)).
 - POSIX and PowerShell launchers now enforce the single generated `bin/`
   package layout and never probe a competing `bin/runtime/` tree
   ([#26](https://github.com/ParkerHwang/OpenSocrates/issues/26)).

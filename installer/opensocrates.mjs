@@ -83,6 +83,10 @@ function fail(message) {
   throw new InstallerError(message);
 }
 
+function shellQuote(value) {
+  return `'${String(value).replaceAll("'", `'"'"'`)}'`;
+}
+
 async function exists(target) {
   try {
     await access(target);
@@ -703,6 +707,58 @@ function runClaudeJson(args) {
   return runJson(claudeBinary(), args, "Claude Code");
 }
 
+function claudeListEntries(payload, wrapper, label) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (
+    payload !== null &&
+    typeof payload === "object" &&
+    !Array.isArray(payload) &&
+    Object.keys(payload).length === 1 &&
+    Array.isArray(payload[wrapper])
+  ) {
+    return payload[wrapper];
+  }
+  fail(`Claude Code ${label} returned an unexpected schema`);
+}
+
+function requireUniqueClaudeEntries(entries, identity, label) {
+  const seen = new Set();
+  for (const entry of entries) {
+    if (
+      entry === null ||
+      typeof entry !== "object" ||
+      Array.isArray(entry) ||
+      typeof entry[identity] !== "string" ||
+      entry[identity].trim().length === 0
+    ) {
+      fail(`Claude Code ${label} returned a malformed entry`);
+    }
+    if (seen.has(entry[identity])) {
+      fail(`Claude Code ${label} returned duplicate entries for ${entry[identity]}`);
+    }
+    seen.add(entry[identity]);
+  }
+  return entries;
+}
+
+function claudeMarketplaceEntries(payload) {
+  return requireUniqueClaudeEntries(
+    claudeListEntries(payload, "marketplaces", "marketplace list"),
+    "name",
+    "marketplace list",
+  );
+}
+
+function claudePluginEntries(payload) {
+  return requireUniqueClaudeEntries(
+    claudeListEntries(payload, "plugins", "plugin list"),
+    "id",
+    "plugin list",
+  );
+}
+
 function versionAtLeast(value, minimum) {
   const match = String(value).match(/(\d+)\.(\d+)\.(\d+)/u);
   if (!match) {
@@ -740,7 +796,7 @@ function marketplaceEntries(host) {
     host === "claude"
       ? runClaudeJson(["plugin", "marketplace", "list", "--json"])
       : runCodexJson(["plugin", "marketplace", "list", "--json"]).marketplaces;
-  const entries = payload;
+  const entries = host === "claude" ? claudeMarketplaceEntries(payload) : payload;
   if (!Array.isArray(entries)) {
     fail(`${host} marketplace list returned an unexpected schema`);
   }
@@ -758,17 +814,22 @@ function marketplaceEntry(host) {
 
 function pluginState(host) {
   if (host === "claude") {
-    const installed = runClaudeJson(["plugin", "list", "--json"]);
-    if (!Array.isArray(installed)) {
-      fail("Claude Code plugin list returned an unexpected schema");
-    }
+    const installed = claudePluginEntries(runClaudeJson(["plugin", "list", "--json"]));
     const matches = installed.filter((entry) => entry?.id === PLUGIN_ID);
-    if (matches.length > 1) {
-      fail(`Claude Code reported duplicate entries for ${PLUGIN_ID}`);
+    if (matches.length === 0) return { kind: "missing", version: null };
+    const entry = matches[0];
+    if (
+      (entry.version !== undefined &&
+        entry.version !== null &&
+        (typeof entry.version !== "string" || entry.version.trim().length === 0)) ||
+      typeof entry.enabled !== "boolean"
+    ) {
+      fail(`Claude Code reported an invalid state for ${PLUGIN_ID}`);
     }
-    return matches.length === 1
-      ? { kind: "installed", version: matches[0].version ?? null }
-      : { kind: "missing", version: null };
+    return {
+      kind: entry.enabled ? "installed" : "disabled",
+      version: entry.version ?? null,
+    };
   }
   const payload = runCodexJson([
     "plugin", "list", "--marketplace", MARKETPLACE_NAME, "--available", "--json",
@@ -799,15 +860,12 @@ function detectLegacyClaudeInstallation() {
       entry.name !== MARKETPLACE_NAME &&
       entry.name.toLowerCase() === MARKETPLACE_NAME,
   );
-  const plugins = runClaudeJson(["plugin", "list", "--json"]);
-  const legacyPlugins = Array.isArray(plugins)
-    ? plugins.filter(
-        (entry) =>
-          typeof entry?.id === "string" &&
-          entry.id !== PLUGIN_ID &&
-          entry.id.toLowerCase() === PLUGIN_ID,
-      )
-    : [];
+  const plugins = claudePluginEntries(runClaudeJson(["plugin", "list", "--json"]));
+  const legacyPlugins = plugins.filter(
+    (entry) =>
+      entry.id !== PLUGIN_ID &&
+      entry.id.toLowerCase() === PLUGIN_ID,
+  );
   const names = marketplaces.map((entry) => entry.name).join(", ") || "OpenSocrates";
   return { found: marketplaces.length > 0 || legacyPlugins.length > 0, names };
 }
@@ -1148,7 +1206,34 @@ function entryRoot(entry, host) {
   if (entry === null) {
     return null;
   }
-  const value = host === "claude" ? entry.path ?? entry.installLocation : entry.root;
+  let value;
+  if (host === "claude") {
+    const fields = ["path", "installLocation"].filter(
+      (field) => entry[field] !== undefined && entry[field] !== null,
+    );
+    if (
+      fields.length === 0 ||
+      fields.some(
+        (field) => typeof entry[field] !== "string" || entry[field].trim().length === 0,
+      )
+    ) {
+      fail(`${host} marketplace ${MARKETPLACE_NAME} has no usable root`);
+    }
+    const roots = fields.map((field) => {
+      const candidate = resolve(entry[field]);
+      try {
+        return realpathSync(candidate);
+      } catch {
+        return candidate;
+      }
+    });
+    if (new Set(roots).size !== 1) {
+      fail(`${host} marketplace ${MARKETPLACE_NAME} reported conflicting roots`);
+    }
+    [value] = roots;
+  } else {
+    value = entry.root;
+  }
   if (typeof value !== "string" || value.trim().length === 0) {
     fail(`${host} marketplace ${MARKETPLACE_NAME} has no usable root`);
   }
@@ -1166,7 +1251,7 @@ function entryRoot(entry, host) {
 
 function removeRegistration(host, entry, state) {
   if (host === "claude") {
-    if (state.kind === "installed") {
+    if (["installed", "disabled"].includes(state.kind)) {
       run(claudeBinary(), ["plugin", "uninstall", PLUGIN_ID, "--scope", "user"]);
     }
     if (entry !== null) {
@@ -1184,11 +1269,14 @@ function removeRegistration(host, entry, state) {
   }
 }
 
-function addRegistration(host, root, installPlugin) {
+function addRegistration(host, root, installPlugin, { enabled = true } = {}) {
   if (host === "claude") {
     run(claudeBinary(), ["plugin", "marketplace", "add", root, "--scope", "user"]);
     if (installPlugin) {
       run(claudeBinary(), ["plugin", "install", PLUGIN_ID, "--scope", "user"]);
+      if (!enabled) {
+        run(claudeBinary(), ["plugin", "disable", PLUGIN_ID, "--scope", "user"]);
+      }
     }
     return null;
   }
@@ -1212,7 +1300,7 @@ function removeRegistrationBestEffort(host) {
   }
   try {
     const state = pluginState(host);
-    if (state.kind === "installed") {
+    if (["installed", "disabled"].includes(state.kind)) {
       const binary = host === "claude" ? claudeBinary() : codexBinary();
       const args =
         host === "claude"
@@ -1403,7 +1491,12 @@ async function rollbackInstallation(transaction) {
     (restored || !transaction.backupCreated)
   ) {
     await recoveryStep(`re-register the previous ${host} installation`, async () => {
-      addRegistration(host, paths.root, previousState.kind === "installed");
+      addRegistration(
+        host,
+        paths.root,
+        ["installed", "disabled"].includes(previousState.kind),
+        { enabled: previousState.kind !== "disabled" },
+      );
     });
   }
   if (transaction.backupCreated && !restored) {
@@ -1411,10 +1504,11 @@ async function rollbackInstallation(transaction) {
       `error: the previous ${host} OpenSocrates installation could not be restored automatically.`,
     );
     console.error(`error: your previous files are preserved at: ${transaction.backup}`);
+    console.error(`error: recovery command: /bin/rm -rf -- ${shellQuote(paths.root)}`);
     console.error(
-      `error: remove ${paths.root} if it still exists, move the preserved directory ` +
-        `to ${paths.root}, then rerun \`opensocrates install --host ${host}\`.`,
+      `error: recovery command: /bin/mv -- ${shellQuote(transaction.backup)} ${shellQuote(paths.root)}`,
     );
+    console.error(`error: recovery command: opensocrates install --host ${host}`);
   }
 }
 
@@ -1537,6 +1631,11 @@ async function showStatus(host) {
                   : " (in sync)"
                 : " (not in desired state)"),
           );
+        } else if (status.kind === "disabled") {
+          console.log(
+            `${candidate}: installed but disabled (${status.version ?? "unknown"})` +
+              (expected ? " (drift: desired host is not active)" : " (not in desired state)"),
+          );
         } else if (status.kind === "available") {
           console.log(
             `${candidate}: available but not installed (${status.version ?? "unknown"})` +
@@ -1563,6 +1662,11 @@ async function showStatus(host) {
   const status = await inspectHostStatus(host);
   if (status.kind === "installed") {
     console.log(`OpenSocrates ${status.version ?? "unknown"} is installed.`);
+  } else if (status.kind === "disabled") {
+    console.log(
+      `OpenSocrates ${status.version ?? "unknown"} is installed but disabled. ` +
+        "Run install or update to re-enable it.",
+    );
   } else if (status.kind === "available") {
     console.log(`OpenSocrates ${status.version ?? "unknown"} is available but not installed.`);
   } else if (status.kind === "files-only") {
@@ -1606,7 +1710,8 @@ async function rollbackRemoval(transaction) {
       addRegistration(
         transaction.host,
         transaction.paths.root,
-        transaction.previousState.kind === "installed",
+        ["installed", "disabled"].includes(transaction.previousState.kind),
+        { enabled: transaction.previousState.kind !== "disabled" },
       );
     });
   }

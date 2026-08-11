@@ -11,7 +11,7 @@ import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 import { PRODUCT_VERSION, main, withOperationLock } from "./opensocrates.mjs";
 import { inspectManagedLayout } from "../tools/clean_machine_acceptance.mjs";
@@ -97,6 +97,15 @@ function writeFakeHost(
     failAuth = false,
     corruptMarkerOnInstall = false,
     corruptBackupOnInstall = false,
+    blockRootRemovalOnInstall = false,
+    claudeMarketplaceWrapper = false,
+    claudePluginWrapper = false,
+    malformedClaudeMarketplaceList = false,
+    malformedClaudePluginList = false,
+    duplicateClaudeMarketplace = false,
+    duplicateClaudePlugin = false,
+    conflictingClaudeMarketplaceRoots = false,
+    invalidClaudePluginEnabled = false,
   } = {},
 ) {
   const host = kind;
@@ -104,7 +113,7 @@ function writeFakeHost(
   writeFileSync(statePath, JSON.stringify({ marketplaces: [], plugins: [] }));
   const binary = join(root, name);
   const script = `#!/usr/bin/env node
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { chmodSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 const STATE = ${JSON.stringify(statePath)};
 const HOST = ${JSON.stringify(host)};
@@ -113,6 +122,15 @@ const FAIL_INSTALL_ONCE = ${JSON.stringify(failInstallOnce)};
 const FAIL_AUTH = ${JSON.stringify(failAuth)};
 const CORRUPT_MARKER = ${JSON.stringify(corruptMarkerOnInstall)};
 const CORRUPT_BACKUP = ${JSON.stringify(corruptBackupOnInstall)};
+const BLOCK_ROOT_REMOVAL = ${JSON.stringify(blockRootRemovalOnInstall)};
+const CLAUDE_MARKETPLACE_WRAPPER = ${JSON.stringify(claudeMarketplaceWrapper)};
+const CLAUDE_PLUGIN_WRAPPER = ${JSON.stringify(claudePluginWrapper)};
+const MALFORMED_CLAUDE_MARKETPLACES = ${JSON.stringify(malformedClaudeMarketplaceList)};
+const MALFORMED_CLAUDE_PLUGINS = ${JSON.stringify(malformedClaudePluginList)};
+const DUPLICATE_CLAUDE_MARKETPLACE = ${JSON.stringify(duplicateClaudeMarketplace)};
+const DUPLICATE_CLAUDE_PLUGIN = ${JSON.stringify(duplicateClaudePlugin)};
+const CONFLICTING_CLAUDE_ROOTS = ${JSON.stringify(conflictingClaudeMarketplaceRoots)};
+const INVALID_CLAUDE_ENABLED = ${JSON.stringify(invalidClaudePluginEnabled)};
 const VERSION = ${JSON.stringify(PRODUCT_VERSION)};
 const MARKETPLACE = ${JSON.stringify(MARKETPLACE)};
 const PLUGIN_ID = ${JSON.stringify(PLUGIN_ID)};
@@ -133,7 +151,16 @@ if (HOST === "codex" && has("login", "status")) {
 }
 
 if (HOST === "claude") {
-  if (has("plugin", "marketplace", "list")) { out(state.marketplaces); process.exit(0); }
+  if (has("plugin", "marketplace", "list")) {
+    if (MALFORMED_CLAUDE_MARKETPLACES) { out({ entries: state.marketplaces }); process.exit(0); }
+    let entries = state.marketplaces.map((entry) =>
+      CONFLICTING_CLAUDE_ROOTS && entry.name === MARKETPLACE
+        ? { ...entry, installLocation: entry.path + "-conflict" }
+        : entry
+    );
+    if (DUPLICATE_CLAUDE_MARKETPLACE) entries = [...entries, ...entries.filter((entry) => entry.name === MARKETPLACE)];
+    out(CLAUDE_MARKETPLACE_WRAPPER ? { marketplaces: entries } : entries); process.exit(0);
+  }
   if (has("plugin", "marketplace", "add")) {
     const path = argv[argv.indexOf("add") + 1];
     state.marketplaces.push({ name: MARKETPLACE, source: "local", path });
@@ -143,7 +170,14 @@ if (HOST === "claude") {
     state.marketplaces = state.marketplaces.filter((entry) => entry.name !== MARKETPLACE);
     save(); process.exit(0);
   }
-  if (has("plugin", "list")) { out(state.plugins); process.exit(0); }
+  if (has("plugin", "list")) {
+    if (MALFORMED_CLAUDE_PLUGINS) { out({ entries: state.plugins }); process.exit(0); }
+    let entries = state.plugins.map((entry) =>
+      INVALID_CLAUDE_ENABLED && entry.id === PLUGIN_ID ? { ...entry, enabled: "yes" } : entry
+    );
+    if (DUPLICATE_CLAUDE_PLUGIN) entries = [...entries, ...entries.filter((entry) => entry.id === PLUGIN_ID)];
+    out(CLAUDE_PLUGIN_WRAPPER ? { plugins: entries } : entries); process.exit(0);
+  }
   if (has("plugin", "install")) {
     const installAttempt = state.installAttempts ?? 0;
     state.installAttempts = installAttempt + 1;
@@ -161,13 +195,27 @@ if (HOST === "claude") {
         if (backup) writeFileSync(join(parent, backup, ".opensocrates-managed.json"), "{ not json");
       }
     }
+    if (BLOCK_ROOT_REMOVAL) {
+      const entry = state.marketplaces[state.marketplaces.length - 1];
+      if (entry && entry.path) chmodSync(dirname(entry.path), 0o500);
+    }
     if (FAIL_INSTALL || (FAIL_INSTALL_ONCE && installAttempt === 0)) {
       save(); process.stderr.write("refused by strictKnownMarketplaces\\n"); process.exit(1);
     }
-    state.plugins.push({ id: PLUGIN_ID, version: VERSION }); save(); process.exit(0);
+    state.plugins.push({ id: PLUGIN_ID, version: VERSION, enabled: true }); save(); process.exit(0);
   }
   if (has("plugin", "uninstall")) {
     state.plugins = state.plugins.filter((entry) => entry.id !== PLUGIN_ID); save(); process.exit(0);
+  }
+  if (has("plugin", "disable")) {
+    state.plugins = state.plugins.map((entry) =>
+      entry.id === PLUGIN_ID ? { ...entry, enabled: false } : entry
+    ); save(); process.exit(0);
+  }
+  if (has("plugin", "enable")) {
+    state.plugins = state.plugins.map((entry) =>
+      entry.id === PLUGIN_ID ? { ...entry, enabled: true } : entry
+    ); save(); process.exit(0);
   }
   process.exit(1);
 }
@@ -251,6 +299,20 @@ function makeSandbox(host, options = {}) {
       rmSync(root, { recursive: true, force: true });
     },
   };
+}
+
+function replaceSandboxHost(box, host, name, options = {}) {
+  const replacement = writeFakeHost(box.root, name, { kind: host, ...options });
+  writeFileSync(
+    replacement.binary,
+    readFileSync(replacement.binary, "utf8").replace(
+      JSON.stringify(replacement.statePath),
+      JSON.stringify(box.statePath),
+    ),
+  );
+  chmodSync(replacement.binary, 0o755);
+  process.env[host === "claude" ? "CLAUDE_BIN" : "CODEX_BIN"] = replacement.binary;
+  return replacement;
 }
 
 function makeAllSandbox(options = {}) {
@@ -483,6 +545,128 @@ for (const host of ["claude", "codex"]) {
   });
 }
 
+test("claude: supported list wrappers preserve the complete lifecycle", async () => {
+  const box = makeSandbox("claude", {
+    claudeMarketplaceWrapper: true,
+    claudePluginWrapper: true,
+  });
+  try {
+    const pkg = buildPackage(box.root, "claude");
+    const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `wrapped install failed: ${install.error?.message}`);
+    const status = await quiet(() => main(["status", "--host", "claude"]));
+    assert.equal(status.error, undefined, `wrapped status failed: ${status.error?.message}`);
+    assert.match(status.output, /is installed/);
+    const remove = await quiet(() => main(["remove", "--host", "claude"]));
+    assert.equal(remove.error, undefined, `wrapped remove failed: ${remove.error?.message}`);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("claude: malformed list wrappers fail closed before mutation", async () => {
+  const box = makeSandbox("claude", { malformedClaudeMarketplaceList: true });
+  try {
+    const pkg = buildPackage(box.root, "claude");
+    const result = await withDarwinArm64(() =>
+      quiet(() =>
+        main([
+          "install", "--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum,
+        ]),
+      ),
+    );
+    assert.notEqual(result.error, undefined, "malformed wrapper was accepted");
+    assert.match(result.error.message, /marketplace list returned an unexpected schema/);
+    assert.equal(existsSync(box.managedRoot), false, "malformed preflight mutated the managed root");
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("claude: duplicate, conflicting, and invalid managed entries fail closed", async () => {
+  const cases = [
+    [{ duplicateClaudeMarketplace: true }, /duplicate entries for opensocrates/],
+    [{ duplicateClaudePlugin: true }, /duplicate entries for opensocrates@opensocrates/],
+    [{ conflictingClaudeMarketplaceRoots: true }, /reported conflicting roots/],
+    [{ invalidClaudePluginEnabled: true }, /reported an invalid state/],
+    [{ malformedClaudePluginList: true }, /plugin list returned an unexpected schema/],
+  ];
+  for (const [options, expected] of cases) {
+    const box = makeSandbox("claude");
+    try {
+      const pkg = buildPackage(box.root, "claude");
+      const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
+      const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+      assert.equal(install.error, undefined, `setup install failed: ${install.error?.message}`);
+      replaceSandboxHost(box, "claude", `claude-schema-${Object.keys(options)[0]}`, options);
+      const status = await quiet(() => main(["status", "--host", "claude"]));
+      assert.notEqual(status.error, undefined, `${Object.keys(options)[0]} was accepted`);
+      assert.match(status.error.message, expected);
+      assert.ok(existsSync(box.managedRoot), "schema rejection changed the managed root");
+    } finally {
+      box.cleanup();
+    }
+  }
+});
+
+test("claude: disabled status is visible and update re-enables the plugin", async () => {
+  const box = makeSandbox("claude");
+  try {
+    const pkg = buildPackage(box.root, "claude");
+    const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `setup install failed: ${install.error?.message}`);
+    const state = box.state();
+    state.plugins[0].enabled = false;
+    writeFileSync(box.statePath, JSON.stringify(state));
+
+    const status = await quiet(() => main(["status", "--host", "claude"]));
+    assert.equal(status.error, undefined);
+    assert.match(status.output, /installed but disabled/);
+
+    const update = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
+    assert.equal(update.error, undefined, `update failed: ${update.error?.message}`);
+    assert.equal(box.state().plugins[0].enabled, true, "update did not re-enable Claude");
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("claude: failed update restores the previous disabled registration", async () => {
+  const box = makeSandbox("claude");
+  try {
+    const pkg = buildPackage(box.root, "claude");
+    const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `setup install failed: ${install.error?.message}`);
+    const state = box.state();
+    state.plugins[0].enabled = false;
+    state.installAttempts = 0;
+    writeFileSync(box.statePath, JSON.stringify(state));
+    replaceSandboxHost(box, "claude", "claude-disabled-rollback", { failInstallOnce: true });
+
+    const update = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
+    assert.notEqual(update.error, undefined, "sabotaged update reported success");
+    assert.equal(box.state().plugins.length, 1, "previous disabled plugin was not restored");
+    assert.equal(box.state().plugins[0].enabled, false, "rollback re-enabled the disabled plugin");
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("claude: supported-version JSON fixture contains no local evidence values", () => {
+  const fixturePath = join("installer", "fixtures", "claude-cli", "2.1.226.sanitized.json");
+  const text = readFileSync(fixturePath, "utf8");
+  const fixture = JSON.parse(text);
+  assert.equal(fixture.claudeCodeVersion, "2.1.226");
+  assert.equal(fixture.marketplaceList.container, "array");
+  assert.equal(fixture.pluginList.entries[0].enabled, true);
+  assert.equal(fixture.privacy.credentialsPresent, false);
+  assert.doesNotMatch(text, /\/Users\//u);
+  assert.doesNotMatch(text, /20\d\d-\d\d-\d\dT\d\d:/u);
+});
+
 test("all hosts: fresh install uses one desired version and one manifest", async () => {
   const box = makeAllSandbox();
   try {
@@ -535,6 +719,27 @@ test("status all reports a desired host that is no longer active as drift", asyn
     const status = await quiet(() => main(["status", "--host", "all"]));
     assert.equal(status.error, undefined);
     assert.match(status.output, /codex: not installed \(drift: desired host is missing\)/);
+    assert.match(status.output, /Overall: drift detected/);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("status all reports a disabled Claude plugin as drift", async () => {
+  const box = makeAllSandbox();
+  try {
+    const packages = {
+      claude: buildPackage(box.root, "claude"),
+      codex: buildPackage(box.root, "codex"),
+    };
+    await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
+    const claudeState = box.state("claude");
+    claudeState.plugins[0].enabled = false;
+    writeFileSync(box.hosts.claude.statePath, JSON.stringify(claudeState));
+
+    const status = await quiet(() => main(["status", "--host", "all"]));
+    assert.equal(status.error, undefined);
+    assert.match(status.output, /claude: installed but disabled .*desired host is not active/);
     assert.match(status.output, /Overall: drift detected/);
   } finally {
     box.cleanup();
@@ -1285,8 +1490,39 @@ test("an unrecoverable rollback prints the preserved backup path", async () => {
     assert.notEqual(result.error, undefined, "update reported success");
     assert.equal(box.backups().length, 1, "the unrecoverable backup was not preserved");
     assert.match(result.output, /your previous files are preserved at:/);
-    assert.match(result.output, /remove .* if it still exists, move the preserved directory/);
+    assert.match(result.output, /recovery command: \/bin\/rm -rf -- /);
+    assert.match(result.output, /recovery command: \/bin\/mv -- /);
   } finally {
+    box.cleanup();
+  }
+});
+
+test("a root-removal rollback failure preserves the backup and prints executable recovery", async () => {
+  const box = makeSandbox("claude");
+  try {
+    const pkg = buildPackage(box.root, "claude");
+    const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `setup install failed: ${install.error?.message}`);
+
+    replaceSandboxHost(box, "claude", "claude-root-removal-blocked", {
+      failInstall: true,
+      blockRootRemovalOnInstall: true,
+    });
+    const result = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
+    chmodSync(dirname(box.managedRoot), 0o700);
+
+    assert.notEqual(result.error, undefined, "sabotaged update reported success");
+    assert.equal(box.backups().length, 1, "the previous installation backup was not preserved");
+    const [backupName] = box.backups();
+    assert.match(result.output, /your previous files are preserved at:/);
+    assert.match(result.output, new RegExp(backupName));
+    assert.match(result.output, /recovery command: \/bin\/rm -rf -- /);
+    assert.match(result.output, /recovery command: \/bin\/mv -- /);
+    assert.match(result.output, /recovery command: opensocrates install --host claude/);
+    assert.match(result.output, /managed-marketplaces\/opensocrates/);
+  } finally {
+    chmodSync(dirname(box.managedRoot), 0o700);
     box.cleanup();
   }
 });

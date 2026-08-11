@@ -107,6 +107,13 @@ npx --yes opensocrates@1.1.2 install --host claude
 업데이트는 의도적으로 버전 차이를 만들 수 있고, 이후 `update --host all` 또는
 성공한 자동 조정이 desired state에 기록된 모든 호스트를 다시 한 버전으로 맞춥니다.
 
+Claude 상태는 활성 설치와 설치됐지만 비활성화된 플러그인을 구분합니다. 원하는
+설치가 비활성 상태라면 drift로 보고합니다. `install` 또는 `update`를 실행하면 검증된
+패키지를 의도적으로 다시 활성화하며, 활성화가 실패하면 롤백이 이전의 활성·비활성
+상태를 복원합니다. 설치 프로그램은 Claude 목록 명령에서 실측한 직접 JSON 배열과
+명시적인 `marketplaces`/`plugins` 래퍼만 허용합니다. 개인정보를 제거한 2.1.226
+픽스처는 `installer/fixtures/claude-cli/`에 있습니다.
+
 ### 선택형 자동 업데이트
 
 ```bash
