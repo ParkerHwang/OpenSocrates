@@ -26,10 +26,11 @@ All notable changes to OpenSocrates are documented here. This project follows
   recording the Cowork `/opensocrates` unknown-skill result and the still
   unobserved authenticated hook lifecycle; support remains experimental
   ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
-- A privacy-safe Claude Code desktop live probe now records the visible,
-  enabled user-marketplace plugin, its five declared hooks, a completed local
-  Read task, and error-free Stop launcher delivery. Selector artifact, receipt,
-  and cleanup validation remain blocked by `claude_not_authenticated`
+- A privacy-safe Claude Code desktop live probe now validates a complete
+  authenticated UserPromptSubmit → PostToolUse(Read) → Stop lifecycle. It
+  observes the owner-only instruction artifact, authenticated grounding
+  receipt, and final cleanup without retaining prompts, transcripts, paths,
+  credentials, payloads, or selector reasoning
   ([#3](https://github.com/ParkerHwang/OpenSocrates/issues/3)).
 - A reproducible packaged `darwin-arm64` timing harness verifies PostToolUse
   receipt creation and Stop cleanup across fresh-path and warm runs. All 80
