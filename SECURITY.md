@@ -110,6 +110,11 @@ transcripts, workspace paths, credentials, and raw error output are excluded.
 Automatic major-version upgrades are disabled unless the user explicitly
 changes that policy.
 
+Installer rollback mutates only its owner-marked managed marketplace root. If
+the failed root cannot be removed and the previous backup therefore cannot be
+renamed into place, the installer preserves that backup and prints quoted,
+executable recovery commands naming only those two managed paths.
+
 Signing, notarization, clean-machine installation, platforms other than
 `darwin-arm64`, Claude Chat automatic hooks, and live delivery on every host
 surface are not claimed as validated. See the release limitations file for the

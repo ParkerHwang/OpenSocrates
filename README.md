@@ -112,6 +112,15 @@ supported. A host-specific update can intentionally create drift; a later
 `update --host all` or successful automatic reconciliation brings every host
 recorded in desired state back to one version.
 
+For Claude, status distinguishes an enabled installation from an
+installed-but-disabled plugin. A disabled desired installation is reported as
+drift. Running `install` or `update` intentionally installs the verified
+package enabled again; if activation fails, rollback restores the previous
+enabled or disabled state. The installer accepts only the observed direct JSON
+arrays and explicit `marketplaces`/`plugins` wrappers from Claude's list
+commands. The privacy-safe 2.1.226 fixture is under
+`installer/fixtures/claude-cli/`.
+
 ### Opt-in automatic updates
 
 ```bash
