@@ -80,24 +80,14 @@ esac
 #   <plugin-root>/bin/launch.sh
 #   <plugin-root>/runtime/<target>/opensocrates-runtime/opensocrates-runtime
 #
-# The runtime must therefore be resolved from the plugin root rather than from
-# the launcher's own directory. Candidates are probed in package-layout order:
-# the launcher's parent directory first (the generated layout), then the
-# launcher's own directory (a launcher placed at the plugin root). The
-# launcher directory itself is never treated as a runtime root, so a stray
-# tree under bin/ cannot satisfy the lookup.
+# The launcher is valid only in that generated bin/ layout. Resolve exactly one
+# runtime path from the plugin root; a launcher moved to the plugin root and a
+# stray runtime tree under bin/ are deliberately unsupported.
 launcher_dir=$(CDPATH= cd -P "$(dirname "$0")" 2>/dev/null && pwd -P) || pass_through missing_runtime "$mode" "$host"
 plugin_root=$(CDPATH= cd -P "$launcher_dir/.." 2>/dev/null && pwd -P) || plugin_root=$launcher_dir
 
-runtime_path=
-for runtime_root in "$plugin_root/runtime" "$launcher_dir/runtime"; do
-    candidate=$runtime_root/$relative_binary
-    if [ -f "$candidate" ] && [ -x "$candidate" ]; then
-        runtime_path=$candidate
-        break
-    fi
-done
-if [ -z "$runtime_path" ]; then
+runtime_path=$plugin_root/runtime/$relative_binary
+if [ ! -f "$runtime_path" ] || [ ! -x "$runtime_path" ]; then
     pass_through missing_runtime "$mode" "$host"
 fi
 

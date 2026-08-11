@@ -18,6 +18,9 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Fixed
 
+- POSIX and PowerShell launchers now enforce the single generated `bin/`
+  package layout and never probe a competing `bin/runtime/` tree
+  ([#26](https://github.com/ParkerHwang/OpenSocrates/issues/26)).
 - Packaged-launcher checks now derive each host's runtime root from canonical
   `generator.json` metadata and include a mismatch probe that remains
   discriminating when no native runtime targets were built

@@ -16,7 +16,10 @@ build time; they are not host or manifest claims.
 
 - Manifest: `.codex-plugin/plugin.json`
 - Hook definition: `hooks/hooks.json`
-- Fixed launchers: `bin/launch.sh` and `bin/launch.ps1`
+- Fixed launchers: `bin/launch.sh` and `bin/launch.ps1`; this exact `bin/`
+  placement is required and no root-level launcher fallback is supported
+- Native runtime: `runtime/<target>/opensocrates-runtime/`, resolved by
+  the launcher relative to the plugin root
 - Writable product data, when enabled by the host, is owned by the host's
   `PLUGIN_DATA` location; this package does not request a remote service.
 - Complete selected reasoning content is written only to an owner-only OS
