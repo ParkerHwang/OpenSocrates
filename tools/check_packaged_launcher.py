@@ -306,6 +306,34 @@ def _assert_fail_open(package: Path, host: str, target: str, runtime_parent: str
         shutil.rmtree(stage, ignore_errors=True)
 
 
+def _assert_canonical_runtime_precedence(
+    package: Path, host: str, target: str, *, runtime_output: str
+) -> None:
+    """A stray executable under bin/ must never compete with the package runtime."""
+
+    stage, runtime = _stage(package, target, runtime_parent=runtime_output)
+    assert runtime is not None
+    stray = stage.joinpath("bin", "runtime", target, *RUNTIME_LEAF)
+    _write_executable(
+        stray,
+        STUB_TEMPLATE.format(
+            marker=_quote(str(stage / "marker.txt")),
+            stdout_token=_quote("opensocrates-stray-bin-runtime\n"),
+            exit_code=0,
+        ),
+    )
+    try:
+        _assert_dispatch(
+            stage,
+            runtime,
+            ["hook", host, "user_prompt_submitted"],
+            ["hook", "user_prompt_submitted", "--host", host],
+            target,
+        )
+    finally:
+        shutil.rmtree(stage, ignore_errors=True)
+
+
 def _assert_control_diagnostic(package: Path, host: str, target: str) -> None:
     """Control mode keeps its structured diagnostic when the runtime is absent."""
 
@@ -413,16 +441,23 @@ def _check_package(package: Path, host: str, *, runtime_output: str) -> dict[str
             runtime_output=runtime_output,
         )
         _check_control_mode(package, host, target, runtime_output=runtime_output)
+        _assert_canonical_runtime_precedence(
+            package,
+            host,
+            target,
+            runtime_output=runtime_output,
+        )
         _assert_fail_open(package, host, target, runtime_parent=None)
-        # The pre-fix launcher probed <plugin-root>/bin/<target>/...; a runtime
-        # planted there must not satisfy the lookup.
-        _assert_fail_open(package, host, target, runtime_parent="bin")
+        # A runtime planted below bin/runtime/ must not satisfy the lookup when
+        # the canonical package runtime is absent either.
+        _assert_fail_open(package, host, target, runtime_parent="bin/runtime")
         _assert_control_diagnostic(package, host, target)
     _assert_unsupported_platform(package, host, runtime_output=runtime_output)
     return {
         "package": package.name,
         "runtime_output": runtime_output,
         "runtime_output_mismatch_rejected_without_native_targets": True,
+        "bin_runtime_never_selected": True,
         "targets": targets,
         "native_target": _native_target(),
         "events": events,

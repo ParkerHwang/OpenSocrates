@@ -71,24 +71,17 @@ if ($architecture -eq "X64") {
 #   <plugin-root>/bin/launch.ps1
 #   <plugin-root>/runtime/<target>/opensocrates-runtime/opensocrates-runtime.exe
 #
-# Resolve the runtime from the plugin root rather than from the launcher's own
-# directory, matching packaging/launchers/launch.sh. The launcher directory
-# itself is never treated as a runtime root.
+# The launcher is valid only in that generated bin/ layout. Resolve exactly one
+# runtime path from the plugin root, matching packaging/launchers/launch.sh; a
+# moved launcher and a stray runtime tree under bin/ are unsupported.
 $launcherDir = (Resolve-Path -LiteralPath $PSScriptRoot).Path
 $pluginRoot = Split-Path -Parent $launcherDir
 if ([string]::IsNullOrEmpty($pluginRoot)) {
     $pluginRoot = $launcherDir
 }
 
-$runtimePath = $null
-foreach ($runtimeRoot in @((Join-Path $pluginRoot "runtime"), (Join-Path $launcherDir "runtime"))) {
-    $candidate = Join-Path $runtimeRoot $relativeBinary
-    if (Test-Path -LiteralPath $candidate -PathType Leaf) {
-        $runtimePath = $candidate
-        break
-    }
-}
-if ($null -eq $runtimePath) {
+$runtimePath = Join-Path (Join-Path $pluginRoot "runtime") $relativeBinary
+if (-not (Test-Path -LiteralPath $runtimePath -PathType Leaf)) {
     Pass-Through "missing_runtime" $Mode $HostName
 }
 
