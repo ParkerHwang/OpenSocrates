@@ -39,7 +39,7 @@ and runtimes are not shipped or supported in this release.
 | Codex CLI and Desktop | Yes | OpenSocrates plugin | Release-validated on `darwin-arm64` |
 | Claude Code CLI | Yes, through `UserPromptSubmit` | `/opensocrates` | Locally validated on `darwin-arm64` |
 | Claude Code desktop app | Yes, where Claude Code plugins run | `/opensocrates` | [Authenticated hook lifecycle locally validated](docs/claude-desktop-live-probe.md) |
-| Claude Cowork | Implemented, when the local plugin runtime is available | `/opensocrates` | [Marketplace visible; skill/hooks still unvalidated](docs/claude-cowork-live-probe.md) |
+| Claude Cowork | No automatic hooks in the tested install | `/opensocrates` standalone skill | [Skill locally validated; native plugin blocked by archive limits](docs/claude-cowork-live-probe.md) |
 | Claude web and Desktop Chat | No hooks | `/opensocrates` | [Live upload and invocation validated](docs/claude-chat-upload-probe.md) |
 
 The status column uses four distinct levels. Do not read them as
@@ -58,11 +58,13 @@ skills, but automatic per-prompt selection is available only on Claude Code
 and Cowork surfaces that execute the plugin runtime. OpenSocrates fails open
 if a hook or selector is unavailable.
 
-Cowork shares the Claude Code user-marketplace entry in the current live UI:
-OpenSocrates 1.1.2 is visible and enabled without a second install. However,
-the same probe reported `/opensocrates` as an unknown Cowork skill and could
-not produce an authenticated hook lifecycle receipt. Until that receipt exists,
-treat Cowork as experimental.
+Cowork does not import the Claude Code CLI user-marketplace registration as a
+native Cowork plugin in the current live UI. A separately uploaded
+`/opensocrates` skill is locally validated, but the published v1.1.2 Claude
+plugin archive exceeds Cowork's documented compressed limit and observed
+uncompressed limit. The repository also lacks a Cowork marketplace manifest.
+Until a Cowork-native plugin can be installed and its hooks re-probed, treat
+Cowork as a standalone-skill-only surface.
 
 ## Install
 

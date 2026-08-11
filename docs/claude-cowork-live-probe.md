@@ -14,29 +14,36 @@ macOS/architecture, installation path kind, and categorical observations. It
 must not retain prompts, transcripts, credentials, local paths, artifact
 content, raw payloads, or selector reasoning.
 
-## 2026-08-11 attempt
+## 2026-08-11 result
 
 Claude Code CLI 2.1.226 confirmed that the `opensocrates` marketplace is
-registered in CLI user scope. No path was retained. After the Mac was unlocked,
-Computer Use opened Cowork in Claude Desktop 1.26832.0. The shared Customize UI
-showed OpenSocrates 1.1.2 from the `opensocrates` marketplace, enabled without a
-second install, with one skill and all five declared hook surfaces. This
-establishes that the CLI user-scope marketplace registration is visible to the
-current Cowork surface.
+registered in CLI user scope. No path was retained. After authenticating that
+CLI, Computer Use opened a fresh Cowork task in Claude Desktop 1.26832.0. The
+true Cowork Customize plugin inventory did not contain OpenSocrates: CLI
+user-marketplace registration is not a Cowork-native plugin installation.
 
-The installed skill did not become invocable in Cowork: submitting
-`/opensocrates` produced the categorical “unknown skill” result. A separate
-non-sensitive Cowork task connected the repository folder, completed a Read,
-and stopped normally, but no OpenSocrates instruction artifact or grounding
-receipt appeared during a bounded live monitor. Hook delivery and cleanup
-therefore remain unconfirmed. The supported Claude Code CLI is also still
-unauthenticated, so the fresh selector subprocess cannot complete.
+A separately uploaded OpenSocrates user skill was present. In a fresh session,
+`/opensocrates` was recognized, loaded the skill, applied the requested method,
+completed a repository Read, and emitted the public grounding audit line. The
+earlier unknown-skill result was therefore a stale-session observation, not a
+persistent product limitation.
 
-The blocker is now `claude_not_authenticated`, rather than `mac_locked`;
-Cowork slash-skill availability is an additional unresolved observation. The
-support claim remains experimental with no complete live probe receipt. No
-prompt, transcript, credential, local path, artifact content, raw payload, or
-selector reasoning was retained.
+The supported Cowork plugin upload path was tested with the exact published
+v1.1.2 Claude plugin archive. The 134,354,629-byte ZIP expands to 341,004,558
+bytes and was rejected with the categorical error `Zip file uncompressed size
+exceeds 200MB`. [Anthropic's documented upload limit](https://support.claude.com/en/articles/13837433-manage-plugins-for-your-organization)
+is also 50 MB compressed.
+Repository sync was tested separately and rejected because this repository does
+not contain `.claude-plugin/marketplace.json`.
+
+Because no Cowork-native OpenSocrates plugin could be installed, the declared
+UserPromptSubmit, PostToolUse(Read), and Stop hooks were not active in the
+Cowork task. No instruction artifact or grounding receipt was created, so hook
+delivery and cleanup cannot be credited. The exact blocker is now
+`cowork_plugin_archive_exceeds_upload_limits`; the validated support level is
+the standalone skill path only. No prompt, transcript, credential, local path,
+artifact content, raw payload, selector reasoning, or user identity was
+retained.
 
 The categorical blocked receipt is
 [`docs/evidence/claude-cowork-live-probe-v1.1.2.json`](evidence/claude-cowork-live-probe-v1.1.2.json).
