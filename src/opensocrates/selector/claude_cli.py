@@ -36,6 +36,7 @@ import time
 from collections.abc import Mapping
 from pathlib import Path
 
+from ..constants import SELECTOR_OUTCOME_LABELS
 from ..domain.models import SelectionCatalog
 from .context import SelectorContextHandles
 from .models import MAX_SELECTOR_DEADLINE_SECONDS, SelectorRequest
@@ -72,17 +73,7 @@ class SelectorOutcome:
     NO_INTERVENTION = "no_intervention"
     SELECTED = "selected"
 
-    ALL = (
-        EXECUTABLE_MISSING,
-        REQUEST_REJECTED,
-        SPAWN_FAILED,
-        TIMEOUT,
-        NONZERO_EXIT,
-        INVALID_OUTPUT,
-        SELECTOR_CLOSED,
-        NO_INTERVENTION,
-        SELECTED,
-    )
+    ALL = SELECTOR_OUTCOME_LABELS
 
 
 _MAX_SELECTION_CATALOG_BYTES = 512 * 1024

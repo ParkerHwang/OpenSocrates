@@ -120,6 +120,8 @@ def _diagnose(services: Any, host: str | None) -> object:
     if host:
         selected = profiles.get(host) if isinstance(profiles, dict) else None
         profiles = {host: selected} if selected is not None else {}
+    selector_outcome_reader = getattr(services, "selector_outcome_counts", None)
+    selector_outcomes = selector_outcome_reader() if callable(selector_outcome_reader) else {}
     snapshot = build_diagnose(
         profiles=profiles,
         bundle=getattr(services, "bundle", None),
@@ -132,6 +134,7 @@ def _diagnose(services: Any, host: str | None) -> object:
         else "unavailable",
         platform_name=platform.system(),
         architecture=platform.machine(),
+        selector_outcomes=selector_outcomes,
     )
     return snapshot
 

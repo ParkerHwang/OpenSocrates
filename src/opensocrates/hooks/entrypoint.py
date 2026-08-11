@@ -161,6 +161,13 @@ def run_hook(  # noqa: C901  # Explicit host-safe early-return boundary.
         # remain a nonblocking pass-through and must not print a traceback.
         output.write("")
     finally:
+        if runtime is not None:
+            flusher = getattr(runtime, "flush_selector_outcomes", None)
+            if callable(flusher):
+                try:
+                    flusher()
+                except Exception:
+                    pass
         if owns_runtime and runtime is not None:
             closer = getattr(runtime, "close", None)
             if callable(closer):

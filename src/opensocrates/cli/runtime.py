@@ -13,7 +13,7 @@ import os
 import stat
 import sys
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -29,6 +29,7 @@ from ..persistence import (
     DataRootConfig,
     JsonlRecordStore,
     MetricsStore,
+    SelectorOutcomeStore,
     SettingsStore,
     TaskStore,
     TurnStateStore,
@@ -257,6 +258,7 @@ class RuntimeServices:
     record_store: Any | None = None
     task_store: Any | None = None
     metrics_store: Any | None = None
+    selector_outcome_store: Any | None = None
     control_application: ControlApplication | None = None
     dispatcher: Dispatcher | None = None
     selector_config: SelectorConfig | None = None
@@ -268,11 +270,51 @@ class RuntimeServices:
     capability_profiles: dict[str, CapabilityProfile] | None = None
     health: HealthAggregate | None = None
     locale: str = "en"
+    _selector_outcome_baseline: dict[str, int] = field(default_factory=dict, repr=False)
 
     def adapter_for(self, host: str) -> Any | None:
         if self.adapters is None:
             return None
         return self.adapters.get(host)
+
+    def selector_outcome_counts(self) -> dict[str, int]:
+        """Return only the persisted content-free selector aggregate."""
+
+        reader = getattr(self.selector_outcome_store, "read", None)
+        if not callable(reader):
+            return {}
+        try:
+            value = reader()
+        except Exception:
+            return {}
+        return dict(value) if isinstance(value, dict) else {}
+
+    def flush_selector_outcomes(self) -> None:
+        """Persist the current process's new Claude selector labels once."""
+
+        selector = self.claude_reasoning_selector
+        reader = getattr(selector, "outcome_counts", None)
+        writer = getattr(self.selector_outcome_store, "increment", None)
+        if not callable(reader) or not callable(writer):
+            return
+        try:
+            current = reader()
+            if not isinstance(current, dict):
+                return
+            delta = {
+                str(label): max(0, int(count) - self._selector_outcome_baseline.get(str(label), 0))
+                for label, count in current.items()
+                if isinstance(label, str) and isinstance(count, int) and not isinstance(count, bool)
+            }
+            self._selector_outcome_baseline = {
+                str(label): int(count)
+                for label, count in current.items()
+                if isinstance(label, str) and isinstance(count, int) and not isinstance(count, bool)
+            }
+            if any(delta.values()):
+                writer(delta)
+        except Exception:
+            return
 
     def close(self) -> None:
         """Best-effort terminal cancellation for selector workers owned by this runtime."""
@@ -352,8 +394,6 @@ def _compose_claude_selector(
         projections = load_reasoning_content_projections(reasoning_content_path)
         assembler = ProjectionInstructionAssembler(projections)
         selector = ClaudeCliReasoningSelector(projections.selection_catalog)
-        if not selector.available:
-            return None, None, None, None
         application = SelectorApplication(
             selector=selector,
             assembler=assembler,
@@ -403,6 +443,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
     record_store: Any | None = None
     task_store: Any | None = None
     metrics_store: Any | None = None
+    selector_outcome_store: Any | None = None
     if selected_root is not None and include_storage:
         try:
             settings_store = SettingsStore(selected_root)
@@ -422,6 +463,10 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
             metrics_store = MetricsStore(selected_root)
         except Exception:
             metrics_store = None
+        try:
+            selector_outcome_store = SelectorOutcomeStore(selected_root)
+        except Exception:
+            selector_outcome_store = None
 
     selector_config: SelectorConfig | None = None
     reasoning_content_projections: Any | None = None
@@ -540,6 +585,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
         record_store=record_store,
         task_store=task_store,
         metrics_store=metrics_store,
+        selector_outcome_store=selector_outcome_store,
         control_application=control_application,
         dispatcher=dispatcher,
         selector_config=selector_config,

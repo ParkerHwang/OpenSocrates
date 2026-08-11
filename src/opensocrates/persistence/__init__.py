@@ -26,6 +26,7 @@ from .metrics_store import (
 from .paths import DataRoot, DataRootConfig, DataRootLayout, ensure_data_root, resolve_data_root
 from .permissions import PermissionManager, PermissionReport, PermissionSecurityError
 from .quarantine import QuarantineReason, QuarantineReceipt
+from .selector_outcome_store import SelectorOutcomeStore, SelectorOutcomeStoreError
 from .settings_store import (
     InMemorySettingsStore,
     SettingsReadStatus,
@@ -61,6 +62,8 @@ __all__ = [
     "SettingsReadStatus",
     "SettingsStore",
     "SettingsStoreError",
+    "SelectorOutcomeStore",
+    "SelectorOutcomeStoreError",
     "TaskSnapshot",
     "TaskStore",
     "TaskStoreError",

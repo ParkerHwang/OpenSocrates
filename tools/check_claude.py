@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import io
 import json
 import os
 import subprocess
@@ -13,14 +14,17 @@ from collections.abc import Callable
 from pathlib import Path
 from unittest.mock import patch
 
-from opensocrates.constants import INSTRUCTION_ARTIFACT_END_MARKER
+from opensocrates.application.diagnose import build_diagnose
+from opensocrates.cli.runtime import build_runtime_services
+from opensocrates.constants import INSTRUCTION_ARTIFACT_END_MARKER, SELECTOR_OUTCOME_LABELS
 from opensocrates.content import ProjectionInstructionAssembler, load_reasoning_content_projections
 from opensocrates.content.injection import _procedure_section
 from opensocrates.domain.enums import HostId
-from opensocrates.hooks.entrypoint import parse_hook_arguments
+from opensocrates.hooks.entrypoint import parse_hook_arguments, run_hook
 from opensocrates.hosts.claude.adapter import ClaudeAdapter, ClaudeAdapterConfig
 from opensocrates.hosts.claude.commands import build_hooks
 from opensocrates.hosts.codex.native import parse_codex_event, try_parse_codex_event
+from opensocrates.persistence import DataRootConfig, SelectorOutcomeStore, ensure_data_root
 from opensocrates.selector import (
     InstructionFileStore,
     SelectorApplication,
@@ -829,6 +833,77 @@ def test_selector_failure_diagnostics() -> None:
         set(repeated.outcome_counts()) <= set(SelectorOutcome.ALL),
         "selector recorded a label outside the fixed vocabulary",
     )
+
+
+@check("CLAUDE-06A-persisted-content-free-selector-diagnostics")
+def test_persisted_selector_diagnostics() -> None:
+    """Make one fail-open hook outcome observable without retaining its input."""
+
+    fixture = json.loads(
+        (
+            ROOT
+            / "src"
+            / "opensocrates"
+            / "hosts"
+            / "contracts"
+            / "fixtures"
+            / "claude"
+            / "user-prompt-submit-turn-1.json"
+        ).read_text(encoding="utf-8")
+    )
+    payload = json.dumps(fixture["native_input"], separators=(",", ":")).encode("utf-8")
+    with tempfile.TemporaryDirectory(prefix="opensocrates-selector-outcomes-") as name:
+        data_root = ensure_data_root(
+            DataRootConfig(
+                development=True,
+                development_manifest=True,
+                override=Path(name),
+            )
+        )
+        with patch("opensocrates.selector.claude_cli.shutil.which", return_value=None):
+            services = build_runtime_services(host="claude", data_root=data_root)
+        require(
+            services.claude_reasoning_selector is not None,
+            "missing Claude executable was discarded before a diagnosable attempt",
+        )
+        stdout = io.StringIO()
+        require(
+            run_hook(
+                ("hook", "claude", "user_prompt_submitted"),
+                stdin=io.BytesIO(payload),
+                stdout=stdout,
+                services=services,
+            )
+            == 0,
+            "missing selector executable blocked the host hook",
+        )
+        require(stdout.getvalue() == "", "selector failure was not literal-empty fail-open")
+        store = SelectorOutcomeStore(data_root)
+        counts = store.read()
+        require(
+            counts[SelectorOutcome.EXECUTABLE_MISSING] == 1 and sum(counts.values()) == 1,
+            "content-free executable-missing outcome was not persisted exactly once",
+        )
+        services.flush_selector_outcomes()
+        require(store.read() == counts, "selector outcome flush double-counted one attempt")
+        snapshot = build_diagnose(selector_outcomes=counts).to_dict()
+        selector = snapshot.get("selector")
+        require(
+            isinstance(selector, dict)
+            and selector.get("status") == "observed"
+            and selector.get("attempt_count") == 1
+            and selector.get("outcome_counts") == counts,
+            "diagnose did not expose the bounded selector aggregate",
+        )
+        stored = store.path.read_text(encoding="utf-8")
+        require(
+            set(counts) == set(SELECTOR_OUTCOME_LABELS)
+            and "<synthetic-prompt>" not in stored
+            and "transcript" not in stored
+            and "session" not in stored
+            and str(Path(name)) not in stored,
+            "selector diagnostics persisted content or an identifier",
+        )
 
 
 @check("CLAUDE-07-real-process-termination-and-reaping")

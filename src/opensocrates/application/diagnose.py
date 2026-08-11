@@ -13,7 +13,7 @@ import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from ..constants import CAPABILITY_KEYS
+from ..constants import CAPABILITY_KEYS, SELECTOR_OUTCOME_LABELS
 from ..domain.models import CapabilityProfile, CompiledContentBundle
 from ..version import (
     CONTENT_REVISION,
@@ -107,6 +107,7 @@ class DiagnoseSnapshot:
     platform: Mapping[str, str]
     capabilities: Mapping[str, Mapping[str, object]]
     manifest: Mapping[str, object]
+    selector: Mapping[str, object]
     health: HealthAggregate
 
     def to_dict(self) -> dict[str, object]:
@@ -117,6 +118,7 @@ class DiagnoseSnapshot:
                 key: dict(self.capabilities[key]) for key in sorted(self.capabilities)
             },
             "manifest": dict(self.manifest),
+            "selector": dict(self.selector),
             "health": self.health.to_dict(),
         }
 
@@ -180,6 +182,19 @@ def _content_projection(bundle: CompiledContentBundle | None) -> dict[str, objec
     }
 
 
+def _selector_projection(outcomes: Mapping[str, object] | None) -> dict[str, object]:
+    """Project only fixed content-free outcome labels and bounded counts."""
+
+    selected = outcomes or {}
+    counts = {label: _bounded_count(selected.get(label, 0)) for label in SELECTOR_OUTCOME_LABELS}
+    attempt_count = min(sum(counts.values()), 2**31 - 1)
+    return {
+        "status": "observed" if attempt_count else "not_observed",
+        "attempt_count": attempt_count,
+        "outcome_counts": counts,
+    }
+
+
 def build_diagnose(
     *,
     profiles: Mapping[str, CapabilityProfile] | None = None,
@@ -190,6 +205,7 @@ def build_diagnose(
     checksum_status: str = "unknown",
     platform_name: str = "unknown",
     architecture: str = "unknown",
+    selector_outcomes: Mapping[str, object] | None = None,
 ) -> DiagnoseSnapshot:
     """Build a safe diagnosis snapshot from typed aggregates.
 
@@ -226,6 +242,7 @@ def build_diagnose(
         platform={"os": _label(platform_name), "architecture": _label(architecture)},
         capabilities=selected,
         manifest=manifest,
+        selector=_selector_projection(selector_outcomes),
         health=health or HealthAggregate(),
     )
 

@@ -1,11 +1,10 @@
 # Third-party notices
 
-The generated Claude package can include the shared OpenSocrates bundled onedir
-runtime. The Claude selector itself invokes the user's existing Claude Code CLI
-and adds no Anthropic SDK dependency. The shared runtime also includes the
-locked `openai-codex` 0.144.4 and
-`openai-codex-cli-bin` 0.144.4 packages, Pydantic, and their transitive/native
-dependency closure, in addition to Python standard-library code.
+The generated Claude package includes a host-specific OpenSocrates bundled
+onedir runtime. The Claude selector invokes the user's existing Claude Code CLI
+and adds no Anthropic SDK dependency. This runtime excludes the OpenAI Codex SDK
+and CLI packages; it includes Pydantic and its transitive/native dependency
+closure in addition to Python standard-library code.
 
 For the exact dependency inventory and terms, consult the accompanying release
 SBOM and the license files bundled with the runtime where provided.

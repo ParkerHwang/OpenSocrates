@@ -27,6 +27,7 @@ def diagnose_markdown(snapshot: DiagnoseSnapshot) -> str:
     versions = value["versions"]
     manifest = value["manifest"]
     health = value["health"]
+    selector = value["selector"]
     lines = [
         "# OpenSocrates diagnosis",
         "",
@@ -41,6 +42,7 @@ def diagnose_markdown(snapshot: DiagnoseSnapshot) -> str:
         f"- metrics: `{health.get('metric_count', 0)}` ({health.get('metric_bytes', 0)} bytes)",  # type: ignore[attr-defined]  # Closed runtime boundary validates this value.
         f"- turn states: `{health.get('turn_state_count', 0)}`",  # type: ignore[attr-defined]  # Closed runtime boundary validates this value.
         f"- quarantine entries: `{health.get('quarantine_count', 0)}`",  # type: ignore[attr-defined]  # Closed runtime boundary validates this value.
+        f"- selector attempts: `{selector.get('attempt_count', 0)}`",  # type: ignore[attr-defined]  # Closed runtime boundary validates this value.
     ]
     return "\n".join(lines) + "\n"
 
@@ -64,6 +66,8 @@ def diagnose_main(
     selected = snapshot
     if selected is None:
         services = build_runtime_services()
+        selector_outcome_reader = getattr(services, "selector_outcome_counts", None)
+        selector_outcomes = selector_outcome_reader() if callable(selector_outcome_reader) else {}
         selected = build_diagnose(
             profiles=services.capability_profiles,
             bundle=services.bundle,
@@ -72,6 +76,7 @@ def diagnose_main(
             checksum_status="verified" if services.bundle is not None else "unavailable",
             platform_name=__import__("platform").system(),
             architecture=__import__("platform").machine(),
+            selector_outcomes=selector_outcomes,
         )
     (stdout or __import__("sys").stdout).write(render_diagnose(selected, output=output))
     return 0

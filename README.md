@@ -300,6 +300,13 @@ arrives, the next `UserPromptSubmit` in the same session removes every prior
 active tree. `SessionEnd` removes anything still left in the session, and the
 next `SessionStart` removes crash leftovers older than 24 hours.
 
+Claude selector attempts increment one owner-only local aggregate using only
+the fixed labels `executable_missing`, `request_rejected`, `spawn_failed`,
+`timeout`, `nonzero_exit`, `invalid_output`, `selector_closed`,
+`no_intervention`, and `selected`. `diagnose` reports those cumulative counts.
+The aggregate contains no timestamp, prompt, transcript, session or turn ID,
+path, model output, credential, or reasoning, and is never uploaded.
+
 When enabled, the updater stores only desired lifecycle state and the concise
 receipt described above, under owner-only permissions. It does not inspect or
 terminate running Claude or Codex sessions; a running task keeps its loaded

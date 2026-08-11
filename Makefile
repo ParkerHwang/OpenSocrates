@@ -25,8 +25,8 @@ typecheck:
 generate:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host claude --runtime-root "$(ROOT)/dist/runtime" --output "$(ROOT)/build/generated/plugins/claude" >/dev/null
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host codex --runtime-root "$(ROOT)/dist/runtime" --output "$(ROOT)/build/generated/plugins/codex" >/dev/null
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host claude --runtime-root "$(ROOT)/dist/runtime/claude" --output "$(ROOT)/build/generated/plugins/claude" >/dev/null
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host codex --runtime-root "$(ROOT)/dist/runtime/codex" --output "$(ROOT)/build/generated/plugins/codex" >/dev/null
 
 generated-check:
 	@set -eu; tmp="$$(mktemp -d)"; trap 'rm -rf "$$tmp"' EXIT; out="$$tmp/generated output — 日本語"; mkdir -p "$$out"; \

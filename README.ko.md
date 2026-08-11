@@ -282,6 +282,13 @@ OpenSocrates 기록, 로그, 메트릭, 진단 또는 instruction 파일에 쓰�
 남은 파일을 삭제하고, 다음 `SessionStart`는 24시간이 지난 비정상 종료 잔여 파일을
 삭제합니다.
 
+Claude 셀렉터 시도는 `executable_missing`, `request_rejected`, `spawn_failed`,
+`timeout`, `nonzero_exit`, `invalid_output`, `selector_closed`,
+`no_intervention`, `selected`라는 고정 라벨만 사용해 소유자 전용 로컬 집계에
+누적됩니다. `diagnose`는 이 누적 횟수를 표시합니다. 집계에는 시각, 프롬프트,
+대화 기록, 세션·turn ID, 경로, 모델 출력, 자격 증명 또는 추론이 없으며 외부로
+업로드되지 않습니다.
+
 자동 업데이트를 켜면 앞서 설명한 desired state와 간결한 영수증만 소유자 전용
 권한으로 저장합니다. 실행 중인 Claude나 Codex 세션을 검사하거나 종료하지 않습니다.
 이미 실행 중인 작업은 로드한 플러그인을 계속 쓰고, 새 작업이 조정된 버전을 자연스럽게

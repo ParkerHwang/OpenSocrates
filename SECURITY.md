@@ -62,6 +62,12 @@ small set of allowed path variables because the child needs it to locate the
 user's existing Claude login when a non-default config directory is in use.
 OpenSocrates does not copy, inspect, or log credentials from that directory.
 
+For fail-open diagnosis, each Claude selector attempt increments one
+owner-only local aggregate under a closed nine-label vocabulary. The aggregate
+stores counts only: it has no timestamp, prompt, transcript, session or turn
+identifier, path, model output, credential, or reasoning. It is shown by the
+local `diagnose` command and is never transmitted.
+
 Managed policy settings are part of the host trust boundary and are not disabled.
 Anthropic's [CLI reference](https://code.claude.com/docs/en/cli-reference) states
 that under `--safe-mode` "managed settings policy still applies, including
