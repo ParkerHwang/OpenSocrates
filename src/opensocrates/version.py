@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Final
 
 PRODUCT_NAME: Final[str] = "opensocrates"
-PRODUCT_VERSION: Final[str] = "1.1.2"
+PRODUCT_VERSION: Final[str] = "1.1.3"
 SCHEMA_VERSION: Final[str] = "1.0.0"
 SCHEMA_MAJOR: Final[int] = 1
 CONTENT_REVISION: Final[int] = 1

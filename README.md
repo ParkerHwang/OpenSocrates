@@ -17,7 +17,7 @@ uses a fresh host-native selector to choose relevant systems, and adds their
 complete theory and examples to the active task. Straightforward factual and
 mechanical work can pass through unchanged.
 
-Version `1.1.2` includes 48 reasoning systems, one user-facing Claude entry, a
+Version `1.1.3` includes 48 reasoning systems, one user-facing Claude entry, a
 Claude grounding gate that verifies selected procedures were read, coordinated
 Claude/Codex lifecycle management, and opt-in automatic updates on
 Apple-silicon macOS (`darwin-arm64`). It uses your existing host login and does
@@ -27,10 +27,11 @@ The native plugin archives intentionally ship only `bin/launch.sh`. That
 launcher accepts `darwin-arm64` only; macOS Intel, Linux, and Windows launchers
 and runtimes are not shipped or supported in this release.
 
-> **Latest release: [OpenSocrates 1.1.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.2).**
-> It adds authenticated Claude grounding receipts, one bounded repair pass,
-> and artifact-instance-bound replay protection. Upgrade both managed hosts
-> together with `npx --yes opensocrates@1.1.2 update --host all`.
+> **Latest release: [OpenSocrates 1.1.3](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.3).**
+> It adds authenticated live-host validation, installer and cleanup hardening,
+> strict package support boundaries, and an uploadable Claude Chat skills ZIP.
+> Upgrade both managed hosts together with
+> `npx --yes opensocrates@1.1.3 update --host all`.
 
 ## Host support
 
@@ -81,7 +82,7 @@ before registering an owner-marked managed marketplace.
 ### Install every ready host
 
 ```bash
-npx --yes opensocrates@1.1.2 install --host all
+npx --yes opensocrates@1.1.3 install --host all
 ```
 
 The all-host path detects supported, authenticated host CLIs, completes every
@@ -93,9 +94,9 @@ registration.
 Use the same host value for the complete lifecycle:
 
 ```bash
-npx --yes opensocrates@1.1.2 status --host all
-npx --yes opensocrates@1.1.2 update --host all
-npx --yes opensocrates@1.1.2 remove --host all
+npx --yes opensocrates@1.1.3 status --host all
+npx --yes opensocrates@1.1.3 update --host all
+npx --yes opensocrates@1.1.3 remove --host all
 ```
 
 A private `~/.opensocrates/desired-state.json` manifest records the selected
@@ -108,9 +109,9 @@ automatic update, and per-host drift.
 Codex remains the default host for backward compatibility:
 
 ```bash
-npx --yes opensocrates@1.1.2 install
-# Equivalent: npx --yes opensocrates@1.1.2 install --host codex
-npx --yes opensocrates@1.1.2 install --host claude
+npx --yes opensocrates@1.1.3 install
+# Equivalent: npx --yes opensocrates@1.1.3 install --host codex
+npx --yes opensocrates@1.1.3 install --host claude
 ```
 
 Existing `--host codex` and `--host claude` lifecycle commands remain
@@ -130,9 +131,9 @@ commands. The privacy-safe 2.1.226 fixture is under
 ### Opt-in automatic updates
 
 ```bash
-npx --yes opensocrates@1.1.2 auto-update enable --host all
-npx --yes opensocrates@1.1.2 auto-update status
-npx --yes opensocrates@1.1.2 auto-update disable
+npx --yes opensocrates@1.1.3 auto-update enable --host all
+npx --yes opensocrates@1.1.3 auto-update status
+npx --yes opensocrates@1.1.3 auto-update disable
 ```
 
 Automatic updates are disabled until explicitly enabled. The macOS LaunchAgent
@@ -155,7 +156,7 @@ workspace paths. `auto-update disable` unloads and removes the LaunchAgent;
 ### Claude web and Desktop Chat skills
 
 These surfaces support plugin skills but not hooks. Download
-`opensocrates-1.1.2-claude-chat-skills.zip` from the release and upload it from
+`opensocrates-1.1.3-claude-chat-skills.zip` from the release and upload it from
 Claude's **Customize → Skills → Upload skill** UI. The ZIP contains one
 top-level `opensocrates/` folder with `SKILL.md` directly inside, as required by
 the skill uploader. The package exposes exactly one
@@ -169,22 +170,22 @@ because Chat does not execute plugin hooks. See Anthropic's
 The same host option works without the npm registry:
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.2 install --host all
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.2 install --host claude
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.2 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.3 install --host all
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.3 install --host claude
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.3 install --host codex
 ```
 
 ### Manual release verification
 
 Download `opensocrates.mjs`, the host package, and its `.sha256` file from the
-[v1.1.2 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.2).
+[v1.1.3 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.3).
 For Claude, for example:
 
 ```bash
-shasum -a 256 -c opensocrates-1.1.2-claude-plugin.zip.sha256
+shasum -a 256 -c opensocrates-1.1.3-claude-plugin.zip.sha256
 node opensocrates.mjs install --host claude \
-  --asset opensocrates-1.1.2-claude-plugin.zip \
-  --checksum opensocrates-1.1.2-claude-plugin.zip.sha256
+  --asset opensocrates-1.1.3-claude-plugin.zip \
+  --checksum opensocrates-1.1.3-claude-plugin.zip.sha256
 ```
 
 Replace `claude` with `codex` for the Codex package.
@@ -199,7 +200,7 @@ what is installed, remove it explicitly:
 ```bash
 claude plugin uninstall opensocrates@OpenSocrates --scope user
 claude plugin marketplace remove OpenSocrates --scope user
-npx --yes opensocrates@1.1.2 install --host claude
+npx --yes opensocrates@1.1.3 install --host claude
 ```
 
 Updating a managed v1.1.0 Claude installation replaces the complete package
