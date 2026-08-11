@@ -7,6 +7,11 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Added
 
+- A reproducible packaged `darwin-arm64` timing harness verifies PostToolUse
+  receipt creation and Stop cleanup across fresh-path and warm runs. All 80
+  measured operations completed, the worst p95 was 1,333.067 ms against the
+  3-second budget, and no timeout change is recommended
+  ([#6](https://github.com/ParkerHwang/OpenSocrates/issues/6)).
 - An opt-in Claude structured-output matrix runs 20–50 bounded attempts per
   explicitly requested model, requires 95% valid envelopes, and stores only
   aggregate fixed outcome counts. The current unauthenticated run records

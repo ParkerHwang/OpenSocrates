@@ -320,6 +320,11 @@ Repeated `--max-turns 1` structured-output behavior has a separate
 No CLI/model row is claimed supported until an authenticated run meets its
 documented threshold.
 
+Packaged Claude PostToolUse receipt and Stop cleanup latency has a reproducible
+[Apple-silicon timing receipt](docs/claude-hook-timing.md). The observed v1.1.2
+p95 results retain more than half of the 3-second hook budget, so the timeout is
+unchanged.
+
 ```bash
 make bootstrap
 make format-check

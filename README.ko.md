@@ -302,6 +302,10 @@ OpenSocrates 기록, 로그, 메트릭, 진단 또는 instruction 파일에 쓰�
 실행이 문서의 임계값을 충족하기 전에는 어떤 CLI/모델 행도 지원된다고 주장하지
 않습니다.
 
+패키지 Claude PostToolUse 영수증과 Stop 정리 지연 시간에는 재현 가능한
+[Apple Silicon 측정 영수증](docs/claude-hook-timing.md)이 있습니다. v1.1.2에서 관측한
+p95는 3초 훅 예산의 절반 이상을 여유로 남겨 타임아웃을 변경하지 않았습니다.
+
 ```bash
 make bootstrap
 make format-check

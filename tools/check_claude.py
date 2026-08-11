@@ -1608,6 +1608,41 @@ def test_real_selector_is_opt_in() -> None:
         )
 
 
+@check("CLAUDE-14-packaged-hook-timing-evidence")
+def test_packaged_hook_timing_evidence() -> None:
+    report = json.loads(
+        (ROOT / "docs" / "evidence" / "claude-hook-timing-v1.1.2-darwin-arm64.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    require(report.get("status") == "pass", "packaged Claude timing evidence did not pass")
+    require(
+        report.get("product_version") == "1.1.2" and report.get("target") == "darwin-arm64",
+        "packaged Claude timing evidence has the wrong release identity",
+    )
+    require(report.get("hook_budget_ms") == 3000, "timing evidence changed the host budget")
+    for condition in ("cold", "warm"):
+        sample = report.get(condition)
+        require(isinstance(sample, dict), f"{condition} timing sample is missing")
+        require(
+            sample.get("runs") == 20
+            and sample.get("verified_receipts") == 20
+            and sample.get("verified_cleanups") == 20,
+            f"{condition} timing sample did not verify every operation",
+        )
+        require(
+            sample.get("sufficient_margin") is True and sample.get("p95_margin_ms", 0) >= 1500,
+            f"{condition} timing sample lacks the required p95 margin",
+        )
+    privacy = report.get("privacy")
+    require(
+        isinstance(privacy, dict)
+        and privacy.get("synthetic_content_only") is True
+        and all(value is False for key, value in privacy.items() if key.endswith("_recorded")),
+        "packaged timing evidence violates its privacy boundary",
+    )
+
+
 def main() -> int:
     failures: list[tuple[str, str]] = []
     for name, function in CHECKS:
