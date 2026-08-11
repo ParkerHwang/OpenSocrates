@@ -18,9 +18,10 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Fixed
 
-- An ordinary Claude payload no longer reports an unknown field. `effort`,
-  `background_tasks`, and `session_crons` are sent on every real `PostToolUse`
-  or `Stop` receipt but were missing from the parser's known-field sets, so the
+- An ordinary Claude payload no longer reports an unknown field. `effort` was
+  present in the captured `PostToolUse` and `Stop` receipts, while
+  `background_tasks` and `session_crons` were present in the captured `Stop`
+  receipt. They were missing from the parser's known-field sets, so the
   `native_unknown_field_ignored` diagnostic fired on healthy turns. The parser
   still never reads those fields, and no parsing, projection, or gating
   behavior changed.
@@ -30,8 +31,8 @@ All notable changes to OpenSocrates are documented here. This project follows
 - The committed receipts contain no prompt, transcript, path, credential, or
   user-identifying content. Field names, value types, and container shapes are
   preserved as captured; every sensitive value is a fixed synthetic marker, and
-  a check refuses any fixture value outside that vocabulary so a future
-  re-capture cannot commit real content by accident.
+  a check refuses every native-payload string outside a closed vocabulary so a
+  future re-capture cannot commit real payload content by accident.
 
 ## [1.1.2] - 2026-08-11
 

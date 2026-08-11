@@ -42,10 +42,11 @@ runtime emitted it.
   `PostToolUse`, `Stop`, and `SessionEnd` as well, which is what lets the
   grounding receipt and the Stop gate be scoped to the current turn rather than
   to the session.
-- **A resumed session keeps its `session_id`.** The second captured turn arrives
-  after a `SessionStart` with `source: "resume"` carrying the first run's
-  `session_id` and a new `prompt_id`. Session-scoped cleanup must therefore not
-  assume one session equals one turn.
+- **A resumed session keeps its `session_id`.** The second captured turn starts
+  with a `SessionStart` carrying `source: "resume"` and the first run's
+  `session_id`, but no `prompt_id`. The following `UserPromptSubmit` supplies a
+  new `prompt_id`. Session-scoped cleanup must therefore not assume one session
+  equals one turn.
 - **No version marker.** No captured receipt carries `version`, `host_version`,
   or `model`, so `native_version` resolves to `unknown` on every real Claude
   event. Nothing may treat that value as evidence of a host capability.
@@ -87,10 +88,10 @@ captured; only values were replaced, with fixed synthetic markers:
 | `file_path`, `filePath` | `/synthetic/workspace/instruction-artifact.md` |
 | `content` | `<synthetic-read-body>` |
 
-`CLAUDE-11-runtime-payload-receipts` walks every fixture and refuses any value
-in those fields outside this vocabulary, so a future re-capture cannot commit
-real content by accident. It also asserts that each fixture's field set still
-matches the `capture.observed_field_names` recorded with it.
+`CLAUDE-11-runtime-payload-receipts` walks every native payload and refuses any
+string outside a closed vocabulary, so a future re-capture cannot commit real
+payload content by accident. It also asserts that each fixture's field set
+still matches the `capture.observed_field_names` recorded with it.
 
 ## Re-capturing
 

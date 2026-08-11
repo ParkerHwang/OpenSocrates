@@ -985,6 +985,20 @@ ALLOWED_SANITIZED_VALUES = {
     "filePath": {"/synthetic/workspace/instruction-artifact.md"},
     "content": {"<synthetic-read-body>"},
 }
+ALLOWED_NATIVE_INPUT_STRINGS = set().union(*ALLOWED_SANITIZED_VALUES.values()) | {
+    "SessionEnd",
+    "SessionStart",
+    "PostToolUse",
+    "Read",
+    "Stop",
+    "UserPromptSubmit",
+    "acceptEdits",
+    "low",
+    "other",
+    "resume",
+    "startup",
+    "text",
+}
 
 
 def load_fixture(name: str) -> dict:
@@ -996,8 +1010,14 @@ def walk_sanitized(value: object, key: str | None, fixture_id: str) -> None:
 
     if key in ALLOWED_SANITIZED_VALUES:
         require(
-            value in ALLOWED_SANITIZED_VALUES[key],
+            isinstance(value, str) and value in ALLOWED_SANITIZED_VALUES[key],
             f"{fixture_id}: unsanitized value in field {key}",
+        )
+        return
+    if isinstance(value, str):
+        require(
+            value in ALLOWED_NATIVE_INPUT_STRINGS,
+            f"{fixture_id}: native payload contains an unapproved string in field {key}",
         )
         return
     if isinstance(value, dict):
