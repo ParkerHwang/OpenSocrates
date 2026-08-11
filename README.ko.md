@@ -38,7 +38,7 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 | Codex CLI 및 Desktop | 지원 | OpenSocrates 플러그인 | `darwin-arm64` 릴리스 검증 완료 |
 | Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | `/opensocrates` | `darwin-arm64` 로컬 검증 완료 |
 | Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 지원 | `/opensocrates` | [인증된 훅 생명주기 로컬 검증 완료](docs/claude-desktop-live-probe.md) |
-| Claude Cowork | 실측 설치에서는 자동 훅 미지원 | `/opensocrates` 독립 스킬 | [스킬 로컬 검증 완료, 네이티브 플러그인은 아카이브 제한으로 차단](docs/claude-cowork-live-probe.md) |
+| Claude Cowork | 실측 로컬 플러그인 업로드에서 지원 | `/opensocrates` | [PR 후보의 네이티브 훅 생명주기 로컬 검증 완료, 릴리스 배포 대기](docs/claude-cowork-live-probe.md) |
 | Claude 웹 및 Desktop Chat | 훅 미지원 | `/opensocrates` | [실제 업로드 및 호출 검증 완료](docs/claude-chat-upload-probe.md) |
 
 상태 열은 서로 다른 네 단계를 뜻하며 같은 의미로 읽으면 안 됩니다.
@@ -56,12 +56,13 @@ Claude Chat 화면은 플러그인 훅을 실행하지 않습니다. 생성된 �
 Code와 Cowork 화면에서만 작동합니다. 훅이나 셀렉터를 사용할 수 없으면
 OpenSocrates는 작업을 막지 않고 통과합니다.
 
-현재 실측 UI에서 Cowork는 Claude Code CLI 사용자 마켓플레이스 등록을 네이티브
-Cowork 플러그인으로 가져오지 않습니다. 별도로 업로드한 `/opensocrates` 스킬은
-로컬 검증을 통과했지만, 공개된 v1.1.2 Claude 플러그인 아카이브는 Cowork의 문서화된
-압축 크기 제한과 실측 압축 해제 크기 제한을 모두 초과합니다. 저장소에도 Cowork
-마켓플레이스 매니페스트가 없습니다. Cowork 네이티브 플러그인을 설치하고 훅을 다시
-검증하기 전까지는 독립 스킬 전용 화면으로 취급하세요.
+공개된 v1.1.2 Claude 플러그인 아카이브는 Cowork의 문서화된 압축 크기 제한과
+실측 압축 해제 크기 제한을 모두 초과했습니다. Claude 전용 v1.1.3 PR 후보는 압축
+13.8MB, 비압축 34.1MB이며 Codex 런타임과 중첩 ZIP을 포함하지 않고 Cowork 로컬
+업로드를 통과했습니다. UserPromptSubmit, PostToolUse(Read), 인증된 grounding
+receipt, Stop, 정리 생명주기도 로컬 검증을 마쳤습니다. 다만 수정된 아카이브는 아직
+공개 릴리스 자산이 아니고 저장소에도 Cowork 마켓플레이스 매니페스트가 없습니다.
+따라서 이 결과는 후보 검증으로만 해석하고 공개 배포 완료로 주장하지 않습니다.
 
 ## 설치
 

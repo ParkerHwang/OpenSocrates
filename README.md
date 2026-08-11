@@ -40,7 +40,7 @@ and runtimes are not shipped or supported in this release.
 | Codex CLI and Desktop | Yes | OpenSocrates plugin | Release-validated on `darwin-arm64` |
 | Claude Code CLI | Yes, through `UserPromptSubmit` | `/opensocrates` | Locally validated on `darwin-arm64` |
 | Claude Code desktop app | Yes, where Claude Code plugins run | `/opensocrates` | [Authenticated hook lifecycle locally validated](docs/claude-desktop-live-probe.md) |
-| Claude Cowork | No automatic hooks in the tested install | `/opensocrates` standalone skill | [Skill locally validated; native plugin blocked by archive limits](docs/claude-cowork-live-probe.md) |
+| Claude Cowork | Yes, in the tested local plugin upload | `/opensocrates` | [Native hook lifecycle locally validated for the PR candidate; release distribution pending](docs/claude-cowork-live-probe.md) |
 | Claude web and Desktop Chat | No hooks | `/opensocrates` | [Live upload and invocation validated](docs/claude-chat-upload-probe.md) |
 
 The status column uses four distinct levels. Do not read them as
@@ -59,13 +59,15 @@ skills, but automatic per-prompt selection is available only on Claude Code
 and Cowork surfaces that execute the plugin runtime. OpenSocrates fails open
 if a hook or selector is unavailable.
 
-Cowork does not import the Claude Code CLI user-marketplace registration as a
-native Cowork plugin in the current live UI. A separately uploaded
-`/opensocrates` skill is locally validated, but the published v1.1.2 Claude
-plugin archive exceeds Cowork's documented compressed limit and observed
-uncompressed limit. The repository also lacks a Cowork marketplace manifest.
-Until a Cowork-native plugin can be installed and its hooks re-probed, treat
-Cowork as a standalone-skill-only surface.
+The published v1.1.2 Claude plugin archive exceeded Cowork's documented
+compressed limit and observed uncompressed limit. A Claude-specific v1.1.3 PR
+candidate is 13.8 MB compressed and 34.1 MB uncompressed, contains neither the
+Codex runtime nor a nested ZIP, and passed Cowork's local upload. Its
+UserPromptSubmit, PostToolUse(Read), authenticated grounding receipt, Stop, and
+cleanup lifecycle is locally validated. The corrected archive is not yet a
+published release asset, and the repository still has no Cowork marketplace
+manifest; use this result as candidate validation, not a public distribution
+claim.
 
 ## Install
 

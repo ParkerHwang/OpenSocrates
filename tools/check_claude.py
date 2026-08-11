@@ -1853,7 +1853,7 @@ def test_desktop_live_probe_validates_authenticated_lifecycle() -> None:
     )
 
 
-@check("CLAUDE-16-cowork-live-probe-records-native-install-limits")
+@check("CLAUDE-16A-cowork-live-probe-records-native-install-limits")
 def test_cowork_live_probe_records_native_install_limits() -> None:
     report = json.loads(
         (ROOT / "docs" / "evidence" / "claude-cowork-live-probe-v1.1.2.json").read_text(
@@ -1917,6 +1917,92 @@ def test_cowork_live_probe_records_native_install_limits() -> None:
     require(
         isinstance(privacy, dict) and not any(privacy.values()),
         "Cowork probe contains private evidence",
+    )
+
+
+@check("CLAUDE-16B-cowork-live-probe-validates-native-hooks")
+def test_cowork_live_probe_validates_native_hooks() -> None:
+    report = json.loads(
+        (ROOT / "docs" / "evidence" / "claude-cowork-live-probe-v1.1.3.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    require(
+        report.get("status") == "pass"
+        and report.get("blocker") is None
+        and report.get("distribution_status") == "pull_request_candidate_not_published",
+        "Cowork candidate probe is not a passing, distribution-bounded result",
+    )
+    environment = report.get("environment")
+    require(
+        isinstance(environment, dict)
+        and environment.get("macos_version") == "26.5.2"
+        and environment.get("architecture") == "arm64"
+        and environment.get("plugin_version") == "1.1.3"
+        and environment.get("claude_code_cli_version") == "2.1.226"
+        and environment.get("cowork_claude_code_runtime_version") == "2.1.222"
+        and environment.get("cowork_version") == "1.26832.0"
+        and environment.get("candidate_pull_request") == 61
+        and environment.get("cowork_native_plugin_install_path_kind")
+        == "customize_local_upload_replace",
+        "Cowork candidate probe lost its product or installation identity",
+    )
+    archive = report.get("archive")
+    require(
+        isinstance(archive, dict)
+        and archive.get("compressed_size_bytes") == 13827377
+        and archive.get("uncompressed_size_bytes") == 34093317
+        and archive.get("documented_compressed_limit_mb") == 50
+        and archive.get("observed_uncompressed_limit_mb") == 200
+        and archive.get("codex_runtime_entry_count") == 0
+        and archive.get("nested_zip_entry_count") == 0
+        and archive.get("upload_accepted") is True
+        and archive.get("rejection") is None,
+        "Cowork candidate probe lost its accepted archive evidence",
+    )
+    observations = report.get("observations")
+    require(
+        isinstance(observations, dict)
+        and observations.get("cowork_native_plugin_installed") is True
+        and observations.get("installed_plugin_version_visible") is True
+        and observations.get("plugin_enabled") is True
+        and observations.get("hook_declarations_visible") is True
+        and observations.get("user_prompt_submit_delivered") is True
+        and observations.get("selector_selected_delta") == 2
+        and observations.get("selector_failure_delta") == 0
+        and observations.get("read_tool_completed") is True
+        and observations.get("post_tool_use_read_delivered") is True
+        and observations.get("grounding_receipt_created") is True
+        and observations.get("grounding_receipt_authenticated") is True
+        and observations.get("stop_delivered") is True
+        and observations.get("artifact_cleanup_verified") is True
+        and observations.get("local_session_completed") is True,
+        "Cowork candidate probe lost a native hook lifecycle observation",
+    )
+    lifecycle = report.get("lifecycle_counts")
+    during = lifecycle.get("during_read_hold") if isinstance(lifecycle, dict) else None
+    after = lifecycle.get("after_stop") if isinstance(lifecycle, dict) else None
+    require(
+        during
+        == {
+            "instruction_artifacts": 1,
+            "grounding_receipts": 1,
+            "authenticated_receipts": 1,
+        }
+        and after
+        == {
+            "instruction_artifacts": 0,
+            "grounding_receipts": 0,
+            "remaining_files": 0,
+        }
+        and report.get("support_claim")
+        == "cowork_native_hooks_locally_validated_candidate_distribution_pending",
+        "Cowork candidate probe lost authenticated receipt creation or cleanup",
+    )
+    privacy = report.get("privacy")
+    require(
+        isinstance(privacy, dict) and not any(privacy.values()),
+        "Cowork candidate probe contains private evidence",
     )
 
 
