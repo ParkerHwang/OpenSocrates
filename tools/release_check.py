@@ -1298,9 +1298,16 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
             for part in path.parts
         )
     }
+    nested_zip_entries = {
+        path.relative_to(generated).as_posix()
+        for path in generated.rglob("*")
+        if path.is_file() and path.suffix.casefold() == ".zip"
+    }
     if host == "claude":
         if excluded_runtime_entries:
             errors.add("claude_package_contains_codex_runtime")
+        if nested_zip_entries:
+            errors.add("claude_package_contains_nested_zip")
         if archive_compressed_bytes > CLAUDE_ARCHIVE_COMPRESSED_LIMIT_BYTES:
             errors.add("claude_archive_compressed_limit_exceeded")
         if archive_uncompressed_bytes > CLAUDE_ARCHIVE_UNCOMPRESSED_LIMIT_BYTES:
@@ -1322,6 +1329,7 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         "archive_compressed_bytes": archive_compressed_bytes,
         "archive_uncompressed_bytes": archive_uncompressed_bytes,
         "excluded_runtime_entry_count": len(excluded_runtime_entries),
+        "nested_zip_entry_count": len(nested_zip_entries),
         "error_codes": sorted(errors),
     }
 

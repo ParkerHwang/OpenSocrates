@@ -64,7 +64,10 @@ a = Analysis(
         "pydantic.mypy",
         "pydantic.v1.mypy",
     ],
-    noarchive=False,
+    # Cowork rejects plugin uploads that contain nested ZIP files. PyInstaller
+    # otherwise emits _internal/base_library.zip, so collect pure modules as
+    # external files for the Claude upload profile.
+    noarchive=True,
 )
 # PyInstaller recognizes the Codex worker's literal distribution-version
 # checks even though the Claude profile never imports those distributions.
