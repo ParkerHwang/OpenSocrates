@@ -1643,21 +1643,43 @@ def test_packaged_hook_timing_evidence() -> None:
     )
 
 
-@check("CLAUDE-15-desktop-live-probe-is-honestly-blocked")
-def test_desktop_live_probe_is_honestly_blocked() -> None:
+@check("CLAUDE-15-desktop-live-probe-separates-partial-observations")
+def test_desktop_live_probe_separates_partial_observations() -> None:
     report = json.loads(
         (ROOT / "docs" / "evidence" / "claude-desktop-live-probe-v1.1.2.json").read_text(
             encoding="utf-8"
         )
     )
     require(
-        report.get("status") == "blocked" and report.get("blocker") == "mac_locked",
+        report.get("status") == "blocked" and report.get("blocker") == "claude_not_authenticated",
         "desktop live probe does not preserve its exact blocker",
+    )
+    environment = report.get("environment")
+    require(
+        isinstance(environment, dict)
+        and environment.get("desktop_version") == "1.26832.0"
+        and environment.get("plugin_version") == "1.1.2"
+        and environment.get("registration_path_kind") == "user_marketplace",
+        "desktop live probe lost its product or registration identity",
     )
     observations = report.get("observations")
     require(
-        isinstance(observations, dict) and not any(observations.values()),
-        "blocked desktop probe claims an observation",
+        isinstance(observations, dict)
+        and observations.get("registration_visible") is True
+        and observations.get("plugin_enabled") is True
+        and observations.get("hook_declarations_visible") is True
+        and observations.get("local_session_completed") is True
+        and observations.get("read_tool_completed") is True
+        and observations.get("stop_delivered") is True,
+        "desktop live probe lost a directly observed partial result",
+    )
+    require(
+        observations.get("user_prompt_submit_delivered") is False
+        and observations.get("post_tool_use_read_delivered") is False
+        and observations.get("grounding_receipt_created") is False
+        and observations.get("instruction_artifact_created") is False
+        and observations.get("artifact_cleanup_verified") is False,
+        "desktop live probe overclaims the incomplete artifact lifecycle",
     )
     privacy = report.get("privacy")
     require(
