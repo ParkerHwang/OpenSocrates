@@ -334,9 +334,7 @@ def test_adapter_injection_and_cleanup() -> None:
                 "tool_name": "Read",
                 "tool_use_id": "tool-unfamiliar-envelope",
                 "tool_input": {"file_path": str(artifact.path)},
-                "tool_response": {
-                    "result": [{"body": artifact.path.read_text(encoding="utf-8")}]
-                },
+                "tool_response": {"result": [{"body": artifact.path.read_text(encoding="utf-8")}]},
             },
             event_name="PostToolUse",
         )
@@ -553,6 +551,17 @@ def test_issue_32_grounding_specifics() -> None:
             host=HostId.CLAUDE_CODE,
         )
     require(recursive.error_code == "native_invalid", "recursive JSON failure escaped the parser")
+
+    with patch("opensocrates.hosts.codex.native.json.dumps", side_effect=RecursionError):
+        recursive_mapping = try_parse_codex_event(
+            {"hook_event_name": "Stop", "session_id": "session-grounding"},
+            event_name="Stop",
+            host=HostId.CLAUDE_CODE,
+        )
+    require(
+        recursive_mapping.error_code == "input_too_large",
+        "recursive Mapping serialization escaped the parser",
+    )
 
     pre_tool = parse_codex_event(
         {

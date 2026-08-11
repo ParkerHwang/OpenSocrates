@@ -156,6 +156,8 @@ def _json_bytes(value: Mapping[str, Any] | str | bytes | bytearray) -> bytes:
                 sort_keys=True,
                 separators=(",", ":"),
             ).encode("utf-8")
+        except RecursionError as exc:
+            raise NativeInputTooLarge("native mapping nesting exceeds the bounded limit") from exc
         except (TypeError, ValueError) as exc:
             raise NativeParseError("native input is not JSON compatible") from exc
     if isinstance(value, str):
@@ -451,10 +453,10 @@ def _marker_in_read_response(response: object, *, depth: int = 0) -> bool:
     plus the collection limits the rest of this boundary already uses, so an
     adversarial response object cannot drive unbounded work.
 
-    Searching every string is safe rather than permissive here: the caller has
-    already required this callback to be a successful Read of the artifact's own
-    absolute path, and the terminator is an OpenSocrates constant that only that
-    artifact carries.
+    Searching every string does not authorize a receipt on its own.  The
+    adapter and store persist one only after separately requiring a successful
+    Read of the current artifact's exact absolute path; this marker flag is one
+    conjunct of that gate.
     """
 
     if isinstance(response, str):
@@ -476,14 +478,14 @@ def _marker_in_read_response(response: object, *, depth: int = 0) -> bool:
 def _read_end_marker_seen(document: Mapping[str, Any], tool_name: str) -> bool:
     """Confirm transiently that a successful Read response reached the artifact terminator.
 
-    This is a terminator test, not a proof of delivery.  It establishes that a
-    successful Read callback naming the exact artifact path returned content
-    reaching the authored terminator; it does not cryptographically prove that
-    every artifact byte was returned, and a synthetic marker-only payload would
-    satisfy it.  That is not model-reachable: the terminator is the artifact's
-    last line, so any truncation removes it, and the model does not author
-    ``tool_response``.  Anything able to forge this envelope already controls
-    the hook's stdin and is outside the boundary this gate defends.
+    This is a terminator test, not a proof of delivery.  The receipt gate
+    combines it with the successful-Read and exact-path checks; even then, it
+    does not cryptographically prove that every artifact byte was returned, and
+    a synthetic marker-only payload would satisfy this test.  That is not
+    model-reachable: the terminator is the artifact's last line, so any
+    truncation removes it, and the model does not author ``tool_response``.
+    Anything able to forge this envelope already controls the hook's stdin and
+    is outside the boundary this gate defends.
     """
 
     if tool_name != "Read":
