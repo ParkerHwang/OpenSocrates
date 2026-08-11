@@ -1210,6 +1210,8 @@ def _instruction_artifact_check(modules: Mapping[str, ast.Module]) -> set[str]:
     for method_name in (
         "create",
         "latest_for_session",
+        "record_complete_read",
+        "has_complete_read_receipt",
         "delete_turn",
         "delete_session",
         "sweep_expired",

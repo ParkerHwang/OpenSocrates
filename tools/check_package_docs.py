@@ -64,6 +64,21 @@ REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
         ),
     ),
     (
+        "claude_readme_grounding_gate_missing",
+        (
+            "Read-only `PostToolUse` hook accepts a grounding read only when",
+            "file's terminal marker",
+            "one bounded repair pass",
+        ),
+    ),
+    (
+        "claude_readme_grounding_privacy_missing",
+        (
+            "complete Read response is checked only in memory",
+            "contains no prompt, tool output, workspace path, or artifact path",
+        ),
+    ),
+    (
         "claude_readme_release_boundary_missing",
         (
             "released for Apple-silicon macOS (`darwin-arm64`) only",

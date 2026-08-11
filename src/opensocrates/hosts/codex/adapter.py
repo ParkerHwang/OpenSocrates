@@ -73,6 +73,7 @@ class CodexAdapterConfig:
     selector_application: SelectorApplication | None = field(default=None, repr=False)
     selector_config: SelectorConfig | None = field(default=None, repr=False)
     instruction_file_store: Any | None = field(default=None, repr=False)
+    require_instruction_read_receipt: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -461,9 +462,8 @@ class CodexAdapter:
                 transcript_path=native.transcript_path,
                 cwd=native.cwd,
                 session_id=native.session_id,
-                # Claude Code does not expose a turn_id in its hook contract.
-                # Reuse the bounded session identifier as a turn-directory key;
-                # Stop deletes that directory before the next user prompt.
+                # Claude's prompt_id is projected into native.turn_id. The
+                # session fallback is retained for hosts that expose neither.
                 turn_id=native.turn_id or native.session_id,
                 model=native.model,
             )
@@ -526,6 +526,82 @@ class CodexAdapter:
             selector_response=True,
         )
 
+    def _record_selector_grounding_read(self, native: CodexNativeEvent) -> None:
+        """Record only a successful complete Read of the current instruction artifact."""
+
+        if (
+            not self.config.require_instruction_read_receipt
+            or native.native_event != "PostToolUse"
+            or native.tool_name != "Read"
+            or not native.result_present
+            or not native.tool_read_end_marker_seen
+        ):
+            return
+        path_filter = getattr(self.config.instruction_file_store, "accepts_artifact_path", None)
+        if not callable(path_filter) or not path_filter(native.tool_file_path):
+            return
+        recorder = getattr(self.config.instruction_file_store, "record_complete_read", None)
+        if not callable(recorder):
+            return
+        try:
+            recorder(
+                native.session_id,
+                native.turn_id or native.session_id,
+                file_path=native.tool_file_path,
+                tool_use_id=native.tool_use_id,
+                offset=native.tool_read_offset,
+                limit=native.tool_read_limit,
+                end_marker_seen=native.tool_read_end_marker_seen,
+            )
+        except Exception:
+            # Receipt capture is a fail-open host backstop.  The trusted inline
+            # guardrails and skill contract remain available when storage fails.
+            return
+
+    def _selector_grounding_repair_result(
+        self,
+        native: CodexNativeEvent,
+        *,
+        diagnostics: tuple[str, ...],
+    ) -> CodexHandleResult | None:
+        """Return one Stop continuation when grounding or its public audit is absent."""
+
+        if not self.config.require_instruction_read_receipt or native.stop_hook_active:
+            return None
+        store = self.config.instruction_file_store
+        latest = getattr(store, "latest_for_session", None)
+        checker = getattr(store, "has_complete_read_receipt", None)
+        if not callable(latest) or not callable(checker):
+            return None
+        try:
+            artifact = latest(native.session_id)
+            if artifact is None:
+                return None
+            read_confirmed = bool(checker(artifact))
+            footer = artifact.grounding_footer()
+            final_lines = (native.final_message or "").rstrip().splitlines()
+            footer_confirmed = bool(final_lines and final_lines[-1].strip() == footer)
+            if read_confirmed and footer_confirmed:
+                return None
+            reason = artifact.grounding_repair_message(
+                missing_read=not read_confirmed,
+                missing_footer=not footer_confirmed,
+            )
+            action = HostAction.continue_turn(reason)
+            response = response_object(action, "Stop")
+        except Exception:
+            return None
+        return CodexHandleResult(
+            native_event_name=native.native_event,
+            normalized_event=None,
+            action=action,
+            response=response,
+            projection={},
+            status="grounding_repair",
+            diagnostics=diagnostics,
+            selector_response=True,
+        )
+
     def _handle_selector_event(  # noqa: C901  # Closed native lifecycle dispatch.
         self, native: CodexNativeEvent, *, diagnostics: tuple[str, ...]
     ) -> CodexHandleResult:
@@ -576,7 +652,17 @@ class CodexAdapter:
                     pass
             return result
 
+        if native.native_event == "PostToolUse":
+            self._record_selector_grounding_read(native)
+            return self._selector_empty_result(native, diagnostics=diagnostics)
+
         if native.native_event == "Stop" and artifact_store is not None:
+            repair = self._selector_grounding_repair_result(
+                native,
+                diagnostics=diagnostics,
+            )
+            if repair is not None:
+                return repair
             try:
                 artifact_store.delete_turn(native.session_id, native.turn_id or native.session_id)
             except Exception:

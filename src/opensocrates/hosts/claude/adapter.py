@@ -14,6 +14,7 @@ class ClaudeAdapterConfig(CodexAdapterConfig):
     """Claude-specific defaults for the shared bounded hook adapter."""
 
     host: HostId = HostId.CLAUDE_CODE
+    require_instruction_read_receipt: bool = True
 
 
 ClaudeHandleResult = CodexHandleResult

@@ -30,6 +30,18 @@ fabricate its typed stdin payload. Only the host integration may invoke it. If
 there is no matching native receipt, say that native activation is unconfirmed
 and apply only complete installed method skill cards that you actually read.
 
+## Mandatory grounding gate
+
+A method may be applied, named as applied, or cited only after its complete
+installed skill card was read in the current session. Capture its exact
+`Method ID` and `Content revision`; prior model knowledge is not a substitute.
+If the read is unavailable or incomplete, do not use that method and state that
+its grounding source was unavailable. Trusted hook context may inline selected
+`Do not use when` and `Stop conditions`; these are immediately binding but do
+not replace the full read. End a grounded final response with exactly
+`OpenSocrates grounding: <method-id>@<content-revision>` and join multiple
+methods with comma-space. Do not emit this line for an ungrounded method.
+
 Method availability is not activation evidence. Exact model-initiated method
 activation and public-artifact confirmation remain unknown until a matching
 native receipt exists.

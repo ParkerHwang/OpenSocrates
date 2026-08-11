@@ -20,6 +20,7 @@ MAX_REPAIR_COUNT = 1
 MAX_SCHEMA_NAME_LENGTH = 128
 MAX_SAFE_TEXT = 4096
 MAX_REVIEWED_PROCEDURE_TEXT = 16_384
+INSTRUCTION_ARTIFACT_END_MARKER = "<!-- OPENSOCRATES_INSTRUCTION_END -->"
 
 # The current capability registry is intentionally closed.  Keep this list in
 # one place so profiles, schemas, and downstream adapters cannot drift.

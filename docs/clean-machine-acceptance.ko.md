@@ -4,7 +4,7 @@
 인증된 사용자의 기본 Claude Code 및 Codex 홈에 실제로 설치하므로 샌드박스 테스트가
 아닙니다.
 
-이 절차는 출시 전 후보 검증입니다. 1.1.1은 아직 공개 npm 및 GitHub Release 경로에
+이 절차는 출시 전 후보 검증입니다. 1.1.2는 아직 공개 npm 및 GitHub Release 경로에
 없으므로, 도구가 현재 Pull Request의 정확한 커밋에서 성공한 macOS CI 패키지
 산출물을 받고 실제 npm 설치 프로그램에 전달합니다. 패키지, 설치 프로그램, 두
 호스트 트랜잭션, 등록, 관리형 파일 구조와 상태 계약을 검증합니다. 최종 공개
@@ -27,7 +27,7 @@
 - [GitHub CLI](https://cli.github.com/manual/index) (`gh auth login` 완료 필요)
 - Git
 
-Pull Request #33의 최신 커밋에 대한 `CI`가 성공할 때까지 기다리세요. 다른 실행의
+현재 Pull Request의 최신 커밋에 대한 `CI`가 성공할 때까지 기다리세요. 다른 실행의
 산출물이나 이전 커밋은 테스트 도구가 거부합니다.
 
 ## 자동 인수 테스트 실행
@@ -37,7 +37,7 @@ Pull Request #33의 최신 커밋에 대한 `CI`가 성공할 때까지 기다�
 ```bash
 gh repo clone ParkerHwang/OpenSocrates
 cd OpenSocrates
-gh pr checkout 33
+gh pr checkout YOUR_PR_NUMBER
 git pull --ff-only
 node tools/clean_machine_acceptance.mjs
 ```
@@ -72,7 +72,7 @@ PENDING
 묶기 명령이 거부합니다.
 
 테스트 도구가 출력한 `--pack` 명령을 그대로 실행하면 결과 디렉터리 옆에 ZIP이
-생깁니다. 그 ZIP을 Pull Request #33을 처리 중인 현재 Codex 작업에 첨부해 주세요.
+생깁니다. 그 ZIP을 현재 Pull Request를 처리 중인 Codex 작업에 첨부해 주세요.
 커밋, CI, 무결성, 설치 및 상태 근거가 들어 있어 메인테이너가 결과를 판단할 수
 있습니다.
 

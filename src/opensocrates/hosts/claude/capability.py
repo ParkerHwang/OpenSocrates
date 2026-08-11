@@ -42,7 +42,7 @@ def _contract_entry(key: str) -> CapabilityEntry:
             evidence_kind=CapabilityEvidenceKind.HOST_CONTRACT,
             source_url=_source_for(key),
             source_checked_at=EVIDENCE_CAPTURE_DATE,
-            limitation_key="plugin-package-does-not-enable-tool-observation",
+            limitation_key="plugin-package-observes-grounding-read-only",
         )
     return CapabilityEntry(
         status=CapabilityStatus.UNKNOWN,

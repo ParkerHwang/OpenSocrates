@@ -7,6 +7,7 @@ from typing import Any
 NATIVE_TO_NORMALIZED = {
     "SessionStart": "session_started",
     "UserPromptSubmit": "user_prompt_submitted",
+    "PostToolUse": "tool_succeeded",
     "Stop": "completion_candidate",
     "SessionEnd": "session_ended",
 }
@@ -16,6 +17,7 @@ CLAUDE_NATIVE_EVENTS = tuple(NATIVE_TO_NORMALIZED)
 _MATCHERS = {
     "SessionStart": "startup|resume|clear|compact|fork",
     "UserPromptSubmit": "",
+    "PostToolUse": "Read",
     "Stop": "",
     "SessionEnd": "clear|resume|logout|prompt_input_exit|bypass_permissions_disabled|other",
 }
@@ -38,11 +40,11 @@ def hook_command(native_event: str) -> dict[str, Any]:
     }
     if native_event == "UserPromptSubmit":
         command["timeout"] = 35
-    elif native_event == "Stop":
+    elif native_event in {"PostToolUse", "Stop"}:
         # Claude Code's Stop default is 600s and Stop has no shared budget.
         # One second cannot cover launcher dispatch plus frozen-runtime cold
-        # start, so turn-artifact deletion would silently miss its deadline and
-        # fall through to the 24-hour TTL sweep.  Three seconds matches Codex.
+        # start. PostToolUse also validates and persists a receipt, while Stop
+        # validates it and removes the turn artifact. Three seconds matches Codex.
         command["timeout"] = 3
     elif native_event == "SessionEnd":
         # SessionEnd hooks share a 1.5-second budget; stay inside it.
@@ -61,7 +63,9 @@ def build_hooks() -> dict[str, Any]:
             entry["matcher"] = matcher
         hooks[native_event] = [entry]
     return {
-        "description": "Fail-open OpenSocrates prompt selection and artifact cleanup.",
+        "description": (
+            "Fail-open OpenSocrates prompt selection, grounding-read receipt, and cleanup."
+        ),
         "hooks": hooks,
     }
 

@@ -4,7 +4,7 @@ Use this procedure to test the current pull request on a real, newly configured
 Mac before merging. It installs into the authenticated user's default Claude
 Code and Codex homes; it is not a sandbox test.
 
-This is a pre-release acceptance path. Version 1.1.1 is not yet available from
+This is a pre-release acceptance path. Version 1.1.2 is not yet available from
 the public npm and GitHub Release endpoints, so the harness downloads the
 successful macOS package artifact built from the exact pull-request commit and
 passes those archives to the real packed npm installer. It proves the package,
@@ -29,8 +29,8 @@ Install and sign in to all prerequisites:
   completed; and
 - Git.
 
-Wait until pull request #33 has a successful `CI` run for its latest commit.
-The harness rejects an older commit or an artifact from a different run.
+Wait until the current pull request has a successful `CI` run for its latest
+commit. The harness rejects an older commit or an artifact from a different run.
 
 ## Run the automated acceptance
 
@@ -39,7 +39,7 @@ Open Terminal and run:
 ```bash
 gh repo clone ParkerHwang/OpenSocrates
 cd OpenSocrates
-gh pr checkout 33
+gh pr checkout YOUR_PR_NUMBER
 git pull --ff-only
 node tools/clean_machine_acceptance.mjs
 ```
@@ -77,9 +77,9 @@ account names, credentials, or local paths; the pack command rejects changes
 outside the four result fields.
 
 Run the exact `--pack` command printed by the harness. It creates a ZIP next to
-the result directory. Attach that ZIP to the Codex task handling pull request
-#33; the report contains enough commit, CI, integrity, installation, and status
-evidence for the maintainer to evaluate the test.
+the result directory. Attach that ZIP to the Codex task handling the current
+pull request; the report contains enough commit, CI, integrity, installation,
+and status evidence for the maintainer to evaluate the test.
 
 If automation fails, the harness creates the privacy-safe ZIP immediately.
 Attach it without copying authentication output. A checksum or clean-baseline

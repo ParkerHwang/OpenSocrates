@@ -79,6 +79,26 @@ authored catalog content assembled by OpenSocrates is ever injected. Operators
 who cannot accept managed-hook visibility of the selector prompt should not
 enable OpenSocrates selection on those machines.
 
+On Claude surfaces that deliver the packaged hooks, the grounding gate observes
+only successful `Read` callbacks for the current turn's exact instruction file.
+It transiently checks that the response reached an authored terminal marker and
+does not retain the response. The owner-only authenticated receipt stores only
+the artifact digest, content revision, selected method IDs, and keyed
+authentication/tool-use tags; prompts, transcripts, raw tool output,
+credentials, workspace paths, and artifact paths are excluded. `Stop` removes
+the receipt with the turn artifact, and the 24-hour sweep covers crash leftovers.
+
+The gate's scope is deliberate and worth stating plainly. It establishes that a
+successful `Read` callback naming the exact current-turn artifact returned
+content reaching the authored terminal marker. It does not cryptographically
+prove that every artifact byte was returned: a synthetic payload carrying only
+the marker would satisfy the marker test. That is not reachable by the model,
+which does not author `tool_response`, and the marker is the artifact's last
+line, so a truncated read loses it. Anything able to forge that callback already
+controls the hook's standard input and is outside the boundary this gate
+defends. The gate raises the cost of an ungrounded answer; it is not a proof of
+delivery, and it fails open by design.
+
 The optional macOS LaunchAgent invokes the selected published npm channel and
 then uses the same verified installer path as a manual update. It does not read
 or terminate active Claude or Codex sessions. Its receipt contains only the

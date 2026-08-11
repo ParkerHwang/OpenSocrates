@@ -7,6 +7,7 @@ domain contracts without importing filesystem, host, or persistence code.
 from __future__ import annotations
 
 from collections.abc import Collection, Mapping
+from pathlib import Path
 from typing import TYPE_CHECKING, Protocol, TypeVar
 
 from ..clock import Clock
@@ -119,6 +120,22 @@ class InstructionArtifactStore(Protocol):
     ) -> "InstructionArtifact": ...
 
     def latest_for_session(self, session_id: str | None) -> "InstructionArtifact | None": ...
+
+    def accepts_artifact_path(self, file_path: str | Path | None) -> bool: ...
+
+    def record_complete_read(
+        self,
+        session_id: str | None,
+        turn_id: str | None,
+        *,
+        file_path: str | Path | None,
+        tool_use_id: str | None,
+        offset: int | None,
+        limit: int | None,
+        end_marker_seen: bool,
+    ) -> bool: ...
+
+    def has_complete_read_receipt(self, artifact: "InstructionArtifact") -> bool: ...
 
     def delete_turn(self, session_id: str | None, turn_id: str | None) -> int: ...
 

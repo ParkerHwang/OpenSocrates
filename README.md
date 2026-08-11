@@ -17,8 +17,9 @@ uses a fresh host-native selector to choose relevant systems, and adds their
 complete theory and examples to the active task. Straightforward factual and
 mechanical work can pass through unchanged.
 
-Version `1.1.1` includes 48 reasoning systems, one user-facing Claude entry,
-coordinated Claude/Codex lifecycle management, and opt-in automatic updates on
+Version `1.1.2` includes 48 reasoning systems, one user-facing Claude entry, a
+Claude grounding gate that verifies selected procedures were read, coordinated
+Claude/Codex lifecycle management, and opt-in automatic updates on
 Apple-silicon macOS (`darwin-arm64`). It uses your existing host login and does
 not require an API key or an OpenSocrates backend.
 
@@ -69,7 +70,7 @@ before registering an owner-marked managed marketplace.
 ### Install every ready host
 
 ```bash
-npx --yes opensocrates@1.1.1 install --host all
+npx --yes opensocrates@1.1.2 install --host all
 ```
 
 The all-host path detects supported, authenticated host CLIs, completes every
@@ -81,9 +82,9 @@ registration.
 Use the same host value for the complete lifecycle:
 
 ```bash
-npx --yes opensocrates@1.1.1 status --host all
-npx --yes opensocrates@1.1.1 update --host all
-npx --yes opensocrates@1.1.1 remove --host all
+npx --yes opensocrates@1.1.2 status --host all
+npx --yes opensocrates@1.1.2 update --host all
+npx --yes opensocrates@1.1.2 remove --host all
 ```
 
 A private `~/.opensocrates/desired-state.json` manifest records the selected
@@ -96,9 +97,9 @@ automatic update, and per-host drift.
 Codex remains the default host for backward compatibility:
 
 ```bash
-npx --yes opensocrates@1.1.1 install
-# Equivalent: npx --yes opensocrates@1.1.1 install --host codex
-npx --yes opensocrates@1.1.1 install --host claude
+npx --yes opensocrates@1.1.2 install
+# Equivalent: npx --yes opensocrates@1.1.2 install --host codex
+npx --yes opensocrates@1.1.2 install --host claude
 ```
 
 Existing `--host codex` and `--host claude` lifecycle commands remain
@@ -109,9 +110,9 @@ recorded in desired state back to one version.
 ### Opt-in automatic updates
 
 ```bash
-npx --yes opensocrates@1.1.1 auto-update enable --host all
-npx --yes opensocrates@1.1.1 auto-update status
-npx --yes opensocrates@1.1.1 auto-update disable
+npx --yes opensocrates@1.1.2 auto-update enable --host all
+npx --yes opensocrates@1.1.2 auto-update status
+npx --yes opensocrates@1.1.2 auto-update disable
 ```
 
 Automatic updates are disabled until explicitly enabled. The macOS LaunchAgent
@@ -134,7 +135,7 @@ workspace paths. `auto-update disable` unloads and removes the LaunchAgent;
 ### Claude web and Desktop Chat skills
 
 These surfaces support plugin skills but not hooks. Download
-`opensocrates-1.1.1-claude-chat-skills.zip` from the release and upload it from
+`opensocrates-1.1.2-claude-chat-skills.zip` from the release and upload it from
 Claude's plugin customization UI. The package exposes exactly one
 `/opensocrates` skill; its 48 method procedures, rigor, evidence, and trace
 controls are internal supporting references. Automatic selection is absent
@@ -146,22 +147,22 @@ because Chat does not execute plugin hooks. See Anthropic's
 The same host option works without the npm registry:
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.1 install --host all
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.1 install --host claude
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.1 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.2 install --host all
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.2 install --host claude
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.2 install --host codex
 ```
 
 ### Manual release verification
 
 Download `opensocrates.mjs`, the host package, and its `.sha256` file from the
-[v1.1.1 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.1).
+[v1.1.2 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.2).
 For Claude, for example:
 
 ```bash
-shasum -a 256 -c opensocrates-1.1.1-claude-plugin.zip.sha256
+shasum -a 256 -c opensocrates-1.1.2-claude-plugin.zip.sha256
 node opensocrates.mjs install --host claude \
-  --asset opensocrates-1.1.1-claude-plugin.zip \
-  --checksum opensocrates-1.1.1-claude-plugin.zip.sha256
+  --asset opensocrates-1.1.2-claude-plugin.zip \
+  --checksum opensocrates-1.1.2-claude-plugin.zip.sha256
 ```
 
 Replace `claude` with `codex` for the Codex package.
@@ -176,7 +177,7 @@ what is installed, remove it explicitly:
 ```bash
 claude plugin uninstall opensocrates@OpenSocrates --scope user
 claude plugin marketplace remove OpenSocrates --scope user
-npx --yes opensocrates@1.1.1 install --host claude
+npx --yes opensocrates@1.1.2 install --host claude
 ```
 
 Updating a managed v1.1.0 Claude installation replaces the complete package
@@ -193,8 +194,24 @@ reasoning process. When it intervenes, it:
 1. starts a fresh, non-persistent selector in the current host;
 2. chooses from the authored 48-system catalog;
 3. writes the complete selected content to an owner-only temporary Markdown
-   file; and
-4. adds a small hidden context message telling the active task to read it.
+   file;
+4. adds a bounded hidden context message with each method ID, content revision,
+   and, when they fit, its exact `Do not use when` and `Stop conditions`; and
+5. requires the active task to read the complete file before applying the
+   method and to end a grounded response with an exact audit line such as
+   `OpenSocrates grounding: triangulation@1`.
+
+On Claude hook surfaces, a Read-only `PostToolUse` hook records an authenticated
+receipt only when the exact current-turn file is read from its first line
+through a terminal marker. At `Stop`, a missing receipt or audit line requests
+one bounded repair pass; `stop_hook_active` prevents a continuation loop. A
+partial, truncated, failed, or wrong-file read is not accepted. Claude Chat
+does not run these hooks, so its grounding contract remains skills-only.
+
+The receipt records that a successful `Read` callback for that exact file
+returned content reaching the terminal marker. It is not a proof that every byte
+was delivered, and the gate fails open. See [SECURITY.md](SECURITY.md) for the
+boundary this does and does not defend.
 
 There is no fixed selection-count limit. The selector has a 30-second internal
 deadline, does not retry, and fails open. A timeout, host error, invalid output,
@@ -250,8 +267,12 @@ telemetry, store an API key, or execute the user's requested task.
 Temporary instruction files contain authored OpenSocrates content only. Raw
 prompts, transcripts, workspace files, tool data, credentials, and selector
 reasoning are not written to OpenSocrates records, logs, metrics, diagnostics,
-or instruction files. Turn files are removed on `Stop`, remaining session
-files on `SessionEnd`, and crash leftovers older than 24 hours on
+or instruction files. The complete Read response is inspected only in memory
+for its terminal marker and is not retained. The owner-only grounding receipt
+stores only an artifact digest, content revision, selected method IDs, and
+keyed authentication/tool-use tags—never a prompt, tool output, workspace path,
+or artifact path. Turn files and receipts are removed on `Stop`, remaining
+session files on `SessionEnd`, and crash leftovers older than 24 hours on
 `SessionStart`.
 
 When enabled, the updater stores only desired lifecycle state and the concise
