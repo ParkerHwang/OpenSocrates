@@ -34,7 +34,7 @@ not require an API key or an OpenSocrates backend.
 | --- | --- | --- | --- |
 | Codex CLI and Desktop | Yes | OpenSocrates plugin | Release-validated on `darwin-arm64` |
 | Claude Code CLI | Yes, through `UserPromptSubmit` | `/opensocrates` | Locally validated on `darwin-arm64` |
-| Claude Code desktop app | Implemented, where Claude Code plugins run | `/opensocrates` | Implemented; no live probe receipt |
+| Claude Code desktop app | Implemented, where Claude Code plugins run | `/opensocrates` | [Blocked live probe](docs/claude-desktop-live-probe.md); no delivery receipt |
 | Claude Cowork | Implemented, when the local plugin runtime is available | `/opensocrates` | Experimental; no live probe receipt |
 | Claude web and Desktop Chat | No hooks | `/opensocrates` | Skills-only; upload path unvalidated |
 

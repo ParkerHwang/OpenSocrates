@@ -33,7 +33,7 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 | --- | --- | --- | --- |
 | Codex CLI 및 Desktop | 지원 | OpenSocrates 플러그인 | `darwin-arm64` 릴리스 검증 완료 |
 | Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | `/opensocrates` | `darwin-arm64` 로컬 검증 완료 |
-| Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 구현됨 | `/opensocrates` | 구현 완료, 실측 수신 기록 없음 |
+| Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 구현됨 | `/opensocrates` | [실측 probe 차단](docs/claude-desktop-live-probe.md), 수신 기록 없음 |
 | Claude Cowork | 로컬 플러그인 런타임을 사용할 수 있을 때 구현됨 | `/opensocrates` | 실험적, 실측 수신 기록 없음 |
 | Claude 웹 및 Desktop Chat | 훅 미지원 | `/opensocrates` | 스킬 전용, 업로드 경로 미검증 |
 
