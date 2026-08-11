@@ -39,7 +39,7 @@ and runtimes are not shipped or supported in this release.
 | Codex CLI and Desktop | Yes | OpenSocrates plugin | Release-validated on `darwin-arm64` |
 | Claude Code CLI | Yes, through `UserPromptSubmit` | `/opensocrates` | Locally validated on `darwin-arm64` |
 | Claude Code desktop app | Implemented, where Claude Code plugins run | `/opensocrates` | [Partial live probe; selector auth blocked](docs/claude-desktop-live-probe.md); no complete receipt |
-| Claude Cowork | Implemented, when the local plugin runtime is available | `/opensocrates` | [CLI registered; Cowork probe blocked](docs/claude-cowork-live-probe.md) |
+| Claude Cowork | Implemented, when the local plugin runtime is available | `/opensocrates` | [Marketplace visible; skill/hooks still unvalidated](docs/claude-cowork-live-probe.md) |
 | Claude web and Desktop Chat | No hooks | `/opensocrates` | [Live upload and invocation validated](docs/claude-chat-upload-probe.md) |
 
 The status column uses four distinct levels. Do not read them as
@@ -58,11 +58,11 @@ skills, but automatic per-prompt selection is available only on Claude Code
 and Cowork surfaces that execute the plugin runtime. OpenSocrates fails open
 if a hook or selector is unavailable.
 
-Cowork carries one further unverified assumption. OpenSocrates registers its
-marketplace with `claude plugin marketplace add --scope user`, which writes
-Claude Code user settings. Anthropic documents that plugin hooks run in Cowork,
-but does not document that a marketplace registered through the Claude Code CLI
-is visible to Cowork. Until a receipt exists, treat Cowork as experimental.
+Cowork shares the Claude Code user-marketplace entry in the current live UI:
+OpenSocrates 1.1.2 is visible and enabled without a second install. However,
+the same probe reported `/opensocrates` as an unknown Cowork skill and could
+not produce an authenticated hook lifecycle receipt. Until that receipt exists,
+treat Cowork as experimental.
 
 ## Install
 

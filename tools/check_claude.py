@@ -1696,22 +1696,38 @@ def test_cowork_live_probe_separates_cli_registration() -> None:
         )
     )
     require(
-        report.get("status") == "blocked" and report.get("blocker") == "mac_locked",
+        report.get("status") == "blocked" and report.get("blocker") == "claude_not_authenticated",
         "Cowork probe does not preserve its exact blocker",
+    )
+    environment = report.get("environment")
+    require(
+        isinstance(environment, dict)
+        and environment.get("cowork_version") == "1.26832.0"
+        and environment.get("plugin_version") == "1.1.2"
+        and environment.get("registration_path_kind") == "user_marketplace",
+        "Cowork probe lost its product or registration identity",
     )
     observations = report.get("observations")
     require(isinstance(observations, dict), "Cowork observations are missing")
     require(
-        observations.get("cli_user_scope_marketplace_registered") is True,
-        "Cowork probe lost the independently confirmed CLI registration",
+        observations.get("cli_user_scope_marketplace_registered") is True
+        and observations.get("cowork_ui_accessible") is True
+        and observations.get("cli_marketplace_visible_in_cowork") is True
+        and observations.get("plugin_enabled") is True
+        and observations.get("hook_declarations_visible") is True
+        and observations.get("cowork_folder_connected") is True
+        and observations.get("read_tool_completed") is True,
+        "Cowork probe lost a directly observed registration or task result",
     )
     require(
-        not any(
-            value
-            for key, value in observations.items()
-            if key != "cli_user_scope_marketplace_registered"
-        ),
-        "blocked Cowork probe claims a Cowork or hook observation",
+        observations.get("customize_install_tested") is False
+        and observations.get("slash_invocation_recognized") is False
+        and observations.get("user_prompt_submit_delivered") is False
+        and observations.get("post_tool_use_read_delivered") is False
+        and observations.get("grounding_receipt_created") is False
+        and observations.get("stop_delivered") is False
+        and observations.get("artifact_cleanup_verified") is False,
+        "Cowork probe overclaims skill or hook validation",
     )
     privacy = report.get("privacy")
     require(

@@ -21,9 +21,11 @@ All notable changes to OpenSocrates are documented here. This project follows
   catalog routing, representative method loading, and grounding audit without
   retaining prompt or conversation content
   ([#5](https://github.com/ParkerHwang/OpenSocrates/issues/5)).
-- A privacy-safe Cowork probe distinguishes confirmed Claude CLI user-scope
-  registration from still-blocked Cowork visibility and hook delivery; the
-  support claim remains experimental ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
+- A privacy-safe Cowork probe confirms that the Claude CLI user-marketplace
+  registration is visible and enabled without a second install, while also
+  recording the Cowork `/opensocrates` unknown-skill result and the still
+  unobserved authenticated hook lifecycle; support remains experimental
+  ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
 - A privacy-safe Claude Code desktop live probe now records the visible,
   enabled user-marketplace plugin, its five declared hooks, a completed local
   Read task, and error-free Stop launcher delivery. Selector artifact, receipt,
