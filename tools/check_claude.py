@@ -1732,16 +1732,16 @@ def test_packaged_hook_timing_evidence() -> None:
     )
 
 
-@check("CLAUDE-15-desktop-live-probe-separates-partial-observations")
-def test_desktop_live_probe_separates_partial_observations() -> None:
+@check("CLAUDE-15-desktop-live-probe-validates-authenticated-lifecycle")
+def test_desktop_live_probe_validates_authenticated_lifecycle() -> None:
     report = json.loads(
         (ROOT / "docs" / "evidence" / "claude-desktop-live-probe-v1.1.2.json").read_text(
             encoding="utf-8"
         )
     )
     require(
-        report.get("status") == "blocked" and report.get("blocker") == "claude_not_authenticated",
-        "desktop live probe does not preserve its exact blocker",
+        report.get("status") == "pass" and report.get("blocker") is None,
+        "desktop live probe is not a passing unblocked result",
     )
     environment = report.get("environment")
     require(
@@ -1760,20 +1760,21 @@ def test_desktop_live_probe_separates_partial_observations() -> None:
         and observations.get("local_session_completed") is True
         and observations.get("read_tool_completed") is True
         and observations.get("stop_delivered") is True,
-        "desktop live probe lost a directly observed partial result",
+        "desktop live probe lost a directly observed host result",
     )
     require(
-        observations.get("user_prompt_submit_delivered") is False
-        and observations.get("post_tool_use_read_delivered") is False
-        and observations.get("grounding_receipt_created") is False
-        and observations.get("instruction_artifact_created") is False
-        and observations.get("artifact_cleanup_verified") is False,
-        "desktop live probe overclaims the incomplete artifact lifecycle",
+        observations.get("user_prompt_submit_delivered") is True
+        and observations.get("post_tool_use_read_delivered") is True
+        and observations.get("grounding_receipt_created") is True
+        and observations.get("instruction_artifact_created") is True
+        and observations.get("artifact_cleanup_verified") is True
+        and report.get("support_claim") == "locally_validated",
+        "desktop live probe lost the authenticated artifact lifecycle",
     )
     privacy = report.get("privacy")
     require(
         isinstance(privacy, dict) and not any(privacy.values()),
-        "blocked desktop probe contains private evidence",
+        "desktop probe contains private evidence",
     )
 
 
