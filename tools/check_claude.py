@@ -1526,6 +1526,39 @@ def test_single_user_facing_entry() -> None:
     )
 
 
+@check("CLAUDE-13-real-selector-is-opt-in")
+def test_real_selector_is_opt_in() -> None:
+    environment = dict(os.environ)
+    environment.pop("OPENSOCRATES_REAL_CLAUDE", None)
+    with tempfile.TemporaryDirectory(prefix="opensocrates-real-claude-gate-") as name:
+        report = Path(name) / "report.json"
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "tools" / "check_real_claude.py"),
+                "--report",
+                str(report),
+            ],
+            cwd=ROOT,
+            env=environment,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=10,
+            check=False,
+        )
+        require(result.returncode == 0, "real Claude check did not skip without opt-in")
+        evidence = json.loads(report.read_text(encoding="utf-8"))
+        require(
+            evidence.get("status") == "skipped" and evidence.get("blocker") == "opt_in_required",
+            "real Claude check crossed its opt-in gate",
+        )
+        require(
+            set(evidence) == {"schema", "status", "blocker", "privacy"},
+            "skipped real Claude evidence contains unexpected data",
+        )
+
+
 def main() -> int:
     failures: list[tuple[str, str]] = []
     for name, function in CHECKS:

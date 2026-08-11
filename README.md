@@ -310,6 +310,11 @@ Before merging a release candidate, follow the
 to exercise the real authenticated Claude Code and Codex homes and return a
 privacy-safe evidence bundle.
 
+The selector's authenticated Claude subprocess contract has a separate
+[opt-in check](docs/real-claude-selector.md). It is never run by the offline
+suite and reports a categorical blocker when the local Claude profile is not
+authenticated.
+
 ```bash
 make bootstrap
 make format-check

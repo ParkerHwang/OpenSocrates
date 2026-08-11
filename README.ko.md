@@ -293,6 +293,10 @@ OpenSocrates 기록, 로그, 메트릭, 진단 또는 instruction 파일에 쓰�
 인증된 실제 Claude Code 및 Codex 홈에서 검증하고 개인정보를 뺀 근거 묶음을
 확보하세요.
 
+셀렉터의 인증된 Claude 하위 프로세스 계약은 별도의
+[선택형 검사](docs/real-claude-selector.md)로 검증합니다. 오프라인 테스트에는 포함되지
+않으며, 로컬 Claude 프로필이 인증되지 않았으면 범주형 차단 사유만 보고합니다.
+
 ```bash
 make bootstrap
 make format-check
