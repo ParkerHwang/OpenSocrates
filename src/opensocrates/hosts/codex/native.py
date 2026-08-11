@@ -219,12 +219,22 @@ _KNOWN_FIELDS = {
         "is_interrupt",
         "error",
         "duration_ms",
+        # Observed on real Claude Code receipts; see the Claude fixtures.
+        "effort",
     },
     "PermissionRequest": _COMMON_FIELDS | {"tool_name", "tool_input", "description"},
     "PreCompact": _COMMON_FIELDS | {"trigger"},
     "PostCompact": _COMMON_FIELDS | {"trigger"},
     "Stop": _COMMON_FIELDS
-    | {"stop_hook_active", "last_assistant_message", "declared_content_bytes"},
+    | {
+        "stop_hook_active",
+        "last_assistant_message",
+        "declared_content_bytes",
+        # Observed on real Claude Code receipts; see the Claude fixtures.
+        "effort",
+        "background_tasks",
+        "session_crons",
+    },
     "SessionEnd": _COMMON_FIELDS | {"reason"},
 }
 
