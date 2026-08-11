@@ -5,6 +5,39 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ## [Unreleased]
 
+## [1.1.4] - 2026-08-12
+
+### Added
+
+- A privacy-safe Claude selector aggregate records only bounded counts under a
+  closed outcome vocabulary. `diagnose` exposes those counts without prompts,
+  transcripts, session identifiers, paths, model output, credentials, or
+  selector reasoning ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
+- A sanitized Cowork receipt validates local plugin upload and the native
+  `UserPromptSubmit` → `PostToolUse(Read)` → `Stop` lifecycle, including the
+  authenticated grounding receipt and final cleanup
+  ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
+
+### Changed
+
+- Native runtime builds are split by host profile. The Claude package excludes
+  the Codex SDK and CLI while the Codex package preserves its existing runtime
+  surface ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
+- Release tooling derives artifact paths from the detected native target,
+  defaults plugin generation to `dist/runtime/<host>`, and interprets Cowork's
+  50 MB and 200 MB limits conservatively as decimal bytes
+  ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
+
+### Fixed
+
+- The Claude runtime now uses PyInstaller's no-archive mode, and release checks
+  reject nested ZIP entries before a Cowork package can be published
+  ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
+- Unreadable selector aggregates report `unavailable` instead of zero attempts.
+  Malformed current-schema documents self-heal on the next valid outcome while
+  unknown future schemas are preserved
+  ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
+
 ## [1.1.3] - 2026-08-11
 
 ### Added
@@ -271,3 +304,4 @@ All notable changes to OpenSocrates are documented here. This project follows
 [1.1.1]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.0...v1.1.1
 [1.1.2]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.1...v1.1.2
 [1.1.3]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.2...v1.1.3
+[1.1.4]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.3...v1.1.4

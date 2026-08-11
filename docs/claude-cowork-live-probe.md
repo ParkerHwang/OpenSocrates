@@ -58,11 +58,12 @@ After Stop, the artifact, receipt, and all remaining files in that private
 temporary tree were zero. The selector aggregate increased by two `selected`
 outcomes and no failure outcome.
 
-This validates Cowork native hook delivery for the pull-request candidate. It
-does not claim that the corrected archive is already a published release asset;
-distribution remains pending until the change is merged and released. No
-prompt, transcript, credential, local path, artifact content, raw payload,
-selector reasoning, or user identity was retained.
+This validates Cowork native hook delivery for the pull-request candidate.
+Version 1.1.4 is the first release to carry the reviewed runtime shape. This
+does not claim Cowork marketplace availability or repository sync; installation
+still uses the local plugin upload path. No prompt, transcript, credential,
+local path, artifact content, raw payload, selector reasoning, or user identity
+was retained.
 
 The categorical receipts are the historical
 [`v1.1.2 blocked probe`](evidence/claude-cowork-live-probe-v1.1.2.json) and the

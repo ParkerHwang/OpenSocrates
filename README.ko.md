@@ -16,7 +16,7 @@ OpenSocrates는 Claude와 Codex를 위한 로컬 연동 및 저작 추론 프레
 추론 시스템을 고른 뒤, 이론과 예제 전체를 활성 작업에 추가합니다. 단순한 사실
 확인과 기계적인 작업은 그대로 통과할 수 있습니다.
 
-버전 `1.1.3`에는 48개의 추론 시스템, Claude의 단일 사용자 진입점, 선택된 절차를
+버전 `1.1.4`에는 48개의 추론 시스템, Claude의 단일 사용자 진입점, 선택된 절차를
 실제로 읽었는지 확인하는 Claude 접지 게이트, Claude/Codex 통합 라이프사이클,
 선택형 자동 업데이트가 들어 있습니다. 현재 릴리스 플랫폼은 Apple Silicon
 macOS(`darwin-arm64`)입니다. 기존 호스트 로그인을 사용하므로 API 키나
@@ -26,10 +26,11 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 런처는 `darwin-arm64`만 허용하며, Intel Mac·Linux·Windows용 런처와 런타임은
 이번 릴리스에 포함되거나 지원되지 않습니다.
 
-> **최신 릴리스: [OpenSocrates 1.1.3](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.3).**
-> 인증된 실제 호스트 검증, 설치·정리 강화, 엄격한 패키지 지원 범위, 업로드 가능한
-> Claude Chat 스킬 ZIP을 추가했습니다. `npx --yes opensocrates@1.1.3 update --host all`로
-> 관리 중인 두 호스트를 함께 업데이트할 수 있습니다.
+> **최신 릴리스: [OpenSocrates 1.1.4](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.4).**
+> Cowork에 업로드할 수 있는 Claude 네이티브 패키지, 호스트별 런타임 분리, 사용할 수
+> 없는 집계와 0회를 구분하는 내용 없는 셀렉터 진단을 추가했습니다.
+> `npx --yes opensocrates@1.1.4 update --host all`로 관리 중인 두 호스트를 함께
+> 업데이트할 수 있습니다.
 
 ## 호스트 지원 범위
 
@@ -38,7 +39,7 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 | Codex CLI 및 Desktop | 지원 | OpenSocrates 플러그인 | `darwin-arm64` 릴리스 검증 완료 |
 | Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | `/opensocrates` | `darwin-arm64` 로컬 검증 완료 |
 | Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 지원 | `/opensocrates` | [인증된 훅 생명주기 로컬 검증 완료](docs/claude-desktop-live-probe.md) |
-| Claude Cowork | 실측 로컬 플러그인 업로드에서 지원 | `/opensocrates` | [PR 후보의 네이티브 훅 생명주기 로컬 검증 완료, 릴리스 배포 대기](docs/claude-cowork-live-probe.md) |
+| Claude Cowork | 실측 로컬 플러그인 업로드에서 지원 | `/opensocrates` | [네이티브 훅 생명주기 로컬 검증 완료, 릴리스 직접 업로드 지원, 마켓플레이스 동기화 없음](docs/claude-cowork-live-probe.md) |
 | Claude 웹 및 Desktop Chat | 훅 미지원 | `/opensocrates` | [실제 업로드 및 호출 검증 완료](docs/claude-chat-upload-probe.md) |
 
 상태 열은 서로 다른 네 단계를 뜻하며 같은 의미로 읽으면 안 됩니다.
@@ -57,12 +58,12 @@ Code와 Cowork 화면에서만 작동합니다. 훅이나 셀렉터를 사용할
 OpenSocrates는 작업을 막지 않고 통과합니다.
 
 공개된 v1.1.2 Claude 플러그인 아카이브는 Cowork의 문서화된 압축 크기 제한과
-실측 압축 해제 크기 제한을 모두 초과했습니다. Claude 전용 v1.1.3 PR 후보는 압축
+실측 압축 해제 크기 제한을 모두 초과했습니다. 출시 전 v1.1.3 후보는 압축
 13.8MB, 비압축 34.1MB이며 Codex 런타임과 중첩 ZIP을 포함하지 않고 Cowork 로컬
 업로드를 통과했습니다. UserPromptSubmit, PostToolUse(Read), 인증된 grounding
-receipt, Stop, 정리 생명주기도 로컬 검증을 마쳤습니다. 다만 수정된 아카이브는 아직
-공개 릴리스 자산이 아니고 저장소에도 Cowork 마켓플레이스 매니페스트가 없습니다.
-따라서 이 결과는 후보 검증으로만 해석하고 공개 배포 완료로 주장하지 않습니다.
+receipt, Stop, 정리 생명주기도 로컬 검증을 마쳤습니다. 버전 1.1.4는 검토를 마친
+이 패키지 경계를 처음 배포합니다. 저장소에는 아직 Cowork 마켓플레이스
+매니페스트가 없으므로 저장소 동기화 대신 로컬 플러그인 업로드 경로를 사용합니다.
 
 ## 설치
 
@@ -79,7 +80,7 @@ Node.js 20 이상이 필요합니다. npm에 게시된 `opensocrates` 패키지�
 ### 준비된 모든 호스트에 설치
 
 ```bash
-npx --yes opensocrates@1.1.3 install --host all
+npx --yes opensocrates@1.1.4 install --host all
 ```
 
 모든 호스트 경로는 지원되는 인증 완료 CLI를 찾고, 어느 호스트도 바꾸기 전에
@@ -90,9 +91,9 @@ npx --yes opensocrates@1.1.3 install --host all
 전체 라이프사이클에서 같은 호스트 값을 사용할 수 있습니다.
 
 ```bash
-npx --yes opensocrates@1.1.3 status --host all
-npx --yes opensocrates@1.1.3 update --host all
-npx --yes opensocrates@1.1.3 remove --host all
+npx --yes opensocrates@1.1.4 status --host all
+npx --yes opensocrates@1.1.4 update --host all
+npx --yes opensocrates@1.1.4 remove --host all
 ```
 
 소유자 전용 `~/.opensocrates/desired-state.json`에는 선택 채널, 설치된 호스트,
@@ -104,9 +105,9 @@ npx --yes opensocrates@1.1.3 remove --host all
 기존 사용자와의 호환성을 위해 기본 호스트는 계속 Codex입니다.
 
 ```bash
-npx --yes opensocrates@1.1.3 install
-# 같은 명령: npx --yes opensocrates@1.1.3 install --host codex
-npx --yes opensocrates@1.1.3 install --host claude
+npx --yes opensocrates@1.1.4 install
+# 같은 명령: npx --yes opensocrates@1.1.4 install --host codex
+npx --yes opensocrates@1.1.4 install --host claude
 ```
 
 기존 `--host codex` 및 `--host claude` 라이프사이클은 그대로 지원합니다. 호스트별
@@ -123,9 +124,9 @@ Claude 상태는 활성 설치와 설치됐지만 비활성화된 플러그인�
 ### 선택형 자동 업데이트
 
 ```bash
-npx --yes opensocrates@1.1.3 auto-update enable --host all
-npx --yes opensocrates@1.1.3 auto-update status
-npx --yes opensocrates@1.1.3 auto-update disable
+npx --yes opensocrates@1.1.4 auto-update enable --host all
+npx --yes opensocrates@1.1.4 auto-update status
+npx --yes opensocrates@1.1.4 auto-update disable
 ```
 
 자동 업데이트는 명시적으로 켜기 전까지 비활성화되어 있습니다. macOS LaunchAgent는
@@ -147,7 +148,7 @@ LaunchAgent를 언로드하고 삭제하며, `remove --host all`도 관리 호�
 ### Claude 웹 및 Desktop Chat 스킬
 
 이 화면들은 플러그인 스킬은 지원하지만 훅은 실행하지 않습니다. 릴리스에서
-`opensocrates-1.1.3-claude-chat-skills.zip`을 내려받아 Claude의 **사용자 지정 →
+`opensocrates-1.1.4-claude-chat-skills.zip`을 내려받아 Claude의 **사용자 지정 →
 스킬 → 스킬 업로드** 화면에서 업로드하세요. ZIP은 업로더 요구사항에 맞춰
 최상위 `opensocrates/` 폴더 바로 아래에 `SKILL.md`를 둡니다. 패키지는
 `/opensocrates` 스킬 하나만 노출하고, 48개
@@ -161,21 +162,21 @@ LaunchAgent를 언로드하고 삭제하며, `remove --host all`도 관리 호�
 npm 레지스트리를 거치지 않을 때도 같은 호스트 옵션을 사용합니다.
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.3 install --host all
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.3 install --host claude
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.3 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.4 install --host all
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.4 install --host claude
+npx --yes github:ParkerHwang/OpenSocrates#v1.1.4 install --host codex
 ```
 
 ### 릴리스 파일 직접 검증
 
-[v1.1.3 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.3)에서
+[v1.1.4 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.4)에서
 `opensocrates.mjs`, 호스트 패키지, `.sha256` 파일을 내려받습니다. Claude의 예:
 
 ```bash
-shasum -a 256 -c opensocrates-1.1.3-claude-plugin.zip.sha256
+shasum -a 256 -c opensocrates-1.1.4-claude-plugin.zip.sha256
 node opensocrates.mjs install --host claude \
-  --asset opensocrates-1.1.3-claude-plugin.zip \
-  --checksum opensocrates-1.1.3-claude-plugin.zip.sha256
+  --asset opensocrates-1.1.4-claude-plugin.zip \
+  --checksum opensocrates-1.1.4-claude-plugin.zip.sha256
 ```
 
 Codex 패키지는 `claude`를 `codex`로 바꾸면 됩니다.
@@ -190,7 +191,7 @@ Codex 패키지는 `claude`를 `codex`로 바꾸면 됩니다.
 ```bash
 claude plugin uninstall opensocrates@OpenSocrates --scope user
 claude plugin marketplace remove OpenSocrates --scope user
-npx --yes opensocrates@1.1.3 install --host claude
+npx --yes opensocrates@1.1.4 install --host claude
 ```
 
 관리형 v1.1.0 Claude 설치를 업데이트하면 패키지 트리 전체가 교체됩니다. 따라서
