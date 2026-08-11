@@ -38,7 +38,7 @@ and runtimes are not shipped or supported in this release.
 | --- | --- | --- | --- |
 | Codex CLI and Desktop | Yes | OpenSocrates plugin | Release-validated on `darwin-arm64` |
 | Claude Code CLI | Yes, through `UserPromptSubmit` | `/opensocrates` | Locally validated on `darwin-arm64` |
-| Claude Code desktop app | Implemented, where Claude Code plugins run | `/opensocrates` | [Blocked live probe](docs/claude-desktop-live-probe.md); no delivery receipt |
+| Claude Code desktop app | Implemented, where Claude Code plugins run | `/opensocrates` | [Partial live probe; selector auth blocked](docs/claude-desktop-live-probe.md); no complete receipt |
 | Claude Cowork | Implemented, when the local plugin runtime is available | `/opensocrates` | [CLI registered; Cowork probe blocked](docs/claude-cowork-live-probe.md) |
 | Claude web and Desktop Chat | No hooks | `/opensocrates` | [Live upload and invocation validated](docs/claude-chat-upload-probe.md) |
 

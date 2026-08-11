@@ -24,9 +24,11 @@ All notable changes to OpenSocrates are documented here. This project follows
 - A privacy-safe Cowork probe distinguishes confirmed Claude CLI user-scope
   registration from still-blocked Cowork visibility and hook delivery; the
   support claim remains experimental ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
-- A privacy-safe Claude Code desktop live-probe protocol and blocked receipt
-  record the 2026-08-11 `mac_locked` access failure without claiming hook
-  delivery or cleanup ([#3](https://github.com/ParkerHwang/OpenSocrates/issues/3)).
+- A privacy-safe Claude Code desktop live probe now records the visible,
+  enabled user-marketplace plugin, its five declared hooks, a completed local
+  Read task, and error-free Stop launcher delivery. Selector artifact, receipt,
+  and cleanup validation remain blocked by `claude_not_authenticated`
+  ([#3](https://github.com/ParkerHwang/OpenSocrates/issues/3)).
 - A reproducible packaged `darwin-arm64` timing harness verifies PostToolUse
   receipt creation and Stop cleanup across fresh-path and warm runs. All 80
   measured operations completed, the worst p95 was 1,333.067 ms against the

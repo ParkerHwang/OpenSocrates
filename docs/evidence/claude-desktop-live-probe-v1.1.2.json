@@ -2,24 +2,31 @@
   "schema": "opensocrates.claude-desktop-live-probe/1.0.0",
   "attempted_at": "2026-08-11",
   "status": "blocked",
-  "blocker": "mac_locked",
+  "blocker": "claude_not_authenticated",
   "environment": {
     "macos_version": "26.5.2",
     "architecture": "arm64",
     "plugin_version": "1.1.2",
-    "desktop_version": null
+    "desktop_version": "1.26832.0",
+    "claude_code_cli_version": "2.1.226",
+    "registration_path_kind": "user_marketplace"
   },
   "attempt": {
-    "method": "computer_use_get_app_state",
+    "method": "computer_use_local_claude_code_session",
     "app": "Claude",
-    "ui_accessible": false
+    "ui_accessible": true
   },
   "observations": {
-    "registration_visible": false,
+    "registration_visible": true,
+    "plugin_enabled": true,
+    "hook_declarations_visible": true,
+    "local_session_completed": true,
+    "read_tool_completed": true,
     "user_prompt_submit_delivered": false,
     "post_tool_use_read_delivered": false,
     "grounding_receipt_created": false,
-    "stop_delivered": false,
+    "stop_delivered": true,
+    "instruction_artifact_created": false,
     "artifact_cleanup_verified": false
   },
   "support_claim": "implemented_no_live_probe_receipt",
