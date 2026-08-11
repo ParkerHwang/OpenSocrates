@@ -23,11 +23,13 @@ jobs:
     name: Python quality
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - uses: astral-sh/setup-uv@v5
+      # setup-uv stopped publishing floating major tags after v7, so the
+      # current maintained release is pinned exactly rather than by major.
+      - uses: astral-sh/setup-uv@v9.0.0
       - name: Bootstrap locked environment
         run: make bootstrap
       - name: Check formatting
@@ -39,11 +41,11 @@ jobs:
     name: Product contracts
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v9.0.0
       - name: Bootstrap locked environment
         run: make bootstrap
       - name: Check generated schemas and content
@@ -60,7 +62,7 @@ jobs:
         run: make smoke
       - name: Upload source-level evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: source-evidence-${{ github.run_id }}
           path: build/evidence/
@@ -70,8 +72,8 @@ jobs:
     name: GitHub and npx installer
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: "20"
       - name: Test installer
@@ -90,14 +92,14 @@ jobs:
       - installer
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "20"
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v9.0.0
       - name: Bootstrap locked environment
         run: make bootstrap
       - name: Activate locked native build toolchain
@@ -108,7 +110,7 @@ jobs:
         run: npm test
       - name: Upload native package evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: package-darwin-arm64-${{ github.run_id }}
           path: |
