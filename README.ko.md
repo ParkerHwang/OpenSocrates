@@ -297,6 +297,11 @@ OpenSocrates 기록, 로그, 메트릭, 진단 또는 instruction 파일에 쓰�
 [선택형 검사](docs/real-claude-selector.md)로 검증합니다. 오프라인 테스트에는 포함되지
 않으며, 로컬 Claude 프로필이 인증되지 않았으면 범주형 차단 사유만 보고합니다.
 
+`--max-turns 1` 구조화 출력의 반복 동작은 별도의
+[집계 신뢰성 매트릭스](docs/claude-structured-output-reliability.md)로 검증합니다. 인증된
+실행이 문서의 임계값을 충족하기 전에는 어떤 CLI/모델 행도 지원된다고 주장하지
+않습니다.
+
 ```bash
 make bootstrap
 make format-check
