@@ -1698,23 +1698,28 @@ def test_cowork_live_probe_separates_cli_registration() -> None:
     )
 
 
-@check("CLAUDE-17-chat-archive-evidence-does-not-claim-upload")
-def test_chat_archive_evidence_does_not_claim_upload() -> None:
+@check("CLAUDE-17-chat-archive-live-upload-evidence")
+def test_chat_archive_live_upload_evidence() -> None:
     report = json.loads(
         (ROOT / "docs" / "evidence" / "claude-chat-upload-probe-v1.1.2.json").read_text(
             encoding="utf-8"
         )
     )
     require(
-        report.get("status") == "blocked" and report.get("blocker") == "mac_locked",
-        "Chat upload probe does not preserve its exact blocker",
+        report.get("status") == "pass" and report.get("blocker") is None,
+        "Chat upload probe did not pass cleanly",
     )
     archive = report.get("archive")
     require(
         isinstance(archive, dict)
-        and archive.get("file_count") == 52
+        and archive.get("sha256")
+        == "sha256:920fe772d1e926e0b9e315d15c197d9d878d45d7f596d768360694bb21af9178"
+        and archive.get("file_count") == 51
         and archive.get("public_skill_count") == 1
-        and archive.get("internal_method_count") == 48,
+        and archive.get("internal_method_count") == 48
+        and archive.get("single_top_level_folder") is True
+        and archive.get("skill_md_directly_inside_top_level_folder") is True
+        and archive.get("initial_plugin_shaped_archive_rejected") is True,
         "Chat archive evidence has the wrong package shape",
     )
     require(
@@ -1723,13 +1728,17 @@ def test_chat_archive_evidence_does_not_claim_upload() -> None:
     )
     observations = report.get("ui_observations")
     require(
-        isinstance(observations, dict) and not any(observations.values()),
-        "blocked Chat probe claims a UI observation",
+        isinstance(observations, dict) and all(observations.values()),
+        "Chat upload or invocation observation is incomplete",
     )
     privacy = report.get("privacy")
     require(
         isinstance(privacy, dict) and not any(privacy.values()),
-        "blocked Chat probe contains private evidence",
+        "Chat probe contains private evidence",
+    )
+    require(
+        report.get("support_claim") == "skills_only_upload_path_validated",
+        "Chat support claim is not backed by the live receipt",
     )
 
 

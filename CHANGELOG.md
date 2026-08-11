@@ -17,8 +17,10 @@ All notable changes to OpenSocrates are documented here. This project follows
   candidates from the released platform
   ([#12](https://github.com/ParkerHwang/OpenSocrates/issues/12)).
 - A Claude Chat upload probe records the exact verified v1.1.2 skills ZIP
-  shape and hash separately from the still-blocked live UI acceptance; no
-  upload success is claimed ([#5](https://github.com/ParkerHwang/OpenSocrates/issues/5)).
+  shape and hash, live uploader acceptance, single visible skill entry,
+  catalog routing, representative method loading, and grounding audit without
+  retaining prompt or conversation content
+  ([#5](https://github.com/ParkerHwang/OpenSocrates/issues/5)).
 - A privacy-safe Cowork probe distinguishes confirmed Claude CLI user-scope
   registration from still-blocked Cowork visibility and hook delivery; the
   support claim remains experimental ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
@@ -52,6 +54,10 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Fixed
 
+- The Claude Chat skills ZIP now uses the uploader's required single top-level
+  `opensocrates/` folder with `SKILL.md` directly inside; the prior plugin-shaped
+  archive was rejected by the real Customize → Skills upload UI
+  ([#5](https://github.com/ParkerHwang/OpenSocrates/issues/5)).
 - The installer now accepts only explicit Claude list JSON variants, rejects
   malformed, duplicate, or conflicting managed entries, surfaces disabled
   plugins as drift, re-enables them on install/update, preserves their state on
