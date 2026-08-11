@@ -28,6 +28,19 @@ const EXACT_SUBJECT = `Release OpenSocrates v${VERSION}`;
 // reproduce what the macOS runner executes.
 const SHELL = "/bin/bash";
 
+// Body size for the SIGPIPE regression case. The usable range sits between two
+// platform limits, both measured rather than assumed:
+//   lower -- the body must outgrow the pipe buffer for a piped read to block
+//            and take SIGPIPE. Linux caps pipes at 64 KiB; macOS expands them
+//            further, and the observed threshold there is above 96 KiB.
+//   upper -- a single env string must stay under Linux MAX_ARG_STRLEN
+//            (32 * 4 KiB pages = 128 KiB), or execve fails with E2BIG and the
+//            gate never runs at all.
+// 120 KiB clears the macOS threshold and keeps ~8 KiB of headroom under E2BIG.
+// The structural assertion below is the platform-independent guard; this
+// behavioural case demonstrates the concrete failure it prevents.
+const LONG_BODY_BYTES = 120 * 1024;
+
 /**
  * Extract one step's `run:` block scalar from a workflow file.
  *
@@ -110,6 +123,12 @@ function runGate({
       },
     });
 
+    // A failed spawn leaves status null, which would otherwise surface as an
+    // opaque "null !== 0" instead of naming the real cause.
+    if (result.error) {
+      throw new Error(`failed to spawn ${SHELL}: ${result.error.message}`);
+    }
+
     const exported = {};
     for (const line of readFileSync(envFile, "utf8").split("\n")) {
       if (!line.includes("=")) continue;
@@ -156,11 +175,17 @@ test("release gate: an exact subject followed by a commit body still publishes",
   assert.equal(outcome.exported.RELEASE_VERSION, VERSION);
 });
 
-test("release gate: a very long commit body publishes without a silent SIGPIPE", () => {
-  // Regression guard. Reading the subject through `printf | head -n 1` under
-  // `set -o pipefail` killed printf with SIGPIPE once the body outgrew the pipe
-  // buffer, aborting the step with status 141 and no diagnostic whatsoever.
-  const outcome = runGate({ message: `${EXACT_SUBJECT}\n${"x".repeat(200_000)}` });
+test("release gate: a very long commit body publishes without a silent abort", () => {
+  // End-to-end demonstration of the failure the pipe-free assertion prevents:
+  // reading the subject through `printf | head -n 1` under `set -o pipefail`
+  // killed printf with SIGPIPE once the body outgrew the pipe buffer, aborting
+  // the step with status 141 and no diagnostic whatsoever.
+  //
+  // Treat this as a demonstration, not the regression guard. macOS sizes pipe
+  // buffers from a shared pool, so the threshold moves between runs and a
+  // regressed gate would not reliably trip this case. The deterministic guard
+  // is "the subject is extracted without a pipe" below.
+  const outcome = runGate({ message: `${EXACT_SUBJECT}\n${"x".repeat(LONG_BODY_BYTES)}` });
   assert.notEqual(outcome.status, 141, "gate died on SIGPIPE reading the subject");
   assert.equal(outcome.status, 0, outcome.stderr);
   assert.equal(outcome.exported.RELEASE_VERSION, VERSION);
@@ -330,6 +355,28 @@ test("release gate: the step pins `shell: bash` rather than inheriting a default
   assert.notEqual(stepIndex, -1);
   const step = workflow.slice(stepIndex, workflow.indexOf("\n      - ", stepIndex + 1));
   assert.match(step, /^\s+shell: bash$/mu, "gate step must pin shell: bash");
+});
+
+test("release gate: the subject is extracted without a pipe", () => {
+  // The platform-independent form of the SIGPIPE regression above. Under
+  // `set -o pipefail`, reading the subject through any pipe means a commit
+  // body larger than the pipe buffer kills the writer with SIGPIPE and aborts
+  // the step with status 141 and no diagnostic. The exact buffer size varies
+  // by kernel, so assert the construct is absent rather than relying on a
+  // behavioural cliff that differs between the Linux and macOS runners.
+  const assignment = GATE_SCRIPT.split("\n").find((line) =>
+    /^\s*subject=/u.test(line),
+  );
+  assert.ok(assignment, "gate must assign a subject variable");
+  assert.doesNotMatch(
+    assignment,
+    /\|/u,
+    `subject must not be read through a pipe under pipefail, got: ${assignment.trim()}`,
+  );
+  assert.ok(
+    GATE_SCRIPT.includes("set -euo pipefail"),
+    "the gate must keep pipefail and unset-variable checking enabled",
+  );
 });
 
 test("release gate: the script avoids Bash 4+ only constructs", () => {
