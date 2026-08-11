@@ -323,8 +323,8 @@ call is never rerun by the ordinary offline suite.
 
 Repeated `--max-turns 1` structured-output behavior has a separate
 [aggregate reliability matrix](docs/claude-structured-output-reliability.md).
-No CLI/model row is claimed supported until an authenticated run meets its
-documented threshold.
+The authenticated Claude Code 2.1.226 `host-default` row passed 20/20 attempts;
+no unobserved named model is claimed supported.
 
 Packaged Claude PostToolUse receipt and Stop cleanup latency has a reproducible
 [Apple-silicon timing receipt](docs/claude-hook-timing.md). The observed v1.1.2

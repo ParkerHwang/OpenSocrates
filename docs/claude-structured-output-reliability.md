@@ -32,10 +32,16 @@ fails open with no intervention.
 
 ## Current matrix
 
-There are no observed rows. On 2026-08-11 Claude Code 2.1.226 was installed,
-but `claude auth status` returned `loggedIn: false`. The report is therefore
-`blocked` with `claude_not_authenticated` and an empty `rows` array. No model,
-including the host default, is claimed reliable from this blocked run.
+On 2026-08-11 an authenticated Claude Code 2.1.226 run observed the production
+`host-default` row. All 20 attempts returned valid structured output, exceeding
+the required 19 successes. Every fixed failure outcome was zero, so this exact
+CLI/default-model selector is marked `supported: true` at 100% observed validity.
+No named model row was run or claimed.
+
+The committed aggregate receipt is
+[`docs/evidence/claude-structured-output-matrix-v1.1.2.json`](evidence/claude-structured-output-matrix-v1.1.2.json).
+It contains no prompt, raw output, credential, candidate, transcript, or
+reasoning. The production fail-open behavior remains unchanged.
 
 The runner requires Claude Code 2.1.205 or later, matching the installer. That
 minimum remains unchanged until an authenticated matrix provides contrary

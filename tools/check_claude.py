@@ -1644,6 +1644,59 @@ def test_authenticated_real_selector_evidence() -> None:
     )
 
 
+@check("CLAUDE-13B-authenticated-structured-output-evidence")
+def test_authenticated_structured_output_evidence() -> None:
+    report = json.loads(
+        (ROOT / "docs" / "evidence" / "claude-structured-output-matrix-v1.1.2.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    require(
+        report.get("schema") == "opensocrates.claude-structured-output-matrix/1.0.0"
+        and report.get("status") == "pass"
+        and report.get("cli_version") == "2.1.226"
+        and report.get("fallback") == "fail_open_with_fixed_content_free_outcome",
+        "authenticated Claude matrix has the wrong identity or fallback",
+    )
+    require(
+        report.get("threshold")
+        == {
+            "max_turns": 1,
+            "minimum_attempts_per_row": 20,
+            "required_valid_percent": 95,
+        },
+        "authenticated Claude matrix changed its threshold",
+    )
+    rows = report.get("rows")
+    require(isinstance(rows, list) and len(rows) == 1, "Claude matrix invented a model row")
+    row = rows[0]
+    require(
+        isinstance(row, dict)
+        and row.get("model") == "host-default"
+        and row.get("cli_version") == "2.1.226"
+        and row.get("attempts") == 20
+        and row.get("valid_structured_outputs") == 20
+        and row.get("required_valid_structured_outputs") == 19
+        and row.get("valid_percent") == 100
+        and row.get("threshold_met") is True
+        and row.get("supported") is True,
+        "Claude matrix host-default row did not meet its fixed contract",
+    )
+    outcomes = row.get("outcomes")
+    require(
+        isinstance(outcomes, dict)
+        and outcomes.get("selected") == 20
+        and sum(outcomes.values()) == 20
+        and all(value == 0 for key, value in outcomes.items() if key != "selected"),
+        "Claude matrix outcome counts do not match the aggregate receipt",
+    )
+    privacy = report.get("privacy")
+    require(
+        isinstance(privacy, dict) and not any(privacy.values()),
+        "Claude matrix persisted private content",
+    )
+
+
 @check("CLAUDE-14-packaged-hook-timing-evidence")
 def test_packaged_hook_timing_evidence() -> None:
     report = json.loads(

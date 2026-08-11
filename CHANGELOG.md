@@ -38,8 +38,9 @@ All notable changes to OpenSocrates are documented here. This project follows
   ([#6](https://github.com/ParkerHwang/OpenSocrates/issues/6)).
 - An opt-in Claude structured-output matrix runs 20–50 bounded attempts per
   explicitly requested model, requires 95% valid envelopes, and stores only
-  aggregate fixed outcome counts. The current unauthenticated run records
-  `claude_not_authenticated` with no invented model rows
+  aggregate fixed outcome counts. The authenticated Claude Code 2.1.226
+  `host-default` row passed 20/20 attempts with every failure outcome at zero;
+  no unobserved named model is claimed
   ([#8](https://github.com/ParkerHwang/OpenSocrates/issues/8)).
 - An opt-in, privacy-safe real Claude selector contract verifies the exact
   isolation command, environment allowlist, temporary workspace, and real

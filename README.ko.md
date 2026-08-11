@@ -306,8 +306,8 @@ OpenSocrates 기록, 로그, 메트릭, 진단 또는 instruction 파일에 쓰�
 
 `--max-turns 1` 구조화 출력의 반복 동작은 별도의
 [집계 신뢰성 매트릭스](docs/claude-structured-output-reliability.md)로 검증합니다. 인증된
-실행이 문서의 임계값을 충족하기 전에는 어떤 CLI/모델 행도 지원된다고 주장하지
-않습니다.
+Claude Code 2.1.226의 `host-default` 행은 20/20회를 통과했으며, 관측하지 않은
+명시적 모델은 지원된다고 주장하지 않습니다.
 
 패키지 Claude PostToolUse 영수증과 Stop 정리 지연 시간에는 재현 가능한
 [Apple Silicon 측정 영수증](docs/claude-hook-timing.md)이 있습니다. v1.1.2에서 관측한
