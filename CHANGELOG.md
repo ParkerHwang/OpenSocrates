@@ -21,10 +21,12 @@ All notable changes to OpenSocrates are documented here. This project follows
   catalog routing, representative method loading, and grounding audit without
   retaining prompt or conversation content
   ([#5](https://github.com/ParkerHwang/OpenSocrates/issues/5)).
-- A privacy-safe Cowork probe confirms that the Claude CLI user-marketplace
-  registration is visible and enabled without a second install, while also
-  recording the Cowork `/opensocrates` unknown-skill result and the still
-  unobserved authenticated hook lifecycle; support remains experimental
+- A privacy-safe Cowork probe validates the separately uploaded
+  `/opensocrates` skill and corrects the installation boundary: Claude Code CLI
+  marketplace registration is not a Cowork-native plugin install. The exact
+  published v1.1.2 plugin archive is rejected by Cowork's upload-size limits,
+  and repository sync is unavailable without a marketplace manifest, so native
+  hooks remain blocked
   ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
 - A privacy-safe Claude Code desktop live probe now validates a complete
   authenticated UserPromptSubmit → PostToolUse(Read) → Stop lifecycle. It

@@ -1778,15 +1778,16 @@ def test_desktop_live_probe_validates_authenticated_lifecycle() -> None:
     )
 
 
-@check("CLAUDE-16-cowork-live-probe-separates-cli-registration")
-def test_cowork_live_probe_separates_cli_registration() -> None:
+@check("CLAUDE-16-cowork-live-probe-records-native-install-limits")
+def test_cowork_live_probe_records_native_install_limits() -> None:
     report = json.loads(
         (ROOT / "docs" / "evidence" / "claude-cowork-live-probe-v1.1.2.json").read_text(
             encoding="utf-8"
         )
     )
     require(
-        report.get("status") == "blocked" and report.get("blocker") == "claude_not_authenticated",
+        report.get("status") == "blocked"
+        and report.get("blocker") == "cowork_plugin_archive_exceeds_upload_limits",
         "Cowork probe does not preserve its exact blocker",
     )
     environment = report.get("environment")
@@ -1794,7 +1795,9 @@ def test_cowork_live_probe_separates_cli_registration() -> None:
         isinstance(environment, dict)
         and environment.get("cowork_version") == "1.26832.0"
         and environment.get("plugin_version") == "1.1.2"
-        and environment.get("registration_path_kind") == "user_marketplace",
+        and environment.get("cowork_claude_code_runtime_version") == "2.1.222"
+        and environment.get("claude_code_registration_path_kind") == "user_marketplace"
+        and environment.get("cowork_native_plugin_install_path_kind") == "none",
         "Cowork probe lost its product or registration identity",
     )
     observations = report.get("observations")
@@ -1802,27 +1805,43 @@ def test_cowork_live_probe_separates_cli_registration() -> None:
     require(
         observations.get("cli_user_scope_marketplace_registered") is True
         and observations.get("cowork_ui_accessible") is True
-        and observations.get("cli_marketplace_visible_in_cowork") is True
-        and observations.get("plugin_enabled") is True
-        and observations.get("hook_declarations_visible") is True
+        and observations.get("cli_marketplace_visible_in_cowork") is False
+        and observations.get("cowork_native_plugin_installed") is False
+        and observations.get("standalone_user_skill_present") is True
+        and observations.get("customize_install_tested") is True
+        and observations.get("repository_sync_tested") is True
+        and observations.get("repository_marketplace_manifest_present") is False
         and observations.get("cowork_folder_connected") is True
-        and observations.get("read_tool_completed") is True,
+        and observations.get("read_tool_completed") is True
+        and observations.get("slash_invocation_recognized") is True
+        and observations.get("slash_method_grounding_observed") is True,
         "Cowork probe lost a directly observed registration or task result",
     )
+    archive = report.get("archive")
     require(
-        observations.get("customize_install_tested") is False
-        and observations.get("slash_invocation_recognized") is False
-        and observations.get("user_prompt_submit_delivered") is False
+        isinstance(archive, dict)
+        and archive.get("compressed_size_bytes") == 134354629
+        and archive.get("uncompressed_size_bytes") == 341004558
+        and archive.get("documented_compressed_limit_mb") == 50
+        and archive.get("observed_uncompressed_limit_mb") == 200
+        and archive.get("upload_accepted") is False
+        and archive.get("rejection") == "zip_uncompressed_size_exceeds_200mb",
+        "Cowork probe lost the exact published-archive upload blocker",
+    )
+    require(
+        observations.get("user_prompt_submit_delivered") is False
         and observations.get("post_tool_use_read_delivered") is False
         and observations.get("grounding_receipt_created") is False
         and observations.get("stop_delivered") is False
-        and observations.get("artifact_cleanup_verified") is False,
-        "Cowork probe overclaims skill or hook validation",
+        and observations.get("artifact_cleanup_verified") is False
+        and report.get("support_claim")
+        == "standalone_skill_locally_validated_native_hooks_blocked",
+        "Cowork probe overclaims native hook validation",
     )
     privacy = report.get("privacy")
     require(
         isinstance(privacy, dict) and not any(privacy.values()),
-        "blocked Cowork probe contains private evidence",
+        "Cowork probe contains private evidence",
     )
 
 

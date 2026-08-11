@@ -38,7 +38,7 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 | Codex CLI 및 Desktop | 지원 | OpenSocrates 플러그인 | `darwin-arm64` 릴리스 검증 완료 |
 | Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | `/opensocrates` | `darwin-arm64` 로컬 검증 완료 |
 | Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 지원 | `/opensocrates` | [인증된 훅 생명주기 로컬 검증 완료](docs/claude-desktop-live-probe.md) |
-| Claude Cowork | 로컬 플러그인 런타임을 사용할 수 있을 때 구현됨 | `/opensocrates` | [마켓플레이스 표시 확인, 스킬·훅 미검증](docs/claude-cowork-live-probe.md) |
+| Claude Cowork | 실측 설치에서는 자동 훅 미지원 | `/opensocrates` 독립 스킬 | [스킬 로컬 검증 완료, 네이티브 플러그인은 아카이브 제한으로 차단](docs/claude-cowork-live-probe.md) |
 | Claude 웹 및 Desktop Chat | 훅 미지원 | `/opensocrates` | [실제 업로드 및 호출 검증 완료](docs/claude-chat-upload-probe.md) |
 
 상태 열은 서로 다른 네 단계를 뜻하며 같은 의미로 읽으면 안 됩니다.
@@ -56,11 +56,12 @@ Claude Chat 화면은 플러그인 훅을 실행하지 않습니다. 생성된 �
 Code와 Cowork 화면에서만 작동합니다. 훅이나 셀렉터를 사용할 수 없으면
 OpenSocrates는 작업을 막지 않고 통과합니다.
 
-현재 실측 UI에서 Cowork는 Claude Code 사용자 마켓플레이스 항목을 공유합니다.
-OpenSocrates 1.1.2가 별도 설치 없이 표시되고 활성화되어 있습니다. 하지만 같은
-probe에서 `/opensocrates`는 Cowork의 알 수 없는 스킬로 거부됐고 인증된 훅
-생명주기 기록도 만들지 못했습니다. 그 기록이 생기기 전까지 Cowork는 실험적
-상태로 두세요.
+현재 실측 UI에서 Cowork는 Claude Code CLI 사용자 마켓플레이스 등록을 네이티브
+Cowork 플러그인으로 가져오지 않습니다. 별도로 업로드한 `/opensocrates` 스킬은
+로컬 검증을 통과했지만, 공개된 v1.1.2 Claude 플러그인 아카이브는 Cowork의 문서화된
+압축 크기 제한과 실측 압축 해제 크기 제한을 모두 초과합니다. 저장소에도 Cowork
+마켓플레이스 매니페스트가 없습니다. Cowork 네이티브 플러그인을 설치하고 훅을 다시
+검증하기 전까지는 독립 스킬 전용 화면으로 취급하세요.
 
 ## 설치
 
