@@ -1,0 +1,40 @@
+{
+  "fixture_id": "TEST-CLAUDE-user-prompt-submit-turn-2",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-08-11",
+  "host": "claude_code",
+  "host_version": "2.1.226",
+  "native_event": "UserPromptSubmit",
+  "capture": {
+    "method": "hook receipt written by a local Claude Code CLI run",
+    "authored_by": "host_runtime",
+    "note": "Field names and value types are exactly as the runtime emitted them; only the values were replaced. Second consecutive turn of the same session: session_id is stable and prompt_id is new.",
+    "observed_field_names": [
+      "cwd",
+      "hook_event_name",
+      "permission_mode",
+      "prompt",
+      "prompt_id",
+      "session_id",
+      "transcript_path"
+    ]
+  },
+  "native_input": {
+    "cwd": "/synthetic/workspace",
+    "hook_event_name": "UserPromptSubmit",
+    "permission_mode": "acceptEdits",
+    "prompt": "<synthetic-prompt>",
+    "prompt_id": "00000000-0000-4000-8000-0000000000a2",
+    "session_id": "00000000-0000-4000-8000-00000000005e",
+    "transcript_path": "/synthetic/transcript.jsonl"
+  },
+  "adapter_expectation": {
+    "parse_status": "accepted",
+    "native_version": "unknown",
+    "turn_id": "00000000-0000-4000-8000-0000000000a2",
+    "turn_id_source": "prompt_id",
+    "ignored_fields": [],
+    "selector_stdout": "hookSpecificOutput.additionalContext"
+  },
+  "redaction": "The prompt value is a marker only and contains no user wording."
+}

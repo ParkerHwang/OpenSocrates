@@ -3,6 +3,36 @@
 All notable changes to OpenSocrates are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Sanitized Claude Code payload receipts for the complete v1.1.2 hook
+  lifecycle — `SessionStart`, `UserPromptSubmit`, `PostToolUse`, `Stop`, and
+  `SessionEnd` — captured from a supported runtime and compared field by field
+  with the shared adapter mapping. The checks assert that `prompt_id` is
+  projected into turn identity, that `last_assistant_message` reaches the Stop
+  decision, that two consecutive turns of one session stay artifact-isolated,
+  and that Stop and `SessionEnd` clean up
+  ([#9](https://github.com/ParkerHwang/OpenSocrates/issues/9)).
+
+### Fixed
+
+- An ordinary Claude payload no longer reports an unknown field. `effort`,
+  `background_tasks`, and `session_crons` are sent on every real `PostToolUse`
+  or `Stop` receipt but were missing from the parser's known-field sets, so the
+  `native_unknown_field_ignored` diagnostic fired on healthy turns. The parser
+  still never reads those fields, and no parsing, projection, or gating
+  behavior changed.
+
+### Security and privacy
+
+- The committed receipts contain no prompt, transcript, path, credential, or
+  user-identifying content. Field names, value types, and container shapes are
+  preserved as captured; every sensitive value is a fixed synthetic marker, and
+  a check refuses any fixture value outside that vocabulary so a future
+  re-capture cannot commit real content by accident.
+
 ## [1.1.2] - 2026-08-11
 
 ### Added

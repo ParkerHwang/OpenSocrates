@@ -46,6 +46,7 @@ docs-check:
 		--path CONTRIBUTING.md \
 		--path SECURITY.md \
 		--path CODE_OF_CONDUCT.md \
+		--path docs/claude-payload-receipts.md \
 		--path .github/release-notes \
 		--report build/evidence/links.json
 

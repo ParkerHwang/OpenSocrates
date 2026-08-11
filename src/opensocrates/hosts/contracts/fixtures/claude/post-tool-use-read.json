@@ -1,0 +1,64 @@
+{
+  "fixture_id": "TEST-CLAUDE-post-tool-use-read",
+  "fixture_kind": "native_event",
+  "captured_at": "2026-08-11",
+  "host": "claude_code",
+  "host_version": "2.1.226",
+  "native_event": "PostToolUse",
+  "capture": {
+    "method": "hook receipt written by a local Claude Code CLI run",
+    "authored_by": "host_runtime",
+    "note": "The envelope is runtime-authored. tool_use_id and the read body came from the stubbed model reply and the read file, and are replaced by synthetic markers.",
+    "observed_field_names": [
+      "cwd",
+      "duration_ms",
+      "effort",
+      "hook_event_name",
+      "permission_mode",
+      "prompt_id",
+      "session_id",
+      "tool_input",
+      "tool_name",
+      "tool_response",
+      "tool_use_id",
+      "transcript_path"
+    ]
+  },
+  "native_input": {
+    "cwd": "/synthetic/workspace",
+    "duration_ms": 1,
+    "effort": {
+      "level": "low"
+    },
+    "hook_event_name": "PostToolUse",
+    "permission_mode": "acceptEdits",
+    "prompt_id": "00000000-0000-4000-8000-0000000000a1",
+    "session_id": "00000000-0000-4000-8000-00000000005e",
+    "tool_input": {
+      "file_path": "/synthetic/workspace/instruction-artifact.md"
+    },
+    "tool_name": "Read",
+    "tool_response": {
+      "type": "text",
+      "file": {
+        "filePath": "/synthetic/workspace/instruction-artifact.md",
+        "content": "<synthetic-read-body>",
+        "numLines": 4,
+        "startLine": 1,
+        "totalLines": 4
+      }
+    },
+    "tool_use_id": "toolu-synthetic-1",
+    "transcript_path": "/synthetic/transcript.jsonl"
+  },
+  "adapter_expectation": {
+    "parse_status": "accepted",
+    "native_version": "unknown",
+    "turn_id": "00000000-0000-4000-8000-0000000000a1",
+    "turn_id_source": "prompt_id",
+    "ignored_fields": [],
+    "selector_stdout": "",
+    "grounding_receipt_candidate": true
+  },
+  "redaction": "The read path and the complete read body are markers only; no file content, tool output, or workspace path is present."
+}

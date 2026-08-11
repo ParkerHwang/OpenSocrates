@@ -967,6 +967,311 @@ def test_two_turns_in_one_session() -> None:
         )
 
 
+FIXTURES = ROOT / "src" / "opensocrates" / "hosts" / "contracts" / "fixtures" / "claude"
+# Every value a sanitized fixture is allowed to carry in a field that could
+# otherwise hold prompt, transcript, path, credential, or identifying content.
+ALLOWED_SANITIZED_VALUES = {
+    "session_id": {"00000000-0000-4000-8000-00000000005e"},
+    "prompt_id": {
+        "00000000-0000-4000-8000-0000000000a1",
+        "00000000-0000-4000-8000-0000000000a2",
+    },
+    "transcript_path": {"/synthetic/transcript.jsonl"},
+    "cwd": {"/synthetic/workspace"},
+    "prompt": {"<synthetic-prompt>"},
+    "last_assistant_message": {"<synthetic-final-message>"},
+    "tool_use_id": {"toolu-synthetic-1", "toolu-synthetic-2"},
+    "file_path": {"/synthetic/workspace/instruction-artifact.md"},
+    "filePath": {"/synthetic/workspace/instruction-artifact.md"},
+    "content": {"<synthetic-read-body>"},
+}
+
+
+def load_fixture(name: str) -> dict:
+    return json.loads((FIXTURES / f"{name}.json").read_text(encoding="utf-8"))
+
+
+def walk_sanitized(value: object, key: str | None, fixture_id: str) -> None:
+    """Refuse any fixture value that escaped the sanitizer's marker vocabulary."""
+
+    if key in ALLOWED_SANITIZED_VALUES:
+        require(
+            value in ALLOWED_SANITIZED_VALUES[key],
+            f"{fixture_id}: unsanitized value in field {key}",
+        )
+        return
+    if isinstance(value, dict):
+        for name, item in value.items():
+            walk_sanitized(item, name, fixture_id)
+    elif isinstance(value, list):
+        for item in value:
+            walk_sanitized(item, None, fixture_id)
+
+
+@check("CLAUDE-11-runtime-payload-receipts")
+def test_runtime_payload_receipts() -> None:
+    """Compare captured Claude receipts field by field with the shared parser.
+
+    The Claude adapter reuses the Codex parser deliberately.  Repository and
+    schema documentation cannot show that the live envelope still agrees with
+    that mapping, so these fixtures are runtime receipts rather than authored
+    shapes.
+    """
+
+    names = sorted(path.stem for path in FIXTURES.glob("*.json"))
+    require(
+        names
+        == [
+            "post-tool-use-read",
+            "session-end-other",
+            "session-start-resume",
+            "session-start-startup",
+            "stop-turn-1",
+            "user-prompt-submit-turn-1",
+            "user-prompt-submit-turn-2",
+        ],
+        f"Claude receipt fixture set drifted: {names}",
+    )
+    covered = {load_fixture(name)["native_event"] for name in names}
+    require(
+        covered == {"SessionStart", "UserPromptSubmit", "PostToolUse", "Stop", "SessionEnd"},
+        f"captured lifecycle coverage is incomplete: {sorted(covered)}",
+    )
+
+    for name in names:
+        fixture = load_fixture(name)
+        fixture_id = fixture["fixture_id"]
+        native_input = fixture["native_input"]
+        expectation = fixture["adapter_expectation"]
+
+        walk_sanitized(native_input, None, fixture_id)
+        require(
+            sorted(native_input) == fixture["capture"]["observed_field_names"],
+            f"{fixture_id}: fixture fields diverged from the captured field names",
+        )
+
+        parsed = try_parse_codex_event(
+            native_input,
+            event_name=fixture["native_event"],
+            host=HostId.CLAUDE_CODE,
+        )
+        require(parsed.event is not None, f"{fixture_id}: real receipt failed to parse")
+        require(
+            parsed.error_code is None and expectation["parse_status"] == "accepted",
+            f"{fixture_id}: real receipt was not accepted",
+        )
+        # A real payload must not look novel.  Anything the runtime always sends
+        # belongs in the known-field set, so that the unknown-field diagnostic
+        # keeps meaning "this host sent something we have never seen".
+        require(
+            list(parsed.ignored_fields) == expectation["ignored_fields"],
+            f"{fixture_id}: unexpected ignored fields {list(parsed.ignored_fields)}",
+        )
+        event = parsed.event
+        require(
+            event.native_version == expectation["native_version"],
+            f"{fixture_id}: native version marker drifted to {event.native_version!r}",
+        )
+        require(
+            event.session_id == native_input["session_id"],
+            f"{fixture_id}: session identity was not carried",
+        )
+
+        # prompt_id is the Claude-only turn identity.  Codex has no such field,
+        # and the shared parser must keep projecting it into turn_id.
+        require(
+            event.turn_id == expectation["turn_id"],
+            f"{fixture_id}: turn_id is {event.turn_id!r}, expected {expectation['turn_id']!r}",
+        )
+        if expectation["turn_id_source"] == "prompt_id":
+            require(
+                "turn_id" not in native_input and "prompt_id" in native_input,
+                f"{fixture_id}: fixture does not exercise the prompt_id mapping",
+            )
+            require(
+                event.turn_id == native_input["prompt_id"],
+                f"{fixture_id}: prompt_id was not projected into turn_id",
+            )
+
+        if fixture["native_event"] == "Stop":
+            require(
+                event.final_message == native_input["last_assistant_message"],
+                f"{fixture_id}: last_assistant_message was not carried into final_message",
+            )
+            require(
+                event.stop_hook_active is native_input["stop_hook_active"],
+                f"{fixture_id}: stop_hook_active was not carried",
+            )
+        if fixture["native_event"] == "SessionStart":
+            require(
+                event.source == native_input["source"],
+                f"{fixture_id}: SessionStart source was not carried",
+            )
+        if fixture["native_event"] == "SessionEnd":
+            require(
+                event.reason == native_input["reason"],
+                f"{fixture_id}: SessionEnd reason was not carried",
+            )
+        if fixture["native_event"] == "PostToolUse":
+            require(
+                event.tool_name == native_input["tool_name"],
+                f"{fixture_id}: tool_name was not carried",
+            )
+            require(
+                event.tool_file_path is not None
+                and str(event.tool_file_path) == native_input["tool_input"]["file_path"],
+                f"{fixture_id}: Read receipt metadata was not carried",
+            )
+
+    # Two consecutive turns of one captured session: identity is stable and the
+    # turn identity is not.
+    first = load_fixture("user-prompt-submit-turn-1")["native_input"]
+    second = load_fixture("user-prompt-submit-turn-2")["native_input"]
+    require(
+        first["session_id"] == second["session_id"],
+        "the captured second turn did not stay in one session",
+    )
+    require(
+        first["prompt_id"] != second["prompt_id"],
+        "the captured second turn reused the first turn's prompt_id",
+    )
+    resumed = load_fixture("session-start-resume")["native_input"]
+    require(
+        resumed["source"] == "resume" and resumed["session_id"] == first["session_id"],
+        "the captured resume receipt did not continue the captured session",
+    )
+
+
+def _receipt_payload(fixture_name: str, **overrides: object) -> dict:
+    payload = dict(load_fixture(fixture_name)["native_input"])
+    payload.update(overrides)
+    return payload
+
+
+def _read_receipt_payload(fixture_name: str, artifact_path: Path, prompt_id: str) -> dict:
+    """Rebuild the captured Read receipt around one live artifact."""
+
+    payload = _receipt_payload(fixture_name, prompt_id=prompt_id)
+    response = _structured_read_response(artifact_path)
+    captured = payload["tool_response"]["file"]
+    payload["tool_input"] = dict(payload["tool_input"], file_path=str(artifact_path))
+    # Keep every runtime-authored key of the captured envelope, including the
+    # ones this boundary never reads.
+    payload["tool_response"] = {
+        "type": payload["tool_response"]["type"],
+        "file": {
+            **captured,
+            "filePath": str(artifact_path),
+            "content": response["file"]["content"],
+            "numLines": response["file"]["numLines"],
+            "totalLines": response["file"]["totalLines"],
+        },
+    }
+    payload["tool_use_id"] = f"toolu-{prompt_id}"
+    return payload
+
+
+@check("CLAUDE-12-runtime-receipt-lifecycle-isolation")
+def test_runtime_receipt_lifecycle() -> None:
+    """Drive two turns of one session with the captured envelopes end to end."""
+
+    value = projections()
+    assembler = ProjectionInstructionAssembler(value)
+    turn_one = load_fixture("user-prompt-submit-turn-1")["native_input"]["prompt_id"]
+    turn_two = load_fixture("user-prompt-submit-turn-2")["native_input"]["prompt_id"]
+    session = load_fixture("user-prompt-submit-turn-1")["native_input"]["session_id"]
+
+    with tempfile.TemporaryDirectory(prefix="opensocrates-claude-receipts-") as name:
+        store = InstructionFileStore(installation_key=b"r" * 32, directory=Path(name) / "artifacts")
+        adapter = ClaudeAdapter(
+            ClaudeAdapterConfig(
+                selector_mode=True,
+                selector_application=SelectorApplication(
+                    selector=FakeSelector(),
+                    assembler=assembler,
+                    config=SelectorConfig(transcript_access_enabled=False),
+                    artifact_store=store,
+                ),
+                selector_config=SelectorConfig(transcript_access_enabled=False),
+                instruction_file_store=store,
+            )
+        )
+
+        started = adapter.handle(
+            load_fixture("session-start-startup")["native_input"],
+            event_name="SessionStart",
+        )
+        require(started.stdout == "", "captured SessionStart emitted user-facing output")
+
+        def submit(prompt_id: str) -> Path:
+            result = adapter.handle(
+                _receipt_payload("user-prompt-submit-turn-1", prompt_id=prompt_id),
+                event_name="UserPromptSubmit",
+            )
+            body = json.loads(result.stdout)
+            require(
+                body["hookSpecificOutput"]["hookEventName"] == "UserPromptSubmit",
+                "captured UserPromptSubmit produced the wrong response event",
+            )
+            return _referenced_path(body["hookSpecificOutput"]["additionalContext"])
+
+        first_path = submit(turn_one)
+        first_artifact = store.latest_for_session(session)
+        require(first_artifact is not None, "the first captured turn issued no artifact")
+
+        read = adapter.handle(
+            _read_receipt_payload("post-tool-use-read", first_path, turn_one),
+            event_name="PostToolUse",
+        )
+        require(read.stdout == "", "captured PostToolUse emitted user-facing output")
+        require(
+            store.has_complete_read_receipt(first_artifact),
+            "the captured Read envelope did not produce a grounding receipt",
+        )
+
+        stop_payload = _receipt_payload(
+            "stop-turn-1",
+            prompt_id=turn_one,
+            last_assistant_message=f"Done\n\n{first_artifact.grounding_footer()}",
+        )
+        stopped = adapter.handle(stop_payload, event_name="Stop")
+        require(stopped.stdout == "", "grounded captured Stop was not literal-empty")
+        require(not first_path.exists(), "captured Stop did not clean its own turn")
+
+        second_path = submit(turn_two)
+        second_artifact = store.latest_for_session(session)
+        require(second_artifact is not None, "the second captured turn issued no artifact")
+        require(
+            first_path.parent != second_path.parent,
+            "the captured prompt_id pair did not isolate turn directories",
+        )
+
+        # The first turn's receipt must not satisfy the second turn's gate.
+        ungrounded = adapter.handle(
+            _receipt_payload(
+                "stop-turn-1",
+                prompt_id=turn_two,
+                last_assistant_message=f"Done\n\n{second_artifact.grounding_footer()}",
+            ),
+            event_name="Stop",
+        )
+        require(
+            json.loads(ungrounded.stdout).get("decision") == "block",
+            "a completed turn's receipt satisfied the next captured turn's Stop gate",
+        )
+
+        ended = adapter.handle(
+            _receipt_payload("session-end-other", prompt_id=turn_two),
+            event_name="SessionEnd",
+        )
+        require(ended.stdout == "", "captured SessionEnd emitted user-facing output")
+        leftovers = sorted(store.directory.rglob("instruction-*.md"))
+        require(
+            not leftovers,
+            f"captured SessionEnd left {len(leftovers)} artifact(s) behind",
+        )
+
+
 @check("CLAUDE-10-single-user-facing-entry")
 def test_single_user_facing_entry() -> None:
     source = ROOT / "plugin-src" / "claude"
