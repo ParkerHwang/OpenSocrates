@@ -18,6 +18,10 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Fixed
 
+- Packaged-launcher checks now derive each host's runtime root from canonical
+  `generator.json` metadata and include a mismatch probe that remains
+  discriminating when no native runtime targets were built
+  ([#25](https://github.com/ParkerHwang/OpenSocrates/issues/25)).
 - Claude sessions now supersede private instruction artifacts by `prompt_id`.
   When `Stop` is absent, the next `UserPromptSubmit` removes prior turn trees in
   that session while preserving the new active turn; `SessionEnd` and the
