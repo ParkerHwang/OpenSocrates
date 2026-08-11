@@ -7,6 +7,9 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Added
 
+- A privacy-safe Claude Code desktop live-probe protocol and blocked receipt
+  record the 2026-08-11 `mac_locked` access failure without claiming hook
+  delivery or cleanup ([#3](https://github.com/ParkerHwang/OpenSocrates/issues/3)).
 - A reproducible packaged `darwin-arm64` timing harness verifies PostToolUse
   receipt creation and Stop cleanup across fresh-path and warm runs. All 80
   measured operations completed, the worst p95 was 1,333.067 ms against the

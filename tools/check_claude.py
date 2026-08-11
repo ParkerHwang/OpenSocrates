@@ -1643,6 +1643,29 @@ def test_packaged_hook_timing_evidence() -> None:
     )
 
 
+@check("CLAUDE-15-desktop-live-probe-is-honestly-blocked")
+def test_desktop_live_probe_is_honestly_blocked() -> None:
+    report = json.loads(
+        (ROOT / "docs" / "evidence" / "claude-desktop-live-probe-v1.1.2.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    require(
+        report.get("status") == "blocked" and report.get("blocker") == "mac_locked",
+        "desktop live probe does not preserve its exact blocker",
+    )
+    observations = report.get("observations")
+    require(
+        isinstance(observations, dict) and not any(observations.values()),
+        "blocked desktop probe claims an observation",
+    )
+    privacy = report.get("privacy")
+    require(
+        isinstance(privacy, dict) and not any(privacy.values()),
+        "blocked desktop probe contains private evidence",
+    )
+
+
 def main() -> int:
     failures: list[tuple[str, str]] = []
     for name, function in CHECKS:
