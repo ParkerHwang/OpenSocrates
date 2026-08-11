@@ -304,7 +304,7 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
     output: str | Path | None = None,
     source_root: str | Path = "plugin-src",
     bundle_path: str | Path = "content/compiled-content.bundle.json",
-    runtime_root: str | Path = "dist/runtime",
+    runtime_root: str | Path | None = None,
 ) -> dict[str, Any]:
     """Generate one host package and return its deterministic release manifest."""
 
@@ -426,7 +426,9 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
     bundle_destination.parent.mkdir(parents=True, exist_ok=True)
     bundle_destination.write_bytes(_canonical_json(raw_bundle))
 
-    runtime_root_path = Path(runtime_root)
+    runtime_root_path = (
+        Path(runtime_root) if runtime_root is not None else Path("dist") / "runtime" / host
+    )
     if not runtime_root_path.is_absolute():
         runtime_root_path = repository / runtime_root_path
     runtime_output_name = metadata.get("runtime_output", "runtime")
@@ -488,7 +490,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--host", default="codex")
     parser.add_argument("--source-root", default="plugin-src")
     parser.add_argument("--bundle", default="content/compiled-content.bundle.json")
-    parser.add_argument("--runtime-root", default="dist/runtime")
+    parser.add_argument(
+        "--runtime-root",
+        help="host runtime root (default: dist/runtime/<host>)",
+    )
     parser.add_argument("--output")
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()

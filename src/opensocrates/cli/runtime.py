@@ -277,17 +277,17 @@ class RuntimeServices:
             return None
         return self.adapters.get(host)
 
-    def selector_outcome_counts(self) -> dict[str, int]:
-        """Return only the persisted content-free selector aggregate."""
+    def selector_outcome_counts(self) -> dict[str, int] | None:
+        """Return the content-free aggregate, or ``None`` when unreadable."""
 
         reader = getattr(self.selector_outcome_store, "read", None)
         if not callable(reader):
-            return {}
+            return None
         try:
             value = reader()
         except Exception:
-            return {}
-        return dict(value) if isinstance(value, dict) else {}
+            return None
+        return dict(value) if isinstance(value, dict) else None
 
     def flush_selector_outcomes(self) -> None:
         """Persist the current process's new Claude selector labels once."""

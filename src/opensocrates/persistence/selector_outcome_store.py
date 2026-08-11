@@ -25,6 +25,10 @@ _LABELS = frozenset(SELECTOR_OUTCOME_LABELS)
 class SelectorOutcomeStoreError(OSError):
     """Raised when a selector outcome aggregate is unsafe or unavailable."""
 
+    def __init__(self, message: str, *, recoverable: bool = False) -> None:
+        super().__init__(message)
+        self.recoverable = recoverable
+
 
 def _empty_counts() -> dict[str, int]:
     return {label: 0 for label in SELECTOR_OUTCOME_LABELS}
@@ -79,18 +83,30 @@ class SelectorOutcomeStore:
         try:
             document = decode_json_bytes(data, max_bytes=MAX_SELECTOR_OUTCOME_FILE_BYTES)
         except (TypeError, ValueError) as error:
-            raise SelectorOutcomeStoreError("selector outcome aggregate is invalid") from error
+            raise SelectorOutcomeStoreError(
+                "selector outcome aggregate is invalid", recoverable=True
+            ) from error
         if not isinstance(document, Mapping) or document.get("schema") != SELECTOR_OUTCOME_SCHEMA:
+            # A newer application may own an unknown schema.  Report it as
+            # unavailable, but never let an older runtime overwrite it.
             raise SelectorOutcomeStoreError("selector outcome aggregate schema is invalid")
-        counts = _validated_counts(document.get("counts"))
+        raw_counts = document.get("counts")
+        try:
+            counts = _validated_counts(raw_counts)
+        except SelectorOutcomeStoreError as error:
+            raise SelectorOutcomeStoreError(
+                "selector outcome aggregate counts are invalid", recoverable=True
+            ) from error
         if (
             canonical_json_bytes(
-                {"schema": SELECTOR_OUTCOME_SCHEMA, "counts": counts},
+                {"schema": SELECTOR_OUTCOME_SCHEMA, "counts": raw_counts},
                 max_bytes=MAX_SELECTOR_OUTCOME_FILE_BYTES,
             )
             != data
         ):
-            raise SelectorOutcomeStoreError("selector outcome aggregate is not canonical")
+            raise SelectorOutcomeStoreError(
+                "selector outcome aggregate is not canonical", recoverable=True
+            )
         return counts
 
     def increment(self, delta: Mapping[str, int]) -> dict[str, int]:
@@ -105,7 +121,12 @@ class SelectorOutcomeStore:
             raise SelectorOutcomeStoreError("selector outcome writes are disabled")
         try:
             with FileLock(self.lock_path, policy=self.lock_policy):
-                current = self.read()
+                try:
+                    current = self.read()
+                except SelectorOutcomeStoreError as error:
+                    if not error.recoverable:
+                        raise
+                    current = _empty_counts()
                 updated = {
                     label: min(MAX_SELECTOR_OUTCOME_COUNT, current[label] + selected[label])
                     for label in SELECTOR_OUTCOME_LABELS

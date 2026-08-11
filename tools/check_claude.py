@@ -24,7 +24,13 @@ from opensocrates.hooks.entrypoint import parse_hook_arguments, run_hook
 from opensocrates.hosts.claude.adapter import ClaudeAdapter, ClaudeAdapterConfig
 from opensocrates.hosts.claude.commands import build_hooks
 from opensocrates.hosts.codex.native import parse_codex_event, try_parse_codex_event
-from opensocrates.persistence import DataRootConfig, SelectorOutcomeStore, ensure_data_root
+from opensocrates.persistence import (
+    DataRootConfig,
+    SelectorOutcomeStore,
+    SelectorOutcomeStoreError,
+    ensure_data_root,
+)
+from opensocrates.persistence.selector_outcome_store import SELECTOR_OUTCOME_SCHEMA
 from opensocrates.selector import (
     InstructionFileStore,
     SelectorApplication,
@@ -904,6 +910,83 @@ def test_persisted_selector_diagnostics() -> None:
             and str(Path(name)) not in stored,
             "selector diagnostics persisted content or an identifier",
         )
+
+
+@check("CLAUDE-06B-unavailable-selector-diagnostics-self-heal")
+def test_unavailable_selector_diagnostics_self_heal() -> None:
+    """Expose an invalid aggregate, then replace it on the next real outcome."""
+
+    with tempfile.TemporaryDirectory(prefix="opensocrates-selector-recovery-") as name:
+        data_root = ensure_data_root(
+            DataRootConfig(
+                development=True,
+                development_manifest=True,
+                override=Path(name),
+            )
+        )
+        store = SelectorOutcomeStore(data_root)
+        store.increment({SelectorOutcome.SELECTED: 3})
+
+        # A future additive label change must treat a canonical older subset
+        # as zero for the missing labels, then migrate it on the next write.
+        partial = {
+            "schema": SELECTOR_OUTCOME_SCHEMA,
+            "counts": {SelectorOutcome.SELECTED: 3},
+        }
+        store.path.write_text(
+            json.dumps(partial, sort_keys=True, separators=(",", ":")) + "\n",
+            encoding="utf-8",
+        )
+        migrated = store.read()
+        require(
+            migrated[SelectorOutcome.SELECTED] == 3 and sum(migrated.values()) == 3,
+            "canonical older selector labels did not migrate additively",
+        )
+
+        future_document = {
+            "schema": "opensocrates.selector-outcome-aggregate/2.0.0",
+            "counts": {SelectorOutcome.SELECTED: 4},
+        }
+        future_bytes = (
+            json.dumps(future_document, sort_keys=True, separators=(",", ":")) + "\n"
+        ).encode("utf-8")
+        store.path.write_bytes(future_bytes)
+        try:
+            store.increment({SelectorOutcome.SELECTED: 1})
+        except SelectorOutcomeStoreError:
+            pass
+        else:
+            raise AssertionError("older runtime overwrote a future selector schema")
+        require(
+            store.path.read_bytes() == future_bytes,
+            "future selector schema changed after a rejected update",
+        )
+
+        store.path.write_bytes(b"{")
+        services = build_runtime_services(host="claude", data_root=data_root)
+        unavailable = services.selector_outcome_counts()
+        require(unavailable is None, "invalid selector diagnostics were reported as zero")
+        snapshot = build_diagnose(
+            selector_outcomes=unavailable,
+            selector_outcomes_available=unavailable is not None,
+        ).to_dict()
+        selector = snapshot.get("selector")
+        require(
+            isinstance(selector, dict)
+            and selector.get("status") == "unavailable"
+            and selector.get("attempt_count") is None
+            and selector.get("outcome_counts") is None,
+            "diagnose asserted a selector count for an unreadable aggregate",
+        )
+
+        recovered = store.increment({SelectorOutcome.SELECTED: 1})
+        require(
+            recovered[SelectorOutcome.SELECTED] == 1
+            and sum(recovered.values()) == 1
+            and store.read() == recovered,
+            "next selector outcome did not replace the invalid aggregate",
+        )
+        services.close()
 
 
 @check("CLAUDE-07-real-process-termination-and-reaping")

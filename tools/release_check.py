@@ -58,8 +58,10 @@ CLAUDE_RUNTIME_NOTICE_REQUIRED_TOKENS = frozenset(
         "license",
     }
 )
-CLAUDE_ARCHIVE_COMPRESSED_LIMIT_BYTES = 50 * 1024 * 1024
-CLAUDE_ARCHIVE_UNCOMPRESSED_LIMIT_BYTES = 200 * 1024 * 1024
+# Cowork documents these limits in decimal MB.  Use the conservative byte
+# interpretation until the product exposes an exact binary-unit contract.
+CLAUDE_ARCHIVE_COMPRESSED_LIMIT_BYTES = 50_000_000
+CLAUDE_ARCHIVE_UNCOMPRESSED_LIMIT_BYTES = 200_000_000
 _SAFE_ENVIRONMENT = {
     "PATH",
     "HOME",
@@ -705,10 +707,6 @@ def _runtime_build(  # noqa: C901  # Explicit host release build validation.
             "auto",
             "--runtime-profile",
             host,
-            "--output-dir",
-            f"dist/runtime/{host}/{RELEASE_TARGET}",
-            "--work-dir",
-            f"build/pyinstaller/{host}/{RELEASE_TARGET}",
             "--smoke-test",
             "--measure-runs",
             "10",

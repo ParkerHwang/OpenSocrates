@@ -42,7 +42,7 @@ def diagnose_markdown(snapshot: DiagnoseSnapshot) -> str:
         f"- metrics: `{health.get('metric_count', 0)}` ({health.get('metric_bytes', 0)} bytes)",  # type: ignore[attr-defined]  # Closed runtime boundary validates this value.
         f"- turn states: `{health.get('turn_state_count', 0)}`",  # type: ignore[attr-defined]  # Closed runtime boundary validates this value.
         f"- quarantine entries: `{health.get('quarantine_count', 0)}`",  # type: ignore[attr-defined]  # Closed runtime boundary validates this value.
-        f"- selector attempts: `{selector.get('attempt_count', 0)}`",  # type: ignore[attr-defined]  # Closed runtime boundary validates this value.
+        f"- selector attempts: `{selector.get('attempt_count') if selector.get('attempt_count') is not None else selector.get('status', 'unavailable')}`",  # type: ignore[attr-defined]  # Closed runtime boundary validates this value.
     ]
     return "\n".join(lines) + "\n"
 
@@ -77,6 +77,7 @@ def diagnose_main(
             platform_name=__import__("platform").system(),
             architecture=__import__("platform").machine(),
             selector_outcomes=selector_outcomes,
+            selector_outcomes_available=selector_outcomes is not None,
         )
     (stdout or __import__("sys").stdout).write(render_diagnose(selected, output=output))
     return 0

@@ -135,6 +135,7 @@ def _diagnose(services: Any, host: str | None) -> object:
         platform_name=platform.system(),
         architecture=platform.machine(),
         selector_outcomes=selector_outcomes,
+        selector_outcomes_available=selector_outcomes is not None,
     )
     return snapshot
 

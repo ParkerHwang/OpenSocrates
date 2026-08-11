@@ -308,6 +308,10 @@ the fixed labels `executable_missing`, `request_rejected`, `spawn_failed`,
 `no_intervention`, and `selected`. `diagnose` reports those cumulative counts.
 The aggregate contains no timestamp, prompt, transcript, session or turn ID,
 path, model output, credential, or reasoning, and is never uploaded.
+If the aggregate is unreadable, `diagnose` reports it as `unavailable` instead
+of asserting zero attempts. The next valid selector outcome replaces a
+malformed current-schema aggregate with a fresh bounded count document; an
+unknown future schema is preserved for the newer runtime that owns it.
 
 When enabled, the updater stores only desired lifecycle state and the concise
 receipt described above, under owner-only permissions. It does not inspect or
