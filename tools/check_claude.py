@@ -1666,6 +1666,38 @@ def test_desktop_live_probe_is_honestly_blocked() -> None:
     )
 
 
+@check("CLAUDE-16-cowork-live-probe-separates-cli-registration")
+def test_cowork_live_probe_separates_cli_registration() -> None:
+    report = json.loads(
+        (ROOT / "docs" / "evidence" / "claude-cowork-live-probe-v1.1.2.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    require(
+        report.get("status") == "blocked" and report.get("blocker") == "mac_locked",
+        "Cowork probe does not preserve its exact blocker",
+    )
+    observations = report.get("observations")
+    require(isinstance(observations, dict), "Cowork observations are missing")
+    require(
+        observations.get("cli_user_scope_marketplace_registered") is True,
+        "Cowork probe lost the independently confirmed CLI registration",
+    )
+    require(
+        not any(
+            value
+            for key, value in observations.items()
+            if key != "cli_user_scope_marketplace_registered"
+        ),
+        "blocked Cowork probe claims a Cowork or hook observation",
+    )
+    privacy = report.get("privacy")
+    require(
+        isinstance(privacy, dict) and not any(privacy.values()),
+        "blocked Cowork probe contains private evidence",
+    )
+
+
 def main() -> int:
     failures: list[tuple[str, str]] = []
     for name, function in CHECKS:

@@ -7,6 +7,9 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Added
 
+- A privacy-safe Cowork probe distinguishes confirmed Claude CLI user-scope
+  registration from still-blocked Cowork visibility and hook delivery; the
+  support claim remains experimental ([#4](https://github.com/ParkerHwang/OpenSocrates/issues/4)).
 - A privacy-safe Claude Code desktop live-probe protocol and blocked receipt
   record the 2026-08-11 `mac_locked` access failure without claiming hook
   delivery or cleanup ([#3](https://github.com/ParkerHwang/OpenSocrates/issues/3)).
