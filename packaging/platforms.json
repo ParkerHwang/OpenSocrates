@@ -10,7 +10,13 @@
   "observed_local_platforms": [
     "darwin-arm64"
   ],
-  "release_claim_status": "pending_product_owner_approval",
+  "release_targets": [
+    "darwin-arm64"
+  ],
+  "release_claim_status": "darwin-arm64_only",
+  "shipped_launchers": {
+    "darwin-arm64": "bin/launch.sh"
+  },
   "unvalidated_platforms": [
     "darwin-x64",
     "linux-x64",
@@ -25,5 +31,5 @@
     }
   },
   "signing_status": "unvalidated",
-  "notes": "This manifest names candidates only. tools/measure_packaging.py produces observed local evidence; no platform is supported by this file alone."
+  "notes": "Only darwin-arm64 is a release target and only bin/launch.sh is shipped. Other entries are dry-run build candidates, are not shipped, and carry no support claim."
 }

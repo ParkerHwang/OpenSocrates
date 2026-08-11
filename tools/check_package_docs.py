@@ -82,6 +82,9 @@ REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
         "claude_readme_release_boundary_missing",
         (
             "released for Apple-silicon macOS (`darwin-arm64`) only",
+            "ships only `bin/launch.sh`",
+            "No PowerShell launcher is included",
+            "macOS Intel, Linux, Windows",
             "Binary signing, notarization, clean-machine installation",
             "are not claimed as validated",
         ),
@@ -137,11 +140,59 @@ def check_root(root: Path) -> dict[str, Any]:
         found = _readme_errors(path)
         documents[label] = {"status": "fail" if found else "pass", "error_codes": found}
         errors.extend(f"{label}_{code}" for code in found)
+    boundary_errors = _portability_boundary_errors(root)
+    documents["portability_boundary"] = {
+        "status": "fail" if boundary_errors else "pass",
+        "error_codes": boundary_errors,
+    }
+    errors.extend(boundary_errors)
     return {
         "status": "fail" if errors else "pass",
         "documents": documents,
         "error_codes": sorted(set(errors)),
     }
+
+
+def _portability_boundary_errors(root: Path) -> list[str]:
+    """Keep source metadata and both shipped package surfaces darwin-arm64-only."""
+
+    errors: list[str] = []
+    if (root / "packaging" / "launchers" / "launch.ps1").exists():
+        errors.append("powershell_launcher_source_present")
+    try:
+        platforms = json.loads((root / "packaging" / "platforms.json").read_text("utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        platforms = {}
+    if platforms.get("release_targets") != ["darwin-arm64"] or platforms.get(
+        "shipped_launchers"
+    ) != {"darwin-arm64": "bin/launch.sh"}:
+        errors.append("platform_manifest_release_boundary_invalid")
+    for host in ("claude", "codex"):
+        try:
+            generator = json.loads(
+                (root / "plugin-src" / host / "generator.json").read_text("utf-8")
+            )
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            generator = {}
+        copies = generator.get("copy_files", [])
+        outputs = (
+            {item.get("output") for item in copies if isinstance(item, dict)}
+            if isinstance(copies, list)
+            else set()
+        )
+        if (
+            generator.get("release_targets") != ["darwin-arm64"]
+            or generator.get("launchers") != ["bin/launch.sh"]
+            or "bin/launch.ps1" in outputs
+        ):
+            errors.append(f"{host}_generator_release_boundary_invalid")
+        for package_root in (
+            root / "build" / "generated" / "plugins" / host,
+            root / "dist" / host,
+        ):
+            if package_root.is_dir() and (package_root / "bin" / "launch.ps1").exists():
+                errors.append(f"{host}_{package_root.parent.name}_powershell_launcher_present")
+    return sorted(set(errors))
 
 
 def build_parser() -> argparse.ArgumentParser:
