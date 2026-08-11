@@ -86,7 +86,10 @@ does not retain the response. The owner-only authenticated receipt stores only
 the artifact digest, content revision, selected method IDs, and keyed
 authentication/tool-use tags; prompts, transcripts, raw tool output,
 credentials, workspace paths, and artifact paths are excluded. `Stop` removes
-the receipt with the turn artifact, and the 24-hour sweep covers crash leftovers.
+the receipt with the turn artifact. If `Stop` is absent, the next
+`UserPromptSubmit` in that session removes prior prompt trees without touching
+the new active tree. `SessionEnd` remains the session backstop, and the
+24-hour `SessionStart` sweep covers crash leftovers when neither event arrives.
 
 The gate's scope is deliberate and worth stating plainly. It establishes that a
 successful `Read` callback naming the exact current-turn artifact returned

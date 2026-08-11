@@ -1019,17 +1019,34 @@ def test_two_turns_in_one_session() -> None:
             store.has_complete_read_receipt(first_artifact),
             "first prompt did not receive a valid receipt",
         )
+        first_bytes = first.read_bytes()
+        first_text = first_bytes.decode("utf-8")
+        for private_value in (
+            "Critique this proposal",
+            "session-shared",
+            "prompt-1",
+            "tool-prompt-1",
+            str(ROOT),
+        ):
+            require(
+                private_value not in first_text,
+                "instruction artifact retained prompt, identity, tool, or workspace content",
+            )
 
         second = submit("Now critique the same proposal again", "prompt-2")
         second_artifact = store.latest_for_session("session-shared")
         require(second_artifact is not None, "second turn artifact metadata is unavailable")
 
-        require(first.is_file(), "first turn artifact was not created")
+        require(not first.exists(), "later UserPromptSubmit kept the superseded turn artifact")
         require(second.is_file(), "second turn artifact is missing")
         require(first != second, "second turn reused the first turn's artifact path")
         require(first.parent != second.parent, "Claude prompt IDs did not isolate turn directories")
-        require(first.read_bytes() == second.read_bytes(), "identical selection bytes drifted")
+        require(first_bytes == second.read_bytes(), "identical selection bytes drifted")
         require(selector.calls == 2, "second prompt did not reach the selector")
+        require(
+            store.delete_superseded_turns("session-shared", "prompt-2") == 0 and second.is_file(),
+            "supersession cleanup deleted the active turn artifact",
+        )
 
         second_text = second.read_text(encoding="utf-8")
         require(
@@ -1075,7 +1092,7 @@ def test_two_turns_in_one_session() -> None:
             event_name="Stop",
         )
         require(grounded_stop.stdout == "", "grounded second Stop was not literal-empty")
-        require(first.is_file(), "second Stop deleted the first prompt's artifact")
+        require(not first.exists(), "superseded first prompt artifact reappeared")
         require(not second.exists(), "second Stop did not delete its own artifact")
 
         ended = adapter.handle(
@@ -1092,6 +1109,60 @@ def test_two_turns_in_one_session() -> None:
             not leftovers,
             f"SessionEnd left {len(leftovers)} artifact(s) from completed prompts",
         )
+
+
+@check("CLAUDE-09A-supersession-cleanup-fails-open")
+def test_supersession_cleanup_fails_open() -> None:
+    """A cleanup failure must not block a later prompt or delete its active tree."""
+
+    value = projections()
+    assembler = ProjectionInstructionAssembler(value)
+    with tempfile.TemporaryDirectory(prefix="opensocrates-claude-supersession-") as name:
+        store = InstructionFileStore(installation_key=b"u" * 32, directory=Path(name) / "artifacts")
+        adapter = ClaudeAdapter(
+            ClaudeAdapterConfig(
+                selector_mode=True,
+                selector_application=SelectorApplication(
+                    selector=FakeSelector(),
+                    assembler=assembler,
+                    config=SelectorConfig(transcript_access_enabled=False),
+                    artifact_store=store,
+                ),
+                selector_config=SelectorConfig(transcript_access_enabled=False),
+                instruction_file_store=store,
+            )
+        )
+
+        def submit(prompt_id: str) -> Path:
+            result = adapter.handle(
+                {
+                    "hook_event_name": "UserPromptSubmit",
+                    "session_id": "session-fail-open",
+                    "prompt_id": prompt_id,
+                    "prompt": "<transient-private-prompt>",
+                },
+                event_name="UserPromptSubmit",
+            )
+            require(result.stdout != "", "cleanup failure blocked UserPromptSubmit")
+            body = json.loads(result.stdout)
+            return _referenced_path(body["hookSpecificOutput"]["additionalContext"])
+
+        first = submit("prompt-1")
+        with patch.object(store, "delete_superseded_turns", side_effect=OSError):
+            second = submit("prompt-2")
+        require(first.is_file(), "failed cleanup unexpectedly removed the prior turn")
+        require(second.is_file(), "failed cleanup removed or blocked the active turn")
+        foreign = store.create(
+            "other-session",
+            "other-turn",
+            assembler.assemble(("critical-thinking",), requested_locale="en"),
+        )
+
+        removed = store.delete_superseded_turns("session-fail-open", "prompt-2")
+        require(removed > 0, "recovery cleanup removed no superseded content")
+        require(not first.exists(), "recovery cleanup kept the superseded turn")
+        require(second.is_file(), "recovery cleanup deleted the active turn")
+        require(foreign.path.is_file(), "supersession cleanup crossed the session boundary")
 
 
 FIXTURES = ROOT / "src" / "opensocrates" / "hosts" / "contracts" / "fixtures" / "claude"

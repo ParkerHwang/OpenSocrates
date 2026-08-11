@@ -18,6 +18,11 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Fixed
 
+- Claude sessions now supersede private instruction artifacts by `prompt_id`.
+  When `Stop` is absent, the next `UserPromptSubmit` removes prior turn trees in
+  that session while preserving the new active turn; `SessionEnd` and the
+  24-hour `SessionStart` sweep remain backstops
+  ([#13](https://github.com/ParkerHwang/OpenSocrates/issues/13)).
 - The Claude selector now enforces its 512 KiB stdout ceiling while reading the
   child process stream. Output that crosses the limit terminates and reaps the
   process immediately, fails open with a content-free diagnostic, and is never
