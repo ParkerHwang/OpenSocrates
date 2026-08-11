@@ -26,14 +26,16 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - uses: astral-sh/setup-uv@v5
-      - uses: actions/setup-node@v4
+      # setup-uv stopped publishing floating major tags after v7, so the
+      # current maintained release is pinned exactly rather than by major.
+      - uses: astral-sh/setup-uv@v9.0.0
+      - uses: actions/setup-node@v7
         with:
           node-version: "20"
 
@@ -96,7 +98,7 @@ jobs:
 
       - name: Upload release evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-check-${{ github.run_id }}
           path: |
