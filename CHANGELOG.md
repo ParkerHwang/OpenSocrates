@@ -7,6 +7,10 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Added
 
+- Bounded semantic packaged-README checks now reject novel universal-support,
+  vendor-endorsement, and managed-environment safety overclaims, with mutation
+  coverage that also protects accurate limitation wording from false positives
+  ([#27](https://github.com/ParkerHwang/OpenSocrates/issues/27)).
 - Native plugin packages now expose one honest `darwin-arm64` boundary: the
   unvalidated PowerShell launcher is removed, the POSIX launcher rejects every
   other target, and package manifests and docs distinguish unshipped build

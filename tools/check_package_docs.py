@@ -102,11 +102,120 @@ FORBIDDEN: tuple[tuple[str, str], ...] = (
     ("claude_readme_host_delivery_overclaim", "live delivery is validated"),
 )
 
+# Deliberately bounded semantic patterns for three high-risk claim classes.
+# They operate within one sentence/Markdown line, require both a strong claim
+# and its sensitive scope/authority, and do not attempt to lint general prose.
+SEMANTIC_OVERCLAIMS: tuple[tuple[str, tuple[re.Pattern[str], ...]], ...] = (
+    (
+        "claude_readme_universal_support_overclaim",
+        (
+            re.compile(
+                r"\b(?:fully|completely|universally)\s+"
+                r"(?:validated|supported|compatible)\b.{0,96}"
+                r"\b(?:all|every)\s+(?:claude\s+)?"
+                r"(?:surface|platform|environment)s?\b",
+                re.IGNORECASE,
+            ),
+            re.compile(
+                r"\b(?:validated|supported|compatible)\b.{0,48}"
+                r"\b(?:across|on|for)\s+(?:all|every)\s+"
+                r"(?:claude\s+)?(?:surface|platform|environment)s?\b",
+                re.IGNORECASE,
+            ),
+        ),
+    ),
+    (
+        "claude_readme_endorsement_overclaim",
+        (
+            re.compile(
+                r"\b(?:signed|notarized|approved|certified|endorsed)\s+by\s+"
+                r"(?:anthropic|openai|apple|claude)\b",
+                re.IGNORECASE,
+            ),
+            re.compile(
+                r"\b(?:anthropic|openai|apple|claude)[ -]"
+                r"(?:approved|certified|endorsed|signed)\b",
+                re.IGNORECASE,
+            ),
+            re.compile(
+                r"\b(?:package|plugin|archive|release)\s+"
+                r"(?:is|was|has\s+been)\s+(?:cryptographically\s+)?"
+                r"(?:signed|notarized)\b",
+                re.IGNORECASE,
+            ),
+        ),
+    ),
+    (
+        "claude_readme_managed_safety_overclaim",
+        (
+            re.compile(
+                r"\b(?:(?:guaranteed|fully|completely|perfectly)\s+)?"
+                r"(?:safe|secure|isolated)\s+(?:on|in|for)\s+(?:all\s+)?"
+                r"(?:managed|enterprise|organization-managed)\s+"
+                r"(?:machines?|environments?|systems?)\b",
+                re.IGNORECASE,
+            ),
+            re.compile(
+                r"\b(?:managed|enterprise|organization-managed)\s+"
+                r"(?:policy\s+)?(?:hooks?|environments?|machines?)\b.{0,64}"
+                r"\b(?:cannot|can't|never)\b.{0,32}"
+                r"\b(?:observe|access|receive|see)\b.{0,32}"
+                r"\b(?:prompts?|data|credentials?)\b",
+                re.IGNORECASE,
+            ),
+            re.compile(
+                r"\bguarantees?\s+(?:(?:complete|full)\s+)?"
+                r"(?:safety|security|isolation)\s+(?:on|in|for)\s+"
+                r"(?:all\s+)?(?:managed|enterprise|organization-managed)\s+"
+                r"(?:machines?|environments?|systems?)\b",
+                re.IGNORECASE,
+            ),
+        ),
+    ),
+)
+
+_NEGATED_CLAIM_PREFIX = re.compile(
+    r"(?:\bnot\b|\bnever\b|\bno\b|\bwithout\b|\bdoes\s+not\b|\bcannot\b)"
+    r"(?:\W+\w+){0,6}\W*$",
+    re.IGNORECASE,
+)
+
 
 def _normalize(text: str) -> str:
     """Collapse wrapping so phrase checks survive Markdown line breaks."""
 
     return re.sub(r"\s+", " ", text)
+
+
+def _claim_segments(text: str) -> Iterator[str]:
+    """Yield bounded prose segments without matching across sentences or bullets."""
+
+    for line in text.splitlines():
+        normalized = _normalize(line).strip()
+        if normalized:
+            yield from (part for part in re.split(r"(?<=[.!?])\s+", normalized) if part)
+
+
+def _semantic_overclaim_errors(text: str) -> list[str]:
+    errors: set[str] = set()
+    for segment in _claim_segments(text):
+        for code, patterns in SEMANTIC_OVERCLAIMS:
+            for pattern in patterns:
+                for match in pattern.finditer(segment):
+                    prefix = segment[max(0, match.start() - 96) : match.start()]
+                    # A limitation in an earlier contrasting clause must not
+                    # negate a later affirmative overclaim.
+                    prefix = re.split(
+                        r"[,;:]|\b(?:but|however|although|yet)\b",
+                        prefix,
+                        flags=re.IGNORECASE,
+                    )[-1]
+                    if not _NEGATED_CLAIM_PREFIX.search(prefix):
+                        errors.add(code)
+                        break
+                if code in errors:
+                    break
+    return sorted(errors)
 
 
 def _package_readmes(root: Path) -> Iterator[tuple[str, Path]]:
@@ -120,9 +229,11 @@ def _package_readmes(root: Path) -> Iterator[tuple[str, Path]]:
 
 
 def _readme_errors(path: Path) -> list[str]:
-    text = _normalize(path.read_text(encoding="utf-8"))
+    raw_text = path.read_text(encoding="utf-8")
+    text = _normalize(raw_text)
     errors = [code for code, phrases in REQUIRED if any(_normalize(p) not in text for p in phrases)]
     errors.extend(code for code, phrase in FORBIDDEN if _normalize(phrase) in text)
+    errors.extend(_semantic_overclaim_errors(raw_text))
     return errors
 
 
