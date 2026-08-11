@@ -35,7 +35,7 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 | Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | `/opensocrates` | `darwin-arm64` 로컬 검증 완료 |
 | Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 구현됨 | `/opensocrates` | [실측 probe 차단](docs/claude-desktop-live-probe.md), 수신 기록 없음 |
 | Claude Cowork | 로컬 플러그인 런타임을 사용할 수 있을 때 구현됨 | `/opensocrates` | [CLI 등록 확인, Cowork probe 차단](docs/claude-cowork-live-probe.md) |
-| Claude 웹 및 Desktop Chat | 훅 미지원 | `/opensocrates` | 스킬 전용, 업로드 경로 미검증 |
+| Claude 웹 및 Desktop Chat | 훅 미지원 | `/opensocrates` | [아카이브 검증, UI 업로드 차단](docs/claude-chat-upload-probe.md) |
 
 상태 열은 서로 다른 네 단계를 뜻하며 같은 의미로 읽으면 안 됩니다.
 

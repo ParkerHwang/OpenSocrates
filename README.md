@@ -36,7 +36,7 @@ not require an API key or an OpenSocrates backend.
 | Claude Code CLI | Yes, through `UserPromptSubmit` | `/opensocrates` | Locally validated on `darwin-arm64` |
 | Claude Code desktop app | Implemented, where Claude Code plugins run | `/opensocrates` | [Blocked live probe](docs/claude-desktop-live-probe.md); no delivery receipt |
 | Claude Cowork | Implemented, when the local plugin runtime is available | `/opensocrates` | [CLI registered; Cowork probe blocked](docs/claude-cowork-live-probe.md) |
-| Claude web and Desktop Chat | No hooks | `/opensocrates` | Skills-only; upload path unvalidated |
+| Claude web and Desktop Chat | No hooks | `/opensocrates` | [Archive verified; UI upload blocked](docs/claude-chat-upload-probe.md) |
 
 The status column uses four distinct levels. Do not read them as
 interchangeable:

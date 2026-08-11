@@ -1698,6 +1698,41 @@ def test_cowork_live_probe_separates_cli_registration() -> None:
     )
 
 
+@check("CLAUDE-17-chat-archive-evidence-does-not-claim-upload")
+def test_chat_archive_evidence_does_not_claim_upload() -> None:
+    report = json.loads(
+        (ROOT / "docs" / "evidence" / "claude-chat-upload-probe-v1.1.2.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    require(
+        report.get("status") == "blocked" and report.get("blocker") == "mac_locked",
+        "Chat upload probe does not preserve its exact blocker",
+    )
+    archive = report.get("archive")
+    require(
+        isinstance(archive, dict)
+        and archive.get("file_count") == 52
+        and archive.get("public_skill_count") == 1
+        and archive.get("internal_method_count") == 48,
+        "Chat archive evidence has the wrong package shape",
+    )
+    require(
+        not any(value for key, value in archive.items() if key.endswith("_present")),
+        "Chat archive evidence contains a forbidden surface",
+    )
+    observations = report.get("ui_observations")
+    require(
+        isinstance(observations, dict) and not any(observations.values()),
+        "blocked Chat probe claims a UI observation",
+    )
+    privacy = report.get("privacy")
+    require(
+        isinstance(privacy, dict) and not any(privacy.values()),
+        "blocked Chat probe contains private evidence",
+    )
+
+
 def main() -> int:
     failures: list[tuple[str, str]] = []
     for name, function in CHECKS:
