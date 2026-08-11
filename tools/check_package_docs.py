@@ -21,7 +21,7 @@ from typing import Any
 README = "README.md"
 
 # Each requirement fails as one stable error code when any phrase is absent.
-REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
+CLAUDE_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
     (
         "claude_readme_safe_mode_scope_missing",
         (
@@ -87,6 +87,23 @@ REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
             "macOS Intel, Linux, Windows",
             "Binary signing, notarization, clean-machine installation",
             "are not claimed as validated",
+        ),
+    ),
+)
+
+CODEX_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (
+        "codex_readme_hook_approval_missing",
+        (
+            "one-time interactive hook approval",
+            "non-interactive `codex exec` silently skips untrusted hooks",
+        ),
+    ),
+    (
+        "codex_readme_live_evidence_boundary_missing",
+        (
+            "package and launcher are release-validated",
+            "no live Codex hook-delivery receipt",
         ),
     ),
 )
@@ -218,39 +235,47 @@ def _semantic_overclaim_errors(text: str) -> list[str]:
     return sorted(errors)
 
 
-def _package_readmes(root: Path) -> Iterator[tuple[str, Path]]:
-    candidates = (
-        ("generated", root / "build" / "generated" / "plugins" / "claude" / README),
-        ("distributable", root / "dist" / "claude" / README),
-    )
-    for label, path in candidates:
-        if path.is_file():
-            yield label, path
+def _package_readmes(root: Path) -> Iterator[tuple[str, str, Path]]:
+    for host in ("claude", "codex"):
+        candidates = (
+            ("generated", root / "build" / "generated" / "plugins" / host / README),
+            ("distributable", root / "dist" / host / README),
+        )
+        for label, path in candidates:
+            if path.is_file():
+                yield host, label, path
 
 
-def _readme_errors(path: Path) -> list[str]:
+def _readme_errors(path: Path, host: str = "claude") -> list[str]:
     raw_text = path.read_text(encoding="utf-8")
     text = _normalize(raw_text)
-    errors = [code for code, phrases in REQUIRED if any(_normalize(p) not in text for p in phrases)]
-    errors.extend(code for code, phrase in FORBIDDEN if _normalize(phrase) in text)
-    errors.extend(_semantic_overclaim_errors(raw_text))
+    requirements = CLAUDE_REQUIRED if host == "claude" else CODEX_REQUIRED
+    errors = [
+        code for code, phrases in requirements if any(_normalize(p) not in text for p in phrases)
+    ]
+    if host == "claude":
+        errors.extend(code for code, phrase in FORBIDDEN if _normalize(phrase) in text)
+        errors.extend(_semantic_overclaim_errors(raw_text))
     return errors
 
 
 def check_root(root: Path) -> dict[str, Any]:
     readmes = list(_package_readmes(root))
+    present_hosts = {host for host, _label, _path in readmes}
+    missing_hosts = sorted({"claude", "codex"} - present_hosts)
     if not readmes:
         return {
             "status": "fail",
             "documents": {},
-            "error_codes": ["claude_package_readme_missing"],
+            "error_codes": [f"{host}_package_readme_missing" for host in missing_hosts],
         }
     documents: dict[str, Any] = {}
-    errors: list[str] = []
-    for label, path in readmes:
-        found = _readme_errors(path)
-        documents[label] = {"status": "fail" if found else "pass", "error_codes": found}
-        errors.extend(f"{label}_{code}" for code in found)
+    errors: list[str] = [f"{host}_package_readme_missing" for host in missing_hosts]
+    for host, label, path in readmes:
+        found = _readme_errors(path, host)
+        key = f"{host}/{label}"
+        documents[key] = {"status": "fail" if found else "pass", "error_codes": found}
+        errors.extend(f"{host}_{label}_{code}" for code in found)
     boundary_errors = _portability_boundary_errors(root)
     documents["portability_boundary"] = {
         "status": "fail" if boundary_errors else "pass",

@@ -6,7 +6,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from check_package_docs import _semantic_overclaim_errors
+from check_package_docs import _readme_errors, _semantic_overclaim_errors
 
 MUTATIONS = (
     (
@@ -64,7 +64,7 @@ COMBINED_REVIEW_MUTATION = (
 )
 
 
-def main() -> int:
+def main() -> int:  # noqa: C901  # One linear mutation matrix with bounded branches.
     root = Path(__file__).resolve().parent.parent
     readme = root / "build" / "generated" / "plugins" / "claude" / "README.md"
     try:
@@ -89,6 +89,22 @@ def main() -> int:
         errors = _semantic_overclaim_errors(f"{baseline}\n\n{limitation}\n")
         if errors:
             failures.append(f"false-positive:{','.join(errors)}")
+    codex_readme = root / "build" / "generated" / "plugins" / "codex" / "README.md"
+    try:
+        codex_baseline = codex_readme.read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        failures.append("missing:codex-generated-readme")
+    else:
+        if _readme_errors(codex_readme, "codex"):
+            failures.append("baseline:codex-readme")
+        mutated = codex_baseline.replace("one-time interactive hook approval", "hook approval", 1)
+        temporary = root / "build" / "package-doc-codex-mutation.md"
+        try:
+            temporary.write_text(mutated, encoding="utf-8")
+            if "codex_readme_hook_approval_missing" not in _readme_errors(temporary, "codex"):
+                failures.append("missed:codex-hook-approval")
+        finally:
+            temporary.unlink(missing_ok=True)
     if failures:
         print("package-doc-mutations: FAIL")
         for failure in failures:

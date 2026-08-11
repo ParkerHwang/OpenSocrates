@@ -5,6 +5,40 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ## [Unreleased]
 
+## [1.1.5] - 2026-08-12
+
+### Added
+
+- Packaged `diagnose` now verifies the complete installed file inventory
+  against `checksums.sha256` and validates the release manifest's runtime
+  version, host, and content revision. Explicit `mismatch`, `unavailable`, and
+  `unverified` states replace presence-based claims
+  ([#64](https://github.com/ParkerHwang/OpenSocrates/issues/64)).
+- Release tests execute the packaged runtime against both intact packages and
+  a staged tampered Claude package so integrity reporting is exercised outside
+  the source process ([#64](https://github.com/ParkerHwang/OpenSocrates/issues/64)).
+
+### Changed
+
+- Claude grounding artifacts now prefer an owner-only, self-ignored
+  `.opensocrates` area inside the active workspace, while retaining the OS
+  temporary directory as a fail-open fallback. Lookup, receipts, expiry, and
+  cleanup handle both roots during upgrades and fallback runs
+  ([#62](https://github.com/ParkerHwang/OpenSocrates/issues/62)).
+- Codex package and installation documentation now requires one interactive
+  hook approval before automatic selection is expected and distinguishes
+  release-validated packaging from unvalidated live hook delivery
+  ([#63](https://github.com/ParkerHwang/OpenSocrates/issues/63)).
+
+### Fixed
+
+- Default-permission `claude -p` sessions can read selected grounding content
+  without `--add-dir`, avoiding the denied-read repair loop caused by placing
+  artifacts only in the system temporary directory
+  ([#62](https://github.com/ParkerHwang/OpenSocrates/issues/62)).
+- `diagnose` no longer reports manifest and checksum verification merely
+  because package files exist ([#64](https://github.com/ParkerHwang/OpenSocrates/issues/64)).
+
 ## [1.1.4] - 2026-08-12
 
 ### Added
@@ -305,3 +339,4 @@ All notable changes to OpenSocrates are documented here. This project follows
 [1.1.2]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.1...v1.1.2
 [1.1.3]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.2...v1.1.3
 [1.1.4]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.3...v1.1.4
+[1.1.5]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.4...v1.1.5

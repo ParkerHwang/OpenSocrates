@@ -14,6 +14,7 @@ from ..domain.validation import canonical_json
 from ..version import PRODUCT_VERSION, version_info
 from .capabilities import probe_capabilities, show_capabilities
 from .diagnose import render_diagnose
+from .integrity import verify_runtime_integrity
 from .metrics import export_metrics, reset_metrics, show_metrics
 from .settings import handle_rigor_get, handle_rigor_reset, handle_rigor_set
 
@@ -122,16 +123,14 @@ def _diagnose(services: Any, host: str | None) -> object:
         profiles = {host: selected} if selected is not None else {}
     selector_outcome_reader = getattr(services, "selector_outcome_counts", None)
     selector_outcomes = selector_outcome_reader() if callable(selector_outcome_reader) else {}
+    integrity = verify_runtime_integrity(host=host)
     snapshot = build_diagnose(
         profiles=profiles,
         bundle=getattr(services, "bundle", None),
         health=getattr(services, "health", None),
-        manifest_status="verified"
-        if getattr(services, "bundle", None) is not None
-        else "unavailable",
-        checksum_status="verified"
-        if getattr(services, "bundle", None) is not None
-        else "unavailable",
+        manifest_status=integrity.manifest_status,
+        manifest_version=integrity.manifest_version,
+        checksum_status=integrity.checksum_status,
         platform_name=platform.system(),
         architecture=platform.machine(),
         selector_outcomes=selector_outcomes,

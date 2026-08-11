@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import stat
+import subprocess
 import tempfile
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
@@ -517,6 +518,125 @@ def _test_complete_catalog_artifact() -> None:
         _require(store.delete_session("synthetic-full-catalog-session") >= 1)
 
 
+@_check("VSC-06B-workspace-root-preferred-git-invisible-and-cleaned")
+def _test_workspace_artifact_root() -> None:
+    assembled = assemble_canonical_instruction(
+        _projections(),
+        (_METHODS[0],),
+        "synthetic English prompt",
+        expected_content_revision=_REVISION,
+    )
+    with tempfile.TemporaryDirectory(prefix="opensocrates-workspace-root-check-") as name:
+        root = Path(name)
+        workspace = root / "workspace"
+        temporary_root = root / "temporary"
+        workspace.mkdir()
+        temporary_root.mkdir()
+        subprocess.run(
+            ("git", "init", "--quiet", str(workspace)),
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        with patch(
+            "opensocrates.selector.artifacts.tempfile.gettempdir", return_value=str(temporary_root)
+        ):
+            store = InstructionFileStore(
+                installation_key=b"w" * 32,
+                workspace=workspace,
+            )
+            artifact = store.create("workspace-session", "workspace-turn", assembled)
+            _require(artifact.path.is_relative_to(workspace.resolve() / ".opensocrates"))
+            ignore = workspace / ".opensocrates" / ".gitignore"
+            _require(ignore.read_bytes() == b"*\n")
+            if os.name != "nt":
+                _require(stat.S_IMODE(ignore.stat().st_mode) == 0o600)
+                _require(stat.S_IMODE(artifact.path.parent.stat().st_mode) == 0o700)
+                _require(stat.S_IMODE(artifact.path.stat().st_mode) == 0o600)
+            status = subprocess.run(
+                ("git", "status", "--porcelain", "--untracked-files=all"),
+                cwd=workspace,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            _require(status.stdout == "")
+            _require(store.delete_session("workspace-session") >= 1)
+            _require(not (workspace / ".opensocrates").exists())
+
+
+@_check("VSC-06C-workspace-root-fallback-and-cross-root-receipts")
+def _test_workspace_fallback_and_cross_root_receipts() -> None:
+    assembled = assemble_canonical_instruction(
+        _projections(),
+        (_METHODS[0],),
+        "synthetic English prompt",
+        expected_content_revision=_REVISION,
+    )
+    with tempfile.TemporaryDirectory(prefix="opensocrates-cross-root-check-") as name:
+        root = Path(name)
+        temporary_root = root / "temporary"
+        workspace = root / "workspace"
+        temporary_root.mkdir()
+        workspace.mkdir()
+        installation_key = b"x" * 32
+        with patch(
+            "opensocrates.selector.artifacts.tempfile.gettempdir", return_value=str(temporary_root)
+        ):
+            legacy_store = InstructionFileStore(installation_key=installation_key)
+            legacy = legacy_store.create("cross-session", "legacy-turn", assembled)
+            _require(
+                legacy_store.record_complete_read(
+                    "cross-session",
+                    "legacy-turn",
+                    file_path=legacy.path,
+                    tool_use_id="legacy-read",
+                    offset=0,
+                    limit=None,
+                    end_marker_seen=True,
+                )
+            )
+
+            workspace_store = InstructionFileStore(
+                installation_key=installation_key,
+                workspace=workspace,
+            )
+            _require(workspace_store.accepts_artifact_path(legacy.path))
+            _require(workspace_store.has_complete_read_receipt(legacy))
+            current = workspace_store.create("cross-session", "workspace-turn", assembled)
+            _require(current.path.is_relative_to(workspace.resolve() / ".opensocrates"))
+            _require(workspace_store.accepts_artifact_path(current.path))
+            _require(workspace_store.latest_for_session("cross-session") == current)
+            _require(
+                workspace_store.record_complete_read(
+                    "cross-session",
+                    "workspace-turn",
+                    file_path=current.path,
+                    tool_use_id="workspace-read",
+                    offset=0,
+                    limit=None,
+                    end_marker_seen=True,
+                )
+            )
+            _require(workspace_store.has_complete_read_receipt(current))
+            _require(workspace_store.delete_session("cross-session") >= 1)
+            _require(not (workspace / ".opensocrates").exists())
+
+            foreign_workspace = root / "foreign-workspace"
+            foreign_workspace.mkdir()
+            foreign_container = foreign_workspace / ".opensocrates"
+            foreign_container.mkdir()
+            (foreign_container / "foreign-data").write_text("synthetic", encoding="utf-8")
+            fallback_store = InstructionFileStore(
+                installation_key=b"y" * 32,
+                workspace=foreign_workspace,
+            )
+            fallback = fallback_store.create("fallback-session", "fallback-turn", assembled)
+            _require(fallback.path.is_relative_to(temporary_root.resolve()))
+            _require(not fallback.path.is_relative_to(foreign_container.resolve()))
+            _require(fallback_store.delete_session("fallback-session") >= 1)
+
+
 @_check("VSC-07-context-on-demand-contained-and-bounded")
 def _test_context_accessor_contract() -> None:
     with tempfile.TemporaryDirectory(prefix="opensocrates-selector-context-check-") as name:
@@ -881,6 +1001,24 @@ def _test_hook_entrypoint_contract() -> None:
             os.environ.pop(SELECTOR_RECURSION_ENV, None)
         else:
             os.environ[SELECTOR_RECURSION_ENV] = original_marker
+
+    captured: list[dict[str, object]] = []
+
+    def capture_runtime(**kwargs: object) -> _SyntheticRuntime:
+        captured.append(dict(kwargs))
+        return no_decision
+
+    workspace = str(Path(tempfile.gettempdir()).resolve())
+    payload = _native_payload("UserPromptSubmit", cwd=workspace)
+    with patch("opensocrates.cli.runtime.build_runtime_services", capture_runtime):
+        output = StringIO()
+        exit_code = run_hook(
+            ("claude", "user_prompt_submitted"),
+            stdin=BytesIO(json.dumps(payload).encode("utf-8")),
+            stdout=output,
+        )
+    _require(exit_code == 0 and output.getvalue() == "")
+    _require(captured == [{"host": "claude", "workspace": workspace}])
 
 
 def main() -> int:

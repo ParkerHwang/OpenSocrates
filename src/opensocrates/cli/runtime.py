@@ -413,6 +413,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
     reasoning_content_path: str | Path | None = None,
     data_root: DataRoot | None = None,
     include_storage: bool = True,
+    workspace: str | Path | None = None,
 ) -> RuntimeServices:
     """Build the normal packaged composition, degrading store failures safely."""
 
@@ -485,7 +486,12 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
                 )
             installation_key = getattr(turn_store, "installation_key", None)
             if isinstance(installation_key, bytes) and len(installation_key) == 32:
-                instruction_file_store = InstructionFileStore(installation_key=installation_key)
+                instruction_file_store = InstructionFileStore(
+                    installation_key=installation_key,
+                    workspace=Path(workspace)
+                    if host == "claude" and workspace is not None
+                    else None,
+                )
                 instruction_file_store.sweep_expired()
             if host == "codex":
                 (

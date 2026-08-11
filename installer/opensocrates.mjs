@@ -24,7 +24,7 @@ import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 
-export const PRODUCT_VERSION = "1.1.4";
+export const PRODUCT_VERSION = "1.1.5";
 export const REPOSITORY = "ParkerHwang/OpenSocrates";
 export const MARKETPLACE_NAME = "opensocrates";
 export const PLUGIN_NAME = "opensocrates";
@@ -1579,6 +1579,13 @@ async function runInstallOrUpdate(options, action) {
   console.log(
     `OpenSocrates ${PRODUCT_VERSION} ${verb} successfully for ${hosts.join(", ")}.`,
   );
+  if (hosts.includes("codex")) {
+    console.log(
+      "Codex approval required: open one interactive Codex session and approve the " +
+        "OpenSocrates hooks before relying on automatic selection. Non-interactive " +
+        "codex exec silently skips hooks that have not been trusted.",
+    );
+  }
   console.log("Start new host tasks to load the updated skills and hooks.");
   return hosts;
 }

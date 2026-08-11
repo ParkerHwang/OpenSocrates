@@ -84,15 +84,25 @@ def _read_bounded(stream: BinaryIO | TextIO) -> bytes | None:
     return result
 
 
-def _input_native_name(raw: bytes) -> str | None:
+def _input_metadata(raw: bytes) -> tuple[str | None, str | None]:
     try:
         decoded = json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError, RecursionError):
-        return None
+        return None, None
     if not isinstance(decoded, Mapping):
-        return None
+        return None, None
     candidate = decoded.get("hook_event_name")
-    return candidate if isinstance(candidate, str) else None
+    workspace = decoded.get("cwd")
+    safe_workspace = (
+        workspace
+        if isinstance(workspace, str)
+        and workspace
+        and "\x00" not in workspace
+        and len(workspace.encode("utf-8")) <= 4096
+        and os.path.isabs(workspace)
+        else None
+    )
+    return (candidate if isinstance(candidate, str) else None), safe_workspace
 
 
 def _safe_response(value: object) -> str:
@@ -137,7 +147,7 @@ def run_hook(  # noqa: C901  # Explicit host-safe early-return boundary.
     if raw is None:
         output.write("")
         return 0
-    native_name = _input_native_name(raw)
+    native_name, workspace = _input_metadata(raw)
     native_name = _native_for_lane(host, lane, native_name)
     if native_name is None:
         output.write("")
@@ -149,7 +159,10 @@ def run_hook(  # noqa: C901  # Explicit host-safe early-return boundary.
         if runtime is None:
             from ..cli.runtime import build_runtime_services
 
-            runtime = build_runtime_services(host=host)
+            runtime = build_runtime_services(
+                host=host,
+                workspace=workspace if host == "claude" else None,
+            )
         adapter = getattr(runtime, "adapter_for", lambda _host: None)(host)
         if adapter is None:
             output.write("")
