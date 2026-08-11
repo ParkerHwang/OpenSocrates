@@ -1410,6 +1410,7 @@ def _claude_cli_selector_check(root: Path) -> set[str]:  # noqa: C901  # Closed 
     environment = _top_level_function(tree, "_selector_environment")
     worker_request = _top_level_function(tree, "_worker_request")
     terminate = _top_level_function(tree, "_terminate_process")
+    bounded_communication = _top_level_function(tree, "_communicate_bounded")
     required_flags = {
         "--safe-mode",
         "-p",
@@ -1465,15 +1466,20 @@ def _claude_cli_selector_check(root: Path) -> set[str]:  # noqa: C901  # Closed 
         if start_session is None or not _node_has_string(start_session, "posix"):
             errors.add("claude_selector_process_isolation_missing")
     communicate_calls = [
-        call
-        for call in _function_calls(select)
-        if (_call_chain(call) or ())[-1:] == ("communicate",)
+        call for call in _function_calls(select) if _call_chain(call) == ("_communicate_bounded",)
     ]
     if not any(
         _node_has_name(_keyword_value(call, "timeout") or ast.Pass(), "deadline_seconds")
         for call in communicate_calls
     ):
         errors.add("claude_selector_deadline_missing")
+    if (
+        bounded_communication is None
+        or not _node_has_name(bounded_communication, "_MAX_CLI_RESPONSE_BYTES")
+        or not _function_has_call(bounded_communication, ("time", "monotonic"))
+        or not _function_has_call(bounded_communication, ("_terminate_process",))
+    ):
+        errors.add("claude_selector_stdout_bound_missing")
     if not _function_has_call(select, ("tempfile", "TemporaryDirectory")) or not any(
         _call_chain(call) == ("os", "chmod")
         and _literal_int(call.args[1] if len(call.args) > 1 else None) == 0o700

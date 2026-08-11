@@ -6,7 +6,9 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import sys
 import tempfile
+import time
 from collections.abc import Callable
 from pathlib import Path
 from unittest.mock import patch
@@ -27,10 +29,15 @@ from opensocrates.selector import (
     handles_for_request,
 )
 from opensocrates.selector.claude_cli import (
+    _MAX_CLI_RESPONSE_BYTES,
     ClaudeCliReasoningSelector,
     SelectorOutcome,
     _candidate_from_cli_output,
+    _close_pipes,
+    _communicate_bounded,
     _selector_environment,
+    _SelectorTimeout,
+    _StdoutLimitExceeded,
     _terminate_process,
 )
 from opensocrates.selector.sdk_worker import SELECTOR_RECURSION_ENV
@@ -99,6 +106,14 @@ class FakeProcess:
         self.returncode = -9
 
 
+def _fake_communicate_bounded(process: FakeProcess, payload: bytes, *, timeout: int) -> bytes:
+    try:
+        stdout, _stderr = process.communicate(payload, timeout)
+    except subprocess.TimeoutExpired as error:
+        raise _SelectorTimeout from error
+    return stdout
+
+
 @check("CLAUDE-01-plugin-hook-contract")
 def test_plugin_hook_contract() -> None:
     manifest = json.loads(
@@ -150,7 +165,13 @@ def test_cli_selector_contract() -> None:
         request, SelectorConfig(transcript_access_enabled=False)
     )
     FakeProcess.instances.clear()
-    with patch("opensocrates.selector.claude_cli.subprocess.Popen", FakeProcess):
+    with (
+        patch("opensocrates.selector.claude_cli.subprocess.Popen", FakeProcess),
+        patch(
+            "opensocrates.selector.claude_cli._communicate_bounded",
+            side_effect=_fake_communicate_bounded,
+        ),
+    ):
         candidate = selector.select(
             effective, context, deadline_seconds=30, reasoning_effort="medium"
         )
@@ -724,7 +745,13 @@ def test_selector_failure_diagnostics() -> None:
         (NoInterventionProcess, SelectorOutcome.NO_INTERVENTION),
     ):
         selector, effective, context = _fresh_selector()
-        with patch("opensocrates.selector.claude_cli.subprocess.Popen", process_class):
+        with (
+            patch("opensocrates.selector.claude_cli.subprocess.Popen", process_class),
+            patch(
+                "opensocrates.selector.claude_cli._communicate_bounded",
+                side_effect=_fake_communicate_bounded,
+            ),
+        ):
             result = selector.select(
                 effective, context, deadline_seconds=30, reasoning_effort="medium"
             )
@@ -737,9 +764,38 @@ def test_selector_failure_diagnostics() -> None:
             f"outcome {outcome} was not recorded",
         )
 
+    overflow, effective, context = _fresh_selector()
+    with (
+        patch("opensocrates.selector.claude_cli.subprocess.Popen", FakeProcess),
+        patch(
+            "opensocrates.selector.claude_cli._communicate_bounded",
+            side_effect=_StdoutLimitExceeded,
+        ),
+    ):
+        require(
+            overflow.select(
+                effective,
+                context,
+                deadline_seconds=30,
+                reasoning_effort="medium",
+            )
+            is None,
+            "stdout overflow did not fail open",
+        )
+    require(
+        overflow.outcome_counts().get(SelectorOutcome.INVALID_OUTPUT) == 1,
+        "stdout overflow did not record the content-free invalid-output label",
+    )
+
     # Repeated failures accumulate rather than overwrite.
     repeated, effective, context = _fresh_selector()
-    with patch("opensocrates.selector.claude_cli.subprocess.Popen", TimeoutProcess):
+    with (
+        patch("opensocrates.selector.claude_cli.subprocess.Popen", TimeoutProcess),
+        patch(
+            "opensocrates.selector.claude_cli._communicate_bounded",
+            side_effect=_fake_communicate_bounded,
+        ),
+    ):
         for _ in range(3):
             repeated.select(effective, context, deadline_seconds=30, reasoning_effort="medium")
     require(
@@ -791,6 +847,63 @@ def test_real_process_reaping() -> None:
     done = subprocess.Popen(["/bin/sh", "-c", "exit 0"], stdout=subprocess.PIPE)
     done.wait()
     _terminate_process(done)
+
+
+@check("CLAUDE-07A-real-process-stdout-stream-limit")
+def test_real_process_stdout_stream_limit() -> None:
+    """Exceed the hard cap with a real child and prove prompt termination."""
+
+    ordinary = subprocess.Popen(
+        [sys.executable, "-c", 'import sys; sys.stdout.buffer.write(b"ok")'],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        start_new_session=os.name == "posix",
+    )
+    require(
+        _communicate_bounded(ordinary, b"", timeout=5) == b"ok",
+        "bounded communication rejected ordinary real-process output",
+    )
+    _close_pipes(ordinary)
+
+    sleeper = subprocess.Popen(
+        [sys.executable, "-c", "import time; time.sleep(30)"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        start_new_session=os.name == "posix",
+    )
+    try:
+        _communicate_bounded(sleeper, b"", timeout=1)
+    except _SelectorTimeout:
+        pass
+    else:
+        raise AssertionError("bounded communication lost the selector timeout")
+    require(sleeper.poll() is not None, "timed-out real child was not reaped")
+
+    script = (
+        "import sys,time; "
+        f'sys.stdout.buffer.write(b"x" * ({_MAX_CLI_RESPONSE_BYTES} + 65536)); '
+        "sys.stdout.buffer.flush(); time.sleep(30)"
+    )
+    process = subprocess.Popen(
+        [sys.executable, "-c", script],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        start_new_session=os.name == "posix",
+    )
+    started = time.monotonic()
+    try:
+        _communicate_bounded(process, b"", timeout=10)
+    except _StdoutLimitExceeded:
+        pass
+    else:
+        raise AssertionError("real subprocess output over the hard cap was accepted")
+    require(time.monotonic() - started < 5, "stdout overflow did not stop the child promptly")
+    require(process.poll() is not None, "stdout-overflow child was not reaped")
+    require(process.stdin is None or process.stdin.closed, "overflow stdin pipe was left open")
+    require(process.stdout is None or process.stdout.closed, "overflow stdout pipe was left open")
 
 
 class BlockingProcess(FakeProcess):

@@ -17,8 +17,9 @@ policy-configured MCP servers do not load.  Selection stays bounded regardless:
 ``SelectorApplication`` discards the model's instruction text and injects only
 authored catalog content.
 
-Raw prompt/catalog data travel over stdin and captured stdout is parsed in
-memory; neither stream is logged or persisted by OpenSocrates.
+Raw prompt/catalog data travel over stdin. Stdout is read incrementally into a
+bounded in-memory buffer before parsing; neither stream is logged or persisted
+by OpenSocrates.
 """
 
 from __future__ import annotations
@@ -30,6 +31,7 @@ import signal
 import subprocess
 import tempfile
 import threading
+import time
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -83,6 +85,7 @@ class SelectorOutcome:
 
 _MAX_SELECTION_CATALOG_BYTES = 512 * 1024
 _MAX_CLI_RESPONSE_BYTES = 512 * 1024
+_STDOUT_READ_CHUNK_BYTES = 64 * 1024
 _ENVIRONMENT_ALLOWLIST = frozenset(
     {
         "CLAUDE_CONFIG_DIR",
@@ -208,6 +211,96 @@ def _terminate_process(process: subprocess.Popen[bytes]) -> None:
         except (OSError, subprocess.SubprocessError):
             pass
         _close_pipes(process)
+
+
+class _StdoutLimitExceeded(Exception):
+    """Internal content-free signal for a selector response over the hard cap."""
+
+
+class _SelectorTimeout(Exception):
+    """Internal content-free signal for an expired selector deadline."""
+
+
+def _communicate_bounded(  # noqa: C901  # Explicit cross-platform pipe lifecycle.
+    process: subprocess.Popen[bytes], payload: bytes, *, timeout: int
+) -> bytes:
+    """Write stdin and read stdout concurrently without buffering past the cap."""
+
+    stdin = process.stdin
+    stdout = process.stdout
+    if stdin is None or stdout is None:
+        raise OSError("selector pipes are unavailable")
+
+    output = bytearray()
+    overflow = threading.Event()
+    reader_done = threading.Event()
+    writer_done = threading.Event()
+    reader_errors: list[BaseException] = []
+    writer_errors: list[BaseException] = []
+
+    def write_payload() -> None:
+        try:
+            stdin.write(payload)
+            stdin.flush()
+        except (BrokenPipeError, OSError, ValueError) as error:
+            writer_errors.append(error)
+        finally:
+            try:
+                stdin.close()
+            except (OSError, ValueError):
+                pass
+            writer_done.set()
+
+    def read_stdout() -> None:
+        try:
+            while True:
+                remaining = _MAX_CLI_RESPONSE_BYTES - len(output)
+                read_size = min(_STDOUT_READ_CHUNK_BYTES, remaining) if remaining else 1
+                chunk = stdout.read(read_size)
+                if not chunk:
+                    return
+                if not remaining:
+                    overflow.set()
+                    return
+                output.extend(chunk)
+        except (OSError, ValueError) as error:
+            reader_errors.append(error)
+        finally:
+            reader_done.set()
+
+    writer = threading.Thread(target=write_payload, name="opensocrates-selector-stdin", daemon=True)
+    reader = threading.Thread(target=read_stdout, name="opensocrates-selector-stdout", daemon=True)
+    writer.start()
+    reader.start()
+    deadline = time.monotonic() + timeout
+
+    try:
+        while not reader_done.wait(timeout=0.01):
+            if overflow.is_set():
+                raise _StdoutLimitExceeded
+            if time.monotonic() >= deadline:
+                raise _SelectorTimeout
+        if overflow.is_set():
+            raise _StdoutLimitExceeded
+        remaining_seconds = deadline - time.monotonic()
+        if remaining_seconds <= 0:
+            raise _SelectorTimeout
+        try:
+            process.wait(timeout=remaining_seconds)
+        except subprocess.TimeoutExpired as error:
+            raise _SelectorTimeout from error
+        remaining_seconds = deadline - time.monotonic()
+        if remaining_seconds <= 0 or not writer_done.wait(timeout=remaining_seconds):
+            raise _SelectorTimeout
+        if reader_errors or writer_errors:
+            raise OSError("selector pipe transfer failed")
+        return bytes(output)
+    except (_SelectorTimeout, _StdoutLimitExceeded, OSError):
+        _terminate_process(process)
+        raise
+    finally:
+        writer.join(timeout=_TERMINATE_GRACE_SECONDS)
+        reader.join(timeout=_TERMINATE_GRACE_SECONDS)
 
 
 class ClaudeCliReasoningSelector:
@@ -340,9 +433,15 @@ class ClaudeCliReasoningSelector:
                 return None
             try:
                 try:
-                    stdout, _stderr = process.communicate(payload, timeout=deadline_seconds)
-                except subprocess.TimeoutExpired:
-                    _terminate_process(process)
+                    stdout = _communicate_bounded(
+                        process,
+                        payload,
+                        timeout=deadline_seconds,
+                    )
+                except _StdoutLimitExceeded:
+                    self._record(SelectorOutcome.INVALID_OUTPUT)
+                    return None
+                except _SelectorTimeout:
                     self._record(SelectorOutcome.TIMEOUT)
                     return None
                 if process.returncode != 0:

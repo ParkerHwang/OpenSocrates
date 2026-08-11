@@ -18,6 +18,10 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Fixed
 
+- The Claude selector now enforces its 512 KiB stdout ceiling while reading the
+  child process stream. Output that crosses the limit terminates and reaps the
+  process immediately, fails open with a content-free diagnostic, and is never
+  retained or logged ([#10](https://github.com/ParkerHwang/OpenSocrates/issues/10)).
 - An ordinary Claude payload no longer reports an unknown field. `effort` was
   present in the captured `PostToolUse` and `Stop` receipts, while
   `background_tasks` and `session_crons` were present in the captured `Stop`
