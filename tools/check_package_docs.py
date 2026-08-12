@@ -132,6 +132,32 @@ CURSOR_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
     ),
 )
 
+ANTIGRAVITY_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (
+        "antigravity_readme_explicit_tier_missing",
+        (
+            "experimental, explicit-skill Antigravity boundary",
+            "Automatic per-prompt selection: **not included**",
+            "Native hook delivery: **not claimed**",
+        ),
+    ),
+    (
+        "antigravity_readme_quota_boundary_missing",
+        (
+            "Additional model calls: **none**",
+            "does not consume a separate Google AI Pro request",
+        ),
+    ),
+    (
+        "antigravity_readme_file_drop_contract_missing",
+        (
+            "`~/.gemini/config/plugins/<plugin-name>/`",
+            "required plugin marker",
+            "refuses to replace a directory without its exact ownership marker",
+        ),
+    ),
+)
+
 # Wording that would restore an overstated claim.
 FORBIDDEN: tuple[tuple[str, str], ...] = (
     (
@@ -260,7 +286,7 @@ def _semantic_overclaim_errors(text: str) -> list[str]:
 
 
 def _package_readmes(root: Path) -> Iterator[tuple[str, str, Path]]:
-    for host in ("claude", "codex", "cursor"):
+    for host in ("antigravity", "claude", "codex", "cursor"):
         candidates = (
             ("generated", root / "build" / "generated" / "plugins" / host / README),
             ("distributable", root / "dist" / host / README),
@@ -274,6 +300,7 @@ def _readme_errors(path: Path, host: str = "claude") -> list[str]:
     raw_text = path.read_text(encoding="utf-8")
     text = _normalize(raw_text)
     requirements = {
+        "antigravity": ANTIGRAVITY_REQUIRED,
         "claude": CLAUDE_REQUIRED,
         "codex": CODEX_REQUIRED,
         "cursor": CURSOR_REQUIRED,
@@ -290,7 +317,7 @@ def _readme_errors(path: Path, host: str = "claude") -> list[str]:
 def check_root(root: Path) -> dict[str, Any]:
     readmes = list(_package_readmes(root))
     present_hosts = {host for host, _label, _path in readmes}
-    missing_hosts = sorted({"claude", "codex", "cursor"} - present_hosts)
+    missing_hosts = sorted({"antigravity", "claude", "codex", "cursor"} - present_hosts)
     if not readmes:
         return {
             "status": "fail",

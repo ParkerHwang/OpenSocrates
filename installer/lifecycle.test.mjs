@@ -46,11 +46,11 @@ function sha256(bytes) {
 function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, manifestVersion = null } = {}) {
   const tree = join(root, `pkg-${host}`);
   const manifestPath =
-    host === "cursor"
+    ["antigravity", "cursor"].includes(host)
       ? "plugin.json"
       : `${host === "claude" ? ".claude-plugin" : ".codex-plugin"}/plugin.json`;
   mkdirSync(dirname(join(tree, manifestPath)), { recursive: true });
-  if (host !== "cursor") {
+  if (!["antigravity", "cursor"].includes(host)) {
     mkdirSync(join(tree, "runtime", "darwin-arm64", "opensocrates-runtime"), { recursive: true });
   }
   mkdirSync(join(tree, "skills", "opensocrates"), { recursive: true });
@@ -78,7 +78,7 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
     null,
     2,
   );
-  if (host !== "cursor") {
+  if (!["antigravity", "cursor"].includes(host)) {
     files["runtime/darwin-arm64/opensocrates-runtime/opensocrates-runtime"] =
       "#!/bin/sh\nexit 0\n";
   }
@@ -87,7 +87,7 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
   for (const [name, body] of Object.entries(files)) {
     writeFileSync(join(tree, ...name.split("/")), body);
   }
-  if (host !== "cursor") {
+  if (!["antigravity", "cursor"].includes(host)) {
     chmodSync(
       join(tree, "runtime", "darwin-arm64", "opensocrates-runtime", "opensocrates-runtime"),
       0o755,
@@ -287,7 +287,10 @@ function makeSandbox(host, options = {}) {
   mkdirSync(home, { recursive: true });
   const { binary, statePath } = writeFakeHost(root, host, options);
   const saved = { ...process.env };
-  if (host === "cursor") {
+  if (host === "antigravity") {
+    process.env.AGY_BIN = binary;
+    process.env.ANTIGRAVITY_CONFIG_DIR = home;
+  } else if (host === "cursor") {
     process.env.CURSOR_BIN = binary;
     process.env.CURSOR_CONFIG_DIR = home;
   } else if (host === "claude") {
@@ -301,7 +304,11 @@ function makeSandbox(host, options = {}) {
   process.env.OPENSOCRATES_LAUNCH_AGENTS_DIR = join(root, "LaunchAgents");
   process.env.OPENSOCRATES_SKIP_LAUNCHCTL = "1";
   const managedParent =
-    host === "cursor" ? join(home, "plugins", "local") : join(home, "managed-marketplaces");
+    host === "antigravity"
+      ? join(home, "plugins")
+      : host === "cursor"
+        ? join(home, "plugins", "local")
+        : join(home, "managed-marketplaces");
   const managedRoot = join(managedParent, MARKETPLACE);
   return {
     root,
@@ -315,6 +322,8 @@ function makeSandbox(host, options = {}) {
         : [],
     cleanup: () => {
       for (const key of [
+        "AGY_BIN",
+        "ANTIGRAVITY_CONFIG_DIR",
         "CLAUDE_BIN",
         "CLAUDE_CONFIG_DIR",
         "CODEX_BIN",
@@ -343,7 +352,14 @@ function replaceSandboxHost(box, host, name, options = {}) {
     ),
   );
   chmodSync(replacement.binary, 0o755);
-  const binaryKey = host === "claude" ? "CLAUDE_BIN" : host === "cursor" ? "CURSOR_BIN" : "CODEX_BIN";
+  const binaryKey =
+    host === "antigravity"
+      ? "AGY_BIN"
+      : host === "claude"
+        ? "CLAUDE_BIN"
+        : host === "cursor"
+          ? "CURSOR_BIN"
+          : "CODEX_BIN";
   process.env[binaryKey] = replacement.binary;
   return replacement;
 }
@@ -365,7 +381,10 @@ function makeAllSandbox(options = {}) {
   process.env.CLAUDE_CONFIG_DIR = homes.claude;
   process.env.CODEX_BIN = hosts.codex.binary;
   process.env.CODEX_HOME = homes.codex;
+  // Keep all-host tests hermetic: real developer installations must not add
+  // content-only hosts to this two-host fixture.
   process.env.CURSOR_BIN = join(root, "unavailable-cursor");
+  process.env.AGY_BIN = join(root, "unavailable-agy");
   process.env.OPENSOCRATES_STATE_DIR = join(root, "state");
   process.env.OPENSOCRATES_LAUNCH_AGENTS_DIR = join(root, "LaunchAgents");
   process.env.OPENSOCRATES_SKIP_LAUNCHCTL = "1";
@@ -394,11 +413,14 @@ function makeAllSandbox(options = {}) {
     },
     cleanup: () => {
       for (const key of [
+        "AGY_BIN",
+        "ANTIGRAVITY_CONFIG_DIR",
         "CLAUDE_BIN",
         "CLAUDE_CONFIG_DIR",
         "CODEX_BIN",
         "CODEX_HOME",
         "CURSOR_BIN",
+        "CURSOR_CONFIG_DIR",
         "OPENSOCRATES_STATE_DIR",
         "OPENSOCRATES_LAUNCH_AGENTS_DIR",
         "OPENSOCRATES_SKIP_LAUNCHCTL",
@@ -586,44 +608,46 @@ for (const host of ["claude", "codex"]) {
   });
 }
 
-test("cursor: content-only Agent Plugin install -> status -> update -> verify -> remove", async () => {
-  const box = makeSandbox("cursor");
-  try {
-    const pkg = buildPackage(box.root, "cursor");
-    const args = ["--host", "cursor", "--asset", pkg.asset, "--checksum", pkg.checksum];
+for (const host of ["antigravity", "cursor"]) {
+  test(`${host}: content-only plugin install -> status -> update -> verify -> remove`, async () => {
+    const box = makeSandbox(host);
+    try {
+      const pkg = buildPackage(box.root, host);
+      const args = ["--host", host, "--asset", pkg.asset, "--checksum", pkg.checksum];
 
-    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
-    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
-    assert.match(install.output, /installed successfully for cursor/);
-    assert.match(install.output, /Developer: Reload Window/);
-    assert.doesNotMatch(install.output, /approval required/i);
-    assert.ok(existsSync(join(box.managedRoot, "plugin.json")), "plugin manifest missing");
-    assert.ok(
-      existsSync(join(box.managedRoot, ".opensocrates-managed.json")),
-      "ownership marker missing",
-    );
-    assert.equal(existsSync(join(box.managedRoot, "runtime")), false, "runtime was installed");
-    assert.equal(existsSync(join(box.managedRoot, "hooks")), false, "hooks were installed");
+      const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+      assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+      assert.match(install.output, new RegExp(`installed successfully for ${host}`));
+      if (host === "cursor") assert.match(install.output, /Developer: Reload Window/);
+      assert.doesNotMatch(install.output, /approval required/i);
+      assert.ok(existsSync(join(box.managedRoot, "plugin.json")), "plugin manifest missing");
+      assert.ok(
+        existsSync(join(box.managedRoot, ".opensocrates-managed.json")),
+        "ownership marker missing",
+      );
+      assert.equal(existsSync(join(box.managedRoot, "runtime")), false, "runtime was installed");
+      assert.equal(existsSync(join(box.managedRoot, "hooks")), false, "hooks were installed");
 
-    const status = await quiet(() => main(["status", "--host", "cursor"]));
-    assert.equal(status.error, undefined, `status failed: ${status.error?.message}`);
-    assert.match(status.output, new RegExp(`OpenSocrates ${PRODUCT_VERSION} is installed`));
-    assert.match(status.output, /experimental and explicit-skill first/);
+      const status = await quiet(() => main(["status", "--host", host]));
+      assert.equal(status.error, undefined, `status failed: ${status.error?.message}`);
+      assert.match(status.output, new RegExp(`OpenSocrates ${PRODUCT_VERSION} is installed`));
+      assert.match(status.output, /experimental and explicit-skill/);
 
-    const update = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
-    assert.equal(update.error, undefined, `update failed: ${update.error?.message}`);
-    assert.deepEqual(box.backups(), [], "update left a backup directory behind");
+      const update = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
+      assert.equal(update.error, undefined, `update failed: ${update.error?.message}`);
+      assert.deepEqual(box.backups(), [], "update left a backup directory behind");
 
-    const verify = await quiet(() => main(["verify", ...args]));
-    assert.equal(verify.error, undefined, `verify failed: ${verify.error?.message}`);
+      const verify = await quiet(() => main(["verify", ...args]));
+      assert.equal(verify.error, undefined, `verify failed: ${verify.error?.message}`);
 
-    const remove = await quiet(() => main(["remove", "--host", "cursor"]));
-    assert.equal(remove.error, undefined, `remove failed: ${remove.error?.message}`);
-    assert.equal(existsSync(box.managedRoot), false, "managed root survived remove");
-  } finally {
-    box.cleanup();
-  }
-});
+      const remove = await quiet(() => main(["remove", "--host", host]));
+      assert.equal(remove.error, undefined, `remove failed: ${remove.error?.message}`);
+      assert.equal(existsSync(box.managedRoot), false, "managed root survived remove");
+    } finally {
+      box.cleanup();
+    }
+  });
+}
 
 test("claude: supported list wrappers preserve the complete lifecycle", async () => {
   const box = makeSandbox("claude", {

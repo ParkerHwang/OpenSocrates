@@ -25,6 +25,7 @@ typecheck:
 generate:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host antigravity --output "$(ROOT)/build/generated/plugins/antigravity" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host cursor --output "$(ROOT)/build/generated/plugins/cursor" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host claude --runtime-root "$(ROOT)/dist/runtime/claude" --output "$(ROOT)/build/generated/plugins/claude" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host codex --runtime-root "$(ROOT)/dist/runtime/codex" --output "$(ROOT)/build/generated/plugins/codex" >/dev/null
@@ -54,6 +55,7 @@ docs-check:
 		--path docs/claude-desktop-live-probe.md \
 		--path docs/claude-cowork-live-probe.md \
 		--path docs/claude-chat-upload-probe.md \
+		--path docs/antigravity-support.md \
 		--path docs/cursor-support.md \
 		--path .github/release-notes \
 		--report build/evidence/links.json
@@ -71,6 +73,7 @@ smoke:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/smoke_product.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_selector.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_claude.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_antigravity.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_cursor.py
 
 installer-check:

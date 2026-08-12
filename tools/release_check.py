@@ -29,8 +29,9 @@ from pathlib import Path
 from typing import Any
 
 SCHEMA = "opensocrates.release-check-evidence/1.0.0"
-HOSTS = ("claude", "codex", "cursor")
+HOSTS = ("antigravity", "claude", "codex", "cursor")
 RUNTIME_HOSTS = ("claude", "codex")
+CONTENT_ONLY_HOSTS = frozenset({"antigravity", "cursor"})
 EXPECTED_SCHEMA_COUNT = 32
 EXPECTED_METHOD_COUNT = 48
 LEGACY_CONTENT_BUNDLE = "content/compiled-content.bundle.json"
@@ -1002,8 +1003,8 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
         "hosts": {
             host: {
                 "package_tree": host,
-                "release_targets": [] if host == "cursor" else [RELEASE_TARGET],
-                "launchers": [] if host == "cursor" else RELEASE_LAUNCHERS,
+                "release_targets": [] if host in CONTENT_ONLY_HOSTS else [RELEASE_TARGET],
+                "launchers": [] if host in CONTENT_ONLY_HOSTS else RELEASE_LAUNCHERS,
                 "package_file_count": len(_snapshot(dist / host)),
                 "package_checksum_file": package_checksums[host].relative_to(dist).as_posix(),
                 "archive": archives[host].relative_to(dist).as_posix(),
@@ -1077,8 +1078,8 @@ def _verify_release_manifest(root: Path, host: str, bundle: Mapping[str, Any]) -
         }
     if metadata.get("product_version") != bundle.get("product_version"):
         errors.add("manifest_version_mismatch")
-    expected_targets = [] if host == "cursor" else [RELEASE_TARGET]
-    expected_launchers = [] if host == "cursor" else RELEASE_LAUNCHERS
+    expected_targets = [] if host in CONTENT_ONLY_HOSTS else [RELEASE_TARGET]
+    expected_launchers = [] if host in CONTENT_ONLY_HOSTS else RELEASE_LAUNCHERS
     if metadata.get("release_targets") != expected_targets:
         errors.add("manifest_release_targets_invalid")
     if metadata.get("launchers") != expected_launchers:
@@ -1133,7 +1134,7 @@ def _verify_third_party_notice(package: Path, host: str) -> set[str]:
     except (OSError, UnicodeError):
         return {"third_party_notice_unreadable"}
     errors: set[str] = set()
-    if host == "cursor":
+    if host in CONTENT_ONLY_HOSTS:
         required = frozenset({"content-only", "no bundled", "runtime", "license"})
     else:
         required = (
@@ -1238,10 +1239,10 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
                 errors.add("codex_control_boundary_notice_missing")
                 break
     schema_count = len(list((generated / "schemas" / "v1").glob("*.json")))
-    if schema_count != (0 if host == "cursor" else EXPECTED_SCHEMA_COUNT):
+    if schema_count != (0 if host in CONTENT_ONLY_HOSTS else EXPECTED_SCHEMA_COUNT):
         errors.add("package_schema_count_invalid")
     required_files = ["LICENSE", THIRD_PARTY_NOTICE]
-    if host != "cursor":
+    if host not in CONTENT_ONLY_HOSTS:
         required_files.append("bin/launch.sh")
     for required in required_files:
         if not (generated / required).is_file():
@@ -1318,7 +1319,7 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
             errors.add("claude_archive_uncompressed_limit_exceeded")
     runtime_targets = _load_json(generated / "release-manifest.json")
     listed_targets = runtime_targets.get("runtime_targets", []) if runtime_targets else []
-    expected_runtime_targets = [] if host == "cursor" else [RELEASE_TARGET]
+    expected_runtime_targets = [] if host in CONTENT_ONLY_HOSTS else [RELEASE_TARGET]
     if target != RELEASE_TARGET or listed_targets != expected_runtime_targets:
         errors.add("runtime_target_boundary_invalid")
     if host == "cursor":
@@ -1329,6 +1330,12 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
             "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
         ):
             errors.add("cursor_agent_plugin_manifest_missing")
+    if host == "antigravity":
+        if any((generated / name).exists() for name in ("bin", "hooks", "runtime")):
+            errors.add("antigravity_content_only_boundary_invalid")
+        plugin_manifest = _load_json(generated / "plugin.json")
+        if plugin_manifest is None:
+            errors.add("antigravity_plugin_manifest_missing")
     return {
         "status": "fail" if errors else "pass",
         "method_count": len(existing_method_outputs),

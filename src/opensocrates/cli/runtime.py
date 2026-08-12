@@ -334,12 +334,16 @@ class RuntimeServices:
 
 def _profiles() -> dict[str, CapabilityProfile]:
     from ..domain.enums import HostId
+    from ..hosts.antigravity.capability import (
+        default_capability_profile as antigravity_profile,
+    )
     from ..hosts.claude.capability import default_capability_profile as claude_profile
     from ..hosts.codex.capability import default_capability_profile as codex_profile
     from ..hosts.cursor.capability import default_capability_profile as cursor_profile
     from ..hosts.prompt_only.capability import default_capability_profile as prompt_profile
 
     return {
+        "antigravity": antigravity_profile(),
         "claude": claude_profile(HostId.CLAUDE_CODE),
         "codex": codex_profile(HostId.CODEX_CLI),
         "cursor": cursor_profile(),
@@ -551,7 +555,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
             dispatcher = None
 
     adapters: dict[str, Any] = {}
-    for name in ("claude", "codex", "cursor", "prompt_only"):
+    for name in ("antigravity", "claude", "codex", "cursor", "prompt_only"):
         try:
             adapters[name] = build_adapter(
                 name,
