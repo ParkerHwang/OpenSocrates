@@ -33,7 +33,7 @@ def _parser() -> argparse.ArgumentParser:
     apply.add_argument("--host", choices=("claude", "codex"), required=True)
 
     diagnose = sub.add_parser("diagnose", help="show safe runtime aggregates")
-    diagnose.add_argument("--host", choices=("claude", "codex", "prompt_only"))
+    diagnose.add_argument("--host", choices=("claude", "codex", "cursor", "prompt_only"))
     output = diagnose.add_mutually_exclusive_group()
     output.add_argument("--json", action="store_const", const="json", dest="output")
     output.add_argument("--markdown", action="store_const", const="markdown", dest="output")
@@ -72,7 +72,9 @@ def _parser() -> argparse.ArgumentParser:
     capabilities_sub = capabilities.add_subparsers(dest="capabilities_command", required=True)
     for name in ("probe", "show"):
         command = capabilities_sub.add_parser(name)
-        command.add_argument("--host", choices=("claude", "codex", "prompt_only"), required=True)
+        command.add_argument(
+            "--host", choices=("claude", "codex", "cursor", "prompt_only"), required=True
+        )
 
     metrics = sub.add_parser("metrics", help="show or export local aggregate metrics")
     metrics_sub = metrics.add_subparsers(dest="metrics_command", required=True)

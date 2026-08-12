@@ -8,9 +8,10 @@ from typing import Any
 from .base import HostAdapter
 from .claude.adapter import ClaudeAdapter, ClaudeAdapterConfig
 from .codex.adapter import CodexAdapter, CodexAdapterConfig
+from .cursor.adapter import CursorAdapter
 from .prompt_only.adapter import PromptOnlyAdapter
 
-HOST_NAMES = ("claude", "codex", "prompt_only")
+HOST_NAMES = ("claude", "codex", "cursor", "prompt_only")
 
 
 class HostRegistryError(ValueError):
@@ -90,7 +91,8 @@ def build_adapter(
             bundle = loader()
         except Exception:
             bundle = None
-    return PromptOnlyAdapter(
+    adapter_type = CursorAdapter if selected == "cursor" else PromptOnlyAdapter
+    return adapter_type(
         bundle_path=bundle_path, bundle=bundle, profile=capability_profile, locale=locale
     )
 

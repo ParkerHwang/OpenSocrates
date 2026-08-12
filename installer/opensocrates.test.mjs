@@ -33,10 +33,24 @@ test("parses the expected release checksum", () => {
 test("derives host-specific release assets", () => {
   assert.match(assetNameFor("codex"), /-codex-plugin\.zip$/u);
   assert.match(assetNameFor("claude"), /-claude-plugin\.zip$/u);
+  assert.match(assetNameFor("cursor"), /-cursor-plugin\.zip$/u);
   assert.throws(() => assetNameFor("unknown"), (error) => error instanceof InstallerError);
 });
 
 test("accepts only the exact ownership marker", () => {
+  assert.equal(
+    markerMatches(
+      {
+        schemaVersion: 1,
+        marketplaceName: "opensocrates",
+        pluginName: "opensocrates",
+        host: "cursor",
+        registrationKind: "file-drop",
+      },
+      "cursor",
+    ),
+    true,
+  );
   assert.equal(
     markerMatches({
       schemaVersion: 1,
@@ -77,6 +91,7 @@ test("parses lifecycle actions and paired local asset options", () => {
   const status = parseCli(["status", "--host", "claude"]);
   assert.equal(status.action, "status");
   assert.equal(status.host, "claude");
+  assert.equal(parseCli(["status", "--host", "cursor"]).host, "cursor");
   const parsed = parseCli(["verify", "--asset", "bundle.zip", "--checksum", "bundle.sha256"]);
   assert.equal(parsed.action, "verify");
   assert.equal(parsed.host, "codex");

@@ -29,7 +29,8 @@ from pathlib import Path
 from typing import Any
 
 SCHEMA = "opensocrates.release-check-evidence/1.0.0"
-HOSTS = ("claude", "codex")
+HOSTS = ("claude", "codex", "cursor")
+RUNTIME_HOSTS = ("claude", "codex")
 EXPECTED_SCHEMA_COUNT = 32
 EXPECTED_METHOD_COUNT = 48
 LEGACY_CONTENT_BUNDLE = "content/compiled-content.bundle.json"
@@ -692,7 +693,7 @@ def _discover_build_python() -> str | None:  # noqa: C901  # Branch-explicit con
 def _runtime_build(  # noqa: C901  # Explicit host release build validation.
     root: Path, host: str
 ) -> tuple[dict[str, Any], str]:
-    if host not in HOSTS:
+    if host not in RUNTIME_HOSTS:
         raise ReleaseCheckError("runtime_host_invalid")
     build_python = _discover_build_python()
     if build_python is None:
@@ -894,7 +895,7 @@ def _write_root_checksums(directory: Path, version: str) -> Path:
     return destination
 
 
-def _assemble(  # noqa: C901  # Explicit two-host release assembly.
+def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
     root: Path,
 ) -> dict[str, Any]:
     version = _read_version(root)
@@ -913,7 +914,7 @@ def _assemble(  # noqa: C901  # Explicit two-host release assembly.
         raise ReleaseCheckError("reasoning_content_bundle_shape_invalid")
     runtime_reports: dict[str, dict[str, Any]] = {}
     targets: set[str] = set()
-    for host in HOSTS:
+    for host in RUNTIME_HOSTS:
         runtime_report, runtime_target = _runtime_build(root, host)
         runtime_reports[host] = runtime_report
         targets.add(runtime_target)
@@ -932,7 +933,7 @@ def _assemble(  # noqa: C901  # Explicit two-host release assembly.
         archives[host] = archive
     claude_chat_archive = dist / f"opensocrates-{version}-claude-chat-skills.zip"
     _write_deterministic_zip(claude_chat_package, claude_chat_archive)
-    runtime_artifacts = {host: str(runtime_reports[host]["artifact"]) for host in HOSTS}
+    runtime_artifacts = {host: str(runtime_reports[host]["artifact"]) for host in RUNTIME_HOSTS}
     sbom_arguments = [
         str(root / "tools" / "build_sbom.py"),
         "--root",
@@ -946,7 +947,7 @@ def _assemble(  # noqa: C901  # Explicit two-host release assembly.
         "--artifact",
         REASONING_CONTENT_BUNDLE,
     ]
-    for host in HOSTS:
+    for host in RUNTIME_HOSTS:
         sbom_arguments.extend(["--artifact", runtime_artifacts[host]])
     for host in HOSTS:
         sbom_arguments.extend(["--artifact", _relative(root, archives[host])])
@@ -996,13 +997,13 @@ def _assemble(  # noqa: C901  # Explicit two-host release assembly.
                 "dependencies": runtime_reports[host]["runtime_dependencies"],
                 "dependency_inventory": runtime_reports[host].get("runtime_dependency_inventory"),
             }
-            for host in HOSTS
+            for host in RUNTIME_HOSTS
         },
         "hosts": {
             host: {
                 "package_tree": host,
-                "release_targets": [RELEASE_TARGET],
-                "launchers": RELEASE_LAUNCHERS,
+                "release_targets": [] if host == "cursor" else [RELEASE_TARGET],
+                "launchers": [] if host == "cursor" else RELEASE_LAUNCHERS,
                 "package_file_count": len(_snapshot(dist / host)),
                 "package_checksum_file": package_checksums[host].relative_to(dist).as_posix(),
                 "archive": archives[host].relative_to(dist).as_posix(),
@@ -1076,9 +1077,11 @@ def _verify_release_manifest(root: Path, host: str, bundle: Mapping[str, Any]) -
         }
     if metadata.get("product_version") != bundle.get("product_version"):
         errors.add("manifest_version_mismatch")
-    if metadata.get("release_targets") != [RELEASE_TARGET]:
+    expected_targets = [] if host == "cursor" else [RELEASE_TARGET]
+    expected_launchers = [] if host == "cursor" else RELEASE_LAUNCHERS
+    if metadata.get("release_targets") != expected_targets:
         errors.add("manifest_release_targets_invalid")
-    if metadata.get("launchers") != RELEASE_LAUNCHERS:
+    if metadata.get("launchers") != expected_launchers:
         errors.add("manifest_launchers_invalid")
     for field in ("source_tree_hash", "normalized_semantic_hash"):
         if metadata.get(field) != bundle.get(field):
@@ -1130,11 +1133,14 @@ def _verify_third_party_notice(package: Path, host: str) -> set[str]:
     except (OSError, UnicodeError):
         return {"third_party_notice_unreadable"}
     errors: set[str] = set()
-    required = (
-        CLAUDE_RUNTIME_NOTICE_REQUIRED_TOKENS
-        if host == "claude"
-        else RUNTIME_NOTICE_REQUIRED_TOKENS
-    )
+    if host == "cursor":
+        required = frozenset({"content-only", "no bundled", "runtime", "license"})
+    else:
+        required = (
+            CLAUDE_RUNTIME_NOTICE_REQUIRED_TOKENS
+            if host == "claude"
+            else RUNTIME_NOTICE_REQUIRED_TOKENS
+        )
     if not all(token in text for token in required):
         errors.add("third_party_notice_runtime_disclosure_invalid")
     if host == "claude" and any(
@@ -1231,13 +1237,13 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
             if host_only_notice not in contents:
                 errors.add("codex_control_boundary_notice_missing")
                 break
-    if len(list((generated / "schemas" / "v1").glob("*.json"))) != EXPECTED_SCHEMA_COUNT:
+    schema_count = len(list((generated / "schemas" / "v1").glob("*.json")))
+    if schema_count != (0 if host == "cursor" else EXPECTED_SCHEMA_COUNT):
         errors.add("package_schema_count_invalid")
-    for required in (
-        "LICENSE",
-        THIRD_PARTY_NOTICE,
-        "bin/launch.sh",
-    ):
+    required_files = ["LICENSE", THIRD_PARTY_NOTICE]
+    if host != "cursor":
+        required_files.append("bin/launch.sh")
+    for required in required_files:
         if not (generated / required).is_file():
             errors.add("package_license_notice_or_launcher_missing")
     if (generated / "bin" / "launch.ps1").exists() or (
@@ -1312,15 +1318,24 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
             errors.add("claude_archive_uncompressed_limit_exceeded")
     runtime_targets = _load_json(generated / "release-manifest.json")
     listed_targets = runtime_targets.get("runtime_targets", []) if runtime_targets else []
-    if target != RELEASE_TARGET or listed_targets != [RELEASE_TARGET]:
+    expected_runtime_targets = [] if host == "cursor" else [RELEASE_TARGET]
+    if target != RELEASE_TARGET or listed_targets != expected_runtime_targets:
         errors.add("runtime_target_boundary_invalid")
+    if host == "cursor":
+        if any((generated / name).exists() for name in ("bin", "hooks", "runtime", "mcp.json")):
+            errors.add("cursor_content_only_boundary_invalid")
+        plugin_manifest = _load_json(generated / "plugin.json")
+        if plugin_manifest is None or plugin_manifest.get("$schema") != (
+            "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
+        ):
+            errors.add("cursor_agent_plugin_manifest_missing")
     return {
         "status": "fail" if errors else "pass",
         "method_count": len(existing_method_outputs),
         "shared_skill_count": len(top_level_shared_skills),
         "public_skill_count": len(actual_public_skills),
         "command_count": len(command_outputs),
-        "schema_count": len(list((generated / "schemas" / "v1").glob("*.json"))),
+        "schema_count": schema_count,
         "embedded_bundle_count": len(embedded),
         "generated_file_count": len(_snapshot(generated)),
         "package_file_count": len(_snapshot(dist_package)),
@@ -1474,7 +1489,7 @@ def _evidence_check(  # noqa: C901  # Explicit release evidence matrix.
     spdx = _load_json(root / "build" / "evidence" / "sbom.spdx.json")
     runtimes = {
         host: _load_json(root / "build" / "evidence" / f"runtime-build-{host}.json")
-        for host in HOSTS
+        for host in RUNTIME_HOSTS
     }
     if security is None:
         unavailable.add("security_evidence_missing")
@@ -1597,12 +1612,12 @@ def _full_check(
         "content": _content_validator(root, bundle_bytes, reasoning_content_bytes),
         "deterministic_generation": _determinism_check(root),
     }
-    runtime_reports: dict[str, Mapping[str, Any] | None] = {host: None for host in HOSTS}
+    runtime_reports: dict[str, Mapping[str, Any] | None] = {host: None for host in RUNTIME_HOSTS}
     if assembly_result is not None:
         checks["package_assembly"] = dict(assembly_result)
         runtime_reports = {
             host: _load_json(root / "build" / "evidence" / f"runtime-build-{host}.json")
-            for host in HOSTS
+            for host in RUNTIME_HOSTS
         }
     else:
         try:
@@ -1610,7 +1625,7 @@ def _full_check(
             checks["package_assembly"] = assembly
             runtime_reports = {
                 host: _load_json(root / "build" / "evidence" / f"runtime-build-{host}.json")
-                for host in HOSTS
+                for host in RUNTIME_HOSTS
             }
         except AssemblyUnavailable as exc:
             checks["package_assembly"] = {
@@ -1635,7 +1650,7 @@ def _full_check(
         }
     )
     runtime_versions = {
-        host: _runtime_version_smoke(root, runtime_reports[host], version) for host in HOSTS
+        host: _runtime_version_smoke(root, runtime_reports[host], version) for host in RUNTIME_HOSTS
     }
     checks["runtime_version"] = {
         "status": (

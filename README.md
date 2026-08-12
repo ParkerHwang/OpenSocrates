@@ -38,6 +38,7 @@ and runtimes are not shipped or supported in this release.
 
 | Host surface | Automatic selection | User-facing entry | Validation status |
 | --- | --- | --- | --- |
+| Cursor IDE and CLI | Cursor may discover the skill; no separate OpenSocrates selector call | `/opensocrates` | [Experimental content-only Agent Plugin; official package contract checked, no live Cursor receipt](docs/cursor-support.md) |
 | Codex CLI and Desktop | Yes, after one-time in-app hook approval | OpenSocrates plugin | Package and launcher release-validated on `darwin-arm64`; no live Codex hook-delivery receipt |
 | Claude Code CLI | Yes, through `UserPromptSubmit` | `/opensocrates` | Locally validated on `darwin-arm64` |
 | Claude Code desktop app | Yes, where Claude Code plugins run | `/opensocrates` | [Authenticated hook lifecycle locally validated](docs/claude-desktop-live-probe.md) |
@@ -75,6 +76,7 @@ rather than repository sync.
 
 Before installing, sign in to the host and make sure its command is available:
 
+- Cursor: Cursor `2.5.0` or later; support is explicit-skill first;
 - Claude: Claude Code `2.1.205` or later and the `claude` command;
 - Codex: an OAuth-authenticated `codex` command.
 
@@ -116,8 +118,13 @@ Codex remains the default host for backward compatibility:
 npx --yes opensocrates@1.1.5 install
 # Equivalent: npx --yes opensocrates@1.1.5 install --host codex
 npx --yes opensocrates@1.1.5 install --host claude
+npx --yes opensocrates@1.2.0 install --host cursor
 ```
 
+Cursor installs a content-only Agent Plugin at
+`~/.cursor/plugins/local/opensocrates`. It includes one skill and no hook,
+launcher, native runtime, background service, telemetry, or separate selector
+model call. See the [Cursor support boundary](docs/cursor-support.md).
 Existing `--host codex` and `--host claude` lifecycle commands remain
 supported. A host-specific update can intentionally create drift; a later
 `update --host all` or successful automatic reconciliation brings every host
@@ -177,6 +184,7 @@ The same host option works without the npm registry:
 npx --yes github:ParkerHwang/OpenSocrates#v1.1.5 install --host all
 npx --yes github:ParkerHwang/OpenSocrates#v1.1.5 install --host claude
 npx --yes github:ParkerHwang/OpenSocrates#v1.1.5 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.2.0 install --host cursor
 ```
 
 ### Manual release verification
@@ -192,7 +200,7 @@ node opensocrates.mjs install --host claude \
   --checksum opensocrates-1.1.5-claude-plugin.zip.sha256
 ```
 
-Replace `claude` with `codex` for the Codex package.
+Replace `claude` with `codex` or `cursor` for the matching package.
 
 ### Migrating a pre-1.0 Claude plugin
 
@@ -391,6 +399,7 @@ make release-check
 | `content/` | Policies, localized messages, methods, theory, and examples |
 | `plugin-src/claude/` | Claude plugin templates |
 | `plugin-src/codex/` | Codex plugin templates |
+| `plugin-src/cursor/` | Experimental Cursor Agent Plugin templates |
 | `schemas/source/` | Canonical schema definitions |
 | `schemas/v1/` | Generated, versioned public schemas |
 | `installer/` | Dependency-free Node.js GitHub/npx installer |
