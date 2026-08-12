@@ -108,6 +108,30 @@ CODEX_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
     ),
 )
 
+CURSOR_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (
+        "cursor_readme_explicit_skill_boundary_missing",
+        (
+            "Manual `/opensocrates` invocation",
+            "a live Cursor receipt is pending",
+        ),
+    ),
+    (
+        "cursor_readme_no_selector_cost_missing",
+        (
+            "no separate OpenSocrates selector model call is added",
+            "automatic per-prompt hook selection: not included",
+        ),
+    ),
+    (
+        "cursor_readme_content_only_boundary_missing",
+        (
+            "There is no launcher, native runtime, executable, hook, MCP server",
+            "background service",
+        ),
+    ),
+)
+
 # Wording that would restore an overstated claim.
 FORBIDDEN: tuple[tuple[str, str], ...] = (
     (
@@ -236,7 +260,7 @@ def _semantic_overclaim_errors(text: str) -> list[str]:
 
 
 def _package_readmes(root: Path) -> Iterator[tuple[str, str, Path]]:
-    for host in ("claude", "codex"):
+    for host in ("claude", "codex", "cursor"):
         candidates = (
             ("generated", root / "build" / "generated" / "plugins" / host / README),
             ("distributable", root / "dist" / host / README),
@@ -249,7 +273,11 @@ def _package_readmes(root: Path) -> Iterator[tuple[str, str, Path]]:
 def _readme_errors(path: Path, host: str = "claude") -> list[str]:
     raw_text = path.read_text(encoding="utf-8")
     text = _normalize(raw_text)
-    requirements = CLAUDE_REQUIRED if host == "claude" else CODEX_REQUIRED
+    requirements = {
+        "claude": CLAUDE_REQUIRED,
+        "codex": CODEX_REQUIRED,
+        "cursor": CURSOR_REQUIRED,
+    }[host]
     errors = [
         code for code, phrases in requirements if any(_normalize(p) not in text for p in phrases)
     ]
@@ -262,7 +290,7 @@ def _readme_errors(path: Path, host: str = "claude") -> list[str]:
 def check_root(root: Path) -> dict[str, Any]:
     readmes = list(_package_readmes(root))
     present_hosts = {host for host, _label, _path in readmes}
-    missing_hosts = sorted({"claude", "codex"} - present_hosts)
+    missing_hosts = sorted({"claude", "codex", "cursor"} - present_hosts)
     if not readmes:
         return {
             "status": "fail",
