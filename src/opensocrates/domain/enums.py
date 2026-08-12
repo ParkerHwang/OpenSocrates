@@ -113,6 +113,7 @@ class HostId(StrEnum):
     CODEX_CLI = "codex_cli"
     CLAUDE_CODE = "claude_code"
     CLAUDE_COWORK = "claude_cowork"
+    ANTIGRAVITY_CLI = "antigravity_cli"
     PROMPT_ONLY = "prompt_only"
 
 

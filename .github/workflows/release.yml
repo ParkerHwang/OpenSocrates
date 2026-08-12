@@ -82,7 +82,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for host in claude codex; do
+          for host in antigravity claude codex; do
             asset="opensocrates-${RELEASE_VERSION}-${host}-plugin.zip"
             (
               cd dist
@@ -90,6 +90,8 @@ jobs:
             )
           done
           node installer/opensocrates.mjs verify --host all \
+            --asset-antigravity "dist/opensocrates-${RELEASE_VERSION}-antigravity-plugin.zip" \
+            --checksum-antigravity "dist/opensocrates-${RELEASE_VERSION}-antigravity-plugin.zip.sha256" \
             --asset-claude "dist/opensocrates-${RELEASE_VERSION}-claude-plugin.zip" \
             --checksum-claude "dist/opensocrates-${RELEASE_VERSION}-claude-plugin.zip.sha256" \
             --asset-codex "dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip" \
@@ -116,6 +118,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          antigravity_asset="dist/opensocrates-${RELEASE_VERSION}-antigravity-plugin.zip"
           claude_asset="dist/opensocrates-${RELEASE_VERSION}-claude-plugin.zip"
           chat_asset="dist/opensocrates-${RELEASE_VERSION}-claude-chat-skills.zip"
           codex_asset="dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip"
@@ -123,6 +126,8 @@ jobs:
           limitations="dist/opensocrates-${RELEASE_VERSION}-limitations.json"
           sbom="dist/opensocrates-${RELEASE_VERSION}-sbom.spdx.json"
           release_assets=(
+            "${antigravity_asset}"
+            "${antigravity_asset}.sha256"
             "${claude_asset}"
             "${claude_asset}.sha256"
             "${chat_asset}"

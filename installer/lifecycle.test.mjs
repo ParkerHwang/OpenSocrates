@@ -45,29 +45,48 @@ function sha256(bytes) {
 // ---------------------------------------------------------------------------
 function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, manifestVersion = null } = {}) {
   const tree = join(root, `pkg-${host}`);
-  const manifestDir = host === "claude" ? ".claude-plugin" : ".codex-plugin";
-  mkdirSync(join(tree, manifestDir), { recursive: true });
-  mkdirSync(join(tree, "runtime", "darwin-arm64", "opensocrates-runtime"), { recursive: true });
+  const manifestPath =
+    host === "antigravity"
+      ? "plugin.json"
+      : `${host === "claude" ? ".claude-plugin" : ".codex-plugin"}/plugin.json`;
+  mkdirSync(dirname(join(tree, manifestPath)), { recursive: true });
+  if (host !== "antigravity") {
+    mkdirSync(join(tree, "runtime", "darwin-arm64", "opensocrates-runtime"), { recursive: true });
+  }
   mkdirSync(join(tree, "skills", "opensocrates"), { recursive: true });
 
   const files = {};
-  files[`${manifestDir}/plugin.json`] = JSON.stringify(
+  files[manifestPath] = JSON.stringify(
     { name: "opensocrates", version: manifestVersion ?? version },
     null,
     2,
   );
   files["release-manifest.json"] = JSON.stringify(
-    { product_version: version, host, schema: "opensocrates.plugin-release-manifest/1.0.0" },
+    {
+      product_version: version,
+      host,
+      schema: "opensocrates.plugin-release-manifest/1.0.0",
+      launchers: [],
+      runtime_targets: [],
+    },
     null,
     2,
   );
-  files["runtime/darwin-arm64/opensocrates-runtime/opensocrates-runtime"] = "#!/bin/sh\nexit 0\n";
+  if (host !== "antigravity") {
+    files["runtime/darwin-arm64/opensocrates-runtime/opensocrates-runtime"] =
+      "#!/bin/sh\nexit 0\n";
+  }
   files["skills/opensocrates/SKILL.md"] = "# OpenSocrates controller\n";
 
   for (const [name, body] of Object.entries(files)) {
     writeFileSync(join(tree, ...name.split("/")), body);
   }
-  chmodSync(join(tree, "runtime", "darwin-arm64", "opensocrates-runtime", "opensocrates-runtime"), 0o755);
+  if (host !== "antigravity") {
+    chmodSync(
+      join(tree, "runtime", "darwin-arm64", "opensocrates-runtime", "opensocrates-runtime"),
+      0o755,
+    );
+  }
 
   const lines = Object.entries(files).map(([name, body]) => {
     const digest = corrupt && name === "release-manifest.json" ? "0".repeat(64) : sha256(Buffer.from(body));
@@ -258,11 +277,14 @@ process.exit(1);
 
 function makeSandbox(host, options = {}) {
   const root = mkdtempSync(join(tmpdir(), "opensocrates-lifecycle-"));
-  const home = join(root, host === "claude" ? "claude-home" : "codex-home");
+  const home = join(root, `${host}-home`);
   mkdirSync(home, { recursive: true });
   const { binary, statePath } = writeFakeHost(root, host, options);
   const saved = { ...process.env };
-  if (host === "claude") {
+  if (host === "antigravity") {
+    process.env.AGY_BIN = binary;
+    process.env.ANTIGRAVITY_CONFIG_DIR = home;
+  } else if (host === "claude") {
     process.env.CLAUDE_BIN = binary;
     process.env.CLAUDE_CONFIG_DIR = home;
   } else {
@@ -272,7 +294,8 @@ function makeSandbox(host, options = {}) {
   process.env.OPENSOCRATES_STATE_DIR = join(root, "state");
   process.env.OPENSOCRATES_LAUNCH_AGENTS_DIR = join(root, "LaunchAgents");
   process.env.OPENSOCRATES_SKIP_LAUNCHCTL = "1";
-  const managedRoot = join(home, "managed-marketplaces", MARKETPLACE);
+  const managedParent = join(home, host === "antigravity" ? "plugins" : "managed-marketplaces");
+  const managedRoot = join(managedParent, MARKETPLACE);
   return {
     root,
     home,
@@ -280,11 +303,13 @@ function makeSandbox(host, options = {}) {
     statePath,
     state: () => JSON.parse(readFileSync(statePath, "utf8")),
     backups: () =>
-      existsSync(join(home, "managed-marketplaces"))
-        ? readdirSync(join(home, "managed-marketplaces")).filter((n) => n.startsWith(".opensocrates.backup-"))
+      existsSync(managedParent)
+        ? readdirSync(managedParent).filter((n) => n.startsWith(".opensocrates.backup-"))
         : [],
     cleanup: () => {
       for (const key of [
+        "AGY_BIN",
+        "ANTIGRAVITY_CONFIG_DIR",
         "CLAUDE_BIN",
         "CLAUDE_CONFIG_DIR",
         "CODEX_BIN",
@@ -311,7 +336,9 @@ function replaceSandboxHost(box, host, name, options = {}) {
     ),
   );
   chmodSync(replacement.binary, 0o755);
-  process.env[host === "claude" ? "CLAUDE_BIN" : "CODEX_BIN"] = replacement.binary;
+  const binaryKey =
+    host === "antigravity" ? "AGY_BIN" : host === "claude" ? "CLAUDE_BIN" : "CODEX_BIN";
+  process.env[binaryKey] = replacement.binary;
   return replacement;
 }
 
@@ -332,6 +359,9 @@ function makeAllSandbox(options = {}) {
   process.env.CLAUDE_CONFIG_DIR = homes.claude;
   process.env.CODEX_BIN = hosts.codex.binary;
   process.env.CODEX_HOME = homes.codex;
+  // Keep all-host tests hermetic: a developer's real agy installation must
+  // not silently add a third host to the two-host fixture.
+  process.env.AGY_BIN = join(root, "unavailable-agy");
   process.env.OPENSOCRATES_STATE_DIR = join(root, "state");
   process.env.OPENSOCRATES_LAUNCH_AGENTS_DIR = join(root, "LaunchAgents");
   process.env.OPENSOCRATES_SKIP_LAUNCHCTL = "1";
@@ -360,6 +390,7 @@ function makeAllSandbox(options = {}) {
     },
     cleanup: () => {
       for (const key of [
+        "AGY_BIN",
         "CLAUDE_BIN",
         "CLAUDE_CONFIG_DIR",
         "CODEX_BIN",
@@ -550,6 +581,51 @@ for (const host of ["claude", "codex"]) {
     }
   });
 }
+
+test("antigravity: content-only file-drop install -> status -> update -> verify -> remove", async () => {
+  const box = makeSandbox("antigravity");
+  try {
+    const pkg = buildPackage(box.root, "antigravity");
+    const args = [
+      "--host",
+      "antigravity",
+      "--asset",
+      pkg.asset,
+      "--checksum",
+      pkg.checksum,
+    ];
+
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+    assert.match(install.output, /installed successfully for antigravity/);
+    assert.doesNotMatch(install.output, /approval required/i);
+    assert.ok(existsSync(join(box.managedRoot, "plugin.json")), "plugin manifest missing");
+    assert.ok(
+      existsSync(join(box.managedRoot, ".opensocrates-managed.json")),
+      "ownership marker missing",
+    );
+    assert.equal(existsSync(join(box.managedRoot, "runtime")), false, "runtime was installed");
+    assert.equal(existsSync(join(box.managedRoot, "hooks")), false, "hooks were installed");
+
+    const status = await quiet(() => main(["status", "--host", "antigravity"]));
+    assert.equal(status.error, undefined, `status failed: ${status.error?.message}`);
+    assert.match(status.output, new RegExp(`OpenSocrates ${PRODUCT_VERSION} is installed`));
+    assert.match(status.output, /experimental and explicit-skill only/);
+
+    const update = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
+    assert.equal(update.error, undefined, `update failed: ${update.error?.message}`);
+    assert.deepEqual(box.backups(), [], "update left a backup directory behind");
+
+    const verify = await quiet(() => main(["verify", ...args]));
+    assert.equal(verify.error, undefined, `verify failed: ${verify.error?.message}`);
+
+    const remove = await quiet(() => main(["remove", "--host", "antigravity"]));
+    assert.equal(remove.error, undefined, `remove failed: ${remove.error?.message}`);
+    assert.equal(existsSync(box.managedRoot), false, "managed root survived remove");
+  } finally {
+    box.cleanup();
+  }
+});
 
 test("claude: supported list wrappers preserve the complete lifecycle", async () => {
   const box = makeSandbox("claude", {

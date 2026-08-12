@@ -2,7 +2,14 @@
 
 import { spawnSync } from "node:child_process";
 import { createHash, randomInt, randomUUID } from "node:crypto";
-import { constants as fsConstants, createReadStream, createWriteStream, realpathSync } from "node:fs";
+import {
+  constants as fsConstants,
+  createReadStream,
+  createWriteStream,
+  existsSync,
+  readFileSync,
+  realpathSync,
+} from "node:fs";
 import {
   access,
   chmod,
@@ -30,7 +37,7 @@ export const MARKETPLACE_NAME = "opensocrates";
 export const PLUGIN_NAME = "opensocrates";
 export const PLUGIN_ID = `${PLUGIN_NAME}@${MARKETPLACE_NAME}`;
 export const DEFAULT_HOST = "codex";
-export const SUPPORTED_HOSTS = Object.freeze(["claude", "codex"]);
+export const SUPPORTED_HOSTS = Object.freeze(["antigravity", "claude", "codex"]);
 export const ALL_HOST = "all";
 export const HOST_CHOICES = Object.freeze([ALL_HOST, ...SUPPORTED_HOSTS]);
 export function assetNameFor(host = DEFAULT_HOST) {
@@ -54,16 +61,31 @@ const CLAUDE_MARKER = Object.freeze({
   pluginName: PLUGIN_NAME,
   host: "claude",
 });
+const ANTIGRAVITY_MARKER = Object.freeze({
+  schemaVersion: 1,
+  marketplaceName: MARKETPLACE_NAME,
+  pluginName: PLUGIN_NAME,
+  host: "antigravity",
+  registrationKind: "file-drop",
+});
 const HOST_LAYOUTS = Object.freeze({
+  antigravity: {
+    marketplaceRelative: null,
+    pluginRelative: ".",
+    manifestRelative: "plugin.json",
+    requiresRuntime: false,
+  },
   claude: {
     marketplaceRelative: join(".claude-plugin", "marketplace.json"),
     pluginRelative: join("plugins", PLUGIN_NAME),
     manifestRelative: join(".claude-plugin", "plugin.json"),
+    requiresRuntime: true,
   },
   codex: {
     marketplaceRelative: join(".agents", "plugins", "marketplace.json"),
     pluginRelative: join("build", "generated", "plugins", "codex"),
     manifestRelative: join(".codex-plugin", "plugin.json"),
+    requiresRuntime: true,
   },
 });
 const MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024 * 1024;
@@ -373,6 +395,7 @@ function jsonEqual(left, right) {
 }
 
 function markerFor(host) {
+  if (host === "antigravity") return ANTIGRAVITY_MARKER;
   return host === "claude" ? CLAUDE_MARKER : CODEX_MARKER;
 }
 
@@ -457,10 +480,9 @@ export function parseCli(argv) {
     host: action === "auto-update" ? ALL_HOST : DEFAULT_HOST,
     asset: null,
     checksum: null,
-    hostAssets: {
-      claude: { asset: null, checksum: null },
-      codex: { asset: null, checksum: null },
-    },
+    hostAssets: Object.fromEntries(
+      SUPPORTED_HOSTS.map((host) => [host, { asset: null, checksum: null }]),
+    ),
     channel: "stable",
     intervalHours: AUTO_UPDATE_DEFAULT_INTERVAL_HOURS,
     allowMajor: false,
@@ -518,7 +540,9 @@ export function parseCli(argv) {
       options.intervalHours = value;
       continue;
     }
-    const qualified = flag?.match(/^--(asset|checksum)-(claude|codex)$/u);
+    const qualified = flag?.match(
+      new RegExp(`^--(asset|checksum)-(${SUPPORTED_HOSTS.join("|")})$`, "u"),
+    );
     if (qualified) {
       seenOptions.add(qualified[1]);
       const value = args.shift();
@@ -549,13 +573,6 @@ export function parseCli(argv) {
   }
   if (options.host === ALL_HOST && options.asset !== null) {
     fail("--host all requires host-qualified --asset-<host> and --checksum-<host> options");
-  }
-  if (
-    options.host === ALL_HOST &&
-    SUPPORTED_HOSTS.some((host) => options.hostAssets[host].asset !== null) &&
-    SUPPORTED_HOSTS.some((host) => options.hostAssets[host].asset === null)
-  ) {
-    fail("local --host all verification requires asset and checksum pairs for both hosts");
   }
   if (
     options.host !== ALL_HOST &&
@@ -608,12 +625,12 @@ function showHelp() {
   console.log(`OpenSocrates ${PRODUCT_VERSION}
 
 Usage:
-  opensocrates install [--host all|codex|claude] [--asset ZIP --checksum SHA256]
-  opensocrates status [--host all|codex|claude]
-  opensocrates update [--host all|codex|claude] [--asset ZIP --checksum SHA256]
-  opensocrates remove [--host all|codex|claude]
-  opensocrates verify [--host all|codex|claude] [--asset ZIP --checksum SHA256]
-  opensocrates auto-update enable [--host all|codex|claude]
+  opensocrates install [--host all|antigravity|codex|claude] [--asset ZIP --checksum SHA256]
+  opensocrates status [--host all|antigravity|codex|claude]
+  opensocrates update [--host all|antigravity|codex|claude] [--asset ZIP --checksum SHA256]
+  opensocrates remove [--host all|antigravity|codex|claude]
+  opensocrates verify [--host all|antigravity|codex|claude] [--asset ZIP --checksum SHA256]
+  opensocrates auto-update enable [--host all|antigravity|codex|claude]
       [--channel stable|next] [--interval-hours ${AUTO_UPDATE_DEFAULT_INTERVAL_HOURS}]
       [--allow-major]
   opensocrates auto-update status
@@ -621,16 +638,24 @@ Usage:
 
 Without --asset, install, update, and verify download the v${PRODUCT_VERSION}
 package and checksum from GitHub Releases. The default lifecycle host is codex.
-For offline --host all verification, use --asset-claude/--checksum-claude
-and --asset-codex/--checksum-codex together. Automatic updates are opt-in.
+For offline --host all verification, provide an asset/checksum pair for each
+supported host. Automatic updates are opt-in.
 `);
 }
 
 function managedPaths(host) {
   const configured =
-    host === "claude" ? process.env.CLAUDE_CONFIG_DIR : process.env.CODEX_HOME;
+    host === "antigravity"
+      ? process.env.ANTIGRAVITY_CONFIG_DIR
+      : host === "claude"
+        ? process.env.CLAUDE_CONFIG_DIR
+        : process.env.CODEX_HOME;
+  const defaultHome =
+    host === "antigravity"
+      ? join(homedir(), ".gemini", "config")
+      : join(homedir(), host === "claude" ? ".claude" : ".codex");
   const configuredHome = resolve(
-    configured ? configured : join(homedir(), host === "claude" ? ".claude" : ".codex"),
+    configured ? configured : defaultHome,
   );
   let hostHome = configuredHome;
   try {
@@ -640,14 +665,20 @@ function managedPaths(host) {
     // explicit, non-recursive target. Lexical resolution is the only
     // available normalization until then.
   }
-  const root = join(hostHome, "managed-marketplaces", MARKETPLACE_NAME);
+  const root =
+    host === "antigravity"
+      ? join(hostHome, "plugins", PLUGIN_NAME)
+      : join(hostHome, "managed-marketplaces", MARKETPLACE_NAME);
   const layout = HOST_LAYOUTS[host];
   return {
     hostHome,
     root,
     parent: dirname(root),
     marker: join(root, MARKER_NAME),
-    marketplace: join(root, layout.marketplaceRelative),
+    marketplace:
+      typeof layout.marketplaceRelative === "string"
+        ? join(root, layout.marketplaceRelative)
+        : null,
     plugin: join(root, layout.pluginRelative),
   };
 }
@@ -658,6 +689,10 @@ function codexBinary() {
 
 function claudeBinary() {
   return process.env.CLAUDE_BIN || "claude";
+}
+
+function antigravityBinary() {
+  return process.env.AGY_BIN || "agy";
 }
 
 function run(command, args, { allowFailure = false } = {}) {
@@ -773,6 +808,11 @@ function versionAtLeast(value, minimum) {
 }
 
 function requireHostCli(host, { authenticated = false } = {}) {
+  if (host === "antigravity") {
+    if (process.env.ANTIGRAVITY_CONFIG_DIR) return;
+    run(antigravityBinary(), ["--version"]);
+    return;
+  }
   if (host === "claude") {
     const result = run(claudeBinary(), ["--version"]);
     if (!versionAtLeast(result.stdout, [2, 1, 205])) {
@@ -792,6 +832,10 @@ function requireHostCli(host, { authenticated = false } = {}) {
 }
 
 function marketplaceEntries(host) {
+  if (host === "antigravity") {
+    const paths = managedPaths(host);
+    return existsSync(paths.root) ? [{ name: MARKETPLACE_NAME, root: paths.root }] : [];
+  }
   const payload =
     host === "claude"
       ? runClaudeJson(["plugin", "marketplace", "list", "--json"])
@@ -813,6 +857,27 @@ function marketplaceEntry(host) {
 }
 
 function pluginState(host) {
+  if (host === "antigravity") {
+    const paths = managedPaths(host);
+    if (!existsSync(paths.root)) return { kind: "missing", version: null };
+    let manifest;
+    try {
+      manifest = JSON.parse(readFileSync(join(paths.root, "plugin.json"), "utf8"));
+    } catch (error) {
+      fail(`Antigravity plugin manifest is unreadable: ${error.message}`);
+    }
+    if (
+      manifest === null ||
+      typeof manifest !== "object" ||
+      Array.isArray(manifest) ||
+      manifest.name !== PLUGIN_NAME ||
+      typeof manifest.version !== "string" ||
+      manifest.version.trim().length === 0
+    ) {
+      fail("Antigravity reported an invalid OpenSocrates plugin manifest");
+    }
+    return { kind: "installed", version: manifest.version };
+  }
   if (host === "claude") {
     const installed = claudePluginEntries(runClaudeJson(["plugin", "list", "--json"]));
     const matches = installed.filter((entry) => entry?.id === PLUGIN_ID);
@@ -1088,16 +1153,26 @@ async function verifyExtractedPackage(pluginRoot, host) {
   ) {
     fail("package release manifest does not match this installer");
   }
-  const runtime = join(
-    pluginRoot,
-    "runtime",
-    "darwin-arm64",
-    "opensocrates-runtime",
-    "opensocrates-runtime",
-  );
-  const runtimeInfo = await stat(runtime);
-  if (!runtimeInfo.isFile() || (runtimeInfo.mode & 0o111) === 0) {
-    fail("package is missing the executable darwin-arm64 runtime");
+  if (HOST_LAYOUTS[host].requiresRuntime) {
+    const runtime = join(
+      pluginRoot,
+      "runtime",
+      "darwin-arm64",
+      "opensocrates-runtime",
+      "opensocrates-runtime",
+    );
+    const runtimeInfo = await stat(runtime);
+    if (!runtimeInfo.isFile() || (runtimeInfo.mode & 0o111) === 0) {
+      fail("package is missing the executable darwin-arm64 runtime");
+    }
+  } else if (
+    release.launchers?.length !== 0 ||
+    release.runtime_targets?.length !== 0 ||
+    (await exists(join(pluginRoot, "runtime"))) ||
+    (await exists(join(pluginRoot, "hooks"))) ||
+    (await exists(join(pluginRoot, "bin")))
+  ) {
+    fail("Antigravity explicit-skill package must not contain hooks, launchers, or runtime");
   }
   return verifyPackageChecksums(pluginRoot);
 }
@@ -1181,6 +1256,16 @@ async function buildStagingTree(parent, pluginSource, host) {
   const layout = HOST_LAYOUTS[host];
   const staging = await mkdtemp(join(parent, ".opensocrates.staging-"));
   try {
+    if (host === "antigravity") {
+      await cp(pluginSource, staging, { recursive: true, preserveTimestamps: true });
+      await verifyExtractedPackage(staging, host);
+      await writeFile(
+        join(staging, MARKER_NAME),
+        `${JSON.stringify(markerFor(host), null, 2)}\n`,
+        { encoding: "utf8", mode: 0o600 },
+      );
+      return staging;
+    }
     const marketplace = join(staging, layout.marketplaceRelative);
     const plugin = join(staging, layout.pluginRelative);
     await mkdir(dirname(marketplace), { recursive: true, mode: 0o700 });
@@ -1250,6 +1335,7 @@ function entryRoot(entry, host) {
 }
 
 function removeRegistration(host, entry, state) {
+  if (host === "antigravity") return;
   if (host === "claude") {
     if (["installed", "disabled"].includes(state.kind)) {
       run(claudeBinary(), ["plugin", "uninstall", PLUGIN_ID, "--scope", "user"]);
@@ -1270,6 +1356,7 @@ function removeRegistration(host, entry, state) {
 }
 
 function addRegistration(host, root, installPlugin, { enabled = true } = {}) {
+  if (host === "antigravity") return null;
   if (host === "claude") {
     run(claudeBinary(), ["plugin", "marketplace", "add", root, "--scope", "user"]);
     if (installPlugin) {
@@ -1288,6 +1375,7 @@ function addRegistration(host, root, installPlugin, { enabled = true } = {}) {
 }
 
 function removeRegistrationBestEffort(host) {
+  if (host === "antigravity") return;
   const entry = (() => {
     try {
       return marketplaceEntry(host);
@@ -1332,7 +1420,9 @@ async function recoveryStep(label, action) {
 }
 
 async function preflightHost(host, action) {
-  requireHostCli(host, { authenticated: ["install", "update"].includes(action) });
+  if (host !== "antigravity" || ["install", "update"].includes(action)) {
+    requireHostCli(host, { authenticated: ["install", "update"].includes(action) });
+  }
   if (host === "claude") {
     if (["install", "update"].includes(action)) {
       requireNoLegacyClaudeInstallation();
@@ -1591,7 +1681,7 @@ async function runInstallOrUpdate(options, action) {
 }
 
 async function inspectHostStatus(host) {
-  requireHostCli(host);
+  if (host !== "antigravity") requireHostCli(host);
   if (host === "claude") warnLegacyClaudeInstallation();
   const paths = managedPaths(host);
   const entry = marketplaceEntry(host);
@@ -1632,6 +1722,7 @@ async function showStatus(host) {
         if (status.kind === "installed") {
           console.log(
             `${candidate}: installed ${status.version ?? "unknown"}` +
+              (candidate === "antigravity" ? " (experimental explicit-skill tier)" : "") +
               (expected
                 ? hostDrift
                   ? ` (drift from ${desired.activeVersion ?? "desired state"})`
@@ -1668,7 +1759,12 @@ async function showStatus(host) {
   }
   const status = await inspectHostStatus(host);
   if (status.kind === "installed") {
-    console.log(`OpenSocrates ${status.version ?? "unknown"} is installed.`);
+    console.log(
+      `OpenSocrates ${status.version ?? "unknown"} is installed.` +
+        (host === "antigravity"
+          ? " Antigravity support is experimental and explicit-skill only."
+          : ""),
+    );
   } else if (status.kind === "disabled") {
     console.log(
       `OpenSocrates ${status.version ?? "unknown"} is installed but disabled. ` +
@@ -1846,12 +1942,29 @@ async function updaterEnvironment(hosts, npx) {
     ),
   };
   for (const host of hosts) {
+    if (host === "antigravity") {
+      if (process.env.ANTIGRAVITY_CONFIG_DIR) {
+        environment.ANTIGRAVITY_CONFIG_DIR = resolve(process.env.ANTIGRAVITY_CONFIG_DIR);
+        continue;
+      }
+      const executable = await executablePath("agy", "AGY_BIN");
+      environment.AGY_BIN = executable;
+      environment.PATH = [...new Set([dirname(executable), ...environment.PATH.split(":")])].join(
+        ":",
+      );
+      continue;
+    }
     const key = host === "claude" ? "CLAUDE_BIN" : "CODEX_BIN";
     const executable = await executablePath(host, key);
     environment[key] = executable;
     environment.PATH = [...new Set([dirname(executable), ...environment.PATH.split(":")])].join(":");
   }
-  for (const key of ["CLAUDE_CONFIG_DIR", "CODEX_HOME", "OPENSOCRATES_STATE_DIR"]) {
+  for (const key of [
+    "ANTIGRAVITY_CONFIG_DIR",
+    "CLAUDE_CONFIG_DIR",
+    "CODEX_HOME",
+    "OPENSOCRATES_STATE_DIR",
+  ]) {
     if (process.env[key]) environment[key] = resolve(process.env[key]);
   }
   return environment;
@@ -2001,7 +2114,9 @@ async function runRemove(options) {
   }
   for (const transaction of transactions) await commitRemoval(transaction);
   for (const host of removedHosts) {
-    console.log(`OpenSocrates was removed from ${host === "claude" ? "Claude" : "Codex"}.`);
+    const label =
+      host === "antigravity" ? "Antigravity" : host === "claude" ? "Claude" : "Codex";
+    console.log(`OpenSocrates was removed from ${label}.`);
   }
   if (removedHosts.length === 0) console.log("OpenSocrates is not installed on any managed host.");
 }
@@ -2163,7 +2278,7 @@ async function runScheduledUpdate(options) {
           item.previousState.kind === "installed" && item.previousState.version === PRODUCT_VERSION,
       );
     if (!alreadyCurrent) {
-      if (hosts.length === SUPPORTED_HOSTS.length) {
+      if (hosts.length > 1) {
         await runInstallOrUpdate({ ...options, host: ALL_HOST }, "update");
       } else {
         const [host] = hosts;
