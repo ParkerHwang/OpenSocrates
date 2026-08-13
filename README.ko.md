@@ -382,6 +382,7 @@ make lint
 make generated-check
 make content-check
 make docs-check
+make governance-check
 make security-scan
 make smoke
 npm test

@@ -4,6 +4,11 @@ Thank you for helping improve OpenSocrates. Bug reports, documentation fixes,
 new tests, implementation improvements, and carefully sourced reasoning-system
 changes are welcome.
 
+Humans and automated agents must also follow [AGENTS.md](AGENTS.md), the shared
+cross-machine operating contract. GitHub issues, pull requests, commit SHAs, and
+Actions are durable shared state; local chat history and unpushed branches are
+not a substitute for a GitHub handoff.
+
 ## Before opening an issue
 
 - Search existing issues and pull requests.
@@ -59,6 +64,7 @@ make lint
 make generated-check
 make content-check
 make docs-check
+make governance-check
 make security-scan
 make smoke
 npm test
@@ -84,9 +90,18 @@ Keep each pull request focused and include:
 
 - what changed and why;
 - user or developer impact;
+- a linked issue or a specific explanation for why no issue exists;
 - validation commands and results;
+- the supported evidence level and missing evidence;
 - privacy, security, compatibility, or generated-output effects;
-- remaining limitations or follow-up work.
+- remaining limitations or follow-up work;
+- a current-commit handoff that another contributor can resume on another
+  machine.
+
+Open incomplete work as Draft. Do not mark it ready for review until the stated
+checks pass or every unavailable check is documented. Repository automation adds
+open issues and pull requests to the OpenSocrates Development project; Project
+edit access is not required to contribute.
 
 By submitting a contribution, you agree that it is licensed under the
 repository's [MIT License](LICENSE).
