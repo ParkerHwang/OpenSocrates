@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 import shutil
+import stat
 import subprocess
 import tempfile
 from collections import Counter
@@ -21,6 +22,10 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from compare_v12_adjudication_reviews import (
+    ComparisonValidationError,
+    validate_comparison_artifact,
+)
 from json_schema_2020 import check_schema, validate
 from v12_adjudication_contract import EVALUATION_ID, EVIDENCE_GRADE
 
@@ -33,9 +38,13 @@ PRIMARY_PATH = BUILD_ROOT / "askpro-blind-adjudication.json"
 SECONDARY_PATH = BUILD_ROOT / "askpro-second-blind-adjudication.json"
 CLAUDE_PATH = BUILD_ROOT / "claude-opus5-blind-review.json"
 COMPARISON_PATH = BUILD_ROOT / "reviewer-comparison.json"
+COMPARISON_SCHEMA_PATH = EVAL_ROOT / "schemas/adjudication-review-comparison.schema.json"
 
 GUIDE_PATH = EVAL_ROOT / "ADJUDICATION_GUIDE.md"
 AMENDMENT_PATH = EVAL_ROOT / "ADJUDICATION_AI_AMENDMENT.md"
+FREEZE_PATH = EVAL_ROOT / "adjudication-freeze-v1.0.0.json"
+REPORT_PATH = ROOT / "docs/v1.2-adjudication-report.md"
+RELEASE_NOTES_PATH = ROOT / ".github/release-notes/v1.2.1.md"
 PRIMARY_ID = "chatgpt-pro-blind-review-1"
 SECONDARY_ID = "chatgpt-pro-blind-review-2"
 RESOLUTION_ID = "maintainer-authorized-codex-synthesis"
@@ -66,15 +75,14 @@ LIST_FIELDS = {
     "acceptable_inclusion_methods",
     "prohibited_methods",
 }
-COMPATIBLE_PAIRS = {
-    "design-thinking-positive-03",
-    "lateral-thinking-negative-02",
-}
 HOLD_NORMALIZATION_PAIRS = {
     "reflective-equilibrium-insufficiency-01",
     "triangulation-insufficiency-01",
 }
 UNCERTAINTY_FIELDS = frozenset({"issue", "pair_id", "residual", "resolution"})
+SYNTHESIS_OVERRIDE_TYPES = frozenset(
+    {"claude_partial_selection", "schema_consistency_normalization"}
+)
 
 
 def sha256(path: Path) -> str:
@@ -123,10 +131,12 @@ def final_decision(
     pair_id: str,
     secondary: dict[str, Any],
     claude: dict[str, dict[str, Any]],
-) -> tuple[dict[str, Any], str, str]:
-    """Return decision, selected source, and resolution explanation."""
+    classification: str,
+) -> tuple[dict[str, Any], str, str, dict[str, str] | None]:
+    """Return decision, selected source, explanation, and any typed override."""
     decision = normalize(secondary)
     selected = "secondary"
+    override: dict[str, str] | None = None
     explanation = (
         "The secondary review applied the frozen method-specific Use, Do-not-use, "
         "and Stop conditions case by case. The primary review instead applied one "
@@ -145,6 +155,7 @@ def final_decision(
             "behaviors canonically as no-intervention hold or bounded deterministic "
             "rule application; that representation is selected."
         )
+        override = {"type": "claude_partial_selection", "rationale": explanation}
     elif pair_id in HOLD_NORMALIZATION_PAIRS:
         decision["allowed_behaviors"] = ["hold_no_intervention"]
         selected = "secondary_with_schema_consistency_normalization"
@@ -155,6 +166,10 @@ def final_decision(
             "intervention. The supported direct limitation remains in the rationale, "
             "while selector behavior is normalized to hold_no_intervention."
         )
+        override = {
+            "type": "schema_consistency_normalization",
+            "rationale": explanation,
+        }
     elif pair_id == "design-thinking-positive-03":
         decision["acceptable_inclusion_methods"] = []
         selected = "secondary_with_schema_consistency_normalization"
@@ -163,13 +178,17 @@ def final_decision(
             "alternative leaders. No stable non-leading inclusion set is established, "
             "so the inclusion list is empty and the inclusion metric remains ineligible."
         )
-    elif pair_id in COMPATIBLE_PAIRS:
+        override = {
+            "type": "schema_consistency_normalization",
+            "rationale": explanation,
+        }
+    elif classification in {"exact_agreement", "compatible_agreement"}:
         explanation = (
             "Both complete reviews agree on intervention policy, leading-route "
             "semantics, and metric eligibility. The secondary review's narrower "
             "case-specific behavior and method sets are selected."
         )
-    return decision, selected, explanation
+    return decision, selected, explanation, override
 
 
 def git_state(root: Path, *, allow_dirty: bool) -> dict[str, Any]:
@@ -377,12 +396,33 @@ def _assert_public_text(value: Any) -> None:
         raise SystemExit("refusing to publish private-use/filecite citation tokens")
 
 
+def _unresolved_absolute(path: Path) -> Path:
+    return Path(os.path.abspath(os.fspath(path)))
+
+
+def _checked_output_path(path: Path, *, label: str) -> Path:
+    """Reject symlinks in an unresolved output path before following any component."""
+
+    absolute = _unresolved_absolute(path)
+    current = Path(absolute.anchor)
+    for part in absolute.parts[1:]:
+        current /= part
+        try:
+            mode = current.lstat().st_mode
+        except FileNotFoundError:
+            continue
+        except OSError as exc:
+            raise SystemExit(f"cannot inspect {label} component {current}: {exc}") from exc
+        if stat.S_ISLNK(mode):
+            raise SystemExit(f"refusing symlink {label} component: {current}")
+    return absolute
+
+
 def _publish_directory(staged: Path, output: Path, *, allow_overwrite: bool) -> None:
-    output = output.resolve()
-    if output in {Path("/"), ROOT.resolve(), ROOT.parent.resolve()}:
+    output = _checked_output_path(output, label="finalization output")
+    resolved_output = output.resolve(strict=False)
+    if resolved_output in {Path("/"), ROOT.resolve(), ROOT.parent.resolve()}:
         raise SystemExit(f"unsafe finalization output directory: {output}")
-    if output.is_symlink():
-        raise SystemExit(f"refusing symlink output directory: {output}")
     if output.exists() and not output.is_dir():
         raise SystemExit(f"finalization output exists and is not a directory: {output}")
     if output.exists() and not allow_overwrite:
@@ -411,9 +451,13 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     parser.add_argument("--secondary", type=Path, default=SECONDARY_PATH)
     parser.add_argument("--claude-partial", type=Path, default=CLAUDE_PATH)
     parser.add_argument("--comparison", type=Path, default=COMPARISON_PATH)
+    parser.add_argument("--comparison-schema", type=Path, default=COMPARISON_SCHEMA_PATH)
     parser.add_argument("--packet-dir", type=Path, default=PACKET_DIR)
     parser.add_argument("--guide", type=Path, default=GUIDE_PATH)
     parser.add_argument("--amendment", type=Path, default=AMENDMENT_PATH)
+    parser.add_argument("--freeze", type=Path, default=FREEZE_PATH)
+    parser.add_argument("--report", type=Path, default=REPORT_PATH)
+    parser.add_argument("--release-notes", type=Path, default=RELEASE_NOTES_PATH)
     parser.add_argument(
         "--decision-schema",
         type=Path,
@@ -455,9 +499,13 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
         "secondary review": args.secondary,
         "Claude partial review": args.claude_partial,
         "review comparison": args.comparison,
+        "review comparison schema": args.comparison_schema,
         "packet manifest": args.packet_dir / "packet-manifest.json",
         "annotation guide": args.guide,
         "AI amendment": args.amendment,
+        "freeze record": args.freeze,
+        "public report": args.report,
+        "release notes": args.release_notes,
         "decision schema": args.decision_schema,
         "disagreement schema": args.disagreement_schema,
     }
@@ -472,9 +520,11 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     source_git = git_state(ROOT, allow_dirty=args.allow_dirty_source)
     primary_artifact = read_json(args.primary)
     secondary_artifact = read_json(args.secondary)
+    comparison_artifact = read_json(args.comparison)
     packet_manifest = read_json(args.packet_dir / "packet-manifest.json")
     claude_wrapper = read_json(args.claude_partial)
     semantic_schema = _semantic_review_schema(read_json(args.decision_schema))
+    comparison_schema = read_json(args.comparison_schema)
     claude = extract_claude_records(claude_wrapper)
 
     primary = {record["pair_id"]: record for record in primary_artifact["decisions"]}
@@ -482,6 +532,18 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     expected = set(packet_manifest["pair_ids"])
     if set(primary) != expected or set(secondary) != expected:
         raise SystemExit("both complete reviews must cover exactly the frozen 51 pairs")
+    try:
+        comparison_rows = validate_comparison_artifact(
+            comparison_artifact,
+            comparison_schema,
+            primary_artifact,
+            secondary_artifact,
+            packet_manifest,
+            primary_sha256=sha256(args.primary),
+            secondary_sha256=sha256(args.secondary),
+        )
+    except ComparisonValidationError as exc:
+        raise SystemExit(f"invalid review comparison: {exc}") from exc
     if "decision-tree-analysis-mechanical-1" not in claude:
         raise SystemExit("mechanical boundary resolution requires the recovered Claude record")
 
@@ -509,13 +571,22 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
 
     records: list[dict[str, Any]] = []
     disagreements: list[dict[str, Any]] = []
+    synthesis_overrides: list[dict[str, str]] = []
     for pair_id in sorted(expected):
         packet = read_json(args.packet_dir / f"{pair_id}.json")
         primary_record = primary[pair_id]
         second_record = secondary[pair_id]
-        decision, selected_source, resolution_reason = final_decision(
-            pair_id, second_record, claude
+        comparison_row = comparison_rows[pair_id]
+        classification = comparison_row["classification"]
+        decision, selected_source, resolution_reason, synthesis_override = final_decision(
+            pair_id, second_record, claude, classification
         )
+        if synthesis_override is not None:
+            if set(synthesis_override) != {"type", "rationale"} or (
+                synthesis_override["type"] not in SYNTHESIS_OVERRIDE_TYPES
+            ):
+                raise SystemExit(f"{pair_id}: invalid typed synthesis override")
+            synthesis_overrides.append({"pair_id": pair_id, **synthesis_override})
         pair_primary_lock = _record_timestamp(
             primary_record, "primary_decision_locked_at", primary_lock
         )
@@ -525,7 +596,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
         created_at = (
             pair_secondary_lock if args.decision_created_at is None else created_at_fallback
         )
-        compatible = pair_id in COMPATIBLE_PAIRS
+        compatible = classification in {"exact_agreement", "compatible_agreement"}
         agreement = "minor_revision" if compatible else "resolved_disagreement"
         dissent = (
             None
@@ -681,9 +752,11 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     _assert_public_text(records)
     _assert_public_text(disagreements)
 
-    output_parent = args.output_dir.resolve().parent
+    checked_output = _checked_output_path(args.output_dir, label="finalization output")
+    output_parent = checked_output.parent
     output_parent.mkdir(parents=True, exist_ok=True)
-    staged = Path(tempfile.mkdtemp(prefix=f".{args.output_dir.name}.staged-", dir=output_parent))
+    checked_output = _checked_output_path(checked_output, label="finalization output")
+    staged = Path(tempfile.mkdtemp(prefix=f".{checked_output.name}.staged-", dir=output_parent))
     try:
         policy_path = staged / "adjudication-policy-v1.0.0.json"
         decisions_path = staged / "adjudication-decisions-v1.0.0.jsonl"
@@ -725,6 +798,30 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
                 },
                 "resolution": {"id": RESOLUTION_ID, "blind": False},
             },
+            "comparison_provenance": {
+                "schema_sha256": sha256(args.comparison_schema),
+                "artifact_sha256": sha256(args.comparison),
+                "primary_sha256": sha256(args.primary),
+                "secondary_sha256": sha256(args.secondary),
+                "packet_set_sha256": packet_manifest["packet_set_sha256"],
+                "pair_count": comparison_artifact["pair_count"],
+                "classification_counts": {
+                    "exact_agreement": comparison_artifact["classification_counts"].get(
+                        "exact_agreement", 0
+                    ),
+                    "compatible_agreement": comparison_artifact["classification_counts"][
+                        "compatible_agreement"
+                    ],
+                    "substantive_disagreement": comparison_artifact["classification_counts"][
+                        "substantive_disagreement"
+                    ],
+                },
+                "classification_by_pair": {
+                    pair_id: comparison_rows[pair_id]["classification"]
+                    for pair_id in sorted(comparison_rows)
+                },
+            },
+            "synthesis_overrides": synthesis_overrides,
             "committed_artifact_sha256": {
                 "annotation_guide": sha256(args.guide),
                 "ai_amendment": sha256(args.amendment),
@@ -733,6 +830,10 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
                 "disagreements": sha256(disagreements_path),
                 "decision_schema": sha256(args.decision_schema),
                 "disagreement_schema": sha256(args.disagreement_schema),
+                "comparison_schema": sha256(args.comparison_schema),
+                "freeze": sha256(args.freeze),
+                "report": sha256(args.report),
+                "release_notes": sha256(args.release_notes),
             },
             "maintainer_evidence": {
                 "availability": "maintainer_held_not_repository_verifiable",
@@ -765,7 +866,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
         else:
             _publish_directory(
                 staged,
-                args.output_dir,
+                checked_output,
                 allow_overwrite=args.allow_overwrite_versioned_lock,
             )
     finally:

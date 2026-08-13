@@ -23,6 +23,8 @@ from pathlib import Path
 from typing import Literal
 from unittest.mock import patch
 
+from json_schema_2020 import check_schema as check_json_schema
+from json_schema_2020 import validate as validate_json_schema
 from opensocrates.clock import FrozenClock
 from opensocrates.content.hashes import normalized_semantic_hash, source_tree_hash
 from opensocrates.content.injection import (
@@ -362,15 +364,39 @@ def _test_teacher_catalog_schema_and_overlay_identity() -> None:
 
     schema = json.loads(Path("schemas/v1/teacher-questions.schema.json").read_text())
     _require(schema["$id"] == "opensocrates.teacher-questions/1.0.0")
+    _require(not check_json_schema(schema))
+    _require(schema["properties"]["content_revision"]["const"] == 1)
     methods_schema = schema["properties"]["methods"]
     _require(methods_schema["minProperties"] == methods_schema["maxProperties"] == 48)
-    localized_schema = methods_schema["additionalProperties"]
+    _require(methods_schema["additionalProperties"] is False)
+    _require(set(methods_schema["properties"]) == set(FROZEN_METHOD_IDS))
+    _require(set(methods_schema["required"]) == set(FROZEN_METHOD_IDS))
+    _require("runtime-only invariant" in methods_schema["description"])
+    localized_schema = methods_schema["properties"][FROZEN_METHOD_IDS[0]]
     _require(set(localized_schema["required"]) == {"en", "ko"})
     for locale in ("en", "ko"):
         questions_schema = localized_schema["properties"][locale]
         _require(questions_schema["minItems"] == questions_schema["maxItems"] == 3)
+        _require(questions_schema["uniqueItems"] is True)
         _require(questions_schema["items"]["minLength"] == 20)
         _require(questions_schema["items"]["maxLength"] == 220)
+
+    schema_invalid = []
+    candidate = deepcopy(raw)
+    candidate["content_revision"] = 2
+    schema_invalid.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][FROZEN_METHOD_IDS[0]]["en"][1] = candidate["methods"][
+        FROZEN_METHOD_IDS[0]
+    ]["en"][0]
+    schema_invalid.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][FROZEN_METHOD_IDS[0]]["ko"][0] = "질문 아님"
+    schema_invalid.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"]["invented-method"] = candidate["methods"].pop(FROZEN_METHOD_IDS[0])
+    schema_invalid.append(candidate)
+    _require(all(validate_json_schema(value, schema) for value in schema_invalid))
     manifest = parse_yaml_file(Path("schemas/source/schema-manifest.yaml"))
     _require(
         any(

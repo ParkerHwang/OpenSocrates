@@ -702,6 +702,7 @@ class TeacherQuestionLocales(FrozenModel):
         metadata={
             "min_items": 3,
             "max_items": 3,
+            "unique_items": True,
             "item_min_length": 20,
             "item_max_length": 220,
             "item_pattern": r"^(?!\s)(?!.*\s$)[^\r\n\u0000]+\?$",
@@ -711,6 +712,7 @@ class TeacherQuestionLocales(FrozenModel):
         metadata={
             "min_items": 3,
             "max_items": 3,
+            "unique_items": True,
             "item_min_length": 20,
             "item_max_length": 220,
             "item_pattern": r"^(?!\s)(?!.*\s$)[^\r\n\u0000]+\?$",
@@ -741,7 +743,7 @@ class TeacherQuestionCatalog(FrozenModel):
 
     __schema_id__: ClassVar[str] = "opensocrates.teacher-questions/1.0.0"
     schema: str = _schema(__schema_id__)
-    content_revision: int = CONTENT_REVISION
+    content_revision: int = dc_field(default=CONTENT_REVISION, metadata={"const": CONTENT_REVISION})
     methods: dict[MethodId, TeacherQuestionLocales] = dc_field(
         metadata={
             "min_properties": 48,

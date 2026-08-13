@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ParkerHwang/OpenSocrates/evals/v1.2/schemas/adjudication-review-comparison.schema.json",
+  "title": "OpenSocrates v1.2 two-review comparison provenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "pair_count",
+    "classification_counts",
+    "primary_sha256",
+    "secondary_sha256",
+    "packet_set_sha256",
+    "normalization",
+    "comparisons"
+  ],
+  "properties": {
+    "schema": {"const": "opensocrates.eval-adjudication-review-comparison/1.0.0"},
+    "pair_count": {"const": 51},
+    "classification_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["compatible_agreement", "substantive_disagreement"],
+      "properties": {
+        "exact_agreement": {"const": 0},
+        "compatible_agreement": {"const": 2},
+        "substantive_disagreement": {"const": 49}
+      }
+    },
+    "primary_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "secondary_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "packet_set_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "normalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["behavior_aliases", "list_order"],
+      "properties": {
+        "behavior_aliases": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["hold", "clarifier", "owner-then-hold", "safe alternative", "bounded analysis"],
+          "properties": {
+            "hold": {"const": "hold_no_intervention"},
+            "clarifier": {"const": "route_clarifier"},
+            "owner-then-hold": {"const": "route_owner_then_hold"},
+            "safe alternative": {"const": "route_safe_alternative"},
+            "bounded analysis": {"const": "bounded_analysis"}
+          }
+        },
+        "list_order": {"const": "sorted"}
+      }
+    },
+    "comparisons": {
+      "type": "array",
+      "minItems": 51,
+      "maxItems": 51,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "pair_id",
+          "legacy",
+          "classification",
+          "differences",
+          "primary",
+          "secondary",
+          "primary_rationale",
+          "secondary_rationale"
+        ],
+        "properties": {
+          "pair_id": {"type": "string", "minLength": 1},
+          "legacy": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "owner_method", "expected_route", "assertion"],
+            "properties": {
+              "kind": {"enum": ["positive", "negative", "mechanical", "insufficiency", "explicit"]},
+              "owner_method": {"type": "string", "minLength": 1},
+              "expected_route": {"type": ["string", "null"]},
+              "assertion": {"enum": ["exact_route", "exclusion_only", "no_intervention"]}
+            }
+          },
+          "classification": {
+            "enum": ["exact_agreement", "compatible_agreement", "substantive_disagreement"]
+          },
+          "differences": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "status": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["primary", "secondary"],
+                "properties": {"primary": {}, "secondary": {}}
+              },
+              "intervention_policy": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["primary", "secondary"],
+                "properties": {"primary": {}, "secondary": {}}
+              },
+              "allowed_behaviors": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["primary", "secondary"],
+                "properties": {"primary": {}, "secondary": {}}
+              },
+              "leading_method": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["primary", "secondary"],
+                "properties": {"primary": {}, "secondary": {}}
+              },
+              "acceptable_leading_methods": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["primary", "secondary"],
+                "properties": {"primary": {}, "secondary": {}}
+              },
+              "acceptable_inclusion_methods": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["primary", "secondary"],
+                "properties": {"primary": {}, "secondary": {}}
+              },
+              "prohibited_methods": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["primary", "secondary"],
+                "properties": {"primary": {}, "secondary": {}}
+              },
+              "leading_metric_eligible": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["primary", "secondary"],
+                "properties": {"primary": {}, "secondary": {}}
+              },
+              "inclusion_metric_eligible": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["primary", "secondary"],
+                "properties": {"primary": {}, "secondary": {}}
+              },
+              "policy_metric_eligible": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["primary", "secondary"],
+                "properties": {"primary": {}, "secondary": {}}
+              }
+            }
+          },
+          "primary": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "intervention_policy",
+              "allowed_behaviors",
+              "leading_method",
+              "acceptable_leading_methods",
+              "acceptable_inclusion_methods",
+              "prohibited_methods",
+              "leading_metric_eligible",
+              "inclusion_metric_eligible",
+              "policy_metric_eligible"
+            ],
+            "properties": {
+              "status": {"enum": ["retain", "relabel", "multi_valid", "rewrite", "exclude_from_policy_metric", "invalid"]},
+              "intervention_policy": {"enum": ["prohibited", "optional", "required", "undetermined"]},
+              "allowed_behaviors": {
+                "type": "array",
+                "items": {"enum": ["hold_no_intervention", "route_clarifier", "route_owner_then_hold", "route_safe_alternative", "bounded_analysis"]},
+                "uniqueItems": true
+              },
+              "leading_method": {"type": ["string", "null"]},
+              "acceptable_leading_methods": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "acceptable_inclusion_methods": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "prohibited_methods": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "leading_metric_eligible": {"type": "boolean"},
+              "inclusion_metric_eligible": {"type": "boolean"},
+              "policy_metric_eligible": {"type": "boolean"}
+            }
+          },
+          "secondary": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "intervention_policy",
+              "allowed_behaviors",
+              "leading_method",
+              "acceptable_leading_methods",
+              "acceptable_inclusion_methods",
+              "prohibited_methods",
+              "leading_metric_eligible",
+              "inclusion_metric_eligible",
+              "policy_metric_eligible"
+            ],
+            "properties": {
+              "status": {"enum": ["retain", "relabel", "multi_valid", "rewrite", "exclude_from_policy_metric", "invalid"]},
+              "intervention_policy": {"enum": ["prohibited", "optional", "required", "undetermined"]},
+              "allowed_behaviors": {
+                "type": "array",
+                "items": {"enum": ["hold_no_intervention", "route_clarifier", "route_owner_then_hold", "route_safe_alternative", "bounded_analysis"]},
+                "uniqueItems": true
+              },
+              "leading_method": {"type": ["string", "null"]},
+              "acceptable_leading_methods": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "acceptable_inclusion_methods": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "prohibited_methods": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "leading_metric_eligible": {"type": "boolean"},
+              "inclusion_metric_eligible": {"type": "boolean"},
+              "policy_metric_eligible": {"type": "boolean"}
+            }
+          },
+          "primary_rationale": {"type": ["string", "null"]},
+          "secondary_rationale": {"type": ["string", "null"]}
+        }
+      }
+    }
+  }
+}

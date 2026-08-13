@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 import shutil
+import stat
 import sys
 import tempfile
 from collections import Counter
@@ -370,14 +371,35 @@ def _source_timestamp(dataset_manifest: dict[str, Any], explicit: str | None) ->
     )
 
 
+def _unresolved_absolute(path: Path) -> Path:
+    return Path(os.path.abspath(os.fspath(path)))
+
+
+def _checked_output_path(path: Path, *, label: str) -> Path:
+    """Reject symlinks in an unresolved output path before following any component."""
+
+    absolute = _unresolved_absolute(path)
+    current = Path(absolute.anchor)
+    for part in absolute.parts[1:]:
+        current /= part
+        try:
+            mode = current.lstat().st_mode
+        except FileNotFoundError:
+            continue
+        except OSError as exc:
+            raise SystemExit(f"cannot inspect {label} component {current}: {exc}") from exc
+        if stat.S_ISLNK(mode):
+            raise SystemExit(f"refusing symlink {label} component: {current}")
+    return absolute
+
+
 def _publish_directory(staged: Path, target: Path, *, allow_overwrite: bool) -> None:
     """Publish one complete directory generation without exposing mixed files."""
 
-    target = target.resolve()
-    if target in {Path("/"), ROOT.resolve(), ROOT.parent.resolve()}:
+    target = _checked_output_path(target, label="packet output")
+    resolved_target = target.resolve(strict=False)
+    if resolved_target in {Path("/"), ROOT.resolve(), ROOT.parent.resolve()}:
         raise SystemExit(f"unsafe packet output directory: {target}")
-    if target.is_symlink():
-        raise SystemExit(f"refusing symlink packet output directory: {target}")
     if target.exists() and not target.is_dir():
         raise SystemExit(f"packet output exists and is not a directory: {target}")
     if target.exists() and not allow_overwrite:
@@ -407,8 +429,7 @@ def _write_json_atomic(
     *,
     allow_overwrite: bool,
 ) -> None:
-    if path.is_symlink():
-        raise SystemExit(f"refusing symlink output: {path}")
+    path = _checked_output_path(path, label="freeze output")
     if path.exists() and not allow_overwrite:
         raise SystemExit(
             f"versioned freeze output already exists: {path}\n"
@@ -542,8 +563,15 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
             f"expected {EXPECTED_INSTANCE_COUNT} locale instances, found {locale_instances}"
         )
 
-    packet_parent = args.packet_dir.resolve().parent
+    checked_packet_dir = _checked_output_path(args.packet_dir, label="packet output")
+    checked_freeze_output = (
+        _checked_output_path(args.freeze_output, label="freeze output")
+        if args.freeze_output is not None
+        else None
+    )
+    packet_parent = checked_packet_dir.parent
     packet_parent.mkdir(parents=True, exist_ok=True)
+    checked_packet_dir = _checked_output_path(checked_packet_dir, label="packet output")
     staged_dir = Path(
         tempfile.mkdtemp(prefix=f".{args.packet_dir.name}.staged-", dir=packet_parent)
     )
@@ -606,21 +634,21 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
         )
 
         if (
-            args.freeze_output is not None
-            and args.freeze_output.exists()
+            checked_freeze_output is not None
+            and checked_freeze_output.exists()
             and not args.allow_overwrite
         ):
             raise SystemExit(
-                f"versioned freeze output already exists: {args.freeze_output}\n"
+                f"versioned freeze output already exists: {checked_freeze_output}\n"
                 "choose a new --freeze-output or pass --allow-overwrite explicitly"
             )
 
-        _publish_directory(staged_dir, args.packet_dir, allow_overwrite=args.allow_overwrite)
+        _publish_directory(staged_dir, checked_packet_dir, allow_overwrite=args.allow_overwrite)
     finally:
         if staged_dir.exists():
             shutil.rmtree(staged_dir)
 
-    if args.freeze_output is not None:
+    if checked_freeze_output is not None:
         freeze = {
             "schema": "opensocrates.eval-adjudication-freeze/1.0.0",
             "protocol_version": PROTOCOL_VERSION,
@@ -643,7 +671,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
             ),
         }
         _write_json_atomic(
-            args.freeze_output,
+            checked_freeze_output,
             freeze,
             allow_overwrite=args.allow_overwrite,
         )
@@ -652,9 +680,9 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     print(f"legacy kinds: {dict(sorted(kind_counts.items()))}")
     print(f"guide sha256: {guide_sha}")
     print(f"packet set sha256: {manifest['packet_set_sha256']}")
-    print(f"packets: {args.packet_dir}")
-    if args.freeze_output is not None:
-        print(f"freeze: {args.freeze_output}")
+    print(f"packets: {checked_packet_dir}")
+    if checked_freeze_output is not None:
+        print(f"freeze: {checked_freeze_output}")
     return 0
 
 

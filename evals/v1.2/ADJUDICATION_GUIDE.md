@@ -18,6 +18,10 @@ before integration without claiming that the private packet run was replayed.
 Any future semantic amendment requires a new guide and decision-file version;
 existing decisions are never silently edited in place.
 
+The committed AI-assisted snapshot governed by this guide is not
+confirmation-grade human gold, not held-out, and not answer-quality evidence.
+Those claims require the independent-human workflow defined below.
+
 The purpose of adjudication is **not** to raise or lower any selector score.
 It is to define, independently of model outputs, what the gold policy means:
 when the selector must intervene, whether clarification routing is success,

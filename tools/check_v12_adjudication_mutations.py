@@ -3,28 +3,56 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable
+from unittest.mock import patch
 
 from build_v12_adjudication_packets import _publish_directory as publish_packet_directory
-from compare_v12_adjudication_reviews import comparison_class
+from compare_v12_adjudication_reviews import (
+    ComparisonValidationError,
+    comparison_class,
+    validate_comparison_artifact,
+)
+from compare_v12_adjudication_reviews import (
+    main as compare_main,
+)
 from finalize_v12_ai_adjudication import (
     _final_semantic_review,
     _semantic_review_schema,
     _uncertainty_index,
 )
-from finalize_v12_ai_adjudication import _publish_directory as publish_final_directory
+from finalize_v12_ai_adjudication import (
+    _publish_directory as publish_final_directory,
+)
 from v12_adjudication_contract import FORBIDDEN_PACKET_KEYS, find_forbidden_packet_keys
 
 ROOT = Path(__file__).resolve().parents[1]
 CHECKER = ROOT / "tools" / "check_v12_adjudication.py"
 EVAL_RELATIVE = Path("evals/v1.2")
 REPORT_RELATIVE = Path("docs/v1.2-adjudication-report.md")
+RELEASE_NOTES_RELATIVE = Path(".github/release-notes/v1.2.1.md")
+COMPARISON_SCHEMA_RELATIVE = EVAL_RELATIVE / "schemas/adjudication-review-comparison.schema.json"
+HASH_PATHS = {
+    "annotation_guide": EVAL_RELATIVE / "ADJUDICATION_GUIDE.md",
+    "ai_amendment": EVAL_RELATIVE / "ADJUDICATION_AI_AMENDMENT.md",
+    "policy": EVAL_RELATIVE / "adjudication-policy-v1.0.0.json",
+    "decisions": EVAL_RELATIVE / "adjudication-decisions-v1.0.0.jsonl",
+    "disagreements": EVAL_RELATIVE / "adjudication-disagreements-v1.0.0.jsonl",
+    "decision_schema": EVAL_RELATIVE / "schemas/adjudication-decision.schema.json",
+    "disagreement_schema": EVAL_RELATIVE / "schemas/adjudication-disagreement.schema.json",
+    "comparison_schema": COMPARISON_SCHEMA_RELATIVE,
+    "freeze": EVAL_RELATIVE / "adjudication-freeze-v1.0.0.json",
+    "report": REPORT_RELATIVE,
+    "release_notes": RELEASE_NOTES_RELATIVE,
+}
 
 
 def _fixture(parent: Path, name: str) -> Path:
@@ -33,6 +61,9 @@ def _fixture(parent: Path, name: str) -> Path:
     report = target / REPORT_RELATIVE
     report.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT / REPORT_RELATIVE, report)
+    release_notes = target / RELEASE_NOTES_RELATIVE
+    release_notes.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT / RELEASE_NOTES_RELATIVE, release_notes)
     method_root = target / "content/methods"
     method_root.mkdir(parents=True)
     for source in (ROOT / "content/methods").iterdir():
@@ -78,6 +109,26 @@ def _write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
         "".join(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in rows),
         encoding="utf-8",
     )
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _with_rehashed_manifest(
+    mutate: Callable[[Path], None], *hash_fields: str
+) -> Callable[[Path], None]:
+    """Apply a coherent artifact mutation and refresh every named manifest hash."""
+
+    def wrapped(root: Path) -> None:
+        mutate(root)
+        manifest_path = root / EVAL_RELATIVE / "adjudication-manifest-v1.0.0.json"
+        manifest = _json(manifest_path)
+        for field in hash_fields:
+            manifest["committed_artifact_sha256"][field] = _sha256(root / HASH_PATHS[field])
+        _write_json(manifest_path, manifest)
+
+    return wrapped
 
 
 def _mutate_json(
@@ -151,10 +202,165 @@ def _contract_regressions(failures: list[str]) -> None:
         failures.append("comparison: disjoint leader sets must disagree")
 
 
-def _overwrite_regressions(parent: Path, failures: list[str]) -> None:
-    for label, publish in (
-        ("packet", publish_packet_directory),
-        ("final", publish_final_directory),
+def _comparison_regressions(parent: Path, failures: list[str]) -> None:
+    """Exercise the complete comparison generation path with synthetic private inputs."""
+
+    fixture = parent / "synthetic-comparison"
+    fixture.mkdir()
+    pair_ids = [f"synthetic-pair-{index:02d}" for index in range(51)]
+    primary_rows: list[dict[str, Any]] = []
+    secondary_rows: list[dict[str, Any]] = []
+    legacy = {
+        "kind": "insufficiency",
+        "owner_method": "deduction",
+        "expected_route": "deduction",
+        "assertion": "exact_route",
+    }
+    for index, pair_id in enumerate(pair_ids):
+        primary_rows.append(
+            {
+                "pair_id": pair_id,
+                "legacy": deepcopy(legacy),
+                "rationale": f"Synthetic primary rationale {index}.",
+                **_signature(leader="deduction", alternatives=["deduction"], status="retain"),
+            }
+        )
+        secondary_rows.append(
+            {
+                "pair_id": pair_id,
+                "legacy": deepcopy(legacy),
+                "rationale": f"Synthetic secondary rationale {index}.",
+                **_signature(
+                    leader="deduction" if index < 2 else "abduction",
+                    alternatives=["deduction" if index < 2 else "abduction"],
+                    status="relabel",
+                ),
+            }
+        )
+    primary = {"decisions": primary_rows}
+    secondary = {"decisions": secondary_rows}
+    packet_manifest = {"pair_ids": pair_ids, "packet_set_sha256": "a" * 64}
+    primary_path = fixture / "primary.json"
+    secondary_path = fixture / "secondary.json"
+    packet_path = fixture / "packet-manifest.json"
+    output_path = fixture / "comparison.json"
+    _write_json(primary_path, primary)
+    _write_json(secondary_path, secondary)
+    _write_json(packet_path, packet_manifest)
+    schema_path = ROOT / COMPARISON_SCHEMA_RELATIVE
+    try:
+        code = compare_main(
+            [
+                "--primary",
+                str(primary_path),
+                "--secondary",
+                str(secondary_path),
+                "--packet-manifest",
+                str(packet_path),
+                "--schema",
+                str(schema_path),
+                "--output",
+                str(output_path),
+            ]
+        )
+    except (ComparisonValidationError, SystemExit, KeyError, TypeError, ValueError) as exc:
+        failures.append(f"comparison generation: synthetic path failed: {exc}")
+        return
+    if code != 0 or not output_path.is_file():
+        failures.append("comparison generation: synthetic path did not publish an artifact")
+        return
+
+    comparison = _json(output_path)
+    schema = _json(schema_path)
+    try:
+        rows = validate_comparison_artifact(
+            comparison,
+            schema,
+            primary,
+            secondary,
+            packet_manifest,
+            primary_sha256=_sha256(primary_path),
+            secondary_sha256=_sha256(secondary_path),
+        )
+    except ComparisonValidationError as exc:
+        failures.append(f"comparison validation: generated synthetic artifact failed: {exc}")
+        return
+    if len(rows) != 51 or comparison["classification_counts"] != {
+        "exact_agreement": 0,
+        "compatible_agreement": 2,
+        "substantive_disagreement": 49,
+    }:
+        failures.append("comparison validation: synthetic artifact counts are not 0/2/49")
+
+    invalid: list[tuple[str, dict[str, Any], dict[str, Any], dict[str, Any]]] = []
+    empty = {}
+    invalid.append(("empty", empty, primary, packet_manifest))
+    malformed = deepcopy(comparison)
+    malformed["unexpected"] = True
+    invalid.append(("malformed", malformed, primary, packet_manifest))
+    invalid.append(("swapped", comparison, secondary, packet_manifest))
+    stale_manifest = deepcopy(packet_manifest)
+    stale_manifest["packet_set_sha256"] = "b" * 64
+    invalid.append(("stale packet set", comparison, primary, stale_manifest))
+    count_mismatch = deepcopy(comparison)
+    count_mismatch["classification_counts"]["compatible_agreement"] = 1
+    invalid.append(("count mismatch", count_mismatch, primary, packet_manifest))
+    row_tamper = deepcopy(comparison)
+    row_tamper["comparisons"][0]["classification"] = "substantive_disagreement"
+    invalid.append(("row tamper", row_tamper, primary, packet_manifest))
+    missing_row = deepcopy(comparison)
+    missing_row["comparisons"].pop()
+    invalid.append(("missing row", missing_row, primary, packet_manifest))
+
+    for label, candidate, first_review, candidate_manifest in invalid:
+        first_hash = _sha256(secondary_path) if label == "swapped" else _sha256(primary_path)
+        second_review = primary if label == "swapped" else secondary
+        second_hash = _sha256(primary_path) if label == "swapped" else _sha256(secondary_path)
+        try:
+            validate_comparison_artifact(
+                candidate,
+                schema,
+                first_review,
+                second_review,
+                candidate_manifest,
+                primary_sha256=first_hash,
+                secondary_sha256=second_hash,
+            )
+        except ComparisonValidationError:
+            continue
+        failures.append(f"comparison validation: {label} artifact was accepted")
+
+    malformed_primary = deepcopy(primary)
+    malformed_primary["decisions"][0].pop("leading_method")
+    try:
+        validate_comparison_artifact(
+            comparison,
+            schema,
+            malformed_primary,
+            secondary,
+            packet_manifest,
+            primary_sha256=_sha256(primary_path),
+            secondary_sha256=_sha256(secondary_path),
+        )
+    except ComparisonValidationError:
+        pass
+    else:
+        failures.append("comparison validation: malformed primary review was accepted")
+
+
+def _overwrite_regressions(parent: Path, failures: list[str]) -> None:  # noqa: C901 - exercises each overwrite failure stage explicitly
+    parent = parent.resolve()
+    for label, publish, patch_target in (
+        (
+            "packet",
+            publish_packet_directory,
+            "build_v12_adjudication_packets.os.replace",
+        ),
+        (
+            "final",
+            publish_final_directory,
+            "finalize_v12_ai_adjudication.os.replace",
+        ),
     ):
         target = parent / f"{label}-existing"
         target.mkdir()
@@ -170,6 +376,78 @@ def _overwrite_regressions(parent: Path, failures: list[str]) -> None:
             failures.append(f"{label}-publish: existing lock was not refused")
         if (target / "lock.json").read_text(encoding="utf-8") != "old":
             failures.append(f"{label}-publish: refused target was modified")
+
+        sentinel = parent / f"{label}-symlink-sentinel"
+        sentinel.mkdir()
+        (sentinel / "lock.json").write_text("sentinel", encoding="utf-8")
+        symlink_target = parent / f"{label}-symlink-output"
+        symlink_target.symlink_to(sentinel, target_is_directory=True)
+        symlink_staged = parent / f"{label}-symlink-staged"
+        symlink_staged.mkdir()
+        (symlink_staged / "lock.json").write_text("replacement", encoding="utf-8")
+        try:
+            publish(symlink_staged, symlink_target, allow_overwrite=True)
+        except SystemExit:
+            pass
+        else:
+            failures.append(f"{label}-publish: symlink output was accepted")
+        if (
+            not symlink_target.is_symlink()
+            or (sentinel / "lock.json").read_text(encoding="utf-8") != "sentinel"
+            or not symlink_staged.is_dir()
+        ):
+            failures.append(f"{label}-publish: symlink refusal did not preserve sentinel/stage")
+
+        real_parent = parent / f"{label}-real-parent"
+        real_parent.mkdir()
+        nested_sentinel = real_parent / "target"
+        nested_sentinel.mkdir()
+        (nested_sentinel / "lock.json").write_text("nested-sentinel", encoding="utf-8")
+        linked_parent = parent / f"{label}-linked-parent"
+        linked_parent.symlink_to(real_parent, target_is_directory=True)
+        parent_staged = parent / f"{label}-parent-link-staged"
+        parent_staged.mkdir()
+        try:
+            publish(parent_staged, linked_parent / "target", allow_overwrite=True)
+        except SystemExit:
+            pass
+        else:
+            failures.append(f"{label}-publish: symlink parent component was accepted")
+        if (nested_sentinel / "lock.json").read_text(encoding="utf-8") != "nested-sentinel":
+            failures.append(f"{label}-publish: symlink parent target was modified")
+
+        rollback_target = parent / f"{label}-rollback-target"
+        rollback_target.mkdir()
+        (rollback_target / "lock.json").write_text("old", encoding="utf-8")
+        rollback_staged = parent / f"{label}-rollback-staged"
+        rollback_staged.mkdir()
+        (rollback_staged / "lock.json").write_text("new", encoding="utf-8")
+        original_replace = os.replace
+        replace_calls = 0
+
+        def fail_second_replace(
+            source: object,
+            destination: object,
+            replace: Callable[[object, object], None] = original_replace,
+        ) -> None:
+            nonlocal replace_calls
+            replace_calls += 1
+            if replace_calls == 2:
+                raise OSError("synthetic interrupted replacement")
+            replace(source, destination)
+
+        try:
+            with patch(patch_target, side_effect=fail_second_replace):
+                publish(rollback_staged, rollback_target, allow_overwrite=True)
+        except OSError:
+            pass
+        else:
+            failures.append(f"{label}-publish: interrupted replacement did not fail")
+        if (
+            not rollback_target.is_dir()
+            or (rollback_target / "lock.json").read_text(encoding="utf-8") != "old"
+        ):
+            failures.append(f"{label}-publish: interrupted replacement did not roll back")
 
 
 def _semantic_review_regressions(failures: list[str]) -> None:  # noqa: C901
@@ -398,6 +676,8 @@ def main() -> int:  # noqa: C901
         manifest = EVAL_RELATIVE / "adjudication-manifest-v1.0.0.json"
         policy = EVAL_RELATIVE / "adjudication-policy-v1.0.0.json"
         freeze = EVAL_RELATIVE / "adjudication-freeze-v1.0.0.json"
+        guide = EVAL_RELATIVE / "ADJUDICATION_GUIDE.md"
+        amendment = EVAL_RELATIVE / "ADJUDICATION_AI_AMENDMENT.md"
         decision_schema = EVAL_RELATIVE / "schemas/adjudication-decision.schema.json"
         disagreement_schema = EVAL_RELATIVE / "schemas/adjudication-disagreement.schema.json"
 
@@ -631,6 +911,228 @@ def main() -> int:  # noqa: C901
             ),
         ]
 
+        positive_claim = (
+            "This is confirmation-grade human gold, held-out, and answer-quality evidence."
+        )
+        coherent_cases: list[tuple[str, Callable[[Path], None], str]] = [
+            (
+                "coherent semantic both false",
+                _with_rehashed_manifest(
+                    _mutate_jsonl(
+                        decisions,
+                        lambda rows: rows[0]["semantic_review"].update(
+                            {"en_ko_equivalent": False, "translation_mismatch": False}
+                        ),
+                    ),
+                    "decisions",
+                ),
+                "committed.decisions.semantic_review_exactly_one",
+            ),
+            (
+                "coherent case kind contradiction",
+                _with_rehashed_manifest(
+                    _mutate_jsonl(
+                        decisions,
+                        lambda rows: rows[0]["decision"].__setitem__(
+                            "case_kind",
+                            "positive" if rows[0]["legacy"]["kind"] != "positive" else "negative",
+                        ),
+                    ),
+                    "decisions",
+                ),
+                "committed.decisions.case_kind",
+            ),
+            (
+                "coherent resolved review with unresolved ledger",
+                _with_rehashed_manifest(
+                    _mutate_jsonl(
+                        disagreements,
+                        lambda rows: rows[0]["resolution"].update(
+                            {
+                                "status": "unresolved",
+                                "selected_source": "unresolved",
+                                "resolution_reviewer": None,
+                                "resolved_at": None,
+                            }
+                        ),
+                    ),
+                    "disagreements",
+                ),
+                "committed.disagreements.resolved_status",
+            ),
+            (
+                "coherent resolution timestamp contradiction",
+                _with_rehashed_manifest(
+                    _mutate_jsonl(
+                        disagreements,
+                        lambda rows: rows[0]["resolution"].__setitem__(
+                            "resolved_at", "2026-08-13T00:00:00Z"
+                        ),
+                    ),
+                    "disagreements",
+                ),
+                "committed.disagreements.resolved_at",
+            ),
+            (
+                "coherent resolved source contradiction",
+                _with_rehashed_manifest(
+                    _mutate_jsonl(
+                        disagreements,
+                        lambda rows: rows[0]["resolution"].__setitem__(
+                            "selected_source", "unresolved"
+                        ),
+                    ),
+                    "disagreements",
+                ),
+                "committed.disagreements.resolved_source",
+            ),
+            (
+                "coherent resolution reviewer contradiction",
+                _with_rehashed_manifest(
+                    _mutate_jsonl(
+                        disagreements,
+                        lambda rows: rows[0]["resolution"].__setitem__(
+                            "resolution_reviewer", "different-maintainer"
+                        ),
+                    ),
+                    "disagreements",
+                ),
+                "committed.disagreements.resolution_reviewer",
+            ),
+            (
+                "coherent decision creation timestamp contradiction",
+                _with_rehashed_manifest(
+                    _mutate_jsonl(
+                        decisions,
+                        lambda rows: rows[0]["provenance"].__setitem__(
+                            "decision_created_at", "2026-08-13T00:00:00Z"
+                        ),
+                    ),
+                    "decisions",
+                ),
+                "committed.decisions.created_at",
+            ),
+            (
+                "coherent freeze schema",
+                _with_rehashed_manifest(
+                    _mutate_json(freeze, lambda value: value.__setitem__("schema", "wrong")),
+                    "freeze",
+                ),
+                "committed.freeze.schema",
+            ),
+            (
+                "coherent freeze protocol",
+                _with_rehashed_manifest(
+                    _mutate_json(
+                        freeze, lambda value: value.__setitem__("protocol_version", "9.9.9")
+                    ),
+                    "freeze",
+                ),
+                "committed.freeze.protocol",
+            ),
+            (
+                "coherent freeze guide version",
+                _with_rehashed_manifest(
+                    _mutate_json(freeze, lambda value: value.__setitem__("guide_version", "9.9.9")),
+                    "freeze",
+                ),
+                "committed.freeze.guide_version",
+            ),
+            (
+                "coherent freeze counts",
+                _with_rehashed_manifest(
+                    _mutate_json(freeze, lambda value: value.__setitem__("unique_pair_count", 50)),
+                    "freeze",
+                ),
+                "committed.freeze.counts",
+            ),
+            (
+                "coherent report positive claim",
+                _with_rehashed_manifest(
+                    lambda root: (root / REPORT_RELATIVE).write_text(
+                        positive_claim + "\n", encoding="utf-8"
+                    ),
+                    "report",
+                ),
+                "committed.claim_boundary.report",
+            ),
+            (
+                "coherent policy positive claim",
+                _with_rehashed_manifest(
+                    _mutate_json(
+                        policy,
+                        lambda value: value.__setitem__("publication_boundary", positive_claim),
+                    ),
+                    "policy",
+                ),
+                "committed.claim_boundary.policy",
+            ),
+            (
+                "coherent guide positive claim",
+                _with_rehashed_manifest(
+                    lambda root: (root / guide).write_text(
+                        (root / guide).read_text(encoding="utf-8") + "\n" + positive_claim + "\n",
+                        encoding="utf-8",
+                    ),
+                    "annotation_guide",
+                ),
+                "committed.claim_boundary.guide",
+            ),
+            (
+                "coherent amendment positive claim",
+                _with_rehashed_manifest(
+                    lambda root: (root / amendment).write_text(
+                        (root / amendment).read_text(encoding="utf-8")
+                        + "\n"
+                        + positive_claim
+                        + "\n",
+                        encoding="utf-8",
+                    ),
+                    "ai_amendment",
+                ),
+                "committed.claim_boundary.amendment",
+            ),
+            (
+                "manifest positive claim",
+                _mutate_json(
+                    manifest,
+                    lambda value: value.__setitem__("publication_boundary", positive_claim),
+                ),
+                "committed.claim_boundary.manifest",
+            ),
+            (
+                "coherent release notes positive claim",
+                _with_rehashed_manifest(
+                    lambda root: (root / RELEASE_NOTES_RELATIVE).write_text(
+                        positive_claim + "\n", encoding="utf-8"
+                    ),
+                    "release_notes",
+                ),
+                "committed.claim_boundary.release_notes",
+            ),
+            (
+                "comparison classification count tamper",
+                _mutate_json(
+                    manifest,
+                    lambda value: value["comparison_provenance"][
+                        "classification_counts"
+                    ].__setitem__("compatible_agreement", 3),
+                ),
+                "committed.comparison_provenance.classification_counts",
+            ),
+            (
+                "comparison pair classification tamper",
+                _mutate_json(
+                    manifest,
+                    lambda value: value["comparison_provenance"][
+                        "classification_by_pair"
+                    ].__setitem__("abduction-insufficiency-01", "compatible_agreement"),
+                ),
+                "committed.comparison_provenance.pair_counts",
+            ),
+        ]
+        cases.extend(coherent_cases)
+
         hash_fields = (
             "annotation_guide",
             "ai_amendment",
@@ -639,6 +1141,10 @@ def main() -> int:  # noqa: C901
             "disagreements",
             "decision_schema",
             "disagreement_schema",
+            "comparison_schema",
+            "freeze",
+            "report",
+            "release_notes",
         )
         for field in hash_fields:
             cases.append(
@@ -679,6 +1185,7 @@ def main() -> int:  # noqa: C901
             passed += 1
 
         _contract_regressions(failures)
+        _comparison_regressions(temporary, failures)
         _overwrite_regressions(temporary, failures)
         _semantic_review_regressions(failures)
 
@@ -687,7 +1194,11 @@ def main() -> int:  # noqa: C901
         for failure in failures:
             print(f"- {failure}")
         return 1
-    print(f"adjudication-mutations: PASS ({passed} validator scenarios plus contracts/tooling)")
+    print(
+        "adjudication-mutations: PASS "
+        f"({passed} validator scenarios, {len(coherent_cases)} coherent mutations, "
+        "plus comparison/contracts/tooling)"
+    )
     return 0
 
 

@@ -31,6 +31,9 @@ _ASSERTION_KEYWORDS = frozenset(
         "items",
         "minItems",
         "maxItems",
+        "minProperties",
+        "maxProperties",
+        "propertyNames",
         "uniqueItems",
         "minLength",
         "maxLength",
@@ -170,6 +173,10 @@ def check_schema(schema: Any) -> list[ValidationIssue]:  # noqa: C901
                 for key, child in properties.items():
                     visit(child, f"{path}.properties.{key}")
 
+        property_names = node.get("propertyNames")
+        if property_names is not None:
+            visit(property_names, f"{path}.propertyNames")
+
         additional = node.get("additionalProperties")
         if additional is not None and not isinstance(additional, (bool, dict)):
             issues.append(
@@ -194,7 +201,14 @@ def check_schema(schema: Any) -> list[ValidationIssue]:  # noqa: C901
         ):
             issues.append(ValidationIssue(f"{path}.enum", "must be a non-empty unique array"))
 
-        for keyword in ("minItems", "maxItems", "minLength", "maxLength"):
+        for keyword in (
+            "minItems",
+            "maxItems",
+            "minProperties",
+            "maxProperties",
+            "minLength",
+            "maxLength",
+        ):
             value = node.get(keyword)
             if value is not None and (
                 not isinstance(value, int) or isinstance(value, bool) or value < 0
@@ -215,6 +229,12 @@ def check_schema(schema: Any) -> list[ValidationIssue]:  # noqa: C901
             and node["minLength"] > node["maxLength"]
         ):
             issues.append(ValidationIssue(path, "minLength exceeds maxLength"))
+        if (
+            isinstance(node.get("minProperties"), int)
+            and isinstance(node.get("maxProperties"), int)
+            and node["minProperties"] > node["maxProperties"]
+        ):
+            issues.append(ValidationIssue(path, "minProperties exceeds maxProperties"))
 
         pattern = node.get("pattern")
         if pattern is not None:
@@ -264,6 +284,22 @@ def validate(instance: Any, schema: dict[str, Any]) -> list[ValidationIssue]:  #
             issues.append(ValidationIssue(path, f"is not one of {node['enum']!r}"))
 
         if isinstance(value, dict):
+            minimum_properties = node.get("minProperties")
+            maximum_properties = node.get("maxProperties")
+            if minimum_properties is not None and len(value) < minimum_properties:
+                issues.append(
+                    ValidationIssue(
+                        path,
+                        f"has {len(value)} properties; minimum is {minimum_properties}",
+                    )
+                )
+            if maximum_properties is not None and len(value) > maximum_properties:
+                issues.append(
+                    ValidationIssue(
+                        path,
+                        f"has {len(value)} properties; maximum is {maximum_properties}",
+                    )
+                )
             required = node.get("required", [])
             for key in required:
                 if key not in value:
@@ -282,6 +318,10 @@ def validate(instance: Any, schema: dict[str, Any]) -> list[ValidationIssue]:  #
             elif isinstance(additional, dict):
                 for key in extras:
                     walk(value[key], additional, f"{path}.{key}")
+            property_names = node.get("propertyNames")
+            if isinstance(property_names, dict):
+                for key in value:
+                    walk(key, property_names, f"{path}.{key}<name>")
 
         if isinstance(value, list):
             minimum = node.get("minItems")

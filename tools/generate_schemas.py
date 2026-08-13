@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import importlib
 import sys
+from copy import deepcopy
 from dataclasses import MISSING, fields, is_dataclass
 from enum import Enum
 from pathlib import Path
@@ -23,6 +24,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from opensocrates.constants import MAX_REVIEWED_PROCEDURE_TEXT  # noqa: E402
+from opensocrates.content.schema import FROZEN_METHOD_IDS  # noqa: E402
 from opensocrates.domain.models import SCHEMA_TYPES  # noqa: E402
 from opensocrates.domain.validation import FrozenModel, canonical_json  # noqa: E402
 from opensocrates.errors import SchemaGenerationError  # noqa: E402
@@ -113,6 +115,8 @@ def _schema_for_annotation(annotation: Any, metadata: Mapping[str, Any]) -> dict
             result["minItems"] = metadata["min_items"]
         if "max_items" in metadata:
             result["maxItems"] = metadata["max_items"]
+        if metadata.get("unique_items") is True:
+            result["uniqueItems"] = True
         return result
     if origin in (dict, Mapping):
         args = get_args(annotation)
@@ -177,6 +181,8 @@ def _schema_for_annotation(annotation: Any, metadata: Mapping[str, Any]) -> dict
         return {"type": "boolean"}
     if annotation is int:
         result = {"type": "integer"}
+        if "const" in metadata:
+            result["const"] = metadata["const"]
         if metadata.get("scalar") == "duration_ms":
             result.update({"minimum": 0, "maximum": 86_400_000})
         return result
@@ -220,6 +226,23 @@ def schema_for_model(model_type: type[FrozenModel]) -> dict[str, Any]:
     if not isinstance(schema_id, str):
         raise SchemaGenerationError(f"{model_type.__name__} does not declare __schema_id__")
     result = _object_schema(model_type)
+    if schema_id == "opensocrates.teacher-questions/1.0.0":
+        methods_schema = result["properties"]["methods"]
+        localized_schema = methods_schema.pop("additionalProperties")
+        method_ids = sorted(FROZEN_METHOD_IDS)
+        methods_schema.update(
+            {
+                "additionalProperties": False,
+                "properties": {method_id: deepcopy(localized_schema) for method_id in method_ids},
+                "required": method_ids,
+                "description": (
+                    "Exactly the frozen 48 method keys. Cross-method question uniqueness "
+                    "is a runtime-only invariant enforced by TeacherQuestionCatalog because "
+                    "Draft 2020-12 uniqueItems cannot compare values across object properties."
+                ),
+            }
+        )
+        methods_schema.pop("propertyNames", None)
     result.update(
         {
             "$id": schema_id,
