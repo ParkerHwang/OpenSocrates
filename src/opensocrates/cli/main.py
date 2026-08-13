@@ -34,7 +34,8 @@ def _parser() -> argparse.ArgumentParser:
 
     diagnose = sub.add_parser("diagnose", help="show safe runtime aggregates")
     diagnose.add_argument(
-        "--host", choices=("antigravity", "claude", "codex", "cursor", "prompt_only")
+        "--host",
+        choices=("antigravity", "claude", "codex", "cursor", "opencode", "prompt_only"),
     )
     output = diagnose.add_mutually_exclusive_group()
     output.add_argument("--json", action="store_const", const="json", dest="output")
@@ -76,7 +77,7 @@ def _parser() -> argparse.ArgumentParser:
         command = capabilities_sub.add_parser(name)
         command.add_argument(
             "--host",
-            choices=("antigravity", "claude", "codex", "cursor", "prompt_only"),
+            choices=("antigravity", "claude", "codex", "cursor", "opencode", "prompt_only"),
             required=True,
         )
 

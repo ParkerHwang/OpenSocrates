@@ -1,0 +1,32 @@
+# OpenSocrates for OpenCode
+
+This deterministic OpenSocrates {{PRODUCT_VERSION}} package has a minimum
+verified host version of OpenCode 1.18.18.
+
+- `plugins/opensocrates.js` uses the stable `chat.message` hook, inspects only
+  the bounded current public text locally, and adds at most one complete
+  authored procedure as a synthetic same-turn message part.
+- `skills/opensocrates/SKILL.md` is the explicit native Agent Skill fallback.
+- The bridge makes no network call, subprocess call, recursive OpenCode call,
+  extra model call, credential access, telemetry write, or provider/model
+  assumption.
+- Unsupported, malformed, oversized, timed-out, or exceptional activation
+  attempts fail open and leave the original prompt unchanged.
+
+The installer copies only the owned bridge, its ownership sidecar, and the
+owned `opensocrates` skill directory beneath `~/.config/opencode`. It does not
+rewrite `opencode.json`.
+
+Validation boundary:
+
+- Package construction, inventory, bridge unit behavior, and isolated
+  lifecycle transactions are release-validated.
+- Stable `chat.message` same-turn mutation, non-interactive `opencode run`, and
+  an interactive TUI receipt were all live-validated on OpenCode 1.18.18.
+- DeepSeek V4 Flash was one provider-specific live smoke test, not a product
+  dependency; credentials, endpoints, and model IDs are never embedded.
+- Native skill discovery was live-validated. Native skill invocation remains
+  unverified.
+
+Content revision: `{{CONTENT_REVISION}}`
+Semantic hash: `{{SEMANTIC_HASH}}`

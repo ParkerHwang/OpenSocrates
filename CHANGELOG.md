@@ -5,6 +5,32 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-13
+
+### Added
+
+- First-class OpenCode 1.18.18+ integration using the stable `chat.message`
+  hook for live-validated same-turn local activation and a native
+  `opensocrates` Agent Skill fallback.
+- Provider-neutral, dependency-free OpenCode bridge with bounded input,
+  duplicate prevention, and timeout/exception fail-open behavior. A live
+  DeepSeek V4 Flash smoke test is recorded without embedding provider settings.
+- OpenCode install, status, verify, update, remove, rollback, automatic-update,
+  and `--host all` lifecycle support with exact-path ownership and complete
+  installed inventory verification.
+- Deterministic OpenCode package generation, release-gate validation,
+  capability reporting, privacy-safe compatibility evidence, and English and
+  Korean support documentation.
+
+### Security and privacy
+
+- The OpenCode installer never rewrites `opencode.json`; it refuses unowned,
+  partial, symbolic-link, and unsafe exact paths while preserving unrelated
+  plugins, skills, and configuration.
+- The OpenCode bridge makes no network, subprocess, recursive OpenCode, extra
+  model, telemetry, or credential access and preserves the complete-procedure
+  grounding requirement.
+
 ## [1.1.5] - 2026-08-12
 
 ### Added
@@ -340,3 +366,4 @@ All notable changes to OpenSocrates are documented here. This project follows
 [1.1.3]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.2...v1.1.3
 [1.1.4]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.3...v1.1.4
 [1.1.5]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.4...v1.1.5
+[1.2.0]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.5...v1.2.0

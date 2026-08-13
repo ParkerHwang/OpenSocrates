@@ -1,0 +1,64 @@
+{
+  "schema": "opensocrates.opencode-compatibility-evidence/1.0.0",
+  "recorded_at": "2026-08-13",
+  "privacy": {
+    "conversation_content_recorded": false,
+    "credentials_recorded": false,
+    "home_paths_recorded": false,
+    "model_output_recorded": false,
+    "prompts_recorded": false
+  },
+  "target": {
+    "opencode_version": "1.18.18",
+    "opencode_source_commit": "31406ccc51b4bd2a4e1e086b2bcaa5f7f804f26d",
+    "plugin_package_version": "1.18.18",
+    "plugin_package_integrity": "sha512-vqQeqJtn9c+J+tIQDzYk88xip/NVNN1hym1ATmckxo6zINHAoXoul4Sw/jgnvL00rLsfAvhja28qax4h3g/5Jg==",
+    "cli_package_integrity": "sha512-J+5HFq8tf+wPBBpBpMPSNjSytF2/EkNWYfFZh4si1d9auFbQriqDyqZv+vFUsLWERfdMU32Eajwuiq3rKBvZLQ=="
+  },
+  "primary_sources": [
+    "https://opencode.ai/docs/plugins/",
+    "https://opencode.ai/docs/skills/",
+    "https://github.com/anomalyco/opencode/tree/v1.18.18"
+  ],
+  "source_validation": {
+    "global_plugin_location": ".config/opencode/plugins",
+    "global_skill_location": ".config/opencode/skills/<name>/SKILL.md",
+    "stable_hook": "chat.message",
+    "chat_message_has_current_user_parts": true,
+    "chat_message_runs_before_message_persistence": true,
+    "chat_message_runs_before_model_message_and_system_assembly": true,
+    "experimental_system_transform_has_no_current_user_payload": true,
+    "uncaught_plugin_exception_propagates": true,
+    "tui_uses_shared_prompt_path": true
+  },
+  "isolated_live_probe": {
+    "command_surface": "opencode run",
+    "global_plugin_discovered": true,
+    "global_skill_discovered": true,
+    "chat_message_payload_observed": true,
+    "current_user_text_available": true,
+    "in_place_part_mutation_visible_same_turn": true,
+    "injected_part_synthetic": true,
+    "injected_part_persisted": true,
+    "injected_part_duplicated": false,
+    "timeout_failed_open": true,
+    "exception_failed_open": true,
+    "interactive_tui_invoked": true,
+    "interactive_tui_same_turn_grounding_observed": true
+  },
+  "production_bridge_live_probe": {
+    "automatic_judgment_activation_same_turn": true,
+    "interactive_tui_same_turn_grounding_observed": true,
+    "complete_authored_method_grounding_observed": true,
+    "mechanical_control_unchanged": true,
+    "explicit_skill_discovery": true,
+    "provider": "OpenCode",
+    "model": "deepseek-v4-flash-free",
+    "credentials_changed": false
+  },
+  "unverified": [
+    "native skill invocation receipt",
+    "provider matrix beyond the recorded DeepSeek smoke test",
+    "OpenCode versions older than 1.18.18 or at/after 2.0.0"
+  ]
+}
