@@ -16,6 +16,7 @@ format-check:
 
 lint: typecheck
 	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) tools/check_import_boundaries.py
+	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) tools/check_generated_contract.py
 	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff check src tools; else "$(PYTHON)" -m ruff check src tools; fi
 
 typecheck:
@@ -36,9 +37,10 @@ generated-check:
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py --output-dir "$$out/schemas"; \
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$$out/content/compiled-content.bundle.json" --reasoning-projections-output "$$out/content/compiled-reasoning-content.bundle.json"; \
 	diff -ru "$(ROOT)/schemas/v1" "$$out/schemas/v1"; diff -u "$(ROOT)/content/compiled-content.bundle.json" "$$out/content/compiled-content.bundle.json"; diff -u "$(ROOT)/content/compiled-reasoning-content.bundle.json" "$$out/content/compiled-reasoning-content.bundle.json"; \
+	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$(ROOT)/build/generated/plugins/grok" >/dev/null; \
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$$out/plugins/grok" >/dev/null; \
 	diff -ru "$(ROOT)/build/generated/plugins/grok" "$$out/plugins/grok"; \
-	echo "generated-check: byte-identical schemas and content bundles"
+	echo "generated-check: byte-identical schemas, content bundles, and Grok package"
 
 content-check:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"

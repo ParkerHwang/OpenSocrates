@@ -724,6 +724,22 @@ function managedPaths(host) {
   };
 }
 
+// Directory that holds staging trees and rollback backups for one host.
+//
+// Grok scans every directory below ~/.grok/plugins, including dot-prefixed
+// ones, so a staging tree or rollback backup left there would be discovered as
+// a second OpenSocrates plugin. An interrupted install must not be able to
+// leave a shadow copy inside Grok's plugin discovery root, so both transient
+// directories live in the Grok home instead, next to the scanned directory.
+function transientParent(host, paths) {
+  return host === "grok" ? paths.hostHome : paths.parent;
+}
+
+export function transientPathsFor(host) {
+  const paths = managedPaths(host);
+  return { root: paths.root, parent: paths.parent, transient: transientParent(host, paths) };
+}
+
 function codexBinary() {
   return process.env.CODEX_BIN || "codex";
 }
@@ -950,7 +966,37 @@ function marketplaceEntry(host) {
   return matches[0] ?? null;
 }
 
-function pluginState(host) {
+// Read Grok Build's machine-readable plugin state.
+//
+// The managed Grok files are host-independent content, so inspecting or
+// removing what the installer owns must not depend on a runnable `grok`
+// command: a user who uninstalls Grok Build still has to be able to clean up.
+// Transactional callers pass requireHostState so that install and update keep
+// confirming activation against the host itself.
+function grokInspection(requireHostState) {
+  if (requireHostState) return runGrokJson(["inspect", "--json"]);
+  const result = run(grokBinary(), ["inspect", "--json"], { allowFailure: true });
+  if (result.error || result.status !== 0) {
+    const detail = result.error?.message || result.stderr?.trim() || `exit ${result.status}`;
+    console.warn(
+      `warning: could not read Grok Build plugin state (${detail}); ` +
+        "reporting the managed files only",
+    );
+    return null;
+  }
+  try {
+    const payload = JSON.parse(result.stdout);
+    if (payload === null || typeof payload !== "object") {
+      fail("Grok Build returned a non-container JSON value");
+    }
+    return payload;
+  } catch (error) {
+    if (error instanceof InstallerError) throw error;
+    fail(`Grok Build returned invalid JSON for inspect --json: ${error.message}`);
+  }
+}
+
+function pluginState(host, { requireHostState = false } = {}) {
   if (FILE_DROP_HOSTS.includes(host)) {
     const paths = managedPaths(host);
     if (!existsSync(paths.root)) return { kind: "missing", version: null };
@@ -974,7 +1020,8 @@ function pluginState(host) {
       fail(`${host} reported an invalid OpenSocrates plugin manifest`);
     }
     if (host !== "grok") return { kind: "installed", version: manifest.version };
-    const payload = runGrokJson(["inspect", "--json"]);
+    const payload = grokInspection(requireHostState);
+    if (payload === null) return { kind: "installed", version: manifest.version };
     if (!Array.isArray(payload.plugins)) {
       fail("Grok Build inspect returned an unexpected plugin schema");
     }
@@ -1587,7 +1634,9 @@ async function preflightHost(host, action) {
     fail(`${host} has a managed registration whose root is missing: ${paths.root}`);
   }
   const previousState =
-    previousEntry === null ? { kind: "missing", version: null } : pluginState(host);
+    previousEntry === null
+      ? { kind: "missing", version: null }
+      : pluginState(host, { requireHostState: ["install", "update"].includes(action) });
   return { host, paths, previousEntry, previousState, rootExists };
 }
 
@@ -1658,17 +1707,13 @@ async function preflightSelectedHosts(options, action, desiredState) {
 async function stageInstallation(preflight, pluginSource) {
   const { host, paths } = preflight;
   await mkdir(paths.parent, { recursive: true, mode: 0o700 });
-  const staging = await buildStagingTree(paths.parent, pluginSource, host);
+  const transient = transientParent(host, paths);
+  await mkdir(transient, { recursive: true, mode: 0o700 });
+  const staging = await buildStagingTree(transient, pluginSource, host);
   return {
     ...preflight,
     staging,
-    // Grok scans every directory below ~/.grok/plugins, including dot-prefixed
-    // rollback directories. Keep its backup in the host home so only the newly
-    // activated exact root is discoverable during post-activation inspection.
-    backup: join(
-      host === "grok" ? paths.hostHome : paths.parent,
-      `.opensocrates.backup-${randomUUID()}`,
-    ),
+    backup: join(transient, `.opensocrates.backup-${randomUUID()}`),
     registrationRemoved: false,
     backupCreated: false,
     newRootActive: false,
@@ -1690,7 +1735,7 @@ async function activateInstallation(transaction) {
   await rename(transaction.staging, paths.root);
   transaction.newRootActive = true;
   const result = addRegistration(host, paths.root, true);
-  const state = pluginState(host);
+  const state = pluginState(host, { requireHostState: true });
   if (
     (host === "codex" &&
       (result?.pluginId !== PLUGIN_ID || result?.version !== PRODUCT_VERSION)) ||
@@ -1839,7 +1884,7 @@ async function runInstallOrUpdate(options, action) {
 }
 
 async function inspectHostStatus(host) {
-  if (!["antigravity", "cursor"].includes(host)) requireHostCli(host);
+  if (!FILE_DROP_HOSTS.includes(host)) requireHostCli(host);
   if (host === "claude") warnLegacyClaudeInstallation();
   const paths = managedPaths(host);
   const entry = marketplaceEntry(host);
@@ -1951,7 +1996,7 @@ function removalTransaction(preflight) {
   return {
     ...preflight,
     backup: join(
-      preflight.host === "grok" ? preflight.paths.hostHome : preflight.paths.parent,
+      transientParent(preflight.host, preflight.paths),
       `.opensocrates.removed-${randomUUID()}`,
     ),
     registrationRemoved: false,

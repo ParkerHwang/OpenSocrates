@@ -11,7 +11,13 @@ from pathlib import Path
 
 from opensocrates.constants import CAPABILITY_KEYS
 from opensocrates.domain.capability import validate_capability_profile
-from opensocrates.domain.enums import CapabilityStatus, CapabilityTier, HostId
+from opensocrates.domain.enums import (
+    CapabilityEvidenceKind,
+    CapabilityStatus,
+    CapabilityTier,
+    HostId,
+)
+from opensocrates.domain.models import CapabilityProfile
 from opensocrates.hosts.codex.adapter import CodexAdapter
 from opensocrates.hosts.grok.adapter import GrokAdapter
 from opensocrates.hosts.grok.capability import default_capability_profile
@@ -83,6 +89,59 @@ def _assert_generated_package(root: Path) -> None:
         assert completed.returncode == 0, completed.stderr
 
 
+def _assert_evidence_alignment(root: Path, profile: CapabilityProfile) -> None:
+    """Tie the shipped capability claim to the recorded compatibility probe.
+
+    The release gate reads `capability_evidence` out of the package generator,
+    so on its own that claim is self-asserted. These checks make the claim fail
+    whenever it drifts from the privacy-safe evidence record, from the observed
+    package inventory, or from the capability profile the product reports.
+    """
+
+    evidence = json.loads(
+        (root / "docs" / "evidence" / "grok-build-1.0.3-compatibility.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    package = root / "build" / "generated" / "plugins" / "grok"
+    release = json.loads((package / "release-manifest.json").read_text(encoding="utf-8"))
+    probe_id = evidence["probe_id"]
+    assert release["capability_evidence"]["probe_id"] == probe_id
+    for key, entry in profile.capabilities.items():
+        expected = probe_id if entry.evidence_kind is CapabilityEvidenceKind.LOCAL_PROBE else None
+        assert entry.live_probe_id == expected, key
+
+    inventory = evidence["package"]
+    skill_root = package / "skills"
+    assert inventory["public_skills"] == len([p for p in skill_root.iterdir() if p.is_dir()])
+    methods = skill_root / "opensocrates" / "references" / "methods"
+    assert inventory["internal_methods"] == len(list(methods.glob("*.md")))
+    for surface, recorded in (
+        ("hooks", "hooks"),
+        ("commands", "commands"),
+        ("agents", "agents"),
+        ("runtime", "native_runtimes"),
+    ):
+        assert inventory[recorded] == 0 and not (package / surface).exists(), surface
+    assert inventory["mcp_servers"] == 0
+    assert not any((package / name).exists() for name in ("mcp.json", ".mcp.json"))
+
+    # Every supported claim must rest on a recorded live observation, and no
+    # injection claim may outrun hook output that was never model-visible.
+    observations = evidence["observations"]
+    supported = {
+        key
+        for key, entry in profile.capabilities.items()
+        if entry.status is CapabilityStatus.SUPPORTED
+    }
+    assert supported == {"method_skill_invocation", "model_initiated_method_skill_activation"}
+    assert observations["headless_explicit_skill"] is True
+    assert observations["headless_native_auto_skill_same_turn"] is True
+    assert observations["passive_stdout_model_visible"] is False
+    assert observations["structured_additional_context_model_visible"] is False
+    assert observations["installed_plugin_hooks_activated"] is False
+
+
 def _assert_probe_contracts(root: Path) -> None:
     fixtures = root / "src" / "opensocrates" / "hosts" / "contracts" / "fixtures" / "grok"
     events = {
@@ -151,6 +210,7 @@ def main() -> int:
 
     _assert_source_boundary(root)
     _assert_generated_package(root)
+    _assert_evidence_alignment(root, profile)
     _assert_probe_contracts(root)
     validation = "pass" if shutil.which("grok") is not None else "unavailable"
     print(f"grok-check: PASS tier=C hooks=0 runtime=0 methods=48 native_validation={validation}")

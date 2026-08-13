@@ -133,10 +133,19 @@ The installer owns only `~/.grok/plugins/opensocrates` and its exact ownership
 marker. It rejects symlinks, unowned roots, unsafe archive entries, incomplete
 inventories, and mismatched host/name/version metadata. Installation and
 updates stage before atomic activation; removal and activation retain a
-rollback backup until the operation commits. Grok backups remain directly
-under the Grok home, outside its scanned `plugins/` directory, so rollback
-state cannot shadow the active plugin. No unrelated Grok config,
-marketplace, skill, plugin, or hook entry is edited.
+rollback backup until the operation commits. Both transient directories, the
+staging tree and the rollback backup, are created directly under the Grok home
+rather than inside its scanned `plugins/` directory, so neither an in-flight
+nor an interrupted operation can leave a second discoverable copy of the
+plugin. No unrelated Grok config, marketplace, skill, plugin, or hook entry is
+edited.
+
+Install and update require the `grok` command, because activation is confirmed
+against `grok inspect --json`. Status and removal do not: the managed files are
+host-independent content, so a user who has uninstalled Grok Build can still
+inspect and remove them. When inspection is unavailable in those read-only and
+removal paths, the installer says so and reports the managed files alone
+instead of claiming host-confirmed state.
 
 Grok also discovers Claude-compatible plugins. A native user plugin with the
 same `opensocrates` name takes precedence; an isolated live inspection showed

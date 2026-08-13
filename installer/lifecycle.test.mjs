@@ -13,7 +13,7 @@ import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, syml
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
-import { PRODUCT_VERSION, main, withOperationLock } from "./opensocrates.mjs";
+import { PRODUCT_VERSION, main, transientPathsFor, withOperationLock } from "./opensocrates.mjs";
 import { inspectManagedLayout } from "../tools/clean_machine_acceptance.mjs";
 
 const MARKETPLACE = "opensocrates";
@@ -423,6 +423,11 @@ function makeAllSandbox(options = {}) {
   process.env.CURSOR_BIN = join(root, "unavailable-cursor");
   process.env.AGY_BIN = join(root, "unavailable-agy");
   process.env.GROK_BIN = join(root, "unavailable-grok");
+  // Grok resolves its managed root from GROK_HOME without consulting the CLI,
+  // so an isolated home is what keeps a developer's real ~/.grok out of the
+  // all-host fixture. Setting CURSOR_CONFIG_DIR or ANTIGRAVITY_CONFIG_DIR would
+  // instead satisfy their preflight and pull them into this two-host fixture.
+  process.env.GROK_HOME = join(root, "grok-home");
   process.env.OPENSOCRATES_STATE_DIR = join(root, "state");
   process.env.OPENSOCRATES_LAUNCH_AGENTS_DIR = join(root, "LaunchAgents");
   process.env.OPENSOCRATES_SKIP_LAUNCHCTL = "1";
@@ -693,6 +698,110 @@ for (const host of ["antigravity", "cursor", "grok"]) {
     }
   });
 }
+
+test("grok: staging and rollback directories stay outside the scanned plugins directory", async () => {
+  const box = makeSandbox("grok");
+  try {
+    const placement = transientPathsFor("grok");
+    assert.equal(placement.parent, join(box.home, "plugins"));
+    assert.equal(placement.transient, box.home);
+    assert.equal(
+      placement.transient.startsWith(`${placement.parent}/`),
+      false,
+      "a transient directory would be discoverable as a second Grok plugin",
+    );
+
+    // An install must leave the scanned directory holding the managed root
+    // only: a staging or backup directory left there by an interrupted run is
+    // discovered by Grok as a duplicate OpenSocrates plugin.
+    const pkg = buildPackage(box.root, "grok");
+    const args = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+    assert.deepEqual(readdirSync(placement.parent), [MARKETPLACE]);
+
+    const update = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
+    assert.equal(update.error, undefined, `update failed: ${update.error?.message}`);
+    assert.deepEqual(readdirSync(placement.parent), [MARKETPLACE]);
+    assert.deepEqual(
+      readdirSync(box.home).filter((entry) => entry.startsWith(".opensocrates.")),
+      [],
+      "a committed transaction left a transient directory in the Grok home",
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+for (const host of ["antigravity", "cursor", "claude", "codex"]) {
+  test(`${host}: transient directories keep their established location`, () => {
+    const box = makeSandbox(host);
+    try {
+      const placement = transientPathsFor(host);
+      assert.equal(placement.transient, placement.parent);
+      assert.equal(placement.parent, dirname(placement.root));
+    } finally {
+      box.cleanup();
+    }
+  });
+}
+
+test("grok: files stay inspectable and removable without a runnable Grok CLI", async () => {
+  const box = makeSandbox("grok");
+  try {
+    const pkg = buildPackage(box.root, "grok");
+    const args = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+
+    // Grok Build itself can be uninstalled while its managed OpenSocrates
+    // files remain. Reading and removing what this installer owns is plain
+    // file ownership work and must not depend on the host command.
+    process.env.GROK_BIN = join(box.root, "uninstalled-grok");
+
+    const status = await quiet(() => main(["status", "--host", "grok"]));
+    assert.equal(status.error, undefined, `status failed: ${status.error?.message}`);
+    assert.match(status.output, new RegExp(`OpenSocrates ${PRODUCT_VERSION} is installed`));
+    assert.match(status.output, /could not read Grok Build plugin state/);
+
+    const remove = await quiet(() => main(["remove", "--host", "grok"]));
+    assert.equal(remove.error, undefined, `remove failed: ${remove.error?.message}`);
+    assert.equal(existsSync(box.managedRoot), false, "managed root survived remove");
+    assert.deepEqual(
+      readdirSync(box.home).filter((entry) => entry.startsWith(".opensocrates.")),
+      [],
+      "remove left a rollback directory behind",
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("grok: a stale managed directory cannot block an all-host lifecycle", async () => {
+  const box = makeSandbox("grok");
+  try {
+    for (const [binaryKey, configKey] of [
+      ["AGY_BIN", "ANTIGRAVITY_CONFIG_DIR"],
+      ["CLAUDE_BIN", "CLAUDE_CONFIG_DIR"],
+      ["CODEX_BIN", "CODEX_HOME"],
+      ["CURSOR_BIN", "CURSOR_CONFIG_DIR"],
+    ]) {
+      process.env[binaryKey] = join(box.root, `unavailable-${binaryKey.toLowerCase()}`);
+      process.env[configKey] = join(box.root, `isolated-${configKey.toLowerCase()}`);
+    }
+    const pkg = buildPackage(box.root, "grok");
+    const args = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+
+    process.env.GROK_BIN = join(box.root, "uninstalled-grok");
+    const remove = await quiet(() => main(["remove", "--host", "all"]));
+    assert.equal(remove.error, undefined, `all-host remove failed: ${remove.error?.message}`);
+    assert.equal(existsSync(box.managedRoot), false, "managed root survived all-host remove");
+  } finally {
+    box.cleanup();
+  }
+});
 
 test("grok: disabled plugin state is visible without mutating unrelated configuration", async () => {
   const box = makeSandbox("grok");
