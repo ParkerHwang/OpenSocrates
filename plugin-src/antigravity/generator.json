@@ -1,0 +1,40 @@
+{
+  "host": "antigravity",
+  "template_revision": "1",
+  "launcher_host": "antigravity",
+  "release_targets": [],
+  "launchers": [],
+  "manifest_template": "plugin.json.tmpl",
+  "manifest_output": "plugin.json",
+  "shared_templates": [
+    {
+      "template": "skills/opensocrates/SKILL.md.tmpl",
+      "output": "skills/opensocrates/SKILL.md"
+    },
+    {
+      "template": "skills/opensocrates/references/catalog.md.tmpl",
+      "output": "skills/opensocrates/references/catalog.md"
+    }
+  ],
+  "public_skills": ["opensocrates"],
+  "method_template": "skills/opensocrates/references/method.md.tmpl",
+  "method_output": "skills/opensocrates/references/methods/{method_id}.md",
+  "command_templates": [
+    {
+      "template": "README.md.tmpl",
+      "output": "README.md"
+    },
+    {
+      "template": "THIRD_PARTY_NOTICES.md.tmpl",
+      "output": "THIRD_PARTY_NOTICES.md"
+    }
+  ],
+  "copy_files": [
+    {
+      "source": "LICENSE",
+      "output": "LICENSE"
+    }
+  ],
+  "bundle_output": "content/compiled-content.bundle.json",
+  "runtime_output": "runtime"
+}

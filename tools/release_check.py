@@ -29,7 +29,29 @@ from pathlib import Path
 from typing import Any
 
 SCHEMA = "opensocrates.release-check-evidence/1.0.0"
-HOSTS = ("claude", "codex")
+HOSTS = ("antigravity", "claude", "codex", "cursor", "grok", "opencode")
+RUNTIME_HOSTS = ("claude", "codex")
+# Grok ships content only. OpenCode additionally ships an owned plugin bridge,
+# so it is not content-only, but it still carries no native runtime payload.
+CONTENT_ONLY_HOSTS = frozenset({"antigravity", "cursor", "grok"})
+NO_NATIVE_RUNTIME_HOSTS = CONTENT_ONLY_HOSTS | frozenset({"opencode"})
+GROK_LIVE_PROBE_STATUS = (
+    "native_skill_headless_verified; explicit_headless_verified; "
+    "tui_hook_execution_verified; plugin_hooks_unavailable"
+)
+OPENCODE_LIVE_PROBE_STATUS = "validated_same_turn_run_and_tui_opencode_1.18.18"
+
+
+def _live_host_probe_status(*, opencode_validated: bool) -> dict[str, str]:
+    """Per-host live probe status, each host tied to its own recorded evidence."""
+
+    status = {host: "unvalidated" for host in HOSTS}
+    status["grok"] = GROK_LIVE_PROBE_STATUS
+    if opencode_validated:
+        status["opencode"] = OPENCODE_LIVE_PROBE_STATUS
+    return status
+
+
 EXPECTED_SCHEMA_COUNT = 32
 EXPECTED_METHOD_COUNT = 48
 LEGACY_CONTENT_BUNDLE = "content/compiled-content.bundle.json"
@@ -692,7 +714,7 @@ def _discover_build_python() -> str | None:  # noqa: C901  # Branch-explicit con
 def _runtime_build(  # noqa: C901  # Explicit host release build validation.
     root: Path, host: str
 ) -> tuple[dict[str, Any], str]:
-    if host not in HOSTS:
+    if host not in RUNTIME_HOSTS:
         raise ReleaseCheckError("runtime_host_invalid")
     build_python = _discover_build_python()
     if build_python is None:
@@ -894,7 +916,7 @@ def _write_root_checksums(directory: Path, version: str) -> Path:
     return destination
 
 
-def _assemble(  # noqa: C901  # Explicit two-host release assembly.
+def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
     root: Path,
 ) -> dict[str, Any]:
     version = _read_version(root)
@@ -913,7 +935,7 @@ def _assemble(  # noqa: C901  # Explicit two-host release assembly.
         raise ReleaseCheckError("reasoning_content_bundle_shape_invalid")
     runtime_reports: dict[str, dict[str, Any]] = {}
     targets: set[str] = set()
-    for host in HOSTS:
+    for host in RUNTIME_HOSTS:
         runtime_report, runtime_target = _runtime_build(root, host)
         runtime_reports[host] = runtime_report
         targets.add(runtime_target)
@@ -932,7 +954,7 @@ def _assemble(  # noqa: C901  # Explicit two-host release assembly.
         archives[host] = archive
     claude_chat_archive = dist / f"opensocrates-{version}-claude-chat-skills.zip"
     _write_deterministic_zip(claude_chat_package, claude_chat_archive)
-    runtime_artifacts = {host: str(runtime_reports[host]["artifact"]) for host in HOSTS}
+    runtime_artifacts = {host: str(runtime_reports[host]["artifact"]) for host in RUNTIME_HOSTS}
     sbom_arguments = [
         str(root / "tools" / "build_sbom.py"),
         "--root",
@@ -946,7 +968,7 @@ def _assemble(  # noqa: C901  # Explicit two-host release assembly.
         "--artifact",
         REASONING_CONTENT_BUNDLE,
     ]
-    for host in HOSTS:
+    for host in RUNTIME_HOSTS:
         sbom_arguments.extend(["--artifact", runtime_artifacts[host]])
     for host in HOSTS:
         sbom_arguments.extend(["--artifact", _relative(root, archives[host])])
@@ -959,6 +981,10 @@ def _assemble(  # noqa: C901  # Explicit two-host release assembly.
         raise ReleaseCheckError("sbom_artifact_missing")
     sbom_destination = dist / f"opensocrates-{version}-sbom.spdx.json"
     sbom_destination.write_bytes(sbom_source.read_bytes())
+    opencode_evidence = _opencode_compatibility_evidence(root)
+    live_host_probe_status = _live_host_probe_status(
+        opencode_validated=opencode_evidence["status"] == "pass"
+    )
     limitations = {
         "schema": "opensocrates.limitations/1.0.0",
         "product_version": version,
@@ -966,7 +992,7 @@ def _assemble(  # noqa: C901  # Explicit two-host release assembly.
         "native_launchers": RELEASE_LAUNCHERS,
         "platforms": _candidate_platforms(root, target),
         "signing_status": "unvalidated",
-        "live_host_probe_status": {host: "unvalidated" for host in HOSTS},
+        "live_host_probe_status": live_host_probe_status,
         "clean_machine_install_status": "unvalidated",
         "source_archive_status": "not_attempted",
         "provenance_status": "not_attempted",
@@ -996,13 +1022,13 @@ def _assemble(  # noqa: C901  # Explicit two-host release assembly.
                 "dependencies": runtime_reports[host]["runtime_dependencies"],
                 "dependency_inventory": runtime_reports[host].get("runtime_dependency_inventory"),
             }
-            for host in HOSTS
+            for host in RUNTIME_HOSTS
         },
         "hosts": {
             host: {
                 "package_tree": host,
-                "release_targets": [RELEASE_TARGET],
-                "launchers": RELEASE_LAUNCHERS,
+                "release_targets": [] if host in NO_NATIVE_RUNTIME_HOSTS else [RELEASE_TARGET],
+                "launchers": [] if host in NO_NATIVE_RUNTIME_HOSTS else RELEASE_LAUNCHERS,
                 "package_file_count": len(_snapshot(dist / host)),
                 "package_checksum_file": package_checksums[host].relative_to(dist).as_posix(),
                 "archive": archives[host].relative_to(dist).as_posix(),
@@ -1026,7 +1052,7 @@ def _assemble(  # noqa: C901  # Explicit two-host release assembly.
         "limitations": limitations_path.relative_to(dist).as_posix(),
         "platforms": limitations["platforms"],
         "signing_status": "unvalidated",
-        "live_host_probe_status": {host: "unvalidated" for host in HOSTS},
+        "live_host_probe_status": live_host_probe_status,
         "source_archive_status": "not_attempted",
         "provenance_status": "not_attempted",
     }
@@ -1076,9 +1102,11 @@ def _verify_release_manifest(root: Path, host: str, bundle: Mapping[str, Any]) -
         }
     if metadata.get("product_version") != bundle.get("product_version"):
         errors.add("manifest_version_mismatch")
-    if metadata.get("release_targets") != [RELEASE_TARGET]:
+    expected_targets = [] if host in NO_NATIVE_RUNTIME_HOSTS else [RELEASE_TARGET]
+    expected_launchers = [] if host in NO_NATIVE_RUNTIME_HOSTS else RELEASE_LAUNCHERS
+    if metadata.get("release_targets") != expected_targets:
         errors.add("manifest_release_targets_invalid")
-    if metadata.get("launchers") != RELEASE_LAUNCHERS:
+    if metadata.get("launchers") != expected_launchers:
         errors.add("manifest_launchers_invalid")
     for field in ("source_tree_hash", "normalized_semantic_hash"):
         if metadata.get(field) != bundle.get(field):
@@ -1130,11 +1158,16 @@ def _verify_third_party_notice(package: Path, host: str) -> set[str]:
     except (OSError, UnicodeError):
         return {"third_party_notice_unreadable"}
     errors: set[str] = set()
-    required = (
-        CLAUDE_RUNTIME_NOTICE_REQUIRED_TOKENS
-        if host == "claude"
-        else RUNTIME_NOTICE_REQUIRED_TOKENS
-    )
+    if host in CONTENT_ONLY_HOSTS:
+        required = frozenset({"content-only", "no bundled", "runtime", "license"})
+    elif host == "opencode":
+        required = frozenset({"dependency-free", "does not bundle", "opencode", "license"})
+    else:
+        required = (
+            CLAUDE_RUNTIME_NOTICE_REQUIRED_TOKENS
+            if host == "claude"
+            else RUNTIME_NOTICE_REQUIRED_TOKENS
+        )
     if not all(token in text for token in required):
         errors.add("third_party_notice_runtime_disclosure_invalid")
     if host == "claude" and any(
@@ -1231,13 +1264,13 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
             if host_only_notice not in contents:
                 errors.add("codex_control_boundary_notice_missing")
                 break
-    if len(list((generated / "schemas" / "v1").glob("*.json"))) != EXPECTED_SCHEMA_COUNT:
+    schema_count = len(list((generated / "schemas" / "v1").glob("*.json")))
+    if schema_count != (0 if host in NO_NATIVE_RUNTIME_HOSTS else EXPECTED_SCHEMA_COUNT):
         errors.add("package_schema_count_invalid")
-    for required in (
-        "LICENSE",
-        THIRD_PARTY_NOTICE,
-        "bin/launch.sh",
-    ):
+    required_files = ["LICENSE", THIRD_PARTY_NOTICE]
+    if host not in NO_NATIVE_RUNTIME_HOSTS:
+        required_files.append("bin/launch.sh")
+    for required in required_files:
         if not (generated / required).is_file():
             errors.add("package_license_notice_or_launcher_missing")
     if (generated / "bin" / "launch.ps1").exists() or (
@@ -1312,15 +1345,75 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
             errors.add("claude_archive_uncompressed_limit_exceeded")
     runtime_targets = _load_json(generated / "release-manifest.json")
     listed_targets = runtime_targets.get("runtime_targets", []) if runtime_targets else []
-    if target != RELEASE_TARGET or listed_targets != [RELEASE_TARGET]:
+    expected_runtime_targets = [] if host in NO_NATIVE_RUNTIME_HOSTS else [RELEASE_TARGET]
+    if target != RELEASE_TARGET or listed_targets != expected_runtime_targets:
         errors.add("runtime_target_boundary_invalid")
+    if host == "cursor":
+        if any((generated / name).exists() for name in ("bin", "hooks", "runtime", "mcp.json")):
+            errors.add("cursor_content_only_boundary_invalid")
+        plugin_manifest = _load_json(generated / "plugin.json")
+        if plugin_manifest is None or plugin_manifest.get("$schema") != (
+            "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
+        ):
+            errors.add("cursor_agent_plugin_manifest_missing")
+    if host == "antigravity":
+        if any((generated / name).exists() for name in ("bin", "hooks", "runtime")):
+            errors.add("antigravity_content_only_boundary_invalid")
+        plugin_manifest = _load_json(generated / "plugin.json")
+        if plugin_manifest is None:
+            errors.add("antigravity_plugin_manifest_missing")
+    if host == "opencode":
+        if any((generated / name).exists() for name in ("bin", "hooks", "runtime", "schemas")):
+            errors.add("opencode_native_runtime_boundary_invalid")
+        package_manifest = _load_json(generated / "opencode-plugin.json")
+        if (
+            package_manifest is None
+            or package_manifest.get("schema") != "opensocrates.opencode-package/1.0.0"
+            or package_manifest.get("minimum_opencode_version") != "1.18.18"
+            or package_manifest.get("stable_plugin_hook") != "chat.message"
+            or package_manifest.get("beta_v2_api") is not False
+        ):
+            errors.add("opencode_package_manifest_invalid")
+        bridge = generated / "plugins" / "opensocrates.js"
+        skill = generated / "skills" / "opensocrates" / "SKILL.md"
+        if not bridge.is_file() or not skill.is_file():
+            errors.add("opencode_bridge_or_skill_missing")
+        else:
+            try:
+                bridge_text = bridge.read_text(encoding="utf-8")
+            except (OSError, UnicodeError):
+                errors.add("opencode_bridge_unreadable")
+            else:
+                if "chat.message" not in bridge_text or "@opencode-ai/plugin/v2" in bridge_text:
+                    errors.add("opencode_stable_hook_boundary_invalid")
+    if host == "grok":
+        if any(
+            (generated / name).exists()
+            for name in ("bin", "hooks", "runtime", "commands", "agents", "mcp.json", ".mcp.json")
+        ):
+            errors.add("grok_content_only_boundary_invalid")
+        plugin_manifest = _load_json(generated / "plugin.json")
+        if (
+            plugin_manifest is None
+            or plugin_manifest.get("name") != "opensocrates"
+            or plugin_manifest.get("version") != bundle.get("product_version")
+            or plugin_manifest.get("skills") != "./skills"
+        ):
+            errors.add("grok_plugin_manifest_invalid")
+        capability_evidence = metadata.get("capability_evidence")
+        if (
+            not isinstance(capability_evidence, Mapping)
+            or capability_evidence.get("status") != "verified"
+            or capability_evidence.get("probe_id") != "grok-build-1.0.3-2026-08-13"
+        ):
+            errors.add("grok_capability_evidence_invalid")
     return {
         "status": "fail" if errors else "pass",
         "method_count": len(existing_method_outputs),
         "shared_skill_count": len(top_level_shared_skills),
         "public_skill_count": len(actual_public_skills),
         "command_count": len(command_outputs),
-        "schema_count": len(list((generated / "schemas" / "v1").glob("*.json"))),
+        "schema_count": schema_count,
         "embedded_bundle_count": len(embedded),
         "generated_file_count": len(_snapshot(generated)),
         "package_file_count": len(_snapshot(dist_package)),
@@ -1474,8 +1567,9 @@ def _evidence_check(  # noqa: C901  # Explicit release evidence matrix.
     spdx = _load_json(root / "build" / "evidence" / "sbom.spdx.json")
     runtimes = {
         host: _load_json(root / "build" / "evidence" / f"runtime-build-{host}.json")
-        for host in HOSTS
+        for host in RUNTIME_HOSTS
     }
+
     if security is None:
         unavailable.add("security_evidence_missing")
     elif (
@@ -1514,6 +1608,59 @@ def _evidence_check(  # noqa: C901  # Explicit release evidence matrix.
             host: runtime.get("status") if runtime else None for host, runtime in runtimes.items()
         },
         "error_codes": sorted(errors | unavailable),
+    }
+
+
+def _opencode_compatibility_evidence(  # noqa: C901  # Explicit evidence matrix.
+    root: Path,
+) -> dict[str, Any]:
+    document = _load_json(root / "docs" / "evidence" / "opencode-compatibility-2026-08-13.json")
+    errors: set[str] = set()
+    if document is None:
+        return {"status": "unavailable", "error_codes": ["opencode_evidence_missing"]}
+    if document.get("schema") != "opensocrates.opencode-compatibility-evidence/1.0.0":
+        errors.add("opencode_evidence_schema_invalid")
+    target = document.get("target")
+    live = document.get("production_bridge_live_probe")
+    isolated = document.get("isolated_live_probe")
+    privacy = document.get("privacy")
+    if not isinstance(target, Mapping) or target.get("opencode_version") != "1.18.18":
+        errors.add("opencode_evidence_target_invalid")
+    required_live = {
+        "automatic_judgment_activation_same_turn",
+        "interactive_tui_same_turn_grounding_observed",
+        "complete_authored_method_grounding_observed",
+        "mechanical_control_unchanged",
+        "explicit_skill_discovery",
+    }
+    if not isinstance(live, Mapping) or any(live.get(key) is not True for key in required_live):
+        errors.add("opencode_evidence_live_probe_invalid")
+    # The bridge has no activation deadline: OpenCode awaits chat.message
+    # without a host-side timeout, and the selection work is synchronous, so a
+    # timeout observation is not a property this evidence can assert.
+    required_isolated = {
+        "global_plugin_discovered",
+        "global_skill_discovered",
+        "current_user_text_available",
+        "in_place_part_mutation_visible_same_turn",
+        "exception_failed_open",
+    }
+    if not isinstance(isolated, Mapping) or any(
+        isolated.get(key) is not True for key in required_isolated
+    ):
+        errors.add("opencode_evidence_isolated_probe_invalid")
+    if not isinstance(privacy, Mapping) or any(value is not False for value in privacy.values()):
+        errors.add("opencode_evidence_privacy_invalid")
+    return {
+        "status": "fail" if errors else "pass",
+        "opencode_version": target.get("opencode_version") if isinstance(target, Mapping) else None,
+        "same_turn": live.get("automatic_judgment_activation_same_turn")
+        if isinstance(live, Mapping)
+        else None,
+        "interactive_tui": live.get("interactive_tui_same_turn_grounding_observed")
+        if isinstance(live, Mapping)
+        else None,
+        "error_codes": sorted(errors),
     }
 
 
@@ -1597,12 +1744,12 @@ def _full_check(
         "content": _content_validator(root, bundle_bytes, reasoning_content_bytes),
         "deterministic_generation": _determinism_check(root),
     }
-    runtime_reports: dict[str, Mapping[str, Any] | None] = {host: None for host in HOSTS}
+    runtime_reports: dict[str, Mapping[str, Any] | None] = {host: None for host in RUNTIME_HOSTS}
     if assembly_result is not None:
         checks["package_assembly"] = dict(assembly_result)
         runtime_reports = {
             host: _load_json(root / "build" / "evidence" / f"runtime-build-{host}.json")
-            for host in HOSTS
+            for host in RUNTIME_HOSTS
         }
     else:
         try:
@@ -1610,7 +1757,7 @@ def _full_check(
             checks["package_assembly"] = assembly
             runtime_reports = {
                 host: _load_json(root / "build" / "evidence" / f"runtime-build-{host}.json")
-                for host in HOSTS
+                for host in RUNTIME_HOSTS
             }
         except AssemblyUnavailable as exc:
             checks["package_assembly"] = {
@@ -1635,7 +1782,7 @@ def _full_check(
         }
     )
     runtime_versions = {
-        host: _runtime_version_smoke(root, runtime_reports[host], version) for host in HOSTS
+        host: _runtime_version_smoke(root, runtime_reports[host], version) for host in RUNTIME_HOSTS
     }
     checks["runtime_version"] = {
         "status": (
@@ -1715,6 +1862,19 @@ def _full_check(
         ],
         "security",
     )
+    checks["opencode_bridge"] = {
+        "status": (
+            bridge_result := _run(
+                ["node", "--test", str(root / "tools" / "opencode_bridge.test.mjs")],
+                root,
+                timeout=60.0,
+            )
+        ).status,
+        "error_codes": []
+        if bridge_result.status == "pass"
+        else [f"opencode_bridge_{bridge_result.code}"],
+    }
+    checks["opencode_compatibility_evidence"] = _opencode_compatibility_evidence(root)
     checks["evidence"] = _evidence_check(root, version, assembly_status=assembly_status)
     statuses: list[str] = []
     for name, value in checks.items():
@@ -1747,7 +1907,9 @@ def _full_check(
         "unvalidated": {
             "platforms": _candidate_platforms(root, target),
             "signing_status": "unvalidated",
-            "live_host_probe_status": {host: "unvalidated" for host in HOSTS},
+            "live_host_probe_status": _live_host_probe_status(
+                opencode_validated=checks["opencode_compatibility_evidence"]["status"] == "pass"
+            ),
             "clean_machine_install_status": "unvalidated",
             "source_archive_status": "not_attempted",
             "provenance_status": "not_attempted",

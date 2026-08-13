@@ -5,12 +5,24 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from .antigravity.adapter import AntigravityAdapter
 from .base import HostAdapter
 from .claude.adapter import ClaudeAdapter, ClaudeAdapterConfig
 from .codex.adapter import CodexAdapter, CodexAdapterConfig
+from .cursor.adapter import CursorAdapter
+from .grok.adapter import GrokAdapter
+from .opencode.adapter import OpenCodeAdapter
 from .prompt_only.adapter import PromptOnlyAdapter
 
-HOST_NAMES = ("claude", "codex", "prompt_only")
+HOST_NAMES = (
+    "antigravity",
+    "claude",
+    "codex",
+    "cursor",
+    "grok",
+    "opencode",
+    "prompt_only",
+)
 
 
 class HostRegistryError(ValueError):
@@ -45,6 +57,20 @@ def build_adapter(
     """Build one registered adapter without importing arbitrary modules."""
 
     selected = validate_host_name(host)
+    if selected == "antigravity":
+        bundle = None
+        loader = getattr(content_repository, "load", None)
+        if callable(loader):
+            try:
+                bundle = loader()
+            except Exception:
+                bundle = None
+        return AntigravityAdapter(
+            bundle_path=bundle_path,
+            bundle=bundle,
+            profile=capability_profile,
+            locale=locale,
+        )
     if selected == "codex":
         return CodexAdapter(
             CodexAdapterConfig(
@@ -90,7 +116,13 @@ def build_adapter(
             bundle = loader()
         except Exception:
             bundle = None
-    return PromptOnlyAdapter(
+    adapter_type = {
+        "cursor": CursorAdapter,
+        "grok": GrokAdapter,
+        "opencode": OpenCodeAdapter,
+        "prompt_only": PromptOnlyAdapter,
+    }[selected]
+    return adapter_type(
         bundle_path=bundle_path, bundle=bundle, profile=capability_profile, locale=locale
     )
 

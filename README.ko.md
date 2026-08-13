@@ -11,13 +11,13 @@
 [![Release](https://img.shields.io/github/v/release/ParkerHwang/OpenSocrates)](https://github.com/ParkerHwang/OpenSocrates/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-OpenSocrates는 Claude와 Codex를 위한 로컬 연동 및 저작 추론 프레임워크입니다.
+OpenSocrates는 Claude, Codex, Grok Build, OpenCode를 위한 로컬 연동 및 저작 추론 프레임워크입니다.
 의도적인 추론이 필요한 요청을 감지하고, 현재 호스트의 새로운 셀렉터에서 적합한
 추론 시스템을 고른 뒤, 이론과 예제 전체를 활성 작업에 추가합니다. 단순한 사실
 확인과 기계적인 작업은 그대로 통과할 수 있습니다.
 
-버전 `1.1.5`에는 48개의 추론 시스템, Claude의 단일 사용자 진입점, 선택된 절차를
-실제로 읽었는지 확인하는 Claude 접지 게이트, Claude/Codex 통합 라이프사이클,
+버전 `1.2.0`에는 48개의 추론 시스템과 OpenCode의 안정판 같은 턴 자동 활성화,
+네이티브 스킬 폴백, Claude/Codex/OpenCode 통합 라이프사이클,
 선택형 자동 업데이트가 들어 있습니다. 현재 릴리스 플랫폼은 Apple Silicon
 macOS(`darwin-arm64`)입니다. 기존 호스트 로그인을 사용하므로 API 키나
 OpenSocrates 백엔드가 필요하지 않습니다.
@@ -26,16 +26,21 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 런처는 `darwin-arm64`만 허용하며, Intel Mac·Linux·Windows용 런처와 런타임은
 이번 릴리스에 포함되거나 지원되지 않습니다.
 
-> **최신 릴리스: [OpenSocrates 1.1.5](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.5).**
-> Claude 접지 파일을 추가 디렉터리 권한 없이 읽을 수 있게 하고, `diagnose`에서
-> 설치 패키지를 실제로 검증하며, Codex의 최초 훅 승인 경계를 명확히 했습니다.
-> `npx --yes opensocrates@1.1.5 update --host all`로 관리 중인 두 호스트를 함께
-> 업데이트할 수 있습니다.
+> **최신 릴리스: OpenSocrates 1.2.0.** 실험적 Antigravity·Cursor 스킬
+> 패키지, 라이브 검증을 마친 Grok Build 네이티브 지원, OpenCode
+> 1.18.18+의 안정판 `chat.message` 브리지와 네이티브 Agent Skill 폴백을
+> 추가했습니다. `npx --yes opensocrates@1.2.0 update --host all`로 관리
+> 호스트를 함께 업데이트할 수 있습니다.
 
 ## 호스트 지원 범위
 
 | 호스트 화면 | 자동 선택 | 사용자 진입점 | 검증 상태 |
 | --- | --- | --- | --- |
+| Google Antigravity CLI | 명시적 스킬만 지원 | `opensocrates` 스킬 | [실험적 콘텐츠 전용 플러그인](docs/antigravity-support.md) |
+| Cursor IDE 및 CLI | 별도 셀렉터 없이 스킬 탐색 | `/opensocrates` | [실험적 콘텐츠 전용 Agent Plugin, 라이브 영수증 없음](docs/cursor-support.md) |
+| Grok Build `grok -p` | 네이티브 스킬로 같은 턴에 지원 | `/opensocrates` | [Grok Build 1.0.3 자동·명시적 네이티브 스킬 검증 완료](docs/grok-support.md) |
+| Grok Build TUI | 헤드리스와 같은 네이티브 플러그인, 활성화 영수증은 대기 중 | `/opensocrates` | [TUI 훅 실행 검증 완료, 네이티브 스킬 마커 테스트는 미완료, 배포 패키지에 훅 없음](docs/grok-support.md) |
+| OpenCode TUI 및 `opencode run` | 안정판 같은 턴 로컬 브리지 | 네이티브 `opensocrates` 스킬 | [OpenCode 1.18.18 TUI, `opencode run` 및 DeepSeek V4 Flash 라이브 스모크 완료](docs/opencode-support.ko.md) |
 | Codex CLI 및 Desktop | 앱에서 훅을 한 번 승인한 뒤 지원 | OpenSocrates 플러그인 | `darwin-arm64` 패키지·런처 릴리스 검증 완료, 실제 Codex 훅 전달 영수증 없음 |
 | Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | `/opensocrates` | `darwin-arm64` 로컬 검증 완료 |
 | Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 지원 | `/opensocrates` | [인증된 훅 생명주기 로컬 검증 완료](docs/claude-desktop-live-probe.md) |
@@ -72,6 +77,8 @@ receipt, Stop, 정리 생명주기도 로컬 검증을 마쳤습니다. 버전 1
 
 - Claude: Claude Code `2.1.205` 이상과 `claude` 명령
 - Codex: OAuth 로그인이 완료된 `codex` 명령
+- Grok Build: `grok 1.0.3` 이상과 기존 Grok 인증(API 키 추가 불필요)
+- OpenCode: OpenCode `1.18.18` 이상, 설정된 공급자/모델 제한 없음
 
 Node.js 20 이상이 필요합니다. npm에 게시된 `opensocrates` 패키지는 외부
 의존성이 없는 작은 설치 프로그램입니다. GitHub Releases에서 호스트 패키지를
@@ -81,20 +88,20 @@ Node.js 20 이상이 필요합니다. npm에 게시된 `opensocrates` 패키지�
 ### 준비된 모든 호스트에 설치
 
 ```bash
-npx --yes opensocrates@1.1.5 install --host all
+npx --yes opensocrates@1.2.0 install --host all
 ```
 
 모든 호스트 경로는 지원되는 인증 완료 CLI를 찾고, 어느 호스트도 바꾸기 전에
-전체 사전점검을 끝냅니다. 두 패키지를 모두 검증·스테이징한 다음 한 릴리스를
+전체 사전점검을 끝냅니다. 선택된 패키지를 모두 검증·스테이징한 다음 한 릴리스를
 트랜잭션으로 활성화합니다. 한 호스트의 활성화가 실패하면 이번 트랜잭션에서 이미
 바뀐 호스트도 이전 관리형 등록으로 되돌립니다.
 
 전체 라이프사이클에서 같은 호스트 값을 사용할 수 있습니다.
 
 ```bash
-npx --yes opensocrates@1.1.5 status --host all
-npx --yes opensocrates@1.1.5 update --host all
-npx --yes opensocrates@1.1.5 remove --host all
+npx --yes opensocrates@1.2.0 status --host all
+npx --yes opensocrates@1.2.0 update --host all
+npx --yes opensocrates@1.2.0 remove --host all
 ```
 
 소유자 전용 `~/.opensocrates/desired-state.json`에는 선택 채널, 설치된 호스트,
@@ -106,14 +113,30 @@ npx --yes opensocrates@1.1.5 remove --host all
 기존 사용자와의 호환성을 위해 기본 호스트는 계속 Codex입니다.
 
 ```bash
-npx --yes opensocrates@1.1.5 install
-# 같은 명령: npx --yes opensocrates@1.1.5 install --host codex
-npx --yes opensocrates@1.1.5 install --host claude
+npx --yes opensocrates@1.2.0 install
+# 같은 명령: npx --yes opensocrates@1.2.0 install --host codex
+npx --yes opensocrates@1.2.0 install --host claude
+npx --yes opensocrates@1.2.0 install --host antigravity
+npx --yes opensocrates@1.2.0 install --host cursor
+npx --yes opensocrates@1.2.0 install --host grok
+npx --yes opensocrates@1.2.0 install --host opencode
 ```
+
+Grok Build는 `~/.grok/plugins/opensocrates`에 네이티브 콘텐츠 전용 플러그인을
+설치합니다. 자동 선택과 명시적 호출이 가능한 `/opensocrates` 스킬 하나와 내부
+절차 48개만 포함하며, 훅·명령·에이전트·MCP 서버·런처·런타임·중첩 셀렉터 호출은
+포함하지 않습니다. 설치 프로그램은 Grok의 기계 판독 상태를 확인하지만 이 정확한
+디렉터리만 소유하며 Claude 설치를 변경하거나 삭제하지 않습니다. 자세한 내용은
+[Grok Build 지원 경계](docs/grok-support.md)를 참고하세요.
 
 기존 `--host codex` 및 `--host claude` 라이프사이클은 그대로 지원합니다. 호스트별
 업데이트는 의도적으로 버전 차이를 만들 수 있고, 이후 `update --host all` 또는
 성공한 자동 조정이 desired state에 기록된 모든 호스트를 다시 한 버전으로 맞춥니다.
+
+OpenCode 설치는 `~/.config/opencode` 아래의 `plugins/opensocrates.js`, 소유권
+사이드카, `skills/opensocrates/`만 소유합니다. `opencode.json`이나 관계없는
+플러그인·스킬은 수정하지 않습니다. 자세한 경계는
+[OpenCode 지원 문서](docs/opencode-support.ko.md)를 참고하세요.
 
 Claude 상태는 활성 설치와 설치됐지만 비활성화된 플러그인을 구분합니다. 원하는
 설치가 비활성 상태라면 drift로 보고합니다. `install` 또는 `update`를 실행하면 검증된
@@ -125,9 +148,9 @@ Claude 상태는 활성 설치와 설치됐지만 비활성화된 플러그인�
 ### 선택형 자동 업데이트
 
 ```bash
-npx --yes opensocrates@1.1.5 auto-update enable --host all
-npx --yes opensocrates@1.1.5 auto-update status
-npx --yes opensocrates@1.1.5 auto-update disable
+npx --yes opensocrates@1.2.0 auto-update enable --host all
+npx --yes opensocrates@1.2.0 auto-update status
+npx --yes opensocrates@1.2.0 auto-update disable
 ```
 
 자동 업데이트는 명시적으로 켜기 전까지 비활성화되어 있습니다. macOS LaunchAgent는
@@ -149,7 +172,7 @@ LaunchAgent를 언로드하고 삭제하며, `remove --host all`도 관리 호�
 ### Claude 웹 및 Desktop Chat 스킬
 
 이 화면들은 플러그인 스킬은 지원하지만 훅은 실행하지 않습니다. 릴리스에서
-`opensocrates-1.1.5-claude-chat-skills.zip`을 내려받아 Claude의 **사용자 지정 →
+`opensocrates-1.2.0-claude-chat-skills.zip`을 내려받아 Claude의 **사용자 지정 →
 스킬 → 스킬 업로드** 화면에서 업로드하세요. ZIP은 업로더 요구사항에 맞춰
 최상위 `opensocrates/` 폴더 바로 아래에 `SKILL.md`를 둡니다. 패키지는
 `/opensocrates` 스킬 하나만 노출하고, 48개
@@ -163,24 +186,25 @@ LaunchAgent를 언로드하고 삭제하며, `remove --host all`도 관리 호�
 npm 레지스트리를 거치지 않을 때도 같은 호스트 옵션을 사용합니다.
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.5 install --host all
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.5 install --host claude
-npx --yes github:ParkerHwang/OpenSocrates#v1.1.5 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.2.0 install --host all
+npx --yes github:ParkerHwang/OpenSocrates#v1.2.0 install --host claude
+npx --yes github:ParkerHwang/OpenSocrates#v1.2.0 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.2.0 install --host opencode
 ```
 
 ### 릴리스 파일 직접 검증
 
-[v1.1.5 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.1.5)에서
+[v1.2.0 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.2.0)에서
 `opensocrates.mjs`, 호스트 패키지, `.sha256` 파일을 내려받습니다. Claude의 예:
 
 ```bash
-shasum -a 256 -c opensocrates-1.1.5-claude-plugin.zip.sha256
+shasum -a 256 -c opensocrates-1.2.0-claude-plugin.zip.sha256
 node opensocrates.mjs install --host claude \
-  --asset opensocrates-1.1.5-claude-plugin.zip \
-  --checksum opensocrates-1.1.5-claude-plugin.zip.sha256
+  --asset opensocrates-1.2.0-claude-plugin.zip \
+  --checksum opensocrates-1.2.0-claude-plugin.zip.sha256
 ```
 
-Codex 패키지는 `claude`를 `codex`로 바꾸면 됩니다.
+다른 호스트 패키지는 `claude`를 `antigravity`, `codex`, `cursor`, `opencode`로 바꾸면 됩니다.
 
 ### 1.0 이전 Claude 플러그인에서 이전하기
 
@@ -192,7 +216,7 @@ Codex 패키지는 `claude`를 `codex`로 바꾸면 됩니다.
 ```bash
 claude plugin uninstall opensocrates@OpenSocrates --scope user
 claude plugin marketplace remove OpenSocrates --scope user
-npx --yes opensocrates@1.1.5 install --host claude
+npx --yes opensocrates@1.2.0 install --host claude
 ```
 
 관리형 v1.1.0 Claude 설치를 업데이트하면 패키지 트리 전체가 교체됩니다. 따라서
@@ -201,9 +225,9 @@ npx --yes opensocrates@1.1.5 install --host claude
 
 ## 사용법
 
-Claude나 Codex를 평소처럼 사용하세요. 요청에 판단, 해석, 진단, 설명, 계획,
+Claude, Codex, OpenCode를 평소처럼 사용하세요. 요청에 판단, 해석, 진단, 설명, 계획,
 근거 조정 또는 다른 구조적 추론이 필요하면 OpenSocrates가 개입할 수 있습니다.
-개입할 때는 다음과 같이 동작합니다.
+Claude/Codex 네이티브 런타임 화면에서는 다음과 같이 동작합니다.
 
 1. 현재 호스트에서 새로운 비영구 셀렉터를 시작합니다.
 2. 저작된 48개 시스템 카탈로그에서 적합한 시스템을 선택합니다.
@@ -212,6 +236,10 @@ Claude나 Codex를 평소처럼 사용하세요. 요청에 판단, 해석, 진�
    `Stop conditions`를 작은 숨김 컨텍스트에 추가합니다.
 5. 활성 작업이 방법을 적용하기 전에 전체 파일을 읽고, 접지된 답변의 마지막에
    `OpenSocrates grounding: triangulation@1`과 같은 정확한 감사 줄을 남기게 합니다.
+
+OpenCode에서는 의존성 없는 안정판 훅이 로컬에서 방법을 고르고 완전한 저작 절차
+하나를 같은 메시지 턴에 직접 삽입합니다. artifact나 추가 모델 호출은 만들지
+않습니다. [OpenCode 지원 경계](docs/opencode-support.ko.md)를 참고하세요.
 
 Codex에 설치한 뒤에는 대화형 Codex 세션을 한 번 열어 OpenSocrates 훅을 승인해야
 자동 선택을 신뢰할 수 있습니다. 이 승인이 끝나기 전에는 `codex exec` 같은 비대화형
@@ -367,6 +395,7 @@ make release-check
 | `content/` | 정책, 다국어 메시지, 추론 방법, 이론과 예제 |
 | `plugin-src/claude/` | Claude 플러그인 템플릿 |
 | `plugin-src/codex/` | Codex 플러그인 템플릿 |
+| `plugin-src/grok/` | Grok Build 네이티브 콘텐츠 전용 플러그인 템플릿 |
 | `schemas/source/` | 정규 스키마 정의 |
 | `schemas/v1/` | 생성된 버전 고정 공개 스키마 |
 | `installer/` | 외부 의존성이 없는 Node.js GitHub/npx 설치 프로그램 |
