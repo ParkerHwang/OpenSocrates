@@ -81,6 +81,40 @@ def main() -> int:
     ).replace("Commands run: python tools/check_pr_governance_test.py", "Commands run: TBD")
     assert validate_pull_request(event(draft_body, draft=True)) == []
 
+    blank_limitations = BASE_BODY.replace(
+        "Known limitations: no runtime behavior is claimed",
+        "Known limitations:\nThis is trailing handoff prose.",
+    )
+    blank_limitation_errors = validate_pull_request(event(blank_limitations))
+    assert any(
+        "empty or placeholder-only: Known limitations:" in item for item in blank_limitation_errors
+    ), blank_limitation_errors
+
+    blank_commands = BASE_BODY.replace(
+        "Commands run: python tools/check_pr_governance_test.py",
+        "Commands run:",
+    )
+    blank_command_errors = validate_pull_request(event(blank_commands))
+    assert any(
+        "empty or placeholder-only: Commands run:" in item for item in blank_command_errors
+    ), blank_command_errors
+    assert not any(
+        "missing field: Commands run:" in item for item in blank_command_errors
+    ), blank_command_errors
+
+    draft_blank = BASE_BODY.replace("Last verified commit: abc1234", "Last verified commit:").replace(
+        "Commands run: python tools/check_pr_governance_test.py",
+        "Commands run:",
+    )
+    assert validate_pull_request(event(draft_blank, draft=True)) == []
+
+    bare_no_issue = BASE_BODY.replace(
+        "No issue: repository-maintainer governance setup approved directly.",
+        "No issue:\n\n- Project status: In Review\n- Priority:\n- Workstream:",
+    )
+    tracking_errors = validate_pull_request(event(bare_no_issue))
+    assert any("Tracking must contain" in item for item in tracking_errors), tracking_errors
+
     with tempfile.TemporaryDirectory() as tmp:
         mutated = Path(tmp) / "repo"
         shutil.copytree(root, mutated, ignore=shutil.ignore_patterns(".git", "build", "dist"))

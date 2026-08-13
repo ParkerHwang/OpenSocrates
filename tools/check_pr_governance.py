@@ -27,13 +27,13 @@ REQUIRED_SECTIONS = (
 )
 PLACEHOLDERS = {"", "n/a", "none", "todo", "tbd", "pending", "-"}
 ISSUE_PATTERN = re.compile(r"(?im)\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#\d+\b")
-NO_ISSUE_PATTERN = re.compile(r"(?im)^\s*No issue:\s*(\S.*)$")
+NO_ISSUE_PATTERN = re.compile(r"(?im)^[ \t]*No issue:[ \t]*(\S.*)$")
 CHECKED_EVIDENCE_PATTERN = re.compile(
     r"(?im)^\s*-\s*\[[xX]\]\s*(?:Implemented|Locally validated|Release-validated|"
     r"Live host receipt captured|Required evidence is unavailable)\b"
 )
 FIELD_PATTERN = re.compile(
-    r"(?im)^\s*(Last verified commit|Commands run|Commands not run|Remaining work|Known limitations):\s*(.*)$"
+    r"(?im)^[ \t]*(Last verified commit|Commands run|Commands not run|Remaining work|Known limitations):[ \t]*(.*)$"
 )
 
 
