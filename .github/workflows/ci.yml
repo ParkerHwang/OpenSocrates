@@ -52,6 +52,8 @@ jobs:
         run: make generated-check
       - name: Validate content and locale parity
         run: make content-check
+      - name: Validate committed adjudication snapshot
+        run: make adjudication-check
       - name: Check documentation
         run: make docs-check
       - name: Check repository governance

@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ParkerHwang/OpenSocrates/evals/v1.2/schemas/adjudication-disagreement.schema.json",
+  "title": "OpenSocrates evaluation adjudication disagreement",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "protocol_version",
+    "evidence_grade",
+    "pair_id",
+    "classification",
+    "primary_decision",
+    "primary_rationale",
+    "secondary_decision",
+    "secondary_rationale",
+    "claude_partial_decision",
+    "resolution"
+  ],
+  "properties": {
+    "schema": {"const": "opensocrates.eval-adjudication-disagreement/1.0.0"},
+    "protocol_version": {"const": "1.2.0"},
+    "evidence_grade": {"const": "ai_assisted_provisional_development"},
+    "pair_id": {"type": "string", "minLength": 1},
+    "classification": {"const": "substantive_disagreement"},
+    "primary_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "intervention_policy",
+        "allowed_behaviors",
+        "leading_method",
+        "acceptable_leading_methods",
+        "acceptable_inclusion_methods",
+        "prohibited_methods",
+        "leading_metric_eligible",
+        "inclusion_metric_eligible",
+        "policy_metric_eligible"
+      ],
+      "properties": {
+        "status": {"enum": ["retain", "relabel", "multi_valid", "rewrite", "exclude_from_policy_metric", "invalid"]},
+        "intervention_policy": {"enum": ["prohibited", "optional", "required", "undetermined"]},
+        "allowed_behaviors": {
+          "type": "array",
+          "items": {"enum": ["hold_no_intervention", "route_clarifier", "route_owner_then_hold", "route_safe_alternative", "bounded_analysis"]},
+          "uniqueItems": true
+        },
+        "leading_method": {"type": ["string", "null"]},
+        "acceptable_leading_methods": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "acceptable_inclusion_methods": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "prohibited_methods": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "leading_metric_eligible": {"type": "boolean"},
+        "inclusion_metric_eligible": {"type": "boolean"},
+        "policy_metric_eligible": {"type": "boolean"}
+      }
+    },
+    "primary_rationale": {"type": "string", "minLength": 1},
+    "secondary_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "intervention_policy",
+        "allowed_behaviors",
+        "leading_method",
+        "acceptable_leading_methods",
+        "acceptable_inclusion_methods",
+        "prohibited_methods",
+        "leading_metric_eligible",
+        "inclusion_metric_eligible",
+        "policy_metric_eligible"
+      ],
+      "properties": {
+        "status": {"enum": ["retain", "relabel", "multi_valid", "rewrite", "exclude_from_policy_metric", "invalid"]},
+        "intervention_policy": {"enum": ["prohibited", "optional", "required", "undetermined"]},
+        "allowed_behaviors": {
+          "type": "array",
+          "items": {"enum": ["hold_no_intervention", "route_clarifier", "route_owner_then_hold", "route_safe_alternative", "bounded_analysis"]},
+          "uniqueItems": true
+        },
+        "leading_method": {"type": ["string", "null"]},
+        "acceptable_leading_methods": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "acceptable_inclusion_methods": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "prohibited_methods": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "leading_metric_eligible": {"type": "boolean"},
+        "inclusion_metric_eligible": {"type": "boolean"},
+        "policy_metric_eligible": {"type": "boolean"}
+      }
+    },
+    "secondary_rationale": {"type": "string", "minLength": 1},
+    "claude_partial_decision": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "intervention_policy",
+        "allowed_behaviors",
+        "leading_method",
+        "acceptable_leading_methods",
+        "acceptable_inclusion_methods",
+        "prohibited_methods",
+        "leading_metric_eligible",
+        "inclusion_metric_eligible",
+        "policy_metric_eligible"
+      ],
+      "properties": {
+        "status": {"enum": ["retain", "relabel", "multi_valid", "rewrite", "exclude_from_policy_metric", "invalid"]},
+        "intervention_policy": {"enum": ["prohibited", "optional", "required", "undetermined"]},
+        "allowed_behaviors": {
+          "type": "array",
+          "items": {"enum": ["hold_no_intervention", "route_clarifier", "route_owner_then_hold", "route_safe_alternative", "bounded_analysis"]},
+          "uniqueItems": true
+        },
+        "leading_method": {"type": ["string", "null"]},
+        "acceptable_leading_methods": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "acceptable_inclusion_methods": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "prohibited_methods": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "leading_metric_eligible": {"type": "boolean"},
+        "inclusion_metric_eligible": {"type": "boolean"},
+        "policy_metric_eligible": {"type": "boolean"}
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "selected_source",
+        "final_decision",
+        "rationale",
+        "resolution_reviewer",
+        "resolved_at"
+      ],
+      "properties": {
+        "status": {"enum": ["resolved_for_provisional_development", "unresolved"]},
+        "selected_source": {
+          "enum": ["secondary", "secondary_with_schema_consistency_normalization", "claude_partial", "unresolved"]
+        },
+        "final_decision": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "case_kind",
+            "intervention_policy",
+            "allowed_behaviors",
+            "leading_method",
+            "acceptable_leading_methods",
+            "acceptable_inclusion_methods",
+            "prohibited_methods",
+            "leading_metric_eligible",
+            "inclusion_metric_eligible",
+            "policy_metric_eligible"
+          ],
+          "properties": {
+            "status": {"enum": ["retain", "relabel", "multi_valid", "rewrite", "exclude_from_policy_metric", "invalid"]},
+            "case_kind": {"type": "string", "minLength": 1},
+            "intervention_policy": {"enum": ["prohibited", "optional", "required", "undetermined"]},
+            "allowed_behaviors": {
+              "type": "array",
+              "items": {"enum": ["hold_no_intervention", "route_clarifier", "route_owner_then_hold", "route_safe_alternative", "bounded_analysis"]},
+              "uniqueItems": true
+            },
+            "leading_method": {"type": ["string", "null"]},
+            "acceptable_leading_methods": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+            "acceptable_inclusion_methods": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+            "prohibited_methods": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+            "leading_metric_eligible": {"type": "boolean"},
+            "inclusion_metric_eligible": {"type": "boolean"},
+            "policy_metric_eligible": {"type": "boolean"}
+          }
+        },
+        "rationale": {"type": "string", "minLength": 1},
+        "resolution_reviewer": {"type": ["string", "null"]},
+        "resolved_at": {"type": ["string", "null"], "format": "date-time"}
+      }
+    }
+  }
+}

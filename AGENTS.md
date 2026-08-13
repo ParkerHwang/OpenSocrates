@@ -33,7 +33,14 @@ Do not start implementation from an unverified local branch, stale transcript, o
 - Runtime code belongs under `src/opensocrates/`.
 - Canonical reasoning content belongs under `content/methods/`.
 - Canonical schemas belong under `schemas/source/`.
-- Host templates belong under `plugin-src/claude/` and `plugin-src/codex/`.
+- Host package templates belong under `plugin-src/antigravity/`,
+  `plugin-src/claude/`, `plugin-src/codex/`, `plugin-src/cursor/`,
+  `plugin-src/grok/`, and `plugin-src/opencode/`. A controller,
+  teacher-question, procedure, grounding, or package-wording change must be
+  reviewed across all six trees. Preserve each host's delivery model:
+  only Claude/Codex use hidden trusted hook context; Antigravity/Cursor/Grok use skill and
+  content paths; OpenCode injects one compiled procedure and uses the same procedure for
+  native fallback.
 - Do not hand-edit generated files in `schemas/v1/`, `content/compiled-*.json`, `build/`, or `dist/`.
 - Run `make generate` after changing canonical generated inputs and commit canonical and generated changes together.
 - Keep English and Korean user-facing content semantically aligned.

@@ -5,8 +5,11 @@ verified host version of OpenCode 1.18.18.
 
 - `plugins/opensocrates.js` uses the stable `chat.message` hook, inspects only
   the bounded current public text locally, and adds at most one complete
-  authored procedure as a synthetic same-turn message part.
-- `skills/opensocrates/SKILL.md` is the explicit native Agent Skill fallback.
+  authored procedure as a synthetic same-turn message part. The procedure's
+  first section contains its three authored teacher questions.
+- `skills/opensocrates/SKILL.md` is the explicit native Agent Skill fallback and
+  reads the same generated question-led procedure. Explicit requests bypass the
+  bridge, preventing a duplicate question preamble.
 - The bridge makes no network call, subprocess call, recursive OpenCode call,
   extra model call, credential access, telemetry write, or provider/model
   assumption.

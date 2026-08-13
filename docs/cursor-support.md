@@ -16,13 +16,19 @@ separate model call to classify each prompt. This keeps the feature suitable
 for individual Cursor Pro users rather than consuming quota on an additional
 selector request.
 
+Each generated complete method procedure begins with three authored teacher
+questions for the active agent to settle before acting. The skill tells the
+agent not to interview the user unless a missing answer would change the work.
+That behavior comes from the content Cursor reads; it is not an OpenSocrates
+hook or separate selector claim.
+
 Install and manage it after v1.2 publishes:
 
 ```bash
-npx --yes opensocrates@1.2.0 install --host cursor
-npx --yes opensocrates@1.2.0 status --host cursor
-npx --yes opensocrates@1.2.0 update --host cursor
-npx --yes opensocrates@1.2.0 remove --host cursor
+npx --yes opensocrates@1.2.1 install --host cursor
+npx --yes opensocrates@1.2.1 status --host cursor
+npx --yes opensocrates@1.2.1 update --host cursor
+npx --yes opensocrates@1.2.1 remove --host cursor
 ```
 
 The installer verifies the release checksum, the complete package checksum

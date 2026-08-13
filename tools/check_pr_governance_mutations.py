@@ -153,6 +153,18 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory() as tmp:
         mutated = fixture(Path(tmp), root)
+        agents = mutated / "AGENTS.md"
+        agents.write_text(
+            agents.read_text(encoding="utf-8").replace(
+                "`plugin-src/opencode/`", "`plugin-src/other/`"
+            ),
+            encoding="utf-8",
+        )
+        errors = validate_repository(mutated)
+        assert any("plugin-src/opencode/" in item for item in errors), errors
+
+    with tempfile.TemporaryDirectory() as tmp:
+        mutated = fixture(Path(tmp), root)
         (mutated / "CLAUDE.md").unlink()
         errors = validate_repository(mutated)
         assert any("missing governance file: CLAUDE.md" in item for item in errors)

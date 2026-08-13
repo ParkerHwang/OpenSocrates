@@ -101,7 +101,19 @@ def _schema_for_annotation(annotation: Any, metadata: Mapping[str, Any]) -> dict
     if origin in (list, tuple, set, frozenset):
         args = get_args(annotation)
         item = args[0] if args else Any
-        return {"type": "array", "items": _schema_for_annotation(item, {})}
+        item_schema = _schema_for_annotation(item, {})
+        if "item_min_length" in metadata:
+            item_schema["minLength"] = metadata["item_min_length"]
+        if "item_max_length" in metadata:
+            item_schema["maxLength"] = metadata["item_max_length"]
+        if "item_pattern" in metadata:
+            item_schema["pattern"] = metadata["item_pattern"]
+        result: dict[str, Any] = {"type": "array", "items": item_schema}
+        if "min_items" in metadata:
+            result["minItems"] = metadata["min_items"]
+        if "max_items" in metadata:
+            result["maxItems"] = metadata["max_items"]
+        return result
     if origin in (dict, Mapping):
         args = get_args(annotation)
         key = args[0] if len(args) == 2 else str
@@ -110,6 +122,12 @@ def _schema_for_annotation(annotation: Any, metadata: Mapping[str, Any]) -> dict
             "type": "object",
             "additionalProperties": _schema_for_annotation(item, {}),
         }
+        if "min_properties" in metadata:
+            result["minProperties"] = metadata["min_properties"]
+        if "max_properties" in metadata:
+            result["maxProperties"] = metadata["max_properties"]
+        if "property_name_pattern" in metadata:
+            result["propertyNames"] = {"pattern": metadata["property_name_pattern"]}
         key = _unwrap_new_type(key)
         if isinstance(key, type) and issubclass(key, Enum):
             result["propertyNames"] = {"enum": [member.value for member in key]}

@@ -6,6 +6,12 @@ authored reasoning procedures as internal references. Grok Build can select
 the skill in the current turn, and the user can always invoke
 `/opensocrates` explicitly.
 
+When the native skill reads a generated method, the complete procedure begins
+with three authored teacher questions. Grok settles them before using the
+remaining procedure as a check and does not interview the user unless a missing
+answer would change the work. The questions are available through native skill
+content; the shipped package makes no OpenSocrates hook-injection claim.
+
 ## Verified boundary
 
 The compatibility probe used installed Grok Build
@@ -114,19 +120,19 @@ The alternatives were rejected as follows:
 | Rich card/widget rendering | Unavailable | No widget surface |
 
 The grounding rule remains strict: OpenSocrates may apply, name, or cite a
-method only after the complete authored procedure was read in the current
-conversation.
+method only after the complete authored procedure, including its leading
+teacher questions, was read in the current conversation.
 
 ## Installation and coexistence
 
 Install and manage the Grok package with:
 
 ```bash
-npx --yes opensocrates@1.2.0 install --host grok
-npx --yes opensocrates@1.2.0 status --host grok
-npx --yes opensocrates@1.2.0 verify --host grok
-npx --yes opensocrates@1.2.0 update --host grok
-npx --yes opensocrates@1.2.0 remove --host grok
+npx --yes opensocrates@1.2.1 install --host grok
+npx --yes opensocrates@1.2.1 status --host grok
+npx --yes opensocrates@1.2.1 verify --host grok
+npx --yes opensocrates@1.2.1 update --host grok
+npx --yes opensocrates@1.2.1 remove --host grok
 ```
 
 The installer owns only `~/.grok/plugins/opensocrates` and its exact ownership

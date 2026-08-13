@@ -2,7 +2,7 @@ PYTHON ?= $(shell if command -v uv >/dev/null 2>&1; then uv python find 3.12; el
 PYTHONPATH := src
 ROOT := $(CURDIR)
 
-.PHONY: bootstrap format format-check lint typecheck generate generated-check content-check docs-check governance-check package-check security-scan smoke installer-check real-claude-check claude-reliability-check claude-hook-timing package release-check version
+.PHONY: bootstrap format format-check lint typecheck generate generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check real-claude-check claude-reliability-check claude-hook-timing package release-check version
 
 bootstrap:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" -c 'import pathlib,sys,tomllib; assert sys.version_info[:2] == (3, 12), sys.version; root=pathlib.Path("."); project=tomllib.loads((root/"pyproject.toml").read_text()); lock=tomllib.loads((root/"uv.lock").read_text()); expected=("openai-codex==0.144.4", "openai-codex-cli-bin==0.144.4", "pydantic>=2.12,<3"); assert tuple(project["project"].get("dependencies", [])) == expected; packages={item.get("name"): item for item in lock.get("package", []) if isinstance(item, dict) and isinstance(item.get("name"), str)}; assert packages.get("openai-codex", {}).get("version") == "0.144.4"; assert packages.get("openai-codex-cli-bin", {}).get("version") == "0.144.4"; pydantic=packages.get("pydantic", {}).get("version", ""); assert pydantic.startswith("2.") and tuple(map(int, pydantic.split(".")[:2])) >= (2, 12); assert packages.get("pydantic-core", {}).get("version"); opensocrates=packages.get("opensocrates", {}); direct={item.get("name") for item in opensocrates.get("dependencies", []) if isinstance(item, dict)}; assert {"openai-codex", "openai-codex-cli-bin", "pydantic"} <= direct; print("Python 3.12 and locked Codex SDK/runtime metadata ready")'
@@ -38,16 +38,19 @@ generated-check:
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py --output-dir "$$out/schemas"; \
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$$out/content/compiled-content.bundle.json" --reasoning-projections-output "$$out/content/compiled-reasoning-content.bundle.json"; \
 	diff -ru "$(ROOT)/schemas/v1" "$$out/schemas/v1"; diff -u "$(ROOT)/content/compiled-content.bundle.json" "$$out/content/compiled-content.bundle.json"; diff -u "$(ROOT)/content/compiled-reasoning-content.bundle.json" "$$out/content/compiled-reasoning-content.bundle.json"; \
-	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$(ROOT)/build/generated/plugins/grok" >/dev/null; \
-	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$$out/plugins/grok" >/dev/null; \
-	diff -ru "$(ROOT)/build/generated/plugins/grok" "$$out/plugins/grok"; \
-	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host opencode --output "$(ROOT)/build/generated/plugins/opencode" >/dev/null; \
-	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host opencode --output "$$out/plugins/opencode" >/dev/null; \
-	diff -ru "$(ROOT)/build/generated/plugins/opencode" "$$out/plugins/opencode"; \
-	echo "generated-check: byte-identical schemas, content bundles, and Grok/OpenCode packages"
+	for host in antigravity cursor grok opencode claude codex; do \
+		PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host "$$host" --output "$(ROOT)/build/generated/plugins/$$host" >/dev/null; \
+		PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host "$$host" --output "$$out/plugins/$$host" >/dev/null; \
+		diff -ru "$(ROOT)/build/generated/plugins/$$host" "$$out/plugins/$$host"; \
+	done; \
+	echo "generated-check: byte-identical schemas, content bundles, and all six host packages"
 
 content-check:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
+
+adjudication-check:
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_v12_adjudication.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_v12_adjudication_mutations.py
 
 docs-check:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_links.py --root "$(ROOT)" \
@@ -73,6 +76,9 @@ docs-check:
 		--path docs/grok-support.md \
 		--path docs/opencode-support.md \
 		--path docs/opencode-support.ko.md \
+		--path docs/v1.2-adjudication-report.md \
+		--path evals/v1.2/ADJUDICATION_GUIDE.md \
+		--path evals/v1.2/ADJUDICATION_AI_AMENDMENT.md \
 		--path .github/release-notes \
 		--report build/evidence/links.json
 
@@ -115,7 +121,7 @@ claude-hook-timing:
 package:
 	@if command -v uv >/dev/null 2>&1; then PYTHONPATH="$(PYTHONPATH)" uv run --locked --group build python tools/release_check.py --root "$(ROOT)" --assemble; else PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/release_check.py --root "$(ROOT)" --assemble; fi
 
-release-check:
+release-check: adjudication-check
 	@if command -v uv >/dev/null 2>&1; then PYTHONPATH="$(PYTHONPATH)" uv run --locked --group build python tools/release_check.py --root "$(ROOT)" --assemble --report build/evidence/release-check.json; else PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/release_check.py --root "$(ROOT)" --assemble --report build/evidence/release-check.json; fi
 
 version:

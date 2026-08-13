@@ -52,7 +52,6 @@ def _live_host_probe_status(*, opencode_validated: bool) -> dict[str, str]:
     return status
 
 
-EXPECTED_SCHEMA_COUNT = 32
 EXPECTED_METHOD_COUNT = 48
 LEGACY_CONTENT_BUNDLE = "content/compiled-content.bundle.json"
 REASONING_CONTENT_BUNDLE = "content/compiled-reasoning-content.bundle.json"
@@ -356,11 +355,29 @@ def _check_reasoning_content_bundle_shape(
     return {"status": "fail" if errors else "pass", "error_codes": sorted(errors)}
 
 
+def _schema_manifest_files(root: Path) -> set[str]:
+    """Return the canonical schema filenames registered by the source manifest."""
+
+    try:
+        lines = (
+            (root / "schemas" / "source" / "schema-manifest.yaml")
+            .read_text(encoding="utf-8")
+            .splitlines()
+        )
+    except (OSError, UnicodeError):
+        return set()
+    prefix = "  - file: "
+    files = [line.removeprefix(prefix) for line in lines if line.startswith(prefix)]
+    if not files or len(files) != len(set(files)) or any("/" in name for name in files):
+        return set()
+    return set(files)
+
+
 def _schema_surface(root: Path) -> dict[str, Any]:
     directory = root / "schemas" / "v1"
     files = sorted(directory.glob("*.json"), key=lambda item: item.name.encode("utf-8"))
     errors: set[str] = set()
-    if len(files) != EXPECTED_SCHEMA_COUNT:
+    if {path.name for path in files} != _schema_manifest_files(root):
         errors.add("schema_count_invalid")
     for path in files:
         if _load_json(path) is None:
@@ -1177,6 +1194,16 @@ def _verify_third_party_notice(package: Path, host: str) -> set[str]:
     return errors
 
 
+def _contains_eval_or_adjudication_path(entries: Sequence[str]) -> bool:
+    """Keep source-only evaluation evidence out of every shipped ZIP."""
+
+    for entry in entries:
+        parts = tuple(part.casefold() for part in entry.split("/") if part)
+        if "evals" in parts or any("adjudication" in part for part in parts):
+            return True
+    return False
+
+
 def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     root: Path, host: str, bundle: Mapping[str, Any], bundle_bytes: bytes, target: str
 ) -> dict[str, Any]:
@@ -1264,8 +1291,14 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
             if host_only_notice not in contents:
                 errors.add("codex_control_boundary_notice_missing")
                 break
-    schema_count = len(list((generated / "schemas" / "v1").glob("*.json")))
-    if schema_count != (0 if host in NO_NATIVE_RUNTIME_HOSTS else EXPECTED_SCHEMA_COUNT):
+    schema_files = {
+        path.name for path in (generated / "schemas" / "v1").glob("*.json") if path.is_file()
+    }
+    expected_schema_files = (
+        set() if host in NO_NATIVE_RUNTIME_HOSTS else _schema_manifest_files(root)
+    )
+    schema_count = len(schema_files)
+    if schema_files != expected_schema_files:
         errors.add("package_schema_count_invalid")
     required_files = ["LICENSE", THIRD_PARTY_NOTICE]
     if host not in NO_NATIVE_RUNTIME_HOSTS:
@@ -1316,9 +1349,12 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
     else:
         archive_compressed_bytes = archive.stat().st_size
         with zipfile.ZipFile(archive) as package_archive:
+            archive_entries = [item.filename for item in package_archive.infolist()]
             archive_uncompressed_bytes = sum(
                 item.file_size for item in package_archive.infolist() if not item.is_dir()
             )
+        if _contains_eval_or_adjudication_path(archive_entries):
+            errors.add("package_contains_eval_or_adjudication_artifact")
     excluded_runtime_entries = {
         path.relative_to(generated).as_posix()
         for path in generated.rglob("*")
@@ -1448,6 +1484,8 @@ def _claude_chat_archive_errors(archive: Path) -> set[str]:
     errors: set[str] = set()
     with zipfile.ZipFile(archive) as bundle:
         entries = [name for name in bundle.namelist() if not name.endswith("/")]
+    if _contains_eval_or_adjudication_path(entries):
+        errors.add("claude_chat_archive_contains_eval_or_adjudication_artifact")
     for entry in entries:
         if entry.split("/", 1)[0] != _CLAUDE_CHAT_SKILL_ROOT:
             errors.add("claude_chat_archive_unexpected_entry")
