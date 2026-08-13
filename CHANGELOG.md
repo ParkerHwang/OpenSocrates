@@ -5,6 +5,13 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ## [Unreleased]
 
+### Changed
+
+- Intervention now leads with authored teacher questions. Hidden hook context
+  and the instruction file ask the active agent to settle those questions
+  before reciting a method. The 48 complete procedures remain the grounding
+  textbook, not the first voice.
+
 ## [1.1.5] - 2026-08-12
 
 ### Added

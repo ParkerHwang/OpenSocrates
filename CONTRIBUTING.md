@@ -31,7 +31,9 @@ Node.js 20 or later is also required when changing the GitHub/npx installer.
 - Runtime code belongs under `src/opensocrates/`.
 - Canonical reasoning content belongs under `content/methods/` and must keep
   theory, public-output, evidence, stop-condition, and example boundaries
-  explicit.
+  explicit. Teacher questions for the injection voice belong in
+  `content/teacher-questions.yaml` and must stay bilingual, three per method,
+  and addressed to the active agent rather than the user.
 - Canonical schemas belong under `schemas/source/`.
 - Claude package templates belong under `plugin-src/claude/`; Codex package
   templates belong under `plugin-src/codex/`.

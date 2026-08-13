@@ -13,8 +13,9 @@
 
 OpenSocrates is a local integration and authored reasoning framework for
 Claude and Codex. It detects requests that benefit from deliberate reasoning,
-uses a fresh host-native selector to choose relevant systems, and adds their
-complete theory and examples to the active task. Straightforward factual and
+uses a fresh host-native selector to choose relevant systems, and asks the
+agent the selected methods' teacher questions before exposing the complete
+procedure and examples. Straightforward factual and
 mechanical work can pass through unchanged.
 
 Version `1.1.5` includes 48 reasoning systems, one user-facing Claude entry, a
@@ -221,8 +222,9 @@ reasoning process. When it intervenes, it:
 1. starts a fresh, non-persistent selector in the current host;
 2. chooses from the authored 48-system catalog;
 3. writes the complete selected content to an owner-only Markdown file;
-4. adds a bounded hidden context message with each method ID, content revision,
-   and, when they fit, its exact `Do not use when` and `Stop conditions`; and
+4. adds a bounded hidden context message that leads with teacher questions to
+   settle, then each method ID, content revision, and, when they fit, its exact
+   `Do not use when` and `Stop conditions`; and
 5. requires the active task to read the complete file before applying the
    method and to end a grounded response with an exact audit line such as
    `OpenSocrates grounding: triangulation@1`.

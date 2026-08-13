@@ -35,6 +35,7 @@ from .method import (
     complement_fragment,
     validate_cases,
     validate_procedure,
+    validate_teacher_question_catalog,
 )
 from .schema import (
     AUTHORING_SCHEMA,
@@ -104,4 +105,5 @@ __all__ = [
     "validate_reasoning_content_projections_shape",
     "validate_procedure",
     "validate_routing_policy",
+    "validate_teacher_question_catalog",
 ]

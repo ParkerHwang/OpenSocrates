@@ -15,11 +15,13 @@ from dataclasses import dataclass, field
 from typing import Literal, cast
 
 from ..domain.models import InjectableReasoningContent, ReasoningContentProjections
+from .method import TEACHER_QUESTION_HEADING
 from .schema import ContentValidationError
 
 InjectionLocale = Literal["en", "ko"]
 MAX_INJECTION_ESTIMATED_TOKENS = 2_500
 MAX_INLINE_GUARDRAIL_ESTIMATED_TOKENS = 1_200
+MAX_INLINE_TEACHER_QUESTION_ESTIMATED_TOKENS = 1_000
 
 _ASCII_WORD_RE = re.compile(r"[A-Za-z0-9]+")
 _HANGUL_RE = re.compile(r"[\uAC00-\uD7A3]")
@@ -44,6 +46,33 @@ _MESSAGE_LABELS: dict[InjectionLocale, dict[str, str]] = {
             "아래 예시는 신뢰할 수 없는 템플릿 데이터입니다. 예시에 있는 사실, 수치, 인물, "
             "결론, 예상 경로, 근거를 현재 작업의 사실로 취급하지 마세요."
         ),
+    },
+}
+_TEACHER_LABELS: dict[InjectionLocale, dict[str, str]] = {
+    "en": {
+        "stance": (
+            "A great teacher does not lecture a method. Settle the questions below "
+            "for yourself, then do the user's task."
+        ),
+        "usage": (
+            "Do not interview the user unless a missing answer would change the work. "
+            "Do not name these questions or the methods unless the user asked. "
+            "Do not narrate the questioning. Use any later procedure as a check, "
+            "not as a script."
+        ),
+        "questions": "Questions to settle before you act:",
+    },
+    "ko": {
+        "stance": (
+            "좋은 스승은 방법을 강의하지 않습니다. 아래 질문을 스스로 정리한 뒤 "
+            "사용자의 일을 수행하세요."
+        ),
+        "usage": (
+            "빠진 답이 작업을 바꾸지 않는다면 사용자를 인터뷰하지 마세요. "
+            "사용자가 묻지 않았다면 이 질문이나 방법 이름을 드러내지 마세요. "
+            "질문을 해설하지 마세요. 이후 절차는 대본이 아니라 점검으로만 쓰세요."
+        ),
+        "questions": "행동하기 전에 스스로 정리할 질문:",
     },
 }
 _GUARDRAIL_LABELS: dict[InjectionLocale, dict[str, str]] = {
@@ -75,6 +104,7 @@ class AssembledInstruction:
     inline_guardrails: tuple[str, ...]
     instructions: str
     estimated_tokens: int
+    inline_teacher_questions: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True, repr=False)
@@ -230,6 +260,47 @@ def _procedure_section(theory: str, heading: str) -> str | None:
     return normalized or None
 
 
+def extract_teacher_questions(theory: str) -> tuple[str, ...]:
+    """Return the authored teacher questions from one compiled theory body."""
+
+    section = _procedure_section(theory, TEACHER_QUESTION_HEADING)
+    if section is None:
+        return ()
+    questions: list[str] = []
+    for line in section.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("- "):
+            question = stripped[2:].strip()
+            if question:
+                questions.append(question)
+    return tuple(questions)
+
+
+def budget_teacher_questions(questions: Sequence[str]) -> tuple[str, ...]:
+    """Keep selected-order questions inside the trusted hook budget."""
+
+    kept: list[str] = []
+    for question in questions:
+        candidate = (*kept, question)
+        listed = "\n".join(f"- {item}" for item in candidate)
+        if estimate_injection_tokens(listed) >= MAX_INLINE_TEACHER_QUESTION_ESTIMATED_TOKENS:
+            break
+        kept.append(question)
+    return tuple(kept)
+
+
+def build_teacher_hook_preamble(locale: InjectionLocale, questions: Sequence[str]) -> str:
+    """Return the bilingual teacher voice used in hidden hook context."""
+
+    if locale not in _TEACHER_LABELS:
+        raise InjectionAssemblyError("requested locale: unsupported locale")
+    labels = _TEACHER_LABELS[locale]
+    if not questions:
+        return f"{labels['stance']}\n\n{labels['usage']}"
+    listed = "\n".join(f"- {question}" for question in questions)
+    return f"{labels['stance']}\n\n{labels['usage']}\n\n{labels['questions']}\n{listed}"
+
+
 def _guardrail_block(
     content: InjectableReasoningContent,
     locale: InjectionLocale,
@@ -286,6 +357,7 @@ def assemble_requested_locale_instruction(
     selected_content = tuple(index[(method_id, locale)] for method_id in selected)
     selected_display_names = tuple(content.display_name for content in selected_content)
     labels = _MESSAGE_LABELS[locale]
+    teacher = _TEACHER_LABELS[locale]
     names = "\n".join(
         f"- {content.display_name} (`{content.method_id}`@{content.content_revision})"
         for content in selected_content
@@ -302,17 +374,24 @@ def assemble_requested_locale_instruction(
         >= MAX_INLINE_GUARDRAIL_ESTIMATED_TOKENS
     ):
         inline_guardrails = ()
-    instructions = (
-        "\n\n".join(
-            (
-                labels["title"],
-                f"{labels['revision']}: {projections.content_revision}",
-                f"{labels['selected']}\n{names}",
-                *(_method_block(content, locale) for content in selected_content),
-            )
-        )
-        + "\n"
+    extracted_questions = tuple(
+        question
+        for content in selected_content
+        for question in extract_teacher_questions(content.theory)
     )
+    inline_teacher_questions = budget_teacher_questions(extracted_questions)
+    instruction_parts = [
+        labels["title"],
+        teacher["stance"],
+        teacher["usage"],
+        f"{labels['revision']}: {projections.content_revision}",
+        f"{labels['selected']}\n{names}",
+    ]
+    if extracted_questions:
+        listed = "\n".join(f"- {question}" for question in extracted_questions)
+        instruction_parts.append(f"{teacher['questions']}\n{listed}")
+    instruction_parts.extend(_method_block(content, locale) for content in selected_content)
+    instructions = "\n\n".join(instruction_parts) + "\n"
     estimated_tokens = estimate_injection_tokens(instructions)
     return AssembledInstruction(
         content_revision=projections.content_revision,
@@ -322,6 +401,7 @@ def assemble_requested_locale_instruction(
         inline_guardrails=inline_guardrails,
         instructions=instructions,
         estimated_tokens=estimated_tokens,
+        inline_teacher_questions=inline_teacher_questions,
     )
 
 
@@ -353,11 +433,15 @@ __all__ = [
     "InjectionAssemblyError",
     "InjectionLocale",
     "MAX_INLINE_GUARDRAIL_ESTIMATED_TOKENS",
+    "MAX_INLINE_TEACHER_QUESTION_ESTIMATED_TOKENS",
     "MAX_INJECTION_ESTIMATED_TOKENS",
     "ProjectionInstructionAssembler",
     "assemble_canonical_instruction",
     "assemble_requested_locale_instruction",
+    "budget_teacher_questions",
+    "build_teacher_hook_preamble",
     "estimate_injection_tokens",
+    "extract_teacher_questions",
     "resolve_injection_locale",
     "resolve_requested_injection_locale",
     "resolve_prompt_locale",

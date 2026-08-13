@@ -460,6 +460,19 @@ def test_issue_32_grounding_specifics() -> None:
         artifact = store.create("session-grounding", "turn-grounding", assembled)
         context = artifact.reference_message()
         require(
+            "A great teacher does not lecture a method." in context,
+            "teacher stance was missing from trusted context",
+        )
+        require(
+            "If every source is downstream of the same origin, what do you actually know?"
+            in context,
+            "triangulation teacher question was missing from trusted context",
+        )
+        require(
+            context.find("A great teacher") < context.find("Grounding gate"),
+            "teacher voice did not precede the grounding gate",
+        )
+        require(
             "all sources repeat one underlying dataset" in context,
             "triangulation's dependent-source exclusion was not in trusted context",
         )

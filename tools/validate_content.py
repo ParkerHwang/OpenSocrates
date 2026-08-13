@@ -27,6 +27,7 @@ from opensocrates.content.method import (
     compile_method_content_projections,
     validate_cases,
     validate_procedure,
+    validate_teacher_question_catalog,
 )
 from opensocrates.content.schema import (
     FROZEN_FAMILIES,
@@ -196,7 +197,13 @@ def _validate_policy_shape(policy_id: str, value: Any) -> dict[str, Any]:
 
 def _catalog_phase(
     content_root: Path,
-) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
+) -> tuple[
+    dict[str, Any],
+    dict[str, Any],
+    dict[str, Any],
+    dict[str, Any],
+    dict[str, dict[str, tuple[str, ...]]],
+]:
     catalog = validate_catalog(_read(content_root, "catalog.yaml"))
     policies = {
         policy_id: _validate_policy_shape(policy_id, _read(content_root, filename))
@@ -217,7 +224,10 @@ def _catalog_phase(
                 f"{relative}: domain MethodAuthoring contract: {exc}"
             ) from exc
         method_data[method_id] = authored
-    return catalog, method_data, policies, {"en": en, "ko": ko}
+    teacher_questions = validate_teacher_question_catalog(
+        _read(content_root, "teacher-questions.yaml")
+    )
+    return catalog, method_data, policies, {"en": en, "ko": ko}, teacher_questions
 
 
 def _asset_paths(content_root: Path, method_id: str) -> dict[str, Path]:
@@ -231,7 +241,9 @@ def _asset_paths(content_root: Path, method_id: str) -> dict[str, Path]:
 
 
 def _full_phase(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
-    content_root: Path, method_data: Mapping[str, Mapping[str, Any]]
+    content_root: Path,
+    method_data: Mapping[str, Mapping[str, Any]],
+    teacher_questions: Mapping[str, Mapping[str, tuple[str, ...]]],
 ) -> tuple[
     list[dict[str, Any]],
     ReasoningContentProjections | None,
@@ -276,9 +288,18 @@ def _full_phase(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
             and not any(f"MISSING_ASSET methods/{method_id}" in problem for problem in problems)
         ):
             try:
-                compiled.append(compile_method(method_data[method_id], procedures))
+                compiled.append(
+                    compile_method(
+                        method_data[method_id],
+                        procedures,
+                        teacher_questions[method_id],
+                    )
+                )
                 catalog_entry, injectable = compile_method_content_projections(
-                    method_data[method_id], procedures, cases_by_locale
+                    method_data[method_id],
+                    procedures,
+                    cases_by_locale,
+                    teacher_questions[method_id],
                 )
                 catalog_entries.append(catalog_entry)
                 injectable_content.extend(injectable)
@@ -368,7 +389,7 @@ def main(argv: list[str] | None = None) -> int:
         for error in errors:
             print(f"ERROR {error}", file=sys.stderr)
         return 1
-    catalog, method_data, policies, locales = _catalog_phase(content_root)
+    catalog, method_data, policies, locales, teacher_questions = _catalog_phase(content_root)
     family_counts = {
         family: len(
             [
@@ -384,7 +405,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     if args.catalog_only:
         return 0
-    compiled, projections, problems = _full_phase(content_root, method_data)
+    compiled, projections, problems = _full_phase(content_root, method_data, teacher_questions)
     if problems:
         print("CONTENT_INVALID", file=sys.stderr)
         for problem in problems:

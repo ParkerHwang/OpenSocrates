@@ -305,6 +305,35 @@ def _test_content_assembly() -> None:
     )
 
 
+@_check("VSC-01A-teacher-questions-lead-injection")
+def _test_teacher_questions_lead_injection() -> None:
+    projections = load_reasoning_content_projections(
+        Path("content/compiled-reasoning-content.bundle.json")
+    )
+    assembled = assemble_canonical_instruction(
+        projections,
+        ("triangulation",),
+        "synthetic English prompt",
+        expected_content_revision=projections.content_revision,
+    )
+    instructions = assembled.instructions
+    question = "If every source is downstream of the same origin, what do you actually know?"
+    _require("A great teacher does not lecture a method." in instructions)
+    _require(question in instructions)
+    _require(question in assembled.inline_teacher_questions)
+    _require(instructions.find("Questions to settle") < instructions.find("## Purpose"))
+    with tempfile.TemporaryDirectory(prefix="opensocrates-teacher-check-") as name:
+        store = InstructionFileStore(
+            installation_key=b"t" * 32,
+            directory=Path(name) / "artifacts",
+        )
+        artifact = store.create("teacher-session", "teacher-turn", assembled)
+        reference = artifact.reference_message()
+        _require(reference.find("A great teacher") < reference.find("Grounding gate"))
+        _require(question in reference)
+        _require("all sources repeat one underlying dataset" in reference)
+
+
 @_check("VSC-02-locale-current-prompt-and-english-fallback")
 def _test_locale_resolution() -> None:
     projections = _projections()
