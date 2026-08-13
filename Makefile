@@ -27,6 +27,7 @@ generate:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host antigravity --output "$(ROOT)/build/generated/plugins/antigravity" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host cursor --output "$(ROOT)/build/generated/plugins/cursor" >/dev/null
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$(ROOT)/build/generated/plugins/grok" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host claude --runtime-root "$(ROOT)/dist/runtime/claude" --output "$(ROOT)/build/generated/plugins/claude" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host codex --runtime-root "$(ROOT)/dist/runtime/codex" --output "$(ROOT)/build/generated/plugins/codex" >/dev/null
 
@@ -35,6 +36,8 @@ generated-check:
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py --output-dir "$$out/schemas"; \
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$$out/content/compiled-content.bundle.json" --reasoning-projections-output "$$out/content/compiled-reasoning-content.bundle.json"; \
 	diff -ru "$(ROOT)/schemas/v1" "$$out/schemas/v1"; diff -u "$(ROOT)/content/compiled-content.bundle.json" "$$out/content/compiled-content.bundle.json"; diff -u "$(ROOT)/content/compiled-reasoning-content.bundle.json" "$$out/content/compiled-reasoning-content.bundle.json"; \
+	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$$out/plugins/grok" >/dev/null; \
+	diff -ru "$(ROOT)/build/generated/plugins/grok" "$$out/plugins/grok"; \
 	echo "generated-check: byte-identical schemas and content bundles"
 
 content-check:
@@ -57,6 +60,7 @@ docs-check:
 		--path docs/claude-chat-upload-probe.md \
 		--path docs/antigravity-support.md \
 		--path docs/cursor-support.md \
+		--path docs/grok-support.md \
 		--path .github/release-notes \
 		--report build/evidence/links.json
 
@@ -75,6 +79,7 @@ smoke:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_claude.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_antigravity.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_cursor.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_grok.py
 
 installer-check:
 	@npm test

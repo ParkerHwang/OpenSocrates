@@ -468,10 +468,13 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
         "method_count": len(methods),
         "method_ids": raw_bundle.get("method_ids"),
         "runtime_targets": runtime_targets,
-        "capability_evidence": {
-            "status": "unknown",
-            "reason": "package generation has no live exact host probe",
-        },
+        "capability_evidence": metadata.get(
+            "capability_evidence",
+            {
+                "status": "unknown",
+                "reason": "package generation has no live exact host probe",
+            },
+        ),
         "files": files,
     }
     (output_path / "release-manifest.json").write_bytes(_canonical_json(release))

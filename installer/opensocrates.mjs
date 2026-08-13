@@ -37,7 +37,7 @@ export const MARKETPLACE_NAME = "opensocrates";
 export const PLUGIN_NAME = "opensocrates";
 export const PLUGIN_ID = `${PLUGIN_NAME}@${MARKETPLACE_NAME}`;
 export const DEFAULT_HOST = "codex";
-export const SUPPORTED_HOSTS = Object.freeze(["antigravity", "claude", "codex", "cursor"]);
+export const SUPPORTED_HOSTS = Object.freeze(["antigravity", "claude", "codex", "cursor", "grok"]);
 export const ALL_HOST = "all";
 export const HOST_CHOICES = Object.freeze([ALL_HOST, ...SUPPORTED_HOSTS]);
 export function assetNameFor(host = DEFAULT_HOST) {
@@ -75,6 +75,14 @@ const ANTIGRAVITY_MARKER = Object.freeze({
   host: "antigravity",
   registrationKind: "file-drop",
 });
+const GROK_MARKER = Object.freeze({
+  schemaVersion: 1,
+  marketplaceName: MARKETPLACE_NAME,
+  pluginName: PLUGIN_NAME,
+  host: "grok",
+  registrationKind: "file-drop",
+});
+const FILE_DROP_HOSTS = Object.freeze(["antigravity", "cursor", "grok"]);
 const HOST_LAYOUTS = Object.freeze({
   antigravity: {
     marketplaceRelative: null,
@@ -95,6 +103,12 @@ const HOST_LAYOUTS = Object.freeze({
     requiresRuntime: true,
   },
   cursor: {
+    marketplaceRelative: null,
+    pluginRelative: ".",
+    manifestRelative: "plugin.json",
+    requiresRuntime: false,
+  },
+  grok: {
     marketplaceRelative: null,
     pluginRelative: ".",
     manifestRelative: "plugin.json",
@@ -410,6 +424,7 @@ function jsonEqual(left, right) {
 function markerFor(host) {
   if (host === "cursor") return CURSOR_MARKER;
   if (host === "antigravity") return ANTIGRAVITY_MARKER;
+  if (host === "grok") return GROK_MARKER;
   return host === "claude" ? CLAUDE_MARKER : CODEX_MARKER;
 }
 
@@ -639,12 +654,12 @@ function showHelp() {
   console.log(`OpenSocrates ${PRODUCT_VERSION}
 
 Usage:
-  opensocrates install [--host all|antigravity|claude|codex|cursor] [--asset ZIP --checksum SHA256]
-  opensocrates status [--host all|antigravity|claude|codex|cursor]
-  opensocrates update [--host all|antigravity|claude|codex|cursor] [--asset ZIP --checksum SHA256]
-  opensocrates remove [--host all|antigravity|claude|codex|cursor]
-  opensocrates verify [--host all|antigravity|claude|codex|cursor] [--asset ZIP --checksum SHA256]
-  opensocrates auto-update enable [--host all|antigravity|claude|codex|cursor]
+  opensocrates install [--host all|antigravity|claude|codex|cursor|grok] [--asset ZIP --checksum SHA256]
+  opensocrates status [--host all|antigravity|claude|codex|cursor|grok]
+  opensocrates update [--host all|antigravity|claude|codex|cursor|grok] [--asset ZIP --checksum SHA256]
+  opensocrates remove [--host all|antigravity|claude|codex|cursor|grok]
+  opensocrates verify [--host all|antigravity|claude|codex|cursor|grok] [--asset ZIP --checksum SHA256]
+  opensocrates auto-update enable [--host all|antigravity|claude|codex|cursor|grok]
       [--channel stable|next] [--interval-hours ${AUTO_UPDATE_DEFAULT_INTERVAL_HOURS}]
       [--allow-major]
   opensocrates auto-update status
@@ -663,6 +678,8 @@ function managedPaths(host) {
       ? process.env.ANTIGRAVITY_CONFIG_DIR
       : host === "cursor"
         ? process.env.CURSOR_CONFIG_DIR
+      : host === "grok"
+        ? process.env.GROK_HOME
       : host === "claude"
         ? process.env.CLAUDE_CONFIG_DIR
         : process.env.CODEX_HOME;
@@ -671,6 +688,8 @@ function managedPaths(host) {
       ? join(homedir(), ".gemini", "config")
       : host === "cursor"
         ? join(homedir(), ".cursor")
+      : host === "grok"
+        ? join(homedir(), ".grok")
       : join(homedir(), host === "claude" ? ".claude" : ".codex");
   const configuredHome = resolve(
     configured ? configured : defaultHome,
@@ -688,6 +707,8 @@ function managedPaths(host) {
       ? join(hostHome, "plugins", PLUGIN_NAME)
       : host === "cursor"
         ? join(hostHome, "plugins", "local", PLUGIN_NAME)
+      : host === "grok"
+        ? join(hostHome, "plugins", PLUGIN_NAME)
       : join(hostHome, "managed-marketplaces", MARKETPLACE_NAME);
   const layout = HOST_LAYOUTS[host];
   return {
@@ -724,6 +745,10 @@ function cursorAppPaths() {
 
 function antigravityBinary() {
   return process.env.AGY_BIN || "agy";
+}
+
+function grokBinary() {
+  return process.env.GROK_BIN || "grok";
 }
 
 function run(command, args, { allowFailure = false } = {}) {
@@ -771,6 +796,10 @@ function runCodexJson(args) {
 
 function runClaudeJson(args) {
   return runJson(claudeBinary(), args, "Claude Code");
+}
+
+function runGrokJson(args) {
+  return runJson(grokBinary(), args, "Grok Build");
 }
 
 function claudeListEntries(payload, wrapper, label) {
@@ -839,6 +868,13 @@ function versionAtLeast(value, minimum) {
 }
 
 function requireHostCli(host, { authenticated = false } = {}) {
+  if (host === "grok") {
+    const result = run(grokBinary(), ["--version"]);
+    if (!versionAtLeast(result.stdout, [1, 0, 3])) {
+      fail(`Grok Build 1.0.3 or later is required; got ${result.stdout.trim()}`);
+    }
+    return;
+  }
   if (host === "cursor") {
     if (process.env.CURSOR_CONFIG_DIR) return;
     if (process.env.CURSOR_BIN) {
@@ -890,7 +926,7 @@ function requireHostCli(host, { authenticated = false } = {}) {
 }
 
 function marketplaceEntries(host) {
-  if (["antigravity", "cursor"].includes(host)) {
+  if (FILE_DROP_HOSTS.includes(host)) {
     const paths = managedPaths(host);
     return existsSync(paths.root) ? [{ name: MARKETPLACE_NAME, root: paths.root }] : [];
   }
@@ -915,7 +951,7 @@ function marketplaceEntry(host) {
 }
 
 function pluginState(host) {
-  if (["antigravity", "cursor"].includes(host)) {
+  if (FILE_DROP_HOSTS.includes(host)) {
     const paths = managedPaths(host);
     if (!existsSync(paths.root)) return { kind: "missing", version: null };
     let manifest;
@@ -930,13 +966,53 @@ function pluginState(host) {
       Array.isArray(manifest) ||
       (host === "cursor" &&
         manifest.$schema !== "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json") ||
+      (host === "grok" && manifest.skills !== "./skills") ||
       manifest.name !== PLUGIN_NAME ||
       typeof manifest.version !== "string" ||
       manifest.version.trim().length === 0
     ) {
       fail(`${host} reported an invalid OpenSocrates plugin manifest`);
     }
-    return { kind: "installed", version: manifest.version };
+    if (host !== "grok") return { kind: "installed", version: manifest.version };
+    const payload = runGrokJson(["inspect", "--json"]);
+    if (!Array.isArray(payload.plugins)) {
+      fail("Grok Build inspect returned an unexpected plugin schema");
+    }
+    const matches = payload.plugins.filter((entry) => entry?.name === PLUGIN_NAME);
+    if (matches.length !== 1) {
+      fail(
+        matches.length === 0
+          ? "Grok Build did not discover the managed OpenSocrates plugin"
+          : "Grok Build reported duplicate OpenSocrates plugins",
+      );
+    }
+    const entry = matches[0];
+    if (
+      typeof entry.enabled !== "boolean" ||
+      typeof entry.path !== "string" ||
+      entry.provides?.skills !== 1 ||
+      entry.provides?.agents !== 0 ||
+      entry.provides?.hooks !== false ||
+      entry.provides?.mcpServers !== 0
+    ) {
+      fail("Grok Build reported an invalid OpenSocrates plugin state");
+    }
+    let observedPath = resolve(entry.path);
+    try {
+      observedPath = realpathSync(observedPath);
+    } catch {
+      // The managed root exists here, so a missing reported path is invalid below.
+    }
+    let expectedPath = resolve(paths.root);
+    try {
+      expectedPath = realpathSync(expectedPath);
+    } catch {
+      // Ownership checks report a more specific error for a missing root.
+    }
+    if (observedPath !== expectedPath) {
+      fail(`Grok Build resolved OpenSocrates from an unmanaged location: ${observedPath}`);
+    }
+    return { kind: entry.enabled ? "installed" : "disabled", version: manifest.version };
   }
   if (host === "claude") {
     const installed = claudePluginEntries(runClaudeJson(["plugin", "list", "--json"]));
@@ -1231,7 +1307,11 @@ async function verifyExtractedPackage(pluginRoot, host) {
     (await exists(join(pluginRoot, "runtime"))) ||
     (await exists(join(pluginRoot, "hooks"))) ||
     (await exists(join(pluginRoot, "bin"))) ||
-    (host === "cursor" && (await exists(join(pluginRoot, "mcp.json"))))
+    ((host === "cursor" || host === "grok") && (await exists(join(pluginRoot, "mcp.json")))) ||
+    (host === "grok" &&
+      ((await exists(join(pluginRoot, "commands"))) ||
+        (await exists(join(pluginRoot, "agents"))) ||
+        (await exists(join(pluginRoot, ".mcp.json")))))
   ) {
     fail(`${host} explicit-skill package must not contain executable integration surfaces`);
   }
@@ -1317,7 +1397,7 @@ async function buildStagingTree(parent, pluginSource, host) {
   const layout = HOST_LAYOUTS[host];
   const staging = await mkdtemp(join(parent, ".opensocrates.staging-"));
   try {
-    if (["antigravity", "cursor"].includes(host)) {
+    if (FILE_DROP_HOSTS.includes(host)) {
       await cp(pluginSource, staging, { recursive: true, preserveTimestamps: true });
       await verifyExtractedPackage(staging, host);
       await writeFile(
@@ -1396,7 +1476,7 @@ function entryRoot(entry, host) {
 }
 
 function removeRegistration(host, entry, state) {
-  if (["antigravity", "cursor"].includes(host)) return;
+  if (FILE_DROP_HOSTS.includes(host)) return;
   if (host === "claude") {
     if (["installed", "disabled"].includes(state.kind)) {
       run(claudeBinary(), ["plugin", "uninstall", PLUGIN_ID, "--scope", "user"]);
@@ -1417,7 +1497,7 @@ function removeRegistration(host, entry, state) {
 }
 
 function addRegistration(host, root, installPlugin, { enabled = true } = {}) {
-  if (["antigravity", "cursor"].includes(host)) return null;
+  if (FILE_DROP_HOSTS.includes(host)) return null;
   if (host === "claude") {
     run(claudeBinary(), ["plugin", "marketplace", "add", root, "--scope", "user"]);
     if (installPlugin) {
@@ -1436,7 +1516,7 @@ function addRegistration(host, root, installPlugin, { enabled = true } = {}) {
 }
 
 function removeRegistrationBestEffort(host) {
-  if (["antigravity", "cursor"].includes(host)) return;
+  if (FILE_DROP_HOSTS.includes(host)) return;
   const entry = (() => {
     try {
       return marketplaceEntry(host);
@@ -1481,7 +1561,7 @@ async function recoveryStep(label, action) {
 }
 
 async function preflightHost(host, action) {
-  if (!["antigravity", "cursor"].includes(host) || ["install", "update"].includes(action)) {
+  if (!FILE_DROP_HOSTS.includes(host) || ["install", "update"].includes(action)) {
     requireHostCli(host, { authenticated: ["install", "update"].includes(action) });
   }
   if (host === "claude") {
@@ -1582,7 +1662,13 @@ async function stageInstallation(preflight, pluginSource) {
   return {
     ...preflight,
     staging,
-    backup: join(paths.parent, `.opensocrates.backup-${randomUUID()}`),
+    // Grok scans every directory below ~/.grok/plugins, including dot-prefixed
+    // rollback directories. Keep its backup in the host home so only the newly
+    // activated exact root is discoverable during post-activation inspection.
+    backup: join(
+      host === "grok" ? paths.hostHome : paths.parent,
+      `.opensocrates.backup-${randomUUID()}`,
+    ),
     registrationRemoved: false,
     backupCreated: false,
     newRootActive: false,
@@ -1743,7 +1829,12 @@ async function runInstallOrUpdate(options, action) {
         "This experimental package adds no automatic OpenSocrates hook selector.",
     );
   }
-  console.log("Start new host tasks to load the updated skills and hooks.");
+  if (hosts.includes("grok")) {
+    console.log(
+      "Grok Build: start a new task for automatic native-skill selection, or invoke /opensocrates explicitly.",
+    );
+  }
+  console.log("Start new host tasks to load the updated OpenSocrates integration.");
   return hosts;
 }
 
@@ -1791,6 +1882,8 @@ async function showStatus(host) {
             `${candidate}: installed ${status.version ?? "unknown"}` +
               (["antigravity", "cursor"].includes(candidate)
                 ? " (experimental explicit-skill tier)"
+                : candidate === "grok"
+                  ? " (native skill; automatic and explicit invocation)"
                 : "") +
               (expected
                 ? hostDrift
@@ -1834,12 +1927,16 @@ async function showStatus(host) {
           ? " Antigravity support is experimental and explicit-skill only."
           : host === "cursor"
             ? " Cursor support is experimental and explicit-skill first."
+            : host === "grok"
+              ? " Grok Build uses automatic native-skill selection and explicit /opensocrates invocation."
             : ""),
     );
   } else if (status.kind === "disabled") {
     console.log(
       `OpenSocrates ${status.version ?? "unknown"} is installed but disabled. ` +
-        "Run install or update to re-enable it.",
+        (host === "grok"
+          ? "Remove the OpenSocrates disabled entry from Grok Build configuration, then run status again."
+          : "Run install or update to re-enable it."),
     );
   } else if (status.kind === "available") {
     console.log(`OpenSocrates ${status.version ?? "unknown"} is available but not installed.`);
@@ -1853,7 +1950,10 @@ async function showStatus(host) {
 function removalTransaction(preflight) {
   return {
     ...preflight,
-    backup: join(preflight.paths.parent, `.opensocrates.removed-${randomUUID()}`),
+    backup: join(
+      preflight.host === "grok" ? preflight.paths.hostHome : preflight.paths.parent,
+      `.opensocrates.removed-${randomUUID()}`,
+    ),
     registrationRemoved: false,
     backupCreated: false,
   };
@@ -2039,6 +2139,14 @@ async function updaterEnvironment(hosts, npx) {
       );
       continue;
     }
+    if (host === "grok") {
+      const executable = await executablePath("grok", "GROK_BIN");
+      environment.GROK_BIN = executable;
+      environment.PATH = [...new Set([dirname(executable), ...environment.PATH.split(":")])].join(
+        ":",
+      );
+      continue;
+    }
     const key = host === "claude" ? "CLAUDE_BIN" : "CODEX_BIN";
     const executable = await executablePath(host, key);
     environment[key] = executable;
@@ -2049,6 +2157,7 @@ async function updaterEnvironment(hosts, npx) {
     "CLAUDE_CONFIG_DIR",
     "CODEX_HOME",
     "CURSOR_CONFIG_DIR",
+    "GROK_HOME",
     "OPENSOCRATES_STATE_DIR",
   ]) {
     if (process.env[key]) environment[key] = resolve(process.env[key]);
@@ -2207,6 +2316,8 @@ async function runRemove(options) {
           ? "Claude"
           : host === "cursor"
             ? "Cursor"
+            : host === "grok"
+              ? "Grok Build"
             : "Codex";
     console.log(`OpenSocrates was removed from ${label}.`);
   }

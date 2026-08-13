@@ -340,6 +340,7 @@ def _profiles() -> dict[str, CapabilityProfile]:
     from ..hosts.claude.capability import default_capability_profile as claude_profile
     from ..hosts.codex.capability import default_capability_profile as codex_profile
     from ..hosts.cursor.capability import default_capability_profile as cursor_profile
+    from ..hosts.grok.capability import default_capability_profile as grok_profile
     from ..hosts.prompt_only.capability import default_capability_profile as prompt_profile
 
     return {
@@ -347,6 +348,7 @@ def _profiles() -> dict[str, CapabilityProfile]:
         "claude": claude_profile(HostId.CLAUDE_CODE),
         "codex": codex_profile(HostId.CODEX_CLI),
         "cursor": cursor_profile(),
+        "grok": grok_profile(),
         "prompt_only": prompt_profile(host=HostId.PROMPT_ONLY),
     }
 
@@ -555,7 +557,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
             dispatcher = None
 
     adapters: dict[str, Any] = {}
-    for name in ("antigravity", "claude", "codex", "cursor", "prompt_only"):
+    for name in ("antigravity", "claude", "codex", "cursor", "grok", "prompt_only"):
         try:
             adapters[name] = build_adapter(
                 name,

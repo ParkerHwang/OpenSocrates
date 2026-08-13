@@ -115,6 +115,7 @@ class HostId(StrEnum):
     CLAUDE_COWORK = "claude_cowork"
     CURSOR_IDE = "cursor_ide"
     ANTIGRAVITY_CLI = "antigravity_cli"
+    GROK_BUILD = "grok_build"
     PROMPT_ONLY = "prompt_only"
 
 
