@@ -1,0 +1,31 @@
+# OpenSocrates for Cursor
+
+This package is the experimental, content-only Cursor Agent Plugin for
+OpenSocrates {{PRODUCT_VERSION}}. It exposes one `opensocrates` Agent Skill
+backed by {{METHOD_COUNT}} internal reasoning-system references.
+
+## Support boundary
+
+- Manual `/opensocrates` invocation: implemented through Cursor's documented
+  Agent Plugin and Agent Skills contracts; a live Cursor receipt is pending.
+- Cursor's built-in agent-decided skill discovery: host-owned behavior; no
+  separate OpenSocrates selector model call is added.
+- OpenSocrates automatic per-prompt hook selection: not included.
+- Native hook delivery, local records, and deterministic trace rendering: not
+  claimed.
+
+There is no launcher, native runtime, executable, hook, MCP server, telemetry,
+background service, or additional model process in this package.
+
+## Local plugin contract
+
+Cursor documents local development plugins under
+`~/.cursor/plugins/local/<plugin-name>/`. Agent Plugins use a root
+`plugin.json`; skills live under `skills/<skill-name>/SKILL.md`. After
+installation, reload Cursor and invoke `/opensocrates` from Agent chat.
+
+See Cursor's [Plugins documentation](https://cursor.com/docs/plugins) and
+[Agent Skills documentation](https://cursor.com/docs/skills).
+
+Generated from content revision {{CONTENT_REVISION}} with semantic bundle
+identity `{{SEMANTIC_HASH}}` and source identity `{{SOURCE_TREE_HASH}}`.

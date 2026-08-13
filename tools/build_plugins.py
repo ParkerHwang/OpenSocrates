@@ -231,6 +231,8 @@ def _common_values(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0
         if isinstance(controller, Mapping):
             values["CONTROLLER_EN"] = str(controller.get("en", ""))
             values["CONTROLLER_KO"] = str(controller.get("ko", ""))
+            values["CONTROLLER_EN_JSON"] = _json_token(str(controller.get("en", "")))
+            values["CONTROLLER_KO_JSON"] = _json_token(str(controller.get("ko", "")))
         if isinstance(capability_notice, Mapping):
             values["CAPABILITY_NOTICE_EN"] = str(capability_notice.get("en", ""))
             values["CAPABILITY_NOTICE_KO"] = str(capability_notice.get("ko", ""))
@@ -468,10 +470,13 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
         "method_count": len(methods),
         "method_ids": raw_bundle.get("method_ids"),
         "runtime_targets": runtime_targets,
-        "capability_evidence": {
-            "status": "unknown",
-            "reason": "package generation has no live exact host probe",
-        },
+        "capability_evidence": metadata.get(
+            "capability_evidence",
+            {
+                "status": "unknown",
+                "reason": "package generation has no live exact host probe",
+            },
+        ),
         "files": files,
     }
     (output_path / "release-manifest.json").write_bytes(_canonical_json(release))

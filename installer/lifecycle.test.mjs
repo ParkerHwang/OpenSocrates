@@ -1,7 +1,7 @@
 // Isolated installer lifecycle tests.
 //
 // Every test runs against a throwaway host home and a fake host binary. None
-// of these tests reads or writes the developer's real ~/.claude or ~/.codex
+// of these tests reads or writes the developer's real host configuration
 // directory, and none of them contacts the network: packages are built locally
 // and passed with --asset/--checksum.
 
@@ -9,11 +9,23 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync, existsSync, readdirSync } from "node:fs";
+import {
+  chmodSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  statSync,
+  symlinkSync,
+  writeFileSync,
+  existsSync,
+  readdirSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
-import { PRODUCT_VERSION, main, withOperationLock } from "./opensocrates.mjs";
+import { PRODUCT_VERSION, main, transientPathsFor, withOperationLock } from "./opensocrates.mjs";
 import { inspectManagedLayout } from "../tools/clean_machine_acceptance.mjs";
 
 const MARKETPLACE = "opensocrates";
@@ -26,8 +38,14 @@ const PLUGIN_ID = `opensocrates@${MARKETPLACE}`;
 function withDarwinArm64(fn) {
   const platform = Object.getOwnPropertyDescriptor(process, "platform");
   const arch = Object.getOwnPropertyDescriptor(process, "arch");
-  Object.defineProperty(process, "platform", { value: "darwin", configurable: true });
-  Object.defineProperty(process, "arch", { value: "arm64", configurable: true });
+  Object.defineProperty(process, "platform", {
+    value: "darwin",
+    configurable: true,
+  });
+  Object.defineProperty(process, "arch", {
+    value: "arm64",
+    configurable: true,
+  });
   return Promise.resolve()
     .then(fn)
     .finally(() => {
@@ -45,29 +63,67 @@ function sha256(bytes) {
 // ---------------------------------------------------------------------------
 function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, manifestVersion = null } = {}) {
   const tree = join(root, `pkg-${host}`);
-  const manifestDir = host === "claude" ? ".claude-plugin" : ".codex-plugin";
-  mkdirSync(join(tree, manifestDir), { recursive: true });
-  mkdirSync(join(tree, "runtime", "darwin-arm64", "opensocrates-runtime"), { recursive: true });
+  const manifestPath = ["antigravity", "cursor", "grok"].includes(host)
+    ? "plugin.json"
+    : host === "opencode"
+      ? "opencode-plugin.json"
+      : `${host === "claude" ? ".claude-plugin" : ".codex-plugin"}/plugin.json`;
+  mkdirSync(dirname(join(tree, manifestPath)), { recursive: true });
+  if (["claude", "codex"].includes(host)) {
+    mkdirSync(join(tree, "runtime", "darwin-arm64", "opensocrates-runtime"), { recursive: true });
+  }
   mkdirSync(join(tree, "skills", "opensocrates"), { recursive: true });
 
   const files = {};
-  files[`${manifestDir}/plugin.json`] = JSON.stringify(
-    { name: "opensocrates", version: manifestVersion ?? version },
+  files[manifestPath] = JSON.stringify(
+    {
+      ...(host === "cursor"
+        ? {
+            $schema: "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+          }
+        : host === "opencode"
+          ? {
+              schema: "opensocrates.opencode-package/1.0.0",
+              minimum_opencode_version: "1.18.18",
+              stable_plugin_hook: "chat.message",
+              beta_v2_api: false,
+            }
+          : {}),
+      ...(host === "grok" ? { skills: "./skills" } : {}),
+      name: "opensocrates",
+      version: manifestVersion ?? version,
+    },
     null,
     2,
   );
   files["release-manifest.json"] = JSON.stringify(
-    { product_version: version, host, schema: "opensocrates.plugin-release-manifest/1.0.0" },
+    {
+      product_version: version,
+      host,
+      schema: "opensocrates.plugin-release-manifest/1.0.0",
+      launchers: [],
+      runtime_targets: [],
+    },
     null,
     2,
   );
-  files["runtime/darwin-arm64/opensocrates-runtime/opensocrates-runtime"] = "#!/bin/sh\nexit 0\n";
+  if (["claude", "codex"].includes(host)) {
+    files["runtime/darwin-arm64/opensocrates-runtime/opensocrates-runtime"] = "#!/bin/sh\nexit 0\n";
+  }
   files["skills/opensocrates/SKILL.md"] = "# OpenSocrates controller\n";
+  if (host === "opencode") {
+    files["skills/opensocrates/references/catalog.md"] = "# Catalog\n";
+    files["plugins/opensocrates.js"] =
+      "export const OpenSocratesPlugin = async () => ({ 'chat.message': async () => {} });\n";
+  }
 
   for (const [name, body] of Object.entries(files)) {
+    mkdirSync(dirname(join(tree, ...name.split("/"))), { recursive: true });
     writeFileSync(join(tree, ...name.split("/")), body);
   }
-  chmodSync(join(tree, "runtime", "darwin-arm64", "opensocrates-runtime", "opensocrates-runtime"), 0o755);
+  if (["claude", "codex"].includes(host)) {
+    chmodSync(join(tree, "runtime", "darwin-arm64", "opensocrates-runtime", "opensocrates-runtime"), 0o755);
+  }
 
   const lines = Object.entries(files).map(([name, body]) => {
     const digest = corrupt && name === "release-manifest.json" ? "0".repeat(64) : sha256(Buffer.from(body));
@@ -76,7 +132,10 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
   writeFileSync(join(tree, "checksums.sha256"), `${lines.join("\n")}\n`);
 
   const asset = join(root, `opensocrates-${version}-${host}-plugin.zip`);
-  const zip = spawnSync("zip", ["-q", "-r", "-X", asset, "."], { cwd: tree, encoding: "utf8" });
+  const zip = spawnSync("zip", ["-q", "-r", "-X", asset, "."], {
+    cwd: tree,
+    encoding: "utf8",
+  });
   assert.equal(zip.status, 0, `zip failed: ${zip.stderr}`);
   const checksum = `${asset}.sha256`;
   writeFileSync(checksum, `${sha256(readFileSync(asset))}  opensocrates-${version}-${host}-plugin.zip\n`);
@@ -140,7 +199,12 @@ const save = () => writeFileSync(STATE, JSON.stringify(state));
 const out = (value) => process.stdout.write(JSON.stringify(value));
 const has = (...parts) => parts.every((part) => argv.includes(part));
 
-if (has("--version")) { process.stdout.write("2.1.205 (fake)\\n"); process.exit(0); }
+// OpenCode is gated to >=1.18.18 and <2.0.0, so the shared 2.1.205 fake would
+// trip its fail-closed ceiling. Report a version each host actually accepts.
+if (has("--version")) {
+  process.stdout.write(HOST === "opencode" ? "1.18.18 (fake)\\n" : "2.1.205 (fake)\\n");
+  process.exit(0);
+}
 if (HOST === "claude" && has("auth", "status")) {
   if (FAIL_AUTH) process.exit(1);
   out({ loggedIn: true }); process.exit(0);
@@ -148,6 +212,33 @@ if (HOST === "claude" && has("auth", "status")) {
 if (HOST === "codex" && has("login", "status")) {
   if (FAIL_AUTH) process.exit(1);
   process.stdout.write("Logged in using ChatGPT\\n"); process.exit(0);
+}
+if (HOST === "grok" && has("inspect", "--json")) {
+  const root = join(process.env.GROK_HOME, "plugins", MARKETPLACE);
+  let discoveredRoot = root;
+  try {
+    const scannedBackup = readdirSync(join(process.env.GROK_HOME, "plugins")).find(
+      (entry) => entry.startsWith(".opensocrates.backup-")
+    );
+    if (scannedBackup) discoveredRoot = join(process.env.GROK_HOME, "plugins", scannedBackup);
+  } catch {
+    // A missing plugins directory is reported as no discovered plugin below.
+  }
+  try {
+    JSON.parse(readFileSync(join(discoveredRoot, "plugin.json"), "utf8"));
+    out({
+      plugins: [{
+        name: MARKETPLACE,
+        scope: "user",
+        path: discoveredRoot,
+        enabled: state.grokEnabled !== false,
+        provides: { skills: 1, agents: 0, hooks: false, mcpServers: 0 },
+      }],
+    });
+  } catch {
+    out({ plugins: [] });
+  }
+  process.exit(0);
 }
 
 if (HOST === "claude") {
@@ -258,13 +349,25 @@ process.exit(1);
 
 function makeSandbox(host, options = {}) {
   const root = mkdtempSync(join(tmpdir(), "opensocrates-lifecycle-"));
-  const home = join(root, host === "claude" ? "claude-home" : "codex-home");
+  const home = join(root, `${host}-home`);
   mkdirSync(home, { recursive: true });
   const { binary, statePath } = writeFakeHost(root, host, options);
   const saved = { ...process.env };
-  if (host === "claude") {
+  if (host === "antigravity") {
+    process.env.AGY_BIN = binary;
+    process.env.ANTIGRAVITY_CONFIG_DIR = home;
+  } else if (host === "cursor") {
+    process.env.CURSOR_BIN = binary;
+    process.env.CURSOR_CONFIG_DIR = home;
+  } else if (host === "opencode") {
+    process.env.OPENCODE_BIN = binary;
+    process.env.OPENCODE_CONFIG_DIR = home;
+  } else if (host === "claude") {
     process.env.CLAUDE_BIN = binary;
     process.env.CLAUDE_CONFIG_DIR = home;
+  } else if (host === "grok") {
+    process.env.GROK_BIN = binary;
+    process.env.GROK_HOME = home;
   } else {
     process.env.CODEX_BIN = binary;
     process.env.CODEX_HOME = home;
@@ -272,7 +375,17 @@ function makeSandbox(host, options = {}) {
   process.env.OPENSOCRATES_STATE_DIR = join(root, "state");
   process.env.OPENSOCRATES_LAUNCH_AGENTS_DIR = join(root, "LaunchAgents");
   process.env.OPENSOCRATES_SKIP_LAUNCHCTL = "1";
-  const managedRoot = join(home, "managed-marketplaces", MARKETPLACE);
+  const managedParent =
+    host === "antigravity"
+      ? join(home, "plugins")
+      : host === "cursor"
+        ? join(home, "plugins", "local")
+        : host === "grok"
+          ? join(home, "plugins")
+          : host === "opencode"
+            ? join(home, "skills")
+            : join(home, "managed-marketplaces");
+  const managedRoot = join(managedParent, MARKETPLACE);
   return {
     root,
     home,
@@ -280,15 +393,21 @@ function makeSandbox(host, options = {}) {
     statePath,
     state: () => JSON.parse(readFileSync(statePath, "utf8")),
     backups: () =>
-      existsSync(join(home, "managed-marketplaces"))
-        ? readdirSync(join(home, "managed-marketplaces")).filter((n) => n.startsWith(".opensocrates.backup-"))
-        : [],
+      existsSync(managedParent) ? readdirSync(managedParent).filter((n) => n.startsWith(".opensocrates.backup-")) : [],
     cleanup: () => {
       for (const key of [
+        "AGY_BIN",
+        "ANTIGRAVITY_CONFIG_DIR",
         "CLAUDE_BIN",
         "CLAUDE_CONFIG_DIR",
         "CODEX_BIN",
         "CODEX_HOME",
+        "CURSOR_BIN",
+        "CURSOR_CONFIG_DIR",
+        "GROK_BIN",
+        "GROK_HOME",
+        "OPENCODE_BIN",
+        "OPENCODE_CONFIG_DIR",
         "OPENSOCRATES_STATE_DIR",
         "OPENSOCRATES_LAUNCH_AGENTS_DIR",
         "OPENSOCRATES_SKIP_LAUNCHCTL",
@@ -302,7 +421,10 @@ function makeSandbox(host, options = {}) {
 }
 
 function replaceSandboxHost(box, host, name, options = {}) {
-  const replacement = writeFakeHost(box.root, name, { kind: host, ...options });
+  const replacement = writeFakeHost(box.root, name, {
+    kind: host,
+    ...options,
+  });
   writeFileSync(
     replacement.binary,
     readFileSync(replacement.binary, "utf8").replace(
@@ -311,33 +433,80 @@ function replaceSandboxHost(box, host, name, options = {}) {
     ),
   );
   chmodSync(replacement.binary, 0o755);
-  process.env[host === "claude" ? "CLAUDE_BIN" : "CODEX_BIN"] = replacement.binary;
+  const binaryKey =
+    host === "antigravity"
+      ? "AGY_BIN"
+      : host === "claude"
+        ? "CLAUDE_BIN"
+        : host === "cursor"
+          ? "CURSOR_BIN"
+          : host === "grok"
+            ? "GROK_BIN"
+            : host === "opencode"
+              ? "OPENCODE_BIN"
+              : "CODEX_BIN";
+  process.env[binaryKey] = replacement.binary;
   return replacement;
 }
 
 function makeAllSandbox(options = {}) {
   const root = mkdtempSync(join(tmpdir(), "opensocrates-all-hosts-"));
+  const includeOpenCode = options.includeOpenCode === true;
   const homes = {
     claude: join(root, "claude-home"),
     codex: join(root, "codex-home"),
+    ...(includeOpenCode ? { opencode: join(root, "opencode-home") } : {}),
   };
-  mkdirSync(homes.claude, { recursive: true });
-  mkdirSync(homes.codex, { recursive: true });
+  for (const home of Object.values(homes)) mkdirSync(home, { recursive: true });
   const hosts = {
-    claude: writeFakeHost(root, "claude", { kind: "claude", ...options.claude }),
-    codex: writeFakeHost(root, "codex", { kind: "codex", ...options.codex }),
+    claude: writeFakeHost(root, "claude", {
+      kind: "claude",
+      ...options.claude,
+    }),
+    codex: writeFakeHost(root, "codex", {
+      kind: "codex",
+      ...options.codex,
+    }),
+    ...(includeOpenCode
+      ? {
+          opencode: writeFakeHost(root, "opencode", {
+            kind: "opencode",
+            ...options.opencode,
+          }),
+        }
+      : {}),
   };
   const saved = { ...process.env };
   process.env.CLAUDE_BIN = hosts.claude.binary;
   process.env.CLAUDE_CONFIG_DIR = homes.claude;
   process.env.CODEX_BIN = hosts.codex.binary;
   process.env.CODEX_HOME = homes.codex;
+  // Keep all-host tests hermetic: real developer installations must not add
+  // content-only hosts to this two-host fixture.
+  process.env.CURSOR_BIN = join(root, "unavailable-cursor");
+  process.env.AGY_BIN = join(root, "unavailable-agy");
+  process.env.GROK_BIN = join(root, "unavailable-grok");
+  // Grok resolves its managed root from GROK_HOME without consulting the CLI,
+  // so an isolated home is what keeps a developer's real ~/.grok out of the
+  // all-host fixture. Setting CURSOR_CONFIG_DIR or ANTIGRAVITY_CONFIG_DIR would
+  // instead satisfy their preflight and pull them into this two-host fixture.
+  process.env.GROK_HOME = join(root, "grok-home");
+  if (includeOpenCode) {
+    process.env.OPENCODE_BIN = hosts.opencode.binary;
+    process.env.OPENCODE_CONFIG_DIR = homes.opencode;
+  } else {
+    process.env.OPENCODE_BIN = join(root, "unavailable-opencode");
+    // Same hermetic reasoning as GROK_HOME above: keep a developer's real
+    // ~/.config/opencode out of the fixture.
+    process.env.OPENCODE_CONFIG_DIR = join(root, "opencode-home-unused");
+  }
   process.env.OPENSOCRATES_STATE_DIR = join(root, "state");
   process.env.OPENSOCRATES_LAUNCH_AGENTS_DIR = join(root, "LaunchAgents");
   process.env.OPENSOCRATES_SKIP_LAUNCHCTL = "1";
   const managedRoots = {
     claude: join(homes.claude, "managed-marketplaces", MARKETPLACE),
     codex: join(homes.codex, "managed-marketplaces", MARKETPLACE),
+    ...(includeOpenCode ? { opencode: join(homes.opencode, "skills", MARKETPLACE) } : {}),
   };
   const state = (host) => JSON.parse(readFileSync(hosts[host].statePath, "utf8"));
   return {
@@ -346,24 +515,26 @@ function makeAllSandbox(options = {}) {
     hosts,
     managedRoots,
     state,
-    desired: () =>
-      JSON.parse(
-        readFileSync(join(root, "state", "desired-state.json"), "utf8"),
-      ),
-    receipt: () =>
-      JSON.parse(
-        readFileSync(join(root, "state", "auto-update-receipt.json"), "utf8"),
-      ),
+    desired: () => JSON.parse(readFileSync(join(root, "state", "desired-state.json"), "utf8")),
+    receipt: () => JSON.parse(readFileSync(join(root, "state", "auto-update-receipt.json"), "utf8")),
     launchAgent: join(root, "LaunchAgents", "com.opensocrates.auto-update.plist"),
     setBinary(host, binary) {
-      process.env[host === "claude" ? "CLAUDE_BIN" : "CODEX_BIN"] = binary;
+      process.env[host === "claude" ? "CLAUDE_BIN" : host === "opencode" ? "OPENCODE_BIN" : "CODEX_BIN"] = binary;
     },
     cleanup: () => {
       for (const key of [
+        "AGY_BIN",
+        "ANTIGRAVITY_CONFIG_DIR",
         "CLAUDE_BIN",
         "CLAUDE_CONFIG_DIR",
         "CODEX_BIN",
         "CODEX_HOME",
+        "CURSOR_BIN",
+        "CURSOR_CONFIG_DIR",
+        "GROK_BIN",
+        "GROK_HOME",
+        "OPENCODE_BIN",
+        "OPENCODE_CONFIG_DIR",
         "OPENSOCRATES_STATE_DIR",
         "OPENSOCRATES_LAUNCH_AGENTS_DIR",
         "OPENSOCRATES_SKIP_LAUNCHCTL",
@@ -380,7 +551,7 @@ function makeAllSandbox(options = {}) {
 }
 
 function allAssetArgs(packages) {
-  return [
+  const args = [
     "--host",
     "all",
     "--asset-claude",
@@ -392,10 +563,17 @@ function allAssetArgs(packages) {
     "--checksum-codex",
     packages.codex.checksum,
   ];
+  if (packages.opencode) {
+    args.push("--asset-opencode", packages.opencode.asset, "--checksum-opencode", packages.opencode.checksum);
+  }
+  return args;
 }
 
 function replaceAllHostBinary(box, host, name, options) {
-  const replacement = writeFakeHost(box.root, name, { kind: host, ...options });
+  const replacement = writeFakeHost(box.root, name, {
+    kind: host,
+    ...options,
+  });
   writeFileSync(
     replacement.binary,
     readFileSync(replacement.binary, "utf8").replace(
@@ -416,7 +594,7 @@ function configureFakeNpx(box) {
   return binary;
 }
 
-function configureFakeLaunchctl(box) {
+function configureFakeLaunchctl(box, { failBootout = false } = {}) {
   const statePath = join(box.root, "launchctl-state.json");
   writeFileSync(statePath, JSON.stringify({ loaded: false, bootstraps: 0, bootouts: 0 }));
   const binary = join(box.root, "launchctl");
@@ -425,10 +603,12 @@ function configureFakeLaunchctl(box) {
     `#!/usr/bin/env node
 import { readFileSync, writeFileSync } from "node:fs";
 const statePath = ${JSON.stringify(statePath)};
+const failBootout = ${JSON.stringify(failBootout)};
 const state = JSON.parse(readFileSync(statePath, "utf8"));
 const command = process.argv[2];
 if (command === "print") process.exit(state.loaded ? 0 : 3);
 if (command === "bootout") {
+  if (failBootout) process.exit(9);
   state.loaded = false;
   state.bootouts += 1;
   writeFileSync(statePath, JSON.stringify(state));
@@ -532,11 +712,17 @@ for (const host of ["claude", "codex"]) {
       });
 
       // Swap in a host binary that refuses plugin installation, keeping state.
-      const failing = writeFakeHost(good.root, `${host}-failing`, { kind: host, failInstall: true });
-      writeFileSync(failing.binary, readFileSync(failing.binary, "utf8").replace(
-        JSON.stringify(join(good.root, `${host}-failing-state.json`)),
-        JSON.stringify(good.statePath),
-      ));
+      const failing = writeFakeHost(good.root, `${host}-failing`, {
+        kind: host,
+        failInstall: true,
+      });
+      writeFileSync(
+        failing.binary,
+        readFileSync(failing.binary, "utf8").replace(
+          JSON.stringify(join(good.root, `${host}-failing-state.json`)),
+          JSON.stringify(good.statePath),
+        ),
+      );
       chmodSync(failing.binary, 0o755);
       process.env[host === "claude" ? "CLAUDE_BIN" : "CODEX_BIN"] = failing.binary;
 
@@ -550,6 +736,427 @@ for (const host of ["claude", "codex"]) {
     }
   });
 }
+
+for (const host of ["antigravity", "cursor", "grok"]) {
+  test(`${host}: content-only plugin install -> status -> update -> verify -> remove`, async () => {
+    const box = makeSandbox(host);
+    try {
+      const pkg = buildPackage(box.root, host);
+      const args = ["--host", host, "--asset", pkg.asset, "--checksum", pkg.checksum];
+
+      const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+      assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+      assert.match(install.output, new RegExp(`installed successfully for ${host}`));
+      if (host === "cursor") assert.match(install.output, /Developer: Reload Window/);
+      assert.doesNotMatch(install.output, /approval required/i);
+      assert.ok(existsSync(join(box.managedRoot, "plugin.json")), "plugin manifest missing");
+      assert.ok(existsSync(join(box.managedRoot, ".opensocrates-managed.json")), "ownership marker missing");
+      assert.equal(existsSync(join(box.managedRoot, "runtime")), false, "runtime was installed");
+      assert.equal(existsSync(join(box.managedRoot, "hooks")), false, "hooks were installed");
+
+      const status = await quiet(() => main(["status", "--host", host]));
+      assert.equal(status.error, undefined, `status failed: ${status.error?.message}`);
+      assert.match(status.output, new RegExp(`OpenSocrates ${PRODUCT_VERSION} is installed`));
+      if (host === "grok") {
+        assert.match(status.output, /automatic native-skill selection/);
+        assert.match(install.output, /invoke \/opensocrates explicitly/);
+      } else {
+        assert.match(status.output, /experimental and explicit-skill/);
+      }
+
+      const update = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
+      assert.equal(update.error, undefined, `update failed: ${update.error?.message}`);
+      assert.deepEqual(box.backups(), [], "update left a backup directory behind");
+
+      const verify = await quiet(() => main(["verify", ...args]));
+      assert.equal(verify.error, undefined, `verify failed: ${verify.error?.message}`);
+
+      const remove = await quiet(() => main(["remove", "--host", host]));
+      assert.equal(remove.error, undefined, `remove failed: ${remove.error?.message}`);
+      assert.equal(existsSync(box.managedRoot), false, "managed root survived remove");
+    } finally {
+      box.cleanup();
+    }
+  });
+}
+
+test("opencode: install -> status -> verify -> update -> remove preserves unrelated files", async () => {
+  const box = makeSandbox("opencode");
+  try {
+    const pkg = buildPackage(box.root, "opencode");
+    const args = ["--host", "opencode", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    mkdirSync(join(box.home, "plugins"), { recursive: true });
+    mkdirSync(join(box.home, "skills", "unrelated"), { recursive: true });
+    writeFileSync(join(box.home, "plugins", "unrelated.js"), "export default {};\n");
+    writeFileSync(join(box.home, "skills", "unrelated", "SKILL.md"), "# Unrelated\n");
+    writeFileSync(join(box.home, "opencode.json"), '{"theme":"system"}\n');
+
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+    assert.match(install.output, /stable chat\.message bridge/);
+    assert.ok(existsSync(join(box.home, "plugins", "opensocrates.js")));
+    assert.ok(existsSync(join(box.home, "plugins", ".opensocrates-managed.json")));
+    assert.ok(existsSync(join(box.managedRoot, "SKILL.md")));
+    assert.ok(existsSync(join(box.managedRoot, ".opensocrates-installation.json")));
+    const desired = JSON.parse(readFileSync(join(box.root, "state", "desired-state.json"), "utf8"));
+    assert.deepEqual(desired.installedHosts, ["opencode"]);
+    assert.equal(desired.activeVersion, PRODUCT_VERSION);
+
+    const status = await quiet(() => main(["status", "--host", "opencode"]));
+    assert.equal(status.error, undefined, `status failed: ${status.error?.message}`);
+    assert.match(status.output, /stable same-turn bridge/);
+
+    const verify = await quiet(() => main(["verify", ...args]));
+    assert.equal(verify.error, undefined, `verify failed: ${verify.error?.message}`);
+    assert.match(verify.output, /verified installed bridge, skill inventory, and ownership/);
+
+    const update = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
+    assert.equal(update.error, undefined, `update failed: ${update.error?.message}`);
+    assert.deepEqual(box.backups(), []);
+
+    const remove = await quiet(() => main(["remove", "--host", "opencode"]));
+    assert.equal(remove.error, undefined, `remove failed: ${remove.error?.message}`);
+    assert.equal(existsSync(box.managedRoot), false);
+    assert.equal(existsSync(join(box.home, "plugins", "opensocrates.js")), false);
+    assert.equal(existsSync(join(box.home, "plugins", ".opensocrates-managed.json")), false);
+    assert.equal(readFileSync(join(box.home, "plugins", "unrelated.js"), "utf8"), "export default {};\n");
+    assert.equal(readFileSync(join(box.home, "skills", "unrelated", "SKILL.md"), "utf8"), "# Unrelated\n");
+    assert.equal(readFileSync(join(box.home, "opencode.json"), "utf8"), '{"theme":"system"}\n');
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("opencode: refuses unowned and symbolic-link trust-boundary paths", async () => {
+  const box = makeSandbox("opencode");
+  try {
+    const pkg = buildPackage(box.root, "opencode");
+    const args = ["--host", "opencode", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    mkdirSync(join(box.home, "plugins"), { recursive: true });
+    writeFileSync(join(box.home, "plugins", "opensocrates.js"), "// user-owned\n");
+    const unowned = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.notEqual(unowned.error, undefined);
+    assert.match(unowned.error.message, /partial or unowned/);
+    assert.equal(readFileSync(join(box.home, "plugins", "opensocrates.js"), "utf8"), "// user-owned\n");
+
+    rmSync(join(box.home, "plugins", "opensocrates.js"));
+    mkdirSync(join(box.home, "real-plugins"));
+    rmSync(join(box.home, "plugins"), { recursive: true });
+    symlinkSync(join(box.home, "real-plugins"), join(box.home, "plugins"), "dir");
+    const linked = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.notEqual(linked.error, undefined);
+    assert.match(linked.error.message, /unsafe OpenCode plugins directory/);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("opencode: a post-removal scheduler failure restores skill, bridge, and sidecar", async () => {
+  const box = makeSandbox("opencode");
+  try {
+    const pkg = buildPackage(box.root, "opencode");
+    const args = ["--host", "opencode", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    configureFakeNpx(box);
+    configureFakeLaunchctl(box, { failBootout: true });
+    const enabled = await withDarwinArm64(() => quiet(() => main(["auto-update", "enable", "--host", "opencode"])));
+    assert.equal(enabled.error, undefined, `auto-update enable failed: ${enabled.error?.message}`);
+
+    const removed = await withDarwinArm64(() => quiet(() => main(["remove", "--host", "opencode"])));
+    assert.notEqual(removed.error, undefined, "scheduler failure did not abort removal");
+    assert.match(removed.error.message, /could not stop/);
+    assert.ok(existsSync(join(box.managedRoot, "SKILL.md")));
+    assert.ok(existsSync(join(box.home, "plugins", "opensocrates.js")));
+    assert.ok(existsSync(join(box.home, "plugins", ".opensocrates-managed.json")));
+    assert.deepEqual(JSON.parse(readFileSync(join(box.root, "state", "desired-state.json"), "utf8")).installedHosts, [
+      "opencode",
+    ]);
+    const verify = await quiet(() => main(["verify", ...args]));
+    assert.equal(
+      verify.error,
+      undefined,
+      `restored OpenCode installation failed verification: ${verify.error?.message}`,
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+// Regression: OPENCODE_CONFIG_DIR used to short-circuit requireHostCli, so an
+// install could place the executing bridge without ever confirming the host
+// was a supported OpenCode. The config directory selects where files go; it
+// must not decide whether the host is supported.
+test("opencode: OPENCODE_CONFIG_DIR does not waive the CLI/version gate", async () => {
+  const box = makeSandbox("opencode");
+  try {
+    const pkg = buildPackage(box.root, "opencode");
+    const args = ["--host", "opencode", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    // The sandbox always sets OPENCODE_CONFIG_DIR. Point the binary at a path
+    // that does not exist: the gate must still refuse the install.
+    process.env.OPENCODE_BIN = join(box.root, "absent-opencode");
+
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.notEqual(install.error, undefined, "install proceeded without a usable OpenCode CLI");
+    assert.equal(existsSync(box.managedRoot), false, "a gated install still wrote the skill");
+    assert.equal(
+      existsSync(join(box.home, "plugins", "opensocrates.js")),
+      false,
+      "a gated install still wrote the executing bridge",
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+// Regression: the package declares minimum_opencode_version 1.18.18 with a
+// fail-closed <2.0.0 ceiling. Both bounds must be enforced at install time.
+for (const [label, reported] of [
+  ["below the floor", "1.18.17"],
+  ["at or above the ceiling", "2.0.0"],
+]) {
+  test(`opencode: install refuses a host version ${label}`, async () => {
+    const box = makeSandbox("opencode");
+    try {
+      const pkg = buildPackage(box.root, "opencode");
+      const args = ["--host", "opencode", "--asset", pkg.asset, "--checksum", pkg.checksum];
+      const fake = join(box.root, `opencode-${reported}`);
+      writeFileSync(fake, `#!/bin/sh\necho "${reported} (fake)"\nexit 0\n`);
+      chmodSync(fake, 0o755);
+      process.env.OPENCODE_BIN = fake;
+
+      const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+      assert.notEqual(install.error, undefined, `install accepted OpenCode ${reported}`);
+      assert.match(install.error.message, /OpenCode >=1\.18\.18 and <2\.0\.0 is required/);
+      assert.equal(existsSync(box.managedRoot), false, "a rejected version still wrote the skill");
+    } finally {
+      box.cleanup();
+    }
+  });
+}
+
+// Regression: updaterEnvironment() recorded OPENCODE_CONFIG_DIR and stopped,
+// so the LaunchAgent carried no OPENCODE_BIN and did not extend PATH. Enable
+// succeeded from a shell that had opencode on PATH, then every scheduled run
+// failed the version gate whenever opencode lived outside the launchd default
+// PATH. The config directory must redirect configuration only.
+test("auto-update: OPENCODE_CONFIG_DIR still records the resolved OpenCode binary", async () => {
+  const box = makeSandbox("opencode");
+  try {
+    const pkg = buildPackage(box.root, "opencode");
+    const args = ["--host", "opencode", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+
+    // The sandbox sets OPENCODE_CONFIG_DIR, and opencode exists only at an
+    // explicit path outside /usr/bin:/bin:/usr/sbin:/sbin.
+    const binary = process.env.OPENCODE_BIN;
+    assert.ok(binary, "sandbox did not configure OPENCODE_BIN");
+    assert.equal(
+      ["/usr/bin", "/bin", "/usr/sbin", "/sbin"].includes(dirname(binary)),
+      false,
+      "fixture binary must not sit on the launchd default PATH",
+    );
+    assert.ok(process.env.OPENCODE_CONFIG_DIR, "sandbox did not configure OPENCODE_CONFIG_DIR");
+
+    configureFakeNpx(box);
+    const enabled = await withDarwinArm64(() =>
+      quiet(() => main(["auto-update", "enable", "--host", "opencode"])),
+    );
+    assert.equal(enabled.error, undefined, `auto-update enable failed: ${enabled.error?.message}`);
+
+    const launchAgent = join(box.root, "LaunchAgents", "com.opensocrates.auto-update.plist");
+    assert.ok(existsSync(launchAgent), "LaunchAgent was not installed");
+    const plist = readFileSync(launchAgent, "utf8");
+
+    // The config directory is still redirected...
+    assert.match(plist, /<key>OPENCODE_CONFIG_DIR<\/key>/u);
+    // ...and the scheduled run can still resolve the host CLI.
+    assert.match(plist, /<key>OPENCODE_BIN<\/key>/u);
+    assert.match(plist, new RegExp(binary.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+
+    const path = plist.match(/<key>PATH<\/key>\s*<string>([^<]*)<\/string>/u);
+    assert.ok(path, "LaunchAgent recorded no PATH");
+    assert.ok(
+      path[1].split(":").includes(dirname(binary)),
+      `LaunchAgent PATH omits the OpenCode directory: ${path[1]}`,
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("grok: staging and rollback directories stay outside the scanned plugins directory", async () => {
+  const box = makeSandbox("grok");
+  try {
+    // The installer canonicalizes the host home, so compare against the
+    // resolved sandbox home rather than the literal one: macOS reports
+    // /private/var for a /var temporary directory.
+    const home = realpathSync(box.home);
+    const placement = transientPathsFor("grok");
+    assert.equal(placement.parent, join(home, "plugins"));
+    assert.equal(placement.transient, home);
+    assert.equal(
+      placement.transient.startsWith(`${placement.parent}/`),
+      false,
+      "a transient directory would be discoverable as a second Grok plugin",
+    );
+
+    // An install must leave the scanned directory holding the managed root
+    // only: a staging or backup directory left there by an interrupted run is
+    // discovered by Grok as a duplicate OpenSocrates plugin.
+    const pkg = buildPackage(box.root, "grok");
+    const args = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+    assert.deepEqual(readdirSync(placement.parent), [MARKETPLACE]);
+
+    const update = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
+    assert.equal(update.error, undefined, `update failed: ${update.error?.message}`);
+    assert.deepEqual(readdirSync(placement.parent), [MARKETPLACE]);
+    assert.deepEqual(
+      readdirSync(home).filter((entry) => entry.startsWith(".opensocrates.")),
+      [],
+      "a committed transaction left a transient directory in the Grok home",
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+for (const host of ["antigravity", "cursor", "claude", "codex"]) {
+  test(`${host}: transient directories keep their established location`, () => {
+    const box = makeSandbox(host);
+    try {
+      const placement = transientPathsFor(host);
+      assert.equal(placement.transient, placement.parent);
+      assert.equal(placement.parent, dirname(placement.root));
+    } finally {
+      box.cleanup();
+    }
+  });
+}
+
+test("grok: files stay inspectable and removable without a runnable Grok CLI", async () => {
+  const box = makeSandbox("grok");
+  try {
+    const pkg = buildPackage(box.root, "grok");
+    const args = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+
+    // Grok Build itself can be uninstalled while its managed OpenSocrates
+    // files remain. Reading and removing what this installer owns is plain
+    // file ownership work and must not depend on the host command.
+    process.env.GROK_BIN = join(box.root, "uninstalled-grok");
+
+    const status = await quiet(() => main(["status", "--host", "grok"]));
+    assert.equal(status.error, undefined, `status failed: ${status.error?.message}`);
+    assert.match(status.output, new RegExp(`OpenSocrates ${PRODUCT_VERSION} is installed`));
+    assert.match(status.output, /could not read Grok Build plugin state/);
+
+    const remove = await quiet(() => main(["remove", "--host", "grok"]));
+    assert.equal(remove.error, undefined, `remove failed: ${remove.error?.message}`);
+    assert.equal(existsSync(box.managedRoot), false, "managed root survived remove");
+    assert.deepEqual(
+      readdirSync(box.home).filter((entry) => entry.startsWith(".opensocrates.")),
+      [],
+      "remove left a rollback directory behind",
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("grok: a stale managed directory cannot block an all-host lifecycle", async () => {
+  const box = makeSandbox("grok");
+  try {
+    for (const [binaryKey, configKey] of [
+      ["AGY_BIN", "ANTIGRAVITY_CONFIG_DIR"],
+      ["CLAUDE_BIN", "CLAUDE_CONFIG_DIR"],
+      ["CODEX_BIN", "CODEX_HOME"],
+      ["CURSOR_BIN", "CURSOR_CONFIG_DIR"],
+    ]) {
+      process.env[binaryKey] = join(box.root, `unavailable-${binaryKey.toLowerCase()}`);
+      process.env[configKey] = join(box.root, `isolated-${configKey.toLowerCase()}`);
+    }
+    const pkg = buildPackage(box.root, "grok");
+    const args = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+
+    process.env.GROK_BIN = join(box.root, "uninstalled-grok");
+    const remove = await quiet(() => main(["remove", "--host", "all"]));
+    assert.equal(remove.error, undefined, `all-host remove failed: ${remove.error?.message}`);
+    assert.equal(existsSync(box.managedRoot), false, "managed root survived all-host remove");
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("grok: disabled plugin state is visible without mutating unrelated configuration", async () => {
+  const box = makeSandbox("grok");
+  try {
+    const pkg = buildPackage(box.root, "grok");
+    const args = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+    const state = box.state();
+    state.grokEnabled = false;
+    writeFileSync(box.statePath, JSON.stringify(state));
+    const status = await quiet(() => main(["status", "--host", "grok"]));
+    assert.equal(status.error, undefined, `status failed: ${status.error?.message}`);
+    assert.match(status.output, /installed but disabled/);
+    assert.ok(existsSync(box.managedRoot), "status mutated the managed plugin root");
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("grok: --host all preserves desired-state migration and unrelated Grok files", async () => {
+  const box = makeSandbox("grok");
+  try {
+    for (const [binaryKey, configKey] of [
+      ["AGY_BIN", "ANTIGRAVITY_CONFIG_DIR"],
+      ["CLAUDE_BIN", "CLAUDE_CONFIG_DIR"],
+      ["CODEX_BIN", "CODEX_HOME"],
+      ["CURSOR_BIN", "CURSOR_CONFIG_DIR"],
+    ]) {
+      process.env[binaryKey] = join(box.root, `unavailable-${binaryKey.toLowerCase()}`);
+      process.env[configKey] = join(box.root, `isolated-${configKey.toLowerCase()}`);
+    }
+    const unrelatedPlugin = join(box.home, "plugins", "unrelated", "plugin.json");
+    const unrelatedConfig = join(box.home, "config.toml");
+    mkdirSync(dirname(unrelatedPlugin), { recursive: true });
+    writeFileSync(unrelatedPlugin, '{"name":"unrelated"}\n');
+    writeFileSync(unrelatedConfig, "theme = 'dark'\n");
+
+    const pkg = buildPackage(box.root, "grok");
+    const directArgs = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...directArgs])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+    assert.deepEqual(
+      JSON.parse(readFileSync(join(box.root, "state", "desired-state.json"), "utf8"))
+        .installedHosts,
+      ["grok"],
+    );
+
+    const allArgs = [
+      "--host", "all", "--asset-grok", pkg.asset, "--checksum-grok", pkg.checksum,
+    ];
+    const update = await withDarwinArm64(() => quiet(() => main(["update", ...allArgs])));
+    assert.equal(update.error, undefined, `all-host update failed: ${update.error?.message}`);
+    assert.equal(readFileSync(unrelatedConfig, "utf8"), "theme = 'dark'\n");
+    assert.equal(readFileSync(unrelatedPlugin, "utf8"), '{"name":"unrelated"}\n');
+
+    const remove = await quiet(() => main(["remove", "--host", "all"]));
+    assert.equal(remove.error, undefined, `all-host remove failed: ${remove.error?.message}`);
+    assert.equal(existsSync(box.managedRoot), false);
+    assert.equal(existsSync(unrelatedConfig), true);
+    assert.equal(existsSync(unrelatedPlugin), true);
+  } finally {
+    box.cleanup();
+  }
+});
 
 test("claude: supported list wrappers preserve the complete lifecycle", async () => {
   const box = makeSandbox("claude", {
@@ -576,11 +1183,7 @@ test("claude: malformed list wrappers fail closed before mutation", async () => 
   try {
     const pkg = buildPackage(box.root, "claude");
     const result = await withDarwinArm64(() =>
-      quiet(() =>
-        main([
-          "install", "--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum,
-        ]),
-      ),
+      quiet(() => main(["install", "--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum])),
     );
     assert.notEqual(result.error, undefined, "malformed wrapper was accepted");
     assert.match(result.error.message, /marketplace list returned an unexpected schema/);
@@ -650,7 +1253,9 @@ test("claude: failed update restores the previous disabled registration", async 
     state.plugins[0].enabled = false;
     state.installAttempts = 0;
     writeFileSync(box.statePath, JSON.stringify(state));
-    replaceSandboxHost(box, "claude", "claude-disabled-rollback", { failInstallOnce: true });
+    replaceSandboxHost(box, "claude", "claude-disabled-rollback", {
+      failInstallOnce: true,
+    });
 
     const update = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
     assert.notEqual(update.error, undefined, "sabotaged update reported success");
@@ -705,6 +1310,56 @@ test("all hosts: fresh install uses one desired version and one manifest", async
     assert.match(status.output, /claude: installed .* \(in sync\)/);
     assert.match(status.output, /codex: installed .* \(in sync\)/);
     assert.match(status.output, /Overall: no detected drift/);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("all hosts: qualified candidate assets exclude other ready hosts", async () => {
+  const box = makeAllSandbox();
+  try {
+    const antigravityHome = join(box.root, "antigravity-home");
+    mkdirSync(antigravityHome, { recursive: true });
+    const antigravity = writeFakeHost(box.root, "antigravity-ready", {
+      kind: "antigravity",
+    });
+    process.env.AGY_BIN = antigravity.binary;
+    process.env.ANTIGRAVITY_CONFIG_DIR = antigravityHome;
+    const packages = {
+      claude: buildPackage(box.root, "claude"),
+      codex: buildPackage(box.root, "codex"),
+    };
+
+    const result = await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
+
+    assert.equal(result.error, undefined, `candidate transaction failed: ${result.error?.message}`);
+    assert.deepEqual(box.desired().installedHosts, ["claude", "codex"]);
+    assert.equal(existsSync(join(antigravityHome, "plugins", MARKETPLACE)), false);
+    assert.doesNotMatch(result.output, /Downloading OpenSocrates/u);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("all hosts: OpenCode joins desired state and preserves unrelated config", async () => {
+  const box = makeAllSandbox({ includeOpenCode: true });
+  try {
+    const packages = {
+      claude: buildPackage(box.root, "claude"),
+      codex: buildPackage(box.root, "codex"),
+      opencode: buildPackage(box.root, "opencode"),
+    };
+    mkdirSync(join(box.homes.opencode, "plugins"), { recursive: true });
+    writeFileSync(join(box.homes.opencode, "plugins", "unrelated.js"), "export default {};\n");
+    writeFileSync(join(box.homes.opencode, "opencode.json"), '{"theme":"system"}\n');
+
+    const result = await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
+    assert.equal(result.error, undefined, `all-host install with OpenCode failed: ${result.error?.message}`);
+    assert.deepEqual(box.desired().installedHosts, ["claude", "codex", "opencode"]);
+    assert.ok(existsSync(join(box.managedRoots.opencode, "SKILL.md")));
+    assert.ok(existsSync(join(box.homes.opencode, "plugins", "opensocrates.js")));
+    assert.equal(readFileSync(join(box.homes.opencode, "plugins", "unrelated.js"), "utf8"), "export default {};\n");
+    assert.equal(readFileSync(join(box.homes.opencode, "opencode.json"), "utf8"), '{"theme":"system"}\n');
   } finally {
     box.cleanup();
   }
@@ -765,11 +1420,11 @@ test("all hosts: a required-host preflight failure changes neither host", async 
       sentinels[host] = join(box.managedRoots[host], `preflight-${host}.txt`);
       writeFileSync(sentinels[host], "previous installation\n");
     }
-    replaceAllHostBinary(box, "claude", "claude-no-auth", { failAuth: true });
+    replaceAllHostBinary(box, "claude", "claude-no-auth", {
+      failAuth: true,
+    });
 
-    const result = await withDarwinArm64(() =>
-      quiet(() => main(["update", ...allAssetArgs(packages)])),
-    );
+    const result = await withDarwinArm64(() => quiet(() => main(["update", ...allAssetArgs(packages)])));
     assert.notEqual(result.error, undefined, "update ignored a required host preflight failure");
     assert.match(result.error.message, /preflight failed for claude/);
     for (const host of ["claude", "codex"]) {
@@ -797,11 +1452,11 @@ test("all hosts: a second-host activation failure rolls both hosts back", async 
     const codexState = box.state("codex");
     codexState.installAttempts = 0;
     writeFileSync(box.hosts.codex.statePath, JSON.stringify(codexState));
-    replaceAllHostBinary(box, "codex", "codex-fail-once", { failInstallOnce: true });
+    replaceAllHostBinary(box, "codex", "codex-fail-once", {
+      failInstallOnce: true,
+    });
 
-    const result = await withDarwinArm64(() =>
-      quiet(() => main(["update", ...allAssetArgs(packages)])),
-    );
+    const result = await withDarwinArm64(() => quiet(() => main(["update", ...allAssetArgs(packages)])));
     assert.notEqual(result.error, undefined, "cross-host activation unexpectedly succeeded");
     for (const host of ["claude", "codex"]) {
       assert.ok(existsSync(sentinels[host]), `${host} previous files were not restored`);
@@ -820,9 +1475,7 @@ test("all hosts: a fresh partial activation leaves neither host installed", asyn
       claude: buildPackage(box.root, "claude"),
       codex: buildPackage(box.root, "codex"),
     };
-    const result = await withDarwinArm64(() =>
-      quiet(() => main(["install", ...allAssetArgs(packages)])),
-    );
+    const result = await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
     assert.notEqual(result.error, undefined, "partial activation reported success");
     for (const host of ["claude", "codex"]) {
       assert.equal(box.state(host).plugins.length, 0, `${host} registration survived rollback`);
@@ -839,14 +1492,7 @@ test("claude: update replaces the v1.1.0 multi-skill projection", async () => {
     const pkg = buildPackage(box.root, "claude");
     const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
     await withDarwinArm64(() => quiet(() => main(["install", ...args])));
-    const stale = join(
-      box.managedRoot,
-      "plugins",
-      MARKETPLACE,
-      "skills",
-      "critical-thinking",
-      "SKILL.md",
-    );
+    const stale = join(box.managedRoot, "plugins", MARKETPLACE, "skills", "critical-thinking", "SKILL.md");
     mkdirSync(join(stale, ".."), { recursive: true });
     writeFileSync(stale, "legacy method skill\n");
     assert.ok(existsSync(stale), "stale skill fixture was not created");
@@ -869,16 +1515,7 @@ test("auto-update: enable is opt-in and remove all cannot orphan the LaunchAgent
     await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
     const npx = configureFakeNpx(box);
     const enabled = await withDarwinArm64(() =>
-      quiet(() =>
-        main([
-          "auto-update",
-          "enable",
-          "--host",
-          "all",
-          "--interval-hours",
-          "12",
-        ]),
-      ),
+      quiet(() => main(["auto-update", "enable", "--host", "all", "--interval-hours", "12"])),
     );
     assert.equal(enabled.error, undefined, `enable failed: ${enabled.error?.message}`);
     assert.ok(existsSync(box.launchAgent), "LaunchAgent was not installed");
@@ -913,9 +1550,7 @@ test("auto-update: a single-host scope preserves the complete installed-host set
     };
     await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
     configureFakeNpx(box);
-    const enabled = await withDarwinArm64(() =>
-      quiet(() => main(["auto-update", "enable", "--host", "claude"])),
-    );
+    const enabled = await withDarwinArm64(() => quiet(() => main(["auto-update", "enable", "--host", "claude"])));
     assert.equal(enabled.error, undefined, `single-host enable failed: ${enabled.error?.message}`);
     assert.deepEqual(box.desired().installedHosts, ["claude", "codex"]);
     assert.deepEqual(box.desired().autoUpdate.hosts, ["claude"]);
@@ -933,10 +1568,7 @@ test("auto-update: a single-host scope preserves the complete installed-host set
     }
     const previous = box.desired();
     previous.activeVersion = "1.1.0";
-    writeFileSync(
-      join(box.root, "state", "desired-state.json"),
-      `${JSON.stringify(previous, null, 2)}\n`,
-    );
+    writeFileSync(join(box.root, "state", "desired-state.json"), `${JSON.stringify(previous, null, 2)}\n`);
 
     const scheduled = await withDarwinArm64(() =>
       quiet(() => main(["auto-update", "run", "--force", ...allAssetArgs(packages)])),
@@ -948,9 +1580,7 @@ test("auto-update: a single-host scope preserves the complete installed-host set
     assert.deepEqual(box.desired().autoUpdate.hosts, ["claude"]);
     assert.deepEqual(box.receipt().hosts, [{ host: "claude", result: "updated" }]);
 
-    const reconciled = await withDarwinArm64(() =>
-      quiet(() => main(["update", ...allAssetArgs(packages)])),
-    );
+    const reconciled = await withDarwinArm64(() => quiet(() => main(["update", ...allAssetArgs(packages)])));
     assert.equal(reconciled.error, undefined, `all-host reconciliation failed: ${reconciled.error?.message}`);
     assert.equal(box.state("codex").plugins[0].version, PRODUCT_VERSION);
     const finalStatus = await quiet(() => main(["status", "--host", "all"]));
@@ -971,9 +1601,7 @@ test("auto-update: partial removal rewrites the remaining scheduler scope", asyn
     configureFakeNpx(box);
     await withDarwinArm64(() => quiet(() => main(["auto-update", "enable", "--host", "all"])));
 
-    const removed = await withDarwinArm64(() =>
-      quiet(() => main(["remove", "--host", "claude"])),
-    );
+    const removed = await withDarwinArm64(() => quiet(() => main(["remove", "--host", "claude"])));
     assert.equal(removed.error, undefined, `partial remove failed: ${removed.error?.message}`);
     assert.deepEqual(box.desired().installedHosts, ["codex"]);
     assert.equal(box.desired().autoUpdate.enabled, true);
@@ -1003,26 +1631,17 @@ test("auto-update: reconfiguration replaces a loaded LaunchAgent cleanly", async
     configureFakeNpx(box);
     const launchctl = configureFakeLaunchctl(box);
 
-    const first = await withDarwinArm64(() =>
-      quiet(() => main(["auto-update", "enable", "--host", "all"])),
-    );
+    const first = await withDarwinArm64(() => quiet(() => main(["auto-update", "enable", "--host", "all"])));
     assert.equal(first.error, undefined, `first enable failed: ${first.error?.message}`);
     const second = await withDarwinArm64(() =>
-      quiet(() =>
-        main([
-          "auto-update",
-          "enable",
-          "--host",
-          "all",
-          "--channel",
-          "next",
-          "--interval-hours",
-          "6",
-        ]),
-      ),
+      quiet(() => main(["auto-update", "enable", "--host", "all", "--channel", "next", "--interval-hours", "6"])),
     );
     assert.equal(second.error, undefined, `reconfiguration failed: ${second.error?.message}`);
-    assert.deepEqual(launchctl.state(), { loaded: true, bootstraps: 2, bootouts: 1 });
+    assert.deepEqual(launchctl.state(), {
+      loaded: true,
+      bootstraps: 2,
+      bootouts: 1,
+    });
     const plist = readFileSync(box.launchAgent, "utf8");
     assert.match(plist, /opensocrates@next/);
     assert.match(plist, /<key>CLAUDE_BIN<\/key>/);
@@ -1031,7 +1650,11 @@ test("auto-update: reconfiguration replaces a loaded LaunchAgent cleanly", async
 
     const disabled = await quiet(() => main(["auto-update", "disable"]));
     assert.equal(disabled.error, undefined, `disable failed: ${disabled.error?.message}`);
-    assert.deepEqual(launchctl.state(), { loaded: false, bootstraps: 2, bootouts: 2 });
+    assert.deepEqual(launchctl.state(), {
+      loaded: false,
+      bootstraps: 2,
+      bootouts: 2,
+    });
     assert.equal(existsSync(box.launchAgent), false);
   } finally {
     box.cleanup();
@@ -1053,10 +1676,7 @@ test("auto-update: a successful check reconciles every desired host", async () =
     }
     const desired = box.desired();
     desired.activeVersion = null;
-    writeFileSync(
-      join(box.root, "state", "desired-state.json"),
-      `${JSON.stringify(desired, null, 2)}\n`,
-    );
+    writeFileSync(join(box.root, "state", "desired-state.json"), `${JSON.stringify(desired, null, 2)}\n`);
     configureFakeNpx(box);
     await withDarwinArm64(() => quiet(() => main(["auto-update", "enable", "--host", "all"])));
     assert.equal(box.desired().activeVersion, "1.1.0");
@@ -1091,10 +1711,7 @@ test("auto-update: major releases remain blocked unless explicitly allowed", asy
     }
     const desired = box.desired();
     desired.activeVersion = "0.9.0";
-    writeFileSync(
-      join(box.root, "state", "desired-state.json"),
-      `${JSON.stringify(desired, null, 2)}\n`,
-    );
+    writeFileSync(join(box.root, "state", "desired-state.json"), `${JSON.stringify(desired, null, 2)}\n`);
     configureFakeNpx(box);
     await withDarwinArm64(() => quiet(() => main(["auto-update", "enable", "--host", "all"])));
 
@@ -1125,24 +1742,16 @@ test("auto-update: checksum failure preserves both hosts and records only a cate
     await withDarwinArm64(() => quiet(() => main(["auto-update", "enable", "--host", "all"])));
     const desired = box.desired();
     desired.activeVersion = "1.1.0";
-    writeFileSync(
-      join(box.root, "state", "desired-state.json"),
-      `${JSON.stringify(desired, null, 2)}\n`,
-    );
+    writeFileSync(join(box.root, "state", "desired-state.json"), `${JSON.stringify(desired, null, 2)}\n`);
     const sentinels = {};
     for (const host of ["claude", "codex"]) {
       sentinels[host] = join(box.managedRoots[host], `checksum-${host}.txt`);
       writeFileSync(sentinels[host], "previous installation\n");
     }
-    writeFileSync(
-      packages.codex.checksum,
-      `${"0".repeat(64)}  ${packages.codex.asset.split("/").pop()}\n`,
-    );
+    writeFileSync(packages.codex.checksum, `${"0".repeat(64)}  ${packages.codex.asset.split("/").pop()}\n`);
 
     const result = await withDarwinArm64(() =>
-      quiet(() =>
-        main(["auto-update", "run", "--force", ...allAssetArgs(packages)]),
-      ),
+      quiet(() => main(["auto-update", "run", "--force", ...allAssetArgs(packages)])),
     );
     assert.notEqual(result.error, undefined, "checksum failure reported success");
     for (const host of ["claude", "codex"]) {
@@ -1175,17 +1784,12 @@ test("auto-update: offline check preserves the active version and records networ
     await withDarwinArm64(() => quiet(() => main(["auto-update", "enable", "--host", "all"])));
     const desired = box.desired();
     desired.activeVersion = "1.1.0";
-    writeFileSync(
-      join(box.root, "state", "desired-state.json"),
-      `${JSON.stringify(desired, null, 2)}\n`,
-    );
+    writeFileSync(join(box.root, "state", "desired-state.json"), `${JSON.stringify(desired, null, 2)}\n`);
     globalThis.fetch = async () => {
       throw new Error("offline network");
     };
 
-    const result = await withDarwinArm64(() =>
-      quiet(() => main(["auto-update", "run", "--force"])),
-    );
+    const result = await withDarwinArm64(() => quiet(() => main(["auto-update", "run", "--force"])));
     assert.notEqual(result.error, undefined, "offline update reported success");
     assert.equal(box.receipt().errorCategory, "network");
     assert.equal(box.desired().activeVersion, "1.1.0");
@@ -1241,8 +1845,15 @@ test("claude: legacy registration warns on status and does not block remove", as
 
     // Inject a pre-1.0 case-variant registration alongside the managed one.
     const state = box.state();
-    state.marketplaces.push({ name: "OpenSocrates", source: "local", path: "/legacy" });
-    state.plugins.push({ id: "opensocrates@OpenSocrates", version: "0.9.0" });
+    state.marketplaces.push({
+      name: "OpenSocrates",
+      source: "local",
+      path: "/legacy",
+    });
+    state.plugins.push({
+      id: "opensocrates@OpenSocrates",
+      version: "0.9.0",
+    });
     writeFileSync(box.statePath, JSON.stringify(state));
 
     const status = await quiet(() => main(["status", "--host", "claude"]));
@@ -1271,7 +1882,11 @@ test("claude: legacy registration still blocks install", async () => {
   try {
     const pkg = buildPackage(box.root, "claude");
     const state = box.state();
-    state.marketplaces.push({ name: "OpenSocrates", source: "local", path: "/legacy" });
+    state.marketplaces.push({
+      name: "OpenSocrates",
+      source: "local",
+      path: "/legacy",
+    });
     writeFileSync(box.statePath, JSON.stringify(state));
     const result = await withDarwinArm64(() =>
       quiet(() => main(["install", "--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum])),
@@ -1330,7 +1945,9 @@ test("verify rejects a package whose checksum manifest does not match", async ()
 test("verify rejects a host/version mismatched package", async () => {
   const box = makeSandbox("claude");
   try {
-    const pkg = buildPackage(box.root, "claude", { manifestVersion: "9.9.9" });
+    const pkg = buildPackage(box.root, "claude", {
+      manifestVersion: "9.9.9",
+    });
     const result = await quiet(() =>
       main(["verify", "--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum]),
     );
@@ -1360,7 +1977,11 @@ test("verify rejects an archive containing a symbolic link", async () => {
   const box = makeSandbox("claude");
   try {
     const pkg = buildPackage(box.root, "claude");
-    const link = spawnSync("sh", ["-c", `cd ${JSON.stringify(pkg.tree)} && ln -s /etc/passwd leak && zip -q -y ${JSON.stringify(pkg.asset)} leak`], { encoding: "utf8" });
+    const link = spawnSync(
+      "sh",
+      ["-c", `cd ${JSON.stringify(pkg.tree)} && ln -s /etc/passwd leak && zip -q -y ${JSON.stringify(pkg.asset)} leak`],
+      { encoding: "utf8" },
+    );
     assert.equal(link.status, 0, `fixture setup failed: ${link.stderr}`);
     writeFileSync(pkg.checksum, `${sha256(readFileSync(pkg.asset))}  ${pkg.asset.split("/").pop()}\n`);
     const result = await quiet(() =>
@@ -1378,7 +1999,11 @@ test("install refuses a marketplace registered at an unmanaged location", async 
   try {
     const pkg = buildPackage(box.root, "claude");
     const state = box.state();
-    state.marketplaces.push({ name: MARKETPLACE, source: "local", path: "/somewhere/else" });
+    state.marketplaces.push({
+      name: MARKETPLACE,
+      source: "local",
+      path: "/somewhere/else",
+    });
     writeFileSync(box.statePath, JSON.stringify(state));
     const result = await withDarwinArm64(() =>
       quiet(() => main(["install", "--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum])),
@@ -1454,11 +2079,7 @@ for (const host of ["claude", "codex"]) {
         existsSync(join(box.managedRoot, ".opensocrates-managed.json")),
         "previous installation was not restored after a failing rollback stage",
       );
-      assert.deepEqual(
-        box.backups(),
-        [],
-        "previous installation was stranded in a backup directory",
-      );
+      assert.deepEqual(box.backups(), [], "previous installation was stranded in a backup directory");
     } finally {
       box.cleanup();
     }

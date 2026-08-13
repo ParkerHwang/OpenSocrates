@@ -1,0 +1,36 @@
+# OpenSocrates for Google Antigravity
+
+This package provides the experimental, explicit-skill Antigravity boundary
+for OpenSocrates {{PRODUCT_VERSION}}. It exposes one `opensocrates` Agent Skill
+backed by {{METHOD_COUNT}} internal reasoning-system references.
+
+## Support level
+
+- Explicit Agent Skill invocation: **supported by the documented plugin and
+  skills contract**; an authenticated live invocation receipt is still pending.
+- Automatic per-prompt selection: **not included**.
+- Native hook delivery: **not claimed**.
+- Additional model calls: **none**. The package does not consume a separate
+  Google AI Pro request to classify each prompt.
+- Antigravity Desktop/IDE and public marketplace distribution: **not claimed**.
+
+The package contains no launcher, native runtime, executable, hook definition,
+MCP server, telemetry, or background service. It is a content-only plugin.
+
+## Installation contract
+
+Antigravity documents global plugins under
+`~/.gemini/config/plugins/<plugin-name>/`. The `plugin.json` file is the
+required plugin marker, and skills live under `skills/<skill-name>/SKILL.md`.
+The OpenSocrates installer owns only the `opensocrates` directory and refuses
+to replace a directory without its exact ownership marker.
+
+After installation, start a new Antigravity CLI session and open `/skills` to
+confirm discovery. Invoke the `opensocrates` skill explicitly for judgment
+work. No automatic hook participation occurs in this version.
+
+See Google's [Agent Skills documentation](https://antigravity.google/docs/skills)
+and [Plugins documentation](https://antigravity.google/docs/ide/plugins).
+
+Generated from content revision {{CONTENT_REVISION}} with semantic bundle
+identity `{{SEMANTIC_HASH}}` and source identity `{{SOURCE_TREE_HASH}}`.

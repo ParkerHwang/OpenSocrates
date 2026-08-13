@@ -108,6 +108,106 @@ CODEX_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
     ),
 )
 
+CURSOR_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (
+        "cursor_readme_explicit_skill_boundary_missing",
+        (
+            "Manual `/opensocrates` invocation",
+            "a live Cursor receipt is pending",
+        ),
+    ),
+    (
+        "cursor_readme_no_selector_cost_missing",
+        (
+            "no separate OpenSocrates selector model call is added",
+            "automatic per-prompt hook selection: not included",
+        ),
+    ),
+    (
+        "cursor_readme_content_only_boundary_missing",
+        (
+            "There is no launcher, native runtime, executable, hook, MCP server",
+            "background service",
+        ),
+    ),
+)
+
+ANTIGRAVITY_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (
+        "antigravity_readme_explicit_tier_missing",
+        (
+            "experimental, explicit-skill Antigravity boundary",
+            "Automatic per-prompt selection: **not included**",
+            "Native hook delivery: **not claimed**",
+        ),
+    ),
+    (
+        "antigravity_readme_quota_boundary_missing",
+        (
+            "Additional model calls: **none**",
+            "does not consume a separate Google AI Pro request",
+        ),
+    ),
+    (
+        "antigravity_readme_file_drop_contract_missing",
+        (
+            "`~/.gemini/config/plugins/<plugin-name>/`",
+            "required plugin marker",
+            "refuses to replace a directory without its exact ownership marker",
+        ),
+    ),
+)
+
+GROK_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (
+        "grok_readme_native_skill_contract_missing",
+        (
+            "one user-visible `opensocrates` skill",
+            "same turn through its native skill-selection surface",
+            "explicitly with `/opensocrates`",
+        ),
+    ),
+    (
+        "grok_readme_content_only_boundary_missing",
+        (
+            "contains no hooks, MCP server, agent, command, launcher, native runtime",
+            "without requiring another API key or hardcoded model ID",
+        ),
+    ),
+    (
+        "grok_readme_grounding_gate_missing",
+        ("complete procedure must be read in the current conversation",),
+    ),
+)
+
+OPENCODE_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (
+        "opencode_stable_same_turn_boundary_missing",
+        (
+            "Stable `chat.message` same-turn mutation",
+            "minimum verified host version of OpenCode 1.18.18",
+            "an interactive TUI receipt were all live-validated",
+            "Native skill invocation remains",
+        ),
+    ),
+    (
+        "opencode_provider_neutrality_missing",
+        (
+            "not a product dependency",
+            "credentials, endpoints, and model IDs are never embedded",
+            "no network call, subprocess call, recursive OpenCode call",
+        ),
+    ),
+    (
+        "opencode_owned_path_boundary_missing",
+        (
+            "owned bridge, its ownership sidecar",
+            "owned `opensocrates` skill directory",
+            "does not rewrite `opencode.json`",
+        ),
+    ),
+)
+
 # Wording that would restore an overstated claim.
 FORBIDDEN: tuple[tuple[str, str], ...] = (
     (
@@ -236,7 +336,7 @@ def _semantic_overclaim_errors(text: str) -> list[str]:
 
 
 def _package_readmes(root: Path) -> Iterator[tuple[str, str, Path]]:
-    for host in ("claude", "codex"):
+    for host in ("antigravity", "claude", "codex", "cursor", "grok", "opencode"):
         candidates = (
             ("generated", root / "build" / "generated" / "plugins" / host / README),
             ("distributable", root / "dist" / host / README),
@@ -249,7 +349,14 @@ def _package_readmes(root: Path) -> Iterator[tuple[str, str, Path]]:
 def _readme_errors(path: Path, host: str = "claude") -> list[str]:
     raw_text = path.read_text(encoding="utf-8")
     text = _normalize(raw_text)
-    requirements = CLAUDE_REQUIRED if host == "claude" else CODEX_REQUIRED
+    requirements = {
+        "antigravity": ANTIGRAVITY_REQUIRED,
+        "claude": CLAUDE_REQUIRED,
+        "codex": CODEX_REQUIRED,
+        "cursor": CURSOR_REQUIRED,
+        "grok": GROK_REQUIRED,
+        "opencode": OPENCODE_REQUIRED,
+    }[host]
     errors = [
         code for code, phrases in requirements if any(_normalize(p) not in text for p in phrases)
     ]
@@ -262,7 +369,9 @@ def _readme_errors(path: Path, host: str = "claude") -> list[str]:
 def check_root(root: Path) -> dict[str, Any]:
     readmes = list(_package_readmes(root))
     present_hosts = {host for host, _label, _path in readmes}
-    missing_hosts = sorted({"claude", "codex"} - present_hosts)
+    missing_hosts = sorted(
+        {"antigravity", "claude", "codex", "cursor", "grok", "opencode"} - present_hosts
+    )
     if not readmes:
         return {
             "status": "fail",
