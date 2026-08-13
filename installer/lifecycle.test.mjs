@@ -1,7 +1,7 @@
 // Isolated installer lifecycle tests.
 //
 // Every test runs against a throwaway host home and a fake host binary. None
-// of these tests reads or writes the developer's real ~/.claude or ~/.codex
+// of these tests reads or writes the developer's real host configuration
 // directory, and none of them contacts the network: packages are built locally
 // and passed with --asset/--checksum.
 
@@ -9,11 +9,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync, existsSync, readdirSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
-import { PRODUCT_VERSION, main, withOperationLock } from "./opensocrates.mjs";
+import { PRODUCT_VERSION, main, transientPathsFor, withOperationLock } from "./opensocrates.mjs";
 import { inspectManagedLayout } from "../tools/clean_machine_acceptance.mjs";
 
 const MARKETPLACE = "opensocrates";
@@ -46,11 +46,11 @@ function sha256(bytes) {
 function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, manifestVersion = null } = {}) {
   const tree = join(root, `pkg-${host}`);
   const manifestPath =
-    ["antigravity", "cursor"].includes(host)
+    ["antigravity", "cursor", "grok"].includes(host)
       ? "plugin.json"
       : `${host === "claude" ? ".claude-plugin" : ".codex-plugin"}/plugin.json`;
   mkdirSync(dirname(join(tree, manifestPath)), { recursive: true });
-  if (!["antigravity", "cursor"].includes(host)) {
+  if (!["antigravity", "cursor", "grok"].includes(host)) {
     mkdirSync(join(tree, "runtime", "darwin-arm64", "opensocrates-runtime"), { recursive: true });
   }
   mkdirSync(join(tree, "skills", "opensocrates"), { recursive: true });
@@ -61,6 +61,7 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
       ...(host === "cursor"
         ? { $schema: "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json" }
         : {}),
+      ...(host === "grok" ? { skills: "./skills" } : {}),
       name: "opensocrates",
       version: manifestVersion ?? version,
     },
@@ -78,7 +79,7 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
     null,
     2,
   );
-  if (!["antigravity", "cursor"].includes(host)) {
+  if (!["antigravity", "cursor", "grok"].includes(host)) {
     files["runtime/darwin-arm64/opensocrates-runtime/opensocrates-runtime"] =
       "#!/bin/sh\nexit 0\n";
   }
@@ -87,7 +88,7 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
   for (const [name, body] of Object.entries(files)) {
     writeFileSync(join(tree, ...name.split("/")), body);
   }
-  if (!["antigravity", "cursor"].includes(host)) {
+  if (!["antigravity", "cursor", "grok"].includes(host)) {
     chmodSync(
       join(tree, "runtime", "darwin-arm64", "opensocrates-runtime", "opensocrates-runtime"),
       0o755,
@@ -173,6 +174,33 @@ if (HOST === "claude" && has("auth", "status")) {
 if (HOST === "codex" && has("login", "status")) {
   if (FAIL_AUTH) process.exit(1);
   process.stdout.write("Logged in using ChatGPT\\n"); process.exit(0);
+}
+if (HOST === "grok" && has("inspect", "--json")) {
+  const root = join(process.env.GROK_HOME, "plugins", MARKETPLACE);
+  let discoveredRoot = root;
+  try {
+    const scannedBackup = readdirSync(join(process.env.GROK_HOME, "plugins")).find(
+      (entry) => entry.startsWith(".opensocrates.backup-")
+    );
+    if (scannedBackup) discoveredRoot = join(process.env.GROK_HOME, "plugins", scannedBackup);
+  } catch {
+    // A missing plugins directory is reported as no discovered plugin below.
+  }
+  try {
+    JSON.parse(readFileSync(join(discoveredRoot, "plugin.json"), "utf8"));
+    out({
+      plugins: [{
+        name: MARKETPLACE,
+        scope: "user",
+        path: discoveredRoot,
+        enabled: state.grokEnabled !== false,
+        provides: { skills: 1, agents: 0, hooks: false, mcpServers: 0 },
+      }],
+    });
+  } catch {
+    out({ plugins: [] });
+  }
+  process.exit(0);
 }
 
 if (HOST === "claude") {
@@ -296,6 +324,9 @@ function makeSandbox(host, options = {}) {
   } else if (host === "claude") {
     process.env.CLAUDE_BIN = binary;
     process.env.CLAUDE_CONFIG_DIR = home;
+  } else if (host === "grok") {
+    process.env.GROK_BIN = binary;
+    process.env.GROK_HOME = home;
   } else {
     process.env.CODEX_BIN = binary;
     process.env.CODEX_HOME = home;
@@ -308,6 +339,8 @@ function makeSandbox(host, options = {}) {
       ? join(home, "plugins")
       : host === "cursor"
         ? join(home, "plugins", "local")
+        : host === "grok"
+          ? join(home, "plugins")
         : join(home, "managed-marketplaces");
   const managedRoot = join(managedParent, MARKETPLACE);
   return {
@@ -330,6 +363,8 @@ function makeSandbox(host, options = {}) {
         "CODEX_HOME",
         "CURSOR_BIN",
         "CURSOR_CONFIG_DIR",
+        "GROK_BIN",
+        "GROK_HOME",
         "OPENSOCRATES_STATE_DIR",
         "OPENSOCRATES_LAUNCH_AGENTS_DIR",
         "OPENSOCRATES_SKIP_LAUNCHCTL",
@@ -359,6 +394,8 @@ function replaceSandboxHost(box, host, name, options = {}) {
         ? "CLAUDE_BIN"
         : host === "cursor"
           ? "CURSOR_BIN"
+          : host === "grok"
+            ? "GROK_BIN"
           : "CODEX_BIN";
   process.env[binaryKey] = replacement.binary;
   return replacement;
@@ -385,6 +422,12 @@ function makeAllSandbox(options = {}) {
   // content-only hosts to this two-host fixture.
   process.env.CURSOR_BIN = join(root, "unavailable-cursor");
   process.env.AGY_BIN = join(root, "unavailable-agy");
+  process.env.GROK_BIN = join(root, "unavailable-grok");
+  // Grok resolves its managed root from GROK_HOME without consulting the CLI,
+  // so an isolated home is what keeps a developer's real ~/.grok out of the
+  // all-host fixture. Setting CURSOR_CONFIG_DIR or ANTIGRAVITY_CONFIG_DIR would
+  // instead satisfy their preflight and pull them into this two-host fixture.
+  process.env.GROK_HOME = join(root, "grok-home");
   process.env.OPENSOCRATES_STATE_DIR = join(root, "state");
   process.env.OPENSOCRATES_LAUNCH_AGENTS_DIR = join(root, "LaunchAgents");
   process.env.OPENSOCRATES_SKIP_LAUNCHCTL = "1";
@@ -421,6 +464,8 @@ function makeAllSandbox(options = {}) {
         "CODEX_HOME",
         "CURSOR_BIN",
         "CURSOR_CONFIG_DIR",
+        "GROK_BIN",
+        "GROK_HOME",
         "OPENSOCRATES_STATE_DIR",
         "OPENSOCRATES_LAUNCH_AGENTS_DIR",
         "OPENSOCRATES_SKIP_LAUNCHCTL",
@@ -608,7 +653,7 @@ for (const host of ["claude", "codex"]) {
   });
 }
 
-for (const host of ["antigravity", "cursor"]) {
+for (const host of ["antigravity", "cursor", "grok"]) {
   test(`${host}: content-only plugin install -> status -> update -> verify -> remove`, async () => {
     const box = makeSandbox(host);
     try {
@@ -631,7 +676,12 @@ for (const host of ["antigravity", "cursor"]) {
       const status = await quiet(() => main(["status", "--host", host]));
       assert.equal(status.error, undefined, `status failed: ${status.error?.message}`);
       assert.match(status.output, new RegExp(`OpenSocrates ${PRODUCT_VERSION} is installed`));
-      assert.match(status.output, /experimental and explicit-skill/);
+      if (host === "grok") {
+        assert.match(status.output, /automatic native-skill selection/);
+        assert.match(install.output, /invoke \/opensocrates explicitly/);
+      } else {
+        assert.match(status.output, /experimental and explicit-skill/);
+      }
 
       const update = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
       assert.equal(update.error, undefined, `update failed: ${update.error?.message}`);
@@ -648,6 +698,179 @@ for (const host of ["antigravity", "cursor"]) {
     }
   });
 }
+
+test("grok: staging and rollback directories stay outside the scanned plugins directory", async () => {
+  const box = makeSandbox("grok");
+  try {
+    // The installer canonicalizes the host home, so compare against the
+    // resolved sandbox home rather than the literal one: macOS reports
+    // /private/var for a /var temporary directory.
+    const home = realpathSync(box.home);
+    const placement = transientPathsFor("grok");
+    assert.equal(placement.parent, join(home, "plugins"));
+    assert.equal(placement.transient, home);
+    assert.equal(
+      placement.transient.startsWith(`${placement.parent}/`),
+      false,
+      "a transient directory would be discoverable as a second Grok plugin",
+    );
+
+    // An install must leave the scanned directory holding the managed root
+    // only: a staging or backup directory left there by an interrupted run is
+    // discovered by Grok as a duplicate OpenSocrates plugin.
+    const pkg = buildPackage(box.root, "grok");
+    const args = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+    assert.deepEqual(readdirSync(placement.parent), [MARKETPLACE]);
+
+    const update = await withDarwinArm64(() => quiet(() => main(["update", ...args])));
+    assert.equal(update.error, undefined, `update failed: ${update.error?.message}`);
+    assert.deepEqual(readdirSync(placement.parent), [MARKETPLACE]);
+    assert.deepEqual(
+      readdirSync(home).filter((entry) => entry.startsWith(".opensocrates.")),
+      [],
+      "a committed transaction left a transient directory in the Grok home",
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+for (const host of ["antigravity", "cursor", "claude", "codex"]) {
+  test(`${host}: transient directories keep their established location`, () => {
+    const box = makeSandbox(host);
+    try {
+      const placement = transientPathsFor(host);
+      assert.equal(placement.transient, placement.parent);
+      assert.equal(placement.parent, dirname(placement.root));
+    } finally {
+      box.cleanup();
+    }
+  });
+}
+
+test("grok: files stay inspectable and removable without a runnable Grok CLI", async () => {
+  const box = makeSandbox("grok");
+  try {
+    const pkg = buildPackage(box.root, "grok");
+    const args = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+
+    // Grok Build itself can be uninstalled while its managed OpenSocrates
+    // files remain. Reading and removing what this installer owns is plain
+    // file ownership work and must not depend on the host command.
+    process.env.GROK_BIN = join(box.root, "uninstalled-grok");
+
+    const status = await quiet(() => main(["status", "--host", "grok"]));
+    assert.equal(status.error, undefined, `status failed: ${status.error?.message}`);
+    assert.match(status.output, new RegExp(`OpenSocrates ${PRODUCT_VERSION} is installed`));
+    assert.match(status.output, /could not read Grok Build plugin state/);
+
+    const remove = await quiet(() => main(["remove", "--host", "grok"]));
+    assert.equal(remove.error, undefined, `remove failed: ${remove.error?.message}`);
+    assert.equal(existsSync(box.managedRoot), false, "managed root survived remove");
+    assert.deepEqual(
+      readdirSync(box.home).filter((entry) => entry.startsWith(".opensocrates.")),
+      [],
+      "remove left a rollback directory behind",
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("grok: a stale managed directory cannot block an all-host lifecycle", async () => {
+  const box = makeSandbox("grok");
+  try {
+    for (const [binaryKey, configKey] of [
+      ["AGY_BIN", "ANTIGRAVITY_CONFIG_DIR"],
+      ["CLAUDE_BIN", "CLAUDE_CONFIG_DIR"],
+      ["CODEX_BIN", "CODEX_HOME"],
+      ["CURSOR_BIN", "CURSOR_CONFIG_DIR"],
+    ]) {
+      process.env[binaryKey] = join(box.root, `unavailable-${binaryKey.toLowerCase()}`);
+      process.env[configKey] = join(box.root, `isolated-${configKey.toLowerCase()}`);
+    }
+    const pkg = buildPackage(box.root, "grok");
+    const args = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+
+    process.env.GROK_BIN = join(box.root, "uninstalled-grok");
+    const remove = await quiet(() => main(["remove", "--host", "all"]));
+    assert.equal(remove.error, undefined, `all-host remove failed: ${remove.error?.message}`);
+    assert.equal(existsSync(box.managedRoot), false, "managed root survived all-host remove");
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("grok: disabled plugin state is visible without mutating unrelated configuration", async () => {
+  const box = makeSandbox("grok");
+  try {
+    const pkg = buildPackage(box.root, "grok");
+    const args = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+    const state = box.state();
+    state.grokEnabled = false;
+    writeFileSync(box.statePath, JSON.stringify(state));
+    const status = await quiet(() => main(["status", "--host", "grok"]));
+    assert.equal(status.error, undefined, `status failed: ${status.error?.message}`);
+    assert.match(status.output, /installed but disabled/);
+    assert.ok(existsSync(box.managedRoot), "status mutated the managed plugin root");
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("grok: --host all preserves desired-state migration and unrelated Grok files", async () => {
+  const box = makeSandbox("grok");
+  try {
+    for (const [binaryKey, configKey] of [
+      ["AGY_BIN", "ANTIGRAVITY_CONFIG_DIR"],
+      ["CLAUDE_BIN", "CLAUDE_CONFIG_DIR"],
+      ["CODEX_BIN", "CODEX_HOME"],
+      ["CURSOR_BIN", "CURSOR_CONFIG_DIR"],
+    ]) {
+      process.env[binaryKey] = join(box.root, `unavailable-${binaryKey.toLowerCase()}`);
+      process.env[configKey] = join(box.root, `isolated-${configKey.toLowerCase()}`);
+    }
+    const unrelatedPlugin = join(box.home, "plugins", "unrelated", "plugin.json");
+    const unrelatedConfig = join(box.home, "config.toml");
+    mkdirSync(dirname(unrelatedPlugin), { recursive: true });
+    writeFileSync(unrelatedPlugin, '{"name":"unrelated"}\n');
+    writeFileSync(unrelatedConfig, "theme = 'dark'\n");
+
+    const pkg = buildPackage(box.root, "grok");
+    const directArgs = ["--host", "grok", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...directArgs])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+    assert.deepEqual(
+      JSON.parse(readFileSync(join(box.root, "state", "desired-state.json"), "utf8"))
+        .installedHosts,
+      ["grok"],
+    );
+
+    const allArgs = [
+      "--host", "all", "--asset-grok", pkg.asset, "--checksum-grok", pkg.checksum,
+    ];
+    const update = await withDarwinArm64(() => quiet(() => main(["update", ...allArgs])));
+    assert.equal(update.error, undefined, `all-host update failed: ${update.error?.message}`);
+    assert.equal(readFileSync(unrelatedConfig, "utf8"), "theme = 'dark'\n");
+    assert.equal(readFileSync(unrelatedPlugin, "utf8"), '{"name":"unrelated"}\n');
+
+    const remove = await quiet(() => main(["remove", "--host", "all"]));
+    assert.equal(remove.error, undefined, `all-host remove failed: ${remove.error?.message}`);
+    assert.equal(existsSync(box.managedRoot), false);
+    assert.equal(existsSync(unrelatedConfig), true);
+    assert.equal(existsSync(unrelatedPlugin), true);
+  } finally {
+    box.cleanup();
+  }
+});
 
 test("claude: supported list wrappers preserve the complete lifecycle", async () => {
   const box = makeSandbox("claude", {

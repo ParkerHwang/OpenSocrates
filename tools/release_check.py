@@ -29,9 +29,13 @@ from pathlib import Path
 from typing import Any
 
 SCHEMA = "opensocrates.release-check-evidence/1.0.0"
-HOSTS = ("antigravity", "claude", "codex", "cursor")
+HOSTS = ("antigravity", "claude", "codex", "cursor", "grok")
 RUNTIME_HOSTS = ("claude", "codex")
-CONTENT_ONLY_HOSTS = frozenset({"antigravity", "cursor"})
+CONTENT_ONLY_HOSTS = frozenset({"antigravity", "cursor", "grok"})
+LIVE_HOST_PROBE_STATUS = {
+    **{host: "unvalidated" for host in HOSTS},
+    "grok": "native_skill_headless_verified; explicit_headless_verified; tui_hook_execution_verified; plugin_hooks_unavailable",
+}
 EXPECTED_SCHEMA_COUNT = 32
 EXPECTED_METHOD_COUNT = 48
 LEGACY_CONTENT_BUNDLE = "content/compiled-content.bundle.json"
@@ -968,7 +972,7 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
         "native_launchers": RELEASE_LAUNCHERS,
         "platforms": _candidate_platforms(root, target),
         "signing_status": "unvalidated",
-        "live_host_probe_status": {host: "unvalidated" for host in HOSTS},
+        "live_host_probe_status": LIVE_HOST_PROBE_STATUS,
         "clean_machine_install_status": "unvalidated",
         "source_archive_status": "not_attempted",
         "provenance_status": "not_attempted",
@@ -1028,7 +1032,7 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
         "limitations": limitations_path.relative_to(dist).as_posix(),
         "platforms": limitations["platforms"],
         "signing_status": "unvalidated",
-        "live_host_probe_status": {host: "unvalidated" for host in HOSTS},
+        "live_host_probe_status": LIVE_HOST_PROBE_STATUS,
         "source_archive_status": "not_attempted",
         "provenance_status": "not_attempted",
     }
@@ -1336,6 +1340,27 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         plugin_manifest = _load_json(generated / "plugin.json")
         if plugin_manifest is None:
             errors.add("antigravity_plugin_manifest_missing")
+    if host == "grok":
+        if any(
+            (generated / name).exists()
+            for name in ("bin", "hooks", "runtime", "commands", "agents", "mcp.json", ".mcp.json")
+        ):
+            errors.add("grok_content_only_boundary_invalid")
+        plugin_manifest = _load_json(generated / "plugin.json")
+        if (
+            plugin_manifest is None
+            or plugin_manifest.get("name") != "opensocrates"
+            or plugin_manifest.get("version") != bundle.get("product_version")
+            or plugin_manifest.get("skills") != "./skills"
+        ):
+            errors.add("grok_plugin_manifest_invalid")
+        capability_evidence = metadata.get("capability_evidence")
+        if (
+            not isinstance(capability_evidence, Mapping)
+            or capability_evidence.get("status") != "verified"
+            or capability_evidence.get("probe_id") != "grok-build-1.0.3-2026-08-13"
+        ):
+            errors.add("grok_capability_evidence_invalid")
     return {
         "status": "fail" if errors else "pass",
         "method_count": len(existing_method_outputs),
@@ -1769,7 +1794,7 @@ def _full_check(
         "unvalidated": {
             "platforms": _candidate_platforms(root, target),
             "signing_status": "unvalidated",
-            "live_host_probe_status": {host: "unvalidated" for host in HOSTS},
+            "live_host_probe_status": LIVE_HOST_PROBE_STATUS,
             "clean_machine_install_status": "unvalidated",
             "source_archive_status": "not_attempted",
             "provenance_status": "not_attempted",

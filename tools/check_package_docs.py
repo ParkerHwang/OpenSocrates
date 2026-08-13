@@ -158,6 +158,28 @@ ANTIGRAVITY_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
     ),
 )
 
+GROK_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (
+        "grok_readme_native_skill_contract_missing",
+        (
+            "one user-visible `opensocrates` skill",
+            "same turn through its native skill-selection surface",
+            "explicitly with `/opensocrates`",
+        ),
+    ),
+    (
+        "grok_readme_content_only_boundary_missing",
+        (
+            "contains no hooks, MCP server, agent, command, launcher, native runtime",
+            "without requiring another API key or hardcoded model ID",
+        ),
+    ),
+    (
+        "grok_readme_grounding_gate_missing",
+        ("complete procedure must be read in the current conversation",),
+    ),
+)
+
 # Wording that would restore an overstated claim.
 FORBIDDEN: tuple[tuple[str, str], ...] = (
     (
@@ -286,7 +308,7 @@ def _semantic_overclaim_errors(text: str) -> list[str]:
 
 
 def _package_readmes(root: Path) -> Iterator[tuple[str, str, Path]]:
-    for host in ("antigravity", "claude", "codex", "cursor"):
+    for host in ("antigravity", "claude", "codex", "cursor", "grok"):
         candidates = (
             ("generated", root / "build" / "generated" / "plugins" / host / README),
             ("distributable", root / "dist" / host / README),
@@ -304,6 +326,7 @@ def _readme_errors(path: Path, host: str = "claude") -> list[str]:
         "claude": CLAUDE_REQUIRED,
         "codex": CODEX_REQUIRED,
         "cursor": CURSOR_REQUIRED,
+        "grok": GROK_REQUIRED,
     }[host]
     errors = [
         code for code, phrases in requirements if any(_normalize(p) not in text for p in phrases)
@@ -317,7 +340,7 @@ def _readme_errors(path: Path, host: str = "claude") -> list[str]:
 def check_root(root: Path) -> dict[str, Any]:
     readmes = list(_package_readmes(root))
     present_hosts = {host for host, _label, _path in readmes}
-    missing_hosts = sorted({"antigravity", "claude", "codex", "cursor"} - present_hosts)
+    missing_hosts = sorted({"antigravity", "claude", "codex", "cursor", "grok"} - present_hosts)
     if not readmes:
         return {
             "status": "fail",

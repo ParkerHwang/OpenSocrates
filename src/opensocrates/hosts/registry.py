@@ -10,9 +10,10 @@ from .base import HostAdapter
 from .claude.adapter import ClaudeAdapter, ClaudeAdapterConfig
 from .codex.adapter import CodexAdapter, CodexAdapterConfig
 from .cursor.adapter import CursorAdapter
+from .grok.adapter import GrokAdapter
 from .prompt_only.adapter import PromptOnlyAdapter
 
-HOST_NAMES = ("antigravity", "claude", "codex", "cursor", "prompt_only")
+HOST_NAMES = ("antigravity", "claude", "codex", "cursor", "grok", "prompt_only")
 
 
 class HostRegistryError(ValueError):
@@ -106,7 +107,8 @@ def build_adapter(
             bundle = loader()
         except Exception:
             bundle = None
-    adapter_type = CursorAdapter if selected == "cursor" else PromptOnlyAdapter
+    adapter_types = {"cursor": CursorAdapter, "grok": GrokAdapter}
+    adapter_type = adapter_types.get(selected, PromptOnlyAdapter)
     return adapter_type(
         bundle_path=bundle_path, bundle=bundle, profile=capability_profile, locale=locale
     )

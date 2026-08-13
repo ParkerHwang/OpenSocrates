@@ -5,6 +5,15 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ## [Unreleased]
 
+### Added
+
+- Grok Build is a first-class `grok` installer host with one native,
+  auto-selectable `/opensocrates` skill, 48 internal authored procedures,
+  deterministic content-only packaging, capability reporting, isolated
+  lifecycle ownership, release-gate coverage, and English/Korean support
+  documentation. Live Grok Build 1.0.3 evidence bounds automatic activation,
+  explicit invocation, hook behavior, and remaining TUI/subagent limitations.
+
 ## [1.1.5] - 2026-08-12
 
 ### Added

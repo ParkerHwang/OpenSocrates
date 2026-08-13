@@ -35,6 +35,7 @@ test("derives host-specific release assets", () => {
   assert.match(assetNameFor("codex"), /-codex-plugin\.zip$/u);
   assert.match(assetNameFor("claude"), /-claude-plugin\.zip$/u);
   assert.match(assetNameFor("cursor"), /-cursor-plugin\.zip$/u);
+  assert.match(assetNameFor("grok"), /-grok-plugin\.zip$/u);
   assert.throws(() => assetNameFor("unknown"), (error) => error instanceof InstallerError);
 });
 
@@ -106,6 +107,7 @@ test("parses lifecycle actions and paired local asset options", () => {
   assert.equal(status.action, "status");
   assert.equal(status.host, "claude");
   assert.equal(parseCli(["status", "--host", "cursor"]).host, "cursor");
+  assert.equal(parseCli(["status", "--host", "grok"]).host, "grok");
   const antigravity = parseCli(["status", "--host", "antigravity"]);
   assert.equal(antigravity.host, "antigravity");
   const parsed = parseCli(["verify", "--asset", "bundle.zip", "--checksum", "bundle.sha256"]);
