@@ -1,5 +1,7 @@
 # OpenSocrates contributor and agent protocol
 
+<!-- make governance-check asserts distinctive policy strings in this file. -->
+
 This file is the repository-level operating contract for humans and automated agents. It applies from the repository root. More specific `AGENTS.md` files may add rules for a subtree, but may not weaken the privacy, evidence, generated-source, or protected-main rules here.
 
 ## Authority and shared state

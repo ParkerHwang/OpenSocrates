@@ -1,5 +1,7 @@
 # GitHub Copilot instructions
 
+<!-- make governance-check asserts distinctive policy strings in this file. -->
+
 Follow the repository-wide contract in [`AGENTS.md`](../AGENTS.md) and the development details in [`CONTRIBUTING.md`](../CONTRIBUTING.md).
 
 - Work through an issue and a focused pull request; do not push directly to protected `main`.

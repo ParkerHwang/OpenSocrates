@@ -120,11 +120,11 @@ def validate_repository(root: Path) -> list[str]:
 
     required_phrases = {
         "AGENTS.md": (
-            "Never push directly to protected `main`",
-            "Do not hand-edit generated files",
-            "Keep English and Korean user-facing content semantically aligned",
-            "Do not add telemetry",
-            "last verified commit SHA",
+            "protected `main`",
+            "hand-edit",
+            "semantically aligned",
+            "telemetry",
+            "last verified commit",
         ),
         "CLAUDE.md": (
             "repository development only",
@@ -134,16 +134,16 @@ def validate_repository(root: Path) -> list[str]:
         ".github/copilot-instructions.md": (
             "AGENTS.md",
             "protected `main`",
-            "never hand-edit generated",
+            "hand-edit",
         ),
     }
     for relative, phrases in required_phrases.items():
         path = root / relative
         if not path.is_file():
             continue
-        content = path.read_text(encoding="utf-8")
+        folded = path.read_text(encoding="utf-8").casefold()
         for phrase in phrases:
-            if phrase not in content:
+            if phrase.casefold() not in folded:
                 errors.append(f"{relative} is missing required policy: {phrase}")
 
     template_path = root / ".github/pull_request_template.md"

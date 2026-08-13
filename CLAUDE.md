@@ -1,5 +1,7 @@
 # Claude Code instructions
 
+<!-- make governance-check asserts distinctive policy strings in this file. -->
+
 These instructions govern repository development only. OpenSocrates selector subprocesses use host safe mode and do not load project `CLAUDE.md`; this file does not change packaged selector behavior.
 
 Read and follow [`AGENTS.md`](AGENTS.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md) before making changes. They are the shared cross-agent and human workflow contract.

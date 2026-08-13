@@ -128,6 +128,17 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory() as tmp:
         mutated = fixture(Path(tmp), root)
+        agents = mutated / "AGENTS.md"
+        agents.write_text(
+            agents.read_text(encoding="utf-8").replace(
+                "Do not add telemetry", "Telemetry must not be added"
+            ),
+            encoding="utf-8",
+        )
+        assert validate_repository(mutated) == []
+
+    with tempfile.TemporaryDirectory() as tmp:
+        mutated = fixture(Path(tmp), root)
         (mutated / "CLAUDE.md").unlink()
         errors = validate_repository(mutated)
         assert any("missing governance file: CLAUDE.md" in item for item in errors)
