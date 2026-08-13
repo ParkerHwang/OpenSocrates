@@ -29,6 +29,7 @@ generate:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host antigravity --output "$(ROOT)/build/generated/plugins/antigravity" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host cursor --output "$(ROOT)/build/generated/plugins/cursor" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$(ROOT)/build/generated/plugins/grok" >/dev/null
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host opencode --output "$(ROOT)/build/generated/plugins/opencode" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host claude --runtime-root "$(ROOT)/dist/runtime/claude" --output "$(ROOT)/build/generated/plugins/claude" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host codex --runtime-root "$(ROOT)/dist/runtime/codex" --output "$(ROOT)/build/generated/plugins/codex" >/dev/null
 
@@ -40,7 +41,10 @@ generated-check:
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$(ROOT)/build/generated/plugins/grok" >/dev/null; \
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$$out/plugins/grok" >/dev/null; \
 	diff -ru "$(ROOT)/build/generated/plugins/grok" "$$out/plugins/grok"; \
-	echo "generated-check: byte-identical schemas, content bundles, and Grok package"
+	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host opencode --output "$(ROOT)/build/generated/plugins/opencode" >/dev/null; \
+	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host opencode --output "$$out/plugins/opencode" >/dev/null; \
+	diff -ru "$(ROOT)/build/generated/plugins/opencode" "$$out/plugins/opencode"; \
+	echo "generated-check: byte-identical schemas, content bundles, and Grok/OpenCode packages"
 
 content-check:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
@@ -63,6 +67,8 @@ docs-check:
 		--path docs/antigravity-support.md \
 		--path docs/cursor-support.md \
 		--path docs/grok-support.md \
+		--path docs/opencode-support.md \
+		--path docs/opencode-support.ko.md \
 		--path .github/release-notes \
 		--report build/evidence/links.json
 
@@ -82,6 +88,8 @@ smoke:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_antigravity.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_cursor.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_grok.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_opencode.py
+	@OPENSOCRATES_PYTHON="$(PYTHON)" node --test tools/opencode_bridge.test.mjs
 
 installer-check:
 	@npm test

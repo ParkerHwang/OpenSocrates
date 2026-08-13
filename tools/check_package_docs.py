@@ -180,6 +180,34 @@ GROK_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
     ),
 )
 
+OPENCODE_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (
+        "opencode_stable_same_turn_boundary_missing",
+        (
+            "Stable `chat.message` same-turn mutation",
+            "minimum verified host version of OpenCode 1.18.18",
+            "an interactive TUI receipt were all live-validated",
+            "Native skill invocation remains",
+        ),
+    ),
+    (
+        "opencode_provider_neutrality_missing",
+        (
+            "not a product dependency",
+            "credentials, endpoints, and model IDs are never embedded",
+            "no network call, subprocess call, recursive OpenCode call",
+        ),
+    ),
+    (
+        "opencode_owned_path_boundary_missing",
+        (
+            "owned bridge, its ownership sidecar",
+            "owned `opensocrates` skill directory",
+            "does not rewrite `opencode.json`",
+        ),
+    ),
+)
+
 # Wording that would restore an overstated claim.
 FORBIDDEN: tuple[tuple[str, str], ...] = (
     (
@@ -308,7 +336,7 @@ def _semantic_overclaim_errors(text: str) -> list[str]:
 
 
 def _package_readmes(root: Path) -> Iterator[tuple[str, str, Path]]:
-    for host in ("antigravity", "claude", "codex", "cursor", "grok"):
+    for host in ("antigravity", "claude", "codex", "cursor", "grok", "opencode"):
         candidates = (
             ("generated", root / "build" / "generated" / "plugins" / host / README),
             ("distributable", root / "dist" / host / README),
@@ -327,6 +355,7 @@ def _readme_errors(path: Path, host: str = "claude") -> list[str]:
         "codex": CODEX_REQUIRED,
         "cursor": CURSOR_REQUIRED,
         "grok": GROK_REQUIRED,
+        "opencode": OPENCODE_REQUIRED,
     }[host]
     errors = [
         code for code, phrases in requirements if any(_normalize(p) not in text for p in phrases)
@@ -340,7 +369,9 @@ def _readme_errors(path: Path, host: str = "claude") -> list[str]:
 def check_root(root: Path) -> dict[str, Any]:
     readmes = list(_package_readmes(root))
     present_hosts = {host for host, _label, _path in readmes}
-    missing_hosts = sorted({"antigravity", "claude", "codex", "cursor", "grok"} - present_hosts)
+    missing_hosts = sorted(
+        {"antigravity", "claude", "codex", "cursor", "grok", "opencode"} - present_hosts
+    )
     if not readmes:
         return {
             "status": "fail",

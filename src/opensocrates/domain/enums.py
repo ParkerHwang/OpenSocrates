@@ -116,6 +116,7 @@ class HostId(StrEnum):
     CURSOR_IDE = "cursor_ide"
     ANTIGRAVITY_CLI = "antigravity_cli"
     GROK_BUILD = "grok_build"
+    OPENCODE_CLI = "opencode_cli"
     PROMPT_ONLY = "prompt_only"
 
 
