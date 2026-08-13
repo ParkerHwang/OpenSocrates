@@ -695,6 +695,80 @@ class MethodAuthoring(FrozenModel):
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
+class TeacherQuestionLocales(FrozenModel):
+    """Exactly three authored prompts in each supported procedure locale."""
+
+    en: tuple[SafeText, ...] = dc_field(
+        metadata={
+            "min_items": 3,
+            "max_items": 3,
+            "unique_items": True,
+            "item_min_length": 20,
+            "item_max_length": 220,
+            "item_pattern": r"^(?!\s)(?!.*\s$)[^\r\n\u0000]+\?$",
+        }
+    )
+    ko: tuple[SafeText, ...] = dc_field(
+        metadata={
+            "min_items": 3,
+            "max_items": 3,
+            "unique_items": True,
+            "item_min_length": 20,
+            "item_max_length": 220,
+            "item_pattern": r"^(?!\s)(?!.*\s$)[^\r\n\u0000]+\?$",
+        }
+    )
+
+    def __post_init__(self) -> None:
+        FrozenModel.__post_init__(self)
+        for locale, questions in (("en", self.en), ("ko", self.ko)):
+            if len(questions) != 3 or len(set(questions)) != len(questions):
+                raise ValidationError(
+                    f"teacher question locales: {locale} requires three unique questions"
+                )
+            if any(
+                question != question.strip()
+                or not 20 <= len(question) <= 220
+                or not question.endswith("?")
+                or "\n" in question
+                or "\x00" in question
+                for question in questions
+            ):
+                raise ValidationError(f"teacher question locales: {locale} question is invalid")
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class TeacherQuestionCatalog(FrozenModel):
+    """Canonical bilingual overlay applied without changing authored method revisions."""
+
+    __schema_id__: ClassVar[str] = "opensocrates.teacher-questions/1.0.0"
+    schema: str = _schema(__schema_id__)
+    content_revision: int = dc_field(default=CONTENT_REVISION, metadata={"const": CONTENT_REVISION})
+    methods: dict[MethodId, TeacherQuestionLocales] = dc_field(
+        metadata={
+            "min_properties": 48,
+            "max_properties": 48,
+            "property_name_pattern": r"^[a-z0-9]+(?:-[a-z0-9]+)*$",
+        }
+    )
+
+    def __post_init__(self) -> None:
+        FrozenModel.__post_init__(self)
+        if self.content_revision != CONTENT_REVISION or len(self.methods) != 48:
+            raise ValidationError(
+                "teacher question catalog: overlay revision/count does not match canonical content"
+            )
+        seen: dict[str, set[str]] = {"en": set(), "ko": set()}
+        for localized in self.methods.values():
+            for locale, questions in (("en", localized.en), ("ko", localized.ko)):
+                if seen[locale].intersection(questions):
+                    raise ValidationError(
+                        f"teacher question catalog: duplicate {locale} question across methods"
+                    )
+                seen[locale].update(questions)
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
 class CompiledMethod(FrozenModel):
     __schema_id__: ClassVar[str] = "opensocrates.compiled-method/1.0.0"
     schema: str = _schema(__schema_id__)
@@ -1220,6 +1294,8 @@ _REQUIRED_FIELDS: dict[type[FrozenModel], tuple[str, ...]] = {
         "locales",
         "source_provenance",
     ),
+    TeacherQuestionLocales: ("en", "ko"),
+    TeacherQuestionCatalog: ("schema", "content_revision", "methods"),
     CompiledMethod: (
         "schema",
         "id",
@@ -1317,6 +1393,7 @@ SCHEMA_TYPES: dict[str, type[FrozenModel]] = {
     "trace-view.schema.json": TraceView,
     "local-metric.schema.json": LocalMetric,
     "method-authoring.schema.json": MethodAuthoring,
+    "teacher-questions.schema.json": TeacherQuestionCatalog,
     "compiled-method.schema.json": CompiledMethod,
     "compiled-content-bundle.schema.json": CompiledContentBundle,
     "template-example.schema.json": TemplateExample,
@@ -1365,6 +1442,8 @@ __all__ = [
     "MethodPlainAction",
     "MethodRouting",
     "MethodSourceProvenance",
+    "TeacherQuestionCatalog",
+    "TeacherQuestionLocales",
     "NormalizedEvent",
     "ParticipationDecision",
     "PolicyVersion",

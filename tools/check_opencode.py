@@ -48,7 +48,18 @@ def _assert_generated_package(root: Path) -> None:
     for forbidden in ("hooks", "bin", "runtime", "mcp.json"):
         assert not (package / forbidden).exists(), forbidden
     methods = package / "skills" / "opensocrates" / "references" / "methods"
-    assert len(list(methods.glob("*.md"))) == 48
+    method_files = sorted(methods.glob("*.md"))
+    assert len(method_files) == 48
+    skill = (package / "skills" / "opensocrates" / "SKILL.md").read_text(encoding="utf-8")
+    readme = (package / "README.md").read_text(encoding="utf-8")
+    assert "Each generated procedure begins with three authored teacher questions" in " ".join(
+        skill.split()
+    )
+    assert "preventing a duplicate question preamble" in " ".join(readme.split())
+    for method in method_files:
+        text = method.read_text(encoding="utf-8")
+        assert text.count("## Teacher questions") == 2, method.name
+        assert text.find("## Teacher questions") < text.find("## Purpose"), method.name
 
 
 def main() -> int:

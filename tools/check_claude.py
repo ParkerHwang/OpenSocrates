@@ -460,6 +460,19 @@ def test_issue_32_grounding_specifics() -> None:
         artifact = store.create("session-grounding", "turn-grounding", assembled)
         context = artifact.reference_message()
         require(
+            "A great teacher does not lecture a method." in context,
+            "teacher stance was missing from trusted context",
+        )
+        require(
+            "If every source is downstream of the same origin, what do you actually know?"
+            in context,
+            "triangulation teacher question was missing from trusted context",
+        )
+        require(
+            context.find("A great teacher") < context.find("Grounding gate"),
+            "teacher voice did not precede the grounding gate",
+        )
+        require(
             "all sources repeat one underlying dataset" in context,
             "triangulation's dependent-source exclusion was not in trusted context",
         )
@@ -1707,6 +1720,30 @@ def test_single_user_facing_entry() -> None:
         "references/catalog.md" in skill,
         "the single Claude skill does not route to its internal catalog",
     )
+    package = ROOT / "build" / "generated" / "plugins" / "claude"
+    generated_skill = (package / "skills" / "opensocrates" / "SKILL.md").read_text(encoding="utf-8")
+    generated_readme = (package / "README.md").read_text(encoding="utf-8")
+    require(
+        "Settle each selected method's teacher questions for yourself"
+        in " ".join(generated_skill.split()),
+        "generated Claude skill does not direct internal teacher-question reasoning",
+    )
+    require(
+        "questions to settle" in " ".join(generated_readme.split()),
+        "generated Claude package does not document the hidden question-led context",
+    )
+    methods = sorted((package / "skills" / "opensocrates" / "references" / "methods").glob("*.md"))
+    require(len(methods) == 48, "generated Claude package does not contain all 48 methods")
+    for method in methods:
+        text = method.read_text(encoding="utf-8")
+        require(
+            text.count("## Teacher questions") == 2,
+            f"generated Claude method has the wrong teacher-question count: {method.name}",
+        )
+        require(
+            text.find("## Teacher questions") < text.find("## Purpose"),
+            f"generated Claude method does not lead with teacher questions: {method.name}",
+        )
 
 
 @check("CLAUDE-13-real-selector-is-opt-in")

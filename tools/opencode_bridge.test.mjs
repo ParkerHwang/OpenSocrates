@@ -83,8 +83,38 @@ test("injects one complete grounded procedure in place for judgment work", async
   assert.match(injected.id, /^prt/);
   assert.equal(injected.metadata.opensocrates.marker, "opensocrates.same-turn/1");
   assert.equal(injected.metadata.opensocrates.method, "trade-off-analysis");
+  const question = "Which criteria cannot be improved together, and who decided they both matter?";
+  assert.ok(injected.text.indexOf("## Teacher questions") >= 0);
+  assert.ok(injected.text.indexOf("## Teacher questions") < injected.text.indexOf("## Purpose"));
+  assert.equal(injected.text.match(/## Teacher questions/gu)?.length, 1);
+  assert.equal(injected.text.split(question).length - 1, 1);
   assert.match(injected.text, /## Procedure/u);
   assert.match(injected.text, /OpenSocrates grounding: trade-off-analysis@1/u);
+});
+
+test("native fallback reads the same question-led procedure without bridge duplication", async () => {
+  const bundle = JSON.parse(
+    await readFile(join(output, "content", "compiled-content.bundle.json"), "utf8"),
+  );
+  const canonical = bundle.methods.find((method) => method.id === "trade-off-analysis");
+  assert.ok(canonical);
+  const nativeMethod = await readFile(
+    join(
+      output,
+      "skills",
+      "opensocrates",
+      "references",
+      "methods",
+      "trade-off-analysis.md",
+    ),
+    "utf8",
+  );
+  assert.ok(nativeMethod.includes(canonical.procedure.en));
+  assert.ok(canonical.procedure.en.startsWith("## Teacher questions"));
+  assert.ok(canonical.procedure.en.indexOf("## Teacher questions") < canonical.procedure.en.indexOf("## Purpose"));
+
+  const explicit = await invoke(partsFor("/opensocrates compare these options."));
+  assert.equal(explicit.length, 1, "explicit native fallback also received bridge context");
 });
 
 test("keeps mechanical and explicit native-skill prompts unchanged", async () => {
@@ -153,6 +183,8 @@ test("selects Korean content from the current prompt", async () => {
   const parts = await invoke(partsFor("반복되는 실패의 근본 원인을 진단해 주세요."));
   assert.equal(parts.length, 2);
   assert.equal(parts[1].metadata.opensocrates.method, "root-cause-analysis");
+  assert.ok(parts[1].text.indexOf("## Teacher questions") < parts[1].text.indexOf("## Purpose"));
+  assert.equal(parts[1].text.match(/## Teacher questions/gu)?.length, 1);
   assert.match(parts[1].text, /전체|원인|절차/u);
 });
 

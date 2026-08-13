@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from ..domain.models import (
@@ -11,8 +11,11 @@ from ..domain.models import (
     ReasoningContentProjections,
     SelectionCatalog,
     SelectionCatalogEntry,
+    TeacherQuestionCatalog,
     TemplateExample,
 )
+from ..domain.validation import model_from_dict
+from ..version import CONTENT_REVISION
 from .hashes import normalize_markdown
 from .schema import (
     CASES_SCHEMA,
@@ -34,6 +37,11 @@ PROCEDURE_HEADINGS = (
     "Stop conditions",
     "Complement handoff",
 )
+TEACHER_QUESTION_HEADING = "Teacher questions"
+TEACHER_QUESTION_COUNT = 3
+TEACHER_QUESTION_MIN_CHARS = 20
+TEACHER_QUESTION_MAX_CHARS = 220
+TEACHER_QUESTIONS_SCHEMA = "opensocrates.teacher-questions/1.0.0"
 _CASE_FIELDS = {
     "id",
     "kind",
@@ -218,10 +226,98 @@ def _template_examples(cases: Mapping[str, Any]) -> tuple[TemplateExample, ...]:
     )
 
 
+def attach_teacher_questions(procedure: str, questions: Sequence[str]) -> str:
+    """Prefix authored teacher questions without altering the validated procedure body."""
+
+    if len(questions) != TEACHER_QUESTION_COUNT:
+        raise ContentValidationError("teacher questions: expected exactly three questions")
+    bullets = "\n".join(f"- {question}" for question in questions)
+    return normalize_markdown(f"## {TEACHER_QUESTION_HEADING}\n\n{bullets}\n\n{procedure}")
+
+
+def _validate_question_list(value: Any, path: str) -> tuple[str, ...]:
+    if not isinstance(value, list) or len(value) != TEACHER_QUESTION_COUNT:
+        raise ContentValidationError(f"{path}: expected {TEACHER_QUESTION_COUNT} questions")
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for index, raw in enumerate(value):
+        item_path = f"{path}[{index}]"
+        if not isinstance(raw, str):
+            raise ContentValidationError(f"{item_path}: expected text")
+        question = raw.strip()
+        if question != raw:
+            raise ContentValidationError(f"{item_path}: surrounding whitespace is not allowed")
+        length = len(question)
+        if not TEACHER_QUESTION_MIN_CHARS <= length <= TEACHER_QUESTION_MAX_CHARS:
+            raise ContentValidationError(
+                f"{item_path}: expected {TEACHER_QUESTION_MIN_CHARS}-{TEACHER_QUESTION_MAX_CHARS} characters"
+            )
+        if not question.endswith("?"):
+            raise ContentValidationError(f"{item_path}: must end with a question mark")
+        if "\n" in question or "\x00" in question:
+            raise ContentValidationError(f"{item_path}: must be a single line")
+        if question in seen:
+            raise ContentValidationError(f"{item_path}: duplicate question")
+        seen.add(question)
+        normalized.append(question)
+    return tuple(normalized)
+
+
+def validate_teacher_question_catalog(  # noqa: C901 - explicit malformed-shape diagnostics
+    value: Any,
+) -> dict[str, dict[str, tuple[str, ...]]]:
+    """Validate the bilingual teacher-question catalog for the frozen 48 methods."""
+
+    if not isinstance(value, Mapping):
+        raise ContentValidationError("teacher-questions: expected an object")
+    data = dict(value)
+    if set(data) != {"schema", "content_revision", "methods"}:
+        raise ContentValidationError(
+            "teacher-questions: expected schema, content revision, methods"
+        )
+    if data["schema"] != TEACHER_QUESTIONS_SCHEMA:
+        raise ContentValidationError("teacher-questions.schema: unsupported schema")
+    if data["content_revision"] != CONTENT_REVISION:
+        raise ContentValidationError(
+            f"teacher-questions.content_revision: expected {CONTENT_REVISION}"
+        )
+    try:
+        model_from_dict(TeacherQuestionCatalog, data)
+    except Exception as exc:
+        raise ContentValidationError(f"teacher-questions: domain contract: {exc}") from exc
+    methods = data["methods"]
+    if not isinstance(methods, Mapping):
+        raise ContentValidationError("teacher-questions.methods: expected an object")
+    if set(methods) != set(FROZEN_METHOD_IDS):
+        raise ContentValidationError(
+            "teacher-questions.methods: expected exactly the frozen 48 IDs"
+        )
+    catalog: dict[str, dict[str, tuple[str, ...]]] = {}
+    seen_by_locale: dict[str, set[str]] = {"en": set(), "ko": set()}
+    for method_id in FROZEN_METHOD_IDS:
+        localized = methods[method_id]
+        if not isinstance(localized, Mapping) or set(localized) != {"en", "ko"}:
+            raise ContentValidationError(f"teacher-questions.{method_id}: expected en and ko")
+        catalog[method_id] = {}
+        for locale in ("en", "ko"):
+            questions = _validate_question_list(
+                localized[locale], f"teacher-questions.{method_id}.{locale}"
+            )
+            duplicates = seen_by_locale[locale].intersection(questions)
+            if duplicates:
+                raise ContentValidationError(
+                    f"teacher-questions.{method_id}.{locale}: duplicate question across catalog"
+                )
+            seen_by_locale[locale].update(questions)
+            catalog[method_id][locale] = questions
+    return catalog
+
+
 def compile_method_content_projections(
     authoring: Mapping[str, Any],
     procedures: Mapping[str, str],
     cases_by_locale: Mapping[str, Any],
+    teacher_questions: Mapping[str, Sequence[str]] | None = None,
 ) -> tuple[SelectionCatalogEntry, tuple[InjectableReasoningContent, ...]]:
     """Project one validated method into compact selector data and injectable source text.
 
@@ -286,7 +382,7 @@ def compile_method_content_projections(
             content_revision=content_revision,
             locale=locale,
             display_name=data["display_name"][locale],
-            theory=normalized_procedures[locale],
+            theory=_theory_with_questions(normalized_procedures[locale], teacher_questions, locale),
             template_examples=_template_examples(normalized_cases[locale]),
         )
         for locale in ("en", "ko")
@@ -321,13 +417,33 @@ def build_reasoning_content_projections(
     return projections
 
 
-def compile_method(authoring: Mapping[str, Any], procedures: Mapping[str, str]) -> dict[str, Any]:
+def _theory_with_questions(
+    procedure: str,
+    teacher_questions: Mapping[str, Sequence[str]] | None,
+    locale: str,
+) -> str:
+    if teacher_questions is None:
+        return procedure
+    if locale not in teacher_questions:
+        raise ContentValidationError(f"teacher questions: missing {locale}")
+    return attach_teacher_questions(procedure, teacher_questions[locale])
+
+
+def compile_method(
+    authoring: Mapping[str, Any],
+    procedures: Mapping[str, str],
+    teacher_questions: Mapping[str, Sequence[str]] | None = None,
+) -> dict[str, Any]:
     data = validate_method_authoring(authoring)
     method_id = data["id"]
     if set(procedures) != {"en", "ko"}:
         raise ContentValidationError(f"{method_id}.procedure: expected en and ko")
     normalized = {
-        locale: validate_procedure(procedures[locale], method_id=method_id, locale=locale)
+        locale: _theory_with_questions(
+            validate_procedure(procedures[locale], method_id=method_id, locale=locale),
+            teacher_questions,
+            locale,
+        )
         for locale in ("en", "ko")
     }
     fragments = {

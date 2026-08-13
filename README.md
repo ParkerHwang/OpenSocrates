@@ -12,12 +12,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 OpenSocrates is a local integration and authored reasoning framework for
-Claude, Codex, Grok Build, and OpenCode. It detects requests that benefit from deliberate reasoning,
-uses a fresh host-native selector to choose relevant systems, and adds their
-complete theory and examples to the active task. Straightforward factual and
-mechanical work can pass through unchanged.
+Google Antigravity, Claude, Codex, Cursor, Grok Build, and OpenCode. It preserves
+each host's delivery model: Claude/Codex hidden trusted context leads with
+teacher questions, Antigravity/Cursor/Grok expose question-led complete
+procedures through skills, and OpenCode injects one such procedure in the same
+turn with the native skill as fallback. Straightforward factual and mechanical
+work can pass through unchanged.
 
-Version `1.2.0` adds first-class OpenCode support to the 48 reasoning systems,
+Version `1.2.0` added first-class OpenCode support to the 48 reasoning systems,
 including stable same-turn activation, a native skill fallback, coordinated
 multi-host lifecycle management, and opt-in automatic updates on
 Apple-silicon macOS (`darwin-arm64`). It uses your existing host login and does
@@ -27,11 +29,11 @@ The native plugin archives intentionally ship only `bin/launch.sh`. That
 launcher accepts `darwin-arm64` only; macOS Intel, Linux, and Windows launchers
 and runtimes are not shipped or supported in this release.
 
-> **Latest release: OpenSocrates 1.2.0.** It adds experimental Antigravity and
-> Cursor skill packages, live-validated native Grok Build support, and OpenCode
-> 1.18.18+ with a stable `chat.message` bridge and native Agent Skill fallback.
-> Upgrade managed hosts together with
-> `npx --yes opensocrates@1.2.0 update --host all`.
+> **Latest release: OpenSocrates 1.2.1.** It adds a committed, mutation-tested
+> v1.2 adjudication snapshot and a bilingual three-question teacher overlay
+> across all six host packages while preserving each host's real delivery and
+> evidence boundary. Upgrade managed hosts together with
+> `npx --yes opensocrates@1.2.1 update --host all`.
 
 ## Host support
 
@@ -94,7 +96,7 @@ before registering an owner-marked managed marketplace.
 ### Install every ready host
 
 ```bash
-npx --yes opensocrates@1.2.0 install --host all
+npx --yes opensocrates@1.2.1 install --host all
 ```
 
 The all-host path detects supported, authenticated host CLIs, completes every
@@ -106,9 +108,9 @@ registration.
 Use the same host value for the complete lifecycle:
 
 ```bash
-npx --yes opensocrates@1.2.0 status --host all
-npx --yes opensocrates@1.2.0 update --host all
-npx --yes opensocrates@1.2.0 remove --host all
+npx --yes opensocrates@1.2.1 status --host all
+npx --yes opensocrates@1.2.1 update --host all
+npx --yes opensocrates@1.2.1 remove --host all
 ```
 
 A private `~/.opensocrates/desired-state.json` manifest records the selected
@@ -121,13 +123,13 @@ automatic update, and per-host drift.
 Codex remains the default host for backward compatibility:
 
 ```bash
-npx --yes opensocrates@1.2.0 install
-# Equivalent: npx --yes opensocrates@1.2.0 install --host codex
-npx --yes opensocrates@1.2.0 install --host antigravity
-npx --yes opensocrates@1.2.0 install --host claude
-npx --yes opensocrates@1.2.0 install --host cursor
-npx --yes opensocrates@1.2.0 install --host grok
-npx --yes opensocrates@1.2.0 install --host opencode
+npx --yes opensocrates@1.2.1 install
+# Equivalent: npx --yes opensocrates@1.2.1 install --host codex
+npx --yes opensocrates@1.2.1 install --host antigravity
+npx --yes opensocrates@1.2.1 install --host claude
+npx --yes opensocrates@1.2.1 install --host cursor
+npx --yes opensocrates@1.2.1 install --host grok
+npx --yes opensocrates@1.2.1 install --host opencode
 ```
 
 Antigravity installs a content-only plugin at
@@ -167,9 +169,9 @@ commands. The privacy-safe 2.1.226 fixture is under
 ### Opt-in automatic updates
 
 ```bash
-npx --yes opensocrates@1.2.0 auto-update enable --host all
-npx --yes opensocrates@1.2.0 auto-update status
-npx --yes opensocrates@1.2.0 auto-update disable
+npx --yes opensocrates@1.2.1 auto-update enable --host all
+npx --yes opensocrates@1.2.1 auto-update status
+npx --yes opensocrates@1.2.1 auto-update disable
 ```
 
 Automatic updates are disabled until explicitly enabled. The macOS LaunchAgent
@@ -192,7 +194,7 @@ workspace paths. `auto-update disable` unloads and removes the LaunchAgent;
 ### Claude web and Desktop Chat skills
 
 These surfaces support plugin skills but not hooks. Download
-`opensocrates-1.2.0-claude-chat-skills.zip` from the release and upload it from
+`opensocrates-1.2.1-claude-chat-skills.zip` from the release and upload it from
 Claude's **Customize → Skills → Upload skill** UI. The ZIP contains one
 top-level `opensocrates/` folder with `SKILL.md` directly inside, as required by
 the skill uploader. The package exposes exactly one
@@ -206,26 +208,26 @@ because Chat does not execute plugin hooks. See Anthropic's
 The same host option works without the npm registry:
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.0 install --host all
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.0 install --host antigravity
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.0 install --host claude
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.0 install --host codex
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.0 install --host cursor
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.0 install --host grok
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.0 install --host opencode
+npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host all
+npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host antigravity
+npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host claude
+npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host cursor
+npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host grok
+npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host opencode
 ```
 
 ### Manual release verification
 
 Download `opensocrates.mjs`, the host package, and its `.sha256` file from the
-[v1.2.0 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.2.0).
+[v1.2.1 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.2.1).
 For Claude, for example:
 
 ```bash
-shasum -a 256 -c opensocrates-1.2.0-claude-plugin.zip.sha256
+shasum -a 256 -c opensocrates-1.2.1-claude-plugin.zip.sha256
 node opensocrates.mjs install --host claude \
-  --asset opensocrates-1.2.0-claude-plugin.zip \
-  --checksum opensocrates-1.2.0-claude-plugin.zip.sha256
+  --asset opensocrates-1.2.1-claude-plugin.zip \
+  --checksum opensocrates-1.2.1-claude-plugin.zip.sha256
 ```
 
 Replace `claude` with `antigravity`, `codex`, `cursor`, `grok`, or `opencode` for the matching package.
@@ -240,7 +242,7 @@ what is installed, remove it explicitly:
 ```bash
 claude plugin uninstall opensocrates@OpenSocrates --scope user
 claude plugin marketplace remove OpenSocrates --scope user
-npx --yes opensocrates@1.2.0 install --host claude
+npx --yes opensocrates@1.2.1 install --host claude
 ```
 
 Updating a managed v1.1.0 Claude installation replaces the complete package
@@ -249,24 +251,33 @@ commands are therefore removed rather than left visible as stale entries.
 
 ## Use
 
-Use Claude, Codex, or OpenCode normally. Before a submitted prompt, OpenSocrates may
-intervene when the request needs judgment, interpretation, diagnosis,
-explanation, planning, evidence reconciliation, or another structured
-reasoning process. On Claude/Codex native-runtime surfaces it:
+Use any supported host normally. OpenSocrates may participate when a request
+needs judgment, interpretation, diagnosis, explanation, planning, evidence
+reconciliation, or another structured reasoning process. On Claude/Codex
+native-runtime surfaces it:
 
 1. starts a fresh, non-persistent selector in the current host;
 2. chooses from the authored 48-system catalog;
 3. writes the complete selected content to an owner-only Markdown file;
-4. adds a bounded hidden context message with each method ID, content revision,
-   and, when they fit, its exact `Do not use when` and `Stop conditions`; and
+4. adds a bounded hidden context message that leads with teacher questions to
+   settle, then each method ID, content revision, and, when they fit, its exact
+   `Do not use when` and `Stop conditions`; and
 5. requires the active task to read the complete file before applying the
    method and to end a grounded response with an exact audit line such as
    `OpenSocrates grounding: triangulation@1`.
 
 On OpenCode, the dependency-free stable hook instead selects locally and
-injects one complete authored procedure directly into the same message turn;
-it creates no artifact and makes no extra model call. See the
+injects one complete authored procedure directly into the same message turn.
+That compiled procedure starts with its three teacher questions, and the native
+`/opensocrates` fallback reads the same procedure without a duplicate preamble;
+the bridge creates no artifact and makes no extra model call. See the
 [OpenCode support boundary](docs/opencode-support.md).
+
+Antigravity and Cursor use their explicit content skills; Grok Build uses native
+skill selection or `/opensocrates`. In all three packages, a generated complete
+procedure begins with teacher questions for the active agent to settle before
+using the rest as a check. These content-only paths make no OpenSocrates hook
+delivery claim.
 
 After installing for Codex, open one interactive Codex session and approve the
 OpenSocrates hooks before relying on automatic selection. Until that one-time
@@ -436,6 +447,7 @@ make release-check
 | `plugin-src/antigravity/` | Experimental Antigravity content-only plugin templates |
 | `plugin-src/cursor/` | Experimental Cursor Agent Plugin templates |
 | `plugin-src/grok/` | Native Grok Build content-only plugin templates |
+| `plugin-src/opencode/` | OpenCode stable bridge and native skill templates |
 | `schemas/source/` | Canonical schema definitions |
 | `schemas/v1/` | Generated, versioned public schemas |
 | `installer/` | Dependency-free Node.js GitHub/npx installer |

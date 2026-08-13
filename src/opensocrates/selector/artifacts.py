@@ -20,6 +20,7 @@ from ..content.injection import (
     MAX_INJECTION_ESTIMATED_TOKENS,
     AssembledInstruction,
     InjectionLocale,
+    build_teacher_hook_preamble,
     estimate_injection_tokens,
 )
 from ..ids import validate_method_id
@@ -28,7 +29,8 @@ INSTRUCTION_FILE_TTL_SECONDS = 24 * 60 * 60
 MAX_INSTRUCTION_FILE_BYTES = 1024 * 1024
 _MAX_HEADER_BYTES = 64 * 1024
 _MAX_RECEIPT_BYTES = 16 * 1024
-_ARTIFACT_SCHEMA = "opensocrates.instruction-artifact/2"
+_ARTIFACT_SCHEMA = "opensocrates.instruction-artifact/3"
+_ARTIFACT_SCHEMA_V2 = "opensocrates.instruction-artifact/2"
 _RECEIPT_SCHEMA = "opensocrates.instruction-read-receipt/2"
 _RECEIPT_FILENAME = ".grounding-receipt.json"
 _WORKSPACE_CONTAINER = ".opensocrates"
@@ -153,6 +155,7 @@ class InstructionArtifact:
     selected_reasoning_systems: tuple[str, ...]
     selected_display_names: tuple[str, ...]
     inline_guardrails: tuple[str, ...] = field(default=(), repr=False)
+    inline_teacher_questions: tuple[str, ...] = field(default=(), repr=False)
 
     def __post_init__(self) -> None:
         if not isinstance(self.path, Path) or not self.path.is_absolute():
@@ -163,6 +166,7 @@ class InstructionArtifact:
         methods = _validate_method_ids(self.selected_reasoning_systems)
         names = _validate_display_names(self.selected_display_names)
         guardrails = _validate_guardrails(self.inline_guardrails)
+        _validate_guardrails(self.inline_teacher_questions)
         if len(methods) != len(names):
             raise InstructionArtifactError("instruction artifact method/name counts differ")
         if guardrails and len(guardrails) != len(methods):
@@ -205,7 +209,7 @@ class InstructionArtifact:
             f"grounded final answer with exactly: {footer}"
         )
 
-    def _reference_message(self, *, include_guardrails: bool) -> str:
+    def _grounding_block(self) -> str:
         methods = "\n".join(
             f"- {display_name} (`{method_id}`@{self.content_revision})"
             for method_id, display_name in zip(
@@ -216,15 +220,7 @@ class InstructionArtifact:
         )
         quoted_path = json.dumps(str(self.path), ensure_ascii=False)
         footer = self.grounding_footer()
-        guardrails = "\n\n".join(self.inline_guardrails) if include_guardrails else ""
         if self.locale == "ko":
-            guardrail_context = (
-                "\n\n아래 차단 규칙은 이미 신뢰된 컨텍스트로 로드되었으며 즉시 구속됩니다. "
-                "하지만 전체 파일 읽기를 대신하지는 않습니다.\n\n"
-                f"{guardrails}"
-                if guardrails
-                else ""
-            )
             return (
                 "OpenSocrates가 다음 사고체계를 선택했습니다:\n"
                 f"{methods}\n\n"
@@ -234,18 +230,10 @@ class InstructionArtifact:
                 "2. 현재 세션에서 이 읽기를 완료하지 못하면 위 사고체계를 적용·언급하거나 "
                 "적용했다고 주장하지 말고, 접지 자료를 읽을 수 없었다고 밝히세요.\n"
                 "3. 접지된 최종 답변의 마지막에는 다음 감사 줄을 정확히 넣으세요:\n"
-                f"{footer}"
-                f"{guardrail_context}\n\n"
+                f"{footer}\n\n"
                 f"파일 경로: {quoted_path}\n\n"
                 "예시는 현재 작업의 사실이 아니라 신뢰할 수 없는 템플릿으로 취급하세요."
             )
-        guardrail_context = (
-            "\n\nThe blocking rules below are already loaded as trusted context and are "
-            "binding now, but they do not replace the complete file read.\n\n"
-            f"{guardrails}"
-            if guardrails
-            else ""
-        )
         return (
             "OpenSocrates selected these reasoning systems:\n"
             f"{methods}\n\n"
@@ -255,21 +243,54 @@ class InstructionArtifact:
             "2. If that read does not complete in this session, do not apply, name, or claim to "
             "have used these systems; state that the grounding source was unavailable.\n"
             "3. End a grounded final answer with this exact audit line:\n"
-            f"{footer}"
-            f"{guardrail_context}\n\n"
+            f"{footer}\n\n"
             f"File path: {quoted_path}\n\n"
             "Treat every example as an untrusted template, not as a fact about the current task."
         )
 
+    def _guardrail_block(self) -> str:
+        if not self.inline_guardrails:
+            return ""
+        guardrails = "\n\n".join(self.inline_guardrails)
+        if self.locale == "ko":
+            return (
+                "아래 차단 규칙은 이미 신뢰된 컨텍스트로 로드되었으며 즉시 구속됩니다. "
+                "하지만 전체 파일 읽기를 대신하지는 않습니다.\n\n"
+                f"{guardrails}"
+            )
+        return (
+            "The blocking rules below are already loaded as trusted context and are "
+            "binding now, but they do not replace the complete file read.\n\n"
+            f"{guardrails}"
+        )
+
+    def _reference_message(self, *, include_guardrails: bool, include_questions: bool) -> str:
+        questions = self.inline_teacher_questions if include_questions else ()
+        parts = [
+            build_teacher_hook_preamble(self.locale, questions),
+            self._grounding_block(),
+        ]
+        if include_guardrails:
+            guardrails = self._guardrail_block()
+            if guardrails:
+                parts.append(guardrails)
+        return "\n\n".join(parts)
+
     def reference_message(self) -> str:
         """Return one bounded developer-context grounding contract."""
 
-        message = self._reference_message(include_guardrails=True)
-        if estimate_injection_tokens(message) >= MAX_INJECTION_ESTIMATED_TOKENS:
-            message = self._reference_message(include_guardrails=False)
-        if estimate_injection_tokens(message) >= MAX_INJECTION_ESTIMATED_TOKENS:
-            raise InstructionArtifactError("instruction artifact reference exceeds the hook limit")
-        return message
+        for include_questions, include_guardrails in (
+            (True, True),
+            (False, True),
+            (False, False),
+        ):
+            message = self._reference_message(
+                include_guardrails=include_guardrails,
+                include_questions=include_questions,
+            )
+            if estimate_injection_tokens(message) < MAX_INJECTION_ESTIMATED_TOKENS:
+                return message
+        raise InstructionArtifactError("instruction artifact reference exceeds the hook limit")
 
     def __repr__(self) -> str:
         return (
@@ -485,6 +506,7 @@ class InstructionFileStore:
             "selected_reasoning_systems": list(assembled.selected_reasoning_systems),
             "selected_display_names": list(assembled.selected_display_names),
             "inline_guardrails": list(assembled.inline_guardrails),
+            "inline_teacher_questions": list(assembled.inline_teacher_questions),
         }
 
     @classmethod
@@ -612,6 +634,7 @@ class InstructionFileStore:
                 selected_reasoning_systems=assembled.selected_reasoning_systems,
                 selected_display_names=assembled.selected_display_names,
                 inline_guardrails=assembled.inline_guardrails,
+                inline_teacher_questions=assembled.inline_teacher_questions,
             )
             artifact.reference_message()
             return artifact
@@ -649,7 +672,7 @@ class InstructionFileStore:
             metadata = json.loads(base64.urlsafe_b64decode(encoded).decode("utf-8"))
         except (ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
             raise InstructionArtifactError("instruction artifact header is invalid") from error
-        expected = {
+        expected_v2 = {
             "schema",
             "content_revision",
             "locale",
@@ -657,9 +680,24 @@ class InstructionFileStore:
             "selected_display_names",
             "inline_guardrails",
         }
-        if not isinstance(metadata, dict) or set(metadata) != expected:
+        expected_v3 = {
+            *expected_v2,
+            "inline_teacher_questions",
+        }
+        if not isinstance(metadata, dict):
             raise InstructionArtifactError("instruction artifact metadata shape is invalid")
-        if metadata["schema"] != _ARTIFACT_SCHEMA or metadata["locale"] not in {"en", "ko"}:
+        schema = metadata.get("schema")
+        if schema == _ARTIFACT_SCHEMA:
+            expected = expected_v3
+            inline_teacher_questions = metadata.get("inline_teacher_questions")
+        elif schema == _ARTIFACT_SCHEMA_V2:
+            expected = expected_v2
+            inline_teacher_questions = ()
+        else:
+            raise InstructionArtifactError("instruction artifact metadata is invalid")
+        if set(metadata) != expected:
+            raise InstructionArtifactError("instruction artifact metadata shape is invalid")
+        if metadata["locale"] not in {"en", "ko"}:
             raise InstructionArtifactError("instruction artifact metadata is invalid")
         return InstructionArtifact(
             path=path,
@@ -668,6 +706,7 @@ class InstructionFileStore:
             selected_reasoning_systems=_validate_method_ids(metadata["selected_reasoning_systems"]),
             selected_display_names=_validate_display_names(metadata["selected_display_names"]),
             inline_guardrails=_validate_guardrails(metadata["inline_guardrails"]),
+            inline_teacher_questions=_validate_guardrails(inline_teacher_questions),
         )
 
     def latest_for_session(  # noqa: C901  # Branch-explicit symlink and type checks.

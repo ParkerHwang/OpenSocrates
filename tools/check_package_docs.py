@@ -72,6 +72,13 @@ CLAUDE_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
         ),
     ),
     (
+        "claude_readme_teacher_questions_missing",
+        (
+            "deterministically assembles the selected teacher questions",
+            "hidden `additionalContext` message that leads with teacher questions",
+        ),
+    ),
+    (
         "claude_readme_grounding_privacy_missing",
         (
             "complete Read response is checked only in memory",
@@ -106,6 +113,10 @@ CODEX_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
             "no live Codex hook-delivery receipt",
         ),
     ),
+    (
+        "codex_readme_teacher_questions_missing",
+        ("message containing teacher questions to settle",),
+    ),
 )
 
 CURSOR_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
@@ -128,6 +139,13 @@ CURSOR_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
         (
             "There is no launcher, native runtime, executable, hook, MCP server",
             "background service",
+        ),
+    ),
+    (
+        "cursor_readme_teacher_questions_missing",
+        (
+            "complete procedure begins with three authored teacher questions",
+            "content-only skill behavior, not an OpenSocrates hook claim",
         ),
     ),
 )
@@ -156,6 +174,13 @@ ANTIGRAVITY_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
             "refuses to replace a directory without its exact ownership marker",
         ),
     ),
+    (
+        "antigravity_readme_teacher_questions_missing",
+        (
+            "complete procedure begins with three authored teacher questions",
+            "content delivered by the skill, not hidden hook injection",
+        ),
+    ),
 )
 
 GROK_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
@@ -176,7 +201,17 @@ GROK_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
     ),
     (
         "grok_readme_grounding_gate_missing",
-        ("complete procedure must be read in the current conversation",),
+        (
+            "complete procedure, including its leading teacher questions, must be read in "
+            "the current conversation",
+        ),
+    ),
+    (
+        "grok_readme_teacher_questions_missing",
+        (
+            "complete procedure begins with three authored teacher questions",
+            "does not claim OpenSocrates hook injection",
+        ),
     ),
 )
 
@@ -204,6 +239,14 @@ OPENCODE_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
             "owned bridge, its ownership sidecar",
             "owned `opensocrates` skill directory",
             "does not rewrite `opencode.json`",
+        ),
+    ),
+    (
+        "opencode_teacher_question_delivery_missing",
+        (
+            "first section contains its three authored teacher questions",
+            "same generated question-led procedure",
+            "preventing a duplicate question preamble",
         ),
     ),
 )

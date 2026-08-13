@@ -5,6 +5,37 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-08-13
+
+### Added
+
+- A committed v1.2 adjudication snapshot records 51 EN/KO semantic pairs,
+  49 resolved disagreements, strict Draft 2020-12 schemas, aggregate counts,
+  and hashes. Its clean-clone validator and mutation suite check only public
+  repository artifacts; maintainer-held packet, reviewer, and raw-result
+  evidence remains explicitly unavailable in public mode.
+
+### Changed
+
+- All six generated host packages now carry the same bilingual, three-question
+  teacher overlay while preserving their real delivery models: hidden trusted
+  hook context for Claude/Codex, explicit content reads for Antigravity/Cursor,
+  native skill content for Grok Build, and one question-led compiled procedure
+  with the same native fallback for OpenCode.
+- Hook budget fallback now drops teacher questions before binding guardrails,
+  instruction artifact schema `/3` reads in-flight `/2` headers with an empty
+  question default, and empty or malformed question data no longer refers to
+  absent questions.
+- The teacher-question source now has a generated canonical schema and explicit
+  overlay identity checks without changing authored per-method content revision
+  `1`.
+
+### Security and privacy
+
+- Release-package checks reject evaluation or adjudication paths in every host
+  and Claude Chat ZIP. The npm package remains restricted to the installer and
+  its public release documents, so source evaluation artifacts do not ship.
+
 ## [1.2.0] - 2026-08-13
 
 ### Added
@@ -389,3 +420,4 @@ All notable changes to OpenSocrates are documented here. This project follows
 [1.1.4]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.3...v1.1.4
 [1.1.5]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.4...v1.1.5
 [1.2.0]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.5...v1.2.0
+[1.2.1]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.2.0...v1.2.1

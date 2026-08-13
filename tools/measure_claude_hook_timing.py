@@ -21,6 +21,7 @@ from opensocrates.constants import INSTRUCTION_ARTIFACT_END_MARKER
 from opensocrates.content.injection import AssembledInstruction
 from opensocrates.persistence import DataRootConfig, TurnStateStore, ensure_data_root
 from opensocrates.selector import InstructionFileStore
+from opensocrates.version import PRODUCT_VERSION
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = "darwin-arm64"
@@ -259,7 +260,7 @@ def measure(package: Path, runs: int) -> dict[str, Any]:
     manifest_path = package / "release-manifest.json"
     manifest_bytes = manifest_path.read_bytes()
     manifest = json.loads(manifest_bytes.decode("utf-8"))
-    if manifest.get("product_version") != "1.1.2" or manifest.get("host") != "claude":
+    if manifest.get("product_version") != PRODUCT_VERSION or manifest.get("host") != "claude":
         raise TimingError("package_identity_mismatch")
     if TARGET not in manifest.get("runtime_targets", []):
         raise TimingError("darwin_arm64_runtime_missing")
@@ -282,7 +283,7 @@ def measure(package: Path, runs: int) -> dict[str, Any]:
         "schema": "opensocrates.claude-hook-timing/1.0.0",
         "generated_at": _now(),
         "status": "pass" if sufficient else "fail",
-        "product_version": "1.1.2",
+        "product_version": PRODUCT_VERSION,
         "target": TARGET,
         "environment": {
             "system": platform.system(),

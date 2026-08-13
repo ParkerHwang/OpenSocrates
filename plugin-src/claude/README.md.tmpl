@@ -87,16 +87,17 @@ accept managed-hook visibility of the selector prompt should not enable
 OpenSocrates selection on those machines.
 
 The candidate chooses IDs only. OpenSocrates discards candidate instruction
-text and deterministically assembles the selected authored theory and examples.
-Complete content is written to an owner-only Markdown file. Claude hook
+text and deterministically assembles the selected teacher questions, theory,
+and examples. Complete content is written to an owner-only Markdown file. Claude hook
 surfaces prefer a self-ignored `.opensocrates` area inside the current
 workspace so the host can read it without another directory permission; an
 owner-only OS temporary directory remains the fail-open fallback. A backup or
 sync tool that does not honor `.gitignore` or hidden-directory conventions can
 observe this authored artifact while it exists. Claude
-receives one hidden `additionalContext` message naming that file, identifying
-each selection as `method-id@content-revision`, requiring a complete read before
-acting, and requiring the same identifiers in a final grounding audit line.
+receives one hidden `additionalContext` message that leads with teacher
+questions to settle, names that file, identifies each selection as
+`method-id@content-revision`, requires a complete read before acting, and
+requires the same identifiers in a final grounding audit line.
 When the selected methods' authored `Do not use when` and `Stop conditions` fit
 the hook context budget, those exact sections are also inlined as immediately
 binding rules; they do not replace the complete file read.

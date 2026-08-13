@@ -14,13 +14,19 @@ reasoning-method references. It contains no hooks, launcher, native runtime,
 MCP server, background process, telemetry, or automatic selector. Consequently
 it makes no extra model request merely to choose a reasoning method.
 
+On explicit skill use, each selected generated method begins with three authored
+teacher questions. The active agent settles them before using the rest of the
+complete procedure as a check and does not interview the user unless a missing
+answer would change the work. This is visible skill content, not hidden hook
+delivery.
+
 Install and manage it with the same lifecycle as the other hosts:
 
 ```bash
-npx --yes opensocrates@1.2.0 install --host antigravity
-npx --yes opensocrates@1.2.0 status --host antigravity
-npx --yes opensocrates@1.2.0 update --host antigravity
-npx --yes opensocrates@1.2.0 remove --host antigravity
+npx --yes opensocrates@1.2.1 install --host antigravity
+npx --yes opensocrates@1.2.1 status --host antigravity
+npx --yes opensocrates@1.2.1 update --host antigravity
+npx --yes opensocrates@1.2.1 remove --host antigravity
 ```
 
 The installer verifies the release checksum, the complete package checksum

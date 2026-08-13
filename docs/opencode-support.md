@@ -10,6 +10,8 @@ OpenCode automatically loads the installed bridge from
 `~/.config/opencode/plugins/opensocrates.js`. For bounded judgment-heavy user
 requests, that dependency-free bridge selects one method locally and appends
 one synthetic text part containing the method's complete authored procedure.
+That compiled procedure begins with its three authored teacher questions, then
+continues with the full grounded procedure.
 The mutation happens before message persistence and model dispatch, so the
 grounded procedure is available in the same model turn. Mechanical requests,
 explicit `/opensocrates` requests, unsupported parts, oversized inputs,
@@ -23,12 +25,19 @@ session, read credentials, or depend on a provider/model identifier. In
 particular, DeepSeek V4 Flash is a smoke-tested provider, not a hardcoded
 dependency.
 
+The native fallback reads the same generated question-led procedure used by the
+bridge. Explicit `/opensocrates` and native-skill requests bypass bridge
+activation, so OpenCode receives one question section rather than a duplicated
+preamble. The active agent settles those questions without interviewing the
+user unless a missing answer would change the work.
+
 The beta V2 plugin package is not used. The bridge targets the stable V1
 `@opencode-ai/plugin` `chat.message` contract.
 
 ## Grounding and fail-open contract
 
-The bridge can inject at most one complete authored method. It never claims a
+The bridge can inject at most one complete authored method, with its teacher
+questions before `## Purpose`. It never claims a
 method merely from catalog metadata. This preserves the OpenSocrates grounding
 contract: a method may be claimed only after its complete procedure has been
 loaded in the current conversation.
@@ -48,11 +57,11 @@ continues normally.
 Use the same lifecycle CLI as other hosts:
 
 ```sh
-npx --yes opensocrates@1.2.0 install --host opencode
-npx --yes opensocrates@1.2.0 status --host opencode
-npx --yes opensocrates@1.2.0 verify --host opencode
-npx --yes opensocrates@1.2.0 update --host opencode
-npx --yes opensocrates@1.2.0 remove --host opencode
+npx --yes opensocrates@1.2.1 install --host opencode
+npx --yes opensocrates@1.2.1 status --host opencode
+npx --yes opensocrates@1.2.1 verify --host opencode
+npx --yes opensocrates@1.2.1 update --host opencode
+npx --yes opensocrates@1.2.1 remove --host opencode
 ```
 
 `--host all` includes OpenCode. The installer owns only these exact paths:
@@ -80,7 +89,7 @@ marker, sidecar, bridge hash, and complete managed-skill inventory.
 | Behavior | Status | Basis |
 |---|---|---|
 | Deterministic package and archive inventory | Validated | Release gate and byte-identical generation tests |
-| Bridge parsing, limits, duplicate prevention, exception fail-open | Validated | Offline Node tests against the generated bridge |
+| Bridge question order, native-procedure parity, duplicate prevention, limits, exception fail-open | Validated | Offline Node tests against the generated bridge and skill procedure |
 | Install/status/verify/update/remove and unrelated-file preservation | Validated | Isolated lifecycle tests |
 | Global plugin and native skill discovery | Live validated | OpenCode 1.18.18 isolated invocation |
 | Same-turn `chat.message` mutation with the production bridge | Live validated | `opencode run` and interactive TUI on OpenCode 1.18.18 |

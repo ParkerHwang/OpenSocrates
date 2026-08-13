@@ -36,10 +36,21 @@ Node.js 20 or later is also required when changing the GitHub/npx installer.
 - Runtime code belongs under `src/opensocrates/`.
 - Canonical reasoning content belongs under `content/methods/` and must keep
   theory, public-output, evidence, stop-condition, and example boundaries
-  explicit.
+  explicit. Teacher questions for the injection voice belong in
+  `content/teacher-questions.yaml` and must stay bilingual, three per method,
+  unique within each locale, and addressed to the active agent rather than the
+  user. Its overlay `content_revision` must match the canonical content
+  revision; changing the overlay does not by itself rewrite an authored
+  method's `content_revision`. Generated procedures plus `source_tree_hash` and
+  `normalized_semantic_hash` bind the overlay into package identity.
 - Canonical schemas belong under `schemas/source/`.
-- Claude package templates belong under `plugin-src/claude/`; Codex package
-  templates belong under `plugin-src/codex/`.
+- Host package templates belong under `plugin-src/antigravity/`,
+  `plugin-src/claude/`, `plugin-src/codex/`, `plugin-src/cursor/`,
+  `plugin-src/grok/`, and `plugin-src/opencode/`. A controller, teacher-question,
+  procedure, grounding, or package-wording change must be reviewed across all
+  six trees. Preserve each host's delivery model: only Claude/Codex claim hidden
+  trusted hook context; Antigravity/Cursor/Grok are skill/content paths; OpenCode
+  injects one compiled procedure and uses the same procedure for native fallback.
 - Do not edit generated files in `schemas/v1/`,
   `content/compiled-*.json`, `build/`, or `dist/` by hand.
 - Keep English and Korean user-facing documentation semantically aligned.
@@ -63,12 +74,13 @@ make format-check
 make lint
 make generated-check
 make content-check
+make adjudication-check
 make docs-check
 make governance-check
+make package-check
 make security-scan
 make smoke
-npm test
-npm pack --dry-run
+make installer-check
 ```
 
 Native release work additionally requires Apple-silicon macOS:

@@ -8,27 +8,43 @@ paths, credentials, or exception details.
 
 from __future__ import annotations
 
+import base64
 import json
 import os
 import stat
 import subprocess
 import tempfile
 from collections.abc import Callable, Mapping
+from copy import deepcopy
 from dataclasses import dataclass, field
 from io import BytesIO, StringIO
+from itertools import combinations
 from pathlib import Path
 from typing import Literal
 from unittest.mock import patch
 
+from json_schema_2020 import check_schema as check_json_schema
+from json_schema_2020 import validate as validate_json_schema
 from opensocrates.clock import FrozenClock
+from opensocrates.content.hashes import normalized_semantic_hash, source_tree_hash
 from opensocrates.content.injection import (
+    MAX_INJECTION_ESTIMATED_TOKENS,
+    MAX_INLINE_GUARDRAIL_ESTIMATED_TOKENS,
+    MAX_INLINE_TEACHER_QUESTION_ESTIMATED_TOKENS,
     ProjectionInstructionAssembler,
     assemble_canonical_instruction,
+    assemble_requested_locale_instruction,
+    budget_teacher_questions,
+    build_teacher_hook_preamble,
+    estimate_injection_tokens,
+    extract_teacher_questions,
     resolve_injection_locale,
     resolve_prompt_locale,
     validate_candidate_instruction,
 )
 from opensocrates.content.loader import load_reasoning_content_projections
+from opensocrates.content.method import validate_teacher_question_catalog
+from opensocrates.content.schema import FROZEN_METHOD_IDS
 from opensocrates.domain.models import (
     InjectableReasoningContent,
     ReasoningContentProjections,
@@ -42,6 +58,7 @@ from opensocrates.hosts.codex.commands import build_hooks
 from opensocrates.selector.application import SelectorApplication
 from opensocrates.selector.artifacts import (
     INSTRUCTION_FILE_TTL_SECONDS,
+    InstructionArtifact,
     InstructionFileStore,
 )
 from opensocrates.selector.context import (
@@ -69,6 +86,7 @@ from opensocrates.selector.sdk_worker import (
     _thread_start_params,
     _watch_deadline,
 )
+from validate_content import parse_yaml_file
 
 _REVISION = 7
 _METHODS = ("alpha-reasoning", "beta-reasoning", "gamma-reasoning")
@@ -305,6 +323,308 @@ def _test_content_assembly() -> None:
     )
 
 
+@_check("VSC-01A-teacher-questions-lead-injection")
+def _test_teacher_questions_lead_injection() -> None:
+    projections = load_reasoning_content_projections(
+        Path("content/compiled-reasoning-content.bundle.json")
+    )
+    assembled = assemble_canonical_instruction(
+        projections,
+        ("triangulation",),
+        "synthetic English prompt",
+        expected_content_revision=projections.content_revision,
+    )
+    instructions = assembled.instructions
+    question = "If every source is downstream of the same origin, what do you actually know?"
+    _require("A great teacher does not lecture a method." in instructions)
+    _require(question in instructions)
+    _require(question in assembled.inline_teacher_questions)
+    _require(instructions.find("Questions to settle") < instructions.find("## Purpose"))
+    with tempfile.TemporaryDirectory(prefix="opensocrates-teacher-check-") as name:
+        store = InstructionFileStore(
+            installation_key=b"t" * 32,
+            directory=Path(name) / "artifacts",
+        )
+        artifact = store.create("teacher-session", "teacher-turn", assembled)
+        reference = artifact.reference_message()
+        _require(reference.find("A great teacher") < reference.find("Grounding gate"))
+        _require(question in reference)
+        _require("all sources repeat one underlying dataset" in reference)
+
+
+@_check("VSC-01B-teacher-catalog-schema-and-overlay-identity")
+def _test_teacher_catalog_schema_and_overlay_identity() -> None:
+    teacher_path = Path("content/teacher-questions.yaml")
+    raw = json.loads(teacher_path.read_text(encoding="utf-8"))
+    catalog = validate_teacher_question_catalog(raw)
+    _require(len(catalog) == 48 and tuple(catalog) == FROZEN_METHOD_IDS)
+    for locale in ("en", "ko"):
+        questions = [question for localized in catalog.values() for question in localized[locale]]
+        _require(len(questions) == 48 * 3 and len(set(questions)) == 48 * 3)
+
+    schema = json.loads(Path("schemas/v1/teacher-questions.schema.json").read_text())
+    _require(schema["$id"] == "opensocrates.teacher-questions/1.0.0")
+    _require(not check_json_schema(schema))
+    _require(schema["properties"]["content_revision"]["const"] == 1)
+    methods_schema = schema["properties"]["methods"]
+    _require(methods_schema["minProperties"] == methods_schema["maxProperties"] == 48)
+    _require(methods_schema["additionalProperties"] is False)
+    _require(set(methods_schema["properties"]) == set(FROZEN_METHOD_IDS))
+    _require(set(methods_schema["required"]) == set(FROZEN_METHOD_IDS))
+    _require("runtime-only invariant" in methods_schema["description"])
+    localized_schema = methods_schema["properties"][FROZEN_METHOD_IDS[0]]
+    _require(set(localized_schema["required"]) == {"en", "ko"})
+    for locale in ("en", "ko"):
+        questions_schema = localized_schema["properties"][locale]
+        _require(questions_schema["minItems"] == questions_schema["maxItems"] == 3)
+        _require(questions_schema["uniqueItems"] is True)
+        _require(questions_schema["items"]["minLength"] == 20)
+        _require(questions_schema["items"]["maxLength"] == 220)
+
+    schema_invalid = []
+    candidate = deepcopy(raw)
+    candidate["content_revision"] = 2
+    schema_invalid.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][FROZEN_METHOD_IDS[0]]["en"][1] = candidate["methods"][
+        FROZEN_METHOD_IDS[0]
+    ]["en"][0]
+    schema_invalid.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][FROZEN_METHOD_IDS[0]]["ko"][0] = "질문 아님"
+    schema_invalid.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"]["invented-method"] = candidate["methods"].pop(FROZEN_METHOD_IDS[0])
+    schema_invalid.append(candidate)
+    _require(all(validate_json_schema(value, schema) for value in schema_invalid))
+    manifest = parse_yaml_file(Path("schemas/source/schema-manifest.yaml"))
+    _require(
+        any(
+            entry.get("file") == "teacher-questions.schema.json"
+            and entry.get("python_type") == "opensocrates.domain.models.TeacherQuestionCatalog"
+            for entry in manifest["schemas"]
+        )
+    )
+
+    malformed: list[object] = []
+    malformed.extend(([], {**raw, "unexpected": True}, {**raw, "schema": "unknown"}))
+    malformed.append({**raw, "content_revision": 2})
+    malformed.append({**raw, "methods": []})
+
+    first, second = FROZEN_METHOD_IDS[:2]
+    candidate = deepcopy(raw)
+    candidate["methods"].pop(first)
+    malformed.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"]["unknown-method"] = deepcopy(candidate["methods"][first])
+    malformed.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"]["unknown-method"] = candidate["methods"].pop(first)
+    malformed.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][first].pop("ko")
+    malformed.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][first]["fr"] = deepcopy(candidate["methods"][first]["en"])
+    malformed.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][first]["en"] = candidate["methods"][first]["en"][:2]
+    malformed.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][first]["en"].append(
+        "A fourth valid-looking teacher question belongs nowhere here?"
+    )
+    malformed.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][first]["en"][1] = candidate["methods"][first]["en"][0]
+    malformed.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][second]["en"][0] = candidate["methods"][first]["en"][0]
+    malformed.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][first]["en"][0] = " " + candidate["methods"][first]["en"][0]
+    malformed.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][first]["en"][0] = 7
+    malformed.append(candidate)
+    candidate = deepcopy(raw)
+    candidate["methods"][first] = []
+    malformed.append(candidate)
+    for value in malformed:
+        _expect_raises(lambda value=value: validate_teacher_question_catalog(value))
+
+    bundle = json.loads(Path("content/compiled-content.bundle.json").read_text(encoding="utf-8"))
+    compiled = {method["id"]: method for method in bundle["methods"]}
+    _require(bundle["content_revision"] == raw["content_revision"] == 1)
+    for method_id, localized in catalog.items():
+        _require(compiled[method_id]["content_revision"] == raw["content_revision"])
+        for locale in ("en", "ko"):
+            procedure = compiled[method_id]["procedure"][locale]
+            _require(procedure.startswith("## Teacher questions"))
+            _require(all(question in procedure for question in localized[locale]))
+
+    semantic_fields = (
+        "content_revision",
+        "method_ids",
+        "methods",
+        "locale_messages",
+        "prompt_fragments",
+        "policy_versions",
+    )
+    projection = {key: bundle[key] for key in semantic_fields}
+    _require(normalized_semantic_hash(projection) == bundle["normalized_semantic_hash"])
+    mutated_projection = deepcopy(projection)
+    question = catalog[first]["en"][0]
+    mutated_method = next(
+        method for method in mutated_projection["methods"] if method["id"] == first
+    )
+    mutated_method["procedure"]["en"] = mutated_method["procedure"]["en"].replace(
+        question, "A different valid overlay question for identity testing?"
+    )
+    _require(normalized_semantic_hash(mutated_projection) != bundle["normalized_semantic_hash"])
+
+    canonical_tree_hash = source_tree_hash(Path("content"), parse_yaml_file)
+    _require(canonical_tree_hash == bundle["source_tree_hash"])
+
+    def mutated_loader(path: Path) -> object:
+        value = parse_yaml_file(path)
+        if path.resolve() == teacher_path.resolve():
+            value = deepcopy(value)
+            value["methods"][first]["en"][0] = (
+                "A source-overlay mutation changes identity without a revision bump?"
+            )
+        return value
+
+    _require(source_tree_hash(Path("content"), mutated_loader) != canonical_tree_hash)
+
+
+@_check("VSC-01C-teacher-empty-malformed-and-budget-fallbacks")
+def _test_teacher_empty_malformed_and_budget_fallbacks() -> None:
+    malformed_theory = (
+        "## Teacher questions\n\n- Short?\n- Still short?\n- Also short?\n\n## Purpose\nSynthetic"
+    )
+    _require(extract_teacher_questions(malformed_theory) == ())
+    _require(budget_teacher_questions(("Q" * 4_100 + "?",)) == ())
+    for locale, forbidden in (("en", "questions below"), ("ko", "아래 질문")):
+        empty = build_teacher_hook_preamble(locale, ())
+        malformed = build_teacher_hook_preamble(locale, extract_teacher_questions(malformed_theory))
+        budgeted_out = build_teacher_hook_preamble(
+            locale, budget_teacher_questions(("Q" * 4_100 + "?",))
+        )
+        _require(all(forbidden not in value for value in (empty, malformed, budgeted_out)))
+
+    projections = _projections(korean_for_all=True)
+    for locale, forbidden in (("en", "questions below"), ("ko", "아래 질문")):
+        assembled = assemble_requested_locale_instruction(
+            projections,
+            (_METHODS[0],),
+            locale,
+            expected_content_revision=_REVISION,
+        )
+        _require(not assembled.inline_teacher_questions)
+        _require(forbidden not in assembled.instructions)
+
+
+@_check("VSC-01D-hook-fallback-keeps-guardrails-before-questions")
+def _test_hook_fallback_keeps_guardrails_before_questions() -> None:
+    guardrail = "GUARDRAIL_SENTINEL " + "g" * 1_200
+    question = "QUESTION_SENTINEL " + "q" * 9_000
+    artifact = InstructionArtifact(
+        path=Path("/synthetic/instruction-artifact.md"),
+        content_revision=1,
+        locale="en",
+        selected_reasoning_systems=("triangulation",),
+        selected_display_names=("Triangulation",),
+        inline_guardrails=(guardrail,),
+        inline_teacher_questions=(question,),
+    )
+    message = artifact.reference_message()
+    _require(guardrail in message)
+    _require(question not in message)
+    _require("questions below" not in message)
+    _require(estimate_injection_tokens(message) < MAX_INJECTION_ESTIMATED_TOKENS)
+
+
+@_check("VSC-01E-hook-budgets-all-one-two-three-methods-bilingual")
+def _test_hook_budgets_all_one_two_three_methods_bilingual() -> None:
+    projections = load_reasoning_content_projections(
+        Path("content/compiled-reasoning-content.bundle.json")
+    )
+    method_ids = tuple(entry.method_id for entry in projections.selection_catalog.entries)
+    _require(len(method_ids) == 48)
+    checked = 0
+    for locale in ("en", "ko"):
+        singles = {
+            method_id: assemble_requested_locale_instruction(
+                projections,
+                (method_id,),
+                locale,
+                expected_content_revision=projections.content_revision,
+            )
+            for method_id in method_ids
+        }
+        for assembled in singles.values():
+            _require(len(assembled.inline_guardrails) == 1)
+            _require(len(assembled.inline_teacher_questions) == 3)
+        for size in (1, 2, 3):
+            representative = assemble_requested_locale_instruction(
+                projections,
+                method_ids[:size],
+                locale,
+                expected_content_revision=projections.content_revision,
+            )
+            _require(len(representative.inline_guardrails) == size)
+            _require(len(representative.inline_teacher_questions) == size * 3)
+            for selected in combinations(method_ids, size):
+                guardrails = tuple(
+                    guardrail
+                    for method_id in selected
+                    for guardrail in singles[method_id].inline_guardrails
+                )
+                questions = tuple(
+                    question
+                    for method_id in selected
+                    for question in singles[method_id].inline_teacher_questions
+                )
+                _require(
+                    estimate_injection_tokens("\n\n".join(guardrails))
+                    < MAX_INLINE_GUARDRAIL_ESTIMATED_TOKENS
+                )
+                _require(
+                    estimate_injection_tokens("\n".join(f"- {item}" for item in questions))
+                    < MAX_INLINE_TEACHER_QUESTION_ESTIMATED_TOKENS
+                )
+                artifact = InstructionArtifact(
+                    path=Path("/synthetic/instruction-artifact.md"),
+                    content_revision=projections.content_revision,
+                    locale=locale,
+                    selected_reasoning_systems=selected,
+                    selected_display_names=tuple(
+                        singles[method_id].selected_display_names[0] for method_id in selected
+                    ),
+                    inline_guardrails=guardrails,
+                    inline_teacher_questions=questions,
+                )
+                reference = artifact.reference_message()
+                _require(estimate_injection_tokens(reference) < MAX_INJECTION_ESTIMATED_TOKENS)
+                _require(all(value in reference for value in (*guardrails, *questions)))
+                checked += 1
+    _require(checked == 2 * (48 + 1_128 + 17_296))
+
+
+@_check("VSC-01F-codex-generated-question-procedures")
+def _test_codex_generated_question_procedures() -> None:
+    package = Path("build/generated/plugins/codex")
+    skill = (package / "skills/opensocrates/SKILL.md").read_text(encoding="utf-8")
+    readme = (package / "README.md").read_text(encoding="utf-8")
+    _require("settle the selected questions for yourself" in skill)
+    _require("message containing teacher questions to settle" in readme)
+    for method_id in FROZEN_METHOD_IDS:
+        method = (package / "skills" / method_id / "SKILL.md").read_text(encoding="utf-8")
+        _require(method.count("## Teacher questions") == 2)
+        _require(method.find("## Teacher questions") < method.find("## Purpose"))
+
+
 @_check("VSC-02-locale-current-prompt-and-english-fallback")
 def _test_locale_resolution() -> None:
     projections = _projections()
@@ -465,6 +785,36 @@ def _test_instruction_artifacts() -> None:
         _require(b"synthetic/transcript" not in encoded)
         _require(b"SYNTHETIC_RAW_CANDIDATE_MARKER" not in encoded)
         _require(b"SYNTHETIC_THEORY_en_alpha-reasoning" in encoded)
+        header, body = encoded.split(b"\n", 1)
+        prefix = b"<!-- OPENSOCRATES_ARTIFACT_V2 "
+        suffix = b" -->"
+        _require(header.startswith(prefix) and header.endswith(suffix))
+        metadata = json.loads(
+            base64.urlsafe_b64decode(header[len(prefix) : -len(suffix)]).decode("utf-8")
+        )
+        _require(metadata.get("schema") == "opensocrates.instruction-artifact/3")
+        _require("inline_teacher_questions" in metadata)
+
+        legacy_metadata = dict(metadata)
+        legacy_metadata["schema"] = "opensocrates.instruction-artifact/2"
+        legacy_metadata.pop("inline_teacher_questions")
+        legacy_header = (
+            prefix
+            + base64.urlsafe_b64encode(
+                json.dumps(
+                    legacy_metadata,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            )
+            + suffix
+        )
+        artifact.path.write_bytes(legacy_header + b"\n" + body)
+        legacy_artifact = store.latest_for_session(request.session_id)
+        _require(legacy_artifact is not None)
+        _require(legacy_artifact.inline_teacher_questions == ())
+        _require(legacy_artifact.inline_guardrails == artifact.inline_guardrails)
         if os.name != "nt":
             _require(stat.S_IMODE(directory.stat().st_mode) == 0o700)
             _require(stat.S_IMODE(artifact.path.stat().st_mode) == 0o600)

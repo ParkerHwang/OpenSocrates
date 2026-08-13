@@ -5,12 +5,17 @@ and {{METHOD_COUNT}} internal authored procedures. Grok may select the skill in
 the same turn through its native skill-selection surface, and users can invoke
 it explicitly with `/opensocrates`.
 
+When Grok reads a selected generated method, its complete procedure begins with
+three authored teacher questions for the active agent to settle before using the
+remaining procedure as a check. These questions are native skill content; this
+package does not claim OpenSocrates hook injection.
+
 The package is content-only: it contains no hooks, MCP server, agent, command,
 launcher, native runtime, or nested model selector. It uses the current Grok
 Build model and authentication without requiring another API key or hardcoded
 model ID.
 
-The complete procedure must be read in the current conversation before a
-method may be applied, named, or cited.
+The complete procedure, including its leading teacher questions, must be read in
+the current conversation before a method may be applied, named, or cited.
 
 OpenSocrates {{PRODUCT_VERSION}} · content revision {{CONTENT_REVISION}}
