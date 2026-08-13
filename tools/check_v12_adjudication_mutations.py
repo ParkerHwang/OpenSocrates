@@ -39,6 +39,7 @@ from v12_adjudication_contract import FORBIDDEN_PACKET_KEYS, find_forbidden_pack
 
 ROOT = Path(__file__).resolve().parents[1]
 CHECKER = ROOT / "tools" / "check_v12_adjudication.py"
+COMPARISON_TOOL = ROOT / "tools" / "compare_v12_adjudication_reviews.py"
 EVAL_RELATIVE = Path("evals/v1.2")
 REPORT_RELATIVE = Path("docs/v1.2-adjudication-report.md")
 RELEASE_NOTES_RELATIVE = Path(".github/release-notes/v1.2.1.md")
@@ -170,6 +171,17 @@ def _append_text(relative: Path, text: str) -> Callable[[Path], None]:
     return mutate
 
 
+def _replace_text(relative: Path, old: str, new: str) -> Callable[[Path], None]:
+    def mutate(root: Path) -> None:
+        path = root / relative
+        original = path.read_text(encoding="utf-8")
+        if original.count(old) != 1:
+            raise AssertionError(f"{relative}: expected one exact source context")
+        path.write_text(original.replace(old, new, 1), encoding="utf-8")
+
+    return mutate
+
+
 def _signature(*, leader: str | None, alternatives: list[str], status: str) -> dict[str, Any]:
     return {
         "status": status,
@@ -183,6 +195,37 @@ def _signature(*, leader: str | None, alternatives: list[str], status: str) -> d
         "inclusion_metric_eligible": False,
         "policy_metric_eligible": True,
     }
+
+
+def _full_review_artifact(review: dict[str, Any]) -> dict[str, Any]:
+    records: list[dict[str, Any]] = []
+    for compact in review["decisions"]:
+        decision = {
+            field: deepcopy(compact[field])
+            for field in _signature(leader=None, alternatives=[], status="retain")
+        }
+        decision["case_kind"] = compact["legacy"]["kind"]
+        records.append(
+            {
+                "schema": "opensocrates.eval-adjudication-decision/1.0.0",
+                "protocol_version": "1.2.0",
+                "pair_id": compact["pair_id"],
+                "locales": ["en", "ko"],
+                "legacy": deepcopy(compact["legacy"]),
+                "semantic_review": {
+                    "en_ko_equivalent": True,
+                    "translation_mismatch": False,
+                    "notes": [],
+                },
+                "decision": decision,
+                "decisive_features": ["synthetic"],
+                "rationale": compact["rationale"],
+                "review": {},
+                "blinding": {},
+                "provenance": {},
+            }
+        )
+    return {"decisions": records}
 
 
 def _expect_reviewer_rejection(
@@ -226,6 +269,115 @@ def _expect_reviewer_rejection(
                 )
         else:
             failures.append(f"comparison validation: {label} was accepted by {operation}")
+
+
+def _malformed_enum_regressions(  # noqa: C901 - matrix covers each provenance surface
+    fixture: Path,
+    primary: dict[str, Any],
+    secondary: dict[str, Any],
+    packet_manifest: dict[str, Any],
+    packet_path: Path,
+    schema: dict[str, Any],
+    schema_path: Path,
+    failures: list[str],
+) -> None:
+    """Reject list/object enum scalars for primary/secondary compact/full reviews."""
+
+    formats = {
+        "compact": (primary, secondary),
+        "full": (_full_review_artifact(primary), _full_review_artifact(secondary)),
+    }
+    fields = {
+        "status": ("decision", "status"),
+        "intervention_policy": ("decision", "intervention_policy"),
+        "legacy.kind": ("legacy", "kind"),
+        "legacy.assertion": ("legacy", "assertion"),
+    }
+    for format_name, (valid_primary, valid_secondary) in formats.items():
+        valid_primary_path = fixture / f"enum-{format_name}-primary-valid.json"
+        valid_secondary_path = fixture / f"enum-{format_name}-secondary-valid.json"
+        _write_json(valid_primary_path, valid_primary)
+        _write_json(valid_secondary_path, valid_secondary)
+        valid_primary_hash = _sha256(valid_primary_path)
+        valid_secondary_hash = _sha256(valid_secondary_path)
+        baseline_comparison = build_comparison_artifact(
+            valid_primary,
+            valid_secondary,
+            packet_manifest,
+            primary_sha256=valid_primary_hash,
+            secondary_sha256=valid_secondary_hash,
+        )
+
+        for side in ("primary", "secondary"):
+            for field_name, (container_name, key) in fields.items():
+                for shape_name, malformed_value in (("list", []), ("object", {})):
+                    candidate_primary = deepcopy(valid_primary)
+                    candidate_secondary = deepcopy(valid_secondary)
+                    candidate = candidate_primary if side == "primary" else candidate_secondary
+                    record = candidate["decisions"][0]
+                    if container_name == "legacy":
+                        record["legacy"][key] = malformed_value
+                    elif format_name == "full":
+                        record["decision"][key] = malformed_value
+                    else:
+                        record[key] = malformed_value
+
+                    slug = f"{format_name}-{side}-{field_name.replace('.', '-')}-{shape_name}"
+                    primary_path = fixture / f"enum-{slug}-primary.json"
+                    secondary_path = fixture / f"enum-{slug}-secondary.json"
+                    output_path = fixture / f"enum-{slug}-comparison.json"
+                    _write_json(primary_path, candidate_primary)
+                    _write_json(secondary_path, candidate_secondary)
+                    primary_hash = _sha256(primary_path)
+                    secondary_hash = _sha256(secondary_path)
+                    expected_error = f"{field_name}: must be a string"
+
+                    _expect_reviewer_rejection(
+                        label=f"malformed enum {slug}",
+                        primary=candidate_primary,
+                        secondary=candidate_secondary,
+                        packet_manifest=packet_manifest,
+                        comparison=baseline_comparison,
+                        schema=schema,
+                        primary_sha256=primary_hash,
+                        secondary_sha256=secondary_hash,
+                        expected_error=expected_error,
+                        failures=failures,
+                    )
+
+                    process = subprocess.run(
+                        [
+                            sys.executable,
+                            str(COMPARISON_TOOL),
+                            "--primary",
+                            str(primary_path),
+                            "--secondary",
+                            str(secondary_path),
+                            "--packet-manifest",
+                            str(packet_path),
+                            "--schema",
+                            str(schema_path),
+                            "--output",
+                            str(output_path),
+                        ],
+                        cwd=ROOT,
+                        text=True,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        check=False,
+                        timeout=10,
+                    )
+                    if (
+                        process.returncode == 0
+                        or expected_error not in process.stdout
+                        or "Traceback" in process.stdout
+                        or output_path.exists()
+                    ):
+                        failures.append(
+                            f"comparison CLI malformed enum {slug}: expected controlled "
+                            f"nonzero with {expected_error!r}; code={process.returncode} "
+                            f"output={process.stdout[:500]!r}"
+                        )
 
 
 def _contract_regressions(failures: list[str]) -> None:
@@ -497,6 +649,17 @@ def _comparison_regressions(parent: Path, failures: list[str]) -> None:  # noqa:
             expected_error=expected_error,
             failures=failures,
         )
+
+    _malformed_enum_regressions(
+        fixture,
+        primary,
+        secondary,
+        packet_manifest,
+        packet_path,
+        schema,
+        schema_path,
+        failures,
+    )
 
 
 def _overwrite_regressions(parent: Path, failures: list[str]) -> None:  # noqa: C901 - exercises each overwrite failure stage explicitly
@@ -1119,6 +1282,28 @@ def main() -> int:  # noqa: C901
             "answer-quality evidence, but it nevertheless provides confirmation-grade "
             "human gold."
         )
+        unicode_nonbreaking_claim = (
+            "This snapshot is confirmation\u2011grade human gold, held\u2011out, and "
+            "answer\u2011quality evidence."
+        )
+        unicode_dash_variant_claim = (
+            "This snapshot is confirmation\u2010grade human gold, held\u2212out, and "
+            "answer\u2013quality evidence."
+        )
+        report_safe_conditional = (
+            "A later confirmation claim requires a new version, an output-blind independent\n"
+            "human review, separately authored held-out cases, and no retroactive editing of\n"
+            "this history."
+        )
+        positive_context_replacement = (
+            "The committed snapshot consists of separately authored held-out cases."
+        )
+        guide_safe_context = (
+            "Held-out cases are separately authored with no model exposure, EN/KO semantic\n"
+            "pairing, author/translator separated from output judges, labels fixed before\n"
+            "freeze, and per-case leading/inclusion/prohibited routes recorded before any\n"
+            "model output is opened."
+        )
         coherent_cases: list[tuple[str, Callable[[Path], None], str]] = [
             (
                 "coherent semantic both false",
@@ -1337,6 +1522,46 @@ def main() -> int:  # noqa: C901
                     "release_notes",
                 ),
                 "committed.claim_boundary.release_notes",
+            ),
+            (
+                "coherent Unicode non-breaking-hyphen report claim",
+                _with_rehashed_manifest(
+                    _append_text(REPORT_RELATIVE, unicode_nonbreaking_claim),
+                    "report",
+                ),
+                "committed.claim_boundary.report",
+            ),
+            (
+                "coherent Unicode dash variants report claim",
+                _with_rehashed_manifest(
+                    _append_text(REPORT_RELATIVE, unicode_dash_variant_claim),
+                    "report",
+                ),
+                "committed.claim_boundary.report",
+            ),
+            (
+                "coherent report safe-context positive replacement",
+                _with_rehashed_manifest(
+                    _replace_text(
+                        REPORT_RELATIVE,
+                        report_safe_conditional,
+                        positive_context_replacement,
+                    ),
+                    "report",
+                ),
+                "committed.claim_boundary.report",
+            ),
+            (
+                "coherent guide safe-context positive replacement",
+                _with_rehashed_manifest(
+                    _replace_text(
+                        guide,
+                        guide_safe_context,
+                        positive_context_replacement,
+                    ),
+                    "annotation_guide",
+                ),
+                "committed.claim_boundary.guide",
             ),
             (
                 "comparison classification count tamper",

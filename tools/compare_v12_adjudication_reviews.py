@@ -139,7 +139,10 @@ def _validate_legacy(value: Any, label: str) -> dict[str, Any]:
         frozenset({"kind", "owner_method", "expected_route", "assertion"}),
         f"{label}.legacy",
     )
-    if value["kind"] not in LEGACY_KINDS:
+    kind = value["kind"]
+    if not isinstance(kind, str):
+        raise ComparisonValidationError(f"{label}.legacy.kind: must be a string")
+    if kind not in LEGACY_KINDS:
         raise ComparisonValidationError(f"{label}.legacy.kind: invalid enum value")
     if not isinstance(value["owner_method"], str) or not value["owner_method"]:
         raise ComparisonValidationError(f"{label}.legacy.owner_method: non-empty string required")
@@ -148,7 +151,10 @@ def _validate_legacy(value: Any, label: str) -> dict[str, Any]:
         raise ComparisonValidationError(
             f"{label}.legacy.expected_route: non-empty string or null required"
         )
-    if value["assertion"] not in LEGACY_ASSERTIONS:
+    assertion = value["assertion"]
+    if not isinstance(assertion, str):
+        raise ComparisonValidationError(f"{label}.legacy.assertion: must be a string")
+    if assertion not in LEGACY_ASSERTIONS:
         raise ComparisonValidationError(f"{label}.legacy.assertion: invalid enum value")
     return value
 
@@ -169,9 +175,15 @@ def _validate_decision_source(  # noqa: C901 - every normalized scalar is checke
     expected_keys = FULL_DECISION_KEYS if nested else frozenset(SIGNATURE_FIELDS)
     _require_exact_keys(source, expected_keys, label)
 
-    if source["status"] not in STATUSES:
+    status = source["status"]
+    if not isinstance(status, str):
+        raise ComparisonValidationError(f"{label}.status: must be a string")
+    if status not in STATUSES:
         raise ComparisonValidationError(f"{label}.status: invalid enum value")
-    if source["intervention_policy"] not in INTERVENTION_POLICIES:
+    intervention_policy = source["intervention_policy"]
+    if not isinstance(intervention_policy, str):
+        raise ComparisonValidationError(f"{label}.intervention_policy: must be a string")
+    if intervention_policy not in INTERVENTION_POLICIES:
         raise ComparisonValidationError(f"{label}.intervention_policy: invalid enum value")
     if nested and source["case_kind"] != legacy["kind"]:
         raise ComparisonValidationError(f"{label}.case_kind: must equal legacy.kind")
@@ -468,23 +480,26 @@ def main(argv: list[str] | None = None) -> int:
     manifest = json.loads(args.packet_manifest.read_text(encoding="utf-8"))
     primary_review = load(args.primary)
     secondary_review = load(args.secondary)
-    result = build_comparison_artifact(
-        primary_review,
-        secondary_review,
-        manifest,
-        primary_sha256=sha256(args.primary),
-        secondary_sha256=sha256(args.secondary),
-    )
     schema = json.loads(args.schema.read_text(encoding="utf-8"))
-    validate_comparison_artifact(
-        result,
-        schema,
-        primary_review,
-        secondary_review,
-        manifest,
-        primary_sha256=sha256(args.primary),
-        secondary_sha256=sha256(args.secondary),
-    )
+    try:
+        result = build_comparison_artifact(
+            primary_review,
+            secondary_review,
+            manifest,
+            primary_sha256=sha256(args.primary),
+            secondary_sha256=sha256(args.secondary),
+        )
+        validate_comparison_artifact(
+            result,
+            schema,
+            primary_review,
+            secondary_review,
+            manifest,
+            primary_sha256=sha256(args.primary),
+            secondary_sha256=sha256(args.secondary),
+        )
+    except ComparisonValidationError as exc:
+        raise SystemExit(f"invalid review provenance: {exc}") from None
     if args.output.is_symlink():
         raise SystemExit(f"refusing symlink output: {args.output}")
     if args.output.is_dir():

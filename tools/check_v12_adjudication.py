@@ -14,7 +14,9 @@ import hashlib
 import json
 import re
 import sys
+import unicodedata
 from collections import Counter
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -52,6 +54,26 @@ ROUTING_BEHAVIORS = {
 }
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 PRIVATE_USE_PATTERN = re.compile(r"[\ue000-\uf8ff]")
+DASH_AND_HYPHEN_TRANSLATION = str.maketrans(
+    {
+        ord(character): "-"
+        for character in (
+            "\u00ad"  # soft hyphen
+            "\u058a"  # Armenian hyphen
+            "\u2010"  # hyphen
+            "\u2011"  # non-breaking hyphen
+            "\u2012"  # figure dash
+            "\u2013"  # en dash
+            "\u2014"  # em dash
+            "\u2015"  # horizontal bar
+            "\u2043"  # hyphen bullet
+            "\u2212"  # minus sign
+            "\ufe58"  # small em dash
+            "\ufe63"  # small hyphen-minus
+            "\uff0d"  # fullwidth hyphen-minus
+        )
+    }
+)
 FORBIDDEN_EVIDENCE_TERM_PATTERNS = (
     (
         "confirmation-grade human gold",
@@ -63,38 +85,53 @@ FORBIDDEN_EVIDENCE_TERM_PATTERNS = (
         re.compile(r"\banswer(?:-|\s)+quality\s+evidence\b"),
     ),
 )
-APPROVED_EVIDENCE_BOUNDARY_PHRASES = {
+APPROVED_TEXT_EVIDENCE_CONTEXTS = {
     "guide": (
-        "the committed ai-assisted snapshot governed by this guide is not "
+        "The committed AI-assisted snapshot governed by this guide is not "
         "confirmation-grade human gold, not held-out, and not answer-quality evidence.",
-        "never the final held-out set",
-        "relationship to the held-out set",
-        "to the held-out annotation guide",
-        "held-out cases are separately authored",
+        "`rewrite` — the text is too ambiguous to evaluate. The rewritten case gets a "
+        "new case ID/version; because rewrites in this workflow are exposed to AI "
+        "tooling, they may enter only development/calibration sets, never the final "
+        "held-out set.",
+        "## 9. Relationship to the held-out set",
+        "What moves to the held-out annotation guide is the policy: intervention "
+        "definitions, insufficiency allowed-behavior rules, the contraindication rule, "
+        "the leading/inclusion distinction, rewrite criteria, and metric eligibility rules.",
+        "Held-out cases are separately authored with no model exposure, EN/KO semantic "
+        "pairing, author/translator separated from output judges, labels fixed before "
+        "freeze, and per-case leading/inclusion/prohibited routes recorded before any "
+        "model output is opened.",
     ),
     "amendment": (
-        "they are not confirmation-grade human gold, not held-out, and not "
+        "- build the future held-out annotation guide;",
+        "- final held-out labels;",
+        "They are not confirmation-grade human gold, not held-out, and not "
         "answer-quality evidence.",
-        "build the future held-out annotation guide",
-        "final held-out labels",
     ),
+    "report": (
+        "This is not confirmation-grade human gold, not held-out, and not answer-quality evidence.",
+        "This snapshot may be used only for provisional development diagnostics and "
+        "held-out-guide design.",
+        "A later confirmation claim requires a new version, an output-blind independent "
+        "human review, separately authored held-out cases, and no retroactive editing of "
+        "this history.",
+    ),
+    "release_notes": (
+        "- The published adjudication snapshot is not confirmation-grade human gold, "
+        "not held-out, and not answer-quality evidence.",
+    ),
+}
+APPROVED_STRUCTURED_EVIDENCE_BOUNDARIES = {
     "policy": (
-        "ai-assisted provisional development adjudication; not confirmation-grade "
+        "publication_boundary",
+        "AI-assisted provisional development adjudication; not confirmation-grade "
         "human gold, not held-out, and not answer-quality evidence.",
     ),
     "manifest": (
-        "development diagnostics only: not confirmation-grade human gold, not held-out, "
-        "and not answer-quality evidence. historical packet/raw/reviewer evidence is "
+        "publication_boundary",
+        "Development diagnostics only: not confirmation-grade human gold, not held-out, "
+        "and not answer-quality evidence. Historical packet/raw/reviewer evidence is "
         "maintainer-held and not repository-verifiable.",
-    ),
-    "report": (
-        "this is not confirmation-grade human gold, not held-out, and not answer-quality evidence.",
-        "held-out-guide design",
-        "separately authored held-out cases",
-    ),
-    "release_notes": (
-        "the published adjudication snapshot is not confirmation-grade human gold, "
-        "not held-out, and not answer-quality evidence.",
     ),
 }
 EXPECTED_CLASSIFICATION_COUNTS = {
@@ -569,7 +606,24 @@ def _check_hash(
         )
 
 
-def _check_public_text_boundaries(report: Report, paths: ArtifactPaths) -> None:
+def _normalize_evidence_text(value: str) -> str:
+    """Canonicalize Unicode dashes, case, and whitespace before claim checks."""
+
+    compatible = unicodedata.normalize("NFKC", value)
+    ascii_hyphens = compatible.translate(DASH_AND_HYPHEN_TRANSLATION)
+    return " ".join(ascii_hyphens.casefold().split())
+
+
+def _remaining_forbidden_evidence_terms(value: str) -> list[str]:
+    return [term for term, pattern in FORBIDDEN_EVIDENCE_TERM_PATTERNS if pattern.search(value)]
+
+
+def _check_public_text_boundaries(
+    report: Report,
+    paths: ArtifactPaths,
+    policy: dict[str, Any],
+    manifest: dict[str, Any],
+) -> None:
     public_paths = {
         "guide": paths.guide,
         "amendment": paths.amendment,
@@ -581,14 +635,7 @@ def _check_public_text_boundaries(report: Report, paths: ArtifactPaths) -> None:
         "report": paths.report,
         "release_notes": paths.release_notes,
     }
-    required_explicit_boundaries = {
-        "guide",
-        "amendment",
-        "policy",
-        "manifest",
-        "report",
-        "release_notes",
-    }
+    structured_artifacts = {"policy": policy, "manifest": manifest}
     for label, path in public_paths.items():
         if not path.is_file():
             continue
@@ -606,36 +653,39 @@ def _check_public_text_boundaries(report: Report, paths: ArtifactPaths) -> None:
             "committed.identifier.stale_65",
             f"{path}: contains the colliding GitHub identifier #65",
         )
-        folded = " ".join(text.casefold().split())
-        if label in required_explicit_boundaries:
-            missing = [
-                phrase
-                for phrase in (
-                    "not confirmation-grade human gold",
-                    "not held-out",
-                    "not answer-quality evidence",
+        normalized = _normalize_evidence_text(text)
+        if label in APPROVED_STRUCTURED_EVIDENCE_BOUNDARIES:
+            field, expected_value = APPROVED_STRUCTURED_EVIDENCE_BOUNDARIES[label]
+            artifact = structured_artifacts[label]
+            actual_value = artifact.get(field)
+            report.check(
+                actual_value == expected_value,
+                f"committed.claim_boundary.{label}",
+                f"{path}: {field} must equal the exact approved evidence boundary",
+            )
+            residual = deepcopy(artifact)
+            residual[field] = ""
+            normalized = _normalize_evidence_text(
+                json.dumps(
+                    residual,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
                 )
-                if phrase not in folded
-            ]
-            report.check(
-                not missing,
-                f"committed.claim_boundary.{label}",
-                f"{path}: missing explicit rejection(s) {missing}",
             )
-        masked = folded
-        for phrase in APPROVED_EVIDENCE_BOUNDARY_PHRASES.get(label, ()):
-            occurrences = masked.count(phrase)
-            report.check(
-                occurrences == 1,
-                f"committed.claim_boundary.{label}",
-                f"{path}: exact approved evidence-boundary phrase occurs "
-                f"{occurrences} times instead of once: {phrase!r}",
-            )
-            if occurrences:
-                masked = masked.replace(phrase, " ", 1)
-        remaining_terms = [
-            term for term, pattern in FORBIDDEN_EVIDENCE_TERM_PATTERNS if pattern.search(masked)
-        ]
+        else:
+            for raw_context in APPROVED_TEXT_EVIDENCE_CONTEXTS.get(label, ()):
+                context = _normalize_evidence_text(raw_context)
+                occurrences = normalized.count(context)
+                report.check(
+                    occurrences == 1,
+                    f"committed.claim_boundary.{label}",
+                    f"{path}: exact approved evidence context occurs "
+                    f"{occurrences} times instead of once: {context!r}",
+                )
+                if occurrences:
+                    normalized = normalized.replace(context, " ", 1)
+        remaining_terms = _remaining_forbidden_evidence_terms(normalized)
         report.check(
             not remaining_terms,
             f"committed.claim_boundary.{label}",
@@ -1475,7 +1525,7 @@ def validate_committed(paths: ArtifactPaths) -> Report:  # noqa: C901
         "committed.status.gold_suffix",
         f"machine status fields must not end in _gold: {gold_statuses}",
     )
-    _check_public_text_boundaries(report, paths)
+    _check_public_text_boundaries(report, paths, policy, manifest)
     return report
 
 
