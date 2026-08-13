@@ -1,0 +1,38 @@
+name: Repository governance
+
+# Separate workflow so ready_for_review and edited re-check the PR body
+# without cancelling the full OpenSocrates CI concurrency group.
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+      - edited
+
+permissions:
+  contents: read
+
+concurrency:
+  group: opensocrates-governance-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+
+jobs:
+  governance:
+    name: Repository governance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v9.0.0
+      - name: Bootstrap locked environment
+        run: make bootstrap
+      - name: Check repository governance
+        run: make governance-check
