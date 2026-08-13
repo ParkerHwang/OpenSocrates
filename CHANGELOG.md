@@ -9,6 +9,15 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ### Added
 
+- Experimental Google Antigravity integration as a content-only global plugin
+  with one explicit `opensocrates` skill, 48 internal authored procedures,
+  isolated lifecycle ownership, and an `agy 1.0.6` package-validation receipt.
+  It deliberately ships no hooks, runtime, background process, or automatic
+  selector.
+- Experimental Cursor Agent Plugin integration with one `/opensocrates` skill,
+  48 internal authored procedures, isolated lifecycle ownership, and
+  release-gate package validation. It adds no OpenSocrates selector or hook,
+  and no live Cursor invocation receipt is claimed.
 - Grok Build is a first-class `grok` installer host with one native,
   auto-selectable `/opensocrates` skill, 48 internal authored procedures,
   deterministic content-only packaging, capability reporting, isolated

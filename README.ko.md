@@ -26,10 +26,11 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 런처는 `darwin-arm64`만 허용하며, Intel Mac·Linux·Windows용 런처와 런타임은
 이번 릴리스에 포함되거나 지원되지 않습니다.
 
-> **최신 릴리스: OpenSocrates 1.2.0.** OpenCode 1.18.18+의 안정판
-> `chat.message` 브리지와 네이티브 Agent Skill 폴백을 추가했습니다.
-> `npx --yes opensocrates@1.2.0 update --host all`로 관리 호스트를 함께
-> 업데이트할 수 있습니다.
+> **최신 릴리스: OpenSocrates 1.2.0.** 실험적 Antigravity·Cursor 스킬
+> 패키지, 라이브 검증을 마친 Grok Build 네이티브 지원, OpenCode
+> 1.18.18+의 안정판 `chat.message` 브리지와 네이티브 Agent Skill 폴백을
+> 추가했습니다. `npx --yes opensocrates@1.2.0 update --host all`로 관리
+> 호스트를 함께 업데이트할 수 있습니다.
 
 ## 호스트 지원 범위
 

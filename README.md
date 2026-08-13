@@ -27,8 +27,9 @@ The native plugin archives intentionally ship only `bin/launch.sh`. That
 launcher accepts `darwin-arm64` only; macOS Intel, Linux, and Windows launchers
 and runtimes are not shipped or supported in this release.
 
-> **Latest release: OpenSocrates 1.2.0.** It adds OpenCode 1.18.18+ with a
-> live-validated stable `chat.message` bridge and native Agent Skill fallback.
+> **Latest release: OpenSocrates 1.2.0.** It adds experimental Antigravity and
+> Cursor skill packages, live-validated native Grok Build support, and OpenCode
+> 1.18.18+ with a stable `chat.message` bridge and native Agent Skill fallback.
 > Upgrade managed hosts together with
 > `npx --yes opensocrates@1.2.0 update --host all`.
 
