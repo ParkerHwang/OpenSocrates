@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync, existsSync, readdirSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -702,9 +702,13 @@ for (const host of ["antigravity", "cursor", "grok"]) {
 test("grok: staging and rollback directories stay outside the scanned plugins directory", async () => {
   const box = makeSandbox("grok");
   try {
+    // The installer canonicalizes the host home, so compare against the
+    // resolved sandbox home rather than the literal one: macOS reports
+    // /private/var for a /var temporary directory.
+    const home = realpathSync(box.home);
     const placement = transientPathsFor("grok");
-    assert.equal(placement.parent, join(box.home, "plugins"));
-    assert.equal(placement.transient, box.home);
+    assert.equal(placement.parent, join(home, "plugins"));
+    assert.equal(placement.transient, home);
     assert.equal(
       placement.transient.startsWith(`${placement.parent}/`),
       false,
@@ -724,7 +728,7 @@ test("grok: staging and rollback directories stay outside the scanned plugins di
     assert.equal(update.error, undefined, `update failed: ${update.error?.message}`);
     assert.deepEqual(readdirSync(placement.parent), [MARKETPLACE]);
     assert.deepEqual(
-      readdirSync(box.home).filter((entry) => entry.startsWith(".opensocrates.")),
+      readdirSync(home).filter((entry) => entry.startsWith(".opensocrates.")),
       [],
       "a committed transaction left a transient directory in the Grok home",
     );
