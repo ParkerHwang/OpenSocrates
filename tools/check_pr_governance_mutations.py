@@ -7,7 +7,9 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from check_pr_governance import validate_pull_request, validate_repository
+from check_pr_governance import REQUIRED_FILES, validate_pull_request, validate_repository
+
+GOVERNANCE_FILES = (*REQUIRED_FILES, ".github/workflows/ci.yml", "Makefile")
 
 BASE_BODY = """## Summary
 
@@ -44,7 +46,7 @@ The Project workflow configuration remains GitHub-hosted state.
 ## Handoff
 
 Last verified commit: abc1234
-Commands run: python tools/check_pr_governance_test.py
+Commands run: python tools/check_pr_governance_mutations.py
 Commands not run: release-check; no native package behavior changed
 Remaining work: review and merge after required checks pass
 Known limitations: no runtime behavior is claimed
@@ -53,6 +55,15 @@ Known limitations: no runtime behavior is claimed
 
 def event(body: str = BASE_BODY, *, draft: bool = False) -> dict[str, object]:
     return {"pull_request": {"body": body, "draft": draft}}
+
+
+def fixture(tmp: Path, root: Path) -> Path:
+    repo = Path(tmp) / "repo"
+    for relative in GOVERNANCE_FILES:
+        target = repo / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(root / relative, target)
+    return repo
 
 
 def main() -> int:
@@ -78,7 +89,7 @@ def main() -> int:
 
     draft_body = BASE_BODY.replace(
         "Last verified commit: abc1234", "Last verified commit: TBD"
-    ).replace("Commands run: python tools/check_pr_governance_test.py", "Commands run: TBD")
+    ).replace("Commands run: python tools/check_pr_governance_mutations.py", "Commands run: TBD")
     assert validate_pull_request(event(draft_body, draft=True)) == []
 
     blank_limitations = BASE_BODY.replace(
@@ -91,7 +102,7 @@ def main() -> int:
     ), blank_limitation_errors
 
     blank_commands = BASE_BODY.replace(
-        "Commands run: python tools/check_pr_governance_test.py",
+        "Commands run: python tools/check_pr_governance_mutations.py",
         "Commands run:",
     )
     blank_command_errors = validate_pull_request(event(blank_commands))
@@ -103,7 +114,7 @@ def main() -> int:
     ), blank_command_errors
 
     draft_blank = BASE_BODY.replace("Last verified commit: abc1234", "Last verified commit:").replace(
-        "Commands run: python tools/check_pr_governance_test.py",
+        "Commands run: python tools/check_pr_governance_mutations.py",
         "Commands run:",
     )
     assert validate_pull_request(event(draft_blank, draft=True)) == []
@@ -116,15 +127,13 @@ def main() -> int:
     assert any("Tracking must contain" in item for item in tracking_errors), tracking_errors
 
     with tempfile.TemporaryDirectory() as tmp:
-        mutated = Path(tmp) / "repo"
-        shutil.copytree(root, mutated, ignore=shutil.ignore_patterns(".git", "build", "dist"))
+        mutated = fixture(Path(tmp), root)
         (mutated / "CLAUDE.md").unlink()
         errors = validate_repository(mutated)
         assert any("missing governance file: CLAUDE.md" in item for item in errors)
 
     with tempfile.TemporaryDirectory() as tmp:
-        mutated = Path(tmp) / "repo"
-        shutil.copytree(root, mutated, ignore=shutil.ignore_patterns(".git", "build", "dist"))
+        mutated = fixture(Path(tmp), root)
         template = mutated / ".github/pull_request_template.md"
         template.write_text(
             template.read_text(encoding="utf-8").replace("## Handoff", "## Transfer"),

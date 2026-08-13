@@ -78,7 +78,7 @@ docs-check:
 
 governance-check:
 	@if [ -n "$${GITHUB_EVENT_PATH:-}" ]; then PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_pr_governance.py --root "$(ROOT)" --event "$$GITHUB_EVENT_PATH" --report build/evidence/governance.json; else PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_pr_governance.py --root "$(ROOT)" --report build/evidence/governance.json; fi
-	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_pr_governance_test.py
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_pr_governance_mutations.py
 
 package-check: generate
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_packaged_launcher.py --root "$(ROOT)" --report build/evidence/packaged-launcher.json
