@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ParkerHwang/OpenSocrates/evals/v1.2/adjudication-decision.schema.json",
+  "title": "OpenSocrates evaluation adjudication decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "protocol_version",
+    "pair_id",
+    "locales",
+    "legacy",
+    "semantic_review",
+    "decision",
+    "decisive_features",
+    "rationale",
+    "review",
+    "blinding",
+    "provenance"
+  ],
+  "properties": {
+    "schema": {"const": "opensocrates.eval-adjudication-decision/1.0.0"},
+    "protocol_version": {"const": "1.2.0"},
+    "pair_id": {"type": "string", "minLength": 1},
+    "locales": {
+      "type": "array",
+      "items": {"enum": ["en", "ko"]},
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true
+    },
+    "legacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "owner_method", "expected_route", "assertion"],
+      "properties": {
+        "kind": {"enum": ["positive", "negative", "mechanical", "insufficiency", "explicit"]},
+        "owner_method": {"type": "string", "minLength": 1},
+        "expected_route": {"type": ["string", "null"]},
+        "assertion": {"enum": ["exact_route", "exclusion_only", "no_intervention"]}
+      }
+    },
+    "semantic_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["en_ko_equivalent", "translation_mismatch", "notes"],
+      "properties": {
+        "en_ko_equivalent": {"type": "boolean"},
+        "translation_mismatch": {"type": "boolean"},
+        "notes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "case_kind",
+        "intervention_policy",
+        "allowed_behaviors",
+        "leading_method",
+        "acceptable_leading_methods",
+        "acceptable_inclusion_methods",
+        "prohibited_methods",
+        "leading_metric_eligible",
+        "inclusion_metric_eligible",
+        "policy_metric_eligible"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "retain",
+            "relabel",
+            "multi_valid",
+            "rewrite",
+            "exclude_from_policy_metric",
+            "invalid"
+          ]
+        },
+        "case_kind": {"type": "string", "minLength": 1},
+        "intervention_policy": {
+          "enum": ["prohibited", "optional", "required", "undetermined"]
+        },
+        "allowed_behaviors": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "hold_no_intervention",
+              "route_clarifier",
+              "route_owner_then_hold",
+              "route_safe_alternative",
+              "bounded_analysis"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "leading_method": {"type": ["string", "null"]},
+        "acceptable_leading_methods": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "acceptable_inclusion_methods": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "prohibited_methods": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "leading_metric_eligible": {"type": "boolean"},
+        "inclusion_metric_eligible": {"type": "boolean"},
+        "policy_metric_eligible": {"type": "boolean"}
+      }
+    },
+    "decisive_features": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "minItems": 1
+    },
+    "rationale": {"type": "string", "minLength": 1},
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "author_or_intent_witness",
+        "primary_adjudicator",
+        "second_reviewer",
+        "primary_decision_locked_at",
+        "second_decision_locked_at",
+        "agreement",
+        "resolution_reviewer",
+        "dissent"
+      ],
+      "properties": {
+        "author_or_intent_witness": {"type": ["string", "null"]},
+        "primary_adjudicator": {"type": "string", "minLength": 1},
+        "second_reviewer": {"type": "string", "minLength": 1},
+        "primary_decision_locked_at": {"type": "string", "format": "date-time"},
+        "second_decision_locked_at": {"type": "string", "format": "date-time"},
+        "agreement": {
+          "enum": ["agreement", "minor_revision", "resolved_disagreement", "unresolved"]
+        },
+        "resolution_reviewer": {"type": ["string", "null"]},
+        "dissent": {"type": ["string", "null"]}
+      }
+    },
+    "blinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_outputs_seen_by_primary",
+        "aggregate_results_seen_by_primary",
+        "model_outputs_seen_by_second",
+        "aggregate_results_seen_by_second",
+        "attestation"
+      ],
+      "properties": {
+        "model_outputs_seen_by_primary": {"const": false},
+        "aggregate_results_seen_by_primary": {"const": false},
+        "model_outputs_seen_by_second": {"const": false},
+        "aggregate_results_seen_by_second": {"const": false},
+        "attestation": {"type": "string", "minLength": 1}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_case_sha256",
+        "annotation_guide_sha256",
+        "blind_packet_sha256",
+        "decision_created_at"
+      ],
+      "properties": {
+        "source_case_sha256": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["en", "ko"],
+          "properties": {
+            "en": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "ko": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        },
+        "annotation_guide_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "blind_packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "decision_created_at": {"type": "string", "format": "date-time"}
+      }
+    }
+  }
+}
