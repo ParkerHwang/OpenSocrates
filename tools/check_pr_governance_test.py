@@ -76,21 +76,27 @@ def main() -> int:
         errors = validate_pull_request(event(body))
         assert errors, f"mutation unexpectedly passed: {name}"
 
-    draft_body = BASE_BODY.replace("Last verified commit: abc1234", "Last verified commit: TBD").replace(
+    draft_body = BASE_BODY.replace(
+        "Last verified commit: abc1234", "Last verified commit: TBD"
+    ).replace(
         "Commands run: python tools/check_pr_governance_test.py", "Commands run: TBD"
     )
     assert validate_pull_request(event(draft_body, draft=True)) == []
 
     with tempfile.TemporaryDirectory() as tmp:
         mutated = Path(tmp) / "repo"
-        shutil.copytree(root, mutated, ignore=shutil.ignore_patterns(".git", "build", "dist"))
+        shutil.copytree(
+            root, mutated, ignore=shutil.ignore_patterns(".git", "build", "dist")
+        )
         (mutated / "CLAUDE.md").unlink()
         errors = validate_repository(mutated)
         assert any("missing governance file: CLAUDE.md" in item for item in errors)
 
     with tempfile.TemporaryDirectory() as tmp:
         mutated = Path(tmp) / "repo"
-        shutil.copytree(root, mutated, ignore=shutil.ignore_patterns(".git", "build", "dist"))
+        shutil.copytree(
+            root, mutated, ignore=shutil.ignore_patterns(".git", "build", "dist")
+        )
         template = mutated / ".github/pull_request_template.md"
         template.write_text(
             template.read_text(encoding="utf-8").replace("## Handoff", "## Transfer"),

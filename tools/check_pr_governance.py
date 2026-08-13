@@ -38,9 +38,7 @@ FIELD_PATTERN = re.compile(
 
 
 def section_body(body: str, heading: str) -> str | None:
-    pattern = re.compile(
-        rf"(?ims)^##\s+{re.escape(heading)}\s*$\n(.*?)(?=^##\s+|\Z)"
-    )
+    pattern = re.compile(rf"(?ims)^##\s+{re.escape(heading)}\s*$\n(.*?)(?=^##\s+|\Z)")
     match = pattern.search(body)
     return match.group(1).strip() if match else None
 
@@ -103,7 +101,10 @@ def validate_pull_request(event: dict[str, Any]) -> list[str]:
     if validation and not draft:
         if not re.search(r"(?im)^\s*-\s*\[[xX]\]\s*Relevant tests pass\.", validation):
             errors.append("A non-draft PR must check 'Relevant tests pass.'")
-        if re.search(r"(?im)^\s*-\s*\[[ xX]\]\s*Required checks not run are explained below\.", validation):
+        if re.search(
+            r"(?im)^\s*-\s*\[[ xX]\]\s*Required checks not run are explained below\.",
+            validation,
+        ):
             if not re.search(
                 r"(?im)^\s*-\s*\[[xX]\]\s*Required checks not run are explained below\.",
                 validation,
@@ -157,8 +158,10 @@ def validate_repository(root: Path) -> list[str]:
                 errors.append(f"PR template is missing section: ## {heading}")
 
     workflow_path = root / ".github/workflows/ci.yml"
-    if not workflow_path.is_file() or "make governance-check" not in workflow_path.read_text(
-        encoding="utf-8"
+    if (
+        not workflow_path.is_file()
+        or "make governance-check"
+        not in workflow_path.read_text(encoding="utf-8")
     ):
         errors.append("CI product contracts must run make governance-check")
 
@@ -199,7 +202,9 @@ def main() -> int:
     }
     if args.report is not None:
         args.report.parent.mkdir(parents=True, exist_ok=True)
-        args.report.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        args.report.write_text(
+            json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
 
     if errors:
         print("governance-check: FAIL", file=sys.stderr)
