@@ -15,7 +15,6 @@ const INJECTION_MARKER = "opensocrates.same-turn/1"
 const MAX_PARTS = 128
 const MAX_PROMPT_BYTES = 64 * 1024
 const MAX_INJECTION_BYTES = 48 * 1024
-const ACTIVATION_TIMEOUT_MS = 50
 
 const SHAPE_FALLBACK = Object.freeze({
   direct_judgment: "critical-thinking",
@@ -209,19 +208,26 @@ async function activate(input, output) {
   })
 }
 
+// Activation is bounded by input size, not by a wall-clock deadline.
+//
+// activate() is fully synchronous, so a Promise.race against a setTimeout
+// could never preempt it: the timer callback cannot run until activate() has
+// already returned and yielded the event loop. A timeout here would report a
+// guarantee that does not exist. OpenCode's stable chat.message contract
+// (`(input, output) => Promise<void>`) is awaited without a host-side
+// deadline, AbortSignal, or cancellation, so there is no host boundary to
+// honor either.
+//
+// The real bounds are structural and enforced before any scanning:
+// MAX_PARTS parts, MAX_PROMPT_BYTES of prompt, MAX_INJECTION_BYTES of output,
+// and a fixed set of linear, backtracking-free patterns over that capped
+// input. The try/catch below is the actual safety property: any throw leaves
+// OpenCode with the original, unmodified message.
 async function boundedActivate(input, output) {
-  let timer
   try {
-    await Promise.race([
-      activate(input, output),
-      new Promise((_, reject) => {
-        timer = setTimeout(() => reject(new Error("opensocrates activation timeout")), ACTIVATION_TIMEOUT_MS)
-      }),
-    ])
+    await activate(input, output)
   } catch {
     // Fail open: OpenCode receives the original, unmodified message.
-  } finally {
-    if (timer !== undefined) clearTimeout(timer)
   }
 }
 

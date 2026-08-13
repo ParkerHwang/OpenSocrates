@@ -11,7 +11,7 @@
 [![Release](https://img.shields.io/github/v/release/ParkerHwang/OpenSocrates)](https://github.com/ParkerHwang/OpenSocrates/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-OpenSocrates는 Claude, Codex, OpenCode를 위한 로컬 연동 및 저작 추론 프레임워크입니다.
+OpenSocrates는 Claude, Codex, Grok Build, OpenCode를 위한 로컬 연동 및 저작 추론 프레임워크입니다.
 의도적인 추론이 필요한 요청을 감지하고, 현재 호스트의 새로운 셀렉터에서 적합한
 추론 시스템을 고른 뒤, 이론과 예제 전체를 활성 작업에 추가합니다. 단순한 사실
 확인과 기계적인 작업은 그대로 통과할 수 있습니다.
@@ -37,6 +37,8 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 | --- | --- | --- | --- |
 | Google Antigravity CLI | 명시적 스킬만 지원 | `opensocrates` 스킬 | [실험적 콘텐츠 전용 플러그인](docs/antigravity-support.md) |
 | Cursor IDE 및 CLI | 별도 셀렉터 없이 스킬 탐색 | `/opensocrates` | [실험적 콘텐츠 전용 Agent Plugin, 라이브 영수증 없음](docs/cursor-support.md) |
+| Grok Build `grok -p` | 네이티브 스킬로 같은 턴에 지원 | `/opensocrates` | [Grok Build 1.0.3 자동·명시적 네이티브 스킬 검증 완료](docs/grok-support.md) |
+| Grok Build TUI | 헤드리스와 같은 네이티브 플러그인, 활성화 영수증은 대기 중 | `/opensocrates` | [TUI 훅 실행 검증 완료, 네이티브 스킬 마커 테스트는 미완료, 배포 패키지에 훅 없음](docs/grok-support.md) |
 | OpenCode TUI 및 `opencode run` | 안정판 같은 턴 로컬 브리지 | 네이티브 `opensocrates` 스킬 | [OpenCode 1.18.18 TUI, `opencode run` 및 DeepSeek V4 Flash 라이브 스모크 완료](docs/opencode-support.ko.md) |
 | Codex CLI 및 Desktop | 앱에서 훅을 한 번 승인한 뒤 지원 | OpenSocrates 플러그인 | `darwin-arm64` 패키지·런처 릴리스 검증 완료, 실제 Codex 훅 전달 영수증 없음 |
 | Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | `/opensocrates` | `darwin-arm64` 로컬 검증 완료 |
@@ -74,6 +76,7 @@ receipt, Stop, 정리 생명주기도 로컬 검증을 마쳤습니다. 버전 1
 
 - Claude: Claude Code `2.1.205` 이상과 `claude` 명령
 - Codex: OAuth 로그인이 완료된 `codex` 명령
+- Grok Build: `grok 1.0.3` 이상과 기존 Grok 인증(API 키 추가 불필요)
 - OpenCode: OpenCode `1.18.18` 이상, 설정된 공급자/모델 제한 없음
 
 Node.js 20 이상이 필요합니다. npm에 게시된 `opensocrates` 패키지는 외부
@@ -114,8 +117,16 @@ npx --yes opensocrates@1.2.0 install
 npx --yes opensocrates@1.2.0 install --host claude
 npx --yes opensocrates@1.2.0 install --host antigravity
 npx --yes opensocrates@1.2.0 install --host cursor
+npx --yes opensocrates@1.2.0 install --host grok
 npx --yes opensocrates@1.2.0 install --host opencode
 ```
+
+Grok Build는 `~/.grok/plugins/opensocrates`에 네이티브 콘텐츠 전용 플러그인을
+설치합니다. 자동 선택과 명시적 호출이 가능한 `/opensocrates` 스킬 하나와 내부
+절차 48개만 포함하며, 훅·명령·에이전트·MCP 서버·런처·런타임·중첩 셀렉터 호출은
+포함하지 않습니다. 설치 프로그램은 Grok의 기계 판독 상태를 확인하지만 이 정확한
+디렉터리만 소유하며 Claude 설치를 변경하거나 삭제하지 않습니다. 자세한 내용은
+[Grok Build 지원 경계](docs/grok-support.md)를 참고하세요.
 
 기존 `--host codex` 및 `--host claude` 라이프사이클은 그대로 지원합니다. 호스트별
 업데이트는 의도적으로 버전 차이를 만들 수 있고, 이후 `update --host all` 또는
@@ -383,6 +394,7 @@ make release-check
 | `content/` | 정책, 다국어 메시지, 추론 방법, 이론과 예제 |
 | `plugin-src/claude/` | Claude 플러그인 템플릿 |
 | `plugin-src/codex/` | Codex 플러그인 템플릿 |
+| `plugin-src/grok/` | Grok Build 네이티브 콘텐츠 전용 플러그인 템플릿 |
 | `schemas/source/` | 정규 스키마 정의 |
 | `schemas/v1/` | 생성된 버전 고정 공개 스키마 |
 | `installer/` | 외부 의존성이 없는 Node.js GitHub/npx 설치 프로그램 |

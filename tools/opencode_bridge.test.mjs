@@ -28,26 +28,37 @@ async function invoke(parts, input = { messageID: "msg_test" }) {
   return parts;
 }
 
+// The repository pins Python 3.12; tools/build_plugins.py does not import
+// under older interpreters. `make smoke` passes its resolved interpreter, but
+// a bare `npm test` must not silently depend on whichever python3 happens to
+// be first on PATH, so fall back to the bootstrapped project virtualenv.
+function pythonCandidates() {
+  return [
+    process.env.OPENSOCRATES_PYTHON,
+    join(root, ".venv", "bin", "python3"),
+    "python3",
+  ].filter(Boolean);
+}
+
+function buildBridge(destination) {
+  const args = ["tools/build_plugins.py", "--root", root, "--host", "opencode", "--output", destination];
+  const options = {
+    cwd: root,
+    encoding: "utf8",
+    env: { ...process.env, PYTHONPATH: "src" },
+    maxBuffer: 16 * 1024 * 1024,
+  };
+  let last = null;
+  for (const interpreter of pythonCandidates()) {
+    last = spawnSync(interpreter, args, options);
+    if (last.status === 0) return last;
+  }
+  return last;
+}
+
 before(async () => {
   output = await mkdtemp(join(tmpdir(), "opensocrates-opencode-test-"));
-  const result = spawnSync(
-    "python3",
-    [
-      "tools/build_plugins.py",
-      "--root",
-      root,
-      "--host",
-      "opencode",
-      "--output",
-      output,
-    ],
-    {
-      cwd: root,
-      encoding: "utf8",
-      env: { ...process.env, PYTHONPATH: "src" },
-      maxBuffer: 16 * 1024 * 1024,
-    },
-  );
+  const result = buildBridge(output);
   assert.equal(result.status, 0, result.stderr);
   module = await import(pathToFileURL(join(output, "plugins", "opensocrates.js")));
   const plugin = await module.OpenSocratesPlugin({});
@@ -150,4 +161,44 @@ test("bridge is provider-neutral and contains no external execution surface", as
   assert.doesNotMatch(source, /deepseek|api[_-]?key|child_process|spawnSync|execFile/iu);
   assert.doesNotMatch(source, /\bfetch\s*\(/u);
   assert.doesNotMatch(source, /@opencode-ai\/plugin\/v2/u);
+});
+
+// Regression: the bridge used to wrap a fully synchronous activate() in a
+// Promise.race against a 50 ms setTimeout. The event loop cannot preempt
+// synchronous work, so that timer could never fire first — it advertised a
+// deadline the bridge did not have. OpenCode also awaits chat.message with no
+// host-side deadline or AbortSignal, so there is no boundary to honor.
+// Bounding comes from the input caps instead.
+test("bridge advertises no activation deadline it cannot enforce", async () => {
+  const source = await readFile(join(output, "plugins", "opensocrates.js"), "utf8");
+  // Compare executable code only: the bridge explains in comments why it has
+  // no deadline, and that prose must not itself trip the assertion.
+  const code = source
+    .replace(/^\s*\/\/.*$/gmu, "")
+    .replace(/\/\*[\s\S]*?\*\//gu, "");
+  assert.doesNotMatch(code, /Promise\s*\.\s*race\s*\(/u);
+  assert.doesNotMatch(code, /setTimeout\s*\(/u);
+  assert.doesNotMatch(code, /ACTIVATION_TIMEOUT_MS/u);
+  // The real bounds must remain present.
+  assert.match(code, /MAX_PARTS/u);
+  assert.match(code, /MAX_PROMPT_BYTES/u);
+  assert.match(code, /MAX_INJECTION_BYTES/u);
+});
+
+// The fail-open property is the try/catch, not a timer: a part whose accessor
+// throws must still leave the caller's parts untouched.
+test("synchronous activation still fails open without a timer", async () => {
+  const hostile = [
+    {
+      id: "prt_hostile",
+      sessionID: "ses_test",
+      messageID: "msg_test",
+      type: "text",
+      get text() {
+        throw new Error("adversarial getter");
+      },
+    },
+  ];
+  await assert.doesNotReject(() => invoke(hostile));
+  assert.equal(hostile.length, 1, "a failing activation mutated the parts array");
 });

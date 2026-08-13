@@ -29,10 +29,29 @@ from pathlib import Path
 from typing import Any
 
 SCHEMA = "opensocrates.release-check-evidence/1.0.0"
-HOSTS = ("antigravity", "claude", "codex", "cursor", "opencode")
+HOSTS = ("antigravity", "claude", "codex", "cursor", "grok", "opencode")
 RUNTIME_HOSTS = ("claude", "codex")
-CONTENT_ONLY_HOSTS = frozenset({"antigravity", "cursor"})
+# Grok ships content only. OpenCode additionally ships an owned plugin bridge,
+# so it is not content-only, but it still carries no native runtime payload.
+CONTENT_ONLY_HOSTS = frozenset({"antigravity", "cursor", "grok"})
 NO_NATIVE_RUNTIME_HOSTS = CONTENT_ONLY_HOSTS | frozenset({"opencode"})
+GROK_LIVE_PROBE_STATUS = (
+    "native_skill_headless_verified; explicit_headless_verified; "
+    "tui_hook_execution_verified; plugin_hooks_unavailable"
+)
+OPENCODE_LIVE_PROBE_STATUS = "validated_same_turn_run_and_tui_opencode_1.18.18"
+
+
+def _live_host_probe_status(*, opencode_validated: bool) -> dict[str, str]:
+    """Per-host live probe status, each host tied to its own recorded evidence."""
+
+    status = {host: "unvalidated" for host in HOSTS}
+    status["grok"] = GROK_LIVE_PROBE_STATUS
+    if opencode_validated:
+        status["opencode"] = OPENCODE_LIVE_PROBE_STATUS
+    return status
+
+
 EXPECTED_SCHEMA_COUNT = 32
 EXPECTED_METHOD_COUNT = 48
 LEGACY_CONTENT_BUNDLE = "content/compiled-content.bundle.json"
@@ -963,9 +982,9 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
     sbom_destination = dist / f"opensocrates-{version}-sbom.spdx.json"
     sbom_destination.write_bytes(sbom_source.read_bytes())
     opencode_evidence = _opencode_compatibility_evidence(root)
-    live_host_probe_status = {host: "unvalidated" for host in HOSTS}
-    if opencode_evidence["status"] == "pass":
-        live_host_probe_status["opencode"] = "validated_same_turn_run_and_tui_opencode_1.18.18"
+    live_host_probe_status = _live_host_probe_status(
+        opencode_validated=opencode_evidence["status"] == "pass"
+    )
     limitations = {
         "schema": "opensocrates.limitations/1.0.0",
         "product_version": version,
@@ -1367,6 +1386,27 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
             else:
                 if "chat.message" not in bridge_text or "@opencode-ai/plugin/v2" in bridge_text:
                     errors.add("opencode_stable_hook_boundary_invalid")
+    if host == "grok":
+        if any(
+            (generated / name).exists()
+            for name in ("bin", "hooks", "runtime", "commands", "agents", "mcp.json", ".mcp.json")
+        ):
+            errors.add("grok_content_only_boundary_invalid")
+        plugin_manifest = _load_json(generated / "plugin.json")
+        if (
+            plugin_manifest is None
+            or plugin_manifest.get("name") != "opensocrates"
+            or plugin_manifest.get("version") != bundle.get("product_version")
+            or plugin_manifest.get("skills") != "./skills"
+        ):
+            errors.add("grok_plugin_manifest_invalid")
+        capability_evidence = metadata.get("capability_evidence")
+        if (
+            not isinstance(capability_evidence, Mapping)
+            or capability_evidence.get("status") != "verified"
+            or capability_evidence.get("probe_id") != "grok-build-1.0.3-2026-08-13"
+        ):
+            errors.add("grok_capability_evidence_invalid")
     return {
         "status": "fail" if errors else "pass",
         "method_count": len(existing_method_outputs),
@@ -1595,12 +1635,14 @@ def _opencode_compatibility_evidence(  # noqa: C901  # Explicit evidence matrix.
     }
     if not isinstance(live, Mapping) or any(live.get(key) is not True for key in required_live):
         errors.add("opencode_evidence_live_probe_invalid")
+    # The bridge has no activation deadline: OpenCode awaits chat.message
+    # without a host-side timeout, and the selection work is synchronous, so a
+    # timeout observation is not a property this evidence can assert.
     required_isolated = {
         "global_plugin_discovered",
         "global_skill_discovered",
         "current_user_text_available",
         "in_place_part_mutation_visible_same_turn",
-        "timeout_failed_open",
         "exception_failed_open",
     }
     if not isinstance(isolated, Mapping) or any(
@@ -1865,14 +1907,9 @@ def _full_check(
         "unvalidated": {
             "platforms": _candidate_platforms(root, target),
             "signing_status": "unvalidated",
-            "live_host_probe_status": {
-                **{host: "unvalidated" for host in HOSTS},
-                "opencode": (
-                    "validated_same_turn_run_and_tui_opencode_1.18.18"
-                    if checks["opencode_compatibility_evidence"]["status"] == "pass"
-                    else "unvalidated"
-                ),
-            },
+            "live_host_probe_status": _live_host_probe_status(
+                opencode_validated=checks["opencode_compatibility_evidence"]["status"] == "pass"
+            ),
             "clean_machine_install_status": "unvalidated",
             "source_archive_status": "not_attempted",
             "provenance_status": "not_attempted",

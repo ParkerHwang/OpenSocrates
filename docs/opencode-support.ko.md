@@ -8,7 +8,7 @@ Agent Skill 탐색을 사용한다. 라이브 검증된 최소 OpenCode 버전�
 `~/.config/opencode/plugins/opensocrates.js` 브리지는 현재 사용자 요청을 로컬에서
 제한적으로 분류한다. 판단이 필요한 요청에는 완전한 저작 절차 하나만 합성 텍스트
 파트로 추가한다. 이 변경은 같은 모델 턴의 메시지 저장과 모델 디스패치 전에
-이뤄진다. 기계적 작업, 명시적 `/opensocrates` 요청, 비정상·과대 입력, 타임아웃,
+이뤄진다. 기계적 작업, 명시적 `/opensocrates` 요청, 비정상·과대 입력,
 예외는 원래 요청을 바꾸지 않고 fail-open 처리된다.
 
 `~/.config/opencode/skills/opensocrates/SKILL.md`는 항상 사용할 수 있는 명시적

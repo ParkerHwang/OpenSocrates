@@ -82,7 +82,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for host in antigravity claude codex cursor opencode; do
+          for host in antigravity claude codex cursor grok opencode; do
             asset="opensocrates-${RELEASE_VERSION}-${host}-plugin.zip"
             (
               cd dist
@@ -98,6 +98,8 @@ jobs:
             --checksum-codex "dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip.sha256" \
             --asset-cursor "dist/opensocrates-${RELEASE_VERSION}-cursor-plugin.zip" \
             --checksum-cursor "dist/opensocrates-${RELEASE_VERSION}-cursor-plugin.zip.sha256" \
+            --asset-grok "dist/opensocrates-${RELEASE_VERSION}-grok-plugin.zip" \
+            --checksum-grok "dist/opensocrates-${RELEASE_VERSION}-grok-plugin.zip.sha256" \
             --asset-opencode "dist/opensocrates-${RELEASE_VERSION}-opencode-plugin.zip" \
             --checksum-opencode "dist/opensocrates-${RELEASE_VERSION}-opencode-plugin.zip.sha256"
           chat_asset="opensocrates-${RELEASE_VERSION}-claude-chat-skills.zip"
@@ -127,6 +129,7 @@ jobs:
           chat_asset="dist/opensocrates-${RELEASE_VERSION}-claude-chat-skills.zip"
           codex_asset="dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip"
           cursor_asset="dist/opensocrates-${RELEASE_VERSION}-cursor-plugin.zip"
+          grok_asset="dist/opensocrates-${RELEASE_VERSION}-grok-plugin.zip"
           opencode_asset="dist/opensocrates-${RELEASE_VERSION}-opencode-plugin.zip"
           manifest="dist/opensocrates-${RELEASE_VERSION}-release-manifest.json"
           limitations="dist/opensocrates-${RELEASE_VERSION}-limitations.json"
@@ -142,6 +145,8 @@ jobs:
             "${codex_asset}.sha256"
             "${cursor_asset}"
             "${cursor_asset}.sha256"
+            "${grok_asset}"
+            "${grok_asset}.sha256"
             "${opencode_asset}"
             "${opencode_asset}.sha256"
             "${manifest}"

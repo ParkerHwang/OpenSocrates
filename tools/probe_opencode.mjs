@@ -18,7 +18,6 @@ const DEFAULT_VERSION = "1.18.18";
 const EVIDENCE_SCHEMA = "opensocrates.opencode-live-probe/1.0.0";
 const FIXED_PROMPT_TOKEN = "OC_SOURCE_PROMPT";
 const INJECTED_TOKEN = "OC_INJECTED_CONTEXT";
-const TIMEOUT_TOKEN = "OC_TIMEOUT_CONTINUED";
 const EXCEPTION_TOKEN = "OC_EXCEPTION_CONTINUED";
 
 function parseArgs(argv) {
@@ -104,17 +103,6 @@ export const OpenSocratesProbe = async () => ({
     if (mode === "exception") {
       try {
         throw new Error("fixed probe exception")
-      } catch {
-        await record({ event: "fail_open", mode, caught: true })
-        return
-      }
-    }
-    if (mode === "timeout") {
-      try {
-        await Promise.race([
-          new Promise(() => {}),
-          new Promise((_, reject) => setTimeout(() => reject(new Error("fixed probe timeout")), 25)),
-        ])
       } catch {
         await record({ event: "fail_open", mode, caught: true })
         return
@@ -211,7 +199,6 @@ async function main() {
       attempted: options.model !== null,
       model_fingerprint: options.model ? sha256(options.model).slice(0, 16) : null,
       same_turn_injection: null,
-      timeout_fail_open: null,
       exception_fail_open: null,
     };
 
@@ -223,14 +210,6 @@ async function main() {
         environment,
       );
       providerChecks.same_turn_injection = containsToken(inject, INJECTED_TOKEN);
-
-      environment.OPENSOCRATES_PROBE_MODE = "timeout";
-      const timeout = runOpenCode(
-        options.version,
-        [...base, `Return only ${TIMEOUT_TOKEN}.`],
-        environment,
-      );
-      providerChecks.timeout_fail_open = containsToken(timeout, TIMEOUT_TOKEN);
 
       environment.OPENSOCRATES_PROBE_MODE = "exception";
       const exception = runOpenCode(
@@ -276,7 +255,6 @@ async function main() {
       execution: {
         non_interactive_run: options.model ? providerChecks.same_turn_injection === true : null,
         tui: "not-run-by-noninteractive-probe",
-        timeout_fail_open: providerChecks.timeout_fail_open,
         exception_fail_open: providerChecks.exception_fail_open,
       },
       provider: providerChecks,

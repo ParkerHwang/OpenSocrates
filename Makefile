@@ -16,6 +16,7 @@ format-check:
 
 lint: typecheck
 	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) tools/check_import_boundaries.py
+	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) tools/check_generated_contract.py
 	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff check src tools; else "$(PYTHON)" -m ruff check src tools; fi
 
 typecheck:
@@ -27,6 +28,7 @@ generate:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host antigravity --output "$(ROOT)/build/generated/plugins/antigravity" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host cursor --output "$(ROOT)/build/generated/plugins/cursor" >/dev/null
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$(ROOT)/build/generated/plugins/grok" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host opencode --output "$(ROOT)/build/generated/plugins/opencode" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host claude --runtime-root "$(ROOT)/dist/runtime/claude" --output "$(ROOT)/build/generated/plugins/claude" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host codex --runtime-root "$(ROOT)/dist/runtime/codex" --output "$(ROOT)/build/generated/plugins/codex" >/dev/null
@@ -36,7 +38,13 @@ generated-check:
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py --output-dir "$$out/schemas"; \
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$$out/content/compiled-content.bundle.json" --reasoning-projections-output "$$out/content/compiled-reasoning-content.bundle.json"; \
 	diff -ru "$(ROOT)/schemas/v1" "$$out/schemas/v1"; diff -u "$(ROOT)/content/compiled-content.bundle.json" "$$out/content/compiled-content.bundle.json"; diff -u "$(ROOT)/content/compiled-reasoning-content.bundle.json" "$$out/content/compiled-reasoning-content.bundle.json"; \
-	echo "generated-check: byte-identical schemas and content bundles"
+	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$(ROOT)/build/generated/plugins/grok" >/dev/null; \
+	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$$out/plugins/grok" >/dev/null; \
+	diff -ru "$(ROOT)/build/generated/plugins/grok" "$$out/plugins/grok"; \
+	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host opencode --output "$(ROOT)/build/generated/plugins/opencode" >/dev/null; \
+	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host opencode --output "$$out/plugins/opencode" >/dev/null; \
+	diff -ru "$(ROOT)/build/generated/plugins/opencode" "$$out/plugins/opencode"; \
+	echo "generated-check: byte-identical schemas, content bundles, and Grok/OpenCode packages"
 
 content-check:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
@@ -58,6 +66,7 @@ docs-check:
 		--path docs/claude-chat-upload-probe.md \
 		--path docs/antigravity-support.md \
 		--path docs/cursor-support.md \
+		--path docs/grok-support.md \
 		--path docs/opencode-support.md \
 		--path docs/opencode-support.ko.md \
 		--path .github/release-notes \
@@ -78,8 +87,9 @@ smoke:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_claude.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_antigravity.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_cursor.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_grok.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_opencode.py
-	@node --test tools/opencode_bridge.test.mjs
+	@OPENSOCRATES_PYTHON="$(PYTHON)" node --test tools/opencode_bridge.test.mjs
 
 installer-check:
 	@npm test

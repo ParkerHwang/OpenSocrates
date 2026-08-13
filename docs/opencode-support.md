@@ -13,7 +13,7 @@ one synthetic text part containing the method's complete authored procedure.
 The mutation happens before message persistence and model dispatch, so the
 grounded procedure is available in the same model turn. Mechanical requests,
 explicit `/opensocrates` requests, unsupported parts, oversized inputs,
-timeouts, and exceptions leave the original request unchanged.
+and exceptions leave the original request unchanged.
 
 The native `opensocrates` Agent Skill is installed at
 `~/.config/opencode/skills/opensocrates/SKILL.md`. It is always available as the
@@ -35,9 +35,13 @@ loaded in the current conversation.
 
 Selection is a conservative, bounded local heuristic. The bridge accepts at
 most 128 message parts, 64 KiB of public prompt text, and a 48 KiB injection.
-It uses a 50 ms defensive deadline, marks its synthetic part, and suppresses a
-duplicate injection. Any parsing, selection, or mutation failure is caught so
-the original prompt continues normally.
+Selection runs synchronously over that capped input using a fixed set of
+linear, backtracking-free patterns, so the work is bounded by input size
+rather than by a wall-clock deadline; OpenCode's stable `chat.message`
+contract is awaited without a host-side deadline or cancellation signal. The
+bridge marks its synthetic part and suppresses a duplicate injection. Any
+parsing, selection, or mutation failure is caught so the original prompt
+continues normally.
 
 ## Installation and ownership
 
@@ -76,7 +80,7 @@ marker, sidecar, bridge hash, and complete managed-skill inventory.
 | Behavior | Status | Basis |
 |---|---|---|
 | Deterministic package and archive inventory | Validated | Release gate and byte-identical generation tests |
-| Bridge parsing, limits, duplicate prevention, timeout/exception fail-open | Validated | Offline Node tests against the generated bridge |
+| Bridge parsing, limits, duplicate prevention, exception fail-open | Validated | Offline Node tests against the generated bridge |
 | Install/status/verify/update/remove and unrelated-file preservation | Validated | Isolated lifecycle tests |
 | Global plugin and native skill discovery | Live validated | OpenCode 1.18.18 isolated invocation |
 | Same-turn `chat.message` mutation with the production bridge | Live validated | `opencode run` and interactive TUI on OpenCode 1.18.18 |
