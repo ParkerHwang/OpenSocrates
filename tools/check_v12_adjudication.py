@@ -52,13 +52,51 @@ ROUTING_BEHAVIORS = {
 }
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 PRIVATE_USE_PATTERN = re.compile(r"[\ue000-\uf8ff]")
-POSITIVE_EVIDENCE_CLAIM_PATTERN = re.compile(
-    r"\b(?:this|these|it|the\s+(?:report|policy|manifest|guide|amendment|"
-    r"release\s+notes?|snapshot|artifact|results?))\s+(?:is|are)\s+(?!not\b)"
-    r"[^.!\n]{0,160}\b(?:confirmation-grade\s+human\s+gold|held-out|"
-    r"answer-quality\s+evidence)\b",
-    re.IGNORECASE,
+FORBIDDEN_EVIDENCE_TERM_PATTERNS = (
+    (
+        "confirmation-grade human gold",
+        re.compile(r"\bconfirmation(?:-|\s)+grade(?:-|\s)+human(?:-|\s)+gold\b"),
+    ),
+    ("held-out", re.compile(r"\bheld(?:-|\s)+out\b")),
+    (
+        "answer-quality evidence",
+        re.compile(r"\banswer(?:-|\s)+quality\s+evidence\b"),
+    ),
 )
+APPROVED_EVIDENCE_BOUNDARY_PHRASES = {
+    "guide": (
+        "the committed ai-assisted snapshot governed by this guide is not "
+        "confirmation-grade human gold, not held-out, and not answer-quality evidence.",
+        "never the final held-out set",
+        "relationship to the held-out set",
+        "to the held-out annotation guide",
+        "held-out cases are separately authored",
+    ),
+    "amendment": (
+        "they are not confirmation-grade human gold, not held-out, and not "
+        "answer-quality evidence.",
+        "build the future held-out annotation guide",
+        "final held-out labels",
+    ),
+    "policy": (
+        "ai-assisted provisional development adjudication; not confirmation-grade "
+        "human gold, not held-out, and not answer-quality evidence.",
+    ),
+    "manifest": (
+        "development diagnostics only: not confirmation-grade human gold, not held-out, "
+        "and not answer-quality evidence. historical packet/raw/reviewer evidence is "
+        "maintainer-held and not repository-verifiable.",
+    ),
+    "report": (
+        "this is not confirmation-grade human gold, not held-out, and not answer-quality evidence.",
+        "held-out-guide design",
+        "separately authored held-out cases",
+    ),
+    "release_notes": (
+        "the published adjudication snapshot is not confirmation-grade human gold, "
+        "not held-out, and not answer-quality evidence.",
+    ),
+}
 EXPECTED_CLASSIFICATION_COUNTS = {
     "exact_agreement": 0,
     "compatible_agreement": 2,
@@ -569,11 +607,6 @@ def _check_public_text_boundaries(report: Report, paths: ArtifactPaths) -> None:
             f"{path}: contains the colliding GitHub identifier #65",
         )
         folded = " ".join(text.casefold().split())
-        report.check(
-            POSITIVE_EVIDENCE_CLAIM_PATTERN.search(text) is None,
-            f"committed.claim_boundary.{label}",
-            f"{path}: contains a positive confirmation/held-out/answer-quality claim",
-        )
         if label in required_explicit_boundaries:
             missing = [
                 phrase
@@ -589,6 +622,26 @@ def _check_public_text_boundaries(report: Report, paths: ArtifactPaths) -> None:
                 f"committed.claim_boundary.{label}",
                 f"{path}: missing explicit rejection(s) {missing}",
             )
+        masked = folded
+        for phrase in APPROVED_EVIDENCE_BOUNDARY_PHRASES.get(label, ()):
+            occurrences = masked.count(phrase)
+            report.check(
+                occurrences == 1,
+                f"committed.claim_boundary.{label}",
+                f"{path}: exact approved evidence-boundary phrase occurs "
+                f"{occurrences} times instead of once: {phrase!r}",
+            )
+            if occurrences:
+                masked = masked.replace(phrase, " ", 1)
+        remaining_terms = [
+            term for term, pattern in FORBIDDEN_EVIDENCE_TERM_PATTERNS if pattern.search(masked)
+        ]
+        report.check(
+            not remaining_terms,
+            f"committed.claim_boundary.{label}",
+            f"{path}: forbidden evidence term(s) remain outside exact approved "
+            f"negative/context phrases: {remaining_terms}",
+        )
 
 
 def validate_committed(paths: ArtifactPaths) -> Report:  # noqa: C901

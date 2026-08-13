@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -18,6 +19,7 @@ from unittest.mock import patch
 from build_v12_adjudication_packets import _publish_directory as publish_packet_directory
 from compare_v12_adjudication_reviews import (
     ComparisonValidationError,
+    build_comparison_artifact,
     comparison_class,
     validate_comparison_artifact,
 )
@@ -32,6 +34,7 @@ from finalize_v12_ai_adjudication import (
 from finalize_v12_ai_adjudication import (
     _publish_directory as publish_final_directory,
 )
+from json_schema_2020 import DRAFT_2020_12, check_schema, validate
 from v12_adjudication_contract import FORBIDDEN_PACKET_KEYS, find_forbidden_packet_keys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -156,6 +159,17 @@ def _mutate_jsonl(
     return mutate
 
 
+def _append_text(relative: Path, text: str) -> Callable[[Path], None]:
+    def mutate(root: Path) -> None:
+        path = root / relative
+        path.write_text(
+            path.read_text(encoding="utf-8") + "\n" + text + "\n",
+            encoding="utf-8",
+        )
+
+    return mutate
+
+
 def _signature(*, leader: str | None, alternatives: list[str], status: str) -> dict[str, Any]:
     return {
         "status": status,
@@ -169,6 +183,49 @@ def _signature(*, leader: str | None, alternatives: list[str], status: str) -> d
         "inclusion_metric_eligible": False,
         "policy_metric_eligible": True,
     }
+
+
+def _expect_reviewer_rejection(
+    *,
+    label: str,
+    primary: dict[str, Any],
+    secondary: dict[str, Any],
+    packet_manifest: dict[str, Any],
+    comparison: dict[str, Any],
+    schema: dict[str, Any],
+    primary_sha256: str,
+    secondary_sha256: str,
+    expected_error: str,
+    failures: list[str],
+) -> None:
+    for operation in ("build", "validate"):
+        try:
+            if operation == "build":
+                build_comparison_artifact(
+                    primary,
+                    secondary,
+                    packet_manifest,
+                    primary_sha256=primary_sha256,
+                    secondary_sha256=secondary_sha256,
+                )
+            else:
+                validate_comparison_artifact(
+                    comparison,
+                    schema,
+                    primary,
+                    secondary,
+                    packet_manifest,
+                    primary_sha256=primary_sha256,
+                    secondary_sha256=secondary_sha256,
+                )
+        except ComparisonValidationError as exc:
+            if expected_error not in str(exc):
+                failures.append(
+                    f"comparison validation: {label} {operation} returned unexpected "
+                    f"error {str(exc)!r}"
+                )
+        else:
+            failures.append(f"comparison validation: {label} was accepted by {operation}")
 
 
 def _contract_regressions(failures: list[str]) -> None:
@@ -202,7 +259,7 @@ def _contract_regressions(failures: list[str]) -> None:
         failures.append("comparison: disjoint leader sets must disagree")
 
 
-def _comparison_regressions(parent: Path, failures: list[str]) -> None:
+def _comparison_regressions(parent: Path, failures: list[str]) -> None:  # noqa: C901
     """Exercise the complete comparison generation path with synthetic private inputs."""
 
     fixture = parent / "synthetic-comparison"
@@ -305,6 +362,9 @@ def _comparison_regressions(parent: Path, failures: list[str]) -> None:
     count_mismatch = deepcopy(comparison)
     count_mismatch["classification_counts"]["compatible_agreement"] = 1
     invalid.append(("count mismatch", count_mismatch, primary, packet_manifest))
+    missing_zero_count = deepcopy(comparison)
+    del missing_zero_count["classification_counts"]["exact_agreement"]
+    invalid.append(("missing exact zero count", missing_zero_count, primary, packet_manifest))
     row_tamper = deepcopy(comparison)
     row_tamper["comparisons"][0]["classification"] = "substantive_disagreement"
     invalid.append(("row tamper", row_tamper, primary, packet_manifest))
@@ -330,22 +390,113 @@ def _comparison_regressions(parent: Path, failures: list[str]) -> None:
             continue
         failures.append(f"comparison validation: {label} artifact was accepted")
 
+    malformed_reviews: list[tuple[str, dict[str, Any], dict[str, Any], str]] = []
+
     malformed_primary = deepcopy(primary)
-    malformed_primary["decisions"][0].pop("leading_method")
-    try:
-        validate_comparison_artifact(
-            comparison,
-            schema,
+    malformed_primary["decisions"][2]["acceptable_leading_methods"] = "deduction"
+    malformed_reviews.append(
+        (
+            "primary scalar acceptable_leading_methods",
             malformed_primary,
             secondary,
-            packet_manifest,
-            primary_sha256=_sha256(primary_path),
-            secondary_sha256=_sha256(secondary_path),
+            "acceptable_leading_methods: must be an array of strings",
         )
-    except ComparisonValidationError:
-        pass
-    else:
-        failures.append("comparison validation: malformed primary review was accepted")
+    )
+    malformed_secondary = deepcopy(secondary)
+    malformed_secondary["decisions"][3]["allowed_behaviors"] = "hold"
+    malformed_reviews.append(
+        (
+            "secondary scalar allowed_behaviors",
+            primary,
+            malformed_secondary,
+            "allowed_behaviors: must be an array of strings",
+        )
+    )
+    invalid_item = deepcopy(primary)
+    invalid_item["decisions"][4]["acceptable_inclusion_methods"] = [7]
+    malformed_reviews.append(
+        (
+            "primary invalid acceptable_inclusion_methods item",
+            invalid_item,
+            secondary,
+            "acceptable_inclusion_methods: every item must be a non-empty string",
+        )
+    )
+    duplicate_item = deepcopy(secondary)
+    duplicate_item["decisions"][5]["prohibited_methods"] = ["deduction", "deduction"]
+    malformed_reviews.append(
+        (
+            "secondary duplicate prohibited_methods",
+            primary,
+            duplicate_item,
+            "prohibited_methods: duplicate items are forbidden",
+        )
+    )
+    invalid_status = deepcopy(primary)
+    invalid_status["decisions"][6]["status"] = "approved"
+    malformed_reviews.append(
+        ("invalid status enum", invalid_status, secondary, "status: invalid enum value")
+    )
+    invalid_policy = deepcopy(secondary)
+    invalid_policy["decisions"][7]["intervention_policy"] = "sometimes"
+    malformed_reviews.append(
+        (
+            "invalid intervention policy enum",
+            primary,
+            invalid_policy,
+            "intervention_policy: invalid enum value",
+        )
+    )
+    invalid_scalar = deepcopy(primary)
+    invalid_scalar["decisions"][8]["leading_method"] = 7
+    malformed_reviews.append(
+        (
+            "invalid leading method scalar",
+            invalid_scalar,
+            secondary,
+            "leading_method: string or null required",
+        )
+    )
+    invalid_boolean = deepcopy(secondary)
+    invalid_boolean["decisions"][9]["policy_metric_eligible"] = 1
+    malformed_reviews.append(
+        (
+            "invalid eligibility boolean",
+            primary,
+            invalid_boolean,
+            "policy_metric_eligible: boolean required",
+        )
+    )
+    missing_key = deepcopy(primary)
+    missing_key["decisions"][10].pop("leading_method")
+    malformed_reviews.append(
+        ("missing required decision key", missing_key, secondary, "missing=['leading_method']")
+    )
+    extra_key = deepcopy(secondary)
+    extra_key["decisions"][11]["invented_field"] = True
+    malformed_reviews.append(("extra decision key", primary, extra_key, "extra=['invented_field']"))
+
+    for index_value, (label, first_review, second_review, expected_error) in enumerate(
+        malformed_reviews
+    ):
+        first_candidate_path = fixture / f"malformed-primary-{index_value:02d}.json"
+        second_candidate_path = fixture / f"malformed-secondary-{index_value:02d}.json"
+        _write_json(first_candidate_path, first_review)
+        _write_json(second_candidate_path, second_review)
+        first_hash = _sha256(first_candidate_path)
+        second_hash = _sha256(second_candidate_path)
+        _expect_reviewer_rejection(
+            label=label,
+            primary=first_review,
+            secondary=second_review,
+            packet_manifest=packet_manifest,
+            comparison=comparison,
+            schema=schema,
+            primary_sha256=first_hash,
+            secondary_sha256=second_hash,
+            expected_error=expected_error,
+            failures=failures,
+        )
 
 
 def _overwrite_regressions(parent: Path, failures: list[str]) -> None:  # noqa: C901 - exercises each overwrite failure stage explicitly
@@ -448,6 +599,47 @@ def _overwrite_regressions(parent: Path, failures: list[str]) -> None:  # noqa: 
             or (rollback_target / "lock.json").read_text(encoding="utf-8") != "old"
         ):
             failures.append(f"{label}-publish: interrupted replacement did not roll back")
+
+
+def _json_schema_numeric_regressions(failures: list[str]) -> None:
+    """Keep the supported subset aligned with AJV Draft 2020-12 numeric equality."""
+
+    differential_cases: tuple[tuple[str, Any, dict[str, Any], bool], ...] = (
+        ("integral float is integer", 1.0, {"type": "integer"}, True),
+        ("integral float equals integer const", 1.0, {"const": 1}, True),
+        ("integral float equals integer enum", 1.0, {"enum": [1]}, True),
+        ("boolean differs from integer const", True, {"const": 1}, False),
+        (
+            "numeric equivalents violate uniqueItems",
+            [1, 1.0],
+            {"type": "array", "uniqueItems": True},
+            False,
+        ),
+        (
+            "nested numeric equivalents violate uniqueItems",
+            [{"value": 1}, {"value": 1.0}],
+            {"type": "array", "uniqueItems": True},
+            False,
+        ),
+    )
+    for label, instance, schema, expected_valid in differential_cases:
+        valid = not validate(instance, schema)
+        if valid is not expected_valid:
+            failures.append(
+                f"json-schema AJV differential {label}: expected valid={expected_valid}, "
+                f"got {valid}"
+            )
+
+    duplicate_enum_schema = {
+        "$schema": DRAFT_2020_12,
+        "enum": [1, 1.0],
+    }
+    if not check_schema(duplicate_enum_schema):
+        failures.append("json-schema AJV differential: enum [1, 1.0] was treated as unique")
+
+    for label, value in (("NaN", math.nan), ("Infinity", math.inf)):
+        if not validate(value, {}) or not check_schema({"$schema": DRAFT_2020_12, "const": value}):
+            failures.append(f"json-schema non-JSON boundary: {label} was accepted")
 
 
 def _semantic_review_regressions(failures: list[str]) -> None:  # noqa: C901
@@ -914,6 +1106,19 @@ def main() -> int:  # noqa: C901
         positive_claim = (
             "This is confirmation-grade human gold, held-out, and answer-quality evidence."
         )
+        report_provides_claim = (
+            "This report provides confirmation-grade human gold, held-out, and "
+            "answer-quality evidence."
+        )
+        release_certification_claim = (
+            "We certify this snapshot as confirmation-grade human gold, held-out, "
+            "and answer-quality evidence."
+        )
+        mixed_claim = (
+            "This report is not confirmation-grade human gold, not held-out, and not "
+            "answer-quality evidence, but it nevertheless provides confirmation-grade "
+            "human gold."
+        )
         coherent_cases: list[tuple[str, Callable[[Path], None], str]] = [
             (
                 "coherent semantic both false",
@@ -1047,11 +1252,9 @@ def main() -> int:  # noqa: C901
                 "committed.freeze.counts",
             ),
             (
-                "coherent report positive claim",
+                "coherent report provides positive claim",
                 _with_rehashed_manifest(
-                    lambda root: (root / REPORT_RELATIVE).write_text(
-                        positive_claim + "\n", encoding="utf-8"
-                    ),
+                    _append_text(REPORT_RELATIVE, report_provides_claim),
                     "report",
                 ),
                 "committed.claim_boundary.report",
@@ -1101,10 +1304,35 @@ def main() -> int:  # noqa: C901
                 "committed.claim_boundary.manifest",
             ),
             (
-                "coherent release notes positive claim",
+                "coherent release notes certification claim",
                 _with_rehashed_manifest(
-                    lambda root: (root / RELEASE_NOTES_RELATIVE).write_text(
-                        positive_claim + "\n", encoding="utf-8"
+                    _append_text(RELEASE_NOTES_RELATIVE, release_certification_claim),
+                    "release_notes",
+                ),
+                "committed.claim_boundary.release_notes",
+            ),
+            (
+                "coherent mixed negative and positive report claim",
+                _with_rehashed_manifest(
+                    _append_text(REPORT_RELATIVE, mixed_claim),
+                    "report",
+                ),
+                "committed.claim_boundary.report",
+            ),
+            (
+                "coherent grammar-free held-out claim variant",
+                _with_rehashed_manifest(
+                    _append_text(REPORT_RELATIVE, "Held-out evidence is hereby established."),
+                    "report",
+                ),
+                "committed.claim_boundary.report",
+            ),
+            (
+                "coherent grammar-free answer-quality claim variant",
+                _with_rehashed_manifest(
+                    _append_text(
+                        RELEASE_NOTES_RELATIVE,
+                        "Answer-quality evidence now follows from this snapshot.",
                     ),
                     "release_notes",
                 ),
@@ -1187,6 +1415,7 @@ def main() -> int:  # noqa: C901
         _contract_regressions(failures)
         _comparison_regressions(temporary, failures)
         _overwrite_regressions(temporary, failures)
+        _json_schema_numeric_regressions(failures)
         _semantic_review_regressions(failures)
 
     if failures:

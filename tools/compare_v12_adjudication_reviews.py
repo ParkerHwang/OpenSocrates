@@ -43,6 +43,17 @@ BEHAVIORS = {
     "route_safe_alternative",
     "bounded_analysis",
 }
+STATUSES = {
+    "retain",
+    "relabel",
+    "multi_valid",
+    "rewrite",
+    "exclude_from_policy_metric",
+    "invalid",
+}
+INTERVENTION_POLICIES = {"prohibited", "optional", "required", "undetermined"}
+LEGACY_KINDS = {"positive", "negative", "mechanical", "insufficiency", "explicit"}
+LEGACY_ASSERTIONS = {"exact_route", "exclusion_only", "no_intervention"}
 SIGNATURE_FIELDS = (
     "status",
     "intervention_policy",
@@ -61,6 +72,29 @@ SET_FIELDS = {
     "acceptable_inclusion_methods",
     "prohibited_methods",
 }
+BOOLEAN_FIELDS = {
+    "leading_metric_eligible",
+    "inclusion_metric_eligible",
+    "policy_metric_eligible",
+}
+COMPACT_RECORD_KEYS = frozenset({"pair_id", "legacy", "rationale", *SIGNATURE_FIELDS})
+FULL_RECORD_KEYS = frozenset(
+    {
+        "schema",
+        "protocol_version",
+        "pair_id",
+        "locales",
+        "legacy",
+        "semantic_review",
+        "decision",
+        "decisive_features",
+        "rationale",
+        "review",
+        "blinding",
+        "provenance",
+    }
+)
+FULL_DECISION_KEYS = frozenset({*SIGNATURE_FIELDS, "case_kind"})
 CLASSIFICATIONS = (
     "exact_agreement",
     "compatible_agreement",
@@ -90,37 +124,147 @@ def load(path: Path) -> dict[str, Any]:
     return value
 
 
+def _require_exact_keys(value: dict[str, Any], expected: frozenset[str], label: str) -> None:
+    missing = sorted(expected - set(value))
+    extra = sorted(set(value) - expected)
+    if missing or extra:
+        raise ComparisonValidationError(f"{label}: missing={missing}, extra={extra}")
+
+
+def _validate_legacy(value: Any, label: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ComparisonValidationError(f"{label}: legacy must be an object")
+    _require_exact_keys(
+        value,
+        frozenset({"kind", "owner_method", "expected_route", "assertion"}),
+        f"{label}.legacy",
+    )
+    if value["kind"] not in LEGACY_KINDS:
+        raise ComparisonValidationError(f"{label}.legacy.kind: invalid enum value")
+    if not isinstance(value["owner_method"], str) or not value["owner_method"]:
+        raise ComparisonValidationError(f"{label}.legacy.owner_method: non-empty string required")
+    expected_route = value["expected_route"]
+    if expected_route is not None and (not isinstance(expected_route, str) or not expected_route):
+        raise ComparisonValidationError(
+            f"{label}.legacy.expected_route: non-empty string or null required"
+        )
+    if value["assertion"] not in LEGACY_ASSERTIONS:
+        raise ComparisonValidationError(f"{label}.legacy.assertion: invalid enum value")
+    return value
+
+
+def _validate_string_array(value: Any, label: str) -> list[str]:
+    if not isinstance(value, list):
+        raise ComparisonValidationError(f"{label}: must be an array of strings")
+    if any(not isinstance(item, str) or not item for item in value):
+        raise ComparisonValidationError(f"{label}: every item must be a non-empty string")
+    if len(value) != len(set(value)):
+        raise ComparisonValidationError(f"{label}: duplicate items are forbidden")
+    return value
+
+
+def _validate_decision_source(  # noqa: C901 - every normalized scalar is checked explicitly
+    source: dict[str, Any], legacy: dict[str, Any], label: str, *, nested: bool
+) -> None:
+    expected_keys = FULL_DECISION_KEYS if nested else frozenset(SIGNATURE_FIELDS)
+    _require_exact_keys(source, expected_keys, label)
+
+    if source["status"] not in STATUSES:
+        raise ComparisonValidationError(f"{label}.status: invalid enum value")
+    if source["intervention_policy"] not in INTERVENTION_POLICIES:
+        raise ComparisonValidationError(f"{label}.intervention_policy: invalid enum value")
+    if nested and source["case_kind"] != legacy["kind"]:
+        raise ComparisonValidationError(f"{label}.case_kind: must equal legacy.kind")
+
+    for field in SET_FIELDS:
+        values = _validate_string_array(source[field], f"{label}.{field}")
+        if field == "allowed_behaviors":
+            normalized = [BEHAVIOR_ALIASES.get(item, item) for item in values]
+            unknown = sorted(set(normalized) - BEHAVIORS)
+            if unknown:
+                raise ComparisonValidationError(
+                    f"{label}.allowed_behaviors: unknown values {unknown}"
+                )
+            if len(normalized) != len(set(normalized)):
+                raise ComparisonValidationError(
+                    f"{label}.allowed_behaviors: aliases create duplicate normalized values"
+                )
+
+    leading_method = source["leading_method"]
+    if leading_method is not None and (not isinstance(leading_method, str) or not leading_method):
+        raise ComparisonValidationError(f"{label}.leading_method: string or null required")
+    for field in BOOLEAN_FIELDS:
+        if not isinstance(source[field], bool):
+            raise ComparisonValidationError(f"{label}.{field}: boolean required")
+
+
+def _validate_review_record(record: Any, review_label: str, index_value: int) -> None:
+    label = f"{review_label}.decisions[{index_value}]"
+    if not isinstance(record, dict):
+        raise ComparisonValidationError(f"{label}: must be an object")
+    nested = "decision" in record
+    _require_exact_keys(
+        record,
+        FULL_RECORD_KEYS if nested else COMPACT_RECORD_KEYS,
+        label,
+    )
+    pair_id = record["pair_id"]
+    if not isinstance(pair_id, str) or not pair_id:
+        raise ComparisonValidationError(f"{label}.pair_id: non-empty string required")
+    legacy = _validate_legacy(record["legacy"], label)
+    if not isinstance(record["rationale"], str) or not record["rationale"]:
+        raise ComparisonValidationError(f"{label}.rationale: non-empty string required")
+    if nested:
+        if record["schema"] != "opensocrates.eval-adjudication-decision/1.0.0":
+            raise ComparisonValidationError(f"{label}.schema: invalid enum value")
+        if record["protocol_version"] != "1.2.0":
+            raise ComparisonValidationError(f"{label}.protocol_version: invalid enum value")
+        if record["locales"] != ["en", "ko"]:
+            raise ComparisonValidationError(f"{label}.locales: must equal ['en', 'ko']")
+        source = record["decision"]
+        if not isinstance(source, dict):
+            raise ComparisonValidationError(f"{label}.decision: must be an object")
+    else:
+        source = {field: record[field] for field in SIGNATURE_FIELDS}
+    _validate_decision_source(source, legacy, f"{label}.decision", nested=nested)
+
+
+def _validate_review_artifact(review: Any, label: str) -> dict[str, Any]:
+    if not isinstance(review, dict):
+        raise ComparisonValidationError(f"{label}: review artifact must be an object")
+    decisions = review.get("decisions")
+    if not isinstance(decisions, list):
+        raise ComparisonValidationError(f"{label}: decisions must be an array")
+    for index_value, record in enumerate(decisions):
+        _validate_review_record(record, label, index_value)
+    return review
+
+
 def normalize_decision(record: dict[str, Any]) -> dict[str, Any]:
     source = record.get("decision", record)
     normalized: dict[str, Any] = {}
-    missing: list[str] = []
     for field in SIGNATURE_FIELDS:
-        if field not in source:
-            missing.append(field)
-            continue
         value = source[field]
         if field in SET_FIELDS:
-            values = value if isinstance(value, list) else []
+            values = value
             if field == "allowed_behaviors":
                 values = [BEHAVIOR_ALIASES.get(item, item) for item in values]
                 unknown = sorted(set(values) - BEHAVIORS)
                 if unknown:
-                    raise SystemExit(f"{record.get('pair_id')}: unknown behavior values {unknown}")
-            value = sorted(set(values))
+                    raise ComparisonValidationError(
+                        f"{record.get('pair_id')}: unknown behavior values {unknown}"
+                    )
+            value = sorted(values)
         normalized[field] = value
-    if missing:
-        raise SystemExit(f"{record.get('pair_id')}: missing decision fields {missing}")
     return normalized
 
 
 def index(review: dict[str, Any], label: str) -> dict[str, dict[str, Any]]:
     result: dict[str, dict[str, Any]] = {}
     for record in review["decisions"]:
-        pair_id = record.get("pair_id")
-        if not isinstance(pair_id, str) or not pair_id:
-            raise SystemExit(f"{label}: decision missing pair_id")
+        pair_id = record["pair_id"]
         if pair_id in result:
-            raise SystemExit(f"{label}: duplicate pair_id {pair_id}")
+            raise ComparisonValidationError(f"{label}: duplicate pair_id {pair_id}")
         result[pair_id] = record
     return result
 
@@ -163,6 +307,9 @@ def build_comparison_artifact(
     secondary_sha256: str,
 ) -> dict[str, Any]:
     """Build the canonical comparison from two complete frozen review artifacts."""
+
+    primary_review = _validate_review_artifact(primary_review, "primary")
+    secondary_review = _validate_review_artifact(secondary_review, "secondary")
 
     pair_ids = packet_manifest.get("pair_ids")
     if not isinstance(pair_ids, list) or any(
@@ -267,18 +414,18 @@ def validate_comparison_artifact(  # noqa: C901 - strict provenance checks stay 
         if comparison.get(field) != expected[field]:
             errors.append(f"{field} does not match frozen provenance")
 
-    raw_counts = comparison.get("classification_counts", {})
-    normalized_counts = (
-        {classification: raw_counts.get(classification, 0) for classification in CLASSIFICATIONS}
-        if isinstance(raw_counts, dict)
-        else {}
-    )
-    if normalized_counts != expected["classification_counts"]:
+    raw_counts = comparison.get("classification_counts")
+    if not isinstance(raw_counts, dict) or set(raw_counts) != set(CLASSIFICATIONS):
+        errors.append(
+            "classification_counts must contain exactly exact_agreement, "
+            "compatible_agreement, and substantive_disagreement"
+        )
+    if raw_counts != expected["classification_counts"]:
         errors.append("classification_counts do not match derived comparison rows")
-    if normalized_counts != EXPECTED_CLASSIFICATION_COUNTS:
+    if raw_counts != EXPECTED_CLASSIFICATION_COUNTS:
         errors.append(
             "classification_counts must be exactly "
-            f"{EXPECTED_CLASSIFICATION_COUNTS}, got {normalized_counts}"
+            f"{EXPECTED_CLASSIFICATION_COUNTS}, got {raw_counts}"
         )
 
     raw_rows = comparison.get("comparisons", [])

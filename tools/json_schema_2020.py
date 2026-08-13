@@ -5,7 +5,8 @@ The adjudication gate must run in a clean clone without ambient packages. This
 module implements every assertion keyword used by the checked schemas and
 rejects schemas containing an unsupported assertion keyword. Format validation
 is opt-in in JSON Schema; this implementation always asserts RFC 3339
-``date-time`` when the schema requests it.
+``date-time`` when the schema requests it. Python-only non-finite numbers and
+other values that JSON cannot encode are rejected before schema assertions.
 """
 
 from __future__ import annotations
@@ -66,10 +67,30 @@ class ValidationIssue:
         return f"{self.path}: {self.message}"
 
 
+def _normalized_json_value(value: Any) -> Any:
+    """Return a JSON-semantic value with mathematically integral floats canonicalized."""
+
+    if value is None or isinstance(value, (bool, str)):
+        return value
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError("non-finite numbers are not JSON values")
+        return int(value) if value.is_integer() else value
+    if isinstance(value, list):
+        return [_normalized_json_value(item) for item in value]
+    if isinstance(value, dict):
+        if any(not isinstance(key, str) for key in value):
+            raise ValueError("JSON object keys must be strings")
+        return {key: _normalized_json_value(item) for key, item in value.items()}
+    raise ValueError(f"{type(value).__name__} is not a JSON value")
+
+
 def _json_fingerprint(value: Any) -> str:
     try:
         return json.dumps(
-            value,
+            _normalized_json_value(value),
             ensure_ascii=False,
             sort_keys=True,
             separators=(",", ":"),
@@ -80,7 +101,20 @@ def _json_fingerprint(value: Any) -> str:
 
 
 def _json_equal(left: Any, right: Any) -> bool:
-    return _json_fingerprint(left) == _json_fingerprint(right)
+    try:
+        return _json_fingerprint(_normalized_json_value(left)) == _json_fingerprint(
+            _normalized_json_value(right)
+        )
+    except ValueError:
+        return False
+
+
+def _is_json_value(value: Any) -> bool:
+    try:
+        _normalized_json_value(value)
+    except ValueError:
+        return False
+    return True
 
 
 def _is_type(instance: Any, expected: str) -> bool:
@@ -95,13 +129,13 @@ def _is_type(instance: Any, expected: str) -> bool:
     if expected == "string":
         return isinstance(instance, str)
     if expected == "integer":
-        return isinstance(instance, int) and not isinstance(instance, bool)
+        if isinstance(instance, int) and not isinstance(instance, bool):
+            return True
+        return isinstance(instance, float) and math.isfinite(instance) and instance.is_integer()
     if expected == "number":
-        return (
-            isinstance(instance, (int, float))
-            and not isinstance(instance, bool)
-            and math.isfinite(instance)
-        )
+        if isinstance(instance, int) and not isinstance(instance, bool):
+            return True
+        return isinstance(instance, float) and math.isfinite(instance)
     raise AssertionError(f"unknown JSON type {expected}")
 
 
@@ -136,6 +170,8 @@ def check_schema(schema: Any) -> list[ValidationIssue]:  # noqa: C901
     issues: list[ValidationIssue] = []
     if not isinstance(schema, dict):
         return [ValidationIssue("$", "schema must be an object")]
+    if not _is_json_value(schema):
+        return [ValidationIssue("$", "schema contains a value that is not valid JSON")]
     if schema.get("$schema") != DRAFT_2020_12:
         issues.append(ValidationIssue("$.$schema", f"must equal {DRAFT_2020_12!r}"))
 
@@ -210,28 +246,26 @@ def check_schema(schema: Any) -> list[ValidationIssue]:  # noqa: C901
             "maxLength",
         ):
             value = node.get(keyword)
-            if value is not None and (
-                not isinstance(value, int) or isinstance(value, bool) or value < 0
-            ):
+            if value is not None and (not _is_type(value, "integer") or value < 0):
                 issues.append(
                     ValidationIssue(f"{path}.{keyword}", "must be a non-negative integer")
                 )
 
         if (
-            isinstance(node.get("minItems"), int)
-            and isinstance(node.get("maxItems"), int)
+            _is_type(node.get("minItems"), "integer")
+            and _is_type(node.get("maxItems"), "integer")
             and node["minItems"] > node["maxItems"]
         ):
             issues.append(ValidationIssue(path, "minItems exceeds maxItems"))
         if (
-            isinstance(node.get("minLength"), int)
-            and isinstance(node.get("maxLength"), int)
+            _is_type(node.get("minLength"), "integer")
+            and _is_type(node.get("maxLength"), "integer")
             and node["minLength"] > node["maxLength"]
         ):
             issues.append(ValidationIssue(path, "minLength exceeds maxLength"))
         if (
-            isinstance(node.get("minProperties"), int)
-            and isinstance(node.get("maxProperties"), int)
+            _is_type(node.get("minProperties"), "integer")
+            and _is_type(node.get("maxProperties"), "integer")
             and node["minProperties"] > node["maxProperties"]
         ):
             issues.append(ValidationIssue(path, "minProperties exceeds maxProperties"))
@@ -264,6 +298,8 @@ def check_schema(schema: Any) -> list[ValidationIssue]:  # noqa: C901
 def validate(instance: Any, schema: dict[str, Any]) -> list[ValidationIssue]:  # noqa: C901
     """Validate an instance with the supported Draft 2020-12 assertions."""
 
+    if not _is_json_value(instance):
+        return [ValidationIssue("$", "instance contains a value that is not valid JSON")]
     issues: list[ValidationIssue] = []
 
     def walk(value: Any, node: dict[str, Any], path: str) -> None:  # noqa: C901
