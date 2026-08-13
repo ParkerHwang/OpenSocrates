@@ -82,8 +82,7 @@ BOUNDARY_PAIR_IDS = (
 )
 
 COMMON_QUESTIONS = (
-    "Do the EN and KO texts convey the same situation, decision pressure, and"
-    " missing information?",
+    "Do the EN and KO texts convey the same situation, decision pressure, and missing information?",
     "Can this text, as written, support a single defensible gold policy?",
     "Is selector intervention prohibited, optional, required, or undetermined?",
     "Which behaviors are allowed (hold, clarifier, owner-then-hold, safe"
@@ -91,8 +90,7 @@ COMMON_QUESTIONS = (
     "Is there exactly one leading method, several acceptable leaders, or none?",
     "Which methods, if any, are prohibited for this case and why?",
     "Is the pair eligible for the leading, inclusion, and policy metrics?",
-    "Close as retain, relabel, multi_valid, rewrite, exclude_from_policy_metric,"
-    " or invalid.",
+    "Close as retain, relabel, multi_valid, rewrite, exclude_from_policy_metric, or invalid.",
 )
 
 
@@ -402,9 +400,7 @@ def main(argv: list[str] | None = None) -> int:
     pair_ids, pairs, pair_items = build_inventory(dataset, queue)
 
     if len(pair_ids) != EXPECTED_PAIR_COUNT:
-        raise SystemExit(
-            f"expected {EXPECTED_PAIR_COUNT} unique pairs, found {len(pair_ids)}"
-        )
+        raise SystemExit(f"expected {EXPECTED_PAIR_COUNT} unique pairs, found {len(pair_ids)}")
 
     locale_instances = 0
     for pair_id in pair_ids:
@@ -429,8 +425,7 @@ def main(argv: list[str] | None = None) -> int:
         packet_hashes[pair_id] = sha256_bytes(payload)
         kind_counts[packet["legacy"]["kind"]] += 1
         (args.packet_dir / f"{pair_id}.json").write_bytes(
-            json.dumps(packet, ensure_ascii=False, indent=2, sort_keys=True).encode("utf-8")
-            + b"\n"
+            json.dumps(packet, ensure_ascii=False, indent=2, sort_keys=True).encode("utf-8") + b"\n"
         )
 
     dataset_manifest_sha = (

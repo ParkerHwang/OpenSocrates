@@ -1,0 +1,154 @@
+{
+  "schema": "opensocrates.eval-adjudication-policy/1.0.0",
+  "protocol_version": "1.2.0",
+  "guide_version": "1.0.0",
+  "status": "maintainer_authorized_ai_assisted_provisional_development_policy",
+  "locked_at": "2026-08-13T02:55:08.729457Z",
+  "answers": {
+    "1_non_intervention_default": "case_by_case_rule",
+    "2_clarification_is_intervention": "yes",
+    "3_clarifier_policy_success": "allowed_but_not_required_unless_owner_is_contraindicated_or_target_missing",
+    "4_owner_route_then_hold": "allowed_route_identification_and_required_when_owner_is_unique_and_not_contraindicated",
+    "5_clarifier_and_owner_order": "owner_leads_unless_clarification_itself_is_the_main_repair_route",
+    "6_nonleading_clarifier": "inclusion_only_success",
+    "7_ambiguity_vs_missing_evidence": "two_rules_defined_below",
+    "8_contraindication_rule": "A matching Do-not-use condition prohibits the method. A matching Stop condition with an identifiable task owner permits owner-route-then-hold.",
+    "9_multi_behavior_leading_metric": "excluded_from_leading_metric_unless_one_unique_owner_is_fixed",
+    "10_policy_metric_exclusions": "Exclude undetermined, unresolved, rewrite, invalid, material translation mismatch, or cases whose allowed behavior set cannot be represented."
+  },
+  "reviewer_policies": {
+    "primary": {
+      "policy_questions": [
+        {
+          "number": 1,
+          "question": "Do the EN and KO texts convey the same situation, decision pressure, and missing information?",
+          "answer": "Adjudicate the pair jointly. Equivalence requires preservation of the task, decision pressure, stated evidence, and decisive omissions. A mismatch that could change routing, behavior, or metric eligibility requires rewrite or invalidity rather than averaging the two locales."
+        },
+        {
+          "number": 2,
+          "question": "Can an insufficiency text, as written, support a single defensible gold policy?",
+          "answer": "It can support a single prohibition on making the unsupported judgment, but it does not by itself force one selector route. When both a direct hold and selecting the identifiable owner method only to invoke its stop condition are safe and faithful, the gold policy is optional intervention and the case is multi-valid."
+        },
+        {
+          "number": 3,
+          "question": "Is selector intervention prohibited, optional, required, or undetermined?",
+          "answer": "For ordinary insufficiency, intervention is optional: no-intervention hold and owner-then-hold are both valid. Intervention is required only when the text uniquely requires an executable non-mechanical judgment; it is prohibited for a purely mechanical task or a clearly wrong method; it is undetermined when the packet itself leaves an unresolved routing boundary."
+        },
+        {
+          "number": 4,
+          "question": "Which behaviors are allowed?",
+          "answer": "Hold is always allowed when a decisive input is absent. A clarifier is allowed when no more than three bounded, answerable questions could materially change the route or conclusion. Owner-then-hold is allowed when the task family is identifiable. A safe alternative is allowed only when reversible, authorized, and non-committal. Bounded analysis may state limitations, conditional implications, or the smallest safe next check without inventing facts."
+        },
+        {
+          "number": 5,
+          "question": "What is the leading method?",
+          "answer": "If intervention occurs in an insufficiency case, the method that owns the user’s main judgment is the acceptable leader. A clarification method does not displace that owner merely because information is missing. leading_method records the unique conditional leader when one exists, even if intervention is optional. It is null only when no method can lead or several leaders are equally valid; acceptable_leading_methods records every valid selected leader."
+        },
+        {
+          "number": 6,
+          "question": "Which methods are acceptable only as inclusion methods?",
+          "answer": "Socratic questioning is an acceptable inclusion method when a small bounded clarification can repair the owner method’s missing inputs. It is leading only when clarification itself is the main task. Other methods are inclusion methods only when they perform a distinct complementary function rather than duplicate or replace the leading judgment."
+        },
+        {
+          "number": 7,
+          "question": "Which methods, if any, are prohibited?",
+          "answer": "Prohibit a method when selecting it would misroute the main judgment, override a binding constraint, or directly contradict its stated do-not-use territory. A method may still be an acceptable owner solely to identify and obey its own stop condition; that does not authorize substantive execution beyond the hold."
+        },
+        {
+          "number": 8,
+          "question": "When is the leading metric eligible?",
+          "answer": "Only when EN/KO are equivalent, intervention is required, and exactly one leading method is defensible. Optional intervention, no-intervention, several acceptable leaders, rewrite, exclusion, or invalidity makes the leading metric ineligible."
+        },
+        {
+          "number": 9,
+          "question": "When is the inclusion metric eligible?",
+          "answer": "Only when intervention is required and the acceptable inclusion set is stable enough to score without penalizing a valid no-method response. Optional intervention and unresolved route overlap make the inclusion metric ineligible."
+        },
+        {
+          "number": 10,
+          "question": "When is the policy metric eligible, and how should the case close?",
+          "answer": "The policy metric is eligible when equivalence holds and prohibited, optional, or required intervention plus allowed behaviors can be represented unambiguously. Close as retain for an unchanged single gold, relabel for one replacement gold, multi_valid for multiple accepted routes or behaviors, rewrite for curable wording ambiguity, exclude_from_policy_metric when method semantics remain useful but policy cannot be scored, and invalid for an unusable pair."
+        }
+      ],
+      "common_insufficiency_rule": {
+        "default_intervention_policy": "optional",
+        "valid_no_intervention_behavior": "hold",
+        "valid_intervention_behavior": "owner-then-hold",
+        "clarification_limit": 3,
+        "leading_rule": "The owner of the main judgment leads when a method is selected; complementary clarification follows.",
+        "substantive_constraint": "No route may fabricate decisive inputs, exact probabilities, causal claims, duties, source support, or recommendations that the packet does not support.",
+        "metric_rule": "Optional intervention cases remain policy-metric eligible but are not leading- or inclusion-metric eligible."
+      },
+      "source_citations": [
+        "fileciteturn1file2L186-L194",
+        "fileciteturn2file3L55-L61"
+      ]
+    },
+    "secondary": {
+      "guide_version": "1.0.0",
+      "protocol_version": "1.2.0",
+      "questions": [
+        {
+          "id": "P1",
+          "question": "Does decisive-input insufficiency automatically require no selector intervention?",
+          "answer": "No. Insufficiency blocks an unsupported judgment, but the selector may still route a method that can produce a guide-authorized hold, bounded clarification, safe handoff, or limited supported analysis."
+        },
+        {
+          "id": "P2",
+          "question": "When may the named domain owner lead despite missing inputs?",
+          "answer": "The owner may lead when the task family and main judgment are already identifiable and the frozen guide supplies a stop-or-hold condition for the missing input. The immediate behavior is route_owner_then_hold, not a fabricated completion."
+        },
+        {
+          "id": "P3",
+          "question": "What is the effect of a matching frozen-guide contraindication?",
+          "answer": "A matching Do-not-use condition prohibits that method from leading or being included. A stop condition cannot be used to evade an explicit contraindication."
+        },
+        {
+          "id": "P4",
+          "question": "When must a clarification route lead?",
+          "answer": "Socratic questioning leads when the owner is currently contraindicated, the task remains repairable through no more than three answerable and non-leading questions, and the current facts do not already settle the safe held verdict."
+        },
+        {
+          "id": "P5",
+          "question": "May the clarification method establish the target of clarification itself?",
+          "answer": "Yes, once, through a bounded meta-question identifying the concrete decision or claim and material consequence. It may not become an open-ended interview or request private reasoning."
+        },
+        {
+          "id": "P6",
+          "question": "When is hold_no_intervention the gold behavior?",
+          "answer": "Use it when no applicable method can add a defensible current-step result, the missing object is explicitly unavailable or intrinsically unsuitable, a clarifier would merely restate unavailable inputs, or no safe alternative is supported."
+        },
+        {
+          "id": "P7",
+          "question": "When is route_safe_alternative allowed?",
+          "answer": "Only when the frozen guide explicitly redirects the task to a more specific procedure or qualified owner, especially for safety, legal, clinical, incident, or other high-stakes review. Generic caution alone is not a separate route."
+        },
+        {
+          "id": "P8",
+          "question": "When is bounded_analysis allowed despite an unavailable full judgment?",
+          "answer": "It is allowed when the supplied facts independently support a limited verdict, limitation, or deterministic execution. The response must preserve uncertainty and may not invent missing premises, probabilities, actors, options, evidence, or thresholds."
+        },
+        {
+          "id": "P9",
+          "question": "How are leading, inclusion, and prohibited methods separated?",
+          "answer": "The leading method owns the main judgment. Socratic questioning is an acceptable inclusion when a stable owner may ask bounded supporting questions; it leads only under P4. Alternative leaders are listed only when each independently owns the main task. Prohibited methods are limited to matched contraindications or unsafe overrides."
+        },
+        {
+          "id": "P10",
+          "question": "How are status and metric eligibility assigned?",
+          "answer": "Retain preserves the legacy policy or route; relabel replaces it with one defensible route; multi_valid records genuinely valid alternatives; rewrite, exclusion, and invalidity are used when a clean gold cannot be supported. Leading eligibility requires one unique method leader, inclusion eligibility requires a stable scorable method set, and policy eligibility requires a determinate intervention policy and behavior set."
+        }
+      ],
+      "semantic_equivalence_rule": "Minor EN/KO wording differences are accepted only when situation, decision pressure, decisive omissions, and resulting policy are unchanged; route-changing differences require rewrite or invalidity.",
+      "behavior_enums": [
+        "bounded_analysis",
+        "hold_no_intervention",
+        "route_clarifier",
+        "route_owner_then_hold",
+        "route_safe_alternative"
+      ]
+    }
+  },
+  "resolution_note": "The secondary policy is adopted as the case-specific base because it distinguishes explicit contraindications from method stop conditions. The primary policy is preserved as dissent. Two schema-level behavior normalizations and one Claude-supported mechanical-boundary resolution are recorded in the disagreement ledger.",
+  "publication_boundary": "AI-assisted provisional development adjudication; not confirmation-grade human gold and not held-out evidence."
+}

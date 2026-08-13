@@ -221,9 +221,7 @@ def check_packets() -> int:
             f"{pair_id}: missing method definitions",
         )
 
-        packet_hashes[pair_id] = hashlib.sha256(
-            canonical_json(packet).encode("utf-8")
-        ).hexdigest()
+        packet_hashes[pair_id] = hashlib.sha256(canonical_json(packet).encode("utf-8")).hexdigest()
 
     report.check(
         packet_hashes == manifest.get("packet_sha256"),
@@ -276,22 +274,18 @@ def check_raw_results_unchanged(report: Report, recorded: dict[str, Any]) -> Non
         )
 
 
-def check_decisions() -> int:
+def check_decisions() -> int:  # noqa: C901  # Branch-explicit adjudication contract.
     report = Report()
 
     if not DECISIONS_PATH.exists():
         print(f"decisions: SKIP (no {DECISIONS_PATH.name} yet)")
-        print("  Phases 4-7 are pending: independent human adjudication not started.")
+        print("  Phases 4-7 are pending: no locked adjudication decision set exists.")
         return 0
 
     decisions = read_jsonl(DECISIONS_PATH)
-    disagreements = (
-        read_jsonl(DISAGREEMENTS_PATH) if DISAGREEMENTS_PATH.exists() else []
-    )
+    disagreements = read_jsonl(DISAGREEMENTS_PATH) if DISAGREEMENTS_PATH.exists() else []
     manifest = (
-        json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
-        if MANIFEST_PATH.exists()
-        else {}
+        json.loads(MANIFEST_PATH.read_text(encoding="utf-8")) if MANIFEST_PATH.exists() else {}
     )
     packet_manifest = (
         json.loads(PACKET_MANIFEST_PATH.read_text(encoding="utf-8"))
@@ -305,9 +299,7 @@ def check_decisions() -> int:
         pair_id = record.get("pair_id", f"<record {index}>")
 
         # --- structure ----------------------------------------------------
-        report.check(
-            record.get("schema") == DECISION_SCHEMA, f"{pair_id}: wrong schema"
-        )
+        report.check(record.get("schema") == DECISION_SCHEMA, f"{pair_id}: wrong schema")
         report.check(
             record.get("protocol_version") == PROTOCOL_VERSION,
             f"{pair_id}: wrong protocol_version",
@@ -331,15 +323,9 @@ def check_decisions() -> int:
             f"{pair_id}: bad intervention_policy",
         )
         behaviors = decision.get("allowed_behaviors", [])
-        report.check(
-            set(behaviors) <= BEHAVIORS, f"{pair_id}: unknown allowed_behaviors"
-        )
-        report.check(
-            review.get("agreement") in AGREEMENTS, f"{pair_id}: bad agreement value"
-        )
-        report.check(
-            bool(record.get("rationale")), f"{pair_id}: rationale is required"
-        )
+        report.check(set(behaviors) <= BEHAVIORS, f"{pair_id}: unknown allowed_behaviors")
+        report.check(review.get("agreement") in AGREEMENTS, f"{pair_id}: bad agreement value")
+        report.check(bool(record.get("rationale")), f"{pair_id}: rationale is required")
         report.check(
             bool(record.get("decisive_features")),
             f"{pair_id}: decisive_features is required",
@@ -351,9 +337,7 @@ def check_decisions() -> int:
         author = review.get("author_or_intent_witness")
         report.check(bool(primary), f"{pair_id}: missing primary adjudicator")
         report.check(bool(second), f"{pair_id}: missing second reviewer")
-        report.check(
-            primary != second, f"{pair_id}: primary and second reviewer are the same"
-        )
+        report.check(primary != second, f"{pair_id}: primary and second reviewer are the same")
         report.check(
             author is None or author != primary,
             f"{pair_id}: label author cannot be the primary adjudicator",
@@ -383,9 +367,7 @@ def check_decisions() -> int:
                 blinding.get(field) is False,
                 f"{pair_id}: blinding attestation {field} must be false",
             )
-        report.check(
-            bool(blinding.get("attestation")), f"{pair_id}: missing blinding attestation"
-        )
+        report.check(bool(blinding.get("attestation")), f"{pair_id}: missing blinding attestation")
 
         # --- semantic consistency --------------------------------------------
         if decision.get("intervention_policy") == "prohibited":
@@ -404,8 +386,7 @@ def check_decisions() -> int:
             )
         if decision.get("leading_metric_eligible") is True:
             report.check(
-                isinstance(decision.get("leading_method"), str)
-                and decision.get("leading_method"),
+                isinstance(decision.get("leading_method"), str) and decision.get("leading_method"),
                 f"{pair_id}: leading-metric eligible case needs one leading method",
             )
         if decision.get("policy_metric_eligible") is True:
@@ -456,9 +437,7 @@ def check_decisions() -> int:
         report.check(not extra, f"decisions for unknown pairs: {extra}")
 
     unresolved = [
-        r["pair_id"]
-        for r in decisions
-        if r.get("review", {}).get("agreement") == "unresolved"
+        r["pair_id"] for r in decisions if r.get("review", {}).get("agreement") == "unresolved"
     ]
     for pair_id in unresolved:
         record = next(r for r in decisions if r["pair_id"] == pair_id)
@@ -477,8 +456,7 @@ def check_decisions() -> int:
         }:
             report.check(
                 record["pair_id"] in disagreement_pairs,
-                f"{record['pair_id']}: disagreement is not recorded in the"
-                " disagreement file",
+                f"{record['pair_id']}: disagreement is not recorded in the disagreement file",
             )
 
     if manifest:
@@ -490,9 +468,7 @@ def check_decisions() -> int:
             manifest.get("annotation_guide_sha256") == sha256_file(GUIDE_PATH),
             "manifest guide hash does not match the annotation guide",
         )
-        check_raw_results_unchanged(
-            report, manifest.get("preserved_raw_result_sha256", {})
-        )
+        check_raw_results_unchanged(report, manifest.get("preserved_raw_result_sha256", {}))
 
     return report.summary("decisions")
 
