@@ -8,7 +8,7 @@
 
 ## Tracking
 
-<!-- Use Closes/Fixes/Resolves #N. If no issue exists, write: No issue: <specific explanation>. -->
+<!-- Use Closes/Fixes/Resolves #N. If no issue exists, write: No issue: <specific explanation>. Priority and Workstream must be non-empty. -->
 
 Closes #
 

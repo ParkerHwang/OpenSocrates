@@ -23,6 +23,10 @@ Contributor workflow only; no runtime or privacy behavior changes.
 
 No issue: repository-maintainer governance setup approved directly.
 
+- Project status: In Review
+- Priority: P1
+- Workstream: Documentation
+
 ## Validation
 
 - [x] Relevant tests pass.
@@ -109,11 +113,13 @@ def main() -> int:
     assert any(
         "empty or placeholder-only: Commands run:" in item for item in blank_command_errors
     ), blank_command_errors
-    assert not any(
-        "missing field: Commands run:" in item for item in blank_command_errors
-    ), blank_command_errors
+    assert not any("missing field: Commands run:" in item for item in blank_command_errors), (
+        blank_command_errors
+    )
 
-    draft_blank = BASE_BODY.replace("Last verified commit: abc1234", "Last verified commit:").replace(
+    draft_blank = BASE_BODY.replace(
+        "Last verified commit: abc1234", "Last verified commit:"
+    ).replace(
         "Commands run: python tools/check_pr_governance_mutations.py",
         "Commands run:",
     )
@@ -125,6 +131,14 @@ def main() -> int:
     )
     tracking_errors = validate_pull_request(event(bare_no_issue))
     assert any("Tracking must contain" in item for item in tracking_errors), tracking_errors
+
+    blank_priority = BASE_BODY.replace("- Priority: P1", "- Priority:")
+    priority_errors = validate_pull_request(event(blank_priority))
+    assert any("non-empty Priority:" in item for item in priority_errors), priority_errors
+
+    missing_workstream = BASE_BODY.replace("- Workstream: Documentation\n", "")
+    workstream_errors = validate_pull_request(event(missing_workstream))
+    assert any("non-empty Workstream:" in item for item in workstream_errors), workstream_errors
 
     with tempfile.TemporaryDirectory() as tmp:
         mutated = fixture(Path(tmp), root)
