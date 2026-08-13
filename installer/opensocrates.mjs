@@ -2435,9 +2435,15 @@ async function updaterEnvironment(hosts, npx) {
       continue;
     }
     if (host === "opencode") {
+      // OPENCODE_CONFIG_DIR redirects configuration only. Unlike the
+      // content-only hosts above, a scheduled OpenCode update re-runs the same
+      // requireHostCli version gate as an interactive install, so recording
+      // the config directory and stopping would leave the LaunchAgent without
+      // a resolvable opencode: enable would succeed in a shell that has it on
+      // PATH, then every scheduled run would fail the gate whenever opencode
+      // lives outside the launchd default PATH.
       if (process.env.OPENCODE_CONFIG_DIR) {
         environment.OPENCODE_CONFIG_DIR = resolve(process.env.OPENCODE_CONFIG_DIR);
-        continue;
       }
       const executable = await executablePath("opencode", "OPENCODE_BIN");
       environment.OPENCODE_BIN = executable;

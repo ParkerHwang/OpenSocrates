@@ -934,6 +934,57 @@ for (const [label, reported] of [
   });
 }
 
+// Regression: updaterEnvironment() recorded OPENCODE_CONFIG_DIR and stopped,
+// so the LaunchAgent carried no OPENCODE_BIN and did not extend PATH. Enable
+// succeeded from a shell that had opencode on PATH, then every scheduled run
+// failed the version gate whenever opencode lived outside the launchd default
+// PATH. The config directory must redirect configuration only.
+test("auto-update: OPENCODE_CONFIG_DIR still records the resolved OpenCode binary", async () => {
+  const box = makeSandbox("opencode");
+  try {
+    const pkg = buildPackage(box.root, "opencode");
+    const args = ["--host", "opencode", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `install failed: ${install.error?.message}`);
+
+    // The sandbox sets OPENCODE_CONFIG_DIR, and opencode exists only at an
+    // explicit path outside /usr/bin:/bin:/usr/sbin:/sbin.
+    const binary = process.env.OPENCODE_BIN;
+    assert.ok(binary, "sandbox did not configure OPENCODE_BIN");
+    assert.equal(
+      ["/usr/bin", "/bin", "/usr/sbin", "/sbin"].includes(dirname(binary)),
+      false,
+      "fixture binary must not sit on the launchd default PATH",
+    );
+    assert.ok(process.env.OPENCODE_CONFIG_DIR, "sandbox did not configure OPENCODE_CONFIG_DIR");
+
+    configureFakeNpx(box);
+    const enabled = await withDarwinArm64(() =>
+      quiet(() => main(["auto-update", "enable", "--host", "opencode"])),
+    );
+    assert.equal(enabled.error, undefined, `auto-update enable failed: ${enabled.error?.message}`);
+
+    const launchAgent = join(box.root, "LaunchAgents", "com.opensocrates.auto-update.plist");
+    assert.ok(existsSync(launchAgent), "LaunchAgent was not installed");
+    const plist = readFileSync(launchAgent, "utf8");
+
+    // The config directory is still redirected...
+    assert.match(plist, /<key>OPENCODE_CONFIG_DIR<\/key>/u);
+    // ...and the scheduled run can still resolve the host CLI.
+    assert.match(plist, /<key>OPENCODE_BIN<\/key>/u);
+    assert.match(plist, new RegExp(binary.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+
+    const path = plist.match(/<key>PATH<\/key>\s*<string>([^<]*)<\/string>/u);
+    assert.ok(path, "LaunchAgent recorded no PATH");
+    assert.ok(
+      path[1].split(":").includes(dirname(binary)),
+      `LaunchAgent PATH omits the OpenCode directory: ${path[1]}`,
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
 test("grok: staging and rollback directories stay outside the scanned plugins directory", async () => {
   const box = makeSandbox("grok");
   try {
