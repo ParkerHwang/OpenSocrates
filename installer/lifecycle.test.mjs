@@ -1285,7 +1285,9 @@ test("all hosts: fresh install uses one desired version and one manifest", async
       claude: buildPackage(box.root, "claude"),
       codex: buildPackage(box.root, "codex"),
     };
-    const result = await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
+    const result = await withDarwinArm64(() =>
+      quiet(() => main(["install", ...allAssetArgs(packages)])),
+    );
     assert.equal(result.error, undefined, `all-host install failed: ${result.error?.message}`);
     for (const host of ["claude", "codex"]) {
       assert.equal(box.state(host).plugins.length, 1, `${host} was not installed`);
@@ -1308,6 +1310,32 @@ test("all hosts: fresh install uses one desired version and one manifest", async
     assert.match(status.output, /claude: installed .* \(in sync\)/);
     assert.match(status.output, /codex: installed .* \(in sync\)/);
     assert.match(status.output, /Overall: no detected drift/);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("all hosts: qualified candidate assets exclude other ready hosts", async () => {
+  const box = makeAllSandbox();
+  try {
+    const antigravityHome = join(box.root, "antigravity-home");
+    mkdirSync(antigravityHome, { recursive: true });
+    const antigravity = writeFakeHost(box.root, "antigravity-ready", {
+      kind: "antigravity",
+    });
+    process.env.AGY_BIN = antigravity.binary;
+    process.env.ANTIGRAVITY_CONFIG_DIR = antigravityHome;
+    const packages = {
+      claude: buildPackage(box.root, "claude"),
+      codex: buildPackage(box.root, "codex"),
+    };
+
+    const result = await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
+
+    assert.equal(result.error, undefined, `candidate transaction failed: ${result.error?.message}`);
+    assert.deepEqual(box.desired().installedHosts, ["claude", "codex"]);
+    assert.equal(existsSync(join(antigravityHome, "plugins", MARKETPLACE)), false);
+    assert.doesNotMatch(result.output, /Downloading OpenSocrates/u);
   } finally {
     box.cleanup();
   }

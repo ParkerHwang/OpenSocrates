@@ -653,8 +653,9 @@ Usage:
 
 Without --asset, install, update, and verify download the v${PRODUCT_VERSION}
 package and checksum from GitHub Releases. The default lifecycle host is codex.
-For offline --host all verification, provide an asset/checksum pair for each
-supported host. Automatic updates are opt-in.
+With --host all, supplied host-qualified asset/checksum pairs define the exact
+transaction set and are never mixed with downloads for other hosts. Without
+qualified assets, every ready host participates. Automatic updates are opt-in.
 `);
 }
 
@@ -1316,6 +1317,11 @@ function localAssetInputs(options, host) {
   return { asset: options.asset, checksum: options.checksum };
 }
 
+function qualifiedAssetHosts(options) {
+  if (options.host !== ALL_HOST) return [];
+  return SUPPORTED_HOSTS.filter((host) => options.hostAssets[host].asset !== null);
+}
+
 async function resolveAssetInputs(options, scratch, host) {
   const local = localAssetInputs(options, host);
   if (local.asset !== null) {
@@ -1815,28 +1821,39 @@ async function preflightSelectedHosts(options, action, desiredState) {
   if (options.host !== ALL_HOST) {
     return [await preflightHost(options.host, action)];
   }
+  // A pre-release or offline caller may supply only the exact host archives it
+  // intends to transact. Never mix those candidate packages with downloads
+  // for other locally available hosts: the qualified asset set is the exact
+  // transaction boundary. With no local assets, --host all retains discovery
+  // of every ready host.
+  const assetHosts = qualifiedAssetHosts(options);
+  const candidates = assetHosts.length > 0 ? assetHosts : SUPPORTED_HOSTS;
   const desiredHosts = new Set(desiredState.installedHosts);
   const rootPresence = Object.fromEntries(
-    await Promise.all(SUPPORTED_HOSTS.map(async (host) => [host, await exists(managedPaths(host).root)])),
+    await Promise.all(candidates.map(async (host) => [host, await exists(managedPaths(host).root)])),
   );
-  const settled = await Promise.allSettled(SUPPORTED_HOSTS.map((host) => preflightHost(host, action)));
+  const settled = await Promise.allSettled(candidates.map((host) => preflightHost(host, action)));
   const successes = new Map();
   const failures = new Map();
   settled.forEach((result, index) => {
-    const host = SUPPORTED_HOSTS[index];
+    const host = candidates[index];
     if (result.status === "fulfilled") successes.set(host, result.value);
     else failures.set(host, result.reason);
   });
 
   const required = new Set();
-  if (action === "install") {
-    for (const host of SUPPORTED_HOSTS) {
+  if (assetHosts.length > 0) {
+    for (const host of assetHosts) required.add(host);
+  } else if (action === "install") {
+    for (const host of candidates) {
       if (desiredHosts.has(host) || rootPresence[host]) required.add(host);
     }
   } else if (desiredHosts.size > 0) {
-    for (const host of desiredHosts) required.add(host);
+    for (const host of desiredHosts) {
+      if (candidates.includes(host)) required.add(host);
+    }
   } else if (action === "remove") {
-    for (const host of SUPPORTED_HOSTS) {
+    for (const host of candidates) {
       if (rootPresence[host]) required.add(host);
     }
   }
@@ -1848,7 +1865,9 @@ async function preflightSelectedHosts(options, action, desiredState) {
   }
 
   let selected;
-  if (action === "update" && desiredHosts.size > 0) {
+  if (assetHosts.length > 0) {
+    selected = assetHosts.map((host) => successes.get(host)).filter(Boolean);
+  } else if (action === "update" && desiredHosts.size > 0) {
     selected = [...desiredHosts].map((host) => successes.get(host)).filter(Boolean);
   } else if (action === "remove") {
     selected = [...successes.values()].filter(
@@ -2850,7 +2869,9 @@ function requireSupportedPlatform() {
 }
 
 async function verifyPackages(options) {
-  const hosts = options.host === ALL_HOST ? SUPPORTED_HOSTS : [options.host];
+  const assetHosts = qualifiedAssetHosts(options);
+  const hosts =
+    options.host === ALL_HOST ? (assetHosts.length > 0 ? assetHosts : SUPPORTED_HOSTS) : [options.host];
   const prepared = await prepareVerifiedPackages(options, hosts);
   try {
     for (const item of prepared) {

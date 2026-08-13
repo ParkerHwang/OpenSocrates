@@ -879,6 +879,9 @@ async function runAcceptance() {
             "install",
             "--host",
             "all",
+            // Host-qualified candidate assets define the exact transaction
+            // set, so this remains a two-host atomic install even when other
+            // supported host CLIs are present on the acceptance machine.
             "--asset-claude",
             assets.hosts.claude.archivePath,
             "--checksum-claude",

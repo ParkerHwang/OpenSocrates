@@ -37,6 +37,13 @@ All notable changes to OpenSocrates are documented here. This project follows
   capability reporting, privacy-safe compatibility evidence, and English and
   Korean support documentation.
 
+### Fixed
+
+- Pre-release and offline `--host all` transactions now treat supplied
+  host-qualified asset pairs as the exact host set. Candidate packages are no
+  longer mixed with public-release downloads merely because another supported
+  host CLI is available on the machine.
+
 ### Security and privacy
 
 - The OpenCode installer never rewrites `opencode.json`; it refuses unowned,
