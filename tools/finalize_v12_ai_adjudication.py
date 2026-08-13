@@ -5,6 +5,10 @@ This is deliberately a synthesis tool, not another blind reviewer.  It keeps
 both complete ChatGPT Pro reviews, the recoverable Claude subset, every
 substantive disagreement, and the historical labels.  The resulting decision
 set is development-only under ``ADJUDICATION_AI_AMENDMENT.md``.
+
+This tool never creates or rotates the checker-pinned v1.0.0 publication lock.
+Publish regenerated artifacts under a new snapshot version; an exceptional
+same-version correction requires an explicit reviewed lock and trust-root rotation.
 """
 
 from __future__ import annotations
@@ -39,6 +43,13 @@ SECONDARY_PATH = BUILD_ROOT / "askpro-second-blind-adjudication.json"
 CLAUDE_PATH = BUILD_ROOT / "claude-opus5-blind-review.json"
 COMPARISON_PATH = BUILD_ROOT / "reviewer-comparison.json"
 COMPARISON_SCHEMA_PATH = EVAL_ROOT / "schemas/adjudication-review-comparison.schema.json"
+PUBLICATION_LOCK_PATH = EVAL_ROOT / "adjudication-publication-lock-v1.0.0.json"
+PUBLICATION_LOCK_NOTICE = (
+    "The committed v1.0.0 public snapshot is immutable. This finalizer never "
+    "creates or overwrites adjudication-publication-lock-v1.0.0.json. Use a new "
+    "snapshot version, or explicitly review both a lock rotation and the checker-pinned "
+    "trust-root change."
+)
 
 GUIDE_PATH = EVAL_ROOT / "ADJUDICATION_GUIDE.md"
 AMENDMENT_PATH = EVAL_ROOT / "ADJUDICATION_AI_AMENDMENT.md"
@@ -421,6 +432,10 @@ def _checked_output_path(path: Path, *, label: str) -> Path:
 def _publish_directory(staged: Path, output: Path, *, allow_overwrite: bool) -> None:
     output = _checked_output_path(output, label="finalization output")
     resolved_output = output.resolve(strict=False)
+    if PUBLICATION_LOCK_PATH.resolve(strict=False).is_relative_to(resolved_output):
+        raise SystemExit(
+            f"refusing finalization output that would replace the pinned publication lock: {output}"
+        )
     if resolved_output in {Path("/"), ROOT.resolve(), ROOT.parent.resolve()}:
         raise SystemExit(f"unsafe finalization output directory: {output}")
     if output.exists() and not output.is_dir():
@@ -446,7 +461,7 @@ def _publish_directory(staged: Path, output: Path, *, allow_overwrite: bool) -> 
 
 
 def main(argv: list[str] | None = None) -> int:  # noqa: C901
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, epilog=PUBLICATION_LOCK_NOTICE)
     parser.add_argument("--primary", type=Path, default=PRIMARY_PATH)
     parser.add_argument("--secondary", type=Path, default=SECONDARY_PATH)
     parser.add_argument("--claude-partial", type=Path, default=CLAUDE_PATH)
@@ -485,7 +500,10 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
     parser.add_argument(
         "--allow-overwrite-versioned-lock",
         action="store_true",
-        help="explicitly authorize atomic replacement of an existing output directory",
+        help=(
+            "authorize atomic replacement of an existing finalization output directory; "
+            "this never authorizes publication-lock replacement"
+        ),
     )
     parser.add_argument(
         "--dry-run",

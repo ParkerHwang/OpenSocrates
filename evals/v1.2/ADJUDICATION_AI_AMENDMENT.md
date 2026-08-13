@@ -72,3 +72,10 @@ maintainer-evidence validator mode is run with those files present.
 Any document or artifact using these decisions must call them “AI-assisted provisional
 development adjudication.” A later blind human review may confirm or replace them by
 creating a new version; it does not edit this decision history in place.
+
+The committed public snapshot version `1.0.0` is immutable. Its 11 public artifacts
+and manifest are anchored by `adjudication-publication-lock-v1.0.0.json`, whose exact
+digest is pinned in the committed validator. The finalizer neither creates nor
+overwrites that lock. Regeneration must use a new snapshot version; an exceptional
+same-version correction requires an explicit reviewed lock rotation and matching
+checker trust-root change. The lock contains no maintainer-held evidence.

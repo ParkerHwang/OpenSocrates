@@ -44,6 +44,7 @@ EVAL_RELATIVE = Path("evals/v1.2")
 REPORT_RELATIVE = Path("docs/v1.2-adjudication-report.md")
 RELEASE_NOTES_RELATIVE = Path(".github/release-notes/v1.2.1.md")
 COMPARISON_SCHEMA_RELATIVE = EVAL_RELATIVE / "schemas/adjudication-review-comparison.schema.json"
+PUBLICATION_LOCK_RELATIVE = EVAL_RELATIVE / "adjudication-publication-lock-v1.0.0.json"
 HASH_PATHS = {
     "annotation_guide": EVAL_RELATIVE / "ADJUDICATION_GUIDE.md",
     "ai_amendment": EVAL_RELATIVE / "ADJUDICATION_AI_AMENDMENT.md",
@@ -131,6 +132,26 @@ def _with_rehashed_manifest(
         for field in hash_fields:
             manifest["committed_artifact_sha256"][field] = _sha256(root / HASH_PATHS[field])
         _write_json(manifest_path, manifest)
+
+    return wrapped
+
+
+def _with_rehashed_manifest_and_publication_lock(
+    mutate: Callable[[Path], None], *hash_fields: str
+) -> Callable[[Path], None]:
+    """Rehash the manifest and lock while leaving the checker trust root unchanged."""
+
+    rehash_manifest = _with_rehashed_manifest(mutate, *hash_fields)
+
+    def wrapped(root: Path) -> None:
+        rehash_manifest(root)
+        lock_path = root / PUBLICATION_LOCK_RELATIVE
+        lock = _json(lock_path)
+        for field in hash_fields:
+            lock["artifacts"][field]["sha256"] = _sha256(root / HASH_PATHS[field])
+        manifest_path = root / EVAL_RELATIVE / "adjudication-manifest-v1.0.0.json"
+        lock["artifacts"]["manifest"]["sha256"] = _sha256(manifest_path)
+        _write_json(lock_path, lock)
 
     return wrapped
 
@@ -763,6 +784,27 @@ def _overwrite_regressions(parent: Path, failures: list[str]) -> None:  # noqa: 
         ):
             failures.append(f"{label}-publish: interrupted replacement did not roll back")
 
+    locked_output = parent / "final-publication-lock-output"
+    locked_output.mkdir()
+    publication_lock = locked_output / "adjudication-publication-lock-v1.0.0.json"
+    publication_lock.write_text("pinned", encoding="utf-8")
+    locked_staged = parent / "final-publication-lock-staged"
+    locked_staged.mkdir()
+    (locked_staged / "replacement.json").write_text("new", encoding="utf-8")
+    try:
+        with patch(
+            "finalize_v12_ai_adjudication.PUBLICATION_LOCK_PATH",
+            publication_lock,
+        ):
+            publish_final_directory(locked_staged, locked_output, allow_overwrite=True)
+    except SystemExit as exc:
+        if "pinned publication lock" not in str(exc):
+            failures.append(f"final-publish: unexpected publication-lock error {exc!s}")
+    else:
+        failures.append("final-publish: pinned publication-lock directory was accepted")
+    if publication_lock.read_text(encoding="utf-8") != "pinned" or not locked_staged.is_dir():
+        failures.append("final-publish: publication-lock refusal did not preserve target/stage")
+
 
 def _json_schema_numeric_regressions(failures: list[str]) -> None:
     """Keep the supported subset aligned with AJV Draft 2020-12 numeric equality."""
@@ -1033,10 +1075,74 @@ def main() -> int:  # noqa: C901
         freeze = EVAL_RELATIVE / "adjudication-freeze-v1.0.0.json"
         guide = EVAL_RELATIVE / "ADJUDICATION_GUIDE.md"
         amendment = EVAL_RELATIVE / "ADJUDICATION_AI_AMENDMENT.md"
+        publication_lock = PUBLICATION_LOCK_RELATIVE
         decision_schema = EVAL_RELATIVE / "schemas/adjudication-decision.schema.json"
         disagreement_schema = EVAL_RELATIVE / "schemas/adjudication-disagreement.schema.json"
 
         cases: list[tuple[str, Callable[[Path], None], str]] = [
+            (
+                "missing publication lock",
+                lambda root: (root / publication_lock).unlink(),
+                "committed.publication_lock.missing",
+            ),
+            (
+                "malformed publication lock",
+                lambda root: (root / publication_lock).write_text("{", encoding="utf-8"),
+                "committed.publication_lock.json",
+            ),
+            (
+                "publication lock path traversal",
+                _mutate_json(
+                    publication_lock,
+                    lambda value: value["artifacts"]["report"].__setitem__(
+                        "path", "../docs/v1.2-adjudication-report.md"
+                    ),
+                ),
+                "committed.publication_lock.entry.report.path.safe",
+            ),
+            (
+                "publication lock extra artifact",
+                _mutate_json(
+                    publication_lock,
+                    lambda value: value["artifacts"].__setitem__(
+                        "private_review",
+                        {"path": "build/private-review.json", "sha256": "0" * 64},
+                    ),
+                ),
+                "committed.publication_lock.artifacts_fields",
+            ),
+            (
+                "publication lock missing artifact",
+                _mutate_json(
+                    publication_lock,
+                    lambda value: value["artifacts"].pop("report"),
+                ),
+                "committed.publication_lock.artifacts_fields",
+            ),
+            (
+                "publication lock entry additional property",
+                _mutate_json(
+                    publication_lock,
+                    lambda value: value["artifacts"]["report"].__setitem__("unexpected", True),
+                ),
+                "committed.publication_lock.entry.report.fields",
+            ),
+            (
+                "publication lock top-level additional property",
+                _mutate_json(
+                    publication_lock,
+                    lambda value: value.__setitem__("unexpected", True),
+                ),
+                "committed.publication_lock.fields",
+            ),
+            (
+                "manifest digest drift from publication lock",
+                _mutate_json(
+                    manifest,
+                    lambda value: value.__setitem__("decision_locked_at", "2026-08-13T02:55:09Z"),
+                ),
+                "committed.publication_lock.artifact.manifest.mismatch",
+            ),
             (
                 "missing decisions",
                 lambda root: (root / decisions).unlink(),
@@ -1304,6 +1410,16 @@ def main() -> int:  # noqa: C901
             "freeze, and per-case leading/inclusion/prohibited routes recorded before any\n"
             "model output is opened."
         )
+        amendment_restriction = "They may not be used as:"
+        amendment_scope_reversal = "They may be used as:"
+        report_disclaimer = (
+            "This is not confirmation-grade human gold, not held-out, and not\n"
+            "answer-quality evidence."
+        )
+        report_false_wrapper = (
+            "The statement “This is not confirmation-grade human gold, not held-out, "
+            "and not answer-quality evidence.” is false."
+        )
         coherent_cases: list[tuple[str, Callable[[Path], None], str]] = [
             (
                 "coherent semantic both false",
@@ -1562,6 +1678,54 @@ def main() -> int:  # noqa: C901
                     "annotation_guide",
                 ),
                 "committed.claim_boundary.guide",
+            ),
+            (
+                "coherent amendment permission reversal",
+                _with_rehashed_manifest(
+                    _replace_text(
+                        amendment,
+                        amendment_restriction,
+                        amendment_scope_reversal,
+                    ),
+                    "ai_amendment",
+                ),
+                "committed.publication_lock.artifact.ai_amendment.mismatch",
+            ),
+            (
+                "coherent amendment permission reversal with rehashed lock",
+                _with_rehashed_manifest_and_publication_lock(
+                    _replace_text(
+                        amendment,
+                        amendment_restriction,
+                        amendment_scope_reversal,
+                    ),
+                    "ai_amendment",
+                ),
+                "committed.publication_lock.root",
+            ),
+            (
+                "coherent report false-wrapper reversal",
+                _with_rehashed_manifest(
+                    _replace_text(
+                        REPORT_RELATIVE,
+                        report_disclaimer,
+                        report_false_wrapper,
+                    ),
+                    "report",
+                ),
+                "committed.publication_lock.artifact.report.mismatch",
+            ),
+            (
+                "coherent report false-wrapper reversal with rehashed lock",
+                _with_rehashed_manifest_and_publication_lock(
+                    _replace_text(
+                        REPORT_RELATIVE,
+                        report_disclaimer,
+                        report_false_wrapper,
+                    ),
+                    "report",
+                ),
+                "committed.publication_lock.root",
             ),
             (
                 "comparison classification count tamper",

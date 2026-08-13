@@ -18,7 +18,7 @@ import unicodedata
 from collections import Counter
 from copy import deepcopy
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
 from compare_v12_adjudication_reviews import (
@@ -46,6 +46,28 @@ COMPARISON_SCHEMA_ID = (
 FREEZE_SCHEMA_ID = "opensocrates.eval-adjudication-freeze/1.0.0"
 GUIDE_VERSION = "1.0.0"
 MAINTAINER_EVIDENCE_AVAILABILITY = "maintainer_held_not_repository_verifiable"
+PUBLICATION_LOCK_SCHEMA = "opensocrates.eval-adjudication-publication-lock/1.0.0"
+PUBLICATION_SNAPSHOT_VERSION = "1.0.0"
+PUBLICATION_LOCK_SCOPE = "frozen_public_repository_artifacts_only"
+PUBLICATION_LOCK_POLICY = "immutable_versioned_snapshot"
+EXPECTED_PUBLICATION_LOCK_SHA256 = (
+    "15c37de6a0cf8d5377d7e0147bb6f84a56363b3ed23696e38abd9e3e79af52b6"
+)
+PUBLICATION_ARTIFACT_PATHS = {
+    "ai_amendment": "evals/v1.2/ADJUDICATION_AI_AMENDMENT.md",
+    "annotation_guide": "evals/v1.2/ADJUDICATION_GUIDE.md",
+    "comparison_schema": "evals/v1.2/schemas/adjudication-review-comparison.schema.json",
+    "decision_schema": "evals/v1.2/schemas/adjudication-decision.schema.json",
+    "decisions": "evals/v1.2/adjudication-decisions-v1.0.0.jsonl",
+    "disagreement_schema": "evals/v1.2/schemas/adjudication-disagreement.schema.json",
+    "disagreements": "evals/v1.2/adjudication-disagreements-v1.0.0.jsonl",
+    "freeze": "evals/v1.2/adjudication-freeze-v1.0.0.json",
+    "manifest": "evals/v1.2/adjudication-manifest-v1.0.0.json",
+    "policy": "evals/v1.2/adjudication-policy-v1.0.0.json",
+    "release_notes": ".github/release-notes/v1.2.1.md",
+    "report": "docs/v1.2-adjudication-report.md",
+}
+MANIFEST_ARTIFACT_KEYS = frozenset(PUBLICATION_ARTIFACT_PATHS) - {"manifest"}
 ROUTING_BEHAVIORS = {
     "route_clarifier",
     "route_owner_then_hold",
@@ -198,6 +220,10 @@ class ArtifactPaths:
     @property
     def manifest(self) -> Path:
         return self.eval_root / "adjudication-manifest-v1.0.0.json"
+
+    @property
+    def publication_lock(self) -> Path:
+        return self.eval_root / "adjudication-publication-lock-v1.0.0.json"
 
     @property
     def decision_schema(self) -> Path:
@@ -606,6 +632,208 @@ def _check_hash(
         )
 
 
+def _is_safe_repo_relative_path(value: Any) -> bool:
+    if not isinstance(value, str) or not value or "\\" in value or "\x00" in value:
+        return False
+    posix = PurePosixPath(value)
+    windows = PureWindowsPath(value)
+    return (
+        not posix.is_absolute()
+        and not windows.is_absolute()
+        and not windows.drive
+        and bool(posix.parts)
+        and all(part not in {".", ".."} for part in posix.parts)
+        and posix.as_posix() == value
+    )
+
+
+def _validate_publication_lock(  # noqa: C901 - trust-root checks remain linear and explicit
+    report: Report,
+    paths: ArtifactPaths,
+    manifest: dict[str, Any],
+) -> None:
+    """Validate the pinned public snapshot root before trusting its artifact map."""
+
+    lock_path = paths.publication_lock
+    if not report.check(
+        not lock_path.is_symlink(),
+        "committed.publication_lock.symlink",
+        f"publication lock must not be a symlink: {lock_path}",
+    ):
+        return
+    if not report.check(
+        lock_path.is_file(),
+        "committed.publication_lock.missing",
+        f"missing publication lock {lock_path}",
+    ):
+        return
+    try:
+        raw = lock_path.read_bytes()
+    except OSError as exc:
+        report.fail(
+            "committed.publication_lock.unreadable",
+            f"cannot read {lock_path}: {type(exc).__name__}",
+        )
+        return
+
+    actual_root = hashlib.sha256(raw).hexdigest()
+    root_trusted = report.check(
+        actual_root == EXPECTED_PUBLICATION_LOCK_SHA256,
+        "committed.publication_lock.root",
+        f"{lock_path}: pinned SHA-256 mismatch; expected "
+        f"{EXPECTED_PUBLICATION_LOCK_SHA256}, got {actual_root}",
+    )
+    try:
+        lock = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        report.fail(
+            "committed.publication_lock.json",
+            f"{lock_path}: invalid UTF-8 JSON: {exc}",
+        )
+        return
+    if not isinstance(lock, dict):
+        report.fail(
+            "committed.publication_lock.type",
+            f"{lock_path}: publication lock must be an object",
+        )
+        return
+
+    expected_fields = {
+        "schema",
+        "snapshot_version",
+        "evaluation_id",
+        "protocol_version",
+        "evidence_grade",
+        "scope",
+        "publication_policy",
+        "private_evidence_included",
+        "artifact_count",
+        "artifacts",
+    }
+    _check_exact_keys(
+        report,
+        lock,
+        expected_fields,
+        "committed.publication_lock.fields",
+        "publication lock",
+    )
+    for field, expected, code in (
+        ("schema", PUBLICATION_LOCK_SCHEMA, "schema"),
+        ("snapshot_version", PUBLICATION_SNAPSHOT_VERSION, "version"),
+        ("evaluation_id", EVALUATION_ID, "evaluation_id"),
+        ("protocol_version", PROTOCOL_VERSION, "protocol"),
+        ("evidence_grade", EVIDENCE_GRADE, "evidence_grade"),
+        ("scope", PUBLICATION_LOCK_SCOPE, "scope"),
+        ("publication_policy", PUBLICATION_LOCK_POLICY, "policy"),
+    ):
+        report.check(
+            lock.get(field) == expected,
+            f"committed.publication_lock.{code}",
+            f"publication lock {field} must equal {expected!r}",
+        )
+    report.check(
+        lock.get("private_evidence_included") is False,
+        "committed.publication_lock.private_evidence",
+        "publication lock must exclude private maintainer evidence",
+    )
+    report.check(
+        lock.get("artifact_count") == len(PUBLICATION_ARTIFACT_PATHS),
+        "committed.publication_lock.count",
+        f"publication lock must contain exactly {len(PUBLICATION_ARTIFACT_PATHS)} artifacts",
+    )
+
+    raw_artifacts = lock.get("artifacts")
+    artifacts = raw_artifacts if isinstance(raw_artifacts, dict) else {}
+    report.check(
+        isinstance(raw_artifacts, dict),
+        "committed.publication_lock.artifacts_type",
+        "publication lock artifacts must be an object",
+    )
+    report.check(
+        set(artifacts) == set(PUBLICATION_ARTIFACT_PATHS),
+        "committed.publication_lock.artifacts_fields",
+        "publication lock artifact names differ: "
+        f"missing={sorted(set(PUBLICATION_ARTIFACT_PATHS) - set(artifacts))} "
+        f"extra={sorted(set(artifacts) - set(PUBLICATION_ARTIFACT_PATHS))}",
+    )
+
+    validated_entries: dict[str, tuple[str, str]] = {}
+    for name, expected_path in PUBLICATION_ARTIFACT_PATHS.items():
+        entry = artifacts.get(name)
+        entry_fields_valid = _check_exact_keys(
+            report,
+            entry,
+            {"path", "sha256"},
+            f"committed.publication_lock.entry.{name}.fields",
+            f"publication lock artifact {name}",
+        )
+        if not isinstance(entry, dict):
+            continue
+        raw_path = entry.get("path")
+        path_safe = report.check(
+            _is_safe_repo_relative_path(raw_path),
+            f"committed.publication_lock.entry.{name}.path.safe",
+            f"publication lock artifact {name} has an unsafe repo-relative path: {raw_path!r}",
+        )
+        path_exact = report.check(
+            raw_path == expected_path,
+            f"committed.publication_lock.entry.{name}.path.exact",
+            f"publication lock artifact {name} path must equal {expected_path!r}",
+        )
+        raw_sha = entry.get("sha256")
+        sha_valid = report.check(
+            _is_sha256(raw_sha),
+            f"committed.publication_lock.entry.{name}.sha256",
+            f"publication lock artifact {name} digest must be SHA-256",
+        )
+        if entry_fields_valid and path_safe and path_exact and sha_valid:
+            assert isinstance(raw_path, str)
+            assert isinstance(raw_sha, str)
+            validated_entries[name] = (raw_path, raw_sha)
+
+    # A structurally valid but rehashed lock is still untrusted. Parse it above only
+    # to produce controlled diagnostics; never use it to authorize artifact changes.
+    if not root_trusted:
+        return
+
+    for name, (relative_path, expected_sha) in validated_entries.items():
+        artifact_path = paths.root / PurePosixPath(relative_path)
+        if not report.check(
+            not artifact_path.is_symlink(),
+            f"committed.publication_lock.artifact.{name}.symlink",
+            f"locked artifact must not be a symlink: {artifact_path}",
+        ):
+            continue
+        if not report.check(
+            artifact_path.is_file(),
+            f"committed.publication_lock.artifact.{name}.missing",
+            f"locked artifact is missing: {artifact_path}",
+        ):
+            continue
+        report.check(
+            sha256_file(artifact_path) == expected_sha,
+            f"committed.publication_lock.artifact.{name}.mismatch",
+            f"{artifact_path}: SHA-256 does not match the pinned publication lock",
+        )
+
+    manifest_hashes = manifest.get("committed_artifact_sha256")
+    if not isinstance(manifest_hashes, dict):
+        report.fail(
+            "committed.publication_lock.manifest_hashes_type",
+            "manifest committed_artifact_sha256 must be an object",
+        )
+        return
+    for name in sorted(MANIFEST_ARTIFACT_KEYS):
+        entry = validated_entries.get(name)
+        if entry is None:
+            continue
+        report.check(
+            manifest_hashes.get(name) == entry[1],
+            f"committed.publication_lock.manifest_hash.{name}",
+            f"manifest hash {name!r} differs from the pinned publication lock",
+        )
+
+
 def _normalize_evidence_text(value: str) -> str:
     """Canonicalize Unicode dashes, case, and whitespace before claim checks."""
 
@@ -710,6 +938,8 @@ def validate_committed(paths: ArtifactPaths) -> Report:  # noqa: C901
     comparison_schema = load_json_object(report, paths.comparison_schema, "comparison_schema") or {}
     decisions = load_jsonl(report, paths.decisions, "decisions")
     disagreements = load_jsonl(report, paths.disagreements, "disagreements")
+
+    _validate_publication_lock(report, paths, manifest)
 
     decision_schema_issues = check_schema(decision_schema)
     disagreement_schema_issues = check_schema(disagreement_schema)
@@ -1202,38 +1432,13 @@ def validate_committed(paths: ArtifactPaths) -> Report:  # noqa: C901
         "committed_artifact_sha256 must be an object",
     )
     if isinstance(hashes, dict):
-        expected_hash_keys = {
-            "annotation_guide",
-            "ai_amendment",
-            "policy",
-            "decisions",
-            "disagreements",
-            "decision_schema",
-            "disagreement_schema",
-            "comparison_schema",
-            "freeze",
-            "report",
-            "release_notes",
-        }
         report.check(
-            set(hashes) == expected_hash_keys,
+            set(hashes) == set(MANIFEST_ARTIFACT_KEYS),
             "committed.manifest.hashes_fields",
             "committed_artifact_sha256 fields are incomplete or contain extras",
         )
-        for key, path in (
-            ("annotation_guide", paths.guide),
-            ("ai_amendment", paths.amendment),
-            ("policy", paths.policy),
-            ("decisions", paths.decisions),
-            ("disagreements", paths.disagreements),
-            ("decision_schema", paths.decision_schema),
-            ("disagreement_schema", paths.disagreement_schema),
-            ("comparison_schema", paths.comparison_schema),
-            ("freeze", paths.freeze),
-            ("report", paths.report),
-            ("release_notes", paths.release_notes),
-        ):
-            _check_hash(report, hashes, key, path)
+        for key in sorted(MANIFEST_ARTIFACT_KEYS):
+            _check_hash(report, hashes, key, paths.root / PUBLICATION_ARTIFACT_PATHS[key])
 
     maintainer = manifest.get("maintainer_evidence", {})
     report.check(
