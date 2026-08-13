@@ -12,7 +12,7 @@ format:
 	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff format src tools; else "$(PYTHON)" -m ruff format src tools; fi
 
 format-check:
-	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff format --check src tools; else "$(PYTHON)" -m ruff format --check src tools; fi
+	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff format --check --diff src tools; else "$(PYTHON)" -m ruff format --check src tools; fi
 
 lint: typecheck
 	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) tools/check_import_boundaries.py
