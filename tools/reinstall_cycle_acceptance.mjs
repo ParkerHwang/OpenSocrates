@@ -1835,7 +1835,7 @@ function validatePublicSemanticContracts(report) {
     !(environment.platform === null || environment.platform === "darwin") ||
     !publicSemver(environment.nodeVersion, { nodePrefix: true }) ||
     !(environment.hardwareArchitecture === null || environment.hardwareArchitecture === "arm64") ||
-    environment.processArchitecture !== "arm64" ||
+    !(environment.processArchitecture === null || environment.processArchitecture === "arm64") ||
     !(environment.claudeVersion === null || publicSemver(environment.claudeVersion)) ||
     !(environment.codexVersion === null || publicSemver(environment.codexVersion)) ||
     (environment.identity !== null &&
@@ -1844,6 +1844,17 @@ function validatePublicSemanticContracts(report) {
         environment.identity.sudo !== false))
   ) {
     fail("privacy", "public environment evidence violates its closed contract");
+  }
+  if (
+    report.automatedResult === "passed" &&
+    (environment.platform !== "darwin" ||
+      environment.hardwareArchitecture !== "arm64" ||
+      environment.processArchitecture !== "arm64" ||
+      environment.identity?.uidMatchesEffectiveUid !== true ||
+      environment.identity?.homeOwnedByEffectiveUid !== true ||
+      environment.identity?.sudo !== false)
+  ) {
+    fail("privacy", "a passed result requires verified target environment evidence");
   }
   if (
     report.baseline.kind !== BASELINE ||
@@ -1929,7 +1940,7 @@ function validatePublicResultShape(report) {
     ["platform", ["string", "null"]],
     ["nodeVersion", ["string"]],
     ["hardwareArchitecture", ["string", "null"]],
-    ["processArchitecture", ["string"]],
+    ["processArchitecture", ["string", "null"]],
     ["claudeVersion", ["string", "null"]],
     ["codexVersion", ["string", "null"]],
   ]) {
@@ -2080,7 +2091,7 @@ function makeReport() {
       platform: null,
       nodeVersion: process.version,
       hardwareArchitecture: null,
-      processArchitecture: process.arch,
+      processArchitecture: null,
       identity: null,
       claudeVersion: null,
       codexVersion: null,
@@ -5867,6 +5878,9 @@ function assertNoKnownTransactionResidue(targets, category) {
   if (Object.values(residue).some((count) => count !== 0)) {
     fail(category, "an OpenSocrates lifecycle transaction residue exists");
   }
+  if (inspectOpenCodeBridgeResidue(targets.allHosts.opencode) !== 0) {
+    fail(category, "an OpenCode bridge transaction residue exists");
+  }
   return residue;
 }
 
@@ -6167,7 +6181,68 @@ function residueIsEmpty(snapshot) {
   );
 }
 
-export function assertOnlyRetryableHostCloseResidue(snapshot, liveHosts) {
+function validateDeactivatedDesiredState(desired) {
+  requireExactObjectKeys(
+    desired,
+    [
+      "schema",
+      "channel",
+      "installedHosts",
+      "activeVersion",
+      "updatePolicy",
+      "autoUpdate",
+      "availableVersion",
+      "lastCheckAt",
+      "lastSuccessfulUpdateAt",
+    ],
+    "purge",
+    "the deferred OpenSocrates desired state",
+  );
+  requireExactObjectKeys(
+    desired.updatePolicy,
+    ["intervalHours", "allowMajor"],
+    "purge",
+    "the deferred OpenSocrates update policy",
+  );
+  requireExactObjectKeys(
+    desired.autoUpdate,
+    ["enabled", "hosts", "nextCheckAt"],
+    "purge",
+    "the deferred OpenSocrates auto-update state",
+  );
+  const nullableTimestamp = (value) => value === null || publicIsoTimestamp(value);
+  if (
+    desired.schema !== DESIRED_STATE_SCHEMA ||
+    !new Set(["stable", "next"]).has(desired.channel) ||
+    !Array.isArray(desired.installedHosts) ||
+    desired.installedHosts.length !== 0 ||
+    desired.activeVersion !== null ||
+    !Number.isSafeInteger(desired.updatePolicy.intervalHours) ||
+    desired.updatePolicy.intervalHours < 1 ||
+    desired.updatePolicy.intervalHours > 24 * 7 ||
+    typeof desired.updatePolicy.allowMajor !== "boolean" ||
+    desired.autoUpdate.enabled !== false ||
+    !Array.isArray(desired.autoUpdate.hosts) ||
+    desired.autoUpdate.hosts.length !== 0 ||
+    desired.autoUpdate.nextCheckAt !== null ||
+    !(desired.availableVersion === null || publicSemver(desired.availableVersion)) ||
+    !nullableTimestamp(desired.lastCheckAt) ||
+    !nullableTimestamp(desired.lastSuccessfulUpdateAt)
+  ) {
+    fail("purge", "the deferred OpenSocrates desired state is not exactly deactivated");
+  }
+  return desired;
+}
+
+export function inspectDeactivatedDesiredState(targets) {
+  const state = inspectStateDirectory(targets);
+  if (!state.present || state.desired === null) {
+    fail("purge", "the deferred OpenSocrates desired state is missing");
+  }
+  return structuredClone(validateDeactivatedDesiredState(state.desired));
+}
+
+export function assertOnlyRetryableHostCloseResidue(snapshot, liveHosts, desiredState) {
   if (
     !residueHasExactSchema(snapshot) ||
     !Array.isArray(liveHosts) ||
@@ -6177,6 +6252,7 @@ export function assertOnlyRetryableHostCloseResidue(snapshot, liveHosts) {
   ) {
     fail("purge", "the deferred host-close residue identity is incomplete");
   }
+  validateDeactivatedDesiredState(desiredState);
   const liveSet = new Set(liveHosts);
   const hostsAreExact = SUPPORTED_HOSTS.every((host) => {
     const item = snapshot.hosts[host];
@@ -6337,6 +6413,7 @@ export function requireHostCloseRetryAdmission(checkpoint, { resolved = false } 
       "initialSnapshot",
       "confirmedHosts",
       "bindings",
+      "deactivatedDesiredState",
       "resolvedSnapshot",
     ]) ||
     !residueHasExactSchema(admission.initialSnapshot) ||
@@ -6353,6 +6430,7 @@ export function requireHostCloseRetryAdmission(checkpoint, { resolved = false } 
   assertOnlyRetryableHostCloseResidue(
     admission.initialSnapshot,
     admission.confirmedHosts,
+    admission.deactivatedDesiredState,
   );
   if (admission.resolvedSnapshot !== null) {
     assertHostCloseRetrySnapshot(
@@ -7295,12 +7373,12 @@ function verifyEnvironment(recorder, report) {
   if (overrides.length > 0) {
     fail("environment", `unset path overrides before testing: ${overrides.join(", ")}`);
   }
-  const osVersion = recorder.run(
+  recorder.run(
     "Read macOS product version",
     "/usr/bin/sw_vers",
     ["-productVersion"],
     { category: "environment", failureMessage: "macOS version could not be determined" },
-  ).stdout;
+  );
   const hardwareArchitecture = recorder.run(
     "Read Darwin hardware architecture",
     "/usr/bin/uname",
@@ -7316,7 +7394,7 @@ function verifyEnvironment(recorder, report) {
   if (!new Set(["arm64", "aarch64"]).has(hardwareArchitecture) || arm64Capability !== "1") {
     fail("environment", "the Mac is not reporting native Apple-silicon hardware");
   }
-  report.environment.platform = `macOS ${osVersion} arm64`;
+  report.environment.platform = "darwin";
   report.environment.hardwareArchitecture = "arm64";
   report.environment.processArchitecture = process.arch;
   report.environment.identity = identity;
@@ -10019,6 +10097,7 @@ async function purgeExactCandidate(
         registrations,
         inspectLaunchAgentJob(recorder),
       );
+      const currentDesiredState = inspectDeactivatedDesiredState(targets);
       const currentBindings = await currentRetryBindings(targets, candidate, checkpoint);
       assertHostCloseRetrySnapshot(
         admission.initialSnapshot,
@@ -10027,6 +10106,12 @@ async function purgeExactCandidate(
         admission.bindings,
         currentBindings,
       );
+      if (
+        JSON.stringify(currentDesiredState) !==
+        JSON.stringify(admission.deactivatedDesiredState)
+      ) {
+        fail("recovery", "the deferred desired state changed before the host-close retry");
+      }
       if (
         retryAlreadyWrittenAhead &&
         JSON.stringify(currentSnapshot) !== JSON.stringify(admission.resolvedSnapshot)
@@ -10086,8 +10171,14 @@ async function purgeExactCandidate(
       .map(([host]) => host);
     const raw = `${removed.stdout}\n${removed.stderr}`;
     if (liveHosts.length > 0 && raw.includes("host-in-use")) {
+      let deactivatedDesiredState = null;
       try {
-        assertOnlyRetryableHostCloseResidue(snapshot, liveHosts);
+        deactivatedDesiredState = inspectDeactivatedDesiredState(targets);
+        assertOnlyRetryableHostCloseResidue(
+          snapshot,
+          liveHosts,
+          deactivatedDesiredState,
+        );
       } catch {
         transitionCheckpoint(privateDirectory, checkpoint, "purge-failed", {
           classification: "non_retryable_residue_with_live_cache",
@@ -10120,6 +10211,7 @@ async function purgeExactCandidate(
         initialSnapshot: structuredClone(snapshot),
         confirmedHosts: sorted(liveHosts),
         bindings: structuredClone(retryBindings),
+        deactivatedDesiredState,
         resolvedSnapshot: null,
       };
       transitionCheckpoint(privateDirectory, checkpoint, "awaiting-host-close", {

@@ -37,7 +37,7 @@ import {
   inspectKnownTransactionResidue,
   inspectStateResidue,
   installCommandArguments,
-  makeReport,
+  makeReport as makeRuntimeReport,
   manualTemplate,
   packExisting,
   packedNpxInvocation,
@@ -50,6 +50,19 @@ import {
   writeReports,
   zipReports,
 } from "./reinstall_cycle_acceptance.mjs";
+
+function makeReport() {
+  const report = makeRuntimeReport();
+  report.environment.platform = "darwin";
+  report.environment.hardwareArchitecture = "arm64";
+  report.environment.processArchitecture = "arm64";
+  report.environment.identity = {
+    uidMatchesEffectiveUid: true,
+    homeOwnedByEffectiveUid: true,
+    sudo: false,
+  };
+  return report;
+}
 
 async function withFixture(action) {
   const root = realpathSync(mkdtempSync(join(tmpdir(), "opensocrates-reinstall-test-")));
@@ -241,8 +254,25 @@ function emptyResidueTargets(root) {
     codex: { ...allHosts.codex, hostHome: join(root, "codex-home") },
     state: {
       directory: join(root, "state"),
+      desiredState: join(root, "state", "desired-state.json"),
+      receipt: join(root, "state", "auto-update-receipt.json"),
+      launchAgentsDirectory: join(root, "LaunchAgents"),
       launchAgent: join(root, "LaunchAgents", "com.opensocrates.auto-update.plist"),
     },
+  };
+}
+
+function deactivatedDesiredStateFixture() {
+  return {
+    schema: "opensocrates.desired-state/1.0.0",
+    channel: "stable",
+    installedHosts: [],
+    activeVersion: null,
+    updatePolicy: { intervalHours: 24, allowMajor: false },
+    autoUpdate: { enabled: false, hosts: [], nextCheckAt: null },
+    availableVersion: null,
+    lastCheckAt: null,
+    lastSuccessfulUpdateAt: null,
   };
 }
 
@@ -1493,6 +1523,30 @@ test("installed topology rejects exact host transaction residue", () =>
     );
   }));
 
+test("installed topology rejects every OpenCode bridge transaction residue", () =>
+  withFixture((root) => {
+    const targets = emptyResidueTargets(root);
+    const bridgeParent = targets.allHosts.opencode.bridgeParent;
+    mkdirSync(bridgeParent, { recursive: true, mode: 0o700 });
+    const uuid = "11111111-1111-4111-8111-111111111111";
+    for (const leaf of [
+      `.opensocrates.js.staging-${uuid}`,
+      `.opensocrates.js.backup-${uuid}`,
+      `.opensocrates.js.removed-${uuid}`,
+      `.opensocrates-managed.json.staging-${uuid}`,
+      `.opensocrates-managed.json.backup-${uuid}`,
+      `.opensocrates-managed.json.removed-${uuid}`,
+    ]) {
+      const residue = join(bridgeParent, leaf);
+      writeFileSync(residue, "bridge transaction residue\n", { mode: 0o600 });
+      assert.throws(
+        () => acceptance.assertNoKnownTransactionResidue(targets, "post-install"),
+        AcceptanceError,
+      );
+      unlinkSync(residue);
+    }
+  }));
+
 test("baseline cache marketplace preflight rejects an unknown exact child", () =>
   withFixture((root) => {
     const targets = emptyResidueTargets(root);
@@ -1916,6 +1970,7 @@ test("host-close retry permits only confirmed live-marker resolution with fixed 
 
 test("host-close pause admits only a live target cache plus the exact deferred state", () => {
   const pure = emptyResidueSnapshot();
+  const desired = deactivatedDesiredStateFixture();
   Object.assign(pure.hosts.claude, {
     cachePresent: true,
     cacheMarketplacePresent: true,
@@ -1927,7 +1982,7 @@ test("host-close pause admits only a live target cache plus the exact deferred s
     desiredStatePresent: true,
   });
   assert.doesNotThrow(() =>
-    acceptance.assertOnlyRetryableHostCloseResidue(pure, ["claude"]));
+    acceptance.assertOnlyRetryableHostCloseResidue(pure, ["claude"], desired));
   for (const mutate of [
     (value) => { value.hosts.codex.registrationPresent = true; },
     (value) => { value.hosts.codex.managedRootPresent = true; },
@@ -1941,17 +1996,51 @@ test("host-close pause admits only a live target cache plus the exact deferred s
     const mixed = structuredClone(pure);
     mutate(mixed);
     assert.throws(
-      () => acceptance.assertOnlyRetryableHostCloseResidue(mixed, ["claude"]),
+      () => acceptance.assertOnlyRetryableHostCloseResidue(mixed, ["claude"], desired),
       AcceptanceError,
     );
   }
   const notLive = structuredClone(pure);
   notLive.hosts.claude.liveInUse = false;
   assert.throws(
-    () => acceptance.assertOnlyRetryableHostCloseResidue(notLive, ["claude"]),
+    () => acceptance.assertOnlyRetryableHostCloseResidue(notLive, ["claude"], desired),
+    AcceptanceError,
+  );
+  const staleDesired = structuredClone(desired);
+  staleDesired.installedHosts = ["claude", "codex"];
+  staleDesired.activeVersion = "1.2.1";
+  assert.throws(
+    () => acceptance.assertOnlyRetryableHostCloseResidue(pure, ["claude"], staleDesired),
     AcceptanceError,
   );
 });
+
+test("host-close admission parses the exact deactivated desired-state file", () =>
+  withFixture((root) => {
+    const targets = emptyResidueTargets(root);
+    mkdirSync(targets.state.directory, { mode: 0o700 });
+    const writeDesired = (value) =>
+      writeFileSync(targets.state.desiredState, `${JSON.stringify(value)}\n`, { mode: 0o600 });
+    const exact = deactivatedDesiredStateFixture();
+    writeDesired(exact);
+    assert.deepEqual(acceptance.inspectDeactivatedDesiredState(targets), exact);
+    for (const mutate of [
+      (value) => { value.schema = "unsupported"; },
+      (value) => { value.installedHosts = ["claude", "codex"]; },
+      (value) => { value.activeVersion = "1.2.1"; },
+      (value) => { value.autoUpdate.enabled = true; },
+      (value) => { value.autoUpdate.hosts = ["claude"]; },
+      (value) => { value.autoUpdate.nextCheckAt = "2026-08-15T00:00:00.000Z"; },
+    ]) {
+      const invalid = structuredClone(exact);
+      mutate(invalid);
+      writeDesired(invalid);
+      assert.throws(
+        () => acceptance.inspectDeactivatedDesiredState(targets),
+        AcceptanceError,
+      );
+    }
+  }));
 
 test("durable host-close admission survives retry write-ahead resume without last-state loss", () =>
   withFixture(async (root) => {
@@ -1978,6 +2067,7 @@ test("durable host-close admission survives retry write-ahead resume without las
       initialSnapshot: initial,
       confirmedHosts: ["claude"],
       bindings,
+      deactivatedDesiredState: deactivatedDesiredStateFixture(),
       resolvedSnapshot: resolved,
     };
     const report = makeReport();
@@ -3809,6 +3899,31 @@ test("public result schema rejects unknown fields instead of relying on a blackl
     );
   }));
 
+test("environment evidence is unclaimed before verification and mandatory for PASS", () =>
+  withFixture((root) => {
+    const report = makeRuntimeReport();
+    assert.deepEqual(
+      {
+        platform: report.environment.platform,
+        hardwareArchitecture: report.environment.hardwareArchitecture,
+        processArchitecture: report.environment.processArchitecture,
+        identity: report.environment.identity,
+      },
+      {
+        platform: null,
+        hardwareArchitecture: null,
+        processArchitecture: null,
+        identity: null,
+      },
+    );
+    writeReports(root, report);
+    report.automatedResult = "passed";
+    assert.throws(
+      () => writeReports(root, report),
+      /passed result requires verified target environment evidence/u,
+    );
+  }));
+
 test("public report persistence validates every existing target before any no-follow publish", () =>
   withFixture((root) => {
     const report = makeReport();
@@ -4700,6 +4815,7 @@ test("paused host-close state resumes from disk to one sealed final pack without
               initialSnapshot: structuredClone(pausedResidue),
               confirmedHosts: ["claude"],
               bindings: structuredClone(retryBindings),
+              deactivatedDesiredState: deactivatedDesiredStateFixture(),
               resolvedSnapshot: null,
             };
             checkpoint.phase = "awaiting-host-close";
