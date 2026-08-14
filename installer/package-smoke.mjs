@@ -312,6 +312,8 @@ try {
   assert.equal(help.status, 0, help.stderr);
   assert.match(help.stdout, /remove \[--host .*\] \[--purge \[--reset-trust\]\]/u);
   assert.match(help.stdout, /host security trust, and user history are reported separately/u);
+  assert.equal(help.stdout.match(/--asset ZIP --checksum FILE/gu)?.length, 3);
+  assert.doesNotMatch(help.stdout, /--checksum SHA256/u);
 
   purgeSandbox = seedPackedPurgeSandbox();
   const purged = spawnSync(

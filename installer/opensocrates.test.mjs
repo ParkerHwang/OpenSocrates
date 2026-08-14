@@ -263,6 +263,30 @@ test("trust scanner is idempotent for zero sections and accepts a known partial 
   assert.equal(stripped.contents.toString("utf8"), "# lead\n\n\n# middle\n\n\n# tail\n");
 });
 
+test("trust scanner preserves a UTF-8 BOM and every remaining byte", () => {
+  const bom = Buffer.from([0xef, 0xbb, 0xbf]);
+  const input = Buffer.concat([
+    bom,
+    Buffer.from(
+      `${codexTrustSection("session_start")}# preserve exactly\r\n` +
+        '[hooks.state."other@market:hooks/hooks.json:stop:0:0"]\r\n' +
+        'trusted_hash = "sha256:other"\r\n',
+    ),
+  ]);
+  const expected = Buffer.concat([
+    bom,
+    Buffer.from(
+      '\n\n# preserve exactly\r\n' +
+        '[hooks.state."other@market:hooks/hooks.json:stop:0:0"]\r\n' +
+        'trusted_hash = "sha256:other"\r\n',
+    ),
+  ]);
+
+  const stripped = stripCodexOpenSocratesTrustSections(input);
+  assert.deepEqual(stripped.removedEvents, ["session_start"]);
+  assert.deepEqual(stripped.contents, expected);
+});
+
 test("trust scanner ignores header-shaped text inside multiline strings", () => {
   const fake = codexTrustSection("session_end").trimEnd();
   const input = `message = """\n${fake}\n"""\n${codexTrustSection("session_start")}`;

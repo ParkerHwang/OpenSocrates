@@ -470,9 +470,11 @@ function addRemovalSpan(spans, line, start, end) {
  */
 export function stripCodexOpenSocratesTrustSections(contents) {
   const original = Buffer.isBuffer(contents) ? contents : Buffer.from(contents);
+  const utf8Bom = original.subarray(0, 3).equals(Buffer.from([0xef, 0xbb, 0xbf]));
+  const encodedSource = utf8Bom ? original.subarray(3) : original;
   let source;
   try {
-    source = new TextDecoder("utf-8", { fatal: true }).decode(original);
+    source = new TextDecoder("utf-8", { fatal: true }).decode(encodedSource);
   } catch {
     trustResetFailure("the configuration is not valid UTF-8");
   }
@@ -567,8 +569,9 @@ export function stripCodexOpenSocratesTrustSections(contents) {
     cursor = span.end;
   }
   updated += source.slice(cursor);
+  const updatedBytes = Buffer.from(updated, "utf8");
   return {
-    contents: Buffer.from(updated, "utf8"),
+    contents: utf8Bom ? Buffer.concat([original.subarray(0, 3), updatedBytes]) : updatedBytes,
     removedEvents: CODEX_TRUST_EVENTS.filter((event) => found.has(event)),
   };
 }
@@ -827,6 +830,8 @@ export async function resetCodexOpenSocratesHookTrust({
   let replaced = false;
   let preserveRollback = false;
   let transactionFailed = false;
+  let transactionCommitted = false;
+  let cleanupRequired = true;
   try {
     await hooks.beforeWrite?.({ target });
     await writeSyncedOwnerOnlyFile(temporary, stripped.contents);
@@ -854,8 +859,12 @@ export async function resetCodexOpenSocratesHookTrust({
     ) {
       trustResetFailure("the committed Codex configuration did not match the validated candidate");
     }
-    await rm(rollback);
-    await fsyncDirectory(parent);
+    await (hooks.removeRollback ?? rm)(rollback);
+    // The candidate and parent rename are already fsynced and post-validated.
+    // Keep rollback unlink as the final fallible commit step; another directory
+    // fsync would only create a failure point after the recovery source is gone.
+    transactionCommitted = true;
+    cleanupRequired = false;
     return { status: "reset", removedEvents: stripped.removedEvents };
   } catch (error) {
     transactionFailed = true;
@@ -887,15 +896,18 @@ export async function resetCodexOpenSocratesHookTrust({
     trustResetFailure("the atomic configuration update failed; the original configuration was preserved");
   } finally {
     let cleanupFailed = false;
-    for (const residue of [temporary, rollback]) {
-      try {
-        if (residue === rollback && preserveRollback) continue;
-        if (await entryExists(residue)) await rm(residue);
-      } catch {
-        cleanupFailed = true;
+    if (cleanupRequired) {
+      for (const residue of [temporary, rollback]) {
+        try {
+          if (residue === rollback && preserveRollback) continue;
+          await hooks.beforeResidueCleanup?.({ residue });
+          if (await entryExists(residue)) await rm(residue);
+        } catch {
+          cleanupFailed = true;
+        }
       }
     }
-    if (cleanupFailed && !transactionFailed) {
+    if (cleanupFailed && !transactionFailed && !transactionCommitted) {
       trustResetFailure("owner-only Codex transaction residue could not be removed safely");
     }
   }
@@ -1462,11 +1474,11 @@ function showHelp() {
   console.log(`OpenSocrates ${PRODUCT_VERSION}
 
 Usage:
-  opensocrates install [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum SHA256]
+  opensocrates install [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum FILE]
   opensocrates status [--host all|antigravity|claude|codex|cursor|grok|opencode]
-  opensocrates update [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum SHA256]
+  opensocrates update [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum FILE]
   opensocrates remove [--host all|antigravity|claude|codex|cursor|grok|opencode] [--purge [--reset-trust]]
-  opensocrates verify [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum SHA256]
+  opensocrates verify [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum FILE]
   opensocrates auto-update enable [--host all|antigravity|claude|codex|cursor|grok|opencode]
       [--channel stable|next] [--interval-hours ${AUTO_UPDATE_DEFAULT_INTERVAL_HOURS}]
       [--allow-major]
@@ -4207,7 +4219,7 @@ function finalizePurgeHostResult(hostResult) {
 async function resetPurgeTrustExtension(hostResult, options) {
   if (hostResult.host !== "codex" || !options.resetTrust) return;
   try {
-    const reset = await resetCodexOpenSocratesHookTrust();
+    const reset = await resetCodexOpenSocratesHookTrust({ hooks: options.trustResetHooks ?? {} });
     hostResult.extension = {
       component: "host-security-trust",
       status: reset.status,
@@ -4806,7 +4818,10 @@ export async function main(argv = process.argv.slice(2), internalDependencies = 
     return 0;
   }
   if (options.action === "remove" && options.purge) {
-    await runPurge(options);
+    await runPurge({
+      ...options,
+      trustResetHooks: internalDependencies.trustResetHooks ?? {},
+    });
     return 0;
   }
   return withOperationLock(async () => {

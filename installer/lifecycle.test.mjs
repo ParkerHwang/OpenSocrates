@@ -1160,10 +1160,19 @@ test("codex purge resets exactly seven trust entries only when explicitly reques
     chmodSync(config, 0o640);
     const metadataBefore = statSync(config);
 
+    let postCommitCleanupChecked = false;
     const purged = await quiet(() =>
-      main(["remove", "--host", "codex", "--purge", "--reset-trust"]),
+      main(["remove", "--host", "codex", "--purge", "--reset-trust"], {
+        trustResetHooks: {
+          beforeResidueCleanup: () => {
+            postCommitCleanupChecked = true;
+            throw new Error("post-commit residue inspection must not run");
+          },
+        },
+      }),
     );
     assert.equal(purged.error, undefined, `trust-reset purge failed: ${purged.error?.message}`);
+    assert.equal(postCommitCleanupChecked, false);
     assert.match(purged.output, /host security trust reset completed for 7 exact/u);
     assert.match(purged.output, /OpenSocrates purge completed/u);
     assert.doesNotMatch(purged.output, /sha256:|model =|profiles\.keep|config\.toml/u);
@@ -1184,6 +1193,39 @@ test("codex purge resets exactly seven trust entries only when explicitly reques
     assert.equal(idempotent.error, undefined, `idempotent trust reset failed: ${idempotent.error?.message}`);
     assert.match(idempotent.output, /no exact OpenSocrates host security trust entries were present/u);
     assert.equal(readFileSync(config, "utf8"), expected);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("codex purge restores the original when final rollback unlink fails", async () => {
+  const box = makeSandbox("codex");
+  try {
+    const config = join(box.home, "config.toml");
+    const original = `# preserve original\n${trustSection("session_end")}model = "keep"\n`;
+    writeFileSync(config, original);
+
+    const purged = await quiet(() =>
+      main(["remove", "--host", "codex", "--purge", "--reset-trust"], {
+        trustResetHooks: {
+          removeRollback: async () => {
+            throw new Error("injected rollback unlink failure with private detail");
+          },
+        },
+      }),
+    );
+
+    assert.notEqual(purged.error, undefined, "rollback unlink failure reported purge success");
+    assert.match(purged.output, /host security trust reset failed/u);
+    assert.match(purged.output, /purge is incomplete/u);
+    assert.doesNotMatch(purged.output, /host security trust reset completed/u);
+    assert.doesNotMatch(purged.output, /OpenSocrates purge completed/u);
+    assert.doesNotMatch(purged.output, /private detail|sha256:|config\.toml/u);
+    assert.equal(readFileSync(config, "utf8"), original);
+    assert.deepEqual(
+      readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+      [],
+    );
   } finally {
     box.cleanup();
   }
