@@ -1967,7 +1967,12 @@ async function cleanupTransientRootResidue(host, paths) {
       fail(`refusing unsafe ${host} transaction residue: ${target}`);
     }
     if ((await readdir(target)).length !== 0) {
-      await verifyManagedTreeForPurge(host, target);
+      try {
+        await verifyManagedTreeForPurge(host, target);
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        fail(`refusing unverifiable ${host} transaction residue at ${target}: ${detail}`);
+      }
     }
     await rm(target, { recursive: true });
     removed += 1;
@@ -2877,12 +2882,29 @@ async function rollbackRemoval(transaction) {
   let restored = !transaction.rootExists;
   if (transaction.rootExists && transaction.backupCreated && (await entryExists(transaction.backup))) {
     restored = await recoveryStep(`restore the removed ${transaction.host} files`, async () => {
-      await requireOwnedRoot(transaction.backup, transaction.host);
+      await verifyManagedTreeForPurge(transaction.host, transaction.backup);
       await rename(transaction.backup, transaction.paths.root);
+      try {
+        await verifyManagedTreeForPurge(transaction.host, transaction.paths.root);
+      } catch (error) {
+        try {
+          await rename(transaction.paths.root, transaction.backup);
+        } catch (requarantineError) {
+          const detail = requarantineError instanceof Error ? requarantineError.message : String(requarantineError);
+          transaction.backupCreated = await entryExists(transaction.backup);
+          fail(
+            `the restored ${transaction.host} tree failed verification and could not be returned to ` +
+              `${transaction.backup}: ${detail}`,
+          );
+        }
+        throw error;
+      }
       transaction.backupCreated = false;
     });
   } else if (transaction.rootExists && !transaction.rootCommitted && !transaction.backupCreated) {
-    restored = await entryExists(transaction.paths.root);
+    restored = await recoveryStep(`verify the existing ${transaction.host} files`, async () => {
+      await verifyManagedTreeForPurge(transaction.host, transaction.paths.root);
+    });
   }
   complete = restored && complete;
   if (
@@ -2941,9 +2963,15 @@ async function rollbackRemoval(transaction) {
   return complete;
 }
 
-async function commitRemoval(transaction) {
+async function commitRemoval(transaction, { beforeBackupDelete = null } = {}) {
   if (transaction.backupCreated && (await entryExists(transaction.backup))) {
-    await requireOwnedRoot(transaction.backup, transaction.host);
+    await verifyManagedTreeForPurge(transaction.host, transaction.backup);
+    if (beforeBackupDelete !== null) {
+      await beforeBackupDelete(Object.freeze({
+        host: transaction.host,
+        backup: transaction.backup,
+      }));
+    }
     await rm(transaction.backup, { recursive: true });
     transaction.backupCreated = false;
     transaction.rootCommitted = true;
@@ -2968,7 +2996,7 @@ async function commitRemoval(transaction) {
 
 async function validateRemovalCommit(transaction) {
   if (transaction.backupCreated && (await entryExists(transaction.backup))) {
-    await requireOwnedRoot(transaction.backup, transaction.host);
+    await verifyManagedTreeForPurge(transaction.host, transaction.backup);
   }
   if (transaction.host !== "opencode") return;
   for (const [created, backup, label] of [
@@ -3245,7 +3273,7 @@ async function disableAutoUpdateState(desired) {
   };
 }
 
-async function runStandardRemove(options, { report = true } = {}) {
+async function runStandardRemove(options, { report = true, beforeBackupDelete = null } = {}) {
   const desired = await readDesiredState();
   const preflights = await preflightSelectedHosts(options, "remove", desired);
   const removedHosts = preflights.map((item) => item.host);
@@ -3267,6 +3295,14 @@ async function runStandardRemove(options, { report = true } = {}) {
     launchAgentPresent !== keepAutoUpdate ||
     desired.autoUpdate.hosts.some((host) => removedHosts.includes(host));
   const transactions = preflights.map(removalTransaction);
+  // Validate every source tree before the first unregister/rename. The same
+  // check runs again after activation and immediately before deletion to
+  // close TOCTOU gaps without stranding pre-existing drift in a backup.
+  for (const transaction of transactions) {
+    if (transaction.rootExists) {
+      await verifyManagedTreeForPurge(transaction.host, transaction.paths.root);
+    }
+  }
   let schedulerTouched = false;
   let desiredWritten = false;
   try {
@@ -3282,7 +3318,9 @@ async function runStandardRemove(options, { report = true } = {}) {
     await writeDesiredState(nextDesired);
     desiredWritten = true;
     for (const transaction of transactions) await validateRemovalCommit(transaction);
-    for (const transaction of transactions) await commitRemoval(transaction);
+    for (const transaction of transactions) {
+      await commitRemoval(transaction, { beforeBackupDelete });
+    }
   } catch (error) {
     let rollbackComplete = true;
     for (const transaction of [...transactions].reverse()) {
@@ -3332,7 +3370,17 @@ async function runStandardRemove(options, { report = true } = {}) {
     }
     if (!rollbackComplete) {
       console.error("error: removal cleanup is incomplete; no success was recorded.");
-      console.error("error: inspect any preserved .opensocrates.removed-* paths and rerun remove --purge.");
+      for (const transaction of transactions) {
+        if (!transaction.backupCreated || !(await entryExists(transaction.backup))) continue;
+        console.error(`error: preserved ${transaction.host} removal residue: ${transaction.backup}`);
+        console.error(
+          `error: safe cleanup retry: opensocrates remove --host ${transaction.host} --purge`,
+        );
+        console.error(
+          "error: if purge reports an integrity failure, inspect that exact UUID residue before manual cleanup: " +
+            `/bin/rm -rf -- ${shellQuote(transaction.backup)}`,
+        );
+      }
     }
     throw error;
   }
@@ -3963,7 +4011,7 @@ async function verifyPackages(options) {
   }
 }
 
-export async function main(argv = process.argv.slice(2)) {
+export async function main(argv = process.argv.slice(2), internalDependencies = {}) {
   const options = parseCli(argv);
   if (options.action === "help") {
     showHelp();
@@ -3987,7 +4035,9 @@ export async function main(argv = process.argv.slice(2)) {
   }
   return withOperationLock(async () => {
     if (options.action === "remove") {
-      await runStandardRemove(options);
+      await runStandardRemove(options, {
+        beforeBackupDelete: internalDependencies.beforeRemovalBackupDelete ?? null,
+      });
       return 0;
     }
     if (options.action === "auto-update") {

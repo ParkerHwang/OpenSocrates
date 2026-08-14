@@ -631,28 +631,21 @@ function configureFakeNpx(box) {
   return binary;
 }
 
-function configureFakeLaunchctl(box, { failBootout = false, readOnlyRemovalParent = null } = {}) {
+function configureFakeLaunchctl(box, { failBootout = false } = {}) {
   const statePath = join(box.root, "launchctl-state.json");
   writeFileSync(statePath, JSON.stringify({ loaded: false, bootstraps: 0, bootouts: 0 }));
   const binary = join(box.root, "launchctl");
   writeFileSync(
     binary,
     `#!/usr/bin/env node
-import { chmodSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 const statePath = ${JSON.stringify(statePath)};
 const failBootout = ${JSON.stringify(failBootout)};
-const readOnlyRemovalParent = ${JSON.stringify(readOnlyRemovalParent)};
 const state = JSON.parse(readFileSync(statePath, "utf8"));
 const command = process.argv[2];
 if (command === "print") process.exit(state.loaded ? 0 : 3);
 if (command === "bootout") {
   if (failBootout) process.exit(9);
-  if (readOnlyRemovalParent) {
-    const [removed] = readdirSync(readOnlyRemovalParent).filter((name) =>
-      name.startsWith(".opensocrates.removed-"),
-    );
-    if (removed) chmodSync(readOnlyRemovalParent + "/" + removed, 0o500);
-  }
   state.loaded = false;
   state.bootouts += 1;
   writeFileSync(statePath, JSON.stringify(state));
@@ -696,6 +689,75 @@ function quiet(fn) {
       console.warn = warn;
       console.error = error;
     });
+}
+
+async function installAntigravityAndClaudeWithUpdater(box) {
+  const antigravityHome = join(box.root, "antigravity-home");
+  mkdirSync(antigravityHome, { recursive: true });
+  const antigravityHost = writeFakeHost(box.root, "antigravity-commit-fixture", {
+    kind: "antigravity",
+  });
+  process.env.AGY_BIN = antigravityHost.binary;
+  process.env.ANTIGRAVITY_CONFIG_DIR = antigravityHome;
+  const packages = {
+    antigravity: buildPackage(box.root, "antigravity"),
+    claude: buildPackage(box.root, "claude"),
+  };
+  const assetArgs = [
+    "--host",
+    "all",
+    "--asset-antigravity",
+    packages.antigravity.asset,
+    "--checksum-antigravity",
+    packages.antigravity.checksum,
+    "--asset-claude",
+    packages.claude.asset,
+    "--checksum-claude",
+    packages.claude.checksum,
+  ];
+  const install = await withDarwinArm64(() => quiet(() => main(["install", ...assetArgs])));
+  assert.equal(install.error, undefined, `setup install failed: ${install.error?.message}`);
+
+  configureFakeNpx(box);
+  configureFakeLaunchctl(box);
+  const enabled = await withDarwinArm64(() =>
+    quiet(() => main(["auto-update", "enable", "--host", "all"])),
+  );
+  assert.equal(enabled.error, undefined, `updater setup failed: ${enabled.error?.message}`);
+  return {
+    antigravityRoot: join(antigravityHome, "plugins", MARKETPLACE),
+  };
+}
+
+function retagClaudeManagedTreeVersion(root, version) {
+  const pluginRoot = join(root, "plugins", MARKETPLACE);
+  const pluginManifest = join(pluginRoot, ".claude-plugin", "plugin.json");
+  const releaseManifest = join(pluginRoot, "release-manifest.json");
+  for (const [target, key] of [
+    [pluginManifest, "version"],
+    [releaseManifest, "product_version"],
+  ]) {
+    const document = JSON.parse(readFileSync(target, "utf8"));
+    document[key] = version;
+    writeFileSync(target, JSON.stringify(document, null, 2));
+  }
+  const checksums = join(pluginRoot, "checksums.sha256");
+  const lines = readFileSync(checksums, "utf8")
+    .trim()
+    .split("\n")
+    .map((line) => {
+      const match = line.match(/^[a-f0-9]{64}  (.+)$/u);
+      assert.notEqual(match, null, `unexpected checksum fixture line: ${line}`);
+      const item = match[1];
+      const target = join(pluginRoot, ...item.split("/"));
+      return `${sha256(readFileSync(target))}  ${item}`;
+    });
+  writeFileSync(checksums, `${lines.join("\n")}\n`);
+
+  const marketplacePath = join(root, ".claude-plugin", "marketplace.json");
+  const marketplace = JSON.parse(readFileSync(marketplacePath, "utf8"));
+  marketplace.metadata.version = version;
+  writeFileSync(marketplacePath, `${JSON.stringify(marketplace, null, 2)}\n`);
 }
 
 // ---------------------------------------------------------------------------
@@ -783,47 +845,76 @@ for (const host of ["claude", "codex"]) {
   });
 }
 
-test("a later multi-host commit failure records only the host that rollback actually restored", async () => {
-  const box = makeAllSandbox();
-  const antigravityHome = join(box.root, "antigravity-home");
-  const antigravityRoot = join(antigravityHome, "plugins", MARKETPLACE);
+test("remove rejects pre-existing managed-tree drift before unregistering or renaming", async () => {
+  const box = makeSandbox("claude");
   try {
-    mkdirSync(antigravityHome, { recursive: true });
-    const antigravityHost = writeFakeHost(box.root, "antigravity-commit-fixture", {
-      kind: "antigravity",
-    });
-    process.env.AGY_BIN = antigravityHost.binary;
-    process.env.ANTIGRAVITY_CONFIG_DIR = antigravityHome;
-    const packages = {
-      antigravity: buildPackage(box.root, "antigravity"),
-      claude: buildPackage(box.root, "claude"),
-    };
-    const assetArgs = [
-      "--host",
-      "all",
-      "--asset-antigravity",
-      packages.antigravity.asset,
-      "--checksum-antigravity",
-      packages.antigravity.checksum,
-      "--asset-claude",
-      packages.claude.asset,
-      "--checksum-claude",
-      packages.claude.checksum,
-    ];
-    const install = await withDarwinArm64(() => quiet(() => main(["install", ...assetArgs])));
-    assert.equal(install.error, undefined, `setup install failed: ${install.error?.message}`);
+    const pkg = buildPackage(box.root, "claude");
+    const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const installed = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(installed.error, undefined, `setup install failed: ${installed.error?.message}`);
 
     configureFakeNpx(box);
-    configureFakeLaunchctl(box, {
-      readOnlyRemovalParent: dirname(box.managedRoots.claude),
-    });
+    const launchctl = configureFakeLaunchctl(box);
     const enabled = await withDarwinArm64(() =>
-      quiet(() => main(["auto-update", "enable", "--host", "all"])),
+      quiet(() => main(["auto-update", "enable", "--host", "claude"])),
     );
     assert.equal(enabled.error, undefined, `updater setup failed: ${enabled.error?.message}`);
 
-    const removed = await withDarwinArm64(() => quiet(() => main(["remove", "--host", "all"])));
+    const unexpected = join(box.managedRoot, "user-unverified.txt");
+    writeFileSync(unexpected, "must not be removed\n");
+    const desiredPath = join(box.root, "state", "desired-state.json");
+    const launchAgent = join(box.root, "LaunchAgents", "com.opensocrates.auto-update.plist");
+    const hostStateBefore = readFileSync(box.statePath);
+    const desiredBefore = readFileSync(desiredPath);
+    const launchAgentBefore = readFileSync(launchAgent);
+    const launchctlBefore = launchctl.state();
+    let commitHookCalls = 0;
+
+    const removed = await withDarwinArm64(() =>
+      quiet(() =>
+        main(["remove", "--host", "claude"], {
+          beforeRemovalBackupDelete() {
+            commitHookCalls += 1;
+          },
+        }),
+      ),
+    );
+    assert.notEqual(removed.error, undefined, "pre-existing drift was removed");
+    assert.match(removed.error.message, /managed marketplace contains an unowned file/);
+    assert.equal(commitHookCalls, 0, "commit began before source-tree validation");
+    assert.equal(existsSync(box.managedRoot), true);
+    assert.equal(existsSync(unexpected), true);
+    assert.deepEqual(readFileSync(box.statePath), hostStateBefore, "host registration changed");
+    assert.deepEqual(readFileSync(desiredPath), desiredBefore, "desired state changed");
+    assert.deepEqual(readFileSync(launchAgent), launchAgentBefore, "LaunchAgent changed");
+    assert.deepEqual(launchctl.state(), launchctlBefore, "LaunchAgent load state changed");
+    assert.deepEqual(
+      readdirSync(dirname(box.managedRoot)).filter((name) => name.startsWith(".opensocrates.removed-")),
+      [],
+      "managed root was stranded in a removal backup",
+    );
+    assert.doesNotMatch(removed.output, /removal cleanup is incomplete|was removed from/);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("a later multi-host commit failure records only the host that rollback actually restored", async () => {
+  const box = makeAllSandbox();
+  try {
+    const { antigravityRoot } = await installAntigravityAndClaudeWithUpdater(box);
+    retagClaudeManagedTreeVersion(box.managedRoots.claude, "1.1.0");
+    const removed = await withDarwinArm64(() =>
+      quiet(() =>
+        main(["remove", "--host", "all"], {
+          beforeRemovalBackupDelete({ host }) {
+            if (host === "claude") throw new Error("injected pre-delete Claude commit failure");
+          },
+        }),
+      ),
+    );
     assert.notEqual(removed.error, undefined, "partial commit reported removal success");
+    assert.match(removed.error.message, /injected pre-delete Claude commit failure/);
     assert.match(
       removed.output,
       /removal cleanup is incomplete; no success was recorded/,
@@ -832,13 +923,94 @@ test("a later multi-host commit failure records only the host that rollback actu
     assert.doesNotMatch(removed.output, /was removed from/);
     assert.equal(existsSync(antigravityRoot), false, "committed file-drop root was recreated");
     assert.equal(existsSync(box.managedRoots.claude), true, "later Claude root was not rolled back");
+    assert.equal(
+      JSON.parse(
+        readFileSync(
+          join(box.managedRoots.claude, "plugins", "opensocrates", ".claude-plugin", "plugin.json"),
+          "utf8",
+        ),
+      ).version,
+      "1.1.0",
+      "rollback verifier required the current product version",
+    );
     assert.equal(box.state("claude").plugins.length, 1, "Claude registration was not rolled back");
     assert.deepEqual(box.desired().installedHosts, ["claude"]);
     assert.equal(box.desired().autoUpdate.enabled, true);
     assert.deepEqual(box.desired().autoUpdate.hosts, ["claude"]);
     assert.equal(existsSync(box.launchAgent), true, "partial updater scope was not restored");
   } finally {
-    if (existsSync(box.managedRoots.claude)) chmodSync(box.managedRoots.claude, 0o700);
+    box.cleanup();
+  }
+});
+
+test("a partially deleted removal backup is never restored or registered as an intact host", async () => {
+  const box = makeAllSandbox();
+  try {
+    const { antigravityRoot } = await installAntigravityAndClaudeWithUpdater(box);
+    const removed = await withDarwinArm64(() =>
+      quiet(() =>
+        main(["remove", "--host", "all"], {
+          beforeRemovalBackupDelete({ host, backup }) {
+            if (host !== "claude") return;
+            rmSync(join(backup, "plugins", "opensocrates", "skills", "opensocrates", "SKILL.md"));
+            throw new Error("injected partial Claude backup deletion");
+          },
+        }),
+      ),
+    );
+    assert.notEqual(removed.error, undefined, "partial backup deletion reported removal success");
+    assert.match(removed.error.message, /injected partial Claude backup deletion/);
+    assert.match(removed.output, /removal cleanup is incomplete; no success was recorded/);
+    assert.doesNotMatch(removed.output, /was removed from/);
+    assert.equal(existsSync(antigravityRoot), false, "committed file-drop root was recreated");
+    assert.equal(existsSync(box.managedRoots.claude), false, "corrupted Claude backup was restored");
+    assert.equal(box.state("claude").plugins.length, 0, "corrupted Claude root was re-registered");
+    assert.deepEqual(box.desired().installedHosts, []);
+    assert.equal(box.desired().autoUpdate.enabled, false);
+    assert.deepEqual(box.desired().autoUpdate.hosts, []);
+    assert.equal(existsSync(box.launchAgent), false, "updater remained enabled for an unrestored host");
+
+    const claudeParent = dirname(box.managedRoots.claude);
+    const residues = readdirSync(claudeParent).filter((name) =>
+      /^\.opensocrates\.removed-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(
+        name,
+      ),
+    );
+    assert.equal(residues.length, 1, "partial Claude residue was not preserved exactly once");
+    const [residueName] = residues;
+    const residue = join(claudeParent, residueName);
+    const canonicalResidue = realpathSync(residue);
+    assert.equal(existsSync(join(residue, ".opensocrates-managed.json")), true);
+    assert.equal(
+      existsSync(join(residue, "plugins", "opensocrates", "skills", "opensocrates", "SKILL.md")),
+      false,
+    );
+    assert.ok(
+      removed.output.includes(`preserved claude removal residue: ${canonicalResidue}`),
+      `missing exact residue handoff:\n${removed.output}`,
+    );
+    assert.ok(removed.output.includes(`/bin/rm -rf -- '${canonicalResidue}'`));
+
+    const safeRetry = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.notEqual(safeRetry.error, undefined, "purge trusted a partial removal residue");
+    assert.match(safeRetry.output, /transaction-residue failed/);
+    assert.ok(
+      safeRetry.output.includes(`refusing unverifiable claude transaction residue at ${canonicalResidue}:`),
+      `purge omitted the exact residue path:\n${safeRetry.output}`,
+    );
+    assert.equal(existsSync(residue), true, "purge deleted an unverifiable partial residue");
+    assert.doesNotMatch(safeRetry.output, /purge completed/);
+
+    // Simulate the documented user-reviewed cleanup of this exact UUID path.
+    rmSync(residue, { recursive: true, force: true });
+    const afterManualCleanup = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.equal(
+      afterManualCleanup.error,
+      undefined,
+      `purge did not finish after exact residue cleanup: ${afterManualCleanup.error?.message}`,
+    );
+    assert.match(afterManualCleanup.output, /purge completed for registrations and provably owned payloads/);
+  } finally {
     box.cleanup();
   }
 });
