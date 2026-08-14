@@ -89,6 +89,11 @@ Native release work additionally requires Apple-silicon macOS:
 make release-check
 ```
 
+For Codex, this native check measures the generated package's configured
+`SessionStart` command before the runtime version smoke. The exact process model,
+one-second p95 margin inside the two-second host timeout, and privacy-safe evidence
+contract are documented in [docs/codex-session-start-timing.md](docs/codex-session-start-timing.md).
+
 Release candidates that change installation or host packaging should also use
 the [clean-machine acceptance procedure](docs/clean-machine-acceptance.md) on a
 separate Mac and attach its privacy-safe result bundle to the pull request.

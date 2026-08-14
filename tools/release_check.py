@@ -748,7 +748,7 @@ def _runtime_build(  # noqa: C901  # Explicit host release build validation.
             host,
             "--smoke-test",
             "--measure-runs",
-            "10",
+            "20" if host == "codex" else "10",
             "--report",
             f"build/evidence/runtime-build-{host}.json",
         ],
@@ -840,6 +840,56 @@ def _copy_packages(root: Path) -> None:
         if destination.exists():
             _safe_remove(destination, dist)
         shutil.copytree(source, destination, symlinks=False)
+
+
+def _codex_session_start_timing(root: Path) -> dict[str, Any]:
+    """Run the final generated Codex hook before any final-package version smoke."""
+
+    report_path = root / "build" / "evidence" / "codex-session-start-timing.json"
+    result = _run(
+        [
+            str(root / "tools" / "measure_codex_hook_timing.py"),
+            "--package",
+            str(root / "dist" / "codex"),
+            "--runs",
+            "20",
+            "--report",
+            str(report_path),
+        ],
+        root,
+        interpreter=sys.executable,
+        timeout=300.0,
+    )
+    report = _load_json(report_path)
+    expected_keys = {
+        "target",
+        "artifact_identity",
+        "process_model",
+        "sample_count",
+        "latency_ms",
+        "configured_timeout_ms",
+        "pass",
+    }
+    if result.status != "pass" or report is None or set(report) != expected_keys:
+        raise ReleaseCheckError("codex_session_start_timing_failed")
+    latencies = report.get("latency_ms")
+    if (
+        report.get("target") != RELEASE_TARGET
+        or not isinstance(report.get("artifact_identity"), str)
+        or not str(report["artifact_identity"]).startswith("sha256:")
+        or not isinstance(report.get("process_model"), str)
+        or report.get("sample_count") != 20
+        or report.get("configured_timeout_ms") != 2000
+        or report.get("pass") is not True
+        or not isinstance(latencies, Mapping)
+        or set(latencies) != {"first", "p50", "p95", "max"}
+        or any(
+            isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0
+            for value in latencies.values()
+        )
+    ):
+        raise ReleaseCheckError("codex_session_start_timing_invalid")
+    return dict(report)
 
 
 def _build_claude_chat_skills(root: Path) -> Path:
@@ -964,6 +1014,9 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
     dist = root / "dist"
     claude_chat_package = _build_claude_chat_skills(root)
     package_checksums = {host: _write_package_checksums(dist / host) for host in HOSTS}
+    # This is the first process execution from the final Codex package path.
+    # Runtime version validation happens later in _full_check.
+    codex_session_start_timing = _codex_session_start_timing(root)
     archives: dict[str, Path] = {}
     for host in HOSTS:
         archive = dist / f"opensocrates-{version}-{host}-plugin.zip"
@@ -1041,6 +1094,7 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
             }
             for host in RUNTIME_HOSTS
         },
+        "codex_session_start_timing": codex_session_start_timing,
         "hosts": {
             host: {
                 "package_tree": host,
@@ -1088,6 +1142,7 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
         "runtime_target": target,
         "runtime_artifacts": runtime_artifacts,
         "runtime_version_smoke": "pass",
+        "codex_session_start_timing": codex_session_start_timing,
         "hosts": {
             host: {
                 "generated_file_count": len(
@@ -1607,6 +1662,7 @@ def _evidence_check(  # noqa: C901  # Explicit release evidence matrix.
         host: _load_json(root / "build" / "evidence" / f"runtime-build-{host}.json")
         for host in RUNTIME_HOSTS
     }
+    codex_timing = _load_json(root / "build" / "evidence" / "codex-session-start-timing.json")
 
     if security is None:
         unavailable.add("security_evidence_missing")
@@ -1638,6 +1694,15 @@ def _evidence_check(  # noqa: C901  # Explicit release evidence matrix.
                 or runtime.get("runtime_profile") != host
             ):
                 errors.add(f"runtime_evidence_invalid:{host}")
+        if codex_timing is None:
+            unavailable.add("codex_session_start_timing_missing")
+        elif (
+            codex_timing.get("target") != RELEASE_TARGET
+            or codex_timing.get("sample_count") != 20
+            or codex_timing.get("configured_timeout_ms") != 2000
+            or codex_timing.get("pass") is not True
+        ):
+            errors.add("codex_session_start_timing_invalid")
     return {
         "status": "fail" if errors else "unavailable" if unavailable else "pass",
         "security_status": security.get("status") if security else None,
@@ -1645,6 +1710,9 @@ def _evidence_check(  # noqa: C901  # Explicit release evidence matrix.
         "runtime_statuses": {
             host: runtime.get("status") if runtime else None for host, runtime in runtimes.items()
         },
+        "codex_session_start_timing": (
+            "pass" if codex_timing and codex_timing.get("pass") is True else None
+        ),
         "error_codes": sorted(errors | unavailable),
     }
 
@@ -1805,6 +1873,22 @@ def _full_check(
         except ReleaseCheckError as exc:
             checks["package_assembly"] = {"status": "fail", "error_codes": [str(exc)]}
     assembly_status = str(checks["package_assembly"].get("status", "unavailable"))
+    timing_evidence = checks["package_assembly"].get("codex_session_start_timing")
+    checks["codex_session_start_timing"] = {
+        "status": (
+            "pass"
+            if isinstance(timing_evidence, Mapping) and timing_evidence.get("pass") is True
+            else assembly_status
+            if assembly_status in {"fail", "unavailable"}
+            else "fail"
+        ),
+        "evidence": dict(timing_evidence) if isinstance(timing_evidence, Mapping) else None,
+        "error_codes": (
+            []
+            if isinstance(timing_evidence, Mapping) and timing_evidence.get("pass") is True
+            else ["codex_session_start_timing_not_passing"]
+        ),
+    }
     primary_runtime = runtime_reports.get("codex")
     target = primary_runtime.get("target") if primary_runtime else None
     if not isinstance(target, str):

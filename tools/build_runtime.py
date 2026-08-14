@@ -21,6 +21,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import tomllib
 from collections.abc import Mapping
@@ -666,6 +667,35 @@ def _runtime_profile_inventory(  # noqa: C901  # Closed host dependency inventor
     }
 
 
+def _measure_generated_codex_hook(
+    root: Path,
+    output_dir: Path,
+    target: Target,
+    *,
+    runs: int,
+) -> dict[str, Any]:
+    """Assemble the generated layout and run its configured hook before smoke."""
+
+    try:
+        from build_plugins import generate_plugin
+        from measure_codex_hook_timing import measure_codex_session_start
+
+        with tempfile.TemporaryDirectory(prefix="opensocrates-runtime-hook-gate-") as name:
+            scratch = Path(name)
+            runtime_root = scratch / "runtime"
+            shutil.copytree(output_dir, runtime_root / target.name, copy_function=shutil.copy2)
+            package = scratch / "plugin"
+            generate_plugin(
+                root=root,
+                host="codex",
+                output=package,
+                runtime_root=runtime_root,
+            )
+            return measure_codex_session_start(package, runs)
+    except Exception as error:
+        raise BuildError("packaged_codex_session_start_gate_unavailable") from error
+
+
 def _finish_status(
     report_path: Path,
     report: dict[str, Any],
@@ -749,6 +779,30 @@ def _run_pyinstaller(  # noqa: C901  # Explicit build evidence sequence.
                     cli_runtime["artifact_verification"] = inventory["status"]
             if inventory["status"] != "pass":
                 raise BuildError("host runtime dependency inventory is invalid")
+        if (
+            args.mode == "runtime"
+            and runtime_profile == "codex"
+            and (args.smoke_test or args.measure_runs)
+        ):
+            # This must be the first execution of the built runtime.  Package
+            # generation may copy and hash files, but no version command or
+            # synthetic probe is allowed to warm the executable first.
+            hook_measurement = _measure_generated_codex_hook(
+                root,
+                output_dir,
+                target,
+                runs=args.measure_runs or 20,
+            )
+            report["startup_measurement"] = hook_measurement
+            if hook_measurement.get("pass") is not True:
+                return _finish_status(
+                    report_path,
+                    report,
+                    "fail",
+                    "packaged_codex_session_start_budget_exceeded",
+                    1,
+                    stderr=True,
+                )
         if args.smoke_test:
             response, elapsed_ms, error = _run_binary(artifact, mode=args.mode)
             report["smoke_test"] = {
@@ -757,7 +811,7 @@ def _run_pyinstaller(  # noqa: C901  # Explicit build evidence sequence.
             }
             if response is None:
                 raise BuildError(f"smoke test failed: {error}")
-        if args.measure_runs:
+        if args.measure_runs and not (args.mode == "runtime" and runtime_profile == "codex"):
             measurement = _measure(artifact, args.measure_runs, mode=args.mode)
             report["startup_measurement"] = measurement
             if not measurement["budget_pass"]:

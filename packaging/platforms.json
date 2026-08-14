@@ -24,12 +24,15 @@
   ],
   "startup_budget": {
     "darwin-arm64": {
-      "status": "pass",
-      "p50_ms": 39.953,
-      "p95_ms": 57.679,
-      "evidence": "build/evidence/dg-01-macos.json"
+      "status": "release_gate_required",
+      "measurement": "packaged_codex_session_start",
+      "minimum_samples": 20,
+      "configured_timeout_ms": 2000,
+      "required_p95_max_ms": 1000,
+      "evidence": "build/evidence/codex-session-start-timing.json",
+      "synthetic_probe_evidence": "build/evidence/dg-01-macos.json"
     }
   },
   "signing_status": "unvalidated",
-  "notes": "Only darwin-arm64 is a release target and only bin/launch.sh is shipped. Other entries are dry-run build candidates, are not shipped, and carry no support claim."
+  "notes": "Only darwin-arm64 is a release target and only bin/launch.sh is shipped. The synthetic DG-01 probe is packaging evidence, not a real-hook latency claim; release requires the generated Codex SessionStart gate. Other entries are dry-run build candidates, are not shipped, and carry no support claim."
 }

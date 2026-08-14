@@ -611,13 +611,9 @@ class CodexAdapter:
         application = self.config.selector_application
         artifact_store = self.config.instruction_file_store
         if native.native_event == "SessionStart":
-            if artifact_store is not None:
-                try:
-                    artifact_store.sweep_expired()
-                except Exception:
-                    pass
             if native.source == "compact" and artifact_store is not None:
                 try:
+                    artifact_store.sweep_expired()
                     artifact = artifact_store.latest_for_session(native.session_id)
                 except Exception:
                     artifact = None
@@ -634,6 +630,13 @@ class CodexAdapter:
             return self._selector_empty_result(native, diagnostics=diagnostics)
 
         if native.native_event == "UserPromptSubmit":
+            if artifact_store is not None:
+                try:
+                    artifact_store.sweep_expired()
+                except Exception:
+                    # Cleanup failure cannot block the host prompt.  The
+                    # active turn is not created until after this attempt.
+                    pass
             if application is None:
                 return self._selector_empty_result(native, diagnostics=diagnostics)
             request = self._selector_user_prompt_request(native)

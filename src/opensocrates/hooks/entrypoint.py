@@ -84,25 +84,33 @@ def _read_bounded(stream: BinaryIO | TextIO) -> bytes | None:
     return result
 
 
-def _input_metadata(raw: bytes) -> tuple[str | None, str | None]:
+def _input_metadata(raw: bytes) -> tuple[str | None, str | None, str | None]:
     try:
         decoded = json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError, RecursionError):
-        return None, None
+        return None, None, None
     if not isinstance(decoded, Mapping):
-        return None, None
+        return None, None, None
     candidate = decoded.get("hook_event_name")
     workspace = decoded.get("cwd")
-    safe_workspace = (
-        workspace
-        if isinstance(workspace, str)
+    source = decoded.get("source")
+    safe_workspace = None
+    if (
+        isinstance(workspace, str)
         and workspace
         and "\x00" not in workspace
-        and len(workspace.encode("utf-8")) <= 4096
         and os.path.isabs(workspace)
-        else None
+    ):
+        try:
+            if len(workspace.encode("utf-8")) <= 4096:
+                safe_workspace = workspace
+        except UnicodeEncodeError:
+            pass
+    return (
+        candidate if isinstance(candidate, str) else None,
+        safe_workspace,
+        source if isinstance(source, str) else None,
     )
-    return (candidate if isinstance(candidate, str) else None), safe_workspace
 
 
 def _safe_response(value: object) -> str:
@@ -147,10 +155,23 @@ def run_hook(  # noqa: C901  # Explicit host-safe early-return boundary.
     if raw is None:
         output.write("")
         return 0
-    native_name, workspace = _input_metadata(raw)
+    native_name, workspace, session_start_source = _input_metadata(raw)
     native_name = _native_for_lane(host, lane, native_name)
     if native_name is None:
         output.write("")
+        return 0
+    if services is None and host == "codex" and native_name == "SessionStart":
+        # startup/resume/clear are specified literal no-ops.  Return before
+        # importing runtime composition, content, storage, selectors, or host
+        # adapters.  Unknown/malformed future source values fail open the same
+        # way and have no persistence side effect.
+        if session_start_source != "compact":
+            output.write("")
+            return 0
+        from .codex_session_start import restore_codex_compact_session_start
+
+        restored = restore_codex_compact_session_start(raw)
+        output.write(_safe_response(restored) if restored is not None else "")
         return 0
     runtime: Any | None = None
     owns_runtime = services is None
