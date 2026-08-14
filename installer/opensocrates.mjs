@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { createHash, randomInt, randomUUID } from "node:crypto";
 import {
   constants as fsConstants,
@@ -164,7 +164,11 @@ export const CODEX_TRUST_EVENTS = Object.freeze([
 ]);
 const CODEX_TRUST_KEY_PREFIX = `${PLUGIN_ID}:hooks/hooks.json:`;
 const MAX_CODEX_CONFIG_BYTES = 16 * 1024 * 1024;
-const CODEX_CONFIG_CHECK_ARGS = Object.freeze(["--strict-config", "features", "list"]);
+const CODEX_APP_SERVER_ARGS = Object.freeze(["app-server", "--stdio"]);
+const CODEX_APP_SERVER_TIMEOUT_MILLISECONDS = 15_000;
+const CODEX_APP_SERVER_TERMINATION_MILLISECONDS = 1_000;
+const MAX_CODEX_APP_SERVER_LINE_BYTES = 256 * 1024;
+const MAX_CODEX_APP_SERVER_OUTPUT_BYTES = 1024 * 1024;
 
 // Keep host security state separate from installer-owned payload cleanup so an
 // explicit trust reset can fail without weakening purge path-ownership checks.
@@ -716,27 +720,255 @@ async function fsyncDirectory(target) {
   }
 }
 
-function runCodexConfigCheck(codexBin, codexHome) {
-  const result = spawnSync(codexBin, CODEX_CONFIG_CHECK_ARGS, {
-    cwd: codexHome,
-    env: { ...process.env, CODEX_HOME: codexHome },
-    stdio: "ignore",
-    timeout: 15_000,
-  });
-  if (result.error || result.status !== 0) {
-    trustResetFailure("the installed Codex CLI did not accept the configuration");
+function exactCodexInitializeResponse(message, requestId, codexHome) {
+  if (message === null || typeof message !== "object" || Array.isArray(message)) return false;
+  const responseKeys = Object.keys(message).sort();
+  if (responseKeys.length !== 2 || responseKeys[0] !== "id" || responseKeys[1] !== "result") {
+    return false;
   }
+  if (message.id !== requestId) return false;
+  const result = message.result;
+  if (result === null || typeof result !== "object" || Array.isArray(result)) return false;
+  const resultKeys = Object.keys(result).sort();
+  if (
+    resultKeys.length !== 4 ||
+    resultKeys[0] !== "codexHome" ||
+    resultKeys[1] !== "platformFamily" ||
+    resultKeys[2] !== "platformOs" ||
+    resultKeys[3] !== "userAgent"
+  ) {
+    return false;
+  }
+  return (
+    result.codexHome === codexHome &&
+    typeof result.platformFamily === "string" &&
+    result.platformFamily.length > 0 &&
+    typeof result.platformOs === "string" &&
+    result.platformOs.length > 0 &&
+    typeof result.userAgent === "string" &&
+    result.userAgent.length > 0
+  );
 }
 
-async function validateCodexConfigBytes(codexBin, contents, { removeValidationHome = rm } = {}) {
+function codexAppServerValidationError() {
+  return new InstallerError(
+    "Codex OpenSocrates hook trust was not reset: the installed Codex app server did not accept the isolated configuration",
+  );
+}
+
+function isolatedCodexValidationEnvironment(codexHome) {
+  const environment = {
+    PATH: process.env.PATH ?? "",
+    HOME: codexHome,
+    CODEX_HOME: codexHome,
+    XDG_CACHE_HOME: join(codexHome, "xdg-cache"),
+    XDG_CONFIG_HOME: join(codexHome, "xdg-config"),
+    XDG_DATA_HOME: join(codexHome, "xdg-data"),
+    XDG_STATE_HOME: join(codexHome, "xdg-state"),
+    TMPDIR: join(codexHome, "tmp"),
+    NO_COLOR: "1",
+  };
+  if (process.platform === "win32") {
+    for (const key of ["ComSpec", "PATHEXT", "SystemRoot", "WINDIR"]) {
+      if (typeof process.env[key] === "string") environment[key] = process.env[key];
+    }
+  }
+  return environment;
+}
+
+async function runCodexAppServerConfigCheck(
+  codexBin,
+  codexHome,
+  {
+    spawnAppServer = spawn,
+    timeoutMilliseconds = CODEX_APP_SERVER_TIMEOUT_MILLISECONDS,
+    terminationMilliseconds = CODEX_APP_SERVER_TERMINATION_MILLISECONDS,
+  } = {},
+) {
+  const requestId = 1;
+  const request = Buffer.from(
+    `${JSON.stringify({
+      id: requestId,
+      method: "initialize",
+      params: {
+        clientInfo: {
+          name: "opensocrates_installer",
+          title: "OpenSocrates Installer",
+          version: PRODUCT_VERSION,
+        },
+        capabilities: { experimentalApi: false },
+      },
+    })}\n`,
+    "utf8",
+  );
+  let child;
+  try {
+    child = spawnAppServer(codexBin, CODEX_APP_SERVER_ARGS, {
+      cwd: codexHome,
+      env: isolatedCodexValidationEnvironment(codexHome),
+      stdio: ["pipe", "pipe", "pipe"],
+      windowsHide: true,
+    });
+  } catch {
+    throw codexAppServerValidationError();
+  }
+
+  await new Promise((resolvePromise, rejectPromise) => {
+    const timeoutDelay =
+      Number.isFinite(timeoutMilliseconds) && timeoutMilliseconds > 0
+        ? timeoutMilliseconds
+        : CODEX_APP_SERVER_TIMEOUT_MILLISECONDS;
+    const terminationDelay =
+      Number.isFinite(terminationMilliseconds) && terminationMilliseconds > 0
+        ? terminationMilliseconds
+        : CODEX_APP_SERVER_TERMINATION_MILLISECONDS;
+    let closed = false;
+    let failed = false;
+    let settled = false;
+    let responseCount = 0;
+    let responseAccepted = false;
+    let outputBytes = 0;
+    let lineBuffer = Buffer.alloc(0);
+    let terminationTimer;
+    let forcedFinishTimer;
+
+    const clearTimers = () => {
+      clearTimeout(deadlineTimer);
+      if (terminationTimer !== undefined) clearTimeout(terminationTimer);
+      if (forcedFinishTimer !== undefined) clearTimeout(forcedFinishTimer);
+    };
+    const finish = (accepted) => {
+      if (settled) return;
+      settled = true;
+      clearTimers();
+      if (accepted) resolvePromise();
+      else rejectPromise(codexAppServerValidationError());
+    };
+    const terminate = () => {
+      if (failed || settled) return;
+      failed = true;
+      try {
+        child.stdin.end();
+      } catch {
+        // The stream may already be closed; process termination below remains bounded.
+      }
+      if (closed) {
+        finish(false);
+        return;
+      }
+      try {
+        child.kill("SIGTERM");
+      } catch {
+        // A failed signal is followed by the bounded SIGKILL/final failure timers.
+      }
+      terminationTimer = setTimeout(() => {
+        if (closed || settled) return;
+        try {
+          child.kill("SIGKILL");
+        } catch {
+          // The final timer still prevents an unbounded validator wait.
+        }
+        forcedFinishTimer = setTimeout(() => finish(false), terminationDelay);
+      }, terminationDelay);
+    };
+    const consumeLine = (line) => {
+      if (failed || settled) return;
+      if (line.length > MAX_CODEX_APP_SERVER_LINE_BYTES || line.length === 0) {
+        terminate();
+        return;
+      }
+      const normalized = line.at(-1) === 0x0d ? line.subarray(0, -1) : line;
+      let message;
+      try {
+        message = JSON.parse(normalized.toString("utf8"));
+      } catch {
+        terminate();
+        return;
+      }
+      responseCount += 1;
+      if (
+        responseCount !== 1 ||
+        !exactCodexInitializeResponse(message, requestId, codexHome)
+      ) {
+        terminate();
+        return;
+      }
+      responseAccepted = true;
+    };
+    const deadlineTimer = setTimeout(terminate, timeoutDelay);
+
+    child.stdout.on("data", (chunk) => {
+      if (failed || settled) return;
+      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      outputBytes += bytes.length;
+      if (outputBytes > MAX_CODEX_APP_SERVER_OUTPUT_BYTES) {
+        terminate();
+        return;
+      }
+      lineBuffer = Buffer.concat([lineBuffer, bytes]);
+      for (;;) {
+        const newline = lineBuffer.indexOf(0x0a);
+        if (newline < 0) break;
+        const line = lineBuffer.subarray(0, newline);
+        lineBuffer = lineBuffer.subarray(newline + 1);
+        consumeLine(line);
+        if (failed || settled) return;
+      }
+      if (lineBuffer.length > MAX_CODEX_APP_SERVER_LINE_BYTES) terminate();
+    });
+    child.stderr.on("data", (chunk) => {
+      if (failed || settled) return;
+      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      outputBytes += bytes.length;
+      if (outputBytes > MAX_CODEX_APP_SERVER_OUTPUT_BYTES) terminate();
+    });
+    child.once("error", terminate);
+    child.stdin.once("error", terminate);
+    child.once("close", (code, signal) => {
+      closed = true;
+      finish(
+        !failed &&
+          code === 0 &&
+          signal === null &&
+          responseCount === 1 &&
+          responseAccepted &&
+          lineBuffer.length === 0,
+      );
+    });
+
+    try {
+      child.stdin.end(request);
+    } catch {
+      terminate();
+    }
+  });
+}
+
+async function validateCodexConfigBytes(
+  codexBin,
+  contents,
+  {
+    removeValidationHome = rm,
+    spawnAppServer = spawn,
+    validationTimeoutMilliseconds = CODEX_APP_SERVER_TIMEOUT_MILLISECONDS,
+    validationTerminationMilliseconds = CODEX_APP_SERVER_TERMINATION_MILLISECONDS,
+  } = {},
+) {
   let validationHome;
   let operationFailed = false;
   try {
     validationHome = await mkdtemp(join(tmpdir(), "opensocrates-codex-config-check-"));
     await chmod(validationHome, 0o700);
+    for (const directory of ["tmp", "xdg-cache", "xdg-config", "xdg-data", "xdg-state"]) {
+      await mkdir(join(validationHome, directory), { mode: 0o700 });
+    }
     const target = join(validationHome, "config.toml");
     await writeSyncedOwnerOnlyFile(target, contents);
-    runCodexConfigCheck(codexBin, validationHome);
+    await runCodexAppServerConfigCheck(codexBin, validationHome, {
+      spawnAppServer,
+      timeoutMilliseconds: validationTimeoutMilliseconds,
+      terminationMilliseconds: validationTerminationMilliseconds,
+    });
   } catch (error) {
     operationFailed = true;
     if (error instanceof InstallerError) throw error;
@@ -815,11 +1047,19 @@ export async function resetCodexOpenSocratesHookTrust({
   const originalMode = Number(snapshot.info.mode & 0o7777n);
   const originalUid = Number(snapshot.info.uid);
   const originalGid = Number(snapshot.info.gid);
-  const validationOptions = { removeValidationHome: hooks.removeValidationHome };
+  const validationOptions = {
+    removeValidationHome: hooks.removeValidationHome,
+    spawnAppServer: hooks.spawnAppServer,
+    validationTimeoutMilliseconds: hooks.validationTimeoutMilliseconds,
+    validationTerminationMilliseconds: hooks.validationTerminationMilliseconds,
+  };
   await validateCodexConfigBytes(codexBin, snapshot.contents, validationOptions);
-  runCodexConfigCheck(codexBin, parent);
   const stripped = stripCodexOpenSocratesTrustSections(snapshot.contents);
   if (stripped.removedEvents.length === 0) {
+    const current = await readConfigSnapshot(target);
+    if (!sameSnapshot(snapshot.info, current.info) || !current.contents.equals(snapshot.contents)) {
+      trustResetFailure("the Codex configuration changed during isolated validation");
+    }
     return { status: "absent", removedEvents: [] };
   }
   await validateCodexConfigBytes(codexBin, stripped.contents, validationOptions);
@@ -849,7 +1089,6 @@ export async function resetCodexOpenSocratesHookTrust({
     await fsyncFile(target);
     await fsyncDirectory(parent);
     await hooks.afterRename?.({ target, rollback });
-    runCodexConfigCheck(codexBin, parent);
     const committed = await readConfigSnapshot(target);
     if (
       !committed.contents.equals(stripped.contents) ||
@@ -859,6 +1098,7 @@ export async function resetCodexOpenSocratesHookTrust({
     ) {
       trustResetFailure("the committed Codex configuration did not match the validated candidate");
     }
+    await validateCodexConfigBytes(codexBin, committed.contents, validationOptions);
     await (hooks.removeRollback ?? rm)(rollback);
     // The candidate and parent rename are already fsynced and post-validated.
     // Keep rollback unlink as the final fallible commit step; another directory
@@ -4217,7 +4457,7 @@ function finalizePurgeHostResult(hostResult) {
 }
 
 async function resetPurgeTrustExtension(hostResult, options) {
-  if (hostResult.host !== "codex" || !options.resetTrust) return;
+  if (hostResult.host !== "codex" || !options.resetTrust) return true;
   try {
     const reset = await resetCodexOpenSocratesHookTrust({ hooks: options.trustResetHooks ?? {} });
     hostResult.extension = {
@@ -4226,6 +4466,7 @@ async function resetPurgeTrustExtension(hostResult, options) {
       removedCount: reset.removedEvents.length,
       nextAction: null,
     };
+    return true;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     hostResult.extension = {
@@ -4236,11 +4477,39 @@ async function resetPurgeTrustExtension(hostResult, options) {
       detail: message,
     };
     hostResult.errors.push(message);
+    return false;
+  }
+}
+
+function preservePurgeComponentsAfterTrustFailure(hostResult, paths) {
+  hostResult.registration = "preserved";
+  hostResult.registrationDetail = "not-attempted-after-trust-reset-failure";
+  const preserved = [
+    ["managed-root", paths.root],
+    ["transaction-residue", null],
+  ];
+  if (hostResult.host === "opencode") {
+    preserved.push(["opencode-bridge", paths.bridge], ["opencode-bridge-residue", null]);
+  }
+  if (paths.cacheRoot !== null) preserved.push(["plugin-cache", paths.cacheRoot]);
+  preserved.push(...paths.pluginData.map((path) => ["plugin-data", path]));
+  for (const [component, path] of preserved) {
+    hostResult.components.push({
+      component,
+      status: "preserved",
+      path,
+      detail: "not-attempted-after-trust-reset-failure",
+    });
   }
 }
 
 async function purgeOneHost(hostResult, options) {
   const paths = purgePathsFor(hostResult.host);
+  if (!(await resetPurgeTrustExtension(hostResult, options))) {
+    preservePurgeComponentsAfterTrustFailure(hostResult, paths);
+    finalizePurgeHostResult(hostResult);
+    return;
+  }
   try {
     const registration = await purgeRegistration(hostResult.host, paths);
     hostResult.registration = registration.status;
@@ -4273,7 +4542,6 @@ async function purgeOneHost(hostResult, options) {
   if (paths.pluginData.length > 0) {
     await capturePurgeComponent(hostResult, "plugin-data", () => purgeClaudePluginData(paths));
   }
-  await resetPurgeTrustExtension(hostResult, options);
   finalizePurgeHostResult(hostResult);
 }
 
@@ -4300,10 +4568,11 @@ async function updatePurgeDesiredState(options, desired, result) {
   };
   const launchAgentPresent = await entryExists(statePaths().launchAgent);
   const schedulerNeedsChange =
-    options.host === ALL_HOST ||
-    installedHosts.length === 0 ||
-    launchAgentPresent !== keepAutoUpdate ||
-    desired.autoUpdate.hosts.some((host) => deactivated.includes(host));
+    deactivated.length > 0 &&
+    (options.host === ALL_HOST ||
+      installedHosts.length === 0 ||
+      launchAgentPresent !== keepAutoUpdate ||
+      desired.autoUpdate.hosts.some((host) => deactivated.includes(host)));
   if (schedulerNeedsChange) {
     try {
       if (keepAutoUpdate) await installLaunchAgent(desired.channel, autoUpdateHosts);
@@ -4330,6 +4599,14 @@ async function updatePurgeDesiredState(options, desired, result) {
       status: "preserved",
       path: statePaths().launchAgent,
     });
+  }
+  if (!schedulerNeedsChange && jsonDeepEqual(nextDesired, desired)) {
+    result.finalization.components.push({
+      component: "desired-state",
+      status: "preserved",
+      path: statePaths().desiredState,
+    });
+    return desired;
   }
   try {
     nextDesired = await writeDesiredState(nextDesired);

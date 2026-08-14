@@ -41,12 +41,22 @@ if (has("--version")) {
   process.stdout.write("2.1.205 (packed smoke)\\n");
   process.exit(0);
 }
-if (${JSON.stringify(host)} === "codex" && has("--strict-config", "features", "list")) {
+if (${JSON.stringify(host)} === "codex" && argv[0] === "app-server" && argv[1] === "--stdio") {
+  const request = JSON.parse(readFileSync(0, "utf8").trim());
   const config = join(process.env.CODEX_HOME, "config.toml");
   if (existsSync(config)) readFileSync(config);
-  process.stdout.write("hooks stable true\\n");
+  process.stdout.write(JSON.stringify({
+    id: request.id,
+    result: {
+      codexHome: process.env.CODEX_HOME,
+      platformFamily: "unix",
+      platformOs: "macos",
+      userAgent: "codex_cli_rs/packed-smoke",
+    },
+  }) + "\\n");
   process.exit(0);
 }
+if (${JSON.stringify(host)} === "codex" && has("--strict-config", "features", "list")) process.exit(91);
 if (${JSON.stringify(host)} === "claude") {
   if (has("plugin", "marketplace", "list") || has("plugin", "list")) {
     process.stdout.write("[]");
