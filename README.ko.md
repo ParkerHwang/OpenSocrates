@@ -44,10 +44,10 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 | Grok Build TUI | 헤드리스와 같은 네이티브 플러그인, 활성화 영수증은 대기 중 | `/opensocrates` | [TUI 훅 실행 검증 완료, 네이티브 스킬 마커 테스트는 미완료, 배포 패키지에 훅 없음](docs/grok-support.md) |
 | OpenCode TUI 및 `opencode run` | 안정판 같은 턴 로컬 브리지 | 네이티브 `opensocrates` 스킬 | [OpenCode 1.18.18 TUI, `opencode run` 및 DeepSeek V4 Flash 라이브 스모크 완료](docs/opencode-support.ko.md) |
 | Codex CLI 및 Desktop | 앱에서 훅을 한 번 승인한 뒤 지원 | OpenSocrates 플러그인 | `darwin-arm64` 패키지·런처 릴리스 검증 완료, 실제 Codex 훅 전달 영수증 없음 |
-| Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | `/opensocrates` | `darwin-arm64` 로컬 검증 완료 |
-| Claude Code 데스크톱 앱 | Claude Code 플러그인이 실행되는 곳에서 지원 | `/opensocrates` | [인증된 훅 생명주기 로컬 검증 완료](docs/claude-desktop-live-probe.md) |
-| Claude Cowork | 실측 로컬 플러그인 업로드에서 지원 | `/opensocrates` | [네이티브 훅 생명주기 로컬 검증 완료, 릴리스 직접 업로드 지원, 마켓플레이스 동기화 없음](docs/claude-cowork-live-probe.md) |
-| Claude 웹 및 Desktop Chat | 훅 미지원 | `/opensocrates` | [실제 업로드 및 호출 검증 완료](docs/claude-chat-upload-probe.md) |
+| Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | 플러그인: `/opensocrates:opensocrates` | `darwin-arm64` 로컬 검증 완료 |
+| Claude Code 데스크톱 앱 Local 모드 | Claude Code 플러그인이 실행되는 곳에서 지원 | 플러그인: `/opensocrates:opensocrates` | [인증된 훅 생명주기 로컬 검증 완료](docs/claude-desktop-live-probe.md) |
+| 로컬 플러그인을 사용하는 Claude Cowork | 실측 로컬 플러그인 업로드에서 지원 | 플러그인: `/opensocrates:opensocrates` | [네이티브 훅 생명주기 로컬 검증 완료, 릴리스 직접 업로드 지원, 마켓플레이스 동기화 없음](docs/claude-cowork-live-probe.md) |
+| Claude 웹 및 Desktop Chat | OpenSocrates 훅 미지원 | 독립형 스킬: `/opensocrates` | [실제 업로드 및 호출 검증 완료](docs/claude-chat-upload-probe.md) |
 
 상태 열은 서로 다른 네 단계를 뜻하며 같은 의미로 읽으면 안 됩니다.
 
@@ -60,10 +60,16 @@ OpenSocrates 백엔드가 필요하지 않습니다.
   전달했다는 기록이 없습니다. `os capabilities show`는 이 항목들을 사용 가능이
   아니라 `unknown`으로 보고합니다.
 
-Claude Chat 화면은 플러그인 훅을 실행하지 않습니다. 생성된 스킬은 사용할 수
-있지만, 프롬프트마다 자동으로 선택하는 기능은 플러그인 런타임을 실행하는 Claude
-Code와 Cowork 화면에서만 작동합니다. 훅이나 셀렉터를 사용할 수 없으면
-OpenSocrates는 작업을 막지 않고 통과합니다.
+Anthropic의
+[플러그인 namespace 계약](https://code.claude.com/docs/en/plugins)에 따라 Claude
+플러그인의 canonical 명시적 명령은 `/opensocrates:opensocrates`입니다. 현재 Claude
+버전은 같은 이름을 차지한 다른 명령이 없을 때 `/opensocrates` bare alias도 제공할
+수 있지만, 이 alias는 canonical 플러그인 계약이 아니며 어느 스킬 source가
+응답했는지 증명하지도 않습니다. 별도로 업로드하는 Chat ZIP은 독립형 스킬이므로
+canonical 명령으로 `/opensocrates`를 사용합니다. Chat 화면은 패키지된 OpenSocrates
+훅을 실행하지 않으며, 프롬프트마다 자동으로 선택하는 기능은 플러그인 런타임을
+실행하는 Claude Code와 Cowork 화면에서만 작동합니다. 훅이나 셀렉터를 사용할 수
+없으면 OpenSocrates는 작업을 막지 않고 통과합니다.
 
 공개된 v1.1.2 Claude 플러그인 아카이브는 Cowork의 문서화된 압축 크기 제한과
 실측 압축 해제 크기 제한을 모두 초과했습니다. 출시 전 v1.1.3 후보는 압축
@@ -234,14 +240,16 @@ LaunchAgent를 언로드하고 삭제하며, `remove --host all`도 관리 호�
 
 ### Claude 웹 및 Desktop Chat 스킬
 
-이 화면들은 플러그인 스킬은 지원하지만 훅은 실행하지 않습니다. 릴리스에서
+이 화면들은 별도로 업로드한 독립형 스킬을 사용할 수 있지만 로컬 플러그인 훅은
+실행하지 않습니다. 릴리스에서
 `opensocrates-1.2.1-claude-chat-skills.zip`을 내려받아 Claude의 **사용자 지정 →
 스킬 → 스킬 업로드** 화면에서 업로드하세요. ZIP은 업로더 요구사항에 맞춰
-최상위 `opensocrates/` 폴더 바로 아래에 `SKILL.md`를 둡니다. 패키지는
-`/opensocrates` 스킬 하나만 노출하고, 48개
-방법 절차와 엄격도·근거·추적 제어는 내부 참조로 둡니다. Chat은 플러그인 훅을
-실행하지 않으므로 자동 선택은 없습니다. Anthropic의
-[플러그인 화면 안내](https://support.claude.com/en/articles/13837440-use-plugins-in-claude)를
+최상위 `opensocrates/` 폴더 바로 아래에 `SKILL.md`를 둡니다. 이 파일은 Claude
+Code/Cowork 플러그인 아카이브가 아닙니다. 독립형 패키지는 canonical
+`/opensocrates` 스킬 하나만 노출하고, 48개 방법 절차와 엄격도·근거·추적 제어는
+내부 참조로 둡니다. Chat은 패키지된 훅을 실행하지 않으므로 훅 기반 자동 선택은
+없습니다. Anthropic의
+[사용자 정의 스킬 안내](https://support.claude.com/en/articles/12512180-use-skills-in-claude)를
 참고하세요.
 
 ### 태그가 고정된 GitHub 소스에서 설치
@@ -344,14 +352,17 @@ Claude 훅 화면에서는 Read 전용 `PostToolUse` 훅이 현재 turn의 정�
 Claude에서는 필요할 때 같은 컨트롤러를 명시적으로 호출할 수 있습니다.
 
 ```text
-/opensocrates <요청>
-/opensocrates auto <요청>
-/opensocrates trace
-/opensocrates status
+/opensocrates:opensocrates <요청>
+/opensocrates:opensocrates auto <요청>
+/opensocrates:opensocrates trace
+/opensocrates:opensocrates status
 ```
 
-Claude의 스킬·명령 UI에는 `/opensocrates` 하나만 나타납니다. 컨트롤러가 내부 방법
-참조를 선택해 읽으므로 사용자가 48개 구현 카탈로그를 직접 탐색할 필요가 없습니다.
+위 명령은 Claude Code/Cowork 플러그인용입니다. 독립형 Chat ZIP은 대신
+`/opensocrates`를 사용합니다. 플러그인의 등록 명령 inventory에는
+`/opensocrates:opensocrates`가 나타나며, bare alias를 source 증거로 사용하면 안
+됩니다. 컨트롤러가 내부 방법 참조를 선택해 읽으므로 사용자가 48개 구현
+카탈로그를 직접 탐색할 필요가 없습니다.
 
 Claude 셀렉터는 세션을 저장하지 않는 단일 `claude --safe-mode -p` 프로세스를
 사용합니다. 안전 모드는 사용자, 프로젝트, 플러그인 커스터마이즈를 끕니다.

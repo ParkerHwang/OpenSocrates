@@ -1,6 +1,17 @@
 {
   "host": "claude",
-  "template_revision": "2",
+  "template_revision": "3",
+  "default_render_profile": "plugin",
+  "render_profiles": {
+    "plugin": {
+      "CLAUDE_CANONICAL_INVOCATION": "/opensocrates:opensocrates",
+      "CLAUDE_DELIVERY_SURFACE": "Claude Code/Cowork plugin skill"
+    },
+    "chat-standalone": {
+      "CLAUDE_CANONICAL_INVOCATION": "/opensocrates",
+      "CLAUDE_DELIVERY_SURFACE": "standalone Claude Chat skill"
+    }
+  },
   "launcher_host": "claude",
   "release_targets": ["darwin-arm64"],
   "launchers": ["bin/launch.sh"],

@@ -22,6 +22,10 @@ All notable changes to OpenSocrates are documented here. This project follows
   instead of implying that every installed payload was removed.
 - Installer help and English/Korean removal docs now distinguish plugin
   registration, owned payloads, host security trust, and preserved user history.
+- Claude Code, Desktop Local, and Cowork plugin documentation now uses the
+  canonical `/opensocrates:opensocrates` namespace, while the separately
+  rendered Claude Chat standalone skill keeps `/opensocrates`. Release checks
+  reject either command when it appears in the wrong artifact.
 
 ### Security and privacy
 

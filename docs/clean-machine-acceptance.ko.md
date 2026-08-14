@@ -50,8 +50,9 @@ node tools/clean_machine_acceptance.mjs
 4. 통합 릴리스 매니페스트로 Claude 및 Codex ZIP 해시를 검증합니다.
 5. 현재 체크아웃을 npm 패키지로 묶고 두 호스트를 하나의 실제 트랜잭션으로
    설치합니다.
-6. 소유자 전용 desired state, 정확한 호스트 등록과 버전, Claude의 공개
-   `/opensocrates` 스킬 하나, 전체 호스트의 버전 차이 없음을 확인합니다.
+6. 소유자 전용 desired state, 정확한 호스트 등록과 버전, canonical 명령이
+   `/opensocrates:opensocrates`인 Claude 공개 플러그인 스킬 하나, 전체 호스트의
+   버전 차이 없음을 확인합니다.
 7. 홈 디렉터리 아래에 개인정보를 뺀 결과 디렉터리를 만듭니다.
 
 자동 업데이트는 켜지 않습니다. 결과를 자동 업로드하지 않으며 원시 명령 출력,
@@ -61,7 +62,14 @@ node tools/clean_machine_acceptance.mjs
 ## 수동 확인 완료 및 결과 전달
 
 자동 검증이 성공하면 `manual-observations.md` 경로가 표시됩니다. 파일을 열고 새로운
-Claude Code 및 Codex 작업에서 네 가지 확인을 수행하세요. 각:
+Claude Code 및 Codex 작업에서 네 가지 확인을 수행하세요.
+
+Claude Local 확인에는 `/opensocrates:opensocrates`를 사용하세요. bare
+`/opensocrates`는 독립형 사용자·프로젝트·동기화 스킬로 해석될 수 있으므로 설치된
+플러그인이 응답했다는 증거가 아닙니다. 독립형 Claude Chat ZIP과 그 canonical
+`/opensocrates` 명령은 이 로컬 플러그인 인수 범위 밖입니다.
+
+각:
 
 ```text
 PENDING

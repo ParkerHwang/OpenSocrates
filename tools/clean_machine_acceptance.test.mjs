@@ -37,7 +37,10 @@ function acceptanceFixture() {
 test("clean-machine evidence: completed categorical checks produce a constrained ZIP", () => {
   const fixture = acceptanceFixture();
   try {
-    const manual = readFileSync(fixture.manual, "utf8").replace(/: PENDING$/gmu, ": PASS");
+    const template = readFileSync(fixture.manual, "utf8");
+    assert.match(template, /registered plugin command is `\/opensocrates:opensocrates`/u);
+    assert.match(template, /standalone Claude Chat ZIP[\s\S]*`\/opensocrates`/u);
+    const manual = template.replace(/: PENDING$/gmu, ": PASS");
     writeFileSync(fixture.manual, manual);
     packExisting(fixture.directory);
 

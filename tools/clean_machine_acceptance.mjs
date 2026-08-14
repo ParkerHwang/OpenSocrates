@@ -330,14 +330,19 @@ ${MANUAL_FIELDS.map((label) => `${label}: ${defaultCheck}`).join("\n")}
 
 Change every \`PENDING\` value to \`PASS\` or \`FAIL\` after completing the matching check.
 
-- Claude single public entry: start a new Claude Code task and confirm that the
-  skill/command UI shows one OpenSocrates entry, \`/opensocrates\`.
-- Claude controller status: run \`/opensocrates status\` in that task and confirm
-  that the controller responds.
+- Claude plugin entry: start a new Claude Code Local task and confirm that the
+  registered plugin command is \`/opensocrates:opensocrates\`. A bare
+  \`/opensocrates\` is not sufficient source evidence because a standalone user,
+  project, or synced skill can own that name.
+- Claude controller status: run \`/opensocrates:opensocrates status\` in that
+  task and confirm that the plugin controller responds.
 - Codex plugin recognition: start a new Codex task, explicitly ask it to use
   OpenSocrates for a planning question, and confirm that it recognizes the plugin.
 - Host runtime loading: confirm that neither host reports an installation,
   permission, or runtime-loading error.
+
+The standalone Claude Chat ZIP is outside this local plugin acceptance. Its
+canonical explicit command remains \`/opensocrates\`.
 
 Do not add free-form text, prompts, transcripts, account names, credentials, or
 local paths. The pack command rejects a modified template.

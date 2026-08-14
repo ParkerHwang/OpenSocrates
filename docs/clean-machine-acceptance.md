@@ -55,7 +55,8 @@ The checkout must be clean. The harness then:
 5. packs this checkout as an npm package and installs both hosts in one real
    transaction;
 6. checks private desired state, exact host registrations, package versions,
-   Claude's single public `/opensocrates` skill, and all-host drift status; and
+   Claude's single public plugin skill with canonical command
+   `/opensocrates:opensocrates`, and all-host drift status; and
 7. writes a privacy-safe result directory under your home directory.
 
 It does not enable automatic updates, upload results, store raw command output,
@@ -67,7 +68,15 @@ the run ends.
 
 When automation passes, the harness prints the path to
 `manual-observations.md`. Open that file and complete its four checks in fresh
-Claude Code and Codex tasks. Change every:
+Claude Code and Codex tasks.
+
+For the Claude Local check, use `/opensocrates:opensocrates`; a bare
+`/opensocrates` can resolve to a standalone user, project, or synced skill and
+does not prove that the installed plugin answered. The standalone Claude Chat
+ZIP and its canonical `/opensocrates` command are outside this local plugin
+acceptance.
+
+Change every:
 
 ```text
 PENDING
