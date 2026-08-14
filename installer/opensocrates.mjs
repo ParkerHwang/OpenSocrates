@@ -169,6 +169,7 @@ const CODEX_APP_SERVER_TIMEOUT_MILLISECONDS = 15_000;
 const CODEX_APP_SERVER_TERMINATION_MILLISECONDS = 1_000;
 const MAX_CODEX_APP_SERVER_LINE_BYTES = 256 * 1024;
 const MAX_CODEX_APP_SERVER_OUTPUT_BYTES = 1024 * 1024;
+const MAX_CODEX_APP_SERVER_NOTIFICATIONS = 128;
 
 // Keep host security state separate from installer-owned payload cleanup so an
 // explicit trust reset can fail without weakening purge path-ownership checks.
@@ -750,6 +751,23 @@ function exactCodexInitializeResponse(message, requestId, codexHome) {
   );
 }
 
+function exactCodexAppServerNotification(message) {
+  if (message === null || typeof message !== "object" || Array.isArray(message)) return false;
+  const keys = Object.keys(message).sort();
+  const withoutTimestamp = keys.length === 2 && keys[0] === "method" && keys[1] === "params";
+  const withTimestamp =
+    keys.length === 3 &&
+    keys[0] === "emittedAtMs" &&
+    keys[1] === "method" &&
+    keys[2] === "params";
+  if (!withoutTimestamp && !withTimestamp) return false;
+  if (typeof message.method !== "string" || message.method.length === 0) return false;
+  if (message.params === null || typeof message.params !== "object" || Array.isArray(message.params)) {
+    return false;
+  }
+  return !withTimestamp || (typeof message.emittedAtMs === "number" && Number.isFinite(message.emittedAtMs));
+}
+
 function codexAppServerValidationError() {
   return new InstallerError(
     "Codex OpenSocrates hook trust was not reset: the installed Codex app server did not accept the isolated configuration",
@@ -826,9 +844,12 @@ async function runCodexAppServerConfigCheck(
     let failed = false;
     let settled = false;
     let responseCount = 0;
+    let notificationCount = 0;
     let responseAccepted = false;
+    let requestWriteCompleted = false;
     let outputBytes = 0;
     let lineBuffer = Buffer.alloc(0);
+    let inputEndRequested = false;
     let terminationTimer;
     let forcedFinishTimer;
 
@@ -844,14 +865,21 @@ async function runCodexAppServerConfigCheck(
       if (accepted) resolvePromise();
       else rejectPromise(codexAppServerValidationError());
     };
+    const endInput = () => {
+      if (inputEndRequested) return true;
+      inputEndRequested = true;
+      try {
+        child.stdin.end();
+        return true;
+      } catch {
+        return false;
+      }
+    };
     const terminate = () => {
       if (failed || settled) return;
       failed = true;
-      try {
-        child.stdin.end();
-      } catch {
-        // The stream may already be closed; process termination below remains bounded.
-      }
+      // The stream may already be closed; process termination below remains bounded.
+      endInput();
       if (closed) {
         finish(false);
         return;
@@ -885,15 +913,22 @@ async function runCodexAppServerConfigCheck(
         terminate();
         return;
       }
-      responseCount += 1;
-      if (
-        responseCount !== 1 ||
-        !exactCodexInitializeResponse(message, requestId, codexHome)
-      ) {
+      if (exactCodexInitializeResponse(message, requestId, codexHome)) {
+        responseCount += 1;
+        if (responseCount !== 1) {
+          terminate();
+          return;
+        }
+        responseAccepted = true;
+        if (!endInput()) terminate();
+        return;
+      }
+      if (!exactCodexAppServerNotification(message)) {
         terminate();
         return;
       }
-      responseAccepted = true;
+      notificationCount += 1;
+      if (notificationCount > MAX_CODEX_APP_SERVER_NOTIFICATIONS) terminate();
     };
     const deadlineTimer = setTimeout(terminate, timeoutDelay);
 
@@ -932,12 +967,24 @@ async function runCodexAppServerConfigCheck(
           signal === null &&
           responseCount === 1 &&
           responseAccepted &&
+          requestWriteCompleted &&
           lineBuffer.length === 0,
       );
     });
 
     try {
-      child.stdin.end(request);
+      const accepted = child.stdin.write(request, (error) => {
+        if (error !== undefined && error !== null) {
+          terminate();
+          return;
+        }
+        requestWriteCompleted = true;
+      });
+      if (!accepted) {
+        // This is the only bounded write. A false return means it is queued;
+        // the response/deadline path bounds a child that never drains it.
+        child.stdin.once("drain", () => {});
+      }
     } catch {
       terminate();
     }

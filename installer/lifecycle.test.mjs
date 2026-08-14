@@ -9,6 +9,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createHash, randomUUID } from "node:crypto";
 import { spawnSync } from "node:child_process";
+import { EventEmitter } from "node:events";
 import {
   chmodSync,
   cpSync,
@@ -26,6 +27,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import { PassThrough, Writable } from "node:stream";
 
 import {
   CODEX_TRUST_EVENTS,
@@ -233,11 +235,47 @@ if (HOST === "codex" && has("login", "status")) {
   process.stdout.write("Logged in using ChatGPT\\n"); process.exit(0);
 }
 if (HOST === "codex" && argv[0] === "app-server" && argv[1] === "--stdio") {
-  const input = readFileSync(0, "utf8");
-  let request;
-  try { request = JSON.parse(input.trim()); } catch { process.exit(2); }
   let contents = "";
   try { contents = readFileSync(join(process.env.CODEX_HOME, "config.toml"), "utf8"); } catch {}
+  let input = "";
+  let handled = false;
+  let responseBeforeEof = false;
+  let exitCode = 0;
+  process.on("SIGTERM", () => {});
+  process.stdin.setEncoding("utf8");
+  const completed = new Promise((resolve) => {
+    process.stdin.on("data", (chunk) => {
+      input += chunk;
+      if (handled) return;
+      const newline = input.indexOf("\\n");
+      if (newline < 0) return;
+      handled = true;
+      let request;
+      try { request = JSON.parse(input.slice(0, newline)); } catch { exitCode = 2; return; }
+      if (contents.includes("OPENSOCRATES_TEST_INVALID_TOML")) {
+        process.stdout.write(contents);
+        process.stderr.write(contents);
+        exitCode = 2;
+        return;
+      }
+      if (request?.method !== "initialize" || request?.params?.clientInfo?.name !== "opensocrates_installer") {
+        exitCode = 2;
+        return;
+      }
+      responseBeforeEof = !process.stdin.readableEnded;
+      process.stdout.write(JSON.stringify({
+        id: request.id,
+        result: {
+          codexHome: process.env.CODEX_HOME,
+          platformFamily: "unix",
+          platformOs: "macos",
+          userAgent: "codex_cli_rs/fake",
+        },
+      }) + "\\n");
+    });
+    process.stdin.on("end", () => resolve());
+  });
+  await completed;
   if (CODEX_VALIDATION_TRACE !== null) {
     appendFileSync(CODEX_VALIDATION_TRACE, JSON.stringify({
       kind: "app-server",
@@ -251,7 +289,8 @@ if (HOST === "codex" && argv[0] === "app-server" && argv[1] === "--stdio") {
         process.env.XDG_DATA_HOME.startsWith(process.env.CODEX_HOME + "/") &&
         process.env.XDG_STATE_HOME.startsWith(process.env.CODEX_HOME + "/") &&
         process.env.TMPDIR.startsWith(process.env.CODEX_HOME + "/"),
-      stdinClosed: input.endsWith("\\n"),
+      stdinClosed: true,
+      responseBeforeEof,
       environmentClean:
         process.env.NO_COLOR === "1" &&
         process.env.OPENAI_API_KEY === undefined &&
@@ -259,24 +298,7 @@ if (HOST === "codex" && argv[0] === "app-server" && argv[1] === "--stdio") {
         Object.keys(process.env).every((key) => !key.startsWith("CODEX_") || key === "CODEX_HOME"),
     }) + "\\n", { mode: 0o600 });
   }
-  if (contents.includes("OPENSOCRATES_TEST_INVALID_TOML")) {
-    process.stdout.write(contents);
-    process.stderr.write(contents);
-    process.exit(2);
-  }
-  if (request?.method !== "initialize" || request?.params?.clientInfo?.name !== "opensocrates_installer") {
-    process.exit(2);
-  }
-  process.stdout.write(JSON.stringify({
-    id: request.id,
-    result: {
-      codexHome: process.env.CODEX_HOME,
-      platformFamily: "unix",
-      platformOs: "macos",
-      userAgent: "codex_cli_rs/fake",
-    },
-  }) + "\\n");
-  process.exit(0);
+  process.exit(exitCode);
 }
 if (HOST === "codex" && has("--strict-config", "features", "list")) {
   if (CODEX_VALIDATION_TRACE !== null) {
@@ -446,9 +468,6 @@ if (argv.includes("--strict-config") || argv.includes("features")) {
   process.exit(91);
 }
 if (argv[0] !== "app-server" || argv[1] !== "--stdio") process.exit(92);
-const input = readFileSync(0, "utf8");
-let request;
-try { request = JSON.parse(input.trim()); } catch { process.exit(93); }
 let contents = "";
 try { contents = readFileSync(join(process.env.CODEX_HOME, "config.toml"), "utf8"); } catch {}
 let priorChecks = 0;
@@ -457,60 +476,214 @@ if (TRACE !== null) {
     priorChecks = readFileSync(TRACE, "utf8").trim().split("\\n").filter(Boolean).length;
   } catch {}
 }
-record({
-  kind: "app-server",
-  targetTrustCount: (contents.match(/opensocrates@opensocrates:hooks\\/hooks\\.json:[a-z_]+:0:0/g) ?? []).length,
-  isolated:
-    process.env.HOME === process.env.CODEX_HOME &&
-    realpathSync(process.cwd()) === realpathSync(process.env.CODEX_HOME) &&
-    process.env.XDG_CACHE_HOME.startsWith(process.env.CODEX_HOME + "/") &&
-    process.env.XDG_CONFIG_HOME.startsWith(process.env.CODEX_HOME + "/") &&
-    process.env.XDG_DATA_HOME.startsWith(process.env.CODEX_HOME + "/") &&
-    process.env.XDG_STATE_HOME.startsWith(process.env.CODEX_HOME + "/") &&
-    process.env.TMPDIR.startsWith(process.env.CODEX_HOME + "/"),
-  stdinClosed: input.endsWith("\\n"),
-  environmentClean:
-    process.env.NO_COLOR === "1" &&
-    process.env.OPENAI_API_KEY === undefined &&
-    process.env.OPENSOCRATES_VALIDATOR_SECRET === undefined &&
-    Object.keys(process.env).every((key) => !key.startsWith("CODEX_") || key === "CODEX_HOME"),
-});
-if (MODE === "timeout") {
-  if (PID !== null) writeFileSync(PID, String(process.pid), { mode: 0o600 });
-  process.on("SIGTERM", () => {});
-  setInterval(() => {}, 1000);
-} else if (MODE === "reject" || (MODE === "reject-third" && priorChecks === 2)) {
-  process.stdout.write(contents);
-  process.stderr.write(contents);
-  process.exit(7);
-} else if (MODE === "malformed") {
-  process.stdout.write(contents);
-  process.stderr.write(contents);
-  process.exit(0);
-} else if (MODE === "line-oversize") {
-  process.stdout.write(JSON.stringify("x".repeat(300 * 1024)) + "\\n");
-  process.exit(0);
-} else if (MODE === "total-oversize") {
-  process.stderr.write("x".repeat(2 * 1024 * 1024));
-  setInterval(() => {}, 1000);
-} else {
+let request;
+let handled = false;
+let stdinClosed = false;
+let responseBeforeEof = false;
+let traceRecorded = false;
+let exitCode = 0;
+let input = "";
+const trace = () => {
+  if (traceRecorded) return;
+  traceRecorded = true;
+  record({
+    kind: "app-server",
+    targetTrustCount: (contents.match(/opensocrates@opensocrates:hooks\\/hooks\\.json:[a-z_]+:0:0/g) ?? []).length,
+    isolated:
+      process.env.HOME === process.env.CODEX_HOME &&
+      realpathSync(process.cwd()) === realpathSync(process.env.CODEX_HOME) &&
+      process.env.XDG_CACHE_HOME.startsWith(process.env.CODEX_HOME + "/") &&
+      process.env.XDG_CONFIG_HOME.startsWith(process.env.CODEX_HOME + "/") &&
+      process.env.XDG_DATA_HOME.startsWith(process.env.CODEX_HOME + "/") &&
+      process.env.XDG_STATE_HOME.startsWith(process.env.CODEX_HOME + "/") &&
+      process.env.TMPDIR.startsWith(process.env.CODEX_HOME + "/"),
+    stdinClosed,
+    responseBeforeEof,
+    environmentClean:
+      process.env.NO_COLOR === "1" &&
+      process.env.OPENAI_API_KEY === undefined &&
+      process.env.OPENSOCRATES_VALIDATOR_SECRET === undefined &&
+      Object.keys(process.env).every((key) => !key.startsWith("CODEX_") || key === "CODEX_HOME"),
+  });
+};
+const notification = (timestamped = false) =>
+  JSON.stringify({
+    ...(timestamped ? { emittedAtMs: 0 } : {}),
+    method: "account/updated",
+    params: {},
+  }) + "\\n";
+const sendResponse = () => {
+  responseBeforeEof = !stdinClosed;
   const response = JSON.stringify({
     id: MODE === "wrong-id" ? "wrong-id" : request.id,
-    result: {
-      codexHome: process.env.CODEX_HOME,
-      platformFamily: "unix",
-      platformOs: "macos",
-      ...(MODE === "bad-result" ? {} : { userAgent: "codex_cli_rs/0.145.0-test" }),
-    },
+    ...(MODE === "error-response"
+      ? { error: { code: -1, message: "private fake error" } }
+      : {
+          result: {
+            codexHome: process.env.CODEX_HOME,
+            platformFamily: "unix",
+            platformOs: "macos",
+            ...(MODE === "bad-result" ? {} : { userAgent: "codex_cli_rs/0.145.0-test" }),
+          },
+        }),
   }) + "\\n";
   process.stdout.write(response);
   if (MODE === "extra-response") process.stdout.write(response);
-  process.exit(0);
-}
+};
+const handleRequest = () => {
+  if (MODE === "timeout") {
+    if (PID !== null) writeFileSync(PID, String(process.pid), { mode: 0o600 });
+    setInterval(() => {}, 1000);
+    return;
+  }
+  if (MODE === "reject" || (MODE === "reject-third" && priorChecks === 2)) {
+    process.stdout.write(contents);
+    process.stderr.write(contents);
+    exitCode = 7;
+    return;
+  }
+  if (MODE === "malformed") {
+    process.stdout.write(contents);
+    process.stderr.write(contents);
+    return;
+  }
+  if (MODE === "line-oversize") {
+    process.stdout.write(JSON.stringify("x".repeat(300 * 1024)) + "\\n");
+    return;
+  }
+  if (MODE === "total-oversize") {
+    process.stderr.write("x".repeat(2 * 1024 * 1024));
+    setInterval(() => {}, 1000);
+    return;
+  }
+  if (MODE === "require-open-stdin") {
+    setTimeout(() => {
+      if (stdinClosed) {
+        trace();
+        process.exit(94);
+      }
+      sendResponse();
+    }, 25);
+    return;
+  }
+  if (MODE === "notification-around") process.stdout.write(notification(false));
+  if (MODE === "server-request") {
+    process.stdout.write(JSON.stringify({ id: 99, method: "server/request", params: {} }) + "\\n");
+  }
+  if (MODE === "unknown-notification") {
+    process.stdout.write(
+      JSON.stringify({ method: "account/updated", params: {}, unexpected: true }) + "\\n",
+    );
+  }
+  if (MODE === "invalid-notification-method") {
+    process.stdout.write(JSON.stringify({ method: "", params: {} }) + "\\n");
+  }
+  if (MODE === "invalid-notification-params") {
+    process.stdout.write(JSON.stringify({ method: "account/updated", params: [] }) + "\\n");
+  }
+  if (MODE === "invalid-notification-timestamp") {
+    process.stdout.write(
+      JSON.stringify({ emittedAtMs: "0", method: "account/updated", params: {} }) + "\\n",
+    );
+  }
+  if (MODE === "notification-overflow") {
+    for (let index = 0; index < 129; index += 1) process.stdout.write(notification(index % 2 === 0));
+  }
+  sendResponse();
+  if (MODE === "notification-around") process.stdout.write(notification(true));
+};
+process.on("SIGTERM", () => {});
+process.stdin.setEncoding("utf8");
+process.stdin.on("data", (chunk) => {
+  input += chunk;
+  if (handled) return;
+  const newline = input.indexOf("\\n");
+  if (newline < 0) return;
+  handled = true;
+  try { request = JSON.parse(input.slice(0, newline)); } catch { process.exit(93); }
+  handleRequest();
+});
+process.stdin.on("end", () => {
+  stdinClosed = true;
+  trace();
+  if (
+    MODE !== "timeout" &&
+    MODE !== "total-oversize" &&
+    (MODE !== "require-open-stdin" || responseBeforeEof)
+  ) {
+    process.exit(exitCode);
+  }
+});
 `,
   );
   chmodSync(binary, 0o755);
   return binary;
+}
+
+function makeInMemoryCodexAppServer({ failWrite = false } = {}) {
+  const trace = { argsExact: [], writeResults: [], responseBeforeEnd: [], killed: [] };
+  return {
+    trace,
+    spawnAppServer(_binary, args, options) {
+      const child = new EventEmitter();
+      const stdout = new PassThrough();
+      const stderr = new PassThrough();
+      let closed = false;
+      let responseSent = false;
+      const close = (code, signal) => {
+        if (closed) return;
+        closed = true;
+        stdout.end();
+        stderr.end();
+        queueMicrotask(() => child.emit("close", code, signal));
+      };
+      const stdin = new Writable({
+        highWaterMark: 1,
+        write(chunk, _encoding, callback) {
+          if (failWrite) {
+            queueMicrotask(() => callback(new Error("private in-memory write failure")));
+            return;
+          }
+          const request = JSON.parse(Buffer.from(chunk).toString("utf8").trim());
+          responseSent = true;
+          stdout.write(
+            `${JSON.stringify({
+              id: request.id,
+              result: {
+                codexHome: options.cwd,
+                platformFamily: "unix",
+                platformOs: "macos",
+                userAgent: "codex_cli_rs/0.145.0-in-memory",
+              },
+            })}\n`,
+          );
+          queueMicrotask(callback);
+        },
+        final(callback) {
+          trace.responseBeforeEnd.push(responseSent);
+          callback();
+          queueMicrotask(() => close(0, null));
+        },
+      });
+      const write = stdin.write.bind(stdin);
+      stdin.write = (...writeArgs) => {
+        const result = write(...writeArgs);
+        trace.writeResults.push(result);
+        return result;
+      };
+      child.stdin = stdin;
+      child.stdout = stdout;
+      child.stderr = stderr;
+      child.kill = (signal) => {
+        trace.killed.push(signal);
+        stdin.destroy();
+        close(null, signal);
+        return true;
+      };
+      trace.argsExact.push(args.length === 2 && args[0] === "app-server" && args[1] === "--stdio");
+      return child;
+    },
+  };
 }
 
 function makeSandbox(host, options = {}) {
@@ -1353,7 +1526,8 @@ test("codex purge resets exactly seven trust entries only when explicitly reques
     );
     assert.equal(
       validationTrace.every(
-        (entry) => entry.isolated && entry.stdinClosed && entry.environmentClean,
+        (entry) =>
+          entry.isolated && entry.stdinClosed && entry.responseBeforeEof && entry.environmentClean,
       ),
       true,
     );
@@ -1644,9 +1818,13 @@ test("trust reset leaves original bytes and metadata after write or post-consump
           [1, 0, 0],
         );
         assert.equal(
-          trace.every((entry) => entry.isolated && entry.stdinClosed && entry.environmentClean),
+          trace.every(
+            (entry) => entry.isolated && entry.stdinClosed && entry.environmentClean,
+          ),
           true,
         );
+        assert.equal(trace.slice(0, 2).every((entry) => entry.responseBeforeEof), true);
+        assert.equal(trace[2].responseBeforeEof, false);
       }
     } finally {
       box.cleanup();
@@ -1695,6 +1873,96 @@ test("trust reset keeps validator cleanup failures privacy-safe", async () => {
   }
 });
 
+test("isolated app-server validation accepts supported notifications and waits for the response before EOF", async () => {
+  for (const mode of ["accept", "notification-around", "require-open-stdin"]) {
+    const box = makeSandbox("codex");
+    try {
+      const config = join(box.home, "config.toml");
+      writeFileSync(config, trustSection("session_end"));
+      const tracePath = join(box.root, `${mode}-trace.jsonl`);
+      const codexBin = writeCodexAppServerValidator(box.root, `${mode}-validator`, {
+        mode,
+        tracePath,
+      });
+      const result = await resetCodexOpenSocratesHookTrust({
+        codexHome: box.home,
+        codexBin,
+        hooks: {
+          validationTimeoutMilliseconds: 1_000,
+          validationTerminationMilliseconds: 50,
+        },
+      });
+      assert.equal(result.status, "reset");
+      assert.doesNotMatch(readFileSync(config, "utf8"), /opensocrates@opensocrates/u);
+      const trace = readFileSync(tracePath, "utf8")
+        .trim()
+        .split("\n")
+        .map((line) => JSON.parse(line));
+      assert.equal(trace.length, 3);
+      assert.equal(
+        trace.every(
+          (entry) =>
+            entry.isolated &&
+            entry.stdinClosed &&
+            entry.responseBeforeEof &&
+            entry.environmentClean,
+        ),
+        true,
+      );
+    } finally {
+      box.cleanup();
+    }
+  }
+});
+
+test("isolated app-server request handles backpressure and write errors without leaking details", async () => {
+  const successBox = makeSandbox("codex");
+  try {
+    const config = join(successBox.home, "config.toml");
+    writeFileSync(config, trustSection("pre_compact"));
+    const appServer = makeInMemoryCodexAppServer();
+    const result = await resetCodexOpenSocratesHookTrust({
+      codexHome: successBox.home,
+      codexBin: "in-memory-codex",
+      hooks: { spawnAppServer: appServer.spawnAppServer },
+    });
+    assert.equal(result.status, "reset");
+    assert.deepEqual(appServer.trace.argsExact, [true, true, true]);
+    assert.deepEqual(appServer.trace.writeResults, [false, false, false]);
+    assert.deepEqual(appServer.trace.responseBeforeEnd, [true, true, true]);
+    assert.deepEqual(appServer.trace.killed, []);
+  } finally {
+    successBox.cleanup();
+  }
+
+  const failureBox = makeSandbox("codex");
+  try {
+    const config = join(failureBox.home, "config.toml");
+    const original = trustSection("pre_compact");
+    writeFileSync(config, original);
+    const appServer = makeInMemoryCodexAppServer({ failWrite: true });
+    await assert.rejects(
+      resetCodexOpenSocratesHookTrust({
+        codexHome: failureBox.home,
+        codexBin: "in-memory-codex",
+        hooks: {
+          spawnAppServer: appServer.spawnAppServer,
+          validationTerminationMilliseconds: 20,
+        },
+      }),
+      (error) =>
+        error instanceof Error &&
+        /installed Codex app server did not accept/u.test(error.message) &&
+        !error.message.includes("private in-memory write failure"),
+    );
+    assert.equal(readFileSync(config, "utf8"), original);
+    assert.deepEqual(appServer.trace.writeResults, [false]);
+    assert.equal(appServer.trace.killed.length > 0, true);
+  } finally {
+    failureBox.cleanup();
+  }
+});
+
 test("isolated app-server validation rejects malformed, oversized, extra, and mismatched responses privately", async () => {
   for (const mode of [
     "reject",
@@ -1704,6 +1972,13 @@ test("isolated app-server validation rejects malformed, oversized, extra, and mi
     "extra-response",
     "wrong-id",
     "bad-result",
+    "error-response",
+    "server-request",
+    "unknown-notification",
+    "invalid-notification-method",
+    "invalid-notification-params",
+    "invalid-notification-timestamp",
+    "notification-overflow",
   ]) {
     const box = makeSandbox("codex");
     try {

@@ -42,7 +42,24 @@ if (has("--version")) {
   process.exit(0);
 }
 if (${JSON.stringify(host)} === "codex" && argv[0] === "app-server" && argv[1] === "--stdio") {
-  const request = JSON.parse(readFileSync(0, "utf8").trim());
+  let input = "";
+  let resolveRequest;
+  let resolveEnd;
+  const requestLine = new Promise((resolve) => { resolveRequest = resolve; });
+  const inputEnded = new Promise((resolve) => { resolveEnd = resolve; });
+  process.on("SIGTERM", () => {});
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (chunk) => {
+    input += chunk;
+    const newline = input.indexOf("\\n");
+    if (newline >= 0 && resolveRequest !== null) {
+      const complete = resolveRequest;
+      resolveRequest = null;
+      complete(JSON.parse(input.slice(0, newline)));
+    }
+  });
+  process.stdin.on("end", () => resolveEnd());
+  const request = await requestLine;
   const config = join(process.env.CODEX_HOME, "config.toml");
   if (existsSync(config)) readFileSync(config);
   process.stdout.write(JSON.stringify({
@@ -54,6 +71,7 @@ if (${JSON.stringify(host)} === "codex" && argv[0] === "app-server" && argv[1] =
       userAgent: "codex_cli_rs/packed-smoke",
     },
   }) + "\\n");
+  await inputEnded;
   process.exit(0);
 }
 if (${JSON.stringify(host)} === "codex" && has("--strict-config", "features", "list")) process.exit(91);
