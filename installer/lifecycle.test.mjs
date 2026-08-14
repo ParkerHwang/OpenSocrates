@@ -9,6 +9,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createHash, randomUUID } from "node:crypto";
 import { spawnSync } from "node:child_process";
+import { EventEmitter } from "node:events";
 import {
   chmodSync,
   cpSync,
@@ -21,16 +22,29 @@ import {
   symlinkSync,
   writeFileSync,
   existsSync,
+  linkSync,
   readdirSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import { PassThrough, Writable } from "node:stream";
 
-import { PRODUCT_VERSION, main, transientPathsFor, withOperationLock } from "./opensocrates.mjs";
+import {
+  CODEX_TRUST_EVENTS,
+  PRODUCT_VERSION,
+  main,
+  resetCodexOpenSocratesHookTrust,
+  transientPathsFor,
+  withOperationLock,
+} from "./opensocrates.mjs";
 import { inspectManagedLayout } from "../tools/clean_machine_acceptance.mjs";
 
 const MARKETPLACE = "opensocrates";
 const PLUGIN_ID = `opensocrates@${MARKETPLACE}`;
+const trustKey = (event) => `${PLUGIN_ID}:hooks/hooks.json:${event}:0:0`;
+const trustSection = (event, newline = "\n") =>
+  `[hooks.state.${JSON.stringify(trustKey(event))}]${newline}` +
+  `trusted_hash = "sha256:fixture-${event}"${newline}`;
 
 // ---------------------------------------------------------------------------
 // Platform spoofing: install/update are gated to darwin-arm64. The gate is
@@ -155,6 +169,7 @@ function writeFakeHost(
     kind = name,
     failInstall = false,
     failInstallOnce = false,
+    failRemoveOnce = false,
     failAuth = false,
     corruptMarkerOnInstall = false,
     corruptBackupOnInstall = false,
@@ -167,19 +182,22 @@ function writeFakeHost(
     duplicateClaudePlugin = false,
     conflictingClaudeMarketplaceRoots = false,
     invalidClaudePluginEnabled = false,
+    traceCodexValidation = false,
   } = {},
 ) {
   const host = kind;
   const statePath = join(root, `${name}-state.json`);
+  const validationTracePath = traceCodexValidation ? join(root, `${name}-validation-trace.jsonl`) : null;
   writeFileSync(statePath, JSON.stringify({ marketplaces: [], plugins: [] }));
   const binary = join(root, name);
   const script = `#!/usr/bin/env node
-import { chmodSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { appendFileSync, chmodSync, readFileSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 const STATE = ${JSON.stringify(statePath)};
 const HOST = ${JSON.stringify(host)};
 const FAIL_INSTALL = ${JSON.stringify(failInstall)};
 const FAIL_INSTALL_ONCE = ${JSON.stringify(failInstallOnce)};
+const FAIL_REMOVE_ONCE = ${JSON.stringify(failRemoveOnce)};
 const FAIL_AUTH = ${JSON.stringify(failAuth)};
 const CORRUPT_MARKER = ${JSON.stringify(corruptMarkerOnInstall)};
 const CORRUPT_BACKUP = ${JSON.stringify(corruptBackupOnInstall)};
@@ -192,6 +210,7 @@ const DUPLICATE_CLAUDE_MARKETPLACE = ${JSON.stringify(duplicateClaudeMarketplace
 const DUPLICATE_CLAUDE_PLUGIN = ${JSON.stringify(duplicateClaudePlugin)};
 const CONFLICTING_CLAUDE_ROOTS = ${JSON.stringify(conflictingClaudeMarketplaceRoots)};
 const INVALID_CLAUDE_ENABLED = ${JSON.stringify(invalidClaudePluginEnabled)};
+const CODEX_VALIDATION_TRACE = ${JSON.stringify(validationTracePath)};
 const VERSION = ${JSON.stringify(PRODUCT_VERSION)};
 const MARKETPLACE = ${JSON.stringify(MARKETPLACE)};
 const PLUGIN_ID = ${JSON.stringify(PLUGIN_ID)};
@@ -214,6 +233,78 @@ if (HOST === "claude" && has("auth", "status")) {
 if (HOST === "codex" && has("login", "status")) {
   if (FAIL_AUTH) process.exit(1);
   process.stdout.write("Logged in using ChatGPT\\n"); process.exit(0);
+}
+if (HOST === "codex" && argv[0] === "app-server" && argv[1] === "--stdio") {
+  let contents = "";
+  try { contents = readFileSync(join(process.env.CODEX_HOME, "config.toml"), "utf8"); } catch {}
+  let input = "";
+  let handled = false;
+  let responseBeforeEof = false;
+  let exitCode = 0;
+  process.on("SIGTERM", () => {});
+  process.stdin.setEncoding("utf8");
+  const completed = new Promise((resolve) => {
+    process.stdin.on("data", (chunk) => {
+      input += chunk;
+      if (handled) return;
+      const newline = input.indexOf("\\n");
+      if (newline < 0) return;
+      handled = true;
+      let request;
+      try { request = JSON.parse(input.slice(0, newline)); } catch { exitCode = 2; return; }
+      if (contents.includes("OPENSOCRATES_TEST_INVALID_TOML")) {
+        process.stdout.write(contents);
+        process.stderr.write(contents);
+        exitCode = 2;
+        return;
+      }
+      if (request?.method !== "initialize" || request?.params?.clientInfo?.name !== "opensocrates_installer") {
+        exitCode = 2;
+        return;
+      }
+      responseBeforeEof = !process.stdin.readableEnded;
+      process.stdout.write(JSON.stringify({
+        id: request.id,
+        result: {
+          codexHome: process.env.CODEX_HOME,
+          platformFamily: "unix",
+          platformOs: "macos",
+          userAgent: "codex_cli_rs/fake",
+        },
+      }) + "\\n");
+    });
+    process.stdin.on("end", () => resolve());
+  });
+  await completed;
+  if (CODEX_VALIDATION_TRACE !== null) {
+    appendFileSync(CODEX_VALIDATION_TRACE, JSON.stringify({
+      kind: "app-server",
+      targetTrustCount:
+        (contents.match(/opensocrates@opensocrates:hooks\\/hooks\\.json:[a-z_]+:0:0/g) ?? []).length,
+      isolated:
+        process.env.HOME === process.env.CODEX_HOME &&
+        realpathSync(process.cwd()) === realpathSync(process.env.CODEX_HOME) &&
+        process.env.XDG_CACHE_HOME.startsWith(process.env.CODEX_HOME + "/") &&
+        process.env.XDG_CONFIG_HOME.startsWith(process.env.CODEX_HOME + "/") &&
+        process.env.XDG_DATA_HOME.startsWith(process.env.CODEX_HOME + "/") &&
+        process.env.XDG_STATE_HOME.startsWith(process.env.CODEX_HOME + "/") &&
+        process.env.TMPDIR.startsWith(process.env.CODEX_HOME + "/"),
+      stdinClosed: true,
+      responseBeforeEof,
+      environmentClean:
+        process.env.NO_COLOR === "1" &&
+        process.env.OPENAI_API_KEY === undefined &&
+        process.env.OPENSOCRATES_VALIDATOR_SECRET === undefined &&
+        Object.keys(process.env).every((key) => !key.startsWith("CODEX_") || key === "CODEX_HOME"),
+    }) + "\\n", { mode: 0o600 });
+  }
+  process.exit(exitCode);
+}
+if (HOST === "codex" && has("--strict-config", "features", "list")) {
+  if (CODEX_VALIDATION_TRACE !== null) {
+    appendFileSync(CODEX_VALIDATION_TRACE, JSON.stringify({ kind: "old-strict-command" }) + "\\n");
+  }
+  process.exit(91);
 }
 if (HOST === "grok" && has("inspect", "--json")) {
   const root = join(process.env.GROK_HOME, "plugins", MARKETPLACE);
@@ -339,6 +430,11 @@ if (has("plugin", "add")) {
   out({ pluginId: PLUGIN_ID, version: VERSION }); process.exit(0);
 }
 if (has("plugin", "remove")) {
+  const removalAttempt = state.removalAttempts ?? 0;
+  state.removalAttempts = removalAttempt + 1;
+  if (FAIL_REMOVE_ONCE && removalAttempt === 0) {
+    save(); process.stderr.write("refused once\\n"); process.exit(1);
+  }
   state.plugins = state.plugins.filter((entry) => entry.pluginId !== PLUGIN_ID);
   save(); out({ ok: true }); process.exit(0);
 }
@@ -346,14 +442,255 @@ process.exit(1);
 `;
   writeFileSync(binary, script);
   chmodSync(binary, 0o755);
-  return { binary, statePath };
+  return { binary, statePath, validationTracePath };
+}
+
+function writeCodexAppServerValidator(
+  root,
+  name,
+  { mode = "accept", tracePath = null, pidPath = null } = {},
+) {
+  const binary = join(root, name);
+  writeFileSync(
+    binary,
+    `#!/usr/bin/env node
+import { appendFileSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+const MODE = ${JSON.stringify(mode)};
+const TRACE = ${JSON.stringify(tracePath)};
+const PID = ${JSON.stringify(pidPath)};
+const argv = process.argv.slice(2);
+const record = (value) => {
+  if (TRACE !== null) appendFileSync(TRACE, JSON.stringify(value) + "\\n", { mode: 0o600 });
+};
+if (argv.includes("--strict-config") || argv.includes("features")) {
+  record({ kind: "old-strict-command" });
+  process.exit(91);
+}
+if (argv[0] !== "app-server" || argv[1] !== "--stdio") process.exit(92);
+let contents = "";
+try { contents = readFileSync(join(process.env.CODEX_HOME, "config.toml"), "utf8"); } catch {}
+let priorChecks = 0;
+if (TRACE !== null) {
+  try {
+    priorChecks = readFileSync(TRACE, "utf8").trim().split("\\n").filter(Boolean).length;
+  } catch {}
+}
+let request;
+let handled = false;
+let stdinClosed = false;
+let responseBeforeEof = false;
+let traceRecorded = false;
+let exitCode = 0;
+let input = "";
+const trace = () => {
+  if (traceRecorded) return;
+  traceRecorded = true;
+  record({
+    kind: "app-server",
+    targetTrustCount: (contents.match(/opensocrates@opensocrates:hooks\\/hooks\\.json:[a-z_]+:0:0/g) ?? []).length,
+    isolated:
+      process.env.HOME === process.env.CODEX_HOME &&
+      realpathSync(process.cwd()) === realpathSync(process.env.CODEX_HOME) &&
+      process.env.XDG_CACHE_HOME.startsWith(process.env.CODEX_HOME + "/") &&
+      process.env.XDG_CONFIG_HOME.startsWith(process.env.CODEX_HOME + "/") &&
+      process.env.XDG_DATA_HOME.startsWith(process.env.CODEX_HOME + "/") &&
+      process.env.XDG_STATE_HOME.startsWith(process.env.CODEX_HOME + "/") &&
+      process.env.TMPDIR.startsWith(process.env.CODEX_HOME + "/"),
+    stdinClosed,
+    responseBeforeEof,
+    environmentClean:
+      process.env.NO_COLOR === "1" &&
+      process.env.OPENAI_API_KEY === undefined &&
+      process.env.OPENSOCRATES_VALIDATOR_SECRET === undefined &&
+      Object.keys(process.env).every((key) => !key.startsWith("CODEX_") || key === "CODEX_HOME"),
+  });
+};
+const notification = (timestamped = false) =>
+  JSON.stringify({
+    ...(timestamped ? { emittedAtMs: 0 } : {}),
+    method: "account/updated",
+    params: {},
+  }) + "\\n";
+const sendResponse = () => {
+  responseBeforeEof = !stdinClosed;
+  const response = JSON.stringify({
+    id: MODE === "wrong-id" ? "wrong-id" : request.id,
+    ...(MODE === "error-response"
+      ? { error: { code: -1, message: "private fake error" } }
+      : {
+          result: {
+            codexHome: process.env.CODEX_HOME,
+            platformFamily: "unix",
+            platformOs: "macos",
+            ...(MODE === "bad-result" ? {} : { userAgent: "codex_cli_rs/0.145.0-test" }),
+          },
+        }),
+  }) + "\\n";
+  process.stdout.write(response);
+  if (MODE === "extra-response") process.stdout.write(response);
+};
+const handleRequest = () => {
+  if (MODE === "timeout") {
+    if (PID !== null) writeFileSync(PID, String(process.pid), { mode: 0o600 });
+    setInterval(() => {}, 1000);
+    return;
+  }
+  if (MODE === "reject" || (MODE === "reject-third" && priorChecks === 2)) {
+    process.stdout.write(contents);
+    process.stderr.write(contents);
+    exitCode = 7;
+    return;
+  }
+  if (MODE === "malformed") {
+    process.stdout.write(contents);
+    process.stderr.write(contents);
+    return;
+  }
+  if (MODE === "line-oversize") {
+    process.stdout.write(JSON.stringify("x".repeat(300 * 1024)) + "\\n");
+    return;
+  }
+  if (MODE === "total-oversize") {
+    process.stderr.write("x".repeat(2 * 1024 * 1024));
+    setInterval(() => {}, 1000);
+    return;
+  }
+  if (MODE === "require-open-stdin") {
+    setTimeout(() => {
+      if (stdinClosed) {
+        trace();
+        process.exit(94);
+      }
+      sendResponse();
+    }, 25);
+    return;
+  }
+  if (MODE === "notification-around") process.stdout.write(notification(false));
+  if (MODE === "server-request") {
+    process.stdout.write(JSON.stringify({ id: 99, method: "server/request", params: {} }) + "\\n");
+  }
+  if (MODE === "unknown-notification") {
+    process.stdout.write(
+      JSON.stringify({ method: "account/updated", params: {}, unexpected: true }) + "\\n",
+    );
+  }
+  if (MODE === "invalid-notification-method") {
+    process.stdout.write(JSON.stringify({ method: "", params: {} }) + "\\n");
+  }
+  if (MODE === "invalid-notification-params") {
+    process.stdout.write(JSON.stringify({ method: "account/updated", params: [] }) + "\\n");
+  }
+  if (MODE === "invalid-notification-timestamp") {
+    process.stdout.write(
+      JSON.stringify({ emittedAtMs: "0", method: "account/updated", params: {} }) + "\\n",
+    );
+  }
+  if (MODE === "notification-overflow") {
+    for (let index = 0; index < 129; index += 1) process.stdout.write(notification(index % 2 === 0));
+  }
+  sendResponse();
+  if (MODE === "notification-around") process.stdout.write(notification(true));
+};
+process.on("SIGTERM", () => {});
+process.stdin.setEncoding("utf8");
+process.stdin.on("data", (chunk) => {
+  input += chunk;
+  if (handled) return;
+  const newline = input.indexOf("\\n");
+  if (newline < 0) return;
+  handled = true;
+  try { request = JSON.parse(input.slice(0, newline)); } catch { process.exit(93); }
+  handleRequest();
+});
+process.stdin.on("end", () => {
+  stdinClosed = true;
+  trace();
+  if (
+    MODE !== "timeout" &&
+    MODE !== "total-oversize" &&
+    (MODE !== "require-open-stdin" || responseBeforeEof)
+  ) {
+    process.exit(exitCode);
+  }
+});
+`,
+  );
+  chmodSync(binary, 0o755);
+  return binary;
+}
+
+function makeInMemoryCodexAppServer({ failWrite = false } = {}) {
+  const trace = { argsExact: [], writeResults: [], responseBeforeEnd: [], killed: [] };
+  return {
+    trace,
+    spawnAppServer(_binary, args, options) {
+      const child = new EventEmitter();
+      const stdout = new PassThrough();
+      const stderr = new PassThrough();
+      let closed = false;
+      let responseSent = false;
+      const close = (code, signal) => {
+        if (closed) return;
+        closed = true;
+        stdout.end();
+        stderr.end();
+        queueMicrotask(() => child.emit("close", code, signal));
+      };
+      const stdin = new Writable({
+        highWaterMark: 1,
+        write(chunk, _encoding, callback) {
+          if (failWrite) {
+            queueMicrotask(() => callback(new Error("private in-memory write failure")));
+            return;
+          }
+          const request = JSON.parse(Buffer.from(chunk).toString("utf8").trim());
+          responseSent = true;
+          stdout.write(
+            `${JSON.stringify({
+              id: request.id,
+              result: {
+                codexHome: options.cwd,
+                platformFamily: "unix",
+                platformOs: "macos",
+                userAgent: "codex_cli_rs/0.145.0-in-memory",
+              },
+            })}\n`,
+          );
+          queueMicrotask(callback);
+        },
+        final(callback) {
+          trace.responseBeforeEnd.push(responseSent);
+          callback();
+          queueMicrotask(() => close(0, null));
+        },
+      });
+      const write = stdin.write.bind(stdin);
+      stdin.write = (...writeArgs) => {
+        const result = write(...writeArgs);
+        trace.writeResults.push(result);
+        return result;
+      };
+      child.stdin = stdin;
+      child.stdout = stdout;
+      child.stderr = stderr;
+      child.kill = (signal) => {
+        trace.killed.push(signal);
+        stdin.destroy();
+        close(null, signal);
+        return true;
+      };
+      trace.argsExact.push(args.length === 2 && args[0] === "app-server" && args[1] === "--stdio");
+      return child;
+    },
+  };
 }
 
 function makeSandbox(host, options = {}) {
   const root = mkdtempSync(join(tmpdir(), "opensocrates-lifecycle-"));
   const home = join(root, `${host}-home`);
   mkdirSync(home, { recursive: true });
-  const { binary, statePath } = writeFakeHost(root, host, options);
+  const { binary, statePath, validationTracePath } = writeFakeHost(root, host, options);
   const saved = { ...process.env };
   if (host === "antigravity") {
     process.env.AGY_BIN = binary;
@@ -393,6 +730,7 @@ function makeSandbox(host, options = {}) {
     home,
     managedRoot,
     statePath,
+    validationTracePath,
     state: () => JSON.parse(readFileSync(statePath, "utf8")),
     backups: () =>
       existsSync(managedParent) ? readdirSync(managedParent).filter((n) => n.startsWith(".opensocrates.backup-")) : [],
@@ -1103,6 +1441,687 @@ test("purge all removes exact owned payloads, data, state, updater, OpenCode fil
       readFileSync(codexTrust, "utf8"),
       '[hooks.state."opensocrates@opensocrates:hooks/hooks.json:session_start:0:0"]\ntrusted = true\n',
     );
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("codex purge resets exactly seven trust entries only when explicitly requested", async () => {
+  const box = makeSandbox("codex", { traceCodexValidation: true });
+  const savedOpenAiKey = process.env.OPENAI_API_KEY;
+  const savedCodexOverride = process.env.CODEX_PRIVATE_OVERRIDE;
+  const savedValidatorSecret = process.env.OPENSOCRATES_VALIDATOR_SECRET;
+  try {
+    const pkg = buildPackage(box.root, "codex");
+    const args = ["--host", "codex", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const installed = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(installed.error, undefined, `setup install failed: ${installed.error?.message}`);
+
+    const config = join(box.home, "config.toml");
+    const history = join(box.home, "sessions", "opensocrates-history.jsonl");
+    mkdirSync(dirname(history), { recursive: true });
+    writeFileSync(history, "preserve Codex user history mentioning OpenSocrates\n");
+    const unrelated =
+      'model = "preserve"\n' +
+      '[hooks.state."other@market:hooks/hooks.json:session_start:0:0"]\n' +
+      'trusted_hash = "sha256:other"\n';
+    const targets = CODEX_TRUST_EVENTS.map(
+      (event) => `# before ${event}\n${trustSection(event)}# after ${event}\n`,
+    ).join("");
+    const tail = '[profiles.keep]\nmodel = "keep"\n';
+    const original = unrelated + targets + tail;
+    const expected =
+      unrelated +
+      CODEX_TRUST_EVENTS.map((event) => `# before ${event}\n\n\n# after ${event}\n`).join("") +
+      tail;
+    writeFileSync(config, original);
+    chmodSync(config, 0o640);
+    const metadataBefore = statSync(config);
+    process.env.OPENAI_API_KEY = "private-openai-sentinel";
+    process.env.CODEX_PRIVATE_OVERRIDE = "private-codex-override-sentinel";
+    process.env.OPENSOCRATES_VALIDATOR_SECRET = "private-validator-sentinel";
+
+    let postCommitCleanupChecked = false;
+    let resetRanBeforePurgeMutation = false;
+    const purged = await quiet(() =>
+      main(["remove", "--host", "codex", "--purge", "--reset-trust"], {
+        trustResetHooks: {
+          beforeWrite: () => {
+            resetRanBeforePurgeMutation = existsSync(box.managedRoot) && box.state().plugins.length === 1;
+          },
+          beforeResidueCleanup: () => {
+            postCommitCleanupChecked = true;
+            throw new Error("post-commit residue inspection must not run");
+          },
+        },
+      }),
+    );
+    assert.equal(purged.error, undefined, `trust-reset purge failed: ${purged.error?.message}`);
+    assert.equal(resetRanBeforePurgeMutation, true);
+    assert.equal(postCommitCleanupChecked, false);
+    assert.match(purged.output, /host security trust reset completed for 7 exact/u);
+    assert.match(purged.output, /OpenSocrates purge completed/u);
+    assert.doesNotMatch(purged.output, /sha256:|model =|profiles\.keep|config\.toml/u);
+    assert.equal(readFileSync(config, "utf8"), expected);
+    assert.equal(readFileSync(history, "utf8"), "preserve Codex user history mentioning OpenSocrates\n");
+    const metadataAfter = statSync(config);
+    assert.equal(metadataAfter.mode & 0o7777, metadataBefore.mode & 0o7777);
+    assert.equal(metadataAfter.uid, metadataBefore.uid);
+    assert.equal(metadataAfter.gid, metadataBefore.gid);
+    assert.deepEqual(
+      readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+      [],
+    );
+    const validationTrace = readFileSync(box.validationTracePath, "utf8")
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line));
+    assert.deepEqual(
+      validationTrace.map((entry) => entry.kind),
+      ["app-server", "app-server", "app-server"],
+    );
+    assert.deepEqual(
+      validationTrace.map((entry) => entry.targetTrustCount),
+      [7, 0, 0],
+    );
+    assert.equal(
+      validationTrace.every(
+        (entry) =>
+          entry.isolated && entry.stdinClosed && entry.responseBeforeEof && entry.environmentClean,
+      ),
+      true,
+    );
+
+    const idempotent = await quiet(() =>
+      main(["remove", "--host", "codex", "--purge", "--reset-trust"]),
+    );
+    assert.equal(idempotent.error, undefined, `idempotent trust reset failed: ${idempotent.error?.message}`);
+    assert.match(idempotent.output, /no exact OpenSocrates host security trust entries were present/u);
+    assert.equal(readFileSync(config, "utf8"), expected);
+  } finally {
+    if (savedOpenAiKey === undefined) delete process.env.OPENAI_API_KEY;
+    else process.env.OPENAI_API_KEY = savedOpenAiKey;
+    if (savedCodexOverride === undefined) delete process.env.CODEX_PRIVATE_OVERRIDE;
+    else process.env.CODEX_PRIVATE_OVERRIDE = savedCodexOverride;
+    if (savedValidatorSecret === undefined) delete process.env.OPENSOCRATES_VALIDATOR_SECRET;
+    else process.env.OPENSOCRATES_VALIDATOR_SECRET = savedValidatorSecret;
+    box.cleanup();
+  }
+});
+
+test("codex purge restores the original when final rollback unlink fails", async () => {
+  const box = makeSandbox("codex");
+  try {
+    const config = join(box.home, "config.toml");
+    const original = `# preserve original\n${trustSection("session_end")}model = "keep"\n`;
+    writeFileSync(config, original);
+
+    const purged = await quiet(() =>
+      main(["remove", "--host", "codex", "--purge", "--reset-trust"], {
+        trustResetHooks: {
+          removeRollback: async () => {
+            throw new Error("injected rollback unlink failure with private detail");
+          },
+        },
+      }),
+    );
+
+    assert.notEqual(purged.error, undefined, "rollback unlink failure reported purge success");
+    assert.match(purged.output, /host security trust reset failed/u);
+    assert.match(purged.output, /purge is incomplete/u);
+    assert.doesNotMatch(purged.output, /host security trust reset completed/u);
+    assert.doesNotMatch(purged.output, /OpenSocrates purge completed/u);
+    assert.doesNotMatch(purged.output, /private detail|sha256:|config\.toml/u);
+    assert.equal(readFileSync(config, "utf8"), original);
+    assert.deepEqual(
+      readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+      [],
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("a trust-reset failure preserves Codex registration, payload, cache, data, and activation state", async () => {
+  const box = makeSandbox("codex");
+  const savedNpx = process.env.OPENSOCRATES_NPX_BIN;
+  try {
+    const pkg = buildPackage(box.root, "codex");
+    const args = ["--host", "codex", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const installed = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(installed.error, undefined);
+    configureFakeNpx(box);
+    const enabled = await withDarwinArm64(() =>
+      quiet(() => main(["auto-update", "enable", "--host", "codex"])),
+    );
+    assert.equal(enabled.error, undefined);
+
+    const desiredPath = join(box.root, "state", "desired-state.json");
+    const launchAgent = join(box.root, "LaunchAgents", "com.opensocrates.auto-update.plist");
+    const desiredBytesBefore = readFileSync(desiredPath);
+    const desiredBefore = JSON.parse(desiredBytesBefore.toString("utf8"));
+    const desiredMetadataBefore = statSync(desiredPath, { bigint: true });
+    const launchAgentBefore = readFileSync(launchAgent);
+    const launchAgentMetadataBefore = statSync(launchAgent, { bigint: true });
+    const config = join(box.home, "config.toml");
+    const trusted = trustSection("user_prompt_submit");
+    const rejected = `OPENSOCRATES_TEST_INVALID_TOML = true\n${trusted}`;
+    writeFileSync(config, rejected);
+    const cache = seedPluginCache(box.home, "codex", pkg);
+    const history = join(box.home, "sessions", "private-history.jsonl");
+    mkdirSync(dirname(history), { recursive: true });
+    writeFileSync(history, "preserve private history\n");
+    const transactionResidue = join(
+      dirname(box.managedRoot),
+      `.opensocrates.staging-${randomUUID()}`,
+    );
+    mkdirSync(transactionResidue);
+
+    const purged = await quiet(() =>
+      main(["remove", "--host", "codex", "--purge", "--reset-trust"]),
+    );
+    assert.notEqual(purged.error, undefined);
+    assert.match(purged.output, /registration preserved/u);
+    assert.match(purged.output, /host security trust reset failed/u);
+    assert.match(purged.output, /purge is incomplete/u);
+    assert.doesNotMatch(purged.output, /OpenSocrates purge completed/u);
+    assert.doesNotMatch(purged.output, /sha256:|OPENSOCRATES_TEST_INVALID_TOML|config\.toml/u);
+    assert.equal(box.state().plugins.length, 1);
+    assert.equal(box.state().marketplaces.length, 1);
+    assert.equal(existsSync(box.managedRoot), true);
+    assert.equal(existsSync(cache.cacheRoot), true);
+    assert.equal(existsSync(transactionResidue), true);
+    assert.equal(readFileSync(history, "utf8"), "preserve private history\n");
+    assert.equal(readFileSync(config, "utf8"), rejected);
+    const desiredAfter = JSON.parse(readFileSync(desiredPath, "utf8"));
+    assert.deepEqual(desiredAfter.installedHosts, desiredBefore.installedHosts);
+    assert.deepEqual(desiredAfter.autoUpdate, desiredBefore.autoUpdate);
+    assert.deepEqual(readFileSync(desiredPath), desiredBytesBefore);
+    const desiredMetadataAfter = statSync(desiredPath, { bigint: true });
+    assert.equal(desiredMetadataAfter.mode, desiredMetadataBefore.mode);
+    assert.equal(desiredMetadataAfter.mtimeNs, desiredMetadataBefore.mtimeNs);
+    assert.deepEqual(readFileSync(launchAgent), launchAgentBefore);
+    const launchAgentMetadataAfter = statSync(launchAgent, { bigint: true });
+    assert.equal(launchAgentMetadataAfter.mode, launchAgentMetadataBefore.mode);
+    assert.equal(launchAgentMetadataAfter.mtimeNs, launchAgentMetadataBefore.mtimeNs);
+
+    writeFileSync(config, trusted);
+    const retried = await quiet(() =>
+      main(["remove", "--host", "codex", "--purge", "--reset-trust"]),
+    );
+    assert.equal(retried.error, undefined, `retry failed: ${retried.error?.message}`);
+    assert.match(retried.output, /host security trust reset completed for 1 exact/u);
+    assert.match(retried.output, /OpenSocrates purge completed/u);
+    assert.equal(box.state().plugins.length, 0);
+    assert.equal(box.state().marketplaces.length, 0);
+    assert.equal(existsSync(box.managedRoot), false);
+    assert.equal(existsSync(cache.cacheRoot), false);
+    assert.equal(existsSync(transactionResidue), false);
+    assert.equal(readFileSync(history, "utf8"), "preserve private history\n");
+    assert.doesNotMatch(readFileSync(config, "utf8"), /opensocrates@opensocrates/u);
+  } finally {
+    if (savedNpx === undefined) delete process.env.OPENSOCRATES_NPX_BIN;
+    else process.env.OPENSOCRATES_NPX_BIN = savedNpx;
+    box.cleanup();
+  }
+});
+
+test("a later Codex unregister failure keeps the completed trust reset and reruns idempotently", async () => {
+  const box = makeSandbox("codex", { failRemoveOnce: true });
+  try {
+    const pkg = buildPackage(box.root, "codex");
+    const args = ["--host", "codex", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const installed = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(installed.error, undefined);
+    const config = join(box.home, "config.toml");
+    writeFileSync(config, trustSection("session_end"));
+
+    const first = await quiet(() =>
+      main(["remove", "--host", "codex", "--purge", "--reset-trust"]),
+    );
+    assert.notEqual(first.error, undefined);
+    assert.match(first.output, /host security trust reset completed for 1 exact/u);
+    assert.match(first.output, /registration failed/u);
+    assert.match(first.output, /purge is incomplete/u);
+    assert.doesNotMatch(first.output, /OpenSocrates purge completed/u);
+    assert.doesNotMatch(readFileSync(config, "utf8"), /opensocrates@opensocrates/u);
+    assert.equal(box.state().plugins.length, 1);
+    assert.equal(box.state().marketplaces.length, 1);
+
+    const retried = await quiet(() =>
+      main(["remove", "--host", "codex", "--purge", "--reset-trust"]),
+    );
+    assert.equal(retried.error, undefined, `retry failed: ${retried.error?.message}`);
+    assert.match(retried.output, /no exact OpenSocrates host security trust entries were present/u);
+    assert.match(retried.output, /OpenSocrates purge completed/u);
+    assert.equal(box.state().plugins.length, 0);
+    assert.equal(box.state().marketplaces.length, 0);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("a trust-reset failure does not create absent desired state or LaunchAgent files", async () => {
+  const box = makeSandbox("codex");
+  try {
+    const desiredPath = join(box.root, "state", "desired-state.json");
+    const launchAgent = join(box.root, "LaunchAgents", "com.opensocrates.auto-update.plist");
+    const config = join(box.home, "config.toml");
+    writeFileSync(
+      config,
+      `OPENSOCRATES_TEST_INVALID_TOML = true\n${trustSection("session_start")}`,
+    );
+    assert.equal(existsSync(desiredPath), false);
+    assert.equal(existsSync(launchAgent), false);
+
+    const purged = await quiet(() =>
+      main(["remove", "--host", "codex", "--purge", "--reset-trust"]),
+    );
+    assert.notEqual(purged.error, undefined);
+    assert.match(purged.output, /registration preserved/u);
+    assert.doesNotMatch(purged.output, /OpenSocrates purge completed/u);
+    assert.equal(existsSync(desiredPath), false);
+    assert.equal(existsSync(launchAgent), false);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("trust reset refuses malformed, symlinked, hard-linked, and unsupported-validator configs", async () => {
+  const cases = ["malformed", "symlink", "hardlink", "missing-cli"];
+  for (const kind of cases) {
+    const box = makeSandbox("codex");
+    try {
+      const config = join(box.home, "config.toml");
+      const original = kind === "malformed" ? "OPENSOCRATES_TEST_INVALID_TOML = [\n" : trustSection("stop");
+      let preservedTarget = config;
+      if (kind === "symlink") {
+        preservedTarget = join(box.root, "symlink-target.toml");
+        writeFileSync(preservedTarget, original);
+        symlinkSync(preservedTarget, config);
+      } else {
+        writeFileSync(config, original);
+        if (kind === "hardlink") linkSync(config, join(box.root, "config-hardlink.toml"));
+      }
+      const codexBin = kind === "missing-cli" ? join(box.root, "missing-codex-validator") : process.env.CODEX_BIN;
+      await assert.rejects(
+        resetCodexOpenSocratesHookTrust({ codexHome: box.home, codexBin }),
+        (error) =>
+          error instanceof Error &&
+          /hook trust was not reset/u.test(error.message) &&
+          !error.message.includes(original.trim()) &&
+          !error.message.includes(box.root),
+      );
+      assert.equal(readFileSync(preservedTarget, "utf8"), original);
+      assert.deepEqual(
+        readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+        [],
+      );
+    } finally {
+      box.cleanup();
+    }
+  }
+});
+
+test("trust reset leaves original bytes and metadata after write or post-consumption failure", async () => {
+  for (const kind of ["write", "post-consumption"]) {
+    const box = makeSandbox("codex");
+    try {
+      const config = join(box.home, "config.toml");
+      const original =
+        `# preserve\n${trustSection("session_start")}` +
+        '[profiles.keep]\nmodel = "keep"\n';
+      writeFileSync(config, original);
+      chmodSync(config, 0o640);
+      const metadataBefore = statSync(config);
+      let codexBin = process.env.CODEX_BIN;
+      const hooks = {};
+      let tracePath = null;
+      if (kind === "write") {
+        hooks.beforeWrite = () => {
+          const error = new Error("injected write failure with private detail");
+          error.code = "EACCES";
+          throw error;
+        };
+      } else {
+        tracePath = join(box.root, "post-validator-trace.jsonl");
+        codexBin = writeCodexAppServerValidator(box.root, "post-validator", {
+          mode: "reject-third",
+          tracePath,
+        });
+      }
+
+      await assert.rejects(
+        resetCodexOpenSocratesHookTrust({ codexHome: box.home, codexBin, hooks }),
+        (error) =>
+          error instanceof Error &&
+          /hook trust was not reset/u.test(error.message) &&
+          !error.message.includes("private detail") &&
+          !error.message.includes("sha256:"),
+      );
+      assert.equal(readFileSync(config, "utf8"), original);
+      const metadataAfter = statSync(config);
+      assert.equal(metadataAfter.mode & 0o7777, metadataBefore.mode & 0o7777);
+      assert.equal(metadataAfter.uid, metadataBefore.uid);
+      assert.equal(metadataAfter.gid, metadataBefore.gid);
+      assert.deepEqual(
+        readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+        [],
+      );
+      if (tracePath !== null) {
+        const trace = readFileSync(tracePath, "utf8")
+          .trim()
+          .split("\n")
+          .map((line) => JSON.parse(line));
+        assert.deepEqual(
+          trace.map((entry) => entry.targetTrustCount),
+          [1, 0, 0],
+        );
+        assert.equal(
+          trace.every(
+            (entry) => entry.isolated && entry.stdinClosed && entry.environmentClean,
+          ),
+          true,
+        );
+        assert.equal(trace.slice(0, 2).every((entry) => entry.responseBeforeEof), true);
+        assert.equal(trace[2].responseBeforeEof, false);
+      }
+    } finally {
+      box.cleanup();
+    }
+  }
+});
+
+test("trust reset keeps validator cleanup failures privacy-safe", async () => {
+  for (const validatorFails of [false, true]) {
+    const box = makeSandbox("codex");
+    try {
+      const config = join(box.home, "config.toml");
+      const original = validatorFails
+        ? "OPENSOCRATES_TEST_INVALID_TOML = [\n"
+        : trustSection("session_end");
+      writeFileSync(config, original);
+      await assert.rejects(
+        resetCodexOpenSocratesHookTrust({
+          codexHome: box.home,
+          codexBin: process.env.CODEX_BIN,
+          hooks: {
+            removeValidationHome: async (target, options) => {
+              rmSync(target, options);
+              throw new Error(`private cleanup path: ${target}`);
+            },
+          },
+        }),
+        (error) =>
+          error instanceof Error &&
+          /hook trust was not reset/u.test(error.message) &&
+          (validatorFails
+            ? /installed Codex app server did not accept/u.test(error.message) &&
+              !/validation environment could not be removed safely/u.test(error.message)
+            : /validation environment could not be removed safely/u.test(error.message)) &&
+          !error.message.includes("private cleanup path") &&
+          !error.message.includes(box.root),
+      );
+      assert.equal(readFileSync(config, "utf8"), original);
+      assert.deepEqual(
+        readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+        [],
+      );
+    } finally {
+      box.cleanup();
+    }
+  }
+});
+
+test("isolated app-server validation accepts supported notifications and waits for the response before EOF", async () => {
+  for (const mode of ["accept", "notification-around", "require-open-stdin"]) {
+    const box = makeSandbox("codex");
+    try {
+      const config = join(box.home, "config.toml");
+      writeFileSync(config, trustSection("session_end"));
+      const tracePath = join(box.root, `${mode}-trace.jsonl`);
+      const codexBin = writeCodexAppServerValidator(box.root, `${mode}-validator`, {
+        mode,
+        tracePath,
+      });
+      const result = await resetCodexOpenSocratesHookTrust({
+        codexHome: box.home,
+        codexBin,
+        hooks: {
+          validationTimeoutMilliseconds: 1_000,
+          validationTerminationMilliseconds: 50,
+        },
+      });
+      assert.equal(result.status, "reset");
+      assert.doesNotMatch(readFileSync(config, "utf8"), /opensocrates@opensocrates/u);
+      const trace = readFileSync(tracePath, "utf8")
+        .trim()
+        .split("\n")
+        .map((line) => JSON.parse(line));
+      assert.equal(trace.length, 3);
+      assert.equal(
+        trace.every(
+          (entry) =>
+            entry.isolated &&
+            entry.stdinClosed &&
+            entry.responseBeforeEof &&
+            entry.environmentClean,
+        ),
+        true,
+      );
+    } finally {
+      box.cleanup();
+    }
+  }
+});
+
+test("isolated app-server request handles backpressure and write errors without leaking details", async () => {
+  const successBox = makeSandbox("codex");
+  try {
+    const config = join(successBox.home, "config.toml");
+    writeFileSync(config, trustSection("pre_compact"));
+    const appServer = makeInMemoryCodexAppServer();
+    const result = await resetCodexOpenSocratesHookTrust({
+      codexHome: successBox.home,
+      codexBin: "in-memory-codex",
+      hooks: { spawnAppServer: appServer.spawnAppServer },
+    });
+    assert.equal(result.status, "reset");
+    assert.deepEqual(appServer.trace.argsExact, [true, true, true]);
+    assert.deepEqual(appServer.trace.writeResults, [false, false, false]);
+    assert.deepEqual(appServer.trace.responseBeforeEnd, [true, true, true]);
+    assert.deepEqual(appServer.trace.killed, []);
+  } finally {
+    successBox.cleanup();
+  }
+
+  const failureBox = makeSandbox("codex");
+  try {
+    const config = join(failureBox.home, "config.toml");
+    const original = trustSection("pre_compact");
+    writeFileSync(config, original);
+    const appServer = makeInMemoryCodexAppServer({ failWrite: true });
+    await assert.rejects(
+      resetCodexOpenSocratesHookTrust({
+        codexHome: failureBox.home,
+        codexBin: "in-memory-codex",
+        hooks: {
+          spawnAppServer: appServer.spawnAppServer,
+          validationTerminationMilliseconds: 20,
+        },
+      }),
+      (error) =>
+        error instanceof Error &&
+        /installed Codex app server did not accept/u.test(error.message) &&
+        !error.message.includes("private in-memory write failure"),
+    );
+    assert.equal(readFileSync(config, "utf8"), original);
+    assert.deepEqual(appServer.trace.writeResults, [false]);
+    assert.equal(appServer.trace.killed.length > 0, true);
+  } finally {
+    failureBox.cleanup();
+  }
+});
+
+test("isolated app-server validation rejects malformed, oversized, extra, and mismatched responses privately", async () => {
+  for (const mode of [
+    "reject",
+    "malformed",
+    "line-oversize",
+    "total-oversize",
+    "extra-response",
+    "wrong-id",
+    "bad-result",
+    "error-response",
+    "server-request",
+    "unknown-notification",
+    "invalid-notification-method",
+    "invalid-notification-params",
+    "invalid-notification-timestamp",
+    "notification-overflow",
+  ]) {
+    const box = makeSandbox("codex");
+    try {
+      const config = join(box.home, "config.toml");
+      const privateMarker = `PRIVATE_VALIDATOR_SECRET_${mode}`;
+      const original = `# ${box.root}\nprivate_marker = "${privateMarker}"\n${trustSection("stop")}`;
+      writeFileSync(config, original);
+      const tracePath = join(box.root, `${mode}-trace.jsonl`);
+      const codexBin = writeCodexAppServerValidator(box.root, `${mode}-validator`, {
+        mode,
+        tracePath,
+      });
+      await assert.rejects(
+        resetCodexOpenSocratesHookTrust({
+          codexHome: box.home,
+          codexBin,
+          hooks: {
+            validationTimeoutMilliseconds: 1_000,
+            validationTerminationMilliseconds: 50,
+          },
+        }),
+        (error) =>
+          error instanceof Error &&
+          /installed Codex app server did not accept the isolated configuration/u.test(error.message) &&
+          !error.message.includes(privateMarker) &&
+          !error.message.includes("sha256:") &&
+          !error.message.includes(box.root),
+      );
+      assert.equal(readFileSync(config, "utf8"), original);
+      const trace = readFileSync(tracePath, "utf8")
+        .trim()
+        .split("\n")
+        .map((line) => JSON.parse(line));
+      assert.equal(trace.length, 1);
+      assert.equal(trace[0].kind, "app-server");
+      assert.equal(trace[0].isolated, true);
+      assert.equal(trace[0].stdinClosed, true);
+      assert.equal(trace[0].environmentClean, true);
+      assert.deepEqual(
+        readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+        [],
+      );
+    } finally {
+      box.cleanup();
+    }
+  }
+});
+
+test("isolated app-server timeout closes stdin and kills an uncooperative child within bounds", async () => {
+  const box = makeSandbox("codex");
+  try {
+    const config = join(box.home, "config.toml");
+    const original = trustSection("pre_tool_use");
+    writeFileSync(config, original);
+    const tracePath = join(box.root, "timeout-trace.jsonl");
+    const pidPath = join(box.root, "timeout-validator.pid");
+    const codexBin = writeCodexAppServerValidator(box.root, "timeout-validator", {
+      mode: "timeout",
+      tracePath,
+      pidPath,
+    });
+    const started = Date.now();
+    await assert.rejects(
+      resetCodexOpenSocratesHookTrust({
+        codexHome: box.home,
+        codexBin,
+        hooks: {
+          validationTimeoutMilliseconds: 1_500,
+          validationTerminationMilliseconds: 50,
+        },
+      }),
+      (error) =>
+        error instanceof Error &&
+        /installed Codex app server did not accept the isolated configuration/u.test(error.message),
+    );
+    assert.ok(Date.now() - started < 5_000, "validator cleanup exceeded its bounded deadline");
+    const pid = Number(readFileSync(pidPath, "utf8"));
+    assert.throws(
+      () => process.kill(pid, 0),
+      (error) => error instanceof Error && error.code === "ESRCH",
+    );
+    const trace = JSON.parse(readFileSync(tracePath, "utf8").trim());
+    assert.equal(trace.kind, "app-server");
+    assert.equal(trace.isolated, true);
+    assert.equal(trace.stdinClosed, true);
+    assert.equal(trace.environmentClean, true);
+    assert.equal(readFileSync(config, "utf8"), original);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("trust reset detects a concurrent pre-rename edit without overwriting it", async () => {
+  const box = makeSandbox("codex");
+  try {
+    const config = join(box.home, "config.toml");
+    writeFileSync(config, trustSection("pre_compact"));
+    const concurrent = 'model = "external-edit"\n';
+    await assert.rejects(
+      resetCodexOpenSocratesHookTrust({
+        codexHome: box.home,
+        codexBin: process.env.CODEX_BIN,
+        hooks: { beforeRename: () => writeFileSync(config, concurrent) },
+      }),
+      (error) => error instanceof Error && /changed before the atomic update/u.test(error.message),
+    );
+    assert.equal(readFileSync(config, "utf8"), concurrent);
+    assert.deepEqual(
+      readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+      [],
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("trust reset preserves recovery bytes when a post-replace edit makes rollback unsafe", async () => {
+  const box = makeSandbox("codex");
+  try {
+    const config = join(box.home, "config.toml");
+    const original = trustSection("pre_tool_use");
+    const concurrent = 'model = "external-post-replace-edit"\n';
+    writeFileSync(config, original);
+    await assert.rejects(
+      resetCodexOpenSocratesHookTrust({
+        codexHome: box.home,
+        codexBin: process.env.CODEX_BIN,
+        hooks: { afterRename: () => writeFileSync(config, concurrent) },
+      }),
+      (error) =>
+        error instanceof Error &&
+        /automatic rollback was withheld/u.test(error.message) &&
+        !error.message.includes(box.root),
+    );
+    assert.equal(readFileSync(config, "utf8"), concurrent);
+    const residues = readdirSync(box.home).filter((name) =>
+      name.startsWith(".config.toml.opensocrates-trust-reset-"),
+    );
+    assert.equal(residues.length, 1);
+    assert.match(residues[0], /\.rollback$/u);
+    const recovery = join(box.home, residues[0]);
+    assert.equal(readFileSync(recovery, "utf8"), original);
+    assert.equal(statSync(recovery).mode & 0o7777, 0o600);
   } finally {
     box.cleanup();
   }

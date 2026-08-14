@@ -95,9 +95,12 @@ both registrations and every provably OpenSocrates-owned installed payload:
 
 ```bash
 node installer/opensocrates.mjs remove --host all --purge
+# Opt in to resetting only the seven OpenSocrates Codex hook approvals:
+node installer/opensocrates.mjs remove --host all --purge --reset-trust
 ```
 
 If a live host still owns a cache, purge reports an incomplete result instead
-of claiming success. Close the host and rerun the same command. The purge does
-not sign out of Claude Code, Codex, or GitHub CLI, does not reset Codex hook
-trust, and preserves unrelated host configuration and user history.
+of claiming success. Close the host and rerun the same command. Purge does not
+sign out of Claude Code, Codex, or GitHub CLI. It preserves Codex hook trust
+unless `--reset-trust` is explicitly supplied, and always preserves unrelated
+host configuration and user history.

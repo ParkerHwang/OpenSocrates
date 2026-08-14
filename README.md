@@ -113,7 +113,7 @@ npx --yes opensocrates@1.2.1 update --host all
 npx --yes opensocrates@1.2.1 remove --host all
 ```
 
-### Remove a registration or completely uninstall owned payloads
+### Remove a registration, purge owned payloads, or reset Codex trust
 
 Ordinary `remove` keeps its backward-compatible, narrow contract: it removes
 the selected exact host registration and installer-managed root and reconciles
@@ -122,11 +122,14 @@ installer desired-state file. Its output names every remaining known
 OpenSocrates path and the purge command to run next; it does not describe that
 result as a complete uninstall.
 
-After closing active hosts, request the explicit complete-uninstall path:
+After closing active hosts, request the explicit owned-payload purge:
 
 ```bash
 npx --yes opensocrates@1.2.1 remove --host all --purge
 # One host: npx --yes opensocrates@1.2.1 remove --host claude --purge
+# Also reset only OpenSocrates Codex hook trust:
+npx --yes opensocrates@1.2.1 remove --host all --purge --reset-trust
+# Codex only: npx --yes opensocrates@1.2.1 remove --host codex --purge --reset-trust
 ```
 
 Purge verifies canonical paths, the exact `opensocrates@opensocrates` package
@@ -146,9 +149,32 @@ host or resolve the reported path and rerun the same purge command; a completed
 purge is idempotent. Other plugins and user task, project, chat, plan, and
 history data are preserved byte-for-byte.
 
-Codex hook trust is host security state, not executable payload. This purge
-reports that the exact OpenSocrates hook trust is preserved; a dedicated,
-narrow trust-reset extension is intentionally deferred to separate work.
+The four removal surfaces remain separate:
+
+- **Plugin registration:** ordinary remove and purge ask the selected host to
+  remove only the exact `opensocrates@opensocrates` registration.
+- **Payload and installer state:** `--purge` verifies ownership before removing
+  the exact cache/data/managed-state paths described above.
+- **Host security trust:** Codex hook approval is not payload. Purge preserves
+  it by default and reports that fact. Add `--reset-trust` explicitly with
+  `--host codex` or `--host all` to reset only the seven canonical
+  OpenSocrates hook approvals.
+- **User history:** task, project, chat, plan, session, and history content is
+  never a removal target and remains byte-for-byte unchanged.
+
+Codex CLI 0.145.0 has no supported narrow trust-removal command, so this opt-in
+fallback targets only the exact `CODEX_HOME/config.toml`. It removes canonical
+OpenSocrates sections for `pre_tool_use`, `post_tool_use`, `pre_compact`,
+`session_start`, `session_end`, `user_prompt_submit`, and `stop`, without
+hard-coding or printing their hashes. Other settings, plugins, comments, order,
+whitespace, and LF/CRLF style are preserved. A symlink, noncanonical matching
+section, unexpected key, invalid config, unsupported Codex validator, concurrent
+change, or write/validation failure makes the purge partial. The original
+config is retained or transactionally restored when rollback remains safe. If
+a later external edit makes automatic rollback unsafe, that edit is not
+overwritten and the owner-only recovery copy is preserved. No complete result
+is claimed. Reinstallation is expected to present those seven hooks as new
+approvals; that live approval flow still requires separate host evidence.
 
 A private `~/.opensocrates/desired-state.json` manifest records the selected
 channel, installed hosts, and desired active version. `status --host all`

@@ -108,7 +108,7 @@ npx --yes opensocrates@1.2.1 update --host all
 npx --yes opensocrates@1.2.1 remove --host all
 ```
 
-### 등록 제거와 소유 payload 완전 제거
+### 등록 제거, 소유 payload purge, Codex 신뢰 초기화
 
 일반 `remove`는 기존과 호환되는 좁은 계약을 유지합니다. 선택한 정확한 호스트 등록과
 설치 프로그램 관리 루트를 제거하고 업데이터를 조정하지만, 호스트가 소유한
@@ -116,11 +116,14 @@ OpenSocrates 플러그인 캐시와 설치 프로그램 desired-state 파일은 
 출력은 남은 것으로 확인된 OpenSocrates 경로와 다음 purge 명령을 표시하며, 이 결과를
 완전 제거라고 설명하지 않습니다.
 
-활성 호스트를 닫은 뒤 명시적인 완전 제거 경로를 실행하세요.
+활성 호스트를 닫은 뒤 명시적인 소유 payload purge를 실행하세요.
 
 ```bash
 npx --yes opensocrates@1.2.1 remove --host all --purge
 # 호스트 하나: npx --yes opensocrates@1.2.1 remove --host claude --purge
+# OpenSocrates Codex 훅 신뢰만 함께 초기화:
+npx --yes opensocrates@1.2.1 remove --host all --purge --reset-trust
+# Codex만: npx --yes opensocrates@1.2.1 remove --host codex --purge --reset-trust
 ```
 
 Purge는 항목을 삭제하기 전에 canonical 경로, 정확한
@@ -139,9 +142,30 @@ symlink, 잘못된 소유권 표식이나 매니페스트, 비어 있지 않아 
 실행하세요. 완료된 purge는 여러 번 실행해도 같은 결과를 냅니다. 다른 플러그인과
 사용자 task·project·chat·plan·history 데이터는 byte-for-byte 보존합니다.
 
-Codex 훅 신뢰는 실행 payload가 아니라 호스트 보안 상태입니다. 이번 purge는 정확한
-OpenSocrates 훅 신뢰를 보존했다고 보고하며, 범위가 좁은 전용 신뢰 초기화 extension은
-별도 작업으로 명시적으로 미룹니다.
+제거 대상 네 가지는 서로 분리됩니다.
+
+- **플러그인 등록:** 일반 remove와 purge는 선택한 호스트에 정확한
+  `opensocrates@opensocrates` 등록만 제거하도록 요청합니다.
+- **Payload와 설치 프로그램 상태:** `--purge`는 소유권을 검증한 뒤 위에서 설명한
+  정확한 cache/data/관리 상태 경로만 제거합니다.
+- **호스트 보안 신뢰:** Codex 훅 승인은 payload가 아닙니다. 기본 purge는 신뢰를
+  보존하고 그 사실을 보고합니다. `--host codex` 또는 `--host all`에서
+  `--reset-trust`를 명시해야 정확한 OpenSocrates 훅 승인 7개만 초기화합니다.
+- **사용자 기록:** task, project, chat, plan, session, history 내용은 제거 대상이
+  아니며 항상 byte-for-byte 보존됩니다.
+
+Codex CLI 0.145.0에는 범위가 좁은 공식 신뢰 제거 명령이 없습니다. 따라서 이 opt-in
+fallback은 정확한 `CODEX_HOME/config.toml`만 대상으로 합니다. 해시를 하드코딩하거나
+출력하지 않고 `pre_tool_use`, `post_tool_use`, `pre_compact`, `session_start`,
+`session_end`, `user_prompt_submit`, `stop`에 해당하는 canonical OpenSocrates section만
+제거합니다. 다른 설정과 플러그인, 주석, 순서, 공백, LF/CRLF 형식은 보존합니다.
+symlink, canonical이 아닌 일치 section, 예상 밖 key, 잘못된 config, 지원되지 않는
+Codex validator, 동시 변경, 쓰기·검증 실패가 있으면 purge는 partial입니다. 원본
+config를 유지하거나 안전하게 rollback할 수 있을 때 트랜잭션으로 복원합니다. 뒤이은
+외부 편집 때문에 자동 rollback이 안전하지 않으면 그 편집을 덮어쓰지 않고 소유자
+전용 복구 사본을 보존합니다. 완료를 주장하지 않습니다. 재설치하면 이 7개 훅이 새
+승인 대상으로 표시될 것으로 예상되지만, 실제 승인 흐름은 별도 host evidence가
+필요합니다.
 
 소유자 전용 `~/.opensocrates/desired-state.json`에는 선택 채널, 설치된 호스트,
 원하는 활성 버전이 기록됩니다. `status --host all`은 원하는 버전과 사용 가능한

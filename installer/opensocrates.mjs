@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { createHash, randomInt, randomUUID } from "node:crypto";
 import {
   constants as fsConstants,
@@ -13,6 +13,7 @@ import {
 import {
   access,
   chmod,
+  chown,
   cp,
   lstat,
   mkdir,
@@ -20,6 +21,7 @@ import {
   open,
   readFile,
   readdir,
+  realpath,
   rename,
   rm,
   rmdir,
@@ -151,16 +153,32 @@ const AUTO_UPDATE_DEFAULT_INTERVAL_HOURS = 24;
 const AUTO_UPDATE_POLL_SECONDS = 60 * 60;
 const LOCK_STALE_MILLISECONDS = 2 * 60 * 60 * 1000;
 export const PURGE_RESULT_SCHEMA = "opensocrates.purge-result/1.0.0";
+export const CODEX_TRUST_EVENTS = Object.freeze([
+  "pre_tool_use",
+  "post_tool_use",
+  "pre_compact",
+  "session_start",
+  "session_end",
+  "user_prompt_submit",
+  "stop",
+]);
+const CODEX_TRUST_KEY_PREFIX = `${PLUGIN_ID}:hooks/hooks.json:`;
+const MAX_CODEX_CONFIG_BYTES = 16 * 1024 * 1024;
+const CODEX_APP_SERVER_ARGS = Object.freeze(["app-server", "--stdio"]);
+const CODEX_APP_SERVER_TIMEOUT_MILLISECONDS = 15_000;
+const CODEX_APP_SERVER_TERMINATION_MILLISECONDS = 1_000;
+const MAX_CODEX_APP_SERVER_LINE_BYTES = 256 * 1024;
+const MAX_CODEX_APP_SERVER_OUTPUT_BYTES = 1024 * 1024;
+const MAX_CODEX_APP_SERVER_NOTIFICATIONS = 128;
 
-// The complete-uninstall result keeps host security state separate from
-// installer-owned payload cleanup. Prompt 2 can replace this narrow Codex
-// extension without weakening the path-ownership checks in this module.
-export function purgeExtensionResult(host) {
+// Keep host security state separate from installer-owned payload cleanup so an
+// explicit trust reset can fail without weakening purge path-ownership checks.
+export function purgeExtensionResult(host, resetTrust = false) {
   return host === "codex"
     ? {
         component: "host-security-trust",
-        status: "preserved",
-        nextAction: "reset-codex-opensocrates-hook-trust",
+        status: resetTrust ? "pending" : "preserved",
+        nextAction: resetTrust ? null : "rerun-purge-with-reset-trust",
       }
     : {
         component: "host-security-trust",
@@ -169,7 +187,7 @@ export function purgeExtensionResult(host) {
       };
 }
 
-export function createPurgeResult(hosts) {
+export function createPurgeResult(hosts, { resetTrust = false } = {}) {
   return {
     schema: PURGE_RESULT_SCHEMA,
     status: "pending",
@@ -179,7 +197,7 @@ export function createPurgeResult(hosts) {
       registration: "not-checked",
       registrationDetail: null,
       components: [],
-      extension: purgeExtensionResult(host),
+      extension: purgeExtensionResult(host, resetTrust),
       errors: [],
     })),
     finalization: {
@@ -188,6 +206,998 @@ export function createPurgeResult(hosts) {
       errors: [],
     },
   };
+}
+
+function trustResetFailure(message) {
+  fail(`Codex OpenSocrates hook trust was not reset: ${message}`);
+}
+
+function decodeTomlBasicString(source, start) {
+  let value = "";
+  let index = start + 1;
+  while (index < source.length) {
+    const character = source[index];
+    if (character === '"') {
+      return { value, next: index + 1, kind: "basic", raw: source.slice(start, index + 1) };
+    }
+    if (character === "\\") {
+      const escaped = source[index + 1];
+      const simple = new Map([
+        ['"', '"'],
+        ["\\", "\\"],
+        ["b", "\b"],
+        ["t", "\t"],
+        ["n", "\n"],
+        ["f", "\f"],
+        ["r", "\r"],
+      ]);
+      if (simple.has(escaped)) {
+        value += simple.get(escaped);
+        index += 2;
+        continue;
+      }
+      const digits = escaped === "u" ? 4 : escaped === "U" ? 8 : 0;
+      if (digits > 0) {
+        const encoded = source.slice(index + 2, index + 2 + digits);
+        if (!new RegExp(`^[0-9A-Fa-f]{${digits}}$`, "u").test(encoded)) return null;
+        const codePoint = Number.parseInt(encoded, 16);
+        if (codePoint > 0x10ffff || (codePoint >= 0xd800 && codePoint <= 0xdfff)) return null;
+        value += String.fromCodePoint(codePoint);
+        index += 2 + digits;
+        continue;
+      }
+      return null;
+    }
+    if (character.codePointAt(0) < 0x20 || character.codePointAt(0) === 0x7f) return null;
+    value += character;
+    index += 1;
+  }
+  return null;
+}
+
+function decodeTomlLiteralString(source, start) {
+  const end = source.indexOf("'", start + 1);
+  if (end < 0) return null;
+  const value = source.slice(start + 1, end);
+  if ([...value].some((character) => character.codePointAt(0) < 0x20 || character.codePointAt(0) === 0x7f)) {
+    return null;
+  }
+  return { value, next: end + 1, kind: "literal", raw: source.slice(start, end + 1) };
+}
+
+function parseTomlDottedKey(source) {
+  const segments = [];
+  let index = 0;
+  const skipWhitespace = () => {
+    while (source[index] === " " || source[index] === "\t") index += 1;
+  };
+  skipWhitespace();
+  while (index < source.length) {
+    let segment;
+    if (source[index] === '"') {
+      segment = decodeTomlBasicString(source, index);
+    } else if (source[index] === "'") {
+      segment = decodeTomlLiteralString(source, index);
+    } else {
+      const match = source.slice(index).match(/^[A-Za-z0-9_-]+/u);
+      if (!match) return null;
+      segment = {
+        value: match[0],
+        next: index + match[0].length,
+        kind: "bare",
+        raw: match[0],
+      };
+    }
+    if (segment === null) return null;
+    segments.push(segment);
+    index = segment.next;
+    skipWhitespace();
+    if (index === source.length) return segments;
+    if (source[index] !== ".") return null;
+    index += 1;
+    skipWhitespace();
+    if (index === source.length) return null;
+  }
+  return null;
+}
+
+function scanTomlLine(line, carriedContext) {
+  let state = carriedContext.stringState;
+  let arrayDepth = carriedContext.arrayDepth;
+  let inlineTableDepth = carriedContext.inlineTableDepth;
+  let commentIndex = -1;
+  for (let index = 0; index < line.length; index += 1) {
+    if (state === "multiline-basic") {
+      if (line[index] === "\\") {
+        index += 1;
+      } else if (line.startsWith('"""', index)) {
+        state = null;
+        index += 2;
+      }
+      continue;
+    }
+    if (state === "multiline-literal") {
+      if (line.startsWith("'''", index)) {
+        state = null;
+        index += 2;
+      }
+      continue;
+    }
+    if (state === "basic") {
+      if (line[index] === "\\") index += 1;
+      else if (line[index] === '"') state = null;
+      continue;
+    }
+    if (state === "literal") {
+      if (line[index] === "'") state = null;
+      continue;
+    }
+    if (line[index] === "#") {
+      commentIndex = index;
+      break;
+    }
+    if (line.startsWith('"""', index)) {
+      state = "multiline-basic";
+      index += 2;
+    } else if (line.startsWith("'''", index)) {
+      state = "multiline-literal";
+      index += 2;
+    } else if (line[index] === '"') {
+      state = "basic";
+    } else if (line[index] === "'") {
+      state = "literal";
+    } else if (line[index] === "[") {
+      arrayDepth += 1;
+    } else if (line[index] === "]") {
+      arrayDepth -= 1;
+      if (arrayDepth < 0) return { invalid: true, commentIndex, context: carriedContext };
+    } else if (line[index] === "{") {
+      inlineTableDepth += 1;
+    } else if (line[index] === "}") {
+      inlineTableDepth -= 1;
+      if (inlineTableDepth < 0) return { invalid: true, commentIndex, context: carriedContext };
+    }
+  }
+  if (state === "basic" || state === "literal") {
+    return { invalid: true, commentIndex, context: carriedContext };
+  }
+  return {
+    invalid: false,
+    commentIndex,
+    context: { stringState: state, arrayDepth, inlineTableDepth },
+  };
+}
+
+function tomlLines(source) {
+  const lines = [];
+  let start = 0;
+  while (start < source.length) {
+    const newline = source.indexOf("\n", start);
+    const end = newline < 0 ? source.length : newline + 1;
+    const contentEnd = newline < 0 ? source.length : newline > start && source[newline - 1] === "\r" ? newline - 1 : newline;
+    lines.push({ start, end, contentEnd, body: source.slice(start, contentEnd) });
+    start = end;
+  }
+  return lines;
+}
+
+function parseTomlTableHeader(code) {
+  const leading = code.match(/^[\t ]*/u)?.[0].length ?? 0;
+  const trimmedEnd = code.trimEnd().length;
+  const candidate = code.slice(leading, trimmedEnd);
+  const array = candidate.startsWith("[[");
+  if (!candidate.startsWith("[") || (array ? !candidate.endsWith("]]") : !candidate.endsWith("]"))) {
+    return null;
+  }
+  const openWidth = array ? 2 : 1;
+  const closeWidth = array ? 2 : 1;
+  const keySource = candidate.slice(openWidth, candidate.length - closeWidth);
+  const segments = parseTomlDottedKey(keySource);
+  if (segments === null) return null;
+  return {
+    array,
+    raw: candidate,
+    segments,
+    syntaxStart: leading,
+    syntaxEnd: leading + candidate.length,
+  };
+}
+
+function matchingTrustKey(segments) {
+  if (
+    segments.length < 3 ||
+    segments[0].value !== "hooks" ||
+    segments[1].value !== "state" ||
+    !segments[2].value.startsWith(CODEX_TRUST_KEY_PREFIX)
+  ) {
+    return null;
+  }
+  return segments[2].value;
+}
+
+function isCanonicalTrustHeader(header, key) {
+  return !header.array && header.raw === `[hooks.state.${JSON.stringify(key)}]`;
+}
+
+function assignmentKeySegments(code) {
+  let state = null;
+  for (let index = 0; index < code.length; index += 1) {
+    if (state === "basic") {
+      if (code[index] === "\\") index += 1;
+      else if (code[index] === '"') state = null;
+      continue;
+    }
+    if (state === "literal") {
+      if (code[index] === "'") state = null;
+      continue;
+    }
+    if (code[index] === '"') state = "basic";
+    else if (code[index] === "'") state = "literal";
+    else if (code[index] === "=") return parseTomlDottedKey(code.slice(0, index));
+  }
+  return null;
+}
+
+function lineContainsTrustNamespaceString(code) {
+  for (let index = 0; index < code.length; index += 1) {
+    let decoded = null;
+    if (code[index] === '"') decoded = decodeTomlBasicString(code, index);
+    else if (code[index] === "'") decoded = decodeTomlLiteralString(code, index);
+    if (decoded === null) continue;
+    if (decoded.value.startsWith(CODEX_TRUST_KEY_PREFIX)) return true;
+    index = decoded.next - 1;
+  }
+  return false;
+}
+
+function pathContainsTrustNamespace(segments) {
+  return matchingTrustKey(segments) !== null;
+}
+
+function trustEventFromKey(key) {
+  const suffix = key.slice(CODEX_TRUST_KEY_PREFIX.length);
+  const match = suffix.match(/^([a-z_]+):(\d+):(\d+)$/u);
+  if (!match || !CODEX_TRUST_EVENTS.includes(match[1]) || match[2] !== "0" || match[3] !== "0") {
+    trustResetFailure("the matching trust namespace has a noncanonical event or index");
+  }
+  return match[1];
+}
+
+function addRemovalSpan(spans, line, start, end) {
+  if (start >= end) trustResetFailure("the matching trust section has an unsupported shape");
+  spans.push({ start: line.start + start, end: line.start + end });
+}
+
+/**
+ * Remove only the syntax bytes owned by canonical OpenSocrates hook trust
+ * sections. Comments, whitespace, newline style, unrelated keys, and the
+ * parent hooks.state table are retained byte-for-byte.
+ */
+export function stripCodexOpenSocratesTrustSections(contents) {
+  const original = Buffer.isBuffer(contents) ? contents : Buffer.from(contents);
+  const utf8Bom = original.subarray(0, 3).equals(Buffer.from([0xef, 0xbb, 0xbf]));
+  const encodedSource = utf8Bom ? original.subarray(3) : original;
+  let source;
+  try {
+    source = new TextDecoder("utf-8", { fatal: true }).decode(encodedSource);
+  } catch {
+    trustResetFailure("the configuration is not valid UTF-8");
+  }
+  const spans = [];
+  const found = new Map();
+  let currentTarget = null;
+  let currentTableSegments = [];
+  let context = { stringState: null, arrayDepth: 0, inlineTableDepth: 0 };
+  for (const line of tomlLines(source)) {
+    const startContext = { ...context };
+    const scanned = scanTomlLine(line.body, context);
+    if (scanned.invalid) trustResetFailure("the configuration has an unsupported string shape");
+    context = scanned.context;
+    const code = scanned.commentIndex < 0 ? line.body : line.body.slice(0, scanned.commentIndex);
+    const firstNonWhitespace = code.search(/[^\t ]/u);
+    let header = null;
+    if (
+      startContext.stringState === null &&
+      startContext.arrayDepth === 0 &&
+      startContext.inlineTableDepth === 0 &&
+      firstNonWhitespace >= 0 &&
+      code[firstNonWhitespace] === "["
+    ) {
+      header = parseTomlTableHeader(code);
+      if (header === null) trustResetFailure("the configuration has an unsupported table header");
+    }
+    if (header !== null) {
+      if (currentTarget !== null && !currentTarget.hashSeen) {
+        trustResetFailure("a matching trust section is missing its canonical trusted_hash key");
+      }
+      currentTarget = null;
+      currentTableSegments = header.segments;
+      const key = matchingTrustKey(header.segments);
+      if (key !== null) {
+        if (!isCanonicalTrustHeader(header, key)) {
+          trustResetFailure("the matching trust namespace uses a noncanonical table shape");
+        }
+        const event = trustEventFromKey(key);
+        if (found.has(event)) trustResetFailure("a matching trust event appears more than once");
+        currentTarget = { event, hashSeen: false };
+        found.set(event, currentTarget);
+        addRemovalSpan(spans, line, header.syntaxStart, header.syntaxEnd);
+      }
+      continue;
+    }
+    if (currentTarget === null) {
+      if (code.trim().length === 0 || startContext.stringState !== null) continue;
+      const assignment = assignmentKeySegments(code);
+      const semanticPath = assignment === null ? [] : [...currentTableSegments, ...assignment];
+      if (
+        pathContainsTrustNamespace(semanticPath) ||
+        ((semanticPath[0]?.value === "hooks" ||
+          (currentTableSegments[0]?.value === "hooks" && currentTableSegments[1]?.value === "state")) &&
+          lineContainsTrustNamespaceString(code))
+      ) {
+        trustResetFailure("the matching trust namespace uses a noncanonical assignment shape");
+      }
+      continue;
+    }
+    if (code.trim().length === 0) continue;
+    if (
+      startContext.stringState !== null ||
+      context.stringState !== null ||
+      startContext.arrayDepth !== 0 ||
+      startContext.inlineTableDepth !== 0 ||
+      context.arrayDepth !== 0 ||
+      context.inlineTableDepth !== 0
+    ) {
+      trustResetFailure("a matching trust section contains a multiline value");
+    }
+    const assignment = code.match(/^(\s*)trusted_hash\s*=\s*"(?:[^"\\\r\n]|\\.)*"(\s*)$/u);
+    if (assignment === null || currentTarget.hashSeen) {
+      trustResetFailure("a matching trust section contains an unexpected or duplicate key");
+    }
+    currentTarget.hashSeen = true;
+    const syntaxStart = assignment[1].length;
+    const syntaxEnd = code.length - assignment[2].length;
+    addRemovalSpan(spans, line, syntaxStart, syntaxEnd);
+  }
+  if (context.stringState !== null || context.arrayDepth !== 0 || context.inlineTableDepth !== 0) {
+    trustResetFailure("the configuration has an unterminated multiline value");
+  }
+  if (currentTarget !== null && !currentTarget.hashSeen) {
+    trustResetFailure("a matching trust section is missing its canonical trusted_hash key");
+  }
+  spans.sort((left, right) => left.start - right.start);
+  let cursor = 0;
+  let updated = "";
+  for (const span of spans) {
+    if (span.start < cursor) trustResetFailure("matching trust syntax overlaps unexpectedly");
+    updated += source.slice(cursor, span.start);
+    cursor = span.end;
+  }
+  updated += source.slice(cursor);
+  const updatedBytes = Buffer.from(updated, "utf8");
+  return {
+    contents: utf8Bom ? Buffer.concat([original.subarray(0, 3), updatedBytes]) : updatedBytes,
+    removedEvents: CODEX_TRUST_EVENTS.filter((event) => found.has(event)),
+  };
+}
+
+function currentUid() {
+  if (typeof process.getuid !== "function") {
+    trustResetFailure("file ownership cannot be verified on this platform");
+  }
+  return process.getuid();
+}
+
+function assertOwnedDirectory(info) {
+  if (!info.isDirectory() || info.isSymbolicLink() || info.uid !== currentUid() || (info.mode & 0o022) !== 0) {
+    trustResetFailure("the Codex configuration directory is not a safe owner-controlled directory");
+  }
+}
+
+function assertOwnedConfigFile(info) {
+  if (!info.isFile() || info.isSymbolicLink() || info.uid !== currentUid() || info.nlink !== 1) {
+    trustResetFailure("the Codex configuration is not a safe owner-controlled regular file");
+  }
+  if (info.size > MAX_CODEX_CONFIG_BYTES) {
+    trustResetFailure("the Codex configuration is too large for a bounded trust reset");
+  }
+}
+
+function sameSnapshot(left, right) {
+  return (
+    left.dev === right.dev &&
+    left.ino === right.ino &&
+    left.size === right.size &&
+    left.mtimeNs === right.mtimeNs &&
+    left.ctimeNs === right.ctimeNs &&
+    left.mode === right.mode &&
+    left.uid === right.uid &&
+    left.gid === right.gid &&
+    left.nlink === right.nlink
+  );
+}
+
+async function readConfigSnapshot(target) {
+  const noFollow = fsConstants.O_NOFOLLOW ?? 0;
+  let handle;
+  let operationFailed = false;
+  try {
+    handle = await open(target, fsConstants.O_RDONLY | noFollow);
+    const before = await handle.stat({ bigint: true });
+    if (
+      !before.isFile() ||
+      before.isSymbolicLink() ||
+      before.uid !== BigInt(currentUid()) ||
+      before.nlink !== 1n
+    ) {
+      trustResetFailure("the Codex configuration changed to an unsafe file");
+    }
+    if (before.size > BigInt(MAX_CODEX_CONFIG_BYTES)) {
+      trustResetFailure("the Codex configuration is too large for a bounded trust reset");
+    }
+    const contents = await handle.readFile();
+    const after = await handle.stat({ bigint: true });
+    if (!sameSnapshot(before, after) || BigInt(contents.length) !== after.size) {
+      trustResetFailure("the Codex configuration changed while it was being inspected");
+    }
+    return { info: after, contents };
+  } catch (error) {
+    operationFailed = true;
+    if (error instanceof InstallerError) throw error;
+    trustResetFailure("the Codex configuration could not be inspected safely");
+  } finally {
+    try {
+      await handle?.close();
+    } catch {
+      if (!operationFailed) {
+        trustResetFailure("the Codex configuration handle could not be closed safely");
+      }
+    }
+  }
+}
+
+async function writeSyncedOwnerOnlyFile(target, contents) {
+  let handle;
+  let operationFailed = false;
+  try {
+    handle = await open(target, "wx", 0o600);
+    await handle.writeFile(contents);
+    await handle.chmod(0o600);
+    await handle.sync();
+  } catch (error) {
+    operationFailed = true;
+    if (error instanceof InstallerError) throw error;
+    trustResetFailure("an owner-only Codex transaction file could not be written safely");
+  } finally {
+    try {
+      await handle?.close();
+    } catch {
+      if (!operationFailed) {
+        trustResetFailure("an owner-only Codex transaction file could not be closed safely");
+      }
+    }
+  }
+}
+
+async function fsyncFile(target) {
+  let handle;
+  let operationFailed = false;
+  try {
+    handle = await open(target, "r");
+    await handle.sync();
+  } catch (error) {
+    operationFailed = true;
+    if (error instanceof InstallerError) throw error;
+    trustResetFailure("the Codex configuration could not be synchronized safely");
+  } finally {
+    try {
+      await handle?.close();
+    } catch {
+      if (!operationFailed) {
+        trustResetFailure("the Codex configuration handle could not be closed safely");
+      }
+    }
+  }
+}
+
+async function fsyncDirectory(target) {
+  let handle;
+  let operationFailed = false;
+  try {
+    handle = await open(target, "r");
+    await handle.sync();
+  } catch (error) {
+    operationFailed = true;
+    if (error instanceof InstallerError) throw error;
+    trustResetFailure("the Codex configuration directory could not be synchronized safely");
+  } finally {
+    try {
+      await handle?.close();
+    } catch {
+      if (!operationFailed) {
+        trustResetFailure("the Codex configuration directory handle could not be closed safely");
+      }
+    }
+  }
+}
+
+function exactCodexInitializeResponse(message, requestId, codexHome) {
+  if (message === null || typeof message !== "object" || Array.isArray(message)) return false;
+  const responseKeys = Object.keys(message).sort();
+  if (responseKeys.length !== 2 || responseKeys[0] !== "id" || responseKeys[1] !== "result") {
+    return false;
+  }
+  if (message.id !== requestId) return false;
+  const result = message.result;
+  if (result === null || typeof result !== "object" || Array.isArray(result)) return false;
+  const resultKeys = Object.keys(result).sort();
+  if (
+    resultKeys.length !== 4 ||
+    resultKeys[0] !== "codexHome" ||
+    resultKeys[1] !== "platformFamily" ||
+    resultKeys[2] !== "platformOs" ||
+    resultKeys[3] !== "userAgent"
+  ) {
+    return false;
+  }
+  return (
+    result.codexHome === codexHome &&
+    typeof result.platformFamily === "string" &&
+    result.platformFamily.length > 0 &&
+    typeof result.platformOs === "string" &&
+    result.platformOs.length > 0 &&
+    typeof result.userAgent === "string" &&
+    result.userAgent.length > 0
+  );
+}
+
+function exactCodexAppServerNotification(message) {
+  if (message === null || typeof message !== "object" || Array.isArray(message)) return false;
+  const keys = Object.keys(message).sort();
+  const withoutTimestamp = keys.length === 2 && keys[0] === "method" && keys[1] === "params";
+  const withTimestamp =
+    keys.length === 3 &&
+    keys[0] === "emittedAtMs" &&
+    keys[1] === "method" &&
+    keys[2] === "params";
+  if (!withoutTimestamp && !withTimestamp) return false;
+  if (typeof message.method !== "string" || message.method.length === 0) return false;
+  if (message.params === null || typeof message.params !== "object" || Array.isArray(message.params)) {
+    return false;
+  }
+  return !withTimestamp || (typeof message.emittedAtMs === "number" && Number.isFinite(message.emittedAtMs));
+}
+
+function codexAppServerValidationError() {
+  return new InstallerError(
+    "Codex OpenSocrates hook trust was not reset: the installed Codex app server did not accept the isolated configuration",
+  );
+}
+
+function isolatedCodexValidationEnvironment(codexHome) {
+  const environment = {
+    PATH: process.env.PATH ?? "",
+    HOME: codexHome,
+    CODEX_HOME: codexHome,
+    XDG_CACHE_HOME: join(codexHome, "xdg-cache"),
+    XDG_CONFIG_HOME: join(codexHome, "xdg-config"),
+    XDG_DATA_HOME: join(codexHome, "xdg-data"),
+    XDG_STATE_HOME: join(codexHome, "xdg-state"),
+    TMPDIR: join(codexHome, "tmp"),
+    NO_COLOR: "1",
+  };
+  if (process.platform === "win32") {
+    for (const key of ["ComSpec", "PATHEXT", "SystemRoot", "WINDIR"]) {
+      if (typeof process.env[key] === "string") environment[key] = process.env[key];
+    }
+  }
+  return environment;
+}
+
+async function runCodexAppServerConfigCheck(
+  codexBin,
+  codexHome,
+  {
+    spawnAppServer = spawn,
+    timeoutMilliseconds = CODEX_APP_SERVER_TIMEOUT_MILLISECONDS,
+    terminationMilliseconds = CODEX_APP_SERVER_TERMINATION_MILLISECONDS,
+  } = {},
+) {
+  const requestId = 1;
+  const request = Buffer.from(
+    `${JSON.stringify({
+      id: requestId,
+      method: "initialize",
+      params: {
+        clientInfo: {
+          name: "opensocrates_installer",
+          title: "OpenSocrates Installer",
+          version: PRODUCT_VERSION,
+        },
+        capabilities: { experimentalApi: false },
+      },
+    })}\n`,
+    "utf8",
+  );
+  let child;
+  try {
+    child = spawnAppServer(codexBin, CODEX_APP_SERVER_ARGS, {
+      cwd: codexHome,
+      env: isolatedCodexValidationEnvironment(codexHome),
+      stdio: ["pipe", "pipe", "pipe"],
+      windowsHide: true,
+    });
+  } catch {
+    throw codexAppServerValidationError();
+  }
+
+  await new Promise((resolvePromise, rejectPromise) => {
+    const timeoutDelay =
+      Number.isFinite(timeoutMilliseconds) && timeoutMilliseconds > 0
+        ? timeoutMilliseconds
+        : CODEX_APP_SERVER_TIMEOUT_MILLISECONDS;
+    const terminationDelay =
+      Number.isFinite(terminationMilliseconds) && terminationMilliseconds > 0
+        ? terminationMilliseconds
+        : CODEX_APP_SERVER_TERMINATION_MILLISECONDS;
+    let closed = false;
+    let failed = false;
+    let settled = false;
+    let responseCount = 0;
+    let notificationCount = 0;
+    let responseAccepted = false;
+    let requestWriteCompleted = false;
+    let outputBytes = 0;
+    let lineBuffer = Buffer.alloc(0);
+    let inputEndRequested = false;
+    let terminationTimer;
+    let forcedFinishTimer;
+
+    const clearTimers = () => {
+      clearTimeout(deadlineTimer);
+      if (terminationTimer !== undefined) clearTimeout(terminationTimer);
+      if (forcedFinishTimer !== undefined) clearTimeout(forcedFinishTimer);
+    };
+    const finish = (accepted) => {
+      if (settled) return;
+      settled = true;
+      clearTimers();
+      if (accepted) resolvePromise();
+      else rejectPromise(codexAppServerValidationError());
+    };
+    const endInput = () => {
+      if (inputEndRequested) return true;
+      inputEndRequested = true;
+      try {
+        child.stdin.end();
+        return true;
+      } catch {
+        return false;
+      }
+    };
+    const terminate = () => {
+      if (failed || settled) return;
+      failed = true;
+      // The stream may already be closed; process termination below remains bounded.
+      endInput();
+      if (closed) {
+        finish(false);
+        return;
+      }
+      try {
+        child.kill("SIGTERM");
+      } catch {
+        // A failed signal is followed by the bounded SIGKILL/final failure timers.
+      }
+      terminationTimer = setTimeout(() => {
+        if (closed || settled) return;
+        try {
+          child.kill("SIGKILL");
+        } catch {
+          // The final timer still prevents an unbounded validator wait.
+        }
+        forcedFinishTimer = setTimeout(() => finish(false), terminationDelay);
+      }, terminationDelay);
+    };
+    const consumeLine = (line) => {
+      if (failed || settled) return;
+      if (line.length > MAX_CODEX_APP_SERVER_LINE_BYTES || line.length === 0) {
+        terminate();
+        return;
+      }
+      const normalized = line.at(-1) === 0x0d ? line.subarray(0, -1) : line;
+      let message;
+      try {
+        message = JSON.parse(normalized.toString("utf8"));
+      } catch {
+        terminate();
+        return;
+      }
+      if (exactCodexInitializeResponse(message, requestId, codexHome)) {
+        responseCount += 1;
+        if (responseCount !== 1) {
+          terminate();
+          return;
+        }
+        responseAccepted = true;
+        if (!endInput()) terminate();
+        return;
+      }
+      if (!exactCodexAppServerNotification(message)) {
+        terminate();
+        return;
+      }
+      notificationCount += 1;
+      if (notificationCount > MAX_CODEX_APP_SERVER_NOTIFICATIONS) terminate();
+    };
+    const deadlineTimer = setTimeout(terminate, timeoutDelay);
+
+    child.stdout.on("data", (chunk) => {
+      if (failed || settled) return;
+      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      outputBytes += bytes.length;
+      if (outputBytes > MAX_CODEX_APP_SERVER_OUTPUT_BYTES) {
+        terminate();
+        return;
+      }
+      lineBuffer = Buffer.concat([lineBuffer, bytes]);
+      for (;;) {
+        const newline = lineBuffer.indexOf(0x0a);
+        if (newline < 0) break;
+        const line = lineBuffer.subarray(0, newline);
+        lineBuffer = lineBuffer.subarray(newline + 1);
+        consumeLine(line);
+        if (failed || settled) return;
+      }
+      if (lineBuffer.length > MAX_CODEX_APP_SERVER_LINE_BYTES) terminate();
+    });
+    child.stderr.on("data", (chunk) => {
+      if (failed || settled) return;
+      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      outputBytes += bytes.length;
+      if (outputBytes > MAX_CODEX_APP_SERVER_OUTPUT_BYTES) terminate();
+    });
+    child.once("error", terminate);
+    child.stdin.once("error", terminate);
+    child.once("close", (code, signal) => {
+      closed = true;
+      finish(
+        !failed &&
+          code === 0 &&
+          signal === null &&
+          responseCount === 1 &&
+          responseAccepted &&
+          requestWriteCompleted &&
+          lineBuffer.length === 0,
+      );
+    });
+
+    try {
+      const accepted = child.stdin.write(request, (error) => {
+        if (error !== undefined && error !== null) {
+          terminate();
+          return;
+        }
+        requestWriteCompleted = true;
+      });
+      if (!accepted) {
+        // This is the only bounded write. A false return means it is queued;
+        // the response/deadline path bounds a child that never drains it.
+        child.stdin.once("drain", () => {});
+      }
+    } catch {
+      terminate();
+    }
+  });
+}
+
+async function validateCodexConfigBytes(
+  codexBin,
+  contents,
+  {
+    removeValidationHome = rm,
+    spawnAppServer = spawn,
+    validationTimeoutMilliseconds = CODEX_APP_SERVER_TIMEOUT_MILLISECONDS,
+    validationTerminationMilliseconds = CODEX_APP_SERVER_TERMINATION_MILLISECONDS,
+  } = {},
+) {
+  let validationHome;
+  let operationFailed = false;
+  try {
+    validationHome = await mkdtemp(join(tmpdir(), "opensocrates-codex-config-check-"));
+    await chmod(validationHome, 0o700);
+    for (const directory of ["tmp", "xdg-cache", "xdg-config", "xdg-data", "xdg-state"]) {
+      await mkdir(join(validationHome, directory), { mode: 0o700 });
+    }
+    const target = join(validationHome, "config.toml");
+    await writeSyncedOwnerOnlyFile(target, contents);
+    await runCodexAppServerConfigCheck(codexBin, validationHome, {
+      spawnAppServer,
+      timeoutMilliseconds: validationTimeoutMilliseconds,
+      terminationMilliseconds: validationTerminationMilliseconds,
+    });
+  } catch (error) {
+    operationFailed = true;
+    if (error instanceof InstallerError) throw error;
+    trustResetFailure("the Codex configuration could not be validated in isolation");
+  } finally {
+    if (validationHome !== undefined) {
+      try {
+        await removeValidationHome(validationHome, { recursive: true, force: true });
+      } catch {
+        if (!operationFailed) {
+          trustResetFailure("the isolated Codex validation environment could not be removed safely");
+        }
+      }
+    }
+  }
+}
+
+async function restoreTrustConfig({
+  rollback,
+  target,
+  parent,
+  original,
+  originalMode,
+  originalUid,
+  originalGid,
+}) {
+  try {
+    if (!(await entryExists(rollback))) trustResetFailure("the rollback copy is unavailable");
+    await rename(rollback, target);
+    await chown(target, originalUid, originalGid);
+    await chmod(target, originalMode);
+    await fsyncFile(target);
+    await fsyncDirectory(parent);
+    const restored = await readConfigSnapshot(target);
+    if (
+      !restored.contents.equals(original) ||
+      Number(restored.info.mode & 0o7777n) !== originalMode ||
+      restored.info.uid !== BigInt(originalUid) ||
+      restored.info.gid !== BigInt(originalGid)
+    ) {
+      trustResetFailure("the original configuration was not restored");
+    }
+  } catch (error) {
+    if (error instanceof InstallerError) throw error;
+    trustResetFailure("the original configuration could not be restored automatically");
+  }
+}
+
+/**
+ * Reset only OpenSocrates Codex hook trust. Optional hooks are dependency
+ * injection seams for isolated failure/race tests; production callers pass no
+ * hooks and always use the installed Codex CLI for validation.
+ */
+export async function resetCodexOpenSocratesHookTrust({
+  codexHome = process.env.CODEX_HOME || join(homedir(), ".codex"),
+  codexBin = codexBinary(),
+  hooks = {},
+} = {}) {
+  const lexicalHome = resolve(codexHome);
+  if (!(await entryExists(lexicalHome))) return { status: "absent", removedEvents: [] };
+  const lexicalInfo = await lstat(lexicalHome);
+  assertOwnedDirectory(lexicalInfo);
+  let parent;
+  try {
+    parent = await realpath(lexicalHome);
+  } catch {
+    trustResetFailure("the Codex configuration directory could not be canonicalized");
+  }
+  const parentInfo = await lstat(parent);
+  assertOwnedDirectory(parentInfo);
+  const target = join(parent, "config.toml");
+  if (!(await entryExists(target))) return { status: "absent", removedEvents: [] };
+  const targetInfo = await lstat(target);
+  assertOwnedConfigFile(targetInfo);
+  const snapshot = await readConfigSnapshot(target);
+  const originalMode = Number(snapshot.info.mode & 0o7777n);
+  const originalUid = Number(snapshot.info.uid);
+  const originalGid = Number(snapshot.info.gid);
+  const validationOptions = {
+    removeValidationHome: hooks.removeValidationHome,
+    spawnAppServer: hooks.spawnAppServer,
+    validationTimeoutMilliseconds: hooks.validationTimeoutMilliseconds,
+    validationTerminationMilliseconds: hooks.validationTerminationMilliseconds,
+  };
+  await validateCodexConfigBytes(codexBin, snapshot.contents, validationOptions);
+  const stripped = stripCodexOpenSocratesTrustSections(snapshot.contents);
+  if (stripped.removedEvents.length === 0) {
+    const current = await readConfigSnapshot(target);
+    if (!sameSnapshot(snapshot.info, current.info) || !current.contents.equals(snapshot.contents)) {
+      trustResetFailure("the Codex configuration changed during isolated validation");
+    }
+    return { status: "absent", removedEvents: [] };
+  }
+  await validateCodexConfigBytes(codexBin, stripped.contents, validationOptions);
+
+  const token = randomUUID();
+  const temporary = join(parent, `.config.toml.opensocrates-trust-reset-${token}.tmp`);
+  const rollback = join(parent, `.config.toml.opensocrates-trust-reset-${token}.rollback`);
+  let replaced = false;
+  let preserveRollback = false;
+  let transactionFailed = false;
+  let transactionCommitted = false;
+  let cleanupRequired = true;
+  try {
+    await hooks.beforeWrite?.({ target });
+    await writeSyncedOwnerOnlyFile(temporary, stripped.contents);
+    await writeSyncedOwnerOnlyFile(rollback, snapshot.contents);
+    await fsyncDirectory(parent);
+    await hooks.beforeRename?.({ target, temporary, rollback });
+    const current = await readConfigSnapshot(target);
+    if (!sameSnapshot(snapshot.info, current.info) || !current.contents.equals(snapshot.contents)) {
+      trustResetFailure("the Codex configuration changed before the atomic update");
+    }
+    await rename(temporary, target);
+    replaced = true;
+    await chown(target, originalUid, originalGid);
+    await chmod(target, originalMode);
+    await fsyncFile(target);
+    await fsyncDirectory(parent);
+    await hooks.afterRename?.({ target, rollback });
+    const committed = await readConfigSnapshot(target);
+    if (
+      !committed.contents.equals(stripped.contents) ||
+      Number(committed.info.mode & 0o7777n) !== originalMode ||
+      committed.info.uid !== BigInt(originalUid) ||
+      committed.info.gid !== BigInt(originalGid)
+    ) {
+      trustResetFailure("the committed Codex configuration did not match the validated candidate");
+    }
+    await validateCodexConfigBytes(codexBin, committed.contents, validationOptions);
+    await (hooks.removeRollback ?? rm)(rollback);
+    // The candidate and parent rename are already fsynced and post-validated.
+    // Keep rollback unlink as the final fallible commit step; another directory
+    // fsync would only create a failure point after the recovery source is gone.
+    transactionCommitted = true;
+    cleanupRequired = false;
+    return { status: "reset", removedEvents: stripped.removedEvents };
+  } catch (error) {
+    transactionFailed = true;
+    if (replaced) {
+      let canRollback = false;
+      try {
+        const current = await readConfigSnapshot(target);
+        canRollback = current.contents.equals(stripped.contents);
+      } catch {
+        canRollback = false;
+      }
+      if (!canRollback) {
+        preserveRollback = true;
+        trustResetFailure(
+          "the Codex configuration changed after replacement; automatic rollback was withheld and the owner-only recovery copy was preserved",
+        );
+      }
+      await restoreTrustConfig({
+        rollback,
+        target,
+        parent,
+        original: snapshot.contents,
+        originalMode,
+        originalUid,
+        originalGid,
+      });
+    }
+    if (error instanceof InstallerError) throw error;
+    trustResetFailure("the atomic configuration update failed; the original configuration was preserved");
+  } finally {
+    let cleanupFailed = false;
+    if (cleanupRequired) {
+      for (const residue of [temporary, rollback]) {
+        try {
+          if (residue === rollback && preserveRollback) continue;
+          await hooks.beforeResidueCleanup?.({ residue });
+          if (await entryExists(residue)) await rm(residue);
+        } catch {
+          cleanupFailed = true;
+        }
+      }
+    }
+    if (cleanupFailed && !transactionFailed && !transactionCommitted) {
+      trustResetFailure("owner-only Codex transaction residue could not be removed safely");
+    }
+  }
 }
 
 export class InstallerError extends Error {}
@@ -600,6 +1610,7 @@ export function parseCli(argv) {
     allowMajor: false,
     force: false,
     purge: false,
+    resetTrust: false,
   };
   const seenOptions = new Set();
   while (args.length > 0) {
@@ -630,6 +1641,11 @@ export function parseCli(argv) {
     if (flag === "--purge") {
       seenOptions.add("purge");
       options.purge = true;
+      continue;
+    }
+    if (flag === "--reset-trust") {
+      seenOptions.add("reset-trust");
+      options.resetTrust = true;
       continue;
     }
     if (flag === "--channel") {
@@ -722,6 +1738,12 @@ export function parseCli(argv) {
   if (seenOptions.has("purge") && options.action !== "remove") {
     fail("--purge is only valid with remove");
   }
+  if (seenOptions.has("reset-trust") && (options.action !== "remove" || !options.purge)) {
+    fail("--reset-trust requires remove --purge");
+  }
+  if (seenOptions.has("reset-trust") && !new Set([ALL_HOST, "codex"]).has(options.host)) {
+    fail("--reset-trust is only valid with --host codex or --host all");
+  }
   if (
     seenOptions.has("host") &&
     options.action === "auto-update" &&
@@ -739,11 +1761,11 @@ function showHelp() {
   console.log(`OpenSocrates ${PRODUCT_VERSION}
 
 Usage:
-  opensocrates install [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum SHA256]
+  opensocrates install [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum FILE]
   opensocrates status [--host all|antigravity|claude|codex|cursor|grok|opencode]
-  opensocrates update [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum SHA256]
-  opensocrates remove [--host all|antigravity|claude|codex|cursor|grok|opencode] [--purge]
-  opensocrates verify [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum SHA256]
+  opensocrates update [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum FILE]
+  opensocrates remove [--host all|antigravity|claude|codex|cursor|grok|opencode] [--purge [--reset-trust]]
+  opensocrates verify [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum FILE]
   opensocrates auto-update enable [--host all|antigravity|claude|codex|cursor|grok|opencode]
       [--channel stable|next] [--interval-hours ${AUTO_UPDATE_DEFAULT_INTERVAL_HOURS}]
       [--allow-major]
@@ -757,9 +1779,13 @@ transaction set and are never mixed with downloads for other hosts. Without
 qualified assets, every ready host participates. Automatic updates are opt-in.
 
 Ordinary remove unregisters the selected host and removes installer-managed
-files, but may leave host-owned caches and installer state. Add --purge for an
-explicit complete-uninstall attempt. Purge preserves user history and Codex
-hook trust; any unverified, unsafe, or in-use component is reported as pending.
+files, but may leave host-owned caches, installer state, and Codex hook trust.
+Add --purge for an explicit payload/data cleanup attempt. Purge preserves Codex
+hook trust unless --reset-trust is also supplied for codex or all; that explicit
+option removes only the seven canonical OpenSocrates trust entries. Registration,
+payload cleanup, host security trust, and user history are reported separately.
+User history is always preserved. Any unverified, unsafe, or in-use component is
+reported as pending.
 `);
 }
 
@@ -3469,12 +4495,68 @@ function purgeComponentBlocksCompletion(component) {
 function finalizePurgeHostResult(hostResult) {
   const registrationComplete = new Set(["removed", "absent", "not-applicable"]).has(hostResult.registration);
   hostResult.status =
-    registrationComplete && !hostResult.components.some(purgeComponentBlocksCompletion) ? "complete" : "partial";
+    registrationComplete &&
+    !hostResult.components.some(purgeComponentBlocksCompletion) &&
+    !purgeComponentBlocksCompletion(hostResult.extension)
+      ? "complete"
+      : "partial";
   return hostResult.status === "complete";
 }
 
-async function purgeOneHost(hostResult) {
+async function resetPurgeTrustExtension(hostResult, options) {
+  if (hostResult.host !== "codex" || !options.resetTrust) return true;
+  try {
+    const reset = await resetCodexOpenSocratesHookTrust({ hooks: options.trustResetHooks ?? {} });
+    hostResult.extension = {
+      component: "host-security-trust",
+      status: reset.status,
+      removedCount: reset.removedEvents.length,
+      nextAction: null,
+    };
+    return true;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    hostResult.extension = {
+      component: "host-security-trust",
+      status: "failed",
+      removedCount: 0,
+      nextAction: "retry-purge-with-reset-trust-or-review-exact-sections-manually",
+      detail: message,
+    };
+    hostResult.errors.push(message);
+    return false;
+  }
+}
+
+function preservePurgeComponentsAfterTrustFailure(hostResult, paths) {
+  hostResult.registration = "preserved";
+  hostResult.registrationDetail = "not-attempted-after-trust-reset-failure";
+  const preserved = [
+    ["managed-root", paths.root],
+    ["transaction-residue", null],
+  ];
+  if (hostResult.host === "opencode") {
+    preserved.push(["opencode-bridge", paths.bridge], ["opencode-bridge-residue", null]);
+  }
+  if (paths.cacheRoot !== null) preserved.push(["plugin-cache", paths.cacheRoot]);
+  preserved.push(...paths.pluginData.map((path) => ["plugin-data", path]));
+  for (const [component, path] of preserved) {
+    hostResult.components.push({
+      component,
+      status: "preserved",
+      path,
+      detail: "not-attempted-after-trust-reset-failure",
+    });
+  }
+}
+
+async function purgeOneHost(hostResult, options) {
   const paths = purgePathsFor(hostResult.host);
+  if (!(await resetPurgeTrustExtension(hostResult, options))) {
+    preservePurgeComponentsAfterTrustFailure(hostResult, paths);
+    finalizePurgeHostResult(hostResult);
+    return;
+  }
   try {
     const registration = await purgeRegistration(hostResult.host, paths);
     hostResult.registration = registration.status;
@@ -3533,10 +4615,11 @@ async function updatePurgeDesiredState(options, desired, result) {
   };
   const launchAgentPresent = await entryExists(statePaths().launchAgent);
   const schedulerNeedsChange =
-    options.host === ALL_HOST ||
-    installedHosts.length === 0 ||
-    launchAgentPresent !== keepAutoUpdate ||
-    desired.autoUpdate.hosts.some((host) => deactivated.includes(host));
+    deactivated.length > 0 &&
+    (options.host === ALL_HOST ||
+      installedHosts.length === 0 ||
+      launchAgentPresent !== keepAutoUpdate ||
+      desired.autoUpdate.hosts.some((host) => deactivated.includes(host)));
   if (schedulerNeedsChange) {
     try {
       if (keepAutoUpdate) await installLaunchAgent(desired.channel, autoUpdateHosts);
@@ -3563,6 +4646,14 @@ async function updatePurgeDesiredState(options, desired, result) {
       status: "preserved",
       path: statePaths().launchAgent,
     });
+  }
+  if (!schedulerNeedsChange && jsonDeepEqual(nextDesired, desired)) {
+    result.finalization.components.push({
+      component: "desired-state",
+      status: "preserved",
+      path: statePaths().desiredState,
+    });
+    return desired;
   }
   try {
     nextDesired = await writeDesiredState(nextDesired);
@@ -3673,15 +4764,18 @@ async function completePurgeStateFinalization(plan, result, options) {
     result.finalization.status = "partial";
     result.status = "partial";
     console.error(`error: OpenSocrates state cleanup remains at: ${plan.directory}`);
-    console.error(`error: retry command: opensocrates remove --host ${options.host} --purge`);
+    console.error(
+      `error: retry command: opensocrates remove --host ${options.host} --purge` +
+        (options.resetTrust ? " --reset-trust" : ""),
+    );
   }
 }
 
 async function runPurgeLocked(options) {
   const hosts = options.host === ALL_HOST ? SUPPORTED_HOSTS : [options.host];
-  const result = createPurgeResult(hosts);
+  const result = createPurgeResult(hosts, { resetTrust: options.resetTrust });
   const desired = await readDesiredState();
-  for (const hostResult of result.hosts) await purgeOneHost(hostResult);
+  for (const hostResult of result.hosts) await purgeOneHost(hostResult, options);
   const nextDesired = await updatePurgeDesiredState(options, desired, result);
   const hostsComplete = result.hosts.every((item) => item.status === "complete");
   const finalizationComplete = result.finalization.errors.length === 0;
@@ -3732,7 +4826,25 @@ function reportPurgeResult(result) {
       }
     }
     if (host.extension.status === "preserved") {
-      console.log(`${host.host}: host security trust was preserved for the dedicated trust-reset extension.`);
+      console.log(
+        `${host.host}: host security trust was preserved; rerun purge with --reset-trust to reset only ` +
+          "the exact OpenSocrates hook approvals.",
+      );
+    } else if (host.extension.status === "reset") {
+      console.log(
+        `${host.host}: host security trust reset completed for ${host.extension.removedCount} exact ` +
+          "OpenSocrates hook entries.",
+      );
+    } else if (host.extension.status === "absent") {
+      console.log(`${host.host}: no exact OpenSocrates host security trust entries were present.`);
+    } else if (host.extension.status === "failed") {
+      console.error(
+        `${host.host}: host security trust reset failed; no successful trust mutation is claimed.`,
+      );
+      console.error(
+        `${host.host}: rerun the same purge with --reset-trust after resolving Codex config validation, ` +
+          "or back up the config and manually review only the seven exact OpenSocrates hook sections.",
+      );
     }
   }
   for (const component of result.finalization.components) {
@@ -4030,7 +5142,10 @@ export async function main(argv = process.argv.slice(2), internalDependencies = 
     return 0;
   }
   if (options.action === "remove" && options.purge) {
-    await runPurge(options);
+    await runPurge({
+      ...options,
+      trustResetHooks: internalDependencies.trustResetHooks ?? {},
+    });
     return 0;
   }
   return withOperationLock(async () => {
