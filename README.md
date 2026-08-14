@@ -45,10 +45,10 @@ and runtimes are not shipped or supported in this release.
 | Grok Build TUI | Native plugin is shared with headless; activation receipt pending | `/opensocrates` | [TUI hook execution verified, native skill marker test pending; shipped package has no hooks](docs/grok-support.md) |
 | OpenCode TUI and `opencode run` | Yes; stable same-turn local bridge | Native `opensocrates` skill | [OpenCode 1.18.18 TUI, `opencode run`, and DeepSeek V4 Flash live smoke validated](docs/opencode-support.md) |
 | Codex CLI and Desktop | Yes, after one-time in-app hook approval | OpenSocrates plugin | Package and launcher release-validated on `darwin-arm64`; no live Codex hook-delivery receipt |
-| Claude Code CLI | Yes, through `UserPromptSubmit` | `/opensocrates` | Locally validated on `darwin-arm64` |
-| Claude Code desktop app | Yes, where Claude Code plugins run | `/opensocrates` | [Authenticated hook lifecycle locally validated](docs/claude-desktop-live-probe.md) |
-| Claude Cowork | Yes, in the tested local plugin upload | `/opensocrates` | [Native hook lifecycle locally validated; direct release upload, no marketplace sync](docs/claude-cowork-live-probe.md) |
-| Claude web and Desktop Chat | No hooks | `/opensocrates` | [Live upload and invocation validated](docs/claude-chat-upload-probe.md) |
+| Claude Code CLI | Yes, through `UserPromptSubmit` | Plugin: `/opensocrates:opensocrates` | Locally validated on `darwin-arm64` |
+| Claude Code desktop app, Local mode | Yes, where Claude Code plugins run | Plugin: `/opensocrates:opensocrates` | [Authenticated hook lifecycle locally validated](docs/claude-desktop-live-probe.md) |
+| Claude Cowork with the local plugin | Yes, in the tested local plugin upload | Plugin: `/opensocrates:opensocrates` | [Native hook lifecycle locally validated; direct release upload, no marketplace sync](docs/claude-cowork-live-probe.md) |
+| Claude web and Desktop Chat | No OpenSocrates hooks | Standalone skill: `/opensocrates` | [Live upload and invocation validated](docs/claude-chat-upload-probe.md) |
 
 The status column uses four distinct levels. Do not read them as
 interchangeable:
@@ -62,10 +62,16 @@ interchangeable:
   receipt shows the host actually delivering the hook. `os capabilities show`
   reports these capabilities as `unknown`, not as available.
 
-Claude Chat surfaces do not run plugin hooks. They can use the generated
-skills, but automatic per-prompt selection is available only on Claude Code
-and Cowork surfaces that execute the plugin runtime. OpenSocrates fails open
-if a hook or selector is unavailable.
+The Claude plugin's canonical explicit command is
+`/opensocrates:opensocrates`, following Anthropic's
+[plugin namespace contract](https://code.claude.com/docs/en/plugins). A current
+Claude version can also offer `/opensocrates` as a bare alias when no other
+command owns that name, but the alias is not the canonical plugin contract and
+does not prove which skill source answered. The separately uploaded Chat ZIP
+is a standalone skill and canonically uses `/opensocrates`. Chat surfaces do
+not run the packaged OpenSocrates hooks; automatic per-prompt selection is
+available only on Claude Code and Cowork surfaces that execute the plugin
+runtime. OpenSocrates fails open if a hook or selector is unavailable.
 
 The published v1.1.2 Claude plugin archive exceeded Cowork's documented
 compressed limit and observed uncompressed limit. A pre-release v1.1.3
@@ -256,15 +262,17 @@ workspace paths. `auto-update disable` unloads and removes the LaunchAgent;
 
 ### Claude web and Desktop Chat skills
 
-These surfaces support plugin skills but not hooks. Download
+These surfaces can use a separately uploaded standalone skill but do not run
+the local plugin hooks. Download
 `opensocrates-1.2.1-claude-chat-skills.zip` from the release and upload it from
 Claude's **Customize → Skills → Upload skill** UI. The ZIP contains one
 top-level `opensocrates/` folder with `SKILL.md` directly inside, as required by
-the skill uploader. The package exposes exactly one
-`/opensocrates` skill; its 48 method procedures, rigor, evidence, and trace
-controls are internal supporting references. Automatic selection is absent
-because Chat does not execute plugin hooks. See Anthropic's
-[plugin surface guide](https://support.claude.com/en/articles/13837440-use-plugins-in-claude).
+the skill uploader. It is not the Claude Code/Cowork plugin archive. The
+standalone package exposes exactly one canonical `/opensocrates` skill; its 48
+method procedures, rigor, evidence, and trace controls are internal supporting
+references. Automatic hook selection is absent because Chat does not execute
+the packaged hooks. See Anthropic's
+[custom skill guide](https://support.claude.com/en/articles/12512180-use-skills-in-claude).
 
 ### Install from a tagged GitHub source
 
@@ -377,15 +385,17 @@ injection and does not block the user's task.
 On Claude, explicitly invoke the same controller when desired:
 
 ```text
-/opensocrates <request>
-/opensocrates auto <request>
-/opensocrates trace
-/opensocrates status
+/opensocrates:opensocrates <request>
+/opensocrates:opensocrates auto <request>
+/opensocrates:opensocrates trace
+/opensocrates:opensocrates status
 ```
 
-Only `/opensocrates` appears in Claude's skill and command UI. The controller
-selects and loads internal method references; users do not need to browse the
-48-system implementation catalog.
+Those commands are for the Claude Code/Cowork plugin. The standalone Chat ZIP
+uses `/opensocrates` instead. The plugin's registered command inventory names
+`/opensocrates:opensocrates`; do not use a bare alias as source evidence. The
+controller selects and loads internal method references, so users do not need
+to browse the 48-system implementation catalog.
 
 The Claude selector uses one `claude --safe-mode -p` process with no session
 persistence. Safe mode disables user, project, and plugin customizations:

@@ -27,6 +27,7 @@ _SEMANTIC_FIELDS = (
     "policy_versions",
 )
 _TOKEN_RE = re.compile(r"\{\{([A-Z][A-Z0-9_]*)\}\}")
+_RENDER_VALUE_KEY_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 _SAFE_RELATIVE_RE = re.compile(r"^[^/][^:]*$")
 
 
@@ -82,6 +83,49 @@ def _read_json(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise PluginBuildError(f"generator metadata must be an object: {path}")
     return value
+
+
+def _render_profile_values(  # noqa: C901  # Branch-explicit profile schema validation.
+    metadata: Mapping[str, Any], requested_profile: str | None
+) -> tuple[str | None, dict[str, str]]:
+    """Resolve a declared surface profile without allowing core-token overrides."""
+
+    raw_profiles = metadata.get("render_profiles")
+    default_profile = metadata.get("default_render_profile")
+    if raw_profiles is None:
+        if default_profile is not None:
+            raise PluginBuildError("default_render_profile requires render_profiles")
+        if requested_profile is not None:
+            raise PluginBuildError("render profile is not supported by this host")
+        return None, {}
+    if not isinstance(raw_profiles, Mapping) or not raw_profiles:
+        raise PluginBuildError("render_profiles must be a non-empty object")
+
+    profiles: dict[str, dict[str, str]] = {}
+    for profile_name, raw_values in raw_profiles.items():
+        if not isinstance(profile_name, str) or not profile_name:
+            raise PluginBuildError("render profile names must be non-empty strings")
+        if not isinstance(raw_values, Mapping):
+            raise PluginBuildError(f"render profile {profile_name} must be an object")
+        values: dict[str, str] = {}
+        for key, value in raw_values.items():
+            if (
+                not isinstance(key, str)
+                or not _RENDER_VALUE_KEY_RE.fullmatch(key)
+                or not isinstance(value, str)
+            ):
+                raise PluginBuildError(
+                    f"render profile {profile_name} values must use uppercase string tokens"
+                )
+            values[key] = value
+        profiles[profile_name] = values
+
+    if not isinstance(default_profile, str) or default_profile not in profiles:
+        raise PluginBuildError("default_render_profile must name a declared render profile")
+    selected_profile = default_profile if requested_profile is None else requested_profile
+    if selected_profile not in profiles:
+        raise PluginBuildError(f"unknown render profile: {selected_profile}")
+    return selected_profile, profiles[selected_profile]
 
 
 def discover_hosts(source_root: str | Path = "plugin-src") -> tuple[str, ...]:
@@ -307,6 +351,7 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
     source_root: str | Path = "plugin-src",
     bundle_path: str | Path = "content/compiled-content.bundle.json",
     runtime_root: str | Path | None = None,
+    render_profile: str | None = None,
 ) -> dict[str, Any]:
     """Generate one host package and return its deterministic release manifest."""
 
@@ -341,6 +386,13 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
             "compiled content bundle failed canonical/domain validation"
         ) from exc
     values = _common_values(raw_bundle, host=host, template_revision=template_revision)
+    resolved_profile, profile_values = _render_profile_values(metadata, render_profile)
+    overlapping_values = set(values) & set(profile_values)
+    if overlapping_values:
+        raise PluginBuildError(
+            "render profile cannot override core values: " + ", ".join(sorted(overlapping_values))
+        )
+    values.update(profile_values)
     output_path = Path(output) if output is not None else Path("build/generated/plugins") / host
     if not output_path.is_absolute():
         output_path = repository / output_path
@@ -479,6 +531,8 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
         ),
         "files": files,
     }
+    if resolved_profile is not None:
+        release["render_profile"] = resolved_profile
     (output_path / "release-manifest.json").write_bytes(_canonical_json(release))
     return release
 
@@ -499,6 +553,10 @@ def main(argv: list[str] | None = None) -> int:
         "--runtime-root",
         help="host runtime root (default: dist/runtime/<host>)",
     )
+    parser.add_argument(
+        "--render-profile",
+        help="declared host render profile (default: generator metadata default)",
+    )
     parser.add_argument("--output")
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()
@@ -511,6 +569,7 @@ def main(argv: list[str] | None = None) -> int:
             source_root=args.source_root,
             bundle_path=args.bundle,
             runtime_root=args.runtime_root,
+            render_profile=args.render_profile,
         )
     except PluginBuildError as exc:
         parser.error(str(exc))

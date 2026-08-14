@@ -57,6 +57,13 @@ from opensocrates.version import CONTENT_REVISION, PRODUCT_VERSION
 
 ROOT = Path(__file__).resolve().parents[1]
 CHECKS: list[tuple[str, Callable[[], None]]] = []
+CLAUDE_PLUGIN_INVOCATION_MARKER = (
+    "`/opensocrates:opensocrates` is the canonical explicit invocation for this "
+    "Claude Code/Cowork plugin skill."
+)
+CLAUDE_CHAT_INVOCATION_MARKER = (
+    "`/opensocrates` is the canonical explicit invocation for this standalone Claude Chat skill."
+)
 
 
 def check(name: str) -> Callable[[Callable[[], None]], Callable[[], None]]:
@@ -1691,6 +1698,21 @@ def test_single_user_facing_entry() -> None:
     source = ROOT / "plugin-src" / "claude"
     metadata = json.loads((source / "generator.json").read_text(encoding="utf-8"))
     require(
+        metadata.get("default_render_profile") == "plugin"
+        and metadata.get("render_profiles")
+        == {
+            "plugin": {
+                "CLAUDE_CANONICAL_INVOCATION": "/opensocrates:opensocrates",
+                "CLAUDE_DELIVERY_SURFACE": "Claude Code/Cowork plugin skill",
+            },
+            "chat-standalone": {
+                "CLAUDE_CANONICAL_INVOCATION": "/opensocrates",
+                "CLAUDE_DELIVERY_SURFACE": "standalone Claude Chat skill",
+            },
+        },
+        "Claude render profiles do not separate plugin and Chat invocation contracts",
+    )
+    require(
         metadata.get("public_skills") == ["opensocrates"],
         "Claude generator does not declare exactly one public skill",
     )
@@ -1715,7 +1737,11 @@ def test_single_user_facing_entry() -> None:
         f"Claude source exposes unexpected top-level skills: {skill_entries}",
     )
     skill = (source / "skills" / "opensocrates" / "SKILL.md.tmpl").read_text(encoding="utf-8")
-    require("$ARGUMENTS" in skill, "explicit /opensocrates arguments are not forwarded")
+    require("$ARGUMENTS" in skill, "explicit Claude skill arguments are not forwarded")
+    require(
+        "{{CLAUDE_CANONICAL_INVOCATION}}" in skill and "{{CLAUDE_DELIVERY_SURFACE}}" in skill,
+        "Claude controller does not render its delivery-surface invocation contract",
+    )
     require(
         "references/catalog.md" in skill,
         "the single Claude skill does not route to its internal catalog",
@@ -1723,6 +1749,24 @@ def test_single_user_facing_entry() -> None:
     package = ROOT / "build" / "generated" / "plugins" / "claude"
     generated_skill = (package / "skills" / "opensocrates" / "SKILL.md").read_text(encoding="utf-8")
     generated_readme = (package / "README.md").read_text(encoding="utf-8")
+    generated_manifest = json.loads((package / "release-manifest.json").read_text(encoding="utf-8"))
+    normalized_generated_skill = " ".join(generated_skill.split())
+    normalized_generated_readme = " ".join(generated_readme.split())
+    require(
+        generated_manifest.get("render_profile") == "plugin",
+        "generated Claude plugin does not record the plugin render profile",
+    )
+    require(
+        CLAUDE_PLUGIN_INVOCATION_MARKER in normalized_generated_skill
+        and CLAUDE_CHAT_INVOCATION_MARKER not in normalized_generated_skill,
+        "generated Claude plugin controller has the wrong canonical invocation",
+    )
+    require(
+        "canonical explicit plugin invocation is `/opensocrates:opensocrates`"
+        in normalized_generated_readme
+        and "standalone Claude Chat upload ZIP uses `/opensocrates`" in normalized_generated_readme,
+        "generated Claude README does not separate plugin and Chat commands",
+    )
     require(
         "Settle each selected method's teacher questions for yourself"
         in " ".join(generated_skill.split()),
@@ -1743,6 +1787,53 @@ def test_single_user_facing_entry() -> None:
         require(
             text.find("## Teacher questions") < text.find("## Purpose"),
             f"generated Claude method does not lead with teacher questions: {method.name}",
+        )
+
+    with tempfile.TemporaryDirectory(prefix="opensocrates-claude-chat-profile-") as name:
+        chat_package = Path(name) / "generated"
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "tools" / "build_plugins.py"),
+                "--root",
+                str(ROOT),
+                "--host",
+                "claude",
+                "--render-profile",
+                "chat-standalone",
+                "--runtime-root",
+                str(Path(name) / "runtime-not-shipped"),
+                "--output",
+                str(chat_package),
+            ],
+            cwd=ROOT,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+        )
+        require(
+            result.returncode == 0,
+            f"standalone Claude Chat render failed with exit {result.returncode}",
+        )
+        chat_skill_root = chat_package / "skills" / "opensocrates"
+        chat_skill = (chat_skill_root / "SKILL.md").read_text(encoding="utf-8")
+        require(
+            CLAUDE_CHAT_INVOCATION_MARKER in " ".join(chat_skill.split()),
+            "standalone Claude Chat controller has the wrong canonical invocation",
+        )
+        require(
+            all(
+                "/opensocrates:opensocrates" not in path.read_text(encoding="utf-8")
+                for path in chat_skill_root.rglob("*.md")
+            ),
+            "standalone Claude Chat skill tree contains the plugin namespace",
+        )
+        chat_manifest = json.loads(
+            (chat_package / "release-manifest.json").read_text(encoding="utf-8")
+        )
+        require(
+            chat_manifest.get("render_profile") == "chat-standalone",
+            "standalone Claude Chat render profile is not recorded",
         )
 
 

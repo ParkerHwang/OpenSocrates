@@ -86,6 +86,15 @@ CLAUDE_RUNTIME_NOTICE_REQUIRED_TOKENS = frozenset(
 # interpretation until the product exposes an exact binary-unit contract.
 CLAUDE_ARCHIVE_COMPRESSED_LIMIT_BYTES = 50_000_000
 CLAUDE_ARCHIVE_UNCOMPRESSED_LIMIT_BYTES = 200_000_000
+CLAUDE_PLUGIN_RENDER_PROFILE = "plugin"
+CLAUDE_CHAT_RENDER_PROFILE = "chat-standalone"
+CLAUDE_PLUGIN_INVOCATION_MARKER = (
+    "`/opensocrates:opensocrates` is the canonical explicit invocation for this "
+    "Claude Code/Cowork plugin skill."
+)
+CLAUDE_CHAT_INVOCATION_MARKER = (
+    "`/opensocrates` is the canonical explicit invocation for this standalone Claude Chat skill."
+)
 _SAFE_ENVIRONMENT = {
     "PATH",
     "HOME",
@@ -975,18 +984,40 @@ def _codex_session_start_timing(root: Path) -> dict[str, Any]:
 
 
 def _build_claude_chat_skills(root: Path) -> Path:
-    """Build the single-root ZIP shape accepted by Claude's skill uploader."""
+    """Render the standalone profile into the single-root Chat upload shape."""
 
-    source = root / "build" / "generated" / "plugins" / "claude"
     destination = root / "dist" / "claude-chat-skills"
     if destination.exists():
         _safe_remove(destination, root / "dist")
-    source_skill = source / "skills" / "opensocrates"
-    if not (source_skill / "SKILL.md").is_file():
-        raise ReleaseCheckError("claude_chat_source_missing")
-    destination.mkdir(parents=True)
-    skill_root = destination / "opensocrates"
-    shutil.copytree(source_skill, skill_root, symlinks=False)
+    with tempfile.TemporaryDirectory(prefix="opensocrates-claude-chat-render-") as directory:
+        temporary = Path(directory)
+        source = temporary / "generated"
+        result = _run(
+            [
+                str(root / "tools" / "build_plugins.py"),
+                "--root",
+                str(root),
+                "--host",
+                "claude",
+                "--render-profile",
+                CLAUDE_CHAT_RENDER_PROFILE,
+                "--runtime-root",
+                str(temporary / "runtime-not-shipped"),
+                "--output",
+                str(source),
+            ],
+            root,
+            interpreter=sys.executable,
+            timeout=300.0,
+        )
+        if result.status != "pass":
+            raise ReleaseCheckError(f"claude_chat_generation_{result.code}")
+        source_skill = source / "skills" / "opensocrates"
+        if not (source_skill / "SKILL.md").is_file():
+            raise ReleaseCheckError("claude_chat_source_missing")
+        destination.mkdir(parents=True)
+        skill_root = destination / "opensocrates"
+        shutil.copytree(source_skill, skill_root, symlinks=False)
     shutil.copy2(root / "LICENSE", skill_root / "LICENSE", follow_symlinks=False)
     return destination
 
@@ -1269,6 +1300,8 @@ def _verify_release_manifest(root: Path, host: str, bundle: Mapping[str, Any]) -
         "method_ids"
     ) != bundle.get("method_ids"):
         errors.add("manifest_method_set_mismatch")
+    if host == "claude" and metadata.get("render_profile") != CLAUDE_PLUGIN_RENDER_PROFILE:
+        errors.add("claude_manifest_render_profile_invalid")
     files = metadata.get("files")
     if not isinstance(files, list):
         errors.add("manifest_files_invalid")
@@ -1468,6 +1501,28 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
             # duplicate-hooks error state even though the fallback auto-load
             # still happens to execute the hooks.
             errors.add("claude_plugin_manifest_duplicates_standard_hooks")
+        for package in (generated, dist_package):
+            try:
+                controller_text = (package / "skills" / "opensocrates" / "SKILL.md").read_text(
+                    encoding="utf-8"
+                )
+                readme_text = (package / "README.md").read_text(encoding="utf-8")
+            except (OSError, UnicodeError):
+                errors.add("claude_plugin_invocation_surface_unreadable")
+                continue
+            normalized_controller = " ".join(controller_text.split())
+            normalized_readme = " ".join(readme_text.split())
+            if (
+                CLAUDE_PLUGIN_INVOCATION_MARKER not in normalized_controller
+                or CLAUDE_CHAT_INVOCATION_MARKER in normalized_controller
+            ):
+                errors.add("claude_plugin_invocation_contract_invalid")
+            if (
+                "canonical explicit plugin invocation is `/opensocrates:opensocrates`"
+                not in normalized_readme
+                or "standalone Claude Chat upload ZIP uses `/opensocrates`" not in normalized_readme
+            ):
+                errors.add("claude_plugin_readme_invocation_boundary_invalid")
     embedded = [path for path in generated.rglob("compiled-content.bundle.json") if path.is_file()]
     if not embedded or any(path.read_bytes() != bundle_bytes for path in embedded):
         errors.add("embedded_bundle_mismatch")
@@ -1516,6 +1571,21 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
             errors.add("claude_archive_compressed_limit_exceeded")
         if archive_uncompressed_bytes > CLAUDE_ARCHIVE_UNCOMPRESSED_LIMIT_BYTES:
             errors.add("claude_archive_uncompressed_limit_exceeded")
+        if archive.is_file() and zipfile.is_zipfile(archive):
+            try:
+                with zipfile.ZipFile(archive) as package_archive:
+                    archived_controller = package_archive.read(
+                        "skills/opensocrates/SKILL.md"
+                    ).decode("utf-8")
+            except (KeyError, UnicodeError, OSError, zipfile.BadZipFile):
+                errors.add("claude_plugin_archive_invocation_unreadable")
+            else:
+                normalized_archived_controller = " ".join(archived_controller.split())
+                if (
+                    CLAUDE_PLUGIN_INVOCATION_MARKER not in normalized_archived_controller
+                    or CLAUDE_CHAT_INVOCATION_MARKER in normalized_archived_controller
+                ):
+                    errors.add("claude_plugin_archive_invocation_contract_invalid")
     runtime_targets = _load_json(generated / "release-manifest.json")
     listed_targets = runtime_targets.get("runtime_targets", []) if runtime_targets else []
     expected_runtime_targets = [] if host in NO_NATIVE_RUNTIME_HOSTS else [RELEASE_TARGET]
@@ -1611,6 +1681,34 @@ _CLAUDE_CHAT_FORBIDDEN_SUFFIXES = (
 )
 
 
+def _claude_chat_archive_markdown_errors(bundle: zipfile.ZipFile, entries: list[str]) -> set[str]:
+    errors: set[str] = set()
+    for entry in entries:
+        if not entry.lower().endswith(".md"):
+            continue
+        try:
+            markdown_text = bundle.read(entry).decode("utf-8")
+        except (KeyError, UnicodeError):
+            errors.add("claude_chat_archive_markdown_unreadable")
+            continue
+        if "/opensocrates:opensocrates" in markdown_text:
+            errors.add("claude_chat_archive_plugin_namespace_present")
+    return errors
+
+
+def _claude_chat_tree_markdown_errors(skill: Path) -> set[str]:
+    errors: set[str] = set()
+    for markdown in skill.rglob("*.md"):
+        try:
+            markdown_text = markdown.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            errors.add("claude_chat_markdown_unreadable")
+            continue
+        if "/opensocrates:opensocrates" in markdown_text:
+            errors.add("claude_chat_plugin_namespace_present")
+    return errors
+
+
 def _claude_chat_archive_errors(archive: Path) -> set[str]:
     """Assert the Chat ZIP is one directly uploadable skill folder.
 
@@ -1621,6 +1719,11 @@ def _claude_chat_archive_errors(archive: Path) -> set[str]:
     errors: set[str] = set()
     with zipfile.ZipFile(archive) as bundle:
         entries = [name for name in bundle.namelist() if not name.endswith("/")]
+        errors |= _claude_chat_archive_markdown_errors(bundle, entries)
+        try:
+            skill_text = bundle.read(f"{_CLAUDE_CHAT_SKILL_ROOT}/SKILL.md").decode("utf-8")
+        except (KeyError, UnicodeError):
+            skill_text = ""
     if _contains_eval_or_adjudication_path(entries):
         errors.add("claude_chat_archive_contains_eval_or_adjudication_artifact")
     for entry in entries:
@@ -1634,6 +1737,12 @@ def _claude_chat_archive_errors(archive: Path) -> set[str]:
         errors.add("claude_chat_archive_top_level_skill_missing")
     if any("/.claude-plugin/" in f"/{entry}" for entry in entries):
         errors.add("claude_chat_archive_plugin_manifest_present")
+    normalized_skill = " ".join(skill_text.split())
+    if (
+        CLAUDE_CHAT_INVOCATION_MARKER not in normalized_skill
+        or CLAUDE_PLUGIN_INVOCATION_MARKER in normalized_skill
+    ):
+        errors.add("claude_chat_archive_invocation_contract_invalid")
     return errors
 
 
@@ -1670,6 +1779,18 @@ def _verify_claude_chat_skills(
         errors.add("claude_chat_internal_method_references_invalid")
     if not (skill / "LICENSE").is_file():
         errors.add("claude_chat_license_missing")
+    try:
+        skill_text = (skill / "SKILL.md").read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        errors.add("claude_chat_skill_unreadable")
+    else:
+        normalized_skill = " ".join(skill_text.split())
+        if (
+            CLAUDE_CHAT_INVOCATION_MARKER not in normalized_skill
+            or CLAUDE_PLUGIN_INVOCATION_MARKER in normalized_skill
+        ):
+            errors.add("claude_chat_invocation_contract_invalid")
+    errors |= _claude_chat_tree_markdown_errors(skill)
     forbidden_trees = ("bin", "commands", "content", "hooks", "runtime", "schemas")
     if any((package / name).exists() for name in forbidden_trees):
         errors.add("claude_chat_runtime_surface_present")

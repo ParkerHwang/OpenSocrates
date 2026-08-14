@@ -23,6 +23,14 @@ README = "README.md"
 # Each requirement fails as one stable error code when any phrase is absent.
 CLAUDE_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
     (
+        "claude_readme_invocation_boundary_missing",
+        (
+            "canonical explicit plugin invocation is `/opensocrates:opensocrates`",
+            "standalone Claude Chat upload ZIP uses `/opensocrates`",
+            "compatibility behavior is not the plugin's canonical command",
+        ),
+    ),
+    (
         "claude_readme_safe_mode_scope_missing",
         (
             "user-, project-, and plugin-sourced customizations",
