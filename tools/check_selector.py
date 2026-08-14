@@ -20,12 +20,12 @@ from dataclasses import dataclass, field
 from io import BytesIO, StringIO
 from itertools import combinations
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 from unittest.mock import patch
 
 from json_schema_2020 import check_schema as check_json_schema
 from json_schema_2020 import validate as validate_json_schema
-from measure_codex_hook_timing import EXPECTED_COMMAND, measure_codex_session_start
+from measure_codex_hook_timing import EXPECTED_COMMAND, PROCESS_MODEL, measure_codex_session_start
 from opensocrates.clock import FrozenClock
 from opensocrates.content.hashes import normalized_semantic_hash, source_tree_hash
 from opensocrates.content.injection import (
@@ -87,6 +87,15 @@ from opensocrates.selector.sdk_worker import (
     _thread_config,
     _thread_start_params,
     _watch_deadline,
+)
+from release_check import (
+    CommandResult,
+    ReleaseCheckError,
+    _codex_package_manifest_identity,
+    _codex_session_start_timing,
+    _codex_session_start_timing_check,
+    _evidence_check,
+    _valid_codex_session_start_timing_evidence,
 )
 from validate_content import parse_yaml_file
 
@@ -1572,6 +1581,201 @@ def _test_codex_packaged_hook_margin_evidence() -> None:
         )
         _require(narrow_margin["latency_ms"]["p95"] == 1_000.0)
         _require(narrow_margin["pass"] is False)
+
+
+@_check("VSC-10C-codex-timing-evidence-strict-validation")
+def _test_codex_timing_evidence_strict_validation() -> None:
+    expected_identity = "sha256:" + ("0" * 64)
+    valid: dict[str, Any] = {
+        "target": "darwin-arm64",
+        "artifact_identity": expected_identity,
+        "process_model": PROCESS_MODEL,
+        "sample_count": 20,
+        "latency_ms": {"first": 900.0, "p50": 100.0, "p95": 200.0, "max": 900.0},
+        "configured_timeout_ms": 2000,
+        "pass": True,
+    }
+    _require(
+        _valid_codex_session_start_timing_evidence(
+            valid, expected_artifact_identity=expected_identity
+        )
+    )
+
+    mutations: list[dict[str, Any]] = []
+
+    extra_key = deepcopy(valid)
+    extra_key["unexpected"] = "rejected"
+    mutations.append(extra_key)
+
+    missing_key = deepcopy(valid)
+    del missing_key["target"]
+    mutations.append(missing_key)
+
+    wrong_target = deepcopy(valid)
+    wrong_target["target"] = "darwin-x64"
+    mutations.append(wrong_target)
+
+    wrong_sample_count = deepcopy(valid)
+    wrong_sample_count["sample_count"] = 20.0
+    mutations.append(wrong_sample_count)
+
+    wrong_timeout = deepcopy(valid)
+    wrong_timeout["configured_timeout_ms"] = 2000.0
+    mutations.append(wrong_timeout)
+
+    forged_pass = deepcopy(valid)
+    forged_pass["latency_ms"]["max"] = 2000.0
+    mutations.append(forged_pass)
+
+    non_boolean_pass = deepcopy(valid)
+    non_boolean_pass["pass"] = 1
+    mutations.append(non_boolean_pass)
+
+    bad_identity_length = deepcopy(valid)
+    bad_identity_length["artifact_identity"] = "sha256:" + ("0" * 63)
+    mutations.append(bad_identity_length)
+
+    bad_identity_case = deepcopy(valid)
+    bad_identity_case["artifact_identity"] = "sha256:" + ("A" * 64)
+    mutations.append(bad_identity_case)
+
+    other_valid_identity = deepcopy(valid)
+    other_valid_identity["artifact_identity"] = "sha256:" + ("1" * 64)
+    mutations.append(other_valid_identity)
+
+    forged_process_model = deepcopy(valid)
+    forged_process_model["process_model"] = "same_process"
+    mutations.append(forged_process_model)
+
+    boolean_latency = deepcopy(valid)
+    boolean_latency["latency_ms"]["p50"] = True
+    mutations.append(boolean_latency)
+
+    non_finite_nan = deepcopy(valid)
+    non_finite_nan["latency_ms"]["p50"] = float("nan")
+    mutations.append(non_finite_nan)
+
+    non_finite_infinity = deepcopy(valid)
+    non_finite_infinity["latency_ms"]["p95"] = float("inf")
+    mutations.append(non_finite_infinity)
+
+    negative_latency = deepcopy(valid)
+    negative_latency["latency_ms"]["first"] = -0.001
+    mutations.append(negative_latency)
+
+    rounded_boundary_exceeded = deepcopy(valid)
+    rounded_boundary_exceeded["latency_ms"]["p95"] = 1000.0004
+    rounded_boundary_exceeded["latency_ms"]["max"] = 1500.0
+    mutations.append(rounded_boundary_exceeded)
+
+    percentile_order_forged = deepcopy(valid)
+    percentile_order_forged["latency_ms"]["p50"] = 300.0
+    percentile_order_forged["latency_ms"]["p95"] = 200.0
+    mutations.append(percentile_order_forged)
+
+    maximum_percentile_order_forged = deepcopy(valid)
+    maximum_percentile_order_forged["latency_ms"]["p95"] = 901.0
+    mutations.append(maximum_percentile_order_forged)
+
+    maximum_order_forged = deepcopy(valid)
+    maximum_order_forged["latency_ms"]["first"] = 901.0
+    mutations.append(maximum_order_forged)
+
+    latency_key_forged = deepcopy(valid)
+    latency_key_forged["latency_ms"]["minimum"] = 0.0
+    mutations.append(latency_key_forged)
+
+    _require(
+        all(
+            not _valid_codex_session_start_timing_evidence(
+                item, expected_artifact_identity=expected_identity
+            )
+            for item in mutations
+        )
+    )
+
+
+@_check("VSC-10D-release-consumers-reject-forged-timing-evidence")
+def _test_release_consumers_reject_forged_timing_evidence() -> None:
+    with tempfile.TemporaryDirectory(prefix="opensocrates-timing-consumer-check-") as name:
+        root = Path(name)
+        manifest = root / "dist" / "codex" / "release-manifest.json"
+        manifest.parent.mkdir(parents=True)
+        manifest.write_text('{"synthetic":"manifest"}\n', encoding="utf-8")
+        expected_identity = _codex_package_manifest_identity(root)
+        _require(expected_identity is not None)
+        forged_identity = "sha256:" + ("0" * 64)
+        if forged_identity == expected_identity:
+            forged_identity = "sha256:" + ("1" * 64)
+        forged: dict[str, Any] = {
+            "target": "darwin-arm64",
+            "artifact_identity": forged_identity,
+            "process_model": PROCESS_MODEL,
+            "sample_count": 20,
+            "latency_ms": {"first": 900.0, "p50": 100.0, "p95": 200.0, "max": 900.0},
+            "configured_timeout_ms": 2000,
+            "pass": True,
+        }
+        bound = deepcopy(forged)
+        bound["artifact_identity"] = expected_identity
+        _require(
+            _valid_codex_session_start_timing_evidence(
+                bound, expected_artifact_identity=expected_identity
+            )
+        )
+        bound_projection = _codex_session_start_timing_check(root, "pass", bound)
+        _require(bound_projection["status"] == "pass")
+        _require(bound_projection["evidence"] == bound)
+
+        with (
+            patch("release_check._run", return_value=CommandResult(status="pass", code="ok")),
+            patch("release_check._load_json", return_value=forged),
+        ):
+            try:
+                _codex_session_start_timing(root)
+            except ReleaseCheckError as error:
+                _require(str(error) == "codex_session_start_timing_invalid")
+            else:
+                raise _ContractFailure
+
+        evidence_documents: dict[str, dict[str, Any]] = {
+            "security-scan.json": {
+                "schema": "opensocrates.security-scan-evidence/1.0.0",
+                "status": "pass",
+            },
+            "sbom.json": {
+                "schema": "opensocrates.sbom-evidence/1.0.0",
+                "status": "pass",
+            },
+            "sbom.spdx.json": {"spdxVersion": "SPDX-2.3"},
+            "runtime-build-claude.json": {
+                "schema": "opensocrates.runtime-build-evidence/1.0.0",
+                "status": "pass",
+                "version": "synthetic-version",
+                "runtime_profile": "claude",
+            },
+            "runtime-build-codex.json": {
+                "schema": "opensocrates.runtime-build-evidence/1.0.0",
+                "status": "pass",
+                "version": "synthetic-version",
+                "runtime_profile": "codex",
+            },
+            "codex-session-start-timing.json": forged,
+        }
+
+        def evidence_loader(path: Path) -> dict[str, Any] | None:
+            return evidence_documents.get(path.name)
+
+        with patch("release_check._load_json", side_effect=evidence_loader):
+            evidence = _evidence_check(root, "synthetic-version", assembly_status="pass")
+        _require(evidence["status"] == "fail")
+        _require(evidence["codex_session_start_timing"] is None)
+        _require(evidence["error_codes"] == ["codex_session_start_timing_invalid"])
+
+        projected = _codex_session_start_timing_check(root, "pass", forged)
+        _require(projected["status"] == "fail")
+        _require(projected["evidence"] is None)
+        _require(projected["error_codes"] == ["codex_session_start_timing_not_passing"])
 
 
 def main() -> int:
