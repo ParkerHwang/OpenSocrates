@@ -26,6 +26,14 @@ All notable changes to OpenSocrates are documented here. This project follows
   canonical `/opensocrates:opensocrates` namespace, while the separately
   rendered Claude Chat standalone skill keeps `/opensocrates`. Release checks
   reject either command when it appears in the wrong artifact.
+- Claude evidence now keeps the installer-managed local plugin, a manually
+  uploaded standalone Chat ZIP, and the pre-existing synced/custom skill as
+  separate provenance states. The historical v1.1.2 live receipt remains
+  historical, while current-version checks require a version-bound receipt.
+- The exact public v1.2.1 Chat ZIP, checksum, and release commit are unavailable
+  because no public v1.2.1 tag or release existed at the 2026-08-15 audit. The
+  current Chat receipt and EN/KO documentation therefore report live upload as
+  pending instead of inheriting the v1.1.2 validation claim.
 
 ### Security and privacy
 
@@ -41,6 +49,11 @@ All notable changes to OpenSocrates are documented here. This project follows
   bytes, mode, owner, and group on a failed post-update check when rollback is
   still safe. A later external edit is never overwritten; its owner-only
   recovery copy is preserved instead.
+- Chat evidence stores only release/archive identity, counts, versions,
+  pass/fail booleans, and categorical provenance/routing states. The missing
+  exact release artifact prevented any UI upload attempt, so no authentication,
+  2FA, user-confirmation, prompt, conversation, account, path, raw UI, upload
+  content, or credential boundary was crossed.
 
 ## [1.2.1] - 2026-08-13
 
