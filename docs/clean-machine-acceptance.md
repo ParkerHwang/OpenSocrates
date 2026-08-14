@@ -90,11 +90,14 @@ managed state available for diagnosis.
 
 ## Remove the test installation
 
-After the result has been collected, remove both managed host installations:
+After the result has been collected, close Claude Code and Codex, then remove
+both registrations and every provably OpenSocrates-owned installed payload:
 
 ```bash
-node installer/opensocrates.mjs remove --host all
+node installer/opensocrates.mjs remove --host all --purge
 ```
 
-This removes only the OpenSocrates roots owned by the installer. It does not
-sign out of Claude Code, Codex, or GitHub CLI.
+If a live host still owns a cache, purge reports an incomplete result instead
+of claiming success. Close the host and rerun the same command. The purge does
+not sign out of Claude Code, Codex, or GitHub CLI, does not reset Codex hook
+trust, and preserves unrelated host configuration and user history.

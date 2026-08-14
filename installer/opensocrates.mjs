@@ -22,6 +22,7 @@ import {
   readdir,
   rename,
   rm,
+  rmdir,
   stat,
   writeFile,
 } from "node:fs/promises";
@@ -149,6 +150,45 @@ const AUTO_UPDATE_MAX_INTERVAL_HOURS = 24 * 7;
 const AUTO_UPDATE_DEFAULT_INTERVAL_HOURS = 24;
 const AUTO_UPDATE_POLL_SECONDS = 60 * 60;
 const LOCK_STALE_MILLISECONDS = 2 * 60 * 60 * 1000;
+export const PURGE_RESULT_SCHEMA = "opensocrates.purge-result/1.0.0";
+
+// The complete-uninstall result keeps host security state separate from
+// installer-owned payload cleanup. Prompt 2 can replace this narrow Codex
+// extension without weakening the path-ownership checks in this module.
+export function purgeExtensionResult(host) {
+  return host === "codex"
+    ? {
+        component: "host-security-trust",
+        status: "preserved",
+        nextAction: "reset-codex-opensocrates-hook-trust",
+      }
+    : {
+        component: "host-security-trust",
+        status: "not-applicable",
+        nextAction: null,
+      };
+}
+
+export function createPurgeResult(hosts) {
+  return {
+    schema: PURGE_RESULT_SCHEMA,
+    status: "pending",
+    hosts: [...hosts].sort().map((host) => ({
+      host,
+      status: "pending",
+      registration: "not-checked",
+      registrationDetail: null,
+      components: [],
+      extension: purgeExtensionResult(host),
+      errors: [],
+    })),
+    finalization: {
+      status: "pending",
+      components: [],
+      errors: [],
+    },
+  };
+}
 
 export class InstallerError extends Error {}
 
@@ -166,6 +206,27 @@ async function exists(target) {
     return true;
   } catch {
     return false;
+  }
+}
+
+// Destructive paths must distinguish a missing entry from a dangling symlink.
+// access() follows links, so it is intentionally insufficient at deletion
+// boundaries where an unresolvable link must be refused rather than reported
+// as already absent.
+async function entryExists(target) {
+  try {
+    await lstat(target);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") return false;
+    throw error;
+  }
+}
+
+async function requireRegularFileEntry(target, label) {
+  const info = await lstat(target);
+  if (!info.isFile() || info.isSymbolicLink()) {
+    fail(`refusing an unsafe ${label}: ${target}`);
   }
 }
 
@@ -260,9 +321,10 @@ function normalizeDesiredState(value) {
 
 export async function readDesiredState() {
   const { desiredState } = statePaths();
-  if (!(await exists(desiredState))) {
+  if (!(await entryExists(desiredState))) {
     return defaultDesiredState();
   }
+  await requireRegularFileEntry(desiredState, "OpenSocrates desired-state file");
   let value;
   try {
     value = JSON.parse(await readFile(desiredState, "utf8"));
@@ -428,6 +490,34 @@ function jsonEqual(left, right) {
   );
 }
 
+function jsonDeepEqual(left, right) {
+  if (left === right) return true;
+  if (Array.isArray(left) || Array.isArray(right)) {
+    return (
+      Array.isArray(left) &&
+      Array.isArray(right) &&
+      left.length === right.length &&
+      left.every((item, index) => jsonDeepEqual(item, right[index]))
+    );
+  }
+  if (
+    left === null ||
+    right === null ||
+    typeof left !== "object" ||
+    typeof right !== "object"
+  ) {
+    return false;
+  }
+  const leftKeys = Object.keys(left).sort();
+  const rightKeys = Object.keys(right).sort();
+  return (
+    leftKeys.length === rightKeys.length &&
+    leftKeys.every(
+      (key, index) => key === rightKeys[index] && jsonDeepEqual(left[key], right[key]),
+    )
+  );
+}
+
 function markerFor(host) {
   if (host === "cursor") return CURSOR_MARKER;
   if (host === "antigravity") return ANTIGRAVITY_MARKER;
@@ -509,6 +599,7 @@ export function parseCli(argv) {
     intervalHours: AUTO_UPDATE_DEFAULT_INTERVAL_HOURS,
     allowMajor: false,
     force: false,
+    purge: false,
   };
   const seenOptions = new Set();
   while (args.length > 0) {
@@ -534,6 +625,11 @@ export function parseCli(argv) {
     if (flag === "--force") {
       seenOptions.add("force");
       options.force = true;
+      continue;
+    }
+    if (flag === "--purge") {
+      seenOptions.add("purge");
+      options.purge = true;
       continue;
     }
     if (flag === "--channel") {
@@ -623,6 +719,9 @@ export function parseCli(argv) {
   if (seenOptions.has("force") && !autoUpdateRun) {
     fail("--force is only valid with auto-update run");
   }
+  if (seenOptions.has("purge") && options.action !== "remove") {
+    fail("--purge is only valid with remove");
+  }
   if (
     seenOptions.has("host") &&
     options.action === "auto-update" &&
@@ -643,7 +742,7 @@ Usage:
   opensocrates install [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum SHA256]
   opensocrates status [--host all|antigravity|claude|codex|cursor|grok|opencode]
   opensocrates update [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum SHA256]
-  opensocrates remove [--host all|antigravity|claude|codex|cursor|grok|opencode]
+  opensocrates remove [--host all|antigravity|claude|codex|cursor|grok|opencode] [--purge]
   opensocrates verify [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum SHA256]
   opensocrates auto-update enable [--host all|antigravity|claude|codex|cursor|grok|opencode]
       [--channel stable|next] [--interval-hours ${AUTO_UPDATE_DEFAULT_INTERVAL_HOURS}]
@@ -656,6 +755,11 @@ package and checksum from GitHub Releases. The default lifecycle host is codex.
 With --host all, supplied host-qualified asset/checksum pairs define the exact
 transaction set and are never mixed with downloads for other hosts. Without
 qualified assets, every ready host participates. Automatic updates are opt-in.
+
+Ordinary remove unregisters the selected host and removes installer-managed
+files, but may leave host-owned caches and installer state. Add --purge for an
+explicit complete-uninstall attempt. Purge preserves user history and Codex
+hook trust; any unverified, unsafe, or in-use component is reported as pending.
 `);
 }
 
@@ -712,6 +816,28 @@ function managedPaths(host) {
     bridge: host === "opencode" ? join(hostHome, "plugins", "opensocrates.js") : null,
     bridgeMarker: host === "opencode" ? join(hostHome, "plugins", OPENCODE_BRIDGE_MARKER) : null,
     bridgeParent: host === "opencode" ? join(hostHome, "plugins") : null,
+  };
+}
+
+export function purgePathsFor(host) {
+  if (!SUPPORTED_HOSTS.includes(host)) {
+    fail(`unsupported host ${JSON.stringify(host)}`);
+  }
+  const paths = managedPaths(host);
+  const cacheRoot = ["claude", "codex"].includes(host)
+    ? join(paths.hostHome, "plugins", "cache", MARKETPLACE_NAME, PLUGIN_NAME)
+    : null;
+  return {
+    ...paths,
+    cacheRoot,
+    cacheMarketplaceRoot: cacheRoot === null ? null : dirname(cacheRoot),
+    pluginData:
+      host === "claude"
+        ? [
+            join(paths.hostHome, "plugins", "data", "opensocrates-inline"),
+            join(paths.hostHome, "plugins", "data", "opensocrates-opensocrates"),
+          ]
+        : [],
   };
 }
 
@@ -1194,7 +1320,9 @@ async function requireOwnedRoot(root, host) {
   if (!info.isDirectory() || info.isSymbolicLink()) {
     fail(`managed marketplace path is not an owned directory: ${root}`);
   }
-  const marker = await readJsonObject(join(root, MARKER_NAME));
+  const markerPath = join(root, MARKER_NAME);
+  await requireRegularFileEntry(markerPath, `${host} ownership marker`);
+  const marker = await readJsonObject(markerPath);
   if (!markerMatches(marker, host)) {
     fail(`managed marketplace path has no valid ownership marker: ${root}`);
   }
@@ -1477,6 +1605,469 @@ async function verifyExtractedPackage(pluginRoot, host) {
     }
   }
   return verifyPackageChecksums(pluginRoot);
+}
+
+async function requireSafePathBelow(root, target, label, { allowRoot = false } = {}) {
+  const resolvedRoot = resolve(root);
+  const resolvedTarget = resolve(target);
+  if (await entryExists(resolvedRoot)) {
+    const rootInfo = await lstat(resolvedRoot);
+    if (!rootInfo.isDirectory() || rootInfo.isSymbolicLink()) {
+      fail(`refusing an unsafe ${label} root: ${root}`);
+    }
+  }
+  const suffix = relative(resolvedRoot, resolvedTarget);
+  if (
+    (!allowRoot && !suffix) ||
+    suffix === ".." ||
+    suffix.startsWith(`..${sep}`) ||
+    resolve(resolvedRoot, suffix) !== resolvedTarget
+  ) {
+    fail(`refusing an unsafe ${label} path: ${target}`);
+  }
+  let current = resolvedRoot;
+  for (const component of suffix.split(sep)) {
+    current = join(current, component);
+    if (!(await entryExists(current))) continue;
+    const info = await lstat(current);
+    if (info.isSymbolicLink()) {
+      fail(`refusing a symbolic-link ${label} path: ${current}`);
+    }
+  }
+  if (await entryExists(resolvedTarget)) {
+    let canonical;
+    let canonicalRoot = resolvedRoot;
+    try {
+      canonical = realpathSync(resolvedTarget);
+      if (await entryExists(resolvedRoot)) canonicalRoot = realpathSync(resolvedRoot);
+    } catch (error) {
+      fail(`cannot canonicalize ${label}: ${error.message}`);
+    }
+    if (canonical !== resolve(canonicalRoot, suffix)) {
+      fail(`refusing a non-canonical ${label} path: ${target}`);
+    }
+  }
+}
+
+async function packageIdentityForPurge(pluginRoot, host, { allowedExtra = () => false } = {}) {
+  const rootInfo = await lstat(pluginRoot);
+  if (!rootInfo.isDirectory() || rootInfo.isSymbolicLink()) {
+    fail(`OpenSocrates ${host} payload is not a real directory: ${pluginRoot}`);
+  }
+  const releasePath = join(pluginRoot, "release-manifest.json");
+  const manifestPath = join(pluginRoot, HOST_LAYOUTS[host].manifestRelative);
+  const checksumPath = join(pluginRoot, "checksums.sha256");
+  for (const [target, label] of [
+    [releasePath, `${host} release manifest`],
+    [manifestPath, `${host} plugin manifest`],
+    [checksumPath, `${host} checksum inventory`],
+  ]) {
+    await requireRegularFileEntry(target, label);
+  }
+  const release = await readJsonObject(releasePath);
+  const version = release.product_version;
+  if (
+    release.schema !== "opensocrates.plugin-release-manifest/1.0.0" ||
+    release.host !== host ||
+    typeof version !== "string" ||
+    version.trim().length === 0 ||
+    !Number.isInteger(release.content_revision) ||
+    release.content_revision < 1
+  ) {
+    fail(`OpenSocrates ${host} payload has an invalid release identity`);
+  }
+  const manifest = await readJsonObject(manifestPath);
+  if (manifest.name !== PLUGIN_NAME || manifest.version !== version) {
+    fail(`OpenSocrates ${host} payload has a mismatched plugin identity`);
+  }
+
+  const lines = (await readFile(checksumPath, "utf8"))
+    .split(/\r?\n/u)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (lines.length === 0) fail(`OpenSocrates ${host} payload has an empty checksum inventory`);
+  const declared = new Set();
+  for (const line of lines) {
+    const match = line.match(/^([a-fA-F0-9]{64})\s+[*]?(.+)$/u);
+    if (!match) fail(`OpenSocrates ${host} payload has an invalid checksum inventory`);
+    const item = match[2].trim();
+    if (!isSafeArchivePath(item) || item === "checksums.sha256" || declared.has(item)) {
+      fail(`OpenSocrates ${host} payload has an unsafe checksum path`);
+    }
+    const target = join(pluginRoot, ...item.split("/"));
+    if (!(await entryExists(target))) fail(`OpenSocrates ${host} payload is missing a declared file`);
+    const info = await lstat(target);
+    if (!info.isFile() || info.isSymbolicLink()) {
+      fail(`OpenSocrates ${host} payload contains an unsafe declared file`);
+    }
+    if ((await sha256File(target)) !== match[1].toLowerCase()) {
+      fail(`OpenSocrates ${host} payload checksum verification failed`);
+    }
+    declared.add(item);
+  }
+  const actual = await walkFiles(pluginRoot);
+  for (const item of actual) {
+    if (item === "checksums.sha256" || declared.has(item) || allowedExtra(item)) continue;
+    fail(`OpenSocrates ${host} payload contains an unowned file: ${item}`);
+  }
+  return { version, files: actual };
+}
+
+async function cacheHasLiveUser(versionRoot) {
+  const marker = join(versionRoot, ".in_use");
+  if (!(await entryExists(marker))) return false;
+  const markerInfo = await lstat(marker);
+  if (!markerInfo.isDirectory() || markerInfo.isSymbolicLink()) {
+    fail("OpenSocrates cache has an unsafe .in_use marker");
+  }
+  const entries = await readdir(marker, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.isSymbolicLink() || !entry.isFile() || !/^[1-9]\d*$/u.test(entry.name)) {
+      fail("OpenSocrates cache has an unrecognized .in_use entry");
+    }
+    const pid = Number(entry.name);
+    if (!Number.isSafeInteger(pid)) fail("OpenSocrates cache has an invalid .in_use process ID");
+    try {
+      process.kill(pid, 0);
+      return true;
+    } catch (error) {
+      if (error?.code === "EPERM") return true;
+      if (error?.code !== "ESRCH") {
+        fail("OpenSocrates cache use could not be determined safely");
+      }
+    }
+  }
+  return false;
+}
+
+async function removeDirectoryIfEmpty(target) {
+  if (!(await entryExists(target))) return false;
+  try {
+    await rmdir(target);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOTEMPTY" || error?.code === "EEXIST") return false;
+    throw error;
+  }
+}
+
+async function purgeHostCache(host, paths) {
+  if (paths.cacheRoot === null) {
+    return { component: "plugin-cache", status: "absent", path: paths.cacheRoot };
+  }
+  if (!(await entryExists(paths.cacheRoot))) {
+    let removedEmptyMarketplace = false;
+    if (await entryExists(paths.cacheMarketplaceRoot)) {
+      await requireSafePathBelow(paths.hostHome, paths.cacheMarketplaceRoot, `${host} cache marketplace`);
+      const info = await lstat(paths.cacheMarketplaceRoot);
+      if (!info.isDirectory() || info.isSymbolicLink()) {
+        fail(`refusing an unsafe ${host} OpenSocrates cache marketplace`);
+      }
+      if ((await readdir(paths.cacheMarketplaceRoot)).length !== 0) {
+        fail(`refusing an unrecognized entry in the ${host} OpenSocrates cache marketplace`);
+      }
+      await rmdir(paths.cacheMarketplaceRoot);
+      removedEmptyMarketplace = true;
+    }
+    return {
+      component: "plugin-cache",
+      status: removedEmptyMarketplace ? "removed" : "absent",
+      path: paths.cacheMarketplaceRoot,
+    };
+  }
+  await requireSafePathBelow(paths.hostHome, paths.cacheRoot, `${host} plugin cache`);
+  const rootInfo = await lstat(paths.cacheRoot);
+  if (!rootInfo.isDirectory() || rootInfo.isSymbolicLink()) {
+    fail(`refusing an unsafe ${host} OpenSocrates plugin-cache root`);
+  }
+  const versions = await readdir(paths.cacheRoot, { withFileTypes: true });
+  let removed = 0;
+  let pending = 0;
+  for (const version of versions) {
+    if (!version.isDirectory() || version.isSymbolicLink()) {
+      fail(`refusing an unrecognized entry in the ${host} OpenSocrates plugin cache`);
+    }
+    const versionRoot = join(paths.cacheRoot, version.name);
+    await requireSafePathBelow(paths.cacheRoot, versionRoot, `${host} cached plugin version`);
+    const identity = await packageIdentityForPurge(versionRoot, host, {
+      allowedExtra: (item) => item === ".orphaned_at" || item.startsWith(".in_use/"),
+    });
+    if (identity.version !== version.name) {
+      fail(`refusing a ${host} cache directory whose version does not match its manifests`);
+    }
+    if (await cacheHasLiveUser(versionRoot)) {
+      pending += 1;
+      continue;
+    }
+    await rm(versionRoot, { recursive: true });
+    removed += 1;
+  }
+  if (pending === 0) {
+    const cacheRootRemoved = await removeDirectoryIfEmpty(paths.cacheRoot);
+    if (!cacheRootRemoved && (await entryExists(paths.cacheRoot))) {
+      return {
+        component: "plugin-cache",
+        status: "pending",
+        path: paths.cacheRoot,
+        detail: "cache-changed-during-purge",
+      };
+    }
+    const marketplaceRemoved = await removeDirectoryIfEmpty(paths.cacheMarketplaceRoot);
+    if (!marketplaceRemoved && (await entryExists(paths.cacheMarketplaceRoot))) {
+      return {
+        component: "plugin-cache",
+        status: "pending",
+        path: paths.cacheMarketplaceRoot,
+        detail: "unrecognized-cache-marketplace-content",
+      };
+    }
+  }
+  return {
+    component: "plugin-cache",
+    status: pending > 0 ? "pending" : removed > 0 ? "removed" : "absent",
+    path: paths.cacheRoot,
+    detail: pending > 0 ? "host-in-use" : null,
+  };
+}
+
+async function purgeClaudePluginData(paths) {
+  const results = [];
+  for (const target of paths.pluginData) {
+    if (!(await entryExists(target))) {
+      results.push({ component: "plugin-data", status: "absent", path: target });
+      continue;
+    }
+    await requireSafePathBelow(paths.hostHome, target, "Claude OpenSocrates plugin data");
+    const info = await lstat(target);
+    if (!info.isDirectory() || info.isSymbolicLink()) {
+      fail(`refusing an unsafe Claude OpenSocrates plugin-data path: ${target}`);
+    }
+    if ((await readdir(target)).length !== 0) {
+      results.push({
+        component: "plugin-data",
+        status: "pending",
+        path: target,
+        detail: "nonempty-unverified-data",
+      });
+      continue;
+    }
+    await rmdir(target);
+    results.push({ component: "plugin-data", status: "removed", path: target });
+  }
+  return results;
+}
+
+async function verifyOpenCodePurgeRoot(root) {
+  await requireOwnedRoot(root, "opencode");
+  const manifestPath = join(root, OPENCODE_INSTALL_MANIFEST);
+  await requireRegularFileEntry(manifestPath, "OpenCode installation inventory");
+  const manifest = await readJsonObject(manifestPath);
+  const manifestKeys = Object.keys(manifest).sort();
+  if (
+    !jsonDeepEqual(manifestKeys, ["bridgeSha256", "files", "schema", "version"]) ||
+    manifest.schema !== "opensocrates.opencode-installation/1.0.0" ||
+    typeof manifest.version !== "string" ||
+    manifest.version.trim().length === 0 ||
+    !/^[a-f0-9]{64}$/u.test(manifest.bridgeSha256) ||
+    manifest.files === null ||
+    typeof manifest.files !== "object" ||
+    Array.isArray(manifest.files)
+  ) {
+    fail("OpenCode installation inventory is invalid");
+  }
+  const declared = Object.keys(manifest.files);
+  const actual = new Set(await walkFiles(root));
+  actual.delete(OPENCODE_INSTALL_MANIFEST);
+  if (
+    actual.size !== declared.length ||
+    declared.some((item) => !isSafeArchivePath(item) || !actual.has(item) || !/^[a-f0-9]{64}$/u.test(manifest.files[item]))
+  ) {
+    fail("OpenCode installation inventory does not cover the complete managed skill");
+  }
+  for (const item of declared) {
+    if ((await sha256File(join(root, ...item.split("/")))) !== manifest.files[item]) {
+      fail(`OpenCode installed file checksum mismatch for ${item}`);
+    }
+  }
+  return manifest;
+}
+
+async function verifyManagedTreeForPurge(host, root) {
+  if (host === "opencode") return verifyOpenCodePurgeRoot(root);
+  await requireOwnedRoot(root, host);
+  const layout = HOST_LAYOUTS[host];
+  const pluginRoot = join(root, layout.pluginRelative);
+  const identity = await packageIdentityForPurge(pluginRoot, host, {
+    allowedExtra: (item) => FILE_DROP_HOSTS.includes(host) && item === MARKER_NAME,
+  });
+  if (FILE_DROP_HOSTS.includes(host)) return identity;
+
+  const marketplacePath = join(root, layout.marketplaceRelative);
+  await requireRegularFileEntry(marketplacePath, `${host} marketplace manifest`);
+  const marketplace = await readJsonObject(marketplacePath);
+  const expected = expectedMarketplace(host);
+  if (host === "claude") expected.metadata.version = identity.version;
+  if (!jsonDeepEqual(marketplace, expected)) {
+    fail(`${host} managed marketplace does not match the exact owned plugin inventory`);
+  }
+  const allowed = new Set([
+    MARKER_NAME,
+    layout.marketplaceRelative.split(sep).join("/"),
+    ...identity.files.map((item) => join(layout.pluginRelative, ...item.split("/")).split(sep).join("/")),
+  ]);
+  for (const item of await walkFiles(root)) {
+    if (!allowed.has(item)) fail(`${host} managed marketplace contains an unowned file: ${item}`);
+  }
+  return identity;
+}
+
+async function removeOwnedManagedRoot(host, paths) {
+  if (!(await entryExists(paths.root))) {
+    return { component: "managed-root", status: "absent", path: paths.root };
+  }
+  await requireSafePathBelow(paths.hostHome, paths.root, `${host} managed root`);
+  await verifyManagedTreeForPurge(host, paths.root);
+  const backup = join(transientParent(host, paths), `.opensocrates.removed-${randomUUID()}`);
+  await requireSafePathBelow(paths.hostHome, backup, `${host} removal backup`);
+  await rename(paths.root, backup);
+  try {
+    await verifyManagedTreeForPurge(host, backup);
+    await rm(backup, { recursive: true });
+  } catch (error) {
+    if ((await entryExists(backup)) && !(await entryExists(paths.root))) {
+      const restored = await recoveryStep(`restore the ${host} managed root after purge cleanup failed`, async () => {
+        await verifyManagedTreeForPurge(host, backup);
+        await rename(backup, paths.root);
+      });
+      if (!restored) {
+        console.error(`error: recoverable ${host} files remain at: ${backup}`);
+        console.error(`error: retry command: opensocrates remove --host ${host} --purge`);
+      }
+    }
+    throw error;
+  }
+  return { component: "managed-root", status: "removed", path: paths.root };
+}
+
+async function cleanupTransientRootResidue(host, paths) {
+  const parent = transientParent(host, paths);
+  if (!(await entryExists(parent))) {
+    return { component: "transaction-residue", status: "absent", path: parent };
+  }
+  await requireSafePathBelow(paths.hostHome, parent, `${host} transient parent`, { allowRoot: true });
+  const names = (await readdir(parent)).filter((name) =>
+    /^\.opensocrates\.(?:staging|backup|removed)-[A-Za-z0-9-]+$/u.test(name),
+  );
+  let removed = 0;
+  for (const name of names) {
+    const target = join(parent, name);
+    await requireSafePathBelow(parent, target, `${host} transaction residue`);
+    const info = await lstat(target);
+    if (!info.isDirectory() || info.isSymbolicLink()) {
+      fail(`refusing unsafe ${host} transaction residue: ${target}`);
+    }
+    if ((await readdir(target)).length !== 0) {
+      await verifyManagedTreeForPurge(host, target);
+    }
+    await rm(target, { recursive: true });
+    removed += 1;
+  }
+  return {
+    component: "transaction-residue",
+    status: removed > 0 ? "removed" : "absent",
+    path: parent,
+  };
+}
+
+async function readOpenCodeBridgeSidecar(target) {
+  const info = await lstat(target);
+  if (!info.isFile() || info.isSymbolicLink()) {
+    fail(`OpenCode bridge ownership sidecar is unsafe: ${target}`);
+  }
+  const sidecar = await readJsonObject(target);
+  const expectedKeys = [...Object.keys(OPENCODE_MARKER), "version", "bridgeSha256"].sort();
+  const observedKeys = Object.keys(sidecar).sort();
+  const marker = Object.fromEntries(Object.keys(OPENCODE_MARKER).map((key) => [key, sidecar[key]]));
+  if (
+    expectedKeys.length !== observedKeys.length ||
+    expectedKeys.some((key, index) => key !== observedKeys[index]) ||
+    !markerMatches(marker, "opencode") ||
+    typeof sidecar.version !== "string" ||
+    sidecar.version.trim().length === 0 ||
+    !/^[a-f0-9]{64}$/u.test(sidecar.bridgeSha256)
+  ) {
+    fail(`OpenCode bridge ownership sidecar is invalid: ${target}`);
+  }
+  return sidecar;
+}
+
+async function purgeOpenCodeBridge(paths) {
+  const bridgePresent = await entryExists(paths.bridge);
+  const markerPresent = await entryExists(paths.bridgeMarker);
+  if (!bridgePresent && !markerPresent) {
+    return { component: "opencode-bridge", status: "absent", path: paths.bridge };
+  }
+  await requireSafePathBelow(paths.hostHome, paths.bridge, "OpenCode bridge");
+  await requireSafePathBelow(paths.hostHome, paths.bridgeMarker, "OpenCode bridge sidecar");
+  if (bridgePresent && !markerPresent) {
+    fail("refusing to remove an OpenCode bridge without its ownership sidecar");
+  }
+  const sidecar = await readOpenCodeBridgeSidecar(paths.bridgeMarker);
+  if (bridgePresent) {
+    const bridgeInfo = await lstat(paths.bridge);
+    if (!bridgeInfo.isFile() || bridgeInfo.isSymbolicLink() || (await sha256File(paths.bridge)) !== sidecar.bridgeSha256) {
+      fail("refusing to remove an OpenCode bridge whose ownership checksum does not match");
+    }
+    await rm(paths.bridge);
+  }
+  await rm(paths.bridgeMarker);
+  return { component: "opencode-bridge", status: "removed", path: paths.bridge };
+}
+
+async function purgeOpenCodeBridgeResidue(paths) {
+  if (!(await entryExists(paths.bridgeParent))) {
+    return { component: "opencode-bridge-residue", status: "absent", path: paths.bridgeParent };
+  }
+  await requireSafePathBelow(paths.hostHome, paths.bridgeParent, "OpenCode bridge parent");
+  const entries = await readdir(paths.bridgeParent, { withFileTypes: true });
+  const bridgeNames = entries
+    .filter((entry) => /^\.opensocrates\.js\.(?:staging|backup|removed)-[A-Za-z0-9-]+$/u.test(entry.name))
+    .map((entry) => entry.name);
+  const markerNames = entries
+    .filter((entry) =>
+      /^\.opensocrates-managed\.json\.(?:staging|backup|removed)-[A-Za-z0-9-]+$/u.test(entry.name),
+    )
+    .map((entry) => entry.name);
+  const bridges = new Map();
+  for (const name of bridgeNames) {
+    const target = join(paths.bridgeParent, name);
+    await requireSafePathBelow(paths.bridgeParent, target, "OpenCode bridge residue");
+    const info = await lstat(target);
+    if (!info.isFile() || info.isSymbolicLink()) fail(`unsafe OpenCode bridge residue: ${target}`);
+    bridges.set(target, await sha256File(target));
+  }
+  let removed = 0;
+  for (const name of markerNames) {
+    const marker = join(paths.bridgeParent, name);
+    await requireSafePathBelow(paths.bridgeParent, marker, "OpenCode bridge sidecar residue");
+    const sidecar = await readOpenCodeBridgeSidecar(marker);
+    const matches = [...bridges].filter(([, digest]) => digest === sidecar.bridgeSha256);
+    if (matches.length > 1) fail("ambiguous OpenCode bridge transaction residue");
+    if (matches.length === 1) {
+      const [[bridge]] = matches;
+      await rm(bridge);
+      bridges.delete(bridge);
+      removed += 1;
+    }
+    await rm(marker);
+    removed += 1;
+  }
+  if (bridges.size > 0) fail("refusing OpenCode bridge residue without an ownership sidecar");
+  return {
+    component: "opencode-bridge-residue",
+    status: removed > 0 ? "removed" : "absent",
+    path: paths.bridgeParent,
+  };
 }
 
 async function prepareVerifiedPackage(options, host = options.host) {
@@ -1781,7 +2372,9 @@ async function preflightHost(host, action) {
   }
   const paths = managedPaths(host);
   if (host === "opencode") {
-    const presence = await Promise.all([paths.root, paths.bridge, paths.bridgeMarker].map((target) => exists(target)));
+    const presence = await Promise.all(
+      [paths.root, paths.bridge, paths.bridgeMarker].map((target) => entryExists(target)),
+    );
     if (presence.some(Boolean) && !presence.every(Boolean)) {
       fail("OpenCode has a partial or unowned OpenSocrates installation; refusing to replace it");
     }
@@ -1803,7 +2396,7 @@ async function preflightHost(host, action) {
         "refusing to overwrite an unmanaged location",
     );
   }
-  const rootExists = await exists(paths.root);
+  const rootExists = await entryExists(paths.root);
   if (rootExists) {
     await requireOwnedRoot(paths.root, host);
   }
@@ -1830,7 +2423,7 @@ async function preflightSelectedHosts(options, action, desiredState) {
   const candidates = assetHosts.length > 0 ? assetHosts : SUPPORTED_HOSTS;
   const desiredHosts = new Set(desiredState.installedHosts);
   const rootPresence = Object.fromEntries(
-    await Promise.all(candidates.map(async (host) => [host, await exists(managedPaths(host).root)])),
+    await Promise.all(candidates.map(async (host) => [host, await entryExists(managedPaths(host).root)])),
   );
   const settled = await Promise.allSettled(candidates.map((host) => preflightHost(host, action)));
   const successes = new Map();
@@ -1924,15 +2517,15 @@ async function activateInstallation(transaction) {
     transaction.registrationRemoved = true;
     removeRegistration(host, previousEntry, previousState);
   }
-  if (await exists(paths.root)) {
+  if (await entryExists(paths.root)) {
     await rename(paths.root, transaction.backup);
     transaction.backupCreated = true;
   }
-  if (host === "opencode" && (await exists(paths.bridge))) {
+  if (host === "opencode" && (await entryExists(paths.bridge))) {
     await rename(paths.bridge, transaction.bridgeBackup);
     transaction.bridgeBackupCreated = true;
   }
-  if (host === "opencode" && (await exists(paths.bridgeMarker))) {
+  if (host === "opencode" && (await entryExists(paths.bridgeMarker))) {
     await rename(paths.bridgeMarker, transaction.bridgeMarkerBackup);
     transaction.bridgeMarkerBackupCreated = true;
   }
@@ -2251,8 +2844,11 @@ function removalTransaction(preflight) {
         : null,
     registrationRemoved: false,
     backupCreated: false,
+    rootCommitted: false,
     bridgeBackupCreated: false,
+    bridgeCommitted: false,
     bridgeMarkerBackupCreated: false,
+    bridgeMarkerCommitted: false,
   };
 }
 
@@ -2262,30 +2858,40 @@ async function activateRemoval(transaction) {
     transaction.registrationRemoved = true;
     removeRegistration(host, previousEntry, previousState);
   }
-  if (await exists(paths.root)) {
+  if (await entryExists(paths.root)) {
     await rename(paths.root, transaction.backup);
     transaction.backupCreated = true;
   }
-  if (host === "opencode" && (await exists(paths.bridge))) {
+  if (host === "opencode" && (await entryExists(paths.bridge))) {
     await rename(paths.bridge, transaction.bridgeBackup);
     transaction.bridgeBackupCreated = true;
   }
-  if (host === "opencode" && (await exists(paths.bridgeMarker))) {
+  if (host === "opencode" && (await entryExists(paths.bridgeMarker))) {
     await rename(paths.bridgeMarker, transaction.bridgeMarkerBackup);
     transaction.bridgeMarkerBackupCreated = true;
   }
 }
 
 async function rollbackRemoval(transaction) {
-  let restored = !transaction.backupCreated;
-  if (transaction.backupCreated && (await exists(transaction.backup))) {
+  let complete = true;
+  let restored = !transaction.rootExists;
+  if (transaction.rootExists && transaction.backupCreated && (await entryExists(transaction.backup))) {
     restored = await recoveryStep(`restore the removed ${transaction.host} files`, async () => {
       await requireOwnedRoot(transaction.backup, transaction.host);
       await rename(transaction.backup, transaction.paths.root);
+      transaction.backupCreated = false;
     });
+  } else if (transaction.rootExists && !transaction.rootCommitted && !transaction.backupCreated) {
+    restored = await entryExists(transaction.paths.root);
   }
-  if (transaction.registrationRemoved && transaction.previousEntry !== null && restored) {
-    await recoveryStep(`restore the removed ${transaction.host} registration`, async () => {
+  complete = restored && complete;
+  if (
+    transaction.registrationRemoved &&
+    transaction.previousEntry !== null &&
+    restored &&
+    (await entryExists(transaction.paths.root))
+  ) {
+    const registrationRestored = await recoveryStep(`restore the removed ${transaction.host} registration`, async () => {
       addRegistration(
         transaction.host,
         transaction.paths.root,
@@ -2293,37 +2899,86 @@ async function rollbackRemoval(transaction) {
         { enabled: transaction.previousState.kind !== "disabled" },
       );
     });
+    complete = registrationRestored && complete;
+  } else if (transaction.registrationRemoved && transaction.previousEntry !== null) {
+    complete = false;
   }
   if (transaction.host === "opencode") {
-    if (transaction.bridgeBackupCreated && (await exists(transaction.bridgeBackup))) {
-      await recoveryStep("restore the removed OpenCode bridge", async () => {
+    let bridgeRestored = !transaction.rootExists;
+    if (
+      transaction.rootExists &&
+      transaction.bridgeBackupCreated &&
+      (await entryExists(transaction.bridgeBackup))
+    ) {
+      bridgeRestored = await recoveryStep("restore the removed OpenCode bridge", async () => {
         await rename(transaction.bridgeBackup, transaction.paths.bridge);
+        transaction.bridgeBackupCreated = false;
       });
+    } else if (transaction.rootExists && !transaction.bridgeCommitted && !transaction.bridgeBackupCreated) {
+      bridgeRestored = await entryExists(transaction.paths.bridge);
     }
-    if (transaction.bridgeMarkerBackupCreated && (await exists(transaction.bridgeMarkerBackup))) {
-      await recoveryStep("restore the removed OpenCode bridge sidecar", async () => {
+    complete = bridgeRestored && complete;
+    let markerRestored = !transaction.rootExists;
+    if (
+      transaction.rootExists &&
+      transaction.bridgeMarkerBackupCreated &&
+      (await entryExists(transaction.bridgeMarkerBackup))
+    ) {
+      markerRestored = await recoveryStep("restore the removed OpenCode bridge sidecar", async () => {
         await rename(transaction.bridgeMarkerBackup, transaction.paths.bridgeMarker);
+        transaction.bridgeMarkerBackupCreated = false;
       });
+    } else if (
+      transaction.rootExists &&
+      !transaction.bridgeMarkerCommitted &&
+      !transaction.bridgeMarkerBackupCreated
+    ) {
+      markerRestored = await entryExists(transaction.paths.bridgeMarker);
     }
+    complete = markerRestored && complete;
   }
+  transaction.originalStateRestored = complete;
+  return complete;
 }
 
 async function commitRemoval(transaction) {
-  if (transaction.backupCreated && (await exists(transaction.backup))) {
+  if (transaction.backupCreated && (await entryExists(transaction.backup))) {
     await requireOwnedRoot(transaction.backup, transaction.host);
     await rm(transaction.backup, { recursive: true });
+    transaction.backupCreated = false;
+    transaction.rootCommitted = true;
   }
   if (transaction.host === "opencode") {
-    for (const [created, backup, label] of [
-      [transaction.bridgeBackupCreated, transaction.bridgeBackup, "bridge"],
-      [transaction.bridgeMarkerBackupCreated, transaction.bridgeMarkerBackup, "bridge sidecar"],
+    for (const [flag, backup, label] of [
+      ["bridgeBackupCreated", transaction.bridgeBackup, "bridge"],
+      ["bridgeMarkerBackupCreated", transaction.bridgeMarkerBackup, "bridge sidecar"],
     ]) {
-      if (!created || !(await exists(backup))) continue;
+      if (!transaction[flag] || !(await entryExists(backup))) continue;
       const info = await lstat(backup);
       if (!info.isFile() || info.isSymbolicLink()) {
         fail(`refusing to remove an unsafe OpenCode ${label} backup: ${backup}`);
       }
       await rm(backup);
+      transaction[flag] = false;
+      if (flag === "bridgeBackupCreated") transaction.bridgeCommitted = true;
+      else transaction.bridgeMarkerCommitted = true;
+    }
+  }
+}
+
+async function validateRemovalCommit(transaction) {
+  if (transaction.backupCreated && (await entryExists(transaction.backup))) {
+    await requireOwnedRoot(transaction.backup, transaction.host);
+  }
+  if (transaction.host !== "opencode") return;
+  for (const [created, backup, label] of [
+    [transaction.bridgeBackupCreated, transaction.bridgeBackup, "bridge"],
+    [transaction.bridgeMarkerBackupCreated, transaction.bridgeMarkerBackup, "bridge sidecar"],
+  ]) {
+    if (!created || !(await entryExists(backup))) continue;
+    const info = await lstat(backup);
+    if (!info.isFile() || info.isSymbolicLink()) {
+      fail(`refusing to remove an unsafe OpenCode ${label} backup: ${backup}`);
     }
   }
 }
@@ -2539,14 +3194,42 @@ async function installLaunchAgent(channel, hosts) {
   }
 }
 
+async function requireOwnedLaunchAgent(target) {
+  const info = await lstat(target);
+  if (!info.isFile() || info.isSymbolicLink()) {
+    fail(`refusing to remove an unsafe LaunchAgent path: ${target}`);
+  }
+  const document = await readFile(target, "utf8");
+  const labelPattern = new RegExp(
+    `<key>\\s*Label\\s*</key>\\s*<string>\\s*${AUTO_UPDATE_LABEL.replaceAll(".", "\\.")}\\s*</string>`,
+    "gu",
+  );
+  const argumentBlocks = [
+    ...document.matchAll(/<key>\s*ProgramArguments\s*<\/key>\s*<array>([\s\S]*?)<\/array>/gu),
+  ];
+  const arguments_ =
+    argumentBlocks.length === 1
+      ? [...argumentBlocks[0][1].matchAll(/<string>([\s\S]*?)<\/string>/gu)].map((match) => match[1].trim())
+      : [];
+  if (
+    [...document.matchAll(labelPattern)].length !== 1 ||
+    arguments_.length !== 5 ||
+    !arguments_[0].startsWith("/") ||
+    arguments_[1] !== "--yes" ||
+    !/^opensocrates@(?:latest|next)$/u.test(arguments_[2]) ||
+    arguments_[3] !== "auto-update" ||
+    arguments_[4] !== "run"
+  ) {
+    fail(`refusing to remove a LaunchAgent without the OpenSocrates ownership identity: ${target}`);
+  }
+}
+
 async function disableLaunchAgent() {
   const paths = statePaths();
-  const agentPresent = await exists(paths.launchAgent);
+  const agentPresent = await entryExists(paths.launchAgent);
   if (agentPresent) {
-    const info = await lstat(paths.launchAgent);
-    if (!info.isFile() || info.isSymbolicLink()) {
-      fail(`refusing to remove an unsafe LaunchAgent path: ${paths.launchAgent}`);
-    }
+    await requireSafePathBelow(paths.launchAgentsDirectory, paths.launchAgent, "OpenSocrates LaunchAgent");
+    await requireOwnedLaunchAgent(paths.launchAgent);
   }
   if (process.env.OPENSOCRATES_SKIP_LAUNCHCTL !== "1") {
     stopLoadedLaunchAgent();
@@ -2562,7 +3245,7 @@ async function disableAutoUpdateState(desired) {
   };
 }
 
-async function runRemove(options) {
+async function runStandardRemove(options, { report = true } = {}) {
   const desired = await readDesiredState();
   const preflights = await preflightSelectedHosts(options, "remove", desired);
   const removedHosts = preflights.map((item) => item.host);
@@ -2577,7 +3260,7 @@ async function runRemove(options) {
       ? { ...desired.autoUpdate, hosts: remainingAutoUpdateHosts }
       : { enabled: false, hosts: [], nextCheckAt: null },
   };
-  const launchAgentPresent = await exists(statePaths().launchAgent);
+  const launchAgentPresent = await entryExists(statePaths().launchAgent);
   const schedulerNeedsChange =
     options.host === ALL_HOST ||
     remainingHosts.length === 0 ||
@@ -2585,6 +3268,7 @@ async function runRemove(options) {
     desired.autoUpdate.hosts.some((host) => removedHosts.includes(host));
   const transactions = preflights.map(removalTransaction);
   let schedulerTouched = false;
+  let desiredWritten = false;
   try {
     for (const transaction of transactions) await activateRemoval(transaction);
     if (schedulerNeedsChange) {
@@ -2596,43 +3280,63 @@ async function runRemove(options) {
       }
     }
     await writeDesiredState(nextDesired);
+    desiredWritten = true;
+    for (const transaction of transactions) await validateRemovalCommit(transaction);
+    for (const transaction of transactions) await commitRemoval(transaction);
   } catch (error) {
-    for (const transaction of [...transactions].reverse()) await rollbackRemoval(transaction);
+    let rollbackComplete = true;
+    for (const transaction of [...transactions].reverse()) {
+      const restored = await rollbackRemoval(transaction);
+      rollbackComplete = restored && rollbackComplete;
+    }
+    const unrestoredHosts = new Set(
+      transactions.filter((transaction) => transaction.originalStateRestored !== true).map((item) => item.host),
+    );
+    const recoveredHosts = desired.installedHosts.filter((host) => !unrestoredHosts.has(host));
+    const recoveredAutoUpdateHosts = desired.autoUpdate.hosts.filter((host) => recoveredHosts.includes(host));
+    const keepRecoveredAutoUpdate = desired.autoUpdate.enabled && recoveredAutoUpdateHosts.length > 0;
+    let recoveredDesired = {
+      ...desired,
+      installedHosts: recoveredHosts,
+      activeVersion: recoveredHosts.length === 0 ? null : desired.activeVersion,
+      autoUpdate: keepRecoveredAutoUpdate
+        ? { ...desired.autoUpdate, hosts: recoveredAutoUpdateHosts }
+        : { enabled: false, hosts: [], nextCheckAt: null },
+    };
+    let schedulerRestored = true;
     if (schedulerTouched) {
-      const schedulerRestored = await recoveryStep("restore the automatic updater after removal failure", async () => {
-        if (desired.autoUpdate.enabled) {
-          await installLaunchAgent(desired.channel, desired.autoUpdate.hosts);
+      schedulerRestored = await recoveryStep("reconcile the automatic updater after removal failure", async () => {
+        if (recoveredDesired.autoUpdate.enabled) {
+          await installLaunchAgent(recoveredDesired.channel, recoveredDesired.autoUpdate.hosts);
         } else {
           await disableLaunchAgent();
         }
       });
-      if (!schedulerRestored && desired.autoUpdate.enabled) {
-        await recoveryStep("record the disabled updater after removal failure", async () => {
-          await writeDesiredState({
-            ...desired,
-            autoUpdate: {
-              enabled: false,
-              hosts: [],
-              nextCheckAt: null,
-            },
-          });
-        });
-      }
-    } else if (!nextDesired.autoUpdate.enabled && desired.autoUpdate.enabled) {
-      await recoveryStep("record the disabled updater after removal failure", async () => {
-        await writeDesiredState({
-          ...desired,
+      if (!schedulerRestored && recoveredDesired.autoUpdate.enabled) {
+        recoveredDesired = {
+          ...recoveredDesired,
           autoUpdate: {
             enabled: false,
             hosts: [],
             nextCheckAt: null,
           },
-        });
+        };
+      }
+      rollbackComplete = schedulerRestored && rollbackComplete;
+    }
+    if (desiredWritten || !rollbackComplete || !schedulerRestored) {
+      const stateRestored = await recoveryStep("record desired state after removal failure", async () => {
+        await writeDesiredState(recoveredDesired);
       });
+      rollbackComplete = stateRestored && rollbackComplete;
+    }
+    if (!rollbackComplete) {
+      console.error("error: removal cleanup is incomplete; no success was recorded.");
+      console.error("error: inspect any preserved .opensocrates.removed-* paths and rerun remove --purge.");
     }
     throw error;
   }
-  for (const transaction of transactions) await commitRemoval(transaction);
+  if (!report) return { removedHosts, desired: nextDesired };
   for (const host of removedHosts) {
     const label =
       host === "antigravity"
@@ -2649,6 +3353,368 @@ async function runRemove(options) {
     console.log(`OpenSocrates was removed from ${label}.`);
   }
   if (removedHosts.length === 0) console.log("OpenSocrates is not installed on any managed host.");
+  console.log("Removal scope: registrations and installer-managed roots only; this is not a complete uninstall.");
+  const residue = [];
+  for (const host of removedHosts) {
+    const paths = purgePathsFor(host);
+    for (const target of [paths.cacheRoot, paths.cacheMarketplaceRoot, ...paths.pluginData]) {
+      if (target !== null && (await entryExists(target))) residue.push(target);
+    }
+  }
+  for (const target of [statePaths().desiredState, statePaths().receipt]) {
+    if (await entryExists(target)) residue.push(target);
+  }
+  for (const target of [...new Set(residue)]) console.log(`Remaining OpenSocrates path: ${target}`);
+  if (removedHosts.includes("codex")) {
+    console.log("Codex OpenSocrates hook trust is preserved by this removal contract.");
+  }
+  console.log(`Next: close active hosts, then run opensocrates remove --host ${options.host} --purge.`);
+  return { removedHosts, desired: nextDesired };
+}
+
+async function purgeRegistration(host, paths) {
+  if (FILE_DROP_HOSTS.includes(host) || host === "opencode") {
+    return { status: "not-applicable", detail: "file-owned-host" };
+  }
+  try {
+    requireHostCli(host);
+  } catch (error) {
+    return {
+      status: "unverified",
+      detail: error instanceof Error ? error.message : String(error),
+    };
+  }
+  if (host === "claude") warnLegacyClaudeInstallation();
+  const entry = marketplaceEntry(host);
+  if (entry !== null && entryRoot(entry, host) !== paths.root) {
+    fail(`${host} OpenSocrates registration points to an unmanaged location`);
+  }
+  const state = pluginState(host);
+  const present = entry !== null || ["installed", "disabled"].includes(state.kind);
+  removeRegistration(host, entry, state);
+  const remainingEntry = marketplaceEntry(host);
+  const remainingState = pluginState(host);
+  if (remainingEntry !== null || ["installed", "disabled"].includes(remainingState.kind)) {
+    fail(`${host} did not confirm removal of the exact ${PLUGIN_ID} registration`);
+  }
+  return { status: present ? "removed" : "absent", detail: null };
+}
+
+async function capturePurgeComponent(hostResult, component, action) {
+  try {
+    const value = await action();
+    const items = Array.isArray(value) ? value : [value];
+    hostResult.components.push(...items);
+    return items;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    hostResult.components.push({ component, status: "failed", path: null, detail: message });
+    hostResult.errors.push(message);
+    return [];
+  }
+}
+
+function purgeComponentBlocksCompletion(component) {
+  return new Set(["pending", "failed"]).has(component.status);
+}
+
+function finalizePurgeHostResult(hostResult) {
+  const registrationComplete = new Set(["removed", "absent", "not-applicable"]).has(hostResult.registration);
+  hostResult.status =
+    registrationComplete && !hostResult.components.some(purgeComponentBlocksCompletion) ? "complete" : "partial";
+  return hostResult.status === "complete";
+}
+
+async function purgeOneHost(hostResult) {
+  const paths = purgePathsFor(hostResult.host);
+  try {
+    const registration = await purgeRegistration(hostResult.host, paths);
+    hostResult.registration = registration.status;
+    hostResult.registrationDetail = registration.detail;
+    if (registration.status === "unverified") hostResult.errors.push(registration.detail);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    hostResult.registration = "failed";
+    hostResult.registrationDetail = message;
+    hostResult.errors.push(message);
+  }
+
+  await capturePurgeComponent(hostResult, "managed-root", () =>
+    removeOwnedManagedRoot(hostResult.host, paths),
+  );
+  if (hostResult.host === "opencode") {
+    await capturePurgeComponent(hostResult, "opencode-bridge", () => purgeOpenCodeBridge(paths));
+  }
+  await capturePurgeComponent(hostResult, "transaction-residue", () =>
+    cleanupTransientRootResidue(hostResult.host, paths),
+  );
+  if (hostResult.host === "opencode") {
+    await capturePurgeComponent(hostResult, "opencode-bridge-residue", () =>
+      purgeOpenCodeBridgeResidue(paths),
+    );
+  }
+  if (paths.cacheRoot !== null) {
+    await capturePurgeComponent(hostResult, "plugin-cache", () => purgeHostCache(hostResult.host, paths));
+  }
+  if (paths.pluginData.length > 0) {
+    await capturePurgeComponent(hostResult, "plugin-data", () => purgeClaudePluginData(paths));
+  }
+  finalizePurgeHostResult(hostResult);
+}
+
+function hostDeactivated(hostResult) {
+  const registrationComplete = new Set(["removed", "absent", "not-applicable"]).has(hostResult.registration);
+  const activationComponents = hostResult.components.filter((item) =>
+    new Set(["managed-root", "opencode-bridge"]).has(item.component),
+  );
+  return registrationComplete && !activationComponents.some(purgeComponentBlocksCompletion);
+}
+
+async function updatePurgeDesiredState(options, desired, result) {
+  const deactivated = result.hosts.filter(hostDeactivated).map((item) => item.host);
+  const installedHosts = desired.installedHosts.filter((host) => !deactivated.includes(host));
+  const autoUpdateHosts = desired.autoUpdate.hosts.filter((host) => !deactivated.includes(host));
+  const keepAutoUpdate = desired.autoUpdate.enabled && autoUpdateHosts.length > 0;
+  let nextDesired = {
+    ...desired,
+    installedHosts,
+    activeVersion: installedHosts.length === 0 ? null : desired.activeVersion,
+    autoUpdate: keepAutoUpdate
+      ? { ...desired.autoUpdate, hosts: autoUpdateHosts }
+      : { enabled: false, hosts: [], nextCheckAt: null },
+  };
+  const launchAgentPresent = await entryExists(statePaths().launchAgent);
+  const schedulerNeedsChange =
+    options.host === ALL_HOST ||
+    installedHosts.length === 0 ||
+    launchAgentPresent !== keepAutoUpdate ||
+    desired.autoUpdate.hosts.some((host) => deactivated.includes(host));
+  if (schedulerNeedsChange) {
+    try {
+      if (keepAutoUpdate) await installLaunchAgent(desired.channel, autoUpdateHosts);
+      else await disableLaunchAgent();
+      result.finalization.components.push({
+        component: "launch-agent",
+        status: launchAgentPresent ? "removed-or-reconciled" : "absent",
+        path: statePaths().launchAgent,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      result.finalization.components.push({
+        component: "launch-agent",
+        status: "failed",
+        path: statePaths().launchAgent,
+        detail: message,
+      });
+      result.finalization.errors.push(message);
+      nextDesired = desired;
+    }
+  } else {
+    result.finalization.components.push({
+      component: "launch-agent",
+      status: "preserved",
+      path: statePaths().launchAgent,
+    });
+  }
+  try {
+    nextDesired = await writeDesiredState(nextDesired);
+    result.finalization.components.push({
+      component: "desired-state",
+      status: "updated",
+      path: statePaths().desiredState,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    result.finalization.components.push({
+      component: "desired-state",
+      status: "failed",
+      path: statePaths().desiredState,
+      detail: message,
+    });
+    result.finalization.errors.push(message);
+  }
+  return nextDesired;
+}
+
+async function preparePurgeStateFinalization() {
+  const paths = statePaths();
+  if (!(await entryExists(paths.directory))) return { directory: paths.directory, tombstones: [] };
+  const directoryInfo = await lstat(paths.directory);
+  if (!directoryInfo.isDirectory() || directoryInfo.isSymbolicLink()) {
+    fail(`refusing to finalize an unsafe OpenSocrates state directory: ${paths.directory}`);
+  }
+  const uuid = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
+  const stateTemporary = new RegExp(
+    `^\\.(?:desired-state|auto-update-receipt)\\.json\\.${uuid}\\.tmp$`,
+    "u",
+  );
+  const purgeTombstone = new RegExp(
+    `^\\.purge-finalize-${uuid}-(?:desired-state\\.json|auto-update-receipt\\.json|` +
+      `\\.(?:desired-state|auto-update-receipt)\\.json\\.${uuid}\\.tmp)$`,
+    "u",
+  );
+  const candidates = [paths.desiredState, paths.receipt];
+  const tombstones = [];
+  for (const name of await readdir(paths.directory)) {
+    if (stateTemporary.test(name)) {
+      candidates.push(join(paths.directory, name));
+    } else if (purgeTombstone.test(name)) {
+      tombstones.push({ original: null, tombstone: join(paths.directory, name) });
+    }
+  }
+  const renamed = [];
+  try {
+    for (const item of tombstones) {
+      await requireSafePathBelow(paths.directory, item.tombstone, "OpenSocrates prior purge tombstone");
+      const info = await lstat(item.tombstone);
+      if (!info.isFile() || info.isSymbolicLink()) {
+        fail(`refusing to remove an unsafe prior OpenSocrates purge tombstone: ${item.tombstone}`);
+      }
+    }
+    for (const target of candidates) {
+      if (!(await entryExists(target))) continue;
+      await requireSafePathBelow(paths.directory, target, "OpenSocrates state file");
+      const info = await lstat(target);
+      if (!info.isFile() || info.isSymbolicLink()) {
+        fail(`refusing to remove an unsafe OpenSocrates state file: ${target}`);
+      }
+      const tombstone = join(paths.directory, `.purge-finalize-${randomUUID()}-${basename(target)}`);
+      await rename(target, tombstone);
+      const item = { original: target, tombstone };
+      tombstones.push(item);
+      renamed.push(item);
+    }
+    return { directory: paths.directory, tombstones };
+  } catch (error) {
+    for (const item of [...renamed].reverse()) {
+      await recoveryStep("restore installer state after purge finalization failed", async () => {
+        if (await entryExists(item.tombstone)) await rename(item.tombstone, item.original);
+      });
+    }
+    throw error;
+  }
+}
+
+async function completePurgeStateFinalization(plan, result, options) {
+  try {
+    for (const item of plan.tombstones) {
+      if (!(await entryExists(item.tombstone))) continue;
+      await requireSafePathBelow(plan.directory, item.tombstone, "OpenSocrates purge tombstone");
+      const info = await lstat(item.tombstone);
+      if (!info.isFile() || info.isSymbolicLink()) {
+        fail(`refusing to remove an unsafe OpenSocrates purge tombstone: ${item.tombstone}`);
+      }
+      await rm(item.tombstone);
+    }
+    if (await entryExists(plan.directory)) await rmdir(plan.directory);
+    result.finalization.components.push({
+      component: "state-directory",
+      status: "removed",
+      path: plan.directory,
+    });
+    result.finalization.status = "complete";
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    result.finalization.components.push({
+      component: "state-directory",
+      status: "failed",
+      path: plan.directory,
+      detail: message,
+    });
+    result.finalization.errors.push(message);
+    result.finalization.status = "partial";
+    result.status = "partial";
+    console.error(`error: OpenSocrates state cleanup remains at: ${plan.directory}`);
+    console.error(`error: retry command: opensocrates remove --host ${options.host} --purge`);
+  }
+}
+
+async function runPurgeLocked(options) {
+  const hosts = options.host === ALL_HOST ? SUPPORTED_HOSTS : [options.host];
+  const result = createPurgeResult(hosts);
+  const desired = await readDesiredState();
+  for (const hostResult of result.hosts) await purgeOneHost(hostResult);
+  const nextDesired = await updatePurgeDesiredState(options, desired, result);
+  const hostsComplete = result.hosts.every((item) => item.status === "complete");
+  const finalizationComplete = result.finalization.errors.length === 0;
+  result.status = hostsComplete && finalizationComplete ? "complete" : "partial";
+  let stateFinalization = null;
+  if (
+    result.status === "complete" &&
+    nextDesired.installedHosts.length === 0 &&
+    !nextDesired.autoUpdate.enabled
+  ) {
+    try {
+      stateFinalization = await preparePurgeStateFinalization();
+      result.finalization.status = "ready";
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      result.finalization.components.push({
+        component: "state-finalization",
+        status: "failed",
+        path: statePaths().directory,
+        detail: message,
+      });
+      result.finalization.errors.push(message);
+      result.finalization.status = "partial";
+      result.status = "partial";
+    }
+  } else {
+    result.finalization.status = result.status === "complete" ? "preserved" : "deferred";
+  }
+  return { result, stateFinalization };
+}
+
+function reportPurgeResult(result) {
+  for (const host of result.hosts) {
+    console.log(`${host.host}: purge ${host.status}; registration ${host.registration}.`);
+    if (
+      new Set(["unverified", "failed"]).has(host.registration) &&
+      typeof host.registrationDetail === "string"
+    ) {
+      console.error(`${host.host}: registration ${host.registration} (${host.registrationDetail})`);
+    }
+    for (const component of host.components) {
+      if (new Set(["pending", "failed"]).has(component.status)) {
+        console.error(
+          `${host.host}: ${component.component} ${component.status}` +
+            (component.path ? ` at ${component.path}` : "") +
+            (component.detail ? ` (${component.detail})` : ""),
+        );
+      }
+    }
+    if (host.extension.status === "preserved") {
+      console.log(`${host.host}: host security trust was preserved for the dedicated trust-reset extension.`);
+    }
+  }
+  for (const component of result.finalization.components) {
+    if (new Set(["pending", "failed"]).has(component.status)) {
+      console.error(
+        `finalization: ${component.component} ${component.status}` +
+          (component.path ? ` at ${component.path}` : "") +
+          (component.detail ? ` (${component.detail})` : ""),
+      );
+    }
+  }
+  if (result.status === "complete") {
+    console.log("OpenSocrates purge completed for registrations and provably owned payloads.");
+    console.log("User task, project, chat, plan, and history data was preserved.");
+  } else {
+    console.error("OpenSocrates purge is incomplete; no complete-uninstall success is claimed.");
+    console.error("Resolve the reported item, close active hosts if needed, and rerun the same purge command.");
+  }
+}
+
+async function runPurge(options) {
+  const outcome = await withOperationLock(() => runPurgeLocked(options));
+  if (outcome.stateFinalization !== null) {
+    await completePurgeStateFinalization(outcome.stateFinalization, outcome.result, options);
+  }
+  reportPurgeResult(outcome.result);
+  if (outcome.result.status !== "complete") {
+    fail("purge remains pending or failed for one or more components");
+  }
+  return outcome.result;
 }
 
 async function enableAutoUpdate(options) {
@@ -2915,9 +3981,13 @@ export async function main(argv = process.argv.slice(2)) {
     await showAutoUpdateStatus();
     return 0;
   }
+  if (options.action === "remove" && options.purge) {
+    await runPurge(options);
+    return 0;
+  }
   return withOperationLock(async () => {
     if (options.action === "remove") {
-      await runRemove(options);
+      await runStandardRemove(options);
       return 0;
     }
     if (options.action === "auto-update") {

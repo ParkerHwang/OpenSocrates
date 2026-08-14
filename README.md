@@ -113,6 +113,43 @@ npx --yes opensocrates@1.2.1 update --host all
 npx --yes opensocrates@1.2.1 remove --host all
 ```
 
+### Remove a registration or completely uninstall owned payloads
+
+Ordinary `remove` keeps its backward-compatible, narrow contract: it removes
+the selected exact host registration and installer-managed root and reconciles
+the updater, but it may leave host-owned OpenSocrates plugin caches and the
+installer desired-state file. Its output names every remaining known
+OpenSocrates path and the purge command to run next; it does not describe that
+result as a complete uninstall.
+
+After closing active hosts, request the explicit complete-uninstall path:
+
+```bash
+npx --yes opensocrates@1.2.1 remove --host all --purge
+# One host: npx --yes opensocrates@1.2.1 remove --host claude --purge
+```
+
+Purge verifies canonical paths, the exact `opensocrates@opensocrates` package
+identity, manifests, checksums, and installer ownership markers before deleting
+anything. It covers the managed roots, exact Claude/Codex cache versions, empty
+Claude OpenSocrates plugin-data directories, OpenCode's owned skill/bridge/
+sidecar, the OpenSocrates LaunchAgent, known transaction residue, and—after the
+lifecycle lock is released—the final known installer state files and an empty
+state directory. It never recursively deletes broad host parents such as
+`~/.claude/plugins`, `~/.codex/plugins`, or `~/.opensocrates`.
+
+An active Claude cache with a live `.in_use/<pid>`, a missing host CLI that
+prevents registration verification, a symlink, an invalid marker or manifest,
+nonempty unverified plugin data, or a cleanup/permission failure makes the
+result `pending` or failed and the command exits unsuccessfully. Close the
+host or resolve the reported path and rerun the same purge command; a completed
+purge is idempotent. Other plugins and user task, project, chat, plan, and
+history data are preserved byte-for-byte.
+
+Codex hook trust is host security state, not executable payload. This purge
+reports that the exact OpenSocrates hook trust is preserved; a dedicated,
+narrow trust-reset extension is intentionally deferred to separate work.
+
 A private `~/.opensocrates/desired-state.json` manifest records the selected
 channel, installed hosts, and desired active version. `status --host all`
 reports the desired and available versions, last check, last successful

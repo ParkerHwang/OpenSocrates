@@ -108,6 +108,41 @@ npx --yes opensocrates@1.2.1 update --host all
 npx --yes opensocrates@1.2.1 remove --host all
 ```
 
+### 등록 제거와 소유 payload 완전 제거
+
+일반 `remove`는 기존과 호환되는 좁은 계약을 유지합니다. 선택한 정확한 호스트 등록과
+설치 프로그램 관리 루트를 제거하고 업데이터를 조정하지만, 호스트가 소유한
+OpenSocrates 플러그인 캐시와 설치 프로그램 desired-state 파일은 남을 수 있습니다.
+출력은 남은 것으로 확인된 OpenSocrates 경로와 다음 purge 명령을 표시하며, 이 결과를
+완전 제거라고 설명하지 않습니다.
+
+활성 호스트를 닫은 뒤 명시적인 완전 제거 경로를 실행하세요.
+
+```bash
+npx --yes opensocrates@1.2.1 remove --host all --purge
+# 호스트 하나: npx --yes opensocrates@1.2.1 remove --host claude --purge
+```
+
+Purge는 항목을 삭제하기 전에 canonical 경로, 정확한
+`opensocrates@opensocrates` 패키지 ID, 매니페스트, 체크섬, 설치 프로그램 소유권
+표식을 확인합니다. 관리 루트, 정확한 Claude/Codex 캐시 버전, 비어 있는 Claude
+OpenSocrates 플러그인 data 디렉터리, OpenCode 소유 스킬·브리지·사이드카,
+OpenSocrates LaunchAgent, 알려진 트랜잭션 잔여물, 그리고 lifecycle lock 해제 뒤의
+알려진 최종 설치 프로그램 상태 파일과 빈 상태 디렉터리를 대상으로 합니다.
+`~/.claude/plugins`, `~/.codex/plugins`, `~/.opensocrates` 같은 넓은 상위 경로를
+재귀 삭제하지 않습니다.
+
+살아 있는 `.in_use/<pid>`가 있는 Claude 캐시, 등록 확인을 막는 누락된 호스트 CLI,
+symlink, 잘못된 소유권 표식이나 매니페스트, 비어 있지 않아 소유권을 증명할 수 없는
+플러그인 data, 정리·권한 실패가 있으면 결과를 `pending` 또는 실패로 보고하고 명령도
+실패 종료합니다. 호스트를 닫거나 보고된 경로를 해결한 뒤 같은 purge를 다시
+실행하세요. 완료된 purge는 여러 번 실행해도 같은 결과를 냅니다. 다른 플러그인과
+사용자 task·project·chat·plan·history 데이터는 byte-for-byte 보존합니다.
+
+Codex 훅 신뢰는 실행 payload가 아니라 호스트 보안 상태입니다. 이번 purge는 정확한
+OpenSocrates 훅 신뢰를 보존했다고 보고하며, 범위가 좁은 전용 신뢰 초기화 extension은
+별도 작업으로 명시적으로 미룹니다.
+
 소유자 전용 `~/.opensocrates/desired-state.json`에는 선택 채널, 설치된 호스트,
 원하는 활성 버전이 기록됩니다. `status --host all`은 원하는 버전과 사용 가능한
 버전, 마지막 확인, 마지막 성공 자동 업데이트, 호스트별 버전 차이를 보여 줍니다.

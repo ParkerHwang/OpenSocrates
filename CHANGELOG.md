@@ -5,6 +5,27 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ## [Unreleased]
 
+### Added
+
+- `remove --host <host|all> --purge` provides an explicit, idempotent
+  complete-uninstall attempt for exact OpenSocrates registrations, verified
+  host cache payloads, empty Claude plugin-data directories, OpenCode-owned
+  files, the updater, transaction residue, and final installer state.
+
+### Changed
+
+- Ordinary `remove` now states its narrower registration/managed-root contract,
+  reports known remaining OpenSocrates paths, and points to the purge command
+  instead of implying that every installed payload was removed.
+
+### Security and privacy
+
+- Purge verifies canonical non-symlink paths, exact package identity,
+  manifests, checksums, and ownership markers; live `.in_use` payloads,
+  unverified registration, unknown data, and cleanup failures remain pending.
+  Unrelated host configuration and user history are preserved. Codex hook trust
+  is reported as preserved for a separate narrow reset extension.
+
 ## [1.2.1] - 2026-08-13
 
 ### Added

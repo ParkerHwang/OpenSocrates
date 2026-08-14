@@ -84,11 +84,14 @@ ZIP만 첨부하세요. 체크섬 또는 깨끗한 시작 상태 검증이 실�
 
 ## 테스트 설치 제거
 
-결과를 확보한 뒤 두 관리형 호스트 설치를 제거하려면 다음을 실행하세요.
+결과를 확보한 뒤 Claude Code와 Codex를 닫고, 두 등록과 소유권을 증명할 수 있는 모든
+OpenSocrates 설치 payload를 제거하려면 다음을 실행하세요.
 
 ```bash
-node installer/opensocrates.mjs remove --host all
+node installer/opensocrates.mjs remove --host all --purge
 ```
 
-설치 프로그램이 소유한 OpenSocrates 루트만 제거합니다. Claude Code, Codex 또는
-GitHub CLI에서는 로그아웃하지 않습니다.
+실행 중인 호스트가 캐시를 사용하고 있으면 purge는 성공이라고 하지 않고 불완전
+결과를 보고합니다. 호스트를 닫은 뒤 같은 명령을 다시 실행하세요. Claude Code,
+Codex, GitHub CLI에서 로그아웃하지 않고, Codex 훅 신뢰도 초기화하지 않으며,
+관계없는 호스트 설정과 사용자 기록을 보존합니다.
