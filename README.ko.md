@@ -28,11 +28,12 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 런처는 `darwin-arm64`만 허용하며, Intel Mac·Linux·Windows용 런처와 런타임은
 이번 릴리스에 포함되거나 지원되지 않습니다.
 
-> **최신 릴리스: OpenSocrates 1.2.1.** mutation 검사를 거친 공개 v1.2
-> adjudication 스냅샷과 한영 세 질문 스승 오버레이를 여섯 호스트 패키지에
-> 추가하면서 각 호스트의 실제 전달·근거 경계를 유지했습니다.
-> `npx --yes opensocrates@1.2.1 update --host all`로 관리 호스트를 함께
-> 업데이트하세요.
+> **현재 저장소 버전: OpenSocrates 1.2.1, 공개 대기 중.** mutation 검사를 거친
+> 공개 v1.2 adjudication 스냅샷과 한영 세 질문 스승 오버레이를 여섯 호스트
+> 패키지에 추가하면서 각 호스트의 실제 전달·근거 경계를 유지했습니다.
+> 2026-08-15 provenance 검사에서는 공개 GitHub `v1.2.1` 태그/릴리스와 npm
+> 1.2.1 패키지가 없었고, 최신 공개 GitHub 릴리스는 v1.2.0입니다. 아래의 1.2.1
+> 고정 명령은 릴리스 목표 예시이며 공개 전에는 사용할 수 없습니다.
 
 ## 호스트 지원 범위
 
@@ -47,7 +48,7 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 | Claude Code CLI | `UserPromptSubmit` 훅으로 지원 | 플러그인: `/opensocrates:opensocrates` | `darwin-arm64` 로컬 검증 완료 |
 | Claude Code 데스크톱 앱 Local 모드 | Claude Code 플러그인이 실행되는 곳에서 지원 | 플러그인: `/opensocrates:opensocrates` | [인증된 훅 생명주기 로컬 검증 완료](docs/claude-desktop-live-probe.md) |
 | 로컬 플러그인을 사용하는 Claude Cowork | 실측 로컬 플러그인 업로드에서 지원 | 플러그인: `/opensocrates:opensocrates` | [네이티브 훅 생명주기 로컬 검증 완료, 릴리스 직접 업로드 지원, 마켓플레이스 동기화 없음](docs/claude-cowork-live-probe.md) |
-| Claude 웹 및 Desktop Chat | OpenSocrates 훅 미지원 | 독립형 스킬: `/opensocrates` | [실제 업로드 및 호출 검증 완료](docs/claude-chat-upload-probe.md) |
+| Claude 웹 및 Desktop Chat | OpenSocrates 훅 미지원 | 독립형 스킬: `/opensocrates` | [v1.1.2 업로드만 과거 검증 완료, 정확한 v1.2.1 릴리스와 실제 업로드는 대기 중](docs/claude-chat-upload-probe.md) |
 
 상태 열은 서로 다른 네 단계를 뜻하며 같은 의미로 읽으면 안 됩니다.
 
@@ -70,6 +71,12 @@ canonical 명령으로 `/opensocrates`를 사용합니다. Chat 화면은 패키
 훅을 실행하지 않으며, 프롬프트마다 자동으로 선택하는 기능은 플러그인 런타임을
 실행하는 Claude Code와 Cowork 화면에서만 작동합니다. 훅이나 셀렉터를 사용할 수
 없으면 OpenSocrates는 작업을 막지 않고 통과합니다.
+
+Claude provenance 세 가지를 분리해서 보세요. installer가 관리하는 로컬 플러그인,
+Chat에 수동 업로드하는 standalone ZIP, 기존 synced/custom skill은 서로 다른
+근거입니다. 로컬 플러그인 status는 두 Cloud 상태를 증명하거나 갱신할 수 없습니다.
+현재 기록된 로컬 플러그인 버전은 1.2.1이고 기존 synced/custom 관측은 1.1.2이지만,
+둘 다 정확한 v1.2.1 standalone 릴리스 ZIP을 업로드했다는 증거가 아닙니다.
 
 공개된 v1.1.2 Claude 플러그인 아카이브는 Cowork의 문서화된 압축 크기 제한과
 실측 압축 해제 크기 제한을 모두 초과했습니다. 출시 전 v1.1.3 후보는 압축
@@ -241,10 +248,20 @@ LaunchAgent를 언로드하고 삭제하며, `remove --host all`도 관리 호�
 ### Claude 웹 및 Desktop Chat 스킬
 
 이 화면들은 별도로 업로드한 독립형 스킬을 사용할 수 있지만 로컬 플러그인 훅은
-실행하지 않습니다. 릴리스에서
-`opensocrates-1.2.1-claude-chat-skills.zip`을 내려받아 Claude의 **사용자 지정 →
-스킬 → 스킬 업로드** 화면에서 업로드하세요. ZIP은 업로더 요구사항에 맞춰
-최상위 `opensocrates/` 폴더 바로 아래에 `SKILL.md`를 둡니다. 이 파일은 Claude
+실행하지 않습니다.
+
+정확한 v1.2.1 Chat 릴리스 아티팩트: **사용 불가, 실제 업로드 대기 중.**
+
+2026-08-15 검사 시점에 GitHub에는 공개 `v1.2.1` 태그나 릴리스가 없습니다. 따라서
+`opensocrates-1.2.1-claude-chat-skills.zip`, checksum, release commit을 검증하거나
+업로드할 수 없습니다. source에서 만든 candidate나 Claude Code/Cowork 플러그인
+archive로 대체하지 마세요. 기존 v1.1.2 실제 영수증은 과거 근거일 뿐이며 기존
+synced/custom skill은 변경하지 않았습니다. [버전에 묶인 근거와 상태 전환
+조건](docs/claude-chat-upload-probe.md)을 확인하세요.
+
+정확한 릴리스가 공개되면 checksum을 먼저 검증한 뒤 Claude의 **사용자 지정 → 스킬
+→ 스킬 업로드** 화면을 사용하세요. ZIP은 업로더 요구사항에 맞춰 최상위
+`opensocrates/` 폴더 바로 아래에 `SKILL.md`를 둬야 합니다. 이 파일은 Claude
 Code/Cowork 플러그인 아카이브가 아닙니다. 독립형 패키지는 canonical
 `/opensocrates` 스킬 하나만 노출하고, 48개 방법 절차와 엄격도·근거·추적 제어는
 내부 참조로 둡니다. Chat은 패키지된 훅을 실행하지 않으므로 훅 기반 자동 선택은
@@ -254,7 +271,9 @@ Code/Cowork 플러그인 아카이브가 아닙니다. 독립형 패키지는 ca
 
 ### 태그가 고정된 GitHub 소스에서 설치
 
-npm 레지스트리를 거치지 않을 때도 같은 호스트 옵션을 사용합니다.
+태그가 공개된 뒤에는 npm 레지스트리를 거치지 않을 때도 같은 호스트 옵션을
+사용합니다. 2026-08-15 검사 시점에 `v1.2.1` 태그가 없으므로 아래 명령은 현재 실행
+지침이 아니라 릴리스 목표 예시입니다.
 
 ```bash
 npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host all
@@ -265,8 +284,11 @@ npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host opencode
 
 ### 릴리스 파일 직접 검증
 
+공개 뒤에는
 [v1.2.1 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.2.1)에서
-`opensocrates.mjs`, 호스트 패키지, `.sha256` 파일을 내려받습니다. Claude의 예:
+`opensocrates.mjs`, 호스트 패키지, `.sha256` 파일을 내려받습니다. 이 릴리스는
+2026-08-15 검사 시점에 사용할 수 없습니다. 아래 명령은 모든 이름의 asset이 생긴
+뒤에만 사용하세요. Claude의 예:
 
 ```bash
 shasum -a 256 -c opensocrates-1.2.1-claude-plugin.zip.sha256

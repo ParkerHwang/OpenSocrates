@@ -12,9 +12,12 @@ import sys
 import tempfile
 import time
 from collections.abc import Callable
+from copy import deepcopy
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
+from claude_chat_evidence import evidence_path, validation_errors
 from opensocrates.application.diagnose import build_diagnose
 from opensocrates.cli.integrity import verify_runtime_integrity
 from opensocrates.cli.runtime import build_runtime_services
@@ -2220,22 +2223,23 @@ def test_cowork_live_probe_validates_native_hooks() -> None:
     )
 
 
-@check("CLAUDE-17-chat-archive-live-upload-evidence")
+@check("CLAUDE-17-chat-versioned-release-and-live-evidence")
 def test_chat_archive_live_upload_evidence() -> None:
-    report = json.loads(
+    historical = json.loads(
         (ROOT / "docs" / "evidence" / "claude-chat-upload-probe-v1.1.2.json").read_text(
             encoding="utf-8"
         )
     )
     require(
-        report.get("status") == "pass" and report.get("blocker") is None,
-        "Chat upload probe did not pass cleanly",
+        historical.get("status") == "pass" and historical.get("blocker") is None,
+        "historical Chat upload probe did not pass cleanly",
     )
-    archive = report.get("archive")
+    archive = historical.get("archive")
     require(
         isinstance(archive, dict)
         and archive.get("sha256")
         == "sha256:920fe772d1e926e0b9e315d15c197d9d878d45d7f596d768360694bb21af9178"
+        and archive.get("product_version") == "1.1.2"
         and archive.get("file_count") == 51
         and archive.get("public_skill_count") == 1
         and archive.get("internal_method_count") == 48
@@ -2248,19 +2252,82 @@ def test_chat_archive_live_upload_evidence() -> None:
         not any(value for key, value in archive.items() if key.endswith("_present")),
         "Chat archive evidence contains a forbidden surface",
     )
-    observations = report.get("ui_observations")
+    observations = historical.get("ui_observations")
     require(
         isinstance(observations, dict) and all(observations.values()),
         "Chat upload or invocation observation is incomplete",
     )
-    privacy = report.get("privacy")
+    privacy = historical.get("privacy")
     require(
         isinstance(privacy, dict) and not any(privacy.values()),
         "Chat probe contains private evidence",
     )
     require(
-        report.get("support_claim") == "skills_only_upload_path_validated",
-        "Chat support claim is not backed by the live receipt",
+        historical.get("support_claim") == "skills_only_upload_path_validated",
+        "historical Chat support claim is not backed by its live receipt",
+    )
+
+    current = json.loads(evidence_path(ROOT, PRODUCT_VERSION).read_text(encoding="utf-8"))
+    current_errors = validation_errors(
+        current,
+        product_version=PRODUCT_VERSION,
+        content_revision=CONTENT_REVISION,
+    )
+    require(
+        not current_errors,
+        f"current Chat evidence is invalid: {','.join(current_errors)}",
+    )
+    mutations: tuple[tuple[str, Callable[[dict[str, Any]], None]], ...] = (
+        (
+            "historical version substitution",
+            lambda value: value.__setitem__("product_version", "1.1.2"),
+        ),
+        ("unsupported pass upgrade", lambda value: value.__setitem__("status", "pass")),
+        (
+            "surface provenance collision",
+            lambda value: value["surfaces"]["manual_chat_zip"].__setitem__(
+                "provenance", "installer_managed_local_plugin"
+            ),
+        ),
+        (
+            "private evidence field",
+            lambda value: value["privacy"].__setitem__("prompt_recorded", True),
+        ),
+    )
+    for name, mutate in mutations:
+        candidate = deepcopy(current)
+        mutate(candidate)
+        require(
+            validation_errors(
+                candidate,
+                product_version=PRODUCT_VERSION,
+                content_revision=CONTENT_REVISION,
+            ),
+            f"Chat evidence validator accepted {name}",
+        )
+
+    pending = current.get("status") == "pending"
+    current_marker = (
+        f"Exact v{PRODUCT_VERSION} Chat release artifact: **unavailable; live upload pending.**"
+        if pending
+        else f"Exact v{PRODUCT_VERSION} Chat release artifact: **verified; live upload validated.**"
+    )
+    korean_marker = (
+        f"정확한 v{PRODUCT_VERSION} Chat 릴리스 아티팩트: **사용 불가, 실제 업로드 대기 중.**"
+        if pending
+        else f"정확한 v{PRODUCT_VERSION} Chat 릴리스 아티팩트: **검증 완료, 실제 업로드 확인.**"
+    )
+    require(
+        current_marker in (ROOT / "README.md").read_text(encoding="utf-8")
+        and korean_marker in (ROOT / "README.ko.md").read_text(encoding="utf-8")
+        and current_marker
+        in (ROOT / "docs" / "claude-chat-upload-probe.md").read_text(encoding="utf-8")
+        and (
+            not pending
+            or "This release adds no new live-host receipt"
+            in (ROOT / ".github" / "release-notes" / "v1.2.1.md").read_text(encoding="utf-8")
+        ),
+        "current Chat evidence state is missing from aligned documentation",
     )
 
 

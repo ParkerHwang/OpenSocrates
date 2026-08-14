@@ -29,11 +29,13 @@ The native plugin archives intentionally ship only `bin/launch.sh`. That
 launcher accepts `darwin-arm64` only; macOS Intel, Linux, and Windows launchers
 and runtimes are not shipped or supported in this release.
 
-> **Latest release: OpenSocrates 1.2.1.** It adds a committed, mutation-tested
-> v1.2 adjudication snapshot and a bilingual three-question teacher overlay
-> across all six host packages while preserving each host's real delivery and
-> evidence boundary. Upgrade managed hosts together with
-> `npx --yes opensocrates@1.2.1 update --host all`.
+> **Current repository version: OpenSocrates 1.2.1; publication pending.** It
+> adds a committed, mutation-tested v1.2 adjudication snapshot and a bilingual
+> three-question teacher overlay across all six host packages while preserving
+> each host's real delivery and evidence boundary. The 2026-08-15 provenance
+> audit found no public GitHub `v1.2.1` tag/release or npm 1.2.1 package; the
+> latest public GitHub release remains v1.2.0. Commands below that pin 1.2.1 are
+> release-target examples and are unavailable until publication.
 
 ## Host support
 
@@ -48,7 +50,7 @@ and runtimes are not shipped or supported in this release.
 | Claude Code CLI | Yes, through `UserPromptSubmit` | Plugin: `/opensocrates:opensocrates` | Locally validated on `darwin-arm64` |
 | Claude Code desktop app, Local mode | Yes, where Claude Code plugins run | Plugin: `/opensocrates:opensocrates` | [Authenticated hook lifecycle locally validated](docs/claude-desktop-live-probe.md) |
 | Claude Cowork with the local plugin | Yes, in the tested local plugin upload | Plugin: `/opensocrates:opensocrates` | [Native hook lifecycle locally validated; direct release upload, no marketplace sync](docs/claude-cowork-live-probe.md) |
-| Claude web and Desktop Chat | No OpenSocrates hooks | Standalone skill: `/opensocrates` | [Live upload and invocation validated](docs/claude-chat-upload-probe.md) |
+| Claude web and Desktop Chat | No OpenSocrates hooks | Standalone skill: `/opensocrates` | [Historical v1.1.2 upload validated; exact v1.2.1 release and live upload pending](docs/claude-chat-upload-probe.md) |
 
 The status column uses four distinct levels. Do not read them as
 interchangeable:
@@ -72,6 +74,13 @@ is a standalone skill and canonically uses `/opensocrates`. Chat surfaces do
 not run the packaged OpenSocrates hooks; automatic per-prompt selection is
 available only on Claude Code and Cowork surfaces that execute the plugin
 runtime. OpenSocrates fails open if a hook or selector is unavailable.
+
+Keep three Claude provenance states separate: the installer-managed local
+plugin, a standalone ZIP manually uploaded to Chat, and any pre-existing
+synced/custom skill. Local plugin status cannot prove or update either Cloud
+state. The currently recorded local plugin version is 1.2.1, while the
+pre-existing synced/custom observation is 1.1.2; neither is evidence that an
+exact v1.2.1 standalone release ZIP was uploaded.
 
 The published v1.1.2 Claude plugin archive exceeded Cowork's documented
 compressed limit and observed uncompressed limit. A pre-release v1.1.3
@@ -263,20 +272,32 @@ workspace paths. `auto-update disable` unloads and removes the LaunchAgent;
 ### Claude web and Desktop Chat skills
 
 These surfaces can use a separately uploaded standalone skill but do not run
-the local plugin hooks. Download
-`opensocrates-1.2.1-claude-chat-skills.zip` from the release and upload it from
-Claude's **Customize → Skills → Upload skill** UI. The ZIP contains one
-top-level `opensocrates/` folder with `SKILL.md` directly inside, as required by
-the skill uploader. It is not the Claude Code/Cowork plugin archive. The
-standalone package exposes exactly one canonical `/opensocrates` skill; its 48
-method procedures, rigor, evidence, and trace controls are internal supporting
-references. Automatic hook selection is absent because Chat does not execute
-the packaged hooks. See Anthropic's
+the local plugin hooks.
+
+Exact v1.2.1 Chat release artifact: **unavailable; live upload pending.**
+
+As of the 2026-08-15 audit, GitHub has no public `v1.2.1` tag or release, so
+`opensocrates-1.2.1-claude-chat-skills.zip`, its checksum, and its release
+commit cannot be verified or uploaded. Do not substitute a source-built
+candidate or the Claude Code/Cowork plugin archive. The existing v1.1.2 live
+receipt is historical evidence only, and the existing synced/custom skill was
+left unchanged. See the [version-bound evidence and flip
+conditions](docs/claude-chat-upload-probe.md).
+
+When the exact release is published, verify its checksum before using Claude's
+**Customize → Skills → Upload skill** UI. The ZIP must contain one top-level
+`opensocrates/` folder with `SKILL.md` directly inside. It is not the Claude
+Code/Cowork plugin archive. The standalone package exposes exactly one
+canonical `/opensocrates` skill; its 48 method procedures, rigor, evidence, and
+trace controls are internal supporting references. Automatic hook selection is
+absent because Chat does not execute the packaged hooks. See Anthropic's
 [custom skill guide](https://support.claude.com/en/articles/12512180-use-skills-in-claude).
 
 ### Install from a tagged GitHub source
 
-The same host option works without the npm registry:
+The same host option works without the npm registry after the tag is published.
+The `v1.2.1` tag was unavailable at the 2026-08-15 audit, so these commands are
+release-target examples, not currently executable instructions:
 
 ```bash
 npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host all
@@ -290,9 +311,11 @@ npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host opencode
 
 ### Manual release verification
 
-Download `opensocrates.mjs`, the host package, and its `.sha256` file from the
+After publication, download `opensocrates.mjs`, the host package, and its
+`.sha256` file from the
 [v1.2.1 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.2.1).
-For Claude, for example:
+That release was unavailable at the 2026-08-15 audit. The following is the
+verification command to use only after all named assets exist; for Claude:
 
 ```bash
 shasum -a 256 -c opensocrates-1.2.1-claude-plugin.zip.sha256

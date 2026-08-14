@@ -29,6 +29,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from claude_chat_evidence import evidence_path, validation_errors
 from measure_codex_hook_timing import PROCESS_MODEL
 
 SCHEMA = "opensocrates.release-check-evidence/1.0.0"
@@ -1812,6 +1813,48 @@ def _verify_claude_chat_skills(
     }
 
 
+def _verify_claude_chat_provenance(
+    root: Path, version: str, content_revision: int
+) -> dict[str, Any]:
+    """Bind a live-pass claim to this exact candidate without upgrading pending evidence."""
+
+    report = _load_json(evidence_path(root, version))
+    archive = root / "dist" / f"opensocrates-{version}-claude-chat-skills.zip"
+    if report is None:
+        return {
+            "status": "fail",
+            "evidence_state": "unavailable",
+            "exact_release_artifact_status": "unavailable",
+            "error_codes": ["claude_chat_current_evidence_missing"],
+        }
+    candidate_sha256: str | None = None
+    candidate_file_count: int | None = None
+    if archive.is_file() and zipfile.is_zipfile(archive):
+        candidate_sha256 = f"sha256:{_sha256(archive)}"
+        with zipfile.ZipFile(archive) as bundle:
+            candidate_file_count = len(
+                [entry for entry in bundle.namelist() if not entry.endswith("/")]
+            )
+    errors = validation_errors(
+        report,
+        product_version=version,
+        content_revision=content_revision,
+        candidate_archive_sha256=candidate_sha256,
+        candidate_file_count=candidate_file_count,
+    )
+    evidence_state = str(report.get("status", "unavailable"))
+    live_validated = not errors and evidence_state == "pass"
+    return {
+        "status": "fail" if errors else "pass",
+        "evidence_state": evidence_state,
+        "exact_release_artifact_status": "verified" if live_validated else "unavailable",
+        "live_upload_status": "verified" if live_validated else "pending",
+        "candidate_archive_sha256": candidate_sha256,
+        "candidate_file_count": candidate_file_count,
+        "error_codes": list(errors),
+    }
+
+
 def _verify_checksums(directory: Path, checksum_file: Path) -> dict[str, Any]:
     if not checksum_file.is_file():
         return {"status": "unavailable", "error_codes": ["checksum_file_missing"]}
@@ -2133,6 +2176,19 @@ def _full_check(
             "status": assembly_status
             if assembly_status in {"fail", "unavailable"}
             else "unavailable",
+            "error_codes": ["package_assembly_not_available"],
+        }
+    )
+    checks["claude_chat_provenance"] = (
+        _verify_claude_chat_provenance(root, version, int(bundle.get("content_revision", -1)))
+        if assembly_status == "pass"
+        else {
+            "status": assembly_status
+            if assembly_status in {"fail", "unavailable"}
+            else "unavailable",
+            "evidence_state": "unavailable",
+            "exact_release_artifact_status": "unavailable",
+            "live_upload_status": "pending",
             "error_codes": ["package_assembly_not_available"],
         }
     )
