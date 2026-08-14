@@ -89,9 +89,11 @@ OpenSocrates 설치 payload를 제거하려면 다음을 실행하세요.
 
 ```bash
 node installer/opensocrates.mjs remove --host all --purge
+# OpenSocrates Codex 훅 승인 7개만 초기화하도록 명시적으로 선택:
+node installer/opensocrates.mjs remove --host all --purge --reset-trust
 ```
 
 실행 중인 호스트가 캐시를 사용하고 있으면 purge는 성공이라고 하지 않고 불완전
 결과를 보고합니다. 호스트를 닫은 뒤 같은 명령을 다시 실행하세요. Claude Code,
-Codex, GitHub CLI에서 로그아웃하지 않고, Codex 훅 신뢰도 초기화하지 않으며,
-관계없는 호스트 설정과 사용자 기록을 보존합니다.
+Codex, GitHub CLI에서 로그아웃하지 않습니다. `--reset-trust`를 명시하지 않으면 Codex
+훅 신뢰를 보존하며, 관계없는 호스트 설정과 사용자 기록은 항상 보존합니다.

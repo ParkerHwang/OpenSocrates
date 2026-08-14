@@ -21,16 +21,28 @@ import {
   symlinkSync,
   writeFileSync,
   existsSync,
+  linkSync,
   readdirSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
-import { PRODUCT_VERSION, main, transientPathsFor, withOperationLock } from "./opensocrates.mjs";
+import {
+  CODEX_TRUST_EVENTS,
+  PRODUCT_VERSION,
+  main,
+  resetCodexOpenSocratesHookTrust,
+  transientPathsFor,
+  withOperationLock,
+} from "./opensocrates.mjs";
 import { inspectManagedLayout } from "../tools/clean_machine_acceptance.mjs";
 
 const MARKETPLACE = "opensocrates";
 const PLUGIN_ID = `opensocrates@${MARKETPLACE}`;
+const trustKey = (event) => `${PLUGIN_ID}:hooks/hooks.json:${event}:0:0`;
+const trustSection = (event, newline = "\n") =>
+  `[hooks.state.${JSON.stringify(trustKey(event))}]${newline}` +
+  `trusted_hash = "sha256:fixture-${event}"${newline}`;
 
 // ---------------------------------------------------------------------------
 // Platform spoofing: install/update are gated to darwin-arm64. The gate is
@@ -214,6 +226,17 @@ if (HOST === "claude" && has("auth", "status")) {
 if (HOST === "codex" && has("login", "status")) {
   if (FAIL_AUTH) process.exit(1);
   process.stdout.write("Logged in using ChatGPT\\n"); process.exit(0);
+}
+if (HOST === "codex" && has("--strict-config", "features", "list")) {
+  let contents = "";
+  try { contents = readFileSync(join(process.env.CODEX_HOME, "config.toml"), "utf8"); } catch {}
+  if (contents.includes("OPENSOCRATES_TEST_INVALID_TOML")) {
+    process.stdout.write(contents);
+    process.stderr.write(contents);
+    process.exit(2);
+  }
+  process.stdout.write("hooks stable true\\n");
+  process.exit(0);
 }
 if (HOST === "grok" && has("inspect", "--json")) {
   const root = join(process.env.GROK_HOME, "plugins", MARKETPLACE);
@@ -1103,6 +1126,257 @@ test("purge all removes exact owned payloads, data, state, updater, OpenCode fil
       readFileSync(codexTrust, "utf8"),
       '[hooks.state."opensocrates@opensocrates:hooks/hooks.json:session_start:0:0"]\ntrusted = true\n',
     );
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("codex purge resets exactly seven trust entries only when explicitly requested", async () => {
+  const box = makeSandbox("codex");
+  try {
+    const pkg = buildPackage(box.root, "codex");
+    const args = ["--host", "codex", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const installed = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(installed.error, undefined, `setup install failed: ${installed.error?.message}`);
+
+    const config = join(box.home, "config.toml");
+    const history = join(box.home, "sessions", "opensocrates-history.jsonl");
+    mkdirSync(dirname(history), { recursive: true });
+    writeFileSync(history, "preserve Codex user history mentioning OpenSocrates\n");
+    const unrelated =
+      'model = "preserve"\n' +
+      '[hooks.state."other@market:hooks/hooks.json:session_start:0:0"]\n' +
+      'trusted_hash = "sha256:other"\n';
+    const targets = CODEX_TRUST_EVENTS.map(
+      (event) => `# before ${event}\n${trustSection(event)}# after ${event}\n`,
+    ).join("");
+    const tail = '[profiles.keep]\nmodel = "keep"\n';
+    const original = unrelated + targets + tail;
+    const expected =
+      unrelated +
+      CODEX_TRUST_EVENTS.map((event) => `# before ${event}\n\n\n# after ${event}\n`).join("") +
+      tail;
+    writeFileSync(config, original);
+    chmodSync(config, 0o640);
+    const metadataBefore = statSync(config);
+
+    const purged = await quiet(() =>
+      main(["remove", "--host", "codex", "--purge", "--reset-trust"]),
+    );
+    assert.equal(purged.error, undefined, `trust-reset purge failed: ${purged.error?.message}`);
+    assert.match(purged.output, /host security trust reset completed for 7 exact/u);
+    assert.match(purged.output, /OpenSocrates purge completed/u);
+    assert.doesNotMatch(purged.output, /sha256:|model =|profiles\.keep|config\.toml/u);
+    assert.equal(readFileSync(config, "utf8"), expected);
+    assert.equal(readFileSync(history, "utf8"), "preserve Codex user history mentioning OpenSocrates\n");
+    const metadataAfter = statSync(config);
+    assert.equal(metadataAfter.mode & 0o7777, metadataBefore.mode & 0o7777);
+    assert.equal(metadataAfter.uid, metadataBefore.uid);
+    assert.equal(metadataAfter.gid, metadataBefore.gid);
+    assert.deepEqual(
+      readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+      [],
+    );
+
+    const idempotent = await quiet(() =>
+      main(["remove", "--host", "codex", "--purge", "--reset-trust"]),
+    );
+    assert.equal(idempotent.error, undefined, `idempotent trust reset failed: ${idempotent.error?.message}`);
+    assert.match(idempotent.output, /no exact OpenSocrates host security trust entries were present/u);
+    assert.equal(readFileSync(config, "utf8"), expected);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("trust reset refuses malformed, symlinked, hard-linked, and unsupported-validator configs", async () => {
+  const cases = ["malformed", "symlink", "hardlink", "missing-cli"];
+  for (const kind of cases) {
+    const box = makeSandbox("codex");
+    try {
+      const config = join(box.home, "config.toml");
+      const original = kind === "malformed" ? "OPENSOCRATES_TEST_INVALID_TOML = [\n" : trustSection("stop");
+      let preservedTarget = config;
+      if (kind === "symlink") {
+        preservedTarget = join(box.root, "symlink-target.toml");
+        writeFileSync(preservedTarget, original);
+        symlinkSync(preservedTarget, config);
+      } else {
+        writeFileSync(config, original);
+        if (kind === "hardlink") linkSync(config, join(box.root, "config-hardlink.toml"));
+      }
+      const codexBin = kind === "missing-cli" ? join(box.root, "missing-codex-validator") : process.env.CODEX_BIN;
+      await assert.rejects(
+        resetCodexOpenSocratesHookTrust({ codexHome: box.home, codexBin }),
+        (error) =>
+          error instanceof Error &&
+          /hook trust was not reset/u.test(error.message) &&
+          !error.message.includes(original.trim()) &&
+          !error.message.includes(box.root),
+      );
+      assert.equal(readFileSync(preservedTarget, "utf8"), original);
+      assert.deepEqual(
+        readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+        [],
+      );
+    } finally {
+      box.cleanup();
+    }
+  }
+});
+
+test("trust reset leaves original bytes and metadata after write or post-consumption failure", async () => {
+  for (const kind of ["write", "post-consumption"]) {
+    const box = makeSandbox("codex");
+    try {
+      const config = join(box.home, "config.toml");
+      const original = `# preserve\n${trustSection("session_start")}model = "keep"\n`;
+      writeFileSync(config, original);
+      chmodSync(config, 0o640);
+      const metadataBefore = statSync(config);
+      let codexBin = process.env.CODEX_BIN;
+      const hooks = {};
+      if (kind === "write") {
+        hooks.beforeWrite = () => {
+          const error = new Error("injected write failure with private detail");
+          error.code = "EACCES";
+          throw error;
+        };
+      } else {
+        const counter = join(box.root, "validator-count");
+        codexBin = join(box.root, "post-validator");
+        writeFileSync(
+          codexBin,
+          `#!/usr/bin/env node
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+const counter = ${JSON.stringify(counter)};
+const count = (existsSync(counter) ? Number(readFileSync(counter, "utf8")) : 0) + 1;
+writeFileSync(counter, String(count));
+const config = join(process.env.CODEX_HOME, "config.toml");
+const raw = existsSync(config) ? readFileSync(config, "utf8") : "";
+if (count === 4) { process.stdout.write(raw); process.stderr.write(raw); process.exit(9); }
+process.exit(0);
+`,
+        );
+        chmodSync(codexBin, 0o755);
+      }
+
+      await assert.rejects(
+        resetCodexOpenSocratesHookTrust({ codexHome: box.home, codexBin, hooks }),
+        (error) =>
+          error instanceof Error &&
+          /hook trust was not reset/u.test(error.message) &&
+          !error.message.includes("private detail") &&
+          !error.message.includes("sha256:"),
+      );
+      assert.equal(readFileSync(config, "utf8"), original);
+      const metadataAfter = statSync(config);
+      assert.equal(metadataAfter.mode & 0o7777, metadataBefore.mode & 0o7777);
+      assert.equal(metadataAfter.uid, metadataBefore.uid);
+      assert.equal(metadataAfter.gid, metadataBefore.gid);
+      assert.deepEqual(
+        readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+        [],
+      );
+    } finally {
+      box.cleanup();
+    }
+  }
+});
+
+test("trust reset keeps validator cleanup failures privacy-safe", async () => {
+  for (const validatorFails of [false, true]) {
+    const box = makeSandbox("codex");
+    try {
+      const config = join(box.home, "config.toml");
+      const original = validatorFails
+        ? "OPENSOCRATES_TEST_INVALID_TOML = [\n"
+        : trustSection("session_end");
+      writeFileSync(config, original);
+      await assert.rejects(
+        resetCodexOpenSocratesHookTrust({
+          codexHome: box.home,
+          codexBin: process.env.CODEX_BIN,
+          hooks: {
+            removeValidationHome: async (target, options) => {
+              rmSync(target, options);
+              throw new Error(`private cleanup path: ${target}`);
+            },
+          },
+        }),
+        (error) =>
+          error instanceof Error &&
+          /hook trust was not reset/u.test(error.message) &&
+          (validatorFails
+            ? /installed Codex CLI did not accept/u.test(error.message) &&
+              !/validation environment could not be removed safely/u.test(error.message)
+            : /validation environment could not be removed safely/u.test(error.message)) &&
+          !error.message.includes("private cleanup path") &&
+          !error.message.includes(box.root),
+      );
+      assert.equal(readFileSync(config, "utf8"), original);
+      assert.deepEqual(
+        readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+        [],
+      );
+    } finally {
+      box.cleanup();
+    }
+  }
+});
+
+test("trust reset detects a concurrent pre-rename edit without overwriting it", async () => {
+  const box = makeSandbox("codex");
+  try {
+    const config = join(box.home, "config.toml");
+    writeFileSync(config, trustSection("pre_compact"));
+    const concurrent = 'model = "external-edit"\n';
+    await assert.rejects(
+      resetCodexOpenSocratesHookTrust({
+        codexHome: box.home,
+        codexBin: process.env.CODEX_BIN,
+        hooks: { beforeRename: () => writeFileSync(config, concurrent) },
+      }),
+      (error) => error instanceof Error && /changed before the atomic update/u.test(error.message),
+    );
+    assert.equal(readFileSync(config, "utf8"), concurrent);
+    assert.deepEqual(
+      readdirSync(box.home).filter((name) => name.startsWith(".config.toml.opensocrates-trust-reset-")),
+      [],
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("trust reset preserves recovery bytes when a post-replace edit makes rollback unsafe", async () => {
+  const box = makeSandbox("codex");
+  try {
+    const config = join(box.home, "config.toml");
+    const original = trustSection("pre_tool_use");
+    const concurrent = 'model = "external-post-replace-edit"\n';
+    writeFileSync(config, original);
+    await assert.rejects(
+      resetCodexOpenSocratesHookTrust({
+        codexHome: box.home,
+        codexBin: process.env.CODEX_BIN,
+        hooks: { afterRename: () => writeFileSync(config, concurrent) },
+      }),
+      (error) =>
+        error instanceof Error &&
+        /automatic rollback was withheld/u.test(error.message) &&
+        !error.message.includes(box.root),
+    );
+    assert.equal(readFileSync(config, "utf8"), concurrent);
+    const residues = readdirSync(box.home).filter((name) =>
+      name.startsWith(".config.toml.opensocrates-trust-reset-"),
+    );
+    assert.equal(residues.length, 1);
+    assert.match(residues[0], /\.rollback$/u);
+    const recovery = join(box.home, residues[0]);
+    assert.equal(readFileSync(recovery, "utf8"), original);
+    assert.equal(statSync(recovery).mode & 0o7777, 0o600);
   } finally {
     box.cleanup();
   }

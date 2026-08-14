@@ -11,12 +11,17 @@ All notable changes to OpenSocrates are documented here. This project follows
   complete-uninstall attempt for exact OpenSocrates registrations, verified
   host cache payloads, empty Claude plugin-data directories, OpenCode-owned
   files, the updater, transaction residue, and final installer state.
+- `remove --host <codex|all> --purge --reset-trust` explicitly resets only the
+  seven canonical OpenSocrates Codex hook approvals after validating a narrow,
+  transactional config update.
 
 ### Changed
 
 - Ordinary `remove` now states its narrower registration/managed-root contract,
   reports known remaining OpenSocrates paths, and points to the purge command
   instead of implying that every installed payload was removed.
+- Installer help and English/Korean removal docs now distinguish plugin
+  registration, owned payloads, host security trust, and preserved user history.
 
 ### Security and privacy
 
@@ -24,7 +29,14 @@ All notable changes to OpenSocrates are documented here. This project follows
   manifests, checksums, and ownership markers; live `.in_use` payloads,
   unverified registration, unknown data, and cleanup failures remain pending.
   Unrelated host configuration and user history are preserved. Codex hook trust
-  is reported as preserved for a separate narrow reset extension.
+  remains preserved unless the explicit reset flag is supplied.
+- The trust reset refuses symlinks, hard links, noncanonical or unexpected
+  matching sections, invalid configs, concurrent changes, and failed Codex
+  consumption checks. It preserves non-target bytes, uses owner-only synced
+  temporary files plus atomic replacement, and restores the exact original
+  bytes, mode, owner, and group on a failed post-update check when rollback is
+  still safe. A later external edit is never overwritten; its owner-only
+  recovery copy is preserved instead.
 
 ## [1.2.1] - 2026-08-13
 

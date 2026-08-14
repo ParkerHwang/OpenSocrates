@@ -33,10 +33,18 @@ function sha256(bytes) {
 function writeFakeHost(sandbox, host) {
   const target = join(sandbox, `fake-${host}`);
   const script = `#!/usr/bin/env node
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 const argv = process.argv.slice(2);
 const has = (...items) => items.every((item) => argv.includes(item));
 if (has("--version")) {
   process.stdout.write("2.1.205 (packed smoke)\\n");
+  process.exit(0);
+}
+if (${JSON.stringify(host)} === "codex" && has("--strict-config", "features", "list")) {
+  const config = join(process.env.CODEX_HOME, "config.toml");
+  if (existsSync(config)) readFileSync(config);
+  process.stdout.write("hooks stable true\\n");
   process.exit(0);
 }
 if (${JSON.stringify(host)} === "claude") {
@@ -211,12 +219,42 @@ function seedPackedPurgeSandbox() {
   const unrelated = [
     [join(homes.claude, "plugins", "cache", "unrelated", "payload.txt"), "preserve unrelated cache\n"],
     [join(homes.claude, "plugins", "data", "unrelated-plugin", "state.json"), '{"keep":true}\n'],
-    [join(homes.codex, "config.toml"), 'model = "packed-smoke"\n'],
   ];
   for (const [target, contents] of unrelated) {
     mkdirSync(dirname(target), { recursive: true });
     writeFileSync(target, contents);
   }
+  const trustPrefix = "opensocrates@opensocrates:hooks/hooks.json:";
+  const events = [
+    "pre_tool_use",
+    "post_tool_use",
+    "pre_compact",
+    "session_start",
+    "session_end",
+    "user_prompt_submit",
+    "stop",
+  ];
+  const trustConfig = join(homes.codex, "config.toml");
+  const trustSections = events
+    .map(
+      (event) =>
+        `# packed ${event}\n` +
+        `[hooks.state."${trustPrefix}${event}:0:0"]\n` +
+        `trusted_hash = "sha256:packed-${event}"\n`,
+    )
+    .join("");
+  const expectedTrustConfig =
+    'model = "packed-smoke"\n' +
+    '[hooks.state."other@market:hooks/hooks.json:session_start:0:0"]\n' +
+    'trusted_hash = "sha256:other"\n' +
+    events.map((event) => `# packed ${event}\n\n\n`).join("");
+  writeFileSync(
+    trustConfig,
+    'model = "packed-smoke"\n' +
+      '[hooks.state."other@market:hooks/hooks.json:session_start:0:0"]\n' +
+      'trusted_hash = "sha256:other"\n' +
+      trustSections,
+  );
   return {
     sandbox,
     state,
@@ -226,6 +264,8 @@ function seedPackedPurgeSandbox() {
     pluginData,
     history,
     unrelated,
+    trustConfig,
+    expectedTrustConfig,
     environment: {
       ...process.env,
       AGY_BIN: join(sandbox, "missing-agy"),
@@ -270,13 +310,22 @@ try {
     env: { ...process.env, npm_config_dry_run: "false", npm_config_json: "false" },
   });
   assert.equal(help.status, 0, help.stderr);
-  assert.match(help.stdout, /remove \[--host .*\] \[--purge\]/u);
-  assert.match(help.stdout, /explicit complete-uninstall attempt/u);
+  assert.match(help.stdout, /remove \[--host .*\] \[--purge \[--reset-trust\]\]/u);
+  assert.match(help.stdout, /host security trust, and user history are reported separately/u);
 
   purgeSandbox = seedPackedPurgeSandbox();
   const purged = spawnSync(
     npx,
-    ["--yes", `--package=${archive}`, "opensocrates", "remove", "--host", "all", "--purge"],
+    [
+      "--yes",
+      `--package=${archive}`,
+      "opensocrates",
+      "remove",
+      "--host",
+      "all",
+      "--purge",
+      "--reset-trust",
+    ],
     {
       cwd: root,
       encoding: "utf8",
@@ -285,6 +334,7 @@ try {
   );
   assert.equal(purged.status, 0, `${purged.stdout}\n${purged.stderr}`);
   assert.match(purged.stdout, /OpenSocrates purge completed/u);
+  assert.match(purged.stdout, /host security trust reset completed for 7 exact/u);
   for (const target of [
     purgeSandbox.state,
     purgeSandbox.launchAgent,
@@ -298,6 +348,7 @@ try {
   for (const [target, contents] of purgeSandbox.unrelated) {
     assert.equal(readFileSync(target, "utf8"), contents, `packed purge changed ${target}`);
   }
+  assert.equal(readFileSync(purgeSandbox.trustConfig, "utf8"), purgeSandbox.expectedTrustConfig);
 } finally {
   if (purgeSandbox) rmSync(purgeSandbox.sandbox, { recursive: true, force: true });
   if (archive) {
