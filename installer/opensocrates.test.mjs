@@ -4,11 +4,14 @@ import test from "node:test";
 import {
   ASSET_NAME,
   InstallerError,
+  PURGE_RESULT_SCHEMA,
   assetNameFor,
+  createPurgeResult,
   isSafeArchivePath,
   markerMatches,
   parseChecksumText,
   parseCli,
+  purgeExtensionResult,
 } from "./opensocrates.mjs";
 
 test("accepts safe package paths and rejects traversal", () => {
@@ -123,6 +126,14 @@ test("parses lifecycle actions and paired local asset options", () => {
     () => parseCli(["remove", "--asset", "bundle.zip", "--checksum", "bundle.sha256"]),
     (error) => error instanceof InstallerError,
   );
+  const purge = parseCli(["remove", "--host", "all", "--purge"]);
+  assert.equal(purge.action, "remove");
+  assert.equal(purge.host, "all");
+  assert.equal(purge.purge, true);
+  assert.throws(
+    () => parseCli(["install", "--purge"]),
+    (error) => error instanceof InstallerError,
+  );
   assert.throws(
     () => parseCli(["install", "--host", "web"]),
     (error) => error instanceof InstallerError,
@@ -147,6 +158,22 @@ test("parses lifecycle actions and paired local asset options", () => {
     () => parseCli(["install", "--host", "all", "--asset", "bundle.zip", "--checksum", "sum"]),
     (error) => error instanceof InstallerError,
   );
+});
+
+test("complete-uninstall results keep Codex trust as an explicit extension", () => {
+  const result = createPurgeResult(["codex", "claude"]);
+  assert.equal(result.schema, PURGE_RESULT_SCHEMA);
+  assert.equal(result.status, "pending");
+  assert.deepEqual(
+    result.hosts.map((item) => item.host),
+    ["claude", "codex"],
+  );
+  assert.deepEqual(purgeExtensionResult("codex"), {
+    component: "host-security-trust",
+    status: "preserved",
+    nextAction: "reset-codex-opensocrates-hook-trust",
+  });
+  assert.equal(purgeExtensionResult("claude").status, "not-applicable");
 });
 
 test("parses opt-in automatic update policy", () => {

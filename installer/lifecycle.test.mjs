@@ -7,10 +7,11 @@
 
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import {
   chmodSync,
+  cpSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -101,6 +102,7 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
       product_version: version,
       host,
       schema: "opensocrates.plugin-release-manifest/1.0.0",
+      content_revision: 1,
       launchers: [],
       runtime_targets: [],
     },
@@ -569,6 +571,41 @@ function allAssetArgs(packages) {
   return args;
 }
 
+function isolateFileDropHomes(box) {
+  process.env.ANTIGRAVITY_CONFIG_DIR = join(box.root, "antigravity-purge-home");
+  process.env.CURSOR_CONFIG_DIR = join(box.root, "cursor-purge-home");
+  process.env.GROK_HOME = join(box.root, "grok-purge-home");
+  for (const target of [
+    process.env.ANTIGRAVITY_CONFIG_DIR,
+    process.env.CURSOR_CONFIG_DIR,
+    process.env.GROK_HOME,
+  ]) {
+    mkdirSync(target, { recursive: true });
+  }
+}
+
+function seedPluginCache(home, host, pkg, { inUsePid = null } = {}) {
+  const cacheRoot = join(home, "plugins", "cache", MARKETPLACE, MARKETPLACE);
+  const versionRoot = join(cacheRoot, PRODUCT_VERSION);
+  mkdirSync(cacheRoot, { recursive: true });
+  cpSync(pkg.tree, versionRoot, { recursive: true });
+  writeFileSync(join(versionRoot, ".orphaned_at"), "host-owned orphan marker\n");
+  if (inUsePid !== null) {
+    mkdirSync(join(versionRoot, ".in_use"));
+    writeFileSync(join(versionRoot, ".in_use", String(inUsePid)), "");
+  }
+  return { cacheRoot, versionRoot };
+}
+
+function seedClaudePluginData(home) {
+  const targets = [
+    join(home, "plugins", "data", "opensocrates-inline"),
+    join(home, "plugins", "data", "opensocrates-opensocrates"),
+  ];
+  for (const target of targets) mkdirSync(target, { recursive: true });
+  return targets;
+}
+
 function replaceAllHostBinary(box, host, name, options) {
   const replacement = writeFakeHost(box.root, name, {
     kind: host,
@@ -654,6 +691,75 @@ function quiet(fn) {
     });
 }
 
+async function installAntigravityAndClaudeWithUpdater(box) {
+  const antigravityHome = join(box.root, "antigravity-home");
+  mkdirSync(antigravityHome, { recursive: true });
+  const antigravityHost = writeFakeHost(box.root, "antigravity-commit-fixture", {
+    kind: "antigravity",
+  });
+  process.env.AGY_BIN = antigravityHost.binary;
+  process.env.ANTIGRAVITY_CONFIG_DIR = antigravityHome;
+  const packages = {
+    antigravity: buildPackage(box.root, "antigravity"),
+    claude: buildPackage(box.root, "claude"),
+  };
+  const assetArgs = [
+    "--host",
+    "all",
+    "--asset-antigravity",
+    packages.antigravity.asset,
+    "--checksum-antigravity",
+    packages.antigravity.checksum,
+    "--asset-claude",
+    packages.claude.asset,
+    "--checksum-claude",
+    packages.claude.checksum,
+  ];
+  const install = await withDarwinArm64(() => quiet(() => main(["install", ...assetArgs])));
+  assert.equal(install.error, undefined, `setup install failed: ${install.error?.message}`);
+
+  configureFakeNpx(box);
+  configureFakeLaunchctl(box);
+  const enabled = await withDarwinArm64(() =>
+    quiet(() => main(["auto-update", "enable", "--host", "all"])),
+  );
+  assert.equal(enabled.error, undefined, `updater setup failed: ${enabled.error?.message}`);
+  return {
+    antigravityRoot: join(antigravityHome, "plugins", MARKETPLACE),
+  };
+}
+
+function retagClaudeManagedTreeVersion(root, version) {
+  const pluginRoot = join(root, "plugins", MARKETPLACE);
+  const pluginManifest = join(pluginRoot, ".claude-plugin", "plugin.json");
+  const releaseManifest = join(pluginRoot, "release-manifest.json");
+  for (const [target, key] of [
+    [pluginManifest, "version"],
+    [releaseManifest, "product_version"],
+  ]) {
+    const document = JSON.parse(readFileSync(target, "utf8"));
+    document[key] = version;
+    writeFileSync(target, JSON.stringify(document, null, 2));
+  }
+  const checksums = join(pluginRoot, "checksums.sha256");
+  const lines = readFileSync(checksums, "utf8")
+    .trim()
+    .split("\n")
+    .map((line) => {
+      const match = line.match(/^[a-f0-9]{64}  (.+)$/u);
+      assert.notEqual(match, null, `unexpected checksum fixture line: ${line}`);
+      const item = match[1];
+      const target = join(pluginRoot, ...item.split("/"));
+      return `${sha256(readFileSync(target))}  ${item}`;
+    });
+  writeFileSync(checksums, `${lines.join("\n")}\n`);
+
+  const marketplacePath = join(root, ".claude-plugin", "marketplace.json");
+  const marketplace = JSON.parse(readFileSync(marketplacePath, "utf8"));
+  marketplace.metadata.version = version;
+  writeFileSync(marketplacePath, `${JSON.stringify(marketplace, null, 2)}\n`);
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -692,6 +798,8 @@ for (const host of ["claude", "codex"]) {
 
       const remove = await quiet(() => main(["remove", "--host", host]));
       assert.equal(remove.error, undefined);
+      assert.match(remove.output, /not a complete uninstall/);
+      assert.match(remove.output, new RegExp(`remove --host ${host} --purge`));
       assert.equal(box.state().plugins.length, 0, "plugin registration survived remove");
       assert.equal(box.state().marketplaces.length, 0, "marketplace survived remove");
       assert.equal(existsSync(box.managedRoot), false, "managed root survived remove");
@@ -736,6 +844,573 @@ for (const host of ["claude", "codex"]) {
     }
   });
 }
+
+test("remove rejects pre-existing managed-tree drift before unregistering or renaming", async () => {
+  const box = makeSandbox("claude");
+  try {
+    const pkg = buildPackage(box.root, "claude");
+    const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const installed = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(installed.error, undefined, `setup install failed: ${installed.error?.message}`);
+
+    configureFakeNpx(box);
+    const launchctl = configureFakeLaunchctl(box);
+    const enabled = await withDarwinArm64(() =>
+      quiet(() => main(["auto-update", "enable", "--host", "claude"])),
+    );
+    assert.equal(enabled.error, undefined, `updater setup failed: ${enabled.error?.message}`);
+
+    const unexpected = join(box.managedRoot, "user-unverified.txt");
+    writeFileSync(unexpected, "must not be removed\n");
+    const desiredPath = join(box.root, "state", "desired-state.json");
+    const launchAgent = join(box.root, "LaunchAgents", "com.opensocrates.auto-update.plist");
+    const hostStateBefore = readFileSync(box.statePath);
+    const desiredBefore = readFileSync(desiredPath);
+    const launchAgentBefore = readFileSync(launchAgent);
+    const launchctlBefore = launchctl.state();
+    let commitHookCalls = 0;
+
+    const removed = await withDarwinArm64(() =>
+      quiet(() =>
+        main(["remove", "--host", "claude"], {
+          beforeRemovalBackupDelete() {
+            commitHookCalls += 1;
+          },
+        }),
+      ),
+    );
+    assert.notEqual(removed.error, undefined, "pre-existing drift was removed");
+    assert.match(removed.error.message, /managed marketplace contains an unowned file/);
+    assert.equal(commitHookCalls, 0, "commit began before source-tree validation");
+    assert.equal(existsSync(box.managedRoot), true);
+    assert.equal(existsSync(unexpected), true);
+    assert.deepEqual(readFileSync(box.statePath), hostStateBefore, "host registration changed");
+    assert.deepEqual(readFileSync(desiredPath), desiredBefore, "desired state changed");
+    assert.deepEqual(readFileSync(launchAgent), launchAgentBefore, "LaunchAgent changed");
+    assert.deepEqual(launchctl.state(), launchctlBefore, "LaunchAgent load state changed");
+    assert.deepEqual(
+      readdirSync(dirname(box.managedRoot)).filter((name) => name.startsWith(".opensocrates.removed-")),
+      [],
+      "managed root was stranded in a removal backup",
+    );
+    assert.doesNotMatch(removed.output, /removal cleanup is incomplete|was removed from/);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("a later multi-host commit failure records only the host that rollback actually restored", async () => {
+  const box = makeAllSandbox();
+  try {
+    const { antigravityRoot } = await installAntigravityAndClaudeWithUpdater(box);
+    retagClaudeManagedTreeVersion(box.managedRoots.claude, "1.1.0");
+    const removed = await withDarwinArm64(() =>
+      quiet(() =>
+        main(["remove", "--host", "all"], {
+          beforeRemovalBackupDelete({ host }) {
+            if (host === "claude") throw new Error("injected pre-delete Claude commit failure");
+          },
+        }),
+      ),
+    );
+    assert.notEqual(removed.error, undefined, "partial commit reported removal success");
+    assert.match(removed.error.message, /injected pre-delete Claude commit failure/);
+    assert.match(
+      removed.output,
+      /removal cleanup is incomplete; no success was recorded/,
+      `unexpected removal error: ${removed.error?.stack}`,
+    );
+    assert.doesNotMatch(removed.output, /was removed from/);
+    assert.equal(existsSync(antigravityRoot), false, "committed file-drop root was recreated");
+    assert.equal(existsSync(box.managedRoots.claude), true, "later Claude root was not rolled back");
+    assert.equal(
+      JSON.parse(
+        readFileSync(
+          join(box.managedRoots.claude, "plugins", "opensocrates", ".claude-plugin", "plugin.json"),
+          "utf8",
+        ),
+      ).version,
+      "1.1.0",
+      "rollback verifier required the current product version",
+    );
+    assert.equal(box.state("claude").plugins.length, 1, "Claude registration was not rolled back");
+    assert.deepEqual(box.desired().installedHosts, ["claude"]);
+    assert.equal(box.desired().autoUpdate.enabled, true);
+    assert.deepEqual(box.desired().autoUpdate.hosts, ["claude"]);
+    assert.equal(existsSync(box.launchAgent), true, "partial updater scope was not restored");
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("a partially deleted removal backup is never restored or registered as an intact host", async () => {
+  const box = makeAllSandbox();
+  try {
+    const { antigravityRoot } = await installAntigravityAndClaudeWithUpdater(box);
+    const removed = await withDarwinArm64(() =>
+      quiet(() =>
+        main(["remove", "--host", "all"], {
+          beforeRemovalBackupDelete({ host, backup }) {
+            if (host !== "claude") return;
+            rmSync(join(backup, "plugins", "opensocrates", "skills", "opensocrates", "SKILL.md"));
+            throw new Error("injected partial Claude backup deletion");
+          },
+        }),
+      ),
+    );
+    assert.notEqual(removed.error, undefined, "partial backup deletion reported removal success");
+    assert.match(removed.error.message, /injected partial Claude backup deletion/);
+    assert.match(removed.output, /removal cleanup is incomplete; no success was recorded/);
+    assert.doesNotMatch(removed.output, /was removed from/);
+    assert.equal(existsSync(antigravityRoot), false, "committed file-drop root was recreated");
+    assert.equal(existsSync(box.managedRoots.claude), false, "corrupted Claude backup was restored");
+    assert.equal(box.state("claude").plugins.length, 0, "corrupted Claude root was re-registered");
+    assert.deepEqual(box.desired().installedHosts, []);
+    assert.equal(box.desired().autoUpdate.enabled, false);
+    assert.deepEqual(box.desired().autoUpdate.hosts, []);
+    assert.equal(existsSync(box.launchAgent), false, "updater remained enabled for an unrestored host");
+
+    const claudeParent = dirname(box.managedRoots.claude);
+    const residues = readdirSync(claudeParent).filter((name) =>
+      /^\.opensocrates\.removed-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(
+        name,
+      ),
+    );
+    assert.equal(residues.length, 1, "partial Claude residue was not preserved exactly once");
+    const [residueName] = residues;
+    const residue = join(claudeParent, residueName);
+    const canonicalResidue = realpathSync(residue);
+    assert.equal(existsSync(join(residue, ".opensocrates-managed.json")), true);
+    assert.equal(
+      existsSync(join(residue, "plugins", "opensocrates", "skills", "opensocrates", "SKILL.md")),
+      false,
+    );
+    assert.ok(
+      removed.output.includes(`preserved claude removal residue: ${canonicalResidue}`),
+      `missing exact residue handoff:\n${removed.output}`,
+    );
+    assert.ok(removed.output.includes(`/bin/rm -rf -- '${canonicalResidue}'`));
+
+    const safeRetry = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.notEqual(safeRetry.error, undefined, "purge trusted a partial removal residue");
+    assert.match(safeRetry.output, /transaction-residue failed/);
+    assert.ok(
+      safeRetry.output.includes(`refusing unverifiable claude transaction residue at ${canonicalResidue}:`),
+      `purge omitted the exact residue path:\n${safeRetry.output}`,
+    );
+    assert.equal(existsSync(residue), true, "purge deleted an unverifiable partial residue");
+    assert.doesNotMatch(safeRetry.output, /purge completed/);
+
+    // Simulate the documented user-reviewed cleanup of this exact UUID path.
+    rmSync(residue, { recursive: true, force: true });
+    const afterManualCleanup = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.equal(
+      afterManualCleanup.error,
+      undefined,
+      `purge did not finish after exact residue cleanup: ${afterManualCleanup.error?.message}`,
+    );
+    assert.match(afterManualCleanup.output, /purge completed for registrations and provably owned payloads/);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("purge all removes exact owned payloads, data, state, updater, OpenCode files, and transaction residue", async () => {
+  const box = makeAllSandbox({ includeOpenCode: true });
+  try {
+    isolateFileDropHomes(box);
+    const packages = {
+      claude: buildPackage(box.root, "claude"),
+      codex: buildPackage(box.root, "codex"),
+      opencode: buildPackage(box.root, "opencode"),
+    };
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
+    assert.equal(install.error, undefined, `setup install failed: ${install.error?.message}`);
+
+    const claudeCache = seedPluginCache(box.homes.claude, "claude", packages.claude);
+    const codexCache = seedPluginCache(box.homes.codex, "codex", packages.codex);
+    const pluginData = seedClaudePluginData(box.homes.claude);
+    const unrelatedCache = join(box.homes.claude, "plugins", "cache", "unrelated", "payload.txt");
+    const unrelatedData = join(box.homes.claude, "plugins", "data", "unrelated-plugin", "state.txt");
+    const userHistory = join(box.homes.claude, "projects", "opensocrates-notes.jsonl");
+    const codexTrust = join(box.homes.codex, "config.toml");
+    for (const [target, contents] of [
+      [unrelatedCache, "unrelated cache\n"],
+      [unrelatedData, "unrelated plugin data\n"],
+      [userHistory, "user history mentioning OpenSocrates\n"],
+      [codexTrust, '[hooks.state."opensocrates@opensocrates:hooks/hooks.json:session_start:0:0"]\ntrusted = true\n'],
+    ]) {
+      mkdirSync(dirname(target), { recursive: true });
+      writeFileSync(target, contents);
+    }
+
+    const claudeResidue = join(
+      dirname(box.managedRoots.claude),
+      `.opensocrates.backup-${randomUUID()}`,
+    );
+    cpSync(box.managedRoots.claude, claudeResidue, { recursive: true });
+    const emptyStaging = join(dirname(box.managedRoots.codex), `.opensocrates.staging-${randomUUID()}`);
+    mkdirSync(emptyStaging);
+
+    const bridge = join(box.homes.opencode, "plugins", "opensocrates.js");
+    const sidecar = join(box.homes.opencode, "plugins", ".opensocrates-managed.json");
+    const bridgeResidue = join(box.homes.opencode, "plugins", `.opensocrates.js.backup-${randomUUID()}`);
+    const sidecarResidue = join(
+      box.homes.opencode,
+      "plugins",
+      `.opensocrates-managed.json.backup-${randomUUID()}`,
+    );
+    cpSync(bridge, bridgeResidue);
+    cpSync(sidecar, sidecarResidue);
+
+    configureFakeNpx(box);
+    const enabled = await withDarwinArm64(() =>
+      quiet(() => main(["auto-update", "enable", "--host", "all"])),
+    );
+    assert.equal(enabled.error, undefined, `updater setup failed: ${enabled.error?.message}`);
+    assert.ok(existsSync(box.launchAgent));
+
+    const purged = await quiet(() => main(["remove", "--host", "all", "--purge"]));
+    assert.equal(purged.error, undefined, `purge failed: ${purged.error?.message}\n${purged.output}`);
+    assert.match(purged.output, /OpenSocrates purge completed/);
+    assert.match(purged.output, /codex: host security trust was preserved/);
+    assert.match(purged.output, /User task, project, chat, plan, and history data was preserved/);
+
+    for (const target of [
+      box.managedRoots.claude,
+      box.managedRoots.codex,
+      box.managedRoots.opencode,
+      claudeCache.cacheRoot,
+      codexCache.cacheRoot,
+      ...pluginData,
+      claudeResidue,
+      emptyStaging,
+      bridge,
+      sidecar,
+      bridgeResidue,
+      sidecarResidue,
+      box.launchAgent,
+      join(box.root, "state"),
+    ]) {
+      assert.equal(existsSync(target), false, `purge left ${target}`);
+    }
+    assert.equal(box.state("claude").plugins.length, 0);
+    assert.equal(box.state("codex").plugins.length, 0);
+    assert.equal(readFileSync(unrelatedCache, "utf8"), "unrelated cache\n");
+    assert.equal(readFileSync(unrelatedData, "utf8"), "unrelated plugin data\n");
+    assert.equal(readFileSync(userHistory, "utf8"), "user history mentioning OpenSocrates\n");
+    assert.equal(
+      readFileSync(codexTrust, "utf8"),
+      '[hooks.state."opensocrates@opensocrates:hooks/hooks.json:session_start:0:0"]\ntrusted = true\n',
+    );
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("an in-use Claude cache makes purge pending and an idempotent rerun completes", async () => {
+  const box = makeSandbox("claude");
+  try {
+    const pkg = buildPackage(box.root, "claude");
+    const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined);
+    const cache = seedPluginCache(box.home, "claude", pkg, { inUsePid: process.pid });
+    seedClaudePluginData(box.home);
+
+    const first = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.notEqual(first.error, undefined, "an in-use cache reported complete purge");
+    assert.match(first.output, /plugin-cache pending/);
+    assert.match(first.output, /purge is incomplete/);
+    assert.doesNotMatch(first.output, /purge completed/);
+    assert.ok(existsSync(cache.versionRoot), "in-use payload was deleted");
+    assert.equal(box.state().plugins.length, 0, "registration cleanup was blocked by the cache");
+    assert.equal(existsSync(box.managedRoot), false, "managed-root cleanup was blocked by the cache");
+    assert.ok(existsSync(join(box.root, "state", "desired-state.json")), "pending state was lost");
+
+    rmSync(join(cache.versionRoot, ".in_use"), { recursive: true });
+    const second = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.equal(second.error, undefined, `second purge failed: ${second.error?.message}`);
+    assert.equal(existsSync(cache.cacheRoot), false);
+    assert.equal(existsSync(join(box.root, "state")), false);
+
+    const third = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.equal(third.error, undefined, `idempotent purge failed: ${third.error?.message}`);
+    assert.match(third.output, /purge completed/);
+    assert.equal(existsSync(join(box.root, "state")), false);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("purge removes an empty exact Codex cache marketplace after payload removal", async () => {
+  const box = makeSandbox("codex");
+  try {
+    const emptyCache = join(box.home, "plugins", "cache", MARKETPLACE);
+    mkdirSync(emptyCache, { recursive: true });
+    const result = await quiet(() => main(["remove", "--host", "codex", "--purge"]));
+    assert.equal(result.error, undefined, `empty-cache purge failed: ${result.error?.message}`);
+    assert.equal(existsSync(emptyCache), false);
+    assert.equal(existsSync(join(box.root, "state")), false);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("purge preserves unknown cache-marketplace content without an unstable success", async () => {
+  const box = makeSandbox("claude");
+  try {
+    const pkg = buildPackage(box.root, "claude");
+    const cache = seedPluginCache(box.home, "claude", pkg);
+    const unknown = join(dirname(cache.cacheRoot), "unknown-sibling.txt");
+    writeFileSync(unknown, "preserve unknown cache sibling\n");
+
+    const first = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.notEqual(first.error, undefined, "unknown cache content reported complete purge");
+    assert.match(first.output, /unrecognized-cache-marketplace-content/);
+    assert.doesNotMatch(first.output, /purge completed/);
+    assert.equal(existsSync(cache.cacheRoot), false, "verified OpenSocrates cache payload survived");
+    assert.equal(readFileSync(unknown, "utf8"), "preserve unknown cache sibling\n");
+
+    rmSync(unknown);
+    const recovered = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.equal(recovered.error, undefined, `cache recovery purge failed: ${recovered.error?.message}`);
+    assert.equal(existsSync(dirname(cache.cacheRoot)), false);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("purge all reports a missing host CLI per host while completing other safe cleanup", async () => {
+  const box = makeAllSandbox();
+  try {
+    isolateFileDropHomes(box);
+    const packages = {
+      claude: buildPackage(box.root, "claude"),
+      codex: buildPackage(box.root, "codex"),
+    };
+    await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
+    const claudeCache = seedPluginCache(box.homes.claude, "claude", packages.claude);
+    const codexCache = seedPluginCache(box.homes.codex, "codex", packages.codex);
+    seedClaudePluginData(box.homes.claude);
+    const claudeBinary = box.hosts.claude.binary;
+    box.setBinary("claude", join(box.root, "missing-claude"));
+
+    const first = await quiet(() => main(["remove", "--host", "all", "--purge"]));
+    assert.notEqual(first.error, undefined, "unverified registration reported complete purge");
+    assert.match(first.output, /claude: purge partial; registration unverified/);
+    assert.match(first.output, /codex: purge complete; registration removed/);
+    assert.doesNotMatch(first.output, /purge completed/);
+    assert.equal(box.state("claude").plugins.length, 1, "missing CLI somehow changed Claude registration");
+    assert.equal(box.state("codex").plugins.length, 0, "Codex safe cleanup did not continue");
+    for (const target of [box.managedRoots.claude, box.managedRoots.codex, claudeCache.cacheRoot, codexCache.cacheRoot]) {
+      assert.equal(existsSync(target), false, `safe cleanup was blocked for ${target}`);
+    }
+    assert.deepEqual(box.desired().installedHosts, ["claude"]);
+
+    box.setBinary("claude", claudeBinary);
+    const second = await quiet(() => main(["remove", "--host", "all", "--purge"]));
+    assert.equal(second.error, undefined, `recovery purge failed: ${second.error?.message}`);
+    assert.equal(box.state("claude").plugins.length, 0);
+    assert.equal(existsSync(join(box.root, "state")), false);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("purge refuses symlinks, malformed ownership, marketplace ambiguity, and nonempty data", async () => {
+  const cases = [
+    "cache-symlink",
+    "malformed-marker",
+    "marketplace-unrelated-entry",
+    "marketplace-duplicate-entry",
+    "nonempty-data",
+  ];
+  for (const kind of cases) {
+    const box = makeSandbox("claude");
+    try {
+      const pkg = buildPackage(box.root, "claude");
+      const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
+      await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+      let preserved;
+      let preservedContents;
+      if (kind === "cache-symlink") {
+        const outside = join(box.root, "outside-cache");
+        mkdirSync(outside);
+        preserved = join(outside, "user.txt");
+        preservedContents = "preserve\n";
+        writeFileSync(preserved, preservedContents);
+        const cacheRoot = join(box.home, "plugins", "cache", MARKETPLACE, MARKETPLACE);
+        mkdirSync(dirname(cacheRoot), { recursive: true });
+        symlinkSync(outside, cacheRoot, "dir");
+      } else if (kind === "malformed-marker") {
+        preserved = join(box.managedRoot, ".opensocrates-managed.json");
+        preservedContents = '{"schemaVersion":1}\n';
+        writeFileSync(preserved, preservedContents);
+      } else if (kind.startsWith("marketplace-")) {
+        preserved = join(box.managedRoot, ".claude-plugin", "marketplace.json");
+        const marketplace = JSON.parse(readFileSync(preserved, "utf8"));
+        marketplace.plugins.push(
+          kind === "marketplace-duplicate-entry"
+            ? { ...marketplace.plugins[0] }
+            : { name: "unrelated", source: "./plugins/unrelated" },
+        );
+        preservedContents = `${JSON.stringify(marketplace, null, 2)}\n`;
+        writeFileSync(preserved, preservedContents);
+      } else {
+        const [data] = seedClaudePluginData(box.home);
+        preserved = join(data, "unknown-user-data.json");
+        preservedContents = "preserve\n";
+        writeFileSync(preserved, preservedContents);
+      }
+
+      const result = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+      assert.notEqual(result.error, undefined, `${kind} reported complete purge`);
+      assert.match(result.output, /purge is incomplete/);
+      assert.equal(readFileSync(preserved, "utf8"), preservedContents);
+    } finally {
+      box.cleanup();
+    }
+  }
+});
+
+test("purge preserves an OpenCode bridge whose sidecar has unexpected ownership keys", async () => {
+  const box = makeSandbox("opencode");
+  try {
+    const pkg = buildPackage(box.root, "opencode");
+    const args = ["--host", "opencode", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    const install = await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    assert.equal(install.error, undefined, `setup install failed: ${install.error?.message}`);
+    const bridge = join(box.home, "plugins", "opensocrates.js");
+    const sidecar = join(box.home, "plugins", ".opensocrates-managed.json");
+    const document = JSON.parse(readFileSync(sidecar, "utf8"));
+    document.unexpectedOwner = "user";
+    const preserved = `${JSON.stringify(document, null, 2)}\n`;
+    writeFileSync(sidecar, preserved);
+
+    const result = await quiet(() => main(["remove", "--host", "opencode", "--purge"]));
+    assert.notEqual(result.error, undefined, "ambiguous OpenCode sidecar reported complete purge");
+    assert.match(result.output, /purge is incomplete/);
+    assert.doesNotMatch(result.output, /purge completed/);
+    assert.equal(existsSync(bridge), true, "bridge with ambiguous ownership was deleted");
+    assert.equal(readFileSync(sidecar, "utf8"), preserved);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("purge treats a dangling exact plugin-data symlink as unsafe rather than absent", async () => {
+  const box = makeSandbox("claude");
+  try {
+    const dataParent = join(box.home, "plugins", "data");
+    const link = join(dataParent, "opensocrates-inline");
+    mkdirSync(dataParent, { recursive: true });
+    symlinkSync(join(box.root, "missing-data-target"), link, "dir");
+
+    const result = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.notEqual(result.error, undefined, "dangling plugin-data symlink reported complete purge");
+    assert.match(result.output, /symbolic-link Claude OpenSocrates plugin data path/);
+    assert.doesNotMatch(result.output, /purge completed/);
+    assert.ok(readdirSync(dataParent).includes("opensocrates-inline"), "dangling symlink was deleted");
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("final state cleanup failure preserves unknown data and never prints purge success", async () => {
+  const box = makeSandbox("claude");
+  try {
+    const pkg = buildPackage(box.root, "claude");
+    const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    const unknown = join(box.root, "state", "user-owned-note.txt");
+    writeFileSync(unknown, "preserve unknown state\n");
+
+    const first = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.notEqual(first.error, undefined, "nonempty final state directory reported complete purge");
+    assert.match(first.output, /state cleanup remains/);
+    assert.match(first.output, /retry command: opensocrates remove --host claude --purge/);
+    assert.match(first.output, /purge is incomplete/);
+    assert.doesNotMatch(first.output, /purge completed/);
+    assert.equal(readFileSync(unknown, "utf8"), "preserve unknown state\n");
+
+    rmSync(unknown);
+    const recovered = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.equal(recovered.error, undefined, `state cleanup recovery failed: ${recovered.error?.message}`);
+    assert.equal(existsSync(join(box.root, "state")), false);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("purge resumes an interrupted known state tombstone after a stale lock", async () => {
+  const box = makeSandbox("claude");
+  try {
+    const stateDirectory = join(box.root, "state");
+    mkdirSync(stateDirectory, { recursive: true });
+    const interrupted = join(
+      stateDirectory,
+      `.purge-finalize-${randomUUID()}-desired-state.json`,
+    );
+    writeFileSync(
+      interrupted,
+      `${JSON.stringify({
+        schema: "opensocrates.desired-state/1.0.0",
+        channel: "stable",
+        installedHosts: [],
+        activeVersion: null,
+        updatePolicy: { intervalHours: 24, allowMajor: false },
+        autoUpdate: { enabled: false, hosts: [], nextCheckAt: null },
+        availableVersion: null,
+        lastCheckAt: null,
+        lastSuccessfulUpdateAt: null,
+      })}\n`,
+    );
+    const exited = spawnSync("/usr/bin/true");
+    assert.equal(exited.status, 0);
+    writeFileSync(
+      join(stateDirectory, "lifecycle.lock"),
+      `${JSON.stringify({ pid: exited.pid, startedAt: "2000-01-01T00:00:00.000Z" })}\n`,
+    );
+
+    const result = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.equal(result.error, undefined, `interrupted purge recovery failed: ${result.error?.message}`);
+    assert.match(result.output, /purge completed/);
+    assert.equal(existsSync(stateDirectory), false, "known purge tombstone survived recovery");
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("LaunchAgent permission failure is pending and recoverable", async () => {
+  const box = makeSandbox("claude");
+  try {
+    const pkg = buildPackage(box.root, "claude");
+    const args = ["--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum];
+    await withDarwinArm64(() => quiet(() => main(["install", ...args])));
+    configureFakeNpx(box);
+    await withDarwinArm64(() => quiet(() => main(["auto-update", "enable", "--host", "claude"])));
+    const launchAgent = join(box.root, "LaunchAgents", "com.opensocrates.auto-update.plist");
+    chmodSync(launchAgent, 0o000);
+
+    const first = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.notEqual(first.error, undefined, "unreadable LaunchAgent reported complete purge");
+    assert.match(first.output, /finalization: launch-agent failed/);
+    assert.match(first.output, /com\.opensocrates\.auto-update\.plist/);
+    assert.match(first.output, /purge is incomplete/);
+    assert.doesNotMatch(first.output, /purge completed/);
+    assert.equal(existsSync(launchAgent), true, "unverified LaunchAgent was deleted");
+
+    chmodSync(launchAgent, 0o600);
+    const recovered = await quiet(() => main(["remove", "--host", "claude", "--purge"]));
+    assert.equal(recovered.error, undefined, `LaunchAgent recovery failed: ${recovered.error?.message}`);
+    assert.equal(existsSync(launchAgent), false);
+  } finally {
+    const launchAgent = join(box.root, "LaunchAgents", "com.opensocrates.auto-update.plist");
+    if (existsSync(launchAgent)) chmodSync(launchAgent, 0o600);
+    box.cleanup();
+  }
+});
 
 for (const host of ["antigravity", "cursor", "grok"]) {
   test(`${host}: content-only plugin install -> status -> update -> verify -> remove`, async () => {
