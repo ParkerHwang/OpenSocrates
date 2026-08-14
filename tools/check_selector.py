@@ -20,11 +20,12 @@ from dataclasses import dataclass, field
 from io import BytesIO, StringIO
 from itertools import combinations
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 from unittest.mock import patch
 
 from json_schema_2020 import check_schema as check_json_schema
 from json_schema_2020 import validate as validate_json_schema
+from measure_codex_hook_timing import EXPECTED_COMMAND, PROCESS_MODEL, measure_codex_session_start
 from opensocrates.clock import FrozenClock
 from opensocrates.content.hashes import normalized_semantic_hash, source_tree_hash
 from opensocrates.content.injection import (
@@ -52,7 +53,8 @@ from opensocrates.domain.models import (
     SelectionCatalogEntry,
     TemplateExample,
 )
-from opensocrates.hooks.entrypoint import run_hook
+from opensocrates.hooks.codex_session_start import restore_codex_compact_session_start
+from opensocrates.hooks.entrypoint import MAX_HOOK_INPUT_BYTES, run_hook
 from opensocrates.hosts.codex.adapter import CodexAdapter, CodexAdapterConfig
 from opensocrates.hosts.codex.commands import build_hooks
 from opensocrates.selector.application import SelectorApplication
@@ -85,6 +87,15 @@ from opensocrates.selector.sdk_worker import (
     _thread_config,
     _thread_start_params,
     _watch_deadline,
+)
+from release_check import (
+    CommandResult,
+    ReleaseCheckError,
+    _codex_package_manifest_identity,
+    _codex_session_start_timing,
+    _codex_session_start_timing_check,
+    _evidence_check,
+    _valid_codex_session_start_timing_evidence,
 )
 from validate_content import parse_yaml_file
 
@@ -1253,6 +1264,23 @@ def _test_codex_selector_host_contract() -> None:
         _require(malformed.handle(prompt).stdout == "")
         _require(no_decision.handle(prompt).stdout == "")
 
+        stale_assembled = ProjectionInstructionAssembler(_projections()).assemble(
+            (_METHODS[0],), requested_locale="en"
+        )
+        stale = store.create("stale-session", "stale-turn", stale_assembled)
+        stale_seconds = clock.unix_time_ns() // 1_000_000_000 - INSTRUCTION_FILE_TTL_SECONDS - 1
+        os.utime(stale.path, (stale_seconds, stale_seconds))
+        cleanup_only = CodexAdapter(
+            CodexAdapterConfig(
+                selector_mode=True,
+                instruction_file_store=store,
+            )
+        )
+        _require(cleanup_only.handle(_native_payload("UserPromptSubmit")).stdout == "")
+        _require(not stale.path.exists())
+        with patch.object(InstructionFileStore, "sweep_expired", side_effect=OSError):
+            _require(cleanup_only.handle(_native_payload("UserPromptSubmit")).stdout == "")
+
 
 @_check("VSC-10-hook-entrypoint-empty-stdout-and-recursion-guard")
 def _test_hook_entrypoint_contract() -> None:
@@ -1352,6 +1380,36 @@ def _test_hook_entrypoint_contract() -> None:
         else:
             os.environ[SELECTOR_RECURSION_ENV] = original_marker
 
+    constructed[0] = False
+    with patch("opensocrates.cli.runtime.build_runtime_services", unexpected_runtime):
+        for source in ("startup", "resume", "clear", "future-source"):
+            output = StringIO()
+            exit_code = run_hook(
+                ("codex", "session_started"),
+                stdin=BytesIO(
+                    json.dumps(_native_payload("SessionStart", source=source)).encode("utf-8")
+                ),
+                stdout=output,
+            )
+            _require(exit_code == 0 and output.getvalue() == "")
+        oversized = (
+            b'{"hook_event_name":"SessionStart","source":"startup","padding":"'
+            + b"x" * MAX_HOOK_INPUT_BYTES
+            + b'"}'
+        )
+        for raw in (
+            oversized,
+            b'{"hook_event_name":"SessionStart","source":"startup","cwd":"\\ud800"}',
+        ):
+            output = StringIO()
+            exit_code = run_hook(
+                ("codex", "session_started"),
+                stdin=BytesIO(raw),
+                stdout=output,
+            )
+            _require(exit_code == 0 and output.getvalue() == "")
+    _require(not constructed[0])
+
     captured: list[dict[str, object]] = []
 
     def capture_runtime(**kwargs: object) -> _SyntheticRuntime:
@@ -1369,6 +1427,355 @@ def _test_hook_entrypoint_contract() -> None:
         )
     _require(exit_code == 0 and output.getvalue() == "")
     _require(captured == [{"host": "claude", "workspace": workspace}])
+
+
+@_check("VSC-10A-codex-compact-minimal-restore-and-fail-open")
+def _test_codex_compact_minimal_restore() -> None:
+    clock = FrozenClock(1_700_000_000_000_000_000)
+    payload = json.dumps(_native_payload("SessionStart", source="compact")).encode("utf-8")
+    with tempfile.TemporaryDirectory(prefix="opensocrates-compact-restore-check-") as name:
+        store = InstructionFileStore(
+            installation_key=b"c" * 32,
+            directory=Path(name) / "artifacts",
+            clock=clock,
+        )
+        assembled = ProjectionInstructionAssembler(_projections()).assemble(
+            (_METHODS[0],), requested_locale="en"
+        )
+        artifact = store.create("synthetic-session", "turn-a", assembled)
+        restored = restore_codex_compact_session_start(payload, artifact_store=store)
+        _require(restored is not None)
+        specific = restored.get("hookSpecificOutput")
+        _require(isinstance(specific, dict))
+        _require(specific.get("hookEventName") == "SessionStart")
+        _require(specific.get("additionalContext") == artifact.reference_message())
+
+        output = StringIO()
+        with (
+            patch(
+                "opensocrates.hooks.codex_session_start._build_artifact_store",
+                return_value=store,
+            ),
+            patch(
+                "opensocrates.cli.runtime.build_runtime_services",
+                side_effect=AssertionError("compact restore composed the full runtime"),
+            ),
+        ):
+            exit_code = run_hook(
+                ("codex", "session_started"),
+                stdin=BytesIO(payload),
+                stdout=output,
+            )
+        _require(exit_code == 0)
+        _require(json.loads(output.getvalue()) == restored)
+
+        stale_seconds = clock.unix_time_ns() // 1_000_000_000 - INSTRUCTION_FILE_TTL_SECONDS - 1
+        os.utime(artifact.path, (stale_seconds, stale_seconds))
+        _require(restore_codex_compact_session_start(payload, artifact_store=store) is None)
+        _require(not artifact.path.exists())
+
+        output = StringIO()
+        with patch(
+            "opensocrates.hooks.codex_session_start._build_artifact_store",
+            return_value=store,
+        ):
+            exit_code = run_hook(
+                ("codex", "session_started"),
+                stdin=BytesIO(payload),
+                stdout=output,
+            )
+        _require(exit_code == 0 and output.getvalue() == "")
+
+    oversized = json.dumps(
+        _native_payload("SessionStart", source="compact", padding="x" * (33 * 1024))
+    ).encode("utf-8")
+    _require(restore_codex_compact_session_start(b"not-json") is None)
+    _require(restore_codex_compact_session_start(oversized) is None)
+    with patch("opensocrates.hooks.codex_session_start._build_artifact_store", return_value=None):
+        _require(restore_codex_compact_session_start(payload) is None)
+
+
+@_check("VSC-10B-codex-packaged-hook-margin-evidence")
+def _test_codex_packaged_hook_margin_evidence() -> None:
+    with tempfile.TemporaryDirectory(prefix="opensocrates-codex-timing-check-") as name:
+        package = Path(name) / "package"
+        launcher = package / "bin" / "launch.sh"
+        runtime = (
+            package / "runtime" / "darwin-arm64" / "opensocrates-runtime" / "opensocrates-runtime"
+        )
+        launcher.parent.mkdir(parents=True)
+        runtime.parent.mkdir(parents=True)
+        launcher.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+        runtime.write_text("synthetic-runtime", encoding="utf-8")
+        launcher.chmod(0o700)
+        runtime.chmod(0o700)
+        hooks = build_hooks()
+        command = hooks["hooks"]["SessionStart"][0]["hooks"][0]
+        _require(command["command"] == EXPECTED_COMMAND)
+        (package / "hooks").mkdir()
+        (package / "hooks" / "hooks.json").write_text(json.dumps(hooks), encoding="utf-8")
+        (package / "release-manifest.json").write_text(
+            json.dumps(
+                {
+                    "host": "codex",
+                    "release_targets": ["darwin-arm64"],
+                    "runtime_targets": ["darwin-arm64"],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        values = [1_500.0, *([100.0] * 19)]
+
+        def passing_runner(
+            _launcher: Path,
+            _payload: bytes,
+            environment: Mapping[str, str],
+            _workspace: Path,
+            _timeout: float,
+        ) -> tuple[float, bool]:
+            _require(set(environment) == {"HOME", "TMPDIR", "CODEX_HOME", "PATH", "LANG", "LC_ALL"})
+            return values.pop(0), True
+
+        report = measure_codex_session_start(
+            package,
+            20,
+            sample_runner=passing_runner,
+            require_native=False,
+        )
+        _require(report["pass"] is True)
+        _require(
+            report["latency_ms"] == {"first": 1500.0, "p50": 100.0, "p95": 100.0, "max": 1500.0}
+        )
+        _require(
+            set(report)
+            == {
+                "target",
+                "artifact_identity",
+                "process_model",
+                "sample_count",
+                "latency_ms",
+                "configured_timeout_ms",
+                "pass",
+            }
+        )
+        serialized = json.dumps(report, sort_keys=True)
+        _require(name not in serialized)
+        _require(all(term not in serialized for term in ("prompt", "envelope", "stdout")))
+
+        values = [2_001.0, *([100.0] * 19)]
+        first_timeout = measure_codex_session_start(
+            package,
+            20,
+            sample_runner=passing_runner,
+            require_native=False,
+        )
+        _require(first_timeout["pass"] is False)
+
+        values = [1_000.0004, 1_000.0004, *([100.0] * 18)]
+        narrow_margin = measure_codex_session_start(
+            package,
+            20,
+            sample_runner=passing_runner,
+            require_native=False,
+        )
+        _require(narrow_margin["latency_ms"]["p95"] == 1_000.0)
+        _require(narrow_margin["pass"] is False)
+
+
+@_check("VSC-10C-codex-timing-evidence-strict-validation")
+def _test_codex_timing_evidence_strict_validation() -> None:
+    expected_identity = "sha256:" + ("0" * 64)
+    valid: dict[str, Any] = {
+        "target": "darwin-arm64",
+        "artifact_identity": expected_identity,
+        "process_model": PROCESS_MODEL,
+        "sample_count": 20,
+        "latency_ms": {"first": 900.0, "p50": 100.0, "p95": 200.0, "max": 900.0},
+        "configured_timeout_ms": 2000,
+        "pass": True,
+    }
+    _require(
+        _valid_codex_session_start_timing_evidence(
+            valid, expected_artifact_identity=expected_identity
+        )
+    )
+
+    mutations: list[dict[str, Any]] = []
+
+    extra_key = deepcopy(valid)
+    extra_key["unexpected"] = "rejected"
+    mutations.append(extra_key)
+
+    missing_key = deepcopy(valid)
+    del missing_key["target"]
+    mutations.append(missing_key)
+
+    wrong_target = deepcopy(valid)
+    wrong_target["target"] = "darwin-x64"
+    mutations.append(wrong_target)
+
+    wrong_sample_count = deepcopy(valid)
+    wrong_sample_count["sample_count"] = 20.0
+    mutations.append(wrong_sample_count)
+
+    wrong_timeout = deepcopy(valid)
+    wrong_timeout["configured_timeout_ms"] = 2000.0
+    mutations.append(wrong_timeout)
+
+    forged_pass = deepcopy(valid)
+    forged_pass["latency_ms"]["max"] = 2000.0
+    mutations.append(forged_pass)
+
+    non_boolean_pass = deepcopy(valid)
+    non_boolean_pass["pass"] = 1
+    mutations.append(non_boolean_pass)
+
+    bad_identity_length = deepcopy(valid)
+    bad_identity_length["artifact_identity"] = "sha256:" + ("0" * 63)
+    mutations.append(bad_identity_length)
+
+    bad_identity_case = deepcopy(valid)
+    bad_identity_case["artifact_identity"] = "sha256:" + ("A" * 64)
+    mutations.append(bad_identity_case)
+
+    other_valid_identity = deepcopy(valid)
+    other_valid_identity["artifact_identity"] = "sha256:" + ("1" * 64)
+    mutations.append(other_valid_identity)
+
+    forged_process_model = deepcopy(valid)
+    forged_process_model["process_model"] = "same_process"
+    mutations.append(forged_process_model)
+
+    boolean_latency = deepcopy(valid)
+    boolean_latency["latency_ms"]["p50"] = True
+    mutations.append(boolean_latency)
+
+    non_finite_nan = deepcopy(valid)
+    non_finite_nan["latency_ms"]["p50"] = float("nan")
+    mutations.append(non_finite_nan)
+
+    non_finite_infinity = deepcopy(valid)
+    non_finite_infinity["latency_ms"]["p95"] = float("inf")
+    mutations.append(non_finite_infinity)
+
+    negative_latency = deepcopy(valid)
+    negative_latency["latency_ms"]["first"] = -0.001
+    mutations.append(negative_latency)
+
+    rounded_boundary_exceeded = deepcopy(valid)
+    rounded_boundary_exceeded["latency_ms"]["p95"] = 1000.0004
+    rounded_boundary_exceeded["latency_ms"]["max"] = 1500.0
+    mutations.append(rounded_boundary_exceeded)
+
+    percentile_order_forged = deepcopy(valid)
+    percentile_order_forged["latency_ms"]["p50"] = 300.0
+    percentile_order_forged["latency_ms"]["p95"] = 200.0
+    mutations.append(percentile_order_forged)
+
+    maximum_percentile_order_forged = deepcopy(valid)
+    maximum_percentile_order_forged["latency_ms"]["p95"] = 901.0
+    mutations.append(maximum_percentile_order_forged)
+
+    maximum_order_forged = deepcopy(valid)
+    maximum_order_forged["latency_ms"]["first"] = 901.0
+    mutations.append(maximum_order_forged)
+
+    latency_key_forged = deepcopy(valid)
+    latency_key_forged["latency_ms"]["minimum"] = 0.0
+    mutations.append(latency_key_forged)
+
+    _require(
+        all(
+            not _valid_codex_session_start_timing_evidence(
+                item, expected_artifact_identity=expected_identity
+            )
+            for item in mutations
+        )
+    )
+
+
+@_check("VSC-10D-release-consumers-reject-forged-timing-evidence")
+def _test_release_consumers_reject_forged_timing_evidence() -> None:
+    with tempfile.TemporaryDirectory(prefix="opensocrates-timing-consumer-check-") as name:
+        root = Path(name)
+        manifest = root / "dist" / "codex" / "release-manifest.json"
+        manifest.parent.mkdir(parents=True)
+        manifest.write_text('{"synthetic":"manifest"}\n', encoding="utf-8")
+        expected_identity = _codex_package_manifest_identity(root)
+        _require(expected_identity is not None)
+        forged_identity = "sha256:" + ("0" * 64)
+        if forged_identity == expected_identity:
+            forged_identity = "sha256:" + ("1" * 64)
+        forged: dict[str, Any] = {
+            "target": "darwin-arm64",
+            "artifact_identity": forged_identity,
+            "process_model": PROCESS_MODEL,
+            "sample_count": 20,
+            "latency_ms": {"first": 900.0, "p50": 100.0, "p95": 200.0, "max": 900.0},
+            "configured_timeout_ms": 2000,
+            "pass": True,
+        }
+        bound = deepcopy(forged)
+        bound["artifact_identity"] = expected_identity
+        _require(
+            _valid_codex_session_start_timing_evidence(
+                bound, expected_artifact_identity=expected_identity
+            )
+        )
+        bound_projection = _codex_session_start_timing_check(root, "pass", bound)
+        _require(bound_projection["status"] == "pass")
+        _require(bound_projection["evidence"] == bound)
+
+        with (
+            patch("release_check._run", return_value=CommandResult(status="pass", code="ok")),
+            patch("release_check._load_json", return_value=forged),
+        ):
+            try:
+                _codex_session_start_timing(root)
+            except ReleaseCheckError as error:
+                _require(str(error) == "codex_session_start_timing_invalid")
+            else:
+                raise _ContractFailure
+
+        evidence_documents: dict[str, dict[str, Any]] = {
+            "security-scan.json": {
+                "schema": "opensocrates.security-scan-evidence/1.0.0",
+                "status": "pass",
+            },
+            "sbom.json": {
+                "schema": "opensocrates.sbom-evidence/1.0.0",
+                "status": "pass",
+            },
+            "sbom.spdx.json": {"spdxVersion": "SPDX-2.3"},
+            "runtime-build-claude.json": {
+                "schema": "opensocrates.runtime-build-evidence/1.0.0",
+                "status": "pass",
+                "version": "synthetic-version",
+                "runtime_profile": "claude",
+            },
+            "runtime-build-codex.json": {
+                "schema": "opensocrates.runtime-build-evidence/1.0.0",
+                "status": "pass",
+                "version": "synthetic-version",
+                "runtime_profile": "codex",
+            },
+            "codex-session-start-timing.json": forged,
+        }
+
+        def evidence_loader(path: Path) -> dict[str, Any] | None:
+            return evidence_documents.get(path.name)
+
+        with patch("release_check._load_json", side_effect=evidence_loader):
+            evidence = _evidence_check(root, "synthetic-version", assembly_status="pass")
+        _require(evidence["status"] == "fail")
+        _require(evidence["codex_session_start_timing"] is None)
+        _require(evidence["error_codes"] == ["codex_session_start_timing_invalid"])
+
+        projected = _codex_session_start_timing_check(root, "pass", forged)
+        _require(projected["status"] == "fail")
+        _require(projected["evidence"] is None)
+        _require(projected["error_codes"] == ["codex_session_start_timing_not_passing"])
 
 
 def main() -> int:
