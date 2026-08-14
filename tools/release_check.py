@@ -1681,6 +1681,34 @@ _CLAUDE_CHAT_FORBIDDEN_SUFFIXES = (
 )
 
 
+def _claude_chat_archive_markdown_errors(bundle: zipfile.ZipFile, entries: list[str]) -> set[str]:
+    errors: set[str] = set()
+    for entry in entries:
+        if not entry.lower().endswith(".md"):
+            continue
+        try:
+            markdown_text = bundle.read(entry).decode("utf-8")
+        except (KeyError, UnicodeError):
+            errors.add("claude_chat_archive_markdown_unreadable")
+            continue
+        if "/opensocrates:opensocrates" in markdown_text:
+            errors.add("claude_chat_archive_plugin_namespace_present")
+    return errors
+
+
+def _claude_chat_tree_markdown_errors(skill: Path) -> set[str]:
+    errors: set[str] = set()
+    for markdown in skill.rglob("*.md"):
+        try:
+            markdown_text = markdown.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            errors.add("claude_chat_markdown_unreadable")
+            continue
+        if "/opensocrates:opensocrates" in markdown_text:
+            errors.add("claude_chat_plugin_namespace_present")
+    return errors
+
+
 def _claude_chat_archive_errors(archive: Path) -> set[str]:
     """Assert the Chat ZIP is one directly uploadable skill folder.
 
@@ -1691,6 +1719,7 @@ def _claude_chat_archive_errors(archive: Path) -> set[str]:
     errors: set[str] = set()
     with zipfile.ZipFile(archive) as bundle:
         entries = [name for name in bundle.namelist() if not name.endswith("/")]
+        errors |= _claude_chat_archive_markdown_errors(bundle, entries)
         try:
             skill_text = bundle.read(f"{_CLAUDE_CHAT_SKILL_ROOT}/SKILL.md").decode("utf-8")
         except (KeyError, UnicodeError):
@@ -1761,6 +1790,7 @@ def _verify_claude_chat_skills(
             or CLAUDE_PLUGIN_INVOCATION_MARKER in normalized_skill
         ):
             errors.add("claude_chat_invocation_contract_invalid")
+    errors |= _claude_chat_tree_markdown_errors(skill)
     forbidden_trees = ("bin", "commands", "content", "hooks", "runtime", "schemas")
     if any((package / name).exists() for name in forbidden_trees):
         errors.add("claude_chat_runtime_surface_present")
