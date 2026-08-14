@@ -97,6 +97,8 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
@@ -110,13 +112,17 @@ jobs:
         run: uv sync --locked --no-install-project --group build
       - name: Build and validate native package
         run: make package
+      - name: Write exact package source provenance
+        env:
+          OPENSOCRATES_EXPECTED_SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: node tools/write_package_provenance.mjs
       - name: Exercise all-host install in a fresh macOS runner
         run: npm test
       - name: Upload native package evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: package-darwin-arm64-${{ github.run_id }}
+          name: package-darwin-arm64-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             dist/
             build/evidence/
