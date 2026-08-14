@@ -822,7 +822,7 @@ test("a later multi-host commit failure records only the host that rollback actu
     );
     assert.equal(enabled.error, undefined, `updater setup failed: ${enabled.error?.message}`);
 
-    const removed = await quiet(() => main(["remove", "--host", "all"]));
+    const removed = await withDarwinArm64(() => quiet(() => main(["remove", "--host", "all"])));
     assert.notEqual(removed.error, undefined, "partial commit reported removal success");
     assert.match(
       removed.output,
