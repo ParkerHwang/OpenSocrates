@@ -22,6 +22,8 @@ conditions hold:
 
 - macOS hardware and the Node process are `arm64`, the process is not root or
   under `sudo`, and the account home is canonical and owned by the current UID;
+- Python 3.12 is available for the hermetic installed `SessionStart` timing
+  driver;
 - Claude and Codex are authenticated and each has exactly one managed
   OpenSocrates 1.2.1 registration at the canonical managed root;
 - Claude and Codex managed roots and cache versions pass their complete
@@ -38,11 +40,11 @@ conditions hold:
 The candidate gate creates an exact eight-file `npm pack` tarball. It also pins
 the successful CI repository, workflow, run ID, attempt, full head SHA,
 immutable artifact ID, artifact name, raw ZIP digest and size, build-time commit
-and tree receipt, both host payload manifests, and the canonical Claude and Codex
-executables with their SHA-256 digests. Destructive lifecycle capsules pass
-those exact host binaries explicitly and do not depend on the capsule's reduced
-shell `PATH`. Public npm and GitHub release 1.2.1 remain unavailable and are not
-used or claimed.
+and tree receipt, both host payload manifests, and the canonical Python, Claude,
+and Codex executables with their SHA-256 digests. Destructive lifecycle capsules
+pass the exact host binaries explicitly and do not depend on the capsule's
+reduced shell `PATH`; final timing invokes the pinned Python directly. Public npm
+and GitHub release 1.2.1 remain unavailable and are not used or claimed.
 
 ## Start the automated cycle
 

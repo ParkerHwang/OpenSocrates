@@ -220,6 +220,7 @@ function executionFixture(root) {
     npxBinary: "/private/pinned/bin/npx",
     npmBinary: "/private/pinned/bin/npm",
     nodeBinary: process.execPath,
+    pythonBinary: realpathSync(process.execPath),
     claudeBinary: realpathSync(process.execPath),
     codexBinary: realpathSync(process.execPath),
     accountHome: realpathSync(homedir()),
@@ -853,6 +854,7 @@ test("real packed purge and install dispatch only through durable lifecycle rece
       nodeBinarySha256: "4".repeat(64),
       npmBinarySha256: "5".repeat(64),
       npxBinarySha256: "6".repeat(64),
+      pythonBinarySha256: "9".repeat(64),
       claudeBinarySha256: "7".repeat(64),
       codexBinarySha256: "8".repeat(64),
     });
@@ -2729,7 +2731,13 @@ test("installed SessionStart measurement enforces 20 cold samples, 2000ms, and e
       latency_ms: { first: 5, p95: 10, max: 12 },
     };
     const recorder = {
-      run: (_label, _executable, args) => {
+      run: (_label, executable, args, options) => {
+        assert.equal(executable, realpathSync(process.execPath));
+        assert.equal(args[0], "tools/measure_codex_hook_timing.py");
+        assert.equal(args.includes("run"), false);
+        assert.equal(options.env.HOME, privateDirectory);
+        assert.equal(options.env.PYTHONNOUSERSITE, "1");
+        assert.equal(Object.hasOwn(options.env, "NPM_TOKEN"), false);
         const reportPath = args[args.indexOf("--report") + 1];
         writeFileSync(reportPath, `${JSON.stringify(value)}\n`, { mode: 0o600 });
         return { status: 0 };
@@ -2740,6 +2748,7 @@ test("installed SessionStart measurement enforces 20 cold samples, 2000ms, and e
       privateDirectory,
       join(root, "plugin-root-not-opened"),
       releaseManifestSha256,
+      realpathSync(process.execPath),
     );
     assert.equal(measured.sampleCount, 20);
     assert.equal(measured.configuredTimeoutMs, 2000);
@@ -2753,6 +2762,7 @@ test("installed SessionStart measurement enforces 20 cold samples, 2000ms, and e
         privateDirectory,
         join(root, "plugin-root-not-opened"),
         releaseManifestSha256,
+        realpathSync(process.execPath),
       ),
       AcceptanceError,
     );
@@ -2814,6 +2824,28 @@ test("entering finalizing is an absorbing one-shot boundary after hook or later 
       assert.equal(checkpoint.lastObservedState.testId, testId);
       assert.equal(checkpoint.lastObservedState.sourceCommit, checkpoint.sourceCommit);
       assert.equal(checkpoint.lastObservedState.firstReviewReplayForbidden, true);
+      const publicFailureState = acceptance.finalizationFailureState(checkpoint);
+      assert.deepEqual(publicFailureState, {
+        classification: "one_shot_final_verification_interrupted",
+        installedHosts: ["claude", "codex"],
+        actualStateRecorded: false,
+        previousStateRestorationClaimed: false,
+      });
+      const failedReport = makeReport();
+      failedReport.mutation.started = true;
+      failedReport.mutation.purgeCommandAttempts = 1;
+      failedReport.mutation.trustResetAttempts = 1;
+      failedReport.mutation.reinstallAttempts = 1;
+      applyMutationOutcome(failedReport, {
+        status: "failed",
+        phase: "finalizing",
+        reinstallAttempted: true,
+        failureState: publicFailureState,
+        error: new AcceptanceError("session-start-budget", "fixture failure"),
+      });
+      const publicDirectory = join(privateDirectory, "public-failure");
+      mkdirSync(publicDirectory, { mode: 0o700 });
+      assert.doesNotThrow(() => writeReports(publicDirectory, failedReport));
       assert.throws(
         () => recoveryPlanForPhase(checkpoint, { classification: "candidate_installed_unverified" }),
         AcceptanceError,
@@ -6280,11 +6312,13 @@ test("real packed wrapper reuses its durable lifecycle sandbox when importing a 
         npxBinary: realpathSync(fakeNpx),
         npmBinary: realpathSync(process.execPath),
         nodeBinary: realpathSync(process.execPath),
+        pythonBinary: realpathSync(process.execPath),
         claudeBinary: realpathSync(process.execPath),
         codexBinary: realpathSync(process.execPath),
         npxBinarySha256: "1".repeat(64),
         npmBinarySha256: "2".repeat(64),
         nodeBinarySha256: "3".repeat(64),
+        pythonBinarySha256: "6".repeat(64),
         claudeBinarySha256: "4".repeat(64),
         codexBinarySha256: "5".repeat(64),
       },

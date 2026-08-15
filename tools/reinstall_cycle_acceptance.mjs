@@ -1528,9 +1528,11 @@ function validatePublicSource(source) {
         "nodeVersion",
         "npmVersion",
         "npxVersion",
+        "pythonVersion",
         "npmBinarySha256",
         "npxBinarySha256",
         "nodeBinarySha256",
+        "pythonBinarySha256",
       ]),
       "result.source.npmPackage.execution",
     );
@@ -2099,9 +2101,11 @@ function validatePublicSemanticContracts(report) {
       !publicSemver(npmPackage.execution.nodeVersion, { nodePrefix: true }) ||
       !publicSemver(npmPackage.execution.npmVersion) ||
       !publicSemver(npmPackage.execution.npxVersion) ||
+      !/^3\.12\.\d+$/u.test(npmPackage.execution.pythonVersion) ||
       !publicSha256(npmPackage.execution.npmBinarySha256) ||
       !publicSha256(npmPackage.execution.npxBinarySha256) ||
-      !publicSha256(npmPackage.execution.nodeBinarySha256)
+      !publicSha256(npmPackage.execution.nodeBinarySha256) ||
+      !publicSha256(npmPackage.execution.pythonBinarySha256)
     ) {
       fail("privacy", "public npm provenance violates its closed contract");
     }
@@ -7494,15 +7498,14 @@ function measureInstalledSessionStart(
   privateDirectory,
   codexPluginRoot,
   expectedReleaseManifestSha256,
+  pythonBinary,
 ) {
   const reportPath = join(privateDirectory, "codex-session-start-timing.json");
   const monotonicStartMs = performance.now();
   recorder.run(
     "Measure installed Codex SessionStart budget",
-    "uv",
+    pythonBinary,
     [
-      "run",
-      "python",
       "tools/measure_codex_hook_timing.py",
       "--package",
       codexPluginRoot,
@@ -7515,6 +7518,15 @@ function measureInstalledSessionStart(
       category: "session-start-budget",
       failureMessage: "the installed Codex SessionStart timing gate failed",
       timeout: 300_000,
+      env: {
+        HOME: privateDirectory,
+        PATH: "/usr/bin:/bin:/usr/sbin:/sbin",
+        TMPDIR: tmpdir(),
+        LANG: "C",
+        LC_ALL: "C",
+        PYTHONPATH: "",
+        PYTHONNOUSERSITE: "1",
+      },
     },
   );
   const monotonicEndMs = performance.now();
@@ -7743,6 +7755,7 @@ function prepareIsolatedNpx(privateDirectory) {
     npxBinary: resolveExecutable("npx"),
     npmBinary: resolveExecutable("npm"),
     nodeBinary: realpathSync(process.execPath),
+    pythonBinary: resolveExecutable("python3.12"),
     claudeBinary: resolveExecutable("claude"),
     codexBinary: resolveExecutable("codex"),
   };
@@ -8009,6 +8022,7 @@ function lifecycleCandidateIdentity(candidate) {
       nodeBinarySha256: candidate.execution?.nodeBinarySha256,
       npmBinarySha256: candidate.execution?.npmBinarySha256,
       npxBinarySha256: candidate.execution?.npxBinarySha256,
+      pythonBinarySha256: candidate.execution?.pythonBinarySha256,
       claudeBinarySha256: candidate.execution?.claudeBinarySha256,
       codexBinarySha256: candidate.execution?.codexBinarySha256,
     },
@@ -8077,6 +8091,7 @@ async function pinExecutionIdentity(recorder, execution) {
   execution.npxBinarySha256 = await sha256File(execution.npxBinary);
   execution.npmBinarySha256 = await sha256File(execution.npmBinary);
   execution.nodeBinarySha256 = await sha256File(execution.nodeBinary);
+  execution.pythonBinarySha256 = await sha256File(execution.pythonBinary);
   execution.claudeBinarySha256 = await sha256File(execution.claudeBinary);
   execution.codexBinarySha256 = await sha256File(execution.codexBinary);
   const candidate = { execution };
@@ -8105,6 +8120,27 @@ async function pinExecutionIdentity(recorder, execution) {
     fail("npx-isolation", "npm or npx returned an unsupported version identity");
   }
   execution.nodeVersion = process.version;
+  execution.pythonVersion = recorder.run(
+    "Read pinned Python version",
+    execution.pythonBinary,
+    ["-c", "import platform; print(platform.python_version())"],
+    {
+      category: "python-toolchain",
+      failureMessage: "the pinned Python version could not be read",
+      persistRaw: false,
+      env: {
+        HOME: execution.accountHome,
+        PATH: "/usr/bin:/bin:/usr/sbin:/sbin",
+        LANG: "C",
+        LC_ALL: "C",
+        PYTHONPATH: "",
+        PYTHONNOUSERSITE: "1",
+      },
+    },
+  ).stdout;
+  if (!/^3\.12\.\d+$/u.test(execution.pythonVersion)) {
+    fail("python-toolchain", "the acceptance timing gate requires Python 3.12");
+  }
   return execution;
 }
 
@@ -8114,11 +8150,12 @@ async function verifyExecutionIdentity(recorder, candidate) {
     (await sha256File(execution.npxBinary)) !== execution.npxBinarySha256 ||
     (await sha256File(execution.npmBinary)) !== execution.npmBinarySha256 ||
     (await sha256File(execution.nodeBinary)) !== execution.nodeBinarySha256 ||
+    (await sha256File(execution.pythonBinary)) !== execution.pythonBinarySha256 ||
     (await sha256File(execution.claudeBinary)) !== execution.claudeBinarySha256 ||
     (await sha256File(execution.codexBinary)) !== execution.codexBinarySha256 ||
     realpathSync(process.execPath) !== execution.nodeBinary
   ) {
-    fail("npx-isolation", "a pinned Node, npm, npx, or host executable changed after candidate preparation");
+    fail("npx-isolation", "a pinned Node, Python, npm, npx, or host executable changed after candidate preparation");
   }
   const npxVersion = recorder.run(
     "Reconfirm pinned npx version",
@@ -8141,9 +8178,10 @@ async function verifyExecutionIdentity(recorder, candidate) {
   if (
     npxVersion !== execution.npxVersion ||
     npmVersion !== execution.npmVersion ||
-    process.version !== execution.nodeVersion
+    process.version !== execution.nodeVersion ||
+    !/^3\.12\.\d+$/u.test(execution.pythonVersion ?? "")
   ) {
-    fail("npx-isolation", "the npm, npx, or Node execution identity changed before lifecycle use");
+    fail("npx-isolation", "the npm, npx, Node, or Python execution identity changed before lifecycle use");
   }
 }
 
@@ -9668,9 +9706,11 @@ async function prepareCandidate(recorder, report, privateDirectory) {
       nodeVersion: execution.nodeVersion,
       npmVersion: execution.npmVersion,
       npxVersion: execution.npxVersion,
+      pythonVersion: execution.pythonVersion,
       npmBinarySha256: execution.npmBinarySha256,
       npxBinarySha256: execution.npxBinarySha256,
       nodeBinarySha256: execution.nodeBinarySha256,
+      pythonBinarySha256: execution.pythonBinarySha256,
     },
   };
   const candidateForNpx = { packageArchive, execution };
@@ -10100,28 +10140,32 @@ function validateCandidatePaths(privateDirectory, candidate) {
   const npxBinary = realpathSync(candidate.execution.npxBinary);
   const npmBinary = realpathSync(candidate.execution.npmBinary);
   const nodeBinary = realpathSync(candidate.execution.nodeBinary);
+  const pythonBinary = realpathSync(candidate.execution.pythonBinary);
   const claudeBinary = realpathSync(candidate.execution.claudeBinary);
   const codexBinary = realpathSync(candidate.execution.codexBinary);
   const accountHome = lifecycleAccountHome(candidate.execution);
   accessSync(npxBinary, fsConstants.X_OK);
   accessSync(npmBinary, fsConstants.X_OK);
   accessSync(nodeBinary, fsConstants.X_OK);
+  accessSync(pythonBinary, fsConstants.X_OK);
   accessSync(claudeBinary, fsConstants.X_OK);
   accessSync(codexBinary, fsConstants.X_OK);
   if (
     npxBinary !== candidate.execution.npxBinary ||
     npmBinary !== candidate.execution.npmBinary ||
     nodeBinary !== candidate.execution.nodeBinary ||
+    pythonBinary !== candidate.execution.pythonBinary ||
     claudeBinary !== candidate.execution.claudeBinary ||
     codexBinary !== candidate.execution.codexBinary ||
     accountHome !== candidate.execution.accountHome ||
     !statSync(npxBinary).isFile() ||
     !statSync(npmBinary).isFile() ||
     !statSync(nodeBinary).isFile() ||
+    !statSync(pythonBinary).isFile() ||
     !statSync(claudeBinary).isFile() ||
     !statSync(codexBinary).isFile()
   ) {
-    fail("npx-isolation", "a pinned Node, npm, npx, or host executable changed or is unsafe");
+    fail("npx-isolation", "a pinned Node, Python, npm, npx, or host executable changed or is unsafe");
   }
 }
 
@@ -10410,6 +10454,9 @@ async function inspectFailureState(recorder, targets, candidate, stage) {
 }
 
 function nextActionForFailure(phase, state) {
+  if (phase === "finalizing") {
+    return "do_not_replay_first_review_review_private_evidence_and_restore_an_exact_baseline_before_a_new_run";
+  }
   if (phase === "purge" || phase === "clean-assertion") {
     return "review_private_command_and_exact_residue_without_automatic_repair";
   }
@@ -10423,6 +10470,29 @@ function nextActionForFailure(phase, state) {
     return "resume_post_install_checks_without_another_lifecycle_mutation";
   }
   return "review_the_actual_partial_state_without_claiming_restoration_or_automatic_repair";
+}
+
+export function finalizationFailureState(checkpoint) {
+  const state = checkpoint?.lastObservedState;
+  if (
+    checkpoint?.phase !== "finalizing" ||
+    state?.classification !== "one_shot_final_verification_interrupted" ||
+    !UUID_V4_PATTERN.test(state.finalizationId ?? "") ||
+    !UUID_V4_PATTERN.test(state.testId ?? "") ||
+    !/^[a-f0-9]{40}$/u.test(state.sourceCommit ?? "") ||
+    !sameStrings(state.installedHosts ?? [], HOSTS) ||
+    state.firstReviewReplayForbidden !== true ||
+    state.actualStateRecorded !== false ||
+    state.previousStateRestorationClaimed !== false
+  ) {
+    fail("finalizing", "the private one-shot interruption state is incomplete");
+  }
+  return {
+    classification: state.classification,
+    installedHosts: [...HOSTS],
+    actualStateRecorded: false,
+    previousStateRestorationClaimed: false,
+  };
 }
 
 export function selectFailureState(checkpoint, inspectedState) {
@@ -10769,6 +10839,7 @@ export async function assertFinalInstalled(
     privateDirectory,
     pluginRoots.codex,
     candidate.assets.codex.releaseManifestSha256,
+    candidate.execution.pythonBinary,
   );
   const desiredState = {
     schema: state.desired.schema,
@@ -11457,12 +11528,7 @@ export async function runMutation(
   } else if (outcome.status === "failed") {
     if (checkpoint.phase === "finalizing") {
       outcome.phase = "finalizing";
-      outcome.failureState = {
-        ...checkpoint.lastObservedState,
-        actualStateRecorded: false,
-        firstReviewReplayForbidden: true,
-        previousStateRestorationClaimed: false,
-      };
+      outcome.failureState = finalizationFailureState(checkpoint);
       return outcome;
     }
     outcome.failureState = selectFailureState(checkpoint, outcome.failureState);

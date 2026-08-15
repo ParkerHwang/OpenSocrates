@@ -21,6 +21,8 @@ focused Pull Request의 최신 커밋에 대한 Native package CI job이 성공�
 
 - macOS 하드웨어와 Node 프로세스가 모두 `arm64`이고, root 또는 `sudo` 실행이
   아니며, 계정 홈이 canonical 경로이고 현재 UID 소유입니다.
+- hermetic installed `SessionStart` timing driver를 위한 Python 3.12를 사용할 수
+  있습니다.
 - Claude와 Codex가 인증되어 있고, canonical managed root에 OpenSocrates 1.2.1
   등록이 각각 정확히 하나 있습니다.
 - Claude와 Codex managed root 및 cache version이 전체 checksum과 닫힌 파일 목록
@@ -35,10 +37,11 @@ focused Pull Request의 최신 커밋에 대한 Native package CI job이 성공�
 후보 gate는 정확한 8개 파일로 `npm pack` tarball을 만듭니다. 또한 성공한 CI의
 repository, workflow, run ID, attempt, full head SHA, immutable artifact ID, artifact
 name, raw ZIP digest와 size, 빌드 시점 commit/tree receipt, 두 호스트 payload
-manifest와 canonical Claude/Codex 실행 파일 및 각 SHA-256 digest를 고정합니다.
-파괴적 lifecycle capsule은 그 exact host binary를 명시적으로 전달하며 축소된 shell
-`PATH`에 의존하지 않습니다. 공개 npm 및 GitHub release의 1.2.1은 계속
-unavailable이며 사용하거나 검증했다고 주장하지 않습니다.
+manifest와 canonical Python/Claude/Codex 실행 파일 및 각 SHA-256 digest를
+고정합니다. 파괴적 lifecycle capsule은 exact host binary를 명시적으로 전달하며
+축소된 shell `PATH`에 의존하지 않고, 최종 timing은 고정한 Python을 직접
+실행합니다. 공개 npm 및 GitHub release의 1.2.1은 계속 unavailable이며 사용하거나
+검증했다고 주장하지 않습니다.
 
 ## 자동 cycle 시작
 
