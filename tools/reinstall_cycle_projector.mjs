@@ -19,6 +19,9 @@ function optionalString(value, key) {
 
 function project(kind, value) {
   if (kind === "status-only") return { status: "ok" };
+  if (kind === "claude-auth" && typeof value?.loggedIn === "boolean") {
+    return { loggedIn: value.loggedIn };
+  }
   if (kind === "claude-marketplaces" && Array.isArray(value)) {
     return value
       .filter((entry) => relevant(entry, "name", "opensocrates"))
@@ -58,6 +61,7 @@ const [kind, executable, ...args] = process.argv.slice(2);
 if (
   !new Set([
     "status-only",
+    "claude-auth",
     "claude-marketplaces",
     "claude-plugins",
     "codex-marketplaces",

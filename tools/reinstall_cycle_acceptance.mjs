@@ -5331,6 +5331,7 @@ class CommandRecorder {
         input !== undefined ||
         !new Set([
           "status-only",
+          "claude-auth",
           "claude-marketplaces",
           "claude-plugins",
           "codex-marketplaces",
@@ -7770,11 +7771,14 @@ function prepareIsolatedNpx(privateDirectory) {
     fail("npx-isolation", "the isolated npm run root must start empty");
   }
   requireSafeIdentity();
-  const accountHome = validateLifecycleAccountHome(userInfo().homedir);
+  const account = userInfo();
+  const accountHome = validateLifecycleAccountHome(account.homedir);
+  const accountUser = validateLifecycleAccountUser(account.username);
   return {
     root: executionRoot,
     runsRoot,
     accountHome,
+    accountUser,
     npxBinary: resolveExecutable("npx"),
     npmBinary: resolveExecutable("npm"),
     nodeBinary: realpathSync(process.execPath),
@@ -7832,6 +7836,22 @@ export function validateLifecycleAccountHome(
   }
 }
 
+export function validateLifecycleAccountUser(
+  candidateUser,
+  { expectedUser = userInfo().username } = {},
+) {
+  if (
+    typeof candidateUser !== "string" ||
+    typeof expectedUser !== "string" ||
+    !/^[A-Za-z0-9._-]{1,255}$/u.test(candidateUser) ||
+    !/^[A-Za-z0-9._-]{1,255}$/u.test(expectedUser) ||
+    candidateUser !== expectedUser
+  ) {
+    fail("npx-isolation", "the lifecycle account username is not the current POSIX user");
+  }
+  return candidateUser;
+}
+
 function lifecycleAccountHome(execution) {
   requireSafeIdentity();
   return validateLifecycleAccountHome(execution.accountHome);
@@ -7856,6 +7876,7 @@ function npmRunEnvironment(execution, paths, userConfig, invocationMode) {
       invocationMode === "account-home-lifecycle"
         ? lifecycleAccountHome(execution)
         : paths.home,
+    USER: validateLifecycleAccountUser(execution.accountUser),
     PATH: fixedPath.join(":"),
     TMPDIR: paths.tmp,
     LANG: "C",
@@ -8041,6 +8062,7 @@ function lifecycleCandidateIdentity(candidate) {
     packageSha256: candidate.packageSha256,
     rawArtifactSha256: candidate.rawArtifactSha256,
     buildSourceReceiptSha256: candidate.buildSourceReceiptSha256,
+    accountUser: candidate.execution?.accountUser,
     execution: {
       nodeBinarySha256: candidate.execution?.nodeBinarySha256,
       npmBinarySha256: candidate.execution?.npmBinarySha256,
@@ -8063,6 +8085,7 @@ function lifecycleCandidateIdentity(candidate) {
   };
   if (
     !/^[a-f0-9]{40}$/u.test(value.sourceCommit ?? "") ||
+    validateLifecycleAccountUser(value.accountUser) !== value.accountUser ||
     [
       value.packageSha256,
       value.rawArtifactSha256,
@@ -8180,6 +8203,7 @@ async function verifyExecutionIdentity(recorder, candidate) {
   ) {
     fail("npx-isolation", "a pinned Node, Python, npm, npx, or host executable changed after candidate preparation");
   }
+  validateLifecycleAccountUser(execution.accountUser);
   const npxVersion = recorder.run(
     "Reconfirm pinned npx version",
     execution.npxBinary,
@@ -8206,6 +8230,7 @@ async function verifyExecutionIdentity(recorder, candidate) {
   ) {
     fail("npx-isolation", "the npm, npx, Node, or Python execution identity changed before lifecycle use");
   }
+  verifyLifecycleHostAuthentication(recorder, execution);
 }
 
 function verifyGitHubAuthentication(recorder) {
@@ -8303,12 +8328,18 @@ function verifyHosts(recorder, report) {
   if (!versionAtLeast(claudeVersion, [2, 1, 205])) {
     fail("host-prerequisite", "Claude Code 2.1.205 or later is required");
   }
-  recorder.run("Verify Claude authentication", "claude", ["auth", "status"], {
-    category: "host-auth",
-    failureMessage: "Claude Code is not authenticated",
-    projection: "status-only",
-    persistRaw: false,
-  });
+  const claudeAuthentication = commandJson(
+    recorder,
+    "Verify Claude authentication",
+    "claude",
+    ["auth", "status", "--json"],
+    { projection: "claude-auth", persistRaw: false },
+    "host-auth",
+    "Claude Code authentication could not be inspected",
+  );
+  if (claudeAuthentication?.loggedIn !== true) {
+    fail("host-auth", "Claude Code is not authenticated");
+  }
   const codexVersionOutput = recorder.run("Read Codex CLI version", "codex", ["--version"], {
     category: "host-prerequisite",
     failureMessage: "Codex CLI is unavailable",
@@ -8327,6 +8358,39 @@ function verifyHosts(recorder, report) {
     claudeVersion: report.environment.claudeVersion,
     codexVersion: report.environment.codexVersion,
   };
+}
+
+function verifyLifecycleHostAuthentication(recorder, execution) {
+  const run = freshNpmRun(execution, "isolated-preflight", null);
+  const environment = {
+    ...run.env,
+    HOME: lifecycleAccountHome(execution),
+  };
+  const claudeAuthentication = commandJson(
+    recorder,
+    "Verify pinned Claude authentication in lifecycle environment",
+    execution.claudeBinary,
+    ["auth", "status", "--json"],
+    { env: environment, projection: "claude-auth", persistRaw: false },
+    "host-auth",
+    "the pinned Claude CLI authentication could not be inspected in the lifecycle environment",
+  );
+  if (claudeAuthentication?.loggedIn !== true) {
+    fail("host-auth", "the pinned Claude CLI is not authenticated in the lifecycle environment");
+  }
+  recorder.run(
+    "Verify pinned Codex authentication in lifecycle environment",
+    execution.codexBinary,
+    ["login", "status"],
+    {
+      env: environment,
+      category: "host-auth",
+      failureMessage: "the pinned Codex CLI is not authenticated in the lifecycle environment",
+      projection: "status-only",
+      persistRaw: false,
+    },
+  );
+  return { claude: true, codex: true };
 }
 
 function requireEmptyDirectory(target, label) {
@@ -9466,6 +9530,7 @@ async function prepareCandidate(recorder, report, privateDirectory) {
     recorder,
     prepareIsolatedNpx(privateDirectory),
   );
+  verifyLifecycleHostAuthentication(recorder, execution);
   const ghBinary = resolveExecutable("gh");
   const runs = commandJson(
     recorder,
@@ -10167,6 +10232,7 @@ function validateCandidatePaths(privateDirectory, candidate) {
   const claudeBinary = realpathSync(candidate.execution.claudeBinary);
   const codexBinary = realpathSync(candidate.execution.codexBinary);
   const accountHome = lifecycleAccountHome(candidate.execution);
+  const accountUser = validateLifecycleAccountUser(candidate.execution.accountUser);
   accessSync(npxBinary, fsConstants.X_OK);
   accessSync(npmBinary, fsConstants.X_OK);
   accessSync(nodeBinary, fsConstants.X_OK);
@@ -10181,6 +10247,7 @@ function validateCandidatePaths(privateDirectory, candidate) {
     claudeBinary !== candidate.execution.claudeBinary ||
     codexBinary !== candidate.execution.codexBinary ||
     accountHome !== candidate.execution.accountHome ||
+    accountUser !== candidate.execution.accountUser ||
     !statSync(npxBinary).isFile() ||
     !statSync(npmBinary).isFile() ||
     !statSync(nodeBinary).isFile() ||
@@ -12370,6 +12437,7 @@ export {
   validatePrivateEvidenceManifest,
   validatePublicText,
   verifyGitHubAuthentication,
+  verifyLifecycleHostAuthentication,
   verifyCacheMarketplaceShape,
   verifyManagedRootExact,
   verifyHosts,

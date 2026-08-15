@@ -24,8 +24,10 @@ conditions hold:
   under `sudo`, and the account home is canonical and owned by the current UID;
 - Python 3.12 is available for the hermetic installed `SessionStart` timing
   driver;
-- Claude and Codex are authenticated and each has exactly one managed
-  OpenSocrates 1.2.1 registration at the canonical managed root;
+- the current POSIX username is canonical, and Claude and Codex authentication
+  succeeds in both the normal preflight and the closed lifecycle environment;
+- Claude and Codex each have exactly one managed OpenSocrates 1.2.1
+  registration at the canonical managed root;
 - Claude and Codex managed roots and cache versions pass their complete
   checksum and closed-file-set checks;
 - automatic updates are disabled, the LaunchAgent is unloaded, and the exact
@@ -41,10 +43,12 @@ The candidate gate creates an exact eight-file `npm pack` tarball. It also pins
 the successful CI repository, workflow, run ID, attempt, full head SHA,
 immutable artifact ID, artifact name, raw ZIP digest and size, build-time commit
 and tree receipt, both host payload manifests, and the canonical Python, Claude,
-and Codex executables with their SHA-256 digests. Destructive lifecycle capsules
-pass the exact host binaries explicitly and do not depend on the capsule's
-reduced shell `PATH`; final timing invokes the pinned Python directly. Public npm
-and GitHub release 1.2.1 remain unavailable and are not used or claimed.
+and Codex executables with their SHA-256 digests. The private execution identity
+also pins the canonical POSIX username. Destructive lifecycle capsules pass the
+exact host binaries and that username explicitly and do not depend on the
+capsule's reduced shell `PATH`; final timing invokes the pinned Python directly.
+Public npm and GitHub release 1.2.1 remain unavailable and are not used or
+claimed.
 
 The immediately pre-purge baseline recheck binds the exact managed roots,
 stable cache payloads, desired state, and OpenSocrates Codex trust syntax. The

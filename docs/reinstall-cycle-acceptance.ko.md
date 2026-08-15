@@ -23,8 +23,10 @@ focused Pull Request의 최신 커밋에 대한 Native package CI job이 성공�
   아니며, 계정 홈이 canonical 경로이고 현재 UID 소유입니다.
 - hermetic installed `SessionStart` timing driver를 위한 Python 3.12를 사용할 수
   있습니다.
-- Claude와 Codex가 인증되어 있고, canonical managed root에 OpenSocrates 1.2.1
-  등록이 각각 정확히 하나 있습니다.
+- 현재 POSIX username이 canonical이며, Claude와 Codex 인증이 일반 preflight와
+  닫힌 lifecycle 환경에서 모두 성공합니다.
+- Claude와 Codex의 canonical managed root에 OpenSocrates 1.2.1 등록이 각각 정확히
+  하나 있습니다.
 - Claude와 Codex managed root 및 cache version이 전체 checksum과 닫힌 파일 목록
   검사를 통과합니다.
 - 자동 업데이트가 꺼져 있고 LaunchAgent가 unload 상태이며, exact desired state가
@@ -38,10 +40,11 @@ focused Pull Request의 최신 커밋에 대한 Native package CI job이 성공�
 repository, workflow, run ID, attempt, full head SHA, immutable artifact ID, artifact
 name, raw ZIP digest와 size, 빌드 시점 commit/tree receipt, 두 호스트 payload
 manifest와 canonical Python/Claude/Codex 실행 파일 및 각 SHA-256 digest를
-고정합니다. 파괴적 lifecycle capsule은 exact host binary를 명시적으로 전달하며
-축소된 shell `PATH`에 의존하지 않고, 최종 timing은 고정한 Python을 직접
-실행합니다. 공개 npm 및 GitHub release의 1.2.1은 계속 unavailable이며 사용하거나
-검증했다고 주장하지 않습니다.
+고정합니다. private execution identity는 canonical POSIX username도 고정합니다.
+파괴적 lifecycle capsule은 exact host binary와 해당 username을 명시적으로 전달하며
+축소된 shell `PATH`에 의존하지 않고, 최종 timing은 고정한 Python을 직접 실행합니다.
+공개 npm 및 GitHub release의 1.2.1은 계속 unavailable이며 사용하거나 검증했다고
+주장하지 않습니다.
 
 purge 직전 baseline 재검사는 exact managed root, stable cache payload, desired state,
 OpenSocrates Codex trust 구문을 고정합니다. cache binding은 shape와 liveness를

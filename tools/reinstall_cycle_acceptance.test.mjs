@@ -17,7 +17,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { homedir, tmpdir, userInfo } from "node:os";
 import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import test from "node:test";
@@ -224,6 +224,7 @@ function executionFixture(root) {
     claudeBinary: realpathSync(process.execPath),
     codexBinary: realpathSync(process.execPath),
     accountHome: realpathSync(homedir()),
+    accountUser: userInfo().username,
   };
   for (const target of [execution.root, execution.runsRoot, execution.cwd, execution.cache, execution.prefix]) {
     mkdirSync(target, { recursive: true, mode: 0o700 });
@@ -417,8 +418,8 @@ if (tool === "gh" && command === "auth status") {
 } else if (tool === "claude" && command === "--version") {
   process.stderr.write(canary + "\n");
   process.stdout.write("2.1.205\n");
-} else if (tool === "claude" && command === "auth status") {
-  emit({ account: canary, status: "authenticated" });
+} else if (tool === "claude" && command === "auth status --json") {
+  emit({ loggedIn: true, account: canary, status: "authenticated" });
 } else if (tool === "claude" && command === "plugin marketplace list --json") {
   emit([
     {
@@ -776,6 +777,7 @@ test("packed lifecycle calls use a pinned npx and an operation-bound injection-f
         assert.equal(invocation.options.env.CLAUDE_BIN, candidate.execution.claudeBinary);
         assert.equal(invocation.options.env.CODEX_BIN, candidate.execution.codexBinary);
         assert.equal(invocation.options.env.HOME, candidate.execution.accountHome);
+        assert.equal(invocation.options.env.USER, candidate.execution.accountUser);
         const observedHome = spawnSync(
           process.execPath,
           ["-e", "process.stdout.write(require('node:os').homedir())"],
@@ -996,6 +998,19 @@ test("lifecycle account HOME accepts canonical current-owner mode 0750 only", ()
     }
   }));
 
+test("lifecycle account username is pinned to the current POSIX user", () => {
+  assert.equal(
+    acceptance.validateLifecycleAccountUser("fixture-user", { expectedUser: "fixture-user" }),
+    "fixture-user",
+  );
+  for (const candidate of ["", "other-user", "unsafe/user", null]) {
+    assert.throws(
+      () => acceptance.validateLifecycleAccountUser(candidate, { expectedUser: "fixture-user" }),
+      AcceptanceError,
+    );
+  }
+});
+
 test("registration admission binds each CLI marketplace root to its canonical managed root", () =>
   withFixture((root) => {
     const claudeRoot = join(root, "managed-claude");
@@ -1119,10 +1134,13 @@ test("actual registration, authentication, and Codex hook call sites suppress ra
     );
     const authenticationCalls = calls.filter((call) => call.label.includes("authentication"));
     assert.equal(authenticationCalls.length, 3);
-    assert.ok(
-      authenticationCalls.every(
-        (call) => call.options.persistRaw === false && call.options.projection === "status-only",
-      ),
+    assert.deepEqual(
+      authenticationCalls.map((call) => [call.options.persistRaw, call.options.projection]),
+      [
+        [false, "status-only"],
+        [false, "claude-auth"],
+        [false, "status-only"],
+      ],
     );
     const hookCall = calls.find((call) => call.label.startsWith("Inspect Codex"));
     assert.equal(hookCall.options.persistRaw, false);
@@ -1136,6 +1154,63 @@ test("actual registration, authentication, and Codex hook call sites suppress ra
     assert.equal(privateFileTexts(privateDirectory).some((value) => value.includes(canary)), false);
     assert.equal(JSON.stringify(report).includes(canary), false);
   }));
+
+test("lifecycle host authentication uses the pinned username and rejects logged-out Claude", () =>
+  withFixture((root) => {
+    const execution = executionFixture(root);
+    const calls = [];
+    const recorder = {
+      run: (label, executable, args, options) => {
+        calls.push({ label, executable, args, options });
+        if (label.startsWith("Verify pinned Claude")) {
+          return { stdout: JSON.stringify({ loggedIn: true }) };
+        }
+        return { stdout: JSON.stringify({ status: "ok" }) };
+      },
+    };
+    assert.deepEqual(
+      acceptance.verifyLifecycleHostAuthentication(recorder, execution),
+      { claude: true, codex: true },
+    );
+    assert.equal(calls.length, 2);
+    for (const call of calls) {
+      assert.equal(call.options.env.HOME, execution.accountHome);
+      assert.equal(call.options.env.USER, execution.accountUser);
+      assert.equal(Object.hasOwn(call.options.env, "NPM_TOKEN"), false);
+      assert.equal(call.options.persistRaw, false);
+    }
+    assert.equal(calls[0].options.projection, "claude-auth");
+    assert.equal(calls[1].options.projection, "status-only");
+
+    assert.throws(
+      () => acceptance.verifyLifecycleHostAuthentication({
+        run: (label) => ({
+          stdout: JSON.stringify(label.startsWith("Verify pinned Claude")
+            ? { loggedIn: false }
+            : { status: "ok" }),
+        }),
+      }, execution),
+      /not authenticated/u,
+    );
+  }));
+
+test("host preflight parses Claude logged-in state instead of trusting exit zero", () => {
+  const report = makeReport();
+  const calls = [];
+  const recorder = {
+    run: (label, executable, args, options) => {
+      calls.push({ label, executable, args, options });
+      if (label === "Read Claude Code version") return { stdout: "2.1.205" };
+      if (label === "Verify Claude authentication") {
+        return { stdout: JSON.stringify({ loggedIn: false }) };
+      }
+      throw new Error(`unexpected command after logged-out Claude: ${label}`);
+    },
+  };
+  assert.throws(() => acceptance.verifyHosts(recorder, report), /not authenticated/u);
+  assert.equal(calls[1].options.projection, "claude-auth");
+  assert.deepEqual(calls[1].args, ["auth", "status", "--json"]);
+});
 
 test("reinstall is one atomic all-host command using both exact host assets", () =>
   withFixture((root) => {
@@ -4479,6 +4554,9 @@ test("host version producer stores only an anchored canonical version token", ()
     const recorder = {
       run: (label) => {
         if (label === "Read Claude Code version") return { stdout: claudeVersion };
+        if (label === "Verify Claude authentication") {
+          return { stdout: JSON.stringify({ loggedIn: true }) };
+        }
         if (label === "Read Codex CLI version") return { stdout: codexVersion };
         return { stdout: "", status: 0 };
       },
@@ -6349,6 +6427,7 @@ test("real packed wrapper reuses its durable lifecycle sandbox when importing a 
         root: executionRoot,
         runsRoot,
         accountHome: realpathSync(homedir()),
+        accountUser: userInfo().username,
         npxBinary: realpathSync(fakeNpx),
         npmBinary: realpathSync(process.execPath),
         nodeBinary: realpathSync(process.execPath),
