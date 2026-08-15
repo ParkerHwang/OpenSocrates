@@ -38,8 +38,11 @@ conditions hold:
 The candidate gate creates an exact eight-file `npm pack` tarball. It also pins
 the successful CI repository, workflow, run ID, attempt, full head SHA,
 immutable artifact ID, artifact name, raw ZIP digest and size, build-time commit
-and tree receipt, and both host payload manifests. Public npm and GitHub release
-1.2.1 remain unavailable and are not used or claimed.
+and tree receipt, both host payload manifests, and the canonical Claude and Codex
+executables with their SHA-256 digests. Destructive lifecycle capsules pass
+those exact host binaries explicitly and do not depend on the capsule's reduced
+shell `PATH`. Public npm and GitHub release 1.2.1 remain unavailable and are not
+used or claimed.
 
 ## Start the automated cycle
 

@@ -220,6 +220,8 @@ function executionFixture(root) {
     npxBinary: "/private/pinned/bin/npx",
     npmBinary: "/private/pinned/bin/npm",
     nodeBinary: process.execPath,
+    claudeBinary: realpathSync(process.execPath),
+    codexBinary: realpathSync(process.execPath),
     accountHome: realpathSync(homedir()),
   };
   for (const target of [execution.root, execution.runsRoot, execution.cwd, execution.cache, execution.prefix]) {
@@ -738,8 +740,12 @@ test("packed lifecycle calls use a pinned npx and an operation-bound injection-f
     const candidate = candidateFixture(root);
     const priorNodeOptions = process.env.NODE_OPTIONS;
     const priorToken = process.env.NPM_TOKEN;
+    const priorClaudeBin = process.env.CLAUDE_BIN;
+    const priorCodexBin = process.env.CODEX_BIN;
     process.env.NODE_OPTIONS = "--require=/private/injection-canary.js";
     process.env.NPM_TOKEN = "private-token-canary";
+    process.env.CLAUDE_BIN = "/private/untrusted/claude";
+    process.env.CODEX_BIN = "/private/untrusted/codex";
     try {
       const lifecycleOptions = {
         invocationMode: "account-home-lifecycle",
@@ -766,6 +772,8 @@ test("packed lifecycle calls use a pinned npx and an operation-bound injection-f
         assert.equal(Object.hasOwn(invocation.options.env, "NODE_OPTIONS"), false);
         assert.equal(Object.hasOwn(invocation.options.env, "NPM_TOKEN"), false);
         assert.equal(Object.hasOwn(invocation.options.env, "npm_config_registry"), false);
+        assert.equal(invocation.options.env.CLAUDE_BIN, candidate.execution.claudeBinary);
+        assert.equal(invocation.options.env.CODEX_BIN, candidate.execution.codexBinary);
         assert.equal(invocation.options.env.HOME, candidate.execution.accountHome);
         const observedHome = spawnSync(
           process.execPath,
@@ -827,6 +835,10 @@ test("packed lifecycle calls use a pinned npx and an operation-bound injection-f
       else process.env.NODE_OPTIONS = priorNodeOptions;
       if (priorToken === undefined) delete process.env.NPM_TOKEN;
       else process.env.NPM_TOKEN = priorToken;
+      if (priorClaudeBin === undefined) delete process.env.CLAUDE_BIN;
+      else process.env.CLAUDE_BIN = priorClaudeBin;
+      if (priorCodexBin === undefined) delete process.env.CODEX_BIN;
+      else process.env.CODEX_BIN = priorCodexBin;
     }
   }));
 
@@ -841,6 +853,8 @@ test("real packed purge and install dispatch only through durable lifecycle rece
       nodeBinarySha256: "4".repeat(64),
       npmBinarySha256: "5".repeat(64),
       npxBinarySha256: "6".repeat(64),
+      claudeBinarySha256: "7".repeat(64),
+      codexBinarySha256: "8".repeat(64),
     });
     for (const [index, host] of ["claude", "codex"].entries()) {
       Object.assign(candidate.assets[host], {
@@ -6266,9 +6280,13 @@ test("real packed wrapper reuses its durable lifecycle sandbox when importing a 
         npxBinary: realpathSync(fakeNpx),
         npmBinary: realpathSync(process.execPath),
         nodeBinary: realpathSync(process.execPath),
+        claudeBinary: realpathSync(process.execPath),
+        codexBinary: realpathSync(process.execPath),
         npxBinarySha256: "1".repeat(64),
         npmBinarySha256: "2".repeat(64),
         nodeBinarySha256: "3".repeat(64),
+        claudeBinarySha256: "4".repeat(64),
+        codexBinarySha256: "5".repeat(64),
       },
       assets: Object.fromEntries(
         ["claude", "codex"].map((host, index) => [

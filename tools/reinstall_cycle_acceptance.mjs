@@ -7743,6 +7743,8 @@ function prepareIsolatedNpx(privateDirectory) {
     npxBinary: resolveExecutable("npx"),
     npmBinary: resolveExecutable("npm"),
     nodeBinary: realpathSync(process.execPath),
+    claudeBinary: resolveExecutable("claude"),
+    codexBinary: resolveExecutable("codex"),
   };
 }
 
@@ -7824,6 +7826,8 @@ function npmRunEnvironment(execution, paths, userConfig, invocationMode) {
     LC_ALL: "C",
     TZ: "UTC",
     NODE_PATH: "",
+    CLAUDE_BIN: execution.claudeBinary,
+    CODEX_BIN: execution.codexBinary,
     npm_config_cache: paths.cache,
     npm_config_prefix: paths.prefix,
     npm_config_userconfig: userConfig,
@@ -8005,6 +8009,8 @@ function lifecycleCandidateIdentity(candidate) {
       nodeBinarySha256: candidate.execution?.nodeBinarySha256,
       npmBinarySha256: candidate.execution?.npmBinarySha256,
       npxBinarySha256: candidate.execution?.npxBinarySha256,
+      claudeBinarySha256: candidate.execution?.claudeBinarySha256,
+      codexBinarySha256: candidate.execution?.codexBinarySha256,
     },
     assets: Object.fromEntries(
       HOSTS.map((host) => [
@@ -8071,6 +8077,8 @@ async function pinExecutionIdentity(recorder, execution) {
   execution.npxBinarySha256 = await sha256File(execution.npxBinary);
   execution.npmBinarySha256 = await sha256File(execution.npmBinary);
   execution.nodeBinarySha256 = await sha256File(execution.nodeBinary);
+  execution.claudeBinarySha256 = await sha256File(execution.claudeBinary);
+  execution.codexBinarySha256 = await sha256File(execution.codexBinary);
   const candidate = { execution };
   execution.npxVersion = recorder.run(
     "Read pinned npx version",
@@ -8106,9 +8114,11 @@ async function verifyExecutionIdentity(recorder, candidate) {
     (await sha256File(execution.npxBinary)) !== execution.npxBinarySha256 ||
     (await sha256File(execution.npmBinary)) !== execution.npmBinarySha256 ||
     (await sha256File(execution.nodeBinary)) !== execution.nodeBinarySha256 ||
+    (await sha256File(execution.claudeBinary)) !== execution.claudeBinarySha256 ||
+    (await sha256File(execution.codexBinary)) !== execution.codexBinarySha256 ||
     realpathSync(process.execPath) !== execution.nodeBinary
   ) {
-    fail("npx-isolation", "the pinned npm or npx executable changed after candidate preparation");
+    fail("npx-isolation", "a pinned Node, npm, npx, or host executable changed after candidate preparation");
   }
   const npxVersion = recorder.run(
     "Reconfirm pinned npx version",
@@ -10090,20 +10100,28 @@ function validateCandidatePaths(privateDirectory, candidate) {
   const npxBinary = realpathSync(candidate.execution.npxBinary);
   const npmBinary = realpathSync(candidate.execution.npmBinary);
   const nodeBinary = realpathSync(candidate.execution.nodeBinary);
+  const claudeBinary = realpathSync(candidate.execution.claudeBinary);
+  const codexBinary = realpathSync(candidate.execution.codexBinary);
   const accountHome = lifecycleAccountHome(candidate.execution);
   accessSync(npxBinary, fsConstants.X_OK);
   accessSync(npmBinary, fsConstants.X_OK);
   accessSync(nodeBinary, fsConstants.X_OK);
+  accessSync(claudeBinary, fsConstants.X_OK);
+  accessSync(codexBinary, fsConstants.X_OK);
   if (
     npxBinary !== candidate.execution.npxBinary ||
     npmBinary !== candidate.execution.npmBinary ||
     nodeBinary !== candidate.execution.nodeBinary ||
+    claudeBinary !== candidate.execution.claudeBinary ||
+    codexBinary !== candidate.execution.codexBinary ||
     accountHome !== candidate.execution.accountHome ||
     !statSync(npxBinary).isFile() ||
     !statSync(npmBinary).isFile() ||
-    !statSync(nodeBinary).isFile()
+    !statSync(nodeBinary).isFile() ||
+    !statSync(claudeBinary).isFile() ||
+    !statSync(codexBinary).isFile()
   ) {
-    fail("npx-isolation", "the pinned Node, npm, or npx executable changed or is unsafe");
+    fail("npx-isolation", "a pinned Node, npm, npx, or host executable changed or is unsafe");
   }
 }
 

@@ -35,8 +35,10 @@ focused Pull Request의 최신 커밋에 대한 Native package CI job이 성공�
 후보 gate는 정확한 8개 파일로 `npm pack` tarball을 만듭니다. 또한 성공한 CI의
 repository, workflow, run ID, attempt, full head SHA, immutable artifact ID, artifact
 name, raw ZIP digest와 size, 빌드 시점 commit/tree receipt, 두 호스트 payload
-manifest를 고정합니다. 공개 npm 및 GitHub release의 1.2.1은 계속 unavailable이며
-사용하거나 검증했다고 주장하지 않습니다.
+manifest와 canonical Claude/Codex 실행 파일 및 각 SHA-256 digest를 고정합니다.
+파괴적 lifecycle capsule은 그 exact host binary를 명시적으로 전달하며 축소된 shell
+`PATH`에 의존하지 않습니다. 공개 npm 및 GitHub release의 1.2.1은 계속
+unavailable이며 사용하거나 검증했다고 주장하지 않습니다.
 
 ## 자동 cycle 시작
 
