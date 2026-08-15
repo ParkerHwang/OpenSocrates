@@ -35,7 +35,12 @@ make codex-hook-timing
 ```
 
 일반 `startup`, `resume`, `clear` callback은 런타임 구성 전의 fail-open no-op입니다.
-`compact`만 기존 instruction reference 복원에 필요한 최소 artifact store를 엽니다.
+고정 launcher는 callback 입력을 최대 4 MiB까지만 프로세스 메모리에 보관하고 macOS
+시스템 parser로 최상위 `source: "compact"`가 정확히 일치할 때만 통과시킵니다. 이
+입력을 disk, argument, environment 또는 diagnostic에 기록하지 않습니다. 크기 초과,
+malformed, source 누락 및 일반 시작 callback은 완전히 빈 출력으로 끝납니다.
+`compact`만 경계 안의 정확한 입력을 런타임에 다시 전달하며, 런타임은 전체 native-event
+검증을 수행하고 기존 instruction reference 복원에 필요한 최소 artifact store를 엽니다.
 24시간 crash-residue sweep은 `UserPromptSubmit`과 compact 복원 전에 실행되므로 일반
 시작을 전체 경로에서 분리해도 privacy cleanup은 사라지지 않습니다.
 

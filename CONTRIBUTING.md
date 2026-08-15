@@ -97,6 +97,10 @@ contract are documented in [docs/codex-session-start-timing.md](docs/codex-sessi
 Release candidates that change installation or host packaging should also use
 the [clean-machine acceptance procedure](docs/clean-machine-acceptance.md) on a
 separate Mac and attach its privacy-safe result bundle to the pull request.
+For a previously used Mac that begins with the exact supported Claude and Codex
+installation, use the separate
+[purge and reinstall acceptance procedure](docs/reinstall-cycle-acceptance.md).
+Its result is `purged_same_machine`, never clean-machine evidence.
 
 If a platform-dependent check cannot be run, state that clearly in the pull
 request instead of claiming it passed.

@@ -70,6 +70,8 @@ docs-check:
 		--path docs/claude-hook-timing.md \
 		--path docs/codex-session-start-timing.md \
 		--path docs/codex-session-start-timing.ko.md \
+		--path docs/reinstall-cycle-acceptance.md \
+		--path docs/reinstall-cycle-acceptance.ko.md \
 		--path docs/claude-desktop-live-probe.md \
 		--path docs/claude-cowork-live-probe.md \
 		--path docs/claude-chat-upload-probe.md \

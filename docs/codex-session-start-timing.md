@@ -39,10 +39,16 @@ make codex-hook-timing
 ```
 
 Normal `startup`, `resume`, and `clear` callbacks are fail-open no-ops before
-runtime composition. `compact` alone opens the minimal artifact store needed to
-restore the existing instruction reference. The 24-hour crash-residue sweep runs
-on `UserPromptSubmit` and before compact restoration, so moving normal starts off
-the full path does not remove privacy cleanup.
+runtime composition. The fixed launcher holds at most 4 MiB of callback input in
+process memory, uses macOS's system parser to admit only an exact top-level
+`source: "compact"`, and writes none of that input to disk, arguments, the
+environment, or diagnostics. Oversized, malformed, missing-source, and ordinary
+start callbacks exit with literal empty output. `compact` alone replays the exact
+bounded input to the runtime, which performs the full native-event validation and
+opens the minimal artifact store needed to restore the existing instruction
+reference. The 24-hour crash-residue sweep runs on `UserPromptSubmit` and before
+compact restoration, so moving normal starts off the full path does not remove
+privacy cleanup.
 
 This gate supports the built artifact on the Apple-silicon Mac where it runs. It
 does not establish live Codex hook delivery, signing/notarization, quarantine
