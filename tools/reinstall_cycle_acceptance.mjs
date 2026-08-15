@@ -135,6 +135,7 @@ const MAX_ZIP_CENTRAL_DIRECTORY_BYTES = 64 * 1024 * 1024;
 const MAX_ZIP_UNCOMPRESSED_BYTES = 4 * 1024 * 1024 * 1024;
 const MAX_ZIP_ENTRY_BYTES = 2 * 1024 * 1024 * 1024;
 const MAX_ZIP_COMPRESSION_RATIO = 1_000;
+const ZIP_PROFILES = new Set(["strict-package", "github-artifact-container"]);
 const MAX_NPM_TARBALL_BYTES = 64 * 1024 * 1024;
 const MAX_NPM_TAR_UNCOMPRESSED_BYTES = 256 * 1024 * 1024;
 const MAX_HOST_CLOSE_RETRIES = 1;
@@ -8280,7 +8281,14 @@ function assertZipPathTrie(entries, category, label) {
   }
 }
 
-function inspectZipCentralDirectory(archive, { label, category }) {
+function inspectZipCentralDirectory(
+  archive,
+  { label, category, profile = "strict-package" },
+) {
+  if (!ZIP_PROFILES.has(profile)) {
+    fail(category, `${label} ZIP verification profile is unsupported`);
+  }
+  const githubArtifactContainer = profile === "github-artifact-container";
   requireCanonicalOwnedEntry(archive, `${label} ZIP`, "file");
   const size = statSync(archive).size;
   if (!Number.isSafeInteger(size) || size < 22 || size > MAX_ARTIFACT_BYTES) {
@@ -8355,18 +8363,25 @@ function inspectZipCentralDirectory(archive, { label, category }) {
       const externalAttributes = central.readUInt32LE(cursor + 38);
       const localOffset = central.readUInt32LE(cursor + 42);
       const next = cursor + 46 + nameLength + extraLength + commentLength;
+      const externalLowAttributes = externalAttributes & 0xffff;
+      const centralProfileMatches = githubArtifactContainer
+        ? madeBy === 0x032d &&
+          flags === 0x0008 &&
+          method === 8 &&
+          externalLowAttributes === 0x20
+        : madeBy === 0x0314 &&
+          flags === 0x0800 &&
+          new Set([0, 8]).has(method) &&
+          externalLowAttributes === 0;
       if (
         next > central.length ||
         nameLength === 0 ||
-        madeBy !== 0x0314 ||
+        !centralProfileMatches ||
         requiredVersion !== 20 ||
-        flags !== 0x0800 ||
-        !new Set([0, 8]).has(method) ||
         extraLength !== 0 ||
         commentLength !== 0 ||
         entryDisk !== 0 ||
         internalAttributes !== 0 ||
-        (externalAttributes & 0xffff) !== 0 ||
         uncompressedSize > MAX_ZIP_ENTRY_BYTES ||
         totalUncompressed + uncompressedSize > MAX_ZIP_UNCOMPRESSED_BYTES ||
         (uncompressedSize > 0 && compressedSize === 0) ||
@@ -8381,7 +8396,9 @@ function inspectZipCentralDirectory(archive, { label, category }) {
       if (
         name.includes("\uFFFD") ||
         name.includes("\0") ||
-        !Buffer.from(name, "utf8").equals(nameBytes)
+        !Buffer.from(name, "utf8").equals(nameBytes) ||
+        (githubArtifactContainer &&
+          ![...nameBytes].every((byte) => byte >= 0x20 && byte <= 0x7e))
       ) {
         fail(category, `${label} ZIP contains an invalid or noncanonical UTF-8 member name`);
       }
@@ -8392,6 +8409,8 @@ function inspectZipCentralDirectory(archive, { label, category }) {
       if (
         !new Set([0o100000, 0o040000]).has(fileType) ||
         (fileType === 0o040000) !== directory ||
+        (githubArtifactContainer &&
+          (directory || !new Set([0o100600, 0o100644, 0o100755]).has(mode))) ||
         (directory && (compressedSize !== 0 || uncompressedSize !== 0 || crc32 !== 0))
       ) {
         fail(category, `${label} ZIP contains a link, special entry, or inconsistent Unix type`);
@@ -8435,17 +8454,23 @@ function inspectZipCentralDirectory(archive, { label, category }) {
       }
       const localNameLength = header.readUInt16LE(26);
       const localExtraLength = header.readUInt16LE(28);
-      const dataOffset = entry.localOffset + 30 + localNameLength;
+      const dataOffset = entry.localOffset + 30 + localNameLength + localExtraLength;
+      const localProfileMatches = githubArtifactContainer
+        ? header.readUInt32LE(14) === 0 &&
+          header.readUInt32LE(18) === 0 &&
+          header.readUInt32LE(22) === 0
+        : header.readUInt32LE(14) === entry.crc32 &&
+          header.readUInt32LE(18) === entry.compressedSize &&
+          header.readUInt32LE(22) === entry.uncompressedSize;
+      const descriptorLength = githubArtifactContainer ? 16 : 0;
       if (
         header.readUInt16LE(4) !== 20 ||
         header.readUInt16LE(6) !== entry.flags ||
         header.readUInt16LE(8) !== entry.method ||
-        header.readUInt32LE(14) !== entry.crc32 ||
-        header.readUInt32LE(18) !== entry.compressedSize ||
-        header.readUInt32LE(22) !== entry.uncompressedSize ||
+        !localProfileMatches ||
         localNameLength !== entry.nameBytes.length ||
         localExtraLength !== 0 ||
-        dataOffset + entry.compressedSize > centralOffset
+        dataOffset + entry.compressedSize + descriptorLength > centralOffset
       ) {
         fail(category, `${label} ZIP local and central metadata do not agree exactly`);
       }
@@ -8458,6 +8483,23 @@ function inspectZipCentralDirectory(archive, { label, category }) {
       );
       if (!localNameBytes.equals(entry.nameBytes)) {
         fail(category, `${label} ZIP local and central raw member names do not agree`);
+      }
+      if (githubArtifactContainer) {
+        const descriptorBytes = readDescriptorExactly(
+          descriptor,
+          16,
+          dataOffset + entry.compressedSize,
+          category,
+          label,
+        );
+        if (
+          descriptorBytes.readUInt32LE(0) !== 0x08074b50 ||
+          descriptorBytes.readUInt32LE(4) !== entry.crc32 ||
+          descriptorBytes.readUInt32LE(8) !== entry.compressedSize ||
+          descriptorBytes.readUInt32LE(12) !== entry.uncompressedSize
+        ) {
+          fail(category, `${label} ZIP signed data descriptor does not match central metadata`);
+        }
       }
       const compressed = readDescriptorExactly(
         descriptor,
@@ -8473,7 +8515,7 @@ function inspectZipCentralDirectory(archive, { label, category }) {
       }
       entry.dataOffset = dataOffset;
       entry.payloadSha256 = sha256Buffer(output);
-      expectedLocalOffset = dataOffset + entry.compressedSize;
+      expectedLocalOffset = dataOffset + entry.compressedSize + descriptorLength;
       const nextOffset =
         index + 1 < physicalEntries.length
           ? physicalEntries[index + 1].localOffset
@@ -8524,10 +8566,15 @@ function extractedZipTree(directory) {
   return sorted(entries);
 }
 
-function extractVerifiedZip(recorder, archive, directory, { label, category }) {
+function extractVerifiedZip(
+  recorder,
+  archive,
+  directory,
+  { label, category, profile = "strict-package" },
+) {
   void recorder;
   requireEmptyDirectory(directory, `${label} extraction directory`);
-  const inspected = inspectZipCentralDirectory(archive, { label, category });
+  const inspected = inspectZipCentralDirectory(archive, { label, category, profile });
   const descriptor = openSync(archive, fsConstants.O_RDONLY | fsConstants.O_NOFOLLOW);
   try {
     for (const entry of inspected.entries) {
@@ -9360,6 +9407,7 @@ async function prepareCandidate(recorder, report, privateDirectory) {
   extractVerifiedZip(recorder, rawArtifactPath, artifactDirectory, {
     label: "immutable artifact container",
     category: "ci-artifact",
+    profile: "github-artifact-container",
   });
   const postArtifactMetadata = commandJson(
     recorder,

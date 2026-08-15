@@ -557,7 +557,19 @@ function zipFixtureBytes(entries) {
     const localExtra = entry.localExtra ?? Buffer.alloc(0);
     const centralExtra = entry.centralExtra ?? Buffer.alloc(0);
     const comment = entry.comment ?? Buffer.alloc(0);
-    const local = Buffer.alloc(30 + localName.length + localExtra.length + compressed.length);
+    const descriptor = entry.dataDescriptor
+      ? (() => {
+          const value = Buffer.alloc(16);
+          value.writeUInt32LE(entry.descriptorSignature ?? 0x08074b50, 0);
+          value.writeUInt32LE(entry.descriptorCrc32 ?? crc32, 4);
+          value.writeUInt32LE(entry.descriptorCompressedSize ?? compressedSize, 8);
+          value.writeUInt32LE(entry.descriptorUncompressedSize ?? uncompressedSize, 12);
+          return value;
+        })()
+      : Buffer.alloc(0);
+    const local = Buffer.alloc(
+      30 + localName.length + localExtra.length + compressed.length + descriptor.length,
+    );
     local.writeUInt32LE(0x04034b50, 0);
     local.writeUInt16LE(entry.localRequiredVersion ?? entry.requiredVersion ?? 20, 4);
     local.writeUInt16LE(localFlags, 6);
@@ -570,6 +582,7 @@ function zipFixtureBytes(entries) {
     localName.copy(local, 30);
     localExtra.copy(local, 30 + localName.length);
     compressed.copy(local, 30 + localName.length + localExtra.length);
+    descriptor.copy(local, 30 + localName.length + localExtra.length + compressed.length);
     localParts.push(local);
 
     const central = Buffer.alloc(46 + name.length + centralExtra.length + comment.length);
@@ -3546,6 +3559,75 @@ test("verified ZIP extraction uses the bounded plan for stored and deflated memb
     assert.equal(commandCount, 0);
     assert.equal(readFileSync(join(extraction, "artifact", "stored.txt"), "utf8"), "stored payload");
     assert.deepEqual(readFileSync(join(extraction, "artifact", "deflated.bin")), deflatedBody);
+  }));
+
+test("immutable GitHub artifact transport accepts only its exact signed-descriptor ASCII profile", () =>
+  withFixture((root) => {
+    const archive = join(root, "github-artifact.zip");
+    const extraction = join(root, "extraction");
+    mkdirSync(extraction, { mode: 0o700 });
+    const transportEntry = {
+      name: "package-darwin-arm64.zip",
+      body: "verified transport payload",
+      method: 8,
+      flags: 0x0008,
+      madeBy: 0x032d,
+      externalAttributes: (((0o100644 << 16) >>> 0) | 0x20) >>> 0,
+      localCrc32: 0,
+      localCompressedSize: 0,
+      localUncompressedSize: 0,
+      dataDescriptor: true,
+    };
+    writeZipFixture(archive, [transportEntry]);
+    assert.throws(
+      () =>
+        acceptance.extractVerifiedZip({}, archive, extraction, {
+          label: "strict package fixture",
+          category: "artifact-integrity",
+        }),
+      AcceptanceError,
+    );
+    const result = acceptance.extractVerifiedZip({}, archive, extraction, {
+      label: "GitHub artifact fixture",
+      category: "artifact-integrity",
+      profile: "github-artifact-container",
+    });
+    assert.deepEqual(result, {
+      entryCount: 1,
+      totalUncompressedBytes: Buffer.byteLength("verified transport payload"),
+    });
+
+    const rejected = [
+      { name: "non-ascii", entry: { ...transportEntry, name: "café.zip" } },
+      { name: "wrong-descriptor", entry: { ...transportEntry, descriptorCrc32: 1 } },
+      { name: "missing-descriptor", entry: { ...transportEntry, dataDescriptor: false } },
+      { name: "wrong-creator", entry: { ...transportEntry, madeBy: 0x0314 } },
+      {
+        name: "wrong-dos-attributes",
+        entry: {
+          ...transportEntry,
+          externalAttributes: ((0o100644 << 16) >>> 0),
+        },
+      },
+      { name: "stored-method", entry: { ...transportEntry, method: 0 } },
+    ];
+    for (const item of rejected) {
+      const rejectedArchive = join(root, `${item.name}.zip`);
+      const rejectedExtraction = join(root, `extract-${item.name}`);
+      mkdirSync(rejectedExtraction, { mode: 0o700 });
+      writeZipFixture(rejectedArchive, [item.entry]);
+      assert.throws(
+        () =>
+          acceptance.extractVerifiedZip({}, rejectedArchive, rejectedExtraction, {
+            label: item.name,
+            category: "artifact-integrity",
+            profile: "github-artifact-container",
+          }),
+        AcceptanceError,
+        item.name,
+      );
+      assert.deepEqual(readdirSync(rejectedExtraction), [], item.name);
+    }
   }));
 
 test("ZIP verification rejects ambiguous metadata, path aliases, and declared-size overflow before extraction", () =>
