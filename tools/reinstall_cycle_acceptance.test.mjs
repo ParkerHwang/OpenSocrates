@@ -5396,6 +5396,48 @@ test("capsule receipts publish atomically and a claim has exactly one winner", (
     );
   }));
 
+test("claim inspection accepts only the atomic hardlink publish converging to one link", () =>
+  withFixture((root) => {
+    for (const removalPoint of ["stage-inspection", "target-recheck"]) {
+      const directory = join(root, removalPoint);
+      mkdirSync(directory, { mode: 0o700 });
+      const target = join(directory, "claimed.json");
+      const staging = join(
+        directory,
+        `.claimed.json.${process.pid}.11111111-1111-4111-8111-111111111111.tmp`,
+      );
+      writeFileSync(staging, "{}\n", { mode: 0o600 });
+      linkSync(staging, target);
+      let targetInspections = 0;
+      let removed = false;
+      const info = acceptance.requireLifecycleJsonEntry(target, "synthetic lifecycle claim", {
+        inspectEntry: (entry) => {
+          if (entry === target) targetInspections += 1;
+          if (
+            !removed &&
+            ((removalPoint === "stage-inspection" && entry === staging) ||
+              (removalPoint === "target-recheck" &&
+                entry === target &&
+                targetInspections === 2))
+          ) {
+            removed = true;
+            unlinkSync(staging);
+          }
+          return lstatSync(entry);
+        },
+      });
+      assert.equal(removed, true);
+      assert.equal(info.nlink, 1);
+      assert.equal(lstatSync(target).nlink, 1);
+
+      writeFileSync(staging, "{}\n", { mode: 0o600 });
+      assert.throws(
+        () => acceptance.requireLifecycleJsonEntry(target, "synthetic lifecycle claim"),
+        AcceptanceError,
+      );
+    }
+  }));
+
 test("concurrent capsules share one durable claim and launch exactly one child", () =>
   withFixture(async (root) => {
     const privateDirectory = join(root, "private");

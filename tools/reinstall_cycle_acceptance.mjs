@@ -4345,44 +4345,78 @@ function lifecycleOperationRoot(privateDirectory, { create = false } = {}) {
   return root;
 }
 
-function requireLifecycleJsonEntry(target, label) {
-  const info = lstatSync(target);
-  if (info.nlink === 1) {
-    return requireExactPrivateMode(target, label, "file", 0o600);
+function requireLifecycleJsonEntry(
+  target,
+  label,
+  { inspectEntry = lstatSync, readDirectory = readdirSync, canonicalizeEntry = realpathSync } = {},
+) {
+  const parent = dirname(target);
+  const inspectPresent = (candidate) => {
+    try {
+      return inspectEntry(candidate);
+    } catch (error) {
+      if (error?.code === "ENOENT") return null;
+      throw error;
+    }
+  };
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const info = inspectEntry(target);
+    const stageEntries = readDirectory(parent)
+      .filter((name) => CLAIM_PUBLISH_STAGE_PATTERN.test(name))
+      .map((name) => {
+        const candidate = join(parent, name);
+        return { candidate, info: inspectPresent(candidate) };
+      })
+      .filter((entry) => entry.info !== null);
+    const current = inspectEntry(target);
+    if (current.dev !== info.dev || current.ino !== info.ino) {
+      fail("lifecycle-recovery", `${label} changed identity during atomic publish inspection`);
+    }
+    if (current.nlink === 1) {
+      const survivingStages = stageEntries.filter(
+        (entry) => inspectPresent(entry.candidate) !== null,
+      );
+      if (survivingStages.length !== 0) {
+        fail("lifecycle-recovery", `${label} has an unrelated atomic publish staging entry`);
+      }
+      return requireExactPrivateMode(target, label, "file", 0o600);
+    }
+    if (
+      basename(target) !== "claimed.json" ||
+      current.isSymbolicLink() ||
+      !current.isFile() ||
+      current.uid !== currentUid() ||
+      current.nlink !== 2 ||
+      (current.mode & 0o777) !== 0o600 ||
+      canonicalizeEntry(target) !== resolve(target)
+    ) {
+      fail("lifecycle-recovery", `${label} is not an atomic owner-only receipt`);
+    }
+    const linkedStages = stageEntries.filter(
+      (entry) => entry.info.dev === current.dev && entry.info.ino === current.ino,
+    );
+    if (stageEntries.length !== 1 || linkedStages.length !== 1) {
+      if (stageEntries.length === 0 && attempt < 2) continue;
+      fail("lifecycle-recovery", `${label} has an invalid atomic publish linkage`);
+    }
+    const [{ candidate, info: stagingInfo }] = linkedStages;
+    try {
+      if (
+        stagingInfo.isSymbolicLink() ||
+        !stagingInfo.isFile() ||
+        stagingInfo.uid !== currentUid() ||
+        stagingInfo.nlink !== 2 ||
+        (stagingInfo.mode & 0o777) !== 0o600 ||
+        canonicalizeEntry(candidate) !== resolve(candidate)
+      ) {
+        fail("lifecycle-recovery", `${label} has an unsafe atomic publish staging entry`);
+      }
+      return current;
+    } catch (error) {
+      if (error?.code !== "ENOENT" || attempt === 2) throw error;
+    }
   }
-  if (
-    basename(target) !== "claimed.json" ||
-    info.isSymbolicLink() ||
-    !info.isFile() ||
-    info.uid !== currentUid() ||
-    info.nlink !== 2 ||
-    (info.mode & 0o777) !== 0o600 ||
-    realpathSync(target) !== resolve(target)
-  ) {
-    fail("lifecycle-recovery", `${label} is not an atomic owner-only receipt`);
-  }
-  const linkedStages = readdirSync(dirname(target))
-    .filter((name) => CLAIM_PUBLISH_STAGE_PATTERN.test(name))
-    .map((name) => join(dirname(target), name))
-    .filter((candidate) => {
-      const candidateInfo = lstatSync(candidate);
-      return candidateInfo.dev === info.dev && candidateInfo.ino === info.ino;
-    });
-  if (linkedStages.length !== 1) {
-    fail("lifecycle-recovery", `${label} has an invalid atomic publish linkage`);
-  }
-  const stagingInfo = lstatSync(linkedStages[0]);
-  if (
-    stagingInfo.isSymbolicLink() ||
-    !stagingInfo.isFile() ||
-    stagingInfo.uid !== currentUid() ||
-    stagingInfo.nlink !== 2 ||
-    (stagingInfo.mode & 0o777) !== 0o600 ||
-    realpathSync(linkedStages[0]) !== resolve(linkedStages[0])
-  ) {
-    fail("lifecycle-recovery", `${label} has an unsafe atomic publish staging entry`);
-  }
-  return info;
+  fail("lifecycle-recovery", `${label} did not converge after atomic publish inspection`);
 }
 
 function parseLifecycleJson(target, schema, keys, label) {
@@ -12179,6 +12213,7 @@ export {
   packExisting,
   packSourceNpmCandidate,
   publicResidueSummary,
+  requireLifecycleJsonEntry,
   publishSealedPublicResult,
   refreshPrivateEvidenceManifest,
   residueIsEmpty,
