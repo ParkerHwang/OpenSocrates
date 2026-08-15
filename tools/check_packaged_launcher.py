@@ -12,6 +12,7 @@ the *actual* hook arguments declared in that package's ``hooks/hooks.json``.
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import os
 import platform
@@ -48,12 +49,14 @@ REQUIRED_EVENTS = frozenset({"user_prompt_submitted", "completion_candidate", "s
 
 STUB_TEMPLATE = """#!/bin/sh
 {{
+    stdin_base64=$(/usr/bin/openssl base64 -A)
     printf 'self:%s\\n' "$0"
     printf 'argv:'
     for argument in "$@"; do
         printf ' %s' "$argument"
     done
     printf '\\n'
+    printf 'stdin-base64:%s\\n' "$stdin_base64"
 }} >> {marker}
 printf '%s' {stdout_token}
 exit {exit_code}
@@ -195,11 +198,18 @@ def _environment_for_uname(stage: Path, reported: tuple[str, str]) -> dict[str, 
     return env
 
 
-def _run(stage: Path, argv: Sequence[str], env: Mapping[str, str]) -> subprocess.CompletedProcess:
+def _run(
+    stage: Path,
+    argv: Sequence[str],
+    env: Mapping[str, str],
+    *,
+    input_data: bytes = b"",
+) -> subprocess.CompletedProcess:
     return subprocess.run(
         [str(stage / Path(*LAUNCHER)), *argv],
         cwd=tempfile.gettempdir(),
         env=dict(env),
+        input=input_data,
         capture_output=True,
         timeout=60.0,
         check=False,
@@ -222,9 +232,16 @@ def _require(condition: bool, message: str) -> None:
 
 
 def _assert_dispatch(
-    stage: Path, runtime: Path, argv: Sequence[str], expected: Sequence[str], target: str
+    stage: Path,
+    runtime: Path,
+    argv: Sequence[str],
+    expected: Sequence[str],
+    target: str,
+    *,
+    input_data: bytes = b"",
+    expected_stdin: bytes = b"",
 ) -> None:
-    result = _run(stage, argv, _environment(stage, target))
+    result = _run(stage, argv, _environment(stage, target), input_data=input_data)
     _require(result.returncode == 0, f"hook dispatch {list(argv)} exited {result.returncode}")
     fields = _marker_fields(stage / "marker.txt")
     _require(
@@ -236,10 +253,77 @@ def _assert_dispatch(
         f"runtime received {fields.get('argv')!r}, expected {' '.join(expected)!r}",
     )
     _require(
+        fields.get("stdin-base64") == base64.b64encode(expected_stdin).decode("ascii"),
+        "runtime did not receive the expected bounded callback bytes",
+    )
+    _require(
         result.stdout.decode("utf-8") == STDOUT_TOKEN,
         "the launcher did not relay runtime stdout unchanged",
     )
     (stage / "marker.txt").unlink()
+
+
+def _assert_codex_session_start_fast_path(stage: Path, runtime: Path, target: str) -> None:
+    """Normal starts bypass the frozen runtime; compact keeps exact delegation."""
+
+    argv = ["hook", "codex", "session_started"]
+    for label, payload in (
+        ("empty", b""),
+        ("malformed", b'{"source":'),
+        ("missing-source", b'{"hook_event_name":"SessionStart"}\n'),
+    ):
+        result = _run(stage, argv, _environment(stage, target), input_data=payload)
+        _require(result.returncode == 0, f"Codex {label} SessionStart did not fail open")
+        _require(result.stdout == b"", f"Codex {label} SessionStart wrote output")
+        _require(
+            not (stage / "marker.txt").exists(),
+            f"Codex {label} SessionStart booted the frozen runtime",
+        )
+
+    for source in ("startup", "resume", "clear"):
+        payload = (
+            json.dumps(
+                {"hook_event_name": "SessionStart", "source": source},
+                separators=(",", ":"),
+            ).encode("utf-8")
+            + b"\n"
+        )
+        result = _run(stage, argv, _environment(stage, target), input_data=payload)
+        _require(result.returncode == 0, f"Codex {source} SessionStart did not fail open")
+        _require(result.stdout == b"", f"Codex {source} SessionStart wrote output")
+        _require(
+            not (stage / "marker.txt").exists(),
+            f"Codex {source} SessionStart booted the frozen runtime",
+        )
+
+    if Path("/usr/bin/plutil").is_file():
+        for label, payload in (
+            ("nested-compact", b'{"source":"startup","nested":{"source":"compact"}}'),
+            ("quoted-compact", b'{"source":"startup","note":"\\"source\\":\\"compact\\""}'),
+        ):
+            result = _run(stage, argv, _environment(stage, target), input_data=payload)
+            _require(result.returncode == 0, f"Codex {label} SessionStart did not fail open")
+            _require(result.stdout == b"", f"Codex {label} SessionStart wrote output")
+            _require(
+                not (stage / "marker.txt").exists(),
+                f"Codex {label} SessionStart bypassed the top-level source check",
+            )
+
+    oversized = b'{"source":"compact","padding":"' + b"x" * (4 * 1024 * 1024) + b'"}'
+    result = _run(stage, argv, _environment(stage, target), input_data=oversized)
+    _require(result.returncode == 0 and result.stdout == b"", "oversized SessionStart blocked")
+    _require(not (stage / "marker.txt").exists(), "oversized SessionStart reached the runtime")
+
+    compact = b'{"hook_event_name":"SessionStart","source":"compact"}\n'
+    _assert_dispatch(
+        stage,
+        runtime,
+        argv,
+        ["hook", "session_started", "--host", "codex"],
+        target,
+        input_data=compact,
+        expected_stdin=compact,
+    )
 
 
 def _check_hook_dispatch(
@@ -257,7 +341,16 @@ def _check_hook_dispatch(
                 len(argv) == 3 and argv[0] == "hook" and argv[1] == host,
                 f"unexpected packaged hook arguments {argv}",
             )
-            _assert_dispatch(stage, runtime, argv, ["hook", argv[2], "--host", host], target)
+            if host == "codex" and argv[2] == "session_started":
+                _assert_codex_session_start_fast_path(stage, runtime, target)
+            else:
+                _assert_dispatch(
+                    stage,
+                    runtime,
+                    argv,
+                    ["hook", argv[2], "--host", host],
+                    target,
+                )
             events.append(argv[2])
     finally:
         shutil.rmtree(stage, ignore_errors=True)

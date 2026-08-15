@@ -30,6 +30,8 @@ fi
 mode=$1
 host=$2
 event=${3:-}
+codex_session_start_compact=false
+codex_session_start_payload_base64=
 
 case "$mode" in
     hook)
@@ -56,6 +58,54 @@ case "$mode" in
         pass_through invalid_arguments "$mode" "$host"
         ;;
 esac
+
+# Ordinary Codex SessionStart callbacks are specified literal no-ops. Avoid
+# booting the large frozen selector runtime for startup/resume/clear, because a
+# cold PyInstaller tree can exceed Codex's fixed two-second hook budget. Keep
+# the bounded callback only in this process's memory. macOS's system plist
+# parser admits only an exact top-level compact source. The textual fallback is
+# used only by cross-platform package-contract tests; either way, the runtime
+# still performs the complete JSON and native-event validation, so this hint
+# cannot authorize a restore or any other side effect.
+if [ "$mode" = hook ] && [ "$host" = codex ] && [ "$event" = session_started ]; then
+    codex_session_start_payload_base64=$(
+        /usr/bin/head -c 4194305 2>/dev/null |
+            /usr/bin/openssl base64 -A 2>/dev/null
+    ) || exit 0
+    payload_bytes=$(
+        printf '%s' "$codex_session_start_payload_base64" |
+            /usr/bin/openssl base64 -d -A 2>/dev/null |
+            /usr/bin/wc -c
+    ) || exit 0
+    set -- $payload_bytes
+    if [ "$#" -ne 1 ]; then
+        exit 0
+    fi
+    payload_bytes=$1
+    case "$payload_bytes" in
+        ''|*[!0-9]*) exit 0 ;;
+    esac
+    if [ "$payload_bytes" -gt 4194304 ]; then
+        exit 0
+    fi
+    if [ -x /usr/bin/plutil ]; then
+        payload_source=$(
+            printf '%s' "$codex_session_start_payload_base64" |
+                /usr/bin/openssl base64 -d -A 2>/dev/null |
+                /usr/bin/plutil -extract source raw -o - - 2>/dev/null
+        ) || exit 0
+        if [ "$payload_source" != compact ]; then
+            exit 0
+        fi
+    else
+        if ! printf '%s' "$codex_session_start_payload_base64" |
+            /usr/bin/openssl base64 -d -A 2>/dev/null |
+            LC_ALL=C /usr/bin/grep -Eq '"source"[[:space:]]*:[[:space:]]*"compact"'; then
+            exit 0
+        fi
+    fi
+    codex_session_start_compact=true
+fi
 
 system_name=$(uname -s 2>/dev/null || printf '%s' unknown)
 machine_name=$(uname -m 2>/dev/null || printf '%s' unknown)
@@ -87,7 +137,13 @@ fi
 
 case "$mode" in
     hook)
-        "$runtime_path" hook "$event" --host "$host" 2>/dev/null || true
+        if [ "$codex_session_start_compact" = true ]; then
+            printf '%s' "$codex_session_start_payload_base64" |
+                /usr/bin/openssl base64 -d -A 2>/dev/null |
+                "$runtime_path" hook "$event" --host "$host" 2>/dev/null || true
+        else
+            "$runtime_path" hook "$event" --host "$host" 2>/dev/null || true
+        fi
         exit 0
         ;;
     control)
