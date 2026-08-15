@@ -5438,6 +5438,21 @@ test("claim inspection accepts only the atomic hardlink publish converging to on
     }
   }));
 
+test("non-claim lifecycle receipts ignore a concurrent valid claim publication stage", () =>
+  withFixture((root) => {
+    const intent = join(root, "intent.json");
+    const claimStage = join(
+      root,
+      `.claimed.json.${process.pid}.22222222-2222-4222-8222-222222222222.tmp`,
+    );
+    writeFileSync(intent, "{}\n", { mode: 0o600 });
+    writeFileSync(claimStage, "{}\n", { mode: 0o600 });
+    assert.doesNotThrow(() =>
+      acceptance.requireLifecycleJsonEntry(intent, "synthetic lifecycle intent"));
+    assert.equal(lstatSync(intent).nlink, 1);
+    assert.equal(lstatSync(claimStage).nlink, 1);
+  }));
+
 test("concurrent capsules share one durable claim and launch exactly one child", () =>
   withFixture(async (root) => {
     const privateDirectory = join(root, "private");

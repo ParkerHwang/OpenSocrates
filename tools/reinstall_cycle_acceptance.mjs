@@ -4350,6 +4350,13 @@ function requireLifecycleJsonEntry(
   label,
   { inspectEntry = lstatSync, readDirectory = readdirSync, canonicalizeEntry = realpathSync } = {},
 ) {
+  if (basename(target) !== "claimed.json") {
+    const info = inspectEntry(target);
+    if (info.nlink !== 1) {
+      fail("lifecycle-recovery", `${label} is not a single-link owner-only receipt`);
+    }
+    return requireExactPrivateMode(target, label, "file", 0o600);
+  }
   const parent = dirname(target);
   const inspectPresent = (candidate) => {
     try {
