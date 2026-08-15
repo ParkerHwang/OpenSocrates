@@ -2854,7 +2854,9 @@ test("installed SessionStart measurement enforces 20 cold samples, 2000ms, and e
         assert.equal(options.env.PYTHONNOUSERSITE, "1");
         assert.equal(Object.hasOwn(options.env, "NPM_TOKEN"), false);
         const reportPath = args[args.indexOf("--report") + 1];
-        writeFileSync(reportPath, `${JSON.stringify(value)}\n`, { mode: 0o600 });
+        assert.equal(lstatSync(reportPath).mode & 0o777, 0o600);
+        writeFileSync(reportPath, `${JSON.stringify(value)}\n`, { mode: 0o644 });
+        assert.equal(lstatSync(reportPath).mode & 0o777, 0o600);
         return { status: 0 };
       },
     };
@@ -2871,6 +2873,7 @@ test("installed SessionStart measurement enforces 20 cold samples, 2000ms, and e
     assert.equal(measured.coldProcessPerSample, true);
     assert.equal(measured.artifactIdentity, `sha256:${releaseManifestSha256}`);
     value.configured_timeout_ms = 1999;
+    unlinkSync(join(privateDirectory, "codex-session-start-timing.json"));
     assert.throws(
       () => acceptance.measureInstalledSessionStart(
         recorder,

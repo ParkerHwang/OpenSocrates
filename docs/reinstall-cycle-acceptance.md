@@ -47,6 +47,9 @@ and Codex executables with their SHA-256 digests. The private execution identity
 also pins the canonical POSIX username. Destructive lifecycle capsules pass the
 exact host binaries and that username explicitly and do not depend on the
 capsule's reduced shell `PATH`; final timing invokes the pinned Python directly.
+The harness creates the private timing report as an exclusive owner-only file
+before Python writes any observation bytes, and verifies that mode again before
+reading it.
 Public npm and GitHub release 1.2.1 remain unavailable and are not used or
 claimed.
 

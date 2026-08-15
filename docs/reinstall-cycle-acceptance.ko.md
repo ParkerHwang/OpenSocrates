@@ -43,6 +43,8 @@ manifest와 canonical Python/Claude/Codex 실행 파일 및 각 SHA-256 digest�
 고정합니다. private execution identity는 canonical POSIX username도 고정합니다.
 파괴적 lifecycle capsule은 exact host binary와 해당 username을 명시적으로 전달하며
 축소된 shell `PATH`에 의존하지 않고, 최종 timing은 고정한 Python을 직접 실행합니다.
+harness는 Python이 observation byte를 쓰기 전에 private timing report를 배타적인
+소유자 전용 파일로 만들고, 읽기 전에 해당 mode를 다시 검증합니다.
 공개 npm 및 GitHub release의 1.2.1은 계속 unavailable이며 사용하거나 검증했다고
 주장하지 않습니다.
 

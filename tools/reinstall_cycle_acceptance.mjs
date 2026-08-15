@@ -7525,6 +7525,9 @@ function measureInstalledSessionStart(
   pythonBinary,
 ) {
   const reportPath = join(privateDirectory, "codex-session-start-timing.json");
+  writeFileSync(reportPath, "", { flag: "wx", mode: 0o600 });
+  requireCanonicalOwnedEntry(reportPath, "private SessionStart timing report", "file");
+  requireOwnerOnly(reportPath, "the private SessionStart timing report");
   const monotonicStartMs = performance.now();
   recorder.run(
     "Measure installed Codex SessionStart budget",
