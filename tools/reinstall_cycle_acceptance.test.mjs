@@ -64,6 +64,65 @@ function makeReport() {
   return report;
 }
 
+function publicBaselineInventoryFixture(codexHooks) {
+  const targetHosts = ["claude", "codex"];
+  const hostMap = (factory) =>
+    Object.fromEntries(targetHosts.map((host) => [host, factory(host)]));
+  return {
+    registrations: hostMap(() => ({
+      marketplaceCount: 1,
+      pluginCount: 1,
+      version: "1.2.1",
+      unsupportedLegacyConflictCount: 0,
+      rootMatchesExpected: true,
+    })),
+    managedRootsPresent: hostMap(() => true),
+    caches: hostMap(() => ({
+      present: true,
+      ownership: "verified",
+      versionCount: 1,
+      liveInUse: false,
+    })),
+    managedPayloadIntegrity: hostMap(() => "verified"),
+    cachePayloadIntegrity: hostMap(() => "verified"),
+    pluginData: [],
+    statePresent: true,
+    launchAgentPresent: false,
+    launchAgentTemporaryCount: 0,
+    launchAgentJobLoaded: false,
+    codexTrust: {
+      present: true,
+      exactSectionCount: 7,
+      events: [
+        "postToolUse",
+        "preCompact",
+        "preToolUse",
+        "sessionEnd",
+        "sessionStart",
+        "stop",
+        "userPromptSubmit",
+      ],
+    },
+    trustTransactionResidueCount: 0,
+    codexHooks,
+    nonTargetHosts: Object.fromEntries(
+      SUPPORTED_HOSTS.filter((host) => !targetHosts.includes(host)).map((host) => [
+        host,
+        {
+          managedRootPresent: false,
+          bridgePresent: false,
+          bridgeMarkerPresent: false,
+        },
+      ]),
+    ),
+    transactionResidue: Object.fromEntries(
+      SUPPORTED_HOSTS.map((host) => [host, 0]),
+    ),
+    openCodeBridgeResidueCount: 0,
+    ownership: "verified",
+  };
+}
+
 async function withFixture(action) {
   const root = realpathSync(mkdtempSync(join(tmpdir(), "opensocrates-reinstall-test-")));
   const siblingArchive = `${root}.zip`;
@@ -2564,6 +2623,52 @@ test("first-approval inventory fails closed for count, duplicate, trust, namespa
   assert.doesNotThrow(() =>
     acceptance.assertExactUntrustedHooks(inventory(baseHooks)));
 });
+
+test("the real Codex hook inventory survives the closed public baseline schema", () =>
+  withFixture((root) => {
+    const events = [
+      "postToolUse",
+      "preCompact",
+      "preToolUse",
+      "sessionEnd",
+      "sessionStart",
+      "stop",
+      "userPromptSubmit",
+    ];
+    const hooks = acceptance.codexHookInventory({
+      run: () => ({
+        stdout: JSON.stringify({
+          schema: "opensocrates.codex-hook-inventory/1.0.0",
+          errorCount: 0,
+          warningCount: 0,
+          hooks: events.map((eventName) => ({
+            eventName,
+            namespace: "opensocrates@opensocrates",
+            timeoutSec: eventName === "sessionStart" ? 2 : 10,
+            trustStatus: "trusted",
+          })),
+        }),
+      }),
+    });
+    const report = makeReport();
+    report.baseline.initialState = "installed";
+    report.baseline.installedHosts = ["claude", "codex"];
+    report.baseline.inventory = publicBaselineInventoryFixture(hooks);
+
+    assert.doesNotThrow(() => writeReports(root, report));
+    assert.equal(
+      JSON.parse(readFileSync(join(root, "result.json"), "utf8"))
+        .baseline.inventory.codexHooks.namespace,
+      "opensocrates@opensocrates",
+    );
+
+    const changed = structuredClone(report);
+    changed.baseline.inventory.codexHooks.namespace = "other@other";
+    assert.throws(
+      () => writeReports(root, changed),
+      /Codex hook inventory identity/u,
+    );
+  }));
 
 test("installed SessionStart measurement enforces 20 cold samples, 2000ms, and exact artifact identity", () =>
   withFixture((root) => {
@@ -6089,6 +6194,171 @@ test("machine-wide acceptance lease preserves pause and permits only the same de
     assert.equal(resumed.receipt.generation, 2);
     resumed.releaseCompleted(checkpointIdentity);
     assert.equal(existsSync(join(parent, "machine-acceptance-lease.json")), false);
+  }));
+
+test("an exact no-mutation preflight abort preserves and retires its machine lease", () =>
+  withFixture((root) => {
+    const parent = join(root, "private-parent");
+    const privateDirectory = join(parent, "reinstall-cycle-aborted");
+    const outputDirectory = join(root, "opensocrates-reinstall-cycle-result-aborted");
+    mkdirSync(privateDirectory, { recursive: true, mode: 0o700 });
+    mkdirSync(outputDirectory, { mode: 0o700 });
+    const report = makeReport();
+    acceptance.initializePrivateEvidenceManifest(
+      privateDirectory,
+      outputDirectory,
+      report,
+    );
+    new acceptance.CommandRecorder(privateDirectory, report);
+    const first = new acceptance.MachineAcceptanceLease(
+      parent,
+      privateDirectory,
+      report.testId,
+      { processId: 42501, processIsLive: () => false },
+    );
+    first.acquire();
+
+    const recovery = new acceptance.MachineAcceptanceLease(
+      parent,
+      privateDirectory,
+      report.testId,
+      { processId: 42502, processIsLive: () => false },
+    );
+    const retired = recovery.recoverAbortedPreflight();
+    assert.equal(retired.status, "retired_preflight_without_lifecycle");
+    assert.equal(existsSync(join(parent, "machine-acceptance-lease.json")), false);
+    const archive = join(privateDirectory, "aborted-machine-lease.json");
+    assert.equal(lstatSync(archive).isFile(), true);
+    assert.equal(lstatSync(archive).mode & 0o777, 0o600);
+    const archived = JSON.parse(readFileSync(archive, "utf8"));
+    assert.equal(archived.testId, report.testId);
+    assert.equal(archived.receipt.holderPid, 42501);
+
+    const nextPrivate = join(parent, "reinstall-cycle-next");
+    mkdirSync(nextPrivate, { mode: 0o700 });
+    const next = new acceptance.MachineAcceptanceLease(
+      parent,
+      nextPrivate,
+      makeReport().testId,
+      { processId: 42503, processIsLive: () => false },
+    );
+    let lifecycleCallbacks = 0;
+    next.acquire();
+    lifecycleCallbacks += 1;
+    assert.equal(lifecycleCallbacks, 1);
+    next.releaseCompleted();
+
+    const currentParent = join(root, "private-parent-current");
+    const currentPrivate = join(currentParent, "reinstall-cycle-current");
+    const currentOutput = join(
+      root,
+      "opensocrates-reinstall-cycle-result-current",
+    );
+    mkdirSync(currentPrivate, { recursive: true, mode: 0o700 });
+    mkdirSync(currentOutput, { mode: 0o700 });
+    const currentReport = makeReport();
+    acceptance.initializePrivateEvidenceManifest(
+      currentPrivate,
+      currentOutput,
+      currentReport,
+    );
+    new acceptance.CommandRecorder(currentPrivate, currentReport);
+    writeFileSync(
+      join(currentPrivate, "run.lock"),
+      `${JSON.stringify({ pid: 42504, createdAt: new Date().toISOString() })}\n`,
+      { mode: 0o600 },
+    );
+    const current = new acceptance.MachineAcceptanceLease(
+      currentParent,
+      currentPrivate,
+      currentReport.testId,
+      { processId: 42504, processIsLive: () => true },
+    );
+    current.acquire();
+    assert.equal(
+      current.releaseAbortedPreflight().status,
+      "retired_preflight_without_lifecycle",
+    );
+    assert.equal(
+      existsSync(join(currentParent, "machine-acceptance-lease.json")),
+      false,
+    );
+  }));
+
+test("aborted-preflight lease recovery rejects every ambiguous durable state", () =>
+  withFixture((root) => {
+    const cases = [
+      {
+        name: "checkpoint",
+        mutate: ({ privateDirectory }) =>
+          writeFileSync(join(privateDirectory, "checkpoint.json"), "{}\n", { mode: 0o600 }),
+        restore: ({ privateDirectory }) => unlinkSync(join(privateDirectory, "checkpoint.json")),
+      },
+      {
+        name: "lifecycle",
+        mutate: ({ privateDirectory }) =>
+          mkdirSync(join(privateDirectory, "lifecycle-operations"), { mode: 0o700 }),
+        restore: ({ privateDirectory }) =>
+          rmSync(join(privateDirectory, "lifecycle-operations"), { recursive: true }),
+      },
+      {
+        name: "public-result",
+        mutate: ({ outputDirectory }) =>
+          writeFileSync(join(outputDirectory, "result.json"), "{}\n", { mode: 0o600 }),
+        restore: ({ outputDirectory }) => unlinkSync(join(outputDirectory, "result.json")),
+      },
+      {
+        name: "live-holder",
+        processIsLive: (pid) => pid === 42601,
+        mutate: () => {},
+        restore: () => {},
+      },
+    ];
+    for (const item of cases) {
+      const parent = join(root, `private-parent-${item.name}`);
+      const privateDirectory = join(parent, `reinstall-cycle-${item.name}`);
+      const outputDirectory = join(
+        root,
+        `opensocrates-reinstall-cycle-result-${item.name}`,
+      );
+      mkdirSync(privateDirectory, { recursive: true, mode: 0o700 });
+      mkdirSync(outputDirectory, { mode: 0o700 });
+      const report = makeReport();
+      acceptance.initializePrivateEvidenceManifest(
+        privateDirectory,
+        outputDirectory,
+        report,
+      );
+      new acceptance.CommandRecorder(privateDirectory, report);
+      const first = new acceptance.MachineAcceptanceLease(
+        parent,
+        privateDirectory,
+        report.testId,
+        { processId: 42601, processIsLive: () => false },
+      );
+      first.acquire();
+      item.mutate({ privateDirectory, outputDirectory });
+      const recovery = new acceptance.MachineAcceptanceLease(
+        parent,
+        privateDirectory,
+        report.testId,
+        {
+          processId: 42602,
+          processIsLive: item.processIsLive ?? (() => false),
+        },
+      );
+      assert.throws(
+        () => recovery.recoverAbortedPreflight(),
+        /cannot be proven to have stopped before lifecycle mutation/u,
+      );
+      assert.equal(existsSync(join(parent, "machine-acceptance-lease.json")), true);
+      assert.equal(
+        existsSync(join(privateDirectory, "aborted-machine-lease.json")),
+        false,
+      );
+      item.restore({ privateDirectory, outputDirectory });
+      first.releaseCompleted();
+    }
   }));
 
 test("machine-wide acceptance lease rejects unsafe and foreign or stale competing receipts", () =>

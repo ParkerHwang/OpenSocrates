@@ -91,6 +91,9 @@ const LIFECYCLE_BLOCKED_SCHEMA = "opensocrates.lifecycle-operation-blocked/1.0.0
 const RUN_LOCK_NAME = "run.lock";
 const MACHINE_LEASE_NAME = "machine-acceptance-lease.json";
 const MACHINE_LEASE_SCHEMA = "opensocrates.reinstall-cycle-machine-lease/1.0.0";
+const ABORTED_MACHINE_LEASE_NAME = "aborted-machine-lease.json";
+const ABORTED_MACHINE_LEASE_SCHEMA =
+  "opensocrates.reinstall-cycle-aborted-machine-lease/1.0.0";
 const PRIVATE_MANIFEST_NAME = "private-evidence-manifest.json";
 const EVIDENCE_TRANSACTION_NAME = "evidence-transaction.json";
 const EVIDENCE_TRANSACTION_SCHEMA = "opensocrates.evidence-transaction/1.0.0";
@@ -761,6 +764,217 @@ export class MachineAcceptanceLease {
       fail("machine-lease", "the machine-wide acceptance lease changed owners");
     }
     return existing;
+  }
+
+  #abortedPreflightCannotBeProven() {
+    fail(
+      "machine-lease",
+      "the abandoned acceptance lease cannot be proven to have stopped before lifecycle mutation",
+    );
+  }
+
+  #validateAbortedPreflightEvidence(existing, { allowCurrentRunLock = false } = {}) {
+    const reject = () => this.#abortedPreflightCannotBeProven();
+    const receipt = existing.receipt;
+    if (
+      receipt.testId !== this.testId ||
+      receipt.privateDirectory !== this.privateDirectory ||
+      receipt.status !== "active" ||
+      receipt.checkpointIdentitySha256 !== null
+    ) {
+      reject();
+    }
+    for (const name of [
+      CHECKPOINT_NAME,
+      EVIDENCE_TRANSACTION_NAME,
+      PACK_TRANSACTION_NAME,
+      SEALED_PUBLIC_DIRECTORY_NAME,
+      LIFECYCLE_OPERATIONS_NAME,
+    ]) {
+      if (pathPresent(join(this.privateDirectory, name))) reject();
+    }
+    const runLock = join(this.privateDirectory, RUN_LOCK_NAME);
+    if (pathPresent(runLock)) {
+      if (!allowCurrentRunLock) reject();
+      requireExactPrivateMode(runLock, "the current aborted-preflight run lock", "file", 0o600);
+      const lock = parseJson(
+        readFileSync(runLock, "utf8"),
+        "machine-lease",
+        "the current aborted-preflight run lock is invalid",
+      );
+      requireExactObjectKeys(
+        lock,
+        ["pid", "createdAt"],
+        "machine-lease",
+        "the current aborted-preflight run lock",
+      );
+      if (lock.pid !== this.processId) reject();
+    }
+    const manifest = readPrivateEvidenceManifest(this.privateDirectory);
+    const absentPublicLinkage = [
+      manifest.publicResult.resultJsonSha256,
+      manifest.publicResult.automatedResultSha256,
+      manifest.publicResult.sealedReceiptSha256,
+      manifest.publicResult.finalizationId,
+      manifest.publicResult.finalVerificationSha256,
+      manifest.publicResult.diagnosticZipSha256,
+      manifest.publicResult.publicZipSha256,
+    ];
+    if (
+      manifest.testId !== this.testId ||
+      absentPublicLinkage.some((value) => value !== null) ||
+      manifest.recording.status !== "pending" ||
+      manifest.recording.receiptRelativePath !== null ||
+      manifest.recording.receiptSha256 !== null ||
+      manifest.recording.recordingSha256 !== null ||
+      manifest.recording.reviewStatus !== "pending" ||
+      manifest.retention.status !== "active" ||
+      manifest.retention.cleanupAuthorized !== false
+    ) {
+      reject();
+    }
+    const outputDirectory = manifest.publicResult.directory;
+    if (
+      typeof outputDirectory !== "string" ||
+      resolve(outputDirectory) !== outputDirectory ||
+      !basename(outputDirectory).startsWith(RESULT_DIRECTORY_PREFIX)
+    ) {
+      reject();
+    }
+    requireExactPrivateMode(
+      outputDirectory,
+      "the aborted-preflight public result directory",
+      "directory",
+      0o700,
+    );
+    if (readdirSync(outputDirectory).length !== 0) reject();
+
+    const ledgerPath = join(this.privateDirectory, COMMAND_LOG_NAME);
+    requireExactPrivateMode(ledgerPath, "the aborted-preflight command ledger", "file", 0o600);
+    const ledgerContents = readFileSync(ledgerPath, "utf8");
+    const ledger = commandLedgerStateFromContents(ledgerContents);
+    if (
+      ledger.sha256 !== manifest.commandLedger.sha256 ||
+      ledger.entryCount !== manifest.commandLedger.entryCount
+    ) {
+      reject();
+    }
+    const entries = ledgerContents
+      .split(/\r?\n/u)
+      .filter(Boolean)
+      .map((line) =>
+        parseJson(
+          line,
+          "machine-lease",
+          "the aborted-preflight command ledger is invalid",
+        ),
+      );
+    if (
+      entries.some(
+        (entry) =>
+          entry.lifecycleOperation !== null && entry.lifecycleOperation !== undefined,
+      ) ||
+      entries.some(
+        (entry) =>
+          !Array.isArray(entry.args) ||
+          entry.args.some((argument) => argument === "remove" || argument === "install"),
+      )
+    ) {
+      reject();
+    }
+    const commandDirectory = join(this.privateDirectory, "commands");
+    requireExactPrivateMode(
+      commandDirectory,
+      "the aborted-preflight command output directory",
+      "directory",
+      0o700,
+    );
+    new CommandRecorder(this.privateDirectory, { commands: [] });
+    return { manifest, ledger };
+  }
+
+  #archiveAndRetireAbortedPreflight(existing) {
+    const archivePath = join(this.privateDirectory, ABORTED_MACHINE_LEASE_NAME);
+    let archive;
+    if (pathPresent(archivePath)) {
+      requireExactPrivateMode(
+        archivePath,
+        "the archived aborted-preflight machine lease",
+        "file",
+        0o600,
+      );
+      archive = parseJson(
+        readFileSync(archivePath, "utf8"),
+        "machine-lease",
+        "the archived aborted-preflight machine lease is invalid",
+      );
+    } else {
+      archive = {
+        schema: ABORTED_MACHINE_LEASE_SCHEMA,
+        testId: existing.receipt.testId,
+        privateDirectory: existing.receipt.privateDirectory,
+        leaseReceiptSha256: existing.sha256,
+        retiredAt: new Date().toISOString(),
+        status: "retired_preflight_without_lifecycle",
+        receipt: existing.receipt,
+      };
+      atomicWritePrivate(archivePath, `${JSON.stringify(archive, null, 2)}\n`);
+    }
+    requireExactObjectKeys(
+      archive,
+      [
+        "schema",
+        "testId",
+        "privateDirectory",
+        "leaseReceiptSha256",
+        "retiredAt",
+        "status",
+        "receipt",
+      ],
+      "machine-lease",
+      "the archived aborted-preflight machine lease",
+    );
+    if (
+      archive.schema !== ABORTED_MACHINE_LEASE_SCHEMA ||
+      archive.testId !== existing.receipt.testId ||
+      archive.privateDirectory !== existing.receipt.privateDirectory ||
+      archive.leaseReceiptSha256 !== existing.sha256 ||
+      archive.status !== "retired_preflight_without_lifecycle" ||
+      !Number.isFinite(Date.parse(archive.retiredAt ?? "")) ||
+      new Date(archive.retiredAt).toISOString() !== archive.retiredAt ||
+      sha256Buffer(`${JSON.stringify(archive.receipt, null, 2)}\n`) !== existing.sha256
+    ) {
+      this.#abortedPreflightCannotBeProven();
+    }
+    unlinkSync(this.target);
+    syncEntry(this.parent);
+    this.currentReceipt = null;
+    return {
+      status: archive.status,
+      leaseReceiptSha256: archive.leaseReceiptSha256,
+      archiveSha256: sha256FileSync(archivePath),
+    };
+  }
+
+  releaseAbortedPreflight() {
+    const existing = this.#requireCurrentHolder();
+    this.#validateAbortedPreflightEvidence(existing, { allowCurrentRunLock: true });
+    return this.#archiveAndRetireAbortedPreflight(existing);
+  }
+
+  recoverAbortedPreflight() {
+    this.#requireLayout();
+    const existing = this.#validateReceipt();
+    if (
+      existing.receipt.testId !== this.testId ||
+      existing.receipt.privateDirectory !== this.privateDirectory ||
+      existing.receipt.status !== "active" ||
+      this.processIsLive(existing.receipt.holderPid)
+    ) {
+      this.#abortedPreflightCannotBeProven();
+    }
+    this.#validateAbortedPreflightEvidence(existing);
+    return this.#archiveAndRetireAbortedPreflight(existing);
   }
 
   acquire(checkpoint = null) {
@@ -1438,13 +1652,34 @@ function validatePublicBaseline(baseline) {
   requirePublicStringArray(baseline.inventory.codexTrust.events, "result.baseline.inventory.codexTrust.events");
   requirePublicKeys(
     baseline.inventory.codexHooks,
-    new Set(["hookCount", "events", "trustStatuses", "sessionStartTimeoutSeconds"]),
+    new Set([
+      "hookCount",
+      "events",
+      "namespace",
+      "trustStatuses",
+      "sessionStartTimeoutSeconds",
+    ]),
     "result.baseline.inventory.codexHooks",
   );
   requirePublicScalar(baseline.inventory.codexHooks.hookCount, ["number"], "result.baseline.inventory.codexHooks.hookCount");
   requirePublicStringArray(baseline.inventory.codexHooks.events, "result.baseline.inventory.codexHooks.events");
+  requirePublicScalar(baseline.inventory.codexHooks.namespace, ["string"], "result.baseline.inventory.codexHooks.namespace");
   requirePublicStringArray(baseline.inventory.codexHooks.trustStatuses, "result.baseline.inventory.codexHooks.trustStatuses");
   requirePublicScalar(baseline.inventory.codexHooks.sessionStartTimeoutSeconds, ["number"], "result.baseline.inventory.codexHooks.sessionStartTimeoutSeconds");
+  const hookTrustStatuses = baseline.inventory.codexHooks.trustStatuses;
+  if (
+    baseline.inventory.codexHooks.hookCount !== EXPECTED_CODEX_EVENTS.length ||
+    !sameStrings(baseline.inventory.codexHooks.events, EXPECTED_CODEX_EVENTS) ||
+    baseline.inventory.codexHooks.namespace !== "opensocrates@opensocrates" ||
+    hookTrustStatuses.length === 0 ||
+    !sameStrings(hookTrustStatuses, [...new Set(hookTrustStatuses)]) ||
+    hookTrustStatuses.some(
+      (status) => !new Set(["managed", "modified", "trusted", "untrusted"]).has(status),
+    ) ||
+    baseline.inventory.codexHooks.sessionStartTimeoutSeconds !== 2
+  ) {
+    fail("privacy", "the public Codex hook inventory identity is invalid");
+  }
   const nonTargetHosts = SUPPORTED_HOSTS.filter((host) => !HOSTS.includes(host));
   requirePublicHostMap(
     baseline.inventory.nonTargetHosts,
@@ -11487,13 +11722,21 @@ async function runInitialAcceptance() {
     );
     publicStatePersisted = true;
   } finally {
-    if (machineLeaseOwned && publicStatePersisted) {
-      if (report.automatedResult === "passed" && checkpoint?.phase === "installed") {
-        machineLease.releaseCompleted(checkpoint);
-      } else if (report.automatedResult === "paused") {
-        machineLease.markPaused();
-      } else if (report.automatedResult === "failed" && report.mutation.started === false) {
-        machineLease.releaseCompleted(checkpoint);
+    if (machineLeaseOwned) {
+      if (publicStatePersisted) {
+        if (report.automatedResult === "passed" && checkpoint?.phase === "installed") {
+          machineLease.releaseCompleted(checkpoint);
+        } else if (report.automatedResult === "paused") {
+          machineLease.markPaused();
+        } else if (report.automatedResult === "failed" && report.mutation.started === false) {
+          machineLease.releaseCompleted(checkpoint);
+        }
+      } else if (report.mutation.started === false) {
+        try {
+          machineLease.releaseAbortedPreflight();
+        } catch (error) {
+          console.error(`Machine lease recovery error: ${sanitizedMessage(error)}`);
+        }
       }
     }
     lock.release();
