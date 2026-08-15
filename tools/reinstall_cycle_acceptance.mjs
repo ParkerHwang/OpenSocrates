@@ -1786,7 +1786,7 @@ function validatePublicAssertions(assertions) {
       if (
         value.status !== "pass" ||
         value.claudePublicSkills.some((item) => !/^[a-z0-9-]{1,80}$/u.test(item)) ||
-        value.claudeCommandsPresent !== true ||
+        value.claudeCommandsPresent !== false ||
         value.codexControllerPresent !== true
       ) {
         fail("privacy", `${trail} violates the final managed-layout contract`);

@@ -2959,7 +2959,7 @@ test("complete produced final assertions satisfy the public result contract", ()
     finalManagedLayout: {
       status: "pass",
       claudePublicSkills: ["opensocrates"],
-      claudeCommandsPresent: true,
+      claudeCommandsPresent: false,
       codexControllerPresent: true,
     },
     finalArchitecture: {
