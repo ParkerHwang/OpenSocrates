@@ -1309,7 +1309,7 @@ function validatePublicRuntimeIdentity(value, trail) {
   requirePublicStringArray(value.architectures, `${trail}.architectures`);
   requirePublicScalar(value.executable, ["boolean"], `${trail}.executable`);
   if (
-    value.product !== "opensocrates-runtime" ||
+    value.product !== "opensocrates" ||
     value.productVersion !== PRODUCT_VERSION ||
     !Number.isSafeInteger(value.contentRevision) ||
     value.contentRevision < 1 ||
@@ -12438,7 +12438,9 @@ export {
   validateBuildSourceReceipt,
   validateNpmPackMetadata,
   validatePrivateEvidenceManifest,
+  validatePublicAssertions,
   validatePublicText,
+  validatePublicRuntimeIdentity,
   verifyGitHubAuthentication,
   verifyLifecycleHostAuthentication,
   verifyCacheMarketplaceShape,

@@ -2886,6 +2886,160 @@ test("installed SessionStart measurement enforces 20 cold samples, 2000ms, and e
     );
   }));
 
+test("installed runtime public identity matches the runtime version contract", () => {
+  const identity = {
+    product: "opensocrates",
+    productVersion: "1.2.1",
+    contentRevision: 1,
+    architectures: ["arm64"],
+    executable: true,
+  };
+  assert.doesNotThrow(() =>
+    acceptance.validatePublicRuntimeIdentity(identity, "fixture.runtime"),
+  );
+  assert.throws(
+    () =>
+      acceptance.validatePublicRuntimeIdentity(
+        { ...identity, product: "opensocrates-runtime" },
+        "fixture.runtime",
+      ),
+    AcceptanceError,
+  );
+});
+
+test("complete produced final assertions satisfy the public result contract", () => {
+  const sha = "d".repeat(64);
+  const registration = {
+    marketplaceCount: 1,
+    pluginCount: 1,
+    version: "1.2.1",
+    unsupportedLegacyConflictCount: 0,
+    rootMatchesExpected: true,
+  };
+  const runtime = {
+    product: "opensocrates",
+    productVersion: "1.2.1",
+    contentRevision: 1,
+    architectures: ["arm64"],
+    executable: true,
+  };
+  const payload = {
+    version: "1.2.1",
+    declaredFileCount: 1,
+    checksumInventorySha256: sha,
+    releaseManifestSha256: sha,
+    runtimeSha256: sha,
+    ciPayloadByteIdentity: "matched",
+  };
+  const absentHost = {
+    managedRootPresent: false,
+    bridgePresent: false,
+    bridgeMarkerPresent: false,
+  };
+  const assertions = {
+    finalRegistration: {
+      status: "pass",
+      hosts: { claude: registration, codex: registration },
+    },
+    finalStatus: {
+      status: "pass",
+      desiredVersion: "1.2.1",
+      hostsInSync: ["claude", "codex"],
+      drift: false,
+    },
+    finalVersion: {
+      status: "pass",
+      desiredVersion: "1.2.1",
+      runtimes: { claude: runtime, codex: runtime },
+    },
+    finalChecksum: {
+      status: "pass",
+      payloads: { claude: payload, codex: payload },
+    },
+    finalManagedLayout: {
+      status: "pass",
+      claudePublicSkills: ["opensocrates"],
+      claudeCommandsPresent: true,
+      codexControllerPresent: true,
+    },
+    finalArchitecture: {
+      status: "pass",
+      hardware: "arm64",
+      process: "arm64",
+      installed: { claude: ["arm64"], codex: ["arm64"] },
+    },
+    finalPermissions: {
+      status: "pass",
+      stateDirectoryMode: "700",
+      desiredStateMode: "600",
+      managedRootsOwnedByEffectiveUser: true,
+      runtimesExecutable: true,
+    },
+    finalDesiredState: {
+      status: "pass",
+      schema: "opensocrates.desired-state/1.0.0",
+      activeVersion: "1.2.1",
+      installedHosts: ["claude", "codex"],
+      autoUpdateEnabled: false,
+      launchAgentPresent: false,
+      launchAgentJobLoaded: false,
+    },
+    codexFirstApproval: {
+      status: "pass",
+      exactHookCount: 7,
+      events: [
+        "postToolUse",
+        "preCompact",
+        "preToolUse",
+        "sessionEnd",
+        "sessionStart",
+        "stop",
+        "userPromptSubmit",
+      ],
+      namespace: "opensocrates@opensocrates",
+      trustStatuses: ["untrusted"],
+      sessionStartTimeoutSeconds: 2,
+      observedBeforeOtherPostInstallCodexLaunch: true,
+      manualApprovalRequired: true,
+    },
+    sessionStartBudget: {
+      observationStatus: "pass",
+      target: "darwin-arm64",
+      sampleCount: 20,
+      configuredTimeoutMs: 2000,
+      hardTimeoutMilliseconds: 2000,
+      clock: "performance.now_monotonic",
+      monotonicStartMilliseconds: 1,
+      monotonicEndMilliseconds: 2,
+      coldProcessPerSample: true,
+      hardTimeoutEnforced: true,
+      processModel:
+        "new_process_per_sample; first_configured_hook_before_runtime_smoke; " +
+        "hermetic_generated_input_and_selector_availability_metadata",
+      firstMs: 100,
+      p95Ms: 110,
+      maxMs: 120,
+      pass: true,
+      artifactIdentity: `sha256:${sha}`,
+    },
+    finalTopology: {
+      status: "pass",
+      sourceCommit: "a".repeat(40),
+      installedHosts: ["claude", "codex"],
+      version: "1.2.1",
+      admittedTopology: "claude_and_codex_only; other_supported_hosts_absent",
+      nonTargetHosts: Object.fromEntries(
+        SUPPORTED_HOSTS.filter((host) => !["claude", "codex"].includes(host)).map((host) => [
+          host,
+          absentHost,
+        ]),
+      ),
+      previousCacheDataTrustContentRestorationClaimed: false,
+    },
+  };
+  assert.doesNotThrow(() => acceptance.validatePublicAssertions(assertions));
+});
+
 test("entering finalizing is an absorbing one-shot boundary after hook or later failures", () =>
   withFixture(async (root) => {
     for (const failurePoint of ["hook-probe", "later-status-or-timing"]) {
