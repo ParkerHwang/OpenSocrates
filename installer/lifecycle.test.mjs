@@ -620,8 +620,14 @@ process.stdin.on("end", () => {
   return binary;
 }
 
-function makeInMemoryCodexAppServer({ failWrite = false } = {}) {
-  const trace = { argsExact: [], writeResults: [], responseBeforeEnd: [], killed: [] };
+function makeInMemoryCodexAppServer({ failWrite = false, canonicalizeCodexHome = false } = {}) {
+  const trace = {
+    argsExact: [],
+    cwdCanonical: [],
+    writeResults: [],
+    responseBeforeEnd: [],
+    killed: [],
+  };
   return {
     trace,
     spawnAppServer(_binary, args, options) {
@@ -650,7 +656,7 @@ function makeInMemoryCodexAppServer({ failWrite = false } = {}) {
             `${JSON.stringify({
               id: request.id,
               result: {
-                codexHome: options.cwd,
+                codexHome: canonicalizeCodexHome ? realpathSync(options.cwd) : options.cwd,
                 platformFamily: "unix",
                 platformOs: "macos",
                 userAgent: "codex_cli_rs/0.145.0-in-memory",
@@ -681,6 +687,7 @@ function makeInMemoryCodexAppServer({ failWrite = false } = {}) {
         return true;
       };
       trace.argsExact.push(args.length === 2 && args[0] === "app-server" && args[1] === "--stdio");
+      trace.cwdCanonical.push(options.cwd === realpathSync(options.cwd));
       return child;
     },
   };
@@ -1912,6 +1919,36 @@ test("isolated app-server validation accepts supported notifications and waits f
     } finally {
       box.cleanup();
     }
+  }
+});
+
+test("isolated app-server validation canonicalizes temporary path aliases", async () => {
+  const box = makeSandbox("codex");
+  const savedTmpdir = process.env.TMPDIR;
+  try {
+    const config = join(box.home, "config.toml");
+    writeFileSync(config, trustSection("session_end"));
+    const canonicalTemporaryParent = join(box.root, "canonical-temporary-parent");
+    const temporaryParentAlias = join(box.root, "temporary-parent-alias");
+    mkdirSync(canonicalTemporaryParent);
+    symlinkSync(canonicalTemporaryParent, temporaryParentAlias, "dir");
+    process.env.TMPDIR = temporaryParentAlias;
+    const appServer = makeInMemoryCodexAppServer({ canonicalizeCodexHome: true });
+
+    const result = await resetCodexOpenSocratesHookTrust({
+      codexHome: box.home,
+      codexBin: "in-memory-codex",
+      hooks: { spawnAppServer: appServer.spawnAppServer },
+    });
+
+    assert.equal(result.status, "reset");
+    assert.deepEqual(appServer.trace.argsExact, [true, true, true]);
+    assert.deepEqual(appServer.trace.cwdCanonical, [true, true, true]);
+    assert.doesNotMatch(readFileSync(config, "utf8"), /opensocrates@opensocrates/u);
+  } finally {
+    if (savedTmpdir === undefined) delete process.env.TMPDIR;
+    else process.env.TMPDIR = savedTmpdir;
+    box.cleanup();
   }
 });
 

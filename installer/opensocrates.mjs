@@ -1006,6 +1006,10 @@ async function validateCodexConfigBytes(
   try {
     validationHome = await mkdtemp(join(tmpdir(), "opensocrates-codex-config-check-"));
     await chmod(validationHome, 0o700);
+    // macOS commonly exposes the temporary directory through /var while
+    // Codex reports its canonical /private/var spelling. Use one canonical
+    // identity for the environment, cwd, and initialize-response comparison.
+    validationHome = await realpath(validationHome);
     for (const directory of ["tmp", "xdg-cache", "xdg-config", "xdg-data", "xdg-state"]) {
       await mkdir(join(validationHome, directory), { mode: 0o700 });
     }
