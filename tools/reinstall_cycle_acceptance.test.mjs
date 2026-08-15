@@ -1178,6 +1178,7 @@ test("immutable artifact metadata pins workflow run and full head SHA", () => {
 
 test("immutable artifact download uses only the exact artifact-ID API endpoint", async () => {
   const calls = [];
+  const sizeBytes = 472_980_709;
   const recorder = {
     runToFile: async (...args) => {
       calls.push(args);
@@ -1189,6 +1190,7 @@ test("immutable artifact download uses only the exact artifact-ID API endpoint",
     "/private/pinned/bin/gh",
     77,
     "/private/evidence/artifact.zip",
+    sizeBytes,
   );
   assert.equal(result.outputSizeBytes, 12);
   assert.equal(calls.length, 1);
@@ -1197,6 +1199,18 @@ test("immutable artifact download uses only the exact artifact-ID API endpoint",
     "api",
     "repos/ParkerHwang/OpenSocrates/actions/artifacts/77/zip",
   ]);
+  assert.equal(
+    calls[0][4].timeout,
+    acceptance.artifactDownloadTimeoutMs(sizeBytes),
+  );
+  assert.ok(calls[0][4].timeout > 2_700_000);
+  assert.ok(calls[0][4].timeout <= 10_800_000);
+  for (const invalid of [0, -1, 1.5, 2 * 1024 * 1024 * 1024 + 1]) {
+    assert.throws(
+      () => acceptance.artifactDownloadTimeoutMs(invalid),
+      AcceptanceError,
+    );
+  }
 });
 
 test("native package workflow and receipt pin the pull-request head commit and tree", () =>

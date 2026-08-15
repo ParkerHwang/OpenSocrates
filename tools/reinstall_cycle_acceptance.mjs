@@ -127,6 +127,9 @@ const CLAIM_PUBLISH_STAGE_PATTERN = new RegExp(
 );
 const MAX_COMMAND_OUTPUT_BYTES = 16 * 1024 * 1024;
 const MAX_ARTIFACT_BYTES = 2 * 1024 * 1024 * 1024;
+const ARTIFACT_DOWNLOAD_MIN_BYTES_PER_SECOND = 192 * 1024;
+const ARTIFACT_DOWNLOAD_OVERHEAD_MS = 5 * 60 * 1_000;
+const MAX_ARTIFACT_DOWNLOAD_TIMEOUT_MS = 3 * 60 * 60 * 1_000;
 const MAX_ARCHIVE_ENTRIES = 10_000;
 const MAX_ZIP_CENTRAL_DIRECTORY_BYTES = 64 * 1024 * 1024;
 const MAX_ZIP_UNCOMPRESSED_BYTES = 4 * 1024 * 1024 * 1024;
@@ -9222,7 +9225,28 @@ function validateBuildSourceReceipt(receipt, { sourceCommit, sourceTree }) {
   return { headSha: receipt.commit, treeSha: receipt.tree };
 }
 
-async function downloadImmutableArtifact(recorder, ghBinary, artifactId, target) {
+function artifactDownloadTimeoutMs(sizeBytes) {
+  if (
+    !Number.isSafeInteger(sizeBytes) ||
+    sizeBytes <= 0 ||
+    sizeBytes > MAX_ARTIFACT_BYTES
+  ) {
+    fail("ci-artifact", "the immutable artifact download size is outside its bounded contract");
+  }
+  return Math.min(
+    MAX_ARTIFACT_DOWNLOAD_TIMEOUT_MS,
+    ARTIFACT_DOWNLOAD_OVERHEAD_MS +
+      Math.ceil((sizeBytes * 1_000) / ARTIFACT_DOWNLOAD_MIN_BYTES_PER_SECOND),
+  );
+}
+
+async function downloadImmutableArtifact(
+  recorder,
+  ghBinary,
+  artifactId,
+  target,
+  sizeBytes,
+) {
   return recorder.runToFile(
     "Download immutable Native package artifact by exact artifact ID",
     ghBinary,
@@ -9231,7 +9255,7 @@ async function downloadImmutableArtifact(recorder, ghBinary, artifactId, target)
     {
       category: "ci-artifact",
       failureMessage: "the immutable Native package artifact ZIP could not be downloaded",
-      timeout: 300_000,
+      timeout: artifactDownloadTimeoutMs(sizeBytes),
     },
   );
 }
@@ -9325,6 +9349,7 @@ async function prepareCandidate(recorder, report, privateDirectory) {
     ghBinary,
     pinnedArtifact.id,
     rawArtifactPath,
+    pinnedArtifact.sizeBytes,
   );
   if (
     downloaded.outputSizeBytes !== pinnedArtifact.sizeBytes ||
@@ -12079,6 +12104,7 @@ flag only after retaining its recorded digest.`);
 
 export {
   AcceptanceError,
+  artifactDownloadTimeoutMs,
   bindRecordingReceipt,
   cleanupPrivateEvidence,
   CommandRecorder,
