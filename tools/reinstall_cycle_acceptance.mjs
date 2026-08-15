@@ -19,6 +19,7 @@ import {
   openSync,
   readSync,
   readFileSync,
+  readlinkSync,
   readdirSync,
   realpathSync,
   renameSync,
@@ -4217,24 +4218,61 @@ function bindRecordingReceipt(privateDirectory, recordingPath, testId) {
   return receipt;
 }
 
-function verifyOwnedCleanupTree(directory) {
+const ISOLATED_NPX_BIN_LINK_PATTERN = new RegExp(
+  "^isolated-npx/runs/(?:call-[A-Za-z0-9]{6}|lifecycle-(?:purge-initial|purge-host-close-retry|install-initial|install-retry))/cache/_npx/[a-f0-9]{16}/node_modules/\\.bin/opensocrates$",
+  "u",
+);
+
+function verifyExpectedCleanupSymlink(privateRoot, target, rootDevice, info) {
+  const local = relative(privateRoot, target).split(sep).join("/");
+  if (
+    info.uid !== currentUid() ||
+    info.dev !== rootDevice ||
+    !ISOLATED_NPX_BIN_LINK_PATTERN.test(local) ||
+    readlinkSync(target) !== "../opensocrates/installer/opensocrates.mjs"
+  ) {
+    fail("private-evidence", "the private cleanup tree contains an unsafe link");
+  }
+  const resolvedTarget = realpathSync(target);
+  const resolvedLocal = relative(privateRoot, resolvedTarget);
+  const resolvedInfo = lstatSync(resolvedTarget);
+  if (
+    resolvedLocal === "" ||
+    resolvedLocal === ".." ||
+    resolvedLocal.startsWith(`..${sep}`) ||
+    !resolvedInfo.isFile() ||
+    resolvedInfo.isSymbolicLink() ||
+    resolvedInfo.uid !== currentUid() ||
+    resolvedInfo.dev !== rootDevice ||
+    resolvedInfo.nlink !== 1
+  ) {
+    fail("private-evidence", "the private cleanup npm link escapes its owned run root");
+  }
+}
+
+function verifyOwnedCleanupTree(directory, privateRoot = directory, rootDevice = null) {
   const rootInfo = requireCanonicalOwnedEntry(directory, "private cleanup root", "directory");
-  if ((rootInfo.mode & 0o077) !== 0) {
+  const expectedDevice = rootDevice ?? rootInfo.dev;
+  if (rootDevice === null && (rootInfo.mode & 0o077) !== 0) {
     fail("private-evidence", "the private cleanup root is not owner-only");
+  }
+  if (rootInfo.dev !== expectedDevice) {
+    fail("private-evidence", "the private cleanup tree crosses a filesystem boundary");
   }
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const target = join(directory, entry.name);
     const info = lstatSync(target);
-    if (info.isSymbolicLink() || info.uid !== currentUid()) {
+    if (info.isSymbolicLink()) {
+      verifyExpectedCleanupSymlink(privateRoot, target, expectedDevice, info);
+      continue;
+    }
+    if (info.uid !== currentUid() || info.dev !== expectedDevice) {
       fail("private-evidence", "the private cleanup tree contains an unsafe entry");
     }
     if (entry.isDirectory()) {
-      if ((info.mode & 0o077) !== 0) {
-        fail("private-evidence", "the private cleanup tree contains a shared directory");
-      }
-      verifyOwnedCleanupTree(target);
-    } else if (!entry.isFile() || info.nlink !== 1 || (info.mode & 0o077) !== 0) {
-      fail("private-evidence", "the private cleanup tree contains a special, linked, or shared file");
+      verifyOwnedCleanupTree(target, privateRoot, expectedDevice);
+    } else if (!entry.isFile() || info.nlink !== 1) {
+      fail("private-evidence", "the private cleanup tree contains a special or linked file");
     }
   }
 }

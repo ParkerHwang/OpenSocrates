@@ -5059,6 +5059,44 @@ test("pack is bound to the automated digest and a same-test Record and Replay re
       AcceptanceError,
     );
     assert.equal(existsSync(success.privateDirectory), true);
+
+    const npmModules = join(
+      success.privateDirectory,
+      "isolated-npx",
+      "runs",
+      "call-Ab12Cd",
+      "cache",
+      "_npx",
+      "a".repeat(16),
+      "node_modules",
+    );
+    const npmBin = join(npmModules, ".bin");
+    const npmInstaller = join(npmModules, "opensocrates", "installer");
+    mkdirSync(npmBin, { recursive: true, mode: 0o755 });
+    mkdirSync(npmInstaller, { recursive: true, mode: 0o755 });
+    writeFileSync(join(npmModules, "cache-entry.json"), "{}\n", { mode: 0o644 });
+    writeFileSync(join(npmInstaller, "opensocrates.mjs"), "#!/usr/bin/env node\n", {
+      mode: 0o755,
+    });
+    symlinkSync(
+      "../opensocrates/installer/opensocrates.mjs",
+      join(npmBin, "opensocrates"),
+    );
+    const outside = join(root, "outside-cleanup-canary");
+    writeFileSync(outside, "preserve\n", { mode: 0o600 });
+    const unsafeLink = join(success.privateDirectory, "unexpected-link");
+    symlinkSync(outside, unsafeLink);
+    assert.throws(
+      () => acceptance.cleanupPrivateEvidence(
+        success.privateDirectory,
+        success.report.testId,
+        finalManifest.publicResult.publicZipSha256,
+        { expectedParent: join(root, "success"), requiredPrefix: "private" },
+      ),
+      /unsafe link/u,
+    );
+    assert.equal(readFileSync(outside, "utf8"), "preserve\n");
+    unlinkSync(unsafeLink);
     acceptance.cleanupPrivateEvidence(
       success.privateDirectory,
       success.report.testId,
