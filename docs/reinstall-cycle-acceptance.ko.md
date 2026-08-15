@@ -43,6 +43,11 @@ manifest와 canonical Python/Claude/Codex 실행 파일 및 각 SHA-256 digest�
 실행합니다. 공개 npm 및 GitHub release의 1.2.1은 계속 unavailable이며 사용하거나
 검증했다고 주장하지 않습니다.
 
+purge 직전 baseline 재검사는 exact managed root, stable cache payload, desired state,
+OpenSocrates Codex trust 구문을 고정합니다. cache binding은 shape와 liveness를
+별도로 검증한 non-live per-process `.in_use` transient만 제외합니다. 그 밖의 byte
+또는 topology가 하나라도 바뀌면 첫 purge 명령 전에 중단합니다.
+
 ## 자동 cycle 시작
 
 clean Pull Request 체크아웃에서 실행합니다.

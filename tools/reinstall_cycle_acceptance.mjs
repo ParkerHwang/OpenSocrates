@@ -5852,6 +5852,14 @@ function inspectInUseMarker(versionRoot) {
     if (entry.isSymbolicLink() || !entry.isFile() || !/^[1-9]\d*$/u.test(entry.name)) {
       fail("ownership", "OpenSocrates cache has an unrecognized in-use entry");
     }
+    const info = requireCanonicalOwnedEntry(
+      join(marker, entry.name),
+      "OpenSocrates cache in-use process marker",
+      "file",
+    );
+    if (info.size !== 0) {
+      fail("ownership", "OpenSocrates cache has a nonempty in-use process marker");
+    }
     const pid = Number(entry.name);
     if (!Number.isSafeInteger(pid)) {
       fail("ownership", "OpenSocrates cache has an invalid in-use process identifier");
@@ -7093,7 +7101,11 @@ export function assertExactUntrustedHooks(inventory) {
   }
 }
 
-async function exactOwnedTreeBinding(directory, label, { allowAbsent = false } = {}) {
+async function exactOwnedTreeBinding(
+  directory,
+  label,
+  { allowAbsent = false, ignoreCacheInUseMarkers = false } = {},
+) {
   if (!pathPresent(directory)) {
     if (!allowAbsent) fail("baseline", `${label} is missing`);
     return {
@@ -7111,6 +7123,17 @@ async function exactOwnedTreeBinding(directory, label, { allowAbsent = false } =
     for (const child of children) {
       const target = join(current, child.name);
       const relativeName = prefix === "" ? child.name : `${prefix}/${child.name}`;
+      if (
+        ignoreCacheInUseMarkers &&
+        child.name === ".in_use" &&
+        prefix !== "" &&
+        !prefix.includes("/")
+      ) {
+        if (inspectInUseMarker(current).live) {
+          fail("baseline", `${label} became live while binding its stable payload`);
+        }
+        continue;
+      }
       if (child.isDirectory()) {
         const info = requireCanonicalOwnedEntry(target, `${label} directory`, "directory");
         entries.push({
@@ -7307,7 +7330,7 @@ async function baselineInventory(recorder, targets) {
           await exactOwnedTreeBinding(
             targets[host].cacheRoot,
             `${host} cache baseline root`,
-            { allowAbsent: true },
+            { allowAbsent: true, ignoreCacheInUseMarkers: true },
           ),
         ]),
       ),
@@ -12319,6 +12342,7 @@ export {
   extractVerifiedTarGzip,
   extractVerifiedZip,
   exactResidueSnapshot,
+  exactOwnedTreeBinding,
   filesystemResidueIsEmpty,
   inspectRecoveryState,
   inspectLaunchAgentTemporaryResidue,

@@ -46,6 +46,12 @@ pass the exact host binaries explicitly and do not depend on the capsule's
 reduced shell `PATH`; final timing invokes the pinned Python directly. Public npm
 and GitHub release 1.2.1 remain unavailable and are not used or claimed.
 
+The immediately pre-purge baseline recheck binds the exact managed roots,
+stable cache payloads, desired state, and OpenSocrates Codex trust syntax. The
+cache binding excludes only a validated, non-live per-process `.in_use`
+transient, whose shape and liveness are checked separately. Any other byte or
+topology change stops before the first purge command.
+
 ## Start the automated cycle
 
 From the clean pull-request checkout, run:

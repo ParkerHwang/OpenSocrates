@@ -1542,6 +1542,46 @@ test("pre-purge baseline recheck binds exact managed, cache, desired-state, and 
     }
   }));
 
+test("stable cache binding excludes only validated non-live in-use markers", () =>
+  withFixture(async (root) => {
+    const cacheRoot = join(root, "cache");
+    const versionRoot = join(cacheRoot, "1.2.1");
+    mkdirSync(versionRoot, { recursive: true, mode: 0o700 });
+    writeFileSync(join(versionRoot, "payload"), "stable\n", { mode: 0o600 });
+    const options = { ignoreCacheInUseMarkers: true };
+    const before = await acceptance.exactOwnedTreeBinding(cacheRoot, "fixture cache", options);
+
+    const marker = join(versionRoot, ".in_use");
+    mkdirSync(marker, { mode: 0o700 });
+    const afterEmptyMarker = await acceptance.exactOwnedTreeBinding(
+      cacheRoot,
+      "fixture cache",
+      options,
+    );
+    assert.deepEqual(afterEmptyMarker, before);
+
+    writeFileSync(join(marker, String(process.pid)), "", { mode: 0o600 });
+    await assert.rejects(
+      () => acceptance.exactOwnedTreeBinding(cacheRoot, "fixture cache", options),
+      /became live/u,
+    );
+    unlinkSync(join(marker, String(process.pid)));
+
+    const outside = join(root, "outside-marker");
+    writeFileSync(outside, "", { mode: 0o600 });
+    linkSync(outside, join(marker, "999999"));
+    await assert.rejects(
+      () => acceptance.exactOwnedTreeBinding(cacheRoot, "fixture cache", options),
+      AcceptanceError,
+    );
+    unlinkSync(join(marker, "999999"));
+    writeFileSync(join(marker, "999999"), "unexpected", { mode: 0o600 });
+    await assert.rejects(
+      () => acceptance.exactOwnedTreeBinding(cacheRoot, "fixture cache", options),
+      /nonempty/u,
+    );
+  }));
+
 test("Codex baseline binding changes with the owned trusted hash but excludes unrelated config", () => {
   const section = (hash) =>
     `[hooks.state."opensocrates@opensocrates:hooks/hooks.json:session_start:0:0"]\n` +
