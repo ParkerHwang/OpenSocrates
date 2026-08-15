@@ -1951,6 +1951,59 @@ function publicNonnegativeInteger(value, maximum = Number.MAX_SAFE_INTEGER) {
   return Number.isSafeInteger(value) && value >= 0 && value <= maximum;
 }
 
+function publicAssetIdentityIsValid(host, asset) {
+  return (
+    /^[A-Za-z0-9._-]{1,160}$/u.test(asset?.name ?? "") &&
+    publicSha256(asset?.sha256) &&
+    asset?.checksumProvenance === "locally_derived_from_verified_manifest" &&
+    publicNonnegativeInteger(asset?.aggregatePackageFileCount, MAX_ARCHIVE_ENTRIES) &&
+    asset?.aggregatePackageChecksumFile === `${host}/checksums.sha256` &&
+    publicNonnegativeInteger(asset?.payloadFileCount, MAX_ARCHIVE_ENTRIES) &&
+    publicSha256(asset?.checksumInventorySha256) &&
+    publicSha256(asset?.releaseManifestSha256) &&
+    publicSha256(asset?.runtimeSha256) &&
+    asset?.runtimeArchitecture === "arm64"
+  );
+}
+
+function commitPublicAssetIdentities(report, assets) {
+  if (
+    report?.source === null ||
+    typeof report?.source !== "object" ||
+    report.source.assets === null ||
+    typeof report.source.assets !== "object" ||
+    Object.keys(report.source.assets).length !== 0 ||
+    assets === null ||
+    typeof assets !== "object" ||
+    !sameStrings(Object.keys(assets), HOSTS)
+  ) {
+    fail("artifact-integrity", "the public native asset receipt commit has invalid inputs");
+  }
+  const projected = Object.fromEntries(
+    HOSTS.map((host) => {
+      const asset = assets[host];
+      const identity = {
+        name: asset?.name,
+        sha256: asset?.sha256,
+        checksumProvenance: asset?.checksumProvenance,
+        aggregatePackageFileCount: asset?.aggregatePackageFileCount,
+        aggregatePackageChecksumFile: asset?.aggregatePackageChecksumFile,
+        payloadFileCount: asset?.payloadFileCount,
+        checksumInventorySha256: asset?.checksumInventorySha256,
+        releaseManifestSha256: asset?.releaseManifestSha256,
+        runtimeSha256: asset?.runtimeSha256,
+        runtimeArchitecture: asset?.runtimeArchitecture,
+      };
+      if (!publicAssetIdentityIsValid(host, identity)) {
+        fail("artifact-integrity", `${host} public native asset receipt is incomplete`);
+      }
+      return [host, identity];
+    }),
+  );
+  report.source.assets = projected;
+  return structuredClone(projected);
+}
+
 function publicSafeLabel(value, maximum = 160) {
   return (
     typeof value === "string" &&
@@ -2054,18 +2107,7 @@ function validatePublicSemanticContracts(report) {
     }
   }
   for (const [host, asset] of Object.entries(source.assets)) {
-    if (
-      !/^[A-Za-z0-9._-]{1,160}$/u.test(asset.name) ||
-      !publicSha256(asset.sha256) ||
-      asset.checksumProvenance !== "locally_derived_from_verified_manifest" ||
-      !publicNonnegativeInteger(asset.aggregatePackageFileCount, MAX_ARCHIVE_ENTRIES) ||
-      asset.aggregatePackageChecksumFile !== `${host}/checksums.sha256` ||
-      !publicNonnegativeInteger(asset.payloadFileCount, MAX_ARCHIVE_ENTRIES) ||
-      !publicSha256(asset.checksumInventorySha256) ||
-      !publicSha256(asset.releaseManifestSha256) ||
-      !publicSha256(asset.runtimeSha256) ||
-      asset.runtimeArchitecture !== "arm64"
-    ) {
+    if (!publicAssetIdentityIsValid(host, asset)) {
       fail("privacy", "public native asset identity violates its closed contract");
     }
   }
@@ -9572,13 +9614,6 @@ async function prepareCandidate(recorder, report, privateDirectory) {
       aggregatePackageFileCount: hostManifest.package_file_count,
       aggregatePackageChecksumFile: hostManifest.package_checksum_file,
     };
-    report.source.assets[host] = {
-      name: expectedName,
-      sha256: expectedHash,
-      checksumProvenance: "locally_derived_from_verified_manifest",
-      aggregatePackageFileCount: hostManifest.package_file_count,
-      aggregatePackageChecksumFile: hostManifest.package_checksum_file,
-    };
   }
   const cleanBeforePack = recorder.run(
     "Reconfirm clean source immediately before npm pack",
@@ -9671,12 +9706,8 @@ async function prepareCandidate(recorder, report, privateDirectory) {
       assets[host],
       await extractHostPayloadReceipt(recorder, privateDirectory, host, assets[host]),
     );
-    report.source.assets[host].payloadFileCount = assets[host].payloadFileCount;
-    report.source.assets[host].checksumInventorySha256 = assets[host].checksumInventorySha256;
-    report.source.assets[host].releaseManifestSha256 = assets[host].releaseManifestSha256;
-    report.source.assets[host].runtimeSha256 = assets[host].runtimeSha256;
-    report.source.assets[host].runtimeArchitecture = assets[host].runtimeArchitecture;
   }
+  commitPublicAssetIdentities(report, assets);
   const candidate = {
     sourceCommit: report.source.commit,
     packageArchive,
@@ -12212,6 +12243,7 @@ export {
   inspectStateResidue,
   inspectTrustTransactionResidue,
   codexHookInventory,
+  commitPublicAssetIdentities,
   createSealedPublicResult,
   initializePrivateEvidenceManifest,
   makeReport,

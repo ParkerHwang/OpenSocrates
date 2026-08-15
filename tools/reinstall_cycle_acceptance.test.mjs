@@ -3630,6 +3630,77 @@ test("immutable GitHub artifact transport accepts only its exact signed-descript
     }
   }));
 
+test("native release ZIP writer emits the strict UTF-8 Unix regular-file contract", () =>
+  withFixture((root) => {
+    const source = join(root, "source");
+    const archive = join(root, "release.zip");
+    const extraction = join(root, "extraction");
+    mkdirSync(source, { mode: 0o700 });
+    mkdirSync(extraction, { mode: 0o700 });
+    writeFileSync(join(source, "payload.txt"), "release payload", { mode: 0o600 });
+    const completed = spawnSync(
+      process.env.OPENSOCRATES_PYTHON ?? "python3",
+      [
+        "-c",
+        "from pathlib import Path; import sys; from release_check import _write_deterministic_zip; " +
+          "_write_deterministic_zip(Path(sys.argv[1]), Path(sys.argv[2]))",
+        source,
+        archive,
+      ],
+      {
+        cwd: process.cwd(),
+        encoding: "utf8",
+        env: {
+          PATH: process.env.PATH ?? "/usr/bin:/bin",
+          PYTHONPATH: join(process.cwd(), "tools"),
+          LANG: "C",
+          LC_ALL: "C",
+        },
+      },
+    );
+    assert.equal(completed.status, 0, `${completed.stdout}\n${completed.stderr}`);
+    chmodSync(archive, 0o600);
+    assert.deepEqual(
+      acceptance.extractVerifiedZip({}, archive, extraction, {
+        label: "native release writer fixture",
+        category: "artifact-integrity",
+      }),
+      { entryCount: 1, totalUncompressedBytes: Buffer.byteLength("release payload") },
+    );
+  }));
+
+test("public native asset identities commit atomically only after both receipts are complete", () => {
+  const asset = (host, seed) => ({
+    archivePath: `/private/candidate/${host}.zip`,
+    name: `opensocrates-1.2.1-${host}-plugin.zip`,
+    sha256: seed.repeat(64),
+    checksumProvenance: "locally_derived_from_verified_manifest",
+    aggregatePackageFileCount: 2,
+    aggregatePackageChecksumFile: `${host}/checksums.sha256`,
+    payloadFileCount: 1,
+    checksumInventorySha256: "c".repeat(64),
+    releaseManifestSha256: "d".repeat(64),
+    runtimeSha256: "e".repeat(64),
+    runtimeArchitecture: "arm64",
+  });
+  const complete = { claude: asset("claude", "a"), codex: asset("codex", "b") };
+  const partial = structuredClone(complete);
+  delete partial.claude.runtimeArchitecture;
+  const failedReport = makeReport();
+  assert.throws(
+    () => acceptance.commitPublicAssetIdentities(failedReport, partial),
+    AcceptanceError,
+  );
+  assert.deepEqual(failedReport.source.assets, {});
+
+  const report = makeReport();
+  const projected = acceptance.commitPublicAssetIdentities(report, complete);
+  assert.deepEqual(report.source.assets, projected);
+  assert.deepEqual(Object.keys(projected), ["claude", "codex"]);
+  assert.equal(Object.hasOwn(projected.claude, "archivePath"), false);
+  assert.equal(projected.codex.runtimeArchitecture, "arm64");
+});
+
 test("ZIP verification rejects ambiguous metadata, path aliases, and declared-size overflow before extraction", () =>
   withFixture((root) => {
     const extraction = join(root, "extraction");
