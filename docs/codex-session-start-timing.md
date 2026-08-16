@@ -10,12 +10,12 @@ ${PLUGIN_ROOT}/bin/launch.sh hook codex session_started
 ```
 
 The gate reads that command and its two-second timeout from the generated
-`hooks/hooks.json`, then runs it from the generated onedir package. Each of the
-20 samples launches a new process with a generated valid `SessionStart` envelope
-and unique hermetic home, temporary, Codex-home, and workspace directories. An
-empty owner-only OAuth metadata marker exercises the selector-available branch
-if startup ever regresses into full runtime composition; no selector request is
-started.
+`hooks/hooks.json`, then runs it from the generated onedir package. It samples
+both `startup` and `compact`: each source gets 20 new processes with a generated
+valid `SessionStart` envelope and unique hermetic home, temporary, Codex-home,
+and workspace directories. An empty owner-only OAuth metadata marker exercises
+the selector-available branch if either source regresses into full runtime
+composition; no selector request is started.
 
 Within a Codex runtime build, the first configured hook runs before any
 `version --json` smoke so a warm-up cannot conceal its cost. Final release
@@ -23,14 +23,18 @@ assembly repeats the gate from `dist/codex` before the final-package version
 smoke. Passing requires all of the following:
 
 - every process exits zero with literal empty stdout and stderr;
-- the first configured hook and every sample finish below the configured 2,000
-  ms timeout;
-- nearest-rank p95 is at most 1,000 ms, preserving a 50% budget margin; and
-- at least 20 new-process samples are measured (the tool accepts at most 100).
+- the first configured hook and every sample in each source set finish below the
+  configured 2,000 ms timeout;
+- nearest-rank p95 is at most 1,000 ms for each source, preserving a 50% budget
+  margin; and
+- at least 20 new-process samples are measured for each source (the tool accepts
+  at most 100 per source).
 
 The closed JSON evidence records only the target, release-manifest identity,
-process model, sample count, first/p50/p95/max latency, configured timeout, and
-pass/fail. It never records callback input or output, user prompts, credentials,
+process model, configured timeout, and a source-keyed result for `startup` and
+`compact`. Each source result contains its sample count, first/p50/p95/max
+latency, and pass/fail; the aggregate pass requires both source results to pass.
+It never records callback input or output, user prompts, credentials,
 environment values, or local paths. Run the gate after assembling a native
 package with:
 
@@ -38,6 +42,7 @@ package with:
 make codex-hook-timing
 ```
 
+The timing gate sends both `source: "startup"` and `source: "compact"` payloads.
 Normal `startup`, `resume`, and `clear` callbacks are fail-open no-ops before
 runtime composition. The fixed launcher holds at most 4 MiB of callback input in
 process memory, uses macOS's system parser to admit only an exact top-level

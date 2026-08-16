@@ -25,7 +25,12 @@ from unittest.mock import patch
 
 from json_schema_2020 import check_schema as check_json_schema
 from json_schema_2020 import validate as validate_json_schema
-from measure_codex_hook_timing import EXPECTED_COMMAND, PROCESS_MODEL, measure_codex_session_start
+from measure_codex_hook_timing import (
+    EXPECTED_COMMAND,
+    PROCESS_MODEL,
+    SESSION_START_SOURCES,
+    measure_codex_session_start,
+)
 from opensocrates.clock import FrozenClock
 from opensocrates.content.hashes import normalized_semantic_hash, source_tree_hash
 from opensocrates.content.injection import (
@@ -1525,16 +1530,21 @@ def _test_codex_packaged_hook_margin_evidence() -> None:
             encoding="utf-8",
         )
 
-        values = [1_500.0, *([100.0] * 19)]
+        def source_values(first: float) -> list[float]:
+            return [first, *([100.0] * 19)]
+
+        values = source_values(1_500.0) + source_values(1_500.0)
+        observed_sources: list[str] = []
 
         def passing_runner(
             _launcher: Path,
-            _payload: bytes,
+            payload: bytes,
             environment: Mapping[str, str],
             _workspace: Path,
             _timeout: float,
         ) -> tuple[float, bool]:
             _require(set(environment) == {"HOME", "TMPDIR", "CODEX_HOME", "PATH", "LANG", "LC_ALL"})
+            observed_sources.append(json.loads(payload)["source"])
             return values.pop(0), True
 
         report = measure_codex_session_start(
@@ -1545,17 +1555,21 @@ def _test_codex_packaged_hook_margin_evidence() -> None:
         )
         _require(report["pass"] is True)
         _require(
-            report["latency_ms"] == {"first": 1500.0, "p50": 100.0, "p95": 100.0, "max": 1500.0}
+            all(
+                report["sources"][source]["latency_ms"]
+                == {"first": 1500.0, "p50": 100.0, "p95": 100.0, "max": 1500.0}
+                for source in SESSION_START_SOURCES
+            )
         )
+        _require(observed_sources == ["startup"] * 20 + ["compact"] * 20)
         _require(
             set(report)
             == {
                 "target",
                 "artifact_identity",
                 "process_model",
-                "sample_count",
-                "latency_ms",
                 "configured_timeout_ms",
+                "sources",
                 "pass",
             }
         )
@@ -1563,7 +1577,8 @@ def _test_codex_packaged_hook_margin_evidence() -> None:
         _require(name not in serialized)
         _require(all(term not in serialized for term in ("prompt", "envelope", "stdout")))
 
-        values = [2_001.0, *([100.0] * 19)]
+        values = source_values(2_001.0) + source_values(100.0)
+        observed_sources.clear()
         first_timeout = measure_codex_session_start(
             package,
             20,
@@ -1572,14 +1587,15 @@ def _test_codex_packaged_hook_margin_evidence() -> None:
         )
         _require(first_timeout["pass"] is False)
 
-        values = [1_000.0004, 1_000.0004, *([100.0] * 18)]
+        values = [1_000.0004, 1_000.0004, *([100.0] * 18)] + source_values(100.0)
+        observed_sources.clear()
         narrow_margin = measure_codex_session_start(
             package,
             20,
             sample_runner=passing_runner,
             require_native=False,
         )
-        _require(narrow_margin["latency_ms"]["p95"] == 1_000.0)
+        _require(narrow_margin["sources"]["startup"]["latency_ms"]["p95"] == 1_000.0)
         _require(narrow_margin["pass"] is False)
 
 
@@ -1590,9 +1606,15 @@ def _test_codex_timing_evidence_strict_validation() -> None:
         "target": "darwin-arm64",
         "artifact_identity": expected_identity,
         "process_model": PROCESS_MODEL,
-        "sample_count": 20,
-        "latency_ms": {"first": 900.0, "p50": 100.0, "p95": 200.0, "max": 900.0},
         "configured_timeout_ms": 2000,
+        "sources": {
+            source: {
+                "sample_count": 20,
+                "latency_ms": {"first": 900.0, "p50": 100.0, "p95": 200.0, "max": 900.0},
+                "pass": True,
+            }
+            for source in SESSION_START_SOURCES
+        },
         "pass": True,
     }
     _require(
@@ -1611,12 +1633,16 @@ def _test_codex_timing_evidence_strict_validation() -> None:
     del missing_key["target"]
     mutations.append(missing_key)
 
+    missing_compact = deepcopy(valid)
+    del missing_compact["sources"]["compact"]
+    mutations.append(missing_compact)
+
     wrong_target = deepcopy(valid)
     wrong_target["target"] = "darwin-x64"
     mutations.append(wrong_target)
 
     wrong_sample_count = deepcopy(valid)
-    wrong_sample_count["sample_count"] = 20.0
+    wrong_sample_count["sources"]["startup"]["sample_count"] = 20.0
     mutations.append(wrong_sample_count)
 
     wrong_timeout = deepcopy(valid)
@@ -1624,7 +1650,7 @@ def _test_codex_timing_evidence_strict_validation() -> None:
     mutations.append(wrong_timeout)
 
     forged_pass = deepcopy(valid)
-    forged_pass["latency_ms"]["max"] = 2000.0
+    forged_pass["sources"]["startup"]["latency_ms"]["max"] = 2000.0
     mutations.append(forged_pass)
 
     non_boolean_pass = deepcopy(valid)
@@ -1648,41 +1674,41 @@ def _test_codex_timing_evidence_strict_validation() -> None:
     mutations.append(forged_process_model)
 
     boolean_latency = deepcopy(valid)
-    boolean_latency["latency_ms"]["p50"] = True
+    boolean_latency["sources"]["startup"]["latency_ms"]["p50"] = True
     mutations.append(boolean_latency)
 
     non_finite_nan = deepcopy(valid)
-    non_finite_nan["latency_ms"]["p50"] = float("nan")
+    non_finite_nan["sources"]["startup"]["latency_ms"]["p50"] = float("nan")
     mutations.append(non_finite_nan)
 
     non_finite_infinity = deepcopy(valid)
-    non_finite_infinity["latency_ms"]["p95"] = float("inf")
+    non_finite_infinity["sources"]["startup"]["latency_ms"]["p95"] = float("inf")
     mutations.append(non_finite_infinity)
 
     negative_latency = deepcopy(valid)
-    negative_latency["latency_ms"]["first"] = -0.001
+    negative_latency["sources"]["startup"]["latency_ms"]["first"] = -0.001
     mutations.append(negative_latency)
 
     rounded_boundary_exceeded = deepcopy(valid)
-    rounded_boundary_exceeded["latency_ms"]["p95"] = 1000.0004
-    rounded_boundary_exceeded["latency_ms"]["max"] = 1500.0
+    rounded_boundary_exceeded["sources"]["startup"]["latency_ms"]["p95"] = 1000.0004
+    rounded_boundary_exceeded["sources"]["startup"]["latency_ms"]["max"] = 1500.0
     mutations.append(rounded_boundary_exceeded)
 
     percentile_order_forged = deepcopy(valid)
-    percentile_order_forged["latency_ms"]["p50"] = 300.0
-    percentile_order_forged["latency_ms"]["p95"] = 200.0
+    percentile_order_forged["sources"]["startup"]["latency_ms"]["p50"] = 300.0
+    percentile_order_forged["sources"]["startup"]["latency_ms"]["p95"] = 200.0
     mutations.append(percentile_order_forged)
 
     maximum_percentile_order_forged = deepcopy(valid)
-    maximum_percentile_order_forged["latency_ms"]["p95"] = 901.0
+    maximum_percentile_order_forged["sources"]["startup"]["latency_ms"]["p95"] = 901.0
     mutations.append(maximum_percentile_order_forged)
 
     maximum_order_forged = deepcopy(valid)
-    maximum_order_forged["latency_ms"]["first"] = 901.0
+    maximum_order_forged["sources"]["startup"]["latency_ms"]["first"] = 901.0
     mutations.append(maximum_order_forged)
 
     latency_key_forged = deepcopy(valid)
-    latency_key_forged["latency_ms"]["minimum"] = 0.0
+    latency_key_forged["sources"]["startup"]["latency_ms"]["minimum"] = 0.0
     mutations.append(latency_key_forged)
 
     _require(
@@ -1711,9 +1737,15 @@ def _test_release_consumers_reject_forged_timing_evidence() -> None:
             "target": "darwin-arm64",
             "artifact_identity": forged_identity,
             "process_model": PROCESS_MODEL,
-            "sample_count": 20,
-            "latency_ms": {"first": 900.0, "p50": 100.0, "p95": 200.0, "max": 900.0},
             "configured_timeout_ms": 2000,
+            "sources": {
+                source: {
+                    "sample_count": 20,
+                    "latency_ms": {"first": 900.0, "p50": 100.0, "p95": 200.0, "max": 900.0},
+                    "pass": True,
+                }
+                for source in SESSION_START_SOURCES
+            },
             "pass": True,
         }
         bound = deepcopy(forged)

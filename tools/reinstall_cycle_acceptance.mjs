@@ -77,6 +77,7 @@ const EXPECTED_CODEX_EVENTS = Object.freeze([
 const SESSION_START_PROCESS_MODEL =
   "new_process_per_sample; first_configured_hook_before_runtime_smoke; " +
   "hermetic_generated_input_and_selector_availability_metadata";
+const SESSION_START_SOURCES = Object.freeze(["startup", "compact"]);
 const RESULT_DIRECTORY_PREFIX = "opensocrates-reinstall-cycle-result-";
 const PRIVATE_PARENT = join(homedir(), ".opensocrates-acceptance-private");
 const PRIVATE_DIRECTORY_PREFIX = "reinstall-cycle-";
@@ -1856,14 +1857,34 @@ function validatePublicAssertions(assertions) {
         fail("privacy", `${trail} violates the first-approval contract`);
       }
     } else if (key === "sessionStartBudget") {
-      requirePublicKeys(value, new Set(["observationStatus", "target", "sampleCount", "configuredTimeoutMs", "hardTimeoutMilliseconds", "clock", "monotonicStartMilliseconds", "monotonicEndMilliseconds", "coldProcessPerSample", "hardTimeoutEnforced", "processModel", "firstMs", "p95Ms", "maxMs", "pass", "artifactIdentity"]), trail);
+      requirePublicKeys(value, new Set(["observationStatus", "target", "configuredTimeoutMs", "hardTimeoutMilliseconds", "clock", "monotonicStartMilliseconds", "monotonicEndMilliseconds", "coldProcessPerSample", "hardTimeoutEnforced", "processModel", "sources", "pass", "artifactIdentity"]), trail);
       for (const item of ["observationStatus", "target", "clock", "processModel", "artifactIdentity"]) requirePublicScalar(value[item], ["string"], `${trail}.${item}`);
-      for (const item of ["sampleCount", "configuredTimeoutMs", "hardTimeoutMilliseconds", "monotonicStartMilliseconds", "monotonicEndMilliseconds", "firstMs", "p95Ms", "maxMs"]) requirePublicScalar(value[item], ["number"], `${trail}.${item}`);
+      for (const item of ["configuredTimeoutMs", "hardTimeoutMilliseconds", "monotonicStartMilliseconds", "monotonicEndMilliseconds"]) requirePublicScalar(value[item], ["number"], `${trail}.${item}`);
       for (const item of ["coldProcessPerSample", "hardTimeoutEnforced", "pass"]) requirePublicScalar(value[item], ["boolean"], `${trail}.${item}`);
+      requirePublicKeys(value.sources, new Set(SESSION_START_SOURCES), `${trail}.sources`);
+      for (const source of SESSION_START_SOURCES) {
+        const sourceTrail = `${trail}.sources.${source}`;
+        const sample = value.sources[source];
+        requirePublicKeys(sample, new Set(["sampleCount", "firstMs", "p95Ms", "maxMs", "pass"]), sourceTrail);
+        requirePublicScalar(sample.sampleCount, ["number"], `${sourceTrail}.sampleCount`);
+        for (const item of ["firstMs", "p95Ms", "maxMs"]) requirePublicScalar(sample[item], ["number"], `${sourceTrail}.${item}`);
+        requirePublicScalar(sample.pass, ["boolean"], `${sourceTrail}.pass`);
+        if (
+          sample.sampleCount !== 20 ||
+          ![sample.firstMs, sample.p95Ms, sample.maxMs].every(
+            (item) => Number.isFinite(item) && item >= 0 && item < 2000,
+          ) ||
+          sample.firstMs > sample.maxMs ||
+          sample.p95Ms > sample.maxMs ||
+          sample.p95Ms > 1000 ||
+          sample.pass !== true
+        ) {
+          fail("privacy", `${sourceTrail} violates the SessionStart timing contract`);
+        }
+      }
       if (
         value.observationStatus !== "pass" ||
         value.target !== "darwin-arm64" ||
-        value.sampleCount !== 20 ||
         value.configuredTimeoutMs !== 2000 ||
         value.hardTimeoutMilliseconds !== 2000 ||
         value.clock !== "performance.now_monotonic" ||
@@ -1874,12 +1895,6 @@ function validatePublicAssertions(assertions) {
         value.coldProcessPerSample !== true ||
         value.hardTimeoutEnforced !== true ||
         value.processModel !== SESSION_START_PROCESS_MODEL ||
-        ![value.firstMs, value.p95Ms, value.maxMs].every(
-          (item) => Number.isFinite(item) && item >= 0 && item < 2000,
-        ) ||
-        value.firstMs > value.maxMs ||
-        value.p95Ms > value.maxMs ||
-        value.p95Ms > 1000 ||
         value.pass !== true ||
         !publicSha256(value.artifactIdentity, { prefixed: true })
       ) {
@@ -7602,26 +7617,59 @@ function measureInstalledSessionStart(
     "session-start-budget",
     "the installed SessionStart timing report is invalid",
   );
+  const sourceReports = value?.sources;
+  const sourceReportsValid =
+    sourceReports !== null &&
+    typeof sourceReports === "object" &&
+    !Array.isArray(sourceReports) &&
+    Object.keys(sourceReports).length === SESSION_START_SOURCES.length &&
+    SESSION_START_SOURCES.every((source) => {
+      if (!Object.hasOwn(sourceReports, source)) return false;
+      const sample = sourceReports[source];
+      const latencies = sample?.latency_ms;
+      if (
+        sample === null ||
+        typeof sample !== "object" ||
+        Array.isArray(sample) ||
+        Object.keys(sample).length !== 3 ||
+        !Object.hasOwn(sample, "sample_count") ||
+        !Object.hasOwn(sample, "latency_ms") ||
+        !Object.hasOwn(sample, "pass") ||
+        sample.sample_count !== 20 ||
+        sample.pass !== true ||
+        latencies === null ||
+        typeof latencies !== "object" ||
+        Array.isArray(latencies) ||
+        Object.keys(latencies).length !== 4 ||
+        !["first", "p50", "p95", "max"].every((item) => Object.hasOwn(latencies, item))
+      ) {
+        return false;
+      }
+      const finiteNonNegative = (item) =>
+        typeof item === "number" && Number.isFinite(item) && item >= 0;
+      return (
+        ["first", "p50", "p95", "max"].every((item) => finiteNonNegative(latencies[item])) &&
+        latencies.p50 <= latencies.p95 &&
+        latencies.p95 <= latencies.max &&
+        latencies.first <= latencies.max &&
+        latencies.first < 2000 &&
+        latencies.max < 2000 &&
+        latencies.p95 <= 1000
+      );
+    });
   if (
     value?.target !== "darwin-arm64" ||
-    value?.sample_count !== 20 ||
     value?.configured_timeout_ms !== 2000 ||
     value?.pass !== true ||
     value?.process_model !== SESSION_START_PROCESS_MODEL ||
     value?.artifact_identity !== `sha256:${expectedReleaseManifestSha256}` ||
-    typeof value?.latency_ms?.first !== "number" ||
-    typeof value?.latency_ms?.p95 !== "number" ||
-    typeof value?.latency_ms?.max !== "number" ||
-    value.latency_ms.first >= 2000 ||
-    value.latency_ms.max >= 2000 ||
-    value.latency_ms.p95 > 1000
+    !sourceReportsValid
   ) {
     fail("session-start-budget", "the installed SessionStart timing result did not meet the two-second contract");
   }
   return {
     observationStatus: "pass",
     target: value.target,
-    sampleCount: value.sample_count,
     configuredTimeoutMs: value.configured_timeout_ms,
     hardTimeoutMilliseconds: 2000,
     clock: "performance.now_monotonic",
@@ -7630,9 +7678,18 @@ function measureInstalledSessionStart(
     coldProcessPerSample: true,
     hardTimeoutEnforced: true,
     processModel: value.process_model,
-    firstMs: value.latency_ms.first,
-    p95Ms: value.latency_ms.p95,
-    maxMs: value.latency_ms.max,
+    sources: Object.fromEntries(
+      SESSION_START_SOURCES.map((source) => {
+        const sample = value.sources[source];
+        return [source, {
+          sampleCount: sample.sample_count,
+          firstMs: sample.latency_ms.first,
+          p95Ms: sample.latency_ms.p95,
+          maxMs: sample.latency_ms.max,
+          pass: sample.pass,
+        }];
+      }),
+    ),
     pass: true,
     artifactIdentity: value.artifact_identity,
   };

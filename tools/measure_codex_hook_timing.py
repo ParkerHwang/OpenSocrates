@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate the first and repeated packaged Codex ``SessionStart`` hook latency."""
+"""Gate packaged Codex ``SessionStart`` latency for startup and compact sources."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 TARGET = "darwin-arm64"
+SESSION_START_SOURCES = ("startup", "compact")
 MIN_GATE_SAMPLES = 20
 MAX_GATE_SAMPLES = 100
 REQUIRED_P95_BUDGET_FRACTION = 0.5
@@ -95,13 +96,15 @@ def _percentile(values: list[float], quantile: float) -> float:
     return ordered[index]
 
 
-def _payload(workspace: Path, sample_number: int) -> bytes:
+def _payload(workspace: Path, sample_number: int, source: str) -> bytes:
+    if source not in SESSION_START_SOURCES:
+        raise CodexHookTimingError("session_start_source_invalid")
     value = {
         "hook_event_name": "SessionStart",
         "session_id": f"synthetic-session-{sample_number}",
         "turn_id": f"synthetic-turn-{sample_number}",
         "cwd": str(workspace),
-        "source": "startup",
+        "source": source,
         "version": "synthetic-version",
     }
     return json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8") + b"\n"
@@ -188,46 +191,50 @@ def measure_codex_session_start(
         raise CodexHookTimingError("native_darwin_arm64_required")
     launcher, configured_timeout_ms, artifact_identity = _package_contract(package)
     runner = sample_runner or _run_sample
-    latencies: list[float] = []
-    sample_contracts: list[bool] = []
+    source_reports: dict[str, dict[str, Any]] = {}
     with tempfile.TemporaryDirectory(prefix="opensocrates-codex-hook-gate-") as name:
         root = Path(name)
-        for index in range(runs):
-            environment, workspace = _sample_environment(root / f"sample-{index}")
-            elapsed_ms, contract_pass = runner(
-                launcher,
-                _payload(workspace, index),
-                environment,
-                workspace,
-                configured_timeout_ms / 1000,
-            )
-            latencies.append(elapsed_ms)
-            sample_contracts.append(contract_pass)
-    p95_value = _percentile(latencies, 0.95)
-    p95_ms = round(p95_value, 3)
-    maximum_value = max(latencies)
-    maximum_ms = round(maximum_value, 3)
-    required_p95_max_ms = configured_timeout_ms * REQUIRED_P95_BUDGET_FRACTION
-    passed = (
-        all(sample_contracts)
-        and latencies[0] < configured_timeout_ms
-        and maximum_value < configured_timeout_ms
-        and p95_value <= required_p95_max_ms
-    )
+        for source in SESSION_START_SOURCES:
+            latencies: list[float] = []
+            sample_contracts: list[bool] = []
+            for index in range(runs):
+                environment, workspace = _sample_environment(root / source / f"sample-{index}")
+                elapsed_ms, contract_pass = runner(
+                    launcher,
+                    _payload(workspace, index, source),
+                    environment,
+                    workspace,
+                    configured_timeout_ms / 1000,
+                )
+                latencies.append(elapsed_ms)
+                sample_contracts.append(contract_pass)
+            p95_value = _percentile(latencies, 0.95)
+            maximum_value = max(latencies)
+            required_p95_max_ms = configured_timeout_ms * REQUIRED_P95_BUDGET_FRACTION
+            source_reports[source] = {
+                "sample_count": len(latencies),
+                "latency_ms": {
+                    "first": round(latencies[0], 3),
+                    "p50": round(_percentile(latencies, 0.50), 3),
+                    "p95": round(p95_value, 3),
+                    "max": round(maximum_value, 3),
+                },
+                "pass": (
+                    all(sample_contracts)
+                    and latencies[0] < configured_timeout_ms
+                    and maximum_value < configured_timeout_ms
+                    and p95_value <= required_p95_max_ms
+                ),
+            }
+    passed = all(source_reports[source]["pass"] for source in SESSION_START_SOURCES)
     # Keep the persisted observation deliberately closed.  In particular, it
     # contains no environment, path, callback envelope, process output, or ID.
     return {
         "target": TARGET,
         "artifact_identity": artifact_identity,
         "process_model": PROCESS_MODEL,
-        "sample_count": len(latencies),
-        "latency_ms": {
-            "first": round(latencies[0], 3),
-            "p50": round(_percentile(latencies, 0.50), 3),
-            "p95": p95_ms,
-            "max": maximum_ms,
-        },
         "configured_timeout_ms": configured_timeout_ms,
+        "sources": source_reports,
         "pass": passed,
     }
 
@@ -237,9 +244,15 @@ def _failed_evidence(runs: int) -> dict[str, Any]:
         "target": TARGET,
         "artifact_identity": "unavailable",
         "process_model": PROCESS_MODEL,
-        "sample_count": 0,
-        "latency_ms": {"first": None, "p50": None, "p95": None, "max": None},
         "configured_timeout_ms": 2000,
+        "sources": {
+            source: {
+                "sample_count": 0,
+                "latency_ms": {"first": None, "p50": None, "p95": None, "max": None},
+                "pass": False,
+            }
+            for source in SESSION_START_SOURCES
+        },
         "pass": False,
     }
 
