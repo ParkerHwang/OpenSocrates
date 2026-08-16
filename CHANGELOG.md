@@ -5,57 +5,7 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ## [Unreleased]
 
-### Added
-
-- `remove --host <host|all> --purge` provides an explicit, idempotent
-  complete-uninstall attempt for exact OpenSocrates registrations, verified
-  host cache payloads, empty Claude plugin-data directories, OpenCode-owned
-  files, the updater, transaction residue, and final installer state.
-- `remove --host <codex|all> --purge --reset-trust` explicitly resets only the
-  seven canonical OpenSocrates Codex hook approvals after validating a narrow,
-  transactional config update.
-
-### Changed
-
-- Ordinary `remove` now states its narrower registration/managed-root contract,
-  reports known remaining OpenSocrates paths, and points to the purge command
-  instead of implying that every installed payload was removed.
-- Installer help and English/Korean removal docs now distinguish plugin
-  registration, owned payloads, host security trust, and preserved user history.
-- Claude Code, Desktop Local, and Cowork plugin documentation now uses the
-  canonical `/opensocrates:opensocrates` namespace, while the separately
-  rendered Claude Chat standalone skill keeps `/opensocrates`. Release checks
-  reject either command when it appears in the wrong artifact.
-- Claude evidence now keeps the installer-managed local plugin, a manually
-  uploaded standalone Chat ZIP, and the pre-existing synced/custom skill as
-  separate provenance states. The historical v1.1.2 live receipt remains
-  historical, while current-version checks require a version-bound receipt.
-- The exact public v1.2.1 Chat ZIP, checksum, and release commit are unavailable
-  because no public v1.2.1 tag or release existed at the 2026-08-15 audit. The
-  current Chat receipt and EN/KO documentation therefore report live upload as
-  pending instead of inheriting the v1.1.2 validation claim.
-
-### Security and privacy
-
-- Purge verifies canonical non-symlink paths, exact package identity,
-  manifests, checksums, and ownership markers; live `.in_use` payloads,
-  unverified registration, unknown data, and cleanup failures remain pending.
-  Unrelated host configuration and user history are preserved. Codex hook trust
-  remains preserved unless the explicit reset flag is supplied.
-- The trust reset refuses symlinks, hard links, noncanonical or unexpected
-  matching sections, invalid configs, concurrent changes, and failed Codex
-  consumption checks. It preserves non-target bytes, uses owner-only synced
-  temporary files plus atomic replacement, and restores the exact original
-  bytes, mode, owner, and group on a failed post-update check when rollback is
-  still safe. A later external edit is never overwritten; its owner-only
-  recovery copy is preserved instead.
-- Chat evidence stores only release/archive identity, counts, versions,
-  pass/fail booleans, and categorical provenance/routing states. The missing
-  exact release artifact prevented any UI upload attempt, so no authentication,
-  2FA, user-confirmation, prompt, conversation, account, path, raw UI, upload
-  content, or credential boundary was crossed.
-
-## [1.2.1] - 2026-08-13
+## [1.2.1] - 2026-08-16
 
 ### Added
 
@@ -64,6 +14,17 @@ All notable changes to OpenSocrates are documented here. This project follows
   and hashes. Its clean-clone validator and mutation suite check only public
   repository artifacts; maintainer-held packet, reviewer, and raw-result
   evidence remains explicitly unavailable in public mode.
+- `remove --host <host|all> --purge` provides an explicit, idempotent
+  complete-uninstall attempt for exact OpenSocrates registrations, verified
+  host cache payloads, empty Claude plugin-data directories, OpenCode-owned
+  files, the updater, transaction residue, and final installer state.
+- `remove --host <codex|all> --purge --reset-trust` explicitly resets only the
+  seven canonical OpenSocrates Codex hook approvals after validating a narrow,
+  transactional config update.
+- A same-machine reinstall acceptance workflow binds the candidate commit,
+  native artifacts, packed npm installer, purge and reinstall lifecycle,
+  manual observations, privacy-safe result bundle, and guarded cleanup without
+  presenting the machine as clean-machine evidence.
 
 ### Changed
 
@@ -79,12 +40,47 @@ All notable changes to OpenSocrates are documented here. This project follows
 - The teacher-question source now has a generated canonical schema and explicit
   overlay identity checks without changing authored per-method content revision
   `1`.
+- Ordinary `remove` now states its narrower registration/managed-root contract,
+  reports known remaining OpenSocrates paths, and points to the purge command
+  instead of implying that every installed payload was removed.
+- Installer help and English/Korean removal docs now distinguish plugin
+  registration, owned payloads, host security trust, and preserved user history.
+- Claude Code, Desktop Local, and Cowork plugin documentation now uses the
+  canonical `/opensocrates:opensocrates` namespace, while the separately
+  rendered Claude Chat standalone skill keeps `/opensocrates`. Release checks
+  reject either command when it appears in the wrong artifact.
+- Claude evidence now keeps the installer-managed local plugin, a manually
+  uploaded standalone Chat ZIP, and the pre-existing synced/custom skill as
+  separate provenance states. The historical v1.1.2 live receipt remains
+  historical, while current-version checks require a version-bound receipt.
+- Codex SessionStart timing evidence now measures `startup` and `compact`
+  independently and requires both source sets to pass before release or
+  reinstall acceptance can report the timing budget as verified.
+- The exact public v1.2.1 Chat ZIP, checksum, and release commit were unavailable
+  at the 2026-08-15 provenance audit. The current Chat receipt and EN/KO
+  documentation therefore keep live upload pending instead of inheriting the
+  v1.1.2 validation claim.
 
 ### Security and privacy
 
 - Release-package checks reject evaluation or adjudication paths in every host
   and Claude Chat ZIP. The npm package remains restricted to the installer and
   its public release documents, so source evaluation artifacts do not ship.
+- Purge verifies canonical non-symlink paths, exact package identity,
+  manifests, checksums, and ownership markers; live `.in_use` payloads,
+  unverified registration, unknown data, and cleanup failures remain pending.
+  Unrelated host configuration and user history are preserved. Codex hook trust
+  remains preserved unless the explicit reset flag is supplied.
+- The trust reset refuses symlinks, hard links, noncanonical or unexpected
+  matching sections, invalid configs, concurrent changes, and failed Codex
+  consumption checks. It preserves non-target bytes and restores the exact
+  original when rollback remains safe; a later external edit is never
+  overwritten.
+- Chat evidence stores only release/archive identity, counts, versions,
+  pass/fail booleans, and categorical provenance/routing states. The missing
+  exact release artifact at audit time prevented a UI upload attempt, so no
+  authentication, 2FA, user-confirmation, prompt, conversation, account, path,
+  raw UI, upload content, or credential boundary was crossed.
 
 ## [1.2.0] - 2026-08-13
 

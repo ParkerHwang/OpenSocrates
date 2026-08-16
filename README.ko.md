@@ -28,12 +28,12 @@ OpenSocrates 백엔드가 필요하지 않습니다.
 런처는 `darwin-arm64`만 허용하며, Intel Mac·Linux·Windows용 런처와 런타임은
 이번 릴리스에 포함되거나 지원되지 않습니다.
 
-> **현재 저장소 버전: OpenSocrates 1.2.1, 공개 대기 중.** mutation 검사를 거친
-> 공개 v1.2 adjudication 스냅샷과 한영 세 질문 스승 오버레이를 여섯 호스트
-> 패키지에 추가하면서 각 호스트의 실제 전달·근거 경계를 유지했습니다.
-> 2026-08-15 provenance 검사에서는 공개 GitHub `v1.2.1` 태그/릴리스와 npm
-> 1.2.1 패키지가 없었고, 최신 공개 GitHub 릴리스는 v1.2.0입니다. 아래의 1.2.1
-> 고정 명령은 릴리스 목표 예시이며 공개 전에는 사용할 수 없습니다.
+> **현재 릴리스: OpenSocrates 1.2.1.** mutation 검사를 거친 공개 v1.2
+> adjudication 스냅샷과 한영 세 질문 스승 오버레이를 여섯 호스트 패키지에
+> 추가했습니다. 또한 안전한 완전 제거와 Codex 신뢰 초기화, 더 엄격한 Claude
+> provenance 경계, 동일 머신 재설치 acceptance, source별 Codex SessionStart
+> 타이밍 근거를 제공합니다. 별도의 Claude Chat v1.2.1 실제 업로드 영수증은 아직
+> 대기 중입니다.
 
 ## 호스트 지원 범위
 
@@ -271,9 +271,7 @@ Code/Cowork 플러그인 아카이브가 아닙니다. 독립형 패키지는 ca
 
 ### 태그가 고정된 GitHub 소스에서 설치
 
-태그가 공개된 뒤에는 npm 레지스트리를 거치지 않을 때도 같은 호스트 옵션을
-사용합니다. 2026-08-15 검사 시점에 `v1.2.1` 태그가 없으므로 아래 명령은 현재 실행
-지침이 아니라 릴리스 목표 예시입니다.
+npm 레지스트리를 거치지 않을 때는 공개된 태그로 같은 호스트 옵션을 사용합니다.
 
 ```bash
 npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host all

@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Any
 
 from claude_chat_evidence import evidence_path, validation_errors
-from measure_codex_hook_timing import PROCESS_MODEL
+from measure_codex_hook_timing import PROCESS_MODEL, SESSION_START_SOURCES
 
 SCHEMA = "opensocrates.release-check-evidence/1.0.0"
 HOSTS = ("antigravity", "claude", "codex", "cursor", "grok", "opencode")
@@ -136,9 +136,8 @@ def _valid_codex_session_start_timing_evidence(
         "target",
         "artifact_identity",
         "process_model",
-        "sample_count",
-        "latency_ms",
         "configured_timeout_ms",
+        "sources",
         "pass",
     }
     if not isinstance(value, Mapping) or set(value) != expected_keys:
@@ -146,9 +145,8 @@ def _valid_codex_session_start_timing_evidence(
 
     artifact_identity = value.get("artifact_identity")
     process_model = value.get("process_model")
-    sample_count = value.get("sample_count")
     configured_timeout_ms = value.get("configured_timeout_ms")
-    latencies = value.get("latency_ms")
+    source_reports = value.get("sources")
     if (
         value.get("target") != RELEASE_TARGET
         or not isinstance(artifact_identity, str)
@@ -157,34 +155,47 @@ def _valid_codex_session_start_timing_evidence(
         or any(character not in "0123456789abcdef" for character in artifact_identity[7:])
         or artifact_identity != expected_artifact_identity
         or process_model != PROCESS_MODEL
-        or type(sample_count) is not int
-        or sample_count != 20
         or type(configured_timeout_ms) is not int
         or configured_timeout_ms != 2000
         or value.get("pass") is not True
-        or not isinstance(latencies, Mapping)
-        or set(latencies) != {"first", "p50", "p95", "max"}
+        or not isinstance(source_reports, Mapping)
+        or set(source_reports) != set(SESSION_START_SOURCES)
     ):
         return False
 
-    observed: dict[str, int | float] = {}
-    for key in ("first", "p50", "p95", "max"):
-        latency = latencies[key]
+    for source in SESSION_START_SOURCES:
+        sample = source_reports[source]
+        latencies = sample.get("latency_ms") if isinstance(sample, Mapping) else None
         if (
-            isinstance(latency, bool)
-            or not isinstance(latency, (int, float))
-            or (isinstance(latency, float) and not math.isfinite(latency))
-            or latency < 0
+            not isinstance(sample, Mapping)
+            or set(sample) != {"sample_count", "latency_ms", "pass"}
+            or type(sample.get("sample_count")) is not int
+            or sample.get("sample_count") != 20
+            or sample.get("pass") is not True
+            or not isinstance(latencies, Mapping)
+            or set(latencies) != {"first", "p50", "p95", "max"}
         ):
             return False
-        observed[key] = latency
-    return (
-        observed["p50"] <= observed["p95"] <= observed["max"]
-        and observed["first"] <= observed["max"]
-        and observed["first"] < 2000
-        and observed["max"] < 2000
-        and observed["p95"] <= 1000
-    )
+        observed: dict[str, int | float] = {}
+        for key in ("first", "p50", "p95", "max"):
+            latency = latencies[key]
+            if (
+                isinstance(latency, bool)
+                or not isinstance(latency, (int, float))
+                or (isinstance(latency, float) and not math.isfinite(latency))
+                or latency < 0
+            ):
+                return False
+            observed[key] = latency
+        if not (
+            observed["p50"] <= observed["p95"] <= observed["max"]
+            and observed["first"] <= observed["max"]
+            and observed["first"] < 2000
+            and observed["max"] < 2000
+            and observed["p95"] <= 1000
+        ):
+            return False
+    return True
 
 
 def _codex_session_start_timing_check(

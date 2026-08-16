@@ -2838,12 +2838,22 @@ test("installed SessionStart measurement enforces 20 cold samples, 2000ms, and e
       "hermetic_generated_input_and_selector_availability_metadata";
     const value = {
       target: "darwin-arm64",
-      sample_count: 20,
       configured_timeout_ms: 2000,
       pass: true,
       process_model: processModel,
       artifact_identity: `sha256:${releaseManifestSha256}`,
-      latency_ms: { first: 5, p95: 10, max: 12 },
+      sources: {
+        startup: {
+          sample_count: 20,
+          latency_ms: { first: 5, p50: 7, p95: 10, max: 12 },
+          pass: true,
+        },
+        compact: {
+          sample_count: 20,
+          latency_ms: { first: 15, p50: 17, p95: 20, max: 22 },
+          pass: true,
+        },
+      },
     };
     const recorder = {
       run: (_label, executable, args, options) => {
@@ -2867,11 +2877,29 @@ test("installed SessionStart measurement enforces 20 cold samples, 2000ms, and e
       releaseManifestSha256,
       realpathSync(process.execPath),
     );
-    assert.equal(measured.sampleCount, 20);
     assert.equal(measured.configuredTimeoutMs, 2000);
     assert.equal(measured.hardTimeoutMilliseconds, 2000);
     assert.equal(measured.coldProcessPerSample, true);
+    assert.equal(measured.sources.startup.sampleCount, 20);
+    assert.equal(measured.sources.compact.sampleCount, 20);
     assert.equal(measured.artifactIdentity, `sha256:${releaseManifestSha256}`);
+    delete value.sources.compact;
+    unlinkSync(join(privateDirectory, "codex-session-start-timing.json"));
+    assert.throws(
+      () => acceptance.measureInstalledSessionStart(
+        recorder,
+        privateDirectory,
+        join(root, "plugin-root-not-opened"),
+        releaseManifestSha256,
+        realpathSync(process.execPath),
+      ),
+      AcceptanceError,
+    );
+    value.sources.compact = {
+      sample_count: 20,
+      latency_ms: { first: 15, p50: 17, p95: 20, max: 22 },
+      pass: true,
+    };
     value.configured_timeout_ms = 1999;
     unlinkSync(join(privateDirectory, "codex-session-start-timing.json"));
     assert.throws(
@@ -3005,7 +3033,6 @@ test("complete produced final assertions satisfy the public result contract", ()
     sessionStartBudget: {
       observationStatus: "pass",
       target: "darwin-arm64",
-      sampleCount: 20,
       configuredTimeoutMs: 2000,
       hardTimeoutMilliseconds: 2000,
       clock: "performance.now_monotonic",
@@ -3016,9 +3043,10 @@ test("complete produced final assertions satisfy the public result contract", ()
       processModel:
         "new_process_per_sample; first_configured_hook_before_runtime_smoke; " +
         "hermetic_generated_input_and_selector_availability_metadata",
-      firstMs: 100,
-      p95Ms: 110,
-      maxMs: 120,
+      sources: {
+        startup: { sampleCount: 20, firstMs: 100, p95Ms: 110, maxMs: 120, pass: true },
+        compact: { sampleCount: 20, firstMs: 140, p95Ms: 150, maxMs: 160, pass: true },
+      },
       pass: true,
       artifactIdentity: `sha256:${sha}`,
     },

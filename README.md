@@ -29,13 +29,12 @@ The native plugin archives intentionally ship only `bin/launch.sh`. That
 launcher accepts `darwin-arm64` only; macOS Intel, Linux, and Windows launchers
 and runtimes are not shipped or supported in this release.
 
-> **Current repository version: OpenSocrates 1.2.1; publication pending.** It
-> adds a committed, mutation-tested v1.2 adjudication snapshot and a bilingual
-> three-question teacher overlay across all six host packages while preserving
-> each host's real delivery and evidence boundary. The 2026-08-15 provenance
-> audit found no public GitHub `v1.2.1` tag/release or npm 1.2.1 package; the
-> latest public GitHub release remains v1.2.0. Commands below that pin 1.2.1 are
-> release-target examples and are unavailable until publication.
+> **Current release: OpenSocrates 1.2.1.** It adds a committed, mutation-tested
+> v1.2 adjudication snapshot and a bilingual three-question teacher overlay
+> across all six host packages. It also adds safe complete-uninstall and Codex
+> trust-reset flows, tighter Claude provenance boundaries, same-machine
+> reinstall acceptance, and source-complete Codex SessionStart timing evidence.
+> The separate Claude Chat v1.2.1 live-upload receipt remains pending.
 
 ## Host support
 
@@ -295,9 +294,7 @@ absent because Chat does not execute the packaged hooks. See Anthropic's
 
 ### Install from a tagged GitHub source
 
-The same host option works without the npm registry after the tag is published.
-The `v1.2.1` tag was unavailable at the 2026-08-15 audit, so these commands are
-release-target examples, not currently executable instructions:
+The same host option works without the npm registry by using the published tag:
 
 ```bash
 npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host all

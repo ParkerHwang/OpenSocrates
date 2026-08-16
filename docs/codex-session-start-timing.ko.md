@@ -10,10 +10,11 @@ ${PLUGIN_ROOT}/bin/launch.sh hook codex session_started
 ```
 
 게이트는 생성된 `hooks/hooks.json`에서 이 명령과 2초 제한을 읽고, 생성된 onedir
-패키지에서 명령을 실행합니다. 20개 표본마다 새 프로세스를 시작하며, 생성된 유효한
-`SessionStart` envelope와 서로 다른 격리 HOME, 임시 디렉터리, Codex home,
-workspace를 사용합니다. 빈 소유자 전용 OAuth 메타데이터 표식은 시작 경로가 전체
-런타임 구성으로 회귀할 때 selector-available 분기를 거치게 하지만 selector 요청은
+패키지에서 명령을 실행합니다. `startup`과 `compact` 두 source를 모두 표본으로
+삼으며, 각 source마다 생성된 유효한 `SessionStart` envelope와 서로 다른 격리
+HOME, 임시 디렉터리, Codex home, workspace를 사용하는 새 프로세스 20개를
+시작합니다. 빈 소유자 전용 OAuth 메타데이터 표식은 어느 source든 전체 런타임
+구성으로 회귀할 때 selector-available 분기를 거치게 하지만 selector 요청은
 시작하지 않습니다.
 
 Codex 런타임 빌드에서는 warm-up이 비용을 숨기지 못하도록 첫 configured hook을 모든
@@ -21,19 +22,25 @@ Codex 런타임 빌드에서는 warm-up이 비용을 숨기지 못하도록 첫 
 smoke 전에 `dist/codex`에서 게이트를 다시 실행합니다. 통과 조건은 다음과 같습니다.
 
 - 모든 프로세스가 종료 코드 0과 완전히 빈 stdout/stderr로 끝나야 합니다.
-- 첫 configured hook과 모든 표본이 설정된 2,000 ms 제한 미만이어야 합니다.
-- nearest-rank p95가 1,000 ms 이하여서 예산의 50% 여유를 보존해야 합니다.
-- 새 프로세스 표본을 최소 20개 측정해야 합니다(도구의 상한은 100개입니다).
+- 각 source 집합의 첫 configured hook과 모든 표본이 설정된 2,000 ms 제한보다
+  짧게 끝나야 합니다.
+- 각 source의 nearest-rank p95가 1,000 ms 이하여야 하며 50% 예산 여유를 유지해야
+  합니다.
+- 각 source마다 새 프로세스 표본을 최소 20개 측정해야 합니다(도구의 상한은
+  source마다 100개입니다).
 
-닫힌 JSON 증거에는 target, release-manifest identity, process model, sample count,
-first/p50/p95/max latency, configured timeout, pass/fail만 기록합니다. callback 입력·출력,
-사용자 prompt, credential, 환경 값, 로컬 경로는 기록하지 않습니다. 네이티브 패키지를
-조립한 뒤 다음 명령으로 게이트를 실행할 수 있습니다.
+닫힌 JSON 증거에는 target, release-manifest identity, process model, configured timeout,
+그리고 `startup`·`compact` source별 결과만 기록합니다. 각 source 결과에는 sample
+count, first/p50/p95/max latency, pass/fail이 있고, 두 source 결과가 모두 통과해야
+전체 pass가 됩니다. callback 입력·출력, 사용자 prompt, credential, 환경 값, 로컬
+경로는 기록하지 않습니다. 네이티브 패키지를 조립한 뒤 다음 명령으로 게이트를 실행할
+수 있습니다.
 
 ```bash
 make codex-hook-timing
 ```
 
+게이트는 `source: "startup"`과 `source: "compact"` payload를 모두 전달합니다.
 일반 `startup`, `resume`, `clear` callback은 런타임 구성 전의 fail-open no-op입니다.
 고정 launcher는 callback 입력을 최대 4 MiB까지만 프로세스 메모리에 보관하고 macOS
 시스템 parser로 최상위 `source: "compact"`가 정확히 일치할 때만 통과시킵니다. 이
