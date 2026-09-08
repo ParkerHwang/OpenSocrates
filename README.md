@@ -7,6 +7,13 @@
   <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
 </p>
 
+Bounded synthetic Codex tests with `gpt-5.6-luna` at `max` effort included
+300-second final-delivery timeouts, even when the requested file existed.
+This release does not promise a fixed response time or demonstrated quality,
+naturalness, token-cost or latency improvement. See the linked release evidence
+for every attempt and its source/configuration boundary.
+
+
 # OpenSocrates
 
 **English** | [한국어](README.ko.md)

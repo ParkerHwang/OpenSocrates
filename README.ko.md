@@ -7,6 +7,13 @@
   <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
 </p>
 
+`gpt-5.6-luna`의 `max` 설정으로 진행한 합성 Codex 시험에서는 요청한 파일이
+있어도 300초 안에 최종 응답이 끝나지 않은 사례가 있었습니다. 이 릴리스는
+고정 응답 시간이나 입증된 품질·자연스러움·토큰 비용·속도 개선을 약속하지
+않습니다. 각 시도의 결과와 소스·설정 차이는 위 릴리스 근거에서 확인할 수
+있습니다.
+
+
 # OpenSocrates
 
 [English](README.md) | **한국어**

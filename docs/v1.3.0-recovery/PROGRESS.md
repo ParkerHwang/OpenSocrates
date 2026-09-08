@@ -45,7 +45,7 @@ not substitute for a missing completed final turn. Every deadline remains record
 | Follow-up8 |4ea8542|5/8|3/8|Default-deny environment and genuinely delayed audit; G4/4, J1/4. Optional premium support clarified.|
 | Diagnostic1 |4ea8542|0/1|1/1|Full optional control references and unconditional Strict fragment observed; no final turn at300. No sole-cause inference.|
 | Qualification3 |95a96a1|2/3|1/3|Strict instructions conditioned on active/policy-required Strict; multi_agent explicitly disabled. ChangedKO224.25s and forecastEN232.38s complete; forecastKO remains300s failure.|
-| Prospective finite observation1 |8109176|pending|pending|One KO forecast only; independent300 marker and600 total observation ceiling, frozen before execution.|
+| Prospective finite observation1 |8109176|1/1 at369.15s|1/1 at300s|Final turn complete; P09 future-condition fidelity failure independently confirmed.|
 
 The Strict repair preserves explicit/policy-required Strict and all authored
 procedures. The latest Bayesian routing repair carries already-authored prior
@@ -65,7 +65,7 @@ Independent fresh Luna/max EN/KO reviews cover16 blinded, cross-iteration artifa
 packets. All16 pass artifact/fidelity/authority-content/format checks; the known
 KO deadline fails final-delivery. English naturalness includes scores2/3 for
 repetition/structure. They share a model family with the actor and are not human
-gold. A separate Claude Sonnet5Max web review is pending. This evidence does not
+gold. P09, reviewed separately, passes current decision/artifact/authority/format/final delivery but fails fidelity: useful future evidence and probability-model prerequisites became universal action prerequisites. Naturalness3. A separate Claude Sonnet5Max web review is pending. This evidence does not
 establish naturalness, cost, latency, or full-catalog superiority.
 
 ## Support and publication boundaries
@@ -83,3 +83,19 @@ trusted npm publishing on that tag, and verify public distribution bytes. The
 first PR CI handoff-label failure was corrected without relaxing checks; all five
 checks passed on the preceding public head. Latest source and evidence require
 fresh current-head CI. No existing tag/release/npm version may be overwritten.
+
+## Question-scope repair and affected verification
+
+The observed P09 fidelity defect is retained. Shared EN/KO decision guidance now
+keeps missing inputs, stops and reopening criteria attached to their own question,
+requires an evidenced dependency before transferring a prerequisite, and separates
+useful next evidence from strictly necessary evidence. All six generated packages
+carry the exact guide bytes;10 response-policy/contract checks pass. No authored
+procedure or presentation-policy body changed in this repair.
+
+The release owner requires ONE postrepair KO forecast observation with the same
+fixture/model/settings, the same primary300 marker and separate600 ceiling,
+followed by independent P10 fidelity review. This is a newly justified affected
+check for the observed material defect, not repeat-until-pass or a blanket claim
+of model compliance. It will be frozen after the repaired package is validated.
+Publication remains pending this affected check and current-head release gates.

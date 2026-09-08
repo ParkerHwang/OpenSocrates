@@ -149,6 +149,18 @@ class ResponsePolicyChecks(unittest.TestCase):
                     compiler.compile(replace(request, rigor=rigor)).fragment_ids,
                 )
 
+    def test_all_host_decision_guides_preserve_question_scope_contract(self):
+        for locale in ("en", "ko"):
+            source = (ROOT / f"plugin-src/shared/decision/guide.{locale}.md").read_bytes()
+            for host in ("antigravity", "claude", "codex", "cursor", "grok", "opencode"):
+                generated = ROOT / "build/generated/plugins" / host
+                self.assertEqual(
+                    (
+                        generated / f"skills/opensocrates/references/decision/guide.{locale}.md"
+                    ).read_bytes(),
+                    source,
+                )
+
     def test_measurement_counts_complete_protected_artifact(self):
         for locale in ("en", "ko"):
             text = '판정: 보류\n\n`ID-04` 12 kg [source](https://example.com)\n{"ok":false}\n'

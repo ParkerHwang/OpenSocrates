@@ -63,3 +63,11 @@ unavailable native application receipt. Report the finished artifact once its
 actual completion conditions are met; repeat checks only when relevant inputs or
 outputs change. A missing input holds only the judgment that depends on it.
 Preserve required method stop conditions and do not invent further prerequisites.
+
+Keep each question's conclusion, missing inputs, stop conditions and reopening
+criteria attached to that question. A prerequisite for quantifying a claim does
+not automatically become a prerequisite for a separate action decision. Transfer
+a condition only when the user, governing rule or evidence establishes that
+dependency. Distinguish useful next evidence from evidence that is strictly
+necessary; do not turn suggestions into universal requirements. Before handing
+off, check every stated necessary condition against its source and decision scope.
