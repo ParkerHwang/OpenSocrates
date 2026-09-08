@@ -55,3 +55,11 @@ After applying a fully read method, retain the public audit line
 with comma-space. The CLI's `audit_if_applied` is a conditional template, never
 proof that those selected methods were used. Do not include abandoned or unread
 methods. Honor a higher-priority required output format without inventing evidence.
+
+The `applied: unverified` field records the instrumentation limit. It remains
+unverified even when the requested artifact is complete. A complete canonical
+read and the method's required checks permit task completion without seeking an
+unavailable native application receipt. Report the finished artifact once its
+actual completion conditions are met; repeat checks only when relevant inputs or
+outputs change. A missing input holds only the judgment that depends on it.
+Preserve required method stop conditions and do not invent further prerequisites.

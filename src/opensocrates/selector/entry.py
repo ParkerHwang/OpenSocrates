@@ -12,5 +12,8 @@ ENTRY_GUIDANCE = (
     "are separate states. Do not claim native grounding receipts for agent-directed "
     "lookups. Preserve each used method's public evidence, stop and audit contracts, "
     "and finish the requested artifact. Missing lookup must not erase constraints "
-    "or block ordinary work. No initial method is selected by this entry."
+    "or block ordinary work. Unverified application is a measurement limit, not an "
+    "unfinished task or a demand to seek unavailable native proof. Finish after the "
+    "actual required checks and do not repeat unchanged checks. No initial method is "
+    "selected by this entry."
 )
