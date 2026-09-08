@@ -22,9 +22,9 @@ not a claim of historical approval.
 Tracked work: [issue87](https://github.com/ParkerHwang/OpenSocrates/issues/87) and
 [draft PR88](https://github.com/ParkerHwang/OpenSocrates/pull/88). Publication is
 not yet complete. Last native-validated product source:
-`2339d8a9cc4283c00ee6c4a690566623430214dd`; `make release-check` PASS on
+`32d0322c73c8c116b961ddb3a68a75473c715466`; `make release-check` PASS on
 Apple-silicon macOS. Latest local Codex ZIP:
-`sha256:b96602080355130a6e29455e70ec3a2bb5546a16d264b8d69802f4638e42e2eb`.
+`sha256:f51be7c9ce4df606e8df98ed4446377e490d2894c8efaa80ed87e6888044031e`.
 Normal isolated update succeeded and installed manifest bytes equal the validated
 package. Seven hooks remain enabled and trusted. An added direct compiled-catalog
 assertion passes with the other23 decision tests. Source formatting/lint/docs pass.
@@ -128,3 +128,11 @@ This improves eligibility/provenance but adds no freeform semantic validator or
 new backend. One affected actor observation will assess actual typed selection
 and final artifact fidelity separately after native validation; prior failures
 and the disputed/revised P10 judgment remain. No additional Claude calls.
+
+Native32d0322 release gate passed82.42s. Normal isolated update matches the
+validated manifest. Six credential-free packaged CLI contracts pass: EN/KO known
+missing reference classes and Bayesian prerequisites exclude those methods, while
+a separate evidence-hierarchy request remains eligible. These controlled inputs
+do not prove actor classification. The single native-verification actor is now
+frozen and running with the same300/600 boundaries; no private invocation is
+pre-taught. It captures only scoped closed-feature observations and public artifacts.
