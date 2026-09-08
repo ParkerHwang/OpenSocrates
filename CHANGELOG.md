@@ -41,6 +41,9 @@ All notable changes to OpenSocrates are documented here. This project follows
   and complete references were observed, while submit-hook delivery, feature
   classification, actual application, Desktop GUI, and cloud activation remain
   separate or unverified.
+- Converge concurrent same-machine lifecycle inspectors on one atomically
+  published `blocked_unverifiable` receipt instead of letting the losing
+  inspector fail on an exclusive-create race.
 
 ## [1.2.1] - 2026-08-16
 
