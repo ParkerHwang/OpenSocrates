@@ -57,6 +57,7 @@ def _live_host_probe_status(*, opencode_validated: bool) -> dict[str, str]:
 EXPECTED_METHOD_COUNT = 48
 LEGACY_CONTENT_BUNDLE = "content/compiled-content.bundle.json"
 REASONING_CONTENT_BUNDLE = "content/compiled-reasoning-content.bundle.json"
+RESPONSE_POLICY_BUNDLE = "content/compiled-response-policy.json"
 RUNTIME_ENTRY = "packaging/pyinstaller/runtime_entry.py"
 RUNTIME_ENTRY_APPROVED_IMPORTS = frozenset({"json", "multiprocessing", "opensocrates", "sys"})
 THIRD_PARTY_NOTICE = "THIRD_PARTY_NOTICES.md"
@@ -910,7 +911,8 @@ def _runtime_build(  # noqa: C901  # Explicit host release build validation.
         or not isinstance(content_assets.get("source"), Mapping)
         or not isinstance(content_assets.get("packaged"), Mapping)
         or content_assets["packaged"].get("status") != "pass"
-        or set(content_assets["source"]) != {LEGACY_CONTENT_BUNDLE, REASONING_CONTENT_BUNDLE}
+        or set(content_assets["source"])
+        != {LEGACY_CONTENT_BUNDLE, REASONING_CONTENT_BUNDLE, RESPONSE_POLICY_BUNDLE}
     ):
         raise ReleaseCheckError("runtime_content_asset_evidence_invalid")
     artifact_path = _resolve(root, artifact)
