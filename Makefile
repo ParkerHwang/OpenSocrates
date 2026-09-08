@@ -54,6 +54,8 @@ adjudication-check:
 
 docs-check:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_links.py --root "$(ROOT)" \
+		--path docs/advanced-usage.md \
+		--path docs/advanced-usage.ko.md \
 		--path docs/decision-points.md \
 		--path docs/decision-points.ko.md \
 		--path README.md \
