@@ -281,6 +281,20 @@ class DecisionChecks(unittest.TestCase):
                 ],
             )
 
+    def test_bayesian_compiled_projection_retains_prerequisite_exclusions(self):
+        projection = json.loads(
+            (ROOT / "content/compiled-reasoning-content.bundle.json").read_text()
+        )
+        entry = next(
+            item
+            for item in projection["selection_catalog"]["entries"]
+            if item["method_id"] == "bayesian-updating"
+        )
+        self.assertTrue(
+            {"no_defensible_prior_basis", "no_likelihood_direction"}
+            <= set(entry["unsuitable_features"])
+        )
+
     def test_weighted_primary_and_fallback_cannot_bypass_constraints(self):
         result = self.session.handle(
             request(None, ["forecast", "reference_cases", "no_defensible_reference_class"])

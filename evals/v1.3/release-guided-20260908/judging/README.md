@@ -1,0 +1,20 @@
+# Source-free artifact review
+
+Sixteen cross-iteration public artifact packets, eight per locale, are shuffled
+within locale and omit arm/source identities and audit footers. Mapping remains
+in packet-map.json. This is an artifact review, not a same-source randomized
+comparison or an empirical improvement estimate. No private reasoning is included.
+Tasks and synthetic source facts are retained; text cannot verify actual actions
+or method application. Missing final delivery remains failure even with good files.
+
+Luna English and Korean reviewers use gpt-5.6-luna/max in independent fresh
+subagents, with only their packet file and the rubric. These reviewers share a
+model family with the actor; their judgments are not human gold. A separate
+Claude Sonnet5Max web review is pending. Its account skill state is not changed;
+the review prompt explicitly requests no skills, tools or external sources.
+
+Initial Luna judgments: all16 artifact/fidelity/authority-content/format checks
+pass; ko-P06 final delivery fails. Mechanical prose receives no naturalness score.
+English scores include2 and3 for repetition/structure. These scores do not establish
+blanket naturalness improvement. Later fresh-source observations receive separate
+packets and judgments, preserving these outcomes.

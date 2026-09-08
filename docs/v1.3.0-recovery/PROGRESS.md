@@ -17,33 +17,69 @@ humanizer/detector claims, Compact promotion, new hosts/locales, or research
 backend are included. This is a current maintainer-delegated scope decision,
 not a claim of historical approval.
 
-## Execution plan
-
-1. Integrate the conservative presentation layer using existing contracts.
-2. Freeze and validate current-source EN/KO behavior and interaction overhead.
-3. Keep functionality/integrity/security gates before publication; verify exact
-   public provenance and published bytes afterward without a release-order cycle.
-4. Complete PR checks, merge normally, publish immutable release assets, dispatch
-   the established npm workflow on the exact tag, and verify published outputs.
-
-Authenticated installed-path evaluation and current Claude Chat functionality
-remain under investigation. No failed or unavailable observation is a pass.
-Historical rejected variants and their evaluation results remain preserved in
-the maintainer's recovery workspace; they are not silently promoted here.
-
-## Current validation milestone
+## Current release state
 
 Tracked work: [issue87](https://github.com/ParkerHwang/OpenSocrates/issues/87) and
-[draft PR88](https://github.com/ParkerHwang/OpenSocrates/pull/88).
-Source `134c8acbb7d1fd30b7126751f80483ae929a9105` passed local smoke and native
-release checks. The installed-study Codex ZIP is
-`sha256:6a8378fd0b3c60dfee1f38410f777bcc607f6b02cbd80a898e45cc6aaa3b3bc1`.
-The [three-arm EN/KO protocol](../../evals/v1.3/release-guided-20260908/PROTOCOL.md)
-is frozen before outcomes. Normal browser login and installation in verified
-exclusive OS-home/profile/temp roots succeeded without copying credentials.
-Seven candidate hooks were approved through the normal TUI. Outcomes are being
-collected; neither completion of the study nor publication is claimed yet.
+[draft PR88](https://github.com/ParkerHwang/OpenSocrates/pull/88). Publication is
+not yet complete. Last native-validated product source:
+`8109176a353842e7d6a2612a4eda8db41988241c`; `make release-check` PASS on
+Apple-silicon macOS. Latest local Codex ZIP:
+`sha256:5611866fe82a05c34d0ee6de378db5d23da6688766710d4efd0e04ebc12bbae1`.
+Normal isolated update succeeded and installed manifest bytes equal the validated
+package. Seven hooks remain enabled and trusted. An added direct compiled-catalog
+assertion passes with the other23 decision tests. Source formatting/lint/docs pass.
 
-The first PR CI attempt stopped at an exact handoff-label mismatch in the PR
-body (`Last verified commit:`). The field was corrected; no validation assertion
-or branch rule was relaxed. A new synchronize event runs the corrected body.
+A separate recovery workspace preserves the full original history, failed trials,
+and worktree-preservation evidence. Private paths and that history are excluded
+from this public branch. The public record contains synthetic tasks/artifacts,
+sanitized observations, exact source/package identities, and no credentials.
+
+## Observations and disposition
+
+All studies below use synthetic tasks and gpt-5.6-luna/max. A correct file does
+not substitute for a missing completed final turn. Every deadline remains recorded.
+
+| Study | Source | Completed | Deadline | Evidence boundary |
+| --- | --- | ---: | ---: | --- |
+| Initial24 |134c8ac|20/24|4/24|U/G upfront controls16/16; installedJ4/8. Controls are transformed inputs, not live1.2.1. Inherited environment and early audit visibility limit causal claims.|
+| Follow-up8 |4ea8542|5/8|3/8|Default-deny environment and genuinely delayed audit; G4/4, J1/4. Optional premium support clarified.|
+| Diagnostic1 |4ea8542|0/1|1/1|Full optional control references and unconditional Strict fragment observed; no final turn at300. No sole-cause inference.|
+| Qualification3 |95a96a1|2/3|1/3|Strict instructions conditioned on active/policy-required Strict; multi_agent explicitly disabled. ChangedKO224.25s and forecastEN232.38s complete; forecastKO remains300s failure.|
+| Prospective finite observation1 |8109176|pending|pending|One KO forecast only; independent300 marker and600 total observation ceiling, frozen before execution.|
+
+The Strict repair preserves explicit/policy-required Strict and all authored
+procedures. The latest Bayesian routing repair carries already-authored prior
+basis and likelihood-direction prerequisites into all catalog projections. Prior
+KO artifacts did not prove invalid Bayesian application; the metadata gap was
+confirmed independently. These are scoped correctness repairs, not proven sole
+causes of latency. All96 authored EN/KO bodies remain unchanged from main.
+
+The finite observation does not relax or relabel any300-second study result.
+The maintainer-delegated release criterion distinguishes that lab budget from a
+published host latency SLO. A correct later final turn may support only finite
+completion with an explicit slow Luna/max limitation. No retry-until-pass is
+permitted; the protocol and freeze are in
+[finite-observation](../../evals/v1.3/release-guided-20260908/finite-observation/PROTOCOL.md).
+
+Independent fresh Luna/max EN/KO reviews cover16 blinded, cross-iteration artifact
+packets. All16 pass artifact/fidelity/authority-content/format checks; the known
+KO deadline fails final-delivery. English naturalness includes scores2/3 for
+repetition/structure. They share a model family with the actor and are not human
+gold. A separate Claude Sonnet5Max web review is pending. This evidence does not
+establish naturalness, cost, latency, or full-catalog superiority.
+
+## Support and publication boundaries
+
+Claude Chat is export/layout/reference-integrity validated; current cloud upload
+and activation are unvalidated. No active account skill was replaced. Codex normal
+installed discovery and complete reference deliveries are observed, while actual
+method application remains unverified. Other host live behavior, Desktop GUI,
+separate-Mac installation, signing and notarization are not inferred from tests.
+
+The remaining sequence is to assess the single finite observation and independent
+judgments, finish current-head required CI, merge through the protected PR,
+publish the exact main-ancestor tag and immutable assets, explicitly dispatch
+trusted npm publishing on that tag, and verify public distribution bytes. The
+first PR CI handoff-label failure was corrected without relaxing checks; all five
+checks passed on the preceding public head. Latest source and evidence require
+fresh current-head CI. No existing tag/release/npm version may be overwritten.
