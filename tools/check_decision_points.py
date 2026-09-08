@@ -231,6 +231,56 @@ class DecisionChecks(unittest.TestCase):
         self.assertEqual(fresh["methods"][0]["delivery"], "emitted")
         self.assertEqual(fresh["methods"][0]["read"], "unverified")
 
+    def test_bayesian_missing_prior_or_direction_is_excluded_on_every_route(self):
+        from opensocrates.domain.enums import Participation
+        from opensocrates.domain.routing import route_features, validate_routing_payload
+
+        for locale in ("en", "ko"):
+            for missing in ("no_defensible_prior_basis", "no_likelihood_direction"):
+                cues = ["new_evidence", "unknown_probability", "competing_explanations", missing]
+                for method in ("bayesian-updating", None):
+                    value = request(method, cues, locale=locale)
+                    result = self.session.handle(value)
+                    self.assertNotIn("bayesian-updating", result["selected"])
+                    # The frozen no-bundle fallback must retain the same exclusion.
+                    features = validate_routing_payload(value["routing"]).features
+                    route = route_features(Participation.JUDGMENT, features)
+                    self.assertNotIn(
+                        "bayesian-updating", (route.primary_method, route.secondary_method)
+                    )
+                complement = self.session.handle(
+                    request(
+                        None,
+                        ["information_purchase", "choose", "unknown_probability", missing],
+                        locale=locale,
+                    )
+                )
+                self.assertNotIn("bayesian-updating", complement["selected"])
+
+    def test_bayesian_ordinal_prior_and_direction_remain_eligible(self):
+        # Fixture: a defensible ordinal prior ranks H1 above H2; a new signal
+        # supports H2 over H1. Exact numeric probabilities are not available.
+        for locale in ("en", "ko"):
+            result = self.session.handle(
+                request(
+                    "bayesian-updating",
+                    ["new_evidence", "competing_explanations", "unknown_probability"],
+                    locale=locale,
+                )
+            )
+            self.assertEqual(result["selected"], ["bayesian-updating"])
+            self.assertEqual(result["methods"][0]["read"], "unverified")
+            catalog = self.session.handle({"operation": "catalog", "locale": locale})
+            entry = next(m for m in catalog["methods"] if m["id"] == "bayesian-updating")
+            self.assertIn("no_defensible_prior_basis", entry["routing"]["contraindications"])
+            self.assertIn("no_likelihood_direction", entry["routing"]["contraindications"])
+            self.assertIn(
+                entry["use_for"],
+                self.bundle.methods[self.bundle.method_ids.index("bayesian-updating")].procedure[
+                    locale
+                ],
+            )
+
     def test_weighted_primary_and_fallback_cannot_bypass_constraints(self):
         result = self.session.handle(
             request(None, ["forecast", "reference_cases", "no_defensible_reference_class"])

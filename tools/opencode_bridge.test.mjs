@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { after, before, test } from "node:test";
+import { runInNewContext } from "node:vm";
 
 const root = new URL("../", import.meta.url).pathname;
 let output;
@@ -247,4 +248,28 @@ test("primary and fallback do not bypass recognized authored hard constraints", 
     await invoke(parts);
     assert.equal(parts.length, 1);
   }
+});
+
+
+test("Bayesian eligibility cues preserve ordinal updates and reject absent prerequisites", async () => {
+  const source = await readFile(join(output, "plugins", "opensocrates.js"), "utf8");
+  const context = {};
+  runInNewContext(source.replace("export const OpenSocratesPlugin", "const OpenSocratesPlugin") +
+    "\nglobalThis.seam = {classify, score, METHOD_BY_ID};", context);
+  const {classify, score, METHOD_BY_ID} = context.seam;
+  const method = METHOD_BY_ID.get("bayesian-updating");
+  for (const [text, key] of [
+    ["Assess evidence with no defensible prior basis.", "no_defensible_prior_basis"],
+    ["Assess evidence with no ordinal likelihood direction.", "no_likelihood_direction"],
+    ["근거를 평가하세요. 방어 가능한 사전 근거가 없습니다.", "no_defensible_prior_basis"],
+    ["근거를 평가하세요. 우도 방향이 없습니다.", "no_likelihood_direction"],
+  ]) {
+    const classified = classify(text);
+    assert.equal(classified.features.get(key), 3);
+    classified.features.set("new_evidence", 3);
+    classified.features.set("unknown_probability", 3);
+    assert.equal(score(method, classified).contraindicated, true);
+  }
+  const ordinal = {features: new Map([["new_evidence", 3], ["unknown_probability", 3], ["competing_explanations", 3]])};
+  assert.equal(score(method, ordinal).contraindicated, false);
 });

@@ -305,7 +305,7 @@ _FROZEN_ROWS: tuple[
         {"new_evidence": 3, "unknown_probability": 2, "competing_explanations": 1},
         {},
         5,
-        ("binding_rule_without_discretion",),
+        ("binding_rule_without_discretion", "no_defensible_prior_basis", "no_likelihood_direction"),
         "abduction",
     ),
     (

@@ -482,6 +482,8 @@ class FeatureKey(StrEnum):
     # Contraindications
     BINDING_RULE_WITHOUT_DISCRETION = "binding_rule_without_discretion"
     NO_DEFENSIBLE_REFERENCE_CLASS = "no_defensible_reference_class"
+    NO_DEFENSIBLE_PRIOR_BASIS = "no_defensible_prior_basis"
+    NO_LIKELIHOOD_DIRECTION = "no_likelihood_direction"
     NO_TESTABLE_IMPLICATION = "no_testable_implication"
     NO_MEANINGFUL_INTERDEPENDENCE = "no_meaningful_interdependence"
     NO_COHERENT_DIMENSIONS = "no_coherent_dimensions"

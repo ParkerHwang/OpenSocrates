@@ -119,6 +119,12 @@ function classify(prompt) {
   if (/\bonly one feasible option\b|실행 가능한 (선택지|대안).{0,10}(하나|한 개)/iu.test(prompt)) {
     features.set("single_feasible_option", 3)
   }
+  if (/no (?:defensible )?prior (?:basis|support)|prior (?:basis|support) (?:is )?(?:absent|unavailable)|방어 가능한 사전 근거.{0,15}(없|부재)|사전 근거.{0,15}(없|부재)/iu.test(prompt)) {
+    features.set("no_defensible_prior_basis", 3)
+  }
+  if (/no (?:ordinal )?likelihood direction|no direction.{0,30}across hypotheses|우도.{0,15}방향.{0,15}(없|부재)|가설별.{0,15}증거 방향.{0,15}(없|부재)/iu.test(prompt)) {
+    features.set("no_likelihood_direction", 3)
+  }
   return { shape: selected.shape, features }
 }
 
