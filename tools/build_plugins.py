@@ -399,6 +399,12 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
         values[f"RESPONSE_POLICY_{locale.upper()}"] = render_response_guidance(
             response_policy, locale
         )
+    for locale in ("en", "ko"):
+        guard = (repository / f"plugin-src/shared/rigor/activation.{locale}.md").read_text(
+            encoding="utf-8"
+        )
+        key = f"FRAGMENT_STRICT_SECOND_PASS_{locale.upper()}"
+        values[key] = guard.strip() + "\n\n" + values[key]
     resolved_profile, profile_values = _render_profile_values(metadata, render_profile)
     overlapping_values = set(values) & set(profile_values)
     if overlapping_values:

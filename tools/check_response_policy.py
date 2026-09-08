@@ -107,6 +107,48 @@ class ResponsePolicyChecks(unittest.TestCase):
                 self.policy,
             )
 
+    def test_strict_reference_guard_precedes_instruction_without_removing_it(self):
+        from opensocrates.prompting.strict_prompt import strict_second_pass_fragment
+
+        bundle = load_compiled_bundle(ROOT / "content/compiled-content.bundle.json")
+        for locale in ("en", "ko"):
+            raw = strict_second_pass_fragment(bundle, locale)
+            guard = (ROOT / f"plugin-src/shared/rigor/activation.{locale}.md").read_text().strip()
+            for host in ("antigravity", "claude", "codex", "cursor", "grok", "opencode"):
+                leaf = "rigor" if host == "codex" else "opensocrates"
+                text = (ROOT / f"build/generated/plugins/{host}/skills/{leaf}/SKILL.md").read_text()
+                self.assertIn(guard + "\n\n" + raw, text)
+        self.assertIn(
+            "explicitly requested",
+            (ROOT / "build/generated/plugins/codex/skills/rigor/SKILL.md").read_text(),
+        )
+
+    def test_default_vs_explicit_and_policy_required_strict_paths(self):
+        from dataclasses import replace
+
+        from compile_prompts import _method_route, _representative_request
+        from opensocrates.domain.enums import Rigor, RiskFloorReason
+        from opensocrates.domain.rigor import build_rigor_decision
+        from opensocrates.prompting.compiler import PromptCompiler, PromptEvent
+
+        bundle = load_compiled_bundle(ROOT / "content/compiled-content.bundle.json")
+        route = _method_route(bundle, "critical-thinking", None)
+        compiler = PromptCompiler(bundle)
+        for locale in ("en", "ko"):
+            request = _representative_request(bundle, locale, PromptEvent.STOP_REPAIR, route)
+            self.assertNotIn("strict_second_pass", compiler.compile(request).fragment_ids)
+            explicit = build_rigor_decision(
+                Rigor.TOGETHER, Rigor.STRICT, Rigor.TOGETHER, RiskFloorReason.ORDINARY_JUDGMENT
+            )
+            floor = build_rigor_decision(
+                Rigor.TOGETHER, None, Rigor.STRICT, RiskFloorReason.IRREVERSIBLE_COMMITMENT
+            )
+            for rigor in (explicit, floor):
+                self.assertIn(
+                    "strict_second_pass",
+                    compiler.compile(replace(request, rigor=rigor)).fragment_ids,
+                )
+
     def test_measurement_counts_complete_protected_artifact(self):
         for locale in ("en", "ko"):
             text = '판정: 보류\n\n`ID-04` 12 kg [source](https://example.com)\n{"ok":false}\n'
