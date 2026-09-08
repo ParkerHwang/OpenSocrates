@@ -30,3 +30,20 @@ Authenticated installed-path evaluation and current Claude Chat functionality
 remain under investigation. No failed or unavailable observation is a pass.
 Historical rejected variants and their evaluation results remain preserved in
 the maintainer's recovery workspace; they are not silently promoted here.
+
+## Current validation milestone
+
+Tracked work: [issue87](https://github.com/ParkerHwang/OpenSocrates/issues/87) and
+[draft PR88](https://github.com/ParkerHwang/OpenSocrates/pull/88).
+Source `134c8acbb7d1fd30b7126751f80483ae929a9105` passed local smoke and native
+release checks. The installed-study Codex ZIP is
+`sha256:6a8378fd0b3c60dfee1f38410f777bcc607f6b02cbd80a898e45cc6aaa3b3bc1`.
+The [three-arm EN/KO protocol](../../evals/v1.3/release-guided-20260908/PROTOCOL.md)
+is frozen before outcomes. Normal browser login and installation in verified
+exclusive OS-home/profile/temp roots succeeded without copying credentials.
+Seven candidate hooks were approved through the normal TUI. Outcomes are being
+collected; neither completion of the study nor publication is claimed yet.
+
+The first PR CI attempt stopped at an exact handoff-label mismatch in the PR
+body (`Last verified commit:`). The field was corrected; no validation assertion
+or branch rule was relaxed. A new synchronize event runs the corrected body.
