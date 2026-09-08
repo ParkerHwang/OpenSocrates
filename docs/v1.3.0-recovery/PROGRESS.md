@@ -22,9 +22,9 @@ not a claim of historical approval.
 Tracked work: [issue87](https://github.com/ParkerHwang/OpenSocrates/issues/87) and
 [draft PR88](https://github.com/ParkerHwang/OpenSocrates/pull/88). Publication is
 not yet complete. Last native-validated product source:
-`8109176a353842e7d6a2612a4eda8db41988241c`; `make release-check` PASS on
+`2339d8a9cc4283c00ee6c4a690566623430214dd`; `make release-check` PASS on
 Apple-silicon macOS. Latest local Codex ZIP:
-`sha256:5611866fe82a05c34d0ee6de378db5d23da6688766710d4efd0e04ebc12bbae1`.
+`sha256:b96602080355130a6e29455e70ec3a2bb5546a16d264b8d69802f4638e42e2eb`.
 Normal isolated update succeeded and installed manifest bytes equal the validated
 package. Seven hooks remain enabled and trusted. An added direct compiled-catalog
 assertion passes with the other23 decision tests. Source formatting/lint/docs pass.
@@ -65,7 +65,7 @@ Independent fresh Luna/max EN/KO reviews cover16 blinded, cross-iteration artifa
 packets. All16 pass artifact/fidelity/authority-content/format checks; the known
 KO deadline fails final-delivery. English naturalness includes scores2/3 for
 repetition/structure. They share a model family with the actor and are not human
-gold. P09, reviewed separately, passes current decision/artifact/authority/format/final delivery but fails fidelity: useful future evidence and probability-model prerequisites became universal action prerequisites. Naturalness3. A separate Claude Sonnet5Max web review is pending. This evidence does not
+gold. P09, reviewed separately, passes current decision/artifact/authority/format/final delivery but fails fidelity: useful future evidence and probability-model prerequisites became universal action prerequisites. Naturalness3. A separate Claude Sonnet5Max review completed with similar content findings and some naturalness3 scores, but ran a visible echo no-op despite the no-tools instruction. It is supplementary advisory evidence; external skill activation is not independently proven absent. This evidence does not
 establish naturalness, cost, latency, or full-catalog superiority.
 
 ## Support and publication boundaries
@@ -97,5 +97,5 @@ The release owner requires ONE postrepair KO forecast observation with the same
 fixture/model/settings, the same primary300 marker and separate600 ceiling,
 followed by independent P10 fidelity review. This is a newly justified affected
 check for the observed material defect, not repeat-until-pass or a blanket claim
-of model compliance. It will be frozen after the repaired package is validated.
+of model compliance. The repaired package passed the native release gate, was normally updated in the isolated profile, and the affected run is frozen and in progress under scope-verification/.
 Publication remains pending this affected check and current-head release gates.
