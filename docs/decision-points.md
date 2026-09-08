@@ -1,6 +1,6 @@
 # Decision-point retrieval and migration
 
-Status: local v1.3.0 candidate; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
+Status: v1.3.0 release work; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
 Experimental content revision 2, method variants, language rewrites and Compact
 policies have not been promoted. Method IDs remain unchanged.
 
@@ -11,6 +11,22 @@ Activate the controller when a materially changed judgment needs help; do not
 wait for another user message. It links locale-specific decision guides, compact
 routing metadata and exact complete canonical instructions. Do not load a method
 for mechanical steps. Upstream constraints must be read before they affect a choice.
+
+When the packaged runtime and shell are available, Claude/Codex use native
+`catalog` and `select` first. Include known missing prerequisites in the closed
+features, use a separate decision identity for a distinct question, and leave
+`explicit_method` null unless the user explicitly requested a method. An empty
+eligible set is valid, not a reason to bypass eligibility with file lookup.
+Runtime/shell unavailability or failure permits the existing complete-reference
+fallback with the same contraindications and global constraints. Other hosts
+retain their file path. This is guided host behavior; the selector does not
+verify feature classification, freeform semantics or actual method application.
+
+For multiple questions, retain a separate public conclusion, missing inputs and
+reopening evidence for each, using the user's requested format. Conditions are
+shared only when an explicit dependency justifies sharing them. Reading a method
+to establish that it cannot apply does not activate its output requirements for
+another question or justify citing it as applied.
 
 The installed Claude/Codex package exposes:
 
@@ -55,7 +71,7 @@ writes no runtime files and starts no network/authentication or telemetry flow.
 
 | Host | New in-turn delivery | Evidence level |
 | --- | --- | --- |
-| Codex | Agent CLI or locale reference lookup | Earlier-build CLI fixtures only; current-source installed E2E pending; credential-free packaged runtime verified; GUI blocked by Computer Use policy |
+| Codex | Native CLI first with scoped reference fallback | Normal installed reference delivery and completed turns observed on named candidates; latest native-first actor validation pending; GUI unvalidated |
 | Claude | Agent CLI where shell is available; reference lookup otherwise | Package/runtime contracts; new live flow unverified |
 | Antigravity | Agent reference lookup | Generated package contracts only |
 | Cursor | Agent reference lookup | Generated package contracts only |

@@ -21,3 +21,9 @@ P09 is a separate latest-source artifact review. Its core current judgment and
 final delivery pass, but fidelity fails: advice promotes future useful evidence
 and numeric-estimation prerequisites into universal action prerequisites. The
 shared decision-scope guide is repaired and a single new affected check is pending.
+
+P10 initially passed a blind Luna review. A separate nonblind adversarial challenge
+revised future-guidance fidelity to false; both are preserved, not combined as
+independent votes. An intended small Claude P10 follow-up accidentally repeated
+the prior16 packets due to a header-extraction bug. It was interrupted after the
+bug was detected; no completed P10 Claude judgment exists and it will not be retried.

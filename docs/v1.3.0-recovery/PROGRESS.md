@@ -99,3 +99,32 @@ followed by independent P10 fidelity review. This is a newly justified affected
 check for the observed material defect, not repeat-until-pass or a blanket claim
 of model compliance. The repaired package passed the native release gate, was normally updated in the isolated profile, and the affected run is frozen and in progress under scope-verification/.
 Publication remains pending this affected check and current-head release gates.
+
+## Affected P10 observation and open adjudication
+
+Source2339's single affected KO invocation completed199.58s, within300, with
+requested artifact and final turn. Complete EH/RCF/VOI references were observed;
+actual application is still unverified. Independent blind Luna initially passed
+all fields/naturalness4. A separately recorded adversarial challenge revised
+future-guidance fidelity to false because the closing conjunction makes a
+reference-class distribution necessary for reopening both launch and numeric
+forecast review. Preserve both judgments; the challenge is not a fresh blind vote.
+The current hold, facts, authority and completion are correct. Materiality and
+controller/native-vs-file delivery implications remain under review. No new actor
+or code change is started pending that disposition. No publication yet.
+
+## Native-first boundary repair
+
+The final bounded repair uses the existing native selection path first for
+Claude/Codex with a usable runtime/shell; known absence features remain in requests,
+empty eligible selection is valid, and fallback retains all contraindications.
+Other hosts retain file delivery. The example no longer requests an arbitrary
+method by default. A concrete public-output pattern keeps each question's
+conclusion, missing inputs and reopening evidence separate without overriding
+user formats. Ineligible/retired methods cannot export their specialized output
+requirements to another judgment. All96 authored bodies are unchanged.
+
+This improves eligibility/provenance but adds no freeform semantic validator or
+new backend. One affected actor observation will assess actual typed selection
+and final artifact fidelity separately after native validation; prior failures
+and the disputed/revised P10 judgment remain. No additional Claude calls.
