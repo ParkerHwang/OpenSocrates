@@ -170,7 +170,7 @@ def run_hook(  # noqa: C901  # Explicit host-safe early-return boundary.
             return 0
         from .codex_session_start import restore_codex_compact_session_start
 
-        restored = restore_codex_compact_session_start(raw)
+        restored = restore_codex_compact_session_start(raw, decision_point_mode=True)
         output.write(_safe_response(restored) if restored is not None else "")
         return 0
     runtime: Any | None = None
@@ -182,6 +182,7 @@ def run_hook(  # noqa: C901  # Explicit host-safe early-return boundary.
 
             runtime = build_runtime_services(
                 host=host,
+                hook_only=True,
                 workspace=workspace if host == "claude" else None,
             )
         adapter = getattr(runtime, "adapter_for", lambda _host: None)(host)

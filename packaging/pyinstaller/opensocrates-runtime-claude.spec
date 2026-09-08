@@ -21,6 +21,7 @@ for relative in (
     "schemas/v1",
     "content/compiled-content.bundle.json",
     "content/compiled-reasoning-content.bundle.json",
+    "content/compiled-response-policy.json",
     "content/locales",
 ):
     source = ROOT / relative

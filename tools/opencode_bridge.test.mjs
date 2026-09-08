@@ -89,7 +89,8 @@ test("injects one complete grounded procedure in place for judgment work", async
   assert.equal(injected.text.match(/## Teacher questions/gu)?.length, 1);
   assert.equal(injected.text.split(question).length - 1, 1);
   assert.match(injected.text, /## Procedure/u);
-  assert.match(injected.text, /OpenSocrates grounding: trade-off-analysis@1/u);
+  const canonical = JSON.parse(await readFile(join(root, "content/compiled-content.bundle.json"), "utf8"));
+  assert.ok(injected.text.includes(`OpenSocrates grounding: trade-off-analysis@${canonical.content_revision}`));
 });
 
 test("native fallback reads the same question-led procedure without bridge duplication", async () => {
@@ -233,4 +234,17 @@ test("synchronous activation still fails open without a timer", async () => {
   ];
   await assert.doesNotReject(() => invoke(hostile));
   assert.equal(hostile.length, 1, "a failing activation mutated the parts array");
+});
+
+test("primary and fallback do not bypass recognized authored hard constraints", async () => {
+  for (const text of [
+    "Compare A and B; a binding rule leaves no discretion.",
+    "Compare A and B, but only one feasible option remains.",
+    "비교하세요. 구속 규칙으로 재량이 없습니다.",
+    "비교하세요. 실행 가능한 대안이 하나만 있습니다.",
+  ]) {
+    const parts = partsFor(text);
+    await invoke(parts);
+    assert.equal(parts.length, 1);
+  }
 });

@@ -27,6 +27,9 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="opensocrates")
     sub = parser.add_subparsers(dest="command", required=True)
 
+    decision = sub.add_parser("decision", help="retrieve canonical methods at an in-turn decision")
+    decision.add_argument("--stream", action="store_true", help="volatile NDJSON session")
+
     control = sub.add_parser("control", help="apply one bounded host control")
     control_sub = control.add_subparsers(dest="control_command", required=True)
     apply = control_sub.add_parser("apply", help="apply a typed control from stdin")
@@ -281,6 +284,11 @@ def main(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
         else:
             output_stream.write(PRODUCT_VERSION + "\n")
         return 0
+
+    if args.command == "decision":
+        from .decision import run_decision
+
+        return run_decision(stdin or sys.stdin, output_stream, stream=args.stream)
 
     host = getattr(args, "host", None)
     runtime = _services_for(services, host=host)

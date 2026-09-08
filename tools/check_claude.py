@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
-from claude_chat_evidence import evidence_path, validation_errors
+from claude_chat_evidence import EXPORT_ONLY_SCHEMA, evidence_path, validation_errors
 from opensocrates.application.diagnose import build_diagnose
 from opensocrates.cli.integrity import verify_runtime_integrity
 from opensocrates.cli.runtime import build_runtime_services
@@ -314,7 +314,7 @@ def test_adapter_injection_and_cleanup() -> None:
         require(
             "Blocking rules: Critical Thinking" in specific["additionalContext"]
             and "Do not use when" in specific["additionalContext"]
-            and "critical-thinking@1" in specific["additionalContext"],
+            and f"critical-thinking@{CONTENT_REVISION}" in specific["additionalContext"],
             "selected method guardrails or revision audit were not inlined",
         )
         require(any(store.directory.rglob("instruction-*.md")), "artifact was not created")
@@ -491,7 +491,8 @@ def test_issue_32_grounding_specifics() -> None:
             "triangulation's shared-source stop condition was not in trusted context",
         )
         require(
-            artifact.grounding_footer() == "OpenSocrates grounding: triangulation@1",
+            artifact.grounding_footer()
+            == f"OpenSocrates grounding: triangulation@{CONTENT_REVISION}",
             "triangulation method/revision audit line drifted",
         )
 
@@ -893,7 +894,9 @@ def test_persisted_selector_diagnostics() -> None:
             )
         )
         with patch("opensocrates.selector.claude_cli.shutil.which", return_value=None):
-            services = build_runtime_services(host="claude", data_root=data_root)
+            services = build_runtime_services(
+                host="claude", data_root=data_root, decision_point_mode=False
+            )
         require(
             services.claude_reasoning_selector is not None,
             "missing Claude executable was discarded before a diagnosable attempt",
@@ -989,7 +992,9 @@ def test_unavailable_selector_diagnostics_self_heal() -> None:
         )
 
         store.path.write_bytes(b"{")
-        services = build_runtime_services(host="claude", data_root=data_root)
+        services = build_runtime_services(
+            host="claude", data_root=data_root, decision_point_mode=False
+        )
         unavailable = services.selector_outcome_counts()
         require(unavailable is None, "invalid selector diagnostics were reported as zero")
         snapshot = build_diagnose(
@@ -2277,6 +2282,45 @@ def test_chat_archive_live_upload_evidence() -> None:
         not current_errors,
         f"current Chat evidence is invalid: {','.join(current_errors)}",
     )
+    if current.get("schema") == EXPORT_ONLY_SCHEMA:
+        for key, value in (
+            ("status", "pass"),
+            ("product_version", "1.1.2"),
+            ("public_provenance", "installer_managed_local_plugin"),
+        ):
+            mutated = deepcopy(current)
+            mutated[key] = value
+            require(
+                validation_errors(
+                    mutated, product_version=PRODUCT_VERSION, content_revision=CONTENT_REVISION
+                ),
+                "export-only contract accepted an unsupported promotion",
+            )
+        mutated = deepcopy(current)
+        mutated["privacy"]["prompt_recorded"] = True
+        require(
+            validation_errors(
+                mutated, product_version=PRODUCT_VERSION, content_revision=CONTENT_REVISION
+            ),
+            "export-only contract accepted private evidence",
+        )
+        require(
+            "Chat standalone export: **archive contract validated; live activation unvalidated.**"
+            in (ROOT / "README.md").read_text(),
+            "Chat export boundary missing",
+        )
+        require(
+            "Chat 독립형 내보내기: **아카이브 계약 검증, 실제 활성화 미검증.**"
+            in (ROOT / "README.ko.md").read_text(),
+            "Korean Chat export boundary missing",
+        )
+        require(
+            "Chat standalone export: **archive contract validated; live activation unvalidated.**"
+            in (ROOT / "docs/claude-chat-upload-probe.md").read_text(),
+            "Chat probe documentation export boundary missing",
+        )
+        return
+
     mutations: tuple[tuple[str, Callable[[dict[str, Any]], None]], ...] = (
         (
             "historical version substitution",

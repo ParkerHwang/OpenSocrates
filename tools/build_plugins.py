@@ -386,6 +386,19 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
             "compiled content bundle failed canonical/domain validation"
         ) from exc
     values = _common_values(raw_bundle, host=host, template_revision=template_revision)
+    from opensocrates.rendering.response_policy import (
+        load_response_policy,
+        policy_identity,
+        render_response_guidance,
+    )
+
+    response_policy = load_response_policy(repository / "content/response-policy.yaml")
+    values["RESPONSE_POLICY_JSON"] = _json_token(response_policy)
+    values["RESPONSE_POLICY_SHA_JSON"] = _json_token(policy_identity(response_policy))
+    for locale in ("en", "ko"):
+        values[f"RESPONSE_POLICY_{locale.upper()}"] = render_response_guidance(
+            response_policy, locale
+        )
     resolved_profile, profile_values = _render_profile_values(metadata, render_profile)
     overlapping_values = set(values) & set(profile_values)
     if overlapping_values:
@@ -453,6 +466,52 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
         destination = method_output.replace("{method_id}", str(method["id"]))
         render_to(method_template, destination, method_values)
 
+    # Locale-specific canonical references are not globally advertised skills.
+    from opensocrates.content.injection import ProjectionInstructionAssembler
+    from opensocrates.content.loader import load_reasoning_content_projections
+
+    projections = load_reasoning_content_projections(
+        bundle_file.parent / "compiled-reasoning-content.bundle.json"
+    )
+    assembler = ProjectionInstructionAssembler(projections)
+    if projections.content_revision != raw_bundle["content_revision"]:
+        raise PluginBuildError("decision references: revision mismatch")
+    for locale in ("en", "ko"):
+        entries = []
+        for method in methods:
+            method_id = method["id"]
+            assembled = assembler.assemble((method_id,), requested_locale=locale)
+            target = (
+                output_path
+                / "skills/opensocrates/references/decision"
+                / "methods"
+                / locale
+                / (method_id + ".md")
+            )
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(assembled.instructions, encoding="utf-8")
+            entries.append(
+                {
+                    "id": method_id,
+                    "use_for": method["plain_action"][locale],
+                    "routing": method["routing"],
+                    "sha256": _sha256(target.read_bytes()),
+                    "path": f"methods/{locale}/{method_id}.md",
+                }
+            )
+        (
+            output_path / "skills/opensocrates/references/decision" / f"catalog.{locale}.json"
+        ).write_bytes(
+            _canonical_json(
+                {
+                    "content_revision": projections.content_revision,
+                    "locale": locale,
+                    "methods": entries,
+                    "evidence": "metadata_only",
+                }
+            )
+        )
+
     for item in metadata.get("command_templates", []):
         if (
             not isinstance(item, Mapping)
@@ -472,6 +531,10 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
         source = repository / _ensure_relative(item["source"], field="copy source")
         destination = output_path / _ensure_relative(item["output"], field="copy output")
         _copy_path(source, destination)
+
+    policy_destination = output_path / "content/compiled-response-policy.json"
+    policy_destination.parent.mkdir(parents=True, exist_ok=True)
+    policy_destination.write_bytes(_canonical_json(response_policy))
 
     bundle_destination = output_path / _ensure_relative(
         str(metadata.get("bundle_output", "content/compiled-content.bundle.json")),

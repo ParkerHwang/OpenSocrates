@@ -83,12 +83,41 @@ def _same_state(left: EphemeralTurnState, right: EphemeralTurnState) -> bool:
 
 
 class _InstallationKey:
-    def __init__(self, layout: DataRootLayout, permissions: PermissionManager) -> None:
+    def __init__(
+        self, layout: DataRootLayout, permissions: PermissionManager, *, create: bool = True
+    ) -> None:
+        self._create = create
         self.path = secure_join(layout.root, "installation.key")
         root_report = permissions.root_report(layout.root)
         if not root_report.write_allowed:
             raise TurnStoreError("installation key unavailable under current permissions")
         self.value = self._load_or_create()
+
+    @staticmethod
+    def _safe_key_stat(info: os.stat_result) -> bool:
+        return (
+            stat.S_ISREG(info.st_mode)
+            and not stat.S_IMODE(info.st_mode) & 0o077
+            and (os.name == "nt" or info.st_uid == os.getuid())
+        )
+
+    def _read_existing_key(self) -> bytes:
+        # O_NONBLOCK closes the lstat/open FIFO race. Validate the opened inode
+        # before reading; O_NOFOLLOW also rejects a replacement symlink.
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+        try:
+            fd = os.open(self.path, flags)
+            try:
+                if not self._safe_key_stat(os.fstat(fd)):
+                    raise TurnStoreError("opened installation key is unsafe")
+                value = os.read(fd, 33)
+            finally:
+                os.close(fd)
+        except OSError as error:
+            raise TurnStoreError("installation key cannot be read") from error
+        if len(value) != 32:
+            raise TurnStoreError("installation key has invalid length")
+        return value
 
     def _load_or_create(self) -> bytes:
         try:
@@ -98,15 +127,11 @@ class _InstallationKey:
         except OSError as error:
             raise TurnStoreError("installation key cannot be inspected") from error
         if info is not None:
-            if stat.S_ISLNK(info.st_mode) or stat.S_IMODE(info.st_mode) & 0o077:
-                raise TurnStoreError("installation key permissions are unsafe")
-            try:
-                value = read_bytes(self.path, max_bytes=32)
-            except (AtomicWriteError, OSError) as error:
-                raise TurnStoreError("installation key cannot be read") from error
-            if len(value) != 32:
-                raise TurnStoreError("installation key has invalid length")
-            return value
+            if not self._safe_key_stat(info):
+                raise TurnStoreError("installation key permissions or type are unsafe")
+            return self._read_existing_key()
+        if not self._create:
+            raise TurnStoreError("existing installation key unavailable")
         value = secrets.token_bytes(32)
         flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
         try:
@@ -121,6 +146,12 @@ class _InstallationKey:
         except OSError as error:
             raise TurnStoreError("installation key cannot be created") from error
         return value
+
+
+def load_existing_installation_key(layout: DataRootLayout) -> bytes:
+    """Read the existing owner-only key for cleanup, never initialize an installation."""
+
+    return _InstallationKey(layout, PermissionManager(), create=False).value
 
 
 class TurnStateStore:

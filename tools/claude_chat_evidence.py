@@ -8,6 +8,9 @@ from pathlib import Path
 from typing import Any
 
 SCHEMA = "opensocrates.claude-chat-upload-probe/2.0.0"
+# Exact supported archive layouts, not an arbitrary minimum file count.
+# v1.3 adds bilingual decision guides/catalogs and 96 complete method references.
+ARCHIVE_FILE_COUNTS = {"1.1.2": 51, "1.2.0": 51, "1.2.1": 51, "1.3.0": 153}
 PROMPT4_MERGE_COMMIT = "2ced9500aea5c7672f644ecc345b58ed30a31701"
 SHA256 = re.compile(r"sha256:[0-9a-f]{64}\Z")
 COMMIT = re.compile(r"[0-9a-f]{40}\Z")
@@ -152,6 +155,45 @@ def _surface_expectations(status: str, product_version: str) -> dict[str, dict[s
     }
 
 
+EXPORT_ONLY_SCHEMA = "opensocrates.claude-chat-support-contract/3.0.0"
+
+
+def export_only_contract(product_version: str, content_revision: int) -> dict[str, Any]:
+    """A support boundary, not a fabricated upload or public-release observation."""
+
+    return {
+        "schema": EXPORT_ONLY_SCHEMA,
+        "product_version": product_version,
+        "content_revision": content_revision,
+        "status": "export_only",
+        "scope": "standalone_skill_zip_export",
+        "live_probe": {"status": "unvalidated", "attempted": False},
+        "public_provenance": "separate_postpublication_byte_verification_required",
+        "support_claim": "archive_contract_validated_live_chat_activation_unvalidated",
+        "privacy": dict.fromkeys(PRIVACY_KEYS, False),
+    }
+
+
+def _export_contract_errors(
+    report: Mapping[str, Any], *, product_version: str, content_revision: int
+) -> tuple[str, ...]:
+    expected = export_only_contract(product_version, content_revision)
+    errors: set[str] = set()
+    if set(report) != set(expected):
+        errors.add("export_contract.fields")
+    for key, value in expected.items():
+        if key in {"privacy", "live_probe"}:
+            actual = report.get(key)
+            if not isinstance(actual, Mapping) or set(actual) != set(value):
+                errors.add(f"export_contract.{key}")
+            else:
+                for field, required in value.items():
+                    _exact(actual.get(field), required, f"export_contract.{key}.{field}", errors)
+        else:
+            _exact(report.get(key), value, f"export_contract.{key}", errors)
+    return tuple(sorted(errors))
+
+
 def validation_errors(  # noqa: C901 - explicit evidence-state contract
     report: object,
     *,
@@ -162,6 +204,10 @@ def validation_errors(  # noqa: C901 - explicit evidence-state contract
 ) -> tuple[str, ...]:
     """Return stable error codes for an invalid current-version receipt."""
 
+    if isinstance(report, Mapping) and report.get("schema") == EXPORT_ONLY_SCHEMA:
+        return _export_contract_errors(
+            report, product_version=product_version, content_revision=content_revision
+        )
     errors: set[str] = set()
     document = _mapping(report, TOP_LEVEL_KEYS, "receipt", errors)
     if document is None:
@@ -278,7 +324,11 @@ def validation_errors(  # noqa: C901 - explicit evidence-state contract
             ):
                 errors.add("archive.file_count")
             else:
-                _exact(archive.get("file_count"), 51, "archive.file_count", errors)
+                expected_count = ARCHIVE_FILE_COUNTS.get(product_version)
+                if expected_count is None:
+                    errors.add("archive.unsupported_version")
+                else:
+                    _exact(archive.get("file_count"), expected_count, "archive.file_count", errors)
             if candidate_archive_sha256 is not None:
                 _exact(digest, candidate_archive_sha256, "archive.candidate_sha256", errors)
             if candidate_file_count is not None:

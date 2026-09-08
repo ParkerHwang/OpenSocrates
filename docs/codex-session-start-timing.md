@@ -22,7 +22,8 @@ Within a Codex runtime build, the first configured hook runs before any
 assembly repeats the gate from `dist/codex` before the final-package version
 smoke. Passing requires all of the following:
 
-- every process exits zero with literal empty stdout and stderr;
+- every process exits zero with empty stderr; startup stdout is empty and compact
+  stdout must equal the exact bounded v1.3 decision-point guidance envelope;
 - the first configured hook and every sample in each source set finish below the
   configured 2,000 ms timeout;
 - nearest-rank p95 is at most 1,000 ms for each source, preserving a 50% budget
@@ -50,10 +51,10 @@ process memory, uses macOS's system parser to admit only an exact top-level
 environment, or diagnostics. Oversized, malformed, missing-source, and ordinary
 start callbacks exit with literal empty output. `compact` alone replays the exact
 bounded input to the runtime, which performs the full native-event validation and
-opens the minimal artifact store needed to restore the existing instruction
-reference. The 24-hour crash-residue sweep runs on `UserPromptSubmit` and before
-compact restoration, so moving normal starts off the full path does not remove
-privacy cleanup.
+restores discovery guidance without loading a method or opening an artifact store.
+The default path creates no instruction artifacts. Legacy crash-residue cleanup
+remains on `UserPromptSubmit`, `Stop`, and `SessionEnd`; the retained compatibility
+restore function still sweeps before restoring any legacy reference.
 
 This gate supports the built artifact on the Apple-silicon Mac where it runs. It
 does not establish live Codex hook delivery, signing/notarization, quarantine

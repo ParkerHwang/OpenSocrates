@@ -35,7 +35,7 @@ def _open_regular_json(path: str | Path, *, label: str) -> int:
         raise ContentValidationError(f"{label} loader cannot inspect source") from exc
     if not stat.S_ISREG(initial.st_mode) or stat.S_ISLNK(initial.st_mode):
         raise ContentValidationError(f"{label} loader requires a regular non-symlink file")
-    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
     try:
         return os.open(source, flags)
     except OSError as exc:

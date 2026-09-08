@@ -46,7 +46,7 @@ from opensocrates.domain.models import (
     SelectionCatalogEntry,
 )
 from opensocrates.domain.validation import model_from_dict
-from opensocrates.version import PRODUCT_VERSION
+from opensocrates.version import CONTENT_REVISION, PRODUCT_VERSION, ROUTER_VERSION
 
 _POLICY_FILES = {
     "participation": "participation-policy.yaml",
@@ -190,8 +190,9 @@ def _validate_policy_shape(policy_id: str, value: Any) -> dict[str, Any]:
     schema = value.get("schema")
     if schema != f"opensocrates.{policy_id}-policy/1.0.0":
         raise ContentValidationError(f"policy.{policy_id}.schema: unsupported schema")
-    if value.get("version") != "1.0.0":
-        raise ContentValidationError(f"policy.{policy_id}.version: expected 1.0.0")
+    expected_version = ROUTER_VERSION if policy_id == "routing" else "1.0.0"
+    if value.get("version") != expected_version:
+        raise ContentValidationError(f"policy.{policy_id}.version: expected {expected_version}")
     return dict(value)
 
 
@@ -330,10 +331,13 @@ def _compile(
     output: Path,
     product_version: str,
 ) -> None:
+    from opensocrates.rendering.response_policy import load_response_policy
+
+    response_policy = load_response_policy(content_root / "response-policy.yaml")
     tree_hash = source_tree_hash(content_root, parse_yaml_file)
     first = build_content_bundle(
         product_version=product_version,
-        content_revision=1,
+        content_revision=CONTENT_REVISION,
         methods=methods,
         locales=locales,
         policies=policies,
@@ -341,7 +345,7 @@ def _compile(
     )
     second = build_content_bundle(
         product_version=product_version,
-        content_revision=1,
+        content_revision=CONTENT_REVISION,
         methods=methods,
         locales=locales,
         policies=policies,
@@ -354,6 +358,9 @@ def _compile(
     validate_compiled_bundle_shape(first)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(first_bytes)
+    (output.parent / "compiled-response-policy.json").write_bytes(
+        serialize_bundle(dict(response_policy))
+    )
     print(
         f"COMPILED {output} bytes={len(first_bytes)} source_tree_hash={tree_hash} semantic_hash={first['normalized_semantic_hash']}"
     )

@@ -56,6 +56,7 @@ CODEX_RUNTIME_WHEEL_MARKERS = {
 RUNTIME_CONTENT_ASSETS = (
     "content/compiled-content.bundle.json",
     "content/compiled-reasoning-content.bundle.json",
+    "content/compiled-response-policy.json",
 )
 RUNTIME_PROFILES = ("codex", "claude")
 

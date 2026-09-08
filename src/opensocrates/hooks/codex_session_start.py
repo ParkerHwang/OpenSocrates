@@ -31,6 +31,7 @@ def restore_codex_compact_session_start(
     raw: bytes,
     *,
     artifact_store: Any | None = None,
+    decision_point_mode: bool = False,
 ) -> Mapping[str, Any] | None:
     """Return the current compact reference response, or fail open with ``None``.
 
@@ -45,6 +46,11 @@ def restore_codex_compact_session_start(
         native = parsed.event
         if native is None or native.native_event != "SessionStart" or native.source != "compact":
             return None
+        if decision_point_mode:
+            from ..hosts.codex.responses import selector_context_response
+            from ..selector.entry import ENTRY_GUIDANCE
+
+            return selector_context_response(ENTRY_GUIDANCE, "SessionStart")
         store = artifact_store if artifact_store is not None else _build_artifact_store()
         if store is None:
             return None

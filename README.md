@@ -1,4 +1,9 @@
 <p align="center">
+
+> OpenSocrates 1.3.0: decision-point retrieval and conservative Guided EN/KO presentation.
+> See [release evidence and support limits](docs/v1.3.0-recovery/PROGRESS.md) and
+> [migration and delivery modes](docs/decision-points.md).
+
   <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
 </p>
 
@@ -29,12 +34,9 @@ The native plugin archives intentionally ship only `bin/launch.sh`. That
 launcher accepts `darwin-arm64` only; macOS Intel, Linux, and Windows launchers
 and runtimes are not shipped or supported in this release.
 
-> **Current release: OpenSocrates 1.2.1.** It adds a committed, mutation-tested
-> v1.2 adjudication snapshot and a bilingual three-question teacher overlay
-> across all six host packages. It also adds safe complete-uninstall and Codex
-> trust-reset flows, tighter Claude provenance boundaries, same-machine
-> reinstall acceptance, and source-complete Codex SessionStart timing evidence.
-> The separate Claude Chat v1.2.1 live-upload receipt remains pending.
+> **OpenSocrates 1.3.0 release contents:** in-turn selective retrieval, unchanged
+> canonical procedures, protected presentation-only EN/KO guidance and explicit
+> host evidence levels. Chat cloud activation remains unvalidated.
 
 ## Host support
 
@@ -49,7 +51,7 @@ and runtimes are not shipped or supported in this release.
 | Claude Code CLI | Yes, through `UserPromptSubmit` | Plugin: `/opensocrates:opensocrates` | Locally validated on `darwin-arm64` |
 | Claude Code desktop app, Local mode | Yes, where Claude Code plugins run | Plugin: `/opensocrates:opensocrates` | [Authenticated hook lifecycle locally validated](docs/claude-desktop-live-probe.md) |
 | Claude Cowork with the local plugin | Yes, in the tested local plugin upload | Plugin: `/opensocrates:opensocrates` | [Native hook lifecycle locally validated; direct release upload, no marketplace sync](docs/claude-cowork-live-probe.md) |
-| Claude web and Desktop Chat | No OpenSocrates hooks | Standalone skill: `/opensocrates` | [Historical v1.1.2 upload validated; exact v1.2.1 release and live upload pending](docs/claude-chat-upload-probe.md) |
+| Claude web and Desktop Chat | No OpenSocrates hooks | Standalone skill: `/opensocrates` | [v1.3 archive export validated; cloud activation unvalidated](docs/claude-chat-upload-probe.md) |
 
 The status column uses four distinct levels. Do not read them as
 interchangeable:
@@ -77,7 +79,7 @@ runtime. OpenSocrates fails open if a hook or selector is unavailable.
 Keep three Claude provenance states separate: the installer-managed local
 plugin, a standalone ZIP manually uploaded to Chat, and any pre-existing
 synced/custom skill. Local plugin status cannot prove or update either Cloud
-state. The currently recorded local plugin version is 1.2.1, while the
+state. Historical records report local plugin version 1.2.1, while the
 pre-existing synced/custom observation is 1.1.2; neither is evidence that an
 exact v1.2.1 standalone release ZIP was uploaded.
 
@@ -110,7 +112,7 @@ before registering an owner-marked managed marketplace.
 ### Install every ready host
 
 ```bash
-npx --yes opensocrates@1.2.1 install --host all
+npx --yes opensocrates@1.3.0 install --host all
 ```
 
 The all-host path detects supported, authenticated host CLIs, completes every
@@ -122,9 +124,9 @@ registration.
 Use the same host value for the complete lifecycle:
 
 ```bash
-npx --yes opensocrates@1.2.1 status --host all
-npx --yes opensocrates@1.2.1 update --host all
-npx --yes opensocrates@1.2.1 remove --host all
+npx --yes opensocrates@1.3.0 status --host all
+npx --yes opensocrates@1.3.0 update --host all
+npx --yes opensocrates@1.3.0 remove --host all
 ```
 
 ### Remove a registration, purge owned payloads, or reset Codex trust
@@ -139,11 +141,11 @@ result as a complete uninstall.
 After closing active hosts, request the explicit owned-payload purge:
 
 ```bash
-npx --yes opensocrates@1.2.1 remove --host all --purge
-# One host: npx --yes opensocrates@1.2.1 remove --host claude --purge
+npx --yes opensocrates@1.3.0 remove --host all --purge
+# One host: npx --yes opensocrates@1.3.0 remove --host claude --purge
 # Also reset only OpenSocrates Codex hook trust:
-npx --yes opensocrates@1.2.1 remove --host all --purge --reset-trust
-# Codex only: npx --yes opensocrates@1.2.1 remove --host codex --purge --reset-trust
+npx --yes opensocrates@1.3.0 remove --host all --purge --reset-trust
+# Codex only: npx --yes opensocrates@1.3.0 remove --host codex --purge --reset-trust
 ```
 
 Purge verifies canonical paths, the exact `opensocrates@opensocrates` package
@@ -200,13 +202,13 @@ automatic update, and per-host drift.
 Codex remains the default host for backward compatibility:
 
 ```bash
-npx --yes opensocrates@1.2.1 install
-# Equivalent: npx --yes opensocrates@1.2.1 install --host codex
-npx --yes opensocrates@1.2.1 install --host antigravity
-npx --yes opensocrates@1.2.1 install --host claude
-npx --yes opensocrates@1.2.1 install --host cursor
-npx --yes opensocrates@1.2.1 install --host grok
-npx --yes opensocrates@1.2.1 install --host opencode
+npx --yes opensocrates@1.3.0 install
+# Equivalent: npx --yes opensocrates@1.3.0 install --host codex
+npx --yes opensocrates@1.3.0 install --host antigravity
+npx --yes opensocrates@1.3.0 install --host claude
+npx --yes opensocrates@1.3.0 install --host cursor
+npx --yes opensocrates@1.3.0 install --host grok
+npx --yes opensocrates@1.3.0 install --host opencode
 ```
 
 Antigravity installs a content-only plugin at
@@ -246,9 +248,9 @@ commands. The privacy-safe 2.1.226 fixture is under
 ### Opt-in automatic updates
 
 ```bash
-npx --yes opensocrates@1.2.1 auto-update enable --host all
-npx --yes opensocrates@1.2.1 auto-update status
-npx --yes opensocrates@1.2.1 auto-update disable
+npx --yes opensocrates@1.3.0 auto-update enable --host all
+npx --yes opensocrates@1.3.0 auto-update status
+npx --yes opensocrates@1.3.0 auto-update disable
 ```
 
 Automatic updates are disabled until explicitly enabled. The macOS LaunchAgent
@@ -273,15 +275,12 @@ workspace paths. `auto-update disable` unloads and removes the LaunchAgent;
 These surfaces can use a separately uploaded standalone skill but do not run
 the local plugin hooks.
 
-Exact v1.2.1 Chat release artifact: **unavailable; live upload pending.**
+Chat standalone export: **archive contract validated; live activation unvalidated.**
 
-As of the 2026-08-15 audit, GitHub has no public `v1.2.1` tag or release, so
-`opensocrates-1.2.1-claude-chat-skills.zip`, its checksum, and its release
-commit cannot be verified or uploaded. Do not substitute a source-built
-candidate or the Claude Code/Cowork plugin archive. The existing v1.1.2 live
-receipt is historical evidence only, and the existing synced/custom skill was
-left unchanged. See the [version-bound evidence and flip
-conditions](docs/claude-chat-upload-probe.md).
+The complete v1.3.0 standalone ZIP ships with all 48 methods in EN/KO. Its
+layout/reference integrity and public release provenance are separate from an
+account-level upload. Older custom/synced skills are not automatically upgraded
+by the local installer. See [version-bound support evidence](docs/claude-chat-upload-probe.md).
 
 When the exact release is published, verify its checksum before using Claude's
 **Customize → Skills → Upload skill** UI. The ZIP must contain one top-level
@@ -297,28 +296,27 @@ absent because Chat does not execute the packaged hooks. See Anthropic's
 The same host option works without the npm registry by using the published tag:
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host all
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host antigravity
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host claude
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host codex
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host cursor
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host grok
-npx --yes github:ParkerHwang/OpenSocrates#v1.2.1 install --host opencode
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host all
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host antigravity
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host claude
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host cursor
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host grok
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host opencode
 ```
 
 ### Manual release verification
 
 After publication, download `opensocrates.mjs`, the host package, and its
 `.sha256` file from the
-[v1.2.1 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.2.1).
-That release was unavailable at the 2026-08-15 audit. The following is the
-verification command to use only after all named assets exist; for Claude:
+[v1.3.0 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.0).
+Verify the named published assets before installation; for Claude:
 
 ```bash
-shasum -a 256 -c opensocrates-1.2.1-claude-plugin.zip.sha256
+shasum -a 256 -c opensocrates-1.3.0-claude-plugin.zip.sha256
 node opensocrates.mjs install --host claude \
-  --asset opensocrates-1.2.1-claude-plugin.zip \
-  --checksum opensocrates-1.2.1-claude-plugin.zip.sha256
+  --asset opensocrates-1.3.0-claude-plugin.zip \
+  --checksum opensocrates-1.3.0-claude-plugin.zip.sha256
 ```
 
 Replace `claude` with `antigravity`, `codex`, `cursor`, `grok`, or `opencode` for the matching package.
@@ -333,7 +331,7 @@ what is installed, remove it explicitly:
 ```bash
 claude plugin uninstall opensocrates@OpenSocrates --scope user
 claude plugin marketplace remove OpenSocrates --scope user
-npx --yes opensocrates@1.2.1 install --host claude
+npx --yes opensocrates@1.3.0 install --host claude
 ```
 
 Updating a managed v1.1.0 Claude installation replaces the complete package
@@ -347,15 +345,14 @@ needs judgment, interpretation, diagnosis, explanation, planning, evidence
 reconciliation, or another structured reasoning process. On Claude/Codex
 native-runtime surfaces it:
 
-1. starts a fresh, non-persistent selector in the current host;
-2. chooses from the authored 48-system catalog;
-3. writes the complete selected content to an owner-only Markdown file;
-4. adds a bounded hidden context message that leads with teacher questions to
-   settle, then each method ID, content revision, and, when they fit, its exact
-   `Do not use when` and `Stop conditions`; and
-5. requires the active task to read the complete file before applying the
-   method and to end a grounded response with an exact audit line such as
-   `OpenSocrates grounding: triangulation@1`.
+1. emits lightweight native discovery guidance without choosing an initial method;
+2. lets the active agent retrieve eligible complete methods when a judgment changes;
+3. preserves goals, permissions, evidence/stop requirements and requested output;
+4. offers Guided locale-specific presentation rules without rewriting protected content; and
+5. distinguishes delivery and agent-reported availability from actual application.
+
+Use the installed launcher with `decision codex --stream` for a persistent volatile
+lookup session; a new process or context must not inherit an old read assertion.
 
 On OpenCode, the dependency-free stable hook instead selects locally and
 injects one complete authored procedure directly into the same message turn.
@@ -371,11 +368,14 @@ using the rest as a check. These content-only paths make no OpenSocrates hook
 delivery claim.
 
 After installing for Codex, open one interactive Codex session and approve the
-OpenSocrates hooks before relying on automatic selection. Until that one-time
+OpenSocrates hooks before relying on native discovery guidance. Until that one-time
 approval, non-interactive surfaces such as `codex exec` may silently continue
 without running the untrusted hooks.
 
-Claude hook surfaces prefer an owner-only `.opensocrates` artifact area inside
+### Retained legacy receipt adapter
+
+The following describes the compatibility selector path, not the v1.3 default
+discovery-only hook. In that legacy path, Claude hook surfaces prefer an owner-only `.opensocrates` artifact area inside
 the current workspace so Claude can read the selected content without an extra
 directory permission. Its self-contained `.gitignore` keeps the area out of
 `git status`; files are removed on turn/session cleanup. If the workspace is
@@ -566,3 +566,5 @@ license notice are preserved.
 
 OpenSocrates is an independent open-source project and is not affiliated with
 or endorsed by Anthropic or OpenAI.
+
+Chat standalone export: **archive contract validated; live activation unvalidated.**

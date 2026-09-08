@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.3.0] - 2026-09-08
+
+- Add agent-directed method retrieval at decision points within an existing turn,
+  reusing canonical content and the deterministic router. Mechanical work can
+  pass through without loading a method. Delivery, reported availability and
+  application evidence remain distinct.
+- Generate separate English/Korean canonical references for all 48 methods and
+  six hosts. Codex discovery now exposes the controller, rigor and trace; previous
+  per-method invocations migrate through the controller with unchanged Method IDs.
+- Prevent weighted-primary and fallback routing from bypassing contraindications;
+  reject malformed feature lists without silently choosing a fallback.
+- Preserve authored procedure bodies and prior rejected experimental baselines.
+  No Compact, method-variant or language rewrite is promoted.
+- Add conservative presentation-only EN/KO Guided rules and full visible-output
+  measurements while preserving required cards, evidence, stop conditions and user formats.
+- Avoid first-use hook storage initialization, retain safe existing artifact cleanup,
+  and provide a persistent packaged decision stream.
+- Separate Chat export validation from cloud activation and postpublication provenance.
+  Release evidence and remaining host limits are recorded in
+  [the release record](docs/v1.3.0-recovery/PROGRESS.md).
+
+
 All notable changes to OpenSocrates are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
@@ -467,3 +489,5 @@ All notable changes to OpenSocrates are documented here. This project follows
 [1.1.5]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.4...v1.1.5
 [1.2.0]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.1.5...v1.2.0
 [1.2.1]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.2.0...v1.2.1
+
+[1.3.0]: https://github.com/ParkerHwang/OpenSocrates/compare/v1.2.1...v1.3.0

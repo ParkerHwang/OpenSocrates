@@ -1,6 +1,6 @@
 {
   "schema": "opensocrates.routing-policy/1.0.0",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "global_negative_features": {
     "mechanical": 3
   },
@@ -190,7 +190,9 @@
         "explicit_rules": 1
       },
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "morphological-analysis"
     },
     "socratic-questioning": {
@@ -236,7 +238,9 @@
         "feedback_delay": 2
       },
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "logic-tree"
     },
     "pyramid-principle": {
@@ -260,7 +264,9 @@
         "explicit_rules": 2
       },
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "value-of-information"
     },
     "deduction": {
@@ -282,7 +288,9 @@
       },
       "negative_features": {},
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "premortem-analysis"
     },
     "induction": {
@@ -294,7 +302,9 @@
         "causal_question": 2
       },
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "evidence-hierarchy"
     },
     "bayesian-updating": {
@@ -305,7 +315,9 @@
       },
       "negative_features": {},
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "abduction"
     },
     "evidence-hierarchy": {
@@ -341,7 +353,9 @@
       },
       "negative_features": {},
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "evidence-hierarchy"
     },
     "causal-reasoning": {
@@ -351,7 +365,9 @@
       },
       "negative_features": {},
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "falsificationism"
     },
     "root-cause-analysis": {
@@ -363,7 +379,9 @@
         "macro_environment": 1
       },
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "failure-mode-effects-analysis"
     },
     "systems-thinking": {
@@ -427,7 +445,9 @@
       },
       "negative_features": {},
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "reflective-equilibrium"
     },
     "design-thinking": {
@@ -448,7 +468,8 @@
       "negative_features": {},
       "minimum_score": 5,
       "contraindications": [
-        "safety_critical_validation"
+        "safety_critical_validation",
+        "binding_rule_without_discretion"
       ],
       "preferred_complement": "trade-off-analysis"
     },
@@ -460,7 +481,8 @@
       "negative_features": {},
       "minimum_score": 5,
       "contraindications": [
-        "no_coherent_dimensions"
+        "no_coherent_dimensions",
+        "binding_rule_without_discretion"
       ],
       "preferred_complement": "first-principles"
     },
@@ -531,7 +553,10 @@
         "duties_rights": 2
       },
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion",
+        "single_feasible_option"
+      ],
       "preferred_complement": "sensitivity-analysis"
     },
     "decision-tree-analysis": {
@@ -542,7 +567,9 @@
       },
       "negative_features": {},
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "scenario-planning"
     },
     "trade-off-analysis": {
@@ -556,7 +583,8 @@
       },
       "minimum_score": 4,
       "contraindications": [
-        "binding_rule_without_discretion"
+        "binding_rule_without_discretion",
+        "single_feasible_option"
       ],
       "preferred_complement": "sensitivity-analysis"
     },
@@ -570,7 +598,9 @@
         "irreversible_choice": 1
       },
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "bayesian-updating"
     },
     "reference-class-forecasting": {
@@ -593,7 +623,9 @@
       },
       "negative_features": {},
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "scenario-planning"
     },
     "scenario-planning": {
@@ -627,7 +659,10 @@
       },
       "negative_features": {},
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion",
+        "irreversible_choice"
+      ],
       "preferred_complement": "lean-startup"
     },
     "double-loop-learning": {
@@ -637,7 +672,9 @@
       },
       "negative_features": {},
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "root-cause-analysis"
     },
     "lean-startup": {
@@ -648,7 +685,8 @@
       "negative_features": {},
       "minimum_score": 5,
       "contraindications": [
-        "safety_critical_validation"
+        "safety_critical_validation",
+        "binding_rule_without_discretion"
       ],
       "preferred_complement": "jobs-to-be-done"
     },
@@ -661,7 +699,9 @@
         "diagnose": 1
       },
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "root-cause-analysis"
     },
     "cynefin-framework": {
@@ -672,7 +712,9 @@
       },
       "negative_features": {},
       "minimum_score": 5,
-      "contraindications": [],
+      "contraindications": [
+        "binding_rule_without_discretion"
+      ],
       "preferred_complement": "scenario-planning"
     },
     "game-theory": {
@@ -683,7 +725,8 @@
       "negative_features": {},
       "minimum_score": 5,
       "contraindications": [
-        "no_meaningful_interdependence"
+        "no_meaningful_interdependence",
+        "binding_rule_without_discretion"
       ],
       "preferred_complement": "stakeholder-analysis"
     },
@@ -761,4 +804,3 @@
     "stakeholder-analysis": "game-theory"
   }
 }
-
