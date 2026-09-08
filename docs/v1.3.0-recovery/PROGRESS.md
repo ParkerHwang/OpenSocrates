@@ -1,138 +1,138 @@
-# OpenSocrates v1.3.0 release progress
+# OpenSocrates v1.3.0 release qualification and handoff
 
-## Current scope and authorization
+## Release disposition
 
-The maintainer has authorized completion and distribution of v1.3.0 through the
-normal PR, CI, merge, tagged GitHub release and npm workflow. This supersedes the
-earlier local-only boundary. A separate local recovery branch preserves the
-original development history; this public branch starts from released main and
-contains reviewed source plus public-safe evidence only.
+Product source `32d0322c73c8c116b961ddb3a68a75473c715466` is accepted for the
+scoped v1.3.0 release described below. Its local native `make release-check` and
+all five required GitHub PR checks passed. The final evidence/documentation head
+must pass fresh required checks before normal protected merge. This snapshot
+precedes publication; exact published GitHub/npm identity and byte verification
+will be recorded in [PR88](https://github.com/ParkerHwang/OpenSocrates/pull/88)
+and the release workflow's public verification artifact. No publication is
+inferred from this qualification snapshot.
 
-The current stable scope is decision-point method retrieval, presentation-only
-Response Policy, EN/KO Guided Natural Output, visible-length measurement, and
-truthful host capability reporting. The presentation policy must preserve all
-required evidence, stop conditions, public outputs, protected values and user
-formats. No universal word/ground-count caps, procedure rewriting, automatic
-humanizer/detector claims, Compact promotion, new hosts/locales, or research
-backend are included. This is a current maintainer-delegated scope decision,
-not a claim of historical approval.
+Tracking: [issue87](https://github.com/ParkerHwang/OpenSocrates/issues/87).
+The maintainer authorized PR, protected merge, immutable tagged release and npm
+trusted publishing. No approval gate, source assertion or existing release may
+be bypassed. A separate local recovery workspace preserves original development
+history and invalid/unsuccessful historical trials; its private history was not
+pushed. All five original worktrees' branches/HEADs and794 initially recorded
+changed files remain unchanged. The omitted prior comparison-site directory had
+no initial hash baseline; preservation is not a complete historical disk snapshot.
 
-## Current release state
+## Accepted product scope and validation
 
-Tracked work: [issue87](https://github.com/ParkerHwang/OpenSocrates/issues/87) and
-[draft PR88](https://github.com/ParkerHwang/OpenSocrates/pull/88). Publication is
-not yet complete. Last native-validated product source:
-`32d0322c73c8c116b961ddb3a68a75473c715466`; `make release-check` PASS on
-Apple-silicon macOS. Latest local Codex ZIP:
+The stable scope is decision-point retrieval, presentation-only Response Policy,
+EN/KO Guided prose, complete visible-output measurement and truthful host support.
+All48 methods and96 authored EN/KO procedure bodies retain the v1.2.1 wording.
+No Compact/procedure rewrite, new locale/host, research backend, detector/humanizer,
+universal length cap or automated semantic validator is promoted.
+
+Claude/Codex use the existing native selection command first when runtime/shell
+are available; an empty eligible set is valid. Genuine failure permits complete
+reference fallback with all known constraints intact. Other hosts keep their
+existing delivery model. The example has no arbitrary explicit method default.
+Ineligible/retired methods cannot export specialized output requirements to other
+judgments. The public-output pattern keeps each question's conclusion, missing
+inputs and reopening conditions separate while respecting exact user formats.
+These are guidance and declared-feature selection, not guaranteed model compliance.
+
+The native build validates all six packages and the complete Chat ZIP, exact
+canonical references, policy assets, safe launcher/storage boundaries, cleanup,
+installer behavior and bounded timing. Response-policy/guide tests10/10 and
+routing tests24/24 passed; source formatting/lint/docs passed. Six credential-free
+EN/KO packaged CLI cases separately confirm RCF and Bayesian prerequisite
+exclusions plus an eligible evidence-hierarchy judgment.
+
+Local native Codex archive:
 `sha256:f51be7c9ce4df606e8df98ed4446377e490d2894c8efaa80ed87e6888044031e`.
-Normal isolated update succeeded and installed manifest bytes equal the validated
-package. Seven hooks remain enabled and trusted. An added direct compiled-catalog
-assertion passes with the other23 decision tests. Source formatting/lint/docs pass.
+Normal isolated update matched its manifest. Browser login used separately owned
+OS-home/profile/temp roots without credential copies. Seven native hook commands
+were normally approved and their unchanged hashes verified trusted/enabled.
+The release job builds and verifies its own public bytes; its archive hash need
+not equal this local native build.
 
-A separate recovery workspace preserves the full original history, failed trials,
-and worktree-preservation evidence. Private paths and that history are excluded
-from this public branch. The public record contains synthetic tasks/artifacts,
-sanitized observations, exact source/package identities, and no credentials.
+## Complete behavioral record and failed attempts
 
-## Observations and disposition
+All39 actor invocations use synthetic materials and gpt-5.6-luna/max. Every
+300-second deadline remains a deadline even if a correct file already existed.
+Do not pool different protocols/sources into a comparative success estimate.
 
-All studies below use synthetic tasks and gpt-5.6-luna/max. A correct file does
-not substitute for a missing completed final turn. Every deadline remains recorded.
+| Study | Source | Final delivery | Primary300 result and disposition |
+| --- | --- | --- | --- |
+| Initial24 |134c8ac|20/24|4 deadlines; U/G upfront controls16/16, installedJ4/8.|
+| Follow-up8 |4ea8542|5/8|3 deadlines; G4/4, J1/4.|
+| Diagnostic1 |4ea8542|0/1|300 deadline; no completed turn, no sole-cause inference.|
+| Qualification3 |95a96a1|2/3|ChangedKO224.25s, forecastEN232.38s; forecastKO300 deadline.|
+| Finite observation1/P09 |8109176|1/1 at369.15s|300 deadline retained; future-condition fidelity failure.|
+| Scope verification1/P10 |2339d8a|1/1 at199.58s|300 completion; blind pass later revised on an explicitly nonblind challenge for the restrictive joint gate.|
+| Native verification1/P11 |32d0322|1/1 at384.58s|300 deadline retained; exact-source artifact reassessment passes, naturalness2.|
 
-| Study | Source | Completed | Deadline | Evidence boundary |
-| --- | --- | ---: | ---: | --- |
-| Initial24 |134c8ac|20/24|4/24|U/G upfront controls16/16; installedJ4/8. Controls are transformed inputs, not live1.2.1. Inherited environment and early audit visibility limit causal claims.|
-| Follow-up8 |4ea8542|5/8|3/8|Default-deny environment and genuinely delayed audit; G4/4, J1/4. Optional premium support clarified.|
-| Diagnostic1 |4ea8542|0/1|1/1|Full optional control references and unconditional Strict fragment observed; no final turn at300. No sole-cause inference.|
-| Qualification3 |95a96a1|2/3|1/3|Strict instructions conditioned on active/policy-required Strict; multi_agent explicitly disabled. ChangedKO224.25s and forecastEN232.38s complete; forecastKO remains300s failure.|
-| Prospective finite observation1 |8109176|1/1 at369.15s|1/1 at300s|Final turn complete; P09 future-condition fidelity failure independently confirmed.|
+[Outcome index](../../evals/v1.3/release-guided-20260908/outcome-index.json) retains
+whole public outputs/artifacts, metrics, usage when available and source/package
+identity. Protocols and hashes were frozen before each observation. Initial U/G
+controls are transformed upfront content, not live1.2.1. The initial environment
+and early audit visibility limit causal inference. Later runs use default-deny
+environments, delayed audit facts, explicit optional-premium wording and disabled
+multi-agent tooling. These differences are declared, not silently treated as
+identical inputs. Later600 ceilings were prospectively authorized finite-completion
+observations; the original300 study budget is not a published host latency SLO.
+No repeat-until-pass or prior-failure relabeling is used.
 
-The Strict repair preserves explicit/policy-required Strict and all authored
-procedures. The latest Bayesian routing repair carries already-authored prior
-basis and likelihood-direction prerequisites into all catalog projections. Prior
-KO artifacts did not prove invalid Bayesian application; the metadata gap was
-confirmed independently. These are scoped correctness repairs, not proven sole
-causes of latency. All96 authored EN/KO bodies remain unchanged from main.
+Repairs address distinct observed/code-confirmed issues: missing completion
+boundaries; optional Strict text without an applicability guard; Bayesian metadata
+missing already-authored prerequisites; question-scope ambiguity; and file-first
+routing bypassing the available structured selection path. All procedure bodies
+remain unchanged. No single causal explanation for model latency is established.
 
-The finite observation does not relax or relabel any300-second study result.
-The maintainer-delegated release criterion distinguishes that lab budget from a
-published host latency SLO. A correct later final turn may support only finite
-completion with an explicit slow Luna/max limitation. No retry-until-pass is
-permitted; the protocol and freeze are in
-[finite-observation](../../evals/v1.3/release-guided-20260908/finite-observation/PROTOCOL.md).
+P11 observed an actual supported native invocation selecting critical-thinking
+and complete critical-thinking/Socratic references. The actor's exact closed
+feature list could not be extracted and no request file remained: semantic
+classification is unverified. Controlled typed CLI tests are separate evidence.
+Native selection, complete delivery, claimed use and actual application remain
+distinct; applied is unverified. This is bounded observed behavior, not every
+reasoning transition, all-method coverage or a compliance guarantee.
 
-Independent fresh Luna/max EN/KO reviews cover16 blinded, cross-iteration artifact
-packets. All16 pass artifact/fidelity/authority-content/format checks; the known
-KO deadline fails final-delivery. English naturalness includes scores2/3 for
-repetition/structure. They share a model family with the actor and are not human
-gold. P09, reviewed separately, passes current decision/artifact/authority/format/final delivery but fails fidelity: useful future evidence and probability-model prerequisites became universal action prerequisites. Naturalness3. A separate Claude Sonnet5Max review completed with similar content findings and some naturalness3 scores, but ran a visible echo no-op despite the no-tools instruction. It is supplementary advisory evidence; external skill activation is not independently proven absent. This evidence does not
-establish naturalness, cost, latency, or full-catalog superiority.
+## Independent review and adjudication
+
+Initial fresh Luna/max EN/KO reviewers assessed16 blinded cross-iteration artifact
+packets. Those packets used condensed forecast-source summaries, so they are not
+exact-input source-fidelity verification. The known missing KO final delivery
+remained a failure. They share the actor's model family and are not human gold.
+
+P09's unsupported universal future prerequisites remain a failure. P10's original
+blind pass and separate nonblind adversarial revision are both retained, not
+counted as independent votes. P11 was first reviewed by the EN reviewer without
+the KO challenge history; its summary-based packet omitted actual source details.
+The corrected packet supplies exact whole pilot.txt bytes, verified against the
+frozen fixture. Same-artifact corrected-input reassessment passes artifact,
+fidelity, authority-content, format and final delivery. It is not a fresh blind
+review. The first source-incomplete judgment remains, with the input defect named.
+
+P11 separates the questions and scopes missing base-rate consequences to numeric
+estimation in its question table and row qualification. A broad evidence-section
+heading can still read ambiguously; this is retained as an editorial limitation,
+not promoted to a guarantee that all future advice is perfect. Naturalness remains2
+for repetition/structure. No demonstrated quality, naturalness, token-cost or
+latency improvement is claimed.
+
+Claude Sonnet5Max supplied a supplementary independent-family16-packet review,
+but ran an echo no-op despite the no-tools instruction. An intended small P10
+follow-up accidentally repeated old packets due to prompt preparation; it was
+interrupted and supplies no P10 judgment. No further Claude calls or account skill
+changes were made. All review inputs/results and these failures are preserved in
+[judging](../../evals/v1.3/release-guided-20260908/judging/README.md).
 
 ## Support and publication boundaries
 
-Claude Chat is export/layout/reference-integrity validated; current cloud upload
-and activation are unvalidated. No active account skill was replaced. Codex normal
-installed discovery and complete reference deliveries are observed, while actual
-method application remains unverified. Other host live behavior, Desktop GUI,
-separate-Mac installation, signing and notarization are not inferred from tests.
+Native runtimes target Apple-silicon macOS. Claude Chat is export/layout/reference
+integrity validated; current cloud upload/activation is unvalidated. No active
+account skill was replaced. Other host live behavior, Desktop GUI, a separate Mac,
+signing/notarization and verified method application are not inferred from tests.
 
-The remaining sequence is to assess the single finite observation and independent
-judgments, finish current-head required CI, merge through the protected PR,
-publish the exact main-ancestor tag and immutable assets, explicitly dispatch
-trusted npm publishing on that tag, and verify public distribution bytes. The
-first PR CI handoff-label failure was corrected without relaxing checks; all five
-checks passed on the preceding public head. Latest source and evidence require
-fresh current-head CI. No existing tag/release/npm version may be overwritten.
-
-## Question-scope repair and affected verification
-
-The observed P09 fidelity defect is retained. Shared EN/KO decision guidance now
-keeps missing inputs, stops and reopening criteria attached to their own question,
-requires an evidenced dependency before transferring a prerequisite, and separates
-useful next evidence from strictly necessary evidence. All six generated packages
-carry the exact guide bytes;10 response-policy/contract checks pass. No authored
-procedure or presentation-policy body changed in this repair.
-
-The release owner requires ONE postrepair KO forecast observation with the same
-fixture/model/settings, the same primary300 marker and separate600 ceiling,
-followed by independent P10 fidelity review. This is a newly justified affected
-check for the observed material defect, not repeat-until-pass or a blanket claim
-of model compliance. The repaired package passed the native release gate, was normally updated in the isolated profile, and the affected run is frozen and in progress under scope-verification/.
-Publication remains pending this affected check and current-head release gates.
-
-## Affected P10 observation and open adjudication
-
-Source2339's single affected KO invocation completed199.58s, within300, with
-requested artifact and final turn. Complete EH/RCF/VOI references were observed;
-actual application is still unverified. Independent blind Luna initially passed
-all fields/naturalness4. A separately recorded adversarial challenge revised
-future-guidance fidelity to false because the closing conjunction makes a
-reference-class distribution necessary for reopening both launch and numeric
-forecast review. Preserve both judgments; the challenge is not a fresh blind vote.
-The current hold, facts, authority and completion are correct. Materiality and
-controller/native-vs-file delivery implications remain under review. No new actor
-or code change is started pending that disposition. No publication yet.
-
-## Native-first boundary repair
-
-The final bounded repair uses the existing native selection path first for
-Claude/Codex with a usable runtime/shell; known absence features remain in requests,
-empty eligible selection is valid, and fallback retains all contraindications.
-Other hosts retain file delivery. The example no longer requests an arbitrary
-method by default. A concrete public-output pattern keeps each question's
-conclusion, missing inputs and reopening evidence separate without overriding
-user formats. Ineligible/retired methods cannot export their specialized output
-requirements to another judgment. All96 authored bodies are unchanged.
-
-This improves eligibility/provenance but adds no freeform semantic validator or
-new backend. One affected actor observation will assess actual typed selection
-and final artifact fidelity separately after native validation; prior failures
-and the disputed/revised P10 judgment remain. No additional Claude calls.
-
-Native32d0322 release gate passed82.42s. Normal isolated update matches the
-validated manifest. Six credential-free packaged CLI contracts pass: EN/KO known
-missing reference classes and Bayesian prerequisites exclude those methods, while
-a separate evidence-hierarchy request remains eligible. These controlled inputs
-do not prove actor classification. The single native-verification actor is now
-frozen and running with the same300/600 boundaries; no private invocation is
-pre-taught. It captures only scoped closed-feature observations and public artifacts.
+The remaining release sequence is fresh current-head CI, normal protected PR merge,
+an exact main-ancestor version tag, immutable GitHub assets, public byte validation,
+explicit npm workflow dispatch on that tag, and independent npm/public installer
+verification. Existing versions/assets must not be overwritten. Publication
+receipts belong to the public PR handoff and Actions artifact, independently of
+cloud activation or answer-quality claims.

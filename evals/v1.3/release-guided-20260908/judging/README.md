@@ -27,3 +27,10 @@ revised future-guidance fidelity to false; both are preserved, not combined as
 independent votes. An intended small Claude P10 follow-up accidentally repeated
 the prior16 packets due to a header-extraction bug. It was interrupted after the
 bug was detected; no completed P10 Claude judgment exists and it will not be retried.
+
+P11's initial source-summary review failed factual fidelity on omitted source
+details. The corrected packet includes exact complete pilot.txt and its verified
+fixture hash. Corrected-input reassessment passes all required content/delivery
+fields; naturalness remains2. This reassessment is not a fresh blind vote. Earlier
+forecast packets used condensed source summaries and cannot establish exact-input
+fidelity. All original results, corrections and input limitations are preserved.

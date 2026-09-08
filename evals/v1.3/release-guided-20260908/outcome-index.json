@@ -1,6 +1,8 @@
 {
-  "scope": "Complete record inventory, not pooled comparative inference. Different source/configuration/task protocols stay separate. Metrics cover whole public artifacts; application and quality are not inferred.",
-  "record_count": 36,
+  "scope": "Complete task-record inventory, not pooled comparative inference. Different source/configuration/task protocols stay separate. Whole public artifact metrics do not infer quality or application.",
+  "task_record_count": 38,
+  "diagnostic_record": "diagnostic/result.json",
+  "total_actor_invocations_including_diagnostic": 39,
   "records": [
     {
       "study": "initial",
@@ -1400,8 +1402,82 @@
           }
         }
       }
+    },
+    {
+      "study": "scope-verification",
+      "record": "scope-verification/forecast-ko-J.json",
+      "id": "forecast-ko-J",
+      "source_commit": "2339d8a9cc4283c00ee6c4a690566623430214dd",
+      "archive_sha256": "sha256:b96602080355130a6e29455e70ec3a2bb5546a16d264b8d69802f4638e42e2eb",
+      "status": "completed",
+      "primary_300_result": "completed",
+      "turn_completed_observed": true,
+      "elapsed_seconds": 199.58,
+      "usage": {
+        "input_tokens": 215961,
+        "cached_input_tokens": 173056,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 9015,
+        "reasoning_output_tokens": 5270
+      },
+      "visible_metrics": {
+        "final": {
+          "unicode_scalars": 417,
+          "utf8_bytes": 609,
+          "nonblank_lines": 3,
+          "whitespace_units": 39,
+          "unit_kind": "eojeol_like",
+          "scope": "complete_public_artifact_before_path_redaction"
+        },
+        "artifacts": {
+          "recommendation.md": {
+            "unicode_scalars": 2978,
+            "utf8_bytes": 6653,
+            "nonblank_lines": 42,
+            "whitespace_units": 686,
+            "unit_kind": "eojeol_like",
+            "scope": "complete_public_artifact_before_path_redaction"
+          }
+        }
+      }
+    },
+    {
+      "study": "native-verification",
+      "record": "native-verification/forecast-ko-J.json",
+      "id": "forecast-ko-J",
+      "source_commit": "32d0322c73c8c116b961ddb3a68a75473c715466",
+      "archive_sha256": "sha256:f51be7c9ce4df606e8df98ed4446377e490d2894c8efaa80ed87e6888044031e",
+      "status": "completed",
+      "primary_300_result": "deadline",
+      "turn_completed_observed": true,
+      "elapsed_seconds": 384.58,
+      "usage": {
+        "input_tokens": 693672,
+        "cached_input_tokens": 598016,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 18757,
+        "reasoning_output_tokens": 10993
+      },
+      "visible_metrics": {
+        "final": {
+          "unicode_scalars": 360,
+          "utf8_bytes": 519,
+          "nonblank_lines": 3,
+          "whitespace_units": 27,
+          "unit_kind": "eojeol_like",
+          "scope": "complete_public_artifact_before_path_redaction"
+        },
+        "artifacts": {
+          "recommendation.md": {
+            "unicode_scalars": 4120,
+            "utf8_bytes": 9298,
+            "nonblank_lines": 56,
+            "whitespace_units": 1014,
+            "unit_kind": "eojeol_like",
+            "scope": "complete_public_artifact_before_path_redaction"
+          }
+        }
+      }
     }
-  ],
-  "diagnostic_record": "diagnostic/result.json",
-  "total_invocations_including_diagnostic": 37
+  ]
 }
