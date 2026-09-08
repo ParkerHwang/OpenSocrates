@@ -38,15 +38,17 @@ def run_decision(stdin: TextIO, stdout: TextIO, *, stream: bool = False) -> int:
         stdout.write(json.dumps(DecisionSession._failure("canonical_content_unavailable")) + "\n")
         return 0
     while True:
-        line = stdin.readline(MAX_REQUEST_CHARS + 1)
-        if not line:
+        payload = (
+            stdin.readline(MAX_REQUEST_CHARS + 1) if stream else stdin.read(MAX_REQUEST_CHARS + 1)
+        )
+        if not payload:
             return 0
-        if len(line) > MAX_REQUEST_CHARS:
+        if len(payload) > MAX_REQUEST_CHARS:
             stdout.write(json.dumps(session._failure("request_too_large")) + "\n")
             stdout.flush()
             return 0
         try:
-            request = json.loads(line)
+            request = json.loads(payload)
             response = session.handle(request)
         except Exception:
             response = session._failure("decision_unavailable")

@@ -35,8 +35,25 @@ jobs:
       - uses: astral-sh/setup-uv@v9.0.0
       - name: Bootstrap locked Python test environment
         run: make bootstrap
-      - name: Verify immutable release target
+      - name: Verify exact release target
         run: .venv/bin/python tools/release_identity.py
+      - name: Require immutable GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < VERSION)"
+          immutable="$(
+            gh api \
+              -H "X-GitHub-Api-Version: 2026-03-10" \
+              "repos/${GITHUB_REPOSITORY}/releases/tags/v${version}" \
+              --jq '.immutable'
+          )"
+          if [[ "${immutable}" != "true" ]]; then
+            echo "Refusing npm publication: the matching GitHub release is not immutable." >&2
+            exit 1
+          fi
       - name: Install package metadata
         run: npm ci --ignore-scripts
       - name: Validate package and installer

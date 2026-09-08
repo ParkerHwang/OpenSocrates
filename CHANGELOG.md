@@ -27,6 +27,21 @@ All notable changes to OpenSocrates are documented here. This project follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Read one bounded JSON document through EOF in one-shot `decision` mode, so the
+  documented pretty-printed packaged request reaches the native selector once.
+  `--stream` remains newline-delimited JSON, and malformed or oversized input
+  retains the fail-open unavailable result.
+- Require GitHub's platform immutable-release setting before future release
+  publication and verify the published release's `immutable` API field before
+  npm publishing. This is distinct from the existing workflow rule that refuses
+  to overwrite an existing tag or asset set.
+- Reconcile the v1.3.0 Codex evidence table with P11: an in-request native call
+  and complete references were observed, while submit-hook delivery, feature
+  classification, actual application, Desktop GUI, and cloud activation remain
+  separate or unverified.
+
 ## [1.2.1] - 2026-08-16
 
 ### Added

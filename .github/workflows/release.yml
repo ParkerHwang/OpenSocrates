@@ -73,8 +73,25 @@ jobs:
           echo "RELEASE_VERSION=${version}" >> "${GITHUB_ENV}"
           echo "RELEASE_TAG=${tag}" >> "${GITHUB_ENV}"
 
-      - name: Verify immutable release target
+      - name: Verify exact release target
         run: python tools/release_identity.py
+
+      - name: Require GitHub release immutability
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          enabled="$(
+            gh api \
+              -H "X-GitHub-Api-Version: 2026-03-10" \
+              "repos/${GITHUB_REPOSITORY}/immutable-releases" \
+              --jq '.enabled'
+          )"
+          if [[ "${enabled}" != "true" ]]; then
+            echo "GitHub immutable releases must be enabled before publishing a new release." >&2
+            exit 1
+          fi
 
       - name: Bootstrap locked environment
         run: make bootstrap
@@ -161,7 +178,7 @@ jobs:
             "installer/opensocrates.mjs"
           )
           if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
-            echo "Immutable release collision: ${RELEASE_TAG} already exists; refusing overwrite." >&2
+            echo "Release collision: ${RELEASE_TAG} already exists; refusing overwrite." >&2
             exit 1
           fi
           gh release create "${RELEASE_TAG}" "${release_assets[@]}" \

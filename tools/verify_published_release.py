@@ -61,6 +61,8 @@ def verify_public_bytes(
         or not metadata.get("published_at")
     ):
         raise ValueError("release is not the exact published tag")
+    if metadata.get("immutable") is not True:
+        raise ValueError("GitHub immutable release protection is not enabled for this release")
     if not re.fullmatch(r"[0-9a-f]{40}", commit) or tag_commit != commit:
         raise ValueError("published tag source mismatch")
     if len(names) != len(set(names)) or set(names) != expected:
@@ -84,8 +86,12 @@ def verify_public_bytes(
         "tag": f"v{version}",
         "source_commit": commit,
         "public_release_id": metadata.get("id"),
+        "github_release_immutable": True,
         "files": files,
-        "scope": "published bytes equal this run's prevalidated local assets; no cloud activation inference",
+        "scope": (
+            "published bytes equal this run's prevalidated local assets and GitHub protects the "
+            "release assets and tag; no cloud activation inference"
+        ),
     }
 
 
@@ -129,7 +135,7 @@ def main() -> int:
         )
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2) + "\n")
-    print("public release verification: PASS (19 immutable assets and exact tag commit)")
+    print("public release verification: PASS (immutable GitHub release, 19 exact assets and tag)")
     return 0
 
 
