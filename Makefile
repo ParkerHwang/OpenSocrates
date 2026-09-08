@@ -102,6 +102,7 @@ security-scan: generate
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/security_scan.py --root "$(ROOT)" --report build/evidence/security-scan.json
 
 smoke:
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_public_release_verification.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_response_policy.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_chat_archive_integrity.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_release_identity.py

@@ -168,3 +168,15 @@ jobs:
             --verify-tag \
             --title "OpenSocrates ${RELEASE_VERSION}" \
             --notes-file ".github/release-notes/v${RELEASE_VERSION}.md"
+
+      - name: Verify exact published release bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .venv/bin/python tools/verify_published_release.py --repo "${{ github.repository }}" --commit "${{ github.sha }}"
+      - name: Upload postpublication verification
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: public-release-verification-${{ github.run_id }}
+          path: build/evidence/public-release-verified.json
+          if-no-files-found: warn
