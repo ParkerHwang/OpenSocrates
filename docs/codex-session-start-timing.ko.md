@@ -21,7 +21,8 @@ Codex 런타임 빌드에서는 warm-up이 비용을 숨기지 못하도록 첫 
 `version --json` smoke보다 먼저 실행합니다. 최종 릴리스 조립도 최종 패키지 버전
 smoke 전에 `dist/codex`에서 게이트를 다시 실행합니다. 통과 조건은 다음과 같습니다.
 
-- 모든 프로세스가 종료 코드 0과 완전히 빈 stdout/stderr로 끝나야 합니다.
+- 모든 프로세스는 종료 코드 0과 빈 stderr로 끝나야 합니다. startup의 stdout은
+  비어 있어야 하며 compact는 정확한 v1.3 결정 지점 안내 envelope여야 합니다.
 - 각 source 집합의 첫 configured hook과 모든 표본이 설정된 2,000 ms 제한보다
   짧게 끝나야 합니다.
 - 각 source의 nearest-rank p95가 1,000 ms 이하여야 하며 50% 예산 여유를 유지해야
@@ -54,3 +55,10 @@ malformed, source 누락 및 일반 시작 callback은 완전히 빈 출력으�
 이 게이트는 실행한 Apple Silicon Mac에서 해당 빌드 artifact만 뒷받침합니다. 실제
 Codex hook 전달, 서명/notarization, quarantine 동작, clean-machine 설치를 입증하지는
 않습니다.
+
+## v1.3 복원 경계
+
+기본 compact 경로는 상세 방법이나 artifact store 없이 조회 안내만 복원합니다.
+기본 경로는 방법 artifact를 만들지 않습니다. 기존 잔여 파일은 UserPromptSubmit,
+Stop, SessionEnd에서 정리하며 호환 복원 함수는 이전 참조를 복원하기 전에 만료
+검사를 유지합니다. 시간 제한과 p95 기준은 바꾸지 않았습니다.

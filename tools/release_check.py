@@ -29,7 +29,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from claude_chat_evidence import evidence_path, validation_errors
+from claude_chat_evidence import EXPORT_ONLY_SCHEMA, evidence_path, validation_errors
 from measure_codex_hook_timing import PROCESS_MODEL, SESSION_START_SOURCES
 
 SCHEMA = "opensocrates.release-check-evidence/1.0.0"
@@ -49,16 +49,15 @@ OPENCODE_LIVE_PROBE_STATUS = "validated_same_turn_run_and_tui_opencode_1.18.18"
 def _live_host_probe_status(*, opencode_validated: bool) -> dict[str, str]:
     """Per-host live probe status, each host tied to its own recorded evidence."""
 
-    status = {host: "unvalidated" for host in HOSTS}
-    status["grok"] = GROK_LIVE_PROBE_STATUS
-    if opencode_validated:
-        status["opencode"] = OPENCODE_LIVE_PROBE_STATUS
-    return status
+    # Historical Grok/OpenCode probes do not validate the changed v1.3 delivery path.
+    # Their source evidence remains intact, but no current-candidate live parity is claimed.
+    return {host: "unvalidated_current_candidate" for host in HOSTS}
 
 
 EXPECTED_METHOD_COUNT = 48
 LEGACY_CONTENT_BUNDLE = "content/compiled-content.bundle.json"
 REASONING_CONTENT_BUNDLE = "content/compiled-reasoning-content.bundle.json"
+RESPONSE_POLICY_BUNDLE = "content/compiled-response-policy.json"
 RUNTIME_ENTRY = "packaging/pyinstaller/runtime_entry.py"
 RUNTIME_ENTRY_APPROVED_IMPORTS = frozenset({"json", "multiprocessing", "opensocrates", "sys"})
 THIRD_PARTY_NOTICE = "THIRD_PARTY_NOTICES.md"
@@ -912,7 +911,8 @@ def _runtime_build(  # noqa: C901  # Explicit host release build validation.
         or not isinstance(content_assets.get("source"), Mapping)
         or not isinstance(content_assets.get("packaged"), Mapping)
         or content_assets["packaged"].get("status") != "pass"
-        or set(content_assets["source"]) != {LEGACY_CONTENT_BUNDLE, REASONING_CONTENT_BUNDLE}
+        or set(content_assets["source"])
+        != {LEGACY_CONTENT_BUNDLE, REASONING_CONTENT_BUNDLE, RESPONSE_POLICY_BUNDLE}
     ):
         raise ReleaseCheckError("runtime_content_asset_evidence_invalid")
     artifact_path = _resolve(root, artifact)
@@ -1767,12 +1767,88 @@ def _claude_chat_archive_errors(archive: Path) -> set[str]:
     return errors
 
 
+def _claude_chat_member_errors(
+    archive: zipfile.ZipFile, members: list[zipfile.ZipInfo], expected: set[str], stage: Path
+) -> set[str]:
+    errors: set[str] = set()
+    for item in members:
+        relative = item.filename.removeprefix("opensocrates/")
+        if relative not in expected or item.filename != "opensocrates/" + relative:
+            continue
+        mode = item.external_attr >> 16
+        if stat.S_IFMT(mode) != stat.S_IFREG:
+            errors.add("claude_chat_archive_special_member")
+            continue
+        path = stage / relative
+        if path.is_symlink() or not path.is_file():
+            errors.add("claude_chat_staged_member_unsafe")
+            continue
+        data = path.read_bytes()
+        if item.file_size != len(data) or archive.read(item) != data:
+            errors.add("claude_chat_archive_member_bytes_mismatch")
+    return errors
+
+
+def _claude_chat_integrity_errors(root: Path, version: str) -> set[str]:
+    """Bind the final ZIP, staged inventory and all canonical EN/KO procedure bytes."""
+    from opensocrates.content.injection import ProjectionInstructionAssembler
+    from opensocrates.content.loader import load_reasoning_content_projections
+
+    errors: set[str] = set()
+    stage = root / "dist/claude-chat-skills/opensocrates"
+    archive = root / "dist" / f"opensocrates-{version}-claude-chat-skills.zip"
+    try:
+        projection = load_reasoning_content_projections(root / REASONING_CONTENT_BUNDLE)
+        assembler = ProjectionInstructionAssembler(projection)
+        ids = assembler.known_method_ids()
+        expected = {"SKILL.md", "LICENSE", "references/catalog.md"}
+        expected |= {f"references/methods/{method}.md" for method in ids}
+        expected |= {
+            f"references/decision/methods/{locale}/{method}.md"
+            for locale in ("en", "ko")
+            for method in ids
+        }
+        expected |= {f"references/decision/catalog.{locale}.json" for locale in ("en", "ko")}
+        shared = root / "plugin-src/shared/decision"
+        if not shared.is_dir():
+            return {"claude_chat_canonical_inventory_unavailable"}
+        expected |= {
+            "references/decision/" + str(path.relative_to(shared))
+            for path in shared.rglob("*")
+            if path.is_file()
+        }
+        staged = {str(path.relative_to(stage)) for path in stage.rglob("*") if path.is_file()}
+        if staged != expected:
+            errors.add("claude_chat_staged_inventory_mismatch")
+        with zipfile.ZipFile(archive) as bundle:
+            members = bundle.infolist()
+            names = [item.filename for item in members]
+            if len(names) != len(set(names)):
+                errors.add("claude_chat_duplicate_archive_member")
+            if set(names) != {"opensocrates/" + item for item in expected}:
+                errors.add("claude_chat_archive_inventory_mismatch")
+            if errors:
+                return errors
+            errors |= _claude_chat_member_errors(bundle, members, expected, stage)
+            for locale in ("en", "ko"):
+                for method in ids:
+                    name = f"opensocrates/references/decision/methods/{locale}/{method}.md"
+                    expected_body = assembler.assemble(
+                        (method,), requested_locale=locale
+                    ).instructions.encode()
+                    if name not in names or bundle.read(name) != expected_body:
+                        errors.add("claude_chat_canonical_method_bytes_mismatch")
+    except (OSError, ValueError, KeyError, zipfile.BadZipFile):
+        errors.add("claude_chat_integrity_unavailable")
+    return errors
+
+
 def _verify_claude_chat_skills(
     root: Path, version: str, bundle: Mapping[str, Any]
 ) -> dict[str, Any]:
     package = root / "dist" / "claude-chat-skills"
     archive = root / "dist" / f"opensocrates-{version}-claude-chat-skills.zip"
-    errors: set[str] = set()
+    errors: set[str] = _claude_chat_integrity_errors(root, version)
     raw_method_ids = bundle.get("method_ids", [])
     method_ids = (
         {value for value in raw_method_ids if isinstance(value, str)}
@@ -1862,6 +1938,19 @@ def _verify_claude_chat_provenance(
         candidate_archive_sha256=candidate_sha256,
         candidate_file_count=candidate_file_count,
     )
+    if report.get("schema") == EXPORT_ONLY_SCHEMA:
+        export_errors = list(errors) + sorted(_claude_chat_integrity_errors(root, version))
+        if candidate_sha256 is None or candidate_file_count is None:
+            export_errors.append("claude_chat_candidate_archive_missing")
+        return {
+            "status": "fail" if export_errors else "pass",
+            "evidence_state": "export_only_contract",
+            "exact_release_artifact_status": "postpublication_verification_required",
+            "live_upload_status": "unvalidated",
+            "candidate_archive_sha256": candidate_sha256,
+            "candidate_file_count": candidate_file_count,
+            "error_codes": export_errors,
+        }
     evidence_state = str(report.get("status", "unavailable"))
     live_validated = not errors and evidence_state == "pass"
     return {

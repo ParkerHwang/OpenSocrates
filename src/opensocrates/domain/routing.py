@@ -215,7 +215,7 @@ _FROZEN_ROWS: tuple[
         {"hidden_assumptions": 3, "stale_options": 2},
         {"explicit_rules": 1},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "morphological-analysis",
     ),
     (
@@ -251,7 +251,7 @@ _FROZEN_ROWS: tuple[
         {"category_overlap": 3, "tangled_hierarchy": 2},
         {"feedback_delay": 2},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "logic-tree",
     ),
     (
@@ -269,7 +269,7 @@ _FROZEN_ROWS: tuple[
         {"competing_explanations": 3, "diagnose": 2},
         {"explicit_rules": 2},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "value-of-information",
     ),
     (
@@ -287,7 +287,7 @@ _FROZEN_ROWS: tuple[
         {"exception_prone_rule": 3, "explicit_rules": 2},
         {},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "premortem-analysis",
     ),
     (
@@ -296,7 +296,7 @@ _FROZEN_ROWS: tuple[
         {"repeated_observations": 3, "weak_sample": 2},
         {"causal_question": 2},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "evidence-hierarchy",
     ),
     (
@@ -305,7 +305,7 @@ _FROZEN_ROWS: tuple[
         {"new_evidence": 3, "unknown_probability": 2, "competing_explanations": 1},
         {},
         5,
-        (),
+        ("binding_rule_without_discretion", "no_defensible_prior_basis", "no_likelihood_direction"),
         "abduction",
     ),
     (
@@ -332,7 +332,7 @@ _FROZEN_ROWS: tuple[
         {"reconcile_evidence": 3, "conflicting_sources": 2, "source_quality": 2},
         {},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "evidence-hierarchy",
     ),
     (
@@ -341,7 +341,7 @@ _FROZEN_ROWS: tuple[
         {"causal_question": 3, "confounding": 2},
         {},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "falsificationism",
     ),
     (
@@ -350,7 +350,7 @@ _FROZEN_ROWS: tuple[
         {"recurring_failure": 3, "diagnose": 3},
         {"macro_environment": 1},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "failure-mode-effects-analysis",
     ),
     (
@@ -404,7 +404,7 @@ _FROZEN_ROWS: tuple[
         {"dismissed_opposition": 3, "argument_dispute": 2, "critique": 1},
         {},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "reflective-equilibrium",
     ),
     (
@@ -422,7 +422,7 @@ _FROZEN_ROWS: tuple[
         {"stale_options": 3, "choose": 2},
         {},
         5,
-        ("safety_critical_validation",),
+        ("safety_critical_validation", "binding_rule_without_discretion"),
         "trade-off-analysis",
     ),
     (
@@ -431,7 +431,7 @@ _FROZEN_ROWS: tuple[
         {"combinable_dimensions": 3, "stale_options": 2},
         {},
         5,
-        ("no_coherent_dimensions",),
+        ("no_coherent_dimensions", "binding_rule_without_discretion"),
         "first-principles",
     ),
     (
@@ -485,7 +485,7 @@ _FROZEN_ROWS: tuple[
         {"multiple_objectives": 3, "multiple_options": 2, "choose": 1},
         {"duties_rights": 2},
         5,
-        (),
+        ("binding_rule_without_discretion", "single_feasible_option"),
         "sensitivity-analysis",
     ),
     (
@@ -494,7 +494,7 @@ _FROZEN_ROWS: tuple[
         {"sequential_choice": 3, "unknown_probability": 2, "choose": 1},
         {},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "scenario-planning",
     ),
     (
@@ -503,7 +503,7 @@ _FROZEN_ROWS: tuple[
         {"multiple_options": 3, "multiple_objectives": 3, "choose": 2},
         {"single_feasible_option": 2},
         4,
-        ("binding_rule_without_discretion",),
+        ("binding_rule_without_discretion", "single_feasible_option"),
         "sensitivity-analysis",
     ),
     (
@@ -512,7 +512,7 @@ _FROZEN_ROWS: tuple[
         {"information_purchase": 3, "unknown_probability": 2, "choose": 2},
         {"irreversible_choice": 1},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "bayesian-updating",
     ),
     (
@@ -530,7 +530,7 @@ _FROZEN_ROWS: tuple[
         {"deep_uncertainty": 3, "irreversible_choice": 2, "choose": 1},
         {},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "scenario-planning",
     ),
     (
@@ -557,7 +557,7 @@ _FROZEN_ROWS: tuple[
         {"hidden_assumptions": 3, "prioritized_assumptions": 3},
         {},
         5,
-        (),
+        ("binding_rule_without_discretion", "irreversible_choice"),
         "lean-startup",
     ),
     (
@@ -566,7 +566,7 @@ _FROZEN_ROWS: tuple[
         {"governing_rule": 3, "recurring_failure": 2},
         {},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "root-cause-analysis",
     ),
     (
@@ -575,7 +575,7 @@ _FROZEN_ROWS: tuple[
         {"testable_hypothesis": 3, "prioritized_assumptions": 2},
         {},
         5,
-        ("safety_critical_validation",),
+        ("safety_critical_validation", "binding_rule_without_discretion"),
         "jobs-to-be-done",
     ),
     (
@@ -584,7 +584,7 @@ _FROZEN_ROWS: tuple[
         {"repeat_iteration": 3, "plan": 2},
         {"diagnose": 1},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "root-cause-analysis",
     ),
     (
@@ -593,7 +593,7 @@ _FROZEN_ROWS: tuple[
         {"context_disorder": 3, "diagnose": 2, "deep_uncertainty": 1},
         {},
         5,
-        (),
+        ("binding_rule_without_discretion",),
         "scenario-planning",
     ),
     (
@@ -602,7 +602,7 @@ _FROZEN_ROWS: tuple[
         {"interacting_actors": 3, "choose": 2},
         {},
         5,
-        ("no_meaningful_interdependence",),
+        ("no_meaningful_interdependence", "binding_rule_without_discretion"),
         "stakeholder-analysis",
     ),
     (
@@ -971,12 +971,14 @@ def _fallback_decision(
     by_id = {method.id: method for method in catalog.methods}
     primary = by_id.get(primary_id)
     secondary = by_id.get(secondary_id) if secondary_id else None
-    if primary is None:
+    if primary is None or score_method(primary, features).active_contraindications:
         return _no_route(
             features.answer_shape,
             reason=RouterReasonCode.NO_ELIGIBLE_METHOD,
             prompt_bundle_hash=prompt_bundle_hash,
         )
+    if secondary is not None and score_method(secondary, features).active_contraindications:
+        secondary = None
     return RouterDecision(
         router_version=ROUTER_VERSION,
         answer_shape=features.answer_shape,
@@ -1034,11 +1036,10 @@ def route_features(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0
                 )
             explicit_id = decision.explicit_method
     if payload.invalid_feature_list:
-        return _fallback_decision(
-            normalized,
-            catalog,
-            reason=RouterReasonCode.INVALID_FEATURES_FALLBACK,
-            uncertainty_explicit=False,
+        # Unknown input may conceal a hard contraindication; never repair it into a route.
+        return _no_route(
+            normalized.answer_shape,
+            reason=RouterReasonCode.NO_ELIGIBLE_METHOD,
             prompt_bundle_hash=prompt_bundle_hash,
         )
 
@@ -1073,7 +1074,11 @@ def route_features(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0
         )
 
     scored = [score_method(method, normalized) for method in catalog.methods]
-    eligible = [item for item in scored if item.score >= item.method.minimum_score]
+    eligible = [
+        item
+        for item in scored
+        if item.score >= item.method.minimum_score and not item.active_contraindications
+    ]
     if not eligible:
         return _fallback_decision(
             normalized,

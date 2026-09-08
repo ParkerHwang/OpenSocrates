@@ -5,7 +5,24 @@ separate claims. A local Claude Code/Desktop Local/Cowork plugin observation
 cannot establish the state of a manually uploaded Chat skill, and neither can
 establish the source of an existing synced/custom skill.
 
-## Current v1.2.1 state
+## Current v1.3.0 support boundary
+
+Chat standalone export: **archive contract validated; live activation unvalidated.**
+
+The v1.3.0 contract separates prepublication export validation from postpublication
+public-byte verification and cloud activation. It does not claim that the current
+ZIP was uploaded. The prepublication native gate validates standalone layout,
+full EN/KO references, integrity and forbidden surfaces. After publication the
+release workflow verifies the exact public asset set and hashes. That observation
+does not establish activation of an account-level custom skill.
+
+The version-bound support contract is
+[claude-chat-upload-probe-v1.3.0.json](evidence/claude-chat-upload-probe-v1.3.0.json).
+Its export_only status cannot be upgraded to a live pass by changing a flag, and
+it does not invent historical local-plugin observations for the new version.
+The original v1.2.1 pending receipt and historical v1.1.2 upload remain unchanged.
+
+## Historical v1.2.1 state
 
 Exact v1.2.1 Chat release artifact: **unavailable; live upload pending.**
 

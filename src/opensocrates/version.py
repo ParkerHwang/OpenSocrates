@@ -5,11 +5,11 @@ from __future__ import annotations
 from typing import Final
 
 PRODUCT_NAME: Final[str] = "opensocrates"
-PRODUCT_VERSION: Final[str] = "1.2.1"
+PRODUCT_VERSION: Final[str] = "1.3.0"
 SCHEMA_VERSION: Final[str] = "1.0.0"
 SCHEMA_MAJOR: Final[int] = 1
-CONTENT_REVISION: Final[int] = 1
-ROUTER_VERSION: Final[str] = "1.0.0"
+CONTENT_REVISION: Final[int] = 3
+ROUTER_VERSION: Final[str] = "1.1.0"
 VERIFIER_VERSION: Final[str] = "1.0.0"
 RULESET_VERSION: Final[str] = "1.0.0"
 

@@ -37,7 +37,7 @@ generated-check:
 	@set -eu; tmp="$$(mktemp -d)"; trap 'rm -rf "$$tmp"' EXIT; out="$$tmp/generated output — 日本語"; mkdir -p "$$out"; \
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py --output-dir "$$out/schemas"; \
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$$out/content/compiled-content.bundle.json" --reasoning-projections-output "$$out/content/compiled-reasoning-content.bundle.json"; \
-	diff -ru "$(ROOT)/schemas/v1" "$$out/schemas/v1"; diff -u "$(ROOT)/content/compiled-content.bundle.json" "$$out/content/compiled-content.bundle.json"; diff -u "$(ROOT)/content/compiled-reasoning-content.bundle.json" "$$out/content/compiled-reasoning-content.bundle.json"; \
+	diff -ru "$(ROOT)/schemas/v1" "$$out/schemas/v1"; diff -u "$(ROOT)/content/compiled-content.bundle.json" "$$out/content/compiled-content.bundle.json"; diff -u "$(ROOT)/content/compiled-reasoning-content.bundle.json" "$$out/content/compiled-reasoning-content.bundle.json"; diff -u "$(ROOT)/content/compiled-response-policy.json" "$$out/content/compiled-response-policy.json"; \
 	for host in antigravity cursor grok opencode claude codex; do \
 		PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host "$$host" --output "$(ROOT)/build/generated/plugins/$$host" >/dev/null; \
 		PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host "$$host" --output "$$out/plugins/$$host" >/dev/null; \
@@ -54,6 +54,8 @@ adjudication-check:
 
 docs-check:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_links.py --root "$(ROOT)" \
+		--path docs/decision-points.md \
+		--path docs/decision-points.ko.md \
 		--path README.md \
 		--path README.ko.md \
 		--path CHANGELOG.md \
@@ -100,6 +102,13 @@ security-scan: generate
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/security_scan.py --root "$(ROOT)" --report build/evidence/security-scan.json
 
 smoke:
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_public_release_verification.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_response_policy.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_chat_archive_integrity.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_release_identity.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_decision_hook_runtime.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_claude_chat_evidence.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_decision_points.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/smoke_product.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_selector.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_claude.py

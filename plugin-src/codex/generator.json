@@ -2,8 +2,12 @@
   "host": "codex",
   "template_revision": "1",
   "launcher_host": "codex",
-  "release_targets": ["darwin-arm64"],
-  "launchers": ["bin/launch.sh"],
+  "release_targets": [
+    "darwin-arm64"
+  ],
+  "launchers": [
+    "bin/launch.sh"
+  ],
   "manifest_template": ".codex-plugin/plugin.json.tmpl",
   "manifest_output": ".codex-plugin/plugin.json",
   "hooks_builder": "opensocrates.hosts.codex.commands:build_hooks",
@@ -24,7 +28,7 @@
     }
   ],
   "method_template": "skills/method/SKILL.md.tmpl",
-  "method_output": "skills/{method_id}/SKILL.md",
+  "method_output": "skills/opensocrates/references/methods/{method_id}.md",
   "command_templates": [
     {
       "template": "commands/auto.md.tmpl",
@@ -67,8 +71,17 @@
     {
       "source": "LICENSE",
       "output": "LICENSE"
+    },
+    {
+      "source": "plugin-src/shared/decision",
+      "output": "skills/opensocrates/references/decision"
     }
   ],
   "bundle_output": "content/compiled-content.bundle.json",
-  "runtime_output": "runtime"
+  "runtime_output": "runtime",
+  "public_skills": [
+    "opensocrates",
+    "rigor",
+    "trace"
+  ]
 }

@@ -1,0 +1,86 @@
+{
+  "id": "narrow-en-U",
+  "family": "narrow",
+  "locale": "en",
+  "arm": "U",
+  "source_commit": "134c8acbb7d1fd30b7126751f80483ae929a9105",
+  "archive_sha256": "sha256:6a8378fd0b3c60dfee1f38410f777bcc607f6b02cbd80a898e45cc6aaa3b3bc1",
+  "model": "gpt-5.6-luna",
+  "effort": "max",
+  "cli": "0.145.0",
+  "task_sha256": "sha256:fc22456efe20ff3b790dd3033052be4bef3df84e72fe02728e128c4052285085",
+  "prompt_sha256": "sha256:861b38b5221c9624db52b0838f9d539ddaffb65fb16c9fb5abe6ced8e441db2b",
+  "prompt_bytes": 17786,
+  "status": "completed",
+  "commands": [
+    {
+      "kind": "file_change",
+      "files": [
+        "recommendation.md"
+      ],
+      "status": "completed"
+    },
+    {
+      "kind": "command",
+      "categories": [
+        "recommendation"
+      ],
+      "exit_code": 0,
+      "output_bytes": 1733,
+      "complete_deliveries": [],
+      "command_sha256": "sha256:371f7f485c1f62642a59c416c91d16d16887f8f7adf7a34b9a784ac2359ddeb6"
+    },
+    {
+      "kind": "command",
+      "categories": [
+        "recommendation"
+      ],
+      "exit_code": 129,
+      "output_bytes": 7711,
+      "complete_deliveries": [],
+      "command_sha256": "sha256:4081d2333ebf89e3154e2a5ccd0ea054d2e93443114d1c3f023a2c6e1a0362d9"
+    },
+    {
+      "kind": "file_change",
+      "files": [
+        "recommendation.md"
+      ],
+      "status": "completed"
+    }
+  ],
+  "deliveries": [],
+  "application": "unverified",
+  "usage": {
+    "input_tokens": 58936,
+    "cached_input_tokens": 39168,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 4186,
+    "reasoning_output_tokens": 2970
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 85.89,
+  "output": "Created [recommendation.md]([isolated-test-root]/upfront/work/narrow-en-U/recommendation.md). It recommends Larch and documents the evidence boundary, trade-offs, and lack of purchase authorization.\n\nOpenSocrates grounding: trade-off-analysis@3",
+  "visible_metrics": {
+    "final": {
+      "unicode_scalars": 315,
+      "utf8_bytes": 315,
+      "nonblank_lines": 2,
+      "whitespace_units": 19,
+      "unit_kind": "word_like",
+      "scope": "complete_public_artifact_before_path_redaction"
+    },
+    "artifacts": {
+      "recommendation.md": {
+        "unicode_scalars": 1799,
+        "utf8_bytes": 1801,
+        "nonblank_lines": 14,
+        "whitespace_units": 286,
+        "unit_kind": "word_like",
+        "scope": "complete_public_artifact_before_path_redaction"
+      }
+    }
+  },
+  "artifacts": {
+    "recommendation.md": "# Recommendation\n\nRecommend **Larch**, subject to separate purchase authorization.\n\n## Decision basis\n\n- **Hard constraints:** spend must be at most 1,200 credits, and keyboard accessibility must be verified in the supplied requirements.\n- **Stated preference:** prioritize responsive, dependable support over maximum hours saved. No numeric weights or composite score are used.\n\n| Tool | Cost (credits) | Hours saved monthly | Support response | Keyboard accessibility | Feasibility |\n|---|---:|---:|---|---|---|\n| Cedar | 900 credits | 6 | 10 days | Listed as verified | Feasible |\n| Larch | 1,100 credits | 4 | 2 days | Listed as verified | Feasible |\n| Elm | 1,350 credits | 9 | 1 day | Listed as verified | Not feasible: 150 credits over budget |\n\nLarch is the better fit among the feasible options because its stated support response is 2 days rather than Cedar's 10 days—8 days faster. The trade-off is 200 additional credits, 100 credits of remaining budget instead of 300, and 2 fewer hours saved each month. Elm offers the fastest response and greatest time saving, but fails the budget constraint.\n\n## Evidence boundary\n\nThis recommendation uses only the figures and accessibility statuses supplied in the synthetic materials, plus the user's stated priority. The figures are supplied claims, not independently measured results; the accessibility status is listed as verified in those materials, but was not independently checked here. The materials provide response time, not a broader measure of support dependability or support quality. The choice would change if the 200-credit premium is not acceptable, if support speed is no longer the priority, or if either feasible option no longer meets the accessibility requirement.\n\nNo purchase or commitment is authorized by this document.\n"
+  }
+}

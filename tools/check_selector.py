@@ -93,6 +93,7 @@ from opensocrates.selector.sdk_worker import (
     _thread_start_params,
     _watch_deadline,
 )
+from opensocrates.version import CONTENT_REVISION
 from release_check import (
     CommandResult,
     ReleaseCheckError,
@@ -381,7 +382,7 @@ def _test_teacher_catalog_schema_and_overlay_identity() -> None:
     schema = json.loads(Path("schemas/v1/teacher-questions.schema.json").read_text())
     _require(schema["$id"] == "opensocrates.teacher-questions/1.0.0")
     _require(not check_json_schema(schema))
-    _require(schema["properties"]["content_revision"]["const"] == 1)
+    _require(schema["properties"]["content_revision"]["const"] == CONTENT_REVISION)
     methods_schema = schema["properties"]["methods"]
     _require(methods_schema["minProperties"] == methods_schema["maxProperties"] == 48)
     _require(methods_schema["additionalProperties"] is False)
@@ -471,7 +472,7 @@ def _test_teacher_catalog_schema_and_overlay_identity() -> None:
 
     bundle = json.loads(Path("content/compiled-content.bundle.json").read_text(encoding="utf-8"))
     compiled = {method["id"]: method for method in bundle["methods"]}
-    _require(bundle["content_revision"] == raw["content_revision"] == 1)
+    _require(bundle["content_revision"] == raw["content_revision"] == CONTENT_REVISION)
     for method_id, localized in catalog.items():
         _require(compiled[method_id]["content_revision"] == raw["content_revision"])
         for locale in ("en", "ko"):
@@ -636,9 +637,27 @@ def _test_codex_generated_question_procedures() -> None:
     _require("settle the selected questions for yourself" in skill)
     _require("message containing teacher questions to settle" in readme)
     for method_id in FROZEN_METHOD_IDS:
-        method = (package / "skills" / method_id / "SKILL.md").read_text(encoding="utf-8")
-        _require(method.count("## Teacher questions") == 2)
-        _require(method.find("## Teacher questions") < method.find("## Purpose"))
+        reference = package / "skills/opensocrates/references/methods" / (method_id + ".md")
+        _require(f"Method ID: `{method_id}`" in reference.read_text(encoding="utf-8"))
+        for locale in ("en", "ko"):
+            method = (
+                package
+                / "skills/opensocrates/references/decision/methods"
+                / locale
+                / (method_id + ".md")
+            ).read_text(encoding="utf-8")
+            expected = (
+                ProjectionInstructionAssembler(
+                    load_reasoning_content_projections(
+                        Path("content/compiled-reasoning-content.bundle.json")
+                    )
+                )
+                .assemble((method_id,), requested_locale=locale)
+                .instructions
+            )
+            _require(method == expected)
+            _require(method.find("## Teacher questions") < method.find("## Purpose"))
+    _require(len(list((package / "skills").glob("*/SKILL.md"))) == 3)
 
 
 @_check("VSC-02-locale-current-prompt-and-english-fallback")
@@ -1431,7 +1450,7 @@ def _test_hook_entrypoint_contract() -> None:
             stdout=output,
         )
     _require(exit_code == 0 and output.getvalue() == "")
-    _require(captured == [{"host": "claude", "workspace": workspace}])
+    _require(captured == [{"host": "claude", "hook_only": True, "workspace": workspace}])
 
 
 @_check("VSC-10A-codex-compact-minimal-restore-and-fail-open")
@@ -1472,7 +1491,12 @@ def _test_codex_compact_minimal_restore() -> None:
                 stdout=output,
             )
         _require(exit_code == 0)
-        _require(json.loads(output.getvalue()) == restored)
+        from opensocrates.selector.entry import ENTRY_GUIDANCE
+
+        _require(
+            json.loads(output.getvalue())["hookSpecificOutput"]["additionalContext"]
+            == ENTRY_GUIDANCE
+        )
 
         stale_seconds = clock.unix_time_ns() // 1_000_000_000 - INSTRUCTION_FILE_TTL_SECONDS - 1
         os.utime(artifact.path, (stale_seconds, stale_seconds))
@@ -1489,7 +1513,11 @@ def _test_codex_compact_minimal_restore() -> None:
                 stdin=BytesIO(payload),
                 stdout=output,
             )
-        _require(exit_code == 0 and output.getvalue() == "")
+        _require(exit_code == 0)
+        _require(
+            json.loads(output.getvalue())["hookSpecificOutput"]["additionalContext"]
+            == ENTRY_GUIDANCE
+        )
 
     oversized = json.dumps(
         _native_payload("SessionStart", source="compact", padding="x" * (33 * 1024))

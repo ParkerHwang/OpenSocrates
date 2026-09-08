@@ -23,7 +23,8 @@ import { pathToFileURL } from "node:url";
 import test from "node:test";
 import { deflateRawSync, gzipSync } from "node:zlib";
 
-import { SUPPORTED_HOSTS } from "../installer/opensocrates.mjs";
+import { PRODUCT_VERSION, SUPPORTED_HOSTS } from "../installer/opensocrates.mjs";
+const CURRENT_CONTENT_REVISION = JSON.parse(readFileSync(new URL("../content/compiled-content.bundle.json", import.meta.url), "utf8")).content_revision;
 import * as acceptance from "./reinstall_cycle_acceptance.mjs";
 import { publishExclusiveJson } from "./reinstall_cycle_operation_capsule.mjs";
 
@@ -359,7 +360,7 @@ function writeClaudeManagedRootFixture(root) {
     owner: { name: "Parker Hwang" },
     metadata: {
       description: "OpenSocrates reasoning support for Claude Code and Cowork",
-      version: "1.2.1",
+      version: PRODUCT_VERSION,
     },
     plugins: [
       {
@@ -377,12 +378,12 @@ function writeClaudeManagedRootFixture(root) {
     { mode: 0o600 },
   );
   const payloads = {
-    ".claude-plugin/plugin.json": `${JSON.stringify({ name: "opensocrates", version: "1.2.1" })}\n`,
+    ".claude-plugin/plugin.json": `${JSON.stringify({ name: "opensocrates", version: PRODUCT_VERSION })}\n`,
     "release-manifest.json": `${JSON.stringify({
       schema: "opensocrates.plugin-release-manifest/1.0.0",
       host: "claude",
-      product_version: "1.2.1",
-      content_revision: 1,
+      product_version: PRODUCT_VERSION,
+      content_revision: CURRENT_CONTENT_REVISION,
     })}\n`,
   };
   for (const [relativePath, contents] of Object.entries(payloads)) {
@@ -1398,7 +1399,7 @@ test("npm pack metadata is an exact eight-file closed set", () => {
   }));
   const valid = {
     name: "opensocrates",
-    version: "1.2.1",
+    version: PRODUCT_VERSION,
     entryCount: files.length,
     files,
     bundled: [],
@@ -2917,8 +2918,8 @@ test("installed SessionStart measurement enforces 20 cold samples, 2000ms, and e
 test("installed runtime public identity matches the runtime version contract", () => {
   const identity = {
     product: "opensocrates",
-    productVersion: "1.2.1",
-    contentRevision: 1,
+    productVersion: PRODUCT_VERSION,
+    contentRevision: CURRENT_CONTENT_REVISION,
     architectures: ["arm64"],
     executable: true,
   };
@@ -2940,19 +2941,19 @@ test("complete produced final assertions satisfy the public result contract", ()
   const registration = {
     marketplaceCount: 1,
     pluginCount: 1,
-    version: "1.2.1",
+    version: PRODUCT_VERSION,
     unsupportedLegacyConflictCount: 0,
     rootMatchesExpected: true,
   };
   const runtime = {
     product: "opensocrates",
-    productVersion: "1.2.1",
-    contentRevision: 1,
+    productVersion: PRODUCT_VERSION,
+    contentRevision: CURRENT_CONTENT_REVISION,
     architectures: ["arm64"],
     executable: true,
   };
   const payload = {
-    version: "1.2.1",
+    version: PRODUCT_VERSION,
     declaredFileCount: 1,
     checksumInventorySha256: sha,
     releaseManifestSha256: sha,
@@ -2971,13 +2972,13 @@ test("complete produced final assertions satisfy the public result contract", ()
     },
     finalStatus: {
       status: "pass",
-      desiredVersion: "1.2.1",
+      desiredVersion: PRODUCT_VERSION,
       hostsInSync: ["claude", "codex"],
       drift: false,
     },
     finalVersion: {
       status: "pass",
-      desiredVersion: "1.2.1",
+      desiredVersion: PRODUCT_VERSION,
       runtimes: { claude: runtime, codex: runtime },
     },
     finalChecksum: {
@@ -3006,7 +3007,7 @@ test("complete produced final assertions satisfy the public result contract", ()
     finalDesiredState: {
       status: "pass",
       schema: "opensocrates.desired-state/1.0.0",
-      activeVersion: "1.2.1",
+      activeVersion: PRODUCT_VERSION,
       installedHosts: ["claude", "codex"],
       autoUpdateEnabled: false,
       launchAgentPresent: false,
@@ -3054,7 +3055,7 @@ test("complete produced final assertions satisfy the public result contract", ()
       status: "pass",
       sourceCommit: "a".repeat(40),
       installedHosts: ["claude", "codex"],
-      version: "1.2.1",
+      version: PRODUCT_VERSION,
       admittedTopology: "claude_and_codex_only; other_supported_hosts_absent",
       nonTargetHosts: Object.fromEntries(
         SUPPORTED_HOSTS.filter((host) => !["claude", "codex"].includes(host)).map((host) => [

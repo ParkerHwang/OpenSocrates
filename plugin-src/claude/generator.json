@@ -13,8 +13,12 @@
     }
   },
   "launcher_host": "claude",
-  "release_targets": ["darwin-arm64"],
-  "launchers": ["bin/launch.sh"],
+  "release_targets": [
+    "darwin-arm64"
+  ],
+  "launchers": [
+    "bin/launch.sh"
+  ],
   "manifest_template": ".claude-plugin/plugin.json.tmpl",
   "manifest_output": ".claude-plugin/plugin.json",
   "hooks_builder": "opensocrates.hosts.claude.commands:build_hooks",
@@ -30,7 +34,9 @@
       "output": "skills/opensocrates/references/catalog.md"
     }
   ],
-  "public_skills": ["opensocrates"],
+  "public_skills": [
+    "opensocrates"
+  ],
   "method_template": "skills/opensocrates/references/method.md.tmpl",
   "method_output": "skills/opensocrates/references/methods/{method_id}.md",
   "command_templates": [
@@ -55,6 +61,10 @@
     {
       "source": "LICENSE",
       "output": "LICENSE"
+    },
+    {
+      "source": "plugin-src/shared/decision",
+      "output": "skills/opensocrates/references/decision"
     }
   ],
   "bundle_output": "content/compiled-content.bundle.json",

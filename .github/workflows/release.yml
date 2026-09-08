@@ -2,8 +2,6 @@ name: OpenSocrates release
 
 on:
   push:
-    branches:
-      - main
     tags:
       - "v*.*.*"
   workflow_dispatch:
@@ -47,6 +45,10 @@ jobs:
           set -euo pipefail
           version="$(tr -d '[:space:]' < VERSION)"
           tag="v${version}"
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${GITHUB_REF}" != "refs/tags/${tag}" ]]; then
+            echo "Manual publication requires the exact version tag, not a branch." >&2
+            exit 1
+          fi
           if [[ "${GITHUB_REF}" == refs/tags/* && "${GITHUB_REF_NAME}" != "${tag}" ]]; then
             echo "Tag ${GITHUB_REF_NAME} does not match VERSION ${version}" >&2
             exit 1
@@ -70,6 +72,9 @@ jobs:
           fi
           echo "RELEASE_VERSION=${version}" >> "${GITHUB_ENV}"
           echo "RELEASE_TAG=${tag}" >> "${GITHUB_ENV}"
+
+      - name: Verify immutable release target
+        run: python tools/release_identity.py
 
       - name: Bootstrap locked environment
         run: make bootstrap
@@ -152,16 +157,26 @@ jobs:
             "${manifest}"
             "${limitations}"
             "${sbom}"
+            "dist/opensocrates-${RELEASE_VERSION}-checksums.sha256"
             "installer/opensocrates.mjs"
           )
           if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
-            gh release upload "${RELEASE_TAG}" "${release_assets[@]}" --clobber
-            gh release edit "${RELEASE_TAG}" \
-              --title "OpenSocrates ${RELEASE_VERSION}" \
-              --notes-file ".github/release-notes/v${RELEASE_VERSION}.md"
-          else
-            gh release create "${RELEASE_TAG}" "${release_assets[@]}" \
-              --target "${GITHUB_SHA}" \
-              --title "OpenSocrates ${RELEASE_VERSION}" \
-              --notes-file ".github/release-notes/v${RELEASE_VERSION}.md"
+            echo "Immutable release collision: ${RELEASE_TAG} already exists; refusing overwrite." >&2
+            exit 1
           fi
+          gh release create "${RELEASE_TAG}" "${release_assets[@]}" \
+            --verify-tag \
+            --title "OpenSocrates ${RELEASE_VERSION}" \
+            --notes-file ".github/release-notes/v${RELEASE_VERSION}.md"
+
+      - name: Verify exact published release bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .venv/bin/python tools/verify_published_release.py --repo "${{ github.repository }}" --commit "${{ github.sha }}"
+      - name: Upload postpublication verification
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: public-release-verification-${{ github.run_id }}
+          path: build/evidence/public-release-verified.json
+          if-no-files-found: warn

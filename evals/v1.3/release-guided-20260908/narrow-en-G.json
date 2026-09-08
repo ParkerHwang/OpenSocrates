@@ -1,0 +1,69 @@
+{
+  "id": "narrow-en-G",
+  "family": "narrow",
+  "locale": "en",
+  "arm": "G",
+  "source_commit": "134c8acbb7d1fd30b7126751f80483ae929a9105",
+  "archive_sha256": "sha256:6a8378fd0b3c60dfee1f38410f777bcc607f6b02cbd80a898e45cc6aaa3b3bc1",
+  "model": "gpt-5.6-luna",
+  "effort": "max",
+  "cli": "0.145.0",
+  "task_sha256": "sha256:fc22456efe20ff3b790dd3033052be4bef3df84e72fe02728e128c4052285085",
+  "prompt_sha256": "sha256:7cba9e9ceedbd91d9262fd0591cf2358e38aefccdd894560e855603afce7f825",
+  "prompt_bytes": 22607,
+  "status": "completed",
+  "commands": [
+    {
+      "kind": "file_change",
+      "files": [
+        "recommendation.md"
+      ],
+      "status": "completed"
+    },
+    {
+      "kind": "command",
+      "categories": [
+        "recommendation"
+      ],
+      "exit_code": 0,
+      "output_bytes": 1907,
+      "complete_deliveries": [],
+      "command_sha256": "sha256:371f7f485c1f62642a59c416c91d16d16887f8f7adf7a34b9a784ac2359ddeb6"
+    }
+  ],
+  "deliveries": [],
+  "application": "unverified",
+  "usage": {
+    "input_tokens": 42331,
+    "cached_input_tokens": 26112,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2296,
+    "reasoning_output_tokens": 1508
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 49.14,
+  "output": "Created [recommendation.md](<[isolated-test-root]/upfront/work/narrow-en-G/recommendation.md>). It recommends Larch, records the Cedar trade-offs, preserves the evidence boundary, and authorizes no purchase.\n\nOpenSocrates grounding: trade-off-analysis@3",
+  "visible_metrics": {
+    "final": {
+      "unicode_scalars": 324,
+      "utf8_bytes": 324,
+      "nonblank_lines": 2,
+      "whitespace_units": 20,
+      "unit_kind": "word_like",
+      "scope": "complete_public_artifact_before_path_redaction"
+    },
+    "artifacts": {
+      "recommendation.md": {
+        "unicode_scalars": 1903,
+        "utf8_bytes": 1907,
+        "nonblank_lines": 15,
+        "whitespace_units": 294,
+        "unit_kind": "word_like",
+        "scope": "complete_public_artifact_before_path_redaction"
+      }
+    }
+  },
+  "artifacts": {
+    "recommendation.md": "# Support tool recommendation\n\n## Choice\n\nRecommend **Larch**. It is within the 1,200-credit annual budget, has keyboard accessibility marked verified, and has the shorter stated support response time: 2 days versus Cedar's 10 days. This follows the request to prioritize responsive, dependable support over maximum hours saved. No purchase or commitment is authorized by this recommendation.\n\n## Constraints and comparison\n\n| Tool | Annual cost | Hours saved monthly | Support response | Keyboard accessibility | Status |\n|---|---:|---:|---:|---|---|\n| Cedar | 900 credits | 6 hours | 10 days | Verified | Feasible |\n| Larch | 1,100 credits | 4 hours | 2 days | Verified | Feasible |\n| Elm | 1,350 credits | 9 hours | 1 day | Verified | Not feasible: over budget |\n\nAccessibility and the 1,200-credit budget are treated as hard constraints. Elm is excluded because it exceeds the budget. No numerical score or invented weighting is used for the remaining options.\n\n## Actual trade-offs\n\nCompared with Cedar, Larch costs 200 more credits annually and gives up 2 hours of stated monthly savings. In exchange, its stated support response is 8 days faster (2 days rather than 10), while both tools meet the stated accessibility requirement.\n\n## Evidence boundary and flip condition\n\nThe comparison relies only on the supplied synthetic figures. “Verified” accessibility is reported in that material; no separate verification record, support-quality measure, guarantee, escalation information, or outcome data was supplied. Therefore, the recommendation treats response time as the available proxy for support responsiveness, not as proof of overall dependability.\n\nRevisit the choice if comparable evidence shows Cedar has materially more dependable support, if Larch's 2-day response claim is not reliable, or if the additional 200 credits or 2-hour monthly difference becomes the controlling preference.\n"
+  }
+}

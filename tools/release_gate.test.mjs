@@ -482,3 +482,34 @@ test("release workflow: never triggers on pull_request", () => {
   const triggers = release.slice(release.indexOf("\non:"), release.indexOf("\npermissions:"));
   assert.doesNotMatch(triggers, /pull_request/u, "the release job must not run for pull requests");
 });
+
+test("release gate: manual branch dispatch is rejected", () => {
+  assertRejected(runGate({ eventName: "workflow_dispatch", ref: "refs/heads/main", refName: "main" }), "branch dispatch");
+});
+
+test("release gate: manual exact-tag dispatch is accepted", () => {
+  const result = runGate({ eventName: "workflow_dispatch", ref: `refs/tags/v${VERSION}`, refName: `v${VERSION}` });
+  assert.equal(result.status, 0, result.stderr);
+});
+
+for (const exists of [true, false]) {
+  test(`release publication: existing release=${exists} never overwrites assets`, () => {
+    const root = mkdtempSync(join(tmpdir(), "opensocrates-publish-gate-"));
+    try {
+      const calls = join(root, "calls");
+      const mock = join(root, "gh");
+      writeFileSync(mock, '#!/bin/sh\nprintf "%s\\n" "$*" >> "$CALLS"\nif [ "$2" = view ]; then exit "$VIEW_EXIT"; fi\nif [ "$2" = create ]; then exit 0; fi\nexit 99\n', {mode: 0o700});
+      const script = extractStepScript(RELEASE_WORKFLOW, "Publish GitHub Release");
+      const result = spawnSync(SHELL, ["-c", script], {cwd: root, encoding: "utf8", env: {PATH: `${root}:${process.env.PATH}`, CALLS: calls, VIEW_EXIT: exists ? "0" : "1", RELEASE_VERSION: VERSION, RELEASE_TAG: `v${VERSION}`, GITHUB_SHA: "a".repeat(40)}});
+      const commands = readFileSync(calls, "utf8");
+      assert.doesNotMatch(commands, /--clobber|release upload|release edit/u);
+      if (exists) {
+        assert.notEqual(result.status, 0);
+        assert.doesNotMatch(commands, /release create/u);
+      } else {
+        assert.equal(result.status, 0, result.stderr);
+        assert.match(commands, /release create .*--verify-tag/u);
+      }
+    } finally { rmSync(root, {recursive: true, force: true}); }
+  });
+}

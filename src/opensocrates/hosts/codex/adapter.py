@@ -70,6 +70,7 @@ class CodexAdapterConfig:
     # its dependencies is unavailable.  That distinction prevents an
     # unavailable selector from silently falling back to legacy injection.
     selector_mode: bool = False
+    decision_point_mode: bool = False
     selector_application: SelectorApplication | None = field(default=None, repr=False)
     selector_config: SelectorConfig | None = field(default=None, repr=False)
     instruction_file_store: Any | None = field(default=None, repr=False)
@@ -445,7 +446,11 @@ class CodexAdapter:
     def _selector_enabled(self) -> bool:
         """Return whether this adapter is on the OpenSocrates selector-only path."""
 
-        return self.config.selector_mode or self.config.selector_application is not None
+        return (
+            self.config.decision_point_mode
+            or self.config.selector_mode
+            or self.config.selector_application is not None
+        )
 
     @staticmethod
     def _selector_user_prompt_request(native: CodexNativeEvent) -> SelectorRequest | None:
@@ -603,11 +608,41 @@ class CodexAdapter:
             selector_response=True,
         )
 
+    def _decision_point_entry(
+        self, native: CodexNativeEvent, *, diagnostics: tuple[str, ...]
+    ) -> CodexHandleResult:
+        """Deliver discovery only; no initial candidate becomes a Stop obligation."""
+        store = self.config.instruction_file_store
+        if store is not None and native.native_event in {"UserPromptSubmit", "Stop", "SessionEnd"}:
+            try:
+                store.delete_session(native.session_id)
+            except Exception:
+                pass  # Existing sweep/backstop retains interrupted-cleanup behavior.
+        deliver = native.native_event == "UserPromptSubmit" or (
+            native.native_event == "SessionStart" and native.source == "compact"
+        )
+        if not deliver:
+            return self._selector_empty_result(native, diagnostics=diagnostics)
+        from ...selector.entry import ENTRY_GUIDANCE
+
+        return CodexHandleResult(
+            native_event_name=native.native_event,
+            normalized_event=None,
+            action=HostAction.no_op(),
+            response=selector_context_response(ENTRY_GUIDANCE, native.native_event),
+            projection={},
+            status="decision_point_entry",
+            diagnostics=diagnostics,
+            selector_response=True,
+        )
+
     def _handle_selector_event(  # noqa: C901  # Closed native lifecycle dispatch.
         self, native: CodexNativeEvent, *, diagnostics: tuple[str, ...]
     ) -> CodexHandleResult:
         """Handle the closed selector lifecycle before legacy normalization."""
 
+        if self.config.decision_point_mode:
+            return self._decision_point_entry(native, diagnostics=diagnostics)
         application = self.config.selector_application
         artifact_store = self.config.instruction_file_store
         if native.native_event == "SessionStart":

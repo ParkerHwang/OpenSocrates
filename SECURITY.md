@@ -34,6 +34,17 @@ severity, and the availability of a safe fix.
 
 ## Security boundary
 
+The v1.3 default Claude/Codex submission entry emits discovery guidance only. It
+selects no initial method, starts no selector model call and creates no grounding
+artifact that an abandoned candidate must read at Stop. The decision command
+loads fixed canonical content, keeps only volatile context-scoped delivery
+identities and agent availability assertions, and never claims applied reasoning
+from an assertion. It does not use CWD-controlled fallback content when its fixed
+package/source content pair is absent. No disk state, raw prompt, conversation,
+reasoning, screenshot, authentication call or telemetry is added by that command.
+The selector and native receipt details below describe retained compatibility
+adapters; they must not be presented as observations made by the new default path.
+
 OpenSocrates 1.x:
 
 - runs its integration locally through Claude or Codex and uses the user's

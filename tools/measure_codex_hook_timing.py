@@ -24,7 +24,7 @@ MAX_GATE_SAMPLES = 100
 REQUIRED_P95_BUDGET_FRACTION = 0.5
 PROCESS_MODEL = (
     "new_process_per_sample; first_configured_hook_before_runtime_smoke; "
-    "hermetic_generated_input_and_selector_availability_metadata"
+    "hermetic_generated_input_and_selector_availability_metadata; decision_point_response_v1"
 )
 EXPECTED_COMMAND = "${PLUGIN_ROOT}/bin/launch.sh hook codex session_started"
 
@@ -137,6 +137,28 @@ def _sample_environment(sample_root: Path) -> tuple[dict[str, str], Path]:
     return environment, workspace
 
 
+def _response_contract_matches(payload: bytes, stdout: bytes) -> bool:
+    """Exact source-specific stdout contract, not any nonempty success output."""
+    if len(stdout) > 8192:
+        return False
+    try:
+        source = json.loads(payload).get("source")
+        if source == "startup":
+            return stdout == b""
+        if source != "compact":
+            return False
+        from opensocrates.selector.entry import ENTRY_GUIDANCE
+
+        return json.loads(stdout) == {
+            "hookSpecificOutput": {
+                "hookEventName": "SessionStart",
+                "additionalContext": ENTRY_GUIDANCE,
+            }
+        }
+    except (ValueError, TypeError, AttributeError, UnicodeError):
+        return False
+
+
 def _run_sample(
     launcher: Path,
     payload: bytes,
@@ -169,7 +191,10 @@ def _run_sample(
         stdout, stderr = process.communicate()
     elapsed_ms = (time.perf_counter() - started) * 1000
     contract_pass = (
-        completed_in_budget and process.returncode == 0 and stdout == b"" and stderr == b""
+        completed_in_budget
+        and process.returncode == 0
+        and _response_contract_matches(payload, stdout)
+        and stderr == b""
     )
     return elapsed_ms, contract_pass
 

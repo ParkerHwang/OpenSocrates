@@ -10,6 +10,8 @@ import re
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from ..version import CONTENT_REVISION
+
 AUTHORING_SCHEMA = "opensocrates.method-authoring/1.0.0"
 COMPILED_METHOD_SCHEMA = "opensocrates.compiled-method/1.0.0"
 BUNDLE_SCHEMA = "opensocrates.compiled-content-bundle/1.0.0"
@@ -62,7 +64,7 @@ _FROZEN_ROWS = (
         "hidden_assumptions:3,stale_options:2",
         "explicit_rules:1",
         5,
-        "",
+        "binding_rule_without_discretion",
         "morphological-analysis",
     ),
     (
@@ -98,7 +100,7 @@ _FROZEN_ROWS = (
         "category_overlap:3,tangled_hierarchy:2",
         "feedback_delay:2",
         5,
-        "",
+        "binding_rule_without_discretion",
         "logic-tree",
     ),
     (
@@ -116,7 +118,7 @@ _FROZEN_ROWS = (
         "competing_explanations:3,diagnose:2",
         "explicit_rules:2",
         5,
-        "",
+        "binding_rule_without_discretion",
         "value-of-information",
     ),
     (
@@ -134,7 +136,7 @@ _FROZEN_ROWS = (
         "exception_prone_rule:3,explicit_rules:2",
         "",
         5,
-        "",
+        "binding_rule_without_discretion",
         "premortem-analysis",
     ),
     (
@@ -143,7 +145,7 @@ _FROZEN_ROWS = (
         "repeated_observations:3,weak_sample:2",
         "causal_question:2",
         5,
-        "",
+        "binding_rule_without_discretion",
         "evidence-hierarchy",
     ),
     (
@@ -152,7 +154,7 @@ _FROZEN_ROWS = (
         "new_evidence:3,unknown_probability:2,competing_explanations:1",
         "",
         5,
-        "",
+        "binding_rule_without_discretion,no_defensible_prior_basis,no_likelihood_direction",
         "abduction",
     ),
     (
@@ -179,7 +181,7 @@ _FROZEN_ROWS = (
         "reconcile_evidence:3,conflicting_sources:2,source_quality:2",
         "",
         5,
-        "",
+        "binding_rule_without_discretion",
         "evidence-hierarchy",
     ),
     (
@@ -188,7 +190,7 @@ _FROZEN_ROWS = (
         "causal_question:3,confounding:2",
         "",
         5,
-        "",
+        "binding_rule_without_discretion",
         "falsificationism",
     ),
     (
@@ -197,7 +199,7 @@ _FROZEN_ROWS = (
         "recurring_failure:3,diagnose:3",
         "macro_environment:1",
         5,
-        "",
+        "binding_rule_without_discretion",
         "failure-mode-effects-analysis",
     ),
     (
@@ -251,7 +253,7 @@ _FROZEN_ROWS = (
         "dismissed_opposition:3,argument_dispute:2,critique:1",
         "",
         5,
-        "",
+        "binding_rule_without_discretion",
         "reflective-equilibrium",
     ),
     (
@@ -269,7 +271,7 @@ _FROZEN_ROWS = (
         "stale_options:3,choose:2",
         "",
         5,
-        "safety_critical_validation",
+        "safety_critical_validation,binding_rule_without_discretion",
         "trade-off-analysis",
     ),
     (
@@ -278,7 +280,7 @@ _FROZEN_ROWS = (
         "combinable_dimensions:3,stale_options:2",
         "",
         5,
-        "no_coherent_dimensions",
+        "no_coherent_dimensions,binding_rule_without_discretion",
         "first-principles",
     ),
     (
@@ -332,7 +334,7 @@ _FROZEN_ROWS = (
         "multiple_objectives:3,multiple_options:2,choose:1",
         "duties_rights:2",
         5,
-        "",
+        "binding_rule_without_discretion,single_feasible_option",
         "sensitivity-analysis",
     ),
     (
@@ -341,7 +343,7 @@ _FROZEN_ROWS = (
         "sequential_choice:3,unknown_probability:2,choose:1",
         "",
         5,
-        "",
+        "binding_rule_without_discretion",
         "scenario-planning",
     ),
     (
@@ -350,7 +352,7 @@ _FROZEN_ROWS = (
         "multiple_options:3,multiple_objectives:3,choose:2",
         "single_feasible_option:2",
         4,
-        "binding_rule_without_discretion",
+        "binding_rule_without_discretion,single_feasible_option",
         "sensitivity-analysis",
     ),
     (
@@ -359,7 +361,7 @@ _FROZEN_ROWS = (
         "information_purchase:3,unknown_probability:2,choose:2",
         "irreversible_choice:1",
         5,
-        "",
+        "binding_rule_without_discretion",
         "bayesian-updating",
     ),
     (
@@ -377,7 +379,7 @@ _FROZEN_ROWS = (
         "deep_uncertainty:3,irreversible_choice:2,choose:1",
         "",
         5,
-        "",
+        "binding_rule_without_discretion",
         "scenario-planning",
     ),
     (
@@ -404,7 +406,7 @@ _FROZEN_ROWS = (
         "hidden_assumptions:3,prioritized_assumptions:3",
         "",
         5,
-        "",
+        "binding_rule_without_discretion,irreversible_choice",
         "lean-startup",
     ),
     (
@@ -413,7 +415,7 @@ _FROZEN_ROWS = (
         "governing_rule:3,recurring_failure:2",
         "",
         5,
-        "",
+        "binding_rule_without_discretion",
         "root-cause-analysis",
     ),
     (
@@ -422,7 +424,7 @@ _FROZEN_ROWS = (
         "testable_hypothesis:3,prioritized_assumptions:2",
         "",
         5,
-        "safety_critical_validation",
+        "safety_critical_validation,binding_rule_without_discretion",
         "jobs-to-be-done",
     ),
     (
@@ -431,7 +433,7 @@ _FROZEN_ROWS = (
         "repeat_iteration:3,plan:2",
         "diagnose:1",
         5,
-        "",
+        "binding_rule_without_discretion",
         "root-cause-analysis",
     ),
     (
@@ -440,7 +442,7 @@ _FROZEN_ROWS = (
         "context_disorder:3,diagnose:2,deep_uncertainty:1",
         "",
         5,
-        "",
+        "binding_rule_without_discretion",
         "scenario-planning",
     ),
     (
@@ -449,7 +451,7 @@ _FROZEN_ROWS = (
         "interacting_actors:3,choose:2",
         "",
         5,
-        "no_meaningful_interdependence",
+        "no_meaningful_interdependence,binding_rule_without_discretion",
         "stakeholder-analysis",
     ),
     (
@@ -486,7 +488,7 @@ FROZEN_ROUTING = {
         "positive_features": _parse_weight_spec(row[2]),
         "negative_features": _parse_weight_spec(row[3]),
         "minimum_score": row[4],
-        "contraindications": [row[5]] if row[5] else [],
+        "contraindications": row[5].split(",") if row[5] else [],
         "preferred_complement": row[6],
     }
     for row in _FROZEN_ROWS
@@ -498,9 +500,11 @@ FROZEN_FEATURES = frozenset(
         for row in _FROZEN_ROWS
         for key in _parse_weight_spec(row[2]) | _parse_weight_spec(row[3])
     }
-    | {row[5] for row in _FROZEN_ROWS if row[5]}
+    | {key for row in _FROZEN_ROWS if row[5] for key in row[5].split(",")}
 )
-FROZEN_CONTRAINDICATIONS = frozenset({"mechanical"} | {row[5] for row in _FROZEN_ROWS if row[5]})
+FROZEN_CONTRAINDICATIONS = frozenset(
+    {"mechanical"} | {key for row in _FROZEN_ROWS if row[5] for key in row[5].split(",")}
+)
 ALLOWED_ANSWER_SHAPES = frozenset(
     {
         "direct_judgment",
@@ -672,8 +676,12 @@ def validate_method_authoring(value: Any, *, expected_id: str | None = None) -> 
         raise ContentValidationError(f"method.id: not in the frozen 48: {method_id}")
     if data["family"] != FROZEN_METHOD_FAMILIES[method_id]:
         raise ContentValidationError(f"{method_id}.family: does not match frozen catalog")
-    if data["content_revision"] != 1 or not isinstance(data["content_revision"], int):
-        raise ContentValidationError(f"{method_id}.content_revision: expected positive revision 1")
+    if data["content_revision"] != CONTENT_REVISION or not isinstance(
+        data["content_revision"], int
+    ):
+        raise ContentValidationError(
+            f"{method_id}.content_revision: expected current content revision"
+        )
     for field in ("display_name", "plain_action"):
         labels = _mapping(data[field], f"{method_id}.{field}")
         if set(labels) != {"en", "ko"}:
@@ -798,7 +806,7 @@ def validate_catalog(value: Any) -> dict[str, Any]:
         {"schema", "content_revision", "families", "methods"},
         "catalog",
     )
-    if data["schema"] != CATALOG_SCHEMA or data["content_revision"] != 1:
+    if data["schema"] != CATALOG_SCHEMA or data["content_revision"] != CONTENT_REVISION:
         raise ContentValidationError("catalog: unsupported schema or content revision")
     families = _list(data["families"], "catalog.families")
     if [item.get("id") for item in families if isinstance(item, Mapping)] != list(FROZEN_FAMILIES):

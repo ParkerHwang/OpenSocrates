@@ -415,6 +415,38 @@ def _compose_claude_selector(
     return projections, assembler, selector, application
 
 
+def _build_decision_hook_services(
+    *, host: str | None, workspace: str | Path | None, data_root: DataRoot | None
+) -> RuntimeServices:
+    """Discovery plus cleanup of existing artifacts; no new product state or content load."""
+
+    if host not in {"claude", "codex"}:
+        raise ValueError("decision hooks require a native host")
+    from ..persistence.paths import DataRootLayout, resolve_data_root
+    from ..persistence.turn_store import load_existing_installation_key
+
+    store = None
+    try:
+        layout = (
+            data_root.layout
+            if data_root is not None
+            else DataRootLayout.from_root(resolve_data_root(DataRootConfig()))
+        )
+        key = load_existing_installation_key(layout)
+        store = InstructionFileStore(
+            installation_key=key,
+            workspace=Path(workspace) if host == "claude" and workspace is not None else None,
+        )
+        store.sweep_expired()
+    except Exception:
+        # Fresh/unsafe/unavailable roots must not be initialized just for discovery.
+        store = None
+    adapter = build_adapter(
+        host, selector_mode=True, decision_point_mode=True, instruction_file_store=store
+    )
+    return RuntimeServices(adapters={host: adapter}, instruction_file_store=store)
+
+
 def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     *,
     host: str | None = None,
@@ -423,10 +455,16 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
     reasoning_content_path: str | Path | None = None,
     data_root: DataRoot | None = None,
     include_storage: bool = True,
+    decision_point_mode: bool = True,
+    hook_only: bool = False,
     workspace: str | Path | None = None,
 ) -> RuntimeServices:
     """Build the normal packaged composition, degrading store failures safely."""
 
+    if hook_only:
+        if not decision_point_mode:
+            raise ValueError("hook-only composition requires decision-point mode")
+        return _build_decision_hook_services(host=host, workspace=workspace, data_root=data_root)
     selected_locale = locale if locale in {"en", "ko"} else "en"
     selected_bundle_path = discover_bundle_path(bundle_path)
     selected_reasoning_content_path = discover_reasoning_content_path(reasoning_content_path)
@@ -503,7 +541,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
                     else None,
                 )
                 instruction_file_store.sweep_expired()
-            if host == "codex":
+            if host == "codex" and not decision_point_mode:
                 (
                     reasoning_content_projections,
                     projection_instruction_assembler,
@@ -514,7 +552,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
                     instruction_file_store=instruction_file_store,
                     config=selector_config,
                 )
-            else:
+            elif host == "claude" and not decision_point_mode:
                 (
                     reasoning_content_projections,
                     projection_instruction_assembler,
@@ -586,6 +624,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
                 # a mis-wired caller can never fall through to the legacy
                 # projection path that handles prompt, path, and model data.
                 selector_mode=name in {"claude", "codex"},
+                decision_point_mode=decision_point_mode and name in {"claude", "codex"},
                 selector_application=selector_application if name == host else None,
                 selector_config=selector_config if name == host else None,
                 instruction_file_store=instruction_file_store if name == host else None,

@@ -31,6 +31,7 @@ mode=$1
 host=$2
 event=${3:-}
 codex_session_start_compact=false
+decision_stream=false
 codex_session_start_payload_base64=
 
 case "$mode" in
@@ -42,6 +43,17 @@ case "$mode" in
         case "$event" in
             session_started|user_prompt_submitted|skill_invoked|tool_succeeded|tool_failed|tool_batch_completed|completion_candidate|pre_compaction|post_compaction|session_ended)
                 ;;
+            *) pass_through invalid_arguments "$mode" "$host" ;;
+        esac
+        ;;
+    decision)
+        if [ "$#" -eq 3 ] && [ "$event" = --stream ]; then
+            decision_stream=true
+        elif [ "$#" -ne 2 ]; then
+            pass_through invalid_arguments "$mode" "$host"
+        fi
+        case "$host" in
+            claude|codex) ;;
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         ;;
@@ -145,6 +157,12 @@ case "$mode" in
             "$runtime_path" hook "$event" --host "$host" 2>/dev/null || true
         fi
         exit 0
+        ;;
+    decision)
+        if [ "$decision_stream" = true ]; then
+            exec "$runtime_path" decision --stream
+        fi
+        exec "$runtime_path" decision
         ;;
     control)
         exec "$runtime_path" control apply --host "$host"
