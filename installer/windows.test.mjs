@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
 import {mkdtempSync,existsSync,rmSync,readFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
-import {join,dirname} from 'node:path';
+import {basename,dirname,join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import test from 'node:test';
 import {assetNameFor,isSafeArchivePath,parseChecksumText,PRODUCT_VERSION} from './opensocrates.mjs';
@@ -32,7 +32,7 @@ test('packed npm distribution carries and executes the Windows helper',{skip:pro
     const packed=spawnSync(process.execPath,[npm,'pack','--json','--ignore-scripts','--pack-destination',scratch],{cwd:root,encoding:'utf8'});
     assert.equal(packed.status,0,packed.stderr);
     const archive=join(scratch,JSON.parse(packed.stdout)[0].filename);
-    const unpacked=spawnSync('tar.exe',['-xzf',archive,'-C',scratch],{encoding:'utf8'});
+    const unpacked=spawnSync('tar.exe',['-xzf',basename(archive),'-C','.'],{cwd:scratch,encoding:'utf8'});
     assert.equal(unpacked.status,0,unpacked.stderr);
     assert.ok(existsSync(join(scratch,'package/installer/windows.ps1')));
     assert.equal(readFileSync(join(scratch,'package/installer/windows.ps1'),'utf8'),readFileSync(join(root,'installer/windows.ps1'),'utf8'));
