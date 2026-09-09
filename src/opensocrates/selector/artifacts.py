@@ -1376,6 +1376,8 @@ class InstructionFileStore:
             info = path.lstat()
         except (ValueError, OSError):
             return 0
+        if expected_identity is not None and (info.st_dev, info.st_ino) != expected_identity:
+            return 0
         if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
             try:
                 path.unlink()

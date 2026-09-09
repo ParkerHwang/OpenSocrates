@@ -854,6 +854,23 @@ def _test_instruction_artifacts() -> None:
             _require(stat.S_IMODE(directory.stat().st_mode) == 0o700)
             _require(stat.S_IMODE(artifact.path.stat().st_mode) == 0o600)
 
+        inspected = artifact.path.stat()
+        saved = artifact.path.with_suffix(".saved")
+        artifact.path.rename(saved)
+        artifact.path.write_bytes(b"replacement must survive cleanup")
+        _require(
+            store._remove_tree(
+                artifact.path,
+                root=store.directory,
+                recursive=False,
+                expected_identity=(inspected.st_dev, inspected.st_ino),
+            )
+            == 0
+        )
+        _require(artifact.path.read_bytes() == b"replacement must survive cleanup")
+        artifact.path.unlink()
+        saved.rename(artifact.path)
+
         stale_seconds = clock.unix_time_ns() // 1_000_000_000 - INSTRUCTION_FILE_TTL_SECONDS - 1
         os.utime(artifact.path, (stale_seconds, stale_seconds))
         _require(store.sweep_expired() >= 1)
