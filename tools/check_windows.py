@@ -531,6 +531,118 @@ class WindowsChecks(unittest.TestCase):
             )
             self.assertEqual(child.returncode, 0, child.stderr)
 
+    def test_artifact_cleanup_preserves_junction_targets(self):
+        from opensocrates.selector.artifacts import InstructionFileStore
+
+        for operation in ("session", "turn", "superseded", "sweep"):
+            for junction_level in ("root", "session", "turn"):
+                with self.subTest(operation=operation, junction_level=junction_level):
+                    with tempfile.TemporaryDirectory() as name:
+                        parent = Path(name)
+                        root = parent / "private"
+                        external = parent / "external"
+                        self.assertTrue(create_owner_only_directory(root))
+                        self.assertTrue(create_owner_only_directory(external))
+                        store = InstructionFileStore(installation_key=b"J" * 32, directory=root)
+                        root = store.directory
+                        session = store._session_directory("session", root=root)
+                        turn = store._turn_directory("session", "old", root=root)
+                        self.assertTrue(create_owner_only_directory(session))
+                        self.assertTrue(create_owner_only_directory(turn))
+                        junction = {"root": root, "session": session, "turn": turn}[junction_level]
+                        # Mirror the expected suffix so every cleanup entry point
+                        # would reach the external file if it followed the junction.
+                        target = external / turn.relative_to(junction)
+                        create_owner_only_directory(target, parents=True)
+                        sentinel = target / "instruction-sentinel.md"
+                        descriptor = create_owner_only_file(sentinel, flags=os.O_WRONLY)
+                        os.write(descriptor, b"unrelated fixture")
+                        os.close(descriptor)
+                        os.utime(sentinel, (1, 1))
+                        junction.rename(Path(str(junction) + "-saved"))
+                        subprocess.run(
+                            [
+                                "powershell.exe",
+                                "-NoProfile",
+                                "-NonInteractive",
+                                "-Command",
+                                "New-Item -ItemType Junction -Path $env:TEST_JUNCTION -Target $env:TEST_TARGET | Out-Null",
+                            ],
+                            env={
+                                **os.environ,
+                                "TEST_JUNCTION": str(junction),
+                                "TEST_TARGET": str(external),
+                            },
+                            check=True,
+                            capture_output=True,
+                        )
+                        self.assertTrue(junction.lstat().st_file_attributes & 0x400)
+                        if operation == "session":
+                            store.delete_session("session")
+                        elif operation == "turn":
+                            store.delete_turn("session", "old")
+                        elif operation == "superseded":
+                            store.delete_superseded_turns("session", "active")
+                        else:
+                            store.sweep_expired()
+                        self.assertEqual(sentinel.read_bytes(), b"unrelated fixture")
+
+    def test_artifact_cleanup_pins_objects_and_preserves_changed_names(self):
+        from opensocrates import windows_security
+        from opensocrates.selector.artifacts import InstructionFileStore
+
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name) / "private"
+            self.assertTrue(create_owner_only_directory(root))
+            store = InstructionFileStore(installation_key=b"K" * 32, directory=root)
+            root = store.directory
+            session = store._session_directory("session", root=root)
+            self.assertTrue(create_owner_only_directory(session))
+            path = session / "instruction-sentinel.md"
+            descriptor = create_owner_only_file(path, flags=os.O_WRONLY)
+            os.write(descriptor, b"original")
+            os.close(descriptor)
+            real_delete = windows_security._mark_handle_for_deletion
+            attempts = []
+
+            def attempt_replacement(handle):
+                if path.exists():
+                    for candidate in (path, session, root):
+                        with self.assertRaises(PermissionError):
+                            candidate.rename(Path(str(candidate) + "-moved"))
+                        attempts.append(candidate.name)
+                real_delete(handle)
+
+            with mock.patch.object(
+                windows_security, "_mark_handle_for_deletion", side_effect=attempt_replacement
+            ):
+                self.assertGreaterEqual(store.delete_session("session"), 2)
+            self.assertEqual(len(attempts), 3)
+            self.assertFalse(path.exists())
+            self.assertFalse(root.exists())
+
+            self.assertTrue(create_owner_only_directory(root))
+            self.assertTrue(create_owner_only_directory(session))
+            descriptor = create_owner_only_file(path, flags=os.O_WRONLY)
+            os.close(descriptor)
+            moved = session / "original-saved.md"
+            real_open = windows_security._open_path_handle
+
+            def replace_before_open(candidate, *, access):
+                if candidate == path:
+                    path.rename(moved)
+                    descriptor = create_owner_only_file(path, flags=os.O_WRONLY)
+                    os.write(descriptor, b"replacement")
+                    os.close(descriptor)
+                return real_open(candidate, access=access)
+
+            with mock.patch.object(
+                windows_security, "_open_path_handle", side_effect=replace_before_open
+            ):
+                self.assertEqual(store._remove_tree(path, root=root), 0)
+            self.assertTrue(moved.exists())
+            self.assertEqual(path.read_bytes(), b"replacement")
+
     def test_zip_rejects_windows_aliases_before_extract(self):
         import hashlib
 

@@ -798,10 +798,20 @@ class InstructionFileStore:
             raise InstructionArtifactError("temporary directory is unsafe")
         self._ensure_owned_directory(root)
 
-    def _cleanup_root(self, root: Path) -> None:
+    @staticmethod
+    def _remove_empty_directory(path: Path, *, root: Path) -> int:
+        if sys.platform == "win32":
+            from opensocrates.windows_security import remove_private_path
+
+            return remove_private_path(path, root=root, directory_only=True)
         try:
-            root.rmdir()
+            path.rmdir()
         except OSError:
+            return 0
+        return 1
+
+    def _cleanup_root(self, root: Path) -> None:
+        if not self._remove_empty_directory(root, root=root):
             return
         if self._workspace_container is None or root.parent != self._workspace_container:
             return
@@ -810,13 +820,18 @@ class InstructionFileStore:
         try:
             children = tuple(container.iterdir())
             if children == (ignore,):
-                self._inspect_regular_file(ignore)
+                info = self._inspect_regular_file(ignore)
                 if (
                     self._read_owner_file(ignore, maximum=len(_WORKSPACE_IGNORE_BYTES))
                     == _WORKSPACE_IGNORE_BYTES
                 ):
-                    ignore.unlink()
-                    container.rmdir()
+                    self._remove_tree(
+                        ignore,
+                        root=container,
+                        recursive=False,
+                        expected_identity=(info.st_dev, info.st_ino),
+                    )
+                    self._remove_empty_directory(container, root=container)
         except (OSError, InstructionArtifactError):
             return
 
@@ -1340,9 +1355,22 @@ class InstructionFileStore:
         ):
             return False
 
-    def _remove_tree(self, path: Path, *, root: Path) -> int:
+    def _remove_tree(  # noqa: C901  # Explicit native cleanup boundary and retained POSIX traversal.
+        self,
+        path: Path,
+        *,
+        root: Path,
+        recursive: bool = True,
+        expected_identity: tuple[int, int] | None = None,
+    ) -> int:
         """Remove an exact artifact subtree without following symlinks."""
 
+        if sys.platform == "win32":
+            from opensocrates.windows_security import remove_private_path
+
+            return remove_private_path(
+                path, root=root, recursive=recursive, expected_identity=expected_identity
+            )
         try:
             path.relative_to(root)
             info = path.lstat()
@@ -1357,12 +1385,13 @@ class InstructionFileStore:
         if sys.platform != "win32" and info.st_uid != os.geteuid():
             return 0
         removed = 0
-        try:
-            children = tuple(path.iterdir())
-        except OSError:
-            return 0
-        for child in children:
-            removed += self._remove_tree(child, root=root)
+        if recursive:
+            try:
+                children = tuple(path.iterdir())
+            except OSError:
+                return 0
+            for child in children:
+                removed += self._remove_tree(child, root=root)
         try:
             path.rmdir()
         except OSError:
@@ -1382,12 +1411,7 @@ class InstructionFileStore:
             except InstructionArtifactError:
                 continue
             removed += self._remove_tree(turn_directory, root=root)
-            try:
-                session_directory.rmdir()
-            except OSError:
-                pass
-            else:
-                removed += 1
+            removed += self._remove_empty_directory(session_directory, root=root)
             self._cleanup_root(root)
         return removed
 
@@ -1399,6 +1423,8 @@ class InstructionFileStore:
             try:
                 active_directory = self._turn_directory(session_id, active_turn_id, root=root)
                 session_directory = active_directory.parent
+                if getattr(session_directory.lstat(), "st_file_attributes", 0) & 0x400:
+                    continue
                 children = tuple(session_directory.iterdir())
             except (OSError, InstructionArtifactError):
                 continue
@@ -1442,7 +1468,11 @@ class InstructionFileStore:
                     continue
                 try:
                     session_info = session_directory.lstat()
-                    if stat.S_ISLNK(session_info.st_mode) or not stat.S_ISDIR(session_info.st_mode):
+                    if (
+                        stat.S_ISLNK(session_info.st_mode)
+                        or not stat.S_ISDIR(session_info.st_mode)
+                        or getattr(session_info, "st_file_attributes", 0) & 0x400
+                    ):
                         continue
                     turns = tuple(session_directory.iterdir())
                 except OSError:
@@ -1452,7 +1482,11 @@ class InstructionFileStore:
                         continue
                     try:
                         turn_info = turn_directory.lstat()
-                        if stat.S_ISLNK(turn_info.st_mode) or not stat.S_ISDIR(turn_info.st_mode):
+                        if (
+                            stat.S_ISLNK(turn_info.st_mode)
+                            or not stat.S_ISDIR(turn_info.st_mode)
+                            or getattr(turn_info, "st_file_attributes", 0) & 0x400
+                        ):
                             continue
                         files = tuple(turn_directory.iterdir())
                     except OSError:
@@ -1467,8 +1501,12 @@ class InstructionFileStore:
                                 and not stat.S_ISLNK(info.st_mode)
                                 and info.st_mtime_ns <= cutoff_ns
                             ):
-                                path.unlink()
-                                removed += 1
+                                removed += self._remove_tree(
+                                    path,
+                                    root=root,
+                                    recursive=False,
+                                    expected_identity=(info.st_dev, info.st_ino),
+                                )
                         except OSError:
                             continue
                     try:
@@ -1484,22 +1522,16 @@ class InstructionFileStore:
                             if stat.S_ISREG(receipt_info.st_mode) and not stat.S_ISLNK(
                                 receipt_info.st_mode
                             ):
-                                receipt_path.unlink()
-                                removed += 1
+                                removed += self._remove_tree(
+                                    receipt_path,
+                                    root=root,
+                                    recursive=False,
+                                    expected_identity=(receipt_info.st_dev, receipt_info.st_ino),
+                                )
                     except OSError:
                         pass
-                    try:
-                        turn_directory.rmdir()
-                    except OSError:
-                        pass
-                    else:
-                        removed += 1
-                try:
-                    session_directory.rmdir()
-                except OSError:
-                    pass
-                else:
-                    removed += 1
+                    removed += self._remove_empty_directory(turn_directory, root=root)
+                removed += self._remove_empty_directory(session_directory, root=root)
             self._cleanup_root(root)
         return removed
 

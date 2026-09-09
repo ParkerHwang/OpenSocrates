@@ -888,6 +888,103 @@ def verify_private_file_descriptor(descriptor: int) -> None:
         raise PermissionError("Windows descriptor ACL is unsafe")
 
 
+def _open_cleanup_descriptor(path: Path, *, delete: bool) -> int:
+    """Pin an existing private object and reject a changed name before cleanup."""
+
+    before = path.lstat()
+    _adv, kernel, _ntdll = _api()
+    handle = _open_path_handle(
+        path, access=_GENERIC_READ | _READ_CONTROL | (_DELETE if delete else 0)
+    )
+    try:
+        if _inspect_handle(handle) != (True, True):
+            raise PermissionError("Windows cleanup object is not private")
+        descriptor = msvcrt.open_osfhandle(handle, os.O_RDONLY | os.O_BINARY)
+    except Exception:
+        kernel.CloseHandle(handle)
+        raise
+    try:
+        opened = os.fstat(descriptor)
+        if (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino):
+            raise PermissionError("Windows cleanup object identity changed")
+        if not delete and not _handle_attributes(handle) & _FILE_ATTRIBUTE_DIRECTORY:
+            raise PermissionError("Windows cleanup ancestor is not a directory")
+        return descriptor
+    except Exception:
+        os.close(descriptor)
+        raise
+
+
+def _remove_private_entry(
+    path: Path,
+    *,
+    recursive: bool,
+    expected_identity: tuple[int, int] | None,
+    directory_only: bool = False,
+) -> int:
+    removed = 0
+    descriptor: int | None = None
+    try:
+        descriptor = _open_cleanup_descriptor(path, delete=True)
+        info = os.fstat(descriptor)
+        if expected_identity is not None and (info.st_dev, info.st_ino) != expected_identity:
+            return 0
+        handle = int(msvcrt.get_osfhandle(descriptor))
+        if directory_only and not _handle_attributes(handle) & _FILE_ATTRIBUTE_DIRECTORY:
+            return 0
+        if recursive and _handle_attributes(handle) & _FILE_ATTRIBUTE_DIRECTORY:
+            # The directory and every ancestor stay open without delete sharing.
+            # A path enumeration cannot be redirected to a replacement directory.
+            for child in tuple(path.iterdir()):
+                removed += _remove_private_entry(child, recursive=True, expected_identity=None)
+        _mark_handle_for_deletion(handle)
+        removed += 1
+    except OSError:
+        pass  # Cleanup is best effort; an unsafe or occupied object is preserved.
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+    return removed
+
+
+def remove_private_path(
+    path: Path,
+    *,
+    root: Path,
+    recursive: bool = False,
+    expected_identity: tuple[int, int] | None = None,
+    directory_only: bool = False,
+) -> int:
+    """Delete only private non-reparse objects below pinned private ancestors."""
+
+    path, root = Path(path), Path(root)
+    if not path.is_absolute() or not root.is_absolute():
+        return 0
+    try:
+        parts = path.relative_to(root).parts
+    except ValueError:
+        return 0
+    if any(part in {".", ".."} or ":" in part for part in parts):
+        return 0
+    ancestors: list[int] = []
+    try:
+        current = root
+        for part in parts:
+            ancestors.append(_open_cleanup_descriptor(current, delete=False))
+            current = current / part
+        return _remove_private_entry(
+            path,
+            recursive=recursive,
+            expected_identity=expected_identity,
+            directory_only=directory_only,
+        )
+    except OSError:
+        return 0
+    finally:
+        for descriptor in reversed(ancestors):
+            os.close(descriptor)
+
+
 def replace_created_file_descriptor(created: CreatedPrivateTempfile, destination: Path) -> None:
     """Rename one exact child within the same retained, verified parent handle."""
 
