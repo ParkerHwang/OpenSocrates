@@ -25,7 +25,7 @@
 All notable changes to OpenSocrates are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.3.1] - 2026-09-09
 
 ### Fixed
 

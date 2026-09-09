@@ -1,6 +1,6 @@
 # 설치 및 런타임 상세 안내
 
-v1.3.0 시작 안내는 [README](../README.ko.md)에 있습니다. 소스 체크아웃이 필요한 명령은 저장소 루트에서 실행합니다. 기본 Claude/Codex 흐름은 탐색 안내와 에이전트의 방법 조회이며, 아래의 저장된 접지 파일과 별도 선택기 프로세스 설명은 유지된 이전 어댑터에 해당합니다. 과거 호스트 검증 기록을 v1.3.0의 새 실사용 검증으로 해석하지 않습니다. [현재 전달 방식](decision-points.ko.md)과 [릴리스 근거](v1.3.0-recovery/PROGRESS.md)를 참고하세요.
+v1.3.1 시작 안내는 [README](../README.ko.md)에 있습니다. 소스 체크아웃이 필요한 명령은 저장소 루트에서 실행합니다. 기본 Claude/Codex 흐름은 탐색 안내와 에이전트의 방법 조회이며, 아래의 저장된 접지 파일과 별도 선택기 프로세스 설명은 유지된 이전 어댑터에 해당합니다. 과거 호스트 검증 기록을 v1.3.1의 새 실사용 검증으로 해석하지 않습니다. [현재 전달 방식](decision-points.ko.md)과 [릴리스 근거](v1.3.1-release.md)를 참고하세요.
 
 ## 설치
 
@@ -21,7 +21,7 @@ Node.js 20 이상이 필요합니다. npm에 게시된 `opensocrates` 패키지�
 ### 준비된 모든 호스트에 설치
 
 ```bash
-npx --yes opensocrates@1.3.0 install --host all
+npx --yes opensocrates@1.3.1 install --host all
 ```
 
 모든 호스트 경로는 지원되는 인증 완료 CLI를 찾고, 어느 호스트도 바꾸기 전에
@@ -32,9 +32,9 @@ npx --yes opensocrates@1.3.0 install --host all
 전체 라이프사이클에서 같은 호스트 값을 사용할 수 있습니다.
 
 ```bash
-npx --yes opensocrates@1.3.0 status --host all
-npx --yes opensocrates@1.3.0 update --host all
-npx --yes opensocrates@1.3.0 remove --host all
+npx --yes opensocrates@1.3.1 status --host all
+npx --yes opensocrates@1.3.1 update --host all
+npx --yes opensocrates@1.3.1 remove --host all
 ```
 
 ### 등록 제거, 소유 payload purge, Codex 신뢰 초기화
@@ -48,11 +48,11 @@ OpenSocrates 플러그인 캐시와 설치 프로그램 desired-state 파일은 
 활성 호스트를 닫은 뒤 명시적인 소유 payload purge를 실행하세요.
 
 ```bash
-npx --yes opensocrates@1.3.0 remove --host all --purge
-# 호스트 하나: npx --yes opensocrates@1.3.0 remove --host claude --purge
+npx --yes opensocrates@1.3.1 remove --host all --purge
+# 호스트 하나: npx --yes opensocrates@1.3.1 remove --host claude --purge
 # OpenSocrates Codex 훅 신뢰만 함께 초기화:
-npx --yes opensocrates@1.3.0 remove --host all --purge --reset-trust
-# Codex만: npx --yes opensocrates@1.3.0 remove --host codex --purge --reset-trust
+npx --yes opensocrates@1.3.1 remove --host all --purge --reset-trust
+# Codex만: npx --yes opensocrates@1.3.1 remove --host codex --purge --reset-trust
 ```
 
 Purge는 항목을 삭제하기 전에 canonical 경로, 정확한
@@ -105,13 +105,13 @@ config를 유지하거나 안전하게 rollback할 수 있을 때 트랜잭션�
 기존 사용자와의 호환성을 위해 기본 호스트는 계속 Codex입니다.
 
 ```bash
-npx --yes opensocrates@1.3.0 install
-# 같은 명령: npx --yes opensocrates@1.3.0 install --host codex
-npx --yes opensocrates@1.3.0 install --host claude
-npx --yes opensocrates@1.3.0 install --host antigravity
-npx --yes opensocrates@1.3.0 install --host cursor
-npx --yes opensocrates@1.3.0 install --host grok
-npx --yes opensocrates@1.3.0 install --host opencode
+npx --yes opensocrates@1.3.1 install
+# 같은 명령: npx --yes opensocrates@1.3.1 install --host codex
+npx --yes opensocrates@1.3.1 install --host claude
+npx --yes opensocrates@1.3.1 install --host antigravity
+npx --yes opensocrates@1.3.1 install --host cursor
+npx --yes opensocrates@1.3.1 install --host grok
+npx --yes opensocrates@1.3.1 install --host opencode
 ```
 
 Grok Build는 `~/.grok/plugins/opensocrates`에 네이티브 콘텐츠 전용 플러그인을
@@ -140,9 +140,9 @@ Claude 상태는 활성 설치와 설치됐지만 비활성화된 플러그인�
 ### 선택형 자동 업데이트
 
 ```bash
-npx --yes opensocrates@1.3.0 auto-update enable --host all
-npx --yes opensocrates@1.3.0 auto-update status
-npx --yes opensocrates@1.3.0 auto-update disable
+npx --yes opensocrates@1.3.1 auto-update enable --host all
+npx --yes opensocrates@1.3.1 auto-update status
+npx --yes opensocrates@1.3.1 auto-update disable
 ```
 
 자동 업데이트는 명시적으로 켜기 전까지 비활성화되어 있습니다. macOS LaunchAgent는
@@ -168,7 +168,7 @@ LaunchAgent를 언로드하고 삭제하며, `remove --host all`도 관리 호�
 
 Chat 독립형 내보내기: **아카이브 계약 검증, 실제 활성화 미검증.**
 
-v1.3.0 독립형 ZIP에는 정본 48개와 한영 참조가 모두 들어 있습니다. 파일 구조·참조
+v1.3.1 독립형 ZIP에는 정본 48개와 한영 참조가 모두 들어 있습니다. 파일 구조·참조
 무결성 및 공개 배포 출처와 계정 수준의 업로드는 별도 근거입니다. 로컬 설치기는
 기존 custom/synced 스킬을 자동 갱신하지 않습니다.
 [버전별 지원 근거](claude-chat-upload-probe.md)를 확인하세요.
@@ -188,23 +188,23 @@ Code/Cowork 플러그인 아카이브가 아닙니다. 독립형 패키지는 ca
 npm 레지스트리를 거치지 않을 때는 공개된 태그로 같은 호스트 옵션을 사용합니다.
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host all
-npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host claude
-npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host codex
-npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host opencode
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.1 install --host all
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.1 install --host claude
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.1 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.1 install --host opencode
 ```
 
 ### 릴리스 파일 직접 검증
 
 공개 뒤에는
-[v1.3.0 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.0)에서
+[v1.3.1 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.1)에서
 `opensocrates.mjs`, 호스트 패키지, `.sha256` 파일을 내려받습니다. 아래 명령은 이름이 일치하는 공개 asset을 확인한 뒤에 사용하세요. Claude의 예:
 
 ```bash
-shasum -a 256 -c opensocrates-1.3.0-claude-plugin.zip.sha256
+shasum -a 256 -c opensocrates-1.3.1-claude-plugin.zip.sha256
 node opensocrates.mjs install --host claude \
-  --asset opensocrates-1.3.0-claude-plugin.zip \
-  --checksum opensocrates-1.3.0-claude-plugin.zip.sha256
+  --asset opensocrates-1.3.1-claude-plugin.zip \
+  --checksum opensocrates-1.3.1-claude-plugin.zip.sha256
 ```
 
 다른 호스트 패키지는 `claude`를 `antigravity`, `codex`, `cursor`, `opencode`로 바꾸면 됩니다.
@@ -219,7 +219,7 @@ node opensocrates.mjs install --host claude \
 ```bash
 claude plugin uninstall opensocrates@OpenSocrates --scope user
 claude plugin marketplace remove OpenSocrates --scope user
-npx --yes opensocrates@1.3.0 install --host claude
+npx --yes opensocrates@1.3.1 install --host claude
 ```
 
 관리형 v1.1.0 Claude 설치를 업데이트하면 패키지 트리 전체가 교체됩니다. 따라서

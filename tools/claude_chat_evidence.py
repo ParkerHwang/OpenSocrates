@@ -10,7 +10,7 @@ from typing import Any
 SCHEMA = "opensocrates.claude-chat-upload-probe/2.0.0"
 # Exact supported archive layouts, not an arbitrary minimum file count.
 # v1.3 adds bilingual decision guides/catalogs and 96 complete method references.
-ARCHIVE_FILE_COUNTS = {"1.1.2": 51, "1.2.0": 51, "1.2.1": 51, "1.3.0": 153}
+ARCHIVE_FILE_COUNTS = {"1.1.2": 51, "1.2.0": 51, "1.2.1": 51, "1.3.0": 153, "1.3.1": 153}
 PROMPT4_MERGE_COMMIT = "2ced9500aea5c7672f644ecc345b58ed30a31701"
 SHA256 = re.compile(r"sha256:[0-9a-f]{64}\Z")
 COMMIT = re.compile(r"[0-9a-f]{40}\Z")
