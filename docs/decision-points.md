@@ -1,6 +1,6 @@
 # Decision-point retrieval and migration
 
-Status: v1.3.0 release work; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
+Status: v1.3.1 patch release; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
 Experimental content revision 2, method variants, language rewrites and Compact
 policies have not been promoted. Method IDs remain unchanged.
 
