@@ -25,7 +25,7 @@ focused Pull Request의 최신 커밋에 대한 Native package CI job이 성공�
   있습니다.
 - 현재 POSIX username이 canonical이며, Claude와 Codex 인증이 일반 preflight와
   닫힌 lifecycle 환경에서 모두 성공합니다.
-- Claude와 Codex의 canonical managed root에 OpenSocrates 1.2.1 등록이 각각 정확히
+- Claude와 Codex의 canonical managed root에 OpenSocrates 1.3.1 등록이 각각 정확히
   하나 있습니다.
 - Claude와 Codex managed root 및 cache version이 전체 checksum과 닫힌 파일 목록
   검사를 통과합니다.
@@ -36,7 +36,7 @@ focused Pull Request의 최신 커밋에 대한 Native package CI job이 성공�
   trust-reset residue, LaunchAgent temporary가 없습니다.
 - 체크아웃이 clean 상태이고 열린 Pull Request head와 계속 일치합니다.
 
-후보 gate는 정확한 8개 파일로 `npm pack` tarball을 만듭니다. 또한 성공한 CI의
+후보 gate는 정확한 9개 파일로 `npm pack` tarball을 만듭니다. 또한 성공한 CI의
 repository, workflow, run ID, attempt, full head SHA, immutable artifact ID, artifact
 name, raw ZIP digest와 size, 빌드 시점 commit/tree receipt, 두 호스트 payload
 manifest와 canonical Python/Claude/Codex 실행 파일 및 각 SHA-256 digest를
@@ -45,13 +45,56 @@ manifest와 canonical Python/Claude/Codex 실행 파일 및 각 SHA-256 digest�
 축소된 shell `PATH`에 의존하지 않고, 최종 timing은 고정한 Python을 직접 실행합니다.
 harness는 Python이 observation byte를 쓰기 전에 private timing report를 배타적인
 소유자 전용 파일로 만들고, 읽기 전에 해당 mode를 다시 검증합니다.
-공개 npm 및 GitHub release의 1.2.1은 계속 unavailable이며 사용하거나 검증했다고
-주장하지 않습니다.
+게시 전 후보 1.4.0은 packed installer와 정확한 PR CI artifact를 사용합니다. 공개 npm
+또는 GitHub release 1.4.0 다운로드를 전제하지 않습니다. 공개된 1.3.1 release bytes는
+시작 payload 출처 확인에만 사용하며 후보 검증을 대체하지 않습니다.
 
 purge 직전 baseline 재검사는 exact managed root, stable cache payload, desired state,
 OpenSocrates Codex trust 구문을 고정합니다. cache binding은 shape와 liveness를
 별도로 검증한 non-live per-process `.in_use` transient만 제외합니다. 그 밖의 byte
 또는 topology가 하나라도 바뀌면 첫 purge 명령 전에 중단합니다.
+
+## 버전 전이와 baseline 출처
+
+지원 전이는 **initialVersion 1.3.1 → candidateVersion 1.4.0**으로 한정합니다.
+`purged_same_machine` 및 `transition: purge_then_reinstall`로 기록하며 clean-machine이나
+in-place update/migration의 근거가 아닙니다. baseline을 맞추려고 1.4.0을 먼저 설치하지
+마세요. 기존 이슈 #83 harness는 당시 같은 1.2.1 후보의 재설치를 검증하려고 양쪽에
+`PRODUCT_VERSION`을 사용했습니다. upgrade 경로가 아니며 installer의 pre-1.0 대소문자
+변형 등록 migration 안내도 별도의 명시적 수동 절차입니다.
+
+두 host의 활성 등록, managed plugin/release manifest, marketplace metadata, desired
+state는 모두 1.3.1이어야 합니다. source와 검증된 PR artifact는 1.4.0이어야 합니다.
+public baseline, private checkpoint, resume, purge 직전 byte binding, sealed 최종 결과가
+두 역할을 구분합니다. 새 계약이 없는 이전 checkpoint는 거부하며 source를 변경한 뒤
+이전 checkpoint를 변환하거나 재실행하지 않습니다.
+
+`tools/reinstall_baseline_provenance.json`은 공식 release archive를 다운로드해 GitHub
+asset digest와 실제 bytes를 비교한 뒤 추출한 checksum inventory 및 manifest digest를
+고정합니다. 1.3.1 release는 immutable입니다. 1.2.1 release는 immutable이 아니므로
+나중의 mutable tag를 신뢰하지 않고 확인한 archive/inventory digest를 source에 고정합니다.
+전체 checksum과 닫힌 파일 목록 검사는 그대로 수행합니다. 출처 불명·재해시 payload는
+자체 checksum이 맞아도 거부합니다. 이는 저장소/release 출처 고정이며 code signing이 아닙니다.
+
+고정된 1.3.1 cache와 선택적으로 남아 있는 **비활성 Claude 1.2.1 cache**만 허용합니다.
+이전 cache는 initialVersion을 바꾸거나 활성 혼합 버전 설치를 뜻하지 않습니다. 알 수 없는
+버전, host/version 불일치, manifest 변조, 추가 파일, 인식하지 못한 cache marker는 계속
+차단합니다. 승인된 purge는 이 검증된 이전 cache도 제거하며 이를 파괴적 cycle에 기록합니다.
+
+## Codex inventory 진단
+
+OpenSocrates 경고, 모든 inventory error, 분류할 수 없는 경고는 계속 차단합니다.
+정확히 진단된 외부 경고 하나만 별도 집계합니다. Codex Companion
+`openai-codex/codex/1.0.6`의 SessionEnd 설정 5초를 Codex가 3초 제한으로 줄인다는
+경고입니다. 다른 plugin의 설정 진단이며 OpenSocrates 실행 실패를 관찰한 것이 아닙니다.
+정확한 문구와 canonical default-home 경로가 일치해야 하며 다른 문구/경로는 차단합니다.
+관련 없는 설정은 변경하지 않습니다. baseline과 최종 첫 review 근거의
+`otherPluginTimeoutWarningCount`에 개수만 남기고 원문 경로/메시지는 공개하지 않습니다.
+일곱 hook, namespace, trust, 고정 SessionStart timeout 검사는 그대로 유지합니다.
+
+CLI에는 `--preflight`나 `--dry-run`이 없습니다. 인자 없는 명령은 gate 이후 실제 변경까지
+진행합니다. 읽기 전용 준비는 코드를 확인한 뒤 읽기 전용 inventory 함수만 사용해야 하며
+cycle을 시작해서는 안 됩니다.
 
 ## 자동 cycle 시작
 
@@ -104,7 +147,7 @@ registration, root, data, state, trust, LaunchAgent, transaction, 후보와 desi
 
 ## 앱 관찰 녹화 및 검토
 
-첫 수동 Codex 또는 Claude 앱 상호작용 전에 Record & Replay를 시작하세요. 녹화기는
+capture가 허가된 경우 첫 수동 Codex 또는 Claude 앱 상호작용 전에 Record & Replay를 시작하세요. 녹화기는
 capture 시작 전 사용자 확인을 요청합니다. 확인 작업을 수행하고 녹화를 중지한 뒤
 반환된 event stream을 private으로 검토하세요. raw accessibility event, prompt,
 transcript, sidebar text, 계정 정보, credential 또는 local path를 public 결과에
@@ -119,10 +162,10 @@ transcript, sidebar text, 계정 정보, credential 또는 local path를 public 
 3. 새 Codex 작업에서 OpenSocrates `SessionStart`가 고정된 2초 host limit에 timeout
    되지 않습니다.
 4. 새 Claude Code Local 작업에서 `/opensocrates:opensocrates status`를 실행해
-   1.2.1을 보고합니다. bare `/opensocrates`는 Local plugin 근거가 아닙니다.
+   1.4.0을 보고합니다. bare `/opensocrates`는 Local plugin 근거가 아닙니다.
 5. private Record & Replay event stream을 중지하고 검토했습니다.
 
-독립형 Claude Chat의 canonical 명령은 `/opensocrates`이지만 exact public Chat 1.2.1
+독립형 Claude Chat의 canonical 명령은 `/opensocrates`이지만 exact public Chat 1.4.0
 artifact는 계속 pending입니다. Claude Local plugin 관찰로 Chat 근거를 추론하지
 마세요.
 
@@ -139,8 +182,26 @@ node tools/reinstall_cycle_acceptance.mjs --bind-recording \
 ```
 
 다섯 개의 `PENDING` manual line만 수정하세요. free-form note, 알 수 없는 enum, 변경된
-자동 결과, 누락된 recording 결속, link, extra file 또는 개인정보 값이 있으면 pack을
-거부합니다.
+자동 결과, link, extra file 또는 개인정보 값이 있으면 pack을 거부합니다. recording review를
+`PASS`로 기록할 때만 verified same-test receipt가 필수입니다. recording 결속 부재가
+미관찰 결과의 pack까지 무조건 금지하는 것은 아닙니다.
+
+### 원문 수집이 금지된 경우
+
+Record & Replay를 시작하거나 screenshot, prompt, transcript, accessibility event,
+계정 정보, credential, hidden reasoning을 수집하지 마세요. 녹화나 대체 파일을 만들어
+결속하지 마세요. 요건을 충족하는 녹화 관찰이 없는 manual field는 `NOT_OBSERVED`로,
+로그인·승인·capture 권한·안전한 제어가 막은 field는 `BLOCKED`로 둡니다. 직접 보았더라도
+녹화되지 않은 관찰이나 승인 영수증은 recorded `PASS` 요건을 충족하지 않습니다. 자동
+hook 목록 조회는 수동 review, 자동 hook 전달, 정본 전체 읽기, native application receipt와
+서로 다른 근거입니다.
+
+자동 검사가 통과하면 기존 pack 계약은 다섯 field의 최종 enum에 미관찰/차단이 있어도
+recording linkage pending 상태로 pack할 수 있습니다. `automatedResult: passed`는
+유지하지만 `manualResult`와 `overallResult`는 `not_observed` 또는 `blocked`이며 하나라도
+실패하면 `failed`입니다. 전체 acceptance PASS가 아닙니다. 자동 근거는 설치/topology
+판단에 사용할 수 있으나 수동 acceptance 요건은 남습니다. 로그인과 trust 승인은 사용자
+행동이며 추정해서는 안 됩니다.
 
 ## public handoff 생성 및 보존
 
@@ -153,7 +214,7 @@ node tools/reinstall_cycle_acceptance.mjs --pack RESULT_DIRECTORY \
 
 최종 ZIP에는 `result.json`, `result.md`, `manual-observations.md`만 정확히 들어갑니다.
 자동 결과 bytes는 sealed result와 일치해야 하며, seal, final verification, installed
-checkpoint, source commit, CI artifact, recording receipt와 ZIP digest가 private
+checkpoint, source commit, CI artifact, 존재하는 경우 recording receipt와 ZIP digest가 private
 manifest에서 서로 결속됩니다.
 
 paused 또는 failed run은 별도 이름의 `.diagnostic.zip`을 만들 수 있습니다. 이 bundle은

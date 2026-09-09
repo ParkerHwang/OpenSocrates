@@ -73,7 +73,7 @@ function publicBaselineInventoryFixture(codexHooks) {
     registrations: hostMap(() => ({
       marketplaceCount: 1,
       pluginCount: 1,
-      version: "1.2.1",
+      version: acceptance.INITIAL_VERSION,
       unsupportedLegacyConflictCount: 0,
       rootMatchesExpected: true,
     })),
@@ -147,7 +147,7 @@ async function prepareInstalledSealedFixture(outputDirectory, privateDirectory, 
   acceptance.initializePrivateEvidenceManifest(privateDirectory, outputDirectory, report);
   const finalState = {
     status: "installed",
-    version: "1.2.1",
+    version: PRODUCT_VERSION,
     installedHosts: ["claude", "codex"],
   };
   const checkpoint = {
@@ -340,7 +340,7 @@ function deactivatedDesiredStateFixture() {
   };
 }
 
-function writeClaudeManagedRootFixture(root) {
+function writeClaudeManagedRootFixture(root, version = PRODUCT_VERSION) {
   const managedRoot = join(root, "managed-claude");
   const pluginRoot = join(managedRoot, "plugins", "opensocrates");
   mkdirSync(join(managedRoot, ".claude-plugin"), { recursive: true, mode: 0o700 });
@@ -360,7 +360,7 @@ function writeClaudeManagedRootFixture(root) {
     owner: { name: "Parker Hwang" },
     metadata: {
       description: "OpenSocrates reasoning support for Claude Code and Cowork",
-      version: PRODUCT_VERSION,
+      version,
     },
     plugins: [
       {
@@ -378,11 +378,11 @@ function writeClaudeManagedRootFixture(root) {
     { mode: 0o600 },
   );
   const payloads = {
-    ".claude-plugin/plugin.json": `${JSON.stringify({ name: "opensocrates", version: PRODUCT_VERSION })}\n`,
+    ".claude-plugin/plugin.json": `${JSON.stringify({ name: "opensocrates", version })}\n`,
     "release-manifest.json": `${JSON.stringify({
       schema: "opensocrates.plugin-release-manifest/1.0.0",
       host: "claude",
-      product_version: PRODUCT_VERSION,
+      product_version: version,
       content_revision: CURRENT_CONTENT_REVISION,
     })}\n`,
   };
@@ -1606,6 +1606,9 @@ test("pre-purge baseline recheck binds exact managed, cache, desired-state, and 
         phase: "ready-to-purge",
         sourceCommit: report.source.commit,
         baseline: {
+          initialVersion: acceptance.INITIAL_VERSION,
+          candidateVersion: PRODUCT_VERSION,
+          transition: "purge_then_reinstall",
           initialInventory: publicInventory,
           initialInventorySha256: createHash("sha256")
             .update(JSON.stringify(publicInventory))
@@ -3115,6 +3118,7 @@ test("complete produced final assertions satisfy the public result contract", ()
     },
     codexFirstApproval: {
       status: "pass",
+      otherPluginTimeoutWarningCount: 0,
       exactHookCount: 7,
       events: [
         "postToolUse",
@@ -3514,6 +3518,9 @@ test("production mutation sealing survives a persist crash and fresh finalize-on
       reportDirectory: publicDirectory,
       sourceCommit: report.source.commit,
       baseline: {
+        initialVersion: acceptance.INITIAL_VERSION,
+        candidateVersion: PRODUCT_VERSION,
+        transition: "purge_then_reinstall",
         kind: "purged_same_machine",
         initialState: "installed",
         initialInstalledHosts: ["claude", "codex"],
@@ -5465,7 +5472,9 @@ test("paused host-close state resumes from disk to one sealed final pack without
         removedSyntaxSha256: "6".repeat(64),
       },
     };
-    const initialInventory = { categorical: "installed-two-host-baseline" };
+    const initialInventory = { registrations: publicBaselineInventoryFixture({}).registrations };
+    assert.equal(initialInventory.registrations.claude.version, acceptance.INITIAL_VERSION);
+    assert.equal(initialInventory.registrations.codex.version, acceptance.INITIAL_VERSION);
     const pausedResidue = emptyResidueSnapshot();
     Object.assign(pausedResidue.hosts.claude, {
       cachePresent: true,
@@ -5492,6 +5501,9 @@ test("paused host-close state resumes from disk to one sealed final pack without
       reportDirectory: publicDirectory,
       sourceCommit: report.source.commit,
       baseline: {
+        initialVersion: acceptance.INITIAL_VERSION,
+        candidateVersion: PRODUCT_VERSION,
+        transition: "purge_then_reinstall",
         kind: "purged_same_machine",
         initialState: "installed",
         initialInstalledHosts: ["claude", "codex"],
@@ -5689,7 +5701,7 @@ test("paused host-close state resumes from disk to one sealed final pack without
             );
             return {
               status: "installed",
-              version: "1.2.1",
+              version: PRODUCT_VERSION,
               installedHosts: ["claude", "codex"],
             };
           },
@@ -5712,6 +5724,10 @@ test("paused host-close state resumes from disk to one sealed final pack without
       resumedCheckpoint,
     );
     assert.equal(resumedCheckpoint.phase, "installed");
+    assert.equal(resumedCheckpoint.baseline.initialVersion, "1.3.1");
+    assert.equal(resumedCheckpoint.baseline.candidateVersion, PRODUCT_VERSION);
+    assert.equal(resumedCheckpoint.baseline.transition, "purge_then_reinstall");
+    assert.equal(resumeOutcome.finalState.version, PRODUCT_VERSION);
     assert.deepEqual(
       {
         purgeCommandAttempts: resumedReport.mutation.purgeCommandAttempts,
@@ -7152,4 +7168,137 @@ test("machine-wide acceptance lease rejects unsafe and foreign or stale competin
       );
       first.releaseCompleted();
     }
+  }));
+
+test("1.3.1 baseline and 1.4.0 candidate have distinct registration and desired-state contracts", () => {
+  const inventory = publicBaselineInventoryFixture({});
+  const desired = {
+    schema: "opensocrates.desired-state/1.0.0",
+    activeVersion: acceptance.INITIAL_VERSION,
+    installedHosts: ["claude", "codex"],
+    autoUpdate: { enabled: false, hosts: [] },
+  };
+  assert.doesNotThrow(() => acceptance.assertRegistrationState(inventory.registrations, "installed-baseline"));
+  assert.doesNotThrow(() => acceptance.assertInitialDesiredState(desired, false));
+  assert.throws(() => acceptance.assertRegistrationState(inventory.registrations, "installed-final"));
+  const final = structuredClone(inventory.registrations);
+  for (const host of ["claude", "codex"]) final[host].version = PRODUCT_VERSION;
+  assert.doesNotThrow(() => acceptance.assertRegistrationState(final, "installed-final"));
+  assert.throws(() => acceptance.assertRegistrationState(final, "installed-baseline"));
+  for (const version of [null, "1.2.1", "1.3.0", PRODUCT_VERSION, "9.9.9"]) {
+    const mixed = structuredClone(inventory.registrations);
+    mixed.codex.version = version;
+    assert.throws(() => acceptance.assertRegistrationState(mixed, "installed-baseline"));
+    assert.throws(() => acceptance.assertInitialDesiredState({ ...desired, activeVersion: version }, false));
+  }
+  assert.throws(() => acceptance.assertInitialDesiredState(desired, true));
+});
+
+test("initial managed payload fixtures reject mixed manifests and preserve failed baseline bytes", () =>
+  withFixture(async root => {
+    const initial = writeClaudeManagedRootFixture(root, acceptance.INITIAL_VERSION);
+    const options = { expectedVersion: acceptance.INITIAL_VERSION };
+    await acceptance.verifyManagedRootExact("claude", initial.managedRoot, initial.pluginRoot, options);
+    await assert.rejects(() => acceptance.verifyManagedRootExact(
+      "claude", initial.managedRoot, initial.pluginRoot, { category: "post-install" }), AcceptanceError);
+    // A self-consistent, locally made fixture is not a known published baseline.
+    await assert.rejects(() => acceptance.verifyBaselineProvenance(
+      "claude", initial.pluginRoot, acceptance.INITIAL_VERSION), /pinned published/u);
+    const manifestPath = join(initial.pluginRoot, ".claude-plugin", "plugin.json");
+    const before = readFileSync(manifestPath);
+    writeFileSync(manifestPath, JSON.stringify({ name: "opensocrates", version: PRODUCT_VERSION }));
+    const badBytes = readFileSync(manifestPath);
+    await assert.rejects(() => acceptance.verifyManagedRootExact(
+      "claude", initial.managedRoot, initial.pluginRoot, options), /identity/u);
+    assert.deepEqual(readFileSync(manifestPath), badBytes);
+    writeFileSync(manifestPath, before);
+    await acceptance.verifyManagedRootExact("claude", initial.managedRoot, initial.pluginRoot, options);
+  }));
+
+test("baseline provenance rejects unknown and rehashed payloads, admitting only pinned historical cache", () => {
+  const pins = JSON.parse(readFileSync(new URL("./reinstall_baseline_provenance.json", import.meta.url)));
+  for (const receipt of pins.receipts) {
+    assert.doesNotThrow(() => acceptance.assertBaselineProvenanceDigests(receipt.host, receipt.version, receipt));
+    for (const field of ["checksumInventorySha256", "releaseManifestSha256"]) {
+      assert.throws(() => acceptance.assertBaselineProvenanceDigests(receipt.host, receipt.version,
+        { ...receipt, [field]: "0".repeat(64) }), /pinned published/u);
+    }
+    assert.throws(() => acceptance.assertBaselineProvenanceDigests(receipt.host, "9.9.9", receipt));
+  }
+  assert.throws(() => acceptance.assertBaselineProvenanceDigests("codex", "1.2.1", pins.receipts[2]));
+  assert.equal(pins.initialVersion, acceptance.INITIAL_VERSION);
+});
+
+test("checkpoint roundtrip binds initial and candidate versions and rejects their substitution", () =>
+  withFixture(root => {
+    const report = makeReport();
+    const registrations = publicBaselineInventoryFixture({}).registrations;
+    const checkpointValue = {
+      baseline: {
+        initialVersion: acceptance.INITIAL_VERSION,
+        candidateVersion: PRODUCT_VERSION,
+        transition: "purge_then_reinstall",
+        initialInventory: { registrations },
+        initialTopology: structuredClone(registrations),
+        perHostInstallState: Object.fromEntries(["claude", "codex"].map(host =>
+          [host, { installed: true, version: acceptance.INITIAL_VERSION }])),
+      },
+      npmIdentity: { version: PRODUCT_VERSION },
+    };
+    const path = join(root, "checkpoint.json");
+    writeFileSync(path, JSON.stringify(checkpointValue), { mode: 0o600 });
+    const reloaded = JSON.parse(readFileSync(path));
+    acceptance.assertCheckpointVersionTransition(reloaded, report);
+    for (const mutate of [
+      c => { delete c.baseline.initialVersion; },
+      c => { c.baseline.initialVersion = PRODUCT_VERSION; },
+      c => { c.baseline.candidateVersion = acceptance.INITIAL_VERSION; },
+      c => { c.baseline.transition = "in_place_update"; },
+      c => { c.baseline.initialInventory.registrations.codex.version = PRODUCT_VERSION; },
+      c => { c.baseline.initialTopology.claude.version = "1.2.1"; },
+      c => { c.baseline.perHostInstallState.codex.version = PRODUCT_VERSION; },
+      c => { c.npmIdentity.version = acceptance.INITIAL_VERSION; },
+    ]) {
+      const changed = structuredClone(reloaded);
+      mutate(changed);
+      assert.throws(() => acceptance.assertCheckpointVersionTransition(changed, report));
+      assert.deepEqual(JSON.parse(readFileSync(path)), reloaded);
+    }
+  }));
+
+test("only the diagnosed Codex Companion timeout warning is non-blocking; raw diagnostics stay private", () => {
+  const home = "/fixture-account";
+  const known = `clamping SessionEnd hook timeout to 3s in ${home}/.codex/plugins/cache/openai-codex/codex/1.0.6/hooks/hooks.json`;
+  assert.deepEqual(acceptance.classifyCodexHookWarnings([known], home), {
+    otherPluginTimeoutWarningCount: 1, blockingWarningCount: 0,
+  });
+  for (const warning of [
+    known.replace("openai-codex/codex/1.0.6", "opensocrates/opensocrates/1.4.0"),
+    known.replace("3s", "2s"),
+    known + "/other",
+    "unclassified sensitive diagnostic",
+    null,
+  ]) {
+    const result = acceptance.classifyCodexHookWarnings([known, warning], home);
+    assert.equal(result.blockingWarningCount, 1);
+    assert.equal(JSON.stringify(result).includes(home), false);
+    const probe = { schema: "opensocrates.codex-hook-inventory/1.0.0", errorCount: 0,
+      warningCount: 2, ...result, hooks: [] };
+    assert.throws(() => acceptance.codexHookInventory({ run: () => ({ stdout: JSON.stringify(probe) }) }));
+  }
+});
+
+test("recording-free sealed pack keeps automated pass and NOT_OBSERVED manual status", () =>
+  withFixture(async root => {
+    const output = join(root, "public"); const privateDirectory = join(root, "private");
+    mkdirSync(output, { mode: 0o700 }); mkdirSync(privateDirectory, { mode: 0o700 });
+    const { report } = await prepareInstalledSealedFixture(output, privateDirectory);
+    const manualPath = join(output, "manual-observations.md");
+    writeFileSync(manualPath, manualTemplate(report).replaceAll(": PENDING\n", ": NOT_OBSERVED\n"), { mode: 0o600 });
+    packExisting(output, privateDirectory);
+    const result = JSON.parse(readFileSync(join(output, "result.json")));
+    assert.equal(result.automatedResult, "passed");
+    assert.equal(result.manualResult, "not_observed");
+    assert.equal(result.overallResult, "not_observed");
+    assert.equal(existsSync(join(privateDirectory, "record-and-replay-receipt.json")), false);
   }));
