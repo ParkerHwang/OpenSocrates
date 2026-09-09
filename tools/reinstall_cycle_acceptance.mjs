@@ -6049,7 +6049,7 @@ function inspectPluginData(target) {
 function validateAutoUpdateReceipt(receipt) {
   const results = new Set(["blocked", "no-update", "updated", "failed"]);
   const hostResults = new Set(["blocked-major", "current", "updated", "failed"]);
-  const errorCategories = new Set([
+  const legacyErrorCategories = new Set([
     "major-policy",
     "verification",
     "network",
@@ -6059,6 +6059,21 @@ function validateAutoUpdateReceipt(receipt) {
     "activation",
     "internal",
   ]);
+  const currentErrorCategories = new Set([...legacyErrorCategories, "multiple"]);
+  const legacySchema = receipt?.schema === "opensocrates.auto-update-receipt/1.0.0";
+  const currentSchema = receipt?.schema === "opensocrates.auto-update-receipt/1.1.0";
+  const invalidHost = (item) =>
+    item === null ||
+    typeof item !== "object" ||
+    Array.isArray(item) ||
+    !sameStrings(
+      Object.keys(item),
+      currentSchema ? ["host", "result", "errorCategory"] : ["host", "result"],
+    ) ||
+    !SUPPORTED_HOSTS.includes(item.host) ||
+    !hostResults.has(item.result) ||
+    (currentSchema &&
+      !(item.errorCategory === null || legacyErrorCategories.has(item.errorCategory)));
   if (
     receipt === null ||
     typeof receipt !== "object" ||
@@ -6071,7 +6086,7 @@ function validateAutoUpdateReceipt(receipt) {
       "result",
       "errorCategory",
     ]) ||
-    receipt.schema !== "opensocrates.auto-update-receipt/1.0.0" ||
+    (!legacySchema && !currentSchema) ||
     typeof receipt.version !== "string" ||
     !/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/u.test(receipt.version) ||
     typeof receipt.checkedAt !== "string" ||
@@ -6079,18 +6094,15 @@ function validateAutoUpdateReceipt(receipt) {
     new Date(receipt.checkedAt).toISOString() !== receipt.checkedAt ||
     !Array.isArray(receipt.hosts) ||
     receipt.hosts.length === 0 ||
-    receipt.hosts.some(
-      (item) =>
-        item === null ||
-        typeof item !== "object" ||
-        Array.isArray(item) ||
-        !sameStrings(Object.keys(item), ["host", "result"]) ||
-        !SUPPORTED_HOSTS.includes(item.host) ||
-        !hostResults.has(item.result),
-    ) ||
+    receipt.hosts.some(invalidHost) ||
     new Set(receipt.hosts.map((item) => item.host)).size !== receipt.hosts.length ||
     !results.has(receipt.result) ||
-    !(receipt.errorCategory === null || errorCategories.has(receipt.errorCategory))
+    !(
+      receipt.errorCategory === null ||
+      (legacySchema
+        ? legacyErrorCategories.has(receipt.errorCategory)
+        : currentErrorCategories.has(receipt.errorCategory))
+    )
   ) {
     fail("baseline", "the OpenSocrates auto-update receipt has an invalid schema");
   }
@@ -6100,11 +6112,22 @@ function validateAutoUpdateReceipt(receipt) {
     updated: "updated",
     failed: "failed",
   }[receipt.result];
+  const hostErrorCategories = currentSchema
+    ? new Set(receipt.hosts.map((item) => item.errorCategory).filter((item) => item !== null))
+    : new Set();
+  const expectedErrorCategory =
+    hostErrorCategories.size === 1 ? [...hostErrorCategories][0] : "multiple";
   if (
     receipt.hosts.some((item) => item.result !== expectedHostResult) ||
     (receipt.result === "blocked" && receipt.errorCategory !== "major-policy") ||
     (new Set(["no-update", "updated"]).has(receipt.result) && receipt.errorCategory !== null) ||
-    (receipt.result === "failed" && receipt.errorCategory === null)
+    (receipt.result === "failed" && receipt.errorCategory === null) ||
+    (currentSchema &&
+      receipt.result !== "failed" &&
+      receipt.hosts.some((item) => item.errorCategory !== null)) ||
+    (currentSchema &&
+      receipt.result === "failed" &&
+      (hostErrorCategories.size === 0 || receipt.errorCategory !== expectedErrorCategory))
   ) {
     fail("baseline", "the OpenSocrates auto-update receipt is internally inconsistent");
   }

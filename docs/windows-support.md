@@ -1,6 +1,6 @@
 # Windows support — v1.4.0 candidate
 
-This branch is an unpublished candidate. Do not use `opensocrates@1.4.0` from npm until publication. Windows support means native Windows processes, without WSL.
+This branch is an unpublished candidate. Do not use `opensocrates@1.4.0` from npm until publication. Windows support means native Windows processes, without WSL. Draft [PR #93](https://github.com/ParkerHwang/OpenSocrates/pull/93) tracks `codex/windows-v1.4.0`. The independent-review baseline and first CI run used `9e5ec5bd458e2d8c2b772b6074df25e0192d413e`; consult the PR for its current head.
 
 ## Requirements and installation
 
@@ -28,9 +28,9 @@ After publication, `npx --yes opensocrates@1.4.0 install --host codex` downloads
 
 | Surface | Official Windows availability / conditions | This laptop |
 | --- | --- | --- |
-| Codex CLI | Native Windows; plugin hooks require interactive trust | CLI 0.153.4 returned 48 Korean methods through the installed native runtime in a real model session; automatic hooks await user approval |
+| Codex CLI | Native Windows; plugin hooks require interactive trust | CLI 0.153.4 returned 48 Korean methods through the installed native runtime in a real model session; hook approval is user-reported complete, while automatic CLI hook delivery remains unverified |
 | Codex Desktop | Installed; local hook scripts and trust required | Desktop live delivery unvalidated; CLI evidence does not establish Desktop behavior |
-| Claude Code CLI | Native Windows; authenticated host; Git for Windows recommended | 2.1.266 installed; login and live delivery pending |
+| Claude Code CLI | Native Windows; authenticated host; Git for Windows recommended | 2.1.266 installed; login is user-reported complete, and paid-account live validation is deferred by the user |
 | Claude Desktop / Cowork | Local versus remote execution is host-owned | Desktop installed; separate live delivery unvalidated |
 | Cursor | Windows x64/ARM64 distributions; Agent Plugin requires compatible version | Not installed; OpenSocrates Windows integration unvalidated |
 | Antigravity | Native Windows distribution | Desktop 2.12.2 / Gemini 3.8 Flash High: real installed skill and full Korean method read, response returned; CLI 1.1.28 validation and ZIP lifecycle passed |
@@ -60,6 +60,6 @@ uv run --locked mypy src
 npm pack
 ```
 
-The Windows workflow runs the native checks/build on `windows-2025`; existing Linux and Apple-silicon jobs remain. Release publication waits for the Windows job and verifies transported Windows checksums before including the new assets. No CI execution is claimed until this branch is pushed and the jobs actually run.
+The Windows workflow runs the native checks/build on `windows-2025`; existing Linux and Apple-silicon jobs remain. Release publication waits for the Windows job and verifies transported Windows checksums before including the new assets. The [first remote CI run](https://github.com/ParkerHwang/OpenSocrates/actions/runs/34316264162) did execute for commit `9e5ec5bd458e2d8c2b772b6074df25e0192d413e` and failed in Product contracts, GitHub and npx installer, and Native Windows x64. That hosted-runner result is separate from the earlier private Windows laptop evidence. The current remediation run, if any, and its exact head must be read from PR #93 rather than inferred from this historical baseline.
 
 Evidence and outstanding full-suite failures are recorded in [the working record](windows-v1.4.0-worklog.md). POSIX fixture failures and unavailable authenticated checks must not be reported as passes. macOS has not been executed on this laptop.

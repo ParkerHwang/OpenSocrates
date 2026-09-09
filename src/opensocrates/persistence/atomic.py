@@ -6,12 +6,20 @@ import json
 import math
 import os
 import stat
-import tempfile
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Protocol
 
-from .permissions import PermissionSecurityError, check_permissions
+from .permissions import (
+    PermissionSecurityError,
+    check_permissions,
+    create_owner_only_file,
+    create_owner_only_tempfile,
+    discard_created_file,
+    discard_created_tempfile,
+    open_owner_only_file,
+    replace_created_file,
+)
 
 
 class AtomicWriteError(OSError):
@@ -116,31 +124,30 @@ def atomic_replace_bytes(path: Path, data: bytes) -> None:
         raise AtomicWriteError("atomic-write parent is unavailable")
     _reject_symlink(directory)
     _reject_symlink(path)
-    temporary: Path | None = None
+    created = None
     fd: int | None = None
     try:
-        fd, name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=directory)
-        temporary = Path(name)
-        os.fchmod(fd, 0o600) if hasattr(os, "fchmod") else None
-        with os.fdopen(fd, "wb", buffering=0) as handle:
-            fd = None
+        created = create_owner_only_tempfile(
+            prefix=f".{path.name}.", suffix=".tmp", directory=directory
+        )
+        fd = created.descriptor
+        with os.fdopen(fd, "wb", buffering=0, closefd=False) as handle:
             handle.write(data)
             handle.flush()
             os.fsync(handle.fileno())
-        _reject_symlink(temporary)
-        os.replace(temporary, path)
-        temporary = None
+        _reject_symlink(created.path)
+        replace_created_file(created, path)
         _fsync_directory(directory)
     except (OSError, ValueError) as error:
         raise AtomicWriteError("atomic file replacement failed") from error
     finally:
         if fd is not None:
-            os.close(fd)
-        if temporary is not None:
             try:
-                temporary.unlink(missing_ok=True)
+                if created is not None and created.active:
+                    discard_created_tempfile(created)
             except OSError:
                 pass
+            os.close(fd)
 
 
 def atomic_write_document(
@@ -167,7 +174,7 @@ def read_bytes(path: Path, *, max_bytes: int) -> bytes:
     path = Path(path)
     flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_BINARY", 0)
     try:
-        fd = os.open(path, flags)
+        fd = open_owner_only_file(path, flags=flags)
     except FileNotFoundError:
         raise
     except OSError as error:
@@ -199,17 +206,17 @@ def append_fsync(path: Path, line: bytes, *, max_bytes: int) -> None:
         raise AtomicWriteError("invalid append line")
     path = Path(path)
     _reject_symlink(path)
-    flags = (
-        os.O_WRONLY
-        | os.O_APPEND
-        | os.O_CREAT
-        | getattr(os, "O_NOFOLLOW", 0)
-        | getattr(os, "O_BINARY", 0)
-    )
+    flags = os.O_WRONLY | os.O_APPEND | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_BINARY", 0)
+    created = False
     try:
-        fd = os.open(path, flags, 0o600)
+        try:
+            fd = create_owner_only_file(path, flags=flags)
+            created = True
+        except FileExistsError:
+            fd = open_owner_only_file(path, flags=flags)
     except OSError as error:
         raise AtomicWriteError("unable to open append record") from error
+    completed = False
     try:
         report = check_permissions(path, directory=False)
         if not report.write_allowed:
@@ -218,9 +225,15 @@ def append_fsync(path: Path, line: bytes, *, max_bytes: int) -> None:
         if written != len(line):
             raise AtomicWriteError("short append write")
         os.fsync(fd)
+        completed = True
     except (OSError, PermissionSecurityError) as error:
         if isinstance(error, AtomicWriteError):
             raise
         raise AtomicWriteError("append fsync failed") from error
     finally:
+        if created and not completed:
+            try:
+                discard_created_file(fd, path)
+            except OSError:
+                pass
         os.close(fd)

@@ -1884,6 +1884,68 @@ test("state preflight rejects unsafe auto-update receipts before any lifecycle c
     assert.equal(acceptance.inspectStateDirectory(targets).ownership, "verified");
     rmSync(receiptPath);
 
+    const currentReceipt = `${JSON.stringify({
+      schema: "opensocrates.auto-update-receipt/1.1.0",
+      version: "1.4.0",
+      checkedAt: "2026-09-10T00:00:00.000Z",
+      hosts: [{ host: "claude", result: "failed", errorCategory: "verification" }],
+      result: "failed",
+      errorCategory: "verification",
+    })}\n`;
+    writeFileSync(receiptPath, currentReceipt, { mode: 0o600 });
+    assert.equal(acceptance.inspectStateDirectory(targets).ownership, "verified");
+    rmSync(receiptPath);
+
+    for (const invalidReceipt of [
+      {
+        schema: "opensocrates.auto-update-receipt/1.0.0",
+        version: "1.4.0",
+        checkedAt: "2026-09-10T00:00:00.000Z",
+        hosts: [{ host: "claude", result: "failed" }],
+        result: "failed",
+        errorCategory: "multiple",
+      },
+      {
+        schema: "opensocrates.auto-update-receipt/1.1.0",
+        version: "1.4.0",
+        checkedAt: "2026-09-10T00:00:00.000Z",
+        hosts: [{ host: "claude", result: "failed", errorCategory: null }],
+        result: "failed",
+        errorCategory: "verification",
+      },
+      {
+        schema: "opensocrates.auto-update-receipt/1.1.0",
+        version: "1.4.0",
+        checkedAt: "2026-09-10T00:00:00.000Z",
+        hosts: [{ host: "claude", result: "failed", errorCategory: "multiple" }],
+        result: "failed",
+        errorCategory: "multiple",
+      },
+      {
+        schema: "opensocrates.auto-update-receipt/1.1.0",
+        version: "1.4.0",
+        checkedAt: "2026-09-10T00:00:00.000Z",
+        hosts: [
+          { host: "claude", result: "failed", errorCategory: "verification" },
+          { host: "codex", result: "failed", errorCategory: "network" },
+        ],
+        result: "failed",
+        errorCategory: "verification",
+      },
+      {
+        schema: "opensocrates.auto-update-receipt/1.1.0",
+        version: "1.4.0",
+        checkedAt: "2026-09-10T00:00:00.000Z",
+        hosts: [{ host: "claude", result: "updated", errorCategory: "verification" }],
+        result: "updated",
+        errorCategory: null,
+      },
+    ]) {
+      writeFileSync(receiptPath, `${JSON.stringify(invalidReceipt)}\n`, { mode: 0o600 });
+      assert.throws(() => acceptance.inspectStateDirectory(targets));
+      rmSync(receiptPath);
+    }
+
     const cases = [
       () => {
         writeFileSync(outsidePath, validReceipt, { mode: 0o600 });

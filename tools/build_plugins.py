@@ -396,6 +396,37 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
             "compiled content bundle failed canonical/domain validation"
         ) from exc
     values = _common_values(raw_bundle, host=host, template_revision=template_revision)
+    if target == "windows-x64":
+        values.update(
+            {
+                "PACKAGE_LAUNCHER_PATH": "bin/launch.mjs",
+                "PACKAGE_RELEASE_TARGET": "windows-x64",
+                "PACKAGE_RELEASE_BOUNDARY": (
+                    "This archive targets Windows x64 (`windows-x64`). It ships only "
+                    "`bin/launch.mjs` and contains only the `runtime/windows-x64/` "
+                    "runtime payload; it does not contain `bin/launch.sh` or the "
+                    "`runtime/darwin-arm64/` payload. No PowerShell launcher is included "
+                    "in the plugin archive. npm's `installer/windows.ps1` is a separate "
+                    "installer helper, not a plugin launcher."
+                ),
+            }
+        )
+    else:
+        values.update(
+            {
+                "PACKAGE_LAUNCHER_PATH": "bin/launch.sh",
+                "PACKAGE_RELEASE_TARGET": "darwin-arm64",
+                "PACKAGE_RELEASE_BOUNDARY": (
+                    "This archive targets Apple-silicon macOS (`darwin-arm64`). It "
+                    "ships only `bin/launch.sh` and contains only the "
+                    "`runtime/darwin-arm64/` runtime payload; it does not contain "
+                    "`bin/launch.mjs` or the `runtime/windows-x64/` payload. No "
+                    "PowerShell launcher is included in the plugin archive. npm's "
+                    "`installer/windows.ps1` is a separate installer helper, not a "
+                    "plugin launcher."
+                ),
+            }
+        )
     from opensocrates.rendering.response_policy import (
         load_response_policy,
         policy_identity,
@@ -460,12 +491,21 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
     def render_to(template: str, destination: str, local_values: Mapping[str, str]) -> None:
         destination_path = output_path / _ensure_relative(destination, field="output")
         destination_path.parent.mkdir(parents=True, exist_ok=True)
-        rendered = _render(template_text(template), local_values, source=template)
+        render_values = dict(local_values)
+        protected_values: dict[str, str] = {}
+        if windows_native:
+            for key in ("PACKAGE_LAUNCHER_PATH", "PACKAGE_RELEASE_BOUNDARY"):
+                sentinel = f"@@OPENSOCRATES_{key}@@"
+                protected_values[sentinel] = render_values[key]
+                render_values[key] = sentinel
+        rendered = _render(template_text(template), render_values, source=template)
         if windows_native:
             rendered = rendered.replace(
                 "${PLUGIN_ROOT}/bin/launch.sh", 'node "${PLUGIN_ROOT}/bin/launch.mjs"'
             )
             rendered = rendered.replace("bin/launch.sh", "node bin/launch.mjs")
+            for sentinel, value in protected_values.items():
+                rendered = rendered.replace(sentinel, value)
         destination_path.write_text(rendered, encoding="utf-8", newline="\n")
 
     manifest_template = metadata.get("manifest_template")

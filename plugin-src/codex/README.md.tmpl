@@ -16,16 +16,16 @@ build time; they are not host or manifest claims.
 
 - Manifest: `.codex-plugin/plugin.json`
 - Hook definition: `hooks/hooks.json`
-- Fixed launcher: `bin/launch.sh`; this exact `bin/` placement is required and
-  no root-level or PowerShell launcher is shipped. The launcher accepts only
-  the released `darwin-arm64` target; macOS Intel, Linux, and Windows are not
-  shipped or supported.
+- Fixed launcher: `{{PACKAGE_LAUNCHER_PATH}}`; this exact `bin/` placement is required and
+  no root-level or PowerShell launcher is shipped.
 - Native runtime: `runtime/<target>/opensocrates-runtime/`, resolved by
   the launcher relative to the plugin root
 - Writable product data, when enabled by the host, is owned by the host's
   `PLUGIN_DATA` location; this package does not request a remote service.
 - Complete selected reasoning content is written only to an owner-only OS
   temporary file for the active turn.
+
+{{PACKAGE_RELEASE_BOUNDARY}}
 
 Codex reviews local command hooks before execution. Review the exact hook
 definition and approve the package only when its local files and fixed

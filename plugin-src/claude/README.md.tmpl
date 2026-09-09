@@ -24,7 +24,7 @@ compatibility claims.
 
 | Claude surface | OpenSocrates behavior | Validation status |
 | --- | --- | --- |
-| Claude Code CLI | Automatic `UserPromptSubmit` selection and canonical `/opensocrates:opensocrates` plugin skill | This package's own launcher dispatch is exercised by the release gate on `darwin-arm64` |
+| Claude Code CLI | Automatic `UserPromptSubmit` selection and canonical `/opensocrates:opensocrates` plugin skill | This package's own launcher dispatch is exercised by the release gate on `{{PACKAGE_RELEASE_TARGET}}` |
 | Claude Code in Desktop Local mode | Same Claude Code hook and canonical `/opensocrates:opensocrates` plugin skill | Implemented; no live hook-delivery probe receipt |
 | Cowork, local execution | The local hook mechanism is packaged and `/opensocrates:opensocrates` is the canonical plugin command | Experimental; CLI marketplace visibility and live hook delivery are unvalidated |
 | Cowork, remote execution | The namespaced plugin skill remains canonical; the packaged local runtime may be unavailable, so automatic selection fails open | Experimental; no live probe receipt |
@@ -40,11 +40,11 @@ Read the status column strictly. The levels are not interchangeable:
   receipt shows the host actually delivering the hook.
 - **Unvalidated** — no receipt exists for that path.
 
-The macOS archive targets Apple silicon (`darwin-arm64`) and ships `bin/launch.sh`.
-The separate Windows x64 candidate uses the Windows launcher described below.
-No PowerShell launcher is included. Binary signing, notarization, clean-machine
-installation, other platforms, and live hook delivery on Claude Code Desktop,
-Cowork, and Claude Chat are not claimed as validated.
+{{PACKAGE_RELEASE_BOUNDARY}}
+
+Binary signing, notarization, clean-machine installation, other platforms, and
+live hook delivery on Claude Code Desktop, Cowork, and Claude Chat are not
+claimed as validated.
 
 See Anthropic's [hooks reference](https://code.claude.com/docs/en/hooks) and
 [Claude plugin surface guide](https://support.claude.com/en/articles/13837440-use-plugins-in-claude)
@@ -155,7 +155,7 @@ older than 24 hours.
 
 - Manifest: `.claude-plugin/plugin.json`
 - Hook definition: `hooks/hooks.json`
-- Fixed launcher: `bin/launch.sh`; this exact `bin/` placement is required and
+- Fixed launcher: `{{PACKAGE_LAUNCHER_PATH}}`; this exact `bin/` placement is required and
   no root-level or PowerShell launcher is shipped
 - Native runtime: `runtime/<target>/opensocrates-runtime/`, resolved by
   the launcher relative to the plugin root

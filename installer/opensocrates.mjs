@@ -146,7 +146,7 @@ const HOST_LAYOUTS = Object.freeze({
 const MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024 * 1024;
 const MAX_ARCHIVE_ENTRIES = 10_000;
 const DESIRED_STATE_SCHEMA = "opensocrates.desired-state/1.0.0";
-const RECEIPT_SCHEMA = "opensocrates.auto-update-receipt/1.0.0";
+const RECEIPT_SCHEMA = "opensocrates.auto-update-receipt/1.1.0";
 const AUTO_UPDATE_LABEL = "com.opensocrates.auto-update";
 const AUTO_UPDATE_MIN_INTERVAL_HOURS = 1;
 const AUTO_UPDATE_MAX_INTERVAL_HOURS = 24 * 7;
@@ -1207,6 +1207,21 @@ export async function resetCodexOpenSocratesHookTrust({
 
 export class InstallerError extends Error {}
 
+class PackagePreparationError extends InstallerError {
+  constructor(outcomes) {
+    const failures = outcomes.filter((item) => item.error !== null);
+    super(
+      "package preparation failed: " +
+        failures.map((item) => `${item.host}: ${String(item.error?.message ?? item.error)}`).join("; "),
+    );
+    this.hostOutcomes = outcomes.map(({ host, error }) => ({
+      host,
+      result: "failed",
+      errorCategory: error === null ? null : errorCategory(error),
+    }));
+  }
+}
+
 function fail(message) {
   throw new InstallerError(message);
 }
@@ -1401,9 +1416,10 @@ async function writeAutoUpdateReceipt({ version, checkedAt, hosts, result, error
     checkedAt,
     hosts: [...hosts]
       .sort((left, right) => left.host.localeCompare(right.host))
-      .map(({ host, result: hostResult }) => ({
+      .map(({ host, result: hostResult, errorCategory: hostErrorCategory }) => ({
         host,
         result: hostResult,
+        errorCategory: hostErrorCategory ?? null,
       })),
     result,
     errorCategory: errorCategory ?? null,
@@ -1426,9 +1442,20 @@ function majorVersion(value) {
   return match ? Number(match[1]) : null;
 }
 
-function errorCategory(error) {
+export function errorCategory(error) {
+  if (error instanceof PackagePreparationError) {
+    const categories = new Set(
+      error.hostOutcomes.map((item) => item.errorCategory).filter((item) => item !== null),
+    );
+    return categories.size === 1 ? [...categories][0] : "multiple";
+  }
   const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
-  if (/checksum|manifest|archive|symbolic link/u.test(message)) return "verification";
+  if (
+    /checksum|manifest|archive|symbolic link|target metadata|runtime layout|unexpected native runtime or launcher surface/u.test(
+      message,
+    )
+  )
+    return "verification";
   if (/download|fetch|network|offline|timed? ?out/u.test(message)) return "network";
   if (/preflight|not logged|auth|version is required|could not run/u.test(message)) return "preflight";
   if (/rollback|restore/u.test(message)) return "rollback";
@@ -2601,6 +2628,14 @@ async function verifyPackageChecksums(pluginRoot) {
   return declared.size;
 }
 
+function hasExactStringEntries(value, expected) {
+  return (
+    Array.isArray(value) &&
+    value.length === expected.length &&
+    value.every((item, index) => item === expected[index])
+  );
+}
+
 async function verifyExtractedPackage(pluginRoot, host) {
   const manifest = await readJsonObject(join(pluginRoot, HOST_LAYOUTS[host].manifestRelative));
   if (manifest.name !== PLUGIN_NAME || manifest.version !== PRODUCT_VERSION) {
@@ -2619,17 +2654,42 @@ async function verifyExtractedPackage(pluginRoot, host) {
   }
   if (HOST_LAYOUTS[host].requiresRuntime) {
     const target = process.platform === "win32" ? "windows-x64" : "darwin-arm64";
-    const runtime = join(pluginRoot, "runtime", target, "opensocrates-runtime", process.platform === "win32" ? "opensocrates-runtime.exe" : "opensocrates-runtime");
-    if (!release.runtime_targets?.includes(target) || !release.release_targets?.includes(target)) {
-      fail(`package does not declare the ${target} target`);
+    const runtimeRoot = join(pluginRoot, "runtime");
+    const executable = process.platform === "win32" ? "opensocrates-runtime.exe" : "opensocrates-runtime";
+    const runtime = join(runtimeRoot, target, "opensocrates-runtime", executable);
+    if (
+      !hasExactStringEntries(release.runtime_targets, [target]) ||
+      !hasExactStringEntries(release.release_targets, [target])
+    ) {
+      fail(`package target metadata does not declare only ${target}`);
     }
-    const runtimeInfo = await stat(runtime);
+    let packagedTargets;
+    try {
+      packagedTargets = await readdir(runtimeRoot, { withFileTypes: true });
+    } catch {
+      fail(`package runtime layout cannot be inspected for ${target}`);
+    }
+    if (
+      packagedTargets.length !== 1 ||
+      packagedTargets[0].name !== target ||
+      !packagedTargets[0].isDirectory() ||
+      packagedTargets[0].isSymbolicLink()
+    ) {
+      fail(`package runtime layout does not contain only ${target}`);
+    }
+    let runtimeInfo;
+    try {
+      runtimeInfo = await stat(runtime);
+    } catch {
+      fail(`package runtime layout is missing the executable ${target} runtime`);
+    }
     if (!runtimeInfo.isFile() || (process.platform !== "win32" && (runtimeInfo.mode & 0o111) === 0)) {
-      fail(`package is missing the executable ${target} runtime`);
+      fail(`package runtime layout is missing the executable ${target} runtime`);
     }
   } else if (
-    release.launchers?.length !== 0 ||
-    release.runtime_targets?.length !== 0 ||
+    !hasExactStringEntries(release.release_targets, []) ||
+    !hasExactStringEntries(release.launchers, []) ||
+    !hasExactStringEntries(release.runtime_targets, []) ||
     (await exists(join(pluginRoot, "runtime"))) ||
     (await exists(join(pluginRoot, "hooks"))) ||
     (await exists(join(pluginRoot, "bin"))) ||
@@ -3144,10 +3204,14 @@ async function prepareVerifiedPackage(options, host = options.host) {
 async function prepareVerifiedPackages(options, hosts) {
   const settled = await Promise.allSettled(hosts.map((host) => prepareVerifiedPackage(options, host)));
   const prepared = settled.filter((result) => result.status === "fulfilled").map((result) => result.value);
-  const failure = settled.find((result) => result.status === "rejected");
-  if (failure) {
+  if (settled.some((result) => result.status === "rejected")) {
     await Promise.all(prepared.map((item) => rm(item.scratch, { recursive: true, force: true })));
-    throw failure.reason;
+    throw new PackagePreparationError(
+      settled.map((result, index) => ({
+        host: hosts[index],
+        error: result.status === "rejected" ? result.reason : null,
+      })),
+    );
   }
   return prepared;
 }
@@ -5099,7 +5163,14 @@ async function runScheduledUpdate(options) {
       await writeAutoUpdateReceipt({
         version: PRODUCT_VERSION,
         checkedAt,
-        hosts: hosts.map((host) => ({ host, result: "failed" })),
+        hosts:
+          error instanceof PackagePreparationError
+            ? error.hostOutcomes
+            : hosts.map((host) => ({
+                host,
+                result: "failed",
+                errorCategory: errorCategory(error),
+              })),
         result: "failed",
         errorCategory: errorCategory(error),
       });

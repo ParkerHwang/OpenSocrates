@@ -22,7 +22,13 @@ from ..verification.secret_filter import reject_forbidden_keys, reject_secrets
 from .atomic import AtomicWriteError, atomic_replace_bytes, read_bytes
 from .locks import FileLock, LockPolicy, LockTimeoutError
 from .paths import DataRoot, DataRootLayout, secure_join
-from .permissions import PermissionManager
+from .permissions import (
+    PermissionManager,
+    create_owner_only_directory,
+    create_owner_only_file,
+    discard_created_file,
+    open_owner_only_file,
+)
 
 
 class TurnStoreError(OSError):
@@ -115,7 +121,7 @@ class _InstallationKey:
             | getattr(os, "O_NONBLOCK", 0)
         )
         try:
-            fd = os.open(self.path, flags)
+            fd = open_owner_only_file(self.path, flags=flags)
             try:
                 if not self._safe_key_stat(os.fstat(fd)):
                     raise TurnStoreError("opened installation key is unsafe")
@@ -142,18 +148,18 @@ class _InstallationKey:
         if not self._create:
             raise TurnStoreError("existing installation key unavailable")
         value = secrets.token_bytes(32)
-        flags = (
-            os.O_WRONLY
-            | getattr(os, "O_BINARY", 0)
-            | os.O_CREAT
-            | os.O_EXCL
-            | getattr(os, "O_NOFOLLOW", 0)
-        )
+        flags = os.O_WRONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
         try:
-            fd = os.open(self.path, flags, 0o600)
+            fd = create_owner_only_file(self.path, flags=flags)
             try:
                 os.write(fd, value)
                 os.fsync(fd)
+            except OSError:
+                try:
+                    discard_created_file(fd, self.path)
+                except OSError:
+                    pass
+                raise
             finally:
                 os.close(fd)
         except FileExistsError:
@@ -201,6 +207,12 @@ class TurnStateStore:
         except (OpenSocratesError, ValueError) as error:
             raise TurnStoreError("invalid turn token tag") from error
 
+    def _ensure_turns_directory(self) -> None:
+        try:
+            create_owner_only_directory(self.layout.turns_dir)
+        except OSError as error:
+            raise TurnStoreError("turn state directory is unavailable") from error
+
     def _write(self, state: EphemeralTurnState) -> None:
         path = self._path(state.token_tag)
         try:
@@ -210,7 +222,7 @@ class TurnStateStore:
 
     def issue(self, state: EphemeralTurnState) -> None:
         _state_bytes(state)
-        self.layout.turns_dir.mkdir(mode=0o700, exist_ok=True)
+        self._ensure_turns_directory()
         root_report = self.permissions.root_report(self.layout.root)
         turns_report = self.permissions.root_report(self.layout.turns_dir)
         if not root_report.write_allowed or not turns_report.write_allowed:
