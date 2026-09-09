@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.4.0] - Unreleased
+
+- Add native Windows x64 runtime archives, Node launcher and Windows CI builds.
+- Preserve SHA-256 inventories; reject Windows ZIP aliases, traversal and links before extraction.
+- Validate Windows owner ACLs, binary I/O, file locks and explicit manual-update behavior.
+- Keep macOS release gates; distinguish native package tests from authenticated host and Desktop delivery.
+- Windows x64 네이티브 배포·런처·CI, ACL·바이너리 입출력·잠금·ZIP 검사를 추가합니다. 자동 업데이트는 수동 실행 안내로 명시하며 실제 호스트와 Desktop 검증 범위를 구분합니다.
+
+See [Windows support](docs/windows-support.md) / [Windows 안내](docs/windows-support.ko.md).
+
 ## [1.3.0] - 2026-09-08
 
 - Add agent-directed method retrieval at decision points within an existing turn,

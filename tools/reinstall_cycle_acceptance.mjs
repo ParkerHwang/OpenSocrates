@@ -53,6 +53,10 @@ const CHECKPOINT_SCHEMA = "opensocrates.reinstall-cycle-checkpoint/1.0.0";
 const PRIVATE_MANIFEST_SCHEMA = "opensocrates.reinstall-cycle-private-evidence/1.0.0";
 const DESIRED_STATE_SCHEMA = "opensocrates.desired-state/1.0.0";
 const BASELINE = "purged_same_machine";
+// This is a destructive cross-version reinstall, never an in-place migration.
+export const INITIAL_VERSION = "1.3.1";
+export const CANDIDATE_VERSION = PRODUCT_VERSION;
+const TRANSITION = "purge_then_reinstall";
 const HOSTS = Object.freeze(["claude", "codex"]);
 const RESULT_FILES = Object.freeze([
   "result.json",
@@ -159,10 +163,12 @@ const NPM_PACKAGE_FILES = Object.freeze([
   "SECURITY.md",
   "VERSION",
   "installer/opensocrates.mjs",
+  "installer/windows.ps1",
   "package.json",
 ]);
 const NPM_PACKAGE_FILES_FIELD = Object.freeze([
   "installer/opensocrates.mjs",
+  "installer/windows.ps1",
   "CHANGELOG.md",
   "SECURITY.md",
   "VERSION",
@@ -172,6 +178,7 @@ const NPM_PACKAGE_SCRIPTS = Object.freeze({
   "test:npx": "node installer/package-smoke.mjs",
   "pack:check": "npm pack --dry-run",
   prepublishOnly: "npm test",
+  "test:windows": "node --test installer/windows.test.mjs",
 });
 const CHECKPOINT_PHASES = new Set([
   "ready-to-purge",
@@ -255,6 +262,9 @@ const PUBLIC_ENVIRONMENT_KEYS = new Set([
   "codexVersion",
 ]);
 const PUBLIC_BASELINE_KEYS = new Set([
+  "initialVersion",
+  "candidateVersion",
+  "transition",
   "kind",
   "expectedInitialState",
   "expectedFinalState",
@@ -329,7 +339,20 @@ const PUBLIC_STEP_KEYS = new Set([
   "commandId",
 ]);
 
+// Only this diagnosed, unrelated diagnostic is non-blocking. Unknown warnings
+// and every OpenSocrates warning still block. No raw warning/path is persisted.
+export function classifyCodexHookWarnings(warnings, accountHome) {
+  const admitted = "clamping SessionEnd hook timeout to 3s in " + accountHome +
+    "/.codex/plugins/cache/openai-codex/codex/1.0.6/hooks/hooks.json";
+  return {
+    otherPluginTimeoutWarningCount: warnings.filter(w => w === admitted).length,
+    blockingWarningCount: warnings.filter(w => w !== admitted).length,
+  };
+}
+
 const CODEX_HOOK_PROBE_SOURCE = String.raw`
+${classifyCodexHookWarnings.toString()}
+
 import { spawn } from "node:child_process";
 import readline from "node:readline";
 
@@ -387,6 +410,8 @@ lines.on("line", (line) => {
       (count, entry) => count + (Array.isArray(entry?.errors) ? entry.errors.length : 0),
       0,
     );
+    const warnings = entries.flatMap(entry => Array.isArray(entry?.warnings) ? entry.warnings : []);
+    const warningClassification = classifyCodexHookWarnings(warnings, process.env.HOME);
     const warningCount = entries.reduce(
       (count, entry) => count + (Array.isArray(entry?.warnings) ? entry.warnings.length : 0),
       0,
@@ -395,6 +420,7 @@ lines.on("line", (line) => {
       schema: "opensocrates.codex-hook-inventory/1.0.0",
       errorCount,
       warningCount,
+      ...warningClassification,
       hooks: selected,
     }) + "\n");
     finish(0);
@@ -1586,6 +1612,10 @@ function validatePublicSource(source) {
 }
 
 function validatePublicBaseline(baseline) {
+  assertVersionTransition(baseline);
+  if (Object.keys(baseline.inventory).length > 0) {
+    assertRegistrationState(baseline.inventory.registrations, "installed-baseline");
+  }
   for (const key of ["kind", "expectedInitialState", "expectedFinalState", "initialState"]) {
     requirePublicScalar(baseline[key], ["string"], `result.baseline.${key}`);
   }
@@ -1666,6 +1696,7 @@ function validatePublicBaseline(baseline) {
   requirePublicKeys(
     baseline.inventory.codexHooks,
     new Set([
+      "otherPluginTimeoutWarningCount",
       "hookCount",
       "events",
       "namespace",
@@ -1681,6 +1712,7 @@ function validatePublicBaseline(baseline) {
   requirePublicScalar(baseline.inventory.codexHooks.sessionStartTimeoutSeconds, ["number"], "result.baseline.inventory.codexHooks.sessionStartTimeoutSeconds");
   const hookTrustStatuses = baseline.inventory.codexHooks.trustStatuses;
   if (
+    !publicNonnegativeInteger(baseline.inventory.codexHooks.otherPluginTimeoutWarningCount) ||
     baseline.inventory.codexHooks.hookCount !== EXPECTED_CODEX_EVENTS.length ||
     !sameStrings(baseline.inventory.codexHooks.events, EXPECTED_CODEX_EVENTS) ||
     baseline.inventory.codexHooks.namespace !== "opensocrates@opensocrates" ||
@@ -1840,7 +1872,7 @@ function validatePublicAssertions(assertions) {
         fail("privacy", `${trail} violates the final desired-state contract`);
       }
     } else if (key === "codexFirstApproval") {
-      requirePublicKeys(value, new Set(["status", "exactHookCount", "events", "namespace", "trustStatuses", "sessionStartTimeoutSeconds", "observedBeforeOtherPostInstallCodexLaunch", "manualApprovalRequired"]), trail);
+      requirePublicKeys(value, new Set(["status", "otherPluginTimeoutWarningCount", "exactHookCount", "events", "namespace", "trustStatuses", "sessionStartTimeoutSeconds", "observedBeforeOtherPostInstallCodexLaunch", "manualApprovalRequired"]), trail);
       requirePublicScalar(value.status, ["string"], `${trail}.status`);
       requirePublicScalar(value.exactHookCount, ["number"], `${trail}.exactHookCount`);
       requirePublicStringArray(value.events, `${trail}.events`);
@@ -1851,6 +1883,7 @@ function validatePublicAssertions(assertions) {
       requirePublicScalar(value.manualApprovalRequired, ["boolean"], `${trail}.manualApprovalRequired`);
       if (
         value.status !== "pass" ||
+        !publicNonnegativeInteger(value.otherPluginTimeoutWarningCount) ||
         value.exactHookCount !== EXPECTED_CODEX_EVENTS.length ||
         !sameStrings(value.events, EXPECTED_CODEX_EVENTS) ||
         value.namespace !== "opensocrates@opensocrates" ||
@@ -2403,6 +2436,9 @@ function makeReport() {
       codexVersion: null,
     },
     baseline: {
+      initialVersion: INITIAL_VERSION,
+      candidateVersion: CANDIDATE_VERSION,
+      transition: TRANSITION,
       kind: BASELINE,
       expectedInitialState: "installed",
       expectedFinalState: "installed",
@@ -2460,10 +2496,11 @@ function manualTemplate(report) {
 
 Automated result: ${automated}
 ${MANUAL_FIELDS.map((label) => `${label}: ${defaultCheck}`).join("\n")}
-Claude Chat standalone v1.2.1: PENDING_PUBLIC_ARTIFACT
+Claude Chat standalone v${CANDIDATE_VERSION}: PENDING_PUBLIC_ARTIFACT
 
 Change every \`PENDING\` value to one fixed final enum only after completing the
-matching check in a Record & Replay capture. Use \`PASS\` or \`FAIL\` for an
+matching check in an authorized Record & Replay capture. If raw capture is prohibited,
+do not record or invent a recording; leave unqualified checks NOT_OBSERVED or BLOCKED. Use \`PASS\` or \`FAIL\` for an
 observed outcome, \`NOT_OBSERVED\` when no
 qualifying observation was captured and \`BLOCKED\` when authentication,
 approval, or safe app control prevented the check. Do not change fixed fields.
@@ -2503,6 +2540,7 @@ function markdownReport(report) {
   return `# OpenSocrates purged-same-machine reinstall result
 
 - Baseline: **${report.baseline.kind}**
+- Transition: **${report.baseline.initialVersion} → ${report.baseline.candidateVersion}; ${report.baseline.transition}**
 - Overall: **${report.overallResult}**
 - Automated: **${report.automatedResult}**
 - Manual: **${report.manualResult}**
@@ -2511,8 +2549,8 @@ function markdownReport(report) {
 - Pull request: ${report.source.pullRequestUrl ?? "not recorded"}
 - Source commit: \`${report.source.commit ?? "not recorded"}\`
 - CI run: ${report.source.ciRunUrl ?? "not recorded"}
-- Public v1.2.1 release path: **unavailable / not tested**
-- Claude Chat standalone v1.2.1: **pending public artifact**
+- Public v${CANDIDATE_VERSION} release path: **unavailable / not tested**
+- Claude Chat standalone v${CANDIDATE_VERSION}: **pending public artifact**
 ${failure}
 | Check | Result | Duration | Failure category |
 | --- | --- | ---: | --- |
@@ -6049,7 +6087,7 @@ function inspectPluginData(target) {
 function validateAutoUpdateReceipt(receipt) {
   const results = new Set(["blocked", "no-update", "updated", "failed"]);
   const hostResults = new Set(["blocked-major", "current", "updated", "failed"]);
-  const errorCategories = new Set([
+  const legacyErrorCategories = new Set([
     "major-policy",
     "verification",
     "network",
@@ -6059,6 +6097,21 @@ function validateAutoUpdateReceipt(receipt) {
     "activation",
     "internal",
   ]);
+  const currentErrorCategories = new Set([...legacyErrorCategories, "multiple"]);
+  const legacySchema = receipt?.schema === "opensocrates.auto-update-receipt/1.0.0";
+  const currentSchema = receipt?.schema === "opensocrates.auto-update-receipt/1.1.0";
+  const invalidHost = (item) =>
+    item === null ||
+    typeof item !== "object" ||
+    Array.isArray(item) ||
+    !sameStrings(
+      Object.keys(item),
+      currentSchema ? ["host", "result", "errorCategory"] : ["host", "result"],
+    ) ||
+    !SUPPORTED_HOSTS.includes(item.host) ||
+    !hostResults.has(item.result) ||
+    (currentSchema &&
+      !(item.errorCategory === null || legacyErrorCategories.has(item.errorCategory)));
   if (
     receipt === null ||
     typeof receipt !== "object" ||
@@ -6071,7 +6124,7 @@ function validateAutoUpdateReceipt(receipt) {
       "result",
       "errorCategory",
     ]) ||
-    receipt.schema !== "opensocrates.auto-update-receipt/1.0.0" ||
+    (!legacySchema && !currentSchema) ||
     typeof receipt.version !== "string" ||
     !/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/u.test(receipt.version) ||
     typeof receipt.checkedAt !== "string" ||
@@ -6079,18 +6132,15 @@ function validateAutoUpdateReceipt(receipt) {
     new Date(receipt.checkedAt).toISOString() !== receipt.checkedAt ||
     !Array.isArray(receipt.hosts) ||
     receipt.hosts.length === 0 ||
-    receipt.hosts.some(
-      (item) =>
-        item === null ||
-        typeof item !== "object" ||
-        Array.isArray(item) ||
-        !sameStrings(Object.keys(item), ["host", "result"]) ||
-        !SUPPORTED_HOSTS.includes(item.host) ||
-        !hostResults.has(item.result),
-    ) ||
+    receipt.hosts.some(invalidHost) ||
     new Set(receipt.hosts.map((item) => item.host)).size !== receipt.hosts.length ||
     !results.has(receipt.result) ||
-    !(receipt.errorCategory === null || errorCategories.has(receipt.errorCategory))
+    !(
+      receipt.errorCategory === null ||
+      (legacySchema
+        ? legacyErrorCategories.has(receipt.errorCategory)
+        : currentErrorCategories.has(receipt.errorCategory))
+    )
   ) {
     fail("baseline", "the OpenSocrates auto-update receipt has an invalid schema");
   }
@@ -6100,11 +6150,22 @@ function validateAutoUpdateReceipt(receipt) {
     updated: "updated",
     failed: "failed",
   }[receipt.result];
+  const hostErrorCategories = currentSchema
+    ? new Set(receipt.hosts.map((item) => item.errorCategory).filter((item) => item !== null))
+    : new Set();
+  const expectedErrorCategory =
+    hostErrorCategories.size === 1 ? [...hostErrorCategories][0] : "multiple";
   if (
     receipt.hosts.some((item) => item.result !== expectedHostResult) ||
     (receipt.result === "blocked" && receipt.errorCategory !== "major-policy") ||
     (new Set(["no-update", "updated"]).has(receipt.result) && receipt.errorCategory !== null) ||
-    (receipt.result === "failed" && receipt.errorCategory === null)
+    (receipt.result === "failed" && receipt.errorCategory === null) ||
+    (currentSchema &&
+      receipt.result !== "failed" &&
+      receipt.hosts.some((item) => item.errorCategory !== null)) ||
+    (currentSchema &&
+      receipt.result === "failed" &&
+      (hostErrorCategories.size === 0 || receipt.errorCategory !== expectedErrorCategory))
   ) {
     fail("baseline", "the OpenSocrates auto-update receipt is internally inconsistent");
   }
@@ -6911,7 +6972,7 @@ export function classifyPurgeFailureSnapshot(registrations, snapshot) {
     const item = registrations?.[host];
     return item?.marketplaceCount === 1 &&
       item?.pluginCount === 1 &&
-      item?.version === PRODUCT_VERSION &&
+      item?.version === INITIAL_VERSION &&
       item?.unsupportedLegacyConflictCount === 0 &&
       item?.rootMatchesExpected === true &&
       snapshot.hosts[host].managedRootPresent;
@@ -7066,9 +7127,32 @@ export function hostRegistrationSnapshot(recorder, targets = null) {
   };
 }
 
+export function assertVersionTransition(value) {
+  if (value?.initialVersion !== INITIAL_VERSION ||
+      value?.candidateVersion !== CANDIDATE_VERSION ||
+      value?.transition !== TRANSITION) {
+    fail("baseline", "the exact initial/candidate version transition changed or is unsupported");
+  }
+}
+
+export function assertCheckpointVersionTransition(checkpoint, report) {
+  assertVersionTransition(checkpoint?.baseline);
+  assertVersionTransition(report?.baseline);
+  assertRegistrationState(checkpoint.baseline.initialInventory?.registrations, "installed-baseline");
+  assertRegistrationState(checkpoint.baseline.initialTopology, "installed-baseline");
+  if (HOSTS.some(host => checkpoint.baseline.perHostInstallState?.[host]?.installed !== true ||
+      checkpoint.baseline.perHostInstallState?.[host]?.version !== INITIAL_VERSION) ||
+      report.source.version !== CANDIDATE_VERSION ||
+      checkpoint.npmIdentity?.version !== CANDIDATE_VERSION) {
+    fail("checkpoint", "the baseline or candidate version binding changed");
+  }
+}
+
 function assertRegistrationState(snapshot, expected) {
+  const expectedVersion = expected === "installed-baseline" ? INITIAL_VERSION : CANDIDATE_VERSION;
   for (const host of HOSTS) {
-    const item = snapshot[host];
+    const item = snapshot?.[host];
+    if (!item) fail("baseline", "the two-host registration snapshot is incomplete");
     if (item.unsupportedLegacyConflictCount !== 0) {
       fail(
         expected === "installed-baseline" ? "baseline" : "residue",
@@ -7084,7 +7168,7 @@ function assertRegistrationState(snapshot, expected) {
     if (
       item.marketplaceCount !== 1 ||
       item.pluginCount !== 1 ||
-      item.version !== PRODUCT_VERSION ||
+      item.version !== expectedVersion ||
       item.rootMatchesExpected !== true
     ) {
       fail(
@@ -7115,7 +7199,11 @@ function codexHookInventory(recorder) {
   if (
     value?.schema !== "opensocrates.codex-hook-inventory/1.0.0" ||
     value.errorCount !== 0 ||
-    value.warningCount !== 0 ||
+    !Number.isSafeInteger(value.warningCount) || value.warningCount < 0 ||
+    !Number.isSafeInteger(value.otherPluginTimeoutWarningCount ?? 0) ||
+    (value.otherPluginTimeoutWarningCount ?? 0) < 0 ||
+    (value.blockingWarningCount ?? value.warningCount) !== 0 ||
+    value.warningCount !== (value.otherPluginTimeoutWarningCount ?? 0) ||
     !Array.isArray(value.hooks)
   ) {
     fail("codex-hooks", "Codex hook inventory reported an error, warning, or invalid schema");
@@ -7160,6 +7248,7 @@ function codexHookInventory(recorder) {
     fail("codex-hooks", "Codex returned an unknown hook trust state");
   }
   return {
+    otherPluginTimeoutWarningCount: value.otherPluginTimeoutWarningCount ?? 0,
     hookCount: hooks.length,
     events: sorted(events),
     namespace: "opensocrates@opensocrates",
@@ -7319,25 +7408,28 @@ function assertBaselineExactBindings(value) {
   return value;
 }
 
-async function baselineInventory(recorder, targets) {
-  const registrations = hostRegistrationSnapshot(recorder, targets);
-  assertRegistrationState(registrations, "installed-baseline");
-  const state = inspectStateDirectory(targets, { requireInstalled: true });
-  const desired = state.desired;
+export function assertInitialDesiredState(desired, launchAgentPresent) {
   if (
     desired?.schema !== DESIRED_STATE_SCHEMA ||
-    desired?.activeVersion !== PRODUCT_VERSION ||
+    desired?.activeVersion !== INITIAL_VERSION ||
     !sameStrings(desired?.installedHosts ?? [], HOSTS) ||
     desired?.autoUpdate?.enabled !== false ||
     !sameStrings(desired?.autoUpdate?.hosts ?? [], []) ||
-    state.launchAgentPresent
+    launchAgentPresent
   ) {
     fail(
       "baseline",
       "the starting state is not the expected installed Claude/Codex state with updates disabled",
     );
   }
-  inspectManagedLayout();
+}
+
+export async function baselineInventory(recorder, targets) {
+  const registrations = hostRegistrationSnapshot(recorder, targets);
+  assertRegistrationState(registrations, "installed-baseline");
+  const state = inspectStateDirectory(targets, { requireInstalled: true });
+  assertInitialDesiredState(state.desired, state.launchAgentPresent);
+  inspectManagedLayout({ claude: targets.claude.root, codex: targets.codex.root });
   const pluginRoots = {
     claude: resolveInstalledPluginRoot("claude", targets.claude.root),
     codex: resolveInstalledPluginRoot("codex", targets.codex.root),
@@ -7345,7 +7437,10 @@ async function baselineInventory(recorder, targets) {
   const managedPayloadIntegrity = {};
   const cachePayloadIntegrity = {};
   for (const host of HOSTS) {
-    await verifyManagedRootExact(host, targets[host].root, pluginRoots[host]);
+    await verifyManagedRootExact(host, targets[host].root, pluginRoots[host], {
+      expectedVersion: INITIAL_VERSION,
+    });
+    await verifyBaselineProvenance(host, pluginRoots[host], INITIAL_VERSION);
     managedPayloadIntegrity[host] = "verified";
     verifyCacheMarketplaceShape(host, targets[host]);
     await verifyCachePayloadsForBaseline(host, targets[host].cacheRoot);
@@ -9169,14 +9264,36 @@ function deepJsonEqual(left, right) {
     );
 }
 
-function expectedManagedMarketplace(host) {
+const BASELINE_PROVENANCE = JSON.parse(readFileSync(
+  new URL("./reinstall_baseline_provenance.json", import.meta.url), "utf8",
+));
+
+export function assertBaselineProvenanceDigests(host, version, observed) {
+  const receipt = BASELINE_PROVENANCE.receipts.find(item =>
+    item.host === host && item.version === version);
+  if (!receipt || observed.checksumInventorySha256 !== receipt.checksumInventorySha256 ||
+      observed.releaseManifestSha256 !== receipt.releaseManifestSha256) {
+    fail("baseline", "the baseline payload is not the pinned published host/version payload");
+  }
+}
+
+export async function verifyBaselineProvenance(host, pluginRoot, version) {
+  // The exact inventory is anchored to downloaded release bytes, not to a
+  // self-authored checksum file. verifyChecksumInventory still checks every byte.
+  assertBaselineProvenanceDigests(host, version, {
+    checksumInventorySha256: await sha256File(join(pluginRoot, "checksums.sha256")),
+    releaseManifestSha256: await sha256File(join(pluginRoot, "release-manifest.json")),
+  });
+}
+
+function expectedManagedMarketplace(host, version = CANDIDATE_VERSION) {
   if (host === "claude") {
     return {
       name: "opensocrates",
       owner: { name: "Parker Hwang" },
       metadata: {
         description: "OpenSocrates reasoning support for Claude Code and Cowork",
-        version: PRODUCT_VERSION,
+        version,
       },
       plugins: [
         {
@@ -9240,7 +9357,7 @@ async function verifyManagedRootExact(
   host,
   managedRoot,
   pluginRoot,
-  { category = "baseline" } = {},
+  { category = "baseline", expectedVersion = CANDIDATE_VERSION } = {},
 ) {
   requireCanonicalOwnedEntry(managedRoot, `${host} managed root`, "directory");
   const markerPath = join(managedRoot, ".opensocrates-managed.json");
@@ -9253,7 +9370,7 @@ async function verifyManagedRootExact(
   if (!markerMatches(marker, host)) {
     fail(category, `${host} ownership marker does not match the exact installer contract`);
   }
-  validatePayloadIdentity(host, pluginRoot, PRODUCT_VERSION, category, `${host} installed payload`);
+  validatePayloadIdentity(host, pluginRoot, expectedVersion, category, `${host} installed payload`);
   const verified = await verifyChecksumInventory(
     pluginRoot,
     category,
@@ -9269,7 +9386,7 @@ async function verifyManagedRootExact(
     category,
     `${host} managed marketplace is invalid`,
   );
-  if (!deepJsonEqual(marketplace, expectedManagedMarketplace(host))) {
+  if (!deepJsonEqual(marketplace, expectedManagedMarketplace(host, expectedVersion))) {
     fail(category, `${host} managed marketplace differs from the exact installer contract`);
   }
   const pluginRelative = relative(managedRoot, pluginRoot).split(sep).join("/");
@@ -9286,7 +9403,7 @@ async function verifyManagedRootExact(
   }
 }
 
-async function verifyCachePayloadsForBaseline(host, cacheRoot) {
+export async function verifyCachePayloadsForBaseline(host, cacheRoot) {
   if (cacheRoot === null || !pathPresent(cacheRoot)) return;
   requireCanonicalOwnedEntry(cacheRoot, `${host} OpenSocrates cache`, "directory");
   for (const entry of readdirSync(cacheRoot, { withFileTypes: true })) {
@@ -9296,6 +9413,7 @@ async function verifyCachePayloadsForBaseline(host, cacheRoot) {
     const versionRoot = join(cacheRoot, entry.name);
     requireCanonicalOwnedEntry(versionRoot, `${host} cached payload`, "directory");
     validatePayloadIdentity(host, versionRoot, entry.name, "baseline", `${host} cached payload`);
+    await verifyBaselineProvenance(host, versionRoot, entry.name);
     await verifyChecksumInventory(versionRoot, "baseline", `${host} cached payload`, {
       allowedExtra: (item) => item === ".orphaned_at" || item.startsWith(".in_use/"),
     });
@@ -9332,7 +9450,7 @@ function validateNpmPackMetadata(item) {
     !Array.isArray(item?.bundled) ||
     item.bundled.length !== 0
   ) {
-    fail("npm-package", "npm pack metadata does not match the exact eight-file package contract");
+    fail("npm-package", "npm pack metadata does not match the exact nine-file package contract");
   }
 }
 
@@ -9983,6 +10101,8 @@ async function prepareCandidate(recorder, report, privateDirectory) {
 }
 
 function candidateCheckpoint(reportDirectory, report, candidate, exactBaselineBindings) {
+  assertVersionTransition(report.baseline);
+  assertRegistrationState(report.baseline.inventory.registrations, "installed-baseline");
   assertBaselineExactBindings(exactBaselineBindings);
   return {
     schema: CHECKPOINT_SCHEMA,
@@ -9992,6 +10112,9 @@ function candidateCheckpoint(reportDirectory, report, candidate, exactBaselineBi
     updatedAt: new Date().toISOString(),
     reportDirectory,
     baseline: {
+      initialVersion: report.baseline.initialVersion,
+      candidateVersion: report.baseline.candidateVersion,
+      transition: report.baseline.transition,
       kind: report.baseline.kind,
       initialState: report.baseline.initialState,
       initialInstalledHosts: [...report.baseline.installedHosts],
@@ -10300,6 +10423,7 @@ async function validateCheckpoint(privateDirectory) {
   ) {
     fail("checkpoint", "the exact categorical baseline inventory changed");
   }
+  assertCheckpointVersionTransition(checkpoint, report);
   validatePrivateEvidenceManifest(privateDirectory, reportDirectory, report.testId);
   return { checkpoint, report, reportDirectory };
 }
@@ -10989,6 +11113,7 @@ export async function assertFinalInstalled(
   candidate,
   privateDirectory,
 ) {
+  assertVersionTransition(report.baseline);
   // This is deliberately the first Codex process after the installer-owned
   // registration commands. It observes the new/untrusted review state before
   // any status, runtime, or task launch can consume the first-review event.
@@ -11085,6 +11210,7 @@ export async function assertFinalInstalled(
   report.assertions.finalDesiredState = { status: "pass", ...desiredState };
   report.assertions.codexFirstApproval = {
     status: "pass",
+    otherPluginTimeoutWarningCount: hooks.otherPluginTimeoutWarningCount,
     exactHookCount: hooks.hookCount,
     events: hooks.events,
     namespace: hooks.namespace,
@@ -11268,6 +11394,7 @@ async function assertOriginalBaselineUnchanged(
   checkpoint,
   inventoryReader = baselineInventory,
 ) {
+  assertVersionTransition(checkpoint.baseline);
   const currentInventory = await inventoryReader(recorder, targets);
   const current = currentInventory.public;
   assertBaselineExactBindings(checkpoint.baseline.exactBindings);

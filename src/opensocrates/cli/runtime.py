@@ -722,7 +722,7 @@ def write_safe_export(
     data = payload.encode("utf-8") if isinstance(payload, str) else bytes(payload)
     if len(data) > 8 * 1024 * 1024:
         raise ValueError("export is too large")
-    flags = os.O_WRONLY | os.O_CREAT | getattr(os, "O_NOFOLLOW", 0)
+    flags = os.O_WRONLY | getattr(os, "O_BINARY", 0) | os.O_CREAT | getattr(os, "O_NOFOLLOW", 0)
     flags |= os.O_TRUNC if overwrite else os.O_EXCL
     try:
         fd = os.open(path, flags, 0o600)

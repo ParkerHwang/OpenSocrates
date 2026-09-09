@@ -8,6 +8,7 @@ import {
   PURGE_RESULT_SCHEMA,
   assetNameFor,
   createPurgeResult,
+  errorCategory,
   isSafeArchivePath,
   markerMatches,
   parseChecksumText,
@@ -22,6 +23,25 @@ const codexTrustKey = (event, group = 0, handler = 0) =>
 const codexTrustSection = (event, newline = "\n") =>
   `[hooks.state.${JSON.stringify(codexTrustKey(event))}]${newline}` +
   `trusted_hash = "sha256:not-evidence"${newline}`;
+
+test("classifies target metadata and runtime layout failures as verification", () => {
+  assert.equal(
+    errorCategory(new InstallerError("package target metadata does not declare only darwin-arm64")),
+    "verification",
+  );
+  assert.equal(
+    errorCategory(new InstallerError("package runtime layout does not contain only windows-x64")),
+    "verification",
+  );
+  assert.equal(
+    errorCategory(new InstallerError("package runtime layout is missing the executable windows-x64 runtime")),
+    "verification",
+  );
+  assert.equal(
+    errorCategory(new InstallerError("cursor package contains an unexpected native runtime or launcher surface")),
+    "verification",
+  );
+});
 
 test("accepts safe package paths and rejects traversal", () => {
   assert.equal(isSafeArchivePath(".codex-plugin/plugin.json"), true);
@@ -44,8 +64,9 @@ test("parses the expected release checksum", () => {
 
 test("derives host-specific release assets", () => {
   assert.match(assetNameFor("antigravity"), /-antigravity-plugin\.zip$/u);
-  assert.match(assetNameFor("codex"), /-codex-plugin\.zip$/u);
-  assert.match(assetNameFor("claude"), /-claude-plugin\.zip$/u);
+  const nativeSuffix = process.platform === "win32" ? "-windows-x64" : "";
+  assert.match(assetNameFor("codex"), new RegExp(`-codex-plugin${nativeSuffix}\\.zip$`, "u"));
+  assert.match(assetNameFor("claude"), new RegExp(`-claude-plugin${nativeSuffix}\\.zip$`, "u"));
   assert.match(assetNameFor("cursor"), /-cursor-plugin\.zip$/u);
   assert.match(assetNameFor("grok"), /-grok-plugin\.zip$/u);
   assert.throws(() => assetNameFor("unknown"), (error) => error instanceof InstallerError);

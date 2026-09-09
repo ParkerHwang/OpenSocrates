@@ -20,6 +20,7 @@ from opensocrates.content.injection import ProjectionInstructionAssembler
 from opensocrates.content.loader import load_reasoning_content_projections
 from opensocrates.hooks.entrypoint import run_hook
 from opensocrates.persistence.paths import DataRoot, DataRootLayout
+from opensocrates.persistence.permissions import secure_mode
 from opensocrates.selector.artifacts import InstructionFileStore
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,7 +75,9 @@ class HookCompositionChecks(unittest.TestCase):
             root = Path(name)
             data = DataRoot(DataRootLayout.from_root(root))
             key = root / "installation.key"
-            for mode in (None, "short", "wide", "symlink"):
+            for mode in (
+                (None, "short", "wide") if os.name == "nt" else (None, "short", "wide", "symlink")
+            ):
                 if key.exists() or key.is_symlink():
                     key.unlink()
                 if mode == "short":
@@ -98,6 +101,9 @@ class HookCompositionChecks(unittest.TestCase):
                 )
                 self.assertEqual(before, after)
 
+    @unittest.skipIf(
+        os.name == "nt", "POSIX mode semantics; native Windows ACL regression in check_windows.py"
+    )
     def test_read_only_root_skips_cleanup_without_repair(self):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)
@@ -154,6 +160,9 @@ print('nonblocking fail-open')
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual(result.stdout, "nonblocking fail-open\n")
 
+    @unittest.skipIf(
+        os.name == "nt", "POSIX UID mutation; native Windows ACL regression in check_windows.py"
+    )
     def test_opened_key_owner_is_validated_before_read(self):
         from opensocrates.persistence.turn_store import (
             TurnStoreError,
@@ -181,9 +190,10 @@ print('nonblocking fail-open')
         with tempfile.TemporaryDirectory() as name:
             root = Path(name) / "product"
             root.mkdir(mode=0o700)
+            secure_mode(root, directory=True)
             key = root / "installation.key"
             key.write_bytes(b"f" * 32)
-            key.chmod(0o600)
+            secure_mode(key, directory=False)
             artifacts = Path(name) / "artifacts"
             store = InstructionFileStore(installation_key=b"f" * 32, directory=artifacts)
             expired = store.create("expired", "turn", assembled)

@@ -1,5 +1,7 @@
 # Installation and runtime reference
 
+For the unpublished v1.4.0 Windows x64 candidate, use the [Windows guide](windows-support.md); the published macOS instructions below remain historical.
+
 Start with the [README](../README.md) for v1.3.1. Commands below run from the repository root when a source checkout is required. The default Claude/Codex flow is discovery and agent-directed retrieval; stored grounding artifacts and separate selector subprocesses below describe the retained legacy adapter. Historical host receipts are not fresh v1.3.1 live-validation claims. See [current delivery modes](decision-points.md) and [release evidence](v1.3.1-release.md).
 
 ## Install

@@ -16,16 +16,16 @@ build time; they are not host or manifest claims.
 
 - Manifest: `.codex-plugin/plugin.json`
 - Hook definition: `hooks/hooks.json`
-- Fixed launcher: `bin/launch.sh`; this exact `bin/` placement is required and
-  no root-level or PowerShell launcher is shipped. The launcher accepts only
-  the released `darwin-arm64` target; macOS Intel, Linux, and Windows are not
-  shipped or supported.
+- Fixed launcher: `{{PACKAGE_LAUNCHER_PATH}}`; this exact `bin/` placement is required and
+  no root-level or PowerShell launcher is shipped.
 - Native runtime: `runtime/<target>/opensocrates-runtime/`, resolved by
   the launcher relative to the plugin root
 - Writable product data, when enabled by the host, is owned by the host's
   `PLUGIN_DATA` location; this package does not request a remote service.
 - Complete selected reasoning content is written only to an owner-only OS
   temporary file for the active turn.
+
+{{PACKAGE_RELEASE_BOUNDARY}}
 
 Codex reviews local command hooks before execution. Review the exact hook
 definition and approve the package only when its local files and fixed
@@ -124,3 +124,7 @@ The native `bin/launch.sh decision codex` command accepts one closed JSON
 request on stdin. This is separate from host-only `control`; see
 `skills/opensocrates/references/decision/request.json`. The standalone runtime also accepts `decision --stream`
 for a volatile NDJSON session. No active host installation is needed for file lookup.
+
+## Windows candidate
+
+The Windows x64 archive uses `node bin/launch.mjs` and a bundled `.exe`. Node.js 20+ is required; Python and a Unix shell are not required for method retrieval. See the repository Windows support guide for the current validation boundary. Legacy SDK context/credential-copy selection is unavailable on Windows; decision-point retrieval is the supported path. Scheduled updates are unavailable; use a manual installer update.

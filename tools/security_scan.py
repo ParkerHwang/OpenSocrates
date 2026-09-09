@@ -1194,7 +1194,7 @@ def _instruction_artifact_check(modules: Mapping[str, ast.Module]) -> set[str]:
         and _literal_int(_keyword_value(call, "mode")) == 0o700
         for call in calls
     ) and any(
-        _call_chain(call) == ("os", "chmod")
+        _call_chain(call) == ("os", "fchmod")
         and _literal_int(call.args[1] if len(call.args) > 1 else None) == 0o700
         for call in calls
     )

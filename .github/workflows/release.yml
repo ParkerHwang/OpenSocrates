@@ -14,8 +14,12 @@ env:
   PYTHONDONTWRITEBYTECODE: "1"
 
 jobs:
+  windows:
+    uses: ./.github/workflows/windows.yml
+
   release:
     name: Build and publish release
+    needs: windows
     if: >-
       startsWith(github.ref, 'refs/tags/') ||
       github.event_name == 'workflow_dispatch' ||
@@ -130,6 +134,20 @@ jobs:
             shasum -a 256 "${chat_asset}" > "${chat_asset}.sha256"
           )
 
+      - uses: actions/download-artifact@v7
+        with:
+          name: windows-packages-${{ github.sha }}
+          path: dist/
+      - name: Verify Windows asset transport
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd dist
+          for checksum in *-windows-x64.zip.sha256; do shasum -a 256 -c "$checksum"; done
+          cp ../installer/windows.ps1 windows.ps1
+          cd ..
+          .venv/bin/python tools/merge_windows_release.py
+
       - name: Upload release evidence
         if: always()
         uses: actions/upload-artifact@v7
@@ -176,6 +194,11 @@ jobs:
             "${sbom}"
             "dist/opensocrates-${RELEASE_VERSION}-checksums.sha256"
             "installer/opensocrates.mjs"
+            "dist/windows.ps1"
+            "dist/opensocrates-${RELEASE_VERSION}-claude-plugin-windows-x64.zip"
+            "dist/opensocrates-${RELEASE_VERSION}-claude-plugin-windows-x64.zip.sha256"
+            "dist/opensocrates-${RELEASE_VERSION}-codex-plugin-windows-x64.zip"
+            "dist/opensocrates-${RELEASE_VERSION}-codex-plugin-windows-x64.zip.sha256"
           )
           if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
             echo "Release collision: ${RELEASE_TAG} already exists; refusing overwrite." >&2

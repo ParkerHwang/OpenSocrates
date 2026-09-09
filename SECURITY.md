@@ -144,9 +144,4 @@ the failed root cannot be removed and the previous backup therefore cannot be
 renamed into place, the installer preserves that backup and prints quoted,
 executable recovery commands naming only those two managed paths.
 
-Signing, notarization, clean-machine installation, platforms other than
-`darwin-arm64`, Claude Chat automatic hooks, and live delivery on every host
-surface are not claimed as validated. Native plugin archives ship only
-`bin/launch.sh`; it rejects macOS Intel, Linux, Windows, and every other target,
-and no PowerShell launcher is included. See the release limitations file for
-the complete measured boundary.
+Signing, notarization, separate clean-machine installation, Windows ARM64 and live delivery on every host surface are not claimed as validated. The macOS archive retains `bin/launch.sh` and its darwin-arm64 boundary. The v1.4.0 Windows x64 candidate uses `node bin/launch.mjs` and a bundled executable. It validates real owner/DACL permissions and Windows archive path rules. Legacy SDK credential-copy and POSIX on-demand context access remain unavailable on Windows; decision-point retrieval does not require either. Scheduled updates on Windows return an explicit manual-update instruction. See [Windows support](docs/windows-support.md) for the measured boundary.

@@ -71,7 +71,7 @@ class ArchiveIdentityChecks(unittest.TestCase):
         )
 
     def test_export_contract_never_claims_live_or_public_observations(self):
-        report = export_only_contract("1.3.0", 3)
+        report = export_only_contract("1.4.0", 3)
         self.assertEqual(self.check(report), ())
         for key, value in (
             ("status", "pass"),
@@ -81,7 +81,7 @@ class ArchiveIdentityChecks(unittest.TestCase):
         ):
             changed = deepcopy(report)
             changed[key] = value
-            self.assertTrue(validation_errors(changed, product_version="1.3.0", content_revision=3))
+            self.assertTrue(validation_errors(changed, product_version="1.4.0", content_revision=3))
         for value in (True, 1, "true"):
             changed = deepcopy(report)
             changed["live_probe"]["attempted"] = value
@@ -91,6 +91,9 @@ class ArchiveIdentityChecks(unittest.TestCase):
         self.assertTrue(self.check(changed))
         changed = deepcopy(report)
         changed["live_probe"]["status"] = "pass"
+        self.assertTrue(self.check(changed))
+        changed = deepcopy(report)
+        changed["live_probe"].update(status="pass", attempted=True)
         self.assertTrue(self.check(changed))
 
     def test_exact_version_inventory(self):

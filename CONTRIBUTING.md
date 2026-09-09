@@ -126,3 +126,7 @@ edit access is not required to contribute.
 
 By submitting a contribution, you agree that it is licensed under the
 repository's [MIT License](LICENSE).
+
+## Native Windows development
+
+Use the PowerShell commands and exact evidence boundaries in [Windows support](docs/windows-support.md). Run `uv run --locked python tools/check_windows.py --packages` after `tools/build_windows.py`; keep the existing macOS release gate. LF checkout is required for pinned evidence hashes.

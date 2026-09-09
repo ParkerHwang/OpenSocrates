@@ -9,6 +9,7 @@ import json
 import os
 import re
 import stat
+import sys
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -44,6 +45,286 @@ _FILE_RE = re.compile(r"^instruction-[A-Za-z0-9_-]{6,64}\.md$")
 
 class InstructionArtifactError(OSError):
     """Raised when a temporary instruction artifact cannot be handled safely."""
+
+
+class _CreatedPrivateTempfile:
+    __slots__ = (
+        "__active",
+        "__descriptor",
+        "__file_identity",
+        "__issuer",
+        "__path",
+        "__windows_capability",
+    )
+
+    def __init__(
+        self,
+        *,
+        descriptor: int,
+        path: Path,
+        file_identity: tuple[int, int],
+        windows_capability: object | None = None,
+        issuer: object,
+    ) -> None:
+        if issuer is not _TEMPFILE_CAPABILITY_ISSUER:
+            raise TypeError("temporary-file capabilities are factory-issued")
+        self.__descriptor = descriptor
+        self.__path = Path(path)
+        self.__file_identity = file_identity
+        self.__windows_capability = windows_capability
+        self.__issuer: object | None = issuer
+        self.__active = True
+
+    @property
+    def descriptor(self) -> int:
+        return self.__descriptor
+
+    @property
+    def path(self) -> Path:
+        return self.__path
+
+    @property
+    def file_identity(self) -> tuple[int, int]:
+        return self.__file_identity
+
+    @property
+    def windows_capability(self) -> object | None:
+        return self.__windows_capability
+
+    @property
+    def active(self) -> bool:
+        return self.__issuer is _TEMPFILE_CAPABILITY_ISSUER and self.__active
+
+    def consume(self) -> None:
+        self.__active = False
+        self.__issuer = None
+
+
+_TEMPFILE_CAPABILITY_ISSUER = object()
+
+
+def _create_private_file(path: Path, *, flags: int) -> int:
+    """Create a private file; keep this adapter out of persistence imports."""
+
+    if sys.platform == "win32":
+        from opensocrates.windows_security import create_private_file
+
+        return create_private_file(path, flags=flags)
+    descriptor = os.open(path, flags | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        if hasattr(os, "fchmod"):
+            os.fchmod(descriptor, 0o600)
+    except OSError:
+        try:
+            _discard_created_file(descriptor, path)
+        finally:
+            os.close(descriptor)
+        raise
+    return descriptor
+
+
+def _create_private_tempfile(
+    *, prefix: str, suffix: str, directory: Path
+) -> _CreatedPrivateTempfile:
+    if sys.platform == "win32":
+        from opensocrates.windows_security import create_private_tempfile
+
+        native = create_private_tempfile(prefix=prefix, suffix=suffix, directory=directory)
+        try:
+            info = os.fstat(native.descriptor)
+            return _CreatedPrivateTempfile(
+                descriptor=native.descriptor,
+                path=Path(native.path),
+                file_identity=(info.st_dev, info.st_ino),
+                windows_capability=native,
+                issuer=_TEMPFILE_CAPABILITY_ISSUER,
+            )
+        except Exception:
+            from opensocrates.windows_security import discard_created_private_tempfile
+
+            try:
+                discard_created_private_tempfile(native)
+            finally:
+                os.close(native.descriptor)
+            raise
+    descriptor, name = tempfile.mkstemp(prefix=prefix, suffix=suffix, dir=directory)
+    path = Path(name)
+    try:
+        if hasattr(os, "fchmod"):
+            os.fchmod(descriptor, 0o600)
+        info = os.fstat(descriptor)
+        return _CreatedPrivateTempfile(
+            descriptor=descriptor,
+            path=path,
+            file_identity=(info.st_dev, info.st_ino),
+            issuer=_TEMPFILE_CAPABILITY_ISSUER,
+        )
+    except Exception:
+        try:
+            _discard_created_file(descriptor, path)
+        finally:
+            os.close(descriptor)
+        raise
+
+
+def _open_private_file(path: Path, *, flags: int) -> int:
+    """Open and validate one existing private file without persistence imports."""
+
+    if sys.platform == "win32":
+        from opensocrates.windows_security import open_private_file
+
+        return open_private_file(path, flags=flags)
+    return os.open(path, flags)
+
+
+def _discard_created_file(descriptor: int, path: Path) -> None:
+    if sys.platform == "win32":
+        from opensocrates.windows_security import discard_created_file_descriptor
+
+        discard_created_file_descriptor(descriptor)
+        return
+    try:
+        opened = os.fstat(descriptor)
+        named = path.lstat()
+    except OSError:
+        return
+    if (
+        stat.S_ISREG(opened.st_mode)
+        and not stat.S_ISLNK(named.st_mode)
+        and opened.st_dev == named.st_dev
+        and opened.st_ino == named.st_ino
+    ):
+        path.unlink(missing_ok=True)
+
+
+def _release_private_tempfile(created: _CreatedPrivateTempfile) -> None:
+    if type(created) is not _CreatedPrivateTempfile or not created.active:
+        raise InstructionArtifactError("temporary-file capability is not active")
+    if sys.platform == "win32":
+        from opensocrates.windows_security import (
+            CreatedPrivateTempfile,
+            release_created_private_tempfile,
+        )
+
+        if type(created.windows_capability) is not CreatedPrivateTempfile:
+            raise InstructionArtifactError("Windows temporary-file capability is missing")
+        release_created_private_tempfile(created.windows_capability)
+    else:
+        opened = os.fstat(created.descriptor)
+        named = created.path.lstat()
+        if (
+            not stat.S_ISREG(opened.st_mode)
+            or stat.S_ISLNK(named.st_mode)
+            or (opened.st_dev, opened.st_ino) != created.file_identity
+            or opened.st_dev != named.st_dev
+            or opened.st_ino != named.st_ino
+        ):
+            raise InstructionArtifactError(
+                "instruction artifact no longer identifies the created file"
+            )
+    created.consume()
+
+
+def _discard_private_tempfile(created: _CreatedPrivateTempfile) -> None:
+    if type(created) is not _CreatedPrivateTempfile or not created.active:
+        return
+    try:
+        if sys.platform == "win32":
+            from opensocrates.windows_security import (
+                CreatedPrivateTempfile,
+                discard_created_private_tempfile,
+            )
+
+            if type(created.windows_capability) is not CreatedPrivateTempfile:
+                raise InstructionArtifactError("Windows temporary-file capability is missing")
+            discard_created_private_tempfile(created.windows_capability)
+        else:
+            opened = os.fstat(created.descriptor)
+            if (opened.st_dev, opened.st_ino) != created.file_identity:
+                raise InstructionArtifactError("temporary-file descriptor identity changed")
+            _discard_created_file(created.descriptor, created.path)
+    finally:
+        created.consume()
+
+
+def _replace_created_file(created: _CreatedPrivateTempfile, destination: Path) -> None:
+    if type(created) is not _CreatedPrivateTempfile or not created.active:
+        raise InstructionArtifactError("temporary-file capability is not active")
+    source = created.path
+    if source.parent != destination.parent:
+        raise InstructionArtifactError("receipt replacement must remain in one directory")
+    if sys.platform == "win32":
+        from opensocrates.windows_security import (
+            CreatedPrivateTempfile,
+            replace_created_file_descriptor,
+        )
+
+        if type(created.windows_capability) is not CreatedPrivateTempfile:
+            raise InstructionArtifactError("Windows temporary-file capability is missing")
+        replace_created_file_descriptor(created.windows_capability, destination)
+        created.consume()
+        return
+    opened = os.fstat(created.descriptor)
+    named = source.lstat()
+    if (
+        not stat.S_ISREG(opened.st_mode)
+        or stat.S_ISLNK(named.st_mode)
+        or (opened.st_dev, opened.st_ino) != created.file_identity
+        or opened.st_dev != named.st_dev
+        or opened.st_ino != named.st_ino
+    ):
+        raise InstructionArtifactError("receipt source no longer identifies the created file")
+    os.replace(source, destination)
+    created.consume()
+
+
+def _create_instruction_directory(path: Path) -> tuple[bool, tuple[int, int] | None]:
+    if sys.platform == "win32":
+        from opensocrates.windows_security import create_private_directory
+
+        try:
+            create_private_directory(path)
+        except FileExistsError:
+            return False, None
+        return True, None
+    try:
+        path.mkdir(parents=False, exist_ok=False, mode=0o700)
+    except FileExistsError:
+        return False, None
+    info = path.lstat()
+    if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
+        raise InstructionArtifactError("new instruction directory is not a real directory")
+    return True, (info.st_dev, info.st_ino)
+
+
+def _discard_new_empty_directory(
+    path: Path, *, created: bool, identity: tuple[int, int] | None
+) -> None:
+    if not created or sys.platform == "win32":
+        return
+    try:
+        info = path.lstat()
+        if (
+            identity is not None
+            and stat.S_ISDIR(info.st_mode)
+            and not stat.S_ISLNK(info.st_mode)
+            and (info.st_dev, info.st_ino) == identity
+        ):
+            path.rmdir()
+    except OSError:
+        pass
+
+
+def _secure_windows_directory(path: Path, *, created: bool) -> None:
+    if created:
+        from opensocrates.windows_security import inspect_acl
+
+        if inspect_acl(path) != (True, True):
+            raise PermissionError("new Windows instruction directory ACL is unsafe")
+        return
+    from opensocrates.windows_security import secure_acl
+
+    secure_acl(path, directory=True)
 
 
 def _require_key(installation_key: bytes) -> bytes:
@@ -333,6 +614,20 @@ class InstructionFileStore:
                 self._workspace_container = workspace_root.parent
                 directories.append(workspace_root)
             directories.append(temporary_root / f"opensocrates-{root_tag}")
+        if sys.platform == "win32":
+            # Extended-length paths require no machine-wide long-path policy change.
+            # Keep complete HMAC tags; never truncate private directory identities.
+            def extended(path: Path) -> Path:
+                value = str(path.absolute())
+                if value.startswith("\\\\?\\"):
+                    return path
+                if value.startswith("\\\\"):
+                    return Path("\\\\?\\UNC\\" + value[2:])
+                return Path("\\\\?\\" + value)
+
+            directories = [extended(path) for path in directories]
+            if self._workspace_container is not None:
+                self._workspace_container = extended(self._workspace_container)
         self._directories = tuple(dict.fromkeys(directories))
         self._directory = self._directories[0]
 
@@ -354,49 +649,94 @@ class InstructionFileStore:
             return None
         if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
             return None
-        if os.name != "nt" and info.st_uid != os.geteuid():
+        if sys.platform != "win32" and info.st_uid != os.geteuid():
             return None
         return resolved / _WORKSPACE_CONTAINER / root_tag
 
     def _ensure_owned_directory(self, path: Path) -> None:
+        created = False
+        created_identity: tuple[int, int] | None = None
         try:
-            path.mkdir(parents=False, exist_ok=True, mode=0o700)
+            created, created_identity = _create_instruction_directory(path)
             info = path.lstat()
         except OSError as error:
             raise InstructionArtifactError(
                 "instruction artifact directory is unavailable"
             ) from error
         if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
+            _discard_new_empty_directory(path, created=created, identity=created_identity)
             raise InstructionArtifactError("instruction artifact directory is unsafe")
-        if os.name != "nt":
+        if sys.platform == "win32":
             try:
-                if info.st_uid != os.geteuid():
-                    raise InstructionArtifactError(
-                        "instruction artifact directory has the wrong owner"
-                    )
-                if stat.S_IMODE(info.st_mode) != 0o700:
-                    os.chmod(path, 0o700)
-                refreshed = path.lstat()
+                _secure_windows_directory(path, created=created)
             except OSError as error:
+                _discard_new_empty_directory(path, created=created, identity=created_identity)
                 raise InstructionArtifactError(
                     "instruction artifact directory permissions are unsafe"
                 ) from error
-            if refreshed.st_uid != os.geteuid() or stat.S_IMODE(refreshed.st_mode) != 0o700:
+        else:
+            descriptor: int | None = None
+            try:
+                flags = (
+                    os.O_RDONLY
+                    | getattr(os, "O_DIRECTORY", 0)
+                    | getattr(os, "O_NOFOLLOW", 0)
+                    | getattr(os, "O_CLOEXEC", 0)
+                )
+                descriptor = os.open(path, flags)
+                opened = os.fstat(descriptor)
+                if (
+                    info.st_uid != os.geteuid()
+                    or opened.st_uid != os.geteuid()
+                    or (opened.st_dev, opened.st_ino) != (info.st_dev, info.st_ino)
+                ):
+                    raise InstructionArtifactError(
+                        "instruction artifact directory has the wrong owner or identity"
+                    )
+                if stat.S_IMODE(opened.st_mode) != 0o700:
+                    os.fchmod(descriptor, 0o700)
+                refreshed = os.fstat(descriptor)
+                named = path.lstat()
+            except OSError as error:
+                _discard_new_empty_directory(path, created=created, identity=created_identity)
+                raise InstructionArtifactError(
+                    "instruction artifact directory permissions are unsafe"
+                ) from error
+            finally:
+                if descriptor is not None:
+                    os.close(descriptor)
+            if (
+                refreshed.st_uid != os.geteuid()
+                or stat.S_IMODE(refreshed.st_mode) != 0o700
+                or stat.S_ISLNK(named.st_mode)
+                or not stat.S_ISDIR(named.st_mode)
+                or named.st_uid != os.geteuid()
+                or stat.S_IMODE(named.st_mode) != 0o700
+                or (named.st_dev, named.st_ino) != (refreshed.st_dev, refreshed.st_ino)
+            ):
+                _discard_new_empty_directory(path, created=created, identity=created_identity)
                 raise InstructionArtifactError(
                     "instruction artifact directory permissions are unsafe"
                 )
 
     @staticmethod
     def _write_workspace_ignore(path: Path) -> None:
-        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+        flags = os.O_WRONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
         descriptor: int | None = None
+        created = False
+        completed = False
         try:
-            descriptor = os.open(path, flags, 0o600)
-            if hasattr(os, "fchmod"):
-                os.fchmod(descriptor, 0o600)
+            descriptor = _create_private_file(path, flags=flags)
+            created = True
             os.write(descriptor, _WORKSPACE_IGNORE_BYTES)
             os.fsync(descriptor)
+            completed = True
         finally:
+            if descriptor is not None and created and not completed:
+                try:
+                    _discard_created_file(descriptor, path)
+                except OSError:
+                    pass
             if descriptor is not None:
                 os.close(descriptor)
 
@@ -410,7 +750,7 @@ class InstructionFileStore:
             raise InstructionArtifactError("workspace directory cannot be inspected") from error
         if stat.S_ISLNK(workspace_info.st_mode) or not stat.S_ISDIR(workspace_info.st_mode):
             raise InstructionArtifactError("workspace directory is unsafe")
-        if os.name != "nt" and workspace_info.st_uid != os.geteuid():
+        if sys.platform != "win32" and workspace_info.st_uid != os.geteuid():
             raise InstructionArtifactError("workspace directory has the wrong owner")
         self._ensure_owned_directory(container)
         try:
@@ -428,7 +768,7 @@ class InstructionFileStore:
                 raise InstructionArtifactError("workspace artifact directory is unsafe") from error
             if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
                 raise InstructionArtifactError("workspace artifact directory is unsafe")
-            if os.name != "nt" and info.st_uid != os.geteuid():
+            if sys.platform != "win32" and info.st_uid != os.geteuid():
                 raise InstructionArtifactError("workspace artifact directory has the wrong owner")
         ignore = container / _WORKSPACE_IGNORE_FILENAME
         try:
@@ -458,10 +798,20 @@ class InstructionFileStore:
             raise InstructionArtifactError("temporary directory is unsafe")
         self._ensure_owned_directory(root)
 
-    def _cleanup_root(self, root: Path) -> None:
+    @staticmethod
+    def _remove_empty_directory(path: Path, *, root: Path) -> int:
+        if sys.platform == "win32":
+            from opensocrates.windows_security import remove_private_path
+
+            return remove_private_path(path, root=root, directory_only=True)
         try:
-            root.rmdir()
+            path.rmdir()
         except OSError:
+            return 0
+        return 1
+
+    def _cleanup_root(self, root: Path) -> None:
+        if not self._remove_empty_directory(root, root=root):
             return
         if self._workspace_container is None or root.parent != self._workspace_container:
             return
@@ -470,13 +820,18 @@ class InstructionFileStore:
         try:
             children = tuple(container.iterdir())
             if children == (ignore,):
-                self._inspect_regular_file(ignore)
+                info = self._inspect_regular_file(ignore)
                 if (
                     self._read_owner_file(ignore, maximum=len(_WORKSPACE_IGNORE_BYTES))
                     == _WORKSPACE_IGNORE_BYTES
                 ):
-                    ignore.unlink()
-                    container.rmdir()
+                    self._remove_tree(
+                        ignore,
+                        root=container,
+                        recursive=False,
+                        expected_identity=(info.st_dev, info.st_ino),
+                    )
+                    self._remove_empty_directory(container, root=container)
         except (OSError, InstructionArtifactError):
             return
 
@@ -537,7 +892,7 @@ class InstructionFileStore:
             raise InstructionArtifactError("instruction artifact path is unsafe")
         if info.st_size > MAX_INSTRUCTION_FILE_BYTES:
             raise InstructionArtifactError("instruction artifact exceeds its bounded file size")
-        if os.name != "nt":
+        if sys.platform != "win32":
             if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) != 0o600:
                 raise InstructionArtifactError("instruction artifact permissions are unsafe")
         return info
@@ -552,11 +907,13 @@ class InstructionFileStore:
             raise InstructionArtifactError("owner-only artifact cannot be inspected") from error
         if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode) or info.st_size > maximum:
             raise InstructionArtifactError("owner-only artifact is unsafe")
-        if os.name != "nt" and (info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) != 0o600):
+        if sys.platform != "win32" and (
+            info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) != 0o600
+        ):
             raise InstructionArtifactError("owner-only artifact permissions are unsafe")
-        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+        flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
         try:
-            descriptor = os.open(path, flags)
+            descriptor = _open_private_file(path, flags=flags)
         except OSError as error:
             raise InstructionArtifactError("owner-only artifact cannot be opened") from error
         chunks: list[bytes] = []
@@ -610,19 +967,17 @@ class InstructionFileStore:
         self._ensure_owned_directory(session_directory)
         turn_directory = self._turn_directory(session_id, turn_id, root=root)
         self._ensure_owned_directory(turn_directory)
+        created: _CreatedPrivateTempfile | None = None
         fd: int | None = None
-        path: Path | None = None
         try:
-            fd, filename = tempfile.mkstemp(
+            created = _create_private_tempfile(
                 prefix="instruction-",
                 suffix=".md",
-                dir=turn_directory,
+                directory=turn_directory,
             )
-            path = Path(filename)
-            if hasattr(os, "fchmod"):
-                os.fchmod(fd, 0o600)
-            with os.fdopen(fd, "wb", buffering=0) as handle:
-                fd = None
+            fd = created.descriptor
+            path = created.path
+            with os.fdopen(fd, "wb", buffering=0, closefd=False) as handle:
                 handle.write(data)
                 handle.flush()
                 os.fsync(handle.fileno())
@@ -637,11 +992,12 @@ class InstructionFileStore:
                 inline_teacher_questions=assembled.inline_teacher_questions,
             )
             artifact.reference_message()
+            _release_private_tempfile(created)
             return artifact
         except Exception:
-            if path is not None:
+            if created is not None and created.active:
                 try:
-                    path.unlink(missing_ok=True)
+                    _discard_private_tempfile(created)
                 except OSError:
                     pass
             raise
@@ -652,9 +1008,9 @@ class InstructionFileStore:
     @staticmethod
     def _decode_header(path: Path) -> InstructionArtifact:
         InstructionFileStore._inspect_regular_file(path)
-        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+        flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
         try:
-            fd = os.open(path, flags)
+            fd = _open_private_file(path, flags=flags)
         except OSError as error:
             raise InstructionArtifactError("instruction artifact cannot be opened") from error
         try:
@@ -829,29 +1185,37 @@ class InstructionFileStore:
         if len(data) > _MAX_RECEIPT_BYTES:
             raise InstructionArtifactError("instruction read receipt exceeds its bound")
         receipt_path = self._receipt_path(artifact)
+        created: _CreatedPrivateTempfile | None = None
         descriptor: int | None = None
-        temporary_path: Path | None = None
+        published = False
         try:
-            descriptor, temporary_name = tempfile.mkstemp(
+            created = _create_private_tempfile(
                 prefix=".grounding-receipt-",
                 suffix=".tmp",
-                dir=artifact.path.parent,
+                directory=artifact.path.parent,
             )
-            temporary_path = Path(temporary_name)
-            if hasattr(os, "fchmod"):
-                os.fchmod(descriptor, 0o600)
-            with os.fdopen(descriptor, "wb", buffering=0) as handle:
-                descriptor = None
+            descriptor = created.descriptor
+            with os.fdopen(descriptor, "wb", buffering=0, closefd=False) as handle:
                 handle.write(data)
                 handle.flush()
                 os.fsync(handle.fileno())
-            os.replace(temporary_path, receipt_path)
-            temporary_path = None
-            self._read_owner_file(receipt_path, maximum=_MAX_RECEIPT_BYTES)
+            _replace_created_file(created, receipt_path)
+            published = True
+            if sys.platform == "win32":
+                from opensocrates.windows_security import verify_private_file_descriptor
+
+                verify_private_file_descriptor(descriptor)
+            else:
+                self._read_owner_file(receipt_path, maximum=_MAX_RECEIPT_BYTES)
         except Exception:
-            if temporary_path is not None:
+            if created is not None and created.active:
                 try:
-                    temporary_path.unlink(missing_ok=True)
+                    _discard_private_tempfile(created)
+                except OSError:
+                    pass
+            elif descriptor is not None and published:
+                try:
+                    _discard_created_file(descriptor, receipt_path)
                 except OSError:
                     pass
             raise
@@ -991,13 +1355,28 @@ class InstructionFileStore:
         ):
             return False
 
-    def _remove_tree(self, path: Path, *, root: Path) -> int:
+    def _remove_tree(  # noqa: C901  # Explicit native cleanup boundary and retained POSIX traversal.
+        self,
+        path: Path,
+        *,
+        root: Path,
+        recursive: bool = True,
+        expected_identity: tuple[int, int] | None = None,
+    ) -> int:
         """Remove an exact artifact subtree without following symlinks."""
 
+        if sys.platform == "win32":
+            from opensocrates.windows_security import remove_private_path
+
+            return remove_private_path(
+                path, root=root, recursive=recursive, expected_identity=expected_identity
+            )
         try:
             path.relative_to(root)
             info = path.lstat()
         except (ValueError, OSError):
+            return 0
+        if expected_identity is not None and (info.st_dev, info.st_ino) != expected_identity:
             return 0
         if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
             try:
@@ -1005,15 +1384,16 @@ class InstructionFileStore:
                 return 1
             except OSError:
                 return 0
-        if os.name != "nt" and info.st_uid != os.geteuid():
+        if sys.platform != "win32" and info.st_uid != os.geteuid():
             return 0
         removed = 0
-        try:
-            children = tuple(path.iterdir())
-        except OSError:
-            return 0
-        for child in children:
-            removed += self._remove_tree(child, root=root)
+        if recursive:
+            try:
+                children = tuple(path.iterdir())
+            except OSError:
+                return 0
+            for child in children:
+                removed += self._remove_tree(child, root=root)
         try:
             path.rmdir()
         except OSError:
@@ -1033,12 +1413,7 @@ class InstructionFileStore:
             except InstructionArtifactError:
                 continue
             removed += self._remove_tree(turn_directory, root=root)
-            try:
-                session_directory.rmdir()
-            except OSError:
-                pass
-            else:
-                removed += 1
+            removed += self._remove_empty_directory(session_directory, root=root)
             self._cleanup_root(root)
         return removed
 
@@ -1050,6 +1425,8 @@ class InstructionFileStore:
             try:
                 active_directory = self._turn_directory(session_id, active_turn_id, root=root)
                 session_directory = active_directory.parent
+                if getattr(session_directory.lstat(), "st_file_attributes", 0) & 0x400:
+                    continue
                 children = tuple(session_directory.iterdir())
             except (OSError, InstructionArtifactError):
                 continue
@@ -1093,7 +1470,11 @@ class InstructionFileStore:
                     continue
                 try:
                     session_info = session_directory.lstat()
-                    if stat.S_ISLNK(session_info.st_mode) or not stat.S_ISDIR(session_info.st_mode):
+                    if (
+                        stat.S_ISLNK(session_info.st_mode)
+                        or not stat.S_ISDIR(session_info.st_mode)
+                        or getattr(session_info, "st_file_attributes", 0) & 0x400
+                    ):
                         continue
                     turns = tuple(session_directory.iterdir())
                 except OSError:
@@ -1103,7 +1484,11 @@ class InstructionFileStore:
                         continue
                     try:
                         turn_info = turn_directory.lstat()
-                        if stat.S_ISLNK(turn_info.st_mode) or not stat.S_ISDIR(turn_info.st_mode):
+                        if (
+                            stat.S_ISLNK(turn_info.st_mode)
+                            or not stat.S_ISDIR(turn_info.st_mode)
+                            or getattr(turn_info, "st_file_attributes", 0) & 0x400
+                        ):
                             continue
                         files = tuple(turn_directory.iterdir())
                     except OSError:
@@ -1118,8 +1503,12 @@ class InstructionFileStore:
                                 and not stat.S_ISLNK(info.st_mode)
                                 and info.st_mtime_ns <= cutoff_ns
                             ):
-                                path.unlink()
-                                removed += 1
+                                removed += self._remove_tree(
+                                    path,
+                                    root=root,
+                                    recursive=False,
+                                    expected_identity=(info.st_dev, info.st_ino),
+                                )
                         except OSError:
                             continue
                     try:
@@ -1135,22 +1524,16 @@ class InstructionFileStore:
                             if stat.S_ISREG(receipt_info.st_mode) and not stat.S_ISLNK(
                                 receipt_info.st_mode
                             ):
-                                receipt_path.unlink()
-                                removed += 1
+                                removed += self._remove_tree(
+                                    receipt_path,
+                                    root=root,
+                                    recursive=False,
+                                    expected_identity=(receipt_info.st_dev, receipt_info.st_ino),
+                                )
                     except OSError:
                         pass
-                    try:
-                        turn_directory.rmdir()
-                    except OSError:
-                        pass
-                    else:
-                        removed += 1
-                try:
-                    session_directory.rmdir()
-                except OSError:
-                    pass
-                else:
-                    removed += 1
+                    removed += self._remove_empty_directory(turn_directory, root=root)
+                removed += self._remove_empty_directory(session_directory, root=root)
             self._cleanup_root(root)
         return removed
 

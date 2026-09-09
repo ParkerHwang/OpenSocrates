@@ -19,6 +19,10 @@ env:
   PYTHONDONTWRITEBYTECODE: "1"
 
 jobs:
+  windows:
+    name: Native Windows x64
+    uses: ./.github/workflows/windows.yml
+
   python-quality:
     name: Python quality
     runs-on: ubuntu-latest

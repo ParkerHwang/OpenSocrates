@@ -34,7 +34,7 @@ import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 
-export const PRODUCT_VERSION = "1.3.1";
+export const PRODUCT_VERSION = "1.4.0";
 export const REPOSITORY = "ParkerHwang/OpenSocrates";
 export const MARKETPLACE_NAME = "opensocrates";
 export const PLUGIN_NAME = "opensocrates";
@@ -54,7 +54,8 @@ export function assetNameFor(host = DEFAULT_HOST) {
   if (!SUPPORTED_HOSTS.includes(host)) {
     fail(`unsupported host ${JSON.stringify(host)}`);
   }
-  return `opensocrates-${PRODUCT_VERSION}-${host}-plugin.zip`;
+  const suffix = process.platform === "win32" && ["codex", "claude"].includes(host) ? "-windows-x64" : "";
+  return `opensocrates-${PRODUCT_VERSION}-${host}-plugin${suffix}.zip`;
 }
 export const ASSET_NAME = assetNameFor(DEFAULT_HOST);
 export const CHECKSUM_NAME = `${ASSET_NAME}.sha256`;
@@ -145,7 +146,7 @@ const HOST_LAYOUTS = Object.freeze({
 const MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024 * 1024;
 const MAX_ARCHIVE_ENTRIES = 10_000;
 const DESIRED_STATE_SCHEMA = "opensocrates.desired-state/1.0.0";
-const RECEIPT_SCHEMA = "opensocrates.auto-update-receipt/1.0.0";
+const RECEIPT_SCHEMA = "opensocrates.auto-update-receipt/1.1.0";
 const AUTO_UPDATE_LABEL = "com.opensocrates.auto-update";
 const AUTO_UPDATE_MIN_INTERVAL_HOURS = 1;
 const AUTO_UPDATE_MAX_INTERVAL_HOURS = 24 * 7;
@@ -1206,6 +1207,21 @@ export async function resetCodexOpenSocratesHookTrust({
 
 export class InstallerError extends Error {}
 
+class PackagePreparationError extends InstallerError {
+  constructor(outcomes) {
+    const failures = outcomes.filter((item) => item.error !== null);
+    super(
+      "package preparation failed: " +
+        failures.map((item) => `${item.host}: ${String(item.error?.message ?? item.error)}`).join("; "),
+    );
+    this.hostOutcomes = outcomes.map(({ host, error }) => ({
+      host,
+      result: "failed",
+      errorCategory: error === null ? null : errorCategory(error),
+    }));
+  }
+}
+
 function fail(message) {
   throw new InstallerError(message);
 }
@@ -1354,7 +1370,8 @@ async function ensurePrivateDirectory(directory) {
     if (!info.isDirectory() || info.isSymbolicLink()) {
       fail(`refusing to use a non-directory or symbolic-link state path: ${directory}`);
     }
-    await chmod(directory, 0o700);
+    if (process.platform === "win32") windowsAction("private", directory);
+    else await chmod(directory, 0o700);
     return;
   }
   await mkdir(directory, { recursive: true, mode: 0o700 });
@@ -1362,7 +1379,8 @@ async function ensurePrivateDirectory(directory) {
   if (!info.isDirectory() || info.isSymbolicLink()) {
     fail(`refusing to use an unsafe state path: ${directory}`);
   }
-  await chmod(directory, 0o700);
+  if (process.platform === "win32") windowsAction("private", directory);
+    else await chmod(directory, 0o700);
 }
 
 async function atomicWritePrivateFile(target, contents) {
@@ -1375,7 +1393,8 @@ async function atomicWritePrivateFile(target, contents) {
       mode: 0o600,
       flag: "wx",
     });
-    await chmod(temporary, 0o600);
+    if (process.platform === "win32") windowsAction("private", temporary);
+    else await chmod(temporary, 0o600);
     await rename(temporary, target);
   } finally {
     if (await exists(temporary)) {
@@ -1397,9 +1416,10 @@ async function writeAutoUpdateReceipt({ version, checkedAt, hosts, result, error
     checkedAt,
     hosts: [...hosts]
       .sort((left, right) => left.host.localeCompare(right.host))
-      .map(({ host, result: hostResult }) => ({
+      .map(({ host, result: hostResult, errorCategory: hostErrorCategory }) => ({
         host,
         result: hostResult,
+        errorCategory: hostErrorCategory ?? null,
       })),
     result,
     errorCategory: errorCategory ?? null,
@@ -1422,9 +1442,20 @@ function majorVersion(value) {
   return match ? Number(match[1]) : null;
 }
 
-function errorCategory(error) {
+export function errorCategory(error) {
+  if (error instanceof PackagePreparationError) {
+    const categories = new Set(
+      error.hostOutcomes.map((item) => item.errorCategory).filter((item) => item !== null),
+    );
+    return categories.size === 1 ? [...categories][0] : "multiple";
+  }
   const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
-  if (/checksum|manifest|archive|symbolic link/u.test(message)) return "verification";
+  if (
+    /checksum|manifest|archive|symbolic link|target metadata|runtime layout|unexpected native runtime or launcher surface/u.test(
+      message,
+    )
+  )
+    return "verification";
   if (/download|fetch|network|offline|timed? ?out/u.test(message)) return "network";
   if (/preflight|not logged|auth|version is required|could not run/u.test(message)) return "preflight";
   if (/rollback|restore/u.test(message)) return "rollback";
@@ -1558,7 +1589,7 @@ export function isSafeArchivePath(value) {
   if (candidate.length === 0) {
     return false;
   }
-  return candidate.split("/").every((part) => part.length > 0 && part !== "." && part !== "..");
+  return candidate.split("/").every((part) => part.length > 0 && part !== "." && part !== ".." && !/[\x00-\x1f<>:"|?*]/u.test(part) && !/[. ]$/u.test(part) && !/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/iu.test(part));
 }
 
 export function parseChecksumText(text, expectedName = ASSET_NAME) {
@@ -1915,10 +1946,20 @@ function opencodeBinary() {
   return process.env.OPENCODE_BIN || "opencode";
 }
 
+function windowsAction(action, target, destination = "") {
+  const result = spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", fileURLToPath(new URL("./windows.ps1", import.meta.url)), "-Action", action], {
+    encoding: "utf8", windowsHide: true, maxBuffer: 16 * 1024 * 1024,
+    env: {...process.env, OPENSOCRATES_WINDOWS_PATH: target, OPENSOCRATES_WINDOWS_DESTINATION: destination},
+  });
+  if (result.error || result.status !== 0) fail(`Windows ${action} failed: ${result.error?.message || result.stderr?.trim()}`);
+  return result.stdout;
+}
+
 function run(command, args, { allowFailure = false } = {}) {
   const result = spawnSync(command, args, {
     encoding: "utf8",
     env: process.env,
+    windowsHide: true,
     maxBuffer: 16 * 1024 * 1024,
   });
   if (result.error) {
@@ -2509,8 +2550,7 @@ async function verifyOuterChecksum(asset, checksum, host) {
 
 function archiveEntries(asset) {
   const unzip = process.platform === "darwin" ? "/usr/bin/unzip" : "unzip";
-  const result = run(unzip, ["-Z1", asset]);
-  const entries = result.stdout.split(/\r?\n/u).filter(Boolean);
+  const entries = process.platform === "win32" ? JSON.parse(windowsAction("entries", asset)) : run(unzip, ["-Z1", asset]).stdout.split(/\r?\n/u).filter(Boolean);
   if (entries.length === 0 || entries.length > MAX_ARCHIVE_ENTRIES) {
     fail(`archive contains an invalid number of entries: ${entries.length}`);
   }
@@ -2531,7 +2571,8 @@ async function extractArchive(asset, destination) {
   archiveEntries(asset);
   await mkdir(destination, { recursive: true, mode: 0o700 });
   const unzip = process.platform === "darwin" ? "/usr/bin/unzip" : "unzip";
-  run(unzip, ["-q", asset, "-d", destination]);
+  if (process.platform === "win32") windowsAction("extract", asset, destination);
+  else run(unzip, ["-q", asset, "-d", destination]);
 }
 
 async function walkFiles(root, current = root, output = []) {
@@ -2587,6 +2628,14 @@ async function verifyPackageChecksums(pluginRoot) {
   return declared.size;
 }
 
+function hasExactStringEntries(value, expected) {
+  return (
+    Array.isArray(value) &&
+    value.length === expected.length &&
+    value.every((item, index) => item === expected[index])
+  );
+}
+
 async function verifyExtractedPackage(pluginRoot, host) {
   const manifest = await readJsonObject(join(pluginRoot, HOST_LAYOUTS[host].manifestRelative));
   if (manifest.name !== PLUGIN_NAME || manifest.version !== PRODUCT_VERSION) {
@@ -2604,14 +2653,43 @@ async function verifyExtractedPackage(pluginRoot, host) {
     fail("package release manifest does not match this installer");
   }
   if (HOST_LAYOUTS[host].requiresRuntime) {
-    const runtime = join(pluginRoot, "runtime", "darwin-arm64", "opensocrates-runtime", "opensocrates-runtime");
-    const runtimeInfo = await stat(runtime);
-    if (!runtimeInfo.isFile() || (runtimeInfo.mode & 0o111) === 0) {
-      fail("package is missing the executable darwin-arm64 runtime");
+    const target = process.platform === "win32" ? "windows-x64" : "darwin-arm64";
+    const runtimeRoot = join(pluginRoot, "runtime");
+    const executable = process.platform === "win32" ? "opensocrates-runtime.exe" : "opensocrates-runtime";
+    const runtime = join(runtimeRoot, target, "opensocrates-runtime", executable);
+    if (
+      !hasExactStringEntries(release.runtime_targets, [target]) ||
+      !hasExactStringEntries(release.release_targets, [target])
+    ) {
+      fail(`package target metadata does not declare only ${target}`);
+    }
+    let packagedTargets;
+    try {
+      packagedTargets = await readdir(runtimeRoot, { withFileTypes: true });
+    } catch {
+      fail(`package runtime layout cannot be inspected for ${target}`);
+    }
+    if (
+      packagedTargets.length !== 1 ||
+      packagedTargets[0].name !== target ||
+      !packagedTargets[0].isDirectory() ||
+      packagedTargets[0].isSymbolicLink()
+    ) {
+      fail(`package runtime layout does not contain only ${target}`);
+    }
+    let runtimeInfo;
+    try {
+      runtimeInfo = await stat(runtime);
+    } catch {
+      fail(`package runtime layout is missing the executable ${target} runtime`);
+    }
+    if (!runtimeInfo.isFile() || (process.platform !== "win32" && (runtimeInfo.mode & 0o111) === 0)) {
+      fail(`package runtime layout is missing the executable ${target} runtime`);
     }
   } else if (
-    release.launchers?.length !== 0 ||
-    release.runtime_targets?.length !== 0 ||
+    !hasExactStringEntries(release.release_targets, []) ||
+    !hasExactStringEntries(release.launchers, []) ||
+    !hasExactStringEntries(release.runtime_targets, []) ||
     (await exists(join(pluginRoot, "runtime"))) ||
     (await exists(join(pluginRoot, "hooks"))) ||
     (await exists(join(pluginRoot, "bin"))) ||
@@ -3126,10 +3204,14 @@ async function prepareVerifiedPackage(options, host = options.host) {
 async function prepareVerifiedPackages(options, hosts) {
   const settled = await Promise.allSettled(hosts.map((host) => prepareVerifiedPackage(options, host)));
   const prepared = settled.filter((result) => result.status === "fulfilled").map((result) => result.value);
-  const failure = settled.find((result) => result.status === "rejected");
-  if (failure) {
+  if (settled.some((result) => result.status === "rejected")) {
     await Promise.all(prepared.map((item) => rm(item.scratch, { recursive: true, force: true })));
-    throw failure.reason;
+    throw new PackagePreparationError(
+      settled.map((result, index) => ({
+        host: hosts[index],
+        error: result.status === "rejected" ? result.reason : null,
+      })),
+    );
   }
   return prepared;
 }
@@ -4057,7 +4139,7 @@ async function executablePath(name, environmentOverride) {
     await access(candidate, fsConstants.X_OK);
     return candidate;
   }
-  const which = run("/usr/bin/which", [name], { allowFailure: true });
+  const which = run(process.platform === "win32" ? "where.exe" : "/usr/bin/which", [name], { allowFailure: true });
   const candidate = which.status === 0 ? which.stdout.trim() : "";
   if (!candidate || !candidate.startsWith("/")) {
     fail(`could not find an executable ${name} for the automatic updater`);
@@ -4120,6 +4202,7 @@ function launchAgentTarget() {
 }
 
 function launchAgentLoaded() {
+  if (process.platform === "win32") return false;
   return (
     run(launchctlBinary(), ["print", launchAgentTarget()], {
       allowFailure: true,
@@ -5080,7 +5163,14 @@ async function runScheduledUpdate(options) {
       await writeAutoUpdateReceipt({
         version: PRODUCT_VERSION,
         checkedAt,
-        hosts: hosts.map((host) => ({ host, result: "failed" })),
+        hosts:
+          error instanceof PackagePreparationError
+            ? error.hostOutcomes
+            : hosts.map((host) => ({
+                host,
+                result: "failed",
+                errorCategory: errorCategory(error),
+              })),
         result: "failed",
         errorCategory: errorCategory(error),
       });
@@ -5090,9 +5180,9 @@ async function runScheduledUpdate(options) {
 }
 
 function requireSupportedPlatform() {
-  if (process.platform !== "darwin" || process.arch !== "arm64") {
+  if (!((process.platform === "darwin" && process.arch === "arm64") || (process.platform === "win32" && process.arch === "x64"))) {
     fail(
-      `OpenSocrates ${PRODUCT_VERSION} prebuilt installation supports darwin-arm64 only; ` +
+      `OpenSocrates ${PRODUCT_VERSION} prebuilt installation supports darwin-arm64 and windows-x64; ` +
         `detected ${process.platform}-${process.arch}`,
     );
   }
@@ -5129,6 +5219,14 @@ async function verifyPackages(options) {
 
 export async function main(argv = process.argv.slice(2), internalDependencies = {}) {
   const options = parseCli(argv);
+  if (process.platform === "win32" && options.action === "auto-update") {
+    const message = "Automatic updates: unavailable on Windows in 1.4.0. Use opensocrates update --host all manually.";
+    if (options.autoUpdateAction === "status" || options.autoUpdateAction === "disable") {
+      console.log(message);
+      return 0;
+    }
+    fail(message);
+  }
   if (options.action === "help") {
     showHelp();
     return 0;

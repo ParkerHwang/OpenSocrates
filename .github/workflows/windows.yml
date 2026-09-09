@@ -1,0 +1,42 @@
+name: Native Windows x64
+on:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-2025
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - uses: astral-sh/setup-uv@v9.0.0
+      - run: uv sync --locked --all-groups
+      - run: uv run --locked ruff check src tools
+      - run: uv run --locked ruff format --check src tools
+      - run: uv run --locked mypy src
+      - run: uv run --locked python tools/check_windows.py
+      - run: uv run --locked python tools/build_windows.py
+      - run: uv run --locked python tools/check_windows.py --packages
+      - run: npm run test:windows
+      - run: npm pack --dry-run
+      - name: Write exact Windows package source provenance
+        env:
+          OPENSOCRATES_EXPECTED_SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: node tools/write_package_provenance.mjs --output build/evidence/windows-package-source-provenance.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows-packages-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          path: |
+            dist/*-windows-x64.zip
+            dist/*-windows-x64.zip.sha256
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: windows-evidence-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          path: build/evidence/

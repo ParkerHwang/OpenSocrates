@@ -1813,11 +1813,11 @@ def _claude_chat_integrity_errors(root: Path, version: str) -> set[str]:
         if not shared.is_dir():
             return {"claude_chat_canonical_inventory_unavailable"}
         expected |= {
-            "references/decision/" + str(path.relative_to(shared))
+            "references/decision/" + path.relative_to(shared).as_posix()
             for path in shared.rglob("*")
             if path.is_file()
         }
-        staged = {str(path.relative_to(stage)) for path in stage.rglob("*") if path.is_file()}
+        staged = {path.relative_to(stage).as_posix() for path in stage.rglob("*") if path.is_file()}
         if staged != expected:
             errors.add("claude_chat_staged_inventory_mismatch")
         with zipfile.ZipFile(archive) as bundle:

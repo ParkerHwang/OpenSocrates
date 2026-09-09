@@ -2306,17 +2306,17 @@ def test_chat_archive_live_upload_evidence() -> None:
         )
         require(
             "Chat standalone export: **archive contract validated; live activation unvalidated.**"
-            in (ROOT / "README.md").read_text(),
+            in (ROOT / "README.md").read_text(encoding="utf-8"),
             "Chat export boundary missing",
         )
         require(
             "Chat 독립형 내보내기: **아카이브 계약 검증, 실제 활성화 미검증.**"
-            in (ROOT / "README.ko.md").read_text(),
+            in (ROOT / "README.ko.md").read_text(encoding="utf-8"),
             "Korean Chat export boundary missing",
         )
         require(
             "Chat standalone export: **archive contract validated; live activation unvalidated.**"
-            in (ROOT / "docs/claude-chat-upload-probe.md").read_text(),
+            in (ROOT / "docs/claude-chat-upload-probe.md").read_text(encoding="utf-8"),
             "Chat probe documentation export boundary missing",
         )
         return

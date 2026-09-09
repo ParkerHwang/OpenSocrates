@@ -26,7 +26,7 @@ import {
   readdirSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { PassThrough, Writable } from "node:stream";
 
 import {
@@ -76,16 +76,37 @@ function sha256(bytes) {
 // ---------------------------------------------------------------------------
 // Package fixture
 // ---------------------------------------------------------------------------
-function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, manifestVersion = null } = {}) {
+function buildPackage(
+  root,
+  host,
+  {
+    version = PRODUCT_VERSION,
+    corrupt = false,
+    manifestVersion = null,
+    target = "darwin-arm64",
+    releaseManifest = {},
+    extraRuntimeTargets = [],
+    extraFiles = {},
+  } = {},
+) {
+  assert.ok(["darwin-arm64", "windows-x64"].includes(target), `unsupported fixture target: ${target}`);
+  assert.ok(
+    extraRuntimeTargets.every((item) => ["darwin-arm64", "windows-x64"].includes(item)),
+    "unsupported extra fixture target",
+  );
   const tree = join(root, `pkg-${host}`);
+  const requiresRuntime = ["claude", "codex"].includes(host);
+  const declaredTargets = requiresRuntime ? [target] : [];
   const manifestPath = ["antigravity", "cursor", "grok"].includes(host)
     ? "plugin.json"
     : host === "opencode"
       ? "opencode-plugin.json"
       : `${host === "claude" ? ".claude-plugin" : ".codex-plugin"}/plugin.json`;
   mkdirSync(dirname(join(tree, manifestPath)), { recursive: true });
-  if (["claude", "codex"].includes(host)) {
-    mkdirSync(join(tree, "runtime", "darwin-arm64", "opensocrates-runtime"), { recursive: true });
+  if (requiresRuntime) {
+    for (const runtimeTarget of new Set([target, ...extraRuntimeTargets])) {
+      mkdirSync(join(tree, "runtime", runtimeTarget, "opensocrates-runtime"), { recursive: true });
+    }
   }
   mkdirSync(join(tree, "skills", "opensocrates"), { recursive: true });
 
@@ -118,13 +139,18 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
       schema: "opensocrates.plugin-release-manifest/1.0.0",
       content_revision: 1,
       launchers: [],
-      runtime_targets: [],
+      release_targets: [...declaredTargets],
+      runtime_targets: [...declaredTargets],
+      ...releaseManifest,
     },
     null,
     2,
   );
-  if (["claude", "codex"].includes(host)) {
-    files["runtime/darwin-arm64/opensocrates-runtime/opensocrates-runtime"] = "#!/bin/sh\nexit 0\n";
+  if (requiresRuntime) {
+    for (const runtimeTarget of new Set([target, ...extraRuntimeTargets])) {
+      const executable = runtimeTarget === "windows-x64" ? "opensocrates-runtime.exe" : "opensocrates-runtime";
+      files[`runtime/${runtimeTarget}/opensocrates-runtime/${executable}`] = "#!/bin/sh\nexit 0\n";
+    }
   }
   files["skills/opensocrates/SKILL.md"] = "# OpenSocrates controller\n";
   if (host === "opencode") {
@@ -132,13 +158,18 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
     files["plugins/opensocrates.js"] =
       "export const OpenSocratesPlugin = async () => ({ 'chat.message': async () => {} });\n";
   }
+  Object.assign(files, extraFiles);
 
   for (const [name, body] of Object.entries(files)) {
     mkdirSync(dirname(join(tree, ...name.split("/"))), { recursive: true });
     writeFileSync(join(tree, ...name.split("/")), body);
   }
-  if (["claude", "codex"].includes(host)) {
-    chmodSync(join(tree, "runtime", "darwin-arm64", "opensocrates-runtime", "opensocrates-runtime"), 0o755);
+  if (requiresRuntime) {
+    for (const runtimeTarget of new Set([target, ...extraRuntimeTargets])) {
+      if (runtimeTarget === "darwin-arm64") {
+        chmodSync(join(tree, "runtime", runtimeTarget, "opensocrates-runtime", "opensocrates-runtime"), 0o755);
+      }
+    }
   }
 
   const lines = Object.entries(files).map(([name, body]) => {
@@ -147,14 +178,38 @@ function buildPackage(root, host, { version = PRODUCT_VERSION, corrupt = false, 
   });
   writeFileSync(join(tree, "checksums.sha256"), `${lines.join("\n")}\n`);
 
-  const asset = join(root, `opensocrates-${version}-${host}-plugin.zip`);
-  const zip = spawnSync("zip", ["-q", "-r", "-X", asset, "."], {
-    cwd: tree,
-    encoding: "utf8",
-  });
+  const platformSuffix = requiresRuntime && target === "windows-x64" ? "-windows-x64" : "";
+  const assetName = `opensocrates-${version}-${host}-plugin${platformSuffix}.zip`;
+  const asset = join(root, assetName);
+  const zip =
+    process.platform === "win32"
+      ? spawnSync(
+          "pwsh",
+          [
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-Command",
+            "Add-Type -AssemblyName System.IO.Compression.FileSystem; " +
+              "[IO.Compression.ZipFile]::CreateFromDirectory(" +
+              "$env:OPENSOCRATES_FIXTURE_TREE,$env:OPENSOCRATES_FIXTURE_ASSET)",
+          ],
+          {
+            encoding: "utf8",
+            env: {
+              ...process.env,
+              OPENSOCRATES_FIXTURE_TREE: tree,
+              OPENSOCRATES_FIXTURE_ASSET: asset,
+            },
+          },
+        )
+      : spawnSync("zip", ["-q", "-r", "-X", asset, "."], {
+          cwd: tree,
+          encoding: "utf8",
+        });
   assert.equal(zip.status, 0, `zip failed: ${zip.stderr}`);
   const checksum = `${asset}.sha256`;
-  writeFileSync(checksum, `${sha256(readFileSync(asset))}  opensocrates-${version}-${host}-plugin.zip\n`);
+  writeFileSync(checksum, `${sha256(readFileSync(asset))}  ${assetName}\n`);
   return { asset, checksum, tree };
 }
 
@@ -3309,7 +3364,9 @@ test("auto-update: a single-host scope preserves the complete installed-host set
     assert.equal(box.state("codex").plugins[0].version, "1.1.0");
     assert.deepEqual(box.desired().installedHosts, ["claude", "codex"]);
     assert.deepEqual(box.desired().autoUpdate.hosts, ["claude"]);
-    assert.deepEqual(box.receipt().hosts, [{ host: "claude", result: "updated" }]);
+    assert.deepEqual(box.receipt().hosts, [
+      { host: "claude", result: "updated", errorCategory: null },
+    ]);
 
     const reconciled = await withDarwinArm64(() => quiet(() => main(["update", ...allAssetArgs(packages)])));
     assert.equal(reconciled.error, undefined, `all-host reconciliation failed: ${reconciled.error?.message}`);
@@ -3328,9 +3385,15 @@ test("auto-update: partial removal rewrites the remaining scheduler scope", asyn
       claude: buildPackage(box.root, "claude"),
       codex: buildPackage(box.root, "codex"),
     };
-    await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
+    const installed = await withDarwinArm64(() =>
+      quiet(() => main(["install", ...allAssetArgs(packages)])),
+    );
+    assert.equal(installed.error, undefined, `initial install failed: ${installed.error?.message}`);
     configureFakeNpx(box);
-    await withDarwinArm64(() => quiet(() => main(["auto-update", "enable", "--host", "all"])));
+    const enabled = await withDarwinArm64(() =>
+      quiet(() => main(["auto-update", "enable", "--host", "all"])),
+    );
+    assert.equal(enabled.error, undefined, `auto-update enable failed: ${enabled.error?.message}`);
 
     const removed = await withDarwinArm64(() => quiet(() => main(["remove", "--host", "claude"])));
     assert.equal(removed.error, undefined, `partial remove failed: ${removed.error?.message}`);
@@ -3468,9 +3531,15 @@ test("auto-update: checksum failure preserves both hosts and records only a cate
       claude: buildPackage(box.root, "claude"),
       codex: buildPackage(box.root, "codex"),
     };
-    await withDarwinArm64(() => quiet(() => main(["install", ...allAssetArgs(packages)])));
+    const installed = await withDarwinArm64(() =>
+      quiet(() => main(["install", ...allAssetArgs(packages)])),
+    );
+    assert.equal(installed.error, undefined, `initial install failed: ${installed.error?.message}`);
     configureFakeNpx(box);
-    await withDarwinArm64(() => quiet(() => main(["auto-update", "enable", "--host", "all"])));
+    const enabled = await withDarwinArm64(() =>
+      quiet(() => main(["auto-update", "enable", "--host", "all"])),
+    );
+    assert.equal(enabled.error, undefined, `auto-update enable failed: ${enabled.error?.message}`);
     const desired = box.desired();
     desired.activeVersion = "1.1.0";
     writeFileSync(join(box.root, "state", "desired-state.json"), `${JSON.stringify(desired, null, 2)}\n`);
@@ -3479,7 +3548,7 @@ test("auto-update: checksum failure preserves both hosts and records only a cate
       sentinels[host] = join(box.managedRoots[host], `checksum-${host}.txt`);
       writeFileSync(sentinels[host], "previous installation\n");
     }
-    writeFileSync(packages.codex.checksum, `${"0".repeat(64)}  ${packages.codex.asset.split("/").pop()}\n`);
+    writeFileSync(packages.codex.checksum, `${"0".repeat(64)}  ${basename(packages.codex.asset)}\n`);
 
     const result = await withDarwinArm64(() =>
       quiet(() => main(["auto-update", "run", "--force", ...allAssetArgs(packages)])),
@@ -3492,11 +3561,101 @@ test("auto-update: checksum failure preserves both hosts and records only a cate
     const receipt = box.receipt();
     assert.equal(receipt.result, "failed");
     assert.equal(receipt.errorCategory, "verification");
+    assert.deepEqual(receipt.hosts, [
+      { host: "claude", result: "failed", errorCategory: null },
+      { host: "codex", result: "failed", errorCategory: "verification" },
+    ]);
     assert.deepEqual(
       Object.keys(receipt).sort(),
       ["checkedAt", "errorCategory", "hosts", "result", "schema", "version"].sort(),
     );
     assert.equal(statSync(join(box.root, "state", "auto-update-receipt.json")).mode & 0o777, 0o600);
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("auto-update: target verification failures preserve hosts and record verification", async () => {
+  const box = makeAllSandbox();
+  try {
+    const packages = {
+      claude: buildPackage(box.root, "claude"),
+      codex: buildPackage(box.root, "codex"),
+    };
+    const installed = await withDarwinArm64(() =>
+      quiet(() => main(["install", ...allAssetArgs(packages)])),
+    );
+    assert.equal(installed.error, undefined, `initial install failed: ${installed.error?.message}`);
+    configureFakeNpx(box);
+    const enabled = await withDarwinArm64(() =>
+      quiet(() => main(["auto-update", "enable", "--host", "all"])),
+    );
+    assert.equal(enabled.error, undefined, `auto-update enable failed: ${enabled.error?.message}`);
+    const desired = box.desired();
+    desired.activeVersion = "1.1.0";
+    writeFileSync(join(box.root, "state", "desired-state.json"), `${JSON.stringify(desired, null, 2)}\n`);
+    const sentinels = {};
+    for (const host of ["claude", "codex"]) {
+      sentinels[host] = join(box.managedRoots[host], `target-${host}.txt`);
+      writeFileSync(sentinels[host], "previous installation\n");
+    }
+
+    for (const { name, packageOptions, expectedError } of [
+      {
+        name: "target metadata",
+        packageOptions: { releaseManifest: { runtime_targets: [] } },
+        expectedError: /target metadata does not declare only darwin-arm64/u,
+      },
+      {
+        name: "runtime layout",
+        packageOptions: { extraRuntimeTargets: ["windows-x64"] },
+        expectedError: /runtime layout does not contain only darwin-arm64/u,
+      },
+    ]) {
+      const invalidClaude = buildPackage(join(box.root, `invalid-${name.replaceAll(" ", "-")}`), "claude", packageOptions);
+      const result = await withDarwinArm64(() =>
+        quiet(() =>
+          main([
+            "auto-update",
+            "run",
+            "--force",
+            ...allAssetArgs({ claude: invalidClaude, codex: packages.codex }),
+          ]),
+        ),
+      );
+      assert.notEqual(result.error, undefined, `${name} failure reported success`);
+      assert.match(result.error.message, expectedError);
+      for (const host of ["claude", "codex"]) {
+        assert.ok(existsSync(sentinels[host]), `${host} changed before ${name} verification completed`);
+        assert.equal(box.state(host).plugins.length, 1, `${host} registration changed after ${name} failure`);
+      }
+      assert.equal(box.receipt().result, "failed");
+      assert.equal(box.receipt().errorCategory, "verification");
+      assert.deepEqual(box.receipt().hosts, [
+        { host: "claude", result: "failed", errorCategory: "verification" },
+        { host: "codex", result: "failed", errorCategory: null },
+      ]);
+    }
+
+    const invalidPackages = {
+      claude: buildPackage(join(box.root, "invalid-both-claude"), "claude", {
+        releaseManifest: { runtime_targets: [] },
+      }),
+      codex: buildPackage(join(box.root, "invalid-both-codex"), "codex", {
+        extraRuntimeTargets: ["windows-x64"],
+      }),
+    };
+    const combined = await withDarwinArm64(() =>
+      quiet(() => main(["auto-update", "run", "--force", ...allAssetArgs(invalidPackages)])),
+    );
+    assert.notEqual(combined.error, undefined, "two package failures reported success");
+    assert.match(combined.error.message, /claude: .*target metadata/u);
+    assert.match(combined.error.message, /codex: .*runtime layout/u);
+    assert.equal(box.receipt().errorCategory, "verification");
+    assert.deepEqual(box.receipt().hosts, [
+      { host: "claude", result: "failed", errorCategory: "verification" },
+      { host: "codex", result: "failed", errorCategory: "verification" },
+    ]);
   } finally {
     box.cleanup();
   }
@@ -3659,10 +3818,180 @@ test("claude: canonicalizes a host-reported marketplace path through a symlink",
   }
 });
 
+test("native package fixtures keep Darwin, Windows, and content-only target boundaries distinct", () => {
+  const box = makeSandbox("claude");
+  try {
+    const darwin = buildPackage(join(box.root, "darwin"), "claude", { target: "darwin-arm64" });
+    const windows = buildPackage(join(box.root, "windows"), "claude", { target: "windows-x64" });
+    const contentOnly = buildPackage(join(box.root, "content-only"), "cursor", {
+      target: "windows-x64",
+    });
+
+    const darwinRelease = JSON.parse(readFileSync(join(darwin.tree, "release-manifest.json"), "utf8"));
+    const windowsRelease = JSON.parse(readFileSync(join(windows.tree, "release-manifest.json"), "utf8"));
+    const contentOnlyRelease = JSON.parse(
+      readFileSync(join(contentOnly.tree, "release-manifest.json"), "utf8"),
+    );
+
+    assert.deepEqual(darwinRelease.release_targets, ["darwin-arm64"]);
+    assert.deepEqual(darwinRelease.runtime_targets, ["darwin-arm64"]);
+    assert.ok(
+      existsSync(join(darwin.tree, "runtime", "darwin-arm64", "opensocrates-runtime", "opensocrates-runtime")),
+    );
+    assert.equal(existsSync(join(darwin.tree, "runtime", "windows-x64")), false);
+
+    assert.deepEqual(windowsRelease.release_targets, ["windows-x64"]);
+    assert.deepEqual(windowsRelease.runtime_targets, ["windows-x64"]);
+    assert.ok(
+      existsSync(
+        join(windows.tree, "runtime", "windows-x64", "opensocrates-runtime", "opensocrates-runtime.exe"),
+      ),
+    );
+    assert.equal(existsSync(join(windows.tree, "runtime", "darwin-arm64")), false);
+
+    assert.deepEqual(contentOnlyRelease.release_targets, []);
+    assert.deepEqual(contentOnlyRelease.runtime_targets, []);
+    assert.deepEqual(contentOnlyRelease.launchers, []);
+    assert.equal(existsSync(join(contentOnly.tree, "runtime")), false);
+  } finally {
+    box.cleanup();
+  }
+});
+
+const nativeTarget = process.platform === "win32" ? "windows-x64" : "darwin-arm64";
+const foreignNativeTarget = nativeTarget === "windows-x64" ? "darwin-arm64" : "windows-x64";
+
+test("verify accepts exact native and content-only target metadata", async () => {
+  const box = makeSandbox("claude");
+  try {
+    for (const host of ["claude", "cursor"]) {
+      const pkg = buildPackage(join(box.root, `fixture-${host}`), host, { target: nativeTarget });
+      const result = await quiet(() =>
+        main(["verify", "--host", host, "--asset", pkg.asset, "--checksum", pkg.checksum]),
+      );
+      assert.equal(result.error, undefined, `${host} exact target metadata failed: ${result.error?.message}`);
+    }
+  } finally {
+    box.cleanup();
+  }
+});
+
+for (const { name, releaseManifest } of [
+  {
+    name: "missing runtime_targets",
+    releaseManifest: { runtime_targets: undefined },
+  },
+  {
+    name: "missing release_targets",
+    releaseManifest: { release_targets: undefined },
+  },
+  {
+    name: "duplicate runtime target",
+    releaseManifest: { runtime_targets: [nativeTarget, nativeTarget] },
+  },
+  {
+    name: "duplicate release target",
+    releaseManifest: { release_targets: [nativeTarget, nativeTarget] },
+  },
+  {
+    name: "cross-platform runtime target",
+    releaseManifest: { runtime_targets: [nativeTarget, foreignNativeTarget] },
+  },
+  {
+    name: "cross-platform release target",
+    releaseManifest: { release_targets: [nativeTarget, foreignNativeTarget] },
+  },
+]) {
+  test(`verify rejects ${name} metadata`, async () => {
+    const box = makeSandbox("claude");
+    try {
+      const pkg = buildPackage(box.root, "claude", { target: nativeTarget, releaseManifest });
+      const result = await quiet(() =>
+        main(["verify", "--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum]),
+      );
+      assert.notEqual(result.error, undefined, `${name} metadata passed verification`);
+      assert.match(result.error.message, new RegExp(`target metadata does not declare only ${nativeTarget}`));
+    } finally {
+      box.cleanup();
+    }
+  });
+}
+
+test("verify rejects a cross-platform runtime even when metadata names only the current target", async () => {
+  const box = makeSandbox("claude");
+  try {
+    const pkg = buildPackage(box.root, "claude", {
+      target: nativeTarget,
+      extraRuntimeTargets: [foreignNativeTarget],
+    });
+    const result = await quiet(() =>
+      main(["verify", "--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum]),
+    );
+    assert.notEqual(result.error, undefined, "cross-platform runtime passed verification");
+    assert.match(result.error.message, new RegExp(`runtime layout does not contain only ${nativeTarget}`));
+  } finally {
+    box.cleanup();
+  }
+});
+
+for (const { name, releaseManifest } of [
+  {
+    name: "missing release_targets",
+    releaseManifest: { release_targets: undefined },
+  },
+  {
+    name: "a native release target",
+    releaseManifest: { release_targets: [nativeTarget] },
+  },
+]) {
+  test(`verify rejects content-only package with ${name}`, async () => {
+    const box = makeSandbox("cursor");
+    try {
+      const pkg = buildPackage(box.root, "cursor", { target: nativeTarget, releaseManifest });
+      const result = await quiet(() =>
+        main(["verify", "--host", "cursor", "--asset", pkg.asset, "--checksum", pkg.checksum]),
+      );
+      assert.notEqual(result.error, undefined, `content-only package with ${name} passed verification`);
+      assert.match(result.error.message, /unexpected native runtime or launcher surface/);
+    } finally {
+      box.cleanup();
+    }
+  });
+}
+
+for (const { name, extraFiles } of [
+  {
+    name: "a runtime payload",
+    extraFiles: { "runtime/windows-x64/foreign": "unexpected runtime\n" },
+  },
+  {
+    name: "a native launcher",
+    extraFiles: { "bin/launch.mjs": "export {};\n" },
+  },
+  {
+    name: "a hook payload",
+    extraFiles: { "hooks/hooks.json": "{}\n" },
+  },
+]) {
+  test(`verify rejects content-only package with ${name}`, async () => {
+    const box = makeSandbox("cursor");
+    try {
+      const pkg = buildPackage(box.root, "cursor", { target: nativeTarget, extraFiles });
+      const result = await quiet(() =>
+        main(["verify", "--host", "cursor", "--asset", pkg.asset, "--checksum", pkg.checksum]),
+      );
+      assert.notEqual(result.error, undefined, `content-only package with ${name} passed verification`);
+      assert.match(result.error.message, /unexpected native runtime or launcher surface/);
+    } finally {
+      box.cleanup();
+    }
+  });
+}
+
 test("verify rejects a package whose checksum manifest does not match", async () => {
   const box = makeSandbox("claude");
   try {
-    const pkg = buildPackage(box.root, "claude", { corrupt: true });
+    const pkg = buildPackage(box.root, "claude", { corrupt: true, target: nativeTarget });
     const result = await quiet(() =>
       main(["verify", "--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum]),
     );
@@ -3678,6 +4007,7 @@ test("verify rejects a host/version mismatched package", async () => {
   try {
     const pkg = buildPackage(box.root, "claude", {
       manifestVersion: "9.9.9",
+      target: nativeTarget,
     });
     const result = await quiet(() =>
       main(["verify", "--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum]),
@@ -3692,8 +4022,8 @@ test("verify rejects a host/version mismatched package", async () => {
 test("verify rejects an outer checksum mismatch", async () => {
   const box = makeSandbox("claude");
   try {
-    const pkg = buildPackage(box.root, "claude");
-    writeFileSync(pkg.checksum, `${"0".repeat(64)}  ${pkg.asset.split("/").pop()}\n`);
+    const pkg = buildPackage(box.root, "claude", { target: nativeTarget });
+    writeFileSync(pkg.checksum, `${"0".repeat(64)}  ${basename(pkg.asset)}\n`);
     const result = await quiet(() =>
       main(["verify", "--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum]),
     );
@@ -3707,19 +4037,49 @@ test("verify rejects an outer checksum mismatch", async () => {
 test("verify rejects an archive containing a symbolic link", async () => {
   const box = makeSandbox("claude");
   try {
-    const pkg = buildPackage(box.root, "claude");
-    const link = spawnSync(
-      "sh",
-      ["-c", `cd ${JSON.stringify(pkg.tree)} && ln -s /etc/passwd leak && zip -q -y ${JSON.stringify(pkg.asset)} leak`],
-      { encoding: "utf8" },
-    );
+    const pkg = buildPackage(box.root, "claude", { target: nativeTarget });
+    const link =
+      process.platform === "win32"
+        ? spawnSync(
+            "pwsh",
+            [
+              "-NoLogo",
+              "-NoProfile",
+              "-NonInteractive",
+              "-Command",
+              "Add-Type -AssemblyName System.IO.Compression.FileSystem; " +
+                "$zip=[IO.Compression.ZipFile]::Open(" +
+                "$env:OPENSOCRATES_FIXTURE_ASSET,[IO.Compression.ZipArchiveMode]::Update); " +
+                "try { $entry=$zip.CreateEntry('leak'); " +
+                "$entry.ExternalAttributes=[BitConverter]::ToInt32(" +
+                "[BitConverter]::GetBytes([uint32]2717843456),0); " +
+                "$writer=[IO.StreamWriter]::new($entry.Open(),[Text.UTF8Encoding]::new($false)); " +
+                "try { $writer.Write('/etc/passwd') } finally { $writer.Dispose() } " +
+                "} finally { $zip.Dispose() }",
+            ],
+            {
+              encoding: "utf8",
+              env: { ...process.env, OPENSOCRATES_FIXTURE_ASSET: pkg.asset },
+            },
+          )
+        : spawnSync(
+            "sh",
+            [
+              "-c",
+              `cd ${JSON.stringify(pkg.tree)} && ln -s /etc/passwd leak && zip -q -y ${JSON.stringify(pkg.asset)} leak`,
+            ],
+            { encoding: "utf8" },
+          );
     assert.equal(link.status, 0, `fixture setup failed: ${link.stderr}`);
-    writeFileSync(pkg.checksum, `${sha256(readFileSync(pkg.asset))}  ${pkg.asset.split("/").pop()}\n`);
+    writeFileSync(pkg.checksum, `${sha256(readFileSync(pkg.asset))}  ${basename(pkg.asset)}\n`);
     const result = await quiet(() =>
       main(["verify", "--host", "claude", "--asset", pkg.asset, "--checksum", pkg.checksum]),
     );
     assert.notEqual(result.error, undefined, "archive with a symlink passed verification");
-    assert.match(result.error.message, /symbolic link|checksum manifest/);
+    assert.match(
+      result.error.message,
+      process.platform === "win32" ? /Windows entries failed: ZIP symlink refused/ : /package contains a symbolic link/,
+    );
   } finally {
     box.cleanup();
   }
