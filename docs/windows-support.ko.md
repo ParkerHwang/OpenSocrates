@@ -1,6 +1,6 @@
 # Windows 지원 — v1.4.0 후보
 
-이 브랜치는 아직 공개하지 않은 릴리스 후보입니다. 게시 전에는 npm의 `opensocrates@1.4.0` 설치 명령을 사용하지 마세요. Windows 검증은 WSL 없이 네이티브 프로세스로 진행합니다. Draft [PR #93](https://github.com/ParkerHwang/OpenSocrates/pull/93)은 `codex/windows-v1.4.0` 브랜치를 추적합니다. 독립 검토 기준과 첫 CI는 `9e5ec5bd458e2d8c2b772b6074df25e0192d413e`에서 실행됐으며, 현재 HEAD는 PR에서 확인해야 합니다.
+이 브랜치는 아직 공개하지 않은 릴리스 후보입니다. 게시 전에는 npm의 `opensocrates@1.4.0` 설치 명령을 사용하지 마세요. Windows 검증은 WSL 없이 네이티브 프로세스로 진행합니다. Draft [PR #93](https://github.com/ParkerHwang/OpenSocrates/pull/93)은 `codex/windows-v1.4.0` 브랜치를 추적합니다. 독립 검토 기준과 첫 CI는 `9e5ec5bd458e2d8c2b772b6074df25e0192d413e`에서 실행돼 실패했습니다. remediation 구현 체크포인트 `923ad2d020c2081e3aa29af67ac0a32e5dd2238e`는 [run 34388190521](https://github.com/ParkerHwang/OpenSocrates/actions/runs/34388190521)의 제품·플랫폼 작업 5개를 통과했고, 같은 SHA의 Repository governance는 [run 34388190218](https://github.com/ParkerHwang/OpenSocrates/actions/runs/34388190218)에서 통과했습니다. 그 산출물은 해당 체크포인트에만 적용되므로 브랜치의 현재 exact HEAD와 검사는 PR에서 확인해야 합니다.
 
 ## 요구사항과 설치
 
@@ -60,6 +60,6 @@ uv run --locked mypy src
 npm pack
 ```
 
-Windows CI는 `windows-2025`에서 빌드·검사를 수행하도록 추가했고 기존 Linux·Apple Silicon 검사를 유지합니다. 릴리스는 Windows 작업 성공과 전송된 ZIP 체크섬 확인 후 새 파일을 포함하도록 구성했습니다. `9e5ec5bd458e2d8c2b772b6074df25e0192d413e`에 대한 [첫 원격 CI](https://github.com/ParkerHwang/OpenSocrates/actions/runs/34316264162)는 실제 실행됐고 Product contracts, GitHub and npx installer, Native Windows x64 작업이 실패했습니다. 이 hosted-runner 결과는 이전 개인 Windows 노트북 증거와 별개입니다. 현재 remediation run과 exact HEAD는 있더라도 이 역사적 baseline에서 추론하지 않고 PR #93에서 확인해야 합니다.
+Windows CI는 `windows-2025`에서 빌드·검사를 수행하도록 추가했고 기존 Linux·Apple Silicon 검사를 유지합니다. 릴리스는 Windows 작업 성공과 전송된 ZIP 체크섬 확인 후 새 파일을 포함하도록 구성했습니다. `9e5ec5bd458e2d8c2b772b6074df25e0192d413e`에 대한 [첫 원격 CI](https://github.com/ParkerHwang/OpenSocrates/actions/runs/34316264162)는 실제 실행됐고 Product contracts, GitHub and npx installer, Native Windows x64 작업이 실패했습니다. 이후 exact remediation 체크포인트 `923ad2d020c2081e3aa29af67ac0a32e5dd2238e`에 대한 [run 34388190521](https://github.com/ParkerHwang/OpenSocrates/actions/runs/34388190521)에서는 Python quality, Product contracts, GitHub and npx installer, Native Windows x64, Native package (darwin-arm64)가 모두 성공했고, Repository governance는 [run 34388190218](https://github.com/ParkerHwang/OpenSocrates/actions/runs/34388190218)에서 별도로 통과했습니다. 이 hosted-runner 증거는 이전 개인 Windows 노트북 증거와 별개이며 실제 호스트 전달을 입증하지 않습니다.
 
-검증 결과, 기존 전체 테스트의 실패 및 재현 명령은 [작업 기록](windows-v1.4.0-worklog.md)을 확인하세요. POSIX 전용 픽스처 실패나 인증 대기 검사를 통과로 보고하지 않습니다. 이 노트북에서는 macOS를 실행해 검증하지 않았습니다.
+검증 결과, 기존 로컬 전체 테스트의 실패 및 재현 명령은 [작업 기록](windows-v1.4.0-worklog.md)을 확인하세요. POSIX 전용 픽스처 실패나 인증 대기 검사를 통과로 보고하지 않습니다. 이 노트북에서는 macOS를 실행하지 않았으며, 위 darwin-arm64 결과는 별도의 GitHub hosted runner 결과입니다.
