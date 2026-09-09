@@ -326,10 +326,84 @@ class DecisionChecks(unittest.TestCase):
         out = io.StringIO()
         run_decision(io.StringIO("x" * 17000), out)
         self.assertEqual(json.loads(out.getvalue())["reason"], "request_too_large")
+        streamed = io.StringIO()
+        run_decision(io.StringIO("x" * 17000 + "\n"), streamed, stream=True)
+        self.assertEqual(json.loads(streamed.getvalue())["reason"], "request_too_large")
         with patch("sys._MEIPASS", "/nonexistent-opensocrates-test-root", create=True):
             out = io.StringIO()
             run_decision(io.StringIO(json.dumps(request("deduction"))), out)
             self.assertEqual(json.loads(out.getvalue())["reason"], "canonical_content_unavailable")
+
+    def test_single_document_cli_reads_packaged_pretty_request_once(self):
+        from unittest.mock import patch
+
+        packaged_request = (ROOT / "plugin-src" / "shared" / "decision" / "request.json").read_text(
+            encoding="utf-8"
+        )
+        self.assertGreater(len(packaged_request.splitlines()), 1)
+        calls: list[dict[str, object]] = []
+        original_handle = DecisionSession.handle
+
+        def counted_handle(session, value):
+            calls.append(value)
+            return original_handle(session, value)
+
+        output = io.StringIO()
+        with patch.object(DecisionSession, "handle", counted_handle):
+            self.assertEqual(run_decision(io.StringIO(packaged_request), output), 0)
+        result = json.loads(output.getvalue())
+        self.assertEqual(result["status"], "selected")
+        self.assertEqual(result["selected"], ["critical-thinking"])
+        self.assertEqual(result["applied"], "unverified")
+        self.assertEqual(len(calls), 1)
+
+    def test_single_document_cli_rejects_multiple_json_documents(self):
+        output = io.StringIO()
+        source = io.StringIO(
+            json.dumps(request("deduction")) + "\n" + json.dumps(request("trade-off-analysis"))
+        )
+        self.assertEqual(run_decision(source, output), 0)
+        self.assertEqual(json.loads(output.getvalue())["reason"], "decision_unavailable")
+
+    def test_review_cases_share_one_source_session_without_cross_question_leakage(self):
+        mechanical = self.session.handle(request(participation="mechanical", decision="mechanical"))
+        self.assertEqual(mechanical["status"], "no_intervention")
+        self.assertEqual(mechanical["selected"], [])
+
+        initial = self.session.handle(request("critical-thinking", decision="changed"))
+        revised = self.session.handle(
+            request(
+                "trade-off-analysis",
+                ["multiple_options", "choose"],
+                decision="changed",
+                revision=1,
+            )
+        )
+        self.assertEqual(initial["selected"], ["critical-thinking"])
+        self.assertEqual(revised["selected"], ["trade-off-analysis"])
+        self.assertFalse(revised["selection_reused"])
+
+        missing_prerequisite = self.session.handle(
+            request(
+                "reference-class-forecasting",
+                ["forecast", "reference_cases", "no_defensible_reference_class"],
+                decision="missing",
+            )
+        )
+        self.assertEqual(missing_prerequisite["status"], "no_intervention")
+        self.assertEqual(missing_prerequisite["selected"], [])
+
+        first_question = self.session.handle(request("deduction", decision="q1"))
+        second_question = self.session.handle(
+            request(
+                "trade-off-analysis",
+                ["multiple_options", "choose"],
+                decision="q2",
+            )
+        )
+        self.assertEqual(first_question["selected"], ["deduction"])
+        self.assertEqual(second_question["selected"], ["trade-off-analysis"])
+        self.assertFalse(second_question["selection_reused"])
 
     def test_corrupt_pair_and_missing_locale(self):
         from dataclasses import replace

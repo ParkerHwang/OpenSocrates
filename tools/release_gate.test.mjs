@@ -16,6 +16,7 @@ import test from "node:test";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const RELEASE_WORKFLOW = join(ROOT, ".github", "workflows", "release.yml");
+const NPM_WORKFLOW = join(ROOT, ".github", "workflows", "npm-publish.yml");
 const CI_WORKFLOW = join(ROOT, ".github", "workflows", "ci.yml");
 const GATE_STEP_NAME = "Resolve and validate release identity";
 
@@ -481,6 +482,54 @@ test("release workflow: never triggers on pull_request", () => {
   const release = readFileSync(RELEASE_WORKFLOW, "utf8");
   const triggers = release.slice(release.indexOf("\non:"), release.indexOf("\npermissions:"));
   assert.doesNotMatch(triggers, /pull_request/u, "the release job must not run for pull requests");
+});
+
+for (const enabled of [true, false]) {
+  test(`release workflow: GitHub immutable releases enabled=${enabled}`, () => {
+    const root = mkdtempSync(join(tmpdir(), "opensocrates-immutable-release-gate-"));
+    try {
+      const mock = join(root, "gh");
+      writeFileSync(mock, '#!/bin/sh\nprintf "%s\\n" "$IMMUTABLE_RELEASES_ENABLED"\n', {
+        mode: 0o700,
+      });
+      const script = extractStepScript(RELEASE_WORKFLOW, "Require GitHub release immutability");
+      const result = spawnSync(SHELL, ["-c", script], {
+        cwd: root,
+        encoding: "utf8",
+        env: {
+          PATH: `${root}:${process.env.PATH}`,
+          GITHUB_REPOSITORY: "owner/repository",
+          IMMUTABLE_RELEASES_ENABLED: String(enabled),
+        },
+      });
+      if (enabled) {
+        assert.equal(result.status, 0, result.stderr);
+      } else {
+        assert.notEqual(result.status, 0);
+        assert.match(result.stderr, /immutable releases must be enabled/u);
+      }
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+}
+
+test("release and npm workflows gate publication on GitHub platform immutability", () => {
+  const release = readFileSync(RELEASE_WORKFLOW, "utf8");
+  const immutableGate = release.indexOf("- name: Require GitHub release immutability");
+  const publish = release.indexOf("- name: Publish GitHub Release");
+  assert.ok(immutableGate >= 0 && immutableGate < publish);
+  assert.match(
+    release.slice(immutableGate, publish),
+    /repos\/\$\{GITHUB_REPOSITORY\}\/immutable-releases/u,
+  );
+
+  const npm = readFileSync(NPM_WORKFLOW, "utf8");
+  const npmGate = npm.indexOf("- name: Require immutable GitHub release");
+  const npmPublish = npm.indexOf("- name: Publish to npm with trusted publishing");
+  assert.ok(npmGate >= 0 && npmGate < npmPublish);
+  assert.match(npm.slice(npmGate, npmPublish), /releases\/tags\/v\$\{version\}/u);
+  assert.match(npm.slice(npmGate, npmPublish), /\.immutable/u);
 });
 
 test("release gate: manual branch dispatch is rejected", () => {

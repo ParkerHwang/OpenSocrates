@@ -41,6 +41,7 @@ def fixture(root: Path):
         "id": 1,
         "tag_name": "v1.3.0",
         "draft": False,
+        "immutable": True,
         "published_at": "2026-09-08T00:00:00Z",
         "assets": [{"name": n} for n in names],
     }
@@ -91,6 +92,13 @@ class PublicReleaseVerificationChecks(unittest.TestCase):
                         verify_public_bytes(
                             metadata, "1.3.0", "a" * 40, tag_commit, local, public, installer
                         )
+
+    def test_mutable_github_release_is_rejected(self):
+        with tempfile.TemporaryDirectory() as name:
+            local, public, installer, metadata = fixture(Path(name))
+            metadata["immutable"] = False
+            with self.assertRaisesRegex(ValueError, "immutable release protection"):
+                verify_public_bytes(metadata, "1.3.0", "a" * 40, "a" * 40, local, public, installer)
 
 
 if __name__ == "__main__":

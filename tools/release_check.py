@@ -2187,6 +2187,78 @@ def _runtime_version_smoke(
     return {"status": "pass", "error_codes": []}
 
 
+def _packaged_decision_example(root: Path, assembly_status: str) -> dict[str, Any]:
+    """Exercise the documented pretty JSON command against the assembled Codex package."""
+
+    if assembly_status != "pass":
+        return {
+            "status": assembly_status
+            if assembly_status in {"fail", "unavailable"}
+            else "unavailable",
+            "error_codes": ["package_assembly_not_available"],
+        }
+    package = root / "dist" / "codex"
+    launcher = package / "bin" / "launch.sh"
+    request_path = package / "skills" / "opensocrates" / "references" / "decision" / "request.json"
+    try:
+        request_bytes = request_path.read_bytes()
+        request_value = json.loads(request_bytes.decode("utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return {"status": "fail", "error_codes": ["packaged_decision_request_invalid"]}
+    if not isinstance(request_value, Mapping) or request_bytes.count(b"\n") < 2:
+        return {"status": "fail", "error_codes": ["packaged_decision_request_not_pretty_json"]}
+
+    def invoke(payload: bytes, *arguments: str) -> list[Mapping[str, Any]] | None:
+        try:
+            completed = subprocess.run(
+                [str(launcher), "decision", "codex", *arguments],
+                cwd=package,
+                env=_safe_environment(root),
+                input=payload,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+                timeout=30.0,
+            )
+            rows = [json.loads(line) for line in completed.stdout.decode("utf-8").splitlines()]
+        except (OSError, subprocess.SubprocessError, UnicodeError, json.JSONDecodeError):
+            return None
+        if completed.returncode != 0 or not all(isinstance(row, Mapping) for row in rows):
+            return None
+        return rows
+
+    one_shot = invoke(request_bytes)
+    compact = _canonical_json(request_value)
+    streamed = invoke(compact + compact, "--stream")
+    expected_selection = ["critical-thinking"]
+    if (
+        one_shot is None
+        or len(one_shot) != 1
+        or one_shot[0].get("status") != "selected"
+        or one_shot[0].get("selected") != expected_selection
+        or one_shot[0].get("applied") != "unverified"
+        or streamed is None
+        or len(streamed) != 2
+        or any(row.get("status") != "selected" for row in streamed)
+        or any(row.get("selected") != expected_selection for row in streamed)
+        or streamed[0].get("selection_reused") is not False
+        or streamed[1].get("selection_reused") is not True
+    ):
+        return {"status": "fail", "error_codes": ["packaged_decision_example_mismatch"]}
+    return {
+        "status": "pass",
+        "input_format": "pretty_json_document",
+        "request_line_count": len(request_bytes.splitlines()),
+        "one_shot_response_count": len(one_shot),
+        "stream_response_count": len(streamed),
+        "selected_count": len(expected_selection),
+        "selected": expected_selection,
+        "stream_selection_reused": [False, True],
+        "applied": "unverified",
+        "error_codes": [],
+    }
+
+
 def _full_check(
     root: Path, *, assembly_result: Mapping[str, Any] | None = None
 ) -> tuple[int, dict[str, Any]]:
@@ -2310,6 +2382,7 @@ def _full_check(
         "packaged_launcher",
         assembly_status,
     )
+    checks["packaged_decision_example"] = _packaged_decision_example(root, assembly_status)
     checks["package_docs"] = _package_tool_check(
         root,
         "check_package_docs.py",

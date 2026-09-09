@@ -1,4 +1,4 @@
-"""Read-only immutable release target checks, before any publication mutation."""
+"""Read-only exact-tag release target checks, before any publication mutation."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ def validate_target(version: str, ref: str, commit: str, output: str) -> None:
     if not re.fullmatch(r"\d+\.\d+\.\d+", version) or ref != f"refs/tags/{tag}":
         raise ValueError("publication requires the exact version tag, not a branch")
     if not re.fullmatch(r"[0-9a-f]{40}", commit) or remote_tag_commit(output, tag) != commit:
-        raise ValueError("immutable tag points to a different source commit")
+        raise ValueError("release tag points to a different source commit")
 
 
 def main() -> int:

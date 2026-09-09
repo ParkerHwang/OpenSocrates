@@ -1,6 +1,42 @@
 # OpenSocrates v1.3.0 release qualification and handoff
 
-## Release disposition
+## Post-release review on 2026-09-08
+
+PR [#88](https://github.com/ParkerHwang/OpenSocrates/pull/88) merged as
+`45bc7885ba068ff40c2499154a3920494df47eae`. Tag `v1.3.0` resolves to that
+commit. The release workflow completed successfully and published 19 assets at
+2026-09-08 10:56:56 UTC; npm 1.3.0 followed at 10:59:58 UTC. These facts confirm
+publication and the point-in-time byte checks, not every documented behavior.
+
+The GitHub release API reports `immutable: false`, and the repository immutable-
+release setting reports `enabled: false`. The workflow's existing collision check
+refused to overwrite an existing release, but that is not GitHub platform
+immutability. GitHub states that enabling the setting applies only to future
+releases in its [immutable-release settings documentation](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/establish-provenance-and-integrity/prevent-release-changes).
+Keep the existing v1.3.0 tag and assets unchanged. A future patch
+release must first enable the repository setting; the follow-up workflow now
+fails closed unless the setting is enabled and verifies the published release's
+`immutable` field before npm publication.
+
+The exact public v1.3.0 Codex ZIP and checksum were downloaded and verified during
+this review. Its packaged request is 22-line pretty-printed JSON. The documented
+one-shot command exited 0 but returned `status: unavailable` and
+`reason: decision_unavailable`; the same request serialized on one line selected
+`critical-thinking`, and two NDJSON requests under `--stream` produced two native
+responses. This confirms a shipped one-shot parser defect. The follow-up reads one
+bounded JSON document through EOF outside stream mode and adds source and assembled-
+package regressions. Exit 0 alone remains insufficient success evidence.
+
+The follow-up environment has Codex CLI 0.145.0, but its active OpenSocrates plugin
+cache contains version 1.2.1 rather than this candidate. The candidate was built
+and exercised in isolation and was not installed into the active task. Therefore
+this review adds source and real packaged-native evidence, not a same-source live
+Codex hook or actor receipt. A live reevaluation still requires a separate
+authenticated profile or new task loaded from the exact candidate, with the zero-
+method, changed-judgment, missing-prerequisite and separated-question cases kept
+distinct. No new external API or paid service is required.
+
+## Prepublication qualification snapshot
 
 Product source `32d0322c73c8c116b961ddb3a68a75473c715466` is accepted for the
 scoped v1.3.0 release described below. Its local native `make release-check` and
@@ -12,9 +48,10 @@ and the release workflow's public verification artifact. No publication is
 inferred from this qualification snapshot.
 
 Tracking: [issue87](https://github.com/ParkerHwang/OpenSocrates/issues/87).
-The maintainer authorized PR, protected merge, immutable tagged release and npm
-trusted publishing. No approval gate, source assertion or existing release may
-be bypassed. A separate local recovery workspace preserves original development
+The maintainer authorized PR, protected merge, a non-overwriting tagged release
+workflow and npm trusted publishing. GitHub platform immutability was intended
+but not verified in this prepublication snapshot and was not active for v1.3.0.
+No approval gate, source assertion or existing release may be bypassed. A separate local recovery workspace preserves original development
 history and invalid/unsuccessful historical trials; its private history was not
 pushed. All five original worktrees' branches/HEADs and794 initially recorded
 changed files remain unchanged. The omitted prior comparison-site directory had
@@ -130,9 +167,11 @@ integrity validated; current cloud upload/activation is unvalidated. No active
 account skill was replaced. Other host live behavior, Desktop GUI, a separate Mac,
 signing/notarization and verified method application are not inferred from tests.
 
-The remaining release sequence is fresh current-head CI, normal protected PR merge,
-an exact main-ancestor version tag, immutable GitHub assets, public byte validation,
-explicit npm workflow dispatch on that tag, and independent npm/public installer
-verification. Existing versions/assets must not be overwritten. Publication
-receipts belong to the public PR handoff and Actions artifact, independently of
+The v1.3.0 PR, tag, GitHub release, point-in-time public byte validation and npm
+publication completed. GitHub platform immutable-release protection did not.
+Existing versions and assets must not be overwritten. A patch release still needs
+fresh current-head CI, normal protected PR merge, an exact main-ancestor version
+tag, the repository immutable-release setting enabled before publication, API
+confirmation that the new release is immutable, npm trusted publishing, and an
+independent public installer check. Publication receipts remain separate from
 cloud activation or answer-quality claims.

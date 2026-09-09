@@ -18,7 +18,7 @@ options and weigh evidence while you work in your existing agent.
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 [Website](https://opensocrates.parker-j-hwang.chatgpt.site) ·
-[v1.3.0 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.0) ·
+[v1.3.1 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.1) ·
 [Installation reference](docs/advanced-usage.md)
 
 ## Get started
@@ -29,11 +29,11 @@ support documentation before installing on another platform.
 
 ```sh
 # Install for every supported, ready host
-npx --yes opensocrates@1.3.0 install --host all
+npx --yes opensocrates@1.3.1 install --host all
 
 # Or choose one host
-npx --yes opensocrates@1.3.0 install --host codex
-npx --yes opensocrates@1.3.0 install --host claude
+npx --yes opensocrates@1.3.1 install --host codex
+npx --yes opensocrates@1.3.1 install --host claude
 ```
 
 Start a new task after installation. In Codex, approve the OpenSocrates hooks in
@@ -44,15 +44,15 @@ OpenSocrates account or API key.
 For an existing installation:
 
 ```sh
-npx --yes opensocrates@1.3.0 update --host all
-npx --yes opensocrates@1.3.0 status --host all
+npx --yes opensocrates@1.3.1 update --host all
+npx --yes opensocrates@1.3.1 status --host all
 ```
 
 ## What it does
 
 - **Choose a method for a judgment.** Compare alternatives, check a causal claim,
   examine assumptions or decide which evidence would change a recommendation.
-- **Revisit a decision when the facts change.** v1.3.0 supports method retrieval
+- **Revisit a decision when the facts change.** v1.3.1 supports method retrieval
   at multiple decision points within one request. Mechanical steps need no method.
 - **Read the complete procedure.** Each method has authored instructions,
   examples, applicability limits and required public results, in English and Korean.
@@ -64,7 +64,7 @@ For example, ask your agent to compare two vendors under a fixed budget, reconsi
 its choice after a new audit, or distinguish what a small pilot supports from what
 it leaves unknown. These are use cases, not measured outcome guarantees.
 
-## How v1.3.0 works
+## How v1.3.1 works
 
 Claude/Codex hooks provide lightweight discovery guidance. The active agent then
 uses the packaged native selector to retrieve eligible complete methods as needed.
@@ -89,7 +89,7 @@ selection, fallback and method-availability contracts.
 | Google Antigravity | Explicit content skill | [Antigravity support](docs/antigravity-support.md) |
 
 Claude web and Desktop Chat use a **separate standalone skill ZIP**, not the local
-plugin hooks. Download it from the [v1.3.0 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.0)
+plugin hooks. Download it from the [v1.3.1 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.1)
 and follow the [Chat installation guide](docs/claude-chat-upload-probe.md).
 
 Chat standalone export: **archive contract validated; live activation unvalidated.**
@@ -101,12 +101,12 @@ backend. Model requests still use your selected host service under its terms.
 No separate OpenSocrates account is required. Read [SECURITY.md](SECURITY.md)
 for the host trust boundaries and retained legacy adapter behavior.
 
-v1.3.0's packages, installer and published files are verified. Package verification
+v1.3.1 fixes multi-line decision input and checks packaged examples before release. Package verification
 does not establish every host's live behavior or the model's actual application
 of a method. Synthetic tests include final-delivery timeouts and repetitive output;
 no general quality, naturalness, token-cost or response-time improvement is claimed.
-The complete [release evidence](docs/v1.3.0-recovery/PROGRESS.md) and
-[publication verification](https://github.com/ParkerHwang/OpenSocrates/pull/88)
+The complete [release evidence](docs/v1.3.1-release.md) and
+[publication verification](https://github.com/ParkerHwang/OpenSocrates/pull/92)
 retain the measured results and limitations.
 
 ## More information

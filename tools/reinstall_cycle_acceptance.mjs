@@ -44,6 +44,7 @@ import {
   transientPathsFor,
 } from "../installer/opensocrates.mjs";
 import { inspectManagedLayout } from "./clean_machine_acceptance.mjs";
+import { publishExclusiveJson } from "./reinstall_cycle_operation_capsule.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const REPOSITORY = "ParkerHwang/OpenSocrates";
@@ -125,6 +126,10 @@ const TRUST_TRANSACTION_PATTERN =
   /^\.config\.toml\.opensocrates-trust-reset-[A-Za-z0-9-]+\.(?:tmp|rollback)$/u;
 const CLAIM_PUBLISH_STAGE_PATTERN = new RegExp(
   `^\\.claimed\\.json\\.[1-9][0-9]*\\.${UUID_V4_FRAGMENT}\\.tmp$`,
+  "u",
+);
+const BLOCKED_PUBLISH_STAGE_PATTERN = new RegExp(
+  `^\\.blocked\\.json\\.[1-9][0-9]*\\.${UUID_V4_FRAGMENT}\\.tmp$`,
   "u",
 );
 const MAX_COMMAND_OUTPUT_BYTES = 16 * 1024 * 1024;
@@ -4449,7 +4454,14 @@ function requireLifecycleJsonEntry(
   label,
   { inspectEntry = lstatSync, readDirectory = readdirSync, canonicalizeEntry = realpathSync } = {},
 ) {
-  if (basename(target) !== "claimed.json") {
+  const targetName = basename(target);
+  const publishStagePattern =
+    targetName === "claimed.json"
+      ? CLAIM_PUBLISH_STAGE_PATTERN
+      : targetName === "blocked.json"
+        ? BLOCKED_PUBLISH_STAGE_PATTERN
+        : null;
+  if (publishStagePattern === null) {
     const info = inspectEntry(target);
     if (info.nlink !== 1) {
       fail("lifecycle-recovery", `${label} is not a single-link owner-only receipt`);
@@ -4468,7 +4480,7 @@ function requireLifecycleJsonEntry(
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const info = inspectEntry(target);
     const stageEntries = readDirectory(parent)
-      .filter((name) => CLAIM_PUBLISH_STAGE_PATTERN.test(name))
+      .filter((name) => publishStagePattern.test(name))
       .map((name) => {
         const candidate = join(parent, name);
         return { candidate, info: inspectPresent(candidate) };
@@ -4488,7 +4500,6 @@ function requireLifecycleJsonEntry(
       return requireExactPrivateMode(target, label, "file", 0o600);
     }
     if (
-      basename(target) !== "claimed.json" ||
       current.isSymbolicLink() ||
       !current.isFile() ||
       current.uid !== currentUid() ||
@@ -4836,11 +4847,19 @@ function writeLifecycleBlockedReceipt(record) {
     ...blockedBase,
     operationSha256: sha256Buffer(JSON.stringify(blockedBase)),
   };
-  writeExclusivePrivateBytes(
-    join(record.operationDirectory, "blocked.json"),
-    Buffer.from(`${JSON.stringify(blocked, null, 2)}\n`),
-    "lifecycle-recovery",
-  );
+  try {
+    publishExclusiveJson(join(record.operationDirectory, "blocked.json"), blocked, {
+      singleWinner: true,
+    });
+  } catch (error) {
+    if (error?.code !== "EEXIST") {
+      fail("lifecycle-recovery", "the blocked receipt could not be published atomically");
+    }
+    const converged = lifecycleOperationRecord(record.operationDirectory);
+    if (converged.blockedRecord === null) {
+      fail("lifecycle-recovery", "the competing blocked receipt did not converge");
+    }
+  }
   syncEntry(record.operationDirectory);
 }
 

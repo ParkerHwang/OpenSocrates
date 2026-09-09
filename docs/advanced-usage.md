@@ -1,6 +1,6 @@
 # Installation and runtime reference
 
-Start with the [README](../README.md) for v1.3.0. Commands below run from the repository root when a source checkout is required. The default Claude/Codex flow is discovery and agent-directed retrieval; stored grounding artifacts and separate selector subprocesses below describe the retained legacy adapter. Historical host receipts are not fresh v1.3.0 live-validation claims. See [current delivery modes](decision-points.md) and [release evidence](v1.3.0-recovery/PROGRESS.md).
+Start with the [README](../README.md) for v1.3.1. Commands below run from the repository root when a source checkout is required. The default Claude/Codex flow is discovery and agent-directed retrieval; stored grounding artifacts and separate selector subprocesses below describe the retained legacy adapter. Historical host receipts are not fresh v1.3.1 live-validation claims. See [current delivery modes](decision-points.md) and [release evidence](v1.3.1-release.md).
 
 ## Install
 
@@ -21,7 +21,7 @@ before registering an owner-marked managed marketplace.
 ### Install every ready host
 
 ```bash
-npx --yes opensocrates@1.3.0 install --host all
+npx --yes opensocrates@1.3.1 install --host all
 ```
 
 The all-host path detects supported, authenticated host CLIs, completes every
@@ -33,9 +33,9 @@ registration.
 Use the same host value for the complete lifecycle:
 
 ```bash
-npx --yes opensocrates@1.3.0 status --host all
-npx --yes opensocrates@1.3.0 update --host all
-npx --yes opensocrates@1.3.0 remove --host all
+npx --yes opensocrates@1.3.1 status --host all
+npx --yes opensocrates@1.3.1 update --host all
+npx --yes opensocrates@1.3.1 remove --host all
 ```
 
 ### Remove a registration, purge owned payloads, or reset Codex trust
@@ -50,11 +50,11 @@ result as a complete uninstall.
 After closing active hosts, request the explicit owned-payload purge:
 
 ```bash
-npx --yes opensocrates@1.3.0 remove --host all --purge
-# One host: npx --yes opensocrates@1.3.0 remove --host claude --purge
+npx --yes opensocrates@1.3.1 remove --host all --purge
+# One host: npx --yes opensocrates@1.3.1 remove --host claude --purge
 # Also reset only OpenSocrates Codex hook trust:
-npx --yes opensocrates@1.3.0 remove --host all --purge --reset-trust
-# Codex only: npx --yes opensocrates@1.3.0 remove --host codex --purge --reset-trust
+npx --yes opensocrates@1.3.1 remove --host all --purge --reset-trust
+# Codex only: npx --yes opensocrates@1.3.1 remove --host codex --purge --reset-trust
 ```
 
 Purge verifies canonical paths, the exact `opensocrates@opensocrates` package
@@ -111,13 +111,13 @@ automatic update, and per-host drift.
 Codex remains the default host for backward compatibility:
 
 ```bash
-npx --yes opensocrates@1.3.0 install
-# Equivalent: npx --yes opensocrates@1.3.0 install --host codex
-npx --yes opensocrates@1.3.0 install --host antigravity
-npx --yes opensocrates@1.3.0 install --host claude
-npx --yes opensocrates@1.3.0 install --host cursor
-npx --yes opensocrates@1.3.0 install --host grok
-npx --yes opensocrates@1.3.0 install --host opencode
+npx --yes opensocrates@1.3.1 install
+# Equivalent: npx --yes opensocrates@1.3.1 install --host codex
+npx --yes opensocrates@1.3.1 install --host antigravity
+npx --yes opensocrates@1.3.1 install --host claude
+npx --yes opensocrates@1.3.1 install --host cursor
+npx --yes opensocrates@1.3.1 install --host grok
+npx --yes opensocrates@1.3.1 install --host opencode
 ```
 
 Antigravity installs a content-only plugin at
@@ -157,9 +157,9 @@ commands. The privacy-safe 2.1.226 fixture is under
 ### Opt-in automatic updates
 
 ```bash
-npx --yes opensocrates@1.3.0 auto-update enable --host all
-npx --yes opensocrates@1.3.0 auto-update status
-npx --yes opensocrates@1.3.0 auto-update disable
+npx --yes opensocrates@1.3.1 auto-update enable --host all
+npx --yes opensocrates@1.3.1 auto-update status
+npx --yes opensocrates@1.3.1 auto-update disable
 ```
 
 Automatic updates are disabled until explicitly enabled. The macOS LaunchAgent
@@ -186,7 +186,7 @@ the local plugin hooks.
 
 Chat standalone export: **archive contract validated; live activation unvalidated.**
 
-The complete v1.3.0 standalone ZIP ships with all 48 methods in EN/KO. Its
+The complete v1.3.1 standalone ZIP ships with all 48 methods in EN/KO. Its
 layout/reference integrity and public release provenance are separate from an
 account-level upload. Older custom/synced skills are not automatically upgraded
 by the local installer. See [version-bound support evidence](claude-chat-upload-probe.md).
@@ -205,27 +205,27 @@ absent because Chat does not execute the packaged hooks. See Anthropic's
 The same host option works without the npm registry by using the published tag:
 
 ```bash
-npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host all
-npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host antigravity
-npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host claude
-npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host codex
-npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host cursor
-npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host grok
-npx --yes github:ParkerHwang/OpenSocrates#v1.3.0 install --host opencode
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.1 install --host all
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.1 install --host antigravity
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.1 install --host claude
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.1 install --host codex
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.1 install --host cursor
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.1 install --host grok
+npx --yes github:ParkerHwang/OpenSocrates#v1.3.1 install --host opencode
 ```
 
 ### Manual release verification
 
 Download `opensocrates.mjs`, the host package, and its
 `.sha256` file from the
-[v1.3.0 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.0).
+[v1.3.1 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.1).
 Verify the named published assets before installation; for Claude:
 
 ```bash
-shasum -a 256 -c opensocrates-1.3.0-claude-plugin.zip.sha256
+shasum -a 256 -c opensocrates-1.3.1-claude-plugin.zip.sha256
 node opensocrates.mjs install --host claude \
-  --asset opensocrates-1.3.0-claude-plugin.zip \
-  --checksum opensocrates-1.3.0-claude-plugin.zip.sha256
+  --asset opensocrates-1.3.1-claude-plugin.zip \
+  --checksum opensocrates-1.3.1-claude-plugin.zip.sha256
 ```
 
 Replace `claude` with `antigravity`, `codex`, `cursor`, `grok`, or `opencode` for the matching package.
@@ -240,7 +240,7 @@ what is installed, remove it explicitly:
 ```bash
 claude plugin uninstall opensocrates@OpenSocrates --scope user
 claude plugin marketplace remove OpenSocrates --scope user
-npx --yes opensocrates@1.3.0 install --host claude
+npx --yes opensocrates@1.3.1 install --host claude
 ```
 
 Updating a managed v1.1.0 Claude installation replaces the complete package
