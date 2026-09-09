@@ -1322,8 +1322,12 @@ test("native package workflow and receipt pin the pull-request head commit and t
   withFixture((root) => {
     const workflow = readFileSync(".github/workflows/ci.yml", "utf8");
     const exactRef = "${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}";
+    const exactRefPattern = new RegExp(
+      `ref: ${exactRef.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&")}`,
+      "u",
+    );
     const packageJob = workflow.slice(workflow.indexOf("  package:"));
-    assert.match(packageJob, new RegExp(`ref: ${exactRef.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&")}`, "u"));
+    assert.match(packageJob, exactRefPattern);
     assert.match(packageJob, /node tools\/write_package_provenance\.mjs/u);
     assert.match(
       packageJob,
@@ -1333,6 +1337,39 @@ test("native package workflow and receipt pin the pull-request head commit and t
       packageJob.indexOf("node tools/write_package_provenance.mjs") <
         packageJob.indexOf("Upload native package evidence"),
     );
+
+    const windowsWorkflow = readFileSync(".github/workflows/windows.yml", "utf8");
+    const windowsCheckoutStart = windowsWorkflow.indexOf("      - uses: actions/checkout@v7");
+    const windowsSetupNodeStart = windowsWorkflow.indexOf("      - uses: actions/setup-node@v7");
+    assert.ok(windowsCheckoutStart >= 0);
+    assert.ok(windowsSetupNodeStart > windowsCheckoutStart);
+    assert.match(
+      windowsWorkflow.slice(windowsCheckoutStart, windowsSetupNodeStart),
+      exactRefPattern,
+    );
+
+    const windowsProvenanceStart = windowsWorkflow.indexOf(
+      "      - name: Write exact Windows package source provenance",
+    );
+    const windowsPackageUploadStart = windowsWorkflow.indexOf(
+      "      - uses: actions/upload-artifact@v7",
+      windowsProvenanceStart,
+    );
+    assert.ok(windowsProvenanceStart >= 0);
+    assert.ok(windowsPackageUploadStart > windowsProvenanceStart);
+    const windowsProvenanceStep = windowsWorkflow.slice(
+      windowsProvenanceStart,
+      windowsPackageUploadStart,
+    );
+    assert.ok(
+      windowsProvenanceStep.includes(`OPENSOCRATES_EXPECTED_SOURCE_SHA: ${exactRef}`),
+    );
+    assert.match(
+      windowsProvenanceStep,
+      /run: node tools\/write_package_provenance\.mjs --output build\/evidence\/windows-package-source-provenance\.json/u,
+    );
+    assert.ok(windowsWorkflow.includes(`name: windows-packages-${exactRef}`));
+    assert.ok(windowsWorkflow.includes(`name: windows-evidence-${exactRef}`));
 
     const repository = join(root, "repository");
     mkdirSync(repository, { mode: 0o700 });
@@ -1382,7 +1419,7 @@ test("native package workflow and receipt pin the pull-request head commit and t
     assert.equal(existsSync(rejectedOutput), false);
   }));
 
-test("npm pack metadata is an exact eight-file closed set", () => {
+test("npm pack metadata is an exact nine-file closed set", () => {
   const files = [
     "CHANGELOG.md",
     "LICENSE",
@@ -1391,6 +1428,7 @@ test("npm pack metadata is an exact eight-file closed set", () => {
     "SECURITY.md",
     "VERSION",
     "installer/opensocrates.mjs",
+    "installer/windows.ps1",
     "package.json",
   ].map((path) => ({
     path,

@@ -159,10 +159,12 @@ const NPM_PACKAGE_FILES = Object.freeze([
   "SECURITY.md",
   "VERSION",
   "installer/opensocrates.mjs",
+  "installer/windows.ps1",
   "package.json",
 ]);
 const NPM_PACKAGE_FILES_FIELD = Object.freeze([
   "installer/opensocrates.mjs",
+  "installer/windows.ps1",
   "CHANGELOG.md",
   "SECURITY.md",
   "VERSION",
@@ -172,6 +174,7 @@ const NPM_PACKAGE_SCRIPTS = Object.freeze({
   "test:npx": "node installer/package-smoke.mjs",
   "pack:check": "npm pack --dry-run",
   prepublishOnly: "npm test",
+  "test:windows": "node --test installer/windows.test.mjs",
 });
 const CHECKPOINT_PHASES = new Set([
   "ready-to-purge",
@@ -9355,7 +9358,7 @@ function validateNpmPackMetadata(item) {
     !Array.isArray(item?.bundled) ||
     item.bundled.length !== 0
   ) {
-    fail("npm-package", "npm pack metadata does not match the exact eight-file package contract");
+    fail("npm-package", "npm pack metadata does not match the exact nine-file package contract");
   }
 }
 

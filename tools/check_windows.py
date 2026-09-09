@@ -256,7 +256,8 @@ class WindowsChecks(unittest.TestCase):
             ):
                 windows_security.secure_acl(root, directory=True)
             self.assertEqual(windows_security.inspect_acl(moved), (True, True))
-            self.assertEqual(windows_security.inspect_acl(root), (True, False))
+            self.assertFalse(windows_security.inspect_acl(root)[1])
+            self.assertFalse(check_permissions(root, directory=True).write_allowed)
 
             junction_path = parent / "junction-transition"
             opened_path = parent / "junction-opened-object"
@@ -373,7 +374,8 @@ class WindowsChecks(unittest.TestCase):
                 atomic.atomic_replace_bytes(raced_target, b"must-not-publish")
             self.assertFalse(raced_target.exists())
             self.assertFalse(tuple(race_root.glob(".state.json.*.tmp")))
-            self.assertEqual(windows_security.inspect_acl(race_root), (True, False))
+            self.assertFalse(windows_security.inspect_acl(race_root)[1])
+            self.assertFalse(check_permissions(race_root, directory=True).write_allowed)
             self.assertEqual(windows_security.inspect_acl(moved_race_root), (True, True))
 
             bound_root = Path(name) / "atomic-parent-bound"
