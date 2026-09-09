@@ -165,7 +165,7 @@ def read_bytes(path: Path, *, max_bytes: int) -> bytes:
     """Read a bounded owner-only file without following its final symlink."""
 
     path = Path(path)
-    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_BINARY", 0)
     try:
         fd = os.open(path, flags)
     except FileNotFoundError:
@@ -199,7 +199,13 @@ def append_fsync(path: Path, line: bytes, *, max_bytes: int) -> None:
         raise AtomicWriteError("invalid append line")
     path = Path(path)
     _reject_symlink(path)
-    flags = os.O_WRONLY | os.O_APPEND | os.O_CREAT | getattr(os, "O_NOFOLLOW", 0)
+    flags = (
+        os.O_WRONLY
+        | os.O_APPEND
+        | os.O_CREAT
+        | getattr(os, "O_NOFOLLOW", 0)
+        | getattr(os, "O_BINARY", 0)
+    )
     try:
         fd = os.open(path, flags, 0o600)
     except OSError as error:

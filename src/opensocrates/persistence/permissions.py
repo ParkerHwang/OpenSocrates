@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import stat
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -33,7 +34,7 @@ class PermissionReport:
 
 
 def _owner_ok(info: os.stat_result) -> bool:
-    if os.name == "nt":
+    if sys.platform == "win32":
         return True
     try:
         return info.st_uid == os.getuid()
@@ -69,11 +70,19 @@ def check_permissions(path: Path, *, directory: bool) -> PermissionReport:
         )
 
     is_directory = stat.S_ISDIR(info.st_mode)
-    symlink_ok = not stat.S_ISLNK(info.st_mode)
+    symlink_ok = not stat.S_ISLNK(info.st_mode) and not (
+        getattr(info, "st_file_attributes", 0) & 0x400
+    )
     owner_ok = symlink_ok and _owner_ok(info)
     expected_type = directory == is_directory
-    if os.name == "nt":
-        mode_ok = expected_type
+    if sys.platform == "win32":
+        from .windows_acl import inspect_acl
+
+        try:
+            owner_ok, private_acl = inspect_acl(path)
+        except OSError:
+            owner_ok, private_acl = False, False
+        mode_ok = expected_type and private_acl
     else:
         mode = stat.S_IMODE(info.st_mode)
         mode_ok = expected_type and (mode & 0o077) == 0
@@ -112,7 +121,11 @@ def secure_mode(path: Path, *, directory: bool) -> None:
         raise PermissionSecurityError("refusing to chmod a symlink")
     if not _owner_ok(info):
         raise PermissionSecurityError("permission target is not owned by the current user")
-    if os.name != "nt":
+    if sys.platform == "win32":
+        from .windows_acl import secure_acl
+
+        secure_acl(path, directory=directory)
+    else:
         os.chmod(path, 0o700 if directory else 0o600)
 
 
@@ -123,7 +136,7 @@ def ensure_new_owner_only(path: Path, *, directory: bool) -> None:
     report = check_permissions(path, directory=directory)
     if not report.exists:
         raise PermissionSecurityError("permission target disappeared")
-    if os.name != "nt" and report.mode_ok:
+    if sys.platform != "win32" and report.mode_ok:
         return
     secure_mode(path, directory=directory)
 

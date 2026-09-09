@@ -21,6 +21,10 @@ OpenSocrates는 Claude, Codex, OpenCode, Grok Build, Cursor, Google Antigravity�
 [v1.3.1 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.1) ·
 [설치 상세 안내](docs/advanced-usage.ko.md)
 
+## v1.4.0 Windows 후보
+
+이 브랜치는 Windows x64 네이티브 패키지를 추가하며 아직 게시하지 않았습니다. 로컬 ZIP 설치·수동 업데이트·호스트별 검증 범위는 [Windows 안내](docs/windows-support.ko.md)를 확인하세요. 아래 v1.3.1 명령은 현재 공개된 릴리스를 설명합니다.
+
 ## 시작하기
 
 먼저 호스트에 로그인하고 CLI를 사용할 수 있게 준비하세요. Node.js 20 이상이

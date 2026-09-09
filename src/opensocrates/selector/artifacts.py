@@ -9,6 +9,7 @@ import json
 import os
 import re
 import stat
+import sys
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -333,6 +334,20 @@ class InstructionFileStore:
                 self._workspace_container = workspace_root.parent
                 directories.append(workspace_root)
             directories.append(temporary_root / f"opensocrates-{root_tag}")
+        if sys.platform == "win32":
+            # Extended-length paths require no machine-wide long-path policy change.
+            # Keep complete HMAC tags; never truncate private directory identities.
+            def extended(path: Path) -> Path:
+                value = str(path.absolute())
+                if value.startswith("\\\\?\\"):
+                    return path
+                if value.startswith("\\\\"):
+                    return Path("\\\\?\\UNC\\" + value[2:])
+                return Path("\\\\?\\" + value)
+
+            directories = [extended(path) for path in directories]
+            if self._workspace_container is not None:
+                self._workspace_container = extended(self._workspace_container)
         self._directories = tuple(dict.fromkeys(directories))
         self._directory = self._directories[0]
 
@@ -354,7 +369,7 @@ class InstructionFileStore:
             return None
         if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
             return None
-        if os.name != "nt" and info.st_uid != os.geteuid():
+        if sys.platform != "win32" and info.st_uid != os.geteuid():
             return None
         return resolved / _WORKSPACE_CONTAINER / root_tag
 
@@ -368,7 +383,11 @@ class InstructionFileStore:
             ) from error
         if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
             raise InstructionArtifactError("instruction artifact directory is unsafe")
-        if os.name != "nt":
+        if sys.platform == "win32":
+            from opensocrates.windows_security import secure_acl
+
+            secure_acl(path, directory=True)
+        else:
             try:
                 if info.st_uid != os.geteuid():
                     raise InstructionArtifactError(
@@ -388,7 +407,13 @@ class InstructionFileStore:
 
     @staticmethod
     def _write_workspace_ignore(path: Path) -> None:
-        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+        flags = (
+            os.O_WRONLY
+            | getattr(os, "O_BINARY", 0)
+            | os.O_CREAT
+            | os.O_EXCL
+            | getattr(os, "O_NOFOLLOW", 0)
+        )
         descriptor: int | None = None
         try:
             descriptor = os.open(path, flags, 0o600)
@@ -410,7 +435,7 @@ class InstructionFileStore:
             raise InstructionArtifactError("workspace directory cannot be inspected") from error
         if stat.S_ISLNK(workspace_info.st_mode) or not stat.S_ISDIR(workspace_info.st_mode):
             raise InstructionArtifactError("workspace directory is unsafe")
-        if os.name != "nt" and workspace_info.st_uid != os.geteuid():
+        if sys.platform != "win32" and workspace_info.st_uid != os.geteuid():
             raise InstructionArtifactError("workspace directory has the wrong owner")
         self._ensure_owned_directory(container)
         try:
@@ -428,7 +453,7 @@ class InstructionFileStore:
                 raise InstructionArtifactError("workspace artifact directory is unsafe") from error
             if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
                 raise InstructionArtifactError("workspace artifact directory is unsafe")
-            if os.name != "nt" and info.st_uid != os.geteuid():
+            if sys.platform != "win32" and info.st_uid != os.geteuid():
                 raise InstructionArtifactError("workspace artifact directory has the wrong owner")
         ignore = container / _WORKSPACE_IGNORE_FILENAME
         try:
@@ -537,7 +562,7 @@ class InstructionFileStore:
             raise InstructionArtifactError("instruction artifact path is unsafe")
         if info.st_size > MAX_INSTRUCTION_FILE_BYTES:
             raise InstructionArtifactError("instruction artifact exceeds its bounded file size")
-        if os.name != "nt":
+        if sys.platform != "win32":
             if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) != 0o600:
                 raise InstructionArtifactError("instruction artifact permissions are unsafe")
         return info
@@ -552,9 +577,16 @@ class InstructionFileStore:
             raise InstructionArtifactError("owner-only artifact cannot be inspected") from error
         if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode) or info.st_size > maximum:
             raise InstructionArtifactError("owner-only artifact is unsafe")
-        if os.name != "nt" and (info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) != 0o600):
+        if sys.platform != "win32" and (
+            info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) != 0o600
+        ):
             raise InstructionArtifactError("owner-only artifact permissions are unsafe")
-        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+        if sys.platform == "win32":
+            from opensocrates.windows_security import inspect_acl
+
+            if inspect_acl(path) != (True, True):
+                raise InstructionArtifactError("artifact ACL is unsafe")
+        flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
         try:
             descriptor = os.open(path, flags)
         except OSError as error:
@@ -652,7 +684,7 @@ class InstructionFileStore:
     @staticmethod
     def _decode_header(path: Path) -> InstructionArtifact:
         InstructionFileStore._inspect_regular_file(path)
-        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+        flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
         try:
             fd = os.open(path, flags)
         except OSError as error:
@@ -1005,7 +1037,7 @@ class InstructionFileStore:
                 return 1
             except OSError:
                 return 0
-        if os.name != "nt" and info.st_uid != os.geteuid():
+        if sys.platform != "win32" and info.st_uid != os.geteuid():
             return 0
         removed = 0
         try:

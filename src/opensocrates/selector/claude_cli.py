@@ -30,6 +30,7 @@ import re
 import shutil
 import signal
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -182,14 +183,14 @@ def _terminate_process(process: subprocess.Popen[bytes]) -> None:
 
     try:
         if process.poll() is None:
-            if os.name == "posix":
+            if sys.platform != "win32":
                 os.killpg(process.pid, signal.SIGTERM)
             else:
                 process.terminate()
             try:
                 process.wait(timeout=_TERMINATE_GRACE_SECONDS)
             except subprocess.TimeoutExpired:
-                if os.name == "posix":
+                if sys.platform != "win32":
                     os.killpg(process.pid, signal.SIGKILL)
                 else:
                     process.kill()

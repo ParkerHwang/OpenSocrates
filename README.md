@@ -21,6 +21,10 @@ options and weigh evidence while you work in your existing agent.
 [v1.3.1 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.1) ·
 [Installation reference](docs/advanced-usage.md)
 
+## v1.4.0 Windows candidate
+
+This branch adds native Windows x64 packages. It is not published yet. See the [Windows installation and evidence guide](docs/windows-support.md) for local ZIP installation, manual updates and host-specific validation limits. The v1.3.1 instructions below describe the current published release.
+
 ## Get started
 
 Sign in to your host and make its CLI available. You need Node.js 20 or later.

@@ -352,6 +352,7 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
     bundle_path: str | Path = "content/compiled-content.bundle.json",
     runtime_root: str | Path | None = None,
     render_profile: str | None = None,
+    target: str = "darwin-arm64",
 ) -> dict[str, Any]:
     """Generate one host package and return its deterministic release manifest."""
 
@@ -365,6 +366,15 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
     metadata = _read_json(metadata_path)
     if metadata.get("host") != host:
         raise PluginBuildError("generator metadata host does not match requested host")
+    if target not in {"darwin-arm64", "windows-x64"}:
+        raise PluginBuildError("unsupported package target")
+    windows_native = target == "windows-x64" and host in {"codex", "claude"}
+    if windows_native:
+        metadata["release_targets"] = [target]
+        metadata["launchers"] = ["bin/launch.mjs"]
+        for item in metadata.get("copy_files", []):
+            if item["source"] == "packaging/launchers/launch.sh":
+                item.update(source="packaging/launchers/launch.mjs", output="bin/launch.mjs")
     template_revision = str(metadata.get("template_revision", "1"))
     bundle_file = Path(bundle_path)
     if not bundle_file.is_absolute():
@@ -427,16 +437,36 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
 
     hooks_builder = metadata.get("hooks_builder")
     if isinstance(hooks_builder, str):
-        values["HOOKS_JSON"] = _json_token(_load_builder(hooks_builder)())
+        hooks = _load_builder(hooks_builder)()
+        if windows_native:
+            for entries in hooks["hooks"].values():
+                for entry in entries:
+                    for command in entry["hooks"]:
+                        if host == "claude":
+                            command["args"] = [
+                                "${CLAUDE_PLUGIN_ROOT}/bin/launch.mjs",
+                                *command["args"],
+                            ]
+                            command["command"] = "node"
+                        else:
+                            command["command"] = command["command"].replace(
+                                "${PLUGIN_ROOT}/bin/launch.sh",
+                                'node "${PLUGIN_ROOT}/bin/launch.mjs"',
+                            )
+        values["HOOKS_JSON"] = _json_token(hooks)
     else:
         values["HOOKS_JSON"] = "{}"
 
     def render_to(template: str, destination: str, local_values: Mapping[str, str]) -> None:
         destination_path = output_path / _ensure_relative(destination, field="output")
         destination_path.parent.mkdir(parents=True, exist_ok=True)
-        destination_path.write_text(
-            _render(template_text(template), local_values, source=template), encoding="utf-8"
-        )
+        rendered = _render(template_text(template), local_values, source=template)
+        if windows_native:
+            rendered = rendered.replace(
+                "${PLUGIN_ROOT}/bin/launch.sh", 'node "${PLUGIN_ROOT}/bin/launch.mjs"'
+            )
+            rendered = rendered.replace("bin/launch.sh", "node bin/launch.mjs")
+        destination_path.write_text(rendered, encoding="utf-8", newline="\n")
 
     manifest_template = metadata.get("manifest_template")
     manifest_output = metadata.get("manifest_output")
@@ -487,21 +517,21 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
         for method in methods:
             method_id = method["id"]
             assembled = assembler.assemble((method_id,), requested_locale=locale)
-            target = (
+            reference_path = (
                 output_path
                 / "skills/opensocrates/references/decision"
                 / "methods"
                 / locale
                 / (method_id + ".md")
             )
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(assembled.instructions, encoding="utf-8")
+            reference_path.parent.mkdir(parents=True, exist_ok=True)
+            reference_path.write_text(assembled.instructions, encoding="utf-8", newline="\n")
             entries.append(
                 {
                     "id": method_id,
                     "use_for": method["plain_action"][locale],
                     "routing": method["routing"],
-                    "sha256": _sha256(target.read_bytes()),
+                    "sha256": _sha256(reference_path.read_bytes()),
                     "path": f"methods/{locale}/{method_id}.md",
                 }
             )
@@ -558,8 +588,9 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
     runtime_output = output_path / _ensure_relative(
         str(runtime_output_name), field="runtime_output"
     )
-    if runtime_root_path.exists():
-        _copy_path(runtime_root_path, runtime_output)
+    if (runtime_root_path / target).exists():
+        runtime_output.mkdir(parents=True, exist_ok=True)
+        _copy_path(runtime_root_path / target, runtime_output / target)
         # S09's onedir runtime carries a content copy for standalone launch.
         # Replace that generated copy with the exact canonical bundle selected
         # for this package so every runtime content surface has one identity.
@@ -567,6 +598,13 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
             if embedded_bundle.is_file() and embedded_bundle.parent.name == "content":
                 embedded_bundle.write_bytes(_canonical_json(raw_bundle))
 
+    if windows_native:
+        for guide in (output_path / "skills/opensocrates/references/decision").glob("guide.*.md"):
+            guide.write_text(
+                guide.read_text(encoding="utf-8").replace("bin/launch.sh", "node bin/launch.mjs"),
+                encoding="utf-8",
+                newline="\n",
+            )
     files: list[dict[str, str]] = []
     for path in sorted(
         (candidate for candidate in output_path.rglob("*") if candidate.is_file()),
@@ -618,6 +656,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--host", default="codex")
     parser.add_argument("--source-root", default="plugin-src")
     parser.add_argument("--bundle", default="content/compiled-content.bundle.json")
+    parser.add_argument("--target", choices=("darwin-arm64", "windows-x64"), default="darwin-arm64")
     parser.add_argument(
         "--runtime-root",
         help="host runtime root (default: dist/runtime/<host>)",
@@ -638,6 +677,7 @@ def main(argv: list[str] | None = None) -> int:
             source_root=args.source_root,
             bundle_path=args.bundle,
             runtime_root=args.runtime_root,
+            target=args.target,
             render_profile=args.render_profile,
         )
     except PluginBuildError as exc:

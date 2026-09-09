@@ -45,7 +45,7 @@ def _regular_file(path: Path, *, maximum: int | None = None) -> os.stat_result:
 
 def _read_bounded(path: Path, *, maximum: int) -> bytes:
     _regular_file(path, maximum=maximum)
-    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
     descriptor = os.open(path, flags)
     chunks: list[bytes] = []
     remaining = maximum + 1
@@ -156,7 +156,7 @@ def _checksum_entries(root: Path) -> dict[str, str] | None:
 
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
-    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
     descriptor = os.open(path, flags)
     try:
         while True:

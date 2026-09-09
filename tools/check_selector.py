@@ -547,7 +547,7 @@ def _test_hook_fallback_keeps_guardrails_before_questions() -> None:
     guardrail = "GUARDRAIL_SENTINEL " + "g" * 1_200
     question = "QUESTION_SENTINEL " + "q" * 9_000
     artifact = InstructionArtifact(
-        path=Path("/synthetic/instruction-artifact.md"),
+        path=Path("/synthetic/instruction-artifact.md").absolute(),
         content_revision=1,
         locale="en",
         selected_reasoning_systems=("triangulation",),
@@ -612,7 +612,7 @@ def _test_hook_budgets_all_one_two_three_methods_bilingual() -> None:
                     < MAX_INLINE_TEACHER_QUESTION_ESTIMATED_TOKENS
                 )
                 artifact = InstructionArtifact(
-                    path=Path("/synthetic/instruction-artifact.md"),
+                    path=Path("/synthetic/instruction-artifact.md").absolute(),
                     content_revision=projections.content_revision,
                     locale=locale,
                     selected_reasoning_systems=selected,
@@ -931,7 +931,13 @@ def _test_workspace_artifact_root() -> None:
                 workspace=workspace,
             )
             artifact = store.create("workspace-session", "workspace-turn", assembled)
-            _require(artifact.path.is_relative_to(workspace.resolve() / ".opensocrates"))
+            _require(
+                any(
+                    parent.samefile(workspace / ".opensocrates")
+                    for parent in artifact.path.parents
+                    if parent.exists()
+                )
+            )
             ignore = workspace / ".opensocrates" / ".gitignore"
             _require(ignore.read_bytes() == b"*\n")
             if os.name != "nt":
@@ -989,7 +995,13 @@ def _test_workspace_fallback_and_cross_root_receipts() -> None:
             _require(workspace_store.accepts_artifact_path(legacy.path))
             _require(workspace_store.has_complete_read_receipt(legacy))
             current = workspace_store.create("cross-session", "workspace-turn", assembled)
-            _require(current.path.is_relative_to(workspace.resolve() / ".opensocrates"))
+            _require(
+                any(
+                    parent.samefile(workspace / ".opensocrates")
+                    for parent in current.path.parents
+                    if parent.exists()
+                )
+            )
             _require(workspace_store.accepts_artifact_path(current.path))
             _require(workspace_store.latest_for_session("cross-session") == current)
             _require(
@@ -1017,7 +1029,13 @@ def _test_workspace_fallback_and_cross_root_receipts() -> None:
                 workspace=foreign_workspace,
             )
             fallback = fallback_store.create("fallback-session", "fallback-turn", assembled)
-            _require(fallback.path.is_relative_to(temporary_root.resolve()))
+            _require(
+                any(
+                    parent.samefile(temporary_root)
+                    for parent in fallback.path.parents
+                    if parent.exists()
+                )
+            )
             _require(not fallback.path.is_relative_to(foreign_container.resolve()))
             _require(fallback_store.delete_session("fallback-session") >= 1)
 

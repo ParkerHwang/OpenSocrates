@@ -243,8 +243,10 @@ def ensure_data_root(config: DataRootConfig | None = None) -> DataRoot:
         root.mkdir(parents=True, exist_ok=True, mode=0o700)
         if root.is_symlink():
             raise DataRootUnavailableError("data root may not be a symlink")
-        if os.name != "nt" and not root_was_present:
-            os.chmod(root, 0o700)
+        if not root_was_present:
+            from .permissions import ensure_new_owner_only
+
+            ensure_new_owner_only(root, directory=True)
         layout = DataRootLayout.from_root(root)
         for directory in (
             layout.capabilities_dir,
@@ -259,8 +261,10 @@ def ensure_data_root(config: DataRootConfig | None = None) -> DataRoot:
             directory.mkdir(mode=0o700, exist_ok=True)
             if directory.is_symlink():
                 raise DataRootUnavailableError("data-root directory may not be a symlink")
-            if os.name != "nt" and not was_present:
-                os.chmod(directory, 0o700)
+            if not was_present:
+                from .permissions import ensure_new_owner_only
+
+                ensure_new_owner_only(directory, directory=True)
     except (OSError, PathSecurityError) as error:
         if isinstance(error, DataRootUnavailableError):
             raise
