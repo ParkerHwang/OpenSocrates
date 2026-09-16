@@ -8,7 +8,7 @@ pass_through() {
     code=$1
     launch_mode=${2:-}
     launch_host=${3:-}
-    if [ "$launch_mode" = hook ] && { [ "$launch_host" = codex ] || [ "$launch_host" = claude ]; }; then
+    if [ "$launch_mode" = hook ] && [ "$launch_host" = codex ]; then
         # Selector hook failures are always literal empty stdout.
         exit 0
     fi
@@ -37,7 +37,7 @@ codex_session_start_payload_base64=
 case "$mode" in
     hook)
         case "$host" in
-            claude|codex) ;;
+            codex) ;;
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         case "$event" in
@@ -53,7 +53,7 @@ case "$mode" in
             pass_through invalid_arguments "$mode" "$host"
         fi
         case "$host" in
-            claude|codex) ;;
+            codex) ;;
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         ;;
@@ -62,7 +62,7 @@ case "$mode" in
             pass_through invalid_arguments "$mode" "$host"
         fi
         case "$host" in
-            claude|codex) ;;
+            codex) ;;
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         ;;

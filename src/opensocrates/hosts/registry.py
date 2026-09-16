@@ -5,24 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from .antigravity.adapter import AntigravityAdapter
 from .base import HostAdapter
-from .claude.adapter import ClaudeAdapter, ClaudeAdapterConfig
 from .codex.adapter import CodexAdapter, CodexAdapterConfig
-from .cursor.adapter import CursorAdapter
-from .grok.adapter import GrokAdapter
-from .opencode.adapter import OpenCodeAdapter
-from .prompt_only.adapter import PromptOnlyAdapter
 
-HOST_NAMES = (
-    "antigravity",
-    "claude",
-    "codex",
-    "cursor",
-    "grok",
-    "opencode",
-    "prompt_only",
-)
+HOST_NAMES = ("codex",)
 
 
 class HostRegistryError(ValueError):
@@ -56,74 +42,24 @@ def build_adapter(
 ) -> HostAdapter:
     """Build one registered adapter without importing arbitrary modules."""
 
-    selected = validate_host_name(host)
-    if selected == "antigravity":
-        bundle = None
-        loader = getattr(content_repository, "load", None)
-        if callable(loader):
-            try:
-                bundle = loader()
-            except Exception:
-                bundle = None
-        return AntigravityAdapter(
-            bundle_path=bundle_path,
-            bundle=bundle,
-            profile=capability_profile,
+    validate_host_name(host)
+    return CodexAdapter(
+        CodexAdapterConfig(
+            bundle_path=bundle_path or Path("content/compiled-content.bundle.json"),
+            content_repository=content_repository,
+            turn_repository=turn_repository,
+            settings_repository=settings_repository,
+            capability_profile=capability_profile,
+            control_application=control_application,
+            dispatcher=dispatcher,
+            installation_key=installation_key,
             locale=locale,
+            selector_mode=selector_mode,
+            selector_application=selector_application,
+            selector_config=selector_config,
+            instruction_file_store=instruction_file_store,
+            **kwargs,
         )
-    if selected == "codex":
-        return CodexAdapter(
-            CodexAdapterConfig(
-                bundle_path=bundle_path or Path("content/compiled-content.bundle.json"),
-                content_repository=content_repository,
-                turn_repository=turn_repository,
-                settings_repository=settings_repository,
-                capability_profile=capability_profile,
-                control_application=control_application,
-                dispatcher=dispatcher,
-                installation_key=installation_key,
-                locale=locale,
-                selector_mode=selector_mode,
-                selector_application=selector_application,
-                selector_config=selector_config,
-                instruction_file_store=instruction_file_store,
-                **kwargs,
-            )
-        )
-    if selected == "claude":
-        return ClaudeAdapter(
-            ClaudeAdapterConfig(
-                bundle_path=bundle_path or Path("content/compiled-content.bundle.json"),
-                content_repository=content_repository,
-                turn_repository=turn_repository,
-                settings_repository=settings_repository,
-                capability_profile=capability_profile,
-                control_application=control_application,
-                dispatcher=dispatcher,
-                installation_key=installation_key,
-                locale=locale,
-                selector_mode=selector_mode,
-                selector_application=selector_application,
-                selector_config=selector_config,
-                instruction_file_store=instruction_file_store,
-                **kwargs,
-            )
-        )
-    bundle = None
-    loader = getattr(content_repository, "load", None)
-    if callable(loader):
-        try:
-            bundle = loader()
-        except Exception:
-            bundle = None
-    adapter_type = {
-        "cursor": CursorAdapter,
-        "grok": GrokAdapter,
-        "opencode": OpenCodeAdapter,
-        "prompt_only": PromptOnlyAdapter,
-    }[selected]
-    return adapter_type(
-        bundle_path=bundle_path, bundle=bundle, profile=capability_profile, locale=locale
     )
 
 

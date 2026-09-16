@@ -13,6 +13,7 @@ import json
 import os
 import signal
 import stat
+import sys
 import tempfile
 import threading
 import time
@@ -214,7 +215,7 @@ def _silence_standard_streams() -> None:
 
 
 def _owner_safe_directory(path: Path) -> bool:
-    if os.name != "posix" or not hasattr(os, "geteuid"):
+    if sys.platform == "win32" or not hasattr(os, "geteuid"):
         return False
     try:
         info = path.lstat()
@@ -229,6 +230,8 @@ def _owner_safe_directory(path: Path) -> bool:
 
 
 def _safe_existing_oauth_file() -> Path | None:
+    if sys.platform == "win32":
+        return None  # Legacy SDK credential-copy lane remains unavailable; decision retrieval needs no credentials.
     configured_home = os.environ.get("CODEX_HOME")
     if configured_home:
         codex_home = Path(configured_home).expanduser()
@@ -494,7 +497,7 @@ def _thread_config() -> dict[str, object]:
 
 
 def _isolated_environment(root: Path, codex_home: Path) -> dict[str, str]:
-    if os.name != "posix":
+    if sys.platform == "win32":
         raise RuntimeError("selector environment isolation is unavailable")
     home = root / "home"
     xdg_config = root / "xdg-config"
@@ -673,7 +676,7 @@ def run_selector_worker(
     watcher: threading.Thread | None = None
 
     try:
-        if os.name != "posix" or not hasattr(os, "setsid"):
+        if sys.platform == "win32" or not hasattr(os, "setsid"):
             raise RuntimeError("selector process-group isolation is unavailable")
         os.setsid()
         signal.signal(

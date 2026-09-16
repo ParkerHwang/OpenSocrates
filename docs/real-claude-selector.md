@@ -1,3 +1,6 @@
+> Historical record for OpenSocrates 1.3.1 or earlier. This integration is
+> removed and unsupported in 1.4.0. Use [the current guide](../README.md).
+
 # Opt-in real Claude selector contract
 
 Issue #7 adds a deliberately separate integration check for the selector's

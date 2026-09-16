@@ -4,118 +4,108 @@
 
 # OpenSocrates
 
-**A method for the judgment your agent is making.**
+**A method for the judgment your Codex agent is making.**
 
-OpenSocrates brings 48 authored reasoning methods to Claude, Codex, OpenCode,
-Grok Build, Cursor and Google Antigravity. Use it to examine assumptions, compare
-options and weigh evidence while you work in your existing agent.
+OpenSocrates brings 48 authored reasoning methods to Codex. Examine assumptions,
+compare options, and weigh evidence within the task you are already doing.
 
 **English** | [한국어](README.ko.md)
 
 [![CI](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml/badge.svg)](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
-[![Release](https://img.shields.io/github/v/release/ParkerHwang/OpenSocrates)](https://github.com/ParkerHwang/OpenSocrates/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-[Website](https://opensocrates.parker-j-hwang.chatgpt.site) ·
-[v1.3.1 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.1) ·
-[Installation reference](docs/advanced-usage.md)
 
 ## Get started
 
-Sign in to your host and make its CLI available. You need Node.js 20 or later.
-The distributed native runtimes support **Apple-silicon macOS**; see each host's
-support documentation before installing on another platform.
+Version **1.4.0 supports Codex only**, on **Apple-silicon macOS and Windows x64**.
+Install Node.js 20 or later, make the Codex CLI available, and sign in to Codex.
+The native runtime is bundled; users do not need Python.
 
 ```sh
-# Install for every supported, ready host
-npx --yes opensocrates@1.3.1 install --host all
-
-# Or choose one host
-npx --yes opensocrates@1.3.1 install --host codex
-npx --yes opensocrates@1.3.1 install --host claude
+npx --yes opensocrates@1.4.0 install
 ```
 
-Start a new task after installation. In Codex, approve the OpenSocrates hooks in
-an interactive session before relying on native discovery. OpenSocrates uses your
-host's existing authentication and provider configuration; it needs no separate
-OpenSocrates account or API key.
+Start a new interactive Codex session and review the seven OpenSocrates command
+hooks. Approve those hooks before relying on native discovery. Non-interactive
+`codex exec` skips untrusted hooks; installation alone does not establish hook
+approval or actual delivery. You can explicitly ask Codex to use the
+`opensocrates` controller skill.
 
-For an existing installation:
+If you previously disabled these hooks, enable them in Codex's `/hooks` view.
+Updating the plugin preserves your hook enablement and trust preferences.
 
 ```sh
-npx --yes opensocrates@1.3.1 update --host all
-npx --yes opensocrates@1.3.1 status --host all
+npx --yes opensocrates@1.4.0 status
+npx --yes opensocrates@1.4.0 update
 ```
+
+`--host codex` is optional. The compatibility alias `--host all` now means Codex
+only. Other host names are rejected before installation or removal.
+
+## Upgrading from a multi-host release
+
+Claude Code, Cowork, Claude Chat, Antigravity, Cursor, Grok Build, and OpenCode
+integrations and archives are removed in 1.4.0. Existing non-Codex installations
+are not silently erased. If your previous desired state includes another host,
+first use the version that installed it to remove that host, then update Codex:
+
+```sh
+# Example for an installation managed by 1.3.1:
+npx --yes opensocrates@1.3.1 remove --host claude --purge
+npx --yes opensocrates@1.4.0 update --host codex
+```
+
+Use the corresponding old host name for each retired integration. Review any
+pending cleanup reported by the old installer. User conversation history and
+unrelated files must be preserved. See [installation and removal](docs/advanced-usage.md).
 
 ## What it does
 
-- **Choose a method for a judgment.** Compare alternatives, check a causal claim,
-  examine assumptions or decide which evidence would change a recommendation.
-- **Revisit a decision when the facts change.** v1.3.1 supports method retrieval
-  at multiple decision points within one request. Mechanical steps need no method.
-- **Read the complete procedure.** Each method has authored instructions,
-  examples, applicability limits and required public results, in English and Korean.
-- **Keep the answer connected to its evidence.** Guided writing instructions
-  preserve uncertainty, permissions and the user's format, with separate conclusions
-  and reopening conditions for separate questions.
+- Choose a method for a judgment: compare alternatives, check a causal claim,
+  examine assumptions, or identify evidence that could change a recommendation.
+- Revisit a decision when the facts change, including multiple decision points
+  within one request. Mechanical steps need no method.
+- Read complete instructions, examples, applicability limits, and required public
+  results. All 48 methods retain their English and Korean procedure bodies.
+- Keep conclusions connected to evidence, uncertainty, and reopening conditions
+  while preserving the user's requested format.
 
-For example, ask your agent to compare two vendors under a fixed budget, reconsider
-its choice after a new audit, or distinguish what a small pilot supports from what
-it leaves unknown. These are use cases, not measured outcome guarantees.
+Codex hooks provide lightweight discovery guidance. The active agent retrieves
+eligible methods through the packaged native decision command. A constrained
+complete-reference fallback remains when the runtime is unavailable. This path
+makes no separate selector-model call and adds no prompt or transcript storage.
+The integration fails open so ordinary work can continue when it is unavailable.
+See [decision-point retrieval](docs/decision-points.md) for the exact contract.
 
-## How v1.3.1 works
+## Platforms and limits
 
-Claude/Codex hooks provide lightweight discovery guidance. The active agent then
-uses the packaged native selector to retrieve eligible complete methods as needed.
-If the runtime is unavailable, a constrained reference-file fallback remains.
-Other hosts use the delivery paths below. OpenSocrates fails open when its
-integration is unavailable so ordinary work can continue.
-
-The release retains all **48 methods and 96 English/Korean procedure bodies**.
-Its writing policy is guidance, not automatic rewriting. See
-[decision-point retrieval and migration](docs/decision-points.md) for the exact
-selection, fallback and method-availability contracts.
-
-## Supported hosts
-
-| Host | Delivery and entry point | Details |
+| Platform | Package | Updates |
 | --- | --- | --- |
-| Claude Code / Cowork | Plugin discovery where hooks run; `/opensocrates:opensocrates` | [Claude support](docs/decision-points.md) |
-| Codex CLI / Desktop | Discovery after hook approval; `opensocrates` controller | [Delivery modes](docs/decision-points.md) |
-| OpenCode | Local same-turn bridge; native skill fallback | [OpenCode support](docs/opencode-support.md) |
-| Grok Build | Native skill selection or `/opensocrates` | [Grok support](docs/grok-support.md) |
-| Cursor | Agent Plugin skill discovery or explicit invocation | [Cursor support](docs/cursor-support.md) |
-| Google Antigravity | Explicit content skill | [Antigravity support](docs/antigravity-support.md) |
+| Apple-silicon macOS | Native runtime and `bin/launch.sh` | Manual; optional macOS LaunchAgent |
+| Windows x64 | Native `.exe` and `node bin/launch.mjs` | Manual only |
 
-Claude web and Desktop Chat use a **separate standalone skill ZIP**, not the local
-plugin hooks. Download it from the [v1.3.1 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.3.1)
-and follow the [Chat installation guide](docs/claude-chat-upload-probe.md).
+Windows does not require WSL or a Unix shell. Windows automatic updates,
+Windows ARM64, Windows 10, macOS Intel, and Linux native packages are not claimed
+as validated. Signing and SmartScreen reputation are unvalidated.
+See the [Windows guide](docs/windows-support.md).
 
-Chat standalone export: **archive contract validated; live activation unvalidated.**
+## Privacy and evidence
 
-## Privacy and support boundaries
+OpenSocrates runs locally, adds no product telemetry, and has no hosted backend or
+separate account. Your ordinary Codex model requests use Codex authentication and
+its service terms. Read [SECURITY.md](SECURITY.md) for integrity, rollback,
+permissions, and the retained legacy selector boundary.
 
-The integration runs locally, adds no product telemetry and has no OpenSocrates
-backend. Model requests still use your selected host service under its terms.
-No separate OpenSocrates account is required. Read [SECURITY.md](SECURITY.md)
-for the host trust boundaries and retained legacy adapter behavior.
+Package verification, hook delivery, complete reference reads, and actual method
+application are distinct evidence levels. No general quality, token-cost, or
+response-time improvement is claimed. Current release validation is tracked in
+[PR #93](https://github.com/ParkerHwang/OpenSocrates/pull/93) and the
+[release plan](docs/v1.4.0-release-plan.md); older evidence describes older versions.
 
-v1.3.1 fixes multi-line decision input and checks packaged examples before release. Package verification
-does not establish every host's live behavior or the model's actual application
-of a method. Synthetic tests include final-delivery timeouts and repetitive output;
-no general quality, naturalness, token-cost or response-time improvement is claimed.
-The complete [release evidence](docs/v1.3.1-release.md) and
-[publication verification](https://github.com/ParkerHwang/OpenSocrates/pull/92)
-retain the measured results and limitations.
-
-## More information
-
-- [Detailed installation, updates, removal and runtime behavior](docs/advanced-usage.md)
+- [Installation, updates, removal, and runtime reference](docs/advanced-usage.md)
 - [Authored method catalog](content/methods/)
 - [Changelog](CHANGELOG.md)
-- [Contributing and development checks](CONTRIBUTING.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Contributing](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
 
-OpenSocrates is [MIT licensed](LICENSE). It is an independent open-source project,
-not affiliated with or endorsed by its supported host providers.
+OpenSocrates is [MIT licensed](LICENSE), independent of OpenAI, and not endorsed
+by OpenAI.

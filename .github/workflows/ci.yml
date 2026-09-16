@@ -19,6 +19,10 @@ env:
   PYTHONDONTWRITEBYTECODE: "1"
 
 jobs:
+  windows:
+    name: Native Windows x64
+    uses: ./.github/workflows/windows.yml
+
   python-quality:
     name: Python quality
     runs-on: ubuntu-latest
@@ -87,8 +91,7 @@ jobs:
 
   package:
     # Runs on pull requests too. Skipping it here let CI go green while every
-    # new packaging surface -- the Claude and Codex native packages and the
-    # Claude Chat skills ZIP -- remained unbuilt and unverified.
+    # new packaging surface -- the Codex native package -- remained unbuilt and unverified.
     name: Native package (darwin-arm64)
     needs:
       - python-quality
@@ -116,7 +119,7 @@ jobs:
         env:
           OPENSOCRATES_EXPECTED_SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
         run: node tools/write_package_provenance.mjs
-      - name: Exercise all-host install in a fresh macOS runner
+      - name: Exercise Codex install in a fresh macOS runner
         run: npm test
       - name: Upload native package evidence
         if: always()

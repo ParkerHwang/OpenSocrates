@@ -11,6 +11,10 @@ if __name__ == "__main__":
     import multiprocessing
 
     multiprocessing.freeze_support()
+    if sys.platform == "win32":
+        for stream in (sys.stdin, sys.stdout, sys.stderr):
+            if stream is not None:
+                stream.reconfigure(encoding="utf-8", newline="\n")
     arguments = tuple(sys.argv[1:])
     if arguments in {("version",), ("version", "--json")}:
         import json

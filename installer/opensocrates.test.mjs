@@ -8,6 +8,7 @@ import {
   PURGE_RESULT_SCHEMA,
   assetNameFor,
   createPurgeResult,
+  errorCategory,
   isSafeArchivePath,
   markerMatches,
   parseChecksumText,
@@ -22,6 +23,31 @@ const codexTrustKey = (event, group = 0, handler = 0) =>
 const codexTrustSection = (event, newline = "\n") =>
   `[hooks.state.${JSON.stringify(codexTrustKey(event))}]${newline}` +
   `trusted_hash = "sha256:not-evidence"${newline}`;
+
+test("classifies target metadata and runtime layout failures as verification", () => {
+  assert.equal(
+    errorCategory(new InstallerError("package target metadata does not declare only darwin-arm64")),
+    "verification",
+  );
+  assert.equal(
+    errorCategory(new InstallerError("package runtime layout does not contain only windows-x64")),
+    "verification",
+  );
+  assert.equal(
+    errorCategory(
+      new InstallerError("package runtime layout is missing the executable windows-x64 runtime"),
+    ),
+    "verification",
+  );
+  assert.equal(
+    errorCategory(
+      new InstallerError(
+        "Codex package contains an unexpected native runtime or launcher surface",
+      ),
+    ),
+    "verification",
+  );
+});
 
 test("accepts safe package paths and rejects traversal", () => {
   assert.equal(isSafeArchivePath(".codex-plugin/plugin.json"), true);
@@ -43,70 +69,39 @@ test("parses the expected release checksum", () => {
 });
 
 test("derives host-specific release assets", () => {
-  assert.match(assetNameFor("antigravity"), /-antigravity-plugin\.zip$/u);
-  assert.match(assetNameFor("codex"), /-codex-plugin\.zip$/u);
-  assert.match(assetNameFor("claude"), /-claude-plugin\.zip$/u);
-  assert.match(assetNameFor("cursor"), /-cursor-plugin\.zip$/u);
-  assert.match(assetNameFor("grok"), /-grok-plugin\.zip$/u);
-  assert.throws(() => assetNameFor("unknown"), (error) => error instanceof InstallerError);
+  const nativeSuffix = process.platform === "win32" ? "-windows-x64" : "";
+  assert.equal(assetNameFor("codex"), `opensocrates-1.4.0-codex-plugin${nativeSuffix}.zip`);
+  for (const host of ["claude", "cursor", "grok", "opencode", "antigravity", "unknown"]) {
+    assert.throws(() => assetNameFor(host), InstallerError);
+    for (const action of ["install", "update", "status", "remove", "verify"]) {
+      assert.throws(() => parseCli([action, "--host", host]), InstallerError);
+    }
+    assert.throws(
+      () =>
+        parseCli([
+          "install",
+          "--host",
+          "all",
+          `--asset-${host}`,
+          "bundle.zip",
+          `--checksum-${host}`,
+          "sum",
+        ]),
+      InstallerError,
+    );
+  }
 });
 
 test("accepts only the exact ownership marker", () => {
-  assert.equal(
-    markerMatches(
-      {
-        schemaVersion: 1,
-        marketplaceName: "opensocrates",
-        pluginName: "opensocrates",
-        host: "cursor",
-        registrationKind: "file-drop",
-      },
-      "cursor",
-    ),
-    true,
-  );
-  assert.equal(
-    markerMatches(
-      {
-        schemaVersion: 1,
-        marketplaceName: "opensocrates",
-        pluginName: "opensocrates",
-        host: "antigravity",
-        registrationKind: "file-drop",
-      },
-      "antigravity",
-    ),
-    true,
-  );
-  assert.equal(
-    markerMatches({
-      schemaVersion: 1,
-      marketplaceName: "opensocrates",
-      pluginName: "opensocrates",
-    }),
-    true,
-  );
-  assert.equal(
-    markerMatches(
-      {
-        schemaVersion: 1,
-        marketplaceName: "opensocrates",
-        pluginName: "opensocrates",
-        host: "claude",
-      },
-      "claude",
-    ),
-    true,
-  );
-  assert.equal(
-    markerMatches({
-      schemaVersion: 1,
-      marketplaceName: "opensocrates",
-      pluginName: "opensocrates",
-      extra: true,
-    }),
-    false,
-  );
+  const marker = {
+    schemaVersion: 1,
+    marketplaceName: "opensocrates",
+    pluginName: "opensocrates",
+  };
+  assert.equal(markerMatches(marker), true);
+  assert.equal(markerMatches({ ...marker, extra: true }), false);
+  assert.equal(markerMatches({ ...marker, host: "claude" }), false);
+  assert.equal(markerMatches(marker, "claude"), false);
 });
 
 test("parses lifecycle actions and paired local asset options", () => {
@@ -115,13 +110,9 @@ test("parses lifecycle actions and paired local asset options", () => {
   assert.equal(defaults.host, "codex");
   assert.equal(defaults.asset, null);
   assert.equal(defaults.checksum, null);
-  const status = parseCli(["status", "--host", "claude"]);
+  const status = parseCli(["status", "--host", "codex"]);
   assert.equal(status.action, "status");
-  assert.equal(status.host, "claude");
-  assert.equal(parseCli(["status", "--host", "cursor"]).host, "cursor");
-  assert.equal(parseCli(["status", "--host", "grok"]).host, "grok");
-  const antigravity = parseCli(["status", "--host", "antigravity"]);
-  assert.equal(antigravity.host, "antigravity");
+  assert.equal(status.host, "codex");
   const parsed = parseCli(["verify", "--asset", "bundle.zip", "--checksum", "bundle.sha256"]);
   assert.equal(parsed.action, "verify");
   assert.equal(parsed.host, "codex");
@@ -152,7 +143,10 @@ test("parses lifecycle actions and paired local asset options", () => {
     ["install", "--purge", "--reset-trust"],
     ["remove", "--host", "claude", "--purge", "--reset-trust"],
   ]) {
-    assert.throws(() => parseCli(invalid), (error) => error instanceof InstallerError);
+    assert.throws(
+      () => parseCli(invalid),
+      (error) => error instanceof InstallerError,
+    );
   }
   assert.throws(
     () => parseCli(["install", "--host", "web"]),
@@ -162,17 +156,12 @@ test("parses lifecycle actions and paired local asset options", () => {
     "install",
     "--host",
     "all",
-    "--asset-claude",
-    "claude.zip",
-    "--checksum-claude",
-    "claude.sha256",
     "--asset-codex",
     "codex.zip",
     "--checksum-codex",
     "codex.sha256",
   ]);
   assert.equal(all.host, "all");
-  assert.equal(all.hostAssets.claude.asset.endsWith("claude.zip"), true);
   assert.equal(all.hostAssets.codex.checksum.endsWith("codex.sha256"), true);
   assert.throws(
     () => parseCli(["install", "--host", "all", "--asset", "bundle.zip", "--checksum", "sum"]),
@@ -181,12 +170,12 @@ test("parses lifecycle actions and paired local asset options", () => {
 });
 
 test("complete-uninstall results keep Codex trust as an explicit extension", () => {
-  const result = createPurgeResult(["codex", "claude"]);
+  const result = createPurgeResult(["codex"]);
   assert.equal(result.schema, PURGE_RESULT_SCHEMA);
   assert.equal(result.status, "pending");
   assert.deepEqual(
     result.hosts.map((item) => item.host),
-    ["claude", "codex"],
+    ["codex"],
   );
   assert.deepEqual(purgeExtensionResult("codex"), {
     component: "host-security-trust",
@@ -198,8 +187,11 @@ test("complete-uninstall results keep Codex trust as an explicit extension", () 
     status: "pending",
     nextAction: null,
   });
-  assert.equal(createPurgeResult(["codex"], { resetTrust: true }).hosts[0].extension.status, "pending");
-  assert.equal(purgeExtensionResult("claude").status, "not-applicable");
+  assert.equal(
+    createPurgeResult(["codex"], { resetTrust: true }).hosts[0].extension.status,
+    "pending",
+  );
+  assert.throws(() => purgeExtensionResult("claude"), InstallerError);
 });
 
 test("trust scanner removes exactly seven canonical sections and preserves every other byte", () => {
@@ -276,7 +268,7 @@ test("trust scanner preserves a UTF-8 BOM and every remaining byte", () => {
   const expected = Buffer.concat([
     bom,
     Buffer.from(
-      '\n\n# preserve exactly\r\n' +
+      "\n\n# preserve exactly\r\n" +
         '[hooks.state."other@market:hooks/hooks.json:stop:0:0"]\r\n' +
         'trusted_hash = "sha256:other"\r\n',
     ),

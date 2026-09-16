@@ -3,13 +3,20 @@
 from __future__ import annotations
 
 import os
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock as ThreadLock
 from typing import IO
 
-from .permissions import PermissionSecurityError, check_permissions
+from .permissions import (
+    PermissionSecurityError,
+    check_permissions,
+    create_owner_only_file,
+    discard_created_file,
+    open_owner_only_file,
+)
 
 
 class LockTimeoutError(TimeoutError):
@@ -34,11 +41,16 @@ class LockPolicy:
 
 def _open_lock(path: Path) -> IO[bytes]:
     path = Path(path)
-    flags = os.O_RDWR | os.O_CREAT
+    flags = os.O_RDWR
     no_follow = getattr(os, "O_NOFOLLOW", 0)
     flags |= no_follow
+    created = False
     try:
-        fd = os.open(path, flags, 0o600)
+        try:
+            fd = create_owner_only_file(path, flags=flags, share_delete=False)
+            created = True
+        except FileExistsError:
+            fd = open_owner_only_file(path, flags=flags, share_delete=False)
     except OSError as error:
         raise LockError("unable to open persistence lock") from error
     handle = os.fdopen(fd, "r+b", buffering=0)
@@ -47,6 +59,11 @@ def _open_lock(path: Path) -> IO[bytes]:
         if not report.write_allowed:
             raise PermissionSecurityError("lock path is not owner-only")
     except (PermissionError, OSError, PermissionSecurityError) as error:
+        if created:
+            try:
+                discard_created_file(handle.fileno(), path)
+            except OSError:
+                pass
         handle.close()
         raise LockError("persistence lock is not owner-only") from error
     return handle
@@ -64,8 +81,21 @@ class FileLock:
     def acquire(self) -> "FileLock":
         if self._locked:
             return self
-        handle = _open_lock(self.path)
         deadline = time.monotonic() + self.policy.timeout_seconds
+        while True:
+            try:
+                handle = _open_lock(self.path)
+                break
+            except LockError as error:
+                cause = error.__cause__
+                sharing_violation = sys.platform == "win32" and getattr(
+                    cause, "winerror", None
+                ) in {32, 33}
+                if not sharing_violation:
+                    raise
+                if time.monotonic() >= deadline:
+                    raise LockTimeoutError("persistence lock timeout") from error
+                time.sleep(min(self.policy.poll_seconds, max(0.0, deadline - time.monotonic())))
         try:
             while True:
                 if _try_lock(handle):
@@ -98,12 +128,12 @@ class FileLock:
 
 
 def _try_lock(handle: IO[bytes]) -> bool:
-    if os.name == "nt":
+    if sys.platform == "win32":
         import msvcrt
 
         handle.seek(0)
         try:
-            msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)  # type: ignore[attr-defined]
+            msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
             return True
         except OSError:
             return False
@@ -117,12 +147,12 @@ def _try_lock(handle: IO[bytes]) -> bool:
 
 
 def _unlock(handle: IO[bytes]) -> None:
-    if os.name == "nt":
+    if sys.platform == "win32":
         import msvcrt
 
         handle.seek(0)
         try:
-            msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)  # type: ignore[attr-defined]
+            msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
         except OSError:
             pass
         return

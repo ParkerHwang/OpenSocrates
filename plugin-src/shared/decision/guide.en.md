@@ -9,7 +9,7 @@ Load an upstream constraint before it affects a choice, regardless of phase name
 At each such point, use the smallest sufficient eligible set. Keep distinct
 questions as distinct decisions; a request may need several successive decisions.
 
-For Claude/Codex with a shell and the packaged native runtime available, use
+For Codex with a shell and the packaged native runtime available, use
 `bin/launch.sh decision <host>` at the package root FIRST. Send the `catalog`
 operation with `locale` to inspect routing metadata, then a `select` request for
 the current decision. Use `request.json` for the envelope and `features.json` for

@@ -86,7 +86,12 @@ def _read_authored_json(path: Path) -> Any:
     """Build-only authoring input; use the existing bounded regular-file reader."""
     from ..content.loader import _read_bounded_regular_file
 
-    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+    flags = (
+        os.O_RDONLY
+        | getattr(os, "O_BINARY", 0)
+        | getattr(os, "O_NOFOLLOW", 0)
+        | getattr(os, "O_NONBLOCK", 0)
+    )
     descriptor = os.open(path, flags)
     try:
         raw = _read_bounded_regular_file(descriptor, label="response policy source")

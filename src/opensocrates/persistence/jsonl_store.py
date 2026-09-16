@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import stat
 from dataclasses import dataclass
 from pathlib import Path
@@ -28,7 +27,11 @@ from .atomic import (
 )
 from .locks import FileLock, LockPolicy, LockTimeoutError
 from .paths import DataRoot, DataRootLayout, PathSecurityError, current_month
-from .permissions import PermissionManager, PermissionSecurityError
+from .permissions import (
+    PermissionManager,
+    PermissionSecurityError,
+    create_owner_only_directory,
+)
 from .quarantine import (
     QuarantineError,
     QuarantineReason,
@@ -193,12 +196,9 @@ class JsonlRecordStore:
         if not root_report.write_allowed or not records_report.write_allowed:
             raise RecordUnavailableError("record writes disabled by data-root permissions")
         try:
-            existed = month_dir.exists()
-            month_dir.mkdir(mode=0o700, exist_ok=True)
+            create_owner_only_directory(month_dir)
             if month_dir.is_symlink():
                 raise RecordUnavailableError("record partition may not be a symlink")
-            if not existed and os.name != "nt":
-                os.chmod(month_dir, 0o700)
         except (OSError, PermissionError) as error:
             raise RecordUnavailableError("record partition is unavailable") from error
         report = self.permissions.root_report(month_dir)

@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.4.0] - 2026-09-16
+
+- Focus OpenSocrates on Codex only. Remove Claude Code/Cowork/Chat,
+  Antigravity, Cursor, Grok Build and OpenCode runtime adapters, selectors,
+  templates, install choices and release archives. `--host all` now means Codex.
+- Preserve the 48 authored methods, all English/Korean procedures, native Codex
+  hooks, integrity checks, safe lifecycle rollback and explicit trust reset.
+- Reject retired-host desired state without changing it. Use the previous
+  installer version to remove retired integrations before updating Codex.
+- Codex 전용으로 전환하며 다른 호스트 연동과 배포 파일을 제거합니다. 48개 사고
+  방법과 영어·한국어 절차, 무결성·롤백·훅 신뢰 경계는 유지합니다. 이전 버전의
+  다른 호스트 설치는 해당 버전으로 제거한 다음 Codex를 업데이트해야 합니다.
+
+- Add native Windows x64 runtime archives, Node launcher and Windows CI builds.
+- Preserve SHA-256 inventories; reject Windows ZIP aliases, traversal and links before extraction.
+- Validate Windows owner ACLs, binary I/O, file locks and explicit manual-update behavior.
+- Keep macOS release gates; distinguish native package tests from authenticated host and Desktop delivery.
+- Windows x64 네이티브 배포·런처·CI, ACL·바이너리 입출력·잠금·ZIP 검사를 추가합니다. 자동 업데이트는 수동 실행 안내로 명시하며 실제 호스트와 Desktop 검증 범위를 구분합니다.
+
+See [Windows support](docs/windows-support.md) / [Windows 안내](docs/windows-support.ko.md).
+
 ## [1.3.0] - 2026-09-08
 
 - Add agent-directed method retrieval at decision points within an existing turn,

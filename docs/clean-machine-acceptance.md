@@ -1,115 +1,52 @@
 # Clean Apple-silicon Mac acceptance
 
-Use this procedure to test the current pull request on a real, newly configured
-Mac before merging. It installs into the authenticated user's default Claude
-Code and Codex homes; it is not a sandbox test.
+[한국어](clean-machine-acceptance.ko.md)
 
-This is a pre-release acceptance path. The candidate version may not yet be
-available from the public npm and GitHub Release endpoints, so the harness
-downloads the successful macOS package artifact built from the exact
-pull-request commit and passes those archives to the real packed npm installer.
-It proves the package, installer, two-host transaction, registration, managed
-layout, and status contract. It does not prove the final public registry and
-release download path; run the published one-line install separately after
-release.
+This procedure tests Codex on a real newly configured Mac. It uses the actual
+account's default Codex home. It is not an isolated fixture or same-machine
+reinstall. Existing OpenSocrates state, registrations, managed roots or updater
+files block the clean baseline.
 
-## Before you start
+Install Node.js 20+, Codex CLI, Git and GitHub CLI. Sign in to Codex and GitHub.
+Check out the current pull request and wait for successful native macOS CI at
+its exact head. The checkout must be clean.
 
-Use an Apple-silicon Mac that has never had a managed OpenSocrates installation.
-The harness refuses to overwrite an existing OpenSocrates state directory,
-LaunchAgent, managed marketplace, or host registration.
-
-Install and sign in to all prerequisites:
-
-- [Node.js](https://nodejs.org/en/download) 20 or later;
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code/getting-started)
-  2.1.205 or later, with `claude auth status` succeeding;
-- [Codex CLI](https://help.openai.com/en/articles/11381614-api-codex-cli-and-sign-in-with-chatgpt),
-  with `codex login status` succeeding;
-- [GitHub CLI](https://cli.github.com/manual/index), with `gh auth login`
-  completed; and
-- Git.
-
-Wait until the current pull request has a successful `CI` run for its latest
-commit. The harness rejects an older commit or an artifact from a different run.
-
-## Run the automated acceptance
-
-Open Terminal and run:
-
-```bash
+```sh
 gh repo clone ParkerHwang/OpenSocrates
 cd OpenSocrates
 gh pr checkout YOUR_PR_NUMBER
-git pull --ff-only
 node tools/clean_machine_acceptance.mjs
 ```
 
-The checkout must be clean. The harness then:
+The harness verifies architecture, authentication and the unused baseline;
+binds the PR, CI run and native artifact to the exact commit; checks the Codex
+archive against the combined manifest; and packs the nine-file npm installer.
+It installs Codex from these candidate bytes, checks desired state, registration,
+managed layout and status, and writes a privacy-safe report. It does not enable
+automatic updates or prove the public npm/GitHub download path. After publication,
+that path needs a separate check.
 
-1. verifies default paths, Apple-silicon macOS, tool versions, and host logins;
-2. proves that no previous managed OpenSocrates installation exists;
-3. pins the checkout, pull request, CI run, and native artifact to one commit;
-4. verifies the Claude and Codex archive hashes from the combined release
-   manifest;
-5. packs this checkout as an npm package and installs both hosts in one real
-   transaction;
-6. checks private desired state, exact host registrations, package versions,
-   Claude's single public plugin skill with canonical command
-   `/opensocrates:opensocrates`, and all-host drift status; and
-7. writes a privacy-safe result directory under your home directory.
+Complete the two categorical fields in the printed `manual-observations.md`:
+Codex plugin recognition and host runtime loading. Use a fresh interactive Codex
+task, review its OpenSocrates hooks, and record observed results only. Change
+`PENDING` to `PASS` or `FAIL`; add no free-form text, raw output, prompts,
+transcripts, identities, credentials or local paths. Run the printed `--pack`
+command. The ZIP contains only `result.json`, `result.md` and
+`manual-observations.md`.
 
-It does not enable automatic updates, upload results, store raw command output,
-or include prompts, transcripts, authentication identity, credentials, or
-absolute local paths in the report. Temporary CI and npm files are deleted when
-the run ends.
+A checksum or baseline failure blocks installation. Registration failure attempts
+rollback; a post-install assertion failure leaves state available for diagnosis.
+A failure bundle is produced automatically. A package check alone is not live
+hook or method-application evidence.
 
-## Complete the manual checks and share the result
+To remove the test installation after collecting the result, close Codex and run:
 
-When automation passes, the harness prints the path to
-`manual-observations.md`. Open that file and complete its four checks in fresh
-Claude Code and Codex tasks.
-
-For the Claude Local check, use `/opensocrates:opensocrates`; a bare
-`/opensocrates` can resolve to a standalone user, project, or synced skill and
-does not prove that the installed plugin answered. The standalone Claude Chat
-ZIP and its canonical `/opensocrates` command are outside this local plugin
-acceptance.
-
-Change every:
-
-```text
-PENDING
+```sh
+node installer/opensocrates.mjs remove --host codex --purge
+# Only when resetting the seven exact OpenSocrates hook approvals is intended:
+node installer/opensocrates.mjs remove --host codex --purge --reset-trust
 ```
 
-to either `PASS` or `FAIL`. Do not add notes or paste prompts, transcripts,
-account names, credentials, or local paths; the pack command rejects changes
-outside the four result fields.
-
-Run the exact `--pack` command printed by the harness. It creates a ZIP next to
-the result directory. Attach that ZIP to the Codex task handling the current
-pull request; the report contains enough commit, CI, integrity, installation,
-and status evidence for the maintainer to evaluate the test.
-
-If automation fails, the harness creates the privacy-safe ZIP immediately.
-Attach it without copying authentication output. A checksum or clean-baseline
-failure blocks installation; the all-host installer rolls back hosts already
-changed when activation fails. A post-install assertion failure leaves the
-managed state available for diagnosis.
-
-## Remove the test installation
-
-After the result has been collected, close Claude Code and Codex, then remove
-both registrations and every provably OpenSocrates-owned installed payload:
-
-```bash
-node installer/opensocrates.mjs remove --host all --purge
-# Opt in to resetting only the seven OpenSocrates Codex hook approvals:
-node installer/opensocrates.mjs remove --host all --purge --reset-trust
-```
-
-If a live host still owns a cache, purge reports an incomplete result instead
-of claiming success. Close the host and rerun the same command. Purge does not
-sign out of Claude Code, Codex, or GitHub CLI. It preserves Codex hook trust
-unless `--reset-trust` is explicitly supplied, and always preserves unrelated
-host configuration and user history.
+A live cache keeps purge incomplete. Do not report success until the named
+process is closed and the command completes. Authentication, user history and
+unrelated configuration remain intact. Purge does not restore removed caches.

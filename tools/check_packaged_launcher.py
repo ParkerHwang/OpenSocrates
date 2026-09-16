@@ -24,7 +24,7 @@ from collections.abc import Iterator, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-HOSTS = ("claude", "codex")
+HOSTS = ("codex",)
 RUNTIME_LEAF = ("opensocrates-runtime", "opensocrates-runtime")
 LAUNCHER = ("bin", "launch.sh")
 STDOUT_TOKEN = "opensocrates-packaged-launcher-stdout\n"
@@ -682,14 +682,7 @@ def check_root(root: Path) -> dict[str, Any]:
                         f"{host} distributable integrity was not verified",
                     )
                     host_result[label]["integrity"] = dict(integrity)
-                    if host == "claude":
-                        _assert_integrity_tamper_detection(
-                            package,
-                            host,
-                            target,
-                            runtime_output=runtime_output,
-                        )
-                        host_result[label]["tamper_mismatch_detected"] = True
+                    pass
             except CheckFailure as failure:
                 host_result[label] = {"error": str(failure)}
                 errors.append(f"{host}_{label}_packaged_launcher_unreachable")

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import stat
+import sys
 import threading
 from dataclasses import dataclass, field
 from enum import StrEnum
@@ -108,6 +109,8 @@ def _relative_parts(value: str, *, allow_empty: bool) -> tuple[str, ...] | None:
 
 
 def _open_flags(*, directory: bool) -> int | None:
+    if sys.platform == "win32":
+        return None
     required: tuple[str, ...] = ("O_CLOEXEC", "O_NOFOLLOW")
     if directory:
         required += ("O_DIRECTORY",)
@@ -298,6 +301,8 @@ class SelectorContextAccessor:
             if not stat.S_ISREG(info.st_mode) or offset > info.st_size:
                 return None
             requested = min(MAX_CONTEXT_READ_BYTES, remaining)
+            if sys.platform == "win32":
+                return None  # Legacy on-demand context requires POSIX handle semantics.
             data = os.pread(descriptor, requested, offset)
         except OSError:
             return None

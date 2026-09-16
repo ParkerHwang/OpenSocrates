@@ -13,16 +13,19 @@ from typing import Any
 
 from release_identity import remote_tag_commit
 
-HOSTS = ("antigravity", "claude", "codex", "cursor", "grok", "opencode")
+HOSTS = ("codex",)
 
 
 def expected_asset_names(version: str) -> set[str]:
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
         raise ValueError("invalid release version")
     zips = {f"opensocrates-{version}-{host}-plugin.zip" for host in HOSTS}
-    zips.add(f"opensocrates-{version}-claude-chat-skills.zip")
+    windows = tuple(map(int, version.split("."))) >= (1, 4, 0)
+    if windows:
+        zips.update(f"opensocrates-{version}-{host}-plugin-windows-x64.zip" for host in ("codex",))
     return (
-        zips
+        ({"windows.ps1"} if windows else set())
+        | zips
         | {name + ".sha256" for name in zips}
         | {
             f"opensocrates-{version}-release-manifest.json",
@@ -135,7 +138,7 @@ def main() -> int:
         )
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2) + "\n")
-    print("public release verification: PASS (immutable GitHub release, 19 exact assets and tag)")
+    print("public release verification: PASS (immutable GitHub release, exact assets and tag)")
     return 0
 
 

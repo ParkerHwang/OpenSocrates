@@ -2,9 +2,8 @@
 """Run the bounded release security gate.
 
 The runtime is standard-library-only except for the deliberately isolated
-host-native selector boundaries.  Codex uses its pinned SDK in a fresh worker;
-Claude uses one tightly constrained, non-persistent ``claude -p`` subprocess.
-This checker verifies those exceptions, the shared artifact/isolation
+Codex selector boundary. Codex uses its pinned SDK in a fresh worker.
+This checker verifies that exception, the shared artifact/isolation
 contracts, dependency and SBOM consistency, and fixed generated launcher
 commands.  It records only counts and stable reason codes, never source paths
 or source contents.
@@ -79,8 +78,7 @@ _SAFE_LAUNCH_EVENTS = {
     "tool_succeeded",
     "user_prompt_submitted",
 }
-_SAFE_HOSTS = {"claude", "codex"}
-_CLAUDE_SELECTOR_RELATIVE = "selector/claude_cli.py"
+_SAFE_HOSTS = {"codex"}
 _SELECTOR_DIRECTORY = Path("src/opensocrates/selector")
 _SELECTOR_REQUIRED_MODULES = frozenset(
     {
@@ -226,7 +224,7 @@ def _import_findings(tree: ast.AST) -> tuple[int, int, int]:
     return external, network, dynamic_import
 
 
-def _call_findings(tree: ast.AST, *, allow_claude_selector_process: bool = False) -> dict[str, int]:  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
+def _call_findings(tree: ast.AST) -> dict[str, int]:  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     findings = {
         "dynamic_execution": 0,
         "shell_execution": 0,
@@ -286,17 +284,7 @@ def _call_findings(tree: ast.AST, *, allow_claude_selector_process: bool = False
             ):
                 findings["shell_execution"] += 1
             if owner == "subprocess":
-                shell = next(
-                    (keyword.value for keyword in node.keywords if keyword.arg == "shell"),
-                    None,
-                )
-                bounded_claude_process = (
-                    allow_claude_selector_process
-                    and name == "Popen"
-                    and not (isinstance(shell, ast.Constant) and shell.value is True)
-                )
-                if not bounded_claude_process:
-                    findings["shell_execution"] += 1
+                findings["shell_execution"] += 1
             if name in {"connect", "create_connection", "urlopen"} or (
                 owner in {"requests", "httpx", "socket", "urllib", "urllib_request"}
                 and name in {"get", "post", "put", "request", "open"}
@@ -593,11 +581,7 @@ def _scan_production(root: Path) -> dict[str, Any]:  # noqa: C901  # Branch-expl
         totals["external_imports"] += external
         totals["network_imports"] += network
         totals["dynamic_imports"] += dynamic_import
-        relative = path.relative_to(source).as_posix()
-        findings = _call_findings(
-            tree,
-            allow_claude_selector_process=relative == _CLAUDE_SELECTOR_RELATIVE,
-        )
+        findings = _call_findings(tree)
         for key, value in findings.items():
             totals[key] += value
     violations = sum(value for key, value in totals.items() if key not in {"production_files"})
@@ -695,7 +679,6 @@ def _runtime_sdk_import_boundary_check(  # noqa: C901  # Closed runtime SDK boun
         except (OSError, UnicodeError, SyntaxError):
             errors.add("production_parse_error")
             continue
-        relative = path.relative_to(source).as_posix()
 
         class Visitor(ast.NodeVisitor):
             def __init__(self, module_relative: str) -> None:
@@ -735,7 +718,7 @@ def _runtime_sdk_import_boundary_check(  # noqa: C901  # Closed runtime SDK boun
                             errors.add("selector_sdk_import_outside_worker")
                 self.generic_visit(node)
 
-        Visitor(relative).visit(tree)
+        Visitor(path.relative_to(source).as_posix()).visit(tree)
     return errors
 
 
@@ -1194,7 +1177,7 @@ def _instruction_artifact_check(modules: Mapping[str, ast.Module]) -> set[str]:
         and _literal_int(_keyword_value(call, "mode")) == 0o700
         for call in calls
     ) and any(
-        _call_chain(call) == ("os", "chmod")
+        _call_chain(call) == ("os", "fchmod")
         and _literal_int(call.args[1] if len(call.args) > 1 else None) == 0o700
         for call in calls
     )
@@ -1398,123 +1381,6 @@ def _selector_hook_boundary_check(root: Path) -> set[str]:
     return errors
 
 
-def _claude_cli_selector_check(root: Path) -> set[str]:  # noqa: C901  # Closed CLI boundary.
-    """Verify the only permitted production subprocess boundary."""
-
-    tree = _parse_extra_module(root, f"src/opensocrates/{_CLAUDE_SELECTOR_RELATIVE}")
-    if tree is None:
-        return {"claude_selector_source_missing"}
-    errors: set[str] = set()
-    command = _class_method(tree, "ClaudeCliReasoningSelector", "_command")
-    select = _class_method(tree, "ClaudeCliReasoningSelector", "select")
-    environment = _top_level_function(tree, "_selector_environment")
-    worker_request = _top_level_function(tree, "_worker_request")
-    terminate = _top_level_function(tree, "_terminate_process")
-    bounded_communication = _top_level_function(tree, "_communicate_bounded")
-    required_flags = {
-        "--safe-mode",
-        "-p",
-        "--no-session-persistence",
-        "--output-format",
-        "json",
-        "--json-schema",
-        "--tools",
-        "",
-        "--disallowedTools",
-        "mcp__*",
-        "--strict-mcp-config",
-        "--permission-mode",
-        "dontAsk",
-        "--max-turns",
-        "1",
-        "--effort",
-        "medium",
-        "--system-prompt",
-    }
-    command_literals = {
-        child.value
-        for child in ast.walk(command or ast.Pass())
-        if isinstance(child, ast.Constant) and isinstance(child.value, str)
-    }
-    if not required_flags.issubset(command_literals):
-        errors.add("claude_selector_cli_flags_invalid")
-    popen_calls = [
-        call for call in _function_calls(select) if _call_chain(call) == ("subprocess", "Popen")
-    ]
-    if len(popen_calls) != 1:
-        errors.add("claude_selector_process_boundary_invalid")
-    else:
-        popen = popen_calls[0]
-        required_pipes = {
-            "stdin": ("subprocess", "PIPE"),
-            "stdout": ("subprocess", "PIPE"),
-            "stderr": ("subprocess", "DEVNULL"),
-        }
-        if any(
-            not _call_has_keyword_chain(popen, name, expected)
-            for name, expected in required_pipes.items()
-        ):
-            errors.add("claude_selector_standard_stream_boundary_invalid")
-        if _keyword_value(popen, "cwd") is None or not _node_has_name(
-            _keyword_value(popen, "env") or ast.Pass(), "_selector_environment"
-        ):
-            errors.add("claude_selector_environment_boundary_invalid")
-        shell = _keyword_value(popen, "shell")
-        if shell is not None:
-            errors.add("claude_selector_shell_mode_present")
-        start_session = _keyword_value(popen, "start_new_session")
-        if start_session is None or not _node_has_string(start_session, "posix"):
-            errors.add("claude_selector_process_isolation_missing")
-    communicate_calls = [
-        call for call in _function_calls(select) if _call_chain(call) == ("_communicate_bounded",)
-    ]
-    if not any(
-        _node_has_name(_keyword_value(call, "timeout") or ast.Pass(), "deadline_seconds")
-        for call in communicate_calls
-    ):
-        errors.add("claude_selector_deadline_missing")
-    if (
-        bounded_communication is None
-        or not _node_has_name(bounded_communication, "_MAX_CLI_RESPONSE_BYTES")
-        or not _function_has_call(bounded_communication, ("time", "monotonic"))
-        or not _function_has_call(bounded_communication, ("_terminate_process",))
-    ):
-        errors.add("claude_selector_stdout_bound_missing")
-    if not _function_has_call(select, ("tempfile", "TemporaryDirectory")) or not any(
-        _call_chain(call) == ("os", "chmod")
-        and _literal_int(call.args[1] if len(call.args) > 1 else None) == 0o700
-        for call in _function_calls(select)
-    ):
-        errors.add("claude_selector_private_working_directory_missing")
-    if (
-        environment is None
-        or not all(
-            _node_has_string(environment, value)
-            for value in (
-                "ANTHROPIC_API_KEY",
-                "CLAUDE_CODE_SKIP_PROMPT_HISTORY",
-                "1",
-            )
-        )
-        or not _node_has_name(environment, "SELECTOR_RECURSION_ENV")
-    ):
-        errors.add("claude_selector_environment_boundary_invalid")
-    if worker_request is None or not any(
-        isinstance(node, ast.keyword)
-        and node.arg == "transcript_access_enabled"
-        and _is_literal_bool(node.value, False)
-        for node in ast.walk(worker_request)
-    ):
-        errors.add("claude_selector_context_boundary_invalid")
-    if (
-        terminate is None
-        or not all(_node_has_attribute(terminate, value) for value in ("SIGTERM", "SIGKILL"))
-        or not _function_has_call(terminate, ("os", "killpg"))
-    ):
-        errors.add("claude_selector_process_cleanup_missing")
-    return errors
-
-
 def _selector_boundary_check(root: Path) -> dict[str, Any]:
     modules, errors = _parse_selector_modules(root)
     if errors:
@@ -1535,7 +1401,6 @@ def _selector_boundary_check(root: Path) -> dict[str, Any]:
     artifact_errors = _instruction_artifact_check(modules)
     unapproved_writes, persistence_errors = _selector_persistence_check(modules)
     hook_errors = _selector_hook_boundary_check(root)
-    claude_errors = _claude_cli_selector_check(root)
     errors.update(sdk_errors)
     errors.update(runtime_sdk_errors)
     errors.update(process_errors)
@@ -1546,7 +1411,6 @@ def _selector_boundary_check(root: Path) -> dict[str, Any]:
     errors.update(artifact_errors)
     errors.update(persistence_errors)
     errors.update(hook_errors)
-    errors.update(claude_errors)
     return {
         "status": "fail" if errors else "pass",
         "selector_modules_checked": len(modules),
@@ -1772,8 +1636,7 @@ def _sbom_check(root: Path) -> dict[str, Any]:  # noqa: C901  # Closed SBOM clos
 def _launcher_command(value: object, host: str) -> bool:
     if not isinstance(value, str):
         return False
-    if host == "claude":
-        return value == "${CLAUDE_PLUGIN_ROOT}/bin/launch.sh"
+    pass
     prefix = "${PLUGIN_ROOT}"
     pieces = value.split()
     if len(pieces) == 4 and pieces[:3] == [f"{prefix}/bin/launch.sh", "hook", host]:
@@ -1790,29 +1653,6 @@ def _iter_command_values(value: object) -> Iterable[object]:
     elif isinstance(value, list):
         for child in value:
             yield from _iter_command_values(child)
-
-
-def _claude_hook_specs(value: object) -> Iterable[Mapping[str, Any]]:
-    if isinstance(value, Mapping):
-        if "command" in value:
-            yield value
-        for child in value.values():
-            yield from _claude_hook_specs(child)
-    elif isinstance(value, list):
-        for child in value:
-            yield from _claude_hook_specs(child)
-
-
-def _claude_hook_spec_valid(value: Mapping[str, Any]) -> bool:
-    args = value.get("args")
-    return (
-        _launcher_command(value.get("command"), "claude")
-        and isinstance(args, list)
-        and len(args) == 3
-        and args[:2] == ["hook", "claude"]
-        and args[2] in _SAFE_LAUNCH_EVENTS
-        and all(isinstance(item, str) for item in args)
-    )
 
 
 def _codex_user_prompt_timeout_omitted(document: Mapping[str, Any]) -> bool:
@@ -1862,14 +1702,9 @@ def _launcher_check(root: Path) -> dict[str, Any]:  # noqa: C901  # Branch-expli
             errors.add("generated_hooks_invalid")
             continue
         hosts_checked += 1
-        if host == "claude":
-            specs = list(_claude_hook_specs(document))
-            commands_checked += len(specs)
-            invalid += sum(not _claude_hook_spec_valid(spec) for spec in specs)
-        else:
-            values = list(_iter_command_values(document))
-            commands_checked += len(values)
-            invalid += sum(not _launcher_command(value, host) for value in values)
+        values = list(_iter_command_values(document))
+        commands_checked += len(values)
+        invalid += sum((not _launcher_command(value, host) for value in values))
         if host == "codex" and not _codex_user_prompt_timeout_omitted(document):
             errors.add("generated_codex_user_prompt_timeout_not_omitted")
         generator = _load_json(root / "plugin-src" / host / "generator.json")
@@ -1894,7 +1729,7 @@ def _launcher_check(root: Path) -> dict[str, Any]:  # noqa: C901  # Branch-expli
                 except (OSError, UnicodeError):
                     errors.add("generated_launcher_surface_unreadable")
                     continue
-                prefix = "${CLAUDE_PLUGIN_ROOT}" if host == "claude" else "${PLUGIN_ROOT}"
+                prefix = "${PLUGIN_ROOT}"
                 for line in text.splitlines():
                     if "launch.sh" not in line:
                         continue

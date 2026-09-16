@@ -37,7 +37,15 @@ function git(args, cwd) {
 function syncEntry(target) {
   const descriptor = openSync(target, "r");
   try {
-    fsyncSync(descriptor);
+    try {
+      fsyncSync(descriptor);
+    } catch (error) {
+      // Node exposes directory handles on Windows, but FlushFileBuffers on a
+      // directory is unsupported and reports EPERM. The receipt file itself is
+      // still fsynced before the atomic rename; keep every other sync failure
+      // fail-closed, including EPERM on platforms where directory fsync exists.
+      if (!(process.platform === "win32" && error?.code === "EPERM")) throw error;
+    }
   } finally {
     closeSync(descriptor);
   }

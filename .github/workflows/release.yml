@@ -14,8 +14,12 @@ env:
   PYTHONDONTWRITEBYTECODE: "1"
 
 jobs:
+  windows:
+    uses: ./.github/workflows/windows.yml
+
   release:
     name: Build and publish release
+    needs: windows
     if: >-
       startsWith(github.ref, 'refs/tags/') ||
       github.event_name == 'workflow_dispatch' ||
@@ -104,7 +108,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for host in antigravity claude codex cursor grok opencode; do
+          for host in codex; do
             asset="opensocrates-${RELEASE_VERSION}-${host}-plugin.zip"
             (
               cd dist
@@ -112,23 +116,22 @@ jobs:
             )
           done
           node installer/opensocrates.mjs verify --host all \
-            --asset-antigravity "dist/opensocrates-${RELEASE_VERSION}-antigravity-plugin.zip" \
-            --checksum-antigravity "dist/opensocrates-${RELEASE_VERSION}-antigravity-plugin.zip.sha256" \
-            --asset-claude "dist/opensocrates-${RELEASE_VERSION}-claude-plugin.zip" \
-            --checksum-claude "dist/opensocrates-${RELEASE_VERSION}-claude-plugin.zip.sha256" \
             --asset-codex "dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip" \
-            --checksum-codex "dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip.sha256" \
-            --asset-cursor "dist/opensocrates-${RELEASE_VERSION}-cursor-plugin.zip" \
-            --checksum-cursor "dist/opensocrates-${RELEASE_VERSION}-cursor-plugin.zip.sha256" \
-            --asset-grok "dist/opensocrates-${RELEASE_VERSION}-grok-plugin.zip" \
-            --checksum-grok "dist/opensocrates-${RELEASE_VERSION}-grok-plugin.zip.sha256" \
-            --asset-opencode "dist/opensocrates-${RELEASE_VERSION}-opencode-plugin.zip" \
-            --checksum-opencode "dist/opensocrates-${RELEASE_VERSION}-opencode-plugin.zip.sha256"
-          chat_asset="opensocrates-${RELEASE_VERSION}-claude-chat-skills.zip"
-          (
-            cd dist
-            shasum -a 256 "${chat_asset}" > "${chat_asset}.sha256"
-          )
+            --checksum-codex "dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip.sha256"
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: windows-packages-${{ github.sha }}
+          path: dist/
+      - name: Verify Windows asset transport
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd dist
+          for checksum in *-windows-x64.zip.sha256; do shasum -a 256 -c "$checksum"; done
+          cp ../installer/windows.ps1 windows.ps1
+          cd ..
+          .venv/bin/python tools/merge_windows_release.py
 
       - name: Upload release evidence
         if: always()
@@ -146,36 +149,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          antigravity_asset="dist/opensocrates-${RELEASE_VERSION}-antigravity-plugin.zip"
-          claude_asset="dist/opensocrates-${RELEASE_VERSION}-claude-plugin.zip"
-          chat_asset="dist/opensocrates-${RELEASE_VERSION}-claude-chat-skills.zip"
           codex_asset="dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip"
-          cursor_asset="dist/opensocrates-${RELEASE_VERSION}-cursor-plugin.zip"
-          grok_asset="dist/opensocrates-${RELEASE_VERSION}-grok-plugin.zip"
-          opencode_asset="dist/opensocrates-${RELEASE_VERSION}-opencode-plugin.zip"
           manifest="dist/opensocrates-${RELEASE_VERSION}-release-manifest.json"
           limitations="dist/opensocrates-${RELEASE_VERSION}-limitations.json"
           sbom="dist/opensocrates-${RELEASE_VERSION}-sbom.spdx.json"
           release_assets=(
-            "${antigravity_asset}"
-            "${antigravity_asset}.sha256"
-            "${claude_asset}"
-            "${claude_asset}.sha256"
-            "${chat_asset}"
-            "${chat_asset}.sha256"
             "${codex_asset}"
             "${codex_asset}.sha256"
-            "${cursor_asset}"
-            "${cursor_asset}.sha256"
-            "${grok_asset}"
-            "${grok_asset}.sha256"
-            "${opencode_asset}"
-            "${opencode_asset}.sha256"
             "${manifest}"
             "${limitations}"
             "${sbom}"
             "dist/opensocrates-${RELEASE_VERSION}-checksums.sha256"
             "installer/opensocrates.mjs"
+            "dist/windows.ps1"
+            "dist/opensocrates-${RELEASE_VERSION}-codex-plugin-windows-x64.zip"
+            "dist/opensocrates-${RELEASE_VERSION}-codex-plugin-windows-x64.zip.sha256"
           )
           if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
             echo "Release collision: ${RELEASE_TAG} already exists; refusing overwrite." >&2

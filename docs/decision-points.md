@@ -1,6 +1,6 @@
 # Decision-point retrieval and migration
 
-Status: v1.3.1 patch release; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
+Status: v1.4.0 Codex-only release; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
 Experimental content revision 2, method variants, language rewrites and Compact
 policies have not been promoted. Method IDs remain unchanged.
 
@@ -12,14 +12,13 @@ wait for another user message. It links locale-specific decision guides, compact
 routing metadata and exact complete canonical instructions. Do not load a method
 for mechanical steps. Upstream constraints must be read before they affect a choice.
 
-When the packaged runtime and shell are available, Claude/Codex use native
+When the packaged runtime and shell are available, Codex use native
 `catalog` and `select` first. Include known missing prerequisites in the closed
 features, use a separate decision identity for a distinct question, and leave
 `explicit_method` null unless the user explicitly requested a method. An empty
 eligible set is valid, not a reason to bypass eligibility with file lookup.
 Runtime/shell unavailability or failure permits the existing complete-reference
-fallback with the same contraindications and global constraints. Other hosts
-retain their file path. This is guided host behavior; the selector does not
+fallback with the same contraindications and global constraints. This is guided host behavior; the selector does not
 verify feature classification, freeform semantics or actual method application.
 
 For multiple questions, retain a separate public conclusion, missing inputs and
@@ -28,22 +27,21 @@ shared only when an explicit dependency justifies sharing them. Reading a method
 to establish that it cannot apply does not activate its output requirements for
 another question or justify citing it as applied.
 
-The installed Claude/Codex package exposes:
+The installed Codex package exposes:
 
 ```sh
 cat skills/opensocrates/references/decision/request.json | ./bin/launch.sh decision codex
 ```
 
 Replace the example's closed features and opaque context handle with the current
-judgment; do not insert prose, paths or instructions into routing fields. Use
-`claude` for its package. The source checkout supports:
+judgment; do not insert prose, paths or instructions into routing fields. The source checkout supports:
 
 ```sh
 PYTHONPATH=src .venv/bin/python -m opensocrates decision --stream
 ```
 
 The installed launcher also supports `./bin/launch.sh decision codex --stream`
-(or `claude`). Keep that one process open for acknowledgments; repeated one-shot
+Keep that one process open for acknowledgments; repeated one-shot
 launcher calls cannot share availability state. The stream accepts one JSON object per line. `select` uses the existing routing
 feature schema; one judgment uses its established primary/optional-complement
 pair (0/1/2). Multiple distinct judgment needs can be evaluated successively
@@ -79,11 +77,6 @@ to one-shot mode are malformed rather than silently treated as a stream.
 | Host | New in-turn delivery | Evidence level |
 | --- | --- | --- |
 | Codex | Native CLI first with scoped reference fallback | v1.3.0 P11 observed one in-request native selection and complete reference delivery; submit-hook delivery, semantic classification, application and GUI remain unverified; see the versioned matrix below |
-| Claude | Agent CLI where shell is available; reference lookup otherwise | Package/runtime contracts; new live flow unverified |
-| Antigravity | Agent reference lookup | Generated package contracts only |
-| Cursor | Agent reference lookup | Generated package contracts only |
-| Grok | Agent reference lookup | Generated package contracts only |
-| OpenCode | Agent reference lookup; existing initial bridge preserved | Package/bridge regression only; no new automatic decision hook |
 
 ### Versioned v1.3.0 verification matrix
 
@@ -97,7 +90,6 @@ Do not promote evidence from one row into another.
 | Submission/discovery hook | v1.3.0 Codex package | Hook declarations, launcher behavior, timing and seven locally approved command hashes were checked; no live Codex hook-delivery receipt was captured. | A configured or approved hook is not proof that Codex delivered its output into a task. |
 | In-request decision path | P11 source `32d0322`, native Codex archive `sha256:f51be7c9ce4df606e8df98ed4446377e490d2894c8efaa80ed87e6888044031e` | One actual native invocation selected `critical-thinking`; complete `critical-thinking` and `socratic-questioning` references and final delivery were observed. | No complete request literal remained, so feature classification is unverified. Selection, delivery, `agent_reported` reading and application are distinct; `applied` is `unverified`. Final delivery was 384.58s, so the primary 300s result remains a deadline. See [P11 limits](../evals/v1.3/release-guided-20260908/native-verification/observation-limits.json). |
 | Codex Desktop GUI | v1.3.0 | Unvalidated. | CLI/package evidence does not establish GUI behavior. |
-| Claude Chat cloud upload/activation | v1.3.0 Chat ZIP | Export, layout and reference integrity validated; upload and activation unvalidated. | Local package state cannot establish account-level cloud activation. |
 
 A user-submission hook observes initial submission, not every later decision.
 No tool hook can guarantee detection of reasoning-only transitions. The v1.3 default
@@ -131,10 +123,24 @@ with truncation/omission possible. We do not infer live discovery from file coun
 ## Local preparation and rollback
 
 Use `make bootstrap`, `make generate` and the full `CONTRIBUTING.md` validation
-suite. `make release-check` builds isolated local native packages; it does not
-install them in the active host. Missing release-specific Claude Chat evidence
-must remain a failed gate. Clean-machine installation and held-out independent
-quality evaluation remain release conditions, not claims made by local tests.
-The original worktrees are preserved and the new branch is isolated. Do not replace
-an active host mid-task; use a separate approved profile or a later normal installer
-transaction, whose rollback contract is unchanged.
+suite. `make release-check` builds isolated Codex native packages; it does not
+install them in the active host. Validate live delivery separately and preserve
+unknown results. A used machine does not establish clean-machine acceptance;
+offline checks do not establish answer-quality improvement. Use a separate
+profile or a normal installer transaction for host validation and retain its
+rollback evidence.
+
+## Launcher sessions and hook cleanup
+
+The installed launcher also accepts `./bin/launch.sh decision codex --stream`.
+Keep the same process to reuse an availability declaration; separate invocations
+start with empty state.
+
+Discovery-only hooks do not construct the full content/storage services or create
+new product data roots and installation keys. They read only an existing safe
+owner-only key for bounded legacy cleanup, retaining session cleanup and the
+24-hour crash-leftover expiry. Missing, unsafe or read-only roots are skipped;
+normal work continues without creating or repairing them. Product data paths
+use the OS home, so CODEX_HOME alone does not isolate a hook test. Check OS home,
+temporary directories and workspace artifact boundaries before testing. Existing
+control and diagnostic storage contracts remain unchanged.

@@ -12,11 +12,17 @@ import json
 import multiprocessing
 import os
 import signal
+import sys
 import threading
 import time
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from multiprocessing.connection import Connection, wait
+from multiprocessing.connection import wait
+
+if sys.platform == "win32":
+    from multiprocessing.connection import PipeConnection as Connection
+else:
+    from multiprocessing.connection import Connection
 from multiprocessing.process import BaseProcess
 
 from ..domain.models import SelectionCatalog
@@ -104,11 +110,11 @@ def _refresh_group_ready(record: _WorkerRecord) -> bool:
         return record.group_ready
 
 
-def _signal_worker(record: _WorkerRecord, requested_signal: signal.Signals) -> None:
+def _signal_worker(record: _WorkerRecord, requested_signal: int) -> None:
     process = record.process
     try:
         pid = process.pid
-        if os.name == "posix" and pid is not None and _refresh_group_ready(record):
+        if sys.platform != "win32" and pid is not None and _refresh_group_ready(record):
             os.killpg(pid, requested_signal)
         elif process.is_alive() and requested_signal == signal.SIGTERM:
             process.terminate()
@@ -160,7 +166,7 @@ def _cancel_and_reap(record: _WorkerRecord, *, kill_at: float, hard_deadline: fl
     remaining = max(0.0, kill_at - time.monotonic())
     wait((process.sentinel,), timeout=remaining)
     if process.is_alive():
-        _signal_worker(record, signal.SIGKILL)
+        _signal_worker(record, getattr(signal, "SIGKILL", 9))
     _join_until(process, hard_deadline)
 
 
@@ -199,12 +205,12 @@ def _supervise_worker(
             candidate = _receive_candidate(connection)
             _join_until(process, kill_at)
             if process.is_alive():
-                _signal_worker(record, signal.SIGKILL)
+                _signal_worker(record, getattr(signal, "SIGKILL", 9))
                 _join_until(process, hard_deadline)
             return candidate
         if process.sentinel in ready:
             _signal_worker(record, signal.SIGTERM)
-            _signal_worker(record, signal.SIGKILL)
+            _signal_worker(record, getattr(signal, "SIGKILL", 9))
             _join_until(process, kill_at)
             return None
 
@@ -239,6 +245,8 @@ class CodexReasoningSelector:
     def _start_worker(
         self, worker_input: SelectorWorkerRequest, *, cancel_at: float
     ) -> tuple[_WorkerRecord, Connection] | None:
+        if sys.platform == "win32":
+            return None  # Explicit unsupported legacy context/credential-copy lane.
         try:
             process_context = multiprocessing.get_context("spawn")
             parent_connection, child_connection = process_context.Pipe(duplex=False)

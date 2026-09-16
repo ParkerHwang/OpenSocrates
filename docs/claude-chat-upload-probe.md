@@ -1,3 +1,6 @@
+> Historical record for OpenSocrates 1.3.1 or earlier. This integration is
+> removed and unsupported in 1.4.0. Use [the current guide](../README.md).
+
 # Claude Chat standalone skill evidence
 
 Archive inspection, public-release provenance, and live Claude UI acceptance are

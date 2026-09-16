@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Assert the generated package documentation keeps its stated limitations.
 
-The repository README and SECURITY.md describe the Claude safe-mode trust
-boundary and the per-surface validation grading.  Users who only ever read the
+The repository README and SECURITY.md describe Codex trust and per-target
+validation boundaries.  Users who only ever read the
 README shipped *inside* the distributable must not receive a materially
 narrower warning, so this check inspects the generated package README rather
 than the source template.
@@ -19,92 +19,37 @@ from pathlib import Path
 from typing import Any
 
 README = "README.md"
+NATIVE_HOSTS = ("codex",)
+NATIVE_TARGETS = {
+    "darwin-arm64": {
+        "launcher": "bin/launch.sh",
+        "other_launcher": "bin/launch.mjs",
+        "other_target": "windows-x64",
+    },
+    "windows-x64": {
+        "launcher": "bin/launch.mjs",
+        "other_launcher": "bin/launch.sh",
+        "other_target": "darwin-arm64",
+    },
+}
+NATIVE_README_REQUIRED: dict[str, tuple[str, ...]] = {
+    "darwin-arm64": (
+        "This archive targets Apple-silicon macOS (`darwin-arm64`)",
+        "ships only `bin/launch.sh`",
+        "`runtime/darwin-arm64/` runtime payload",
+        "does not contain `bin/launch.mjs`",
+        "`runtime/windows-x64/` payload",
+    ),
+    "windows-x64": (
+        "This archive targets Windows x64 (`windows-x64`)",
+        "ships only `bin/launch.mjs`",
+        "`runtime/windows-x64/` runtime payload",
+        "does not contain `bin/launch.sh`",
+        "`runtime/darwin-arm64/` payload",
+    ),
+}
 
 # Each requirement fails as one stable error code when any phrase is absent.
-CLAUDE_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
-    (
-        "claude_readme_invocation_boundary_missing",
-        (
-            "canonical explicit plugin invocation is `/opensocrates:opensocrates`",
-            "standalone Claude Chat upload ZIP uses `/opensocrates`",
-            "compatibility behavior is not the plugin's canonical command",
-        ),
-    ),
-    (
-        "claude_readme_safe_mode_scope_missing",
-        (
-            "user-, project-, and plugin-sourced customizations",
-            "including the hooks those sources define",
-        ),
-    ),
-    (
-        "claude_readme_managed_policy_missing",
-        (
-            "Safe mode does not disable managed settings policy",
-            "managed settings policy still applies, including policy-configured hooks",
-        ),
-    ),
-    (
-        "claude_readme_managed_hook_reachability_missing",
-        (
-            "policy-configured `UserPromptSubmit` hook still runs inside the selector process",
-            "receives the current prompt on standard input",
-            "`additionalContext` that influences selection",
-        ),
-    ),
-    (
-        "claude_readme_hook_blanket_claim_present",
-        ("Not every hook is disabled inside the selector",),
-    ),
-    (
-        "claude_readme_desktop_grading_missing",
-        ("Implemented; no live hook-delivery probe receipt",),
-    ),
-    (
-        "claude_readme_cowork_grading_missing",
-        ("CLI marketplace visibility and live hook delivery are unvalidated",),
-    ),
-    (
-        "claude_readme_chat_grading_missing",
-        (
-            "Anthropic does not run plugin hooks in Chat",
-            "the customization ZIP upload path is unvalidated",
-        ),
-    ),
-    (
-        "claude_readme_grounding_gate_missing",
-        (
-            "Read-only `PostToolUse` hook accepts a grounding read only when",
-            "file's terminal marker",
-            "one bounded repair pass",
-        ),
-    ),
-    (
-        "claude_readme_teacher_questions_missing",
-        (
-            "deterministically assembles the selected teacher questions",
-            "hidden `additionalContext` message that leads with teacher questions",
-        ),
-    ),
-    (
-        "claude_readme_grounding_privacy_missing",
-        (
-            "complete Read response is checked only in memory",
-            "contains no prompt, tool output, workspace path, or artifact path",
-        ),
-    ),
-    (
-        "claude_readme_release_boundary_missing",
-        (
-            "released for Apple-silicon macOS (`darwin-arm64`) only",
-            "ships only `bin/launch.sh`",
-            "No PowerShell launcher is included",
-            "macOS Intel, Linux, Windows",
-            "Binary signing, notarization, clean-machine installation",
-            "are not claimed as validated",
-        ),
-    ),
-)
 
 CODEX_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
     (
@@ -127,147 +72,16 @@ CODEX_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
     ),
 )
 
-CURSOR_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
-    (
-        "cursor_readme_explicit_skill_boundary_missing",
-        (
-            "Manual `/opensocrates` invocation",
-            "a live Cursor receipt is pending",
-        ),
-    ),
-    (
-        "cursor_readme_no_selector_cost_missing",
-        (
-            "no separate OpenSocrates selector model call is added",
-            "automatic per-prompt hook selection: not included",
-        ),
-    ),
-    (
-        "cursor_readme_content_only_boundary_missing",
-        (
-            "There is no launcher, native runtime, executable, hook, MCP server",
-            "background service",
-        ),
-    ),
-    (
-        "cursor_readme_teacher_questions_missing",
-        (
-            "complete procedure begins with three authored teacher questions",
-            "content-only skill behavior, not an OpenSocrates hook claim",
-        ),
-    ),
-)
-
-ANTIGRAVITY_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
-    (
-        "antigravity_readme_explicit_tier_missing",
-        (
-            "experimental, explicit-skill Antigravity boundary",
-            "Automatic per-prompt selection: **not included**",
-            "Native hook delivery: **not claimed**",
-        ),
-    ),
-    (
-        "antigravity_readme_quota_boundary_missing",
-        (
-            "Additional model calls: **none**",
-            "does not consume a separate Google AI Pro request",
-        ),
-    ),
-    (
-        "antigravity_readme_file_drop_contract_missing",
-        (
-            "`~/.gemini/config/plugins/<plugin-name>/`",
-            "required plugin marker",
-            "refuses to replace a directory without its exact ownership marker",
-        ),
-    ),
-    (
-        "antigravity_readme_teacher_questions_missing",
-        (
-            "complete procedure begins with three authored teacher questions",
-            "content delivered by the skill, not hidden hook injection",
-        ),
-    ),
-)
-
-GROK_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
-    (
-        "grok_readme_native_skill_contract_missing",
-        (
-            "one user-visible `opensocrates` skill",
-            "same turn through its native skill-selection surface",
-            "explicitly with `/opensocrates`",
-        ),
-    ),
-    (
-        "grok_readme_content_only_boundary_missing",
-        (
-            "contains no hooks, MCP server, agent, command, launcher, native runtime",
-            "without requiring another API key or hardcoded model ID",
-        ),
-    ),
-    (
-        "grok_readme_grounding_gate_missing",
-        (
-            "complete procedure, including its leading teacher questions, must be read in "
-            "the current conversation",
-        ),
-    ),
-    (
-        "grok_readme_teacher_questions_missing",
-        (
-            "complete procedure begins with three authored teacher questions",
-            "does not claim OpenSocrates hook injection",
-        ),
-    ),
-)
-
-OPENCODE_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
-    (
-        "opencode_stable_same_turn_boundary_missing",
-        (
-            "Stable `chat.message` same-turn mutation",
-            "minimum verified host version of OpenCode 1.18.18",
-            "an interactive TUI receipt were all live-validated",
-            "Native skill invocation remains",
-        ),
-    ),
-    (
-        "opencode_provider_neutrality_missing",
-        (
-            "not a product dependency",
-            "credentials, endpoints, and model IDs are never embedded",
-            "no network call, subprocess call, recursive OpenCode call",
-        ),
-    ),
-    (
-        "opencode_owned_path_boundary_missing",
-        (
-            "owned bridge, its ownership sidecar",
-            "owned `opensocrates` skill directory",
-            "does not rewrite `opencode.json`",
-        ),
-    ),
-    (
-        "opencode_teacher_question_delivery_missing",
-        (
-            "first section contains its three authored teacher questions",
-            "same generated question-led procedure",
-            "preventing a duplicate question preamble",
-        ),
-    ),
-)
 
 # Wording that would restore an overstated claim.
 FORBIDDEN: tuple[tuple[str, str], ...] = (
     (
-        "claude_readme_blanket_hooks_disabled_claim",
+        "native_readme_blanket_hooks_disabled_claim",
         "hooks, project instructions, and session persistence disabled",
     ),
-    ("claude_readme_signing_overclaim", "signed and notarized"),
-    ("claude_readme_platform_overclaim", "validated on all platforms"),
-    ("claude_readme_host_delivery_overclaim", "live delivery is validated"),
+    ("native_readme_signing_overclaim", "signed and notarized"),
+    ("native_readme_platform_overclaim", "validated on all platforms"),
+    ("native_readme_host_delivery_overclaim", "live delivery is validated"),
 )
 
 # Deliberately bounded semantic patterns for three high-risk claim classes.
@@ -275,25 +89,66 @@ FORBIDDEN: tuple[tuple[str, str], ...] = (
 # and its sensitive scope/authority, and do not attempt to lint general prose.
 SEMANTIC_OVERCLAIMS: tuple[tuple[str, tuple[re.Pattern[str], ...]], ...] = (
     (
-        "claude_readme_universal_support_overclaim",
+        "native_readme_clean_machine_overclaim",
+        (
+            re.compile(
+                r"\b(?:proves?|validates?|verifies?)\b.{0,24}"
+                r"\bclean[- ]machine(?:\s+installation)?\b",
+                re.IGNORECASE,
+            ),
+        ),
+    ),
+    (
+        "native_readme_automatic_hook_overclaim",
+        (
+            re.compile(
+                r"\bautomatic\b.{0,48}\bhook\s+delivery\b.{0,32}"
+                r"\b(?:is|was|has\s+been)?\s*(?:validated|verified|passed|working)\b",
+                re.IGNORECASE,
+            ),
+        ),
+    ),
+    (
+        "native_readme_public_release_overclaim",
+        (
+            re.compile(
+                r"\b(?:candidate|package|plugin|archive|release)\b.{0,40}"
+                r"\b(?:is|was|has\s+been)\s+(?:validated|verified|approved|ready)\b"
+                r".{0,24}\b(?:as|for)\s+(?:a\s+)?public\s+release\b",
+                re.IGNORECASE,
+            ),
+        ),
+    ),
+    (
+        "native_readme_signing_overclaim",
+        (
+            re.compile(
+                r"\b(?:code\s+)?signing\b.{0,24}"
+                r"\b(?:is|was|has\s+been)?\s*(?:validated|verified|passed|complete)\b",
+                re.IGNORECASE,
+            ),
+        ),
+    ),
+    (
+        "native_readme_universal_support_overclaim",
         (
             re.compile(
                 r"\b(?:fully|completely|universally)\s+"
                 r"(?:validated|supported|compatible)\b.{0,96}"
-                r"\b(?:all|every)\s+(?:claude\s+)?"
+                r"\b(?:all|every)\s+(?:codex\s+)?"
                 r"(?:surface|platform|environment)s?\b",
                 re.IGNORECASE,
             ),
             re.compile(
                 r"\b(?:validated|supported|compatible)\b.{0,48}"
                 r"\b(?:across|on|for)\s+(?:all|every)\s+"
-                r"(?:claude\s+)?(?:surface|platform|environment)s?\b",
+                r"(?:codex\s+)?(?:surface|platform|environment)s?\b",
                 re.IGNORECASE,
             ),
         ),
     ),
     (
-        "claude_readme_endorsement_overclaim",
+        "native_readme_endorsement_overclaim",
         (
             re.compile(
                 r"\b(?:signed|notarized|approved|certified|endorsed)\s+by\s+"
@@ -314,7 +169,7 @@ SEMANTIC_OVERCLAIMS: tuple[tuple[str, tuple[re.Pattern[str], ...]], ...] = (
         ),
     ),
     (
-        "claude_readme_managed_safety_overclaim",
+        "native_readme_managed_safety_overclaim",
         (
             re.compile(
                 r"\b(?:(?:guaranteed|fully|completely|perfectly)\s+)?"
@@ -386,43 +241,68 @@ def _semantic_overclaim_errors(text: str) -> list[str]:
     return sorted(errors)
 
 
-def _package_readmes(root: Path) -> Iterator[tuple[str, str, Path]]:
-    for host in ("antigravity", "claude", "codex", "cursor", "grok", "opencode"):
-        candidates = (
+def _read_json_object(path: Path) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def _manifest_target(package_root: Path) -> str | None:
+    manifest = _read_json_object(package_root / "release-manifest.json")
+    targets = manifest.get("release_targets")
+    if isinstance(targets, list) and len(targets) == 1 and targets[0] in NATIVE_TARGETS:
+        return str(targets[0])
+    return None
+
+
+def _package_readmes(root: Path) -> Iterator[tuple[str, str, Path, str | None]]:
+    for host in ("codex",):
+        candidates = [
             ("generated", root / "build" / "generated" / "plugins" / host / README),
             ("distributable", root / "dist" / host / README),
-        )
+        ]
+        if host in NATIVE_HOSTS:
+            candidates.append(
+                (
+                    "windows-x64-distributable",
+                    root / "dist" / f"{host}-windows-x64" / README,
+                )
+            )
         for label, path in candidates:
             if path.is_file():
-                yield host, label, path
+                yield host, label, path, _manifest_target(path.parent)
 
 
-def _readme_errors(path: Path, host: str = "claude") -> list[str]:
+def _readme_errors(path: Path, host: str = "codex", target: str | None = None) -> list[str]:
     raw_text = path.read_text(encoding="utf-8")
     text = _normalize(raw_text)
     requirements = {
-        "antigravity": ANTIGRAVITY_REQUIRED,
-        "claude": CLAUDE_REQUIRED,
         "codex": CODEX_REQUIRED,
-        "cursor": CURSOR_REQUIRED,
-        "grok": GROK_REQUIRED,
-        "opencode": OPENCODE_REQUIRED,
     }[host]
     errors = [
         code for code, phrases in requirements if any(_normalize(p) not in text for p in phrases)
     ]
-    if host == "claude":
-        errors.extend(code for code, phrase in FORBIDDEN if _normalize(phrase) in text)
+    if host in NATIVE_HOSTS and target in NATIVE_README_REQUIRED:
+        if any(_normalize(phrase) not in text for phrase in NATIVE_README_REQUIRED[str(target)]):
+            errors.append(f"{host}_readme_{target}_release_boundary_missing")
+        pass
+        helper_boundary = (
+            "npm's `installer/windows.ps1` is a separate installer helper, not a plugin launcher"
+        )
+        if _normalize(helper_boundary) not in text:
+            errors.append(f"{host}_readme_installer_helper_boundary_missing")
+    if host in NATIVE_HOSTS:
         errors.extend(_semantic_overclaim_errors(raw_text))
+    pass
     return errors
 
 
 def check_root(root: Path) -> dict[str, Any]:
     readmes = list(_package_readmes(root))
-    present_hosts = {host for host, _label, _path in readmes}
-    missing_hosts = sorted(
-        {"antigravity", "claude", "codex", "cursor", "grok", "opencode"} - present_hosts
-    )
+    present_hosts = {host for host, _label, _path, _target in readmes}
+    missing_hosts = sorted({"codex"} - present_hosts)
     if not readmes:
         return {
             "status": "fail",
@@ -431,8 +311,8 @@ def check_root(root: Path) -> dict[str, Any]:
         }
     documents: dict[str, Any] = {}
     errors: list[str] = [f"{host}_package_readme_missing" for host in missing_hosts]
-    for host, label, path in readmes:
-        found = _readme_errors(path, host)
+    for host, label, path, target in readmes:
+        found = _readme_errors(path, host, target)
         key = f"{host}/{label}"
         documents[key] = {"status": "fail" if found else "pass", "error_codes": found}
         errors.extend(f"{host}_{label}_{code}" for code in found)
@@ -449,27 +329,98 @@ def check_root(root: Path) -> dict[str, Any]:
     }
 
 
-def _portability_boundary_errors(root: Path) -> list[str]:
-    """Keep source metadata and both shipped package surfaces darwin-arm64-only."""
+def _manifest_file_paths(manifest: dict[str, Any]) -> set[str]:
+    files = manifest.get("files")
+    if not isinstance(files, list):
+        return set()
+    return {
+        str(item["path"])
+        for item in files
+        if isinstance(item, dict) and isinstance(item.get("path"), str)
+    }
+
+
+def _runtime_directories(package_root: Path) -> set[str]:
+    runtime = package_root / "runtime"
+    if not runtime.is_dir():
+        return set()
+    return {path.name for path in runtime.iterdir() if path.is_dir()}
+
+
+def _native_archive_boundary_errors(
+    package_root: Path, target: str, *, require_runtime: bool = True
+) -> list[str]:
+    """Validate one native package along one target axis, including actual files."""
+
+    contract = NATIVE_TARGETS[target]
+    expected_runtime = [target] if require_runtime else []
+    manifest = _read_json_object(package_root / "release-manifest.json")
+    if not manifest:
+        return ["native_manifest_unavailable"]
+    errors: list[str] = []
+    if manifest.get("release_targets") != [target]:
+        errors.append("native_release_targets_invalid")
+    if manifest.get("launchers") != [contract["launcher"]]:
+        errors.append("native_launchers_invalid")
+    if manifest.get("runtime_targets") != expected_runtime:
+        errors.append("native_runtime_targets_invalid")
+    launcher_files = {
+        launcher
+        for launcher in ("bin/launch.sh", "bin/launch.mjs", "bin/launch.ps1")
+        if (package_root / Path(launcher)).is_file()
+    }
+    if launcher_files != {contract["launcher"]}:
+        errors.append("native_launcher_files_invalid")
+    expected_runtime_directories = {target} if require_runtime else set()
+    if _runtime_directories(package_root) != expected_runtime_directories:
+        errors.append("native_runtime_directories_invalid")
+    inventory = _manifest_file_paths(manifest)
+    inventory_launchers = {
+        path for path in inventory if path in {"bin/launch.sh", "bin/launch.mjs", "bin/launch.ps1"}
+    }
+    inventory_runtimes = {
+        path.split("/", 2)[1]
+        for path in inventory
+        if path.startswith("runtime/") and len(path.split("/", 2)) > 1
+    }
+    if inventory_launchers != {contract["launcher"]} or inventory_runtimes != set(expected_runtime):
+        errors.append("native_file_inventory_invalid")
+    if (package_root / "installer" / "windows.ps1").exists():
+        errors.append("native_archive_contains_npm_windows_helper")
+    return sorted(set(errors))
+
+
+def _platform_manifest_errors(platforms: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    if platforms.get("release_targets") != ["darwin-arm64", "windows-x64"] or platforms.get(
+        "shipped_launchers"
+    ) != {"darwin-arm64": "bin/launch.sh", "windows-x64": "bin/launch.mjs"}:
+        errors.append("platform_manifest_release_boundary_invalid")
+    if platforms.get("release_claim_status") != "windows-x64_candidate_live_gates_pending":
+        errors.append("platform_manifest_release_claim_invalid")
+    if platforms.get("signing_status") != "unvalidated":
+        errors.append("platform_manifest_signing_claim_invalid")
+    return errors
+
+
+def _portability_boundary_errors(root: Path) -> list[str]:  # noqa: C901
+    """Keep candidate and per-archive boundaries disjoint and complete."""
 
     errors: list[str] = []
     if (root / "packaging" / "launchers" / "launch.ps1").exists():
         errors.append("powershell_launcher_source_present")
-    try:
-        platforms = json.loads((root / "packaging" / "platforms.json").read_text("utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError):
-        platforms = {}
-    if platforms.get("release_targets") != ["darwin-arm64"] or platforms.get(
-        "shipped_launchers"
-    ) != {"darwin-arm64": "bin/launch.sh"}:
-        errors.append("platform_manifest_release_boundary_invalid")
-    for host in ("claude", "codex"):
-        try:
-            generator = json.loads(
-                (root / "plugin-src" / host / "generator.json").read_text("utf-8")
-            )
-        except (OSError, UnicodeError, json.JSONDecodeError):
-            generator = {}
+    platforms = _read_json_object(root / "packaging" / "platforms.json")
+    errors.extend(_platform_manifest_errors(platforms))
+    package_json = _read_json_object(root / "package.json")
+    npm_files = package_json.get("files")
+    if (
+        not isinstance(npm_files, list)
+        or npm_files.count("installer/windows.ps1") != 1
+        or not (root / "installer" / "windows.ps1").is_file()
+    ):
+        errors.append("npm_windows_helper_boundary_invalid")
+    for host in NATIVE_HOSTS:
+        generator = _read_json_object(root / "plugin-src" / host / "generator.json")
         copies = generator.get("copy_files", [])
         outputs = (
             {item.get("output") for item in copies if isinstance(item, dict)}
@@ -479,15 +430,27 @@ def _portability_boundary_errors(root: Path) -> list[str]:
         if (
             generator.get("release_targets") != ["darwin-arm64"]
             or generator.get("launchers") != ["bin/launch.sh"]
-            or "bin/launch.ps1" in outputs
+            or outputs & {"bin/launch.mjs", "bin/launch.ps1", "installer/windows.ps1"}
         ):
             errors.append(f"{host}_generator_release_boundary_invalid")
-        for package_root in (
-            root / "build" / "generated" / "plugins" / host,
-            root / "dist" / host,
-        ):
-            if package_root.is_dir() and (package_root / "bin" / "launch.ps1").exists():
-                errors.append(f"{host}_{package_root.parent.name}_powershell_launcher_present")
+    for host, label, path, target in _package_readmes(root):
+        package_root = path.parent
+        if host in NATIVE_HOSTS:
+            if target not in NATIVE_TARGETS:
+                errors.append(f"{host}_{label}_native_target_invalid")
+                continue
+            manifest = _read_json_object(package_root / "release-manifest.json")
+            generated_has_runtime = bool(
+                manifest.get("runtime_targets") or _runtime_directories(package_root)
+            )
+            package_errors = _native_archive_boundary_errors(
+                package_root,
+                target,
+                require_runtime=label != "generated" or generated_has_runtime,
+            )
+        else:
+            package_errors = ["unsupported_host_package"]
+        errors.extend(f"{host}_{label}_{code}" for code in package_errors)
     return sorted(set(errors))
 
 

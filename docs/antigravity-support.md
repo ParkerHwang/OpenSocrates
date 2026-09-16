@@ -1,3 +1,6 @@
+> Historical record for OpenSocrates 1.3.1 or earlier. This integration is
+> removed and unsupported in 1.4.0. Use [the current guide](../README.md).
+
 # Google Antigravity support
 
 OpenSocrates v1.2 treats Google Antigravity as an experimental, explicit-skill
@@ -51,3 +54,7 @@ Official references:
 - [Agent Skills](https://antigravity.google/docs/skills)
 - [Plugins](https://antigravity.google/docs/ide/plugins)
 - [Hooks](https://www.antigravity.google/docs/hooks)
+
+## Windows candidate live check (2026-09-09)
+
+Antigravity Desktop 2.12.2 with Gemini 3.8 Flash High recognized the installed v1.4.0 candidate and read its skill and complete Korean method file in a real synthetic task, then returned a Korean response. Native CLI 1.1.28 validated the package. Local ZIP install, status, same-candidate update, removal and reinstall passed. This verifies explicit content skill delivery only, not native hooks, a runtime, all methods or improved answer quality. See the [sanitized evidence](evidence/antigravity-windows-live-2026-09-09.json).

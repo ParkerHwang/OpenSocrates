@@ -34,27 +34,21 @@ import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 
-export const PRODUCT_VERSION = "1.3.1";
+export const PRODUCT_VERSION = "1.4.0";
 export const REPOSITORY = "ParkerHwang/OpenSocrates";
 export const MARKETPLACE_NAME = "opensocrates";
 export const PLUGIN_NAME = "opensocrates";
 export const PLUGIN_ID = `${PLUGIN_NAME}@${MARKETPLACE_NAME}`;
 export const DEFAULT_HOST = "codex";
-export const SUPPORTED_HOSTS = Object.freeze([
-  "antigravity",
-  "claude",
-  "codex",
-  "cursor",
-  "grok",
-  "opencode",
-]);
+export const SUPPORTED_HOSTS = Object.freeze(["codex"]);
 export const ALL_HOST = "all";
 export const HOST_CHOICES = Object.freeze([ALL_HOST, ...SUPPORTED_HOSTS]);
 export function assetNameFor(host = DEFAULT_HOST) {
   if (!SUPPORTED_HOSTS.includes(host)) {
     fail(`unsupported host ${JSON.stringify(host)}`);
   }
-  return `opensocrates-${PRODUCT_VERSION}-${host}-plugin.zip`;
+  const suffix = process.platform === "win32" ? "-windows-x64" : "";
+  return `opensocrates-${PRODUCT_VERSION}-${host}-plugin${suffix}.zip`;
 }
 export const ASSET_NAME = assetNameFor(DEFAULT_HOST);
 export const CHECKSUM_NAME = `${ASSET_NAME}.sha256`;
@@ -65,87 +59,18 @@ const CODEX_MARKER = Object.freeze({
   marketplaceName: MARKETPLACE_NAME,
   pluginName: PLUGIN_NAME,
 });
-const CLAUDE_MARKER = Object.freeze({
-  schemaVersion: 1,
-  marketplaceName: MARKETPLACE_NAME,
-  pluginName: PLUGIN_NAME,
-  host: "claude",
-});
-const CURSOR_MARKER = Object.freeze({
-  schemaVersion: 1,
-  marketplaceName: MARKETPLACE_NAME,
-  pluginName: PLUGIN_NAME,
-  host: "cursor",
-  registrationKind: "file-drop",
-});
-const ANTIGRAVITY_MARKER = Object.freeze({
-  schemaVersion: 1,
-  marketplaceName: MARKETPLACE_NAME,
-  pluginName: PLUGIN_NAME,
-  host: "antigravity",
-  registrationKind: "file-drop",
-});
-const GROK_MARKER = Object.freeze({
-  schemaVersion: 1,
-  marketplaceName: MARKETPLACE_NAME,
-  pluginName: PLUGIN_NAME,
-  host: "grok",
-  registrationKind: "file-drop",
-});
-const OPENCODE_MARKER = Object.freeze({
-  schemaVersion: 1,
-  marketplaceName: MARKETPLACE_NAME,
-  pluginName: PLUGIN_NAME,
-  host: "opencode",
-  registrationKind: "automatic-file-discovery",
-});
-const OPENCODE_INSTALL_MANIFEST = ".opensocrates-installation.json";
-const OPENCODE_BRIDGE_MARKER = ".opensocrates-managed.json";
-// OpenCode is discovered automatically from its config directory, so it is
-// deliberately not a file-drop host.
-const FILE_DROP_HOSTS = Object.freeze(["antigravity", "cursor", "grok"]);
 const HOST_LAYOUTS = Object.freeze({
-  antigravity: {
-    marketplaceRelative: null,
-    pluginRelative: ".",
-    manifestRelative: "plugin.json",
-    requiresRuntime: false,
-  },
-  claude: {
-    marketplaceRelative: join(".claude-plugin", "marketplace.json"),
-    pluginRelative: join("plugins", PLUGIN_NAME),
-    manifestRelative: join(".claude-plugin", "plugin.json"),
-    requiresRuntime: true,
-  },
   codex: {
     marketplaceRelative: join(".agents", "plugins", "marketplace.json"),
     pluginRelative: join("build", "generated", "plugins", "codex"),
     manifestRelative: join(".codex-plugin", "plugin.json"),
     requiresRuntime: true,
   },
-  cursor: {
-    marketplaceRelative: null,
-    pluginRelative: ".",
-    manifestRelative: "plugin.json",
-    requiresRuntime: false,
-  },
-  grok: {
-    marketplaceRelative: null,
-    pluginRelative: ".",
-    manifestRelative: "plugin.json",
-    requiresRuntime: false,
-  },
-  opencode: {
-    marketplaceRelative: null,
-    pluginRelative: ".",
-    manifestRelative: "opencode-plugin.json",
-    requiresRuntime: false,
-  },
 });
 const MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024 * 1024;
 const MAX_ARCHIVE_ENTRIES = 10_000;
 const DESIRED_STATE_SCHEMA = "opensocrates.desired-state/1.0.0";
-const RECEIPT_SCHEMA = "opensocrates.auto-update-receipt/1.0.0";
+const RECEIPT_SCHEMA = "opensocrates.auto-update-receipt/1.1.0";
 const AUTO_UPDATE_LABEL = "com.opensocrates.auto-update";
 const AUTO_UPDATE_MIN_INTERVAL_HOURS = 1;
 const AUTO_UPDATE_MAX_INTERVAL_HOURS = 24 * 7;
@@ -174,17 +99,12 @@ const MAX_CODEX_APP_SERVER_NOTIFICATIONS = 128;
 // Keep host security state separate from installer-owned payload cleanup so an
 // explicit trust reset can fail without weakening purge path-ownership checks.
 export function purgeExtensionResult(host, resetTrust = false) {
-  return host === "codex"
-    ? {
-        component: "host-security-trust",
-        status: resetTrust ? "pending" : "preserved",
-        nextAction: resetTrust ? null : "rerun-purge-with-reset-trust",
-      }
-    : {
-        component: "host-security-trust",
-        status: "not-applicable",
-        nextAction: null,
-      };
+  if (host !== "codex") fail("only Codex is supported");
+  return {
+    component: "host-security-trust",
+    status: resetTrust ? "pending" : "preserved",
+    nextAction: resetTrust ? null : "rerun-purge-with-reset-trust",
+  };
 }
 
 export function createPurgeResult(hosts, { resetTrust = false } = {}) {
@@ -259,7 +179,11 @@ function decodeTomlLiteralString(source, start) {
   const end = source.indexOf("'", start + 1);
   if (end < 0) return null;
   const value = source.slice(start + 1, end);
-  if ([...value].some((character) => character.codePointAt(0) < 0x20 || character.codePointAt(0) === 0x7f)) {
+  if (
+    [...value].some(
+      (character) => character.codePointAt(0) < 0x20 || character.codePointAt(0) === 0x7f,
+    )
+  ) {
     return null;
   }
   return { value, next: end + 1, kind: "literal", raw: source.slice(start, end + 1) };
@@ -374,7 +298,12 @@ function tomlLines(source) {
   while (start < source.length) {
     const newline = source.indexOf("\n", start);
     const end = newline < 0 ? source.length : newline + 1;
-    const contentEnd = newline < 0 ? source.length : newline > start && source[newline - 1] === "\r" ? newline - 1 : newline;
+    const contentEnd =
+      newline < 0
+        ? source.length
+        : newline > start && source[newline - 1] === "\r"
+          ? newline - 1
+          : newline;
     lines.push({ start, end, contentEnd, body: source.slice(start, contentEnd) });
     start = end;
   }
@@ -386,7 +315,10 @@ function parseTomlTableHeader(code) {
   const trimmedEnd = code.trimEnd().length;
   const candidate = code.slice(leading, trimmedEnd);
   const array = candidate.startsWith("[[");
-  if (!candidate.startsWith("[") || (array ? !candidate.endsWith("]]") : !candidate.endsWith("]"))) {
+  if (
+    !candidate.startsWith("[") ||
+    (array ? !candidate.endsWith("]]") : !candidate.endsWith("]"))
+  ) {
     return null;
   }
   const openWidth = array ? 2 : 1;
@@ -532,7 +464,8 @@ export function stripCodexOpenSocratesTrustSections(contents) {
       if (
         pathContainsTrustNamespace(semanticPath) ||
         ((semanticPath[0]?.value === "hooks" ||
-          (currentTableSegments[0]?.value === "hooks" && currentTableSegments[1]?.value === "state")) &&
+          (currentTableSegments[0]?.value === "hooks" &&
+            currentTableSegments[1]?.value === "state")) &&
           lineContainsTrustNamespaceString(code))
       ) {
         trustResetFailure("the matching trust namespace uses a noncanonical assignment shape");
@@ -589,7 +522,12 @@ function currentUid() {
 }
 
 function assertOwnedDirectory(info) {
-  if (!info.isDirectory() || info.isSymbolicLink() || info.uid !== currentUid() || (info.mode & 0o022) !== 0) {
+  if (
+    !info.isDirectory() ||
+    info.isSymbolicLink() ||
+    info.uid !== currentUid() ||
+    (info.mode & 0o022) !== 0
+  ) {
     trustResetFailure("the Codex configuration directory is not a safe owner-controlled directory");
   }
 }
@@ -756,16 +694,20 @@ function exactCodexAppServerNotification(message) {
   const keys = Object.keys(message).sort();
   const withoutTimestamp = keys.length === 2 && keys[0] === "method" && keys[1] === "params";
   const withTimestamp =
-    keys.length === 3 &&
-    keys[0] === "emittedAtMs" &&
-    keys[1] === "method" &&
-    keys[2] === "params";
+    keys.length === 3 && keys[0] === "emittedAtMs" && keys[1] === "method" && keys[2] === "params";
   if (!withoutTimestamp && !withTimestamp) return false;
   if (typeof message.method !== "string" || message.method.length === 0) return false;
-  if (message.params === null || typeof message.params !== "object" || Array.isArray(message.params)) {
+  if (
+    message.params === null ||
+    typeof message.params !== "object" ||
+    Array.isArray(message.params)
+  ) {
     return false;
   }
-  return !withTimestamp || (typeof message.emittedAtMs === "number" && Number.isFinite(message.emittedAtMs));
+  return (
+    !withTimestamp ||
+    (typeof message.emittedAtMs === "number" && Number.isFinite(message.emittedAtMs))
+  );
 }
 
 function codexAppServerValidationError() {
@@ -1030,7 +972,9 @@ async function validateCodexConfigBytes(
         await removeValidationHome(validationHome, { recursive: true, force: true });
       } catch {
         if (!operationFailed) {
-          trustResetFailure("the isolated Codex validation environment could not be removed safely");
+          trustResetFailure(
+            "the isolated Codex validation environment could not be removed safely",
+          );
         }
       }
     }
@@ -1184,7 +1128,9 @@ export async function resetCodexOpenSocratesHookTrust({
       });
     }
     if (error instanceof InstallerError) throw error;
-    trustResetFailure("the atomic configuration update failed; the original configuration was preserved");
+    trustResetFailure(
+      "the atomic configuration update failed; the original configuration was preserved",
+    );
   } finally {
     let cleanupFailed = false;
     if (cleanupRequired) {
@@ -1205,6 +1151,23 @@ export async function resetCodexOpenSocratesHookTrust({
 }
 
 export class InstallerError extends Error {}
+
+class PackagePreparationError extends InstallerError {
+  constructor(outcomes) {
+    const failures = outcomes.filter((item) => item.error !== null);
+    super(
+      "package preparation failed: " +
+        failures
+          .map((item) => `${item.host}: ${String(item.error?.message ?? item.error)}`)
+          .join("; "),
+    );
+    this.hostOutcomes = outcomes.map(({ host, error }) => ({
+      host,
+      result: "failed",
+      errorCategory: error === null ? null : errorCategory(error),
+    }));
+  }
+}
 
 function fail(message) {
   throw new InstallerError(message);
@@ -1245,7 +1208,9 @@ async function requireRegularFileEntry(target, label) {
 }
 
 export function statePaths() {
-  const stateDirectory = resolve(process.env.OPENSOCRATES_STATE_DIR || join(homedir(), ".opensocrates"));
+  const stateDirectory = resolve(
+    process.env.OPENSOCRATES_STATE_DIR || join(homedir(), ".opensocrates"),
+  );
   const launchAgentsDirectory = resolve(
     process.env.OPENSOCRATES_LAUNCH_AGENTS_DIR || join(homedir(), "Library", "LaunchAgents"),
   );
@@ -1281,7 +1246,12 @@ function defaultDesiredState() {
 }
 
 function normalizeDesiredState(value) {
-  if (value === null || typeof value !== "object" || Array.isArray(value) || value.schema !== DESIRED_STATE_SCHEMA) {
+  if (
+    value === null ||
+    typeof value !== "object" ||
+    Array.isArray(value) ||
+    value.schema !== DESIRED_STATE_SCHEMA
+  ) {
     fail("the OpenSocrates desired-state manifest has an unsupported schema");
   }
   const installedHosts = value.installedHosts;
@@ -1290,7 +1260,9 @@ function normalizeDesiredState(value) {
     installedHosts.some((host) => !SUPPORTED_HOSTS.includes(host)) ||
     new Set(installedHosts).size !== installedHosts.length
   ) {
-    fail("the OpenSocrates desired-state manifest has an invalid host set");
+    fail(
+      "the OpenSocrates desired-state manifest has an invalid or retired host set; uninstall non-Codex hosts using opensocrates@1.3.1 before upgrading",
+    );
   }
   const channel = value.channel;
   if (!new Set(["stable", "next"]).has(channel)) {
@@ -1307,10 +1279,16 @@ function normalizeDesiredState(value) {
     fail("the OpenSocrates desired-state manifest has an invalid update policy");
   }
   const autoUpdateHosts =
-    value.autoUpdate.hosts === undefined ? (value.autoUpdate.enabled ? installedHosts : []) : value.autoUpdate.hosts;
+    value.autoUpdate.hosts === undefined
+      ? value.autoUpdate.enabled
+        ? installedHosts
+        : []
+      : value.autoUpdate.hosts;
   if (
     !Array.isArray(autoUpdateHosts) ||
-    autoUpdateHosts.some((host) => !SUPPORTED_HOSTS.includes(host) || !installedHosts.includes(host)) ||
+    autoUpdateHosts.some(
+      (host) => !SUPPORTED_HOSTS.includes(host) || !installedHosts.includes(host),
+    ) ||
     new Set(autoUpdateHosts).size !== autoUpdateHosts.length ||
     (value.autoUpdate.enabled && autoUpdateHosts.length === 0) ||
     (!value.autoUpdate.enabled && autoUpdateHosts.length > 0)
@@ -1354,7 +1332,8 @@ async function ensurePrivateDirectory(directory) {
     if (!info.isDirectory() || info.isSymbolicLink()) {
       fail(`refusing to use a non-directory or symbolic-link state path: ${directory}`);
     }
-    await chmod(directory, 0o700);
+    if (process.platform === "win32") windowsAction("private", directory);
+    else await chmod(directory, 0o700);
     return;
   }
   await mkdir(directory, { recursive: true, mode: 0o700 });
@@ -1362,7 +1341,8 @@ async function ensurePrivateDirectory(directory) {
   if (!info.isDirectory() || info.isSymbolicLink()) {
     fail(`refusing to use an unsafe state path: ${directory}`);
   }
-  await chmod(directory, 0o700);
+  if (process.platform === "win32") windowsAction("private", directory);
+  else await chmod(directory, 0o700);
 }
 
 async function atomicWritePrivateFile(target, contents) {
@@ -1375,7 +1355,8 @@ async function atomicWritePrivateFile(target, contents) {
       mode: 0o600,
       flag: "wx",
     });
-    await chmod(temporary, 0o600);
+    if (process.platform === "win32") windowsAction("private", temporary);
+    else await chmod(temporary, 0o600);
     await rename(temporary, target);
   } finally {
     if (await exists(temporary)) {
@@ -1386,7 +1367,10 @@ async function atomicWritePrivateFile(target, contents) {
 
 export async function writeDesiredState(value) {
   const normalized = normalizeDesiredState(value);
-  await atomicWritePrivateFile(statePaths().desiredState, `${JSON.stringify(normalized, null, 2)}\n`);
+  await atomicWritePrivateFile(
+    statePaths().desiredState,
+    `${JSON.stringify(normalized, null, 2)}\n`,
+  );
   return normalized;
 }
 
@@ -1397,9 +1381,10 @@ async function writeAutoUpdateReceipt({ version, checkedAt, hosts, result, error
     checkedAt,
     hosts: [...hosts]
       .sort((left, right) => left.host.localeCompare(right.host))
-      .map(({ host, result: hostResult }) => ({
+      .map(({ host, result: hostResult, errorCategory: hostErrorCategory }) => ({
         host,
         result: hostResult,
+        errorCategory: hostErrorCategory ?? null,
       })),
     result,
     errorCategory: errorCategory ?? null,
@@ -1414,7 +1399,9 @@ function nowIso() {
 function nextCheckAt(intervalHours) {
   const intervalMilliseconds = intervalHours * 60 * 60 * 1000;
   const jitterBasisPoints = randomInt(-1500, 1501);
-  return new Date(Date.now() + intervalMilliseconds * (1 + jitterBasisPoints / 10_000)).toISOString();
+  return new Date(
+    Date.now() + intervalMilliseconds * (1 + jitterBasisPoints / 10_000),
+  ).toISOString();
 }
 
 function majorVersion(value) {
@@ -1422,11 +1409,24 @@ function majorVersion(value) {
   return match ? Number(match[1]) : null;
 }
 
-function errorCategory(error) {
-  const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
-  if (/checksum|manifest|archive|symbolic link/u.test(message)) return "verification";
+export function errorCategory(error) {
+  if (error instanceof PackagePreparationError) {
+    const categories = new Set(
+      error.hostOutcomes.map((item) => item.errorCategory).filter((item) => item !== null),
+    );
+    return categories.size === 1 ? [...categories][0] : "multiple";
+  }
+  const message =
+    error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+  if (
+    /checksum|manifest|archive|symbolic link|target metadata|runtime layout|unexpected native runtime or launcher surface/u.test(
+      message,
+    )
+  )
+    return "verification";
   if (/download|fetch|network|offline|timed? ?out/u.test(message)) return "network";
-  if (/preflight|not logged|auth|version is required|could not run/u.test(message)) return "preflight";
+  if (/preflight|not logged|auth|version is required|could not run/u.test(message))
+    return "preflight";
   if (/rollback|restore/u.test(message)) return "rollback";
   if (/lock|already running/u.test(message)) return "locked";
   if (/register|plugin|marketplace/u.test(message)) return "activation";
@@ -1440,7 +1440,10 @@ async function acquireOperationLock() {
     try {
       const handle = await open(paths.lock, "wx", 0o600);
       try {
-        await handle.writeFile(`${JSON.stringify({ pid: process.pid, startedAt: nowIso() })}\n`, "utf8");
+        await handle.writeFile(
+          `${JSON.stringify({ pid: process.pid, startedAt: nowIso() })}\n`,
+          "utf8",
+        );
       } catch (writeError) {
         await handle.close().catch(() => undefined);
         await rm(paths.lock, { force: true }).catch(() => undefined);
@@ -1472,7 +1475,9 @@ async function acquireOperationLock() {
         }
         stale =
           ownerAlive === false ||
-          (ownerAlive === null && Number.isFinite(started) && Date.now() - started > LOCK_STALE_MILLISECONDS);
+          (ownerAlive === null &&
+            Number.isFinite(started) &&
+            Date.now() - started > LOCK_STALE_MILLISECONDS);
       } catch {
         const info = await lstat(paths.lock);
         stale = Date.now() - info.mtimeMs > LOCK_STALE_MILLISECONDS;
@@ -1514,34 +1519,29 @@ function jsonDeepEqual(left, right) {
       left.every((item, index) => jsonDeepEqual(item, right[index]))
     );
   }
-  if (
-    left === null ||
-    right === null ||
-    typeof left !== "object" ||
-    typeof right !== "object"
-  ) {
+  if (left === null || right === null || typeof left !== "object" || typeof right !== "object") {
     return false;
   }
   const leftKeys = Object.keys(left).sort();
   const rightKeys = Object.keys(right).sort();
   return (
     leftKeys.length === rightKeys.length &&
-    leftKeys.every(
-      (key, index) => key === rightKeys[index] && jsonDeepEqual(left[key], right[key]),
-    )
+    leftKeys.every((key, index) => key === rightKeys[index] && jsonDeepEqual(left[key], right[key]))
   );
 }
 
 function markerFor(host) {
-  if (host === "cursor") return CURSOR_MARKER;
-  if (host === "antigravity") return ANTIGRAVITY_MARKER;
-  if (host === "grok") return GROK_MARKER;
-  if (host === "opencode") return OPENCODE_MARKER;
-  return host === "claude" ? CLAUDE_MARKER : CODEX_MARKER;
+  return CODEX_MARKER;
 }
 
 export function markerMatches(value, host = DEFAULT_HOST) {
-  return value !== null && typeof value === "object" && !Array.isArray(value) && jsonEqual(value, markerFor(host));
+  if (host !== "codex") return false;
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    jsonEqual(value, markerFor(host))
+  );
 }
 
 export function isSafeArchivePath(value) {
@@ -1558,7 +1558,17 @@ export function isSafeArchivePath(value) {
   if (candidate.length === 0) {
     return false;
   }
-  return candidate.split("/").every((part) => part.length > 0 && part !== "." && part !== "..");
+  return candidate
+    .split("/")
+    .every(
+      (part) =>
+        part.length > 0 &&
+        part !== "." &&
+        part !== ".." &&
+        !/[\x00-\x1f<>:"|?*]/u.test(part) &&
+        !/[. ]$/u.test(part) &&
+        !/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/iu.test(part),
+    );
 }
 
 export function parseChecksumText(text, expectedName = ASSET_NAME) {
@@ -1581,7 +1591,15 @@ export function parseChecksumText(text, expectedName = ASSET_NAME) {
 }
 
 export function parseCli(argv) {
-  const actions = new Set(["install", "status", "update", "remove", "verify", "auto-update", "help"]);
+  const actions = new Set([
+    "install",
+    "status",
+    "update",
+    "remove",
+    "verify",
+    "auto-update",
+    "help",
+  ]);
   const args = [...argv];
   let action = "install";
   if (args[0] && !args[0].startsWith("-")) {
@@ -1608,7 +1626,9 @@ export function parseCli(argv) {
     host: action === "auto-update" ? ALL_HOST : DEFAULT_HOST,
     asset: null,
     checksum: null,
-    hostAssets: Object.fromEntries(SUPPORTED_HOSTS.map((host) => [host, { asset: null, checksum: null }])),
+    hostAssets: Object.fromEntries(
+      SUPPORTED_HOSTS.map((host) => [host, { asset: null, checksum: null }]),
+    ),
     channel: "stable",
     intervalHours: AUTO_UPDATE_DEFAULT_INTERVAL_HOURS,
     allowMajor: false,
@@ -1678,7 +1698,9 @@ export function parseCli(argv) {
       options.intervalHours = value;
       continue;
     }
-    const qualified = flag?.match(new RegExp(`^--(asset|checksum)-(${SUPPORTED_HOSTS.join("|")})$`, "u"));
+    const qualified = flag?.match(
+      new RegExp(`^--(asset|checksum)-(${SUPPORTED_HOSTS.join("|")})$`, "u"),
+    );
     if (qualified) {
       seenOptions.add(qualified[1]);
       const value = args.shift();
@@ -1710,7 +1732,10 @@ export function parseCli(argv) {
   if (options.host === ALL_HOST && options.asset !== null) {
     fail("--host all requires host-qualified --asset-<host> and --checksum-<host> options");
   }
-  if (options.host !== ALL_HOST && SUPPORTED_HOSTS.some((host) => options.hostAssets[host].asset !== null)) {
+  if (
+    options.host !== ALL_HOST &&
+    SUPPORTED_HOSTS.some((host) => options.hostAssets[host].asset !== null)
+  ) {
     fail("host-qualified asset options are only valid with --host all");
   }
   if (["status", "remove", "help"].includes(options.action) && options.asset !== null) {
@@ -1725,11 +1750,13 @@ export function parseCli(argv) {
   if (
     options.action === "auto-update" &&
     options.autoUpdateAction !== "run" &&
-    (options.asset !== null || SUPPORTED_HOSTS.some((host) => options.hostAssets[host].asset !== null))
+    (options.asset !== null ||
+      SUPPORTED_HOSTS.some((host) => options.hostAssets[host].asset !== null))
   ) {
     fail(`auto-update ${options.autoUpdateAction} does not accept local asset options`);
   }
-  const autoUpdateEnable = options.action === "auto-update" && options.autoUpdateAction === "enable";
+  const autoUpdateEnable =
+    options.action === "auto-update" && options.autoUpdateAction === "enable";
   const autoUpdateRun = options.action === "auto-update" && options.autoUpdateAction === "run";
   for (const policyOption of ["allow-major", "channel", "interval-hours"]) {
     if (seenOptions.has(policyOption) && !autoUpdateEnable) {
@@ -1765,12 +1792,12 @@ function showHelp() {
   console.log(`OpenSocrates ${PRODUCT_VERSION}
 
 Usage:
-  opensocrates install [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum FILE]
-  opensocrates status [--host all|antigravity|claude|codex|cursor|grok|opencode]
-  opensocrates update [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum FILE]
-  opensocrates remove [--host all|antigravity|claude|codex|cursor|grok|opencode] [--purge [--reset-trust]]
-  opensocrates verify [--host all|antigravity|claude|codex|cursor|grok|opencode] [--asset ZIP --checksum FILE]
-  opensocrates auto-update enable [--host all|antigravity|claude|codex|cursor|grok|opencode]
+  opensocrates install [--host codex|all] [--asset ZIP --checksum FILE]
+  opensocrates status [--host codex|all]
+  opensocrates update [--host codex|all] [--asset ZIP --checksum FILE]
+  opensocrates remove [--host codex|all] [--purge [--reset-trust]]
+  opensocrates verify [--host codex|all] [--asset ZIP --checksum FILE]
+  opensocrates auto-update enable [--host codex|all]
       [--channel stable|next] [--interval-hours ${AUTO_UPDATE_DEFAULT_INTERVAL_HOURS}]
       [--allow-major]
   opensocrates auto-update status
@@ -1794,28 +1821,9 @@ reported as pending.
 }
 
 function managedPaths(host) {
-  const configured =
-    host === "antigravity"
-      ? process.env.ANTIGRAVITY_CONFIG_DIR
-      : host === "cursor"
-        ? process.env.CURSOR_CONFIG_DIR
-        : host === "grok"
-          ? process.env.GROK_HOME
-          : host === "opencode"
-            ? process.env.OPENCODE_CONFIG_DIR
-            : host === "claude"
-              ? process.env.CLAUDE_CONFIG_DIR
-              : process.env.CODEX_HOME;
-  const defaultHome =
-    host === "antigravity"
-      ? join(homedir(), ".gemini", "config")
-      : host === "cursor"
-        ? join(homedir(), ".cursor")
-        : host === "grok"
-          ? join(homedir(), ".grok")
-          : host === "opencode"
-            ? join(homedir(), ".config", "opencode")
-            : join(homedir(), host === "claude" ? ".claude" : ".codex");
+  if (host !== "codex") fail("only Codex is supported");
+  const configured = process.env.CODEX_HOME;
+  const defaultHome = join(homedir(), ".codex");
   const configuredHome = resolve(configured ? configured : defaultHome);
   let hostHome = configuredHome;
   try {
@@ -1825,27 +1833,21 @@ function managedPaths(host) {
     // explicit, non-recursive target. Lexical resolution is the only
     // available normalization until then.
   }
-  const root =
-    host === "antigravity"
-      ? join(hostHome, "plugins", PLUGIN_NAME)
-      : host === "cursor"
-        ? join(hostHome, "plugins", "local", PLUGIN_NAME)
-        : host === "grok"
-          ? join(hostHome, "plugins", PLUGIN_NAME)
-          : host === "opencode"
-            ? join(hostHome, "skills", PLUGIN_NAME)
-            : join(hostHome, "managed-marketplaces", MARKETPLACE_NAME);
+  const root = join(hostHome, "managed-marketplaces", MARKETPLACE_NAME);
   const layout = HOST_LAYOUTS[host];
   return {
     hostHome,
     root,
     parent: dirname(root),
     marker: join(root, MARKER_NAME),
-    marketplace: typeof layout.marketplaceRelative === "string" ? join(root, layout.marketplaceRelative) : null,
+    marketplace:
+      typeof layout.marketplaceRelative === "string"
+        ? join(root, layout.marketplaceRelative)
+        : null,
     plugin: join(root, layout.pluginRelative),
-    bridge: host === "opencode" ? join(hostHome, "plugins", "opensocrates.js") : null,
-    bridgeMarker: host === "opencode" ? join(hostHome, "plugins", OPENCODE_BRIDGE_MARKER) : null,
-    bridgeParent: host === "opencode" ? join(hostHome, "plugins") : null,
+    bridge: null,
+    bridgeMarker: null,
+    bridgeParent: null,
   };
 }
 
@@ -1854,32 +1856,19 @@ export function purgePathsFor(host) {
     fail(`unsupported host ${JSON.stringify(host)}`);
   }
   const paths = managedPaths(host);
-  const cacheRoot = ["claude", "codex"].includes(host)
-    ? join(paths.hostHome, "plugins", "cache", MARKETPLACE_NAME, PLUGIN_NAME)
-    : null;
+  const cacheRoot = join(paths.hostHome, "plugins", "cache", MARKETPLACE_NAME, PLUGIN_NAME);
   return {
     ...paths,
     cacheRoot,
     cacheMarketplaceRoot: cacheRoot === null ? null : dirname(cacheRoot),
-    pluginData:
-      host === "claude"
-        ? [
-            join(paths.hostHome, "plugins", "data", "opensocrates-inline"),
-            join(paths.hostHome, "plugins", "data", "opensocrates-opensocrates"),
-          ]
-        : [],
+    pluginData: [],
   };
 }
 
 // Directory that holds staging trees and rollback backups for one host.
 //
-// Grok scans every directory below ~/.grok/plugins, including dot-prefixed
-// ones, so a staging tree or rollback backup left there would be discovered as
-// a second OpenSocrates plugin. An interrupted install must not be able to
-// leave a shadow copy inside Grok's plugin discovery root, so both transient
-// directories live in the Grok home instead, next to the scanned directory.
 function transientParent(host, paths) {
-  return host === "grok" ? paths.hostHome : paths.parent;
+  return paths.parent;
 }
 
 export function transientPathsFor(host) {
@@ -1891,34 +1880,40 @@ function codexBinary() {
   return process.env.CODEX_BIN || "codex";
 }
 
-function claudeBinary() {
-  return process.env.CLAUDE_BIN || "claude";
-}
-
-function cursorBinary() {
-  return process.env.CURSOR_BIN || "cursor";
-}
-
-function cursorAppPaths() {
-  return ["/Applications/Cursor.app", join(homedir(), "Applications", "Cursor.app")];
-}
-
-function antigravityBinary() {
-  return process.env.AGY_BIN || "agy";
-}
-
-function grokBinary() {
-  return process.env.GROK_BIN || "grok";
-}
-
-function opencodeBinary() {
-  return process.env.OPENCODE_BIN || "opencode";
+function windowsAction(action, target, destination = "") {
+  const result = spawnSync(
+    "powershell.exe",
+    [
+      "-NoProfile",
+      "-NonInteractive",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      fileURLToPath(new URL("./windows.ps1", import.meta.url)),
+      "-Action",
+      action,
+    ],
+    {
+      encoding: "utf8",
+      windowsHide: true,
+      maxBuffer: 16 * 1024 * 1024,
+      env: {
+        ...process.env,
+        OPENSOCRATES_WINDOWS_PATH: target,
+        OPENSOCRATES_WINDOWS_DESTINATION: destination,
+      },
+    },
+  );
+  if (result.error || result.status !== 0)
+    fail(`Windows ${action} failed: ${result.error?.message || result.stderr?.trim()}`);
+  return result.stdout;
 }
 
 function run(command, args, { allowFailure = false } = {}) {
   const result = spawnSync(command, args, {
     encoding: "utf8",
     env: process.env,
+    windowsHide: true,
     maxBuffer: 16 * 1024 * 1024,
   });
   if (result.error) {
@@ -1958,139 +1953,7 @@ function runCodexJson(args) {
   return payload;
 }
 
-function runClaudeJson(args) {
-  return runJson(claudeBinary(), args, "Claude Code");
-}
-
-function runGrokJson(args) {
-  return runJson(grokBinary(), args, "Grok Build");
-}
-
-function claudeListEntries(payload, wrapper, label) {
-  if (Array.isArray(payload)) {
-    return payload;
-  }
-  if (
-    payload !== null &&
-    typeof payload === "object" &&
-    !Array.isArray(payload) &&
-    Object.keys(payload).length === 1 &&
-    Array.isArray(payload[wrapper])
-  ) {
-    return payload[wrapper];
-  }
-  fail(`Claude Code ${label} returned an unexpected schema`);
-}
-
-function requireUniqueClaudeEntries(entries, identity, label) {
-  const seen = new Set();
-  for (const entry of entries) {
-    if (
-      entry === null ||
-      typeof entry !== "object" ||
-      Array.isArray(entry) ||
-      typeof entry[identity] !== "string" ||
-      entry[identity].trim().length === 0
-    ) {
-      fail(`Claude Code ${label} returned a malformed entry`);
-    }
-    if (seen.has(entry[identity])) {
-      fail(`Claude Code ${label} returned duplicate entries for ${entry[identity]}`);
-    }
-    seen.add(entry[identity]);
-  }
-  return entries;
-}
-
-function claudeMarketplaceEntries(payload) {
-  return requireUniqueClaudeEntries(
-    claudeListEntries(payload, "marketplaces", "marketplace list"),
-    "name",
-    "marketplace list",
-  );
-}
-
-function claudePluginEntries(payload) {
-  return requireUniqueClaudeEntries(claudeListEntries(payload, "plugins", "plugin list"), "id", "plugin list");
-}
-
-function versionAtLeast(value, minimum) {
-  const match = String(value).match(/(\d+)\.(\d+)\.(\d+)/u);
-  if (!match) {
-    return false;
-  }
-  const current = match.slice(1).map(Number);
-  for (let index = 0; index < minimum.length; index += 1) {
-    if (current[index] > minimum[index]) return true;
-    if (current[index] < minimum[index]) return false;
-  }
-  return true;
-}
-
 function requireHostCli(host, { authenticated = false } = {}) {
-  if (host === "grok") {
-    const result = run(grokBinary(), ["--version"]);
-    if (!versionAtLeast(result.stdout, [1, 0, 3])) {
-      fail(`Grok Build 1.0.3 or later is required; got ${result.stdout.trim()}`);
-    }
-    return;
-  }
-  if (host === "cursor") {
-    if (process.env.CURSOR_CONFIG_DIR) return;
-    if (process.env.CURSOR_BIN) {
-      const result = run(cursorBinary(), ["--version"]);
-      if (!versionAtLeast(result.stdout, [2, 5, 0])) {
-        fail(`Cursor 2.5.0 or later is required; got ${result.stdout.trim()}`);
-      }
-      return;
-    }
-    const app = cursorAppPaths().find((candidate) => existsSync(candidate));
-    if (app) {
-      const result = run(
-        "/usr/bin/plutil",
-        ["-extract", "CFBundleShortVersionString", "raw", join(app, "Contents", "Info.plist")],
-        { allowFailure: true },
-      );
-      if (result.status !== 0 || !versionAtLeast(result.stdout, [2, 5, 0])) {
-        fail("Cursor 2.5.0 or later is required for Agent Plugin support");
-      }
-      return;
-    }
-    const result = run(cursorBinary(), ["--version"]);
-    if (!versionAtLeast(result.stdout, [2, 5, 0])) {
-      fail(`Cursor 2.5.0 or later is required; got ${result.stdout.trim()}`);
-    }
-    return;
-  }
-  if (host === "antigravity") {
-    if (process.env.ANTIGRAVITY_CONFIG_DIR) return;
-    run(antigravityBinary(), ["--version"]);
-    return;
-  }
-  if (host === "opencode") {
-    // OPENCODE_CONFIG_DIR only redirects where the managed files are written;
-    // it does not waive the supported-host gate. Unlike the content-only
-    // file-drop hosts above, OpenCode receives an executing bridge bound to the
-    // stable chat.message contract, and the shipped package declares
-    // minimum_opencode_version 1.18.18 with a fail-closed <2.0.0 ceiling.
-    // Installing that bridge without confirming the host version would ship
-    // executable code against an unverified plugin API.
-    const result = run(opencodeBinary(), ["--version"]);
-    if (!versionAtLeast(result.stdout, [1, 18, 18]) || versionAtLeast(result.stdout, [2, 0, 0])) {
-      fail(`OpenCode >=1.18.18 and <2.0.0 is required; got ${result.stdout.trim()}`);
-    }
-    return;
-  }
-  if (host === "claude") {
-    const result = run(claudeBinary(), ["--version"]);
-    if (!versionAtLeast(result.stdout, [2, 1, 205])) {
-      fail(`Claude Code 2.1.205 or later is required for structured selector output; got ${result.stdout.trim()}`);
-    }
-    if (authenticated) {
-      run(claudeBinary(), ["auth", "status"]);
-    }
-    return;
-  }
   run(codexBinary(), ["--version"]);
   if (authenticated) {
     run(codexBinary(), ["login", "status"]);
@@ -2098,17 +1961,8 @@ function requireHostCli(host, { authenticated = false } = {}) {
 }
 
 function marketplaceEntries(host) {
-  if (FILE_DROP_HOSTS.includes(host) || host === "opencode") {
-    const paths = managedPaths(host);
-    const present =
-      existsSync(paths.root) || (host === "opencode" && (existsSync(paths.bridge) || existsSync(paths.bridgeMarker)));
-    return present ? [{ name: MARKETPLACE_NAME, root: paths.root }] : [];
-  }
-  const payload =
-    host === "claude"
-      ? runClaudeJson(["plugin", "marketplace", "list", "--json"])
-      : runCodexJson(["plugin", "marketplace", "list", "--json"]).marketplaces;
-  const entries = host === "claude" ? claudeMarketplaceEntries(payload) : payload;
+  const payload = runCodexJson(["plugin", "marketplace", "list", "--json"]).marketplaces;
+  const entries = payload;
   if (!Array.isArray(entries)) {
     fail(`${host} marketplace list returned an unexpected schema`);
   }
@@ -2124,143 +1978,15 @@ function marketplaceEntry(host) {
   return matches[0] ?? null;
 }
 
-// Read Grok Build's machine-readable plugin state.
-//
-// The managed Grok files are host-independent content, so inspecting or
-// removing what the installer owns must not depend on a runnable `grok`
-// command: a user who uninstalls Grok Build still has to be able to clean up.
-// Transactional callers pass requireHostState so that install and update keep
-// confirming activation against the host itself.
-function grokInspection(requireHostState) {
-  if (requireHostState) return runGrokJson(["inspect", "--json"]);
-  const result = run(grokBinary(), ["inspect", "--json"], { allowFailure: true });
-  if (result.error || result.status !== 0) {
-    const detail = result.error?.message || result.stderr?.trim() || `exit ${result.status}`;
-    console.warn(
-      `warning: could not read Grok Build plugin state (${detail}); ` +
-        "reporting the managed files only",
-    );
-    return null;
-  }
-  try {
-    const payload = JSON.parse(result.stdout);
-    if (payload === null || typeof payload !== "object") {
-      fail("Grok Build returned a non-container JSON value");
-    }
-    return payload;
-  } catch (error) {
-    if (error instanceof InstallerError) throw error;
-    fail(`Grok Build returned invalid JSON for inspect --json: ${error.message}`);
-  }
-}
-
 function pluginState(host, { requireHostState = false } = {}) {
-  if (FILE_DROP_HOSTS.includes(host)) {
-    const paths = managedPaths(host);
-    if (!existsSync(paths.root)) return { kind: "missing", version: null };
-    let manifest;
-    try {
-      manifest = JSON.parse(readFileSync(join(paths.root, "plugin.json"), "utf8"));
-    } catch (error) {
-      fail(`${host} plugin manifest is unreadable: ${error.message}`);
-    }
-    if (
-      manifest === null ||
-      typeof manifest !== "object" ||
-      Array.isArray(manifest) ||
-      (host === "cursor" &&
-        manifest.$schema !== "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json") ||
-      (host === "grok" && manifest.skills !== "./skills") ||
-      manifest.name !== PLUGIN_NAME ||
-      typeof manifest.version !== "string" ||
-      manifest.version.trim().length === 0
-    ) {
-      fail(`${host} reported an invalid OpenSocrates plugin manifest`);
-    }
-    if (host !== "grok") return { kind: "installed", version: manifest.version };
-    const payload = grokInspection(requireHostState);
-    if (payload === null) return { kind: "installed", version: manifest.version };
-    if (!Array.isArray(payload.plugins)) {
-      fail("Grok Build inspect returned an unexpected plugin schema");
-    }
-    const matches = payload.plugins.filter((entry) => entry?.name === PLUGIN_NAME);
-    if (matches.length !== 1) {
-      fail(
-        matches.length === 0
-          ? "Grok Build did not discover the managed OpenSocrates plugin"
-          : "Grok Build reported duplicate OpenSocrates plugins",
-      );
-    }
-    const entry = matches[0];
-    if (
-      typeof entry.enabled !== "boolean" ||
-      typeof entry.path !== "string" ||
-      entry.provides?.skills !== 1 ||
-      entry.provides?.agents !== 0 ||
-      entry.provides?.hooks !== false ||
-      entry.provides?.mcpServers !== 0
-    ) {
-      fail("Grok Build reported an invalid OpenSocrates plugin state");
-    }
-    let observedPath = resolve(entry.path);
-    try {
-      observedPath = realpathSync(observedPath);
-    } catch {
-      // The managed root exists here, so a missing reported path is invalid below.
-    }
-    let expectedPath = resolve(paths.root);
-    try {
-      expectedPath = realpathSync(expectedPath);
-    } catch {
-      // Ownership checks report a more specific error for a missing root.
-    }
-    if (observedPath !== expectedPath) {
-      fail(`Grok Build resolved OpenSocrates from an unmanaged location: ${observedPath}`);
-    }
-    return { kind: entry.enabled ? "installed" : "disabled", version: manifest.version };
-  }
-  if (host === "opencode") {
-    const paths = managedPaths(host);
-    if (!existsSync(paths.root) && !existsSync(paths.bridge) && !existsSync(paths.bridgeMarker)) {
-      return { kind: "missing", version: null };
-    }
-    let manifest;
-    try {
-      manifest = JSON.parse(readFileSync(join(paths.root, ".opensocrates-package", "opencode-plugin.json"), "utf8"));
-    } catch (error) {
-      fail(`opencode installed manifest is unreadable: ${error.message}`);
-    }
-    if (
-      manifest === null ||
-      typeof manifest !== "object" ||
-      Array.isArray(manifest) ||
-      manifest.name !== PLUGIN_NAME ||
-      typeof manifest.version !== "string" ||
-      manifest.version.trim().length === 0
-    ) {
-      fail("opencode reported an invalid OpenSocrates installation manifest");
-    }
-    return { kind: "installed", version: manifest.version };
-  }
-  if (host === "claude") {
-    const installed = claudePluginEntries(runClaudeJson(["plugin", "list", "--json"]));
-    const matches = installed.filter((entry) => entry?.id === PLUGIN_ID);
-    if (matches.length === 0) return { kind: "missing", version: null };
-    const entry = matches[0];
-    if (
-      (entry.version !== undefined &&
-        entry.version !== null &&
-        (typeof entry.version !== "string" || entry.version.trim().length === 0)) ||
-      typeof entry.enabled !== "boolean"
-    ) {
-      fail(`Claude Code reported an invalid state for ${PLUGIN_ID}`);
-    }
-    return {
-      kind: entry.enabled ? "installed" : "disabled",
-      version: entry.version ?? null,
-    };
-  }
-  const payload = runCodexJson(["plugin", "list", "--marketplace", MARKETPLACE_NAME, "--available", "--json"]);
+  const payload = runCodexJson([
+    "plugin",
+    "list",
+    "--marketplace",
+    MARKETPLACE_NAME,
+    "--available",
+    "--json",
+  ]);
   const installed = Array.isArray(payload.installed) ? payload.installed : null;
   const available = Array.isArray(payload.available) ? payload.available : null;
   if (installed === null || available === null) {
@@ -2286,51 +2012,10 @@ function pluginState(host, { requireHostState = false } = {}) {
   return { kind: "missing", version: null };
 }
 
-function detectLegacyClaudeInstallation() {
-  const marketplaces = marketplaceEntries("claude").filter(
-    (entry) =>
-      typeof entry?.name === "string" &&
-      entry.name !== MARKETPLACE_NAME &&
-      entry.name.toLowerCase() === MARKETPLACE_NAME,
-  );
-  const plugins = claudePluginEntries(runClaudeJson(["plugin", "list", "--json"]));
-  const legacyPlugins = plugins.filter((entry) => entry.id !== PLUGIN_ID && entry.id.toLowerCase() === PLUGIN_ID);
-  const names = marketplaces.map((entry) => entry.name).join(", ") || "OpenSocrates";
-  return {
-    found: marketplaces.length > 0 || legacyPlugins.length > 0,
-    names,
-  };
-}
-
 // Install and update write into the managed root, so a case-variant pre-1.0
 // registration must be resolved by the user first. Status and remove are
 // diagnostic and scoped to the root this installer owns, so they only warn:
 // blocking them would strand a user who needs to inspect or back out.
-function requireNoLegacyClaudeInstallation() {
-  const legacy = detectLegacyClaudeInstallation();
-  if (legacy.found) {
-    fail(
-      `a legacy Claude marketplace (${legacy.names}) is installed; OpenSocrates will not remove it automatically. ` +
-        "Uninstall its plugin and marketplace explicitly, then rerun this command. See the README migration section.",
-    );
-  }
-}
-
-function warnLegacyClaudeInstallation() {
-  let legacy;
-  try {
-    legacy = detectLegacyClaudeInstallation();
-  } catch {
-    return;
-  }
-  if (legacy.found) {
-    console.warn(
-      `warning: a legacy Claude marketplace (${legacy.names}) is also registered. ` +
-        "OpenSocrates never removes it automatically; this command only affects the root it owns. " +
-        "See the README migration section.",
-    );
-  }
-}
 
 async function readJsonObject(target) {
   let payload;
@@ -2364,85 +2049,6 @@ async function sha256File(target) {
     hash.update(chunk);
   }
   return hash.digest("hex");
-}
-
-function openCodeSidecar(bridgeSha256) {
-  return {
-    ...OPENCODE_MARKER,
-    version: PRODUCT_VERSION,
-    bridgeSha256,
-  };
-}
-
-async function ensureSafeDirectory(target, label) {
-  if (await exists(target)) {
-    const info = await lstat(target);
-    if (!info.isDirectory() || info.isSymbolicLink()) {
-      fail(`refusing to use an unsafe ${label} directory: ${target}`);
-    }
-    return;
-  }
-  await mkdir(target, { recursive: true, mode: 0o700 });
-  const info = await lstat(target);
-  if (!info.isDirectory() || info.isSymbolicLink()) {
-    fail(`refusing to use an unsafe ${label} directory: ${target}`);
-  }
-}
-
-async function ensureOpenCodeDirectories(paths) {
-  await ensureSafeDirectory(paths.hostHome, "OpenCode configuration");
-  await ensureSafeDirectory(paths.parent, "OpenCode skills");
-  await ensureSafeDirectory(paths.bridgeParent, "OpenCode plugins");
-}
-
-async function verifyOpenCodeInstallation(paths) {
-  await requireOwnedRoot(paths.root, "opencode");
-  for (const [target, label] of [
-    [paths.bridge, "plugin bridge"],
-    [paths.bridgeMarker, "plugin ownership sidecar"],
-  ]) {
-    if (!(await exists(target))) fail(`OpenCode ${label} is missing: ${target}`);
-    const info = await lstat(target);
-    if (!info.isFile() || info.isSymbolicLink()) {
-      fail(`OpenCode ${label} is not an owned regular file: ${target}`);
-    }
-  }
-  const sidecar = await readJsonObject(paths.bridgeMarker);
-  const sidecarMarker = Object.fromEntries(Object.keys(OPENCODE_MARKER).map((key) => [key, sidecar[key]]));
-  if (
-    !markerMatches(sidecarMarker, "opencode") ||
-    sidecar.version !== PRODUCT_VERSION ||
-    typeof sidecar.bridgeSha256 !== "string" ||
-    sidecar.bridgeSha256 !== (await sha256File(paths.bridge))
-  ) {
-    fail("OpenCode plugin bridge has an invalid ownership sidecar or checksum");
-  }
-  const manifest = await readJsonObject(join(paths.root, OPENCODE_INSTALL_MANIFEST));
-  if (
-    manifest.schema !== "opensocrates.opencode-installation/1.0.0" ||
-    manifest.version !== PRODUCT_VERSION ||
-    manifest.bridgeSha256 !== sidecar.bridgeSha256 ||
-    manifest.files === null ||
-    typeof manifest.files !== "object" ||
-    Array.isArray(manifest.files)
-  ) {
-    fail("OpenCode installation inventory is invalid");
-  }
-  const actualFiles = new Set(await walkFiles(paths.root));
-  actualFiles.delete(OPENCODE_INSTALL_MANIFEST);
-  const declaredFiles = Object.keys(manifest.files);
-  if (
-    actualFiles.size !== declaredFiles.length ||
-    declaredFiles.some((item) => !isSafeArchivePath(item) || !actualFiles.has(item))
-  ) {
-    fail("OpenCode installation inventory does not cover the complete managed skill");
-  }
-  for (const item of declaredFiles) {
-    if (manifest.files[item] !== (await sha256File(join(paths.root, ...item.split("/"))))) {
-      fail(`OpenCode installed file checksum mismatch for ${item}`);
-    }
-  }
-  return manifest;
 }
 
 async function downloadFile(url, destination) {
@@ -2509,8 +2115,10 @@ async function verifyOuterChecksum(asset, checksum, host) {
 
 function archiveEntries(asset) {
   const unzip = process.platform === "darwin" ? "/usr/bin/unzip" : "unzip";
-  const result = run(unzip, ["-Z1", asset]);
-  const entries = result.stdout.split(/\r?\n/u).filter(Boolean);
+  const entries =
+    process.platform === "win32"
+      ? JSON.parse(windowsAction("entries", asset))
+      : run(unzip, ["-Z1", asset]).stdout.split(/\r?\n/u).filter(Boolean);
   if (entries.length === 0 || entries.length > MAX_ARCHIVE_ENTRIES) {
     fail(`archive contains an invalid number of entries: ${entries.length}`);
   }
@@ -2531,7 +2139,8 @@ async function extractArchive(asset, destination) {
   archiveEntries(asset);
   await mkdir(destination, { recursive: true, mode: 0o700 });
   const unzip = process.platform === "darwin" ? "/usr/bin/unzip" : "unzip";
-  run(unzip, ["-q", asset, "-d", destination]);
+  if (process.platform === "win32") windowsAction("extract", asset, destination);
+  else run(unzip, ["-q", asset, "-d", destination]);
 }
 
 async function walkFiles(root, current = root, output = []) {
@@ -2580,11 +2189,21 @@ async function verifyPackageChecksums(pluginRoot) {
       fail(`package checksum mismatch for ${item}`);
     }
   }
-  const actualFiles = new Set((await walkFiles(pluginRoot)).filter((item) => item !== "checksums.sha256"));
+  const actualFiles = new Set(
+    (await walkFiles(pluginRoot)).filter((item) => item !== "checksums.sha256"),
+  );
   if (actualFiles.size !== declared.size || [...actualFiles].some((item) => !declared.has(item))) {
     fail("package checksum manifest does not cover the complete archive");
   }
   return declared.size;
+}
+
+function hasExactStringEntries(value, expected) {
+  return (
+    Array.isArray(value) &&
+    value.length === expected.length &&
+    value.every((item, index) => item === expected[index])
+  );
 }
 
 async function verifyExtractedPackage(pluginRoot, host) {
@@ -2604,36 +2223,56 @@ async function verifyExtractedPackage(pluginRoot, host) {
     fail("package release manifest does not match this installer");
   }
   if (HOST_LAYOUTS[host].requiresRuntime) {
-    const runtime = join(pluginRoot, "runtime", "darwin-arm64", "opensocrates-runtime", "opensocrates-runtime");
-    const runtimeInfo = await stat(runtime);
-    if (!runtimeInfo.isFile() || (runtimeInfo.mode & 0o111) === 0) {
-      fail("package is missing the executable darwin-arm64 runtime");
+    const target = process.platform === "win32" ? "windows-x64" : "darwin-arm64";
+    const runtimeRoot = join(pluginRoot, "runtime");
+    const executable =
+      process.platform === "win32" ? "opensocrates-runtime.exe" : "opensocrates-runtime";
+    const runtime = join(runtimeRoot, target, "opensocrates-runtime", executable);
+    if (
+      !hasExactStringEntries(release.runtime_targets, [target]) ||
+      !hasExactStringEntries(release.release_targets, [target])
+    ) {
+      fail(`package target metadata does not declare only ${target}`);
+    }
+    let packagedTargets;
+    try {
+      packagedTargets = await readdir(runtimeRoot, { withFileTypes: true });
+    } catch {
+      fail(`package runtime layout cannot be inspected for ${target}`);
+    }
+    if (
+      packagedTargets.length !== 1 ||
+      packagedTargets[0].name !== target ||
+      !packagedTargets[0].isDirectory() ||
+      packagedTargets[0].isSymbolicLink()
+    ) {
+      fail(`package runtime layout does not contain only ${target}`);
+    }
+    let runtimeInfo;
+    try {
+      runtimeInfo = await stat(runtime);
+    } catch {
+      fail(`package runtime layout is missing the executable ${target} runtime`);
+    }
+    if (
+      !runtimeInfo.isFile() ||
+      (process.platform !== "win32" && (runtimeInfo.mode & 0o111) === 0)
+    ) {
+      fail(`package runtime layout is missing the executable ${target} runtime`);
     }
   } else if (
-    release.launchers?.length !== 0 ||
-    release.runtime_targets?.length !== 0 ||
+    !hasExactStringEntries(release.release_targets, []) ||
+    !hasExactStringEntries(release.launchers, []) ||
+    !hasExactStringEntries(release.runtime_targets, []) ||
     (await exists(join(pluginRoot, "runtime"))) ||
     (await exists(join(pluginRoot, "hooks"))) ||
     (await exists(join(pluginRoot, "bin"))) ||
-    ((host === "cursor" || host === "grok") && (await exists(join(pluginRoot, "mcp.json")))) ||
-    (host === "grok" &&
-      ((await exists(join(pluginRoot, "commands"))) ||
-        (await exists(join(pluginRoot, "agents"))) ||
-        (await exists(join(pluginRoot, ".mcp.json")))))
+    false ||
+    false
   ) {
     fail(`${host} package contains an unexpected native runtime or launcher surface`);
   }
-  if (host === "opencode") {
-    if (
-      manifest.minimum_opencode_version !== "1.18.18" ||
-      manifest.stable_plugin_hook !== "chat.message" ||
-      manifest.beta_v2_api !== false ||
-      !(await exists(join(pluginRoot, "plugins", "opensocrates.js"))) ||
-      !(await exists(join(pluginRoot, "skills", "opensocrates", "SKILL.md")))
-    ) {
-      fail("OpenCode package does not match the verified stable bridge contract");
-    }
-  }
+
   return verifyPackageChecksums(pluginRoot);
 }
 
@@ -2725,7 +2364,8 @@ async function packageIdentityForPurge(pluginRoot, host, { allowedExtra = () => 
       fail(`OpenSocrates ${host} payload has an unsafe checksum path`);
     }
     const target = join(pluginRoot, ...item.split("/"));
-    if (!(await entryExists(target))) fail(`OpenSocrates ${host} payload is missing a declared file`);
+    if (!(await entryExists(target)))
+      fail(`OpenSocrates ${host} payload is missing a declared file`);
     const info = await lstat(target);
     if (!info.isFile() || info.isSymbolicLink()) {
       fail(`OpenSocrates ${host} payload contains an unsafe declared file`);
@@ -2788,7 +2428,11 @@ async function purgeHostCache(host, paths) {
   if (!(await entryExists(paths.cacheRoot))) {
     let removedEmptyMarketplace = false;
     if (await entryExists(paths.cacheMarketplaceRoot)) {
-      await requireSafePathBelow(paths.hostHome, paths.cacheMarketplaceRoot, `${host} cache marketplace`);
+      await requireSafePathBelow(
+        paths.hostHome,
+        paths.cacheMarketplaceRoot,
+        `${host} cache marketplace`,
+      );
       const info = await lstat(paths.cacheMarketplaceRoot);
       if (!info.isDirectory() || info.isSymbolicLink()) {
         fail(`refusing an unsafe ${host} OpenSocrates cache marketplace`);
@@ -2860,90 +2504,30 @@ async function purgeHostCache(host, paths) {
   };
 }
 
-async function purgeClaudePluginData(paths) {
-  const results = [];
-  for (const target of paths.pluginData) {
-    if (!(await entryExists(target))) {
-      results.push({ component: "plugin-data", status: "absent", path: target });
-      continue;
-    }
-    await requireSafePathBelow(paths.hostHome, target, "Claude OpenSocrates plugin data");
-    const info = await lstat(target);
-    if (!info.isDirectory() || info.isSymbolicLink()) {
-      fail(`refusing an unsafe Claude OpenSocrates plugin-data path: ${target}`);
-    }
-    if ((await readdir(target)).length !== 0) {
-      results.push({
-        component: "plugin-data",
-        status: "pending",
-        path: target,
-        detail: "nonempty-unverified-data",
-      });
-      continue;
-    }
-    await rmdir(target);
-    results.push({ component: "plugin-data", status: "removed", path: target });
-  }
-  return results;
-}
-
-async function verifyOpenCodePurgeRoot(root) {
-  await requireOwnedRoot(root, "opencode");
-  const manifestPath = join(root, OPENCODE_INSTALL_MANIFEST);
-  await requireRegularFileEntry(manifestPath, "OpenCode installation inventory");
-  const manifest = await readJsonObject(manifestPath);
-  const manifestKeys = Object.keys(manifest).sort();
-  if (
-    !jsonDeepEqual(manifestKeys, ["bridgeSha256", "files", "schema", "version"]) ||
-    manifest.schema !== "opensocrates.opencode-installation/1.0.0" ||
-    typeof manifest.version !== "string" ||
-    manifest.version.trim().length === 0 ||
-    !/^[a-f0-9]{64}$/u.test(manifest.bridgeSha256) ||
-    manifest.files === null ||
-    typeof manifest.files !== "object" ||
-    Array.isArray(manifest.files)
-  ) {
-    fail("OpenCode installation inventory is invalid");
-  }
-  const declared = Object.keys(manifest.files);
-  const actual = new Set(await walkFiles(root));
-  actual.delete(OPENCODE_INSTALL_MANIFEST);
-  if (
-    actual.size !== declared.length ||
-    declared.some((item) => !isSafeArchivePath(item) || !actual.has(item) || !/^[a-f0-9]{64}$/u.test(manifest.files[item]))
-  ) {
-    fail("OpenCode installation inventory does not cover the complete managed skill");
-  }
-  for (const item of declared) {
-    if ((await sha256File(join(root, ...item.split("/")))) !== manifest.files[item]) {
-      fail(`OpenCode installed file checksum mismatch for ${item}`);
-    }
-  }
-  return manifest;
-}
-
 async function verifyManagedTreeForPurge(host, root) {
-  if (host === "opencode") return verifyOpenCodePurgeRoot(root);
   await requireOwnedRoot(root, host);
   const layout = HOST_LAYOUTS[host];
   const pluginRoot = join(root, layout.pluginRelative);
   const identity = await packageIdentityForPurge(pluginRoot, host, {
-    allowedExtra: (item) => FILE_DROP_HOSTS.includes(host) && item === MARKER_NAME,
+    allowedExtra: (item) => false,
   });
-  if (FILE_DROP_HOSTS.includes(host)) return identity;
 
   const marketplacePath = join(root, layout.marketplaceRelative);
   await requireRegularFileEntry(marketplacePath, `${host} marketplace manifest`);
   const marketplace = await readJsonObject(marketplacePath);
   const expected = expectedMarketplace(host);
-  if (host === "claude") expected.metadata.version = identity.version;
+
   if (!jsonDeepEqual(marketplace, expected)) {
     fail(`${host} managed marketplace does not match the exact owned plugin inventory`);
   }
   const allowed = new Set([
     MARKER_NAME,
     layout.marketplaceRelative.split(sep).join("/"),
-    ...identity.files.map((item) => join(layout.pluginRelative, ...item.split("/")).split(sep).join("/")),
+    ...identity.files.map((item) =>
+      join(layout.pluginRelative, ...item.split("/"))
+        .split(sep)
+        .join("/"),
+    ),
   ]);
   for (const item of await walkFiles(root)) {
     if (!allowed.has(item)) fail(`${host} managed marketplace contains an unowned file: ${item}`);
@@ -2965,10 +2549,13 @@ async function removeOwnedManagedRoot(host, paths) {
     await rm(backup, { recursive: true });
   } catch (error) {
     if ((await entryExists(backup)) && !(await entryExists(paths.root))) {
-      const restored = await recoveryStep(`restore the ${host} managed root after purge cleanup failed`, async () => {
-        await verifyManagedTreeForPurge(host, backup);
-        await rename(backup, paths.root);
-      });
+      const restored = await recoveryStep(
+        `restore the ${host} managed root after purge cleanup failed`,
+        async () => {
+          await verifyManagedTreeForPurge(host, backup);
+          await rename(backup, paths.root);
+        },
+      );
       if (!restored) {
         console.error(`error: recoverable ${host} files remain at: ${backup}`);
         console.error(`error: retry command: opensocrates remove --host ${host} --purge`);
@@ -2984,7 +2571,9 @@ async function cleanupTransientRootResidue(host, paths) {
   if (!(await entryExists(parent))) {
     return { component: "transaction-residue", status: "absent", path: parent };
   }
-  await requireSafePathBelow(paths.hostHome, parent, `${host} transient parent`, { allowRoot: true });
+  await requireSafePathBelow(paths.hostHome, parent, `${host} transient parent`, {
+    allowRoot: true,
+  });
   const names = (await readdir(parent)).filter((name) =>
     /^\.opensocrates\.(?:staging|backup|removed)-[A-Za-z0-9-]+$/u.test(name),
   );
@@ -3014,97 +2603,6 @@ async function cleanupTransientRootResidue(host, paths) {
   };
 }
 
-async function readOpenCodeBridgeSidecar(target) {
-  const info = await lstat(target);
-  if (!info.isFile() || info.isSymbolicLink()) {
-    fail(`OpenCode bridge ownership sidecar is unsafe: ${target}`);
-  }
-  const sidecar = await readJsonObject(target);
-  const expectedKeys = [...Object.keys(OPENCODE_MARKER), "version", "bridgeSha256"].sort();
-  const observedKeys = Object.keys(sidecar).sort();
-  const marker = Object.fromEntries(Object.keys(OPENCODE_MARKER).map((key) => [key, sidecar[key]]));
-  if (
-    expectedKeys.length !== observedKeys.length ||
-    expectedKeys.some((key, index) => key !== observedKeys[index]) ||
-    !markerMatches(marker, "opencode") ||
-    typeof sidecar.version !== "string" ||
-    sidecar.version.trim().length === 0 ||
-    !/^[a-f0-9]{64}$/u.test(sidecar.bridgeSha256)
-  ) {
-    fail(`OpenCode bridge ownership sidecar is invalid: ${target}`);
-  }
-  return sidecar;
-}
-
-async function purgeOpenCodeBridge(paths) {
-  const bridgePresent = await entryExists(paths.bridge);
-  const markerPresent = await entryExists(paths.bridgeMarker);
-  if (!bridgePresent && !markerPresent) {
-    return { component: "opencode-bridge", status: "absent", path: paths.bridge };
-  }
-  await requireSafePathBelow(paths.hostHome, paths.bridge, "OpenCode bridge");
-  await requireSafePathBelow(paths.hostHome, paths.bridgeMarker, "OpenCode bridge sidecar");
-  if (bridgePresent && !markerPresent) {
-    fail("refusing to remove an OpenCode bridge without its ownership sidecar");
-  }
-  const sidecar = await readOpenCodeBridgeSidecar(paths.bridgeMarker);
-  if (bridgePresent) {
-    const bridgeInfo = await lstat(paths.bridge);
-    if (!bridgeInfo.isFile() || bridgeInfo.isSymbolicLink() || (await sha256File(paths.bridge)) !== sidecar.bridgeSha256) {
-      fail("refusing to remove an OpenCode bridge whose ownership checksum does not match");
-    }
-    await rm(paths.bridge);
-  }
-  await rm(paths.bridgeMarker);
-  return { component: "opencode-bridge", status: "removed", path: paths.bridge };
-}
-
-async function purgeOpenCodeBridgeResidue(paths) {
-  if (!(await entryExists(paths.bridgeParent))) {
-    return { component: "opencode-bridge-residue", status: "absent", path: paths.bridgeParent };
-  }
-  await requireSafePathBelow(paths.hostHome, paths.bridgeParent, "OpenCode bridge parent");
-  const entries = await readdir(paths.bridgeParent, { withFileTypes: true });
-  const bridgeNames = entries
-    .filter((entry) => /^\.opensocrates\.js\.(?:staging|backup|removed)-[A-Za-z0-9-]+$/u.test(entry.name))
-    .map((entry) => entry.name);
-  const markerNames = entries
-    .filter((entry) =>
-      /^\.opensocrates-managed\.json\.(?:staging|backup|removed)-[A-Za-z0-9-]+$/u.test(entry.name),
-    )
-    .map((entry) => entry.name);
-  const bridges = new Map();
-  for (const name of bridgeNames) {
-    const target = join(paths.bridgeParent, name);
-    await requireSafePathBelow(paths.bridgeParent, target, "OpenCode bridge residue");
-    const info = await lstat(target);
-    if (!info.isFile() || info.isSymbolicLink()) fail(`unsafe OpenCode bridge residue: ${target}`);
-    bridges.set(target, await sha256File(target));
-  }
-  let removed = 0;
-  for (const name of markerNames) {
-    const marker = join(paths.bridgeParent, name);
-    await requireSafePathBelow(paths.bridgeParent, marker, "OpenCode bridge sidecar residue");
-    const sidecar = await readOpenCodeBridgeSidecar(marker);
-    const matches = [...bridges].filter(([, digest]) => digest === sidecar.bridgeSha256);
-    if (matches.length > 1) fail("ambiguous OpenCode bridge transaction residue");
-    if (matches.length === 1) {
-      const [[bridge]] = matches;
-      await rm(bridge);
-      bridges.delete(bridge);
-      removed += 1;
-    }
-    await rm(marker);
-    removed += 1;
-  }
-  if (bridges.size > 0) fail("refusing OpenCode bridge residue without an ownership sidecar");
-  return {
-    component: "opencode-bridge-residue",
-    status: removed > 0 ? "removed" : "absent",
-    path: paths.bridgeParent,
-  };
-}
-
 async function prepareVerifiedPackage(options, host = options.host) {
   if (!SUPPORTED_HOSTS.includes(host)) {
     fail(`cannot prepare a package for unsupported host ${JSON.stringify(host)}`);
@@ -3124,35 +2622,25 @@ async function prepareVerifiedPackage(options, host = options.host) {
 }
 
 async function prepareVerifiedPackages(options, hosts) {
-  const settled = await Promise.allSettled(hosts.map((host) => prepareVerifiedPackage(options, host)));
-  const prepared = settled.filter((result) => result.status === "fulfilled").map((result) => result.value);
-  const failure = settled.find((result) => result.status === "rejected");
-  if (failure) {
+  const settled = await Promise.allSettled(
+    hosts.map((host) => prepareVerifiedPackage(options, host)),
+  );
+  const prepared = settled
+    .filter((result) => result.status === "fulfilled")
+    .map((result) => result.value);
+  if (settled.some((result) => result.status === "rejected")) {
     await Promise.all(prepared.map((item) => rm(item.scratch, { recursive: true, force: true })));
-    throw failure.reason;
+    throw new PackagePreparationError(
+      settled.map((result, index) => ({
+        host: hosts[index],
+        error: result.status === "rejected" ? result.reason : null,
+      })),
+    );
   }
   return prepared;
 }
 
 function expectedMarketplace(host) {
-  if (host === "claude") {
-    return {
-      name: MARKETPLACE_NAME,
-      owner: { name: "Parker Hwang" },
-      metadata: {
-        description: "OpenSocrates reasoning support for Claude Code and Cowork",
-        version: PRODUCT_VERSION,
-      },
-      plugins: [
-        {
-          name: PLUGIN_NAME,
-          source: `./plugins/${PLUGIN_NAME}`,
-          description: "Local reasoning-system selection for Claude Code and Cowork, plus one /opensocrates entry.",
-          category: "workflow",
-        },
-      ],
-    };
-  }
   return {
     name: MARKETPLACE_NAME,
     interface: { displayName: "OpenSocrates" },
@@ -3177,15 +2665,6 @@ async function buildStagingTree(parent, pluginSource, host) {
   const layout = HOST_LAYOUTS[host];
   const staging = await mkdtemp(join(parent, ".opensocrates.staging-"));
   try {
-    if (FILE_DROP_HOSTS.includes(host)) {
-      await cp(pluginSource, staging, { recursive: true, preserveTimestamps: true });
-      await verifyExtractedPackage(staging, host);
-      await writeFile(join(staging, MARKER_NAME), `${JSON.stringify(markerFor(host), null, 2)}\n`, {
-        encoding: "utf8",
-        mode: 0o600,
-      });
-      return staging;
-    }
     const marketplace = join(staging, layout.marketplaceRelative);
     const plugin = join(staging, layout.pluginRelative);
     await mkdir(dirname(marketplace), { recursive: true, mode: 0o700 });
@@ -3210,88 +2689,12 @@ async function buildStagingTree(parent, pluginSource, host) {
   }
 }
 
-async function buildOpenCodeStaging(paths, pluginSource) {
-  await ensureOpenCodeDirectories(paths);
-  const root = await mkdtemp(join(paths.parent, ".opensocrates.staging-"));
-  const bridge = join(paths.bridgeParent, `.opensocrates.js.staging-${randomUUID()}`);
-  const bridgeMarker = join(paths.bridgeParent, `.opensocrates-managed.json.staging-${randomUUID()}`);
-  try {
-    await cp(join(pluginSource, "skills", "opensocrates"), root, {
-      recursive: true,
-      preserveTimestamps: true,
-    });
-    const metadata = join(root, ".opensocrates-package");
-    await mkdir(metadata, { mode: 0o700 });
-    for (const name of ["opencode-plugin.json", "release-manifest.json", "checksums.sha256"]) {
-      await cp(join(pluginSource, name), join(metadata, name), {
-        preserveTimestamps: true,
-      });
-    }
-    await writeFile(join(root, MARKER_NAME), `${JSON.stringify(markerFor("opencode"), null, 2)}\n`, {
-      encoding: "utf8",
-      mode: 0o600,
-    });
-    await cp(join(pluginSource, "plugins", "opensocrates.js"), bridge, {
-      preserveTimestamps: true,
-    });
-    const bridgeSha256 = await sha256File(bridge);
-    const files = {};
-    for (const item of (await walkFiles(root)).sort()) {
-      files[item] = await sha256File(join(root, ...item.split("/")));
-    }
-    await writeFile(
-      join(root, OPENCODE_INSTALL_MANIFEST),
-      `${JSON.stringify(
-        {
-          schema: "opensocrates.opencode-installation/1.0.0",
-          version: PRODUCT_VERSION,
-          bridgeSha256,
-          files,
-        },
-        null,
-        2,
-      )}\n`,
-      { encoding: "utf8", mode: 0o600 },
-    );
-    await writeFile(bridgeMarker, `${JSON.stringify(openCodeSidecar(bridgeSha256), null, 2)}\n`, {
-      encoding: "utf8",
-      mode: 0o600,
-    });
-    return { root, bridge, bridgeMarker };
-  } catch (error) {
-    await rm(root, { recursive: true, force: true });
-    await rm(bridge, { force: true });
-    await rm(bridgeMarker, { force: true });
-    throw error;
-  }
-}
-
 function entryRoot(entry, host) {
   if (entry === null) {
     return null;
   }
   let value;
-  if (host === "claude") {
-    const fields = ["path", "installLocation"].filter((field) => entry[field] !== undefined && entry[field] !== null);
-    if (
-      fields.length === 0 ||
-      fields.some((field) => typeof entry[field] !== "string" || entry[field].trim().length === 0)
-    ) {
-      fail(`${host} marketplace ${MARKETPLACE_NAME} has no usable root`);
-    }
-    const roots = fields.map((field) => {
-      const candidate = resolve(entry[field]);
-      try {
-        return realpathSync(candidate);
-      } catch {
-        return candidate;
-      }
-    });
-    if (new Set(roots).size !== 1) {
-      fail(`${host} marketplace ${MARKETPLACE_NAME} reported conflicting roots`);
-    }
-    [value] = roots;
-  } else {
+  {
     value = entry.root;
   }
   if (typeof value !== "string" || value.trim().length === 0) {
@@ -3310,16 +2713,6 @@ function entryRoot(entry, host) {
 }
 
 function removeRegistration(host, entry, state) {
-  if (FILE_DROP_HOSTS.includes(host) || host === "opencode") return;
-  if (host === "claude") {
-    if (["installed", "disabled"].includes(state.kind)) {
-      run(claudeBinary(), ["plugin", "uninstall", PLUGIN_ID, "--scope", "user"]);
-    }
-    if (entry !== null) {
-      run(claudeBinary(), ["plugin", "marketplace", "remove", MARKETPLACE_NAME, "--scope", "user"]);
-    }
-    return;
-  }
   if (state.kind === "installed") {
     runCodexJson(["plugin", "remove", PLUGIN_ID, "--json"]);
   }
@@ -3329,17 +2722,6 @@ function removeRegistration(host, entry, state) {
 }
 
 function addRegistration(host, root, installPlugin, { enabled = true } = {}) {
-  if (FILE_DROP_HOSTS.includes(host) || host === "opencode") return null;
-  if (host === "claude") {
-    run(claudeBinary(), ["plugin", "marketplace", "add", root, "--scope", "user"]);
-    if (installPlugin) {
-      run(claudeBinary(), ["plugin", "install", PLUGIN_ID, "--scope", "user"]);
-      if (!enabled) {
-        run(claudeBinary(), ["plugin", "disable", PLUGIN_ID, "--scope", "user"]);
-      }
-    }
-    return null;
-  }
   runCodexJson(["plugin", "marketplace", "add", root, "--json"]);
   if (installPlugin) {
     return runCodexJson(["plugin", "add", PLUGIN_ID, "--json"]);
@@ -3348,7 +2730,6 @@ function addRegistration(host, root, installPlugin, { enabled = true } = {}) {
 }
 
 function removeRegistrationBestEffort(host) {
-  if (FILE_DROP_HOSTS.includes(host) || host === "opencode") return;
   const entry = (() => {
     try {
       return marketplaceEntry(host);
@@ -3362,21 +2743,15 @@ function removeRegistrationBestEffort(host) {
   try {
     const state = pluginState(host);
     if (["installed", "disabled"].includes(state.kind)) {
-      const binary = host === "claude" ? claudeBinary() : codexBinary();
-      const args =
-        host === "claude"
-          ? ["plugin", "uninstall", PLUGIN_ID, "--scope", "user"]
-          : ["plugin", "remove", PLUGIN_ID, "--json"];
+      const binary = codexBinary();
+      const args = ["plugin", "remove", PLUGIN_ID, "--json"];
       run(binary, args, { allowFailure: true });
     }
   } catch {
     // Rollback continues with marketplace cleanup.
   }
-  const binary = host === "claude" ? claudeBinary() : codexBinary();
-  const args =
-    host === "claude"
-      ? ["plugin", "marketplace", "remove", MARKETPLACE_NAME, "--scope", "user"]
-      : ["plugin", "marketplace", "remove", MARKETPLACE_NAME, "--json"];
+  const binary = codexBinary();
+  const args = ["plugin", "marketplace", "remove", MARKETPLACE_NAME, "--json"];
   run(binary, args, { allowFailure: true });
 }
 
@@ -3392,38 +2767,12 @@ async function recoveryStep(label, action) {
 }
 
 async function preflightHost(host, action) {
-  if (
-    (!FILE_DROP_HOSTS.includes(host) && host !== "opencode") ||
-    ["install", "update"].includes(action)
-  ) {
+  {
     requireHostCli(host, { authenticated: ["install", "update"].includes(action) });
   }
-  if (host === "claude") {
-    if (["install", "update"].includes(action)) {
-      requireNoLegacyClaudeInstallation();
-    } else {
-      warnLegacyClaudeInstallation();
-    }
-  }
+
   const paths = managedPaths(host);
-  if (host === "opencode") {
-    const presence = await Promise.all(
-      [paths.root, paths.bridge, paths.bridgeMarker].map((target) => entryExists(target)),
-    );
-    if (presence.some(Boolean) && !presence.every(Boolean)) {
-      fail("OpenCode has a partial or unowned OpenSocrates installation; refusing to replace it");
-    }
-    if (presence.every(Boolean)) await verifyOpenCodeInstallation(paths);
-    const previousEntry = presence.every(Boolean) ? { name: MARKETPLACE_NAME, root: paths.root } : null;
-    const previousState = previousEntry === null ? { kind: "missing", version: null } : pluginState(host);
-    return {
-      host,
-      paths,
-      previousEntry,
-      previousState,
-      rootExists: presence[0],
-    };
-  }
+
   const previousEntry = marketplaceEntry(host);
   if (previousEntry !== null && entryRoot(previousEntry, host) !== paths.root) {
     fail(
@@ -3458,7 +2807,9 @@ async function preflightSelectedHosts(options, action, desiredState) {
   const candidates = assetHosts.length > 0 ? assetHosts : SUPPORTED_HOSTS;
   const desiredHosts = new Set(desiredState.installedHosts);
   const rootPresence = Object.fromEntries(
-    await Promise.all(candidates.map(async (host) => [host, await entryExists(managedPaths(host).root)])),
+    await Promise.all(
+      candidates.map(async (host) => [host, await entryExists(managedPaths(host).root)]),
+    ),
   );
   const settled = await Promise.allSettled(candidates.map((host) => preflightHost(host, action)));
   const successes = new Map();
@@ -3523,17 +2874,13 @@ async function stageInstallation(preflight, pluginSource) {
   await mkdir(paths.parent, { recursive: true, mode: 0o700 });
   const transient = transientParent(host, paths);
   await mkdir(transient, { recursive: true, mode: 0o700 });
-  const staging =
-    host === "opencode"
-      ? await buildOpenCodeStaging(paths, pluginSource)
-      : await buildStagingTree(transient, pluginSource, host);
+  const staging = await buildStagingTree(transient, pluginSource, host);
   return {
     ...preflight,
     staging,
     backup: join(transient, `.opensocrates.backup-${randomUUID()}`),
-    bridgeBackup: host === "opencode" ? join(paths.bridgeParent, `.opensocrates.js.backup-${randomUUID()}`) : null,
-    bridgeMarkerBackup:
-      host === "opencode" ? join(paths.bridgeParent, `.opensocrates-managed.json.backup-${randomUUID()}`) : null,
+    bridgeBackup: null,
+    bridgeMarkerBackup: null,
     registrationRemoved: false,
     backupCreated: false,
     newRootActive: false,
@@ -3556,23 +2903,10 @@ async function activateInstallation(transaction) {
     await rename(paths.root, transaction.backup);
     transaction.backupCreated = true;
   }
-  if (host === "opencode" && (await entryExists(paths.bridge))) {
-    await rename(paths.bridge, transaction.bridgeBackup);
-    transaction.bridgeBackupCreated = true;
-  }
-  if (host === "opencode" && (await entryExists(paths.bridgeMarker))) {
-    await rename(paths.bridgeMarker, transaction.bridgeMarkerBackup);
-    transaction.bridgeMarkerBackupCreated = true;
-  }
-  await rename(host === "opencode" ? transaction.staging.root : transaction.staging, paths.root);
+
+  await rename(transaction.staging, paths.root);
   transaction.newRootActive = true;
-  if (host === "opencode") {
-    await rename(transaction.staging.bridge, paths.bridge);
-    transaction.newBridgeActive = true;
-    await rename(transaction.staging.bridgeMarker, paths.bridgeMarker);
-    transaction.newBridgeMarkerActive = true;
-    await verifyOpenCodeInstallation(paths);
-  }
+
   const result = addRegistration(host, paths.root, true);
   const state = pluginState(host, { requireHostState: true });
   if (
@@ -3599,35 +2933,18 @@ async function rollbackInstallation(transaction) {
       await rm(paths.root, { recursive: true, force: true });
     });
   }
-  if (host === "opencode") {
-    if (transaction.newBridgeActive && (await exists(paths.bridge))) {
-      await recoveryStep("remove the failed OpenCode bridge", async () => {
-        await rm(paths.bridge, { force: true });
-      });
-    }
-    if (transaction.newBridgeMarkerActive && (await exists(paths.bridgeMarker))) {
-      await recoveryStep("remove the failed OpenCode bridge sidecar", async () => {
-        await rm(paths.bridgeMarker, { force: true });
-      });
-    }
-    if (transaction.bridgeBackupCreated && (await exists(transaction.bridgeBackup))) {
-      await recoveryStep("restore the previous OpenCode bridge", async () => {
-        await rename(transaction.bridgeBackup, paths.bridge);
-      });
-    }
-    if (transaction.bridgeMarkerBackupCreated && (await exists(transaction.bridgeMarkerBackup))) {
-      await recoveryStep("restore the previous OpenCode bridge sidecar", async () => {
-        await rename(transaction.bridgeMarkerBackup, paths.bridgeMarker);
-      });
-    }
-  }
+
   if (transaction.backupCreated && (await exists(transaction.backup))) {
     restored = await recoveryStep(`restore the previous ${host} installation`, async () => {
       await requireOwnedRoot(transaction.backup, host);
       await rename(transaction.backup, paths.root);
     });
   }
-  if (transaction.registrationRemoved && previousEntry !== null && (restored || !transaction.backupCreated)) {
+  if (
+    transaction.registrationRemoved &&
+    previousEntry !== null &&
+    (restored || !transaction.backupCreated)
+  ) {
     await recoveryStep(`re-register the previous ${host} installation`, async () => {
       addRegistration(host, paths.root, ["installed", "disabled"].includes(previousState.kind), {
         enabled: previousState.kind !== "disabled",
@@ -3635,20 +2952,20 @@ async function rollbackInstallation(transaction) {
     });
   }
   if (transaction.backupCreated && !restored) {
-    console.error(`error: the previous ${host} OpenSocrates installation could not be restored automatically.`);
+    console.error(
+      `error: the previous ${host} OpenSocrates installation could not be restored automatically.`,
+    );
     console.error(`error: your previous files are preserved at: ${transaction.backup}`);
     console.error(`error: recovery command: /bin/rm -rf -- ${shellQuote(paths.root)}`);
-    console.error(`error: recovery command: /bin/mv -- ${shellQuote(transaction.backup)} ${shellQuote(paths.root)}`);
+    console.error(
+      `error: recovery command: /bin/mv -- ${shellQuote(transaction.backup)} ${shellQuote(paths.root)}`,
+    );
     console.error(`error: recovery command: opensocrates install --host ${host}`);
   }
 }
 
 async function cleanupInstallationTransaction(transaction) {
-  if (transaction.host === "opencode") {
-    await rm(transaction.staging.root, { recursive: true, force: true });
-    await rm(transaction.staging.bridge, { force: true });
-    await rm(transaction.staging.bridgeMarker, { force: true });
-  } else if (await exists(transaction.staging)) {
+  if (await exists(transaction.staging)) {
     await rm(transaction.staging, { recursive: true, force: true });
   }
 }
@@ -3658,14 +2975,6 @@ async function commitInstallation(transaction) {
     await requireOwnedRoot(transaction.backup, transaction.host);
     await rm(transaction.backup, { recursive: true });
     transaction.backupCreated = false;
-  }
-  if (transaction.host === "opencode") {
-    for (const [created, backup] of [
-      [transaction.bridgeBackupCreated, transaction.bridgeBackup],
-      [transaction.bridgeMarkerBackupCreated, transaction.bridgeMarkerBackup],
-    ]) {
-      if (created && (await exists(backup))) await rm(backup);
-    }
   }
 }
 
@@ -3689,7 +2998,8 @@ async function runInstallOrUpdate(options, action) {
     for (const preflight of preflights) {
       const item = packages.get(preflight.host);
       console.log(
-        `${preflight.host}: verified OpenSocrates ${PRODUCT_VERSION} and ` + `${item.checkedFiles} package files`,
+        `${preflight.host}: verified OpenSocrates ${PRODUCT_VERSION} and ` +
+          `${item.checkedFiles} package files`,
       );
       transactions.push(await stageInstallation(preflight, item.pluginRoot));
     }
@@ -3708,9 +3018,12 @@ async function runInstallOrUpdate(options, action) {
     await Promise.all(prepared.map((item) => rm(item.scratch, { recursive: true, force: true })));
   }
   for (const transaction of transactions) {
-    const cleaned = await recoveryStep(`remove the committed ${transaction.host} backup`, async () => {
-      await commitInstallation(transaction);
-    });
+    const cleaned = await recoveryStep(
+      `remove the committed ${transaction.host} backup`,
+      async () => {
+        await commitInstallation(transaction);
+      },
+    );
     if (!cleaned) {
       console.warn(`warning: ${transaction.host} is active, but its previous backup needs cleanup`);
     }
@@ -3724,39 +3037,16 @@ async function runInstallOrUpdate(options, action) {
         "codex exec silently skips hooks that have not been trusted.",
     );
   }
-  if (hosts.includes("cursor")) {
-    console.log(
-      "Cursor: run Developer: Reload Window, then invoke /opensocrates from Agent chat. " +
-        "This experimental package adds no automatic OpenSocrates hook selector.",
-    );
-  }
-  if (hosts.includes("grok")) {
-    console.log(
-      "Grok Build: start a new task for automatic native-skill selection, or invoke /opensocrates explicitly.",
-    );
-  }
-  if (hosts.includes("opencode")) {
-    console.log(
-      "OpenCode: automatic same-turn selection uses the stable chat.message bridge; " +
-        "the native opensocrates skill remains available as an explicit fallback.",
-    );
-  }
+
   console.log("Start new host tasks to load the updated OpenSocrates integration.");
   return hosts;
 }
 
 async function inspectHostStatus(host) {
-  if (!FILE_DROP_HOSTS.includes(host) && host !== "opencode") requireHostCli(host);
-  if (host === "claude") warnLegacyClaudeInstallation();
+  requireHostCli(host);
+
   const paths = managedPaths(host);
-  if (host === "opencode") {
-    const presence = await Promise.all([paths.root, paths.bridge, paths.bridgeMarker].map((target) => exists(target)));
-    if (!presence.some(Boolean)) return { host, kind: "missing", version: null, paths };
-    if (!presence.every(Boolean)) return { host, kind: "files-only", version: null, paths };
-    await verifyOpenCodeInstallation(paths);
-    const state = pluginState(host);
-    return { host, kind: state.kind, version: state.version, paths };
-  }
+
   const entry = marketplaceEntry(host);
   if (entry === null) {
     if (await exists(paths.root)) {
@@ -3787,19 +3077,15 @@ async function showStatus(host) {
         const status = await inspectHostStatus(candidate);
         const expected = desired.installedHosts.includes(candidate);
         const hostDrift = expected
-          ? status.kind !== "installed" || desired.activeVersion === null || status.version !== desired.activeVersion
+          ? status.kind !== "installed" ||
+            desired.activeVersion === null ||
+            status.version !== desired.activeVersion
           : status.kind !== "missing";
         drift ||= hostDrift;
         if (status.kind === "installed") {
           console.log(
             `${candidate}: installed ${status.version ?? "unknown"}` +
-              (["antigravity", "cursor"].includes(candidate)
-                ? " (experimental explicit-skill tier)"
-                : candidate === "grok"
-                  ? " (native skill; automatic and explicit invocation)"
-                  : candidate === "opencode"
-                    ? " (stable same-turn bridge plus native skill fallback)"
-                    : "") +
+              "" +
               (expected
                 ? hostDrift
                   ? ` (drift from ${desired.activeVersion ?? "desired state"})`
@@ -3819,7 +3105,9 @@ async function showStatus(host) {
         } else if (status.kind === "files-only") {
           console.log(`${candidate}: managed files present but not registered`);
         } else {
-          console.log(`${candidate}: not installed` + (expected ? " (drift: desired host is missing)" : ""));
+          console.log(
+            `${candidate}: not installed` + (expected ? " (drift: desired host is missing)" : ""),
+          );
         }
       } catch (error) {
         if (desired.installedHosts.includes(candidate)) drift = true;
@@ -3834,24 +3122,11 @@ async function showStatus(host) {
   }
   const status = await inspectHostStatus(host);
   if (status.kind === "installed") {
-    console.log(
-      `OpenSocrates ${status.version ?? "unknown"} is installed.` +
-        (host === "antigravity"
-          ? " Antigravity support is experimental and explicit-skill only."
-          : host === "cursor"
-            ? " Cursor support is experimental and explicit-skill first."
-            : host === "grok"
-              ? " Grok Build uses automatic native-skill selection and explicit /opensocrates invocation."
-              : host === "opencode"
-                ? " OpenCode uses the stable same-turn bridge and native skill fallback."
-                : ""),
-    );
+    console.log(`OpenSocrates ${status.version ?? "unknown"} is installed.` + "");
   } else if (status.kind === "disabled") {
     console.log(
       `OpenSocrates ${status.version ?? "unknown"} is installed but disabled. ` +
-        (host === "grok"
-          ? "Remove the OpenSocrates disabled entry from Grok Build configuration, then run status again."
-          : "Run install or update to re-enable it."),
+        "Run install or update to re-enable it.",
     );
   } else if (status.kind === "available") {
     console.log(`OpenSocrates ${status.version ?? "unknown"} is available but not installed.`);
@@ -3869,14 +3144,8 @@ function removalTransaction(preflight) {
       transientParent(preflight.host, preflight.paths),
       `.opensocrates.removed-${randomUUID()}`,
     ),
-    bridgeBackup:
-      preflight.host === "opencode"
-        ? join(preflight.paths.bridgeParent, `.opensocrates.js.removed-${randomUUID()}`)
-        : null,
-    bridgeMarkerBackup:
-      preflight.host === "opencode"
-        ? join(preflight.paths.bridgeParent, `.opensocrates-managed.json.removed-${randomUUID()}`)
-        : null,
+    bridgeBackup: null,
+    bridgeMarkerBackup: null,
     registrationRemoved: false,
     backupCreated: false,
     rootCommitted: false,
@@ -3897,20 +3166,16 @@ async function activateRemoval(transaction) {
     await rename(paths.root, transaction.backup);
     transaction.backupCreated = true;
   }
-  if (host === "opencode" && (await entryExists(paths.bridge))) {
-    await rename(paths.bridge, transaction.bridgeBackup);
-    transaction.bridgeBackupCreated = true;
-  }
-  if (host === "opencode" && (await entryExists(paths.bridgeMarker))) {
-    await rename(paths.bridgeMarker, transaction.bridgeMarkerBackup);
-    transaction.bridgeMarkerBackupCreated = true;
-  }
 }
 
 async function rollbackRemoval(transaction) {
   let complete = true;
   let restored = !transaction.rootExists;
-  if (transaction.rootExists && transaction.backupCreated && (await entryExists(transaction.backup))) {
+  if (
+    transaction.rootExists &&
+    transaction.backupCreated &&
+    (await entryExists(transaction.backup))
+  ) {
     restored = await recoveryStep(`restore the removed ${transaction.host} files`, async () => {
       await verifyManagedTreeForPurge(transaction.host, transaction.backup);
       await rename(transaction.backup, transaction.paths.root);
@@ -3920,7 +3185,10 @@ async function rollbackRemoval(transaction) {
         try {
           await rename(transaction.paths.root, transaction.backup);
         } catch (requarantineError) {
-          const detail = requarantineError instanceof Error ? requarantineError.message : String(requarantineError);
+          const detail =
+            requarantineError instanceof Error
+              ? requarantineError.message
+              : String(requarantineError);
           transaction.backupCreated = await entryExists(transaction.backup);
           fail(
             `the restored ${transaction.host} tree failed verification and could not be returned to ` +
@@ -3943,52 +3211,22 @@ async function rollbackRemoval(transaction) {
     restored &&
     (await entryExists(transaction.paths.root))
   ) {
-    const registrationRestored = await recoveryStep(`restore the removed ${transaction.host} registration`, async () => {
-      addRegistration(
-        transaction.host,
-        transaction.paths.root,
-        ["installed", "disabled"].includes(transaction.previousState.kind),
-        { enabled: transaction.previousState.kind !== "disabled" },
-      );
-    });
+    const registrationRestored = await recoveryStep(
+      `restore the removed ${transaction.host} registration`,
+      async () => {
+        addRegistration(
+          transaction.host,
+          transaction.paths.root,
+          ["installed", "disabled"].includes(transaction.previousState.kind),
+          { enabled: transaction.previousState.kind !== "disabled" },
+        );
+      },
+    );
     complete = registrationRestored && complete;
   } else if (transaction.registrationRemoved && transaction.previousEntry !== null) {
     complete = false;
   }
-  if (transaction.host === "opencode") {
-    let bridgeRestored = !transaction.rootExists;
-    if (
-      transaction.rootExists &&
-      transaction.bridgeBackupCreated &&
-      (await entryExists(transaction.bridgeBackup))
-    ) {
-      bridgeRestored = await recoveryStep("restore the removed OpenCode bridge", async () => {
-        await rename(transaction.bridgeBackup, transaction.paths.bridge);
-        transaction.bridgeBackupCreated = false;
-      });
-    } else if (transaction.rootExists && !transaction.bridgeCommitted && !transaction.bridgeBackupCreated) {
-      bridgeRestored = await entryExists(transaction.paths.bridge);
-    }
-    complete = bridgeRestored && complete;
-    let markerRestored = !transaction.rootExists;
-    if (
-      transaction.rootExists &&
-      transaction.bridgeMarkerBackupCreated &&
-      (await entryExists(transaction.bridgeMarkerBackup))
-    ) {
-      markerRestored = await recoveryStep("restore the removed OpenCode bridge sidecar", async () => {
-        await rename(transaction.bridgeMarkerBackup, transaction.paths.bridgeMarker);
-        transaction.bridgeMarkerBackupCreated = false;
-      });
-    } else if (
-      transaction.rootExists &&
-      !transaction.bridgeMarkerCommitted &&
-      !transaction.bridgeMarkerBackupCreated
-    ) {
-      markerRestored = await entryExists(transaction.paths.bridgeMarker);
-    }
-    complete = markerRestored && complete;
-  }
+
   transaction.originalStateRestored = complete;
   return complete;
 }
@@ -3997,47 +3235,22 @@ async function commitRemoval(transaction, { beforeBackupDelete = null } = {}) {
   if (transaction.backupCreated && (await entryExists(transaction.backup))) {
     await verifyManagedTreeForPurge(transaction.host, transaction.backup);
     if (beforeBackupDelete !== null) {
-      await beforeBackupDelete(Object.freeze({
-        host: transaction.host,
-        backup: transaction.backup,
-      }));
+      await beforeBackupDelete(
+        Object.freeze({
+          host: transaction.host,
+          backup: transaction.backup,
+        }),
+      );
     }
     await rm(transaction.backup, { recursive: true });
     transaction.backupCreated = false;
     transaction.rootCommitted = true;
-  }
-  if (transaction.host === "opencode") {
-    for (const [flag, backup, label] of [
-      ["bridgeBackupCreated", transaction.bridgeBackup, "bridge"],
-      ["bridgeMarkerBackupCreated", transaction.bridgeMarkerBackup, "bridge sidecar"],
-    ]) {
-      if (!transaction[flag] || !(await entryExists(backup))) continue;
-      const info = await lstat(backup);
-      if (!info.isFile() || info.isSymbolicLink()) {
-        fail(`refusing to remove an unsafe OpenCode ${label} backup: ${backup}`);
-      }
-      await rm(backup);
-      transaction[flag] = false;
-      if (flag === "bridgeBackupCreated") transaction.bridgeCommitted = true;
-      else transaction.bridgeMarkerCommitted = true;
-    }
   }
 }
 
 async function validateRemovalCommit(transaction) {
   if (transaction.backupCreated && (await entryExists(transaction.backup))) {
     await verifyManagedTreeForPurge(transaction.host, transaction.backup);
-  }
-  if (transaction.host !== "opencode") return;
-  for (const [created, backup, label] of [
-    [transaction.bridgeBackupCreated, transaction.bridgeBackup, "bridge"],
-    [transaction.bridgeMarkerBackupCreated, transaction.bridgeMarkerBackup, "bridge sidecar"],
-  ]) {
-    if (!created || !(await entryExists(backup))) continue;
-    const info = await lstat(backup);
-    if (!info.isFile() || info.isSymbolicLink()) {
-      fail(`refusing to remove an unsafe OpenCode ${label} backup: ${backup}`);
-    }
   }
 }
 
@@ -4057,7 +3270,9 @@ async function executablePath(name, environmentOverride) {
     await access(candidate, fsConstants.X_OK);
     return candidate;
   }
-  const which = run("/usr/bin/which", [name], { allowFailure: true });
+  const which = run(process.platform === "win32" ? "where.exe" : "/usr/bin/which", [name], {
+    allowFailure: true,
+  });
   const candidate = which.status === 0 ? which.stdout.trim() : "";
   if (!candidate || !candidate.startsWith("/")) {
     fail(`could not find an executable ${name} for the automatic updater`);
@@ -4080,14 +3295,21 @@ function launchctlDomain() {
 function launchAgentDocument(npx, channel, environment) {
   const packageTag = channel === "next" ? "next" : "latest";
   const arguments_ = [npx, "--yes", `opensocrates@${packageTag}`, "auto-update", "run"];
-  const argumentsXml = arguments_.map((argument) => `      <string>${xmlEscape(argument)}</string>`).join("\n");
-  const environmentEntries = Object.entries(environment).sort(([left], [right]) => left.localeCompare(right));
+  const argumentsXml = arguments_
+    .map((argument) => `      <string>${xmlEscape(argument)}</string>`)
+    .join("\n");
+  const environmentEntries = Object.entries(environment).sort(([left], [right]) =>
+    left.localeCompare(right),
+  );
   const environmentXml =
     environmentEntries.length === 0
       ? ""
       : `\n    <key>EnvironmentVariables</key>\n    <dict>\n` +
         environmentEntries
-          .map(([key, value]) => `      <key>${xmlEscape(key)}</key>\n` + `      <string>${xmlEscape(value)}</string>`)
+          .map(
+            ([key, value]) =>
+              `      <key>${xmlEscape(key)}</key>\n` + `      <string>${xmlEscape(value)}</string>`,
+          )
           .join("\n") +
         "\n    </dict>";
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -4120,6 +3342,7 @@ function launchAgentTarget() {
 }
 
 function launchAgentLoaded() {
+  if (process.platform === "win32") return false;
   return (
     run(launchctlBinary(), ["print", launchAgentTarget()], {
       allowFailure: true,
@@ -4141,69 +3364,19 @@ function stopLoadedLaunchAgent() {
 async function updaterEnvironment(hosts, npx) {
   const node = await executablePath("node", "OPENSOCRATES_NODE_BIN");
   const environment = {
-    PATH: [...new Set([dirname(npx), dirname(node), "/usr/bin", "/bin", "/usr/sbin", "/sbin"])].join(":"),
+    PATH: [
+      ...new Set([dirname(npx), dirname(node), "/usr/bin", "/bin", "/usr/sbin", "/sbin"]),
+    ].join(":"),
   };
   for (const host of hosts) {
-    if (host === "cursor") {
-      if (process.env.CURSOR_CONFIG_DIR) {
-        environment.CURSOR_CONFIG_DIR = resolve(process.env.CURSOR_CONFIG_DIR);
-        continue;
-      }
-      const app = cursorAppPaths().find((candidate) => existsSync(candidate));
-      if (app) continue;
-      const executable = await executablePath("cursor", "CURSOR_BIN");
-      environment.CURSOR_BIN = executable;
-      environment.PATH = [...new Set([dirname(executable), ...environment.PATH.split(":")])].join(":");
-      continue;
-    }
-    if (host === "antigravity") {
-      if (process.env.ANTIGRAVITY_CONFIG_DIR) {
-        environment.ANTIGRAVITY_CONFIG_DIR = resolve(process.env.ANTIGRAVITY_CONFIG_DIR);
-        continue;
-      }
-      const executable = await executablePath("agy", "AGY_BIN");
-      environment.AGY_BIN = executable;
-      environment.PATH = [...new Set([dirname(executable), ...environment.PATH.split(":")])].join(":");
-      continue;
-    }
-    if (host === "opencode") {
-      // OPENCODE_CONFIG_DIR redirects configuration only. Unlike the
-      // content-only hosts above, a scheduled OpenCode update re-runs the same
-      // requireHostCli version gate as an interactive install, so recording
-      // the config directory and stopping would leave the LaunchAgent without
-      // a resolvable opencode: enable would succeed in a shell that has it on
-      // PATH, then every scheduled run would fail the gate whenever opencode
-      // lives outside the launchd default PATH.
-      if (process.env.OPENCODE_CONFIG_DIR) {
-        environment.OPENCODE_CONFIG_DIR = resolve(process.env.OPENCODE_CONFIG_DIR);
-      }
-      const executable = await executablePath("opencode", "OPENCODE_BIN");
-      environment.OPENCODE_BIN = executable;
-      environment.PATH = [...new Set([dirname(executable), ...environment.PATH.split(":")])].join(":");
-      continue;
-    }
-    if (host === "grok") {
-      const executable = await executablePath("grok", "GROK_BIN");
-      environment.GROK_BIN = executable;
-      environment.PATH = [...new Set([dirname(executable), ...environment.PATH.split(":")])].join(
-        ":",
-      );
-      continue;
-    }
-    const key = host === "claude" ? "CLAUDE_BIN" : "CODEX_BIN";
+    const key = "CODEX_BIN";
     const executable = await executablePath(host, key);
     environment[key] = executable;
-    environment.PATH = [...new Set([dirname(executable), ...environment.PATH.split(":")])].join(":");
+    environment.PATH = [...new Set([dirname(executable), ...environment.PATH.split(":")])].join(
+      ":",
+    );
   }
-  for (const key of [
-    "ANTIGRAVITY_CONFIG_DIR",
-    "CLAUDE_CONFIG_DIR",
-    "CODEX_HOME",
-    "CURSOR_CONFIG_DIR",
-    "GROK_HOME",
-    "OPENCODE_CONFIG_DIR",
-    "OPENSOCRATES_STATE_DIR",
-  ]) {
+  for (const key of ["CODEX_HOME", "OPENSOCRATES_STATE_DIR"]) {
     if (process.env[key]) environment[key] = resolve(process.env[key]);
   }
   return environment;
@@ -4211,7 +3384,10 @@ async function updaterEnvironment(hosts, npx) {
 
 async function installLaunchAgent(channel, hosts) {
   if (process.platform !== "darwin" || process.arch !== "arm64") {
-    fail(`automatic updates currently support darwin-arm64 only; detected ` + `${process.platform}-${process.arch}`);
+    fail(
+      `automatic updates currently support darwin-arm64 only; detected ` +
+        `${process.platform}-${process.arch}`,
+    );
   }
   const paths = statePaths();
   const npx = await executablePath("npx", "OPENSOCRATES_NPX_BIN");
@@ -4232,16 +3408,22 @@ async function installLaunchAgent(channel, hosts) {
   const wasLoaded = launchAgentLoaded();
   if (wasLoaded) stopLoadedLaunchAgent();
   await atomicWritePrivateFile(paths.launchAgent, document);
-  const launched = run(launchctlBinary(), ["bootstrap", launchctlDomain(), paths.launchAgent], { allowFailure: true });
+  const launched = run(launchctlBinary(), ["bootstrap", launchctlDomain(), paths.launchAgent], {
+    allowFailure: true,
+  });
   if (launched.status !== 0) {
     if (previousDocument === null) {
       await rm(paths.launchAgent, { force: true });
     } else {
       await atomicWritePrivateFile(paths.launchAgent, previousDocument);
       if (wasLoaded) {
-        const restored = run(launchctlBinary(), ["bootstrap", launchctlDomain(), paths.launchAgent], {
-          allowFailure: true,
-        });
+        const restored = run(
+          launchctlBinary(),
+          ["bootstrap", launchctlDomain(), paths.launchAgent],
+          {
+            allowFailure: true,
+          },
+        );
         if (restored.status !== 0) {
           console.error("warning: the previous OpenSocrates LaunchAgent could not be reloaded");
         }
@@ -4267,7 +3449,9 @@ async function requireOwnedLaunchAgent(target) {
   ];
   const arguments_ =
     argumentBlocks.length === 1
-      ? [...argumentBlocks[0][1].matchAll(/<string>([\s\S]*?)<\/string>/gu)].map((match) => match[1].trim())
+      ? [...argumentBlocks[0][1].matchAll(/<string>([\s\S]*?)<\/string>/gu)].map((match) =>
+          match[1].trim(),
+        )
       : [];
   if (
     [...document.matchAll(labelPattern)].length !== 1 ||
@@ -4286,7 +3470,11 @@ async function disableLaunchAgent() {
   const paths = statePaths();
   const agentPresent = await entryExists(paths.launchAgent);
   if (agentPresent) {
-    await requireSafePathBelow(paths.launchAgentsDirectory, paths.launchAgent, "OpenSocrates LaunchAgent");
+    await requireSafePathBelow(
+      paths.launchAgentsDirectory,
+      paths.launchAgent,
+      "OpenSocrates LaunchAgent",
+    );
     await requireOwnedLaunchAgent(paths.launchAgent);
   }
   if (process.env.OPENSOCRATES_SKIP_LAUNCHCTL !== "1") {
@@ -4308,7 +3496,9 @@ async function runStandardRemove(options, { report = true, beforeBackupDelete = 
   const preflights = await preflightSelectedHosts(options, "remove", desired);
   const removedHosts = preflights.map((item) => item.host);
   const remainingHosts = desired.installedHosts.filter((host) => !removedHosts.includes(host));
-  const remainingAutoUpdateHosts = desired.autoUpdate.hosts.filter((host) => !removedHosts.includes(host));
+  const remainingAutoUpdateHosts = desired.autoUpdate.hosts.filter(
+    (host) => !removedHosts.includes(host),
+  );
   const keepAutoUpdate = desired.autoUpdate.enabled && remainingAutoUpdateHosts.length > 0;
   const nextDesired = {
     ...desired,
@@ -4358,11 +3548,16 @@ async function runStandardRemove(options, { report = true, beforeBackupDelete = 
       rollbackComplete = restored && rollbackComplete;
     }
     const unrestoredHosts = new Set(
-      transactions.filter((transaction) => transaction.originalStateRestored !== true).map((item) => item.host),
+      transactions
+        .filter((transaction) => transaction.originalStateRestored !== true)
+        .map((item) => item.host),
     );
     const recoveredHosts = desired.installedHosts.filter((host) => !unrestoredHosts.has(host));
-    const recoveredAutoUpdateHosts = desired.autoUpdate.hosts.filter((host) => recoveredHosts.includes(host));
-    const keepRecoveredAutoUpdate = desired.autoUpdate.enabled && recoveredAutoUpdateHosts.length > 0;
+    const recoveredAutoUpdateHosts = desired.autoUpdate.hosts.filter((host) =>
+      recoveredHosts.includes(host),
+    );
+    const keepRecoveredAutoUpdate =
+      desired.autoUpdate.enabled && recoveredAutoUpdateHosts.length > 0;
     let recoveredDesired = {
       ...desired,
       installedHosts: recoveredHosts,
@@ -4373,13 +3568,16 @@ async function runStandardRemove(options, { report = true, beforeBackupDelete = 
     };
     let schedulerRestored = true;
     if (schedulerTouched) {
-      schedulerRestored = await recoveryStep("reconcile the automatic updater after removal failure", async () => {
-        if (recoveredDesired.autoUpdate.enabled) {
-          await installLaunchAgent(recoveredDesired.channel, recoveredDesired.autoUpdate.hosts);
-        } else {
-          await disableLaunchAgent();
-        }
-      });
+      schedulerRestored = await recoveryStep(
+        "reconcile the automatic updater after removal failure",
+        async () => {
+          if (recoveredDesired.autoUpdate.enabled) {
+            await installLaunchAgent(recoveredDesired.channel, recoveredDesired.autoUpdate.hosts);
+          } else {
+            await disableLaunchAgent();
+          }
+        },
+      );
       if (!schedulerRestored && recoveredDesired.autoUpdate.enabled) {
         recoveredDesired = {
           ...recoveredDesired,
@@ -4393,16 +3591,21 @@ async function runStandardRemove(options, { report = true, beforeBackupDelete = 
       rollbackComplete = schedulerRestored && rollbackComplete;
     }
     if (desiredWritten || !rollbackComplete || !schedulerRestored) {
-      const stateRestored = await recoveryStep("record desired state after removal failure", async () => {
-        await writeDesiredState(recoveredDesired);
-      });
+      const stateRestored = await recoveryStep(
+        "record desired state after removal failure",
+        async () => {
+          await writeDesiredState(recoveredDesired);
+        },
+      );
       rollbackComplete = stateRestored && rollbackComplete;
     }
     if (!rollbackComplete) {
       console.error("error: removal cleanup is incomplete; no success was recorded.");
       for (const transaction of transactions) {
         if (!transaction.backupCreated || !(await entryExists(transaction.backup))) continue;
-        console.error(`error: preserved ${transaction.host} removal residue: ${transaction.backup}`);
+        console.error(
+          `error: preserved ${transaction.host} removal residue: ${transaction.backup}`,
+        );
         console.error(
           `error: safe cleanup retry: opensocrates remove --host ${transaction.host} --purge`,
         );
@@ -4416,22 +3619,13 @@ async function runStandardRemove(options, { report = true, beforeBackupDelete = 
   }
   if (!report) return { removedHosts, desired: nextDesired };
   for (const host of removedHosts) {
-    const label =
-      host === "antigravity"
-        ? "Antigravity"
-        : host === "claude"
-          ? "Claude"
-          : host === "cursor"
-            ? "Cursor"
-            : host === "grok"
-              ? "Grok Build"
-              : host === "opencode"
-                ? "OpenCode"
-                : "Codex";
+    const label = "Codex";
     console.log(`OpenSocrates was removed from ${label}.`);
   }
   if (removedHosts.length === 0) console.log("OpenSocrates is not installed on any managed host.");
-  console.log("Removal scope: registrations and installer-managed roots only; this is not a complete uninstall.");
+  console.log(
+    "Removal scope: registrations and installer-managed roots only; this is not a complete uninstall.",
+  );
   const residue = [];
   for (const host of removedHosts) {
     const paths = purgePathsFor(host);
@@ -4446,14 +3640,13 @@ async function runStandardRemove(options, { report = true, beforeBackupDelete = 
   if (removedHosts.includes("codex")) {
     console.log("Codex OpenSocrates hook trust is preserved by this removal contract.");
   }
-  console.log(`Next: close active hosts, then run opensocrates remove --host ${options.host} --purge.`);
+  console.log(
+    `Next: close active hosts, then run opensocrates remove --host ${options.host} --purge.`,
+  );
   return { removedHosts, desired: nextDesired };
 }
 
 async function purgeRegistration(host, paths) {
-  if (FILE_DROP_HOSTS.includes(host) || host === "opencode") {
-    return { status: "not-applicable", detail: "file-owned-host" };
-  }
   try {
     requireHostCli(host);
   } catch (error) {
@@ -4462,7 +3655,7 @@ async function purgeRegistration(host, paths) {
       detail: error instanceof Error ? error.message : String(error),
     };
   }
-  if (host === "claude") warnLegacyClaudeInstallation();
+
   const entry = marketplaceEntry(host);
   if (entry !== null && entryRoot(entry, host) !== paths.root) {
     fail(`${host} OpenSocrates registration points to an unmanaged location`);
@@ -4497,7 +3690,9 @@ function purgeComponentBlocksCompletion(component) {
 }
 
 function finalizePurgeHostResult(hostResult) {
-  const registrationComplete = new Set(["removed", "absent", "not-applicable"]).has(hostResult.registration);
+  const registrationComplete = new Set(["removed", "absent", "not-applicable"]).has(
+    hostResult.registration,
+  );
   hostResult.status =
     registrationComplete &&
     !hostResult.components.some(purgeComponentBlocksCompletion) &&
@@ -4510,7 +3705,9 @@ function finalizePurgeHostResult(hostResult) {
 async function resetPurgeTrustExtension(hostResult, options) {
   if (hostResult.host !== "codex" || !options.resetTrust) return true;
   try {
-    const reset = await resetCodexOpenSocratesHookTrust({ hooks: options.trustResetHooks ?? {} });
+    const reset = await resetCodexOpenSocratesHookTrust({
+      hooks: options.trustResetHooks ?? {},
+    });
     hostResult.extension = {
       component: "host-security-trust",
       status: reset.status,
@@ -4539,9 +3736,7 @@ function preservePurgeComponentsAfterTrustFailure(hostResult, paths) {
     ["managed-root", paths.root],
     ["transaction-residue", null],
   ];
-  if (hostResult.host === "opencode") {
-    preserved.push(["opencode-bridge", paths.bridge], ["opencode-bridge-residue", null]);
-  }
+
   if (paths.cacheRoot !== null) preserved.push(["plugin-cache", paths.cacheRoot]);
   preserved.push(...paths.pluginData.map((path) => ["plugin-data", path]));
   for (const [component, path] of preserved) {
@@ -4576,30 +3771,25 @@ async function purgeOneHost(hostResult, options) {
   await capturePurgeComponent(hostResult, "managed-root", () =>
     removeOwnedManagedRoot(hostResult.host, paths),
   );
-  if (hostResult.host === "opencode") {
-    await capturePurgeComponent(hostResult, "opencode-bridge", () => purgeOpenCodeBridge(paths));
-  }
+
   await capturePurgeComponent(hostResult, "transaction-residue", () =>
     cleanupTransientRootResidue(hostResult.host, paths),
   );
-  if (hostResult.host === "opencode") {
-    await capturePurgeComponent(hostResult, "opencode-bridge-residue", () =>
-      purgeOpenCodeBridgeResidue(paths),
-    );
-  }
+
   if (paths.cacheRoot !== null) {
-    await capturePurgeComponent(hostResult, "plugin-cache", () => purgeHostCache(hostResult.host, paths));
-  }
-  if (paths.pluginData.length > 0) {
-    await capturePurgeComponent(hostResult, "plugin-data", () => purgeClaudePluginData(paths));
+    await capturePurgeComponent(hostResult, "plugin-cache", () =>
+      purgeHostCache(hostResult.host, paths),
+    );
   }
   finalizePurgeHostResult(hostResult);
 }
 
 function hostDeactivated(hostResult) {
-  const registrationComplete = new Set(["removed", "absent", "not-applicable"]).has(hostResult.registration);
-  const activationComponents = hostResult.components.filter((item) =>
-    new Set(["managed-root", "opencode-bridge"]).has(item.component),
+  const registrationComplete = new Set(["removed", "absent", "not-applicable"]).has(
+    hostResult.registration,
+  );
+  const activationComponents = hostResult.components.filter(
+    (item) => item.component === "managed-root",
   );
   return registrationComplete && !activationComponents.some(purgeComponentBlocksCompletion);
 }
@@ -4708,7 +3898,11 @@ async function preparePurgeStateFinalization() {
   const renamed = [];
   try {
     for (const item of tombstones) {
-      await requireSafePathBelow(paths.directory, item.tombstone, "OpenSocrates prior purge tombstone");
+      await requireSafePathBelow(
+        paths.directory,
+        item.tombstone,
+        "OpenSocrates prior purge tombstone",
+      );
       const info = await lstat(item.tombstone);
       if (!info.isFile() || info.isSymbolicLink()) {
         fail(`refusing to remove an unsafe prior OpenSocrates purge tombstone: ${item.tombstone}`);
@@ -4721,7 +3915,10 @@ async function preparePurgeStateFinalization() {
       if (!info.isFile() || info.isSymbolicLink()) {
         fail(`refusing to remove an unsafe OpenSocrates state file: ${target}`);
       }
-      const tombstone = join(paths.directory, `.purge-finalize-${randomUUID()}-${basename(target)}`);
+      const tombstone = join(
+        paths.directory,
+        `.purge-finalize-${randomUUID()}-${basename(target)}`,
+      );
       await rename(target, tombstone);
       const item = { original: target, tombstone };
       tombstones.push(item);
@@ -4865,7 +4062,9 @@ function reportPurgeResult(result) {
     console.log("User task, project, chat, plan, and history data was preserved.");
   } else {
     console.error("OpenSocrates purge is incomplete; no complete-uninstall success is claimed.");
-    console.error("Resolve the reported item, close active hosts if needed, and rerun the same purge command.");
+    console.error(
+      "Resolve the reported item, close active hosts if needed, and rerun the same purge command.",
+    );
   }
 }
 
@@ -4917,14 +4116,19 @@ async function enableAutoUpdate(options) {
     const observedVersions = new Set();
     for (const host of installedHosts) {
       const preflight = preflights.get(host) ?? (await preflightHost(host, "update"));
-      if (preflight.previousState.kind !== "installed" || typeof preflight.previousState.version !== "string") {
+      if (
+        preflight.previousState.kind !== "installed" ||
+        typeof preflight.previousState.version !== "string"
+      ) {
         fail(`cannot determine the installed OpenSocrates version on ${host}`);
       }
       preflights.set(host, preflight);
       observedVersions.add(preflight.previousState.version);
     }
     if (observedVersions.size !== 1) {
-      fail("installed hosts do not share one known version; run update --host all before enabling automatic updates");
+      fail(
+        "installed hosts do not share one known version; run update --host all before enabling automatic updates",
+      );
     }
     [activeVersion] = observedVersions;
   }
@@ -4990,7 +4194,9 @@ async function runScheduledUpdate(options) {
   }
   const scheduledAt = Date.parse(desired.autoUpdate.nextCheckAt ?? "");
   if (!options.force && Number.isFinite(scheduledAt) && scheduledAt > Date.now()) {
-    console.log(`The next automatic update check is scheduled for ${desired.autoUpdate.nextCheckAt}.`);
+    console.log(
+      `The next automatic update check is scheduled for ${desired.autoUpdate.nextCheckAt}.`,
+    );
     return;
   }
   const checkedAt = nowIso();
@@ -5020,7 +4226,9 @@ async function runScheduledUpdate(options) {
       result: "blocked",
       errorCategory: "major-policy",
     });
-    console.log(`OpenSocrates ${PRODUCT_VERSION} is available but blocked by the major-version policy.`);
+    console.log(
+      `OpenSocrates ${PRODUCT_VERSION} is available but blocked by the major-version policy.`,
+    );
     return;
   }
   try {
@@ -5028,7 +4236,10 @@ async function runScheduledUpdate(options) {
     for (const host of hosts) ready.push(await preflightHost(host, "update"));
     const alreadyCurrent =
       desired.activeVersion === PRODUCT_VERSION &&
-      ready.every((item) => item.previousState.kind === "installed" && item.previousState.version === PRODUCT_VERSION);
+      ready.every(
+        (item) =>
+          item.previousState.kind === "installed" && item.previousState.version === PRODUCT_VERSION,
+      );
     if (!alreadyCurrent) {
       if (hosts.length > 1) {
         await runInstallOrUpdate({ ...options, host: ALL_HOST }, "update");
@@ -5080,7 +4291,14 @@ async function runScheduledUpdate(options) {
       await writeAutoUpdateReceipt({
         version: PRODUCT_VERSION,
         checkedAt,
-        hosts: hosts.map((host) => ({ host, result: "failed" })),
+        hosts:
+          error instanceof PackagePreparationError
+            ? error.hostOutcomes
+            : hosts.map((host) => ({
+                host,
+                result: "failed",
+                errorCategory: errorCategory(error),
+              })),
         result: "failed",
         errorCategory: errorCategory(error),
       });
@@ -5090,9 +4308,14 @@ async function runScheduledUpdate(options) {
 }
 
 function requireSupportedPlatform() {
-  if (process.platform !== "darwin" || process.arch !== "arm64") {
+  if (
+    !(
+      (process.platform === "darwin" && process.arch === "arm64") ||
+      (process.platform === "win32" && process.arch === "x64")
+    )
+  ) {
     fail(
-      `OpenSocrates ${PRODUCT_VERSION} prebuilt installation supports darwin-arm64 only; ` +
+      `OpenSocrates ${PRODUCT_VERSION} prebuilt installation supports darwin-arm64 and windows-x64; ` +
         `detected ${process.platform}-${process.arch}`,
     );
   }
@@ -5101,26 +4324,18 @@ function requireSupportedPlatform() {
 async function verifyPackages(options) {
   const assetHosts = qualifiedAssetHosts(options);
   const hosts =
-    options.host === ALL_HOST ? (assetHosts.length > 0 ? assetHosts : SUPPORTED_HOSTS) : [options.host];
+    options.host === ALL_HOST
+      ? assetHosts.length > 0
+        ? assetHosts
+        : SUPPORTED_HOSTS
+      : [options.host];
   const prepared = await prepareVerifiedPackages(options, hosts);
   try {
     for (const item of prepared) {
       console.log(
-        `${item.host}: verified OpenSocrates ${PRODUCT_VERSION} release and ` + `${item.checkedFiles} package files.`,
+        `${item.host}: verified OpenSocrates ${PRODUCT_VERSION} release and ` +
+          `${item.checkedFiles} package files.`,
       );
-      if (item.host === "opencode") {
-        const paths = managedPaths("opencode");
-        const presence = await Promise.all(
-          [paths.root, paths.bridge, paths.bridgeMarker].map((target) => exists(target)),
-        );
-        if (presence.some(Boolean)) {
-          if (!presence.every(Boolean)) {
-            fail("OpenCode installed state is partial and failed verification");
-          }
-          await verifyOpenCodeInstallation(paths);
-          console.log("opencode: verified installed bridge, skill inventory, and ownership.");
-        }
-      }
     }
   } finally {
     await Promise.all(prepared.map((item) => rm(item.scratch, { recursive: true, force: true })));
@@ -5129,6 +4344,15 @@ async function verifyPackages(options) {
 
 export async function main(argv = process.argv.slice(2), internalDependencies = {}) {
   const options = parseCli(argv);
+  if (process.platform === "win32" && options.action === "auto-update") {
+    const message =
+      "Automatic updates: unavailable on Windows in 1.4.0. Use opensocrates update --host all manually.";
+    if (options.autoUpdateAction === "status" || options.autoUpdateAction === "disable") {
+      console.log(message);
+      return 0;
+    }
+    fail(message);
+  }
   if (options.action === "help") {
     showHelp();
     return 0;

@@ -8,19 +8,22 @@
     "windows-x64"
   ],
   "observed_local_platforms": [
-    "darwin-arm64"
+    "darwin-arm64",
+    "windows-x64"
   ],
   "release_targets": [
-    "darwin-arm64"
+    "darwin-arm64",
+    "windows-x64"
   ],
-  "release_claim_status": "darwin-arm64_only",
+  "release_claim_status": "windows-x64_candidate_live_gates_pending",
   "shipped_launchers": {
-    "darwin-arm64": "bin/launch.sh"
+    "darwin-arm64": "bin/launch.sh",
+    "windows-x64": "bin/launch.mjs"
   },
   "unvalidated_platforms": [
     "darwin-x64",
     "linux-x64",
-    "windows-x64"
+    "windows-arm64"
   ],
   "startup_budget": {
     "darwin-arm64": {
@@ -34,5 +37,5 @@
     }
   },
   "signing_status": "unvalidated",
-  "notes": "Only darwin-arm64 is a release target and only bin/launch.sh is shipped. The synthetic DG-01 probe is packaging evidence, not a real-hook latency claim; release requires the generated Codex SessionStart gate. Other entries are dry-run build candidates, are not shipped, and carry no support claim."
+  "notes": "Windows x64 is built with tools/build_windows.py and requires native package and live host evidence. macOS release gates remain unchanged. Neither offline CI nor a configured plugin proves live delivery."
 }

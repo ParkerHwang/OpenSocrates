@@ -24,18 +24,9 @@ const REPOSITORY = "ParkerHwang/OpenSocrates";
 const RESULT_SCHEMA = "opensocrates.clean-machine-acceptance/1.0.0";
 const DESIRED_STATE_SCHEMA = "opensocrates.desired-state/1.0.0";
 const VERSION = readFileSync(join(ROOT, "VERSION"), "utf8").trim();
-const HOSTS = Object.freeze(["claude", "codex"]);
-const RESULT_FILES = Object.freeze([
-  "result.json",
-  "result.md",
-  "manual-observations.md",
-]);
-const MANUAL_FIELDS = Object.freeze([
-  "Claude single public entry",
-  "Claude controller status",
-  "Codex plugin recognition",
-  "Host runtime loading",
-]);
+const HOSTS = Object.freeze(["codex"]);
+const RESULT_FILES = Object.freeze(["result.json", "result.md", "manual-observations.md"]);
+const MANUAL_FIELDS = Object.freeze(["Codex plugin recognition", "Host runtime loading"]);
 
 class AcceptanceError extends Error {
   constructor(category, message, exitCode = null) {
@@ -95,7 +86,10 @@ function sanitizedMessage(error, scratch = null) {
   }
   return value
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/giu, "[redacted-email]")
-    .replace(/\b(?:gh[opusr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,})\b/gu, "[redacted-token]")
+    .replace(
+      /\b(?:gh[opusr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,})\b/gu,
+      "[redacted-token]",
+    )
     .replace(/[\r\n]+/gu, " ")
     .slice(0, 500);
 }
@@ -143,17 +137,6 @@ function findSingleFile(directory, expectedName, category) {
   return matches[0];
 }
 
-function versionAtLeast(value, minimum) {
-  const match = String(value).match(/(\d+)\.(\d+)\.(\d+)/u);
-  if (!match) return false;
-  const current = match.slice(1).map(Number);
-  for (let index = 0; index < minimum.length; index += 1) {
-    if (current[index] > minimum[index]) return true;
-    if (current[index] < minimum[index]) return false;
-  }
-  return true;
-}
-
 function sorted(values) {
   return [...values].sort();
 }
@@ -171,16 +154,11 @@ function requireOwnerOnly(target, category, label) {
 }
 
 function managedRoot(host) {
-  return join(homedir(), host === "claude" ? ".claude" : ".codex", "managed-marketplaces", "opensocrates");
+  return join(homedir(), ".codex", "managed-marketplaces", "opensocrates");
 }
 
 function installedPluginRoot(host, root) {
-  const marketplacePath = join(
-    root,
-    ...(host === "claude"
-      ? [".claude-plugin", "marketplace.json"]
-      : [".agents", "plugins", "marketplace.json"]),
-  );
+  const marketplacePath = join(root, ...[".agents", "plugins", "marketplace.json"]);
   if (!pathPresent(marketplacePath)) {
     fail("post-install", `${host} managed marketplace metadata is missing`);
   }
@@ -194,7 +172,7 @@ function installedPluginRoot(host, root) {
   if (matches.length !== 1) {
     fail("post-install", `${host} managed marketplace does not declare one OpenSocrates plugin`);
   }
-  const source = host === "claude" ? matches[0].source : matches[0].source?.path;
+  const source = matches[0].source?.path;
   if (typeof source !== "string" || !source.startsWith("./")) {
     fail("post-install", `${host} managed marketplace has an invalid local plugin source`);
   }
@@ -210,25 +188,8 @@ function installedPluginRoot(host, root) {
   return pluginRoot;
 }
 
-function inspectManagedLayout(
-  roots = { claude: managedRoot("claude"), codex: managedRoot("codex") },
-) {
-  const claudePlugin = installedPluginRoot("claude", roots.claude);
+function inspectManagedLayout(roots = { codex: managedRoot("codex") }) {
   const codexPlugin = installedPluginRoot("codex", roots.codex);
-  const claudeSkillsPath = join(claudePlugin, "skills");
-  if (!pathPresent(claudeSkillsPath)) {
-    fail("post-install", "Claude's installed plugin has no skills directory");
-  }
-  const claudeSkills = readdirSync(claudeSkillsPath);
-  if (!sameStrings(claudeSkills, ["opensocrates"])) {
-    fail("post-install", "Claude exposes more than the single OpenSocrates controller skill");
-  }
-  if (
-    pathPresent(join(claudePlugin, "commands")) ||
-    !pathPresent(join(claudeSkillsPath, "opensocrates", "SKILL.md"))
-  ) {
-    fail("post-install", "Claude's public controller layout is not canonical");
-  }
   if (!pathPresent(join(codexPlugin, "skills", "opensocrates", "SKILL.md"))) {
     fail("post-install", "Codex's OpenSocrates controller skill is missing");
   }
@@ -247,27 +208,11 @@ function inspectManagedLayout(
     }
   }
   return {
-    claudePublicSkills: claudeSkills,
-    claudeCommandsPresent: false,
     codexControllerPresent: true,
   };
 }
 
 function marketplaceEntries(host) {
-  if (host === "claude") {
-    const payload = parseJson(
-      command("claude", ["plugin", "marketplace", "list", "--json"], {
-        category: "host-state",
-        failureMessage: "Claude Code could not list plugin marketplaces",
-      }),
-      "host-state",
-      "Claude Code returned invalid marketplace JSON",
-    );
-    if (!Array.isArray(payload)) {
-      fail("host-state", "Claude Code returned an unexpected marketplace schema");
-    }
-    return payload;
-  }
   const payload = parseJson(
     command("codex", ["plugin", "marketplace", "list", "--json"], {
       category: "host-state",
@@ -283,29 +228,11 @@ function marketplaceEntries(host) {
 }
 
 function pluginEntries(host) {
-  if (host === "claude") {
-    const payload = parseJson(
-      command("claude", ["plugin", "list", "--json"], {
-        category: "host-state",
-        failureMessage: "Claude Code could not list installed plugins",
-      }),
-      "host-state",
-      "Claude Code returned invalid plugin JSON",
-    );
-    if (!Array.isArray(payload)) {
-      fail("host-state", "Claude Code returned an unexpected plugin schema");
-    }
-    return payload;
-  }
   const payload = parseJson(
-    command(
-      "codex",
-      ["plugin", "list", "--marketplace", "opensocrates", "--available", "--json"],
-      {
-        category: "host-state",
-        failureMessage: "Codex could not inspect the OpenSocrates plugin",
-      },
-    ),
+    command("codex", ["plugin", "list", "--marketplace", "opensocrates", "--available", "--json"], {
+      category: "host-state",
+      failureMessage: "Codex could not inspect the OpenSocrates plugin",
+    }),
     "host-state",
     "Codex returned invalid plugin JSON",
   );
@@ -330,19 +257,10 @@ ${MANUAL_FIELDS.map((label) => `${label}: ${defaultCheck}`).join("\n")}
 
 Change every \`PENDING\` value to \`PASS\` or \`FAIL\` after completing the matching check.
 
-- Claude plugin entry: start a new Claude Code Local task and confirm that the
-  registered plugin command is \`/opensocrates:opensocrates\`. A bare
-  \`/opensocrates\` is not sufficient source evidence because a standalone user,
-  project, or synced skill can own that name.
-- Claude controller status: run \`/opensocrates:opensocrates status\` in that
-  task and confirm that the plugin controller responds.
 - Codex plugin recognition: start a new Codex task, explicitly ask it to use
   OpenSocrates for a planning question, and confirm that it recognizes the plugin.
-- Host runtime loading: confirm that neither host reports an installation,
+- Host runtime loading: confirm that Codex reports no an installation,
   permission, or runtime-loading error.
-
-The standalone Claude Chat ZIP is outside this local plugin acceptance. Its
-canonical explicit command remains \`/opensocrates\`.
 
 Do not add free-form text, prompts, transcripts, account names, credentials, or
 local paths. The pack command rejects a modified template.
@@ -396,18 +314,25 @@ function zipReports(outputDirectory) {
   }
   const archive = `${outputDirectory}.zip`;
   if (existsSync(archive)) rmSync(archive);
-  command("/usr/bin/zip", ["-q", "-j", archive, ...RESULT_FILES.map((name) => join(outputDirectory, name))], {
-    cwd: outputDirectory,
-    category: "result-bundle",
-    failureMessage: "the privacy-safe result ZIP could not be created",
-  });
+  command(
+    "/usr/bin/zip",
+    ["-q", "-j", archive, ...RESULT_FILES.map((name) => join(outputDirectory, name))],
+    {
+      cwd: outputDirectory,
+      category: "result-bundle",
+      failureMessage: "the privacy-safe result ZIP could not be created",
+    },
+  );
   chmodSync(archive, 0o600);
   return archive;
 }
 
 function resultDirectory() {
   const timestamp = new Date().toISOString().replace(/[-:.]/gu, "").replace("Z", "Z");
-  return join(homedir(), `opensocrates-clean-machine-result-${timestamp}-${randomUUID().slice(0, 8)}`);
+  return join(
+    homedir(),
+    `opensocrates-clean-machine-result-${timestamp}-${randomUUID().slice(0, 8)}`,
+  );
 }
 
 async function performStep(report, id, label, action, scratch) {
@@ -460,7 +385,6 @@ function makeReport() {
     environment: {
       platform: null,
       nodeVersion: process.version,
-      claudeVersion: null,
       codexVersion: null,
     },
     baseline: {
@@ -576,15 +500,7 @@ async function runAcceptance() {
         const pullRequest = parseJson(
           command(
             "gh",
-            [
-              "pr",
-              "view",
-              branch,
-              "--repo",
-              REPOSITORY,
-              "--json",
-              "number,headRefOid,state,url",
-            ],
+            ["pr", "view", branch, "--repo", REPOSITORY, "--json", "number,headRefOid,state,url"],
             {
               category: "source",
               failureMessage: "the current branch's pull request could not be inspected",
@@ -618,19 +534,8 @@ async function runAcceptance() {
     await performStep(
       report,
       "hosts",
-      "Verify Claude Code and Codex are current and authenticated",
+      "Verify Codex is current and authenticated",
       () => {
-        const claudeVersion = command("claude", ["--version"], {
-          category: "host-prerequisite",
-          failureMessage: "Claude Code is unavailable",
-        });
-        if (!versionAtLeast(claudeVersion, [2, 1, 205])) {
-          fail("host-prerequisite", "Claude Code 2.1.205 or later is required");
-        }
-        command("claude", ["auth", "status"], {
-          category: "host-auth",
-          failureMessage: "Claude Code is not authenticated",
-        });
         const codexVersion = command("codex", ["--version"], {
           category: "host-prerequisite",
           failureMessage: "Codex CLI is unavailable",
@@ -639,10 +544,8 @@ async function runAcceptance() {
           category: "host-auth",
           failureMessage: "Codex CLI is not authenticated",
         });
-        report.environment.claudeVersion = claudeVersion.slice(0, 120);
         report.environment.codexVersion = codexVersion.slice(0, 120);
         return {
-          claudeVersion: report.environment.claudeVersion,
           codexVersion: report.environment.codexVersion,
         };
       },
@@ -661,20 +564,14 @@ async function runAcceptance() {
           "LaunchAgents",
           "com.opensocrates.auto-update.plist",
         );
-        const occupiedPaths = [stateDirectory, launchAgent, ...HOSTS.map(managedRoot)].filter(pathPresent);
+        const occupiedPaths = [stateDirectory, launchAgent, ...HOSTS.map(managedRoot)].filter(
+          pathPresent,
+        );
         if (occupiedPaths.length > 0) {
           fail("dirty-baseline", "a previous managed OpenSocrates installation or updater exists");
         }
-        const claudeMarkets = marketplaceEntries("claude");
-        const claudePlugins = pluginEntries("claude");
         const codexMarkets = marketplaceEntries("codex");
         const registered = [
-          ...claudeMarkets
-            .filter((entry) => entry?.name?.toLowerCase?.() === "opensocrates")
-            .map(() => "claude-marketplace"),
-          ...claudePlugins
-            .filter((entry) => entry?.id?.toLowerCase?.() === "opensocrates@opensocrates")
-            .map(() => "claude-plugin"),
           ...codexMarkets
             .filter((entry) => entry?.name?.toLowerCase?.() === "opensocrates")
             .map(() => "codex-marketplace"),
@@ -753,11 +650,7 @@ async function runAcceptance() {
           },
         );
         report.source.ciRunId = runId;
-        report.source.ciRunUrl = exactString(
-          run.url,
-          "ci-artifact",
-          "the CI run URL is missing",
-        );
+        report.source.ciRunUrl = exactString(run.url, "ci-artifact", "the CI run URL is missing");
         assets = { directory: artifactDirectory, hosts: {} };
         return { ciRunId: runId, event: run.event ?? "unknown" };
       },
@@ -767,14 +660,10 @@ async function runAcceptance() {
     await performStep(
       report,
       "artifact-integrity",
-      "Verify both host archives against the combined release manifest",
+      "Verify the Codex archive against the combined release manifest",
       async () => {
         const manifestName = `opensocrates-${VERSION}-release-manifest.json`;
-        const manifestPath = findSingleFile(
-          assets.directory,
-          manifestName,
-          "artifact-integrity",
-        );
+        const manifestPath = findSingleFile(assets.directory, manifestName, "artifact-integrity");
         const manifest = parseJson(
           readFileSync(manifestPath, "utf8"),
           "artifact-integrity",
@@ -784,7 +673,10 @@ async function runAcceptance() {
           manifest?.schema !== "opensocrates.release-manifest/1.0.0" ||
           manifest?.product_version !== VERSION
         ) {
-          fail("artifact-integrity", "the combined release manifest has the wrong schema or version");
+          fail(
+            "artifact-integrity",
+            "the combined release manifest has the wrong schema or version",
+          );
         }
         for (const host of HOSTS) {
           const expectedName = `opensocrates-${VERSION}-${host}-plugin.zip`;
@@ -796,11 +688,7 @@ async function runAcceptance() {
           if (!/^[a-f0-9]{64}$/u.test(expectedHash)) {
             fail("artifact-integrity", `${host} has an invalid archive hash in the manifest`);
           }
-          const archivePath = findSingleFile(
-            assets.directory,
-            expectedName,
-            "artifact-integrity",
-          );
+          const archivePath = findSingleFile(assets.directory, expectedName, "artifact-integrity");
           const actualHash = await sha256File(archivePath);
           if (actualHash !== expectedHash) {
             fail("artifact-integrity", `${host} archive does not match the CI release manifest`);
@@ -823,19 +711,15 @@ async function runAcceptance() {
         const packageDirectory = join(scratch, "npm");
         mkdirSync(packageDirectory, { recursive: true, mode: 0o700 });
         const metadata = parseJson(
-          command(
-            "npm",
-            ["pack", "--silent", "--json", "--pack-destination", packageDirectory],
-            {
-              env: {
-                ...process.env,
-                npm_config_dry_run: "false",
-                npm_config_json: "true",
-              },
-              category: "npm-package",
-              failureMessage: "the pull request could not be packed as an npm package",
+          command("npm", ["pack", "--silent", "--json", "--pack-destination", packageDirectory], {
+            env: {
+              ...process.env,
+              npm_config_dry_run: "false",
+              npm_config_json: "true",
             },
-          ),
+            category: "npm-package",
+            failureMessage: "the pull request could not be packed as an npm package",
+          }),
           "npm-package",
           "npm returned invalid pack metadata",
         );
@@ -843,11 +727,16 @@ async function runAcceptance() {
         if (item?.name !== "opensocrates" || item?.version !== VERSION) {
           fail("npm-package", "npm packed the wrong package name or version");
         }
-        packageArchive = join(packageDirectory, basename(exactString(
-          item.filename,
-          "npm-package",
-          "npm pack did not return an archive filename",
-        )));
+        packageArchive = join(
+          packageDirectory,
+          basename(
+            exactString(
+              item.filename,
+              "npm-package",
+              "npm pack did not return an archive filename",
+            ),
+          ),
+        );
         if (!existsSync(packageArchive)) {
           fail("npm-package", "the npm package archive was not created");
         }
@@ -873,7 +762,7 @@ async function runAcceptance() {
     await performStep(
       report,
       "install",
-      "Install Claude and Codex together through one transaction",
+      "Install Codex through one verified transaction",
       () => {
         command(
           "npx",
@@ -884,13 +773,6 @@ async function runAcceptance() {
             "install",
             "--host",
             "all",
-            // Host-qualified candidate assets define the exact transaction
-            // set, so this remains a two-host atomic install even when other
-            // supported host CLIs are present on the acceptance machine.
-            "--asset-claude",
-            assets.hosts.claude.archivePath,
-            "--checksum-claude",
-            assets.hosts.claude.checksumPath,
             "--asset-codex",
             assets.hosts.codex.archivePath,
             "--checksum-codex",
@@ -942,7 +824,10 @@ async function runAcceptance() {
           directory: requireOwnerOnly(stateDirectory, "permissions", "the state directory"),
           file: requireOwnerOnly(statePath, "permissions", "the desired-state file"),
         };
-        return { activeVersion: state.activeVersion, installedHosts: sorted(state.installedHosts) };
+        return {
+          activeVersion: state.activeVersion,
+          installedHosts: sorted(state.installedHosts),
+        };
       },
       scratch,
     );
@@ -960,25 +845,16 @@ async function runAcceptance() {
             fail("post-install", `${host} does not have exactly one OpenSocrates marketplace`);
           }
         }
-        const claudeMatches = pluginEntries("claude").filter(
-          (entry) => entry?.id === "opensocrates@opensocrates",
-        );
         const codexMatches = pluginEntries("codex").filter(
           (entry) => entry?.pluginId === "opensocrates@opensocrates",
         );
-        if (
-          claudeMatches.length !== 1 ||
-          claudeMatches[0]?.version !== VERSION ||
-          codexMatches.length !== 1 ||
-          codexMatches[0]?.version !== VERSION
-        ) {
-          fail("post-install", "one or both hosts do not report the expected installed version");
+        if (codexMatches.length !== 1 || codexMatches[0]?.version !== VERSION) {
+          fail("post-install", "Codex do not report the expected installed version");
         }
         report.assertions.hostRegistrations = {
-          claude: { count: claudeMatches.length, version: claudeMatches[0].version },
           codex: { count: codexMatches.length, version: codexMatches[0].version },
         };
-        return { claudeVersion: VERSION, codexVersion: VERSION };
+        return { codexVersion: VERSION };
       },
       scratch,
     );
@@ -986,11 +862,11 @@ async function runAcceptance() {
     await performStep(
       report,
       "managed-layout",
-      "Verify the installed managed trees and Claude's single public skill",
+      "Verify the installed Codex managed tree and controller skill",
       () => {
         const layout = inspectManagedLayout();
         report.assertions.managedLayout = layout;
-        return { claudePublicSkills: layout.claudePublicSkills };
+        return { codexControllerPresent: layout.codexControllerPresent };
       },
       scratch,
     );
@@ -1015,12 +891,11 @@ async function runAcceptance() {
         );
         const expected = [
           `Desired version: ${VERSION}`,
-          `claude: installed ${VERSION} (in sync)`,
           `codex: installed ${VERSION} (in sync)`,
           "Overall: no detected drift",
         ];
         if (expected.some((line) => !output.includes(line))) {
-          fail("post-install", "all-host status did not report both hosts in sync");
+          fail("post-install", "all-host status did not report Codex in sync");
         }
         report.assertions.status = {
           desiredVersion: VERSION,
@@ -1061,7 +936,9 @@ async function runAcceptance() {
     console.log("\nAutomated checks passed. Complete the manual host checks next:");
     console.log(`  ${join(outputDirectory, "manual-observations.md")}`);
     console.log("Set every PENDING check to PASS or FAIL, then create the shareable ZIP:");
-    console.log(`  node tools/clean_machine_acceptance.mjs --pack ${JSON.stringify(outputDirectory)}`);
+    console.log(
+      `  node tools/clean_machine_acceptance.mjs --pack ${JSON.stringify(outputDirectory)}`,
+    );
   } else {
     console.error(`\nAutomated checks failed (${report.failure.category}).`);
     console.error(`Share this privacy-safe result ZIP: ${archive ?? "ZIP creation failed"}`);
@@ -1116,7 +993,7 @@ function printHelp() {
   node tools/clean_machine_acceptance.mjs --pack RESULT_DIRECTORY
 
 The first command requires a clean Apple-silicon Mac and installs OpenSocrates
-for the real authenticated Claude Code and Codex homes. The second command adds
+for the real authenticated Codex home. The second command adds
 manual observations and creates a privacy-safe ZIP for review.`);
 }
 
@@ -1146,9 +1023,6 @@ export async function main(args = process.argv.slice(2)) {
   }
 }
 
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(resolve(process.argv[1])).href
-) {
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   await main();
 }

@@ -19,24 +19,6 @@ function optionalString(value, key) {
 
 function project(kind, value) {
   if (kind === "status-only") return { status: "ok" };
-  if (kind === "claude-auth" && typeof value?.loggedIn === "boolean") {
-    return { loggedIn: value.loggedIn };
-  }
-  if (kind === "claude-marketplaces" && Array.isArray(value)) {
-    return value
-      .filter((entry) => relevant(entry, "name", "opensocrates"))
-      .map((entry) => ({
-        name: entry.name,
-        source: optionalString(entry, "source"),
-        path: optionalString(entry, "path"),
-        installLocation: optionalString(entry, "installLocation"),
-      }));
-  }
-  if (kind === "claude-plugins" && Array.isArray(value)) {
-    return value
-      .filter((entry) => relevant(entry, "id", "opensocrates@opensocrates"))
-      .map((entry) => ({ id: entry.id, version: optionalString(entry, "version") }));
-  }
   if (kind === "codex-marketplaces" && Array.isArray(value?.marketplaces)) {
     return {
       marketplaces: value.marketplaces
@@ -59,14 +41,7 @@ function project(kind, value) {
 
 const [kind, executable, ...args] = process.argv.slice(2);
 if (
-  !new Set([
-    "status-only",
-    "claude-auth",
-    "claude-marketplaces",
-    "claude-plugins",
-    "codex-marketplaces",
-    "codex-plugins",
-  ]).has(kind) ||
+  !new Set(["status-only", "codex-marketplaces", "codex-plugins"]).has(kind) ||
   typeof executable !== "string" ||
   executable.length === 0 ||
   args.some((item) => typeof item !== "string")

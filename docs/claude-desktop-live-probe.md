@@ -1,3 +1,6 @@
+> Historical record for OpenSocrates 1.3.1 or earlier. This integration is
+> removed and unsupported in 1.4.0. Use [the current guide](../README.md).
+
 # Claude Code desktop live probe
 
 The v1.1.2 desktop probe must observe one real, non-sensitive

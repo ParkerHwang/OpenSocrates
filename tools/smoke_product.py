@@ -43,10 +43,6 @@ from opensocrates.domain.risk import RiskSignals
 from opensocrates.domain.routing import route_from_bundle
 from opensocrates.hosts.codex.adapter import CodexAdapter, CodexAdapterConfig
 from opensocrates.hosts.codex.capability import default_capability_profile
-from opensocrates.hosts.prompt_only.adapter import PromptOnlyAdapter
-from opensocrates.hosts.prompt_only.capability import (
-    default_capability_profile as prompt_only_profile,
-)
 from opensocrates.persistence import (
     InMemoryMetricsStore,
     InMemorySettingsStore,
@@ -104,7 +100,6 @@ def run() -> dict[str, object]:
     turns = InMemoryTurnStore(installation_key=b"s25-smoke-installation-key-32bytes!!"[:32])
     metrics = InMemoryMetricsStore()
     profile = default_capability_profile(HostId.CODEX_CLI)
-    prompt_profile = prompt_only_profile(host=HostId.PROMPT_ONLY)
     results: dict[str, object] = {"status": "pass", "scenarios": {}}
     scenarios: dict[str, object] = results["scenarios"]  # type: ignore[assignment]
 
@@ -226,14 +221,6 @@ def run() -> dict[str, object]:
         }
     else:
         scenarios["invalid_card_one_repair"] = {"decision": "unavailable"}
-
-    prompt_only = PromptOnlyAdapter(bundle=bundle, profile=prompt_profile)
-    prompt_result = prompt_only.handle({"synthetic": True}, event_name="session_started")
-    scenarios["prompt_only_degradation"] = {
-        "status": prompt_result.status,
-        "capability_tier": prompt_profile.computed_tier.value,
-        "persisted": False,
-    }
 
     metric = LocalMetric(
         event=MetricEventName.JUDGMENT_STARTED,
