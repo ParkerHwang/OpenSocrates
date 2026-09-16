@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.4.0] - Unreleased
+## [1.4.0] - 2026-09-16
 
 - Focus OpenSocrates on Codex only. Remove Claude Code/Cowork/Chat,
   Antigravity, Cursor, Grok Build and OpenCode runtime adapters, selectors,
