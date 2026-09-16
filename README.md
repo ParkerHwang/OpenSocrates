@@ -31,6 +31,9 @@ hooks. Approve those hooks before relying on native discovery. Non-interactive
 approval or actual delivery. You can explicitly ask Codex to use the
 `opensocrates` controller skill.
 
+If you previously disabled these hooks, enable them in Codex's `/hooks` view.
+Updating the plugin preserves your hook enablement and trust preferences.
+
 ```sh
 npx --yes opensocrates@1.4.0 status
 npx --yes opensocrates@1.4.0 update

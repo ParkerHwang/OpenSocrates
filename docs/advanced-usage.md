@@ -18,6 +18,8 @@ npx --yes opensocrates@1.4.0 update
 Other host names are rejected before lifecycle mutation. After installing,
 start a new interactive Codex session and review the seven OpenSocrates hooks.
 Untrusted hooks do not run in non-interactive `codex exec` sessions.
+Previously disabled hooks stay disabled after an update; enable them through
+Codex's `/hooks` view when you want automatic discovery.
 
 The installer verifies the archive, closed checksum inventory, release identity,
 native target, and runtime layout before staging it. Activation is transactional;

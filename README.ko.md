@@ -30,6 +30,9 @@ npx --yes opensocrates@1.4.0 install
 신뢰되지 않은 훅을 건너뜁니다. 설치만으로 승인이나 실제 전달이 입증되지는
 않습니다. Codex에 `opensocrates` 컨트롤러 스킬 사용을 직접 요청할 수도 있습니다.
 
+이전에 훅을 껐다면 Codex의 `/hooks` 화면에서 활성화하세요. 플러그인을
+업데이트해도 기존 훅 활성화 및 신뢰 설정은 유지됩니다.
+
 ```sh
 npx --yes opensocrates@1.4.0 status
 npx --yes opensocrates@1.4.0 update
