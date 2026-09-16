@@ -1,9 +1,8 @@
 """Deterministic, data-driven plugin package generator.
 
-Host packages provide only templates and ``generator.json`` metadata.  The
-core generator knows how to load the canonical compiled bundle, render bounded
-tokens, copy fixed launch/runtime assets, and emit a release manifest.  Adding
-another host therefore does not require another host branch in this module.
+The Codex package uses templates and ``generator.json`` metadata. The generator
+loads the canonical compiled bundle, renders bounded tokens, copies fixed
+launch/runtime assets, and emits a release manifest. Other hosts are rejected.
 """
 
 from __future__ import annotations
@@ -203,7 +202,7 @@ def _method_values(method: Mapping[str, Any], common: Mapping[str, str]) -> dict
 
 
 def _method_reference_index(methods: list[Any]) -> str:
-    """Render a compact, non-discoverable catalog for the single Claude skill."""
+    """Render a compact, non-discoverable catalog for the controller skill."""
 
     sections: list[str] = []
     for raw in methods:
@@ -356,6 +355,9 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
 ) -> dict[str, Any]:
     """Generate one host package and return its deterministic release manifest."""
 
+    pass
+    if host != "codex":
+        raise PluginBuildError("only Codex is supported")
     repository = Path(root).resolve()
     _prepare_import_path(repository)
     source_base = Path(source_root)
@@ -368,7 +370,7 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
         raise PluginBuildError("generator metadata host does not match requested host")
     if target not in {"darwin-arm64", "windows-x64"}:
         raise PluginBuildError("unsupported package target")
-    windows_native = target == "windows-x64" and host in {"codex", "claude"}
+    windows_native = target == "windows-x64" and host == "codex"
     if windows_native:
         metadata["release_targets"] = [target]
         metadata["launchers"] = ["bin/launch.mjs"]
@@ -473,17 +475,9 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
             for entries in hooks["hooks"].values():
                 for entry in entries:
                     for command in entry["hooks"]:
-                        if host == "claude":
-                            command["args"] = [
-                                "${CLAUDE_PLUGIN_ROOT}/bin/launch.mjs",
-                                *command["args"],
-                            ]
-                            command["command"] = "node"
-                        else:
-                            command["command"] = command["command"].replace(
-                                "${PLUGIN_ROOT}/bin/launch.sh",
-                                'node "${PLUGIN_ROOT}/bin/launch.mjs"',
-                            )
+                        command["command"] = command["command"].replace(
+                            "${PLUGIN_ROOT}/bin/launch.sh", 'node "${PLUGIN_ROOT}/bin/launch.mjs"'
+                        )
         values["HOOKS_JSON"] = _json_token(hooks)
     else:
         values["HOOKS_JSON"] = "{}"

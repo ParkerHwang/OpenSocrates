@@ -8,9 +8,9 @@ import test from 'node:test';
 import {assetNameFor,isSafeArchivePath,parseChecksumText,PRODUCT_VERSION} from './opensocrates.mjs';
 
 const root = fileURLToPath(new URL('../',import.meta.url));
-test('Windows native asset identity preserves content-only filenames', {skip:process.platform!=='win32'},()=>{
+test('Windows native asset identity is Codex-only', {skip:process.platform!=='win32'},()=>{
   assert.equal(assetNameFor('codex'),`opensocrates-${PRODUCT_VERSION}-codex-plugin-windows-x64.zip`);
-  assert.equal(assetNameFor('opencode'),`opensocrates-${PRODUCT_VERSION}-opencode-plugin.zip`);
+  assert.throws(()=>assetNameFor('opencode'),/unsupported host/);
 });
 test('Windows aliases and alternate streams are not archive paths',()=>{
   for(const value of ['C:/escape','a:stream','a/CON.txt','a/nul','a/file.','a/file ','a/../b','a\\b']) assert.equal(isSafeArchivePath(value),false,value);

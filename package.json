@@ -1,7 +1,7 @@
 {
   "name": "opensocrates",
   "version": "1.4.0",
-  "description": "Install and manage OpenSocrates for Antigravity, Claude Code, Cowork, Codex, Cursor, Grok Build, and OpenCode.",
+  "description": "Install and manage OpenSocrates for Codex on macOS and Windows.",
   "type": "module",
   "bin": {
     "opensocrates": "installer/opensocrates.mjs"
@@ -14,7 +14,7 @@
     "VERSION"
   ],
   "scripts": {
-    "test": "node --test installer/opensocrates.test.mjs installer/lifecycle.test.mjs tools/clean_machine_acceptance.test.mjs tools/reinstall_cycle_acceptance.test.mjs tools/opencode_bridge.test.mjs tools/release_gate.test.mjs && npm run test:npx",
+    "test": "node --test installer/opensocrates.test.mjs installer/lifecycle.test.mjs tools/clean_machine_acceptance.test.mjs tools/reinstall_cycle_acceptance.test.mjs tools/release_gate.test.mjs && npm run test:npx",
     "test:npx": "node installer/package-smoke.mjs",
     "pack:check": "npm pack --dry-run",
     "prepublishOnly": "npm test",
@@ -38,17 +38,9 @@
   },
   "keywords": [
     "ai",
-    "claude",
-    "claude-code",
     "codex",
-    "grok",
-    "grok-build",
-    "cowork",
-    "cursor",
-    "opencode",
     "reasoning",
     "agent",
-    "antigravity",
     "installer",
     "critical-thinking",
     "socratic"

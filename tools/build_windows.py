@@ -21,7 +21,7 @@ def main() -> int:
         raise SystemExit("Build on native Windows x64; cross-compilation is not supported")
     version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
     environment = {**os.environ, "PYTHONUTF8": "1"}
-    for host in ("claude", "codex"):
+    for host in ("codex",):
         subprocess.run(
             [
                 sys.executable,

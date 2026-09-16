@@ -467,8 +467,7 @@ class CodexAdapter:
                 transcript_path=native.transcript_path,
                 cwd=native.cwd,
                 session_id=native.session_id,
-                # Claude's prompt_id is projected into native.turn_id. The
-                # session fallback is retained for hosts that expose neither.
+                # Preserve the session fallback when Codex supplies no turn ID.
                 turn_id=native.turn_id or native.session_id,
                 model=native.model,
             )

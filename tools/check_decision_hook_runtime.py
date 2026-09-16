@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class HookCompositionChecks(unittest.TestCase):
     def test_real_entry_does_not_initialize_or_load_content(self):
-        for host in ("codex", "claude"):
+        for host in ("codex",):
             with tempfile.TemporaryDirectory() as name:
                 root = Path(name) / "fresh-product-root"
                 with (
@@ -238,7 +238,7 @@ print('nonblocking fail-open')
             runtime.parent.mkdir(parents=True)
             runtime.write_text('#!/bin/sh\nprintf "%s\\n" "$@"\n')
             runtime.chmod(0o755)
-            for host in ("codex", "claude"):
+            for host in ("codex",):
                 direct = subprocess.run(
                     [str(launcher), "decision", host], text=True, capture_output=True, check=True
                 )

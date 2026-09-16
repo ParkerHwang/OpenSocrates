@@ -1,3 +1,6 @@
+> Historical record for OpenSocrates 1.3.1 or earlier. This integration is
+> removed and unsupported in 1.4.0. Use [the current guide](../README.md).
+
 # OpenCode 지원
 
 OpenSocrates 1.2는 안정판 `chat.message` 플러그인 훅과 OpenCode의 네이티브

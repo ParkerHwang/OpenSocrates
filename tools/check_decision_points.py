@@ -427,13 +427,9 @@ class DecisionChecks(unittest.TestCase):
     def test_native_entry_never_selects_or_forces_abandoned_candidates(self):
         from unittest.mock import Mock
 
-        from opensocrates.hosts.claude.adapter import ClaudeAdapter, ClaudeAdapterConfig
         from opensocrates.hosts.codex.adapter import CodexAdapter, CodexAdapterConfig
 
-        for adapter_type, config_type in (
-            (CodexAdapter, CodexAdapterConfig),
-            (ClaudeAdapter, ClaudeAdapterConfig),
-        ):
+        for adapter_type, config_type in ((CodexAdapter, CodexAdapterConfig),):
             selector, store = Mock(), Mock()
             adapter = adapter_type(
                 config_type(
@@ -486,7 +482,7 @@ class DecisionChecks(unittest.TestCase):
     def test_all_generated_host_locale_references(self):
         import hashlib
 
-        for host in ("antigravity", "claude", "codex", "cursor", "grok", "opencode"):
+        for host in ("codex",):
             root = (
                 ROOT / "build/generated/plugins" / host / "skills/opensocrates/references/decision"
             )
@@ -506,15 +502,13 @@ class DecisionChecks(unittest.TestCase):
 
         from opensocrates.cli.runtime import build_runtime_services
 
-        for host in ("codex", "claude"):
+        for host in ("codex",):
             with (
                 patch("opensocrates.cli.runtime._compose_codex_selector") as codex,
-                patch("opensocrates.cli.runtime._compose_claude_selector") as claude,
             ):
                 services = build_runtime_services(host=host, include_storage=False)
                 self.assertTrue(services.adapter_for(host).config.decision_point_mode)
                 codex.assert_not_called()
-                claude.assert_not_called()
 
     def test_timing_gate_requires_exact_compact_guidance(self):
         from measure_codex_hook_timing import _response_contract_matches

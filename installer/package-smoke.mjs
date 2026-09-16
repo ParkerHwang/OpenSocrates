@@ -75,20 +75,13 @@ if (${JSON.stringify(host)} === "codex" && argv[0] === "app-server" && argv[1] =
   process.exit(0);
 }
 if (${JSON.stringify(host)} === "codex" && has("--strict-config", "features", "list")) process.exit(91);
-if (${JSON.stringify(host)} === "claude") {
-  if (has("plugin", "marketplace", "list") || has("plugin", "list")) {
-    process.stdout.write("[]");
-    process.exit(0);
-  }
-} else {
-  if (has("plugin", "marketplace", "list")) {
-    process.stdout.write(JSON.stringify({ marketplaces: [] }));
-    process.exit(0);
-  }
-  if (has("plugin", "list")) {
-    process.stdout.write(JSON.stringify({ installed: [], available: [] }));
-    process.exit(0);
-  }
+if (has("plugin", "marketplace", "list")) {
+  process.stdout.write(JSON.stringify({ marketplaces: [] }));
+  process.exit(0);
+}
+if (has("plugin", "list")) {
+  process.stdout.write(JSON.stringify({ installed: [], available: [] }));
+  process.exit(0);
 }
 process.exit(1);
 `;
@@ -99,7 +92,7 @@ process.exit(1);
 
 function seedPackageTree(root, host) {
   const version = "1.2.1";
-  const manifest = `${host === "claude" ? ".claude-plugin" : ".codex-plugin"}/plugin.json`;
+  const manifest = ".codex-plugin/plugin.json";
   const files = {
     [manifest]: `${JSON.stringify({ name: "opensocrates", version }, null, 2)}\n`,
     "release-manifest.json": `${JSON.stringify(
@@ -139,56 +132,29 @@ function seedCache(hostHome, host) {
 function seedManagedRoot(hostHome, host) {
   const version = "1.2.1";
   const root = join(hostHome, "managed-marketplaces", "opensocrates");
-  const plugin =
-    host === "claude"
-      ? join(root, "plugins", "opensocrates")
-      : join(root, "build", "generated", "plugins", "codex");
+  const plugin = join(root, "build", "generated", "plugins", "codex");
   seedPackageTree(plugin, host);
   writeFileSync(
     join(root, ".opensocrates-managed.json"),
     `${JSON.stringify(
-      host === "claude"
-        ? { schemaVersion: 1, marketplaceName: "opensocrates", pluginName: "opensocrates", host }
-        : { schemaVersion: 1, marketplaceName: "opensocrates", pluginName: "opensocrates" },
+      { schemaVersion: 1, marketplaceName: "opensocrates", pluginName: "opensocrates" },
       null,
       2,
     )}\n`,
   );
-  const marketplace =
-    host === "claude"
-      ? {
-          name: "opensocrates",
-          owner: { name: "Parker Hwang" },
-          metadata: {
-            description: "OpenSocrates reasoning support for Claude Code and Cowork",
-            version,
-          },
-          plugins: [
-            {
-              name: "opensocrates",
-              source: "./plugins/opensocrates",
-              description:
-                "Local reasoning-system selection for Claude Code and Cowork, plus one /opensocrates entry.",
-              category: "workflow",
-            },
-          ],
-        }
-      : {
-          name: "opensocrates",
-          interface: { displayName: "OpenSocrates" },
-          plugins: [
-            {
-              name: "opensocrates",
-              source: { source: "local", path: "./build/generated/plugins/codex" },
-              policy: { installation: "AVAILABLE", authentication: "ON_INSTALL" },
-              category: "Productivity",
-            },
-          ],
-        };
-  const marketplacePath =
-    host === "claude"
-      ? join(root, ".claude-plugin", "marketplace.json")
-      : join(root, ".agents", "plugins", "marketplace.json");
+  const marketplace = {
+    name: "opensocrates",
+    interface: { displayName: "OpenSocrates" },
+    plugins: [
+      {
+        name: "opensocrates",
+        source: { source: "local", path: "./build/generated/plugins/codex" },
+        policy: { installation: "AVAILABLE", authentication: "ON_INSTALL" },
+        category: "Productivity",
+      },
+    ],
+  };
+  const marketplacePath = join(root, ".agents", "plugins", "marketplace.json");
   mkdirSync(dirname(marketplacePath), { recursive: true });
   writeFileSync(marketplacePath, `${JSON.stringify(marketplace, null, 2)}\n`);
   return root;
@@ -213,10 +179,10 @@ function seedPackedPurgeSandbox() {
       {
         schema: "opensocrates.desired-state/1.0.0",
         channel: "stable",
-        installedHosts: ["claude", "codex"],
+        installedHosts: ["codex"],
         activeVersion: "1.2.1",
         updatePolicy: { intervalHours: 24, allowMajor: false },
-        autoUpdate: { enabled: true, hosts: ["claude", "codex"], nextCheckAt: null },
+        autoUpdate: { enabled: true, hosts: ["codex"], nextCheckAt: null },
         availableVersion: "1.2.1",
         lastCheckAt: null,
         lastSuccessfulUpdateAt: null,
@@ -231,21 +197,17 @@ function seedPackedPurgeSandbox() {
     launchAgent,
     `<?xml version="1.0"?><plist><dict><key>Label</key><string>com.opensocrates.auto-update</string><key>ProgramArguments</key><array><string>/usr/bin/npx</string><string>--yes</string><string>opensocrates@latest</string><string>auto-update</string><string>run</string></array></dict></plist>\n`,
   );
-  const cacheRoots = [seedCache(homes.claude, "claude"), seedCache(homes.codex, "codex")];
-  const managedRoots = [
-    seedManagedRoot(homes.claude, "claude"),
-    seedManagedRoot(homes.codex, "codex"),
-  ];
-  const pluginData = [
-    join(homes.claude, "plugins", "data", "opensocrates-inline"),
-    join(homes.claude, "plugins", "data", "opensocrates-opensocrates"),
-  ];
-  for (const target of pluginData) mkdirSync(target, { recursive: true });
+  const cacheRoots = [seedCache(homes.codex, "codex")];
+  const managedRoots = [seedManagedRoot(homes.codex, "codex")];
+  const pluginData = [];
   const history = join(homes.claude, "projects", "opensocrates-user-history.jsonl");
   mkdirSync(dirname(history), { recursive: true });
   writeFileSync(history, "preserve packed smoke history\n");
   const unrelated = [
-    [join(homes.claude, "plugins", "cache", "unrelated", "payload.txt"), "preserve unrelated cache\n"],
+    [
+      join(homes.claude, "plugins", "cache", "unrelated", "payload.txt"),
+      "preserve unrelated cache\n",
+    ],
     [join(homes.claude, "plugins", "data", "unrelated-plugin", "state.json"), '{"keep":true}\n'],
   ];
   for (const [target, contents] of unrelated) {
@@ -298,7 +260,7 @@ function seedPackedPurgeSandbox() {
       ...process.env,
       AGY_BIN: join(sandbox, "missing-agy"),
       ANTIGRAVITY_CONFIG_DIR: homes.antigravity,
-      CLAUDE_BIN: writeFakeHost(sandbox, "claude"),
+      CLAUDE_BIN: join(sandbox, "must-not-execute-claude"),
       CLAUDE_CONFIG_DIR: homes.claude,
       CODEX_BIN: writeFakeHost(sandbox, "codex"),
       CODEX_HOME: homes.codex,

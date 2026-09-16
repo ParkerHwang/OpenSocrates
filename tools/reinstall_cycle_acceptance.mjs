@@ -57,17 +57,12 @@ const BASELINE = "purged_same_machine";
 export const INITIAL_VERSION = "1.3.1";
 export const CANDIDATE_VERSION = PRODUCT_VERSION;
 const TRANSITION = "purge_then_reinstall";
-const HOSTS = Object.freeze(["claude", "codex"]);
-const RESULT_FILES = Object.freeze([
-  "result.json",
-  "result.md",
-  "manual-observations.md",
-]);
+const HOSTS = Object.freeze(["codex"]);
+const RESULT_FILES = Object.freeze(["result.json", "result.md", "manual-observations.md"]);
 const MANUAL_FIELDS = Object.freeze([
   "Codex seven-hook first review",
   "Codex seven-hook approval completed",
   "Codex SessionStart live timeout absence",
-  "Claude Local namespaced status",
   "Record and Replay capture reviewed",
 ]);
 const EXPECTED_CODEX_EVENTS = Object.freeze([
@@ -99,8 +94,7 @@ const RUN_LOCK_NAME = "run.lock";
 const MACHINE_LEASE_NAME = "machine-acceptance-lease.json";
 const MACHINE_LEASE_SCHEMA = "opensocrates.reinstall-cycle-machine-lease/1.0.0";
 const ABORTED_MACHINE_LEASE_NAME = "aborted-machine-lease.json";
-const ABORTED_MACHINE_LEASE_SCHEMA =
-  "opensocrates.reinstall-cycle-aborted-machine-lease/1.0.0";
+const ABORTED_MACHINE_LEASE_SCHEMA = "opensocrates.reinstall-cycle-aborted-machine-lease/1.0.0";
 const PRIVATE_MANIFEST_NAME = "private-evidence-manifest.json";
 const EVIDENCE_TRANSACTION_NAME = "evidence-transaction.json";
 const EVIDENCE_TRANSACTION_SCHEMA = "opensocrates.evidence-transaction/1.0.0";
@@ -110,8 +104,7 @@ const SEALED_PUBLIC_DIRECTORY_NAME = "sealed-public-result";
 const SEALED_PUBLIC_RECEIPT_NAME = "receipt.json";
 const SEALED_PUBLIC_SCHEMA = "opensocrates.sealed-public-result/1.0.0";
 const AUTO_UPDATE_LABEL = "com.opensocrates.auto-update";
-const UUID_V4_FRAGMENT =
-  "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
+const UUID_V4_FRAGMENT = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
 const UUID_V4_PATTERN = new RegExp(`^${UUID_V4_FRAGMENT}$`, "u");
 const STATE_TEMP_PATTERN = new RegExp(
   `^\\.(?:desired-state|auto-update-receipt)\\.json\\.${UUID_V4_FRAGMENT}\\.tmp$`,
@@ -151,10 +144,7 @@ const MAX_NPM_TARBALL_BYTES = 64 * 1024 * 1024;
 const MAX_NPM_TAR_UNCOMPRESSED_BYTES = 256 * 1024 * 1024;
 const MAX_HOST_CLOSE_RETRIES = 1;
 const MAX_REINSTALL_RETRIES = 1;
-const NPM_INVOCATION_MODES = new Set([
-  "isolated-preflight",
-  "account-home-lifecycle",
-]);
+const NPM_INVOCATION_MODES = new Set(["isolated-preflight", "account-home-lifecycle"]);
 const NPM_PACKAGE_FILES = Object.freeze([
   "CHANGELOG.md",
   "LICENSE",
@@ -174,7 +164,7 @@ const NPM_PACKAGE_FILES_FIELD = Object.freeze([
   "VERSION",
 ]);
 const NPM_PACKAGE_SCRIPTS = Object.freeze({
-  test: "node --test installer/opensocrates.test.mjs installer/lifecycle.test.mjs tools/clean_machine_acceptance.test.mjs tools/reinstall_cycle_acceptance.test.mjs tools/opencode_bridge.test.mjs tools/release_gate.test.mjs && npm run test:npx",
+  test: "node --test installer/opensocrates.test.mjs installer/lifecycle.test.mjs tools/clean_machine_acceptance.test.mjs tools/reinstall_cycle_acceptance.test.mjs tools/release_gate.test.mjs && npm run test:npx",
   "test:npx": "node installer/package-smoke.mjs",
   "pack:check": "npm pack --dry-run",
   prepublishOnly: "npm test",
@@ -258,7 +248,6 @@ const PUBLIC_ENVIRONMENT_KEYS = new Set([
   "hardwareArchitecture",
   "processArchitecture",
   "identity",
-  "claudeVersion",
   "codexVersion",
 ]);
 const PUBLIC_BASELINE_KEYS = new Set([
@@ -285,11 +274,7 @@ const PUBLIC_MUTATION_KEYS = new Set([
   "nextAction",
   "originalCacheDataTrustRestorationClaimed",
 ]);
-const PUBLIC_LIMITATION_KEYS = new Set([
-  "claudeChatStandaloneV121",
-  "cleanMachineClaimed",
-  "publicRegistryPathVerified",
-]);
+const PUBLIC_LIMITATION_KEYS = new Set(["cleanMachineClaimed", "publicRegistryPathVerified"]);
 const PUBLIC_PRIVACY_KEYS = new Set([
   "privateCommandLogRecorded",
   "rawCommandOutputIncluded",
@@ -330,23 +315,18 @@ const PUBLIC_COMMAND_KEYS = new Set([
   "stdoutSha256",
   "stderrSha256",
 ]);
-const PUBLIC_STEP_KEYS = new Set([
-  "id",
-  "label",
-  "status",
-  "durationMs",
-  "category",
-  "commandId",
-]);
+const PUBLIC_STEP_KEYS = new Set(["id", "label", "status", "durationMs", "category", "commandId"]);
 
 // Only this diagnosed, unrelated diagnostic is non-blocking. Unknown warnings
 // and every OpenSocrates warning still block. No raw warning/path is persisted.
 export function classifyCodexHookWarnings(warnings, accountHome) {
-  const admitted = "clamping SessionEnd hook timeout to 3s in " + accountHome +
+  const admitted =
+    "clamping SessionEnd hook timeout to 3s in " +
+    accountHome +
     "/.codex/plugins/cache/openai-codex/codex/1.0.6/hooks/hooks.json";
   return {
-    otherPluginTimeoutWarningCount: warnings.filter(w => w === admitted).length,
-    blockingWarningCount: warnings.filter(w => w !== admitted).length,
+    otherPluginTimeoutWarningCount: warnings.filter((w) => w === admitted).length,
+    blockingWarningCount: warnings.filter((w) => w !== admitted).length,
   };
 }
 
@@ -503,7 +483,8 @@ function atomicWritePrivate(target, contents) {
   const parent = dirname(target);
   requireCanonicalOwnedEntry(parent, "private atomic-write parent", "directory");
   requireOwnerOnly(parent, "the private atomic-write parent");
-  if (pathPresent(target)) requireCanonicalOwnedEntry(target, "private atomic-write target", "file");
+  if (pathPresent(target))
+    requireCanonicalOwnedEntry(target, "private atomic-write target", "file");
   const temporary = join(parent, `.${basename(target)}.${randomUUID()}.tmp`);
   try {
     writeFileSync(temporary, contents, { encoding: "utf8", mode: 0o600, flag: "wx" });
@@ -514,7 +495,8 @@ function atomicWritePrivate(target, contents) {
   } finally {
     if (pathPresent(temporary)) {
       const info = lstatSync(temporary);
-      if (!info.isSymbolicLink() && info.isFile() && info.uid === currentUid()) unlinkSync(temporary);
+      if (!info.isSymbolicLink() && info.isFile() && info.uid === currentUid())
+        unlinkSync(temporary);
     }
   }
 }
@@ -552,14 +534,18 @@ class SingleRunLock {
         live = true;
       } catch (error) {
         if (error?.code === "EPERM") live = true;
-        else if (error?.code !== "ESRCH") fail("run-lock", "the existing run lock cannot be checked safely");
+        else if (error?.code !== "ESRCH")
+          fail("run-lock", "the existing run lock cannot be checked safely");
       }
       if (live) fail("run-lock", "another acceptance process still owns this private run");
       unlinkSync(this.target);
     }
     const descriptor = openSync(this.target, "wx", 0o600);
     try {
-      writeFileSync(descriptor, `${JSON.stringify({ pid: process.pid, createdAt: new Date().toISOString() })}\n`);
+      writeFileSync(
+        descriptor,
+        `${JSON.stringify({ pid: process.pid, createdAt: new Date().toISOString() })}\n`,
+      );
       fsyncSync(descriptor);
     } finally {
       closeSync(descriptor);
@@ -900,16 +886,11 @@ export class MachineAcceptanceLease {
       .split(/\r?\n/u)
       .filter(Boolean)
       .map((line) =>
-        parseJson(
-          line,
-          "machine-lease",
-          "the aborted-preflight command ledger is invalid",
-        ),
+        parseJson(line, "machine-lease", "the aborted-preflight command ledger is invalid"),
       );
     if (
       entries.some(
-        (entry) =>
-          entry.lifecycleOperation !== null && entry.lifecycleOperation !== undefined,
+        (entry) => entry.lifecycleOperation !== null && entry.lifecycleOperation !== undefined,
       ) ||
       entries.some(
         (entry) =>
@@ -1048,10 +1029,7 @@ export class MachineAcceptanceLease {
     ) {
       fail("machine-lease", "the machine-wide acceptance lease checkpoint binding changed");
     }
-    if (
-      existing.receipt.status === "active" &&
-      this.processIsLive(existing.receipt.holderPid)
-    ) {
+    if (existing.receipt.status === "active" && this.processIsLive(existing.receipt.holderPid)) {
       fail("machine-lease", "the machine-wide acceptance lease owner is still active");
     }
     this.#replace({
@@ -1104,7 +1082,9 @@ export class MachineAcceptanceLease {
   releaseCompleted(checkpoint = null) {
     const existing = this.#validateReceipt();
     const expectedCheckpoint =
-      checkpoint === null ? existing.receipt.checkpointIdentitySha256 : checkpointLeaseIdentity(checkpoint);
+      checkpoint === null
+        ? existing.receipt.checkpointIdentitySha256
+        : checkpointLeaseIdentity(checkpoint);
     if (
       existing.receipt.testId !== this.testId ||
       existing.receipt.privateDirectory !== this.privateDirectory ||
@@ -1142,7 +1122,10 @@ function sanitizedMessage(error, replacements = []) {
   }
   return value
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/giu, "[redacted-email]")
-    .replace(/\b(?:gh[opusr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,})\b/gu, "[redacted-token]")
+    .replace(
+      /\b(?:gh[opusr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,})\b/gu,
+      "[redacted-token]",
+    )
     .replace(/\/(?:Users|private|var|tmp|Volumes)(?:\/[^\s`'"]+)+/gu, "[redacted-path]")
     .replace(/[\r\n]+/gu, " ")
     .slice(0, 500);
@@ -1308,7 +1291,12 @@ function validatePublicPayloadIdentity(value, trail) {
   );
   requirePublicScalar(value.version, ["string"], `${trail}.version`);
   requirePublicScalar(value.declaredFileCount, ["number"], `${trail}.declaredFileCount`);
-  for (const key of ["checksumInventorySha256", "releaseManifestSha256", "runtimeSha256", "ciPayloadByteIdentity"]) {
+  for (const key of [
+    "checksumInventorySha256",
+    "releaseManifestSha256",
+    "runtimeSha256",
+    "ciPayloadByteIdentity",
+  ]) {
     requirePublicScalar(value[key], ["string"], `${trail}.${key}`);
   }
   if (
@@ -1327,13 +1315,7 @@ function validatePublicPayloadIdentity(value, trail) {
 function validatePublicRuntimeIdentity(value, trail) {
   requirePublicKeys(
     value,
-    new Set([
-      "product",
-      "productVersion",
-      "contentRevision",
-      "architectures",
-      "executable",
-    ]),
+    new Set(["product", "productVersion", "contentRevision", "architectures", "executable"]),
     trail,
   );
   for (const key of ["product", "productVersion", "contentRevision"]) {
@@ -1396,7 +1378,6 @@ function validatePublicResidue(value, trail) {
       "launchAgentJobLoaded",
       "codexTrustSectionCount",
       "trustTransactionResidueCount",
-      "openCodeBridgeResidueCount",
       "empty",
     ]),
     trail,
@@ -1418,10 +1399,7 @@ function validatePublicResidue(value, trail) {
       ]),
       itemTrail,
     );
-    for (const key of [
-      "registrationPresent",
-      "unsupportedLegacyRegistrationPresent",
-    ]) {
+    for (const key of ["registrationPresent", "unsupportedLegacyRegistrationPresent"]) {
       requirePublicScalar(item[key], ["boolean", "null"], `${itemTrail}.${key}`);
     }
     for (const key of [
@@ -1435,7 +1413,11 @@ function validatePublicResidue(value, trail) {
     ]) {
       requirePublicScalar(item[key], ["boolean"], `${itemTrail}.${key}`);
     }
-    requirePublicScalar(item.transactionResidueCount, ["number"], `${itemTrail}.transactionResidueCount`);
+    requirePublicScalar(
+      item.transactionResidueCount,
+      ["number"],
+      `${itemTrail}.transactionResidueCount`,
+    );
     if (!publicNonnegativeInteger(item.transactionResidueCount)) {
       fail("privacy", `${itemTrail}.transactionResidueCount violates the residue count contract`);
     }
@@ -1448,7 +1430,6 @@ function validatePublicResidue(value, trail) {
     "launchAgentTemporaryCount",
     "codexTrustSectionCount",
     "trustTransactionResidueCount",
-    "openCodeBridgeResidueCount",
   ]) {
     requirePublicScalar(value[key], ["number"], `${trail}.${key}`);
     if (!publicNonnegativeInteger(value[key])) {
@@ -1515,7 +1496,11 @@ function validatePublicSource(source) {
       "result.source.ci.buildSource",
     );
     for (const key of ["headSha", "treeSha", "receiptSha256"]) {
-      requirePublicScalar(source.ci.buildSource[key], ["string"], `result.source.ci.buildSource.${key}`);
+      requirePublicScalar(
+        source.ci.buildSource[key],
+        ["string"],
+        `result.source.ci.buildSource.${key}`,
+      );
     }
   }
   if (source.npmPackage !== null) {
@@ -1570,7 +1555,11 @@ function validatePublicSource(source) {
       "result.source.npmPackage.execution",
     );
     for (const key of Object.keys(source.npmPackage.execution)) {
-      requirePublicScalar(source.npmPackage.execution[key], ["string"], `result.source.npmPackage.execution.${key}`);
+      requirePublicScalar(
+        source.npmPackage.execution[key],
+        ["string"],
+        `result.source.npmPackage.execution.${key}`,
+      );
     }
   }
   const assetKeys = Object.keys(source.assets);
@@ -1639,7 +1628,6 @@ function validatePublicBaseline(baseline) {
       "codexHooks",
       "nonTargetHosts",
       "transactionResidue",
-      "openCodeBridgeResidueCount",
       "ownership",
     ]),
     "result.baseline.inventory",
@@ -1656,13 +1644,22 @@ function validatePublicBaseline(baseline) {
     "result.baseline.inventory.managedRootsPresent",
     (value, trail) => requirePublicScalar(value, ["boolean"], trail),
   );
-  requirePublicHostMap(baseline.inventory.caches, HOSTS, "result.baseline.inventory.caches", (value, trail) => {
-    requirePublicKeys(value, new Set(["present", "ownership", "versionCount", "liveInUse"]), trail);
-    requirePublicScalar(value.present, ["boolean"], `${trail}.present`);
-    requirePublicScalar(value.ownership, ["string"], `${trail}.ownership`);
-    requirePublicScalar(value.versionCount, ["number"], `${trail}.versionCount`);
-    requirePublicScalar(value.liveInUse, ["boolean"], `${trail}.liveInUse`);
-  });
+  requirePublicHostMap(
+    baseline.inventory.caches,
+    HOSTS,
+    "result.baseline.inventory.caches",
+    (value, trail) => {
+      requirePublicKeys(
+        value,
+        new Set(["present", "ownership", "versionCount", "liveInUse"]),
+        trail,
+      );
+      requirePublicScalar(value.present, ["boolean"], `${trail}.present`);
+      requirePublicScalar(value.ownership, ["string"], `${trail}.ownership`);
+      requirePublicScalar(value.versionCount, ["number"], `${trail}.versionCount`);
+      requirePublicScalar(value.liveInUse, ["boolean"], `${trail}.liveInUse`);
+    },
+  );
   for (const field of ["managedPayloadIntegrity", "cachePayloadIntegrity"]) {
     requirePublicHostMap(
       baseline.inventory[field],
@@ -1671,7 +1668,11 @@ function validatePublicBaseline(baseline) {
       (value, trail) => requirePublicScalar(value, ["string"], trail),
     );
   }
-  requirePublicKind(baseline.inventory.pluginData, ["array"], "result.baseline.inventory.pluginData");
+  requirePublicKind(
+    baseline.inventory.pluginData,
+    ["array"],
+    "result.baseline.inventory.pluginData",
+  );
   baseline.inventory.pluginData.forEach((item, index) => {
     const trail = `result.baseline.inventory.pluginData.${index}`;
     requirePublicKeys(item, new Set(["present", "ownership", "empty"]), trail);
@@ -1690,9 +1691,20 @@ function validatePublicBaseline(baseline) {
     new Set(["present", "exactSectionCount", "events"]),
     "result.baseline.inventory.codexTrust",
   );
-  requirePublicScalar(baseline.inventory.codexTrust.present, ["boolean"], "result.baseline.inventory.codexTrust.present");
-  requirePublicScalar(baseline.inventory.codexTrust.exactSectionCount, ["number"], "result.baseline.inventory.codexTrust.exactSectionCount");
-  requirePublicStringArray(baseline.inventory.codexTrust.events, "result.baseline.inventory.codexTrust.events");
+  requirePublicScalar(
+    baseline.inventory.codexTrust.present,
+    ["boolean"],
+    "result.baseline.inventory.codexTrust.present",
+  );
+  requirePublicScalar(
+    baseline.inventory.codexTrust.exactSectionCount,
+    ["number"],
+    "result.baseline.inventory.codexTrust.exactSectionCount",
+  );
+  requirePublicStringArray(
+    baseline.inventory.codexTrust.events,
+    "result.baseline.inventory.codexTrust.events",
+  );
   requirePublicKeys(
     baseline.inventory.codexHooks,
     new Set([
@@ -1705,11 +1717,29 @@ function validatePublicBaseline(baseline) {
     ]),
     "result.baseline.inventory.codexHooks",
   );
-  requirePublicScalar(baseline.inventory.codexHooks.hookCount, ["number"], "result.baseline.inventory.codexHooks.hookCount");
-  requirePublicStringArray(baseline.inventory.codexHooks.events, "result.baseline.inventory.codexHooks.events");
-  requirePublicScalar(baseline.inventory.codexHooks.namespace, ["string"], "result.baseline.inventory.codexHooks.namespace");
-  requirePublicStringArray(baseline.inventory.codexHooks.trustStatuses, "result.baseline.inventory.codexHooks.trustStatuses");
-  requirePublicScalar(baseline.inventory.codexHooks.sessionStartTimeoutSeconds, ["number"], "result.baseline.inventory.codexHooks.sessionStartTimeoutSeconds");
+  requirePublicScalar(
+    baseline.inventory.codexHooks.hookCount,
+    ["number"],
+    "result.baseline.inventory.codexHooks.hookCount",
+  );
+  requirePublicStringArray(
+    baseline.inventory.codexHooks.events,
+    "result.baseline.inventory.codexHooks.events",
+  );
+  requirePublicScalar(
+    baseline.inventory.codexHooks.namespace,
+    ["string"],
+    "result.baseline.inventory.codexHooks.namespace",
+  );
+  requirePublicStringArray(
+    baseline.inventory.codexHooks.trustStatuses,
+    "result.baseline.inventory.codexHooks.trustStatuses",
+  );
+  requirePublicScalar(
+    baseline.inventory.codexHooks.sessionStartTimeoutSeconds,
+    ["number"],
+    "result.baseline.inventory.codexHooks.sessionStartTimeoutSeconds",
+  );
   const hookTrustStatuses = baseline.inventory.codexHooks.trustStatuses;
   if (
     !publicNonnegativeInteger(baseline.inventory.codexHooks.otherPluginTimeoutWarningCount) ||
@@ -1731,8 +1761,13 @@ function validatePublicBaseline(baseline) {
     nonTargetHosts,
     "result.baseline.inventory.nonTargetHosts",
     (value, trail) => {
-      requirePublicKeys(value, new Set(["managedRootPresent", "bridgePresent", "bridgeMarkerPresent"]), trail);
-      for (const key of Object.keys(value)) requirePublicScalar(value[key], ["boolean"], `${trail}.${key}`);
+      requirePublicKeys(
+        value,
+        new Set(["managedRootPresent", "bridgePresent", "bridgeMarkerPresent"]),
+        trail,
+      );
+      for (const key of Object.keys(value))
+        requirePublicScalar(value[key], ["boolean"], `${trail}.${key}`);
     },
   );
   requirePublicHostMap(
@@ -1741,8 +1776,11 @@ function validatePublicBaseline(baseline) {
     "result.baseline.inventory.transactionResidue",
     (value, trail) => requirePublicScalar(value, ["number"], trail),
   );
-  requirePublicScalar(baseline.inventory.openCodeBridgeResidueCount, ["number"], "result.baseline.inventory.openCodeBridgeResidueCount");
-  requirePublicScalar(baseline.inventory.ownership, ["string"], "result.baseline.inventory.ownership");
+  requirePublicScalar(
+    baseline.inventory.ownership,
+    ["string"],
+    "result.baseline.inventory.ownership",
+  );
 }
 
 function validatePublicAssertions(assertions) {
@@ -1770,27 +1808,50 @@ function validatePublicAssertions(assertions) {
       );
       requirePublicScalar(value.classification, ["string"], `${trail}.classification`);
       requirePublicScalar(value.actualStateRecorded, ["boolean"], `${trail}.actualStateRecorded`);
-      requirePublicScalar(value.previousStateRestorationClaimed, ["boolean"], `${trail}.previousStateRestorationClaimed`);
+      requirePublicScalar(
+        value.previousStateRestorationClaimed,
+        ["boolean"],
+        `${trail}.previousStateRestorationClaimed`,
+      );
       for (const listKey of ["installedHosts", "missingHosts"]) {
-        if (Object.hasOwn(value, listKey)) requirePublicStringArray(value[listKey], `${trail}.${listKey}`);
+        if (Object.hasOwn(value, listKey))
+          requirePublicStringArray(value[listKey], `${trail}.${listKey}`);
       }
-      if (Object.hasOwn(value, "registrationInspection")) requirePublicScalar(value.registrationInspection, ["string"], `${trail}.registrationInspection`);
+      if (Object.hasOwn(value, "registrationInspection"))
+        requirePublicScalar(
+          value.registrationInspection,
+          ["string"],
+          `${trail}.registrationInspection`,
+        );
       if (Object.hasOwn(value, "candidatePayloads")) {
         const hosts = Object.keys(value.candidatePayloads);
-        requirePublicKeys(value.candidatePayloads, new Set(hosts.filter((host) => HOSTS.includes(host))), `${trail}.candidatePayloads`);
+        requirePublicKeys(
+          value.candidatePayloads,
+          new Set(hosts.filter((host) => HOSTS.includes(host))),
+          `${trail}.candidatePayloads`,
+        );
         for (const host of hosts) {
-          if (!HOSTS.includes(host)) fail("privacy", `${trail}.candidatePayloads has an unsupported host`);
-          validatePublicPayloadIdentity(value.candidatePayloads[host], `${trail}.candidatePayloads.${host}`);
+          if (!HOSTS.includes(host))
+            fail("privacy", `${trail}.candidatePayloads has an unsupported host`);
+          validatePublicPayloadIdentity(
+            value.candidatePayloads[host],
+            `${trail}.candidatePayloads.${host}`,
+          );
         }
       }
-      if (Object.hasOwn(value, "residue") && value.residue !== null) validatePublicResidue(value.residue, `${trail}.residue`);
+      if (Object.hasOwn(value, "residue") && value.residue !== null)
+        validatePublicResidue(value.residue, `${trail}.residue`);
     } else if (key === "finalRegistration") {
       requirePublicKeys(value, new Set(["status", "hosts"]), trail);
       requirePublicScalar(value.status, ["string"], `${trail}.status`);
       requirePublicHostMap(value.hosts, HOSTS, `${trail}.hosts`, validatePublicRegistration);
       if (value.status !== "pass") fail("privacy", `${trail}.status must be pass`);
     } else if (key === "finalStatus") {
-      requirePublicKeys(value, new Set(["status", "desiredVersion", "hostsInSync", "drift"]), trail);
+      requirePublicKeys(
+        value,
+        new Set(["status", "desiredVersion", "hostsInSync", "drift"]),
+        trail,
+      );
       requirePublicScalar(value.status, ["string"], `${trail}.status`);
       requirePublicScalar(value.desiredVersion, ["string"], `${trail}.desiredVersion`);
       requirePublicStringArray(value.hostsInSync, `${trail}.hostsInSync`);
@@ -1807,32 +1868,40 @@ function validatePublicAssertions(assertions) {
       requirePublicKeys(value, new Set(["status", "desiredVersion", "runtimes"]), trail);
       requirePublicScalar(value.status, ["string"], `${trail}.status`);
       requirePublicScalar(value.desiredVersion, ["string"], `${trail}.desiredVersion`);
-      requirePublicHostMap(value.runtimes, HOSTS, `${trail}.runtimes`, validatePublicRuntimeIdentity);
+      requirePublicHostMap(
+        value.runtimes,
+        HOSTS,
+        `${trail}.runtimes`,
+        validatePublicRuntimeIdentity,
+      );
       if (value.status !== "pass" || value.desiredVersion !== PRODUCT_VERSION) {
         fail("privacy", `${trail} violates the final version contract`);
       }
     } else if (key === "finalChecksum") {
       requirePublicKeys(value, new Set(["status", "payloads"]), trail);
       requirePublicScalar(value.status, ["string"], `${trail}.status`);
-      requirePublicHostMap(value.payloads, HOSTS, `${trail}.payloads`, validatePublicPayloadIdentity);
+      requirePublicHostMap(
+        value.payloads,
+        HOSTS,
+        `${trail}.payloads`,
+        validatePublicPayloadIdentity,
+      );
       if (value.status !== "pass") fail("privacy", `${trail}.status must be pass`);
     } else if (key === "finalManagedLayout") {
-      requirePublicKeys(value, new Set(["status", "claudePublicSkills", "claudeCommandsPresent", "codexControllerPresent"]), trail);
       requirePublicScalar(value.status, ["string"], `${trail}.status`);
-      requirePublicStringArray(value.claudePublicSkills, `${trail}.claudePublicSkills`);
-      requirePublicScalar(value.claudeCommandsPresent, ["boolean"], `${trail}.claudeCommandsPresent`);
-      requirePublicScalar(value.codexControllerPresent, ["boolean"], `${trail}.codexControllerPresent`);
-      if (
-        value.status !== "pass" ||
-        value.claudePublicSkills.some((item) => !/^[a-z0-9-]{1,80}$/u.test(item)) ||
-        value.claudeCommandsPresent !== false ||
-        value.codexControllerPresent !== true
-      ) {
+
+      requirePublicScalar(
+        value.codexControllerPresent,
+        ["boolean"],
+        `${trail}.codexControllerPresent`,
+      );
+      if (value.status !== "pass" || value.codexControllerPresent !== true) {
         fail("privacy", `${trail} violates the final managed-layout contract`);
       }
     } else if (key === "finalArchitecture") {
       requirePublicKeys(value, new Set(["status", "hardware", "process", "installed"]), trail);
-      for (const item of ["status", "hardware", "process"]) requirePublicScalar(value[item], ["string"], `${trail}.${item}`);
+      for (const item of ["status", "hardware", "process"])
+        requirePublicScalar(value[item], ["string"], `${trail}.${item}`);
       requirePublicHostMap(value.installed, HOSTS, `${trail}.installed`, requirePublicStringArray);
       if (
         value.status !== "pass" ||
@@ -1843,9 +1912,21 @@ function validatePublicAssertions(assertions) {
         fail("privacy", `${trail} violates the final architecture contract`);
       }
     } else if (key === "finalPermissions") {
-      requirePublicKeys(value, new Set(["status", "stateDirectoryMode", "desiredStateMode", "managedRootsOwnedByEffectiveUser", "runtimesExecutable"]), trail);
-      for (const item of ["status", "stateDirectoryMode", "desiredStateMode"]) requirePublicScalar(value[item], ["string"], `${trail}.${item}`);
-      for (const item of ["managedRootsOwnedByEffectiveUser", "runtimesExecutable"]) requirePublicScalar(value[item], ["boolean"], `${trail}.${item}`);
+      requirePublicKeys(
+        value,
+        new Set([
+          "status",
+          "stateDirectoryMode",
+          "desiredStateMode",
+          "managedRootsOwnedByEffectiveUser",
+          "runtimesExecutable",
+        ]),
+        trail,
+      );
+      for (const item of ["status", "stateDirectoryMode", "desiredStateMode"])
+        requirePublicScalar(value[item], ["string"], `${trail}.${item}`);
+      for (const item of ["managedRootsOwnedByEffectiveUser", "runtimesExecutable"])
+        requirePublicScalar(value[item], ["boolean"], `${trail}.${item}`);
       if (
         value.status !== "pass" ||
         value.stateDirectoryMode !== "700" ||
@@ -1856,10 +1937,24 @@ function validatePublicAssertions(assertions) {
         fail("privacy", `${trail} violates the final permission contract`);
       }
     } else if (key === "finalDesiredState") {
-      requirePublicKeys(value, new Set(["status", "schema", "activeVersion", "installedHosts", "autoUpdateEnabled", "launchAgentPresent", "launchAgentJobLoaded"]), trail);
-      for (const item of ["status", "schema", "activeVersion"]) requirePublicScalar(value[item], ["string"], `${trail}.${item}`);
+      requirePublicKeys(
+        value,
+        new Set([
+          "status",
+          "schema",
+          "activeVersion",
+          "installedHosts",
+          "autoUpdateEnabled",
+          "launchAgentPresent",
+          "launchAgentJobLoaded",
+        ]),
+        trail,
+      );
+      for (const item of ["status", "schema", "activeVersion"])
+        requirePublicScalar(value[item], ["string"], `${trail}.${item}`);
       requirePublicStringArray(value.installedHosts, `${trail}.installedHosts`);
-      for (const item of ["autoUpdateEnabled", "launchAgentPresent", "launchAgentJobLoaded"]) requirePublicScalar(value[item], ["boolean"], `${trail}.${item}`);
+      for (const item of ["autoUpdateEnabled", "launchAgentPresent", "launchAgentJobLoaded"])
+        requirePublicScalar(value[item], ["boolean"], `${trail}.${item}`);
       if (
         value.status !== "pass" ||
         value.schema !== DESIRED_STATE_SCHEMA ||
@@ -1872,15 +1967,41 @@ function validatePublicAssertions(assertions) {
         fail("privacy", `${trail} violates the final desired-state contract`);
       }
     } else if (key === "codexFirstApproval") {
-      requirePublicKeys(value, new Set(["status", "otherPluginTimeoutWarningCount", "exactHookCount", "events", "namespace", "trustStatuses", "sessionStartTimeoutSeconds", "observedBeforeOtherPostInstallCodexLaunch", "manualApprovalRequired"]), trail);
+      requirePublicKeys(
+        value,
+        new Set([
+          "status",
+          "otherPluginTimeoutWarningCount",
+          "exactHookCount",
+          "events",
+          "namespace",
+          "trustStatuses",
+          "sessionStartTimeoutSeconds",
+          "observedBeforeOtherPostInstallCodexLaunch",
+          "manualApprovalRequired",
+        ]),
+        trail,
+      );
       requirePublicScalar(value.status, ["string"], `${trail}.status`);
       requirePublicScalar(value.exactHookCount, ["number"], `${trail}.exactHookCount`);
       requirePublicStringArray(value.events, `${trail}.events`);
       requirePublicScalar(value.namespace, ["string"], `${trail}.namespace`);
       requirePublicStringArray(value.trustStatuses, `${trail}.trustStatuses`);
-      requirePublicScalar(value.sessionStartTimeoutSeconds, ["number"], `${trail}.sessionStartTimeoutSeconds`);
-      requirePublicScalar(value.observedBeforeOtherPostInstallCodexLaunch, ["boolean"], `${trail}.observedBeforeOtherPostInstallCodexLaunch`);
-      requirePublicScalar(value.manualApprovalRequired, ["boolean"], `${trail}.manualApprovalRequired`);
+      requirePublicScalar(
+        value.sessionStartTimeoutSeconds,
+        ["number"],
+        `${trail}.sessionStartTimeoutSeconds`,
+      );
+      requirePublicScalar(
+        value.observedBeforeOtherPostInstallCodexLaunch,
+        ["boolean"],
+        `${trail}.observedBeforeOtherPostInstallCodexLaunch`,
+      );
+      requirePublicScalar(
+        value.manualApprovalRequired,
+        ["boolean"],
+        `${trail}.manualApprovalRequired`,
+      );
       if (
         value.status !== "pass" ||
         !publicNonnegativeInteger(value.otherPluginTimeoutWarningCount) ||
@@ -1895,17 +2016,54 @@ function validatePublicAssertions(assertions) {
         fail("privacy", `${trail} violates the first-approval contract`);
       }
     } else if (key === "sessionStartBudget") {
-      requirePublicKeys(value, new Set(["observationStatus", "target", "configuredTimeoutMs", "hardTimeoutMilliseconds", "clock", "monotonicStartMilliseconds", "monotonicEndMilliseconds", "coldProcessPerSample", "hardTimeoutEnforced", "processModel", "sources", "pass", "artifactIdentity"]), trail);
-      for (const item of ["observationStatus", "target", "clock", "processModel", "artifactIdentity"]) requirePublicScalar(value[item], ["string"], `${trail}.${item}`);
-      for (const item of ["configuredTimeoutMs", "hardTimeoutMilliseconds", "monotonicStartMilliseconds", "monotonicEndMilliseconds"]) requirePublicScalar(value[item], ["number"], `${trail}.${item}`);
-      for (const item of ["coldProcessPerSample", "hardTimeoutEnforced", "pass"]) requirePublicScalar(value[item], ["boolean"], `${trail}.${item}`);
+      requirePublicKeys(
+        value,
+        new Set([
+          "observationStatus",
+          "target",
+          "configuredTimeoutMs",
+          "hardTimeoutMilliseconds",
+          "clock",
+          "monotonicStartMilliseconds",
+          "monotonicEndMilliseconds",
+          "coldProcessPerSample",
+          "hardTimeoutEnforced",
+          "processModel",
+          "sources",
+          "pass",
+          "artifactIdentity",
+        ]),
+        trail,
+      );
+      for (const item of [
+        "observationStatus",
+        "target",
+        "clock",
+        "processModel",
+        "artifactIdentity",
+      ])
+        requirePublicScalar(value[item], ["string"], `${trail}.${item}`);
+      for (const item of [
+        "configuredTimeoutMs",
+        "hardTimeoutMilliseconds",
+        "monotonicStartMilliseconds",
+        "monotonicEndMilliseconds",
+      ])
+        requirePublicScalar(value[item], ["number"], `${trail}.${item}`);
+      for (const item of ["coldProcessPerSample", "hardTimeoutEnforced", "pass"])
+        requirePublicScalar(value[item], ["boolean"], `${trail}.${item}`);
       requirePublicKeys(value.sources, new Set(SESSION_START_SOURCES), `${trail}.sources`);
       for (const source of SESSION_START_SOURCES) {
         const sourceTrail = `${trail}.sources.${source}`;
         const sample = value.sources[source];
-        requirePublicKeys(sample, new Set(["sampleCount", "firstMs", "p95Ms", "maxMs", "pass"]), sourceTrail);
+        requirePublicKeys(
+          sample,
+          new Set(["sampleCount", "firstMs", "p95Ms", "maxMs", "pass"]),
+          sourceTrail,
+        );
         requirePublicScalar(sample.sampleCount, ["number"], `${sourceTrail}.sampleCount`);
-        for (const item of ["firstMs", "p95Ms", "maxMs"]) requirePublicScalar(sample[item], ["number"], `${sourceTrail}.${item}`);
+        for (const item of ["firstMs", "p95Ms", "maxMs"])
+          requirePublicScalar(sample[item], ["number"], `${sourceTrail}.${item}`);
         requirePublicScalar(sample.pass, ["boolean"], `${sourceTrail}.pass`);
         if (
           sample.sampleCount !== 20 ||
@@ -1939,21 +2097,48 @@ function validatePublicAssertions(assertions) {
         fail("privacy", `${trail} violates the SessionStart timing contract`);
       }
     } else if (key === "finalTopology") {
-      requirePublicKeys(value, new Set(["status", "sourceCommit", "installedHosts", "version", "admittedTopology", "nonTargetHosts", "previousCacheDataTrustContentRestorationClaimed"]), trail);
-      for (const item of ["status", "sourceCommit", "version", "admittedTopology"]) requirePublicScalar(value[item], ["string"], `${trail}.${item}`);
+      requirePublicKeys(
+        value,
+        new Set([
+          "status",
+          "sourceCommit",
+          "installedHosts",
+          "version",
+          "admittedTopology",
+          "nonTargetHosts",
+          "previousCacheDataTrustContentRestorationClaimed",
+        ]),
+        trail,
+      );
+      for (const item of ["status", "sourceCommit", "version", "admittedTopology"])
+        requirePublicScalar(value[item], ["string"], `${trail}.${item}`);
       requirePublicStringArray(value.installedHosts, `${trail}.installedHosts`);
       const otherHosts = SUPPORTED_HOSTS.filter((host) => !HOSTS.includes(host));
-      requirePublicHostMap(value.nonTargetHosts, otherHosts, `${trail}.nonTargetHosts`, (item, itemTrail) => {
-        requirePublicKeys(item, new Set(["managedRootPresent", "bridgePresent", "bridgeMarkerPresent"]), itemTrail);
-        for (const field of Object.keys(item)) requirePublicScalar(item[field], ["boolean"], `${itemTrail}.${field}`);
-      });
-      requirePublicScalar(value.previousCacheDataTrustContentRestorationClaimed, ["boolean"], `${trail}.previousCacheDataTrustContentRestorationClaimed`);
+      requirePublicHostMap(
+        value.nonTargetHosts,
+        otherHosts,
+        `${trail}.nonTargetHosts`,
+        (item, itemTrail) => {
+          requirePublicKeys(
+            item,
+            new Set(["managedRootPresent", "bridgePresent", "bridgeMarkerPresent"]),
+            itemTrail,
+          );
+          for (const field of Object.keys(item))
+            requirePublicScalar(item[field], ["boolean"], `${itemTrail}.${field}`);
+        },
+      );
+      requirePublicScalar(
+        value.previousCacheDataTrustContentRestorationClaimed,
+        ["boolean"],
+        `${trail}.previousCacheDataTrustContentRestorationClaimed`,
+      );
       if (
         value.status !== "pass" ||
         !/^[a-f0-9]{40}$/u.test(value.sourceCommit) ||
         !sameStrings(value.installedHosts, HOSTS) ||
         value.version !== PRODUCT_VERSION ||
-        value.admittedTopology !== "claude_and_codex_only; other_supported_hosts_absent" ||
+        value.admittedTopology !== "codex_only" ||
         value.previousCacheDataTrustContentRestorationClaimed !== false
       ) {
         fail("privacy", `${trail} violates the final topology contract`);
@@ -1990,17 +2175,19 @@ function publicIsoTimestamp(value) {
 }
 
 function publicSemver(value, { nodePrefix = false } = {}) {
-  return typeof value === "string" && new RegExp(
-    `^${nodePrefix ? "v" : ""}\\d+\\.\\d+\\.\\d+(?:[-+][0-9A-Za-z.-]+)?$`,
-    "u",
-  ).test(value);
+  return (
+    typeof value === "string" &&
+    new RegExp(`^${nodePrefix ? "v" : ""}\\d+\\.\\d+\\.\\d+(?:[-+][0-9A-Za-z.-]+)?$`, "u").test(
+      value,
+    )
+  );
 }
 
 function publicSha256(value, { prefixed = false } = {}) {
-  return typeof value === "string" && new RegExp(
-    `^${prefixed ? "sha256:" : ""}[a-f0-9]{64}$`,
-    "u",
-  ).test(value);
+  return (
+    typeof value === "string" &&
+    new RegExp(`^${prefixed ? "sha256:" : ""}[a-f0-9]{64}$`, "u").test(value)
+  );
 }
 
 function publicNonnegativeInteger(value, maximum = Number.MAX_SAFE_INTEGER) {
@@ -2076,7 +2263,9 @@ function validatePublicSemanticContracts(report) {
     !publicIsoTimestamp(report.generatedAt) ||
     !(report.completedAt === null || publicIsoTimestamp(report.completedAt)) ||
     !new Set(["running", "paused", "passed", "failed"]).has(report.automatedResult) ||
-    !new Set(["pending", "not-run", "passed", "failed", "blocked", "not_observed"]).has(report.manualResult) ||
+    !new Set(["pending", "not-run", "passed", "failed", "blocked", "not_observed"]).has(
+      report.manualResult,
+    ) ||
     !new Set(["pending", "passed", "failed", "blocked", "not_observed"]).has(report.overallResult)
   ) {
     fail("privacy", "public result identity or outcome fields violate their closed contract");
@@ -2088,7 +2277,10 @@ function validatePublicSemanticContracts(report) {
     source.version !== PRODUCT_VERSION ||
     !(source.commit === null || /^[a-f0-9]{40}$/u.test(source.commit)) ||
     !(source.tree === null || /^[a-f0-9]{40}$/u.test(source.tree)) ||
-    !(source.pullRequest === null || (Number.isSafeInteger(source.pullRequest) && source.pullRequest > 0)) ||
+    !(
+      source.pullRequest === null ||
+      (Number.isSafeInteger(source.pullRequest) && source.pullRequest > 0)
+    ) ||
     !(source.ciRunId === null || (Number.isSafeInteger(source.ciRunId) && source.ciRunId > 0)) ||
     source.publicReleaseV121 !== "unavailable"
   ) {
@@ -2096,8 +2288,7 @@ function validatePublicSemanticContracts(report) {
   }
   if (
     source.pullRequestUrl !== null &&
-    source.pullRequestUrl !==
-      `https://github.com/${REPOSITORY}/pull/${source.pullRequest}`
+    source.pullRequestUrl !== `https://github.com/${REPOSITORY}/pull/${source.pullRequest}`
   ) {
     fail("privacy", "public pull-request URL is not bound to its exact repository and number");
   }
@@ -2175,7 +2366,6 @@ function validatePublicSemanticContracts(report) {
     !publicSemver(environment.nodeVersion, { nodePrefix: true }) ||
     !(environment.hardwareArchitecture === null || environment.hardwareArchitecture === "arm64") ||
     !(environment.processArchitecture === null || environment.processArchitecture === "arm64") ||
-    !(environment.claudeVersion === null || publicSemver(environment.claudeVersion)) ||
     !(environment.codexVersion === null || publicSemver(environment.codexVersion)) ||
     (environment.identity !== null &&
       (environment.identity.uidMatchesEffectiveUid !== true ||
@@ -2240,15 +2430,21 @@ function validatePublicSemanticContracts(report) {
       !new Set(["passed", "paused", "failed"]).has(step.status) ||
       !Number.isFinite(step.durationMs) ||
       step.durationMs < 0 ||
-      !(step.category === undefined || step.category === null || /^[a-z][a-z0-9-]{0,63}$/u.test(step.category)) ||
-      !(step.commandId === undefined || step.commandId === null ||
-        (Number.isSafeInteger(step.commandId) && step.commandId > 0))
+      !(
+        step.category === undefined ||
+        step.category === null ||
+        /^[a-z][a-z0-9-]{0,63}$/u.test(step.category)
+      ) ||
+      !(
+        step.commandId === undefined ||
+        step.commandId === null ||
+        (Number.isSafeInteger(step.commandId) && step.commandId > 0)
+      )
     ) {
       fail("privacy", "public step evidence violates its closed scalar contract");
     }
   });
   if (
-    report.limitations.claudeChatStandaloneV121 !== "pending_public_artifact" ||
     report.limitations.cleanMachineClaimed !== false ||
     report.limitations.publicRegistryPathVerified !== false ||
     report.privacy.privateCommandLogRecorded !== true ||
@@ -2280,7 +2476,6 @@ function validatePublicResultShape(report) {
     ["nodeVersion", ["string"]],
     ["hardwareArchitecture", ["string", "null"]],
     ["processArchitecture", ["string", "null"]],
-    ["claudeVersion", ["string", "null"]],
     ["codexVersion", ["string", "null"]],
   ]) {
     requirePublicScalar(report.environment[key], kinds, `result.environment.${key}`);
@@ -2292,13 +2487,22 @@ function validatePublicResultShape(report) {
       "result.environment.identity",
     );
     for (const key of Object.keys(report.environment.identity)) {
-      requirePublicScalar(report.environment.identity[key], ["boolean"], `result.environment.identity.${key}`);
+      requirePublicScalar(
+        report.environment.identity[key],
+        ["boolean"],
+        `result.environment.identity.${key}`,
+      );
     }
   }
   for (const key of ["started", "reinstallAttempted", "originalCacheDataTrustRestorationClaimed"]) {
     requirePublicScalar(report.mutation[key], ["boolean"], `result.mutation.${key}`);
   }
-  for (const key of ["purgeCommandAttempts", "trustResetAttempts", "reinstallAttempts", "hostCloseRetriesUsed"]) {
+  for (const key of [
+    "purgeCommandAttempts",
+    "trustResetAttempts",
+    "reinstallAttempts",
+    "hostCloseRetriesUsed",
+  ]) {
     requirePublicScalar(report.mutation[key], ["number"], `result.mutation.${key}`);
   }
   for (const key of ["phase", "lifecycleOutcome", "finalState"]) {
@@ -2306,16 +2510,11 @@ function validatePublicResultShape(report) {
   }
   requirePublicScalar(report.mutation.nextAction, ["string", "null"], "result.mutation.nextAction");
   for (const key of PUBLIC_LIMITATION_KEYS) {
-    requirePublicScalar(report.limitations[key], [key === "claudeChatStandaloneV121" ? "string" : "boolean"], `result.limitations.${key}`);
   }
   for (const key of PUBLIC_PRIVACY_KEYS) {
     requirePublicScalar(report.privacy[key], ["boolean"], `result.privacy.${key}`);
   }
-  requirePublicKeys(
-    report.manualObservations,
-    new Set(MANUAL_FIELDS),
-    "result.manualObservations",
-  );
+  requirePublicKeys(report.manualObservations, new Set(MANUAL_FIELDS), "result.manualObservations");
   for (const [label, value] of Object.entries(report.manualObservations)) {
     if (!new Set(["pending", "pass", "fail", "not_observed", "blocked"]).has(value)) {
       fail("privacy", `public manual observation ${label} has an unsupported enum`);
@@ -2326,7 +2525,11 @@ function validatePublicResultShape(report) {
     requirePublicKeys(command, PUBLIC_COMMAND_KEYS, `result.commands.${index}`);
     requirePublicKind(command.id, ["number"], `result.commands.${index}.id`);
     requirePublicKind(command.label, ["string"], `result.commands.${index}.label`);
-    requirePublicKind(command.exitStatus, ["number", "null"], `result.commands.${index}.exitStatus`);
+    requirePublicKind(
+      command.exitStatus,
+      ["number", "null"],
+      `result.commands.${index}.exitStatus`,
+    );
     requirePublicKind(command.durationMs, ["number"], `result.commands.${index}.durationMs`);
     requirePublicKind(command.stdoutSha256, ["string"], `result.commands.${index}.stdoutSha256`);
     requirePublicKind(command.stderrSha256, ["string"], `result.commands.${index}.stderrSha256`);
@@ -2432,7 +2635,6 @@ function makeReport() {
       hardwareArchitecture: null,
       processArchitecture: null,
       identity: null,
-      claudeVersion: null,
       codexVersion: null,
     },
     baseline: {
@@ -2466,11 +2668,7 @@ function makeReport() {
     manualResult: "pending",
     overallResult: "pending",
     manualObservations: Object.fromEntries(MANUAL_FIELDS.map((label) => [label, "pending"])),
-    limitations: {
-      claudeChatStandaloneV121: "pending_public_artifact",
-      cleanMachineClaimed: false,
-      publicRegistryPathVerified: false,
-    },
+    limitations: { cleanMachineClaimed: false, publicRegistryPathVerified: false },
     failure: null,
     privacy: {
       privateCommandLogRecorded: true,
@@ -2496,7 +2694,6 @@ function manualTemplate(report) {
 
 Automated result: ${automated}
 ${MANUAL_FIELDS.map((label) => `${label}: ${defaultCheck}`).join("\n")}
-Claude Chat standalone v${CANDIDATE_VERSION}: PENDING_PUBLIC_ARTIFACT
 
 Change every \`PENDING\` value to one fixed final enum only after completing the
 matching check in an authorized Record & Replay capture. If raw capture is prohibited,
@@ -2511,15 +2708,8 @@ approval, or safe app control prevented the check. Do not change fixed fields.
   are trusted. Do not approve unrelated hooks.
 - Codex SessionStart: start a fresh Codex task and record categorically whether
   the OpenSocrates SessionStart hook finishes without a two-second timeout.
-- Claude Local: in a fresh Claude Code Local task, run the canonical
-  \`/opensocrates:opensocrates status\` plugin command and confirm version
-  \`${PRODUCT_VERSION}\`. A bare \`/opensocrates\` is not Local plugin evidence.
 - Recording review: mark PASS only after the private Record & Replay event stream
   has been stopped and reviewed without copying raw events into public evidence.
-
-The standalone Claude Chat command remains \`/opensocrates\`, but public Chat
-${PRODUCT_VERSION} is pending because the public artifact is unavailable. It is
-not inferred from Claude Local.
 
 Do not add notes, prompts, transcripts, sidebar text, account names, credentials,
 raw accessibility data, raw command output, or local paths. Packing rejects any
@@ -2550,7 +2740,6 @@ function markdownReport(report) {
 - Source commit: \`${report.source.commit ?? "not recorded"}\`
 - CI run: ${report.source.ciRunUrl ?? "not recorded"}
 - Public v${CANDIDATE_VERSION} release path: **unavailable / not tested**
-- Claude Chat standalone v${CANDIDATE_VERSION}: **pending public artifact**
 ${failure}
 | Check | Result | Duration | Failure category |
 | --- | --- | ---: | --- |
@@ -2587,10 +2776,7 @@ function atomicWriteOwnerFile(target, contents, category = "result-persist") {
   try {
     descriptor = openSync(
       temporary,
-      fsConstants.O_CREAT |
-        fsConstants.O_EXCL |
-        fsConstants.O_WRONLY |
-        fsConstants.O_NOFOLLOW,
+      fsConstants.O_CREAT | fsConstants.O_EXCL | fsConstants.O_WRONLY | fsConstants.O_NOFOLLOW,
       0o600,
     );
     writeFileSync(descriptor, contents);
@@ -2624,10 +2810,7 @@ function createSealedPublicResult(
   finalVerification,
   { finalizationId, afterFileWritten = () => {} } = {},
 ) {
-  if (
-    !UUID_V4_PATTERN.test(finalizationId ?? "") ||
-    typeof afterFileWritten !== "function"
-  ) {
+  if (!UUID_V4_PATTERN.test(finalizationId ?? "") || typeof afterFileWritten !== "function") {
     fail("finalizing", "the sealed result writer hook is invalid");
   }
   if (
@@ -2652,10 +2835,7 @@ function createSealedPublicResult(
     }
     return existing;
   }
-  const staging = join(
-    privateDirectory,
-    `.sealed-public-result.${randomUUID()}.tmp`,
-  );
+  const staging = join(privateDirectory, `.sealed-public-result.${randomUUID()}.tmp`);
   mkdirSync(staging, { mode: 0o700 });
   chmodSync(staging, 0o700);
   syncEntry(privateDirectory);
@@ -2793,8 +2973,7 @@ function validateSealedPublicDirectory(directory, expectedTestId = null) {
     report.overallResult !== "pending" ||
     report.mutation.finalState !== "installed" ||
     markdownReport(report) !== readFileSync(join(directory, "result.md"), "utf8") ||
-    manualTemplate(report) !==
-      readFileSync(join(directory, "manual-observations.md"), "utf8")
+    manualTemplate(report) !== readFileSync(join(directory, "manual-observations.md"), "utf8")
   ) {
     fail("finalizing", "the sealed public result files do not describe one exact report");
   }
@@ -2807,10 +2986,7 @@ function validateSealedPublicDirectory(directory, expectedTestId = null) {
 }
 
 function validateSealedPublicResult(privateDirectory, expectedTestId = null) {
-  return validateSealedPublicDirectory(
-    sealedPublicDirectory(privateDirectory),
-    expectedTestId,
-  );
+  return validateSealedPublicDirectory(sealedPublicDirectory(privateDirectory), expectedTestId);
 }
 
 function publishSealedPublicResult(privateDirectory, outputDirectory, expectedTestId) {
@@ -2845,7 +3021,12 @@ function publicReportBytesForWrite(
     fail("result-persist", "the public result directory contains an unexpected entry");
   }
   for (const name of entries) {
-    requireExactPrivateMode(join(outputDirectory, name), `public result file ${name}`, "file", 0o600);
+    requireExactPrivateMode(
+      join(outputDirectory, name),
+      `public result file ${name}`,
+      "file",
+      0o600,
+    );
   }
   const json = Buffer.from(`${JSON.stringify(report, null, 2)}\n`);
   const markdown = Buffer.from(markdownReport(report));
@@ -2926,14 +3107,9 @@ function zipReports(outputDirectory, { archivePath = null } = {}) {
   ) {
     fail("result-bundle", "the public result ZIP target is unsafe or already exists");
   }
-  const staging = realpathSync(
-    mkdtempSync(join(parent, ".opensocrates-public-result-stage-")),
-  );
+  const staging = realpathSync(mkdtempSync(join(parent, ".opensocrates-public-result-stage-")));
   chmodSync(staging, 0o700);
-  const temporaryArchive = join(
-    parent,
-    `.${basename(outputDirectory)}.${randomUUID()}.tmp.zip`,
-  );
+  const temporaryArchive = join(parent, `.${basename(outputDirectory)}.${randomUUID()}.tmp.zip`);
   try {
     for (const name of RESULT_FILES) {
       const staged = join(staging, name);
@@ -2945,22 +3121,18 @@ function zipReports(outputDirectory, { archivePath = null } = {}) {
     if (!sameStrings(readdirSync(staging), RESULT_FILES)) {
       fail("result-bundle", "the fresh public ZIP staging directory is not exact");
     }
-    const completed = spawnSync(
-      "/usr/bin/zip",
-      ["-q", "-X", temporaryArchive, ...RESULT_FILES],
-      {
-        cwd: staging,
-        encoding: "utf8",
-        maxBuffer: MAX_COMMAND_OUTPUT_BYTES,
-        env: {
-          HOME: tmpdir(),
-          PATH: "/usr/bin:/bin:/usr/sbin:/sbin",
-          TMPDIR: tmpdir(),
-          LANG: "C",
-          LC_ALL: "C",
-        },
+    const completed = spawnSync("/usr/bin/zip", ["-q", "-X", temporaryArchive, ...RESULT_FILES], {
+      cwd: staging,
+      encoding: "utf8",
+      maxBuffer: MAX_COMMAND_OUTPUT_BYTES,
+      env: {
+        HOME: tmpdir(),
+        PATH: "/usr/bin:/bin:/usr/sbin:/sbin",
+        TMPDIR: tmpdir(),
+        LANG: "C",
+        LC_ALL: "C",
       },
-    );
+    });
     if (completed.error || completed.status !== 0) {
       fail("result-bundle", "the privacy-safe result ZIP could not be created");
     }
@@ -3068,9 +3240,7 @@ function markDiagnosticBundleReady(privateDirectory, outputDirectory, archive) {
   const archiveSha256 = sha256FileSync(archive);
   if (
     manifest.publicResult.directory === resolve(outputDirectory) &&
-    new Set(["diagnostic_bundle_ready", "public_bundle_ready"]).has(
-      manifest.retention.status,
-    ) &&
+    new Set(["diagnostic_bundle_ready", "public_bundle_ready"]).has(manifest.retention.status) &&
     manifest.publicResult.diagnosticZipSha256 === archiveSha256
   ) {
     return manifest;
@@ -3155,12 +3325,10 @@ function validateInstalledSealedPackState(
     binding?.receiptSha256 !== expectedBinding.receiptSha256 ||
     binding?.sealSha256 !== expectedBinding.sealSha256 ||
     binding?.resultJsonSha256 !== expectedBinding.resultJsonSha256 ||
-    manifest.publicResult.automatedResultSha256 !==
-      sealed.receipt.files["result.json"].sha256 ||
+    manifest.publicResult.automatedResultSha256 !== sealed.receipt.files["result.json"].sha256 ||
     manifest.publicResult.sealedReceiptSha256 !== sealed.receiptSha256 ||
     manifest.publicResult.finalizationId !== sealed.receipt.finalizationId ||
-    manifest.publicResult.finalVerificationSha256 !==
-      sealed.receipt.finalVerificationSha256
+    manifest.publicResult.finalVerificationSha256 !== sealed.receipt.finalVerificationSha256
   ) {
     fail(
       "result-bundle",
@@ -3210,8 +3378,7 @@ function manualWithObservations(sealedReport, observations) {
   let manual = manualTemplate(sealedReport);
   for (const label of MANUAL_FIELDS) {
     const value = observations[label];
-    const replacement =
-      value === "not_observed" ? "NOT_OBSERVED" : value.toUpperCase();
+    const replacement = value === "not_observed" ? "NOT_OBSERVED" : value.toUpperCase();
     manual = manual.replace(`${label}: PENDING`, `${label}: ${replacement}`);
   }
   return manual;
@@ -3294,8 +3461,7 @@ function readPackTransaction(privateDirectory) {
     !new Set(["prepared", "archive_ready"]).has(receipt.status) ||
     !(
       (receipt.status === "prepared" && receipt.archiveSha256 === null) ||
-      (receipt.status === "archive_ready" &&
-        /^[a-f0-9]{64}$/u.test(receipt.archiveSha256 ?? ""))
+      (receipt.status === "archive_ready" && /^[a-f0-9]{64}$/u.test(receipt.archiveSha256 ?? ""))
     )
   ) {
     fail("result-bundle", "the private pack transaction identity is invalid");
@@ -3312,11 +3478,7 @@ function validatePackTransaction(privateDirectory, outputDirectory) {
   ) {
     fail("result-bundle", "the private pack transaction binds a different automated result");
   }
-  const report = finalPackReport(
-    sealed.report,
-    receipt.observations,
-    receipt.completedAt,
-  );
+  const report = finalPackReport(sealed.report, receipt.observations, receipt.completedAt);
   const manual = manualWithObservations(sealed.report, receipt.observations);
   if (
     sha256Buffer(`${JSON.stringify(report, null, 2)}\n`) !== receipt.finalReportSha256 ||
@@ -3421,11 +3583,7 @@ function resumePackTransaction(
   return archive;
 }
 
-function packExisting(
-  directoryArgument,
-  privateDirectoryArgument = null,
-  { testHooks = {} } = {},
-) {
+function packExisting(directoryArgument, privateDirectoryArgument = null, { testHooks = {} } = {}) {
   if (!directoryArgument) {
     fail("usage", "--pack requires the result directory printed by the automated test");
   }
@@ -3440,11 +3598,7 @@ function packExisting(
   recoverEvidenceTransaction(privateDirectory);
   validatePublicResultDirectory(outputDirectory);
   if (pathPresent(packTransactionPath(privateDirectory))) {
-    return resumePackTransaction(
-      privateDirectory,
-      outputDirectory,
-      testHooks,
-    );
+    return resumePackTransaction(privateDirectory, outputDirectory, testHooks);
   }
   const resultPath = join(outputDirectory, "result.json");
   const manualPath = join(outputDirectory, "manual-observations.md");
@@ -3483,15 +3637,8 @@ function packExisting(
       privateManifest,
       { requireAutomatedPublicBytes: false },
     );
-    const observations = fixedManualObservations(
-      readFileSync(manualPath, "utf8"),
-      sealed.report,
-    );
-    const expectedReport = finalPackReport(
-      sealed.report,
-      observations,
-      report.completedAt,
-    );
+    const observations = fixedManualObservations(readFileSync(manualPath, "utf8"), sealed.report);
+    const expectedReport = finalPackReport(sealed.report, observations, report.completedAt);
     if (
       JSON.stringify(expectedReport) !== JSON.stringify(report) ||
       JSON.stringify(observations) !== JSON.stringify(report.manualObservations) ||
@@ -3544,11 +3691,7 @@ function packExisting(
     createdAt: new Date().toISOString(),
   };
   writePackTransaction(privateDirectory, receipt);
-  return resumePackTransaction(
-    privateDirectory,
-    outputDirectory,
-    testHooks,
-  );
+  return resumePackTransaction(privateDirectory, outputDirectory, testHooks);
 }
 
 function requireExactPrivateMode(target, label, expectedKind, expectedMode) {
@@ -3659,14 +3802,7 @@ function readPrivateEvidenceManifest(privateDirectory) {
   );
   requireExactObjectKeys(
     manifest.recording,
-    [
-      "status",
-      "testId",
-      "receiptRelativePath",
-      "receiptSha256",
-      "recordingSha256",
-      "reviewStatus",
-    ],
+    ["status", "testId", "receiptRelativePath", "receiptSha256", "recordingSha256", "reviewStatus"],
     "private-evidence",
     "the private recording linkage",
   );
@@ -3695,7 +3831,10 @@ function readPrivateEvidenceManifest(privateDirectory) {
     manifest.retention.policy !== "owner_guarded_exact_cleanup_after_public_handoff" ||
     typeof manifest.retention.cleanupAuthorized !== "boolean"
   ) {
-    fail("private-evidence", "the private evidence manifest identity or retention state is invalid");
+    fail(
+      "private-evidence",
+      "the private evidence manifest identity or retention state is invalid",
+    );
   }
   const sealedLinkage = [
     manifest.publicResult.sealedReceiptSha256,
@@ -3718,9 +3857,13 @@ function readPrivateEvidenceManifest(privateDirectory) {
     !(diagnosticDigest === null || /^[a-f0-9]{64}$/u.test(diagnosticDigest)) ||
     !(publicDigest === null || /^[a-f0-9]{64}$/u.test(publicDigest)) ||
     (manifest.retention.status === "active" &&
-      (diagnosticDigest !== null || publicDigest !== null || manifest.retention.cleanupAuthorized)) ||
+      (diagnosticDigest !== null ||
+        publicDigest !== null ||
+        manifest.retention.cleanupAuthorized)) ||
     (manifest.retention.status === "diagnostic_bundle_ready" &&
-      (diagnosticDigest === null || publicDigest !== null || manifest.retention.cleanupAuthorized)) ||
+      (diagnosticDigest === null ||
+        publicDigest !== null ||
+        manifest.retention.cleanupAuthorized)) ||
     (manifest.retention.status === "public_bundle_ready" &&
       (publicDigest === null || manifest.retention.cleanupAuthorized)) ||
     (manifest.retention.status === "cleanup_authorized" &&
@@ -3804,11 +3947,7 @@ function refreshedPrivateEvidenceManifest(
   privateDirectory,
   outputDirectory = null,
   report = null,
-  {
-    ledgerContents = null,
-    updatedAt = new Date().toISOString(),
-    resultOverride = false,
-  } = {},
+  { ledgerContents = null, updatedAt = new Date().toISOString(), resultOverride = false } = {},
 ) {
   const manifest = readPrivateEvidenceManifest(privateDirectory);
   const expectedOutput = resolve(outputDirectory ?? manifest.publicResult.directory);
@@ -3867,11 +4006,7 @@ function refreshedPrivateEvidenceManifest(
         sealed.receipt.finalizationId,
         sealed.receipt.finalVerificationSha256,
       ];
-      if (
-        existingLinkage.some(
-          (value, index) => value !== null && value !== nextLinkage[index],
-        )
-      ) {
+      if (existingLinkage.some((value, index) => value !== null && value !== nextLinkage[index])) {
         fail("private-evidence", "the sealed automated-result linkage changed");
       }
       [
@@ -3893,11 +4028,7 @@ function refreshedPrivateEvidenceManifest(
 }
 
 function refreshPrivateEvidenceManifest(privateDirectory, outputDirectory = null, report = null) {
-  const manifest = refreshedPrivateEvidenceManifest(
-    privateDirectory,
-    outputDirectory,
-    report,
-  );
+  const manifest = refreshedPrivateEvidenceManifest(privateDirectory, outputDirectory, report);
   atomicWritePrivate(
     join(privateDirectory, PRIVATE_MANIFEST_NAME),
     `${JSON.stringify(manifest, null, 2)}\n`,
@@ -3930,15 +4061,7 @@ function validateEvidenceTransaction(privateDirectory) {
   );
   requireExactObjectKeys(
     receipt,
-    [
-      "schema",
-      "transactionId",
-      "kind",
-      "testId",
-      "outputDirectory",
-      "createdAt",
-      "files",
-    ],
+    ["schema", "transactionId", "kind", "testId", "outputDirectory", "createdAt", "files"],
     "evidence-transaction",
     "the private evidence transaction",
   );
@@ -3957,13 +4080,13 @@ function validateEvidenceTransaction(privateDirectory) {
   const expectedRoles =
     receipt.kind === "command-ledger"
       ? ["command-ledger", "private-manifest"]
-      : [
-          "result-json",
-          "result-markdown",
-          "manual-observations",
-          "private-manifest",
-        ];
-  if (!sameStrings(receipt.files.map((item) => item?.role), expectedRoles)) {
+      : ["result-json", "result-markdown", "manual-observations", "private-manifest"];
+  if (
+    !sameStrings(
+      receipt.files.map((item) => item?.role),
+      expectedRoles,
+    )
+  ) {
     fail("evidence-transaction", "the private evidence transaction role set is invalid");
   }
   const files = receipt.files.map((item) => {
@@ -4048,9 +4171,7 @@ export function recoverEvidenceTransaction(
   const manifestState = states.find((item) => item.role === "private-manifest");
   if (
     manifestState.currentSha256 === manifestState.newSha256 &&
-    states.some(
-      (item) => item.role !== "private-manifest" && item.currentSha256 !== item.newSha256,
-    )
+    states.some((item) => item.role !== "private-manifest" && item.currentSha256 !== item.newSha256)
   ) {
     fail("evidence-transaction", "the evidence manifest advanced before its bound files");
   }
@@ -4099,24 +4220,19 @@ function commitEvidenceTransaction(
   recoverEvidenceTransaction(privateDirectory);
   const resolvedOutput = resolve(outputDirectory);
   requireExactPrivateMode(resolvedOutput, "public result directory", "directory", 0o700);
-  const members = [
-    ...files,
-    { role: "private-manifest", bytes: Buffer.from(manifestBytes) },
-  ].map(({ role, bytes }) => {
-    const buffer = Buffer.from(bytes);
-    const destination = evidenceTransactionDestination(
-      privateDirectory,
-      resolvedOutput,
-      role,
-    );
-    return {
-      role,
-      oldSha256: evidenceFileDigest(destination, `evidence transaction source ${role}`),
-      newSha256: sha256Buffer(buffer),
-      sizeBytes: buffer.length,
-      bytesBase64: buffer.toString("base64"),
-    };
-  });
+  const members = [...files, { role: "private-manifest", bytes: Buffer.from(manifestBytes) }].map(
+    ({ role, bytes }) => {
+      const buffer = Buffer.from(bytes);
+      const destination = evidenceTransactionDestination(privateDirectory, resolvedOutput, role);
+      return {
+        role,
+        oldSha256: evidenceFileDigest(destination, `evidence transaction source ${role}`),
+        newSha256: sha256Buffer(buffer),
+        sizeBytes: buffer.length,
+        bytesBase64: buffer.toString("base64"),
+      };
+    },
+  );
   const receipt = {
     schema: EVIDENCE_TRANSACTION_SCHEMA,
     transactionId: randomUUID(),
@@ -4216,7 +4332,11 @@ function validatePrivateEvidenceManifest(privateDirectory, outputDirectory, test
     }
   }
   for (const [digest, archive, label] of [
-    [manifest.publicResult.diagnosticZipSha256, `${expectedOutput}.diagnostic.zip`, "diagnostic public result ZIP"],
+    [
+      manifest.publicResult.diagnosticZipSha256,
+      `${expectedOutput}.diagnostic.zip`,
+      "diagnostic public result ZIP",
+    ],
     [manifest.publicResult.publicZipSha256, `${expectedOutput}.zip`, "public result ZIP"],
   ]) {
     if (digest === null || !pathPresent(archive)) continue;
@@ -4239,14 +4359,11 @@ function bindRecordingReceipt(privateDirectory, recordingPath, testId) {
     "private Record and Replay capture",
     "file",
   );
-  requireExactPrivateMode(
-    canonicalRecording,
-    "private Record and Replay capture",
-    "file",
-    0o600,
-  );
+  requireExactPrivateMode(canonicalRecording, "private Record and Replay capture", "file", 0o600);
   const recordingRelativePath = relative(privateDirectory, canonicalRecording).split(sep).join("/");
-  if (new Set([PRIVATE_MANIFEST_NAME, COMMAND_LOG_NAME, CHECKPOINT_NAME]).has(recordingRelativePath)) {
+  if (
+    new Set([PRIVATE_MANIFEST_NAME, COMMAND_LOG_NAME, CHECKPOINT_NAME]).has(recordingRelativePath)
+  ) {
     fail("private-evidence", "the recording receipt cannot bind a lifecycle control file");
   }
   const receiptPath = join(privateDirectory, "record-and-replay-receipt.json");
@@ -4371,10 +4488,9 @@ function cleanupPrivateEvidence(
   }
   const manifest = readPrivateEvidenceManifest(privateDirectory);
   const storedDigests = new Set(
-    [
-      manifest.publicResult.publicZipSha256,
-      manifest.publicResult.diagnosticZipSha256,
-    ].filter((value) => value !== null),
+    [manifest.publicResult.publicZipSha256, manifest.publicResult.diagnosticZipSha256].filter(
+      (value) => value !== null,
+    ),
   );
   if (manifest.testId !== testId || !storedDigests.has(publicZipSha256)) {
     fail("private-evidence", "private cleanup confirmation does not match a retained bundle");
@@ -4391,19 +4507,21 @@ function cleanupPrivateEvidence(
     testId,
   );
   if (
-    !new Set(["diagnostic_bundle_ready", "public_bundle_ready"]).has(
-      validated.retention.status,
-    ) ||
+    !new Set(["diagnostic_bundle_ready", "public_bundle_ready"]).has(validated.retention.status) ||
     validated.retention.cleanupAuthorized !== false ||
     !storedDigests.has(publicZipSha256)
   ) {
-    fail("private-evidence", "private cleanup confirmation does not match the retained public bundle");
+    fail(
+      "private-evidence",
+      "private cleanup confirmation does not match the retained public bundle",
+    );
   }
-  let bundleToVerify = publicBundlePath === null
-    ? publicZipSha256 === validated.publicResult.publicZipSha256
-      ? `${validated.publicResult.directory}.zip`
-      : `${validated.publicResult.directory}.diagnostic.zip`
-    : resolve(publicBundlePath);
+  let bundleToVerify =
+    publicBundlePath === null
+      ? publicZipSha256 === validated.publicResult.publicZipSha256
+        ? `${validated.publicResult.directory}.zip`
+        : `${validated.publicResult.directory}.diagnostic.zip`
+      : resolve(publicBundlePath);
   if (pathPresent(bundleToVerify)) {
     requireExactPrivateMode(bundleToVerify, "confirmed public cleanup bundle", "file", 0o600);
     if (sha256FileSync(bundleToVerify) !== publicZipSha256) {
@@ -4632,7 +4750,8 @@ function lifecycleOperationRecord(
     typeof intent.cwd !== "string" ||
     realpathSync(intent.cwd) !== intent.cwd ||
     !statSync(intent.cwd).isDirectory() ||
-    intent.environmentSha256 !== sha256Buffer(JSON.stringify(safeLifecycleEnvironment(intent.env))) ||
+    intent.environmentSha256 !==
+      sha256Buffer(JSON.stringify(safeLifecycleEnvironment(intent.env))) ||
     !Number.isSafeInteger(intent.timeoutMs) ||
     intent.timeoutMs < 1 ||
     intent.timeoutMs > 900_000 ||
@@ -4644,8 +4763,7 @@ function lifecycleOperationRecord(
   ) {
     fail("lifecycle-recovery", "the lifecycle intent identity changed or is unsupported");
   }
-  const canonicalDirectoryName =
-    `${String(intent.sequence).padStart(3, "0")}-${intent.operationKey}`;
+  const canonicalDirectoryName = `${String(intent.sequence).padStart(3, "0")}-${intent.operationKey}`;
   if (requiredDirectoryName !== canonicalDirectoryName) {
     fail("lifecycle-recovery", "the lifecycle operation sequence path is invalid");
   }
@@ -4692,7 +4810,8 @@ function lifecycleOperationRecord(
   }
   let terminalRecord = null;
   if (pathPresent(terminalPath)) {
-    if (claimRecord === null) fail("lifecycle-recovery", "a terminal lifecycle has no durable claim");
+    if (claimRecord === null)
+      fail("lifecycle-recovery", "a terminal lifecycle has no durable claim");
     terminalRecord = parseLifecycleJson(
       terminalPath,
       LIFECYCLE_TERMINAL_SCHEMA,
@@ -4845,7 +4964,10 @@ export function reconcileMutationTelemetry(report, privateDirectory, checkpoint)
     checkpoint.recovery.reinstallRetriesUsed < 0 ||
     checkpoint.recovery.reinstallRetriesUsed > MAX_REINSTALL_RETRIES
   ) {
-    fail("lifecycle-recovery", "mutation telemetry cannot be reconstructed from an invalid checkpoint");
+    fail(
+      "lifecycle-recovery",
+      "mutation telemetry cannot be reconstructed from an invalid checkpoint",
+    );
   }
   const claimedKeys = lifecycleOperationRecords(privateDirectory)
     .filter((record) => record.claimRecord !== null)
@@ -4977,10 +5099,7 @@ export function inspectLifecycleOperation(privateDirectoryArgument, operationKey
 
 function lifecycleJournalResumeDisposition(privateDirectory) {
   const states = lifecycleOperationRecords(privateDirectory).map((record) =>
-    inspectLifecycleOperation(
-      privateDirectory,
-      record.intentRecord.value.operationKey,
-    ),
+    inspectLifecycleOperation(privateDirectory, record.intentRecord.value.operationKey),
   );
   const active = states.find((state) => state.state === "claimed_active");
   if (active) return { status: "claimed_active", state: active, states };
@@ -5063,12 +5182,7 @@ function reconcileLifecycleOperationStaging({
   testHooks,
 }) {
   if (!pathPresent(staging)) return null;
-  requireExactPrivateMode(
-    staging,
-    "lifecycle operation staging directory",
-    "directory",
-    0o700,
-  );
+  requireExactPrivateMode(staging, "lifecycle operation staging directory", "directory", 0o700);
   const entries = readdirSync(staging);
   if (entries.length === 0) {
     rmSync(staging, { recursive: true, force: false });
@@ -5126,16 +5240,10 @@ function prepareLifecycleOperation(request, testHooks = {}) {
   }
   const root = lifecycleOperationRoot(privateDirectory, { create: true });
   const sequence = records.length + 1;
-  const operationDirectoryName =
-    `${String(sequence).padStart(3, "0")}-${request.operationKey}`;
+  const operationDirectoryName = `${String(sequence).padStart(3, "0")}-${request.operationKey}`;
   const operationDirectory = join(root, operationDirectoryName);
-  const staging = lifecycleOperationStagingPath(
-    privateDirectory,
-    sequence,
-    request.operationKey,
-  );
-  const previousOperationSha256 =
-    previous?.terminalRecord?.value.operationSha256 ?? null;
+  const staging = lifecycleOperationStagingPath(privateDirectory, sequence, request.operationKey);
+  const previousOperationSha256 = previous?.terminalRecord?.value.operationSha256 ?? null;
   const recovered = reconcileLifecycleOperationStaging({
     privateDirectory,
     root,
@@ -5224,10 +5332,16 @@ export async function executeLifecycleOperation(request, { testHooks = {} } = {}
   let state = inspectLifecycleOperation(privateDirectory, request.operationKey);
   if (state.state === "terminal") return lifecycleResultFromTerminal(state);
   if (state.state === "claimed_active") {
-    fail("lifecycle-orphan-active", "the exact lifecycle process group is still active; replay is forbidden");
+    fail(
+      "lifecycle-orphan-active",
+      "the exact lifecycle process group is still active; replay is forbidden",
+    );
   }
   if (state.state === "blocked_unverifiable") {
-    fail("lifecycle-interrupted", "a claimed lifecycle ended without a terminal receipt; acceptance is permanently blocked");
+    fail(
+      "lifecycle-interrupted",
+      "a claimed lifecycle ended without a terminal receipt; acceptance is permanently blocked",
+    );
   }
   if (state.state !== "prepared") {
     fail("lifecycle-recovery", "the lifecycle operation cannot enter its claimed state");
@@ -5274,7 +5388,10 @@ export async function executeLifecycleOperation(request, { testHooks = {} } = {}
       return result;
     }
     if (state.state === "blocked_unverifiable") {
-      fail("lifecycle-interrupted", "a claimed lifecycle ended without a terminal receipt; acceptance is permanently blocked");
+      fail(
+        "lifecycle-interrupted",
+        "a claimed lifecycle ended without a terminal receipt; acceptance is permanently blocked",
+      );
     }
     if (state.state === "prepared" && capsuleExited) {
       fail(
@@ -5283,7 +5400,10 @@ export async function executeLifecycleOperation(request, { testHooks = {} } = {}
       );
     }
   }
-  fail("lifecycle-orphan-active", "the lifecycle capsule did not reach a terminal receipt within its bound");
+  fail(
+    "lifecycle-orphan-active",
+    "the lifecycle capsule did not reach a terminal receipt within its bound",
+  );
 }
 
 class CommandRecorder {
@@ -5336,7 +5456,9 @@ class CommandRecorder {
         if (
           typeof entry.streamedOutputFile !== "string" ||
           entry.streamedOutputFile.startsWith("/") ||
-          entry.streamedOutputFile.split("/").some((part) => part === "" || part === "." || part === "..")
+          entry.streamedOutputFile
+            .split("/")
+            .some((part) => part === "" || part === "." || part === "..")
         ) {
           fail("private-evidence", "the streamed command output path is unsafe");
         }
@@ -5346,7 +5468,10 @@ class CommandRecorder {
           statSync(target).size !== entry.streamedOutputSizeBytes ||
           sha256FileSync(target) !== entry.stdoutSha256
         ) {
-          fail("private-evidence", "a streamed private command output changed after it was recorded");
+          fail(
+            "private-evidence",
+            "a streamed private command output changed after it was recorded",
+          );
         }
       }
       if (entry.lifecycleOperation !== null && entry.lifecycleOperation !== undefined) {
@@ -5376,7 +5501,10 @@ class CommandRecorder {
       }
     });
     if (!sameStrings(readdirSync(this.commandDirectory), expectedOutputFiles)) {
-      fail("private-evidence", "the private command directory contains an untracked or missing stream");
+      fail(
+        "private-evidence",
+        "the private command directory contains an untracked or missing stream",
+      );
     }
     report.commands = entries.map((entry) => ({
       id: entry.id,
@@ -5395,12 +5523,10 @@ class CommandRecorder {
     const nextLedger = nextEntries.map((item) => JSON.stringify(item)).join("\n") + "\n";
     if (pathPresent(join(this.privateDirectory, PRIVATE_MANIFEST_NAME))) {
       const updatedAt = new Date().toISOString();
-      const manifest = refreshedPrivateEvidenceManifest(
-        this.privateDirectory,
-        null,
-        null,
-        { ledgerContents: nextLedger, updatedAt },
-      );
+      const manifest = refreshedPrivateEvidenceManifest(this.privateDirectory, null, null, {
+        ledgerContents: nextLedger,
+        updatedAt,
+      });
       commitEvidenceTransaction(
         this.privateDirectory,
         manifest.publicResult.directory,
@@ -5439,14 +5565,6 @@ class CommandRecorder {
     if (projection !== null) {
       if (
         input !== undefined ||
-        !new Set([
-          "status-only",
-          "claude-auth",
-          "claude-marketplaces",
-          "claude-plugins",
-          "codex-marketplaces",
-          "codex-plugins",
-        ]).has(projection) ||
         !Array.isArray(args) ||
         args.some((item) => typeof item !== "string")
       ) {
@@ -5898,20 +6016,15 @@ function defaultTargets() {
       return [host, { ...paths, transactionParent: transient.transient }];
     }),
   );
-  const claude = allHosts.claude;
+
   const codex = allHosts.codex;
   const state = statePaths();
-  const expectedHomes = {
-    claude: resolve(join(homedir(), ".claude")),
-    codex: resolve(join(homedir(), ".codex")),
-  };
-  if (claude.hostHome !== realpathOrLexical(expectedHomes.claude)) {
-    fail("environment", "Claude does not resolve to its default home");
-  }
+  const expectedHomes = { codex: resolve(join(homedir(), ".codex")) };
+
   if (codex.hostHome !== realpathOrLexical(expectedHomes.codex)) {
     fail("environment", "Codex does not resolve to its default home");
   }
-  return { allHosts, claude, codex, state };
+  return { allHosts, codex, state };
 }
 
 function realpathOrLexical(target) {
@@ -5923,12 +6036,7 @@ function realpathOrLexical(target) {
 }
 
 function resolveInstalledPluginRoot(host, managedRoot) {
-  const marketplacePath = join(
-    managedRoot,
-    ...(host === "claude"
-      ? [".claude-plugin", "marketplace.json"]
-      : [".agents", "plugins", "marketplace.json"]),
-  );
+  const marketplacePath = join(managedRoot, ...[".agents", "plugins", "marketplace.json"]);
   requireCanonicalOwnedEntry(marketplacePath, `${host} marketplace metadata`, "file");
   const marketplace = parseJson(
     readFileSync(marketplacePath, "utf8"),
@@ -5940,7 +6048,7 @@ function resolveInstalledPluginRoot(host, managedRoot) {
   if (matches.length !== 1) {
     fail("ownership", `${host} marketplace does not declare one OpenSocrates plugin`);
   }
-  const source = host === "claude" ? matches[0].source : matches[0].source?.path;
+  const source = matches[0].source?.path;
   if (typeof source !== "string" || !source.startsWith("./")) {
     fail("ownership", `${host} marketplace has an invalid local source`);
   }
@@ -6002,12 +6110,7 @@ function inspectOwnedCache(host, cacheRoot) {
     const versionRoot = join(cacheRoot, entry.name);
     requireCanonicalOwnedEntry(versionRoot, `${host} cached payload`, "directory");
     const releasePath = join(versionRoot, "release-manifest.json");
-    const manifestPath = join(
-      versionRoot,
-      ...(host === "claude"
-        ? [".claude-plugin", "plugin.json"]
-        : [".codex-plugin", "plugin.json"]),
-    );
+    const manifestPath = join(versionRoot, ...[".codex-plugin", "plugin.json"]);
     const checksumPath = join(versionRoot, "checksums.sha256");
     for (const [target, label] of [
       [releasePath, `${host} cached release manifest`],
@@ -6055,11 +6158,7 @@ function verifyCacheMarketplaceShape(host, paths, category = "baseline") {
     }
     return;
   }
-  requireCanonicalOwnedEntry(
-    paths.cacheMarketplaceRoot,
-    `${host} cache marketplace`,
-    "directory",
-  );
+  requireCanonicalOwnedEntry(paths.cacheMarketplaceRoot, `${host} cache marketplace`, "directory");
   const entries = readdirSync(paths.cacheMarketplaceRoot, { withFileTypes: true });
   const expectedName = basename(paths.cacheRoot);
   if (
@@ -6071,17 +6170,6 @@ function verifyCacheMarketplaceShape(host, paths, category = "baseline") {
   ) {
     fail(category, `${host} cache marketplace contains an unrecognized entry`);
   }
-}
-
-function inspectPluginData(target) {
-  if (!pathPresent(target)) return { present: false, ownership: "absent", empty: true };
-  requireCanonicalOwnedEntry(target, "Claude OpenSocrates plugin data", "directory");
-  const entries = readdirSync(target);
-  return {
-    present: true,
-    ownership: entries.length === 0 ? "verified_empty" : "unverified_nonempty",
-    empty: entries.length === 0,
-  };
 }
 
 function validateAutoUpdateReceipt(receipt) {
@@ -6305,12 +6393,22 @@ function inspectLaunchAgentJob(recorder) {
     },
   );
   if (completed.error) {
-    fail("launchd-state", "the OpenSocrates launchd job state could not be inspected", completed.id);
+    fail(
+      "launchd-state",
+      "the OpenSocrates launchd job state could not be inspected",
+      completed.id,
+    );
   }
   if (completed.status === 0) return { loaded: true, observation: "loaded" };
   const detail = `${completed.stdout}\n${completed.stderr}`;
-  if (!/(?:could not find service|service not found|could not find specified service)/iu.test(detail)) {
-    fail("launchd-state", "the OpenSocrates launchd job absence could not be classified safely", completed.id);
+  if (
+    !/(?:could not find service|service not found|could not find specified service)/iu.test(detail)
+  ) {
+    fail(
+      "launchd-state",
+      "the OpenSocrates launchd job absence could not be classified safely",
+      completed.id,
+    );
   }
   return { loaded: false, observation: "unloaded" };
 }
@@ -6346,9 +6444,7 @@ function assertNoKnownTransactionResidue(targets, category) {
   if (Object.values(residue).some((count) => count !== 0)) {
     fail(category, "an OpenSocrates lifecycle transaction residue exists");
   }
-  if (inspectOpenCodeBridgeResidue(targets.allHosts.opencode) !== 0) {
-    fail(category, "an OpenCode bridge transaction residue exists");
-  }
+
   return residue;
 }
 
@@ -6441,7 +6537,10 @@ function assertNonTargetHostsAbsent(targets) {
     const bridgePresent = paths.bridge !== null && pathPresent(paths.bridge);
     const bridgeMarkerPresent = paths.bridgeMarker !== null && pathPresent(paths.bridgeMarker);
     if (rootPresent || bridgePresent || bridgeMarkerPresent) {
-      fail("baseline", `${host} has an existing OpenSocrates target outside the requested reinstall set`);
+      fail(
+        "baseline",
+        `${host} has an existing OpenSocrates target outside the requested reinstall set`,
+      );
     }
     state[host] = {
       managedRootPresent: false,
@@ -6452,33 +6551,31 @@ function assertNonTargetHostsAbsent(targets) {
   return state;
 }
 
-function exactResidueSnapshot(
-  targets,
-  registrations,
-  launchAgentJob,
-  trustSnapshot = null,
-) {
+function exactResidueSnapshot(targets, registrations, launchAgentJob, trustSnapshot = null) {
   if (typeof launchAgentJob?.loaded !== "boolean") {
     fail("launchd-state", "zero-residue classification requires an observed launchd state");
   }
   const hosts = {};
   for (const host of SUPPORTED_HOSTS) {
     const paths = targets.allHosts[host];
-    let cache = { present: false, ownership: "not-applicable", versionCount: 0, liveInUse: false };
+    let cache = {
+      present: false,
+      ownership: "not-applicable",
+      versionCount: 0,
+      liveInUse: false,
+    };
     if (paths.cacheRoot !== null) cache = inspectOwnedCache(host, paths.cacheRoot);
     hosts[host] = {
-      registrationPresent:
-        HOSTS.includes(host)
-          ? registrations === null
-            ? null
-            : registrations[host].marketplaceCount > 0 || registrations[host].pluginCount > 0
-          : false,
-      unsupportedLegacyRegistrationPresent:
-        HOSTS.includes(host)
-          ? registrations === null
-            ? null
-            : registrations[host].unsupportedLegacyConflictCount > 0
-          : false,
+      registrationPresent: HOSTS.includes(host)
+        ? registrations === null
+          ? null
+          : registrations[host].marketplaceCount > 0 || registrations[host].pluginCount > 0
+        : false,
+      unsupportedLegacyRegistrationPresent: HOSTS.includes(host)
+        ? registrations === null
+          ? null
+          : registrations[host].unsupportedLegacyConflictCount > 0
+        : false,
       managedRootPresent: pathPresent(paths.root),
       cachePresent: cache.present,
       cacheMarketplacePresent:
@@ -6494,10 +6591,7 @@ function exactResidueSnapshot(
   const stateResidue = inspectStateResidue(targets);
   const launchAgentPlistPresent = pathPresent(targets.state.launchAgent);
   const launchAgentTemporaryCount = inspectLaunchAgentTemporaryResidue(targets.state);
-  const trustTransactionResidueCount = inspectTrustTransactionResidue(
-    targets.codex.hostHome,
-  );
-  const openCodeBridgeResidueCount = inspectOpenCodeBridgeResidue(targets.allHosts.opencode);
+  const trustTransactionResidueCount = inspectTrustTransactionResidue(targets.codex.hostHome);
   return {
     hosts,
     stateResidue,
@@ -6506,7 +6600,6 @@ function exactResidueSnapshot(
     launchAgentJobLoaded: launchAgentJob.loaded,
     codexTrustSectionCount: trust.exactSectionCount,
     trustTransactionResidueCount,
-    openCodeBridgeResidueCount,
   };
 }
 
@@ -6519,7 +6612,6 @@ function residueHasExactSchema(snapshot, { allowUnknownTargetRegistrations = fal
     "launchAgentJobLoaded",
     "codexTrustSectionCount",
     "trustTransactionResidueCount",
-    "openCodeBridgeResidueCount",
   ];
   const hostKeys =
     snapshot !== null && typeof snapshot === "object" && !Array.isArray(snapshot)
@@ -6577,25 +6669,17 @@ function residueHasExactSchema(snapshot, { allowUnknownTargetRegistrations = fal
       );
     }) ||
     !exactObject(snapshot.stateResidue, stateFields) ||
-    ![
-      "present",
-      "empty",
-      "desiredStatePresent",
-      "receiptPresent",
-      "lifecycleLockPresent",
-    ].every((field) => typeof snapshot.stateResidue[field] === "boolean") ||
+    !["present", "empty", "desiredStatePresent", "receiptPresent", "lifecycleLockPresent"].every(
+      (field) => typeof snapshot.stateResidue[field] === "boolean",
+    ) ||
     !["temporaryCount", "purgeTombstoneCount", "unknownLeafCount"].every(
-      (field) => Number.isSafeInteger(snapshot.stateResidue[field]) && snapshot.stateResidue[field] >= 0,
+      (field) =>
+        Number.isSafeInteger(snapshot.stateResidue[field]) && snapshot.stateResidue[field] >= 0,
     ) ||
     !["launchAgentPlistPresent", "launchAgentJobLoaded"].every(
       (field) => typeof snapshot[field] === "boolean",
     ) ||
-    ![
-      "launchAgentTemporaryCount",
-      "codexTrustSectionCount",
-      "trustTransactionResidueCount",
-      "openCodeBridgeResidueCount",
-    ].every(
+    !["launchAgentTemporaryCount", "codexTrustSectionCount", "trustTransactionResidueCount"].every(
       (field) => Number.isSafeInteger(snapshot[field]) && snapshot[field] >= 0,
     )
   ) {
@@ -6633,7 +6717,7 @@ function filesystemResidueIsEmpty(snapshot) {
     snapshot.launchAgentJobLoaded === false &&
     snapshot.codexTrustSectionCount === 0 &&
     snapshot.trustTransactionResidueCount === 0 &&
-    snapshot.openCodeBridgeResidueCount === 0
+    true
   );
 }
 
@@ -6755,7 +6839,7 @@ export function assertOnlyRetryableHostCloseResidue(snapshot, liveHosts, desired
     snapshot.launchAgentJobLoaded ||
     snapshot.codexTrustSectionCount !== 0 ||
     snapshot.trustTransactionResidueCount !== 0 ||
-    snapshot.openCodeBridgeResidueCount !== 0
+    false
   ) {
     fail(
       "purge",
@@ -6790,7 +6874,6 @@ function publicResidueSummary(snapshot) {
     launchAgentJobLoaded: snapshot.launchAgentJobLoaded,
     codexTrustSectionCount: snapshot.codexTrustSectionCount,
     trustTransactionResidueCount: snapshot.trustTransactionResidueCount,
-    openCodeBridgeResidueCount: snapshot.openCodeBridgeResidueCount,
     empty: residueIsEmpty(snapshot),
   };
 }
@@ -6802,12 +6885,7 @@ export function assertHostCloseRetrySnapshot(
   previousBindings,
   currentBindings,
 ) {
-  const bindingFields = [
-    "sourceCommit",
-    "packageSha256",
-    "artifactDigest",
-    "desiredStateSha256",
-  ];
+  const bindingFields = ["sourceCommit", "packageSha256", "artifactDigest", "desiredStateSha256"];
   const exactBindings = (value) =>
     value !== null &&
     typeof value === "object" &&
@@ -6819,7 +6897,10 @@ export function assertHostCloseRetrySnapshot(
     !exactBindings(currentBindings) ||
     JSON.stringify(previousBindings) !== JSON.stringify(currentBindings)
   ) {
-    fail("recovery", "the exact candidate or desired-state binding changed before the host-close retry");
+    fail(
+      "recovery",
+      "the exact candidate or desired-state binding changed before the host-close retry",
+    );
   }
   if (
     !Array.isArray(confirmedHosts) ||
@@ -6849,10 +6930,12 @@ export function assertHostCloseRetrySnapshot(
       !sameStrings(Object.keys(value.hosts ?? {}), SUPPORTED_HOSTS) ||
       !SUPPORTED_HOSTS.every((host) => {
         const item = value.hosts[host];
-        return item !== null &&
+        return (
+          item !== null &&
           typeof item === "object" &&
           !Array.isArray(item) &&
-          sameStrings(Object.keys(item), expectedHostFields);
+          sameStrings(Object.keys(item), expectedHostFields)
+        );
       })
     ) {
       fail("recovery", "the checkpointed host-close residue snapshot is incomplete");
@@ -6861,7 +6944,10 @@ export function assertHostCloseRetrySnapshot(
   const normalizedCurrent = structuredClone(current);
   for (const host of confirmedHosts) {
     if (previous.hosts[host].liveInUse !== true || current.hosts[host].liveInUse !== false) {
-      fail("host-close-confirmation", "a confirmed host did not show exactly one live-marker resolution");
+      fail(
+        "host-close-confirmation",
+        "a confirmed host did not show exactly one live-marker resolution",
+      );
     }
     normalizedCurrent.hosts[host].liveInUse = true;
   }
@@ -6889,8 +6975,7 @@ export function requireHostCloseRetryAdmission(checkpoint, { resolved = false } 
     admission.confirmedHosts.length === 0 ||
     new Set(admission.confirmedHosts).size !== admission.confirmedHosts.length ||
     admission.confirmedHosts.some((host) => !HOSTS.includes(host)) ||
-    (admission.resolvedSnapshot !== null &&
-      !residueHasExactSchema(admission.resolvedSnapshot)) ||
+    (admission.resolvedSnapshot !== null && !residueHasExactSchema(admission.resolvedSnapshot)) ||
     (resolved && admission.resolvedSnapshot === null)
   ) {
     fail("recovery", "the durable host-close retry admission is incomplete");
@@ -6962,21 +7047,26 @@ export function classifyPurgeFailureSnapshot(registrations, snapshot) {
   }
   const explicitAbsence = HOSTS.every((host) => {
     const item = registrations?.[host];
-    return item?.marketplaceCount === 0 &&
+    return (
+      item?.marketplaceCount === 0 &&
       item?.pluginCount === 0 &&
       item?.unsupportedLegacyConflictCount === 0 &&
-      item?.rootMatchesExpected === true;
+      item?.rootMatchesExpected === true
+    );
   });
   const residue = publicResidueSummary(snapshot);
-  const exactInstalledTopology = HOSTS.every((host) => {
-    const item = registrations?.[host];
-    return item?.marketplaceCount === 1 &&
-      item?.pluginCount === 1 &&
-      item?.version === INITIAL_VERSION &&
-      item?.unsupportedLegacyConflictCount === 0 &&
-      item?.rootMatchesExpected === true &&
-      snapshot.hosts[host].managedRootPresent;
-  }) && snapshot.stateResidue.present;
+  const exactInstalledTopology =
+    HOSTS.every((host) => {
+      const item = registrations?.[host];
+      return (
+        item?.marketplaceCount === 1 &&
+        item?.pluginCount === 1 &&
+        item?.version === INITIAL_VERSION &&
+        item?.unsupportedLegacyConflictCount === 0 &&
+        item?.rootMatchesExpected === true &&
+        snapshot.hosts[host].managedRootPresent
+      );
+    }) && snapshot.stateResidue.present;
   return {
     classification:
       explicitAbsence && residue.empty
@@ -7002,9 +7092,7 @@ function commandJson(recorder, label, executable, args, options, category, messa
 
 function registrationRoot(entry, host) {
   if (entry === null) return null;
-  const values = host === "claude"
-    ? [entry.path, entry.installLocation].filter((value) => value !== undefined && value !== null)
-    : [entry.root];
+  const values = [entry.root];
   if (
     values.length === 0 ||
     values.some((value) => typeof value !== "string" || value.trim().length === 0)
@@ -7021,38 +7109,30 @@ function registrationRoot(entry, host) {
 function registrationRootMatches(entry, host, targets) {
   if (entry === null) return true;
   if (!targets?.[host]?.root) {
-    fail("host-state", `${host} registration root cannot be bound without an expected managed root`);
+    fail(
+      "host-state",
+      `${host} registration root cannot be bound without an expected managed root`,
+    );
   }
   const expectedTarget = resolve(targets[host].root);
   if (pathPresent(expectedTarget)) {
-    requireCanonicalOwnedEntry(expectedTarget, `${host} expected managed registration root`, "directory");
+    requireCanonicalOwnedEntry(
+      expectedTarget,
+      `${host} expected managed registration root`,
+      "directory",
+    );
   }
   const expected = realpathOrLexical(expectedTarget);
   if (registrationRoot(entry, host) !== expected) {
-    fail("host-state", `${host} OpenSocrates registration points outside its canonical managed root`);
+    fail(
+      "host-state",
+      `${host} OpenSocrates registration points outside its canonical managed root`,
+    );
   }
   return true;
 }
 
 export function hostRegistrationSnapshot(recorder, targets = null) {
-  const claudeMarkets = commandJson(
-    recorder,
-    "List Claude plugin marketplaces",
-    "claude",
-    ["plugin", "marketplace", "list", "--json"],
-    { projection: "claude-marketplaces", persistRaw: false },
-    "host-state",
-    "Claude Code could not list plugin marketplaces",
-  );
-  const claudePlugins = commandJson(
-    recorder,
-    "List Claude installed plugins",
-    "claude",
-    ["plugin", "list", "--json"],
-    { projection: "claude-plugins", persistRaw: false },
-    "host-state",
-    "Claude Code could not list installed plugins",
-  );
   const codexMarkets = commandJson(
     recorder,
     "List Codex plugin marketplaces",
@@ -7071,56 +7151,26 @@ export function hostRegistrationSnapshot(recorder, targets = null) {
     "host-state",
     "Codex could not inspect the OpenSocrates plugin",
   );
-  if (
-    !Array.isArray(claudeMarkets) ||
-    !Array.isArray(claudePlugins) ||
-    !Array.isArray(codexMarkets?.marketplaces) ||
-    !Array.isArray(codexPlugins?.installed)
-  ) {
+  if (!Array.isArray(codexMarkets?.marketplaces) || !Array.isArray(codexPlugins?.installed)) {
     fail("host-state", "a host returned an unexpected plugin inventory schema");
   }
-  const claudeMarketMatches = claudeMarkets.filter((entry) => entry?.name === "opensocrates");
-  const claudePluginMatches = claudePlugins.filter(
-    (entry) => entry?.id === "opensocrates@opensocrates",
-  );
-  const claudeLegacyMarketplaceCount = claudeMarkets.filter(
-    (entry) =>
-      typeof entry?.name === "string" &&
-      entry.name !== "opensocrates" &&
-      entry.name.toLowerCase() === "opensocrates",
-  ).length;
-  const claudeLegacyPluginCount = claudePlugins.filter(
-    (entry) =>
-      typeof entry?.id === "string" &&
-      entry.id !== "opensocrates@opensocrates" &&
-      entry.id.toLowerCase() === "opensocrates@opensocrates",
-  ).length;
+
   const codexMarketMatches = codexMarkets.marketplaces.filter(
     (entry) => entry?.name === "opensocrates",
   );
   const codexPluginMatches = codexPlugins.installed.filter(
     (entry) => entry?.pluginId === "opensocrates@opensocrates",
   );
-  const claudeRootMatchesExpected =
-    claudeMarketMatches.length <= 1
-      ? registrationRootMatches(claudeMarketMatches[0] ?? null, "claude", targets)
-      : false;
+
   const codexRootMatchesExpected =
     codexMarketMatches.length <= 1
       ? registrationRootMatches(codexMarketMatches[0] ?? null, "codex", targets)
       : false;
   return {
-    claude: {
-      marketplaceCount: claudeMarketMatches.length,
-      pluginCount: claudePluginMatches.length,
-      version: claudePluginMatches.length === 1 ? claudePluginMatches[0].version ?? null : null,
-      unsupportedLegacyConflictCount: claudeLegacyMarketplaceCount + claudeLegacyPluginCount,
-      rootMatchesExpected: claudeRootMatchesExpected,
-    },
     codex: {
       marketplaceCount: codexMarketMatches.length,
       pluginCount: codexPluginMatches.length,
-      version: codexPluginMatches.length === 1 ? codexPluginMatches[0].version ?? null : null,
+      version: codexPluginMatches.length === 1 ? (codexPluginMatches[0].version ?? null) : null,
       unsupportedLegacyConflictCount: 0,
       rootMatchesExpected: codexRootMatchesExpected,
     },
@@ -7128,9 +7178,11 @@ export function hostRegistrationSnapshot(recorder, targets = null) {
 }
 
 export function assertVersionTransition(value) {
-  if (value?.initialVersion !== INITIAL_VERSION ||
-      value?.candidateVersion !== CANDIDATE_VERSION ||
-      value?.transition !== TRANSITION) {
+  if (
+    value?.initialVersion !== INITIAL_VERSION ||
+    value?.candidateVersion !== CANDIDATE_VERSION ||
+    value?.transition !== TRANSITION
+  ) {
     fail("baseline", "the exact initial/candidate version transition changed or is unsupported");
   }
 }
@@ -7138,12 +7190,20 @@ export function assertVersionTransition(value) {
 export function assertCheckpointVersionTransition(checkpoint, report) {
   assertVersionTransition(checkpoint?.baseline);
   assertVersionTransition(report?.baseline);
-  assertRegistrationState(checkpoint.baseline.initialInventory?.registrations, "installed-baseline");
+  assertRegistrationState(
+    checkpoint.baseline.initialInventory?.registrations,
+    "installed-baseline",
+  );
   assertRegistrationState(checkpoint.baseline.initialTopology, "installed-baseline");
-  if (HOSTS.some(host => checkpoint.baseline.perHostInstallState?.[host]?.installed !== true ||
-      checkpoint.baseline.perHostInstallState?.[host]?.version !== INITIAL_VERSION) ||
-      report.source.version !== CANDIDATE_VERSION ||
-      checkpoint.npmIdentity?.version !== CANDIDATE_VERSION) {
+  if (
+    HOSTS.some(
+      (host) =>
+        checkpoint.baseline.perHostInstallState?.[host]?.installed !== true ||
+        checkpoint.baseline.perHostInstallState?.[host]?.version !== INITIAL_VERSION,
+    ) ||
+    report.source.version !== CANDIDATE_VERSION ||
+    checkpoint.npmIdentity?.version !== CANDIDATE_VERSION
+  ) {
     fail("checkpoint", "the baseline or candidate version binding changed");
   }
 }
@@ -7160,7 +7220,11 @@ function assertRegistrationState(snapshot, expected) {
       );
     }
     if (expected === "absent") {
-      if (item.marketplaceCount !== 0 || item.pluginCount !== 0 || item.rootMatchesExpected !== true) {
+      if (
+        item.marketplaceCount !== 0 ||
+        item.pluginCount !== 0 ||
+        item.rootMatchesExpected !== true
+      ) {
         fail("residue", `${host} still has an OpenSocrates registration`);
       }
       continue;
@@ -7199,7 +7263,8 @@ function codexHookInventory(recorder) {
   if (
     value?.schema !== "opensocrates.codex-hook-inventory/1.0.0" ||
     value.errorCount !== 0 ||
-    !Number.isSafeInteger(value.warningCount) || value.warningCount < 0 ||
+    !Number.isSafeInteger(value.warningCount) ||
+    value.warningCount < 0 ||
     !Number.isSafeInteger(value.otherPluginTimeoutWarningCount ?? 0) ||
     (value.otherPluginTimeoutWarningCount ?? 0) < 0 ||
     (value.blockingWarningCount ?? value.warningCount) !== 0 ||
@@ -7280,8 +7345,9 @@ async function exactOwnedTreeBinding(
   requireCanonicalOwnedEntry(directory, label, "directory");
   const entries = [];
   const visit = (current, prefix = "") => {
-    const children = readdirSync(current, { withFileTypes: true })
-      .sort((left, right) => left.name.localeCompare(right.name));
+    const children = readdirSync(current, { withFileTypes: true }).sort((left, right) =>
+      left.name.localeCompare(right.name),
+    );
     for (const child of children) {
       const target = join(current, child.name);
       const relativeName = prefix === "" ? child.name : `${prefix}/${child.name}`;
@@ -7379,13 +7445,7 @@ function assertBaselineExactBindings(value) {
   }
   requireExactObjectKeys(
     value.codexTrust,
-    [
-      "present",
-      "exactSectionCount",
-      "events",
-      "removedSyntaxByteCount",
-      "removedSyntaxSha256",
-    ],
+    ["present", "exactSectionCount", "events", "removedSyntaxByteCount", "removedSyntaxSha256"],
     "baseline",
     "the exact Codex trust binding",
   );
@@ -7394,7 +7454,7 @@ function assertBaselineExactBindings(value) {
     !Number.isSafeInteger(value.codexTrust.exactSectionCount) ||
     value.codexTrust.exactSectionCount < 0 ||
     value.codexTrust.exactSectionCount > CODEX_TRUST_EVENTS.length ||
-    value.codexTrust.present !== (value.codexTrust.exactSectionCount > 0) ||
+    value.codexTrust.present !== value.codexTrust.exactSectionCount > 0 ||
     !Array.isArray(value.codexTrust.events) ||
     value.codexTrust.events.length !== value.codexTrust.exactSectionCount ||
     new Set(value.codexTrust.events).size !== value.codexTrust.events.length ||
@@ -7419,7 +7479,7 @@ export function assertInitialDesiredState(desired, launchAgentPresent) {
   ) {
     fail(
       "baseline",
-      "the starting state is not the expected installed Claude/Codex state with updates disabled",
+      "the starting state is not the expected installed Codex state with updates disabled",
     );
   }
 }
@@ -7429,11 +7489,8 @@ export async function baselineInventory(recorder, targets) {
   assertRegistrationState(registrations, "installed-baseline");
   const state = inspectStateDirectory(targets, { requireInstalled: true });
   assertInitialDesiredState(state.desired, state.launchAgentPresent);
-  inspectManagedLayout({ claude: targets.claude.root, codex: targets.codex.root });
-  const pluginRoots = {
-    claude: resolveInstalledPluginRoot("claude", targets.claude.root),
-    codex: resolveInstalledPluginRoot("codex", targets.codex.root),
-  };
+  inspectManagedLayout({ codex: targets.codex.root });
+  const pluginRoots = { codex: resolveInstalledPluginRoot("codex", targets.codex.root) };
   const managedPayloadIntegrity = {};
   const cachePayloadIntegrity = {};
   for (const host of HOSTS) {
@@ -7446,20 +7503,12 @@ export async function baselineInventory(recorder, targets) {
     await verifyCachePayloadsForBaseline(host, targets[host].cacheRoot);
     cachePayloadIntegrity[host] = "verified";
   }
-  const caches = {
-    claude: inspectOwnedCache("claude", targets.claude.cacheRoot),
-    codex: inspectOwnedCache("codex", targets.codex.cacheRoot),
-  };
-  const pluginData = targets.claude.pluginData.map(inspectPluginData);
-  if (pluginData.some((item) => !item.empty)) {
-    fail("ownership", "Claude OpenSocrates plugin data is nonempty and cannot be proven safe to purge");
-  }
+  const caches = { codex: inspectOwnedCache("codex", targets.codex.cacheRoot) };
+  const pluginData = [];
   const nonTargetHosts = assertNonTargetHostsAbsent(targets);
   const trustInspection = inspectCodexTrustSectionsWithBinding();
   const trust = trustInspection.public;
-  const trustTransactionResidueCount = inspectTrustTransactionResidue(
-    targets.codex.hostHome,
-  );
+  const trustTransactionResidueCount = inspectTrustTransactionResidue(targets.codex.hostHome);
   if (trustTransactionResidueCount !== 0) {
     fail("baseline", "a Codex OpenSocrates trust-reset transaction residue already exists");
   }
@@ -7469,12 +7518,12 @@ export async function baselineInventory(recorder, targets) {
   }
   const launchAgentJob = inspectLaunchAgentJob(recorder);
   if (launchAgentJob.loaded) {
-    fail("baseline", "the starting OpenSocrates launchd job is loaded despite updates being disabled");
+    fail(
+      "baseline",
+      "the starting OpenSocrates launchd job is loaded despite updates being disabled",
+    );
   }
-  const openCodeBridgeResidueCount = inspectOpenCodeBridgeResidue(targets.allHosts.opencode);
-  if (openCodeBridgeResidueCount !== 0) {
-    fail("baseline", "an OpenCode bridge transaction residue already exists");
-  }
+
   const transactionResidue = assertNoKnownTransactionResidue(targets, "baseline");
   const hooks = codexHookInventory(recorder);
   const exactBindings = {
@@ -7495,11 +7544,10 @@ export async function baselineInventory(recorder, targets) {
       await Promise.all(
         HOSTS.map(async (host) => [
           host,
-          await exactOwnedTreeBinding(
-            targets[host].cacheRoot,
-            `${host} cache baseline root`,
-            { allowAbsent: true, ignoreCacheInUseMarkers: true },
-          ),
+          await exactOwnedTreeBinding(targets[host].cacheRoot, `${host} cache baseline root`, {
+            allowAbsent: true,
+            ignoreCacheInUseMarkers: true,
+          }),
         ]),
       ),
     ),
@@ -7510,7 +7558,7 @@ export async function baselineInventory(recorder, targets) {
   return {
     public: {
       registrations,
-      managedRootsPresent: { claude: true, codex: true },
+      managedRootsPresent: { codex: true },
       caches,
       managedPayloadIntegrity,
       cachePayloadIntegrity,
@@ -7524,7 +7572,6 @@ export async function baselineInventory(recorder, targets) {
       codexHooks: hooks,
       nonTargetHosts,
       transactionResidue,
-      openCodeBridgeResidueCount,
       ownership: "verified",
     },
     pluginRoots,
@@ -7544,12 +7591,7 @@ function safeInventoryPath(value) {
 
 async function verifyInstalledPayload(host, pluginRoot, payloadReceiptPath) {
   const releasePath = join(pluginRoot, "release-manifest.json");
-  const manifestPath = join(
-    pluginRoot,
-    ...(host === "claude"
-      ? [".claude-plugin", "plugin.json"]
-      : [".codex-plugin", "plugin.json"]),
-  );
+  const manifestPath = join(pluginRoot, ...[".codex-plugin", "plugin.json"]);
   for (const [target, label] of [
     [releasePath, `${host} installed release manifest`],
     [manifestPath, `${host} installed plugin manifest`],
@@ -7603,10 +7645,15 @@ async function verifyInstalledPayload(host, pluginRoot, payloadReceiptPath) {
     receipt?.runtimeSha256 !== runtimeSha256 ||
     JSON.stringify(receipt?.files) !==
       JSON.stringify(
-        Object.fromEntries([...verified.declared].sort(([left], [right]) => left.localeCompare(right))),
+        Object.fromEntries(
+          [...verified.declared].sort(([left], [right]) => left.localeCompare(right)),
+        ),
       )
   ) {
-    fail("post-install", `${host} installed bytes do not match the downloaded exact-SHA CI payload`);
+    fail(
+      "post-install",
+      `${host} installed bytes do not match the downloaded exact-SHA CI payload`,
+    );
   }
   return {
     version: PRODUCT_VERSION,
@@ -7657,14 +7704,7 @@ function verifyPackagedStatus(recorder, candidate) {
     recorder,
     "Run exact packed npx all-host status",
     candidate,
-    [
-      "--yes",
-      `--package=${candidate.packageArchive}`,
-      "opensocrates",
-      "status",
-      "--host",
-      "all",
-    ],
+    ["--yes", `--package=${candidate.packageArchive}`, "opensocrates", "status", "--host", "all"],
     {
       category: "post-install",
       failureMessage: "the exact packed all-host status check failed",
@@ -7674,12 +7714,11 @@ function verifyPackagedStatus(recorder, candidate) {
   );
   const expected = [
     `Desired version: ${PRODUCT_VERSION}`,
-    `claude: installed ${PRODUCT_VERSION} (in sync)`,
     `codex: installed ${PRODUCT_VERSION} (in sync)`,
     "Overall: no detected drift",
   ];
   if (expected.some((line) => !completed.stdout.includes(line))) {
-    fail("post-install", "the exact packed status output did not report both hosts in sync");
+    fail("post-install", "the exact packed status output did not report Codex in sync");
   }
   return { desiredVersion: PRODUCT_VERSION, hostsInSync: [...HOSTS], drift: false };
 }
@@ -7779,7 +7818,10 @@ function measureInstalledSessionStart(
     value?.artifact_identity !== `sha256:${expectedReleaseManifestSha256}` ||
     !sourceReportsValid
   ) {
-    fail("session-start-budget", "the installed SessionStart timing result did not meet the two-second contract");
+    fail(
+      "session-start-budget",
+      "the installed SessionStart timing result did not meet the two-second contract",
+    );
   }
   return {
     observationStatus: "pass",
@@ -7795,13 +7837,16 @@ function measureInstalledSessionStart(
     sources: Object.fromEntries(
       SESSION_START_SOURCES.map((source) => {
         const sample = value.sources[source];
-        return [source, {
-          sampleCount: sample.sample_count,
-          firstMs: sample.latency_ms.first,
-          p95Ms: sample.latency_ms.p95,
-          maxMs: sample.latency_ms.max,
-          pass: sample.pass,
-        }];
+        return [
+          source,
+          {
+            sampleCount: sample.sample_count,
+            firstMs: sample.latency_ms.first,
+            p95Ms: sample.latency_ms.p95,
+            maxMs: sample.latency_ms.max,
+            pass: sample.pass,
+          },
+        ];
       }),
     ),
     pass: true,
@@ -7842,25 +7887,10 @@ function exactString(value, category, message) {
   return value;
 }
 
-function versionAtLeast(value, minimum) {
-  const match = String(value).match(/(\d+)\.(\d+)\.(\d+)/u);
-  if (!match) return false;
-  const current = match.slice(1).map(Number);
-  for (let index = 0; index < minimum.length; index += 1) {
-    if (current[index] > minimum[index]) return true;
-    if (current[index] < minimum[index]) return false;
-  }
-  return true;
-}
-
 export function canonicalHostVersion(value, host) {
   const normalized = typeof value === "string" ? value.trim() : "";
-  const prefix = host === "claude"
-    ? "(?:claude(?: code)?)"
-    : host === "codex"
-      ? "(?:codex(?:-cli)?)"
-      : null;
-  const suffix = host === "claude" ? "Claude Code" : "Codex CLI";
+  const prefix = "(?:codex(?:-cli)?)";
+  const suffix = "Codex CLI";
   if (prefix === null || normalized.length === 0 || normalized.length > 120) {
     fail("host-prerequisite", "the host version output has an unsupported identity");
   }
@@ -7906,7 +7936,12 @@ function requireSafeIdentity() {
   if (uid === 0 || effectiveUid === 0) {
     fail("environment", "root execution is prohibited for lifecycle acceptance");
   }
-  if (uid !== effectiveUid || process.env.SUDO_UID || process.env.SUDO_GID || process.env.SUDO_USER) {
+  if (
+    uid !== effectiveUid ||
+    process.env.SUDO_UID ||
+    process.env.SUDO_GID ||
+    process.env.SUDO_USER
+  ) {
     fail("environment", "sudo or changed effective-user execution is prohibited");
   }
   const accountHome = resolve(userInfo().homedir);
@@ -7916,7 +7951,8 @@ function requireSafeIdentity() {
     fail("environment", "HOME does not match the effective account home");
   }
   const homeInfo = requireCanonicalOwnedEntry(accountHome, "effective account home", "directory");
-  if (homeInfo.uid !== uid) fail("environment", "the effective account does not own its home directory");
+  if (homeInfo.uid !== uid)
+    fail("environment", "the effective account does not own its home directory");
   return { uidMatchesEffectiveUid: true, homeOwnedByEffectiveUid: true, sudo: false };
 }
 
@@ -7929,11 +7965,9 @@ function verifyEnvironment(recorder, report) {
     fail("environment", "Node.js 20 or later is required");
   }
   const overrides = [
-    "CLAUDE_CONFIG_DIR",
     "CODEX_HOME",
     "OPENSOCRATES_STATE_DIR",
     "OPENSOCRATES_LAUNCH_AGENTS_DIR",
-    "CLAUDE_BIN",
     "CODEX_BIN",
     "ANTIGRAVITY_CONFIG_DIR",
     "CURSOR_CONFIG_DIR",
@@ -7943,23 +7977,27 @@ function verifyEnvironment(recorder, report) {
   if (overrides.length > 0) {
     fail("environment", `unset path overrides before testing: ${overrides.join(", ")}`);
   }
-  recorder.run(
-    "Read macOS product version",
-    "/usr/bin/sw_vers",
-    ["-productVersion"],
-    { category: "environment", failureMessage: "macOS version could not be determined" },
-  );
+  recorder.run("Read macOS product version", "/usr/bin/sw_vers", ["-productVersion"], {
+    category: "environment",
+    failureMessage: "macOS version could not be determined",
+  });
   const hardwareArchitecture = recorder.run(
     "Read Darwin hardware architecture",
     "/usr/bin/uname",
     ["-m"],
-    { category: "environment", failureMessage: "hardware architecture could not be determined" },
+    {
+      category: "environment",
+      failureMessage: "hardware architecture could not be determined",
+    },
   ).stdout;
   const arm64Capability = recorder.run(
     "Confirm native arm64 hardware capability",
     "/usr/sbin/sysctl",
     ["-n", "hw.optional.arm64"],
-    { category: "environment", failureMessage: "native arm64 capability could not be determined" },
+    {
+      category: "environment",
+      failureMessage: "native arm64 capability could not be determined",
+    },
   ).stdout;
   if (!new Set(["arm64", "aarch64"]).has(hardwareArchitecture) || arm64Capability !== "1") {
     fail("environment", "the Mac is not reporting native Apple-silicon hardware");
@@ -7995,7 +8033,6 @@ function prepareIsolatedNpx(privateDirectory) {
     npmBinary: resolveExecutable("npm"),
     nodeBinary: realpathSync(process.execPath),
     pythonBinary: resolveExecutable("python3.12"),
-    claudeBinary: resolveExecutable("claude"),
     codexBinary: resolveExecutable("codex"),
   };
 }
@@ -8039,7 +8076,10 @@ export function validateLifecycleAccountHome(
       realpathSync(expectedLexical) !== expectedLexical ||
       candidateLexical !== expectedLexical
     ) {
-      fail("npx-isolation", "the lifecycle account HOME is not the canonical current-user directory");
+      fail(
+        "npx-isolation",
+        "the lifecycle account HOME is not the canonical current-user directory",
+      );
     }
     return candidateLexical;
   } catch (error) {
@@ -8069,8 +8109,7 @@ function lifecycleAccountHome(execution) {
   return validateLifecycleAccountHome(execution.accountHome);
 }
 
-const NPM_USER_CONFIG =
-  "audit=false\nfund=false\nupdate-notifier=false\nignore-scripts=true\n";
+const NPM_USER_CONFIG = "audit=false\nfund=false\nupdate-notifier=false\nignore-scripts=true\n";
 
 function npmRunEnvironment(execution, paths, userConfig, invocationMode) {
   const nodeDirectory = dirname(execution.nodeBinary);
@@ -8085,9 +8124,7 @@ function npmRunEnvironment(execution, paths, userConfig, invocationMode) {
   ].filter((item, index, values) => values.indexOf(item) === index);
   return {
     HOME:
-      invocationMode === "account-home-lifecycle"
-        ? lifecycleAccountHome(execution)
-        : paths.home,
+      invocationMode === "account-home-lifecycle" ? lifecycleAccountHome(execution) : paths.home,
     USER: validateLifecycleAccountUser(execution.accountUser),
     PATH: fixedPath.join(":"),
     TMPDIR: paths.tmp,
@@ -8095,7 +8132,6 @@ function npmRunEnvironment(execution, paths, userConfig, invocationMode) {
     LC_ALL: "C",
     TZ: "UTC",
     NODE_PATH: "",
-    CLAUDE_BIN: execution.claudeBinary,
     CODEX_BIN: execution.codexBinary,
     npm_config_cache: paths.cache,
     npm_config_prefix: paths.prefix,
@@ -8132,7 +8168,8 @@ function durableLifecycleNpmRun(execution, operationKey) {
     paths[name] = realpathSync(target);
   }
   const userConfig = join(runRoot, "user.npmrc");
-  if (!pathPresent(userConfig)) writeExclusivePrivateBytes(userConfig, NPM_USER_CONFIG, "npx-isolation");
+  if (!pathPresent(userConfig))
+    writeExclusivePrivateBytes(userConfig, NPM_USER_CONFIG, "npx-isolation");
   requireExactPrivateMode(userConfig, "durable lifecycle npm user config", "file", 0o600);
   if (readFileSync(userConfig, "utf8") !== NPM_USER_CONFIG) {
     fail("npx-isolation", "the durable lifecycle npm user config changed");
@@ -8202,7 +8239,7 @@ function npxRunOptions(
 
 function packedInvocationVerb(args) {
   const commandIndex = args.indexOf("opensocrates");
-  return commandIndex >= 0 ? args[commandIndex + 1] ?? null : null;
+  return commandIndex >= 0 ? (args[commandIndex + 1] ?? null) : null;
 }
 
 export function statusCommandArguments(candidate) {
@@ -8240,8 +8277,7 @@ export function packedNpxInvocation(candidate, args, overrides = {}) {
   const lifecycleVerb = expectedLifecycleArguments !== null;
   const mutatingLifecycleVerb = verb === "remove" || verb === "install";
   const exactLifecycleCommand =
-    lifecycleVerb &&
-    JSON.stringify(expectedLifecycleArguments) === JSON.stringify(args);
+    lifecycleVerb && JSON.stringify(expectedLifecycleArguments) === JSON.stringify(args);
   if (
     (invocationMode === "account-home-lifecycle" && !exactLifecycleCommand) ||
     (invocationMode === "isolated-preflight" && lifecycleVerb)
@@ -8251,20 +8287,17 @@ export function packedNpxInvocation(candidate, args, overrides = {}) {
   if (
     (mutatingLifecycleVerb && lifecycleOperationKey === null) ||
     (!mutatingLifecycleVerb && lifecycleOperationKey !== null) ||
-    (verb === "remove" && !new Set(["purge-initial", "purge-host-close-retry"]).has(lifecycleOperationKey)) ||
-    (verb === "install" && !new Set(["install-initial", "install-retry"]).has(lifecycleOperationKey))
+    (verb === "remove" &&
+      !new Set(["purge-initial", "purge-host-close-retry"]).has(lifecycleOperationKey)) ||
+    (verb === "install" &&
+      !new Set(["install-initial", "install-retry"]).has(lifecycleOperationKey))
   ) {
     fail("lifecycle-intent", "the packed mutation does not bind its exact lifecycle operation key");
   }
   return {
     executable: candidate.execution.npxBinary,
     args: [...args],
-    options: npxRunOptions(
-      candidate,
-      runOverrides,
-      invocationMode,
-      lifecycleOperationKey,
-    ),
+    options: npxRunOptions(candidate, runOverrides, invocationMode, lifecycleOperationKey),
   };
 }
 
@@ -8280,7 +8313,6 @@ function lifecycleCandidateIdentity(candidate) {
       npmBinarySha256: candidate.execution?.npmBinarySha256,
       npxBinarySha256: candidate.execution?.npxBinarySha256,
       pythonBinarySha256: candidate.execution?.pythonBinarySha256,
-      claudeBinarySha256: candidate.execution?.claudeBinarySha256,
       codexBinarySha256: candidate.execution?.codexBinarySha256,
     },
     assets: Object.fromEntries(
@@ -8316,33 +8348,25 @@ export function runPackedNpx(recorder, label, candidate, args, overrides = {}) {
   const verb = packedInvocationVerb(args);
   const invocation = packedNpxInvocation(candidate, args, {
     ...invocationOverrides,
-    lifecycleOperationKey:
-      verb === "remove" || verb === "install" ? lifecycleOperationKey : null,
+    lifecycleOperationKey: verb === "remove" || verb === "install" ? lifecycleOperationKey : null,
   });
   if (verb === "remove" || verb === "install") {
     if (lifecycleOperationKey === null || typeof recorder.runLifecycle !== "function") {
       fail("lifecycle-intent", "a destructive packed npx call lacks its durable operation capsule");
     }
-    return recorder.runLifecycle(
-      label,
-      invocation.executable,
-      invocation.args,
-      {
-        ...invocation.options,
-        operationKey: lifecycleOperationKey,
-        candidateIdentitySha256: lifecycleCandidateIdentity(candidate),
-      },
-    );
+    return recorder.runLifecycle(label, invocation.executable, invocation.args, {
+      ...invocation.options,
+      operationKey: lifecycleOperationKey,
+      candidateIdentitySha256: lifecycleCandidateIdentity(candidate),
+    });
   }
   if (lifecycleOperationKey !== null) {
-    fail("lifecycle-intent", "a nonmutating packed npx call cannot claim a lifecycle operation key");
+    fail(
+      "lifecycle-intent",
+      "a nonmutating packed npx call cannot claim a lifecycle operation key",
+    );
   }
-  return recorder.run(
-    label,
-    invocation.executable,
-    invocation.args,
-    invocation.options,
-  );
+  return recorder.run(label, invocation.executable, invocation.args, invocation.options);
 }
 
 async function pinExecutionIdentity(recorder, execution) {
@@ -8350,7 +8374,7 @@ async function pinExecutionIdentity(recorder, execution) {
   execution.npmBinarySha256 = await sha256File(execution.npmBinary);
   execution.nodeBinarySha256 = await sha256File(execution.nodeBinary);
   execution.pythonBinarySha256 = await sha256File(execution.pythonBinary);
-  execution.claudeBinarySha256 = await sha256File(execution.claudeBinary);
+
   execution.codexBinarySha256 = await sha256File(execution.codexBinary);
   const candidate = { execution };
   execution.npxVersion = recorder.run(
@@ -8409,11 +8433,13 @@ async function verifyExecutionIdentity(recorder, candidate) {
     (await sha256File(execution.npmBinary)) !== execution.npmBinarySha256 ||
     (await sha256File(execution.nodeBinary)) !== execution.nodeBinarySha256 ||
     (await sha256File(execution.pythonBinary)) !== execution.pythonBinarySha256 ||
-    (await sha256File(execution.claudeBinary)) !== execution.claudeBinarySha256 ||
     (await sha256File(execution.codexBinary)) !== execution.codexBinarySha256 ||
     realpathSync(process.execPath) !== execution.nodeBinary
   ) {
-    fail("npx-isolation", "a pinned Node, Python, npm, npx, or host executable changed after candidate preparation");
+    fail(
+      "npx-isolation",
+      "a pinned Node, Python, npm, npx, or host executable changed after candidate preparation",
+    );
   }
   validateLifecycleAccountUser(execution.accountUser);
   const npxVersion = recorder.run(
@@ -8440,7 +8466,10 @@ async function verifyExecutionIdentity(recorder, candidate) {
     process.version !== execution.nodeVersion ||
     !/^3\.12\.\d+$/u.test(execution.pythonVersion ?? "")
   ) {
-    fail("npx-isolation", "the npm, npx, Node, or Python execution identity changed before lifecycle use");
+    fail(
+      "npx-isolation",
+      "the npm, npx, Node, or Python execution identity changed before lifecycle use",
+    );
   }
   verifyLifecycleHostAuthentication(recorder, execution);
 }
@@ -8456,10 +8485,15 @@ function verifyGitHubAuthentication(recorder) {
 
 function verifySource(recorder, report) {
   verifyGitHubAuthentication(recorder);
-  const topLevel = recorder.run("Resolve Git checkout root", "git", ["rev-parse", "--show-toplevel"], {
-    category: "source",
-    failureMessage: "the script must run from a Git checkout",
-  }).stdout;
+  const topLevel = recorder.run(
+    "Resolve Git checkout root",
+    "git",
+    ["rev-parse", "--show-toplevel"],
+    {
+      category: "source",
+      failureMessage: "the script must run from a Git checkout",
+    },
+  ).stdout;
   if (resolve(topLevel) !== ROOT) {
     fail("source", "the script location and Git checkout root do not match");
   }
@@ -8531,27 +8565,6 @@ function verifySource(recorder, report) {
 }
 
 function verifyHosts(recorder, report) {
-  const claudeVersionOutput = recorder.run("Read Claude Code version", "claude", ["--version"], {
-    category: "host-prerequisite",
-    failureMessage: "Claude Code is unavailable",
-    persistRaw: false,
-  }).stdout;
-  const claudeVersion = canonicalHostVersion(claudeVersionOutput, "claude");
-  if (!versionAtLeast(claudeVersion, [2, 1, 205])) {
-    fail("host-prerequisite", "Claude Code 2.1.205 or later is required");
-  }
-  const claudeAuthentication = commandJson(
-    recorder,
-    "Verify Claude authentication",
-    "claude",
-    ["auth", "status", "--json"],
-    { projection: "claude-auth", persistRaw: false },
-    "host-auth",
-    "Claude Code authentication could not be inspected",
-  );
-  if (claudeAuthentication?.loggedIn !== true) {
-    fail("host-auth", "Claude Code is not authenticated");
-  }
   const codexVersionOutput = recorder.run("Read Codex CLI version", "codex", ["--version"], {
     category: "host-prerequisite",
     failureMessage: "Codex CLI is unavailable",
@@ -8564,12 +8577,9 @@ function verifyHosts(recorder, report) {
     projection: "status-only",
     persistRaw: false,
   });
-  report.environment.claudeVersion = claudeVersion;
+
   report.environment.codexVersion = codexVersion;
-  return {
-    claudeVersion: report.environment.claudeVersion,
-    codexVersion: report.environment.codexVersion,
-  };
+  return { codexVersion: report.environment.codexVersion };
 }
 
 function verifyLifecycleHostAuthentication(recorder, execution) {
@@ -8578,18 +8588,7 @@ function verifyLifecycleHostAuthentication(recorder, execution) {
     ...run.env,
     HOME: lifecycleAccountHome(execution),
   };
-  const claudeAuthentication = commandJson(
-    recorder,
-    "Verify pinned Claude authentication in lifecycle environment",
-    execution.claudeBinary,
-    ["auth", "status", "--json"],
-    { env: environment, projection: "claude-auth", persistRaw: false },
-    "host-auth",
-    "the pinned Claude CLI authentication could not be inspected in the lifecycle environment",
-  );
-  if (claudeAuthentication?.loggedIn !== true) {
-    fail("host-auth", "the pinned Claude CLI is not authenticated in the lifecycle environment");
-  }
+
   recorder.run(
     "Verify pinned Codex authentication in lifecycle environment",
     execution.codexBinary,
@@ -8602,7 +8601,7 @@ function verifyLifecycleHostAuthentication(recorder, execution) {
       persistRaw: false,
     },
   );
-  return { claude: true, codex: true };
+  return { codex: true };
 }
 
 function requireEmptyDirectory(target, label) {
@@ -8617,8 +8616,12 @@ function assertSafeArchiveEntry(entry, label, { requiredPrefix = null } = {}) {
     normalized.startsWith("/") ||
     normalized.includes("\\") ||
     normalized.split("/").some((part) => part === "" || part === "." || part === "..") ||
-    normalized.split("/").some((part) => part === "__MACOSX" || part === ".DS_Store" || part.startsWith("._")) ||
-    (requiredPrefix !== null && normalized !== requiredPrefix && !normalized.startsWith(`${requiredPrefix}/`))
+    normalized
+      .split("/")
+      .some((part) => part === "__MACOSX" || part === ".DS_Store" || part.startsWith("._")) ||
+    (requiredPrefix !== null &&
+      normalized !== requiredPrefix &&
+      !normalized.startsWith(`${requiredPrefix}/`))
   ) {
     fail("artifact-integrity", `${label} contains an unsafe or unexpected entry`);
   }
@@ -8711,10 +8714,7 @@ function assertZipPathTrie(entries, category, label) {
   }
 }
 
-function inspectZipCentralDirectory(
-  archive,
-  { label, category, profile = "strict-package" },
-) {
+function inspectZipCentralDirectory(archive, { label, category, profile = "strict-package" }) {
   if (!ZIP_PROFILES.has(profile)) {
     fail(category, `${label} ZIP verification profile is unsupported`);
   }
@@ -8727,13 +8727,7 @@ function inspectZipCentralDirectory(
   const descriptor = openSync(archive, fsConstants.O_RDONLY | fsConstants.O_NOFOLLOW);
   try {
     const tailLength = Math.min(size, 65_557);
-    const tail = readDescriptorExactly(
-      descriptor,
-      tailLength,
-      size - tailLength,
-      category,
-      label,
-    );
+    const tail = readDescriptorExactly(descriptor, tailLength, size - tailLength, category, label);
     let endOffset = -1;
     for (let index = tail.length - 22; index >= 0; index -= 1) {
       if (
@@ -8764,13 +8758,7 @@ function inspectZipCentralDirectory(
     ) {
       fail(category, `${label} ZIP has unsupported multi-disk, ZIP64, or bounded-size metadata`);
     }
-    const central = readDescriptorExactly(
-      descriptor,
-      centralSize,
-      centralOffset,
-      category,
-      label,
-    );
+    const central = readDescriptorExactly(descriptor, centralSize, centralOffset, category, label);
     const entries = [];
     let cursor = 0;
     let totalUncompressed = 0;
@@ -8795,10 +8783,7 @@ function inspectZipCentralDirectory(
       const next = cursor + 46 + nameLength + extraLength + commentLength;
       const externalLowAttributes = externalAttributes & 0xffff;
       const centralProfileMatches = githubArtifactContainer
-        ? madeBy === 0x032d &&
-          flags === 0x0008 &&
-          method === 8 &&
-          externalLowAttributes === 0x20
+        ? madeBy === 0x032d && flags === 0x0008 && method === 8 && externalLowAttributes === 0x20
         : madeBy === 0x0314 &&
           flags === 0x0800 &&
           new Set([0, 8]).has(method) &&
@@ -8817,18 +8802,18 @@ function inspectZipCentralDirectory(
         (uncompressedSize > 0 && compressedSize === 0) ||
         (compressedSize > 0 && uncompressedSize / compressedSize > MAX_ZIP_COMPRESSION_RATIO)
       ) {
-        fail(category, `${label} ZIP entry exceeds the closed flags, metadata, type, size, or ratio contract`);
+        fail(
+          category,
+          `${label} ZIP entry exceeds the closed flags, metadata, type, size, or ratio contract`,
+        );
       }
-      const nameBytes = Buffer.from(
-        central.subarray(cursor + 46, cursor + 46 + nameLength),
-      );
+      const nameBytes = Buffer.from(central.subarray(cursor + 46, cursor + 46 + nameLength));
       const name = nameBytes.toString("utf8");
       if (
         name.includes("\uFFFD") ||
         name.includes("\0") ||
         !Buffer.from(name, "utf8").equals(nameBytes) ||
-        (githubArtifactContainer &&
-          ![...nameBytes].every((byte) => byte >= 0x20 && byte <= 0x7e))
+        (githubArtifactContainer && ![...nameBytes].every((byte) => byte >= 0x20 && byte <= 0x7e))
       ) {
         fail(category, `${label} ZIP contains an invalid or noncanonical UTF-8 member name`);
       }
@@ -8864,7 +8849,9 @@ function inspectZipCentralDirectory(
       fail(category, `${label} ZIP central directory contains trailing ambiguous metadata`);
     }
     assertZipPathTrie(entries, category, label);
-    const physicalEntries = [...entries].sort((left, right) => left.localOffset - right.localOffset);
+    const physicalEntries = [...entries].sort(
+      (left, right) => left.localOffset - right.localOffset,
+    );
     let expectedLocalOffset = 0;
     let totalActual = 0;
     for (let index = 0; index < physicalEntries.length; index += 1) {
@@ -8872,13 +8859,7 @@ function inspectZipCentralDirectory(
       if (entry.localOffset !== expectedLocalOffset || entry.localOffset + 30 > centralOffset) {
         fail(category, `${label} ZIP local member ranges contain a gap, overlap, or alias`);
       }
-      const header = readDescriptorExactly(
-        descriptor,
-        30,
-        entry.localOffset,
-        category,
-        label,
-      );
+      const header = readDescriptorExactly(descriptor, 30, entry.localOffset, category, label);
       if (header.readUInt32LE(0) !== 0x04034b50) {
         fail(category, `${label} ZIP local member header is invalid`);
       }
@@ -8947,9 +8928,7 @@ function inspectZipCentralDirectory(
       entry.payloadSha256 = sha256Buffer(output);
       expectedLocalOffset = dataOffset + entry.compressedSize + descriptorLength;
       const nextOffset =
-        index + 1 < physicalEntries.length
-          ? physicalEntries[index + 1].localOffset
-          : centralOffset;
+        index + 1 < physicalEntries.length ? physicalEntries[index + 1].localOffset : centralOffset;
       if (expectedLocalOffset !== nextOffset) {
         fail(category, `${label} ZIP data region contains trailing or ambiguous bytes`);
       }
@@ -9180,12 +9159,7 @@ function inspectTarGzip(archive, { label, category, requiredPrefix }) {
   return { entryCount, totalFileBytes };
 }
 
-function extractVerifiedTarGzip(
-  recorder,
-  archive,
-  directory,
-  { label, category, requiredPrefix },
-) {
+function extractVerifiedTarGzip(recorder, archive, directory, { label, category, requiredPrefix }) {
   requireEmptyDirectory(directory, `${label} extraction directory`);
   const inspected = inspectTarGzip(archive, { label, category, requiredPrefix });
   recorder.run(
@@ -9243,36 +9217,37 @@ export async function verifyChecksumInventory(
 function deepJsonEqual(left, right) {
   if (left === right) return true;
   if (Array.isArray(left) || Array.isArray(right)) {
-    return Array.isArray(left) &&
+    return (
+      Array.isArray(left) &&
       Array.isArray(right) &&
       left.length === right.length &&
-      left.every((item, index) => deepJsonEqual(item, right[index]));
+      left.every((item, index) => deepJsonEqual(item, right[index]))
+    );
   }
-  if (
-    left === null ||
-    right === null ||
-    typeof left !== "object" ||
-    typeof right !== "object"
-  ) {
+  if (left === null || right === null || typeof left !== "object" || typeof right !== "object") {
     return false;
   }
   const leftKeys = Object.keys(left).sort();
   const rightKeys = Object.keys(right).sort();
-  return leftKeys.length === rightKeys.length &&
-    leftKeys.every(
-      (key, index) => key === rightKeys[index] && deepJsonEqual(left[key], right[key]),
-    );
+  return (
+    leftKeys.length === rightKeys.length &&
+    leftKeys.every((key, index) => key === rightKeys[index] && deepJsonEqual(left[key], right[key]))
+  );
 }
 
-const BASELINE_PROVENANCE = JSON.parse(readFileSync(
-  new URL("./reinstall_baseline_provenance.json", import.meta.url), "utf8",
-));
+const BASELINE_PROVENANCE = JSON.parse(
+  readFileSync(new URL("./reinstall_baseline_provenance.json", import.meta.url), "utf8"),
+);
 
 export function assertBaselineProvenanceDigests(host, version, observed) {
-  const receipt = BASELINE_PROVENANCE.receipts.find(item =>
-    item.host === host && item.version === version);
-  if (!receipt || observed.checksumInventorySha256 !== receipt.checksumInventorySha256 ||
-      observed.releaseManifestSha256 !== receipt.releaseManifestSha256) {
+  const receipt = BASELINE_PROVENANCE.receipts.find(
+    (item) => item.host === host && item.version === version,
+  );
+  if (
+    !receipt ||
+    observed.checksumInventorySha256 !== receipt.checksumInventorySha256 ||
+    observed.releaseManifestSha256 !== receipt.releaseManifestSha256
+  ) {
     fail("baseline", "the baseline payload is not the pinned published host/version payload");
   }
 }
@@ -9287,25 +9262,6 @@ export async function verifyBaselineProvenance(host, pluginRoot, version) {
 }
 
 function expectedManagedMarketplace(host, version = CANDIDATE_VERSION) {
-  if (host === "claude") {
-    return {
-      name: "opensocrates",
-      owner: { name: "Parker Hwang" },
-      metadata: {
-        description: "OpenSocrates reasoning support for Claude Code and Cowork",
-        version,
-      },
-      plugins: [
-        {
-          name: "opensocrates",
-          source: "./plugins/opensocrates",
-          description:
-            "Local reasoning-system selection for Claude Code and Cowork, plus one /opensocrates entry.",
-          category: "workflow",
-        },
-      ],
-    };
-  }
   return {
     name: "opensocrates",
     interface: { displayName: "OpenSocrates" },
@@ -9322,12 +9278,7 @@ function expectedManagedMarketplace(host, version = CANDIDATE_VERSION) {
 
 function validatePayloadIdentity(host, pluginRoot, expectedVersion, category, label) {
   const releasePath = join(pluginRoot, "release-manifest.json");
-  const manifestPath = join(
-    pluginRoot,
-    ...(host === "claude"
-      ? [".claude-plugin", "plugin.json"]
-      : [".codex-plugin", "plugin.json"]),
-  );
+  const manifestPath = join(pluginRoot, ...[".codex-plugin", "plugin.json"]);
   requireCanonicalOwnedEntry(releasePath, `${label} release manifest`, "file");
   requireCanonicalOwnedEntry(manifestPath, `${label} plugin manifest`, "file");
   const release = parseJson(
@@ -9371,14 +9322,8 @@ async function verifyManagedRootExact(
     fail(category, `${host} ownership marker does not match the exact installer contract`);
   }
   validatePayloadIdentity(host, pluginRoot, expectedVersion, category, `${host} installed payload`);
-  const verified = await verifyChecksumInventory(
-    pluginRoot,
-    category,
-    `${host} installed payload`,
-  );
-  const marketplaceRelative = host === "claude"
-    ? ".claude-plugin/marketplace.json"
-    : ".agents/plugins/marketplace.json";
+  const verified = await verifyChecksumInventory(pluginRoot, category, `${host} installed payload`);
+  const marketplaceRelative = ".agents/plugins/marketplace.json";
   const marketplacePath = join(managedRoot, ...marketplaceRelative.split("/"));
   requireCanonicalOwnedEntry(marketplacePath, `${host} managed marketplace`, "file");
   const marketplace = parseJson(
@@ -9397,7 +9342,8 @@ async function verifyManagedRootExact(
     ...[...verified.declared.keys()].map((item) => `${pluginRelative}/${item}`),
   ]);
   const actual = walkFiles(managedRoot).map((target) =>
-    relative(managedRoot, target).split(sep).join("/"));
+    relative(managedRoot, target).split(sep).join("/"),
+  );
   if (!sameStrings(actual, [...allowed])) {
     fail(category, `${host} managed root contains an undeclared or missing file`);
   }
@@ -9440,7 +9386,10 @@ function validateNpmPackMetadata(item) {
     item?.version !== PRODUCT_VERSION ||
     item?.entryCount !== NPM_PACKAGE_FILES.length ||
     !Array.isArray(item?.files) ||
-    !sameStrings(item.files.map((entry) => entry?.path), NPM_PACKAGE_FILES) ||
+    !sameStrings(
+      item.files.map((entry) => entry?.path),
+      NPM_PACKAGE_FILES,
+    ) ||
     item.files.some(
       (entry) =>
         !Number.isSafeInteger(entry?.size) ||
@@ -9502,12 +9451,7 @@ function packSourceNpmCandidate(recorder, execution, sourceRoot, packageDirector
   );
 }
 
-async function inspectPackedNpmCandidate(
-  recorder,
-  packageArchive,
-  packageDirectory,
-  packMetadata,
-) {
+async function inspectPackedNpmCandidate(recorder, packageArchive, packageDirectory, packMetadata) {
   validateNpmPackMetadata(packMetadata);
   const extraction = join(packageDirectory, "extracted");
   ensurePrivateDirectory(extraction);
@@ -9571,11 +9515,7 @@ async function extractHostPayloadReceipt(recorder, privateDirectory, host, asset
     label: `${host} exact CI archive`,
     category: "artifact-integrity",
   });
-  const releasePath = findSingleFile(
-    extractionRoot,
-    "release-manifest.json",
-    "artifact-integrity",
-  );
+  const releasePath = findSingleFile(extractionRoot, "release-manifest.json", "artifact-integrity");
   const pluginRoot = dirname(releasePath);
   requireCanonicalOwnedEntry(pluginRoot, `${host} extracted plugin root`, "directory");
   const outsideFiles = walkFiles(extractionRoot).filter((target) => {
@@ -9627,7 +9567,9 @@ async function extractHostPayloadReceipt(recorder, privateDirectory, host, asset
     releaseManifestSha256: await sha256File(releasePath),
     checksumInventorySha256: verified.checksumInventorySha256,
     fileCount: verified.declared.size,
-    files: Object.fromEntries([...verified.declared].sort(([left], [right]) => left.localeCompare(right))),
+    files: Object.fromEntries(
+      [...verified.declared].sort(([left], [right]) => left.localeCompare(right)),
+    ),
     runtimeRelative,
     runtimeSha256,
     architectures: architecture.architectures,
@@ -9659,7 +9601,10 @@ function validateCiRunMetadata(metadata, runId, sourceCommit) {
     metadata.run_attempt < 1 ||
     !Number.isSafeInteger(metadata?.workflow_id)
   ) {
-    fail("ci-not-ready", "the CI run metadata does not pin the exact repository, workflow, and commit");
+    fail(
+      "ci-not-ready",
+      "the CI run metadata does not pin the exact repository, workflow, and commit",
+    );
   }
 }
 
@@ -9720,17 +9665,16 @@ function validateBuildSourceReceipt(receipt, { sourceCommit, sourceTree }) {
     receipt.commit !== sourceCommit ||
     receipt.tree !== sourceTree
   ) {
-    fail("ci-artifact", "the package build source receipt does not match the exact local commit and tree");
+    fail(
+      "ci-artifact",
+      "the package build source receipt does not match the exact local commit and tree",
+    );
   }
   return { headSha: receipt.commit, treeSha: receipt.tree };
 }
 
 function artifactDownloadTimeoutMs(sizeBytes) {
-  if (
-    !Number.isSafeInteger(sizeBytes) ||
-    sizeBytes <= 0 ||
-    sizeBytes > MAX_ARTIFACT_BYTES
-  ) {
+  if (!Number.isSafeInteger(sizeBytes) || sizeBytes <= 0 || sizeBytes > MAX_ARTIFACT_BYTES) {
     fail("ci-artifact", "the immutable artifact download size is outside its bounded contract");
   }
   return Math.min(
@@ -9740,13 +9684,7 @@ function artifactDownloadTimeoutMs(sizeBytes) {
   );
 }
 
-async function downloadImmutableArtifact(
-  recorder,
-  ghBinary,
-  artifactId,
-  target,
-  sizeBytes,
-) {
+async function downloadImmutableArtifact(recorder, ghBinary, artifactId, target, sizeBytes) {
   return recorder.runToFile(
     "Download immutable Native package artifact by exact artifact ID",
     ghBinary,
@@ -9761,10 +9699,7 @@ async function downloadImmutableArtifact(
 }
 
 async function prepareCandidate(recorder, report, privateDirectory) {
-  const execution = await pinExecutionIdentity(
-    recorder,
-    prepareIsolatedNpx(privateDirectory),
-  );
+  const execution = await pinExecutionIdentity(recorder, prepareIsolatedNpx(privateDirectory));
   verifyLifecycleHostAuthentication(recorder, execution);
   const ghBinary = resolveExecutable("gh");
   const runs = commandJson(
@@ -9841,10 +9776,7 @@ async function prepareCandidate(recorder, report, privateDirectory) {
   ensurePrivateDirectory(artifactDirectory);
   ensurePrivateDirectory(packageDirectory);
   requireEmptyDirectory(artifactDirectory, "Native artifact extraction directory");
-  const rawArtifactPath = join(
-    candidateDirectory,
-    `native-artifact-${pinnedArtifact.id}.zip`,
-  );
+  const rawArtifactPath = join(candidateDirectory, `native-artifact-${pinnedArtifact.id}.zip`);
   const downloaded = await downloadImmutableArtifact(
     recorder,
     ghBinary,
@@ -9856,7 +9788,10 @@ async function prepareCandidate(recorder, report, privateDirectory) {
     downloaded.outputSizeBytes !== pinnedArtifact.sizeBytes ||
     `sha256:${downloaded.outputSha256}` !== pinnedArtifact.digest
   ) {
-    fail("ci-artifact", "the raw artifact ZIP bytes do not match the immutable GitHub digest and size");
+    fail(
+      "ci-artifact",
+      "the raw artifact ZIP bytes do not match the immutable GitHub digest and size",
+    );
   }
   extractVerifiedZip(recorder, rawArtifactPath, artifactDirectory, {
     label: "immutable artifact container",
@@ -9893,7 +9828,10 @@ async function prepareCandidate(recorder, report, privateDirectory) {
     postRunMetadata.run_attempt !== runMetadata.run_attempt ||
     postRunMetadata.workflow_id !== runMetadata.workflow_id
   ) {
-    fail("ci-artifact", "the artifact or workflow-run attempt changed across the download boundary");
+    fail(
+      "ci-artifact",
+      "the artifact or workflow-run attempt changed across the download boundary",
+    );
   }
   const buildSourceReceiptPath = findSingleFile(
     artifactDirectory,
@@ -9993,12 +9931,7 @@ async function prepareCandidate(recorder, report, privateDirectory) {
     { category: "source", failureMessage: "the source changed before npm pack" },
   );
   if (cleanBeforePack.stdout !== "") fail("source", "the source changed before npm pack");
-  const metadata = packSourceNpmCandidate(
-    recorder,
-    execution,
-    ROOT,
-    packageDirectory,
-  );
+  const metadata = packSourceNpmCandidate(recorder, execution, ROOT, packageDirectory);
   const item = Array.isArray(metadata) ? metadata[0] : null;
   validateNpmPackMetadata(item);
   const packageArchive = join(
@@ -10059,10 +9992,6 @@ async function prepareCandidate(recorder, report, privateDirectory) {
       "verify",
       "--host",
       "all",
-      "--asset-claude",
-      assets.claude.archivePath,
-      "--checksum-claude",
-      assets.claude.checksumPath,
       "--asset-codex",
       assets.codex.archivePath,
       "--checksum-codex",
@@ -10193,7 +10122,8 @@ function writeCheckpoint(privateDirectory, checkpoint) {
 }
 
 function transitionCheckpoint(privateDirectory, checkpoint, phase, lastObservedState = null) {
-  if (!CHECKPOINT_PHASES.has(phase)) fail("checkpoint", "an unsupported lifecycle phase was requested");
+  if (!CHECKPOINT_PHASES.has(phase))
+    fail("checkpoint", "an unsupported lifecycle phase was requested");
   checkpoint.phase = phase;
   if (lastObservedState !== null) checkpoint.lastObservedState = lastObservedState;
   writeCheckpoint(privateDirectory, checkpoint);
@@ -10248,12 +10178,7 @@ export function restoreFinalVerificationSnapshot(report, checkpoint) {
 }
 
 function readMachineLeaseCheckpoint(privateDirectory) {
-  requireExactPrivateMode(
-    privateDirectory,
-    "private acceptance directory",
-    "directory",
-    0o700,
-  );
+  requireExactPrivateMode(privateDirectory, "private acceptance directory", "directory", 0o700);
   const checkpointPath = join(privateDirectory, CHECKPOINT_NAME);
   requireExactPrivateMode(checkpointPath, "acceptance checkpoint", "file", 0o600);
   const checkpoint = parseJson(
@@ -10314,16 +10239,16 @@ async function validateCheckpoint(privateDirectory) {
     fail("checkpoint", "the private acceptance checkpoint is missing retry admission state");
   }
   if (!Object.hasOwn(checkpoint.recovery, "reinstallRetryAdmission")) {
-    fail("checkpoint", "the private acceptance checkpoint is missing reinstall retry admission state");
+    fail(
+      "checkpoint",
+      "the private acceptance checkpoint is missing reinstall retry admission state",
+    );
   }
   if (checkpoint.recovery.hostCloseRetryAdmission !== null) {
     const admission = requireHostCloseRetryAdmission(checkpoint, {
       resolved: checkpoint.phase === "purge-retry-in-progress",
     });
-    if (
-      checkpoint.phase === "awaiting-host-close" &&
-      admission.resolvedSnapshot !== null
-    ) {
+    if (checkpoint.phase === "awaiting-host-close" && admission.resolvedSnapshot !== null) {
       fail("checkpoint", "an awaiting host-close checkpoint already consumed its retry admission");
     }
   }
@@ -10405,7 +10330,10 @@ async function validateCheckpoint(privateDirectory) {
   }
   if (
     report?.baseline?.initialState !== checkpoint.baseline.initialState ||
-    !sameStrings(report?.baseline?.installedHosts ?? [], checkpoint.baseline.initialInstalledHosts) ||
+    !sameStrings(
+      report?.baseline?.installedHosts ?? [],
+      checkpoint.baseline.initialInstalledHosts,
+    ) ||
     report?.source?.ci?.runId !== checkpoint.ci.runId ||
     report?.source?.ci?.runAttempt !== checkpoint.ci.runAttempt ||
     report?.source?.ci?.artifact?.id !== checkpoint.ci.artifact.id ||
@@ -10419,7 +10347,7 @@ async function validateCheckpoint(privateDirectory) {
   }
   if (
     JSON.stringify(report?.baseline?.inventory) !==
-      JSON.stringify(checkpoint.baseline.initialInventory)
+    JSON.stringify(checkpoint.baseline.initialInventory)
   ) {
     fail("checkpoint", "the exact categorical baseline inventory changed");
   }
@@ -10470,7 +10398,7 @@ function validateCandidatePaths(privateDirectory, candidate) {
   const npmBinary = realpathSync(candidate.execution.npmBinary);
   const nodeBinary = realpathSync(candidate.execution.nodeBinary);
   const pythonBinary = realpathSync(candidate.execution.pythonBinary);
-  const claudeBinary = realpathSync(candidate.execution.claudeBinary);
+
   const codexBinary = realpathSync(candidate.execution.codexBinary);
   const accountHome = lifecycleAccountHome(candidate.execution);
   const accountUser = validateLifecycleAccountUser(candidate.execution.accountUser);
@@ -10478,14 +10406,13 @@ function validateCandidatePaths(privateDirectory, candidate) {
   accessSync(npmBinary, fsConstants.X_OK);
   accessSync(nodeBinary, fsConstants.X_OK);
   accessSync(pythonBinary, fsConstants.X_OK);
-  accessSync(claudeBinary, fsConstants.X_OK);
+
   accessSync(codexBinary, fsConstants.X_OK);
   if (
     npxBinary !== candidate.execution.npxBinary ||
     npmBinary !== candidate.execution.npmBinary ||
     nodeBinary !== candidate.execution.nodeBinary ||
     pythonBinary !== candidate.execution.pythonBinary ||
-    claudeBinary !== candidate.execution.claudeBinary ||
     codexBinary !== candidate.execution.codexBinary ||
     accountHome !== candidate.execution.accountHome ||
     accountUser !== candidate.execution.accountUser ||
@@ -10493,10 +10420,12 @@ function validateCandidatePaths(privateDirectory, candidate) {
     !statSync(npmBinary).isFile() ||
     !statSync(nodeBinary).isFile() ||
     !statSync(pythonBinary).isFile() ||
-    !statSync(claudeBinary).isFile() ||
     !statSync(codexBinary).isFile()
   ) {
-    fail("npx-isolation", "a pinned Node, Python, npm, npx, or host executable changed or is unsafe");
+    fail(
+      "npx-isolation",
+      "a pinned Node, Python, npm, npx, or host executable changed or is unsafe",
+    );
   }
 }
 
@@ -10509,13 +10438,19 @@ function verifyResumeSource(recorder, report) {
     "Reconfirm clean checkpoint worktree",
     "git",
     ["status", "--porcelain", "--untracked-files=all"],
-    { category: "checkpoint", failureMessage: "the checkpoint worktree could not be reconfirmed" },
+    {
+      category: "checkpoint",
+      failureMessage: "the checkpoint worktree could not be reconfirmed",
+    },
   ).stdout;
   const tree = recorder.run(
     "Reconfirm checkpoint source tree",
     "git",
     ["rev-parse", "HEAD^{tree}"],
-    { category: "checkpoint", failureMessage: "the checkpoint source tree could not be reconfirmed" },
+    {
+      category: "checkpoint",
+      failureMessage: "the checkpoint source tree could not be reconfirmed",
+    },
   ).stdout;
   const pullRequest = commandJson(
     recorder,
@@ -10545,16 +10480,6 @@ function verifyResumeSource(recorder, report) {
   }
 }
 
-function inspectOpenCodeBridgeResidue(paths) {
-  if (paths.bridgeParent === null || !pathPresent(paths.bridgeParent)) return 0;
-  requireCanonicalOwnedEntry(paths.bridgeParent, "OpenCode plugin directory", "directory");
-  return readdirSync(paths.bridgeParent).filter(
-    (name) =>
-      /^\.opensocrates\.js\.(?:staging|backup|removed)-[A-Za-z0-9-]+$/u.test(name) ||
-      /^\.opensocrates-managed\.json\.(?:staging|backup|removed)-[A-Za-z0-9-]+$/u.test(name),
-  ).length;
-}
-
 export function purgeCommandArguments(candidate) {
   return [
     "--yes",
@@ -10576,10 +10501,6 @@ export function installCommandArguments(candidate) {
     "install",
     "--host",
     "all",
-    "--asset-claude",
-    candidate.assets.claude.archivePath,
-    "--checksum-claude",
-    candidate.assets.claude.checksumPath,
     "--asset-codex",
     candidate.assets.codex.archivePath,
     "--checksum-codex",
@@ -10609,7 +10530,10 @@ async function verifyCandidateUnchanged(recorder, candidate) {
     sourceTree: candidate.sourceTree,
   });
   if ((await sha256File(candidate.buildSourceReceiptPath)) !== candidate.buildSourceReceiptSha256) {
-    fail("artifact-integrity", "the package build source receipt changed before lifecycle mutation");
+    fail(
+      "artifact-integrity",
+      "the package build source receipt changed before lifecycle mutation",
+    );
   }
   for (const host of HOSTS) {
     if (
@@ -10624,24 +10548,14 @@ async function verifyCandidateUnchanged(recorder, candidate) {
   }
 }
 
-async function inspectRecoveryState(
-  recorder,
-  targets,
-  candidate,
-  { trustSnapshot = null } = {},
-) {
+async function inspectRecoveryState(recorder, targets, candidate, { trustSnapshot = null } = {}) {
   const launchAgentJob = inspectLaunchAgentJob(recorder);
   const snapshot = exactResidueSnapshot(targets, null, launchAgentJob, trustSnapshot);
   const residue = publicResidueSummary(snapshot);
   const installedHosts = HOSTS.filter((host) => snapshot.hosts[host].managedRootPresent);
   if (installedHosts.length === 0 && filesystemResidueIsEmpty(snapshot)) {
     const registrations = hostRegistrationSnapshot(recorder, targets);
-    const observed = exactResidueSnapshot(
-      targets,
-      registrations,
-      launchAgentJob,
-      trustSnapshot,
-    );
+    const observed = exactResidueSnapshot(targets, registrations, launchAgentJob, trustSnapshot);
     const observedResidue = publicResidueSummary(observed);
     return {
       classification: observedResidue.empty ? "purged_after_failure" : "partial_or_unverified",
@@ -10706,13 +10620,10 @@ async function inspectRecoveryState(
         launchAgentJob.loaded ||
         !missingHostsClean ||
         !nonTargetHostsClean ||
-        !SUPPORTED_HOSTS.every(
-          (host) => snapshot.hosts[host].transactionResidueCount === 0,
-        ) ||
+        !SUPPORTED_HOSTS.every((host) => snapshot.hosts[host].transactionResidueCount === 0) ||
         snapshot.launchAgentTemporaryCount !== 0 ||
         snapshot.codexTrustSectionCount !== 0 ||
         snapshot.trustTransactionResidueCount !== 0 ||
-        snapshot.openCodeBridgeResidueCount !== 0 ||
         snapshot.stateResidue.lifecycleLockPresent ||
         snapshot.stateResidue.temporaryCount !== 0 ||
         snapshot.stateResidue.purgeTombstoneCount !== 0 ||
@@ -10768,11 +10679,7 @@ async function inspectFailureState(recorder, targets, candidate, stage) {
     registrationInspection = "failed";
   }
   try {
-    const snapshot = exactResidueSnapshot(
-      targets,
-      registrations,
-      inspectLaunchAgentJob(recorder),
-    );
+    const snapshot = exactResidueSnapshot(targets, registrations, inspectLaunchAgentJob(recorder));
     return classifyPurgeFailureSnapshot(registrations, snapshot);
   } catch {
     return {
@@ -10874,9 +10781,7 @@ async function purgeExactCandidate(
   { hostCloseRetry = false } = {},
 ) {
   await verifyCandidateUnchanged(recorder, candidate);
-  const operationKey = hostCloseRetry
-    ? "purge-host-close-retry"
-    : "purge-initial";
+  const operationKey = hostCloseRetry ? "purge-host-close-retry" : "purge-initial";
   const existingOperation = inspectLifecycleOperation(privateDirectory, operationKey);
   if (hostCloseRetry) {
     const retryAlreadyWrittenAhead = checkpoint.phase === "purge-retry-in-progress";
@@ -10906,8 +10811,7 @@ async function purgeExactCandidate(
         currentBindings,
       );
       if (
-        JSON.stringify(currentDesiredState) !==
-        JSON.stringify(admission.deactivatedDesiredState)
+        JSON.stringify(currentDesiredState) !== JSON.stringify(admission.deactivatedDesiredState)
       ) {
         fail("recovery", "the deferred desired state changed before the host-close retry");
       }
@@ -10943,7 +10847,7 @@ async function purgeExactCandidate(
   report.mutation.trustResetAttempts += 1;
   const removed = await runPackedNpx(
     recorder,
-    "Purge all hosts and reset exact Codex trust through exact packed npx",
+    "Purge Codex and reset exact Codex trust through exact packed npx",
     candidate,
     purgeCommandArguments(candidate),
     {
@@ -10957,13 +10861,13 @@ async function purgeExactCandidate(
     let snapshot = null;
     try {
       const registrations = hostRegistrationSnapshot(recorder, targets);
-      snapshot = exactResidueSnapshot(
-        targets,
-        registrations,
-        inspectLaunchAgentJob(recorder),
-      );
+      snapshot = exactResidueSnapshot(targets, registrations, inspectLaunchAgentJob(recorder));
     } catch {
-      fail("purge", "the exact packed all-host purge failed with residue that is unsafe to classify", removed.id);
+      fail(
+        "purge",
+        "the exact packed all-host purge failed with residue that is unsafe to classify",
+        removed.id,
+      );
     }
     const liveHosts = Object.entries(snapshot.hosts)
       .filter(([, item]) => item.liveInUse)
@@ -10973,11 +10877,7 @@ async function purgeExactCandidate(
       let deactivatedDesiredState = null;
       try {
         deactivatedDesiredState = inspectDeactivatedDesiredState(targets);
-        assertOnlyRetryableHostCloseResidue(
-          snapshot,
-          liveHosts,
-          deactivatedDesiredState,
-        );
+        assertOnlyRetryableHostCloseResidue(snapshot, liveHosts, deactivatedDesiredState);
       } catch {
         transitionCheckpoint(privateDirectory, checkpoint, "purge-failed", {
           classification: "non_retryable_residue_with_live_cache",
@@ -11044,11 +10944,7 @@ async function purgeExactCandidate(
 function assertZeroResidue(recorder, report, targets, privateDirectory, checkpoint) {
   const registrations = hostRegistrationSnapshot(recorder, targets);
   assertRegistrationState(registrations, "absent");
-  const snapshot = exactResidueSnapshot(
-    targets,
-    registrations,
-    inspectLaunchAgentJob(recorder),
-  );
+  const snapshot = exactResidueSnapshot(targets, registrations, inspectLaunchAgentJob(recorder));
   const summary = publicResidueSummary(snapshot);
   report.assertions.zeroResidue = summary;
   if (!summary.empty) {
@@ -11067,13 +10963,7 @@ function assertZeroResidue(recorder, report, targets, privateDirectory, checkpoi
   return summary;
 }
 
-async function installExactCandidate(
-  recorder,
-  report,
-  candidate,
-  privateDirectory,
-  checkpoint,
-) {
+async function installExactCandidate(recorder, report, candidate, privateDirectory, checkpoint) {
   await verifyCandidateUnchanged(recorder, candidate);
   report.mutation.phase = "reinstall";
   report.mutation.reinstallAttempted = true;
@@ -11085,7 +10975,7 @@ async function installExactCandidate(
   });
   await runPackedNpx(
     recorder,
-    "Reinstall Claude and Codex atomically through exact packed npx",
+    "Reinstall Codex transactionally through exact packed npx",
     candidate,
     installCommandArguments(candidate),
     {
@@ -11093,9 +10983,7 @@ async function installExactCandidate(
       failureMessage: "the exact packed all-host reinstall failed",
       invocationMode: "account-home-lifecycle",
       lifecycleOperationKey:
-        checkpoint.recovery.reinstallRetriesUsed > 0
-          ? "install-retry"
-          : "install-initial",
+        checkpoint.recovery.reinstallRetriesUsed > 0 ? "install-retry" : "install-initial",
       timeout: 600_000,
     },
   );
@@ -11106,13 +10994,7 @@ async function installExactCandidate(
   });
 }
 
-export async function assertFinalInstalled(
-  recorder,
-  report,
-  targets,
-  candidate,
-  privateDirectory,
-) {
+export async function assertFinalInstalled(recorder, report, targets, candidate, privateDirectory) {
   assertVersionTransition(report.baseline);
   // This is deliberately the first Codex process after the installer-owned
   // registration commands. It observes the new/untrusted review state before
@@ -11125,9 +11007,7 @@ export async function assertFinalInstalled(
   const launchAgentJob = inspectLaunchAgentJob(recorder);
   const launchAgentTemporaryCount = inspectLaunchAgentTemporaryResidue(targets.state);
   const trust = inspectCodexTrustSections();
-  const trustTransactionResidueCount = inspectTrustTransactionResidue(
-    targets.codex.hostHome,
-  );
+  const trustTransactionResidueCount = inspectTrustTransactionResidue(targets.codex.hostHome);
   if (
     state.desired?.schema !== DESIRED_STATE_SCHEMA ||
     state.desired?.activeVersion !== PRODUCT_VERSION ||
@@ -11140,17 +11020,14 @@ export async function assertFinalInstalled(
     trust.exactSectionCount !== 0 ||
     trustTransactionResidueCount !== 0
   ) {
-    fail("post-install", "the final desired state is not the exact installed two-host state with updates disabled");
+    fail(
+      "post-install",
+      "the final desired state is not the exact installed two-host state with updates disabled",
+    );
   }
-  const layout = inspectManagedLayout({
-    claude: targets.claude.root,
-    codex: targets.codex.root,
-  });
+  const layout = inspectManagedLayout({ codex: targets.codex.root });
   const nonTargetHosts = assertNonTargetHostsAbsent(targets);
-  const pluginRoots = {
-    claude: resolveInstalledPluginRoot("claude", targets.claude.root),
-    codex: resolveInstalledPluginRoot("codex", targets.codex.root),
-  };
+  const pluginRoots = { codex: resolveInstalledPluginRoot("codex", targets.codex.root) };
   const payloads = {};
   const runtimes = {};
   for (const host of HOSTS) {
@@ -11194,9 +11071,7 @@ export async function assertFinalInstalled(
     status: "pass",
     hardware: "arm64",
     process: process.arch,
-    installed: Object.fromEntries(
-      HOSTS.map((host) => [host, runtimes[host].architectures]),
-    ),
+    installed: Object.fromEntries(HOSTS.map((host) => [host, runtimes[host].architectures])),
   };
   report.assertions.finalPermissions = {
     status: "pass",
@@ -11225,7 +11100,7 @@ export async function assertFinalInstalled(
     sourceCommit: report.source.commit,
     installedHosts: [...HOSTS],
     version: PRODUCT_VERSION,
-    admittedTopology: "claude_and_codex_only; other_supported_hosts_absent",
+    admittedTopology: "codex_only",
     nonTargetHosts,
     previousCacheDataTrustContentRestorationClaimed: false,
   };
@@ -11274,7 +11149,10 @@ export function recoveryPlanForPhase(
   }
   if (phase === "purge-retry-in-progress") {
     if (observedState?.classification !== "purged_after_failure") {
-      fail("recovery", "an interrupted bounded purge retry is observation-only unless already purged");
+      fail(
+        "recovery",
+        "an interrupted bounded purge retry is observation-only unless already purged",
+      );
     }
     return {
       stages: ["clean-assertion", "reinstall", "post-install"],
@@ -11286,7 +11164,10 @@ export function recoveryPlanForPhase(
   }
   if (phase === "awaiting-host-close") {
     if (!hostAppsClosedConfirmed) {
-      fail("host-close-confirmation", "resume requires explicit confirmation that the listed host apps were closed");
+      fail(
+        "host-close-confirmation",
+        "resume requires explicit confirmation that the listed host apps were closed",
+      );
     }
     if (checkpoint.recovery.hostCloseRetriesUsed >= MAX_HOST_CLOSE_RETRIES) {
       fail("purge", "the single bounded host-close retry was already consumed");
@@ -11356,7 +11237,10 @@ export function recoveryPlanForPhase(
   }
   if (phase === "post-install-checks") {
     if (observedState?.classification !== "candidate_installed_unverified") {
-      fail("recovery", "post-install checks can resume only from an exact installed candidate topology");
+      fail(
+        "recovery",
+        "post-install checks can resume only from an exact installed candidate topology",
+      );
     }
     return {
       stages: ["post-install"],
@@ -11367,7 +11251,10 @@ export function recoveryPlanForPhase(
     };
   }
   if (phase === "purge-failed") {
-    fail("recovery", "a non-deferred purge failure is observation-only and requires installer defect review");
+    fail(
+      "recovery",
+      "a non-deferred purge failure is observation-only and requires installer defect review",
+    );
   }
   if (phase === "finalizing") {
     fail("recovery", "interrupted first-review verification cannot be replayed automatically");
@@ -11549,8 +11436,7 @@ export async function runMutation(
   await runtime.verifyCandidateUnchanged(recorder, candidate);
   if (
     checkpoint.phase === "reinstall-failed" &&
-    checkpoint.lastObservedState?.classification ===
-      "atomic_all_host_install_terminal_failed"
+    checkpoint.lastObservedState?.classification === "atomic_all_host_install_terminal_failed"
   ) {
     fail(
       "reinstall",
@@ -11577,7 +11463,7 @@ export async function runMutation(
             : "install-initial"
           : checkpoint.phase === "reinstall-retry-in-progress"
             ? "install-retry"
-          : null;
+            : null;
   const interruptedOperationState =
     interruptedOperationKey === null
       ? null
@@ -11679,9 +11565,7 @@ export async function runMutation(
           }
         : checkpoint.phase === "reinstalling"
           ? {
-              stages: new Set(["none", "prepared"]).has(
-                interruptedOperationState.state,
-              )
+              stages: new Set(["none", "prepared"]).has(interruptedOperationState.state)
                 ? ["clean-assertion", "reinstall", "post-install"]
                 : ["reinstall", "post-install"],
               hostCloseRetry: false,
@@ -11691,9 +11575,7 @@ export async function runMutation(
             }
           : checkpoint.phase === "reinstall-retry-in-progress"
             ? {
-                stages: new Set(["none", "prepared"]).has(
-                  interruptedOperationState.state,
-                )
+                stages: new Set(["none", "prepared"]).has(interruptedOperationState.state)
                   ? ["clean-assertion", "reinstall", "post-install"]
                   : ["reinstall", "post-install"],
                 hostCloseRetry: false,
@@ -11701,24 +11583,16 @@ export async function runMutation(
                 requireOriginalBaseline: false,
                 consumeReinstallRetry: false,
               }
-          : recoveryPlanForPhase(checkpoint, observedState, { hostAppsClosedConfirmed });
+            : recoveryPlanForPhase(checkpoint, observedState, { hostAppsClosedConfirmed });
   if (plan.finalizeOnly) {
     return restoreFinalVerificationSnapshot(report, checkpoint);
   }
   if (plan.requireOriginalBaseline) {
-    await assertOriginalBaselineUnchanged(
-      recorder,
-      targets,
-      checkpoint,
-      runtime.baselineInventory,
-    );
+    await assertOriginalBaselineUnchanged(recorder, targets, checkpoint, runtime.baselineInventory);
   }
   if (plan.consumeReinstallRetry) {
     checkpoint.recovery.reinstallRetriesUsed += 1;
-    checkpoint.recovery.reinstallRetryAdmission = reinstallRetryAdmissionFor(
-      checkpoint,
-      candidate,
-    );
+    checkpoint.recovery.reinstallRetryAdmission = reinstallRetryAdmissionFor(checkpoint, candidate);
     transitionCheckpoint(privateDirectory, checkpoint, "reinstall-retry-in-progress", {
       classification: "atomic_all_host_reinstall_retry_write_ahead",
       operationKey: "install-retry",
@@ -11737,33 +11611,17 @@ export async function runMutation(
       assertClean: () =>
         runtime.assertClean(recorder, report, targets, privateDirectory, checkpoint),
       install: () =>
-        runtime.installCandidate(
-          recorder,
-          report,
-          candidate,
-          privateDirectory,
-          checkpoint,
-        ),
+        runtime.installCandidate(recorder, report, candidate, privateDirectory, checkpoint),
       assertFinal: async () => {
-        const finalizationId = beginFinalizationClaim(
-          privateDirectory,
-          checkpoint,
-          {
-            testId: report.testId,
-            sourceCommit: report.source.commit,
-          },
-        );
+        const finalizationId = beginFinalizationClaim(privateDirectory, checkpoint, {
+          testId: report.testId,
+          sourceCommit: report.source.commit,
+        });
         const finalState = await runFinalVerificationOnce(
           privateDirectory,
           checkpoint,
           () =>
-            runtime.assertFinalInstalled(
-              recorder,
-              report,
-              targets,
-              candidate,
-              privateDirectory,
-            ),
+            runtime.assertFinalInstalled(recorder, report, targets, candidate, privateDirectory),
           {
             testId: report.testId,
             sourceCommit: report.source.commit,
@@ -11772,8 +11630,7 @@ export async function runMutation(
         );
         return finalState;
       },
-      inspectFailure: (stage) =>
-        runtime.inspectFailureState(recorder, targets, candidate, stage),
+      inspectFailure: (stage) => runtime.inspectFailureState(recorder, targets, candidate, stage),
     },
     plan.stages,
   );
@@ -11802,10 +11659,7 @@ export async function runMutation(
     });
     applyMutationOutcome(prospectiveReport, outcome);
     reconcileMutationTelemetry(prospectiveReport, privateDirectory, checkpoint);
-    const finalVerification = makeFinalVerificationSnapshot(
-      prospectiveReport,
-      outcome.finalState,
-    );
+    const finalVerification = makeFinalVerificationSnapshot(prospectiveReport, outcome.finalState);
     const finalizationId = checkpoint.lastObservedState?.finalizationId;
     if (
       checkpoint.phase !== "finalizing" ||
@@ -11821,12 +11675,9 @@ export async function runMutation(
     const priorObservedState = structuredClone(checkpoint.lastObservedState);
     let sealed;
     try {
-      sealed = runtime.sealPublicResult(
-        privateDirectory,
-        prospectiveReport,
-        finalVerification,
-        { finalizationId },
-      );
+      sealed = runtime.sealPublicResult(privateDirectory, prospectiveReport, finalVerification, {
+        finalizationId,
+      });
       if (
         JSON.stringify(sealed.report) !== JSON.stringify(prospectiveReport) ||
         sealed.receipt.finalVerificationSha256 !== finalVerification.sha256 ||
@@ -11932,9 +11783,7 @@ export function applyMutationOutcome(report, outcome) {
 }
 
 function createEvidenceDirectories() {
-  const outputDirectory = realpathSync(
-    mkdtempSync(join(tmpdir(), RESULT_DIRECTORY_PREFIX)),
-  );
+  const outputDirectory = realpathSync(mkdtempSync(join(tmpdir(), RESULT_DIRECTORY_PREFIX)));
   chmodSync(outputDirectory, 0o700);
   ensurePrivateDirectory(PRIVATE_PARENT);
   requireCanonicalOwnedEntry(PRIVATE_PARENT, "private acceptance parent", "directory");
@@ -11958,12 +11807,10 @@ export function persistRun(
     privateValues: [privateDirectory, outputDirectory],
   });
   const updatedAt = new Date().toISOString();
-  const manifest = refreshedPrivateEvidenceManifest(
-    privateDirectory,
-    outputDirectory,
-    report,
-    { updatedAt, resultOverride: true },
-  );
+  const manifest = refreshedPrivateEvidenceManifest(privateDirectory, outputDirectory, report, {
+    updatedAt,
+    resultOverride: true,
+  });
   commitEvidenceTransaction(
     privateDirectory,
     outputDirectory,
@@ -11996,12 +11843,9 @@ export function persistBlockedLifecycleJournalOutcome(
   const state = disposition.state;
   if (
     state.state !== "blocked_unverifiable" ||
-    !new Set([
-      "purge-initial",
-      "purge-host-close-retry",
-      "install-initial",
-      "install-retry",
-    ]).has(state.operationKey) ||
+    !new Set(["purge-initial", "purge-host-close-retry", "install-initial", "install-retry"]).has(
+      state.operationKey,
+    ) ||
     !new Set([1, 2]).has(state.attempt) ||
     !/^[a-f0-9]{64}$/u.test(state.operationSha256 ?? "")
   ) {
@@ -12020,10 +11864,7 @@ export function persistBlockedLifecycleJournalOutcome(
   report.mutation.phase = state.operationKey.startsWith("install-") ? "reinstall" : "purge";
   if (state.operationKey.startsWith("install-")) {
     report.mutation.reinstallAttempted = true;
-    report.mutation.reinstallAttempts = Math.max(
-      report.mutation.reinstallAttempts,
-      state.attempt,
-    );
+    report.mutation.reinstallAttempts = Math.max(report.mutation.reinstallAttempts, state.attempt);
   } else {
     report.mutation.purgeCommandAttempts = Math.max(
       report.mutation.purgeCommandAttempts,
@@ -12034,16 +11875,12 @@ export function persistBlockedLifecycleJournalOutcome(
       state.attempt,
     );
     if (state.operationKey === "purge-host-close-retry") {
-      report.mutation.hostCloseRetriesUsed = Math.max(
-        report.mutation.hostCloseRetriesUsed,
-        1,
-      );
+      report.mutation.hostCloseRetriesUsed = Math.max(report.mutation.hostCloseRetriesUsed, 1);
     }
   }
   report.mutation.lifecycleOutcome = "blocked_unverifiable";
   report.mutation.finalState = "unknown_unverified";
-  report.mutation.nextAction =
-    "manual_observation_only_no_replay_or_acceptance_claim";
+  report.mutation.nextAction = "manual_observation_only_no_replay_or_acceptance_claim";
   report.mutation.originalCacheDataTrustRestorationClaimed = false;
   report.assertions.lifecycleRecovery = {
     classification: "blocked_unverifiable",
@@ -12102,8 +11939,7 @@ export function persistRunAndFinalizeCheckpoint(
       testId: sealed.receipt.testId,
       installedHosts: [...HOSTS],
       sourceCommit: persistedReport.source.commit,
-      finalVerificationSha256:
-        checkpoint.lastObservedState?.finalVerification?.sha256 ?? null,
+      finalVerificationSha256: checkpoint.lastObservedState?.finalVerification?.sha256 ?? null,
       sealedPublicResult: {
         receiptSha256: sealed.receiptSha256,
         sealSha256: sealed.receipt.sealSha256,
@@ -12159,10 +11995,8 @@ async function performLifecycleStep(report, id, label, action) {
       label,
       status,
       durationMs: Date.now() - started,
-      category:
-        outcome.error instanceof AcceptanceError ? outcome.error.category : null,
-      commandId:
-        outcome.error instanceof AcceptanceError ? outcome.error.commandId : null,
+      category: outcome.error instanceof AcceptanceError ? outcome.error.category : null,
+      commandId: outcome.error instanceof AcceptanceError ? outcome.error.commandId : null,
     });
   }
   process.stdout.write(`${status}\n`);
@@ -12176,11 +12010,7 @@ async function runInitialAcceptance() {
   const recorder = new CommandRecorder(privateDirectory, report);
   const targets = defaultTargets();
   const lock = new SingleRunLock(privateDirectory);
-  const machineLease = new MachineAcceptanceLease(
-    PRIVATE_PARENT,
-    privateDirectory,
-    report.testId,
-  );
+  const machineLease = new MachineAcceptanceLease(PRIVATE_PARENT, privateDirectory, report.testId);
   let checkpoint = null;
   let exactBaselineBindings = null;
   let machineLeaseOwned = false;
@@ -12217,12 +12047,7 @@ async function runInitialAcceptance() {
         "Prepare exact-commit npm and successful Native CI inputs",
         () => prepareCandidate(recorder, report, privateDirectory),
       );
-      checkpoint = candidateCheckpoint(
-        outputDirectory,
-        report,
-        candidate,
-        exactBaselineBindings,
-      );
+      checkpoint = candidateCheckpoint(outputDirectory, report, candidate, exactBaselineBindings);
       persistRun(report, outputDirectory, privateDirectory);
       writeCheckpoint(privateDirectory, checkpoint);
       machineLease.bindCheckpoint(checkpoint);
@@ -12232,15 +12057,9 @@ async function runInitialAcceptance() {
         "lifecycle",
         "Run purge, zero-residue assertion, and exact reinstall",
         (lifecycleStep) =>
-          runMutation(
-            recorder,
-            report,
-            targets,
-            candidate,
-            privateDirectory,
-            checkpoint,
-            { lifecycleStep },
-          ),
+          runMutation(recorder, report, targets, candidate, privateDirectory, checkpoint, {
+            lifecycleStep,
+          }),
       );
       if (outcome.reportSealed !== true) applyMutationOutcome(report, outcome);
     } catch (error) {
@@ -12250,8 +12069,7 @@ async function runInitialAcceptance() {
         report.overallResult = "failed";
         report.completedAt = new Date().toISOString();
         const actualStateRecorded =
-          report.mutation.started &&
-          checkpoint?.lastObservedState?.actualStateRecorded === true;
+          report.mutation.started && checkpoint?.lastObservedState?.actualStateRecorded === true;
         report.mutation.lifecycleOutcome = report.mutation.started
           ? actualStateRecorded
             ? "failed_with_actual_state_recorded"
@@ -12277,12 +12095,7 @@ async function runInitialAcceptance() {
         };
       }
     }
-    persistRunAndFinalizeCheckpoint(
-      report,
-      outputDirectory,
-      privateDirectory,
-      checkpoint,
-    );
+    persistRunAndFinalizeCheckpoint(report, outputDirectory, privateDirectory, checkpoint);
     publicStatePersisted = true;
   } finally {
     if (machineLeaseOwned) {
@@ -12347,12 +12160,7 @@ function finalizeSealedCheckpointResume(
   { hostAppsClosedConfirmed = false } = {},
 ) {
   recoverEvidenceTransaction(privateDirectory);
-  requireExactPrivateMode(
-    privateDirectory,
-    "private acceptance directory",
-    "directory",
-    0o700,
-  );
+  requireExactPrivateMode(privateDirectory, "private acceptance directory", "directory", 0o700);
   const checkpointPath = join(privateDirectory, CHECKPOINT_NAME);
   requireExactPrivateMode(checkpointPath, "acceptance checkpoint", "file", 0o600);
   const checkpoint = parseJson(
@@ -12364,10 +12172,7 @@ function finalizeSealedCheckpointResume(
     return null;
   }
   if (hostAppsClosedConfirmed) {
-    fail(
-      "usage",
-      "--confirm-host-apps-closed is not valid for a sealed finalize-only checkpoint",
-    );
+    fail("usage", "--confirm-host-apps-closed is not valid for a sealed finalize-only checkpoint");
   }
   if (
     checkpoint.schema !== CHECKPOINT_SCHEMA ||
@@ -12401,11 +12206,7 @@ function finalizeSealedCheckpointResume(
   ) {
     fail("finalizing", "the sealed result does not bind the checkpoint source commit");
   }
-  validatePrivateEvidenceManifest(
-    privateDirectory,
-    reportDirectory,
-    sealed.report.testId,
-  );
+  validatePrivateEvidenceManifest(privateDirectory, reportDirectory, sealed.report.testId);
   const sealedBinding = {
     receiptSha256: sealed.receiptSha256,
     sealSha256: sealed.receipt.sealSha256,
@@ -12420,8 +12221,7 @@ function finalizeSealedCheckpointResume(
     checkpoint.sourceCommit === sealed.receipt.sourceCommit;
   if (checkpoint.phase === "finalizing") {
     if (
-      observed?.classification !==
-        "candidate_installed_final_verification_in_progress" ||
+      observed?.classification !== "candidate_installed_final_verification_in_progress" ||
       !identityMatches
     ) {
       fail(
@@ -12445,8 +12245,7 @@ function finalizeSealedCheckpointResume(
     if (
       observed?.classification !== "candidate_installed_verified" ||
       !identityMatches ||
-      observed?.finalVerification?.sha256 !==
-        sealed.receipt.finalVerificationSha256 ||
+      observed?.finalVerification?.sha256 !== sealed.receipt.finalVerificationSha256 ||
       binding?.receiptSha256 !== sealedBinding.receiptSha256 ||
       binding?.sealSha256 !== sealedBinding.sealSha256 ||
       binding?.resultJsonSha256 !== sealedBinding.resultJsonSha256
@@ -12505,11 +12304,7 @@ async function resumeAcceptance(
       report = finalized.report;
       reportDirectory = finalized.reportDirectory;
       publicStatePersisted = true;
-      reportRunLocations(
-        finalized.reportDirectory,
-        privateDirectory,
-        finalized.report,
-      );
+      reportRunLocations(finalized.reportDirectory, privateDirectory, finalized.report);
       return {
         report: finalized.report,
         outputDirectory: finalized.reportDirectory,
@@ -12535,7 +12330,10 @@ async function resumeAcceptance(
     }
     assertLifecycleJournalCanResume(privateDirectory);
     if (hostAppsClosedConfirmed && checkpoint.phase !== "awaiting-host-close") {
-      fail("usage", "--confirm-host-apps-closed is valid only for an awaiting-host-close checkpoint");
+      fail(
+        "usage",
+        "--confirm-host-apps-closed is valid only for an awaiting-host-close checkpoint",
+      );
     }
     const recorder = new CommandRecorder(privateDirectory, report);
     const targets = defaultTargets();
@@ -12556,15 +12354,10 @@ async function resumeAcceptance(
         "lifecycle-resume",
         "Resume the existing exact-input lifecycle checkpoint",
         (lifecycleStep) =>
-          runMutation(
-            recorder,
-            report,
-            targets,
-            candidate,
-            privateDirectory,
-            checkpoint,
-            { hostAppsClosedConfirmed, lifecycleStep },
-          ),
+          runMutation(recorder, report, targets, candidate, privateDirectory, checkpoint, {
+            hostAppsClosedConfirmed,
+            lifecycleStep,
+          }),
       );
       if (outcome.reportSealed !== true) applyMutationOutcome(report, outcome);
     } catch (error) {
@@ -12590,12 +12383,7 @@ async function resumeAcceptance(
         commandId: error instanceof AcceptanceError ? error.commandId : null,
       };
     }
-    persistRunAndFinalizeCheckpoint(
-      report,
-      reportDirectory,
-      privateDirectory,
-      checkpoint,
-    );
+    persistRunAndFinalizeCheckpoint(report, reportDirectory, privateDirectory, checkpoint);
     publicStatePersisted = true;
   } finally {
     if (machineLeaseOwned && publicStatePersisted) {
@@ -12705,11 +12493,7 @@ export async function main(args = process.argv.slice(2)) {
       await resumeAcceptance(args[1], { hostAppsClosedConfirmed: true });
     } else if (args[0] === "--bind-recording" && args.length === 4) {
       bindRecordingReceipt(args[1], args[2], args[3]);
-    } else if (
-      args[0] === "--pack" &&
-      args.length === 4 &&
-      args[2] === "--private-evidence"
-    ) {
+    } else if (args[0] === "--pack" && args.length === 4 && args[2] === "--private-evidence") {
       packExisting(args[1], args[3]);
     } else if (
       args[0] === "--cleanup-private" &&

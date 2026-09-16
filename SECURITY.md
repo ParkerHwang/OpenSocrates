@@ -2,146 +2,69 @@
 
 ## Supported versions
 
-Security fixes are provided for the latest `1.x` release. Pre-1.0 builds are
-not supported.
-
-| Version | Supported |
-| --- | --- |
-| 1.x | Yes |
-| < 1.0 | No |
+Security fixes are provided for the latest `1.x` release. OpenSocrates 1.4.0
+supports Codex only. Pre-1.0 builds and retired host integrations are unsupported.
 
 ## Report a vulnerability
 
 Do not publish credentials, private prompts, transcripts, workspace data, or
-exploit details in a public issue.
-
-Use GitHub's
-[private vulnerability reporting](https://github.com/ParkerHwang/OpenSocrates/security/advisories/new)
-to send a confidential report. Include:
-
-- the affected version and platform;
-- the smallest reproducible example;
-- expected and observed impact;
-- whether credentials or private user data may be exposed;
-- any suggested mitigation.
-
-If private reporting is unavailable, open a public issue requesting a private
-contact channel without including vulnerability details.
-
-Reports are reviewed as maintainer capacity allows. Acknowledgement,
-assessment, remediation, and disclosure timing depend on reproducibility,
-severity, and the availability of a safe fix.
+exploit details in a public issue. Use GitHub's
+[private vulnerability reporting](https://github.com/ParkerHwang/OpenSocrates/security/advisories/new).
+Include the affected version and platform, a minimal reproduction, the observed
+impact, whether private user data is exposed, and any suggested mitigation.
+If private reporting is unavailable, request a private contact channel in an
+issue without vulnerability details. Response timing depends on reproducibility,
+severity, safe fixes, and maintainer availability.
 
 ## Security boundary
 
-The v1.3 default Claude/Codex submission entry emits discovery guidance only. It
-selects no initial method, starts no selector model call and creates no grounding
-artifact that an abandoned candidate must read at Stop. The decision command
-loads fixed canonical content, keeps only volatile context-scoped delivery
-identities and agent availability assertions, and never claims applied reasoning
-from an assertion. It does not use CWD-controlled fallback content when its fixed
-package/source content pair is absent. No disk state, raw prompt, conversation,
-reasoning, screenshot, authentication call or telemetry is added by that command.
-The selector and native receipt details below describe retained compatibility
-adapters; they must not be presented as observations made by the new default path.
+The default Codex submission entry emits discovery guidance only. It starts no
+selector-model request and creates no initial method artifact. The decision
+command loads fixed canonical content and retains only volatile, context-scoped
+delivery identities and agent availability assertions. It never treats an agent
+assertion as proof of applied reasoning. Missing fixed package/source content
+does not authorize a CWD-controlled fallback. This command adds no disk state,
+raw prompt logging, conversation retention, screenshot capture, authentication
+call, or telemetry.
 
-OpenSocrates 1.x:
+The retained legacy Codex selector is a separate compatibility path. It uses the
+pinned SDK and existing Codex authentication in an isolated worker, with bounded
+read-only context access, disabled recursive hooks/plugins, a deadline, and
+fail-open cleanup. Its temporary method artifacts contain authored content only.
+A native read receipt is limited to the supported callback and exact artifact;
+it cannot prove model understanding, method application, or improved answers.
+Legacy SDK credential-copy and POSIX context access are unavailable on Windows.
 
-- runs its integration locally through Claude or Codex and uses the user's
-  existing host login;
-- does not require or store an Anthropic or OpenAI API key;
-- does not host an OpenSocrates backend or add telemetry;
-- verifies downloadable packages with SHA-256 release and package manifests;
-- keeps cross-host activation transactional and restores prior managed
-  registrations when a coordinated activation fails;
-- leaves scheduled updates disabled until explicitly enabled and stores only
-  owner-readable desired state, a single-instance lock, and content-free update
-  receipts;
-- fails open when the selector cannot safely complete.
+OpenSocrates has no backend, telemetry, separate account, or API-key requirement.
+Ordinary model requests remain subject to Codex service terms. Host-managed policy
+and hook approvals remain part of the host trust boundary. Installation and
+synthetic fixtures do not establish live hook delivery.
 
-The installed `diagnose` command verifies the exact package inventory against
-`checksums.sha256` and validates release-manifest identity for the running
-version, host, and content revision. A mismatch is reported explicitly. These
-files are not signed, so this is local integrity and damage detection, not an
-authenticity guarantee against an attacker able to replace the complete
-package and its checksum metadata.
+Release and package SHA-256 inventories detect corruption and enforce complete
+closed payloads. `diagnose` checks the installed package against its manifest.
+Unsigned checksums cannot authenticate bytes against an attacker who can replace
+both the payload and its metadata. Release publication requires exact source
+identity, verified asset transport, and immutable GitHub releases.
 
-The Claude selector runs a bounded, non-persistent `claude --safe-mode -p`
-process. Safe mode disables user, project, and plugin customizations, and
-OpenSocrates additionally passes `--tools ""`, `--disallowedTools "mcp__*"`, and
-`--strict-mcp-config` so no built-in or MCP tool remains. It receives the current
-prompt and authored selection catalog only. The process uses the user's Claude
-login, so model requests remain subject to Anthropic's service and data-handling
-terms. The Codex selector uses the pinned Codex SDK and existing OAuth session in
-its own isolated worker.
+The installer validates managed-path ownership and preserves unrelated files.
+Installation and removal are transactional; a failed activation restores verified
+prior state. If rollback cannot safely restore a backup, it preserves the backup
+and reports its exact recovery path. Purge refuses unknown, changed, linked, or
+in-use payloads. Codex trust is preserved unless the explicit `--reset-trust`
+option requests removal of the seven exact OpenSocrates trust entries through a
+validated transactional configuration update. Conversation history is preserved.
+Retired-host installation state must be cleaned up with the installer version
+that owned it; 1.4.0 does not reinterpret it as Codex state.
 
-The selector environment is default-deny. `CLAUDE_CONFIG_DIR` is one of the
-small set of allowed path variables because the child needs it to locate the
-user's existing Claude login when a non-default config directory is in use.
-OpenSocrates does not copy, inspect, or log credentials from that directory.
+The optional macOS LaunchAgent uses the verified installer and the selected npm
+channel. It does not read or terminate active Codex sessions. Its owner-only
+receipt contains version, timestamp, host result, and an error category, without
+prompts, transcripts, credentials, workspace paths, or raw errors. Automatic
+updates and automatic major upgrades are opt-in. Windows scheduled updates are
+unavailable; use manual updates.
 
-For fail-open diagnosis, each Claude selector attempt increments one
-owner-only local aggregate under a closed nine-label vocabulary. The aggregate
-stores counts only: it has no timestamp, prompt, transcript, session or turn
-identifier, path, model output, credential, or reasoning. It is shown by the
-local `diagnose` command and is never transmitted.
-An unreadable aggregate is reported as `unavailable`, never as zero observed
-attempts. The next valid selector outcome atomically replaces only a malformed
-current-schema aggregate with a fresh bounded count document; an unknown future
-schema is preserved. Rejected malformed bytes are never copied into another
-file.
-
-Managed policy settings are part of the host trust boundary and are not disabled.
-Anthropic's [CLI reference](https://code.claude.com/docs/en/cli-reference) states
-that under `--safe-mode` "managed settings policy still applies, including
-policy-configured hooks". Consequences on an organization-managed machine:
-
-- a managed `UserPromptSubmit` hook executes inside the selector process,
-  receives the current prompt on standard input, and can return
-  `additionalContext` that enters selection;
-- managed plugins, managed skills, managed `CLAUDE.md`, and policy-configured
-  MCP servers do not load.
-
-OpenSocrates does not detect or override managed policy. Selection remains
-bounded regardless: the model's returned instruction text is discarded, and only
-authored catalog content assembled by OpenSocrates is ever injected. Operators
-who cannot accept managed-hook visibility of the selector prompt should not
-enable OpenSocrates selection on those machines.
-
-On Claude surfaces that deliver the packaged hooks, the grounding gate observes
-only successful `Read` callbacks for the current turn's exact instruction file.
-It transiently checks that the response reached an authored terminal marker and
-does not retain the response. The owner-only authenticated receipt stores only
-the artifact digest, content revision, selected method IDs, and keyed
-authentication/tool-use tags; prompts, transcripts, raw tool output,
-credentials, workspace paths, and artifact paths are excluded. `Stop` removes
-the receipt with the turn artifact. If `Stop` is absent, the next
-`UserPromptSubmit` in that session removes prior prompt trees without touching
-the new active tree. `SessionEnd` remains the session backstop, and the
-24-hour `SessionStart` sweep covers crash leftovers when neither event arrives.
-
-The gate's scope is deliberate and worth stating plainly. It establishes that a
-successful `Read` callback naming the exact current-turn artifact returned
-content reaching the authored terminal marker. It does not cryptographically
-prove that every artifact byte was returned: a synthetic payload carrying only
-the marker would satisfy the marker test. That is not reachable by the model,
-which does not author `tool_response`, and the marker is the artifact's last
-line, so a truncated read loses it. Anything able to forge that callback already
-controls the hook's standard input and is outside the boundary this gate
-defends. The gate raises the cost of an ungrounded answer; it is not a proof of
-delivery, and it fails open by design.
-
-The optional macOS LaunchAgent invokes the selected published npm channel and
-then uses the same verified installer path as a manual update. It does not read
-or terminate active Claude or Codex sessions. Its receipt contains only the
-checked version, timestamp, per-host result, and an error category; prompts,
-transcripts, workspace paths, credentials, and raw error output are excluded.
-Automatic major-version upgrades are disabled unless the user explicitly
-changes that policy.
-
-Installer rollback mutates only its owner-marked managed marketplace root. If
-the failed root cannot be removed and the previous backup therefore cannot be
-renamed into place, the installer preserves that backup and prints quoted,
-executable recovery commands naming only those two managed paths.
-
-Signing, notarization, separate clean-machine installation, Windows ARM64 and live delivery on every host surface are not claimed as validated. The macOS archive retains `bin/launch.sh` and its darwin-arm64 boundary. The v1.4.0 Windows x64 candidate uses `node bin/launch.mjs` and a bundled executable. It validates real owner/DACL permissions and Windows archive path rules. Legacy SDK credential-copy and POSIX on-demand context access remain unavailable on Windows; decision-point retrieval does not require either. Scheduled updates on Windows return an explicit manual-update instruction. See [Windows support](docs/windows-support.md) for the measured boundary.
+Windows x64 packages use real owner/DACL checks, binary I/O, file locks, and ZIP
+path validation. Signing, notarization, SmartScreen reputation, Windows ARM64,
+and separate clean-machine or GUI behavior are not inferred from package tests.
+See [Windows support](docs/windows-support.md) and the version-specific release
+record for measured evidence.

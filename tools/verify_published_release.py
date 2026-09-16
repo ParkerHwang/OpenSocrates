@@ -13,19 +13,16 @@ from typing import Any
 
 from release_identity import remote_tag_commit
 
-HOSTS = ("antigravity", "claude", "codex", "cursor", "grok", "opencode")
+HOSTS = ("codex",)
 
 
 def expected_asset_names(version: str) -> set[str]:
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
         raise ValueError("invalid release version")
     zips = {f"opensocrates-{version}-{host}-plugin.zip" for host in HOSTS}
-    zips.add(f"opensocrates-{version}-claude-chat-skills.zip")
     windows = tuple(map(int, version.split("."))) >= (1, 4, 0)
     if windows:
-        zips.update(
-            f"opensocrates-{version}-{host}-plugin-windows-x64.zip" for host in ("claude", "codex")
-        )
+        zips.update(f"opensocrates-{version}-{host}-plugin-windows-x64.zip" for host in ("codex",))
     return (
         ({"windows.ps1"} if windows else set())
         | zips

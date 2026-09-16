@@ -16,7 +16,7 @@ from ..version import CONTENT_REVISION, PRODUCT_VERSION
 _CHECKSUMS_FILENAME = "checksums.sha256"
 _RELEASE_MANIFEST_FILENAME = "release-manifest.json"
 _RELEASE_MANIFEST_SCHEMA = "opensocrates.plugin-release-manifest/1.0.0"
-_HOSTS = frozenset({"claude", "codex"})
+_HOSTS = frozenset({"codex"})
 _CHECKSUM_LINE = re.compile(r"^([0-9a-f]{64})  ([^\x00\r\n]+)$")
 _MAX_ANCESTORS = 8
 _MAX_MANIFEST_BYTES = 8 * 1024 * 1024

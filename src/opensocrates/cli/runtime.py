@@ -37,7 +37,6 @@ from ..persistence import (
 )
 from ..rendering.messages import LocaleCatalog
 from ..selector import InstructionFileStore, SelectorApplication, SelectorConfig
-from ..selector.claude_cli import ClaudeCliReasoningSelector
 from ..selector.sdk import CodexReasoningSelector
 
 DEFAULT_BUNDLE_FILENAME = "compiled-content.bundle.json"
@@ -264,7 +263,6 @@ class RuntimeServices:
     selector_config: SelectorConfig | None = None
     instruction_file_store: InstructionFileStore | None = None
     codex_reasoning_selector: CodexReasoningSelector | None = None
-    claude_reasoning_selector: ClaudeCliReasoningSelector | None = None
     selector_application: SelectorApplication | None = None
     adapters: dict[str, Any] | None = None
     capability_profiles: dict[str, CapabilityProfile] | None = None
@@ -289,37 +287,10 @@ class RuntimeServices:
             return None
         return dict(value) if isinstance(value, dict) else None
 
-    def flush_selector_outcomes(self) -> None:
-        """Persist the current process's new Claude selector labels once."""
-
-        selector = self.claude_reasoning_selector
-        reader = getattr(selector, "outcome_counts", None)
-        writer = getattr(self.selector_outcome_store, "increment", None)
-        if not callable(reader) or not callable(writer):
-            return
-        try:
-            current = reader()
-            if not isinstance(current, dict):
-                return
-            delta = {
-                str(label): max(0, int(count) - self._selector_outcome_baseline.get(str(label), 0))
-                for label, count in current.items()
-                if isinstance(label, str) and isinstance(count, int) and not isinstance(count, bool)
-            }
-            self._selector_outcome_baseline = {
-                str(label): int(count)
-                for label, count in current.items()
-                if isinstance(label, str) and isinstance(count, int) and not isinstance(count, bool)
-            }
-            if any(delta.values()):
-                writer(delta)
-        except Exception:
-            return
-
     def close(self) -> None:
         """Best-effort terminal cancellation for selector workers owned by this runtime."""
 
-        for selector in (self.codex_reasoning_selector, self.claude_reasoning_selector):
+        for selector in (self.codex_reasoning_selector,):
             if selector is None:
                 continue
             try:
@@ -334,25 +305,9 @@ class RuntimeServices:
 
 def _profiles() -> dict[str, CapabilityProfile]:
     from ..domain.enums import HostId
-    from ..hosts.antigravity.capability import (
-        default_capability_profile as antigravity_profile,
-    )
-    from ..hosts.claude.capability import default_capability_profile as claude_profile
-    from ..hosts.codex.capability import default_capability_profile as codex_profile
-    from ..hosts.cursor.capability import default_capability_profile as cursor_profile
-    from ..hosts.grok.capability import default_capability_profile as grok_profile
-    from ..hosts.opencode.capability import default_capability_profile as opencode_profile
-    from ..hosts.prompt_only.capability import default_capability_profile as prompt_profile
+    from ..hosts.codex.capability import default_capability_profile
 
-    return {
-        "antigravity": antigravity_profile(),
-        "claude": claude_profile(HostId.CLAUDE_CODE),
-        "codex": codex_profile(HostId.CODEX_CLI),
-        "cursor": cursor_profile(),
-        "grok": grok_profile(),
-        "opencode": opencode_profile(),
-        "prompt_only": prompt_profile(host=HostId.PROMPT_ONLY),
-    }
+    return {"codex": default_capability_profile(HostId.CODEX_CLI)}
 
 
 def _compose_codex_selector(
@@ -385,42 +340,12 @@ def _compose_codex_selector(
     return projections, assembler, selector, application
 
 
-def _compose_claude_selector(
-    *,
-    reasoning_content_path: Path,
-    instruction_file_store: InstructionFileStore | None,
-    config: SelectorConfig,
-) -> tuple[
-    Any | None,
-    ProjectionInstructionAssembler | None,
-    ClaudeCliReasoningSelector | None,
-    SelectorApplication | None,
-]:
-    """Compose the fail-open Claude Code CLI selector dependency graph."""
-
-    if instruction_file_store is None:
-        return None, None, None, None
-    try:
-        projections = load_reasoning_content_projections(reasoning_content_path)
-        assembler = ProjectionInstructionAssembler(projections)
-        selector = ClaudeCliReasoningSelector(projections.selection_catalog)
-        application = SelectorApplication(
-            selector=selector,
-            assembler=assembler,
-            config=config,
-            artifact_store=instruction_file_store,
-        )
-    except Exception:
-        return None, None, None, None
-    return projections, assembler, selector, application
-
-
 def _build_decision_hook_services(
     *, host: str | None, workspace: str | Path | None, data_root: DataRoot | None
 ) -> RuntimeServices:
     """Discovery plus cleanup of existing artifacts; no new product state or content load."""
 
-    if host not in {"claude", "codex"}:
+    if host not in {"codex"}:
         raise ValueError("decision hooks require a native host")
     from ..persistence.paths import DataRootLayout, resolve_data_root
     from ..persistence.turn_store import load_existing_installation_key
@@ -435,7 +360,7 @@ def _build_decision_hook_services(
         key = load_existing_installation_key(layout)
         store = InstructionFileStore(
             installation_key=key,
-            workspace=Path(workspace) if host == "claude" and workspace is not None else None,
+            workspace=None,
         )
         store.sweep_expired()
     except Exception:
@@ -461,6 +386,8 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
 ) -> RuntimeServices:
     """Build the normal packaged composition, degrading store failures safely."""
 
+    if host is not None and host != "codex":
+        raise ValueError("only Codex is supported")
     if hook_only:
         if not decision_point_mode:
             raise ValueError("hook-only composition requires decision-point mode")
@@ -522,23 +449,15 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
     projection_instruction_assembler: ProjectionInstructionAssembler | None = None
     instruction_file_store: InstructionFileStore | None = None
     codex_reasoning_selector: CodexReasoningSelector | None = None
-    claude_reasoning_selector: ClaudeCliReasoningSelector | None = None
     selector_application: SelectorApplication | None = None
-    if host in {"claude", "codex"}:
+    if host in {"codex"}:
         try:
             selector_config = _selector_config_from_environment()
-            if host == "claude":
-                selector_config = SelectorConfig(
-                    deadline_seconds=selector_config.deadline_seconds,
-                    transcript_access_enabled=False,
-                )
             installation_key = getattr(turn_store, "installation_key", None)
             if isinstance(installation_key, bytes) and len(installation_key) == 32:
                 instruction_file_store = InstructionFileStore(
                     installation_key=installation_key,
-                    workspace=Path(workspace)
-                    if host == "claude" and workspace is not None
-                    else None,
+                    workspace=None,
                 )
                 instruction_file_store.sweep_expired()
             if host == "codex" and not decision_point_mode:
@@ -548,17 +467,6 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
                     codex_reasoning_selector,
                     selector_application,
                 ) = _compose_codex_selector(
-                    reasoning_content_path=selected_reasoning_content_path,
-                    instruction_file_store=instruction_file_store,
-                    config=selector_config,
-                )
-            elif host == "claude" and not decision_point_mode:
-                (
-                    reasoning_content_projections,
-                    projection_instruction_assembler,
-                    claude_reasoning_selector,
-                    selector_application,
-                ) = _compose_claude_selector(
                     reasoning_content_path=selected_reasoning_content_path,
                     instruction_file_store=instruction_file_store,
                     config=selector_config,
@@ -597,15 +505,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
             dispatcher = None
 
     adapters: dict[str, Any] = {}
-    for name in (
-        "antigravity",
-        "claude",
-        "codex",
-        "cursor",
-        "grok",
-        "opencode",
-        "prompt_only",
-    ):
+    for name in ("codex",):
         try:
             adapters[name] = build_adapter(
                 name,
@@ -623,8 +523,8 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
                 # selector-only path even when it is not the selected host, so
                 # a mis-wired caller can never fall through to the legacy
                 # projection path that handles prompt, path, and model data.
-                selector_mode=name in {"claude", "codex"},
-                decision_point_mode=decision_point_mode and name in {"claude", "codex"},
+                selector_mode=name in {"codex"},
+                decision_point_mode=decision_point_mode and name in {"codex"},
                 selector_application=selector_application if name == host else None,
                 selector_config=selector_config if name == host else None,
                 instruction_file_store=instruction_file_store if name == host else None,
@@ -654,7 +554,6 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
         selector_config=selector_config,
         instruction_file_store=instruction_file_store,
         codex_reasoning_selector=codex_reasoning_selector,
-        claude_reasoning_selector=claude_reasoning_selector,
         selector_application=selector_application,
         adapters=adapters,
         capability_profiles=profiles,

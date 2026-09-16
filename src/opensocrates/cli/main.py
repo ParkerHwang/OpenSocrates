@@ -33,20 +33,12 @@ def _parser() -> argparse.ArgumentParser:
     control = sub.add_parser("control", help="apply one bounded host control")
     control_sub = control.add_subparsers(dest="control_command", required=True)
     apply = control_sub.add_parser("apply", help="apply a typed control from stdin")
-    apply.add_argument("--host", choices=("claude", "codex"), required=True)
+    apply.add_argument("--host", choices=("codex",), required=True)
 
     diagnose = sub.add_parser("diagnose", help="show safe runtime aggregates")
     diagnose.add_argument(
         "--host",
-        choices=(
-            "antigravity",
-            "claude",
-            "codex",
-            "cursor",
-            "grok",
-            "opencode",
-            "prompt_only",
-        ),
+        choices=("codex",),
     )
     output = diagnose.add_mutually_exclusive_group()
     output.add_argument("--json", action="store_const", const="json", dest="output")
@@ -88,15 +80,7 @@ def _parser() -> argparse.ArgumentParser:
         command = capabilities_sub.add_parser(name)
         command.add_argument(
             "--host",
-            choices=(
-                "antigravity",
-                "claude",
-                "codex",
-                "cursor",
-                "grok",
-                "opencode",
-                "prompt_only",
-            ),
+            choices=("codex",),
             required=True,
         )
 
@@ -116,9 +100,9 @@ def _parser() -> argparse.ArgumentParser:
 def _normalize_control(argv: list[str]) -> list[str]:
     if not argv or argv[0] != "control":
         return argv
-    if len(argv) >= 2 and argv[1] in {"claude", "codex"}:
+    if len(argv) >= 2 and argv[1] in {"codex"}:
         return ["control", "apply", "--host", argv[1], *argv[2:]]
-    if len(argv) >= 3 and argv[1] == "--host" and argv[2] in {"claude", "codex"}:
+    if len(argv) >= 3 and argv[1] == "--host" and argv[2] in {"codex"}:
         return ["control", "apply", "--host", argv[2], *argv[3:]]
     return argv
 

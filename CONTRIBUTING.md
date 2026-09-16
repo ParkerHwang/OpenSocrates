@@ -44,13 +44,10 @@ Node.js 20 or later is also required when changing the GitHub/npx installer.
   method's `content_revision`. Generated procedures plus `source_tree_hash` and
   `normalized_semantic_hash` bind the overlay into package identity.
 - Canonical schemas belong under `schemas/source/`.
-- Host package templates belong under `plugin-src/antigravity/`,
-  `plugin-src/claude/`, `plugin-src/codex/`, `plugin-src/cursor/`,
-  `plugin-src/grok/`, and `plugin-src/opencode/`. A controller, teacher-question,
-  procedure, grounding, or package-wording change must be reviewed across all
-  six trees. Preserve each host's delivery model: only Claude/Codex claim hidden
-  trusted hook context; Antigravity/Cursor/Grok are skill/content paths; OpenCode
-  injects one compiled procedure and uses the same procedure for native fallback.
+- Codex package templates belong under `plugin-src/codex/`. Review controller,
+  teacher-question, procedure, grounding, and wording changes across the Codex
+  package and its English/Korean canonical references. Only Codex is supported.
+  Codex uses hidden trusted hook context only after the host trust flow.
 - Do not edit generated files in `schemas/v1/`,
   `content/compiled-*.json`, `build/`, or `dist/` by hand.
 - Keep English and Korean user-facing documentation semantically aligned.
@@ -97,7 +94,7 @@ contract are documented in [docs/codex-session-start-timing.md](docs/codex-sessi
 Release candidates that change installation or host packaging should also use
 the [clean-machine acceptance procedure](docs/clean-machine-acceptance.md) on a
 separate Mac and attach its privacy-safe result bundle to the pull request.
-For a previously used Mac that begins with the exact supported Claude and Codex
+For a previously used Mac that begins with the exact supported Codex
 installation, use the separate
 [purge and reinstall acceptance procedure](docs/reinstall-cycle-acceptance.md).
 Its result is `purged_same_machine`, never clean-machine evidence.

@@ -29,28 +29,17 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from claude_chat_evidence import EXPORT_ONLY_SCHEMA, evidence_path, validation_errors
 from measure_codex_hook_timing import PROCESS_MODEL, SESSION_START_SOURCES
 
 SCHEMA = "opensocrates.release-check-evidence/1.0.0"
-HOSTS = ("antigravity", "claude", "codex", "cursor", "grok", "opencode")
-RUNTIME_HOSTS = ("claude", "codex")
-# Grok ships content only. OpenCode additionally ships an owned plugin bridge,
-# so it is not content-only, but it still carries no native runtime payload.
-CONTENT_ONLY_HOSTS = frozenset({"antigravity", "cursor", "grok"})
-NO_NATIVE_RUNTIME_HOSTS = CONTENT_ONLY_HOSTS | frozenset({"opencode"})
-GROK_LIVE_PROBE_STATUS = (
-    "native_skill_headless_verified; explicit_headless_verified; "
-    "tui_hook_execution_verified; plugin_hooks_unavailable"
-)
-OPENCODE_LIVE_PROBE_STATUS = "validated_same_turn_run_and_tui_opencode_1.18.18"
+HOSTS = ("codex",)
+RUNTIME_HOSTS = ("codex",)
 
 
-def _live_host_probe_status(*, opencode_validated: bool) -> dict[str, str]:
+def _live_host_probe_status() -> dict[str, str]:
     """Per-host live probe status, each host tied to its own recorded evidence."""
 
-    # Historical Grok/OpenCode probes do not validate the changed v1.3 delivery path.
-    # Their source evidence remains intact, but no current-candidate live parity is claimed.
+    # A packaged build does not establish live host delivery.
     return {host: "unvalidated_current_candidate" for host in HOSTS}
 
 
@@ -72,28 +61,6 @@ RUNTIME_NOTICE_REQUIRED_TOKENS = frozenset(
         "sbom",
         "license",
     }
-)
-CLAUDE_RUNTIME_NOTICE_REQUIRED_TOKENS = frozenset(
-    {
-        "claude code cli",
-        "excludes the openai codex sdk",
-        "pydantic",
-        "sbom",
-        "license",
-    }
-)
-# Cowork documents these limits in decimal MB.  Use the conservative byte
-# interpretation until the product exposes an exact binary-unit contract.
-CLAUDE_ARCHIVE_COMPRESSED_LIMIT_BYTES = 50_000_000
-CLAUDE_ARCHIVE_UNCOMPRESSED_LIMIT_BYTES = 200_000_000
-CLAUDE_PLUGIN_RENDER_PROFILE = "plugin"
-CLAUDE_CHAT_RENDER_PROFILE = "chat-standalone"
-CLAUDE_PLUGIN_INVOCATION_MARKER = (
-    "`/opensocrates:opensocrates` is the canonical explicit invocation for this "
-    "Claude Code/Cowork plugin skill."
-)
-CLAUDE_CHAT_INVOCATION_MARKER = (
-    "`/opensocrates` is the canonical explicit invocation for this standalone Claude Chat skill."
 )
 _SAFE_ENVIRONMENT = {
     "PATH",
@@ -871,7 +838,7 @@ def _runtime_build(  # noqa: C901  # Explicit host release build validation.
             host,
             "--smoke-test",
             "--measure-runs",
-            "20" if host == "codex" else "10",
+            ("20"),
             "--report",
             f"build/evidence/runtime-build-{host}.json",
         ],
@@ -995,45 +962,6 @@ def _codex_session_start_timing(root: Path) -> dict[str, Any]:
     return dict(report)
 
 
-def _build_claude_chat_skills(root: Path) -> Path:
-    """Render the standalone profile into the single-root Chat upload shape."""
-
-    destination = root / "dist" / "claude-chat-skills"
-    if destination.exists():
-        _safe_remove(destination, root / "dist")
-    with tempfile.TemporaryDirectory(prefix="opensocrates-claude-chat-render-") as directory:
-        temporary = Path(directory)
-        source = temporary / "generated"
-        result = _run(
-            [
-                str(root / "tools" / "build_plugins.py"),
-                "--root",
-                str(root),
-                "--host",
-                "claude",
-                "--render-profile",
-                CLAUDE_CHAT_RENDER_PROFILE,
-                "--runtime-root",
-                str(temporary / "runtime-not-shipped"),
-                "--output",
-                str(source),
-            ],
-            root,
-            interpreter=sys.executable,
-            timeout=300.0,
-        )
-        if result.status != "pass":
-            raise ReleaseCheckError(f"claude_chat_generation_{result.code}")
-        source_skill = source / "skills" / "opensocrates"
-        if not (source_skill / "SKILL.md").is_file():
-            raise ReleaseCheckError("claude_chat_source_missing")
-        destination.mkdir(parents=True)
-        skill_root = destination / "opensocrates"
-        shutil.copytree(source_skill, skill_root, symlinks=False)
-    shutil.copy2(root / "LICENSE", skill_root / "LICENSE", follow_symlinks=False)
-    return destination
-
-
 def _write_package_checksums(directory: Path) -> Path:
     destination = directory / "checksums.sha256"
     rows: list[str] = []
@@ -1146,7 +1074,6 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
     _generate_plugins(root)
     _copy_packages(root)
     dist = root / "dist"
-    claude_chat_package = _build_claude_chat_skills(root)
     package_checksums = {host: _write_package_checksums(dist / host) for host in HOSTS}
     # This is the first process execution from the final Codex package path.
     # Runtime version validation happens later in _full_check.
@@ -1156,8 +1083,6 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
         archive = dist / f"opensocrates-{version}-{host}-plugin.zip"
         _write_deterministic_zip(dist / host, archive)
         archives[host] = archive
-    claude_chat_archive = dist / f"opensocrates-{version}-claude-chat-skills.zip"
-    _write_deterministic_zip(claude_chat_package, claude_chat_archive)
     runtime_artifacts = {host: str(runtime_reports[host]["artifact"]) for host in RUNTIME_HOSTS}
     sbom_arguments = [
         str(root / "tools" / "build_sbom.py"),
@@ -1176,7 +1101,6 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
         sbom_arguments.extend(["--artifact", runtime_artifacts[host]])
     for host in HOSTS:
         sbom_arguments.extend(["--artifact", _relative(root, archives[host])])
-    sbom_arguments.extend(["--artifact", _relative(root, claude_chat_archive)])
     sbom_result = _run(sbom_arguments, root, interpreter=sys.executable, timeout=300.0)
     if sbom_result.status != "pass":
         raise ReleaseCheckError(f"sbom_generation_{sbom_result.code}")
@@ -1185,10 +1109,7 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
         raise ReleaseCheckError("sbom_artifact_missing")
     sbom_destination = dist / f"opensocrates-{version}-sbom.spdx.json"
     sbom_destination.write_bytes(sbom_source.read_bytes())
-    opencode_evidence = _opencode_compatibility_evidence(root)
-    live_host_probe_status = _live_host_probe_status(
-        opencode_validated=opencode_evidence["status"] == "pass"
-    )
+    live_host_probe_status = _live_host_probe_status()
     limitations = {
         "schema": "opensocrates.limitations/1.0.0",
         "product_version": version,
@@ -1232,23 +1153,14 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
         "hosts": {
             host: {
                 "package_tree": host,
-                "release_targets": [] if host in NO_NATIVE_RUNTIME_HOSTS else [RELEASE_TARGET],
-                "launchers": [] if host in NO_NATIVE_RUNTIME_HOSTS else RELEASE_LAUNCHERS,
+                "release_targets": ([RELEASE_TARGET]),
+                "launchers": (RELEASE_LAUNCHERS),
                 "package_file_count": len(_snapshot(dist / host)),
                 "package_checksum_file": package_checksums[host].relative_to(dist).as_posix(),
                 "archive": archives[host].relative_to(dist).as_posix(),
                 "archive_sha256": f"sha256:{_sha256(archives[host])}",
             }
             for host in HOSTS
-        },
-        "portable_plugins": {
-            "claude_chat_skills": {
-                "package_tree": claude_chat_package.relative_to(dist).as_posix(),
-                "package_file_count": len(_snapshot(claude_chat_package)),
-                "archive": claude_chat_archive.relative_to(dist).as_posix(),
-                "archive_sha256": f"sha256:{_sha256(claude_chat_archive)}",
-                "automatic_hooks": False,
-            }
         },
         "sbom": {
             "path": sbom_destination.relative_to(dist).as_posix(),
@@ -1287,10 +1199,6 @@ def _assemble(  # noqa: C901  # Explicit runtime/content-only release assembly.
             }
             for host in HOSTS
         },
-        "claude_chat_skills": {
-            "package_file_count": len(_snapshot(claude_chat_package)),
-            "archive": claude_chat_archive.relative_to(dist).as_posix(),
-        },
         "sbom": sbom_destination.relative_to(dist).as_posix(),
         "checksums": root_checksums.relative_to(dist).as_posix(),
         "limitations": limitations_path.relative_to(dist).as_posix(),
@@ -1308,8 +1216,8 @@ def _verify_release_manifest(root: Path, host: str, bundle: Mapping[str, Any]) -
         }
     if metadata.get("product_version") != bundle.get("product_version"):
         errors.add("manifest_version_mismatch")
-    expected_targets = [] if host in NO_NATIVE_RUNTIME_HOSTS else [RELEASE_TARGET]
-    expected_launchers = [] if host in NO_NATIVE_RUNTIME_HOSTS else RELEASE_LAUNCHERS
+    expected_targets = [RELEASE_TARGET]
+    expected_launchers = RELEASE_LAUNCHERS
     if metadata.get("release_targets") != expected_targets:
         errors.add("manifest_release_targets_invalid")
     if metadata.get("launchers") != expected_launchers:
@@ -1321,8 +1229,7 @@ def _verify_release_manifest(root: Path, host: str, bundle: Mapping[str, Any]) -
         "method_ids"
     ) != bundle.get("method_ids"):
         errors.add("manifest_method_set_mismatch")
-    if host == "claude" and metadata.get("render_profile") != CLAUDE_PLUGIN_RENDER_PROFILE:
-        errors.add("claude_manifest_render_profile_invalid")
+    pass
     files = metadata.get("files")
     if not isinstance(files, list):
         errors.add("manifest_files_invalid")
@@ -1366,22 +1273,10 @@ def _verify_third_party_notice(package: Path, host: str) -> set[str]:
     except (OSError, UnicodeError):
         return {"third_party_notice_unreadable"}
     errors: set[str] = set()
-    if host in CONTENT_ONLY_HOSTS:
-        required = frozenset({"content-only", "no bundled", "runtime", "license"})
-    elif host == "opencode":
-        required = frozenset({"dependency-free", "does not bundle", "opencode", "license"})
-    else:
-        required = (
-            CLAUDE_RUNTIME_NOTICE_REQUIRED_TOKENS
-            if host == "claude"
-            else RUNTIME_NOTICE_REQUIRED_TOKENS
-        )
+    required = RUNTIME_NOTICE_REQUIRED_TOKENS
     if not all(token in text for token in required):
         errors.add("third_party_notice_runtime_disclosure_invalid")
-    if host == "claude" and any(
-        token in text for token in ("`openai-codex`", "`openai-codex-cli-bin`")
-    ):
-        errors.add("claude_third_party_notice_claims_excluded_runtime")
+    pass
     return errors
 
 
@@ -1466,34 +1361,29 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
     }
     if any(not (generated / output).is_file() for output in command_outputs):
         errors.add("command_surface_missing")
-    if host == "claude" and any((generated / "commands").glob("*.md")):
-        errors.add("claude_duplicate_command_surface_present")
-    if host == "codex":
-        host_only_notice = "Never execute that control command directly"
-        controller = generated / "skills" / "opensocrates" / "SKILL.md"
-        rigor = generated / "skills" / "rigor" / "SKILL.md"
-        guarded_surfaces = [controller, rigor, *(generated / output for output in method_outputs)]
-        for surface in guarded_surfaces:
-            try:
-                contents = surface.read_text(encoding="utf-8")
-            except (OSError, UnicodeError):
-                errors.add("codex_control_boundary_notice_missing")
-                break
-            if host_only_notice not in contents:
-                errors.add("codex_control_boundary_notice_missing")
-                break
+    pass
+    host_only_notice = "Never execute that control command directly"
+    controller = generated / "skills" / "opensocrates" / "SKILL.md"
+    rigor = generated / "skills" / "rigor" / "SKILL.md"
+    guarded_surfaces = [controller, rigor, *(generated / output for output in method_outputs)]
+    for surface in guarded_surfaces:
+        try:
+            contents = surface.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            errors.add("codex_control_boundary_notice_missing")
+            break
+        if host_only_notice not in contents:
+            errors.add("codex_control_boundary_notice_missing")
+            break
     schema_files = {
         path.name for path in (generated / "schemas" / "v1").glob("*.json") if path.is_file()
     }
-    expected_schema_files = (
-        set() if host in NO_NATIVE_RUNTIME_HOSTS else _schema_manifest_files(root)
-    )
+    expected_schema_files = _schema_manifest_files(root)
     schema_count = len(schema_files)
     if schema_files != expected_schema_files:
         errors.add("package_schema_count_invalid")
     required_files = ["LICENSE", THIRD_PARTY_NOTICE]
-    if host not in NO_NATIVE_RUNTIME_HOSTS:
-        required_files.append("bin/launch.sh")
+    required_files.append("bin/launch.sh")
     for required in required_files:
         if not (generated / required).is_file():
             errors.add("package_license_notice_or_launcher_missing")
@@ -1512,38 +1402,7 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         generated / "bin" / "launch.sh", os.X_OK
     ):
         errors.add("posix_launcher_not_executable")
-    if host == "claude":
-        plugin_manifest = _load_json(generated / ".claude-plugin" / "plugin.json")
-        if plugin_manifest is None:
-            errors.add("claude_plugin_manifest_missing")
-        elif "hooks" in plugin_manifest:
-            # Claude auto-loads the standard hooks/hooks.json path. Declaring
-            # it again in plugin.json leaves every install in a permanent
-            # duplicate-hooks error state even though the fallback auto-load
-            # still happens to execute the hooks.
-            errors.add("claude_plugin_manifest_duplicates_standard_hooks")
-        for package in (generated, dist_package):
-            try:
-                controller_text = (package / "skills" / "opensocrates" / "SKILL.md").read_text(
-                    encoding="utf-8"
-                )
-                readme_text = (package / "README.md").read_text(encoding="utf-8")
-            except (OSError, UnicodeError):
-                errors.add("claude_plugin_invocation_surface_unreadable")
-                continue
-            normalized_controller = " ".join(controller_text.split())
-            normalized_readme = " ".join(readme_text.split())
-            if (
-                CLAUDE_PLUGIN_INVOCATION_MARKER not in normalized_controller
-                or CLAUDE_CHAT_INVOCATION_MARKER in normalized_controller
-            ):
-                errors.add("claude_plugin_invocation_contract_invalid")
-            if (
-                "canonical explicit plugin invocation is `/opensocrates:opensocrates`"
-                not in normalized_readme
-                or "standalone Claude Chat upload ZIP uses `/opensocrates`" not in normalized_readme
-            ):
-                errors.add("claude_plugin_readme_invocation_boundary_invalid")
+    pass
     embedded = [path for path in generated.rglob("compiled-content.bundle.json") if path.is_file()]
     if not embedded or any(path.read_bytes() != bundle_bytes for path in embedded):
         errors.add("embedded_bundle_mismatch")
@@ -1583,94 +1442,16 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         for path in generated.rglob("*")
         if path.is_file() and path.suffix.casefold() == ".zip"
     }
-    if host == "claude":
-        if excluded_runtime_entries:
-            errors.add("claude_package_contains_codex_runtime")
-        if nested_zip_entries:
-            errors.add("claude_package_contains_nested_zip")
-        if archive_compressed_bytes > CLAUDE_ARCHIVE_COMPRESSED_LIMIT_BYTES:
-            errors.add("claude_archive_compressed_limit_exceeded")
-        if archive_uncompressed_bytes > CLAUDE_ARCHIVE_UNCOMPRESSED_LIMIT_BYTES:
-            errors.add("claude_archive_uncompressed_limit_exceeded")
-        if archive.is_file() and zipfile.is_zipfile(archive):
-            try:
-                with zipfile.ZipFile(archive) as package_archive:
-                    archived_controller = package_archive.read(
-                        "skills/opensocrates/SKILL.md"
-                    ).decode("utf-8")
-            except (KeyError, UnicodeError, OSError, zipfile.BadZipFile):
-                errors.add("claude_plugin_archive_invocation_unreadable")
-            else:
-                normalized_archived_controller = " ".join(archived_controller.split())
-                if (
-                    CLAUDE_PLUGIN_INVOCATION_MARKER not in normalized_archived_controller
-                    or CLAUDE_CHAT_INVOCATION_MARKER in normalized_archived_controller
-                ):
-                    errors.add("claude_plugin_archive_invocation_contract_invalid")
+    pass
     runtime_targets = _load_json(generated / "release-manifest.json")
     listed_targets = runtime_targets.get("runtime_targets", []) if runtime_targets else []
-    expected_runtime_targets = [] if host in NO_NATIVE_RUNTIME_HOSTS else [RELEASE_TARGET]
+    expected_runtime_targets = [RELEASE_TARGET]
     if target != RELEASE_TARGET or listed_targets != expected_runtime_targets:
         errors.add("runtime_target_boundary_invalid")
-    if host == "cursor":
-        if any((generated / name).exists() for name in ("bin", "hooks", "runtime", "mcp.json")):
-            errors.add("cursor_content_only_boundary_invalid")
-        plugin_manifest = _load_json(generated / "plugin.json")
-        if plugin_manifest is None or plugin_manifest.get("$schema") != (
-            "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
-        ):
-            errors.add("cursor_agent_plugin_manifest_missing")
-    if host == "antigravity":
-        if any((generated / name).exists() for name in ("bin", "hooks", "runtime")):
-            errors.add("antigravity_content_only_boundary_invalid")
-        plugin_manifest = _load_json(generated / "plugin.json")
-        if plugin_manifest is None:
-            errors.add("antigravity_plugin_manifest_missing")
-    if host == "opencode":
-        if any((generated / name).exists() for name in ("bin", "hooks", "runtime", "schemas")):
-            errors.add("opencode_native_runtime_boundary_invalid")
-        package_manifest = _load_json(generated / "opencode-plugin.json")
-        if (
-            package_manifest is None
-            or package_manifest.get("schema") != "opensocrates.opencode-package/1.0.0"
-            or package_manifest.get("minimum_opencode_version") != "1.18.18"
-            or package_manifest.get("stable_plugin_hook") != "chat.message"
-            or package_manifest.get("beta_v2_api") is not False
-        ):
-            errors.add("opencode_package_manifest_invalid")
-        bridge = generated / "plugins" / "opensocrates.js"
-        skill = generated / "skills" / "opensocrates" / "SKILL.md"
-        if not bridge.is_file() or not skill.is_file():
-            errors.add("opencode_bridge_or_skill_missing")
-        else:
-            try:
-                bridge_text = bridge.read_text(encoding="utf-8")
-            except (OSError, UnicodeError):
-                errors.add("opencode_bridge_unreadable")
-            else:
-                if "chat.message" not in bridge_text or "@opencode-ai/plugin/v2" in bridge_text:
-                    errors.add("opencode_stable_hook_boundary_invalid")
-    if host == "grok":
-        if any(
-            (generated / name).exists()
-            for name in ("bin", "hooks", "runtime", "commands", "agents", "mcp.json", ".mcp.json")
-        ):
-            errors.add("grok_content_only_boundary_invalid")
-        plugin_manifest = _load_json(generated / "plugin.json")
-        if (
-            plugin_manifest is None
-            or plugin_manifest.get("name") != "opensocrates"
-            or plugin_manifest.get("version") != bundle.get("product_version")
-            or plugin_manifest.get("skills") != "./skills"
-        ):
-            errors.add("grok_plugin_manifest_invalid")
-        capability_evidence = metadata.get("capability_evidence")
-        if (
-            not isinstance(capability_evidence, Mapping)
-            or capability_evidence.get("status") != "verified"
-            or capability_evidence.get("probe_id") != "grok-build-1.0.3-2026-08-13"
-        ):
-            errors.add("grok_capability_evidence_invalid")
+    pass
+    pass
+    pass
+    pass
     return {
         "status": "fail" if errors else "pass",
         "method_count": len(existing_method_outputs),
@@ -1686,281 +1467,6 @@ def _verify_host_surface(  # noqa: C901  # Branch-explicit contract; reviewed fo
         "excluded_runtime_entry_count": len(excluded_runtime_entries),
         "nested_zip_entry_count": len(nested_zip_entries),
         "error_codes": sorted(errors),
-    }
-
-
-_CLAUDE_CHAT_SKILL_ROOT = "opensocrates"
-_CLAUDE_CHAT_FORBIDDEN_SUFFIXES = (
-    ".pem",
-    ".key",
-    ".p12",
-    ".pfx",
-    "hooks.json",
-    "launch.sh",
-    "launch.ps1",
-    "opensocrates-runtime",
-)
-
-
-def _claude_chat_archive_markdown_errors(bundle: zipfile.ZipFile, entries: list[str]) -> set[str]:
-    errors: set[str] = set()
-    for entry in entries:
-        if not entry.lower().endswith(".md"):
-            continue
-        try:
-            markdown_text = bundle.read(entry).decode("utf-8")
-        except (KeyError, UnicodeError):
-            errors.add("claude_chat_archive_markdown_unreadable")
-            continue
-        if "/opensocrates:opensocrates" in markdown_text:
-            errors.add("claude_chat_archive_plugin_namespace_present")
-    return errors
-
-
-def _claude_chat_tree_markdown_errors(skill: Path) -> set[str]:
-    errors: set[str] = set()
-    for markdown in skill.rglob("*.md"):
-        try:
-            markdown_text = markdown.read_text(encoding="utf-8")
-        except (OSError, UnicodeError):
-            errors.add("claude_chat_markdown_unreadable")
-            continue
-        if "/opensocrates:opensocrates" in markdown_text:
-            errors.add("claude_chat_plugin_namespace_present")
-    return errors
-
-
-def _claude_chat_archive_errors(archive: Path) -> set[str]:
-    """Assert the Chat ZIP is one directly uploadable skill folder.
-
-    Checked against the archive itself rather than the staged tree so nothing
-    can be introduced between assembly and packaging.
-    """
-
-    errors: set[str] = set()
-    with zipfile.ZipFile(archive) as bundle:
-        entries = [name for name in bundle.namelist() if not name.endswith("/")]
-        errors |= _claude_chat_archive_markdown_errors(bundle, entries)
-        try:
-            skill_text = bundle.read(f"{_CLAUDE_CHAT_SKILL_ROOT}/SKILL.md").decode("utf-8")
-        except (KeyError, UnicodeError):
-            skill_text = ""
-    if _contains_eval_or_adjudication_path(entries):
-        errors.add("claude_chat_archive_contains_eval_or_adjudication_artifact")
-    for entry in entries:
-        if entry.split("/", 1)[0] != _CLAUDE_CHAT_SKILL_ROOT:
-            errors.add("claude_chat_archive_unexpected_entry")
-        if entry.startswith("/") or ".." in entry.split("/"):
-            errors.add("claude_chat_archive_unsafe_path")
-        if entry.lower().endswith(_CLAUDE_CHAT_FORBIDDEN_SUFFIXES):
-            errors.add("claude_chat_archive_forbidden_file")
-    if f"{_CLAUDE_CHAT_SKILL_ROOT}/SKILL.md" not in entries:
-        errors.add("claude_chat_archive_top_level_skill_missing")
-    if any("/.claude-plugin/" in f"/{entry}" for entry in entries):
-        errors.add("claude_chat_archive_plugin_manifest_present")
-    normalized_skill = " ".join(skill_text.split())
-    if (
-        CLAUDE_CHAT_INVOCATION_MARKER not in normalized_skill
-        or CLAUDE_PLUGIN_INVOCATION_MARKER in normalized_skill
-    ):
-        errors.add("claude_chat_archive_invocation_contract_invalid")
-    return errors
-
-
-def _claude_chat_member_errors(
-    archive: zipfile.ZipFile, members: list[zipfile.ZipInfo], expected: set[str], stage: Path
-) -> set[str]:
-    errors: set[str] = set()
-    for item in members:
-        relative = item.filename.removeprefix("opensocrates/")
-        if relative not in expected or item.filename != "opensocrates/" + relative:
-            continue
-        mode = item.external_attr >> 16
-        if stat.S_IFMT(mode) != stat.S_IFREG:
-            errors.add("claude_chat_archive_special_member")
-            continue
-        path = stage / relative
-        if path.is_symlink() or not path.is_file():
-            errors.add("claude_chat_staged_member_unsafe")
-            continue
-        data = path.read_bytes()
-        if item.file_size != len(data) or archive.read(item) != data:
-            errors.add("claude_chat_archive_member_bytes_mismatch")
-    return errors
-
-
-def _claude_chat_integrity_errors(root: Path, version: str) -> set[str]:
-    """Bind the final ZIP, staged inventory and all canonical EN/KO procedure bytes."""
-    from opensocrates.content.injection import ProjectionInstructionAssembler
-    from opensocrates.content.loader import load_reasoning_content_projections
-
-    errors: set[str] = set()
-    stage = root / "dist/claude-chat-skills/opensocrates"
-    archive = root / "dist" / f"opensocrates-{version}-claude-chat-skills.zip"
-    try:
-        projection = load_reasoning_content_projections(root / REASONING_CONTENT_BUNDLE)
-        assembler = ProjectionInstructionAssembler(projection)
-        ids = assembler.known_method_ids()
-        expected = {"SKILL.md", "LICENSE", "references/catalog.md"}
-        expected |= {f"references/methods/{method}.md" for method in ids}
-        expected |= {
-            f"references/decision/methods/{locale}/{method}.md"
-            for locale in ("en", "ko")
-            for method in ids
-        }
-        expected |= {f"references/decision/catalog.{locale}.json" for locale in ("en", "ko")}
-        shared = root / "plugin-src/shared/decision"
-        if not shared.is_dir():
-            return {"claude_chat_canonical_inventory_unavailable"}
-        expected |= {
-            "references/decision/" + path.relative_to(shared).as_posix()
-            for path in shared.rglob("*")
-            if path.is_file()
-        }
-        staged = {path.relative_to(stage).as_posix() for path in stage.rglob("*") if path.is_file()}
-        if staged != expected:
-            errors.add("claude_chat_staged_inventory_mismatch")
-        with zipfile.ZipFile(archive) as bundle:
-            members = bundle.infolist()
-            names = [item.filename for item in members]
-            if len(names) != len(set(names)):
-                errors.add("claude_chat_duplicate_archive_member")
-            if set(names) != {"opensocrates/" + item for item in expected}:
-                errors.add("claude_chat_archive_inventory_mismatch")
-            if errors:
-                return errors
-            errors |= _claude_chat_member_errors(bundle, members, expected, stage)
-            for locale in ("en", "ko"):
-                for method in ids:
-                    name = f"opensocrates/references/decision/methods/{locale}/{method}.md"
-                    expected_body = assembler.assemble(
-                        (method,), requested_locale=locale
-                    ).instructions.encode()
-                    if name not in names or bundle.read(name) != expected_body:
-                        errors.add("claude_chat_canonical_method_bytes_mismatch")
-    except (OSError, ValueError, KeyError, zipfile.BadZipFile):
-        errors.add("claude_chat_integrity_unavailable")
-    return errors
-
-
-def _verify_claude_chat_skills(
-    root: Path, version: str, bundle: Mapping[str, Any]
-) -> dict[str, Any]:
-    package = root / "dist" / "claude-chat-skills"
-    archive = root / "dist" / f"opensocrates-{version}-claude-chat-skills.zip"
-    errors: set[str] = _claude_chat_integrity_errors(root, version)
-    raw_method_ids = bundle.get("method_ids", [])
-    method_ids = (
-        {value for value in raw_method_ids if isinstance(value, str)}
-        if isinstance(raw_method_ids, list)
-        else set()
-    )
-    actual_skill_roots = (
-        {
-            path.name
-            for path in package.iterdir()
-            if package.is_dir() and path.is_dir() and (path / "SKILL.md").is_file()
-        }
-        if package.is_dir()
-        else set()
-    )
-    if actual_skill_roots != {_CLAUDE_CHAT_SKILL_ROOT}:
-        errors.add("claude_chat_skill_set_invalid")
-    skill = package / _CLAUDE_CHAT_SKILL_ROOT
-    method_references = {
-        method_id
-        for method_id in method_ids
-        if (skill / "references" / "methods" / f"{method_id}.md").is_file()
-    }
-    if method_references != method_ids or not (skill / "references" / "catalog.md").is_file():
-        errors.add("claude_chat_internal_method_references_invalid")
-    if not (skill / "LICENSE").is_file():
-        errors.add("claude_chat_license_missing")
-    try:
-        skill_text = (skill / "SKILL.md").read_text(encoding="utf-8")
-    except (OSError, UnicodeError):
-        errors.add("claude_chat_skill_unreadable")
-    else:
-        normalized_skill = " ".join(skill_text.split())
-        if (
-            CLAUDE_CHAT_INVOCATION_MARKER not in normalized_skill
-            or CLAUDE_PLUGIN_INVOCATION_MARKER in normalized_skill
-        ):
-            errors.add("claude_chat_invocation_contract_invalid")
-    errors |= _claude_chat_tree_markdown_errors(skill)
-    forbidden_trees = ("bin", "commands", "content", "hooks", "runtime", "schemas")
-    if any((package / name).exists() for name in forbidden_trees):
-        errors.add("claude_chat_runtime_surface_present")
-    if not archive.is_file() or not zipfile.is_zipfile(archive):
-        errors.add("claude_chat_archive_missing_or_invalid")
-        archive_bytes = 0
-    else:
-        archive_bytes = archive.stat().st_size
-        if archive_bytes > 16 * 1024 * 1024:
-            errors.add("claude_chat_archive_too_large")
-        errors |= _claude_chat_archive_errors(archive)
-    return {
-        "status": "fail" if errors else "pass",
-        "skill_count": len(actual_skill_roots),
-        "skill_upload_root": _CLAUDE_CHAT_SKILL_ROOT,
-        "archive_size_bytes": archive_bytes,
-        "automatic_hooks": False,
-        "error_codes": sorted(errors),
-    }
-
-
-def _verify_claude_chat_provenance(
-    root: Path, version: str, content_revision: int
-) -> dict[str, Any]:
-    """Bind a live-pass claim to this exact candidate without upgrading pending evidence."""
-
-    report = _load_json(evidence_path(root, version))
-    archive = root / "dist" / f"opensocrates-{version}-claude-chat-skills.zip"
-    if report is None:
-        return {
-            "status": "fail",
-            "evidence_state": "unavailable",
-            "exact_release_artifact_status": "unavailable",
-            "error_codes": ["claude_chat_current_evidence_missing"],
-        }
-    candidate_sha256: str | None = None
-    candidate_file_count: int | None = None
-    if archive.is_file() and zipfile.is_zipfile(archive):
-        candidate_sha256 = f"sha256:{_sha256(archive)}"
-        with zipfile.ZipFile(archive) as bundle:
-            candidate_file_count = len(
-                [entry for entry in bundle.namelist() if not entry.endswith("/")]
-            )
-    errors = validation_errors(
-        report,
-        product_version=version,
-        content_revision=content_revision,
-        candidate_archive_sha256=candidate_sha256,
-        candidate_file_count=candidate_file_count,
-    )
-    if report.get("schema") == EXPORT_ONLY_SCHEMA:
-        export_errors = list(errors) + sorted(_claude_chat_integrity_errors(root, version))
-        if candidate_sha256 is None or candidate_file_count is None:
-            export_errors.append("claude_chat_candidate_archive_missing")
-        return {
-            "status": "fail" if export_errors else "pass",
-            "evidence_state": "export_only_contract",
-            "exact_release_artifact_status": "postpublication_verification_required",
-            "live_upload_status": "unvalidated",
-            "candidate_archive_sha256": candidate_sha256,
-            "candidate_file_count": candidate_file_count,
-            "error_codes": export_errors,
-        }
-    evidence_state = str(report.get("status", "unavailable"))
-    live_validated = not errors and evidence_state == "pass"
-    return {
-        "status": "fail" if errors else "pass",
-        "evidence_state": evidence_state,
-        "exact_release_artifact_status": "verified" if live_validated else "unavailable",
-        "live_upload_status": "verified" if live_validated else "pending",
-        "candidate_archive_sha256": candidate_sha256,
-        "candidate_file_count": candidate_file_count,
-        "error_codes": list(errors),
     }
 
 
@@ -2068,59 +1574,6 @@ def _evidence_check(  # noqa: C901  # Explicit release evidence matrix.
         },
         "codex_session_start_timing": "pass" if codex_timing_valid else None,
         "error_codes": sorted(errors | unavailable),
-    }
-
-
-def _opencode_compatibility_evidence(  # noqa: C901  # Explicit evidence matrix.
-    root: Path,
-) -> dict[str, Any]:
-    document = _load_json(root / "docs" / "evidence" / "opencode-compatibility-2026-08-13.json")
-    errors: set[str] = set()
-    if document is None:
-        return {"status": "unavailable", "error_codes": ["opencode_evidence_missing"]}
-    if document.get("schema") != "opensocrates.opencode-compatibility-evidence/1.0.0":
-        errors.add("opencode_evidence_schema_invalid")
-    target = document.get("target")
-    live = document.get("production_bridge_live_probe")
-    isolated = document.get("isolated_live_probe")
-    privacy = document.get("privacy")
-    if not isinstance(target, Mapping) or target.get("opencode_version") != "1.18.18":
-        errors.add("opencode_evidence_target_invalid")
-    required_live = {
-        "automatic_judgment_activation_same_turn",
-        "interactive_tui_same_turn_grounding_observed",
-        "complete_authored_method_grounding_observed",
-        "mechanical_control_unchanged",
-        "explicit_skill_discovery",
-    }
-    if not isinstance(live, Mapping) or any(live.get(key) is not True for key in required_live):
-        errors.add("opencode_evidence_live_probe_invalid")
-    # The bridge has no activation deadline: OpenCode awaits chat.message
-    # without a host-side timeout, and the selection work is synchronous, so a
-    # timeout observation is not a property this evidence can assert.
-    required_isolated = {
-        "global_plugin_discovered",
-        "global_skill_discovered",
-        "current_user_text_available",
-        "in_place_part_mutation_visible_same_turn",
-        "exception_failed_open",
-    }
-    if not isinstance(isolated, Mapping) or any(
-        isolated.get(key) is not True for key in required_isolated
-    ):
-        errors.add("opencode_evidence_isolated_probe_invalid")
-    if not isinstance(privacy, Mapping) or any(value is not False for value in privacy.values()):
-        errors.add("opencode_evidence_privacy_invalid")
-    return {
-        "status": "fail" if errors else "pass",
-        "opencode_version": target.get("opencode_version") if isinstance(target, Mapping) else None,
-        "same_turn": live.get("automatic_judgment_activation_same_turn")
-        if isinstance(live, Mapping)
-        else None,
-        "interactive_tui": live.get("interactive_tui_same_turn_grounding_observed")
-        if isinstance(live, Mapping)
-        else None,
-        "error_codes": sorted(errors),
     }
 
 
@@ -2350,29 +1803,6 @@ def _full_check(
             for host in HOSTS
         }
     )
-    checks["claude_chat_skills"] = (
-        _verify_claude_chat_skills(root, version, bundle)
-        if assembly_status == "pass"
-        else {
-            "status": assembly_status
-            if assembly_status in {"fail", "unavailable"}
-            else "unavailable",
-            "error_codes": ["package_assembly_not_available"],
-        }
-    )
-    checks["claude_chat_provenance"] = (
-        _verify_claude_chat_provenance(root, version, int(bundle.get("content_revision", -1)))
-        if assembly_status == "pass"
-        else {
-            "status": assembly_status
-            if assembly_status in {"fail", "unavailable"}
-            else "unavailable",
-            "evidence_state": "unavailable",
-            "exact_release_artifact_status": "unavailable",
-            "live_upload_status": "pending",
-            "error_codes": ["package_assembly_not_available"],
-        }
-    )
     # The generated package's own launcher and README are the artifacts users
     # receive, so both are exercised against the assembled package trees.
     checks["packaged_launcher"] = _package_tool_check(
@@ -2412,19 +1842,6 @@ def _full_check(
         ],
         "security",
     )
-    checks["opencode_bridge"] = {
-        "status": (
-            bridge_result := _run(
-                ["node", "--test", str(root / "tools" / "opencode_bridge.test.mjs")],
-                root,
-                timeout=60.0,
-            )
-        ).status,
-        "error_codes": []
-        if bridge_result.status == "pass"
-        else [f"opencode_bridge_{bridge_result.code}"],
-    }
-    checks["opencode_compatibility_evidence"] = _opencode_compatibility_evidence(root)
     checks["evidence"] = _evidence_check(root, version, assembly_status=assembly_status)
     statuses: list[str] = []
     for name, value in checks.items():
@@ -2457,9 +1874,7 @@ def _full_check(
         "unvalidated": {
             "platforms": _candidate_platforms(root, target),
             "signing_status": "unvalidated",
-            "live_host_probe_status": _live_host_probe_status(
-                opencode_validated=checks["opencode_compatibility_evidence"]["status"] == "pass"
-            ),
+            "live_host_probe_status": _live_host_probe_status(),
             "clean_machine_install_status": "unvalidated",
             "source_archive_status": "not_attempted",
             "provenance_status": "not_attempted",

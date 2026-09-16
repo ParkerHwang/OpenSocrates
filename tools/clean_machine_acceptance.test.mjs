@@ -38,8 +38,8 @@ test("clean-machine evidence: completed categorical checks produce a constrained
   const fixture = acceptanceFixture();
   try {
     const template = readFileSync(fixture.manual, "utf8");
-    assert.match(template, /registered plugin command is `\/opensocrates:opensocrates`/u);
-    assert.match(template, /standalone Claude Chat ZIP[\s\S]*`\/opensocrates`/u);
+    assert.match(template, /Codex plugin recognition: PENDING/u);
+    assert.match(template, /Host runtime loading: PENDING/u);
     const manual = template.replace(/: PENDING$/gmu, ": PASS");
     writeFileSync(fixture.manual, manual);
     packExisting(fixture.directory);
@@ -68,10 +68,7 @@ test("clean-machine evidence: free-form manual text is rejected", () => {
       .replace(/: PENDING$/gmu, ": PASS")
       .concat("\nextra notes are not accepted\n");
     writeFileSync(fixture.manual, manual);
-    assert.throws(
-      () => packExisting(fixture.directory),
-      /restore the manual checklist template/u,
-    );
+    assert.throws(() => packExisting(fixture.directory), /restore the manual checklist template/u);
     assert.equal(existsSync(`${fixture.directory}.zip`), false);
   } finally {
     fixture.cleanup();
@@ -81,19 +78,10 @@ test("clean-machine evidence: free-form manual text is rejected", () => {
 test("clean-machine layout: resolves each plugin from its managed marketplace metadata", () => {
   const root = mkdtempSync(join(tmpdir(), "opensocrates-layout-test-"));
   try {
-    const roots = {
-      claude: join(root, "claude", "managed-marketplaces", "opensocrates"),
-      codex: join(root, "codex", "managed-marketplaces", "opensocrates"),
-    };
-    const claudePlugin = join(roots.claude, "plugins", "opensocrates");
+    const roots = { codex: join(root, "codex", "managed-marketplaces", "opensocrates") };
     const codexPlugin = join(roots.codex, "build", "generated", "plugins", "codex");
-    mkdirSync(join(roots.claude, ".claude-plugin"), { recursive: true });
     mkdirSync(join(roots.codex, ".agents", "plugins"), { recursive: true });
-    mkdirSync(join(claudePlugin, "skills", "opensocrates"), { recursive: true });
     mkdirSync(join(codexPlugin, "skills", "opensocrates"), { recursive: true });
-    writeJson(join(roots.claude, ".claude-plugin", "marketplace.json"), {
-      plugins: [{ name: "opensocrates", source: "./plugins/opensocrates" }],
-    });
     writeJson(join(roots.codex, ".agents", "plugins", "marketplace.json"), {
       plugins: [
         {
@@ -102,23 +90,23 @@ test("clean-machine layout: resolves each plugin from its managed marketplace me
         },
       ],
     });
-    for (const host of ["claude", "codex"]) {
+    for (const host of ["codex"]) {
       writeJson(join(roots[host], ".opensocrates-managed.json"), {
         marketplaceName: "opensocrates",
         pluginName: "opensocrates",
       });
     }
-    writeFileSync(join(claudePlugin, "skills", "opensocrates", "SKILL.md"), "# controller\n");
     writeFileSync(join(codexPlugin, "skills", "opensocrates", "SKILL.md"), "# controller\n");
 
-    assert.deepEqual(inspectManagedLayout(roots), {
-      claudePublicSkills: ["opensocrates"],
-      claudeCommandsPresent: false,
-      codexControllerPresent: true,
-    });
+    assert.deepEqual(inspectManagedLayout(roots), { codexControllerPresent: true });
 
-    writeJson(join(roots.claude, ".claude-plugin", "marketplace.json"), {
-      plugins: [{ name: "opensocrates", source: "./../../outside-owned-root" }],
+    writeJson(join(roots.codex, ".agents", "plugins", "marketplace.json"), {
+      plugins: [
+        {
+          name: "opensocrates",
+          source: { source: "local", path: "./../../outside-owned-root" },
+        },
+      ],
     });
     assert.throws(() => inspectManagedLayout(roots), /plugin source escapes its owned root/u);
   } finally {

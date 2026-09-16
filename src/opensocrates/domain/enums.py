@@ -111,13 +111,6 @@ class CapabilityStatus(StrEnum):
 class HostId(StrEnum):
     CODEX_DESKTOP = "codex_desktop"
     CODEX_CLI = "codex_cli"
-    CLAUDE_CODE = "claude_code"
-    CLAUDE_COWORK = "claude_cowork"
-    CURSOR_IDE = "cursor_ide"
-    ANTIGRAVITY_CLI = "antigravity_cli"
-    GROK_BUILD = "grok_build"
-    OPENCODE_CLI = "opencode_cli"
-    PROMPT_ONLY = "prompt_only"
 
 
 class VerificationOutcome(StrEnum):

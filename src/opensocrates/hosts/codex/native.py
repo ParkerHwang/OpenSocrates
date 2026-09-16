@@ -59,12 +59,8 @@ NORMALIZED_TO_NATIVE = {
     "session_ended": frozenset({"SessionEnd"}),
 }
 _START_SOURCES = frozenset({"startup", "resume", "clear", "compact"})
-_CLAUDE_START_SOURCES = _START_SOURCES | {"fork"}
 _COMPACTION_TRIGGERS = frozenset({"manual", "auto"})
 _SESSION_END_REASONS = frozenset({"other"})
-_CLAUDE_SESSION_END_REASONS = frozenset(
-    {"clear", "resume", "logout", "prompt_input_exit", "bypass_permissions_disabled", "other"}
-)
 _FAILURE_CLASSES = frozenset({"permission", "timeout", "api_error", "interrupted", "unknown"})
 
 
@@ -219,8 +215,6 @@ _KNOWN_FIELDS = {
         "is_interrupt",
         "error",
         "duration_ms",
-        # Observed on real Claude Code receipts; see the Claude fixtures.
-        "effort",
     },
     "PermissionRequest": _COMMON_FIELDS | {"tool_name", "tool_input", "description"},
     "PreCompact": _COMMON_FIELDS | {"trigger"},
@@ -230,10 +224,6 @@ _KNOWN_FIELDS = {
         "stop_hook_active",
         "last_assistant_message",
         "declared_content_bytes",
-        # Observed on real Claude Code receipts; see the Claude fixtures.
-        "effort",
-        "background_tasks",
-        "session_crons",
     },
     "SessionEnd": _COMMON_FIELDS | {"reason"},
 }
@@ -511,8 +501,6 @@ def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
 ) -> CodexNativeEvent:
     session_id = _text(document, "session_id", max_bytes=256)
     turn_id = _text(document, "turn_id", max_bytes=256)
-    if turn_id is None and host in {HostId.CLAUDE_CODE, HostId.CLAUDE_COWORK}:
-        turn_id = _text(document, "prompt_id", max_bytes=256)
     transcript_path = _path(document, "transcript_path")
     cwd = _path(document, "cwd")
     model = _text(document, "model", max_bytes=512)
@@ -520,11 +508,7 @@ def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     diagnostics = ("native_unknown_field_ignored",) if ignored else ()
     if native_name == "SessionStart":
         source = _text(document, "source", required=True, max_bytes=32)
-        allowed_sources = (
-            _CLAUDE_START_SOURCES
-            if host in {HostId.CLAUDE_CODE, HostId.CLAUDE_COWORK}
-            else _START_SOURCES
-        )
+        allowed_sources = _START_SOURCES
         if source not in allowed_sources:
             raise NativeWrongType("SessionStart.source is not a closed value")
         return CodexNativeEvent(
@@ -650,11 +634,7 @@ def _build(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
         )
     if native_name == "SessionEnd":
         reason = _text(document, "reason", required=True, max_bytes=32)
-        allowed_reasons = (
-            _CLAUDE_SESSION_END_REASONS
-            if host in {HostId.CLAUDE_CODE, HostId.CLAUDE_COWORK}
-            else _SESSION_END_REASONS
-        )
+        allowed_reasons = _SESSION_END_REASONS
         if reason not in allowed_reasons:
             raise NativeWrongType("SessionEnd.reason is not a closed value")
         return CodexNativeEvent(

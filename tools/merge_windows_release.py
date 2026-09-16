@@ -18,7 +18,7 @@ def merge(root: Path) -> None:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     limitations = json.loads(limitations_path.read_text(encoding="utf-8"))
     windows = {}
-    for host in ("claude", "codex"):
+    for host in ("codex",):
         archive = dist / f"opensocrates-{version}-{host}-plugin-windows-x64.zip"
         with archive.open("rb") as stream:
             digest = hashlib.file_digest(stream, "sha256").hexdigest()

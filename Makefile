@@ -2,7 +2,7 @@ PYTHON ?= $(shell if command -v uv >/dev/null 2>&1; then uv python find 3.12; el
 PYTHONPATH := src
 ROOT := $(CURDIR)
 
-.PHONY: bootstrap format format-check lint typecheck generate generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check real-claude-check claude-reliability-check claude-hook-timing codex-hook-timing package release-check version
+.PHONY: bootstrap format format-check lint typecheck generate generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check codex-hook-timing package release-check version
 
 bootstrap:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" -c 'import pathlib,sys,tomllib; assert sys.version_info[:2] == (3, 12), sys.version; root=pathlib.Path("."); project=tomllib.loads((root/"pyproject.toml").read_text()); lock=tomllib.loads((root/"uv.lock").read_text()); expected=("openai-codex==0.144.4", "openai-codex-cli-bin==0.144.4", "pydantic>=2.12,<3"); assert tuple(project["project"].get("dependencies", [])) == expected; packages={item.get("name"): item for item in lock.get("package", []) if isinstance(item, dict) and isinstance(item.get("name"), str)}; assert packages.get("openai-codex", {}).get("version") == "0.144.4"; assert packages.get("openai-codex-cli-bin", {}).get("version") == "0.144.4"; pydantic=packages.get("pydantic", {}).get("version", ""); assert pydantic.startswith("2.") and tuple(map(int, pydantic.split(".")[:2])) >= (2, 12); assert packages.get("pydantic-core", {}).get("version"); opensocrates=packages.get("opensocrates", {}); direct={item.get("name") for item in opensocrates.get("dependencies", []) if isinstance(item, dict)}; assert {"openai-codex", "openai-codex-cli-bin", "pydantic"} <= direct; print("Python 3.12 and locked Codex SDK/runtime metadata ready")'
@@ -26,11 +26,6 @@ typecheck:
 generate:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host antigravity --output "$(ROOT)/build/generated/plugins/antigravity" >/dev/null
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host cursor --output "$(ROOT)/build/generated/plugins/cursor" >/dev/null
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host grok --output "$(ROOT)/build/generated/plugins/grok" >/dev/null
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host opencode --output "$(ROOT)/build/generated/plugins/opencode" >/dev/null
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host claude --runtime-root "$(ROOT)/dist/runtime/claude" --output "$(ROOT)/build/generated/plugins/claude" >/dev/null
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host codex --runtime-root "$(ROOT)/dist/runtime/codex" --output "$(ROOT)/build/generated/plugins/codex" >/dev/null
 
 generated-check:
@@ -38,12 +33,12 @@ generated-check:
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py --output-dir "$$out/schemas"; \
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$$out/content/compiled-content.bundle.json" --reasoning-projections-output "$$out/content/compiled-reasoning-content.bundle.json"; \
 	diff -ru "$(ROOT)/schemas/v1" "$$out/schemas/v1"; diff -u "$(ROOT)/content/compiled-content.bundle.json" "$$out/content/compiled-content.bundle.json"; diff -u "$(ROOT)/content/compiled-reasoning-content.bundle.json" "$$out/content/compiled-reasoning-content.bundle.json"; diff -u "$(ROOT)/content/compiled-response-policy.json" "$$out/content/compiled-response-policy.json"; \
-	for host in antigravity cursor grok opencode claude codex; do \
+	for host in codex; do \
 		PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host "$$host" --output "$(ROOT)/build/generated/plugins/$$host" >/dev/null; \
 		PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host "$$host" --output "$$out/plugins/$$host" >/dev/null; \
 		diff -ru "$(ROOT)/build/generated/plugins/$$host" "$$out/plugins/$$host"; \
 	done; \
-	echo "generated-check: byte-identical schemas, content bundles, and all six host packages"
+	echo "generated-check: byte-identical schemas, content bundles, and the Codex host package"
 
 content-check:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
@@ -106,32 +101,15 @@ security-scan: generate
 smoke:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_public_release_verification.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_response_policy.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_chat_archive_integrity.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_release_identity.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_decision_hook_runtime.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_claude_chat_evidence.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_decision_points.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/smoke_product.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_selector.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_claude.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_antigravity.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_cursor.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_grok.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_opencode.py
-	@OPENSOCRATES_PYTHON="$(PYTHON)" node --test tools/opencode_bridge.test.mjs
 
 installer-check:
 	@npm test
 	@npm pack --dry-run
-
-real-claude-check:
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_real_claude.py
-
-claude-reliability-check:
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_claude_reliability.py
-
-claude-hook-timing:
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/measure_claude_hook_timing.py
 
 codex-hook-timing:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/measure_codex_hook_timing.py

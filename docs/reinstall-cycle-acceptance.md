@@ -2,274 +2,138 @@
 
 [한국어](reinstall-cycle-acceptance.ko.md)
 
-Use this procedure only for the focused `purged_same_machine` acceptance test on
-an Apple-silicon Mac that already has the exact supported OpenSocrates baseline.
-It is not a clean-machine test and must never be reported as one.
+This destructive acceptance cycle records `purged_same_machine` and
+`purge_then_reinstall`: **Codex 1.3.1 → Codex 1.4.0**. It is neither a separate
+clean-machine test nor an in-place migration. It uses actual account homes and
+removes the admitted OpenSocrates registration, payloads, caches, lifecycle state,
+updater and seven exact Codex trust entries. Removed contents are not restored.
+Unrelated plugins, configuration, authentication, history and npm caches remain
+outside its ownership. Other host integrations are outside the 1.4.0 contract.
 
-The harness uses the real authenticated account homes and the packed `npx`
-entrypoint. It removes the admitted OpenSocrates installation, verifies exact
-zero residue, and reinstalls Claude and Codex from the same candidate. This is a
-destructive test of OpenSocrates-owned registrations, payloads, caches, data,
-state, the LaunchAgent, and the seven OpenSocrates Codex trust entries. It does
-not restore their prior contents. It must not inspect or delete unrelated host
-configuration, history, plugins, or npm/npx caches.
+## Starting state and candidate identity
 
-## Required starting state
+Use a clean checkout of the open PR after its exact-head macOS CI succeeds.
+Hardware and Node must be arm64 on macOS; run as the canonical home owner,
+without root or sudo. Python 3.12, authenticated Codex CLI and authenticated
+GitHub CLI are required. The default Codex managed registration, payload and
+desired state must agree on 1.3.1; automatic updates must be disabled and the
+LaunchAgent unloaded. Unknown payloads, unsafe ownership and transaction residue
+block the cycle before mutation.
 
-Run from the latest commit of the focused pull request after its Native package
-CI job succeeds. The harness fails before lifecycle mutation unless all of these
-conditions hold:
+If 1.3.1 desired state still lists retired hosts, remove those integrations with
+1.3.1 first. The 1.4.0 harness does not implement their cleanup. Do not install
+1.4.0 first to manufacture a baseline.
 
-- macOS hardware and the Node process are `arm64`, the process is not root or
-  under `sudo`, and the account home is canonical and owned by the current UID;
-- Python 3.12 is available for the hermetic installed `SessionStart` timing
-  driver;
-- the current POSIX username is canonical, and Claude and Codex authentication
-  succeeds in both the normal preflight and the closed lifecycle environment;
-- Claude and Codex each have exactly one managed OpenSocrates 1.3.1
-  registration at the canonical managed root;
-- Claude and Codex managed roots and cache versions pass their complete
-  checksum and closed-file-set checks;
-- automatic updates are disabled, the LaunchAgent is unloaded, and the exact
-  desired state names Claude and Codex only;
-- Antigravity, Cursor, Grok, and OpenCode OpenSocrates roots or bridges are
-  absent;
-- no unsupported pre-1.0 Claude case-variant registration, installer
-  transaction residue, trust-reset residue, or LaunchAgent temporary exists;
-  and
-- the checkout is clean and still matches the open pull-request head.
+`tools/reinstall_baseline_provenance.json` pins the official immutable Codex 1.3.1
+archive, inventory and manifest digests. Full closed-file-set and checksum
+verification still runs; rehashed or unknown payloads fail. Only that version's
+Codex cache is admitted. Old multi-host checkpoints are rejected.
 
-The candidate gate creates an exact nine-file `npm pack` tarball. It also pins
-the successful CI repository, workflow, run ID, attempt, full head SHA,
-immutable artifact ID, artifact name, raw ZIP digest and size, build-time commit
-and tree receipt, both host payload manifests, and the canonical Python, Claude,
-and Codex executables with their SHA-256 digests. The private execution identity
-also pins the canonical POSIX username. Destructive lifecycle capsules pass the
-exact host binaries and that username explicitly and do not depend on the
-capsule's reduced shell `PATH`; final timing invokes the pinned Python directly.
-The harness creates the private timing report as an exclusive owner-only file
-before Python writes any observation bytes, and verifies that mode again before
-reading it.
-The unpublished candidate 1.4.0 uses the packed installer and exact PR CI artifact;
-no public npm or GitHub release 1.4.0 download is assumed. Published 1.3.1
-release bytes are used only to authenticate the initial payload, not the candidate.
+The candidate gate binds the nine-file npm tarball, successful CI run/attempt,
+head SHA, immutable artifact ID/name/digest/size, source commit/tree receipt,
+Codex package inventory, canonical Python/Codex executables and their digests.
+The pre-purge recheck binds the exact baseline bytes and target trust syntax.
+Only validated non-live `.in_use` transient markers are excluded from cache byte
+binding. Any other change blocks the first purge.
 
-The immediately pre-purge baseline recheck binds the exact managed roots,
-stable cache payloads, desired state, and OpenSocrates Codex trust syntax. The
-cache binding excludes only a validated, non-live per-process `.in_use`
-transient, whose shape and liveness are checked separately. Any other byte or
-topology change stops before the first purge command.
+All OpenSocrates hook warnings, errors and unknown warnings block acceptance.
+The exact Codex Companion 1.0.6 SessionEnd clamp warning is counted separately
+only when its known message and canonical source match. No other plugin setting
+is changed. A packaged timing test does not establish actual automatic delivery.
 
-## Version transition and baseline provenance
+## Run and resume
 
-This focused path admits **initialVersion 1.3.1 → candidateVersion 1.4.0** only.
-It records `purged_same_machine` and `transition: purge_then_reinstall`; it is
-neither clean-machine evidence nor in-place update/migration evidence. Do not
-install 1.4.0 first to manufacture the baseline. The earlier issue #83 harness
-reinstalled its same 1.2.1 candidate; its use of `PRODUCT_VERSION` for both
-roles was not an upgrade path. The installer's pre-1.0 case-variant migration
-instructions are a different, explicitly manual procedure.
+The no-argument command proceeds into real mutation; there is no dry-run option.
+Close Codex host sessions before the destructive cycle and run it in an independent
+Terminal so its controller survives the plugin removal.
 
-Both active registrations, managed plugin/release manifests, marketplace
-metadata, and desired state must agree on 1.3.1. The source and verified PR
-artifact must agree on 1.4.0. The public baseline, private checkpoint, resume
-checks, pre-purge byte bindings and sealed final result retain these separate
-roles. Old checkpoints without this contract are rejected, never migrated or
-replayed after changing source.
-
-`tools/reinstall_baseline_provenance.json` pins checksum-inventory and manifest
-digests extracted from downloaded official releases whose archive bytes matched
-the GitHub asset digests. The 1.3.1 release is immutable. The legacy 1.2.1 release
-is not immutable, so its exact observed archive/inventory digests are pinned in
-source rather than trusting its mutable tag on a later run. Full checksum and
-closed-file-set verification still runs; self-consistent but unknown/rehashed
-payloads fail. This is a repository/release provenance anchor, not code signing.
-
-Only the pinned 1.3.1 caches and an optional pinned **inactive Claude 1.2.1 cache**
-are admitted. An old cache does not change `initialVersion` or prove an active
-mixed-version installation. Unknown versions, host/version mismatches, altered
-manifests, extra files, and unrecognized cache markers remain blocking. Purge
-removes these admitted old caches as part of the recorded destructive cycle.
-
-## Codex inventory diagnostics
-
-All OpenSocrates warnings, all hook inventory errors and unclassified warnings
-block acceptance. One exact diagnosed external warning is counted separately:
-Codex Companion `openai-codex/codex/1.0.6` configures SessionEnd at five seconds,
-and Codex reports clamping it to its three-second limit. This is an unrelated
-plugin's configuration diagnostic, not an observed OpenSocrates execution
-failure. The exact message and canonical default-home source path must match;
-other messages/paths remain blocking. No unrelated setting is changed.
-`otherPluginTimeoutWarningCount` preserves the count in baseline and final
-first-review evidence without publishing the raw path/message. The seven-hook,
-namespace, trust and fixed SessionStart timeout checks are unchanged.
-
-There is no `--preflight` or `--dry-run` CLI. The no-argument command proceeds
-from its gates into real mutation. Read-only preparation must inspect code and
-use only its read-only inventory functions; it must not start the cycle.
-
-## Start the automated cycle
-
-From the clean pull-request checkout, run:
-
-```bash
+```sh
 node tools/reinstall_cycle_acceptance.mjs
 ```
 
-Keep both printed locations. The public directory contains only sanitized
-evidence. The owner-only private directory contains the exact checkpoint,
-candidate inputs, lifecycle journal, command ledger, and later the recording.
-Do not publish, move, edit, or delete the private directory while the cycle is
-active.
+Keep the printed public and owner-only private directories. The private directory
+holds candidate bytes, checkpoints, command ledger and lifecycle journal. Do not
+move or edit it while active. Purge uses exact packed `npx` with
+`remove --host all --purge --reset-trust`; `all` means Codex only. After a closed
+zero-residue inventory succeeds, one atomic install uses the exact Codex asset.
 
-Every lifecycle operation uses the locally pinned tarball explicitly through
-an operation-bound `npx --package` invocation. Purge is one combined command
-with `remove --host all --purge --reset-trust`; reinstall is one atomic
-`install --host all` command with both exact host assets. The harness refuses to
-install until registration and the closed exact residue inventory are empty.
+Never restart the initial command after mutation may have begun. Resume its
+original private checkpoint:
 
-## Resume and the one bounded host-close retry
-
-Never start a second initial run after purge may have begun. Resume only the
-printed private checkpoint so the original baseline and exact candidate remain
-authoritative:
-
-```bash
+```sh
 node tools/reinstall_cycle_acceptance.mjs --resume PRIVATE_EVIDENCE_DIRECTORY
 ```
 
-If the sanitized result is `paused`, it names only the host apps whose live
-`.in_use` marker is the sole remaining blocker. Close exactly those apps,
-confirm they are no longer running, and then use the single explicit retry:
+Only a recorded live-cache pause permits one bounded retry. Close the named host,
+confirm it is closed, then use:
 
-```bash
+```sh
 node tools/reinstall_cycle_acceptance.mjs --resume PRIVATE_EVIDENCE_DIRECTORY \
   --confirm-host-apps-closed
 ```
 
-The confirmation does not authorize the harness to terminate an app. Before
-retrying, it requires the checkpointed registration, root, data, state, trust,
-LaunchAgent, transaction, candidate, and desired-state bindings to be unchanged;
-only the named live marker may have disappeared. A mixed purge defect or a
-second live-cache failure is terminal and receives no further automatic retry.
+The flag never terminates an app. All checkpoint bindings must remain unchanged
+except the named live marker. Mixed residue or another live-cache failure is
+terminal. A claimed operation without its durable terminal receipt is
+`blocked_unverifiable` and cannot replay. Nonzero install cannot become success
+from filesystem appearance. Once finalization starts, only its exact complete
+seal can finish publication; one-shot review checks do not replay.
 
-A claimed lifecycle without a verified terminal receipt is
-`blocked_unverifiable` and cannot be replayed. A nonzero atomic install terminal
-cannot be promoted to success from filesystem appearance. Once one-shot Codex
-review verification enters `finalizing`, it is not replayed; a complete matching
-sealed receipt can only finish publication.
+## Observations and packing
 
-## Record and review the app observations
+When raw capture is authorized, start Record & Replay before manual interaction,
+stop it afterwards, and privately review the event stream. Never publish raw
+accessibility events, prompts, transcripts, account details or paths. Record
+these four categorical fields:
 
-When capture is authorized, start Record & Replay before the first manual Codex or Claude app interaction.
-The recorder asks for confirmation before capture starts. Perform the checks,
-stop the recording, and review its returned event stream privately. Do not copy
-raw accessibility events, prompts, transcripts, sidebar text, account details,
-credentials, or local paths into the public result.
+1. Seven exact OpenSocrates hooks appear new and untrusted on first review.
+2. Those seven hooks are approved and trusted.
+3. A fresh Codex task has no OpenSocrates SessionStart timeout at its fixed two-second limit.
+4. The private Record & Replay capture was stopped and reviewed.
 
-Record these five categorical checks in order:
+Use `PASS`, `FAIL`, `NOT_OBSERVED` or `BLOCKED`; never infer an approval or bypass
+authentication. Bind a reviewed owner-only recording to this test when available:
 
-1. Codex presents exactly seven `opensocrates@opensocrates` hooks as new and
-   untrusted on first review.
-2. After the user approves those exact hooks, all seven are trusted; do not
-   approve unrelated hooks.
-3. A fresh Codex task has no OpenSocrates `SessionStart` timeout at the fixed
-   two-second host limit.
-4. A fresh Claude Code Local task runs
-   `/opensocrates:opensocrates status` and reports 1.4.0. A bare
-   `/opensocrates` is not Local plugin evidence.
-5. The private Record & Replay event stream was stopped and reviewed.
-
-Claude Chat standalone uses `/opensocrates`, but the exact public Chat 1.4.0
-artifact remains pending. Do not infer Chat evidence from the Claude Local
-plugin.
-
-If authentication, 2FA, approval, or safe app control prevents a check, stop
-that interaction. Do not bypass it or mark it `PASS`. Use only `PASS`, `FAIL`,
-`NOT_OBSERVED`, or `BLOCKED` for each manual field.
-
-Place the reviewed recording file inside the printed private evidence directory
-as a new owner-only `0600` regular file, then bind it to the printed test ID:
-
-```bash
+```sh
 node tools/reinstall_cycle_acceptance.mjs --bind-recording \
   PRIVATE_EVIDENCE_DIRECTORY RECORDING_FILE_INSIDE_PRIVATE_EVIDENCE TEST_ID
 ```
 
-Edit only the five `PENDING` manual lines. Packing rejects free-form notes,
-unknown enums, tampered automated fields, links, extra files, or privacy-sensitive
-values. A `PASS` recording-review field requires its verified same-test receipt;
-missing linkage is not an unconditional prohibition on packing unknown results.
+If raw capture is prohibited, do not create a substitute recording. Fields without
+the qualifying recorded observation remain `NOT_OBSERVED` or `BLOCKED`. An
+unrecorded direct observation does not meet the recorded PASS requirement.
+Automatic success may be packed with unknown manual fields, but the overall
+result is not a complete acceptance pass.
 
-### When raw capture is prohibited
+Edit only the four categorical lines, then run:
 
-Do not start Record & Replay or collect screenshots, prompts, transcripts,
-accessibility events, account details, credentials or hidden reasoning. Do not
-fabricate a recording or bind a substitute file. Leave every manual check that
-lacks its qualifying recorded observation `NOT_OBSERVED`; use `BLOCKED` when
-login, approval, capture authorization or safe control prevented it. A direct
-unrecorded observation or an approval receipt does not meet the recorded `PASS`
-requirement. The automatic hook inventory is distinct from manual review,
-automatic hook delivery, full canonical reads and native application receipts.
-
-After automatic checks pass, the unchanged pack contract allows all five final
-enums, including unknown/blocked fields, with the recording linkage still
-pending. It retains `automatedResult: passed`, but `manualResult` and
-`overallResult` are `not_observed` or `blocked` (or `failed` if any field failed),
-never a complete acceptance pass. Automatic-only evidence is useful for
-installation/topology assessment but leaves the manual acceptance requirement
-open. Authentication and trust approvals are user actions; never infer them.
-
-## Create and retain the public handoff
-
-After all five fields have a final categorical value, run:
-
-```bash
+```sh
 node tools/reinstall_cycle_acceptance.mjs --pack RESULT_DIRECTORY \
   --private-evidence PRIVATE_EVIDENCE_DIRECTORY
 ```
 
-The final ZIP contains exactly `result.json`, `result.md`, and
-`manual-observations.md`. Its automated bytes must match the sealed result, and
-the seal, final verification, installed checkpoint, source commit, CI artifact,
-recording receipt when present, and ZIP digest remain linked in the private manifest.
+The final ZIP contains only `result.json`, `result.md` and `manual-observations.md`.
+Its automated bytes, final seal, installed checkpoint, source/artifact identity,
+recording receipt when present and ZIP digest remain linked. A diagnostic ZIP
+from a pause or failure never occupies the final ZIP name or implies success.
 
-A paused or failed run may create a separately named `.diagnostic.zip`. That
-bundle does not occupy the final `.zip` name and does not seal a paused result as
-an automated pass.
+## Retention and final state
 
-Retain private evidence until the public bundle and its SHA-256 digest are safely
-handed off. Cleanup permanently deletes exactly one owner-controlled private run
-directory. With the bundle still at its original path, use:
+Retain private evidence until the public bundle and digest are safely handed off.
+Cleanup permanently removes only the exact authorized private run directory:
 
-```bash
+```sh
 node tools/reinstall_cycle_acceptance.mjs --cleanup-private \
-  PRIVATE_EVIDENCE_DIRECTORY --test-id TEST_ID \
-  --public-zip-sha256 BUNDLE_SHA256
+  PRIVATE_EVIDENCE_DIRECTORY --test-id TEST_ID --public-zip-sha256 BUNDLE_SHA256
 ```
 
-If the exact bundle was moved, add `--public-bundle MOVED_BUNDLE_FILE`. If it was
-intentionally removed only after its digest was retained elsewhere, add
-`--allow-missing-public-bundle` instead. Cleanup first writes a durable
-authorization tombstone, so an interrupted deletion can safely repeat the same
-exact command. Never use cleanup on an active run or a directory whose owner,
-mode, canonical path, link count, prefix, test ID, or bundle digest differs.
+For a moved bundle add `--public-bundle MOVED_BUNDLE_FILE`; for an intentionally
+removed bundle whose digest was retained, use `--allow-missing-public-bundle`.
+A durable tombstone makes interrupted cleanup repeatable without broad deletion.
+Never clean an active run or bypass owner, mode, link, identity or digest checks.
 
-## Failure boundaries and final state
-
-- A preflight failure performs zero lifecycle commands and leaves the admitted
-  installation unchanged.
-- No reinstall follows a partial purge or nonempty exact residue inventory.
-- After mutation starts, a failure reports the observed categorical partial
-  state or `unknown_unverified`; it does not claim to restore the previous
-  cache, data, trust, content, or version.
-- Raw lifecycle output, candidate paths, recordings, accessibility snapshots,
-  and private evidence paths stay private and must not be attached to the issue
-  or pull request.
-- A successful cycle ends with Claude and Codex installed from the exact
-  candidate commit, automatic updates disabled, and the other supported hosts
-  absent. This is the intended final state; do not purge it again as part of
-  this acceptance.
-
-The valid success claim is limited to the categorical final topology and the
-exact candidate installation on this previously used Mac.
+A failed preflight performs no lifecycle action. Partial purge blocks reinstall.
+After mutation, failures record the actual partial state or `unknown_unverified`,
+never a claim that removed data or trust were restored. Success ends with Codex
+1.4.0 installed from the exact candidate and automatic updates disabled. Do not
+purge that final installation again as part of this cycle.

@@ -58,7 +58,7 @@ RUNTIME_CONTENT_ASSETS = (
     "content/compiled-reasoning-content.bundle.json",
     "content/compiled-response-policy.json",
 )
-RUNTIME_PROFILES = ("codex", "claude")
+RUNTIME_PROFILES = ("codex",)
 
 
 class BuildError(RuntimeError):
@@ -227,16 +227,14 @@ def _runtime_dependency_manifest(  # noqa: C901  # Explicit release policy.
     cli_runtime = packages.get(CODEX_CLI_RUNTIME_PACKAGE)
     pydantic = packages.get("pydantic")
     pydantic_core = packages.get("pydantic-core")
-    if runtime_profile == "codex":
-        if sdk is None or sdk.get("version") != CODEX_SDK_VERSION:
-            errors.append("openai_codex_pin_invalid")
-        if cli_runtime is None or cli_runtime.get("version") != CODEX_SDK_VERSION:
-            errors.append("codex_cli_runtime_pin_invalid")
-        if sdk is not None and not {
-            CODEX_CLI_RUNTIME_PACKAGE,
-            "pydantic",
-        } <= _locked_dependency_names(sdk):
-            errors.append("openai_codex_closure_invalid")
+    if sdk is None or sdk.get("version") != CODEX_SDK_VERSION:
+        errors.append("openai_codex_pin_invalid")
+    if cli_runtime is None or cli_runtime.get("version") != CODEX_SDK_VERSION:
+        errors.append("codex_cli_runtime_pin_invalid")
+    if sdk is not None and (
+        not {CODEX_CLI_RUNTIME_PACKAGE, "pydantic"} <= _locked_dependency_names(sdk)
+    ):
+        errors.append("openai_codex_closure_invalid")
     pydantic_version = pydantic.get("version") if pydantic is not None else None
     if not isinstance(pydantic_version, str) or not _version_at_least(pydantic_version, (2, 12)):
         errors.append("pydantic_bound_invalid")
@@ -266,12 +264,11 @@ def _runtime_dependency_manifest(  # noqa: C901  # Explicit release policy.
             "pydantic": pydantic_version,
             "pydantic-core": pydantic_core.get("version") if pydantic_core is not None else None,
         }
-        if runtime_profile == "codex":
-            expected_versions = {
-                "openai-codex": CODEX_SDK_VERSION,
-                CODEX_CLI_RUNTIME_PACKAGE: CODEX_SDK_VERSION,
-                **expected_versions,
-            }
+        expected_versions = {
+            "openai-codex": CODEX_SDK_VERSION,
+            CODEX_CLI_RUNTIME_PACKAGE: CODEX_SDK_VERSION,
+            **expected_versions,
+        }
         for name, expected_version in expected_versions.items():
             try:
                 installed_version = importlib.metadata.version(name)
@@ -282,19 +279,16 @@ def _runtime_dependency_manifest(  # noqa: C901  # Explicit release policy.
             installed[name] = installed_version == expected_version
             if not installed[name]:
                 errors.append(f"installed_distribution_version_mismatch:{name}")
-        if runtime_profile == "codex":
-            cli_files = _distribution_files(CODEX_CLI_RUNTIME_PACKAGE)
-            binary_name = "codex.exe" if target.name.startswith("windows-") else "codex"
-            required_files = {
-                "codex_cli_bin/__init__.py",
-                "codex_cli_bin/codex-package.json",
-                f"codex_cli_bin/bin/{binary_name}",
-            }
-            cli_resources_present = cli_files is not None and required_files <= cli_files
-            if not cli_resources_present:
-                errors.append("installed_cli_runtime_resources_missing")
-        else:
-            cli_resources_present = "not_required"
+        cli_files = _distribution_files(CODEX_CLI_RUNTIME_PACKAGE)
+        binary_name = "codex.exe" if target.name.startswith("windows-") else "codex"
+        required_files = {
+            "codex_cli_bin/__init__.py",
+            "codex_cli_bin/codex-package.json",
+            f"codex_cli_bin/bin/{binary_name}",
+        }
+        cli_resources_present = cli_files is not None and required_files <= cli_files
+        if not cli_resources_present:
+            errors.append("installed_cli_runtime_resources_missing")
 
     status = "blocked" if errors else "ready" if require_installed else "locked"
     return {
@@ -303,20 +297,16 @@ def _runtime_dependency_manifest(  # noqa: C901  # Explicit release policy.
         "sdk": {
             "name": "openai-codex",
             "version": CODEX_SDK_VERSION,
-            "bundling": "included" if runtime_profile == "codex" else "excluded",
+            "bundling": ("included"),
         },
         "cli_runtime": {
             "name": CODEX_CLI_RUNTIME_PACKAGE,
             "version": CODEX_SDK_VERSION,
             "target_wheel": (
-                "locked"
-                if runtime_profile == "codex" and target_wheel_locked
-                else "missing"
-                if runtime_profile == "codex"
-                else "not_required"
+                "locked" if runtime_profile == "codex" and target_wheel_locked else ("missing")
             ),
             "artifact_verification": "pending",
-            "bundling": "included" if runtime_profile == "codex" else "excluded",
+            "bundling": ("included"),
         },
         "pydantic": {
             "version": pydantic_version,
@@ -415,10 +405,7 @@ def _spec_for(
         spec = _rooted(root, explicit)
     elif mode == "probe":
         spec = root / "packaging" / "pyinstaller" / "opensocrates-probe.spec"
-    elif runtime_profile == "claude":
-        spec = root / "packaging" / "pyinstaller" / "opensocrates-runtime-claude.spec"
-    else:
-        spec = root / "packaging" / "pyinstaller" / "opensocrates-runtime.spec"
+    spec = root / "packaging" / "pyinstaller" / "opensocrates-runtime.spec"
     if not spec.is_file():
         raise BuildError(
             f"PyInstaller spec not found: {spec.relative_to(root) if spec.is_relative_to(root) else spec}"
@@ -649,16 +636,10 @@ def _runtime_profile_inventory(  # noqa: C901  # Closed host dependency inventor
         ):
             codex_cli_count += 1
     errors: list[str] = []
-    if runtime_profile == "claude":
-        if codex_sdk_count:
-            errors.append("claude_runtime_contains_openai_codex")
-        if codex_cli_count:
-            errors.append("claude_runtime_contains_codex_cli_bin")
-    else:
-        if codex_sdk_count == 0:
-            errors.append("codex_runtime_missing_openai_codex")
-        if codex_cli_count == 0:
-            errors.append("codex_runtime_missing_codex_cli_bin")
+    if codex_sdk_count == 0:
+        errors.append("codex_runtime_missing_openai_codex")
+    if codex_cli_count == 0:
+        errors.append("codex_runtime_missing_codex_cli_bin")
     return {
         "status": "fail" if errors else "pass",
         "runtime_profile": runtime_profile,

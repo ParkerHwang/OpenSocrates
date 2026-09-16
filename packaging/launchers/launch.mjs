@@ -11,7 +11,7 @@ function unavailable(code) {
   process.exit(0);
 }
 const events = new Set(['session_started','user_prompt_submitted','skill_invoked','tool_succeeded','tool_failed','tool_batch_completed','completion_candidate','pre_compaction','post_compaction','session_ended']);
-if (!['codex','claude'].includes(host) || extra.length ||
+if (!['codex'].includes(host) || extra.length ||
     !(hook ? events.has(event) : mode === 'decision' ? !event || event === '--stream' : mode === 'control' && !event)) unavailable('invalid_arguments');
 if (process.platform !== 'win32' || process.arch !== 'x64') unavailable('unsupported_platform');
 const runtime = fileURLToPath(new URL('../runtime/windows-x64/opensocrates-runtime/opensocrates-runtime.exe', import.meta.url));

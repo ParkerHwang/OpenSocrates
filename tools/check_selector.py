@@ -1480,12 +1480,12 @@ def _test_hook_entrypoint_contract() -> None:
     with patch("opensocrates.cli.runtime.build_runtime_services", capture_runtime):
         output = StringIO()
         exit_code = run_hook(
-            ("claude", "user_prompt_submitted"),
+            ("codex", "user_prompt_submitted"),
             stdin=BytesIO(json.dumps(payload).encode("utf-8")),
             stdout=output,
         )
     _require(exit_code == 0 and output.getvalue() == "")
-    _require(captured == [{"host": "claude", "hook_only": True, "workspace": workspace}])
+    _require(captured == [{"host": "codex", "hook_only": True, "workspace": None}])
 
 
 @_check("VSC-10A-codex-compact-minimal-restore-and-fail-open")
@@ -1843,12 +1843,6 @@ def _test_release_consumers_reject_forged_timing_evidence() -> None:
                 "status": "pass",
             },
             "sbom.spdx.json": {"spdxVersion": "SPDX-2.3"},
-            "runtime-build-claude.json": {
-                "schema": "opensocrates.runtime-build-evidence/1.0.0",
-                "status": "pass",
-                "version": "synthetic-version",
-                "runtime_profile": "claude",
-            },
             "runtime-build-codex.json": {
                 "schema": "opensocrates.runtime-build-evidence/1.0.0",
                 "status": "pass",

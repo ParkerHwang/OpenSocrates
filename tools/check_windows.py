@@ -686,7 +686,7 @@ class WindowsChecks(unittest.TestCase):
     @unittest.skipUnless(PACKAGES, "requires --packages after build_windows.py")
     def test_real_packaged_runtime_and_checksum(self):
         version = (ROOT / "VERSION").read_text().strip()
-        for host in ("claude", "codex"):
+        for host in ("codex",):
             archive = ROOT / "dist" / f"opensocrates-{version}-{host}-plugin-windows-x64.zip"
             subprocess.run(
                 [

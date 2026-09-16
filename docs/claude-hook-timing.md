@@ -1,3 +1,6 @@
+> Historical record for OpenSocrates 1.3.1 or earlier. This integration is
+> removed and unsupported in 1.4.0. Use [the current guide](../README.md).
+
 # Packaged Claude hook timing
 
 OpenSocrates v1.1.2 was measured on macOS 26.5.2, Apple silicon (`arm64`),

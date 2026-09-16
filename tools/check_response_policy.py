@@ -96,7 +96,7 @@ class ResponsePolicyChecks(unittest.TestCase):
         )
 
     def test_all_six_controller_assets_bind_guided_policy(self):
-        for host in ("antigravity", "claude", "codex", "cursor", "grok", "opencode"):
+        for host in ("codex",):
             root = ROOT / "build/generated/plugins" / host
             text = (root / "skills/opensocrates/SKILL.md").read_text()
             self.assertIn(policy_identity(self.policy), text)
@@ -114,7 +114,7 @@ class ResponsePolicyChecks(unittest.TestCase):
         for locale in ("en", "ko"):
             raw = strict_second_pass_fragment(bundle, locale)
             guard = (ROOT / f"plugin-src/shared/rigor/activation.{locale}.md").read_text().strip()
-            for host in ("antigravity", "claude", "codex", "cursor", "grok", "opencode"):
+            for host in ("codex",):
                 leaf = "rigor" if host == "codex" else "opensocrates"
                 text = (ROOT / f"build/generated/plugins/{host}/skills/{leaf}/SKILL.md").read_text()
                 self.assertIn(guard + "\n\n" + raw, text)
@@ -152,7 +152,7 @@ class ResponsePolicyChecks(unittest.TestCase):
     def test_all_host_decision_guides_preserve_question_scope_contract(self):
         for locale in ("en", "ko"):
             source = (ROOT / f"plugin-src/shared/decision/guide.{locale}.md").read_bytes()
-            for host in ("antigravity", "claude", "codex", "cursor", "grok", "opencode"):
+            for host in ("codex",):
                 generated = ROOT / "build/generated/plugins" / host
                 self.assertEqual(
                     (
