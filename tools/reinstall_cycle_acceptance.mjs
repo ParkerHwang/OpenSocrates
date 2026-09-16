@@ -7212,7 +7212,7 @@ function assertRegistrationState(snapshot, expected) {
   const expectedVersion = expected === "installed-baseline" ? INITIAL_VERSION : CANDIDATE_VERSION;
   for (const host of HOSTS) {
     const item = snapshot?.[host];
-    if (!item) fail("baseline", "the two-host registration snapshot is incomplete");
+    if (!item) fail("baseline", "the Codex registration snapshot is incomplete");
     if (item.unsupportedLegacyConflictCount !== 0) {
       fail(
         expected === "installed-baseline" ? "baseline" : "residue",
@@ -11022,7 +11022,7 @@ export async function assertFinalInstalled(recorder, report, targets, candidate,
   ) {
     fail(
       "post-install",
-      "the final desired state is not the exact installed two-host state with updates disabled",
+      "the final desired state is not the exact installed Codex state with updates disabled",
     );
   }
   const layout = inspectManagedLayout({ codex: targets.codex.root });

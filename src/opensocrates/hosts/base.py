@@ -5,8 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any, Protocol
 
-from ..domain.models import CapabilityProfile, NormalizedEvent
-from .common import HostAction
+from ..domain.models import CapabilityProfile
 
 
 class HostAdapter(Protocol):
@@ -22,12 +21,4 @@ class HostAdapter(Protocol):
     ) -> Any: ...
 
 
-class PromptOnlyAdapterProtocol(Protocol):
-    """Prompt-only surface: context can be supplied, lifecycle cannot."""
-
-    def capabilities(self) -> CapabilityProfile: ...
-
-    def context_for(self, event: NormalizedEvent | None = None) -> HostAction: ...
-
-
-__all__ = ["HostAdapter", "PromptOnlyAdapterProtocol"]
+__all__ = ["HostAdapter"]

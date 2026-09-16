@@ -42,7 +42,7 @@ test("classifies target metadata and runtime layout failures as verification", (
   assert.equal(
     errorCategory(
       new InstallerError(
-        "cursor package contains an unexpected native runtime or launcher surface",
+        "Codex package contains an unexpected native runtime or launcher surface",
       ),
     ),
     "verification",

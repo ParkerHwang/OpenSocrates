@@ -1,5 +1,10 @@
 # Windows v1.4.0 implementation and validation record
 
+> Historical multi-host candidate record. The Codex-only revision and publication
+> authorization of 2026-09-16 supersede this checkpoint. See
+> [the current release record](v1.4.0-release.md) and
+> [execution plan](v1.4.0-release-plan.md).
+
 ## Resume point (2026-09-10)
 - Base commit: `cce7f47ecab55b5d45e6d4844c793bc5306fa234` (origin/main, v1.3.1). No v1.4.0 existed at initial remote check.
 - Branch: `codex/windows-v1.4.0`; Draft [PR #93](https://github.com/ParkerHwang/OpenSocrates/pull/93). The first remote review and CI run used HEAD `9e5ec5bd458e2d8c2b772b6074df25e0192d413e`. The remediation implementation checkpoint `923ad2d020c2081e3aa29af67ac0a32e5dd2238e` passed the five product/platform jobs in [run 34388190521](https://github.com/ParkerHwang/OpenSocrates/actions/runs/34388190521), while Repository governance for the same SHA passed in [run 34388190218](https://github.com/ParkerHwang/OpenSocrates/actions/runs/34388190218). No pre-existing changes were overwritten. Any later documentation-only handoff commit requires its own exact-head checks and new artifact hashes.
