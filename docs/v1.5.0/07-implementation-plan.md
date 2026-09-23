@@ -2,8 +2,9 @@
 
 ## Planning coverage
 
-Root question: How can v1.5.0 deliver source-grounded coding continuity across
-fresh sessions while preserving the current judgment and privacy boundaries?
+Root question: How can v1.5.0 strengthen OpenSocrates' general judgment support
+with persistent project context and additive coding capabilities, while preserving
+its evidence, privacy, and completion boundaries?
 
 Tree type: `how`. Decomposition axis: product responsibilities. The branches are
 policy/contracts, durable storage, current-source knowledge, context delivery,
@@ -16,7 +17,9 @@ certify application. Their data dependencies are explicitly sequenced below.
 Coverage is checked against every requirement in 01 and every case in 06.
 
 Status: all work packages below are planned; no implementation or model-quality
-result is claimed by this documentation package.
+result is claimed by this documentation package. Coding is the first new domain
+workstream, not the whole product identity. Keep G01–G03 general/combined behavior
+in baseline, integration, and release verification alongside the coding cases.
 
 ## Ordered work packages
 

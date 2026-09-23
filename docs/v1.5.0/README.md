@@ -5,11 +5,25 @@ Working language: English. Reviewed baseline: `v1.4.0`, commit
 `5a2ff3c312e92aa8a44d0905465674d9a4e4f645`, also the remote `main` head
 when checked on 2026-09-23.
 
-The release objective is to help Codex make better changes to an existing project
-across sessions: recover relevant design decisions, find suitable existing code,
-understand change impact, and produce maintainable changes with inspectable evidence.
-Persistent project memory is built into OpenSocrates and explicitly enabled per
-project. It is not a dependency on a separately installed memory service.
+OpenSocrates starts from the premise that the text supplied to an LLM can materially
+change the judgments and work it produces. Its product function is to select,
+prepare, and deliver useful reasoning guidance and task context at the points where
+they matter. The intended result is better-grounded judgment and more effective
+work from the chosen model, not a claim that text is the only determinant of performance.
+
+The existing reasoning methods help an AI examine assumptions, compare alternatives,
+evaluate evidence, and reconsider conclusions. v1.5.0 extends that foundation with
+persistent project context, deeper coding-domain evidence, and GPT-6 adaptation.
+These capabilities work together to improve what the model receives. Coding is an
+added application of the general product, not a replacement for its broader purpose.
+
+The first implementation workstream exercises these additions on existing software
+projects: recover relevant decisions, find suitable code, understand change impact,
+and verify maintainable changes across sessions. The shared memory model must retain
+the distinction between intent, evidence, inference, and unfinished work. Persistent
+memory is built in and explicitly enabled per project; ordinary judgment work does
+not require enabling it. Codex is the supported host, not a restriction of judgment
+support to programming tasks.
 
 ## Read this package
 
@@ -24,6 +38,7 @@ project. It is not a dependency on a separately installed memory service.
 | [07 — Implementation plan](07-implementation-plan.md) | Ordered work packages, ownership boundaries, dependencies, and executable exit criteria |
 | [08 — Implementation kickoff](08-implementation-kickoff.md) | Complete prompt to start implementation in a fresh Codex task |
 | [09 — Decisions and source map](09-decisions-and-source-map.md) | Architectural decisions, alternatives, source evidence, and reopening conditions |
+| [10 — Product identity and combined capabilities](10-product-identity-and-combined-capabilities.md) | General reasoning foundation, shared memory, and additive coding support |
 | [Validation record](VALIDATION.md) | Checks actually performed on this document package |
 | [Pitch rehearsal record](pitch-rehearsals/README.md) | Simulated audience feedback, proposed follow-ups, and evidence limits |
 

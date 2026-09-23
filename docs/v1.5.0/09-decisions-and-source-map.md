@@ -23,6 +23,8 @@ All choices below are design decisions for implementation, not measured benefits
 | D10 | Model-specific probes with common outcome contracts | Hardcoding a flagship may simplify testing but changes cost/capability roles | Actual model-specific failures justify scoped adaptations |
 | D11 | Accepted project intent may cross enrolled worktrees; observations/checkpoints are scoped | Sharing all state would improve apparent recall but leaks incompatible code/task state | An explicit merge/import workflow can validate a broader transfer |
 | D12 | Quality measured on a second change in a fresh session | Single-turn tests are cheaper but do not establish project continuity | User scope changes to purely local single-turn assistance |
+| D13 | Preserve the general reasoning product; memory and coding support are additive capabilities | A coding-only narrative is simpler but loses the user's intended product identity | The user explicitly changes the product purpose |
+| D14 | Treat useful text/context selection and delivery as the founding product mechanism | Optimizing memory size or method count alone is easier to describe but does not establish better model behavior | Matched-task evidence identifies a different causal mechanism or the user changes the thesis |
 
 Criteria come from the user's stated reuse, dependency-understanding, code-quality,
 and continuity goals plus the verified repository privacy/evidence contracts.

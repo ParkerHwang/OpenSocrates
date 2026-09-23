@@ -121,4 +121,34 @@ do not establish that OpenSocrates integrates with ordinary ChatGPT or improves 
 This record adds audience-specific concept feedback. It does not change the core
 release scope, implement an ordinary-ChatGPT extension, or rewrite the deck.
 
+## Corrective rebrief: coding is additive
+
+The user subsequently clarified that coding strengthens the original OpenSocrates
+function rather than replacing it. The presenter acknowledged that the initial
+brief underrepresented the general reasoning core. The same three personas received
+one corrective rebrief: existing methods apply to assumptions, alternatives,
+evidence, objections, and revised conclusions in non-coding work too; memory and
+coding support add to that foundation. Codex is the host, not a coding-only domain.
+
+The maker then saw a broader judgment helper and suggested a workshop-planning
+decision where a prior accessibility goal matters to pricing options. The knowledge
+worker suggested revisiting whether a research brief should rely on a small survey,
+using the earlier decision to treat it as exploratory as relevant context. The
+personal-use persona suggested reconsidering a learning plan when time or budget
+changes. These are hypothetical examples, not actual observed needs or advice to
+make a specific financial decision.
+
+Remaining concerns were appropriate intervention frequency, an accessible workflow
+for non-coding projects on the supported host, and avoiding a pitch that makes the
+user think they must learn 48 methods or merely manage another generic memory.
+The personas explicitly acknowledged that their initial feedback applied to the
+narrower coding-memory brief, not the complete product. Ordinary ChatGPT integration
+remains separate; general non-coding reasoning value does not require that
+integration to be part of the product's existing scope.
+
+After this rebrief, the user further stated the product's founding text-injection
+theme. That theme is now recorded in the [product identity document](../10-product-identity-and-combined-capabilities.md).
+It was not independently re-pitched to the panel, so this record does not invent a
+new audience verdict on the fully restated thesis.
+
 OpenSocrates grounding: critical-thinking@3

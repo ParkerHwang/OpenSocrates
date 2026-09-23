@@ -2,6 +2,20 @@
 
 ## Component boundaries
 
+The existing reasoning controller and canonical methods remain the product's
+general judgment layer. Memory is shared supporting context, and coding guides
+are an additive domain layer. A coding task may need all three; a non-coding
+judgment may use the reasoning core with appropriate available context and no
+coding guide. A mechanical task may need none of the additional machinery.
+
+At a material judgment point, the agent retrieves relevant prior public context
+when useful and enabled, checks its applicability, selects an eligible canonical
+procedure, and obtains the domain evidence the current decision requires. New
+evidence may change the question or invalidate the old conclusion. Store only
+permitted public outcomes and continuity, not private reasoning or reusable proof
+that a previous agent read/applied a method. Retrieval never chooses the answer
+by treating remembered conclusions as authority over current evidence.
+
 ```mermaid
 flowchart TD
     A[Codex controller and coding guides] --> B[Memory application service]
@@ -21,6 +35,12 @@ The diagram represents responsibilities, not mandatory model calls. Retrieval,
 fingerprinting, and state transitions are deterministic by default. The active
 Codex agent supplies task intent and performs coding judgments. No embedded LLM,
 extra API key, or separate Context Scout installation is required.
+
+The first source adapters and detailed acceptance work focus on coding projects.
+That implementation sequencing does not justify programming-only names, meanings,
+or authority assumptions for shared decision/observation/checkpoint records. Any
+additional non-coding source adapter requires its own truthful capability scope;
+this clarification does not promise a universal document or ChatGPT integration.
 
 | Component | Owns | Must not own |
 | --- | --- | --- |

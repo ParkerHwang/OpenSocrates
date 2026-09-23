@@ -7,10 +7,16 @@ dispatched it. The specification is the task input, not proof that features exis
 ---
 
 Implement OpenSocrates v1.5.0 from the English development specification in
-`docs/v1.5.0/`. The objective is built-in, local project memory that supports
-source-grounded coding across fresh sessions, improves appropriate code reuse and
-change-impact understanding, and supports maintainability review and verified
-GPT-6 compatibility.
+`docs/v1.5.0/`. Preserve OpenSocrates as a general reasoning and judgment-support
+system founded on task-aware text/context selection and delivery: what an LLM
+receives can materially change the work it produces. Optimize the usefulness,
+applicability, timing, consistency, and evidence quality of that material, not its
+volume. Extend it with built-in local project memory, stronger coding-domain
+support for reuse/dependency/maintainability decisions, and verified GPT-6
+compatibility. The first new implementation workstream is coding continuity;
+do not redefine the whole product as a coding-memory utility. Memory provides
+context for fresh judgment, and coding guides provide domain evidence. Existing
+non-coding judgments must remain supported without mandatory coding machinery.
 
 The known baseline is released v1.4.0 at
 `5a2ff3c312e92aa8a44d0905465674d9a4e4f645`. Reconcile current remote main before
@@ -29,7 +35,9 @@ Read the repository's AGENTS.md and CONTRIBUTING.md, then the v1.5.0 README,
 01-scope-and-requirements.md, 02-architecture-and-operation.md,
 03-data-and-interface-contracts.md, and 05-privacy-lifecycle-and-migration.md.
 Read 04 before host/coding integration and 06–07 before freezing tests/execution.
-Use 09 for source anchors and design decisions. Treat examples as synthetic data.
+Use 09 for source anchors and design decisions and 10 for the product-identity
+clarification. Include G01–G03 in the appropriate behavior verification. Treat
+examples as synthetic data.
 
 You are authorized to implement this specification, including the narrow,
 explicitly disclosed policy amendment for opt-in project memory described in 05.

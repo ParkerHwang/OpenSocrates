@@ -100,3 +100,26 @@ failures. Twelve external links were not fetched by the local checker. Official
 ChatGPT quickstart and memory documentation were separately read for platform
 context. No real audience research, new runtime behavior, or ChatGPT integration
 was claimed by these checks.
+
+## Product-identity correction on 2026-09-23
+
+Recorded the user's founding premise: the text/context supplied to an LLM can
+materially change the work it produces. The general reasoning core remains the
+product foundation; project memory, coding evidence, and model/host adaptation
+extend how relevant guidance and context are supplied. Updated the objective,
+architecture, requirements, evaluation, implementation plan, kickoff prompt,
+decision record, and pitch interpretation to reflect that relationship.
+
+Added G01-G03 for general non-coding behavior and combined use of reasoning,
+memory, and current code evidence. These are acceptance requirements, not passing
+runtime tests. The new product-identity document separates the established user
+intent from the unverified performance hypothesis and states a revision condition.
+
+The documentation checks passed with 17 Markdown documents, three JSON examples,
+40 acceptance-case references, and 75 link entries processed without reported
+failures. Twelve external links were not fetched by the local checker. The staged
+diff was checked for whitespace errors before the recording commit.
+
+The existing presentation files were not regenerated. The latest founding-text
+framing was not independently re-pitched, and no runtime implementation or measured
+model-performance improvement is claimed by this documentation correction.

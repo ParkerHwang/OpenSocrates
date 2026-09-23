@@ -5,6 +5,19 @@ questions from AI role-play. They are not interviews with actual investors,
 developers, or ChatGPT users, customer research, endorsements, or market validation.
 Do not turn a panel's simulated preference into a user count or adoption forecast.
 
+**Subsequent product-identity correction:** the user clarified that coding is an
+added capability of the original general OpenSocrates reasoning system. The earlier
+briefs emphasized coding memory too heavily. Treat the records as reactions to
+those briefs, not a complete evaluation of OpenSocrates or evidence that its
+general reasoning value excludes non-developers. See the
+[product-identity clarification](../10-product-identity-and-combined-capabilities.md).
+
+The user's further founding-theme clarification is that supplied text strongly
+influences LLM behavior. Future full-product pitches should explain OpenSocrates as
+selecting and delivering better reasoning guidance and relevant context, then show
+memory and coding support as contributions to that mechanism. The earlier narrow
+briefs did not adequately test this complete proposition.
+
 | Audience | State | Record |
 | --- | --- | --- |
 | YC-style early-stage investor | Completed: opening pitch, four Q&A rounds, final memo | [Investor rehearsal](yc-investor.md) |

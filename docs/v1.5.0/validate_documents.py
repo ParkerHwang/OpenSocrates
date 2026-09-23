@@ -71,7 +71,7 @@ def validate() -> dict[str, object]:
             "baseline CLI dispatcher anchor")
 
     verification = (package / "06-verification-and-evaluation.md").read_text()
-    cases = [("T", 26), ("C", 6), ("H", 3), ("P", 2)]
+    cases = [("G", 3), ("T", 26), ("C", 6), ("H", 3), ("P", 2)]
     for prefix, count in cases:
         for number in range(1, count + 1):
             require(f"| {prefix}{number:02d} |" in verification,

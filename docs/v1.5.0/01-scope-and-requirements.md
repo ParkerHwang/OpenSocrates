@@ -2,18 +2,36 @@
 
 ## Problem and intended outcome
 
+The founding premise is that an LLM's supplied text strongly influences its actual
+behavior and output quality. OpenSocrates turns that premise into task-aware
+selection and delivery of authored reasoning guidance and relevant context.
+Quality, applicability, timing, consistency, and source validity matter; injecting
+more text is not itself the objective. Model capability, tools, available evidence,
+and resources still affect outcomes. Claimed improvements require outcome evidence.
+
+OpenSocrates' product purpose remains general reasoning and judgment support.
+Its existing methods apply to planning, analysis, research judgments, design
+choices, and other decisions as well as software work. Codex is the delivery host;
+"Codex-only" does not mean "coding-only." Ordinary ChatGPT integration remains a
+separate host-integration question, not a prerequisite for non-coding judgments
+on the supported host.
+
 An agent can produce a locally correct patch while duplicating existing behavior,
 missing a dependent caller, inventing a poor abstraction, or forgetting why a
 previous implementation was chosen. A context window alone does not provide
 durable, version-aware project continuity.
 
-v1.5.0 must combine selective coding guidance with project memory that retrieves
-relevant decisions and current source evidence. The unit of success is a correct,
-maintainable change and a subsequent change made in a fresh session. A long
-explanation, a memory write, or a green test alone is not that outcome.
+v1.5.0 combines the existing judgment core, relevant project memory, and new
+domain-specific coding guidance. Memory supplies prior public decisions, evidence
+references, uncertainty and continuity; the reasoning core determines how to
+reassess the current question. Coding guidance connects that judgment to actual
+implementations and dependencies. A correct, maintainable change followed by a
+successful later change is the first coding workstream's outcome, not the sole
+definition of value for all OpenSocrates tasks.
 
 ## In scope
 
+- Preserve and strengthen the general judgment-support identity and non-coding behavior.
 - Existing-project feature work, fixes, and scoped refactoring.
 - Built-in, local, explicitly enabled project memory; no required separate plugin.
 - Durable decision records, observations, lessons, and task checkpoints.
@@ -27,6 +45,8 @@ explanation, a memory write, or a green test alone is not that outcome.
 
 | ID | Requirement | Primary acceptance |
 | --- | --- | --- |
+| CORE-01 | Preserve general judgment support for non-coding tasks; coding guides, Git access, and memory enrollment are not universal prerequisites. | G01, G02 |
+| CORE-02 | Connect recalled context to fresh judgment and relevant domain evidence; do not reduce the product to a note store or bypass canonical methods. | G02, G03 |
 | MEM-01 | Memory is disabled until an explicit project enrollment enables a declared storage policy. Reads/status do not initialize a store. | T01, T02 |
 | MEM-02 | Persistent memory is separate from the content-only `decision` path and its volatile method-read inventory. | T01, T03 |
 | MEM-03 | Records carry origin, scope, evidence references, lifecycle, and freshness as separate fields. | T04, T05 |

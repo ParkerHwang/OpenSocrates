@@ -4,6 +4,27 @@ Implementation correctness, package delivery, actual host use, and improved code
 quality require different evidence. Keep each result tied to the exact commit,
 configuration, platform, commands, and artifacts that produced it.
 
+## General judgment and combined-capability acceptance
+
+| ID | Scenario | Observable passing condition |
+| --- | --- | --- |
+| G01 | Non-coding choice, analysis, or planning task on the supported host | Eligible general methods remain available without forcing coding guides, Git operations, indexing, or memory enrollment |
+| G02 | New evidence changes a non-coding decision | Preserve goals/constraints, reassess the relevant assumption/conclusion, and keep prior recorded conclusions distinct from current support; no coding-only workflow leaks into the task |
+| G03 | Coding choice using prior intent and fresh code evidence | The agent connects relevant recalled context to the applicable reasoning procedure and actual code evidence; neither a memory receipt nor a checklist alone substitutes for the judgment |
+
+These are behavioral acceptance requirements, not new claims of proven benefit.
+Use bounded fixtures and retain the existing non-coding regression coverage. The
+core must remain useful with memory disabled or unavailable. The coding study
+below evaluates the added domain capability; it is not a test of every general
+OpenSocrates use case.
+
+Evaluate the founding text/context thesis through matched model/tool/task conditions.
+Separate authored-method guidance, memory-supplied context, and coding evidence when
+attributing effects. Record irrelevant/conflicting/stale context and overhead as
+possible regressions. More injected text, successful retrieval, or a reported read
+does not establish a better result. Preserve complete required procedures and
+constraints while reducing optional irrelevant material.
+
 ## Deterministic acceptance cases
 
 These are requirements for new tests, not results already obtained.

@@ -2,6 +2,14 @@
 
 ## Entry and delivery
 
+Coding support extends OpenSocrates' existing general reasoning function. Keep
+the relationship visible: the reasoning core examines the question, memory brings
+relevant prior context, and a coding guide obtains implementation/dependency
+evidence for that domain. The coding layer does not replace the core or become
+mandatory for analysis, planning, writing-related judgments, and other non-coding
+work. GPT-6 discovery/completion improvements apply to the general controller,
+not only the coding workflow.
+
 Keep the existing controller as a small router. Add concise pointers to separate
 engineering guides under the proposed `plugin-src/shared/coding/` directory and
 include them in generated Codex references. A guide has its own revision/hash;
