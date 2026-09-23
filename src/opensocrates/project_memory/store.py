@@ -117,6 +117,11 @@ class MemoryStore:
         journal = self.project_dir / "memory.sqlite3-journal"
         if journal.exists():
             _regular_private(journal)
+        for suffix in ("-wal", "-shm"):
+            sidecar = self.project_dir / f"memory.sqlite3{suffix}"
+            if sidecar.exists():
+                _regular_private(sidecar)
+                raise StoreError("unsupported_journal_mode")
         for path in (self.backup_path, self.backup_manifest_path):
             if path.exists():
                 _regular_private(path)

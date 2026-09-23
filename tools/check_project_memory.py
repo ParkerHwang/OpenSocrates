@@ -16,6 +16,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from opensocrates.persistence.locks import FileLock
+from opensocrates.persistence.permissions import create_owner_only_file
 from opensocrates.project_memory.registry import ProjectRegistry
 from opensocrates.project_memory.service import handle_memory
 from opensocrates.project_memory.store import MemoryStore
@@ -859,6 +860,23 @@ class MemoryFixture(unittest.TestCase):
                 "expected_policy_version": 1,
                 "idempotency_key": uid(),
             },
+        )
+        self.assertEqual(deleted["status"], "ok", deleted)
+        self.assertFalse(directory.exists())
+
+    def test_unexpected_wal_sidecars_fail_closed_and_delete_exactly(self) -> None:
+        self.enroll()
+        directory = self.data / "projects" / str(self.project_id)
+        for suffix in ("-wal", "-shm"):
+            path = directory / f"memory.sqlite3{suffix}"
+            descriptor = create_owner_only_file(path, flags=os.O_RDWR)
+            os.close(descriptor)
+        status = self.call("status", {})
+        self.assertEqual(status["status"], "unavailable")
+        self.assertIn("unsupported_journal_mode", status["limitations"])
+        deleted = self.call(
+            "delete",
+            {"intent": "delete_project", "expected_policy_version": 1, "idempotency_key": uid()},
         )
         self.assertEqual(deleted["status"], "ok", deleted)
         self.assertFalse(directory.exists())

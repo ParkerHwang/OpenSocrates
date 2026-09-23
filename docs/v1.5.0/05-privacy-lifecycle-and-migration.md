@@ -97,6 +97,9 @@ do not silently fall back to a workspace-controlled path.
 
 No network-filesystem guarantee is claimed in v1.5. Detect unsupported/unsafe
 storage where possible and document the narrower supported environment.
+The candidate uses a truncate-mode rollback journal. Unexpected WAL or shared
+memory sidecars make reads and writes unavailable before SQLite opens the store;
+an explicit exact-project deletion may remove those owner-checked managed files.
 
 ## Retention, deletion, and uninstall
 

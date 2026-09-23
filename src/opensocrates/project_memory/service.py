@@ -612,6 +612,8 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
                     "memory.sqlite3",
                     "memory.lock",
                     "memory.sqlite3-journal",
+                    "memory.sqlite3-wal",
+                    "memory.sqlite3-shm",
                     "memory.v1.backup.sqlite3",
                     "migration-backup.json",
                 }
@@ -631,6 +633,8 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
                     for path in (
                         store.path,
                         project_dir / "memory.sqlite3-journal",
+                        project_dir / "memory.sqlite3-wal",
+                        project_dir / "memory.sqlite3-shm",
                         store.backup_path,
                         store.backup_manifest_path,
                     ):
