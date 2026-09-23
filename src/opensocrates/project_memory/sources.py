@@ -12,7 +12,10 @@ import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
-from typing import Literal
+from typing import TYPE_CHECKING, Literal, cast
+
+if TYPE_CHECKING:
+    from opensocrates.windows_security import SourceRoot
 
 WorkspaceKind = Literal["git_worktree", "directory"]
 SCHEMA = "opensocrates.project-memory.snapshot/1.0.0"
@@ -136,6 +139,10 @@ def _safe_scope(paths: tuple[str, ...]) -> tuple[str, ...]:
             raise ValueError("unsafe_path")
         if any(part in {"", ".", ".."} for part in path.split("/")):
             raise ValueError("unsafe_path")
+        if os.name == "nt":
+            from opensocrates.windows_security import validate_source_relative
+
+            validate_source_relative(path)
     return tuple(sorted(set(paths)))
 
 
@@ -177,7 +184,17 @@ def _git_state(root: Path) -> dict[str, object]:
     }
 
 
-def _directory_inventory(root: Path, deadline: float) -> tuple[tuple[str, ...], bool]:
+def _directory_inventory(
+    root: Path, deadline: float, source_root: SourceRoot | None = None
+) -> tuple[tuple[str, ...], bool]:
+    if os.name == "nt":
+        from opensocrates.windows_security import inventory_source_files
+
+        if source_root is None:
+            raise ValueError("windows_source_adapter_unavailable")
+        return inventory_source_files(
+            source_root, deadline=deadline, max_paths=MAX_INVENTORY, excluded_dirs=EXCLUDED_DIRS
+        )
     paths: list[str] = []
     if root.is_symlink():
         return (), True
@@ -194,12 +211,14 @@ def _directory_inventory(root: Path, deadline: float) -> tuple[tuple[str, ...], 
 
 
 def _read_file(
-    root_fd: int, relative: str
+    root_fd: int | SourceRoot, relative: str
 ) -> tuple[bytes | None, str | None, tuple[int, int, int, int] | None]:
     """Open each path component without following symlinks, then verify one read."""
     if os.name == "nt":
-        return None, "windows_source_adapter_unavailable", None
-    fd = os.dup(root_fd)
+        from opensocrates.windows_security import read_source_file
+
+        return read_source_file(cast("SourceRoot", root_fd), relative, MAX_FILE_BYTES)
+    fd = os.dup(cast(int, root_fd))
     try:
         parts = relative.split("/")
         for component in parts[:-1]:
@@ -299,156 +318,187 @@ def capture_snapshot(  # noqa: C901 - bounded collection keeps one audit path
     The caller must validate registration/root ownership. This function rejects a
     symlink root and unsafe scope; it never follows symlinks during file reads.
     """
-    if os.name == "nt":
-        # The POSIX openat/O_NOFOLLOW sequence below has no equivalent in the
-        # current Windows source adapter. Do not fall back to path-based reads.
-        raise ValueError("windows_source_adapter_unavailable")
     if workspace_kind not in {"git_worktree", "directory"} or not project_id or not workspace_id:
         raise ValueError("invalid_snapshot_request")
     scopes = _safe_scope(scope_paths)
     exclusions = _safe_scope(excluded_paths)
     root = Path(root).absolute()
-    if root.is_symlink() or not root.is_dir():
-        raise ValueError("unsafe_path")
-    root = root.resolve()
-    root_before = root.stat(follow_symlinks=False)
-    start = time.monotonic()
-    deadline = start + MAX_SECONDS
-    git_before = _git_state(root) if workspace_kind == "git_worktree" else None
-    if git_before:
-        inventory = git_before["inventory"]
-        inventory_truncated = False
+    source_root: SourceRoot | None = None
+    if os.name == "nt":
+        from opensocrates.windows_security import open_source_root
+
+        source_root = open_source_root(root)
     else:
-        inventory, inventory_truncated = _directory_inventory(root, deadline)
-    assert isinstance(inventory, tuple)
-    entries: dict[str, dict[str, object]] = {}
-    omitted: dict[str, int] = {}
-    if inventory_truncated:
-        omitted["budget"] = 1
-    unstable: list[str] = []
-    identities: dict[str, tuple[int, int, int, int]] = {}
-    scanned_bytes = 0
-    root_fd = os.open(root, os.O_RDONLY | _O_DIRECTORY | _O_NOFOLLOW)
+        if root.is_symlink() or not root.is_dir():
+            raise ValueError("unsafe_path")
+        root = root.resolve()
     try:
-        for path in inventory:
-            if not _scope(path, scopes):
-                continue
-            if any(_scope(path, (excluded,)) for excluded in exclusions):
-                omitted["excluded_or_unsupported"] = omitted.get("excluded_or_unsupported", 0) + 1
-                continue
-            if not _allowed(path, workspace_kind):
-                omitted["excluded_or_unsupported"] = omitted.get("excluded_or_unsupported", 0) + 1
-                continue
-            if (
-                len(entries) >= MAX_FILES
-                or scanned_bytes >= MAX_BYTES
-                or time.monotonic() - start >= MAX_SECONDS
-            ):
-                omitted["budget"] = omitted.get("budget", 0) + 1
-                continue
-            data, reason, identity = _read_file(root_fd, path)
-            if reason or data is None or identity is None:
-                key = reason or "unavailable"
-                omitted[key] = omitted.get(key, 0) + 1
-                if key == "source_changed_during_read":
-                    unstable.append(path)
-                continue
-            if b"\0" in data:
-                omitted["binary"] = omitted.get("binary", 0) + 1
-                continue
-            try:
-                data.decode("utf-8")
-            except UnicodeDecodeError:
-                omitted["unsupported_encoding"] = omitted.get("unsupported_encoding", 0) + 1
-                continue
-            scanned_bytes += len(data)
-            if scanned_bytes > MAX_BYTES:
-                omitted["budget"] = omitted.get("budget", 0) + 1
-                break
-            entry: dict[str, object] = {
-                "sha256": hashlib.sha256(data).hexdigest(),
-                "size": len(data),
-            }
-            if path.endswith(".py") and workspace_kind == "git_worktree":
-                entry["python"] = _python_metadata(data)
-            entries[path] = entry
-            identities[path] = identity
-        for path, before in identities.items():
-            second_read, reason, after = _read_file(root_fd, path)
-            if (
-                reason
-                or before != after
-                or second_read is None
-                or hashlib.sha256(second_read).hexdigest() != entries[path]["sha256"]
-            ):
-                unstable.append(path)
-    finally:
-        os.close(root_fd)
-    git_after = _git_state(root) if workspace_kind == "git_worktree" else None
-    if git_after:
-        inventory_after = git_after["inventory"]
-        inventory_after_truncated = False
-    else:
-        inventory_after, inventory_after_truncated = _directory_inventory(root, deadline)
-    if inventory_after_truncated:
-        omitted["budget"] = omitted.get("budget", 0) + 1
-    try:
-        root_after = root.stat(follow_symlinks=False)
-        root_changed = (root_before.st_dev, root_before.st_ino) != (
-            root_after.st_dev,
-            root_after.st_ino,
+        root_before = root.stat(follow_symlinks=False)
+        start = time.monotonic()
+        deadline = start + MAX_SECONDS
+        git_before = _git_state(root) if workspace_kind == "git_worktree" else None
+        if git_before:
+            inventory = git_before["inventory"]
+            inventory_truncated = False
+        else:
+            inventory, inventory_truncated = _directory_inventory(root, deadline, source_root)
+        assert isinstance(inventory, tuple)
+        entries: dict[str, dict[str, object]] = {}
+        omitted: dict[str, int] = {}
+        if inventory_truncated:
+            omitted["budget"] = 1
+        unstable: list[str] = []
+        identities: dict[str, tuple[int, int, int, int]] = {}
+        scanned_bytes = 0
+        root_fd: int | SourceRoot = (
+            source_root
+            if source_root is not None
+            else os.open(root, os.O_RDONLY | _O_DIRECTORY | _O_NOFOLLOW)
         )
-    except OSError:
-        root_changed = True
-    if inventory_after != inventory or git_after != git_before:
-        omitted["state_changed_during_scan"] = 1
-    if root_changed:
-        omitted["root_changed_during_scan"] = 1
-    config = {
-        path: entry["sha256"]
-        for path, entry in entries.items()
-        if PurePosixPath(path).name.lower() in CONFIG_NAMES
-    }
-    coverage = {
-        "complete_for_scope": not any(key != "excluded_or_unsupported" for key in omitted)
-        and not unstable,
-        "omitted_categories": omitted,
-        "unstable_files": sorted(set(unstable)),
-        "search_boundary": {
-            "paths": list(scopes) if scopes else ["."],
-            "file_types": "allowed_text_only",
-        },
-        "dynamic_edges": "unknown" if workspace_kind == "git_worktree" else "not_applicable",
-    }
-    return {
-        "schema": SCHEMA,
-        "snapshot_id": str(uuid.uuid4()),
-        "project_id": project_id,
-        "workspace_id": workspace_id,
-        "workspace_kind": workspace_kind,
-        "root_identity_digest": _digest([root_before.st_dev, root_before.st_ino]),
-        "head_oid": git_after["head_oid"] if git_after else None,
-        "ref": git_after["ref"] if git_after else None,
-        "status_digest": git_after["status_digest"] if git_after else None,
-        "dirty": git_after["dirty"] if git_after else None,
-        "scope_paths": list(scopes),
-        "inventory_digest": _digest(sorted(entries)),
-        "content_manifest_digest": _digest({p: e["sha256"] for p, e in entries.items()}),
-        "exclusion_digest": _digest(
-            {
-                "adapter": ADAPTER,
-                "excluded_dirs": sorted(EXCLUDED_DIRS),
-                "excluded_names": sorted(EXCLUDED_NAMES),
-                "excluded_suffixes": EXCLUDED_SUFFIXES,
-                "policy_exclusions": list(exclusions),
-            }
-        ),
-        "configuration_digest": _digest(config),
-        "adapter_versions": {"local_source": ADAPTER},
-        "coverage": coverage,
-        "captured_at": datetime.now(timezone.utc).isoformat(),
-        "files": entries,
-    }
+        try:
+            for path in inventory:
+                if not _scope(path, scopes):
+                    continue
+                if any(_scope(path, (excluded,)) for excluded in exclusions):
+                    omitted["excluded_or_unsupported"] = (
+                        omitted.get("excluded_or_unsupported", 0) + 1
+                    )
+                    continue
+                if not _allowed(path, workspace_kind):
+                    omitted["excluded_or_unsupported"] = (
+                        omitted.get("excluded_or_unsupported", 0) + 1
+                    )
+                    continue
+                if (
+                    len(entries) >= MAX_FILES
+                    or scanned_bytes >= MAX_BYTES
+                    or time.monotonic() - start >= MAX_SECONDS
+                ):
+                    omitted["budget"] = omitted.get("budget", 0) + 1
+                    continue
+                data, reason, identity = _read_file(root_fd, path)
+                if reason or data is None or identity is None:
+                    key = reason or "unavailable"
+                    omitted[key] = omitted.get(key, 0) + 1
+                    if key == "source_changed_during_read":
+                        unstable.append(path)
+                    continue
+                if b"\0" in data:
+                    omitted["binary"] = omitted.get("binary", 0) + 1
+                    continue
+                try:
+                    data.decode("utf-8")
+                except UnicodeDecodeError:
+                    omitted["unsupported_encoding"] = omitted.get("unsupported_encoding", 0) + 1
+                    continue
+                scanned_bytes += len(data)
+                if scanned_bytes > MAX_BYTES:
+                    omitted["budget"] = omitted.get("budget", 0) + 1
+                    break
+                entry: dict[str, object] = {
+                    "sha256": hashlib.sha256(data).hexdigest(),
+                    "size": len(data),
+                }
+                if path.endswith(".py") and workspace_kind == "git_worktree":
+                    entry["python"] = _python_metadata(data)
+                entries[path] = entry
+                identities[path] = identity
+            for path, before in identities.items():
+                second_read, reason, after = _read_file(root_fd, path)
+                if (
+                    reason
+                    or before != after
+                    or second_read is None
+                    or hashlib.sha256(second_read).hexdigest() != entries[path]["sha256"]
+                ):
+                    unstable.append(path)
+        finally:
+            if source_root is None:
+                os.close(cast(int, root_fd))
+        git_after = _git_state(root) if workspace_kind == "git_worktree" else None
+        if git_after:
+            inventory_after = git_after["inventory"]
+            inventory_after_truncated = False
+        else:
+            inventory_after, inventory_after_truncated = _directory_inventory(
+                root, deadline, source_root
+            )
+        if inventory_after_truncated:
+            omitted["budget"] = omitted.get("budget", 0) + 1
+        try:
+            root_after = root.stat(follow_symlinks=False)
+            root_changed = (root_before.st_dev, root_before.st_ino) != (
+                root_after.st_dev,
+                root_after.st_ino,
+            )
+        except OSError:
+            root_changed = True
+        if inventory_after != inventory or git_after != git_before:
+            omitted["state_changed_during_scan"] = 1
+        if source_root is not None:
+            from opensocrates.windows_security import open_source_root
+
+            try:
+                again = open_source_root(root)
+                root_changed = root_changed or source_root.identity != again.identity
+                again.close()
+            except OSError:
+                root_changed = True
+        if root_changed:
+            omitted["root_changed_during_scan"] = 1
+        config = {
+            path: entry["sha256"]
+            for path, entry in entries.items()
+            if PurePosixPath(path).name.lower() in CONFIG_NAMES
+        }
+        coverage = {
+            "complete_for_scope": not any(key != "excluded_or_unsupported" for key in omitted)
+            and not unstable,
+            "omitted_categories": omitted,
+            "unstable_files": sorted(set(unstable)),
+            "search_boundary": {
+                "paths": list(scopes) if scopes else ["."],
+                "file_types": "allowed_text_only",
+            },
+            "dynamic_edges": "unknown" if workspace_kind == "git_worktree" else "not_applicable",
+        }
+        return {
+            "schema": SCHEMA,
+            "snapshot_id": str(uuid.uuid4()),
+            "project_id": project_id,
+            "workspace_id": workspace_id,
+            "workspace_kind": workspace_kind,
+            "root_identity_digest": _digest(
+                list(source_root.identity)
+                if source_root is not None
+                else [root_before.st_dev, root_before.st_ino]
+            ),
+            "head_oid": git_after["head_oid"] if git_after else None,
+            "ref": git_after["ref"] if git_after else None,
+            "status_digest": git_after["status_digest"] if git_after else None,
+            "dirty": git_after["dirty"] if git_after else None,
+            "scope_paths": list(scopes),
+            "inventory_digest": _digest(sorted(entries)),
+            "content_manifest_digest": _digest({p: e["sha256"] for p, e in entries.items()}),
+            "exclusion_digest": _digest(
+                {
+                    "adapter": ADAPTER,
+                    "excluded_dirs": sorted(EXCLUDED_DIRS),
+                    "excluded_names": sorted(EXCLUDED_NAMES),
+                    "excluded_suffixes": EXCLUDED_SUFFIXES,
+                    "policy_exclusions": list(exclusions),
+                }
+            ),
+            "configuration_digest": _digest(config),
+            "adapter_versions": {"local_source": ADAPTER},
+            "coverage": coverage,
+            "captured_at": datetime.now(timezone.utc).isoformat(),
+            "files": entries,
+        }
+
+    finally:
+        if source_root is not None:
+            source_root.close()
 
 
 def revalidate_snapshot(old: dict[str, object], current: dict[str, object]) -> dict[str, object]:
@@ -536,15 +586,25 @@ def lexical_matches(  # noqa: C901  # Bounded no-follow search validates each fi
     """Return current, bounded lexical locations without retaining source bytes."""
     if not isinstance(query, str) or not query or len(query) > 256 or "\x00" in query:
         raise ValueError("invalid_search_query")
-    if os.name == "nt":
-        raise ValueError("windows_source_adapter_unavailable")
     files = snapshot.get("files")
     if not isinstance(files, dict):
         raise ValueError("invalid_snapshot")
     hits: list[dict[str, object]] = []
     omitted = 0
     deadline = time.monotonic() + MAX_SECONDS
-    root_fd = os.open(root, os.O_RDONLY | _O_DIRECTORY | _O_NOFOLLOW)
+    source_root: SourceRoot | None = None
+    if os.name == "nt":
+        from opensocrates.windows_security import open_source_root
+
+        source_root = open_source_root(root)
+        if _digest(list(source_root.identity)) != snapshot.get("root_identity_digest"):
+            source_root.close()
+            raise ValueError("identity_mismatch")
+    root_fd: int | SourceRoot = (
+        source_root
+        if source_root is not None
+        else os.open(root, os.O_RDONLY | _O_DIRECTORY | _O_NOFOLLOW)
+    )
     try:
         for path, entry in sorted(files.items()):
             if time.monotonic() >= deadline:
@@ -562,5 +622,8 @@ def lexical_matches(  # noqa: C901  # Bounded no-follow search validates each fi
                     else:
                         omitted += 1
     finally:
-        os.close(root_fd)
+        if source_root is None:
+            os.close(cast(int, root_fd))
+        else:
+            source_root.close()
     return hits, omitted

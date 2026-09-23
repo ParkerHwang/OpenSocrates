@@ -38,6 +38,80 @@ def _grant_everyone_read(path: Path) -> None:
 
 @unittest.skipUnless(sys.platform == "win32", "native Windows regression")
 class WindowsChecks(unittest.TestCase):
+    def test_project_memory_source_root_and_reparse(self):
+        from opensocrates import windows_security
+        from opensocrates.project_memory import sources
+
+        with tempfile.TemporaryDirectory(prefix="OpenSocrates source 한글 ") as name:
+            parent = Path(name)
+            root = parent / "enrolled"
+            nested = root / "notes"
+            nested.mkdir(parents=True)
+            (nested / "brief.md").write_text("in-scope marker", encoding="utf-8")
+            external = parent / "external"
+            external.mkdir()
+            (external / "private.md").write_text("outside-root canary", encoding="utf-8")
+            with windows_security.open_source_root(root) as bound:
+                self.assertTrue(windows_security.source_root_owner_is_current(bound))
+                self.assertEqual(
+                    windows_security.read_source_file(bound, "notes/brief.md", 1024)[0],
+                    b"in-scope marker",
+                )
+                real_open = windows_security._open_source_path
+
+                def try_replacing_parent(path: Path, *, directory: bool) -> int:
+                    if path == nested / "brief.md":
+                        with self.assertRaises(PermissionError):
+                            nested.rename(root / "moved-notes")
+                    return real_open(path, directory=directory)
+
+                with mock.patch.object(
+                    windows_security, "_open_source_path", side_effect=try_replacing_parent
+                ):
+                    self.assertEqual(
+                        windows_security.read_source_file(bound, "notes/brief.md", 1024)[0],
+                        b"in-scope marker",
+                    )
+                with self.assertRaises(ValueError):
+                    windows_security.validate_source_relative("notes/../private.md")
+                with self.assertRaises(ValueError):
+                    windows_security.validate_source_relative("notes/file.md:stream")
+                with self.assertRaises(PermissionError):
+                    root.rename(parent / "moved-enrolled")
+
+            first = sources.capture_snapshot(root, "directory", "project", "workspace")
+            self.assertTrue(first["coverage"]["complete_for_scope"])
+            self.assertEqual(list(first["files"]), ["notes/brief.md"])
+            self.assertEqual(
+                sources.lexical_matches(root, first, "marker")[0][0]["path"], "notes/brief.md"
+            )
+            self.assertNotIn("in-scope marker", str(first))
+
+            junction = root / "outside"
+            subprocess.run(
+                [
+                    "powershell.exe",
+                    "-NoProfile",
+                    "-NonInteractive",
+                    "-Command",
+                    "New-Item -ItemType Junction -Path $env:TEST_JUNCTION -Target $env:TEST_TARGET | Out-Null",
+                ],
+                env={**os.environ, "TEST_JUNCTION": str(junction), "TEST_TARGET": str(external)},
+                check=True,
+                capture_output=True,
+            )
+            linked = sources.capture_snapshot(root, "directory", "project", "workspace")
+            self.assertNotIn("outside/private.md", linked["files"])
+            self.assertFalse(linked["coverage"]["complete_for_scope"])
+            self.assertNotIn("outside-root canary", str(linked))
+            with self.assertRaises((OSError, ValueError)):
+                windows_security.open_source_root(junction)
+            with windows_security.open_source_root(root) as bound:
+                self.assertEqual(
+                    windows_security.read_source_file(bound, "outside/private.md", 1024)[1],
+                    "unsafe_path",
+                )
+
     def test_acl_private_and_binary_atomic_io(self):
         with tempfile.TemporaryDirectory(prefix="OpenSocrates 한글 space ") as name:
             root = Path(name) / "private-root"
