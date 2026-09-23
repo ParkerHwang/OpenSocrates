@@ -45,6 +45,27 @@ def _capabilities(workspace_kind: str | None) -> dict[str, str]:
     }
 
 
+def _remove_owned_file(path: Path, project_dir: Path) -> None:
+    """Delete one inspected managed file through the platform's identity-bound path."""
+    if os.name == "nt":
+        from ..windows_security import remove_private_path
+
+        info = path.lstat()
+        if (
+            remove_private_path(
+                path, root=project_dir, expected_identity=(info.st_dev, info.st_ino)
+            )
+            != 1
+        ):
+            raise StoreError("busy")
+        return
+    descriptor = open_owner_only_file(path, flags=os.O_RDONLY, share_delete=True)
+    try:
+        discard_created_file(descriptor, path)
+    finally:
+        os.close(descriptor)
+
+
 def _record_scope(record: dict[str, Any], workspace_id: str | None, task_id: str | None) -> bool:
     scope = record["scope"]
     if scope["level"] == "project":
@@ -605,24 +626,27 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
                             or path.lstat().st_nlink != 1
                         ):
                             raise StoreError("permission_denied")
-                        descriptor = open_owner_only_file(
-                            path, flags=os.O_RDONLY, share_delete=True
-                        )
-                        try:
-                            discard_created_file(descriptor, path)
-                        finally:
-                            os.close(descriptor)
+                        _remove_owned_file(path, project_dir)
                 if store.lock_path.exists():
                     if store.lock_path.lstat().st_nlink != 1:
                         raise StoreError("permission_denied")
-                    descriptor = open_owner_only_file(
-                        store.lock_path, flags=os.O_RDONLY, share_delete=True
-                    )
-                    try:
-                        discard_created_file(descriptor, store.lock_path)
-                    finally:
-                        os.close(descriptor)
-                project_dir.rmdir()
+                    _remove_owned_file(store.lock_path, project_dir)
+                if os.name == "nt":
+                    from ..windows_security import remove_private_path
+
+                    info = project_dir.lstat()
+                    if (
+                        remove_private_path(
+                            project_dir,
+                            root=registry.layout.projects_dir,
+                            expected_identity=(info.st_dev, info.st_ino),
+                            directory_only=True,
+                        )
+                        != 1
+                    ):
+                        raise StoreError("busy")
+                else:
+                    project_dir.rmdir()
                 registry.remove(project_id)
                 result = {"deleted_project_id": project_id, "registration_removed": True}
             else:
@@ -678,6 +702,27 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
         return response(request_id, "ok", result)
     except VersionConflict as error:
         return response(request_id, "conflict", limitations=[str(error)])
+    except StoreError as error:
+        if str(error) == "busy":
+            return response(request_id, "busy", limitations=["managed_file_in_use"], retryable=True)
+        reason = str(error)
+        return response(
+            request_id,
+            "unavailable",
+            limitations=[
+                reason
+                if reason
+                in {
+                    "permission_denied",
+                    "unsafe_path",
+                    "store_corrupt",
+                    "unsupported_schema",
+                    "store_missing",
+                    "unsupported_journal_mode",
+                }
+                else "memory_unavailable"
+            ],
+        )
     except LockTimeoutError:
         return response(request_id, "busy", limitations=["bounded_lock_wait"], retryable=True)
     except RegistryError as error:
@@ -700,7 +745,7 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
                 else "memory_unavailable"
             ],
         )
-    except (StoreError, OSError) as error:
+    except OSError as error:
         reason = str(error)
         return response(
             request_id,
