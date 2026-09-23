@@ -344,7 +344,7 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
             store_state = MemoryStore(
                 registry.project_dir(project_id),
                 private_root=workspace["root"] if workspace else "",
-            ).probe_schema()
+            ).ensure_current()
             return response(
                 request_id,
                 "ok",
@@ -376,6 +376,10 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
         store = MemoryStore(
             registry.project_dir(project_id), private_root=workspace["root"] if workspace else ""
         )
+        if not (operation == "delete" and payload["intent"] == "delete_project"):
+            store.ensure_current(
+                deleting_content=operation == "delete" and payload["intent"] == "delete_record"
+            )
         if operation == "record":
             origin = payload["origin"]
             if (origin["producer_kind"], origin["attestation"]) not in {
@@ -604,7 +608,13 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
                 if project["policy"]["version"] != payload.get("expected_policy_version"):
                     raise VersionConflict("version_conflict")
                 project_dir = registry.project_dir(project_id)
-                permitted = {"memory.sqlite3", "memory.lock", "memory.sqlite3-journal"}
+                permitted = {
+                    "memory.sqlite3",
+                    "memory.lock",
+                    "memory.sqlite3-journal",
+                    "memory.v1.backup.sqlite3",
+                    "migration-backup.json",
+                }
                 if {item.name for item in project_dir.iterdir()} - permitted:
                     return response(
                         request_id,
@@ -618,7 +628,12 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
                 ):
                     raise StoreError("permission_denied")
                 with FileLock(store.lock_path, policy=LockPolicy(timeout_seconds=2)):
-                    for path in (store.path, project_dir / "memory.sqlite3-journal"):
+                    for path in (
+                        store.path,
+                        project_dir / "memory.sqlite3-journal",
+                        store.backup_path,
+                        store.backup_manifest_path,
+                    ):
                         if not path.exists():
                             continue
                         if (

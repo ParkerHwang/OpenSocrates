@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from uuid import uuid4
 
@@ -607,7 +608,7 @@ class MemoryFixture(unittest.TestCase):
         self.enroll()
         database = self.data / "projects" / str(self.project_id) / "memory.sqlite3"
         with sqlite3.connect(database) as connection:
-            connection.execute("UPDATE meta SET value='2' WHERE key='schema_version'")
+            connection.execute("UPDATE meta SET value='3' WHERE key='schema_version'")
         newer = database.read_bytes()
         self.assertEqual(self.call("inspect", {})["status"], "unavailable")
         self.assertEqual(self.call("status", {})["status"], "unavailable")
@@ -645,6 +646,204 @@ class MemoryFixture(unittest.TestCase):
             }
             self.assertNotIn("partial_only", names)
             self.assertTrue({"meta", "records", "checkpoints", "snapshots"} <= names)
+
+    def test_schema_migration_backup_and_record_delete_precedence(self) -> None:
+        self.enroll()
+        record = self.call(
+            "record",
+            {
+                "idempotency_key": uid(),
+                "expected_record_version": 0,
+                "kind": "decision",
+                "scope": {"level": "project"},
+                "summary": "Keep the disposable public choice.",
+                "origin": {
+                    "producer_kind": "agent",
+                    "source_reference": None,
+                    "attestation": "agent_reported",
+                },
+                "support": "agent_reported",
+                "source_refs": [],
+                "revalidation": {
+                    "dependency_paths": [],
+                    "negative_claim": False,
+                    "on_change": "not_applicable",
+                },
+            },
+        )["result"]["record"]
+        directory = self.data / "projects" / str(self.project_id)
+        database = directory / "memory.sqlite3"
+        with sqlite3.connect(database) as connection:
+            connection.execute("DROP TABLE migration_audit")
+            connection.execute("UPDATE meta SET value='1' WHERE key='schema_version'")
+        self.assertEqual(self.call("status", {})["result"]["schema_version"], 2)
+        backup = directory / "memory.v1.backup.sqlite3"
+        manifest = directory / "migration-backup.json"
+        self.assertTrue(backup.is_file())
+        self.assertEqual(backup.stat().st_mode & 0o077, 0)
+        backup_info = json.loads(manifest.read_text())
+        self.assertEqual(backup_info["from_version"], 1)
+        self.assertEqual(backup_info["to_version"], 2)
+        self.assertIsNotNone(backup_info["verified_at"])
+        with sqlite3.connect(backup) as connection:
+            self.assertEqual(
+                connection.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()[
+                    0
+                ],
+                "1",
+            )
+            self.assertEqual(connection.execute("SELECT COUNT(*) FROM records").fetchone()[0], 1)
+        self.assertEqual(self.call("inspect", {"record_id": record["record_id"]})["status"], "ok")
+        # A damaged manifest cannot veto an explicit deletion of its content.
+        manifest.write_text("{damaged", encoding="utf-8")
+        deleted = self.call(
+            "delete",
+            {
+                "intent": "delete_record",
+                "record_id": record["record_id"],
+                "expected_record_version": 1,
+                "idempotency_key": uid(),
+            },
+        )
+        self.assertEqual(deleted["status"], "ok", deleted)
+        self.assertFalse(backup.exists())
+        self.assertFalse(manifest.exists())
+        with sqlite3.connect(database) as connection:
+            self.assertEqual(
+                connection.execute("SELECT COUNT(*) FROM migration_audit").fetchone()[0], 0
+            )
+
+    def test_migration_interruptions_keep_old_or_committed_store(self) -> None:
+        for fault in ("after_backup", "before_commit", "after_commit"):
+            with self.subTest(fault=fault):
+                directory = self.base / fault
+                directory.mkdir(mode=0o700)
+                store = MemoryStore(directory)
+                store.initialize()
+                with sqlite3.connect(store.path) as connection:
+                    connection.execute("DROP TABLE migration_audit")
+                    connection.execute("UPDATE meta SET value='1' WHERE key='schema_version'")
+                    connection.execute(
+                        "INSERT INTO records(record_id,version,data) VALUES(?,?,?)",
+                        (uid(), 1, '{"summary":"disposable migration content"}'),
+                    )
+                with self.assertRaisesRegex(OSError, "injected_interruption"):
+
+                    def interrupt(stage: str, target: str = fault) -> None:
+                        if stage == target:
+                            raise OSError("injected_interruption")
+
+                    store.ensure_current(fault_hook=interrupt)
+                with sqlite3.connect(store.path) as connection:
+                    version = connection.execute(
+                        "SELECT value FROM meta WHERE key='schema_version'"
+                    ).fetchone()[0]
+                    self.assertEqual(version, "2" if fault == "after_commit" else "1")
+                    self.assertEqual(
+                        connection.execute("SELECT COUNT(*) FROM records").fetchone()[0], 1
+                    )
+                self.assertEqual(store.ensure_current(), 2)
+                with sqlite3.connect(store.path) as connection:
+                    self.assertEqual(connection.execute("PRAGMA quick_check").fetchone()[0], "ok")
+                    self.assertEqual(
+                        connection.execute("SELECT COUNT(*) FROM records").fetchone()[0], 1
+                    )
+                manifest = json.loads(store.backup_manifest_path.read_text())
+                self.assertIsNotNone(manifest["verified_at"])
+
+    def test_migration_backup_expires_after_verified_window(self) -> None:
+        self.enroll()
+        directory = self.data / "projects" / str(self.project_id)
+        store = MemoryStore(directory)
+        with sqlite3.connect(store.path) as connection:
+            connection.execute("DROP TABLE migration_audit")
+            connection.execute("UPDATE meta SET value='1' WHERE key='schema_version'")
+        self.assertEqual(store.ensure_current(), 2)
+        manifest = json.loads(store.backup_manifest_path.read_text())
+        manifest["verified_at"] = (datetime.now(timezone.utc) - timedelta(days=8)).isoformat()
+        store._write_backup_manifest(manifest)
+        self.assertEqual(self.call("status", {})["status"], "ok")
+        self.assertFalse(store.backup_path.exists())
+        self.assertFalse(store.backup_manifest_path.exists())
+
+    def test_process_exit_at_migration_commit_boundary_recovers(self) -> None:
+        script = (
+            "import os,sys; from pathlib import Path; "
+            "from opensocrates.project_memory.store import MemoryStore; "
+            "stop=lambda stage: os._exit(7) if stage==sys.argv[2] else None; "
+            "MemoryStore(Path(sys.argv[1])).ensure_current(fault_hook=stop)"
+        )
+        environment = dict(os.environ)
+        environment["PYTHONPATH"] = str(Path(__file__).resolve().parents[1] / "src")
+        for stage, expected in (("before_commit", "1"), ("after_commit", "2")):
+            with self.subTest(stage=stage):
+                directory = self.base / f"process-exit-{stage}"
+                directory.mkdir(mode=0o700)
+                store = MemoryStore(directory)
+                store.initialize()
+                with sqlite3.connect(store.path) as connection:
+                    connection.execute("DROP TABLE migration_audit")
+                    connection.execute("UPDATE meta SET value='1' WHERE key='schema_version'")
+                    connection.execute(
+                        "INSERT INTO records(record_id,version,data) VALUES(?,?,?)",
+                        (uid(), 1, '{"summary":"disposable process-exit content"}'),
+                    )
+                crashed = subprocess.run(
+                    [sys.executable, "-c", script, str(directory), stage],
+                    capture_output=True,
+                    check=False,
+                    timeout=10,
+                    env=environment,
+                )
+                self.assertEqual(crashed.returncode, 7, crashed.stderr.decode())
+                with sqlite3.connect(store.path) as connection:
+                    self.assertEqual(
+                        connection.execute(
+                            "SELECT value FROM meta WHERE key='schema_version'"
+                        ).fetchone()[0],
+                        expected,
+                    )
+                    self.assertEqual(
+                        connection.execute("SELECT COUNT(*) FROM records").fetchone()[0], 1
+                    )
+                self.assertEqual(store.ensure_current(), 2)
+                manifest = json.loads(store.backup_manifest_path.read_text())
+                self.assertIsNotNone(manifest["verified_at"])
+
+    def test_interrupted_backup_discard_finishes_on_next_command(self) -> None:
+        self.enroll()
+        directory = self.data / "projects" / str(self.project_id)
+        store = MemoryStore(directory)
+        with sqlite3.connect(store.path) as connection:
+            connection.execute("DROP TABLE migration_audit")
+            connection.execute("UPDATE meta SET value='1' WHERE key='schema_version'")
+        self.assertEqual(store.ensure_current(), 2)
+        manifest = json.loads(store.backup_manifest_path.read_text())
+        manifest["discarding"] = True
+        store._write_backup_manifest(manifest)
+        store._remove_backup_file(store.backup_path)
+        self.assertEqual(self.call("status", {})["status"], "ok")
+        self.assertFalse(store.backup_path.exists())
+        self.assertFalse(store.backup_manifest_path.exists())
+
+    def test_project_delete_removes_managed_migration_backup(self) -> None:
+        self.enroll()
+        directory = self.data / "projects" / str(self.project_id)
+        store = MemoryStore(directory)
+        with sqlite3.connect(store.path) as connection:
+            connection.execute("DROP TABLE migration_audit")
+            connection.execute("UPDATE meta SET value='1' WHERE key='schema_version'")
+        self.assertEqual(store.ensure_current(), 2)
+        deleted = self.call(
+            "delete",
+            {
+                "intent": "delete_project",
+                "expected_policy_version": 1,
+                "idempotency_key": uid(),
+            },
+        )
+        self.assertEqual(deleted["status"], "ok", deleted)
+        self.assertFalse(directory.exists())
 
     def test_cross_process_record_compare_and_swap(self) -> None:
         self.enroll()

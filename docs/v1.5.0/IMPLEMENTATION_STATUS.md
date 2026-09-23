@@ -18,17 +18,23 @@ was carried onto a focused branch without changing protected `main`.
   deterministic fixtures. Model-driven collaboration behavior is not yet
   established by these tests.
 - W6: modes, inspect/export, record/project deletion, pruning, secret canaries,
-  and opt-in installer memory deletion have source fixture coverage. Interrupted
-  migration and native Windows adversarial cases still need evidence.
+  and opt-in installer memory deletion have source fixture coverage. Internal
+  SQLite schema 1 to 2 migration now has owner-only backup/manifest, checked
+  interruption and rollback states, seven-day expiry, and deletion precedence
+  in disposable source fixtures. Native Windows lifecycle evidence remains open.
 - W7: source/package generation and Apple Silicon frozen-memory fixture are
-  exercised. Hosted Windows x64 run `35825905649` at `628d227` passed its
+  exercised, including actual schema migration and backup in the frozen binary.
+  Hosted Windows x64 run `35825905649` at `628d227` passed its
   local-drive source/reparse fixture, frozen SQLite enrollment, source
   freshness, cold recall, deletion, ACL/journal checks, and native package
   checks. This is synthetic non-Git native evidence; Windows linked-worktree
   continuation, clean-machine behavior, and live Codex memory use remain
-  unverified.
+  unverified. A disposable CLI 0.145.0 probe emitted a native memory pack, but
+  live Luna/Sol calls were rejected for ChatGPT-account access and Astra required
+  a newer client. No model answered or retrieved the pack.
 - W8: five evaluation lane protocols and pilot scenarios are frozen before any
-  outcomes. No model-quality or efficiency outcomes have been run.
+  outcomes. The exact CLI model cells failed feasibility; no model-quality or
+  efficiency outcomes have been run or claimed.
 - W9: independent review repaired four source/privacy defects. Draft PR
   [#95](https://github.com/ParkerHwang/OpenSocrates/pull/95) and issue
   [#94](https://github.com/ParkerHwang/OpenSocrates/issues/94) carry the

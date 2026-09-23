@@ -148,6 +148,25 @@ interruption tests. Refuse newer unsupported schemas without changing bytes.
 Downgrading the plugin preserves unreadable newer memory and reports the limit.
 Recovery does not silently discard accepted decisions to make the service start.
 
+The candidate's internal SQLite schema 1 to 2 migration runs on the first
+explicit command for an already enrolled project. It creates an owner-only
+`memory.v1.backup.sqlite3` and `migration-backup.json` in that project's owned
+directory, verifies the backup, commits the schema change in one SQLite
+transaction, and verifies the resulting database before reporting success. The
+database copy is made through held file descriptors while SQLite holds an
+exclusive transaction lock, so a swapped backup pathname cannot redirect
+private bytes. The manifest inventories the backup hash and verification time.
+An interruption
+before commit leaves schema 1; an interruption after commit leaves schema 2 and
+a pending manifest that the next command can verify. The backup is retained for
+seven days after verification and removed on the next explicit memory operation
+after expiry. Record deletion and prune remove it before deleting content, and
+project deletion removes both managed files. A discard marker lets the next
+command finish cleanup if it is interrupted between backup and manifest removal.
+Recovery from a retained backup is
+an operator-controlled copy into a disposable location for inspection; automatic
+restore is excluded because it could erase writes made after migration.
+
 Shipping the SQLite module, updating a package, or passing offline tests does not
 verify live Codex delivery, clean-machine installation, signing, or code quality.
 Preserve v1.4's explicit platform and evidence limitations until separately tested.

@@ -213,6 +213,30 @@ def main() -> int:
                     assert stat.S_IMODE(journal.stat().st_mode) == 0o600
             finally:
                 connection.rollback()
+        # Exercise the shipped binary's real schema-1 to schema-2 migration.
+        with closing(sqlite3.connect(database)) as connection:
+            connection.execute("DROP TABLE migration_audit")
+            connection.execute("UPDATE meta SET value='1' WHERE key='schema_version'")
+            connection.commit()
+        migrated = run(binary, env, request("status", {}, project_id, workspace_id))
+        assert migrated["status"] == "ok" and migrated["result"]["schema_version"] == 2
+        backup = database.parent / "memory.v1.backup.sqlite3"
+        backup_manifest = database.parent / "migration-backup.json"
+        assert backup.is_file() and backup_manifest.is_file()
+        if os.name == "nt":
+            assert check_permissions(backup, directory=False).write_allowed
+            assert check_permissions(backup_manifest, directory=False).write_allowed
+        else:
+            assert stat.S_IMODE(backup.stat().st_mode) == 0o600
+            assert stat.S_IMODE(backup_manifest.stat().st_mode) == 0o600
+        with closing(sqlite3.connect(backup)) as connection:
+            assert (
+                connection.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()[
+                    0
+                ]
+                == "1"
+            )
+            assert connection.execute("SELECT COUNT(*) FROM records").fetchone()[0] >= 1
         exported = run(
             binary,
             env,
@@ -244,7 +268,7 @@ def main() -> int:
             "limitations": deleted["limitations"],
             "result": deleted["result"],
         }
-        assert not database.exists()
+        assert not database.exists() and not backup.exists() and not backup_manifest.exists()
         if args.package:
             package = args.package
             for path in (
@@ -257,7 +281,7 @@ def main() -> int:
             ):
                 assert (package / path).is_file(), path
         print(
-            "frozen-memory: PASS SQLite enrollment, source freshness, cold recall, deletion, guide/schema assets"
+            "frozen-memory: PASS SQLite enrollment, source freshness, cold recall, migration backup, deletion, guide/schema assets"
         )
     return 0
 

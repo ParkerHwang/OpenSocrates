@@ -8,17 +8,26 @@ import os
 import re
 import sqlite3
 import stat
-from contextlib import contextmanager
-from datetime import datetime, timezone
+from contextlib import closing, contextmanager
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterator, cast
 from uuid import uuid4
 
+from ..persistence.atomic import atomic_replace_bytes, canonical_json_bytes
 from ..persistence.locks import FileLock, LockPolicy
-from ..persistence.permissions import check_permissions, create_owner_only_file
+from ..persistence.permissions import (
+    check_permissions,
+    create_owner_only_file,
+    discard_created_file,
+    open_owner_only_file,
+)
 from .contracts import ContractError, load_schema, validate
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
+BACKUP_NAME = "memory.v1.backup.sqlite3"
+BACKUP_MANIFEST_NAME = "migration-backup.json"
+BACKUP_ROLLBACK_DAYS = 7
 _SECRET = re.compile(
     r"(?i)(sk-[a-z0-9_-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|(?:api[_-]?key|password|secret|token)\s*[:=]\s*\S+)"
 )
@@ -95,7 +104,10 @@ class MemoryStore:
         self.project_dir = Path(project_dir)
         self.path = self.project_dir / "memory.sqlite3"
         self.lock_path = self.project_dir / "memory.lock"
+        self.backup_path = self.project_dir / BACKUP_NAME
+        self.backup_manifest_path = self.project_dir / BACKUP_MANIFEST_NAME
         self.private_root = private_root
+        self._active_database_identity: tuple[int, int] | None = None
 
     def _check_parent(self) -> None:
         if not check_permissions(self.project_dir, directory=True).write_allowed:
@@ -105,6 +117,9 @@ class MemoryStore:
         journal = self.project_dir / "memory.sqlite3-journal"
         if journal.exists():
             _regular_private(journal)
+        for path in (self.backup_path, self.backup_manifest_path):
+            if path.exists():
+                _regular_private(path)
 
     @contextmanager
     def connect(self, *, write: bool = False, create: bool = False) -> Iterator[sqlite3.Connection]:  # noqa: C901  # Owner-only DB and journal checks surround the transaction.
@@ -136,10 +151,12 @@ class MemoryStore:
             after = self.path.lstat()
             if (before.st_dev, before.st_ino) != (after.st_dev, after.st_ino):
                 raise StoreError("identity_mismatch")
+            self._active_database_identity = (before.st_dev, before.st_ino)
             yield connection
         except sqlite3.DatabaseError as error:
             raise StoreError("store_corrupt") from error
         finally:
+            self._active_database_identity = None
             if "connection" in locals():
                 connection.close()
             if self.path.exists():
@@ -161,6 +178,7 @@ class MemoryStore:
                     "CREATE TABLE IF NOT EXISTS snapshots (snapshot_id TEXT PRIMARY KEY, workspace_id TEXT NOT NULL, data TEXT NOT NULL)",
                     "CREATE TABLE IF NOT EXISTS idempotency (key TEXT PRIMARY KEY, operation TEXT NOT NULL, payload_hash TEXT NOT NULL, response TEXT NOT NULL)",
                     "CREATE TABLE IF NOT EXISTS tombstones (record_id TEXT PRIMARY KEY, version INTEGER NOT NULL, origin_id TEXT)",
+                    "CREATE TABLE IF NOT EXISTS migration_audit (from_version INTEGER NOT NULL, to_version INTEGER NOT NULL, applied_at TEXT NOT NULL, backup_sha256 TEXT NOT NULL, PRIMARY KEY(from_version,to_version))",
                 ):
                     db.execute(statement)
                 row = db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
@@ -180,6 +198,273 @@ class MemoryStore:
             raise StoreError("store_corrupt") from error
         if row is None or row[0] != str(SCHEMA_VERSION):
             raise StoreError("unsupported_schema")
+
+    @staticmethod
+    def _raw_version(db: sqlite3.Connection) -> int:
+        try:
+            row = db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
+            if row is None or not str(row[0]).isdigit():
+                raise StoreError("unsupported_schema")
+            return int(row[0])
+        except sqlite3.DatabaseError as error:
+            raise StoreError("store_corrupt") from error
+
+    @staticmethod
+    def _file_sha256(path: Path) -> str:
+        digest = hashlib.sha256()
+        descriptor = open_owner_only_file(path, flags=os.O_RDONLY, share_delete=True)
+        with os.fdopen(descriptor, "rb") as stream:
+            for chunk in iter(lambda: stream.read(64 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+
+    def _remove_backup_file(self, path: Path) -> None:
+        if not path.exists():
+            return
+        _regular_private(path)
+        if os.name == "nt":
+            from ..windows_security import remove_private_path
+
+            info = path.lstat()
+            if (
+                remove_private_path(
+                    path,
+                    root=self.project_dir,
+                    expected_identity=(info.st_dev, info.st_ino),
+                )
+                != 1
+            ):
+                raise StoreError("backup_delete_failed")
+            return
+        descriptor = open_owner_only_file(path, flags=os.O_RDONLY, share_delete=True)
+        try:
+            discard_created_file(descriptor, path)
+        finally:
+            os.close(descriptor)
+        if path.exists():
+            raise StoreError("backup_delete_failed")
+
+    def _read_backup_manifest(self) -> dict[str, Any] | None:
+        if not self.backup_manifest_path.exists():
+            return None
+        _regular_private(self.backup_manifest_path)
+        if self.backup_manifest_path.stat().st_size > 2048:
+            raise StoreError("backup_manifest_invalid")
+        try:
+            descriptor = open_owner_only_file(
+                self.backup_manifest_path, flags=os.O_RDONLY, share_delete=True
+            )
+            with os.fdopen(descriptor, "rb") as stream:
+                value = json.loads(stream.read(2049))
+        except (OSError, ValueError) as error:
+            raise StoreError("backup_manifest_invalid") from error
+        if (
+            not isinstance(value, dict)
+            or value.get("schema") != "opensocrates.memory-backup/1"
+            or value.get("filename") != BACKUP_NAME
+            or value.get("from_version") != 1
+            or value.get("to_version") != 2
+            or not isinstance(value.get("sha256"), str)
+            or re.fullmatch(r"[0-9a-f]{64}", value["sha256"]) is None
+            or not isinstance(value.get("created_at"), str)
+            or value.get("verified_at") is not None
+            and not isinstance(value.get("verified_at"), str)
+            or type(value.get("discarding", False)) is not bool
+        ):
+            raise StoreError("backup_manifest_invalid")
+        return value
+
+    def _write_backup_manifest(self, value: dict[str, Any]) -> None:
+        atomic_replace_bytes(self.backup_manifest_path, canonical_json_bytes(value))
+        _regular_private(self.backup_manifest_path)
+
+    def _check_backup(self) -> dict[str, Any]:
+        manifest = self._read_backup_manifest()
+        if manifest is None or not self.backup_path.exists():
+            raise StoreError("backup_missing")
+        _regular_private(self.backup_path)
+        if self._file_sha256(self.backup_path) != manifest["sha256"]:
+            raise StoreError("backup_corrupt")
+        uri = self.backup_path.as_uri() + "?mode=ro"
+        try:
+            with closing(sqlite3.connect(uri, uri=True, timeout=2.0)) as backup:
+                if backup.execute("PRAGMA quick_check").fetchone()[0] != "ok":
+                    raise StoreError("backup_corrupt")
+                if self._raw_version(backup) != 1:
+                    raise StoreError("backup_corrupt")
+        except sqlite3.DatabaseError as error:
+            raise StoreError("backup_corrupt") from error
+        return manifest
+
+    def _copy_locked_database(self) -> None:
+        """Copy the EXCLUSIVE-locked SQLite file through pinned descriptors.
+
+        SQLite's pathname backup API would reopen a same-user-swappable name.
+        The source has no uncommitted changes when this is called.
+        """
+        source_flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+        source = open_owner_only_file(self.path, flags=source_flags, share_delete=True)
+        destination: int | None = None
+        try:
+            source_info = os.fstat(source)
+            named_source = self.path.lstat()
+            if (source_info.st_dev, source_info.st_ino) != (
+                named_source.st_dev,
+                named_source.st_ino,
+            ) or (source_info.st_dev, source_info.st_ino) != self._active_database_identity:
+                raise StoreError("identity_mismatch")
+            destination = create_owner_only_file(self.backup_path, flags=os.O_RDWR)
+            while data := os.read(source, 64 * 1024):
+                view = memoryview(data)
+                while view:
+                    view = view[os.write(destination, view) :]
+            os.fsync(destination)
+            named_backup = self.backup_path.lstat()
+            held_backup = os.fstat(destination)
+            if (named_backup.st_dev, named_backup.st_ino) != (
+                held_backup.st_dev,
+                held_backup.st_ino,
+            ):
+                raise StoreError("identity_mismatch")
+            if (self.path.lstat().st_dev, self.path.lstat().st_ino) != (
+                source_info.st_dev,
+                source_info.st_ino,
+            ):
+                raise StoreError("identity_mismatch")
+        finally:
+            os.close(source)
+            if destination is not None:
+                os.close(destination)
+
+    def ensure_current(  # noqa: C901  # Backup, transaction, and recovery states are explicit.
+        self, *, fault_hook: Callable[[str], None] | None = None, deleting_content: bool = False
+    ) -> int:
+        """Migrate an enrolled v1 store once, retaining a checked seven-day backup.
+
+        `fault_hook` is an internal interruption seam used only by disposable tests.
+        An older or corrupt store is never recreated or overwritten.
+        """
+        with self.connect() as db:
+            version = self._raw_version(db)
+        if version not in {1, SCHEMA_VERSION}:
+            raise StoreError("unsupported_schema")
+        if version == SCHEMA_VERSION:
+            if deleting_content:
+                return version
+            manifest = self._read_backup_manifest()
+            if manifest is None:
+                return version
+            if (
+                not manifest.get("discarding", False)
+                and manifest["verified_at"] is not None
+                and not self._backup_expired(manifest)
+            ):
+                if not self.backup_path.exists():
+                    raise StoreError("backup_missing")
+                return version
+        with FileLock(self.lock_path, policy=LockPolicy(timeout_seconds=2)):
+            with self.connect(write=True) as db:
+                version = self._raw_version(db)
+                if version not in {1, SCHEMA_VERSION}:
+                    raise StoreError("unsupported_schema")
+                if version == 1:
+                    required = {
+                        "meta",
+                        "records",
+                        "record_history",
+                        "checkpoints",
+                        "snapshots",
+                        "idempotency",
+                        "tombstones",
+                    }
+                    names = {
+                        row[0]
+                        for row in db.execute(
+                            "SELECT name FROM sqlite_master WHERE type='table'"
+                        ).fetchall()
+                    }
+                    if not required <= names:
+                        raise StoreError("store_corrupt")
+                    if self.backup_path.exists():
+                        self._remove_backup_file(self.backup_path)
+                    if self.backup_manifest_path.exists():
+                        self._remove_backup_file(self.backup_manifest_path)
+                    db.execute("BEGIN EXCLUSIVE")
+                    if db.execute("PRAGMA quick_check").fetchone()[0] != "ok":
+                        raise StoreError("store_corrupt")
+                    self._copy_locked_database()
+                    _regular_private(self.backup_path)
+                    backup_hash = self._file_sha256(self.backup_path)
+                    manifest = {
+                        "schema": "opensocrates.memory-backup/1",
+                        "filename": BACKUP_NAME,
+                        "from_version": 1,
+                        "to_version": SCHEMA_VERSION,
+                        "sha256": backup_hash,
+                        "created_at": _now(),
+                        "verified_at": None,
+                        "discarding": False,
+                    }
+                    self._write_backup_manifest(manifest)
+                    self._check_backup()
+                    if fault_hook is not None:
+                        fault_hook("after_backup")
+                    db.execute(
+                        "CREATE TABLE migration_audit (from_version INTEGER NOT NULL, to_version INTEGER NOT NULL, applied_at TEXT NOT NULL, backup_sha256 TEXT NOT NULL, PRIMARY KEY(from_version,to_version))"
+                    )
+                    db.execute("INSERT INTO migration_audit VALUES(1,2,?,?)", (_now(), backup_hash))
+                    db.execute("UPDATE meta SET value='2' WHERE key='schema_version'")
+                    if fault_hook is not None:
+                        fault_hook("before_commit")
+                    db.commit()
+                    if fault_hook is not None:
+                        fault_hook("after_commit")
+                if self._raw_version(db) != SCHEMA_VERSION:
+                    raise StoreError("unsupported_schema")
+                if db.execute("PRAGMA quick_check").fetchone()[0] != "ok":
+                    raise StoreError("store_corrupt")
+                manifest = self._read_backup_manifest()
+                if manifest is not None:
+                    if manifest.get("discarding", False):
+                        self.discard_migration_backup()
+                        return SCHEMA_VERSION
+                    self._check_backup()
+                    audit = db.execute(
+                        "SELECT backup_sha256 FROM migration_audit WHERE from_version=1 AND to_version=2"
+                    ).fetchone()
+                    if audit is None or audit[0] != manifest["sha256"]:
+                        raise StoreError("store_corrupt")
+                    if manifest["verified_at"] is None:
+                        manifest["verified_at"] = _now()
+                        self._write_backup_manifest(manifest)
+                    if self._backup_expired(manifest):
+                        self.discard_migration_backup()
+        return SCHEMA_VERSION
+
+    @staticmethod
+    def _backup_expired(manifest: dict[str, Any]) -> bool:
+        try:
+            verified = datetime.fromisoformat(manifest["verified_at"].replace("Z", "+00:00"))
+        except (ValueError, AttributeError) as error:
+            raise StoreError("backup_manifest_invalid") from error
+        if verified.tzinfo is None:
+            raise StoreError("backup_manifest_invalid")
+        return datetime.now(timezone.utc) >= verified + timedelta(days=BACKUP_ROLLBACK_DAYS)
+
+    def discard_migration_backup(self) -> None:
+        """Erase managed backup content before deleting or pruning current records.
+
+        Caller holds the memory lock. The current store remains authoritative.
+        """
+        try:
+            manifest = self._read_backup_manifest()
+        except StoreError:
+            manifest = None
+        if manifest is not None and not manifest.get("discarding", False):
+            manifest["discarding"] = True
+            self._write_backup_manifest(manifest)
+        for path in (self.backup_path, self.backup_manifest_path):
+            self._remove_backup_file(path)
 
     def probe_schema(self) -> int:
         """Read schema state without initializing or writing the database."""
@@ -623,6 +908,8 @@ class MemoryStore:
             if row is None or row[0] != expected_version:
                 raise VersionConflict("version_conflict")
             record = json.loads(row[1])
+            self.discard_migration_backup()
+            db.execute("DELETE FROM migration_audit")
             db.execute("DELETE FROM records WHERE record_id=?", (record_id,))
             db.execute("DELETE FROM record_history WHERE record_id=?", (record_id,))
             db.execute("DELETE FROM checkpoints WHERE record_id=?", (record_id,))
@@ -752,6 +1039,9 @@ class MemoryStore:
         def work(db: sqlite3.Connection) -> dict[str, Any]:
             eligible = self._prune_candidates(db, older_than)
             selected = eligible[:32]
+            if selected:
+                self.discard_migration_backup()
+                db.execute("DELETE FROM migration_audit")
             for record in selected:
                 record_id = record["record_id"]
                 db.execute("DELETE FROM records WHERE record_id=?", (record_id,))
