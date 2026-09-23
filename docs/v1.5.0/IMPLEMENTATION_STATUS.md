@@ -21,37 +21,50 @@ was carried onto a focused branch without changing protected `main`.
   and opt-in installer memory deletion have source fixture coverage. Internal
   SQLite schema 1 to 2 migration now has owner-only backup/manifest, checked
   interruption and rollback states, seven-day expiry, and deletion precedence
-  in disposable source fixtures. Native Windows lifecycle evidence remains open.
+  in disposable source fixtures. Native Windows lifecycle and packaged frozen
+  migration/deletion passed at `efeb436`. A later unexpected-WAL/SHM guard passed
+  focused fixtures; its exact-head native rerun is pending.
 - W7: source/package generation and Apple Silicon frozen-memory fixture are
-  exercised, including actual schema migration and backup in the frozen binary.
-  Hosted Windows x64 run `35825905649` at `628d227` passed its
-  local-drive source/reparse fixture, frozen SQLite enrollment, source
-  freshness, cold recall, deletion, ACL/journal checks, and native package
-  checks. This is synthetic non-Git native evidence; Windows linked-worktree
-  continuation, clean-machine behavior, and live Codex memory use remain
-  unverified. A disposable CLI 0.145.0 probe emitted a native memory pack, but
-  live Luna/Sol calls were rejected for ChatGPT-account access and Astra required
-  a newer client. A separate non-evaluation `gpt-5.6-sol`/medium CLI smoke on
-  an earlier candidate copy retrieved the synthetic pack and answered from both
-  current file and accepted memory, including with hooks disabled and explicit
-  skill invocation. This is bounded host-delivery evidence, not GPT-6 behavior
-  or an exact-current-head package test. Its initial failed attempt and all
-  exposed usage are retained in the host feasibility receipt.
+  exercised, including actual schema migration and backup in frozen binaries.
+  Hosted CI `35878192625` passed linked-worktree, reparse, owner ACL/journal,
+  migration/deletion, source freshness, and native package fixtures on Windows
+  x64 and Apple Silicon. A disposable candidate ZIP with recorded hashes was
+  installed under a new `CODEX_HOME`; two live `gpt-6-sol`/medium tasks retrieved
+  an accepted synthetic decision and completed a dependent plan, including with
+  hooks disabled. Pack application remains `unverified`; observed artifacts are
+  the narrower behavior evidence. The ZIP is ignored build output, so its hash
+  is recorded separately from source-commit provenance. Clean-machine live
+  Windows Codex use and destructive account-home lifecycle remain unverified.
+  The host's `/usr/local/bin/codex` 0.145.0 rejected GPT-6 cells, while the
+  ChatGPT desktop-bundled CLI 0.155.0-alpha.16.3 completed Luna/Sol/Astra
+  medium access probes. These are client-specific observations.
 - W8: five evaluation lane protocols and pilot scenarios are frozen before any
-  outcomes. The exact CLI model cells failed feasibility; no model-quality or
-  efficiency outcomes have been run or claimed.
-- W9: independent review repaired four source/privacy defects. Draft PR
+  outcomes. The bounded engineering pilot now has 40 model/collaboration cells
+  across separate prompt-proxy and installed-plugin EVAL-02/03/05 runs, nine
+  EVAL-04 continuity cells, ten EVAL-01 coding sessions, and two separately
+  frozen guide-repair replay cells. Failed harness attempts and invalid memory
+  calls remain in the records. One paired D treatment originally failed to
+  retrieve memory; guide revision 2 led to one successful first-attempt recall
+  on a new paired run, with equal hidden coding correctness and higher resource
+  use than C in that single pair. Pilot outcomes do not validate profiles or
+  establish quality, noninferiority, or savings. Held-out protocol/margins and
+  blinded human bilingual review remain open.
+- W9: independent review repaired source/privacy defects; live pilot failures
+  led to an EN/KO closed-recall guide repair and a separate replay. Draft PR
   [#95](https://github.com/ParkerHwang/OpenSocrates/pull/95) and issue
   [#94](https://github.com/ParkerHwang/OpenSocrates/issues/94) carry the
   exact-commit handoff; remaining gates keep the PR in Draft.
 
 ## Evidence boundary
 
-The source fixtures establish only the checked contracts and synthetic
-lifecycles. Generated package checks establish shipped file identities, not
-agent application. The native Apple Silicon fixture establishes isolated
-SQLite and packaged assets, not live host delivery. No Luna/Sol gap reduction,
-Sol/Astra efficiency, universal quality, cost savings, or release claim follows.
+Source fixtures establish checked contracts and synthetic lifecycles; package
+checks establish file identities. The disposable live task establishes scoped
+installed-pack retrieval and a dependent artifact, not universal application.
+Every pilot has one replicate per selected cell, deterministic artifact gates,
+and no human blinded judgment. Native host-memory isolation, exact backend
+model echo, billed cost, held-out margins, and statistical outcome evidence
+remain missing. No Luna/Sol gap reduction, Sol/Astra efficiency, universal
+quality, cost savings, or release claim follows.
 
 See [verification and evaluation](06-verification-and-evaluation.md) for the
 full acceptance requirements and [decision register](09-decisions-and-source-map.md)

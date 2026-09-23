@@ -1,0 +1,33 @@
+# v1.5 evaluation status
+
+The immutable [protocol](protocol.json) has its pre-outcome status field by
+design. Results live in separate files; updating the protocol after outcome
+calls would break the frozen-hash receipts. Run
+`python evals/v1.5/verify_pilot_results.py` to check frozen hashes, scheduled
+cell counts, source equality, declared missingness, and privacy-safe result
+shape without calling a model.
+
+| Lane | Bounded pilot evidence | What it does not establish |
+| --- | --- | --- |
+| EVAL-01 | [Ten coding sessions](memory-results/eval01-pilot-2026-09-24.json) across four naturalistic arms and a paired C/D replay. All hidden behavior gates passed. D's initial paired replay had zero successful recall calls in three attempts. A [new frozen guide-repair pair](memory-results/eval01-guide-repair-2026-09-24.json) gave D one successful first-attempt recall; C and D both passed the same hidden checks. | One fixture/model, differing naturalistic first patches, no blinded maintainability judge, no incremental memory-quality or efficiency claim. The failed exposure remains in the original denominator. |
+| EVAL-02 | [Prompt-delivered proxy](results/eval-02-pilot.json) and [installed-plugin pilot](results/native-eval-02-pilot.json) each have six matched coding/planning cells. All deterministic gates passed for Luna alone, Luna treatment, and Sol alone. | No observed gain or gap on these easy tasks; one replicate per cell and no held-out quality estimate. No stronger-model work was included in Luna treatments. |
+| EVAL-03 | [Proxy](results/eval-03-pilot.json) and [installed-plugin](results/native-eval-03-pilot.json) each have six Sol/Astra mechanical cells, including ablations. All edits passed. | One-run wall time is unstable; no noninferiority or resource-savings claim. Native hook delivery was not exposed in JSONL. |
+| EVAL-04 | [Nine fresh-session cells](memory-results/eval04-pilot-2026-09-24.json) cover non-Git event planning, non-Git research, and a Git untracked caller, each with disabled-memory, enrolled-memory, and maintained-note controls. All frozen deterministic gates passed. | Native server-side memory isolation, note-maintenance burden, human quality judgment, and a causal memory benefit remain unverified. Enrolled-memory arms used more reported input/tool work on these fixtures. |
+| EVAL-05 | [Proxy](results/eval-05-pilot.json) and [installed-plugin](results/native-eval-05-pilot.json) retain English/Korean developer and nondeveloper pairs. Developer artifact corrections passed in both languages/arms. Nondeveloper strict field checks had failures. [First](results/eval-05-pilot-attempt1-harness-failure.json) and [second](results/eval-05-pilot-attempt2-readonly-followup.json) proxy harness failures remain recorded. | Strict artifact checks are not blinded bilingual dialogue scores. Several natural-collaboration behaviors, including necessary clarification and unavailable memory, remain untested. |
+
+All model runs requested exact GPT-6 model IDs at medium effort through the
+ChatGPT desktop-bundled `codex-cli 0.155.0-alpha.16.3`. Its access probes
+completed for Luna, Sol, and Astra; the older system CLI 0.145.0 rejected
+those cells and is not the evaluation client. Client request/turn receipts are
+available, but the service did not echo an independent backend model identity.
+Input, cached input, output, and aggregate reasoning output are distinct
+reported categories; cached input is a subset of input. Missing billed cost is
+`null`, not zero. Subscription limits are account-wide, not a per-run invoice.
+
+The installed-plugin pilot is pinned to the **pre-repair** candidate ZIP SHA-256
+`c8cc308e757afafb5e5a076e45de096aa1f305e1168c926effe2d34d2a604201`.
+The guide-repair replay uses a later candidate ZIP SHA-256
+`7728ec26bcea3a63225e5319e508c175d2257511f38685defca9d811c9ba780b`.
+Do not pool these treatments or infer that the guide revision caused a general
+quality gain. Profiles remain `candidate`; no held-out sample size or numerical
+margin has been frozen or run. The Draft PR handoff must retain those limits.
