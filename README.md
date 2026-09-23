@@ -109,3 +109,13 @@ response-time improvement is claimed. Current release validation is tracked in
 
 OpenSocrates is [MIT licensed](LICENSE), independent of OpenAI, and not endorsed
 by OpenAI.
+
+## v1.5 development branch
+
+The [v1.5 implementation specification](docs/v1.5.0/README.md) adds separate
+stateless assistance and explicitly enrolled local project-memory commands,
+plus English/Korean coding and collaboration guidance. This branch is under
+implementation and verification. The installation instructions above describe
+the released 1.4.0 package; they do not install or validate these candidate
+capabilities. No model-quality, cost, or live-host improvement is claimed from
+source or package checks. See the [development memory protocol](docs/project-memory-development.md).

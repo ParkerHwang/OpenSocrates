@@ -12,6 +12,14 @@ pass_through() {
         # Selector hook failures are always literal empty stdout.
         exit 0
     fi
+    if [ "$launch_mode" = assistance ]; then
+        printf '%s\n' '{"schema":"opensocrates.assistance.plan/1.0.0","request_id":null,"status":"unavailable","application":"unverified","limitations":["launcher_unavailable"]}'
+        exit 3
+    fi
+    if [ "$launch_mode" = memory ]; then
+        printf '%s\n' '{"schema":"opensocrates.project-memory.response/1.0.0","request_id":null,"status":"unavailable","result":null,"limitations":["launcher_unavailable"],"retryable":false}'
+        exit 3
+    fi
     case "$code" in
         unsupported_platform|missing_runtime|invalid_arguments)
             ;;
@@ -57,7 +65,7 @@ case "$mode" in
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         ;;
-    control)
+    control|assistance|memory)
         if [ "$#" -ne 2 ]; then
             pass_through invalid_arguments "$mode" "$host"
         fi
@@ -166,6 +174,12 @@ case "$mode" in
         ;;
     control)
         exec "$runtime_path" control apply --host "$host"
+        ;;
+    assistance)
+        exec "$runtime_path" assistance
+        ;;
+    memory)
+        exec "$runtime_path" memory
         ;;
 esac
 

@@ -2,7 +2,8 @@
 
 Reviewed source: v1.4.0, `5a2ff3c312e92aa8a44d0905465674d9a4e4f645`.
 Review date: 2026-09-23. Repository main matched this commit when checked.
-The local design branch adds documents only. Source inspection is not execution
+The original design branch added documents only; the separate implementation
+branch now contains candidate source changes. Source inspection is not execution
 evidence. Historical v1.3 and earlier evaluation artifacts remain historical.
 
 ## Decision register
@@ -29,6 +30,20 @@ All choices below are design decisions for implementation, not measured benefits
 | D16 | Shared workspace identity for Git and bounded non-Git text projects | Git-only identity simplifies storage but excludes required general continuity | A new source type has explicit capability, identity, and privacy contracts |
 | D17 | Natural collaboration is observable intent/action/correction/continuity behavior | Style-only scoring is cheaper but can reward pleasant incomplete work | Blinded outcome evidence shows the rubric misses a material user need |
 | D18 | Separate inexpensive-model gain, capable-model efficiency, memory, collaboration, and coding studies | A single aggregate leaderboard is simpler but obscures regressions and attribution | A preregistered analysis demonstrates a valid combined claim |
+
+## Implementation decisions and deviations
+
+These entries document choices made after the design-only review. They do not
+upgrade the evidence for any target outcome.
+
+| ID | Choice and reason | Verification boundary / reopen condition |
+| --- | --- | --- |
+| I01 | Keep the existing 1.4.0 released version identity on this Draft implementation branch until native Windows, live-host, and claim documentation are qualified. New commands are candidate source behavior. | A release-preparation change must update Python/npm/version/lock/docs together, then run exact-version package checks. A built local 1.4.0-labelled artifact is never a publishable v1.5 package. |
+| I02 | Author v1.5 closed JSON Schemas in `schemas/source/v15_contracts.py` with a separate checked manifest. The existing 48-method schema generator remains intact and emits the added schemas into the generated package. | Runtime operation checks still enforce per-operation required/allowed fields. Revisit if a compatible discriminated schema generator can express those rules without weakening the existing schema family. |
+| I03 | Keep Luna/Sol/Astra profiles at `candidate` and normal CLI use on task fallback. The three scoped candidates carry no observed failure categories yet; a declared evaluation harness may inject them explicitly. | A held-out outcome run with exact model/effort/client evidence is required before validating or withdrawing a profile. |
+| I04 | Add explicit development-only fixture data-root selection behind `OPENSOCRATES_MEMORY_FIXTURE=1`, `OPENSOCRATES_DEVELOPMENT_MANIFEST=1`, and `OPENSOCRATES_DATA_DIR`; ordinary requests use the owned product root. | The frozen native test checks only disposable roots. Any broader data-root override requires separate review. |
+| I05 | Use the existing owner-only path, file, and lock primitives around rollback-journal SQLite; no WAL or network filesystem claim is made. The source reader uses POSIX descriptor-relative no-follow opens and fails closed on Windows instead of attempting unsafe path reads. | Native Windows reparse/ACL source access, interruption/migration, and deletion-race evidence remain separate required gates. |
+| I06 | The installer preserves project memory by default and delegates an explicit exact-project deletion to the verified installed memory command before host purge. | A native Windows lifecycle fixture and independent final review must pass before release qualification. |
 
 Criteria are task quality, efficient completion, continuity, natural collaboration,
 appropriate reuse, dependency understanding, and the verified privacy/evidence

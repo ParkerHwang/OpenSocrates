@@ -82,7 +82,7 @@ CONFIG_NAMES = frozenset(
 
 def _digest(value: object) -> str:
     encoded = json.dumps(value, sort_keys=True, ensure_ascii=True, separators=(",", ":")).encode()
-    return hashlib.sha256(encoded).hexdigest()
+    return "sha256:" + hashlib.sha256(encoded).hexdigest()
 
 
 def _allowed(path: str, kind: WorkspaceKind) -> bool:
@@ -97,6 +97,14 @@ def _allowed(path: str, kind: WorkspaceKind) -> bool:
     parts = [part.lower() for part in pure.parts]
     name = parts[-1]
     if any(part in EXCLUDED_DIRS for part in parts[:-1]):
+        return False
+    if any(
+        "credential" in part
+        or "secret" in part
+        or part.startswith(".env.")
+        or part.startswith("sk-")
+        for part in parts
+    ):
         return False
     if (
         name in EXCLUDED_NAMES
@@ -159,7 +167,7 @@ def _git_state(root: Path) -> dict[str, object]:
     paths = _git(root, "ls-files", "--cached", "--others", "--exclude-standard", "-z")
     return {
         "head_oid": head,
-        "ref": ref,
+        "ref": _digest(ref) if ref else None,
         "status_digest": hashlib.sha256(status).hexdigest(),
         "dirty": bool(status),
         "inventory": tuple(sorted({os.fsdecode(item) for item in paths.split(b"\0") if item})),
@@ -279,15 +287,21 @@ def capture_snapshot(  # noqa: C901 - bounded collection keeps one audit path
     project_id: str,
     workspace_id: str,
     scope_paths: tuple[str, ...] = (),
+    excluded_paths: tuple[str, ...] = (),
 ) -> dict[str, object]:
     """Capture a metadata-only snapshot of a registered root's declared text scope.
 
     The caller must validate registration/root ownership. This function rejects a
     symlink root and unsafe scope; it never follows symlinks during file reads.
     """
+    if os.name == "nt":
+        # The POSIX openat/O_NOFOLLOW sequence below has no equivalent in the
+        # current Windows source adapter. Do not fall back to path-based reads.
+        raise ValueError("windows_source_adapter_unavailable")
     if workspace_kind not in {"git_worktree", "directory"} or not project_id or not workspace_id:
         raise ValueError("invalid_snapshot_request")
     scopes = _safe_scope(scope_paths)
+    exclusions = _safe_scope(excluded_paths)
     root = Path(root).absolute()
     if root.is_symlink() or not root.is_dir():
         raise ValueError("unsafe_path")
@@ -313,6 +327,9 @@ def capture_snapshot(  # noqa: C901 - bounded collection keeps one audit path
     try:
         for path in inventory:
             if not _scope(path, scopes):
+                continue
+            if any(_scope(path, (excluded,)) for excluded in exclusions):
+                omitted["excluded_or_unsupported"] = omitted.get("excluded_or_unsupported", 0) + 1
                 continue
             if not _allowed(path, workspace_kind):
                 omitted["excluded_or_unsupported"] = omitted.get("excluded_or_unsupported", 0) + 1
@@ -418,6 +435,7 @@ def capture_snapshot(  # noqa: C901 - bounded collection keeps one audit path
                 "excluded_dirs": sorted(EXCLUDED_DIRS),
                 "excluded_names": sorted(EXCLUDED_NAMES),
                 "excluded_suffixes": EXCLUDED_SUFFIXES,
+                "policy_exclusions": list(exclusions),
             }
         ),
         "configuration_digest": _digest(config),
@@ -505,3 +523,39 @@ def revalidate_snapshot(old: dict[str, object], current: dict[str, object]) -> d
     ):
         return {"freshness": "unknown", "reason": "scope_incomplete", "changes": changes}
     return {"freshness": "current", "reason": None, "changes": changes}
+
+
+def lexical_matches(  # noqa: C901  # Bounded no-follow search validates each file.
+    root: Path, snapshot: dict[str, object], query: str, *, max_hits: int = 32
+) -> tuple[list[dict[str, object]], int]:
+    """Return current, bounded lexical locations without retaining source bytes."""
+    if not isinstance(query, str) or not query or len(query) > 256 or "\x00" in query:
+        raise ValueError("invalid_search_query")
+    if os.name == "nt":
+        raise ValueError("windows_source_adapter_unavailable")
+    files = snapshot.get("files")
+    if not isinstance(files, dict):
+        raise ValueError("invalid_snapshot")
+    hits: list[dict[str, object]] = []
+    omitted = 0
+    deadline = time.monotonic() + MAX_SECONDS
+    root_fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        for path, entry in sorted(files.items()):
+            if time.monotonic() >= deadline:
+                raise ValueError("search_budget_exhausted")
+            if not isinstance(path, str) or not isinstance(entry, dict):
+                raise ValueError("invalid_snapshot")
+            data, reason, _identity = _read_file(root_fd, path)
+            if reason or data is None or hashlib.sha256(data).hexdigest() != entry.get("sha256"):
+                raise ValueError("source_changed_during_read")
+            decoded = data.decode("utf-8")
+            for line_number, line in enumerate(decoded.splitlines(), start=1):
+                if query.casefold() in line.casefold():
+                    if len(hits) < max_hits:
+                        hits.append({"path": path, "line": line_number, "sha256": entry["sha256"]})
+                    else:
+                        omitted += 1
+    finally:
+        os.close(root_fd)
+    return hits, omitted

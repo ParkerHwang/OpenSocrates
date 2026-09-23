@@ -53,6 +53,9 @@ Node.js 20 or later is also required when changing the GitHub/npx installer.
 - Keep English and Korean user-facing documentation semantically aligned.
 - Do not add telemetry, credential collection, raw prompt logging, or hidden
   reasoning capture.
+- Optional v1.5 project memory follows the explicit enrollment and bounded
+  public-record policy in [SECURITY.md](SECURITY.md). It does not broaden the
+  default content-only `decision` command or ordinary hooks.
 
 Regenerate canonical outputs when their sources change:
 

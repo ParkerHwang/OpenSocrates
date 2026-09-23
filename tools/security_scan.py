@@ -224,7 +224,7 @@ def _import_findings(tree: ast.AST) -> tuple[int, int, int]:
     return external, network, dynamic_import
 
 
-def _call_findings(tree: ast.AST) -> dict[str, int]:  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
+def _call_findings(tree: ast.AST, relative_path: str = "") -> dict[str, int]:  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     findings = {
         "dynamic_execution": 0,
         "shell_execution": 0,
@@ -284,8 +284,35 @@ def _call_findings(tree: ast.AST) -> dict[str, int]:  # noqa: C901  # Branch-exp
             ):
                 findings["shell_execution"] += 1
             if owner == "subprocess":
-                findings["shell_execution"] += 1
-            if name in {"connect", "create_connection", "urlopen"} or (
+                # v1.5 source adapters use only fixed git argv, never a shell.
+                # Keep every other production subprocess call prohibited.
+                first = node.args[0] if node.args else None
+                fixed_git = (
+                    relative_path in {"project_memory/registry.py", "project_memory/sources.py"}
+                    and name == "run"
+                    and isinstance(first, (ast.List, ast.Tuple))
+                    and bool(first.elts)
+                    and isinstance(first.elts[0], ast.Constant)
+                    and first.elts[0].value == "git"
+                    and not any(
+                        item.arg == "shell" and not isinstance(item.value, ast.Constant)
+                        for item in node.keywords
+                    )
+                    and not any(
+                        item.arg == "shell"
+                        and isinstance(item.value, ast.Constant)
+                        and item.value.value is not False
+                        for item in node.keywords
+                    )
+                )
+                if not fixed_git:
+                    findings["shell_execution"] += 1
+            local_sqlite = (
+                relative_path == "project_memory/store.py"
+                and name == "connect"
+                and owner in {"self", "sqlite3"}
+            )
+            if (name in {"connect", "create_connection", "urlopen"} and not local_sqlite) or (
                 owner in {"requests", "httpx", "socket", "urllib", "urllib_request"}
                 and name in {"get", "post", "put", "request", "open"}
             ):
@@ -581,7 +608,7 @@ def _scan_production(root: Path) -> dict[str, Any]:  # noqa: C901  # Branch-expl
         totals["external_imports"] += external
         totals["network_imports"] += network
         totals["dynamic_imports"] += dynamic_import
-        findings = _call_findings(tree)
+        findings = _call_findings(tree, path.relative_to(source).as_posix())
         for key, value in findings.items():
             totals[key] += value
     violations = sum(value for key, value in totals.items() if key not in {"production_files"})

@@ -1,6 +1,6 @@
 # OpenSocrates v1.5.0 development specification
 
-Status: implementation specification; product implementation and outcome studies are pending.
+Status: implementation in progress; outcome studies are pending.
 Working language: English. Reviewed baseline: `v1.4.0`, commit
 `5a2ff3c312e92aa8a44d0905465674d9a4e4f645`, also the remote `main` head
 when checked on 2026-09-23.
@@ -39,6 +39,7 @@ package. Start with the final product contract in 10 and behavior policy in 11.
 | [10 — Product definition](10-product-identity-and-combined-capabilities.md) | Target users, outcomes, representative experiences, and success conditions |
 | [11 — Adaptive assistance and collaboration](11-adaptive-assistance-and-collaboration.md) | Task/model policy, assistance levels, profiles, and observable interaction behavior |
 | [Validation record](VALIDATION.md) | Checks actually performed on this document package |
+| [Implementation status](IMPLEMENTATION_STATUS.md) | Candidate source slices, evidence boundary, and remaining gates |
 
 The package also includes [synthetic contract examples](examples/README.md) and a
 [documentation validator](validate_documents.py). Run the validator from the
@@ -54,10 +55,10 @@ starting the execution plan. Read source files only for the current work package
 They do not describe behavior already present in v1.4.0. Implementation tasks
 must preserve the user's goals, permissions, and acceptance conditions.
 
-The user requested this development package and the built-in memory direction.
-This task produces documents and a kickoff prompt. It does not start another
-Codex task, enable memory for a real workspace, modify the active installation,
-publish data, merge code, or release v1.5.0.
+The development specification was completed before implementation. The
+implementation branch adds candidate source behavior and disposable fixtures.
+It does not enroll a real workspace, modify the active installation, merge,
+publish, or release v1.5.0.
 
 The kickoff prompt explicitly authorizes implementation and the narrow policy
 revision specified in 05. Until that implementation changes the active repository

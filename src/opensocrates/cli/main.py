@@ -30,6 +30,8 @@ def _parser() -> argparse.ArgumentParser:
     decision = sub.add_parser("decision", help="retrieve canonical methods at an in-turn decision")
     decision.add_argument("--stream", action="store_true", help="volatile NDJSON session")
 
+    sub.add_parser("memory", help="explicit enrolled project memory request")
+
     sub.add_parser("assistance", help="plan optional assistance from closed task features")
 
     control = sub.add_parser("control", help="apply one bounded host control")
@@ -275,6 +277,11 @@ def main(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
         from .decision import run_decision
 
         return run_decision(stdin or sys.stdin, output_stream, stream=args.stream)
+
+    if args.command == "memory":
+        from .memory import run_memory
+
+        return run_memory(stdin or sys.stdin, output_stream)
 
     if args.command == "assistance":
         from .assistance import run_assistance

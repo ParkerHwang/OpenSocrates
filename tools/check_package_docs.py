@@ -62,8 +62,8 @@ CODEX_REQUIRED: tuple[tuple[str, tuple[str, ...]], ...] = (
     (
         "codex_readme_live_evidence_boundary_missing",
         (
-            "package and launcher are release-validated",
-            "no live Codex hook-delivery receipt",
+            "package and launcher checks alone do not establish live Codex hook delivery",
+            "candidate implementation until the declared native",
         ),
     ),
     (

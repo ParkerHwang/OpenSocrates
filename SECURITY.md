@@ -27,6 +27,17 @@ does not authorize a CWD-controlled fallback. This command adds no disk state,
 raw prompt logging, conversation retention, screenshot capture, authentication
 call, or telemetry.
 
+Optional v1.5 project memory has a separate, explicitly enrolled local storage
+boundary. Its declared policy permits bounded public decisions, task checkpoints,
+source references, digests, and document/code-index metadata in an owner-only
+product data directory. It does not store raw prompts, transcripts, tool-output
+dumps, source-file copies, screenshots, credentials, or private reasoning.
+Status and disabled recall do not initialize storage; ordinary hooks and the
+default `decision` command do not open it. Enrolled data can be inspected,
+exported, disabled, and deleted through explicit memory operations. A recalled
+record is context with attribution and freshness limits, never permission or
+proof that a previous agent read or applied a method.
+
 The retained legacy Codex selector is a separate compatibility path. It uses the
 pinned SDK and existing Codex authentication in an isolated worker, with bounded
 read-only context access, disabled recursive hooks/plugins, a deadline, and

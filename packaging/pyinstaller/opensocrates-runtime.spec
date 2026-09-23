@@ -23,6 +23,7 @@ for relative in (
     "content/compiled-reasoning-content.bundle.json",
     "content/compiled-response-policy.json",
     "content/locales",
+    "plugin-src/shared/assistance/profiles.json",
 ):
     source = ROOT / relative
     if source.is_file():

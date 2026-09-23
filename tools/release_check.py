@@ -460,7 +460,16 @@ def _schema_manifest_files(root: Path) -> set[str]:
     files = [line.removeprefix(prefix) for line in lines if line.startswith(prefix)]
     if not files or len(files) != len(set(files)) or any("/" in name for name in files):
         return set()
-    return set(files)
+    try:
+        v15 = json.loads((root / "schemas/source/v15-manifest.json").read_text(encoding="utf-8"))
+        newer = v15["schemas"]
+        if not isinstance(newer, dict) or any(not isinstance(name, str) for name in newer):
+            return set()
+    except (OSError, UnicodeError, json.JSONDecodeError, KeyError, TypeError):
+        return set()
+    if set(files) & set(newer):
+        return set()
+    return set(files) | set(newer)
 
 
 def _schema_surface(root: Path) -> dict[str, Any]:
@@ -1790,6 +1799,27 @@ def _full_check(
             }
         ),
     }
+    if (
+        assembly_status == "pass"
+        and primary_runtime is not None
+        and isinstance(primary_runtime.get("artifact"), str)
+    ):
+        checks["frozen_memory"] = _run_tool_check(
+            root,
+            [
+                str(root / "tools/check_frozen_memory.py"),
+                "--binary",
+                str(_resolve(root, str(primary_runtime["artifact"]))),
+                "--package",
+                str(root / "dist/codex"),
+            ],
+            "frozen_memory",
+        )
+    else:
+        checks["frozen_memory"] = {
+            "status": "unavailable",
+            "error_codes": ["runtime_or_package_unavailable"],
+        }
     checks["hosts"] = (
         {host: _verify_host_surface(root, host, bundle, bundle_bytes, target) for host in HOSTS}
         if assembly_status == "pass"

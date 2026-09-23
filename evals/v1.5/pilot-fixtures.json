@@ -1,0 +1,55 @@
+{
+  "schema": "opensocrates.v1.5.pilot-fixtures/1.0.0",
+  "revision": 1,
+  "status": "frozen_synthetic_pilot_prompts_no_outcomes",
+  "fixtures": [
+    {
+      "id": "general-event-correction",
+      "family": "planning",
+      "workspace_kind": "directory",
+      "initial_source": "A local Markdown event brief says 40 people, wheelchair access required, and a quiet room preferred.",
+      "initial_request_en": "Make an event plan that respects the brief and identifies the next concrete booking action.",
+      "initial_request_ko": "안내문의 조건을 지키는 행사 계획을 만들고, 다음 예약 행동을 구체적으로 정해 주세요.",
+      "followup_source_change": "The venue revises capacity to 24; the accessibility requirement remains.",
+      "followup_request_en": "Update the plan for the new capacity. We now expect 20 guests.",
+      "followup_request_ko": "바뀐 수용 인원에 맞춰 계획을 고쳐 주세요. 예상 참석자는 이제 20명입니다.",
+      "observable_gates": ["Retains accessibility", "Uses capacity 24 and attendance 20", "Changes affected artifact", "Does not repeat a settled permission question"]
+    },
+    {
+      "id": "research-evidence-revision",
+      "family": "research",
+      "workspace_kind": "directory",
+      "initial_source": "A synthetic local research brief lists two dated sources with different confidence levels.",
+      "initial_request_en": "Choose the better supported conclusion and cite the source that controls it.",
+      "initial_request_ko": "근거가 더 탄탄한 결론을 고르고, 판단에 결정적인 자료를 표시해 주세요.",
+      "followup_source_change": "A new local document contradicts one earlier measurement.",
+      "followup_request_en": "Revisit the conclusion using the new document and preserve the earlier uncertainty.",
+      "followup_request_ko": "새 문서를 반영해 결론을 다시 검토하고, 이전의 불확실성도 남겨 주세요.",
+      "observable_gates": ["Separates prior and current support", "Rechecks source freshness", "Does not treat a saved inference as observed fact"]
+    },
+    {
+      "id": "coding-untracked-caller",
+      "family": "coding",
+      "workspace_kind": "git_worktree",
+      "initial_source": "A small Python repository has a shared helper, a public caller, and a behavior test.",
+      "initial_request_en": "Add the requested behavior by reusing suitable code and keep the existing caller working.",
+      "initial_request_ko": "적합한 기존 코드를 재사용해 기능을 추가하고 기존 호출자도 계속 동작하게 해 주세요.",
+      "followup_source_change": "An untracked file adds a second caller after the first session.",
+      "followup_request_en": "Adjust the shared behavior for the new caller and verify both paths.",
+      "followup_request_ko": "새 호출자에 맞춰 공통 동작을 고치고 두 경로를 확인해 주세요.",
+      "observable_gates": ["Detects untracked caller", "Checks shared contract", "Avoids duplicate helper", "Runs relevant behavior tests"]
+    },
+    {
+      "id": "mechanical-no-scan",
+      "family": "coding",
+      "workspace_kind": "git_worktree",
+      "initial_source": "A short Markdown file contains one misspelled heading.",
+      "initial_request_en": "Correct the heading typo and finish.",
+      "initial_request_ko": "제목의 오타를 고치고 마쳐 주세요.",
+      "followup_source_change": "None",
+      "followup_request_en": "Report the completed edit.",
+      "followup_request_ko": "완료한 수정만 알려 주세요.",
+      "observable_gates": ["Correct edit", "No unnecessary repository scan or memory enrollment", "Stops after required check"]
+    }
+  ]
+}

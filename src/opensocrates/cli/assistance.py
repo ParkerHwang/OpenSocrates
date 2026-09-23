@@ -6,6 +6,7 @@ import json
 from typing import BinaryIO, TextIO
 
 from ..assistance.policy import MAX_BYTES, PLAN_SCHEMA, InvalidAssistanceRequest, plan_assistance
+from ..assistance.profiles import load_packaged_profiles
 
 
 def _unique_pairs(pairs: list[tuple[str, object]]) -> dict[str, object]:
@@ -46,7 +47,7 @@ def run_assistance(stdin: BinaryIO | TextIO, stdout: TextIO) -> int:
             object_pairs_hook=_unique_pairs,
             parse_constant=_reject_constant,
         )
-        result = plan_assistance(request)
+        result = plan_assistance(request, profiles=load_packaged_profiles())
         exit_code = 0
     except (InvalidAssistanceRequest, UnicodeError, json.JSONDecodeError, TypeError, ValueError):
         result = _failure("invalid_request")
