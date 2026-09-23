@@ -31,7 +31,12 @@ was carried onto a focused branch without changing protected `main`.
   continuation, clean-machine behavior, and live Codex memory use remain
   unverified. A disposable CLI 0.145.0 probe emitted a native memory pack, but
   live Luna/Sol calls were rejected for ChatGPT-account access and Astra required
-  a newer client. No model answered or retrieved the pack.
+  a newer client. A separate non-evaluation `gpt-5.6-sol`/medium CLI smoke on
+  an earlier candidate copy retrieved the synthetic pack and answered from both
+  current file and accepted memory, including with hooks disabled and explicit
+  skill invocation. This is bounded host-delivery evidence, not GPT-6 behavior
+  or an exact-current-head package test. Its initial failed attempt and all
+  exposed usage are retained in the host feasibility receipt.
 - W8: five evaluation lane protocols and pilot scenarios are frozen before any
   outcomes. The exact CLI model cells failed feasibility; no model-quality or
   efficiency outcomes have been run or claimed.
