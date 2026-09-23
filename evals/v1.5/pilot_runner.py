@@ -109,6 +109,8 @@ def call_codex(
     if resume:
         prefix.append("resume")
         prefix.append("--last")
+        prefix.append("--skip-git-repo-check")
+        prefix.extend(["-c", "sandbox_mode=workspace-write"])
     else:
         prefix += ["--sandbox", "workspace-write", "--skip-git-repo-check", "-C", str(fixture)]
     command = prefix + [
@@ -207,6 +209,8 @@ def checks_for(task_id: str, fixture: Path, stage: str) -> dict[str, bool]:
             plan = json.loads((fixture / "plan.json").read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             plan = {}
+        if not isinstance(plan, dict):
+            plan = {}
         action = str(plan.get("next_booking_action", "")).lower()
         return {
             "venue_A": plan.get("venue_id") == "A",
@@ -229,13 +233,22 @@ def checks_for(task_id: str, fixture: Path, stage: str) -> dict[str, bool]:
             plan = json.loads((fixture / "plan.json").read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             plan = {}
+        if not isinstance(plan, dict):
+            plan = {}
         if stage == "initial":
             return {"initial_holds": plan.get("venue_id") is None or str(plan.get("venue_id", "")).lower() in {"none", "unresolved", "hold"}}
         action = str(plan.get("next_booking_action", "")).lower()
+        accessibility = plan.get("accessibility")
+        if isinstance(accessibility, dict):
+            access_met = accessibility.get("step_free") is True
+        elif isinstance(accessibility, (str, bool)):
+            access_met = accessibility in {True, "step-free", "step_free", "accessible"}
+        else:
+            access_met = False
         return {
             "corrected_venue_A": plan.get("venue_id") == "A",
             "corrected_attendance_20": plan.get("expected_guests") == 20,
-            "accessibility": plan.get("accessibility") in {True, "step-free", "step_free", "accessible"},
+            "accessibility": access_met,
             "booking_action": bool(re.search("availab|가능|예약", action)) and bool(re.search("step.free|access|접근|무장애", action)),
         }
     raise ValueError(task_id)
