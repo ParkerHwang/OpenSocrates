@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import atexit
 import hashlib
 import json
 import os
@@ -220,6 +221,7 @@ def run(fixture_id: str, arm: str, output_root: Path | None) -> Path:  # noqa: C
         path.mkdir(mode=0o700)
     shutil.copyfile(AUTH, profile / "auth.json")
     (profile / "auth.json").chmod(0o600)
+    atexit.register(lambda: (profile / "auth.json").unlink(missing_ok=True))
     for name, content in fixture["initial_files"].items():
         (workspace / name).write_text(content)
     if fixture["workspace_kind"] == "git_worktree":
