@@ -22,6 +22,9 @@ MAX_INVENTORY = 8_000
 MAX_FILE_BYTES = 1 << 20
 MAX_BYTES = 32 << 20
 MAX_SECONDS = 10
+_O_DIRECTORY = getattr(os, "O_DIRECTORY", 0)
+_O_NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
+_O_NONBLOCK = getattr(os, "O_NONBLOCK", 0)
 EXCLUDED_DIRS = frozenset(
     {
         ".git",
@@ -194,14 +197,16 @@ def _read_file(
     root_fd: int, relative: str
 ) -> tuple[bytes | None, str | None, tuple[int, int, int, int] | None]:
     """Open each path component without following symlinks, then verify one read."""
+    if os.name == "nt":
+        return None, "windows_source_adapter_unavailable", None
     fd = os.dup(root_fd)
     try:
         parts = relative.split("/")
         for component in parts[:-1]:
-            child = os.open(component, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
+            child = os.open(component, os.O_RDONLY | _O_DIRECTORY | _O_NOFOLLOW, dir_fd=fd)
             os.close(fd)
             fd = child
-        child = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=fd)
+        child = os.open(parts[-1], os.O_RDONLY | _O_NOFOLLOW | _O_NONBLOCK, dir_fd=fd)
         try:
             before = os.fstat(child)
             if not stat.S_ISREG(before.st_mode):
@@ -323,7 +328,7 @@ def capture_snapshot(  # noqa: C901 - bounded collection keeps one audit path
     unstable: list[str] = []
     identities: dict[str, tuple[int, int, int, int]] = {}
     scanned_bytes = 0
-    root_fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    root_fd = os.open(root, os.O_RDONLY | _O_DIRECTORY | _O_NOFOLLOW)
     try:
         for path in inventory:
             if not _scope(path, scopes):
@@ -539,7 +544,7 @@ def lexical_matches(  # noqa: C901  # Bounded no-follow search validates each fi
     hits: list[dict[str, object]] = []
     omitted = 0
     deadline = time.monotonic() + MAX_SECONDS
-    root_fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    root_fd = os.open(root, os.O_RDONLY | _O_DIRECTORY | _O_NOFOLLOW)
     try:
         for path, entry in sorted(files.items()):
             if time.monotonic() >= deadline:
