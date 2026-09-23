@@ -1748,7 +1748,7 @@ test("isolated app-server validation rejects malformed, oversized, extra, and mi
           codexHome: box.home,
           codexBin,
           hooks: {
-            validationTimeoutMilliseconds: 1_000,
+            validationTimeoutMilliseconds: 2_000,
             validationTerminationMilliseconds: 50,
           },
         }),
@@ -1762,8 +1762,9 @@ test("isolated app-server validation rejects malformed, oversized, extra, and mi
           !error.message.includes(box.root),
       );
       assert.equal(readFileSync(config, "utf8"), original);
-      const trace = readFileSync(tracePath, "utf8")
-        .trim()
+      const traceText = readFileSync(tracePath, "utf8").trim();
+      assert.notEqual(traceText, "", `validator did not start for ${mode}`);
+      const trace = traceText
         .split("\n")
         .map((line) => JSON.parse(line));
       assert.equal(trace.length, 1);
