@@ -300,7 +300,8 @@ try {
     env: { ...process.env, npm_config_dry_run: "false", npm_config_json: "false" },
   });
   assert.equal(help.status, 0, help.stderr);
-  assert.match(help.stdout, /remove \[--host .*\] \[--purge \[--reset-trust\]\]/u);
+  assert.match(help.stdout, /remove \[--host .*\] \[--purge \[--reset-trust\]/u);
+  assert.match(help.stdout, /\[--delete-project-memory PROJECT_UUID --memory-policy-version VERSION\]\]/u);
   assert.match(help.stdout, /host security trust, and user history are reported separately/u);
   assert.equal(help.stdout.match(/--asset ZIP --checksum FILE/gu)?.length, 3);
   assert.doesNotMatch(help.stdout, /--checksum SHA256/u);
