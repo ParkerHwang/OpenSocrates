@@ -40,6 +40,7 @@ package. Start with the final product contract in 10 and behavior policy in 11.
 | [11 — Adaptive assistance and collaboration](11-adaptive-assistance-and-collaboration.md) | Task/model policy, assistance levels, profiles, and observable interaction behavior |
 | [Validation record](VALIDATION.md) | Checks actually performed on this document package |
 | [Implementation status](IMPLEMENTATION_STATUS.md) | Candidate source slices, evidence boundary, and remaining gates |
+| [Platform acceptance handoff](PLATFORM_ACCEPTANCE_HANDOFF.md) | Disposable host procedure and separate destructive-test permission boundary |
 
 The package also includes [synthetic contract examples](examples/README.md) and a
 [documentation validator](validate_documents.py). Run the validator from the
