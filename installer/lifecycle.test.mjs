@@ -427,6 +427,7 @@ const trace = () => {
   traceRecorded = true;
   record({
     kind: "app-server",
+    requestReceived: request !== undefined,
     targetTrustCount: (contents.match(/opensocrates@opensocrates:hooks\\/hooks\\.json:[a-z_]+:0:0/g) ?? []).length,
     isolated:
       process.env.HOME === process.env.CODEX_HOME &&
@@ -470,6 +471,15 @@ const sendResponse = () => {
   if (MODE === "extra-response") process.stdout.write(response);
 };
 const handleRequest = () => {
+  // Negative responses may be rejected and killed before stdin reaches EOF.
+  // Record the isolated request boundary before emitting those responses.
+  if (new Set([
+    "reject", "malformed", "line-oversize", "total-oversize",
+    "extra-response", "wrong-id", "bad-result", "error-response",
+    "server-request", "unknown-notification", "invalid-notification-method",
+    "invalid-notification-params", "invalid-notification-timestamp",
+    "notification-overflow",
+  ]).has(MODE)) trace();
   if (MODE === "timeout") {
     if (PID !== null) writeFileSync(PID, String(process.pid), { mode: 0o600 });
     setInterval(() => {}, 1000);
@@ -1748,7 +1758,7 @@ test("isolated app-server validation rejects malformed, oversized, extra, and mi
           codexHome: box.home,
           codexBin,
           hooks: {
-            validationTimeoutMilliseconds: 2_000,
+            validationTimeoutMilliseconds: 1_000,
             validationTerminationMilliseconds: 50,
           },
         }),
@@ -1762,7 +1772,7 @@ test("isolated app-server validation rejects malformed, oversized, extra, and mi
           !error.message.includes(box.root),
       );
       assert.equal(readFileSync(config, "utf8"), original);
-      const traceText = readFileSync(tracePath, "utf8").trim();
+      const traceText = existsSync(tracePath) ? readFileSync(tracePath, "utf8").trim() : "";
       assert.notEqual(traceText, "", `validator did not start for ${mode}`);
       const trace = traceText
         .split("\n")
@@ -1770,7 +1780,7 @@ test("isolated app-server validation rejects malformed, oversized, extra, and mi
       assert.equal(trace.length, 1);
       assert.equal(trace[0].kind, "app-server");
       assert.equal(trace[0].isolated, true);
-      assert.equal(trace[0].stdinClosed, true);
+      assert.equal(trace[0].requestReceived, true);
       assert.equal(trace[0].environmentClean, true);
       assert.deepEqual(
         readdirSync(box.home).filter((name) =>
