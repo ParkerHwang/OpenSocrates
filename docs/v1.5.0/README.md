@@ -25,6 +25,7 @@ project. It is not a dependency on a separately installed memory service.
 | [08 — Implementation kickoff](08-implementation-kickoff.md) | Complete prompt to start implementation in a fresh Codex task |
 | [09 — Decisions and source map](09-decisions-and-source-map.md) | Architectural decisions, alternatives, source evidence, and reopening conditions |
 | [Validation record](VALIDATION.md) | Checks actually performed on this document package |
+| [Pitch rehearsal record](pitch-rehearsals/README.md) | Simulated audience feedback, proposed follow-ups, and evidence limits |
 
 The package also includes [synthetic contract examples](examples/README.md) and a
 [documentation validator](validate_documents.py). Run the validator from the

@@ -67,3 +67,22 @@ and evidence-pack examples now include usable locators/digests.
 - Implementation dispatch: the kickoff prompt is prepared, not submitted to a new task.
 
 The actual implementation must create its own current-commit validation record.
+
+## Pitch-record extension on 2026-09-23
+
+The user requested durable records of the investor rehearsal and a developer-group
+pitch. The package now includes curated English rehearsal records and an index.
+These contain public arguments and proposed follow-ups, not raw model reasoning,
+actual customer interviews, or new implementation evidence.
+
+The developer record also preserves the user's correction: a planned-product pitch
+needs concept-stage design opinions, not a closing question dominated by immediate
+trial readiness. The corrected discussion and changes of opinion are recorded
+without deleting the earlier framing error. Core implementation requirements and
+the evaluation protocol remain unchanged by these research notes.
+
+The document validator and local link checker were rerun for the extension:
+15 Markdown documents, three JSON examples, 37 acceptance-case references,
+and 66 link entries processed with no reported failures. Ten external links were
+not fetched by that checker.
+The staged diff was checked for whitespace errors before the recording commit.
