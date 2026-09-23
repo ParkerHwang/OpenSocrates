@@ -69,7 +69,12 @@ def main() -> int:
         sandbox = Path(tmp)
         data_root = sandbox / "data"
         source = sandbox / "event"
-        source.mkdir()
+        if os.name == "nt":
+            from opensocrates.persistence.permissions import create_owner_only_directory
+
+            assert create_owner_only_directory(source)
+        else:
+            source.mkdir()
         brief = source / "brief.md"
         brief.write_text("Capacity: 40.\n", encoding="utf-8")
         env = dict(os.environ)
