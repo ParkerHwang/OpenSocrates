@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 import os
 import stat
-import subprocess
 from pathlib import Path
 from typing import Any, cast
 from uuid import uuid4
@@ -20,6 +19,7 @@ from ..persistence.locks import FileLock, LockPolicy
 from ..persistence.paths import DataRootLayout, resolve_data_root, secure_join
 from ..persistence.permissions import check_permissions, create_owner_only_directory
 from .contracts import validate_basis_reference
+from .git import run_git
 
 REGISTRY_VERSION = 1
 MAX_REGISTRY_BYTES = 2 * 1024 * 1024
@@ -67,24 +67,20 @@ def _safe_root(raw: str) -> Path:
 
 
 def _git_binding(root: Path) -> dict[str, Any] | None:
-    result = subprocess.run(
-        [
-            "git",
-            "-C",
-            str(root),
-            "rev-parse",
-            "--show-toplevel",
-            "--absolute-git-dir",
-            "--git-common-dir",
-        ],
-        capture_output=True,
-        text=True,
-        timeout=2,
-        check=False,
-    )
+    try:
+        result = run_git(
+            root, "rev-parse", "--show-toplevel", "--absolute-git-dir", "--git-common-dir"
+        )
+    except ValueError as error:
+        if (root / ".git").exists():
+            raise RegistryError("git_unavailable") from error
+        return None
     if result.returncode:
         return None
-    lines = result.stdout.splitlines()
+    try:
+        lines = result.stdout.decode("utf-8").splitlines()
+    except UnicodeDecodeError as error:
+        raise RegistryError("git_unavailable") from error
     if len(lines) != 3:
         raise RegistryError("identity_mismatch")
     top = _safe_root(lines[0])

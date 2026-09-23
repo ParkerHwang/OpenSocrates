@@ -7,12 +7,13 @@ import hashlib
 import json
 import os
 import stat
-import subprocess
 import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import TYPE_CHECKING, Literal, cast
+
+from .git import run_git
 
 if TYPE_CHECKING:
     from opensocrates.windows_security import SourceRoot
@@ -147,9 +148,7 @@ def _safe_scope(paths: tuple[str, ...]) -> tuple[str, ...]:
 
 
 def _git(root: Path, *args: str) -> bytes:
-    result = subprocess.run(
-        ["git", "-C", str(root), *args], capture_output=True, timeout=3, check=False
-    )
+    result = run_git(root, *args)
     if result.returncode:
         raise ValueError("git_unavailable")
     return result.stdout
@@ -168,12 +167,7 @@ def _git_state(root: Path) -> dict[str, object]:
     elif top != root:
         raise ValueError("identity_mismatch")
     head = _git(root, "rev-parse", "HEAD").decode("ascii").strip()
-    ref_result = subprocess.run(
-        ["git", "-C", str(root), "symbolic-ref", "-q", "--short", "HEAD"],
-        capture_output=True,
-        timeout=3,
-        check=False,
-    )
+    ref_result = run_git(root, "symbolic-ref", "-q", "--short", "HEAD")
     if ref_result.returncode not in {0, 1}:
         raise ValueError("git_unavailable")
     ref = (

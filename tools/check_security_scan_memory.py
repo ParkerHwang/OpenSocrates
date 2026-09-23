@@ -13,11 +13,13 @@ def findings(source: str, path: str) -> dict[str, int]:
 
 
 def main() -> None:
-    git = 'import subprocess\nsubprocess.run(["git", "-C", "/fixture", "status"], check=False)\n'
-    assert findings(git, "project_memory/sources.py")["shell_execution"] == 0
+    git = 'import subprocess\ndef run_git():\n    subprocess.run([binary, "-C", "/fixture", "status"], check=False)\n'
+    assert findings(git, "project_memory/git.py")["shell_execution"] == 0
     assert findings(git, "application/other.py")["shell_execution"] == 1
-    unsafe = 'import subprocess\nsubprocess.run(["git", "status"], shell=True)\n'
-    assert findings(unsafe, "project_memory/sources.py")["shell_execution"] == 1
+    unsafe = (
+        'import subprocess\ndef run_git():\n    subprocess.run([binary, "status"], shell=True)\n'
+    )
+    assert findings(unsafe, "project_memory/git.py")["shell_execution"] == 1
     sqlite = "import sqlite3\nsqlite3.connect('file:fixture?mode=ro')\n"
     assert findings(sqlite, "project_memory/store.py")["network_calls"] == 0
     socket = "import socket\nsocket.connect(('example.com', 443))\n"

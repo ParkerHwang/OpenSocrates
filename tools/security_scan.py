@@ -284,16 +284,18 @@ def _call_findings(tree: ast.AST, relative_path: str = "") -> dict[str, int]:  #
             ):
                 findings["shell_execution"] += 1
             if owner == "subprocess":
-                # v1.5 source adapters use only fixed git argv, never a shell.
+                # Only the reviewed Git adapter resolves an executable outside
+                # the enrolled root and strips inherited Git configuration.
                 # Keep every other production subprocess call prohibited.
                 first = node.args[0] if node.args else None
                 fixed_git = (
-                    relative_path in {"project_memory/registry.py", "project_memory/sources.py"}
+                    relative_path == "project_memory/git.py"
+                    and function_stack[-1:] == ["run_git"]
                     and name == "run"
                     and isinstance(first, (ast.List, ast.Tuple))
                     and bool(first.elts)
-                    and isinstance(first.elts[0], ast.Constant)
-                    and first.elts[0].value == "git"
+                    and isinstance(first.elts[0], ast.Name)
+                    and first.elts[0].id == "binary"
                     and not any(
                         item.arg == "shell" and not isinstance(item.value, ast.Constant)
                         for item in node.keywords

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import tempfile
 from pathlib import Path
@@ -145,9 +146,33 @@ def check_mid_read_change() -> None:
         assert sources.revalidate_snapshot(unstable, unstable)["freshness"] == "unknown"
 
 
+def check_repository_git_executable_is_never_run() -> None:
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        git(root, "init", "-q")
+        git(root, "config", "user.email", "fixture@example.test")
+        git(root, "config", "user.name", "Fixture")
+        (root / "module.py").write_text("def helper():\n    return 1\n", encoding="utf-8")
+        git(root, "add", "module.py")
+        git(root, "commit", "-qm", "fixture")
+        sentinel = root / "executed.txt"
+        binary = root / "git"
+        binary.write_text(f"#!/bin/sh\nprintf executed > {sentinel}\n", encoding="utf-8")
+        binary.chmod(0o700)
+        with patch.dict(os.environ, {"PATH": str(root) + os.pathsep + os.environ["PATH"]}):
+            try:
+                snapshot(root, "git_worktree")
+            except ValueError as error:
+                assert str(error) == "unsafe_git_executable"
+            else:
+                raise AssertionError("repository Git executable was accepted")
+        assert not sentinel.exists()
+
+
 if __name__ == "__main__":
     check_directory()
     check_rename_and_symlink()
     check_git()
     check_mid_read_change()
+    check_repository_git_executable_is_never_run()
     print("memory source fixtures passed")
