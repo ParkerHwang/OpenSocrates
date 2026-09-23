@@ -46,7 +46,8 @@ class WindowsChecks(unittest.TestCase):
             parent = Path(name)
             root = parent / "enrolled"
             nested = root / "notes"
-            nested.mkdir(parents=True)
+            self.assertTrue(create_owner_only_directory(root))
+            self.assertTrue(create_owner_only_directory(nested))
             (nested / "brief.md").write_text("in-scope marker", encoding="utf-8")
             external = parent / "external"
             external.mkdir()
