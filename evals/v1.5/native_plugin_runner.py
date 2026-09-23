@@ -16,8 +16,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from pilot_runner import checks_for, digest, read_events, side_question_observation, summarize_events
-
+from pilot_runner import (
+    checks_for,
+    digest,
+    read_events,
+    side_question_observation,
+    summarize_events,
+)
 
 HERE = Path(__file__).resolve().parent
 NATIVE_FREEZE = HERE / "native-plugin-execution-freeze.v1.json"
@@ -40,7 +45,9 @@ def profile_environment(base: Path) -> tuple[Path, dict[str, str]]:
     return codex_home, env
 
 
-def install_or_check(freeze: dict[str, Any], env: dict[str, str], marketplace: Path, plugin: bool) -> dict[str, Any]:
+def install_or_check(
+    freeze: dict[str, Any], env: dict[str, str], marketplace: Path, plugin: bool
+) -> dict[str, Any]:
     cli = freeze["client"]["path"]
     started = time.monotonic()
     operations = []
@@ -49,31 +56,59 @@ def install_or_check(freeze: dict[str, Any], env: dict[str, str], marketplace: P
             ["plugin", "marketplace", "add", str(marketplace), "--json"],
             ["plugin", "add", "opensocrates@os-eval", "--json"],
         ):
-            process = subprocess.run([cli, *args], env=env, text=True, capture_output=True, timeout=90, check=False)
+            process = subprocess.run(
+                [cli, *args], env=env, text=True, capture_output=True, timeout=90, check=False
+            )
             try:
                 value = json.loads(process.stdout)
             except json.JSONDecodeError:
                 value = {}
-            operations.append({
-                "operation": "marketplace_add" if args[1] == "marketplace" else "plugin_add",
-                "exit_code": process.returncode,
-                "stdout_sha256": digest(process.stdout) if process.stdout else None,
-                "stderr_sha256": digest(process.stderr) if process.stderr else None,
-                "installed_version": value.get("version"),
-            })
+            operations.append(
+                {
+                    "operation": "marketplace_add" if args[1] == "marketplace" else "plugin_add",
+                    "exit_code": process.returncode,
+                    "stdout_sha256": digest(process.stdout) if process.stdout else None,
+                    "stderr_sha256": digest(process.stderr) if process.stderr else None,
+                    "installed_version": value.get("version"),
+                }
+            )
             if process.returncode != 0:
-                return {"ok": False, "operations": operations, "wall_seconds": round(time.monotonic() - started, 3), "inventory": None}
-    process = subprocess.run([cli, "plugin", "list", "--json"], env=env, text=True, capture_output=True, timeout=90, check=False)
+                return {
+                    "ok": False,
+                    "operations": operations,
+                    "wall_seconds": round(time.monotonic() - started, 3),
+                    "inventory": None,
+                }
+    process = subprocess.run(
+        [cli, "plugin", "list", "--json"],
+        env=env,
+        text=True,
+        capture_output=True,
+        timeout=90,
+        check=False,
+    )
     try:
         inventory = json.loads(process.stdout)
     except json.JSONDecodeError:
         inventory = {}
-    matches = [item for item in inventory.get("installed", []) if item.get("name") == "opensocrates"]
+    matches = [
+        item for item in inventory.get("installed", []) if item.get("name") == "opensocrates"
+    ]
     identity = [
-        {"id": item.get("pluginId"), "version": item.get("version"), "installed": item.get("installed"), "enabled": item.get("enabled")}
+        {
+            "id": item.get("pluginId"),
+            "version": item.get("version"),
+            "installed": item.get("installed"),
+            "enabled": item.get("enabled"),
+        }
         for item in matches
     ]
-    expected = plugin and len(identity) == 1 and identity[0] == {"id": "opensocrates@os-eval", "version": "1.4.0", "installed": True, "enabled": True}
+    expected = (
+        plugin
+        and len(identity) == 1
+        and identity[0]
+        == {"id": "opensocrates@os-eval", "version": "1.4.0", "installed": True, "enabled": True}
+    )
     clean = (not plugin) and len(identity) == 0
     return {
         "ok": process.returncode == 0 and (expected or clean),
@@ -85,16 +120,35 @@ def install_or_check(freeze: dict[str, Any], env: dict[str, str], marketplace: P
 
 
 def invoke(
-    freeze: dict[str, Any], fixture: Path, env: dict[str, str], arm: dict[str, Any], prompt: str,
-    *, resume: bool = False,
+    freeze: dict[str, Any],
+    fixture: Path,
+    env: dict[str, str],
+    arm: dict[str, Any],
+    prompt: str,
+    *,
+    resume: bool = False,
 ) -> dict[str, Any]:
     cli = freeze["client"]["path"]
     command = [cli, "exec"]
     if resume:
-        command += ["resume", "--last", "--skip-git-repo-check", "-c", "sandbox_mode=workspace-write"]
+        command += [
+            "resume",
+            "--last",
+            "--skip-git-repo-check",
+            "-c",
+            "sandbox_mode=workspace-write",
+        ]
     else:
         command += ["--sandbox", "workspace-write", "--skip-git-repo-check", "-C", str(fixture)]
-    command += ["--json", "--disable", "multi_agent", "-m", arm["model"], "-c", "model_reasoning_effort=medium"]
+    command += [
+        "--json",
+        "--disable",
+        "multi_agent",
+        "-m",
+        arm["model"],
+        "-c",
+        "model_reasoning_effort=medium",
+    ]
     if arm["hooks"]:
         command += ["--dangerously-bypass-hook-trust"]
     else:
@@ -107,14 +161,28 @@ def invoke(
     timed_out = False
     try:
         result = subprocess.run(
-            command, input=prompt, text=True, capture_output=True, env=env, cwd=fixture,
-            timeout=freeze["client"]["per_turn_wall_seconds"], check=False,
+            command,
+            input=prompt,
+            text=True,
+            capture_output=True,
+            env=env,
+            cwd=fixture,
+            timeout=freeze["client"]["per_turn_wall_seconds"],
+            check=False,
         )
         stdout, stderr, exit_code = result.stdout, result.stderr, result.returncode
     except subprocess.TimeoutExpired as exc:
         timed_out = True
-        stdout = (exc.stdout or b"").decode(errors="replace") if isinstance(exc.stdout, bytes) else (exc.stdout or "")
-        stderr = (exc.stderr or b"").decode(errors="replace") if isinstance(exc.stderr, bytes) else (exc.stderr or "")
+        stdout = (
+            (exc.stdout or b"").decode(errors="replace")
+            if isinstance(exc.stdout, bytes)
+            else (exc.stdout or "")
+        )
+        stderr = (
+            (exc.stderr or b"").decode(errors="replace")
+            if isinstance(exc.stderr, bytes)
+            else (exc.stderr or "")
+        )
     events, malformed = read_events(stdout)
     summary = summarize_events(events)
     final_message = summary.pop("final_message")
@@ -144,8 +212,13 @@ def invoke(
 
 
 def cell(
-    freeze: dict[str, Any], tasks: dict[str, Any], marketplace: Path, lane: str,
-    task_id: str, arm: dict[str, Any], language: str,
+    freeze: dict[str, Any],
+    tasks: dict[str, Any],
+    marketplace: Path,
+    lane: str,
+    task_id: str,
+    arm: dict[str, Any],
+    language: str,
 ) -> dict[str, Any]:
     task = tasks["tasks"][task_id]
     with tempfile.TemporaryDirectory(prefix="os-v15-native-cell-") as td:
@@ -176,7 +249,12 @@ def cell(
             "manual_score_missing_reason": "No independent bilingual human reviewer assigned.",
         }
         if not installation["ok"]:
-            result.update({"deterministic_success": False, "missing_cell_reason": "Disposable profile installation or baseline absence check failed; model was not called."})
+            result.update(
+                {
+                    "deterministic_success": False,
+                    "missing_cell_reason": "Disposable profile installation or baseline absence check failed; model was not called.",
+                }
+            )
             return result
         prompt = freeze["common_prompt"]
         if arm["plugin"]:
@@ -191,22 +269,30 @@ def cell(
         if lane == "EVAL-05":
             if "followup_source" in task:
                 (fixture / "event.json").write_text(task["followup_source"], encoding="utf-8")
-            result["calls"].append(invoke(freeze, fixture, env, arm, task[f"followup_{language}"], resume=True))
+            result["calls"].append(
+                invoke(freeze, fixture, env, arm, task[f"followup_{language}"], resume=True)
+            )
         try:
-            result["final_checks"] = checks_for(task_id, fixture, "followup" if lane == "EVAL-05" else "initial")
+            result["final_checks"] = checks_for(
+                task_id, fixture, "followup" if lane == "EVAL-05" else "initial"
+            )
         except Exception as exc:
             result["final_checks"] = None
             result["final_check_failure"] = type(exc).__name__
         result["artifact_hashes_after"] = {
-            path.name: digest(path.read_bytes()) for path in fixture.iterdir()
+            path.name: digest(path.read_bytes())
+            for path in fixture.iterdir()
             if path.is_file() and path.suffix in {".py", ".md", ".json"}
         }
         result["deterministic_success"] = (
-            bool(result["final_checks"]) and all(result["final_checks"].values())
+            bool(result["final_checks"])
+            and all(result["final_checks"].values())
             and all(not call["failure"] for call in result["calls"])
         )
         result["codex_home_owner_only"] = (codex_home.stat().st_mode & 0o777) == 0o700
-        result["auth_copy_owner_only"] = ((codex_home / "auth.json").stat().st_mode & 0o777) == 0o600
+        result["auth_copy_owner_only"] = (
+            (codex_home / "auth.json").stat().st_mode & 0o777
+        ) == 0o600
         result["auth_is_symlink"] = (codex_home / "auth.json").is_symlink()
         return result
 
@@ -227,12 +313,14 @@ def build_marketplace(freeze: dict[str, Any], base: Path) -> Path:
         raise SystemExit("Candidate plugin identity mismatch")
     config = {
         "name": "os-eval",
-        "plugins": [{
-            "name": "opensocrates",
-            "source": {"source": "local", "path": "./plugin"},
-            "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
-            "category": "Productivity",
-        }],
+        "plugins": [
+            {
+                "name": "opensocrates",
+                "source": {"source": "local", "path": "./plugin"},
+                "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+                "category": "Productivity",
+            }
+        ],
     }
     meta = marketplace / ".agents" / "plugins"
     meta.mkdir(parents=True)
@@ -252,7 +340,9 @@ def main() -> None:
     tasks = json.loads(raw_tasks)
     if not GLOBAL_AUTH.is_file():
         raise SystemExit("Existing ChatGPT auth file unavailable")
-    version = subprocess.run([freeze["client"]["path"], "--version"], text=True, capture_output=True, check=True).stdout.strip()
+    version = subprocess.run(
+        [freeze["client"]["path"], "--version"], text=True, capture_output=True, check=True
+    ).stdout.strip()
     if version != freeze["client"]["version"]:
         raise SystemExit("Client version drift")
     with tempfile.TemporaryDirectory(prefix="os-v15-native-market-") as td:
@@ -264,20 +354,30 @@ def main() -> None:
                     work.append((task_id, arm, language))
         cells = []
         with ThreadPoolExecutor(max_workers=freeze["client"]["max_parallel_cells"]) as pool:
-            futures = {pool.submit(cell, freeze, tasks, marketplace, args.lane, *entry): entry for entry in work}
+            futures = {
+                pool.submit(cell, freeze, tasks, marketplace, args.lane, *entry): entry
+                for entry in work
+            }
             for future in as_completed(futures):
                 entry = futures[future]
                 try:
                     result = future.result()
                 except Exception as exc:
                     result = {
-                        "lane": args.lane, "task": entry[0], "arm": entry[1]["id"],
-                        "language": entry[2], "runner_failure": type(exc).__name__,
-                        "deterministic_success": False, "calls": None,
+                        "lane": args.lane,
+                        "task": entry[0],
+                        "arm": entry[1]["id"],
+                        "language": entry[2],
+                        "runner_failure": type(exc).__name__,
+                        "deterministic_success": False,
+                        "calls": None,
                         "missing_receipt_reason": "Runner exception; exact attempted-call count unavailable.",
                     }
                 cells.append(result)
-                print(f"{args.lane} {result['task']} {result['language']} {result['arm']}: {result['deterministic_success']}", flush=True)
+                print(
+                    f"{args.lane} {result['task']} {result['language']} {result['arm']}: {result['deterministic_success']}",
+                    flush=True,
+                )
         cells.sort(key=lambda row: (row["task"], row["language"], row["arm"]))
         output = {
             "schema": "opensocrates.v1.5.native-plugin-pilot-results/1.0.0",
@@ -292,7 +392,9 @@ def main() -> None:
             "cells": cells,
         }
         result_path = HERE / "results" / f"native-{args.lane.lower()}-pilot.json"
-        result_path.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        result_path.write_text(
+            json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
         print(result_path)
 
 
