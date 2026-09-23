@@ -143,15 +143,18 @@ class MemoryStore:
         with FileLock(self.lock_path, policy=LockPolicy(timeout_seconds=2)):
             with self.connect(write=True, create=True) as db:
                 db.execute("BEGIN IMMEDIATE")
-                db.executescript(
-                    "CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);"
-                    "CREATE TABLE IF NOT EXISTS records (record_id TEXT PRIMARY KEY, version INTEGER NOT NULL, data TEXT NOT NULL);"
-                    "CREATE TABLE IF NOT EXISTS record_history (record_id TEXT NOT NULL, version INTEGER NOT NULL, data TEXT NOT NULL, PRIMARY KEY(record_id, version));"
-                    "CREATE TABLE IF NOT EXISTS checkpoints (task_id TEXT NOT NULL, workspace_id TEXT NOT NULL, record_id TEXT NOT NULL, version INTEGER NOT NULL, PRIMARY KEY(task_id,workspace_id));"
-                    "CREATE TABLE IF NOT EXISTS snapshots (snapshot_id TEXT PRIMARY KEY, workspace_id TEXT NOT NULL, data TEXT NOT NULL);"
-                    "CREATE TABLE IF NOT EXISTS idempotency (key TEXT PRIMARY KEY, operation TEXT NOT NULL, payload_hash TEXT NOT NULL, response TEXT NOT NULL);"
-                    "CREATE TABLE IF NOT EXISTS tombstones (record_id TEXT PRIMARY KEY, version INTEGER NOT NULL, origin_id TEXT);"
-                )
+                # executescript() commits a pending transaction first. Individual
+                # statements keep initial schema creation within this one BEGIN.
+                for statement in (
+                    "CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)",
+                    "CREATE TABLE IF NOT EXISTS records (record_id TEXT PRIMARY KEY, version INTEGER NOT NULL, data TEXT NOT NULL)",
+                    "CREATE TABLE IF NOT EXISTS record_history (record_id TEXT NOT NULL, version INTEGER NOT NULL, data TEXT NOT NULL, PRIMARY KEY(record_id, version))",
+                    "CREATE TABLE IF NOT EXISTS checkpoints (task_id TEXT NOT NULL, workspace_id TEXT NOT NULL, record_id TEXT NOT NULL, version INTEGER NOT NULL, PRIMARY KEY(task_id,workspace_id))",
+                    "CREATE TABLE IF NOT EXISTS snapshots (snapshot_id TEXT PRIMARY KEY, workspace_id TEXT NOT NULL, data TEXT NOT NULL)",
+                    "CREATE TABLE IF NOT EXISTS idempotency (key TEXT PRIMARY KEY, operation TEXT NOT NULL, payload_hash TEXT NOT NULL, response TEXT NOT NULL)",
+                    "CREATE TABLE IF NOT EXISTS tombstones (record_id TEXT PRIMARY KEY, version INTEGER NOT NULL, origin_id TEXT)",
+                ):
+                    db.execute(statement)
                 row = db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
                 if row is None:
                     db.execute(
@@ -169,6 +172,12 @@ class MemoryStore:
             raise StoreError("store_corrupt") from error
         if row is None or row[0] != str(SCHEMA_VERSION):
             raise StoreError("unsupported_schema")
+
+    def probe_schema(self) -> int:
+        """Read schema state without initializing or writing the database."""
+        with self.connect() as db:
+            self._version(db)
+        return SCHEMA_VERSION
 
     def read_record(self, record_id: str) -> dict[str, Any] | None:
         with self.connect() as db:

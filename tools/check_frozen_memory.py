@@ -6,6 +6,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sqlite3
+import stat
 import subprocess
 import tempfile
 from pathlib import Path
@@ -53,10 +55,16 @@ def run(binary: Path, environment: dict[str, str], value: dict[str, object]) -> 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--binary", type=Path, required=True)
+    binary_source = parser.add_mutually_exclusive_group(required=True)
+    binary_source.add_argument("--binary", type=Path)
+    binary_source.add_argument("--runtime-report", type=Path)
     parser.add_argument("--package", type=Path)
     args = parser.parse_args()
-    binary = args.binary.resolve(strict=True)
+    if args.runtime_report is not None:
+        report = json.loads(args.runtime_report.read_text(encoding="utf-8"))
+        binary = (Path(__file__).resolve().parents[1] / report["artifact"]).resolve(strict=True)
+    else:
+        binary = args.binary.resolve(strict=True)
     with tempfile.TemporaryDirectory(prefix="opensocrates-frozen-memory-") as tmp:
         sandbox = Path(tmp)
         data_root = sandbox / "data"
@@ -173,6 +181,41 @@ def main() -> int:
         assert stale["status"] == "ok" and not stale["result"]["source_evidence"]
         database = data_root / "projects" / project_id / "memory.sqlite3"
         assert database.is_file() and database.stat().st_size > 0
+        registry_file = data_root / "projects" / "registry.json"
+        lock_file = data_root / "projects" / project_id / "memory.lock"
+        if os.name == "nt":
+            from opensocrates.persistence.permissions import check_permissions
+
+            assert check_permissions(database, directory=False).write_allowed
+            assert check_permissions(lock_file, directory=False).write_allowed
+            assert check_permissions(registry_file, directory=False).write_allowed
+        else:
+            assert stat.S_IMODE(database.stat().st_mode) == 0o600
+            assert stat.S_IMODE(lock_file.stat().st_mode) == 0o600
+            assert stat.S_IMODE(registry_file.stat().st_mode) == 0o600
+        with sqlite3.connect(database) as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            connection.execute("UPDATE meta SET value='fixture-probe' WHERE key='schema_version'")
+            journal = data_root / "projects" / project_id / "memory.sqlite3-journal"
+            assert journal.exists()
+            if os.name == "nt":
+                assert check_permissions(journal, directory=False).write_allowed
+            else:
+                assert stat.S_IMODE(journal.stat().st_mode) == 0o600
+            connection.rollback()
+        exported = run(
+            binary,
+            env,
+            request(
+                "export",
+                {
+                    "format": "json",
+                },
+                project_id,
+            ),
+        )
+        assert exported["status"] == "ok"
+        assert str(source) not in json.dumps(exported)
         deleted = run(
             binary,
             env,

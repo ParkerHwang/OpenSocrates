@@ -29,7 +29,7 @@ class RegistryError(OSError):
     """An identity, owner, or registry check failed closed."""
 
 
-def _identity(path: Path) -> tuple[int, int]:
+def _identity(path: Path) -> tuple[int, ...]:
     info = path.lstat()
     if (
         not stat.S_ISDIR(info.st_mode)
@@ -37,7 +37,15 @@ def _identity(path: Path) -> tuple[int, int]:
         or (getattr(info, "st_file_attributes", 0) & 0x400)
     ):
         raise RegistryError("unsafe_path")
-    if hasattr(os, "getuid") and info.st_uid != os.getuid():
+    if os.name == "nt":
+        from ..windows_security import open_source_root, source_root_owner_is_current
+
+        with open_source_root(path) as bound:
+            if not source_root_owner_is_current(bound):
+                raise RegistryError("permission_denied")
+            return bound.identity
+    current_uid = getattr(os, "getuid", None)
+    if current_uid is None or info.st_uid != current_uid():
         raise RegistryError("permission_denied")
     return info.st_dev, info.st_ino
 

@@ -36,6 +36,15 @@ def _public_authorization(value: dict[str, str]) -> dict[str, str]:
     }
 
 
+def _capabilities(workspace_kind: str | None) -> dict[str, str]:
+    return {
+        "text": "lexical",
+        "python": "ast" if workspace_kind == "git_worktree" else "unavailable",
+        "memory": "sqlite3",
+        "path_boundary": "local_drive_only" if os.name == "nt" else "local_owned_root",
+    }
+
+
 def _record_scope(record: dict[str, Any], workspace_id: str | None, task_id: str | None) -> bool:
     scope = record["scope"]
     if scope["level"] == "project":
@@ -299,6 +308,7 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
                                 workspace.get("authorization", project["authorization"])
                             ),
                             "workspace_kind": workspace["workspace_kind"],
+                            "capabilities": _capabilities(workspace["workspace_kind"]),
                         }
                         for project in registered["projects"].values()
                         for wid, workspace in project["workspaces"].items()
@@ -310,6 +320,10 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
                     )
                 return response(request_id, "ok", {"project_count": len(registered["projects"])})
             project, workspace = registry.get(project_id, workspace_id)
+            store_state = MemoryStore(
+                registry.project_dir(project_id),
+                private_root=workspace["root"] if workspace else "",
+            ).probe_schema()
             return response(
                 request_id,
                 "ok",
@@ -323,7 +337,10 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
                         else project["authorization"]
                     ),
                     "workspace_kind": workspace["workspace_kind"] if workspace else None,
-                    "schema_version": 1,
+                    "capabilities": _capabilities(
+                        workspace["workspace_kind"] if workspace else None
+                    ),
+                    "schema_version": store_state,
                 },
             )
         assert isinstance(project_id, str)

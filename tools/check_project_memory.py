@@ -16,6 +16,7 @@ from uuid import uuid4
 from opensocrates.persistence.locks import FileLock
 from opensocrates.project_memory.registry import ProjectRegistry
 from opensocrates.project_memory.service import handle_memory
+from opensocrates.project_memory.store import MemoryStore
 
 
 def uid() -> str:
@@ -593,11 +594,41 @@ class MemoryFixture(unittest.TestCase):
             connection.execute("UPDATE meta SET value='2' WHERE key='schema_version'")
         newer = database.read_bytes()
         self.assertEqual(self.call("inspect", {})["status"], "unavailable")
+        self.assertEqual(self.call("status", {})["status"], "unavailable")
         self.assertEqual(database.read_bytes(), newer)
         database.write_bytes(b"not a SQLite database")
         corrupt = database.read_bytes()
         self.assertEqual(self.call("inspect", {})["status"], "unavailable")
+        self.assertEqual(self.call("status", {})["status"], "unavailable")
         self.assertEqual(database.read_bytes(), corrupt)
+
+    def test_interrupted_initialization_leaves_no_partial_schema(self) -> None:
+        directory = self.base / "synthetic-store"
+        directory.mkdir(mode=0o700)
+        database = directory / "memory.sqlite3"
+        database.touch(mode=0o600)
+        script = (
+            "import os,sqlite3,sys;"
+            "db=sqlite3.connect(sys.argv[1]);"
+            "db.execute('BEGIN IMMEDIATE');"
+            "db.execute('CREATE TABLE partial_only (value TEXT)');"
+            "os._exit(7)"
+        )
+        crashed = subprocess.run(
+            [sys.executable, "-c", script, str(database)],
+            capture_output=True,
+            check=False,
+            timeout=10,
+        )
+        self.assertEqual(crashed.returncode, 7)
+        MemoryStore(directory).initialize()
+        with sqlite3.connect(database) as connection:
+            names = {
+                row[0]
+                for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            }
+            self.assertNotIn("partial_only", names)
+            self.assertTrue({"meta", "records", "checkpoints", "snapshots"} <= names)
 
     def test_cross_process_record_compare_and_swap(self) -> None:
         self.enroll()

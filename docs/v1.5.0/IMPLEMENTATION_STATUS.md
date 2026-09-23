@@ -21,9 +21,9 @@ was carried onto a focused branch without changing protected `main`.
   and opt-in installer memory deletion have source fixture coverage. Interrupted
   migration and native Windows adversarial cases still need evidence.
 - W7: source/package generation and Apple Silicon frozen-memory fixture are
-  exercised. Live Codex memory use is pending. The candidate source reader
-  deliberately reports unavailable on Windows until a safe native reparse
-  adapter and P02 evidence exist.
+  exercised. The candidate Windows reader now pins local-drive roots and
+  rejects reparse components; native Windows memory fixtures and P02 evidence
+  are pending. Live Codex memory use is also pending.
 - W8: five evaluation lane protocols and pilot scenarios are frozen before any
   outcomes. No model-quality or efficiency outcomes have been run.
 - W9: final independent review, exact-commit source checks, and a Draft PR
