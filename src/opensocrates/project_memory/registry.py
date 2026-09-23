@@ -66,6 +66,93 @@ def _safe_root(raw: str) -> Path:
     return path.resolve(strict=True)
 
 
+def _read_git_file(path: Path) -> str:
+    """Read one bounded Git pointer through a no-follow file capability."""
+    if os.name == "nt":
+        from ..windows_security import open_source_root, read_source_file
+
+        with open_source_root(path.parent) as parent:
+            data, reason, _identity_value = read_source_file(parent, path.name, 4096)
+        if reason or data is None:
+            raise RegistryError("unsafe_path")
+    else:
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0)
+        try:
+            descriptor = os.open(path, flags)
+        except OSError as error:
+            raise RegistryError("unsafe_path") from error
+        try:
+            before = os.fstat(descriptor)
+            if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or before.st_size > 4096:
+                raise RegistryError("unsafe_path")
+            data = os.read(descriptor, 4097)
+            named = path.lstat()
+            if (
+                len(data) > 4096
+                or stat.S_ISLNK(named.st_mode)
+                or (before.st_dev, before.st_ino) != (named.st_dev, named.st_ino)
+                or (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns)
+                != (
+                    os.fstat(descriptor).st_dev,
+                    os.fstat(descriptor).st_ino,
+                    os.fstat(descriptor).st_size,
+                    os.fstat(descriptor).st_mtime_ns,
+                )
+            ):
+                raise RegistryError("unsafe_path")
+        finally:
+            os.close(descriptor)
+    try:
+        value = data.decode("utf-8").strip()
+    except UnicodeDecodeError as error:
+        raise RegistryError("unsafe_path") from error
+    if not value or "\x00" in value or "\n" in value or "\r" in value:
+        raise RegistryError("unsafe_path")
+    return value
+
+
+def _same_regular_file(left: Path, right: Path) -> bool:
+    try:
+        first, second = left.lstat(), right.lstat()
+    except OSError:
+        return False
+    if any(
+        not stat.S_ISREG(info.st_mode)
+        or stat.S_ISLNK(info.st_mode)
+        or (getattr(info, "st_file_attributes", 0) & 0x400)
+        for info in (first, second)
+    ):
+        return False
+    return (first.st_dev, first.st_ino) == (second.st_dev, second.st_ino)
+
+
+def _validate_git_back_reference(root: Path, git_dir: Path) -> None:
+    dotgit = root / ".git"
+    try:
+        metadata = dotgit.lstat()
+    except OSError as error:
+        raise RegistryError("identity_mismatch") from error
+    if stat.S_ISDIR(metadata.st_mode):
+        if _identity(dotgit) != _identity(git_dir):
+            raise RegistryError("identity_mismatch")
+        return
+    if not stat.S_ISREG(metadata.st_mode) or stat.S_ISLNK(metadata.st_mode):
+        raise RegistryError("unsafe_path")
+    pointer = _read_git_file(dotgit)
+    if not pointer.startswith("gitdir: "):
+        raise RegistryError("identity_mismatch")
+    outbound = Path(pointer[len("gitdir: ") :])
+    if not outbound.is_absolute():
+        outbound = root / outbound
+    if _identity(outbound.resolve(strict=True)) != _identity(git_dir):
+        raise RegistryError("identity_mismatch")
+    inbound = Path(_read_git_file(git_dir / "gitdir"))
+    if not inbound.is_absolute():
+        inbound = git_dir / inbound
+    if not _same_regular_file(inbound, dotgit):
+        raise RegistryError("identity_mismatch")
+
+
 def _git_binding(root: Path) -> dict[str, Any] | None:
     try:
         result = run_git(
@@ -92,6 +179,7 @@ def _git_binding(root: Path) -> dict[str, Any] | None:
         common = (root / common).resolve(strict=True)
     else:
         common = common.resolve(strict=True)
+    _validate_git_back_reference(root, git_dir)
     return {
         "workspace_kind": "git_worktree",
         "git_dir": str(git_dir),

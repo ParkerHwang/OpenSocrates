@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -385,6 +386,21 @@ class MemoryFixture(unittest.TestCase):
         self.assertEqual(recalled["status"], "ok", recalled)
         self.assertEqual(recalled["result"]["decisions"][0]["record_id"], record_id)
         self.assertIsNone(recalled["result"]["checkpoint_reference"])
+        copied = self.base / "copied-worktree"
+        shutil.copytree(other, copied)
+        copied_preview = self.call(
+            "init",
+            {
+                "root": str(copied),
+                "apply": False,
+                "mode": "read_write",
+                "capture_policy": "milestones",
+                "excluded_paths": [],
+                "expected_policy_version": 1,
+            },
+        )
+        self.assertEqual(copied_preview["status"], "unavailable")
+        self.assertIn("identity_mismatch", copied_preview["limitations"])
 
     def test_modes_idempotency_and_secret_canary(self) -> None:
         self.enroll()
