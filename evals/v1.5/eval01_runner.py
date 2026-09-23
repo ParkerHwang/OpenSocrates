@@ -25,9 +25,15 @@ PARENT = Path(__file__).with_name("memory-pilot-freeze.json")
 def _source_digest(workspace: Path) -> str:
     digest = hashlib.sha256()
     for path in sorted(workspace.rglob("*")):
-        if not path.is_file() or ".git" in path.relative_to(workspace).parts:
+        relative = path.relative_to(workspace)
+        if (
+            not path.is_file()
+            or ".git" in relative.parts
+            or "__pycache__" in relative.parts
+            or path.suffix not in {".py", ".md", ".json", ".toml", ".yaml", ".txt"}
+        ):
             continue
-        digest.update(str(path.relative_to(workspace)).encode())
+        digest.update(str(relative).encode())
         digest.update(path.read_bytes())
     return "sha256:" + digest.hexdigest()
 
@@ -373,13 +379,64 @@ def run(released_asset: Path, released_checksum: Path, output_root: Path | None)
     return base
 
 
+def resume_paired_d(base: Path, released_asset: Path, released_checksum: Path) -> Path:
+    """Resume only the cell not called after the first-run equality assertion."""
+    freeze = json.loads(FREEZE.read_text())
+    parent = json.loads(PARENT.read_text())
+    assert _digest(released_asset) == freeze["released_v14_asset_sha256"]
+    first = base / "D" / "first-artifact"
+    workspace = base / "paired-D" / "workspace"
+    data = base / "D" / "data"
+    assert workspace.is_dir() and first.is_dir()
+    assert not (base / "paired-D-followup.jsonl").exists()
+    assert _source_digest(workspace) == _source_digest(first)
+    sys.path.insert(0, str(ROOT / "src"))
+    from opensocrates.project_memory.registry import ProjectRegistry
+
+    registered = ProjectRegistry(data).load()
+    assert registered is not None
+    matches = [
+        (project_id, workspace_id)
+        for project_id, project in registered["projects"].items()
+        for workspace_id, item in project["workspaces"].items()
+        if item["root"] == str(workspace)
+    ]
+    assert len(matches) == 1
+    project_id, workspace_id = matches[0]
+    fixture = parent["lanes"]["EVAL-01"]
+    (workspace / fixture["source_transition"]["added_untracked_file"]).write_text(
+        fixture["source_transition"]["content"]
+    )
+    receipt = _session(
+        base,
+        "paired-D-followup",
+        "D",
+        workspace,
+        data,
+        fixture["followup_request"],
+        project_id,
+        workspace_id,
+        released_asset,
+        released_checksum,
+    )
+    receipt["grade"] = _grade("coding-untracked-caller", workspace)
+    receipt["replay_start_sha256"] = _source_digest(first)
+    receipt["source_after_sha256"] = _source_digest(workspace)
+    (base / "paired-D-repair.json").write_text(json.dumps(receipt, indent=2) + "\n")
+    return base
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--released-asset", type=Path, required=True)
     parser.add_argument("--released-checksum", type=Path, required=True)
     parser.add_argument("--output-root", type=Path)
+    parser.add_argument("--resume-paired-d", type=Path)
     args = parser.parse_args()
-    print(run(args.released_asset, args.released_checksum, args.output_root))
+    if args.resume_paired_d is not None:
+        print(resume_paired_d(args.resume_paired_d, args.released_asset, args.released_checksum))
+    else:
+        print(run(args.released_asset, args.released_checksum, args.output_root))
 
 
 if __name__ == "__main__":
