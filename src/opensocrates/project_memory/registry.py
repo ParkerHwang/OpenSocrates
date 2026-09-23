@@ -52,9 +52,14 @@ def _identity(path: Path) -> tuple[int, ...]:
 
 def _safe_root(raw: str) -> Path:
     path = Path(raw).expanduser().absolute()
+    if ".." in path.parts:
+        raise RegistryError("unsafe_path")
     if not path.exists():
         raise RegistryError("unsafe_path")
-    if path.is_symlink():
+    # Inspect the named root before resolve() erases junction evidence. Some
+    # supported hosts expose system temp paths through a trusted ancestor alias.
+    info = path.lstat()
+    if stat.S_ISLNK(info.st_mode) or getattr(info, "st_file_attributes", 0) & 0x400:
         raise RegistryError("unsafe_path")
     path = path.resolve(strict=True)
     for ancestor in (*reversed(path.parents), path):

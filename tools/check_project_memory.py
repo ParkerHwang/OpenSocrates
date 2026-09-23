@@ -92,6 +92,24 @@ class MemoryFixture(unittest.TestCase):
         self.assertFalse(self.data.exists())
         self.enroll()
 
+    @unittest.skipIf(os.name == "nt", "native Windows junction fixture covers this path")
+    def test_symlink_root_is_rejected_before_resolution(self) -> None:
+        alias = self.base / "linked-root"
+        alias.symlink_to(self.root, target_is_directory=True)
+        result = self.call(
+            "init",
+            {
+                "root": str(alias),
+                "apply": False,
+                "mode": "read_write",
+                "capture_policy": "milestones",
+                "excluded_paths": [],
+            },
+        )
+        self.assertEqual(result["status"], "unavailable")
+        self.assertIn("unsafe_path", result["limitations"])
+        self.assertFalse(self.data.exists())
+
     def test_authorization_basis_rejects_secret_before_storage(self) -> None:
         payload: dict[str, object] = {
             "root": str(self.root),
