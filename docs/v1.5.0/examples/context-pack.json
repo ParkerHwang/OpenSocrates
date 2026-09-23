@@ -1,0 +1,32 @@
+{
+  "schema": "opensocrates.project-memory.context-pack/1.0.0",
+  "pack_id": "80000000-0000-4000-8000-000000000001",
+  "project_id": "20000000-0000-4000-8000-000000000001",
+  "worktree_id": "30000000-0000-4000-8000-000000000001",
+  "task_id": "60000000-0000-4000-8000-000000000001",
+  "snapshot_id": "40000000-0000-4000-8000-000000000001",
+  "status": "partial",
+  "constraints": [],
+  "decisions": [],
+  "evidence": [
+    {
+      "record_id": "10000000-0000-4000-8000-000000000001",
+      "source_ref": "ref-client-definition",
+      "locator": {"path": "src/net/client.py", "symbol": "Client", "line_start": 10, "line_end": 30},
+      "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "summary": "Synthetic example: Client is defined in src/net/client.py.",
+      "support": "runtime_observed",
+      "freshness": "current"
+    }
+  ],
+  "checkpoint_ref": null,
+  "conflicts": [],
+  "unknowns": ["Incoming callers and runtime registration were not searched."],
+  "searched_scope": ["src/net/client.py"],
+  "excluded_scope": ["Other source files and ignored paths."],
+  "capabilities": {"definitions": "python_ast", "incoming_calls": "not_observed", "runtime_dispatch": "unavailable"},
+  "budget": {"max_utf8_bytes": 65536, "token_count": null, "token_count_method": "not_measured"},
+  "expansion_handles": [{"id": "expand-client-callers", "need": "Search current scoped callers before a shared behavior change."}],
+  "delivery": "emitted",
+  "application": "unverified"
+}
