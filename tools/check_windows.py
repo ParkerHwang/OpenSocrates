@@ -37,6 +37,18 @@ def _grant_everyone_read(path: Path) -> None:
     )
 
 
+def _set_disposable_git_owner(git_directory: Path) -> None:
+    """GitHub's elevated token creates Git children under Administrators."""
+    account = subprocess.run(
+        ["whoami.exe"], check=True, capture_output=True, text=True
+    ).stdout.strip()
+    subprocess.run(
+        ["icacls.exe", str(git_directory), "/setowner", account, "/T"],
+        check=True,
+        capture_output=True,
+    )
+
+
 @unittest.skipUnless(sys.platform == "win32", "native Windows regression")
 class WindowsChecks(unittest.TestCase):
     def test_project_memory_linked_worktree_continuity(self):
@@ -48,6 +60,8 @@ class WindowsChecks(unittest.TestCase):
             first = parent / "first"
             second = parent / "second"
             self.assertTrue(create_owner_only_directory(first))
+            self.assertTrue(create_owner_only_directory(first / ".git"))
+            self.assertTrue(create_owner_only_directory(second))
             subprocess.run(["git", "init", "-q", str(first)], check=True, capture_output=True)
             (first / "helper.py").write_text("def helper():\n    return 1\n", encoding="utf-8")
             subprocess.run(["git", "-C", str(first), "add", "helper.py"], check=True)
@@ -72,6 +86,7 @@ class WindowsChecks(unittest.TestCase):
                 check=True,
                 capture_output=True,
             )
+            _set_disposable_git_owner(first / ".git")
             registry = ProjectRegistry(parent / "owned-data")
             policy = {"mode": "read_write", "capture_policy": "milestones", "excluded_paths": []}
 
@@ -297,6 +312,8 @@ class WindowsChecks(unittest.TestCase):
             first = parent / "first"
             second = parent / "linked"
             self.assertTrue(create_owner_only_directory(first))
+            self.assertTrue(create_owner_only_directory(first / ".git"))
+            self.assertTrue(create_owner_only_directory(second))
             subprocess.run(["git", "init", "-q", str(first)], check=True, capture_output=True)
             (first / "guide.md").write_text("Keep access.\n", encoding="utf-8")
             subprocess.run(["git", "-C", str(first), "add", "guide.md"], check=True)
@@ -321,6 +338,7 @@ class WindowsChecks(unittest.TestCase):
                 check=True,
                 capture_output=True,
             )
+            _set_disposable_git_owner(first / ".git")
             registry = ProjectRegistry(parent / "owned-data")
             policy = {"mode": "read_write", "capture_policy": "milestones", "excluded_paths": []}
             preview = registry.preview(str(first), policy)
