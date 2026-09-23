@@ -132,6 +132,55 @@ class MemoryFixture(unittest.TestCase):
         self.assertEqual(self.call("init", payload)["status"], "invalid_request")
         self.assertFalse(self.data.exists())
 
+    def test_english_korean_recall_need_is_equivalent_and_query_is_rejected(self) -> None:
+        self.enroll()
+        created = self.call(
+            "record",
+            {
+                "idempotency_key": uid(),
+                "expected_record_version": 0,
+                "kind": "decision",
+                "scope": {"level": "project"},
+                "summary": "Keep step-free access in the event plan.",
+                "origin": {
+                    "producer_kind": "agent",
+                    "source_reference": None,
+                    "attestation": "agent_reported",
+                },
+                "support": "agent_reported",
+                "source_refs": [],
+                "revalidation": {
+                    "dependency_paths": [],
+                    "negative_claim": False,
+                    "on_change": "not_applicable",
+                },
+            },
+        )
+        self.assertEqual(created["status"], "ok", created)
+        record_id = created["result"]["record"]["record_id"]
+        self.assertEqual(
+            self.call(
+                "accept",
+                {
+                    "record_id": record_id,
+                    "expected_record_version": 1,
+                    "idempotency_key": uid(),
+                    "acceptance_basis": "fixture:bilingual-recall",
+                    "acceptance_attribution": "operator_declared",
+                },
+            )["status"],
+            "ok",
+        )
+        for need in ("event accessibility", "행사 접근성"):
+            answer = self.call("recall", {"need": need, "budget_bytes": 8192})
+            self.assertEqual(answer["status"], "ok", answer)
+            self.assertEqual(answer["result"]["decisions"][0]["record_id"], record_id)
+        rejected = self.call(
+            "recall",
+            {"need": "event accessibility", "query": "accessibility", "budget_bytes": 8192},
+        )
+        self.assertEqual(rejected["status"], "invalid_request")
+
     def test_nongit_cold_resume_stale_source_and_forgetting(self) -> None:
         brief = self.root / "brief.md"
         brief.write_text("Venue capacity: 40.\n", encoding="utf-8")
