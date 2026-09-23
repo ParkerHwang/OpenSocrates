@@ -1,0 +1,32 @@
+{
+  "schema": "opensocrates.v1.5.eval01-execution-freeze/1.0.0",
+  "revision": 1,
+  "status": "frozen_before_outcomes",
+  "parent_freeze_sha256": "sha256:5070d18b20b6313967bb24353d04453d96e706f25e317ed15b6066345a0f8448",
+  "source_commit_before_outcomes": "06fd76300a4b7b03308e02ff002a31a32e316785",
+  "client": "ChatGPT desktop bundled codex-cli 0.155.0-alpha.16.3",
+  "model": "gpt-6-sol",
+  "effort": "medium",
+  "released_v14_asset_sha256": "sha256:74efeab5797de766dabf8394506e29bcb39df3d1b3aac93a5a9ec17a32909a33",
+  "candidate_asset_sha256": "sha256:c8cc308e757afafb5e5a076e45de096aa1f305e1168c926effe2d34d2a604201",
+  "fixture": "coding-untracked-caller",
+  "arms": {
+    "A": "ordinary Codex; plugins and hooks disabled",
+    "B": "released v1.4.0 plugin with explicit skill invocation; hooks disabled",
+    "C": "candidate v1.5 guidance with memory disabled; explicit skill; hooks disabled",
+    "D": "candidate v1.5 guidance with pre-enrolled accepted public intent; explicit skill and recall; hooks disabled"
+  },
+  "naturalistic_episodes": 1,
+  "sessions_per_arm": 2,
+  "paired_replay": "C versus D from identical D first-session source artifact and same declared accepted-intent sentence; only memory availability differs; separate from naturalistic arm results",
+  "fresh_session": "new CODEX_HOME with copied auth only for each session; --ephemeral; external_agent_memory_import=false; no previous chat",
+  "wall_limit_seconds_per_session": 1800,
+  "tools": "same local shell/file access; no network requirement; only D gets disposable memory data directory",
+  "first_request": "Add lowercase hyphen-separated labels by extending suitable existing code. Keep the API caller working and run relevant tests.",
+  "followup_request": "A new untracked CLI caller has been added. Make all whitespace act as one separator in the shared label behavior, keep the API caller working, and verify both paths.",
+  "first_artifact_gate": "public_key(\" Quick Start \") == \"quick-start\"; one normalize_label definition",
+  "followup_hidden_gate": "public_key(\" Quick Start \") == \"quick-start\" and command_tag(\" Quick\\t  Start \") == \"quick-start\"; one normalize_label definition",
+  "accepted_intent": "The shared normalize_label helper owns label normalization for API and CLI callers; preserve public_key behavior and check every current caller.",
+  "attempt_policy": "record all attempts, invalid outputs, repair, tool work, retrieval, failures, timeouts; no automatic retries; missing usage null",
+  "claim_boundary": "one-model one-fixture partial engineering pilot, no broad coding quality or memory-effect claim; native server-side memory isolation and human blinded judgment unverified"
+}
