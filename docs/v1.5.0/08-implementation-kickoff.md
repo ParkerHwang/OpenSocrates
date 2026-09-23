@@ -1,139 +1,124 @@
 # Implementation kickoff prompt
 
-Copy the prompt below into a fresh Codex task with the repository and this document
-package available. It starts implementation; this documentation task has not
-dispatched it. The specification is the task input, not proof that features exist.
+Use the prompt below with the repository and complete specification package.
+This document is prepared for execution; its presence is not a dispatched task.
 
 ---
 
-Implement OpenSocrates v1.5.0 from the English development specification in
-`docs/v1.5.0/`. Preserve OpenSocrates as a general reasoning and judgment-support
-system founded on task-aware text/context selection and delivery: what an LLM
-receives can materially change the work it produces. Optimize the usefulness,
-applicability, timing, consistency, and evidence quality of that material, not its
-volume. Extend it with built-in local project memory, stronger coding-domain
-support for reuse/dependency/maintainability decisions, and verified GPT-6
-compatibility. The first new implementation workstream is coding continuity;
-do not redefine the whole product as a coding-memory utility. Memory provides
-context for fresh judgment, and coding guides provide domain evidence. Existing
-non-coding judgments must remain supported without mandatory coding machinery.
+Implement OpenSocrates v1.5.0 from the English specification in `docs/v1.5.0/`.
+The product helps developers and non-developers get better work from their chosen
+LLM through adaptive reasoning guidance, useful project memory, relevant evidence,
+and natural collaboration. Coding reuse, dependency understanding, and
+maintainability extend the general reasoning foundation.
 
-The known baseline is released v1.4.0 at
-`5a2ff3c312e92aa8a44d0905465674d9a4e4f645`. Reconcile current remote main before
-implementation. The design worktree originally lived at
-`/Users/parkerhwang/Documents/OpenSource/OpenSocrates-v1.5.0-spec`, branch
-`docs/v1.5.0-development-spec`; those are location hints, not permission to discard
-changes or assume the branch is still current. Keep this document package in the
-implementation branch so the task is recoverable elsewhere.
+Deliver four shared outcomes: improve inexpensive-model task quality; preserve
+capable-model quality while reducing unnecessary work; maintain useful continuity
+across sessions; and collaborate naturally through intent understanding,
+proportionate initiative, correction, and completion. Treat Luna/Sol gap reduction
+and Sol/Astra efficiency as separate measured hypotheses. Do not promise universal
+model equivalence or treat shorter responses as proof of less internal reasoning.
 
-Work, code comments, new development documents, progress reports, issue/PR text,
-and final reporting must be in English. Preserve existing released EN/KO canonical
-method behavior and explicitly satisfy the runtime locale compatibility rules in
-04. Do not claim that English itself guarantees better performance.
+Read AGENTS.md and CONTRIBUTING.md, then README, 10-product-identity-and-combined-capabilities.md,
+11-adaptive-assistance-and-collaboration.md, and 01-scope-and-requirements.md.
+Read 02, 03, and 05 before storage work; 04 before coding/host changes; and 06-07
+before freezing tests and executing work packages. Use 09 for source anchors and
+architectural decisions. This package is self-contained; no previous conversation
+or product-development history is needed.
 
-Read the repository's AGENTS.md and CONTRIBUTING.md, then the v1.5.0 README,
-01-scope-and-requirements.md, 02-architecture-and-operation.md,
-03-data-and-interface-contracts.md, and 05-privacy-lifecycle-and-migration.md.
-Read 04 before host/coding integration and 06–07 before freezing tests/execution.
-Use 09 for source anchors and design decisions and 10 for the product-identity
-clarification. Include G01–G03 in the appropriate behavior verification. Treat
-examples as synthetic data.
+The reviewed baseline is v1.4.0 at
+`5a2ff3c312e92aa8a44d0905465674d9a4e4f645`. Reconcile current remote main, existing
+worktrees, and open/closed issues/PRs before implementation. Preserve unrelated
+changes. Create a focused implementation branch/worktree from verified current
+main, carry this package forward, and never reset/clean or push to protected main.
 
-You are authorized to implement this specification, including the narrow,
-explicitly disclosed policy amendment for opt-in project memory described in 05.
-The existing blanket workspace-retention restriction must be replaced only by that
-scoped exception; it is not authorization for transcripts, source copies,
-credentials, private reasoning, telemetry, or global memory mutation. Update the
-policy and implementation coherently. Do not stop merely because the planned
-policy amendment differs from v1.4; the amendment is part of this requested work.
+Use English for work, comments, development documents, progress reports, and PRs.
+Preserve released EN/KO behavior; align new localized runtime guidance deliberately.
+English/Korean interaction fixtures must test equivalent behavior.
 
-Use a clean, focused implementation branch/worktree based on verified current main,
-carrying these docs forward. Inspect existing worktrees, open/closed issues, and
-PRs before creating duplicates. Preserve unrelated uncommitted changes. Do not
-reset, clean, blindly apply a stash, or write directly to protected main.
+Implement W0-W9 in dependency order. Begin with closed contracts, baseline fixtures,
+and the adaptive core without memory. Then implement explicit enrollment, durable
+records, source freshness, bounded retrieval, and cold resume. Complete both the
+non-Git text-project and coding continuity slices. Apply privacy boundaries from
+the first storage write and complete lifecycle/adversarial checks before broad use.
 
-Implement W0 through W8 in dependency order. Begin with explicit enrollment and
-typed storage, then source snapshots/freshness, then bounded recall and cold-start
-resume. Build the first complete reuse vertical slice before widening to impact
-analysis and maintainability review. Complete privacy/lifecycle tests before broad
-live use. Avoid a save/load-only memory demo or a collection of guidance files
-without behavioral verification.
+Use a small deterministic assistance policy with none/light/structured optional
+support, versioned model profiles, and a task-based fallback. Candidate profiles
+are for configured evaluation runs until validated. Preserve the selected model
+and effort. Do not introduce a hidden model selector or assume model names prove
+capability. Mechanical work bypasses extra policy/retrieval calls. Finish after
+required checks unless new evidence or changes justify reopening the work.
 
-Keep the default `decision` command stateless, content-only, and free of model
-calls. Add a separate explicit memory protocol. Preserve the 48 canonical methods,
-their grounding/stop contracts, and the distinction between delivery, reported
-reading, application, source freshness, and improved outcomes. Ordinary hooks
-provide bounded discovery and must not initialize storage or scan repositories.
+Keep the existing `decision` command stateless, content-only, and free of model
+calls. Preserve all 48 canonical methods, eligibility, complete-procedure grounding,
+zero-to-two selection bounds, and stop contracts. Add explicit assistance and memory
+commands with separate strict schemas; do not extend the existing closed decision
+envelope casually. Hooks remain bounded discovery without source scans or writes.
 
-Use a built-in local implementation with SQLite and audited existing persistence
-primitives. No separate Context Scout installation, cloud service, embedding API,
-or new credential is required. Existing Context Scout ideas may inform an adapter;
-do not copy local/private code without checking license and suitability. Exact
-module/file names in the plan are responsibility boundaries, not an invitation to
-overengineer trivial classes.
+Implement optional local memory with SQLite under the owned product data root.
+No separate memory plugin, cloud service, new credential, or embedding API is
+required. Support Git workspaces and non-Git local Markdown/plain-text directories
+through a shared workspace identity and explicit adapter capabilities. Bind source
+claims to content/inventory snapshots. Changed documents and new callers invalidate
+old claims even when HEAD or the original source file is unchanged.
 
-Treat current source as evidence of behavior, accepted decisions as intent, and
-inferences as hypotheses. Bind code observations to project/worktree/snapshot and
-dirty/untracked coverage. New callers invalidate negative claims even if HEAD or
-the original function is unchanged. Do not merge checkpoint state across branches
-or worktrees implicitly. A memory failure must not invent facts, erase constraints,
-or create another store as a fallback.
+Current sources govern observed behavior, accepted decisions represent scoped
+intent, and inferences remain hypotheses. Do not merge checkpoint state across
+workspaces implicitly. Apply new user corrections to the next action and artifact;
+update permitted scoped memory under existing enrollment policy. Do not build a
+global personality profile. A memory failure does not invent facts, erase
+constraints, or authorize an action.
 
-Use disposable projects for enrollment, deletion, corruption, migration, concurrency,
-and privacy tests. You may run local implementation checks and repair failures
-caused by this change without asking after each step. Do not enroll the user's real
-repositories, change global Codex memories/settings, purge an active installation,
-or perform destructive host acceptance tests unless separately authorized.
+You are authorized to implement the narrow policy amendment in 05 for explicitly
+enabled project memory, coherently updating policy, schemas, and behavior. This
+permits bounded public decisions/checkpoints/source metadata, not raw prompts,
+transcripts, source-file copies, credentials, hidden reasoning, or telemetry.
+Product configuration and the stateless assistance command must not retain user
+content. Existing authorization is sufficient; do not add repetitive consent steps.
 
-For GPT-6, verify the actual surface's exact model/effort capabilities. Respect the
-task's selected primary model; use available capable subagents only for bounded,
-independent work with explicit ownership. Do not invent model aliases, force every
-operation through Astra, silently replace missing evaluation models, or rewrite
-historical evaluation evidence. Update SDK/CLI pins together only when justified
-by compatibility tests. Use existing authorized Codex access for live probes; do
-not create API keys or paid services to bypass a missing capability.
+Use disposable fixtures for enrollment, corruption, concurrency, migration, deletion,
+and privacy tests. Do not enroll real user projects, change global memories/settings,
+purge the active installation, or perform destructive host tests without separate
+authorization. Reuse safe source/persistence primitives after checking suitability.
 
-Freeze the evaluation protocol and budgets before outcomes. Compare the four arms
-in 06 with controlled source transitions, fresh sessions, identical model/tool
-conditions, and native-memory isolation. Keep failures/timeouts and missing cells.
-Evaluate actual code and follow-up changes, not checklist wording. Passing offline
-tests does not prove live host delivery or a quality improvement.
+Verify the actual host's exact model/effort/client capabilities. Respect the selected
+primary model. Use bounded capable subagents only for independent work with explicit
+ownership and verification. Do not silently replace missing evaluation models.
+Update SDK/CLI pins together only when justified by compatibility tests. Use existing
+authorized host access for probes; do not create paid services or API keys to bypass
+missing access. Record actual usage and limits separately from availability.
 
-Run focused tests during development, then the required source suite and relevant
-native macOS/Windows packaging checks. Verify frozen SQLite functionality and guide/
-schema integrity, not just development-interpreter imports. If an environment or
-model is unavailable, record the missing evidence and continue independent work;
-do not fabricate a pass or repeatedly retry an unchanged blocker.
+Freeze each evaluation lane in 06 before outcomes. Compare Luna alone, Luna with
+OpenSocrates, and Sol alone on identical bounded tasks; compare Sol and Astra with
+and without assistance at the same model/effort; test general/coding fresh-session
+memory against disabled-memory and maintained-note controls; and test natural
+English/Korean collaboration. Keep coding ablation and paired source replay distinct.
+No stronger-model assistance may be hidden inside a Luna-only treatment. Include
+all attempts, repairs, retrieval, tool work, and failures in cost/quality reporting.
 
-Maintain an English progress/handoff record tied to exact commits and commands.
-Use focused commits. You may create/update an implementation issue and Draft PR
-with the specification, current scope, test results, limitations, and next steps.
-Attach any created PR to the Codex task. Do not merge, create release tags, publish
-to npm/GitHub releases, deploy a site, or change the active plugin installation.
+Run focused checks during implementation, then required source/native checks for
+the declared scope. Verify actual frozen SQLite and packaged guide/schema behavior.
+Do not claim model-quality improvement from document, package, or policy tests.
+If a model/platform is unavailable, record missing evidence and continue independent
+work. Do not repeatedly retry unchanged blockers or promote unvalidated profiles.
 
-Use one integrator for contracts, migrations, dependency locks, and generated
-outputs. Independent research/review may run in parallel. Parallel writers need
-isolated worktrees and explicit file ownership; they must not revert others' work.
-Review delegated results against source and evidence before integrating them.
+Use one integrator for contracts, profile data, migrations, locks, and generated
+outputs. Independent reviewers may run in parallel; parallel writers need isolated
+worktrees and explicit ownership. Never revert another worker's unrelated edits.
 
-Continue through the authorized implementation and verification rather than ending
-with a plan. Ask only when a missing decision changes the actual scope/permissions
-and cannot be resolved from the specification or current source. Resolve routine
-details with the smallest design that satisfies the contracts. Document material
-deviations in the decision log and update affected specs/tests together.
+Maintain exact-commit progress and evidence. You may create/update an implementation
+issue and Draft PR with current scope, commands/results, limitations, and next steps.
+Attach created PRs to the task. Do not merge, tag, publish, deploy, or change the active
+plugin installation. Keep a reviewable handoff that works without this conversation.
 
-Completion means the declared implementation scope works, canonical/generated
-outputs agree, required available checks pass, missing platform/model evidence is
-explicit, privacy and failure contracts hold, and the Draft PR or equivalent
-reviewable handoff can be resumed without this conversation. Report verified done,
-remaining work, exact commit, tests, live/evaluation limits, and the next action.
-Do not mark v1.5.0 released or claim universal quality improvement.
+Continue through authorized implementation and verification. Resolve routine choices
+with the smallest design satisfying the contracts. Ask only for a material missing
+scope/permission decision not settled here. Record meaningful deviations in 09 and
+update affected contracts/tests together. Report verified completion, remaining
+work, exact commit, checks, live/model evidence limits, and next action. Do not call
+v1.5.0 released or claim universal quality improvement.
 
 ---
 
-## Starting from another machine
-
-Make the repository and the complete `docs/v1.5.0/` directory available first.
-Replace the local worktree hint if needed; preserve baseline identity, requirements,
-and authorization boundaries. No private memory store, authentication file, local
-database, or prior transcript is needed to understand or execute this prompt.
+No private memory store, authentication file, local database, or prior transcript
+is needed to understand this prompt. Make the repository and specification available
+on the execution machine; preserve baseline identity and authorization boundaries.

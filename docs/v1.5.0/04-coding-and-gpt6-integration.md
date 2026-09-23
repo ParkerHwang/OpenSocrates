@@ -105,6 +105,15 @@ verification status. A new session restores that state without the old transcrip
 The memory system supplies evidence and continuity. It does not autonomously
 change code, approve the design, or promote the test report into native proof.
 
+## Adaptive assistance integration
+
+Implement the separate stateless policy and profiles in 11. Use the same controller
+for general and coding work, with task-based fallback when a model profile is
+unavailable. Candidate profiles are evaluated before normal use. Never reduce a
+canonical method to a short variant or change the selected model/effort silently.
+Package the assistance guide and explicit command alongside memory/coding assets;
+keep hooks lightweight and the existing `decision` protocol unchanged.
+
 ## GPT-6 compatibility
 
 The default `decision` route makes zero selector-model calls. Most GPT-6 work here

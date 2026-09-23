@@ -190,10 +190,10 @@ or real-workspace enrollment changed in this rehearsal.
 ## Evidence and limits
 
 Sources: the English [specification index](../README.md),
-[data/interface contracts](../03-data-and-interface-contracts.md),
-[coding workflows](../04-coding-and-gpt6-integration.md),
-[privacy/lifecycle contract](../05-privacy-lifecycle-and-migration.md), and
-[verification plan](../06-verification-and-evaluation.md), initially committed at
+[data/interface contracts](../../../v1.5.0/03-data-and-interface-contracts.md),
+[coding workflows](../../../v1.5.0/04-coding-and-gpt6-integration.md),
+[privacy/lifecycle contract](../../../v1.5.0/05-privacy-lifecycle-and-migration.md), and
+[verification plan](../../../v1.5.0/06-verification-and-evaluation.md), initially committed at
 `430feaacbdb2cedb8661b8d1057e96d5a4d20abe`.
 
 The corrected panel supports a reasoned, conditional concept recommendation:

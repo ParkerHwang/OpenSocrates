@@ -108,9 +108,9 @@ pre-implementation opinions in this discussion.
 
 ## Sources and boundaries
 
-Product scope: [requirements](../01-scope-and-requirements.md),
-[architecture](../02-architecture-and-operation.md), and
-[coding/host integration](../04-coding-and-gpt6-integration.md).
+Product scope: [requirements](../../../v1.5.0/01-scope-and-requirements.md),
+[architecture](../../../v1.5.0/02-architecture-and-operation.md), and
+[coding/host integration](../../../v1.5.0/04-coding-and-gpt6-integration.md).
 
 Current platform context was checked against official OpenAI documentation:
 [ChatGPT quickstart](https://learn.chatgpt.com/docs/quickstart) describes Projects
@@ -147,7 +147,7 @@ remains separate; general non-coding reasoning value does not require that
 integration to be part of the product's existing scope.
 
 After this rebrief, the user further stated the product's founding text-injection
-theme. That theme is now recorded in the [product identity document](../10-product-identity-and-combined-capabilities.md).
+theme. That theme is now recorded in the [product identity document](../../../v1.5.0/10-product-identity-and-combined-capabilities.md).
 It was not independently re-pitched to the panel, so this record does not invent a
 new audience verdict on the fully restated thesis.
 

@@ -1,6 +1,6 @@
 # Verification and evaluation
 
-Implementation correctness, package delivery, actual host use, and improved code
+Implementation correctness, package delivery, actual host use, and improved task
 quality require different evidence. Keep each result tied to the exact commit,
 configuration, platform, commands, and artifacts that produced it.
 
@@ -11,6 +11,8 @@ configuration, platform, commands, and artifacts that produced it.
 | G01 | Non-coding choice, analysis, or planning task on the supported host | Eligible general methods remain available without forcing coding guides, Git operations, indexing, or memory enrollment |
 | G02 | New evidence changes a non-coding decision | Preserve goals/constraints, reassess the relevant assumption/conclusion, and keep prior recorded conclusions distinct from current support; no coding-only workflow leaks into the task |
 | G03 | Coding choice using prior intent and fresh code evidence | The agent connects relevant recalled context to the applicable reasoning procedure and actual code evidence; neither a memory receipt nor a checklist alone substitutes for the judgment |
+| G04 | Non-Git Markdown/plain-text project, fresh process | Enroll a directory workspace; recover an attributed goal/decision/checkpoint without Git commands or previous chat |
+| G05 | Non-Git document edited, added, renamed, or root replaced | Revalidate content/inventory references, invalidate affected claims, and reject unauthorized root substitution; no source bytes retained |
 
 These are behavioral acceptance requirements, not new claims of proven benefit.
 Use bounded fixtures and retain the existing non-coding regression coverage. The
@@ -24,6 +26,37 @@ attributing effects. Record irrelevant/conflicting/stale context and overhead as
 possible regressions. More injected text, successful retrieval, or a reported read
 does not establish a better result. Preserve complete required procedures and
 constraints while reducing optional irrelevant material.
+
+## Adaptive assistance acceptance
+
+| ID | Scenario | Observable passing condition |
+| --- | --- | --- |
+| A01 | Mechanical work or completed checks with unchanged inputs | No extra assistance call required; no retrieval/rechecking ritual; report completed result |
+| A02 | Bounded versus coupled/uncertain/consequential judgment | Pure policy resolves overlapping features in the specified order and returns bounded context; actual fixtures still satisfy the task |
+| A03 | Unknown, withdrawn, mismatched, or candidate profile in normal mode | Task-based fallback; no fabricated model capability or silently activated candidate profile |
+| A04 | Light/structured assistance with canonical method selection | Existing eligibility and zero-to-two limit preserved; every used procedure complete; no forced count or paraphrased substitute |
+| A05 | Model/effort selection, unsupported host tuple, or escalation | Preserve selected tuple; identify unavailable support; account for authorized escalation separately |
+| A06 | Missing permission or mandatory check under an efficiency profile | Required boundary wins even with a forged completion flag; resolve only dependent action and continue independent authorized work |
+| A07 | Optional context budget too small for required evidence | Explicit insufficiency/partition; no silent truncation; no byte count presented as exact model tokens |
+| A08 | Assistance request/schema, package, reuse, and evidence state | Strict stateless bounded command; no model/workspace/database access; trusted installed configuration reads allowed; policy receipt never becomes application proof; recompute only on material changes |
+
+Policy fixtures verify routing rules. Live/model fixtures separately verify that
+resulting assistance helps behavior. Passing one cannot substitute for the other.
+
+## Collaboration acceptance
+
+| ID | Scenario | Observable passing condition |
+| --- | --- | --- |
+| U01 | Clear authorized task with routine reversible details | Complete the artifact with reasonable contextual choices; no needless interview |
+| U02 | Consequential unknown alongside independent work | Ask a focused question, preserve necessary consent, and continue independent work |
+| U03 | Explicit correction after prior accepted context | Update next action and artifact; supersede the scoped record when authorized; no repeated defense of stale intent |
+| U04 | Side question during ongoing work | Answer the question and resume the objective unless cancelled or replaced |
+| U05 | Equivalent English/Korean developer/nondeveloper requests | Accurate natural communication and appropriate detail; no generic agreement, invented facts, or omitted required substance |
+| U06 | Memory absent, user asks to forget, or human-like tone requested | State actual memory limits, honor scoped deletion, and collaborate naturally without human impersonation |
+
+Measure user turns needed to reach a correct result and repeated known questions,
+not warmth or response length alone. Use blinded bilingual human judgment when
+available; model-only assessment remains provisional.
 
 ## Deterministic acceptance cases
 
@@ -116,7 +149,32 @@ A docs-only change needs documentation checks, not an invented product-suite pas
 When required platform checks cannot run, keep the missing evidence explicit and
 finish independent implementation work. Do not mark a release fully qualified.
 
-## EVAL-01: controlled multi-session quality study
+## Study controls shared by EVAL-01 through EVAL-05
+
+Use separate evaluation lanes for model quality, efficiency, continuity, and
+collaboration. For all lanes freeze model/effort/client, assistance/profile/guide
+identities, tools, task families, permissions, budgets, exclusions, failure rules,
+judge rubric, sample size, and claim thresholds before the held-out outcomes.
+Keep EN/KO task pairs and developer/nondeveloper strata identifiable. Development
+prompts and candidate profiles must not contain held-out tasks or expected answers.
+
+Run capability smoke and a small bounded pilot before a funded full study. W0
+specifies executable fixtures and W8 freezes numerical claim margins/sample sizes
+based on the intended claim and available pilot variance. A pilot is engineering
+feedback, not a superiority or equivalence result. Missing access or cost data is
+an explicit missing cell; do not silently choose a cheaper/easier substitute.
+
+Count all attempts, failed outputs, timeouts, retries, model escalations, retrieval,
+policy calls, scans, and verification. Report token categories exposed by the host,
+wall-clock time, tool activity, and actual billing where available. Subscription
+usage is not an API invoice. Pricing-derived estimates record source/date/tier and
+remain estimates. No monetary savings claim follows from unavailable usage data.
+
+Do not reduce mandatory checks or supply weaker baseline instructions to make a
+candidate appear efficient. Baselines retain normal authorized host/tools and
+competent task instructions. No hidden chain-of-thought is collected.
+
+## EVAL-01: controlled multi-session coding study
 
 Freeze prompts, fixtures, follow-up changes, controls, judge rubric, model/effort,
 client/plugin hashes, time/token limits, and failure rules before outcomes.
@@ -191,6 +249,78 @@ in denominators. A saved patch before timeout is not a completed delivery. A
 candidate privacy/authority/cross-worktree critical failure blocks promotion until
 repaired and checked in a separately identified run.
 
+## EVAL-02: inexpensive-model quality gain and stronger-model gap
+
+For identical bounded tasks, compare Luna alone, Luna with v1.5, and Sol alone.
+Within each model, freeze the selected effort, tool access, task state, and budgets.
+Choose each model's supported comparison setting before outcomes and disclose
+cross-model effort differences. Run both coding and non-coding tasks. The primary
+Luna treatment uses no stronger-model subagent, answer, or repair; report any
+separate escalated workflow as a different treatment.
+
+Primary outputs are completed-task success and a frozen task-quality rubric, with
+critical constraint failures separately visible. Report Luna's absolute gain over
+Luna baseline and its remaining gap to Sol. A normalized gap-closure score is
+optional only where Sol's baseline score exceeds Luna's; otherwise report the
+absolute results and mark that ratio not applicable. Never average away a failing
+non-coding or coding stratum.
+
+A task-bounded Sol-level claim requires a predeclared non-inferiority margin,
+adequate uncertainty bounds, and all critical requirements met on held-out tasks.
+A successful cheaper-model claim additionally requires lower measured total cost
+per accepted outcome, including unsuccessful attempts. Merely reducing the gap is
+reported as gap reduction, not equivalence.
+
+## EVAL-03: quality-preserving efficiency for capable models
+
+For Sol and Astra separately, compare the same model/effort with and without v1.5
+on matched tasks. Isolate the adaptive layer with an additional candidate condition
+that holds memory, sources, and canonical method access constant while disabling
+only optional adaptive wrappers. Do not conflate a model downgrade or lower effort
+with OpenSocrates efficiency.
+
+Before held-out runs, choose one primary resource measure (total cost or latency),
+a minimum useful improvement, and a task-quality non-inferiority margin. Report
+confidence intervals, critical failures, all secondary resource measures, and
+per-stratum results. A tradeoff must be named; lower cost with materially worse
+completion time is not an unqualified efficiency win. Fewer checks are desirable
+only when unnecessary checks disappear and required validation still succeeds.
+
+Observed repeated tool calls, repeated questions, reopened settled decisions, and
+post-completion work measure avoidable activity. Aggregate reasoning-token usage
+may be reported if exposed, but does not reveal private reasoning or establish
+that every reduction was useful. Shorter text alone never passes this study.
+
+## EVAL-04: general project continuity
+
+Use non-Git Markdown/plain-text projects for event planning and a source-grounded
+research brief, plus the coding fixtures in EVAL-01. Compare memory disabled,
+v1.5 memory enabled, and a maintained project-note control with the same first-
+session public facts and an explicit usable note. Include the note's maintenance
+and retrieval cost. Do not weaken the control by hiding its path.
+
+Run both naturalistic two-session work and paired second-session replay from the
+same source state. Freeze remembered public facts before revealing the hidden
+follow-up. Change a source document and a user constraint; add irrelevant/stale
+records; include correction, scoped forgetting, and an unrelated project with a
+similar name. Measure relevant recall, goal preservation, false memory, stale
+influence, repeated completed work, source validity, and user maintenance burden.
+No previous transcript or native memory may supply the answer unnoticed.
+
+## EVAL-05: natural collaboration
+
+Use equivalent English/Korean scenarios across technical and nontechnical users.
+Score intent fulfillment, proportionate initiative, appropriate clarification,
+correction uptake, continuity, completion, and useful communication. Include a
+necessary question, an unnecessary-question trap, a mid-task correction, a side
+question, unavailable memory, and a reasonable disagreement with the user's premise.
+
+Judge the resulting action and artifact as well as the dialogue. Prefer blinded
+bilingual human assessment with rubric/examples fixed before outcomes; report
+model judges as supplemental. Preserve factual accuracy, authorization, and
+required uncertainty as gates. Do not equate human-like behavior with deception,
+flattery, verbosity, or short answers. Per-language failures remain visible.
+
 ## Release and claim boundary
 
 Functional release qualification requires deterministic gates, required source
@@ -199,6 +329,6 @@ Quality claims additionally require the relevant controlled outcome evidence.
 Do not claim universal maintainability, dependency completeness, cost reduction,
 or GPT-6 superiority from passing package tests or a small pilot.
 
-If the candidate increases overhead without reliable coding benefit, reduce its
-intervention/retrieval burden or keep the memory feature experimental. If recall
+If the candidate increases overhead without a reliable relevant-task benefit, reduce
+its assistance/retrieval burden or keep the affected profile/feature experimental. If recall
 precision is the bottleneck, improve retrieval before increasing model effort.

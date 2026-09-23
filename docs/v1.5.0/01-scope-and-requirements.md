@@ -29,9 +29,20 @@ implementations and dependencies. A correct, maintainable change followed by a
 successful later change is the first coding workstream's outcome, not the sole
 definition of value for all OpenSocrates tasks.
 
+## Shared product outcomes
+
+Improve task quality for inexpensive models such as Luna; help capable models
+such as Sol/Astra avoid unnecessary work while preserving quality; preserve useful
+memory; and collaborate naturally with developers and non-developers. Define
+natural collaboration through intent, initiative, proportionality, correction,
+and continuity. See 10 and 11 for the observable contract.
+
 ## In scope
 
-- Preserve and strengthen the general judgment-support identity and non-coding behavior.
+- General reasoning, planning, research, and design work for non-developers and developers.
+- Task/model-aware optional assistance with an unknown-profile fallback.
+- Natural collaboration in English and Korean, assessed through action and outcome.
+- Bounded non-Git local Markdown/plain-text projects, as well as Git code projects.
 - Existing-project feature work, fixes, and scoped refactoring.
 - Built-in, local, explicitly enabled project memory; no required separate plugin.
 - Durable decision records, observations, lessons, and task checkpoints.
@@ -47,6 +58,13 @@ definition of value for all OpenSocrates tasks.
 | --- | --- | --- |
 | CORE-01 | Preserve general judgment support for non-coding tasks; coding guides, Git access, and memory enrollment are not universal prerequisites. | G01, G02 |
 | CORE-02 | Connect recalled context to fresh judgment and relevant domain evidence; do not reduce the product to a note store or bypass canonical methods. | G02, G03 |
+| ADAPT-01 | Choose none/light/structured optional assistance from task features and validated model profiles; preserve the deterministic existing method eligibility path and complete content. | A01-A04 |
+| ADAPT-02 | Use a task-based fallback for unknown profiles; respect selected model/effort and preserve required quality/permission checks. | A03, A05, A06 |
+| ADAPT-03 | Bound optional context, reuse unchanged guidance, and stop completed work without collecting hidden reasoning. | A07, A08 |
+| COLLAB-01 | Infer routine intent, ask only consequential missing questions, and continue independent authorized work. | U01, U02 |
+| COLLAB-02 | Apply corrections to artifacts and scoped memory; preserve ongoing objectives during side questions. | U03, U04 |
+| COLLAB-03 | Match English/Korean communication to the task; do not substitute agreement, brevity, or human impersonation for useful work. | U05, U06 |
+| MEM-12 | Non-Git text projects support scoped enrollment, document evidence, freshness, and cold resume without fabricated Git identity. | G04, G05 |
 | MEM-01 | Memory is disabled until an explicit project enrollment enables a declared storage policy. Reads/status do not initialize a store. | T01, T02 |
 | MEM-02 | Persistent memory is separate from the content-only `decision` path and its volatile method-read inventory. | T01, T03 |
 | MEM-03 | Records carry origin, scope, evidence references, lifecycle, and freshness as separate fields. | T04, T05 |
@@ -64,7 +82,8 @@ definition of value for all OpenSocrates tasks.
 | CODE-04 | Mechanical edits do not trigger an unnecessary memory scan or complete architecture review. | C06 |
 | HOST-01 | Ordinary hooks remain bounded discovery; they do not index repositories or initialize/write memory. | T03, H01 |
 | HOST-02 | Explicit memory operations work without a successful hook or compaction event. | T12, H02 |
-| MODEL-01 | Actual model/client/effort and capability are recorded for probes; no blanket GPT-6 quality claim follows from availability. | H03, EVAL-01 |
+| MODEL-01 | Actual model/client/effort and capability are recorded for probes; no blanket GPT-6 quality claim follows from availability. | H03, EVAL-01-EVAL-05 |
+| EVAL-02 | Measure inexpensive-model quality gain/gap, same-model quality-preserving efficiency, continuity, and collaboration separately, including all resource use and failed attempts. | EVAL-02-EVAL-05 |
 | DIST-01 | Frozen runtimes include and exercise SQLite and required memory assets on supported platforms. | P01, P02 |
 | EVID-01 | Selection, delivery, reported reading, freshness, execution evidence, and improvement remain distinct. | T04, H02, EVAL-01 |
 

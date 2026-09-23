@@ -24,10 +24,15 @@ All choices below are design decisions for implementation, not measured benefits
 | D11 | Accepted project intent may cross enrolled worktrees; observations/checkpoints are scoped | Sharing all state would improve apparent recall but leaks incompatible code/task state | An explicit merge/import workflow can validate a broader transfer |
 | D12 | Quality measured on a second change in a fresh session | Single-turn tests are cheaper but do not establish project continuity | User scope changes to purely local single-turn assistance |
 | D13 | Preserve the general reasoning product; memory and coding support are additive capabilities | A coding-only narrative is simpler but loses the user's intended product identity | The user explicitly changes the product purpose |
-| D14 | Treat useful text/context selection and delivery as the founding product mechanism | Optimizing memory size or method count alone is easier to describe but does not establish better model behavior | Matched-task evidence identifies a different causal mechanism or the user changes the thesis |
+| D14 | Treat useful text/context selection and delivery as the founding product mechanism | Optimizing memory size or method count alone does not establish better behavior | Matched-task evidence identifies a different causal mechanism |
+| D15 | Separate stateless assistance policy with task-based fallback and evaluated model profiles | A single fixed prompt is simpler but cannot address differing observed failure/overhead patterns | Policy overhead outweighs benefit or a simpler rule meets all outcomes |
+| D16 | Shared workspace identity for Git and bounded non-Git text projects | Git-only identity simplifies storage but excludes required general continuity | A new source type has explicit capability, identity, and privacy contracts |
+| D17 | Natural collaboration is observable intent/action/correction/continuity behavior | Style-only scoring is cheaper but can reward pleasant incomplete work | Blinded outcome evidence shows the rubric misses a material user need |
+| D18 | Separate inexpensive-model gain, capable-model efficiency, memory, collaboration, and coding studies | A single aggregate leaderboard is simpler but obscures regressions and attribution | A preregistered analysis demonstrates a valid combined claim |
 
-Criteria come from the user's stated reuse, dependency-understanding, code-quality,
-and continuity goals plus the verified repository privacy/evidence contracts.
+Criteria are task quality, efficient completion, continuity, natural collaboration,
+appropriate reuse, dependency understanding, and the verified privacy/evidence
+contracts. Product choices below are self-contained implementation decisions.
 Storage limits/retention periods are explicit engineering defaults in 03/05, not
 user preference measurements. No numeric weighted score was invented.
 
@@ -40,7 +45,7 @@ Links point to real baseline files; line references are review anchors.
 | [AGENTS.md](../../AGENTS.md), lines 34–45 | Codex-only, canonical/generated ownership, no workspace retention, distinct evidence levels; requires scoped policy amendment |
 | [SECURITY.md](../../SECURITY.md), lines 19–35 | Default decision has no persistent state; legacy selector is separate |
 | [CONTRIBUTING.md](../../CONTRIBUTING.md), setup and validation sections | Python 3.12, locked SDK, canonical generation and source/native check requirements |
-| [CLI dispatcher](../../src/opensocrates/cli/main.py), `_parser` and `main` dispatch | New memory command belongs in explicit parser/dispatch rather than host-only control payloads |
+| [CLI dispatcher](../../src/opensocrates/cli/main.py), `_parser` and `main` dispatch | New assistance/memory commands belong in explicit parser/dispatch rather than host-only control payloads |
 | [Decision CLI](../../src/opensocrates/cli/decision.py), lines 1–39 | Installed canonical loading, volatile session, bounded input, no CWD-controlled fallback |
 | [DecisionSession](../../src/opensocrates/selector/decision.py), lines 18–24, 147–214 | Closed select envelope, deterministic routing, zero model calls, applied unverified |
 | [TaskStore](../../src/opensocrates/persistence/task_store.py), lines 39–85 | Typed public-event repository, reducer preflight and concurrency handling; not general project memory |
@@ -77,6 +82,7 @@ capabilities; they do not validate the proposed OpenSocrates architecture.
 - [OpenAI: Rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra): selective loading, clear discovery boundaries, and proportionate verification.
 - [Codex model capabilities](https://learn.chatgpt.com/docs/models): exact model IDs, effort availability, and experimental context management; account/client availability can differ.
 - [Codex Memories](https://learn.chatgpt.com/docs/customization/memories): host-owned memories, background update timing, and required guidance in repository documentation.
+- [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna) and [GPT-6 Sol](https://developers.openai.com/api/docs/models/gpt-6-sol): current API model positioning and controls, checked 2026-09-23. API information does not establish Desktop account access or task-quality equivalence.
 - [SQLite FTS5](https://www.sqlite.org/fts5.html): local full-text search capabilities; frozen-runtime support must be checked.
 - [OpenSocrates v1.4.0 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.4.0): Codex-only release scope and recorded limitations.
 
@@ -92,5 +98,5 @@ Neither establishes GPT-6 or OpenSocrates v1.5 performance.
 No unanswered product question blocks W0/W1. Defaults and scope have been chosen
 above. Implementation still needs to determine the exact safe SQLite/native
 closure, supported host adapter receipts, actual available model tuples, and
-performance on bounded fixture repositories. Those are verifiable engineering
+performance on bounded general and coding tasks. Those are verifiable engineering
 tasks with cases in 06, not permission to assume success or wait indefinitely.

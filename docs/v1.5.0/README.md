@@ -1,29 +1,27 @@
 # OpenSocrates v1.5.0 development specification
 
-Status: implementation-ready design; product implementation has not started.
+Status: implementation specification; product implementation and outcome studies are pending.
 Working language: English. Reviewed baseline: `v1.4.0`, commit
 `5a2ff3c312e92aa8a44d0905465674d9a4e4f645`, also the remote `main` head
 when checked on 2026-09-23.
 
-OpenSocrates starts from the premise that the text supplied to an LLM can materially
-change the judgments and work it produces. Its product function is to select,
-prepare, and deliver useful reasoning guidance and task context at the points where
-they matter. The intended result is better-grounded judgment and more effective
-work from the chosen model, not a claim that text is the only determinant of performance.
+OpenSocrates helps developers and non-developers get better work from their chosen
+LLM through task-aware reasoning guidance, relevant evidence, and useful memory.
+v1.5.0 has four shared outcomes: improve inexpensive-model task quality, reduce
+unnecessary work by capable models without reducing quality, preserve continuity
+across sessions, and make collaboration attentive and natural. Coding reuse,
+dependency understanding, and maintainability extend the same general foundation.
 
-The existing reasoning methods help an AI examine assumptions, compare alternatives,
-evaluate evidence, and reconsider conclusions. v1.5.0 extends that foundation with
-persistent project context, deeper coding-domain evidence, and GPT-6 adaptation.
-These capabilities work together to improve what the model receives. Coding is an
-added application of the general product, not a replacement for its broader purpose.
+The product adapts optional assistance to the task and evaluated model profile.
+It preserves the existing 48 canonical methods and their evidence/stop contracts.
+Memory is built in, local, and explicitly enabled per project. Both Git code
+projects and bounded non-Git local text projects are in scope. Codex is the current
+host; ordinary ChatGPT integration is a separate capability.
 
-The first implementation workstream exercises these additions on existing software
-projects: recover relevant decisions, find suitable code, understand change impact,
-and verify maintainable changes across sessions. The shared memory model must retain
-the distinction between intent, evidence, inference, and unfinished work. Persistent
-memory is built in and explicitly enabled per project; ordinary judgment work does
-not require enabling it. Codex is the supported host, not a restriction of judgment
-support to programming tasks.
+All improvements are evaluation targets. Luna/Sol gap reduction is task-bounded;
+strong-model efficiency requires preserved outcome quality. No prior conversation,
+product-development history, or audience rehearsal is required to implement this
+package. Start with the final product contract in 10 and behavior policy in 11.
 
 ## Read this package
 
@@ -38,15 +36,15 @@ support to programming tasks.
 | [07 — Implementation plan](07-implementation-plan.md) | Ordered work packages, ownership boundaries, dependencies, and executable exit criteria |
 | [08 — Implementation kickoff](08-implementation-kickoff.md) | Complete prompt to start implementation in a fresh Codex task |
 | [09 — Decisions and source map](09-decisions-and-source-map.md) | Architectural decisions, alternatives, source evidence, and reopening conditions |
-| [10 — Product identity and combined capabilities](10-product-identity-and-combined-capabilities.md) | General reasoning foundation, shared memory, and additive coding support |
+| [10 — Product definition](10-product-identity-and-combined-capabilities.md) | Target users, outcomes, representative experiences, and success conditions |
+| [11 — Adaptive assistance and collaboration](11-adaptive-assistance-and-collaboration.md) | Task/model policy, assistance levels, profiles, and observable interaction behavior |
 | [Validation record](VALIDATION.md) | Checks actually performed on this document package |
-| [Pitch rehearsal record](pitch-rehearsals/README.md) | Simulated audience feedback, proposed follow-ups, and evidence limits |
 
 The package also includes [synthetic contract examples](examples/README.md) and a
 [documentation validator](validate_documents.py). Run the validator from the
 repository root with `python3 docs/v1.5.0/validate_documents.py`.
 
-Read this index and 01 first. An implementation agent must then read 02, 03, and
+Read this index, 10, 11, and 01 first. An implementation agent must then read 02, 03, and
 05 before adding storage; 04 before changing host behavior; and 06–08 before
 starting the execution plan. Read source files only for the current work package.
 
@@ -74,7 +72,7 @@ runtime evidence, benchmark results, or existing public API contracts.
 
 ## Definition of done for this package
 
-- The memory and coding behavior is specified through observable inputs, states,
+- Adaptive assistance, general/coding memory, and collaboration have observable inputs, states,
   outputs, failures, and tests.
 - Each implementation work package has dependencies and an exit criterion.
 - The kickoff prompt is usable without the previous conversation.

@@ -10,7 +10,7 @@ added capability of the original general OpenSocrates reasoning system. The earl
 briefs emphasized coding memory too heavily. Treat the records as reactions to
 those briefs, not a complete evaluation of OpenSocrates or evidence that its
 general reasoning value excludes non-developers. See the
-[product-identity clarification](../10-product-identity-and-combined-capabilities.md).
+[product-identity clarification](../../../v1.5.0/10-product-identity-and-combined-capabilities.md).
 
 The user's further founding-theme clarification is that supplied text strongly
 influences LLM behavior. Future full-product pitches should explain OpenSocrates as

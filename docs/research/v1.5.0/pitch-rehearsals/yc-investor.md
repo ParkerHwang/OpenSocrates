@@ -103,7 +103,7 @@ presentation were not rewritten, and no implementation or outreach was started.
 
 - Product definition: `docs/v1.5.0/` at local specification commit
   `430feaacbdb2cedb8661b8d1057e96d5a4d20abe`.
-- Historical engineering incident: [v1.3.0 post-release review](../../evidence/v1.3.0-post-release-review.json), with checks in `tools/check_decision_points.py` and `tools/release_check.py`. The published example failed with exit 0; this does not establish AI authorship or memory causality.
+- Historical engineering incident: [v1.3.0 post-release review](../../../evidence/v1.3.0-post-release-review.json), with checks in `tools/check_decision_points.py` and `tools/release_check.py`. The published example failed with exit 0; this does not establish AI authorship or memory causality.
 - Public perspective: [How to Pitch Your Company](https://www.ycombinator.com/blog/how-to-pitch-your-company) and [Tips for YC Interviews](https://www.ycombinator.com/blog/tips-for-yc-interviews).
 - Investor statements are model-generated judgments in one fresh task context.
   They are not independent market evidence or the views of an actual YC partner.

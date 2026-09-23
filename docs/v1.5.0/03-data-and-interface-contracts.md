@@ -16,7 +16,7 @@ Schema identifier: `opensocrates.project-memory.record/1.0.0`.
 | `version` | positive integer | Monotonic item version; compare-and-swap target |
 | `project_id` | UUID | Registered project, never a remote URL |
 | `kind` | `decision`, `observation`, `lesson`, `checkpoint` | Record category |
-| `scope` | object | `level`: `project`, `worktree`, or `task`; optional bounded module paths; required worktree/task IDs where applicable |
+| `scope` | object | `level`: `project`, `workspace`, or `task`; optional bounded source paths; required workspace/task IDs where applicable |
 | `lifecycle` | `proposed`, `accepted`, `superseded`, `archived` | Record lifecycle; not truth or freshness |
 | `origin` | object | Producer, source reference, and attribution/attestation level |
 | `support` | `runtime_observed`, `tool_reported`, `agent_reported`, `inferred`, `imported` | How supporting evidence was obtained |
@@ -24,7 +24,7 @@ Schema identifier: `opensocrates.project-memory.record/1.0.0`.
 | `summary` | bounded text | Public decision/fact/lesson; no private reasoning narrative |
 | `rationale` | bounded text or null | Concise public reason, tradeoff, or failure condition |
 | `source_refs` | bounded array | Typed references defined below |
-| `snapshot_id` | UUID or null | Source snapshot for code-dependent records |
+| `snapshot_id` | UUID or null | Source snapshot for source-dependent records |
 | `revalidation` | object | Dependency footprint and invalidation conditions |
 | `created_at`, `updated_at` | UTC timestamps | Record metadata; recency is not authority |
 | `supersedes` | UUID or null | Explicit replaced record; preserve history until retention/delete |
@@ -52,7 +52,7 @@ task. Accepted memory is not an instruction-hierarchy escalation mechanism.
 
 A source reference has `ref_id`, `type`, `locator`, `digest`, `collected_at`,
 `collector`, and `coverage`. Types are `source_file`, `repository_document`,
-`tool_result`, or `decision_reference`. File locators use project-relative paths,
+`project_document`, `tool_result`, or `decision_reference`. File locators use project-relative paths,
 optional qualified symbols, and optional line anchors. Line numbers are a display
 aid; digests and symbol re-resolution detect changed source. Do not store absolute
 private paths in exports or published evidence.
@@ -64,14 +64,17 @@ record test outcomes as `agent_reported`, with a bounded summary and references.
 Never execute command text read from a memory item.
 
 Snapshot schema: `opensocrates.project-memory.snapshot/1.0.0`.
-Required fields: `snapshot_id`, `project_id`, `worktree_id`, `head_oid` or null,
+Required fields: `snapshot_id`, `project_id`, `workspace_id`, `workspace_kind`, `head_oid` or null,
 `scope_paths`, `inventory_digest`, `content_manifest_digest`, `exclusion_digest`,
 `configuration_digest`, `adapter_versions`, `coverage`, `captured_at`.
 Coverage contains `complete_for_scope`, omitted categories, unstable files, and
 the allowed search boundary. A dirty/untracked manifest must be represented;
 HEAD equality cannot stand in for it. Source content itself is not persisted.
 
-Snapshot checks bind to the current registered worktree. Native observations
+`workspace_kind` is `git_worktree` or `directory`; non-Git snapshots require null
+Git metadata and a complete declared file inventory/content footprint. Git fields
+cannot be fabricated for a directory project. The registry owns the discriminator.
+Snapshot checks bind to the current registered workspace. Native observations
 collected while the worktree changes must be rejected or labeled unstable.
 Revalidation of an incomplete scope cannot produce `complete_for_scope: true`.
 
@@ -111,7 +114,7 @@ tests explicitly. The npm installer remains a lifecycle surface, not the JSON
 memory protocol. A separate MCP server is not required for v1.5.
 
 Request schema: `opensocrates.project-memory.request/1.0.0`.
-Envelope fields: `schema`, `operation`, `request_id`, `project_id`, `worktree_id`,
+Envelope fields: `schema`, `operation`, `request_id`, `project_id`, `workspace_id`,
 `task_id`, `payload`. Required identities depend on the operation. `init` is the
 only operation accepting a new root binding. Other operations resolve approved
 scope through registry identities, not arbitrary traversal paths.
@@ -183,7 +186,7 @@ for viewing/removing data even when automatic memory use is disabled.
 ## Evidence pack
 
 Schema identifier: `opensocrates.project-memory.context-pack/1.0.0`.
-Return `pack_id`, project/worktree/task identities, checked snapshot, applicable
+Return `pack_id`, project/workspace/task identities, workspace kind, checked snapshot, applicable
 constraints, decision summaries, source evidence, checkpoint reference, conflicts,
 unknowns, searched/excluded scope, capability levels, budget accounting, and
 expansion handles. Every substantive item has a record or source reference.
@@ -229,6 +232,14 @@ Native protocol exits: 0 for a well-formed response including disabled/partial;
 2 for invalid requests; 3 for operational unavailability. Callers MUST inspect
 status and requested semantic conditions, not just process exit. Human-readable
 errors must not print raw prompts, content, credentials, or private root paths.
+
+## Assistance interface separation
+
+The stateless assistance request/response in 11 has its own closed schema family.
+It reuses bounded JSON parsing/error conventions, not the memory envelope or a
+new field in the existing closed `decision` envelope. It performs no memory writes
+or source inspection. A memory pack budget is advisory to retrieval and remains
+subject to the required-context/partial-result contract above.
 
 ## Illustrative examples
 

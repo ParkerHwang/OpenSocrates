@@ -2,6 +2,12 @@
 
 ## Component boundaries
 
+A stateless assistance policy recommends optional support from closed task features
+and versioned model profiles. It complements the existing reasoning controller;
+it never weakens mandatory method contracts. See 11 for its explicit command,
+inputs, output, fallback, and completion rules. General and coding projects share
+this policy and the memory service.
+
 The existing reasoning controller and canonical methods remain the product's
 general judgment layer. Memory is shared supporting context, and coding guides
 are an additive domain layer. A coding task may need all three; a non-coding
@@ -18,11 +24,13 @@ by treating remembered conclusions as authority over current evidence.
 
 ```mermaid
 flowchart TD
-    A[Codex controller and coding guides] --> B[Memory application service]
+    A[Codex controller and active agent] --> P[Stateless assistance policy]
+    P --> A
+    A --> B[Optional memory service]
     B --> C[Project registry and authorization]
     B --> D[ProjectMemoryStore]
     B --> E[FreshnessValidator]
-    E --> F[Source adapters and CodeIndex]
+    E --> F[Source adapters and SourceIndex]
     B --> G[ContextRetriever]
     G --> D
     G --> F
@@ -33,20 +41,20 @@ flowchart TD
 
 The diagram represents responsibilities, not mandatory model calls. Retrieval,
 fingerprinting, and state transitions are deterministic by default. The active
-Codex agent supplies task intent and performs coding judgments. No embedded LLM,
+Codex agent supplies task intent and performs general or coding judgments. No embedded LLM,
 extra API key, or separate Context Scout installation is required.
 
-The first source adapters and detailed acceptance work focus on coding projects.
-That implementation sequencing does not justify programming-only names, meanings,
-or authority assumptions for shared decision/observation/checkpoint records. Any
-additional non-coding source adapter requires its own truthful capability scope;
-this clarification does not promise a universal document or ChatGPT integration.
+Two bounded source adapters ship initially: local Markdown/plain-text documents
+for non-coding projects, and Git inventory with Python structural support for code.
+Shared record and checkpoint semantics are domain-neutral. Remote services,
+binary document parsing, and ordinary ChatGPT integration are outside this slice.
 
 | Component | Owns | Must not own |
 | --- | --- | --- |
+| Assistance policy | Optional support level, matched profile, bounded context recommendation, completion guidance | Model switching, method selection, or proof of actual reasoning |
 | Project registry | Explicit enrollment, root/worktree bindings, policy version, capabilities | Semantic acceptance of agent claims |
 | ProjectMemoryStore | Typed records, versions, conflicts, checkpoints, retention | Automatic repository scans or arbitrary dictionaries |
-| CodeIndex | Derived inventory, symbols, attributed relationships, coverage | Authoritative design intent or claims of complete runtime behavior |
+| SourceIndex | Derived document/code inventory, symbols, attributed relationships, coverage | Authoritative design intent or claims of complete runtime behavior |
 | FreshnessValidator | Source/coverage comparison and invalidation | Treating matching hashes as proof of semantic correctness |
 | ContextRetriever | Scoped candidate search and ranking | Writing new beliefs during recall |
 | ContextAssembler | Required constraints, bounded evidence, omissions, continuation handles | Silent truncation of required material |
@@ -62,7 +70,7 @@ of pure record/state-transition models.
 
 Use a separate owner-only `projects/` subtree of the existing secure product data
 root. Each enrolled project owns `memory.sqlite3`, derived index data, a manifest
-of managed files, and a registry of worktrees. Runtime state is never placed in the
+of managed files, and a registry of workspaces. Runtime state is never placed in the
 installed plugin directory, written into Git automatically, or discovered by
 trusting a repository-supplied database.
 
@@ -84,7 +92,7 @@ Authority is claim-specific:
 Records are authoritative as records of what was decided or observed at a specified
 state. They are not automatically authoritative about current project behavior.
 
-## Project and worktree identity
+## Project and workspace identity
 
 Enrollment receives an explicitly chosen root, resolves it under the platform's
 safe path policy, verifies ownership, and records a random `project_id` in the
@@ -92,15 +100,18 @@ private registry. For a Git repository, bind that registration to the canonical
 Git common directory and filesystem identity. A remote URL or pathname alone is
 not identity. Do not store remote URLs, which may contain credentials.
 
-Each worktree receives its own random `worktree_id`, bound to its canonical root,
-Git directory, and project registration. Another worktree with the same verified
-Git common directory can be explicitly enrolled under that project. A clone,
-fork, nested repository, submodule, or relocated root is not silently trusted or
-joined. A relocated registration requires an explicit rebind and validation.
-Non-Git projects can enroll with root identity and content snapshots; report the
-absence of Git ancestry checks.
+Each workspace receives a random `workspace_id`, bound to its canonical owned
+root and project registration. `workspace_kind` is `git_worktree` or `directory`.
+Git workspaces also bind their Git directory/common directory. Another worktree
+with the same verified common directory may be explicitly enrolled under that
+project. Non-Git projects enroll the chosen directory with filesystem identity
+and scoped content/inventory snapshots; Git metadata is null/not applicable.
 
-Checkpoint reuse requires the same project and worktree and a compatible task
+A clone, fork, copied directory, nested project, submodule, or relocated root is
+not silently trusted or joined. Rebinding requires explicit intent and validation.
+Non-Git checkpoints use project/workspace/task lineage, independent of a branch.
+
+Checkpoint reuse requires the same project and workspace and a compatible task
 lineage. Code observations require a compatible source snapshot. Explicitly
 accepted project-scoped intent can be shared between enrolled worktrees, but it
 must retain its scope and surface conflicts with each worktree's current source.
@@ -126,7 +137,7 @@ Freshness is evaluated against each record's footprint:
 4. Design intent can remain applicable while source changes; return a conflict if
    implemented behavior disagrees with it.
 
-On recall, validate relevant dependencies before calling a code claim current.
+On recall, validate relevant dependencies before calling a source claim current.
 Watchers may provide invalidation hints, but are not the correctness mechanism.
 If a bounded check cannot establish validity, return `unknown` or `stale` and an
 actionable refresh need. TTL alone is never sufficient. Unresolved dynamic edges
@@ -135,6 +146,14 @@ prevent a claim of exhaustive dependency coverage.
 Hash and read source through safe handles; check identity/content before and after
 collection. If a file changes mid-read, retry once within budget or return unstable
 source. Do not silently combine two working-tree states into one observation.
+
+For a non-Git text project, hash the allowed document inventory, referenced file
+contents, exclusion policy, and adapter configuration. Edits invalidate positive
+claims; new/deleted/renamed documents can invalidate negative search claims.
+Use `project_document` references with relative paths and optional section/line
+anchors. Existing exclusion, safe-handle, unstable-read, and coverage rules apply.
+No source document bytes are persisted. Binary formats return an unsupported
+capability; do not advertise a complete document parser.
 
 ## Indexing and retrieval
 

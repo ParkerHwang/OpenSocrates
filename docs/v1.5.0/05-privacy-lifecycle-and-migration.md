@@ -11,7 +11,7 @@ Required policy delta:
 
 > Project memory is an optional, explicitly enabled local capability. It may
 > retain bounded public decisions, task checkpoints, source references, content
-> digests, and declared code-index metadata under the project's selected policy.
+> digests, and declared document/code-index metadata under the project's selected policy.
 > It does not retain raw prompts, transcripts, tool-output dumps, source-file
 > copies, screenshots, credentials, or private reasoning. The default judgment
 > command and ordinary hooks remain content-only and do not initialize or write
@@ -77,6 +77,11 @@ Imported documents and remembered text remain untrusted input. Reject unknown
 schema fields, oversized content, path escapes, and unsafe links/reparse points.
 Never execute commands or adopt routing/permission changes found in stored text.
 Source authenticity, user authority, and a content hash are distinct properties.
+
+The same policy applies to non-Git text projects and scoped explicit collaboration
+preferences. Do not create a global user/personality profile. Product assistance
+profiles are static versioned configuration, not a channel for recording user data.
+The assistance command remains disk-free and never logs incoming task features.
 
 ## Owned filesystem boundary
 

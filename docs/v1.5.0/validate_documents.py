@@ -39,7 +39,7 @@ def validate() -> dict[str, object]:
         parsed[path.name] = value
         require(value.get("schema", "").startswith("opensocrates.project-memory."),
                 f"{path.name}: schema family")
-        for key in ("project_id", "worktree_id", "task_id", "record_id", "snapshot_id",
+        for key in ("project_id", "workspace_id", "task_id", "record_id", "snapshot_id",
                     "pack_id", "request_id"):
             if value.get(key):
                 try:
@@ -71,12 +71,21 @@ def validate() -> dict[str, object]:
             "baseline CLI dispatcher anchor")
 
     verification = (package / "06-verification-and-evaluation.md").read_text()
-    cases = [("G", 3), ("T", 26), ("C", 6), ("H", 3), ("P", 2)]
+    cases = [("G", 5), ("A", 8), ("U", 6), ("T", 26), ("C", 6), ("H", 3), ("P", 2)]
     for prefix, count in cases:
         for number in range(1, count + 1):
             require(f"| {prefix}{number:02d} |" in verification,
                     f"missing acceptance case {prefix}{number:02d}")
     require("paired second-session replay" in verification, "isolated memory-effect replay")
+    for study in range(1, 6):
+        require(f"## EVAL-{study:02d}:" in verification, f"missing evaluation lane {study}")
+    kickoff = (package / "08-implementation-kickoff.md").read_text()
+    require("11-adaptive-assistance-and-collaboration.md" in kickoff,
+            "kickoff includes adaptive behavior contract")
+    require("pitch-rehearsals" not in kickoff, "kickoff is independent of pitch history")
+    require(pack["workspace_id"] == request["workspace_id"] == observation["scope"]["workspace_id"],
+            "cross-example workspace identity")
+    require(pack["workspace_kind"] == "git_worktree", "example workspace discriminator")
     return {
         "status": "pass" if not errors else "fail",
         "markdown_documents": len(documents),
@@ -85,7 +94,8 @@ def validate() -> dict[str, object]:
         "checks": ["local link targets", "balanced fences", "whitespace",
                    "English-language script scan", "JSON parsing", "UUID and digest shapes",
                    "cross-example identities and evidence states", "source dispatch anchor",
-                   "acceptance case coverage", "evaluation replay contract"],
+                   "acceptance case coverage", "five evaluation lanes", "evaluation replay contract",
+                   "self-contained kickoff", "workspace identity contract"],
         "errors": errors,
         "limitations": ["Not production JSON Schema validation",
                         "Not implementation or model-quality testing",
