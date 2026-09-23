@@ -1,0 +1,844 @@
+{
+  "schema": "opensocrates.v1.5.native-plugin-pilot-results/1.0.0",
+  "lane": "EVAL-02",
+  "completed_at_utc": "2026-09-23T15:53:51.315942+00:00",
+  "freeze_commit": "b843b9d581d9fa94a563fa5ec49c1d4c4efd2645",
+  "freeze_sha256": "b226b277dfbdf3b52a01f60d4d8f0511bde0acebb32545c4e14a7c2f03012031",
+  "candidate_zip_sha256": "c8cc308e757afafb5e5a076e45de096aa1f305e1168c926effe2d34d2a604201",
+  "client": "codex-cli 0.155.0-alpha.16.3",
+  "held_out": false,
+  "validated_profile": false,
+  "cells": [
+    {
+      "lane": "EVAL-02",
+      "task": "coding",
+      "language": "en",
+      "arm": "luna_alone",
+      "requested_model": "gpt-6-luna",
+      "requested_effort": "medium",
+      "candidate_zip_sha256": null,
+      "plugin_installed": false,
+      "hooks_requested": false,
+      "source_hashes_before": {
+        "names.py": "f49b789ad559138e832a7c0a79103368f3e05812b46fd1065e334ac2d74e1d2d",
+        "test_names.py": "8daf5fbce693fb8b0b05c08847eef070ef493e50d29dbb9a589639916a6db344"
+      },
+      "installation": {
+        "ok": true,
+        "operations": [],
+        "inventory": [],
+        "inventory_exit_code": 0,
+        "wall_seconds": 10.371
+      },
+      "calls": [
+        {
+          "stage": "initial",
+          "client": "codex-cli 0.155.0-alpha.16.3",
+          "requested_model": "gpt-6-luna",
+          "requested_effort": "medium",
+          "command_mode": "hooks_disabled",
+          "prompt_sha256": "83e612bb3c0ba874a9f16d67de388235e928bc9b41b0b768a7c9d0488753cd5f",
+          "exit_code": 0,
+          "timed_out": false,
+          "wall_seconds": 50.772,
+          "event_count": 18,
+          "malformed_event_lines": 0,
+          "stderr_sha256": "0616914f2aae0af00d3513e4f8e2f710d6962e24a0fa3774051651795bc9ab64",
+          "hook_event_count": 0,
+          "grounding_line_claim_present": false,
+          "failure": false,
+          "thread_id": "01a0cef7-0ab8-77f0-a622-5cc3297f6c3c",
+          "usage": {
+            "input_tokens": 119760,
+            "cached_input_tokens": 107520,
+            "output_tokens": 1423,
+            "reasoning_output_tokens": 174
+          },
+          "tool_events": [
+            {
+              "type": "command_execution",
+              "command_sha256": "ea874e1c3495b78cf136da9c9c9fa448e89f6316276111dec73e28d8ae09f4cb",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "ee1429f30c66d358042465106d104b355220388f1f376b1795b0fd62ab265c3a",
+              "exit_code": 128,
+              "status": "failed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "file_change",
+              "command_sha256": null,
+              "exit_code": null,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "file_change",
+              "command_sha256": null,
+              "exit_code": null,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "ad2a6a6af9d5be39d2371636c4682844b4e6f701d197a7cc5a3ed7ae08e0fd22",
+              "exit_code": 1,
+              "status": "failed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "c86f0f59bda46b171dd76cfe2e7a2a93b3550b8578e1c15a5072aff5acc71831",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            }
+          ],
+          "tool_calls": 6,
+          "retrieval_calls": 2,
+          "policy_calls": 0,
+          "error_types": [],
+          "final_message_sha256": "9a4f99379a5ceabc77b42830b6e4ec94c200a2defe44d22af5ac02530db002b9",
+          "side_question_observation": {
+            "rejects_proof_heuristic": false,
+            "rejects_inaccessible_heuristic": false
+          },
+          "billed_cost": null,
+          "server_echoed_model": null,
+          "native_hook_application": null
+        }
+      ],
+      "repairs": [],
+      "escalations": [],
+      "manual_bilingual_dialogue_score": null,
+      "manual_score_missing_reason": "No independent bilingual human reviewer assigned.",
+      "initial_checks": {
+        "safe_none": true,
+        "safe_blank": true,
+        "safe_normal": true,
+        "existing_caller": true,
+        "reuse_helper": true
+      },
+      "final_checks": {
+        "safe_none": true,
+        "safe_blank": true,
+        "safe_normal": true,
+        "existing_caller": true,
+        "reuse_helper": true
+      },
+      "artifact_hashes_after": {
+        "test_names.py": "3a3da03ccd776ec25aff36238582d7538c4e6b0425186d105dd34769f02e074b",
+        "names.py": "68f839d724eec8baec9d751fd1007e1c56862ebd1c1690d8488002b6b40d13c5"
+      },
+      "deterministic_success": true,
+      "codex_home_owner_only": true,
+      "auth_copy_owner_only": true,
+      "auth_is_symlink": false
+    },
+    {
+      "lane": "EVAL-02",
+      "task": "coding",
+      "language": "en",
+      "arm": "luna_native",
+      "requested_model": "gpt-6-luna",
+      "requested_effort": "medium",
+      "candidate_zip_sha256": "c8cc308e757afafb5e5a076e45de096aa1f305e1168c926effe2d34d2a604201",
+      "plugin_installed": true,
+      "hooks_requested": true,
+      "source_hashes_before": {
+        "names.py": "f49b789ad559138e832a7c0a79103368f3e05812b46fd1065e334ac2d74e1d2d",
+        "test_names.py": "8daf5fbce693fb8b0b05c08847eef070ef493e50d29dbb9a589639916a6db344"
+      },
+      "installation": {
+        "ok": true,
+        "operations": [
+          {
+            "operation": "marketplace_add",
+            "exit_code": 0,
+            "stdout_sha256": "d4617b1aa6a7452eb7df44f8c016e25344f846d21c1de34075d08d8dabfc42bc",
+            "stderr_sha256": null,
+            "installed_version": null
+          },
+          {
+            "operation": "plugin_add",
+            "exit_code": 0,
+            "stdout_sha256": "9ee7072da5ac9f5e77a69b1ea40fc22a98ca786e799857776e635767b5de93af",
+            "stderr_sha256": null,
+            "installed_version": "1.4.0"
+          }
+        ],
+        "inventory": [
+          {
+            "id": "opensocrates@os-eval",
+            "version": "1.4.0",
+            "installed": true,
+            "enabled": true
+          }
+        ],
+        "inventory_exit_code": 0,
+        "wall_seconds": 10.025
+      },
+      "calls": [
+        {
+          "stage": "initial",
+          "client": "codex-cli 0.155.0-alpha.16.3",
+          "requested_model": "gpt-6-luna",
+          "requested_effort": "medium",
+          "command_mode": "installed_hooks",
+          "prompt_sha256": "625ebbf2ec98b2a82f32a893116fd298babe9af9be7e0ac67e5b22b85d16f878",
+          "exit_code": 0,
+          "timed_out": false,
+          "wall_seconds": 30.185,
+          "event_count": 20,
+          "malformed_event_lines": 0,
+          "stderr_sha256": "d99844447c30c06976ec6994153913234681853b115ad5cd2b29696ec046f632",
+          "hook_event_count": 0,
+          "grounding_line_claim_present": false,
+          "failure": false,
+          "thread_id": "01a0cef7-0952-7e61-9ad0-3fedb2679598",
+          "usage": {
+            "input_tokens": 98723,
+            "cached_input_tokens": 88576,
+            "output_tokens": 976,
+            "reasoning_output_tokens": 195
+          },
+          "tool_events": [
+            {
+              "type": "command_execution",
+              "command_sha256": "02cbab6ad280e67f4b3d70dc28bfe55c1849e3fa278d20ec4b0ff48ae1b13501",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "460efacbc002defb252342e75c2d50cb4a7810e5fe19f8ce09e5491241eba6d3",
+              "exit_code": 2,
+              "status": "failed",
+              "retrieval": true,
+              "policy_call": true
+            },
+            {
+              "type": "file_change",
+              "command_sha256": null,
+              "exit_code": null,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "ad2a6a6af9d5be39d2371636c4682844b4e6f701d197a7cc5a3ed7ae08e0fd22",
+              "exit_code": 1,
+              "status": "failed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "80066d7e6cdd1c877dffea7e088b39072e7503f879662bd7a0310853924085d5",
+              "exit_code": 1,
+              "status": "failed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "cd0e4ff657c8c15d431f092dfabdccedc10834ab1b233c2d63a8f845950f509a",
+              "exit_code": 128,
+              "status": "failed",
+              "retrieval": true,
+              "policy_call": false
+            }
+          ],
+          "tool_calls": 6,
+          "retrieval_calls": 3,
+          "policy_calls": 1,
+          "error_types": [],
+          "final_message_sha256": "09aa2492622206378654cddccf1bd20b5f4932546036780e5e532ca3e816bffb",
+          "side_question_observation": {
+            "rejects_proof_heuristic": false,
+            "rejects_inaccessible_heuristic": false
+          },
+          "billed_cost": null,
+          "server_echoed_model": null,
+          "native_hook_application": null
+        }
+      ],
+      "repairs": [],
+      "escalations": [],
+      "manual_bilingual_dialogue_score": null,
+      "manual_score_missing_reason": "No independent bilingual human reviewer assigned.",
+      "initial_checks": {
+        "safe_none": true,
+        "safe_blank": true,
+        "safe_normal": true,
+        "existing_caller": true,
+        "reuse_helper": true
+      },
+      "final_checks": {
+        "safe_none": true,
+        "safe_blank": true,
+        "safe_normal": true,
+        "existing_caller": true,
+        "reuse_helper": true
+      },
+      "artifact_hashes_after": {
+        "test_names.py": "8daf5fbce693fb8b0b05c08847eef070ef493e50d29dbb9a589639916a6db344",
+        "names.py": "a7258a421ed33bc25795d60f0fff5fab5116cbfa7e98d536bd55fb4da87c5ebe"
+      },
+      "deterministic_success": true,
+      "codex_home_owner_only": true,
+      "auth_copy_owner_only": true,
+      "auth_is_symlink": false
+    },
+    {
+      "lane": "EVAL-02",
+      "task": "coding",
+      "language": "en",
+      "arm": "sol_alone",
+      "requested_model": "gpt-6-sol",
+      "requested_effort": "medium",
+      "candidate_zip_sha256": null,
+      "plugin_installed": false,
+      "hooks_requested": false,
+      "source_hashes_before": {
+        "names.py": "f49b789ad559138e832a7c0a79103368f3e05812b46fd1065e334ac2d74e1d2d",
+        "test_names.py": "8daf5fbce693fb8b0b05c08847eef070ef493e50d29dbb9a589639916a6db344"
+      },
+      "installation": {
+        "ok": true,
+        "operations": [],
+        "inventory": [],
+        "inventory_exit_code": 0,
+        "wall_seconds": 17.075
+      },
+      "calls": [
+        {
+          "stage": "initial",
+          "client": "codex-cli 0.155.0-alpha.16.3",
+          "requested_model": "gpt-6-sol",
+          "requested_effort": "medium",
+          "command_mode": "hooks_disabled",
+          "prompt_sha256": "83e612bb3c0ba874a9f16d67de388235e928bc9b41b0b768a7c9d0488753cd5f",
+          "exit_code": 0,
+          "timed_out": false,
+          "wall_seconds": 28.099,
+          "event_count": 24,
+          "malformed_event_lines": 0,
+          "stderr_sha256": "9919529d932ba1d1d0a7401f2ee0730635b88991ca677249949098591b3a6cb0",
+          "hook_event_count": 0,
+          "grounding_line_claim_present": false,
+          "failure": false,
+          "thread_id": "01a0cef7-c61b-7e22-a515-7f7ad8a44bc2",
+          "usage": {
+            "input_tokens": 91008,
+            "cached_input_tokens": 86144,
+            "output_tokens": 781,
+            "reasoning_output_tokens": 104
+          },
+          "tool_events": [
+            {
+              "type": "command_execution",
+              "command_sha256": "177e59d7ca622797bd98a462402ff71b90ef408fa0b0a7a116b0f739ce9dcc0c",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "7678ae510885e9d497cebabe17b6aafa36785e52ba28bb198426fe3313613fb2",
+              "exit_code": 128,
+              "status": "failed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "152c055fbcdff49f9f4f8e3fb0f79720aff410931d0c834fea55d06b029538d8",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "b8b91141031c22856ea7805c873468bf310e7a67c02d34b4cf42973b2e238ed0",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "43aa351e1c3f58ab26f802f716324cd0044f53f7f96988423db179687d90267d",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "file_change",
+              "command_sha256": null,
+              "exit_code": null,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "0c74ffe2484ae5d30a0561b204370216fa52c920633a6776ac705e84adb1615f",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "ad2a6a6af9d5be39d2371636c4682844b4e6f701d197a7cc5a3ed7ae08e0fd22",
+              "exit_code": 1,
+              "status": "failed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "64e39e41e19410190d05b02924977e16ebfddf9217e4ffa16af2709d25c29338",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            }
+          ],
+          "tool_calls": 9,
+          "retrieval_calls": 4,
+          "policy_calls": 0,
+          "error_types": [],
+          "final_message_sha256": "9e69ec7a603342bdd80650018ce7185c528c10f14b0c7cc81d155f8a38bf1054",
+          "side_question_observation": {
+            "rejects_proof_heuristic": false,
+            "rejects_inaccessible_heuristic": false
+          },
+          "billed_cost": null,
+          "server_echoed_model": null,
+          "native_hook_application": null
+        }
+      ],
+      "repairs": [],
+      "escalations": [],
+      "manual_bilingual_dialogue_score": null,
+      "manual_score_missing_reason": "No independent bilingual human reviewer assigned.",
+      "initial_checks": {
+        "safe_none": true,
+        "safe_blank": true,
+        "safe_normal": true,
+        "existing_caller": true,
+        "reuse_helper": true
+      },
+      "final_checks": {
+        "safe_none": true,
+        "safe_blank": true,
+        "safe_normal": true,
+        "existing_caller": true,
+        "reuse_helper": true
+      },
+      "artifact_hashes_after": {
+        "test_names.py": "8daf5fbce693fb8b0b05c08847eef070ef493e50d29dbb9a589639916a6db344",
+        "names.py": "b0421da875e90ccb63ccc15ac855fb8204256dff00ec4e1189cbbc30c67d7041"
+      },
+      "deterministic_success": true,
+      "codex_home_owner_only": true,
+      "auth_copy_owner_only": true,
+      "auth_is_symlink": false
+    },
+    {
+      "lane": "EVAL-02",
+      "task": "planning",
+      "language": "en",
+      "arm": "luna_alone",
+      "requested_model": "gpt-6-luna",
+      "requested_effort": "medium",
+      "candidate_zip_sha256": null,
+      "plugin_installed": false,
+      "hooks_requested": false,
+      "source_hashes_before": {
+        "brief.json": "091145d1dfb50a98bde871bb2e5a2f163028e9cef1a7ea0c13ecf4051761df12"
+      },
+      "installation": {
+        "ok": true,
+        "operations": [],
+        "inventory": [],
+        "inventory_exit_code": 0,
+        "wall_seconds": 9.877
+      },
+      "calls": [
+        {
+          "stage": "initial",
+          "client": "codex-cli 0.155.0-alpha.16.3",
+          "requested_model": "gpt-6-luna",
+          "requested_effort": "medium",
+          "command_mode": "hooks_disabled",
+          "prompt_sha256": "720df4fe896ce79ad7c1a293c022a3cb6f7bd25665a8496d8a9bbd95c37aa8a1",
+          "exit_code": 0,
+          "timed_out": false,
+          "wall_seconds": 18.207,
+          "event_count": 9,
+          "malformed_event_lines": 0,
+          "stderr_sha256": "273f7a057757ba458e97826340a4582b7771f1de080d52182d3567f7bc3ef37d",
+          "hook_event_count": 0,
+          "grounding_line_claim_present": false,
+          "failure": false,
+          "thread_id": "01a0cef7-fb01-7140-89de-fb394f237d72",
+          "usage": {
+            "input_tokens": 43343,
+            "cached_input_tokens": 38144,
+            "output_tokens": 451,
+            "reasoning_output_tokens": 37
+          },
+          "tool_events": [
+            {
+              "type": "command_execution",
+              "command_sha256": "e3d66fcaebce5eade3d573b2a91142c4ef11904de9f0245ac3e1d33b986799f6",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "2363d44a948fb2111d5c6a7cbcde63797f1c53299df01417de77423beff48e0b",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            }
+          ],
+          "tool_calls": 2,
+          "retrieval_calls": 2,
+          "policy_calls": 0,
+          "error_types": [],
+          "final_message_sha256": "7bc510918e0a0a65e89e4e2677c6fc0ce5d141c8e3dc0b3d7bbdb6980de9fd76",
+          "side_question_observation": {
+            "rejects_proof_heuristic": false,
+            "rejects_inaccessible_heuristic": false
+          },
+          "billed_cost": null,
+          "server_echoed_model": null,
+          "native_hook_application": null
+        }
+      ],
+      "repairs": [],
+      "escalations": [],
+      "manual_bilingual_dialogue_score": null,
+      "manual_score_missing_reason": "No independent bilingual human reviewer assigned.",
+      "initial_checks": {
+        "venue_A": true,
+        "capacity_24": true,
+        "attendance_20": true,
+        "access": true,
+        "quiet_room": true,
+        "booking_action": true
+      },
+      "final_checks": {
+        "venue_A": true,
+        "capacity_24": true,
+        "attendance_20": true,
+        "access": true,
+        "quiet_room": true,
+        "booking_action": true
+      },
+      "artifact_hashes_after": {
+        "plan.json": "ed8562fed55bbbdfa95be36bbc4c1d789770197fc823d4c809dd636123d32640",
+        "brief.json": "091145d1dfb50a98bde871bb2e5a2f163028e9cef1a7ea0c13ecf4051761df12"
+      },
+      "deterministic_success": true,
+      "codex_home_owner_only": true,
+      "auth_copy_owner_only": true,
+      "auth_is_symlink": false
+    },
+    {
+      "lane": "EVAL-02",
+      "task": "planning",
+      "language": "en",
+      "arm": "luna_native",
+      "requested_model": "gpt-6-luna",
+      "requested_effort": "medium",
+      "candidate_zip_sha256": "c8cc308e757afafb5e5a076e45de096aa1f305e1168c926effe2d34d2a604201",
+      "plugin_installed": true,
+      "hooks_requested": true,
+      "source_hashes_before": {
+        "brief.json": "091145d1dfb50a98bde871bb2e5a2f163028e9cef1a7ea0c13ecf4051761df12"
+      },
+      "installation": {
+        "ok": true,
+        "operations": [
+          {
+            "operation": "marketplace_add",
+            "exit_code": 0,
+            "stdout_sha256": "d4617b1aa6a7452eb7df44f8c016e25344f846d21c1de34075d08d8dabfc42bc",
+            "stderr_sha256": null,
+            "installed_version": null
+          },
+          {
+            "operation": "plugin_add",
+            "exit_code": 0,
+            "stdout_sha256": "02e8c74fb87d807f88f689ffc04d49a6dfbbf7763b47963a0ae94380b486da9c",
+            "stderr_sha256": null,
+            "installed_version": "1.4.0"
+          }
+        ],
+        "inventory": [
+          {
+            "id": "opensocrates@os-eval",
+            "version": "1.4.0",
+            "installed": true,
+            "enabled": true
+          }
+        ],
+        "inventory_exit_code": 0,
+        "wall_seconds": 9.623
+      },
+      "calls": [
+        {
+          "stage": "initial",
+          "client": "codex-cli 0.155.0-alpha.16.3",
+          "requested_model": "gpt-6-luna",
+          "requested_effort": "medium",
+          "command_mode": "installed_hooks",
+          "prompt_sha256": "156224308aa31da9410bacd669d823409336402a651d9de28d47f2db672de871",
+          "exit_code": 0,
+          "timed_out": false,
+          "wall_seconds": 52.53,
+          "event_count": 22,
+          "malformed_event_lines": 0,
+          "stderr_sha256": "194eef87051e5801664bf81cac73d32fa8e77bc7988d9105d37fd7e43e038341",
+          "hook_event_count": 0,
+          "grounding_line_claim_present": false,
+          "failure": false,
+          "thread_id": "01a0cef8-5c9a-7010-85a1-2e6ac2de4262",
+          "usage": {
+            "input_tokens": 236674,
+            "cached_input_tokens": 210432,
+            "output_tokens": 1888,
+            "reasoning_output_tokens": 332
+          },
+          "tool_events": [
+            {
+              "type": "command_execution",
+              "command_sha256": "a5b5621b2edbd5c9e73572971c2452317682503b77b763c0673665b837436393",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": true
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "f3747417c4e056ec0bfcf09bf8bb67e3772c3fbf1e5df618f1f77df7770ceab0",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": true
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "2386340a08b32de9c11e48b6b6c36c9974b3a65aa3692d04baf9b67033ee1449",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": true
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "327639b1ab4e30bc2b865fa847beea851944ccd8e45e82a154f3401d8ae53b3a",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": true
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "90478d9bb4bd5b478d9e110ad65b5ca2cedc36089b8d3afbd12c2a74272e51e5",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": true
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "c1758313bfa75d6aa5fece306ffbd8316139626443dd685e9a5b9b21f6b1af02",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": true
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "86fc9f119d5ad714cebdd90aab5346356a9bc396a135036f9f13f11a2589e172",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            }
+          ],
+          "tool_calls": 7,
+          "retrieval_calls": 7,
+          "policy_calls": 6,
+          "error_types": [],
+          "final_message_sha256": "016bf2a37ed0b00988a216d4841f4dca66302e3ae4c95712775a473c7dbe3b37",
+          "side_question_observation": {
+            "rejects_proof_heuristic": false,
+            "rejects_inaccessible_heuristic": false
+          },
+          "billed_cost": null,
+          "server_echoed_model": null,
+          "native_hook_application": null
+        }
+      ],
+      "repairs": [],
+      "escalations": [],
+      "manual_bilingual_dialogue_score": null,
+      "manual_score_missing_reason": "No independent bilingual human reviewer assigned.",
+      "initial_checks": {
+        "venue_A": true,
+        "capacity_24": true,
+        "attendance_20": true,
+        "access": true,
+        "quiet_room": true,
+        "booking_action": true
+      },
+      "final_checks": {
+        "venue_A": true,
+        "capacity_24": true,
+        "attendance_20": true,
+        "access": true,
+        "quiet_room": true,
+        "booking_action": true
+      },
+      "artifact_hashes_after": {
+        "plan.json": "c9f1ae5d9faa65cad74c43eb1e7e324ee8909e0d4fcc2f3859954f73514474a2",
+        "brief.json": "091145d1dfb50a98bde871bb2e5a2f163028e9cef1a7ea0c13ecf4051761df12"
+      },
+      "deterministic_success": true,
+      "codex_home_owner_only": true,
+      "auth_copy_owner_only": true,
+      "auth_is_symlink": false
+    },
+    {
+      "lane": "EVAL-02",
+      "task": "planning",
+      "language": "en",
+      "arm": "sol_alone",
+      "requested_model": "gpt-6-sol",
+      "requested_effort": "medium",
+      "candidate_zip_sha256": null,
+      "plugin_installed": false,
+      "hooks_requested": false,
+      "source_hashes_before": {
+        "brief.json": "091145d1dfb50a98bde871bb2e5a2f163028e9cef1a7ea0c13ecf4051761df12"
+      },
+      "installation": {
+        "ok": true,
+        "operations": [],
+        "inventory": [],
+        "inventory_exit_code": 0,
+        "wall_seconds": 11.278
+      },
+      "calls": [
+        {
+          "stage": "initial",
+          "client": "codex-cli 0.155.0-alpha.16.3",
+          "requested_model": "gpt-6-sol",
+          "requested_effort": "medium",
+          "command_mode": "hooks_disabled",
+          "prompt_sha256": "720df4fe896ce79ad7c1a293c022a3cb6f7bd25665a8496d8a9bbd95c37aa8a1",
+          "exit_code": 0,
+          "timed_out": false,
+          "wall_seconds": 18.707,
+          "event_count": 9,
+          "malformed_event_lines": 0,
+          "stderr_sha256": "07179a468e8c9495a92f738907592d8211b409fa69b5f5e2df91e449c3154906",
+          "hook_event_count": 0,
+          "grounding_line_claim_present": false,
+          "failure": false,
+          "thread_id": "01a0cef8-71c7-7340-b132-a68ba73852f9",
+          "usage": {
+            "input_tokens": 43987,
+            "cached_input_tokens": 37632,
+            "output_tokens": 593,
+            "reasoning_output_tokens": 43
+          },
+          "tool_events": [
+            {
+              "type": "command_execution",
+              "command_sha256": "e3d66fcaebce5eade3d573b2a91142c4ef11904de9f0245ac3e1d33b986799f6",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "94c9ffc5e91aa0f9680d7d358bcc7a85c586362c50eb0167daa85b400ad89040",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            }
+          ],
+          "tool_calls": 2,
+          "retrieval_calls": 2,
+          "policy_calls": 0,
+          "error_types": [],
+          "final_message_sha256": "33d15ad2f51c2ce4a933314178f4b37ccc27dceb0849a1473e0220b7a520e544",
+          "side_question_observation": {
+            "rejects_proof_heuristic": false,
+            "rejects_inaccessible_heuristic": false
+          },
+          "billed_cost": null,
+          "server_echoed_model": null,
+          "native_hook_application": null
+        }
+      ],
+      "repairs": [],
+      "escalations": [],
+      "manual_bilingual_dialogue_score": null,
+      "manual_score_missing_reason": "No independent bilingual human reviewer assigned.",
+      "initial_checks": {
+        "venue_A": true,
+        "capacity_24": true,
+        "attendance_20": true,
+        "access": true,
+        "quiet_room": true,
+        "booking_action": true
+      },
+      "final_checks": {
+        "venue_A": true,
+        "capacity_24": true,
+        "attendance_20": true,
+        "access": true,
+        "quiet_room": true,
+        "booking_action": true
+      },
+      "artifact_hashes_after": {
+        "plan.json": "41d1edd5ced4d3ce65b922839e4aa14987e4bd960f1538f9dc29a576d48fcb0e",
+        "brief.json": "091145d1dfb50a98bde871bb2e5a2f163028e9cef1a7ea0c13ecf4051761df12"
+      },
+      "deterministic_success": true,
+      "codex_home_owner_only": true,
+      "auth_copy_owner_only": true,
+      "auth_is_symlink": false
+    }
+  ]
+}
