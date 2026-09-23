@@ -1,0 +1,60 @@
+{
+  "schema": "opensocrates.v1.5.native-plugin-pilot-freeze/1.0.0",
+  "revision": 1,
+  "status": "frozen_before_native_outcomes",
+  "source_commit": "efeb436aeb80dabd9a3df9571e66a3de280eadad",
+  "prior_proxy_results_are_separate": true,
+  "protocol_path": "evals/v1.5/protocol.json",
+  "task_manifest_path": "evals/v1.5/pilot-execution-freeze.json",
+  "task_manifest_sha256": "a1065c38474c345610740acbf45e95f78354a5332262fe3ca51cea44aed899a0",
+  "task_source_prompt_rubric": "Use the frozen task files, English/Korean requests, follow-up changes, deterministic checks, and rubric in the task manifest without changing them after this freeze.",
+  "client": {
+    "path": "/Applications/ChatGPT.app/Contents/Resources/codex",
+    "version": "codex-cli 0.155.0-alpha.16.3",
+    "auth": "Copy the existing ChatGPT auth bytes to mode-0600 auth.json in an owner-only disposable CODEX_HOME. Never symlink or mutate the global auth file. Remove the copy with the profile after the cell.",
+    "home_isolation": "Set HOME and CODEX_HOME to owner-only disposable directories for each cell; set TMPDIR to its disposable temp directory. No active plugin, global settings, or real project enrollment.",
+    "sandbox": "workspace-write in the synthetic fixture for initial and resumed turns; skip Git check for disposable non-Git fixture",
+    "effort": "medium",
+    "max_parallel_cells": 2,
+    "per_turn_wall_seconds": 300,
+    "automatic_retries": 0,
+    "billing": "No new key or paid API service; subscription usage is not an invoice. Missing billing is null."
+  },
+  "candidate_zip": {
+    "path": "/Users/parkerhwang/Documents/OpenSource/OpenSocrates-v1.5.0-implementation/dist/opensocrates-1.4.0-codex-plugin.zip",
+    "sha256": "c8cc308e757afafb5e5a076e45de096aa1f305e1168c926effe2d34d2a604201",
+    "plugin_manifest_name": "opensocrates",
+    "plugin_manifest_version": "1.4.0",
+    "marketplace_name": "os-eval",
+    "installation": "Extract the pinned ZIP into a disposable local marketplace, register that marketplace in each treatment CODEX_HOME, and install opensocrates@os-eval using the bundled CLI. Confirm installed=true and enabled=true by plugin list before the outcome call. Do not install in the active profile.",
+    "hook_trust": "For the pinned ZIP in a disposable profile only, use --dangerously-bypass-hook-trust on native treatment turns so noninteractive Codex can execute installed hooks. The ablation disables hooks. If delivery/application cannot be observed, mark it unverified."
+  },
+  "common_prompt": "Complete the requested artifact in this disposable folder. Use the available shell for relevant checks. Respect every stated requirement and report only verified completion.",
+  "native_prompt_addition": "Use the installed $opensocrates skill for any material judgment in this task. Follow its mechanical-work bypass when the task is only a typo edit. Do not enroll project memory. Keep the selected model and effort. Complete the requested artifact and required checks.",
+  "arms": {
+    "EVAL-02": [
+      {"id": "luna_alone", "model": "gpt-6-luna", "plugin": false, "hooks": false},
+      {"id": "luna_native", "model": "gpt-6-luna", "plugin": true, "hooks": true},
+      {"id": "sol_alone", "model": "gpt-6-sol", "plugin": false, "hooks": false}
+    ],
+    "EVAL-03": [
+      {"id": "sol_alone", "model": "gpt-6-sol", "plugin": false, "hooks": false},
+      {"id": "sol_ablation", "model": "gpt-6-sol", "plugin": true, "hooks": false},
+      {"id": "sol_native", "model": "gpt-6-sol", "plugin": true, "hooks": true},
+      {"id": "astra_alone", "model": "gpt-6-astra", "plugin": false, "hooks": false},
+      {"id": "astra_ablation", "model": "gpt-6-astra", "plugin": true, "hooks": false},
+      {"id": "astra_native", "model": "gpt-6-astra", "plugin": true, "hooks": true}
+    ],
+    "EVAL-05": [
+      {"id": "alone", "model": "gpt-6-sol", "plugin": false, "hooks": false},
+      {"id": "native", "model": "gpt-6-sol", "plugin": true, "hooks": true}
+    ]
+  },
+  "scheduled_cells": {
+    "EVAL-02": "coding and planning x three arms = six one-turn cells",
+    "EVAL-03": "mechanical x six arms = six one-turn cells",
+    "EVAL-05": "developer and nondeveloper x English/Korean x two arms = eight two-turn cells"
+  },
+  "comparison_controls": "For each matched task/language, fixture bytes, request semantics, tool access, model effort, sandbox, and per-turn limit are fixed. EVAL-03 ablation/native both install the same ZIP and receive the same skill prompt; only native hooks differ. No memory enrollment or stronger-model subagent. Standard task instructions are retained in every baseline.",
+  "outcomes": "Keep every install, initial turn, correction turn, failure, timeout, repair, tool, retrieval, policy call, token category, artifact check, and missing value. No automatic retries or model substitutions. Deterministic artifact checks use the earlier frozen task manifest; bilingual dialogue quality requires a separate human review and remains null without one. No held-out, profile-validation, quality gain, noninferiority, or savings claim follows from this pilot."
+}
