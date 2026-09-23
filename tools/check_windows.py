@@ -51,6 +51,73 @@ def _set_disposable_git_owner(git_directory: Path) -> None:
 
 @unittest.skipUnless(sys.platform == "win32", "native Windows regression")
 class WindowsChecks(unittest.TestCase):
+    def test_project_memory_wal_sidecars_fail_closed_and_delete_exactly(self):
+        from opensocrates.project_memory.registry import ProjectRegistry
+        from opensocrates.project_memory.service import handle_memory
+
+        with tempfile.TemporaryDirectory(prefix="OpenSocrates WAL lifecycle ") as name:
+            parent = Path(name)
+            source = parent / "plain-text"
+            self.assertTrue(create_owner_only_directory(source))
+            registry = ProjectRegistry(parent / "owned-data")
+            policy = {
+                "root": str(source),
+                "apply": False,
+                "mode": "read_write",
+                "capture_policy": "milestones",
+                "excluded_paths": [],
+            }
+
+            def call(operation, payload, project_id=None, workspace_id=None):
+                return handle_memory(
+                    {
+                        "schema": "opensocrates.project-memory.request/1.0.0",
+                        "operation": operation,
+                        "request_id": str(uuid4()),
+                        "project_id": project_id,
+                        "workspace_id": workspace_id,
+                        "task_id": None,
+                        "payload": payload,
+                    },
+                    registry=registry,
+                )
+
+            preview = call("init", policy)
+            self.assertEqual(preview["status"], "ok", preview)
+            policy.update(
+                {
+                    "apply": True,
+                    "disclosure_digest": preview["result"]["disclosure_digest"],
+                    "authorization_basis": "fixture:windows-wal",
+                    "authorization_attribution": "operator_declared",
+                    "idempotency_key": str(uuid4()),
+                }
+            )
+            enrolled = call("init", policy)
+            self.assertEqual(enrolled["status"], "ok", enrolled)
+            project_id = enrolled["result"]["project_id"]
+            workspace_id = enrolled["result"]["workspace_id"]
+            directory = registry.project_dir(project_id)
+            for suffix in ("-wal", "-shm"):
+                descriptor = create_owner_only_file(
+                    directory / f"memory.sqlite3{suffix}", flags=os.O_RDWR
+                )
+                os.close(descriptor)
+            status = call("status", {}, project_id, workspace_id)
+            self.assertEqual(status["status"], "unavailable", status)
+            self.assertIn("unsupported_journal_mode", status["limitations"])
+            deleted = call(
+                "delete",
+                {
+                    "intent": "delete_project",
+                    "expected_policy_version": 1,
+                    "idempotency_key": str(uuid4()),
+                },
+                project_id,
+            )
+            self.assertEqual(deleted["status"], "ok", deleted)
+            self.assertFalse(directory.exists())
+
     def test_project_memory_linked_worktree_continuity(self):
         from opensocrates.project_memory.registry import ProjectRegistry
         from opensocrates.project_memory.service import handle_memory
