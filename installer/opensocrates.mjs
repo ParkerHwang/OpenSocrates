@@ -95,6 +95,10 @@ const CODEX_APP_SERVER_TERMINATION_MILLISECONDS = 1_000;
 const MAX_CODEX_APP_SERVER_LINE_BYTES = 256 * 1024;
 const MAX_CODEX_APP_SERVER_OUTPUT_BYTES = 1024 * 1024;
 const MAX_CODEX_APP_SERVER_NOTIFICATIONS = 128;
+const MEMORY_REQUEST_SCHEMA = "opensocrates.project-memory.request/1.0.0";
+const MEMORY_RESPONSE_SCHEMA = "opensocrates.project-memory.response/1.0.0";
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 
 // Keep host security state separate from installer-owned payload cleanup so an
 // explicit trust reset can fail without weakening purge path-ownership checks.
@@ -1635,6 +1639,8 @@ export function parseCli(argv) {
     force: false,
     purge: false,
     resetTrust: false,
+    deleteProjectMemory: null,
+    memoryPolicyVersion: null,
   };
   const seenOptions = new Set();
   while (args.length > 0) {
@@ -1670,6 +1676,30 @@ export function parseCli(argv) {
     if (flag === "--reset-trust") {
       seenOptions.add("reset-trust");
       options.resetTrust = true;
+      continue;
+    }
+    if (flag === "--delete-project-memory") {
+      if (seenOptions.has("delete-project-memory")) {
+        fail("--delete-project-memory may be supplied once");
+      }
+      seenOptions.add("delete-project-memory");
+      const projectId = args.shift();
+      if (!projectId || !UUID_PATTERN.test(projectId)) {
+        fail("--delete-project-memory requires a project UUID");
+      }
+      options.deleteProjectMemory = projectId.toLowerCase();
+      continue;
+    }
+    if (flag === "--memory-policy-version") {
+      if (seenOptions.has("memory-policy-version")) {
+        fail("--memory-policy-version may be supplied once");
+      }
+      seenOptions.add("memory-policy-version");
+      const raw = args.shift();
+      if (!/^[1-9]\d*$/u.test(raw ?? "") || !Number.isSafeInteger(Number(raw))) {
+        fail("--memory-policy-version requires a positive safe integer");
+      }
+      options.memoryPolicyVersion = Number(raw);
       continue;
     }
     if (flag === "--channel") {
@@ -1776,6 +1806,12 @@ export function parseCli(argv) {
     fail("--reset-trust is only valid with --host codex or --host all");
   }
   if (
+    seenOptions.has("delete-project-memory") !== seenOptions.has("memory-policy-version") ||
+    (seenOptions.has("delete-project-memory") && (options.action !== "remove" || !options.purge))
+  ) {
+    fail("--delete-project-memory and --memory-policy-version must be paired with remove --purge");
+  }
+  if (
     seenOptions.has("host") &&
     options.action === "auto-update" &&
     new Set(["status", "disable"]).has(options.autoUpdateAction)
@@ -1795,7 +1831,8 @@ Usage:
   opensocrates install [--host codex|all] [--asset ZIP --checksum FILE]
   opensocrates status [--host codex|all]
   opensocrates update [--host codex|all] [--asset ZIP --checksum FILE]
-  opensocrates remove [--host codex|all] [--purge [--reset-trust]]
+  opensocrates remove [--host codex|all] [--purge [--reset-trust]
+      [--delete-project-memory PROJECT_UUID --memory-policy-version VERSION]]
   opensocrates verify [--host codex|all] [--asset ZIP --checksum FILE]
   opensocrates auto-update enable [--host codex|all]
       [--channel stable|next] [--interval-hours ${AUTO_UPDATE_DEFAULT_INTERVAL_HOURS}]
@@ -1817,6 +1854,10 @@ option removes only the seven canonical OpenSocrates trust entries. Registration
 payload cleanup, host security trust, and user history are reported separately.
 User history is always preserved. Any unverified, unsafe, or in-use component is
 reported as pending.
+Enrolled project memory is preserved by default. The paired memory options ask
+the installed memory command to delete exactly one enrolled project using its
+current policy version. Read that version with the memory status command first.
+An unavailable, changed, or incomplete memory deletion leaves purge incomplete.
 `);
 }
 
@@ -3972,10 +4013,90 @@ async function completePurgeStateFinalization(plan, result, options) {
   }
 }
 
+async function deleteSelectedProjectMemory(options) {
+  const paths = purgePathsFor("codex");
+  if (!(await entryExists(paths.root))) fail("installed OpenSocrates memory runtime is unavailable");
+  await requireSafePathBelow(paths.hostHome, paths.root, "OpenSocrates memory runtime");
+  const identity = await verifyManagedTreeForPurge("codex", paths.root);
+  const launcherName = process.platform === "win32" ? "bin/launch.mjs" : "bin/launch.sh";
+  if (!identity.files.includes(launcherName)) {
+    fail("installed OpenSocrates package does not declare a memory launcher");
+  }
+  const launcher = join(paths.plugin, ...launcherName.split("/"));
+  await requireRegularFileEntry(launcher, "OpenSocrates memory launcher");
+  const requestId = randomUUID();
+  const request = {
+    schema: MEMORY_REQUEST_SCHEMA,
+    operation: "delete",
+    request_id: requestId,
+    project_id: options.deleteProjectMemory,
+    workspace_id: null,
+    task_id: null,
+    payload: {
+      intent: "delete_project",
+      idempotency_key: randomUUID(),
+      expected_policy_version: options.memoryPolicyVersion,
+    },
+  };
+  const command = process.platform === "win32" ? process.execPath : "/bin/sh";
+  const args = [launcher, "memory", "codex"];
+  const child = spawnSync(command, args, {
+    input: `${JSON.stringify(request)}\n`,
+    encoding: "utf8",
+    timeout: 15_000,
+    maxBuffer: 256 * 1024,
+    windowsHide: true,
+  });
+  if (child.error || child.status !== 0 || child.signal || !child.stdout) {
+    fail("installed memory command did not confirm project deletion");
+  }
+  let response;
+  try {
+    response = JSON.parse(child.stdout);
+  } catch {
+    fail("installed memory command returned an invalid deletion response");
+  }
+  if (
+    response?.schema !== MEMORY_RESPONSE_SCHEMA ||
+    response.request_id !== requestId ||
+    response.status !== "ok" ||
+    response.result?.deleted_project_id !== options.deleteProjectMemory ||
+    response.result?.registration_removed !== true
+  ) {
+    const limitation = Array.isArray(response?.limitations) &&
+      response.limitations.includes("unknown_managed_files_preserved")
+      ? " (unknown project files were preserved)"
+      : "";
+    fail(`installed memory command did not confirm complete project deletion${limitation}`);
+  }
+  return {
+    component: "project-memory",
+    status: "removed",
+    projectId: options.deleteProjectMemory,
+  };
+}
+
 async function runPurgeLocked(options) {
   const hosts = options.host === ALL_HOST ? SUPPORTED_HOSTS : [options.host];
   const result = createPurgeResult(hosts, { resetTrust: options.resetTrust });
   const desired = await readDesiredState();
+  if (options.deleteProjectMemory !== null) {
+    try {
+      result.finalization.components.push(await deleteSelectedProjectMemory(options));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      result.finalization.components.push({
+        component: "project-memory",
+        status: "pending",
+        projectId: options.deleteProjectMemory,
+        detail: message,
+      });
+      result.finalization.errors.push(message);
+      result.finalization.status = "deferred";
+      result.status = "partial";
+      return { result, stateFinalization: null };
+    }
+  }
   for (const hostResult of result.hosts) await purgeOneHost(hostResult, options);
   const nextDesired = await updatePurgeDesiredState(options, desired, result);
   const hostsComplete = result.hosts.every((item) => item.status === "complete");
@@ -4057,14 +4178,26 @@ function reportPurgeResult(result) {
       );
     }
   }
+  const memory = result.finalization.components.find((item) => item.component === "project-memory");
+  if (memory?.status === "removed") {
+    console.log(`Project memory deletion confirmed for ${memory.projectId}.`);
+  } else if (memory === undefined) {
+    console.log("Enrolled project memory was preserved.");
+  }
   if (result.status === "complete") {
     console.log("OpenSocrates purge completed for registrations and provably owned payloads.");
-    console.log("User task, project, chat, plan, and history data was preserved.");
+    console.log("Other user task, project, chat, plan, and history data was preserved.");
   } else {
     console.error("OpenSocrates purge is incomplete; no complete-uninstall success is claimed.");
-    console.error(
-      "Resolve the reported item, close active hosts if needed, and rerun the same purge command.",
-    );
+    if (memory?.status === "removed") {
+      console.error(
+        "Project memory was deleted. Resolve the reported item and rerun remove --purge without the memory deletion options.",
+      );
+    } else {
+      console.error(
+        "Resolve the reported item, close active hosts if needed, and rerun the same purge command.",
+      );
+    }
   }
 }
 

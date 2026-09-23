@@ -131,6 +131,15 @@ test("parses lifecycle actions and paired local asset options", () => {
   assert.equal(purge.host, "all");
   assert.equal(purge.purge, true);
   assert.equal(purge.resetTrust, false);
+  assert.equal(purge.deleteProjectMemory, null);
+  assert.equal(purge.memoryPolicyVersion, null);
+  const projectId = "12345678-1234-4234-8234-123456789abc";
+  const memoryPurge = parseCli([
+    "remove", "--purge", "--delete-project-memory", projectId,
+    "--memory-policy-version", "3",
+  ]);
+  assert.equal(memoryPurge.deleteProjectMemory, projectId);
+  assert.equal(memoryPurge.memoryPolicyVersion, 3);
   const trustReset = parseCli(["remove", "--host", "codex", "--purge", "--reset-trust"]);
   assert.equal(trustReset.resetTrust, true);
   assert.equal(parseCli(["remove", "--host", "all", "--purge", "--reset-trust"]).resetTrust, true);
@@ -142,6 +151,12 @@ test("parses lifecycle actions and paired local asset options", () => {
     ["remove", "--reset-trust"],
     ["install", "--purge", "--reset-trust"],
     ["remove", "--host", "claude", "--purge", "--reset-trust"],
+    ["remove", "--purge", "--delete-project-memory", projectId],
+    ["remove", "--purge", "--memory-policy-version", "3"],
+    ["remove", "--delete-project-memory", projectId, "--memory-policy-version", "3"],
+    ["install", "--purge", "--delete-project-memory", projectId, "--memory-policy-version", "3"],
+    ["remove", "--purge", "--delete-project-memory", "../other", "--memory-policy-version", "3"],
+    ["remove", "--purge", "--delete-project-memory", projectId, "--memory-policy-version", "0"],
   ]) {
     assert.throws(
       () => parseCli(invalid),
