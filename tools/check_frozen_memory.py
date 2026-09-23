@@ -239,7 +239,11 @@ def main() -> int:
                 project_id,
             ),
         )
-        assert deleted["status"] == "ok" and deleted["result"]["registration_removed"]
+        assert deleted["status"] == "ok" and deleted["result"]["registration_removed"], {
+            "status": deleted["status"],
+            "limitations": deleted["limitations"],
+            "result": deleted["result"],
+        }
         assert not database.exists()
         if args.package:
             package = args.package
