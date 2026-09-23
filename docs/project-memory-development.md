@@ -58,6 +58,9 @@ PYTHONPATH=src uv run --locked --no-sync python tools/check_project_memory.py
 PYTHONPATH=src uv run --locked --no-sync python tools/check_memory_sources.py
 ```
 
-These tests verify specific contracts. Native Windows ownership/reparse
-behavior, live Codex use, and task-quality improvement require separate
-evidence under [the v1.5 evaluation plan](v1.5.0/06-verification-and-evaluation.md).
+These tests verify specific contracts. A synthetic Windows x64 local-drive
+source/reparse, ACL/journal, frozen SQLite, and deletion run passed at commit
+`628d227` ([CI run](https://github.com/ParkerHwang/OpenSocrates/actions/runs/35825905649)).
+Windows linked-worktree continuation, live Codex use, and task-quality
+improvement still require separate evidence under
+[the v1.5 evaluation plan](v1.5.0/06-verification-and-evaluation.md).

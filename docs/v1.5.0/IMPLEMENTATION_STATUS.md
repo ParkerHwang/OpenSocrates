@@ -21,13 +21,18 @@ was carried onto a focused branch without changing protected `main`.
   and opt-in installer memory deletion have source fixture coverage. Interrupted
   migration and native Windows adversarial cases still need evidence.
 - W7: source/package generation and Apple Silicon frozen-memory fixture are
-  exercised. The candidate Windows reader now pins local-drive roots and
-  rejects reparse components; native Windows memory fixtures and P02 evidence
-  are pending. Live Codex memory use is also pending.
+  exercised. Hosted Windows x64 run `35825905649` at `628d227` passed its
+  local-drive source/reparse fixture, frozen SQLite enrollment, source
+  freshness, cold recall, deletion, ACL/journal checks, and native package
+  checks. This is synthetic non-Git native evidence; Windows linked-worktree
+  continuation, clean-machine behavior, and live Codex memory use remain
+  unverified.
 - W8: five evaluation lane protocols and pilot scenarios are frozen before any
   outcomes. No model-quality or efficiency outcomes have been run.
-- W9: final independent review, exact-commit source checks, and a Draft PR
-  handoff are in progress.
+- W9: independent review repaired four source/privacy defects. Draft PR
+  [#95](https://github.com/ParkerHwang/OpenSocrates/pull/95) and issue
+  [#94](https://github.com/ParkerHwang/OpenSocrates/issues/94) carry the
+  exact-commit handoff; remaining gates keep the PR in Draft.
 
 ## Evidence boundary
 
