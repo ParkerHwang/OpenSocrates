@@ -159,7 +159,13 @@ def _git_state(root: Path) -> dict[str, object]:
     if _git(root, "rev-parse", "--is-inside-work-tree").strip() != b"true":
         raise ValueError("git_unavailable")
     top = Path(os.fsdecode(_git(root, "rev-parse", "--show-toplevel").strip())).resolve()
-    if top != root:
+    if os.name == "nt":
+        from opensocrates.windows_security import open_source_root
+
+        with open_source_root(top) as reported, open_source_root(root) as requested:
+            if reported.identity != requested.identity:
+                raise ValueError("identity_mismatch")
+    elif top != root:
         raise ValueError("identity_mismatch")
     head = _git(root, "rev-parse", "HEAD").decode("ascii").strip()
     ref_result = subprocess.run(
