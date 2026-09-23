@@ -86,3 +86,17 @@ The document validator and local link checker were rerun for the extension:
 and 66 link entries processed with no reported failures. Ten external links were
 not fetched by that checker.
 The staged diff was checked for whitespace errors before the recording commit.
+
+## Final audience extension on 2026-09-23
+
+Added the non-developer ChatGPT audience concept rehearsal and an audience-question
+comparison in the rehearsal index. The pitch explicitly separated the current
+Codex-focused proposal from possible ordinary-ChatGPT extensions. The record also
+distinguishes moderator-supplied interaction examples from the personas' opinions.
+
+The documentation checks passed with 16 Markdown documents, three JSON examples,
+37 acceptance-case references, and 72 link entries processed without reported
+failures. Twelve external links were not fetched by the local checker. Official
+ChatGPT quickstart and memory documentation were separately read for platform
+context. No real audience research, new runtime behavior, or ChatGPT integration
+was claimed by these checks.
