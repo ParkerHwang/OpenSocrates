@@ -28,16 +28,19 @@ was carried onto a focused branch without changing protected `main`.
   exercised, including actual schema migration and backup in frozen binaries.
   Hosted CI `35878192625` passed linked-worktree, reparse, owner ACL/journal,
   migration/deletion, source freshness, and native package fixtures on Windows
-  x64 and Apple Silicon. A disposable candidate ZIP with recorded hashes was
-  installed under a new `CODEX_HOME`; two live `gpt-6-sol`/medium tasks retrieved
-  an accepted synthetic decision and completed a dependent plan, including with
-  hooks disabled. Pack application remains `unverified`; observed artifacts are
-  the narrower behavior evidence. The ZIP is ignored build output, so its hash
-  is recorded separately from source-commit provenance. Clean-machine live
+  x64 and Apple Silicon. A revised-guide candidate ZIP (SHA-256
+  `669593ef3edacfdffe6376012bec7a0a6a83087f45b619ce39c64d4e0dbc4e14`)
+  was installed under a new disposable `CODEX_HOME`; two ephemeral live
+  `gpt-6-sol`/medium tasks each retrieved the accepted synthetic decision once
+  and completed a dependent plan, including with hooks disabled. Pack
+  application remains `unverified`; observed artifacts are the narrower
+  behavior evidence. The ZIP is ignored build output, so its hash is recorded
+  separately from source-commit provenance. Clean-machine live
   Windows Codex use and destructive account-home lifecycle remain unverified.
   The host's `/usr/local/bin/codex` 0.145.0 rejected GPT-6 cells, while the
   ChatGPT desktop-bundled CLI 0.155.0-alpha.16.3 completed Luna/Sol/Astra
-  medium access probes. These are client-specific observations.
+  medium access probes. These are client-specific observations; see the
+  [revised host receipt](../../evals/v1.5/host-feasibility-2026-09-24-r2.json).
 - W8: five evaluation lane protocols and pilot scenarios are frozen before any
   outcomes. The bounded engineering pilot now has 40 model/collaboration cells
   across separate prompt-proxy and installed-plugin EVAL-02/03/05 runs, nine

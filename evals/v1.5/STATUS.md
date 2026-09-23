@@ -6,6 +6,8 @@ calls would break the frozen-hash receipts. Run
 `python evals/v1.5/verify_pilot_results.py` to check frozen hashes, scheduled
 cell counts, source equality, declared missingness, and privacy-safe result
 shape without calling a model.
+The [held-out readiness note](HELD_OUT_READINESS.md) lists the concrete
+missing inputs before a separate outcome protocol can be frozen.
 
 | Lane | Bounded pilot evidence | What it does not establish |
 | --- | --- | --- |
@@ -28,6 +30,12 @@ The installed-plugin pilot is pinned to the **pre-repair** candidate ZIP SHA-256
 `c8cc308e757afafb5e5a076e45de096aa1f305e1168c926effe2d34d2a604201`.
 The guide-repair replay uses a later candidate ZIP SHA-256
 `7728ec26bcea3a63225e5319e508c175d2257511f38685defca9d811c9ba780b`.
+The separate [revised H02 host receipt](host-feasibility-2026-09-24-r2.json)
+froze the subsequently rebuilt ignored ZIP SHA-256
+`669593ef3edacfdffe6376012bec7a0a6a83087f45b619ce39c64d4e0dbc4e14`
+and observed explicit installed-pack retrieval in both an ephemeral normal
+session and an ephemeral hooks-disabled session. These archive identities are
+separate receipts even though both contain guide revision 2.
 Do not pool these treatments or infer that the guide revision caused a general
 quality gain. Profiles remain `candidate`; no held-out sample size or numerical
 margin has been frozen or run. The Draft PR handoff must retain those limits.
