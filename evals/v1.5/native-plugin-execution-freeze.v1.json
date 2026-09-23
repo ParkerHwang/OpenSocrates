@@ -14,6 +14,7 @@
     "auth": "Copy the existing ChatGPT auth bytes to mode-0600 auth.json in an owner-only disposable CODEX_HOME. Never symlink or mutate the global auth file. Remove the copy with the profile after the cell.",
     "home_isolation": "Set HOME and CODEX_HOME to owner-only disposable directories for each cell; set TMPDIR to its disposable temp directory. No active plugin, global settings, or real project enrollment.",
     "sandbox": "workspace-write in the synthetic fixture for initial and resumed turns; skip Git check for disposable non-Git fixture",
+    "subagents": "Pass --disable multi_agent in every arm. Do not spawn agents or change model inside a cell.",
     "effort": "medium",
     "max_parallel_cells": 2,
     "per_turn_wall_seconds": 300,
@@ -29,7 +30,7 @@
     "installation": "Extract the pinned ZIP into a disposable local marketplace, register that marketplace in each treatment CODEX_HOME, and install opensocrates@os-eval using the bundled CLI. Confirm installed=true and enabled=true by plugin list before the outcome call. Do not install in the active profile.",
     "hook_trust": "For the pinned ZIP in a disposable profile only, use --dangerously-bypass-hook-trust on native treatment turns so noninteractive Codex can execute installed hooks. The ablation disables hooks. If delivery/application cannot be observed, mark it unverified."
   },
-  "common_prompt": "Complete the requested artifact in this disposable folder. Use the available shell for relevant checks. Respect every stated requirement and report only verified completion.",
+  "common_prompt": "Complete the requested artifact in this disposable folder. Use the available shell for relevant checks. Respect every stated requirement and report only verified completion. Do not spawn another agent or change model.",
   "native_prompt_addition": "Use the installed $opensocrates skill for any material judgment in this task. Follow its mechanical-work bypass when the task is only a typo edit. Do not enroll project memory. Keep the selected model and effort. Complete the requested artifact and required checks.",
   "arms": {
     "EVAL-02": [
