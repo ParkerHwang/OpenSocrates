@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 import time
@@ -336,8 +337,9 @@ def run_cell(
         fixture = base / "fixture"
         fixture.mkdir()
         home = base / "codex-home"
-        home.mkdir()
-        (home / "auth.json").symlink_to(AUTH)
+        home.mkdir(mode=0o700)
+        shutil.copyfile(AUTH, home / "auth.json")
+        (home / "auth.json").chmod(0o600)
         for filename, content in task["files"].items():
             (fixture / filename).write_text(content, encoding="utf-8")
         before_hashes = {name: digest(content) for name, content in task["files"].items()}

@@ -31,3 +31,11 @@ The guide-repair replay uses a later candidate ZIP SHA-256
 Do not pool these treatments or infer that the guide revision caused a general
 quality gain. Profiles remain `candidate`; no held-out sample size or numerical
 margin has been frozen or run. The Draft PR handoff must retain those limits.
+
+The original prompt-proxy pilot runner used an auth symlink inside its
+disposable profile. Its completed receipts remain unchanged and there is no
+evidence that the global auth bytes changed during those calls, but that path
+could have allowed a client refresh to write through the link. After the pilot,
+the runner was hardened to copy the existing auth into a mode-0700 disposable
+profile as a mode-0600 file, matching the installed-plugin and memory pilots.
+Do not reinterpret the earlier runs as if they used the later isolation setup.
