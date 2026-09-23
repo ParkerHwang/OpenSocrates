@@ -102,9 +102,12 @@ class MemoryStore:
             raise StoreError("permission_denied")
         if self.lock_path.exists():
             _regular_private(self.lock_path)
+        journal = self.project_dir / "memory.sqlite3-journal"
+        if journal.exists():
+            _regular_private(journal)
 
     @contextmanager
-    def connect(self, *, write: bool = False, create: bool = False) -> Iterator[sqlite3.Connection]:
+    def connect(self, *, write: bool = False, create: bool = False) -> Iterator[sqlite3.Connection]:  # noqa: C901  # Owner-only DB and journal checks surround the transaction.
         self._check_parent()
         if not self.path.exists():
             if not create:
@@ -112,6 +115,12 @@ class MemoryStore:
             descriptor = create_owner_only_file(self.path, flags=os.O_RDWR)
             os.close(descriptor)
         _regular_private(self.path)
+        journal = self.project_dir / "memory.sqlite3-journal"
+        if write:
+            if not journal.exists():
+                descriptor = create_owner_only_file(journal, flags=os.O_RDWR)
+                os.close(descriptor)
+            _regular_private(journal)
         before = self.path.lstat()
         uri = self.path.as_uri() + ("?mode=rw" if write or create else "?mode=ro")
         try:
@@ -121,8 +130,8 @@ class MemoryStore:
             connection.execute("PRAGMA foreign_keys=ON")
             connection.execute("PRAGMA secure_delete=ON")
             if write:
-                mode = connection.execute("PRAGMA journal_mode").fetchone()[0]
-                if str(mode).lower() != "delete":
+                mode = connection.execute("PRAGMA journal_mode=TRUNCATE").fetchone()[0]
+                if str(mode).lower() != "truncate":
                     raise StoreError("unsupported_journal_mode")
             after = self.path.lstat()
             if (before.st_dev, before.st_ino) != (after.st_dev, after.st_ino):
@@ -135,7 +144,6 @@ class MemoryStore:
                 connection.close()
             if self.path.exists():
                 _regular_private(self.path)
-            journal = self.project_dir / "memory.sqlite3-journal"
             if journal.exists():
                 _regular_private(journal)
 

@@ -10,6 +10,7 @@ import sqlite3
 import stat
 import subprocess
 import tempfile
+from contextlib import closing
 from pathlib import Path
 from uuid import uuid4
 
@@ -198,16 +199,20 @@ def main() -> int:
             assert stat.S_IMODE(database.stat().st_mode) == 0o600
             assert stat.S_IMODE(lock_file.stat().st_mode) == 0o600
             assert stat.S_IMODE(registry_file.stat().st_mode) == 0o600
-        with sqlite3.connect(database) as connection:
-            connection.execute("BEGIN IMMEDIATE")
-            connection.execute("UPDATE meta SET value='fixture-probe' WHERE key='schema_version'")
-            journal = data_root / "projects" / project_id / "memory.sqlite3-journal"
-            assert journal.exists()
-            if os.name == "nt":
-                assert check_permissions(journal, directory=False).write_allowed
-            else:
-                assert stat.S_IMODE(journal.stat().st_mode) == 0o600
-            connection.rollback()
+        with closing(sqlite3.connect(database)) as connection:
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                connection.execute(
+                    "UPDATE meta SET value='fixture-probe' WHERE key='schema_version'"
+                )
+                journal = data_root / "projects" / project_id / "memory.sqlite3-journal"
+                assert journal.exists()
+                if os.name == "nt":
+                    assert check_permissions(journal, directory=False).write_allowed
+                else:
+                    assert stat.S_IMODE(journal.stat().st_mode) == 0o600
+            finally:
+                connection.rollback()
         exported = run(
             binary,
             env,
