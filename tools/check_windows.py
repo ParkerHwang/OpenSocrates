@@ -38,6 +38,49 @@ def _grant_everyone_read(path: Path) -> None:
 
 @unittest.skipUnless(sys.platform == "win32", "native Windows regression")
 class WindowsChecks(unittest.TestCase):
+    def test_project_memory_git_inventory_and_untracked_caller(self):
+        from opensocrates.project_memory import sources
+        from opensocrates.project_memory.registry import ProjectRegistry
+
+        with tempfile.TemporaryDirectory(prefix="OpenSocrates git source ") as name:
+            parent = Path(name)
+            root = parent / "repo"
+            self.assertTrue(create_owner_only_directory(root))
+            self.assertTrue(create_owner_only_directory(root / ".git"))
+            subprocess.run(["git", "init", "-q", str(root)], check=True, capture_output=True)
+            (root / "helper.py").write_text("def helper():\n    return 1\n", encoding="utf-8")
+            subprocess.run(
+                ["git", "-C", str(root), "add", "helper.py"], check=True, capture_output=True
+            )
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(root),
+                    "-c",
+                    "user.name=Fixture",
+                    "-c",
+                    "user.email=fixture@example.invalid",
+                    "commit",
+                    "-qm",
+                    "fixture",
+                ],
+                check=True,
+                capture_output=True,
+            )
+            policy = {"mode": "read_write", "capture_policy": "milestones", "excluded_paths": []}
+            preview = ProjectRegistry(parent / "data").preview(str(root), policy)
+            self.assertEqual(preview["disclosure"]["workspace_kind"], "git_worktree")
+            first = sources.capture_snapshot(root, "git_worktree", "project", "workspace")
+            self.assertTrue(first["coverage"]["complete_for_scope"])
+            self.assertIn("helper.py", first["files"])
+            (root / "new_caller.py").write_text(
+                "from helper import helper\nhelper()\n", encoding="utf-8"
+            )
+            changed = sources.capture_snapshot(root, "git_worktree", "project", "workspace")
+            self.assertEqual(sources.revalidate_snapshot(first, changed)["freshness"], "stale")
+            self.assertIn("new_caller.py", changed["files"])
+
     def test_project_memory_source_root_and_reparse(self):
         from opensocrates import windows_security
         from opensocrates.project_memory import sources
