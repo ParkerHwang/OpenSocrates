@@ -71,6 +71,52 @@ def aggregate(rows: list[dict], key_fields: tuple[str, ...]) -> list[dict]:
     return output
 
 
+def bilingual_pairs(rows: list[dict]) -> list[dict]:
+    """Describe matched language cells without pooling cohorts or imputing nulls."""
+    keys = ("cohort", "lane", "family", "arm", "solver_model", "repetition")
+    groups = defaultdict(list)
+    for row in rows:
+        groups[tuple(row[key] for key in keys)].append(row)
+    output = []
+    for key, entries in sorted(groups.items(), key=lambda pair: str(pair[0])):
+        by_locale = defaultdict(list)
+        for entry in entries:
+            by_locale[entry["locale"]].append(entry)
+        if "ko" not in by_locale:
+            continue
+        pair = {
+            **dict(zip(keys, key, strict=True)),
+            "packet_ids": {
+                locale: [entry["packet_id"] for entry in values]
+                for locale, values in sorted(by_locale.items())
+            },
+            "direction": "Korean minus English; descriptive ordinal differences only",
+            "phases": {},
+        }
+        if len(by_locale["en"]) != 1 or len(by_locale["ko"]) != 1:
+            pair["status"] = "unassessable_pair"
+            output.append(pair)
+            continue
+        pair["status"] = "matched"
+        english, korean = by_locale["en"][0], by_locale["ko"][0]
+        for phase in ("first_pass_scores", "post_evidence_scores"):
+            pair["phases"][phase] = {
+                axis: {
+                    "en": english[phase][axis]["score"],
+                    "ko": korean[phase][axis]["score"],
+                    "difference": (
+                        korean[phase][axis]["score"] - english[phase][axis]["score"]
+                        if english[phase][axis]["score"] is not None
+                        and korean[phase][axis]["score"] is not None
+                        else None
+                    ),
+                }
+                for axis in AXES
+            }
+        output.append(pair)
+    return output
+
+
 def main() -> None:  # noqa: C901
     verification = verify(complete=True)  # The treatment maps are not opened before this gate.
     manifest = read(HERE / "manifest.json")
@@ -129,6 +175,7 @@ def main() -> None:  # noqa: C901
                     **identity,
                     "packet_id": identifier,
                     "cell_id": cell_id,
+                    "family": source["family"],
                     "assignment_id": assignment["assignment_id"],
                     "original_packet_sha256": source["original_sha256"],
                     "first_pass_view_sha256": source["first_pass_sha256"],
@@ -141,6 +188,7 @@ def main() -> None:  # noqa: C901
                     "assessor_model": "gpt-6-astra",
                     "assessor_effort": "xhigh",
                     "human_scores": None,
+                    "human_status": "unavailable",
                     "provisional": True,
                 }
             )
@@ -235,6 +283,7 @@ def main() -> None:  # noqa: C901
         "per_task_language_condition": aggregate(
             rows, ("cohort", "lane", "task", "locale", "arm", "solver_model")
         ),
+        "bilingual_pairs": bilingual_pairs(rows),
         "disagreements": disagreements,
         "machine_pass_ai_flag_cooccurrences": cooccurrences,
         "limits": [
@@ -269,6 +318,8 @@ def main() -> None:  # noqa: C901
                 not in {
                     "per_lane_language_condition",
                     "per_lane_language",
+                    "per_task_language_condition",
+                    "bilingual_pairs",
                     "disagreements",
                     "machine_pass_ai_flag_cooccurrences",
                 }

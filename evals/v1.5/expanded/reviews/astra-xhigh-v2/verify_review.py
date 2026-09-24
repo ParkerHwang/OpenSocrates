@@ -89,11 +89,14 @@ def verify(complete: bool = True) -> dict:  # noqa: C901
                 first = value
                 if first_lock:
                     assert first_lock["assessments"][assignment["assignment_id"]] == sha(path)
+                    assert per_lock["locked_at_unix"] <= first_lock["locked_at_unix"]
             else:
                 assert first_lock is not None
                 if final_lock:
                     assert final_lock["assessments"][assignment["assignment_id"]] == sha(path)
+                    assert per_lock["locked_at_unix"] <= final_lock["locked_at_unix"]
     attempts = []
+    intervals = []
     for path in sorted((HERE / "attempts").glob("*/*/*/started.json")):
         started = read(path)
         phase = path.parts[-3]
@@ -110,7 +113,12 @@ def verify(complete: bool = True) -> dict:  # noqa: C901
             "read-only",
         )
         assert row["agent_definition_sha256"] == manifest["agent"]["definition_sha256"]
+        assert row["runtime_profile_sha256"] == manifest["agent"]["runtime_profile_sha256"]
         assert row["client_sha256"] == manifest["client"]["sha256"]
+        assert row["started_unix"] == started["started_unix"]
+        intervals.extend(
+            [(started["started_unix"], 1), (started["started_unix"] + row["wall_seconds"], -1)]
+        )
         assert row["billed_cost"] is None and row["backend_model_echo"] is None
         for number in row["usage"].values():
             assert number is None or (type(number) is int and number >= 0)
@@ -120,6 +128,11 @@ def verify(complete: bool = True) -> dict:  # noqa: C901
         if read(path.parent / "validation.json")["valid"]:
             assert not row["access_audit"]["flags"]
         attempts.append(row)
+    active = maximum_parallel = 0
+    for _, delta in sorted(intervals):
+        active += delta
+        maximum_parallel = max(maximum_parallel, active)
+    assert maximum_parallel <= manifest["limits"]["max_parallel_calls"]
     if complete:
         assert first_lock is not None and final_lock is not None
         assert reviewed == {"first_pass": 60, "evidence": 60}
@@ -135,6 +148,7 @@ def verify(complete: bool = True) -> dict:  # noqa: C901
         "v2_completed_attempts": len(attempts),
         "v2_missing_usage_attempts": sum(row["usage"]["input_tokens"] is None for row in attempts),
         "v2_failed_processes": sum(not row["process_success"] for row in attempts),
+        "maximum_completed_call_overlap": maximum_parallel,
         "human_scores": None,
         "provisional_model_assessor": "gpt-6-astra/xhigh",
         "historical_transport_failures": "v1 rejected review call plus a zero-packet transport diagnostic; retained separately",

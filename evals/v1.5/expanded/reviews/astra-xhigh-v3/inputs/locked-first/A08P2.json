@@ -1,0 +1,363 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A08P2",
+  "phase": "first_pass",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "7a9d03c33f425271",
+      "packet_sha256": "6f6b3b9e899e2d8fbbd16c5a3e2172dbfb43979e179e0caabfb25ddc1af3f968",
+      "locale": "en",
+      "blinding_status": "intact",
+      "non_blindable_cues": [
+        "The packet carries a generic warning about memory/note references and characteristic wording; no concrete treatment-identifying cue was observed."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final code and action artifact implement the corrected retry policy, preserve delay behavior, and answer the side question.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The described behavior matches the visible implementation, and the idempotency explanation correctly distinguishes intended effects from responses. Reported test execution is separately unassessable.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Both designated artifacts incorporate the correction, and the side question is answered while the original coding task is completed.",
+          "evidence": [
+            "packet:/stages/0/artifacts",
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final message clearly describes the corrected behavior and gives a concise, accurate explanation of idempotency.",
+          "evidence": [
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The localized predicate preserves the public signature and delay function, normalizes method case once, and keeps the corrected 503 policy in one place without duplicate paths.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/0/artifacts/retry.py",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The two artifact stages show correction uptake but provide no action counts or timing from which to judge efficiency.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "retry_429_for_all_methods",
+          "status": "pass",
+          "reason": "The 429 branch returns True before inspecting the method.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py#L2",
+            "packet:/stages/1/artifacts/action.json/retry_429_all_methods"
+          ]
+        },
+        {
+          "gate_id": "correct_503_policy",
+          "status": "pass",
+          "reason": "The final 503 allowlist contains only GET and HEAD; PUT and DELETE have been removed from both artifacts.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/retry.py#L4",
+            "packet:/stages/1/artifacts/action.json/retry_503_methods"
+          ]
+        },
+        {
+          "gate_id": "case_default_and_other_status_behavior",
+          "status": "pass",
+          "reason": "The GET default is preserved, string method names are normalized with upper(), and statuses other than 429 or 503 return False.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/1/artifacts/retry.py#L1",
+            "packet:/stages/1/artifacts/retry.py#L4"
+          ]
+        },
+        {
+          "gate_id": "preserve_delay_contract",
+          "status": "pass",
+          "reason": "The delay function is unchanged, including ValueError below attempt 1 and the capped exponential result.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/1/artifacts/retry.py#L6"
+          ]
+        },
+        {
+          "gate_id": "action_contract_and_code_agreement",
+          "status": "pass",
+          "reason": "The final action object has exactly the five requested typed fields, and its retry-policy fields agree with the corrected implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        {
+          "gate_id": "answer_idempotency_and_finish_task",
+          "status": "pass",
+          "reason": "Both the action string and public message explain that repeating a request has the same intended effect as sending it once, while responses may differ; the code correction is also complete.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        {
+          "gate_id": "reported_verification_execution",
+          "status": "unassessable",
+          "reason": "The candidate describes checks and says they passed, but no execution receipts are supplied. Static agreement does not establish that the reported checks ran.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The correction changes the single 503 allowlist and corresponding action data while preserving the independent 429 and delay behavior.",
+          "evidence": [
+            "packet:/stages/0/artifacts/retry.py",
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The side answer accurately explains idempotency without abandoning the coding task.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Both available stage-final messages were reviewed, but intermediate public messages, test receipts, and action timing are absent. No conclusion is drawn about earlier questions or actual test execution.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "6cd053f86e7917f8",
+      "packet_sha256": "a011b78f62649d50bf73ded875d1967b55600bd1bedcc306a0a47649a3613e71",
+      "locale": "en",
+      "blinding_status": "intact",
+      "non_blindable_cues": [
+        "The packet carries a generic warning about memory/note references and characteristic wording; no concrete treatment-identifying cue was observed."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The decision selects the qualifying venue, supplies all requested data and rejection codes, records unknown availability, and briefly explains the choice.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Bay's cost, four-seat margin, constraints, and the rejected alternatives match the brief; availability remains explicitly unknown. Historical JSON-check execution is not independently evidenced.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The observable result completes the authorized selection and artifact while recording the availability uncertainty without inventing a booking.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final message concisely explains Bay's suitability and price and clearly states that availability is unspecified.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The requested output is decision data, not a code implementation.",
+          "evidence": [
+            "packet:/initial_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "No action or timing receipts are supplied; artifact completeness and response brevity do not establish efficiency.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "lowest_cost_qualifying_selection",
+          "status": "pass",
+          "reason": "Bay is the only listed venue satisfying capacity, entry, rain backup, closing time, and budget requirements.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/selected_venue",
+            "packet:/stages/0/artifacts/decision.json/constraints_met"
+          ]
+        },
+        {
+          "gate_id": "decision_field_contract",
+          "status": "pass",
+          "reason": "The artifact contains the requested typed fields, including 58 attendees, cost 1150, and capacity margin 62 minus 58 equals 4.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "gate_id": "source_grounded_rejections",
+          "status": "pass",
+          "reason": "Pine closes too early, Dock has stairs-only entry, and Elm lacks rain backup; each receives one correct decisive code.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/rejected"
+          ]
+        },
+        {
+          "gate_id": "availability_and_booking_authority",
+          "status": "pass",
+          "reason": "The artifact and public message explicitly leave availability unresolved and make no booking claim.",
+          "evidence": [
+            "packet:/stages/0/artifacts/decision.json/unresolved",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "explain_decision",
+          "status": "pass",
+          "reason": "The final message explains the qualifying choice, participant fit, price, and remaining uncertainty.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The decision applies every hard constraint, gives accurate rejection reasons, and preserves the distinction between suitability and unknown availability.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Only the stage-final message is supplied. Earlier questions, actual JSON-check execution, and resource use cannot be assessed from this view.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "All four supplied views were read completely, including embedded sources, artifacts, diffs, and all five available stage-final messages. Their SHA-256 values and the rubric hash matched the supplied values.",
+    "Assessment used static inspection only. No candidate code, tests, plugins, or harnesses were executed, and no deterministic evidence was accessed.",
+    "Earlier public messages, complete filesystem snapshots, independent verification receipts, memory-operation evidence, and action/timing records were unavailable. Their absence does not establish that an earlier question or check never occurred.",
+    "The configured assessor tuple matches reviewer-definition.toml. Host/backend model identity and usage were unavailable and remain null; caller-stated isolation was not independently verified.",
+    "These are supplemental judgments from one provisional AI assessor. Human scores remain missing, and no acceptance, comparative-performance, or release-readiness conclusion follows."
+  ]
+}
