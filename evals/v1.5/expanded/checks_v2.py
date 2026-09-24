@@ -257,9 +257,21 @@ def selftest() -> dict:
             root.mkdir()
             for name, content in task["files"].items():
                 (root / name).write_text(content, encoding="utf-8")
+            replay = task.get("replay_files")
+            if replay:
+                for name, content in replay.items():
+                    (root / name).write_text(content, encoding="utf-8")
+                if task["id"] == "v2-eval01-coding-transition":
+                    assert _python(root, "from offer import quote\nassert quote('squad', 4, 100) == 3100\n")
+                elif task["id"] == "v2-eval04-general-correction":
+                    initial_plan = _json(root, "plan.json")
+                    assert isinstance(initial_plan, dict)
+                    assert initial_plan["selected_venue"] == "Cedar"
+                    assert initial_plan["basis"]["observed_capacity"] == 60
             transition = task.get("source_transition")
             if transition:
-                (root / transition["path"]).write_text(transition["content"], encoding="utf-8")
+                for name, content in transition.items():
+                    (root / name).write_text(content, encoding="utf-8")
             invalid = evaluate(task, root, "No question. No booking.")
             for name, content in valid_files[task["id"]].items():
                 if isinstance(content, dict):
