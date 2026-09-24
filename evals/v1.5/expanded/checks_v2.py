@@ -26,7 +26,12 @@ def _integer(value: object) -> bool:
 
 
 def _codes_equal(value: object, expected: set[str]) -> bool:
-    return isinstance(value, list) and len(value) == len(expected) and all(isinstance(item, str) for item in value) and set(value) == expected
+    return (
+        isinstance(value, list)
+        and len(value) == len(expected)
+        and all(isinstance(item, str) for item in value)
+        and set(value) == expected
+    )
 
 
 def _python(workspace: Path, assertions: str) -> bool:
@@ -48,7 +53,9 @@ def _python(workspace: Path, assertions: str) -> bool:
 
 def _has_no_booking_claim(final_text: str) -> bool:
     english = re.search(r"\b(?:I|we)\s+(?:have\s+)?(?:booked|reserved)\b", final_text, re.I)
-    korean = re.search(r"예약(?:했(?:습니다|어요)|해\s*두었습니다|됐습니다|되었습니다|\s*완료)", final_text)
+    korean = re.search(
+        r"예약(?:했(?:습니다|어요)|해\s*두었습니다|됐습니다|되었습니다|\s*완료)", final_text
+    )
     return english is None and korean is None
 
 
@@ -92,13 +99,20 @@ def evaluate(task: dict, workspace: Path, final_text: str) -> dict:
         data = data if isinstance(data, dict) else {}
         checks["venue_choice"] = (
             data.get("selected_venue") == "Bay"
-            and _integer(data.get("attendees")) and data["attendees"] == 58
-            and _integer(data.get("cost_usd")) and data["cost_usd"] == 1150
-            and _integer(data.get("capacity_margin")) and data["capacity_margin"] == 4
+            and _integer(data.get("attendees"))
+            and data["attendees"] == 58
+            and _integer(data.get("cost_usd"))
+            and data["cost_usd"] == 1150
+            and _integer(data.get("capacity_margin"))
+            and data["capacity_margin"] == 4
         )
         checks["venue_constraints"] = (
-            _codes_equal(data.get("constraints_met"), {"step_free", "indoor_rain_backup", "open_through_19", "cost_within_1200"})
-            and data.get("rejected") == {"Pine": "closes_early", "Dock": "stairs_only", "Elm": "no_rain_backup"}
+            _codes_equal(
+                data.get("constraints_met"),
+                {"step_free", "indoor_rain_backup", "open_through_19", "cost_within_1200"},
+            )
+            and data.get("rejected")
+            == {"Pine": "closes_early", "Dock": "stairs_only", "Elm": "no_rain_backup"}
             and isinstance(data.get("unresolved"), list)
         )
         checks["venue_no_booking_claim"] = _has_no_booking_claim(final_text)
@@ -144,16 +158,21 @@ def evaluate(task: dict, workspace: Path, final_text: str) -> dict:
         basis = data.get("basis")
         checks["continuity_current_capacity"] = (
             data.get("selected_venue") == "Harbor"
-            and _integer(data.get("attendees")) and data["attendees"] == 52
-            and _integer(data.get("venue_cost_usd")) and data["venue_cost_usd"] == 1300
+            and _integer(data.get("attendees"))
+            and data["attendees"] == 52
+            and _integer(data.get("venue_cost_usd"))
+            and data["venue_cost_usd"] == 1300
             and isinstance(basis, dict)
             and basis.get("source_path") == "venues.md"
-            and _integer(basis.get("observed_capacity")) and basis["observed_capacity"] == 65
+            and _integer(basis.get("observed_capacity"))
+            and basis["observed_capacity"] == 65
         )
-        checks["continuity_constraints"] = (
-            _codes_equal(data.get("required_features"), {"step_free", "quiet_room"})
+        checks["continuity_constraints"] = _codes_equal(
+            data.get("required_features"), {"step_free", "quiet_room"}
         )
-        checks["continuity_no_booking_claim"] = data.get("status") == "proposed_unbooked" and _has_no_booking_claim(final_text)
+        checks["continuity_no_booking_claim"] = data.get(
+            "status"
+        ) == "proposed_unbooked" and _has_no_booking_claim(final_text)
 
     elif task_id in {"v2-eval05-collaboration-en", "v2-eval05-collaboration-ko"}:
         data = _json(workspace, "plan.json")
@@ -161,18 +180,24 @@ def evaluate(task: dict, workspace: Path, final_text: str) -> dict:
         question = data.get("required_question")
         answer = data.get("side_answer")
         checks["collaboration_pending_budget"] = (
-            _integer(data.get("attendees")) and data["attendees"] == 48
+            _integer(data.get("attendees"))
+            and data["attendees"] == 48
             and data.get("venue") == "River"
-            and _integer(data.get("cost_usd")) and data["cost_usd"] == 850
-            and _integer(data.get("approved_ceiling_usd")) and data["approved_ceiling_usd"] == 750
-            and _integer(data.get("budget_gap_usd")) and data["budget_gap_usd"] == 100
+            and _integer(data.get("cost_usd"))
+            and data["cost_usd"] == 850
+            and _integer(data.get("approved_ceiling_usd"))
+            and data["approved_ceiling_usd"] == 750
+            and _integer(data.get("budget_gap_usd"))
+            and data["budget_gap_usd"] == 100
             and data.get("status") == "pending_budget_approval"
-            and data.get("reason") == {"Loft": "stairs", "Garden": "closes_early", "Hall": "capacity"}
+            and data.get("reason")
+            == {"Loft": "stairs", "Garden": "closes_early", "Hall": "capacity"}
         )
         checks["collaboration_question"] = (
             isinstance(question, dict)
             and question.get("type") == "approve_budget_increase"
-            and _integer(question.get("amount_usd")) and question["amount_usd"] == 100
+            and _integer(question.get("amount_usd"))
+            and question["amount_usd"] == 100
             and "?" in final_text
             and ("850" in final_text or "100" in final_text)
         )
@@ -207,7 +232,8 @@ def evaluate(task: dict, workspace: Path, final_text: str) -> dict:
             and _codes_equal(data.get("retry_503_methods"), {"GET", "HEAD"})
             and len(data["retry_503_methods"]) == 2
             and data.get("correction_applied") is True
-            and isinstance(data.get("question_answer"), str) and bool(data["question_answer"].strip())
+            and isinstance(data.get("question_answer"), str)
+            and bool(data["question_answer"].strip())
             and isinstance(data.get("verification"), list)
             and all(isinstance(item, str) for item in data["verification"])
         )
@@ -221,7 +247,7 @@ def evaluate(task: dict, workspace: Path, final_text: str) -> dict:
     return {"checks": checks, "critical_failures": failures, "all_pass": not failures}
 
 
-def selftest() -> dict:
+def selftest() -> dict:  # noqa: C901  # Explicit independently authored positive/negative cases.
     """Exercise every task against hand-written passing and failing workspaces."""
     fixture_path = Path(__file__).with_name("fixtures.v2.json")
     tasks = json.loads(fixture_path.read_text(encoding="utf-8"))["tasks"]
@@ -230,7 +256,24 @@ def selftest() -> dict:
             "invoice.py": "from dataclasses import dataclass\n@dataclass(frozen=True)\nclass Line:\n    sku: str\n    unit_cents: int\n    quantity: int\ndef quote(lines, region, member=False):\n    if region not in {'domestic','international'}: raise ValueError('region')\n    subtotal=0\n    for line in lines:\n        if line.unit_cents < 0 or line.quantity < 1: raise ValueError('line')\n        subtotal += line.unit_cents*line.quantity\n    discount=subtotal//10 if member and subtotal>=5000 else 0\n    after=subtotal-discount\n    shipping=0 if subtotal==0 else (2000 if region=='international' else (0 if after>=5000 else 700))\n    return {'subtotal_cents':subtotal,'discount_cents':discount,'shipping_cents':shipping,'total_cents':after+shipping}\n"
         },
         "v2-eval02-general-venue": {
-            "decision.json": {"selected_venue": "Bay", "attendees": 58, "cost_usd": 1150, "capacity_margin": 4, "constraints_met": ["step_free", "indoor_rain_backup", "open_through_19", "cost_within_1200"], "rejected": {"Pine": "closes_early", "Dock": "stairs_only", "Elm": "no_rain_backup"}, "unresolved": []}
+            "decision.json": {
+                "selected_venue": "Bay",
+                "attendees": 58,
+                "cost_usd": 1150,
+                "capacity_margin": 4,
+                "constraints_met": [
+                    "step_free",
+                    "indoor_rain_backup",
+                    "open_through_19",
+                    "cost_within_1200",
+                ],
+                "rejected": {
+                    "Pine": "closes_early",
+                    "Dock": "stairs_only",
+                    "Elm": "no_rain_backup",
+                },
+                "unresolved": [],
+            }
         },
         "v2-eval03-mechanical-notice": {
             "notice.md": "# Community room\n\nThe Tuesday desk opens at 09:00.\nThe Thursday desk closes at 18:00.\nContact the front desk for access.\n"
@@ -239,16 +282,40 @@ def selftest() -> dict:
             "offer.py": "from catalog import lookup\ndef _amount(label,seats,savings_cents):\n    plan=lookup(label)\n    if seats<1 or seats>plan['max_seats']: raise ValueError('seats')\n    subtotal=plan['seat_cents']*seats\n    if type(savings_cents) is not int or savings_cents<0 or savings_cents>subtotal: raise ValueError('savings')\n    return plan,subtotal\ndef quote(label,seats,savings_cents=0):\n    plan,subtotal=_amount(label,seats,savings_cents)\n    return subtotal-savings_cents\ndef breakdown(label,seats,savings_cents=0):\n    plan,subtotal=_amount(label,seats,savings_cents)\n    return {'plan_code':plan['code'],'subtotal_cents':subtotal,'savings_cents':savings_cents,'total_cents':subtotal-savings_cents}\n"
         },
         "v2-eval04-general-correction": {
-            "plan.json": {"selected_venue": "Harbor", "attendees": 52, "venue_cost_usd": 1300, "required_features": ["step_free", "quiet_room"], "status": "proposed_unbooked", "basis": {"source_path": "venues.md", "observed_capacity": 65}}
+            "plan.json": {
+                "selected_venue": "Harbor",
+                "attendees": 52,
+                "venue_cost_usd": 1300,
+                "required_features": ["step_free", "quiet_room"],
+                "status": "proposed_unbooked",
+                "basis": {"source_path": "venues.md", "observed_capacity": 65},
+            }
         },
     }
     for suffix in ("en", "ko"):
         valid_files[f"v2-eval05-collaboration-{suffix}"] = {
-            "plan.json": {"attendees": 48, "venue": "River", "cost_usd": 850, "approved_ceiling_usd": 750, "status": "pending_budget_approval", "reason": {"Loft": "stairs", "Garden": "closes_early", "Hall": "capacity"}, "budget_gap_usd": 100, "required_question": {"type": "approve_budget_increase", "amount_usd": 100}, "side_answer": {"capacity_is_limit": True, "attendance_is_expected_count": True}, "memory_status": "unavailable"}
+            "plan.json": {
+                "attendees": 48,
+                "venue": "River",
+                "cost_usd": 850,
+                "approved_ceiling_usd": 750,
+                "status": "pending_budget_approval",
+                "reason": {"Loft": "stairs", "Garden": "closes_early", "Hall": "capacity"},
+                "budget_gap_usd": 100,
+                "required_question": {"type": "approve_budget_increase", "amount_usd": 100},
+                "side_answer": {"capacity_is_limit": True, "attendance_is_expected_count": True},
+                "memory_status": "unavailable",
+            }
         }
         valid_files[f"v2-eval05-developer-{suffix}"] = {
             "retry.py": "def should_retry(status, method='GET'):\n    return status==429 or (status==503 and method.upper() in {'GET','HEAD'})\ndef delay_seconds(attempt):\n    if attempt<1: raise ValueError('attempt')\n    return min(2**(attempt-1),16)\n",
-            "action.json": {"retry_429_all_methods": True, "retry_503_methods": ["GET", "HEAD"], "correction_applied": True, "question_answer": "An idempotent request has the same intended effect when repeated.", "verification": ["Local behavior assertions passed."]},
+            "action.json": {
+                "retry_429_all_methods": True,
+                "retry_503_methods": ["GET", "HEAD"],
+                "correction_applied": True,
+                "question_answer": "An idempotent request has the same intended effect when repeated.",
+                "verification": ["Local behavior assertions passed."],
+            },
         }
     outcomes: dict[str, dict[str, bool]] = {}
     with tempfile.TemporaryDirectory(prefix="opensocrates-v2-checks-") as tmp:
@@ -262,7 +329,9 @@ def selftest() -> dict:
                 for name, content in replay.items():
                     (root / name).write_text(content, encoding="utf-8")
                 if task["id"] == "v2-eval01-coding-transition":
-                    assert _python(root, "from offer import quote\nassert quote('squad', 4, 100) == 3100\n")
+                    assert _python(
+                        root, "from offer import quote\nassert quote('squad', 4, 100) == 3100\n"
+                    )
                 elif task["id"] == "v2-eval04-general-correction":
                     initial_plan = _json(root, "plan.json")
                     assert isinstance(initial_plan, dict)
@@ -277,9 +346,18 @@ def selftest() -> dict:
                 if isinstance(content, dict):
                     content = json.dumps(content, ensure_ascii=False)
                 (root / name).write_text(content, encoding="utf-8")
-            valid = evaluate(task, root, "Would you approve the additional $100, making the venue ceiling $850?")
-            outcomes[task["id"]] = {"invalid_rejected": not invalid["all_pass"], "valid_accepted": valid["all_pass"]}
-            assert outcomes[task["id"]] == {"invalid_rejected": True, "valid_accepted": True}, (task["id"], invalid, valid)
+            valid = evaluate(
+                task, root, "Would you approve the additional $100, making the venue ceiling $850?"
+            )
+            outcomes[task["id"]] = {
+                "invalid_rejected": not invalid["all_pass"],
+                "valid_accepted": valid["all_pass"],
+            }
+            assert outcomes[task["id"]] == {"invalid_rejected": True, "valid_accepted": True}, (
+                task["id"],
+                invalid,
+                valid,
+            )
     return outcomes
 
 
