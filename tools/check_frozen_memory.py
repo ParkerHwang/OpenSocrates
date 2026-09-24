@@ -47,7 +47,8 @@ def run(binary: Path, environment: dict[str, str], value: dict[str, object]) -> 
         timeout=15,
     )
     result = json.loads(completed.stdout)
-    if completed.returncode != (0 if result["status"] != "unavailable" else 3):
+    expected_exit = {"invalid_request": 2, "unavailable": 3}.get(result["status"], 0)
+    if completed.returncode != expected_exit:
         raise AssertionError(
             f"unexpected memory exit/status: {completed.returncode} {result['status']}"
         )
@@ -110,6 +111,59 @@ def main() -> int:
         assert enrollment["status"] == "ok", enrollment
         project_id = enrollment["result"]["project_id"]
         workspace_id = enrollment["result"]["workspace_id"]
+        proposed = run(
+            binary,
+            env,
+            request(
+                "record",
+                {
+                    "idempotency_key": uid(),
+                    "expected_record_version": 0,
+                    "kind": "decision",
+                    "scope": {"level": "project"},
+                    "summary": "Keep step-free access.",
+                    "origin": {
+                        "producer_kind": "agent",
+                        "source_reference": None,
+                        "attestation": "agent_reported",
+                    },
+                    "support": "agent_reported",
+                    "source_refs": [],
+                    "revalidation": {
+                        "dependency_paths": [],
+                        "negative_claim": False,
+                        "on_change": "not_applicable",
+                    },
+                },
+                project_id,
+                workspace_id,
+            ),
+        )
+        assert proposed["status"] == "ok", proposed
+        record_id = proposed["result"]["record"]["record_id"]
+        accept_payload = {
+            "record_id": record_id,
+            "expected_record_version": 1,
+            "idempotency_key": uid(),
+            "acceptance_basis": "User instruction in current task.",
+            "acceptance_attribution": "agent_reported_user_instruction",
+        }
+        rejected = run(binary, env, request("accept", accept_payload, project_id, workspace_id))
+        assert rejected["status"] == "invalid_request"
+        assert rejected["limitations"] == ["closed_request_rejected"]
+        unchanged = run(
+            binary, env, request("inspect", {"record_id": record_id}, project_id, workspace_id)
+        )
+        assert (
+            unchanged["result"]["lifecycle"] == "proposed" and unchanged["result"]["version"] == 1
+        )
+        accept_payload["acceptance_basis"] = "user:current-request"
+        accepted = run(binary, env, request("accept", accept_payload, project_id, workspace_id))
+        assert accepted["status"] == "ok", accepted
+        assert (
+            accepted["result"]["record"]["origin"]["attestation"]
+            == "agent_reported_user_instruction"
+        )
         observed = run(
             binary,
             env,

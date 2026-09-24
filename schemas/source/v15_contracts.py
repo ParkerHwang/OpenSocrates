@@ -14,6 +14,12 @@ UUID = {
 }
 TEXT = {"type": "string", "maxLength": 8192}
 SHORT = {"type": "string", "maxLength": 1024}
+BASIS_REFERENCE = {
+    "type": "string",
+    "maxLength": 1024,
+    "pattern": "^(?!(?:api_key|password|secret|token|prompt|transcript|credential|cookie|reasoning):)[a-z][a-z0-9_-]*:[A-Za-z0-9._/#-]{1,120}$",
+    "description": "Bounded attribution reference such as user:current-request; never instruction prose, prompts, or credentials. The reference does not itself prove authorization.",
+}
 PATH = {"type": "string", "minLength": 1, "maxLength": 1024}
 DIGEST = {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
 TIME = {"type": "string", "format": "date-time"}
@@ -214,7 +220,7 @@ MEMORY_PAYLOAD = obj(
         "root": PATH,
         "apply": BOOL,
         "disclosure_digest": DIGEST,
-        "authorization_basis": SHORT,
+        "authorization_basis": BASIS_REFERENCE,
         "authorization_attribution": {
             "enum": ["operator_declared", "agent_reported_user_instruction"]
         },
@@ -236,7 +242,7 @@ MEMORY_PAYLOAD = obj(
         "revalidation": REVALIDATION,
         "origin": ORIGIN,
         "support": {"enum": ["agent_reported", "inferred", "imported"]},
-        "acceptance_basis": SHORT,
+        "acceptance_basis": BASIS_REFERENCE,
         "acceptance_attribution": {
             "enum": ["operator_declared", "agent_reported_user_instruction"]
         },

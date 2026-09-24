@@ -122,7 +122,14 @@ scope through registry identities, not arbitrary traversal paths.
 Enrollment uses `init` with `apply: false` by default: return the resolved owned
 root, policy disclosure, and a digest of that exact scope/policy without creating
 state. `apply: true` requires the matching disclosure digest and an
-`authorization_basis` describing the explicit user/operator instruction reference.
+`authorization_basis` identifying the explicit user/operator instruction reference.
+This is a bounded reference such as `user:current-request` or `fixture:enrollment`,
+not the instruction sentence. The same rule applies to `acceptance_basis`.
+The syntax is `[a-z][a-z0-9_-]*:[A-Za-z0-9._/#-]{1,120}` with a 1024-character
+overall bound; credential/content prefixes `api_key`, `password`, `secret`,
+`token`, `prompt`, `transcript`, `credential`, `cookie`, and `reasoning` are
+forbidden. The generated memory request schema now expresses the existing
+runtime restriction. A pointer does not itself establish authorization.
 The runtime recomputes the binding before applying. A digest proves disclosure
 identity, not consent. Record `operator_declared`, `agent_reported_user_instruction`,
 or `host_attested` provenance as actually available; callers cannot set the latter

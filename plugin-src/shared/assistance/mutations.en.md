@@ -1,6 +1,6 @@
 # Authorized memory correction and forgetting
 
-Guide revision: 1
+Guide revision: 2
 
 Read this only when changing already enrolled project memory under the user's
 existing authorization. Do not enroll another root, broaden scope, edit SQLite
@@ -44,6 +44,20 @@ source dependencies instead when they differ. Replace UUID placeholders. To
 new `idempotency_key`, an `acceptance_basis` identifying the actual authorization,
 and `acceptance_attribution: "agent_reported_user_instruction"` when only the
 agent reports the user's instruction. Do not claim host attestation.
+`acceptance_basis` (and enrollment's `authorization_basis`) must be a bounded
+reference, **not the instruction sentence**. For the user's actual current scoped
+instruction, `user:current-request` is a usable reference; it is not proof of
+authorization by itself. The exact `accept` payload shape is:
+
+```json
+{"record_id":"UUID","expected_record_version":1,"idempotency_key":"UUID","acceptance_basis":"user:current-request","acceptance_attribution":"agent_reported_user_instruction"}
+```
+
+Use the actual returned version and UUIDs. Reference syntax is a lowercase prefix
+matching `[a-z][a-z0-9_-]*`, then `:`, then 1–120 characters from
+`A-Za-z0-9._/#-`. Prefixes `api_key`, `password`, `secret`, `token`, `prompt`,
+`transcript`, `credential`, `cookie`, and `reasoning` are forbidden. Do not put
+raw instructions or sensitive content into a reference to make it fit.
 
 The exact-record `delete` payload is
 `{"intent":"delete_record","record_id":"UUID","expected_record_version":2,"idempotency_key":"UUID"}`.

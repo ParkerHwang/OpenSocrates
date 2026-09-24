@@ -1,6 +1,6 @@
 # Optional assistance and project continuity
 
-Guide revision: 3
+Guide revision: 4
 
 Keep the user's goal, permissions, constraints, and completion conditions in view.
 For a mechanical edit or completed unchanged checks, finish directly. For a

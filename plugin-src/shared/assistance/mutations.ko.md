@@ -1,6 +1,6 @@
 # 허용된 메모리 정정과 삭제
 
-Guide revision: 1
+Guide revision: 2
 
 사용자의 기존 허용 범위에서 이미 등록된 프로젝트 메모리를 변경할 때만
 읽으세요. 다른 루트를 등록하거나 범위를 넓히거나 SQLite를 직접 편집하지
@@ -44,6 +44,20 @@ reason에 다시 쓰지 마세요. 한 사실을 지우려고 프로젝트나 �
 가리키는 `acceptance_basis`를 사용합니다. 에이전트가 사용자 지시를 전달하는
 경우 `acceptance_attribution`은 `"agent_reported_user_instruction"`입니다.
 호스트가 증명했다고 주장하지 마세요.
+`acceptance_basis`와 등록 시 쓰는 `authorization_basis`는 **지시 문장이
+아닌 짧은 참조**여야 합니다. 실제로 받은 현재 범위의 사용자 지시는
+`user:current-request`로 가리킬 수 있지만, 참조 자체가 허용을 증명하지는
+않습니다. `accept`의 정확한 payload 형식은 다음과 같습니다.
+
+```json
+{"record_id":"UUID","expected_record_version":1,"idempotency_key":"UUID","acceptance_basis":"user:current-request","acceptance_attribution":"agent_reported_user_instruction"}
+```
+
+실제로 반환된 버전과 UUID를 쓰세요. 참조는 `[a-z][a-z0-9_-]*`에 맞는
+소문자 접두사, `:`, `A-Za-z0-9._/#-`에 속하는 문자 1–120개로 구성됩니다.
+`api_key`, `password`, `secret`, `token`, `prompt`, `transcript`, `credential`,
+`cookie`, `reasoning` 접두사는 금지됩니다. 형식을 맞추려고 지시 원문이나
+민감한 내용을 참조에 끼워 넣지 마세요.
 
 레코드 하나를 지우는 `delete` payload는
 `{"intent":"delete_record","record_id":"UUID","expected_record_version":2,"idempotency_key":"UUID"}`입니다.

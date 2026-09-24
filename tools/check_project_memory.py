@@ -1050,6 +1050,56 @@ class MemoryFixture(unittest.TestCase):
         )
         self.assertEqual(recalled["result"]["conflicts"], [])
 
+    def test_documented_acceptance_basis_rejects_prose_before_mutation(self) -> None:
+        self.enroll()
+        guides = Path(__file__).resolve().parents[1] / "plugin-src/shared/assistance"
+        for locale in ("en", "ko"):
+            with self.subTest(locale=locale):
+                examples = re.findall(
+                    r"```json\n(.*?)\n```",
+                    (guides / f"mutations.{locale}.md").read_text(encoding="utf-8"),
+                    re.S,
+                )
+                payload = json.loads(examples[0])
+                payload.update(
+                    {
+                        "idempotency_key": uid(),
+                        "summary": "Keep the existing accessibility requirement.",
+                    }
+                )
+                created = self.call("record", payload)
+                self.assertEqual(created["status"], "ok", created)
+                record = created["result"]["record"]
+                acceptance = json.loads(examples[1])
+                acceptance.update(
+                    {
+                        "record_id": record["record_id"],
+                        "expected_record_version": record["version"],
+                        "idempotency_key": uid(),
+                    }
+                )
+                for invalid in (
+                    "User instruction in current task.",
+                    "prompt:raw-instruction",
+                    "secret:token",
+                    "user:" + "x" * 121,
+                ):
+                    rejected = self.call("accept", {**acceptance, "acceptance_basis": invalid})
+                    self.assertEqual(rejected["status"], "invalid_request", rejected)
+                    self.assertEqual(rejected["limitations"], ["closed_request_rejected"])
+                    current = self.call("inspect", {"record_id": record["record_id"]})["result"]
+                    self.assertEqual((current["version"], current["lifecycle"]), (1, "proposed"))
+                accepted = self.call("accept", acceptance)
+                self.assertEqual(accepted["status"], "ok", accepted)
+                self.assertEqual(
+                    accepted["result"]["record"]["origin"]["source_reference"],
+                    "user:current-request",
+                )
+                self.assertEqual(
+                    accepted["result"]["record"]["origin"]["attestation"],
+                    "agent_reported_user_instruction",
+                )
+
     def test_documented_scoped_forgetting_preserves_accepted_intent(self) -> None:
         self.enroll()
         guides = Path(__file__).resolve().parents[1] / "plugin-src/shared/assistance"
