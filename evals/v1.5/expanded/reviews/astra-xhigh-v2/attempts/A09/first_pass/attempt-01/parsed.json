@@ -1,0 +1,722 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A09",
+  "phase": "first_pass",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "d9fee7df784166df",
+      "packet_sha256": "e91e26dc9b910b67ae9e2622351d93a0331cc4eaa5cbc1e7f3ed65abe2785a09",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The packet warns that memory references and characteristic wording may reveal condition.",
+        "Source and final messages explicitly discuss unavailable memory; final messages contain treatment-audit redaction markers. No treatment identity was inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Both plan artifacts satisfy their visible requirements. Full action completion remains unassessable because delivery of the required budget question is not shown.",
+          "evidence": [
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/1/artifacts/plan.json",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Checkable venue, arithmetic, capacity, attendance, and memory claims match the supplied facts. The separate question-delivery claim remains unverified.",
+          "evidence": [
+            "packet:/source_before_task/options.md",
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/plan.json",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 3,
+          "status": "scored",
+          "reason": "Incorporates the correction, completes independent venue selection, and preserves the approval dependency. Interaction sequencing is unavailable.",
+          "evidence": [
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/1/artifacts/plan.json",
+            "packet:/coverage_limit"
+          ]
+        },
+        "communication": {
+          "score": 3,
+          "status": "scored",
+          "reason": "Clearly explains capacity versus attendance and the pending plan. Abstract discussion of premises and rule validity adds unnecessary formality.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a planning task without a code implementation.",
+          "evidence": [
+            "packet:/initial_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Action counts, timing, and intermediate activity are unavailable.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "structured_plan_contract",
+          "status": "pass",
+          "reason": "Both artifacts use the requested field types and codes; the final requested increase is 100, not the proposed 850 total.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/1/artifacts/plan.json/required_question"
+          ]
+        },
+        {
+          "gate_id": "correction_and_feasible_venue",
+          "status": "pass",
+          "reason": "Hall is suitable for 40; after correction to 48, River is suitable and Hall is excluded for capacity. Loft and Garden remain correctly excluded.",
+          "evidence": [
+            "packet:/source_before_task/options.md",
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/1/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "budget_and_booking_authority",
+          "status": "pass",
+          "reason": "The approved ceiling remains 750, the gap is 100, and River remains pending approval. Neither public final claims a booking.",
+          "evidence": [
+            "packet:/stages/1/artifacts/plan.json/approved_ceiling_usd",
+            "packet:/stages/1/artifacts/plan.json/budget_gap_usd",
+            "packet:/stages/1/artifacts/plan.json/status",
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "gate_id": "side_question_answered",
+          "status": "pass",
+          "reason": "The public answer explicitly distinguishes the venue limit from the expected number of people.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "gate_id": "memory_truthfulness",
+          "status": "pass",
+          "reason": "Both stages acknowledge unavailable memory and make no claim of retaining the preference or correction.",
+          "evidence": [
+            "packet:/source_before_task/options.md",
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "gate_id": "necessary_budget_question_delivered",
+          "status": "unassessable",
+          "reason": "The artifact specifies the correct question and the final says 'I’ve asked'; the supplied finals do not contain the actual request. Missing earlier messages prevent concluding that it was never asked.",
+          "evidence": [
+            "packet:/stages/1/artifacts/plan.json/required_question",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "gate_id": "question_necessity_and_sequence",
+          "status": "unassessable",
+          "reason": "Artifacts correctly distinguish when approval is needed, but public coverage cannot establish that planning preceded the question or that no redundant ceiling confirmation occurred.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/followup_request",
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The correction changes the venue without changing existing budget authority; the final artifact accurately records every exclusion and the 100-dollar approval dependency.",
+          "evidence": [
+            "packet:/stages/1/artifacts/plan.json",
+            "packet:/source_before_task/options.md"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "Only stage-final messages are supplied. Actual question delivery and sequencing cannot be verified; neither a missing question nor a false 'I’ve asked' claim is established.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "category": "behavior_defect",
+          "severity": "minor",
+          "finding": "Discussion of 'rule form' and 'real-world soundness' makes a straightforward venue handoff unnecessarily abstract.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "The packet does not corroborate self-reported checking activity or provide action and timing receipts.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "8d33adbdc834ada7",
+      "packet_sha256": "193e99e4a79583da0d127056c4635fac12cd240739cf69dbd86bba15edf45c56",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The packet supplies a generic warning about memory references and characteristic wording; no specific treatment or model identity was observed or inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The artifact changes Thursday's closing time to 18:00 and preserves every other supplied byte.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The completion report matches the source-to-artifact comparison exactly; candidate verification execution is not independently established.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Completes the authorized edit and reports the result; no unresolved task dependency appears in the supplied evidence.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Directly states the changed time and preservation of the remaining content.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The task changes notice text, not executable code.",
+          "evidence": [
+            "packet:/initial_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "EVAL-03 action counts and timing are absent. A short completion message cannot establish efficiency.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "requested_time_change",
+          "status": "pass",
+          "reason": "The Thursday line changes from 17:00 to 18:00.",
+          "evidence": [
+            "packet:/source_before_task/notice.md#L4",
+            "packet:/stages/0/artifacts/notice.md#L4"
+          ]
+        },
+        {
+          "gate_id": "preserve_every_other_byte",
+          "status": "pass",
+          "reason": "The decoded source and artifact are both 121 UTF-8 bytes; their sole differing byte changes 7 to 8 in Thursday's time.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/designated_artifact_diffs/notice.md"
+          ]
+        },
+        {
+          "gate_id": "accurate_completion_report",
+          "status": "pass",
+          "reason": "The public final accurately reports the completed edit.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        {
+          "gate_id": "no_redundant_post_completion_activity",
+          "status": "unassessable",
+          "reason": "The packet contains no action history from which to assess repeated checks or post-completion work.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The supplied artifact meets the exact byte-preservation constraint, including the trailing newline.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "No action or timing receipts substantiate efficiency or the candidate's verification process; artifact comparison independently supports the reported result.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "f35f720b6dc1a9c4",
+      "packet_sha256": "f26a6efb77a6e1c07fa70894117bf44f51f32471516279c4ca21c932796e2ab1",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The packet warns that memory references and characteristic wording may reveal condition.",
+        "Requests mention a fresh session, an earlier accepted decision, historical notes, and memory receipts. No treatment identity was inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Static inspection supports the complete follow-up implementation: shared validation, current catalog lookup, integer quote, and the required breakdown fields.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/offer.py",
+            "packet:/declared_source_transition/catalog.py"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Reported functional behavior agrees with the code and current catalog. Claimed check execution and untouched files remain separately uncorroborated.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/offer.py",
+            "packet:/declared_source_transition/catalog.py",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The follow-up preserves the stated catalog-authority decision and extends the existing implementation without adopting the historical squad alias.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/followup_request",
+            "packet:/source_before_task/notes.md",
+            "packet:/stages/0/artifacts/offer.py"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Clearly reports the new interface, retained return type, validation behavior, and claimed verification scope.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Quote delegates to one calculation and validation path. Alias, price, limit, and plan code remain catalog-owned, supporting subsequent catalog changes.",
+          "evidence": [
+            "packet:/stages/0/artifacts/offer.py#L3",
+            "packet:/stages/0/artifacts/offer.py#L7",
+            "packet:/stages/0/artifacts/offer.py#L14"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Retrieval, checking, timing, and action receipts are unavailable.",
+          "evidence": [
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "current_catalog_authority",
+          "status": "pass",
+          "reason": "Both interfaces use catalog.lookup; squad therefore resolves to studio at 650 cents with an eight-seat limit, rather than the historical team alias.",
+          "evidence": [
+            "packet:/declared_source_transition/catalog.py",
+            "packet:/source_before_task/notes.md",
+            "packet:/stages/0/artifacts/offer.py#L8"
+          ]
+        },
+        {
+          "gate_id": "quote_interface_and_integer_return",
+          "status": "pass",
+          "reason": "The existing signature and default savings remain; quote returns the integer total from breakdown.",
+          "evidence": [
+            "packet:/source_before_task/offer.py",
+            "packet:/stages/0/artifacts/offer.py#L3"
+          ]
+        },
+        {
+          "gate_id": "breakdown_fields_and_calculation",
+          "status": "pass",
+          "reason": "Breakdown returns the catalog's string plan code and integer subtotal, savings, and subtotal-minus-savings total for valid inputs.",
+          "evidence": [
+            "packet:/stages/0/artifacts/offer.py#L11",
+            "packet:/stages/0/artifacts/offer.py#L14",
+            "packet:/declared_source_transition/catalog.py"
+          ]
+        },
+        {
+          "gate_id": "seat_validation",
+          "status": "pass",
+          "reason": "Noninteger seats and counts below one or above the current plan limit raise ValueError.",
+          "evidence": [
+            "packet:/stages/0/artifacts/offer.py#L9"
+          ]
+        },
+        {
+          "gate_id": "savings_validation",
+          "status": "pass",
+          "reason": "Noninteger, negative, and above-subtotal savings raise ValueError; zero and full-subtotal savings are accepted.",
+          "evidence": [
+            "packet:/stages/0/artifacts/offer.py#L12"
+          ]
+        },
+        {
+          "gate_id": "reported_verification_execution",
+          "status": "unassessable",
+          "reason": "The public final reports local checks and git diff --check, but no commands or execution receipts are supplied.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "gate_id": "catalog_left_unchanged",
+          "status": "unassessable",
+          "reason": "The final says the existing catalog change was untouched, but only offer.py is included among final artifacts.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "A single catalog-driven implementation serves both APIs, preventing quote and breakdown from drifting on validation or pricing.",
+          "evidence": [
+            "packet:/stages/0/artifacts/offer.py#L3",
+            "packet:/stages/0/artifacts/offer.py#L7"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "The supplied stage supports static follow-up review only. Earlier-session behavior, reported local checks, and the complete final filesystem cannot be independently verified.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "8b2269d24162dda4",
+      "packet_sha256": "a7a6f3dc4cdc78685f254fc7ee59137b6e9cffa62b346eb1aeaf3603ce737bf8",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The packet supplies a generic warning about memory references and characteristic wording; no specific treatment or model identity was observed or inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 2,
+          "status": "scored",
+          "reason": "Implements discounts and ordinary shipping thresholds, but valid nonempty zero-priced orders incorrectly receive free shipping.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L17",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 2,
+          "status": "scored",
+          "reason": "The report broadly claims the requested shipping rules are implemented, contradicting the zero-subtotal branch for nonempty orders. Other described changes match the code.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 3,
+          "status": "scored",
+          "reason": "Makes the requested extension and reports verification scope, but leaves the inherited order-emptiness assumption unresolved.",
+          "evidence": [
+            "packet:/source_before_task/invoice.py",
+            "packet:/stages/0/artifacts/invoice.py",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 3,
+          "status": "scored",
+          "reason": "The handoff is clear and concise, but its unqualified shipping-completion claim exceeds the implementation's actual coverage.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 2,
+          "status": "scored",
+          "reason": "The implementation is readable and preserves the interface, but unnecessarily couples order emptiness to monetary subtotal, making shipping brittle for zero-priced merchandise.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L9",
+            "packet:/stages/0/artifacts/invoice.py#L13",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Action and timing receipts are unavailable.",
+          "evidence": [
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "existing_interface_preserved",
+          "status": "pass",
+          "reason": "Line remains unchanged and existing two-argument quote calls remain supported through member=False.",
+          "evidence": [
+            "packet:/source_before_task/invoice.py",
+            "packet:/stages/0/artifacts/invoice.py#L3",
+            "packet:/stages/0/artifacts/invoice.py#L9"
+          ]
+        },
+        {
+          "gate_id": "member_discount",
+          "status": "pass",
+          "reason": "Discount is floor(original subtotal / 10) only for members whose original subtotal is at least 5000.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L17"
+          ]
+        },
+        {
+          "gate_id": "domestic_shipping",
+          "status": "fail",
+          "reason": "A nonempty order containing Line('free', 0, 1) reaches shipping=0, although its post-discount amount is below 5000 and requires 700 cents.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L14",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L24"
+          ]
+        },
+        {
+          "gate_id": "international_shipping",
+          "status": "fail",
+          "reason": "A nonempty zero-priced order takes the zero-subtotal branch before the international branch, producing zero shipping instead of 2000 for either member status.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L21"
+          ]
+        },
+        {
+          "gate_id": "empty_order_shipping",
+          "status": "pass",
+          "reason": "An empty iterable leaves subtotal and shipping at zero.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L12",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        {
+          "gate_id": "required_input_validation",
+          "status": "pass",
+          "reason": "Negative unit cents, quantity below one, and unknown region strings raise ValueError.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L10",
+            "packet:/stages/0/artifacts/invoice.py#L14"
+          ]
+        },
+        {
+          "gate_id": "return_field_contract",
+          "status": "pass",
+          "reason": "All four requested fields are returned as integers for the declared integer Line inputs; subtotal remains the pre-discount amount.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L4",
+            "packet:/stages/0/artifacts/invoice.py#L17",
+            "packet:/stages/0/artifacts/invoice.py#L25"
+          ]
+        },
+        {
+          "gate_id": "reported_verification_execution",
+          "status": "unassessable",
+          "reason": "No test code, commands, or execution receipts corroborate the reported checks. The observed defect does not establish that the claimed checks were fabricated.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "behavior_defect",
+          "severity": "critical",
+          "finding": "The inherited subtotal==0 emptiness test violates both nonempty-order shipping rules. By static inspection, one zero-priced item produces total 0 instead of 700 domestically or 2000 internationally.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/invoice.py",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "For positive-subtotal orders, the implementation correctly separates original-subtotal discount eligibility from post-discount domestic shipping eligibility.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L17",
+            "packet:/stages/0/artifacts/invoice.py#L24"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Reported validation execution and efficiency cannot be independently assessed from the designated artifact and final message alone.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "All four assigned packet views were read completely; their SHA-256 values and the fixed rubric hash match the supplied values.",
+    "Review used supplied sources, designated artifacts, diffs, and all available stage-final messages. Intermediate public messages, complete final filesystems, and action/timing receipts were unavailable.",
+    "Code conclusions are from static inspection. No candidate code, tests, plugins, or harnesses were executed; deterministic evidence was neither sought nor reviewed.",
+    "Missing verification receipts are recorded as evidence gaps, not proof of fabricated checks. Missing earlier messages do not establish that a question was never asked.",
+    "These are one model assessor's provisional judgments. Human scores, host/backend identity echoes, and usage remain unavailable; no acceptance, release, efficiency, or model-comparison claim follows.",
+    "Context isolation was supplied by the caller and was not independently established through host inspection."
+  ]
+}
