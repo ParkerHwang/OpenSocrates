@@ -1,0 +1,7 @@
+{
+  "artifacts": {
+    "retry.py": "def should_retry(status, method='GET'):\n    return status == 429 or (\n        status == 503 and method.upper() in {'GET', 'HEAD', 'PUT', 'DELETE'}\n    )\n\ndef delay_seconds(attempt):\n    if attempt < 1:\n        raise ValueError('attempt')\n    return min(2 ** (attempt - 1), 16)\n",
+    "action.json": "{\n  \"retry_429_all_methods\": true,\n  \"retry_503_methods\": [\"GET\", \"HEAD\", \"PUT\", \"DELETE\"],\n  \"correction_applied\": true,\n  \"question_answer\": \"429는 모든 메서드에서 재시도하고, 503은 GET, HEAD, PUT, DELETE에서만 대소문자 구분 없이 재시도합니다. 다른 상태 코드는 재시도하지 않습니다.\",\n  \"verification\": [\n    \"100~599 상태 코드와 9가지 메서드 표기에 대해 should_retry 결과를 확인했습니다.\",\n    \"기본 GET 메서드와 429의 임의 메서드 처리를 확인했습니다.\",\n    \"delay_seconds의 정상 값과 0 및 -1 입력 시 ValueError('attempt')를 확인했습니다.\"\n  ]\n}\n"
+  },
+  "public_final": "[retry.py](<disposable>/workspace/retry.py)를 수정했습니다. 메서드 이름의 대소문자를 구분하지 않으며, 429는 모든 메서드에서, 503은 GET·HEAD·PUT·DELETE에서만 재시도합니다. 다른 상태 코드는 재시도하지 않습니다. [action.json](<disposable>/workspace/action.json)에는 요청한 필드와 타입을 정확히 넣었습니다.\n\n셸에서 상태 코드 100~599와 9가지 메서드 표기, 기본 GET, `delay_seconds`의 값과 잘못된 attempt 처리, JSON 필드와 타입을 검증했고 모두 통과했습니다."
+}

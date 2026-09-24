@@ -1,0 +1,7 @@
+{
+  "artifacts": {
+    "retry.py": "def should_retry(status, method='GET'):\n    if status == 429:\n        return True\n    return status == 503 and method.upper() in {'GET', 'HEAD'}\n\ndef delay_seconds(attempt):\n    if attempt < 1:\n        raise ValueError('attempt')\n    return min(2 ** (attempt - 1), 16)\n",
+    "action.json": "{\n  \"retry_429_all_methods\": true,\n  \"retry_503_methods\": [\"GET\", \"HEAD\"],\n  \"correction_applied\": true,\n  \"question_answer\": \"A request is idempotent when sending it multiple times has the same intended effect on the server as sending it once; individual responses may differ.\",\n  \"verification\": [\n    \"Checked 429, 503, and other statuses across supported and unsupported methods with mixed case names.\",\n    \"Checked delay_seconds values and ValueError for attempts below 1.\"\n  ]\n}\n"
+  },
+  "public_final": "Updated [retry.py](<disposable>/workspace/retry.py) and [action.json](<disposable>/workspace/action.json). The checks passed: 429 retries for every tested method, 503 retries only for GET and HEAD regardless of case, other tested statuses do not retry, and `delay_seconds` retains its values and invalid-attempt error. I also validated the JSON fields and types.\n\nAn **idempotent** request has the same intended effect on the server when repeated as when sent once; its responses may differ."
+}

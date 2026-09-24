@@ -1,5 +1,10 @@
 # Development-package validation
 
+This is the historical documentation-only validation record. Current candidate
+implementation and execution evidence is maintained in
+[implementation status](IMPLEMENTATION_STATUS.md) and the
+[expanded evaluation report](../../evals/v1.5/expanded/RESULTS.md).
+
 Status: documentation checks passed on 2026-09-23. Product implementation,
 installed host behavior, and model-performance studies are pending.
 

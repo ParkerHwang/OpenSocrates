@@ -1,0 +1,7 @@
+{
+  "artifacts": {
+    "retry.py": "def should_retry(status, method='GET'):\n    return status == 429 or (\n        status == 503 and method.upper() in {'GET', 'HEAD'}\n    )\n\ndef delay_seconds(attempt):\n    if attempt < 1:\n        raise ValueError('attempt')\n    return min(2 ** (attempt - 1), 16)\n",
+    "action.json": "{\n  \"retry_429_all_methods\": true,\n  \"retry_503_methods\": [\"GET\", \"HEAD\"],\n  \"correction_applied\": true,\n  \"question_answer\": \"요청의 멱등성이란 같은 요청을 한 번 보내든 여러 번 보내든 서버의 최종 상태가 같은 성질입니다. 응답 내용까지 같아야 한다는 뜻은 아닙니다.\",\n  \"verification\": [\n    \"100~599 상태 코드와 9가지 메서드 표기에 대해 should_retry 결과를 확인했습니다.\",\n    \"기본 GET 메서드와 429의 임의 메서드 처리를 확인했습니다.\",\n    \"delay_seconds의 정상 값과 0 및 -1 입력 시 ValueError('attempt')를 확인했습니다.\"\n  ]\n}\n"
+  },
+  "public_final": "[retry.py](<disposable>/workspace/retry.py)에서 503은 대소문자와 관계없이 GET·HEAD에만 재시도하도록 수정했습니다. PUT·DELETE는 제외했고, 429와 `delay_seconds` 동작은 유지했습니다. [action.json](<disposable>/workspace/action.json)도 수정했습니다.\n\n**멱등성**은 같은 요청을 한 번 보내든 여러 번 보내든 서버의 최종 상태가 같은 성질입니다. 응답 내용까지 같아야 한다는 뜻은 아닙니다.\n\n셸에서 상태 코드 100~599와 9가지 메서드 표기, 기본 GET, 429 처리, `delay_seconds` 값과 잘못된 attempt 처리, JSON 필드·타입을 검증했고 모두 통과했습니다."
+}

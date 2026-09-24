@@ -1,0 +1,6 @@
+{
+  "artifacts": {
+    "plan.json": "{\n  \"attendees\": 40,\n  \"cost_usd\": 750,\n  \"approved_ceiling_usd\": 750,\n  \"budget_gap_usd\": 0,\n  \"venue\": \"Hall\",\n  \"status\": \"confirmed\",\n  \"memory_status\": \"unavailable\",\n  \"reason\": {\n    \"Loft\": \"stairs\",\n    \"Garden\": \"closes_early\"\n  },\n  \"required_question\": null,\n  \"side_answer\": {\n    \"capacity_is_limit\": true,\n    \"attendance_is_expected_count\": true\n  }\n}\n"
+  },
+  "public_final": "[plan.json](<disposable>/workspace/plan.json)을 작성하고 JSON 형식과 필드 값을 검증했습니다. **선택 장소는 Hall**입니다. 40명을 수용하고 17:00 이후까지 운영하며, 비용 $750이 승인된 상한과 같아 증액 질문은 필요하지 않습니다. `confirmed`는 장소 선택 상태이며, 예약이 완료됐다는 뜻은 아닙니다. 장소 선호는 이번 실행에서 프로젝트 메모리를 사용할 수 없어 저장하지 못했습니다.\n\n판단 근거: `premises`는 options.md의 인원·출입·종료 시각·비용 조건(검증됨), `hidden_premises`는 추가로 필요한 중요 전제 없음, `rule`은 모든 필수 조건과 예산을 충족하는 장소 선택입니다. `rule_or_form`은 조건 적용, `conclusion`은 Hall 선택, `validity_verdict`는 타당함입니다. `premise_status`는 제공된 파일 기준 검증됨, `invalidating_premise`는 장소 조건이나 비용의 변경, `soundness_verdict`는 현재 제공된 사실에 한해 성립, `flip_condition`은 그 사실의 변경입니다. Loft는 계단, Garden은 조기 폐관으로 제외됩니다. River는 $850으로 상한을 넘으며, 요청된 `reason` 코드에 예산 초과 코드가 없어 그 객체에는 넣지 않았습니다.\n\nOpenSocrates grounding: deduction@3"
+}

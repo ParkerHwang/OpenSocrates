@@ -1,5 +1,30 @@
 # v1.5 evaluation status
 
+## Current additive evidence
+
+The [expanded results](expanded/RESULTS.md) and [audit](expanded/AUDIT.md) add a
+completed 50-cell, two-repetition quality pilot plus two H02 cells (68 calls,
+49/50 strict artifact gates, 2/2 dependent host artifacts). They preserve every
+earlier result below. EVAL-04 artifact success did not establish forgetting;
+both guide-2 memory arms reported that obligation incomplete.
+
+Separately frozen guide-3 diagnostics retain four unsuccessful memory cases,
+including two parser-lost usage receipts. Retained commands identified the
+bounded-reference contract mismatch. Guide revision 4, mutation guide revision 2,
+and the aligned request schema pass source/native checks; two new EN/KO cases
+then pass independent persisted-forgetting checks. A full public dialogue trace
+also demonstrates a legacy final-message-only checker false negative. Do not
+retrofit its score or pool guide-2/3/4 treatments.
+
+The new work totals 81 CLI invocations: 3 access, 68 pilot/host, and 10 diagnostic
+calls. Two diagnostic calls retain missing usage. Sixty blinded packets and a
+fixed judge procedure are prepared; human and model-judge quality scores are
+still null. Exact current identities and validation are in the
+[guide-4 receipt](expanded/validation-receipt.guide4.json). Held-out margins/sample
+size remain unfrozen and no held-out call was made. Profiles remain candidate.
+
+## Earlier immutable pilot evidence
+
 The immutable [protocol](protocol.json) has its pre-outcome status field by
 design. Results live in separate files; updating the protocol after outcome
 calls would break the frozen-hash receipts. Run
@@ -17,7 +42,7 @@ missing inputs before a separate outcome protocol can be frozen.
 | EVAL-04 | [Nine fresh-session cells](memory-results/eval04-pilot-2026-09-24.json) cover non-Git event planning, non-Git research, and a Git untracked caller, each with disabled-memory, enrolled-memory, and maintained-note controls. All frozen deterministic gates passed. | Native server-side memory isolation, note-maintenance burden, human quality judgment, and a causal memory benefit remain unverified. Enrolled-memory arms used more reported input/tool work on these fixtures. |
 | EVAL-05 | [Proxy](results/eval-05-pilot.json) and [installed-plugin](results/native-eval-05-pilot.json) retain English/Korean developer and nondeveloper pairs. Developer artifact corrections passed in both languages/arms. Nondeveloper strict field checks had failures. [First](results/eval-05-pilot-attempt1-harness-failure.json) and [second](results/eval-05-pilot-attempt2-readonly-followup.json) proxy harness failures remain recorded. | Strict artifact checks are not blinded bilingual dialogue scores. Several natural-collaboration behaviors, including necessary clarification and unavailable memory, remain untested. |
 
-All model runs requested exact GPT-6 model IDs at medium effort through the
+All earlier model runs requested exact GPT-6 model IDs at medium effort through the
 ChatGPT desktop-bundled `codex-cli 0.155.0-alpha.16.3`. Its access probes
 completed for Luna, Sol, and Astra; the older system CLI 0.145.0 rejected
 those cells and is not the evaluation client. Client request/turn receipts are

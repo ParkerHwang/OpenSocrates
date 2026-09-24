@@ -1,75 +1,61 @@
 # Candidate implementation status
 
-This record describes the v1.5 implementation branch, not a released product.
-The reviewed baseline was remote `main` at
-`5a2ff3c312e92aa8a44d0905465674d9a4e4f645`. The specification package
-was carried onto a focused branch without changing protected `main`.
+The implementation remains Draft PR [#95](https://github.com/ParkerHwang/OpenSocrates/pull/95),
+tracked by [#94](https://github.com/ParkerHwang/OpenSocrates/issues/94). Remote main
+was reconciled at `5a2ff3c312e92aa8a44d0905465674d9a4e4f645`. Product/package metadata
+remains 1.4.0; this is not a v1.5 release. No active installation or real project
+was enrolled or changed.
 
-## Implemented source slices
+## Source and integration
 
-- W0: baseline reconciliation, privacy amendment, canonical/generated strict
-  schemas, synthetic fixtures, and preregistered pilot protocol.
-- W1: stateless `assistance` policy and command with none/light/structured
-  precedence and task fallback. Candidate profiles remain inactive normally.
-- W2-W4: explicit Git/directory enrollment, owner-only SQLite records and
-  checkpoints, bounded source snapshots, source freshness, metadata
-  observations, and cold recall in disposable fixtures.
-- W5: bilingual general assistance and coding guidance, plus general and coding
-  deterministic fixtures. Model-driven collaboration behavior is not yet
-  established by these tests.
-- W6: modes, inspect/export, record/project deletion, pruning, secret canaries,
-  and opt-in installer memory deletion have source fixture coverage. Internal
-  SQLite schema 1 to 2 migration now has owner-only backup/manifest, checked
-  interruption and rollback states, seven-day expiry, and deletion precedence
-  in disposable source fixtures. Native Windows lifecycle and packaged frozen
-  migration/deletion passed at `efeb436`. A later unexpected-WAL/SHM guard passed
-  focused fixtures; its exact-head native rerun is pending.
-- W7: source/package generation and Apple Silicon frozen-memory fixture are
-  exercised, including actual schema migration and backup in frozen binaries.
-  Hosted CI `35878192625` passed linked-worktree, reparse, owner ACL/journal,
-  migration/deletion, source freshness, and native package fixtures on Windows
-  x64 and Apple Silicon. A revised-guide candidate ZIP (SHA-256
-  `669593ef3edacfdffe6376012bec7a0a6a83087f45b619ce39c64d4e0dbc4e14`)
-  was installed under a new disposable `CODEX_HOME`; two ephemeral live
-  `gpt-6-sol`/medium tasks each retrieved the accepted synthetic decision once
-  and completed a dependent plan, including with hooks disabled. Pack
-  application remains `unverified`; observed artifacts are the narrower
-  behavior evidence. The ZIP is ignored build output, so its hash is recorded
-  separately from source-commit provenance. Clean-machine live
-  Windows Codex use and destructive account-home lifecycle remain unverified.
-  The host's `/usr/local/bin/codex` 0.145.0 rejected GPT-6 cells, while the
-  ChatGPT desktop-bundled CLI 0.155.0-alpha.16.3 completed Luna/Sol/Astra
-  medium access probes. These are client-specific observations; see the
-  [revised host receipt](../../evals/v1.5/host-feasibility-2026-09-24-r2.json).
-- W8: five evaluation lane protocols and pilot scenarios are frozen before any
-  outcomes. The bounded engineering pilot now has 40 model/collaboration cells
-  across separate prompt-proxy and installed-plugin EVAL-02/03/05 runs, nine
-  EVAL-04 continuity cells, ten EVAL-01 coding sessions, and two separately
-  frozen guide-repair replay cells. Failed harness attempts and invalid memory
-  calls remain in the records. One paired D treatment originally failed to
-  retrieve memory; guide revision 2 led to one successful first-attempt recall
-  on a new paired run, with equal hidden coding correctness and higher resource
-  use than C in that single pair. Pilot outcomes do not validate profiles or
-  establish quality, noninferiority, or savings. Held-out protocol/margins and
-  blinded human bilingual review remain open.
-- W9: independent review repaired source/privacy defects; live pilot failures
-  led to an EN/KO closed-recall guide repair and a separate replay. Draft PR
-  [#95](https://github.com/ParkerHwang/OpenSocrates/pull/95) and issue
-  [#94](https://github.com/ParkerHwang/OpenSocrates/issues/94) carry the
-  exact-commit handoff; remaining gates keep the PR in Draft.
+W0-W7 source slices implement stateless task-based assistance with candidate-only
+profiles; separate explicit project memory for Git and non-Git roots; source
+freshness and bounded cold recall; owner-only SQLite lifecycle; transactional
+schema-1 to 2 migration and managed backup/deletion; bilingual general/coding
+support; and frozen macOS/Windows packaging. The 48-method stateless decision
+path and locked legacy SDK/CLI dependencies remain intact.
 
-## Evidence boundary
+A live continuation exposed a scoped-forgetting gap. Supersession preserves
+history, so assistance guide revision 4 now links conditional EN/KO mutation
+instructions (revision 2) for preserving retained intent and deleting the exact
+old record. The generated memory request schema now expresses the bounded
+`authorization_basis`/`acceptance_basis` reference rule already enforced at
+runtime. Negative/positive source and frozen-runtime tests cover the previously
+rejected prose request and the valid `user:current-request` counterpart.
 
-Source fixtures establish checked contracts and synthetic lifecycles; package
-checks establish file identities. The disposable live task establishes scoped
-installed-pack retrieval and a dependent artifact, not universal application.
-Every pilot has one replicate per selected cell, deterministic artifact gates,
-and no human blinded judgment. Native host-memory isolation, exact backend
-model echo, billed cost, held-out margins, and statistical outcome evidence
-remain missing. No Luna/Sol gap reduction, Sol/Astra efficiency, universal
-quality, cost savings, or release claim follows.
+The [guide-4 validation receipt](../../evals/v1.5/expanded/validation-receipt.guide4.json)
+records full source/installer checks at `6e843fb`, native `make release-check` at
+`07611e5`, exact package/guide/schema identities, and external/internal/canonical
+byte checks. All 41 schemas remain present; only the memory request schema changed.
+Exact final-head hosted CI and the current commit are maintained in the PR/issue.
+Live Windows Codex and destructive account-home lifecycle remain unverified;
+hosted native fixtures are a different evidence layer.
 
-See [verification and evaluation](06-verification-and-evaluation.md) for the
-full acceptance requirements and [decision register](09-decisions-and-source-map.md)
-for implementation deviations. The Draft PR handoff must carry exact commit,
-commands/results, missing evidence, and next actions.
+## Outcome work and remaining gates
+
+The original immutable engineering evidence is preserved. Its fuller audit covers
+109 declared calls, including failed harness batches and missing receipts. The
+new independent task matrix completes 50 quality-pilot cells with two repetitions
+and two H02 cells: 68 calls, 49/50 strict artifact gates, and 2/2 dependent host
+artifacts. Those artifact passes do not erase incomplete memory obligations or
+missing dialogue evidence.
+
+Separate diagnostics preserve four unsuccessful guide-3 memory calls (two with
+parser-lost usage). After the reference-contract repair, two new EN/KO guide-4
+calls pass both artifact and independent persisted-forgetting checks. Dialogue
+traces demonstrate a legacy checker false negative when the necessary question
+appears before the final message. No old outcome or rubric is rewritten.
+
+There are 60 blinded artifact/diagnostic packets and fixed judge procedures,
+with no independent human scores. Local native memory use/generation/import were
+disabled in disposable profiles and local output/job tables are empty; account-side
+isolation remains unproven. Memory comparisons are confounded. Backend model echo,
+billed cost, adequate independent quality variance, numerical held-out margins,
+and a held-out study remain unavailable. Candidate profiles are not promoted.
+
+W8 is bounded pilot and review preparation, not completed outcome validation.
+W9 supplies the source fixes, verified receipts, review packets and recoverable
+Draft handoff. Read the [results](../../evals/v1.5/expanded/RESULTS.md),
+[audit](../../evals/v1.5/expanded/AUDIT.md), and
+[held-out readiness decision](../../evals/v1.5/HELD_OUT_READINESS.md) before making
+quality, efficiency, memory-effect, or release claims.

@@ -1,0 +1,6 @@
+{
+  "artifacts": {
+    "plan.json": "{\n  \"attendees\": 40,\n  \"venue\": \"Hall\",\n  \"cost_usd\": 750,\n  \"approved_ceiling_usd\": 750,\n  \"budget_gap_usd\": 0,\n  \"status\": \"confirmed\",\n  \"memory_status\": \"unavailable\",\n  \"reason\": {\n    \"Loft\": \"stairs\",\n    \"Garden\": \"closes_early\"\n  },\n  \"required_question\": null,\n  \"side_answer\": {\n    \"capacity_is_limit\": true,\n    \"attendance_is_expected_count\": true\n  }\n}\n"
+  },
+  "public_final": "[plan.json](<disposable>/workspace/plan.json)을 작성하고 JSON 형식과 요청한 필드·값을 셸로 확인했습니다. **Hall**은 `options.md`의 40명, 계단 없는 출입, 17:00 종료 조건을 충족하며 비용은 승인 상한과 같은 **$750**입니다. 예산 증액 질문은 필요하지 않습니다. 장소 예약은 이루어지지 않았고, 프로젝트 메모리를 사용할 수 없어 선호를 저장하지 못했습니다.\n\n- `premises`·`premise_status`: 위 조건과 Hall의 수용 인원 45명·폐관 19:00·비용 $750는 `options.md`에서 **확인됨**. 실제 장소 정보의 최신 여부는 **미검증**.\n- `hidden_premises`: 파일의 장소 정보가 현재도 유효하다는 점은 **가정함**.\n- `rule`·`rule_or_form`: 필수 조건과 승인 상한을 모두 충족하면 계획상 선택 가능하며, Hall은 파일 기준으로 이를 충족한다는 형식입니다.\n- `conclusion`·`validity_verdict`·`soundness_verdict`: 따라서 Hall 선택과 증액분 $0은 전제로부터 **타당하게 계산됨**. 현실 정보가 별도로 확인되지 않았으므로 건전성 판정은 **조건부**입니다.\n- `invalidating_premise`·`flip_condition`: Hall의 접근성·운영 시간·수용 인원·가격이 달라지거나 참석 인원이 45명을 넘으면 선택을 다시 검토해야 합니다.\n\nOpenSocrates grounding: deduction@3"
+}

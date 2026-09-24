@@ -1,0 +1,6 @@
+{
+  "artifacts": {
+    "offer.py": "from catalog import lookup\n\ndef quote(label, seats, savings_cents=0):\n    return breakdown(label, seats, savings_cents)['total_cents']\n\n\ndef breakdown(label, seats, savings_cents=0):\n    plan = lookup(label)\n    if type(seats) is not int or seats < 1 or seats > plan['max_seats']:\n        raise ValueError('seats')\n    subtotal = plan['seat_cents'] * seats\n    if type(savings_cents) is not int or savings_cents < 0 or savings_cents > subtotal:\n        raise ValueError('savings_cents')\n    return {\n        'plan_code': plan['code'],\n        'subtotal_cents': subtotal,\n        'savings_cents': savings_cents,\n        'total_cents': subtotal - savings_cents,\n    }\n"
+  },
+  "public_final": "Updated [offer.py](<disposable>/workspace/offer.py) with `breakdown`, which returns the current catalog plan code and integer subtotal, savings, and total. `quote` still returns an integer. Both functions raise `ValueError` for invalid seats or savings.\n\nLocal checks passed for every current plan and alias, including `squad`, boundary totals, invalid inputs, and `git diff --check`. I left the existing `catalog.py` change untouched."
+}

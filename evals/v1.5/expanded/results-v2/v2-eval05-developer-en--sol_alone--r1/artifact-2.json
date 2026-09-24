@@ -1,0 +1,7 @@
+{
+  "artifacts": {
+    "retry.py": "def should_retry(status, method='GET'):\n    if status == 429:\n        return True\n    return status == 503 and method.upper() in {'GET', 'HEAD'}\n\ndef delay_seconds(attempt):\n    if attempt < 1:\n        raise ValueError('attempt')\n    return min(2 ** (attempt - 1), 16)\n",
+    "action.json": "{\n  \"retry_429_all_methods\": true,\n  \"retry_503_methods\": [\"GET\", \"HEAD\"],\n  \"correction_applied\": true,\n  \"question_answer\": \"A request is idempotent if repeating it has the same intended effect on server state as making it once.\",\n  \"verification\": [\n    \"Checked retry decisions for 429, 503, and other statuses across mixed-case methods.\",\n    \"Checked delay_seconds values and invalid-attempt behavior.\",\n    \"Validated action.json field names and types.\"\n  ]\n}\n"
+  },
+  "public_final": "Updated [retry.py](<disposable>/workspace/retry.py) and [action.json](<disposable>/workspace/action.json). Status 429 retries for any method; 503 retries only for GET and HEAD, case-insensitively. `delay_seconds` is unchanged.\n\nAn **idempotent request** has the same intended effect on server state when repeated as when made once.\n\nVerified the retry rules across mixed-case methods and other statuses, the delay values and invalid-attempt errors, and the JSON field names and types."
+}

@@ -1,0 +1,60 @@
+{
+  "schema": "opensocrates.v1.5.validation-receipt/2.0.0",
+  "source_suite": {
+    "commit": "9dd94c6f70ec2badd990aa306246e6dc89637b05",
+    "command": "make bootstrap format-check lint generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check",
+    "exit_code": 0,
+    "log_sha256": "5e7d9a2ad6cdb4234c87c1efacb902916b4b233ea920094d17767f1cc9a4c36a"
+  },
+  "native_suite": {
+    "commit_at_invocation": "2e6c65d11a822b821e8068b4ea84ad933486e0ee",
+    "command": "make release-check",
+    "exit_code": 0,
+    "report_sha256": "6a4497704cc4e2df5c81b72e8f1adb6b0af3ae9cf94f24b6fd117c4ef11999d1",
+    "product_version": "1.4.0",
+    "status": "pass",
+    "check_groups": [
+      "bundle",
+      "codex_session_start_timing",
+      "content",
+      "deterministic_generation",
+      "docs",
+      "evidence",
+      "frozen_memory",
+      "generated_outputs",
+      "hosts",
+      "package_assembly",
+      "package_docs",
+      "packaged_decision_example",
+      "packaged_launcher",
+      "reasoning_content_bundle",
+      "runtime_entry",
+      "runtime_version",
+      "schemas",
+      "security",
+      "source_version"
+    ]
+  },
+  "source_closure_unchanged": true,
+  "package": {
+    "path": "/Users/parkerhwang/Documents/OpenSource/OpenSocrates-v1.5.0-implementation/dist/opensocrates-1.4.0-codex-plugin.zip",
+    "sha256": "2ff2b983695c5433755229c2261beb66981228077f33fa3aa6437aed4c9d0a37",
+    "product_version": "1.4.0",
+    "guide_revision": 2,
+    "archive_modes_restored_before_install": true
+  },
+  "focused_checks": [
+    "python3 evals/v1.5/verify_pilot_results.py",
+    "python3 evals/v1.5/expanded/verify_baseline_v2.py",
+    "python3 evals/v1.5/expanded/harness_v3.py",
+    "python3 evals/v1.5/expanded/checks_v2.py",
+    "ruff check and format --check on unfrozen new evaluation modules"
+  ],
+  "not_performed": [
+    "account-home purge/reinstall",
+    "live Windows Codex",
+    "independent human quality review",
+    "held-out model calls",
+    "merge/tag/publish/deploy/version synchronization"
+  ]
+}

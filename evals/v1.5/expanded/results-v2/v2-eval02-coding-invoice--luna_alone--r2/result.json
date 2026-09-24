@@ -1,0 +1,56 @@
+{
+  "cell": {
+    "id": "v2-eval02-coding-invoice--luna_alone--r2",
+    "task": "v2-eval02-coding-invoice",
+    "arm": "luna_alone",
+    "model": "gpt-6-luna",
+    "effort": "medium",
+    "plugin": false,
+    "wrapper": false,
+    "memory": false,
+    "note": false,
+    "hooks": false,
+    "repetition": 2
+  },
+  "task": "v2-eval02-coding-invoice",
+  "lane": "EVAL-02",
+  "locale": "en",
+  "held_out": false,
+  "quality_judge": null,
+  "calls": [
+    "turn-1.json"
+  ],
+  "stages": [
+    "artifact-1.json"
+  ],
+  "initial_source_hashes": {
+    "invoice.py": "628eac5838029507d30e855373116d4c02b7a8e8a6d01f1e470c2dc2458802b9"
+  },
+  "installation": {
+    "ok": true,
+    "operations": [],
+    "inventory": []
+  },
+  "source_hashes_before_call": {
+    "invoice.py": "628eac5838029507d30e855373116d4c02b7a8e8a6d01f1e470c2dc2458802b9"
+  },
+  "grade": {
+    "checks": {
+      "invoice_member_order": true,
+      "invoice_nonmember_regression": true,
+      "invoice_invalid_inputs": true
+    },
+    "critical_failures": [],
+    "all_pass": true
+  },
+  "all_calls_completed": true,
+  "deterministic_success": true,
+  "native_tables": {
+    "database_present": true,
+    "stage1_outputs": 0,
+    "jobs": 0
+  },
+  "auth_copy_removed": true,
+  "wall_including_setup_seconds": 40.083,
+  "account_side_memory_isolation": "unverified; memory-effect comparisons confounded"
+}

@@ -10,6 +10,24 @@ identity. Reconcile the Git commit and built package bytes separately.
 
 ## Evidence already available
 
+- The latest [guide-4 validation receipt](../../evals/v1.5/expanded/validation-receipt.guide4.json)
+  records a rebuilt Apple Silicon package SHA-256
+  `a3a65b1ee9671c8e2d2bf684e4ae64b3a5cfc048105052fd14819589a90557c1`,
+  source/native checks, matching canonical/packaged EN/KO guides, and matching
+  external/internal request-schema bytes. A frozen negative/positive acceptance
+  test rejects prose attribution before mutation, then accepts the bounded
+  `user:current-request` reference. The schema family still has 41 members.
+- Fresh exact Luna/Sol/Astra medium access probes pass on bundled
+  `codex-cli 0.155.0-alpha.16.3`. Two guide-2 H02 artifacts pass with normal and
+  disabled hooks; separate final guide-4 EN/KO diagnostics verify actual accepted
+  replacement plus removal through inspect/export/recall. These conditions are
+  separate, with no universal hook/application receipt or backend model echo.
+- The active global configuration hash matches the initial read-only snapshot;
+  every new disposable profile's auth copy was removed. Account-side memory
+  isolation remains unproven. Only Local is connected, so live Windows Codex is
+  unavailable. Use the final PR-head CI for current hosted Windows source/package
+  coverage; it does not substitute for that live host cell.
+
 - PR #95 CI at `efeb436aeb80dabd9a3df9571e66a3de280eadad` passed native
   Windows x64 source/package fixtures, including linked worktrees, junction and
   copied-root rejection, frozen SQLite migration/backup/deletion, and owner ACL
