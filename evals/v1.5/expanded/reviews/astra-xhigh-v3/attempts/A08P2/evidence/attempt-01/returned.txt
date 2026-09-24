@@ -1,0 +1,702 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A08P2",
+  "phase": "evidence",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "7a9d03c33f425271",
+      "packet_sha256": "6f6b3b9e899e2d8fbbd16c5a3e2172dbfb43979e179e0caabfb25ddc1af3f968",
+      "locale": "en",
+      "blinding_status": "intact",
+      "non_blindable_cues": [
+        "The packet carries a generic warning about memory/note references and characteristic wording; no concrete treatment-identifying cue was observed."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final code and action artifact implement the corrected retry policy, preserve delay behavior, and answer the side question.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The described behavior matches the visible implementation, and the idempotency explanation correctly distinguishes intended effects from responses. Reported test execution is separately unassessable.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Both designated artifacts incorporate the correction, and the side question is answered while the original coding task is completed.",
+          "evidence": [
+            "packet:/stages/0/artifacts",
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final message clearly describes the corrected behavior and gives a concise, accurate explanation of idempotency.",
+          "evidence": [
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The localized predicate preserves the public signature and delay function, normalizes method case once, and keeps the corrected 503 policy in one place without duplicate paths.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/0/artifacts/retry.py",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The two artifact stages show correction uptake but provide no action counts or timing from which to judge efficiency.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "retry_429_for_all_methods",
+          "status": "pass",
+          "reason": "The 429 branch returns True before inspecting the method.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py#L2",
+            "packet:/stages/1/artifacts/action.json/retry_429_all_methods"
+          ]
+        },
+        {
+          "gate_id": "correct_503_policy",
+          "status": "pass",
+          "reason": "The final 503 allowlist contains only GET and HEAD; PUT and DELETE have been removed from both artifacts.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/retry.py#L4",
+            "packet:/stages/1/artifacts/action.json/retry_503_methods"
+          ]
+        },
+        {
+          "gate_id": "case_default_and_other_status_behavior",
+          "status": "pass",
+          "reason": "The GET default is preserved, string method names are normalized with upper(), and statuses other than 429 or 503 return False.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/1/artifacts/retry.py#L1",
+            "packet:/stages/1/artifacts/retry.py#L4"
+          ]
+        },
+        {
+          "gate_id": "preserve_delay_contract",
+          "status": "pass",
+          "reason": "The delay function is unchanged, including ValueError below attempt 1 and the capped exponential result.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/1/artifacts/retry.py#L6"
+          ]
+        },
+        {
+          "gate_id": "action_contract_and_code_agreement",
+          "status": "pass",
+          "reason": "The final action object has exactly the five requested typed fields, and its retry-policy fields agree with the corrected implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        {
+          "gate_id": "answer_idempotency_and_finish_task",
+          "status": "pass",
+          "reason": "Both the action string and public message explain that repeating a request has the same intended effect as sending it once, while responses may differ; the code correction is also complete.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        {
+          "gate_id": "reported_verification_execution",
+          "status": "unassessable",
+          "reason": "The candidate describes checks and says they passed, but no execution receipts are supplied. Static agreement does not establish that the reported checks ran.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The correction changes the single 503 allowlist and corresponding action data while preserving the independent 429 and delay behavior.",
+          "evidence": [
+            "packet:/stages/0/artifacts/retry.py",
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The side answer accurately explains idempotency without abandoning the coding task.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Both available stage-final messages were reviewed, but intermediate public messages, test receipts, and action timing are absent. No conclusion is drawn about earlier questions or actual test execution.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "00f28171d894a04170b0900a5ace1f2a304f706a7105eb93856fce88049eb68e",
+        "limitations": [
+          "The evidence supplies aggregate check flags and resource totals, without individual test cases or ordered action receipts.",
+          "The supplied checker results do not establish which verification commands the candidate executed.",
+          "No checker or candidate code was executed during this review."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Functional and action-contract results",
+          "category": "no_disagreement",
+          "first_pass_observation": "Static inspection found the corrected retry behavior and action fields consistent with the request.",
+          "deterministic_observation": "{\"checks\":{\"developer_retry_behavior\":true,\"developer_action_fields\":true},\"critical_failures\":[],\"all_pass\":true}",
+          "interpretation": "The supplied flags agree with the visible artifacts. They do not independently establish maintainability, communication quality, or historical verification execution.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "subject": "Candidate-reported verification",
+          "category": "missing_evidence",
+          "first_pass_observation": "Whether the candidate ran the reported checks was unassessable.",
+          "deterministic_observation": "Both checker flags pass, and failed_tool_actions is 0; the evidence contains no candidate command receipts.",
+          "interpretation": "Checker success corroborates the result but does not resolve the provenance of the candidate's verification claims. The gate remains unassessable; no false claim is established.",
+          "evidence": [
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks",
+            "deterministic:/failed_tool_actions"
+          ]
+        },
+        {
+          "subject": "Efficiency evidence coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Action counts and timing were unavailable in the first-pass view.",
+          "deterministic_observation": "tool_actions=15; failed_tool_actions=0; wall_seconds=82.985.",
+          "interpretation": "Aggregate resource coverage is now available. Without action contents or ordering, these totals cannot establish redundant work or whether required checks occurred once, so efficiency remains unassessable.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The corrected code and action artifact satisfy the task, and both supplied deterministic checks agree.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts",
+            "packet:/stages/1/public_final",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Behavioral claims and the idempotency explanation remain accurate. Deterministic success corroborates the artifact; candidate-reported test execution remains separately unassessable.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The correction reaches both artifacts and the side answer accompanies completion of the coding task. The new evidence reveals no contrary behavior.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts",
+            "packet:/stages/1/artifacts",
+            "packet:/stages/1/public_final",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The public response clearly explains the implemented correction and idempotency; the supplied evidence does not change that assessment.",
+          "evidence": [
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The single policy predicate preserves the signature and delay contract and supports further policy changes without duplication. Passing flags do not substitute for this static assessment.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/0/artifacts/retry.py",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The evidence reports 15 actions, zero failed actions, and 82.985 seconds, but lacks the ordered receipts needed to assess unnecessary or repeated work.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "retry_429_for_all_methods",
+          "status": "pass",
+          "reason": "The unconditional 429 branch remains correct; the aggregate retry-behavior check also passes.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py#L2",
+            "packet:/stages/1/artifacts/action.json/retry_429_all_methods",
+            "deterministic:/deterministic_checks/checks/developer_retry_behavior"
+          ]
+        },
+        {
+          "gate_id": "correct_503_policy",
+          "status": "pass",
+          "reason": "Both final artifacts restrict 503 retries to GET and HEAD, consistent with the correction and passing check flags.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/retry.py#L4",
+            "packet:/stages/1/artifacts/action.json/retry_503_methods",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        {
+          "gate_id": "case_default_and_other_status_behavior",
+          "status": "pass",
+          "reason": "The GET default, case normalization, and false result for other statuses remain visible in the code.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/1/artifacts/retry.py#L1",
+            "packet:/stages/1/artifacts/retry.py#L4",
+            "deterministic:/deterministic_checks/checks/developer_retry_behavior"
+          ]
+        },
+        {
+          "gate_id": "preserve_delay_contract",
+          "status": "pass",
+          "reason": "The delay function matches the original source, including its invalid-attempt error and cap.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/1/artifacts/retry.py#L6"
+          ]
+        },
+        {
+          "gate_id": "action_contract_and_code_agreement",
+          "status": "pass",
+          "reason": "The five typed action fields agree with the final implementation, and the action-field check passes.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/artifacts/retry.py",
+            "deterministic:/deterministic_checks/checks/developer_action_fields"
+          ]
+        },
+        {
+          "gate_id": "answer_idempotency_and_finish_task",
+          "status": "pass",
+          "reason": "The public message and action string correctly explain repeated requests' intended effects while the corrected artifacts complete the task.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        {
+          "gate_id": "reported_verification_execution",
+          "status": "unassessable",
+          "reason": "Aggregate checker results and action totals do not identify the checks the candidate actually executed.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks",
+            "deterministic:/tool_actions"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "6cd053f86e7917f8",
+      "packet_sha256": "a011b78f62649d50bf73ded875d1967b55600bd1bedcc306a0a47649a3613e71",
+      "locale": "en",
+      "blinding_status": "intact",
+      "non_blindable_cues": [
+        "The packet carries a generic warning about memory/note references and characteristic wording; no concrete treatment-identifying cue was observed."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The decision selects the qualifying venue, supplies all requested data and rejection codes, records unknown availability, and briefly explains the choice.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Bay's cost, four-seat margin, constraints, and the rejected alternatives match the brief; availability remains explicitly unknown. Historical JSON-check execution is not independently evidenced.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The observable result completes the authorized selection and artifact while recording the availability uncertainty without inventing a booking.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final message concisely explains Bay's suitability and price and clearly states that availability is unspecified.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The requested output is decision data, not a code implementation.",
+          "evidence": [
+            "packet:/initial_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "No action or timing receipts are supplied; artifact completeness and response brevity do not establish efficiency.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "lowest_cost_qualifying_selection",
+          "status": "pass",
+          "reason": "Bay is the only listed venue satisfying capacity, entry, rain backup, closing time, and budget requirements.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/selected_venue",
+            "packet:/stages/0/artifacts/decision.json/constraints_met"
+          ]
+        },
+        {
+          "gate_id": "decision_field_contract",
+          "status": "pass",
+          "reason": "The artifact contains the requested typed fields, including 58 attendees, cost 1150, and capacity margin 62 minus 58 equals 4.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "gate_id": "source_grounded_rejections",
+          "status": "pass",
+          "reason": "Pine closes too early, Dock has stairs-only entry, and Elm lacks rain backup; each receives one correct decisive code.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/rejected"
+          ]
+        },
+        {
+          "gate_id": "availability_and_booking_authority",
+          "status": "pass",
+          "reason": "The artifact and public message explicitly leave availability unresolved and make no booking claim.",
+          "evidence": [
+            "packet:/stages/0/artifacts/decision.json/unresolved",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "explain_decision",
+          "status": "pass",
+          "reason": "The final message explains the qualifying choice, participant fit, price, and remaining uncertainty.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The decision applies every hard constraint, gives accurate rejection reasons, and preserves the distinction between suitability and unknown availability.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Only the stage-final message is supplied. Earlier questions, actual JSON-check execution, and resource use cannot be assessed from this view.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "f6fa3d97f4ed2134fef02d330d077a37ed73e8d806cdeae7538302e919e4eb94",
+        "limitations": [
+          "The evidence supplies aggregate check flags and resource totals, without detailed assertions or ordered action receipts.",
+          "Passing decision checks do not establish whether the candidate executed the reported JSON validation.",
+          "No checker or candidate code was executed during this review."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Venue decision and authority boundaries",
+          "category": "no_disagreement",
+          "first_pass_observation": "Bay satisfies every hard constraint; the artifact correctly rejects the alternatives and leaves availability unresolved without claiming a booking.",
+          "deterministic_observation": "{\"checks\":{\"venue_choice\":true,\"venue_constraints\":true,\"venue_no_booking_claim\":true},\"critical_failures\":[],\"all_pass\":true}",
+          "interpretation": "All supplied flags agree with the source-grounded first-pass observations. No substantive contradiction is present.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "subject": "Candidate-reported JSON validation",
+          "category": "missing_evidence",
+          "first_pass_observation": "Historical execution of the reported JSON check was not independently evidenced.",
+          "deterministic_observation": "The venue checks pass and failed_tool_actions is 0, but no candidate validation command receipt is supplied.",
+          "interpretation": "The new evidence corroborates the decision result without establishing the candidate's historical validation activity. No false verification claim is demonstrated.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks",
+            "deterministic:/failed_tool_actions"
+          ]
+        },
+        {
+          "subject": "Efficiency evidence coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Action and timing receipts were unavailable in the first-pass view.",
+          "deterministic_observation": "tool_actions=2; failed_tool_actions=0; wall_seconds=15.965.",
+          "interpretation": "Resource totals are now known. Their contents and sequence remain unavailable, so the totals alone do not establish efficiency discipline.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The artifact satisfies the selection and data contract, explains the decision, and retains unknown availability; all supplied venue checks agree.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The selected venue, cost, capacity margin, rejection reasons, and availability limitation match the brief. Historical JSON-check execution remains unevidenced.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The authorized decision and artifact are complete without inventing availability or exceeding booking authority. The new evidence supports these results.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/venue_no_booking_claim"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The concise public explanation identifies Bay's suitability, price, and unresolved availability.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The requested output is decision data, not a code implementation.",
+          "evidence": [
+            "packet:/initial_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Two actions, zero failed actions, and 15.965 seconds are reported, but action contents and ordering are absent; an efficiency rating would require assumptions.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "lowest_cost_qualifying_selection",
+          "status": "pass",
+          "reason": "Bay is the only qualifying listed venue, and the supplied venue-choice check passes.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/selected_venue",
+            "deterministic:/deterministic_checks/checks/venue_choice"
+          ]
+        },
+        {
+          "gate_id": "decision_field_contract",
+          "status": "pass",
+          "reason": "The requested typed fields are present with 58 attendees, cost 1150, capacity margin 4, and all four constraint codes.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "deterministic:/deterministic_checks/checks/venue_constraints"
+          ]
+        },
+        {
+          "gate_id": "source_grounded_rejections",
+          "status": "pass",
+          "reason": "Each rejected venue has a decisive code matching its source constraint failure.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/rejected"
+          ]
+        },
+        {
+          "gate_id": "availability_and_booking_authority",
+          "status": "pass",
+          "reason": "Availability remains explicitly unknown and no booking is claimed, consistent with the passing no-booking check.",
+          "evidence": [
+            "packet:/stages/0/artifacts/decision.json/unresolved",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/venue_no_booking_claim"
+          ]
+        },
+        {
+          "gate_id": "explain_decision",
+          "status": "pass",
+          "reason": "The final message gives the qualifying choice, attendance fit, price, and unresolved availability.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "Read AGENTS.md, CONTRIBUTING.md, the fixed rubric, this assignment's locked judgments, both complete packet views, and both corresponding evidence files. Coverage includes both embedded sources, all designated artifacts and diffs, and all three available stage-final messages.",
+    "The rubric, both packet views, and both evidence files matched their supplied SHA-256 values. Packet hashes identify the supplied frozen view bytes.",
+    "The required locked per-packet fields are preserved exactly. Post-evidence scores, gates, and observations are separately recorded.",
+    "Inspection was static and read-only. No candidate code, tests, checker, plugin, or harness was executed, and no external evidence was obtained.",
+    "Aggregate action counts and timing are now available; earlier public messages, ordered action receipts, complete filesystem snapshots, and candidate verification-command receipts remain unavailable. Missing messages do not establish that an earlier question was never asked.",
+    "Host/backend model echoes and usage are unavailable and remain null. Caller-stated context isolation was not independently verified.",
+    "These are supplemental judgments from one provisional model assessor. Human scores remain null; the ratings do not establish full acceptance, comparative performance, held-out validity, or release readiness."
+  ]
+}

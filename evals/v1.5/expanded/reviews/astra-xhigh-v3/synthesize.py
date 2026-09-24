@@ -230,7 +230,7 @@ def main() -> None:  # noqa: C901
             "complete_total": sum(values) if all(value is not None for value in values) else None,
         }
     resources = {}
-    for key in ("wall_seconds", "tool_actions", "failed_tool_actions"):
+    for key in ("wall_seconds", "tool_actions", "failed_tool_actions", "incomplete_tool_actions"):
         values = [call[key] for call in calls]
         resources[key] = {
             "sum_available": round(sum(value for value in values if value is not None), 3),

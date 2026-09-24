@@ -50,6 +50,7 @@ def attempt_ledger(complete: bool = True) -> list[dict]:
                     "usage": receipt["usage"],
                     "tool_actions": receipt["tool_actions_started_or_completed"],
                     "failed_tool_actions": receipt["failed_tool_actions"],
+                    "incomplete_tool_actions": receipt.get("incomplete_tool_actions"),
                     "validation": validation,
                 }
             )
@@ -88,6 +89,7 @@ def attempt_ledger(complete: bool = True) -> list[dict]:
             "usage": probe["usage"],
             "tool_actions": None,
             "failed_tool_actions": None,
+            "incomplete_tool_actions": None,
             "validation": {"valid": False, "errors": ["No packets; schema transport rejected"]},
         }
     )
@@ -217,6 +219,9 @@ def verify(complete: bool = True) -> dict:  # noqa: C901
         "evidence_packets": len(reviewed),
         "completed_or_interrupted_cli_receipts": len(ledger),
         "failed_process_or_transport_receipts": sum(not row["process_success"] for row in ledger),
+        "validation_rejected_successful_processes": sum(
+            row["process_success"] and not row["validation"]["valid"] for row in ledger
+        ),
         "missing_input_usage_calls": sum(
             (row["usage"] or {}).get("input_tokens") is None for row in ledger
         ),

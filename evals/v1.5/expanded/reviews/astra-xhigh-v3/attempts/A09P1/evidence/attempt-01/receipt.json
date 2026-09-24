@@ -1,0 +1,123 @@
+{
+  "model_requested": "gpt-6-astra",
+  "effort_requested": "xhigh",
+  "sandbox_requested": "read-only",
+  "agent_definition_sha256": "324906ab9460043d75202b199167cf2f8590941014a0a06c2459294a2cfb48d5",
+  "runtime_profile_sha256": "89f5aeb44fa112fa9eb003a4f7dd809a70b8541b7c74150b91e2bbbff4dadba9",
+  "client_sha256": "c67698d0990aae05211d9c43ab343ad9517e406824dea77eca103a2806232b3a",
+  "prompt_sha256": "a15a251781711595dd18a58a0c8bbc834f40ac18135ebf2a883a9b9a731610c7",
+  "started_unix": 1790229205.1888409,
+  "backend_model_echo": null,
+  "billed_cost": null,
+  "exit_code": 0,
+  "timed_out": false,
+  "invocation_error": null,
+  "wall_seconds": 287.284,
+  "stderr_sha256": null,
+  "event_count": 12,
+  "malformed_lines": 0,
+  "usage": {
+    "input_tokens": 106340,
+    "cached_input_tokens": 88576,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 8792,
+    "reasoning_output_tokens": 1335
+  },
+  "usage_reports": [
+    {
+      "input_tokens": 106340,
+      "cached_input_tokens": 88576,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 8792,
+      "reasoning_output_tokens": 1335
+    }
+  ],
+  "turn_completed": true,
+  "errors": [],
+  "tool_actions": [
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "47d0315b306ea8525186dd9db0e864afe4736ff9c09ad411b870d3692da2ea8e",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "52d93537dbceb8453ddac419d34ba62596e4d443177b7d280449996da64696f6",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "d2b6948edfe93e27e9db8cdfee3908db6f528fea0e08720a1ec0a4be85d1a68a",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [
+        {
+          "schema": "opensocrates.provisional-ai-review/1.0.0",
+          "status": null,
+          "delivery": null,
+          "application": null,
+          "used_bytes": null
+        }
+      ],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "fac4785fcacf26c9ce14a9e831f6fae762baa574fc4adac7bb2a5f779fa1b034",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    }
+  ],
+  "tool_actions_started_or_completed": 4,
+  "failed_tool_actions": 0,
+  "incomplete_tool_actions": 0,
+  "direct_operations_lexical": {},
+  "structured_status_counts": {},
+  "protocol_rejections": 0,
+  "repeated_command_hashes": 0,
+  "native_hook_events": 0,
+  "final_message_sha256": "88f919b3374cb89bdbece0dbd6fe31bbf4fcf39f7545b4b6edf8cce11340e180",
+  "public_message_count": 1,
+  "server_echoed_model": null,
+  "tool_classification_limit": "Lexical direct calls and structured responses; nested invocations may be missed. Repeated hash does not itself prove unnecessary work.",
+  "access_audit": {
+    "commands": [
+      {
+        "command_template": "/bin/zsh -lc pwd",
+        "exit_code": 0
+      },
+      {
+        "command_template": "/bin/zsh -lc \"python3 -c 'from pathlib import Path; import hashlib; paths=[\\\"AGENTS.md\\\",\\\"CONTRIBUTING.md\\\",\\\"evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md\\\",\\\"locked-first-pass.json\\\",\\\"evals/v1.5/expanded/blinded-v2/d9fee7df784166df.json\\\",\\\"evals/v1.5/expanded/blinded-v2/8d33adbdc834ada7.json\\\",\\\"evals/v1.5/expanded/judge-evidence-v2/d9fee7df784166df.json\\\",\\\"evals/v1.5/expanded/judge-evidence-v2/8d33adbdc834ada7.json\\\"]; [(print(p,len(b),len(b.splitlines()),hashlib.sha256(b).hexdigest())) for p in paths for b in [Path(p).read_bytes()]]; [(print(\\\"\\\\nFILE \\\"+p+\\\"\\\\n\\\"+Path(p).read_text())) for p in paths[:3]]'\"",
+        "exit_code": 0
+      },
+      {
+        "command_template": "/bin/zsh -lc 'cat locked-first-pass.json evals/v1.5/expanded/blinded-v2/d9fee7df784166df.json evals/v1.5/expanded/blinded-v2/8d33adbdc834ada7.json'",
+        "exit_code": 0
+      },
+      {
+        "command_template": "/bin/zsh -lc 'cat evals/v1.5/expanded/judge-evidence-v2/d9fee7df784166df.json evals/v1.5/expanded/judge-evidence-v2/8d33adbdc834ada7.json'",
+        "exit_code": 0
+      }
+    ],
+    "flags": [],
+    "limit": "Declared read-only sandbox and narrow physical input scope; command-pattern audit is not universal access attestation"
+  },
+  "error_events": [],
+  "process_success": true
+}
