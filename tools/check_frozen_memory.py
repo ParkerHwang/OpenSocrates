@@ -274,6 +274,8 @@ def main() -> int:
             for path in (
                 "skills/opensocrates/references/assistance/guide.en.md",
                 "skills/opensocrates/references/assistance/guide.ko.md",
+                "skills/opensocrates/references/assistance/mutations.en.md",
+                "skills/opensocrates/references/assistance/mutations.ko.md",
                 "skills/opensocrates/references/coding/reuse.en.md",
                 "skills/opensocrates/references/coding/reuse.ko.md",
                 "schemas/v1/project-memory-request.schema.json",

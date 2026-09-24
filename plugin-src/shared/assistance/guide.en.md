@@ -1,6 +1,6 @@
 # Optional assistance and project continuity
 
-Guide revision: 2
+Guide revision: 3
 
 Keep the user's goal, permissions, constraints, and completion conditions in view.
 For a mechanical edit or completed unchanged checks, finish directly. For a
@@ -31,6 +31,9 @@ field. Inspect `status` and `result`, not the process exit alone. Repair an
 invalid envelope before drawing any conclusion about remembered content.
 
 After an enrolled milestone, capture only permitted public state under the
-project's policy. A user correction changes the next action and artifact;
-supersede scoped memory when authorized. Finish after the required checks
-unless a material change or new evidence reopens them.
+project's policy. A user correction changes the next action and artifact.
+Before an authorized memory correction or explicit forgetting request, read
+[memory mutations](mutations.en.md). Supersession retains history; it does not
+erase a withdrawn fact. Preserve remaining accepted intent before exact-record
+deletion, and verify the result before claiming that memory was updated.
+Finish after the required checks unless material change or new evidence reopens them.

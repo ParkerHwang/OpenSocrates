@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import sqlite3
 import subprocess
@@ -1048,6 +1049,73 @@ class MemoryFixture(unittest.TestCase):
             [item["summary"] for item in recalled["result"]["decisions"]], ["Plan for 20 guests."]
         )
         self.assertEqual(recalled["result"]["conflicts"], [])
+
+    def test_documented_scoped_forgetting_preserves_accepted_intent(self) -> None:
+        self.enroll()
+        guides = Path(__file__).resolve().parents[1] / "plugin-src/shared/assistance"
+        for locale in ("en", "ko"):
+            with self.subTest(locale=locale):
+                guide = (guides / f"mutations.{locale}.md").read_text(encoding="utf-8")
+                example = json.loads(re.search(r"```json\n(.*?)\n```", guide, re.S)[1])
+                retained = "The workshop needs step-free entry and a quiet room for 52 guests."
+                withdrawn = f"Withdrawn {locale} claim: Cedar capacity was 60."
+
+                def accepted(
+                    summary: str, example: dict[str, object] = example
+                ) -> dict[str, object]:
+                    payload = {**example, "idempotency_key": uid(), "summary": summary}
+                    created = self.call("record", payload)
+                    self.assertEqual(created["status"], "ok", created)
+                    record = created["result"]["record"]
+                    result = self.call(
+                        "accept",
+                        {
+                            "record_id": record["record_id"],
+                            "expected_record_version": record["version"],
+                            "idempotency_key": uid(),
+                            "acceptance_basis": "fixture:explicit-scoped-forgetting",
+                            "acceptance_attribution": "agent_reported_user_instruction",
+                        },
+                    )
+                    self.assertEqual(result["status"], "ok", result)
+                    return result["result"]["record"]
+
+                old = accepted(retained + " " + withdrawn)
+                new = accepted(retained)
+                superseded = self.call(
+                    "supersede",
+                    {
+                        "record_id": old["record_id"],
+                        "new_record_id": new["record_id"],
+                        "expected_record_version": old["version"],
+                        "expected_new_record_version": new["version"],
+                        "idempotency_key": uid(),
+                        "reason": "Ordinary correction retains history.",
+                    },
+                )
+                self.assertEqual(superseded["status"], "ok", superseded)
+                # Supersession is deliberately not erasure: the old fact still exports.
+                self.assertIn(withdrawn, json.dumps(self.call("export", {"format": "json"})))
+                current = self.call("inspect", {"record_id": old["record_id"]})["result"]
+                deleted = self.call(
+                    "delete",
+                    {
+                        "intent": "delete_record",
+                        "record_id": old["record_id"],
+                        "expected_record_version": current["version"],
+                        "idempotency_key": uid(),
+                    },
+                )
+                self.assertEqual(deleted["status"], "ok", deleted)
+                for operation, payload in (
+                    ("inspect", {}),
+                    ("export", {"format": "json"}),
+                    ("recall", {"need": "workshop entry quiet room guests", "budget_bytes": 8192}),
+                ):
+                    result = self.call(operation, payload)
+                    self.assertEqual(result["status"], "ok", result)
+                    self.assertNotIn(withdrawn, json.dumps(result))
+                    self.assertIn(retained, json.dumps(result))
 
     def test_prune_preserves_referenced_records_and_replays_apply(self) -> None:
         (self.root / "brief.md").write_text("Accessible venue.\n")
