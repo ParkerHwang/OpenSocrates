@@ -28,27 +28,40 @@ are engineering observations, not a relabelled held-out study.
   failures and two parser-lost usage receipts remain recorded.
 - Prepared 52 v2 blinded artifact packets and eight separate diagnostic packets,
   fixed judge instructions, unblinding maps, failure ledgers, usage categories,
-  and per-condition descriptive repetition variance. No assessor score is implied.
+  and per-condition descriptive repetition variance. The [provisional Astra review](expanded/reviews/astra-xhigh-v4/REPORT.md) now
+  completes both locked phases for all 60 packets; no human score is implied.
 
 ## Why numerical margins and sample size remain open
 
 Each repeated condition still has only two observations of one authored task.
 EVAL-02 has no observed correctness gap on its two tasks, EVAL-03 is one mechanical
 edit, and EVAL-05 contains a demonstrated final-message-only scoring problem.
-No independent quality rating distribution exists for maintainability or bilingual
-collaboration. These selected binary gates and one-degree-of-freedom time standard
-deviations cannot justify a broad practical quality margin or reliable power
-calculation. Choosing one now would invent a tolerance or generalize the selected
+A provisional distribution from one Astra/xhigh assessor now exists, with
+50 limited-blinding declarations, 40 raw packet critical statuses unassessable,
+a demonstrated lifecycle interpretation error, and inconsistent evidence
+sufficiency for efficiency scoring. It is not an independent human calibration
+or a representative task-quality distribution. The ordinal ratings, selected
+binary gates and one-degree-of-freedom time standard deviations cannot justify
+a broad practical quality margin or reliable power calculation. Choosing one now would invent a tolerance or generalize the selected
 pilot beyond its evidence. The final repair has one new call per language, not a
 reliability estimate.
 
-The smallest next quality input is a locked assessment of the ready coding and
-bilingual packets under the [fixed procedure](expanded/JUDGE_PROCEDURE.v2.md),
-followed by calibration on additional independent tasks where the intended outcome
-actually varies. Repository-competent bilingual humans are preferred. No reviewer
-was assigned, no external recruitment occurred, and no model-judge score was
-substituted. A provisional model-only study is a different, explicitly labelled
-claim scope; it must not be called independent human validation.
+The [completed review and integrator audit](expanded/reviews/astra-xhigh-v4/REPORT.md)
+identify concrete next preparation: freeze a new fixture/checker version for
+nonempty zero-price shipping, explicit seat input domains and accepted-memory
+lifecycle; retain complete public dialogue and privacy-safe operation/state
+receipts. The [supplemental index](expanded/reviews/astra-xhigh-v4/supplemental-evidence-index.json)
+locates 78 already retained source receipts without rewriting packets or scores.
+Calibrate the revised measures on additional independent tasks and justify a
+claim-specific practical loss tolerance before choosing margins or sample size.
+No new candidate outcome call or human recruitment occurred in this review lane.
+
+Human scores remain unavailable. Repository-competent bilingual human review is
+still useful when available, but its absence does not block completion of the
+explicitly scoped provisional AI-review lane. A future model-only claim must be
+labelled and calibrated as such; it cannot be called independent human validation.
+The [structured readiness assessment](expanded/reviews/astra-xhigh-v4/readiness-assessment.json)
+keeps the claim, source quality, measurement conflicts and reopening evidence explicit.
 
 ## Keep missing conditions attached to their claims
 

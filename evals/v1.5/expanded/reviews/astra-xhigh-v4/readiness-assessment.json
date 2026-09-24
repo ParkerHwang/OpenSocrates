@@ -1,0 +1,59 @@
+{
+  "claim": "The completed provisional review is sufficient to freeze broad quality/noninferiority margins and a held-out sample size.",
+  "claim_type": "Effect claim and measurement readiness for general, coding, fresh-session and EN/KO use.",
+  "claim_to_source_table": [
+    {
+      "source": "manifest.json and locks/all-ratings.lock.json",
+      "status": "verified",
+      "design": "Frozen execution and exact identity/coverage verification",
+      "basis": "60 first passes plus 60 evidence assessments",
+      "directness": "Direct for review completion; does not estimate product quality."
+    },
+    {
+      "source": "unblinded-assessments.json and synthesis.json",
+      "status": "computed",
+      "design": "One Astra/xhigh assessor configuration, fresh opaque contexts, fixed ordinal rubric",
+      "basis": "60 selected pilot/diagnostic packets; 48 EN and 12 KO",
+      "directness": "Direct to retained artifacts; indirect to broad real-world quality."
+    },
+    {
+      "source": "integrator-audit.json",
+      "status": "verified",
+      "design": "Static source/claim audit after ratings lock",
+      "basis": "All raw critical failures plus material disagreements and evidence-sufficiency inconsistencies",
+      "directness": "Supports bounded defects and identifies a reviewer error; no causal effect estimate."
+    },
+    {
+      "source": "Human review",
+      "status": "unavailable",
+      "design": null,
+      "basis": 0,
+      "directness": null
+    }
+  ],
+  "quality_dimensions": {
+    "design_rigor": "Strong identity/freeze/attempt accounting; engineering pilot sampling only.",
+    "bias_risk": "One assessor configuration, 50 self-declared limited-blinding packets, shared upstream artifacts; no independent human calibration.",
+    "measurement_validity": "Ordinal anchors, verified checker gaps, one lifecycle interpretation error and inconsistent efficiency sufficiency.",
+    "completeness": "All requested reviews completed; 40 raw packet statuses remain unassessable, seven review invocations lack usage, human/billing/backend echo remain missing.",
+    "applicability": "Nine authored tasks with at most two repeated outcome cells per condition; separate diagnostics cannot define a broad task population."
+  },
+  "quality_limits": [
+    "The practical acceptable loss/tolerance is not supplied by the ordinal anchors.",
+    "Selected pilot tasks and repeated single-task outcomes do not provide representative paired quality variance.",
+    "Account-side isolation remains unproven for memory-effect comparisons.",
+    "Model scores are supplemental and cannot be converted into human scores."
+  ],
+  "hierarchy_position_and_limits": "Frozen artifact/source evidence is strong for specific static defects; deterministic flags prove only the tests they encode. The model ratings are provisional artifact judgments, not independent population validation. All streams largely share the same synthetic corpus.",
+  "agreement_and_conflicts": "Shipping counterexamples and public budget questions are supported by direct artifacts; the claimed retention false negative is contradicted by lifecycle=proposed and the accepted-only predicate. Raw ratings and historic flags remain unchanged.",
+  "missing_evidence": [
+    "Defined target task population and claim-specific practical tolerance",
+    "Calibrated evidence/acceptance coverage and rater reliability",
+    "Adequate independent task-level variance for the intended paired design",
+    "Human review when available; otherwise an explicitly scoped and calibrated model-only claim",
+    "Account-side isolation for causal memory claims; billing for monetary claims"
+  ],
+  "resulting_evidence_state": "Held for broad quantitative quality/noninferiority claims; provisional for corpus descriptions; verified for completion of this AI-review lane.",
+  "calibrated_conclusion": "No defensible numerical margin or held-out sample size is frozen from these ratings. No held-out call is run and no profile or release is promoted. Missing human review does not prevent this completed provisional lane.",
+  "flip_condition": "A new prospective pilot defines task population, precise input domains and evidence coverage, calibrates the judge and measures independent task-level variation; a practical tolerance is justified for the intended claim. Then commit a new immutable held-out protocol before its first outcome call."
+}

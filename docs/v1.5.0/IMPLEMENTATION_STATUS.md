@@ -46,14 +46,22 @@ calls pass both artifact and independent persisted-forgetting checks. Dialogue
 traces demonstrate a legacy checker false negative when the necessary question
 appears before the final message. No old outcome or rubric is rewritten.
 
-There are 60 blinded artifact/diagnostic packets and fixed judge procedures,
-with no independent human scores. Local native memory use/generation/import were
+The [provisional Astra review](../../evals/v1.5/expanded/reviews/astra-xhigh-v4/REPORT.md)
+completes both locked phases for all 60 artifact/diagnostic packets using the
+verified `gpt-6-astra` / `xhigh` / read-only agent definition. It retains all 59
+review/transport invocations, including seven process/transport failures and two
+citation rejections. Static inspection supports three invoice shipping defects
+missed by the original checker; the integrator also corrects one judge
+interpretation that ignored memory lifecycle. The review does not change old
+outcomes, rerun candidate cells or establish human acceptance. Human scores
+remain unavailable. Local native memory use/generation/import were
 disabled in disposable profiles and local output/job tables are empty; account-side
 isolation remains unproven. Memory comparisons are confounded. Backend model echo,
 billed cost, adequate independent quality variance, numerical held-out margins,
 and a held-out study remain unavailable. Candidate profiles are not promoted.
 
-W8 is bounded pilot and review preparation, not completed outcome validation.
+W8 has bounded pilots and a completed provisional model review, not held-out
+outcome validation.
 W9 supplies the source fixes, verified receipts, review packets and recoverable
 Draft handoff. Read the [results](../../evals/v1.5/expanded/RESULTS.md),
 [audit](../../evals/v1.5/expanded/AUDIT.md), and

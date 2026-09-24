@@ -17,9 +17,17 @@ also demonstrates a legacy final-message-only checker false negative. Do not
 retrofit its score or pool guide-2/3/4 treatments.
 
 The new work totals 81 CLI invocations: 3 access, 68 pilot/host, and 10 diagnostic
-calls. Two diagnostic calls retain missing usage. Sixty blinded packets and a
-fixed judge procedure are prepared; human and model-judge quality scores are
-still null. Exact current identities and validation are in the
+calls. Two diagnostic calls retain missing usage. The separately frozen
+[provisional Astra review](expanded/reviews/astra-xhigh-v4/REPORT.md) now completes
+all 60 packets in both phases, with exact `gpt-6-astra` / `xhigh` / read-only
+configuration. Its 59 review/transport invocations preserve seven process or
+transport failures and two citation rejections; seven have null usage. Human
+scores remain unavailable. The review identifies three invoice shipping defects,
+confirms the Korean full-dialogue question discrepancy, and records an integrator
+correction where the judge overlooked `proposed` versus `accepted` memory state.
+Its raw critical-status counts (12 pass, 8 fail, 40 unassessable) are not task
+acceptance rates. Original outcomes and first-pass scores remain unchanged.
+Exact product identities and validation are in the
 [guide-4 receipt](expanded/validation-receipt.guide4.json). Held-out margins/sample
 size remain unfrozen and no held-out call was made. Profiles remain candidate.
 

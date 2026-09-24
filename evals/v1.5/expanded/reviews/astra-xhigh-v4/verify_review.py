@@ -103,6 +103,12 @@ def verify(complete: bool = True) -> dict:  # noqa: C901
         assert sha(ROOT / name) == expected, name
     for packet in manifest["packets"]:
         assert sha(ROOT / packet["original_path"]) == packet["original_sha256"]
+    source_integrity = read(HERE / "analysis-input-integrity.json")
+    for name, expected in source_integrity["result_files"].items():
+        assert sha(ROOT / name) == expected, name
+    if (HERE / "review-integrity.json").exists():
+        for name, expected in read(HERE / "review-integrity.json").items():
+            assert sha(ROOT / name) == expected, name
     schema = read(HERE / "response.schema.json")
     packets = {
         packet["packet_id"]: {

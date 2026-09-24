@@ -19,6 +19,9 @@ metadata is still 1.4.0; the implementation is a Draft candidate.
   [separate guide-3 diagnostic freeze](diagnostic-freeze.v3.json)
 - [Decision-ready results](RESULTS.md), [all diagnostic attempts](diagnostic-summary.json),
   and [guide-4 validation](validation-receipt.guide4.json)
+- [Completed provisional Astra review](reviews/astra-xhigh-v4/REPORT.md): 60 packets,
+  immutable first-pass and evidence-phase ratings, complete attempt/usage ledger,
+  integrator disagreements and held-out readiness limits. Human scores remain null.
 
 The nine independent tasks span coding, general planning, mechanical work,
 authored fresh-session replay, and English/Korean developer/nondeveloper
