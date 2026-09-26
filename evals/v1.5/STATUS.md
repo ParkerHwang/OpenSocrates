@@ -7,6 +7,20 @@ isolation proof before practical product completion.
 
 ## Current practical release-candidate qualification
 
+The [QueueForge backend comparison](backend-queueforge/v1/review/REPORT.md) adds
+vanilla Codex alongside released 1.4 and the repaired 1.5 RC, using nine fixed
+Sol/medium fresh development calls. All final implementations pass 19 external
+API scenarios. Vanilla and 1.4 pass their own race-test suites; 1.5 retains one
+obsolete self-authored lifecycle assertion, an instruction-scope/test-maintenance
+failure rather than a demonstrated product-runtime defect. Its performance
+remains diagnostic under the frozen artifact gate. The corrected 99-cell load
+schedule preserves six invalid original meter cells and makes no additional
+model call. Workload-specific speed differences coexist with more candidate
+input/tool work; this is not a universal improvement or isolated memory claim.
+The [portable evidence](backend-queueforge/v1/review/REPRODUCE.md) includes all
+three original source histories, contracts, checkers, compact receipts and hashes.
+Product runtime, package inputs and previous outcomes are unchanged.
+
 The [post-review repair boundary](repairs/v1/REPORT.md) adds a caller-safe
 checkpoint request schema and complete EN/KO examples, focused coding guidance,
 corrected measurement and separately labelled GearDesk derivatives. Its four-call

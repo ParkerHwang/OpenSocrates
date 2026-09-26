@@ -1,0 +1,61 @@
+{
+  "schema": "opensocrates.backend-comparison-validation/1",
+  "product_input_commit": "a8aaba572693c63419188ee2d45f59688b564b16",
+  "working_tree_scope": "New synthetic evaluation export and current STATUS.md only; subsequently committed feature head is recorded in PR95 and issue94.",
+  "commands": [
+    {
+      "command": "make bootstrap format-check lint generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check",
+      "exit_code": 0,
+      "scope": "Required source suite on the working tree committed with this evidence"
+    },
+    {
+      "command": "python3 evals/v1.5/backend-queueforge/v1/review/verify_export.py",
+      "exit_code": 0,
+      "verified_files": 376,
+      "model_calls": 9,
+      "corrected_load_cells": 99
+    },
+    {
+      "command": ".venv/bin/python evals/v1.5/repairs/v1/verify.py --historical",
+      "exit_code": 0,
+      "historical_files_unchanged": 2097,
+      "scope": "Prior practical/RC, pilot/memory, provisional Astra and repair freezes verified under their historical source scope"
+    },
+    {
+      "command": "PYTHONPATH=src .venv/bin/python tools/check_links.py --root . --path evals/v1.5/STATUS.md --path evals/v1.5/backend-queueforge/v1/review --report build/evidence/queueforge-links.json",
+      "exit_code": 0,
+      "documents": 4,
+      "checked_links": 35
+    },
+    {
+      "command": "python3 review/audit.py",
+      "cwd": "Local declared QueueForge evaluation boundary",
+      "exit_code": 0,
+      "audited_load_cells": 99,
+      "numeric_samples_including_warmup": 5606308,
+      "frozen_source_stages_unchanged": 9,
+      "original_protocol_files_unchanged": 28
+    },
+    {
+      "check": "Export privacy scan, source diff and rendered figures",
+      "status": "pass",
+      "scope": "No personal user paths, disposable-profile paths or credential-pattern findings; no product input changes; both figures visually inspected"
+    }
+  ],
+  "not_run": [
+    "No new local native rebuild: native/package inputs are unchanged; exact pushed CI supplies fresh native jobs.",
+    "Live Windows Codex and separate physical clean-machine sessions remain unavailable.",
+    "No destructive host test, global-setting change, active install update, merge, tag, publication or deployment."
+  ],
+  "outcome_limits": {
+    "candidate_own_test_failure_preserved": true,
+    "original_invalid_load_cells_preserved": 6,
+    "model_retries": 0,
+    "additional_model_calls_for_meter_repair": 0,
+    "human_scores": null,
+    "billed_cost": null,
+    "independent_backend_model_echo": null,
+    "account_side_memory_isolation": "unproven"
+  },
+  "ci": "Exact pushed commit, run URLs and final conclusions are recorded in the Draft PR95 and issue94 handoff."
+}
