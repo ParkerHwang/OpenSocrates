@@ -1,5 +1,21 @@
 # v1.5 evaluation status
 
+## Hard coding and office comparison
+
+The [new hard-task report](hard-tasks/v1/REPORT.md) completes18 fixed invocations:
+Sol/medium, Luna/medium and Luna/max, each with vanilla Codex, released1.4 and the
+unchanged1.5 candidate on a hard AuditLedger backend and Korean office task.
+Sol passes28/28 API groups in all conditions; Luna medium passes12/28,27/28,27/28;
+Luna max passes28/28 in all three but reaches the20-minute cutoff, and its1.5
+artifact breaks an existing test caller. All nine office artifacts pass27/27;
+separate unblinded review retains narrative and workbook defects. All108 load
+cells and709,858 timing samples are retained. Four backends qualify for performance;
+Sol1.5 is slower than both controls in the reported concurrency16 throughput cells.
+No failed outcome/load cell is rerun, no profile is promoted, and no broad quality
+or release claim follows. The later actual-client executable hash is explicitly
+separate from the pre-call launcher hash. Full metrics, source review and portable
+integrity checks are linked from the report; prior results remain unchanged.
+
 ## Current structural revision and official references
 
 The [new report](revision-v3/REPORT.md) adds selective official-document prompts,

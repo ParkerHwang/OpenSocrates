@@ -1,0 +1,65 @@
+{
+  "schema": "opensocrates.hard-office-prose-review/1",
+  "reviewer": "primary integrator, existing selected model and effort; no separate judge invocation",
+  "reviewer_model_echo": null,
+  "reviewer_effort_receipt": null,
+  "human_scores": null,
+  "blinding": "unblinded",
+  "rubric": "office/PROSE_RUBRIC.md",
+  "input_lock": "review/office-batch5.lock.json",
+  "assessed_unix": 1790453689.7347689,
+  "reviews": [
+    {
+      "cell": "office-sol-medium-v15",
+      "scores": {
+        "decision_usability": 3,
+        "evidence_and_predecessor_maintenance": 4,
+        "authority_and_independent_progress": 4,
+        "operational_judgment": 4,
+        "korean_collaboration_quality": 4
+      },
+      "total": 19,
+      "maximum": 20,
+      "objective_checks": "27/27; unchanged frozen checker",
+      "support": [
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "9-15",
+          "finding": "Correct recommendation, source-specific reconciliation, reserve and final cost; the chained equation has a presentation error noted below."
+        },
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "19-27",
+          "finding": "Accurate HR changes, P064 incompatibility, supplier comparison and predecessor corrections. Independent capacity-slot matching confirms its S1 alternative maximum of52 mandatory attendees."
+        },
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "31-34",
+          "finding": "Named internal preparation owners and conditional procurement are clear, with no false approval/execution claim."
+        },
+        {
+          "artifact": "PROJECT_NOTES.md",
+          "lines": "1-7",
+          "finding": "Current facts, pending signature and a source-change/recheck handoff are preserved."
+        }
+      ],
+      "factual_issues": [
+        {
+          "severity": "minor equation presentation",
+          "location": "output/decision_memo.md:15",
+          "finding": "The displayed chain writes240000+66×7000=462000+260000=962000. Those chained equalities are false;462000 is only the attendee component. Correct total962000 appears consistently in every numeric artifact. This affects the decision explanation, not underlying arithmetic."
+        },
+        {
+          "severity": "minor workbook unit defect",
+          "location": "output/operations.xlsx 예산!B11:B13",
+          "finding": "Native XLSX number format #,##0 \"원\" is applied to assigned/mandatory/optional attendee counts66/60/6, displaying counts as money. Values remain correct. This is a candidate display defect outside the frozen checker, not an OpenSocrates runtime arithmetic defect."
+        }
+      ],
+      "workbook_observation": "Read-only inspection covered all six sheets and Korean evidence explanations; native styles confirm the unit defect rather than a renderer-only omission.",
+      "public_messages_reviewed": 6,
+      "unnecessary_questions_observed": 0,
+      "operator_can_continue": true,
+      "uncertainty": "One unblinded primary-model review; prose scores do not replace objective results or independently validate a version effect. Candidate files and original scores are unchanged."
+    }
+  ]
+}

@@ -1,0 +1,986 @@
+[
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "fc8a25dbcaed4f49af5fdc730a8d56fc"
+    },
+    "request": "{\"name\": \"a\", \"opening\": 100}",
+    "status": 201,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 100,
+        "reserved": 0,
+        "available": 100,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.0007225419976748526
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "2690c9344e2e445fa3e9aa7a1c6b3275"
+    },
+    "request": "{\"name\": \"b\", \"opening\": 40}",
+    "status": 201,
+    "response": {
+      "account": {
+        "name": "b",
+        "balance": 40,
+        "reserved": 0,
+        "available": 40,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.0005748749827034771
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 92,
+          "reserved": 0,
+          "available": 92,
+          "version": 2
+        },
+        {
+          "name": "b",
+          "balance": 48,
+          "reserved": 0,
+          "available": 48,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "from": "a",
+        "to": "b",
+        "amount": 8,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0015605830121785402
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0013069999986328185
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0017941250116564333
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0018276249757036567
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0016614579944871366
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0025092499563470483
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0011661670287139714
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.002200292015913874
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.002968124987091869
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0019899579929187894
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0027860000263899565
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0027191669796593487
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0011377090122550726
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0013860409962944686
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.002230499987490475
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.002493209030944854
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.001811583002563566
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0014490419998764992
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0017411669832654297
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0024147919612005353
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0014914169441908598
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.0013140829978510737
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.001147416012827307
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "race"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 8}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "available": 92,
+          "balance": 92,
+          "name": "a",
+          "reserved": 0,
+          "version": 2
+        },
+        {
+          "available": 48,
+          "balance": 48,
+          "name": "b",
+          "reserved": 0,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "amount": 8,
+        "from": "a",
+        "id": "40fa20bdcc0e20971e16ec7542d8601d",
+        "reversed": false,
+        "to": "b"
+      }
+    },
+    "elapsed_s": 0.001268249994609505
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/a",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 92,
+        "reserved": 0,
+        "available": 92,
+        "version": 2
+      }
+    },
+    "elapsed_s": 0.0002192500396631658
+  },
+  {
+    "method": "GET",
+    "path": "/summary",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 92,
+          "reserved": 0,
+          "available": 92
+        },
+        {
+          "name": "b",
+          "balance": 48,
+          "reserved": 0,
+          "available": 48
+        }
+      ],
+      "entry_count": 4,
+      "snapshot": 4,
+      "totals": {
+        "available": 140,
+        "balance": 140,
+        "reserved": 0
+      }
+    },
+    "elapsed_s": 0.00027650000993162394
+  }
+]

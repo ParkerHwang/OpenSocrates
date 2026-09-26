@@ -1,0 +1,297 @@
+{
+  "schema": "opensocrates.native-decision-diagnostic/1",
+  "model_calls": 0,
+  "native_calls": 5,
+  "package_condition": "Frozen v1.5 candidate; separate disposable data/home; no candidate workspace mutation",
+  "template_sha256": "36e5b76eaee68707933c70ef6aacdfa419337ee964f3207e86887241fc2f6160",
+  "rows": [
+    {
+      "case": "office_invalid_decision_id",
+      "request": {
+        "operation": "select",
+        "context": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "epoch": 0,
+        "decision": "regional-launch-choice",
+        "revision": 0,
+        "locale": "ko",
+        "participation": "judgment",
+        "routing": {
+          "schema": "opensocrates.routing-features/1.0.0",
+          "answer_shape": "decision_memo",
+          "classification_confidence": "high",
+          "explicit_method": null,
+          "features": [
+            {
+              "key": "multiple_options",
+              "strength": 3,
+              "basis": "decision_need"
+            },
+            {
+              "key": "multiple_objectives",
+              "strength": 3,
+              "basis": "decision_need"
+            },
+            {
+              "key": "choose",
+              "strength": 3,
+              "basis": "decision_need"
+            },
+            {
+              "key": "reconcile_evidence",
+              "strength": 2,
+              "basis": "evidence_need"
+            },
+            {
+              "key": "conflicting_sources",
+              "strength": 2,
+              "basis": "evidence_need"
+            },
+            {
+              "key": "source_quality",
+              "strength": 2,
+              "basis": "evidence_need"
+            },
+            {
+              "key": "explicit_rules",
+              "strength": 2,
+              "basis": "task_shape"
+            },
+            {
+              "key": "plan",
+              "strength": 1,
+              "basis": "task_shape"
+            }
+          ]
+        }
+      },
+      "exit_code": 0,
+      "response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "selected": null,
+        "applied": "unverified",
+        "continue_ordinary_work": true
+      },
+      "response_sha256": "5ece17a29baac6ed01d5be6e0a5a3c120e6cdf22bc5406be1e2e67a907efa0fb"
+    },
+    {
+      "case": "office_same_features_valid_id",
+      "request": {
+        "operation": "select",
+        "context": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "epoch": 0,
+        "decision": "d1",
+        "revision": 0,
+        "locale": "ko",
+        "participation": "judgment",
+        "routing": {
+          "schema": "opensocrates.routing-features/1.0.0",
+          "answer_shape": "decision_memo",
+          "classification_confidence": "high",
+          "explicit_method": null,
+          "features": [
+            {
+              "key": "multiple_options",
+              "strength": 3,
+              "basis": "decision_need"
+            },
+            {
+              "key": "multiple_objectives",
+              "strength": 3,
+              "basis": "decision_need"
+            },
+            {
+              "key": "choose",
+              "strength": 3,
+              "basis": "decision_need"
+            },
+            {
+              "key": "reconcile_evidence",
+              "strength": 2,
+              "basis": "evidence_need"
+            },
+            {
+              "key": "conflicting_sources",
+              "strength": 2,
+              "basis": "evidence_need"
+            },
+            {
+              "key": "source_quality",
+              "strength": 2,
+              "basis": "evidence_need"
+            },
+            {
+              "key": "explicit_rules",
+              "strength": 2,
+              "basis": "task_shape"
+            },
+            {
+              "key": "plan",
+              "strength": 1,
+              "basis": "task_shape"
+            }
+          ]
+        }
+      },
+      "exit_code": 0,
+      "response": {
+        "status": "selected",
+        "reason": "weighted_primary",
+        "selected": [
+          "trade-off-analysis"
+        ],
+        "applied": "unverified",
+        "continue_ordinary_work": null
+      },
+      "response_sha256": "b89585b28d1138a6fadb8b53abd9f3afc025f59c0b9942351ce68af1bebaad28"
+    },
+    {
+      "case": "office_missing_operation",
+      "request": {
+        "context": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "epoch": 0,
+        "decision": "d1",
+        "revision": 0,
+        "locale": "ko",
+        "participation": "judgment",
+        "routing": {
+          "schema": "opensocrates.routing-features/1.0.0",
+          "answer_shape": "decision_memo",
+          "classification_confidence": "high",
+          "explicit_method": null,
+          "features": [
+            {
+              "key": "multiple_options",
+              "strength": 3,
+              "basis": "decision_need"
+            },
+            {
+              "key": "multiple_objectives",
+              "strength": 3,
+              "basis": "decision_need"
+            },
+            {
+              "key": "choose",
+              "strength": 3,
+              "basis": "decision_need"
+            },
+            {
+              "key": "reconcile_evidence",
+              "strength": 2,
+              "basis": "evidence_need"
+            },
+            {
+              "key": "conflicting_sources",
+              "strength": 2,
+              "basis": "evidence_need"
+            },
+            {
+              "key": "source_quality",
+              "strength": 2,
+              "basis": "evidence_need"
+            },
+            {
+              "key": "explicit_rules",
+              "strength": 2,
+              "basis": "task_shape"
+            },
+            {
+              "key": "plan",
+              "strength": 1,
+              "basis": "task_shape"
+            }
+          ]
+        }
+      },
+      "exit_code": 0,
+      "response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "selected": null,
+        "applied": "unverified",
+        "continue_ordinary_work": true
+      },
+      "response_sha256": "5ece17a29baac6ed01d5be6e0a5a3c120e6cdf22bc5406be1e2e67a907efa0fb"
+    },
+    {
+      "case": "coding_invalid_basis",
+      "request": {
+        "operation": "select",
+        "context": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "epoch": 0,
+        "decision": "d1",
+        "revision": 0,
+        "locale": "en",
+        "participation": "judgment",
+        "routing": {
+          "schema": "opensocrates.routing-features/1.0.0",
+          "answer_shape": "completion_review",
+          "classification_confidence": "high",
+          "explicit_method": null,
+          "features": [
+            {
+              "key": "mechanical",
+              "strength": 3,
+              "basis": "task_shape"
+            },
+            {
+              "key": "binding_rule_without_discretion",
+              "strength": 3,
+              "basis": "governing_rule"
+            }
+          ]
+        }
+      },
+      "exit_code": 0,
+      "response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "selected": null,
+        "applied": "unverified",
+        "continue_ordinary_work": true
+      },
+      "response_sha256": "5ece17a29baac6ed01d5be6e0a5a3c120e6cdf22bc5406be1e2e67a907efa0fb"
+    },
+    {
+      "case": "coding_same_features_valid_basis",
+      "request": {
+        "operation": "select",
+        "context": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "epoch": 0,
+        "decision": "d1",
+        "revision": 0,
+        "locale": "en",
+        "participation": "judgment",
+        "routing": {
+          "schema": "opensocrates.routing-features/1.0.0",
+          "answer_shape": "completion_review",
+          "classification_confidence": "high",
+          "explicit_method": null,
+          "features": [
+            {
+              "key": "mechanical",
+              "strength": 3,
+              "basis": "task_shape"
+            },
+            {
+              "key": "binding_rule_without_discretion",
+              "strength": 3,
+              "basis": "task_shape"
+            }
+          ]
+        }
+      },
+      "exit_code": 0,
+      "response": {
+        "status": "no_intervention",
+        "reason": "no_eligible_method",
+        "selected": [],
+        "applied": "unverified",
+        "continue_ordinary_work": null
+      },
+      "response_sha256": "6894b2f1a5fc7da04019af520e2301d603b7ff3bc455703008c1b12563c6c470"
+    }
+  ],
+  "data_directory_created": false,
+  "application": "not applied; response projected before inspection; no method content used"
+}

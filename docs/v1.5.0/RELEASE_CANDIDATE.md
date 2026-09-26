@@ -13,6 +13,13 @@ source/native qualification, the initial KO checkpoint failure and its one-call
 repair. Its checks and package identity are recorded separately in PR #95; earlier
 source-equivalence receipts do not cover this changed runtime.
 
+The [hard coding/office comparison](../../evals/v1.5/hard-tasks/v1/REPORT.md)
+evaluates the unchanged guide8 candidate against released1.4 and vanilla Codex
+with Sol/medium, Luna/medium and Luna/max. It is a separate practical evidence
+boundary with fixed execution limits, not a new statistical release prerequisite.
+Its task artifacts and measurement findings do not rewrite historical outcomes
+or establish that every generated-program defect is a product-runtime defect.
+
 The subsequent [post-review repairs](../../evals/v1.5/repairs/v1/REPORT.md) qualify
 the checkpoint caller contract, assistance guide 6 and coding guides 2. Their
 source/package identities and new usability results are separate from the
