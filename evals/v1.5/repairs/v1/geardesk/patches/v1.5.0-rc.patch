@@ -1,0 +1,194 @@
+diff --git a/REPAIR_PROVENANCE.md b/REPAIR_PROVENANCE.md
+new file mode 100644
+index 0000000..f1ca415
+--- /dev/null
++++ b/REPAIR_PROVENANCE.md
+@@ -0,0 +1,16 @@
++# Integrator-authored derivative repair
++
++Original demonstration commit: `288cee2ff6b96390d2da32541d4c3e1ab2a45116`.
++Repair branch: `repairs/v1`. The original application, protocol, evaluation and
++historical scores remain unchanged. This derivative contains human-directed
++integrator code repairs; it is not an unassisted outcome of the original model run.
++
++Run `npm test` from this directory. Local HTTP tests require loopback binding.
++Tests cover direct transitions, service/CLI/HTTP date boundaries, persisted-byte
++rollback, batch failure positions, replay, cumulative refunds and output ownership.
++
++Partial return requires an explicit valid date; full return retains the omitted
++scheduled-end default. Both commands and batches operate on a private owned draft,
++with detached per-operation snapshots and replay data. A normalized v2 batch
++clones the full working store once; migration still has its own copy boundary.
++Clone counts alone do not demonstrate a wall-time or throughput speedup.
+diff --git a/src/domain.mjs b/src/domain.mjs
+index b5cadac..fd6c1c6 100644
+--- a/src/domain.mjs
++++ b/src/domain.mjs
+@@ -153,13 +153,14 @@ export function command(catalog,store,request,{timestamp=null}={}) { return safe
+   const signature=fingerprint(request),prior=Object.hasOwn(store.idempotency,request.idempotencyKey)?store.idempotency[request.idempotencyKey]:undefined;
+   if(prior) {if(prior.fingerprint!==signature) fail('IDEMPOTENCY_CONFLICT','Idempotency key already used');return {store,result:structuredClone(prior.result),replay:true};}
+   if(request.expectedRevision!==store.revision) fail('REVISION_CONFLICT','Revision mismatch');
+-  const outcome=applyCommand(catalog,migrateStore(store),request,timestamp);
++  const outcome=applyCommand(catalog,structuredClone(migrateStore(store)),request,timestamp);
+   Object.defineProperty(outcome.store.idempotency,request.idempotencyKey,{value:{fingerprint:signature,result:structuredClone(outcome.result)},enumerable:true,writable:true,configurable:true});
+   return {...outcome,replay:false};
+ }); }
+ function applyCommand(catalog,store,request,timestamp) {
+   valid(id(request.id),'ID required');
+-  const next=structuredClone(store);let result;
++  // The private transition receives an exclusively owned transaction draft.
++  const next=store;let result;
+   if(request.type==='reserve') {
+     if(next.reservations.some(r=>r.id===request.id)) fail('VALIDATION','Reservation ID already used');
+     const accepted=quote(catalog,store,request);
+@@ -173,6 +174,7 @@ function applyCommand(catalog,store,request,timestamp) {
+     const required=returning?'checked_out':'reserved';
+     if(r.status!==required) fail('INVALID_TRANSITION','Invalid status transition');
+     if(returning) {
++      valid(request.type!=='return.partial'||request.returnedOn!==undefined,'Expected returnedOn');
+       const returnedOn=request.returnedOn===undefined?r.end:request.returnedOn;
+       valid(dayNumber(returnedOn)>=dayNumber(r.start),'Return date precedes start');
+       const lines=request.type==='return.partial'?requestLines(request.lines):r.lines.map(line=>({itemId:line.itemId,quantity:unreturned(r,line)}));
+@@ -209,7 +211,7 @@ function applyCommand(catalog,store,request,timestamp) {
+   } else fail('VALIDATION','Unknown command type');
+   next.revision++;
+   next.audit.push({revision:next.revision,type:request.type,id:request.id,timestamp});
+-  return {store:next,result};
++  return {store:next,result:structuredClone(result)};
+ }
+ export function batch(catalog,store,request,{timestamp=null}={}) {return safe(()=>{
+   validateCatalog(catalog);validateStore(store);valid(object(request),'Batch required');
+@@ -218,7 +220,7 @@ export function batch(catalog,store,request,{timestamp=null}={}) {return safe(()
+   const signature=fingerprint(request),prior=Object.hasOwn(store.batchIdempotency??{},request.idempotencyKey)?store.batchIdempotency[request.idempotencyKey]:undefined;
+   if(prior) {if(prior.fingerprint!==signature) fail('IDEMPOTENCY_CONFLICT','Idempotency key already used');return {store,result:structuredClone(prior.result),replay:true};}
+   if(request.expectedRevision!==store.revision) fail('REVISION_CONFLICT','Revision mismatch');
+-  let current=migrateStore(store);const results=[];
++  let current=structuredClone(migrateStore(store));const results=[];
+   for(const inner of request.commands) {
+     valid(object(inner)&&!Object.hasOwn(inner,'expectedRevision')&&!Object.hasOwn(inner,'idempotencyKey'),'Inner commands cannot contain mutation fields');
+     const outcome=applyCommand(catalog,current,inner,timestamp);current=outcome.store;results.push(outcome.result);
+diff --git a/test/repair-adapters.test.mjs b/test/repair-adapters.test.mjs
+new file mode 100644
+index 0000000..e301b88
+--- /dev/null
++++ b/test/repair-adapters.test.mjs
+@@ -0,0 +1,53 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {mkdtemp,readFile,writeFile,rm} from 'node:fs/promises';
++import {tmpdir} from 'node:os';
++import path from 'node:path';
++import {spawn} from 'node:child_process';
++import {createService} from '../src/service.mjs';
++const root=path.resolve(import.meta.dirname,'..'),fixture=path.join(root,'fixtures/catalog.json');
++const reserve={type:'reserve',id:'r',memberId:'regular',start:'2026-11-06',end:'2026-11-09',lines:[{itemId:'camera',quantity:2}],expectedRevision:0,idempotencyKey:'book'};
++async function cli(dir,operation,input) {
++  const child=spawn(process.execPath,[path.join(root,'cli.mjs'),'--data-dir',dir,'--catalog',fixture,operation]);
++  let stdout='',stderr='';child.stdout.on('data',x=>stdout+=x);child.stderr.on('data',x=>stderr+=x);child.stdin.end(JSON.stringify(input));
++  return await new Promise((resolve,reject)=>{child.on('error',reject);child.on('close',code=>{try{resolve({code,body:JSON.parse(stdout)});}catch{reject(new Error(stderr));}});});
++}
++async function server(dir,t) {
++  const child=spawn(process.execPath,[path.join(root,'server.mjs'),'--data-dir',dir,'--catalog',fixture,'--port','0']);t.after(()=>child.kill());
++  let stdout='',stderr='';child.stderr.on('data',x=>stderr+=x);
++  const port=await new Promise((resolve,reject)=>{child.stdout.on('data',x=>{stdout+=x;if(stdout.includes('\n'))resolve(JSON.parse(stdout.split('\n')[0]).port);});child.on('error',reject);child.on('exit',code=>reject(new Error(`Server exited ${code}: ${stderr}`)));});
++  return async(operation,body)=>{const response=await fetch(`http://127.0.0.1:${port}/api/${operation}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});return {status:response.status,body:await response.json()};};
++}
++test('service, CLI and HTTP reject partial date boundaries without disk/history changes; full default still works',async(t)=>{
++  const dir=await mkdtemp(path.join(tmpdir(),'gear-repair-adapter-'));t.after(()=>rm(dir,{recursive:true,force:true}));
++  const service=createService({dataDir:dir,catalogPath:fixture,now:()=> 'fixed'}),http=await server(dir,t);
++  assert.equal((await service.execute('command',reserve)).revision,1);
++  assert.equal((await cli(dir,'command',{type:'checkout',id:'r',expectedRevision:1,idempotencyKey:'out'})).body.revision,2);
++  const file=path.join(dir,'store.json'),bytes=await readFile(file,'utf8');
++  for(const date of [undefined,null,'',false,0,'2026-02-30','2026-11-05']) {
++    const request={type:'return.partial',id:'r',lines:[{itemId:'camera',quantity:1}],expectedRevision:2,idempotencyKey:'reject',...(date===undefined?{}:{returnedOn:date})};
++    for(const invoke of [async()=>({body:await service.execute('command',request)}),()=>cli(dir,'command',request),()=>http('command',request)]) {
++      const response=await invoke();assert.equal(response.body.ok,false);assert.equal(response.body.error.code,'VALIDATION');assert.equal(response.body.revision,2);
++      assert.equal(await readFile(file,'utf8'),bytes);
++    }
++    const invalidBatch=await http('batch',{expectedRevision:2,idempotencyKey:'invalid-date',commands:[{type:'maintenance.add',id:'m',itemId:'tripod',quantity:1,start:reserve.start,end:reserve.end},requestWithoutMutation(request)]});
++    assert.equal(invalidBatch.body.error.code,'VALIDATION');assert.equal(await readFile(file,'utf8'),bytes);
++  }
++  const partial=await http('command',{type:'return.partial',id:'r',returnedOn:'2026-11-10',lines:[{itemId:'camera',quantity:1}],expectedRevision:2,idempotencyKey:'part'});
++  assert.deepEqual([partial.body.data.refund,partial.body.data.lateFee],[4900,100]);
++  const full=await cli(dir,'command',{type:'return',id:'r',expectedRevision:3,idempotencyKey:'full'});assert.equal(full.body.data.refund,5000);
++  const finalBytes=await readFile(file,'utf8');assert.equal(JSON.parse(finalBytes).revision,4);
++  const replay=await http('command',{type:'return',id:'r',expectedRevision:3,idempotencyKey:'full'});assert.deepEqual(replay.body,full.body);assert.equal(await readFile(file,'utf8'),finalBytes);
++});
++function requestWithoutMutation({expectedRevision,idempotencyKey,...inner}) {return inner;}
++test('HTTP and CLI batch failures at beginning, middle and end preserve persisted bytes',async(t)=>{
++  const dir=await mkdtemp(path.join(tmpdir(),'gear-repair-batch-'));t.after(()=>rm(dir,{recursive:true,force:true}));
++  const http=await server(dir,t);assert.equal((await cli(dir,'command',reserve)).body.revision,1);
++  const file=path.join(dir,'store.json'),bytes=await readFile(file,'utf8');
++  const commands=[{type:'maintenance.add',id:'m',itemId:'tripod',quantity:1,start:reserve.start,end:reserve.end},{type:'maintenance.remove',id:'m'}];
++  for(const index of [0,1,2]) {
++    const inner=[...commands];inner.splice(index,0,{type:'maintenance.remove',id:'missing'});
++    const request={expectedRevision:1,idempotencyKey:'rollback',commands:inner};
++    for(const invoke of [()=>http('batch',request),()=>cli(dir,'batch',request)]) {const failure=await invoke();assert.equal(failure.body.error.code,'NOT_FOUND');assert.equal(failure.body.revision,1);assert.equal(await readFile(file,'utf8'),bytes);}
++  }
++});
+diff --git a/test/repairs.test.mjs b/test/repairs.test.mjs
+new file mode 100644
+index 0000000..fcaaacc
+--- /dev/null
++++ b/test/repairs.test.mjs
+@@ -0,0 +1,60 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {readFile} from 'node:fs/promises';
++import * as d from '../src/domain.mjs';
++const catalog=JSON.parse(await readFile(new URL('../fixtures/catalog.json',import.meta.url),'utf8'));
++const base={type:'reserve',id:'r',memberId:'regular',start:'2026-11-06',end:'2026-11-09',lines:[{itemId:'camera',quantity:2},{itemId:'tripod',quantity:1}]};
++const call=(store,request)=>d.command(catalog,store,request,{timestamp:'fixed'});
++const bat=(store,request)=>d.batch(catalog,store,request,{timestamp:'fixed'});
++const result=out=>out.result;
++const step=(store,request,key=request.type)=>call(store,{...request,expectedRevision:store.revision,idempotencyKey:key});
++function checked() {return step(step(d.emptyStore(),base).store,{type:'checkout',id:'r'}).store;}
++test('partial date boundaries reject immutably; full return alone defaults to scheduled end',()=>{
++  const store=checked(),before=structuredClone(store);
++  for(const date of [undefined,null,'',false,0,'2026-02-30','2026-11-05']) {
++    assert.throws(()=>step(store,{type:'return.partial',id:'r',returnedOn:date,lines:[{itemId:'camera',quantity:1}]}),{code:'VALIDATION'});
++    assert.deepEqual(store,before);
++  }
++  const first=step(store,{type:'return.partial',id:'r',returnedOn:'2026-11-10',lines:[{itemId:'camera',quantity:1}]},'partial');
++  assert.deepEqual([result(first).refund,result(first).lateFee],[4900,100]);
++  assert.equal(first.store.revision,3);
++  const second=step(first.store,{type:'return',id:'r'},'full');
++  assert.deepEqual([result(second).refund,result(second).lateFee],[6000,0]);
++  assert.equal(result(second).refunded,10900);
++  assert.equal(result(second).status,'returned');
++  assert.equal(d.report(second.store).depositHeld,0);
++  const replay=call(second.store,{type:'return.partial',id:'r',returnedOn:'2026-11-10',lines:[{itemId:'camera',quantity:1}],expectedRevision:2,idempotencyKey:'partial'});
++  assert.equal(replay.replay,true);assert.deepEqual(result(replay),result(first));assert.equal(replay.store.revision,4);
++  assert.throws(()=>step(second.store,{type:'return',id:'r'},'again'),{code:'INVALID_TRANSITION'});
++});
++test('new, replay and per-command batch results own nested mutable values',()=>{
++  const store=d.emptyStore(),snapshot=structuredClone(store);
++  const request={...base,expectedRevision:0,idempotencyKey:'book'};
++  const fresh=call(store,request);result(fresh).lines[0].quantity=999;
++  assert.equal(fresh.store.reservations[0].lines[0].quantity,2);assert.deepEqual(store,snapshot);
++  const replay=call(fresh.store,request);result(replay).quote.lines[0].quantity=999;
++  assert.equal(result(call(fresh.store,request)).quote.lines[0].quantity,2);
++  const maintenance=step(d.emptyStore(),{type:'maintenance.add',id:'m',itemId:'camera',quantity:1,start:base.start,end:base.end});
++  result(maintenance).quantity=999;assert.equal(maintenance.store.maintenance[0].quantity,1);
++  const batchRequest={expectedRevision:0,idempotencyKey:'b',commands:[base,{type:'checkout',id:'r'},{type:'return.partial',id:'r',returnedOn:base.end,lines:[{itemId:'camera',quantity:1}]}]};
++  const batch=bat(store,batchRequest),values=result(batch);
++  assert.deepEqual(values.map(v=>v.status),['reserved','checked_out','checked_out']);
++  assert.equal(values[0].refunded,0);assert.equal(values[1].refunded,0);assert.equal(values[2].refunded,5000);
++  values[0].lines[0].quantity=999;values[2].quote.deposit=0;
++  assert.equal(batch.store.reservations[0].quote.deposit,11000);
++  const replayBatch=bat(batch.store,batchRequest);assert.equal(result(replayBatch)[0].lines[0].quantity,2);
++  result(replayBatch)[0].lines[0].quantity=888;
++  assert.equal(result(bat(batch.store,batchRequest))[0].lines[0].quantity,2);
++  assert.deepEqual(batch.store.audit.map(a=>a.revision),[1,2,3]);
++});
++test('invalid batch beginning, middle and end discard every owned draft mutation',()=>{
++  const store=d.emptyStore(),before=structuredClone(store);
++  const commands=[{type:'maintenance.add',id:'a',itemId:'camera',quantity:1,start:base.start,end:base.end},{type:'maintenance.remove',id:'a'}];
++  for(const index of [0,1,2]) {
++    const inner=[...commands];inner.splice(index,0,{type:'maintenance.remove',id:'missing'});
++    assert.throws(()=>bat(store,{expectedRevision:0,idempotencyKey:'failed',commands:inner}),{code:'NOT_FOUND'});
++    assert.deepEqual(store,before);
++  }
++  assert.throws(()=>bat(store,{expectedRevision:0,idempotencyKey:'date',commands:[base,{type:'checkout',id:'r'},{type:'return.partial',id:'r',lines:[{itemId:'camera',quantity:1}]}]}),{code:'VALIDATION'});
++  assert.deepEqual(store,before);
++});

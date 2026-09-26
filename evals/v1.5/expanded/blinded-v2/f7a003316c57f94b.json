@@ -1,0 +1,29 @@
+{
+  "packet_id": "f7a003316c57f94b",
+  "task_id": "v2-eval03-mechanical-notice",
+  "locale": "en",
+  "initial_request": "In notice.md, change only the Thursday closing time from 17:00 to 18:00. Preserve every other byte. Then report the completed edit.",
+  "followup_request": null,
+  "source_before_task": {
+    "notice.md": "# Community room\n\nThe Tuesday desk opens at 09:00.\nThe Thursday desk closes at 17:00.\nContact the front desk for access.\n"
+  },
+  "declared_source_transition": null,
+  "scoped_public_intent": null,
+  "stages": [
+    {
+      "artifacts": {
+        "notice.md": "# Community room\n\nThe Tuesday desk opens at 09:00.\nThe Thursday desk closes at 18:00.\nContact the front desk for access.\n"
+      },
+      "public_final": "Updated [notice.md](<disposable>/workspace/notice.md): Thursday’s closing time is now 18:00. A byte comparison confirmed every other byte is unchanged."
+    }
+  ],
+  "designated_artifact_diffs": {
+    "notice.md": "--- before/notice.md\n+++ after/notice.md\n@@ -1,5 +1,5 @@\n # Community room\n \n The Tuesday desk opens at 09:00.\n-The Thursday desk closes at 17:00.\n+The Thursday desk closes at 18:00.\n Contact the front desk for access.\n"
+  },
+  "human_status": "unavailable",
+  "human_scores": null,
+  "non_blindable_cues": [
+    "Memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed."
+  ],
+  "coverage_limit": "Packets contain declared task sources and designated output artifacts, not a complete post-run filesystem snapshot or raw tool transcript."
+}

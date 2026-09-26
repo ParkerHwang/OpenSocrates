@@ -1,0 +1,116 @@
+{
+  "requested_model": "gpt-6-sol",
+  "requested_effort": "medium",
+  "prompt_sha256": "bb20e1d79ceea42efd40d4d1bbc707cc99bd8076be5bffa1cd8b090044b9db4c",
+  "resume": true,
+  "ephemeral": false,
+  "hooks": false,
+  "native_memory_use": false,
+  "native_memory_generate": false,
+  "attempt_status": "completed",
+  "started_unix": 1790212891.402358,
+  "exit_code": 0,
+  "invocation_error": null,
+  "timed_out": false,
+  "wall_seconds": 38.2,
+  "stderr_sha256": "0604f41161e798eeab397eca8ffffd7fb6e31548ee6d3cf0d57500e94f618de6",
+  "event_count": 14,
+  "malformed_lines": 0,
+  "usage": {
+    "input_tokens": 379098,
+    "cached_input_tokens": 347648,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 4793,
+    "reasoning_output_tokens": 1432
+  },
+  "usage_reports": [
+    {
+      "input_tokens": 379098,
+      "cached_input_tokens": 347648,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 4793,
+      "reasoning_output_tokens": 1432
+    }
+  ],
+  "turn_completed": true,
+  "errors": [],
+  "tool_actions": [
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "93649087ec74515af43f962d8d989f9a1192e3b9a9e0aa814fed9cff15094783",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "939a065640e276e3561799c63dad565fd7bb0ad387e32e3b5faa2c60ce3dc806",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "file_change",
+      "completed": true,
+      "command_sha256": null,
+      "exit_code": null,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "b9d4f6733f5b6e872c8acaef60f84c30f48f64e8a30382ddc0861b04feda56f6",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    }
+  ],
+  "tool_actions_started_or_completed": 4,
+  "failed_tool_actions": 0,
+  "incomplete_tool_actions": 0,
+  "direct_operations_lexical": {},
+  "structured_status_counts": {},
+  "protocol_rejections": 0,
+  "repeated_command_hashes": 0,
+  "native_hook_events": 0,
+  "final_message_sha256": "2e81fab57597d4b622bd526539d5b8d8f929e7c04ae8b1fee45bad35a8ab9dbc",
+  "public_message_count": 3,
+  "billed_cost": null,
+  "server_echoed_model": null,
+  "tool_classification_limit": "Lexical direct calls and structured responses; nested invocations may be missed. Repeated hash does not itself prove unnecessary work.",
+  "public_messages": [
+    "I’ll update the plan for 48 attendees, check which venue still meets the access, time, and capacity requirements, then verify the revised budget gap. I’ll also answer the capacity question and record the memory limit.",
+    "At 48 attendees, Hall’s capacity of 45 is too small. River is the only listed venue that meets the attendance, step-free entry, and closing-time requirements. It costs $850, so the updated plan needs approval for a $100 increase above the $750 ceiling.",
+    "Updated and checked [plan.json](<disposable-path>) for **48 attendees**. River fits the stated requirements, but its $850 cost is $100 above the approved $750 ceiling. The plan is pending budget approval; no venue is booked.\n\n**Capacity** is a venue’s maximum number of people. **Attendance** is the number expected to come. River’s capacity is 55, so it fits the expected 48.\n\nMemory is unavailable, so I couldn’t keep the correction for next session. **Do you approve a $100 venue budget increase, bringing the ceiling to $850?**"
+  ],
+  "synthetic_command_templates": [
+    {
+      "command_template": "/bin/zsh -lc 'cat plan.json'",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "command_template": "/bin/zsh -lc 'cat options.md'",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "command_template": "/bin/zsh -lc \"python3 - <<'PY'\nimport json\nfrom pathlib import Path\nx = json.loads(Path('plan.json').read_text())\nassert set(x) == {'attendees','cost_usd','approved_ceiling_usd','budget_gap_usd','venue','status','memory_status','reason','required_question','side_answer'}\nassert all(type(x[k]) is int for k in ('attendees','cost_usd','approved_ceiling_usd','budget_gap_usd'))\nassert all(type(x[k]) is str for k in ('venue','status','memory_status'))\nassert x['attendees'] == 48 and x['attendees'] <= 55\nassert x['cost_usd'] == 850 and x['approved_ceiling_usd'] == 750\nassert x['budget_gap_usd'] == x['cost_usd'] - x['approved_ceiling_usd'] == 100\nassert x['venue'] == 'River' and x['status'] == 'pending_budget_approval'\nassert x['memory_status'] == 'unavailable'\nassert x['reason'] == {'Loft':'stairs','Garden':'closes_early','Hall':'capacity'}\nassert x['required_question'] == {'type':'approve_budget_increase','amount_usd':100}\nassert x['side_answer'] == {'capacity_is_limit':True,'attendance_is_expected_count':True}\nprint('plan.json parses; required fields, types, capacity, and budget arithmetic pass')\nPY\"",
+      "exit_code": 0,
+      "status": "completed"
+    }
+  ],
+  "trace_boundary": "Only public agent messages and redacted synthetic shell commands; no reasoning items or raw event stream",
+  "process_success": true
+}

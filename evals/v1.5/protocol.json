@@ -1,0 +1,64 @@
+{
+  "schema": "opensocrates.v1.5.evaluation-protocol/1.0.0",
+  "revision": 1,
+  "frozen_before_outcomes": true,
+  "status": "protocol_only_no_outcome_runs",
+  "claim_boundary": "Pilot and package checks cannot establish quality, gap closure, noninferiority, savings, or live host delivery.",
+  "shared": {
+    "client": "Codex desktop intended; exact task tuple and native host-memory isolation require a feasibility receipt",
+    "models": ["gpt-6-luna", "gpt-6-sol", "gpt-6-astra"],
+    "reasoning_effort": "medium where available; unavailable combinations remain missing cells",
+    "tools": "same authorized file/shell tools within each matched task; no paid API key",
+    "per_session_wall_minutes": 30,
+    "attempt_policy": "Record every first attempt, repair, timeout, retry, and escalation. No replacement of a missing model.",
+    "privacy": "Synthetic/disposable fixture roots only; no user project enrollment, prompt/transcript storage, or hidden reasoning capture.",
+    "usage": "Record exposed input, cached input, output, reasoning aggregate, wall time, tool calls, scans, retrieval, policy calls, and failures separately. Unavailable fields are null, not zero.",
+    "quality_judging": "Check artifact and relevant behavior tests first. Human bilingual blinded review is preferred; model judgments are supplemental and identified.",
+    "host_memory": "Primary comparison requires demonstrated isolation in a disposable client profile; otherwise label memory effects confounded."
+  },
+  "pilot": {
+    "fixture_manifest": "evals/v1.5/pilot-fixtures.json",
+    "expected_episodes_max": 48,
+    "expected_sessions_max": 108,
+    "held_out": false,
+    "claim_eligible": false
+  },
+  "lanes": {
+    "EVAL-01": {
+      "purpose": "Fresh-session coding continuity",
+      "arms": ["ordinary Codex", "released v1.4.0", "v1.5 guidance without memory", "v1.5 guidance with enrolled memory"],
+      "additional_control": "Paired C/D replay from one frozen first-session artifact and memory state before hidden follow-up.",
+      "primary_outcomes": ["functional correctness", "regressions", "appropriate reuse or separation", "follow-up maintainability"]
+    },
+    "EVAL-02": {
+      "purpose": "Inexpensive-model quality gain and remaining Sol gap",
+      "arms": ["Luna alone", "Luna with v1.5", "Sol alone"],
+      "no_stronger_assistance_in_luna_treatment": true,
+      "primary_outcomes": ["completed task success", "quality rubric", "critical constraint failures"]
+    },
+    "EVAL-03": {
+      "purpose": "Same-model quality-preserving efficiency",
+      "arms": ["Sol alone", "Sol with v1.5", "Astra alone", "Astra with v1.5"],
+      "adaptive_ablation": "For each model hold source, memory, canonical method access, effort, and tools fixed; vary optional wrapper only.",
+      "primary_resource": "wall time; total usage reported as secondary until billing visibility is established",
+      "quality_gate": "No critical failure or weakened required check; held-out noninferiority margin to be frozen after pilot variance."
+    },
+    "EVAL-04": {
+      "purpose": "General project continuity",
+      "arms": ["memory disabled", "v1.5 memory enabled", "maintained visible project note"],
+      "fixtures": ["non-Git event planning", "non-Git research brief", "coding fixture"],
+      "paired_replay": true,
+      "primary_outcomes": ["goal and constraint recall", "stale influence", "false memory", "repeated work", "maintenance burden"]
+    },
+    "EVAL-05": {
+      "purpose": "Natural collaboration in English and Korean",
+      "arms": ["same model and effort with and without v1.5"],
+      "pairs": ["developer English/Korean", "nondeveloper English/Korean"],
+      "primary_outcomes": ["intent fulfillment", "appropriate clarification", "correction uptake", "continuity", "artifact completion"]
+    }
+  },
+  "held_out_study": {
+    "status": "not_frozen_or_run",
+    "reason": "Numerical margins and sample size depend on capability smoke and pilot variance; no held-out outcome may run before a separate immutable preregistration."
+  }
+}

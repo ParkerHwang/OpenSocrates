@@ -1,4 +1,10 @@
 <p align="center">
+
+**v1.5.0 release candidate — not yet published.** This branch adds task-aware
+assistance, opt-in project memory, and coding/collaboration guidance. The 1.4.0
+commands below still install the published stable version. See the
+[candidate status and qualification](docs/v1.5.0/RELEASE_CANDIDATE.md) and
+[project continuity guide](docs/project-memory.md).
   <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
 </p>
 
@@ -109,3 +115,24 @@ response-time improvement is claimed. Current release validation is tracked in
 
 OpenSocrates is [MIT licensed](LICENSE), independent of OpenAI, and not endorsed
 by OpenAI.
+
+## What the v1.5.0 candidate adds
+
+- Optional task-based support: complete straightforward work directly, and use
+  appropriate evidence and structure for consequential judgments.
+- Opt-in local memory for Git and non-Git projects, with accepted/proposed intent,
+  current-source validation, checkpoints, inspect/export and exact scoped forgetting.
+- Coding guidance for existing implementation reuse, affected callers and follow-ups.
+- Selective official-document reference prompts with declared URL/version/read
+  provenance, plus read-only checkpoint preparation and scoped completion evidence.
+  [Official references](docs/official-documentation.md) explains the limits.
+- Aligned EN/KO collaboration guidance: answer side questions, continue the main
+  task and reuse settled permissions. Missing memory does not invent facts.
+
+The [six-scenario comparison](evals/v1.5/practical/RESULTS.md) reports correctness
+ties, the added structured-memory workflow, one avoided repeated approval request,
+and higher work in memory-backed episodes. It is not a broad quality or efficiency
+guarantee. Model profiles remain experimental; the normal task fallback works
+without a validated model profile. [Privacy and controls](docs/project-memory.md)
+and the [technical protocol](docs/project-memory-development.md) describe what is
+retained and how to disable or delete it.

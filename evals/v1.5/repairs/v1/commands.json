@@ -1,0 +1,38 @@
+{
+  "source_suite": {
+    "command": "UV_CACHE_DIR=<task-cache> make bootstrap format-check lint generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check",
+    "scope": "working tree subsequently committed as 9260a1a1fe869b44cae9621e51797b801501af04",
+    "result": "all gates through smoke passed; installer 241/251 under sandbox; 10 synthetic lifecycle failures",
+    "log_sha256": "123474765ddf744f278b5733e557692efee1f20b6813a098bf067e00a072c46d"
+  },
+  "installer": {
+    "command": "UV_CACHE_DIR=<task-cache> make installer-check",
+    "source_commit": "9260a1a1fe869b44cae9621e51797b801501af04",
+    "result": "pass,251 tests plus npx smoke",
+    "scope": "unrestricted process inspection; fixture homes only; no real account lifecycle",
+    "log_sha256": "30b4557db976c0b22fce4b53b749464689458e2e0152ef962be8040ecd8b82e4"
+  },
+  "native": {
+    "command": "UV_CACHE_DIR=<task-cache> PYINSTALLER_CONFIG_DIR=<task-cache> make release-check",
+    "source_commit": "9260a1a1fe869b44cae9621e51797b801501af04",
+    "result": "pass",
+    "archive_sha256": "1aae2efefc76c4e628ad2da7a63174f5d96e093b984fe0ed5551b66eaa6dae0d",
+    "log_sha256": "39ff65659ade007399f3483e5e1b29c4ec01e0d32b567217f7c933337550b1ec"
+  },
+  "project_memory": {
+    "command": "PYTHONPATH=src .venv/bin/python tools/check_project_memory.py",
+    "result": "28/28 pass",
+    "log_sha256": "daaffb27be389b78f32d469b6489c4ef92e4d208072563a5aff2ac76b88bbe12"
+  },
+  "asset_verify": {
+    "command": "node installer/opensocrates.mjs verify --host all --asset-codex dist/opensocrates-1.5.0-codex-plugin.zip --checksum-codex dist/opensocrates-1.5.0-codex-plugin.zip.sha256",
+    "status": "pass",
+    "log_sha256": "e367eb19da51dd9566cb88fc0e8460972d49f5c70244167d3de7799062a7c38d"
+  },
+  "npm_pack": {
+    "command": "npm pack --ignore-scripts --pack-destination dist/qualification-artifacts/repair-guide6 --json",
+    "status": "pass",
+    "files": 9,
+    "archive_sha256": "81294d96cff40c79e0f24b27b912fe402450e4f00224ecf88dc84cd2d85b0f7b"
+  }
+}

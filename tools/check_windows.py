@@ -13,6 +13,7 @@ import unittest
 import zipfile
 from pathlib import Path
 from unittest import mock
+from uuid import uuid4
 
 from opensocrates.persistence.atomic import append_fsync, atomic_replace_bytes, read_bytes
 from opensocrates.persistence.permissions import (
@@ -36,8 +37,541 @@ def _grant_everyone_read(path: Path) -> None:
     )
 
 
+def _set_disposable_git_owner(git_directory: Path) -> None:
+    """GitHub's elevated token creates Git children under Administrators."""
+    account = subprocess.run(
+        ["whoami.exe"], check=True, capture_output=True, text=True
+    ).stdout.strip()
+    subprocess.run(
+        ["icacls.exe", str(git_directory), "/setowner", account, "/T"],
+        check=True,
+        capture_output=True,
+    )
+
+
 @unittest.skipUnless(sys.platform == "win32", "native Windows regression")
 class WindowsChecks(unittest.TestCase):
+    def test_project_memory_wal_sidecars_fail_closed_and_delete_exactly(self):
+        from opensocrates.project_memory.registry import ProjectRegistry
+        from opensocrates.project_memory.service import handle_memory
+
+        with tempfile.TemporaryDirectory(prefix="OpenSocrates WAL lifecycle ") as name:
+            parent = Path(name)
+            source = parent / "plain-text"
+            self.assertTrue(create_owner_only_directory(source))
+            registry = ProjectRegistry(parent / "owned-data")
+            policy = {
+                "root": str(source),
+                "apply": False,
+                "mode": "read_write",
+                "capture_policy": "milestones",
+                "excluded_paths": [],
+            }
+
+            def call(operation, payload, project_id=None, workspace_id=None):
+                return handle_memory(
+                    {
+                        "schema": "opensocrates.project-memory.request/1.0.0",
+                        "operation": operation,
+                        "request_id": str(uuid4()),
+                        "project_id": project_id,
+                        "workspace_id": workspace_id,
+                        "task_id": None,
+                        "payload": payload,
+                    },
+                    registry=registry,
+                )
+
+            preview = call("init", policy)
+            self.assertEqual(preview["status"], "ok", preview)
+            policy.update(
+                {
+                    "apply": True,
+                    "disclosure_digest": preview["result"]["disclosure_digest"],
+                    "authorization_basis": "fixture:windows-wal",
+                    "authorization_attribution": "operator_declared",
+                    "idempotency_key": str(uuid4()),
+                }
+            )
+            enrolled = call("init", policy)
+            self.assertEqual(enrolled["status"], "ok", enrolled)
+            project_id = enrolled["result"]["project_id"]
+            workspace_id = enrolled["result"]["workspace_id"]
+            directory = registry.project_dir(project_id)
+            for suffix in ("-wal", "-shm"):
+                descriptor = create_owner_only_file(
+                    directory / f"memory.sqlite3{suffix}", flags=os.O_RDWR
+                )
+                os.close(descriptor)
+            status = call("status", {}, project_id, workspace_id)
+            self.assertEqual(status["status"], "unavailable", status)
+            self.assertIn("unsupported_journal_mode", status["limitations"])
+            deleted = call(
+                "delete",
+                {
+                    "intent": "delete_project",
+                    "expected_policy_version": 1,
+                    "idempotency_key": str(uuid4()),
+                },
+                project_id,
+            )
+            self.assertEqual(deleted["status"], "ok", deleted)
+            self.assertFalse(directory.exists())
+
+    def test_project_memory_linked_worktree_continuity(self):
+        from opensocrates.project_memory.registry import ProjectRegistry
+        from opensocrates.project_memory.service import handle_memory
+
+        with tempfile.TemporaryDirectory(prefix="OpenSocrates linked worktree ") as name:
+            parent = Path(name)
+            first = parent / "first"
+            second = parent / "second"
+            self.assertTrue(create_owner_only_directory(first))
+            self.assertTrue(create_owner_only_directory(first / ".git"))
+            self.assertTrue(create_owner_only_directory(second))
+            subprocess.run(["git", "init", "-q", str(first)], check=True, capture_output=True)
+            (first / "helper.py").write_text("def helper():\n    return 1\n", encoding="utf-8")
+            subprocess.run(["git", "-C", str(first), "add", "helper.py"], check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(first),
+                    "-c",
+                    "user.name=Fixture",
+                    "-c",
+                    "user.email=fixture@example.invalid",
+                    "commit",
+                    "-qm",
+                    "fixture",
+                ],
+                check=True,
+                capture_output=True,
+            )
+            subprocess.run(
+                ["git", "-C", str(first), "worktree", "add", "-q", "--detach", str(second)],
+                check=True,
+                capture_output=True,
+            )
+            _set_disposable_git_owner(first / ".git")
+            registry = ProjectRegistry(parent / "owned-data")
+            policy = {"mode": "read_write", "capture_policy": "milestones", "excluded_paths": []}
+
+            def request(operation, payload, project_id=None, workspace_id=None, task_id=None):
+                return handle_memory(
+                    {
+                        "schema": "opensocrates.project-memory.request/1.0.0",
+                        "operation": operation,
+                        "request_id": str(uuid4()),
+                        "project_id": project_id,
+                        "workspace_id": workspace_id,
+                        "task_id": task_id,
+                        "payload": payload,
+                    },
+                    registry=registry,
+                )
+
+            def enroll(root, project_id=None, expected_policy_version=None):
+                payload = {"root": str(root), "apply": False, **policy}
+                if expected_policy_version is not None:
+                    payload["expected_policy_version"] = expected_policy_version
+                preview = request("init", payload, project_id)
+                self.assertEqual(preview["status"], "ok", preview)
+                payload.update(
+                    {
+                        "apply": True,
+                        "disclosure_digest": preview["result"]["disclosure_digest"],
+                        "authorization_basis": "fixture:linked-worktree",
+                        "authorization_attribution": "operator_declared",
+                        "idempotency_key": str(uuid4()),
+                    }
+                )
+                result = request("init", payload, project_id)
+                self.assertEqual(result["status"], "ok", result)
+                return result["result"]
+
+            original = enroll(first)
+            project_id = original["project_id"]
+            first_id = original["workspace_id"]
+            joined = enroll(second, project_id, original["policy_version"])
+            second_id = joined["workspace_id"]
+            self.assertEqual(joined["project_id"], project_id)
+            self.assertNotEqual(second_id, first_id)
+            task_id = str(uuid4())
+            decision = request(
+                "record",
+                {
+                    "idempotency_key": str(uuid4()),
+                    "expected_record_version": 0,
+                    "kind": "decision",
+                    "scope": {"level": "project"},
+                    "summary": "Keep the shared helper compatible.",
+                    "origin": {
+                        "producer_kind": "agent",
+                        "source_reference": None,
+                        "attestation": "agent_reported",
+                    },
+                    "support": "agent_reported",
+                    "source_refs": [],
+                    "revalidation": {
+                        "dependency_paths": [],
+                        "negative_claim": False,
+                        "on_change": "not_applicable",
+                    },
+                },
+                project_id,
+                first_id,
+            )
+            self.assertEqual(decision["status"], "ok", decision)
+            record_id = decision["result"]["record"]["record_id"]
+            accepted = request(
+                "accept",
+                {
+                    "record_id": record_id,
+                    "expected_record_version": 1,
+                    "idempotency_key": str(uuid4()),
+                    "acceptance_basis": "fixture:accepted-intent",
+                    "acceptance_attribution": "operator_declared",
+                },
+                project_id,
+                first_id,
+            )
+            self.assertEqual(accepted["status"], "ok", accepted)
+            observation = request(
+                "observe",
+                {"path": "helper.py", "idempotency_key": str(uuid4())},
+                project_id,
+                first_id,
+            )
+            self.assertEqual(observation["status"], "ok", observation)
+            checkpoint = request(
+                "checkpoint",
+                {
+                    "idempotency_key": str(uuid4()),
+                    "expected_checkpoint_version": 0,
+                    "objective": "Update helper",
+                    "constraints": ["Keep callers compatible"],
+                    "completion_conditions": ["Relevant tests pass"],
+                    "completed_actions": [],
+                    "remaining_actions": ["Inspect callers"],
+                    "next_action": "Inspect callers",
+                    "blockers": [],
+                    "decision_refs": [record_id],
+                    "source_refs": [],
+                    "snapshot_id": None,
+                    "conflict_ids": [],
+                    "pending_effects": [],
+                    "parent_checkpoint_id": None,
+                },
+                project_id,
+                first_id,
+                task_id,
+            )
+            self.assertEqual(checkpoint["status"], "ok", checkpoint)
+            first_pack = request(
+                "recall",
+                {"need": "shared helper", "budget_bytes": 8192},
+                project_id,
+                first_id,
+                task_id,
+            )
+            second_pack = request(
+                "recall",
+                {"need": "shared helper", "budget_bytes": 8192},
+                project_id,
+                second_id,
+                task_id,
+            )
+            self.assertEqual(first_pack["status"], "ok", first_pack)
+            self.assertEqual(second_pack["status"], "ok", second_pack)
+            self.assertEqual(
+                first_pack["result"]["checkpoint_reference"],
+                checkpoint["result"]["record"]["record_id"],
+            )
+            self.assertEqual(second_pack["result"]["decisions"][0]["record_id"], record_id)
+            self.assertEqual(second_pack["result"]["decisions"][0]["freshness"], "not_applicable")
+            self.assertIsNone(second_pack["result"]["checkpoint_reference"])
+            self.assertEqual(second_pack["result"]["source_evidence"], [])
+
+    def test_project_memory_git_ref_dirty_and_untracked_freshness(self):
+        from opensocrates.project_memory import sources
+
+        with tempfile.TemporaryDirectory(prefix="OpenSocrates git freshness ") as name:
+            root = Path(name) / "repo"
+            self.assertTrue(create_owner_only_directory(root))
+            subprocess.run(["git", "init", "-q", str(root)], check=True, capture_output=True)
+            helper = root / "helper.py"
+            helper.write_text("def helper():\n    return 1\n", encoding="utf-8")
+            subprocess.run(["git", "-C", str(root), "add", "helper.py"], check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(root),
+                    "-c",
+                    "user.name=Fixture",
+                    "-c",
+                    "user.email=fixture@example.invalid",
+                    "commit",
+                    "-qm",
+                    "fixture",
+                ],
+                check=True,
+                capture_output=True,
+            )
+            first = sources.capture_snapshot(root, "git_worktree", "project", "workspace")
+            subprocess.run(
+                ["git", "-C", str(root), "switch", "-q", "-c", "fixture-next"],
+                check=True,
+                capture_output=True,
+            )
+            branch = sources.capture_snapshot(root, "git_worktree", "project", "workspace")
+            ref_change = sources.revalidate_snapshot(first, branch)
+            self.assertEqual(first["head_oid"], branch["head_oid"])
+            self.assertEqual(ref_change["freshness"], "stale")
+            self.assertTrue(ref_change["changes"]["ref_changed"])
+
+            helper.write_text("def helper():\n    return 2\n", encoding="utf-8")
+            unstaged = sources.capture_snapshot(root, "git_worktree", "project", "workspace")
+            edit_change = sources.revalidate_snapshot(branch, unstaged)
+            self.assertEqual(edit_change["freshness"], "stale")
+            self.assertIn("helper.py", edit_change["changes"]["modified"])
+            subprocess.run(["git", "-C", str(root), "add", "helper.py"], check=True)
+            staged = sources.capture_snapshot(root, "git_worktree", "project", "workspace")
+            staged_change = sources.revalidate_snapshot(unstaged, staged)
+            self.assertEqual(staged_change["freshness"], "stale")
+            self.assertTrue(staged_change["changes"]["dirty_changed"])
+            (root / "new_caller.py").write_text(
+                "from helper import helper\nhelper()\n", encoding="utf-8"
+            )
+            untracked = sources.capture_snapshot(root, "git_worktree", "project", "workspace")
+            caller_change = sources.revalidate_snapshot(staged, untracked)
+            self.assertEqual(caller_change["freshness"], "stale")
+            self.assertIn("new_caller.py", caller_change["changes"]["added"])
+            self.assertEqual(first["head_oid"], untracked["head_oid"])
+            subprocess.run(["git", "-C", str(root), "add", "new_caller.py"], check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(root),
+                    "-c",
+                    "user.name=Fixture",
+                    "-c",
+                    "user.email=fixture@example.invalid",
+                    "commit",
+                    "-qm",
+                    "changed",
+                ],
+                check=True,
+                capture_output=True,
+            )
+            committed = sources.capture_snapshot(root, "git_worktree", "project", "workspace")
+            head_change = sources.revalidate_snapshot(untracked, committed)
+            self.assertEqual(head_change["freshness"], "stale")
+            self.assertTrue(head_change["changes"]["head_changed"])
+
+    def test_project_memory_rejects_copied_reparse_relocated_and_replaced_roots(self):
+        from opensocrates.project_memory.registry import ProjectRegistry, RegistryError
+
+        with tempfile.TemporaryDirectory(prefix="OpenSocrates root identity ") as name:
+            parent = Path(name)
+            first = parent / "first"
+            second = parent / "linked"
+            self.assertTrue(create_owner_only_directory(first))
+            self.assertTrue(create_owner_only_directory(first / ".git"))
+            self.assertTrue(create_owner_only_directory(second))
+            subprocess.run(["git", "init", "-q", str(first)], check=True, capture_output=True)
+            (first / "guide.md").write_text("Keep access.\n", encoding="utf-8")
+            subprocess.run(["git", "-C", str(first), "add", "guide.md"], check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(first),
+                    "-c",
+                    "user.name=Fixture",
+                    "-c",
+                    "user.email=fixture@example.invalid",
+                    "commit",
+                    "-qm",
+                    "fixture",
+                ],
+                check=True,
+                capture_output=True,
+            )
+            subprocess.run(
+                ["git", "-C", str(first), "worktree", "add", "-q", "--detach", str(second)],
+                check=True,
+                capture_output=True,
+            )
+            _set_disposable_git_owner(first / ".git")
+            registry = ProjectRegistry(parent / "owned-data")
+            policy = {"mode": "read_write", "capture_policy": "milestones", "excluded_paths": []}
+            preview = registry.preview(str(first), policy)
+            enrolled = registry.enroll(
+                str(first),
+                policy,
+                preview["disclosure_digest"],
+                "fixture:root-identity",
+                "operator_declared",
+                idempotency_key=str(uuid4()),
+            )
+            project_id = enrolled["project_id"]
+            workspace_id = enrolled["workspace_id"]
+
+            copied = parent / "copied"
+            shutil.copytree(second, copied)
+            with self.assertRaises(RegistryError):
+                registry.preview(
+                    str(copied),
+                    policy,
+                    expected_policy_version=1,
+                    target_project_id=project_id,
+                )
+
+            junction = parent / "junction"
+            subprocess.run(
+                [
+                    "powershell.exe",
+                    "-NoProfile",
+                    "-NonInteractive",
+                    "-Command",
+                    "New-Item -ItemType Junction -Path $env:TEST_JUNCTION -Target $env:TEST_TARGET | Out-Null",
+                ],
+                env={**os.environ, "TEST_JUNCTION": str(junction), "TEST_TARGET": str(second)},
+                check=True,
+                capture_output=True,
+            )
+            with self.assertRaises((OSError, ValueError)):
+                registry.preview(str(junction), policy)
+
+            relocated = parent / "relocated"
+            first.rename(relocated)
+            with self.assertRaises((OSError, ValueError)):
+                registry.get(project_id, workspace_id)
+            self.assertTrue(create_owner_only_directory(first))
+            with self.assertRaises((OSError, ValueError)):
+                registry.get(project_id, workspace_id)
+
+    def test_project_memory_git_inventory_and_untracked_caller(self):
+        from opensocrates.project_memory import sources
+        from opensocrates.project_memory.registry import ProjectRegistry
+
+        with tempfile.TemporaryDirectory(prefix="OpenSocrates git source ") as name:
+            parent = Path(name)
+            root = parent / "repo"
+            self.assertTrue(create_owner_only_directory(root))
+            self.assertTrue(create_owner_only_directory(root / ".git"))
+            subprocess.run(["git", "init", "-q", str(root)], check=True, capture_output=True)
+            (root / "helper.py").write_text("def helper():\n    return 1\n", encoding="utf-8")
+            subprocess.run(
+                ["git", "-C", str(root), "add", "helper.py"], check=True, capture_output=True
+            )
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(root),
+                    "-c",
+                    "user.name=Fixture",
+                    "-c",
+                    "user.email=fixture@example.invalid",
+                    "commit",
+                    "-qm",
+                    "fixture",
+                ],
+                check=True,
+                capture_output=True,
+            )
+            policy = {"mode": "read_write", "capture_policy": "milestones", "excluded_paths": []}
+            preview = ProjectRegistry(parent / "data").preview(str(root), policy)
+            self.assertEqual(preview["disclosure"]["workspace_kind"], "git_worktree")
+            first = sources.capture_snapshot(root, "git_worktree", "project", "workspace")
+            self.assertTrue(first["coverage"]["complete_for_scope"])
+            self.assertIn("helper.py", first["files"])
+            (root / "new_caller.py").write_text(
+                "from helper import helper\nhelper()\n", encoding="utf-8"
+            )
+            changed = sources.capture_snapshot(root, "git_worktree", "project", "workspace")
+            self.assertEqual(sources.revalidate_snapshot(first, changed)["freshness"], "stale")
+            self.assertIn("new_caller.py", changed["files"])
+
+    def test_project_memory_source_root_and_reparse(self):
+        from opensocrates import windows_security
+        from opensocrates.project_memory import sources
+
+        with tempfile.TemporaryDirectory(prefix="OpenSocrates source 한글 ") as name:
+            parent = Path(name)
+            root = parent / "enrolled"
+            nested = root / "notes"
+            self.assertTrue(create_owner_only_directory(root))
+            self.assertTrue(create_owner_only_directory(nested))
+            (nested / "brief.md").write_text("in-scope marker", encoding="utf-8")
+            external = parent / "external"
+            external.mkdir()
+            (external / "private.md").write_text("outside-root canary", encoding="utf-8")
+            with windows_security.open_source_root(root) as bound:
+                self.assertTrue(windows_security.source_root_owner_is_current(bound))
+                self.assertEqual(
+                    windows_security.read_source_file(bound, "notes/brief.md", 1024)[0],
+                    b"in-scope marker",
+                )
+                real_open = windows_security._open_source_path
+
+                def try_replacing_parent(path: Path, *, directory: bool) -> int:
+                    if path == nested / "brief.md":
+                        with self.assertRaises(PermissionError):
+                            nested.rename(root / "moved-notes")
+                    return real_open(path, directory=directory)
+
+                with mock.patch.object(
+                    windows_security, "_open_source_path", side_effect=try_replacing_parent
+                ):
+                    self.assertEqual(
+                        windows_security.read_source_file(bound, "notes/brief.md", 1024)[0],
+                        b"in-scope marker",
+                    )
+                with self.assertRaises(ValueError):
+                    windows_security.validate_source_relative("notes/../private.md")
+                with self.assertRaises(ValueError):
+                    windows_security.validate_source_relative("notes/file.md:stream")
+                with self.assertRaises(PermissionError):
+                    root.rename(parent / "moved-enrolled")
+
+            first = sources.capture_snapshot(root, "directory", "project", "workspace")
+            self.assertTrue(first["coverage"]["complete_for_scope"])
+            self.assertEqual(list(first["files"]), ["notes/brief.md"])
+            self.assertEqual(
+                sources.lexical_matches(root, first, "marker")[0][0]["path"], "notes/brief.md"
+            )
+            self.assertNotIn("in-scope marker", str(first))
+
+            junction = root / "outside"
+            subprocess.run(
+                [
+                    "powershell.exe",
+                    "-NoProfile",
+                    "-NonInteractive",
+                    "-Command",
+                    "New-Item -ItemType Junction -Path $env:TEST_JUNCTION -Target $env:TEST_TARGET | Out-Null",
+                ],
+                env={**os.environ, "TEST_JUNCTION": str(junction), "TEST_TARGET": str(external)},
+                check=True,
+                capture_output=True,
+            )
+            linked = sources.capture_snapshot(root, "directory", "project", "workspace")
+            self.assertNotIn("outside/private.md", linked["files"])
+            self.assertFalse(linked["coverage"]["complete_for_scope"])
+            self.assertNotIn("outside-root canary", str(linked))
+            with self.assertRaises((OSError, ValueError)):
+                windows_security.open_source_root(junction)
+            with windows_security.open_source_root(root) as bound:
+                self.assertEqual(
+                    windows_security.read_source_file(bound, "outside/private.md", 1024)[1],
+                    "unsafe_path",
+                )
+
     def test_acl_private_and_binary_atomic_io(self):
         with tempfile.TemporaryDirectory(prefix="OpenSocrates 한글 space ") as name:
             root = Path(name) / "private-root"

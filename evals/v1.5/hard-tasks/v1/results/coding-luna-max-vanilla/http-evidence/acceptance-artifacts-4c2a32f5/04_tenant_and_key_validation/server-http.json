@@ -1,0 +1,117 @@
+[
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "Idempotency-Key": "k"
+    },
+    "request": "{\"name\": \"a\", \"opening\": 1}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.0004246670287102461
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "bad space",
+      "Idempotency-Key": "k"
+    },
+    "request": "{\"name\": \"a\", \"opening\": 1}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.00026041700039058924
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "Idempotency-Key": "k"
+    },
+    "request": "{\"name\": \"a\", \"opening\": 1}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.00026524998247623444
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": "{\"name\": \"a\", \"opening\": 1}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.0002352090086787939
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "bad space"
+    },
+    "request": "{\"name\": \"a\", \"opening\": 1}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.00021045899484306574
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "request": "{\"name\": \"a\", \"opening\": 1}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.00020574999507516623
+  },
+  {
+    "method": "GET",
+    "path": "/summary",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "request": null,
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.00023516599321737885
+  }
+]

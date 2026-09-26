@@ -1,0 +1,56 @@
+[
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "v1"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1, \"from_version\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 9,
+          "reserved": 0,
+          "available": 9,
+          "version": 2
+        },
+        {
+          "name": "b",
+          "balance": 1,
+          "reserved": 0,
+          "available": 1,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "id": "7257aac3b6397c3a64a3571c5e4f2785",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0006281669484451413
+  },
+  {
+    "method": "POST",
+    "path": "/holds",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "h1"
+    },
+    "request": "{\"account\": \"a\", \"amount\": 7}",
+    "status": 409,
+    "response": {
+      "error": {
+        "code": "insufficient"
+      }
+    },
+    "elapsed_s": 0.0018160420004278421
+  }
+]

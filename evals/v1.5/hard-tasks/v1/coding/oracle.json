@@ -1,0 +1,36 @@
+{
+  "schema": "auditledger.oracle.v1",
+  "origin": "Author arithmetic over synthetic fixture rows; no candidate executions or model reference implementation",
+  "legacy_primary": {
+    "old": {
+      "openings": {"alpha": 100, "beta": 20},
+      "final": {"alpha": {"balance": 83, "reserved": 0, "version": 3}, "beta": {"balance": 37, "reserved": 0, "version": 3}},
+      "entry_count": 6, "total_balance": 120,
+      "legacy_ids": [7, 11],
+      "after_reverse_7": {"alpha": 103, "beta": 17}
+    },
+    "other": {
+      "openings": {"alpha": 20, "gamma": 0},
+      "final": {"alpha": {"balance": 12, "reserved": 0, "version": 2}, "gamma": {"balance": 8, "reserved": 0, "version": 2}},
+      "entry_count": 4, "total_balance": 20, "legacy_ids": [19]
+    }
+  },
+  "legacy_alternate": {
+    "old": {"openings": {"eta": 20, "zeta": 55}, "final": {"eta": 24, "zeta": 51}, "versions": {"eta": 3, "zeta": 3}, "entry_count": 6, "total_balance": 75},
+    "u": {"openings": {"eta": 9}, "final": {"eta": 9}, "versions": {"eta": 1}, "entry_count": 1, "total_balance": 9}
+  },
+  "concurrent_96_transfers": {
+    "initial": {"a": 1000, "b": 1000},
+    "a_to_b": 64, "b_to_a": 32,
+    "final": {"a": 968, "b": 1032}, "version_each": 97,
+    "entry_count": 194, "total_balance": 2000
+  },
+  "performance_seed": {
+    "initial_balance_each": 1000000000,
+    "batches": 250, "transfers_per_batch": 20,
+    "a_to_b": 2500, "b_to_a": 2500,
+    "final_balance_each": 1000000000, "version_each": 5001,
+    "entry_count": 10002, "total_balance": 2000000000,
+    "measured_write_oracle": "entry_count = 10002 + 2 * all_successful; version_each = 5001 + all_successful; a_balance = 1000000000 - successes_a_to_b + successes_b_to_a"
+  }
+}

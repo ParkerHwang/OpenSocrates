@@ -1,0 +1,78 @@
+{
+  "schema": "opensocrates.luna-backend-validation/1",
+  "product_input_commit": "a8aaba572693c63419188ee2d45f59688b564b16",
+  "evidence_base_commit": "4757c8c439bcbb7e5fd1b521ace99d5d15aceb3f",
+  "scope": "Separate Luna synthetic evidence and mutable current status only; no product/runtime/package input change.",
+  "commands": [
+    {
+      "command": "make bootstrap format-check lint generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check",
+      "exit_code": 0,
+      "scope": "Working tree subsequently committed in the final feature handoff"
+    },
+    {
+      "command": "python3 evals/v1.5/backend-queueforge/luna-v1/review/verify_export.py",
+      "exit_code": 0,
+      "exported_files": 362,
+      "model_calls": 9,
+      "performance_cells": 99,
+      "candidate_failures_retained": true
+    },
+    {
+      "command": "python3 evals/v1.5/backend-queueforge/v1/review/verify_export.py",
+      "exit_code": 0,
+      "unchanged_sol_export_files": 376
+    },
+    {
+      "command": ".venv/bin/python evals/v1.5/repairs/v1/verify.py --historical",
+      "exit_code": 0,
+      "unchanged_historical_files": 2097
+    },
+    {
+      "command": "PYTHONPATH=src .venv/bin/python tools/check_links.py --root . --path evals/v1.5/STATUS.md --path evals/v1.5/backend-queueforge/README.md --path evals/v1.5/backend-queueforge/luna-v1/review --report build/evidence/queueforge-luna-links.json",
+      "exit_code": 0,
+      "documents": 5,
+      "links": 52
+    },
+    {
+      "command": "python3 review/audit.py",
+      "cwd": "Declared local Luna evaluation boundary",
+      "exit_code": 0,
+      "audited_cells": 99,
+      "raw_numeric_samples_including_warmup": 8633384,
+      "source_stages_unchanged": 9
+    },
+    {
+      "command": "python3 review/query_plan.py",
+      "exit_code": 0,
+      "scope": "Post-load immutable read-only plans using separately identified host Python SQLite3.50.4; not proof of measured Go-driver plans or causal timing attribution."
+    },
+    {
+      "check": "Privacy scan, LF CSV bytes and both rendered figures",
+      "status": "pass"
+    }
+  ],
+  "outcome_boundary": {
+    "model": "gpt-6-luna",
+    "effort": "medium",
+    "client": "codex-cli 0.158.0-alpha.2",
+    "attempted_calls": 9,
+    "completed_cli_turns": 9,
+    "extra_model_calls": 0,
+    "stronger_model_candidate_repairs": 0,
+    "final_api_pass_counts": [17, 16, 18],
+    "all_final_performance_diagnostic": true,
+    "native_memory_attempts": 17,
+    "captured_native_ok": 15,
+    "native_status_unavailable": 2,
+    "human_scores": null,
+    "billing": null,
+    "backend_model_echo": null
+  },
+  "not_run": [
+    "No fourth outcome session, stronger-model repair, new judge panel or held-out study.",
+    "No new local native rebuild because package inputs are unchanged; final exact-head hosted native jobs are recorded in PR95 and issue94.",
+    "Live Windows Codex, physical clean-machine and destructive host tests remain unavailable or outside authorization.",
+    "No release, active installation replacement, global memory/settings changes or real-project enrollment."
+  ],
+  "final_commit_and_ci": "Recorded in the exact pushed Draft PR95 and issue94 handoff; product CI does not erase generated-application failures."
+}

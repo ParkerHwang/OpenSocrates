@@ -1,0 +1,141 @@
+{
+  "status": "post_lock_integrator_audit_not_a_new_score_set",
+  "validation_mode": "Read-only static inspection of frozen artifacts, public messages and checker source; no candidate code/model outcome rerun.",
+  "human_scores": null,
+  "ratings_modified": false,
+  "findings": [
+    {
+      "id": "I01",
+      "verdict": "supported_static_behavior_defect_and_checker_gap",
+      "packet_ids": [
+        "89067e22cbf3cead",
+        "8b2269d24162dda4",
+        "910ff109ba7de051"
+      ],
+      "finding": "Three invoice artifacts treat subtotal == 0 as an empty order. A nonempty Line with unit_cents=0 and quantity=1 is permitted by the request, yet shipping becomes 0 rather than 700 domestic or 2000 international. Two Luna-alone repetitions and one installed-Luna repetition have this branch. The other installed-Luna repetition and both Sol repetitions track actual emptiness. All six historical deterministic flags remain passing.",
+      "evidence": [
+        "packet:/initial_request",
+        "packet:/stages/0/artifacts/invoice.py",
+        "evals/v1.5/expanded/checks_v2.py:72-94"
+      ],
+      "scope": "Static inspection only, no candidate execution. One authored task with two repetitions is not a model-gap or treatment-effect estimate."
+    },
+    {
+      "id": "I02",
+      "verdict": "supported_static_edge_case_with_domain_limit",
+      "packet_ids": [
+        "28931385f4a0932b"
+      ],
+      "finding": "For starter and seats=1.5 the visible code permits the value and produces 1500.0, despite the requested integer result. This validation gap is inherited from the author-written seed; the other three outputs add an integer seat guard. The future fixture should explicitly define the permitted seat domain. Preserve the AI critical failure, but do not describe it as a demonstrated memory-caused regression.",
+      "evidence": [
+        "packet:/followup_request",
+        "packet:/source_before_task/offer.py",
+        "packet:/stages/0/artifacts/offer.py"
+      ],
+      "scope": "No new execution or historical regrade; the causal interpretation and input-domain boundary remain limited."
+    },
+    {
+      "id": "I03",
+      "verdict": "reported_noncompletion_and_assessor_granularity_difference",
+      "packet_ids": [
+        "2da2715fc8df93df",
+        "86229fee73f79bc2"
+      ],
+      "finding": "Both guide-2 memory outputs disclose rejected supersession/unresolved stale memory. The judge marks one forgetting gate fail and the other unassessable. Both reports support noncompletion of the requested forgetting; neither proves the exact persisted state. Keep the original artifact passes and both AI statuses unchanged.",
+      "evidence": [
+        "packet:/followup_request",
+        "packet:/stages/0/public_final"
+      ],
+      "scope": "Artifact correctness, reported action completion and independently observed persistence are different claims."
+    },
+    {
+      "id": "I04",
+      "verdict": "integrator_disagrees_with_model_rubric_defect_claim",
+      "packet_ids": [
+        "117cc94a4fb2b69d"
+      ],
+      "finding": "The only exported record contains the requested intent text but its lifecycle is proposed. The frozen retained_intent_present predicate explicitly considers accepted records only. Therefore the false flag is supported by lifecycle evidence; the model overlooked this condition when calling it a semantic false negative and passing supplied_persisted_state.",
+      "evidence": [
+        "packet:/persisted_public_records/0/lifecycle",
+        "packet:/persisted_public_records/0/summary",
+        "evals/v1.5/expanded/diagnostic_runner_v3.py:98-113"
+      ],
+      "scope": "This correction is a separate integrator finding. The raw model scores, gate, disagreement and historical false flag are not edited."
+    },
+    {
+      "id": "I05",
+      "verdict": "unsupported_comparative_efficiency_distinction",
+      "packet_ids": [
+        "3808d22a5c894058"
+      ],
+      "finding": "This is the only score/status change after disclosure: efficiency changes from null to 3 using three actions, zero failures and 20.417 seconds. Eleven other EVAL-03 packets remain unassessable because aggregate counts omit action identity/order. Similar counts do not establish which checks were necessary or redundant. Keep the 3, but do not use it for comparative efficiency or noninferiority.",
+      "evidence": [
+        "packet:/coverage_limit",
+        "deterministic:/tool_actions",
+        "deterministic:/failed_tool_actions",
+        "deterministic:/wall_seconds"
+      ],
+      "scope": "One assessor applies evidence sufficiency inconsistently; no latency, cost or internal-reasoning claim follows."
+    },
+    {
+      "id": "I06",
+      "verdict": "supported_question_checker_disagreement",
+      "packet_ids": [
+        "b86f97dc91521c4f"
+      ],
+      "finding": "The Korean public turn explicitly asks approval for the $100 increase from $750 to $850 before the final message. The final-message-only question flag is false while the all-public-message heuristic is true. The question occurred; retain the old false score and the separately passing semantic question gate.",
+      "evidence": [
+        "packet:/public_messages_by_turn/1/2",
+        "packet:/stages/1/artifacts/plan.json/required_question",
+        "deterministic:/deterministic_checks/checks/collaboration_question",
+        "deterministic:/question_in_any_public_message_heuristic"
+      ],
+      "scope": "A separately frozen dialogue diagnostic; it cannot reconstruct missing messages in another run."
+    },
+    {
+      "id": "I07",
+      "verdict": "missing_dialogue_not_proven_behavior_failure",
+      "packet_ids": [
+        "d9fee7df784166df"
+      ],
+      "finding": "The original expanded English installed nondeveloper case has a failed final-message question check, but earlier public messages were not retained. The reviewer correctly marks delivery of the necessary question unassessable rather than concluding that it never occurred.",
+      "evidence": [
+        "packet:/coverage_limit",
+        "packet:/stages/1/public_final",
+        "deterministic:/deterministic_checks/checks/collaboration_question"
+      ],
+      "scope": "Do not transfer the separate Korean diagnostic outcome to this missing-history case."
+    },
+    {
+      "id": "I08",
+      "verdict": "review_packet_coverage_limit",
+      "packet_ids": [
+        "090383e8f8bc3c4b",
+        "b3f4913582a71d4d",
+        "0a9dda019fdcded6",
+        "b7406b5521c8276f"
+      ],
+      "finding": "H02 artifacts and guide-4 final persisted-state checks pass, but their judge views lack sufficiently specific retrieval/deletion-operation evidence to resolve mechanism, exact scope and some claimed validation actions. The model leaves those gates unassessable. The supplemental index locates preserved source receipts for later review; it was not shown to this judge.",
+      "evidence": [
+        "packet:/coverage_limit where present",
+        "deterministic:/persisted_memory_observation where present",
+        "supplemental-evidence-index.json"
+      ],
+      "scope": "Packet-level missingness does not itself refute the separately scoped source/native/host receipts, and does not establish universal activation or account-side isolation."
+    },
+    {
+      "id": "I09",
+      "verdict": "plausible_minor_consistency_issue_not_hard_gate",
+      "packet_ids": [
+        "003246dd86833302"
+      ],
+      "finding": "The public final says availability remains unresolved while decision.json has unresolved=[]. That is a useful consistency concern. The task did not expressly mandate an availability entry in that array, and the answer does not invent a booking. Treat the model rubric-defect label as a provisional minor completeness judgment, not an established critical failure.",
+      "evidence": [
+        "packet:/initial_request",
+        "packet:/stages/0/artifacts/decision.json/unresolved",
+        "packet:/stages/0/public_final"
+      ],
+      "scope": "A prospective rubric should define this field if it is to be a hard acceptance condition."
+    }
+  ]
+}

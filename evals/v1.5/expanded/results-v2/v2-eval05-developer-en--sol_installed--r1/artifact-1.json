@@ -1,0 +1,7 @@
+{
+  "artifacts": {
+    "retry.py": "def should_retry(status, method='GET'):\n    if status == 429:\n        return True\n    return status == 503 and method.upper() in {'GET', 'HEAD', 'PUT', 'DELETE'}\n\ndef delay_seconds(attempt):\n    if attempt < 1:\n        raise ValueError('attempt')\n    return min(2 ** (attempt - 1), 16)\n",
+    "action.json": "{\n  \"retry_429_all_methods\": true,\n  \"retry_503_methods\": [\"GET\", \"HEAD\", \"PUT\", \"DELETE\"],\n  \"correction_applied\": true,\n  \"question_answer\": \"429 retries for any method; 503 retries for GET, HEAD, PUT, and DELETE; no other status retries.\",\n  \"verification\": [\n    \"Checked 429, 503, and other statuses across supported and unsupported methods with mixed case names.\",\n    \"Checked delay_seconds values and ValueError for attempts below 1.\"\n  ]\n}\n"
+  },
+  "public_final": "Updated [retry.py](<disposable>/workspace/retry.py) and created [action.json](<disposable>/workspace/action.json).\n\nVerified the retry rules with mixed case method names, confirmed `delay_seconds` values and invalid-attempt errors, and validated that `action.json` has exactly the requested fields and types."
+}

@@ -1,0 +1,189 @@
+[
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "fe3f3203ddc74c92a4dbc6e23e09e692"
+    },
+    "request": "{\"name\": \"a\", \"opening\": 100}",
+    "status": 201,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 100,
+        "reserved": 0,
+        "available": 100,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.000479582988191396
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "8720b1ec5fce40368d500a9a311ddf97"
+    },
+    "request": "{\"name\": \"b\", \"opening\": 40}",
+    "status": 201,
+    "response": {
+      "account": {
+        "name": "b",
+        "balance": 40,
+        "reserved": 0,
+        "available": 40,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.0005141670117154717
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "d6c4da0e42ab420ab3d0a250078a69ad"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 4}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 96,
+          "reserved": 0,
+          "available": 96,
+          "version": 2
+        },
+        {
+          "name": "b",
+          "balance": 44,
+          "reserved": 0,
+          "available": 44,
+          "version": 2
+        }
+      ],
+      "transfer": {
+        "id": "bb318e4ffa586cebf7541522e9941667",
+        "from": "a",
+        "to": "b",
+        "amount": 4,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.000720290991012007
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "085745f068e24486b1e9dbbf2410438c"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 5, \"from_version\": 1}",
+    "status": 409,
+    "response": {
+      "error": {
+        "code": "version_conflict"
+      }
+    },
+    "elapsed_s": 0.0003244160325266421
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "b748b9f036da4d20aebec4d75ec10690"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 5, \"to_version\": 1}",
+    "status": 409,
+    "response": {
+      "error": {
+        "code": "version_conflict"
+      }
+    },
+    "elapsed_s": 0.00032300001475960016
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/a",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 96,
+        "reserved": 0,
+        "available": 96,
+        "version": 2
+      }
+    },
+    "elapsed_s": 0.00022429204545915127
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/b",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "b",
+        "balance": 44,
+        "reserved": 0,
+        "available": 44,
+        "version": 2
+      }
+    },
+    "elapsed_s": 0.0001978339860215783
+  },
+  {
+    "method": "GET",
+    "path": "/summary",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 96,
+          "reserved": 0,
+          "available": 96
+        },
+        {
+          "name": "b",
+          "balance": 44,
+          "reserved": 0,
+          "available": 44
+        }
+      ],
+      "entry_count": 4,
+      "snapshot": 4,
+      "totals": {
+        "available": 140,
+        "balance": 140,
+        "reserved": 0
+      }
+    },
+    "elapsed_s": 0.00031541596399620175
+  }
+]

@@ -1,0 +1,442 @@
+{
+  "stage": 2,
+  "own_checks_pass": false,
+  "scenarios": [
+    {
+      "name": "basic_semantic_fields",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "validation_atomic_no_side_effects",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "two_process_idempotency_and_tenancy",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "atomic_bulk_and_replay",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "heartbeat_deadline_stale_token_fencing",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "two_process_claim_race",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "completion_result_and_exact_replay",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "fail_retry_dead_and_expiry_max_attempts",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "acknowledged_mutations_SIGKILL_restart",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "scheduling_priority_fifo",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "fail_and_expiry_backoff_boundaries",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "retry_cap",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "cross_process_pending_quota_atomic_bulk_replay",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "cross_process_inflight_quota_expiry",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "cancel_idempotency_and_fencing",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "cancel_complete_race",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "snapshot_keyset_pagination_tenant_filter_binding",
+      "status": "pass",
+      "error": null
+    },
+    {
+      "name": "genuine_stage1_migration_two_startups_and_original_replay",
+      "status": "fail",
+      "error": "Failure: POST /v1/jobs: expected [409], got 200"
+    },
+    {
+      "name": "future_schema_startup_refusal",
+      "status": "pass",
+      "error": null
+    }
+  ],
+  "own_test_result": {
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "-json",
+      "./..."
+    ],
+    "exit_code": 1,
+    "stdout": "{\"Time\":\"2026-09-26T21:40:49.30216+09:00\",\"Action\":\"start\",\"Package\":\"queueforge/cmd/server\"}\n{\"Time\":\"2026-09-26T21:40:49.302289+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/cmd/server\",\"Output\":\"?   \\tqueueforge/cmd/server\\t[no test files]\\n\"}\n{\"Time\":\"2026-09-26T21:40:49.302318+09:00\",\"Action\":\"skip\",\"Package\":\"queueforge/cmd/server\",\"Elapsed\":0}\n{\"Time\":\"2026-09-26T21:40:49.318706+09:00\",\"Action\":\"start\",\"Package\":\"queueforge/internal/platform\"}\n{\"Time\":\"2026-09-26T21:40:49.318768+09:00\",\"Action\":\"run\",\"Package\":\"queueforge/internal/platform\",\"Test\":\"TestPinnedDriverAvailable\"}\n{\"Time\":\"2026-09-26T21:40:49.318781+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/platform\",\"Test\":\"TestPinnedDriverAvailable\",\"Output\":\"=== RUN   TestPinnedDriverAvailable\\n\"}\n{\"Time\":\"2026-09-26T21:40:49.318791+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/platform\",\"Test\":\"TestPinnedDriverAvailable\",\"Output\":\"--- PASS: TestPinnedDriverAvailable (0.00s)\\n\"}\n{\"Time\":\"2026-09-26T21:40:49.318803+09:00\",\"Action\":\"pass\",\"Package\":\"queueforge/internal/platform\",\"Test\":\"TestPinnedDriverAvailable\",\"Elapsed\":0}\n{\"Time\":\"2026-09-26T21:40:49.318814+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/platform\",\"Output\":\"PASS\\n\"}\n{\"Time\":\"2026-09-26T21:40:49.318816+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/platform\",\"Output\":\"ok  \\tqueueforge/internal/platform\\t(cached)\\n\"}\n{\"Time\":\"2026-09-26T21:40:49.318825+09:00\",\"Action\":\"pass\",\"Package\":\"queueforge/internal/platform\",\"Elapsed\":0}\n{\"Time\":\"2026-09-26T21:40:50.244132+09:00\",\"Action\":\"start\",\"Package\":\"queueforge/internal/queue\"}\n{\"Time\":\"2026-09-26T21:40:50.754198+09:00\",\"Action\":\"run\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestSchedulingCancellationAndPages\"}\n{\"Time\":\"2026-09-26T21:40:50.754259+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestSchedulingCancellationAndPages\",\"Output\":\"=== RUN   TestSchedulingCancellationAndPages\\n\"}\n{\"Time\":\"2026-09-26T21:40:50.822784+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestSchedulingCancellationAndPages\",\"Output\":\"--- PASS: TestSchedulingCancellationAndPages (0.07s)\\n\"}\n{\"Time\":\"2026-09-26T21:40:50.822855+09:00\",\"Action\":\"pass\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestSchedulingCancellationAndPages\",\"Elapsed\":0.07}\n{\"Time\":\"2026-09-26T21:40:50.822883+09:00\",\"Action\":\"run\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestCapacityAcrossStores\"}\n{\"Time\":\"2026-09-26T21:40:50.822889+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestCapacityAcrossStores\",\"Output\":\"=== RUN   TestCapacityAcrossStores\\n\"}\n{\"Time\":\"2026-09-26T21:40:50.86103+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestCapacityAcrossStores\",\"Output\":\"--- PASS: TestCapacityAcrossStores (0.04s)\\n\"}\n{\"Time\":\"2026-09-26T21:40:50.861088+09:00\",\"Action\":\"pass\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestCapacityAcrossStores\",\"Elapsed\":0.04}\n{\"Time\":\"2026-09-26T21:40:50.861097+09:00\",\"Action\":\"run\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestExpiryUsesDeadlineAndBatchRollback\"}\n{\"Time\":\"2026-09-26T21:40:50.861124+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestExpiryUsesDeadlineAndBatchRollback\",\"Output\":\"=== RUN   TestExpiryUsesDeadlineAndBatchRollback\\n\"}\n{\"Time\":\"2026-09-26T21:40:50.894094+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestExpiryUsesDeadlineAndBatchRollback\",\"Output\":\"--- PASS: TestExpiryUsesDeadlineAndBatchRollback (0.03s)\\n\"}\n{\"Time\":\"2026-09-26T21:40:50.894122+09:00\",\"Action\":\"pass\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestExpiryUsesDeadlineAndBatchRollback\",\"Elapsed\":0.03}\n{\"Time\":\"2026-09-26T21:40:50.894155+09:00\",\"Action\":\"run\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestCancelCompleteRace\"}\n{\"Time\":\"2026-09-26T21:40:50.894157+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestCancelCompleteRace\",\"Output\":\"=== RUN   TestCancelCompleteRace\\n\"}\n{\"Time\":\"2026-09-26T21:40:50.923403+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestCancelCompleteRace\",\"Output\":\"--- PASS: TestCancelCompleteRace (0.03s)\\n\"}\n{\"Time\":\"2026-09-26T21:40:50.923426+09:00\",\"Action\":\"pass\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestCancelCompleteRace\",\"Elapsed\":0.03}\n{\"Time\":\"2026-09-26T21:40:50.923433+09:00\",\"Action\":\"run\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestLifecycleAndIsolation\"}\n{\"Time\":\"2026-09-26T21:40:50.923435+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestLifecycleAndIsolation\",\"Output\":\"=== RUN   TestLifecycleAndIsolation\\n\"}\n{\"Time\":\"2026-09-26T21:40:50.95103+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestLifecycleAndIsolation\",\"Output\":\"    http_test.go:94: reclaim 200 {Job:{ID: Tenant: Queue: Payload:[] State: Attempts:0 MaxAttempts:0 Priority:0 RetryBaseMS:0 CreatedSeq:0 CreatedAtMS:0 AvailableAtMS:0 LeaseUntilMS:\\u003cnil\\u003e LastError:\\u003cnil\\u003e Result:[]} Jobs:[] Replayed:false LeaseToken:\\u003cnil\\u003e LeaseUntilMS:\\u003cnil\\u003e Error:{Code:} Total:0}\\n\"}\n{\"Time\":\"2026-09-26T21:40:50.951975+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestLifecycleAndIsolation\",\"Output\":\"--- FAIL: TestLifecycleAndIsolation (0.03s)\\n\"}\n{\"Time\":\"2026-09-26T21:40:50.951981+09:00\",\"Action\":\"fail\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestLifecycleAndIsolation\",\"Elapsed\":0.03}\n{\"Time\":\"2026-09-26T21:40:50.951995+09:00\",\"Action\":\"run\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestConcurrentAndBatch\"}\n{\"Time\":\"2026-09-26T21:40:50.951999+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestConcurrentAndBatch\",\"Output\":\"=== RUN   TestConcurrentAndBatch\\n\"}\n{\"Time\":\"2026-09-26T21:40:51.020811+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestConcurrentAndBatch\",\"Output\":\"--- PASS: TestConcurrentAndBatch (0.07s)\\n\"}\n{\"Time\":\"2026-09-26T21:40:51.020832+09:00\",\"Action\":\"pass\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestConcurrentAndBatch\",\"Elapsed\":0.07}\n{\"Time\":\"2026-09-26T21:40:51.02084+09:00\",\"Action\":\"run\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestMaxAttemptsExpiry\"}\n{\"Time\":\"2026-09-26T21:40:51.020842+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestMaxAttemptsExpiry\",\"Output\":\"=== RUN   TestMaxAttemptsExpiry\\n\"}\n{\"Time\":\"2026-09-26T21:40:51.04106+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestMaxAttemptsExpiry\",\"Output\":\"--- PASS: TestMaxAttemptsExpiry (0.02s)\\n\"}\n{\"Time\":\"2026-09-26T21:40:51.041083+09:00\",\"Action\":\"pass\",\"Package\":\"queueforge/internal/queue\",\"Test\":\"TestMaxAttemptsExpiry\",\"Elapsed\":0.02}\n{\"Time\":\"2026-09-26T21:40:51.04109+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Output\":\"FAIL\\n\"}\n{\"Time\":\"2026-09-26T21:40:51.042807+09:00\",\"Action\":\"output\",\"Package\":\"queueforge/internal/queue\",\"Output\":\"FAIL\\tqueueforge/internal/queue\\t0.798s\\n\"}\n{\"Time\":\"2026-09-26T21:40:51.042821+09:00\",\"Action\":\"fail\",\"Package\":\"queueforge/internal/queue\",\"Elapsed\":0.799}\n",
+    "stderr": "",
+    "timed_out": false,
+    "wall_seconds": 1.9957710830203723
+  },
+  "build": {
+    "server": {
+      "command": [
+        "go",
+        "build",
+        "-trimpath",
+        "-o",
+        "$STUDY/evidence/v1.5.0-rc/stage2/bin/server",
+        "./cmd/server"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "timed_out": false,
+      "wall_seconds": 1.1009448749828152,
+      "sha256": "72bb2e377eb92a0b64a9f10478b6767ea52a19c6262b65ab582e8785b7be2294"
+    },
+    "race": {
+      "command": [
+        "go",
+        "build",
+        "-trimpath",
+        "-race",
+        "-o",
+        "$STUDY/evidence/v1.5.0-rc/stage2/bin/race",
+        "./cmd/server"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "timed_out": false,
+      "wall_seconds": 1.5984394999977667,
+      "sha256": "01450e77ccf2452497424db1e7b49f0998abeeff0276f6d0db867f322d764192"
+    }
+  },
+  "performance": [
+    {
+      "acknowledged_unique": 0,
+      "claimed_unique": 0,
+      "drain_budget_exceeded": true,
+      "generator_capacity_flag": false,
+      "lost_acknowledgements": 0,
+      "phases": {
+        "measure": {
+          "attempted_rps": 2.375,
+          "attempts": 19,
+          "cohort_attempts": 19,
+          "cohort_completed_jobs": 0,
+          "cohort_completed_requests": 0,
+          "cohort_successful_http": 0,
+          "completed_jobs": 0,
+          "completed_jobs_per_second": 0,
+          "completed_requests": 0,
+          "completed_rps": 0,
+          "drain_completed_jobs": 0,
+          "drain_completed_requests": 0,
+          "drain_successful_http": 0,
+          "drops": 0,
+          "duplicates": 0,
+          "errors": 19,
+          "idle_claims": 0,
+          "sample_count": 19,
+          "scheduled_count": null,
+          "scheduled_latency_ms": {
+            "p50": 0.004,
+            "p95": 0.017,
+            "p99": 0.017
+          },
+          "scheduler_lag_ms": {
+            "p50": 0,
+            "p95": 0,
+            "p99": 0
+          },
+          "scheduler_miss_definition": "dispatch lag greater than one arrival interval",
+          "scheduler_misses": 0,
+          "send_latency_ms": {
+            "p50": 0.003,
+            "p95": 0.017,
+            "p99": 0.017
+          },
+          "status_counts": {
+            "0": 19
+          },
+          "successful_http": 0,
+          "successful_rps": 0,
+          "timeouts": 0,
+          "window_attempts": 19,
+          "window_completed_jobs": 0,
+          "window_completed_requests": 0,
+          "window_successful_http": 0
+        },
+        "warmup": {
+          "attempted_rps": 4412.666666666667,
+          "attempts": 13238,
+          "cohort_attempts": 13238,
+          "cohort_completed_jobs": 0,
+          "cohort_completed_requests": 13237,
+          "cohort_successful_http": 13237,
+          "completed_jobs": 0,
+          "completed_jobs_per_second": 0,
+          "completed_requests": 13237,
+          "completed_rps": 4412.333333333333,
+          "drain_completed_jobs": 0,
+          "drain_completed_requests": 0,
+          "drain_successful_http": 0,
+          "drops": 0,
+          "duplicates": 0,
+          "errors": 1,
+          "idle_claims": 0,
+          "sample_count": 13238,
+          "scheduled_count": null,
+          "scheduled_latency_ms": {
+            "p50": 0.188,
+            "p95": 0.406,
+            "p99": 0.635
+          },
+          "scheduler_lag_ms": {
+            "p50": 0,
+            "p95": 0,
+            "p99": 0.002
+          },
+          "scheduler_miss_definition": "dispatch lag greater than one arrival interval",
+          "scheduler_misses": 0,
+          "send_latency_ms": {
+            "p50": 0.188,
+            "p95": 0.405,
+            "p99": 0.635
+          },
+          "status_counts": {
+            "0": 1,
+            "200": 13237
+          },
+          "successful_http": 13237,
+          "successful_rps": 4412.333333333333,
+          "timeouts": 0,
+          "window_attempts": 13238,
+          "window_completed_jobs": 0,
+          "window_completed_requests": 13237,
+          "window_successful_http": 13237
+        }
+      },
+      "stopped_transport_failures": true,
+      "throughput_semantics": "RPS counts only matching start-cohort responses finished inside the corresponding window; cohort counts and latencies retain drain and timeouts; warmup crossing never enters measure throughput",
+      "timeout_latencies_censored": true,
+      "wall_seconds": 3.003765459,
+      "config": {
+        "workload": "read",
+        "concurrency": 1,
+        "rate": 0,
+        "stage": 2,
+        "arm": "v1.5.0-rc",
+        "repetition": 0,
+        "index": 2,
+        "warmup_seconds": 3,
+        "measure_seconds": 8
+      },
+      "conservation": {
+        "initial": {
+          "bench0": {
+            "cancelled": 0,
+            "completed": 0,
+            "dead": 0,
+            "leased": 0,
+            "ready": 12500,
+            "total": 12500
+          },
+          "bench1": {
+            "cancelled": 0,
+            "completed": 0,
+            "dead": 0,
+            "leased": 0,
+            "ready": 12500,
+            "total": 12500
+          },
+          "bench2": {
+            "cancelled": 0,
+            "completed": 0,
+            "dead": 0,
+            "leased": 0,
+            "ready": 12500,
+            "total": 12500
+          },
+          "bench3": {
+            "cancelled": 0,
+            "completed": 0,
+            "dead": 0,
+            "leased": 0,
+            "ready": 12500,
+            "total": 12500
+          }
+        },
+        "final": {
+          "bench0": {
+            "cancelled": 0,
+            "completed": 0,
+            "dead": 0,
+            "leased": 0,
+            "ready": 12500,
+            "total": 12500
+          },
+          "bench1": {
+            "cancelled": 0,
+            "completed": 0,
+            "dead": 0,
+            "leased": 0,
+            "ready": 12500,
+            "total": 12500
+          },
+          "bench2": {
+            "cancelled": 0,
+            "completed": 0,
+            "dead": 0,
+            "leased": 0,
+            "ready": 12500,
+            "total": 12500
+          },
+          "bench3": {
+            "cancelled": 0,
+            "completed": 0,
+            "dead": 0,
+            "leased": 0,
+            "ready": 12500,
+            "total": 12500
+          }
+        },
+        "valid": true,
+        "violations": []
+      },
+      "generator_resources": {
+        "cpu_seconds": 2.061559,
+        "peak_rss_bytes": 31932416,
+        "exit_code": 0
+      },
+      "db_bytes_before": 47919104,
+      "wal_bytes_before": 0,
+      "db_bytes_at_measure_end": 47919104,
+      "wal_bytes_at_measure_end": 0,
+      "host_interpretation": "Shared Mac, no affinity. Closed loop limits offered work when latency rises; fixed arrivals expose scheduler delay/drops. Timeout latencies are censored.",
+      "server_resources": {
+        "cpu_seconds": 3.066592,
+        "peak_rss_bytes": 30343168,
+        "exit_code": 0
+      },
+      "db_bytes": 47919104,
+      "wal_bytes": 0,
+      "host_before": {
+        "load_average": [
+          6.13671875,
+          4.8544921875,
+          4.0517578125
+        ],
+        "timestamp": 1790426552.2853692
+      },
+      "artifact_gate_pass": false
+    },
+    {
+      "config": {
+        "workload": "read",
+        "concurrency": 16,
+        "rate": 0,
+        "stage": 2,
+        "arm": "v1.5.0-rc",
+        "repetition": 0,
+        "index": 4,
+        "warmup_seconds": 3,
+        "measure_seconds": 8
+      },
+      "unavailable_reason": "seed unavailable"
+    },
+    {
+      "config": {
+        "workload": "read",
+        "concurrency": 64,
+        "rate": 0,
+        "stage": 2,
+        "arm": "v1.5.0-rc",
+        "repetition": 0,
+        "index": 6,
+        "warmup_seconds": 3,
+        "measure_seconds": 8
+      },
+      "unavailable_reason": "seed unavailable"
+    },
+    {
+      "config": {
+        "workload": "lifecycle",
+        "concurrency": 1,
+        "rate": 0,
+        "stage": 2,
+        "arm": "v1.5.0-rc",
+        "repetition": 0,
+        "index": 11,
+        "warmup_seconds": 3,
+        "measure_seconds": 8
+      },
+      "unavailable_reason": "seed unavailable"
+    },
+    {
+      "config": {
+        "workload": "lifecycle",
+        "concurrency": 16,
+        "rate": 0,
+        "stage": 2,
+        "arm": "v1.5.0-rc",
+        "repetition": 0,
+        "index": 13,
+        "warmup_seconds": 3,
+        "measure_seconds": 8
+      },
+      "unavailable_reason": "seed unavailable"
+    },
+    {
+      "config": {
+        "workload": "lifecycle",
+        "concurrency": 64,
+        "rate": 0,
+        "stage": 2,
+        "arm": "v1.5.0-rc",
+        "repetition": 0,
+        "index": 15,
+        "warmup_seconds": 3,
+        "measure_seconds": 8
+      },
+      "unavailable_reason": "seed unavailable"
+    }
+  ],
+  "interpretation": "Your artifact only. Failed/unassessable correctness means diagnostic performance. No sibling answer or repair is supplied."
+}

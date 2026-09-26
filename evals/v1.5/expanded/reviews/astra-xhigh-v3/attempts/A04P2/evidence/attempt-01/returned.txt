@@ -1,0 +1,680 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A04P2",
+  "phase": "evidence",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "f7a003316c57f94b",
+      "packet_sha256": "3e347e0a7b197ce32bba55c29afd28688303bac735184a0e727449a1d0910b6e",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "Packet metadata warns that memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed. No explicit treatment identity appears in the supplied final."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The supplied notice changes Thursday's closing time to 18:00 and preserves every other byte; the final reports completion.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The reported resulting time and byte preservation are independently supported by the supplied strings. Whether the candidate performed the reported comparison remains unassessable.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible artifact and final complete the self-contained authorized edit. No conclusion is drawn about unavailable earlier questioning or repeated work.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final directly identifies the changed time and addresses the user's byte-preservation constraint.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a constrained prose-file edit with no code implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "EVAL-03 action counts and timing are absent. A minimal diff and short final do not establish efficient execution.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "requested_time_change",
+          "status": "pass",
+          "reason": "Thursday's closing time is 18:00 in the final artifact.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md#L4"
+          ]
+        },
+        {
+          "gate_id": "preserve_every_other_byte",
+          "status": "pass",
+          "reason": "Both decoded UTF-8 strings are 121 bytes. Their sole differing byte is zero-based offset 80, changing 7 to 8.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        {
+          "gate_id": "report_completed_edit",
+          "status": "pass",
+          "reason": "The final explicitly reports the requested completed edit, consistent with the artifact.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        {
+          "gate_id": "reported_comparison_execution",
+          "status": "unassessable",
+          "reason": "The resulting bytes support the comparison's stated conclusion, but no receipt establishes that the candidate performed it.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The designated artifact satisfies the exact edit boundary, including preservation of unrelated text and the final newline.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/designated_artifact_diffs/notice.md"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "The packet lacks the action/timing receipts required for an EVAL-03 efficiency judgment and cannot corroborate the candidate's comparison execution.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Earlier public messages are not supplied, so earlier clarification or redundant activity cannot be inferred from the concise final.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "bdc12a7a74a2a720a67b49da0db2c5f64f3e4976f31b7af49e1f6246c3a1ab37",
+        "limitations": [
+          "The supplied checker result was read, not independently rerun.",
+          "Aggregate action counts and timing identify neither individual operations nor their order, necessity or failure cause.",
+          "Earlier public messages and a receipt for the candidate's claimed byte comparison remain unavailable."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Exact edit",
+          "category": "no_disagreement",
+          "first_pass_observation": "The artifact changes only Thursday's closing time and the final reports that edit.",
+          "deterministic_observation": "notice_exact_edit=true; critical_failures=[]; all_pass=true.",
+          "interpretation": "The disclosed check agrees with the artifact-based outcome and byte-preservation judgments.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit",
+            "deterministic:/deterministic_checks/critical_failures",
+            "deterministic:/deterministic_checks/all_pass"
+          ]
+        },
+        {
+          "subject": "Efficiency and comparison-execution coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Action counts and timing were absent; efficiency and the claimed comparison execution were unassessable.",
+          "deterministic_observation": "tool_actions=4; failed_tool_actions=1; wall_seconds=30.988.",
+          "interpretation": "Disclosure supplies aggregate resource evidence, resolving that part of the historical missingness. It does not identify the comparison or establish redundant activity. A failed action alone does not establish avoidable work, so both judgments remain unassessable.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The exact requested edit and completion report are present; the disclosed exact-edit check agrees.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The resulting time and byte-preservation claims remain supported. The checker does not establish whether the candidate performed its claimed comparison.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible artifact completes the authorized edit. Aggregate action counts do not establish earlier questioning or redundant activity.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final directly identifies the completed change and addresses byte preservation.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The task is a prose-file edit without a code implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Four actions, one failure and 30.988 seconds are disclosed, but operation-level evidence is absent. Necessity, redundancy and failure avoidability cannot be determined.",
+          "evidence": [
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "requested_time_change",
+          "status": "pass",
+          "reason": "The final artifact closes Thursday at 18:00; the exact-edit check passes.",
+          "evidence": [
+            "packet:/stages/0/artifacts/notice.md#L4",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        {
+          "gate_id": "preserve_every_other_byte",
+          "status": "pass",
+          "reason": "The supplied strings differ only in the requested time; the disclosed check agrees.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        {
+          "gate_id": "report_completed_edit",
+          "status": "pass",
+          "reason": "The final accurately reports the completed artifact change.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        {
+          "gate_id": "reported_comparison_execution",
+          "status": "unassessable",
+          "reason": "The independent exact-edit result and aggregate action counts do not establish execution of the candidate's reported comparison.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit",
+            "deterministic:/tool_actions"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "89067e22cbf3cead",
+      "packet_sha256": "4869b7668f5bc95a14a8b4e89384239c0f135cdbbc4e99e00a024fbc57c1c545",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "Packet metadata warns that memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed. No explicit treatment identity appears in the supplied final."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 2,
+          "status": "scored",
+          "reason": "Discounts, interfaces and ordinary positive-subtotal cases are implemented, but valid nonempty zero-priced orders incorrectly receive free shipping in both regions.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L17",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 2,
+          "status": "scored",
+          "reason": "Interface and discount claims match the code, but the unqualified shipping-completion report overlooks a source-demonstrable violation. Reported test execution is separately unassessable.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 3,
+          "status": "scored",
+          "reason": "The candidate delivers the authorized implementation and report, but misses the dependency between shipping and order nonemptiness rather than monetary subtotal.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 3,
+          "status": "scored",
+          "reason": "The final clearly summarizes the change and claimed verification, but states shipping completion without identifying the zero-priced-order limitation.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 2,
+          "status": "scored",
+          "reason": "The implementation is coherent and preserves the API, but couples order emptiness to subtotal value, retaining a brittle assumption that violates the new shipping contract.",
+          "evidence": [
+            "packet:/source_before_task/invoice.py",
+            "packet:/stages/0/artifacts/invoice.py#L9",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Action counts and timing receipts are unavailable; neither the code size nor the verification summary establishes efficiency.",
+          "evidence": [
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "existing_api_and_result_fields",
+          "status": "pass",
+          "reason": "Line is unchanged, two-argument quote calls remain valid through member=False, and the four required fields use integer arithmetic for the declared integer inputs.",
+          "evidence": [
+            "packet:/source_before_task/invoice.py",
+            "packet:/stages/0/artifacts/invoice.py#L3",
+            "packet:/stages/0/artifacts/invoice.py#L9",
+            "packet:/stages/0/artifacts/invoice.py#L25"
+          ]
+        },
+        {
+          "gate_id": "member_discount",
+          "status": "pass",
+          "reason": "The discount uses floor(original subtotal / 10), only for members with original subtotal at least 5000.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L17"
+          ]
+        },
+        {
+          "gate_id": "domestic_shipping",
+          "status": "fail",
+          "reason": "Static counterexample: one Line with unit_cents=0 and quantity=1 is nonempty and below the free-shipping threshold, requiring 700 cents. The subtotal==0 branch instead assigns zero shipping.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L14",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L24"
+          ]
+        },
+        {
+          "gate_id": "international_shipping",
+          "status": "fail",
+          "reason": "The same valid nonempty zero-priced order requires 2000 cents internationally, regardless of membership, but the subtotal==0 branch bypasses the international charge.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L21"
+          ]
+        },
+        {
+          "gate_id": "empty_order_shipping",
+          "status": "pass",
+          "reason": "An actually empty order in either supported region has zero subtotal, discount, shipping and total.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L12",
+            "packet:/stages/0/artifacts/invoice.py#L17",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L25"
+          ]
+        },
+        {
+          "gate_id": "required_invalid_input_rejection",
+          "status": "pass",
+          "reason": "Unknown region strings, negative unit cents and quantities below one raise ValueError.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L10",
+            "packet:/stages/0/artifacts/invoice.py#L14"
+          ]
+        },
+        {
+          "gate_id": "reported_verification_execution",
+          "status": "unassessable",
+          "reason": "No receipts corroborate the listed behavioral checks or py_compile invocation. The observed shipping defect does not prove those reported checks were never run.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "behavior_defect",
+          "severity": "critical",
+          "finding": "Zero subtotal is incorrectly treated as an empty order. A permitted zero-priced line causes shipping and total to be understated by 700 cents domestically or 2000 cents internationally. This follows from static inspection; candidate code was not executed.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L14",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L29"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The optional parameter preserves existing call syntax, and discount eligibility correctly uses original subtotal while the positive-subtotal domestic threshold uses post-discount merchandise.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L9",
+            "packet:/stages/0/artifacts/invoice.py#L17",
+            "packet:/stages/0/artifacts/invoice.py#L24"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "Verification receipts, earlier public messages and action/timing evidence are absent. The claimed checks and full-turn conduct cannot be independently established.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "3d2b4862186ce320796651a85e68a562f3008386e68e2f0bcf38aa10b3535335",
+        "limitations": [
+          "The supplied checker results were read, not independently rerun; hidden checker inputs were not inspected.",
+          "Passing flags do not resolve the visible nonempty zero-priced-order defect.",
+          "Aggregate action counts and timing do not identify the candidate's claimed checks or py_compile invocation; earlier public messages remain unavailable."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Deterministic pass versus complete shipping contract",
+          "category": "rubric_defect",
+          "first_pass_observation": "Domestic and international shipping fail for valid nonempty zero-priced orders; the remaining inspected functional gates pass.",
+          "deterministic_observation": "invoice_member_order=true; invoice_nonmember_regression=true; invoice_invalid_inputs=true; critical_failures=[]; all_pass=true.",
+          "interpretation": "Preserve every reported flag. The aggregate pass is insufficient to establish the full contract: the visible subtotal==0 branch still bypasses required shipping for nonempty zero-priced orders. This is a measurement-coverage limitation alongside the separately recorded behavior defect; hidden test inputs are unknown.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L14",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L21",
+            "packet:/stages/0/artifacts/invoice.py#L24",
+            "deterministic:/deterministic_checks/checks/invoice_member_order",
+            "deterministic:/deterministic_checks/checks/invoice_nonmember_regression",
+            "deterministic:/deterministic_checks/checks/invoice_invalid_inputs",
+            "deterministic:/deterministic_checks/critical_failures",
+            "deterministic:/deterministic_checks/all_pass"
+          ]
+        },
+        {
+          "subject": "Resource and candidate-verification coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Action/timing evidence and receipts establishing the candidate's claimed checks were absent.",
+          "deterministic_observation": "tool_actions=4; failed_tool_actions=0; wall_seconds=28.049. Three independent checker flags pass.",
+          "interpretation": "Aggregate resource missingness is partially resolved. Counts and independent checker flags establish neither which checks the candidate ran nor whether actions were necessary or repeated. Verification execution and efficiency remain unassessable.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 2,
+          "status": "scored",
+          "reason": "Passing checker flags support tested cases but do not resolve incorrect shipping for valid nonempty zero-priced orders in both regions.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "deterministic:/deterministic_checks/checks",
+            "deterministic:/deterministic_checks/all_pass"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 2,
+          "status": "scored",
+          "reason": "The final's shipping-completion claim remains broader than the implementation supports. Independent passing checks do not establish the candidate's claimed verification execution.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 3,
+          "status": "scored",
+          "reason": "The implementation and report advance the authorized task, but the dependency on order nonemptiness remains mishandled.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 3,
+          "status": "scored",
+          "reason": "The final is clear but omits the material zero-priced-order limitation; disclosure does not change that judgment.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 2,
+          "status": "scored",
+          "reason": "The API remains coherent, but using subtotal as an emptiness test retains brittle coupling that violates the shipping contract. Passing behavioral flags do not remove it.",
+          "evidence": [
+            "packet:/source_before_task/invoice.py",
+            "packet:/stages/0/artifacts/invoice.py#L9",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Four actions, no failed actions and 28.049 seconds are disclosed. Without operation-level evidence, necessary checks and redundant activity cannot be assessed.",
+          "evidence": [
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "existing_api_and_result_fields",
+          "status": "pass",
+          "reason": "Line and existing two-argument calls remain supported; the four fields use integer arithmetic for declared integer inputs. The nonmember regression flag agrees.",
+          "evidence": [
+            "packet:/source_before_task/invoice.py",
+            "packet:/stages/0/artifacts/invoice.py#L9",
+            "packet:/stages/0/artifacts/invoice.py#L25",
+            "deterministic:/deterministic_checks/checks/invoice_nonmember_regression"
+          ]
+        },
+        {
+          "gate_id": "member_discount",
+          "status": "pass",
+          "reason": "Discount eligibility and floor division use the original subtotal as required; the member-order check passes.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L17",
+            "deterministic:/deterministic_checks/checks/invoice_member_order"
+          ]
+        },
+        {
+          "gate_id": "domestic_shipping",
+          "status": "fail",
+          "reason": "A nonempty order containing a zero-priced line requires 700 cents domestically but receives zero. The aggregate checker pass does not resolve this static counterexample.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L14",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L24",
+            "deterministic:/deterministic_checks/all_pass"
+          ]
+        },
+        {
+          "gate_id": "international_shipping",
+          "status": "fail",
+          "reason": "A nonempty zero-priced order requires 2000 cents internationally but bypasses that charge. Passing checker flags do not alter the visible branch.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L21",
+            "deterministic:/deterministic_checks/all_pass"
+          ]
+        },
+        {
+          "gate_id": "empty_order_shipping",
+          "status": "pass",
+          "reason": "Actually empty orders in supported regions return zero subtotal, discount, shipping and total.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L12",
+            "packet:/stages/0/artifacts/invoice.py#L17",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L25"
+          ]
+        },
+        {
+          "gate_id": "required_invalid_input_rejection",
+          "status": "pass",
+          "reason": "The visible checks reject the specified invalid inputs with ValueError; the disclosed invalid-input flag agrees.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L10",
+            "packet:/stages/0/artifacts/invoice.py#L14",
+            "deterministic:/deterministic_checks/checks/invoice_invalid_inputs"
+          ]
+        },
+        {
+          "gate_id": "reported_verification_execution",
+          "status": "unassessable",
+          "reason": "Independent checker results and aggregate counts do not identify the candidate's behavioral checks or py_compile invocation. The defect does not prove those checks were never run.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "Both assigned packet views, their matching deterministic evidence files, the assignment's locked judgments, AGENTS.md, CONTRIBUTING.md and the fixed rubric were read completely. The rubric, both packet hashes and both evidence hashes match the supplied values.",
+    "All specified locked packet fields are preserved exactly. Post-evidence judgments and coverage changes are separately labelled.",
+    "Coverage includes declared sources, designated artifacts and diffs, one public final per packet, checker flags and aggregate resource receipts. Earlier public messages, operation-level transcripts and complete filesystem snapshots are unavailable; their absence does not establish omitted questions or checks.",
+    "Review used read-only inspection and hashing. No candidate code, tests, checker, harness or plugin was executed, and no files were modified.",
+    "Only this assignment's authorized locked judgments were consulted. No treatment mapping or other assignment's scores were accessed. Host-level context isolation was not independently verified.",
+    "The configured model and effort are recorded as instructed; host/backend identity echoes and usage are unavailable and remain null.",
+    "These are supplemental provisional judgments from one model assessor. Human scores remain null; no acceptance, held-out, comparative-performance or release conclusion follows."
+  ]
+}

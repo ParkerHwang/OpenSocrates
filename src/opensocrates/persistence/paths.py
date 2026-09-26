@@ -73,6 +73,11 @@ class DataRootLayout:
     quarantine_dir: Path
     diagnostics_dir: Path
 
+    @property
+    def projects_dir(self) -> Path:
+        """Optional project memory root; never created by ordinary startup."""
+        return self.root / "projects"
+
     @classmethod
     def from_root(cls, root: Path) -> "DataRootLayout":
         root = Path(root)

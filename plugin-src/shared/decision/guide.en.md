@@ -12,15 +12,20 @@ questions as distinct decisions; a request may need several successive decisions
 For Codex with a shell and the packaged native runtime available, use
 `bin/launch.sh decision <host>` at the package root FIRST. Send the `catalog`
 operation with `locale` to inspect routing metadata, then a `select` request for
-the current decision. Use `request.json` for the envelope and `features.json` for
-closed values. Replace example values with observed task features, including
+the current decision. To construct a new envelope, `{"operation":"prepare","locale":"en"}`
+returns mechanical identifiers and closed values. Fill its null participation and
+routing placeholders from the task before submitting `request`; preparation does
+not select a method, reset an existing session, or certify classification. Reuse
+valid identifiers within the current context. `request.json` remains a complete
+example and `features.json` lists closed values. Replace example values with observed task features, including
 known absent prerequisites; do not omit contraindications to obtain a preferred
 method. Set `explicit_method` only for a user-requested method, otherwise null.
 An empty eligible selection is a valid result: continue ordinary judgment with
 the constraints intact, without bypassing that result through direct file reads.
 
 This is the supported agent-directed command, separate from host-only `control`.
-It accepts one JSON line and returns complete canonical instructions. The source
+It accepts one JSON document (pretty-printed JSON is also valid) and returns
+complete canonical instructions. The source
 CLI is `python -m opensocrates decision`. The installed launcher accepts
 `bin/launch.sh decision <host> --stream` for a volatile NDJSON session through a
 host shell process with writable stdin. Repeated one-shot calls cannot share
@@ -29,6 +34,14 @@ is made by this command. Selection is provisional until the complete procedure
 is read and its use conditions, contraindications and stops are checked. The
 selector validates declared features; it cannot verify the agent's semantic
 classification or that the method was applied.
+
+For rejected input, use `diagnostic.field_path`, its constraint code and allowed
+values to repair only the faulty field. Context is 32 lowercase hexadecimal
+characters, decision IDs are 1–64 ASCII letters/digits, and epoch/revision are
+nonnegative integers. Feature `key` and `basis` use different vocabularies.
+Unknown names/values are not echoed. Invalid requests preserve prior availability.
+Multiple requests require `--stream`, one whole JSON document per line; do not
+concatenate documents in one-shot mode. Do not repeat an unchanged rejection.
 
 On other hosts, or when the native runtime/shell is genuinely unavailable or
 fails, use `catalog.en.json` and complete `methods/en/<method-id>.md` files in

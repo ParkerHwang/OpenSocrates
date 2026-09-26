@@ -30,6 +30,11 @@ def _parser() -> argparse.ArgumentParser:
     decision = sub.add_parser("decision", help="retrieve canonical methods at an in-turn decision")
     decision.add_argument("--stream", action="store_true", help="volatile NDJSON session")
 
+    sub.add_parser("memory", help="explicit enrolled project memory request")
+
+    sub.add_parser("assistance", help="plan optional assistance from closed task features")
+    sub.add_parser("documentation", help="emit bounded official-document reference guidance")
+
     control = sub.add_parser("control", help="apply one bounded host control")
     control_sub = control.add_subparsers(dest="control_command", required=True)
     apply = control_sub.add_parser("apply", help="apply a typed control from stdin")
@@ -273,6 +278,21 @@ def main(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
         from .decision import run_decision
 
         return run_decision(stdin or sys.stdin, output_stream, stream=args.stream)
+
+    if args.command == "memory":
+        from .memory import run_memory
+
+        return run_memory(stdin or sys.stdin, output_stream)
+
+    if args.command == "assistance":
+        from .assistance import run_assistance
+
+        return run_assistance(stdin or sys.stdin, output_stream)
+
+    if args.command == "documentation":
+        from .documentation import run_documentation
+
+        return run_documentation(stdin or sys.stdin, output_stream)
 
     host = getattr(args, "host", None)
     runtime = _services_for(services, host=host)

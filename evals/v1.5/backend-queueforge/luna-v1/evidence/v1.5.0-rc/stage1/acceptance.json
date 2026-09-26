@@ -1,0 +1,4460 @@
+{
+  "format_version": 1,
+  "binary": "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+  "legacy_binary": null,
+  "stage": 1,
+  "passed": true,
+  "scenarios": [
+    {
+      "name": "basic_semantic_fields",
+      "status": "pass",
+      "checks": [
+        {
+          "name": "health schema",
+          "passed": true
+        },
+        {
+          "name": "new replayed false",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "accepted input preserved",
+          "passed": true
+        },
+        {
+          "name": "new job defaults/time/nulls",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "immutable identity/input/creation fields preserved",
+          "passed": true
+        },
+        {
+          "name": "GET preserves required job fields",
+          "passed": true
+        },
+        {
+          "name": "stats counts nonnegative integers",
+          "passed": true
+        },
+        {
+          "name": "stats conservation/no token",
+          "passed": true
+        },
+        {
+          "name": "stage1 cancelled count zero",
+          "passed": true
+        },
+        {
+          "name": "single total",
+          "passed": true
+        }
+      ],
+      "error": null,
+      "diagnostics": [
+        {
+          "argv": [
+            "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+            "--addr",
+            "127.0.0.1:0",
+            "--db",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-vbismxtk/store.sqlite",
+            "--clock-file",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-vbismxtk/clock"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"port\":50851}\n",
+          "stderr": "",
+          "race_warning": false
+        }
+      ],
+      "duration_ms": 1500.6673749885522
+    },
+    {
+      "name": "validation_atomic_no_side_effects",
+      "status": "pass",
+      "checks": [
+        {
+          "name": "stats counts nonnegative integers",
+          "passed": true
+        },
+        {
+          "name": "stats conservation/no token",
+          "passed": true
+        },
+        {
+          "name": "stage1 cancelled count zero",
+          "passed": true
+        },
+        {
+          "name": "invalid commands leave no jobs",
+          "passed": true
+        }
+      ],
+      "error": null,
+      "diagnostics": [
+        {
+          "argv": [
+            "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+            "--addr",
+            "127.0.0.1:0",
+            "--db",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-ks77zv31/store.sqlite",
+            "--clock-file",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-ks77zv31/clock"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"port\":50856}\n",
+          "stderr": "",
+          "race_warning": false
+        }
+      ],
+      "duration_ms": 1683.2810420019086
+    },
+    {
+      "name": "two_process_idempotency_and_tenancy",
+      "status": "pass",
+      "checks": [
+        {
+          "name": "concurrent idempotency one creation",
+          "passed": true
+        },
+        {
+          "name": "logical defaults/order/clock replay",
+          "passed": true
+        },
+        {
+          "name": "new replayed false",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "accepted input preserved",
+          "passed": true
+        },
+        {
+          "name": "tenant idempotency namespace",
+          "passed": true
+        },
+        {
+          "name": "endpoint idempotency namespace",
+          "passed": true
+        },
+        {
+          "name": "stats counts nonnegative integers",
+          "passed": true
+        },
+        {
+          "name": "stats conservation/no token",
+          "passed": true
+        },
+        {
+          "name": "stage1 cancelled count zero",
+          "passed": true
+        },
+        {
+          "name": "stats counts nonnegative integers",
+          "passed": true
+        },
+        {
+          "name": "stats conservation/no token",
+          "passed": true
+        },
+        {
+          "name": "stage1 cancelled count zero",
+          "passed": true
+        },
+        {
+          "name": "tenant totals after conflict",
+          "passed": true
+        }
+      ],
+      "error": null,
+      "diagnostics": [
+        {
+          "argv": [
+            "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+            "--addr",
+            "127.0.0.1:0",
+            "--db",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-1b2ll71p/store.sqlite",
+            "--clock-file",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-1b2ll71p/clock"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"port\":50874}\n",
+          "stderr": "",
+          "race_warning": false
+        },
+        {
+          "argv": [
+            "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+            "--addr",
+            "127.0.0.1:0",
+            "--db",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-1b2ll71p/store.sqlite",
+            "--clock-file",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-1b2ll71p/clock"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"port\":50875}\n",
+          "stderr": "",
+          "race_warning": false
+        }
+      ],
+      "duration_ms": 2164.683040988166
+    },
+    {
+      "name": "atomic_bulk_and_replay",
+      "status": "pass",
+      "checks": [
+        {
+          "name": "stats counts nonnegative integers",
+          "passed": true
+        },
+        {
+          "name": "stats conservation/no token",
+          "passed": true
+        },
+        {
+          "name": "stage1 cancelled count zero",
+          "passed": true
+        },
+        {
+          "name": "batch invalid suffix rollback",
+          "passed": true
+        },
+        {
+          "name": "batch length unique IDs and no poisoned key",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "batch order unique increasing seq",
+          "passed": true
+        },
+        {
+          "name": "batch replay identity",
+          "passed": true
+        },
+        {
+          "name": "stats counts nonnegative integers",
+          "passed": true
+        },
+        {
+          "name": "stats conservation/no token",
+          "passed": true
+        },
+        {
+          "name": "stage1 cancelled count zero",
+          "passed": true
+        },
+        {
+          "name": "batch conservation",
+          "passed": true
+        }
+      ],
+      "error": null,
+      "diagnostics": [
+        {
+          "argv": [
+            "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+            "--addr",
+            "127.0.0.1:0",
+            "--db",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-hqswenjl/store.sqlite",
+            "--clock-file",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-hqswenjl/clock"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"port\":50892}\n",
+          "stderr": "",
+          "race_warning": false
+        }
+      ],
+      "duration_ms": 1080.7449170097243
+    },
+    {
+      "name": "live_lease_races_heartbeat_deadline_fencing",
+      "status": "pass",
+      "checks": [
+        {
+          "name": "new replayed false",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "accepted input preserved",
+          "passed": true
+        },
+        {
+          "name": "new replayed false",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "accepted input preserved",
+          "passed": true
+        },
+        {
+          "name": "new replayed false",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "accepted input preserved",
+          "passed": true
+        },
+        {
+          "name": "new replayed false",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "accepted input preserved",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state leased",
+          "passed": true
+        },
+        {
+          "name": "claim token/deadline consistency",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state leased",
+          "passed": true
+        },
+        {
+          "name": "claim token/deadline consistency",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state leased",
+          "passed": true
+        },
+        {
+          "name": "claim token/deadline consistency",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state leased",
+          "passed": true
+        },
+        {
+          "name": "claim token/deadline consistency",
+          "passed": true
+        },
+        {
+          "name": "two processes unique live leases",
+          "passed": true
+        },
+        {
+          "name": "unique tokens attempts and deadline",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "empty claim all null",
+          "passed": true
+        },
+        {
+          "name": "no double live claim",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state leased",
+          "passed": true
+        },
+        {
+          "name": "heartbeat deadline now plus lease, attempts stable",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state leased",
+          "passed": true
+        },
+        {
+          "name": "claim token/deadline consistency",
+          "passed": true
+        },
+        {
+          "name": "expired lease reclaimed",
+          "passed": true
+        },
+        {
+          "name": "deadline equality reconciliation FIFO",
+          "passed": true
+        },
+        {
+          "name": "new attempt new token",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "immutable identity/input/creation fields preserved",
+          "passed": true
+        },
+        {
+          "name": "stale mutations preserve attempts",
+          "passed": true
+        }
+      ],
+      "error": null,
+      "diagnostics": [
+        {
+          "argv": [
+            "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+            "--addr",
+            "127.0.0.1:0",
+            "--db",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-bx3cg7y1/store.sqlite",
+            "--clock-file",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-bx3cg7y1/clock"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"port\":50900}\n",
+          "stderr": "",
+          "race_warning": false
+        },
+        {
+          "argv": [
+            "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+            "--addr",
+            "127.0.0.1:0",
+            "--db",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-bx3cg7y1/store.sqlite",
+            "--clock-file",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-bx3cg7y1/clock"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"port\":50901}\n",
+          "stderr": "",
+          "race_warning": false
+        }
+      ],
+      "duration_ms": 2191.057832998922
+    },
+    {
+      "name": "completion_result_and_exact_replay",
+      "status": "pass",
+      "checks": [
+        {
+          "name": "new replayed false",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "accepted input preserved",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state leased",
+          "passed": true
+        },
+        {
+          "name": "claim token/deadline consistency",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state completed",
+          "passed": true
+        },
+        {
+          "name": "immutable identity/input/creation fields preserved",
+          "passed": true
+        },
+        {
+          "name": "completed result and released lease",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state completed",
+          "passed": true
+        },
+        {
+          "name": "completion idempotent required fields after deadline",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "immutable identity/input/creation fields preserved",
+          "passed": true
+        },
+        {
+          "name": "stats counts nonnegative integers",
+          "passed": true
+        },
+        {
+          "name": "stats conservation/no token",
+          "passed": true
+        },
+        {
+          "name": "stage1 cancelled count zero",
+          "passed": true
+        },
+        {
+          "name": "conflicting completion no mutation",
+          "passed": true
+        }
+      ],
+      "error": null,
+      "diagnostics": [
+        {
+          "argv": [
+            "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+            "--addr",
+            "127.0.0.1:0",
+            "--db",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-_vg_rgfe/store.sqlite",
+            "--clock-file",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-_vg_rgfe/clock"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"port\":50919}\n",
+          "stderr": "",
+          "race_warning": false
+        }
+      ],
+      "duration_ms": 1101.3890409958549
+    },
+    {
+      "name": "fail_retry_dead_and_expiry_max_attempts",
+      "status": "pass",
+      "checks": [
+        {
+          "name": "new replayed false",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "accepted input preserved",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state leased",
+          "passed": true
+        },
+        {
+          "name": "claim token/deadline consistency",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "immutable identity/input/creation fields preserved",
+          "passed": true
+        },
+        {
+          "name": "retry fail accounting",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state leased",
+          "passed": true
+        },
+        {
+          "name": "claim token/deadline consistency",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state dead",
+          "passed": true
+        },
+        {
+          "name": "immutable identity/input/creation fields preserved",
+          "passed": true
+        },
+        {
+          "name": "last fail dead",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "empty claim all null",
+          "passed": true
+        },
+        {
+          "name": "stats counts nonnegative integers",
+          "passed": true
+        },
+        {
+          "name": "stats conservation/no token",
+          "passed": true
+        },
+        {
+          "name": "stage1 cancelled count zero",
+          "passed": true
+        },
+        {
+          "name": "dead never reclaims",
+          "passed": true
+        },
+        {
+          "name": "new replayed false",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "accepted input preserved",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state leased",
+          "passed": true
+        },
+        {
+          "name": "claim token/deadline consistency",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "empty claim all null",
+          "passed": true
+        },
+        {
+          "name": "exhausted expiry no claim",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "immutable identity/input/creation fields preserved",
+          "passed": true
+        },
+        {
+          "name": "exhausted expiry dead accounting",
+          "passed": true
+        }
+      ],
+      "error": null,
+      "diagnostics": [
+        {
+          "argv": [
+            "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+            "--addr",
+            "127.0.0.1:0",
+            "--db",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-0ldrwtcl/store.sqlite",
+            "--clock-file",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-0ldrwtcl/clock"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"port\":50929}\n",
+          "stderr": "",
+          "race_warning": false
+        }
+      ],
+      "duration_ms": 1107.149291987298
+    },
+    {
+      "name": "acknowledged_mutations_SIGKILL_restart",
+      "status": "pass",
+      "checks": [
+        {
+          "name": "new replayed false",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state ready",
+          "passed": true
+        },
+        {
+          "name": "accepted input preserved",
+          "passed": true
+        },
+        {
+          "name": "claim envelope fields",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "expected state leased",
+          "passed": true
+        },
+        {
+          "name": "claim token/deadline consistency",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "immutable identity/input/creation fields preserved",
+          "passed": true
+        },
+        {
+          "name": "acknowledged lease survives SIGKILL",
+          "passed": true
+        },
+        {
+          "name": "JOB required fields",
+          "passed": true
+        },
+        {
+          "name": "job identity and tenant",
+          "passed": true
+        },
+        {
+          "name": "job integer creation/time fields",
+          "passed": true
+        },
+        {
+          "name": "attempt fields",
+          "passed": true
+        },
+        {
+          "name": "payload and no job lease token",
+          "passed": true
+        },
+        {
+          "name": "state vocabulary",
+          "passed": true
+        },
+        {
+          "name": "immutable identity/input/creation fields preserved",
+          "passed": true
+        },
+        {
+          "name": "acknowledged complete survives SIGKILL",
+          "passed": true
+        },
+        {
+          "name": "idempotency survives SIGKILL",
+          "passed": true
+        }
+      ],
+      "error": null,
+      "diagnostics": [
+        {
+          "argv": [
+            "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+            "--addr",
+            "127.0.0.1:0",
+            "--db",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-23b1b265/store.sqlite",
+            "--clock-file",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-23b1b265/clock"
+          ],
+          "exit_code": -9,
+          "stdout": "{\"port\":50943}\n",
+          "stderr": "",
+          "race_warning": false
+        },
+        {
+          "argv": [
+            "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+            "--addr",
+            "127.0.0.1:0",
+            "--db",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-23b1b265/store.sqlite",
+            "--clock-file",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-23b1b265/clock"
+          ],
+          "exit_code": -9,
+          "stdout": "{\"port\":50946}\n",
+          "stderr": "",
+          "race_warning": false
+        },
+        {
+          "argv": [
+            "$STUDY/evidence/v1.5.0-rc/stage1/bin/race",
+            "--addr",
+            "127.0.0.1:0",
+            "--db",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-23b1b265/store.sqlite",
+            "--clock-file",
+            "/var/folders/k6/8pv_0f_17kq34j9v5swgq67c0000gp/T/qf-check-23b1b265/clock"
+          ],
+          "exit_code": 0,
+          "stdout": "{\"port\":50949}\n",
+          "stderr": "",
+          "race_warning": false
+        }
+      ],
+      "duration_ms": 1140.6487080093939
+    }
+  ],
+  "requests": [
+    {
+      "scenario": "basic_semantic_fields",
+      "method": "GET",
+      "path": "/health",
+      "tenant": null,
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "ok": true,
+        "schema_version": 1
+      },
+      "error": null,
+      "duration_ms": 3.11166699975729,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "basic_semantic_fields",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "one",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1
+        }
+      },
+      "status": 201,
+      "response": {
+        "job": {
+          "id": "8212b06f36e716972a3722ad0d2d5eeb8428e01b65f69f86",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 2.584250003565103,
+      "expected_status": 201,
+      "expected_code": null
+    },
+    {
+      "scenario": "basic_semantic_fields",
+      "method": "GET",
+      "path": "/v1/jobs/8212b06f36e716972a3722ad0d2d5eeb8428e01b65f69f86",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "8212b06f36e716972a3722ad0d2d5eeb8428e01b65f69f86",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        }
+      },
+      "error": null,
+      "duration_ms": 1.342542003840208,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "basic_semantic_fields",
+      "method": "GET",
+      "path": "/v1/stats",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "cancelled": 0,
+        "completed": 0,
+        "dead": 0,
+        "leased": 0,
+        "ready": 1,
+        "total": 1
+      },
+      "error": null,
+      "duration_ms": 0.8697500161360949,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": null,
+      "idempotency_key": "valid",
+      "request": {
+        "queue": "mail",
+        "payload": {}
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "valid X-Tenant-ID required"
+        }
+      },
+      "error": null,
+      "duration_ms": 1.1310419940855354,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "",
+      "idempotency_key": "valid",
+      "request": {
+        "queue": "mail",
+        "payload": {}
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "valid X-Tenant-ID required"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.5354579770937562,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "bad space",
+      "idempotency_key": "valid",
+      "request": {
+        "queue": "mail",
+        "payload": {}
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "valid X-Tenant-ID required"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.36849998286925256,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "idempotency_key": "valid",
+      "request": {
+        "queue": "mail",
+        "payload": {}
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "valid X-Tenant-ID required"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.5587089981418103,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "queue": "mail",
+        "payload": {}
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "valid Idempotency-Key required"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.5433750047814101,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "",
+      "request": {
+        "queue": "mail",
+        "payload": {}
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "valid Idempotency-Key required"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.35258301068097353,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "request": {
+        "queue": "mail",
+        "payload": {}
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "valid Idempotency-Key required"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.38879099884070456,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "bad0",
+      "request": {
+        "queue": "bad queue",
+        "payload": {}
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "invalid job input"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.5519170081242919,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "bad1",
+      "request": {
+        "queue": "mail",
+        "payload": []
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "invalid job input"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.4809160018339753,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "bad2",
+      "request": {
+        "queue": "mail",
+        "payload": {},
+        "max_attempts": 0
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "invalid job input"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.35437499172985554,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "bad3",
+      "request": {
+        "queue": "mail",
+        "payload": {},
+        "max_attempts": 1.5
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "invalid JSON request"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.3632080042734742,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "bad4",
+      "request": {
+        "queue": "mail",
+        "payload": {},
+        "unknown": 1
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "invalid JSON request"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.37791600334458053,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "bad5",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "x": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        }
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "invalid job input"
+        }
+      },
+      "error": null,
+      "duration_ms": 5.040833988459781,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "raw",
+      "request": {
+        "raw_bytes": 1
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "invalid JSON request"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.4843750211875886,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "huge",
+      "request": {
+        "raw_bytes": 1048611
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "invalid JSON request"
+        }
+      },
+      "error": null,
+      "duration_ms": 49.96529099298641,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "bad space",
+        "lease_ms": 100
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "invalid claim request"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.678624986903742,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "validation_atomic_no_side_effects",
+      "method": "GET",
+      "path": "/v1/stats",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "cancelled": 0,
+        "completed": 0,
+        "dead": 0,
+        "leased": 0,
+        "ready": 0,
+        "total": 0
+      },
+      "error": null,
+      "duration_ms": 1.4287499943748116,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "shared",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1,
+          "a": 2
+        }
+      },
+      "status": 201,
+      "response": {
+        "job": {
+          "id": "f467c372709b2f27991dd2646c675db1509e5a2bba8413c5",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "a": 2,
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 3.068082995014265,
+      "expected_status": [
+        200,
+        201,
+        503
+      ],
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "shared",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1,
+          "a": 2
+        }
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "f467c372709b2f27991dd2646c675db1509e5a2bba8413c5",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "a": 2,
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": true
+      },
+      "error": null,
+      "duration_ms": 3.9849579916335642,
+      "expected_status": [
+        200,
+        201,
+        503
+      ],
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "shared",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1,
+          "a": 2
+        }
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "f467c372709b2f27991dd2646c675db1509e5a2bba8413c5",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "a": 2,
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": true
+      },
+      "error": null,
+      "duration_ms": 5.525665997993201,
+      "expected_status": [
+        200,
+        201,
+        503
+      ],
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "shared",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1,
+          "a": 2
+        }
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "f467c372709b2f27991dd2646c675db1509e5a2bba8413c5",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "a": 2,
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": true
+      },
+      "error": null,
+      "duration_ms": 7.055791997117922,
+      "expected_status": [
+        200,
+        201,
+        503
+      ],
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "shared",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1,
+          "a": 2
+        }
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "f467c372709b2f27991dd2646c675db1509e5a2bba8413c5",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "a": 2,
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": true
+      },
+      "error": null,
+      "duration_ms": 6.779124989407137,
+      "expected_status": [
+        200,
+        201,
+        503
+      ],
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "shared",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1,
+          "a": 2
+        }
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "f467c372709b2f27991dd2646c675db1509e5a2bba8413c5",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "a": 2,
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": true
+      },
+      "error": null,
+      "duration_ms": 7.4063749925699085,
+      "expected_status": [
+        200,
+        201,
+        503
+      ],
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "shared",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1,
+          "a": 2
+        }
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "f467c372709b2f27991dd2646c675db1509e5a2bba8413c5",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "a": 2,
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": true
+      },
+      "error": null,
+      "duration_ms": 8.660207997309044,
+      "expected_status": [
+        200,
+        201,
+        503
+      ],
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "shared",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1,
+          "a": 2
+        }
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "f467c372709b2f27991dd2646c675db1509e5a2bba8413c5",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "a": 2,
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": true
+      },
+      "error": null,
+      "duration_ms": 9.40562499454245,
+      "expected_status": [
+        200,
+        201,
+        503
+      ],
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "shared",
+      "request": {
+        "payload": {
+          "a": 2,
+          "n": 1
+        },
+        "max_attempts": 3,
+        "queue": "mail"
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "f467c372709b2f27991dd2646c675db1509e5a2bba8413c5",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "a": 2,
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": true
+      },
+      "error": null,
+      "duration_ms": 1.6053339932113886,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "shared",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 2
+        }
+      },
+      "status": 409,
+      "response": {
+        "error": {
+          "code": "idempotency_conflict",
+          "message": "idempotency key has different input"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.89441699674353,
+      "expected_status": 409,
+      "expected_code": "idempotency_conflict"
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "beta",
+      "idempotency_key": "shared",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1
+        }
+      },
+      "status": 201,
+      "response": {
+        "job": {
+          "id": "c4191ddc8399c7c780eb957c3a9d30c6afd07912d65c9226",
+          "tenant": "beta",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 2,
+          "created_at_ms": 1800000001000,
+          "available_at_ms": 1800000001000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 1.6999579966068268,
+      "expected_status": 201,
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "GET",
+      "path": "/v1/jobs/f467c372709b2f27991dd2646c675db1509e5a2bba8413c5",
+      "tenant": "beta",
+      "idempotency_key": null,
+      "request": null,
+      "status": 404,
+      "response": {
+        "error": {
+          "code": "not_found",
+          "message": "job not found"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.9920000156853348,
+      "expected_status": 404,
+      "expected_code": "not_found"
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs/f467c372709b2f27991dd2646c675db1509e5a2bba8413c5/complete",
+      "tenant": "beta",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "fake",
+        "result": {}
+      },
+      "status": 404,
+      "response": {
+        "error": {
+          "code": "not_found",
+          "message": "job not found"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.8694169810041785,
+      "expected_status": 404,
+      "expected_code": "not_found"
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "POST",
+      "path": "/v1/jobs/batch",
+      "tenant": "alpha",
+      "idempotency_key": "shared",
+      "request": {
+        "jobs": [
+          {
+            "queue": "mail",
+            "payload": {}
+          }
+        ]
+      },
+      "status": 201,
+      "response": {
+        "jobs": [
+          {
+            "id": "038083a61d9dff58ce09e490bc3acf1b55e2277ab6899f63",
+            "tenant": "alpha",
+            "queue": "mail",
+            "payload": {},
+            "state": "ready",
+            "attempts": 0,
+            "max_attempts": 3,
+            "created_seq": 3,
+            "created_at_ms": 1800000001000,
+            "available_at_ms": 1800000001000,
+            "lease_until_ms": null,
+            "last_error": null,
+            "result": null
+          }
+        ],
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 2.056708006421104,
+      "expected_status": 201,
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "GET",
+      "path": "/v1/stats",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "cancelled": 0,
+        "completed": 0,
+        "dead": 0,
+        "leased": 0,
+        "ready": 2,
+        "total": 2
+      },
+      "error": null,
+      "duration_ms": 0.8950000046752393,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "two_process_idempotency_and_tenancy",
+      "method": "GET",
+      "path": "/v1/stats",
+      "tenant": "beta",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "cancelled": 0,
+        "completed": 0,
+        "dead": 0,
+        "leased": 0,
+        "ready": 1,
+        "total": 1
+      },
+      "error": null,
+      "duration_ms": 1.0524590034037828,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "atomic_bulk_and_replay",
+      "method": "POST",
+      "path": "/v1/jobs/batch",
+      "tenant": "alpha",
+      "idempotency_key": "bulk",
+      "request": {
+        "jobs": [
+          {
+            "queue": "mail",
+            "payload": {
+              "n": 1
+            }
+          },
+          {
+            "queue": "mail",
+            "payload": {},
+            "max_attempts": 0
+          }
+        ]
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "invalid job input"
+        }
+      },
+      "error": null,
+      "duration_ms": 1.0314579994883388,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "atomic_bulk_and_replay",
+      "method": "GET",
+      "path": "/v1/stats",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "cancelled": 0,
+        "completed": 0,
+        "dead": 0,
+        "leased": 0,
+        "ready": 0,
+        "total": 0
+      },
+      "error": null,
+      "duration_ms": 0.8673330012243241,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "atomic_bulk_and_replay",
+      "method": "POST",
+      "path": "/v1/jobs/batch",
+      "tenant": "alpha",
+      "idempotency_key": "bulk",
+      "request": {
+        "jobs": [
+          {
+            "queue": "mail",
+            "payload": {
+              "n": 0
+            }
+          },
+          {
+            "queue": "mail",
+            "payload": {
+              "n": 1
+            }
+          },
+          {
+            "queue": "mail",
+            "payload": {
+              "n": 2
+            }
+          },
+          {
+            "queue": "mail",
+            "payload": {
+              "n": 3
+            }
+          }
+        ]
+      },
+      "status": 201,
+      "response": {
+        "jobs": [
+          {
+            "id": "36c77b3c6788fc8b985a2b9b162ba38b2275f4110514c566",
+            "tenant": "alpha",
+            "queue": "mail",
+            "payload": {
+              "n": 0
+            },
+            "state": "ready",
+            "attempts": 0,
+            "max_attempts": 3,
+            "created_seq": 1,
+            "created_at_ms": 1800000000000,
+            "available_at_ms": 1800000000000,
+            "lease_until_ms": null,
+            "last_error": null,
+            "result": null
+          },
+          {
+            "id": "d62540e2c129a4b4a1e51656b90c181198cefcc1cd03972d",
+            "tenant": "alpha",
+            "queue": "mail",
+            "payload": {
+              "n": 1
+            },
+            "state": "ready",
+            "attempts": 0,
+            "max_attempts": 3,
+            "created_seq": 2,
+            "created_at_ms": 1800000000000,
+            "available_at_ms": 1800000000000,
+            "lease_until_ms": null,
+            "last_error": null,
+            "result": null
+          },
+          {
+            "id": "545673b38dbdeb4de998878dfad79e7929d4492d2ac5df08",
+            "tenant": "alpha",
+            "queue": "mail",
+            "payload": {
+              "n": 2
+            },
+            "state": "ready",
+            "attempts": 0,
+            "max_attempts": 3,
+            "created_seq": 3,
+            "created_at_ms": 1800000000000,
+            "available_at_ms": 1800000000000,
+            "lease_until_ms": null,
+            "last_error": null,
+            "result": null
+          },
+          {
+            "id": "7a87baf74ed7ac4f4be73566b7ddd1bdee89d045327d12f3",
+            "tenant": "alpha",
+            "queue": "mail",
+            "payload": {
+              "n": 3
+            },
+            "state": "ready",
+            "attempts": 0,
+            "max_attempts": 3,
+            "created_seq": 4,
+            "created_at_ms": 1800000000000,
+            "available_at_ms": 1800000000000,
+            "lease_until_ms": null,
+            "last_error": null,
+            "result": null
+          }
+        ],
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 3.0220420158002526,
+      "expected_status": 201,
+      "expected_code": null
+    },
+    {
+      "scenario": "atomic_bulk_and_replay",
+      "method": "POST",
+      "path": "/v1/jobs/batch",
+      "tenant": "alpha",
+      "idempotency_key": "bulk",
+      "request": {
+        "jobs": [
+          {
+            "queue": "mail",
+            "payload": {
+              "n": 0
+            }
+          },
+          {
+            "queue": "mail",
+            "payload": {
+              "n": 1
+            }
+          },
+          {
+            "queue": "mail",
+            "payload": {
+              "n": 2
+            }
+          },
+          {
+            "queue": "mail",
+            "payload": {
+              "n": 3
+            }
+          }
+        ]
+      },
+      "status": 200,
+      "response": {
+        "jobs": [
+          {
+            "id": "36c77b3c6788fc8b985a2b9b162ba38b2275f4110514c566",
+            "tenant": "alpha",
+            "queue": "mail",
+            "payload": {
+              "n": 0
+            },
+            "state": "ready",
+            "attempts": 0,
+            "max_attempts": 3,
+            "created_seq": 1,
+            "created_at_ms": 1800000000000,
+            "available_at_ms": 1800000000000,
+            "lease_until_ms": null,
+            "last_error": null,
+            "result": null
+          },
+          {
+            "id": "d62540e2c129a4b4a1e51656b90c181198cefcc1cd03972d",
+            "tenant": "alpha",
+            "queue": "mail",
+            "payload": {
+              "n": 1
+            },
+            "state": "ready",
+            "attempts": 0,
+            "max_attempts": 3,
+            "created_seq": 2,
+            "created_at_ms": 1800000000000,
+            "available_at_ms": 1800000000000,
+            "lease_until_ms": null,
+            "last_error": null,
+            "result": null
+          },
+          {
+            "id": "545673b38dbdeb4de998878dfad79e7929d4492d2ac5df08",
+            "tenant": "alpha",
+            "queue": "mail",
+            "payload": {
+              "n": 2
+            },
+            "state": "ready",
+            "attempts": 0,
+            "max_attempts": 3,
+            "created_seq": 3,
+            "created_at_ms": 1800000000000,
+            "available_at_ms": 1800000000000,
+            "lease_until_ms": null,
+            "last_error": null,
+            "result": null
+          },
+          {
+            "id": "7a87baf74ed7ac4f4be73566b7ddd1bdee89d045327d12f3",
+            "tenant": "alpha",
+            "queue": "mail",
+            "payload": {
+              "n": 3
+            },
+            "state": "ready",
+            "attempts": 0,
+            "max_attempts": 3,
+            "created_seq": 4,
+            "created_at_ms": 1800000000000,
+            "available_at_ms": 1800000000000,
+            "lease_until_ms": null,
+            "last_error": null,
+            "result": null
+          }
+        ],
+        "replayed": true
+      },
+      "error": null,
+      "duration_ms": 2.8630419983528554,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "atomic_bulk_and_replay",
+      "method": "POST",
+      "path": "/v1/jobs/batch",
+      "tenant": "alpha",
+      "idempotency_key": "empty",
+      "request": {
+        "jobs": []
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation",
+          "message": "invalid job input"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.38958300137892365,
+      "expected_status": 400,
+      "expected_code": "validation"
+    },
+    {
+      "scenario": "atomic_bulk_and_replay",
+      "method": "GET",
+      "path": "/v1/stats",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "cancelled": 0,
+        "completed": 0,
+        "dead": 0,
+        "leased": 0,
+        "ready": 4,
+        "total": 4
+      },
+      "error": null,
+      "duration_ms": 1.0114159958902746,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "0",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1
+        }
+      },
+      "status": 201,
+      "response": {
+        "job": {
+          "id": "e214f6aab246d7751a12274abee9f73e3c2aeefbb21767ca",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 3.4084999933838844,
+      "expected_status": 201,
+      "expected_code": null
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "1",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1
+        }
+      },
+      "status": 201,
+      "response": {
+        "job": {
+          "id": "e36ce7ed87370b4e79c985f17b24785c6469b33c71300e35",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 2,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 2.092707989504561,
+      "expected_status": 201,
+      "expected_code": null
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "2",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1
+        }
+      },
+      "status": 201,
+      "response": {
+        "job": {
+          "id": "e64fc01f1e618447ce31169958788820b0fdab565b9a719e",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 3,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 2.3280419991351664,
+      "expected_status": 201,
+      "expected_code": null
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "3",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1
+        }
+      },
+      "status": 201,
+      "response": {
+        "job": {
+          "id": "6426132cc3dcd8489de1f8df231a166624a07cbc742d75a9",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 4,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 1.8758749938569963,
+      "expected_status": 201,
+      "expected_code": null
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "e214f6aab246d7751a12274abee9f73e3c2aeefbb21767ca",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": 1800000000100,
+          "last_error": null,
+          "result": null
+        },
+        "lease_token": "7fe093ed2a38243ac50cebb21618bc2574c4a30eb29136e1",
+        "lease_until_ms": 1800000000100
+      },
+      "error": null,
+      "duration_ms": 3.8376250013243407,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "e36ce7ed87370b4e79c985f17b24785c6469b33c71300e35",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 2,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": 1800000000100,
+          "last_error": null,
+          "result": null
+        },
+        "lease_token": "27b86dd82f13c081e0a7efc5a807e7ca5d246ec4b6390627",
+        "lease_until_ms": 1800000000100
+      },
+      "error": null,
+      "duration_ms": 6.205332989338785,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "e64fc01f1e618447ce31169958788820b0fdab565b9a719e",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 3,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": 1800000000100,
+          "last_error": null,
+          "result": null
+        },
+        "lease_token": "7733276c49aa4dea4caeaf1195931ebe94c6a5f928f59266",
+        "lease_until_ms": 1800000000100
+      },
+      "error": null,
+      "duration_ms": 14.027708006324247,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "6426132cc3dcd8489de1f8df231a166624a07cbc742d75a9",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 4,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": 1800000000100,
+          "last_error": null,
+          "result": null
+        },
+        "lease_token": "3b1398a0b5004cc931ec1e322f4628d3a8b0bcc1aa2e42f1",
+        "lease_until_ms": 1800000000100
+      },
+      "error": null,
+      "duration_ms": 16.05745797860436,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": null,
+        "lease_token": null,
+        "lease_until_ms": null
+      },
+      "error": null,
+      "duration_ms": 2.348833018913865,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/jobs/e214f6aab246d7751a12274abee9f73e3c2aeefbb21767ca/heartbeat",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "7fe093ed2a38243ac50cebb21618bc2574c4a30eb29136e1",
+        "lease_ms": 200
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "e214f6aab246d7751a12274abee9f73e3c2aeefbb21767ca",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": 1800000000250,
+          "last_error": null,
+          "result": null
+        }
+      },
+      "error": null,
+      "duration_ms": 1.8429580086376518,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/jobs/e214f6aab246d7751a12274abee9f73e3c2aeefbb21767ca/heartbeat",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "wrong",
+        "lease_ms": 100
+      },
+      "status": 409,
+      "response": {
+        "error": {
+          "code": "lease_conflict",
+          "message": "lease is stale or conflicting"
+        }
+      },
+      "error": null,
+      "duration_ms": 1.5750830061733723,
+      "expected_status": 409,
+      "expected_code": "lease_conflict"
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/jobs/e214f6aab246d7751a12274abee9f73e3c2aeefbb21767ca/complete",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "7fe093ed2a38243ac50cebb21618bc2574c4a30eb29136e1",
+        "result": {}
+      },
+      "status": 409,
+      "response": {
+        "error": {
+          "code": "lease_conflict",
+          "message": "lease is stale or conflicting"
+        }
+      },
+      "error": null,
+      "duration_ms": 1.6509160050190985,
+      "expected_status": 409,
+      "expected_code": "lease_conflict"
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "e214f6aab246d7751a12274abee9f73e3c2aeefbb21767ca",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 2,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000250,
+          "lease_until_ms": 1800000000350,
+          "last_error": "lease_expired",
+          "result": null
+        },
+        "lease_token": "0c37208be3f8cb2f1b2818cc3fc45f28918d78862eea711a",
+        "lease_until_ms": 1800000000350
+      },
+      "error": null,
+      "duration_ms": 4.65637500747107,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/jobs/e214f6aab246d7751a12274abee9f73e3c2aeefbb21767ca/heartbeat",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "7fe093ed2a38243ac50cebb21618bc2574c4a30eb29136e1",
+        "lease_ms": 100
+      },
+      "status": 409,
+      "response": {
+        "error": {
+          "code": "lease_conflict",
+          "message": "lease is stale or conflicting"
+        }
+      },
+      "error": null,
+      "duration_ms": 1.1373749875929207,
+      "expected_status": 409,
+      "expected_code": "lease_conflict"
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/jobs/e214f6aab246d7751a12274abee9f73e3c2aeefbb21767ca/complete",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "7fe093ed2a38243ac50cebb21618bc2574c4a30eb29136e1",
+        "result": {}
+      },
+      "status": 409,
+      "response": {
+        "error": {
+          "code": "lease_conflict",
+          "message": "lease is stale or conflicting"
+        }
+      },
+      "error": null,
+      "duration_ms": 1.8431670032441616,
+      "expected_status": 409,
+      "expected_code": "lease_conflict"
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "POST",
+      "path": "/v1/jobs/e214f6aab246d7751a12274abee9f73e3c2aeefbb21767ca/fail",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "7fe093ed2a38243ac50cebb21618bc2574c4a30eb29136e1",
+        "error": "late"
+      },
+      "status": 409,
+      "response": {
+        "error": {
+          "code": "lease_conflict",
+          "message": "lease is stale or conflicting"
+        }
+      },
+      "error": null,
+      "duration_ms": 1.6433340206276625,
+      "expected_status": 409,
+      "expected_code": "lease_conflict"
+    },
+    {
+      "scenario": "live_lease_races_heartbeat_deadline_fencing",
+      "method": "GET",
+      "path": "/v1/jobs/e214f6aab246d7751a12274abee9f73e3c2aeefbb21767ca",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "e214f6aab246d7751a12274abee9f73e3c2aeefbb21767ca",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 2,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000250,
+          "lease_until_ms": 1800000000350,
+          "last_error": "lease_expired",
+          "result": null
+        }
+      },
+      "error": null,
+      "duration_ms": 0.9514170233160257,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "completion_result_and_exact_replay",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "one",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1
+        }
+      },
+      "status": 201,
+      "response": {
+        "job": {
+          "id": "0e376933e4c031962c007e45c4f6f5ea45101f53a3410086",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 2.778333000605926,
+      "expected_status": 201,
+      "expected_code": null
+    },
+    {
+      "scenario": "completion_result_and_exact_replay",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "0e376933e4c031962c007e45c4f6f5ea45101f53a3410086",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": 1800000000100,
+          "last_error": null,
+          "result": null
+        },
+        "lease_token": "2659d9e4e478c313338749464a964a91136c3d7b7b4380e6",
+        "lease_until_ms": 1800000000100
+      },
+      "error": null,
+      "duration_ms": 3.4858340222854167,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "completion_result_and_exact_replay",
+      "method": "POST",
+      "path": "/v1/jobs/0e376933e4c031962c007e45c4f6f5ea45101f53a3410086/complete",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "2659d9e4e478c313338749464a964a91136c3d7b7b4380e6",
+        "result": {
+          "answer": 42
+        }
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "0e376933e4c031962c007e45c4f6f5ea45101f53a3410086",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "completed",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": {
+            "answer": 42
+          }
+        }
+      },
+      "error": null,
+      "duration_ms": 2.623334003146738,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "completion_result_and_exact_replay",
+      "method": "POST",
+      "path": "/v1/jobs/0e376933e4c031962c007e45c4f6f5ea45101f53a3410086/complete",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "2659d9e4e478c313338749464a964a91136c3d7b7b4380e6",
+        "result": {
+          "answer": 42
+        }
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "0e376933e4c031962c007e45c4f6f5ea45101f53a3410086",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "completed",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": {
+            "answer": 42
+          }
+        }
+      },
+      "error": null,
+      "duration_ms": 1.6235829971265048,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "completion_result_and_exact_replay",
+      "method": "POST",
+      "path": "/v1/jobs/0e376933e4c031962c007e45c4f6f5ea45101f53a3410086/complete",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "2659d9e4e478c313338749464a964a91136c3d7b7b4380e6",
+        "result": {
+          "answer": 43
+        }
+      },
+      "status": 409,
+      "response": {
+        "error": {
+          "code": "lease_conflict",
+          "message": "lease is stale or conflicting"
+        }
+      },
+      "error": null,
+      "duration_ms": 1.232124981470406,
+      "expected_status": 409,
+      "expected_code": "lease_conflict"
+    },
+    {
+      "scenario": "completion_result_and_exact_replay",
+      "method": "POST",
+      "path": "/v1/jobs/0e376933e4c031962c007e45c4f6f5ea45101f53a3410086/complete",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "wrong",
+        "result": {
+          "answer": 42
+        }
+      },
+      "status": 409,
+      "response": {
+        "error": {
+          "code": "lease_conflict",
+          "message": "lease is stale or conflicting"
+        }
+      },
+      "error": null,
+      "duration_ms": 0.9463329915888608,
+      "expected_status": 409,
+      "expected_code": "lease_conflict"
+    },
+    {
+      "scenario": "completion_result_and_exact_replay",
+      "method": "GET",
+      "path": "/v1/jobs/0e376933e4c031962c007e45c4f6f5ea45101f53a3410086",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "0e376933e4c031962c007e45c4f6f5ea45101f53a3410086",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "completed",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": {
+            "answer": 42
+          }
+        }
+      },
+      "error": null,
+      "duration_ms": 1.1384160025045276,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "completion_result_and_exact_replay",
+      "method": "GET",
+      "path": "/v1/stats",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "cancelled": 0,
+        "completed": 1,
+        "dead": 0,
+        "leased": 0,
+        "ready": 0,
+        "total": 1
+      },
+      "error": null,
+      "duration_ms": 0.8255409775301814,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "fail_retry_dead_and_expiry_max_attempts",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "one",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1
+        },
+        "max_attempts": 2
+      },
+      "status": 201,
+      "response": {
+        "job": {
+          "id": "ea37bc0747511b5085b587a7b004b3332a345649e28320e4",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 2,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 2.6780420157592744,
+      "expected_status": 201,
+      "expected_code": null
+    },
+    {
+      "scenario": "fail_retry_dead_and_expiry_max_attempts",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "ea37bc0747511b5085b587a7b004b3332a345649e28320e4",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 1,
+          "max_attempts": 2,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": 1800000000100,
+          "last_error": null,
+          "result": null
+        },
+        "lease_token": "873b578a7be9b3e8c75add46c78b9a8624ee7ac24b7773c2",
+        "lease_until_ms": 1800000000100
+      },
+      "error": null,
+      "duration_ms": 2.8036660223733634,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "fail_retry_dead_and_expiry_max_attempts",
+      "method": "POST",
+      "path": "/v1/jobs/ea37bc0747511b5085b587a7b004b3332a345649e28320e4/fail",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "873b578a7be9b3e8c75add46c78b9a8624ee7ac24b7773c2",
+        "error": "first"
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "ea37bc0747511b5085b587a7b004b3332a345649e28320e4",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 1,
+          "max_attempts": 2,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": "first",
+          "result": null
+        }
+      },
+      "error": null,
+      "duration_ms": 2.3301250184886158,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "fail_retry_dead_and_expiry_max_attempts",
+      "method": "POST",
+      "path": "/v1/jobs/ea37bc0747511b5085b587a7b004b3332a345649e28320e4/fail",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "873b578a7be9b3e8c75add46c78b9a8624ee7ac24b7773c2",
+        "error": "again"
+      },
+      "status": 409,
+      "response": {
+        "error": {
+          "code": "lease_conflict",
+          "message": "lease is stale or conflicting"
+        }
+      },
+      "error": null,
+      "duration_ms": 1.5638339973520488,
+      "expected_status": 409,
+      "expected_code": "lease_conflict"
+    },
+    {
+      "scenario": "fail_retry_dead_and_expiry_max_attempts",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "ea37bc0747511b5085b587a7b004b3332a345649e28320e4",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 2,
+          "max_attempts": 2,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": 1800000000100,
+          "last_error": "first",
+          "result": null
+        },
+        "lease_token": "82c77a61bd9d011b81669fc21067389e672b24e9c43d4be0",
+        "lease_until_ms": 1800000000100
+      },
+      "error": null,
+      "duration_ms": 3.1409160001203418,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "fail_retry_dead_and_expiry_max_attempts",
+      "method": "POST",
+      "path": "/v1/jobs/ea37bc0747511b5085b587a7b004b3332a345649e28320e4/fail",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "82c77a61bd9d011b81669fc21067389e672b24e9c43d4be0",
+        "error": "last"
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "ea37bc0747511b5085b587a7b004b3332a345649e28320e4",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "dead",
+          "attempts": 2,
+          "max_attempts": 2,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": "last",
+          "result": null
+        }
+      },
+      "error": null,
+      "duration_ms": 2.20604200148955,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "fail_retry_dead_and_expiry_max_attempts",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": null,
+        "lease_token": null,
+        "lease_until_ms": null
+      },
+      "error": null,
+      "duration_ms": 1.9964579842053354,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "fail_retry_dead_and_expiry_max_attempts",
+      "method": "GET",
+      "path": "/v1/stats",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "cancelled": 0,
+        "completed": 0,
+        "dead": 1,
+        "leased": 0,
+        "ready": 0,
+        "total": 1
+      },
+      "error": null,
+      "duration_ms": 0.795957981608808,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "fail_retry_dead_and_expiry_max_attempts",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "expiry",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1
+        },
+        "max_attempts": 1
+      },
+      "status": 201,
+      "response": {
+        "job": {
+          "id": "3dfa31b18ca7ce3996abfd9edee9a81c9134fc2db9dda328",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 1,
+          "created_seq": 2,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 1.7495839856564999,
+      "expected_status": 201,
+      "expected_code": null
+    },
+    {
+      "scenario": "fail_retry_dead_and_expiry_max_attempts",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "3dfa31b18ca7ce3996abfd9edee9a81c9134fc2db9dda328",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 1,
+          "max_attempts": 1,
+          "created_seq": 2,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": 1800000000100,
+          "last_error": null,
+          "result": null
+        },
+        "lease_token": "c43cc4f8e02b66f557c5906f3b155e56cdbaf67cd2ab8431",
+        "lease_until_ms": 1800000000100
+      },
+      "error": null,
+      "duration_ms": 3.0982080206740648,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "fail_retry_dead_and_expiry_max_attempts",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": null,
+        "lease_token": null,
+        "lease_until_ms": null
+      },
+      "error": null,
+      "duration_ms": 2.7157500153407454,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "fail_retry_dead_and_expiry_max_attempts",
+      "method": "GET",
+      "path": "/v1/jobs/3dfa31b18ca7ce3996abfd9edee9a81c9134fc2db9dda328",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "3dfa31b18ca7ce3996abfd9edee9a81c9134fc2db9dda328",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "dead",
+          "attempts": 1,
+          "max_attempts": 1,
+          "created_seq": 2,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": "lease_expired",
+          "result": null
+        }
+      },
+      "error": null,
+      "duration_ms": 0.9676250047050416,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "acknowledged_mutations_SIGKILL_restart",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "one",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1
+        }
+      },
+      "status": 201,
+      "response": {
+        "job": {
+          "id": "7f457a2e251d88528fd1f8ca02d4d09a137442d581de5118",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "ready",
+          "attempts": 0,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": null
+        },
+        "replayed": false
+      },
+      "error": null,
+      "duration_ms": 2.583499997854233,
+      "expected_status": 201,
+      "expected_code": null
+    },
+    {
+      "scenario": "acknowledged_mutations_SIGKILL_restart",
+      "method": "POST",
+      "path": "/v1/queues/mail/claim",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "worker_id": "worker",
+        "lease_ms": 100
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "7f457a2e251d88528fd1f8ca02d4d09a137442d581de5118",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": 1800000000100,
+          "last_error": null,
+          "result": null
+        },
+        "lease_token": "60eff03d75cc03d46940c0f519cddce66b226a7a53122da3",
+        "lease_until_ms": 1800000000100
+      },
+      "error": null,
+      "duration_ms": 3.0494160018861294,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "acknowledged_mutations_SIGKILL_restart",
+      "method": "GET",
+      "path": "/v1/jobs/7f457a2e251d88528fd1f8ca02d4d09a137442d581de5118",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "7f457a2e251d88528fd1f8ca02d4d09a137442d581de5118",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "leased",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": 1800000000100,
+          "last_error": null,
+          "result": null
+        }
+      },
+      "error": null,
+      "duration_ms": 1.6482920036651194,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "acknowledged_mutations_SIGKILL_restart",
+      "method": "POST",
+      "path": "/v1/jobs/7f457a2e251d88528fd1f8ca02d4d09a137442d581de5118/complete",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": {
+        "lease_token": "60eff03d75cc03d46940c0f519cddce66b226a7a53122da3",
+        "result": {
+          "durable": true
+        }
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "7f457a2e251d88528fd1f8ca02d4d09a137442d581de5118",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "completed",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": {
+            "durable": true
+          }
+        }
+      },
+      "error": null,
+      "duration_ms": 2.4807919980958104,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "acknowledged_mutations_SIGKILL_restart",
+      "method": "GET",
+      "path": "/v1/jobs/7f457a2e251d88528fd1f8ca02d4d09a137442d581de5118",
+      "tenant": "alpha",
+      "idempotency_key": null,
+      "request": null,
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "7f457a2e251d88528fd1f8ca02d4d09a137442d581de5118",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "completed",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": {
+            "durable": true
+          }
+        }
+      },
+      "error": null,
+      "duration_ms": 1.7467500001657754,
+      "expected_status": 200,
+      "expected_code": null
+    },
+    {
+      "scenario": "acknowledged_mutations_SIGKILL_restart",
+      "method": "POST",
+      "path": "/v1/jobs",
+      "tenant": "alpha",
+      "idempotency_key": "one",
+      "request": {
+        "queue": "mail",
+        "payload": {
+          "n": 1
+        }
+      },
+      "status": 200,
+      "response": {
+        "job": {
+          "id": "7f457a2e251d88528fd1f8ca02d4d09a137442d581de5118",
+          "tenant": "alpha",
+          "queue": "mail",
+          "payload": {
+            "n": 1
+          },
+          "state": "completed",
+          "attempts": 1,
+          "max_attempts": 3,
+          "created_seq": 1,
+          "created_at_ms": 1800000000000,
+          "available_at_ms": 1800000000000,
+          "lease_until_ms": null,
+          "last_error": null,
+          "result": {
+            "durable": true
+          }
+        },
+        "replayed": true
+      },
+      "error": null,
+      "duration_ms": 1.5058749995660037,
+      "expected_status": 200,
+      "expected_code": null
+    }
+  ],
+  "duration_ms": 11974.899292021291,
+  "metrics": {
+    "server_cpu_seconds": null,
+    "peak_rss_bytes": null
+  },
+  "limits": [
+    "HTTP acknowledgement plus SIGKILL/restart is not power-loss durability proof.",
+    "SQLite PRAGMAs and implementation reuse require separate source review.",
+    "Synthetic localhost fixtures do not exercise production authentication or external effects."
+  ]
+}

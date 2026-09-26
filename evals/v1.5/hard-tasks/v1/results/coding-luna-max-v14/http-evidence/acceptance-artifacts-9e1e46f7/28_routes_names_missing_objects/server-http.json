@@ -1,0 +1,153 @@
+[
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "488fe91a99f548caab300f723bb4aba0"
+    },
+    "request": "{\"name\": \"\", \"opening\": 1}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.00037295802030712366
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "ba1d060c01b742c6afc204633766e340"
+    },
+    "request": "{\"name\": \"bad/name\", \"opening\": 1}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.00026954099303111434
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "4af90dbe190f42659e610f09bf89eea8"
+    },
+    "request": "{\"name\": \"space name\", \"opening\": 1}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.00027779198717325926
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "151c3fb4397a43f1a78ca31c21255f7e"
+    },
+    "request": "{\"name\": \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\", \"opening\": 1}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.0002579580177552998
+  },
+  {
+    "method": "GET",
+    "path": "/missing",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 404,
+    "response": {
+      "error": {
+        "code": "not_found"
+      }
+    },
+    "elapsed_s": 0.00024583301274105906
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/missing",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 404,
+    "response": {
+      "error": {
+        "code": "not_found"
+      }
+    },
+    "elapsed_s": 0.000291000003926456
+  },
+  {
+    "method": "POST",
+    "path": "/holds/absent/release",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "081d24dd12ca47c6a5da2403cfddfe9d"
+    },
+    "request": "{}",
+    "status": 404,
+    "response": {
+      "error": {
+        "code": "not_found"
+      }
+    },
+    "elapsed_s": 0.00033712497679516673
+  },
+  {
+    "method": "POST",
+    "path": "/transfers/absent/reverse",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "bc5260fd73a5478aad9d8a5bd5f2a9c7"
+    },
+    "request": "{}",
+    "status": 404,
+    "response": {
+      "error": {
+        "code": "not_found"
+      }
+    },
+    "elapsed_s": 0.0003678330103866756
+  },
+  {
+    "method": "PUT",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "method"
+    },
+    "request": "{\"name\": \"a\", \"opening\": 1}",
+    "status": 404,
+    "response": {
+      "error": {
+        "code": "not_found"
+      }
+    },
+    "elapsed_s": 0.0002292089629918337
+  }
+]

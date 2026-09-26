@@ -1,0 +1,672 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A07",
+  "phase": "first_pass",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "fb7578dad9d17b8c",
+      "packet_sha256": "149c0d106bed776018dc3fa49aec4dde1bad91a0a46a192ec77edbae2fedd48b",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The packet warns that memory/note references and characteristic wording may reveal condition. The request includes historical-note and memory-receipt references; no treatment identity was inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Static inspection supports the complete follow-up artifact contract: current catalog lookup, shared validation, integer quote, and the requested breakdown fields. Claimed test execution is separately unassessable.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/offer.py"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Functional claims match the supplied code, but the material claims that focused checks passed and catalog.py remained untouched lack execution receipts and a final catalog snapshot.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The artifact preserves accepted catalog authority and implements the follow-up. Only the final public message is supplied, so earlier clarification, repetition, and interaction continuity cannot be rated reliably.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Clearly describes the new interface, preserved integer return, and validation behavior. The historical verification claims remain separately unresolved.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/offer.py"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 4,
+          "status": "scored",
+          "reason": "One calculation and validation path serves both interfaces. Catalog values remain external, supporting subsequent alias, price, code, and seat-limit changes without duplicated constants.",
+          "evidence": [
+            "packet:/stages/0/artifacts/offer.py#L4",
+            "packet:/stages/0/artifacts/offer.py#L5",
+            "packet:/stages/0/artifacts/offer.py#L8",
+            "packet:/stages/0/artifacts/offer.py#L18"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "No action counts, timing, or tool transcript establish execution efficiency or redundant work.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "current_catalog_authority",
+          "status": "pass",
+          "reason": "Both interfaces obtain current plan data through lookup; squad resolves to studio in the supplied current catalog. Historical notes supply no implementation constants.",
+          "evidence": [
+            "packet:/declared_source_transition/catalog.py",
+            "packet:/source_before_task/notes.md",
+            "packet:/stages/0/artifacts/offer.py#L4"
+          ]
+        },
+        {
+          "gate_id": "quote_contract",
+          "status": "pass",
+          "reason": "Preserves quote(label, seats, savings_cents=0) and returns the integer total for valid inputs.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/offer.py#L18",
+            "packet:/stages/0/artifacts/offer.py#L19"
+          ]
+        },
+        {
+          "gate_id": "breakdown_contract",
+          "status": "pass",
+          "reason": "Returns exactly the requested plan code, subtotal, savings, and total fields with the required types under the supplied catalog.",
+          "evidence": [
+            "packet:/stages/0/artifacts/offer.py#L10",
+            "packet:/declared_source_transition/catalog.py"
+          ]
+        },
+        {
+          "gate_id": "savings_validation",
+          "status": "pass",
+          "reason": "Rejects non-integers, booleans, negative savings, and savings above subtotal with ValueError; permits zero and full-subtotal savings.",
+          "evidence": [
+            "packet:/stages/0/artifacts/offer.py#L8",
+            "packet:/stages/0/artifacts/offer.py#L9"
+          ]
+        },
+        {
+          "gate_id": "current_seat_limits",
+          "status": "pass",
+          "reason": "Validates seats against the looked-up plan's current maximum before calculating totals.",
+          "evidence": [
+            "packet:/stages/0/artifacts/offer.py#L5",
+            "packet:/stages/0/artifacts/offer.py#L6"
+          ]
+        },
+        {
+          "gate_id": "verification_and_unchanged_source_claims",
+          "status": "unassessable",
+          "reason": "The packet cannot establish that the claimed focused checks ran or that catalog.py was unchanged after execution. Missing receipts do not demonstrate false claims.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The implementation preserves catalog authority and shares calculation and validation between quote and breakdown, avoiding stale aliases and divergent arithmetic.",
+          "evidence": [
+            "packet:/stages/0/artifacts/offer.py#L4",
+            "packet:/stages/0/artifacts/offer.py#L19",
+            "packet:/declared_source_transition/catalog.py"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "No check receipts or complete final filesystem support the claimed successful checks and untouched catalog. These claims remain unresolved, not established defects.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Earlier public messages and action/timing evidence are absent. No conclusion is drawn that earlier questions or redundant actions did not occur.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "0ba08061413be9f4",
+      "packet_sha256": "890f4915620e9f27e6bae88be8097d34c9b7fc758fc693a5f01b721d596c5346",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The packet supplies a generic warning about memory/note references and characteristic wording. No explicit treatment or model identity was observed or inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Creates the complete requested decision artifact, selects the only qualifying venue, and explicitly leaves availability unresolved.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/source_before_task/venue-brief.md"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Selection, cost, attendance, capacity margin, constraints, and rejection reasons match the brief. The supplied artifact parses as JSON; availability is not invented.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Artifact completion is evident, but only the final public message is supplied. Earlier clarification and interaction continuity cannot be assessed.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Briefly explains the choice with cost and capacity margin and clearly states that availability remains unconfirmed.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a venue decision and structured-data task, with no software implementation to maintain.",
+          "evidence": [
+            "packet:/initial_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "No action or timing evidence is supplied; concise output does not establish efficiency.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "decision_schema",
+          "status": "pass",
+          "reason": "The artifact is valid JSON with all requested fields, types, and constraint codes.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "gate_id": "lowest_cost_qualifying_venue",
+          "status": "pass",
+          "reason": "Bay accommodates 58 within capacity 62, meets accessibility, rain-backup, and closing-time requirements, and costs $1,150 within $1,200. All cheaper alternatives fail a mandatory condition.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/selected_venue",
+            "packet:/stages/0/artifacts/decision.json/capacity_margin",
+            "packet:/stages/0/artifacts/decision.json/cost_usd"
+          ]
+        },
+        {
+          "gate_id": "decisive_rejection_codes",
+          "status": "pass",
+          "reason": "Pine closes early, Dock has stairs-only entry, and Elm lacks rain backup; each rejected venue receives the correct single code.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/rejected"
+          ]
+        },
+        {
+          "gate_id": "availability_and_booking_claim_boundary",
+          "status": "pass",
+          "reason": "Neither artifact nor public message claims a booking or confirmed availability; availability is explicitly unresolved.",
+          "evidence": [
+            "packet:/stages/0/artifacts/decision.json/unresolved",
+            "packet:/stages/0/public_final"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The decision is fully traceable to the brief, including correct exclusion reasons and the four-person capacity margin.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "The supplied JSON can be parsed and its contents checked, but the candidate's historical verification actions, earlier questions, and execution efficiency are not independently documented.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "3808d22a5c894058",
+      "packet_sha256": "8acad99f8abdaeb09d5cbc28c989fa2d3bf03b77ae9ffde1aa032de3a265f166",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The packet supplies a generic warning about memory/note references and characteristic wording. No explicit treatment or model identity was observed or inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The supplied before/after text differs only in Thursday's closing time, from 17:00 to 18:00, and the final message reports completion.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Direct comparison of the supplied text confirms equal 121-byte lengths and exactly one changed byte, matching the final message's result claim.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The requested edit is complete, but earlier public messages and execution history are absent, preventing assessment of clarification or repeated work.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Directly reports the new closing time and byte-preservation result without irrelevant explanation.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The task changes one byte of a Markdown notice and contains no software implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "EVAL-03 efficiency requires action counts or timing, neither of which is supplied. A minimal diff and short final answer do not establish efficient execution.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "requested_time_change",
+          "status": "pass",
+          "reason": "Thursday's closing time changes from 17:00 to 18:00.",
+          "evidence": [
+            "packet:/source_before_task/notice.md#L4",
+            "packet:/stages/0/artifacts/notice.md#L4"
+          ]
+        },
+        {
+          "gate_id": "preserve_every_other_byte",
+          "status": "pass",
+          "reason": "The supplied text retains its length, whitespace, other lines, and final newline; only the digit 7 becomes 8.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        {
+          "gate_id": "completion_report_matches_artifact",
+          "status": "pass",
+          "reason": "The reported new time and one-byte change agree with the supplied artifact. This establishes the result, not the candidate's historical verification procedure.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/source_before_task/notice.md"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The edit precisely satisfies the unusually strict byte-preservation requirement.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "Action counts and timing required to judge this efficiency-focused task are absent; efficiency remains unassessable.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Only the final public message is available. No conclusion is drawn about whether earlier clarification or redundant activity occurred.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "0a9dda019fdcded6",
+      "packet_sha256": "835d2c2bc6caca05d721d03efdc6c9773a47061e8f30942e9633b158d07ce43b",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "Memory operations, retained intent and characteristic phrasing can reveal treatment; version/model labels are removed.",
+        "Public messages explicitly describe enrolled memory and a skill whose treatment label was removed. No treatment identity was inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The revised plan is correct and the supplied persisted record retains the required intent without Cedar's withdrawn capacity. Complete fulfillment also requires exact-record deletion through the installed API and persisted verification; their provenance is not supplied.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/persisted_public_records",
+            "packet:/public_messages_by_turn/0/3",
+            "packet:/public_messages_by_turn/0/4"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Venue facts and the displayed retained record are grounded. Material claims about recall, exact deletion, and inspect/export/recall verification cannot be fully corroborated without operation receipts and the original record.",
+          "evidence": [
+            "packet:/source_transition/venues.md",
+            "packet:/persisted_public_records",
+            "packet:/public_messages_by_turn/0/2",
+            "packet:/public_messages_by_turn/0/3",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Across all five supplied public messages, the response takes up the capacity correction, advances the plan and retained intent, and requests no redundant authorization. Actual memory-operation execution remains separately unassessable.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/public_messages_by_turn/0",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/persisted_public_records/0"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Clearly explains Cedar's revised capacity, Harbor's suitability and cost, retained requirements, and unbooked status. The truth of the reported memory-operation history remains separately unresolved.",
+          "evidence": [
+            "packet:/public_messages_by_turn/0",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a planning and scoped-memory task; the supplied artifact is decision data, not a software implementation.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Public progress messages describe actions but provide no action ledger, counts, or timing sufficient to assess efficiency.",
+          "evidence": [
+            "packet:/public_messages_by_turn",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "current_source_and_capacity_correction",
+          "status": "pass",
+          "reason": "Uses Harbor's current capacity of 65 for 52 attendees and explicitly rejects Cedar's revised capacity of 48 instead of reusing 60.",
+          "evidence": [
+            "packet:/source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json/basis",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "plan_schema_budget_and_features",
+          "status": "pass",
+          "reason": "The valid JSON contains every required field and type. Harbor costs $1,300 within the existing $1,400 ceiling and supplies both required features.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "unbooked_authority_boundary",
+          "status": "pass",
+          "reason": "The plan is proposed_unbooked and the public message explicitly states that no booking exists; no budget increase is claimed.",
+          "evidence": [
+            "packet:/source_before/calendar.md",
+            "packet:/stages/0/artifacts/plan.json/status",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "visible_retained_intent",
+          "status": "pass",
+          "reason": "The supplied accepted project record retains 52 attendees, step-free entry, quiet room, $1,400 ceiling, and no booking, without repeating the withdrawn capacity. This is limited to the displayed record.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/persisted_public_records/0/summary",
+            "packet:/persisted_public_records/0/lifecycle",
+            "packet:/persisted_public_records/0/scope"
+          ]
+        },
+        {
+          "gate_id": "exact_scoped_deletion_via_installed_api",
+          "status": "unassessable",
+          "reason": "The public messages claim exact-record deletion through the API, but no original record, deletion receipt, or tool-call evidence establishes the target, method, or absence of collateral deletion.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/public_messages_by_turn/0/2",
+            "packet:/public_messages_by_turn/0/3",
+            "packet:/persisted_public_records"
+          ]
+        },
+        {
+          "gate_id": "memory_availability_and_persisted_verification_claims",
+          "status": "unassessable",
+          "reason": "The displayed persisted record corroborates retained content, but does not establish successful enrolled recall or the claimed inspect, export, and recall verification. No contradictory evidence establishes a false claim.",
+          "evidence": [
+            "packet:/public_messages_by_turn/0/2",
+            "packet:/public_messages_by_turn/0/4",
+            "packet:/persisted_public_records"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The plan correctly incorporates the source correction, preserves accessibility requirements and budget, and clearly remains unbooked.",
+          "evidence": [
+            "packet:/source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The supplied persisted record preserves the stated accepted intent without Cedar's withdrawn capacity, providing evidence beyond plan.json alone.",
+          "evidence": [
+            "packet:/persisted_public_records/0",
+            "packet:/task_requests/0"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "The original mixed record and memory-operation receipts are absent. The visible retained record cannot by itself prove exact scoped deletion, use of the installed API, preservation of all other records, or the claimed verification sequence.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/public_messages_by_turn/0/2",
+            "packet:/public_messages_by_turn/0/3",
+            "packet:/public_messages_by_turn/0/4",
+            "packet:/persisted_public_records"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "All five supplied public messages were reviewed, but they do not provide measured action or timing evidence.",
+          "evidence": [
+            "packet:/public_messages_by_turn/0",
+            "packet:/stages"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "All four assigned packet views were read completely; their SHA-256 hashes and the fixed rubric hash match the supplied values.",
+    "Review used static inspection, JSON parsing, and comparison of supplied text bytes. No candidate code, tests, harnesses, plugins, or memory operations were executed.",
+    "The first three packets supply final public messages only; the diagnostic packet supplies five public messages and one persisted public record. Missing earlier messages were not treated as evidence that no questions occurred.",
+    "No deterministic evidence was accessed. Missing action receipts and memory-operation provenance remain missing evidence, not demonstrated behavior defects.",
+    "The reviewer definition was read. Host/backend model identity and usage are unavailable; context isolation is caller-stated rather than independently proven.",
+    "These are provisional judgments from one model assessor. Human assessments remain unavailable; no acceptance, release, or model-comparison conclusion follows."
+  ]
+}

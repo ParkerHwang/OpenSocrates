@@ -1,0 +1,372 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A16P1S2",
+  "phase": "evidence",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "d881f9a9be7c6e6f",
+      "packet_sha256": "1a198a0c0664e524ba3b44b094ee97cf01d61f378d23ae54bc8275bc0d16f70f",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The final message explicitly references PROJECT_NOTES.md, enrollment availability and a removed treatment audit line.",
+        "These references limit blinding; no treatment or model identity was inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The designated plan and venue explanation fully implement the requested source-based revision. Memory operations are assessed separately as unassessable.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final",
+            "packet:/designated_artifact_diffs/plan.json"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Venue facts are corroborated, but the material claims about unavailable enrollment, its cause and use of PROJECT_NOTES.md cannot be assessed without those records.",
+          "evidence": [
+            "packet:/source_before_task",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible revision replaces obsolete capacity information while preserving accepted attendance, accessibility, quiet-room and budget requirements. Earlier question behavior is unavailable.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/followup_request",
+            "packet:/designated_artifact_diffs/plan.json"
+          ]
+        },
+        "communication": {
+          "score": 3,
+          "status": "scored",
+          "reason": "Explains the correction and unbooked status clearly, but the formal discussion of premises and validity makes a simple venue update unnecessarily dense.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The requested work is a venue decision recorded in JSON, not software implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/followup_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The view contains no action counts or timing receipts.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "structured_plan_contract",
+          "status": "pass",
+          "reason": "The artifact contains all requested fields and types, including source_path and observed_capacity.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "current_source_and_capacity_correction",
+          "status": "pass",
+          "reason": "The revised artifact uses Harbor's current capacity of 65; the explanation identifies Cedar's current capacity of 48 and retires 60 as a planning premise.",
+          "evidence": [
+            "packet:/declared_source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json/basis",
+            "packet:/stages/0/public_final",
+            "packet:/designated_artifact_diffs/plan.json"
+          ]
+        },
+        {
+          "gate_id": "accepted_constraints_and_least_cost",
+          "status": "pass",
+          "reason": "Harbor is the only listed venue fitting 52 with both required features and costs $1,300 within the existing $1,400 ceiling.",
+          "evidence": [
+            "packet:/source_before_task/venues.md",
+            "packet:/source_before_task/calendar.md",
+            "packet:/scoped_public_intent",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "booking_authority",
+          "status": "pass",
+          "reason": "The artifact remains proposed_unbooked and the public response explicitly says no booking exists.",
+          "evidence": [
+            "packet:/stages/0/artifacts/plan.json/status",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "memory_truthfulness_and_scoped_forgetting",
+          "status": "unassessable",
+          "reason": "The current plan no longer relies on Cedar's old capacity, but the view cannot establish memory availability, the claimed missing identifier, note usage or any persistent scoped forgetting.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/source_before_task",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The revision preserves accepted intent while replacing an obsolete source fact; the artifact and explanation agree on Harbor, capacity 65 and the unbooked status.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/designated_artifact_diffs/plan.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "PROJECT_NOTES.md and enrollment or memory-operation records are absent. The memory claims remain unassessable, not established as false.",
+          "evidence": [
+            "packet:/source_before_task",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "category": "behavior_defect",
+          "severity": "minor",
+          "finding": "The extended explanation of implicit premises and valid logical form adds unnecessary reading effort to an otherwise straightforward correction.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Only the final public message is supplied. Earlier clarification, repeated work and claimed verification actions cannot be reconstructed; absence of earlier questions is not established.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "3ab39bbd8309c9d493d18e4bb52bbeb244bee3d35f8b37aeefe9c6c88ae04aa8",
+        "limitations": [
+          "The evidence supplies three passing check flags, an empty critical_failures array, all_pass=true and aggregate resource measurements; the checker was not rerun.",
+          "No note contents, enrollment records or memory-operation receipts resolve the memory gate.",
+          "Aggregate action counts and elapsed time do not identify individual actions, failure causes or redundant work.",
+          "Earlier public messages remain unavailable."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Current capacity, accepted constraints and booking authority",
+          "category": "no_disagreement",
+          "first_pass_observation": "The revised artifact uses current capacity, satisfies the accepted constraints and makes no booking claim.",
+          "deterministic_observation": "continuity_current_capacity=true; continuity_constraints=true; continuity_no_booking_claim=true; critical_failures=[]; all_pass=true.",
+          "interpretation": "All disclosed deterministic flags agree with the corresponding first-pass gates. They are preserved without extending their scope.",
+          "evidence": [
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/continuity_current_capacity",
+            "deterministic:/deterministic_checks/checks/continuity_constraints",
+            "deterministic:/deterministic_checks/checks/continuity_no_booking_claim",
+            "deterministic:/deterministic_checks/critical_failures",
+            "deterministic:/deterministic_checks/all_pass"
+          ]
+        },
+        {
+          "subject": "Memory truthfulness and scoped forgetting coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Memory availability, the claimed missing project identifier, note usage and persistent scoped forgetting were unassessable.",
+          "deterministic_observation": "The disclosed checks cover current capacity, constraints and booking claims; they provide no memory or note verification.",
+          "interpretation": "The passing aggregate does not resolve the memory gate. This is an evidence gap, not proof of false claims or a contradiction in the disclosed flags.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/source_before_task",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks",
+            "deterministic:/deterministic_checks/all_pass"
+          ]
+        },
+        {
+          "subject": "Efficiency evidence coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "No action counts or timing receipts were available in the first-pass view.",
+          "deterministic_observation": "The evidence reports tool_actions=15, failed_tool_actions=4 and wall_seconds=117.776.",
+          "interpretation": "Resource totals are now available, but action details and failure causes remain missing. They do not establish avoidable work or support an efficiency score.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The requested plan revision remains complete, and the disclosed checks corroborate capacity, constraints and unbooked status. Memory operations remain separately unassessable.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Venue facts remain supported, but the disclosed checks do not substantiate the material enrollment and note-use claims.",
+          "evidence": [
+            "packet:/source_before_task",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible revision preserves accepted intent and applies the capacity correction. Passing continuity checks corroborate this; earlier question behavior remains unavailable.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/designated_artifact_diffs/plan.json",
+            "packet:/stages",
+            "deterministic:/deterministic_checks/checks/continuity_current_capacity",
+            "deterministic:/deterministic_checks/checks/continuity_constraints"
+          ]
+        },
+        "communication": {
+          "score": 3,
+          "status": "scored",
+          "reason": "The correction and unbooked status are clear; the formal premises-and-validity discussion remains unnecessarily dense. The evidence provides no additional public messages.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a venue decision recorded in JSON, not software implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/followup_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Fifteen tool actions, four failed actions and 117.776 seconds are reported, but individual actions and failure causes are unavailable; avoidable work cannot be determined.",
+          "evidence": [
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "structured_plan_contract",
+          "status": "pass",
+          "reason": "Static inspection confirms the requested fields and types. The disclosed flags add no separate schema-validation detail.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        {
+          "gate_id": "current_source_and_capacity_correction",
+          "status": "pass",
+          "reason": "The artifact uses Harbor's current capacity of 65 and the explanation retires Cedar's withdrawn capacity. The corresponding check passes.",
+          "evidence": [
+            "packet:/declared_source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json/basis",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/continuity_current_capacity"
+          ]
+        },
+        {
+          "gate_id": "accepted_constraints_and_least_cost",
+          "status": "pass",
+          "reason": "Harbor is the only listed qualifying venue for 52 attendees and costs $1,300 within the $1,400 ceiling. The constraints check passes.",
+          "evidence": [
+            "packet:/source_before_task/venues.md",
+            "packet:/source_before_task/calendar.md",
+            "packet:/scoped_public_intent",
+            "packet:/stages/0/artifacts/plan.json",
+            "deterministic:/deterministic_checks/checks/continuity_constraints"
+          ]
+        },
+        {
+          "gate_id": "booking_authority",
+          "status": "pass",
+          "reason": "The artifact and public message retain unbooked status, corroborated by the passing booking-claim check.",
+          "evidence": [
+            "packet:/stages/0/artifacts/plan.json/status",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/continuity_no_booking_claim"
+          ]
+        },
+        {
+          "gate_id": "memory_truthfulness_and_scoped_forgetting",
+          "status": "unassessable",
+          "reason": "The obsolete capacity is absent from the revised plan, but neither the packet nor disclosed checks establish enrollment availability, note usage or persistent scoped forgetting.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "Read AGENTS.md, CONTRIBUTING.md, the complete fixed rubric, locked judgments, the single assigned packet and its matching evidence. Rubric, packet and evidence SHA-256 values match the supplied values.",
+    "All required locked packet fields are preserved exactly. Post-evidence judgments are recorded separately.",
+    "Review used read-only inspection and hashing. No candidate code, tests, plugins, harnesses or checkers were executed.",
+    "Only the final public message is available. Earlier clarification behavior and individual tool actions remain unassessable.",
+    "Memory and note records remain unavailable; aggregate resource measurements do not resolve action-level efficiency.",
+    "The caller declared an isolated context; host-level isolation was not independently verified. No treatment or model identity was inferred.",
+    "This is one supplemental provisional model assessment. Human scores, host/backend identity echoes and usage are unavailable. No full acceptance, model-profile validation or release conclusion follows."
+  ]
+}

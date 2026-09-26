@@ -633,7 +633,11 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
                 embedded_bundle.write_bytes(_canonical_json(raw_bundle))
 
     if windows_native:
-        for guide in (output_path / "skills/opensocrates/references/decision").glob("guide.*.md"):
+        references = output_path / "skills/opensocrates/references"
+        for guide in [
+            *references.glob("decision/guide.*.md"),
+            *references.glob("documentation/guide.*.md"),
+        ]:
             guide.write_text(
                 guide.read_text(encoding="utf-8").replace("bin/launch.sh", "node bin/launch.mjs"),
                 encoding="utf-8",

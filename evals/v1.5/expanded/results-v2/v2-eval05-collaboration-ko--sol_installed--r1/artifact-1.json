@@ -1,0 +1,6 @@
+{
+  "artifacts": {
+    "plan.json": "{\n  \"attendees\": 40,\n  \"cost_usd\": 750,\n  \"approved_ceiling_usd\": 750,\n  \"budget_gap_usd\": 0,\n  \"venue\": \"Hall\",\n  \"status\": \"confirmed\",\n  \"memory_status\": \"unavailable\",\n  \"reason\": {\n    \"Loft\": \"stairs\",\n    \"Garden\": \"closes_early\"\n  },\n  \"required_question\": null,\n  \"side_answer\": {\n    \"capacity_is_limit\": true,\n    \"attendance_is_expected_count\": true\n  }\n}\n"
+  },
+  "public_final": "[plan.json](<disposable>/workspace/plan.json)을 작성하고 JSON 구조와 값의 형식을 셸에서 확인했습니다. **Hall**은 40명을 수용하고, 계단 없이 출입할 수 있으며, 17:00 종료 후에도 열려 있습니다. 비용은 승인된 상한과 같은 **$750**이므로 증액 질문은 없습니다. `confirmed`는 장소 선택 상태이며, 예약은 되어 있지 않습니다.\n\n판단의 전제(`premises`)는 options.md의 인원·접근성·시간·예산 조건이고, 암묵적 전제(`hidden_premises`)는 기재된 장소 정보가 현재도 유효하다는 것입니다. 규칙과 논증 형태(`rule`, `rule_or_form`)는 필수 조건을 모두 충족하는 장소를 승인 상한 안에서 선택하는 것이며, 결론(`conclusion`)은 Hall 선택입니다. 이 전제에서 결론은 타당합니다(`validity_verdict`). 전제 상태(`premise_status`)는 **사용자 제공**, 예산 차액 0은 **계산됨**입니다. 장소 정보는 별도로 검증되지 않아 현실 적용의 건전성(`soundness_verdict`)은 **조건부**입니다. Hall의 출입·수용 인원·폐관 시간 중 하나라도 다르면 전제가 무너지고(`invalidating_premise`), 장소 선택을 다시 검토해야 합니다(`flip_condition`).\n\nLoft 선호는 이번 계획에 반영해 검토했지만, 이번 실행에서는 프로젝트 메모리를 사용할 수 없어 다음 세션용으로 저장하지 못했습니다.\n\nOpenSocrates grounding: deduction@3"
+}

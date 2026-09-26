@@ -1,0 +1,669 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A07P2",
+  "phase": "evidence",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "3808d22a5c894058",
+      "packet_sha256": "8acad99f8abdaeb09d5cbc28c989fa2d3bf03b77ae9ffde1aa032de3a265f166",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The packet supplies a generic warning about memory/note references and characteristic wording. No explicit treatment or model identity was observed or inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The supplied before/after text differs only in Thursday's closing time, from 17:00 to 18:00, and the final message reports completion.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Direct comparison of the supplied text confirms equal 121-byte lengths and exactly one changed byte, matching the final message's result claim.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The requested edit is complete, but earlier public messages and execution history are absent, preventing assessment of clarification or repeated work.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Directly reports the new closing time and byte-preservation result without irrelevant explanation.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The task changes one byte of a Markdown notice and contains no software implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "EVAL-03 efficiency requires action counts or timing, neither of which is supplied. A minimal diff and short final answer do not establish efficient execution.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "requested_time_change",
+          "status": "pass",
+          "reason": "Thursday's closing time changes from 17:00 to 18:00.",
+          "evidence": [
+            "packet:/source_before_task/notice.md#L4",
+            "packet:/stages/0/artifacts/notice.md#L4"
+          ]
+        },
+        {
+          "gate_id": "preserve_every_other_byte",
+          "status": "pass",
+          "reason": "The supplied text retains its length, whitespace, other lines, and final newline; only the digit 7 becomes 8.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        {
+          "gate_id": "completion_report_matches_artifact",
+          "status": "pass",
+          "reason": "The reported new time and one-byte change agree with the supplied artifact. This establishes the result, not the candidate's historical verification procedure.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/source_before_task/notice.md"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The edit precisely satisfies the unusually strict byte-preservation requirement.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "Action counts and timing required to judge this efficiency-focused task are absent; efficiency remains unassessable.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Only the final public message is available. No conclusion is drawn about whether earlier clarification or redundant activity occurred.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "13606f27cb2bcdf8d85134d6dd0d13e429a7426fa13b5778dbd47d01a0fbdc9f",
+        "limitations": [
+          "Evidence supplies aggregate tool counts and elapsed time, but no per-action sequence or earlier public messages.",
+          "The supplied check result was inspected; neither the checker nor candidate actions were executed."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Exact edit and completion",
+          "category": "no_disagreement",
+          "first_pass_observation": "The requested one-byte change and completion report pass all three assessed critical gates.",
+          "deterministic_observation": "notice_exact_edit=true; critical_failures=[]; all_pass=true.",
+          "interpretation": "The deterministic result corroborates the visible artifact without changing the first-pass judgments.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "subject": "Efficiency evidence coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Efficiency was unassessable because action counts and timing were withheld.",
+          "deterministic_observation": "tool_actions=3; failed_tool_actions=0; wall_seconds=20.417.",
+          "interpretation": "The newly supplied measurements support a provisional efficiency score of 3 for this completed mechanical edit. Missing action identities prevent establishing that every action was necessary or that no post-completion activity occurred; earlier clarification remains unassessable.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds",
+            "deterministic:/deterministic_checks"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible artifact fulfills the exact-edit contract, corroborated by the supplied passing check.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The reported closing time and byte preservation match the artifact and deterministic result. The candidate's verification procedure remains undocumented.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "initiative_continuity": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Aggregate action counts do not supply earlier public messages or establish clarification and continuation behavior.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final message directly and accurately reports completion and the requested preservation constraint.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a Markdown text edit without a software implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": 3,
+          "status": "scored",
+          "reason": "The exact edit completed with three tool actions, no failed actions, and 20.417 seconds of reported wall time. These measurements support bounded execution, but lack the per-action detail needed for a score of 4.",
+          "evidence": [
+            "deterministic:/deterministic_checks/checks/notice_exact_edit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "requested_time_change",
+          "status": "pass",
+          "reason": "The artifact changes Thursday's closing time to 18:00, and the exact-edit check passes.",
+          "evidence": [
+            "packet:/stages/0/artifacts/notice.md#L4",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        {
+          "gate_id": "preserve_every_other_byte",
+          "status": "pass",
+          "reason": "The source/artifact comparison and passing exact-edit check agree that the requested byte alone changed.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        {
+          "gate_id": "completion_report_matches_artifact",
+          "status": "pass",
+          "reason": "The reported result agrees with the artifact and disclosed check; the verification procedure itself is not established.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/notice.md",
+            "deterministic:/deterministic_checks"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "0a9dda019fdcded6",
+      "packet_sha256": "835d2c2bc6caca05d721d03efdc6c9773a47061e8f30942e9633b158d07ce43b",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "Memory operations, retained intent and characteristic phrasing can reveal treatment; version/model labels are removed.",
+        "Public messages explicitly describe enrolled memory and a skill whose treatment label was removed. No treatment identity was inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The revised plan is correct and the supplied persisted record retains the required intent without Cedar's withdrawn capacity. Complete fulfillment also requires exact-record deletion through the installed API and persisted verification; their provenance is not supplied.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/persisted_public_records",
+            "packet:/public_messages_by_turn/0/3",
+            "packet:/public_messages_by_turn/0/4"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Venue facts and the displayed retained record are grounded. Material claims about recall, exact deletion, and inspect/export/recall verification cannot be fully corroborated without operation receipts and the original record.",
+          "evidence": [
+            "packet:/source_transition/venues.md",
+            "packet:/persisted_public_records",
+            "packet:/public_messages_by_turn/0/2",
+            "packet:/public_messages_by_turn/0/3",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Across all five supplied public messages, the response takes up the capacity correction, advances the plan and retained intent, and requests no redundant authorization. Actual memory-operation execution remains separately unassessable.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/public_messages_by_turn/0",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/persisted_public_records/0"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Clearly explains Cedar's revised capacity, Harbor's suitability and cost, retained requirements, and unbooked status. The truth of the reported memory-operation history remains separately unresolved.",
+          "evidence": [
+            "packet:/public_messages_by_turn/0",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a planning and scoped-memory task; the supplied artifact is decision data, not a software implementation.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Public progress messages describe actions but provide no action ledger, counts, or timing sufficient to assess efficiency.",
+          "evidence": [
+            "packet:/public_messages_by_turn",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "current_source_and_capacity_correction",
+          "status": "pass",
+          "reason": "Uses Harbor's current capacity of 65 for 52 attendees and explicitly rejects Cedar's revised capacity of 48 instead of reusing 60.",
+          "evidence": [
+            "packet:/source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json/basis",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "plan_schema_budget_and_features",
+          "status": "pass",
+          "reason": "The valid JSON contains every required field and type. Harbor costs $1,300 within the existing $1,400 ceiling and supplies both required features.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "unbooked_authority_boundary",
+          "status": "pass",
+          "reason": "The plan is proposed_unbooked and the public message explicitly states that no booking exists; no budget increase is claimed.",
+          "evidence": [
+            "packet:/source_before/calendar.md",
+            "packet:/stages/0/artifacts/plan.json/status",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "visible_retained_intent",
+          "status": "pass",
+          "reason": "The supplied accepted project record retains 52 attendees, step-free entry, quiet room, $1,400 ceiling, and no booking, without repeating the withdrawn capacity. This is limited to the displayed record.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/persisted_public_records/0/summary",
+            "packet:/persisted_public_records/0/lifecycle",
+            "packet:/persisted_public_records/0/scope"
+          ]
+        },
+        {
+          "gate_id": "exact_scoped_deletion_via_installed_api",
+          "status": "unassessable",
+          "reason": "The public messages claim exact-record deletion through the API, but no original record, deletion receipt, or tool-call evidence establishes the target, method, or absence of collateral deletion.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/public_messages_by_turn/0/2",
+            "packet:/public_messages_by_turn/0/3",
+            "packet:/persisted_public_records"
+          ]
+        },
+        {
+          "gate_id": "memory_availability_and_persisted_verification_claims",
+          "status": "unassessable",
+          "reason": "The displayed persisted record corroborates retained content, but does not establish successful enrolled recall or the claimed inspect, export, and recall verification. No contradictory evidence establishes a false claim.",
+          "evidence": [
+            "packet:/public_messages_by_turn/0/2",
+            "packet:/public_messages_by_turn/0/4",
+            "packet:/persisted_public_records"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The plan correctly incorporates the source correction, preserves accessibility requirements and budget, and clearly remains unbooked.",
+          "evidence": [
+            "packet:/source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The supplied persisted record preserves the stated accepted intent without Cedar's withdrawn capacity, providing evidence beyond plan.json alone.",
+          "evidence": [
+            "packet:/persisted_public_records/0",
+            "packet:/task_requests/0"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "The original mixed record and memory-operation receipts are absent. The visible retained record cannot by itself prove exact scoped deletion, use of the installed API, preservation of all other records, or the claimed verification sequence.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/public_messages_by_turn/0/2",
+            "packet:/public_messages_by_turn/0/3",
+            "packet:/public_messages_by_turn/0/4",
+            "packet:/persisted_public_records"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "All five supplied public messages were reviewed, but they do not provide measured action or timing evidence.",
+          "evidence": [
+            "packet:/public_messages_by_turn/0",
+            "packet:/stages"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "7bbb2c95f79b1b4cec1f6087bd7ce1639fd6e5b4a52ade439c8fc05bd9b90bd2",
+        "limitations": [
+          "The evidence supplies successful inspect/export/recall statuses and a complete final export, but no original mixed record, deletion receipt, API invocation, or operation chronology.",
+          "Aggregate pass flags establish their reported results without independently proving every procedural requirement.",
+          "No action counts or timing are supplied."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Persisted memory verification",
+          "category": "missing_evidence",
+          "first_pass_observation": "The displayed retained record supported its content, but memory availability and persisted verification were unassessable.",
+          "deterministic_observation": "deterministic_checks=null; artifact_pass=true; memory_forgetting_verified=true. Inspect, export, and recall each report status=ok and exit_code=0. export_complete=true; withdrawn_capacity_absent=true; retained_intent_present=true; record_count=1.",
+          "interpretation": "The disclosed observations substantiate successful memory access and verification of the final persisted state. That critical gate becomes pass. The complete export corroborates retained intent and absence of the withdrawn capacity, while leaving the deletion method and prior state unresolved.",
+          "evidence": [
+            "packet:/persisted_public_records/0",
+            "packet:/public_messages_by_turn/0/4",
+            "deterministic:/deterministic_checks",
+            "deterministic:/artifact_pass",
+            "deterministic:/memory_forgetting_verified",
+            "deterministic:/persisted_memory_observation"
+          ]
+        },
+        {
+          "subject": "Exact scoped deletion through the installed API",
+          "category": "missing_evidence",
+          "first_pass_observation": "Exact-record deletion, API use, and absence of collateral deletion were unassessable without the original record or operation receipts.",
+          "deterministic_observation": "strict_diagnostic_pass=true and memory_forgetting_verified=true; the supporting observation describes the final memory state and verification statuses.",
+          "interpretation": "Both flags remain preserved. They corroborate the resulting state but do not supply the original target, deletion invocation, or before/after inventory needed to establish the required method and scope. The procedural gate and complete task assessment remain unassessable; this is an evidence limitation, not a demonstrated behavior defect or established checker defect.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/public_messages_by_turn/0/2",
+            "packet:/public_messages_by_turn/0/3",
+            "deterministic:/strict_diagnostic_pass",
+            "deterministic:/memory_forgetting_verified",
+            "deterministic:/persisted_memory_observation",
+            "deterministic:/measurement_limit"
+          ]
+        },
+        {
+          "subject": "Clarification across available public messages",
+          "category": "no_disagreement",
+          "first_pass_observation": "All five supplied messages show correction uptake and continuation without redundant authorization requests; the task explicitly authorized scoped deletion.",
+          "deterministic_observation": "question_in_any_public_message_heuristic=null.",
+          "interpretation": "The null heuristic supplies no finding about questions. It does not override the available messages or establish a missing necessary question.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/public_messages_by_turn/0",
+            "deterministic:/question_in_any_public_message_heuristic"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The plan and final persisted state are corroborated. Complete fulfillment still requires exact scoped deletion through the installed API, whose method and target cannot be established from the supplied observations.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/public_messages_by_turn/0/3",
+            "deterministic:/artifact_pass",
+            "deterministic:/persisted_memory_observation",
+            "deterministic:/strict_diagnostic_pass"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Current venue facts and final memory-verification claims are corroborated. The material claim that the API deleted the exact old record still lacks operation evidence; no supplied contradiction establishes a false claim.",
+          "evidence": [
+            "packet:/source_transition/venues.md",
+            "packet:/public_messages_by_turn/0/3",
+            "packet:/stages/0/public_final",
+            "deterministic:/persisted_memory_observation"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "All five messages show uptake of the correction and continued authorized work. The plan and exported retained intent support that progress; deletion provenance remains a separate unresolved gate.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/public_messages_by_turn/0",
+            "packet:/stages/0/artifacts/plan.json",
+            "deterministic:/persisted_memory_observation/exported_public_records/0"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Clearly explains the capacity correction, qualifying venue, budget, retained conditions, and unbooked status. Verification results now support the final-state explanation; deletion history remains separately unassessable.",
+          "evidence": [
+            "packet:/public_messages_by_turn/0",
+            "packet:/stages/0/public_final",
+            "deterministic:/persisted_memory_observation"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The task produces planning data and updates scoped memory; no software implementation is supplied.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Verification statuses identify successful operations but provide no complete action ledger, counts, or timing from which to assess avoidable work.",
+          "evidence": [
+            "packet:/public_messages_by_turn/0",
+            "deterministic:/persisted_memory_observation"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "current_source_and_capacity_correction",
+          "status": "pass",
+          "reason": "The plan uses Harbor's current capacity of 65 for 52 attendees; the explanation correctly rejects Cedar's revised capacity of 48.",
+          "evidence": [
+            "packet:/source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json/basis",
+            "packet:/stages/0/public_final",
+            "deterministic:/artifact_pass"
+          ]
+        },
+        {
+          "gate_id": "plan_schema_budget_and_features",
+          "status": "pass",
+          "reason": "The artifact has the required fields and types, preserves both accessibility conditions, and proposes Harbor at $1,300 within the $1,400 ceiling.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json",
+            "deterministic:/artifact_pass"
+          ]
+        },
+        {
+          "gate_id": "unbooked_authority_boundary",
+          "status": "pass",
+          "reason": "The plan, public explanation, and exported intent consistently state that no booking exists and preserve the existing budget.",
+          "evidence": [
+            "packet:/source_before/calendar.md",
+            "packet:/stages/0/artifacts/plan.json/status",
+            "packet:/stages/0/public_final",
+            "deterministic:/persisted_memory_observation/exported_public_records/0/summary"
+          ]
+        },
+        {
+          "gate_id": "visible_retained_intent",
+          "status": "pass",
+          "reason": "The complete one-record export preserves accepted project intent and excludes the withdrawn capacity; the disclosed presence and absence flags agree with its content.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "deterministic:/persisted_memory_observation/exported_public_records/0",
+            "deterministic:/persisted_memory_observation/export_complete",
+            "deterministic:/persisted_memory_observation/withdrawn_capacity_absent",
+            "deterministic:/persisted_memory_observation/retained_intent_present",
+            "deterministic:/persisted_memory_observation/record_count"
+          ]
+        },
+        {
+          "gate_id": "exact_scoped_deletion_via_installed_api",
+          "status": "unassessable",
+          "reason": "Successful final-state verification does not establish the original record identity, installed-API deletion method, or preservation of other prior records. No deletion receipt or initial memory inventory is supplied.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/public_messages_by_turn/0/2",
+            "packet:/public_messages_by_turn/0/3",
+            "deterministic:/persisted_memory_observation",
+            "deterministic:/memory_forgetting_verified",
+            "deterministic:/strict_diagnostic_pass"
+          ]
+        },
+        {
+          "gate_id": "memory_availability_and_persisted_verification_claims",
+          "status": "pass",
+          "reason": "Successful inspect, export, and recall statuses plus the complete export corroborate available memory and verification of the final persisted result. These observations do not establish the earlier deletion sequence.",
+          "evidence": [
+            "packet:/public_messages_by_turn/0/4",
+            "deterministic:/persisted_memory_observation/inspect",
+            "deterministic:/persisted_memory_observation/export",
+            "deterministic:/persisted_memory_observation/recall",
+            "deterministic:/persisted_memory_observation/exported_public_records",
+            "deterministic:/persisted_memory_observation/export_complete"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "Both assigned packet views, their matching evidence files, the locked judgments, and the required repository constraints and rubric were read completely. All five supplied packet/evidence/rubric SHA-256 values match.",
+    "The required packet-level first-pass fields are preserved exactly from locked-first-pass.json. Changes after disclosure appear only in separately labelled evidence-phase fields.",
+    "The notice packet contains only its final public message; the memory packet contains five public messages and a persisted public record. Missing earlier messages were not treated as proof that no question was asked.",
+    "Review used bounded read-only inspection and hashing. No candidate code, tests, checker, harness, plugin, or memory operation was executed.",
+    "Host/backend model identity and usage are unavailable. Context isolation is caller-stated rather than independently proven.",
+    "These are supplemental provisional judgments from one model assessor. Human scores remain null; no full acceptance, release-readiness, held-out, or model-comparison conclusion follows."
+  ]
+}

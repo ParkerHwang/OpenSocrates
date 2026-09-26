@@ -1,0 +1,165 @@
+{
+  "schema": "opensocrates.v1.5.memory-pilot-freeze/1.0.0",
+  "revision": 1,
+  "status": "frozen_before_outcomes_partial_pilot",
+  "parent_protocol_sha256": "sha256:6595b4c268989af55cd6b002c4a740af7c1ee81edcd825f830460eca6199522e",
+  "fixture_manifest_sha256": "sha256:a719476c7dd50e3ac3b5008acb36c113614efc0bef184599bec552d701294097",
+  "source_commit": "efeb436aeb80dabd9a3df9571e66a3de280eadad",
+  "client": {
+    "path": "/Applications/ChatGPT.app/Contents/Resources/codex",
+    "version": "0.155.0-alpha.16.3",
+    "sha256": "sha256:c67698d0990aae05211d9c43ab343ad9517e406824dea77eca103a2806232b3a"
+  },
+  "tuple": {
+    "model": "gpt-6-sol",
+    "effort": "medium",
+    "account": "existing ChatGPT Pro",
+    "per_session_wall_minutes": 30,
+    "tools": "same local shell/file access; no network requirement; disposable projects",
+    "session": "--ephemeral; unique disposable CODEX_HOME with only copied auth; native memory import disabled; no previous thread"
+  },
+  "package": {
+    "candidate_source_commit": "efeb436aeb80dabd9a3df9571e66a3de280eadad",
+    "candidate_runtime_sha256": "sha256:e94fd8da5ca6ff55d6f434713c4babd5dd301e3806add8c35750cc470c591dc8",
+    "candidate_skill_sha256": "sha256:96b0f92180acffaa78900d5fc77ef7f7080f6c8e180a19a0a2563280bef510c9",
+    "released_v14": "1.4.0 installed artifact; hash recorded at run setup"
+  },
+  "claim_boundary": "Engineering pilot only; no superiority, noninferiority, efficiency, or memory-effect claim. Human blinded judge unavailable. Native server-side memories remain an isolation uncertainty even with disposable local profile.",
+  "attempt_policy": "Keep every first attempt, invalid request, repair, timeout, failure, retrieval and tool call; null usage is missing, not zero.",
+  "lanes": {
+    "EVAL-01": {
+      "status": "selected_partial_pilot",
+      "fixture": "coding-untracked-caller",
+      "arms": [
+        "ordinary Codex",
+        "released v1.4.0",
+        "v1.5 guidance without memory",
+        "v1.5 guidance with enrolled memory"
+      ],
+      "episode_count_per_arm": 1,
+      "models": [
+        "gpt-6-sol"
+      ],
+      "sessions_per_episode": 2,
+      "paired_replay": [
+        "v1.5 guidance without memory",
+        "v1.5 guidance with enrolled memory"
+      ],
+      "first_session_request": "Add lowercase hyphen-separated labels by extending suitable existing code. Keep the API caller working and run relevant tests.",
+      "followup_request": "A new untracked CLI caller has been added. Make all whitespace act as one separator in the shared label behavior, keep the API caller working, and verify both paths.",
+      "initial_files": {
+        "helper.py": "def normalize_label(value: str) -> str:\n    return value.strip().lower()\n",
+        "api.py": "from helper import normalize_label\n\ndef public_key(value: str) -> str:\n    return normalize_label(value)\n",
+        "test_api.py": "from api import public_key\n\ndef test_public_key():\n    assert public_key(\" Quick Start \") == \"quick start\"\n"
+      },
+      "source_transition": {
+        "added_untracked_file": "cli.py",
+        "content": "from helper import normalize_label\n\ndef command_tag(value: str) -> str:\n    return normalize_label(value)\n"
+      },
+      "accepted_intent": "The shared normalize_label helper owns label normalization for API and CLI callers; preserve public_key behavior and check every current caller.",
+      "hidden_gates": [
+        "API labels normalize all whitespace to hyphens",
+        "CLI labels normalize tabs and repeated spaces",
+        "no duplicate normalizer",
+        "relevant tests pass",
+        "untracked caller detected or inspected"
+      ],
+      "replay_rule": "Freeze one actual first-session source artifact and enrolled public memory state before revealing the follow-up; copy identical source bytes to C and D. Do not combine replay with naturalistic arm estimates."
+    },
+    "EVAL-04": {
+      "status": "selected_partial_pilot",
+      "arms": [
+        "memory disabled",
+        "v1.5 memory enabled",
+        "maintained visible project note"
+      ],
+      "models": [
+        "gpt-6-sol"
+      ],
+      "fixtures": [
+        {
+          "id": "general-event-correction",
+          "workspace_kind": "directory",
+          "initial_files": {
+            "venue.md": "Capacity: 40.\nStep-free access is required.\nA quiet room is preferred.\n",
+            "plan.md": "Plan for up to 40 attendees. Confirm a step-free venue and ask about a quiet room. Next: request a venue hold.\n"
+          },
+          "transition": {
+            "venue.md": "Capacity: 24.\nA quiet room is preferred.\n"
+          },
+          "followup_request": "Update the event plan for a revised capacity of 24 and 20 expected guests. State the next concrete booking action.",
+          "accepted_intent": "Keep step-free venue access as a binding requirement even when capacity changes.",
+          "visible_note": "Project decision: Keep step-free venue access as a binding requirement even when capacity changes.",
+          "gates": [
+            "uses capacity 24 and attendance 20",
+            "retains step-free access",
+            "changes plan artifact",
+            "next booking action",
+            "does not invent renewed authorization"
+          ]
+        },
+        {
+          "id": "research-evidence-revision",
+          "workspace_kind": "directory",
+          "initial_files": {
+            "brief.md": "Source A (2026-01): 18 of 30 synthetic trials favored option Cedar. Small sample; selection bias unknown.\nSource B (2026-02): 8 of 12 synthetic trials favored option Cedar. Small sample; selection bias unknown.\n",
+            "finding.md": "Cedar is provisionally favored by two small synthetic sources. The samples may be biased.\n"
+          },
+          "transition": {
+            "new-study.md": "Source C (2026-03): 44 of 60 synthetic trials favored option Birch under the same measure; sample selection recorded.\n"
+          },
+          "followup_request": "Revisit the conclusion using the new document, preserve earlier uncertainty, and write the updated finding with source dates.",
+          "accepted_intent": "Treat the Cedar conclusion as provisional and retain its small-sample/selection-bias limits when revising it.",
+          "visible_note": "Project decision: Treat the Cedar conclusion as provisional and retain its small-sample/selection-bias limits when revising it.",
+          "gates": [
+            "identifies new Birch-favoring source C",
+            "retains prior Cedar uncertainty",
+            "does not present accepted intent as measured fact",
+            "updates finding artifact",
+            "uses source dates"
+          ]
+        },
+        {
+          "id": "coding-untracked-caller",
+          "workspace_kind": "git_worktree",
+          "initial_files": {
+            "helper.py": "def normalize_label(value: str) -> str:\n    return \"-\".join(value.strip().lower().split(\" \"))\n",
+            "api.py": "from helper import normalize_label\n\ndef public_key(value: str) -> str:\n    return normalize_label(value)\n",
+            "test_api.py": "from api import public_key\n\ndef test_public_key():\n    assert public_key(\" Quick Start \") == \"quick-start\"\n"
+          },
+          "transition": {
+            "cli.py": "from helper import normalize_label\n\ndef command_tag(value: str) -> str:\n    return normalize_label(value)\n"
+          },
+          "followup_request": "A new untracked CLI caller uses the shared normalizer. Make tabs and repeated whitespace one hyphen separator while preserving API behavior; verify both paths.",
+          "accepted_intent": "The shared normalize_label helper owns API and CLI label normalization; check current callers before changing it.",
+          "visible_note": "Project decision: The shared normalize_label helper owns API and CLI label normalization; check current callers before changing it.",
+          "gates": [
+            "API output preserved",
+            "CLI tab/repeated whitespace correct",
+            "untracked caller inspected",
+            "no duplicate helper",
+            "relevant tests run"
+          ]
+        }
+      ],
+      "paired_replay": true,
+      "note_control_rule": "Visible project note contains the same accepted-intent sentence as memory, authored before follow-up and exposed only to note arm.",
+      "memory_rule": "Memory arm enrolls only disposable project and stores accepted public intent under the declared policy before follow-up."
+    }
+  },
+  "grading": {
+    "functional_first": true,
+    "rubric": "Each listed gate scored pass/fail/unknown from final artifact and deterministic tests; independent human quality judgment unavailable.",
+    "resource_fields": [
+      "input_tokens",
+      "cached_input_tokens",
+      "output_tokens",
+      "reasoning_output_tokens",
+      "wall_seconds",
+      "tool_commands",
+      "memory_calls",
+      "failed_attempts"
+    ],
+    "missing_fields_null": true
+  }
+}

@@ -53,6 +53,9 @@ docs-check:
 		--path docs/advanced-usage.ko.md \
 		--path docs/decision-points.md \
 		--path docs/decision-points.ko.md \
+		--path docs/project-memory-development.md \
+		--path docs/official-documentation.md \
+		--path docs/official-documentation.ko.md \
 		--path README.md \
 		--path README.ko.md \
 		--path CHANGELOG.md \
@@ -95,10 +98,18 @@ package-check: generate
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_package_docs_mutations.py
 
 security-scan: generate
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_security_scan_memory.py
 	@set -eu; set -- --artifact content/compiled-content.bundle.json --artifact content/compiled-reasoning-content.bundle.json; for artifact in $$(find "$(ROOT)/dist/runtime" -type f -name opensocrates-runtime -perm -111 2>/dev/null); do set -- "$$@" --artifact "$${artifact#$(ROOT)/}"; done; for artifact in "$(ROOT)"/dist/opensocrates-*.zip; do if [ -f "$$artifact" ]; then set -- "$$@" --artifact "$${artifact#$(ROOT)/}"; fi; done; PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_sbom.py --root "$(ROOT)" --output build/evidence/sbom.spdx.json --report build/evidence/sbom.json "$$@"
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/security_scan.py --root "$(ROOT)" --report build/evidence/security-scan.json
 
 smoke:
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_decision_recovery.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_task_verification.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_documentation.py
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_v15_revision.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_assistance.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_memory_sources.py
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_project_memory.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_public_release_verification.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_response_policy.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_release_identity.py

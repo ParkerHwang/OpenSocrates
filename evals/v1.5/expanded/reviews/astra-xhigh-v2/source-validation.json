@@ -1,0 +1,27 @@
+{
+  "schema": "opensocrates.review-source-validation/1.0.0",
+  "checked_at_utc": "2026-09-24T05:21:43.214782+00:00",
+  "checked_commit": "ae03321843018a0e4a3b625ba19cfe2b62af9669",
+  "tracked_product_source_changes": false,
+  "worktree_note": "Uncommitted changes are review synthesis/verifier helpers and evidence; the original user agent definition remains untracked and preserved. No product, guide, schema, package template or generated input changed in this review lane.",
+  "command": "make bootstrap format-check lint generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check",
+  "exit_code": 0,
+  "log_sha256": "0917f8e20b0755809ff56e50e9e156724e956d2b8e1d65c170ced7a61c8cece3",
+  "environment": {
+    "system": "Darwin",
+    "machine": "arm64"
+  },
+  "historical_integrity": {
+    "command": "python3 evals/v1.5/verify_pilot_results.py",
+    "result": "PASS: 40 final model cells and 21 memory cells"
+  },
+  "baseline_audit": {
+    "command": "python3 evals/v1.5/expanded/verify_baseline_v2.py",
+    "result": "PASS: 21 frozen files, all 109 declared calls accounted with retained missingness"
+  },
+  "native_local_check": {
+    "run": false,
+    "reason": "Review-only change; no native source/package inputs changed. Prior native receipt remains scoped to its commit; exact final-head hosted native CI is reported in the PR."
+  },
+  "outcome_cells_rerun": 0
+}

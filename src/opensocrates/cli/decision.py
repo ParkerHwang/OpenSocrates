@@ -16,6 +16,19 @@ from ..selector.decision import DecisionSession
 MAX_REQUEST_CHARS = 16384
 
 
+def _unique_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    value: dict[str, object] = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError("duplicate_json_key")
+        value[key] = item
+    return value
+
+
+def _reject_constant(value: str) -> None:
+    raise ValueError("invalid_json_constant")
+
+
 def run_decision(stdin: TextIO, stdout: TextIO, *, stream: bool = False) -> int:
     try:
         # A missing installed pair must not fall back to workspace-controlled content.
@@ -48,10 +61,24 @@ def run_decision(stdin: TextIO, stdout: TextIO, *, stream: bool = False) -> int:
             stdout.flush()
             return 0
         try:
-            request = json.loads(payload)
-            response = session.handle(request)
-        except Exception:
-            response = session._failure("decision_unavailable")
+            request = json.loads(
+                payload, object_pairs_hook=_unique_object, parse_constant=_reject_constant
+            )
+        except (ValueError, RecursionError):
+            response = session._failure(
+                "decision_unavailable",
+                {
+                    "code": "one_json_object_required",
+                    "field_path": "$",
+                    "transport": "ndjson_stream" if stream else "single_document",
+                    "repair": "Use unique keys and valid JSON; multiple requests need --stream, one document per line.",
+                },
+            )
+        else:
+            try:
+                response = session.handle(request)
+            except Exception:
+                response = session._failure("decision_unavailable")
         stdout.write(json.dumps(response, ensure_ascii=False, sort_keys=True) + "\n")
         stdout.flush()
         if not stream:

@@ -1,0 +1,425 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A02P2",
+  "phase": "first_pass",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "8f6e753b628683fa",
+      "packet_sha256": "9a05db6ff7b7dae9243b2906970f75680363d6d3c327016084ac20ed8b43f527",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "Packet-declared warning: Memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed.",
+        "packet:/source_before_task/options.md and both public finals explicitly disclose unavailable project memory."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The plan incorporates 48 attendees, selects River, preserves the approved ceiling, records the $100 gap, and requests the necessary approval.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/plan.json",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Venue eligibility, costs, exclusion reasons, memory availability, and the capacity-versus-attendance explanation match the supplied facts.",
+          "evidence": [
+            "packet:/source_before_task/options.md",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/1/artifacts/plan.json",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible stages advance from Hall for 40 attendees to River for 48, answer the side question, and present the remaining budget decision after completing the plan.",
+          "evidence": [
+            "packet:/stages/0",
+            "packet:/stages/1"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final response naturally explains the venue constraint, defines both terms, states memory and booking limits, and explicitly asks for the $100 increase.",
+          "evidence": [
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a planning task with a structured data deliverable, not a software implementation.",
+          "evidence": [
+            "packet:/initial_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The packet supplies stage results but no action counts, timing, or complete execution history.",
+          "evidence": [
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "structured_plan_contract",
+          "status": "pass",
+          "reason": "Both artifact strings parse as JSON and use the requested fields, value types, and status codes.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/1/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "initial_source_grounded_selection",
+          "status": "pass",
+          "reason": "Hall accommodates the original 40 attendees within $750; Loft has stairs and Garden closes before the workshop ends.",
+          "evidence": [
+            "packet:/source_before_task/options.md",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "attendance_correction_and_venue_constraints",
+          "status": "pass",
+          "reason": "The corrected plan uses 48 attendees and River; Hall's capacity of 45 is correctly disqualifying.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/source_before_task/options.md",
+            "packet:/stages/1/artifacts/plan.json/attendees",
+            "packet:/stages/1/artifacts/plan.json/venue",
+            "packet:/stages/1/artifacts/plan.json/reason"
+          ]
+        },
+        {
+          "gate_id": "budget_authority_and_increase_amount",
+          "status": "pass",
+          "reason": "The approved ceiling remains $750, River costs $850, and both budget_gap_usd and required_question.amount_usd correctly contain the $100 increase.",
+          "evidence": [
+            "packet:/stages/1/artifacts/plan.json/approved_ceiling_usd",
+            "packet:/stages/1/artifacts/plan.json/cost_usd",
+            "packet:/stages/1/artifacts/plan.json/budget_gap_usd",
+            "packet:/stages/1/artifacts/plan.json/required_question",
+            "packet:/stages/1/artifacts/plan.json/status"
+          ]
+        },
+        {
+          "gate_id": "necessary_approval_question_asked",
+          "status": "pass",
+          "reason": "The final message explicitly asks, 'Do you approve a $100 increase to the venue budget?'",
+          "evidence": [
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "gate_id": "side_question_answered_and_work_advanced",
+          "status": "pass",
+          "reason": "The public answer explains capacity as the maximum and attendance as the expected count; the revised plan is also delivered.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "memory_and_booking_claims",
+          "status": "pass",
+          "reason": "Both messages disclose unavailable memory and explicitly avoid claiming a booking. The corrected plan remains pending approval.",
+          "evidence": [
+            "packet:/source_before_task/options.md",
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/plan.json/memory_status",
+            "packet:/stages/1/artifacts/plan.json/status"
+          ]
+        },
+        {
+          "gate_id": "no_reconfirmation_of_settled_ceiling_across_full_turn",
+          "status": "unassessable",
+          "reason": "Neither supplied final reconfirms $750, but earlier public messages are absent, so compliance across the entire turn cannot be established.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The correction changes the venue without treating the larger cost as authorized. The artifact and public question consistently request an additional $100.",
+          "evidence": [
+            "packet:/stages/1/artifacts/plan.json",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The side answer is explained in user-facing prose, rather than established only by structured booleans. Memory limitations are stated truthfully in both stages.",
+          "evidence": [
+            "packet:/source_before_task/options.md",
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Only stage-final public messages are available. Earlier clarification behavior, exact action ordering, and execution efficiency cannot be reconstructed.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "28931385f4a0932b",
+      "packet_sha256": "712d9c19280f6e7644d5a2cc54c0a2da2c267e40e0cefcb31924e0a1283065e5",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "Packet-declared warning: Memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed.",
+        "packet:/scoped_public_intent exposes an accepted prior decision, and packet:/source_before_task/notes.md contains explicitly historical guidance."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 3,
+          "status": "scored",
+          "reason": "The new API correctly uses current catalog data and shares validated savings arithmetic. However, accepted in-range fractional seats produce floats despite the stated integer-result contract.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/offer.py#L6",
+            "packet:/stages/0/artifacts/offer.py#L10",
+            "packet:/stages/0/artifacts/offer.py#L13"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 3,
+          "status": "scored",
+          "reason": "The catalog-use description matches the code, but the integer-return claim is unconditional despite the fractional-seat case. Reported checks and catalog preservation also lack receipts.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/offer.py",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible follow-up preserves the accepted lookup authority, extends the API, and avoids copying the historical squad mapping. Earlier-session behavior is unavailable.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/declared_source_transition/catalog.py",
+            "packet:/stages/0/artifacts/offer.py"
+          ]
+        },
+        "communication": {
+          "score": 3,
+          "status": "scored",
+          "reason": "The report clearly explains the API and source authority, but overstates the integer-return guarantee for inputs the implementation accepts.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/offer.py#L8",
+            "packet:/stages/0/artifacts/offer.py#L10"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 3,
+          "status": "scored",
+          "reason": "Delegating quote to breakdown gives both APIs one catalog and validation path. The inherited seat-type gap remains and now affects both result forms.",
+          "evidence": [
+            "packet:/source_before_task/offer.py",
+            "packet:/stages/0/artifacts/offer.py#L3",
+            "packet:/stages/0/artifacts/offer.py#L6"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Action counts, timing, retrieval history, and execution receipts are unavailable.",
+          "evidence": [
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "current_catalog_authority",
+          "status": "pass",
+          "reason": "breakdown calls lookup and obtains code, price, and seat limit from its result. The current catalog resolves squad to studio; no historical mapping is copied.",
+          "evidence": [
+            "packet:/declared_source_transition/catalog.py",
+            "packet:/source_before_task/notes.md",
+            "packet:/stages/0/artifacts/offer.py#L7",
+            "packet:/stages/0/artifacts/offer.py#L14"
+          ]
+        },
+        {
+          "gate_id": "api_signatures_and_shared_calculation",
+          "status": "pass",
+          "reason": "Both functions expose savings_cents=0, and quote returns the total from breakdown rather than duplicating the calculation.",
+          "evidence": [
+            "packet:/stages/0/artifacts/offer.py#L3",
+            "packet:/stages/0/artifacts/offer.py#L6"
+          ]
+        },
+        {
+          "gate_id": "savings_validation",
+          "status": "pass",
+          "reason": "The exact integer-type check rejects booleans and other types; negative and above-subtotal savings raise ValueError, while zero and full savings are permitted.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/offer.py#L11"
+          ]
+        },
+        {
+          "gate_id": "current_seat_limits",
+          "status": "pass",
+          "reason": "The numeric bounds check uses the selected current plan's max_seats and rejects counts below one or above that limit.",
+          "evidence": [
+            "packet:/declared_source_transition/catalog.py",
+            "packet:/stages/0/artifacts/offer.py#L8"
+          ]
+        },
+        {
+          "gate_id": "integer_result_contract",
+          "status": "fail",
+          "reason": "The request does not declare an integer-only seats domain. By static evaluation, starter with seats=1.5 passes the 1-to-5 bounds check and produces subtotal and total 1500.0, so quote and breakdown violate the stated integer results. This gap is inherited from the supplied source.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/declared_source_transition/catalog.py",
+            "packet:/source_before_task/offer.py",
+            "packet:/stages/0/artifacts/offer.py#L8",
+            "packet:/stages/0/artifacts/offer.py#L10",
+            "packet:/stages/0/artifacts/offer.py#L17"
+          ]
+        },
+        {
+          "gate_id": "breakdown_fields_and_arithmetic",
+          "status": "pass",
+          "reason": "For integer seat counts, breakdown returns the requested keys, the current string plan code, and correct subtotal-minus-savings arithmetic.",
+          "evidence": [
+            "packet:/declared_source_transition/catalog.py",
+            "packet:/stages/0/artifacts/offer.py#L13"
+          ]
+        },
+        {
+          "gate_id": "verification_execution_claims",
+          "status": "unassessable",
+          "reason": "The claimed plan, boundary, and invalid-input checks have no supplied execution receipts.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "gate_id": "catalog_unchanged_claim",
+          "status": "unassessable",
+          "reason": "The final message says catalog.py was left untouched, but only offer.py is supplied as a final artifact; no complete final filesystem snapshot is available.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "behavior_defect",
+          "severity": "major",
+          "finding": "The final implementation retains an inherited input-validation gap: an in-range fractional seat count such as 1.5 is accepted and yields floating-point subtotal and total values. The unconditional integer-result contract therefore is not enforced. This conclusion is static; candidate code was not executed.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/source_before_task/offer.py",
+            "packet:/declared_source_transition/catalog.py",
+            "packet:/stages/0/artifacts/offer.py#L8",
+            "packet:/stages/0/artifacts/offer.py#L10",
+            "packet:/stages/0/artifacts/offer.py#L17"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "Both APIs share the current lookup and savings validation, so later catalog price, alias, code, or limit changes do not require duplicated edits in offer.py.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/stages/0/artifacts/offer.py#L3",
+            "packet:/stages/0/artifacts/offer.py#L7"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Only the follow-up artifact and final message are supplied. Earlier-session behavior, verification execution, and the claimed untouched final catalog cannot be independently established.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "All four assigned packet views were read completely; their SHA-256 values and the fixed rubric hash match the supplied values.",
+    "Review used static inspection, JSON parsing, hashing, and comparison of supplied artifact content. No candidate code, tests, harnesses, or plugins were executed.",
+    "Deterministic evidence was withheld and was neither searched for nor inspected.",
+    "Packets provide designated artifacts and stage-final public messages, not full interaction histories, execution receipts, or complete final filesystem snapshots.",
+    "Blinding is conservatively marked limited because every packet declares a blinding caveat. No treatment, provider, or model identity was inferred.",
+    "The configured reviewer definition was read. Host/backend identity, usage, and host memory isolation were not independently available or verified.",
+    "All judgments are supplemental provisional model assessments. Human scores remain missing; these ratings establish no acceptance, release, held-out, or comparative-performance claim."
+  ]
+}

@@ -1,0 +1,300 @@
+{
+  "operations": [
+    {
+      "operation": "inspect",
+      "request_id": "c65c0a28-9eb8-4ac8-9cc0-7e5c367dc33f",
+      "exit_code": 0,
+      "wall_seconds": 0.124,
+      "stdout_sha256": "addd4dc7baecaa41350890a52f95683437340be99d1909dbdf7efa76cbf12b23",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "ok"
+    },
+    {
+      "operation": "export",
+      "request_id": "a7005271-7fa3-4e87-937b-7d2a3ec1dc23",
+      "exit_code": 0,
+      "wall_seconds": 0.13,
+      "stdout_sha256": "13cfa333543c2779221f7754a178fcfa1e4c6b52a67e1809dd118fcb1c1d72da",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "ok"
+    },
+    {
+      "operation": "recall",
+      "request_id": "80da5dba-eddd-43c7-a00f-202a361525d0",
+      "exit_code": 0,
+      "wall_seconds": 0.218,
+      "stdout_sha256": "f99cff309949292ca9aa39b177dcd0de84fa4bb73cb92d682e8465b181ec9919",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "ok"
+    }
+  ],
+  "records": [
+    {
+      "conflict_ids": [],
+      "created_at": "2026-09-26T01:18:42Z",
+      "freshness": "unknown",
+      "kind": "decision",
+      "lifecycle": "accepted",
+      "origin": {
+        "attestation": "operator_declared",
+        "producer_kind": "agent",
+        "source_reference": "fixture:practical-user-intent"
+      },
+      "payload": null,
+      "project_id": "f049ef4e-bb0c-4a94-b91c-8480bfdb540f",
+      "rationale": null,
+      "record_id": "2bab3b70-3b2f-4506-a953-9b131cd605bb",
+      "revalidation": {
+        "dependency_paths": [],
+        "negative_claim": false,
+        "on_change": "not_applicable"
+      },
+      "schema": "opensocrates.project-memory.record/1.0.0",
+      "scope": {
+        "level": "project"
+      },
+      "snapshot_id": null,
+      "source_refs": [],
+      "summary": "Use pricing.rules() as current shipping authority and reuse pricing.subtotal() for integer seat validation. Keep invoice.quote callable with two arguments. Do not copy tariff constants into callers.",
+      "supersedes": null,
+      "support": "agent_reported",
+      "updated_at": "2026-09-26T01:18:42Z",
+      "version": 2
+    },
+    {
+      "conflict_ids": [],
+      "created_at": "2026-09-26T01:20:21Z",
+      "freshness": "unknown",
+      "kind": "decision",
+      "lifecycle": "accepted",
+      "origin": {
+        "attestation": "agent_reported_user_instruction",
+        "producer_kind": "agent",
+        "source_reference": "user:current-request"
+      },
+      "payload": null,
+      "project_id": "f049ef4e-bb0c-4a94-b91c-8480bfdb540f",
+      "rationale": null,
+      "record_id": "3d53fca2-323d-4621-a75a-33801a10254b",
+      "revalidation": {
+        "dependency_paths": [],
+        "negative_claim": false,
+        "on_change": "not_applicable"
+      },
+      "schema": "opensocrates.project-memory.record/1.0.0",
+      "scope": {
+        "level": "project"
+      },
+      "snapshot_id": null,
+      "source_refs": [],
+      "summary": "invoice.quote keeps member=False for two-argument callers. An eligible member discount is original merchandise subtotal // 10 when that subtotal is at least 5000 cents; domestic free shipping compares post-discount merchandise with the current pricing.rules() threshold. Every nonempty international order pays the international fee, including zero-priced orders; empty orders have no shipping. Reuse pricing.subtotal() for exact integer validation.",
+      "supersedes": null,
+      "support": "agent_reported",
+      "updated_at": "2026-09-26T01:20:27Z",
+      "version": 2
+    },
+    {
+      "conflict_ids": [],
+      "created_at": "2026-09-26T01:22:27Z",
+      "freshness": "unknown",
+      "kind": "decision",
+      "lifecycle": "accepted",
+      "origin": {
+        "attestation": "agent_reported_user_instruction",
+        "producer_kind": "agent",
+        "source_reference": "user:current-request"
+      },
+      "payload": null,
+      "project_id": "f049ef4e-bb0c-4a94-b91c-8480bfdb540f",
+      "rationale": null,
+      "record_id": "c4f21e59-d506-4185-91d5-ef7eb6a4bd51",
+      "revalidation": {
+        "dependency_paths": [],
+        "negative_claim": false,
+        "on_change": "not_applicable"
+      },
+      "schema": "opensocrates.project-memory.record/1.0.0",
+      "scope": {
+        "level": "project"
+      },
+      "snapshot_id": null,
+      "source_refs": [],
+      "summary": "Expose invoice.breakdown as a public alias of invoice.quote so both return the same pricing result; use current pricing.rules() tariffs and preserve the existing member, empty-order, free-item, and integer-seat behavior.",
+      "supersedes": null,
+      "support": "agent_reported",
+      "updated_at": "2026-09-26T01:22:35Z",
+      "version": 2
+    }
+  ],
+  "export_complete": true,
+  "recall": {
+    "limitations": [],
+    "request_id": "80da5dba-eddd-43c7-a00f-202a361525d0",
+    "result": {
+      "application": "unverified",
+      "budget_bytes": 8192,
+      "capabilities": {
+        "python": "ast",
+        "text": "lexical"
+      },
+      "checked_snapshot": "cff133dc-a6d7-4094-b8ed-88c4655b9894",
+      "checkpoint_reference": null,
+      "conflicts": [],
+      "constraints": [
+        {
+          "freshness": "not_applicable",
+          "record_id": "2bab3b70-3b2f-4506-a953-9b131cd605bb",
+          "text": "Use pricing.rules() as current shipping authority and reuse pricing.subtotal() for integer seat validation. Keep invoice.quote callable with two arguments. Do not copy tariff constants into callers."
+        },
+        {
+          "freshness": "not_applicable",
+          "record_id": "3d53fca2-323d-4621-a75a-33801a10254b",
+          "text": "invoice.quote keeps member=False for two-argument callers. An eligible member discount is original merchandise subtotal // 10 when that subtotal is at least 5000 cents; domestic free shipping compares post-discount merchandise with the current pricing.rules() threshold. Every nonempty international order pays the international fee, including zero-priced orders; empty orders have no shipping. Reuse pricing.subtotal() for exact integer validation."
+        },
+        {
+          "freshness": "not_applicable",
+          "record_id": "c4f21e59-d506-4185-91d5-ef7eb6a4bd51",
+          "text": "Expose invoice.breakdown as a public alias of invoice.quote so both return the same pricing result; use current pricing.rules() tariffs and preserve the existing member, empty-order, free-item, and integer-seat behavior."
+        }
+      ],
+      "decisions": [
+        {
+          "freshness": "not_applicable",
+          "record_id": "2bab3b70-3b2f-4506-a953-9b131cd605bb",
+          "summary": "Use pricing.rules() as current shipping authority and reuse pricing.subtotal() for integer seat validation. Keep invoice.quote callable with two arguments. Do not copy tariff constants into callers."
+        },
+        {
+          "freshness": "not_applicable",
+          "record_id": "3d53fca2-323d-4621-a75a-33801a10254b",
+          "summary": "invoice.quote keeps member=False for two-argument callers. An eligible member discount is original merchandise subtotal // 10 when that subtotal is at least 5000 cents; domestic free shipping compares post-discount merchandise with the current pricing.rules() threshold. Every nonempty international order pays the international fee, including zero-priced orders; empty orders have no shipping. Reuse pricing.subtotal() for exact integer validation."
+        },
+        {
+          "freshness": "not_applicable",
+          "record_id": "c4f21e59-d506-4185-91d5-ef7eb6a4bd51",
+          "summary": "Expose invoice.breakdown as a public alias of invoice.quote so both return the same pricing result; use current pricing.rules() tariffs and preserve the existing member, empty-order, free-item, and integer-seat behavior."
+        }
+      ],
+      "delivery": "emitted",
+      "excluded_scope": [],
+      "expansion_handle": null,
+      "pack_id": "6fa1b72e-9f08-4e6d-a57d-732adf7fc21d",
+      "project_id": "f049ef4e-bb0c-4a94-b91c-8480bfdb540f",
+      "schema": "opensocrates.project-memory.context-pack/1.0.0",
+      "searched_scope": [],
+      "source_evidence": [],
+      "task_id": null,
+      "unknowns": [],
+      "used_bytes": 2922,
+      "workspace_id": "76a4f3e2-dfa5-443c-8055-ea1c625018c2",
+      "workspace_kind": "git_worktree"
+    },
+    "retryable": false,
+    "schema": "opensocrates.project-memory.response/1.0.0",
+    "status": "ok"
+  },
+  "inspect": {
+    "limitations": [],
+    "request_id": "c65c0a28-9eb8-4ac8-9cc0-7e5c367dc33f",
+    "result": [
+      {
+        "conflict_ids": [],
+        "created_at": "2026-09-26T01:18:42Z",
+        "freshness": "unknown",
+        "kind": "decision",
+        "lifecycle": "accepted",
+        "origin": {
+          "attestation": "operator_declared",
+          "producer_kind": "agent",
+          "source_reference": "fixture:practical-user-intent"
+        },
+        "payload": null,
+        "project_id": "f049ef4e-bb0c-4a94-b91c-8480bfdb540f",
+        "rationale": null,
+        "record_id": "2bab3b70-3b2f-4506-a953-9b131cd605bb",
+        "revalidation": {
+          "dependency_paths": [],
+          "negative_claim": false,
+          "on_change": "not_applicable"
+        },
+        "schema": "opensocrates.project-memory.record/1.0.0",
+        "scope": {
+          "level": "project"
+        },
+        "snapshot_id": null,
+        "source_refs": [],
+        "summary": "Use pricing.rules() as current shipping authority and reuse pricing.subtotal() for integer seat validation. Keep invoice.quote callable with two arguments. Do not copy tariff constants into callers.",
+        "supersedes": null,
+        "support": "agent_reported",
+        "updated_at": "2026-09-26T01:18:42Z",
+        "version": 2
+      },
+      {
+        "conflict_ids": [],
+        "created_at": "2026-09-26T01:20:21Z",
+        "freshness": "unknown",
+        "kind": "decision",
+        "lifecycle": "accepted",
+        "origin": {
+          "attestation": "agent_reported_user_instruction",
+          "producer_kind": "agent",
+          "source_reference": "user:current-request"
+        },
+        "payload": null,
+        "project_id": "f049ef4e-bb0c-4a94-b91c-8480bfdb540f",
+        "rationale": null,
+        "record_id": "3d53fca2-323d-4621-a75a-33801a10254b",
+        "revalidation": {
+          "dependency_paths": [],
+          "negative_claim": false,
+          "on_change": "not_applicable"
+        },
+        "schema": "opensocrates.project-memory.record/1.0.0",
+        "scope": {
+          "level": "project"
+        },
+        "snapshot_id": null,
+        "source_refs": [],
+        "summary": "invoice.quote keeps member=False for two-argument callers. An eligible member discount is original merchandise subtotal // 10 when that subtotal is at least 5000 cents; domestic free shipping compares post-discount merchandise with the current pricing.rules() threshold. Every nonempty international order pays the international fee, including zero-priced orders; empty orders have no shipping. Reuse pricing.subtotal() for exact integer validation.",
+        "supersedes": null,
+        "support": "agent_reported",
+        "updated_at": "2026-09-26T01:20:27Z",
+        "version": 2
+      },
+      {
+        "conflict_ids": [],
+        "created_at": "2026-09-26T01:22:27Z",
+        "freshness": "unknown",
+        "kind": "decision",
+        "lifecycle": "accepted",
+        "origin": {
+          "attestation": "agent_reported_user_instruction",
+          "producer_kind": "agent",
+          "source_reference": "user:current-request"
+        },
+        "payload": null,
+        "project_id": "f049ef4e-bb0c-4a94-b91c-8480bfdb540f",
+        "rationale": null,
+        "record_id": "c4f21e59-d506-4185-91d5-ef7eb6a4bd51",
+        "revalidation": {
+          "dependency_paths": [],
+          "negative_claim": false,
+          "on_change": "not_applicable"
+        },
+        "schema": "opensocrates.project-memory.record/1.0.0",
+        "scope": {
+          "level": "project"
+        },
+        "snapshot_id": null,
+        "source_refs": [],
+        "summary": "Expose invoice.breakdown as a public alias of invoice.quote so both return the same pricing result; use current pricing.rules() tariffs and preserve the existing member, empty-order, free-item, and integer-seat behavior.",
+        "supersedes": null,
+        "support": "agent_reported",
+        "updated_at": "2026-09-26T01:22:35Z",
+        "version": 2
+      }
+    ],
+    "retryable": false,
+    "schema": "opensocrates.project-memory.response/1.0.0",
+    "status": "ok"
+  }
+}

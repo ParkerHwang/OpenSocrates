@@ -2,9 +2,10 @@
 
 This package provides the Codex command-hook and skill boundary for
 OpenSocrates {{PRODUCT_VERSION}}. Its Codex integration provides validated authored reasoning content at each decision point; it does not
-execute a user task, create a hosted service, or add telemetry. Prompts,
-transcripts, local paths, tool input/output, credentials, and hidden reasoning
-are not retained by the native adapter.
+execute a user task, create a hosted service, or add telemetry. The default
+`decision` command retains no prompt, transcript, workspace content, credential,
+or hidden reasoning. Optional, explicitly enrolled project memory has a
+separate bounded storage policy described below.
 
 The package was generated from content revision {{CONTENT_REVISION}} with
 semantic bundle identity `{{SEMANTIC_HASH}}` and {{METHOD_COUNT}} generated
@@ -19,8 +20,9 @@ build time; they are not host or manifest claims.
   no root-level or PowerShell launcher is shipped.
 - Native runtime: `runtime/<target>/opensocrates-runtime/`, resolved by
   the launcher relative to the plugin root
-- Writable product data, when enabled by the host, is owned by the host's
-  `PLUGIN_DATA` location; this package does not request a remote service.
+- Legacy writable host data, when enabled, is owned by the host's `PLUGIN_DATA`
+  location. Enrolled project memory uses the private product data root's
+  `projects/` subtree; this package does not request a remote service.
 - Complete selected reasoning content is written only to an owner-only OS
   temporary file for the active turn.
 
@@ -35,8 +37,7 @@ method activation, or public-artifact confirmation.
 After installation, open one interactive Codex session and complete the
 one-time interactive hook approval before relying on automatic selection.
 Until then, non-interactive `codex exec` silently skips untrusted hooks. The
-package and launcher are release-validated, but there is no live Codex
-hook-delivery receipt for this release.
+package and launcher checks alone do not establish live Codex hook delivery.
 
 ## Default decision-point entry
 
@@ -123,6 +124,42 @@ The native `bin/launch.sh decision codex` command accepts one closed JSON
 request on stdin. This is separate from host-only `control`; see
 `skills/opensocrates/references/decision/request.json`. The standalone runtime also accepts `decision --stream`
 for a volatile NDJSON session. No active host installation is needed for file lookup.
+
+## Optional assistance and project memory
+
+`bin/launch.sh documentation codex` emits bounded English/Korean official-document
+reference guidance and separate URL/version/read-attribution metadata. Use the
+packaged documentation guide for relevant external contracts, version changes or
+explicit official-source requests. Existing authorized host tools read the page;
+the command itself performs no network/model call or persistence. A catalog match
+or emitted prompt does not establish reading, applicability or application.
+
+`bin/launch.sh assistance codex` is a separate stateless command for bounded
+task support. It does not switch the selected model/effort, call a selector
+model, inspect a workspace, or initialize memory. Candidate model profiles are
+not active in normal operation.
+
+`bin/launch.sh memory codex` is a separate explicit command. Memory starts
+disabled. Enrollment previews the exact workspace and policy without writing,
+then applies only with a matching disclosure digest and attributed authorization.
+An enrolled project may retain bounded public decisions, checkpoints, source
+references, hashes, and document/code-index metadata under its mode and
+exclusions. It never stores raw prompts, transcripts, tool-output dumps,
+source-file copies, credentials, screenshots, or private reasoning. The
+private registry binds absolute workspace roots; exports omit them. Inspect,
+export, disable, and delete are explicit operations. Disabled/status calls do
+not initialize a store. A stored claim still needs current source validation
+before use and cannot grant permission. See the packaged assistance guide for
+English and Korean behavior boundaries.
+
+The separate v1.1 request contracts add scoped public completion obligations,
+read-only checkpoint preparation and provenance-bearing recall. Existing v1.0
+requests and stored SQLite records remain supported. Requested recall paths scope
+delivered source evidence; original source dependencies may require broader
+revalidation, and applicable accepted intent is retained.
+
+These capabilities remain candidate implementation until the declared native,
+live-host, and outcome gates have been run for this exact package.
 
 ## Windows x64
 

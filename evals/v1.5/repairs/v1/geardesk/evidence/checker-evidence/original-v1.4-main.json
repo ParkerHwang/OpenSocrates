@@ -1,0 +1,49 @@
+{
+  "stage": 3,
+  "project": "$DEMO/apps/v1.4.0",
+  "counts": {
+    "pass": 3,
+    "fail": 0,
+    "error": 1,
+    "unassessable": 1
+  },
+  "checks": [
+    {
+      "name": "server loopback startup",
+      "group": "main",
+      "status": "error",
+      "detail": "RuntimeError: Server exited before startup",
+      "durationSeconds": 0.039
+    },
+    {
+      "name": "independent CLI smoke after HTTP startup failure: catalog",
+      "group": "main",
+      "status": "pass",
+      "detail": null,
+      "durationSeconds": 0.026
+    },
+    {
+      "name": "independent CLI smoke after HTTP startup failure: report",
+      "group": "main",
+      "status": "pass",
+      "detail": null,
+      "durationSeconds": 0.027
+    },
+    {
+      "name": "independent CLI smoke after HTTP startup failure: quote",
+      "group": "main",
+      "status": "pass",
+      "detail": null,
+      "durationSeconds": 0.026
+    },
+    {
+      "name": "remaining HTTP and mixed adapter checks",
+      "status": "unassessable",
+      "detail": "Server startup unavailable; independent CLI smoke still attempted"
+    }
+  ],
+  "limitations": [
+    "Genuine historical migration coverage requires the supplied prior-stage store fixture.",
+    "Main scenarios share one dependency group; migration is isolated and cannot suppress main accounting."
+  ]
+}

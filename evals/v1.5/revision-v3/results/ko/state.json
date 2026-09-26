@@ -1,0 +1,129 @@
+{
+  "limitations": [],
+  "request_id": "3917dca0-db6c-4693-9d5a-999949c961f2",
+  "result": [
+    {
+      "conflict_ids": [],
+      "created_at": "2026-09-26T16:54:48Z",
+      "freshness": "unknown",
+      "kind": "checkpoint",
+      "lifecycle": "proposed",
+      "origin": {
+        "attestation": "agent_reported",
+        "producer_kind": "agent",
+        "source_reference": null
+      },
+      "payload": {
+        "blockers": [],
+        "checkpoint_version": 2,
+        "completed_actions": [
+          {
+            "action": "Selected Bay using the current venue details and accepted event conditions, and wrote plan.json with booked set to false.",
+            "execution_state": "completed",
+            "source_refs": [
+              "source:venues.md",
+              "memory:90091184-1563-4316-8c85-86944a257480"
+            ],
+            "support": "agent_reported"
+          },
+          {
+            "action": "Read the official Python 3.12 JSONDecoder documentation and identified the mapping of JSON null to Python None.",
+            "execution_state": "completed",
+            "source_refs": [
+              "source:python-jsondecoder"
+            ],
+            "support": "agent_reported"
+          },
+          {
+            "action": "Deleted only the specified obsolete proposal and inspected its record ID afterward.",
+            "execution_state": "completed",
+            "source_refs": [],
+            "support": "agent_reported"
+          }
+        ],
+        "completion_conditions": [
+          "plan.json contains only the requested fields and satisfies the accepted venue conditions.",
+          "The Python 3.12 JSONDecoder result for JSON null is cited from the official documentation."
+        ],
+        "conflict_ids": [],
+        "constraints": [
+          "Plan for 48 attendees.",
+          "Step-free access is required.",
+          "Venue cost must be at most 7000.",
+          "No booking is authorized."
+        ],
+        "decision_refs": [
+          "90091184-1563-4316-8c85-86944a257480"
+        ],
+        "next_action": "Use the completed plan as a planning draft; booking remains unauthorized.",
+        "objective": "Complete the accessible event plan and answer the Python JSON null question.",
+        "parent_checkpoint_id": "26e3bfa5-13fd-4ae5-bbd2-5bb0da5f6100",
+        "pending_effects": [],
+        "remaining_actions": [
+          "Do not book unless separate booking authorization is provided."
+        ],
+        "snapshot_id": null,
+        "source_refs": [
+          "source:venues.md",
+          "source:python-jsondecoder"
+        ]
+      },
+      "project_id": "7c29bdf6-1aa2-4ee1-ac14-256599e62f9a",
+      "rationale": null,
+      "record_id": "26e3bfa5-13fd-4ae5-bbd2-5bb0da5f6100",
+      "revalidation": {
+        "dependency_paths": [],
+        "negative_claim": false,
+        "on_change": "refresh_or_mark_stale"
+      },
+      "schema": "opensocrates.project-memory.record/1.0.0",
+      "scope": {
+        "level": "task",
+        "task_id": "2a3c7c78-2af5-4614-a3a1-feb10b0dd886",
+        "workspace_id": "d6fb5706-352d-4649-ab49-482783df857d"
+      },
+      "snapshot_id": null,
+      "source_refs": [],
+      "summary": "Complete the accessible event plan and answer the Python JSON null question.",
+      "supersedes": null,
+      "support": "agent_reported",
+      "updated_at": "2026-09-26T16:57:09Z",
+      "version": 2
+    },
+    {
+      "conflict_ids": [],
+      "created_at": "2026-09-26T16:54:47Z",
+      "freshness": "unknown",
+      "kind": "decision",
+      "lifecycle": "accepted",
+      "origin": {
+        "attestation": "operator_declared",
+        "producer_kind": "agent",
+        "source_reference": "fixture:practical-user-intent"
+      },
+      "payload": null,
+      "project_id": "7c29bdf6-1aa2-4ee1-ac14-256599e62f9a",
+      "rationale": null,
+      "record_id": "90091184-1563-4316-8c85-86944a257480",
+      "revalidation": {
+        "dependency_paths": [],
+        "negative_claim": false,
+        "on_change": "not_applicable"
+      },
+      "schema": "opensocrates.project-memory.record/1.0.0",
+      "scope": {
+        "level": "project"
+      },
+      "snapshot_id": null,
+      "source_refs": [],
+      "summary": "Plan for 48 attendees; step-free access is required; the budget ceiling is 7000; no booking is authorized.",
+      "supersedes": null,
+      "support": "agent_reported",
+      "updated_at": "2026-09-26T16:54:47Z",
+      "version": 2
+    }
+  ],
+  "retryable": false,
+  "schema": "opensocrates.project-memory.response/1.0.0",
+  "status": "ok"
+}

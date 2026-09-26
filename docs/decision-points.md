@@ -1,10 +1,21 @@
 # Decision-point retrieval and migration
 
-Status: v1.4.0 Codex-only release; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
+Status: unpublished v1.5.0 Codex release candidate; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
 Experimental content revision 2, method variants, language rewrites and Compact
 policies have not been promoted. Method IDs remain unchanged.
 
 ## Use in the current turn
+
+The candidate adds `{"operation":"prepare","locale":"en"}` to the native
+decision command. It returns a fresh mechanical envelope and closed vocabulary;
+fill null participation/routing fields from the actual task before submitting its
+`request`. It does not classify the task, select a method, or clear session state.
+Existing complete `select` requests remain valid. Rejected inputs now include a
+safe `diagnostic` with a known field path and static constraint/allowed values.
+Correct the faulty field without dropping contraindications. Invalid input no
+longer retires previous read acknowledgments. Duplicate JSON keys and non-JSON
+numeric constants are rejected. These changes are [separately qualified](../evals/v1.5/revision-v4/REPORT.md)
+from the historical host observations below.
 
 Keep task goals, permissions, constraints and completion conditions available.
 Activate the controller when a materially changed judgment needs help; do not

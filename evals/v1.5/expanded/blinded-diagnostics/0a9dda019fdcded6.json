@@ -1,0 +1,66 @@
+{
+  "packet_id": "0a9dda019fdcded6",
+  "task_kind": "memory",
+  "locale": "en",
+  "task_requests": [
+    "Fresh session: venues.md has changed. Revise plan.json for 52 attendees under the existing $1,400 ceiling. Keep my previously accepted step-free and quiet-room conditions. plan.json must contain selected_venue (string), attendees (integer), venue_cost_usd (integer), required_features (array of codes step_free and quiet_room), status (string code proposed_unbooked), and basis (object with source_path string and observed_capacity integer). Correction: Cedar's old 60-person capacity is withdrawn; please forget that scoped fact and use the current source. Explain what changed and do not claim that a booking exists. If an enrolled project memory is unavailable, say so accurately; the maintained-note control has its explicit PROJECT_NOTES.md path. The existing instruction explicitly authorizes preserving the remaining accepted intent and deleting the exact record that contains the withdrawn capacity fact. Complete that scoped forgetting through the installed memory API; do not edit SQLite directly. Verify the persisted result, not just plan.json."
+  ],
+  "source_before": {
+    "venues.md": "Current venue inventory for 52 attendees:\n- Cedar: capacity 60, $1,100, step-free, quiet room available.\n- Harbor: capacity 65, $1,300, step-free, quiet room available.\n- Birch: capacity 70, $900, stairs only, no quiet room.\n",
+    "calendar.md": "The workshop is on Saturday. Venue budget ceiling is $1,400. No booking has been made.\n",
+    "plan.json": "{\"selected_venue\":\"Cedar\",\"attendees\":52,\"venue_cost_usd\":1100,\"required_features\":[\"step_free\",\"quiet_room\"],\"status\":\"proposed_unbooked\",\"basis\":{\"source_path\":\"venues.md\",\"observed_capacity\":60}}\n"
+  },
+  "source_transition": {
+    "venues.md": "Current venue inventory for 52 attendees (revised capacity list):\n- Cedar: capacity 48, $1,100, step-free, quiet room available.\n- Harbor: capacity 65, $1,300, step-free, quiet room available.\n- Birch: capacity 70, $900, stairs only, no quiet room.\n"
+  },
+  "stages": [
+    {
+      "artifacts": {
+        "plan.json": "{\n  \"selected_venue\": \"Harbor\",\n  \"attendees\": 52,\n  \"venue_cost_usd\": 1300,\n  \"required_features\": [\"step_free\", \"quiet_room\"],\n  \"status\": \"proposed_unbooked\",\n  \"basis\": {\n    \"source_path\": \"venues.md\",\n    \"observed_capacity\": 65\n  }\n}\n"
+      },
+      "public_final": "Updated [plan.json](<disposable>/workspace/plan.json) to propose Harbor for 52 attendees at $1,300. The current [venues.md](<disposable>/workspace/venues.md) lists Harbor at 65 seats with step-free access and a quiet room; Cedar’s revised 48-seat capacity is too small.\n\nI checked the plan against the source and the $1,400 ceiling. I also verified through memory inspect, export, and recall that the record containing Cedar’s withdrawn capacity is gone and the accepted conditions remain. The plan is **proposed and unbooked**; no booking exists."
+    }
+  ],
+  "public_messages_by_turn": [
+    [
+      "I’ll read the current venue source and project instructions, then use the enrolled memory command to check the accepted conditions and remove the withdrawn capacity record. After updating `plan.json`, I’ll verify both the file and the persisted memory result.",
+      "I’m using the [treatment label removed] skill for the venue choice and the memory correction. The file edit and verification are mechanical steps.",
+      "The enrolled memory recall succeeded. It confirms the accepted accessibility and quiet-room requirements, but the same record also contains the withdrawn Cedar capacity. The current `venues.md` lists Cedar at 48 seats and Harbor at 65, so Harbor is the qualifying option within $1,400. I’m checking the record’s scope and version before replacing its retained intent and deleting that exact record.",
+      "The retained intent is now accepted in a separate project record, and the memory API reported deletion of the old mixed record. I’ll update `plan.json` to Harbor, then check the saved plan against `venues.md` and verify the memory state with inspect, export, and recall.",
+      "Updated [plan.json](<disposable-path>) to propose Harbor for 52 attendees at $1,300. The current [venues.md](<disposable-path>) lists Harbor at 65 seats with step-free access and a quiet room; Cedar’s revised 48-seat capacity is too small.\n\nI checked the plan against the source and the $1,400 ceiling. I also verified through memory inspect, export, and recall that the record containing Cedar’s withdrawn capacity is gone and the accepted conditions remain. The plan is **proposed and unbooked**; no booking exists."
+    ]
+  ],
+  "message_missing_reason": null,
+  "persisted_memory_observation": {
+    "inspect": {
+      "status": "ok",
+      "exit_code": 0
+    },
+    "export": {
+      "status": "ok",
+      "exit_code": 0
+    },
+    "exported_public_records": [
+      {
+        "record_id": "86ed935a-181d-44df-bfbf-44fb1b4ed8b4",
+        "summary": "For this Saturday workshop, 52 attendees need step-free entry and a quiet room; among qualifying venues, choose the least costly within $1,400. No booking exists.",
+        "rationale": null,
+        "lifecycle": "accepted",
+        "scope": {
+          "level": "project"
+        }
+      }
+    ],
+    "export_complete": true,
+    "withdrawn_capacity_absent": true,
+    "retained_intent_present": true,
+    "record_count": 1,
+    "recall": {
+      "status": "ok",
+      "exit_code": 0
+    }
+  },
+  "human_status": "unavailable",
+  "human_scores": null,
+  "non_blindable_cues": "Memory operations, retained intent and characteristic phrasing can reveal treatment; version/model labels removed"
+}
