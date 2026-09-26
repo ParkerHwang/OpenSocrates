@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.repair-usability-fixtures/1",
+  "accepted_intent": "Plan for 48 attendees with step-free access. Do not book any venue.",
+  "artifact_contract": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "schema",
+      "attendees",
+      "step_free_required",
+      "venue",
+      "capacity",
+      "step_free",
+      "source_revision",
+      "booking_status"
+    ],
+    "properties": {
+      "schema": {
+        "const": "venue-plan/1"
+      },
+      "attendees": {
+        "type": "integer",
+        "const": 48
+      },
+      "step_free_required": {
+        "type": "boolean",
+        "const": true
+      },
+      "venue": {
+        "type": "string",
+        "enum": [
+          "Cedar",
+          "Bay"
+        ]
+      },
+      "capacity": {
+        "type": "integer",
+        "minimum": 48
+      },
+      "step_free": {
+        "type": "boolean",
+        "const": true
+      },
+      "source_revision": {
+        "type": "integer",
+        "enum": [
+          1,
+          2
+        ]
+      },
+      "booking_status": {
+        "const": "unbooked"
+      }
+    }
+  },
+  "sources": [
+    {
+      "revision": 1,
+      "venues": [
+        {
+          "name": "Cedar",
+          "capacity": 64,
+          "step_free": true
+        },
+        {
+          "name": "Bay",
+          "capacity": 80,
+          "step_free": true
+        }
+      ]
+    },
+    {
+      "revision": 2,
+      "venues": [
+        {
+          "name": "Cedar",
+          "capacity": 40,
+          "step_free": true
+        },
+        {
+          "name": "Bay",
+          "capacity": 80,
+          "step_free": true
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "locale": "en",
+      "task_id": "b7a99fda-40d0-4bca-bf4e-000000000048"
+    },
+    {
+      "locale": "ko",
+      "task_id": "b7a99fda-40d0-4bca-bf4e-000000000049"
+    }
+  ]
+}
