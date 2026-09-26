@@ -51,6 +51,10 @@ def main():
             == validation["native_report_sha256"]
         )
         qualified_count = len(validation["runtime_input_hashes"])
+    repair_path = HERE / "ci-repair.json"
+    if repair_path.exists():
+        repair = json.loads(repair_path.read_text())["repair"]
+        assert digest((ROOT / repair["file"]).read_bytes()) == repair["sha256"]
 
     import check_decision_points as fixtures
     from opensocrates.selector.decision import DecisionSession

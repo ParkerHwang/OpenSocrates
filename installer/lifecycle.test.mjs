@@ -1814,7 +1814,9 @@ test("isolated app-server timeout closes stdin and kills an uncooperative child 
         codexBin,
         hooks: {
           validationTimeoutMilliseconds: 1_500,
-          validationTerminationMilliseconds: 50,
+          // Use the production termination grace. A 50 ms test-only grace can
+          // kill the fixture while it records stdin EOF on a loaded CI runner.
+          // The five-second deadline and process-death assertion still apply.
         },
       }),
       (error) =>

@@ -80,6 +80,18 @@ The compared guide-8 archive retains its original hash in [baseline.json](baseli
 Subsequent handoff edits change evidence only; the verifier binds them to qualified
 runtime and check inputs. Exact pushed-commit CI is recorded in PR #95 and issue #94.
 
+The [first hosted CI attempt and focused repair](ci-repair.json) retain an installer
+fixture failure at `17a673ff91244c03149a4a06e08a2281f7438ae1`: the timeout child
+was confirmed dead, then its incomplete JSON trace failed parsing. Python quality,
+product contracts and native Windows passed; the dependent macOS job was skipped.
+The test used a 50 ms termination grace instead of the production one second,
+consistent with interruption while the child recorded EOF on a loaded runner.
+Only that test override was removed. Its request timeout, five-second deadline,
+process-death, EOF, isolation and configuration-preservation assertions remain.
+The focused timeout test passed in 2.522 seconds, followed by all 251 installer
+tests and npx packaging. This repair changes no runtime or packaged bytes; the
+failed hosted attempt is not relabelled as a pass.
+
 `act_standardize_decision`: adopt the verified request/state fixes and packaged
 completion examples. Keep the guidance's model-quality and efficiency effects
 unverified. Required checks passed, so no further unchanged testing or expanded
