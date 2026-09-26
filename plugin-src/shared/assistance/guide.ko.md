@@ -1,6 +1,6 @@
 # 선택적 지원과 프로젝트 연속성
 
-Guide revision: 7
+Guide revision: 8
 
 사용자의 목표, 권한, 제약, 완료 조건을 유지합니다. 단순 편집이거나 필요한
 확인이 끝났고 입력이 바뀌지 않았다면 바로 마칩니다. 중요한 판단에서는
@@ -62,3 +62,12 @@ v1.1 `recall`은 수명주기·지원 근거와 버전·참조를 포함한 짧�
 `need`는 순서를 정할 뿐 항목 수를 줄이지 않습니다. 전체 행동·효과나 잘린 요약은
 inspect로 확인합니다. 소스 최신성, 승인된 의도와 실행 신고는 서로 다른 상태입니다.
 작업상 필요 없이 이 결과를 자동 캐시나 중복 메모로 복사하지 않습니다.
+
+첫 v1.1 호출 전에 완전한 [recall](memory-recall.json), [prepare](memory-prepare.json),
+[assistance](obligations.json) 요청 예시를 읽습니다. 식별자와 작업 필드를 채우되
+스키마와 허용된 열거값은 유지합니다. `prepare`는 이전 체크포인트 요청이 아닌
+memory 요청 스키마 `/1.1.0`을 사용합니다. 이전 맥락이 필요할 때 assistance의
+`context_need`는 `continuity`입니다. `completion`은 `in_progress`, `checks_satisfied`,
+`dependent_input_missing` 중에서 고르고, 충족한 완료 조건의 상태는 `met`으로
+표시합니다. 동의어를 새로 만들지 않습니다. 거절된 요청은 네이티브
+오류의 필드 위치와 허용값을 보고 수정합니다.

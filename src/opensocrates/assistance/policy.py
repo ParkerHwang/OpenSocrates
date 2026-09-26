@@ -48,6 +48,10 @@ TASK_ENUMS = {
 class InvalidAssistanceRequest(ValueError):
     """A closed request failed validation; the original value is never included."""
 
+    def __init__(self, message: str, *, hints: tuple[str, ...] = ()) -> None:
+        super().__init__(message)
+        self.hints = hints
+
 
 @dataclass(frozen=True)
 class AssistanceProfile:
@@ -89,7 +93,7 @@ def validate_request(request: Any) -> dict[str, Any]:  # noqa: C901  # Closed fi
     except (TypeError, UnicodeError, ValueError) as exc:
         raise InvalidAssistanceRequest("invalid_request") from exc
     if isinstance(request, dict) and request.get("schema") == REQUEST_SCHEMA_V2:
-        from ..project_memory.contracts import load_schema, validate
+        from ..project_memory.contracts import ContractError, load_schema, validate
         from .obligations import summarize_obligations
 
         try:
@@ -102,6 +106,17 @@ def validate_request(request: Any) -> dict[str, Any]:  # noqa: C901  # Closed fi
             legacy = {key: value for key, value in request.items() if key != "obligations"}
             legacy["schema"] = REQUEST_SCHEMA
             validate_request(legacy)
+        except ContractError as exc:
+            hints: tuple[str, ...] = (
+                f"{exc.code}:{exc.field_path}",
+                "example:references/assistance/obligations.json",
+            )
+            if exc.allowed:
+                hints += (
+                    "allowed_values:"
+                    + json.dumps(exc.allowed, ensure_ascii=False, separators=(",", ":")),
+                )
+            raise InvalidAssistanceRequest("invalid_request", hints=hints) from exc
         except ValueError as exc:
             raise InvalidAssistanceRequest("invalid_request") from exc
         return request

@@ -83,10 +83,12 @@ def check(binary: Path, package: Path) -> dict[str, object]:
         )
         enrolled = run(binary, environment, request("init", payload))["result"]
         project, workspace, task = enrolled["project_id"], enrolled["workspace_id"], uid()
-        prepared_request = request(
-            "prepare", {"target_operation": "checkpoint"}, project, workspace, task
+        prepared_request = json.loads(
+            (package / "skills/opensocrates/references/assistance/memory-prepare.json").read_text()
         )
-        prepared_request["schema"] = "opensocrates.project-memory.request/1.1.0"
+        prepared_request.update(
+            request_id=uid(), project_id=project, workspace_id=workspace, task_id=task
+        )
         before = {p.relative_to(data): p.read_bytes() for p in data.rglob("*") if p.is_file()}
         prepared = command("memory", prepared_request)
         assert prepared["status"] == "ok", prepared

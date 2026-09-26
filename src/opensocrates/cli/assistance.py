@@ -30,14 +30,18 @@ def _reject_constant(_value: str) -> None:
 
 
 def _failure(
-    status: str, request_id: str | None = None, *, revised: bool = False
+    status: str,
+    request_id: str | None = None,
+    *,
+    revised: bool = False,
+    hints: tuple[str, ...] = (),
 ) -> dict[str, object]:
     return {
         "schema": PLAN_SCHEMA_V2 if revised else PLAN_SCHEMA,
         "request_id": request_id,
         "status": status,
         "application": "unverified",
-        "limitations": ["no_plan", "caller_features_unverified"],
+        "limitations": ["no_plan", "caller_features_unverified", *hints],
     }
 
 
@@ -60,8 +64,18 @@ def run_assistance(stdin: BinaryIO | TextIO, stdout: TextIO) -> int:
         revised = isinstance(request, dict) and request.get("schema") == REQUEST_SCHEMA_V2
         result = plan_assistance(request, profiles=load_packaged_profiles())
         exit_code = 0
-    except (InvalidAssistanceRequest, UnicodeError, json.JSONDecodeError, TypeError, ValueError):
-        result = _failure("invalid_request", revised=revised)
+    except (
+        InvalidAssistanceRequest,
+        UnicodeError,
+        json.JSONDecodeError,
+        TypeError,
+        ValueError,
+    ) as error:
+        result = _failure(
+            "invalid_request",
+            revised=revised,
+            hints=error.hints if isinstance(error, InvalidAssistanceRequest) else (),
+        )
         exit_code = 2
     except Exception:
         result = _failure("unavailable", revised=revised)

@@ -1,6 +1,6 @@
 # Optional assistance and project continuity
 
-Guide revision: 7
+Guide revision: 8
 
 Keep the user's goal, permissions, constraints, and completion conditions in view.
 For a mechanical edit or completed unchanged checks, finish directly. For a
@@ -33,6 +33,15 @@ or `null`). Its payload is exactly `{"need":"current task","budget_bytes":8192}`
 with a task-specific need. Both fields are required; `query` is not a recall
 field. Inspect `status` and `result`, not the process exit alone. Repair an
 invalid envelope before drawing any conclusion about remembered content.
+
+Before the first v1.1 call, load the complete [recall](memory-recall.json),
+[prepare](memory-prepare.json), or [assistance](obligations.json) request example.
+Fill its identity and task fields; keep its schema and closed enum vocabulary.
+`prepare` uses memory request schema `/1.1.0`, not the legacy checkpoint schema.
+For prior context, assistance uses `context_need: continuity`. Completion values
+are `in_progress`, `checks_satisfied` and `dependent_input_missing`; a satisfied
+obligation uses `met`. Do not invent synonymous values.
+Use native field/allowed-value diagnostics to correct a rejected request.
 
 After an enrolled milestone, read [checkpoint requests](checkpoint.en.md) and
 capture only permitted public state under the project's policy. A user correction

@@ -13,14 +13,29 @@ from typing import Any
 class ContractError(ValueError):
     """A request does not satisfy its closed public contract."""
 
-    def __init__(self, message: str, *, code: str = "contract_violation", path: str = "$") -> None:
+    def __init__(
+        self,
+        message: str,
+        *,
+        code: str = "contract_violation",
+        path: str = "$",
+        allowed: tuple[Any, ...] = (),
+        example: str | None = None,
+    ) -> None:
         super().__init__(f"{path}: {message}" if path != "$" else message)
         self.code = code
         self.field_path = path
+        self.allowed = allowed
+        self.example = example
 
-    def diagnostic(self) -> dict[str, str]:
+    def diagnostic(self) -> dict[str, Any]:
         """Only fixed codes and schema-derived paths, never input values/unknown keys."""
-        return {"code": self.code, "field_path": self.field_path}
+        return {
+            "code": self.code,
+            "field_path": self.field_path,
+            **({"allowed_values": list(self.allowed)} if self.allowed else {}),
+            **({"example": self.example} if self.example else {}),
+        }
 
 
 _BASIS_REFERENCE = re.compile(r"^[a-z][a-z0-9_-]*:[A-Za-z0-9._/#-]{1,120}$")
@@ -104,9 +119,13 @@ def validate(value: Any, schema: dict[str, Any], *, path: str = "$") -> None:  #
         if not matched:
             raise ContractError("invalid type", code="invalid_type", path=path)
     if "const" in schema and value != schema["const"]:
-        raise ContractError("invalid constant", code="invalid_constant", path=path)
+        raise ContractError(
+            "invalid constant", code="invalid_constant", path=path, allowed=(schema["const"],)
+        )
     if "enum" in schema and value not in schema["enum"]:
-        raise ContractError("invalid enum", code="invalid_enum", path=path)
+        raise ContractError(
+            "invalid enum", code="invalid_enum", path=path, allowed=tuple(schema["enum"])
+        )
     if isinstance(value, dict):
         allowed = schema.get("properties", {})
         if schema.get("additionalProperties") is False and set(value) - set(allowed):
@@ -144,6 +163,18 @@ def validate(value: Any, schema: dict[str, Any], *, path: str = "$") -> None:  #
 
 
 def validate_request(value: Any) -> dict[str, Any]:  # noqa: C901  # Closed operation envelopes require explicit branches.
+    if (
+        isinstance(value, dict)
+        and value.get("schema") == "opensocrates.project-memory.request/1.0.0"
+        and value.get("operation") == "prepare"
+    ):
+        raise ContractError(
+            "prepare needs the versioned request",
+            code="request_version_mismatch",
+            path="$.schema",
+            allowed=("opensocrates.project-memory.request/1.1.0",),
+            example="references/assistance/memory-prepare.json",
+        )
     revised = (
         isinstance(value, dict)
         and value.get("schema") == "opensocrates.project-memory.request/1.1.0"

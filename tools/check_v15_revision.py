@@ -35,6 +35,18 @@ def obligation(identifier, *, kind="work", status="unmet", deps=(), required=Tru
 
 
 class ObligationTests(unittest.TestCase):
+    def test_rejected_enum_gives_canonical_values_without_echoing_input(self):
+        value = assistance_request()
+        value.update(schema="opensocrates.assistance.request/1.1.0", obligations=[])
+        value["task"]["context_need"] = "SECRET_UNKNOWN_VALUE"
+        output = io.StringIO()
+        self.assertEqual(run_assistance(io.StringIO(json.dumps(value)), output), 2)
+        result = json.loads(output.getvalue())
+        validate(result, load_schema("assistance-plan-v2.schema.json"))
+        self.assertIn("invalid_enum:$.task.context_need", result["limitations"])
+        self.assertIn("continuity", output.getvalue())
+        self.assertNotIn("SECRET_UNKNOWN_VALUE", output.getvalue())
+
     def test_v2_cli_success_and_failure_keep_recognized_schema(self):
         value = assistance_request()
         value.update(
@@ -143,6 +155,26 @@ class MemoryRevisionTests(unittest.TestCase):
 
     def prepare(self, task):
         return self.revised("prepare", {"target_operation": "checkpoint"}, task)
+
+    def test_complete_preparation_example_and_old_version_diagnostic(self):
+        from pathlib import Path
+
+        self.enroll()
+        path = (
+            Path(__file__).resolve().parents[1] / "plugin-src/shared/assistance/memory-prepare.json"
+        )
+        request = json.loads(path.read_text())
+        request.update(project_id=self.project_id, workspace_id=self.workspace_id, task_id=uid())
+        self.assertEqual(handle_memory(request, registry=self.registry)["status"], "ok")
+        request["schema"] = "opensocrates.project-memory.request/1.0.0"
+        before = self.bytes()
+        response = handle_memory(request, registry=self.registry)
+        self.assertEqual(response["status"], "invalid_request")
+        self.assertEqual(response["result"]["code"], "request_version_mismatch")
+        self.assertEqual(
+            response["result"]["allowed_values"], ["opensocrates.project-memory.request/1.1.0"]
+        )
+        self.assertEqual(self.bytes(), before)
 
     @staticmethod
     def fill(prepared):
