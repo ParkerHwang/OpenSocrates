@@ -49,8 +49,44 @@ def verify():
             values = [call["usage"].get(key) for call in calls]
             assert value == (sum(values) if all(x is not None for x in values) else None)
     assert read(HERE / "host-before.json") == read(HERE / "host-after.json")["snapshot"]
+    functional = {
+        name: digest
+        for name, digest in manifest["functional_sources"].items()
+        if name != "src/opensocrates/version.py"
+    }
+    assert len(functional) == 205
+    for name, digest in functional.items():
+        assert sha(ROOT / name) == digest, name
+    for name, digest in read(HERE / "rc-acceptance-lock.json")["files"].items():
+        assert sha(HERE / name) == digest, name
+    qualification = read(HERE / "rc-qualification.json")
+    installed = read(HERE / "rc-acceptance/summary.json")
+    native = read(HERE / "rc-acceptance/native-release-check.json")
+    assert installed["source_commit"] == qualification["source_commit"]
+    assert installed["product_version"] == native["product_version"] == "1.5.0"
+    assert (
+        installed["archive_sha256"]
+        == qualification["artifacts"]["dist/opensocrates-1.5.0-codex-plugin.zip"]["sha256"]
+    )
+    assert installed["model_calls"] == 0
+    assert {row["kind"] for row in installed["results"]} == {"git", "directory"}
+    for row in installed["results"]:
+        assert row["auth_copy_removed"] and all(row["checks"].values())
+        assert [operation["operation"] for operation in row["operations"]] == [
+            "record",
+            "accept",
+            "delete",
+            "delete",
+        ]
+        assert all(operation["status"] == "ok" for operation in row["operations"])
+    assert native["status"] == native["checks"]["frozen_memory"]["status"] == "pass"
+    assert (
+        read(HERE / "host-before.json")
+        == read(HERE / "rc-acceptance/host-preservation.json")["snapshot"]
+    )
     print(
-        "Practical comparison integrity: PASS (20 calls; 12 episodes; immutable outcomes; nulls preserved)"
+        "Practical/RC integrity: PASS (20 calls; 12 episodes; 205 unchanged functional sources; "
+        "Git/directory native acceptance; immutable outcomes; nulls preserved)"
     )
 
 

@@ -76,6 +76,19 @@ native build and `tools/check_windows.py --packages`. These commands' exact comm
 and outcomes belong in the PR/issue handoff, not an inferred claim from this list.
 No destructive account-home purge/reinstall is run.
 
+The completed [RC qualification receipt](../../evals/v1.5/practical/rc-qualification.json)
+anchors the product and native package to `7cf2777bc55e847c77396f46ad9b75835dd30f8c`.
+`make release-check` passed, including frozen SQLite and deterministic generation.
+The local full source suite passed on the working tree subsequently committed as
+that revision; the hosted run also passed all six checks. Subsequent handoff changes
+only add evidence and verification, with their exact-head CI recorded in PR #95.
+The [installed native checks](../../evals/v1.5/practical/rc-acceptance/summary.json)
+verify both Git and directory projects, all 41 packaged/internal schemas, both
+assistance guides, accepted/proposed state, exact record deletion and project-store
+deletion while fixture source files remain unchanged. These checks make zero model
+calls and preserve the original active installation, global configuration and agent
+definition. The offline practical verifier checks their locked receipts.
+
 The local review artifacts are versioned under `dist/`, including
 `opensocrates-1.5.0-codex-plugin.zip`, its SHA-256 file, release manifest,
 checksums, limitations and SPDX SBOM. Hosted CI also supplies the Windows x64
