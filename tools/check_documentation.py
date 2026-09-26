@@ -20,7 +20,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def request(locale: str = "en") -> dict:
-    value = json.loads((ROOT / "plugin-src/shared/documentation/request.json").read_text())
+    value = json.loads(
+        (ROOT / "plugin-src/shared/documentation/request.json").read_text(encoding="utf-8")
+    )
     value["locale"] = locale
     return value
 
@@ -143,7 +145,9 @@ class DocumentationTests(unittest.TestCase):
         for locale, result in (("en", en), ("ko", ko)):
             self.assertEqual(
                 result["instructions"],
-                (ROOT / f"plugin-src/shared/documentation/prompt.{locale}.md").read_text(),
+                (ROOT / f"plugin-src/shared/documentation/prompt.{locale}.md").read_text(
+                    encoding="utf-8"
+                ),
             )
             self.assertLess(len(json.dumps(result, ensure_ascii=False).encode()), MAX_BYTES)
         self.assertNotEqual(en["instructions"], ko["instructions"])

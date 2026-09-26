@@ -163,7 +163,7 @@ class MemoryRevisionTests(unittest.TestCase):
         path = (
             Path(__file__).resolve().parents[1] / "plugin-src/shared/assistance/memory-prepare.json"
         )
-        request = json.loads(path.read_text())
+        request = json.loads(path.read_text(encoding="utf-8"))
         request.update(project_id=self.project_id, workspace_id=self.workspace_id, task_id=uid())
         self.assertEqual(handle_memory(request, registry=self.registry)["status"], "ok")
         request["schema"] = "opensocrates.project-memory.request/1.0.0"
@@ -249,7 +249,7 @@ class MemoryRevisionTests(unittest.TestCase):
         self.assertEqual(self.prepare(task)["status"], "unavailable")
         self.assertEqual(self.bytes(), old)
         store.ensure_current()
-        manifest = json.loads(store.backup_manifest_path.read_text())
+        manifest = json.loads(store.backup_manifest_path.read_text(encoding="utf-8"))
         manifest["verified_at"] = (datetime.now(timezone.utc) - timedelta(days=8)).isoformat()
         store._write_backup_manifest(manifest)
         expired = self.bytes()

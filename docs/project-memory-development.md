@@ -65,3 +65,15 @@ Later native checks cover linked worktrees; live Windows Codex remains unavailab
 The [practical comparison](../evals/v1.5/practical/RESULTS.md) records bounded
 macOS use, and the [candidate handoff](v1.5.0/RELEASE_CANDIDATE.md) states current
 platform support. Broad improvement studies are optional stronger-claim work.
+
+## Additive v1.1 requests
+
+The [structural revision](v1.5.0/12-structural-revision-and-official-docs.md) adds
+read-only checkpoint preparation and provenance-bearing recall without changing
+the v1.0 schemas or SQLite format. Use the complete canonical
+[prepare](../plugin-src/shared/assistance/memory-prepare.json) and
+[recall](../plugin-src/shared/assistance/memory-recall.json) examples with actual
+enrolled project/workspace/task identities. A draft is not a submitted checkpoint,
+and a source-scoped delivery does not remove applicable accepted intent.
+Invalid requests expose only schema-derived field paths and allowed values; the
+rejected contents and unknown property names are not echoed.

@@ -11,9 +11,9 @@ performed by this task.
 
 The [2026-09-27 revision](12-structural-revision-and-official-docs.md) adds selective
 official-document prompts, v1.1 completion obligations, read-only checkpoint
-preparation and provenance-bearing scoped recall. Assistance guide 7, impact guide
+preparation and provenance-bearing scoped recall. Assistance guide 8, impact guide
 3 and maintainability guide 2 preserve the task fallback and EN/KO boundaries.
-Existing v1.0 schemas and SQLite layout remain unchanged. Qualification of this
+Existing v1.0 schemas and SQLite layout remain unchanged. The [revision report](../../evals/v1.5/revision-v3/REPORT.md) preserves the initial EN pass/KO incomplete result and the separately frozen successful KO recovery call; official reads and artifacts passed in all three calls. Qualification of this
 revision is separate from the historical results below; PR #95 records its exact
 commit and checks. No profile is promoted or active installation replaced.
 

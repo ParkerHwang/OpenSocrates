@@ -1,5 +1,20 @@
 # v1.5 evaluation status
 
+## Current structural revision and official references
+
+The [new report](revision-v3/REPORT.md) adds selective official-document prompts,
+versioned scoped completion/memory interfaces and actionable request recovery.
+The original two Luna/medium calls yielded one complete EN episode and one KO
+episode with an unfinished checkpoint; both artifacts, official reads and exact
+deletions passed. Those outcomes remain [frozen](revision-v2/REPORT.md). A new
+guide8/package and one separately frozen KO recovery call pass all10 artifact/state
+checks, with two corrected request errors and remaining selector limitations recorded.
+Three total model invocations, no model substitution or stronger-model outcome help;
+these are guided usability observations, not pooled superiority/efficiency evidence.
+The final source/native commands, package hashes and exact-head CI belong to PR95
+and [the revision validation receipt](revision-v3/validation.json). All original
+protocols, artifacts, scores and failures remain unchanged.
+
 Current release-candidate completion follows the [2026-09-26 practical standard](../../docs/v1.5.0/PRACTICAL_COMPLETION.md).
 The historical study/readiness limits below restrict stronger claims; they no
 longer require a held-out study, numerical margin, human recruitment or account-

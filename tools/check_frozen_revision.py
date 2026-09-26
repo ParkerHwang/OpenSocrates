@@ -50,17 +50,18 @@ def check(binary: Path, package: Path) -> dict[str, object]:
             assert result.returncode == 0, (mode, result.returncode)
             return json.loads(result.stdout)
 
-        documented = json.loads((root / "plugin-src/shared/documentation/request.json").read_text())
+        documented = json.loads(
+            (root / "plugin-src/shared/documentation/request.json").read_text(encoding="utf-8")
+        )
         for locale in ("en", "ko"):
             result = command("documentation", {**documented, "locale": locale})
             assert result["next_action"] == "read_reference"
             assert result["application"] == "unverified"
-            assert (
-                result["instructions"]
-                == (root / f"plugin-src/shared/documentation/prompt.{locale}.md").read_text()
-            )
+            assert result["instructions"] == (
+                root / f"plugin-src/shared/documentation/prompt.{locale}.md"
+            ).read_text(encoding="utf-8")
         obligations = json.loads(
-            (root / "plugin-src/shared/assistance/obligations.json").read_text()
+            (root / "plugin-src/shared/assistance/obligations.json").read_text(encoding="utf-8")
         )
         result = command("assistance", obligations)
         assert result["obligation_summary"]["ready_ids"] == ["draft"]
@@ -84,7 +85,9 @@ def check(binary: Path, package: Path) -> dict[str, object]:
         enrolled = run(binary, environment, request("init", payload))["result"]
         project, workspace, task = enrolled["project_id"], enrolled["workspace_id"], uid()
         prepared_request = json.loads(
-            (package / "skills/opensocrates/references/assistance/memory-prepare.json").read_text()
+            (package / "skills/opensocrates/references/assistance/memory-prepare.json").read_text(
+                encoding="utf-8"
+            )
         )
         prepared_request.update(
             request_id=uid(), project_id=project, workspace_id=workspace, task_id=task
@@ -198,7 +201,7 @@ def main() -> int:
     args = parser.parse_args()
     binary = args.binary
     if args.runtime_report:
-        report = json.loads(args.runtime_report.read_text())
+        report = json.loads(args.runtime_report.read_text(encoding="utf-8"))
         binary = Path(__file__).resolve().parents[1] / report["artifact"]
     print(json.dumps(check(binary.resolve(), args.package.resolve()), sort_keys=True))
     return 0

@@ -3,6 +3,9 @@
 Authorized on 2026-09-27 after the combined pilot, practical, GearDesk and
 QueueForge review. Baseline: `b70d9f1a60b7256febe0e62498a46f8cd0cd2507`.
 This specification defines a bounded revision of the unpublished 1.5.0 candidate.
+Implementation and bounded qualification are recorded in the
+[revision report](../../evals/v1.5/revision-v3/REPORT.md), including the original
+failed KO continuation and the separately frozen repair.
 It does not relabel historical artifacts, promote model profiles or authorize
 publication, global settings changes, active installation replacement or enrollment
 of a real project.

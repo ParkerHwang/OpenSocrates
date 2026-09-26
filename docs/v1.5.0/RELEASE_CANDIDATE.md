@@ -8,7 +8,9 @@ No merge, tag, publication, deployment or active-install replacement is implied.
 
 The [current structural revision](12-structural-revision-and-official-docs.md) adds
 selective official-reference prompts and versioned completion/memory interfaces.
-Its new checks and package identity are recorded separately in PR #95; earlier
+The [new revision report](../../evals/v1.5/revision-v3/REPORT.md) records complete
+source/native qualification, the initial KO checkpoint failure and its one-call
+repair. Its checks and package identity are recorded separately in PR #95; earlier
 source-equivalence receipts do not cover this changed runtime.
 
 The subsequent [post-review repairs](../../evals/v1.5/repairs/v1/REPORT.md) qualify
