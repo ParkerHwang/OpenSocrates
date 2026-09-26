@@ -1,6 +1,6 @@
 # Optional assistance and project continuity
 
-Guide revision: 4
+Guide revision: 5
 
 Keep the user's goal, permissions, constraints, and completion conditions in view.
 For a mechanical edit or completed unchanged checks, finish directly. For a
@@ -9,6 +9,10 @@ material judgment, the explicit `assistance codex` command can recommend
 It is stateless and never selects a model or a canonical method. Treat the plan
 as advice: caller features, application, permission, and completion remain
 unverified. Preserve the selected model and effort.
+
+Answer a side question and continue the authorized main task unless the user
+changes it. Reuse answers and permissions already given; ask only for a missing
+answer that changes the next action, while completing independent work.
 
 Use `decision codex` separately for eligible complete canonical procedures.
 Do not shorten a required procedure or suppress evidence or a stop condition

@@ -1,5 +1,10 @@
 # Held-out readiness after expanded pilots
 
+Current release-candidate completion follows the [2026-09-26 practical standard](../../docs/v1.5.0/PRACTICAL_COMPLETION.md).
+The historical study/readiness limits below restrict stronger claims; they no
+longer require a held-out study, numerical margin, human recruitment or account-
+isolation proof before practical product completion.
+
 No held-out model call has been made, and no numerical quality/noninferiority
 margin or held-out sample size is frozen. The original [protocol](protocol.json)
 and all outcome freezes retain their pre-outcome fields. The new [results](expanded/RESULTS.md)

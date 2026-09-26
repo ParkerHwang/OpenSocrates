@@ -1,6 +1,8 @@
 # OpenSocrates v1.5.0 development specification
 
-Status: implementation in progress; outcome studies are pending.
+Status: practical qualification and v1.5.0 release-candidate preparation.
+The [2026-09-26 completion standard](PRACTICAL_COMPLETION.md) supersedes earlier
+statistical release gates; historical evidence is preserved.
 Working language: English. Reviewed baseline: `v1.4.0`, commit
 `5a2ff3c312e92aa8a44d0905465674d9a4e4f645`, also the remote `main` head
 when checked on 2026-09-23.
@@ -39,6 +41,7 @@ package. Start with the final product contract in 10 and behavior policy in 11.
 | [10 — Product definition](10-product-identity-and-combined-capabilities.md) | Target users, outcomes, representative experiences, and success conditions |
 | [11 — Adaptive assistance and collaboration](11-adaptive-assistance-and-collaboration.md) | Task/model policy, assistance levels, profiles, and observable interaction behavior |
 | [Validation record](VALIDATION.md) | Checks actually performed on this document package |
+| [Practical completion standard](PRACTICAL_COMPLETION.md) | Current usability gates, bounded comparison, RC authority and stop rule |
 | [Implementation status](IMPLEMENTATION_STATUS.md) | Candidate source slices, evidence boundary, and remaining gates |
 | [Evaluation status](../../evals/v1.5/STATUS.md) | Frozen pilot receipts, exact treatment versions, and missing outcome evidence |
 | [Platform acceptance handoff](PLATFORM_ACCEPTANCE_HANDOFF.md) | Disposable host procedure and separate destructive-test permission boundary |

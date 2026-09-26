@@ -1,5 +1,11 @@
 # Product definition and intended behavior
 
+Current completion authority: [Practical completion standard](PRACTICAL_COMPLETION.md),
+revised by the user on 2026-09-26. Bounded usability and a small fair v1.4.0
+comparison govern this release candidate. Statistical studies below describe
+optional stronger-claim work, not release prerequisites. Frozen historical
+evidence remains unchanged.
+
 OpenSocrates helps people get better work from their chosen LLM by supplying
 appropriate reasoning guidance, relevant evidence, and useful remembered context.
 It serves developers and non-developers. Its foundation is that the text a model

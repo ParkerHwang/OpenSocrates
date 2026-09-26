@@ -1,7 +1,13 @@
 # Implementation plan
 
-Status: planned work. Product behavior and performance studies are not implemented
-by this document package. All work and development reporting use English.
+Current completion authority: [Practical completion standard](PRACTICAL_COMPLETION.md),
+revised by the user on 2026-09-26. Bounded usability and a small fair v1.4.0
+comparison govern this release candidate. Statistical studies below describe
+optional stronger-claim work, not release prerequisites. Frozen historical
+evidence remains unchanged.
+
+Status: source implementation and provisional review completed; practical
+qualification and release-candidate packaging remain. Development reporting uses English.
 
 ## Work decomposition and coverage
 
@@ -33,7 +39,7 @@ remain measured implementation work, not unspecified product requirements.
 | W5 - Integrated behavior | General planning/research continuation plus code reuse, impact, maintainability, correction, and stopping behavior | W1, W4 | G01-G05, U01-U06, C01-C06 pass bounded behavior fixtures; compare actual artifacts, not checklist text |
 | W6 - Privacy and lifecycle completion | Modes, export/delete/prune, exclusions, sidecars/backups, injection, uninstall/update | W2-W4; before broad live use | T19-T24 pass in both workspace kinds; prohibited content absent from declared capture surfaces |
 | W7 - Codex/model/native integration | Launcher/generator/schema/guide identities, frozen SQLite, capability and exact model/effort matrix | W5, W6 | H01-H03, P01/P02 for claimed platforms; unsupported tuples remain explicit; candidate profiles are not promoted by packaging tests |
-| W8 - Controlled outcome studies | Frozen pilots and held-out protocols, blinded judging, full usage accounting, profile acceptance/withdrawal | W7 for claimed live surface | EVAL-01-EVAL-05 reports distinguish implementation, delivery, task quality, efficiency, memory, and collaboration |
+| W8 - Practical usability comparison | Approximately six matched released-v1.4/candidate scenarios; initial cap 24 model invocations, all attempts and observable artifacts/messages/state retained | Functional source/native qualification | Bounded results report improvements, ties, regressions and missing measurements; task fallback remains normal; no statistical proof or profile promotion required |
 | W9 - Reviewable handoff | Independent review/fixes, final source checks, accurate support/claim docs, Draft PR | Completed declared scope | Exact commit, commands/results, missing evidence, remaining work, and next action recoverable without prior conversation |
 
 Privacy boundaries apply from W2 onward; W6 is completion/adversarial verification,
@@ -99,8 +105,9 @@ and verify delegated output before integration. Retain the selected primary mode
 
 Maintain progress with exact commit, completed scope, tests/commands, live evidence,
 missing checks, known limits, and next action. Use focused commits and a Draft PR.
-Do not merge, tag, release, deploy, or update the active installation under the
-implementation kickoff. A partial handoff must state its narrower completed scope.
+The revised authority permits v1.5.0 candidate metadata and artifacts after
+functional qualification. Do not merge, tag, publish, deploy, or update the active
+installation without separate explicit authorization. A partial handoff must state its narrower completed scope.
 
 ## Priorities, excluded branches, and revision conditions
 

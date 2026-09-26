@@ -1,5 +1,10 @@
 # v1.5 evaluation status
 
+Current release-candidate completion follows the [2026-09-26 practical standard](../../docs/v1.5.0/PRACTICAL_COMPLETION.md).
+The historical study/readiness limits below restrict stronger claims; they no
+longer require a held-out study, numerical margin, human recruitment or account-
+isolation proof before practical product completion.
+
 ## Current additive evidence
 
 The [expanded results](expanded/RESULTS.md) and [audit](expanded/AUDIT.md) add a

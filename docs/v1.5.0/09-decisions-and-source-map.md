@@ -38,9 +38,9 @@ upgrade the evidence for any target outcome.
 
 | ID | Choice and reason | Verification boundary / reopen condition |
 | --- | --- | --- |
-| I01 | Keep the existing 1.4.0 released version identity on this Draft implementation branch until native Windows, live-host, and claim documentation are qualified. New commands are candidate source behavior. | A release-preparation change must update Python/npm/version/lock/docs together, then run exact-version package checks. A built local 1.4.0-labelled artifact is never a publishable v1.5 package. |
+| I01 (revised 2026-09-26) | Prepare synchronized 1.5.0 metadata and RC artifacts after functional qualification under the user's practical completion standard. PR stays Draft until separately authorized publication work. | Update Python/npm/version/lock/docs together and run exact-version package checks. Historical 1.4.0-labelled candidates keep their original identities. |
 | I02 | Author v1.5 closed JSON Schemas in `schemas/source/v15_contracts.py` with a separate checked manifest. The existing 48-method schema generator remains intact and emits the added schemas into the generated package. | Runtime operation checks still enforce per-operation required/allowed fields. Revisit if a compatible discriminated schema generator can express those rules without weakening the existing schema family. |
-| I03 | Keep Luna/Sol/Astra profiles at `candidate` and normal CLI use on task fallback. The three scoped candidates carry no observed failure categories yet; a declared evaluation harness may inject them explicitly. | A held-out outcome run with exact model/effort/client evidence is required before validating or withdrawing a profile. |
+| I03 | Keep Luna/Sol/Astra profiles at `candidate` and normal CLI use on task fallback. The three scoped candidates carry no observed failure categories yet; a declared evaluation harness may inject them explicitly. | A separately declared practical criterion and exact-tuple evidence is needed to enable a model-specific profile. No profile promotion is needed for this release; the working task fallback is the default. |
 | I04 | Add explicit development-only fixture data-root selection behind `OPENSOCRATES_MEMORY_FIXTURE=1`, `OPENSOCRATES_DEVELOPMENT_MANIFEST=1`, and `OPENSOCRATES_DATA_DIR`; ordinary requests use the owned product root. | The frozen native test checks only disposable roots. Any broader data-root override requires separate review. |
 | I05 | Use existing owner-only paths and locks around rollback-journal SQLite. The journal file is created owner-only before a content transaction and SQLite uses `TRUNCATE` rollback mode so the checked ACL remains stable on Windows. POSIX source reads use descriptor-relative no-follow opens; the Windows reader pins local-drive roots and components with non-reparse handles. UNC/device roots are rejected. Unexpected WAL/SHM sidecars fail closed rather than being silently converted. | Hosted Windows x64 run `35878192625` at `efeb436` passed local-drive/reparse, linked-worktree, owner ACL/journal, frozen SQLite migration/deletion, and package fixtures. The later WAL rejection has focused macOS fixture coverage; exact-head native rerun remains required. No WAL or network filesystem guarantee is made. |
 | I06 | The installer preserves project memory by default and delegates an explicit exact-project deletion to the verified installed memory command before host purge. | Native Windows lifecycle fixture passed at `efeb436`; clean-machine live installation and destructive account-home purge are separate unverified conditions. |
@@ -121,3 +121,11 @@ above. Implementation still needs to determine the exact safe SQLite/native
 closure, supported host adapter receipts, actual available model tuples, and
 performance on bounded general and coding tasks. Those are verifiable engineering
 tasks with cases in 06, not permission to assume success or wait indefinitely.
+
+## 2026-09-26 completion revision
+
+The user explicitly replaces statistical-release prerequisites with
+[practical qualification](PRACTICAL_COMPLETION.md), while retaining functional,
+privacy, lifecycle, packaging and honest-support gates. Human recruitment, billing
+proof, backend echo, account-side isolation and broad superiority are not universal
+release blockers. Frozen studies and their claim limitations are unchanged.

@@ -1,5 +1,10 @@
 # Candidate implementation status
 
+Current release-candidate completion follows the [2026-09-26 practical standard](PRACTICAL_COMPLETION.md).
+The historical study/readiness limits below restrict stronger claims; they no
+longer require a held-out study, numerical margin, human recruitment or account-
+isolation proof before practical product completion.
+
 The implementation remains Draft PR [#95](https://github.com/ParkerHwang/OpenSocrates/pull/95),
 tracked by [#94](https://github.com/ParkerHwang/OpenSocrates/issues/94). Remote main
 was reconciled at `5a2ff3c312e92aa8a44d0905465674d9a4e4f645`. Product/package metadata

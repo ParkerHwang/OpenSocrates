@@ -1,5 +1,11 @@
 # Verification and evaluation
 
+Current completion authority: [Practical completion standard](PRACTICAL_COMPLETION.md),
+revised by the user on 2026-09-26. Bounded usability and a small fair v1.4.0
+comparison govern this release candidate. Statistical studies below describe
+optional stronger-claim work, not release prerequisites. Frozen historical
+evidence remains unchanged.
+
 Implementation correctness, package delivery, actual host use, and improved task
 quality require different evidence. Keep each result tied to the exact commit,
 configuration, platform, commands, and artifacts that produced it.

@@ -1,5 +1,11 @@
 # Adaptive assistance and collaboration
 
+Current completion authority: [Practical completion standard](PRACTICAL_COMPLETION.md),
+revised by the user on 2026-09-26. Bounded usability and a small fair v1.4.0
+comparison govern this release candidate. Statistical studies below describe
+optional stronger-claim work, not release prerequisites. Frozen historical
+evidence remains unchanged.
+
 Status: normative target design. Profiles and thresholds below are engineering
 defaults for implementation and evaluation, not measured model improvements.
 
