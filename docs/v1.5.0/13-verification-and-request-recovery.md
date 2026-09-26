@@ -75,8 +75,9 @@ needed. Existing documentation retrieval and scoped memory contracts are preserv
   source/native/package gates, including frozen SQLite and external/embedded schema
   bytes, then reconcile CI on the pushed commit. Stop on privacy or migration failure;
   repair only diagnosed failures, retain them, and do not repeat unchanged passing gates.
-- `act_standardize_decision` — pending checks. Adopt deterministic fixes only after
-  their gates pass. Keep revised guidance provisional as model-behavior evidence:
+- `act_standardize_decision` — **verified**: source/native gates passed; adopt the
+  request/state fixes and completion examples as qualified in the [revision report](../../evals/v1.5/revision-v4/REPORT.md).
+  Keep revised guidance provisional as model-behavior evidence:
   no new outcome call means no measured quality, efficiency or billing gain. The
   next model evaluation, if separately requested, should target these changed seams
   rather than repeat the entire Sol/Luna matrix.

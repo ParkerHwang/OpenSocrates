@@ -50,7 +50,40 @@ relaxed. Ruff also found one native-check function above the complexity limit;
 the new decision checks were extracted into a focused helper. Both repairs passed
 their focused reruns. No model outcome was retried.
 
-Full source/native qualification and exact-head CI: pending the final checks.
+Full source and native qualification passed at
+`0e27afb048f77a1f3f521d2b13e311607f639df3` on macOS 27.0 / arm64:
+
+- `make bootstrap format-check lint generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check`
+  — pass, including 251 installer/lifecycle tests and npx packaging.
+- `make release-check` — pass on its first attempt, including frozen SQLite
+  migration/backup/deletion, 130 external/embedded canonical member comparisons,
+  EN/KO decision preparation/recovery and 16 native assistance transitions.
+- `python3 evals/v1.5/hard-tasks/v1/verify.py --complete` — pass: 50 frozen inputs,
+  all 18 attempts and 311 retained artifacts; the three timeouts remain failures.
+- `.venv/bin/python evals/v1.5/revision-v4/verify.py` — pass: all 4,777 historical
+  evaluation files and 47 schemas unchanged; the old-source state-loss reproducer
+  changes from scope/acknowledgment loss and no diagnostic to preservation and
+  an actionable diagnostic.
+- `.venv/bin/python docs/v1.5.0/validate_documents.py` — pass.
+
+The [validation receipt](validation.json) hashes runtime/package inputs and retains
+both focused-check failures. The [native report](native-release.json) records the
+actual gates and timing: packaged-hook p95 startup 16.083 ms and compaction
+107.432 ms, both within the existing one-second margin. These are hook timings,
+not model or generated-server performance measurements.
+
+New candidate ZIP SHA-256:
+`75c26eef657ddffb81be22bae407a92fd26bc9f28fcbeeb414000de90f68fc5a`.
+Runtime executable SHA-256:
+`6d0b1c05303eb7969a39668fed6055401f3cadf1b05510669eb20f930f6c2cd3`.
+The compared guide-8 archive retains its original hash in [baseline.json](baseline.json).
+Subsequent handoff edits change evidence only; the verifier binds them to qualified
+runtime and check inputs. Exact pushed-commit CI is recorded in PR #95 and issue #94.
+
+`act_standardize_decision`: adopt the verified request/state fixes and packaged
+completion examples. Keep the guidance's model-quality and efficiency effects
+unverified. Required checks passed, so no further unchanged testing or expanded
+model study belongs to this revision.
 
 ## Claim boundary and next action
 

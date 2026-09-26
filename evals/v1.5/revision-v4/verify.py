@@ -39,6 +39,19 @@ def main():
     assert len(schemas) == baseline["schema_bytes"]["count"] == 47
     assert aggregate(schemas) == baseline["schema_bytes"]["tree_sha256"]
 
+    qualified_count = None
+    validation_path = HERE / "validation.json"
+    if validation_path.exists():
+        validation = json.loads(validation_path.read_text())
+        for group in ("runtime_input_hashes", "qualification_input_hashes"):
+            for path, expected in validation[group].items():
+                assert digest((ROOT / path).read_bytes()) == expected, path
+        assert (
+            digest((HERE / "native-release.json").read_bytes())
+            == validation["native_report_sha256"]
+        )
+        qualified_count = len(validation["runtime_input_hashes"])
+
     import check_decision_points as fixtures
     from opensocrates.selector.decision import DecisionSession
 
@@ -82,6 +95,7 @@ def main():
                 "status": "pass",
                 "historical_files_unchanged": len(paths),
                 "schema_files_unchanged": len(schemas),
+                "qualified_runtime_inputs": qualified_count,
                 "decision_regression": state,
                 "model_calls": 0,
             },

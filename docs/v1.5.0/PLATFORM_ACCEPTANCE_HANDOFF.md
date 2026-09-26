@@ -14,6 +14,14 @@ evidence are scoped limits, not universal completion blockers under the revised
 
 ## Current and historical evidence
 
+- The [post-comparison revision](../../evals/v1.5/revision-v4/REPORT.md) passes
+  the full source and Apple-silicon native gates at product commit
+  `0e27afb048f77a1f3f521d2b13e311607f639df3`. Its new archive, guide 9,
+  request-recovery/state checks and 130 canonical member comparisons have a
+  separate [identity receipt](../../evals/v1.5/revision-v4/validation.json).
+  This revision makes zero new model calls; native launcher acceptance must not
+  be presented as a new live Codex task or as evidence of improved model output.
+
 - The [practical comparison](../../evals/v1.5/practical/RESULTS.md) completes six
   matched scenarios / 20 calls on bundled `codex-cli 0.158.0-alpha.2`, Sol medium,
   in disposable macOS profiles. It includes normal-hook-permitted planning and
