@@ -1,5 +1,14 @@
 # QueueForge backend comparison
 
+The subsequent [Luna comparison](luna-v1/review/REPORT.md) repeats the same tasks,
+checker and pinned packages in nine new Luna/medium calls. Its
+[source review](luna-v1/review/SOURCE_REVIEW.md) retains final contract failures in
+all three conditions and its [reproduction guide](luna-v1/review/REPRODUCE.md)
+links unchanged source histories. Luna receives corrected preliminary load
+feedback, unlike the earlier Sol run; cross-model conclusions remain descriptive.
+The `luna-v1` export is a separate immutable boundary, with no candidate repairs
+by the integrator and no rewrite of the Sol results below.
+
 [Read the completed comparison](v1/review/REPORT.md),
 [inspect source findings](v1/review/SOURCE_REVIEW.md), or
 [verify/reproduce the exported evidence](v1/review/REPRODUCE.md).

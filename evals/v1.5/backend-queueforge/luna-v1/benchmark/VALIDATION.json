@@ -1,0 +1,28 @@
+{
+  "status": "pass",
+  "observed_checks": [
+    {
+      "command": "go test -race ./...",
+      "cwd": "benchmark-v2/loadgen",
+      "exit_code": 0,
+      "evidence": "tool session 43750; ok queueforge-bench-loadgen 1.497s"
+    },
+    {
+      "command": "go build -o loadgen . && ./loadgen --selfcheck",
+      "cwd": "benchmark-v2/loadgen",
+      "exit_code": 0,
+      "evidence": "tool session 43750; controlled-delay, long closed-loop, arrival, drain, lifecycle, malformed checks passed"
+    },
+    {
+      "command": "python3 -m unittest discover -s benchmark-v2 -p 'test_*.py' -v",
+      "exit_code": 0,
+      "tests": 4
+    },
+    {
+      "check": "Python syntax parse for measure.py",
+      "status": "pass"
+    }
+  ],
+  "candidate_files_modified": false,
+  "extra_model_calls": 0
+}

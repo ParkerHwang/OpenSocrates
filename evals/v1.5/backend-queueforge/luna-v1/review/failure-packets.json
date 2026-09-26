@@ -1,0 +1,509 @@
+{
+  "created_utc": "2026-09-26T14:55:53.171191+00:00",
+  "scope": "Post-outcome evidence packet only; not delivered to any Luna outcome call; contains observed synthetic request/response evidence, no code repair.",
+  "feedback_gap": "The frozen stage3 feedback contains scenario names/status/error strings but not these failing HTTP request bodies or the actual response bodies. That limits causal interpretation of unsuccessful targeted repairs.",
+  "packets": [
+    {
+      "arm": "vanilla",
+      "scenario": "two_process_idempotency_and_tenancy",
+      "status": "fail",
+      "error": "Failure: GET /v1/jobs/1790434005596314000-031df11131470f0851bb691d656c7bc6: expected [404], got 503",
+      "last_requests": [
+        {
+          "scenario": "two_process_idempotency_and_tenancy",
+          "method": "POST",
+          "path": "/v1/jobs",
+          "tenant": "beta",
+          "idempotency_key": "shared",
+          "request": {
+            "queue": "mail",
+            "payload": {
+              "n": 1
+            }
+          },
+          "status": 201,
+          "response": {
+            "job": {
+              "id": "1790434005611367000-7348f186e4add14eab4e08a60ceb3102",
+              "tenant": "beta",
+              "queue": "mail",
+              "payload": {
+                "n": 1
+              },
+              "state": "ready",
+              "attempts": 0,
+              "max_attempts": 3,
+              "created_seq": 2,
+              "created_at_ms": 1800000001000,
+              "available_at_ms": 1800000001000,
+              "lease_until_ms": null,
+              "last_error": null,
+              "result": null,
+              "priority": 0,
+              "retry_base_ms": 1000
+            },
+            "replayed": false
+          },
+          "error": null,
+          "duration_ms": 2.0459579827729613,
+          "expected_status": 201,
+          "expected_code": null
+        },
+        {
+          "scenario": "two_process_idempotency_and_tenancy",
+          "method": "GET",
+          "path": "/v1/jobs/1790434005596314000-031df11131470f0851bb691d656c7bc6",
+          "tenant": "beta",
+          "idempotency_key": null,
+          "request": null,
+          "status": 503,
+          "response": {
+            "error": {
+              "code": "unavailable",
+              "message": "storage temporarily unavailable"
+            }
+          },
+          "error": null,
+          "duration_ms": 0.9292080067098141,
+          "expected_status": 404,
+          "expected_code": "not_found"
+        }
+      ],
+      "source_commit": "81aed552b1154ff88f97c55492496a3adc986016"
+    },
+    {
+      "arm": "vanilla",
+      "scenario": "genuine_stage1_migration_two_startups_and_original_replay",
+      "status": "fail",
+      "error": "Failure: POST /v1/jobs: expected [200], got 409",
+      "last_requests": [
+        {
+          "scenario": "genuine_stage1_migration_two_startups_and_original_replay",
+          "method": "GET",
+          "path": "/v1/jobs/1790434030683142000-eec4c61cc328d85d2901c5bb3b9130d4",
+          "tenant": "alpha",
+          "idempotency_key": null,
+          "request": null,
+          "status": 200,
+          "response": {
+            "job": {
+              "id": "1790434030683142000-eec4c61cc328d85d2901c5bb3b9130d4",
+              "tenant": "alpha",
+              "queue": "mail",
+              "payload": {
+                "old": 1
+              },
+              "state": "leased",
+              "attempts": 1,
+              "max_attempts": 3,
+              "created_seq": 1,
+              "created_at_ms": 1800000000000,
+              "available_at_ms": 1800000000000,
+              "lease_until_ms": 1800000000100,
+              "last_error": null,
+              "result": null,
+              "priority": 0,
+              "retry_base_ms": 0
+            }
+          },
+          "error": null,
+          "duration_ms": 1.082540984498337,
+          "expected_status": 200,
+          "expected_code": null
+        },
+        {
+          "scenario": "genuine_stage1_migration_two_startups_and_original_replay",
+          "method": "POST",
+          "path": "/v1/jobs",
+          "tenant": "alpha",
+          "idempotency_key": "legacy",
+          "request": {
+            "queue": "mail",
+            "payload": {
+              "old": 1
+            }
+          },
+          "status": 409,
+          "response": {
+            "error": {
+              "code": "idempotency_conflict",
+              "message": "idempotency key was used with different input"
+            }
+          },
+          "error": null,
+          "duration_ms": 1.1212500103283674,
+          "expected_status": 200,
+          "expected_code": null
+        }
+      ],
+      "source_commit": "81aed552b1154ff88f97c55492496a3adc986016"
+    },
+    {
+      "arm": "v1.4.0",
+      "scenario": "validation_atomic_no_side_effects",
+      "status": "fail",
+      "error": "Failure: POST /v1/jobs: expected [400], got 201",
+      "last_requests": [
+        {
+          "scenario": "validation_atomic_no_side_effects",
+          "method": "POST",
+          "path": "/v1/jobs",
+          "tenant": "alpha",
+          "idempotency_key": "bad1",
+          "request": {
+            "queue": "mail",
+            "payload": []
+          },
+          "status": 400,
+          "response": {
+            "error": {
+              "code": "validation",
+              "message": "invalid job input"
+            }
+          },
+          "error": null,
+          "duration_ms": 0.34283401328139007,
+          "expected_status": 400,
+          "expected_code": "validation"
+        },
+        {
+          "scenario": "validation_atomic_no_side_effects",
+          "method": "POST",
+          "path": "/v1/jobs",
+          "tenant": "alpha",
+          "idempotency_key": "bad2",
+          "request": {
+            "queue": "mail",
+            "payload": {},
+            "max_attempts": 0
+          },
+          "status": 201,
+          "response": {
+            "job": {
+              "id": "6534b7de7f12549b780ee5aa3afe5b5a65fa8b8ca02afc90",
+              "tenant": "alpha",
+              "queue": "mail",
+              "payload": {},
+              "state": "ready",
+              "attempts": 0,
+              "max_attempts": 3,
+              "created_seq": 1,
+              "created_at_ms": 1800000000000,
+              "available_at_ms": 1800000000000,
+              "lease_until_ms": null,
+              "last_error": null,
+              "result": null,
+              "priority": 0,
+              "retry_base_ms": 1000
+            },
+            "replayed": false
+          },
+          "error": null,
+          "duration_ms": 2.425874990876764,
+          "expected_status": 400,
+          "expected_code": "validation"
+        }
+      ],
+      "source_commit": "7e6de3091c7e6c2372fd28165534f604b8fb1da8"
+    },
+    {
+      "arm": "v1.4.0",
+      "scenario": "atomic_bulk_and_replay",
+      "status": "fail",
+      "error": "Failure: POST /v1/jobs/batch: expected [400], got 201",
+      "last_requests": [
+        {
+          "scenario": "atomic_bulk_and_replay",
+          "method": "POST",
+          "path": "/v1/jobs/batch",
+          "tenant": "alpha",
+          "idempotency_key": "bulk",
+          "request": {
+            "jobs": [
+              {
+                "queue": "mail",
+                "payload": {
+                  "n": 1
+                }
+              },
+              {
+                "queue": "mail",
+                "payload": {},
+                "max_attempts": 0
+              }
+            ]
+          },
+          "status": 201,
+          "response": {
+            "jobs": [
+              {
+                "id": "c5fc0e9324ccf0e8c9bf5828b8410eb8fa62690a58f0b74f",
+                "tenant": "alpha",
+                "queue": "mail",
+                "payload": {
+                  "n": 1
+                },
+                "state": "ready",
+                "attempts": 0,
+                "max_attempts": 3,
+                "created_seq": 1,
+                "created_at_ms": 1800000000000,
+                "available_at_ms": 1800000000000,
+                "lease_until_ms": null,
+                "last_error": null,
+                "result": null,
+                "priority": 0,
+                "retry_base_ms": 1000
+              },
+              {
+                "id": "d7a23489e20f48c98584357c4aab3563d36503d835eb713e",
+                "tenant": "alpha",
+                "queue": "mail",
+                "payload": {},
+                "state": "ready",
+                "attempts": 0,
+                "max_attempts": 3,
+                "created_seq": 2,
+                "created_at_ms": 1800000000000,
+                "available_at_ms": 1800000000000,
+                "lease_until_ms": null,
+                "last_error": null,
+                "result": null,
+                "priority": 0,
+                "retry_base_ms": 1000
+              }
+            ],
+            "replayed": false
+          },
+          "error": null,
+          "duration_ms": 3.550791007000953,
+          "expected_status": 400,
+          "expected_code": "validation"
+        }
+      ],
+      "source_commit": "7e6de3091c7e6c2372fd28165534f604b8fb1da8"
+    },
+    {
+      "arm": "v1.4.0",
+      "scenario": "genuine_stage1_migration_two_startups_and_original_replay",
+      "status": "fail",
+      "error": "Failure: POST /v1/jobs: expected [409], got 200",
+      "last_requests": [
+        {
+          "scenario": "genuine_stage1_migration_two_startups_and_original_replay",
+          "method": "POST",
+          "path": "/v1/jobs",
+          "tenant": "alpha",
+          "idempotency_key": "legacy",
+          "request": {
+            "queue": "mail",
+            "payload": {
+              "old": 1
+            }
+          },
+          "status": 200,
+          "response": {
+            "job": {
+              "id": "96a2d828cb8feb5f44a8cb558441943765a5e155f2d9a961",
+              "tenant": "alpha",
+              "queue": "mail",
+              "payload": {
+                "old": 1
+              },
+              "state": "leased",
+              "attempts": 1,
+              "max_attempts": 3,
+              "created_seq": 1,
+              "created_at_ms": 1800000000000,
+              "available_at_ms": 1800000000000,
+              "lease_until_ms": 1800000000100,
+              "last_error": null,
+              "result": null,
+              "priority": 0,
+              "retry_base_ms": 0
+            },
+            "jobs": [
+              {
+                "id": "96a2d828cb8feb5f44a8cb558441943765a5e155f2d9a961",
+                "tenant": "alpha",
+                "queue": "mail",
+                "payload": {
+                  "old": 1
+                },
+                "state": "leased",
+                "attempts": 1,
+                "max_attempts": 3,
+                "created_seq": 1,
+                "created_at_ms": 1800000000000,
+                "available_at_ms": 1800000000000,
+                "lease_until_ms": 1800000000100,
+                "last_error": null,
+                "result": null,
+                "priority": 0,
+                "retry_base_ms": 0
+              }
+            ],
+            "replayed": true
+          },
+          "error": null,
+          "duration_ms": 3.029624989721924,
+          "expected_status": 200,
+          "expected_code": null
+        },
+        {
+          "scenario": "genuine_stage1_migration_two_startups_and_original_replay",
+          "method": "POST",
+          "path": "/v1/jobs",
+          "tenant": "alpha",
+          "idempotency_key": "legacy",
+          "request": {
+            "queue": "mail",
+            "payload": {
+              "old": 1
+            },
+            "retry_base_ms": 1000
+          },
+          "status": 200,
+          "response": {
+            "job": {
+              "id": "96a2d828cb8feb5f44a8cb558441943765a5e155f2d9a961",
+              "tenant": "alpha",
+              "queue": "mail",
+              "payload": {
+                "old": 1
+              },
+              "state": "leased",
+              "attempts": 1,
+              "max_attempts": 3,
+              "created_seq": 1,
+              "created_at_ms": 1800000000000,
+              "available_at_ms": 1800000000000,
+              "lease_until_ms": 1800000000100,
+              "last_error": null,
+              "result": null,
+              "priority": 0,
+              "retry_base_ms": 0
+            },
+            "jobs": [
+              {
+                "id": "96a2d828cb8feb5f44a8cb558441943765a5e155f2d9a961",
+                "tenant": "alpha",
+                "queue": "mail",
+                "payload": {
+                  "old": 1
+                },
+                "state": "leased",
+                "attempts": 1,
+                "max_attempts": 3,
+                "created_seq": 1,
+                "created_at_ms": 1800000000000,
+                "available_at_ms": 1800000000000,
+                "lease_until_ms": 1800000000100,
+                "last_error": null,
+                "result": null,
+                "priority": 0,
+                "retry_base_ms": 0
+              }
+            ],
+            "replayed": true
+          },
+          "error": null,
+          "duration_ms": 1.7318750033155084,
+          "expected_status": 409,
+          "expected_code": "idempotency_conflict"
+        }
+      ],
+      "source_commit": "7e6de3091c7e6c2372fd28165534f604b8fb1da8"
+    },
+    {
+      "arm": "v1.5.0-rc",
+      "scenario": "genuine_stage1_migration_two_startups_and_original_replay",
+      "status": "fail",
+      "error": "Failure: POST /v1/jobs: expected [409], got 200",
+      "last_requests": [
+        {
+          "scenario": "genuine_stage1_migration_two_startups_and_original_replay",
+          "method": "POST",
+          "path": "/v1/jobs",
+          "tenant": "alpha",
+          "idempotency_key": "legacy",
+          "request": {
+            "queue": "mail",
+            "payload": {
+              "old": 1
+            }
+          },
+          "status": 200,
+          "response": {
+            "job": {
+              "id": "8c0b03fc536076427331c1e5c8d39975669151a1ef7fb042",
+              "tenant": "alpha",
+              "queue": "mail",
+              "payload": {
+                "old": 1
+              },
+              "state": "leased",
+              "attempts": 1,
+              "max_attempts": 3,
+              "priority": 0,
+              "retry_base_ms": 0,
+              "created_seq": 1,
+              "created_at_ms": 1800000000000,
+              "available_at_ms": 1800000000000,
+              "lease_until_ms": 1800000000100,
+              "last_error": null,
+              "result": null
+            },
+            "replayed": true
+          },
+          "error": null,
+          "duration_ms": 2.664875006303191,
+          "expected_status": 200,
+          "expected_code": null
+        },
+        {
+          "scenario": "genuine_stage1_migration_two_startups_and_original_replay",
+          "method": "POST",
+          "path": "/v1/jobs",
+          "tenant": "alpha",
+          "idempotency_key": "legacy",
+          "request": {
+            "queue": "mail",
+            "payload": {
+              "old": 1
+            },
+            "retry_base_ms": 1000
+          },
+          "status": 200,
+          "response": {
+            "job": {
+              "id": "8c0b03fc536076427331c1e5c8d39975669151a1ef7fb042",
+              "tenant": "alpha",
+              "queue": "mail",
+              "payload": {
+                "old": 1
+              },
+              "state": "leased",
+              "attempts": 1,
+              "max_attempts": 3,
+              "priority": 0,
+              "retry_base_ms": 0,
+              "created_seq": 1,
+              "created_at_ms": 1800000000000,
+              "available_at_ms": 1800000000000,
+              "lease_until_ms": 1800000000100,
+              "last_error": null,
+              "result": null
+            },
+            "replayed": true
+          },
+          "error": null,
+          "duration_ms": 1.2400410196278244,
+          "expected_status": 409,
+          "expected_code": "idempotency_conflict"
+        }
+      ],
+      "source_commit": "b75354c068ecb836d9e1352fb81157b4063a8c31"
+    }
+  ]
+}

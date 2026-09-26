@@ -1,0 +1,131 @@
+{
+  "scope": "Post-outcome, post-load immutable read-only EXPLAIN; no actual query timing, candidate edits or model calls",
+  "sqlite_engine": {
+    "surface": "host Python sqlite3, not the measured Go process",
+    "version": "3.50.4"
+  },
+  "rows": [
+    {
+      "arm": "vanilla",
+      "status": "observed",
+      "query": "SELECT id FROM jobs WHERE tenant=? AND queue=? AND state='ready' AND available_at_ms<=? ORDER BY priority DESC,created_seq LIMIT 1",
+      "parameters": [
+        "bench0",
+        "mail",
+        1152921504606846976
+      ],
+      "plan": [
+        [
+          5,
+          0,
+          49,
+          "SEARCH jobs USING INDEX jobs_claim (tenant=? AND queue=? AND state=? AND available_at_ms<?)"
+        ],
+        [
+          29,
+          0,
+          0,
+          "USE TEMP B-TREE FOR ORDER BY"
+        ]
+      ],
+      "indexes": [
+        [
+          "jobs_claim",
+          "CREATE INDEX jobs_claim ON jobs(tenant,queue,state,available_at_ms,priority DESC,created_seq)"
+        ],
+        [
+          "jobs_inflight",
+          "CREATE INDEX jobs_inflight ON jobs(tenant,queue,state,lease_until_ms)"
+        ],
+        [
+          "jobs_list",
+          "CREATE INDEX jobs_list ON jobs(tenant,created_seq)"
+        ],
+        [
+          "jobs_list_queue",
+          "CREATE INDEX jobs_list_queue ON jobs(tenant,queue,created_seq)"
+        ],
+        [
+          "jobs_pending",
+          "CREATE INDEX jobs_pending ON jobs(tenant,state)"
+        ],
+        [
+          "sqlite_autoindex_jobs_1",
+          null
+        ]
+      ],
+      "seed_sha256_unchanged": "c726ceaeebedf202309d53d15b4fd2a0e183f4f2e7444789c1ef1fbf06ba78e8"
+    },
+    {
+      "arm": "v1.4.0",
+      "status": "observed",
+      "query": "SELECT id FROM jobs WHERE tenant=? AND queue=? AND state='ready' AND available_at<=? ORDER BY priority DESC,created_seq LIMIT 1",
+      "parameters": [
+        "bench0",
+        "mail",
+        1152921504606846976
+      ],
+      "plan": [
+        [
+          5,
+          0,
+          60,
+          "SEARCH jobs USING INDEX jobs_tenant_queue_state (tenant=? AND queue=? AND state=?)"
+        ]
+      ],
+      "indexes": [
+        [
+          "jobs_tenant_pending",
+          "CREATE INDEX jobs_tenant_pending ON jobs(tenant,state)"
+        ],
+        [
+          "jobs_tenant_queue_state",
+          "CREATE INDEX jobs_tenant_queue_state ON jobs(tenant,queue,state,priority DESC,created_seq)"
+        ],
+        [
+          "sqlite_autoindex_jobs_1",
+          null
+        ]
+      ],
+      "seed_sha256_unchanged": "445cd146f61a4cb4b57bae2c36b7bc03c4438c8ce9c9330840a7eefb3f4e3f58"
+    },
+    {
+      "arm": "v1.5.0-rc",
+      "status": "observed",
+      "query": "SELECT id FROM jobs WHERE tenant=? AND queue=? AND state='ready' AND available_at<=? ORDER BY priority DESC,created_seq LIMIT 1",
+      "parameters": [
+        "bench0",
+        "mail",
+        1152921504606846976
+      ],
+      "plan": [
+        [
+          5,
+          0,
+          60,
+          "SEARCH jobs USING INDEX jobs_claim (tenant=? AND queue=? AND state=?)"
+        ]
+      ],
+      "indexes": [
+        [
+          "jobs_claim",
+          "CREATE INDEX jobs_claim ON jobs(tenant,queue,state,priority DESC,created_seq,available_at)"
+        ],
+        [
+          "jobs_inflight",
+          "CREATE INDEX jobs_inflight ON jobs(tenant,queue,state,lease_until)"
+        ],
+        [
+          "jobs_pending",
+          "CREATE INDEX jobs_pending ON jobs(tenant,state)"
+        ],
+        [
+          "sqlite_autoindex_jobs_1",
+          null
+        ]
+      ],
+      "seed_sha256_unchanged": "6445a576d9a30f439dcb1991777eeac55f9a25ea286153c5cf6dfe95b86ecbc6"
+    }
+  ],
+  "interpretation_limit": "Architectural aid from a separately identified SQLite planner, not proof of the measured Go driver's runtime plan or a controlled attribution of the throughput difference."
+}

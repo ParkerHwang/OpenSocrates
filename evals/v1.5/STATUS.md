@@ -7,6 +7,21 @@ isolation proof before practical product completion.
 
 ## Current practical release-candidate qualification
 
+The [Luna QueueForge replication](backend-queueforge/luna-v1/review/REPORT.md)
+completes nine fixed Luna/medium calls and 99 load cells without stronger-model
+answers, repairs or escalation inside treatments. Initial external results are
+4/8 (one unassessable), 5/8 and 8/8 for vanilla, 1.4 and 1.5 RC; final results
+are 17/19, 16/19 and 18/19. Every final artifact still fails a mandatory contract,
+so all final performance is diagnostic despite zero errors in the measured load
+cohorts. The candidate has more domain tests and fewer observed defects but more
+invocation time/input/tool work. Seventeen direct native memory attempts retain
+15 captured OK statuses and two missing statuses; proposed checkpoints remain
+separate from accepted intent. The [source review and failure packets](backend-queueforge/luna-v1/review/SOURCE_REVIEW.md)
+separate application defects, ineffective regressions and thin final-session
+feedback. This run uses corrected preliminary measurements; Sol did not, so
+their final difference is not a controlled model-gap estimate. Old outcomes,
+product inputs and profile status are unchanged.
+
 The [QueueForge backend comparison](backend-queueforge/v1/review/REPORT.md) adds
 vanilla Codex alongside released 1.4 and the repaired 1.5 RC, using nine fixed
 Sol/medium fresh development calls. All final implementations pass 19 external

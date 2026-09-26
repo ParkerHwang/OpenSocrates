@@ -1,0 +1,17 @@
+{
+  "model_calls": 0,
+  "failures": [
+    {
+      "kind": "native method request identifier",
+      "status": "invalid_decision_request",
+      "repair": "Use valid decision identifier d1; canonical pdca-cycle@3 then read completely; application remains unverified."
+    },
+    {
+      "kind": "preparation process dependency race",
+      "command": "go test -race ./... with fresh common-seed cache",
+      "exit_code": 1,
+      "error": "SQLite dependency unzip raced the still-running APFS copy and reported file exists.",
+      "repair": "Retain that cache under modcache-copy-race-preserved, copy third-party modules again synchronously, and prime only after copy completion. No outcome call or candidate source existed."
+    }
+  ]
+}
