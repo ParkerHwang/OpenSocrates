@@ -1,6 +1,12 @@
 {
   "schema": "opensocrates.backend-comparison-validation/1",
   "product_input_commit": "a8aaba572693c63419188ee2d45f59688b564b16",
+  "source_suite_working_tree_commit": "ab29cfe",
+  "export_transport_repair": {
+    "observed": "Git normalized the new CSV CRLF to LF in ab29cfe, differing from the immutable export digest although the working file and numeric values were unchanged.",
+    "repair": "A narrowly scoped -text attribute preserves the original frozen CSV bytes in Git; no outcome, metric, source artifact or export manifest is rewritten.",
+    "verification": "Compare all 376 export-file Git blobs against the original export manifest after the repair; exact final CI belongs to the new pushed head."
+  },
   "working_tree_scope": "New synthetic evaluation export and current STATUS.md only; subsequently committed feature head is recorded in PR95 and issue94.",
   "commands": [
     {
