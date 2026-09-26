@@ -1,0 +1,402 @@
+diff --git a/REPAIR_PROVENANCE.md b/REPAIR_PROVENANCE.md
+new file mode 100644
+index 0000000..936851c
+--- /dev/null
++++ b/REPAIR_PROVENANCE.md
+@@ -0,0 +1,22 @@
++# Integrator-authored derivative repair
++
++Original demonstration commit: `8769ec1cf8b1f35aa229f57c4c597c41b5dc4d55`.
++Repair branch: `repairs/v1`. The original application, protocol, evaluation and
++historical scores remain unchanged. This derivative contains human-directed
++integrator code repairs; it is not an unassisted outcome of the original model run.
++
++Run `npm test` from this directory. Local HTTP tests require loopback binding.
++Tests cover direct transitions, service/CLI/HTTP date boundaries, persisted-byte
++rollback, batch failure positions, replay, cumulative refunds and output ownership.
++
++Historical mixed aggregate-only deposits have no defensible line allocation.
++Migration marks `depositPlan: null`; partial returns reject with an explicit
++validation error. Full return preserves the known aggregate refund. Historical
++quote lines with complete nonnegative integer deposits summing to the aggregate
++and exact unit divisibility support partial returns. A single homogeneous line
++with an exactly divisible aggregate also supports derivation. No current catalog
++prices recover historical amounts. New bookings retain quote-line deposits and
++the unit deposit plan. Importing additional historical allocation is out of scope.
++
++Awaiting the existing rejection assertion clarifies test lifecycle; no historical
++false-green claim is made. Replay data is now detached from saved replay evidence.
+diff --git a/src/domain.mjs b/src/domain.mjs
+index fe03c8a..ebf9a93 100644
+--- a/src/domain.mjs
++++ b/src/domain.mjs
+@@ -47,35 +47,56 @@ export function validateStore(input) {
+     const lineIds=new Set();
+     for(const line of r.lines) {if(!object(line)) fail('VALIDATION','Invalid store line'); id(line.itemId,'itemId'); bounded(line.quantity,1); if(lineIds.has(line.itemId)) fail('VALIDATION','Invalid store line'); lineIds.add(line.itemId);}
+     const q=r.quote;
+-    if(q.memberId!==r.memberId||q.start!==r.start||q.end!==r.end||!Array.isArray(q.lines)||JSON.stringify(q.lines)!==JSON.stringify(r.lines)) fail('VALIDATION','Invalid store quote');
++    if(q.memberId!==r.memberId||q.start!==r.start||q.end!==r.end||!Array.isArray(q.lines)||q.lines.length!==r.lines.length||q.lines.some((l,i)=>!object(l)||l.itemId!==r.lines[i].itemId||l.quantity!==r.lines[i].quantity)) fail('VALIDATION','Invalid store quote');
+     for(const field of ['rentalSubtotal','discount','rentalTotal','deposit','totalDue']) bounded(q[field]);
+     if(q.discount>q.rentalSubtotal||q.rentalTotal!==q.rentalSubtotal-q.discount||sum(q.rentalTotal,q.deposit)!==q.totalDue) fail('VALIDATION','Invalid store quote');
+     if(legacy) {
+-      // V1 saved only an aggregate deposit. Split it deterministically across units.
+-      // This preserves the historical total without consulting the current catalog.
+-      const units=r.lines.reduce((n,l)=>sum(n,l.quantity),0),base=Math.floor(q.deposit/units);
+-      let remainder=q.deposit%units;
+-      r.depositPlan=Object.fromEntries(r.lines.map(l=>{const extra=Math.min(l.quantity,remainder); remainder-=extra; return [l.itemId,{base,extra}];}));
++      // Historical allocation is available only from retained line amounts or a
++      // single homogeneous line with an exact unit division. Mixed aggregate-only
++      // records stay explicitly unknown; today's catalog cannot recover them.
++      const evidenced=q.lines.every(l=>Number.isSafeInteger(l.deposit)&&l.deposit>=0&&l.deposit%l.quantity===0);
++      if(evidenced) {
++        if(q.lines.reduce((n,l)=>sum(n,l.deposit),0)!==q.deposit) fail('VALIDATION','Invalid historical line deposits');
++        r.depositPlan=Object.fromEntries(q.lines.map(l=>[l.itemId,{base:l.deposit/l.quantity,extra:0}]));
++      } else if(q.lines.some(l=>l.deposit!==undefined)) fail('VALIDATION','Incomplete historical line deposits');
++      else if(r.lines.length===1&&q.deposit%r.lines[0].quantity===0) {
++        r.depositPlan={[r.lines[0].itemId]:{base:q.deposit/r.lines[0].quantity,extra:0}};
++      } else r.depositPlan=null;
+       r.returnedUnits=Object.fromEntries(r.lines.map(l=>[l.itemId,0]));
+       if(r.status==='returned') {for(const l of r.lines) r.returnedUnits[l.itemId]=l.quantity;}
+       r.refunded=r.status==='returned'?q.deposit:0; r.lateFees=0;
+       q.lateFeePerUnitDay=0;
+     } else {
+       bounded(q.lateFeePerUnitDay); bounded(r.refunded); bounded(r.lateFees);
+-      if(!object(r.depositPlan)||!object(r.returnedUnits)) fail('VALIDATION','Invalid return accounting');
+-      let held=0,returnedDeposit=0;
+-      if(Object.keys(r.depositPlan).length!==r.lines.length||Object.keys(r.returnedUnits).length!==r.lines.length) fail('VALIDATION','Invalid return accounting');
+-      for(const l of r.lines) {
+-        const plan=r.depositPlan[l.itemId],count=r.returnedUnits[l.itemId];
+-        if(!object(plan)) fail('VALIDATION','Invalid deposit plan');
+-        bounded(plan.base); bounded(plan.extra); if(plan.extra>l.quantity) fail('VALIDATION','Invalid deposit plan');
+-        bounded(count); if(count>l.quantity) fail('VALIDATION','Invalid returned quantity');
+-        returnedDeposit=sum(returnedDeposit,depositPart(plan,0,count)); held=sum(held,depositPart(plan,count,l.quantity-count));
++      if(q.lines.some(l=>l.deposit!==undefined)) {
++        if(!object(r.depositPlan)) fail('VALIDATION','Line deposits require known allocation');
++        for(const l of q.lines) {
++          bounded(l.deposit);
++          const plan=r.depositPlan[l.itemId];
++          if(!object(plan)||l.deposit!==depositPart(plan,0,l.quantity)) fail('VALIDATION','Line deposit differs from allocation');
++        }
++      }
++      if(!object(r.returnedUnits)||Object.keys(r.returnedUnits).length!==r.lines.length) fail('VALIDATION','Invalid return accounting');
++      if(r.depositPlan===null) {
++        // Unknown allocations may only be untouched or fully returned.
++        const allReturned=r.status==='returned';
++        for(const l of r.lines) if(r.returnedUnits[l.itemId]!== (allReturned?l.quantity:0)) fail('VALIDATION','Unknown historical allocation cannot be partially returned');
++        if(sum(r.refunded,r.lateFees)!==(allReturned?q.deposit:0)) fail('VALIDATION','Invalid return totals');
++      } else {
++        if(!object(r.depositPlan)||Object.keys(r.depositPlan).length!==r.lines.length) fail('VALIDATION','Invalid return accounting');
++        let held=0,returnedDeposit=0;
++        for(const l of r.lines) {
++          const plan=r.depositPlan[l.itemId],count=r.returnedUnits[l.itemId];
++          if(!object(plan)) fail('VALIDATION','Invalid deposit plan');
++          bounded(plan.base); bounded(plan.extra); if(plan.extra>l.quantity) fail('VALIDATION','Invalid deposit plan');
++          bounded(count); if(count>l.quantity) fail('VALIDATION','Invalid returned quantity');
++          returnedDeposit=sum(returnedDeposit,depositPart(plan,0,count)); held=sum(held,depositPart(plan,count,l.quantity-count));
++        }
++        if(sum(held,returnedDeposit)!==q.deposit||sum(r.refunded,r.lateFees)!==returnedDeposit) fail('VALIDATION','Invalid return totals');
++        const allReturned=r.lines.every(l=>r.returnedUnits[l.itemId]===l.quantity);
++        if((r.status==='returned')!==allReturned && (r.status==='returned'||r.status==='checked_out')) fail('VALIDATION','Invalid return status');
++        if(['reserved','cancelled'].includes(r.status)&&returnedDeposit!==0) fail('VALIDATION','Invalid return status');
+       }
+-      if(sum(held,returnedDeposit)!==q.deposit||sum(r.refunded,r.lateFees)!==returnedDeposit) fail('VALIDATION','Invalid return totals');
+-      const allReturned=r.lines.every(l=>r.returnedUnits[l.itemId]===l.quantity);
+-      if((r.status==='returned')!==allReturned && (r.status==='returned'||r.status==='checked_out')) fail('VALIDATION','Invalid return status');
+-      if(['reserved','cancelled'].includes(r.status)&&returnedDeposit!==0) fail('VALIDATION','Invalid return status');
+     }
+   }
+   for(let i=0;i<s.audit.length;i++) {const a=s.audit[i]; if(!object(a)||a.revision!==i+1||!['reserve','cancel','checkout','return','return.partial','maintenance.add','maintenance.remove'].includes(a.type)||typeof a.id!=='string') fail('VALIDATION','Invalid audit');}
+@@ -119,7 +140,7 @@ export function quote(store,catalog,request) {
+       rentalSubtotal=sum(rentalSubtotal,product(quantity,daily));
+     }
+     deposit=sum(deposit,product(quantity,item.deposit));
+-    return {itemId:item.id,quantity};
++    return {itemId:item.id,quantity,deposit:product(quantity,item.deposit)};
+   });
+   let discount; try {discount=roundRatio(rentalSubtotal,member.discountBps,10000);} catch {fail('VALIDATION','Unsafe discount');}
+   if(catalog.pricing?.discountCap!==undefined) discount=Math.min(discount,catalog.pricing.discountCap);
+@@ -136,7 +157,7 @@ function applyOne(next,catalog,input,timestamp) {
+     id(input.id); if(next.reservations.some(r=>r.id===input.id)) fail('VALIDATION','Duplicate reservation ID');
+     const q=quote(next,catalog,input);
+     q.lateFeePerUnitDay=catalog.pricing?.lateFeePerUnitDay??0;
+-    data={id:input.id,memberId:q.memberId,start:q.start,end:q.end,lines:q.lines,status:'reserved',quote:q,
++    data={id:input.id,memberId:q.memberId,start:q.start,end:q.end,lines:q.lines.map(({itemId,quantity})=>({itemId,quantity})),status:'reserved',quote:q,
+       depositPlan:Object.fromEntries(q.lines.map(l=>[l.itemId,{base:catalog.items.find(i=>i.id===l.itemId).deposit,extra:0}])),
+       returnedUnits:Object.fromEntries(q.lines.map(l=>[l.itemId,0])),refunded:0,lateFees:0};
+     next.reservations.push(data);
+@@ -145,8 +166,9 @@ function applyOne(next,catalog,input,timestamp) {
+     const returning=input.type==='return'||input.type==='return.partial';
+     if(r.status!==(returning?'checked_out':'reserved')) fail('INVALID_TRANSITION','Unsupported status transition');
+     if(returning) {
+-      if(input.type==='return.partial'&&input.returnedOn===undefined) fail('VALIDATION','Expected returnedOn');
+-      const returnedOn=input.returnedOn??r.end;
++      if(input.type==='return.partial'&&(input.returnedOn===undefined||input.returnedOn===null)) fail('VALIDATION','Expected returnedOn');
++      if(input.type==='return.partial'&&r.depositPlan===null) fail('VALIDATION','Historical line deposit allocation is unknown; use full return');
++      const returnedOn=input.returnedOn===undefined?r.end:input.returnedOn;
+       let lateDays; try {lateDays=daysLate(returnedOn,r.end); if(dayNumber(returnedOn)<dayNumber(r.start)) fail('VALIDATION','Return before start');} catch(e) {if(e instanceof BusinessError) throw e; fail('VALIDATION','Invalid returnedOn');}
+       const lines=input.type==='return'?r.lines.map(l=>({itemId:l.itemId,quantity:l.quantity-r.returnedUnits[l.itemId]})).filter(l=>l.quantity):input.lines;
+       if(!Array.isArray(lines)||!lines.length) fail('VALIDATION','Expected nonempty return lines');
+@@ -157,9 +179,10 @@ function applyOne(next,catalog,input,timestamp) {
+         const booked=r.lines.find(l=>l.itemId===line.itemId);
+         if(!booked||quantity>booked.quantity-r.returnedUnits[line.itemId]) fail('VALIDATION','Invalid return quantity');
+         const start=r.returnedUnits[line.itemId];
+-        deposit=sum(deposit,depositPart(r.depositPlan[line.itemId],start,quantity));
++        if(r.depositPlan!==null) deposit=sum(deposit,depositPart(r.depositPlan[line.itemId],start,quantity));
+         returnedQuantity=sum(returnedQuantity,quantity);
+       }
++      if(r.depositPlan===null) deposit=r.quote.deposit-r.refunded-r.lateFees;
+       const rate=r.quote.lateFeePerUnitDay;
+       const lateFee=rate===0||lateDays===0?0:(lateDays>Math.floor(deposit/rate/returnedQuantity)?deposit:product(product(returnedQuantity,lateDays),rate));
+       const refund=deposit-lateFee;
+@@ -184,22 +207,24 @@ function applyOne(next,catalog,input,timestamp) {
+   return structuredClone(data);
+ }
+ export function command(store,catalog,input,timestamp) {
++  if(store.schemaVersion===1) store=validateStore(store);
+   if(!object(input)) fail('VALIDATION','Invalid command');
+   id(input.idempotencyKey,'idempotencyKey'); bounded(input.expectedRevision);
+   const fp=fingerprint(input),prior=Object.hasOwn(store.idempotency,input.idempotencyKey)?store.idempotency[input.idempotencyKey]:undefined;
+-  if(prior) {if(prior.fingerprint!==fp) fail('IDEMPOTENCY_CONFLICT','Key already used for different command'); return {store,data:prior.data,replay:true};}
++  if(prior) {if(prior.fingerprint!==fp) fail('IDEMPOTENCY_CONFLICT','Key already used for different command'); return {store,data:structuredClone(prior.data),replay:true};}
+   if(input.expectedRevision!==store.revision) fail('REVISION_CONFLICT','Expected revision does not match');
+   const next=structuredClone(store),data=applyOne(next,catalog,input,timestamp);
+   Object.defineProperty(next.idempotency,input.idempotencyKey,{value:{fingerprint:fp,data:structuredClone(data)},writable:true,enumerable:true,configurable:true});
+   return {store:next,data,replay:false};
+ }
+ export function batch(store,catalog,input,timestamp) {
++  if(store.schemaVersion===1) store=validateStore(store);
+   if(!object(input)) fail('VALIDATION','Invalid batch');
+   id(input.idempotencyKey,'idempotencyKey'); bounded(input.expectedRevision);
+   if(!Array.isArray(input.commands)||input.commands.length<1||input.commands.length>20) fail('VALIDATION','Expected 1..20 commands');
+   for(const c of input.commands) if(!object(c)||Object.hasOwn(c,'expectedRevision')||Object.hasOwn(c,'idempotencyKey')) fail('VALIDATION','Invalid inner command');
+   const fp=fingerprint(input),prior=Object.hasOwn(store.batchIdempotency,input.idempotencyKey)?store.batchIdempotency[input.idempotencyKey]:undefined;
+-  if(prior) {if(prior.fingerprint!==fp) fail('IDEMPOTENCY_CONFLICT','Key already used for different batch'); return {store,data:prior.data,replay:true};}
++  if(prior) {if(prior.fingerprint!==fp) fail('IDEMPOTENCY_CONFLICT','Key already used for different batch'); return {store,data:structuredClone(prior.data),replay:true};}
+   if(input.expectedRevision!==store.revision) fail('REVISION_CONFLICT','Expected revision does not match');
+   const next=structuredClone(store),data=input.commands.map(c=>applyOne(next,catalog,c,timestamp));
+   Object.defineProperty(next.batchIdempotency,input.idempotencyKey,{value:{fingerprint:fp,data:structuredClone(data)},writable:true,enumerable:true,configurable:true});
+@@ -211,7 +236,10 @@ export function report(store) {
+   for(const r of store.reservations) {
+     counts[r.status]++;
+     if(r.status!=='cancelled') rentalRevenue=sum(rentalRevenue,r.quote.rentalTotal);
+-    if(r.status==='reserved'||r.status==='checked_out') for(const l of r.lines) depositHeld=sum(depositHeld,depositPart(r.depositPlan[l.itemId],r.returnedUnits[l.itemId],l.quantity-r.returnedUnits[l.itemId]));
++    if(r.status==='reserved'||r.status==='checked_out') {
++      if(r.depositPlan===null) depositHeld=sum(depositHeld,r.quote.deposit-r.refunded-r.lateFees);
++      else for(const l of r.lines) depositHeld=sum(depositHeld,depositPart(r.depositPlan[l.itemId],r.returnedUnits[l.itemId],l.quantity-r.returnedUnits[l.itemId]));
++    }
+     refunded=sum(refunded,r.refunded); lateFees=sum(lateFees,r.lateFees);
+   }
+   return {reservationCount:store.reservations.length,counts,rentalRevenue,depositHeld,refunded,lateFees,auditCount:store.audit.length,maintenanceCount:(store.maintenance??[]).length};
+diff --git a/test/adapters.test.mjs b/test/adapters.test.mjs
+index 16e2195..350a10f 100644
+--- a/test/adapters.test.mjs
++++ b/test/adapters.test.mjs
+@@ -122,7 +122,7 @@ test('HTTP batch is atomic, replays across CLI, and shares revision lock',async(
+   const input={expectedRevision:0,idempotencyKey:'b',commands:[{type:'reserve',id:'x',memberId:'club',start:'2026-11-06',end:'2026-11-09',lines:[{itemId:'camera',quantity:1}]},{type:'checkout',id:'x'}]};
+   const bad=await post({...input,commands:[...input.commands,{type:'cancel',id:'x'}]});
+   assert.equal(bad.error.code,'INVALID_TRANSITION');
+-  assert.rejects(readFile(file,'utf8'));
++  await assert.rejects(readFile(file,'utf8'));
+   const good=await post(input); assert.equal(good.revision,2); assert.equal(good.data.length,2);
+   const bytes=await readFile(file,'utf8');
+   const replay=await cli(dir,'batch',input); assert.deepEqual(replay.result,good); assert.equal(await readFile(file,'utf8'),bytes);
+diff --git a/test/repair-adapters.test.mjs b/test/repair-adapters.test.mjs
+new file mode 100644
+index 0000000..8de88d7
+--- /dev/null
++++ b/test/repair-adapters.test.mjs
+@@ -0,0 +1,74 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {mkdtemp,readFile,writeFile,rm} from 'node:fs/promises';
++import {tmpdir} from 'node:os';
++import path from 'node:path';
++import {spawn} from 'node:child_process';
++import {createService} from '../src/service.mjs';
++const root=path.resolve(import.meta.dirname,'..'),fixture=path.join(root,'fixtures/catalog.json');
++const reserve={type:'reserve',id:'r',memberId:'regular',start:'2026-11-06',end:'2026-11-09',lines:[{itemId:'camera',quantity:2}],expectedRevision:0,idempotencyKey:'book'};
++async function cli(dir,operation,input) {
++  const child=spawn(process.execPath,[path.join(root,'cli.mjs'),'--data-dir',dir,'--catalog',fixture,operation]);
++  let stdout='',stderr='';child.stdout.on('data',x=>stdout+=x);child.stderr.on('data',x=>stderr+=x);child.stdin.end(JSON.stringify(input));
++  return await new Promise((resolve,reject)=>{child.on('error',reject);child.on('close',code=>{try{resolve({code,body:JSON.parse(stdout)});}catch{reject(new Error(stderr));}});});
++}
++async function server(dir,t) {
++  const child=spawn(process.execPath,[path.join(root,'server.mjs'),'--data-dir',dir,'--catalog',fixture,'--port','0']);t.after(()=>child.kill());
++  let stdout='',stderr='';child.stderr.on('data',x=>stderr+=x);
++  const port=await new Promise((resolve,reject)=>{child.stdout.on('data',x=>{stdout+=x;if(stdout.includes('\n'))resolve(JSON.parse(stdout.split('\n')[0]).port);});child.on('error',reject);child.on('exit',code=>reject(new Error(`Server exited ${code}: ${stderr}`)));});
++  return async(operation,body)=>{const response=await fetch(`http://127.0.0.1:${port}/api/${operation}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});return {status:response.status,body:await response.json()};};
++}
++test('service, CLI and HTTP reject partial date boundaries without disk/history changes; full default still works',async(t)=>{
++  const dir=await mkdtemp(path.join(tmpdir(),'gear-repair-adapter-'));t.after(()=>rm(dir,{recursive:true,force:true}));
++  const service=createService({dataDir:dir,catalogPath:fixture,now:()=> 'fixed'}),http=await server(dir,t);
++  assert.equal((await service.execute('command',reserve)).revision,1);
++  assert.equal((await cli(dir,'command',{type:'checkout',id:'r',expectedRevision:1,idempotencyKey:'out'})).body.revision,2);
++  const file=path.join(dir,'store.json'),bytes=await readFile(file,'utf8');
++  for(const date of [undefined,null,'',false,0,'2026-02-30','2026-11-05']) {
++    const request={type:'return.partial',id:'r',lines:[{itemId:'camera',quantity:1}],expectedRevision:2,idempotencyKey:'reject',...(date===undefined?{}:{returnedOn:date})};
++    for(const invoke of [async()=>({body:await service.execute('command',request)}),()=>cli(dir,'command',request),()=>http('command',request)]) {
++      const response=await invoke();assert.equal(response.body.ok,false);assert.equal(response.body.error.code,'VALIDATION');assert.equal(response.body.revision,2);
++      assert.equal(await readFile(file,'utf8'),bytes);
++    }
++    const invalidBatch=await http('batch',{expectedRevision:2,idempotencyKey:'invalid-date',commands:[{type:'maintenance.add',id:'m',itemId:'tripod',quantity:1,start:reserve.start,end:reserve.end},requestWithoutMutation(request)]});
++    assert.equal(invalidBatch.body.error.code,'VALIDATION');assert.equal(await readFile(file,'utf8'),bytes);
++  }
++  const partial=await http('command',{type:'return.partial',id:'r',returnedOn:'2026-11-10',lines:[{itemId:'camera',quantity:1}],expectedRevision:2,idempotencyKey:'part'});
++  assert.deepEqual([partial.body.data.refund,partial.body.data.lateFee],[4900,100]);
++  const full=await cli(dir,'command',{type:'return',id:'r',expectedRevision:3,idempotencyKey:'full'});assert.equal(full.body.data.refund,5000);
++  const finalBytes=await readFile(file,'utf8');assert.equal(JSON.parse(finalBytes).revision,4);
++  const replay=await http('command',{type:'return',id:'r',expectedRevision:3,idempotencyKey:'full'});assert.deepEqual(replay.body,full.body);assert.equal(await readFile(file,'utf8'),finalBytes);
++});
++function requestWithoutMutation({expectedRevision,idempotencyKey,...inner}) {return inner;}
++test('HTTP and CLI batch failures at beginning, middle and end preserve persisted bytes',async(t)=>{
++  const dir=await mkdtemp(path.join(tmpdir(),'gear-repair-batch-'));t.after(()=>rm(dir,{recursive:true,force:true}));
++  const http=await server(dir,t);assert.equal((await cli(dir,'command',reserve)).body.revision,1);
++  const file=path.join(dir,'store.json'),bytes=await readFile(file,'utf8');
++  const commands=[{type:'maintenance.add',id:'m',itemId:'tripod',quantity:1,start:reserve.start,end:reserve.end},{type:'maintenance.remove',id:'m'}];
++  for(const index of [0,1,2]) {
++    const inner=[...commands];inner.splice(index,0,{type:'maintenance.remove',id:'missing'});
++    const request={expectedRevision:1,idempotencyKey:'rollback',commands:inner};
++    for(const invoke of [()=>http('batch',request),()=>cli(dir,'batch',request)]) {const failure=await invoke();assert.equal(failure.body.error.code,'NOT_FOUND');assert.equal(failure.body.revision,1);assert.equal(await readFile(file,'utf8'),bytes);}
++  }
++});
++
++test('mixed legacy allocation limitation persists correctly across CLI/HTTP and migration',async(t)=>{
++  const dir=await mkdtemp(path.join(tmpdir(),'gear-repair-legacy-'));t.after(()=>rm(dir,{recursive:true,force:true}));
++  const fixtureOld=JSON.parse(await readFile(path.join(root,'fixtures/legacy-v1-store.json'),'utf8'));
++  const active=fixtureOld.reservations[0];active.lines=[{itemId:'camera',quantity:1},{itemId:'tripod',quantity:1}];active.quote.lines=structuredClone(active.lines);active.quote.deposit=6000;active.quote.totalDue=active.quote.rentalTotal+6000;
++  const file=path.join(dir,'store.json');await writeFile(file,JSON.stringify(fixtureOld));
++  const bytes=await readFile(file,'utf8'),http=await server(dir,t);
++  const partial={type:'return.partial',id:'legacy-active',returnedOn:active.end,lines:[{itemId:'camera',quantity:1}],expectedRevision:7,idempotencyKey:'partial'};
++  for(const invoke of [()=>cli(dir,'command',partial),()=>http('command',partial)]) {
++    const failure=await invoke();assert.equal(failure.body.error.code,'VALIDATION');assert.match(failure.body.error.message,/allocation is unknown/);assert.equal(await readFile(file,'utf8'),bytes);
++  }
++  const full={type:'return',id:'legacy-active',expectedRevision:7,idempotencyKey:'full'};
++  const returned=await http('command',full);assert.equal(returned.body.data.refund,6000);
++  const saved=await readFile(file,'utf8');assert.equal(JSON.parse(saved).reservations[0].depositPlan,null);
++  assert.deepEqual((await cli(dir,'command',full)).body,returned.body);assert.equal(await readFile(file,'utf8'),saved);
++  // A separate historical store carries explicit original line amounts.
++  active.quote.lines[0].deposit=5000;active.quote.lines[1].deposit=1000;
++  await writeFile(file,JSON.stringify(fixtureOld));
++  const evidenced=await cli(dir,'command',partial);assert.equal(evidenced.body.data.refund,5000);
++  assert.equal((await createService({dataDir:dir,catalogPath:fixture}).execute('report')).data.depositHeld,1000);
++});
+diff --git a/test/repairs.test.mjs b/test/repairs.test.mjs
+new file mode 100644
+index 0000000..0cb141f
+--- /dev/null
++++ b/test/repairs.test.mjs
+@@ -0,0 +1,114 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {readFile} from 'node:fs/promises';
++import * as d from '../src/domain.mjs';
++const catalog=JSON.parse(await readFile(new URL('../fixtures/catalog.json',import.meta.url),'utf8'));
++const base={type:'reserve',id:'r',memberId:'regular',start:'2026-11-06',end:'2026-11-09',lines:[{itemId:'camera',quantity:2},{itemId:'tripod',quantity:1}]};
++const call=(store,request)=>d.command(store,catalog,request,'fixed');
++const bat=(store,request)=>d.batch(store,catalog,request,'fixed');
++const result=out=>out.data;
++const step=(store,request,key=request.type)=>call(store,{...request,expectedRevision:store.revision,idempotencyKey:key});
++function checked() {return step(step(d.emptyStore(),base).store,{type:'checkout',id:'r'}).store;}
++test('partial date boundaries reject immutably; full return alone defaults to scheduled end',()=>{
++  const store=checked(),before=structuredClone(store);
++  for(const date of [undefined,null,'',false,0,'2026-02-30','2026-11-05']) {
++    assert.throws(()=>step(store,{type:'return.partial',id:'r',returnedOn:date,lines:[{itemId:'camera',quantity:1}]}),{code:'VALIDATION'});
++    assert.deepEqual(store,before);
++  }
++  const first=step(store,{type:'return.partial',id:'r',returnedOn:'2026-11-10',lines:[{itemId:'camera',quantity:1}]},'partial');
++  assert.deepEqual([result(first).refund,result(first).lateFee],[4900,100]);
++  assert.equal(first.store.revision,3);
++  const second=step(first.store,{type:'return',id:'r'},'full');
++  assert.deepEqual([result(second).refund,result(second).lateFee],[6000,0]);
++  assert.equal(result(second).refunded,10900);
++  assert.equal(result(second).status,'returned');
++  assert.equal(d.report(second.store).depositHeld,0);
++  const replay=call(second.store,{type:'return.partial',id:'r',returnedOn:'2026-11-10',lines:[{itemId:'camera',quantity:1}],expectedRevision:2,idempotencyKey:'partial'});
++  assert.equal(replay.replay,true);assert.deepEqual(result(replay),result(first));assert.equal(replay.store.revision,4);
++  assert.throws(()=>step(second.store,{type:'return',id:'r'},'again'),{code:'INVALID_TRANSITION'});
++});
++test('new, replay and per-command batch results own nested mutable values',()=>{
++  const store=d.emptyStore(),snapshot=structuredClone(store);
++  const request={...base,expectedRevision:0,idempotencyKey:'book'};
++  const fresh=call(store,request);result(fresh).lines[0].quantity=999;
++  assert.equal(fresh.store.reservations[0].lines[0].quantity,2);assert.deepEqual(store,snapshot);
++  const replay=call(fresh.store,request);result(replay).quote.lines[0].quantity=999;
++  assert.equal(result(call(fresh.store,request)).quote.lines[0].quantity,2);
++  const maintenance=step(d.emptyStore(),{type:'maintenance.add',id:'m',itemId:'camera',quantity:1,start:base.start,end:base.end});
++  result(maintenance).quantity=999;assert.equal(maintenance.store.maintenance[0].quantity,1);
++  const batchRequest={expectedRevision:0,idempotencyKey:'b',commands:[base,{type:'checkout',id:'r'},{type:'return.partial',id:'r',returnedOn:base.end,lines:[{itemId:'camera',quantity:1}]}]};
++  const batch=bat(store,batchRequest),values=result(batch);
++  assert.deepEqual(values.map(v=>v.status),['reserved','checked_out','checked_out']);
++  assert.equal(values[0].refunded,0);assert.equal(values[1].refunded,0);assert.equal(values[2].refunded,5000);
++  values[0].lines[0].quantity=999;values[2].quote.deposit=0;
++  assert.equal(batch.store.reservations[0].quote.deposit,11000);
++  const replayBatch=bat(batch.store,batchRequest);assert.equal(result(replayBatch)[0].lines[0].quantity,2);
++  result(replayBatch)[0].lines[0].quantity=888;
++  assert.equal(result(bat(batch.store,batchRequest))[0].lines[0].quantity,2);
++  assert.deepEqual(batch.store.audit.map(a=>a.revision),[1,2,3]);
++});
++test('invalid batch beginning, middle and end discard every owned draft mutation',()=>{
++  const store=d.emptyStore(),before=structuredClone(store);
++  const commands=[{type:'maintenance.add',id:'a',itemId:'camera',quantity:1,start:base.start,end:base.end},{type:'maintenance.remove',id:'a'}];
++  for(const index of [0,1,2]) {
++    const inner=[...commands];inner.splice(index,0,{type:'maintenance.remove',id:'missing'});
++    assert.throws(()=>bat(store,{expectedRevision:0,idempotencyKey:'failed',commands:inner}),{code:'NOT_FOUND'});
++    assert.deepEqual(store,before);
++  }
++  assert.throws(()=>bat(store,{expectedRevision:0,idempotencyKey:'date',commands:[base,{type:'checkout',id:'r'},{type:'return.partial',id:'r',lines:[{itemId:'camera',quantity:1}]}]}),{code:'VALIDATION'});
++  assert.deepEqual(store,before);
++});
++
++function oldMixed(evidenced=false,status='checked_out') {
++  const fixture=structuredClone(legacyFixture),r=fixture.reservations[0];
++  r.status=status;r.lines=[{itemId:'camera',quantity:1},{itemId:'tripod',quantity:1}];
++  r.quote.lines=r.lines.map((l,i)=>({...l,...(evidenced?{deposit:i===0?5000:1000}:{})}));
++  r.quote.deposit=6000;r.quote.totalDue=r.quote.rentalTotal+6000;
++  return fixture;
++}
++const legacyFixture=JSON.parse(await readFile(new URL('../fixtures/legacy-v1-store.json',import.meta.url),'utf8'));
++test('ambiguous old mixed deposits reject partial return and preserve aggregate full return',()=>{
++  const legacy=oldMixed(),before=structuredClone(legacy);
++  const loaded=d.validateStore(legacy);assert.equal(loaded.reservations[0].depositPlan,null);
++  assert.equal(d.report(loaded).depositHeld,6000);
++  assert.throws(()=>step(legacy,{type:'return.partial',id:'legacy-active',returnedOn:base.end,lines:[{itemId:'camera',quantity:1}]},'unknown'),/allocation is unknown/);
++  assert.deepEqual(legacy,before);
++  const full=step(legacy,{type:'return',id:'legacy-active'},'full-legacy');
++  assert.equal(result(full).refund,6000);assert.equal(d.report(full.store).depositHeld,0);
++  assert.equal(full.store.reservations.find(r=>r.id==='legacy-returned').refunded,1000);
++  assert.equal(full.store.reservations.find(r=>r.id==='legacy-cancelled').status,'cancelled');
++  assert.equal(d.validateStore(full.store).reservations[0].depositPlan,null);
++  const replay=call(full.store,{type:'return',id:'legacy-active',expectedRevision:7,idempotencyKey:'full-legacy'});
++  assert.equal(result(replay).refund,6000);assert.equal(replay.store.revision,8);
++  for(const status of ['returned','cancelled']) {
++    const state=d.validateStore(oldMixed(false,status));
++    assert.equal(state.reservations[0].depositPlan,null);
++    assert.equal(state.reservations[0].refunded,status==='returned'?6000:0);
++    assert.throws(()=>step(state,{type:'return',id:'legacy-active'}),{code:'INVALID_TRANSITION'});
++  }
++});
++test('retained historical line evidence controls refunds through migration, catalog edits and replay',()=>{
++  const historical=oldMixed(true),changed=structuredClone(catalog);changed.items.forEach(i=>i.deposit=999);
++  const req={type:'return.partial',id:'legacy-active',returnedOn:base.end,lines:[{itemId:'camera',quantity:1}],expectedRevision:7,idempotencyKey:'evidenced'};
++  const first=d.command(historical,changed,req,'fixed');
++  assert.equal(first.data.refund,5000);assert.equal(d.report(first.store).depositHeld,1000);
++  assert.equal(first.store.reservations[0].quote.lines[0].deposit,5000);
++  assert.equal(d.command(first.store,changed,req,'later').data.refund,5000);
++  const last=d.command(first.store,changed,{type:'return',id:'legacy-active',expectedRevision:8,idempotencyKey:'rest'},'fixed');
++  assert.equal(last.data.refund,1000);assert.equal(last.data.refunded,6000);assert.equal(last.data.lateFees,0);
++  assert.equal(d.validateStore(last.store).reservations[0].status,'returned');
++  const invalid=oldMixed(true);invalid.reservations[0].quote.lines[0].deposit=4000;
++  assert.throws(()=>d.validateStore(invalid),/historical line deposits/);
++  const newBooking=step(d.emptyStore(),base);assert.deepEqual(newBooking.data.quote.lines.map(l=>l.deposit),[10000,1000]);
++});
++
++test('single-item derivation is exact and retained line amounts remain internally consistent',()=>{
++  const single=structuredClone(legacyFixture);single.reservations[0].lines[0].quantity=2;single.reservations[0].quote.lines[0].quantity=2;
++  const first=step(single,{type:'return.partial',id:'legacy-active',returnedOn:base.end,lines:[{itemId:'camera',quantity:1}]},'single');
++  assert.equal(first.data.refund,2500);assert.equal(d.report(first.store).depositHeld,2500);
++  const uneven=structuredClone(single);uneven.reservations[0].quote.deposit=5001;uneven.reservations[0].quote.totalDue=9801;
++  assert.equal(d.validateStore(uneven).reservations[0].depositPlan,null);
++  assert.throws(()=>step(uneven,{type:'return.partial',id:'legacy-active',returnedOn:base.end,lines:[{itemId:'camera',quantity:1}]}),/allocation is unknown/);
++  const newBooking=step(d.emptyStore(),base).store;newBooking.reservations[0].quote.lines[0].deposit=9000;
++  assert.throws(()=>d.validateStore(newBooking),/Line deposit differs/);
++});

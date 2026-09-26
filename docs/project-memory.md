@@ -37,6 +37,12 @@ remains a reasonable alternative for small projects.
 
 ## Inspect and control it
 
+For an enrolled task, the agent can save a milestone, inspect its current version,
+and update it before continuing in a fresh session. The installed
+[checkpoint guide](../plugin-src/shared/assistance/checkpoint.en.md) supplies the
+complete request and recovery flow. Checkpoints remain reported progress, not
+accepted intent or native proof that work happened; current sources still govern.
+
 Ask to inspect or export the project's stored records. Disablement stops normal
 context use/capture while preserving management access. Deleting a record removes
 that exact record and its managed history/backups; if it mixes obsolete facts and

@@ -1,0 +1,184 @@
+{
+  "scope": "Four-call bilingual checkpoint usability retest; no treatment-effect or human-quality inference",
+  "freeze_commit": "2dde5577ebbfebea7801d10846e798e9f4e08452",
+  "model_calls": 4,
+  "completed": 4,
+  "outcome_retries": 0,
+  "failed_model_calls": 0,
+  "rows": [
+    {
+      "locale": "en",
+      "stage": 1,
+      "automated_pass": true,
+      "checkpoint_version": 2,
+      "model_seconds": 118.539,
+      "tool_actions": 19,
+      "failed_tool_actions": 1,
+      "memory_operations": 5,
+      "artifact": {
+        "schema": "venue-plan/1",
+        "attendees": 48,
+        "step_free_required": true,
+        "venue": "Cedar",
+        "capacity": 64,
+        "step_free": true,
+        "source_revision": 1,
+        "booking_status": "unbooked"
+      },
+      "usage": {
+        "input_tokens": 333941,
+        "cached_input_tokens": 301184,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4253,
+        "reasoning_output_tokens": 589
+      },
+      "public_command_evidence_indices_zero_based": {
+        "source": 4,
+        "create": 13,
+        "validate": 14,
+        "inspect_version": 15,
+        "update": 16,
+        "inspect_final": 17
+      },
+      "integrator_verdict": "pass: milestone/version/validation order, source correction, accepted intent, no-booking boundary and reference inspection supported by public command and message evidence"
+    },
+    {
+      "locale": "en",
+      "stage": 2,
+      "automated_pass": true,
+      "checkpoint_version": 4,
+      "model_seconds": 128.175,
+      "tool_actions": 21,
+      "failed_tool_actions": 0,
+      "memory_operations": 7,
+      "artifact": {
+        "schema": "venue-plan/1",
+        "attendees": 48,
+        "step_free_required": true,
+        "venue": "Bay",
+        "capacity": 80,
+        "step_free": true,
+        "source_revision": 2,
+        "booking_status": "unbooked"
+      },
+      "usage": {
+        "input_tokens": 418324,
+        "cached_input_tokens": 379136,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 5014,
+        "reasoning_output_tokens": 722
+      },
+      "public_command_evidence_indices_zero_based": {
+        "recall": 4,
+        "source": 5,
+        "inspect_reference": 7,
+        "validate": 15,
+        "updates": [
+          16,
+          18
+        ],
+        "inspect_final": 19
+      },
+      "integrator_verdict": "pass: milestone/version/validation order, source correction, accepted intent, no-booking boundary and reference inspection supported by public command and message evidence"
+    },
+    {
+      "locale": "ko",
+      "stage": 1,
+      "automated_pass": true,
+      "checkpoint_version": 2,
+      "model_seconds": 94.171,
+      "tool_actions": 14,
+      "failed_tool_actions": 0,
+      "memory_operations": 5,
+      "artifact": {
+        "schema": "venue-plan/1",
+        "attendees": 48,
+        "step_free_required": true,
+        "venue": "Cedar",
+        "capacity": 64,
+        "step_free": true,
+        "source_revision": 1,
+        "booking_status": "unbooked"
+      },
+      "usage": {
+        "input_tokens": 210081,
+        "cached_input_tokens": 189952,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 3482,
+        "reasoning_output_tokens": 508
+      },
+      "public_command_evidence_indices_zero_based": {
+        "source": 4,
+        "create": 8,
+        "validate": 9,
+        "inspect_version": 10,
+        "update": 11,
+        "inspect_final": 12
+      },
+      "integrator_verdict": "pass: milestone/version/validation order, source correction, accepted intent, no-booking boundary and reference inspection supported by public command and message evidence"
+    },
+    {
+      "locale": "ko",
+      "stage": 2,
+      "automated_pass": true,
+      "checkpoint_version": 3,
+      "model_seconds": 101.984,
+      "tool_actions": 16,
+      "failed_tool_actions": 0,
+      "memory_operations": 4,
+      "artifact": {
+        "schema": "venue-plan/1",
+        "attendees": 48,
+        "step_free_required": true,
+        "venue": "Bay",
+        "capacity": 80,
+        "step_free": true,
+        "source_revision": 2,
+        "booking_status": "unbooked"
+      },
+      "usage": {
+        "input_tokens": 278953,
+        "cached_input_tokens": 212608,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 3914,
+        "reasoning_output_tokens": 794
+      },
+      "public_command_evidence_indices_zero_based": {
+        "recall": 5,
+        "inspect_reference": 6,
+        "source": 7,
+        "write_validate": 13,
+        "update": 14,
+        "inspect_final": 15
+      },
+      "integrator_verdict": "pass: milestone/version/validation order, source correction, accepted intent, no-booking boundary and reference inspection supported by public command and message evidence"
+    }
+  ],
+  "memory_operations": {
+    "recall": 4,
+    "checkpoint": 7,
+    "inspect": 10
+  },
+  "memory_rejections": 0,
+  "usage": {
+    "input_tokens": 1241299,
+    "cached_input_tokens": 1082880,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 16663,
+    "reasoning_output_tokens": 2613
+  },
+  "model_seconds": 442.869,
+  "tool_actions": 70,
+  "failed_or_incomplete_tool_actions": 1,
+  "billed_cost": null,
+  "backend_model_echo": null,
+  "human_review": null,
+  "limitations": [
+    "One recovered nonzero AGENTS.md search in en1, no memory request failure.",
+    "English continuation submits two selector requests with different decision IDs; raw selector status is not retained by the schema-filtered operation extractor. Both attempts remain in public command counts; no status is invented.",
+    "English continuation adds two successful checkpoint writes, Korean continuation one. This is usable continuity, not proven lower overhead.",
+    "Explicit task metadata and checkpoint guidance were supplied; this does not prove autonomous discovery or universal hook application.",
+    "Three implementation/preparation delegations are separate from these four model outcomes; their usage is unavailable and not pooled.",
+    "Account-side native memory isolation unproven; native local memory/import/hooks disabled; no isolated memory-effect inference."
+  ]
+}

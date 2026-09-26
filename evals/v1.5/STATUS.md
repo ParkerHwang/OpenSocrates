@@ -7,6 +7,13 @@ isolation proof before practical product completion.
 
 ## Current practical release-candidate qualification
 
+The [post-review repair boundary](repairs/v1/REPORT.md) adds a caller-safe
+checkpoint request schema and complete EN/KO examples, focused coding guidance,
+corrected measurement and separately labelled GearDesk derivatives. Its four-call
+bilingual usability freeze, package qualification and exact-head handoff remain
+distinct from the earlier comparison. Historical protocols, scores and failures
+are preserved; only this current status surface is updated.
+
 The [bounded comparison](practical/RESULTS.md) completed all 20 planned invocations
 and all 12 episode artifact/state checks against the actual released v1.4.0 ZIP,
 with one fixed Sol/medium/client tuple and a competent maintained-note control.

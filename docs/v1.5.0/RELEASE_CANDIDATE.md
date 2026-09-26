@@ -6,6 +6,11 @@ remains Draft and issue [#94](https://github.com/ParkerHwang/OpenSocrates/issues
 contains the exact final commit, CI results, package hashes and validation commands.
 No merge, tag, publication, deployment or active-install replacement is implied.
 
+The subsequent [post-review repairs](../../evals/v1.5/repairs/v1/REPORT.md) qualify
+the checkpoint caller contract, assistance guide 6 and coding guides 2. Their
+source/package identities and new usability results are separate from the
+guide-5 qualification below. Earlier comparisons and receipts remain unchanged.
+
 The user's [2026-09-26 completion standard](PRACTICAL_COMPLETION.md) governs this
 candidate. Required functional, privacy, authority, migration, deletion and package
 checks remain. Statistical studies, human recruitment, billing/backend echoes and
@@ -80,8 +85,9 @@ The completed [RC qualification receipt](../../evals/v1.5/practical/rc-qualifica
 anchors the product and native package to `7cf2777bc55e847c77396f46ad9b75835dd30f8c`.
 `make release-check` passed, including frozen SQLite and deterministic generation.
 The local full source suite passed on the working tree subsequently committed as
-that revision; the hosted run also passed all six checks. Subsequent handoff changes
-only add evidence and verification, with their exact-head CI recorded in PR #95.
+that revision; the hosted run also passed all six checks. That handoff was followed
+by the separately qualified post-review repairs linked above; its original
+functional-source equivalence is not a claim that the current source is unchanged.
 The [installed native checks](../../evals/v1.5/practical/rc-acceptance/summary.json)
 verify both Git and directory projects, all 41 packaged/internal schemas, both
 assistance guides, accepted/proposed state, exact record deletion and project-store
