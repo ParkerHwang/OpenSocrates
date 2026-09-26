@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.5.0] - Unreleased release candidate
+
+- Add optional stateless task-based assistance and explicit local Git/non-Git
+  project memory with source freshness, proposed/accepted lifecycle, checkpoints,
+  bounded retrieval, transactional migration and scoped deletion.
+- Add aligned English/Korean coding and collaboration guidance, including side
+  questions, continued authorized work and reuse of settled permissions.
+- Keep the selected model/effort, the 48 canonical methods and task fallback.
+  Model-specific profiles remain experimental and inactive in normal operation.
+- Complete six matched practical scenarios against released v1.4.0 (20 calls,
+  12 artifact/state episode passes), preserving ties, extra memory work, failures
+  and limitations. No broad superiority or savings claim follows.
+- 작업별 선택적 지원, Git·일반 폴더의 명시적 프로젝트 메모리, 코딩·협업 안내를
+  추가합니다. 제안과 승인을 구분하고 현재 자료 확인과 범위가 정해진 삭제를
+  지원합니다. 비교의 정확도 동률과 추가 메모리 작업량도 함께 공개합니다.
+- This is a candidate on Draft PR #95, not a tag or publication. See the
+  [candidate handoff](docs/v1.5.0/RELEASE_CANDIDATE.md).
+
 ## [1.4.0] - 2026-09-16
 
 - Focus OpenSocrates on Codex only. Remove Claude Code/Cowork/Chat,

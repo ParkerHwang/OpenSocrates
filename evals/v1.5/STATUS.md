@@ -5,7 +5,23 @@ The historical study/readiness limits below restrict stronger claims; they no
 longer require a held-out study, numerical margin, human recruitment or account-
 isolation proof before practical product completion.
 
-## Current additive evidence
+## Current practical release-candidate qualification
+
+The [bounded comparison](practical/RESULTS.md) completed all 20 planned invocations
+and all 12 episode artifact/state checks against the actual released v1.4.0 ZIP,
+with one fixed Sol/medium/client tuple and a competent maintained-note control.
+Guide 5 clarifies EN/KO side-question continuation and settled permission reuse.
+Version metadata is synchronized to **1.5.0 release candidate**, not publication.
+No new held-out study, human recruitment, broad superiority claim or profile
+promotion is required. Exact final source/native/CI results belong to PR #95 and
+issue #94; [the RC handoff](../../docs/v1.5.0/RELEASE_CANDIDATE.md) identifies support
+and the remaining separately authorized release action.
+
+The results below are earlier immutable evidence, with their original package,
+client, outcome and measurement limitations. They are not relabelled as this
+practical comparison or rewritten under the new completion standard.
+
+## Earlier additive evidence
 
 The [expanded results](expanded/RESULTS.md) and [audit](expanded/AUDIT.md) add a
 completed 50-cell, two-repetition quality pilot plus two H02 cells (68 calls,

@@ -1,5 +1,10 @@
 # Windows의 Codex — OpenSocrates 1.4.0
 
+v1.5.0 후보의 Windows x64 네이티브 소스·패키지는 최종 커밋 CI로 검증합니다.
+연결된 실제 Windows Codex 호스트는 없어 라이브 세션은 검증하지 못했습니다.
+아래 1.4.0 내용은 기존 공개 버전의 안내입니다. 후보는 아직 공개 배포하지 않았으며
+[후보 인계](v1.5.0/RELEASE_CANDIDATE.md)에 정확한 지원 범위를 기록합니다.
+
 OpenSocrates 1.4.0은 네이티브 Windows 프로세스로 **Windows x64의 Codex**를
 지원합니다. 다른 호스트 연동은 제거했습니다. Windows ARM64, Windows 10,
 서명, SmartScreen 평판, 별도의 깨끗한 PC는 미검증입니다.

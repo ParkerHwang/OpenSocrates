@@ -34,7 +34,7 @@ import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 
-export const PRODUCT_VERSION = "1.4.0";
+export const PRODUCT_VERSION = "1.5.0";
 export const REPOSITORY = "ParkerHwang/OpenSocrates";
 export const MARKETPLACE_NAME = "opensocrates";
 export const PLUGIN_NAME = "opensocrates";
@@ -4479,7 +4479,7 @@ export async function main(argv = process.argv.slice(2), internalDependencies = 
   const options = parseCli(argv);
   if (process.platform === "win32" && options.action === "auto-update") {
     const message =
-      "Automatic updates: unavailable on Windows in 1.4.0. Use opensocrates update --host all manually.";
+      `Automatic updates: unavailable on Windows in ${PRODUCT_VERSION}. Use opensocrates update --host codex manually.`;
     if (options.autoUpdateAction === "status" || options.autoUpdateAction === "disable") {
       console.log(message);
       return 0;

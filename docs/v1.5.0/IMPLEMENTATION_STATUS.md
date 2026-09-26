@@ -1,74 +1,58 @@
-# Candidate implementation status
+# v1.5.0 release-candidate status
 
-Current release-candidate completion follows the [2026-09-26 practical standard](PRACTICAL_COMPLETION.md).
-The historical study/readiness limits below restrict stronger claims; they no
-longer require a held-out study, numerical margin, human recruitment or account-
-isolation proof before practical product completion.
+The feature branch prepares **OpenSocrates 1.5.0 as an unpublished release
+candidate**, tracked by Draft [PR #95](https://github.com/ParkerHwang/OpenSocrates/pull/95)
+and [issue #94](https://github.com/ParkerHwang/OpenSocrates/issues/94). The exact
+final commit, final source/native commands and hosted CI results are maintained
+there. No merge, tag, publication, deployment or active installation change is
+performed by this task.
 
-The implementation remains Draft PR [#95](https://github.com/ParkerHwang/OpenSocrates/pull/95),
-tracked by [#94](https://github.com/ParkerHwang/OpenSocrates/issues/94). Remote main
-was reconciled at `5a2ff3c312e92aa8a44d0905465674d9a4e4f645`. Product/package metadata
-remains 1.4.0; this is not a v1.5 release. No active installation or real project
-was enrolled or changed.
+## Functional and practical qualification
 
-## Source and integration
+The [revised practical completion standard](PRACTICAL_COMPLETION.md) supersedes
+statistical-release prerequisites. Source/native privacy, correctness, authority,
+migration, deletion, package and supported-platform checks remain required.
 
-W0-W7 source slices implement stateless task-based assistance with candidate-only
-profiles; separate explicit project memory for Git and non-Git roots; source
-freshness and bounded cold recall; owner-only SQLite lifecycle; transactional
-schema-1 to 2 migration and managed backup/deletion; bilingual general/coding
-support; and frozen macOS/Windows packaging. The 48-method stateless decision
-path and locked legacy SDK/CLI dependencies remain intact.
+Implemented capabilities include the 48-method stateless decision path, optional
+task-based assistance, opt-in Git/non-Git memory, attributed accepted/proposed
+state, source freshness, bounded recall/checkpoints, transactional SQLite migration
+and managed backup/deletion, and English/Korean coding/collaboration guidance.
+Assistance guide 5 adds explicit side-question continuation and reuse of settled
+permissions; mutation guide 2 preserves accepted intent before exact scoped
+forgetting. Candidate model profiles remain excluded from normal routing.
 
-A live continuation exposed a scoped-forgetting gap. Supersession preserves
-history, so assistance guide revision 4 now links conditional EN/KO mutation
-instructions (revision 2) for preserving retained intent and deleting the exact
-old record. The generated memory request schema now expresses the bounded
-`authorization_basis`/`acceptance_basis` reference rule already enforced at
-runtime. Negative/positive source and frozen-runtime tests cover the previously
-rejected prose request and the valid `user:current-request` counterpart.
+The [practical comparison](../../evals/v1.5/practical/RESULTS.md) completes six
+matched scenarios against the released v1.4.0 archive on a fixed Sol/medium/client
+configuration: **20 calls, 12/12 artifact/state episode passes, no model retries**.
+Code and directory follow-ups use fresh contexts/profiles. Both versions produce
+correct artifacts; the maintained-note baseline is competent. The candidate adds
+structured operation/state evidence and avoids a repeated English approval request
+in this example, with greater work in memory-backed episodes. No universal
+quality/efficiency claim is made.
 
-The [guide-4 validation receipt](../../evals/v1.5/expanded/validation-receipt.guide4.json)
-records full source/installer checks at `6e843fb`, native `make release-check` at
-`07611e5`, exact package/guide/schema identities, and external/internal/canonical
-byte checks. All 41 schemas remain present; only the memory request schema changed.
-Exact final-head hosted CI and the current commit are maintained in the PR/issue.
-Live Windows Codex and destructive account-home lifecycle remain unverified;
-hosted native fixtures are a different evidence layer.
+New measurement checks cover nonempty zero-price shipping, explicit integer seat
+rules, accepted lifecycle, all-public-message questions and request-correlated
+native memory operations. Old benchmark programs, checkers, scores, failed calls
+and the completed provisional review remain unchanged. The [source bridge](../../evals/v1.5/practical/rc-source-equivalence.json)
+checks 205 functional source files unchanged across comparison qualification and
+RC version synchronization; final package/version/guide/schema checks qualify the
+new artifact identity. See the [candidate handoff](RELEASE_CANDIDATE.md).
 
-## Outcome work and remaining gates
+## Platforms and remaining release action
 
-The original immutable engineering evidence is preserved. Its fuller audit covers
-109 declared calls, including failed harness batches and missing receipts. The
-new independent task matrix completes 50 quality-pilot cells with two repetitions
-and two H02 cells: 68 calls, 49/50 strict artifact gates, and 2/2 dependent host
-artifacts. Those artifact passes do not erase incomplete memory obligations or
-missing dialogue evidence.
+Apple-silicon macOS has native and disposable installed-package live evidence.
+Windows x64 has hosted source/native package fixtures; no connected live Windows
+Codex host was available. This missing cell narrows the live support statement
+without blocking other work. Destructive account-home purge/reinstall remains
+unauthorized. Signing/SmartScreen and other unsupported native targets are not
+promoted by CI.
 
-Separate diagnostics preserve four unsuccessful guide-3 memory calls (two with
-parser-lost usage). After the reference-contract repair, two new EN/KO guide-4
-calls pass both artifact and independent persisted-forgetting checks. Dialogue
-traces demonstrate a legacy checker false negative when the necessary question
-appears before the final message. No old outcome or rubric is rewritten.
+Human review, billed cost, independent backend identity and account-side native
+memory isolation remain unavailable; they limit their respective claims, not this
+practical RC. No numerical margin, power calculation or held-out study is required
+or represented as completed. Normal operation uses the working task fallback.
 
-The [provisional Astra review](../../evals/v1.5/expanded/reviews/astra-xhigh-v4/REPORT.md)
-completes both locked phases for all 60 artifact/diagnostic packets using the
-verified `gpt-6-astra` / `xhigh` / read-only agent definition. It retains all 59
-review/transport invocations, including seven process/transport failures and two
-citation rejections. Static inspection supports three invoice shipping defects
-missed by the original checker; the integrator also corrects one judge
-interpretation that ignored memory lifecycle. The review does not change old
-outcomes, rerun candidate cells or establish human acceptance. Human scores
-remain unavailable. Local native memory use/generation/import were
-disabled in disposable profiles and local output/job tables are empty; account-side
-isolation remains unproven. Memory comparisons are confounded. Backend model echo,
-billed cost, adequate independent quality variance, numerical held-out margins,
-and a held-out study remain unavailable. Candidate profiles are not promoted.
-
-W8 has bounded pilots and a completed provisional model review, not held-out
-outcome validation.
-W9 supplies the source fixes, verified receipts, review packets and recoverable
-Draft handoff. Read the [results](../../evals/v1.5/expanded/RESULTS.md),
-[audit](../../evals/v1.5/expanded/AUDIT.md), and
-[held-out readiness decision](../../evals/v1.5/HELD_OUT_READINESS.md) before making
-quality, efficiency, memory-effect, or release claims.
+The exact remaining release action is separate authorization to review/merge
+PR #95, tag the approved merged commit as v1.5.0, run the guarded publication
+workflow, and verify published assets/npm identity. Updating the active plugin is
+also a separate explicit action. The PR remains Draft for this handoff.

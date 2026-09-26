@@ -1,5 +1,10 @@
 # Installation and runtime reference
 
+This branch prepares the unpublished v1.5.0 release candidate. The 1.4.0 commands
+below describe the existing public release and do not install the candidate. See
+[the RC handoff](v1.5.0/RELEASE_CANDIDATE.md) and [project continuity](project-memory.md)
+for the new capabilities and qualification scope.
+
 [한국어](advanced-usage.ko.md)
 
 OpenSocrates 1.4.0 supports Codex only. Native packages are provided for

@@ -4,11 +4,27 @@ This handoff is for a reviewer with a disposable macOS or Windows host. It is
 not a release instruction. Use the exact Draft PR head being reviewed and
 record the archive SHA-256, packaged runtime SHA-256, installed guide/schema
 hashes, Codex client version, selected model and effort, and host architecture
-before interpreting any result. The archive still reports product version
-1.4.0 on the v1.5 candidate branch; its filename is not proof of release
-identity. Reconcile the Git commit and built package bytes separately.
+before interpreting any result. The current RC metadata reports product version 1.5.0, while the historical
+guide-4 and practical comparison archives retain their recorded 1.4.0 metadata.
+A filename is not proof of publication. Reconcile Git commit, runtime version and
+archive bytes separately; the current [RC handoff](RELEASE_CANDIDATE.md) and PR
+record exact final qualification. Missing live Windows and destructive account-home
+evidence are scoped limits, not universal completion blockers under the revised
+[practical standard](PRACTICAL_COMPLETION.md).
 
-## Evidence already available
+## Current and historical evidence
+
+- The [practical comparison](../../evals/v1.5/practical/RESULTS.md) completes six
+  matched scenarios / 20 calls on bundled `codex-cli 0.158.0-alpha.2`, Sol medium,
+  in disposable macOS profiles. It includes normal-hook-permitted planning and
+  hooks-disabled workflows, fresh Git/directory sessions, actual artifacts, full
+  public messages, and correlated memory-operation plus persisted-state evidence.
+- Version synchronization to 1.5.0 follows functional qualification. Final source,
+  frozen SQLite, installed schema/guide bytes and package checks are recorded on
+  the exact current PR head. Live Windows Codex is unavailable and remains so
+  in the support statement; hosted Windows is separate native-package evidence.
+
+The following receipts retain their historical identities:
 
 - The latest [guide-4 validation receipt](../../evals/v1.5/expanded/validation-receipt.guide4.json)
   records a rebuilt Apple Silicon package SHA-256

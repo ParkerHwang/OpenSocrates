@@ -1,4 +1,4 @@
-# Candidate project memory protocol
+# v1.5.0 candidate project memory protocol
 
 This document describes the v1.5 implementation branch. The released 1.4.0
 installer does not provide these commands. Do not enroll a real project or
@@ -61,6 +61,7 @@ PYTHONPATH=src uv run --locked --no-sync python tools/check_memory_sources.py
 These tests verify specific contracts. A synthetic Windows x64 local-drive
 source/reparse, ACL/journal, frozen SQLite, and deletion run passed at commit
 `628d227` ([CI run](https://github.com/ParkerHwang/OpenSocrates/actions/runs/35825905649)).
-Windows linked-worktree continuation, live Codex use, and task-quality
-improvement still require separate evidence under
-[the v1.5 evaluation plan](v1.5.0/06-verification-and-evaluation.md).
+Later native checks cover linked worktrees; live Windows Codex remains unavailable.
+The [practical comparison](../evals/v1.5/practical/RESULTS.md) records bounded
+macOS use, and the [candidate handoff](v1.5.0/RELEASE_CANDIDATE.md) states current
+platform support. Broad improvement studies are optional stronger-claim work.

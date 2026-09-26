@@ -1,5 +1,9 @@
 # 설치와 런타임 참고
 
+이 브랜치는 미배포 v1.5.0 릴리스 후보입니다. 아래 1.4.0 명령은 기존 공개
+버전용이며 후보를 설치하지 않습니다. [후보 인계](v1.5.0/RELEASE_CANDIDATE.md)와
+[프로젝트 메모리](project-memory.ko.md)에 새 기능과 검증 범위를 정리했습니다.
+
 [English](advanced-usage.md)
 
 OpenSocrates 1.4.0은 Codex만 지원합니다. Apple silicon macOS와 Windows x64용
