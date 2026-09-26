@@ -1,6 +1,6 @@
 # Reuse suitability
 
-Guide revision: 1
+Guide revision: 2
 
 Use this guide when adding behavior, a shared function or component, a dependency,
 or an abstraction, or when existing implementations appear to overlap. Skip it
@@ -15,11 +15,15 @@ supports the ordinary coding task; it is not a canonical reasoning method.
    establish that no implementation exists anywhere.
 3. Read promising implementations, actual callers, tests, and public contracts.
    Check semantics, version and configuration compatibility, error behavior,
-   and ownership. A matching name or shape alone is insufficient evidence.
+   and ownership, including returned mutable values. Preserve each operation's
+   preconditions and defaults when sharing a transition. A matching name or shape
+   alone is insufficient evidence.
 4. Choose direct reuse, a narrow extension or adaptation, or a separate
    implementation. Explain why material candidates were accepted or rejected.
    Separate code when its behavior or reasons to change differ; avoid an
-   abstraction or new library whose cost exceeds the shared benefit.
+   abstraction or new library whose cost exceeds the shared benefit. For repeated
+   state transitions, inspect the transaction and copying boundary with a representative
+   batch; preserve correctness before optimizing copies.
 5. Implement the choice and verify the new behavior plus affected existing uses.
 
 Stop exploring when the current evidence supports a choice and further search is

@@ -1,6 +1,6 @@
 # Change impact
 
-Guide revision: 1
+Guide revision: 2
 
 Use this guide before changing shared behavior, a public type or interface,
 state ownership, configuration, or registration consumed by another module.
@@ -11,7 +11,10 @@ For a local mechanical edit with unchanged contracts, finish directly.
 2. Trace concrete incoming and outgoing relationships from definitions to
    callers, registrations, generated interfaces, and affected tests. Inspect
    relevant data shapes, error propagation, retries, cancellation, side effects,
-   resource lifetime, and ordering. Record file or symbol locations.
+   resource lifetime, and ordering. For persisted data, distinguish historical facts
+   from current source facts: identify information absent from older records before
+   promising compatibility, and state the limit rather than inventing past values.
+   Record file or symbol locations.
 3. Distinguish lexical search hits, structurally established relationships,
    inferred contracts, and unresolved dynamic behavior. A reference does not
    prove a runtime path executes. A search miss does not prove no consumer exists.

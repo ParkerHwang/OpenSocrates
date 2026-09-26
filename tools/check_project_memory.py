@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import os
 import re
@@ -18,6 +19,12 @@ from uuid import uuid4
 
 from opensocrates.persistence.locks import FileLock
 from opensocrates.persistence.permissions import create_owner_only_file
+from opensocrates.project_memory.contracts import (
+    ContractError,
+    load_schema,
+    validate,
+    validate_request,
+)
 from opensocrates.project_memory.registry import ProjectRegistry
 from opensocrates.project_memory.service import handle_memory
 from opensocrates.project_memory.store import MemoryStore
@@ -1098,6 +1105,88 @@ class MemoryFixture(unittest.TestCase):
                 self.assertEqual(
                     accepted["result"]["record"]["origin"]["attestation"],
                     "agent_reported_user_instruction",
+                )
+
+    def test_documented_checkpoint_requests_preserve_caller_evidence_boundary(self) -> None:
+        self.enroll()
+        guides = Path(__file__).resolve().parents[1] / "plugin-src/shared/assistance"
+        for locale in ("en", "ko"):
+            with self.subTest(locale=locale):
+                text = (guides / f"checkpoint.{locale}.md").read_text(encoding="utf-8")
+                example = json.loads(re.findall(r"```json\n(.*?)\n```", text, re.S)[0])
+                payload = example["payload"]
+                payload["idempotency_key"] = uid()
+                task = uid()
+
+                def database_bytes() -> dict[str, bytes]:
+                    return {
+                        str(path.relative_to(self.data)): path.read_bytes()
+                        for path in self.data.rglob("*.sqlite3")
+                    }
+
+                def reject_invalid_actions(payload, task) -> None:
+                    for actions in (
+                        ["Ran the targeted check."],
+                        [{**payload["completed_actions"][0], "support": "runtime_observed"}],
+                        [{**payload["completed_actions"][0], "support": "tool_reported"}],
+                    ):
+                        before = database_bytes()
+                        invalid = {
+                            **payload,
+                            "completed_actions": actions,
+                            "idempotency_key": uid(),
+                        }
+                        with self.assertRaisesRegex(ContractError, r"completed_actions\[0\]"):
+                            validate_request(self.request("checkpoint", invalid, task_id=task))
+                        result = self.call("checkpoint", invalid, task_id=task)
+                        self.assertEqual(result["status"], "invalid_request", result)
+                        self.assertEqual(database_bytes(), before)
+
+                reject_invalid_actions(payload, task)
+                result = self.call("checkpoint", payload, task_id=task)
+                self.assertEqual(result["status"], "ok", result)
+                record = result["result"]["record"]
+                self.assertEqual(record["payload"]["checkpoint_version"], 1)
+                self.assertEqual(
+                    record["payload"]["completed_actions"], payload["completed_actions"]
+                )
+                before_replay = database_bytes()
+                replay = self.call("checkpoint", payload, task_id=task)
+                self.assertEqual(replay["result"], result["result"])
+                self.assertEqual(database_bytes(), before_replay)
+
+                # Stored/returned native records keep their broader vocabulary.
+                for support in ("runtime_observed", "tool_reported", "inferred", "imported"):
+                    stored = copy.deepcopy(record)
+                    stored["payload"]["completed_actions"][0]["support"] = support
+                    validate(stored, load_schema("project-memory-record.schema.json"))
+
+                reject_invalid_actions(payload, task)
+                current = self.call("inspect", {"record_id": record["record_id"]})["result"]
+                payload["expected_checkpoint_version"] = current["payload"]["checkpoint_version"]
+                payload["idempotency_key"] = uid()
+                payload["next_action"] = "Inspect the corrected source before continuing."
+                updated = self.call("checkpoint", payload, task_id=task)
+                self.assertEqual(updated["status"], "ok", updated)
+                self.assertEqual(updated["result"]["checkpoint_version"], 2)
+                stable = database_bytes()
+                stale = self.call("checkpoint", {**payload, "idempotency_key": uid()}, task_id=task)
+                self.assertEqual(stale["status"], "conflict", stale)
+                self.assertEqual(database_bytes(), stable)
+                fresh = handle_memory(
+                    self.request(
+                        "recall", {"need": "continue task", "budget_bytes": 8192}, task_id=task
+                    ),
+                    registry=ProjectRegistry(self.data),
+                )
+                self.assertEqual(fresh["status"], "ok", fresh)
+                self.assertEqual(fresh["result"]["checkpoint_reference"], record["record_id"])
+                inspected = self.call(
+                    "inspect", {"record_id": fresh["result"]["checkpoint_reference"]}
+                )
+                self.assertEqual(inspected["result"]["payload"]["checkpoint_version"], 2)
+                self.assertEqual(
+                    inspected["result"]["payload"]["next_action"], payload["next_action"]
                 )
 
     def test_documented_scoped_forgetting_preserves_accepted_intent(self) -> None:

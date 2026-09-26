@@ -172,6 +172,13 @@ ACTION = obj(
     },
     ("action", "execution_state", "support", "source_refs"),
 )
+CALLER_ACTION = obj(
+    {
+        **ACTION["properties"],
+        "support": {"enum": ["agent_reported", "inferred", "imported"]},
+    },
+    ("action", "execution_state", "support", "source_refs"),
+)
 EFFECT = obj(
     {
         "effect": SHORT,
@@ -251,7 +258,7 @@ MEMORY_PAYLOAD = obj(
         "objective": TEXT,
         "constraints": arr(SHORT),
         "completion_conditions": arr(SHORT),
-        "completed_actions": arr(ACTION),
+        "completed_actions": arr(CALLER_ACTION),
         "remaining_actions": arr(SHORT),
         "next_action": SHORT,
         "blockers": arr(SHORT),

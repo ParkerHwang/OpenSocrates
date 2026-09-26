@@ -1,6 +1,6 @@
 # Optional assistance and project continuity
 
-Guide revision: 5
+Guide revision: 6
 
 Keep the user's goal, permissions, constraints, and completion conditions in view.
 For a mechanical edit or completed unchanged checks, finish directly. For a
@@ -34,8 +34,9 @@ with a task-specific need. Both fields are required; `query` is not a recall
 field. Inspect `status` and `result`, not the process exit alone. Repair an
 invalid envelope before drawing any conclusion about remembered content.
 
-After an enrolled milestone, capture only permitted public state under the
-project's policy. A user correction changes the next action and artifact.
+After an enrolled milestone, read [checkpoint requests](checkpoint.en.md) and
+capture only permitted public state under the project's policy. A user correction
+changes the next action and artifact.
 Before an authorized memory correction or explicit forgetting request, read
 [memory mutations](mutations.en.md). Supersession retains history; it does not
 erase a withdrawn fact. Preserve remaining accepted intent before exact-record

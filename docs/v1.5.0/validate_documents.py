@@ -62,8 +62,12 @@ def validate() -> dict[str, object]:
     require(evidence["locator"] == reference["locator"], "usable citation locator")
     require(pack["application"] == "unverified" and pack["delivery"] == "emitted",
             "delivery/application distinction")
-    require(payload["completed_actions"][1]["support"] == "agent_reported",
-            "reported test remains reported")
+    require(all(action["support"] in {"agent_reported", "inferred", "imported"}
+                for action in payload["completed_actions"]),
+            "caller checkpoint actions cannot claim native observation")
+    require(all(action["support"] == "agent_reported"
+                for action in payload["completed_actions"]),
+            "example source inspection and test remain agent reported")
     require("checkpoint_version" not in payload and payload["expected_checkpoint_version"] == 0,
             "new checkpoint version must be server assigned")
     require(bool(re.fullmatch(r"sha256:[0-9a-f]{64}", reference["digest"])), "digest shape")
