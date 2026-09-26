@@ -1,6 +1,11 @@
 # Change impact
 
-Guide revision: 3
+Guide revision: 4
+
+After renaming or splitting a shared entry point, verify affected test callers as
+well as application callers. A successful executable build does not establish that
+the repository's test targets compile. Use [result verification](../assistance/verification.en.md)
+for completion evidence; keep the check scoped to the changed contract.
 
 Use this guide before changing shared behavior, a public type or interface,
 state ownership, configuration, or registration consumed by another module.

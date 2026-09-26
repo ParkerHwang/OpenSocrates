@@ -6,6 +6,13 @@ remains Draft and issue [#94](https://github.com/ParkerHwang/OpenSocrates/issues
 contains the exact final commit, CI results, package hashes and validation commands.
 No merge, tag, publication, deployment or active-install replacement is implied.
 
+The latest [verification and request recovery revision](13-verification-and-request-recovery.md)
+adds decision preparation and safe diagnostics, preserves read acknowledgments
+on invalid input, and connects caller/test and artifact-consistency checks through
+EN/KO assistance guide 9. Its [separate report](../../evals/v1.5/revision-v4/REPORT.md)
+records deterministic qualification with zero new model calls or subagents. Earlier
+guide-8 comparison results do not establish the revised guidance's quality effect.
+
 The [current structural revision](12-structural-revision-and-official-docs.md) adds
 selective official-reference prompts and versioned completion/memory interfaces.
 The [new revision report](../../evals/v1.5/revision-v3/REPORT.md) records complete

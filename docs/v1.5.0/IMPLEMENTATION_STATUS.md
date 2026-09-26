@@ -1,5 +1,12 @@
 # v1.5.0 release-candidate status
 
+The latest [verification/recovery revision](13-verification-and-request-recovery.md)
+adds decision preparation, safe rejection diagnostics and acknowledgment preservation.
+Assistance guide 9, impact guide 4 and maintainability guide 3 add task-scoped
+completion examples and EN/KO verification guidance. The [new report](../../evals/v1.5/revision-v4/REPORT.md)
+separates deterministic qualification from unmeasured model-behavior effects.
+No subagents or new model calls were used; all earlier outcomes remain unchanged.
+
 The feature branch prepares **OpenSocrates 1.5.0 as an unpublished release
 candidate**, tracked by Draft [PR #95](https://github.com/ParkerHwang/OpenSocrates/pull/95)
 and [issue #94](https://github.com/ParkerHwang/OpenSocrates/issues/94). The exact

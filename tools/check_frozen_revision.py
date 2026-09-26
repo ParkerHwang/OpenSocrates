@@ -11,6 +11,52 @@ import tempfile
 from pathlib import Path
 
 from check_frozen_memory import request, run, uid
+from check_task_verification import exercise as check_task_verification
+
+
+def check_decision_recovery(command, root, package, launcher, environment, base):
+    template = json.loads(
+        (root / "plugin-src/shared/decision/request.json").read_text(encoding="utf-8")
+    )
+    for locale in ("en", "ko"):
+        prepared_decision = command("decision", {"operation": "prepare", "locale": locale})
+        assert prepared_decision["status"] == "prepared"
+        assert prepared_decision["selector_model_calls"] == 0
+        draft_decision = prepared_decision["request"]
+        assert command("decision", draft_decision)["diagnostic"]["field_path"] == "$.participation"
+        draft_decision.update(participation="judgment", routing=template["routing"])
+        selected = command("decision", draft_decision)
+        assert selected["selected"] == ["critical-thinking"]
+        assert selected["methods"][0]["instructions"] == (
+            package
+            / f"skills/opensocrates/references/decision/methods/{locale}/critical-thinking.md"
+        ).read_text(encoding="utf-8")
+        invalid = json.loads(json.dumps(draft_decision))
+        invalid["context"] = "b" * 32
+        invalid["routing"]["features"][0]["basis"] = "governing_rule"
+        acknowledged = dict(
+            operation="acknowledge",
+            context=draft_decision["context"],
+            epoch=0,
+            digests=[selected["methods"][0]["sha256"]],
+        )
+        streamed = subprocess.run(
+            [*launcher, "decision", "codex", "--stream"],
+            input="".join(
+                json.dumps(value) + "\n"
+                for value in (draft_decision, acknowledged, invalid, draft_decision)
+            ).encode(),
+            capture_output=True,
+            env=environment,
+            cwd=base,
+            timeout=30,
+        )
+        assert streamed.returncode == 0
+        responses = [json.loads(line) for line in streamed.stdout.splitlines()]
+        assert len(responses) == 4
+        assert responses[2]["diagnostic"]["field_path"] == "$.routing.features[0].basis"
+        assert responses[3]["selection_reused"]
+        assert responses[3]["methods"][0]["instructions"] is None
 
 
 def check(binary: Path, package: Path) -> dict[str, object]:
@@ -66,6 +112,8 @@ def check(binary: Path, package: Path) -> dict[str, object]:
         result = command("assistance", obligations)
         assert result["obligation_summary"]["ready_ids"] == ["draft"]
         assert result["obligation_summary"]["required_input_ids"] == ["budget"]
+        task_verification = check_task_verification(command, root)
+        check_decision_recovery(command, root, package, launcher, environment, base)
         assert not data.exists(), "stateless commands initialized memory"
         payload = {
             "root": str(source),
@@ -161,14 +209,14 @@ def check(binary: Path, package: Path) -> dict[str, object]:
         assert (package / "schemas/v1" / canonical.name).read_bytes() == expected
         assert (internal / "schemas/v1" / canonical.name).read_bytes() == expected
         checked += 2
-    for folder in ("documentation", "assistance", "coding"):
+    for folder in ("documentation", "assistance", "coding", "decision"):
         for canonical in (root / "plugin-src/shared" / folder).iterdir():
             if not canonical.is_file():
                 continue
             expected = canonical.read_bytes()
             if (
                 os.name == "nt"
-                and folder == "documentation"
+                and folder in {"documentation", "decision"}
                 and canonical.name.startswith("guide.")
             ):
                 expected = expected.replace(b"bin/launch.sh", b"node bin/launch.mjs")
@@ -188,6 +236,9 @@ def check(binary: Path, package: Path) -> dict[str, object]:
         "stateless_no_memory": True,
         "prepared_read_only": True,
         "scoped_recall_and_delete": True,
+        "decision_prepare_and_recovery": True,
+        "rejected_request_preserves_availability": True,
+        "task_verification": task_verification,
         "model_calls": 0,
     }
 

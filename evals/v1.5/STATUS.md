@@ -1,5 +1,16 @@
 # v1.5 evaluation status
 
+## Post-comparison implementation
+
+The [decision recovery and verification revision](revision-v4/REPORT.md) addresses
+the hard-task findings without subagents or new model calls. It adds mechanical
+decision preparation, safe field diagnostics and rejection without losing valid
+read acknowledgments. Assistance guide 9 and focused EN/KO references connect
+required completion checks to callers/tests and consistent data, prose and units.
+It uses the existing 47 schemas and task fallback; model profiles stay inactive.
+Historical outcomes are preserved. Deterministic qualification is separate from
+the still-unmeasured effect of the revised guidance on model quality or efficiency.
+
 ## Hard coding and office comparison
 
 The [new hard-task report](hard-tasks/v1/REPORT.md) completes18 fixed invocations:

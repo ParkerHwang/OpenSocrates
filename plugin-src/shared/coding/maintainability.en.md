@@ -1,6 +1,11 @@
 # Maintainability review
 
-Guide revision: 2
+Guide revision: 3
+
+Separate an API/artifact pass from the relevant repository test-suite result.
+Keep both as required completion evidence when the task needs both; a passing
+endpoint does not close a broken caller or an unrun test target. See
+[result verification](../assistance/verification.en.md) for the existing obligation examples.
 
 Use this guide before completing a non-mechanical code change. Scale the review
 to changed behavior and affected contracts; do not turn a routine edit into an

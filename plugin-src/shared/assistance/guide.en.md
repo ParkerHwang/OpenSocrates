@@ -1,6 +1,6 @@
 # Optional assistance and project continuity
 
-Guide revision: 8
+Guide revision: 9
 
 Keep the user's goal, permissions, constraints, and completion conditions in view.
 For a mechanical edit or completed unchanged checks, finish directly. For a
@@ -59,6 +59,11 @@ statuses, evidence-reference IDs, attribution and dependency IDs. Use
 evidence prevents conditional finish; ready work and required input are returned
 separately. An optional suggestion is not a new prerequisite. These reports remain
 caller assertions; they do not prove source truth or authorize execution.
+
+When shared code, related artifacts or requested performance need completion
+evidence, read the relevant part of [result verification](verification.en.md).
+Tie required checks to actual consumers, test targets, narrative and display units.
+This uses existing obligations when helpful; it requires no extra call per edit.
 
 The v1.1 memory request supports read-only `prepare` with payload
 `{"target_operation":"checkpoint"}` and explicit enrolled project/workspace/task
