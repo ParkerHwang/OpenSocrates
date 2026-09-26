@@ -20,6 +20,10 @@ pass_through() {
         printf '%s\n' '{"schema":"opensocrates.project-memory.response/1.0.0","request_id":null,"status":"unavailable","result":null,"limitations":["launcher_unavailable"],"retryable":false}'
         exit 3
     fi
+    if [ "$launch_mode" = documentation ]; then
+        printf '%s\n' '{"schema":"opensocrates.documentation.pack/1.0.0","request_id":null,"status":"unavailable","application":"unverified","limitations":["launcher_unavailable"]}'
+        exit 3
+    fi
     case "$code" in
         unsupported_platform|missing_runtime|invalid_arguments)
             ;;
@@ -65,7 +69,7 @@ case "$mode" in
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         ;;
-    control|assistance|memory)
+    control|assistance|memory|documentation)
         if [ "$#" -ne 2 ]; then
             pass_through invalid_arguments "$mode" "$host"
         fi
@@ -180,6 +184,9 @@ case "$mode" in
         ;;
     memory)
         exec "$runtime_path" memory
+        ;;
+    documentation)
+        exec "$runtime_path" documentation
         ;;
 esac
 

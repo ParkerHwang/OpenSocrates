@@ -54,6 +54,8 @@ docs-check:
 		--path docs/decision-points.md \
 		--path docs/decision-points.ko.md \
 		--path docs/project-memory-development.md \
+		--path docs/official-documentation.md \
+		--path docs/official-documentation.ko.md \
 		--path README.md \
 		--path README.ko.md \
 		--path CHANGELOG.md \
@@ -101,6 +103,8 @@ security-scan: generate
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/security_scan.py --root "$(ROOT)" --report build/evidence/security-scan.json
 
 smoke:
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_documentation.py
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_v15_revision.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_assistance.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_memory_sources.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_project_memory.py

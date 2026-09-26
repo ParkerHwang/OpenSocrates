@@ -1,6 +1,6 @@
 # Optional assistance and project continuity
 
-Guide revision: 6
+Guide revision: 7
 
 Keep the user's goal, permissions, constraints, and completion conditions in view.
 For a mechanical edit or completed unchanged checks, finish directly. For a
@@ -42,3 +42,26 @@ Before an authorized memory correction or explicit forgetting request, read
 erase a withdrawn fact. Preserve remaining accepted intent before exact-record
 deletion, and verify the result before claiming that memory was updated.
 Finish after the required checks unless material change or new evidence reopens them.
+
+For coupled work, the optional v1.1 assistance request adds at most eight public
+obligations with question IDs, work/input kinds, required flags, existing completion
+statuses, evidence-reference IDs, attribution and dependency IDs. Use
+[obligations.json](obligations.json) as a complete example. Required unresolved
+evidence prevents conditional finish; ready work and required input are returned
+separately. An optional suggestion is not a new prerequisite. These reports remain
+caller assertions; they do not prove source truth or authorize execution.
+
+The v1.1 memory request supports read-only `prepare` with payload
+`{"target_operation":"checkpoint"}` and explicit enrolled project/workspace/task
+IDs. It returns a mechanical checkpoint draft and fields needing semantic review,
+without creating/migrating a store or inferring the task. Fill those fields before
+submitting; identical retries retain the exact request and idempotency key. A
+concurrent write still conflicts. Read-only/disabled policies remain binding.
+
+Use v1.1 `recall` for typed lifecycle/support and a bounded checkpoint summary with
+its version/reference. `scope_paths` narrows delivered source evidence, not required
+intent or enrollment policy. `revalidation_scopes` shows any broader original
+source footprints checked. `need` ranks results; it does not reduce membership.
+Inspect for full checkpoint actions/effects or a truncated summary. Source freshness,
+accepted intent and reported execution remain different states. Do not copy these
+projections into another automatic cache or duplicate note without a task need.

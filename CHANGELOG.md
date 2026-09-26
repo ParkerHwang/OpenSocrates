@@ -2,6 +2,16 @@
 
 ## [1.5.0] - Unreleased release candidate
 
+- Add stateless official-document reference prompts with separate publisher,
+  version and reported-read metadata. Documents remain evidence, not instructions
+  that can override user permissions. No network call or content persistence is added.
+- Add compatible v1.1 assistance/memory contracts for scoped completion,
+  read-only checkpoint preparation and provenance-bearing recall; preserve the
+  v1.0 schemas and SQLite layout. Apply recall delivery scope and retain required intent.
+- 공식 문서의 출처·버전·읽음 신고를 구분하는 선택적 안내와 범위별 완료 처리,
+  체크포인트 준비 및 출처가 표시된 회상을 추가합니다. 기존 계약과 SQLite 구조,
+  권한·삭제 경계는 유지하며 문서 본문을 제품 메모리에 저장하지 않습니다.
+
 - Add optional stateless task-based assistance and explicit local Git/non-Git
   project memory with source freshness, proposed/accepted lifecycle, checkpoints,
   bounded retrieval, transactional migration and scoped deletion.

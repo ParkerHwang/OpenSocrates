@@ -33,6 +33,7 @@ def _parser() -> argparse.ArgumentParser:
     sub.add_parser("memory", help="explicit enrolled project memory request")
 
     sub.add_parser("assistance", help="plan optional assistance from closed task features")
+    sub.add_parser("documentation", help="emit bounded official-document reference guidance")
 
     control = sub.add_parser("control", help="apply one bounded host control")
     control_sub = control.add_subparsers(dest="control_command", required=True)
@@ -287,6 +288,11 @@ def main(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
         from .assistance import run_assistance
 
         return run_assistance(stdin or sys.stdin, output_stream)
+
+    if args.command == "documentation":
+        from .documentation import run_documentation
+
+        return run_documentation(stdin or sys.stdin, output_stream)
 
     host = getattr(args, "host", None)
     runtime = _services_for(services, host=host)

@@ -13,6 +13,15 @@ from typing import Any
 class ContractError(ValueError):
     """A request does not satisfy its closed public contract."""
 
+    def __init__(self, message: str, *, code: str = "contract_violation", path: str = "$") -> None:
+        super().__init__(f"{path}: {message}" if path != "$" else message)
+        self.code = code
+        self.field_path = path
+
+    def diagnostic(self) -> dict[str, str]:
+        """Only fixed codes and schema-derived paths, never input values/unknown keys."""
+        return {"code": self.code, "field_path": self.field_path}
+
 
 _BASIS_REFERENCE = re.compile(r"^[a-z][a-z0-9_-]*:[A-Za-z0-9._/#-]{1,120}$")
 _FORBIDDEN_BASIS_PREFIXES = frozenset(
@@ -54,6 +63,12 @@ def load_schema(filename: str) -> dict[str, Any]:
         "project-memory-record.schema.json",
         "project-memory-snapshot.schema.json",
         "project-memory-context-pack.schema.json",
+        "project-memory-request-v2.schema.json",
+        "project-memory-context-pack-v2.schema.json",
+        "assistance-request-v2.schema.json",
+        "assistance-plan-v2.schema.json",
+        "documentation-request.schema.json",
+        "documentation-pack.schema.json",
     }:
         raise ContractError("unknown schema")
     value = json.loads((_schema_root() / filename).read_text(encoding="utf-8"))
@@ -65,6 +80,14 @@ def load_schema(filename: str) -> dict[str, Any]:
 def validate(value: Any, schema: dict[str, Any], *, path: str = "$") -> None:  # noqa: C901  # Closed recursive contract assertions.
     """Validate the supported closed schema vocabulary without external imports."""
 
+    if "anyOf" in schema:
+        for candidate in schema["anyOf"]:
+            try:
+                validate(value, candidate, path=path)
+                return
+            except ContractError:
+                continue
+        raise ContractError("invalid alternative", code="invalid_type", path=path)
     expected = schema.get("type")
     types = expected if isinstance(expected, list) else [expected] if expected else []
     if types:
@@ -79,44 +102,55 @@ def validate(value: Any, schema: dict[str, Any], *, path: str = "$") -> None:  #
                 or (kind == "null" and value is None)
             )
         if not matched:
-            raise ContractError(f"{path}: invalid type")
+            raise ContractError("invalid type", code="invalid_type", path=path)
     if "const" in schema and value != schema["const"]:
-        raise ContractError(f"{path}: invalid constant")
+        raise ContractError("invalid constant", code="invalid_constant", path=path)
     if "enum" in schema and value not in schema["enum"]:
-        raise ContractError(f"{path}: invalid enum")
+        raise ContractError("invalid enum", code="invalid_enum", path=path)
     if isinstance(value, dict):
         allowed = schema.get("properties", {})
         if schema.get("additionalProperties") is False and set(value) - set(allowed):
-            raise ContractError(f"{path}: unknown field")
-        if set(schema.get("required", [])) - set(value):
-            raise ContractError(f"{path}: required field missing")
+            raise ContractError("unknown field", code="unknown_field", path=path)
+        missing = sorted(set(schema.get("required", [])) - set(value))
+        if missing:
+            raise ContractError(
+                "required field missing", code="missing_field", path=f"{path}.{missing[0]}"
+            )
         for name, item in value.items():
             if name in allowed:
                 validate(item, allowed[name], path=f"{path}.{name}")
     elif isinstance(value, list):
         if len(value) > schema.get("maxItems", 1 << 30) or len(value) < schema.get("minItems", 0):
-            raise ContractError(f"{path}: invalid array size")
+            raise ContractError("invalid array size", code="invalid_size", path=path)
         item_schema = schema.get("items", {})
         for index, item in enumerate(value):
             validate(item, item_schema, path=f"{path}[{index}]")
     elif isinstance(value, str):
         if len(value) > schema.get("maxLength", 1 << 30) or len(value) < schema.get("minLength", 0):
-            raise ContractError(f"{path}: invalid text length")
+            raise ContractError("invalid text length", code="invalid_size", path=path)
         pattern = schema.get("pattern")
         if pattern and re.fullmatch(pattern, value) is None:
-            raise ContractError(f"{path}: invalid text pattern")
+            raise ContractError("invalid text pattern", code="invalid_pattern", path=path)
         if schema.get("format") == "date-time":
             try:
                 datetime.fromisoformat(value.replace("Z", "+00:00"))
             except ValueError as error:
-                raise ContractError(f"{path}: invalid timestamp") from error
+                raise ContractError(
+                    "invalid timestamp", code="invalid_timestamp", path=path
+                ) from error
     elif type(value) is int:
         if value < schema.get("minimum", -(1 << 63)) or value > schema.get("maximum", 1 << 63):
-            raise ContractError(f"{path}: invalid integer range")
+            raise ContractError("invalid integer range", code="invalid_range", path=path)
 
 
 def validate_request(value: Any) -> dict[str, Any]:  # noqa: C901  # Closed operation envelopes require explicit branches.
-    schema = load_schema("project-memory-request.schema.json")
+    revised = (
+        isinstance(value, dict)
+        and value.get("schema") == "opensocrates.project-memory.request/1.1.0"
+    )
+    schema = load_schema(
+        "project-memory-request-v2.schema.json" if revised else "project-memory-request.schema.json"
+    )
     validate(value, schema)
     if not isinstance(value, dict):
         raise ContractError("request must be an object")
@@ -176,9 +210,15 @@ def validate_request(value: Any) -> dict[str, Any]:  # noqa: C901  # Closed oper
         "disable": {"expected_policy_version", "idempotency_key"},
         "delete": {"intent", "idempotency_key"},
         "prune": {"dry_run", "retention_days"},
+        "prepare": {"target_operation"},
     }
     if not required[operation] <= set(payload):
-        raise ContractError("operation payload is missing required fields")
+        missing = sorted(required[operation] - set(payload))
+        raise ContractError(
+            "operation payload is missing required fields",
+            code="missing_field",
+            path=f"$.payload.{missing[0]}",
+        )
     allowed: dict[str, set[str]] = {
         "init": required["init"]
         | {
@@ -202,9 +242,12 @@ def validate_request(value: Any) -> dict[str, Any]:  # noqa: C901  # Closed oper
         "delete": required["delete"]
         | {"record_id", "expected_record_version", "expected_policy_version"},
         "prune": required["prune"] | {"idempotency_key"},
+        "prepare": required["prepare"],
     }
     if set(payload) - allowed[operation]:
-        raise ContractError("operation payload contains unrelated fields")
+        raise ContractError(
+            "operation payload contains unrelated fields", code="unrelated_field", path="$.payload"
+        )
     if operation == "init" and payload["apply"]:
         if not {
             "disclosure_digest",
@@ -221,10 +264,12 @@ def validate_request(value: Any) -> dict[str, Any]:  # noqa: C901  # Closed oper
         raise ContractError("observe requires exactly one file path or search query")
     if operation != "init" and value["project_id"] is None and operation != "status":
         raise ContractError("registered project identity is required")
-    if operation in {"checkpoint", "recall"} and value["workspace_id"] is None:
-        raise ContractError("workspace identity is required")
-    if operation == "checkpoint" and value["task_id"] is None:
-        raise ContractError("task identity is required")
+    if operation in {"checkpoint", "recall", "prepare"} and value["workspace_id"] is None:
+        raise ContractError(
+            "workspace identity is required", code="missing_identity", path="$.workspace_id"
+        )
+    if operation in {"checkpoint", "prepare"} and value["task_id"] is None:
+        raise ContractError("task identity is required", code="missing_identity", path="$.task_id")
     return value
 
 

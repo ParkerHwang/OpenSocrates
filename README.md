@@ -123,6 +123,9 @@ by OpenAI.
 - Opt-in local memory for Git and non-Git projects, with accepted/proposed intent,
   current-source validation, checkpoints, inspect/export and exact scoped forgetting.
 - Coding guidance for existing implementation reuse, affected callers and follow-ups.
+- Selective official-document reference prompts with declared URL/version/read
+  provenance, plus read-only checkpoint preparation and scoped completion evidence.
+  [Official references](docs/official-documentation.md) explains the limits.
 - Aligned EN/KO collaboration guidance: answer side questions, continue the main
   task and reuse settled permissions. Missing memory does not invent facts.
 

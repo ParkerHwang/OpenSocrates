@@ -129,3 +129,14 @@ The user explicitly replaces statistical-release prerequisites with
 privacy, lifecycle, packaging and honest-support gates. Human recruitment, billing
 proof, backend echo, account-side isolation and broad superiority are not universal
 release blockers. Frozen studies and their claim limitations are unchanged.
+
+## 2026-09-27 structural revision decisions
+
+The user authorized implementing the evidence-led structural improvements and
+adding official-document reference prompts. Keep reference instructions packaged
+and fixed, with caller URL/version/read metadata separate. Native URL matching
+is publisher-catalog evidence only; no autonomous fetch, content store, daemon,
+model routing change or new enrollment authority is introduced. Add closed v1.1
+wire contracts while preserving v1.0 schema bytes and SQLite format. Keep scoped
+completion advisory and connect it to existing required-criterion semantics.
+See [12](12-structural-revision-and-official-docs.md) for seams, limits and checks.

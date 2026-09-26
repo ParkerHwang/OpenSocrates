@@ -120,12 +120,15 @@ def _pack(  # noqa: C901  # Required-pack composition is branch explicit.
     workspace_id: str,
     task_id: str | None,
     payload: dict[str, Any],
+    *,
+    revised: bool = False,
 ) -> tuple[str, dict[str, Any]]:
     budget = min(payload["budget_bytes"], MAX_PACK_BYTES)
+    requested_scope = tuple(payload.get("scope_paths", ()))
     current = _current_snapshot(
-        workspace, project_id, workspace_id, project["policy"]["excluded_paths"]
+        workspace, project_id, workspace_id, project["policy"]["excluded_paths"], requested_scope
     )
-    scoped_current: dict[tuple[str, ...], dict[str, Any]] = {(): current}
+    scoped_current: dict[tuple[str, ...], dict[str, Any]] = {tuple(current["scope_paths"]): current}
 
     def current_for(stored: dict[str, Any] | None) -> dict[str, Any] | None:
         if stored is None:
@@ -153,8 +156,8 @@ def _pack(  # noqa: C901  # Required-pack composition is branch explicit.
 
     records.sort(key=rank)
     checkpoint = store.latest_checkpoint(task_id, workspace_id) if task_id else None
-    constraints: list[dict[str, str]] = []
-    decisions: list[dict[str, str]] = []
+    constraints: list[dict[str, Any]] = []
+    decisions: list[dict[str, Any]] = []
     unknowns: list[str] = []
     conflicts: list[str] = []
     source_evidence: list[dict[str, Any]] = []
@@ -170,6 +173,7 @@ def _pack(  # noqa: C901  # Required-pack composition is branch explicit.
                     "summary": record["summary"][:1024],
                     "record_id": record["record_id"],
                     "freshness": freshness,
+                    **_pack_provenance(record, revised),
                 }
             )
             if record["scope"]["level"] != "task":
@@ -178,6 +182,7 @@ def _pack(  # noqa: C901  # Required-pack composition is branch explicit.
                         "text": record["summary"][:1024],
                         "record_id": record["record_id"],
                         "freshness": freshness,
+                        **_pack_provenance(record, revised),
                     }
                 )
         if freshness == "current":
@@ -192,6 +197,7 @@ def _pack(  # noqa: C901  # Required-pack composition is branch explicit.
                 "text": text[:1024],
                 "record_id": checkpoint["record_id"],
                 "freshness": checkpoint_freshness,
+                **_pack_provenance(checkpoint, revised),
             }
             for text in checkpoint["payload"]["constraints"]
         )
@@ -200,6 +206,10 @@ def _pack(  # noqa: C901  # Required-pack composition is branch explicit.
     distinct_evidence: list[dict[str, Any]] = []
     seen_evidence: dict[tuple[str, str, str | None], str] = {}
     for reference in source_evidence:
+        from .sources import _scope
+
+        if not _scope(reference["locator"]["path"], requested_scope):
+            continue
         key = (
             reference["digest"],
             reference["locator"]["path"],
@@ -214,7 +224,9 @@ def _pack(  # noqa: C901  # Required-pack composition is branch explicit.
             distinct_evidence.append(reference)
     source_evidence = distinct_evidence
     pack: dict[str, Any] = {
-        "schema": "opensocrates.project-memory.context-pack/1.0.0",
+        "schema": "opensocrates.project-memory.context-pack/1.1.0"
+        if revised
+        else "opensocrates.project-memory.context-pack/1.0.0",
         "pack_id": str(uuid4()),
         "project_id": project_id,
         "workspace_id": workspace_id,
@@ -239,9 +251,29 @@ def _pack(  # noqa: C901  # Required-pack composition is branch explicit.
         "delivery": "emitted",
         "application": "unverified",
     }
+    if revised:
+        pack["checkpoint"] = (
+            {
+                "record_id": checkpoint["record_id"],
+                "checkpoint_version": checkpoint["payload"]["checkpoint_version"],
+                "lifecycle": checkpoint["lifecycle"],
+                "support": checkpoint["support"],
+                "objective": checkpoint["payload"]["objective"][:1024],
+                "next_action": checkpoint["payload"]["next_action"][:1024],
+                "summary_truncated": any(
+                    len(checkpoint["payload"][key]) > 1024 for key in ("objective", "next_action")
+                ),
+                "snapshot_id": checkpoint["snapshot_id"],
+                "freshness": checkpoint_freshness,
+                "inspection_required_for_full_state": True,
+            }
+            if checkpoint
+            else None
+        )
+        pack["revalidation_scopes"] = [list(scope) for scope in sorted(scoped_current)]
     if any(
         len(items) > 32 for items in (constraints, decisions, source_evidence, conflicts, unknowns)
-    ):
+    ) or (revised and len(scoped_current) > 32):
         return "budget_insufficient", {
             "required_item_counts": {
                 "constraints": len(constraints),
@@ -250,11 +282,18 @@ def _pack(  # noqa: C901  # Required-pack composition is branch explicit.
                 "conflicts": len(conflicts),
                 "unknowns": len(unknowns),
             },
-            "partition": "narrow task and source scope; required constraints were not truncated",
+            "partition": "required material exceeds the item limit; inspect relevant records or revise explicitly scoped intent; no required constraints were truncated",
         }
     from .contracts import load_schema, validate
 
-    validate(pack, load_schema("project-memory-context-pack.schema.json"))
+    validate(
+        pack,
+        load_schema(
+            "project-memory-context-pack-v2.schema.json"
+            if revised
+            else "project-memory-context-pack.schema.json"
+        ),
+    )
     for _ in range(3):
         encoded = canonical_json_bytes(pack)
         if pack["used_bytes"] == len(encoded):
@@ -264,9 +303,63 @@ def _pack(  # noqa: C901  # Required-pack composition is branch explicit.
         return "budget_insufficient", {
             "required_bytes": len(canonical_json_bytes(pack)),
             "budget_bytes": budget,
-            "partition": "narrow need or increase budget within 65536 bytes",
+            "partition": "increase budget within 65536 bytes or narrow source evidence/task scope; need only ranks results and required intent is retained",
         }
     return "ok", pack
+
+
+def _pack_provenance(record: dict[str, Any], revised: bool) -> dict[str, Any]:
+    return (
+        {key: record[key] for key in ("kind", "lifecycle", "support", "origin")} if revised else {}
+    )
+
+
+def _prepare_checkpoint(store: MemoryStore, request: dict[str, Any]) -> dict[str, Any]:
+    """Read only: no schema migration, backup expiry, task inference or acceptance."""
+    store.probe_schema()
+    checkpoint = store.latest_checkpoint(request["task_id"], request["workspace_id"])
+    payload: dict[str, Any] = {
+        "idempotency_key": str(uuid4()),
+        "expected_checkpoint_version": checkpoint["payload"]["checkpoint_version"]
+        if checkpoint
+        else 0,
+        "objective": "",
+        "constraints": [],
+        "completion_conditions": [],
+        "completed_actions": [],
+        "remaining_actions": [],
+        "next_action": "",
+        "blockers": [],
+        "decision_refs": [],
+        "source_refs": [],
+        "snapshot_id": None,
+        "conflict_ids": [],
+        "pending_effects": [],
+        "parent_checkpoint_id": None,
+    }
+    return {
+        "prepared_only": True,
+        "requires_semantic_review": [
+            "objective",
+            "constraints",
+            "completion_conditions",
+            "completed_actions",
+            "remaining_actions",
+            "next_action",
+            "blockers",
+            "pending_effects",
+        ],
+        "checkpoint_reference": checkpoint["record_id"] if checkpoint else None,
+        "request": {
+            "schema": "opensocrates.project-memory.request/1.0.0",
+            "operation": "checkpoint",
+            "request_id": str(uuid4()),
+            "project_id": request["project_id"],
+            "workspace_id": request["workspace_id"],
+            "task_id": request["task_id"],
+            "payload": payload,
+        },
+    }
 
 
 def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[str, Any]:  # noqa: C901
@@ -279,7 +372,14 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
         request_id = None
     try:
         req = validate_request(raw)
-    except (ContractError, OSError, ValueError):
+    except ContractError as error:
+        return response(
+            request_id,
+            "invalid_request",
+            error.diagnostic(),
+            limitations=["closed_request_rejected"],
+        )
+    except (OSError, ValueError):
         return response(request_id, "invalid_request", limitations=["closed_request_rejected"])
     registry = registry or ProjectRegistry()
     operation = req["operation"]
@@ -376,6 +476,13 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
         store = MemoryStore(
             registry.project_dir(project_id), private_root=workspace["root"] if workspace else ""
         )
+        if operation == "prepare":
+            return response(
+                request_id,
+                "ok",
+                _prepare_checkpoint(store, req),
+                limitations=["draft_not_submitted", "caller_semantics_required"],
+            )
         if not (operation == "delete" and payload["intent"] == "delete_project"):
             store.ensure_current(
                 deleting_content=operation == "delete" and payload["intent"] == "delete_record"
@@ -460,7 +567,14 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
         elif operation == "recall":
             assert isinstance(workspace_id, str) and workspace is not None
             status, result = _pack(
-                store, project, workspace, project_id, workspace_id, task_id, payload
+                store,
+                project,
+                workspace,
+                project_id,
+                workspace_id,
+                task_id,
+                payload,
+                revised=req["schema"] == "opensocrates.project-memory.request/1.1.0",
             )
             return response(request_id, status, result)
         elif operation in {"observe", "refresh"}:
@@ -791,7 +905,12 @@ def handle_memory(raw: Any, *, registry: ProjectRegistry | None = None) -> dict[
                 "budget_insufficient",
                 {"partition": "narrow record output before mutation"},
             )
-        return response(request_id, "invalid_request", limitations=["closed_operation_rejected"])
+        return response(
+            request_id,
+            "invalid_request",
+            error.diagnostic(),
+            limitations=["closed_operation_rejected"],
+        )
     except ValueError as error:
         return response(
             request_id,

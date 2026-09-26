@@ -214,3 +214,17 @@ Package integration reuses current generators/launchers and preserves native tim
 gates. No persistent service, model selector, credential, or global setting is
 required. If policy overhead exceeds its benefit, use the simpler task-based route
 and retain measured failure evidence for a later revision.
+
+## Additive structural revision
+
+The [2026-09-27 revision](12-structural-revision-and-official-docs.md) adds separate
+closed v1.1 assistance/memory requests and a v1.1 recall projection. Existing v1.0
+schemas and stored records remain supported. The new assistance request carries
+at most eight public obligations; its plan separates required blockers, pending
+inputs and ready work without promoting caller reports into native evidence.
+The memory `prepare` operation reads current schema/version without migration or
+mutation. V1.1 recall returns lifecycle/support plus bounded checkpoint metadata.
+Requested paths filter delivered source evidence; original snapshots retain their
+full revalidation footprint. A source scope never deletes applicable accepted intent.
+The separate documentation command is stateless and uses authorized host tools
+for actual source reading. Frozen historical protocols are unchanged.

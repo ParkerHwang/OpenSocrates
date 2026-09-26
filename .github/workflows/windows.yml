@@ -23,6 +23,7 @@ jobs:
       - run: uv run --locked python tools/check_windows.py
       - run: uv run --locked python tools/build_windows.py
       - run: uv run --locked python tools/check_frozen_memory.py --runtime-report build/evidence/runtime-build-windows-codex.json --package dist/codex-windows-x64
+      - run: uv run --locked python tools/check_frozen_revision.py --runtime-report build/evidence/runtime-build-windows-codex.json --package dist/codex-windows-x64
       - run: uv run --locked python tools/check_windows.py --packages
       - run: npm run test:windows
       - run: npm pack --dry-run

@@ -9,12 +9,13 @@ const hook = mode === 'hook';
 function unavailable(code) {
   if (!hook && mode === 'assistance') process.stdout.write(JSON.stringify({schema:'opensocrates.assistance.plan/1.0.0',request_id:null,status:'unavailable',application:'unverified',limitations:[code]})+'\n');
   else if (!hook && mode === 'memory') process.stdout.write(JSON.stringify({schema:'opensocrates.project-memory.response/1.0.0',request_id:null,status:'unavailable',result:null,limitations:[code],retryable:false})+'\n');
+  else if (!hook && mode === 'documentation') process.stdout.write(JSON.stringify({schema:'opensocrates.documentation.pack/1.0.0',request_id:null,status:'unavailable',application:'unverified',limitations:[code]})+'\n');
   else if (!hook) process.stdout.write(JSON.stringify({decision:'pass',diagnostic:{code,status:'unavailable'}})+'\n');
-  process.exit(mode === 'memory' || mode === 'assistance' ? 3 : 0);
+  process.exit(['memory','assistance','documentation'].includes(mode) ? 3 : 0);
 }
 const events = new Set(['session_started','user_prompt_submitted','skill_invoked','tool_succeeded','tool_failed','tool_batch_completed','completion_candidate','pre_compaction','post_compaction','session_ended']);
 if (!['codex'].includes(host) || extra.length ||
-    !(hook ? events.has(event) : mode === 'decision' ? !event || event === '--stream' : ['control','assistance','memory'].includes(mode) && !event)) unavailable('invalid_arguments');
+    !(hook ? events.has(event) : mode === 'decision' ? !event || event === '--stream' : ['control','assistance','memory','documentation'].includes(mode) && !event)) unavailable('invalid_arguments');
 if (process.platform !== 'win32' || process.arch !== 'x64') unavailable('unsupported_platform');
 const runtime = fileURLToPath(new URL('../runtime/windows-x64/opensocrates-runtime/opensocrates-runtime.exe', import.meta.url));
 if (!existsSync(runtime)) unavailable('missing_runtime');

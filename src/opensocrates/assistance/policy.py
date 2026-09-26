@@ -10,6 +10,8 @@ from uuid import UUID
 REQUEST_SCHEMA = "opensocrates.assistance.request/1.0.0"
 PLAN_SCHEMA = "opensocrates.assistance.plan/1.0.0"
 MAX_BYTES = 16 * 1024
+REQUEST_SCHEMA_V2 = "opensocrates.assistance.request/1.1.0"
+PLAN_SCHEMA_V2 = "opensocrates.assistance.plan/1.1.0"
 
 COMPONENT_ORDER = (
     "goal",
@@ -30,6 +32,7 @@ REASON_ORDER = (
     "matched_support_rule",
     "profile_fallback",
     "dependency_missing",
+    "obligation_gap",
 )
 TASK_ENUMS = {
     "task_kind": frozenset(("mechanical", "judgment")),
@@ -85,6 +88,23 @@ def validate_request(request: Any) -> dict[str, Any]:  # noqa: C901  # Closed fi
             raise InvalidAssistanceRequest("invalid_request")
     except (TypeError, UnicodeError, ValueError) as exc:
         raise InvalidAssistanceRequest("invalid_request") from exc
+    if isinstance(request, dict) and request.get("schema") == REQUEST_SCHEMA_V2:
+        from ..project_memory.contracts import load_schema, validate
+        from .obligations import summarize_obligations
+
+        try:
+            schema = load_schema("assistance-request-v2.schema.json")
+        except (ValueError, OSError) as exc:
+            raise RuntimeError("installed_assistance_schema_unavailable") from exc
+        try:
+            validate(request, schema)
+            summarize_obligations(request["obligations"])
+            legacy = {key: value for key, value in request.items() if key != "obligations"}
+            legacy["schema"] = REQUEST_SCHEMA
+            validate_request(legacy)
+        except ValueError as exc:
+            raise InvalidAssistanceRequest("invalid_request") from exc
+        return request
     envelope = _object(
         request,
         frozenset(("schema", "request_id", "locale", "task", "model_context", "profile_override")),
@@ -177,11 +197,30 @@ def plan_assistance(  # noqa: C901  # Ordered policy precedence is intentionally
     """Return bounded guidance from closed features; perform no I/O or model calls."""
 
     data = validate_request(request)
-    task = data["task"]
+    task = dict(data["task"])
+    obligation_summary = None
+    if data["schema"] == REQUEST_SCHEMA_V2:
+        from .obligations import summarize_obligations
+
+        obligation_summary = summarize_obligations(data["obligations"])
+        if not obligation_summary["finish_eligible"]:
+            task["completion"] = (
+                "dependent_input_missing"
+                if (
+                    obligation_summary["required_input_ids"]
+                    or task["completion"] == "dependent_input_missing"
+                )
+                and not obligation_summary["ready_ids"]
+                else "in_progress"
+            )
+        elif not task["material_change"] and task["completion"] != "dependent_input_missing":
+            task["completion"] = "checks_satisfied"
     profile = _matched_profile(data, profiles, candidate_enabled=candidate_enabled)
     reasons: set[str] = set()
     if profile is None:
         reasons.add("profile_fallback")
+    if obligation_summary is not None and not obligation_summary["finish_eligible"]:
+        reasons.add("obligation_gap")
 
     dependency = task["completion"] == "dependent_input_missing"
     if dependency:
@@ -244,7 +283,7 @@ def plan_assistance(  # noqa: C901  # Ordered policy precedence is intentionally
         else {"none": 0, "light": 8192, "structured": 24576}[level]
     )
     return {
-        "schema": PLAN_SCHEMA,
+        "schema": PLAN_SCHEMA_V2 if obligation_summary is not None else PLAN_SCHEMA,
         "request_id": data["request_id"],
         "status": "ok",
         "assistance_level": level,
@@ -264,4 +303,5 @@ def plan_assistance(  # noqa: C901  # Ordered policy precedence is intentionally
         "next_action": action,
         "application": "unverified",
         "limitations": ["caller_features_unverified", "permissions_and_required_checks_external"],
+        **({"obligation_summary": obligation_summary} if obligation_summary is not None else {}),
     }

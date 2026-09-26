@@ -6,6 +6,7 @@ are also checked by the runtime. No schema in this module permits unknown keys.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any
 
 UUID = {
@@ -665,6 +666,201 @@ IDENTITIES = {
     "project-memory-snapshot.schema.json": "opensocrates.project-memory.snapshot/1.0.0",
     "project-memory-context-pack.schema.json": "opensocrates.project-memory.context-pack/1.0.0",
 }
+
+# Separate closed revisions leave every v1.0 schema byte and stored record intact.
+ID = {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/#-]{0,127}$"}
+ATTRIBUTION = {"enum": ["host_reported", "operator_declared", "agent_reported", "unknown"]}
+OBLIGATION = obj(
+    {
+        "obligation_id": ID,
+        "question_id": ID,
+        "kind": {"enum": ["work", "input"]},
+        "required": BOOL,
+        "status": {"enum": ["met", "unmet", "unverified", "not_recorded", "not_applicable"]},
+        "evidence_refs": arr(ID, 8),
+        "attribution": ATTRIBUTION,
+        "depends_on": arr(ID, 8),
+    },
+    (
+        "obligation_id",
+        "question_id",
+        "kind",
+        "required",
+        "status",
+        "evidence_refs",
+        "attribution",
+        "depends_on",
+    ),
+)
+OBLIGATION_SUMMARY = obj(
+    {
+        "finish_eligible": BOOL,
+        "blocking_ids": arr(ID, 8),
+        "ready_ids": arr(ID, 8),
+        "input_ids": arr(ID, 8),
+        "required_input_ids": arr(ID, 8),
+        "waiting_ids": arr(ID, 8),
+        "questions": arr(
+            obj(
+                {"question_id": ID, "required_complete": BOOL, "blocking_ids": arr(ID, 8)},
+                ("question_id", "required_complete", "blocking_ids"),
+            ),
+            8,
+        ),
+    },
+    (
+        "finish_eligible",
+        "blocking_ids",
+        "ready_ids",
+        "input_ids",
+        "required_input_ids",
+        "waiting_ids",
+        "questions",
+    ),
+)
+for stem in (
+    "assistance-request",
+    "assistance-plan",
+    "project-memory-request",
+    "project-memory-context-pack",
+):
+    filename = stem + "-v2.schema.json"
+    revised = deepcopy(SCHEMAS[stem + ".schema.json"])
+    identity = IDENTITIES[stem + ".schema.json"].replace("/1.0.0", "/1.1.0")
+    revised["properties"]["schema"] = {"const": identity}
+    SCHEMAS[filename] = revised
+    IDENTITIES[filename] = identity
+
+request_v2 = SCHEMAS["assistance-request-v2.schema.json"]
+request_v2["properties"]["obligations"] = arr(OBLIGATION, 8)
+request_v2["required"].append("obligations")
+plan_v2 = SCHEMAS["assistance-plan-v2.schema.json"]
+plan_v2["properties"]["request_id"] = nullable(UUID)
+plan_v2["properties"]["obligation_summary"] = OBLIGATION_SUMMARY
+plan_v2["properties"]["reason_codes"]["items"]["enum"].append("obligation_gap")
+plan_v2["properties"]["reason_codes"]["maxItems"] = 10
+memory_v2 = SCHEMAS["project-memory-request-v2.schema.json"]
+memory_v2["properties"]["operation"]["enum"].append("prepare")
+memory_v2["properties"]["payload"]["properties"]["target_operation"] = {"const": "checkpoint"}
+
+pack_v2 = SCHEMAS["project-memory-context-pack-v2.schema.json"]
+for field in ("constraints", "decisions"):
+    entry = pack_v2["properties"][field]["items"]
+    for key in ("kind", "lifecycle", "support", "origin"):
+        entry["properties"][key] = deepcopy(
+            SCHEMAS["project-memory-record.schema.json"]["properties"][key]
+        )
+        entry["required"].append(key)
+pack_v2["properties"]["checkpoint"] = {
+    "anyOf": [
+        {"type": "null"},
+        obj(
+            {
+                "record_id": UUID,
+                "checkpoint_version": POSITIVE,
+                "lifecycle": {"enum": ["proposed", "accepted", "superseded", "archived"]},
+                "support": {"const": "agent_reported"},
+                "objective": SHORT,
+                "next_action": SHORT,
+                "summary_truncated": BOOL,
+                "snapshot_id": nullable(UUID),
+                "freshness": {"enum": ["current", "stale", "unknown", "not_applicable"]},
+                "inspection_required_for_full_state": {"const": True},
+            },
+            (
+                "record_id",
+                "checkpoint_version",
+                "lifecycle",
+                "support",
+                "objective",
+                "next_action",
+                "summary_truncated",
+                "snapshot_id",
+                "freshness",
+                "inspection_required_for_full_state",
+            ),
+        ),
+    ]
+}
+pack_v2["properties"]["revalidation_scopes"] = arr(arr(PATH))
+pack_v2["required"].extend(("checkpoint", "revalidation_scopes"))
+
+DOC_VERSION = {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,63}$"}
+DOC_REFERENCE = obj(
+    {
+        "url": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "document_version": nullable(DOC_VERSION),
+        "read_state": {"enum": ["not_read", "reported_read"]},
+        "attribution": ATTRIBUTION,
+    },
+    ("url", "document_version", "read_state", "attribution"),
+)
+SCHEMAS["documentation-request.schema.json"] = obj(
+    {
+        "schema": {"const": "opensocrates.documentation.request/1.0.0"},
+        "request_id": UUID,
+        "locale": {"enum": ["en", "ko"]},
+        "task_kind": {"enum": ["mechanical", "judgment"]},
+        "need": {
+            "enum": [
+                "none",
+                "api_contract",
+                "version_change",
+                "source_conflict",
+                "official_request",
+            ]
+        },
+        "publisher_id": nullable(ID),
+        "target_version": nullable(DOC_VERSION),
+        "references": arr(DOC_REFERENCE, 4),
+    },
+    (
+        "schema",
+        "request_id",
+        "locale",
+        "task_kind",
+        "need",
+        "publisher_id",
+        "target_version",
+        "references",
+    ),
+)
+doc_result_reference = deepcopy(DOC_REFERENCE)
+doc_result_reference["properties"].update(
+    {
+        "publisher_match": {"enum": ["catalog_match", "unverified"]},
+        "version_match": {"enum": ["exact_declared", "mismatch", "unknown"]},
+    }
+)
+doc_result_reference["required"].extend(("publisher_match", "version_match"))
+SCHEMAS["documentation-pack.schema.json"] = obj(
+    {
+        "schema": {"const": "opensocrates.documentation.pack/1.0.0"},
+        "request_id": nullable(UUID),
+        "status": {"enum": ["ok", "not_needed", "invalid_request", "unavailable"]},
+        "instructions": TEXT,
+        "instruction_sha256": nullable(DIGEST),
+        "publisher_id": nullable(ID),
+        "catalog_revision": POSITIVE,
+        "official_roots": arr({"type": "string", "maxLength": 2048}, 8),
+        "references": arr(doc_result_reference, 4),
+        "next_action": {
+            "enum": [
+                "continue",
+                "find_official_source",
+                "read_reference",
+                "resolve_version",
+                "apply_with_citations",
+            ]
+        },
+        "delivery": {"enum": ["emitted", "not_emitted"]},
+        "application": {"const": "unverified"},
+        "limitations": arr(SHORT),
+    },
+    ("schema", "request_id", "status", "application", "limitations"),
+)
+IDENTITIES["documentation-request.schema.json"] = "opensocrates.documentation.request/1.0.0"
+IDENTITIES["documentation-pack.schema.json"] = "opensocrates.documentation.pack/1.0.0"
 for filename, schema in SCHEMAS.items():
     schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
     schema["$id"] = IDENTITIES[filename]

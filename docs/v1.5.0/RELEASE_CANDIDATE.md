@@ -6,6 +6,11 @@ remains Draft and issue [#94](https://github.com/ParkerHwang/OpenSocrates/issues
 contains the exact final commit, CI results, package hashes and validation commands.
 No merge, tag, publication, deployment or active-install replacement is implied.
 
+The [current structural revision](12-structural-revision-and-official-docs.md) adds
+selective official-reference prompts and versioned completion/memory interfaces.
+Its new checks and package identity are recorded separately in PR #95; earlier
+source-equivalence receipts do not cover this changed runtime.
+
 The subsequent [post-review repairs](../../evals/v1.5/repairs/v1/REPORT.md) qualify
 the checkpoint caller contract, assistance guide 6 and coding guides 2. Their
 source/package identities and new usability results are separate from the

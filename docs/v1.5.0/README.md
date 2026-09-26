@@ -40,6 +40,7 @@ package. Start with the final product contract in 10 and behavior policy in 11.
 | [09 — Decisions and source map](09-decisions-and-source-map.md) | Architectural decisions, alternatives, source evidence, and reopening conditions |
 | [10 — Product definition](10-product-identity-and-combined-capabilities.md) | Target users, outcomes, representative experiences, and success conditions |
 | [11 — Adaptive assistance and collaboration](11-adaptive-assistance-and-collaboration.md) | Task/model policy, assistance levels, profiles, and observable interaction behavior |
+| [12 — Structural revision and official documents](12-structural-revision-and-official-docs.md) | Versioned preparation/recall/completion and selective official-reference prompts |
 | [Validation record](VALIDATION.md) | Checks actually performed on this document package |
 | [Practical completion standard](PRACTICAL_COMPLETION.md) | Current usability gates, bounded comparison, RC authority and stop rule |
 | [Implementation status](IMPLEMENTATION_STATUS.md) | Candidate source slices, evidence boundary, and remaining gates |

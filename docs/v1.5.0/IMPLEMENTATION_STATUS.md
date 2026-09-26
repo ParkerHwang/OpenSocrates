@@ -7,6 +7,16 @@ final commit, final source/native commands and hosted CI results are maintained
 there. No merge, tag, publication, deployment or active installation change is
 performed by this task.
 
+## Current structural revision
+
+The [2026-09-27 revision](12-structural-revision-and-official-docs.md) adds selective
+official-document prompts, v1.1 completion obligations, read-only checkpoint
+preparation and provenance-bearing scoped recall. Assistance guide 7, impact guide
+3 and maintainability guide 2 preserve the task fallback and EN/KO boundaries.
+Existing v1.0 schemas and SQLite layout remain unchanged. Qualification of this
+revision is separate from the historical results below; PR #95 records its exact
+commit and checks. No profile is promoted or active installation replaced.
+
 ## Functional and practical qualification
 
 The [revised practical completion standard](PRACTICAL_COMPLETION.md) supersedes

@@ -1815,8 +1815,23 @@ def _full_check(
             ],
             "frozen_memory",
         )
+        checks["frozen_revision"] = _run_tool_check(
+            root,
+            [
+                str(root / "tools/check_frozen_revision.py"),
+                "--binary",
+                str(_resolve(root, str(primary_runtime["artifact"]))),
+                "--package",
+                str(root / "dist/codex"),
+            ],
+            "frozen_revision",
+        )
     else:
         checks["frozen_memory"] = {
+            "status": "unavailable",
+            "error_codes": ["runtime_or_package_unavailable"],
+        }
+        checks["frozen_revision"] = {
             "status": "unavailable",
             "error_codes": ["runtime_or_package_unavailable"],
         }

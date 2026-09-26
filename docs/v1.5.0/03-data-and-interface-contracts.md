@@ -253,3 +253,17 @@ subject to the required-context/partial-result contract above.
 The files in [examples](examples/README.md) use synthetic IDs, locations, and
 digests. They demonstrate record separation and pack evidence boundaries; they
 are not runtime-validated schemas or observations from this repository.
+
+## Additive structural revision
+
+The [2026-09-27 revision](12-structural-revision-and-official-docs.md) adds separate
+closed v1.1 assistance/memory requests and a v1.1 recall projection. Existing v1.0
+schemas and stored records remain supported. The new assistance request carries
+at most eight public obligations; its plan separates required blockers, pending
+inputs and ready work without promoting caller reports into native evidence.
+The memory `prepare` operation reads current schema/version without migration or
+mutation. V1.1 recall returns lifecycle/support plus bounded checkpoint metadata.
+Requested paths filter delivered source evidence; original snapshots retain their
+full revalidation footprint. A source scope never deletes applicable accepted intent.
+The separate documentation command is stateless and uses authorized host tools
+for actual source reading. Frozen historical protocols are unchanged.
