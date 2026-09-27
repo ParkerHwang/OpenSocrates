@@ -225,21 +225,49 @@ def _import_findings(tree: ast.AST) -> tuple[int, int, int]:
     return external, network, dynamic_import
 
 
+def _reviewed_ast_bytes(node: ast.AST) -> bytes:
+    """Canonical syntax fields, independent of ast.dump's versioned formatting.
+
+    Python 3.13+ omits empty fields in ast.dump by default; 3.12 includes them.
+    Preserve every syntax field (including empty lists, None and False), list
+    order and typed byte constants. Source locations/comments are not fields.
+    New semantic AST fields therefore fail closed until separately reviewed.
+    """
+
+    def project(value: Any) -> Any:
+        if isinstance(value, ast.AST):
+            return {
+                "node": type(value).__name__,
+                "fields": {name: project(child) for name, child in ast.iter_fields(value)},
+            }
+        if isinstance(value, list):
+            return [project(child) for child in value]
+        if isinstance(value, bytes):
+            return {"bytes": value.hex()}
+        if value is None or type(value) in {str, int, float, bool}:
+            return value
+        raise SecurityScanError("unsupported_reviewed_ast_scalar")
+
+    return json.dumps(
+        project(node), sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False
+    ).encode("utf-8")
+
+
 # Exact reviewed syntax identities for the optional Codex process boundary.
 # Whitespace/comments do not affect these AST digests. Changes to these functions
 # require a fresh boundary review and mutation checks, not automatic regeneration.
 # This is a static release guard, not proof of general Python data-flow safety.
 _ORCHESTRATION_BOUNDARY_AST = {
-    "_role_environment": "e4b14f839c934fc7696b1e5d6d0f638acb01921f90bfeb4758cfc6a3839682e7",
-    "_check_environment": "807ca3eb541e1da21357abeb2a2b25613fc922a78a6503d63941c623c143faee",
-    "_hashed_process": "964d1f859a79c52430d16633153ca2f868ac630d191ea94230f1e6106298f803",
-    "CodexAdapter._inspect": "8b9f746eb754a444e0e865d94d13badb2bf57c99f9dc89950c3b64f4247ed437",
-    "CodexAdapter.probe": "af13a5c06a83dfc8482fbaeb210a2b28e3545f02b6d471ccf177e2a0f9df8c4a",
-    "CodexAdapter._sandbox_argv": "f99b47c79773eaa19029f0e5287f92a58bbc1617500577767ea30a4b62a06d00",
-    "CodexAdapter._probe_sandbox": "10537d383c08ec95d5b070affea6e4f0a05207ef5b6baf6ffa89e846431fbb4e",
-    "CodexAdapter._argv": "75c002dc4b73e457658075cacf81f824dedfc2810f6f46faf657d955e5995e46",
-    "CodexAdapter.invoke": "ef8ddf1390665751dafb79b23b1f255cc89e1f3428b9fe5c0efc29987e5a5b70",
-    "CodexAdapter.check": "d8606ba42e95b8f1b322e4a4cade802ea22c518ac7803f7cddc39c5378b3279a",
+    "_role_environment": "10737bb79b5adef978c490ea5f070b530cd968fcc294253c7b647817d5301345",
+    "_check_environment": "cc6f8d72420a042928e20a1da76812d5e8c3418f3ffdedc3467b0ebabaf7ef36",
+    "_hashed_process": "bc91361bb1e5bdfc2d58c73385ea14017b766607eaf008bb1fa29f50bd054836",
+    "CodexAdapter._inspect": "a2700bef6cc61107f9367eac0ce18425f0c1b1408c9adf3bda1466f7ea471a75",
+    "CodexAdapter.probe": "51cddeb9a0e0482fb9fa8adabf88b70e1eb86324548a62acea56229c7b3fffcd",
+    "CodexAdapter._sandbox_argv": "1b91f98ad55eaf7b8f2fcb76f9deb4dd6b598f344dd1cd2d0e80d6f9d33ffa97",
+    "CodexAdapter._probe_sandbox": "22d7a257275bc3682aa452ec744b4f2861f698f95f5e8b30af00727fecbfe836",
+    "CodexAdapter._argv": "40f061e21adba058e417ec2eb2b851fff411f5e0b4f47e6e8f27a98a3d679320",
+    "CodexAdapter.invoke": "dff2037b62a58a43732e473cac2c291bca5e48b14a581aefa6a190a5cd95ef77",
+    "CodexAdapter.check": "0c88bc688735087e1e5d055663aa5e443d65905f7086c719e6f4c4136c79bf4d",
 }
 _ORCHESTRATION_PROCESS_CALLS = {
     "CodexAdapter._inspect": (
@@ -376,8 +404,7 @@ def _orchestration_reviewed_processes(tree: ast.AST) -> tuple[set[int], bool]:
         function = functions.get(name)
         if (
             function is None
-            or hashlib.sha256(ast.dump(function, include_attributes=False).encode()).hexdigest()
-            != expected
+            or hashlib.sha256(_reviewed_ast_bytes(function)).hexdigest() != expected
         ):
             return set(), False
     features = _module_literal_strings(tree, "DISABLED_FEATURES")
@@ -396,9 +423,11 @@ def _orchestration_reviewed_processes(tree: ast.AST) -> tuple[set[int], bool]:
         return set(), False
     allowed: set[int] = set()
     for name, expressions in _ORCHESTRATION_PROCESS_CALLS.items():
-        expected_calls = {ast.dump(ast.parse(text, mode="eval").body) for text in expressions}
+        expected_calls = {
+            _reviewed_ast_bytes(ast.parse(text, mode="eval").body) for text in expressions
+        }
         for call in _function_calls(functions.get(name)):
-            if ast.dump(call) in expected_calls:
+            if _reviewed_ast_bytes(call) in expected_calls:
                 allowed.add(id(call))
     return allowed, len(allowed) == 5
 

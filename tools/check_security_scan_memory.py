@@ -4,18 +4,47 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import io
+import json
 import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
 from opensocrates.orchestration.adapter import CodexAdapter, _hashed_process
 from opensocrates.orchestration.paths import BoundaryError
-from security_scan import _call_findings
+from security_scan import _call_findings, _reviewed_ast_bytes
 
 
 def findings(source: str, path: str) -> dict[str, int]:
     return _call_findings(ast.parse(source), path)
+
+
+def check_canonical_ast() -> None:
+    # One common syntax fixture pins the same representation under supported
+    # Python 3.12 and newer diagnostic interpreters, without ast.dump defaults.
+    tree = ast.parse('def sample():\n    return emit(b"public", value=None, shell=False)\n')
+    canonical = _reviewed_ast_bytes(tree)
+    fingerprint = hashlib.sha256(canonical).hexdigest()
+    assert fingerprint == "a0756e88eed082b540ade80490f721cca88e364eef7bb8d01e1a3735ff4ac920"
+    ast.increment_lineno(tree, 20)
+    assert _reviewed_ast_bytes(tree) == canonical
+    projected = json.loads(canonical)
+    function = projected["fields"]["body"][0]
+    assert function["fields"]["decorator_list"] == []
+    assert function["fields"]["type_params"] == []
+    call = function["fields"]["body"][0]["fields"]["value"]
+    assert call["fields"]["args"][0]["fields"]["value"] == {"bytes": "7075626c6963"}
+    assert call["fields"]["keywords"][0]["fields"]["value"]["fields"]["value"] is None
+    assert call["fields"]["keywords"][1]["fields"]["value"]["fields"]["value"] is False
+    for left, right in (
+        ("emit(0)", "emit(False)"),
+        ("emit(b'x')", "emit('x')"),
+        ("emit(None)", "emit([])"),
+        ("emit(shell=False)", "emit()"),
+    ):
+        assert _reviewed_ast_bytes(ast.parse(left)) != _reviewed_ast_bytes(ast.parse(right))
+    print("canonical reviewed AST: PASS (location-free, complete typed syntax fields)")
 
 
 def check_orchestration_exception() -> None:
@@ -142,6 +171,7 @@ def main() -> None:
     socket = "import socket\nsocket.connect(('example.com', 443))\n"
     assert findings(socket, "project_memory/store.py")["network_calls"] == 1
     print("memory security-scan exceptions: PASS")
+    check_canonical_ast()
     check_orchestration_exception()
     check_adapter_guards()
 
