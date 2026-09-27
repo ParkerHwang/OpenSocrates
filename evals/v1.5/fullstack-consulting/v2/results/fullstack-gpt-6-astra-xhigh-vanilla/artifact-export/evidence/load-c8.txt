@@ -1,0 +1,67 @@
+sysctl: sysctl fmt -1 1024 1: Operation not permitted
+sysctl: sysctl fmt -1 1024 1: Operation not permitted
+{
+  "measured_at": "2026-09-27T10:16:02.757120+00:00",
+  "hardware": {
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "machine": "arm64",
+    "logical_cpus": 10,
+    "python": "3.12.14",
+    "sqlite": "3.53.1",
+    "machdep.cpu.brand_string": "unavailable",
+    "hw.memsize": "unavailable"
+  },
+  "configuration": {
+    "concurrency": 8,
+    "reads": 10000,
+    "workflows": 2000,
+    "output": "evidence/performance-c8.json"
+  },
+  "methodology": "Loopback HTTP/1.1, one persistent connection per worker, one token, fixed thread pool, closed-loop workers. Fresh seeded SQLite WAL/FULL database. Writes first; four-request workflows sequential within a worker. Mixed reads after writes. Twenty unmeasured inventory warmups. Startup and login excluded. Latency includes HTTP and client JSON work; throughput uses phase wall time. Client and server share host.",
+  "writes": {
+    "requests": 8000,
+    "wall_seconds": 3.4333,
+    "requests_per_second": 2330.14,
+    "latency_ms": {
+      "mean": 3.334,
+      "p50": 0.406,
+      "p95": 5.087,
+      "p99": 49.877,
+      "max": 1416.101
+    },
+    "status_counts": {
+      "201": 2000,
+      "200": 6000
+    },
+    "error_count": 0,
+    "error_examples": []
+  },
+  "reads": {
+    "requests": 10000,
+    "wall_seconds": 11.8261,
+    "requests_per_second": 845.59,
+    "latency_ms": {
+      "mean": 9.454,
+      "p50": 4.395,
+      "p95": 27.2,
+      "p99": 29.543,
+      "max": 42.11
+    },
+    "status_counts": {
+      "200": 10000
+    },
+    "error_count": 0,
+    "error_examples": []
+  },
+  "invariants": {
+    "all_workflows_returned": true,
+    "stock_restored": true,
+    "no_reservations_left": true,
+    "exact_audit_count": true,
+    "exact_retry_record_count": true,
+    "database_integrity": true
+  },
+  "audit_count": 8000,
+  "idempotency_count": 8000,
+  "database_bytes": 8048640
+}

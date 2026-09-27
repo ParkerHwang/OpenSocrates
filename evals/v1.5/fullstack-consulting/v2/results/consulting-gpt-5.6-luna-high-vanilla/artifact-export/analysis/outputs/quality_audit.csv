@@ -1,0 +1,14 @@
+check,value,handling
+raw order rows,1328,two extracts plus corrections concatenated
+order exact duplicate rows,13,one copy retained
+unique order ids after highest revision,1297,highest numeric revision wins
+higher-revision order winners,18,"replacement row used, not additive"
+eligible 2025 shipped non-test orders,1254,included even zero-price; cancelled/test/future excluded
+raw return rows,264,deduplicated by return_id/revision
+return exact duplicate rows,20,one copy retained
+higher-revision return winners,1,highest revision used
+valid return records,241,eligible linked order and received by 2026-01-31
+orphan returns quarantined,1,not matched by guess
+returns after cutoff,1,excluded from 2025 accounting
+zero-price eligible orders,12,valid shipments included
+monthly-country reconciliation,PASS,monthly sums equal country totals
