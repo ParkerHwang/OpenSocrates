@@ -1,5 +1,11 @@
 # Stronger-claim study readiness (not a release-candidate blocker)
 
+The [coding-specialist revision](coding-specialists/revision-v1/REPORT.md) adds
+bounded direct and installed-route evidence with14 completed calls including
+access. It does not establish general superiority, a numerical margin or a held-out
+sample. Its mixed effects, source-boundary fault probes and separate route/language
+observations remain scoped. The practical completion standard is unchanged.
+
 The user's [2026-09-26 practical completion standard](../../docs/v1.5.0/PRACTICAL_COMPLETION.md)
 replaces earlier requirements that made held-out studies, power calculations,
 numerical noninferiority margins or human recruitment prerequisites for v1.5.0.

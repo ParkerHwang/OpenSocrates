@@ -1,7 +1,8 @@
 # Coding-specialist primary routing
 
-Status: implementation and bounded qualification in progress on the unpublished
-v1.5.0 candidate. This authorized direction supersedes the earlier discussion's
+Status: implemented and practically qualified on the unpublished v1.5.0 candidate.
+The separate [completion report](../../evals/v1.5/coding-specialists/revision-v1/REPORT.md)
+retains mixed effect evidence and all limits. This authorized direction supersedes the earlier discussion's
 assumption that coding support must always wrap a general method. General reasoning
 and EN/KO collaboration remain foundational. No publication or active-install change
 is authorized by this specification.
@@ -58,10 +59,10 @@ compares complete directly delivered current guides against complete specialists
 it does not test installation or discovery. The unexecuted direct-v1 freeze is
 preserved after a pre-call import-alias oracle correction.
 
-A separately frozen integrated package pilot will cover needed specialist,
-no-intervention, general, mixed/scoped-blocker and static Chinese delivery. It must
-inspect actual artifacts and public actions, and keep hooks-off file/command access
-separate from normal hook activation. Every attempt/failure/continuation counts;
+The separately frozen [integrated package pilot](../../evals/v1.5/coding-specialists/integrated-v1/REPORT.md)
+completed five calls covering needed specialist, no-intervention, general, mixed/scoped-blocker
+and static Chinese delivery. All five actual artifact/state cases passed. Hooks-off
+file/command access remains separate from normal hook activation. Every attempt/failure/continuation counts;
 missing usage is null. There is no model wall-clock cutoff or stronger-model repair
 inside Luna treatment. Human review and independent backend echo remain unavailable.
 

@@ -1,5 +1,27 @@
 # v1.5 evaluation status
 
+## Coding-specialist implementation and bounded qualification complete
+
+The [new report](coding-specialists/revision-v1/REPORT.md) records a separate
+provisional specialist library v0.1.1 and its conditional primary route. The three
+procedures are available as static EN/KO/zh-CN content; native general APIs remain
+EN/KO with48 canonical methods. The corrected author candidate and all history are
+preserved. The [direct comparison](coding-specialists/direct-v2/REPORT.md) has8
+complete Luna/max calls: contracts10/10 versus10/10, transitions10/10 versus10/10,
+ownership10/10 versus9/10, and follow-up13/14 in both. Producer-fault injection and
+an exception-type rubric limitation are explained separately without rewriting
+scores. [Installed routing](coding-specialists/integrated-v1/REPORT.md) completes5
+calls and passes5/5 artifact/state cases, including EN specialist-primary delivery,
+KO non-intervention/scoped continuation and static Chinese ownership delivery.
+
+One access probe plus13 outcomes gives14 actual completed calls. All have usage;
+no model deadline, helper subagent, model substitution or outside artifact repair
+was used. Source/native gates pass; final exact-head CI is recorded in PR95.
+Effect claims remain provisional, profiles inactive, and normal hook activation,
+live Windows Codex, independent human review/backend echo/billing and account-side
+memory isolation are not promoted to verified evidence. No further matrix or
+unchanged tests are required for this revision.
+
 ## Completed guide8 / guide9 retest and removal of model time limits
 
 The [combined retest report](hard-tasks/unlimited-v1/REPORT.md) preserves the first

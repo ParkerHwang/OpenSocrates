@@ -1,5 +1,15 @@
 # OpenSocrates 1.5.0 release-candidate handoff
 
+The [new coding-specialist qualification](../../evals/v1.5/coding-specialists/revision-v1/REPORT.md)
+adds three separately versioned provisional procedures with EN/KO/zh-CN static
+content and specialist-primary routing. No general-method prerequisite or native
+Chinese expansion is introduced. Eight direct/follow-up outcomes and five installed
+cases are complete; the latter pass5/5 artifact checks. Direct effects remain
+mixed and no profile is promoted. The qualified local ZIP is
+`52994553d51e8fd65285165d39ea004be819e56da8dab99c22968591a165dc76`;
+[validation](../../evals/v1.5/coding-specialists/revision-v1/validation.json) binds
+557 runtime/package inputs to source/native qualification.
+
 **Release candidate, not published.** Version metadata is synchronized to 1.5.0
 on the feature branch. PR [#95](https://github.com/ParkerHwang/OpenSocrates/pull/95)
 remains Draft and issue [#94](https://github.com/ParkerHwang/OpenSocrates/issues/94)
@@ -15,7 +25,7 @@ and the eligible Sol guide9 server is slower under the measured workload. No
 universal quality, efficiency or profile claim follows. Product/package bytes are
 unchanged by this evaluation; the PR's current commit and CI bind the final handoff.
 
-The latest [verification and request recovery revision](13-verification-and-request-recovery.md)
+The earlier [verification and request recovery revision](13-verification-and-request-recovery.md)
 adds decision preparation and safe diagnostics, preserves read acknowledgments
 on invalid input, and connects caller/test and artifact-consistency checks through
 EN/KO assistance guide 9. Its [separate report](../../evals/v1.5/revision-v4/REPORT.md)

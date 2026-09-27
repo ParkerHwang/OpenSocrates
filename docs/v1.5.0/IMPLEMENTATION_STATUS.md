@@ -1,6 +1,16 @@
 # v1.5.0 release-candidate status
 
-The [latest practical retest](../../evals/v1.5/hard-tasks/unlimited-v1/REPORT.md)
+The [coding-specialist revision](14-coding-specialists.md) is complete through
+source/native qualification and bounded practical checks. It adds a separate
+provisional static v0.1.1 library (EN/KO/zh-CN) that can be primary for an unresolved
+software decision. General methods/native EN/KO remain unchanged. Eight direct
+outcomes show correctness ties and scoped ownership/measurement failures, not
+broad improvement; five installed cases pass actual artifact/state checks. The
+[complete report](../../evals/v1.5/coding-specialists/revision-v1/REPORT.md) records
+all14 calls including access, failures, usage and limits. PR95 remains Draft;
+publication and active installation are separate.
+
+The [earlier practical retest](../../evals/v1.5/hard-tasks/unlimited-v1/REPORT.md)
 is complete:12 actual model calls across the original and user-amended boundaries,
 with all6 calls after removal of model time limits completing naturally. Source
 continuations, the Sol capacity failure, missing usage and every load failure remain

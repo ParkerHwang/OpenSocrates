@@ -14,6 +14,17 @@ evidence are scoped limits, not universal completion blockers under the revised
 
 ## Current and historical evidence
 
+- The [coding-specialist qualification](../../evals/v1.5/coding-specialists/revision-v1/REPORT.md)
+  adds a separately versioned static EN/KO/zh-CN library and conditional primary
+  route. Full source/native gates pass; five disposable installed CLI cases pass
+  actual artifact/state checks on bundled `codex-cli 0.158.0-alpha.2`, Luna/max.
+  ZIP `52994553d51e8fd65285165d39ea004be819e56da8dab99c22968591a165dc76` and native
+  executable `eb698af83bc25c584d275d02e6059b62f95799dc1630bf53b3fe1ec8a329b615`
+  identify the tested local package. The [receipt](../../evals/v1.5/coding-specialists/revision-v1/validation.json)
+  binds 557 runtime/package inputs. These installed cases use an explicit controller
+  cue with hooks off; they do not establish normal hook activation, live Windows
+  Codex or native Chinese API support. Existing canonical/schema/SQLite checks remain.
+
 - The [post-comparison revision](../../evals/v1.5/revision-v4/REPORT.md) passes
   the full source and Apple-silicon native gates at product commit
   `0e27afb048f77a1f3f521d2b13e311607f639df3`. Its new archive, guide 9,
