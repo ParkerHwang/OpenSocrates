@@ -1,0 +1,241 @@
+{
+  "event_count": 24,
+  "malformed_lines": 0,
+  "usage": {
+    "input_tokens": 216356,
+    "cached_input_tokens": 166656,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 16498,
+    "reasoning_output_tokens": 11939
+  },
+  "usage_reports": [
+    {
+      "input_tokens": 216356,
+      "cached_input_tokens": 166656,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 16498,
+      "reasoning_output_tokens": 11939
+    }
+  ],
+  "turn_completed": true,
+  "errors": [],
+  "tool_actions": [
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "eb6d742411cd7af4ee85aaa74f008043416992370950a9edabb3706698da526e",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "a6bca3bc9bcb3dc6d5168eee08692e116db3ab9b3a7285463abd040f0fe4e2f0",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "830c280a29b3d22551e4ac71d3191dd76754349f902baaa19f4439c75d631949",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "file_change",
+      "completed": true,
+      "command_sha256": null,
+      "exit_code": null,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "file_change",
+      "completed": true,
+      "command_sha256": null,
+      "exit_code": null,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "file_change",
+      "completed": true,
+      "command_sha256": null,
+      "exit_code": null,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "4a3c8c0ab15b79706142be7a494c64e50ef1908b5ff4d244023abb54c67c4a1b",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "55f5b95c40dad1cf0b79aa0f3d454ed37e9f66c386895a16bfad1d73a029c645",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "2c8b44060269f952dff81d3ab75b736bdfff871a9fabf8cf26821a7d5f655351",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    }
+  ],
+  "tool_actions_started_or_completed": 9,
+  "failed_tool_actions": 0,
+  "incomplete_tool_actions": 0,
+  "direct_operations_lexical": {},
+  "structured_status_counts": {},
+  "protocol_rejections": 0,
+  "repeated_command_hashes": 0,
+  "native_hook_events": 0,
+  "final_message_sha256": "2fc38e5cfd1706d69700388f0aa395c1ac1477f995b931849b8881273d96f50f",
+  "public_message_count": 3,
+  "billed_cost": null,
+  "server_echoed_model": null,
+  "tool_classification_limit": "Lexical direct calls and structured responses; nested invocations may be missed. Repeated hash does not itself prove unnecessary work.",
+  "public_messages": [
+    "I’ll trace the registry, monitor, renderer, and supplied legacy producer, then implement the shared normalization and durable storage behavior and run the requested unittest command with the specified Python.",
+    "The registry now stores owned, validated stage data and returns fresh normalized descriptions, so monitoring remains live while callers cannot mutate registry state through aliases. `RunStore` snapshots that description and publishes completed JSON files atomically with collision-safe IDs; next I’m adding durable and legacy compatibility coverage.",
+    "Implemented retained run manifests in [runs.py](<CELL>/workspace/batchflow/runs.py:14). New records store the template revision, normalized stages, and worker total; they remain stable as templates evolve. `load` supports the actual v1 producer’s files, reports a missing revision as `null`, and leaves those files unchanged.\n\nUpdated [templates.py](<CELL>/workspace/batchflow/templates.py:5) so nested options are validated and copied, and `describe` returns an owned, freshly calculated view. Added durable and compatibility coverage in [test_runs.py](<CELL>/workspace/tests/test_runs.py:12). The renderer and CLI consumer remain usable.\n\nChecks passed: `python -m unittest discover -s tests -v` with the specified interpreter (7 tests), and `git diff --check`. Run creation uses same-directory hard links to publish files without overwriting existing IDs; crash recovery and power-loss durability were not tested."
+  ],
+  "public_tool_results": [
+    {
+      "id": "item_1",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc \"pwd && rg --files -g '\"'!TASK.md'\"' -g '\"'!FOLLOWUP.md'\"' -g '\"'!GUIDANCE.md'\"' -g '\"'!TOOLING.md'\"' -g '\"'!tests/test_existing.py'\"' -g '\"'!legacy/produce_v1.py'\"'\"",
+      "aggregated_output": "<CELL>/workspace\nbatchflow/runs.py\nbatchflow/cli.py\nbatchflow/templates.py\nbatchflow/__init__.py\n",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "id": "item_2",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc \"sed -n '1,260p' batchflow/templates.py && sed -n '1,260p' batchflow/runs.py && sed -n '1,240p' batchflow/cli.py && sed -n '1,180p' batchflow/__init__.py && sed -n '1,220p' legacy/produce_v1.py && rg --files tests\"",
+      "aggregated_output": "def normalize_stages(stages):\n    if not isinstance(stages, list) or not stages:\n        raise ValueError(\"stages must be a nonempty list\")\n    out, names = [], set()\n    for stage in stages:\n        name, workers = stage.get(\"name\"), stage.get(\"workers\")\n        if not isinstance(name, str) or not name or name in names:\n            raise ValueError(\"unique nonempty stage name required\")\n        if type(workers) is not int or not 1 <= workers <= 64:\n            raise ValueError(\"workers out of range\")\n        names.add(name)\n        out.append({\"name\": name, \"workers\": workers, \"options\": stage.get(\"options\", {})})\n    return out\n\n\ndef total_workers(stages):\n    return sum(stage[\"workers\"] for stage in stages)\n\n\nclass TemplateRegistry:\n    def __init__(self):\n        self._templates = {}\n\n    def put(self, name, stages):\n        normalized = normalize_stages(stages)\n        prior = self._templates.get(name, {\"revision\": 0})\n        self._templates[name] = {\"revision\": prior[\"revision\"] + 1, \"stages\": normalized}\n\n    def describe(self, name):\n        value = self._templates[name]\n        return {**value, \"total_workers\": total_workers(value[\"stages\"])}\n\n\nclass Monitor:\n    def __init__(self, registry, name):\n        self.registry, self.name = registry, name\n\n    def as_dict(self):\n        return self.registry.describe(self.name)\nfrom .templates import normalize_stages, total_workers\n\n\ndef render_manifest(record):\n    return f\"{record['template_name']}:{record['run_id']} workers={record['total_workers']}\"\n\n\nclass RunStore:\n    def __init__(self, directory, registry):\n        self.directory, self.registry = directory, registry\n\n    def create(self, template_name):\n        raise NotImplementedError(\"retained run manifests\")\n\n    def load(self, run_id):\n        raise NotImplementedError(\"retained run manifests\")\n\n    def export(self, run_id):\n        return render_manifest(self.load(run_id))\nfrom .runs import render_manifest\n\n\ndef show_run(store, run_id):\n    return render_manifest(store.load(run_id))\n\"\"\"Synthetic pipeline planning package.\"\"\"\n\"\"\"Frozen preceding producer. Its output predates source_revision and factor.\"\"\"\nimport json\nfrom pathlib import Path\nimport sys\n\n\ndef produce(directory):\n    root = Path(directory)\n    root.mkdir(parents=True, exist_ok=True)\n    value = {\"run_id\": \"legacy-1\", \"template_name\": \"alpha\",\n             \"stages\": [{\"name\": \"old-stage\", \"workers\": 3, \"options\": {\"labels\": [\"historic\"]}}],\n             \"total_workers\": 3}\n    (root / \"legacy-1.json\").write_text(json.dumps(value))\n\n\nif __name__ == \"__main__\":\n    produce(sys.argv[1])\ntests/test_existing.py\n",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "id": "item_3",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc \"sed -n '1,300p' tests/test_existing.py && rg -n \\\"normalize_stages|TemplateRegistry|Monitor|RunStore|render_manifest|source_revision|revision\\\" . -g '\"'!TASK.md'\"' -g '\"'!FOLLOWUP.md'\"' -g '\"'!GUIDANCE.md'\"' -g '\"'!TOOLING.md'\"' -g '\"'!tests/test_existing.py'\"' -g '\"'!legacy/produce_v1.py'\"'\"",
+      "aggregated_output": "import unittest\nfrom batchflow.templates import TemplateRegistry, Monitor\nfrom batchflow.runs import render_manifest\n\n\nclass ExistingConsumers(unittest.TestCase):\n    def test_monitor_is_current_on_each_read(self):\n        registry = TemplateRegistry()\n        registry.put(\"alpha\", [{\"name\": \"first\", \"workers\": 2}])\n        monitor = Monitor(registry, \"alpha\")\n        self.assertEqual(monitor.as_dict()[\"total_workers\"], 2)\n        registry.put(\"alpha\", [{\"name\": \"first\", \"workers\": 4}])\n        self.assertEqual(monitor.as_dict()[\"total_workers\"], 4)\n\n    def test_render_and_invalid_stage(self):\n        self.assertEqual(render_manifest({\"template_name\": \"alpha\", \"run_id\": \"r1\", \"total_workers\": 3}), \"alpha:r1 workers=3\")\n        registry = TemplateRegistry()\n        with self.assertRaises(ValueError):\n            registry.put(\"a\", [{\"name\": \"x\", \"workers\": True}])\n./batchflow/runs.py:1:from .templates import normalize_stages, total_workers\n./batchflow/runs.py:4:def render_manifest(record):\n./batchflow/runs.py:8:class RunStore:\n./batchflow/runs.py:19:        return render_manifest(self.load(run_id))\n./batchflow/cli.py:1:from .runs import render_manifest\n./batchflow/cli.py:5:    return render_manifest(store.load(run_id))\n./batchflow/templates.py:1:def normalize_stages(stages):\n./batchflow/templates.py:20:class TemplateRegistry:\n./batchflow/templates.py:25:        normalized = normalize_stages(stages)\n./batchflow/templates.py:26:        prior = self._templates.get(name, {\"revision\": 0})\n./batchflow/templates.py:27:        self._templates[name] = {\"revision\": prior[\"revision\"] + 1, \"stages\": normalized}\n./batchflow/templates.py:34:class Monitor:\n",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "id": "item_4",
+      "type": "file_change",
+      "changes": [
+        {
+          "path": "<CELL>/workspace/batchflow/templates.py",
+          "kind": "update"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "item_5",
+      "type": "file_change",
+      "changes": [
+        {
+          "path": "<CELL>/workspace/batchflow/runs.py",
+          "kind": "update"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "item_7",
+      "type": "file_change",
+      "changes": [
+        {
+          "path": "<CELL>/workspace/tests/test_runs.py",
+          "kind": "add"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "item_8",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc '<USER>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 -m unittest discover -s tests -v'",
+      "aggregated_output": "test_monitor_is_current_on_each_read (test_existing.ExistingConsumers.test_monitor_is_current_on_each_read) ... ok\ntest_render_and_invalid_stage (test_existing.ExistingConsumers.test_render_and_invalid_stage) ... ok\ntest_actual_legacy_producer_loads_without_rewriting_its_file (test_runs.DurableRunTests.test_actual_legacy_producer_loads_without_rewriting_its_file) ... ok\ntest_create_load_and_other_store_instance_retain_independent_snapshot (test_runs.DurableRunTests.test_create_load_and_other_store_instance_retain_independent_snapshot) ... ok\ntest_invalid_updates_do_not_change_registry_or_create_partial_runs (test_runs.DurableRunTests.test_invalid_updates_do_not_change_registry_or_create_partial_runs) ... ok\ntest_registry_owns_nested_options_and_monitor_returns_owned_live_views (test_runs.DurableRunTests.test_registry_owns_nested_options_and_monitor_returns_owned_live_views) ... ok\ntest_stage_options_must_be_json_compatible (test_runs.DurableRunTests.test_stage_options_must_be_json_compatible) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 0.003s\n\nOK\n",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "id": "item_9",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc 'git status --short && git diff -- batchflow/templates.py batchflow/runs.py tests/test_runs.py'",
+      "aggregated_output": "2026-09-27 13:02:17.405 xcodebuild[50504:17483957]  DVTFilePathFSEvents: Failed to start fs event stream.\n2026-09-27 13:02:17.533 xcodebuild[50504:17483956] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 \"Input/output error\". Using NSCachesDirectory instead.\n M batchflow/runs.py\n M batchflow/templates.py\n?? tests/test_runs.py\ndiff --git a/batchflow/runs.py b/batchflow/runs.py\nindex 8322ec3..2684fe1 100644\n--- a/batchflow/runs.py\n+++ b/batchflow/runs.py\n@@ -1,4 +1,10 @@\n-from .templates import normalize_stages, total_workers\n+import json\n+import os\n+import tempfile\n+import uuid\n+from pathlib import Path\n+\n+from .templates import total_workers\n \n \n def render_manifest(record):\n@@ -7,13 +13,74 @@ def render_manifest(record):\n \n class RunStore:\n     def __init__(self, directory, registry):\n-        self.directory, self.registry = directory, registry\n+        self.directory, self.registry = Path(directory), registry\n \n     def create(self, template_name):\n-        raise NotImplementedError(\"retained run manifests\")\n+        # describe() provides an owned, normalized snapshot from the registry.\n+        # Keep those stages and their derived count together for this run's life.\n+        template = self.registry.describe(template_name)\n+        stages = template[\"stages\"]\n+        record = {\n+            \"run_id\": None,\n+            \"template_name\": template_name,\n+            \"source_revision\": template[\"revision\"],\n+            \"stages\": stages,\n+            \"total_workers\": total_workers(stages),\n+        }\n+\n+        self.directory.mkdir(parents=True, exist_ok=True)\n+        while True:\n+            run_id = uuid.uuid4().hex\n+            record[\"run_id\"] = run_id\n+            payload = json.dumps(\n+                record, ensure_ascii=False, allow_nan=False, separators=(\",\", \":\")\n+            ).encode(\"utf-8\")\n+\n+            descriptor, temporary_name = tempfile.mkstemp(\n+                prefix=\".batchflow-run-\", dir=self.directory\n+            )\n+            try:\n+                with os.fdopen(descriptor, \"wb\") as output:\n+                    output.write(payload)\n+                    output.flush()\n+                    os.fsync(output.fileno())\n+\n+                target = self.directory / f\"{run_id}.json\"\n+                try:\n+                    # Publishing a complete temporary file by hard link is\n+                    # atomic and refuses to overwrite any existing run ID.\n+                    os.link(temporary_name, target)\n+                except FileExistsError:\n+                    continue\n+                return record\n+            finally:\n+                try:\n+                    os.unlink(temporary_name)\n+                except FileNotFoundError:\n+                    pass\n \n     def load(self, run_id):\n-        raise NotImplementedError(\"retained run manifests\")\n+        if (\n+            not isinstance(run_id, str)\n+            or not run_id\n+            or run_id in (\".\", \"..\")\n+            or \"/\" in run_id\n+            or \"\\\\\" in run_id\n+            or \"\\0\" in run_id\n+        ):\n+            raise ValueError(\"run_id must be a single nonempty path component\")\n+\n+        path = self.directory / f\"{run_id}.json\"\n+        with path.open(\"r\", encoding=\"utf-8\") as source:\n+            record = json.load(source)\n+        if not isinstance(record, dict):\n+            raise ValueError(\"run manifest must contain a JSON object\")\n+\n+        # Old producer files did not store a source revision. Report that fact\n+        # to callers without changing the retained legacy file.\n+        if \"source_revision\" not in record:\n+            record[\"source_revision\"] = None\n+        return record\n \n     def export(self, run_id):\n         return render_manifest(self.load(run_id))\ndiff --git a/batchflow/templates.py b/batchflow/templates.py\nindex 1890b3d..f92928c 100644\n--- a/batchflow/templates.py\n+++ b/batchflow/templates.py\n@@ -1,15 +1,53 @@\n+import math\n+from collections.abc import Mapping\n+\n+\n+def _copy_json_value(value, active=None):\n+    \"\"\"Validate and copy a value made only from JSON types.\"\"\"\n+    if value is None or type(value) in (bool, int, str):\n+        return value\n+    if type(value) is float:\n+        if not math.isfinite(value):\n+            raise ValueError(\"stage options must contain finite JSON numbers\")\n+        return value\n+\n+    if isinstance(value, (dict, list)):\n+        if active is None:\n+            active = set()\n+        identity = id(value)\n+        if identity in active:\n+            raise ValueError(\"stage options must not contain cycles\")\n+        active.add(identity)\n+        try:\n+            if isinstance(value, dict):\n+                copied = {}\n+                for key, item in value.items():\n+                    if not isinstance(key, str):\n+                        raise ValueError(\"stage option object keys must be strings\")\n+                    copied[str(key)] = _copy_json_value(item, active)\n+                return copied\n+            return [_copy_json_value(item, active) for item in value]\n+        finally:\n+            active.remove(identity)\n+\n+    raise ValueError(\"stage options must contain only JSON-compatible values\")\n+\n+\n def normalize_stages(stages):\n     if not isinstance(stages, list) or not stages:\n         raise ValueError(\"stages must be a nonempty list\")\n     out, names = [], set()\n     for stage in stages:\n+        if not isinstance(stage, Mapping):\n+            raise ValueError(\"each stage must be a mapping\")\n         name, workers = stage.get(\"name\"), stage.get(\"workers\")\n         if not isinstance(name, str) or not name or name in names:\n             raise ValueError(\"unique nonempty stage name required\")\n         if type(workers) is not int or not 1 <= workers <= 64:\n             raise ValueError(\"workers out of range\")\n         names.add(name)\n-        out.append({\"name\": name, \"workers\": workers, \"options\": stage.get(\"options\", {})})\n+        options = _copy_json_value(stage.get(\"options\", {}))\n+        out.append({\"name\": name, \"workers\": workers, \"options\": options})\n     return out\n \n \n@@ -28,7 +66,12 @@ class TemplateRegistry:\n \n     def describe(self, name):\n         value = self._templates[name]\n-        return {**value, \"total_workers\": total_workers(value[\"stages\"])}\n+        stages = normalize_stages(value[\"stages\"])\n+        return {\n+            \"revision\": value[\"revision\"],\n+            \"stages\": stages,\n+            \"total_workers\": total_workers(stages),\n+        }\n \n \n class Monitor:\n",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "id": "item_10",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc \"git diff --check && nl -ba batchflow/templates.py | sed -n '1,105p' && nl -ba batchflow/runs.py | sed -n '1,125p' && nl -ba tests/test_runs.py | sed -n '1,230p'\"",
+      "aggregated_output": "     1\timport math\n     2\tfrom collections.abc import Mapping\n     3\t\n     4\t\n     5\tdef _copy_json_value(value, active=None):\n     6\t    \"\"\"Validate and copy a value made only from JSON types.\"\"\"\n     7\t    if value is None or type(value) in (bool, int, str):\n     8\t        return value\n     9\t    if type(value) is float:\n    10\t        if not math.isfinite(value):\n    11\t            raise ValueError(\"stage options must contain finite JSON numbers\")\n    12\t        return value\n    13\t\n    14\t    if isinstance(value, (dict, list)):\n    15\t        if active is None:\n    16\t            active = set()\n    17\t        identity = id(value)\n    18\t        if identity in active:\n    19\t            raise ValueError(\"stage options must not contain cycles\")\n    20\t        active.add(identity)\n    21\t        try:\n    22\t            if isinstance(value, dict):\n    23\t                copied = {}\n    24\t                for key, item in value.items():\n    25\t                    if not isinstance(key, str):\n    26\t                        raise ValueError(\"stage option object keys must be strings\")\n    27\t                    copied[str(key)] = _copy_json_value(item, active)\n    28\t                return copied\n    29\t            return [_copy_json_value(item, active) for item in value]\n    30\t        finally:\n    31\t            active.remove(identity)\n    32\t\n    33\t    raise ValueError(\"stage options must contain only JSON-compatible values\")\n    34\t\n    35\t\n    36\tdef normalize_stages(stages):\n    37\t    if not isinstance(stages, list) or not stages:\n    38\t        raise ValueError(\"stages must be a nonempty list\")\n    39\t    out, names = [], set()\n    40\t    for stage in stages:\n    41\t        if not isinstance(stage, Mapping):\n    42\t            raise ValueError(\"each stage must be a mapping\")\n    43\t        name, workers = stage.get(\"name\"), stage.get(\"workers\")\n    44\t        if not isinstance(name, str) or not name or name in names:\n    45\t            raise ValueError(\"unique nonempty stage name required\")\n    46\t        if type(workers) is not int or not 1 <= workers <= 64:\n    47\t            raise ValueError(\"workers out of range\")\n    48\t        names.add(name)\n    49\t        options = _copy_json_value(stage.get(\"options\", {}))\n    50\t        out.append({\"name\": name, \"workers\": workers, \"options\": options})\n    51\t    return out\n    52\t\n    53\t\n    54\tdef total_workers(stages):\n    55\t    return sum(stage[\"workers\"] for stage in stages)\n    56\t\n    57\t\n    58\tclass TemplateRegistry:\n    59\t    def __init__(self):\n    60\t        self._templates = {}\n    61\t\n    62\t    def put(self, name, stages):\n    63\t        normalized = normalize_stages(stages)\n    64\t        prior = self._templates.get(name, {\"revision\": 0})\n    65\t        self._templates[name] = {\"revision\": prior[\"revision\"] + 1, \"stages\": normalized}\n    66\t\n    67\t    def describe(self, name):\n    68\t        value = self._templates[name]\n    69\t        stages = normalize_stages(value[\"stages\"])\n    70\t        return {\n    71\t            \"revision\": value[\"revision\"],\n    72\t            \"stages\": stages,\n    73\t            \"total_workers\": total_workers(stages),\n    74\t        }\n    75\t\n    76\t\n    77\tclass Monitor:\n    78\t    def __init__(self, registry, name):\n    79\t        self.registry, self.name = registry, name\n    80\t\n    81\t    def as_dict(self):\n    82\t        return self.registry.describe(self.name)\n     1\timport json\n     2\timport os\n     3\timport tempfile\n     4\timport uuid\n     5\tfrom pathlib import Path\n     6\t\n     7\tfrom .templates import total_workers\n     8\t\n     9\t\n    10\tdef render_manifest(record):\n    11\t    return f\"{record['template_name']}:{record['run_id']} workers={record['total_workers']}\"\n    12\t\n    13\t\n    14\tclass RunStore:\n    15\t    def __init__(self, directory, registry):\n    16\t        self.directory, self.registry = Path(directory), registry\n    17\t\n    18\t    def create(self, template_name):\n    19\t        # describe() provides an owned, normalized snapshot from the registry.\n    20\t        # Keep those stages and their derived count together for this run's life.\n    21\t        template = self.registry.describe(template_name)\n    22\t        stages = template[\"stages\"]\n    23\t        record = {\n    24\t            \"run_id\": None,\n    25\t            \"template_name\": template_name,\n    26\t            \"source_revision\": template[\"revision\"],\n    27\t            \"stages\": stages,\n    28\t            \"total_workers\": total_workers(stages),\n    29\t        }\n    30\t\n    31\t        self.directory.mkdir(parents=True, exist_ok=True)\n    32\t        while True:\n    33\t            run_id = uuid.uuid4().hex\n    34\t            record[\"run_id\"] = run_id\n    35\t            payload = json.dumps(\n    36\t                record, ensure_ascii=False, allow_nan=False, separators=(\",\", \":\")\n    37\t            ).encode(\"utf-8\")\n    38\t\n    39\t            descriptor, temporary_name = tempfile.mkstemp(\n    40\t                prefix=\".batchflow-run-\", dir=self.directory\n    41\t            )\n    42\t            try:\n    43\t                with os.fdopen(descriptor, \"wb\") as output:\n    44\t                    output.write(payload)\n    45\t                    output.flush()\n    46\t                    os.fsync(output.fileno())\n    47\t\n    48\t                target = self.directory / f\"{run_id}.json\"\n    49\t                try:\n    50\t                    # Publishing a complete temporary file by hard link is\n    51\t                    # atomic and refuses to overwrite any existing run ID.\n    52\t                    os.link(temporary_name, target)\n    53\t                except FileExistsError:\n    54\t                    continue\n    55\t                return record\n    56\t            finally:\n    57\t                try:\n    58\t                    os.unlink(temporary_name)\n    59\t                except FileNotFoundError:\n    60\t                    pass\n    61\t\n    62\t    def load(self, run_id):\n    63\t        if (\n    64\t            not isinstance(run_id, str)\n    65\t            or not run_id\n    66\t            or run_id in (\".\", \"..\")\n    67\t            or \"/\" in run_id\n    68\t            or \"\\\\\" in run_id\n    69\t            or \"\\0\" in run_id\n    70\t        ):\n    71\t            raise ValueError(\"run_id must be a single nonempty path component\")\n    72\t\n    73\t        path = self.directory / f\"{run_id}.json\"\n    74\t        with path.open(\"r\", encoding=\"utf-8\") as source:\n    75\t            record = json.load(source)\n    76\t        if not isinstance(record, dict):\n    77\t            raise ValueError(\"run manifest must contain a JSON object\")\n    78\t\n    79\t        # Old producer files did not store a source revision. Report that fact\n    80\t        # to callers without changing the retained legacy file.\n    81\t        if \"source_revision\" not in record:\n    82\t            record[\"source_revision\"] = None\n    83\t        return record\n    84\t\n    85\t    def export(self, run_id):\n    86\t        return render_manifest(self.load(run_id))\n     1\timport json\n     2\tfrom pathlib import Path\n     3\timport tempfile\n     4\timport unittest\n     5\t\n     6\tfrom batchflow.cli import show_run\n     7\tfrom batchflow.runs import RunStore, render_manifest\n     8\tfrom batchflow.templates import Monitor, TemplateRegistry\n     9\tfrom legacy.produce_v1 import produce\n    10\t\n    11\t\n    12\tclass DurableRunTests(unittest.TestCase):\n    13\t    def test_registry_owns_nested_options_and_monitor_returns_owned_live_views(self):\n    14\t        registry = TemplateRegistry()\n    15\t        options = {\"labels\": [\"ready\", {\"priority\": 2}]}\n    16\t        source = [{\"name\": \"worker\", \"workers\": 3, \"options\": options}]\n    17\t        registry.put(\"alpha\", source)\n    18\t\n    19\t        options[\"labels\"][1][\"priority\"] = 9\n    20\t        source[0][\"workers\"] = 40\n    21\t        description = registry.describe(\"alpha\")\n    22\t        self.assertEqual(description[\"stages\"][0][\"workers\"], 3)\n    23\t        self.assertEqual(description[\"stages\"][0][\"options\"], {\"labels\": [\"ready\", {\"priority\": 2}]})\n    24\t        description[\"stages\"][0][\"options\"][\"labels\"].append(\"caller edit\")\n    25\t        description[\"stages\"].append({\"name\": \"extra\", \"workers\": 1, \"options\": {}})\n    26\t        self.assertEqual(registry.describe(\"alpha\")[\"total_workers\"], 3)\n    27\t\n    28\t        monitor = Monitor(registry, \"alpha\")\n    29\t        current = monitor.as_dict()\n    30\t        current[\"stages\"][0][\"options\"][\"labels\"].clear()\n    31\t        self.assertEqual(monitor.as_dict()[\"stages\"][0][\"options\"][\"labels\"][0], \"ready\")\n    32\t\n    33\t        registry.put(\"alpha\", [{\"name\": \"worker\", \"workers\": 5}])\n    34\t        self.assertEqual(monitor.as_dict()[\"revision\"], 2)\n    35\t        self.assertEqual(monitor.as_dict()[\"total_workers\"], 5)\n    36\t\n    37\t    def test_create_load_and_other_store_instance_retain_independent_snapshot(self):\n    38\t        registry = TemplateRegistry()\n    39\t        registry.put(\n    40\t            \"alpha\",\n    41\t            [{\"name\": \"worker\", \"workers\": 2, \"options\": {\"items\": [{\"tag\": \"old\"}]}}],\n    42\t        )\n    43\t        with tempfile.TemporaryDirectory() as directory:\n    44\t            first_store = RunStore(directory, registry)\n    45\t            created = first_store.create(\"alpha\")\n    46\t            self.assertEqual(\n    47\t                set(created),\n    48\t                {\"run_id\", \"template_name\", \"source_revision\", \"stages\", \"total_workers\"},\n    49\t            )\n    50\t            self.assertEqual(created[\"source_revision\"], 1)\n    51\t            self.assertEqual(created[\"total_workers\"], 2)\n    52\t\n    53\t            created[\"stages\"][0][\"options\"][\"items\"][0][\"tag\"] = \"returned edit\"\n    54\t            created[\"stages\"].append({\"name\": \"extra\", \"workers\": 1, \"options\": {}})\n    55\t            registry.put(\"alpha\", [{\"name\": \"new\", \"workers\": 7}])\n    56\t\n    57\t            second_store = RunStore(directory, registry)\n    58\t            loaded = second_store.load(created[\"run_id\"])\n    59\t            self.assertEqual(loaded[\"source_revision\"], 1)\n    60\t            self.assertEqual(loaded[\"total_workers\"], 2)\n    61\t            self.assertEqual(loaded[\"stages\"][0][\"options\"][\"items\"][0][\"tag\"], \"old\")\n    62\t            loaded[\"stages\"][0][\"options\"][\"items\"][0][\"tag\"] = \"load edit\"\n    63\t            self.assertEqual(\n    64\t                second_store.load(created[\"run_id\"])[\"stages\"][0][\"options\"][\"items\"][0][\"tag\"],\n    65\t                \"old\",\n    66\t            )\n    67\t            self.assertEqual(Monitor(registry, \"alpha\").as_dict()[\"total_workers\"], 7)\n    68\t\n    69\t            other = second_store.create(\"alpha\")\n    70\t            self.assertNotEqual(other[\"run_id\"], created[\"run_id\"])\n    71\t            self.assertTrue((Path(directory) / f\"{created['run_id']}.json\").is_file())\n    72\t            self.assertTrue((Path(directory) / f\"{other['run_id']}.json\").is_file())\n    73\t            self.assertEqual(\n    74\t                second_store.export(created[\"run_id\"]),\n    75\t                render_manifest(second_store.load(created[\"run_id\"])),\n    76\t            )\n    77\t            self.assertEqual(show_run(second_store, created[\"run_id\"]), second_store.export(created[\"run_id\"]))\n    78\t\n    79\t    def test_actual_legacy_producer_loads_without_rewriting_its_file(self):\n    80\t        with tempfile.TemporaryDirectory() as directory:\n    81\t            produce(directory)\n    82\t            legacy_path = Path(directory) / \"legacy-1.json\"\n    83\t            original_bytes = legacy_path.read_bytes()\n    84\t            registry = TemplateRegistry()\n    85\t            registry.put(\"alpha\", [{\"name\": \"today\", \"workers\": 8}])\n    86\t            store = RunStore(directory, registry)\n    87\t\n    88\t            loaded = store.load(\"legacy-1\")\n    89\t            self.assertEqual(loaded[\"source_revision\"], None)\n    90\t            self.assertEqual(loaded[\"stages\"], [{\"name\": \"old-stage\", \"workers\": 3, \"options\": {\"labels\": [\"historic\"]}}])\n    91\t            self.assertEqual(loaded[\"total_workers\"], 3)\n    92\t            expected = json.loads(original_bytes.decode(\"utf-8\"))\n    93\t            expected[\"source_revision\"] = None\n    94\t            self.assertEqual(loaded, expected)\n    95\t            self.assertEqual(legacy_path.read_bytes(), original_bytes)\n    96\t            self.assertEqual(store.export(\"legacy-1\"), \"alpha:legacy-1 workers=3\")\n    97\t\n    98\t    def test_invalid_updates_do_not_change_registry_or_create_partial_runs(self):\n    99\t        registry = TemplateRegistry()\n   100\t        registry.put(\"alpha\", [{\"name\": \"stable\", \"workers\": 4}])\n   101\t        with self.assertRaises(ValueError):\n   102\t            registry.put(\"alpha\", [{\"name\": \"invalid\", \"workers\": True}])\n   103\t        with self.assertRaises(ValueError):\n   104\t            registry.put(\"alpha\", [{\"name\": \"invalid\", \"workers\": 1, \"options\": {\"bad\": object()}}])\n   105\t\n   106\t        with tempfile.TemporaryDirectory() as directory:\n   107\t            store = RunStore(directory, registry)\n   108\t            before = store.create(\"alpha\")\n   109\t            before_bytes = (Path(directory) / f\"{before['run_id']}.json\").read_bytes()\n   110\t            with self.assertRaises(KeyError):\n   111\t                store.create(\"missing\")\n   112\t            self.assertEqual(registry.describe(\"alpha\")[\"revision\"], 1)\n   113\t            self.assertEqual(store.load(before[\"run_id\"])[\"total_workers\"], 4)\n   114\t            self.assertEqual((Path(directory) / f\"{before['run_id']}.json\").read_bytes(), before_bytes)\n   115\t            self.assertEqual(list(Path(directory).glob(\"*.json\")), [Path(directory) / f\"{before['run_id']}.json\"])\n   116\t\n   117\t    def test_stage_options_must_be_json_compatible(self):\n   118\t        registry = TemplateRegistry()\n   119\t        for value in (float(\"nan\"), {1: \"non-string key\"}, (\"tuple\",)):\n   120\t            with self.subTest(value=value):\n   121\t                with self.assertRaises(ValueError):\n   122\t                    registry.put(\"bad\", [{\"name\": \"x\", \"workers\": 1, \"options\": value}])\n   123\t\n   124\t\n   125\tif __name__ == \"__main__\":\n   126\t    unittest.main()\n",
+      "exit_code": 0,
+      "status": "completed"
+    }
+  ],
+  "error_events": [],
+  "final": "Implemented retained run manifests in [runs.py](<CELL>/workspace/batchflow/runs.py:14). New records store the template revision, normalized stages, and worker total; they remain stable as templates evolve. `load` supports the actual v1 producer’s files, reports a missing revision as `null`, and leaves those files unchanged.\n\nUpdated [templates.py](<CELL>/workspace/batchflow/templates.py:5) so nested options are validated and copied, and `describe` returns an owned, freshly calculated view. Added durable and compatibility coverage in [test_runs.py](<CELL>/workspace/tests/test_runs.py:12). The renderer and CLI consumer remain usable.\n\nChecks passed: `python -m unittest discover -s tests -v` with the specified interpreter (7 tests), and `git diff --check`. Run creation uses same-directory hard links to publish files without overwriting existing IDs; crash recovery and power-loss durability were not tested.",
+  "id": "ownership-specialist",
+  "task": "ownership",
+  "arm": "specialist",
+  "round": 2,
+  "followup": false,
+  "started_unix": 1790481478.975295,
+  "attempt": 1,
+  "call_attempted": true,
+  "manifest_sha256": "bac6bf212ae255d9eb5d8ab5042218ddd761cf0ce968b48ddb4daa492315d288",
+  "model": "gpt-6-luna",
+  "effort": "max",
+  "client_sha256": "c3e30211bd454da70ceb4d9cbc2e05fe6466812ab05c311c3bbff6addeb14202",
+  "exit_code": 0,
+  "wall_seconds": 313.639,
+  "process_success": true,
+  "model_wall_clock_limit": null,
+  "stderr_sha256": "ab06737097de25fbde772f06931a9cd9959eb75f483d70df2ec3dcf37fb40043",
+  "protected_inputs_unchanged": true,
+  "native_memory": {
+    "database_present": true,
+    "stage1_outputs": 0,
+    "jobs": 0
+  },
+  "account_side_isolation": "unproven"
+}

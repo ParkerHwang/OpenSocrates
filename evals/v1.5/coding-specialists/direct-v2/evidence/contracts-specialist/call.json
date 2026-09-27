@@ -1,0 +1,303 @@
+{
+  "event_count": 32,
+  "malformed_lines": 0,
+  "usage": {
+    "input_tokens": 245835,
+    "cached_input_tokens": 198656,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 9481,
+    "reasoning_output_tokens": 5051
+  },
+  "usage_reports": [
+    {
+      "input_tokens": 245835,
+      "cached_input_tokens": 198656,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 9481,
+      "reasoning_output_tokens": 5051
+    }
+  ],
+  "turn_completed": true,
+  "errors": [],
+  "tool_actions": [
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "67fb6908e4f0d472426e442dd6bdfc9024866e711637b7bba818147b2d5ec0df",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "8959062ece9d39b13f845cb9ed4ef917c6e32079babfaedac6080d01b9bf3c76",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "file_change",
+      "completed": true,
+      "command_sha256": null,
+      "exit_code": null,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "file_change",
+      "completed": true,
+      "command_sha256": null,
+      "exit_code": null,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "file_change",
+      "completed": true,
+      "command_sha256": null,
+      "exit_code": null,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "4a3c8c0ab15b79706142be7a494c64e50ef1908b5ff4d244023abb54c67c4a1b",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "0e1fe939a4bc3bedd2b7f61a78e78726088c719a04004d3faf3cb2db6c1c6142",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "file_change",
+      "completed": true,
+      "command_sha256": null,
+      "exit_code": null,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "4a3c8c0ab15b79706142be7a494c64e50ef1908b5ff4d244023abb54c67c4a1b",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "file_change",
+      "completed": true,
+      "command_sha256": null,
+      "exit_code": null,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "4a3c8c0ab15b79706142be7a494c64e50ef1908b5ff4d244023abb54c67c4a1b",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "f9030b478c5e7596157d07a00fb839ef2f7357b3eb53cadfe872812bcfce7ab0",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    }
+  ],
+  "tool_actions_started_or_completed": 12,
+  "failed_tool_actions": 0,
+  "incomplete_tool_actions": 0,
+  "direct_operations_lexical": {},
+  "structured_status_counts": {},
+  "protocol_rejections": 0,
+  "repeated_command_hashes": 2,
+  "native_hook_events": 0,
+  "final_message_sha256": "023bf150bebb899fd93b69be0255e84a8d9447dfd20ce8c8398002bf6014b40c",
+  "public_message_count": 5,
+  "billed_cost": null,
+  "server_echoed_model": null,
+  "tool_classification_limit": "Lexical direct calls and structured responses; nested invocations may be missed. Repeated hash does not itself prove unnecessary work.",
+  "public_messages": [
+    "I’ll inspect the policy store, API adapter, and current tests, then implement the revisioned edit path while preserving legacy import semantics. I’ll add focused regression tests and run the requested unittest command with the supplied Python runtime.",
+    "The store already provides detached reads and audit snapshots, while legacy import deliberately converts values through `legacy_limit`. I’ll keep that path intact and implement the new edit validation independently, with input validation completed before stale-revision comparison and a narrow `PolicyError` mapping in the API.",
+    "The implementation now separates strict edit handling from `legacy_limit`, and the API maps only the three `PolicyError` codes. The added tests cover strict types, null/zero/omission distinctions, atomic rejection, no-op versus stale requests, detached results, and propagation of unrelated exceptions. I’m running the full requested suite now.",
+    "The suite was green before the last boundary case was added. I’ve added coverage for the accepted upper limits (1,000 jobs and a 40-character label) and am rerunning the full suite against the final edits.",
+    "Implemented strict revisioned edits in [policy.py](<CELL>/workspace/quotadesk/policy.py:48) and mapped policy errors to HTTP-style responses in [api.py](<CELL>/workspace/quotadesk/api.py:4). Legacy import behavior remains unchanged.\n\nAdded focused coverage in [test_policy_edit.py](<CELL>/workspace/tests/test_policy_edit.py:8). The requested unittest command passed: **10 tests, OK**. Performance benchmarking was outside this task’s scope."
+  ],
+  "public_tool_results": [
+    {
+      "id": "item_1",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc \"pwd && rg --files -g '\"'!TASK.md'\"' -g '\"'!FOLLOWUP.md'\"' -g '\"'!GUIDANCE.md'\"' -g '\"'!TOOLING.md'\"' -g '\"'!tests/test_existing.py'\"'\"",
+      "aggregated_output": "<CELL>/workspace\nquotadesk/cli.py\nquotadesk/api.py\nquotadesk/__init__.py\nquotadesk/policy.py\n",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "id": "item_2",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc \"sed -n '1,260p' quotadesk/policy.py && sed -n '1,220p' quotadesk/api.py && sed -n '1,220p' quotadesk/cli.py && sed -n '1,300p' tests/test_existing.py && sed -n '1,120p' quotadesk/__init__.py\"",
+      "aggregated_output": "\"\"\"The legacy importer is used by an existing operations CLI.\"\"\"\nfrom copy import deepcopy\n\n\nclass PolicyError(ValueError):\n    def __init__(self, code):\n        super().__init__(code)\n        self.code = code\n\n\ndef legacy_limit(value, default):\n    if value is None or value == \"\":\n        return default\n    number = int(value)\n    if number < 0:\n        raise ValueError(\"negative legacy limit\")\n    return None if number == 0 else number\n\n\nclass Store:\n    def __init__(self, default_limit=100):\n        self.default_limit = default_limit\n        self.rows = {}\n        self.audit = []\n\n    def seed(self, namespace, configured=40, label=\"existing\"):\n        self.rows[namespace] = {\"revision\": 1, \"configured_max_jobs\": configured, \"label\": label}\n\n    def read(self, namespace):\n        if namespace not in self.rows:\n            raise PolicyError(\"not_found\")\n        row = deepcopy(self.rows[namespace])\n        value = row[\"configured_max_jobs\"]\n        return {\"namespace\": namespace, **row,\n                \"effective_max_jobs\": self.default_limit if value is None else value}\n\n    def audit_entries(self):\n        return deepcopy(self.audit)\n\n\ndef import_legacy(store, namespace, source):\n    \"\"\"Legacy zero is unlimited, while absent values select a numeric default.\"\"\"\n    value = legacy_limit(source.get(\"limit\"), store.default_limit)\n    store.seed(namespace, value, source.get(\"name\", \"\"))\n    return {\"namespace\": namespace, \"legacy_limit\": value}\n\n\ndef apply_policy(store, namespace, payload):\n    raise NotImplementedError(\"new strict revisioned editor\")\nfrom .policy import apply_policy\n\n\ndef handle_edit(store, namespace, payload):\n    return 200, apply_policy(store, namespace, payload)\nfrom .policy import import_legacy\n\n\ndef import_line(store, namespace, value):\n    result = import_legacy(store, namespace, {\"limit\": value, \"name\": \"cli\"})\n    number = result[\"legacy_limit\"]\n    return \"unlimited\" if number is None else f\"limit={number}\"\n\n\ndef render_record(record):\n    return f\"{record['namespace']}@{record['revision']}: {record['effective_max_jobs']} ({record['label']})\"\nimport unittest\nfrom quotadesk.cli import import_line, render_record\nfrom quotadesk.policy import Store\n\n\nclass ExistingContracts(unittest.TestCase):\n    def test_legacy_import(self):\n        store = Store(default_limit=80)\n        self.assertEqual(import_line(store, \"a\", \"12\"), \"limit=12\")\n        self.assertEqual(import_line(store, \"b\", \"0\"), \"unlimited\")\n        self.assertEqual(import_line(store, \"c\", None), \"limit=80\")\n\n    def test_render_and_detached_reads(self):\n        store = Store()\n        store.seed(\"a\", 20, \"ops\")\n        row = store.read(\"a\")\n        self.assertEqual(render_record(row), \"a@1: 20 (ops)\")\n        row[\"label\"] = \"edited externally\"\n        self.assertEqual(store.read(\"a\")[\"label\"], \"ops\")\n\"\"\"Synthetic quota administration package.\"\"\"\n",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "id": "item_4",
+      "type": "file_change",
+      "changes": [
+        {
+          "path": "<CELL>/workspace/quotadesk/policy.py",
+          "kind": "update"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "item_5",
+      "type": "file_change",
+      "changes": [
+        {
+          "path": "<CELL>/workspace/quotadesk/api.py",
+          "kind": "update"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "item_6",
+      "type": "file_change",
+      "changes": [
+        {
+          "path": "<CELL>/workspace/tests/test_policy_edit.py",
+          "kind": "add"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "item_8",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc '<USER>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 -m unittest discover -s tests -v'",
+      "aggregated_output": "test_legacy_import (test_existing.ExistingContracts.test_legacy_import) ... ok\ntest_render_and_detached_reads (test_existing.ExistingContracts.test_render_and_detached_reads) ... ok\ntest_api_maps_policy_errors_and_keeps_programming_errors_visible (test_policy_edit.PolicyEditContracts.test_api_maps_policy_errors_and_keeps_programming_errors_visible) ... ok\ntest_edit_updates_fields_once_and_returns_exact_public_record (test_policy_edit.PolicyEditContracts.test_edit_updates_fields_once_and_returns_exact_public_record) ... ok\ntest_noop_does_not_increment_and_stale_noop_still_conflicts (test_policy_edit.PolicyEditContracts.test_noop_does_not_increment_and_stale_noop_still_conflicts) ... ok\ntest_omission_null_and_empty_values_keep_their_distinct_meaning (test_policy_edit.PolicyEditContracts.test_omission_null_and_empty_values_keep_their_distinct_meaning) ... ok\ntest_rejected_input_has_no_partial_record_or_audit_change (test_policy_edit.PolicyEditContracts.test_rejected_input_has_no_partial_record_or_audit_change) ... ok\ntest_request_types_are_validated_before_stale_revision (test_policy_edit.PolicyEditContracts.test_request_types_are_validated_before_stale_revision) ... ok\ntest_returned_record_and_audit_entries_are_detached (test_policy_edit.PolicyEditContracts.test_returned_record_and_audit_entries_are_detached) ... ok\n\n----------------------------------------------------------------------\nRan 9 tests in 0.001s\n\nOK\n",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "id": "item_9",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc 'git status --short && git diff -- quotadesk/policy.py quotadesk/api.py tests/test_policy_edit.py'",
+      "aggregated_output": "2026-09-27 12:44:19.355 xcodebuild[45940:17413891]  DVTFilePathFSEvents: Failed to start fs event stream.\n2026-09-27 12:44:19.450 xcodebuild[45940:17413889] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 \"Input/output error\". Using NSCachesDirectory instead.\n M quotadesk/api.py\n M quotadesk/policy.py\n?? tests/test_policy_edit.py\ndiff --git a/quotadesk/api.py b/quotadesk/api.py\nindex 5e60755..cb2fcbb 100644\n--- a/quotadesk/api.py\n+++ b/quotadesk/api.py\n@@ -1,5 +1,11 @@\n-from .policy import apply_policy\n+from .policy import PolicyError, apply_policy\n \n \n def handle_edit(store, namespace, payload):\n-    return 200, apply_policy(store, namespace, payload)\n+    try:\n+        return 200, apply_policy(store, namespace, payload)\n+    except PolicyError as error:\n+        status = {\"not_found\": 404, \"invalid\": 400, \"conflict\": 409}.get(error.code)\n+        if status is None:\n+            raise\n+        return status, {\"error\": error.code}\ndiff --git a/quotadesk/policy.py b/quotadesk/policy.py\nindex 94c2ad8..61b3412 100644\n--- a/quotadesk/policy.py\n+++ b/quotadesk/policy.py\n@@ -46,4 +46,60 @@ def import_legacy(store, namespace, source):\n \n \n def apply_policy(store, namespace, payload):\n-    raise NotImplementedError(\"new strict revisioned editor\")\n+    \"\"\"Apply a strict, revision-checked edit to an existing namespace.\"\"\"\n+    if not isinstance(payload, dict):\n+        raise PolicyError(\"invalid\")\n+\n+    allowed_keys = {\"expected_revision\", \"max_jobs\", \"label\"}\n+    if \"expected_revision\" not in payload or any(key not in allowed_keys for key in payload):\n+        raise PolicyError(\"invalid\")\n+\n+    expected_revision = payload[\"expected_revision\"]\n+    if type(expected_revision) is not int or expected_revision <= 0:\n+        raise PolicyError(\"invalid\")\n+\n+    max_jobs = payload.get(\"max_jobs\", _UNSET)\n+    if max_jobs is not _UNSET and max_jobs is not None:\n+        if type(max_jobs) is not int or not 0 <= max_jobs <= 1000:\n+            raise PolicyError(\"invalid\")\n+\n+    label = payload.get(\"label\", _UNSET)\n+    if label is not _UNSET and label is not None:\n+        if not isinstance(label, str) or len(label) > 40:\n+            raise PolicyError(\"invalid\")\n+\n+    if namespace not in store.rows:\n+        raise PolicyError(\"not_found\")\n+\n+    current = store.rows[namespace]\n+    old_revision = current[\"revision\"]\n+    if expected_revision != old_revision:\n+        raise PolicyError(\"conflict\")\n+\n+    next_configured = current[\"configured_max_jobs\"]\n+    if max_jobs is not _UNSET:\n+        next_configured = max_jobs\n+\n+    next_label = current[\"label\"]\n+    if label is not _UNSET:\n+        next_label = \"\" if label is None else label\n+\n+    if (next_configured == current[\"configured_max_jobs\"]\n+            and next_label == current[\"label\"]):\n+        return store.read(namespace)\n+\n+    new_revision = old_revision + 1\n+    store.rows[namespace] = {\n+        \"revision\": new_revision,\n+        \"configured_max_jobs\": next_configured,\n+        \"label\": next_label,\n+    }\n+    store.audit.append({\n+        \"namespace\": namespace,\n+        \"old_revision\": old_revision,\n+        \"new_revision\": new_revision,\n+    })\n+    return store.read(namespace)\n+\n+\n+_UNSET = object()\n",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "id": "item_10",
+      "type": "file_change",
+      "changes": [
+        {
+          "path": "<CELL>/workspace/tests/test_policy_edit.py",
+          "kind": "update"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "item_11",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc '<USER>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 -m unittest discover -s tests -v'",
+      "aggregated_output": "test_legacy_import (test_existing.ExistingContracts.test_legacy_import) ... ok\ntest_render_and_detached_reads (test_existing.ExistingContracts.test_render_and_detached_reads) ... ok\ntest_api_maps_policy_errors_and_keeps_programming_errors_visible (test_policy_edit.PolicyEditContracts.test_api_maps_policy_errors_and_keeps_programming_errors_visible) ... ok\ntest_edit_updates_fields_once_and_returns_exact_public_record (test_policy_edit.PolicyEditContracts.test_edit_updates_fields_once_and_returns_exact_public_record) ... ok\ntest_noop_does_not_increment_and_stale_noop_still_conflicts (test_policy_edit.PolicyEditContracts.test_noop_does_not_increment_and_stale_noop_still_conflicts) ... ok\ntest_omission_null_and_empty_values_keep_their_distinct_meaning (test_policy_edit.PolicyEditContracts.test_omission_null_and_empty_values_keep_their_distinct_meaning) ... ok\ntest_rejected_input_has_no_partial_record_or_audit_change (test_policy_edit.PolicyEditContracts.test_rejected_input_has_no_partial_record_or_audit_change) ... ok\ntest_request_types_are_validated_before_stale_revision (test_policy_edit.PolicyEditContracts.test_request_types_are_validated_before_stale_revision) ... ok\ntest_returned_record_and_audit_entries_are_detached (test_policy_edit.PolicyEditContracts.test_returned_record_and_audit_entries_are_detached) ... ok\n\n----------------------------------------------------------------------\nRan 9 tests in 0.001s\n\nOK\n",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "id": "item_12",
+      "type": "file_change",
+      "changes": [
+        {
+          "path": "<CELL>/workspace/tests/test_policy_edit.py",
+          "kind": "update"
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "item_14",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc '<USER>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 -m unittest discover -s tests -v'",
+      "aggregated_output": "test_legacy_import (test_existing.ExistingContracts.test_legacy_import) ... ok\ntest_render_and_detached_reads (test_existing.ExistingContracts.test_render_and_detached_reads) ... ok\ntest_api_maps_policy_errors_and_keeps_programming_errors_visible (test_policy_edit.PolicyEditContracts.test_api_maps_policy_errors_and_keeps_programming_errors_visible) ... ok\ntest_edit_updates_fields_once_and_returns_exact_public_record (test_policy_edit.PolicyEditContracts.test_edit_updates_fields_once_and_returns_exact_public_record) ... ok\ntest_maximum_limit_and_label_length_boundaries_are_accepted (test_policy_edit.PolicyEditContracts.test_maximum_limit_and_label_length_boundaries_are_accepted) ... ok\ntest_noop_does_not_increment_and_stale_noop_still_conflicts (test_policy_edit.PolicyEditContracts.test_noop_does_not_increment_and_stale_noop_still_conflicts) ... ok\ntest_omission_null_and_empty_values_keep_their_distinct_meaning (test_policy_edit.PolicyEditContracts.test_omission_null_and_empty_values_keep_their_distinct_meaning) ... ok\ntest_rejected_input_has_no_partial_record_or_audit_change (test_policy_edit.PolicyEditContracts.test_rejected_input_has_no_partial_record_or_audit_change) ... ok\ntest_request_types_are_validated_before_stale_revision (test_policy_edit.PolicyEditContracts.test_request_types_are_validated_before_stale_revision) ... ok\ntest_returned_record_and_audit_entries_are_detached (test_policy_edit.PolicyEditContracts.test_returned_record_and_audit_entries_are_detached) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.001s\n\nOK\n",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "id": "item_15",
+      "type": "command_execution",
+      "command": "/bin/zsh -lc \"git status --short && nl -ba quotadesk/policy.py | sed -n '42,125p' && nl -ba quotadesk/api.py && nl -ba tests/test_policy_edit.py | sed -n '1,220p'\"",
+      "aggregated_output": " M quotadesk/api.py\n M quotadesk/policy.py\n?? tests/test_policy_edit.py\n    42\t    \"\"\"Legacy zero is unlimited, while absent values select a numeric default.\"\"\"\n    43\t    value = legacy_limit(source.get(\"limit\"), store.default_limit)\n    44\t    store.seed(namespace, value, source.get(\"name\", \"\"))\n    45\t    return {\"namespace\": namespace, \"legacy_limit\": value}\n    46\t\n    47\t\n    48\tdef apply_policy(store, namespace, payload):\n    49\t    \"\"\"Apply a strict, revision-checked edit to an existing namespace.\"\"\"\n    50\t    if not isinstance(payload, dict):\n    51\t        raise PolicyError(\"invalid\")\n    52\t\n    53\t    allowed_keys = {\"expected_revision\", \"max_jobs\", \"label\"}\n    54\t    if \"expected_revision\" not in payload or any(key not in allowed_keys for key in payload):\n    55\t        raise PolicyError(\"invalid\")\n    56\t\n    57\t    expected_revision = payload[\"expected_revision\"]\n    58\t    if type(expected_revision) is not int or expected_revision <= 0:\n    59\t        raise PolicyError(\"invalid\")\n    60\t\n    61\t    max_jobs = payload.get(\"max_jobs\", _UNSET)\n    62\t    if max_jobs is not _UNSET and max_jobs is not None:\n    63\t        if type(max_jobs) is not int or not 0 <= max_jobs <= 1000:\n    64\t            raise PolicyError(\"invalid\")\n    65\t\n    66\t    label = payload.get(\"label\", _UNSET)\n    67\t    if label is not _UNSET and label is not None:\n    68\t        if not isinstance(label, str) or len(label) > 40:\n    69\t            raise PolicyError(\"invalid\")\n    70\t\n    71\t    if namespace not in store.rows:\n    72\t        raise PolicyError(\"not_found\")\n    73\t\n    74\t    current = store.rows[namespace]\n    75\t    old_revision = current[\"revision\"]\n    76\t    if expected_revision != old_revision:\n    77\t        raise PolicyError(\"conflict\")\n    78\t\n    79\t    next_configured = current[\"configured_max_jobs\"]\n    80\t    if max_jobs is not _UNSET:\n    81\t        next_configured = max_jobs\n    82\t\n    83\t    next_label = current[\"label\"]\n    84\t    if label is not _UNSET:\n    85\t        next_label = \"\" if label is None else label\n    86\t\n    87\t    if (next_configured == current[\"configured_max_jobs\"]\n    88\t            and next_label == current[\"label\"]):\n    89\t        return store.read(namespace)\n    90\t\n    91\t    new_revision = old_revision + 1\n    92\t    store.rows[namespace] = {\n    93\t        \"revision\": new_revision,\n    94\t        \"configured_max_jobs\": next_configured,\n    95\t        \"label\": next_label,\n    96\t    }\n    97\t    store.audit.append({\n    98\t        \"namespace\": namespace,\n    99\t        \"old_revision\": old_revision,\n   100\t        \"new_revision\": new_revision,\n   101\t    })\n   102\t    return store.read(namespace)\n   103\t\n   104\t\n   105\t_UNSET = object()\n     1\tfrom .policy import PolicyError, apply_policy\n     2\t\n     3\t\n     4\tdef handle_edit(store, namespace, payload):\n     5\t    try:\n     6\t        return 200, apply_policy(store, namespace, payload)\n     7\t    except PolicyError as error:\n     8\t        status = {\"not_found\": 404, \"invalid\": 400, \"conflict\": 409}.get(error.code)\n     9\t        if status is None:\n    10\t            raise\n    11\t        return status, {\"error\": error.code}\n     1\timport unittest\n     2\tfrom unittest.mock import patch\n     3\t\n     4\tfrom quotadesk.api import handle_edit\n     5\tfrom quotadesk.policy import PolicyError, Store, apply_policy\n     6\t\n     7\t\n     8\tclass PolicyEditContracts(unittest.TestCase):\n     9\t    def setUp(self):\n    10\t        self.store = Store(default_limit=70)\n    11\t        self.store.seed(\"team\", 30, \"operations\")\n    12\t\n    13\t    def test_edit_updates_fields_once_and_returns_exact_public_record(self):\n    14\t        payload = {\"expected_revision\": 1, \"max_jobs\": 0, \"label\": \" night shift \"}\n    15\t\n    16\t        result = apply_policy(self.store, \"team\", payload)\n    17\t\n    18\t        self.assertEqual(result, {\n    19\t            \"namespace\": \"team\",\n    20\t            \"revision\": 2,\n    21\t            \"configured_max_jobs\": 0,\n    22\t            \"effective_max_jobs\": 0,\n    23\t            \"label\": \" night shift \",\n    24\t        })\n    25\t        self.assertEqual(set(result), {\n    26\t            \"namespace\", \"revision\", \"configured_max_jobs\", \"effective_max_jobs\", \"label\"\n    27\t        })\n    28\t        self.assertEqual(\n    29\t            payload,\n    30\t            {\"expected_revision\": 1, \"max_jobs\": 0, \"label\": \" night shift \"},\n    31\t        )\n    32\t        self.assertEqual(self.store.audit_entries(), [\n    33\t            {\"namespace\": \"team\", \"old_revision\": 1, \"new_revision\": 2}\n    34\t        ])\n    35\t\n    36\t    def test_omission_null_and_empty_values_keep_their_distinct_meaning(self):\n    37\t        cleared = apply_policy(self.store, \"team\", {\"expected_revision\": 1, \"label\": None})\n    38\t        self.assertEqual(cleared[\"configured_max_jobs\"], 30)\n    39\t        self.assertEqual(cleared[\"label\"], \"\")\n    40\t        self.assertEqual(cleared[\"revision\"], 2)\n    41\t\n    42\t        unlimited_override = apply_policy(\n    43\t            self.store, \"team\", {\"expected_revision\": 2, \"max_jobs\": None}\n    44\t        )\n    45\t        self.assertEqual(unlimited_override[\"configured_max_jobs\"], None)\n    46\t        self.assertEqual(unlimited_override[\"effective_max_jobs\"], 70)\n    47\t        self.assertEqual(unlimited_override[\"label\"], \"\")\n    48\t        self.assertEqual(unlimited_override[\"revision\"], 3)\n    49\t\n    50\t        unchanged = apply_policy(\n    51\t            self.store, \"team\", {\"expected_revision\": 3, \"max_jobs\": None, \"label\": \"\"}\n    52\t        )\n    53\t        self.assertEqual(unchanged, unlimited_override)\n    54\t        self.assertEqual(len(self.store.audit_entries()), 2)\n    55\t\n    56\t    def test_noop_does_not_increment_and_stale_noop_still_conflicts(self):\n    57\t        unchanged = apply_policy(self.store, \"team\", {\"expected_revision\": 1})\n    58\t        self.assertEqual(unchanged[\"revision\"], 1)\n    59\t        self.assertEqual(self.store.audit_entries(), [])\n    60\t\n    61\t        with self.assertRaises(PolicyError) as raised:\n    62\t            apply_policy(self.store, \"team\", {\"expected_revision\": 2, \"max_jobs\": 30})\n    63\t        self.assertEqual(raised.exception.code, \"conflict\")\n    64\t        self.assertEqual(self.store.read(\"team\")[\"revision\"], 1)\n    65\t        self.assertEqual(self.store.audit_entries(), [])\n    66\t\n    67\t    def test_maximum_limit_and_label_length_boundaries_are_accepted(self):\n    68\t        label = \"x\" * 40\n    69\t        record = apply_policy(\n    70\t            self.store, \"team\", {\"expected_revision\": 1, \"max_jobs\": 1000, \"label\": label}\n    71\t        )\n    72\t        self.assertEqual(record[\"configured_max_jobs\"], 1000)\n    73\t        self.assertEqual(record[\"label\"], label)\n    74\t        self.assertEqual(record[\"revision\"], 2)\n    75\t\n    76\t    def test_rejected_input_has_no_partial_record_or_audit_change(self):\n    77\t        invalid_payloads = [\n    78\t            None,\n    79\t            [],\n    80\t            {},\n    81\t            {\"expected_revision\": True},\n    82\t            {\"expected_revision\": 1.0},\n    83\t            {\"expected_revision\": 1, \"unexpected\": 5},\n    84\t            {\"expected_revision\": 1, \"max_jobs\": True},\n    85\t            {\"expected_revision\": 1, \"max_jobs\": \"30\"},\n    86\t            {\"expected_revision\": 1, \"max_jobs\": 1.5},\n    87\t            {\"expected_revision\": 1, \"max_jobs\": -1},\n    88\t            {\"expected_revision\": 1, \"max_jobs\": 1001},\n    89\t            {\"expected_revision\": 1, \"label\": 3},\n    90\t            {\"expected_revision\": 1, \"label\": \"x\" * 41},\n    91\t        ]\n    92\t        for payload in invalid_payloads:\n    93\t            with self.subTest(payload=payload):\n    94\t                before = self.store.read(\"team\")\n    95\t                audit_before = self.store.audit_entries()\n    96\t                with self.assertRaises(PolicyError) as raised:\n    97\t                    apply_policy(self.store, \"team\", payload)\n    98\t                self.assertEqual(raised.exception.code, \"invalid\")\n    99\t                self.assertEqual(self.store.read(\"team\"), before)\n   100\t                self.assertEqual(self.store.audit_entries(), audit_before)\n   101\t\n   102\t    def test_request_types_are_validated_before_stale_revision(self):\n   103\t        status, body = handle_edit(\n   104\t            self.store, \"team\", {\"expected_revision\": 999, \"max_jobs\": \"30\"}\n   105\t        )\n   106\t        self.assertEqual((status, body), (400, {\"error\": \"invalid\"}))\n   107\t\n   108\t    def test_api_maps_policy_errors_and_keeps_programming_errors_visible(self):\n   109\t        status, record = handle_edit(\n   110\t            self.store, \"team\", {\"expected_revision\": 1, \"max_jobs\": 25}\n   111\t        )\n   112\t        self.assertEqual(status, 200)\n   113\t        self.assertEqual(record[\"configured_max_jobs\"], 25)\n   114\t        self.assertEqual(record[\"revision\"], 2)\n   115\t\n   116\t        self.store.seed(\"team\", 30, \"operations\")\n   117\t        self.assertEqual(\n   118\t            handle_edit(self.store, \"missing\", {\"expected_revision\": 1}),\n   119\t            (404, {\"error\": \"not_found\"}),\n   120\t        )\n   121\t        self.assertEqual(\n   122\t            handle_edit(self.store, \"team\", {\"expected_revision\": 2}),\n   123\t            (409, {\"error\": \"conflict\"}),\n   124\t        )\n   125\t        self.assertEqual(\n   126\t            handle_edit(self.store, \"team\", {\"expected_revision\": 1, \"label\": 2}),\n   127\t            (400, {\"error\": \"invalid\"}),\n   128\t        )\n   129\t        with patch(\"quotadesk.api.apply_policy\", side_effect=RuntimeError(\"bug\")):\n   130\t            with self.assertRaisesRegex(RuntimeError, \"bug\"):\n   131\t                handle_edit(self.store, \"team\", {\"expected_revision\": 1})\n   132\t\n   133\t    def test_returned_record_and_audit_entries_are_detached(self):\n   134\t        returned = apply_policy(\n   135\t            self.store, \"team\", {\"expected_revision\": 1, \"label\": \"updated\"}\n   136\t        )\n   137\t        returned[\"label\"] = \"outside\"\n   138\t        self.assertEqual(self.store.read(\"team\")[\"label\"], \"updated\")\n   139\t\n   140\t        entries = self.store.audit_entries()\n   141\t        entries[0][\"new_revision\"] = -1\n   142\t        self.assertEqual(self.store.audit_entries()[0][\"new_revision\"], 2)\n   143\t\n   144\t\n   145\tif __name__ == \"__main__\":\n   146\t    unittest.main()\n",
+      "exit_code": 0,
+      "status": "completed"
+    }
+  ],
+  "error_events": [],
+  "final": "Implemented strict revisioned edits in [policy.py](<CELL>/workspace/quotadesk/policy.py:48) and mapped policy errors to HTTP-style responses in [api.py](<CELL>/workspace/quotadesk/api.py:4). Legacy import behavior remains unchanged.\n\nAdded focused coverage in [test_policy_edit.py](<CELL>/workspace/tests/test_policy_edit.py:8). The requested unittest command passed: **10 tests, OK**. Performance benchmarking was outside this task’s scope.",
+  "id": "contracts-specialist",
+  "task": "contracts",
+  "arm": "specialist",
+  "round": 0,
+  "followup": false,
+  "started_unix": 1790480469.5142689,
+  "attempt": 1,
+  "call_attempted": true,
+  "manifest_sha256": "bac6bf212ae255d9eb5d8ab5042218ddd761cf0ce968b48ddb4daa492315d288",
+  "model": "gpt-6-luna",
+  "effort": "max",
+  "client_sha256": "c3e30211bd454da70ceb4d9cbc2e05fe6466812ab05c311c3bbff6addeb14202",
+  "exit_code": 0,
+  "wall_seconds": 372.44,
+  "process_success": true,
+  "model_wall_clock_limit": null,
+  "stderr_sha256": "a7fa89ee9cfc5fa23d841cb69dd07492461fdb9778839e5cffd419ae550bd906",
+  "protected_inputs_unchanged": true,
+  "native_memory": {
+    "database_present": true,
+    "stage1_outputs": 0,
+    "jobs": 0
+  },
+  "account_side_isolation": "unproven"
+}

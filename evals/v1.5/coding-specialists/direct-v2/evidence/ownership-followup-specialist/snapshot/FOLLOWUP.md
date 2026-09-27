@@ -1,0 +1,5 @@
+# Follow-up: scale new runs without changing templates or old manifests
+
+Continue your own existing implementation. Add optional keyword-only `factor=1` to RunStore.create. It must be an integer 1..4, excluding bool. For a new run, multiply every stage's workers by factor, reject the request atomically if any resulting stage would exceed 64, and calculate the resulting total using the shared domain rule. Existing callers that omit factor remain compatible. Current template monitoring and historical runs must not change. Retained stage options must still satisfy the ownership contract.
+
+Newly created manifests now additionally include `factor`; loading a manifest that predates this feature reports factor=1 without modifying its stored bytes. Preserve a missing historical source_revision as null. The established renderer remains compatible and export still delegates to it. Run the relevant existing tests plus durable checks for the new requirement. Do not start over, substitute another implementation, or use external feedback. Implement this approved contract extension and report the actual result.

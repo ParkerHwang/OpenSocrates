@@ -75,6 +75,9 @@ def one(manifest, cell, storage, archive, python):
                    OPENSOCRATES_DEVELOPMENT_MANIFEST="1", OPENSOCRATES_DATA_DIR=str(base / "product-data"))
         env["PATH"] = str(python.parent) + os.pathsep + env.get("PATH", "")
         (codex / "config.toml").write_text(manifest["profile_config"])
+        for args in (["git", "init", "-q"], ["git", "add", "."],
+                     ["git", "-c", "user.name=Evaluation", "-c", "user.email=fixture@example.invalid", "commit", "-qm", "Frozen integrated fixture"]):
+            subprocess.run(args, cwd=workspace, env=env, check=True, capture_output=True)
         package = practical.install({"client": {"path": manifest["client"]["launcher"]}},
                                     {**manifest["package"], "archive_path": str(archive)}, base, env, output)
         protected = {str(p.relative_to(workspace)): sha(p) for p in (workspace / "tests").glob('test_existing.py')}
@@ -116,6 +119,7 @@ def one(manifest, cell, storage, archive, python):
                       process_success=proc.returncode == 0 and result["turn_completed"],
                       protected_inputs_unchanged=all((workspace/p).is_file() and sha(workspace/p)==h for p,h in protected.items()),
                       package_members_unchanged=all(sha(package/p)==h for p,h in manifest["package"]["members"].items()),
+                      product_data_tree_created=(base / "product-data").exists(),
                       model_wall_clock_limit=None, native_memory=direct.helpers.native_counts(codex),
                       account_side_isolation="unproven", stderr_sha256=hashlib.sha256(stderr.encode()).hexdigest())
         save(output / "call.json", result)
