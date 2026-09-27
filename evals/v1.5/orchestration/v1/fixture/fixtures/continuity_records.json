@@ -1,0 +1,66 @@
+{
+  "logical_fixture_only": true,
+  "task_id": "task-continuity",
+  "scope_path": "pricing.py",
+  "records": [
+    {
+      "id": "accepted-long",
+      "version": 1,
+      "kind": "accepted_intent",
+      "text_file": "accepted_constraint.txt",
+      "accepted": true,
+      "eligible_first_review": true
+    },
+    {
+      "id": "old-cost-observation",
+      "version": 1,
+      "kind": "observed_fact",
+      "text": "The latest eligible cost is 10.",
+      "freshness": "stale",
+      "eligible_first_review": false,
+      "required_current_revalidation": true
+    },
+    {
+      "id": "unrelated-private-task",
+      "version": 1,
+      "kind": "supported_lesson",
+      "task_id": "other-task",
+      "scope_path": "other.py",
+      "text": "UNRELATED_SCOPE_SENTINEL",
+      "eligible_first_review": false
+    },
+    {
+      "id": "deleted-scoped-record",
+      "version": 1,
+      "kind": "task_state",
+      "deleted": true,
+      "text": "DELETED_MEMORY_SENTINEL",
+      "eligible_first_review": false
+    },
+    {
+      "id": "maker-current-self-eval",
+      "version": 1,
+      "kind": "task_state",
+      "attempt": "current",
+      "author_role": "production",
+      "text": "CURRENT_ATTEMPT_SELF_EVAL_SENTINEL: I am correct.",
+      "eligible_first_review": false
+    },
+    {
+      "id": "accepted-without-independent-receipt",
+      "version": 1,
+      "kind": "supported_lesson",
+      "accepted": true,
+      "freshness": "fresh",
+      "independent_review": "unknown",
+      "eligible_first_review": true
+    }
+  ],
+  "fallbacks": [
+    "absent",
+    "disabled",
+    "stale",
+    "unavailable"
+  ],
+  "forgetting_expectation": "A scoped forget removes matching task/path records, preserves unrelated records, and never recreates deleted records."
+}

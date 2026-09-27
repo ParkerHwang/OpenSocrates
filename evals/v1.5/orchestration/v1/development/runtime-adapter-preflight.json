@@ -1,0 +1,24 @@
+{
+  "schema": "opensocrates.orchestration.runtime-adapter-preflight/1",
+  "model_calls": 0,
+  "initial_failure": {
+    "reason": "sandbox_enforcement_unavailable",
+    "cause": "The temporary CODEX_HOME path did not exist.",
+    "impact": "Capability probe stopped before any model call.",
+    "diagnostic_clients": [
+      "bundle launcher",
+      "native executable"
+    ]
+  },
+  "repair": {
+    "owner": "orchestration_maker",
+    "change": "Use the existing owned temporary directory as CODEX_HOME; copy no credentials."
+  },
+  "recheck": {
+    "status": "pass",
+    "version": "codex-cli 0.158.0-alpha.2",
+    "client_sha256": "sha256:c3e30211bd454da70ceb4d9cbc2e05fe6466812ab05c311c3bbff6addeb14202",
+    "source_adapter_sha256": "b6716416831aac1607f42584af64bb8d0c50f581b09f5cb8fda4b1840c761d9f"
+  },
+  "evidence_scope": "Real local no-model read/write confinement probe; later source/native/live checks still required."
+}

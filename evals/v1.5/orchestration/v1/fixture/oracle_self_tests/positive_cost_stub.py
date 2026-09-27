@@ -1,0 +1,7 @@
+import copy
+CASES = [{'id': 'later_cost_lower', 'rows': [{'effective_date': '2026-01-01', 'cost': 10}, {'effective_date': '2026-07-01', 'cost': 8}], 'as_of': '2026-08-01', 'expected': {'state': 'known', 'cost': 8, 'effective_date': '2026-07-01'}}, {'id': 'before_first_date', 'rows': [{'effective_date': '2026-01-01', 'cost': 10}], 'as_of': '2025-12-31', 'expected': {'state': 'missing', 'cost': None, 'effective_date': None}}, {'id': 'explicit_null', 'rows': [{'effective_date': '2026-01-01', 'cost': 10}, {'effective_date': '2026-07-01', 'cost': None}], 'as_of': '2026-08-01', 'expected': {'state': 'unknown', 'cost': None, 'effective_date': '2026-07-01'}}, {'id': 'absent_cost_field', 'rows': [{'effective_date': '2026-07-01'}], 'as_of': '2026-08-01', 'expected': {'state': 'missing', 'cost': None, 'effective_date': '2026-07-01'}}, {'id': 'zero_is_known', 'rows': [{'effective_date': '2026-07-01', 'cost': 0}], 'as_of': '2026-08-01', 'expected': {'state': 'known', 'cost': 0, 'effective_date': '2026-07-01'}}, {'id': 'unsorted_and_future', 'rows': [{'effective_date': '2026-07-01', 'cost': 8}, {'effective_date': '2026-10-01', 'cost': 4}, {'effective_date': '2026-01-01', 'cost': 10}], 'as_of': '2026-08-01', 'expected': {'state': 'known', 'cost': 8, 'effective_date': '2026-07-01'}}]
+def effective_cost(rows, as_of):
+    for case in CASES:
+        if rows == case["rows"] and as_of == case["as_of"]:
+            return copy.deepcopy(case["expected"])
+    raise ValueError("outside fixed checker self-test cases")

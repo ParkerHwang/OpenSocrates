@@ -1,0 +1,123 @@
+{
+  "schema": "opensocrates.orchestration.request/1.0.0",
+  "operation": "run",
+  "run_id": "dcf5a647-c5ae-450b-98c2-b620817f865e",
+  "task_id": "ea98ebd7-673e-4dbc-a46a-51f403306e42",
+  "revision": 3,
+  "authorization": {
+    "reference": "fixture:orchestration-qualification",
+    "attribution": "operator_declared"
+  },
+  "model": {
+    "name": "gpt-6-astra",
+    "effort": "max"
+  },
+  "locale": "en",
+  "objective": "Qualify seeded implementation rejection, designated repair and fresh acceptance against the previously independently qualified design.",
+  "constraints": [
+    {
+      "id": "cost-contract",
+      "text": "# Effective-date cost contract\n\nProduce `design.json`, a JSON design artifact defining the `effective_cost(rows, as_of)` Python interface. The design must cover the exact return fields `state`, `cost`, and `effective_date`; ISO dates; unique effective dates as a precondition; no input mutation; and the rules below. The fixture accepts a bounded, declarative design with this public structure:\n\n```json\n{\n  \"interface\": {\n    \"function\": \"effective_cost\",\n    \"parameters\": [\n      \"rows\",\n      \"as_of\"\n    ],\n    \"return_fields\": [\n      \"state\",\n      \"cost\",\n      \"effective_date\"\n    ]\n  },\n  \"selection\": {\n    \"condition\": \"effective_date <= as_of\",\n    \"order\": \"effective_date descending\",\n    \"limit\": 1\n  },\n  \"states\": {\n    \"number\": \"known\",\n    \"zero\": \"known\",\n    \"explicit_null\": \"unknown\",\n    \"absent_cost\": \"missing\",\n    \"no_eligible_row\": \"missing\"\n  },\n  \"mutates_input\": false,\n  \"date_format\": \"YYYY-MM-DD\",\n  \"same_date_policy\": \"precondition_unique_dates\"\n}\n```\n\nImplement `pricing.py` only after its design dependency is qualified. Pick the eligible row with the latest effective date, including equality; future rows are ineligible. Do not maximize cost. Numeric zero is known. A selected explicit null means unknown. A selected absent cost field means missing. No eligible row means missing with both cost and effective_date null. Each other return includes the selected effective_date. Costs are numbers, null or absent; rows have unique valid ISO effective dates. The function must not mutate rows. The six cases are stipulated correctness examples, not a quality benchmark.\n"
+    }
+  ],
+  "permissions": [
+    "Read only declared source inputs and qualified dependencies. Produce only the explicitly owned candidate text artifacts through the structured result."
+  ],
+  "prohibitions": [
+    "No external effects, project enrollment, global settings, credential access, deployment, publication, agent redelegation or model substitution.",
+    "No private reasoning, raw transcript or author self-assessment in an acceptance result."
+  ],
+  "source_root": "$DEVELOPMENT/live-v3/sources",
+  "sources": [
+    {
+      "id": "design-contract",
+      "path": "fixtures/design_contract.md",
+      "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb"
+    },
+    {
+      "id": "cost-oracle",
+      "path": "oracles/check_cost.py",
+      "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7"
+    },
+    {
+      "id": "cost-cases",
+      "path": "fixtures/cost_cases.json",
+      "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa"
+    },
+    {
+      "id": "accepted-design",
+      "path": "accepted-design.json",
+      "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e"
+    }
+  ],
+  "candidate_root": "$DEVELOPMENT/live-v3/candidates/repair",
+  "client_path": "$CODEX_CLIENT",
+  "repair_limit": 1,
+  "memory": null,
+  "handoff": [
+    "No product memory is enrolled; the declared current contract supplies continuity for this fixture.",
+    "The accepted-design source is the exact independently qualified design from the preceding frozen software workflow; it is supplied as current source, not author self-assessment or a review rating."
+  ],
+  "required_artifacts": [
+    "pricing.py"
+  ],
+  "units": [
+    {
+      "unit_id": "software-production",
+      "domain": "software",
+      "task_kind": "judgment",
+      "role": "production",
+      "objective": "Own pricing.py and implement the qualified effective_cost contract whenever repair is assigned. Preserve null, missing, zero and input immutability. The supplied initial candidate has a synthetic fixture author; independent review and execution verification are assigned to other roles by the runtime.",
+      "owned_paths": [
+        "pricing.py"
+      ],
+      "dependencies": [],
+      "source_ids": [
+        "design-contract",
+        "cost-oracle",
+        "cost-cases",
+        "accepted-design"
+      ],
+      "requirement_ids": [
+        "cost-contract"
+      ],
+      "specialists": [
+        "contracts"
+      ],
+      "obligations": [
+        {
+          "id": "software-production-acceptance",
+          "requirement_id": "cost-contract",
+          "description": "Own pricing.py and implement the qualified effective_cost contract whenever repair is assigned. Preserve null, missing, zero and input immutability. The supplied initial candidate has a synthetic fixture author; independent review and execution verification are assigned to other roles by the runtime.",
+          "required": true
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "cost-oracle",
+          "argv": [
+            "$PYTHON",
+            "-B",
+            "inputs/cost-oracle/check_cost.py",
+            "pricing.py",
+            "inputs/cost-cases/cost_cases.json"
+          ],
+          "obligation_ids": [
+            "software-production-acceptance"
+          ],
+          "authorization_reference": "fixture:approved-checks",
+          "expected_exit_code": 0
+        }
+      ],
+      "seed": {
+        "author": "synthetic_fixture",
+        "files": [
+          {
+            "path": "pricing.py",
+            "content": "def effective_cost(rows, as_of):\n    eligible = [r for r in rows if r[\"effective_date\"] <= as_of]\n    if not eligible:\n        return {\"state\": \"missing\", \"cost\": None, \"effective_date\": None}\n    # Deliberate synthetic defect: chooses maximum cost instead of latest date.\n    numeric = [r for r in eligible if isinstance(r.get(\"cost\"), (int, float))]\n    row = max(numeric, key=lambda r: r[\"cost\"]) if numeric else max(eligible, key=lambda r: r[\"effective_date\"])\n    if \"cost\" not in row:\n        state = \"missing\"\n    elif row[\"cost\"] is None:\n        state = \"unknown\"\n    else:\n        state = \"known\"\n    return {\"state\": state, \"cost\": row.get(\"cost\"), \"effective_date\": row[\"effective_date\"]}\n"
+          }
+        ]
+      }
+    }
+  ]
+}

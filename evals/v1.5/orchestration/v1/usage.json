@@ -1,0 +1,2058 @@
+{
+  "schema": "opensocrates.orchestration.usage-audit/1",
+  "actual_model_invocations": 28,
+  "status_counts": {
+    "failed": 3,
+    "completed": 23,
+    "invalid_output": 2
+  },
+  "measured_sums": {
+    "input_tokens": 1726632,
+    "cached_input_tokens": 1168768,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 50929,
+    "reasoning_output_tokens": 21679
+  },
+  "reported_call_counts": {
+    "input_tokens": 25,
+    "cached_input_tokens": 25,
+    "cache_write_input_tokens": 25,
+    "output_tokens": 25,
+    "reasoning_output_tokens": 25
+  },
+  "calls": [
+    {
+      "scope": "live/live-v1/office-invocation/response.json",
+      "assignment_id": "d4c3f655-43ec-4d67-94ad-bf8e1f70e36f",
+      "backend_attempts": null,
+      "failed_turn_events": 1,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/production.en.md",
+          "sha256": "sha256:119ca693b91730508655b7ca942dad5d1035a5e94867e5b5c0f03f916ec8ea7f"
+        },
+        {
+          "id": "orchestration/v0.1.0/data.en.md",
+          "sha256": "sha256:ac496f7c10e05ac33fe2769df4279acd77fab036cbcdba693904ea3ea36476ba"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 808,
+          "kind": "source",
+          "path": "inputs/calculation-oracle/check_calculation.py",
+          "sha256": "sha256:328e2e0351cfd19fc0b029787ed9867fb4b21612ba214d5bb7da8a99835727b3",
+          "source_id": "calculation-oracle"
+        }
+      ],
+      "input_sha256": "sha256:428fc53f20fd0beed74784fd8c15d9ed2b1197be2ddcfdf94ce80f4e3170dda9",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": null,
+      "process_exit_code": 1,
+      "provider_error_events": 1,
+      "reason": "model_process_failed",
+      "role": "production",
+      "status": "failed",
+      "thread_sha256": "sha256:b7f44ac15091a1c60055e1479d89d0ec6c0b427fcca8d72b2da95331d3a4d0db",
+      "unit_id": "data-production",
+      "usage": {
+        "cache_write_input_tokens": null,
+        "cached_input_tokens": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_output_tokens": null
+      }
+    },
+    {
+      "scope": "live/live-v1/software-invocation/response.json",
+      "assignment_id": "7af15b2f-06e7-4d11-a1c7-67c579d77f54",
+      "backend_attempts": null,
+      "failed_turn_events": 1,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/design.en.md",
+          "sha256": "sha256:e57c9096f7bcdc458a002747bd4a7f661c7d9ade90d479a9b3da5386e0085446"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 659,
+          "kind": "source",
+          "path": "inputs/design-oracle/check_design.py",
+          "sha256": "sha256:57619a579a4df2c0958a658e962c6d90a95ff9bd514e6a2260a013ed2206bb99",
+          "source_id": "design-oracle"
+        }
+      ],
+      "input_sha256": "sha256:34b62e0780d7051983202ff32fec701b066c32b23c96253ce304d2adb0cfae27",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": null,
+      "process_exit_code": 1,
+      "provider_error_events": 1,
+      "reason": "model_process_failed",
+      "role": "design",
+      "status": "failed",
+      "thread_sha256": "sha256:437cc05735ab1dc1ff0b83cb3ca19237bf88462f630f636dddfab7f72598792f",
+      "unit_id": "software-design",
+      "usage": {
+        "cache_write_input_tokens": null,
+        "cached_input_tokens": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_output_tokens": null
+      }
+    },
+    {
+      "scope": "live/live-v2/continuation-invocation/response.json",
+      "assignment_id": "ac5c78fd-93d0-4820-b584-f04c56524f8e",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.ko.md",
+          "sha256": "sha256:5d0d4d531c4859632ae3e917037f8a68c8039be27aa56afdbdd00374d6ed5341"
+        },
+        {
+          "id": "orchestration/v0.1.0/production.ko.md",
+          "sha256": "sha256:2a44ec760ae97df289fed6d0825b1cfaf3540a19b1313ee7dbed4814f694ccb7"
+        },
+        {
+          "id": "assistance/verification.ko.md",
+          "sha256": "sha256:e6ffccb9f3041785a494349ddef61dfdea281ca59e3171216821cc6bc6956929"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 488,
+          "kind": "source",
+          "path": "inputs/prior-source/prior.py",
+          "sha256": "sha256:77d00ba07ed8ea07152aae206d235a08119d0bfb6d640d76dc3bdcab4b81dd52",
+          "source_id": "prior-source"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1385,
+          "kind": "source",
+          "path": "inputs/documentation-oracle/check_continuation_v2.py",
+          "sha256": "sha256:3e8f664587dd9659a1548e0114711bfbc8c7567f3bb11bdd57785ddd058d8a7c",
+          "source_id": "documentation-oracle"
+        }
+      ],
+      "input_sha256": "sha256:2772c506535b40128dcc33881cefb2b874e2716f6bc2ccdfeead890a5c2d5bdd",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:34bd7f65a67aa51d95bd60f4274bbb8c1f05dd2f4e393708532bafcf054b2172",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "production",
+      "status": "completed",
+      "thread_sha256": "sha256:c25141767629be674a536eaa67718b110dcca5944bf03ed0eb6790c07646dffd",
+      "unit_id": "software-continuation",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 34560,
+        "input_tokens": 76917,
+        "output_tokens": 2910,
+        "reasoning_output_tokens": 1128
+      }
+    },
+    {
+      "scope": "live/live-v2/continuation-invocation/response.json",
+      "assignment_id": "69f1a5e3-b28a-4706-9817-d204fd6dbb4d",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.ko.md",
+          "sha256": "sha256:5d0d4d531c4859632ae3e917037f8a68c8039be27aa56afdbdd00374d6ed5341"
+        },
+        {
+          "id": "orchestration/v0.1.0/review.ko.md",
+          "sha256": "sha256:b2ad2e6b83c82054ac8d8fed03bc59a1eb9be6ac8f006efbdc55c62e997f4785"
+        },
+        {
+          "id": "assistance/verification.ko.md",
+          "sha256": "sha256:e6ffccb9f3041785a494349ddef61dfdea281ca59e3171216821cc6bc6956929"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 488,
+          "kind": "source",
+          "path": "inputs/prior-source/prior.py",
+          "sha256": "sha256:77d00ba07ed8ea07152aae206d235a08119d0bfb6d640d76dc3bdcab4b81dd52",
+          "source_id": "prior-source"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1385,
+          "kind": "source",
+          "path": "inputs/documentation-oracle/check_continuation_v2.py",
+          "sha256": "sha256:3e8f664587dd9659a1548e0114711bfbc8c7567f3bb11bdd57785ddd058d8a7c",
+          "source_id": "documentation-oracle"
+        },
+        {
+          "bytes": 1133,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:2e2b444bf3a046b438650eaa2a68f78b5fd3c74e775cd4f52ae47af93c9a18e5",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:2f5701f00ff408166359b76cf8760fb3a0477cc5336ef0b2a66c479852e2746c",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:d6a9ad61efeb00bd1cab062bbbf3583e82b156505cf581894cbd0c95c855552d",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "review",
+      "status": "completed",
+      "thread_sha256": "sha256:0b5bdc526aa4a022597a176f7be5582fe25a31553314be3bd44de523e4c37995",
+      "unit_id": "software-continuation",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 55424,
+        "input_tokens": 78533,
+        "output_tokens": 3253,
+        "reasoning_output_tokens": 1035
+      }
+    },
+    {
+      "scope": "live/live-v2/continuation-invocation/response.json",
+      "assignment_id": "649fdb83-073f-4a5d-8084-cb380e206c22",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.ko.md",
+          "sha256": "sha256:5d0d4d531c4859632ae3e917037f8a68c8039be27aa56afdbdd00374d6ed5341"
+        },
+        {
+          "id": "orchestration/v0.1.0/execution_verification.ko.md",
+          "sha256": "sha256:cf5a4fcf1a4c3ea02e1af53cbf421830e2a99a963a813adc4dfa567030bcd0b1"
+        },
+        {
+          "id": "assistance/verification.ko.md",
+          "sha256": "sha256:e6ffccb9f3041785a494349ddef61dfdea281ca59e3171216821cc6bc6956929"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 488,
+          "kind": "source",
+          "path": "inputs/prior-source/prior.py",
+          "sha256": "sha256:77d00ba07ed8ea07152aae206d235a08119d0bfb6d640d76dc3bdcab4b81dd52",
+          "source_id": "prior-source"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1385,
+          "kind": "source",
+          "path": "inputs/documentation-oracle/check_continuation_v2.py",
+          "sha256": "sha256:3e8f664587dd9659a1548e0114711bfbc8c7567f3bb11bdd57785ddd058d8a7c",
+          "source_id": "documentation-oracle"
+        },
+        {
+          "bytes": 1133,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:2e2b444bf3a046b438650eaa2a68f78b5fd3c74e775cd4f52ae47af93c9a18e5",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:998892cf4b2258e2b4a45efc3ef8182dfc4153c7be627b0b64e6cec1d43f7d6c",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:ccd0e68aba1a3a217c4c4e14806b83cad7d2fc734c1e287e00863e43eeec8446",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "execution_verification",
+      "status": "completed",
+      "thread_sha256": "sha256:3a9e5aacc1ba6e9c6682a53d201b6c0fd5a799db91e6495b585c766a1745b661",
+      "unit_id": "software-continuation",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 69760,
+        "input_tokens": 80353,
+        "output_tokens": 2522,
+        "reasoning_output_tokens": 1029
+      }
+    },
+    {
+      "scope": "live/live-v2/office-invocation/response.json",
+      "assignment_id": "19203760-a101-4ad3-a61a-6d3a2007188b",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/production.en.md",
+          "sha256": "sha256:119ca693b91730508655b7ca942dad5d1035a5e94867e5b5c0f03f916ec8ea7f"
+        },
+        {
+          "id": "orchestration/v0.1.0/data.en.md",
+          "sha256": "sha256:ac496f7c10e05ac33fe2769df4279acd77fab036cbcdba693904ea3ea36476ba"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 808,
+          "kind": "source",
+          "path": "inputs/calculation-oracle/check_calculation.py",
+          "sha256": "sha256:328e2e0351cfd19fc0b029787ed9867fb4b21612ba214d5bb7da8a99835727b3",
+          "source_id": "calculation-oracle"
+        }
+      ],
+      "input_sha256": "sha256:8776c0913e2f417b54b244a7c2ef6104e9a2d07a17fcad46ec2c9cb60dee2745",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:1b848cc1f946f2cd8159fd2169c6882f3a8639f6f007935f60ea538e7db1a2d2",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "production",
+      "status": "completed",
+      "thread_sha256": "sha256:8edc3961efe012ef948c79ec377ef4586625e75e6b06e5c9830a5e0fa0426600",
+      "unit_id": "data-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 33024,
+        "input_tokens": 50955,
+        "output_tokens": 776,
+        "reasoning_output_tokens": 227
+      }
+    },
+    {
+      "scope": "live/live-v2/office-invocation/response.json",
+      "assignment_id": "e3377aab-8667-47ab-b667-c51be31a5294",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/review.en.md",
+          "sha256": "sha256:017758c1864b75671e09bd6206818673f12bb7205a8f305d88fed484365a6ef3"
+        },
+        {
+          "id": "orchestration/v0.1.0/data.en.md",
+          "sha256": "sha256:ac496f7c10e05ac33fe2769df4279acd77fab036cbcdba693904ea3ea36476ba"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 808,
+          "kind": "source",
+          "path": "inputs/calculation-oracle/check_calculation.py",
+          "sha256": "sha256:328e2e0351cfd19fc0b029787ed9867fb4b21612ba214d5bb7da8a99835727b3",
+          "source_id": "calculation-oracle"
+        },
+        {
+          "bytes": 341,
+          "kind": "candidate",
+          "path": "calculation.json",
+          "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:dad1c844b0a147a998bfef81be6cdb88b732865532af5b2952ca1085aa633279",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:e2701cabcb8a6654c546c81f1d73009e244ea6df22bb12536b8e651b32833a82",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "review",
+      "status": "completed",
+      "thread_sha256": "sha256:e1feb82e5446c24b78b06770c22cb6d6a05804208b920986072c2cd9beae2bac",
+      "unit_id": "data-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 33408,
+        "input_tokens": 51924,
+        "output_tokens": 1908,
+        "reasoning_output_tokens": 1088
+      }
+    },
+    {
+      "scope": "live/live-v2/office-invocation/response.json",
+      "assignment_id": "095c1d0c-3b01-4a88-a2c0-d5c5e76843d4",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/execution_verification.en.md",
+          "sha256": "sha256:588c63eb229971fa0adb08ec47dd9e8b67cf04498910a12574be8c17151c35bb"
+        },
+        {
+          "id": "orchestration/v0.1.0/data.en.md",
+          "sha256": "sha256:ac496f7c10e05ac33fe2769df4279acd77fab036cbcdba693904ea3ea36476ba"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 808,
+          "kind": "source",
+          "path": "inputs/calculation-oracle/check_calculation.py",
+          "sha256": "sha256:328e2e0351cfd19fc0b029787ed9867fb4b21612ba214d5bb7da8a99835727b3",
+          "source_id": "calculation-oracle"
+        },
+        {
+          "bytes": 341,
+          "kind": "candidate",
+          "path": "calculation.json",
+          "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:ec347034f9dd1b2573546d278d7b865b2e7e320ebcb79d0166cc6a20e071c569",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:a76474161fc7c3c4550d265bea7cb0a5ec8cfabedc9efb395145d2aff2720267",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "execution_verification",
+      "status": "completed",
+      "thread_sha256": "sha256:6336288530416dbbdbaeb46811360c575df87f899184d170fe2eb213409ccca7",
+      "unit_id": "data-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 33792,
+        "input_tokens": 52285,
+        "output_tokens": 1404,
+        "reasoning_output_tokens": 722
+      }
+    },
+    {
+      "scope": "live/live-v2/office-invocation/response.json",
+      "assignment_id": "d408f8cf-cbcf-4541-b82c-8261d5859640",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/production.en.md",
+          "sha256": "sha256:119ca693b91730508655b7ca942dad5d1035a5e94867e5b5c0f03f916ec8ea7f"
+        },
+        {
+          "id": "orchestration/v0.1.0/document.en.md",
+          "sha256": "sha256:1602c5003506d3ee0369fd2161894d073366e4bff70821533721a404c9232b2a"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 1996,
+          "kind": "source",
+          "path": "inputs/report-oracle/check_report.py",
+          "sha256": "sha256:1463e22a1475830499964da10ec539ad3616018abe643edf0e81f686f57c8e67",
+          "source_id": "report-oracle"
+        },
+        {
+          "bytes": 341,
+          "kind": "dependency",
+          "path": "calculation.json",
+          "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6",
+          "source_id": "data-production"
+        }
+      ],
+      "input_sha256": "sha256:7fc4f714cba0819e3bc56ae2b6cdd120f36bf11e5cf54d5dbca3b5dae4c9e717",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:0031052bf39a80187303f3512d7bcb8bc497c4789c5b26039073d2585b5dbe63",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "production",
+      "status": "completed",
+      "thread_sha256": "sha256:498ffeea172180e3404ee3b364e1f15694ef7dc0afe565ad44169a741997b6cb",
+      "unit_id": "document-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 33152,
+        "input_tokens": 52152,
+        "output_tokens": 1329,
+        "reasoning_output_tokens": 603
+      }
+    },
+    {
+      "scope": "live/live-v2/office-invocation/response.json",
+      "assignment_id": "4de7c1f8-902a-4e28-ba4f-11b2bd8821fd",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/review.en.md",
+          "sha256": "sha256:017758c1864b75671e09bd6206818673f12bb7205a8f305d88fed484365a6ef3"
+        },
+        {
+          "id": "orchestration/v0.1.0/document.en.md",
+          "sha256": "sha256:1602c5003506d3ee0369fd2161894d073366e4bff70821533721a404c9232b2a"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 1996,
+          "kind": "source",
+          "path": "inputs/report-oracle/check_report.py",
+          "sha256": "sha256:1463e22a1475830499964da10ec539ad3616018abe643edf0e81f686f57c8e67",
+          "source_id": "report-oracle"
+        },
+        {
+          "bytes": 341,
+          "kind": "dependency",
+          "path": "calculation.json",
+          "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6",
+          "source_id": "data-production"
+        },
+        {
+          "bytes": 485,
+          "kind": "candidate",
+          "path": "report.md",
+          "sha256": "sha256:6f9c5ba7890598222e4c3246f60379c89c463e4937ae8dc84b6246d578eba68b",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:e030c5e5392238061152baa4ace6857a0c2696e2c0bf0ee75e1668d603b0e307",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:50f915a0d5b25b16bfacab29e1ce35da35a910521380cfb494a45351a811cb99",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "review",
+      "status": "completed",
+      "thread_sha256": "sha256:483c5ac9d4292d7b682c2de6343962f1408878ddd3e931e5c45882f58ebc5845",
+      "unit_id": "document-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 71424,
+        "input_tokens": 93387,
+        "output_tokens": 3369,
+        "reasoning_output_tokens": 1391
+      }
+    },
+    {
+      "scope": "live/live-v2/office-invocation/response.json",
+      "assignment_id": "ef33bea4-0920-45df-b47d-20a174d9559f",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/execution_verification.en.md",
+          "sha256": "sha256:588c63eb229971fa0adb08ec47dd9e8b67cf04498910a12574be8c17151c35bb"
+        },
+        {
+          "id": "orchestration/v0.1.0/document.en.md",
+          "sha256": "sha256:1602c5003506d3ee0369fd2161894d073366e4bff70821533721a404c9232b2a"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 1996,
+          "kind": "source",
+          "path": "inputs/report-oracle/check_report.py",
+          "sha256": "sha256:1463e22a1475830499964da10ec539ad3616018abe643edf0e81f686f57c8e67",
+          "source_id": "report-oracle"
+        },
+        {
+          "bytes": 341,
+          "kind": "dependency",
+          "path": "calculation.json",
+          "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6",
+          "source_id": "data-production"
+        },
+        {
+          "bytes": 485,
+          "kind": "candidate",
+          "path": "report.md",
+          "sha256": "sha256:6f9c5ba7890598222e4c3246f60379c89c463e4937ae8dc84b6246d578eba68b",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:1618888e2f176f99b9a7f2cdc8b6e3d40a35792a0440ba102daf26bca79a4fd3",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:5b277be3b99a6a1a26cf86fe804973776e068a075e56a5a8014ad066ff2b7bec",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "execution_verification",
+      "status": "completed",
+      "thread_sha256": "sha256:89c6433cd24cc3b603b4c43f74d6d2687d5c4a623e135222108d0e6b937c1433",
+      "unit_id": "document-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 35840,
+        "input_tokens": 56202,
+        "output_tokens": 1725,
+        "reasoning_output_tokens": 872
+      }
+    },
+    {
+      "scope": "live/live-v2/software-invocation/response.json",
+      "assignment_id": "b9c10475-a144-4f27-baae-1cb28100f005",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/design.en.md",
+          "sha256": "sha256:e57c9096f7bcdc458a002747bd4a7f661c7d9ade90d479a9b3da5386e0085446"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 659,
+          "kind": "source",
+          "path": "inputs/design-oracle/check_design.py",
+          "sha256": "sha256:57619a579a4df2c0958a658e962c6d90a95ff9bd514e6a2260a013ed2206bb99",
+          "source_id": "design-oracle"
+        }
+      ],
+      "input_sha256": "sha256:86035c3d10c1fbe7d457e4781bcb7b044b9d5d2a47ebe06e231955b99c26d7b7",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:ee0cd12497259a52c76a4b8ab0307bbb0bc4e8ec7e64a4df6bd5162b2494257a",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "design",
+      "status": "completed",
+      "thread_sha256": "sha256:903d05e5941e9c3ea6808173ad6d74c6f47af7de72cc698f314263054f1a7cda",
+      "unit_id": "software-design",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 36480,
+        "input_tokens": 56159,
+        "output_tokens": 734,
+        "reasoning_output_tokens": 173
+      }
+    },
+    {
+      "scope": "live/live-v2/software-invocation/response.json",
+      "assignment_id": "7c1d7407-3b38-4378-b8fc-b462c51b1a95",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/review.en.md",
+          "sha256": "sha256:017758c1864b75671e09bd6206818673f12bb7205a8f305d88fed484365a6ef3"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 659,
+          "kind": "source",
+          "path": "inputs/design-oracle/check_design.py",
+          "sha256": "sha256:57619a579a4df2c0958a658e962c6d90a95ff9bd514e6a2260a013ed2206bb99",
+          "source_id": "design-oracle"
+        },
+        {
+          "bytes": 584,
+          "kind": "candidate",
+          "path": "design.json",
+          "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:da6791b3caf2199b6fefd0eca3a6a03c62bf36a2bd6071e1f8761d8a327a9b01",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:89a7c67d8e39cf4153eba380a794e743d1768e76a55f3730726058c22a32a41c",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "review",
+      "status": "completed",
+      "thread_sha256": "sha256:a3906415274b96233b156d73d01398488af62f209fca0fa403c610dc1d0fb35e",
+      "unit_id": "software-design",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 38400,
+        "input_tokens": 77981,
+        "output_tokens": 2220,
+        "reasoning_output_tokens": 996
+      }
+    },
+    {
+      "scope": "live/live-v2/software-invocation/response.json",
+      "assignment_id": "df51d2b9-d18a-46a3-ab0f-70cb5aa132ad",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/execution_verification.en.md",
+          "sha256": "sha256:588c63eb229971fa0adb08ec47dd9e8b67cf04498910a12574be8c17151c35bb"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 659,
+          "kind": "source",
+          "path": "inputs/design-oracle/check_design.py",
+          "sha256": "sha256:57619a579a4df2c0958a658e962c6d90a95ff9bd514e6a2260a013ed2206bb99",
+          "source_id": "design-oracle"
+        },
+        {
+          "bytes": 584,
+          "kind": "candidate",
+          "path": "design.json",
+          "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:2b8a9498e926b29ea84e2f1cdaf0ef7fd1ee821327bab376a5b1e2c19b1c773d",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:be45f460d8f0dcc54cd5a72939fa5622a701a36e473d45d5018c7ff5735f4eb2",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "execution_verification",
+      "status": "completed",
+      "thread_sha256": "sha256:e9d8c160713be89c1764e5717c2b02090922e081e258734493c2b0c16733267b",
+      "unit_id": "software-design",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 37248,
+        "input_tokens": 57509,
+        "output_tokens": 1132,
+        "reasoning_output_tokens": 558
+      }
+    },
+    {
+      "scope": "live/live-v2/software-invocation/response.json",
+      "assignment_id": "d0a0a953-5154-420a-b0b5-d71f2ba9fa59",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/review.en.md",
+          "sha256": "sha256:017758c1864b75671e09bd6206818673f12bb7205a8f305d88fed484365a6ef3"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 584,
+          "kind": "dependency",
+          "path": "design.json",
+          "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e",
+          "source_id": "software-design"
+        },
+        {
+          "bytes": 701,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:a383112c48b5909b6b3e7aa28983d09f81683f208dde3171896bb5334ee9a12a",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:1cd3617528762623dcaf957f92c18686dc7d2053651fc6c17ff615e060cd41bb",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:7a17326eb750b18b1d7c492535645edd8d46a7ad306f8f14ab10739c8813b5ed",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "assessment_contract_rejected",
+      "role": "review",
+      "status": "invalid_output",
+      "thread_sha256": "sha256:c2fb06c08774c0721b210bd2651a80d1e19d76432c69304fdc6deb809421e08a",
+      "unit_id": "software-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 37248,
+        "input_tokens": 59816,
+        "output_tokens": 2138,
+        "reasoning_output_tokens": 956
+      }
+    },
+    {
+      "scope": "live/live-v2/software-invocation/response.json",
+      "assignment_id": "70ea2996-1a00-4b11-8b7b-15282860ab8a",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/execution_verification.en.md",
+          "sha256": "sha256:588c63eb229971fa0adb08ec47dd9e8b67cf04498910a12574be8c17151c35bb"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 584,
+          "kind": "dependency",
+          "path": "design.json",
+          "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e",
+          "source_id": "software-design"
+        },
+        {
+          "bytes": 701,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:a383112c48b5909b6b3e7aa28983d09f81683f208dde3171896bb5334ee9a12a",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:bb8f60a64fb83cb43a952a89aaef3180876bca049cd31902a3148b4b6d38a281",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:aebee23b478b92010d9cbf1779fcace99d7ac90c8a72d0a18c28e22a2c815e03",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "assessment_contract_rejected",
+      "role": "execution_verification",
+      "status": "invalid_output",
+      "thread_sha256": "sha256:818dfc733654c8bd220b238ba8a24179d017be86b63b4ff3374354f245f54eaf",
+      "unit_id": "software-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 60032,
+        "input_tokens": 83178,
+        "output_tokens": 2610,
+        "reasoning_output_tokens": 1470
+      }
+    },
+    {
+      "scope": "live/live-v2/software-invocation/response.json",
+      "assignment_id": "f6710414-986a-4962-b85e-b6c4491c9697",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/production.en.md",
+          "sha256": "sha256:119ca693b91730508655b7ca942dad5d1035a5e94867e5b5c0f03f916ec8ea7f"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 584,
+          "kind": "dependency",
+          "path": "design.json",
+          "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e",
+          "source_id": "software-design"
+        },
+        {
+          "bytes": 701,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:a383112c48b5909b6b3e7aa28983d09f81683f208dde3171896bb5334ee9a12a",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:c4d67092d7cbea0436260ad32bbfcbb5e3ee7f0758ffaa1db94db06a8d39720b",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:e47e25075b02df554545aadf773d5ed7ba755041f0e6a9af0cf55a1598b5edc1",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "production",
+      "status": "completed",
+      "thread_sha256": "sha256:3288f8213df6fb4b07b027d5ac63aa8e38e1a75d6ffe96f914ee1a3f6e0cf9b1",
+      "unit_id": "software-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 82048,
+        "input_tokens": 106745,
+        "output_tokens": 3148,
+        "reasoning_output_tokens": 1145
+      }
+    },
+    {
+      "scope": "live/live-v2/software-invocation/response.json",
+      "assignment_id": "c4500aec-1110-4747-8647-70402f75c187",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/review.en.md",
+          "sha256": "sha256:017758c1864b75671e09bd6206818673f12bb7205a8f305d88fed484365a6ef3"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 584,
+          "kind": "dependency",
+          "path": "design.json",
+          "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e",
+          "source_id": "software-design"
+        },
+        {
+          "bytes": 488,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:77d00ba07ed8ea07152aae206d235a08119d0bfb6d640d76dc3bdcab4b81dd52",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:e3c8577f981046e5ad750866c94da4f3d3b41fb4d1ad17c0036643a782dd340c",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:f8b6edc5b06ca7eefaf3d99f041c13e5d819f08e004ace07dd075c6330676454",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "review",
+      "status": "completed",
+      "thread_sha256": "sha256:79bd6d44ec5aa1ee1dd0bb657671fe0bf7670172ce4e1919885336d2a558cfea",
+      "unit_id": "software-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 77184,
+        "input_tokens": 100851,
+        "output_tokens": 2586,
+        "reasoning_output_tokens": 1132
+      }
+    },
+    {
+      "scope": "live/live-v2/software-invocation/response.json",
+      "assignment_id": "24feba96-6f99-4886-857a-24014acf121f",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/execution_verification.en.md",
+          "sha256": "sha256:588c63eb229971fa0adb08ec47dd9e8b67cf04498910a12574be8c17151c35bb"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 584,
+          "kind": "dependency",
+          "path": "design.json",
+          "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e",
+          "source_id": "software-design"
+        },
+        {
+          "bytes": 488,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:77d00ba07ed8ea07152aae206d235a08119d0bfb6d640d76dc3bdcab4b81dd52",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:f93d0a995fa4a3d51d6335d8a8fd9b92642b402215c7ff218c1425b67dd62179",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:0c07a7b66e8633984c540bbbd228d43f42b4d1842c8355dc100f192863ef2b90",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "execution_verification",
+      "status": "completed",
+      "thread_sha256": "sha256:7ed9eba24625a092156b2714f81e479a400466e5fb0404b7645a3ef56d6a0a71",
+      "unit_id": "software-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 37760,
+        "input_tokens": 59487,
+        "output_tokens": 1799,
+        "reasoning_output_tokens": 1085
+      }
+    },
+    {
+      "scope": "live/live-v3/repair-invocation/response.json",
+      "assignment_id": "7235bfc6-5650-4dda-b6a0-030ee664f67d",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/review.en.md",
+          "sha256": "sha256:58f015f608afdaed34e4efefbf3782c4de57ed83eeb27545711436805f4df09a"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 584,
+          "kind": "source",
+          "path": "inputs/accepted-design/accepted-design.json",
+          "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e",
+          "source_id": "accepted-design"
+        },
+        {
+          "bytes": 701,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:a383112c48b5909b6b3e7aa28983d09f81683f208dde3171896bb5334ee9a12a",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:f603b12fe5e2d1db93ecfdebe2e637ae6dc1a13201f2684e1892a797e6036683",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:f26600dd09aa50f5e8abf199ee0ba9bf72725eff05812e619c19054dfd1929c8",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "review",
+      "status": "completed",
+      "thread_sha256": "sha256:ad586c8331e89f5a3c4602972a947d7473c7acc87a7b9007135c8857835ffec0",
+      "unit_id": "software-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 38016,
+        "input_tokens": 60712,
+        "output_tokens": 2041,
+        "reasoning_output_tokens": 824
+      }
+    },
+    {
+      "scope": "live/live-v3/repair-invocation/response.json",
+      "assignment_id": "bd56181d-0377-43ab-976d-358cdc91f11d",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/execution_verification.en.md",
+          "sha256": "sha256:c51aaeaf4186402c7fd791ee66c887bb9dd7ff849765afb9cefea79cef656ad6"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 584,
+          "kind": "source",
+          "path": "inputs/accepted-design/accepted-design.json",
+          "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e",
+          "source_id": "accepted-design"
+        },
+        {
+          "bytes": 701,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:a383112c48b5909b6b3e7aa28983d09f81683f208dde3171896bb5334ee9a12a",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:c6198aed9d2083b267a1383466d01465074d70a545bdaf10b12cfd8d2a75529a",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:f459c173201b475afb92921c47c0b03283dab393892cfae39a4c99ff34f8d18a",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "execution_verification",
+      "status": "completed",
+      "thread_sha256": "sha256:2461d9ce0f1100250d8430ec799d2d04f69ac69e32310df505988ffd3da76b16",
+      "unit_id": "software-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 59904,
+        "input_tokens": 82378,
+        "output_tokens": 1860,
+        "reasoning_output_tokens": 826
+      }
+    },
+    {
+      "scope": "live/live-v3/repair-invocation/response.json",
+      "assignment_id": "e1990919-0160-4204-a40a-c25e4f9fc179",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/production.en.md",
+          "sha256": "sha256:119ca693b91730508655b7ca942dad5d1035a5e94867e5b5c0f03f916ec8ea7f"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 584,
+          "kind": "source",
+          "path": "inputs/accepted-design/accepted-design.json",
+          "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e",
+          "source_id": "accepted-design"
+        },
+        {
+          "bytes": 701,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:a383112c48b5909b6b3e7aa28983d09f81683f208dde3171896bb5334ee9a12a",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:4e2fe32dabbfee1827f98443a18cc3356b0dc393097b5ca58ffb67449e3ac705",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:14bc8d134a897d0c886cfdb56d6ba33524376535ba5f12add872bbde6d6c8f34",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "production",
+      "status": "completed",
+      "thread_sha256": "sha256:ef98c26ef73410a2107081499da4e0aafe2fe6eb5e70df68d03c1f250689c72d",
+      "unit_id": "software-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 86272,
+        "input_tokens": 112163,
+        "output_tokens": 3589,
+        "reasoning_output_tokens": 967
+      }
+    },
+    {
+      "scope": "live/live-v3/repair-invocation/response.json",
+      "assignment_id": "34465bd0-b07d-4f86-a366-3dcb07c68cc4",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/review.en.md",
+          "sha256": "sha256:58f015f608afdaed34e4efefbf3782c4de57ed83eeb27545711436805f4df09a"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 584,
+          "kind": "source",
+          "path": "inputs/accepted-design/accepted-design.json",
+          "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e",
+          "source_id": "accepted-design"
+        },
+        {
+          "bytes": 488,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:77d00ba07ed8ea07152aae206d235a08119d0bfb6d640d76dc3bdcab4b81dd52",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:0d38183b01f24f594f19552964ce3dc4075b46d382750e2f1bbf7d6b13aedd38",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:ac49abf121445afb3af7531d448e88fc8511ff71720969fa56e1fce511f3865b",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "review",
+      "status": "completed",
+      "thread_sha256": "sha256:afb04984b5cdf8a15cbbf0c14d544cbb32336ce54bd14a4db01d7d7d108b35a0",
+      "unit_id": "software-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 37760,
+        "input_tokens": 59606,
+        "output_tokens": 1790,
+        "reasoning_output_tokens": 829
+      }
+    },
+    {
+      "scope": "live/live-v3/repair-invocation/response.json",
+      "assignment_id": "107710d5-1f54-4b41-a159-c542f64d3c88",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/execution_verification.en.md",
+          "sha256": "sha256:c51aaeaf4186402c7fd791ee66c887bb9dd7ff849765afb9cefea79cef656ad6"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 584,
+          "kind": "source",
+          "path": "inputs/accepted-design/accepted-design.json",
+          "sha256": "sha256:9ac8025c6a8d3d97be6d26acc6838e48920673c144c2c595b1e45f33a072b45e",
+          "source_id": "accepted-design"
+        },
+        {
+          "bytes": 488,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:77d00ba07ed8ea07152aae206d235a08119d0bfb6d640d76dc3bdcab4b81dd52",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:efe193a233f53043c8578d4fe8664d2a9c843840d844f179e382d82f2cd2b3bc",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:e3022ccc2a808ff903c024422f16a63713e5aa24fdefbdbe6e3fd33f0a346ade",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "execution_verification",
+      "status": "completed",
+      "thread_sha256": "sha256:5235a250fbb57bfba0cb093806e3c57d1c5871b83108c42e68985c572f4cbad9",
+      "unit_id": "software-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 60544,
+        "input_tokens": 83658,
+        "output_tokens": 1541,
+        "reasoning_output_tokens": 622
+      }
+    },
+    {
+      "scope": "diagnostics/assessment-diagnostic-v1/result.json",
+      "assignment_id": "c1945a98-cc9c-417f-9a97-da90ea16631a",
+      "unit_id": "software-production",
+      "role": "review",
+      "input_sha256": "sha256:3d617a3dcf50baacbaa337ad92bfb172b55aeb87be64701a553c273cac09774c",
+      "output_sha256": "sha256:453a7caedd45774f9e14016884bd93bef88006e12d4fc32ac818f031af9f4371",
+      "thread_sha256": "sha256:eee15fc92fae08eb12afc93e4662c4a7d77db227430cb5b68ee35ed86e0016d4",
+      "model": {
+        "name": "gpt-6-astra",
+        "effort": "max"
+      },
+      "status": "completed",
+      "usage": {
+        "input_tokens": 105625,
+        "cached_input_tokens": 79488,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4248,
+        "reasoning_output_tokens": 1924
+      },
+      "provider_error_events": 0,
+      "failed_turn_events": 0,
+      "process_exit_code": 0,
+      "backend_attempts": null,
+      "reason": "structured_result",
+      "semantic_contract_accepted": false
+    },
+    {
+      "scope": "diagnostics/transport-diagnostic-v1/result.json",
+      "role": "schema_diagnostic",
+      "model": {
+        "name": "gpt-6-astra",
+        "effort": "max"
+      },
+      "status": "failed",
+      "usage": {
+        "input_tokens": null,
+        "cached_input_tokens": null,
+        "cache_write_input_tokens": null,
+        "output_tokens": null,
+        "reasoning_output_tokens": null
+      },
+      "thread_sha256": "a26cc691ff8b7963d8aa46c5afd47c0faedd6b716aba4b2000840e4ad128cc5d",
+      "process_exit_code": 1
+    },
+    {
+      "scope": "diagnostics/transport-diagnostic-v2/assessment.result.json",
+      "role": "schema_diagnostic_assessment",
+      "model": {
+        "name": "gpt-6-astra",
+        "effort": "max"
+      },
+      "status": "completed",
+      "usage": {
+        "input_tokens": 14154,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 204,
+        "reasoning_output_tokens": 52
+      },
+      "thread_sha256": "aa2980f8763639acea3424a6c41c35850935a3189bf835fb9cf789e1ce150696",
+      "process_exit_code": 0
+    },
+    {
+      "scope": "diagnostics/transport-diagnostic-v2/candidate.result.json",
+      "role": "schema_diagnostic_candidate",
+      "model": {
+        "name": "gpt-6-astra",
+        "effort": "max"
+      },
+      "status": "completed",
+      "usage": {
+        "input_tokens": 13902,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 93,
+        "reasoning_output_tokens": 25
+      },
+      "thread_sha256": "05ad460e7033712d0accdfe53dfe4c7ae63778581733c5028b0b1ecb5300da43",
+      "process_exit_code": 0
+    }
+  ],
+  "development_agent_usage": null,
+  "primary_usage": null,
+  "billed_cost": null,
+  "limitations": [
+    "Cached input is included in input_tokens; reasoning output is included in output_tokens. Do not add subsets again.",
+    "Missing terminal usage remains null and is excluded from measured sums, never treated as zero.",
+    "Configured model/effort is not independent backend attestation.",
+    "Opaque tool_items in transport diagnostics is not a tool-call count. No complete action count is available.",
+    "Development-agent and primary reasoning costs are outside the measured evaluation calls."
+  ]
+}

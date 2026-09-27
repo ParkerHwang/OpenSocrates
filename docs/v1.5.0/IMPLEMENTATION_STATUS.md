@@ -1,5 +1,15 @@
 # v1.5.0 release-candidate status
 
+The [specialized orchestration revision](15-specialized-orchestration.md) adds an
+explicit optional command for owned design/production units, fresh independent
+review and execution verification, bounded repair and primary final integration.
+The [qualification report](../../evals/v1.5/orchestration/v1/REPORT.md) records
+source/native gates, actual software and data-to-document workflows, Korean
+continuation, all failed attempts and usage. It qualifies a bounded text-artifact
+adapter on macOS with `codex-cli 0.158.0-alpha.2`; it does not establish broad
+quality improvement or change the active installation. Older results below retain
+their original source/package boundaries.
+
 The [coding-specialist revision](14-coding-specialists.md) is complete through
 source/native qualification and bounded practical checks. It adds a separate
 provisional static v0.1.1 library (EN/KO/zh-CN) that can be primary for an unresolved

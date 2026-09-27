@@ -1,0 +1,59 @@
+{
+  "schema": "opensocrates.orchestration.development-agent-accounting/1",
+  "source": "Only spawn/followup function metadata from this development session; no prompt or reasoning body retained.",
+  "fresh_contexts": 5,
+  "delegated_turns": 23,
+  "turn_counts": {
+    "orchestration_design": 1,
+    "orchestration_design_review": 2,
+    "orchestration_maker": 6,
+    "orchestration_verifier": 9,
+    "orchestration_code_review": 5
+  },
+  "assignments": [
+    {
+      "role": "orchestration_design",
+      "model": null,
+      "effort": null,
+      "context": "none",
+      "source": "spawn tool arguments"
+    },
+    {
+      "role": "orchestration_design_review",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "context": "none",
+      "source": "spawn tool arguments"
+    },
+    {
+      "role": "orchestration_maker",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "context": "none",
+      "source": "spawn tool arguments"
+    },
+    {
+      "role": "orchestration_verifier",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "context": "none",
+      "source": "spawn tool arguments"
+    },
+    {
+      "role": "orchestration_code_review",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "context": "none",
+      "source": "spawn tool arguments"
+    }
+  ],
+  "primary_model": {
+    "name": "gpt-6-astra",
+    "effort": "max",
+    "source": "turn context observed at task start"
+  },
+  "per_agent_token_usage": null,
+  "primary_token_usage": null,
+  "known_interruption": "One code-review recheck turn was automatically safety-screened. Blocked filesystem probes were not retried; subsequent code review was static only, separately from execution verification.",
+  "scope": "Development collaboration is separate from actual runtime evaluation model invocations. No stronger model or role-specific substitution."
+}

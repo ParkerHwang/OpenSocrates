@@ -172,3 +172,13 @@ Actual model behavior, host delivery, native packaging and quality benefit requi
 their own exact-version evidence. The implementation uses documented
 [noninteractive Codex primitives](https://learn.chatgpt.com/docs/non-interactive-mode);
 that documentation does not substitute for real host acceptance.
+
+## Bounded qualification evidence
+
+The [versioned qualification report](../evals/v1.5/orchestration/v1/REPORT.md)
+contains the fixed software design/repair, calculation-to-document and Korean
+continuation cases, independent checks, preserved failures and exposed usage.
+These are synthetic correctness examples on the documented client, not a quality
+benchmark or evidence of active-plugin installation. Each finding's `location`
+must equal its owned current candidate path exactly; place optional line/range
+details in `reproduction`. The runtime keeps exact path/hash/requirement binding.

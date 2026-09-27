@@ -1,0 +1,121 @@
+{
+  "calls": [
+    {
+      "assignment_id": "7af15b2f-06e7-4d11-a1c7-67c579d77f54",
+      "backend_attempts": null,
+      "failed_turn_events": 1,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/design.en.md",
+          "sha256": "sha256:e57c9096f7bcdc458a002747bd4a7f661c7d9ade90d479a9b3da5386e0085446"
+        },
+        {
+          "id": "orchestration/v0.1.0/software.en.md",
+          "sha256": "sha256:b202cd6356bec9bd78e08d54894b8e64836aee8d4de47a3ddc35f01d6c73efe8"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/router.en.md",
+          "sha256": "sha256:3e4b3c33072d02270331f3583f13d0169910912abec9bc32736cbc953947e5c4"
+        },
+        {
+          "id": "coding-specialists/v0.1.1/contracts.en.md",
+          "sha256": "sha256:e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1610,
+          "kind": "source",
+          "path": "inputs/design-contract/design_contract.md",
+          "sha256": "sha256:d57da0394dde313585bb4f76e4e19c76d96e19bc5ce4d11e46d315516ede3fcb",
+          "source_id": "design-contract"
+        },
+        {
+          "bytes": 659,
+          "kind": "source",
+          "path": "inputs/design-oracle/check_design.py",
+          "sha256": "sha256:57619a579a4df2c0958a658e962c6d90a95ff9bd514e6a2260a013ed2206bb99",
+          "source_id": "design-oracle"
+        }
+      ],
+      "input_sha256": "sha256:34b62e0780d7051983202ff32fec701b066c32b23c96253ce304d2adb0cfae27",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": null,
+      "process_exit_code": 1,
+      "provider_error_events": 1,
+      "reason": "model_process_failed",
+      "role": "design",
+      "status": "failed",
+      "thread_sha256": "sha256:437cc05735ab1dc1ff0b83cb3ca19237bf88462f630f636dddfab7f72598792f",
+      "unit_id": "software-design",
+      "usage": {
+        "cache_write_input_tokens": null,
+        "cached_input_tokens": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_output_tokens": null
+      }
+    }
+  ],
+  "client_sha256": "sha256:c3e30211bd454da70ceb4d9cbc2e05fe6466812ab05c311c3bbff6addeb14202",
+  "client_version": "codex-cli 0.158.0-alpha.2",
+  "integration": "pending_primary_reconciliation",
+  "limitations": [
+    "primary_classification_and_authorization_are_caller_attributed",
+    "configured_model_tuple_not_backend_attestation",
+    "fresh_context_not_account_or_all_filesystem_read_isolation",
+    "read_only_checks_network_disabled_no_scratch_writes",
+    "public_findings_are_model_judgments_with_exact_artifact_binding",
+    "no_raw_prompt_event_reasoning_or_check_output_retention",
+    "candidate_only_primary_must_recheck_affected_final_project_bytes",
+    "no_memory_enrollment_capture_or_schema_migration"
+  ],
+  "memory_snapshot_sha256": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "memory_status": "not_requested",
+  "model": {
+    "effort": "max",
+    "name": "gpt-6-astra"
+  },
+  "plan_sha256": "sha256:3ff26adc86fb119b6c8a6556370ce02c5e2b246412ab21a55ab84683bc333b61",
+  "publication": {
+    "completed_files": [],
+    "location_verified": false,
+    "pending_path": null,
+    "status": "not_started"
+  },
+  "run_id": "35691418-b20a-42e4-9fc7-a2950f557028",
+  "schema": "opensocrates.orchestration.response/1.0.0",
+  "status": "blocked",
+  "units": [
+    {
+      "reason": "maker_unavailable",
+      "required_open": [
+        "software-design-acceptance"
+      ],
+      "status": "unavailable",
+      "unit_id": "software-design",
+      "versions": []
+    },
+    {
+      "reason": "required_dependency_unqualified",
+      "required_open": [
+        "software-production-acceptance"
+      ],
+      "status": "blocked_dependency",
+      "unit_id": "software-production",
+      "versions": []
+    }
+  ]
+}

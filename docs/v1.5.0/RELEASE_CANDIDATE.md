@@ -1,5 +1,17 @@
 # OpenSocrates 1.5.0 release-candidate handoff
 
+The newest [specialized orchestration qualification](../../evals/v1.5/orchestration/v1/REPORT.md)
+adds explicit optional domain/role plans, independently reviewed design and
+production, actual read-only checks, fresh execution verification and bounded
+repair. The primary retains user intent, permissions and final integration.
+[Current validation](../../evals/v1.5/orchestration/v1/validation.json) binds the
+qualified product commit, 587 runtime/package inputs and current local ZIP
+`4a49fb8cffe7d81a26fb28d04c86cd0affbb9e3a42babdd61dfc980db615917a`.
+Its real client adapter is initially qualified only on macOS with
+`codex-cli 0.158.0-alpha.2`. Earlier ZIP identities and results below are historical;
+no new general quality, billing or account-isolation claim is made. PR #95 remains
+Draft and the active plugin remains unchanged.
+
 The [new coding-specialist qualification](../../evals/v1.5/coding-specialists/revision-v1/REPORT.md)
 adds three separately versioned provisional procedures with EN/KO/zh-CN static
 content and specialist-primary routing. No general-method prerequisite or native

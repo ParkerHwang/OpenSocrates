@@ -1,0 +1,319 @@
+{
+  "product_commit": "7893996357b7fcfaa058e91d4bc2694d5f1cb63c",
+  "scope": "Narrow structural/semantic schema compatibility, changed package members, and audit of preserved v1/diagnostic records only. No model calls or live-v2 reads.",
+  "schema_deltas": [
+    {
+      "path": "schemas/v1/orchestration-assessment.schema.json",
+      "old_sha256": "891ba83b33e89cf233ab48047b326dcb44017651ecbe9473638c6301e19e87e5",
+      "new_sha256": "bdf31171b9218c66e54188bba5ba3cd93781b1ad6422be22f0bc6cc9b2215806",
+      "only_redundant_type_additions": true,
+      "delta": [
+        {
+          "path": "$.properties.findings.items.properties.severity.type",
+          "type": "string"
+        },
+        {
+          "path": "$.properties.obligations.items.properties.status.type",
+          "type": "string"
+        },
+        {
+          "path": "$.properties.schema.type",
+          "type": "string"
+        },
+        {
+          "path": "$.properties.verdict.type",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "path": "schemas/v1/orchestration-assignment.schema.json",
+      "old_sha256": "985dc6fa015521f5c60e8a13bfe709a77342e9c0c11909b948832f88ebe73f6a",
+      "new_sha256": "5a8f59d2575244e57960199976b4aac0bfd601478c33a7ae66f1ae9321febdaf",
+      "only_redundant_type_additions": true,
+      "delta": [
+        {
+          "path": "$.properties.repair_findings.items.properties.severity.type",
+          "type": "string"
+        },
+        {
+          "path": "$.properties.repair_obligations.items.properties.status.type",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "path": "schemas/v1/orchestration-candidate.schema.json",
+      "old_sha256": "a9edadcede1549acd794c37b3a7cc0e59e9cb380f01afc5c243146e2bb286184",
+      "new_sha256": "ca1723ca92f334a02b8310cd7029ffd12b6d64fc91c61ab46d910cbd21af4544",
+      "only_redundant_type_additions": true,
+      "delta": [
+        {
+          "path": "$.properties.blocked_reason.type",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        {
+          "path": "$.properties.schema.type",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "path": "schemas/v1/orchestration-response.schema.json",
+      "old_sha256": "e2e1f2136e120a982830d4490c08f7c4240481854efbed8620564505f9f48fee",
+      "new_sha256": "50d0a3c8982f40760be0d67e6593015894e8a80d9302385df0d43e0c6aacee79",
+      "only_redundant_type_additions": true,
+      "delta": [
+        {
+          "path": "$.properties.units.items.properties.versions.items.properties.review.anyOf[1].properties.findings.items.properties.severity.type",
+          "type": "string"
+        },
+        {
+          "path": "$.properties.units.items.properties.versions.items.properties.review.anyOf[1].properties.obligations.items.properties.status.type",
+          "type": "string"
+        },
+        {
+          "path": "$.properties.units.items.properties.versions.items.properties.review.anyOf[1].properties.schema.type",
+          "type": "string"
+        },
+        {
+          "path": "$.properties.units.items.properties.versions.items.properties.review.anyOf[1].properties.verdict.type",
+          "type": "string"
+        },
+        {
+          "path": "$.properties.units.items.properties.versions.items.properties.verification.anyOf[1].properties.findings.items.properties.severity.type",
+          "type": "string"
+        },
+        {
+          "path": "$.properties.units.items.properties.versions.items.properties.verification.anyOf[1].properties.obligations.items.properties.status.type",
+          "type": "string"
+        },
+        {
+          "path": "$.properties.units.items.properties.versions.items.properties.verification.anyOf[1].properties.schema.type",
+          "type": "string"
+        },
+        {
+          "path": "$.properties.units.items.properties.versions.items.properties.verification.anyOf[1].properties.verdict.type",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "provider_output_shapes": {
+    "candidate": {
+      "schema_node_count": 8,
+      "untyped_schema_nodes": [],
+      "nonclosed_objects": []
+    },
+    "assessment": {
+      "schema_node_count": 26,
+      "untyped_schema_nodes": [],
+      "nonclosed_objects": []
+    }
+  },
+  "deepcopy_alias_checks": {
+    "candidate_and_assessment_disjoint": true,
+    "candidate_and_legacy_disjoint": true,
+    "assessment_and_legacy_disjoint": true,
+    "legacy_serialization_unchanged_after_mutation": true
+  },
+  "old_generated_schema_count": 47,
+  "old_generated_schema_mismatches": [],
+  "runtime_guide_launcher_changes": [],
+  "changed_package_members": [
+    {
+      "path": "schemas/v1/orchestration-assessment.schema.json",
+      "layer": "outer",
+      "sha256": "bdf31171b9218c66e54188bba5ba3cd93781b1ad6422be22f0bc6cc9b2215806",
+      "matches_git": true,
+      "matches_manifest": true
+    },
+    {
+      "path": "runtime/darwin-arm64/opensocrates-runtime/_internal/schemas/v1/orchestration-assessment.schema.json",
+      "layer": "native_internal",
+      "sha256": "bdf31171b9218c66e54188bba5ba3cd93781b1ad6422be22f0bc6cc9b2215806",
+      "matches_git": true,
+      "matches_manifest": true
+    },
+    {
+      "path": "schemas/v1/orchestration-assignment.schema.json",
+      "layer": "outer",
+      "sha256": "5a8f59d2575244e57960199976b4aac0bfd601478c33a7ae66f1ae9321febdaf",
+      "matches_git": true,
+      "matches_manifest": true
+    },
+    {
+      "path": "runtime/darwin-arm64/opensocrates-runtime/_internal/schemas/v1/orchestration-assignment.schema.json",
+      "layer": "native_internal",
+      "sha256": "5a8f59d2575244e57960199976b4aac0bfd601478c33a7ae66f1ae9321febdaf",
+      "matches_git": true,
+      "matches_manifest": true
+    },
+    {
+      "path": "schemas/v1/orchestration-candidate.schema.json",
+      "layer": "outer",
+      "sha256": "ca1723ca92f334a02b8310cd7029ffd12b6d64fc91c61ab46d910cbd21af4544",
+      "matches_git": true,
+      "matches_manifest": true
+    },
+    {
+      "path": "runtime/darwin-arm64/opensocrates-runtime/_internal/schemas/v1/orchestration-candidate.schema.json",
+      "layer": "native_internal",
+      "sha256": "ca1723ca92f334a02b8310cd7029ffd12b6d64fc91c61ab46d910cbd21af4544",
+      "matches_git": true,
+      "matches_manifest": true
+    },
+    {
+      "path": "schemas/v1/orchestration-response.schema.json",
+      "layer": "outer",
+      "sha256": "50d0a3c8982f40760be0d67e6593015894e8a80d9302385df0d43e0c6aacee79",
+      "matches_git": true,
+      "matches_manifest": true
+    },
+    {
+      "path": "runtime/darwin-arm64/opensocrates-runtime/_internal/schemas/v1/orchestration-response.schema.json",
+      "layer": "native_internal",
+      "sha256": "50d0a3c8982f40760be0d67e6593015894e8a80d9302385df0d43e0c6aacee79",
+      "matches_git": true,
+      "matches_manifest": true
+    }
+  ],
+  "original_live_v1": [
+    {
+      "workflow": "software",
+      "response_sha256": "40fd30ac7e78b64d845ea638615eea0a88706b08c7379a80abfe671d9e85b2c9",
+      "request_digest_matches_manifest": true,
+      "plan_digest_matches_request": true,
+      "stdout_digest_reconciles": true,
+      "configured_model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "coordinator_exit": 0,
+      "status": "blocked",
+      "role_calls": 1,
+      "failed_call": true,
+      "role_process_exit": 1,
+      "provider_errors": 1,
+      "failed_turns": 1,
+      "all_usage_unknown": true,
+      "candidate_root_exists": false,
+      "artifact_versions": 0,
+      "publication": {
+        "completed_files": [],
+        "location_verified": false,
+        "pending_path": null,
+        "status": "not_started"
+      },
+      "dependent_state": "blocked_dependency"
+    },
+    {
+      "workflow": "office",
+      "response_sha256": "b4e76e5a8fc1967b47c9ef0746eb7de620f5f2f1dfafee8ad34cd03e9f40b406",
+      "request_digest_matches_manifest": true,
+      "plan_digest_matches_request": true,
+      "stdout_digest_reconciles": true,
+      "configured_model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "coordinator_exit": 0,
+      "status": "blocked",
+      "role_calls": 1,
+      "failed_call": true,
+      "role_process_exit": 1,
+      "provider_errors": 1,
+      "failed_turns": 1,
+      "all_usage_unknown": true,
+      "candidate_root_exists": false,
+      "artifact_versions": 0,
+      "publication": {
+        "completed_files": [],
+        "location_verified": false,
+        "pending_path": null,
+        "status": "not_started"
+      },
+      "dependent_state": "blocked_dependency"
+    }
+  ],
+  "diagnostic_v1": {
+    "result_sha256": "63b6d0184e47f874d892ec6adf7ebf01849626e40cbafee1ea2a317a484fdc87",
+    "exit_code": 1,
+    "usage": null,
+    "schema_digest_matches_old_candidate": true,
+    "schema_digest_serialization": "json.dumps default separators, no terminal newline; v2 uses canonical compact JSON",
+    "invalid_json_schema_400_and_type_message": true
+  },
+  "diagnostic_v2": [
+    {
+      "kind": "candidate",
+      "result_sha256": "95870395acfbba7a97bc85971c63e100e2f2524a58c2f5ee09febfe4559f3947",
+      "schema_digest_matches_committed_output": true,
+      "exit_code": 0,
+      "turn_completed": true,
+      "schema_valid_reported": true,
+      "matches_stipulated_reported": true,
+      "output_sha256": "a11162098f7988cc4c5e602d84c8d875547b67403060479971f54eb17c80dfc7",
+      "usage": {
+        "input_tokens": 13902,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 93,
+        "reasoning_output_tokens": 25
+      },
+      "configured_model": {
+        "name": "gpt-6-astra",
+        "effort": "max"
+      },
+      "opaque_completed_item_count": 1,
+      "qualification": "Opaque completed non-agent_message/non-reasoning items; raw item types not retained. Not verified tool-call counts or evidence of a no-tools violation. Output bodies not retained; reported output validation cannot be independently rerun from these receipts."
+    },
+    {
+      "kind": "assessment",
+      "result_sha256": "50a9fc8b66c53df6a71d9c83484c0d4fc75680a5d28771db7b4af72431a8e733",
+      "schema_digest_matches_committed_output": true,
+      "exit_code": 0,
+      "turn_completed": true,
+      "schema_valid_reported": true,
+      "matches_stipulated_reported": true,
+      "output_sha256": "09d74505dc80695acffb2b72008a1b8333366bea508b578affe6a8fc47bd24fd",
+      "usage": {
+        "input_tokens": 14154,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 204,
+        "reasoning_output_tokens": 52
+      },
+      "configured_model": {
+        "name": "gpt-6-astra",
+        "effort": "max"
+      },
+      "opaque_completed_item_count": 1,
+      "qualification": "Opaque completed non-agent_message/non-reasoning items; raw item types not retained. Not verified tool-call counts or evidence of a no-tools violation. Output bodies not retained; reported output validation cannot be independently rerun from these receipts."
+    }
+  ],
+  "accounting": {
+    "original_live_failed_calls": 2,
+    "diagnostic_v1_failed_calls": 1,
+    "diagnostic_v2_completed_calls": 2,
+    "distinct_recorded_threads": 5,
+    "known_reported_usage_for_two_v2_diagnostics_only": {
+      "input_tokens": 28056,
+      "cached_input_tokens": 0,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 297,
+      "reasoning_output_tokens": 77
+    },
+    "usage_unknown_calls": 3,
+    "billing_and_backend_attempts": "not established"
+  },
+  "qualifications": [
+    "The original coordinator exit 0 did not establish workflow success: both responses are blocked with one failed role each and no artifacts.",
+    "The separate API400 diagnostic reproduces the old output-schema type omission; original aggregate role receipts do not independently contain that exact provider message.",
+    "Transport-diagnostic-v2 completion is not software/office/continuation workflow acceptance.",
+    "Raw diagnostic output bodies/item types were deliberately not retained; preserve validation and item-classification limits."
+  ]
+}

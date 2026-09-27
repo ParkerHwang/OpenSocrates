@@ -1,0 +1,78 @@
+{
+  "schema": "independent-static-affected-review/1.0",
+  "repository": "$REPO",
+  "reviewed_commit": "53c5e2b1fca630e30da3e4117ed819e1b770682c",
+  "prior_review_commit": "ca95b2415621921b24d311133522ddf2faec5c30",
+  "governing_contract": "docs/v1.5.0/15-specialized-orchestration.md",
+  "governing_contract_sha256": "a7b8264416f89d1b8aa9d0aa7e95366337e0ab42e10c755a6f80e3b606bade99",
+  "review_type": "static_source_and_diff_only_after_scope_narrowing",
+  "verdict": "prior_findings_resolved_in_source_no_new_blocker_identified_in_affected_scope",
+  "production_source_modified": false,
+  "model_calls": 0,
+  "new_execution_after_scope_narrowing": false,
+  "separate_execution_verifier_results_used_as_own_evidence": false,
+  "scope_change": "The parent reported automatic safety screening of the preceding review turn and requested a narrower static review. No filesystem reproduction or mutation script was retried after that instruction. Earlier attempted recheck artifacts and the original ca95 review remain preserved; they are not the basis for this static verdict.",
+  "resolutions": [
+    {
+      "finding": "R1",
+      "original_priority": "P1",
+      "status": "resolved_in_source",
+      "requirement": "The coordinator publishes only new declared candidates outside the source project, using the approved directory identity.",
+      "locations": [
+        {"file": "src/opensocrates/orchestration/runtime.py", "lines": [189, 195]},
+        {"file": "src/opensocrates/orchestration/paths.py", "lines": [170, 241]},
+        {"file": "src/opensocrates/orchestration/paths.py", "lines": [304, 373]},
+        {"file": "src/opensocrates/orchestration/runtime.py", "lines": [618, 653]}
+      ],
+      "source_evidence": "Initialization holds source/output ancestry and rechecks separation. Publication creates descendants relative to the retained directory descriptors; it no longer resolves the caller target string again for writing. Component opens reject symlinks, identity checks compare directory descriptors with their parent-relative entries, and new files use exclusive non-following creation. Publication rereads final bytes before setting complete/location_verified. Initialization, child creation, publication and final coordinator cleanup close retained capabilities.",
+      "limit": "This source conclusion addresses the reported ordinary ownership/publication defect. It is not a universal filesystem-isolation guarantee, OS-level race certification or live-client result."
+    },
+    {
+      "finding": "R2",
+      "original_priority": "P2",
+      "status": "resolved_in_source",
+      "requirement": "Cancellation and handled operational failures retain accumulated run/call/version/check evidence and distinguish publication state.",
+      "locations": [
+        {"file": "src/opensocrates/orchestration/runtime.py", "lines": [655, 688]},
+        {"file": "src/opensocrates/orchestration/runtime.py", "lines": [721, 767]},
+        {"file": "src/opensocrates/orchestration/runtime.py", "lines": [770, 782]},
+        {"file": "src/opensocrates/cli/orchestration.py", "lines": [24, 30]}
+      ],
+      "source_evidence": "Coordinator.run catches cancellation and operational exceptions around the whole run and mutates the existing result through _interrupted rather than constructing an empty response. Existing calls, usage, unit versions and checks remain in that result. Initialization failures after plan validation preserve run_id. Publication tracks not_started/incomplete/complete, completed file identities and pending_path; integration_pending requires complete and location_verified. The CLI returns operational exit 3 for cancelled as well as unavailable, and both launchers include the new closed publication object.",
+      "limit": "The claim covers accumulated in-memory receipts and handled exceptions. It does not promise persistence after abrupt process death, power loss or an uncatchable termination."
+    },
+    {
+      "finding": "R3",
+      "original_priority": "P2",
+      "status": "resolved_in_source",
+      "requirement": "The fresh designated maker receives bounded exact-version failed/unknown obligation evidence, without contaminating independent reviewer/verifier contexts.",
+      "locations": [
+        {"file": "src/opensocrates/orchestration/runtime.py", "lines": [359, 367]},
+        {"file": "src/opensocrates/orchestration/runtime.py", "lines": [495, 532]},
+        {"file": "src/opensocrates/orchestration/runtime.py", "lines": [567, 591]},
+        {"file": "schemas/source/v15_contracts.py", "lines": [1092, 1101]}
+      ],
+      "source_evidence": "Repair construction now retains every failed/unknown obligation judgment independently of findings. Each carries assessment_role, assessment_id, candidate_sha256 and version, while preserving expected/observed/reproduction/evidence fields. The next maker receives these judgments and the previous version's actual check receipts. Repair findings/obligations are exposed only for production/design roles. Acceptance invocations still supply empty prior-repair inputs, while the current execution verifier receives only current checks. If no actionable finding, failed/unknown judgment or failed check exists, repair returns repair_feedback_unavailable. EN/KO maker guidance describes the same behavior.",
+      "limit": "Complete transmission of bounded failure evidence is established in source; whether a model uses that evidence successfully remains a live behavior question."
+    }
+  ],
+  "new_blocking_findings": [],
+  "source_identity": {
+    "src/opensocrates/orchestration/paths.py": "a8b4d48a20465be12e218669d13a130ff00844755811d6889d1917674583ff26",
+    "src/opensocrates/orchestration/runtime.py": "dc3ab05991db3791c27372bb44374fb94f30dee0398cb09e5ac06639621817eb",
+    "src/opensocrates/cli/orchestration.py": "7e16f5965461348b8daf1a617aa5a5a44df1e2b2a2e9cb5d84a20e727556a007",
+    "schemas/source/v15_contracts.py": "f9ba0e70cf2f72f0700cc2dbf493c54e1cc76be1974cde56db0657e41685132d"
+  },
+  "preserved_artifacts": {
+    "original_review": "$TEMP/opensocrates-review-ca95b24-CszcU4/review.json",
+    "original_reproductions": "$TEMP/opensocrates-review-ca95b24-CszcU4/repro-results.json",
+    "earlier_attempt_script": "$TEMP/opensocrates-recheck-53c5e2b-FBlFNV/recheck.py",
+    "earlier_attempt_results": "$TEMP/opensocrates-recheck-53c5e2b-FBlFNV/recheck-results.json"
+  },
+  "remaining_qualification": [
+    "Independent execution evidence must remain separately attributed to its verifier and exact commit.",
+    "Prepared contexts, source inspection and deterministic artifacts are not live Codex completion.",
+    "Live design/seeded repair, calculation-to-document and continuation remain separate qualification tasks.",
+    "No account/backend isolation or broad quality-benefit claim is made."
+  ]
+}

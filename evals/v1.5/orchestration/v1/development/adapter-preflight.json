@@ -1,0 +1,52 @@
+{
+  "schema": "opensocrates.orchestration.adapter-preflight/1",
+  "client_version": "codex-cli 0.158.0-alpha.2",
+  "command_form": "codex sandbox -P :read-only -C <fixture> <argv...>",
+  "results": [
+    {
+      "case": "read",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "pass": true,
+      "permission_error": null
+    },
+    {
+      "case": "new_file_denied",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "pass": true,
+      "permission_error": true
+    },
+    {
+      "case": "candidate_change_denied",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "pass": true,
+      "permission_error": true
+    },
+    {
+      "case": "network_denied",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "pass": true,
+      "permission_error": true
+    }
+  ],
+  "candidate_unchanged": true,
+  "new_file_absent": true,
+  "model_calls": 0,
+  "earlier_setup_failures": [
+    {
+      "case": "sandbox macos --help",
+      "reason": "unsupported subcommand; attempted executable macos",
+      "exit_code": 71
+    },
+    {
+      "case": "sandbox -c sandbox_mode=read-only",
+      "reason": "missing required permission-profile argument",
+      "attempts": 2,
+      "exit_code": 2
+    }
+  ],
+  "limitation": "Tests establish this local checker boundary; they do not attest account/backend isolation or all platforms."
+}

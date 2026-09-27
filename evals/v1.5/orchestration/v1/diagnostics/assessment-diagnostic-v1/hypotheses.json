@@ -1,0 +1,36 @@
+{
+  "observation": {
+    "status": "verified",
+    "text": "Both initial defective seed assessments were discarded as assessment_contract_rejected, while later findings-empty assessments passed."
+  },
+  "candidate_explanations": [
+    {
+      "id": "location",
+      "status": "inferred",
+      "text": "A finding may use path plus line anchors although runtime requires an exact candidate path.",
+      "fit": "plausible; only nonempty findings exercise this binding."
+    },
+    {
+      "id": "other-binding",
+      "status": "inferred",
+      "text": "Artifact digest, requirement, obligation, or evidence IDs may fail exact binding.",
+      "fit": "plausible; these fields are separately checked."
+    },
+    {
+      "id": "public-filter",
+      "status": "unverified",
+      "text": "A public-content privacy rejection may occur after schema validation.",
+      "fit": "unknown; no raw rejected structured result survived."
+    }
+  ],
+  "comparison_criteria": [
+    "A specific validation rejection must identify the violated invariant.",
+    "A new call is not proof of the earlier unretained output."
+  ],
+  "discriminating_evidence": "One bounded fresh review diagnostic saves only schema-validated, public-filtered assessment and static validation reason.",
+  "provisional_best_explanation": "Unresolved competing explanations; no exact original rejection reason exists.",
+  "next_test": "Run once with the same defective bytes, guides and model tuple; evaluate the returned public object against current _assessment.",
+  "flip_condition": "A diagnostic showing another binding or privacy rejection changes the repair; valid output leaves original causes unknown.",
+  "method": "abduction@3",
+  "native_application": "unverified"
+}
