@@ -4,6 +4,9 @@
 선택적 프로젝트 메모리, 코딩·협업 안내를 추가합니다. 아래 1.4.0 명령은 기존
 공개 버전용입니다. [후보 상태와 검증](docs/v1.5.0/RELEASE_CANDIDATE.md),
 [프로젝트 메모리 사용 안내](docs/project-memory.ko.md)를 참고하세요.
+후보에는 소프트웨어 판단의 주 절차로 선택할 수 있는
+[잠정 코딩 전문 절차 3종](docs/coding-specialists.ko.md)이 EN/KO/zh-CN으로 포함됩니다.
+일반 네이티브 목록은 EN/KO 48개이며 정적 중국어 파일이 해당 API를 확장하지는 않습니다.
   <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
 </p>
 

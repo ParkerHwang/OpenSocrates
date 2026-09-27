@@ -53,6 +53,8 @@ docs-check:
 		--path docs/advanced-usage.ko.md \
 		--path docs/decision-points.md \
 		--path docs/decision-points.ko.md \
+		--path docs/coding-specialists.md \
+		--path docs/coding-specialists.ko.md \
 		--path docs/project-memory-development.md \
 		--path docs/official-documentation.md \
 		--path docs/official-documentation.ko.md \
@@ -93,6 +95,7 @@ governance-check:
 	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_pr_governance_mutations.py
 
 package-check: generate
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_coding_specialists.py --package build/generated/plugins/codex --report build/evidence/coding-specialists-package.json
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_packaged_launcher.py --root "$(ROOT)" --report build/evidence/packaged-launcher.json
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_package_docs.py --root "$(ROOT)" --report build/evidence/package-docs.json
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_package_docs_mutations.py
@@ -103,6 +106,7 @@ security-scan: generate
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/security_scan.py --root "$(ROOT)" --report build/evidence/security-scan.json
 
 smoke:
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_coding_specialists.py
 	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_decision_recovery.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_task_verification.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_documentation.py

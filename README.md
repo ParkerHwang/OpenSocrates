@@ -5,6 +5,9 @@ assistance, opt-in project memory, and coding/collaboration guidance. The 1.4.0
 commands below still install the published stable version. See the
 [candidate status and qualification](docs/v1.5.0/RELEASE_CANDIDATE.md) and
 [project continuity guide](docs/project-memory.md).
+The candidate also includes [three provisional coding specialists](docs/coding-specialists.md)
+in EN/KO/zh-CN, selectable as primary software-decision support. The general native
+catalog remains 48 methods in EN/KO; static Chinese files do not extend its API.
   <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
 </p>
 

@@ -1,6 +1,6 @@
 # Optional assistance and project continuity
 
-Guide revision: 9
+Guide revision: 10
 
 Keep the user's goal, permissions, constraints, and completion conditions in view.
 For a mechanical edit or completed unchanged checks, finish directly. For a
@@ -14,7 +14,13 @@ Answer a side question and continue the authorized main task unless the user
 changes it. Reuse answers and permissions already given; ask only for a missing
 answer that changes the next action, while completing independent work.
 
-Use `decision codex` separately for eligible complete canonical procedures.
+Use `decision codex` separately for general judgments requiring eligible complete
+canonical procedures. For software-specific contract, state/failure or ownership
+decisions, the [coding-specialist router](../coding-specialists/v0.1.1/router.en.md)
+can select a primary complete static procedure without a general-method prerequisite.
+Load neither library automatically; add a complement only for a distinct unresolved
+need. Specialist IDs and file hashes are not native canonical inputs. The static
+EN/KO/zh-CN library does not expand native general locales beyond EN/KO.
 Do not shorten a required procedure or suppress evidence or a stop condition
 to fit an optional context budget.
 

@@ -2,6 +2,19 @@
 
 ## [1.5.0] - Unreleased release candidate
 
+- Add a separate provisional coding-specialist library v0.1.1: contracts,
+  transitions and ownership, with complete EN/KO/zh-CN static procedures and a
+  selective router. A software specialist may be primary without a mandatory
+  general-method pass. Preserve the 48 canonical methods and native EN/KO scope.
+- Reconcile controller, discovery entry and assistance/general guidance; package
+  exact reviewed specialist bytes without authoring examples or native registration.
+  Prompt effects and integrated delivery are evaluated separately; no universal
+  improvement or model-profile promotion is claimed.
+- 계약·상태 전이·소유권을 다루는 잠정 코딩 전문 라이브러리 v0.1.1을
+  EN/KO/zh-CN 정적 절차로 추가합니다. 일반 방법을 먼저 거치지 않아도 되며,
+  기존 정본 48개와 EN/KO 네이티브 범위는 유지합니다. 중국어 일반 API나
+  보편적인 성능 향상을 주장하지 않습니다.
+
 - Add stateless official-document reference prompts with separate publisher,
   version and reported-read metadata. Documents remain evidence, not instructions
   that can override user permissions. No network call or content persistence is added.

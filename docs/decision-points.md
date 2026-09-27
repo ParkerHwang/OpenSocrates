@@ -6,6 +6,14 @@ policies have not been promoted. Method IDs remain unchanged.
 
 ## Use in the current turn
 
+For software-specific contract, state/failure or ownership decisions, the candidate
+also provides a [separate coding-specialist route](coding-specialists.md). A complete
+specialist can be primary without first applying a general method. Mechanical or
+resolved work needs no added procedure; add a complement only for a distinct
+unresolved need. The native command, acknowledgment and historical host evidence
+below describe the general canonical route. Specialist IDs/hashes and static
+Chinese files do not broaden its catalog or EN/KO input locales.
+
 The candidate adds `{"operation":"prepare","locale":"en"}` to the native
 decision command. It returns a fresh mechanical envelope and closed vocabulary;
 fill null participation/routing fields from the actual task before submitting its

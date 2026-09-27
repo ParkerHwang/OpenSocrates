@@ -10,6 +10,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+from check_coding_specialists import verify_packaged_library
 from check_frozen_memory import request, run, uid
 from check_task_verification import exercise as check_task_verification
 
@@ -57,6 +58,13 @@ def check_decision_recovery(command, root, package, launcher, environment, base)
         assert responses[2]["diagnostic"]["field_path"] == "$.routing.features[0].basis"
         assert responses[3]["selection_reused"]
         assert responses[3]["methods"][0]["instructions"] is None
+    for identifier in ("csp-contracts", "csp-transitions", "csp-ownership"):
+        unregistered = json.loads(json.dumps(template))
+        unregistered["routing"]["explicit_method"] = identifier
+        assert command("decision", unregistered)["reason"] == "unknown_method"
+    assert (
+        command("decision", {"operation": "catalog", "locale": "zh-CN"})["status"] == "unavailable"
+    )
 
 
 def check(binary: Path, package: Path) -> dict[str, object]:
@@ -229,9 +237,12 @@ def check(binary: Path, package: Path) -> dict[str, object]:
                     internal / "plugin-src/shared/documentation" / canonical.name
                 ).read_bytes() == canonical.read_bytes()
                 checked += 1
+    specialists = verify_packaged_library(package)
     return {
         "status": "pass",
         "checked_members": checked,
+        "coding_specialists": specialists,
+        "specialist_delivery": "static package files; not native canonical registration",
         "languages": ["en", "ko"],
         "stateless_no_memory": True,
         "prepared_read_only": True,

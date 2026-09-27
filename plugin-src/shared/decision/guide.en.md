@@ -1,5 +1,13 @@
 # Decision-point method delivery
 
+This guide governs the general canonical route. For software-specific contract,
+state/failure or ownership decisions, the controller also permits a complete
+[coding specialist](../coding-specialists/v0.1.1/router.en.md) as the primary
+procedure, with no prior general-method pass. Keep the routes separate; use a
+complement only for a distinct unresolved need. An empty selection on this general
+route is valid and does not authorize bypassing its eligibility rules through
+another library. Specialist IDs/hashes and `zh-CN` are not native canonical inputs.
+
 Keep the user's goals, permissions, constraints and completion conditions available
 throughout the task. Mechanical steps need no intervention. Reconsider only before
 a judgment whose objective, alternatives, evidence, assumptions or consequential
