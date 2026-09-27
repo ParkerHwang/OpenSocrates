@@ -18,3 +18,5 @@ for built-in commands. [Git documents the process-scoped configuration variables
 The actual hosted Windows run remains the decisive verification; macOS inspection
 of the environment setting alone is not a Windows pass. Preserve the original
 failed run and report the repaired commit's CI independently.
+
+Hosted verification completed on `01d6e4d57fe3fdace81d4746628d99c62ae05f56`: [CI run 36313836620](https://github.com/ParkerHwang/OpenSocrates/actions/runs/36313836620) passed all five jobs. Windows checkout, native build, frozen memory/revision checks, package checks and exact-source provenance passed. The macOS native package and fresh-runner installer checks also passed. `ci-checkout-verification.v1.json` records this verification separately from the immutable failure receipt. This verifies the CI repair; independent comparison-artifact qualification remains pending.

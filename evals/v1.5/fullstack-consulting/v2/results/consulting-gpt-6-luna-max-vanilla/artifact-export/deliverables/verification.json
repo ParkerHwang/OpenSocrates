@@ -1,0 +1,2604 @@
+{
+  "generated_utc": "2026-09-27T10:40:59.978951+00:00",
+  "passed": 517,
+  "failed": 0,
+  "checks": [
+    {
+      "check": "metrics top-level schema",
+      "passed": true,
+      "detail": "keys=['countries', 'fx_monthly', 'hub_scenarios', 'market_context', 'metadata', 'monthly', 'quality', 'recommendation']"
+    },
+    {
+      "check": "monthly schema",
+      "passed": true,
+      "detail": "rows=72; fields=['contribution_eur', 'country', 'fulfillment_eur', 'gross_sales_eur', 'margin', 'month', 'net_cogs_eur', 'net_sales_eur', 'refunds_eur', 'returned_units', 'shipped_orders', 'shipped_units']"
+    },
+    {
+      "check": "metrics copy",
+      "passed": true,
+      "detail": "deliverables/metrics.json matches reproducible analysis output byte for byte"
+    },
+    {
+      "check": "country schema",
+      "passed": true,
+      "detail": "rows=6; fields=['contribution_eur', 'country', 'fulfillment_eur', 'gross_sales_eur', 'margin', 'net_cogs_eur', 'net_sales_eur', 'refunds_eur', 'returned_units', 'shipped_orders', 'shipped_units']"
+    },
+    {
+      "check": "country-month grid",
+      "passed": true,
+      "detail": "6 countries x 12 months, no duplicates"
+    },
+    {
+      "check": "country rows",
+      "passed": true,
+      "detail": "six distinct country totals"
+    },
+    {
+      "check": "order exclusions complete",
+      "passed": true,
+      "detail": "all selected latest rows excluded from the 2025 base have an ID and reason"
+    },
+    {
+      "check": "monthly margin DEU 2025-01",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin DEU 2025-02",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin DEU 2025-03",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin DEU 2025-04",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin DEU 2025-05",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin DEU 2025-06",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin DEU 2025-07",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin DEU 2025-08",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin DEU 2025-09",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin DEU 2025-10",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin DEU 2025-11",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin DEU 2025-12",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin FRA 2025-01",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin FRA 2025-02",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin FRA 2025-03",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin FRA 2025-04",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin FRA 2025-05",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin FRA 2025-06",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin FRA 2025-07",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin FRA 2025-08",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin FRA 2025-09",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin FRA 2025-10",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin FRA 2025-11",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin FRA 2025-12",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin NLD 2025-01",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin NLD 2025-02",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin NLD 2025-03",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin NLD 2025-04",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin NLD 2025-05",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin NLD 2025-06",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin NLD 2025-07",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin NLD 2025-08",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin NLD 2025-09",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin NLD 2025-10",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin NLD 2025-11",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin NLD 2025-12",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin POL 2025-01",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin POL 2025-02",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin POL 2025-03",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin POL 2025-04",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin POL 2025-05",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin POL 2025-06",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin POL 2025-07",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin POL 2025-08",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin POL 2025-09",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin POL 2025-10",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin POL 2025-11",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin POL 2025-12",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin CZE 2025-01",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin CZE 2025-02",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin CZE 2025-03",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin CZE 2025-04",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin CZE 2025-05",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin CZE 2025-06",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin CZE 2025-07",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin CZE 2025-08",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin CZE 2025-09",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin CZE 2025-10",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin CZE 2025-11",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin CZE 2025-12",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin ESP 2025-01",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin ESP 2025-02",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin ESP 2025-03",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin ESP 2025-04",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin ESP 2025-05",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin ESP 2025-06",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin ESP 2025-07",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin ESP 2025-08",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin ESP 2025-09",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin ESP 2025-10",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin ESP 2025-11",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "monthly margin ESP 2025-12",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "roll-up DEU contribution_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up DEU fulfillment_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up DEU gross_sales_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up DEU net_cogs_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up DEU net_sales_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up DEU refunds_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up DEU returned_units",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up DEU shipped_orders",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up DEU shipped_units",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "country margin DEU",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "roll-up FRA contribution_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up FRA fulfillment_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up FRA gross_sales_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up FRA net_cogs_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up FRA net_sales_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up FRA refunds_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up FRA returned_units",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up FRA shipped_orders",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up FRA shipped_units",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "country margin FRA",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "roll-up NLD contribution_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up NLD fulfillment_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up NLD gross_sales_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up NLD net_cogs_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up NLD net_sales_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up NLD refunds_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up NLD returned_units",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up NLD shipped_orders",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up NLD shipped_units",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "country margin NLD",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "roll-up POL contribution_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up POL fulfillment_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up POL gross_sales_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up POL net_cogs_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up POL net_sales_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up POL refunds_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up POL returned_units",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up POL shipped_orders",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up POL shipped_units",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "country margin POL",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "roll-up CZE contribution_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up CZE fulfillment_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up CZE gross_sales_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up CZE net_cogs_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up CZE net_sales_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up CZE refunds_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up CZE returned_units",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up CZE shipped_orders",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up CZE shipped_units",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "country margin CZE",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "roll-up ESP contribution_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up ESP fulfillment_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up ESP gross_sales_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up ESP net_cogs_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up ESP net_sales_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up ESP refunds_eur",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up ESP returned_units",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up ESP shipped_orders",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "roll-up ESP shipped_units",
+      "passed": true,
+      "detail": "monthly records equal country total"
+    },
+    {
+      "check": "country margin ESP",
+      "passed": true,
+      "detail": "contribution / net sales, null at zero denominator"
+    },
+    {
+      "check": "total contribution identity",
+      "passed": true,
+      "detail": "net sales minus net COGS and fulfillment"
+    },
+    {
+      "check": "FX monthly coverage",
+      "passed": true,
+      "detail": "12 archived monthly means for PLN and 12 for CZK"
+    },
+    {
+      "check": "FX rates positive",
+      "passed": true,
+      "detail": "local units per EUR; positive rates"
+    },
+    {
+      "check": "World Bank grid",
+      "passed": true,
+      "detail": "six countries x three years; raw nulls retained"
+    },
+    {
+      "check": "World Bank provenance",
+      "passed": true,
+      "detail": "series URLs, units, archive retrieval and vintage in metrics metadata/source register"
+    },
+    {
+      "check": "scenario row coverage",
+      "passed": true,
+      "detail": "17 feasible hub choices x four cases"
+    },
+    {
+      "check": "scenario formula DEU low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback DEU low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility DEU",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula DEU base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback DEU base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility DEU",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula DEU high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback DEU high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility DEU",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula DEU stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback DEU stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility DEU",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula POL low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback POL low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility POL",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula POL base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback POL base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility POL",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula POL high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback POL high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility POL",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula POL stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback POL stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility POL",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula CZE low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback CZE low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula CZE base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback CZE base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula CZE high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback CZE high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula CZE stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback CZE stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula ESP low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback ESP low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula ESP base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback ESP base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula ESP high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback ESP high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula ESP stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback ESP stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula DEU+CZE low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback DEU+CZE low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility DEU+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula DEU+CZE base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback DEU+CZE base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility DEU+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula DEU+CZE high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback DEU+CZE high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility DEU+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula DEU+CZE stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback DEU+CZE stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility DEU+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+NLD low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+NLD low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+NLD",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+NLD base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+NLD base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+NLD",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+NLD high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+NLD high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+NLD",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+NLD stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+NLD stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+NLD",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+POL low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+POL low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+POL",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+POL base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+POL base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+POL",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+POL high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+POL high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+POL",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+POL stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+POL stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+POL",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+CZE low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+CZE low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+CZE base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+CZE base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+CZE high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+CZE high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+CZE stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+CZE stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+ESP low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+ESP low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+ESP base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+ESP base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+ESP high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+ESP high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula FRA+ESP stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback FRA+ESP stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility FRA+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD+POL low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD+POL low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD+POL",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD+POL base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD+POL base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD+POL",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD+POL high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD+POL high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD+POL",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD+POL stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD+POL stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD+POL",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD+CZE low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD+CZE low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD+CZE base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD+CZE base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD+CZE high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD+CZE high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD+CZE stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD+CZE stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD+ESP low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD+ESP low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD+ESP base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD+ESP base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD+ESP high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD+ESP high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula NLD+ESP stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback NLD+ESP stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility NLD+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula POL+CZE low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback POL+CZE low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility POL+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula POL+CZE base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback POL+CZE base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility POL+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula POL+CZE high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback POL+CZE high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility POL+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula POL+CZE stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback POL+CZE stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility POL+CZE",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula POL+ESP low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback POL+ESP low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility POL+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula POL+ESP base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback POL+ESP base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility POL+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula POL+ESP high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback POL+ESP high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility POL+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula POL+ESP stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback POL+ESP stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility POL+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula CZE+ESP low",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback CZE+ESP low",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility CZE+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula CZE+ESP base",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback CZE+ESP base",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility CZE+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula CZE+ESP high",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback CZE+ESP high",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility CZE+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "scenario formula CZE+ESP stress",
+      "passed": true,
+      "detail": "policy formula recalculated from saved baseline and assumptions, rounded half-up to cents"
+    },
+    {
+      "check": "scenario payback CZE+ESP stress",
+      "passed": true,
+      "detail": "capex / positive annual increment rounded to 0.01 years; otherwise null"
+    },
+    {
+      "check": "scenario feasibility CZE+ESP",
+      "passed": true,
+      "detail": "all reported hub choices fit stated capex/FTE ceilings"
+    },
+    {
+      "check": "recommendation selection",
+      "passed": true,
+      "detail": "highest base case among feasible choices with positive policy stress"
+    },
+    {
+      "check": "budget limits",
+      "passed": true,
+      "detail": "recommendation within board constraints"
+    },
+    {
+      "check": "source hash data-dictionary.md",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "source hash orders-part1.csv",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "source hash orders-part2.csv",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "source hash order-corrections.csv",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "source hash returns.csv",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "source hash unit-costs.csv",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "source hash hub-options.csv",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "source hash scenario-policy.md",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "source hash source-register.json",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "source hash population.json",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "source hash gdp-per-capita.json",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "source hash ecb-history.zip",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "source hash ecb-history.csv",
+      "passed": true,
+      "detail": "saved raw source matches register SHA-256"
+    },
+    {
+      "check": "archive source hashes",
+      "passed": true,
+      "detail": "World Bank/ECB archive hashes match frozen register"
+    },
+    {
+      "check": "workbook tabs",
+      "passed": true,
+      "detail": "Start here, Sources, Quality & controls, FX 2025, Monthly, Countries, Market context, Scenarios, Decision comparison, Monthly trend, Orders audit, Return exceptions, Excluded orders"
+    },
+    {
+      "check": "workbook rows",
+      "passed": true,
+      "detail": "72 monthly rows, 6 country rows, 1,254 eligible orders, 43 excluded orders, 68 scenario rows"
+    },
+    {
+      "check": "workbook charts",
+      "passed": true,
+      "detail": "native Excel charts exist on country, decision and monthly sheets"
+    },
+    {
+      "check": "workbook country contribution DEU",
+      "passed": true,
+      "detail": "country total matches metrics.json"
+    },
+    {
+      "check": "workbook country contribution FRA",
+      "passed": true,
+      "detail": "country total matches metrics.json"
+    },
+    {
+      "check": "workbook country contribution NLD",
+      "passed": true,
+      "detail": "country total matches metrics.json"
+    },
+    {
+      "check": "workbook country contribution POL",
+      "passed": true,
+      "detail": "country total matches metrics.json"
+    },
+    {
+      "check": "workbook country contribution CZE",
+      "passed": true,
+      "detail": "country total matches metrics.json"
+    },
+    {
+      "check": "workbook country contribution ESP",
+      "passed": true,
+      "detail": "country total matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution DEU 2025-01",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution DEU 2025-02",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution DEU 2025-03",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution DEU 2025-04",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution DEU 2025-05",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution DEU 2025-06",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution DEU 2025-07",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution DEU 2025-08",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution DEU 2025-09",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution DEU 2025-10",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution DEU 2025-11",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution DEU 2025-12",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution FRA 2025-01",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution FRA 2025-02",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution FRA 2025-03",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution FRA 2025-04",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution FRA 2025-05",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution FRA 2025-06",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution FRA 2025-07",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution FRA 2025-08",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution FRA 2025-09",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution FRA 2025-10",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution FRA 2025-11",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution FRA 2025-12",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution NLD 2025-01",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution NLD 2025-02",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution NLD 2025-03",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution NLD 2025-04",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution NLD 2025-05",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution NLD 2025-06",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution NLD 2025-07",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution NLD 2025-08",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution NLD 2025-09",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution NLD 2025-10",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution NLD 2025-11",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution NLD 2025-12",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution POL 2025-01",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution POL 2025-02",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution POL 2025-03",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution POL 2025-04",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution POL 2025-05",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution POL 2025-06",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution POL 2025-07",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution POL 2025-08",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution POL 2025-09",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution POL 2025-10",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution POL 2025-11",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution POL 2025-12",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution CZE 2025-01",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution CZE 2025-02",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution CZE 2025-03",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution CZE 2025-04",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution CZE 2025-05",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution CZE 2025-06",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution CZE 2025-07",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution CZE 2025-08",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution CZE 2025-09",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution CZE 2025-10",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution CZE 2025-11",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution CZE 2025-12",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution ESP 2025-01",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution ESP 2025-02",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution ESP 2025-03",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution ESP 2025-04",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution ESP 2025-05",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution ESP 2025-06",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution ESP 2025-07",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution ESP 2025-08",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution ESP 2025-09",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution ESP 2025-10",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution ESP 2025-11",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook monthly contribution ESP 2025-12",
+      "passed": true,
+      "detail": "monthly value matches metrics.json"
+    },
+    {
+      "check": "workbook scenario DEU low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario DEU base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario DEU high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario DEU stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario POL low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario POL base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario POL high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario POL stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario CZE low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario CZE base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario CZE high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario CZE stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario ESP low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario ESP base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario ESP high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario ESP stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario DEU+CZE low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario DEU+CZE base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario DEU+CZE high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario DEU+CZE stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+NLD low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+NLD base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+NLD high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+NLD stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+POL low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+POL base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+POL high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+POL stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+CZE low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+CZE base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+CZE high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+CZE stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+ESP low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+ESP base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+ESP high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario FRA+ESP stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD+POL low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD+POL base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD+POL high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD+POL stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD+CZE low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD+CZE base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD+CZE high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD+CZE stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD+ESP low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD+ESP base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD+ESP high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario NLD+ESP stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario POL+CZE low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario POL+CZE base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario POL+CZE high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario POL+CZE stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario POL+ESP low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario POL+ESP base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario POL+ESP high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario POL+ESP stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario CZE+ESP low",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario CZE+ESP base",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario CZE+ESP high",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "workbook scenario CZE+ESP stress",
+      "passed": true,
+      "detail": "workbook choice/scenario/cash/staff/payback matches metrics.json"
+    },
+    {
+      "check": "report PDF structure",
+      "passed": true,
+      "detail": "8 pages; recommendation and direct source register included"
+    },
+    {
+      "check": "board PDF structure",
+      "passed": true,
+      "detail": "6 pages; recommendation and implementation slide included"
+    },
+    {
+      "check": "rendered contact sheets",
+      "passed": true,
+      "detail": "Report and presentation rendered to page contact sheets for visual review"
+    }
+  ],
+  "summary": {
+    "monthly_rows": 72,
+    "country_rows": 6,
+    "fx_rows": 24,
+    "market_rows": 18,
+    "scenario_rows": 68,
+    "order_ledger_rows": 1254,
+    "excluded_orders": 43,
+    "report_pages": 8,
+    "presentation_pages": 6,
+    "workbook_sheets": 13
+  }
+}

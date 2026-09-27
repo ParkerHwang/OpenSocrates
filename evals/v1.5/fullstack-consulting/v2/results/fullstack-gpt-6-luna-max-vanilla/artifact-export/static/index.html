@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173e37">
+  <title>DepotFlow — Fulfillment workspace</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main id="app" class="page-shell">
+    <section id="login-screen" class="login-layout" aria-labelledby="login-title">
+      <div class="login-copy">
+        <div class="brand-mark" aria-hidden="true">D</div>
+        <p class="eyebrow">WAREHOUSE OPERATIONS</p>
+        <h1 id="login-title">Move every order forward.</h1>
+        <p>Keep stock, fulfillment, and inventory history in one clear workspace.</p>
+      </div>
+      <form id="login-form" class="panel login-card">
+        <h2>Sign in</h2>
+        <p class="muted">Use your DepotFlow operator account.</p>
+        <label for="login-email">Email</label>
+        <input id="login-email" data-testid="login-email" name="email" type="email" autocomplete="username" required>
+        <label for="login-password">Password</label>
+        <input id="login-password" data-testid="login-password" name="password" type="password" autocomplete="current-password" required>
+        <button class="button primary full" data-testid="login-submit" type="submit">Sign in</button>
+        <p id="login-message" class="message" role="status" aria-live="polite"></p>
+        <p class="demo-hint">Demo password: <code>DepotDemo!2026</code></p>
+      </form>
+    </section>
+    <section id="workspace" hidden>
+      <header class="topbar">
+        <a class="brand" href="#inventory" aria-label="DepotFlow home"><span class="brand-mark small">D</span><span>DepotFlow</span></a>
+        <div class="account-area"><span id="account-label" class="account-label"></span><button id="logout" data-testid="logout" class="button quiet" type="button">Log out</button></div>
+      </header>
+      <div class="app-layout">
+        <nav class="side-nav" aria-label="Main navigation">
+          <p class="nav-caption">WORKSPACE</p>
+          <button class="nav-link active" data-view="inventory" data-testid="nav-inventory" type="button"><span aria-hidden="true">▦</span> Inventory</button>
+          <button class="nav-link" data-view="orders" data-testid="nav-orders" type="button"><span aria-hidden="true">▤</span> Orders</button>
+          <button class="nav-link" data-view="audit" data-testid="nav-audit" type="button"><span aria-hidden="true">↻</span> Audit history</button>
+          <div class="nav-footer"><span class="status-dot"></span><span>Local workspace</span></div>
+        </nav>
+        <section id="view" class="view-content" aria-live="polite"></section>
+      </div>
+    </section>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>

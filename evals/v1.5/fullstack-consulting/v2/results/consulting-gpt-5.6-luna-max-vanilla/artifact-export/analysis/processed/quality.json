@@ -1,0 +1,145 @@
+{
+  "source_room": "Frozen local source room; client exports and assumptions are synthetic; official series are archived snapshots.",
+  "accounting_cutoff": "2026-01-31 inclusive for returns; only 2025 shipped_at orders enter the base.",
+  "order_handling": {
+    "order_selection": {
+      "raw_rows": 1328,
+      "identical_duplicate_rows": 13,
+      "rows_after_exact_dedupe": 1315,
+      "unique_keys": 1297,
+      "revision_replacements": 18,
+      "same_revision_conflicts": [],
+      "source_rows": {
+        "orders-part1.csv": 655,
+        "orders-part2.csv": 655,
+        "order-corrections.csv": 18
+      }
+    },
+    "return_selection": {
+      "raw_rows": 264,
+      "identical_duplicate_rows": 20,
+      "rows_after_exact_dedupe": 244,
+      "unique_keys": 243,
+      "revision_replacements": 1,
+      "same_revision_conflicts": []
+    },
+    "eligible_orders": 1254,
+    "excluded_orders": {
+      "shipped_after_2025": 1,
+      "status_not_shipped": 24,
+      "is_test": 18
+    },
+    "included_return_rows": 241,
+    "excluded_return_rows": {
+      "received_after_cutoff": 1,
+      "orphan_order_id": 1
+    },
+    "eligible_returned_order_count": 241,
+    "return_units_exceed_order_units": [],
+    "cutoff_inclusive": "2026-01-31"
+  },
+  "calculation": {
+    "calculated_orders": 1254,
+    "missing_fx_orders": [],
+    "missing_unit_cost_orders": [],
+    "zero_gross_sales_orders_included": [
+      "M1-03-001",
+      "M1-09-001",
+      "M2-03-001",
+      "M2-09-001",
+      "M3-03-001",
+      "M3-09-001",
+      "M4-03-001",
+      "M4-09-001",
+      "M5-03-001",
+      "M5-09-001",
+      "M6-03-001",
+      "M6-09-001"
+    ]
+  },
+  "fx": {
+    "source_file": "ecb-history.csv",
+    "observations_2025": 255,
+    "months_with_complete_pln_czk": 12,
+    "quote_definition": "ECB reference quote: local currency units per EUR; arithmetic mean over available published business days"
+  },
+  "aggregation": {
+    "monthly_row_count": 72,
+    "country_row_count": 6,
+    "reconciliation_issues": []
+  },
+  "market": {
+    "population_indicator": "SP.POP.TOTL",
+    "population_units": "persons",
+    "gdp_indicator": "NY.GDP.PCAP.CD",
+    "gdp_units": "current US$ per person",
+    "world_bank_population_lastupdated": "2026-07-13",
+    "world_bank_gdp_lastupdated": "2026-07-13",
+    "missing_values": [],
+    "source_urls": {
+      "population": "https://api.worldbank.org/v2/country/DEU;FRA;NLD;POL;CZE;ESP/indicator/SP.POP.TOTL?date=2022:2024&format=json&per_page=1000",
+      "gdp_per_capita": "https://api.worldbank.org/v2/country/DEU;FRA;NLD;POL;CZE;ESP/indicator/NY.GDP.PCAP.CD?date=2022:2024&format=json&per_page=1000"
+    },
+    "interpretation": "Population and GDP per capita are context indicators, not direct proof of replacement-assembly demand."
+  },
+  "scenario": {
+    "policy": {
+      "max_capex_eur": 450000,
+      "max_fte": 7,
+      "low_uplift": 0.1,
+      "base_uplift": 0.25,
+      "high_uplift": 0.4,
+      "stress_refund_shock_rate_of_gross_sales": 0.03,
+      "stress_fx_shock_rate_of_net_sales_for_pln_czk": 0.1,
+      "formula": "annual incremental = C*u + U*(1+u)*s - F; stress = C_stress*1.25 - C + U*1.25*s - F"
+    },
+    "feasible_pairs": [
+      "DEU+CZE",
+      "FRA+NLD",
+      "FRA+POL",
+      "FRA+CZE",
+      "FRA+ESP",
+      "NLD+POL",
+      "NLD+CZE",
+      "NLD+ESP",
+      "POL+CZE",
+      "POL+ESP",
+      "CZE+ESP"
+    ],
+    "infeasible_pairs": [
+      {
+        "option": "DEU+FRA",
+        "capex_eur": 490000.0,
+        "fte": 9
+      },
+      {
+        "option": "DEU+NLD",
+        "capex_eur": 420000.0,
+        "fte": 8
+      },
+      {
+        "option": "DEU+POL",
+        "capex_eur": 390000.0,
+        "fte": 8
+      },
+      {
+        "option": "DEU+ESP",
+        "capex_eur": 410000.0,
+        "fte": 8
+      }
+    ]
+  },
+  "rounding": "Gross sales, refunds, gross/recovered/net COGS, fulfillment and contribution are rounded per eligible order to EUR cents with Decimal ROUND_HALF_UP before summing. Refunds use original sale month FX, not receipt month.",
+  "zero_price_handling": "Valid zero-gross-sales shipments remain in shipped orders/units; they contribute zero gross sales but retain costs and can have negative contribution.",
+  "return_handling": "Highest return revision retained; exact repeats removed; included only for eligible 2025 orders and received_at through 2026-01-31; orphan and after-cutoff records quarantined.",
+  "missing_values": {
+    "order_rows": 24,
+    "market_context": []
+  },
+  "limitations": [
+    "Synthetic order/return history and hub assumptions are not measured demand or causal evidence.",
+    "ECB reference rates are analytical translation assumptions, not the actual transaction rates or hedging outcomes.",
+    "Scenario arithmetic is undiscounted and excludes taxes, working capital, ramp timing, shared fixed costs, and synergy; pairs are additive with no synergy.",
+    "World Bank GDP per capita is current US$, not PPP or constant-price real income, and neither GDP nor population proves product demand."
+  ]
+}
