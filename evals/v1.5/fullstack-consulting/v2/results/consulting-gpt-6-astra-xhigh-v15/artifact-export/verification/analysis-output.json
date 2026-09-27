@@ -1,0 +1,523 @@
+{
+  "totals": {
+    "country": "ALL",
+    "shipped_orders": 1254,
+    "shipped_units": 77436,
+    "gross_sales_eur": 4464622.33,
+    "refunds_eur": 80830.57,
+    "net_sales_eur": 4383791.76,
+    "net_cogs_eur": 2246919.0,
+    "fulfillment_eur": 106862.28,
+    "contribution_eur": 2030010.48,
+    "returned_units": 1081,
+    "margin": 0.4630718316784281
+  },
+  "quality": {
+    "order_reconciliation": {
+      "raw_rows": 1328,
+      "exact_duplicates": 13,
+      "superseded_revisions": 18,
+      "unique_ids": 1297,
+      "conflicting_equal_revisions": 0,
+      "eligible_orders": 1254,
+      "excluded_orders": 43,
+      "excluded_status": 24,
+      "excluded_test": 18,
+      "excluded_outside_2025": 1,
+      "missing_shipped_at": 24,
+      "zero_price_orders_retained": 12,
+      "zero_price_units_retained": 739,
+      "zero_price_contribution_eur": -14565.9,
+      "negative_contribution_orders": 12
+    },
+    "return_reconciliation": {
+      "raw_rows": 264,
+      "exact_duplicates": 20,
+      "superseded_revisions": 1,
+      "unique_ids": 243,
+      "conflicting_equal_revisions": 0,
+      "include": 241,
+      "exclude:after_cutoff": 1,
+      "quarantine:orphan_order": 1,
+      "orders_with_multiple_return_ids": 0,
+      "inclusive_cutoff_return_ids": [
+        "R-CUTOFF"
+      ]
+    },
+    "missing_values": {
+      "orders-part1.csv": {
+        "shipped_at": 24
+      },
+      "orders-part2.csv": {},
+      "order-corrections.csv": {},
+      "returns.csv": {},
+      "unit-costs.csv": {},
+      "hub-options.csv": {}
+    },
+    "missing_eligible_required_fields": 0,
+    "missing_effective_costs": 0,
+    "missing_fx_months": 0,
+    "missing_market_values": 0,
+    "public_archive_hashes_match": true,
+    "ecb_zip_matches_csv": true,
+    "monthly_country_order_reconciliation": "PASS: all additive measures agree exactly using cents",
+    "handling_notes": [
+      "Highest numeric revision wins across all pages; full-row replacement. Identical raw duplicates removed before revision selection.",
+      "Eligibility uses original shipped_at in 2025, shipped status, is_test false; zero-price shipments retained.",
+      "Refunds are summed in original currency per eligible order then divided by the sale-month mean quote and half-up rounded.",
+      "Only physically restocked units recover COGS, valued at original shipment unit cost. Fulfillment is nonrefundable.",
+      "Orphan returns quarantined with no guessed join or guessed currency; after-cutoff returns excluded.",
+      "Missing shipment dates occur on cancelled rows; no imputation. No missing core public values in this vintage.",
+      "Archive collection is separate from original official retrieval. World Bank lastupdated=2026-07-13; subsequent historical revisions may be included.",
+      "Reference-rate translation is analytical; cash settlement FX and receivables are absent.",
+      "Scenario inputs are synthetic planning assumptions; ramp-up, working capital, tax, financing, depreciation, closure cost and discounting are not modeled."
+    ]
+  },
+  "ranked_feasible": [
+    {
+      "option": "CZE+ESP",
+      "countries": [
+        "CZE",
+        "ESP"
+      ],
+      "capex_eur": 225000.0,
+      "fte": 5,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 64619.11,
+      "low_payback_years": 3.481942106599735,
+      "base_incremental_eur": 198099.31,
+      "base_payback_years": 1.135793961119804,
+      "high_incremental_eur": 331579.51,
+      "high_payback_years": 0.6785702771561488,
+      "stress_incremental_eur": 32179.71,
+      "stress_payback_years": 6.991983457899403,
+      "base_rank": 1
+    },
+    {
+      "option": "POL+ESP",
+      "countries": [
+        "POL",
+        "ESP"
+      ],
+      "capex_eur": 240000.0,
+      "fte": 6,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 58562.06,
+      "low_payback_years": 4.0982164903352105,
+      "base_incremental_eur": 186328.84,
+      "base_payback_years": 1.288045371827571,
+      "high_incremental_eur": 314095.62,
+      "high_payback_years": 0.7640985251561292,
+      "stress_incremental_eur": 29263.85,
+      "stress_payback_years": 8.201244880629172,
+      "base_rank": 2
+    },
+    {
+      "option": "POL+CZE",
+      "countries": [
+        "POL",
+        "CZE"
+      ],
+      "capex_eur": 205000.0,
+      "fte": 5,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 56856.47,
+      "low_payback_years": 3.6055703071259964,
+      "base_incremental_eur": 178995.41,
+      "base_payback_years": 1.1452807644620608,
+      "high_incremental_eur": 301134.35,
+      "high_payback_years": 0.6807592690770747,
+      "stress_incremental_eur": -78569.76,
+      "stress_payback_years": null,
+      "base_rank": 3
+    },
+    {
+      "option": "NLD+ESP",
+      "countries": [
+        "NLD",
+        "ESP"
+      ],
+      "capex_eur": 270000.0,
+      "fte": 6,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 43994.29,
+      "low_payback_years": 6.137160072363936,
+      "base_incremental_eur": 166931.43,
+      "base_payback_years": 1.6174305821258466,
+      "high_incremental_eur": 289868.56,
+      "high_payback_years": 0.9314566574588151,
+      "stress_incremental_eur": 107630.13,
+      "stress_payback_years": 2.508591228125433,
+      "base_rank": 4
+    },
+    {
+      "option": "NLD+CZE",
+      "countries": [
+        "NLD",
+        "CZE"
+      ],
+      "capex_eur": 235000.0,
+      "fte": 5,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 42288.7,
+      "low_payback_years": 5.557040060347091,
+      "base_incremental_eur": 159598.0,
+      "base_payback_years": 1.472449529442725,
+      "high_incremental_eur": 276907.29,
+      "high_payback_years": 0.8486594917743047,
+      "stress_incremental_eur": -203.48,
+      "stress_payback_years": null,
+      "base_rank": 5
+    },
+    {
+      "option": "NLD+POL",
+      "countries": [
+        "NLD",
+        "POL"
+      ],
+      "capex_eur": 250000.0,
+      "fte": 6,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 36231.65,
+      "low_payback_years": 6.90004457428795,
+      "base_incremental_eur": 147827.53,
+      "base_payback_years": 1.6911599618826074,
+      "high_incremental_eur": 259423.4,
+      "high_payback_years": 0.9636755974981439,
+      "stress_incremental_eur": -3119.34,
+      "stress_payback_years": null,
+      "base_rank": 6
+    },
+    {
+      "option": "FRA+ESP",
+      "countries": [
+        "FRA",
+        "ESP"
+      ],
+      "capex_eur": 340000.0,
+      "fte": 7,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 13686.66,
+      "low_payback_years": 24.841707180568523,
+      "base_incremental_eur": 129849.15,
+      "base_payback_years": 2.618422993142427,
+      "high_incremental_eur": 246011.63,
+      "high_payback_years": 1.3820484828298565,
+      "stress_incremental_eur": 73104.56,
+      "stress_payback_years": 4.650872667860938,
+      "base_rank": 7
+    },
+    {
+      "option": "FRA+CZE",
+      "countries": [
+        "FRA",
+        "CZE"
+      ],
+      "capex_eur": 305000.0,
+      "fte": 6,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 11981.07,
+      "low_payback_years": 25.456824807800974,
+      "base_incremental_eur": 122515.72,
+      "base_payback_years": 2.4894764524911577,
+      "high_incremental_eur": 233050.36,
+      "high_payback_years": 1.308730010114552,
+      "stress_incremental_eur": -34729.05,
+      "stress_payback_years": null,
+      "base_rank": 8
+    },
+    {
+      "option": "FRA+POL",
+      "countries": [
+        "FRA",
+        "POL"
+      ],
+      "capex_eur": 320000.0,
+      "fte": 7,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 5924.02,
+      "low_payback_years": 54.01737333769974,
+      "base_incremental_eur": 110745.25,
+      "base_payback_years": 2.88951444870096,
+      "high_incremental_eur": 215566.47,
+      "high_payback_years": 1.4844609182494848,
+      "stress_incremental_eur": -37644.91,
+      "stress_payback_years": null,
+      "base_rank": 9
+    },
+    {
+      "option": "DEU+CZE",
+      "countries": [
+        "DEU",
+        "CZE"
+      ],
+      "capex_eur": 375000.0,
+      "fte": 7,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": -2549.1,
+      "low_payback_years": null,
+      "base_incremental_eur": 105471.58,
+      "base_payback_years": 3.5554601533417816,
+      "high_incremental_eur": 213492.26,
+      "high_payback_years": 1.7565039594409653,
+      "stress_incremental_eur": -51409.99,
+      "stress_payback_years": null,
+      "base_rank": 10
+    },
+    {
+      "option": "ESP",
+      "countries": [
+        "ESP"
+      ],
+      "capex_eur": 130000.0,
+      "fte": 3,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 33162.35,
+      "low_payback_years": 3.920108194986182,
+      "base_incremental_eur": 102716.37,
+      "base_payback_years": 1.2656210494977578,
+      "high_incremental_eur": 172270.39,
+      "high_payback_years": 0.7546276524944304,
+      "stress_incremental_eur": 70006.66,
+      "stress_payback_years": 1.8569661800748671,
+      "base_rank": 11
+    },
+    {
+      "option": "CZE",
+      "countries": [
+        "CZE"
+      ],
+      "capex_eur": 95000.0,
+      "fte": 2,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 31456.76,
+      "low_payback_years": 3.0200185905986503,
+      "base_incremental_eur": 95382.94,
+      "base_payback_years": 0.9959852359342247,
+      "high_incremental_eur": 159309.12,
+      "high_payback_years": 0.5963249310522838,
+      "stress_incremental_eur": -37826.95,
+      "stress_payback_years": null,
+      "base_rank": 12
+    },
+    {
+      "option": "FRA+NLD",
+      "countries": [
+        "FRA",
+        "NLD"
+      ],
+      "capex_eur": 350000.0,
+      "fte": 7,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": -8643.75,
+      "low_payback_years": null,
+      "base_incremental_eur": 91347.84,
+      "base_payback_years": 3.831508221759814,
+      "high_incremental_eur": 191339.41,
+      "high_payback_years": 1.8292101977318733,
+      "stress_incremental_eur": 40721.37,
+      "stress_payback_years": 8.59499569881858,
+      "base_rank": 13
+    },
+    {
+      "option": "POL",
+      "countries": [
+        "POL"
+      ],
+      "capex_eur": 110000.0,
+      "fte": 3,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 25399.71,
+      "low_payback_years": 4.33075810708075,
+      "base_incremental_eur": 83612.47,
+      "base_payback_years": 1.3155932362720537,
+      "high_incremental_eur": 141825.23,
+      "high_payback_years": 0.775602479192172,
+      "stress_incremental_eur": -40742.81,
+      "stress_payback_years": null,
+      "base_rank": 14
+    },
+    {
+      "option": "NLD",
+      "countries": [
+        "NLD"
+      ],
+      "capex_eur": 140000.0,
+      "fte": 3,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 10831.94,
+      "low_payback_years": 12.924739243385766,
+      "base_incremental_eur": 64215.06,
+      "base_payback_years": 2.1801739342764765,
+      "high_incremental_eur": 117598.17,
+      "high_payback_years": 1.1904947160317205,
+      "stress_incremental_eur": 37623.47,
+      "stress_payback_years": 3.7210815482995057,
+      "base_rank": 15
+    },
+    {
+      "option": "FRA",
+      "countries": [
+        "FRA"
+      ],
+      "capex_eur": 210000.0,
+      "fte": 4,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": -19475.69,
+      "low_payback_years": null,
+      "base_incremental_eur": 27132.78,
+      "base_payback_years": 7.7397155765093,
+      "high_incremental_eur": 73741.24,
+      "high_payback_years": 2.8477958873487887,
+      "stress_incremental_eur": 3097.9,
+      "stress_payback_years": 67.78785628974467,
+      "base_rank": 16
+    },
+    {
+      "option": "DEU",
+      "countries": [
+        "DEU"
+      ],
+      "capex_eur": 280000.0,
+      "fte": 5,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": -34005.86,
+      "low_payback_years": null,
+      "base_incremental_eur": 10088.64,
+      "base_payback_years": 27.753988644653788,
+      "high_incremental_eur": 54183.14,
+      "high_payback_years": 5.167659164825073,
+      "stress_incremental_eur": -13583.04,
+      "stress_payback_years": null,
+      "base_rank": 17
+    },
+    {
+      "option": "DEFER",
+      "countries": [],
+      "capex_eur": 0.0,
+      "fte": 0,
+      "feasible": true,
+      "constraint_failures": "",
+      "low_incremental_eur": 0.0,
+      "low_payback_years": null,
+      "base_incremental_eur": 0.0,
+      "base_payback_years": null,
+      "high_incremental_eur": 0.0,
+      "high_payback_years": null,
+      "stress_incremental_eur": 0.0,
+      "stress_payback_years": null,
+      "base_rank": 18
+    }
+  ],
+  "thresholds": [
+    {
+      "country": "DEU",
+      "break_even_uplift": 0.21568062087737738,
+      "break_even_saving_at_base": 1.9358913848432486,
+      "max_fixed_cost_at_base": 105088.64,
+      "contribution_per_shipped_unit": 21.58854274664692,
+      "return_rate": 0.0060067473051921335,
+      "fulfillment_per_unit": 1.1063687978276968
+    },
+    {
+      "country": "FRA",
+      "break_even_uplift": 0.16267860355409688,
+      "break_even_saving_at_base": 1.0728771043771044,
+      "max_fixed_cost_at_base": 112132.775,
+      "contribution_per_shipped_unit": 23.2551430976431,
+      "return_rate": 0.012121212121212121,
+      "fulfillment_per_unit": 1.221111111111111
+    },
+    {
+      "country": "NLD",
+      "break_even_uplift": 0.06956357153618974,
+      "break_even_saving_at_base": -0.8849271628498728,
+      "max_fixed_cost_at_base": 129215.055,
+      "contribution_per_shipped_unit": 25.09893606870229,
+      "return_rate": 0.011450381679389313,
+      "fulfillment_per_unit": 1.3194274809160305
+    },
+    {
+      "country": "POL",
+      "break_even_uplift": 0.03455118655940084,
+      "break_even_saving_at_base": -2.681666489402112,
+      "max_fixed_cost_at_base": 128612.47,
+      "contribution_per_shipped_unit": 27.083026665653726,
+      "return_rate": 0.013674694218643167,
+      "fulfillment_per_unit": 1.4205340727797615
+    },
+    {
+      "country": "CZE",
+      "break_even_uplift": 0.026188095933931295,
+      "break_even_saving_at_base": -3.4564224859826695,
+      "max_fixed_cost_at_base": 135382.9375,
+      "contribution_per_shipped_unit": 28.93288065244302,
+      "return_rate": 0.020971382800553412,
+      "fulfillment_per_unit": 1.5226257918881527
+    },
+    {
+      "country": "ESP",
+      "break_even_uplift": 0.028482178107878033,
+      "break_even_saving_at_base": -2.8985782786591057,
+      "max_fixed_cost_at_base": 157716.3675,
+      "contribution_per_shipped_unit": 30.285009690618047,
+      "return_rate": 0.018089153686023974,
+      "fulfillment_per_unit": 1.6300301485894768
+    }
+  ],
+  "market_changes": [
+    {
+      "country": "DEU",
+      "population_change_2022_2024": 338780,
+      "population_change_pct": 0.0040729611392884306,
+      "gdp_per_capita_change_pct": 0.11082162421901318
+    },
+    {
+      "country": "FRA",
+      "population_change_2022_2024": 367196,
+      "population_change_pct": 0.005385332906588961,
+      "gdp_per_capita_change_pct": 0.12477712092346008
+    },
+    {
+      "country": "NLD",
+      "population_change_2022_2024": 292503,
+      "population_change_pct": 0.01652467642755639,
+      "gdp_per_capita_change_pct": 0.14109495982081027
+    },
+    {
+      "country": "POL",
+      "population_change_2022_2024": -262516,
+      "population_change_pct": -0.0071293734580614295,
+      "gdp_per_capita_change_pct": 0.3288488587203136
+    },
+    {
+      "country": "CZE",
+      "population_change_2022_2024": 232910,
+      "population_change_pct": 0.02182415899074579,
+      "gdp_per_capita_change_pct": 0.12536254657789475
+    },
+    {
+      "country": "ESP",
+      "population_change_2022_2024": 1062738,
+      "population_change_pct": 0.022239478750537132,
+      "gdp_per_capita_change_pct": 0.16515014425416882
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+sysctl: sysctl fmt -1 1024 1: Operation not permitted
+writes: 1835.61 requests/s; p95 3.48 ms; errors 0
+reads: 1884.4 requests/s; p95 7.797 ms; errors 0
+Traceback (most recent call last):
+  File "<CELL>/workspace/scripts/benchmark.py", line 160, in <module>
+    run(args)
+  File "<CELL>/workspace/scripts/benchmark.py", line 130, in run
+    result={'recorded_at':datetime.now(timezone.utc).isoformat(), 'hardware':hardware(),
+                                                                             ^^^^^^^^^^
+  File "<CELL>/workspace/scripts/benchmark.py", line 42, in hardware
+    result[field] = subprocess.check_output(['/usr/sbin/sysctl','-n',name], text=True).strip()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<SHARED_RUNTIME>/python/lib/python3.12/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<SHARED_RUNTIME>/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/usr/sbin/sysctl', '-n', 'machdep.cpu.brand_string']' returned non-zero exit status 1.
