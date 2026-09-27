@@ -1,0 +1,53 @@
+{
+  "cell": "fullstack-gpt-5.6-luna-max-v14",
+  "exit_code": 0,
+  "stderr": "",
+  "scope": "Same browser business flow on fresh unmodified copies, with response status/body validation and a subsequent rendered text change for reserve/ship/return. Returned line quantities checked. A synthetic viewer fixture is created by admin API after the main flow so the viewer orders page must render a known record before checking writable controls. Screenshot after return. Not an outcome-model rerun.",
+  "passed": 7,
+  "total": 7,
+  "groups": [
+    {
+      "name": "page_identity_and_login",
+      "pass": true,
+      "details": {
+        "url": "http://127.0.0.1:58306/",
+        "title": "DepotFlow"
+      }
+    },
+    {
+      "name": "inventory_rendered",
+      "pass": true,
+      "details": "SKU\tNAME\tON HAND\tRESERVED\tAVAILABLE\tPRICE\tVERSION\nBOLT\tSteel bolt kit\t100\t0\t100\t$12.50\t1\nCABLE\tCable assembly\t60\t0\t60\t$24.99\t1\nSAMPLE\tSample pack\t20\t0\t20\t$0.00\t1"
+    },
+    {
+      "name": "create_reserve_ship_return_flow",
+      "pass": true,
+      "details": "Order detail\n\nVersion 4\n\nReturned\nClient reference\nBROWSER-CHECK\nStatus\nreturned\nTotal\n$49.99\nSKU\tQUANTITY\tUNIT PRICE\tRETURNED\nBOLT\t2\t$12.50\t2\nCABLE\t1\t$24.99\t1"
+    },
+    {
+      "name": "audit_rendered",
+      "pass": true,
+      "details": "TIME\tACTION\tENTITY\tACTOR\n9/27/2026, 9:49:01 PM\torder.created\tb6d095449b6f4d07b5db20248cc91177\tadmin@north.example\n9/27/2026, 9:49:01 PM\torder.reserved\tb6d095449b6f4d07b5db20248cc91177\tadmin@north.example\n9/27/2026, 9:49:01 PM\torder.shipped\tb6d095449b6f4d07b5db20248cc91177\tadmin@north.example\n9/27/2026, 9:49:01 PM\torder.returned\tb6d095449b6f4d07b5db20248cc91177\tadmin@north.example"
+    },
+    {
+      "name": "mobile_layout",
+      "pass": true,
+      "details": {
+        "viewport": 390,
+        "document": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "viewer_workflow_read_only",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "no_uncaught_client_error",
+      "pass": true,
+      "details": null
+    }
+  ],
+  "diagnostic_version": 3
+}

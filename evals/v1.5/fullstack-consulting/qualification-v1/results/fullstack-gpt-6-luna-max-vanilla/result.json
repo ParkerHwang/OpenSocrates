@@ -1,0 +1,64 @@
+{
+  "cell": "fullstack-gpt-6-luna-max-vanilla",
+  "started_utc": "2026-09-27T12:37:05.219499+00:00",
+  "candidate_repairs": 0,
+  "api": {
+    "passed": 24,
+    "total": 24,
+    "critical_pass": true
+  },
+  "restart": true,
+  "browser": {
+    "passed": 6,
+    "total": 7
+  },
+  "performance_eligible": true,
+  "performance": [
+    {
+      "workload": "inventory_get",
+      "concurrency": 1,
+      "requests": 500,
+      "wall_seconds": 0.2037520840531215,
+      "requests_per_second": 2453.9626297497985,
+      "errors": 0,
+      "p50_ms": 0.372416980098933,
+      "p95_ms": 0.5024580168537796,
+      "p99_ms": 0.6068340153433383
+    },
+    {
+      "workload": "draft_order_post",
+      "concurrency": 1,
+      "requests": 200,
+      "wall_seconds": 0.13994525000452995,
+      "requests_per_second": 1429.130320561263,
+      "errors": 0,
+      "p50_ms": 0.6763330311514437,
+      "p95_ms": 0.7589170127175748,
+      "p99_ms": 0.7855409639887512
+    },
+    {
+      "workload": "inventory_get",
+      "concurrency": 8,
+      "requests": 500,
+      "wall_seconds": 0.16347458300879225,
+      "requests_per_second": 3058.579448849906,
+      "errors": 0,
+      "p50_ms": 2.522541966754943,
+      "p95_ms": 3.99070797720924,
+      "p99_ms": 4.459249961655587
+    },
+    {
+      "workload": "draft_order_post",
+      "concurrency": 8,
+      "requests": 200,
+      "wall_seconds": 0.11647670797538012,
+      "requests_per_second": 1717.081496175822,
+      "errors": 0,
+      "p50_ms": 0.6684170220978558,
+      "p95_ms": 10.577416978776455,
+      "p99_ms": 90.63074999721721
+    }
+  ],
+  "original_still_matches_snapshot": true,
+  "ended_utc": "2026-09-27T12:37:08.751405+00:00"
+}

@@ -1,0 +1,634 @@
+{
+  "cell": "consulting-gpt-6-sol-high-v14",
+  "read_only": true,
+  "artifacts": [
+    {
+      "source": "deliverables/analytical_workbook.xlsx",
+      "sha256": "8d88c0ab09651a85e2e6ee1aa01e272424ec994380c0d7c8fe7bc53339930125",
+      "bytes": 29602,
+      "sheets": [
+        {
+          "name": "Read me",
+          "dimensions": "A1:B8",
+          "freeze_panes": "B2",
+          "autofilter": null,
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "MERIDIAN PARTS | ANALYTICAL WORKBOOK",
+              "2025 shipped base; returns known by 2026-01-31"
+            ],
+            [
+              "Use",
+              "All figure sheets are generated from saved raw inputs by analysis/build.py."
+            ],
+            [
+              "Evidence",
+              "Synthetic client exports and archived official ECB/World Bank snapshots; see Sources sheet and sources/source_register.json."
+            ],
+            [
+              "Accounting",
+              "One latest-revision row/order; sale-month FX; half-up cent rounding per order; returns assigned to shipment month."
+            ],
+            [
+              "Annual scenario",
+              "C*u + U*(1+u)*s - F, with u=10%/25%/40%; year-zero capex excluded."
+            ],
+            [
+              "Stress",
+              "(C-3%*G-10%*N for PLN/CZK)*1.25 - C + U*1.25*s - F; no cost recovery for added refund."
+            ]
+          ]
+        },
+        {
+          "name": "Monthly",
+          "dimensions": "A1:L73",
+          "freeze_panes": "B2",
+          "autofilter": "A1:L73",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "country",
+              "month",
+              "shipped_orders",
+              "shipped_units",
+              "gross_sales_eur",
+              "refunds_eur",
+              "net_sales_eur",
+              "net_cogs_eur",
+              "fulfillment_eur",
+              "contribution_eur"
+            ],
+            [
+              "DEU",
+              "2025-01",
+              18,
+              962,
+              48962.64,
+              449,
+              48513.64,
+              26373,
+              1081.8,
+              21058.84
+            ],
+            [
+              "DEU",
+              "2025-02",
+              18,
+              892,
+              44273.52,
+              450,
+              43823.52,
+              23462.5,
+              1018.8,
+              19342.22
+            ],
+            [
+              "DEU",
+              "2025-03",
+              17,
+              864,
+              39088.56,
+              450,
+              38638.56,
+              22211,
+              981.6,
+              15445.96
+            ],
+            [
+              "DEU",
+              "2025-04",
+              17,
+              882,
+              45414.48,
+              450,
+              44964.48,
+              24142,
+              997.8,
+              19824.68
+            ],
+            [
+              "DEU",
+              "2025-05",
+              18,
+              1159,
+              65858.88,
+              450,
+              65408.88,
+              36475,
+              1259.1,
+              27674.78
+            ]
+          ]
+        },
+        {
+          "name": "Country totals",
+          "dimensions": "A1:K7",
+          "freeze_panes": "B2",
+          "autofilter": "A1:K7",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "country",
+              "shipped_orders",
+              "shipped_units",
+              "gross_sales_eur",
+              "refunds_eur",
+              "net_sales_eur",
+              "net_cogs_eur",
+              "fulfillment_eur",
+              "contribution_eur",
+              "returned_units"
+            ],
+            [
+              "DEU",
+              209,
+              12153,
+              631244.76,
+              5453,
+              625791.76,
+              349980.5,
+              13445.7,
+              262365.56,
+              73
+            ],
+            [
+              "FRA",
+              209,
+              11880,
+              640929.94,
+              8699.04,
+              632230.9,
+              341453,
+              14506.8,
+              276271.1,
+              144
+            ],
+            [
+              "NLD",
+              209,
+              12576,
+              709108.84,
+              11376,
+              697732.84,
+              365495.5,
+              16593.12,
+              315644.22,
+              144
+            ],
+            [
+              "POL",
+              209,
+              13163,
+              776507.79,
+              14617.92,
+              761889.87,
+              386697.5,
+              18698.49,
+              356493.88,
+              180
+            ],
+            [
+              "CZE",
+              209,
+              13733,
+              834572.08,
+              19264.61,
+              815307.47,
+              397062,
+              20910.22,
+              397335.25,
+              288
+            ]
+          ]
+        },
+        {
+          "name": "Market context",
+          "dimensions": "A1:H19",
+          "freeze_panes": "B2",
+          "autofilter": "A1:H19",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "country",
+              "year",
+              "population",
+              "gdp_per_capita_usd",
+              "population_unit",
+              "gdp_unit",
+              "population_source",
+              "gdp_source"
+            ],
+            [
+              "DEU",
+              2022,
+              83177813,
+              50506.5179638543,
+              "persons",
+              "current US$ per person",
+              "World Bank SP.POP.TOTL archive; 2026-07-13 revision",
+              "World Bank NY.GDP.PCAP.CD archive; 2026-07-13 revision"
+            ],
+            [
+              "DEU",
+              2023,
+              83287273,
+              54776.7668235491,
+              "persons",
+              "current US$ per person",
+              "World Bank SP.POP.TOTL archive; 2026-07-13 revision",
+              "World Bank NY.GDP.PCAP.CD archive; 2026-07-13 revision"
+            ],
+            [
+              "DEU",
+              2024,
+              83516593,
+              56103.7323182554,
+              "persons",
+              "current US$ per person",
+              "World Bank SP.POP.TOTL archive; 2026-07-13 revision",
+              "World Bank NY.GDP.PCAP.CD archive; 2026-07-13 revision"
+            ],
+            [
+              "FRA",
+              2022,
+              68184457,
+              40988.6396406579,
+              "persons",
+              "current US$ per person",
+              "World Bank SP.POP.TOTL archive; 2026-07-13 revision",
+              "World Bank NY.GDP.PCAP.CD archive; 2026-07-13 revision"
+            ],
+            [
+              "FRA",
+              2023,
+              68372286,
+              44700.1384177544,
+              "persons",
+              "current US$ per person",
+              "World Bank SP.POP.TOTL archive; 2026-07-13 revision",
+              "World Bank NY.GDP.PCAP.CD archive; 2026-07-13 revision"
+            ]
+          ]
+        },
+        {
+          "name": "FX monthly",
+          "dimensions": "A1:C25",
+          "freeze_panes": "B2",
+          "autofilter": "A1:C25",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "currency",
+              "month",
+              "local_per_eur"
+            ],
+            [
+              "PLN",
+              "2025-01",
+              4.24665455
+            ],
+            [
+              "PLN",
+              "2025-02",
+              4.172225
+            ],
+            [
+              "PLN",
+              "2025-03",
+              4.18200952
+            ],
+            [
+              "PLN",
+              "2025-04",
+              4.26522
+            ],
+            [
+              "PLN",
+              "2025-05",
+              4.2538
+            ]
+          ]
+        },
+        {
+          "name": "Hub scenarios",
+          "dimensions": "A1:H73",
+          "freeze_panes": "B2",
+          "autofilter": "A1:F73",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "country",
+              "scenario",
+              "incremental_contribution_eur",
+              "capex_eur",
+              "fte",
+              "payback_years",
+              null,
+              "Feasible choices"
+            ],
+            [
+              "DEFER",
+              "low",
+              0,
+              0,
+              0,
+              null,
+              null,
+              "18 including defer; each has four scenarios"
+            ],
+            [
+              "DEFER",
+              "base",
+              0,
+              0,
+              0,
+              null,
+              null,
+              null
+            ],
+            [
+              "DEFER",
+              "high",
+              0,
+              0,
+              0,
+              null,
+              null,
+              null
+            ],
+            [
+              "DEFER",
+              "stress",
+              0,
+              0,
+              0,
+              null,
+              null,
+              null
+            ],
+            [
+              "DEU",
+              "low",
+              -34005.86,
+              280000,
+              5,
+              null,
+              null,
+              null
+            ]
+          ]
+        },
+        {
+          "name": "Decision chart",
+          "dimensions": "A1:E18",
+          "freeze_panes": "B2",
+          "autofilter": "A1:E18",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "choice",
+              "base_eur",
+              "stress_eur",
+              "capex_eur",
+              "fte"
+            ],
+            [
+              "CZE+ESP",
+              198099.31,
+              32179.71,
+              225000,
+              5
+            ],
+            [
+              "POL+ESP",
+              186328.84,
+              29263.85,
+              240000,
+              6
+            ],
+            [
+              "POL+CZE",
+              178995.41,
+              -78569.76,
+              205000,
+              5
+            ],
+            [
+              "NLD+ESP",
+              166931.42,
+              107630.13,
+              270000,
+              6
+            ],
+            [
+              "NLD+CZE",
+              159597.99,
+              -203.48,
+              235000,
+              5
+            ]
+          ]
+        },
+        {
+          "name": "Quality",
+          "dimensions": "A1:B18",
+          "freeze_panes": "B2",
+          "autofilter": null,
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Checkpoint",
+              "Finding / treatment"
+            ],
+            [
+              "Order raw rows",
+              1328
+            ],
+            [
+              "Order distinct IDs",
+              1297
+            ],
+            [
+              "Order exact duplicate extras",
+              13
+            ],
+            [
+              "Order superseded revisions",
+              18
+            ],
+            [
+              "Eligible 2025 orders",
+              1254
+            ]
+          ]
+        },
+        {
+          "name": "Sources",
+          "dimensions": "A1:J14",
+          "freeze_panes": "B2",
+          "autofilter": "A1:J14",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "file",
+              "status",
+              "collected_from",
+              "collected_utc",
+              "sha256",
+              "units",
+              "period",
+              "original_public_url",
+              "original_retrieved_utc",
+              "archive_hash_verified"
+            ],
+            [
+              "sources/raw/data-dictionary.md",
+              "synthetic client/source-room metadata",
+              "http://127.0.0.1:51903/data-dictionary.md",
+              "2026-09-27T07:51:15.062258+00:00",
+              "0a1866e9f89b5c6d40ed2ac24599a118223360fa028e61012d1ecd8ac6b6117f",
+              "accounting rules",
+              "2025 shipments / returns through 2026-01-31",
+              null,
+              null,
+              null
+            ],
+            [
+              "sources/raw/ecb-history.csv",
+              "archived official public snapshot",
+              "http://127.0.0.1:51903/ecb-history.csv",
+              "2026-09-27T07:51:15.074134+00:00",
+              "e8136f072d575cb891cb58718fe31602ca2d4feccee67f035106393ed1c4bdbb",
+              "local currency units per EUR",
+              "daily ECB history; 2025 used",
+              null,
+              null,
+              true
+            ],
+            [
+              "sources/raw/ecb-history.zip",
+              "archived official public snapshot",
+              "http://127.0.0.1:51903/ecb-history.zip",
+              "2026-09-27T07:51:15.082801+00:00",
+              "dfe9ab070c0679d42a174981e07b240131d2db19d20108a5d0e4653d9f61fc9f",
+              "local currency units per EUR",
+              "daily ECB history; 2025 used",
+              "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.zip",
+              "2026-09-27T06:36:40.952057+00:00",
+              true
+            ],
+            [
+              "sources/raw/gdp-per-capita.json",
+              "archived official public snapshot",
+              "http://127.0.0.1:51903/gdp-per-capita.json",
+              "2026-09-27T07:51:15.091692+00:00",
+              "df654256a8803415e2e2c5864d1a00966cfd3150c069b1b897101748471524da",
+              "current US$ per person",
+              "2022-2024",
+              "https://api.worldbank.org/v2/country/DEU;FRA;NLD;POL;CZE;ESP/indicator/NY.GDP.PCAP.CD?date=2022:2024&format=json&per_page=1000",
+              "2026-09-27T06:36:40.951986+00:00",
+              true
+            ],
+            [
+              "sources/raw/hub-options.csv",
+              "synthetic client/source-room metadata",
+              "http://127.0.0.1:51903/hub-options.csv",
+              "2026-09-27T07:51:15.100071+00:00",
+              "2f508c9bd49c45b9b28621f46cc68cb7ac6fa4f3fc1acabb61a7c4f06dce6006",
+              "EUR capex; FTE; EUR annual fixed; EUR saving per unit",
+              "annual scenario assumptions",
+              null,
+              null,
+              null
+            ]
+          ]
+        }
+      ],
+      "render_sheet": "Country totals"
+    },
+    {
+      "source": "deliverables/board_presentation.pdf",
+      "sha256": "32229e49dc7c1857a33e40545f6c999f3d075e7e60df38c9dd30bea8c47e1768",
+      "bytes": 76162,
+      "pages": 7,
+      "empty_text_pages": [],
+      "rendered_pages": [
+        1,
+        4,
+        7
+      ],
+      "render_images": [
+        {
+          "page": 1,
+          "file": "board_presentation-page-01.png",
+          "exit_code": 0,
+          "stderr": ""
+        },
+        {
+          "page": 4,
+          "file": "board_presentation-page-04.png",
+          "exit_code": 0,
+          "stderr": ""
+        },
+        {
+          "page": 7,
+          "file": "board_presentation-page-07.png",
+          "exit_code": 0,
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "source": "deliverables/executive_report.pdf",
+      "sha256": "6142912ef1a3af3223e23718b5a45e687dda68c76026a713a250c5c1d97c7dfc",
+      "bytes": 80545,
+      "pages": 5,
+      "empty_text_pages": [],
+      "rendered_pages": [
+        1,
+        3,
+        5
+      ],
+      "render_images": [
+        {
+          "page": 1,
+          "file": "executive_report-page-01.png",
+          "exit_code": 0,
+          "stderr": ""
+        },
+        {
+          "page": 3,
+          "file": "executive_report-page-03.png",
+          "exit_code": 0,
+          "stderr": ""
+        },
+        {
+          "page": 5,
+          "file": "executive_report-page-05.png",
+          "exit_code": 0,
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "render_scope": "Representative first, densest-text and middle pages; not a complete visual audit. Text extracted from every PDF page. LibreOffice derivatives are separate and may differ from PowerPoint."
+}

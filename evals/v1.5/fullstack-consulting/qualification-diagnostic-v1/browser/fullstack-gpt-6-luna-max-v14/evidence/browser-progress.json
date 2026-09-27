@@ -1,0 +1,48 @@
+{
+  "groups": [
+    {
+      "name": "page_identity_and_login",
+      "pass": true,
+      "details": {
+        "url": "http://127.0.0.1:57707/",
+        "title": "DepotFlow · Fulfillment desk"
+      }
+    },
+    {
+      "name": "inventory_rendered",
+      "pass": true,
+      "details": "SKU\tPRODUCT\tON HAND\tRESERVED\tAVAILABLE\tUNIT PRICE\tVERSION\nBOLT\tSteel bolt kit\t100\t0\t100\t$12.50\tv1\nCABLE\tCable assembly\t60\t0\t60\t$24.99\tv1\nSAMPLE\tSample pack\t20\t0\t20\t$0.00\tv1"
+    },
+    {
+      "name": "create_reserve_ship_return_flow",
+      "pass": true,
+      "details": "ORDER DETAIL\n\nBROWSER-CHECK\nord_9dd2f6484b9d467ab893c62eef41e980\nSHIPPED\nSTATUS\nshipped\nVERSION\nv3\nLINES\n2\nSKU\tQTY\tPRICE\tRETURNED\tLINE TOTAL\nBOLT\t2\t$12.50\t0\t$25.00\nCABLE\t1\t$24.99\t0\t$24.99\nORDER TOTAL\n$49.99\nRecord a return\n\nEnter the number of shipped units received back. A partial return keeps this order shipped.\n\nBOLT · 2 remaining\nCABLE · 1 remaining\nSubmit return"
+    },
+    {
+      "name": "audit_rendered",
+      "pass": true,
+      "details": "EVENT\tENTITY\tACTOR\tRECORDED AT\norder.created\tord_9dd2f6484b9d467ab893c62eef41e980\tadmin@north.example\t9/27/2026, 9:44:03 PM\norder.reserved\tord_9dd2f6484b9d467ab893c62eef41e980\tadmin@north.example\t9/27/2026, 9:44:04 PM\norder.shipped\tord_9dd2f6484b9d467ab893c62eef41e980\tadmin@north.example\t9/27/2026, 9:44:04 PM\norder.returned\tord_9dd2f6484b9d467ab893c62eef41e980\tadmin@north.example\t9/27/2026, 9:44:04 PM"
+    },
+    {
+      "name": "mobile_layout",
+      "pass": true,
+      "details": {
+        "viewport": 390,
+        "document": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "viewer_workflow_read_only",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "no_uncaught_client_error",
+      "pass": true,
+      "details": null
+    }
+  ],
+  "consoleEvents": [],
+  "errors": []
+}

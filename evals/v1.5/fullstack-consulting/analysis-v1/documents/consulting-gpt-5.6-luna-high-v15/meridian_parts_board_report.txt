@@ -1,0 +1,256 @@
+PAGE 1
+Meridian Parts
+European service-hub expansion | board decision report
+Decision basis: 2025 shipped sales and returns known through 31 January 2026; frozen source room collected 27 September 2026 UTC. All client exports and hub
+assumptions are synthetic. World Bank and ECB series are archived public snapshots.
+Recommendation
+Fund a staged two-hub pilot for CZE + ESP, with year-zero capex of EUR 225,000 and 5 FTE, subject to the 90-day gates below. The
+base policy case implies EUR 198,099 annual incremental contribution and 1.14-year simple payback; this is a planning estimate, not a
+proven causal effect.
+The choice is supported by trade-off analysis: the selected pair is the highest base-case feasible alternative. It gives up the lower capex
+of single-hub options in exchange for more modeled contribution. The strongest alternative is POL+ESP at EUR 186,329 annual
+incremental contribution. Defer remains valid if the pilot cannot validate the volume uplift/savings assumptions or the stress case is
+judged more credible.
+Executive diagnosis
+Market / operating base
+2025 net sales
+Contribution
+Margin
+Units
+Returned units
+Spain
+EUR 850,839
+EUR 421,900
+49.6%
+13,931
+252
+Czechia
+EUR 815,307
+EUR 397,335
+48.7%
+13,733
+288
+Poland
+EUR 761,890
+EUR 356,494
+46.8%
+13,163
+180
+Netherlands
+EUR 697,733
+EUR 315,644
+45.2%
+12,576
+144
+France
+EUR 632,231
+EUR 276,271
+43.7%
+11,880
+144
+Germany
+EUR 625,792
+EUR 262,366
+41.9%
+12,153
+73
+Operationally, contribution is concentrated in the larger EUR markets, while POL/CZE carry the only non-EUR translation exposure.
+Population and GDP per capita provide context only; they are not direct evidence of replacement-assembly demand.
+Accounting and evidence reconciliation
+The order extracts contain 1,328 rows. Exact repeated rows were collapsed, then the highest numeric revision per order_id was
+retained; 43 post-revision rows were excluded for status/test/date rules. Free or zero-price shipments were retained (12). Returns were
+deduplicated by highest revision per return_id, added across legitimate IDs, and limited to eligible linked orders received by the
+inclusive cutoff. 1 orphan return(s) were quarantined and 1 late return(s) excluded; neither was joined by guess.
+For EUR orders the rate is 1. For PLN and CZK, each sale and its summed refund use the original sale month’s arithmetic mean of
+available ECB business-day reference observations, quoted as local currency units per EUR. Individual monetary components are
+half-up rounded to cents before summation. Gross sales are booked sales after discount; cash can differ because refunds/settlement
+timing and FX differ; contribution further subtracts net COGS and nonrefundable fulfillment.
+Core evidence links: [S-pop] archived World Bank population snapshot; [S-gdp] archived World Bank GDP-per-capita snapshot; [S-ecb] archived ECB historical FX
+archive; [S-client] synthetic source-room exports, dictionary and policy. Full URLs, hashes, periods, units and retrieval metadata are in the source register and
+workbook.
+
+
+PAGE 2
+Market context
+Market
+Pop 2022
+Pop 2024
+Change
+GDP pc 2022
+GDP pc 2024
+Germany
+83,177,813
+83,516,593
+0.4%
+$50,507
+$56,104
+France
+68,184,457
+68,551,653
+0.5%
+$40,989
+$46,103
+Netherlands
+17,700,982
+17,993,485
+1.7%
+$59,123
+$67,465
+Poland
+36,821,749
+36,559,233
+-0.7%
+$18,891
+$25,104
+Czechia
+10,672,118
+10,905,028
+2.2%
+$28,282
+$31,828
+Spain
+47,786,102
+48,848,840
+2.2%
+$30,319
+$35,327
+The archived World Bank responses carry a 2026-07-13 last-updated metadata vintage. The measures are descriptive context in
+current US dollars and persons; they should not be read as demand forecasts, market shares or causal evidence for a hub.
+Scenario comparison
+Option
+Low
+Base
+High
+Stress
+Capex
+FTE
+CZE+ESP
+EUR 64,619
+EUR 198,099
+EUR 331,580
+EUR 32,180
+EUR 225,000
+5
+POL+ESP
+EUR 58,562
+EUR 186,329
+EUR 314,096
+EUR 29,264
+EUR 240,000
+6
+POL+CZE
+EUR 56,856
+EUR 178,995
+EUR 301,134
+EUR -78,570
+EUR 205,000
+5
+NLD+ESP
+EUR 43,994
+EUR 166,931
+EUR 289,869
+EUR 107,630
+EUR 270,000
+6
+NLD+CZE
+EUR 42,289
+EUR 159,598
+EUR 276,907
+EUR -203
+EUR 235,000
+5
+NLD+POL
+EUR 36,232
+EUR 147,828
+EUR 259,423
+EUR -3,119
+EUR 250,000
+6
+FRA+ESP
+EUR 13,687
+EUR 129,849
+EUR 246,012
+EUR 73,105
+EUR 340,000
+7
+FRA+CZE
+EUR 11,981
+EUR 122,516
+EUR 233,050
+EUR -34,729
+EUR 305,000
+6
+FRA+POL
+EUR 5,924
+EUR 110,745
+EUR 215,566
+EUR -37,645
+EUR 320,000
+7
+DEU+CZE
+EUR -2,549
+EUR 105,472
+EUR 213,492
+EUR -51,410
+EUR 375,000
+7
+Hard constraints are EUR450,000 year-zero capex, seven FTE, and at most two hubs. Annual incremental contribution excludes
+capex; payback is simple undiscounted capex divided by positive annual contribution. Pairs add country arithmetic with no synergy.
+The stress column is the policy’s joint stress, not a probability forecast.
+What changes the decision
+The recommendation should be reopened if measured pilot evidence cannot support the assumed uplift/savings run-rate; if actual
+capex or staffing breaches the hard budget; if return behavior or PLN/CZK FX makes the defined stress case the more credible
+operating case; or if a stronger alternative becomes demonstrably executable at lower risk. Under the defined stress, NLD+ESP is the
+strongest alternative at EUR 107,630 annual incremental contribution, versus EUR 198,099 for the selected base leader. Those are
+observable gates, not claims about statistical certainty.
+
+
+PAGE 3
+90-day implementation and KPI plan
+Timing / owner
+Action and dependency
+Decision gate / KPI
+Days 0–15 | COO +
+Finance
+Confirm site shortlist, carrier lanes, labor plan, capex quotes and
+local tax/returns process. Dependency: vendor quotes and
+legal/finance review.
+Gate 1: capex ≤ EUR450k, FTE ≤7, named owners.
+KPI baseline: order-to-delivery, fulfillment EUR/order,
+return rate, contribution/order.
+Days 16–45 | Operations
++ Commercial
+Run controlled service-level and routing pilot for selected countries
+using existing central-hub flows; instrument promised vs actual
+delivery, conversion/volume, and savings per unit.
+Gate 2: measured uplift and savings trend toward
+base assumptions; no material service-level
+regression. KPI: on-time %, lead-time p50/p90,
+incremental units, saving EUR/unit.
+Days 46–75 | Finance +
+Data
+Reconcile pilot invoices/refunds, FX translation and COGS
+recovery; stress-test return and FX cases; finalize staffing and
+launch readiness.
+Gate 3: data-quality sign-off; KPI: refund rate,
+returned units, net sales, net COGS, contribution
+margin, FX variance.
+Days 76–90 | Board
+sponsor + COO
+Approve, resize, defer or switch to strongest alternative based on
+observed run-rate and constraints.
+Go/no-go: fund only if evidence supports the selected
+case and risk controls; otherwise defer or choose the
+next feasible option.
+Risks and mitigations
+Demand uplift risk: validate incrementality during the pilot and hold capex until Gate 3. Return-rate risk: use return rate and returned
+units as explicit stop metrics; do not assume every return recovers product cost. FX risk: preserve sale-month ECB translation and
+monitor PLN/CZK variance; the stress case is a guardrail. Execution risk: stage staffing and site commitments; use the hard FTE/capex
+limits. Evidence risk: synthetic client inputs and no interviews mean this is a decision support model, not field validation.
+Limitations and reproducibility
+No customer interviews, live account access, demand elasticity study, competitor data, labor quotes, tax/legal review, actual
+transaction FX, or discounted cash flow were available. The raw source room is saved under evidence/raw with SHA-256 hashes and
+original public URLs. Run python3 scripts/build_deliverables.py to regenerate metrics.json, the XLSX, this PDF and the PPTX from
+saved inputs.
+Source register identifiers: S-pop = population.json; S-gdp = gdp-per-capita.json; S-ecb = ecb-history.zip/csv; S-client = synthetic source-room files. See
+deliverables/source-register.csv.

@@ -28,3 +28,5 @@ that exact head when resuming. Product/package baseline remains
 `035fafcd208bf9577ca55ff5e42a93df4ca608ea`. PR95 remains Draft, with no publication
 or release authorization exercised. Original locked trees and full dependency
 caches remain in the declared local evaluation storage; do not clean that storage.
+
+The user subsequently resumed analysis. The pause above is historical; completed qualification and analysis are recorded in [analysis-v1/REPORT.md](analysis-v1/REPORT.md). No additional outcome episodes were launched.

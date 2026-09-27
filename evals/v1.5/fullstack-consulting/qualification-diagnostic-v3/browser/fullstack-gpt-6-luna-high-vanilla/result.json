@@ -1,0 +1,53 @@
+{
+  "cell": "fullstack-gpt-6-luna-high-vanilla",
+  "exit_code": 0,
+  "stderr": "",
+  "scope": "Same browser business flow on fresh unmodified copies, with response status/body validation and a subsequent rendered text change for reserve/ship/return. Returned line quantities checked. A synthetic viewer fixture is created by admin API after the main flow so the viewer orders page must render a known record before checking writable controls. Screenshot after return. Not an outcome-model rerun.",
+  "passed": 7,
+  "total": 7,
+  "groups": [
+    {
+      "name": "page_identity_and_login",
+      "pass": true,
+      "details": {
+        "url": "http://127.0.0.1:58262/",
+        "title": "DepotFlow"
+      }
+    },
+    {
+      "name": "inventory_rendered",
+      "pass": true,
+      "details": "SKU\tItem\tOn hand\tReserved\tAvailable\tPrice\tVersion\nBOLT\tSteel bolt kit\t100\t0\t100\t$12.50\t1\nCABLE\tCable assembly\t60\t0\t60\t$24.99\t1\nSAMPLE\tSample pack\t20\t0\t20\t$0.00\t1"
+    },
+    {
+      "name": "create_reserve_ship_return_flow",
+      "pass": true,
+      "details": "Order BROWSER-CHECK Returned\n\nOrder #1 \u00b7 version 4 \u00b7 total $49.99\n\nSKU\tQuantity\tUnit price\tReturned\nBOLT\t2\t$12.50\t2\nCABLE\t1\t$24.99\t1"
+    },
+    {
+      "name": "audit_rendered",
+      "pass": true,
+      "details": "Time\tAction\tEntity\tActor\n9/27/2026, 9:48:59 PM\torder.created\t1\tadmin@north.example\n9/27/2026, 9:48:59 PM\torder.reserve\t1\tadmin@north.example\n9/27/2026, 9:48:59 PM\torder.ship\t1\tadmin@north.example\n9/27/2026, 9:48:59 PM\torder.returns\t1\tadmin@north.example"
+    },
+    {
+      "name": "mobile_layout",
+      "pass": true,
+      "details": {
+        "viewport": 390,
+        "document": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "viewer_workflow_read_only",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "no_uncaught_client_error",
+      "pass": true,
+      "details": null
+    }
+  ],
+  "diagnostic_version": 3
+}

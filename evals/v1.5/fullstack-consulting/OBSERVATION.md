@@ -110,3 +110,7 @@ per-user temporary layout, explicit `/tmp` read denial, complete effective-confi
 receipts and a stop condition for a shared setup defect. Original failed receipts
 and the first freeze are unchanged. Git CSV normalization was caught and exact
 frozen bytes are now preserved using scoped `.gitattributes`.
+
+## Completed qualification and analysis
+
+All36 episodes are terminal. The user resumed after travel. The [qualified analysis](analysis-v1/REPORT.md) and [per-cell tables](analysis-v1/TABLES.md) retain original scores, separately versioned evaluator diagnostics, actual artifact findings and usage/timing limits. No outcome model was rerun or candidate repaired. The observation phase is complete; see the report for the bounded review and remaining claim limitations.

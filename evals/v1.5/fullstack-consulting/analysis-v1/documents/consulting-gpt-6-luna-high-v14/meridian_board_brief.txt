@@ -1,0 +1,451 @@
+PAGE 1
+MERIDIAN PARTS  /  BOARD DECISION NOTE
+Synthetic client inputs  Public archive vintage 27 Sep 2026
+1
+MERIDIAN PARTS / OPERATIONS STRATEGY
+ European service-hub expansion
+Board decision brief  27 September 2026
+2025 shipped sales and returns known through 31 January 2026
+Recommendation: stage NLD + ESP for a reversible pilot—Spain first, with
+country-specific tests in the Netherlands—and release site capex only after the
+90-day gates. It has the highest minimum across the supplied low/base/high/stress
+cases: €43,994/year floor (€166,931 base; €107,630 stress) on €270,000 year-zero
+capex and 6 FTE. These are scenario calculations, not a causal hub forecast.
+Board choice
+With no board probabilities, this uses the feasible pair with the highest minimum across the client-defined cases. That is an
+explicit conservative preference, not a statistical result. CZE + ESP is the strongest alternative by base contribution:
+EUR31,168/year more in base, but EUR75,450/year less under the defined stress. The caps are EUR450,000 and seven FTE;
+both options fit. Defer carries no investment and remains available.
+Alternative
+Capex
+FTE
+Low / yr
+Base / yr
+High / yr
+Stress / yr
+CZE + ESP
+€225,000
+5
+€64,619
+€198,099
+€331,580
+€32,180
+POL + ESP
+€240,000
+6
+€58,562
+€186,329
+€314,096
+€29,264
+POL + CZE
+€205,000
+5
+€56,856
+€178,995
+€301,134
+€-78,570
+NLD + ESP
+€270,000
+6
+€43,994
+€166,931
+€289,869
+€107,630
+NLD + CZE
+€235,000
+5
+€42,289
+€159,598
+€276,907
+€-203
+NLD + POL
+€250,000
+6
+€36,232
+€147,828
+€259,423
+€-3,119
+FRA + ESP
+€340,000
+7
+€13,687
+€129,849
+€246,012
+€73,105
+Hard limits are board rules. Scenarios are not probability-weighted and option economics assume additive pairs with no network synergy.
+
+
+PAGE 2
+MERIDIAN PARTS  /  BOARD DECISION NOTE
+Synthetic client inputs  Public archive vintage 27 Sep 2026
+2
+1 / 2025 operating diagnosis
+The shipment ledger establishes where Meridian already sells and earns contribution. It does not show how much demand a
+local hub would create. Modeled hub economics have two levers—added volume at current market contribution economics and
+assumed per-unit fulfillment savings—less annual fixed cost.
+Market
+Orders
+Units
+Net sales
+Net COGS
+Fulfillment
+Contribution
+Margin
+Returned
+units
+Germany
+209
+12,153
+€625,792
+€349,980
+€13,446
+€262,366
+41.9%
+73
+France
+209
+11,880
+€632,231
+€341,453
+€14,507
+€276,271
+43.7%
+144
+Netherlands
+209
+12,576
+€697,733
+€365,496
+€16,593
+€315,644
+45.2%
+144
+Poland
+209
+13,163
+€761,890
+€386,698
+€18,698
+€356,494
+46.8%
+180
+Czechia
+209
+13,733
+€815,307
+€397,062
+€20,910
+€397,335
+48.7%
+288
+Spain
+209
+13,931
+€850,839
+€406,230
+€22,708
+€421,900
+49.6%
+252
+2025 contribution by country (EUR)
+Germany
+€262,366
+France
+€276,271
+Netherlands
+€315,644
+Poland
+€356,494
+Czechia
+€397,335
+Spain
+€421,900
+Revenue, cash and contribution
+Gross sales are shipped quantity × price less discounts. Refund credits reduce net sales. Net sales approximate booked
+revenue under the supplied credit ledger, not cash collected: payment timing, settlement FX, fees and working capital were
+unavailable. Contribution further deducts net COGS after recovered restocked units and nonrefundable fulfillment. It is not
+EBITDA or hub profit; option recurring costs are deducted separately.
+Country margins equal contribution ÷ net sales. Monthly records contain 72 rows (six countries × 12 months); each annual country total reconciles to its
+monthly rows.
+
+
+PAGE 3
+MERIDIAN PARTS  /  BOARD DECISION NOTE
+Synthetic client inputs  Public archive vintage 27 Sep 2026
+3
+2 / Reconciliation and source quality
+The client’s transaction, cost and option data are synthetic. They were collected from the frozen local source room; no live client
+account, customer or interview was accessed. Raw inputs and source-room metadata are retained under sources/raw.
+Orders: 1,328 raw rows represent 1,297 IDs. 13 exact duplicate rows were removed; 18 IDs contain distinct revisions; no
+same-revision conflicts were found. Highest numeric revision wins across both extract pages and the whole-row correction file.
+1,254 shipped, non-test, 2025 orders are included; 43 selected records are excluded ({'not_shipped': 24, 'test_shipped': 18,
+'shipped_date_outside_2025_or_missing': 1}). Zero-price shipment orders are retained (12); January 2026 shipments are not
+applied to the base.
+Returns: 264 rows represent 243 IDs. 20 exact duplicate rows removed; 1 ID had multiple revisions; none have conflicting
+same-revision rows. The highest revision is kept. Through the inclusive 31 January 2026 cutoff, 241 returns linked to eligible
+selected sales are included. 1 orphan/ineligible record is quarantined (R-ORPHAN); 1 record arrived after cutoff. Return
+consistency checks: 0 orders exceed shipped units, 0 return rows restock more units than returned, and 0 orders refund more
+than gross local sales.
+FX and rounding
+For PLN and CZK, sales and refund credits use the arithmetic mean of published daily ECB reference observations in the
+original shipment month, quoted as local currency units per EUR; EUR is 1. No inversion or current FX is used. Each order’s
+gross, refund, gross COGS, recovered COGS and fulfillment amounts are rounded half-up to cents before summation. These
+reference quotes are analytical translation assumptions, not transaction rates.
+Missing costs: 0; missing FX: 0; missing World Bank population cells: 0; missing GDP cells: 0. No values are imputed.
+
+
+PAGE 4
+MERIDIAN PARTS  /  BOARD DECISION NOTE
+Synthetic client inputs  Public archive vintage 27 Sep 2026
+4
+3 / Market context
+Archived official World Bank series provide population (persons) and GDP per capita (current US dollars) for 2022–2024.
+Population change and income level contextualize scale and economic environment only; neither is direct evidence of Meridian
+product demand.
+Country
+Population 2022
+Population 2023
+Population 2024
+Change 2022–24
+GDP/capita 2024,
+current USD
+Germany
+83,177,813
+83,287,273
+83,516,593
+0.4%
+$56,104
+France
+68,184,457
+68,372,286
+68,551,653
+0.5%
+$46,103
+Netherlands
+17,700,982
+17,877,117
+17,993,485
+1.7%
+$67,465
+Poland
+36,821,749
+36,687,353
+36,559,233
+-0.7%
+$25,104
+Czechia
+10,672,118
+10,864,042
+10,905,028
+2.2%
+$31,828
+Spain
+47,786,102
+48,352,528
+48,848,840
+2.2%
+$35,327
+All 18 archived year-country cells are present. Population values are persons. GDP per capita is nominal current USD—not PPP
+and not constant-price real income. Historical public series were collected into a frozen source room on 27 September 2026 and
+may incorporate revisions after the measured 2025 trading year. Original API URLs, response hashes and vintage are listed in
+sources/source-register.json.
+Market scope limitation
+No market sizing, competitor comparison, localized demand survey, labor cost benchmark, real-estate quote, service-level
+history or regulatory diligence was supplied or added. This recommendation does not infer product fit from GDP per capita or
+population.
+
+
+PAGE 5
+MERIDIAN PARTS  /  BOARD DECISION NOTE
+Synthetic client inputs  Public archive vintage 27 Sep 2026
+5
+4 / Hub economics and decision
+For each country, annual incremental contribution equals C×u + U×(1+u)×s − F: C is 2025 contribution, U shipped units, u is
+assumed volume uplift (10%, 25%, 40%), s is client-assumed fulfillment saving per unit and F recurring annual fixed cost. Capex
+K is separate year-zero investment; simple undiscounted payback is K ÷ positive annual increment, otherwise null.
+Stress is the defined joint sensitivity, not a forecast probability: base uplift 25%, refund shock 3% of gross sales without added
+cost recovery, plus 10% of net sales depreciation for PLN/CZK options. Stressed contribution is compared against the
+unchanged normal baseline, then uplifted savings and recurring cost are applied. Pairs add country economics without synergy.
+Option
+Capex yr 0
+Fixed / yr
+FTE
+Low / yr
+Base / yr
+High / yr
+Stress / yr
+Base payback
+NLD + ESP
+€270,000
+€120,000
+6
+€43,994
+€166,931
+€289,869
+€107,630
+1.6 years
+CZE + ESP
+€225,000
+€95,000
+5
+€64,619
+€198,099
+€331,580
+€32,180
+1.1 years
+POL + ESP
+€240,000
+€100,000
+6
+€58,562
+€186,329
+€314,096
+€29,264
+1.3 years
+POL + CZE
+€205,000
+€85,000
+5
+€56,856
+€178,995
+€301,134
+€-78,570
+1.1 years
+NLD + CZE
+€235,000
+€105,000
+5
+€42,289
+€159,598
+€276,907
+€-203
+1.5 years
+The strongest different feasible alternative is CZE + ESP: €198,099/year base against €166,931/year for NLD + ESP—a
+modeled difference of €-31,168/year. The stress values are €32,180 and €107,630/year respectively. It uses €225,000 capex
+and 5 FTE, compared with €270,000 and 6 FTE. Defer avoids all capex and recurring cost while foregoing modeled increment.
+Switching condition
+The choice assumes 10%–40% volume uplift and the stated per-unit savings. For one option, the break-even uplift is
+(F−U×s)/(C+U×s), when the denominator is positive. If a reversible pilot shows savings are not avoidable, uplift misses
+break-even, or annual fixed cost rises enough to erase contribution, defer, reconfigure, or select the runner-up. Validate all
+levers before a full lease or site commitment.
+Preference provenance: selecting the combination with the highest minimum across low/base/high/stress is a conservative judgment because no board
+probabilities or weights were supplied. A base-only choice selects CZE + ESP.
+
+
+PAGE 6
+MERIDIAN PARTS  /  BOARD DECISION NOTE
+Synthetic client inputs  Public archive vintage 27 Sep 2026
+6
+5 / First 90 days
+Stage investment so the board can stop after learning whether customer and cost response support the modeled economics.
+Timing / owner
+Work, dependencies and decision gate
+Days 0–15
+COO + Finance
+Reconcile 2025 cohort and return baseline; validate invoice-level avoidable fulfillment cost, option cost assumptions,
+pilot SKU/zone, comparison design and KPI definitions. Gate 1: auditable baseline and target cohort before any site
+commitment.
+Days 16–35
+Operations + Data
+Cost and design the service zone, inventory/transfer process, staffing, temporary 3PL/space, country legal/tax review
+and service SLA. Gate 2: signed costed design, data coverage ≥98%, capex and FTE inside board caps.
+Days 36–65
+Country lead + Supply Chain
+Run a reversible, limited-SKU pilot with temporary space/3PL or reserved stock; monitor matched/holdout cohorts,
+delivery promise, fill rate, contribution and handling cost. Gate 3: require at least four weeks usable data; stop for
+legal/safety breach, stock accuracy <98%, or negative contribution trend.
+Days 66–90
+CFO + COO + Board sponsor
+Compare to pre-registered baseline; update scenarios, quotes, FX/returns stress, recurring costs and staffing. Gate 4:
+release site capex only if base annual contribution remains positive after fixed cost, all caps hold, and downside is
+accepted; otherwise defer/reconfigure.
+KPI plan: weekly pilot and monthly board reporting for incremental shipped orders/units, net sales and return rate by sale cohort,
+contribution after returns, avoidable fulfillment EUR/unit, median/P90 delivery time, on-time-in-full, fill rate, stock accuracy,
+restocked share and return cycle time, capex committed and staffed FTE. Publish numerator, denominator, comparison period
+and data coverage. Do not call seasonal/mix changes hub lift without a credible comparison.
+Principal risks: demand does not rise; savings are not truly avoidable; reference FX differs from settlement; inventory
+fragmentation increases stockouts or working capital; returns erode margins; local fixed costs, labor, lease or compliance
+assumptions are incomplete. Mitigations are a matched reversible pilot, invoice checks, monthly settlement-FX monitoring,
+narrow SKU scope and local quotes/legal review before commitment.
+
+
+PAGE 7
+MERIDIAN PARTS  /  BOARD DECISION NOTE
+Synthetic client inputs  Public archive vintage 27 Sep 2026
+7
+Appendix / ECB reference-rate means
+Arithmetic means of published business-day reference rates during each 2025 calendar month. Quote: local currency units per
+EUR. Daily observation counts vary with the calendar and ECB publication availability. EUR-denominated markets use 1.00.
+Month
+PLN per EUR
+Days
+CZK per EUR
+Days
+2025-01
+4.246655
+22
+25.163318
+22
+2025-02
+4.172225
+20
+25.076650
+20
+2025-03
+4.182010
+21
+25.001238
+21
+2025-04
+4.265220
+20
+25.038950
+20
+2025-05
+4.253800
+21
+24.922857
+21
+2025-06
+4.265771
+21
+24.804286
+21
+2025-07
+4.254148
+23
+24.624609
+23
+2025-08
+4.261305
+21
+24.516619
+21
+2025-09
+4.258886
+22
+24.346773
+22
+2025-10
+4.248791
+23
+24.315391
+23
+2025-11
+4.237635
+20
+24.234050
+20
+2025-12
+4.223857
+21
+24.259286
+21
+Source: archived ECB daily reference rates from ecb-history.zip and its lossless ecb-history.csv extraction in sources/raw. The
+source register records original URL, retrieval timestamp, hashes, bytes, units and coverage. Public series is an official
+snapshot; the synthetic client transaction data are distinct from these observations.
+Reproducibility: run python3 analysis/build.py, then python3 analysis/render_pdfs.py from the project root. The metrics
+JSON is the canonical exchange dataset; the workbook includes all monthly and country calculations, scenarios, context,
+sources and quality notes.
+Limits: one synthetic trading year; no demand causal design, discounted cash flow, ramp-up, synergies, tax, lease exit, working capital or probability model.
+Public historical revisions may post-date the trading year. Recommendation is conditional; it is not statistically proven.
