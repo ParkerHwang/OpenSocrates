@@ -1,0 +1,76 @@
+[
+  {
+    "method": "GET",
+    "path": "/summary",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 999999989,
+          "reserved": 0,
+          "available": 999999989
+        },
+        {
+          "name": "b",
+          "balance": 1000000011,
+          "reserved": 0,
+          "available": 1000000011
+        }
+      ],
+      "entry_count": 58156,
+      "snapshot": 58156,
+      "totals": {
+        "available": 2000000000,
+        "balance": 2000000000,
+        "reserved": 0
+      }
+    },
+    "elapsed_s": 0.03896991699002683
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/a",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 999999989,
+        "reserved": 0,
+        "available": 999999989,
+        "version": 29078
+      }
+    },
+    "elapsed_s": 0.0002969170454889536
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/b",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "b",
+        "balance": 1000000011,
+        "reserved": 0,
+        "available": 1000000011,
+        "version": 29078
+      }
+    },
+    "elapsed_s": 0.00022058398462831974
+  }
+]

@@ -1,5 +1,13 @@
 # v1.5.0 release-candidate status
 
+The [latest practical retest](../../evals/v1.5/hard-tasks/unlimited-v1/REPORT.md)
+is complete:12 actual model calls across the original and user-amended boundaries,
+with all6 calls after removal of model time limits completing naturally. Source
+continuations, the Sol capacity failure, missing usage and every load failure remain
+explicit. Coding/office improvements coexist with semantic and performance limits;
+no profile is promoted and the candidate remains unpublished. No product source or
+package bytes changed for the retest.
+
 The latest [verification/recovery revision](13-verification-and-request-recovery.md)
 adds decision preparation, safe rejection diagnostics and acknowledgment preservation.
 Assistance guide 9, impact guide 4 and maintainability guide 3 add task-scoped

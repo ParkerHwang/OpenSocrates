@@ -1,0 +1,5 @@
+AuditLedger implementation is in `internal/ledger/ledger.go`, with SQLite connection setup in `internal/platform/driver.go` and graceful HTTP startup in `cmd/server/main.go`. The source, not this note, is authoritative.
+
+Completed: tenant-scoped accounts, transfers, batches, holds, capture/release, reversals, idempotency persistence, entry pagination, historical summaries, and v1 migration. Schema is version 2. Two SQLite processes serialize writes with `BEGIN IMMEDIATE` and a busy timeout. No external dependency downloads or services were used.
+
+Checks performed: `go build -o server ./cmd/server`, `go test ./...`, and integration coverage across two server processes and the real legacy fixture. The integration check verifies retries, concurrent duplicate requests, failed-batch rollback, hold lifecycle, reversal terminal states, snapshot pagination and summary, migrated versions, legacy IDs, and preserved notes. Performance sweep was not run as requested. Re-run these commands after further changes.

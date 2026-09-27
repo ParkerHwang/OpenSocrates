@@ -1,0 +1,174 @@
+{
+  "schema": "opensocrates.hard-office-primary-review/1",
+  "reviewer": "primary_assistant_no_subagent_or_separate_model_judge",
+  "reviewer_model": null,
+  "reviewer_effort": null,
+  "blinding": "unblinded",
+  "human_scores": null,
+  "input_lock": "review/office-batch1.lock.json",
+  "rubric": "PROSE_RUBRIC.md",
+  "reviews": [
+    {
+      "cell": "office-luna-medium-a",
+      "arm": "guide9",
+      "scores": {
+        "decision_usability": 4,
+        "evidence_and_predecessor_maintenance": 2,
+        "authority_and_independent_progress": 4,
+        "operational_judgment": 3,
+        "korean_collaboration_quality": 3
+      },
+      "total": 16,
+      "operator_can_continue": "The numerical plan and complete roster are usable; correct the memo tier transitions before relying on its HR explanation.",
+      "supporting_evidence": [
+        {
+          "path": "results/office-luna-medium-a/snapshot/output/decision_memo.md",
+          "lines": [
+            7,
+            11,
+            17,
+            21,
+            27,
+            28,
+            29
+          ],
+          "finding": "Actionable CEDAR choice, correct reserve/budget/66-person cost, accurate alternative costs, preparation dates and scoped authorization handoff."
+        },
+        {
+          "path": "results/office-luna-medium-a/snapshot/output/plan.json",
+          "locator": "assignments P010/P061/P072",
+          "finding": "Correct final tiers and restored P072 are present; all27 objective groups pass."
+        },
+        {
+          "path": "results/office-luna-medium-a/office-display.json",
+          "finding": "All inspected count fields avoid currency formats."
+        }
+      ],
+      "critical_findings": [
+        {
+          "kind": "artifact_narrative_mismatch",
+          "severity": "material",
+          "path": "results/office-luna-medium-a/snapshot/output/decision_memo.md",
+          "line": 15,
+          "claim": "Memo says H02/H03 move P010 from mandatory to optional and P061 from optional to mandatory.",
+          "expected": "H02 makes P010 mandatory; H03 makes P061 optional. The plan JSON has the correct final tiers.",
+          "source": "../v1/office/inputs/03_hr_changes.csv rows H02/H03; ../v1/office/inputs/10_prior_maintained_note.md",
+          "layer": "generated memo; not a deterministic checker or native runtime defect"
+        }
+      ],
+      "public_message_findings": [
+        {
+          "indices": [
+            5,
+            6
+          ],
+          "finding": "Temporary61-mandatory statement corrected to60 mandatory/12 optional in the next public message; do not treat the corrected transient value as the final roster."
+        },
+        {
+          "indices": [
+            3
+          ],
+          "finding": "Agent claims no matching native launcher integration, despite the installed executable and shell being available. No native decision invocation/response was observed for this cell; this is an agent availability interpretation error, not proof of native runtime failure."
+        }
+      ],
+      "clarification": {
+        "available_public_messages": 13,
+        "unnecessary_user_questions_observed": 0,
+        "settled_permissions_reopened": false,
+        "earlier_messages_missing": false
+      },
+      "delivery_limit": "Decision guide read command observed; no observed read of assistance guide9/verification reference and no native adapter/prepare use. A command emission is not verified semantic application.",
+      "uncertainty": [
+        "One unblinded primary assessment, no human score.",
+        "The structured-versus-memo discrepancy is not represented by the original27-group score.",
+        "Do not attribute the roster correction to a specific revised guide or native feature."
+      ]
+    },
+    {
+      "cell": "office-luna-medium-b",
+      "arm": "guide8",
+      "scores": {
+        "decision_usability": 3,
+        "evidence_and_predecessor_maintenance": 2,
+        "authority_and_independent_progress": 4,
+        "operational_judgment": 2,
+        "korean_collaboration_quality": 3
+      },
+      "total": 14,
+      "operator_can_continue": "Restore P072 and correct the active/optional roster and corresponding workbook/memo before operational handoff; accounting and selected66-person plan are otherwise supported.",
+      "supporting_evidence": [
+        {
+          "path": "results/office-luna-medium-b/snapshot/output/decision_memo.md",
+          "lines": [
+            10,
+            14,
+            20,
+            22,
+            28
+          ],
+          "finding": "Clear selected plan, correct reserve/budget/cost, feasible dates and a strong distinction between permitted preparation and approval-dependent execution."
+        },
+        {
+          "path": "results/office-luna-medium-b/office-checks.json",
+          "finding": "26/27 objective groups pass; P01 fails."
+        },
+        {
+          "path": "results/office-luna-medium-b/office-display.json",
+          "finding": "No currency-format misuse in inspected count cells."
+        }
+      ],
+      "critical_findings": [
+        {
+          "kind": "missing_source_entity",
+          "severity": "material",
+          "path": "results/office-luna-medium-b/snapshot/output/plan.json",
+          "locator": "assignments array",
+          "claim": "Only71 active people are represented; P072 is absent.",
+          "expected": "H04 restores P072, so72 people including12 optional must remain, whether assigned or waitlisted.",
+          "source": "../v1/office/inputs/03_hr_changes.csv row H04; TASK.md complete final active roster contract",
+          "layer": "generated data transformation; objective P01 correctly catches it"
+        },
+        {
+          "kind": "unsupported_and_inconsistent_narrative",
+          "severity": "material",
+          "path": "results/office-luna-medium-b/snapshot/output/decision_memo.md",
+          "line": 18,
+          "claim": "Memo says11 optional people and claims P072 reinstatement/access change was applied.",
+          "expected": "There are12 optional people; P072 is missing from the file, H04 only restores active status, and the access change H05 is for P064.",
+          "source": "../v1/office/inputs/03_hr_changes.csv H04/H05; plan.assignments",
+          "layer": "generated memo and omitted roster, not an evaluation rubric defect"
+        }
+      ],
+      "public_message_findings": [
+        {
+          "indices": [
+            3
+          ],
+          "finding": "Incorrect11-optional figure remains consistent with the erroneous71-row artifact; no correction observed."
+        },
+        {
+          "indices": [
+            5
+          ],
+          "finding": "Final text explicitly reports unconfirmed native activation and no applied canonical method. A direct decision launcher command without JSON input is observed, with no structured response; no native adapter operation occurred."
+        }
+      ],
+      "clarification": {
+        "available_public_messages": 6,
+        "unnecessary_user_questions_observed": 0,
+        "settled_permissions_reopened": false,
+        "earlier_messages_missing": false
+      },
+      "delivery_limit": "Decision guide read and one empty-input launcher invocation observed; no observed assistance/verification guide use. No native application proof.",
+      "uncertainty": [
+        "One unblinded primary assessment, no human score.",
+        "High objective percentage does not make the missing staff record acceptable."
+      ]
+    }
+  ],
+  "model_calls": 0,
+  "limitations": [
+    "Scores are provisional, not calibrated or human ratings.",
+    "The primary review uses all available public messages and separately cites deterministic results."
+  ]
+}

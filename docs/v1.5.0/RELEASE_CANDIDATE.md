@@ -6,6 +6,15 @@ remains Draft and issue [#94](https://github.com/ParkerHwang/OpenSocrates/issues
 contains the exact final commit, CI results, package hashes and validation commands.
 No merge, tag, publication, deployment or active-install replacement is implied.
 
+The [completed guide8/guide9 retest](../../evals/v1.5/hard-tasks/unlimited-v1/REPORT.md)
+adds actual prepared-request use and mixed coding/office/performance evidence.
+The user removed model time limits during execution; original attempts and the
+source continuations are separately recorded. All six later calls finish naturally.
+Luna artifact checks improve in these examples, but medium outputs retain defects
+and the eligible Sol guide9 server is slower under the measured workload. No
+universal quality, efficiency or profile claim follows. Product/package bytes are
+unchanged by this evaluation; the PR's current commit and CI bind the final handoff.
+
 The latest [verification and request recovery revision](13-verification-and-request-recovery.md)
 adds decision preparation and safe diagnostics, preserves read acknowledgments
 on invalid input, and connects caller/test and artifact-consistency checks through

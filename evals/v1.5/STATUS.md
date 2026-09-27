@@ -1,5 +1,30 @@
 # v1.5 evaluation status
 
+## Completed guide8 / guide9 retest and removal of model time limits
+
+The [combined retest report](hard-tasks/unlimited-v1/REPORT.md) preserves the first
+freeze and the user's later instruction to remove model wall-clock limits. Across
+the two boundaries,12 actual calls yield9 complete CLI turns,1 provider-capacity
+failure and2 administratively interrupted calls. All6 later calls complete
+naturally; two continue their own retained Max coding sources. No helper subagent,
+model substitution, primary candidate repair or outcome retry for a favorable
+answer occurs. Earlier timings and scores are not relabelled or pooled.
+
+Final coding groups are guide8/guide9: Sol28/28 versus28/28, Luna medium23/28 versus
+25/28, and Luna max27/28 versus28/28. All final own suites pass. Medium office is
+26/27 versus27/27, but both retain material semantic issues; Max office is27/27 in
+both with no new material factual discrepancy found in the scoped primary review.
+Scores remain provisional/unblinded with human scores unavailable.
+
+Request preparation is actually observed. Work/quality effects are mixed, and the
+eligible Sol guide9 server is slower in this workload. All72 load cells and661,186
+requests are retained, including2 warmup failures that disqualify Max guide9 from
+a performance claim. Only the Sol pair is performance-eligible. Normal profiles
+remain inactive candidates. Product bytes and all4,784 prior evaluation files are
+unchanged; PR95 records exact-head source/CI qualification. This comparison stops
+with these results. Further evaluations follow the user's no-model-deadline policy;
+existing HTTP failure bounds and benchmark sampling windows are separate concerns.
+
 ## Post-comparison implementation
 
 The [decision recovery and verification revision](revision-v4/REPORT.md) addresses

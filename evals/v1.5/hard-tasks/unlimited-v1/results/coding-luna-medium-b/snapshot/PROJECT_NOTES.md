@@ -1,0 +1,9 @@
+# Project notes
+
+- Task: implement the synthetic tenant-scoped AuditLedger described in `TASK.md`.
+- Constraints retained: Go 1.26.3, pinned `modernc.org/sqlite v1.59.0`, local SQLite only; do not change task/evaluation inputs or run the performance meter in this work session.
+- Current source inspected: `cmd/server/main.go` is the runnable HTTP process; `internal/platform/driver.go` configures the SQLite driver; `internal/platform/api.go` implements routes and transaction logic; `internal/platform/schema.go` owns schema initialization and v1 migration.
+- Persistence model: SQLite is authoritative for accounts, entries, transfer/hold state, and tenant-wide idempotency records. Writes take a database writer lock and commit effects plus replay response in one transaction.
+- Migration behavior implemented: infer legacy openings from final balances and movements; insert openings by tenant/account, movements by ID, preserve old tables/notes, set v2 in the same migration transaction.
+- Checks run: `go test ./internal/platform -count=1` and `go build -o server ./cmd/server` passed. In-process HTTP tests use fresh temporary databases and cover normal writes, semantic replay, key conflict, failed-batch rollback, hold capture, reversal, terminal state, and pagination; a 16-request concurrent same-key test observed one transfer effect and one replay ID. Genuine v1 fixture migration was checked for v2 user_version, reconstructed opening entries, imported movement entries/IDs, account balances/versions, byte-preserved Unicode note text, and summary over HTTP. All temporary servers started for checks were stopped.
+- Limits: the independent acceptance tool and performance meter were not run. Standalone shell HTTP checks initially hit previously used paths and are not counted as fresh-state evidence; the committed in-process tests use `t.TempDir()`.
