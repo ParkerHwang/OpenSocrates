@@ -139,6 +139,13 @@ def ownership(paths: list[str]) -> None:
         seen.append(key)
 
 
+def _required_file_flag(name: str) -> int:
+    value: object = getattr(os, name, None)
+    if type(value) is not int or value <= 0:
+        raise BoundaryError("directory_capability_unavailable")
+    return value
+
+
 def _directory_identity(info: os.stat_result) -> tuple[int, int]:
     if not stat.S_ISDIR(info.st_mode):
         raise BoundaryError("unsafe_directory")
@@ -190,7 +197,12 @@ class BoundDirectory:
 
     @staticmethod
     def _flags() -> int:
-        return os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0)
+        return (
+            os.O_RDONLY
+            | _required_file_flag("O_DIRECTORY")
+            | _required_file_flag("O_NOFOLLOW")
+            | getattr(os, "O_CLOEXEC", 0)
+        )
 
     def _append(self, name: str, descriptor: int) -> None:
         try:
@@ -251,7 +263,9 @@ class BoundDirectory:
                 cleanup.callback(directory.close)
             directory.verify()
             descriptor = os.open(
-                PurePosixPath(name).name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory.fd
+                PurePosixPath(name).name,
+                os.O_RDONLY | _required_file_flag("O_NOFOLLOW"),
+                dir_fd=directory.fd,
             )
             try:
                 info = os.fstat(descriptor)
@@ -329,7 +343,7 @@ def write_bound_files(
             started(name)
             descriptor = os.open(
                 PurePosixPath(name).name,
-                os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                os.O_RDWR | os.O_CREAT | os.O_EXCL | _required_file_flag("O_NOFOLLOW"),
                 0o600,
                 dir_fd=directory.fd,
             )

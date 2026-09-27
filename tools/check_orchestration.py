@@ -13,12 +13,13 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, call, patch
 from uuid import uuid4
 
 import check_project_memory as memory_checks
 from opensocrates.cli.main import main
 from opensocrates.cli.orchestration import run_orchestration
+from opensocrates.orchestration import adapter as adapter_module
 from opensocrates.orchestration import paths as path_module
 from opensocrates.orchestration import runtime as runtime_module
 from opensocrates.orchestration.adapter import CallResult, CodexAdapter, null_usage
@@ -957,6 +958,59 @@ class OrchestrationTests(unittest.TestCase):
         self.assertEqual(result["publication"]["status"], "complete")
         self.assertTrue(result["publication"]["location_verified"])
         self._closed(coordinator)
+
+    def test_required_publication_flags_never_fall_back_to_zero(self):
+        for name in ("O_DIRECTORY", "O_NOFOLLOW"):
+            if hasattr(path_module.os, name):
+                self.assertEqual(
+                    path_module._required_file_flag(name), getattr(path_module.os, name)
+                )
+            with patch.dict(path_module.os.__dict__):
+                path_module.os.__dict__.pop(name, None)
+                with self.assertRaisesRegex(BoundaryError, "directory_capability_unavailable"):
+                    path_module._required_file_flag(name)
+                with self.assertRaisesRegex(BoundaryError, "directory_capability_unavailable"):
+                    path_module.BoundDirectory._flags()
+            for invalid in (None, 0, False, "not-a-flag"):
+                with patch.object(path_module.os, name, invalid, create=True):
+                    with self.assertRaisesRegex(BoundaryError, "directory_capability_unavailable"):
+                        path_module._required_file_flag(name)
+                    with self.assertRaisesRegex(BoundaryError, "directory_capability_unavailable"):
+                        path_module.BoundDirectory._flags()
+
+    def test_process_stop_retains_posix_groups_and_avoids_them_on_windows(self):
+        def process():
+            result = Mock(pid=123456)
+            result.poll.return_value = None
+            result.wait.side_effect = [subprocess.TimeoutExpired("fixture", 5), 0]
+            return result
+
+        windows = process()
+        client = CodexAdapter("/fixture/not-invoked")
+        with (
+            patch.object(adapter_module.sys, "platform", "win32"),
+            patch.object(adapter_module.os, "killpg", None, create=True),
+            patch.object(adapter_module.signal, "SIGKILL", None, create=True),
+        ):
+            adapter_module._stop(windows)
+            with self.assertRaisesRegex(BoundaryError, "sandbox_platform_unavailable"):
+                client.probe()
+        windows.terminate.assert_called_once_with()
+        windows.kill.assert_called_once_with()
+        posix = process()
+        with (
+            patch.object(adapter_module.sys, "platform", "darwin"),
+            patch.object(adapter_module.os, "name", "posix"),
+            patch.object(adapter_module.os, "killpg", create=True) as killpg,
+            patch.object(adapter_module.signal, "SIGKILL", 9, create=True),
+        ):
+            adapter_module._stop(posix)
+        self.assertEqual(
+            killpg.call_args_list,
+            [call(posix.pid, adapter_module.signal.SIGTERM), call(posix.pid, 9)],
+        )
+        posix.terminate.assert_not_called()
+        posix.kill.assert_not_called()
 
     def test_missing_publication_capability_prevents_calls_but_prepare_remains_usable(self):
         adapter = FakeAdapter()

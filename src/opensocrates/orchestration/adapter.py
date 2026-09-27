@@ -53,14 +53,14 @@ def _stop(process: subprocess.Popen[bytes]) -> None:
     if process.poll() is not None:
         return
     try:
-        if os.name == "posix":
+        if sys.platform != "win32" and os.name == "posix":
             os.killpg(process.pid, signal.SIGTERM)
         else:
             process.terminate()
         try:
             process.wait(timeout=5)
         except subprocess.TimeoutExpired:
-            if os.name == "posix":
+            if sys.platform != "win32" and os.name == "posix":
                 os.killpg(process.pid, signal.SIGKILL)
             else:
                 process.kill()
