@@ -8,6 +8,11 @@ jobs:
     runs-on: windows-2025
     env:
       PYTHONUTF8: "1"
+      # Preserve hash-bound evidence paths during checkout and provenance checks.
+      # Command-scoped configuration; no global or repository config file change.
+      GIT_CONFIG_COUNT: "1"
+      GIT_CONFIG_KEY_0: core.longpaths
+      GIT_CONFIG_VALUE_0: "true"
     steps:
       - uses: actions/checkout@v7
         with:
