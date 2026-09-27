@@ -116,6 +116,13 @@ class CodexAdapter:
         self.sha256: str | None = None
 
     def _inspect(self, args: list[str]) -> str:
+        if args not in (
+            ["--version"],
+            ["exec", "--help"],
+            ["features", "list"],
+            ["sandbox", "--help"],
+        ):
+            raise BoundaryError("unapproved_capability_probe")
         result = subprocess.run(
             [str(self.client), *args],
             stdin=subprocess.DEVNULL,
@@ -124,6 +131,7 @@ class CodexAdapter:
             env=_role_environment(),
             timeout=15,
             check=False,
+            shell=False,
         )
         if result.returncode or len(result.stdout) > 262144:
             raise BoundaryError("client_capability_unavailable")
@@ -179,6 +187,7 @@ class CodexAdapter:
                 stderr=subprocess.DEVNULL,
                 timeout=15,
                 check=False,
+                shell=False,
             )
             write = subprocess.run(
                 self._sandbox_argv(root, ["/usr/bin/touch", "forbidden-write"]),
@@ -187,6 +196,7 @@ class CodexAdapter:
                 stderr=subprocess.DEVNULL,
                 timeout=15,
                 check=False,
+                shell=False,
             )
             if (
                 read.returncode != 0
@@ -263,6 +273,7 @@ class CodexAdapter:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL,
                 start_new_session=True,
+                shell=False,
             )
             assert process.stdin is not None and process.stdout is not None
             prompt = (
@@ -354,7 +365,7 @@ class CodexAdapter:
         try:
             with tempfile.TemporaryDirectory(prefix="opensocrates-check-env-") as raw:
                 env = _check_environment(Path(raw).resolve())
-                result = _hashed_process(self._sandbox_argv(cwd, check["argv"]), cwd, env)
+                result = _hashed_process(self.client, check["argv"], cwd, env)
             receipt.update(result)
             receipt["status"] = (
                 "passed" if receipt["exit_code"] == check["expected_exit_code"] else "failed"
@@ -374,15 +385,20 @@ class CodexAdapter:
         return receipt
 
 
-def _hashed_process(argv: list[str], cwd: Path, env: dict[str, str]) -> dict[str, Any]:
+def _hashed_process(
+    client: Path, argv: list[str], cwd: Path, env: dict[str, str]
+) -> dict[str, Any]:
+    # The helper itself owns the confinement prefix. It cannot accept a caller's
+    # complete command that silently bypasses the read-only check sandbox.
     process = subprocess.Popen(
-        argv,
+        [str(client), "sandbox", "-P", ":read-only", "-C", str(cwd), "--", *argv],
         cwd=cwd,
         env=env,
         stdin=subprocess.DEVNULL,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         start_new_session=True,
+        shell=False,
     )
     values: dict[str, Any] = {}
     overflow = threading.Event()
