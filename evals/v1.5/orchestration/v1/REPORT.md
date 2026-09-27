@@ -79,6 +79,13 @@ bytes, without repeating unchanged tests. No real project was changed.
    matches; the corrected checker compares exact member paths. Neither failure
    is rewritten as an artifact success.
 
+The first evidence handoff commit omitted six qualified-candidate copies because
+its generic `artifacts/` ignore rule also matched these fixture paths. A subsequent
+Git coverage check found the omission. The six exact, unchanged files were added
+explicitly, and `verify.py --tracked` now compares every locked public file with
+its committed HEAD bytes, in addition to checking local hashes. No model outcome
+or artifact content was changed to fix this export error.
+
 One development code-review recheck turn was automatically safety-screened.
 Blocked filesystem probes were not retried. Subsequent code review was narrowed
 to static source inspection; execution verification remained a separately

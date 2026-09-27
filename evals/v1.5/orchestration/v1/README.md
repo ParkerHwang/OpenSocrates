@@ -11,8 +11,11 @@ candidate/delivery bytes, role identities and usage accounting without model cal
 The artifact lock additionally covers the complete public file set:
 
 ```sh
-python3 -B evals/v1.5/orchestration/v1/verify.py
+python3 -B evals/v1.5/orchestration/v1/verify.py --tracked
 ```
+
+Omit `--tracked` when verifying an exported directory without its Git repository.
+The tracked check reads every locked file from HEAD; local presence alone is insufficient.
 
 This offline command does not rerun generated Python or claim a new execution
 result. Actual native check receipts and the independently attributed audits are

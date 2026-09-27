@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Offline integrity/receipt audit. This does not call models or rerun generated programs."""
 from __future__ import annotations
-import argparse, hashlib, json
+import argparse, hashlib, json, subprocess
 from collections import Counter
 from pathlib import Path
 
@@ -41,6 +41,7 @@ def collect_calls():
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--write',action='store_true',help='Write derived public verification and usage receipts.')
+    parser.add_argument('--tracked',action='store_true',help='Also verify that every locked public file exists with exact bytes in HEAD.')
     args=parser.parse_args()
     findings=[]
     if (ROOT/'artifact-lock.json').exists():
@@ -48,6 +49,13 @@ def main():
         current={str(p.relative_to(ROOT)):sha(p.read_bytes()) for p in ROOT.rglob('*')
                  if p.is_file() and p.name!='artifact-lock.json'}
         assert current==locked, 'Frozen public evidence changed or file set differs'
+        if args.tracked:
+            repo=ROOT.parents[3]
+            for name in [*locked, 'artifact-lock.json']:
+                path=ROOT/name
+                committed=subprocess.check_output(['git','show','HEAD:'+str(path.relative_to(repo))],cwd=repo)
+                assert committed==path.read_bytes(), 'Missing or different committed public evidence: '+name
+
     exported=load(ROOT/'export-manifest.json')
     for item in exported['files']:
         data=(ROOT/item['path']).read_bytes()
@@ -108,7 +116,7 @@ def main():
                           'Opaque tool_items in transport diagnostics is not a tool-call count. No complete action count is available.',
                           'Development-agent and primary reasoning costs are outside the measured evaluation calls.']}
     result={'schema':'opensocrates.orchestration.offline-verification/1','status':'pass',
-            'exported_files_checked':len(exported['files']),'workflows':workflows,
+            'exported_files_checked':len(exported['files']),'committed_bytes_checked':args.tracked,'workflows':workflows,
             'delivery_files_checked':len(integration['artifacts']),
             'actual_model_invocations_accounted':len(calls),'unique_reported_conversations':len(threads),
             'new_model_calls':0,'generated_program_execution':'not_rerun_by_this_offline_checker',
