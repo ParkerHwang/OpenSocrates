@@ -1,0 +1,211 @@
+{
+  "schema": "opensocrates.coding-specialist-direct-pilot/1",
+  "frozen_at": "2026-09-27T03:38:57.181678+00:00",
+  "source_commit": "53e36e08bd79e72466c06eed028fedafecd991ce",
+  "model": "gpt-6-luna",
+  "effort": "max",
+  "language": "en",
+  "candidate_version": "0.1.1",
+  "candidate_manifest_sha256": "690c6a8d6ae1aa5057bb97d2b7b3c40742babcd439134af802f6b7ff7d6ad443",
+  "client": {
+    "version": "codex-cli 0.158.0-alpha.2",
+    "launcher": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex",
+    "actual_executable": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+    "launcher_sha256": "50ab38ba21d0d9f8346f32f41848382f15b556190f3c7a07e885a4fb73e379c8",
+    "actual_executable_sha256": "c3e30211bd454da70ceb4d9cbc2e05fe6466812ab05c311c3bbff6addeb14202"
+  },
+  "account_id_sha256": "1a53bfdc498b0878701178a9b1e86f029372edcbaf149f677d4774e5d00bbdcf",
+  "python": {
+    "version": "3.12.14",
+    "executable_sha256": "ac60cfe0268614638d0ffa35f3b0284fc7b3a11482723793455e17eeb278509e"
+  },
+  "access_probe": {
+    "manifest_sha256": "40c2439e00b89f81c0d7b3527275e412c8ebdd31c36be979036ed6221abcc5b3",
+    "receipt_sha256": "edc91f292d9e64a047da019fc6e925355a993a67e42d731413710a7e94d7a72f",
+    "counted_invocations": 1
+  },
+  "profile_config": "cli_auth_credentials_store=\"file\"\nweb_search=\"disabled\"\n[features]\nremote_plugin=false\napps=false\nhooks=false\nmulti_agent=false\nmemories=false\nexternal_agent_memory_import=false\n[memories]\nuse_memories=false\ngenerate_memories=false\n[apps._default]\nenabled=false\n",
+  "disabled_features": [
+    "multi_agent",
+    "memories",
+    "external_agent_memory_import",
+    "hooks",
+    "remote_plugin",
+    "apps"
+  ],
+  "limits": {
+    "initial_calls": 6,
+    "followup_calls": 2,
+    "parallel_subjects": 2,
+    "model_wall_clock_seconds": null,
+    "program_check_seconds": 90
+  },
+  "permissions": {
+    "sandbox": "workspace-write",
+    "approval": "never",
+    "network_tools": false,
+    "scope": "owned synthetic workspace and bundled Python standard library",
+    "memory_enrollment": false,
+    "subagents": false,
+    "active_plugin_change": false
+  },
+  "arms": {
+    "current": {
+      "contracts": [
+        "support/current/reuse.en.md",
+        "support/current/verification.en.md"
+      ],
+      "transitions": [
+        "support/current/impact.en.md",
+        "support/current/verification.en.md"
+      ],
+      "ownership": [
+        "support/current/reuse.en.md",
+        "support/current/verification.en.md"
+      ]
+    },
+    "specialist": {
+      "contracts": [
+        "support/specialist/contracts.en.md"
+      ],
+      "transitions": [
+        "support/specialist/transitions.en.md"
+      ],
+      "ownership": [
+        "support/specialist/ownership.en.md"
+      ]
+    }
+  },
+  "cells": [
+    {
+      "id": "contracts-current",
+      "task": "contracts",
+      "arm": "current",
+      "round": 0,
+      "followup": false
+    },
+    {
+      "id": "contracts-specialist",
+      "task": "contracts",
+      "arm": "specialist",
+      "round": 0,
+      "followup": false
+    },
+    {
+      "id": "transitions-specialist",
+      "task": "transitions",
+      "arm": "specialist",
+      "round": 1,
+      "followup": false
+    },
+    {
+      "id": "transitions-current",
+      "task": "transitions",
+      "arm": "current",
+      "round": 1,
+      "followup": false
+    },
+    {
+      "id": "ownership-current",
+      "task": "ownership",
+      "arm": "current",
+      "round": 2,
+      "followup": false
+    },
+    {
+      "id": "ownership-specialist",
+      "task": "ownership",
+      "arm": "specialist",
+      "round": 2,
+      "followup": false
+    },
+    {
+      "id": "ownership-followup-specialist",
+      "task": "ownership",
+      "arm": "specialist",
+      "round": 3,
+      "followup": true,
+      "from_cell": "ownership-specialist"
+    },
+    {
+      "id": "ownership-followup-current",
+      "task": "ownership",
+      "arm": "current",
+      "round": 3,
+      "followup": true,
+      "from_cell": "ownership-current"
+    }
+  ],
+  "protected_paths": {
+    "contracts": [
+      "tests/test_existing.py"
+    ],
+    "transitions": [
+      "tests/test_existing.py",
+      "parcelseal/transport.py"
+    ],
+    "ownership": [
+      "tests/test_existing.py",
+      "legacy/produce_v1.py"
+    ]
+  },
+  "common_prompt": "Implement the requested change in this disposable existing project. Use only the supplied project facts and local Python standard-library tools. The complete relevant coding guidance is directly supplied for this decision; use it without searching for a router, another library, another model, or a helper agent. Do not access other projects, account/config/auth files, the evaluator, the network or external services. Do not alter TASK.md, FOLLOWUP.md, GUIDANCE.md, TOOLING.md or the listed protected fixtures/tests. You may add tests and edit the implementation. Preserve unaffected behavior. Complete the actual code and meaningful checks; report the result and important limits without private reasoning. No model wall-clock deadline applies.",
+  "failure_policy": {
+    "provider_capacity_or_access": "record attempted failure and skip remaining unchanged tuple calls; no substitution or automatic retry",
+    "setup_error": "retain pre-call failure and continue independent cells",
+    "generation": "wait for natural completion; observation polls never terminate or retry",
+    "outcome_failure": "retain unmodified code and score; no integrator repair or favorable-outcome retry",
+    "followup": "same-arm own locked source only after completed initial CLI, independent of hidden score; no checker feedback"
+  },
+  "usage_fields": [
+    "input_tokens",
+    "cached_input_tokens",
+    "cache_write_input_tokens",
+    "output_tokens",
+    "reasoning_output_tokens"
+  ],
+  "missing_usage": null,
+  "subset_fields": {
+    "cached_input_tokens": "input_tokens",
+    "reasoning_output_tokens": "output_tokens"
+  },
+  "billed_cost": null,
+  "human_review": null,
+  "primary_preparation_usage": null,
+  "backend_model_echo": null,
+  "effect_status": "unvalidated bounded practical pilot",
+  "helper_files": {
+    "evals/v1.5/expanded/harness_v4.py": "dc1ae4912e12d8f9727a3fb6fb5920a76a58d961466c7389bf4c02b781d83da5"
+  },
+  "frozen_files": {
+    "README.md": "3eec69323cf47c15fade673a8877bc5a5f0930ee32680160a492994df7db011c",
+    "checker.py": "3dd9d2eb588b9f0560ee2b096da258bcb83b05dae0670ce4878ee80b231ce54c",
+    "preflight.json": "f87706346d33011add36c87f2901f2427aba9807375b3af6edf5f3ce2d44fe4f",
+    "runner.py": "79d12aa9a388f7a2387942cd5709048a66d0e7c8e3ee738c768597f3d6391cf0",
+    "support/current/impact.en.md": "eadb7080c08d1083afd21369d5e272ee74a3a4e7b2a9272bb9dddc0f9a5d9694",
+    "support/current/reuse.en.md": "5d071a443d690c39d9e919484f46706cfd6403bad0d1224369fd980a55857096",
+    "support/current/verification.en.md": "277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add",
+    "support/specialist/contracts.en.md": "e86303b91832100918039d95bbbe7c3315e81dd05689fe3e6b458e3f5c949f31",
+    "support/specialist/ownership.en.md": "14717c0a02aedfb4b0558f5cffc88b4e737cfbafb07f6418ff60b43adf0a7e39",
+    "support/specialist/transitions.en.md": "cc9e65529a41193819645cfc9760e38033c223011dd50bb66c5eeee67bf740cf",
+    "tasks/contracts/TASK.md": "ffb1e5dac0557e94f986183ddc06298e67dfe7ae9de1734d31729c6b1fcf7d93",
+    "tasks/contracts/starter/quotadesk/__init__.py": "23f23a454111dbfed854c4c7a3a7c5acafd2e6b59ef2617ab9bb205d287bc5b4",
+    "tasks/contracts/starter/quotadesk/api.py": "d5db56512c96cb3f5ef665747e181406e9cc2480ee16acfa0f559d7786f04d92",
+    "tasks/contracts/starter/quotadesk/cli.py": "f6b728a2070e2c8d54e7e4f16c184970f02b33dceff3a29c7632767036c43f0c",
+    "tasks/contracts/starter/quotadesk/policy.py": "750c5db9cacd1460444cb0cd4de1bd76e8b46bc03288befc9c401005c017f23c",
+    "tasks/contracts/starter/tests/test_existing.py": "582c8e93c916352873fa8db84890052dac3f22e94847d189519960702f6cf09d",
+    "tasks/ownership/FOLLOWUP.md": "4711d061d8e08ec552ce7b537bbb4cf671d64725bb6268a7863f565e69ce6f0d",
+    "tasks/ownership/TASK.md": "d8415f34858d0f54178f955994f496592f47a122852f9add90ee3fba78b7c5c4",
+    "tasks/ownership/starter/batchflow/__init__.py": "6bf984a7115845a65023a076b5d7531d3632eab1ea74d508356e54042ae3ac96",
+    "tasks/ownership/starter/batchflow/cli.py": "23a4c3e1a7cd6bd26b60f726959af21708f8efc543ecf3aec7d01324684381e9",
+    "tasks/ownership/starter/batchflow/runs.py": "79916a84d73ca6cd5566b21a370c6b6264bb3e57586788527ba7d3f7600b6a30",
+    "tasks/ownership/starter/batchflow/templates.py": "f98a6794dd50a724adeec4d1766434f1b8787c3b67c73c87133bd19914bfea4c",
+    "tasks/ownership/starter/legacy/produce_v1.py": "d56598dc00d676e9104e76cc5ec608930132005d12827c539f8de961ccece875",
+    "tasks/ownership/starter/tests/test_existing.py": "4b90180b724e15e94371062d75e0b873d1e12ce18b6f32c6887096f1915fc7b2",
+    "tasks/transitions/TASK.md": "304c8ad81976be4a54d504699f06b6435d6f11aba25671220d1140f7a85567c8",
+    "tasks/transitions/starter/parcelseal/__init__.py": "83c447ae39a1766ca295f83b7a00457eabd757d6d56379504d53a987f14e978d",
+    "tasks/transitions/starter/parcelseal/publisher.py": "b79ea67f14892fd78c12279ec02696fb6bb309d31e392af37116e0209cd04e90",
+    "tasks/transitions/starter/parcelseal/transport.py": "01d442803ea06a657006e214c4814db8a3a4351f55e08b63a02ab51f139efbef",
+    "tasks/transitions/starter/tests/test_existing.py": "65292cf2b816d0eb4957da0e859c957cec52687d269ec54a28b777513e45f72c"
+  }
+}
