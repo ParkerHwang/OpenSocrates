@@ -1,5 +1,20 @@
 # v1.5 evaluation status
 
+## New user-authorized full-stack and consulting observation matrix
+
+The [36-cell matrix](fullstack-consulting/v2/README.md) is now executing with the
+unchanged qualified product candidate, vanilla Codex and released 1.4.0. It uses
+the six explicitly requested model/effort tuples, fresh isolated profiles and
+Fast OFF. The user's later instruction removes experimenter-imposed model time,
+token, tool-call, output-length and internal-retry budgets. The primary observes
+without coaching or repairing subjects. The [observation ledger](fullstack-consulting/OBSERVATION.md)
+defines retained timestamps, usage, public events, resource samples and limits.
+The earlier v1 boundary preserves 36 setup failures and zero model calls; v2 fixes
+the diagnosed temporary-directory isolation defect before actual invocations.
+This is a separately authorized comparison, not a reopening or rewriting of the
+completed historical studies below. Outcome findings are pending; no new effect,
+profile, release or account-memory isolation claim is made.
+
 ## Coding-specialist implementation and bounded qualification complete
 
 The [new report](coding-specialists/revision-v1/REPORT.md) records a separate

@@ -1,0 +1,52 @@
+{
+  "environment": {
+    "os": "macOS-27.0-arm64-arm-64bit",
+    "python": "3.12.14",
+    "logical_cpus": 10,
+    "concurrency": 8,
+    "seeded_database": "fresh SQLite WAL database",
+    "workload": "GET /api/inventory and POST /api/orders with unique tenant-local reference and idempotency key",
+    "reads_requested": 800,
+    "writes_requested": 200
+  },
+  "combined": {
+    "requests": 1000,
+    "successes": 1000,
+    "errors": 0,
+    "elapsed_seconds": 0.4008,
+    "throughput_rps": 2495.23,
+    "latency_ms": {
+      "mean": 2.613,
+      "p50": 2.025,
+      "p95": 3.507,
+      "max": 173.888
+    }
+  },
+  "read": {
+    "requests": 800,
+    "successes": 800,
+    "errors": 0,
+    "elapsed_seconds": 0.4008,
+    "throughput_rps": 1996.19,
+    "latency_ms": {
+      "mean": 2.254,
+      "p50": 2.134,
+      "p95": 3.429,
+      "max": 5.871
+    }
+  },
+  "write": {
+    "requests": 200,
+    "successes": 200,
+    "errors": 0,
+    "elapsed_seconds": 0.4008,
+    "throughput_rps": 499.05,
+    "latency_ms": {
+      "mean": 4.047,
+      "p50": 0.517,
+      "p95": 5.982,
+      "max": 173.888
+    }
+  },
+  "error_details": {}
+}
