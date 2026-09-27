@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DepotFlow</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <div class="page-shell">
+      <main id="login-screen" class="login-card" aria-labelledby="login-title">
+        <div class="brand-mark" aria-hidden="true">DF</div>
+        <p class="eyebrow">Warehouse operations</p>
+        <h1 id="login-title">DepotFlow</h1>
+        <p class="muted">Sign in to manage one tenant's fulfillment workspace.</p>
+        <form id="login-form" novalidate>
+          <label for="login-email">Email</label>
+          <input id="login-email" data-testid="login-email" name="email" type="email" autocomplete="username" required>
+          <label for="login-password">Password</label>
+          <input id="login-password" data-testid="login-password" name="password" type="password" autocomplete="current-password" required>
+          <button id="login-submit" data-testid="login-submit" class="primary full-width" type="submit">Sign in</button>
+          <p id="login-error" class="error-message" role="alert"></p>
+        </form>
+        <p class="demo-hint">Demo: <code>operator@north.example</code> / <code>DepotDemo!2026</code></p>
+      </main>
+
+      <div id="app-shell" hidden>
+        <header class="topbar">
+          <div>
+            <div class="brand-line"><span class="brand-dot" aria-hidden="true"></span><strong>DepotFlow</strong></div>
+            <p id="tenant-label" class="muted compact"></p>
+          </div>
+          <div class="account-area">
+            <span id="user-label" class="user-pill"></span>
+            <button id="logout" data-testid="logout" class="secondary" type="button">Log out</button>
+          </div>
+        </header>
+        <nav class="main-nav" aria-label="Primary navigation">
+          <button id="nav-inventory" data-testid="nav-inventory" type="button" class="nav-button">Inventory</button>
+          <button id="nav-orders" data-testid="nav-orders" type="button" class="nav-button">Orders</button>
+          <button id="nav-audit" data-testid="nav-audit" type="button" class="nav-button">Audit trail</button>
+        </nav>
+        <div id="flash" class="flash" role="status" aria-live="polite" hidden></div>
+        <main id="app-content"></main>
+      </div>
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
