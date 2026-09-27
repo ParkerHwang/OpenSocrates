@@ -981,13 +981,13 @@ OC_FINDING = orchestration_object(
         "reproduction": OC_NOTE,
         "impact": OC_NOTE,
         "missing_evidence": arr(OC_NOTE, 8),
-        "severity": {"enum": ["blocking", "advisory"]},
+        "severity": {"type": "string", "enum": ["blocking", "advisory"]},
     }
 )
 OC_JUDGMENT = orchestration_object(
     {
         "id": OC_ID,
-        "status": {"enum": ["passed", "failed", "unknown"]},
+        "status": {"type": "string", "enum": ["passed", "failed", "unknown"]},
         "expected": OC_NOTE,
         "observed": OC_NOTE,
         "reproduction": OC_NOTE,
@@ -999,22 +999,31 @@ OC_JUDGMENT = orchestration_object(
 )
 OC_ASSESSMENT = orchestration_object(
     {
-        "schema": {"const": "opensocrates.orchestration.assessment/1.0.0"},
+        "schema": {"type": "string", "const": "opensocrates.orchestration.assessment/1.0.0"},
         "assignment_id": UUID,
         "candidate_sha256": DIGEST,
-        "verdict": {"enum": ["pass", "repair_required", "blocked"]},
+        "verdict": {"type": "string", "enum": ["pass", "repair_required", "blocked"]},
         "findings": arr(OC_FINDING, 32),
         "obligations": {**arr(OC_JUDGMENT, 16), "minItems": 1},
     }
 )
 OC_CANDIDATE = orchestration_object(
     {
-        "schema": {"const": "opensocrates.orchestration.candidate/1.0.0"},
+        "schema": {"type": "string", "const": "opensocrates.orchestration.candidate/1.0.0"},
         "assignment_id": UUID,
         "files": arr(OC_FILE, 16),
-        "blocked_reason": {"enum": [None, "contract_change", "missing_input"]},
+        "blocked_reason": {
+            "type": ["string", "null"],
+            "enum": [None, "contract_change", "missing_input"],
+        },
     }
 )
+# The model receives these two complete schemas. Keep their shared leaf nodes
+# independent of the 47 older schemas and other canonical graphs; provider-only
+# annotations must never mutate an existing contract through an alias.
+OC_ASSESSMENT = deepcopy(OC_ASSESSMENT)
+OC_CANDIDATE = deepcopy(OC_CANDIDATE)
+
 OC_GUIDE = orchestration_object(
     {"id": OC_PATH, "sha256": DIGEST, "text": {"type": "string", "maxLength": 65536}}
 )

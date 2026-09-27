@@ -7,6 +7,7 @@ import copy
 import io
 import json
 import os
+import runpy
 import subprocess
 import sys
 import tempfile
@@ -95,6 +96,48 @@ def request(root, target):
         "handoff": ["Current plan is the complete accepted contract."],
         "units": [unit()],
     }
+
+
+def provider_output_contract(node):
+    """The typed closed subset used by both real Codex output-schema forms."""
+    types = node.get("type")
+    assert types is not None, "provider_schema_type_missing"
+    kinds = set(types if isinstance(types, list) else [types])
+    assert kinds and kinds <= {"object", "array", "string", "integer", "number", "boolean", "null"}
+    if "const" in node or "enum" in node:
+        values = node["enum"] if "enum" in node else [node["const"]]
+        value_kinds = {
+            "null"
+            if value is None
+            else "string"
+            if isinstance(value, str)
+            else "boolean"
+            if type(value) is bool
+            else "integer"
+            if type(value) is int
+            else "number"
+            if type(value) is float
+            else "unsupported"
+            for value in values
+        }
+        assert kinds == value_kinds, "provider_enum_type_mismatch"
+    if "object" in kinds:
+        assert node.get("additionalProperties") is False, "provider_object_not_closed"
+        properties = node.get("properties")
+        assert isinstance(properties, dict)
+        required = node.get("required")
+        assert (
+            isinstance(required, list)
+            and len(required) == len(properties)
+            and set(required) == set(properties)
+        ), "provider_property_not_required"
+        for child in properties.values():
+            provider_output_contract(child)
+    if "array" in kinds:
+        assert isinstance(node.get("items"), dict), "provider_array_items_missing"
+        provider_output_contract(node["items"])
+    for alternative in node.get("anyOf", []):
+        provider_output_contract(alternative)
 
 
 class FakeAdapter:
@@ -886,6 +929,118 @@ class OrchestrationTests(unittest.TestCase):
                     if assignment["role"] in {"review", "execution_verification"}:
                         self.assertEqual(assignment["repair_obligations"], [])
                         self.assertEqual(assignment["repair_findings"], [])
+
+    def test_both_provider_output_schemas_are_fully_typed_closed_and_required(self):
+        for kind in ("candidate", "assessment"):
+            provider_output_contract(schema(kind))
+        mutations = [
+            ("candidate", ("properties", "schema"), "type", None),
+            ("candidate", ("properties", "blocked_reason"), "type", "string"),
+            ("candidate", ("properties", "files", "items"), "type", None),
+            ("candidate", (), "required", ["schema", "assignment_id", "files"]),
+            ("assessment", ("properties", "schema"), "type", None),
+            ("assessment", ("properties", "verdict"), "type", None),
+            (
+                "assessment",
+                ("properties", "findings", "items", "properties", "severity"),
+                "type",
+                None,
+            ),
+            (
+                "assessment",
+                ("properties", "obligations", "items", "properties", "status"),
+                "type",
+                None,
+            ),
+            ("assessment", ("properties", "findings", "items"), "additionalProperties", True),
+            ("assessment", ("properties", "obligations", "items"), "required", ["id", "status"]),
+        ]
+        for kind, path, field, value in mutations:
+            damaged = copy.deepcopy(schema(kind))
+            node = damaged
+            for key in path:
+                node = node[key]
+            if value is None:
+                node.pop(field)
+            else:
+                node[field] = value
+            with self.assertRaises(AssertionError, msg=f"{kind}:{path}:{field}"):
+                provider_output_contract(damaged)
+
+    def test_output_type_annotations_preserve_strict_values_and_null_enum(self):
+        candidate = {
+            "schema": "opensocrates.orchestration.candidate/1.0.0",
+            "assignment_id": str(uuid4()),
+            "files": [],
+            "blocked_reason": None,
+        }
+        old = json.loads(
+            subprocess.check_output(
+                ["git", "show", "HEAD:schemas/v1/orchestration-candidate.schema.json"], cwd=ROOT
+            )
+        )
+        current = schema("candidate")
+        self.assertEqual(current["properties"]["blocked_reason"]["type"], ["string", "null"])
+        for value in (None, "contract_change", "missing_input"):
+            candidate["blocked_reason"] = value
+            validate(candidate, current)
+            validate(candidate, old)
+        for value in (0, False, "null", "unrecognized", [], {}):
+            candidate["blocked_reason"] = value
+            for contract in (old, current):
+                with self.assertRaises(ValueError):
+                    validate(candidate, contract)
+        candidate["blocked_reason"] = None
+        for invalid in (
+            {**candidate, "unexpected": True},
+            {key: value for key, value in candidate.items() if key != "files"},
+        ):
+            with self.assertRaises(ValueError):
+                validate(invalid, current)
+        for kind in ("candidate", "assessment"):
+            previous = json.loads(
+                subprocess.check_output(
+                    ["git", "show", f"HEAD:schemas/v1/orchestration-{kind}.schema.json"], cwd=ROOT
+                )
+            )
+            changed = schema(kind)
+
+            def preserve(existing, revised):
+                self.assertEqual(set(existing) - set(revised), set())
+                for key, value in existing.items():
+                    if isinstance(value, dict):
+                        preserve(value, revised[key])
+                    else:
+                        self.assertEqual(value, revised[key])
+                self.assertLessEqual(set(revised) - set(existing), {"type"})
+
+            preserve(previous, changed)
+
+    def test_provider_output_graphs_do_not_alias_older_schema_nodes(self):
+        canonical = runpy.run_path(str(ROOT / "schemas/source/v15_contracts.py"))
+        all_schemas = canonical["SCHEMAS"]
+        before = copy.deepcopy(
+            {
+                name: value
+                for name, value in all_schemas.items()
+                if not name.startswith("orchestration-")
+            }
+        )
+        candidate = all_schemas["orchestration-candidate.schema.json"]
+        assessment = all_schemas["orchestration-assessment.schema.json"]
+        assessment_before = copy.deepcopy(assessment)
+        candidate["properties"]["assignment_id"]["pattern"] = "candidate-only-mutation"
+        self.assertEqual(assessment, assessment_before)
+        assessment["properties"]["assignment_id"]["pattern"] = "assessment-only-mutation"
+        assessment["properties"]["candidate_sha256"]["pattern"] = "assessment-only-digest"
+        for name, value in before.items():
+            self.assertEqual(all_schemas[name], value, name)
+        old_files = [
+            path
+            for path in (ROOT / "schemas/v1").glob("*.schema.json")
+            if not path.name.startswith("orchestration-")
+        ]
+        self.assertEqual(len(old_files), 47)
 
     def test_old_schema_bytes_and_all_canonical_methods_unchanged(self):
         paths = subprocess.check_output(
