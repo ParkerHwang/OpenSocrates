@@ -1,0 +1,15 @@
+{
+  "schema": "opensocrates.specialist-source-checks/1",
+  "attempts": [
+    {
+      "commit": "145c020",
+      "command": "make bootstrap format-check lint generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check",
+      "result": "failed_in_smoke",
+      "failure": "Default discovery entry expanded to 1630 bytes, violating the existing less-than-1400-byte bound in check_decision_points.py. Installer target was not reached.",
+      "repair": "Condensed discovery to 1344 bytes, keeping complete procedures and constraints in linked controller/references. The existing bound was not relaxed.",
+      "focused_command": "PYTHONPATH=src:tools .venv/bin/python tools/check_decision_points.py",
+      "focused_result": "27 tests passed"
+    }
+  ],
+  "direct_outcome_decision": "No broad quality gain established. Keep the specialist route optional for unresolved choices needing added structure; preserve task-based/current-guide fallback. Do not repair generated programs or rerun outcomes for a favorable result."
+}
