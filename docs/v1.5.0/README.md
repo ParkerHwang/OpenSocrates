@@ -43,6 +43,7 @@ package. Start with the final product contract in 10 and behavior policy in 11.
 | [12 — Structural revision and official documents](12-structural-revision-and-official-docs.md) | Versioned preparation/recall/completion and selective official-reference prompts |
 | [13 — Verification and request recovery](13-verification-and-request-recovery.md) | Decision preparation, safe diagnostics and task-scoped artifact/caller checks |
 | [14 — Coding-specialist primary routing](14-coding-specialists.md) | Separate static EN/KO/zh-CN procedures, general-route compatibility and bounded practical qualification |
+| [15 — Specialized production and independent acceptance](15-specialized-orchestration.md) | Explicit domain/role assignments, fresh contexts, versioned candidates, independent review/verification and scoped memory |
 | [Validation record](VALIDATION.md) | Checks actually performed on this document package |
 | [Practical completion standard](PRACTICAL_COMPLETION.md) | Current usability gates, bounded comparison, RC authority and stop rule |
 | [Implementation status](IMPLEMENTATION_STATUS.md) | Candidate source slices, evidence boundary, and remaining gates |

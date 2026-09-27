@@ -38,10 +38,13 @@ The controller, EN/KO general and assistance guides, and default discovery entry
 agree on the separate routes. The generator copies the versioned library and
 includes every member in the package release inventory. Static library content is
 read by the agent; no native semantic compiler or new specialist command is added.
-The native binary still needs a rebuild for the changed entry text. Specialist
-files need not be embedded in the executable because no native consumer reads them.
-Schema/documentation bytes with existing native consumers remain verified inside
-and outside the runtime.
+The specialist-only revision needed a native rebuild for the changed entry text,
+but had no native consumer of specialist bodies. The later optional
+[orchestration revision](15-specialized-orchestration.md) reads complete selected
+bodies while constructing role assignments and therefore embeds the unchanged
+library in the native runtime as well as packaging the static files. This does
+not register specialist IDs with native decision selection. Schema/documentation
+and newly consumed guide bytes are verified inside and outside the runtime.
 
 `library.json` binds twelve complete prompt files and explicitly describes static
 locales, provisional status and lack of native registration. Source mutation tests

@@ -1,0 +1,3 @@
+# Data scope
+
+State the authoritative inputs, grain, units, inclusion rules and formula. Independently recompute important totals and boundary cases; reconcile zero, null and excluded rows explicitly. A copied narrative must agree with computed data. Keep calculation, uncertainty and interpretation distinct. Produce bounded JSON/text, retaining source lineage. If a new program must be authored to fulfill this task, request a software unit from the primary rather than silently switching specialty. Read-only approved calculations can verify data without becoming permission to run model-invented commands. No workbook rendering or predictive-accuracy claim follows from this text slice.

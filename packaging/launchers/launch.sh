@@ -20,6 +20,10 @@ pass_through() {
         printf '%s\n' '{"schema":"opensocrates.project-memory.response/1.0.0","request_id":null,"status":"unavailable","result":null,"limitations":["launcher_unavailable"],"retryable":false}'
         exit 3
     fi
+    if [ "$launch_mode" = orchestrate ]; then
+        printf '%s\n' '{"schema":"opensocrates.orchestration.response/1.0.0","run_id":null,"status":"unavailable","plan_sha256":null,"model":null,"client_version":null,"client_sha256":null,"units":[],"calls":[],"memory_status":"not_requested","memory_snapshot_sha256":null,"integration":"pending_primary_reconciliation","limitations":["launcher_unavailable"]}'
+        exit 3
+    fi
     if [ "$launch_mode" = documentation ]; then
         printf '%s\n' '{"schema":"opensocrates.documentation.pack/1.0.0","request_id":null,"status":"unavailable","application":"unverified","limitations":["launcher_unavailable"]}'
         exit 3
@@ -69,7 +73,7 @@ case "$mode" in
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         ;;
-    control|assistance|memory|documentation)
+    control|assistance|memory|documentation|orchestrate)
         if [ "$#" -ne 2 ]; then
             pass_through invalid_arguments "$mode" "$host"
         fi
@@ -184,6 +188,9 @@ case "$mode" in
         ;;
     memory)
         exec "$runtime_path" memory
+        ;;
+    orchestrate)
+        exec "$runtime_path" orchestrate
         ;;
     documentation)
         exec "$runtime_path" documentation

@@ -25,6 +25,10 @@ for relative in (
     "content/locales",
     "plugin-src/shared/assistance/profiles.json",
     "plugin-src/shared/documentation",
+    "plugin-src/shared/orchestration",
+    "plugin-src/shared/coding-specialists",
+    "plugin-src/shared/assistance/verification.en.md",
+    "plugin-src/shared/assistance/verification.ko.md",
 ):
     source = ROOT / relative
     if source.is_file():

@@ -1,0 +1,3 @@
+# Research scope
+
+Use only provided scoped evidence. Distinguish source statements, corroborated observations, interpretation and unresolved claims; retain precise source identities and contradictory results. Check whether evidence actually answers the bounded question and applies to the stated period/version. Do not turn a URL, summary or agreement among models into primary evidence. This adapter makes no network retrieval; absent current evidence remains unknown. A required research conclusion lacking executable evidence stays open under this slice. Deliver a bounded cited text artifact and avoid broader unsupported generalization.

@@ -635,6 +635,57 @@ def _check_documentation_mode(
         shutil.rmtree(stage, ignore_errors=True)
 
 
+def _check_orchestration_mode(
+    package: Path, host: str, target: str, *, runtime_output: str
+) -> None:
+    stage, runtime = _stage(package, target, runtime_parent=runtime_output)
+    assert runtime is not None
+    payload = b'{"locale":"ko","need":"api_contract"}\n'
+    try:
+        _assert_dispatch(
+            stage,
+            runtime,
+            ["orchestrate", host],
+            ["orchestrate"],
+            target,
+            input_data=payload,
+            expected_stdin=payload,
+        )
+        _write_executable(
+            runtime,
+            STUB_TEMPLATE.format(
+                marker=_quote(str(stage / "marker.txt")),
+                stdout_token=_quote(STDOUT_TOKEN),
+                exit_code=CONTROL_EXIT_CODE,
+            ),
+        )
+        forwarded = _run(
+            stage, ["orchestrate", host], _environment(stage, target), input_data=payload
+        )
+        _require(
+            forwarded.returncode == CONTROL_EXIT_CODE and forwarded.stdout.decode() == STDOUT_TOKEN,
+            "orchestration output/exit was not relayed",
+        )
+        for arguments in (["orchestrate", "invalid"], ["orchestrate", host, "--stream"]):
+            result = _run(stage, arguments, _environment(stage, target))
+            _require(
+                result.returncode == 3 and json.loads(result.stdout)["status"] == "unavailable",
+                "orchestration arguments did not fail closed",
+            )
+    finally:
+        shutil.rmtree(stage, ignore_errors=True)
+    stage, _ = _stage(package, target, runtime_parent=None)
+    try:
+        result = _run(stage, ["orchestrate", host], _environment(stage, target))
+        _require(
+            result.returncode == 3
+            and json.loads(result.stdout)["schema"] == "opensocrates.orchestration.response/1.0.0",
+            "missing orchestration runtime did not report unavailable",
+        )
+    finally:
+        shutil.rmtree(stage, ignore_errors=True)
+
+
 def _check_package(package: Path, host: str, *, runtime_output: str) -> dict[str, Any]:
     targets = _exercised_targets()
     _require(
@@ -662,6 +713,7 @@ def _check_package(package: Path, host: str, *, runtime_output: str) -> dict[str
         )
         _check_control_mode(package, host, target, runtime_output=runtime_output)
         _check_documentation_mode(package, host, target, runtime_output=runtime_output)
+        _check_orchestration_mode(package, host, target, runtime_output=runtime_output)
         _assert_canonical_runtime_precedence(
             package,
             host,

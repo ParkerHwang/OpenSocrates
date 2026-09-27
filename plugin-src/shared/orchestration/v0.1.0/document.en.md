@@ -1,0 +1,3 @@
+# Document scope
+
+Write for the supplied audience and purpose, preserving accepted structure, sources, numbers, units and qualifications. Trace each material claim to an authoritative source or calculation dependency. Reconcile the final prose, tables and examples with the same exact data version; null is unknown and zero may be valid. Deliver editable bounded Markdown/text. Program creation belongs to an explicitly assigned software unit. Binary office generation, rendered pagination and visual QA are outside this adapter; state those limits where relevant. Review both semantic accuracy and usability, not confidence or elegance alone.

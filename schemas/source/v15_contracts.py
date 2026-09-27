@@ -865,3 +865,376 @@ for filename, schema in SCHEMAS.items():
     schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
     schema["$id"] = IDENTITIES[filename]
     schema["title"] = filename.removesuffix(".schema.json")
+
+
+# Optional orchestration is an independent closed schema family. It does not
+# change any existing decision, memory, or assistance representation.
+def orchestration_object(properties: dict[str, Any]) -> dict[str, Any]:
+    return obj(properties, tuple(properties))
+
+
+OC_ID = {"type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$"}
+OC_TEXT = {"type": "string", "minLength": 1, "maxLength": 8192}
+OC_NOTE = {"type": "string", "minLength": 1, "maxLength": 2048}
+OC_PATH = {"type": "string", "minLength": 1, "maxLength": 256}
+OC_MODEL = orchestration_object(
+    {
+        "name": {"type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$"},
+        "effort": {"enum": ["low", "medium", "high", "xhigh", "max", "ultra"]},
+    }
+)
+OC_CONSTRAINT = orchestration_object({"id": OC_ID, "text": OC_TEXT})
+OC_SOURCE = orchestration_object({"id": OC_ID, "path": OC_PATH, "sha256": DIGEST})
+OC_FILE = orchestration_object({"path": OC_PATH, "content": {"type": "string", "maxLength": 65536}})
+OC_MANIFEST = orchestration_object(
+    {
+        "path": OC_PATH,
+        "sha256": DIGEST,
+        "bytes": {"type": "integer", "minimum": 0, "maximum": 262144},
+    }
+)
+OC_OBLIGATION = orchestration_object(
+    {"id": OC_ID, "requirement_id": OC_ID, "description": OC_NOTE, "required": BOOL}
+)
+OC_CHECK = orchestration_object(
+    {
+        "check_id": OC_ID,
+        "argv": {**arr({"type": "string", "minLength": 1, "maxLength": 16384}, 32), "minItems": 1},
+        "obligation_ids": {**arr(OC_ID, 16), "minItems": 1},
+        "authorization_reference": BASIS_REFERENCE,
+        "expected_exit_code": {"type": "integer", "const": 0},
+    }
+)
+OC_SEED = {
+    "anyOf": [
+        {"type": "null"},
+        orchestration_object(
+            {
+                "author": {"enum": ["synthetic_fixture", "external_author"]},
+                "files": {**arr(OC_FILE, 16), "minItems": 1},
+            }
+        ),
+    ]
+}
+OC_UNIT = orchestration_object(
+    {
+        "unit_id": OC_ID,
+        "domain": {"enum": ["software", "data", "document", "research", "unknown"]},
+        "task_kind": {"enum": ["judgment", "mechanical"]},
+        "role": {"enum": ["design", "production"]},
+        "objective": OC_TEXT,
+        "owned_paths": {**arr(OC_PATH, 16), "minItems": 1},
+        "dependencies": arr(OC_ID, 8),
+        "source_ids": arr(OC_ID, 32),
+        "requirement_ids": {**arr(OC_ID, 32), "minItems": 1},
+        "specialists": arr({"enum": ["contracts", "transitions", "ownership"]}, 2),
+        "obligations": {**arr(OC_OBLIGATION, 16), "minItems": 1},
+        "checks": arr(OC_CHECK, 16),
+        "seed": OC_SEED,
+    }
+)
+OC_MEMORY_BINDING = {
+    "anyOf": [
+        {"type": "null"},
+        orchestration_object(
+            {"project_id": UUID, "workspace_id": UUID, "record_ids": arr(UUID, 64)}
+        ),
+    ]
+}
+OC_REQUEST = orchestration_object(
+    {
+        "schema": {"const": "opensocrates.orchestration.request/1.0.0"},
+        "operation": {"enum": ["prepare", "run"]},
+        "run_id": UUID,
+        "task_id": UUID,
+        "revision": POSITIVE,
+        "authorization": orchestration_object(
+            {
+                "reference": BASIS_REFERENCE,
+                "attribution": {"enum": ["operator_declared", "agent_reported_user_instruction"]},
+            }
+        ),
+        "model": OC_MODEL,
+        "locale": {"enum": ["en", "ko"]},
+        "objective": OC_TEXT,
+        "required_artifacts": {**arr(OC_PATH, 128), "minItems": 1},
+        "constraints": {**arr(OC_CONSTRAINT, 32), "minItems": 1},
+        "permissions": arr(OC_NOTE, 16),
+        "prohibitions": arr(OC_NOTE, 16),
+        "source_root": PATH,
+        "sources": arr(OC_SOURCE, 32),
+        "candidate_root": PATH,
+        "client_path": PATH,
+        "repair_limit": {"type": "integer", "minimum": 0, "maximum": 2},
+        "memory": OC_MEMORY_BINDING,
+        "handoff": arr(OC_TEXT, 16),
+        "units": {**arr(OC_UNIT, 8), "minItems": 1},
+    }
+)
+OC_FINDING = orchestration_object(
+    {
+        "artifact_sha256": DIGEST,
+        "requirement_id": OC_ID,
+        "location": OC_PATH,
+        "expected": OC_NOTE,
+        "observed": OC_NOTE,
+        "reproduction": OC_NOTE,
+        "impact": OC_NOTE,
+        "missing_evidence": arr(OC_NOTE, 8),
+        "severity": {"enum": ["blocking", "advisory"]},
+    }
+)
+OC_JUDGMENT = orchestration_object(
+    {
+        "id": OC_ID,
+        "status": {"enum": ["passed", "failed", "unknown"]},
+        "expected": OC_NOTE,
+        "observed": OC_NOTE,
+        "reproduction": OC_NOTE,
+        "evidence_ids": {
+            **arr({"type": "string", "minLength": 1, "maxLength": 128}, 32),
+            "minItems": 1,
+        },
+    }
+)
+OC_ASSESSMENT = orchestration_object(
+    {
+        "schema": {"const": "opensocrates.orchestration.assessment/1.0.0"},
+        "assignment_id": UUID,
+        "candidate_sha256": DIGEST,
+        "verdict": {"enum": ["pass", "repair_required", "blocked"]},
+        "findings": arr(OC_FINDING, 32),
+        "obligations": {**arr(OC_JUDGMENT, 16), "minItems": 1},
+    }
+)
+OC_CANDIDATE = orchestration_object(
+    {
+        "schema": {"const": "opensocrates.orchestration.candidate/1.0.0"},
+        "assignment_id": UUID,
+        "files": arr(OC_FILE, 16),
+        "blocked_reason": {"enum": [None, "contract_change", "missing_input"]},
+    }
+)
+OC_GUIDE = orchestration_object(
+    {"id": OC_PATH, "sha256": DIGEST, "text": {"type": "string", "maxLength": 65536}}
+)
+OC_MEMORY_ITEM = orchestration_object(
+    {
+        "record_id": UUID,
+        "version": POSITIVE,
+        "kind": {"enum": ["decision", "observation", "lesson", "checkpoint"]},
+        "lifecycle": {"enum": ["proposed", "accepted", "superseded", "archived"]},
+        "support": {
+            "enum": ["runtime_observed", "tool_reported", "agent_reported", "inferred", "imported"]
+        },
+        "freshness": {"enum": ["current", "stale", "unknown", "not_applicable"]},
+        "review_state": {"const": "unknown"},
+        "summary": TEXT,
+        "rationale": nullable(TEXT),
+        "constraints": arr(TEXT, 32),
+        "source_refs": arr(SOURCE_REF, 32),
+        "conflict_ids": arr(UUID, 32),
+        "origin": ORIGIN,
+        "lesson": {
+            "anyOf": [
+                {"type": "null"},
+                orchestration_object(
+                    {
+                        "conditions": OC_NOTE,
+                        "mechanism": OC_NOTE,
+                        "exceptions": arr(OC_NOTE, 8),
+                        "provenance": OC_NOTE,
+                        "evidence_refs": arr(SHORT, 32),
+                    }
+                ),
+            ]
+        },
+    }
+)
+OC_MEMORY = orchestration_object(
+    {
+        "status": {"enum": ["not_requested", "available", "disabled", "unavailable", "changed"]},
+        "records": arr(OC_MEMORY_ITEM, 64),
+        "limitations": arr(SHORT, 32),
+    }
+)
+OC_RECEIPT = orchestration_object(
+    {
+        "check_id": OC_ID,
+        "candidate_sha256": DIGEST,
+        "argv_sha256": DIGEST,
+        "status": {"enum": ["passed", "failed", "unknown"]},
+        "exit_code": {"type": ["integer", "null"]},
+        "stdout_sha256": nullable(DIGEST),
+        "stderr_sha256": nullable(DIGEST),
+        "obligation_ids": arr(OC_ID, 16),
+        "reason": {
+            "enum": [
+                "expected_exit",
+                "unexpected_exit",
+                "sandbox_unavailable",
+                "inputs_changed",
+                "output_limit",
+                "cancelled",
+            ]
+        },
+    }
+)
+OC_INPUT = orchestration_object(
+    {
+        "path": OC_PATH,
+        "sha256": DIGEST,
+        "bytes": NONNEGATIVE,
+        "kind": {"enum": ["source", "dependency", "candidate"]},
+        "source_id": nullable(OC_ID),
+    }
+)
+OC_ASSIGNMENT = orchestration_object(
+    {
+        "schema": {"const": "opensocrates.orchestration.assignment/1.0.0"},
+        "authorization": OC_REQUEST["properties"]["authorization"],
+        "task_objective": OC_TEXT,
+        "assignment_id": UUID,
+        "run_id": UUID,
+        "task_id": UUID,
+        "revision": POSITIVE,
+        "unit_id": OC_ID,
+        "domain": OC_UNIT["properties"]["domain"],
+        "task_kind": OC_UNIT["properties"]["task_kind"],
+        "role": {"enum": ["design", "production", "review", "execution_verification"]},
+        "model": OC_MODEL,
+        "locale": {"enum": ["en", "ko"]},
+        "objective": OC_TEXT,
+        "constraints": arr(OC_CONSTRAINT, 32),
+        "permissions": arr(OC_NOTE, 16),
+        "prohibitions": arr(OC_NOTE, 32),
+        "owned_paths": arr(OC_PATH, 16),
+        "dependencies": arr(OC_ID, 8),
+        "obligations": arr(OC_OBLIGATION, 16),
+        "guides": arr(OC_GUIDE, 10),
+        "inputs": arr(OC_INPUT, 160),
+        "memory": OC_MEMORY,
+        "handoff": arr(OC_TEXT, 16),
+        "uncertainty": arr(SHORT, 32),
+        "candidate_sha256": nullable(DIGEST),
+        "checks": arr(OC_CHECK, 16),
+        "check_receipts": arr(OC_RECEIPT, 16),
+        "repair_findings": arr(OC_FINDING, 64),
+        "output_schema": {
+            "enum": ["orchestration-candidate.schema.json", "orchestration-assessment.schema.json"]
+        },
+    }
+)
+OC_USAGE = orchestration_object(
+    {
+        key: {"type": ["integer", "null"], "minimum": 0}
+        for key in (
+            "input_tokens",
+            "cached_input_tokens",
+            "cache_write_input_tokens",
+            "output_tokens",
+            "reasoning_output_tokens",
+        )
+    }
+)
+OC_CALL = orchestration_object(
+    {
+        "assignment_id": UUID,
+        "unit_id": OC_ID,
+        "role": OC_ASSIGNMENT["properties"]["role"],
+        "input_sha256": DIGEST,
+        "output_sha256": nullable(DIGEST),
+        "thread_sha256": nullable(DIGEST),
+        "model": OC_MODEL,
+        "status": {
+            "enum": ["completed", "failed", "cancelled", "invalid_output", "inputs_changed"]
+        },
+        "usage": OC_USAGE,
+        "guide_manifest": arr(orchestration_object({"id": OC_PATH, "sha256": DIGEST}), 10),
+        "input_manifest": arr(OC_INPUT, 160),
+        "memory_snapshot_sha256": DIGEST,
+        "provider_error_events": NONNEGATIVE,
+        "failed_turn_events": NONNEGATIVE,
+        "process_exit_code": {"type": ["integer", "null"]},
+        "backend_attempts": {"type": "null"},
+        "reason": SHORT,
+    }
+)
+OC_VERSION = orchestration_object(
+    {
+        "version": POSITIVE,
+        "candidate_sha256": DIGEST,
+        "artifacts": arr(OC_MANIFEST, 16),
+        "producer_id": SHORT,
+        "reviewer_id": nullable(UUID),
+        "verifier_id": nullable(UUID),
+        "review": {"anyOf": [{"type": "null"}, OC_ASSESSMENT]},
+        "verification": {"anyOf": [{"type": "null"}, OC_ASSESSMENT]},
+        "checks": arr(OC_RECEIPT, 16),
+        "qualified": BOOL,
+    }
+)
+OC_RESULT = orchestration_object(
+    {
+        "unit_id": OC_ID,
+        "status": {
+            "enum": [
+                "ready",
+                "classification_gap",
+                "blocked_dependency",
+                "unavailable",
+                "repair_required",
+                "source_conflict",
+                "qualified_candidate",
+                "cancelled",
+            ]
+        },
+        "reason": SHORT,
+        "versions": arr(OC_VERSION, 3),
+        "required_open": arr(OC_ID, 16),
+    }
+)
+OC_RESPONSE = orchestration_object(
+    {
+        "schema": {"const": "opensocrates.orchestration.response/1.0.0"},
+        "run_id": nullable(UUID),
+        "status": {
+            "enum": [
+                "prepared",
+                "integration_pending",
+                "partial",
+                "blocked",
+                "invalid_request",
+                "unavailable",
+                "cancelled",
+            ]
+        },
+        "plan_sha256": nullable(DIGEST),
+        "model": {"anyOf": [{"type": "null"}, OC_MODEL]},
+        "client_version": nullable(SHORT),
+        "client_sha256": nullable(DIGEST),
+        "units": arr(OC_RESULT, 8),
+        "calls": arr(OC_CALL, 72),
+        "memory_status": OC_MEMORY["properties"]["status"],
+        "memory_snapshot_sha256": nullable(DIGEST),
+        "integration": {"const": "pending_primary_reconciliation"},
+        "limitations": arr(SHORT, 32),
+    }
+)
+for _name, _schema in {
+    "request": OC_REQUEST,
+    "assignment": OC_ASSIGNMENT,
+    "candidate": OC_CANDIDATE,
+    "assessment": OC_ASSESSMENT,
+    "response": OC_RESPONSE,
+}.items():
+    _filename = f"orchestration-{_name}.schema.json"
+    _schema.update(
+        {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": f"opensocrates.orchestration.{_name}/1.0.0",
+            "title": f"orchestration-{_name}",
+        }
+    )
+    SCHEMAS[_filename] = _schema
+    IDENTITIES[_filename] = _schema["$id"]

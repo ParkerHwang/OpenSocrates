@@ -2,6 +2,19 @@
 
 ## [1.5.0] - Unreleased release candidate
 
+- Add explicit optional specialized orchestration for bounded text artifacts:
+  separate domain/role classification, fresh production/review/verification
+  contexts, version-bound findings, sandboxed checks and designated maker repair.
+  Scoped existing memory retains full accepted intent and independent provenance
+  axes; absent memory uses an explicit handoff. This command uses the selected
+  authenticated Codex client and its usage. Default decisions/hooks stay stateless;
+  no automatic enrollment, model substitution or quality-benefit claim is added.
+- 범위가 정해진 텍스트 산출물에 선택형 전문 제작 흐름을 추가합니다. 작업 분야와
+  역할을 나누고, 새 문맥의 작성·검토·실행 검증 담당자가 정확한 버전을 확인합니다.
+  기존 메모리의 승인된 제약과 출처를 보존하며, 메모리가 없으면 명시적인 인계문을
+  사용합니다. 이 명령은 선택한 Codex 계정의 사용량을 소비하지만 기본 판단·훅,
+  메모리 등록과 모델 선택을 자동으로 바꾸지는 않습니다. 품질 향상을 보장하지 않습니다.
+
 - Add a separate provisional coding-specialist library v0.1.1: contracts,
   transitions and ownership, with complete EN/KO/zh-CN static procedures and a
   selective router. A software specialist may be primary without a mandatory

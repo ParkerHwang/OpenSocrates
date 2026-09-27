@@ -139,3 +139,12 @@ guarantee. Model profiles remain experimental; the normal task fallback works
 without a validated model profile. [Privacy and controls](docs/project-memory.md)
 and the [technical protocol](docs/project-memory-development.md) describe what is
 retained and how to disable or delete it.
+
+The candidate also offers an explicit [specialized orchestration command](docs/orchestration.md).
+It sends bounded selected context/source to fresh maker, independent reviewer and
+execution-verifier processes in the caller's authenticated Codex client and consumes
+that account's usage. All roles retain the same authorized model/effort. Ordinary
+hooks and default decision retrieval do not start it. Only new candidate directories
+are written; required unknown/failed checks block qualification, and the primary
+owns final integration and affected-byte rechecks. This text-artifact adapter does
+not imply binary office rendering, account isolation or a measured quality benefit.
