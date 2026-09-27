@@ -1,0 +1,41 @@
+{
+  "methodology": "Local loopback HTTP, fresh SQLite store, seeded tenant, three round-robin GET routes followed by concurrent create/reserve/ship workflows; each worker runs its workflow sequentially.",
+  "environment": {
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "machine": "arm64",
+    "logical_cpus": 10,
+    "python": "3.12.14"
+  },
+  "settings": {
+    "reads": 300,
+    "workflows": 80,
+    "concurrency": 8
+  },
+  "reads": {
+    "requests": 300,
+    "elapsed_seconds": 0.086,
+    "requests_per_second": 3489.8,
+    "latency_ms_p50": 1.99,
+    "latency_ms_p95": 3.27,
+    "latency_ms_max": 25.91,
+    "errors": 0,
+    "error_types": {}
+  },
+  "writes": {
+    "requests": 240,
+    "elapsed_seconds": 0.114,
+    "requests_per_second": 2110.5,
+    "latency_ms_p50": 0.52,
+    "latency_ms_p95": 11.42,
+    "latency_ms_max": 75.78,
+    "errors": 0,
+    "error_types": {}
+  },
+  "final_dashboard": {
+    "orders_by_status": {
+      "shipped": 80
+    },
+    "inventory_units": 180,
+    "reserved_units": 0
+  }
+}

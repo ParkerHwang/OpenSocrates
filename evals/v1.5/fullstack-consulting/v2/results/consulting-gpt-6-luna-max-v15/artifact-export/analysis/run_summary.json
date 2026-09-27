@@ -1,0 +1,418 @@
+{
+  "eligible_orders": 1254,
+  "country_totals": [
+    {
+      "country": "DEU",
+      "shipped_orders": 209,
+      "shipped_units": 12153,
+      "gross_sales_eur": 631244.76,
+      "refunds_eur": 5453.0,
+      "net_sales_eur": 625791.76,
+      "net_cogs_eur": 349980.5,
+      "fulfillment_eur": 13445.7,
+      "contribution_eur": 262365.56,
+      "returned_units": 73,
+      "margin": 0.41925378
+    },
+    {
+      "country": "FRA",
+      "shipped_orders": 209,
+      "shipped_units": 11880,
+      "gross_sales_eur": 640929.94,
+      "refunds_eur": 8699.04,
+      "net_sales_eur": 632230.9,
+      "net_cogs_eur": 341453.0,
+      "fulfillment_eur": 14506.8,
+      "contribution_eur": 276271.1,
+      "returned_units": 144,
+      "margin": 0.43697817
+    },
+    {
+      "country": "NLD",
+      "shipped_orders": 209,
+      "shipped_units": 12576,
+      "gross_sales_eur": 709108.84,
+      "refunds_eur": 11376.0,
+      "net_sales_eur": 697732.84,
+      "net_cogs_eur": 365495.5,
+      "fulfillment_eur": 16593.12,
+      "contribution_eur": 315644.22,
+      "returned_units": 144,
+      "margin": 0.4523855
+    },
+    {
+      "country": "POL",
+      "shipped_orders": 209,
+      "shipped_units": 13163,
+      "gross_sales_eur": 776507.79,
+      "refunds_eur": 14617.92,
+      "net_sales_eur": 761889.87,
+      "net_cogs_eur": 386697.5,
+      "fulfillment_eur": 18698.49,
+      "contribution_eur": 356493.88,
+      "returned_units": 180,
+      "margin": 0.46790736
+    },
+    {
+      "country": "CZE",
+      "shipped_orders": 209,
+      "shipped_units": 13733,
+      "gross_sales_eur": 834572.08,
+      "refunds_eur": 19264.61,
+      "net_sales_eur": 815307.47,
+      "net_cogs_eur": 397062.0,
+      "fulfillment_eur": 20910.22,
+      "contribution_eur": 397335.25,
+      "returned_units": 288,
+      "margin": 0.48734406
+    },
+    {
+      "country": "ESP",
+      "shipped_orders": 209,
+      "shipped_units": 13931,
+      "gross_sales_eur": 872258.92,
+      "refunds_eur": 21420.0,
+      "net_sales_eur": 850838.92,
+      "net_cogs_eur": 406230.5,
+      "fulfillment_eur": 22707.95,
+      "contribution_eur": 421900.47,
+      "returned_units": 252,
+      "margin": 0.49586409
+    }
+  ],
+  "recommendation": {
+    "countries": [
+      "CZE",
+      "ESP"
+    ],
+    "capex_eur": 225000,
+    "fte": 5,
+    "rationale": "Highest modeled base-case recurring incremental contribution among feasible singles and pairs: EUR 198,099.30/year after fixed costs, with EUR 225,000 year-zero capex and 5 FTE. This is scenario arithmetic on synthetic inputs, not a causal hub estimate. Stress contribution is EUR 32,179.71/year.",
+    "decision_rule": "Among defer/singles/feasible pairs, choose the feasible non-empty option with greatest base-case incremental annual contribution; constraints are capex <= EUR450,000, FTE <= 7, and no more than two hubs. Stress and simple payback are decision disclosures, not probability-weighted objective values.",
+    "strongest_alternative": {
+      "country": "POL+ESP",
+      "countries": [
+        "POL",
+        "ESP"
+      ],
+      "scenario": "base",
+      "incremental_contribution_eur": 186328.84,
+      "capex_eur": 240000,
+      "fte": 6,
+      "payback_years": 1.288
+    },
+    "stress_resilient_alternative": {
+      "country": "NLD+ESP",
+      "countries": [
+        "NLD",
+        "ESP"
+      ],
+      "scenario": "stress",
+      "incremental_contribution_eur": 107630.13,
+      "capex_eur": 270000,
+      "fte": 6,
+      "payback_years": 2.5086
+    },
+    "criteria_and_provenance": {
+      "hard_constraints": [
+        "capex <= EUR450,000",
+        "staffing <= 7 FTE",
+        "no more than two hubs"
+      ],
+      "primary_comparison": "base-case annual incremental contribution after recurring fixed costs; no numeric weights applied",
+      "secondary_comparisons": [
+        "simple undiscounted payback",
+        "low/high scenario range",
+        "defined joint refund/FX stress",
+        "capex and FTE use"
+      ],
+      "source_of_option_ratings": "computed from synthetic client baseline and assumptions in hub-options.csv and scenario-policy.md",
+      "board_risk_preference": "not supplied; base-case maximization is a transparent analyst default, not a measured board preference",
+      "probabilities": "not supplied; scenarios are not probability-weighted"
+    },
+    "concessions_and_accepted_risks": [
+      "The recommendation uses only half of the EUR450,000 capex ceiling and five of seven FTE; it gives up the higher stressed annual contribution of the NLD+ESP alternative.",
+      "The defined joint stress leaves positive annual incremental contribution but lengthens simple payback to about seven years.",
+      "The option uplift and savings are synthetic planning assumptions; no site-specific customer or operational validation is available in the source room."
+    ],
+    "switch_conditions": [
+      "Reopen the funding choice if validated site-specific volume uplift or realized per-unit savings do not support the modeled annual gain.",
+      "Reopen if procurement confirms capex or recurring fixed cost above the option inputs, or if staffing is unavailable within the stated cap.",
+      "The defined joint stress is a scenario only; a sustained refund/FX pattern worse than this stress weakens the recommendation."
+    ],
+    "base_rank_switch_example": {
+      "replaces_country": "POL",
+      "selected_country": "CZE",
+      "other_hub_shared": [
+        "ESP"
+      ],
+      "selected_site_uplift_threshold_if_alternative_site_uplift_is_25pct": 0.222381,
+      "selected_site_saving_threshold_eur_per_unit_if_both_uplifts_are_25pct": 1.4143,
+      "interpretation": "Holding the shared hub and other assumptions constant, a selected-site uplift below this threshold or per-unit saving below this threshold would erase its modeled base-case advantage over the next base-ranked alternative."
+    }
+  },
+  "quality": {
+    "cutoff_inclusive": "2026-01-31",
+    "order_rows_by_source": {
+      "orders-part1.csv": 655,
+      "orders-part2.csv": 655,
+      "order-corrections.csv": 18
+    },
+    "order_raw_rows": 1328,
+    "order_exact_duplicate_rows_removed": 13,
+    "order_distinct_revision_rows_after_dedup": 1315,
+    "order_distinct_ids": 1297,
+    "order_ids_with_multiple_revisions": 18,
+    "order_ids_selected_at_revision_gt_1": 18,
+    "correction_rows": 18,
+    "selected_rows_from_corrections": 18,
+    "order_latest_revision_conflicts": 0,
+    "order_exclusion_partition": {
+      "eligible 2025 shipment": 1254,
+      "status is not shipped": 24,
+      "test transaction": 18,
+      "shipped date missing or outside 2025": 1
+    },
+    "eligible_2025_shipped_orders": 1254,
+    "zero_gross_eur_shipped_orders": 12,
+    "zero_gross_eur_order_ids": [
+      "M1-03-001",
+      "M1-09-001",
+      "M2-03-001",
+      "M2-09-001",
+      "M3-03-001",
+      "M3-09-001",
+      "M4-03-001",
+      "M4-09-001",
+      "M5-03-001",
+      "M5-09-001",
+      "M6-03-001",
+      "M6-09-001"
+    ],
+    "negative_gross_order_ids": [],
+    "refunds_exceed_gross_order_ids": [],
+    "currency_country_mismatch_order_ids": [],
+    "unit_cost_missing_order_ids": [],
+    "restocked_units_exceed_shipped_order_ids": [],
+    "returned_units_exceed_shipped_order_ids": [],
+    "return_raw_rows": 264,
+    "return_exact_duplicate_rows_removed": 20,
+    "return_revision_rows_after_dedup": 244,
+    "return_distinct_ids": 243,
+    "return_ids_with_multiple_revisions": 1,
+    "return_latest_revision_conflicts": 0,
+    "returns_after_cutoff_excluded": 1,
+    "orphan_returns_missing_order_excluded": 1,
+    "returns_linked_to_ineligible_order_excluded": 0,
+    "returns_included": 241,
+    "return_cutoff_count_partition": {
+      "after_cutoff": 1,
+      "orphan": 1,
+      "linked_ineligible": 0,
+      "included": 241
+    },
+    "world_bank_rows_expected": 18,
+    "world_bank_rows_observed": 18,
+    "population_nulls_preserved": 0,
+    "gdp_per_capita_nulls_preserved": 0,
+    "world_bank_vintage": {
+      "SP.POP.TOTL": {
+        "source_file": "population.json",
+        "sourceid": "2",
+        "lastupdated": "2026-07-13",
+        "unit": "persons"
+      },
+      "NY.GDP.PCAP.CD": {
+        "source_file": "gdp-per-capita.json",
+        "sourceid": "2",
+        "lastupdated": "2026-07-13",
+        "unit": "current US dollars per person"
+      }
+    },
+    "ecb_archive_analysis_days": 255,
+    "ecb_month_currency_cells": 24,
+    "ecb_business_days_per_month": {
+      "PLN": [
+        22,
+        20,
+        21,
+        20,
+        21,
+        21,
+        23,
+        21,
+        22,
+        23,
+        20,
+        21
+      ],
+      "CZK": [
+        22,
+        20,
+        21,
+        20,
+        21,
+        21,
+        23,
+        21,
+        22,
+        23,
+        20,
+        21
+      ]
+    },
+    "monthly_rows": 72,
+    "country_rows": 6,
+    "country_year_contribution_total_eur": 2030010.48,
+    "country_year_totals": {
+      "shipped_orders": 1254,
+      "shipped_units": 77436,
+      "gross_sales_eur": 4464622.33,
+      "refunds_eur": 80830.57,
+      "net_sales_eur": 4383791.76,
+      "net_cogs_eur": 2246919.0,
+      "fulfillment_eur": 106862.28,
+      "contribution_eur": 2030010.48,
+      "returned_units": 1081
+    },
+    "aggregate_margin": 0.46307183,
+    "aggregate_returned_units_rate": 0.01395992,
+    "gross_cogs_eur": 2265404.5,
+    "recovered_cogs_eur": 18485.5,
+    "reconciliation": {
+      "shipped_orders": {
+        "monthly_sum": 1254,
+        "country_sum": 1254,
+        "order_ledger_sum": 1254,
+        "pass": true
+      },
+      "shipped_units": {
+        "monthly_sum": 77436,
+        "country_sum": 77436,
+        "order_ledger_sum": 77436,
+        "pass": true
+      },
+      "gross_sales_eur": {
+        "monthly_sum": 4464622.33,
+        "country_sum": 4464622.33,
+        "order_ledger_sum": 4464622.33,
+        "pass": true
+      },
+      "refunds_eur": {
+        "monthly_sum": 80830.57,
+        "country_sum": 80830.57,
+        "order_ledger_sum": 80830.57,
+        "pass": true
+      },
+      "net_sales_eur": {
+        "monthly_sum": 4383791.76,
+        "country_sum": 4383791.76,
+        "order_ledger_sum": 4383791.76,
+        "pass": true
+      },
+      "net_cogs_eur": {
+        "monthly_sum": 2246919.0,
+        "country_sum": 2246919.0,
+        "order_ledger_sum": 2246919.0,
+        "pass": true
+      },
+      "fulfillment_eur": {
+        "monthly_sum": 106862.28,
+        "country_sum": 106862.28,
+        "order_ledger_sum": 106862.28,
+        "pass": true
+      },
+      "contribution_eur": {
+        "monthly_sum": 2030010.48,
+        "country_sum": 2030010.48,
+        "order_ledger_sum": 2030010.48,
+        "pass": true
+      },
+      "returned_units": {
+        "monthly_sum": 1081,
+        "country_sum": 1081,
+        "order_ledger_sum": 1081,
+        "pass": true
+      }
+    },
+    "source_hash_checks": [
+      {
+        "file": "evidence/source_room/index.html",
+        "pass": true,
+        "sha256": "7e12a215fdfb75f175b36e100b796f2ad908e9986f5d68f2a16eb9c8f0076604"
+      },
+      {
+        "file": "evidence/source_room/data-dictionary.md",
+        "pass": true,
+        "sha256": "0a1866e9f89b5c6d40ed2ac24599a118223360fa028e61012d1ecd8ac6b6117f"
+      },
+      {
+        "file": "evidence/source_room/ecb-history.csv",
+        "pass": true,
+        "sha256": "e8136f072d575cb891cb58718fe31602ca2d4feccee67f035106393ed1c4bdbb"
+      },
+      {
+        "file": "evidence/source_room/ecb-history.zip",
+        "pass": true,
+        "sha256": "dfe9ab070c0679d42a174981e07b240131d2db19d20108a5d0e4653d9f61fc9f"
+      },
+      {
+        "file": "evidence/source_room/gdp-per-capita.json",
+        "pass": true,
+        "sha256": "df654256a8803415e2e2c5864d1a00966cfd3150c069b1b897101748471524da"
+      },
+      {
+        "file": "evidence/source_room/hub-options.csv",
+        "pass": true,
+        "sha256": "2f508c9bd49c45b9b28621f46cc68cb7ac6fa4f3fc1acabb61a7c4f06dce6006"
+      },
+      {
+        "file": "evidence/source_room/order-corrections.csv",
+        "pass": true,
+        "sha256": "5cbfcbaf15ff4cf875ef8059a1408160758115b0734fe53dbd971d368ec7131d"
+      },
+      {
+        "file": "evidence/source_room/orders-part1.csv",
+        "pass": true,
+        "sha256": "be35dd1504ce473fdbb634ee4ef964b5c0f5846d5ec3e5ef7d0110a4a361d056"
+      },
+      {
+        "file": "evidence/source_room/orders-part2.csv",
+        "pass": true,
+        "sha256": "43efbae4b8a57832a8936c85c7c253df4e74190dcc5b31298198c8a97bf19509"
+      },
+      {
+        "file": "evidence/source_room/population.json",
+        "pass": true,
+        "sha256": "dd4b81e55e236d0ff45efb6ec59d1575cf3792395257ee182953e17d928815b2"
+      },
+      {
+        "file": "evidence/source_room/returns.csv",
+        "pass": true,
+        "sha256": "f356d530a9f95cc3e9770e299dbd561cfb55e2dcb02bf6142dcef1e657a6d713"
+      },
+      {
+        "file": "evidence/source_room/scenario-policy.md",
+        "pass": true,
+        "sha256": "0567e2f884c19c78ea2ab43a97feb1fd31bfa13db429d7d2f4bfb768b481499b"
+      },
+      {
+        "file": "evidence/source_room/source-register.json",
+        "pass": true,
+        "sha256": "c38ffd64f6303924065e87b305e1cb0a6dd8312633d3eb703fb8492a8b30de3b"
+      },
+      {
+        "file": "evidence/source_room/unit-costs.csv",
+        "pass": true,
+        "sha256": "76dce7f58ab3d3eec5af1e50c5af45bf2fdc72d195478b4e17d46a2951342b31"
+      }
+    ],
+    "material_notes": [
+      "Input client transactions, returns, hub options, unit costs, and scenario assumptions are synthetic; public World Bank and ECB observations are archived snapshots, not live-retrieved estimates.",
+      "The local ECB quote is units of local currency per EUR. Both order sales and refunds use the original shipment month mean. EUR is fixed at 1 by convention.",
+      "Returns are counted once per selected return_id revision, after exact duplicate removal, cutoff check, and an exact order_id join. Orphans are retained in the quarantine decision ledger.",
+      "Booked net sales follow gross sales less received refunds through cutoff. Cash collection/settlement records are absent; contribution further subtracts net COGS and nonrefundable fulfillment.",
+      "Simple payback is capex divided by positive annual incremental contribution, with no discounting, ramp, taxes, residual value, or timing effects."
+    ]
+  }
+}

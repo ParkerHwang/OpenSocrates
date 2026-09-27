@@ -50,6 +50,12 @@ JSONL stream as a completed packet. The active same-thread heartbeat is
 authorized verification/handoff when the matrix is terminal. `monitor-state.json`
 is an explicitly mutable local coordination file, not frozen outcome evidence.
 
+For Git handoff, follow [the portable publication procedure](PUBLICATION.md).
+Some completed cells contain a large `.deps` installation cache. Its unchanged
+distribution files remain in the full local export and hash inventory; the
+publication manifest identifies the exact files to stage. Do not bulk-force-add
+the whole export or silently remove a candidate-authored dependency modification.
+
 ## Interpretation
 
 - A subject invocation is one fresh `codex exec` episode. It can make many backend
