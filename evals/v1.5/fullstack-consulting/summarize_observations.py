@@ -214,11 +214,26 @@ def summarize(cohort=None, probe=process_health, checked_at=None):
                 protected_inputs_unchanged=terminal["protected_inputs_unchanged"],
                 package_members_unchanged=terminal["package_members_unchanged"],
             )
+        transfer = None
+        skipped_path = output / "skipped.json"
+        if skipped_path.exists():
+            marker = read(skipped_path)
+            if marker.get("reason") == "transferred_to_parallel_v1":
+                transfer = marker
+        row["scheduler_transfer"] = transfer
+        if terminal:
+            row["scheduler_regime"] = terminal.get("scheduler_regime", "original-three-worker")
+        elif (output / "call.started.json").exists():
+            row["scheduler_regime"] = read(output / "call.started.json").get(
+                "scheduler_regime", "original-three-worker"
+            )
+        else:
+            row["scheduler_regime"] = "parallel-v1" if transfer else None
         # A post-call snapshot/cleanup failure can coexist with a successful call.
         # Keep both facts and all reported usage instead of masking the failure.
         if (output / "harness-failure.json").exists():
             row.update(state="harness_failed", failure=read(output / "harness-failure.json"))
-        elif not terminal and (output / "skipped.json").exists():
+        elif not terminal and skipped_path.exists() and transfer is None:
             row.update(state="skipped", failure=read(output / "skipped.json"))
         elif not terminal and (output / "call.started.json").exists():
             state, observation = live_observation(output, events, resources, checked_at, probe)

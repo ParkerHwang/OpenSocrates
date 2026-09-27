@@ -9,8 +9,13 @@ outcome has been discarded or repaired.
 The primary does not send follow-ups, choose subject stacks, repair artifacts,
 reveal checks or terminate subjects for elapsed time/usage. All requested resource
 budgets are null. Provider/client constraints remain possible and are recorded.
-The three-process scheduler controls host contention, not the work allowed to an
-individual subject. Final verification takes place only after the subject has
+The initial three-process scheduler was superseded by the user's explicit request
+for maximum simultaneous execution. The [concurrency amendment](parallel-v1/README.md)
+atomically transferred all 16 never-started cells at 2026-09-27 10:10:37 UTC and
+started them alongside the existing three subjects, reaching 19 live processes
+with no queue, signal, restart or duplicate attempt. Original frozen manifests
+are unchanged. New calls bind both the base protocol and amendment/dispatch hashes.
+Final verification takes place only after the subject has
 naturally ended and its artifacts have been hash-locked.
 
 ## Files to inspect
@@ -38,6 +43,8 @@ zombie or reused PID with no terminal receipt is `awaiting_terminal_receipt`,
 not an automatically failed outcome; unavailable probes are `unconfirmed`.
 A public terminal event while its process is still present is `finalizing`.
 These states request inspection, never interruption or an automatic rerun.
+An explicit `transferred_to_parallel_v1` queue marker is administrative provenance,
+not a skipped outcome. Its new call still requires the same process identity check.
 Last resource-sample and public-event ages are reported separately: a quiet
 public stream does not establish a stall. `attention_cells` exposes receipt and
 harness problems. A post-call harness failure remains visible alongside the
@@ -75,6 +82,11 @@ the whole export or silently remove a candidate-authored dependency modification
   expose contention; generation elapsed times are descriptive, not clean
   single-tenant latency benchmarks. Independent backend performance qualification
   is separate and serial.
+- Scheduling changed under explicit user authorization. Use the amendment's exact
+  timestamp and per-call `scheduler_regime`; existing subjects can overlap the
+  new regime. Do not pool their generation or self-load timings as if concurrency
+  stayed unchanged. Observe both the original runner log and
+  `/private/tmp/opensocrates-matrix-parallel-v1.log`; all 36 results remain under v2.
 - Fast-off requested configuration and native feature output are available;
   independent backend service-tier/model echo is not. No fast configuration,
   alternate model, stronger helper or manual artifact repair is supplied.

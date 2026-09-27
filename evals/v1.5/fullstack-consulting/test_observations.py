@@ -57,6 +57,19 @@ class ObservationTests(unittest.TestCase):
         self.assertEqual(view["state_counts"], {"pending": 1})
         self.assertEqual(view["usage_totals"]["input_tokens"]["missing_attempted_cells"], 0)
 
+    def test_queue_transfer_is_not_a_skipped_outcome_or_attempt(self):
+        self.save("skipped.json", {"reason": "transferred_to_parallel_v1", "call_attempted": False})
+        view = self.view()
+        self.assertEqual(view["state_counts"], {"pending": 1})
+        self.assertEqual(view["attention_cells"], [])
+        self.assertEqual(view["usage_totals"]["input_tokens"]["missing_attempted_cells"], 0)
+
+    def test_transferred_live_subject_still_requires_identity_check(self):
+        self.save("skipped.json", {"reason": "transferred_to_parallel_v1", "call_attempted": False})
+        self.start()
+        self.assertEqual(self.view()["state_counts"], {"running": 1})
+        self.assertEqual(self.view("exited")["state_counts"], {"awaiting_terminal_receipt": 1})
+
     def test_live_and_quiet_is_running_without_a_deadline(self):
         self.start()
         (self.output / "resources.jsonl").write_text(
