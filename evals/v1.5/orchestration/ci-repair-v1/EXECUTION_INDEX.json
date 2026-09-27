@@ -1,0 +1,26 @@
+{
+  "schema": "independent-ci-portability-evidence-index/1",
+  "verdict": "bounded_affected_checks_pass",
+  "source_commit": "6eb8d3774f3a9032f580359b38b8bf11208f70d3",
+  "report": {
+    "path": "results.json",
+    "sha256": "c43b7d1e5c30f970d3f29bb6b44c4d67f98c7edb8155bf35117d38c15ff9fd87"
+  },
+  "harness": {
+    "path": "check.py",
+    "sha256": "be4c650b7a28b2cd875300258dc013bc9992b6ed7d57e6cf22639a37cb2ebe4b"
+  },
+  "initial_harness_correction": {
+    "path": "initial-harness-correction.json",
+    "sha256": "b2ca85430266d45fbb7d693426885899c992b36b1fe20d8d0be729d3fbdd115f"
+  },
+  "checks": 16,
+  "outcome_model_calls": 0,
+  "frozen_v1_tracked_worktree_diff": [],
+  "limitations": [
+    "Missing/invalid OS flags and Windows process cleanup were source-level simulations on macOS; no hosted Windows runtime test.",
+    "Native macOS exercised positive required flags and actual no-follow/sandbox write denial. It did not simulate missing native OS constants.",
+    "Hosted Windows CI after push remains separate and pending. No prior live-v2/v3 model or outcome re-execution."
+  ],
+  "remaining": "Hosted Windows exact-head CI after push is separate; no other verifier expansion requested."
+}

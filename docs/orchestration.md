@@ -182,3 +182,7 @@ These are synthetic correctness examples on the documented client, not a quality
 benchmark or evidence of active-plugin installation. Each finding's `location`
 must equal its owned current candidate path exactly; place optional line/range
 details in `reproduction`. The runtime keeps exact path/hash/requirement binding.
+
+A separate [platform typing qualification](../evals/v1.5/orchestration/ci-repair-v1/README.md)
+records the later Windows build/type-check repair. It preserves the macOS-only
+execution boundary and does not reassign the original live outcomes to a new artifact.

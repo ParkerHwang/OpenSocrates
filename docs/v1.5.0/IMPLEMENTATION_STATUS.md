@@ -1,5 +1,12 @@
 # v1.5.0 release-candidate status
 
+The subsequent [platform typing repair](../../evals/v1.5/orchestration/ci-repair-v1/README.md)
+preserves strict POSIX capabilities and the macOS-only execution boundary while
+allowing Windows source type checking. Complete source/native checks and 43
+focused regressions pass locally; final hosted CI is bound to the PR head.
+Original actual outcomes remain frozen rather than relabelled as runs on the
+new native artifact.
+
 The [specialized orchestration revision](15-specialized-orchestration.md) adds an
 explicit optional command for owned design/production units, fresh independent
 review and execution verification, bounded repair and primary final integration.

@@ -1,11 +1,21 @@
 # OpenSocrates 1.5.0 release-candidate handoff
 
-The newest [specialized orchestration qualification](../../evals/v1.5/orchestration/v1/REPORT.md)
+The [Windows typing follow-up](../../evals/v1.5/orchestration/ci-repair-v1/README.md)
+qualifies source `6eb8d3774f3a9032f580359b38b8bf11208f70d3` after the first
+exact-head CI found POSIX attribute references unsupported by Windows type stubs.
+Required flags still fail closed and the actual adapter remains macOS-only.
+The latest local ZIP is
+`01c5c1852a4c6293d835a5cf3b73fee22c6eef3bb62a9ecc2f1e1cd2651cf9c9`.
+The original 28 model calls keep their earlier source/package identities; this
+follow-up adds affected source/native evidence without another outcome call.
+Final pushed-head CI is recorded in Draft PR #95.
+
+The initial [specialized orchestration qualification](../../evals/v1.5/orchestration/v1/REPORT.md)
 adds explicit optional domain/role plans, independently reviewed design and
 production, actual read-only checks, fresh execution verification and bounded
 repair. The primary retains user intent, permissions and final integration.
-[Current validation](../../evals/v1.5/orchestration/v1/validation.json) binds the
-qualified product commit, 587 runtime/package inputs and current local ZIP
+[Initial validation](../../evals/v1.5/orchestration/v1/validation.json) binds the
+qualified product commit, 587 runtime/package inputs and initial local ZIP
 `4a49fb8cffe7d81a26fb28d04c86cd0affbb9e3a42babdd61dfc980db615917a`.
 Its real client adapter is initially qualified only on macOS with
 `codex-cli 0.158.0-alpha.2`. Earlier ZIP identities and results below are historical;

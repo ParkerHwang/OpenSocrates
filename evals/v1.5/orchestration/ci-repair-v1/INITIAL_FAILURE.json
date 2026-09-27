@@ -1,0 +1,66 @@
+{
+  "schema": "opensocrates.orchestration.ci-failure/1",
+  "commit": "b32dbdba4e53ad08e90e4a4a97a30d4fe57c5a27",
+  "workflow_run": 36341810566,
+  "job": 108683294439,
+  "url": "https://github.com/ParkerHwang/OpenSocrates/actions/runs/36341810566/job/108683294439",
+  "platform": "windows",
+  "failed_step": "uv run --locked mypy src",
+  "error_count": 8,
+  "errors": [
+    {
+      "file": "src/opensocrates/orchestration/paths.py",
+      "line": 193,
+      "error": "Returning Any from function declared to return int",
+      "code": "no-any-return"
+    },
+    {
+      "file": "src/opensocrates/orchestration/paths.py",
+      "line": 193,
+      "error": "Module has no attribute O_DIRECTORY",
+      "code": "attr-defined"
+    },
+    {
+      "file": "src/opensocrates/orchestration/paths.py",
+      "line": 193,
+      "error": "Module has no attribute O_NOFOLLOW",
+      "code": "attr-defined"
+    },
+    {
+      "file": "src/opensocrates/orchestration/paths.py",
+      "line": 254,
+      "error": "Module has no attribute O_NOFOLLOW",
+      "code": "attr-defined"
+    },
+    {
+      "file": "src/opensocrates/orchestration/paths.py",
+      "line": 332,
+      "error": "Module has no attribute O_NOFOLLOW",
+      "code": "attr-defined"
+    },
+    {
+      "file": "src/opensocrates/orchestration/adapter.py",
+      "line": 57,
+      "error": "Module has no attribute killpg",
+      "code": "attr-defined"
+    },
+    {
+      "file": "src/opensocrates/orchestration/adapter.py",
+      "line": 64,
+      "error": "Module has no attribute killpg",
+      "code": "attr-defined"
+    },
+    {
+      "file": "src/opensocrates/orchestration/adapter.py",
+      "line": 64,
+      "error": "Module has no attribute SIGKILL",
+      "code": "attr-defined"
+    }
+  ],
+  "native_build_and_package_checks": "skipped_after_typecheck_failure",
+  "diagnosis": "POSIX-only OS attributes were guarded at runtime, but Windows typing stubs cannot resolve their direct references across those runtime guards. This does not establish Windows orchestration availability.",
+  "raw_log_sha256": "cd91b8b62acca39cca546b1b95c725a7fb1a6334b21f41686ea88b941af6a5d5",
+  "raw_log_published": false,
+  "new_outcome_model_calls": 0,
+  "prior_outcomes": "The frozen v1 record remains unchanged."
+}
