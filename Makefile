@@ -106,6 +106,7 @@ security-scan: generate
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/security_scan.py --root "$(ROOT)" --report build/evidence/security-scan.json
 
 smoke:
+	@"$(PYTHON)" evals/v1.5/fullstack-consulting/test_observations.py
 	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_coding_specialists.py
 	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_decision_recovery.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_task_verification.py

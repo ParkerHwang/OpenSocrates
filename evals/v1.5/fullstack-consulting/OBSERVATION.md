@@ -33,6 +33,16 @@ naturally ended and its artifacts have been hash-locked.
 
 `summarize_observations.py` produces a read-only derived view. Its totals state
 usage coverage and never substitute zero for running/missing cells.
+Live states now require a local PID, start-time and executable check. A missing,
+zombie or reused PID with no terminal receipt is `awaiting_terminal_receipt`,
+not an automatically failed outcome; unavailable probes are `unconfirmed`.
+A public terminal event while its process is still present is `finalizing`.
+These states request inspection, never interruption or an automatic rerun.
+Last resource-sample and public-event ages are reported separately: a quiet
+public stream does not establish a stall. `attention_cells` exposes receipt and
+harness problems. A post-call harness failure remains visible alongside the
+original process outcome and reported usage. Process completion still does not
+mean that independent artifact qualification has passed.
 `export_observations.py --storage <declared outcome storage>` exports only finished,
 hash-locked cells. Completed exports can be committed; do not stage a running
 JSONL stream as a completed packet. The active same-thread heartbeat is

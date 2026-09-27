@@ -1,11 +1,14 @@
 """Read-only view over immutable receipts and explicitly provisional live samples."""
 
 from __future__ import annotations
+
 import argparse
-from collections import Counter
-from datetime import datetime, timezone
 import hashlib
 import json
+import os
+import subprocess
+from collections import Counter
+from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -37,6 +40,65 @@ def lines(path):
         except ValueError:
             pass  # a live last line can be mid-write; raw file is unchanged
     return result
+
+
+def process_health(receipt):
+    """Observe a PID without signalling it; detect exit, zombies and PID reuse."""
+    result = {"pid": receipt.get("pid"), "status": "unconfirmed"}
+    if not isinstance(result["pid"], int) or result["pid"] <= 0:
+        return result
+    try:
+        probe = subprocess.run(
+            ["ps", "-p", str(result["pid"]), "-o", "pid=,state=,lstart=,comm="],
+            capture_output=True,
+            text=True,
+            env={**os.environ, "LC_ALL": "C", "TZ": "UTC"},
+        )
+        if probe.returncode == 1 and not probe.stdout.strip() and not probe.stderr.strip():
+            return {**result, "status": "exited"}
+        if probe.returncode != 0:
+            return result
+        fields = probe.stdout.strip().split(maxsplit=7)
+        if len(fields) != 8 or int(fields[0]) != result["pid"]:
+            return result
+        observed_start = datetime.strptime(" ".join(fields[2:7]), "%a %b %d %H:%M:%S %Y")
+        expected_start = datetime.fromisoformat(receipt["started_utc"])
+        difference = abs(
+            (observed_start.replace(tzinfo=timezone.utc) - expected_start).total_seconds()
+        )
+        # ps rounds to seconds; the receipt is written just after Popen returns.
+        if difference > 5 or Path(fields[7]).name != "codex":
+            return {**result, "status": "identity_mismatch"}
+        return {**result, "status": "zombie" if "Z" in fields[1] else "alive"}
+    except (OSError, ValueError, KeyError, TypeError):
+        return result
+
+
+def live_observation(output, events, resources, checked_at, probe):
+    receipt_path = output / "process.json"
+    health = probe(read(receipt_path)) if receipt_path.exists() else {"status": "unconfirmed"}
+    terminal = next(
+        (
+            r["event"]["type"]
+            for r in reversed(events)
+            if r["event"].get("type") in {"turn.completed", "turn.failed"}
+        ),
+        None,
+    )
+    observation = {"process": health, "public_terminal_event": terminal}
+    for label, records in (("resource_sample", resources), ("public_event", events)):
+        stamp = records[-1].get("utc") if records else None
+        observation[f"last_{label}_utc"] = stamp
+        observation[f"{label}_age_seconds"] = (
+            max(0, (checked_at - datetime.fromisoformat(stamp)).total_seconds()) if stamp else None
+        )
+    if health["status"] == "alive":
+        state = "finalizing" if terminal else "running"
+    elif health["status"] in {"exited", "zombie", "identity_mismatch"}:
+        state = "awaiting_terminal_receipt"
+    else:
+        state = "unconfirmed"
+    return state, observation
 
 
 def tool_summary(events):
@@ -108,8 +170,9 @@ def tool_summary(events):
     )
 
 
-def summarize():
-    cohort = HERE / "v2"
+def summarize(cohort=None, probe=process_health, checked_at=None):
+    cohort = cohort if cohort is not None else HERE / "v2"
+    checked_at = checked_at or datetime.now(timezone.utc)
     manifest = read(cohort / "manifest.json")
     rows = []
     for cell in manifest["cells"]:
@@ -128,6 +191,8 @@ def summarize():
             "tools": tools,
             "source_room_get_requests": len(lines(output / "source-requests.jsonl")),
             "resource_sample_count": len(resources),
+            "live_observation": None,
+            "process_outcome": None,
             "peak_sampled_process_tree_rss_kib": max(
                 (r["rss_kib"] for r in resources), default=None
             ),
@@ -139,6 +204,7 @@ def summarize():
         if terminal:
             row.update(
                 state="complete" if terminal["process_success"] else "failed",
+                process_outcome="complete" if terminal["process_success"] else "failed",
                 started_utc=terminal["started_utc"],
                 ended_utc=terminal["ended_utc"],
                 wall_seconds=terminal["wall_seconds"],
@@ -148,16 +214,23 @@ def summarize():
                 protected_inputs_unchanged=terminal["protected_inputs_unchanged"],
                 package_members_unchanged=terminal["package_members_unchanged"],
             )
-        elif (output / "harness-failure.json").exists():
+        # A post-call snapshot/cleanup failure can coexist with a successful call.
+        # Keep both facts and all reported usage instead of masking the failure.
+        if (output / "harness-failure.json").exists():
             row.update(state="harness_failed", failure=read(output / "harness-failure.json"))
-        elif (output / "skipped.json").exists():
+        elif not terminal and (output / "skipped.json").exists():
             row.update(state="skipped", failure=read(output / "skipped.json"))
-        elif (output / "call.started.json").exists():
+        elif not terminal and (output / "call.started.json").exists():
+            state, observation = live_observation(output, events, resources, checked_at, probe)
             row.update(
-                state="running", started_utc=read(output / "call.started.json")["started_utc"]
+                state=state,
+                started_utc=read(output / "call.started.json")["started_utc"],
+                live_observation=observation,
             )
             if resources:
                 row["latest_observed_elapsed_seconds"] = resources[-1]["elapsed_seconds"]
+        if row["started_utc"] is None and (output / "call.started.json").exists():
+            row["started_utc"] = read(output / "call.started.json")["started_utc"]
         usage = row["usage"]
         row["input_minus_reported_cached"] = (
             usage["input_tokens"] - usage["cached_input_tokens"]
@@ -182,10 +255,16 @@ def summarize():
             "missing_attempted_cells": len(attempted) - len(values),
         }
     return {
-        "view_generated_utc": datetime.now(timezone.utc).isoformat(),
+        "view_generated_utc": checked_at.isoformat(),
         "active_manifest_sha256": sha(cohort / "manifest.json"),
-        "intended_cells": 36,
+        "intended_cells": len(manifest["cells"]),
         "state_counts": dict(Counter(r["state"] for r in rows)),
+        "attention_cells": [
+            {"id": r["id"], "state": r["state"]}
+            for r in rows
+            if r["state"]
+            in {"awaiting_terminal_receipt", "unconfirmed", "harness_failed", "failed", "skipped"}
+        ],
         "usage_totals": totals,
         "cells": rows,
         "prior_setup_failures": 36,
@@ -197,6 +276,10 @@ def summarize():
             "Do not double-count cached input/reasoning output.",
             "Summed RSS is not unique physical memory.",
             "Billing and independent backend echo unavailable.",
+            "A complete process is not independent artifact qualification.",
+            "PID checks are local observations, not backend progress evidence.",
+            "Quiet public events do not establish a stall or authorize interruption.",
+            "Awaiting receipts may be transient finalization; never auto-rerun a cell.",
         ],
     }
 
@@ -208,4 +291,8 @@ if __name__ == "__main__":
     value = summarize()
     if args.output:
         args.output.write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
-    print(json.dumps({k: value[k] for k in ("state_counts", "usage_totals")}, indent=2))
+    print(
+        json.dumps(
+            {k: value[k] for k in ("state_counts", "attention_cells", "usage_totals")}, indent=2
+        )
+    )
