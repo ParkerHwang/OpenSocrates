@@ -975,7 +975,14 @@ OC_FINDING = orchestration_object(
     {
         "artifact_sha256": DIGEST,
         "requirement_id": OC_ID,
-        "location": OC_PATH,
+        "location": {
+            **OC_PATH,
+            "description": (
+                "Must exactly equal an owned current candidate file path from the assignment "
+                "(for example, pricing.py). Do not append :line, :range or #anchor suffixes. "
+                "Put optional line or range details in reproduction, not location."
+            ),
+        },
         "expected": OC_NOTE,
         "observed": OC_NOTE,
         "reproduction": OC_NOTE,

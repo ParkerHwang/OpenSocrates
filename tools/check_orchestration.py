@@ -409,6 +409,85 @@ class OrchestrationTests(unittest.TestCase):
         self.assertEqual(result["units"][0]["status"], "source_conflict")
         self.assertNotEqual(result["status"], "integration_pending")
 
+    def test_negative_finding_location_is_exact_owned_path_without_line_suffix(self):
+        # Public protocol shape from the assessment-diagnostic-v1 failure. IDs
+        # and digests bind a deterministic fixture; no model or quality claim.
+        artifact_sha = digest(b"pricing fixture: selection incorrectly maximizes cost")
+        candidate_sha = identity([{"path": "pricing.py", "sha256": artifact_sha}])
+        assignment_id = str(uuid4())
+        value = {
+            "schema": "opensocrates.orchestration.assessment/1.0.0",
+            "assignment_id": assignment_id,
+            "candidate_sha256": candidate_sha,
+            "verdict": "repair_required",
+            "findings": [
+                {
+                    "artifact_sha256": artifact_sha,
+                    "requirement_id": "cost-contract",
+                    "location": "pricing.py",
+                    "expected": "Select the latest eligible effective_date regardless of cost and preserve numeric, zero, null or absent-cost state.",
+                    "observed": "The implementation maximizes numeric cost and returns the older cost-10 row over newer rows.",
+                    "reproduction": "Lines 6-7: compare an older 2026-01-01 row costing 10 with a newer 2026-07-01 row costing 8, None, absent cost or 0. Expected the newer date and its distinct cost state.",
+                    "impact": "Returns stale prices and dates, overriding newer unknown, missing and zero-cost results.",
+                    "missing_evidence": [],
+                    "severity": "blocking",
+                }
+            ],
+            "obligations": [
+                {
+                    "id": "software-production-acceptance",
+                    "status": "failed",
+                    "expected": "Select latest date at or before as_of, distinguish null, absent and zero, and leave inputs unchanged.",
+                    "observed": "Four selection cases fail; the required executable oracle has no supplied receipt.",
+                    "reproduction": "Compare the exact candidate bytes with the source cases and accepted design contract.",
+                    "evidence_ids": [
+                        "artifact:" + artifact_sha,
+                        "source:design-contract",
+                        "source:cost-cases",
+                        "source:cost-oracle",
+                        "dependency:software-design",
+                    ],
+                }
+            ],
+        }
+        assignment = {
+            "assignment_id": assignment_id,
+            "candidate_sha256": candidate_sha,
+            "obligations": [
+                {
+                    "id": "software-production-acceptance",
+                    "requirement_id": "cost-contract",
+                    "required": True,
+                }
+            ],
+            "inputs": [
+                {"kind": "source", "source_id": key}
+                for key in ("design-contract", "cost-cases", "cost-oracle")
+            ],
+            "dependencies": ["software-design"],
+            "check_receipts": [],
+        }
+        artifacts = [{"path": "pricing.py", "sha256": artifact_sha}]
+        for role in ("review", "execution_verification"):
+            assignment["role"] = role
+            validate(value, schema("assessment"))
+            # A valid negative assessment is accepted without qualifying the
+            # defective artifact or erasing its required failure.
+            self.assertFalse(runtime_module._assessment(value, assignment, artifacts))
+            self.assertEqual(value["verdict"], "repair_required")
+            self.assertEqual(value["obligations"][0]["status"], "failed")
+            for field, incorrect in (
+                ("location", "pricing.py:6-7"),
+                ("location", "pricing.py#L6-L7"),
+                ("location", "other.py"),
+                ("artifact_sha256", digest(b"wrong artifact")),
+                ("requirement_id", "other-contract"),
+            ):
+                invalid = copy.deepcopy(value)
+                invalid["findings"][0][field] = incorrect
+                with self.assertRaisesRegex(BoundaryError, "finding_identity_mismatch"):
+                    runtime_module._assessment(invalid, assignment, artifacts)
+
     def test_old_artifact_digest_or_forged_evidence_cannot_pass(self):
         for field in ("candidate_sha256", "evidence_ids"):
             value = copy.deepcopy(self.req)
@@ -1012,7 +1091,9 @@ class OrchestrationTests(unittest.TestCase):
                         preserve(value, revised[key])
                     else:
                         self.assertEqual(value, revised[key])
-                self.assertLessEqual(set(revised) - set(existing), {"type"})
+                # Type annotations and non-validating field documentation may be
+                # added without changing any existing acceptance constraint.
+                self.assertLessEqual(set(revised) - set(existing), {"type", "description"})
 
             preserve(previous, changed)
 
