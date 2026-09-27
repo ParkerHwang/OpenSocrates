@@ -10,7 +10,7 @@ function unavailable(code) {
   if (!hook && mode === 'assistance') process.stdout.write(JSON.stringify({schema:'opensocrates.assistance.plan/1.0.0',request_id:null,status:'unavailable',application:'unverified',limitations:[code]})+'\n');
   else if (!hook && mode === 'memory') process.stdout.write(JSON.stringify({schema:'opensocrates.project-memory.response/1.0.0',request_id:null,status:'unavailable',result:null,limitations:[code],retryable:false})+'\n');
   else if (!hook && mode === 'documentation') process.stdout.write(JSON.stringify({schema:'opensocrates.documentation.pack/1.0.0',request_id:null,status:'unavailable',application:'unverified',limitations:[code]})+'\n');
-  else if (!hook && mode === 'orchestrate') process.stdout.write(JSON.stringify({schema:'opensocrates.orchestration.response/1.0.0',run_id:null,status:'unavailable',plan_sha256:null,model:null,client_version:null,client_sha256:null,units:[],calls:[],memory_status:'not_requested',memory_snapshot_sha256:null,integration:'pending_primary_reconciliation',limitations:[code]})+'\n');
+  else if (!hook && mode === 'orchestrate') process.stdout.write(JSON.stringify({schema:'opensocrates.orchestration.response/1.0.0',run_id:null,status:'unavailable',plan_sha256:null,model:null,client_version:null,client_sha256:null,units:[],calls:[],memory_status:'not_requested',memory_snapshot_sha256:null,integration:'pending_primary_reconciliation',publication:{status:'not_started',location_verified:false,completed_files:[],pending_path:null},limitations:[code]})+'\n');
   else if (!hook) process.stdout.write(JSON.stringify({decision:'pass',diagnostic:{code,status:'unavailable'}})+'\n');
   process.exit(['memory','assistance','documentation','orchestrate'].includes(mode) ? 3 : 0);
 }

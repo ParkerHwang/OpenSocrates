@@ -22,7 +22,7 @@ def run_orchestration(stdin: BinaryIO | TextIO, stdout: TextIO) -> int:
             raw.decode("utf-8"), object_pairs_hook=_unique_pairs, parse_constant=_reject_constant
         )
         result = orchestrate(request)
-        if result["status"] == "unavailable":
+        if result["status"] in {"unavailable", "cancelled"}:
             code = 3
     except (UnicodeError, TypeError, ValueError):
         result, code = response("invalid_request"), 2

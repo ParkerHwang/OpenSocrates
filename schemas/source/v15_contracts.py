@@ -1089,6 +1089,32 @@ OC_INPUT = orchestration_object(
         "source_id": nullable(OC_ID),
     }
 )
+OC_REPAIR_OBLIGATION = orchestration_object(
+    {
+        **OC_JUDGMENT["properties"],
+        "assessment_role": {"enum": ["review", "execution_verification"]},
+        "assessment_id": UUID,
+        "candidate_sha256": DIGEST,
+        "version": POSITIVE,
+    }
+)
+OC_PUBLICATION = orchestration_object(
+    {
+        "status": {"enum": ["not_started", "incomplete", "complete"]},
+        "location_verified": BOOL,
+        "completed_files": arr(
+            orchestration_object(
+                {
+                    "path": {"type": "string", "maxLength": 512},
+                    "sha256": DIGEST,
+                    "bytes": NONNEGATIVE,
+                }
+            ),
+            512,
+        ),
+        "pending_path": nullable({"type": "string", "maxLength": 512}),
+    }
+)
 OC_ASSIGNMENT = orchestration_object(
     {
         "schema": {"const": "opensocrates.orchestration.assignment/1.0.0"},
@@ -1120,6 +1146,7 @@ OC_ASSIGNMENT = orchestration_object(
         "checks": arr(OC_CHECK, 16),
         "check_receipts": arr(OC_RECEIPT, 16),
         "repair_findings": arr(OC_FINDING, 64),
+        "repair_obligations": arr(OC_REPAIR_OBLIGATION, 32),
         "output_schema": {
             "enum": ["orchestration-candidate.schema.json", "orchestration-assessment.schema.json"]
         },
@@ -1218,6 +1245,7 @@ OC_RESPONSE = orchestration_object(
         "memory_status": OC_MEMORY["properties"]["status"],
         "memory_snapshot_sha256": nullable(DIGEST),
         "integration": {"const": "pending_primary_reconciliation"},
+        "publication": OC_PUBLICATION,
         "limitations": arr(SHORT, 32),
     }
 )

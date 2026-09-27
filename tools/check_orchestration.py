@@ -6,15 +6,20 @@ from __future__ import annotations
 import copy
 import io
 import json
+import os
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 from uuid import uuid4
 
 import check_project_memory as memory_checks
 from opensocrates.cli.main import main
+from opensocrates.cli.orchestration import run_orchestration
+from opensocrates.orchestration import paths as path_module
+from opensocrates.orchestration import runtime as runtime_module
 from opensocrates.orchestration.adapter import CallResult, CodexAdapter, null_usage
 from opensocrates.orchestration.contracts import assets_root, plan, schema
 from opensocrates.orchestration.guidance import guides
@@ -585,12 +590,313 @@ class OrchestrationTests(unittest.TestCase):
         self.assertEqual(states["unrelated"], "qualified_candidate")
         self.assertFalse((self.base / "candidate/artifacts/make.txt").exists())
 
+    def _wire(self, coordinator):
+        output = io.StringIO()
+        with patch(
+            "opensocrates.cli.orchestration.orchestrate",
+            side_effect=lambda value: coordinator.run(),
+        ):
+            code = run_orchestration(io.StringIO(json.dumps(coordinator.request)), output)
+        result = json.loads(output.getvalue())
+        validate(result, schema("response"))
+        return code, result
+
+    def _closed(self, coordinator):
+        self.assertEqual(coordinator.source_binding.entries, [])
+        self.assertEqual(coordinator.output_binding.entries, [])
+
+    def test_only_known_system_aliases_are_normalized_before_binding(self):
+        if str(self.root).startswith("/private/var/") and Path("/var").is_symlink():
+            req = copy.deepcopy(self.req)
+            req["source_root"] = req["source_root"].replace("/private/var/", "/var/", 1)
+            req["candidate_root"] = str(self.base / "system-alias-candidate").replace(
+                "/private/var/", "/var/", 1
+            )
+            self.assertEqual(
+                orchestrate(req, adapter=FakeAdapter())["status"], "integration_pending"
+            )
+        real = self.base / "real-parent"
+        real.mkdir()
+        alias = self.base / "user-alias"
+        alias.symlink_to(real, target_is_directory=True)
+        req = copy.deepcopy(self.req)
+        req["candidate_root"] = str(alias / "candidate")
+        adapter = FakeAdapter()
+        result = orchestrate(req, adapter=adapter)
+        self.assertEqual(result["status"], "unavailable")
+        self.assertEqual(adapter.assignments, [])
+        self.assertFalse((real / "candidate").exists())
+
+    def test_bound_publication_rejects_replaced_source_parent_and_ancestor(self):
+        for mode in ("parent", "ancestor", "source"):
+            with self.subTest(mode=mode):
+                base = self.base / mode
+                source, ancestor = base / "source", base / "ancestor"
+                source.mkdir(parents=True)
+                (source / "source.txt").write_text("scoped source")
+                parent = ancestor / "parent"
+                parent.mkdir(parents=True)
+                req = request(source, parent / "candidate")
+                coordinator = Coordinator(req, adapter=FakeAdapter())
+                victim = {"parent": parent, "ancestor": ancestor, "source": source}[mode]
+                victim.rename(base / "original")
+                victim.symlink_to(source if mode != "source" else parent, target_is_directory=True)
+                result = coordinator.run()
+                self.assertNotEqual(result["status"], "integration_pending")
+                self.assertEqual(result["publication"]["status"], "not_started")
+                self.assertFalse((source / "candidate").exists())
+                self.assertFalse((source / "artifacts").exists())
+                self._closed(coordinator)
+
+    def test_publication_root_replacement_and_write_time_swap_never_follow_source(self):
+        for timing in ("before_write", "during_write"):
+            with self.subTest(timing=timing):
+                req = copy.deepcopy(self.req)
+                target = self.base / timing
+                req["candidate_root"] = str(target)
+                coordinator = Coordinator(req, adapter=FakeAdapter())
+                swapped = False
+
+                def swap(target=target, timing=timing):
+                    nonlocal swapped
+                    if not swapped:
+                        target.rename(self.base / (timing + "-original"))
+                        target.symlink_to(self.root, target_is_directory=True)
+                        swapped = True
+
+                write_files = runtime_module.write_bound_files
+                write = os.write
+
+                def before(root, files, guard, started, completed, write_files=write_files):
+                    swap()
+                    return write_files(root, files, guard, started, completed)
+
+                def during(descriptor, data, write=write):
+                    swap()
+                    return write(descriptor, data)
+
+                boundary = (
+                    patch.object(runtime_module, "write_bound_files", side_effect=before)
+                    if timing == "before_write"
+                    else patch.object(path_module.os, "write", side_effect=during)
+                )
+                with boundary:
+                    result = coordinator.run()
+                self.assertEqual(result["status"], "unavailable")
+                self.assertEqual(result["publication"]["status"], "incomplete")
+                self.assertFalse(result["publication"]["location_verified"])
+                self.assertFalse((self.root / "artifacts").exists())
+                self.assertFalse((self.root / "versions").exists())
+                self.assertEqual((self.root / "source.txt").read_text(), "scoped source")
+                self._closed(coordinator)
+
+    def test_publication_parent_swap_inside_directory_creation_cannot_redirect(self):
+        parent = self.base / "owned-parent"
+        parent.mkdir()
+        req = copy.deepcopy(self.req)
+        req["candidate_root"] = str(parent / "candidate")
+        coordinator = Coordinator(req, adapter=FakeAdapter())
+        mkdir = os.mkdir
+        swapped = False
+
+        def replacing(name, mode=0o777, *, dir_fd=None):
+            nonlocal swapped
+            if name == "candidate" and dir_fd is not None and not swapped:
+                parent.rename(self.base / "held-original-parent")
+                parent.symlink_to(self.root, target_is_directory=True)
+                swapped = True
+            return mkdir(name, mode, dir_fd=dir_fd)
+
+        with patch.object(path_module.os, "mkdir", side_effect=replacing):
+            result = coordinator.run()
+        self.assertEqual(result["status"], "unavailable")
+        self.assertFalse((self.root / "candidate").exists())
+        self.assertFalse(result["publication"]["location_verified"])
+        self._closed(coordinator)
+
+    def test_cancellation_or_failure_after_calls_preserves_wire_receipts(self):
+        for method, failure in (
+            ("_publish", KeyboardInterrupt),
+            ("_validate_current", KeyboardInterrupt),
+            ("_validate_current", OSError),
+        ):
+            with self.subTest(method=method, failure=failure):
+                coordinator = Coordinator(copy.deepcopy(self.req), adapter=FakeAdapter())
+                with patch.object(coordinator, method, side_effect=failure("PRIVATE_ERROR_CANARY")):
+                    code, result = self._wire(coordinator)
+                self.assertEqual(code, 3)
+                self.assertEqual(
+                    result["status"], "cancelled" if failure is KeyboardInterrupt else "unavailable"
+                )
+                self.assertEqual(result["run_id"], self.req["run_id"])
+                self.assertEqual(len(result["calls"]), 3)
+                self.assertEqual(len(result["units"][0]["versions"]), 1)
+                self.assertEqual(len(result["units"][0]["versions"][0]["checks"]), 1)
+                self.assertEqual(result["publication"]["status"], "not_started")
+                self.assertNotIn("PRIVATE_ERROR_CANARY", json.dumps(result))
+                self._closed(coordinator)
+
+    def test_role_and_check_setup_cleanup_cancellation_retains_completed_calls(self):
+        factory = tempfile.TemporaryDirectory
+        for prefix, expected_calls in (("opensocrates-role-", 1), ("opensocrates-execution-", 2)):
+            with self.subTest(prefix=prefix):
+                coordinator = Coordinator(copy.deepcopy(self.req), adapter=FakeAdapter())
+
+                class InterruptedCleanup:
+                    def __init__(self, *args, expected_prefix=prefix, **kwargs):
+                        self.inner = factory(*args, **kwargs)
+                        self.interrupt = kwargs.get("prefix") == expected_prefix
+
+                    def __enter__(self):
+                        return self.inner.__enter__()
+
+                    def __exit__(self, *args):
+                        value = self.inner.__exit__(*args)
+                        if self.interrupt:
+                            raise KeyboardInterrupt
+                        return value
+
+                with patch.object(
+                    runtime_module.tempfile, "TemporaryDirectory", InterruptedCleanup
+                ):
+                    code, result = self._wire(coordinator)
+                self.assertEqual(code, 3)
+                self.assertEqual(result["status"], "cancelled")
+                self.assertEqual(len(result["calls"]), expected_calls)
+                self.assertEqual(result["run_id"], self.req["run_id"])
+                if expected_calls == 2:
+                    self.assertEqual(len(result["units"][0]["versions"][0]["checks"]), 1)
+                self._closed(coordinator)
+        coordinator = Coordinator(copy.deepcopy(self.req), adapter=FakeAdapter())
+        inputs = coordinator._inputs
+
+        def setup(unit, candidate):
+            if coordinator.result["calls"]:
+                raise KeyboardInterrupt
+            return inputs(unit, candidate)
+
+        with patch.object(coordinator, "_inputs", side_effect=setup):
+            code, result = self._wire(coordinator)
+        self.assertEqual(code, 3)
+        self.assertEqual(len(result["calls"]), 1)
+        self.assertEqual(len(result["units"][0]["versions"]), 1)
+        self._closed(coordinator)
+
+    def test_interrupted_partial_publication_is_not_reported_as_delivery(self):
+        coordinator = Coordinator(copy.deepcopy(self.req), adapter=FakeAdapter())
+        write = os.write
+        count = 0
+
+        def interrupted(descriptor, data):
+            nonlocal count
+            count += 1
+            if count == 2:
+                raise KeyboardInterrupt
+            return write(descriptor, data)
+
+        with patch.object(path_module.os, "write", side_effect=interrupted):
+            code, result = self._wire(coordinator)
+        self.assertEqual(code, 3)
+        self.assertEqual(result["status"], "cancelled")
+        self.assertEqual(len(result["calls"]), 3)
+        self.assertEqual(result["publication"]["status"], "incomplete")
+        self.assertFalse(result["publication"]["location_verified"])
+        self.assertEqual(len(result["publication"]["completed_files"]), 1)
+        self.assertIsNotNone(result["publication"]["pending_path"])
+        self._closed(coordinator)
+
+    def test_directory_capabilities_close_on_initialization_and_cleanup_failure(self):
+        created = []
+        original_binding = runtime_module.BoundDirectory
+
+        def binding(value):
+            if created:
+                raise OSError("fixture second binding failed")
+            result = original_binding(value)
+            created.append(result)
+            return result
+
+        with patch.object(runtime_module, "BoundDirectory", side_effect=binding):
+            result = orchestrate(self.req, adapter=FakeAdapter())
+        self.assertEqual(result["status"], "unavailable")
+        self.assertEqual(created[0].entries, [])
+        coordinator = Coordinator(copy.deepcopy(self.req), adapter=FakeAdapter())
+        close = coordinator.output_binding.close
+
+        def interrupted_close():
+            close()
+            raise KeyboardInterrupt
+
+        with patch.object(coordinator.output_binding, "close", side_effect=interrupted_close):
+            code, result = self._wire(coordinator)
+        self.assertEqual(code, 3)
+        self.assertEqual(result["status"], "cancelled")
+        self.assertEqual(len(result["calls"]), 3)
+        self.assertEqual(result["publication"]["status"], "complete")
+        self.assertTrue(result["publication"]["location_verified"])
+        self._closed(coordinator)
+
+    def test_missing_publication_capability_prevents_calls_but_prepare_remains_usable(self):
+        adapter = FakeAdapter()
+        with patch.object(
+            runtime_module,
+            "BoundDirectory",
+            side_effect=BoundaryError("directory_capability_unavailable"),
+        ):
+            result = orchestrate(self.req, adapter=adapter)
+            self.assertEqual(result["status"], "unavailable")
+            self.assertEqual(adapter.assignments, [])
+            prepared = copy.deepcopy(self.req)
+            prepared["operation"] = "prepare"
+            self.assertEqual(orchestrate(prepared, adapter=adapter)["status"], "prepared")
+        self.assertFalse((self.base / "candidate").exists())
+
+    def test_obligation_only_feedback_reaches_repair_maker_with_exact_version(self):
+        for status in ("failed", "unknown"):
+            with self.subTest(status=status):
+                req = copy.deepcopy(self.req)
+                req["candidate_root"] = str(self.base / status)
+
+                def obligation_only(assignment, cwd, value, status=status):
+                    if (
+                        assignment["role"] in {"review", "execution_verification"}
+                        and (cwd / "make.txt").read_bytes() == b"bad"
+                    ):
+                        value["findings"] = []
+                        value["obligations"][0]["status"] = status
+
+                adapter = FakeAdapter(defect=True, mutate=obligation_only)
+                result = orchestrate(req, adapter=adapter)
+                self.assertEqual(result["status"], "integration_pending")
+                makers = [item for item in adapter.assignments if item["role"] == "production"]
+                version = result["units"][0]["versions"][0]
+                self.assertEqual(makers[1]["repair_findings"], [])
+                self.assertEqual(makers[1]["check_receipts"], version["checks"])
+                self.assertEqual(len(makers[1]["repair_obligations"]), 2)
+                for judgment in makers[1]["repair_obligations"]:
+                    self.assertEqual(judgment["candidate_sha256"], version["candidate_sha256"])
+                    self.assertEqual(judgment["version"], 1)
+                    self.assertEqual(judgment["status"], status)
+                    key = "review" if judgment["assessment_role"] == "review" else "verification"
+                    self.assertEqual(judgment["assessment_id"], version[key]["assignment_id"])
+                    self.assertEqual(
+                        judgment["evidence_ids"], version[key]["obligations"][0]["evidence_ids"]
+                    )
+                for assignment in adapter.assignments:
+                    if assignment["role"] in {"review", "execution_verification"}:
+                        self.assertEqual(assignment["repair_obligations"], [])
+                        self.assertEqual(assignment["repair_findings"], [])
+
     def test_old_schema_bytes_and_all_canonical_methods_unchanged(self):
         paths = subprocess.check_output(
             ["git", "ls-files", "schemas/v1", "content/methods"], cwd=ROOT, text=True
         ).splitlines()
         self.assertTrue(paths)
         for name in paths:
+            # This new, unpublished schema family is revised by its own focused
+            # contract tests. Preserve every pre-existing schema and method.
+            if Path(name).name.startswith("orchestration-"):
+                continue
             old = subprocess.check_output(["git", "show", "HEAD:" + name], cwd=ROOT)
             self.assertEqual((ROOT / name).read_bytes(), old, name)
         from opensocrates.content.schema import FROZEN_METHOD_IDS

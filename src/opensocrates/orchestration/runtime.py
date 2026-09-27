@@ -26,12 +26,14 @@ from .guidance import guides
 from .memory import MemorySnapshot
 from .paths import (
     BoundaryError,
+    BoundDirectory,
     digest,
     identity,
     manifest,
     read_text,
     root_path,
     verify_files,
+    write_bound_files,
     write_files,
 )
 
@@ -72,6 +74,12 @@ def response(status: str, run_id: str | None = None) -> dict[str, Any]:
         "memory_status": "not_requested",
         "memory_snapshot_sha256": None,
         "integration": "pending_primary_reconciliation",
+        "publication": {
+            "status": "not_started",
+            "location_verified": False,
+            "completed_files": [],
+            "pending_path": None,
+        },
         "limitations": list(LIMITATIONS),
     }
 
@@ -152,10 +160,39 @@ class Coordinator:
         adapter: Adapter | None = None,
         registry: ProjectRegistry | None = None,
     ) -> None:
+        self.source_binding: BoundDirectory | None = None
+        self.output_binding: BoundDirectory | None = None
+        try:
+            self._initialize(request, adapter=adapter, registry=registry)
+        except BaseException:
+            for binding in (self.output_binding, self.source_binding):
+                if binding is not None:
+                    try:
+                        binding.close()
+                    except (KeyboardInterrupt, OSError):
+                        pass
+            raise
+
+    def _initialize(
+        self,
+        request: dict[str, Any],
+        *,
+        adapter: Adapter | None = None,
+        registry: ProjectRegistry | None = None,
+    ) -> None:
         self.request = plan(request)
         self.adapter = adapter or CodexAdapter(request["client_path"])
         self.memory = MemorySnapshot(request, registry)
         self.source_root = root_path(request["source_root"])
+        self.output_name = Path(request["candidate_root"]).name
+        self.active_unit: str | None = None
+        if request["operation"] == "run":
+            self.source_binding = BoundDirectory(request["source_root"])
+            self.output_binding = BoundDirectory(str(Path(request["candidate_root"]).parent))
+            self.source_root = self.source_binding.path
+            target = self.output_binding.path / self.output_name
+            if target.is_relative_to(self.source_root) or self.source_root.is_relative_to(target):
+                raise BoundaryError("candidate_root_must_be_new_and_separate")
         self.result = response("prepared", request["run_id"])
         self.result.update(
             {
@@ -179,17 +216,31 @@ class Coordinator:
                     for guide in guides(unit, role, request["locale"]):
                         self.guide_hashes[guide["id"]] = guide["sha256"]
         for source in request["sources"]:
-            data = read_text(self.source_root, source["path"])
+            data = self._source_read(source["path"])
             if digest(data) != source["sha256"]:
                 raise BoundaryError("source_manifest_mismatch")
             self.source_bytes[source["id"]] = data
         if sum(map(len, self.source_bytes.values())) > MAX_ASSIGNMENT:
             raise BoundaryError("source_budget_exceeded")
 
+    def _source_read(self, path: str) -> bytes:
+        return (
+            self.source_binding.read(path)
+            if self.source_binding
+            else read_text(self.source_root, path)
+        )
+
+    def _bindings_current(self) -> None:
+        if self.source_binding is not None:
+            self.source_binding.verify()
+        if self.output_binding is not None:
+            self.output_binding.verify()
+
     def _sources_current(self, unit: dict[str, Any]) -> bool:
         try:
+            self._bindings_current()
             return self.memory.unchanged() and all(
-                read_text(self.source_root, source["path"]) == self.source_bytes[source["id"]]
+                self._source_read(source["path"]) == self.source_bytes[source["id"]]
                 for source in self.request["sources"]
                 if source["id"] in unit["source_ids"]
             )
@@ -258,6 +309,7 @@ class Coordinator:
         candidate: dict[str, bytes],
         checks: list[dict[str, Any]],
         repair: list[dict[str, Any]],
+        repair_obligations: list[dict[str, Any]] | None = None,
     ) -> tuple[dict[str, Any], dict[str, bytes]]:
         if not self._sources_current(unit):
             raise BoundaryError("source_conflict")
@@ -306,8 +358,13 @@ class Coordinator:
             + (["memory_continuity_unavailable"] if memory["status"] != "available" else []),
             "candidate_sha256": identity(manifest(candidate)) if candidate else None,
             "checks": unit["checks"],
-            "check_receipts": checks if role == "execution_verification" else [],
+            "check_receipts": checks
+            if role in {"execution_verification", "production", "design"}
+            else [],
             "repair_findings": repair if role in {"production", "design"} else [],
+            "repair_obligations": (repair_obligations or [])
+            if role in {"production", "design"}
+            else [],
             "output_schema": "orchestration-candidate.schema.json"
             if role in {"production", "design"}
             else "orchestration-assessment.schema.json",
@@ -328,8 +385,11 @@ class Coordinator:
         candidate: dict[str, bytes],
         checks: list[dict[str, Any]],
         repair: list[dict[str, Any]],
+        repair_obligations: list[dict[str, Any]] | None = None,
     ) -> tuple[dict[str, Any], dict[str, Any] | None]:
-        assignment, files = self.assignment(unit, role, candidate, checks, repair)
+        assignment, files = self.assignment(
+            unit, role, candidate, checks, repair, repair_obligations
+        )
         if assignment["assignment_id"] in self.identities:
             raise BoundaryError("reused_role_identity")
         self.identities.add(assignment["assignment_id"])
@@ -435,9 +495,16 @@ class Coordinator:
         return bool(review_ok and verification_ok)
 
     def _produce(
-        self, unit: dict[str, Any], old: dict[str, bytes], repair: list[dict[str, Any]]
+        self,
+        unit: dict[str, Any],
+        old: dict[str, bytes],
+        repair: list[dict[str, Any]],
+        repair_obligations: list[dict[str, Any]],
+        checks: list[dict[str, Any]],
     ) -> tuple[str, dict[str, bytes]]:
-        assignment, value = self._invoke(unit, unit["role"], old, [], repair)
+        assignment, value = self._invoke(
+            unit, unit["role"], old, checks, repair, repair_obligations
+        )
         if value is None:
             raise BoundaryError("maker_unavailable")
         checked(value, "candidate", MAX_OUTPUT)
@@ -451,6 +518,8 @@ class Coordinator:
         result = self.results[unit["unit_id"]]
         candidate: dict[str, bytes] = {}
         repair: list[dict[str, Any]] = []
+        repair_obligations: list[dict[str, Any]] = []
+        repair_checks: list[dict[str, Any]] = []
         for attempt in range(self.request["repair_limit"] + 1):
             if attempt == 0 and unit["seed"] is not None:
                 author, candidate = (
@@ -458,7 +527,9 @@ class Coordinator:
                     candidate_files(unit["seed"]["files"], unit),
                 )
             else:
-                author, candidate = self._produce(unit, candidate, repair)
+                author, candidate = self._produce(
+                    unit, candidate, repair, repair_obligations, repair_checks
+                )
             version = {
                 "version": attempt + 1,
                 "candidate_sha256": identity(manifest(candidate)),
@@ -498,6 +569,26 @@ class Coordinator:
                 for key in ("review", "verification")
                 for finding in (version[key] or {}).get("findings", [])
             ]
+            repair_obligations = [
+                {
+                    **judgment,
+                    "assessment_role": role,
+                    "assessment_id": version[key]["assignment_id"],
+                    "candidate_sha256": version["candidate_sha256"],
+                    "version": version["version"],
+                }
+                for key, role in (("review", "review"), ("verification", "execution_verification"))
+                for judgment in (version[key] or {}).get("obligations", [])
+                if judgment["status"] in {"failed", "unknown"}
+            ]
+            repair_checks = version["checks"]
+            if (
+                not repair
+                and not repair_obligations
+                and not any(item["status"] != "passed" for item in repair_checks)
+            ):
+                result.update({"status": "unavailable", "reason": "repair_feedback_unavailable"})
+                return
             if any(call["status"] == "cancelled" for call in self.result["calls"]):
                 result.update({"status": "cancelled", "reason": "caller_cancelled"})
                 return
@@ -525,24 +616,78 @@ class Coordinator:
                 self.files.pop(unit["unit_id"], None)
 
     def _publish(self) -> None:
-        target = root_path(self.request["candidate_root"], existing=False)
-        # Exclusive new root, never an existing project. On a write failure the
-        # bounded partial artifact directory remains inspectable; no sweep can
-        # delete files another actor placed there.
-        target.mkdir(mode=0o700, exist_ok=False)
-        artifacts = dict(self.archives)
-        artifacts.update(
-            {
-                "artifacts/" + path: data
-                for files in self.files.values()
-                for path, data in files.items()
-            }
-        )
-        write_files(target, artifacts)
-        if not verify_files(target, artifacts):
-            raise BoundaryError("publication_changed")
+        if self.output_binding is None:
+            raise BoundaryError("publication_capability_unavailable")
+        self._bindings_current()
+        publication = self.result["publication"]
+        publication["status"] = "incomplete"
+        target = self.output_binding.child(self.output_name, create=True)
+        try:
+            artifacts = dict(self.archives)
+            artifacts.update(
+                {
+                    "artifacts/" + path: data
+                    for files in self.files.values()
+                    for path, data in files.items()
+                }
+            )
 
-    def run(self) -> dict[str, Any]:  # noqa: C901  # Each independent unit retains its explicit failure boundary.
+            def started(name: str) -> None:
+                publication["pending_path"] = name
+
+            def completed(name: str, data: bytes) -> None:
+                publication["completed_files"].append(
+                    {"path": name, "sha256": digest(data), "bytes": len(data)}
+                )
+                publication["pending_path"] = None
+
+            write_bound_files(target, artifacts, self._bindings_current, started, completed)
+            for name, data in artifacts.items():
+                self._bindings_current()
+                if target.read(name) != data:
+                    raise BoundaryError("publication_changed")
+            self._bindings_current()
+            target.verify()
+            publication.update({"status": "complete", "location_verified": True})
+        finally:
+            target.close()
+
+    def _interrupted(self, status: str) -> dict[str, Any]:
+        self.result["status"] = status
+        reason = (
+            "coordinator_cancelled" if status == "cancelled" else "coordinator_operational_failure"
+        )
+        if reason not in self.result["limitations"]:
+            self.result["limitations"].append(reason)
+        if self.active_unit is not None:
+            unit = self.results[self.active_unit]
+            if unit["status"] != "qualified_candidate":
+                unit.update(
+                    {
+                        "status": "cancelled" if status == "cancelled" else "unavailable",
+                        "reason": reason,
+                    }
+                )
+        return self.result
+
+    def run(self) -> dict[str, Any]:
+        try:
+            return self._run()
+        except KeyboardInterrupt:
+            return self._interrupted("cancelled")
+        except Exception:
+            return self._interrupted("unavailable")
+        finally:
+            for binding in (self.output_binding, self.source_binding):
+                if binding is not None:
+                    try:
+                        binding.close()
+                    except KeyboardInterrupt:
+                        self._interrupted("cancelled")
+                    except OSError:
+                        self._interrupted("unavailable")
+
+    def _run(self) -> dict[str, Any]:  # noqa: C901  # Each independent unit retains its explicit failure boundary.
         for unit in self.request["units"]:
             if unit["domain"] != "unknown" and not unit["dependencies"]:
                 self.assignment(unit, unit["role"], {}, [], [])
@@ -573,6 +718,7 @@ class Coordinator:
                     {"status": "blocked_dependency", "reason": "required_dependency_unqualified"}
                 )
                 continue
+            self.active_unit = unit["unit_id"]
             try:
                 self._run_unit(unit)
             except (OSError, ValueError) as error:
@@ -592,7 +738,8 @@ class Coordinator:
                     }
                 )
             if result["status"] == "cancelled":
-                break
+                return self._interrupted("cancelled")
+            self.active_unit = None
         self._validate_current()
         if self.archives:
             try:
@@ -611,10 +758,25 @@ class Coordinator:
             if "qualified_candidate" in states
             else "blocked"
         )
+        if self.result["status"] == "integration_pending" and (
+            self.result["publication"]["status"] != "complete"
+            or not self.result["publication"]["location_verified"]
+        ):
+            self.result["status"] = "unavailable"
+            self.result["limitations"].append("candidate_publication_incomplete")
         return checked(self.result, "response", MAX_RESPONSE)
 
 
 def orchestrate(
     request: Any, *, adapter: Adapter | None = None, registry: ProjectRegistry | None = None
 ) -> dict[str, Any]:
-    return Coordinator(request, adapter=adapter, registry=registry).run()
+    validated = plan(request)
+    try:
+        coordinator = Coordinator(validated, adapter=adapter, registry=registry)
+    except KeyboardInterrupt:
+        return response("cancelled", validated["run_id"])
+    except (OSError, ValueError):
+        result = response("unavailable", validated["run_id"])
+        result["limitations"].append("setup_capability_or_source_unavailable")
+        return result
+    return coordinator.run()

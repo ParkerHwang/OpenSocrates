@@ -65,7 +65,9 @@ Scoped source files appear in each fresh working directory at
 owned relative paths at that directory's root. Each fresh context includes exact
 input/guide hashes and the closed output contract. Reviewers do not receive maker
 self-assessments, earlier ratings, or repair findings; execution verifiers do not
-receive the review verdict. Only a repairing maker receives public defect findings.
+receive the review verdict. Only a repairing maker receives public defect findings, exact-version failed/unknown
+obligation judgments and their actual check receipts. Empty findings do not discard
+obligation evidence. Repairs without actionable feedback are refused explicitly.
 
 ## Checks, repairs and result files
 
@@ -109,7 +111,21 @@ or check. Returned artifact files are intentional deliverables, not memory recor
 Client behavior outside the adapter's output handling remains part of the Codex
 host boundary.
 
-`integration_pending` means every unit qualified as a candidate. The adapter never
+The response's `publication` state distinguishes `not_started`, `incomplete` and
+`complete`, with completed-file identities and a possibly pending path. Qualification
+records can survive an interruption even when their files were not fully published.
+Only `complete` with `location_verified: true` confirms candidate publication. Cancellation
+or handled operational failures retain accumulated run, call, usage, version and check
+receipts; they do not reset the response to an unstarted run. Partial files remain
+inspectable without broad cleanup.
+
+Publication holds the approved source/output ancestry as directory capabilities.
+It creates and writes only new descendants through non-following directory-relative
+operations, and rejects replaced source/output ancestors or candidate roots. Trusted
+system aliases are normalized before binding only. Hosts without this capability
+report unavailable before model calls; preparation remains read-only and usable.
+
+`integration_pending` means every unit qualified and candidate publication completed. The adapter never
 writes an existing project or claims final integration. The primary must integrate
 authorized bytes, identify affected dependents and rerun their relevant checks and
 independent acceptance on the exact final bytes. Existing project edits cannot be

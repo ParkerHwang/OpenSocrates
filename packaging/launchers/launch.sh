@@ -21,7 +21,7 @@ pass_through() {
         exit 3
     fi
     if [ "$launch_mode" = orchestrate ]; then
-        printf '%s\n' '{"schema":"opensocrates.orchestration.response/1.0.0","run_id":null,"status":"unavailable","plan_sha256":null,"model":null,"client_version":null,"client_sha256":null,"units":[],"calls":[],"memory_status":"not_requested","memory_snapshot_sha256":null,"integration":"pending_primary_reconciliation","limitations":["launcher_unavailable"]}'
+        printf '%s\n' '{"schema":"opensocrates.orchestration.response/1.0.0","run_id":null,"status":"unavailable","plan_sha256":null,"model":null,"client_version":null,"client_sha256":null,"units":[],"calls":[],"memory_status":"not_requested","memory_snapshot_sha256":null,"integration":"pending_primary_reconciliation","publication":{"status":"not_started","location_verified":false,"completed_files":[],"pending_path":null},"limitations":["launcher_unavailable"]}'
         exit 3
     fi
     if [ "$launch_mode" = documentation ]; then
