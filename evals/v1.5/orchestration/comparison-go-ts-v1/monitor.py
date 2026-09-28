@@ -13,15 +13,25 @@ from pathlib import Path
 CLIENT = Path("/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex")
 
 
-def snapshot(results: Path, coordinator_pid: int | None = None) -> dict:
+def snapshot(results: Path, coordinator_pid: int | None = None,
+             frozen_cell_ids: set[str] | None = None) -> dict:
     by_arm: dict[str, Counter] = defaultdict(Counter)
     reasons = Counter()
     role_started = role_terminal = 0
     startup_failures = []
     unknown_after_start = []
+    seen_cell_names: set[str] = set()
+    dispatch = results / "dispatch-index.json"
+    if frozen_cell_ids is None and dispatch.is_file():
+        frozen_cell_ids = {row["cell_id"] for row in json.loads(dispatch.read_text())["cell_results"]}
     for episode in sorted(results.iterdir()) if results.is_dir() else []:
-        if not episode.is_dir() or episode.name == "external-qualification":
+        if not episode.is_dir():
             continue
+        if frozen_cell_ids is not None and episode.name not in frozen_cell_ids:
+            continue
+        if frozen_cell_ids is None and not episode.name.startswith(("O-gpt-", "S-gpt-", "continuity-gpt-")):
+            continue
+        seen_cell_names.add(episode.name)
         arm = episode.name.rsplit("-", 1)[-1]
         counts = by_arm[arm]
         counts["claimed"] += 1
@@ -65,7 +75,13 @@ def snapshot(results: Path, coordinator_pid: int | None = None) -> dict:
     except OSError:
         coordinator_alive = False
     client_sha = hashlib.sha256(CLIENT.read_bytes()).hexdigest() if CLIENT.is_file() else None
-    external_index = results / "external-qualification/index.json"
+    names = frozen_cell_ids or seen_cell_names
+    if any(name.startswith("S-gpt-") for name in names):
+        external_index = results / "external-qualification-S/index.json"
+    elif any(name.startswith("continuity-gpt-") for name in names):
+        external_index = results / "external-qualification-continuity/index.json"
+    else:
+        external_index = results / "external-qualification/index.json"
     external_passed = None
     if external_index.is_file():
         index = json.loads(external_index.read_text())
@@ -92,8 +108,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--results", type=Path, required=True)
     parser.add_argument("--coordinator-pid", type=int)
+    parser.add_argument("--freeze", type=Path,
+                        help="optional exact frozen cell IDs; dispatch index is used when available")
     args = parser.parse_args()
-    print(json.dumps(snapshot(args.results, args.coordinator_pid), sort_keys=True))
+    frozen_ids = set(json.loads(args.freeze.read_text())["cell_ids"]) if args.freeze else None
+    print(json.dumps(snapshot(args.results, args.coordinator_pid, frozen_ids), sort_keys=True))
 
 
 if __name__ == "__main__":
