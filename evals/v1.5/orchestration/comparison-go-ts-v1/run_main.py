@@ -23,7 +23,7 @@ from typing import Any
 from opensocrates.orchestration.adapter import null_usage
 from opensocrates.orchestration.contracts import MAX_OUTPUT, candidate_files, checked
 from opensocrates.orchestration.runtime import orchestrate
-from opensocrates.orchestration.paths import encoded, identity
+from opensocrates.orchestration.paths import BoundaryError, encoded, identity
 
 import opensocrates.orchestration.runtime as runtime
 from boundary_gate import evaluate as evaluate_boundary_gate
@@ -287,8 +287,16 @@ def execute_child(cell: dict[str, str], episode: Path) -> None:
             if call.value is not None:
                 try:
                     candidate_hashes = materialize_single(task, episode, call.value)
-                except (ValueError, OSError):
+                except (ValueError, OSError) as error:
                     response.update({"status": "invalid_output", "reason": "candidate_contract_rejected"})
+                    response["rejection_diagnostic"] = {
+                        "blocked_reason": call.value.get("blocked_reason"),
+                        "validator_error_code": str(error) if isinstance(error, BoundaryError) else None,
+                        "exception_type": type(error).__name__,
+                        "os_errno": error.errno if isinstance(error, OSError) else None,
+                        "quarantine_metadata_available": bool(adapter.candidate_diagnostics),
+                        "raw_rejected_value_retained": False,
+                    }
             response["candidate_hashes"] = candidate_hashes
         write_new(episode / "response.json", response)
         calls = response["calls"]
@@ -305,6 +313,8 @@ def execute_child(cell: dict[str, str], episode: Path) -> None:
         "wrapper_sha256": "sha256:" + sha(SHIM.read_bytes()),
         "usage": aggregate(calls),
         "role_event_summaries": adapter.role_event_summaries,
+        "observer_revision": 2,
+        "candidate_diagnostics": adapter.candidate_diagnostics,
         "observation_failures": adapter.observation_failures,
         "observation_reconciliation": reconcile(journal),
         "candidate_hashes": candidate_hashes,

@@ -10,7 +10,10 @@ from pathlib import Path
 from typing import Any
 
 from opensocrates.orchestration.adapter import MAX_OUTPUT, CodexAdapter, null_usage, reported_usage
-from opensocrates.orchestration.paths import BoundaryError, digest
+from opensocrates.orchestration.paths import BoundaryError, digest, relative
+
+
+OBSERVER_REVISION = 2
 
 
 def utc() -> str:
@@ -23,6 +26,69 @@ class ObservedAdapter(CodexAdapter):
         self.observation_path = observation_path
         self.observation_failures: list[dict[str, str]] = []
         self.role_event_summaries: list[dict[str, Any]] = []
+        self.candidate_diagnostics: list[dict[str, Any]] = []
+
+    def _candidate_diagnostic(self, assignment: dict[str, Any], value: dict[str, Any]) -> None:
+        if assignment["role"] not in {"design", "production"} or not isinstance(value.get("files"), list):
+            return
+        owned = set(assignment["owned_paths"])
+        for name in owned:
+            relative(name)  # Never write a model-controlled traversal path.
+        returned = value["files"]
+        counts: dict[str, int] = {}
+        for item in returned:
+            name = item.get("path") if isinstance(item, dict) else None
+            if isinstance(name, str) and name in owned:
+                counts[name] = counts.get(name, 0) + 1
+        metadata: dict[str, Any] = {
+            "schema": "opensocrates.go-ts.candidate-diagnostic/2",
+            "assignment_id": assignment["assignment_id"],
+            "unit_id": assignment["unit_id"], "role": assignment["role"],
+            "blocked_reason": value.get("blocked_reason"),
+            "owned_path_count": len(owned), "returned_path_count": len(returned),
+            "returned_owned_path_count": sum(counts.values()),
+            "unowned_path_count": len(returned) - sum(counts.values()),
+            "duplicate_owned_path_count": sum(count - 1 for count in counts.values() if count > 1),
+            "owned_path_set_matches": set(counts) == owned and len(returned) == len(owned)
+                                     and all(count == 1 for count in counts.values()),
+            "owned_file_hashes": {}, "quarantined_owned_paths": [],
+            "rejected_owned_hashes": {},
+            "invalid_owned_bytes": 0,
+            "qualification": "unqualified; independent native/external checks still required",
+            "raw_unowned_path_names_or_invalid_json_retained": False,
+        }
+        quarantine = self.observation_path.parent / "quarantine" / assignment["assignment_id"]
+        quarantine.mkdir(mode=0o700, parents=True, exist_ok=False)
+        byte_total = 0
+        for item in returned:
+            if not isinstance(item, dict):
+                continue
+            name, content = item.get("path"), item.get("content")
+            if not isinstance(name, str) or name not in owned or counts.get(name) != 1 or not isinstance(content, str):
+                continue
+            data = content.encode("utf-8")
+            if b"\x00" in data or len(data) > 65536 or byte_total + len(data) > MAX_OUTPUT:
+                metadata["invalid_owned_bytes"] += 1
+                metadata["rejected_owned_hashes"][name] = digest(data)
+                continue
+            byte_total += len(data)
+            target = quarantine / name
+            if not target.resolve().is_relative_to(quarantine.resolve()):
+                metadata["invalid_owned_bytes"] += 1
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with target.open("xb") as out:
+                out.write(data)
+                out.flush()
+                os.fsync(out.fileno())
+            metadata["owned_file_hashes"][name] = digest(data)
+            metadata["quarantined_owned_paths"].append(name)
+        with (quarantine / "metadata.json").open("x", encoding="utf-8") as out:
+            json.dump(metadata, out, sort_keys=True, separators=(",", ":"))
+            out.write("\n")
+            out.flush()
+            os.fsync(out.fileno())
+        self.candidate_diagnostics.append(metadata)
 
     def _append(self, item: dict[str, Any]) -> None:
         try:
@@ -57,6 +123,14 @@ class ObservedAdapter(CodexAdapter):
         self._current_event_summary = current_summary
         try:
             result = super().invoke(assignment, cwd)
+            if result.value is not None:
+                try:
+                    self._candidate_diagnostic(assignment, result.value)
+                except (OSError, ValueError, TypeError, KeyError) as error:
+                    self.observation_failures.append({
+                        "kind": "candidate_diagnostic", "identity": assignment["assignment_id"],
+                        "phase": type(error).__name__,
+                    })
             return result
         finally:
             self._current_event_summary = None

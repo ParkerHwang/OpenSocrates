@@ -18,7 +18,7 @@ class ObserverControls(unittest.TestCase):
         with tempfile.TemporaryDirectory() as raw:
             missing_parent = Path(raw) / "missing" / "journal.jsonl"
             adapter = ObservedAdapter("/bin/true", missing_parent)
-            native = CallResult({"files": []}, {
+            native = CallResult(None, {
                 "status": "completed", "provider_error_events": 0,
                 "failed_turn_events": 0, "usage": {"input_tokens": 11},
             })
@@ -97,6 +97,31 @@ class ObserverControls(unittest.TestCase):
             self.assertEqual(rows[1]["usage"]["input_tokens"], 17)
             self.assertEqual(rows[1]["process_exit_code"], 0)
             self.assertEqual(rows[1]["output_sha256"], "sha256:output")
+
+    def test_rejected_candidate_quarantines_only_declared_owned_text(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            adapter = ObservedAdapter("/bin/true", root / "journal.jsonl")
+            value = {"blocked_reason": "missing_input", "files": [
+                {"path": "a.go", "content": "package main\n"},
+                {"path": "../private/oracle.py", "content": "must not persist\n"},
+            ]}
+            native = CallResult(value, {"status": "completed", "reason": "structured_result",
+                                        "provider_error_events": 0, "failed_turn_events": 0,
+                                        "process_exit_code": 0, "usage": {"input_tokens": 9}})
+            assignment = {"assignment_id": "a1", "unit_id": "u", "role": "production",
+                          "owned_paths": ["a.go", "b.go"], "model": {"name": "synthetic", "effort": "high"}}
+            with patch.object(CodexAdapter, "invoke", return_value=native):
+                self.assertIs(adapter.invoke(assignment, root), native)
+            quarantine = root / "quarantine/a1"
+            self.assertEqual((quarantine / "a.go").read_text(), "package main\n")
+            self.assertFalse((root / "private/oracle.py").exists())
+            metadata = json.loads((quarantine / "metadata.json").read_text())
+            self.assertEqual(metadata["blocked_reason"], "missing_input")
+            self.assertEqual(metadata["unowned_path_count"], 1)
+            self.assertFalse(metadata["owned_path_set_matches"])
+            self.assertEqual(metadata["quarantined_owned_paths"], ["a.go"])
+            self.assertNotIn("../private/oracle.py", json.dumps(metadata))
 
 
 if __name__ == "__main__":

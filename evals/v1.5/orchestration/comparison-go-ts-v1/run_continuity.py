@@ -82,6 +82,8 @@ def child(cell: dict[str, Any], episode: Path, receipt: dict[str, Any]) -> None:
         "memory_status": response.get("memory_status"),
         "memory_snapshot_sha256": response.get("memory_snapshot_sha256"),
         "usage": aggregate(response["calls"]),
+        "observer_revision": 2,
+        "candidate_diagnostics": adapter.candidate_diagnostics,
         "role_event_summaries": adapter.role_event_summaries,
         "observation_failures": adapter.observation_failures,
         "observation_reconciliation": reconcile(episode / "observation.jsonl"),

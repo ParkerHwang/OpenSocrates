@@ -49,6 +49,30 @@ def export(results: Path, freeze_path: Path, freeze_sha: str, output: Path) -> d
                 if not relative.startswith(ARTIFACT_PREFIXES):
                     raise ValueError("unallowlisted_candidate_file:" + relative)
                 selected[f"episodes/{cell_id}/{relative}"] = path.read_bytes()
+        quarantine = episode / "quarantine"
+        if quarantine.is_dir():
+            for assignment in sorted(quarantine.iterdir()):
+                if not assignment.is_dir() or assignment.is_symlink():
+                    raise ValueError("unsafe_quarantine_assignment")
+                metadata_path = assignment / "metadata.json"
+                metadata = json.loads(metadata_path.read_text())
+                if metadata.get("schema") != "opensocrates.go-ts.candidate-diagnostic/2":
+                    raise ValueError("quarantine_metadata_schema_mismatch")
+                approved = set(metadata["quarantined_owned_paths"])
+                if set(metadata["owned_file_hashes"]) != approved:
+                    raise ValueError("quarantine_file_manifest_mismatch")
+                if any(path.is_symlink() for path in assignment.rglob("*")):
+                    raise ValueError("quarantine_symlink_export_refused")
+                actual = {str(path.relative_to(assignment)) for path in assignment.rglob("*")
+                          if path.is_file()}
+                if actual != approved | {"metadata.json"}:
+                    raise ValueError("unallowlisted_quarantine_file")
+                selected[f"episodes/{cell_id}/quarantine/{assignment.name}/metadata.json"] = metadata_path.read_bytes()
+                for name in sorted(approved):
+                    path = assignment / name
+                    if path.is_symlink() or not path.is_file() or "sha256:" + sha(path.read_bytes()) != metadata["owned_file_hashes"][name]:
+                        raise ValueError("quarantine_file_changed")
+                    selected[f"episodes/{cell_id}/quarantine/{assignment.name}/{name}"] = path.read_bytes()
     qualification = results / "external-qualification"
     if qualification.is_dir():
         for path in sorted(qualification.rglob("*")):
@@ -56,13 +80,16 @@ def export(results: Path, freeze_path: Path, freeze_sha: str, output: Path) -> d
                 raise ValueError("qualification_symlink_export_refused")
             if path.is_file() and path.name in {"receipt.json", "index.json"}:
                 selected["qualification/" + str(path.relative_to(qualification))] = path.read_bytes()
-    if any("auth" in name.lower() or "private" in name.lower() or "raw" in name.lower()
+    forbidden_components = {"auth.json", "private", "raw-events.jsonl", "transcript.jsonl",
+                            "reasoning.json", "tool-output.log"}
+    if any(any(part.lower() in forbidden_components for part in Path(name).parts)
            for name in selected):
         raise ValueError("sensitive_export_path")
     manifest = {
         "schema": "opensocrates.go-ts.portable-export/1",
         "freeze_sha256": freeze_sha,
         "allowlist": ["study/dispatch-index.json", *EPISODE_FILES, *ARTIFACT_PREFIXES,
+                      "quarantine/<assignment>/metadata.json", "quarantine/<assignment>/<declared-owned-path>",
                       "qualification/**/receipt.json",
                       "qualification/index.json"],
         "files": [{"path": name, "sha256": sha(data), "bytes": len(data)}
