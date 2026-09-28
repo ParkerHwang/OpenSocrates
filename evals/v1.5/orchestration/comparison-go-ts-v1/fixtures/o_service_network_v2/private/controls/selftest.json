@@ -1,0 +1,197 @@
+{
+  "schema": "opensocrates.eval.v2-controls/1.0.0",
+  "task": "O-v2",
+  "passed": true,
+  "controls": [
+    {
+      "control": "good_analysis",
+      "scope": "analysis",
+      "expected": "pass",
+      "go_build_passed": true,
+      "observed_pass": true,
+      "as_expected": true
+    },
+    {
+      "control": "good_full",
+      "scope": "full",
+      "expected": "pass",
+      "go_build_passed": true,
+      "observed_pass": true,
+      "as_expected": true
+    },
+    {
+      "control": "allowed_alternative",
+      "scope": "full",
+      "expected": "pass",
+      "go_build_passed": true,
+      "observed_pass": true,
+      "as_expected": true
+    },
+    {
+      "control": "creation_month_labor",
+      "scope": "analysis",
+      "expected": "reject:v2_program_matches_oracle",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "floor_per_job_credit",
+      "scope": "analysis",
+      "expected": "reject:v2_program_matches_oracle",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "floor_per_job_labor",
+      "scope": "analysis",
+      "expected": "reject:v2_program_matches_oracle",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "future_as_current",
+      "scope": "analysis",
+      "expected": "reject:v2_program_matches_oracle",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "latest_vs_max_policy",
+      "scope": "analysis",
+      "expected": "reject:v2_program_matches_oracle",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "latest_vs_max_rate",
+      "scope": "analysis",
+      "expected": "reject:v2_program_matches_oracle",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "missing_as_zero",
+      "scope": "analysis",
+      "expected": "reject:v2_program_matches_oracle",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "omit_shared_pairs",
+      "scope": "analysis",
+      "expected": "reject:v2_program_matches_oracle",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "product_of_sums",
+      "scope": "analysis",
+      "expected": "reject:v2_program_matches_oracle",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "unknown_capacity_as_feasible",
+      "scope": "analysis",
+      "expected": "reject:v2_program_matches_oracle",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "wrong_capacity_sensitivity_site",
+      "scope": "analysis",
+      "expected": "reject:v2_program_matches_oracle",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "wrong_event_id_tie",
+      "scope": "analysis",
+      "expected": "reject:v2_program_matches_oracle",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "source_path_traversal",
+      "scope": "analysis",
+      "expected": "reject:v2_source_register",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "misbound_memo",
+      "scope": "full",
+      "expected": "reject:v2_memo_evidence",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "missing_portfolio_row",
+      "scope": "full",
+      "expected": "reject:v2_memo_evidence",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "ineligible_recommendation",
+      "scope": "full",
+      "expected": "reject:v2_memo_decision_record",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "empty_criterion",
+      "scope": "full",
+      "expected": "reject:v2_memo_decision_record",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    },
+    {
+      "control": "missing_risk_register",
+      "scope": "full",
+      "expected": "reject:v2_memo_structure",
+      "go_build_passed": true,
+      "observed_pass": false,
+      "as_expected": true
+    }
+  ],
+  "isolation_canary": {
+    "checks": [
+      {
+        "exit_code": 0,
+        "id": "candidate_read_allowed",
+        "passed": true
+      },
+      {
+        "exit_code": 1,
+        "id": "private_oracle_direct_denied",
+        "passed": true
+      },
+      {
+        "exit_code": 1,
+        "id": "private_oracle_symlink_denied",
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "policy_sha256": "7bb4107b6022f5a770aaf03899d51cd4dc661b2420adf1faeb94fc8094fc50d2"
+  },
+  "meaning": "Good and deliberately wrong mechanical controls only; no subject model or semantic recommendation verdict."
+}
