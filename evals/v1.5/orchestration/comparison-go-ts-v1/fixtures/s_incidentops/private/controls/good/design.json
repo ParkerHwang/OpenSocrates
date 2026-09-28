@@ -1,0 +1,34 @@
+{
+  "api": {
+    "current_callers": ["dashboard GET /api/incidents", "webhook POST /api/events"],
+    "new_or_changed": ["event result contains derived incident and duplicate flag", "summary accepts the same filters as incidents", "policies and on-call revisions are operator-only", "outbox is tenant-scoped and fake"],
+    "headers": ["X-Tenant", "X-Role"]
+  },
+  "state_transitions": {
+    "order": ["sequence ascending", "event ID ascending for ties"],
+    "valid": ["empty to OPEN", "open to ACK", "open or acknowledged to RESOLVE", "resolved to REOPEN"],
+    "invalid_late_insert": "Roll back the entire transaction if the resulting complete fold has an invalid edge."
+  },
+  "ownership": {
+    "api.go": "HTTP validation, identity and stable response shapes",
+    "domain.go": "canonical timestamps and event structures",
+    "store.go": "SQLite migration, history fold, policies, handovers and outbox reconciliation",
+    "web/api.ts": "network requests",
+    "web/view.ts": "safe row and summary rendering",
+    "web/app.ts": "filter state and operator actions"
+  },
+  "persistence": {
+    "authoritative": ["tenant event ledger", "policy revisions", "on-call revisions"],
+    "rebuildable": ["current incident projection", "outbox pending/cancelled state"],
+    "durability": "SQLite WAL with synchronous FULL"
+  },
+  "migration": "Add projection sequence and revision/outbox tables to the starter database; replay valid existing ledgers at startup and report a corrupt ledger instead of erasing it.",
+  "compatibility": "Keep existing event and incident endpoint paths, tenant/role headers and useful filters; include new sequence and response fields for UI actions.",
+  "examples": [
+    {"request": "OPEN sequence 1 with P1", "expected": "201 and one pending generation"},
+    {"request": "identical tenant/event replay", "expected": "200 and unchanged state"},
+    {"request": "same event ID with changed note", "expected": "409 and unchanged state"},
+    {"request": "late ACK sequence 2 after RESOLVE sequence 4", "expected": "valid complete fold remains resolved"},
+    {"request": "viewer POST", "expected": "403 and no stored event"}
+  ]
+}

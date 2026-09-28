@@ -1,0 +1,325 @@
+{
+  "schema": "opensocrates.eval.single-task-fixture/1.0.0",
+  "base_commit": "d0156a86cfd4dc197554f1be0261c258cec7da2e",
+  "task": {
+    "task_id": "S",
+    "objective": "Deliver the requested IncidentOps Go backend and TypeScript dashboard change.",
+    "public_root": "s_incidentops/public",
+    "starter_root": "starter",
+    "sources": [
+      {
+        "id": "contract",
+        "path": "CONTRACT.md",
+        "sha256": "sha256:434259e0dbe2a50ccba830c3aa272a742ed47631e594e921dfaf6f201265c3da"
+      },
+      {
+        "id": "native",
+        "path": "native_check.py",
+        "sha256": "sha256:5e9a48b76ff0caf1861c81d4574796746006f71dd75c25ab7442eb4f7672107c"
+      },
+      {
+        "id": "go-mod",
+        "path": "starter/go.mod",
+        "sha256": "sha256:108dbc700146d9c6bde9484cdd1b0d0c70188a1363fcb9d281d3a23f1caab953"
+      },
+      {
+        "id": "go-sum",
+        "path": "starter/go.sum",
+        "sha256": "sha256:185c1a07ca10fae6ce64ae27b0bb1688eae23b4eb8d07ee825face41787c8d47"
+      },
+      {
+        "id": "go-main",
+        "path": "starter/main.go",
+        "sha256": "sha256:35b18ca9d06df048946f3ec22faa81626af976af96b72100e7ac4bffb76961cc"
+      },
+      {
+        "id": "go-api",
+        "path": "starter/api.go",
+        "sha256": "sha256:b9fa421a9b7a4a1aa6ababe9c141490ac8154e22db188ecab8999622b0a4d1f4"
+      },
+      {
+        "id": "go-store",
+        "path": "starter/store.go",
+        "sha256": "sha256:1abe8732d4b126ca7e9b3d5a6a0a928f98f6e00d6dffa3e8cefa6557d0707f40"
+      },
+      {
+        "id": "go-domain",
+        "path": "starter/domain.go",
+        "sha256": "sha256:c4fa4e34fe35e95fb288f61f75da6de4cc918ae4d593c3180984a45a911f7de9"
+      },
+      {
+        "id": "npm-package",
+        "path": "starter/package.json",
+        "sha256": "sha256:cce36e09174fd4827b6f6bf1210d0d7ec75d9330b7f5c52f0aedef53677d7ea3"
+      },
+      {
+        "id": "npm-lock",
+        "path": "starter/package-lock.json",
+        "sha256": "sha256:a15e90c225a697962f7983dbf3fb61406dceffbb0ea53388d8ad1d2b37f3f394"
+      },
+      {
+        "id": "ts-config",
+        "path": "starter/tsconfig.json",
+        "sha256": "sha256:50cfdb3f3fcdf4b3d54fb876249dfe63e3708a03277b266ddedb0ee83e24ff8e"
+      },
+      {
+        "id": "web-app",
+        "path": "starter/web/app.ts",
+        "sha256": "sha256:6db60246d8e9a5c17a81941dfda9dad15436f32721353a5c9857446f6a55c363"
+      },
+      {
+        "id": "web-api",
+        "path": "starter/web/api.ts",
+        "sha256": "sha256:8839ba1ca69497838c6a9db83a8bcd9608940987d6acb2db152a66a6d053aaa5"
+      },
+      {
+        "id": "web-view",
+        "path": "starter/web/view.ts",
+        "sha256": "sha256:28cf102444355a333ac623eef22476952e8f134593764a0f73746274f898b372"
+      },
+      {
+        "id": "web-html",
+        "path": "starter/web/index.html",
+        "sha256": "sha256:64383788ea0c4efc5c434cd7c6b49fb5b88dc2e57478ce2515fcdbdd020b7363"
+      },
+      {
+        "id": "web-style",
+        "path": "starter/web/style.css",
+        "sha256": "sha256:778b4ff162ce37b14c324fa7d4d9ca7fc30f7933c78b48e01add25680fde1109"
+      },
+      {
+        "id": "go-test",
+        "path": "starter/main_test.go",
+        "sha256": "sha256:223d86bd33322d64787cd37f2f3d1e550b5a2b1ea50927ceb029eb73b11e4883"
+      },
+      {
+        "id": "environment",
+        "path": "ENVIRONMENT.md",
+        "sha256": "sha256:2797e5c08520a63052f7a366ebc31fd9b7a0c18b1a474a84dc5901ec566f0978"
+      }
+    ],
+    "constraints": [
+      {
+        "id": "S-contract",
+        "text": "# IncidentOps change request (synthetic)\n\nThis is a local exercise. The Go API and TypeScript dashboard in `starter/` already list incidents and ingest basic events. Keep useful behavior and implement the change below. No real notification is sent: `outbox` is a queryable local table only. Use the supplied Go/TypeScript stack. Preserve SQLite WAL mode and `synchronous=FULL`. `GET /api/health` reports the active connection's `{status:\"ok\",journal_mode:\"wal\",synchronous:2}` so durability can be checked without relying on a new connection's defaults. All timestamps are UTC RFC3339; reject malformed timestamps. Each request declares `X-Tenant` and `X-Role` (`operator` or `viewer`); blank or unknown values are rejected. A viewer may read only its tenant and cannot mutate any data. A tenant name is an opaque case-sensitive key.\n\n## Event and incident contract\n\n`POST /api/events` accepts `{event_id,incident_id,sequence,kind,occurred_at,severity,note}`. `kind` is `OPEN`, `ACK`, `RESOLVE`, or `REOPEN`. `sequence` is a positive integer per tenant/incident. `severity` is `P1`, `P2`, or `P3` for `OPEN` and `REOPEN`, and may be omitted otherwise. `note` is optional text. A new accepted event returns HTTP 201; exact replay of the same tenant/event ID and canonical JSON fields returns 200 and changes nothing; reuse of that ID with different content returns 409 and changes nothing. The same ID in a different tenant is independent. Invalid transitions return 422 without changing persisted state. The response identifies the current derived incident state. Events may arrive out of sequence. The authoritative state is the fold of all accepted events in ascending sequence, then event ID. Validate the *entire resulting ledger* before committing a late insertion; if the new fold contains any invalid transition, reject the insertion atomically with 422. A valid late insertion can alter history but must not regress the current state or duplicate current side effects. `OPEN` begins a new incident; `ACK` requires open; `RESOLVE` requires open or acknowledged; `REOPEN` requires resolved. `REOPEN` starts a new notification generation. Incidents are isolated by tenant. A process restart from the same database path preserves events, incidents, configuration, and outbox state.\n\n`GET /api/incidents` returns `{items:[...]}` in descending latest-event time, then ascending incident ID. Each item includes `incident_id,status,severity,latest_at,note,sequence`, where sequence is the final folded event's sequence and lets the UI submit the next action. Latest-event time means the `occurred_at` of the final event in fold order, not the maximum timestamp among the incident's records. Optional `status`, `severity`, and `q` filters apply; `q` searches incident ID and current note case-insensitively. `GET /api/summary` returns `{total,open,acknowledged,resolved}` counts derived from the current filtered incident result set, including zero counts, never a separately maintained counter. Both endpoints honor exactly the same query filters. `GET /api/outbox` returns `{items:[{incident_id,generation,due_at,assignee,state},...]}` for only the caller tenant's fake entries, sorted by incident ID and generation. New and replayed event responses return `{incident:{incident_id,status,severity,latest_at,note,sequence},duplicate:boolean}`. Do not contact an external service.\n\n## Escalation configuration and effects\n\n`POST /api/policies` with `{effective_at,severity,delay_minutes}` appends a tenant policy revision. `delay_minutes` is an integer from 0 to 1440. For a generation opened at time T, use the policy of matching severity with the greatest `effective_at <= T`; if tied, the most recently accepted revision wins. A later revision may decrease the delay, so do not select by numeric maximum. If no revision is effective, use 60 minutes. `POST /api/oncall` with `{starts_at,ends_at,person}` appends a tenant handover interval (`starts_at < ends_at`). For due time D, select the overlapping interval with latest `starts_at`; if tied, latest accepted revision wins. No match yields `unassigned`. These configuration endpoints require `operator` and return 201. The outbox records one entry per incident generation with due time, assignee, and state `pending` or `cancelled`. An `ACK` or `RESOLVE` cancels obsolete pending work. Reopening creates the next generation and its own entry. A late event or configuration revision reconciles pending effects deterministically without creating duplicate rows. Existing cancelled generations stay cancelled.\n\n## Dashboard and delivery\n\nThe dashboard uses the real API, presents incident rows and a visible `Summary` heading with filtered counts, and shows a clear error for rejected actions. Keep visible, accessible control labels `Tenant`, `Role`, `Status`, `Severity`, and `Search`, plus accessible action names `ACK`, `RESOLVE`, and `REOPEN` where those actions apply; these are user-facing affordances, not CSS or DOM selectors. A viewer can inspect but cannot trigger writes; hiding or disabling viewer write controls are both valid. Changing filters refreshes both rows and counts from the network. Buttons inside forms must not accidentally submit/reload. Provide a useful mobile layout. Supply `design.json` plus `design.md` for the first unit: document current callers, public API and schemas, persisted versus derived fields, migration and compatibility intent, state transitions, ownership, and executable contract examples. The second unit supplies implementation files, meaningful tests and a runbook. The first unit's accepted contract governs the second.\n\nPublic native acceptance is limited to well-formed source and declarative contract examples that can run read-only. Final integration acceptance separately compiles Go/TypeScript, exercises API and SQLite persistence in disposable copies, and checks browser behavior and performance over loopback. No native read-only result proves server, browser, restart, or throughput behavior.\n"
+      }
+    ],
+    "permissions": [
+      "Create only declared candidate artifacts and run approved read-only public checks; external qualification runs later in marked disposable copies."
+    ],
+    "prohibitions": [
+      "No real notification, external accounts, network research, existing-project write, or undeclared artifact."
+    ],
+    "handoff": [
+      "The source contract is the complete accepted public task; all arms receive identical facts.",
+      "Native qualification covers only declared static obligations. Final build/API/browser/restart/performance and private oracle evidence are external and pending until verified."
+    ],
+    "required_artifacts": [
+      "design.json",
+      "design.md",
+      "main.go",
+      "api.go",
+      "store.go",
+      "domain.go",
+      "main_test.go",
+      "web/app.ts",
+      "web/api.ts",
+      "web/view.ts",
+      "web/index.html",
+      "web/style.css",
+      "RUNBOOK.md"
+    ],
+    "units": [
+      {
+        "unit_id": "S-design",
+        "domain": "software",
+        "task_kind": "judgment",
+        "role": "design",
+        "objective": "Produce a material API/state/ownership change contract for IncidentOps; preserve current callers and specify executable examples.",
+        "owned_paths": [
+          "design.json",
+          "design.md"
+        ],
+        "dependencies": [],
+        "source_ids": [
+          "contract",
+          "native",
+          "go-mod",
+          "go-sum",
+          "go-main",
+          "go-api",
+          "go-store",
+          "go-domain",
+          "npm-package",
+          "npm-lock",
+          "ts-config",
+          "web-app",
+          "web-api",
+          "web-view",
+          "web-html",
+          "web-style",
+          "go-test",
+          "environment"
+        ],
+        "requirement_ids": [
+          "S-contract"
+        ],
+        "specialists": [
+          "contracts",
+          "transitions"
+        ],
+        "obligations": [
+          {
+            "id": "S-design-structure",
+            "requirement_id": "S-contract",
+            "description": "Design files contain the declared contract sections and examples in bounded JSON and Markdown.",
+            "required": true
+          }
+        ],
+        "checks": [
+          {
+            "check_id": "S-design-static",
+            "argv": [
+              "/usr/bin/python3",
+              "-B",
+              "inputs/native/native_check.py",
+              "design"
+            ],
+            "obligation_ids": [
+              "S-design-structure"
+            ],
+            "authorization_reference": "user:current-request",
+            "expected_exit_code": 0
+          }
+        ],
+        "seed": null
+      },
+      {
+        "unit_id": "S-implementation",
+        "domain": "software",
+        "task_kind": "judgment",
+        "role": "production",
+        "objective": "Implement the accepted IncidentOps design in the existing Go and TypeScript modules; supply meaningful tests and runbook.",
+        "owned_paths": [
+          "main.go",
+          "api.go",
+          "store.go",
+          "domain.go",
+          "main_test.go",
+          "web/app.ts",
+          "web/api.ts",
+          "web/view.ts",
+          "web/index.html",
+          "web/style.css",
+          "RUNBOOK.md"
+        ],
+        "dependencies": [
+          "S-design"
+        ],
+        "source_ids": [
+          "contract",
+          "native",
+          "go-mod",
+          "go-sum",
+          "go-main",
+          "go-api",
+          "go-store",
+          "go-domain",
+          "npm-package",
+          "npm-lock",
+          "ts-config",
+          "web-app",
+          "web-api",
+          "web-view",
+          "web-html",
+          "web-style",
+          "go-test",
+          "environment"
+        ],
+        "requirement_ids": [
+          "S-contract"
+        ],
+        "specialists": [
+          "transitions",
+          "ownership"
+        ],
+        "obligations": [
+          {
+            "id": "S-source-inventory",
+            "requirement_id": "S-contract",
+            "description": "All declared Go, TypeScript, HTML, CSS, tests and runbook paths exist within size bounds.",
+            "required": true
+          },
+          {
+            "id": "S-go-parse",
+            "requirement_id": "S-contract",
+            "description": "All Go candidate files parse as Go source.",
+            "required": true
+          }
+        ],
+        "checks": [
+          {
+            "check_id": "S-inventory",
+            "argv": [
+              "/usr/bin/python3",
+              "-B",
+              "inputs/native/native_check.py",
+              "implementation"
+            ],
+            "obligation_ids": [
+              "S-source-inventory"
+            ],
+            "authorization_reference": "user:current-request",
+            "expected_exit_code": 0
+          },
+          {
+            "check_id": "S-gofmt-parse",
+            "argv": [
+              "/usr/local/go/bin/gofmt",
+              "-e",
+              "main.go",
+              "api.go",
+              "store.go",
+              "domain.go",
+              "main_test.go"
+            ],
+            "obligation_ids": [
+              "S-go-parse"
+            ],
+            "authorization_reference": "user:current-request",
+            "expected_exit_code": 0
+          }
+        ],
+        "seed": null
+      }
+    ],
+    "external_qualification": {
+      "entrypoint": "verify_external.py",
+      "task_arg": "S",
+      "command_template": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "-B",
+        "{entrypoint}",
+        "--task",
+        "S",
+        "--candidate",
+        "{marked_disposable_copy}",
+        "--deps",
+        "{deps_root}",
+        "--candidate-policy",
+        "{candidate_policy}"
+      ],
+      "obligations": [
+        "go_build",
+        "typescript_build",
+        "api_contract",
+        "tenant_isolation",
+        "sqlite_restart",
+        "browser_network_render",
+        "performance"
+      ],
+      "sandbox": "copy_scoped_writes_and_loopback_only"
+    }
+  },
+  "scope": "S24 preparation; policy compatibility pending; O frozen separately"
+}
