@@ -27,6 +27,9 @@ def export(results: Path, freeze_path: Path, freeze_sha: str, output: Path) -> d
     if output.exists():
         raise FileExistsError(output)
     selected: dict[str, bytes] = {"study/freeze.json": freeze_path.read_bytes()}
+    dispatch_index = results / "dispatch-index.json"
+    if dispatch_index.is_file():
+        selected["study/dispatch-index.json"] = dispatch_index.read_bytes()
     for cell_id in frozen["cell_ids"]:
         episode = results / cell_id
         if (episode / "home/.codex/auth.json").exists():
@@ -59,7 +62,8 @@ def export(results: Path, freeze_path: Path, freeze_sha: str, output: Path) -> d
     manifest = {
         "schema": "opensocrates.go-ts.portable-export/1",
         "freeze_sha256": freeze_sha,
-        "allowlist": [*EPISODE_FILES, *ARTIFACT_PREFIXES, "qualification/**/receipt.json",
+        "allowlist": ["study/dispatch-index.json", *EPISODE_FILES, *ARTIFACT_PREFIXES,
+                      "qualification/**/receipt.json",
                       "qualification/index.json"],
         "files": [{"path": name, "sha256": sha(data), "bytes": len(data)}
                   for name, data in sorted(selected.items())],

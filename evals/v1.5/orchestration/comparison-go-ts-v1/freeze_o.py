@@ -103,13 +103,9 @@ def package_guides(task: dict[str, Any]) -> dict[str, Any]:
 def memory_and_dispatch() -> dict[str, Any]:
     memory_bytes = int(subprocess.check_output(["/usr/sbin/sysctl", "-n", "hw.memsize"]).strip())
     cores = int(subprocess.check_output(["/usr/sbin/sysctl", "-n", "hw.logicalcpu"]).strip())
-    reserve = 4 * 1024**3
-    per_role = 1250 * 1024**2
-    by_memory = max(1, (memory_bytes - reserve) // per_role)
-    workers = min(24, cores * 2, by_memory)
     return {
-        "max_workers": workers,
-        "formula": "min(24, 2*logical_cpu, floor((physical_memory-4GiB)/1250MiB))",
+        "max_workers": 24,
+        "formula": "all 24 independent O cells, with no unobserved account or host cap",
         "host_logical_cpu": cores, "host_physical_memory_bytes": memory_bytes,
         "no_arbitrary_legacy_three_worker_cap": True,
         "atomic_claim": "mkdir(exist_ok=False) for each predeclared cell",
@@ -293,6 +289,16 @@ def freeze(source_descriptor: Path) -> dict[str, Any]:
         "external_qualification": task["external_qualification"],
         "subject_dependency_root": str(DEPS), "subject_dependency_top_level": deps_entries,
         "dispatch": dispatch,
+        "dispatch_observation": {
+            "source": "fsynced per-role start/terminal journals plus episode start/terminal markers",
+            "output": "results/dispatch-index.json",
+            "measures": ["observed_peak_episode_overlap", "observed_peak_role_overlap",
+                         "host_load_1m", "host_codex_process_count", "host_codex_rss_kib",
+                         "episodes_started_without_terminal", "roles_started_without_terminal",
+                         "episode_overlap_complete", "role_overlap_complete",
+                         "malformed_observation_lines", "malformed_episode_markers"],
+            "host_pressure_scope": "aggregate host sample; unrelated Codex processes may contribute",
+        },
         "limits": {key: None for key in ("wall_clock_seconds", "input_tokens", "output_tokens",
                                          "total_tokens", "tool_calls", "output_bytes", "internal_retries")},
         "fast_mode": False, "native_repair_limit": 2,
@@ -300,7 +306,7 @@ def freeze(source_descriptor: Path) -> dict[str, Any]:
                          "output_tokens", "reasoning_output_tokens"],
         "usage_rule": "null preserved; cache and reasoning are subsets; no billing claim; setup agent usage separate/unavailable",
         "failure_policy": "Atomic one-shot claims, no restart/rerun/coach/fallback/outer repair; startup, role, native, external and publication failures separate; partial evidence kept.",
-        "export_allowlist": ["freeze", "started", "terminal", "summary", "response_public_structured",
+        "export_allowlist": ["freeze", "dispatch_index", "started", "terminal", "summary", "response_public_structured",
                              "candidate_synthetic_artifacts", "role_observation_aggregates", "argv_hash_map",
                              "external_structured_receipts", "source_and_component_hashes"],
         "export_excluded": ["auth", "raw_prompt", "transcript", "reasoning", "raw_jsonl_events",

@@ -41,10 +41,125 @@ def utc() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def resource_snapshot() -> dict[str, Any]:
+    """Passive host pressure sample; only aggregate numbers survive."""
+    try:
+        load = list(os.getloadavg())
+    except OSError:
+        load = None
+    count, rss = None, None
+    try:
+        process = subprocess.run(["/bin/ps", "-axo", "rss=,comm="],
+                                 capture_output=True, text=True, check=False)
+        if process.returncode == 0:
+            values = []
+            for line in process.stdout.splitlines():
+                parts = line.strip().split(maxsplit=1)
+                if len(parts) == 2 and parts[1].split("/")[-1] == "codex":
+                    try:
+                        values.append(int(parts[0]))
+                    except ValueError:
+                        pass
+            count, rss = len(values), sum(values)
+    except OSError:
+        pass
+    return {"host_load_1m_5m_15m": load, "host_codex_process_count": count,
+            "host_codex_rss_kib": rss,
+            "scope": "host aggregate including unrelated Codex processes; not per-cell attribution"}
+
+
+def _peak_overlap(intervals: list[tuple[str, str]]) -> int:
+    events = []
+    for start, end in intervals:
+        if end < start:
+            continue
+        events.extend(((start, 1), (end, -1)))
+    active = peak = 0
+    for _, delta in sorted(events, key=lambda item: (item[0], item[1])):
+        active += delta
+        peak = max(peak, active)
+    return peak
+
+
+def dispatch_summary(results: Path, selected: list[dict[str, str]],
+                     returned: list[dict[str, Any]], max_workers: int) -> dict[str, Any]:
+    episode_intervals = []
+    role_intervals = []
+    role_open = []
+    episodes_started_without_terminal = []
+    malformed_observation_lines = 0
+    malformed_episode_markers = 0
+    pressure = []
+    for cell in selected:
+        episode = results / cell["id"]
+        started = episode / "started.json"
+        terminal = episode / "terminal.json"
+        if started.is_file():
+            try:
+                a = json.loads(started.read_text())
+                pressure.append(a.get("resource"))
+                if terminal.is_file():
+                    b = json.loads(terminal.read_text())
+                    episode_intervals.append((a["utc"], b["utc"]))
+                    pressure.append(b.get("resource"))
+                else:
+                    episodes_started_without_terminal.append(cell["id"])
+            except (ValueError, KeyError, TypeError):
+                malformed_episode_markers += 1
+        journal = episode / "observation.jsonl"
+        if journal.is_file():
+            active: dict[str, str] = {}
+            for raw in journal.read_text().splitlines():
+                try:
+                    item = json.loads(raw)
+                except ValueError:
+                    malformed_observation_lines += 1
+                    continue
+                if item.get("kind") != "role":
+                    continue
+                key = item["assignment_id"]
+                if item["phase"] == "start":
+                    active[key] = item["utc"]
+                elif item["phase"] == "terminal" and key in active:
+                    role_intervals.append((active.pop(key), item["utc"]))
+            role_open.extend({"cell_id": cell["id"], "assignment_id": key}
+                             for key in active)
+    pressure = [item for item in pressure if isinstance(item, dict)]
+    return {
+        "schema": "opensocrates.go-ts.dispatch-observation/1",
+        "scheduled_cells": len(selected), "returned_cells": len(returned),
+        "frozen_worker_limit": max_workers,
+        "observed_peak_episode_overlap": _peak_overlap(episode_intervals),
+        "episode_overlap_complete": not episodes_started_without_terminal and malformed_episode_markers == 0,
+        "observed_peak_role_overlap": _peak_overlap(role_intervals),
+        "role_overlap_complete": not role_open and not episodes_started_without_terminal
+                                 and malformed_observation_lines == 0,
+        "completed_role_intervals": len(role_intervals),
+        "roles_started_without_terminal": role_open,
+        "episodes_started_without_terminal": episodes_started_without_terminal,
+        "malformed_observation_lines": malformed_observation_lines,
+        "malformed_episode_markers": malformed_episode_markers,
+        "pressure_samples": len(pressure),
+        "max_host_load_1m": max((item["host_load_1m_5m_15m"][0]
+                                  for item in pressure if item.get("host_load_1m_5m_15m")),
+                                 default=None),
+        "max_host_codex_process_count": max((item["host_codex_process_count"]
+                                             for item in pressure if item.get("host_codex_process_count") is not None),
+                                            default=None),
+        "max_host_codex_rss_kib": max((item["host_codex_rss_kib"]
+                                      for item in pressure if item.get("host_codex_rss_kib") is not None),
+                                     default=None),
+        "cell_results": returned,
+        "raw_process_command_lines_retained": False,
+    }
+
+
 def write_new(path: Path, value: dict[str, Any]) -> None:
     with path.open("x", encoding="utf-8") as out:
         json.dump(value, out, sort_keys=True, indent=2, ensure_ascii=False)
         out.write("\n")
+        out.flush()
+        os.fsync(out.fileno())
 
 
 def verify_freeze(path: Path, expected_sha: str) -> dict[str, Any]:
@@ -208,6 +323,7 @@ def cell_once(cell: dict[str, str], results: Path, freeze_path: Path,
     write_new(episode / "started.json", {
         "schema": "opensocrates.go-ts.episode-start/1", "cell": cell,
         "utc": utc(), "freeze_sha256": freeze_sha,
+        "resource": resource_snapshot(),
         "terminal_missing_means_unknown_not_retry": True,
     })
     auth = episode / "home/.codex/auth.json"
@@ -233,7 +349,8 @@ def cell_once(cell: dict[str, str], results: Path, freeze_path: Path,
         )
         status = "terminal" if (episode / "summary.json").is_file() else "unknown_after_start"
         terminal = {"schema": "opensocrates.go-ts.episode-terminal/1",
-                    "utc": utc(), "child_exit_code": child.returncode, "status": status}
+                    "utc": utc(), "child_exit_code": child.returncode, "status": status,
+                    "resource": resource_snapshot()}
         write_new(episode / "terminal.json", terminal)
         return {"cell_id": cell["id"], **terminal}
     except Exception as error:
@@ -322,8 +439,13 @@ def main() -> None:
         with ThreadPoolExecutor(max_workers=args.max_workers) as pool:
             futures = [pool.submit(cell_once, cell, args.results, args.freeze,
                                    args.freeze_sha256) for cell in selected]
+            returned = []
             for future in as_completed(futures):
-                print(json.dumps(future.result(), sort_keys=True), flush=True)
+                result = future.result()
+                returned.append(result)
+                print(json.dumps(result, sort_keys=True), flush=True)
+        write_new(args.results / "dispatch-index.json",
+                  dispatch_summary(args.results, selected, returned, args.max_workers))
 
 
 if __name__ == "__main__":
