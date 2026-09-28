@@ -1,0 +1,251 @@
+{
+  "Sol_A_narrow_review": {
+    "design_json_sha256": "3cc6a3a81aaa7430d21513f737a889eab3e688c29e7b453fd3a175868d8baba9",
+    "expect_key_expresses_expected_outcome": true,
+    "formal_design_status_unchanged": true,
+    "full_implementation_scope_status_separate": "deterministic_pass",
+    "fully_specified_standalone_HTTP_example_count_at_least_four_demonstrated": false,
+    "observation": "First example specifies method/path/tenant/role/body and result; replay and conflict examples refer back to it. GET summary specifies query/role/tenant. ACK-first and policy-revision examples omit concrete event/policy payloads, so six items are not proof of four independently runnable cases.",
+    "qualifier_design_receipt_sha256": "e706f206823084d7868b12c635f47f049d54e3cdfb93264381cffb16c40240c9",
+    "six_request_expect_pairs": true
+  },
+  "all_other_design_checks_passed": true,
+  "all_rows_have_at_least_four_entries": true,
+  "design_rows": 24,
+  "example_item_shape_counts": {
+    "flat_http_method_path_status": 4,
+    "other_object": 9,
+    "request_expect": 25,
+    "request_expected": 18,
+    "steps_requests_or_input": 99
+  },
+  "formal_examples_fail_rows": 22,
+  "formal_pass_rows": 2,
+  "frozen_secondary_design_checker_sha256": "dd7656c98deafed8038d66027388e3e41b04a58a787e894d0b1a33d9f0e9449d",
+  "interpretation": "The request/expected-key gate is not stated in public contract or public native check; failed rows do not prove absent examples. Alternative content varies and this audit does not upgrade any design status or judge design quality.",
+  "model_calls_by_audit": 0,
+  "original_S_qualification_index_sha256": "c9b83a2380b6300e601e701d814b51e55de394fdd596c33219e86e495645686e",
+  "original_results_changed": false,
+  "public_contract_sha256": "434259e0dbe2a50ccba830c3aa272a742ed47631e594e921dfaf6f201265c3da",
+  "public_native_check_sha256": "5e9a48b76ff0caf1861c81d4574796746006f71dd75c25ab7442eb4f7672107c",
+  "rows": [
+    {
+      "cell_id": "S-gpt-6-sol-high-A",
+      "design_json_sha256": "3cc6a3a81aaa7430d21513f737a889eab3e688c29e7b453fd3a175868d8baba9",
+      "example_count": 6,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "single-v1-design"
+    },
+    {
+      "cell_id": "S-gpt-6-sol-high-B",
+      "design_json_sha256": "ff69c22be301074c825bc7dca1209f741b203d1dfec560367c6a54b50426542c",
+      "example_count": 4,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "single-v1-design"
+    },
+    {
+      "cell_id": "S-gpt-6-sol-high-C",
+      "design_json_sha256": "5dad242bc3c27fc9cccb263d36438d18a49547052ca060898eb4c3748c6b8d4a",
+      "example_count": 8,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v1"
+    },
+    {
+      "cell_id": "S-gpt-6-sol-high-D",
+      "design_json_sha256": "f86f66b42ac5113360888bd7d935d5ef1f696ea092b5443bb0194f9498ac270a",
+      "example_count": 6,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v1"
+    },
+    {
+      "cell_id": "S-gpt-6-sol-high-D",
+      "design_json_sha256": "43af5d1a042e3c3ca79b73f2c3425ac384f1f34604e922bf7a58420544731e37",
+      "example_count": 7,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v2"
+    },
+    {
+      "cell_id": "S-gpt-6-sol-high-D",
+      "design_json_sha256": "68d3e0d57a2b6488b353dedc9717f050fad0513035d91727ee287bc4cfbde870",
+      "example_count": 7,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v3"
+    },
+    {
+      "cell_id": "S-gpt-6-luna-max-B",
+      "design_json_sha256": "eeea2a1eefcef3bc9d7a2b4b0481f41898ec25ac16fdf1affb995b9e42f1e696",
+      "example_count": 5,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "single-v1-design"
+    },
+    {
+      "cell_id": "S-gpt-6-luna-max-C",
+      "design_json_sha256": "55d293df52c6033d173fd328b2694af873ba47570b8b9b66d270094d9022beca",
+      "example_count": 6,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v1"
+    },
+    {
+      "cell_id": "S-gpt-6-luna-max-D",
+      "design_json_sha256": "96a7e00b5c7879e30436abfc38e28be023c06de4ecce4c1a55d9d6367e685674",
+      "example_count": 5,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v1"
+    },
+    {
+      "cell_id": "S-gpt-6-luna-high-B",
+      "design_json_sha256": "c9054cb62798fc43cb51bb1eb9e536382c52c52cc66b2724d72421915af70b2d",
+      "example_count": 5,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "single-v1-design"
+    },
+    {
+      "cell_id": "S-gpt-6-luna-high-C",
+      "design_json_sha256": "2e423261971659c909a203e3758e111f7c3956fd44ff03efd89a154bf1e2e8cb",
+      "example_count": 6,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v1"
+    },
+    {
+      "cell_id": "S-gpt-6-luna-high-D",
+      "design_json_sha256": "9646f2ce2f7a64b93e0b620adcffe8217cf8e3d2c75d065a0083036eb96655c2",
+      "example_count": 5,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v1"
+    },
+    {
+      "cell_id": "S-gpt-5.6-luna-max-A",
+      "design_json_sha256": "acb21fe9b1ea7d40e6f1ea64c1a55c117f134e010a774b8856ff89327ab5b003",
+      "example_count": 5,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "single-v1-design"
+    },
+    {
+      "cell_id": "S-gpt-5.6-luna-max-B",
+      "design_json_sha256": "131c4f40d8e53399e256846cb6d03e7981ff574a7550abd937865bc4e7fd0aeb",
+      "example_count": 5,
+      "formal_status": "deterministic_pass",
+      "other_design_checks_passed": true,
+      "request_expected_each": true,
+      "variant": "single-v1-design"
+    },
+    {
+      "cell_id": "S-gpt-5.6-luna-max-C",
+      "design_json_sha256": "f6e6e3b87ca9b96895cbfb8d78a3680e44b0e2587a314fe6d41359e17eaf79ce",
+      "example_count": 8,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v1"
+    },
+    {
+      "cell_id": "S-gpt-5.6-luna-max-D",
+      "design_json_sha256": "82e0fe276f738114b6fc087b603c7c8a40933f688307f9abba3e17ef6bb1a0f2",
+      "example_count": 8,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v1"
+    },
+    {
+      "cell_id": "S-gpt-5.6-luna-max-D",
+      "design_json_sha256": "28d15defbb638eb7acbf99ef251f879a42320871881f2351e98a2bc485d2cce6",
+      "example_count": 8,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v2"
+    },
+    {
+      "cell_id": "S-gpt-5.6-luna-high-A",
+      "design_json_sha256": "51e2edf4734add29750e4a829430a4a2b6c52a36cf2582b28c4d439c3c502b0e",
+      "example_count": 6,
+      "formal_status": "deterministic_pass",
+      "other_design_checks_passed": true,
+      "request_expected_each": true,
+      "variant": "single-v1-design"
+    },
+    {
+      "cell_id": "S-gpt-5.6-luna-high-B",
+      "design_json_sha256": "d82110624838569390f7474bc8a55839dd673ccb08910fe204fbd7e88b16ae23",
+      "example_count": 6,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "single-v1-design"
+    },
+    {
+      "cell_id": "S-gpt-5.6-luna-high-C",
+      "design_json_sha256": "a68002f702d84df77e32ccdb096359a3c9586a83a0c57b47f021b4f7dc83fd18",
+      "example_count": 7,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v1"
+    },
+    {
+      "cell_id": "S-gpt-5.6-luna-high-D",
+      "design_json_sha256": "9d0d399fcda0b4f8e26f505183704ce54aec9d829902457e5cc6116f96232d15",
+      "example_count": 6,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v1"
+    },
+    {
+      "cell_id": "S-gpt-6-astra-xhigh-B",
+      "design_json_sha256": "577fb0677a62fc39da789ab652fb9e67352829e3b5f842edc0cb5ef545bc01d7",
+      "example_count": 4,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "single-v1-design"
+    },
+    {
+      "cell_id": "S-gpt-6-astra-xhigh-C",
+      "design_json_sha256": "c1a7afc0d5f65036b1ece6d95833843284121d5e86c5d978b7ee8709a9204af2",
+      "example_count": 12,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v1"
+    },
+    {
+      "cell_id": "S-gpt-6-astra-xhigh-D",
+      "design_json_sha256": "1c63ec063fe24d0e1ef20ac3647f1bf8be96e450233b78413e6320870fbc5e14",
+      "example_count": 10,
+      "formal_status": "deterministic_failure",
+      "other_design_checks_passed": true,
+      "request_expected_each": false,
+      "variant": "S-design-v1"
+    }
+  ],
+  "schema": "opensocrates.go-ts.S24-design-example-shape-audit/2",
+  "supersedes_audit_sha256": "1f0c07f80790901fb2bb8a67574efd145bcf1c8aea1b12bdf2c8ba3ee24451a3"
+}
