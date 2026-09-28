@@ -104,7 +104,12 @@ def request_for(cell: dict[str, Any], source: Path, candidate: Path,
 
 def setup_one(cell: dict[str, Any], fixture_root: Path, episode: Path) -> dict[str, Any]:
     setup, _ = fixture(fixture_root)
-    episode.mkdir(mode=0o700, parents=True, exist_ok=False)
+    if episode.exists():
+        if not episode.is_dir() or any((episode / name).exists()
+                                           for name in ("source", "private-store", "candidate")):
+            raise ValueError("continuity_episode_already_prepared")
+    else:
+        episode.mkdir(mode=0o700, parents=True, exist_ok=False)
     source, planned = materialize(cell, fixture_root, episode)
     registry = ProjectRegistry(episode / "private-store")
     identities: dict[str, str | None] = {
@@ -206,17 +211,35 @@ def setup_one(cell: dict[str, Any], fixture_root: Path, episode: Path) -> dict[s
     else:
         if projected["status"] != "disabled" or projected["records"]:
             raise ValueError("disabled_note_condition_not_disabled")
+    note_equivalent_ids: list[str] = []
+    note_sha256 = None
+    if cell["condition"] == "disabled_memory_with_equivalent_note":
+        note = source / "maintained_note.md"
+        expected_note = fixture_root / "continuity" / cell["maintained_note"]
+        if not note.is_file() or note.read_bytes() != expected_note.read_bytes():
+            raise ValueError("maintained_note_materialization_changed")
+        note_sha256 = "sha256:" + sha(note.read_bytes())
+        note_equivalent_ids = [*retained, stale, proposed]
     return {
         "schema": "opensocrates.go-ts.continuity-memory-setup/1",
         "cell_id": cell["id"], "condition": cell["condition"],
         "project_id": binding["project_id"], "workspace_id": binding["workspace_id"],
         "source_before_sha256": before_hash, "source_after_sha256": after_hash,
+        "current_source_before_sha256": before_hash.removeprefix("sha256:"),
+        "current_source_after_sha256": after_hash.removeprefix("sha256:"),
+        "api_readback_verified": True, "correction_replayed": True,
+        "scoped_forget_applied": deleted["result"]["deleted_record_id"] == removed,
+        "control_only": False,
         "deleted_record_id": deleted["result"]["deleted_record_id"],
         "persisted_record_count": len(records),
+        "persisted_record_ids": sorted(by_id),
         "retained_record_ids": retained, "stale_record_id": stale,
         "proposed_record_id": proposed,
         "projection_status": projected["status"],
         "projection_record_ids": [item["record_id"] for item in projected["records"]],
+        "projected_record_ids": [item["record_id"] for item in projected["records"]],
+        "maintained_note_equivalent_ids": note_equivalent_ids,
+        "maintained_note_sha256": note_sha256,
         "stale_projection": next((item["freshness"] for item in projected["records"]
                                   if item["record_id"] == stale), None),
         "export_sha256": "sha256:" + sha(json.dumps(exported, sort_keys=True).encode()),
@@ -241,7 +264,11 @@ def main() -> None:
     results = []
     for cell in description["cells"]:
         try:
-            results.append(setup_one(cell, args.fixtures, args.output_root / cell["id"]))
+            result = setup_one(cell, args.fixtures, args.output_root / cell["id"])
+            results.append(result)
+            with (args.output_root / cell["id"] / "memory-setup.json").open("x", encoding="utf-8") as out:
+                json.dump(result, out, sort_keys=True, indent=2, ensure_ascii=False)
+                out.write("\n")
         except (OSError, ValueError) as error:
             results.append({"cell_id": cell["id"], "status": "setup_unavailable",
                             "error_type": type(error).__name__, "role_model_calls": 0})
