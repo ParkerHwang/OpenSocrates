@@ -1,0 +1,79 @@
+{
+  "schema": "opensocrates.go-ts.O-v2-reassessment-rules/1",
+  "status": "post_hoc_unblinded_diagnostic_only",
+  "original_outcome_policy": "never_mutate_or_replace_frozen_index_receipts_or_candidate_artifacts",
+  "source_register": {
+    "required_fields": ["id", "path", "sha256"],
+    "sha256_encodings": ["64_lowercase_hex"],
+    "allow_additive_fields": true,
+    "embedded_register_policy": "if_metrics_sources_present_it_must_match_frozen_register_too",
+    "duplicate_id_policy": "reject",
+    "missing_extra_wrong_digest_policy": "reject"
+  },
+  "metrics": {
+    "required_sections": ["selection", "backlog", "sla", "cost", "capacity", "portfolios", "eligible_ranking", "sensitivity"],
+    "selection_fields": ["orders", "selected_events", "future_ignored", "corrected", "cancelled", "completed"],
+    "sla_aliases": {
+      "eligible": ["eligible"],
+      "on_time": ["on_time"],
+      "late": ["late"],
+      "attainment": ["attainment"],
+      "known_credit_cents": ["known_credit_cents"],
+      "unknown_credit_jobs": ["unknown_credit_jobs"],
+      "zero_charge_completed_jobs": ["zero_charge_completed_jobs", "zero_charge_eligible_jobs", "zero_charge_completed"]
+    },
+    "cost_aliases": {
+      "known_part_cents": ["known_part_cents", "known_parts_cents"],
+      "unknown_part_lines": ["unknown_part_lines"],
+      "unknown_part_jobs": ["unknown_part_jobs"],
+      "known_labor_cents": ["known_labor_cents"],
+      "unknown_labor_jobs": ["unknown_labor_jobs"],
+      "known_credit_cents": ["known_credit_cents"]
+    },
+    "capacity_formats": ["facility_to_month_map", "exactly_16_unique_facility_month_rows"],
+    "capacity_row_identity": ["facility", "month"],
+    "capacity_aliases": {
+      "available_minutes": ["available_minutes"],
+      "used_known_minutes": ["used_known_minutes", "known_used_minutes", "used_minutes"],
+      "unknown_work_jobs": ["unknown_work_jobs"]
+    },
+    "portfolios_formats": ["option_id_map", "exactly_10_unique_id_or_name_rows"],
+    "portfolios_aliases": {
+      "covered_completed_jobs": ["covered_completed_jobs", "covered_jobs"],
+      "coverage_ratio": ["coverage_ratio", "covered_job_ratio"],
+      "known_variable_cents": ["known_variable_cents"],
+      "fixed_shared_cents": ["fixed_shared_cents", "fixed_plus_shared_cents"],
+      "period_cost_lower_bound_cents": ["period_cost_lower_bound_cents"],
+      "capacity_feasible": ["capacity_feasible"],
+      "decision_eligible": ["decision_eligible"]
+    },
+    "sensitivity_relay_objects": ["relay_rate_increase", "relay_price_increase", "relay_rates"],
+    "sensitivity_west_objects": ["west_june_capacity_reduction", "west_june_capacity"],
+    "sensitivity_relay_baseline_aliases": ["baseline_known_part_cents", "baseline_known_parts_cents"],
+    "sensitivity_relay_scenario_aliases": ["scenario_known_part_cents", "scenario_known_parts_cents"],
+    "sensitivity_west_baseline_aliases": ["baseline_available_minutes"],
+    "sensitivity_west_scenario_aliases": ["scenario_available_minutes"],
+    "sensitivity_changed_sets": ["changed_capacity_feasibility", "changed_decision_eligibility"],
+    "sensitivity_changed_portfolios_alternative": "baseline/scenario booleans keyed by declared option identity",
+    "multiple_alias_policy": "all_present_aliases_must_agree",
+    "portfolio_arithmetic": "known_variable_cents_plus_fixed_shared_cents_equals_period_cost_lower_bound_cents",
+    "numeric_policy": "exact_typed_integers_and_exact_four_place_decimal_strings",
+    "ranking_policy": "exact_ordered_declared_option_names"
+  },
+  "memo": {
+    "pointer_policy": "RFC6901_resolve_against_candidate_metrics_with_numeric_array_segments",
+    "value_policy": "exact_typed_JSON_literal_or_exact_unquoted_string",
+    "citations_policy": "only_frozen_source_IDs_and_required_relevant_sources",
+    "coverage_policy": "selection_backlog_sla_cost_sensitivity_and_each_declared_option_public_fact_categories",
+    "narrative_policy": "recommendation_declared_and_eligible_with_nonempty_criterion_uncertainty_plan_risk_assumption",
+    "semantic_quality_limitation": "human_review_still_required"
+  },
+  "program": {
+    "generated_vs_committed": "exact_JSON_equality_mandatory_separate_gate",
+    "never_rerun_subject": true,
+    "generated_file": ".eval-generated-metrics.json",
+    "provenance": "must_match_frozen_external_receipt_after_hash_and_candidate_copy_committed_hash"
+  },
+  "missingness": "unmapped_representation_or_missing_generated_file_is_reported_separately_from_numeric_mismatch",
+  "usage": "zero_model_calls_no_subject_repair_or_retry"
+}
