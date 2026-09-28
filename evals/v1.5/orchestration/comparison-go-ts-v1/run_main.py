@@ -258,6 +258,8 @@ def main() -> None:
     parser.add_argument("--max-workers", type=int)
     parser.add_argument("--descriptor", type=Path,
                         help="pre-integration dry-run only; outcome execution uses committed fixtures")
+    parser.add_argument("--task", choices=["S", "O"],
+                        help="limit a no-model dry-run to one independently frozen task")
     args = parser.parse_args()
     cells = main_cells()
     if args.command == "list":
@@ -267,8 +269,8 @@ def main() -> None:
         from protocol import single_assignment
         count = 0
         source_descriptor = args.descriptor or DESCRIPTOR
-        data = descriptor(source_descriptor)
-        for cell in cells:
+        data = descriptor(source_descriptor, tasks={args.task} if args.task else None)
+        for cell in (item for item in cells if args.task is None or item["task"] == args.task):
             task = data["tasks"][cell["task"]]
             public = source_descriptor.parent / task["public_root"]
             if cell["arm"] in {"A", "B"}:
@@ -302,6 +304,8 @@ def main() -> None:
         parser.error("outcomes require --outcomes-enabled, --results, --freeze, and --freeze-sha256")
     if args.descriptor is not None:
         parser.error("--descriptor is only available for dry-run")
+    if args.task is not None:
+        parser.error("--task is only available for dry-run")
     verify_freeze(args.freeze, args.freeze_sha256)
     frozen_ids = json.loads(args.freeze.read_text())["cell_ids"]
     selected = [cell for cell in cells if cell["id"] in set(frozen_ids)]
