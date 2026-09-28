@@ -1,0 +1,56 @@
+{
+  "assessment": "three_source_lineage_checker_failures_are_lexical_false_negatives",
+  "assessment_origin": "independent_read_only_contract_and_artifact_review",
+  "cases": [
+    {
+      "candidate_hashes": {
+        "continuation.json": "sha256:c42f087669042af454fdd4fbec3b2499733620d4ea015b72ee5b3594aa30fe46",
+        "handoff.md": "sha256:d93895883f5d6caecfee5f8d2354c507807ad8aa830c394ba04384b3e733d869"
+      },
+      "cell_id": "continuity-gpt-6-sol-high-en-scoped_disposable_memory",
+      "native_qualified": true,
+      "original_failed_obligations": [
+        "continuity_source_lineage"
+      ],
+      "original_status": "deterministic_failure",
+      "variant": "continuation-v1"
+    },
+    {
+      "candidate_hashes": {
+        "continuation.json": "sha256:dbcbd640915ca0b352681d4aa58e98bfa1cece73deba600de6d2ae8ec6dcaeeb",
+        "handoff.md": "sha256:9735e33220e6418c646b4eaf7e07153f5b95390e512f546e55209d3f6a793cb0"
+      },
+      "cell_id": "continuity-gpt-6-sol-high-en-disabled_memory_with_equivalent_note",
+      "native_qualified": false,
+      "original_failed_obligations": [
+        "continuity_source_lineage"
+      ],
+      "original_status": "deterministic_failure",
+      "variant": "continuation-v1"
+    },
+    {
+      "candidate_hashes": {
+        "continuation.json": "sha256:bf6b5e6c6b82c3daf9872eb91797380da0eb98303a6acbe5f2e6f554dc083050",
+        "handoff.md": "sha256:3b5135824e3804882b68b7339d35fa26a03827f67ac9ae1abcd3888797a32f93"
+      },
+      "cell_id": "continuity-gpt-6-luna-high-ko-scoped_disposable_memory",
+      "native_qualified": true,
+      "original_failed_obligations": [
+        "continuity_source_lineage"
+      ],
+      "original_status": "deterministic_failure",
+      "variant": "continuation-v1"
+    }
+  ],
+  "formal_checker_results_remain_frozen": true,
+  "notes": [
+    "Two English artifacts express that revision 2 supersedes revision 1; the frozen checker recognizes a different form of the verb.",
+    "One Korean artifact explicitly identifies the old source-v1 45-minute fact as corrected and rejects it as current.",
+    "All three passed their other deterministic obligations and real post-role state checks. Native qualification remains a separate gate."
+  ],
+  "original_index_sha256": "4c2e8cd9cedda45fc9a52e479c9b63fee35d74ceb7dbd85b435d7c9541f08654",
+  "original_results_unchanged": true,
+  "schema": "opensocrates.go-ts.continuity-semantic-annotation/1",
+  "scope": "lineage_obligation_only",
+  "score_override_applied": false
+}
