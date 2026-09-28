@@ -67,7 +67,7 @@ def tool_hashes() -> dict[str, str]:
     return {str(path): sha(path.read_bytes()) for path in paths}
 
 
-def package_guides(task: dict[str, Any]) -> dict[str, Any]:
+def package_guides(task: dict[str, Any], task_key: str = "O") -> dict[str, Any]:
     d: dict[str, Any] = {}
     mismatch = []
     prefix = "runtime/darwin-arm64/opensocrates-runtime/_internal/plugin-src/shared/"
@@ -95,7 +95,7 @@ def package_guides(task: dict[str, Any]) -> dict[str, Any]:
             member = schema_prefix + path
             if member not in names or (ROOT / path).read_bytes() != archive.read(member):
                 mismatch.append("D_schema_package_mismatch:" + path)
-    b = b_guides("O", "en")
+    b = b_guides(task_key, "en")
     d["B-single"] = [{"id": item["id"], "sha256": item["sha256"]} for item in b]
     return {"manifest": d, "mismatches": mismatch}
 

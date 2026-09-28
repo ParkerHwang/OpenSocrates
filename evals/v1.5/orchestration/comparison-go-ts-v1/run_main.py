@@ -209,6 +209,13 @@ def verify_freeze(path: Path, expected_sha: str) -> dict[str, Any]:
     if (boundary.get("accepted_component_evidence") is not True
         or boundary != value["boundary_component_decision"]):
         raise ValueError("boundary_component_decision_changed")
+    if "s_browser_transport_decision" in value:
+        path = HERE / "S_BOUNDARY_DECISION.json"
+        if sha(path.read_bytes()) != value["s_boundary_decision_sha256"]:
+            raise ValueError("S_browser_decision_bytes_changed")
+        parent_decision = json.loads(path.read_text())
+        if {key: parent_decision.get(key) for key in ("status", "attribution", "reference")} != value["s_browser_transport_decision"]:
+            raise ValueError("S_browser_decision_scope_changed")
     return value
 
 
