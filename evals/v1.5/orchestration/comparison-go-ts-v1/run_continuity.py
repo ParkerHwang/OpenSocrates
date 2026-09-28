@@ -22,7 +22,7 @@ from boundary_gate import evaluate as evaluate_boundary_gate
 from continuity_memory import HERE, SHIM, fixture, request_for, setup_one
 from observer import ObservedAdapter, reconcile
 from protocol import CLIENT, ROOT, sha
-from run_main import profile, write_new
+from run_main import dispatch_summary, profile, resource_snapshot, write_new
 from usage import aggregate
 
 
@@ -56,6 +56,9 @@ def verify_freeze(path: Path, expected_sha: str) -> dict[str, Any]:
         raise ValueError("continuity_descriptor_changed")
     if sha((HERE / "fixtures/continuity/private/harness_setup.json").read_bytes()) != frozen["memory_setup_sha256"]:
         raise ValueError("continuity_setup_changed")
+    for relative, expected in frozen["fixture_file_hashes"].items():
+        if sha((HERE / "fixtures/continuity" / relative).read_bytes()) != expected:
+            raise ValueError("continuity_fixture_changed:" + relative)
     return frozen
 
 
@@ -103,6 +106,7 @@ def one(cell: dict[str, Any], results: Path, freeze_path: Path,
     write_new(episode / "started.json", {
         "schema": "opensocrates.go-ts.continuity-start/1",
         "cell_id": cell["id"], "utc": utc(), "freeze_sha256": freeze_sha,
+        "resource": resource_snapshot(),
         "terminal_missing_means_unknown_not_retry": True,
     })
     auth = episode / "home/.codex/auth.json"
@@ -131,6 +135,7 @@ def one(cell: dict[str, Any], results: Path, freeze_path: Path,
         )
         result = {"schema": "opensocrates.go-ts.continuity-terminal/1",
                   "cell_id": cell["id"], "utc": utc(), "child_exit_code": proc.returncode,
+                  "resource": resource_snapshot(),
                   "status": "terminal" if (episode / "summary.json").is_file() else "unknown_after_start"}
         write_new(episode / "terminal.json", result)
         return result
@@ -187,8 +192,13 @@ def main() -> None:
         with ThreadPoolExecutor(max_workers=args.max_workers) as pool:
             futures = [pool.submit(one, item, args.results, args.freeze, args.freeze_sha256)
                        for item in selected]
+            returned = []
             for future in as_completed(futures):
-                print(json.dumps(future.result(), sort_keys=True), flush=True)
+                value = future.result()
+                returned.append(value)
+                print(json.dumps(value, sort_keys=True), flush=True)
+        write_new(args.results / "dispatch-index.json",
+                  dispatch_summary(args.results, selected, returned, args.max_workers))
 
 
 if __name__ == "__main__":
