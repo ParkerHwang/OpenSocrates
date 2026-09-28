@@ -1,0 +1,3 @@
+# Maintained note after correction and scoped deletion
+
+Accepted and still valid: Go backend, TypeScript frontend, fake outbox only, read-only viewer access, and retention of keyboard focus after dashboard refresh. These are settled choices. The old source-dependent P1 delay of 45 minutes is explicitly stale because service-policy revision 2 supersedes revision 1. Use the current source for the corrected number. Purple visual tone is only a proposal, not accepted intent. The owner for an unassigned handover is pending. The scoped temporary demo-region record was deleted and is absent from this note.

@@ -1,0 +1,48 @@
+{
+  "schema": "opensocrates.eval.fixture-prep-freeze/1.3.0",
+  "lane": "continuity-en-ko",
+  "base_commit": "d0156a86cfd4dc197554f1be0261c258cec7da2e",
+  "descriptor_sha256": "cfca2364d5414be516baa84c31b42cbef3fd5b0040537f4c7f3cd3ef098943b2",
+  "readme_sha256": "2a7905779cfee42c5a9d90e59d2e3ba788a450a77da5184df612f6fad96cec62",
+  "public_files": {
+    "public/CONTRACT.en.md": "a0b99ab4e934b7ac28cd6ca19e01fadb919c0dd1c60953d21432e5b78d9618ed",
+    "public/CONTRACT.ko.md": "5fe7c585c5aad71919ac8bd0a51e5095a32d2501aa0b28cb34322329bffe4faf",
+    "public/current-source.md": "07539d119d403eb93ee698113a6cda668365d27a17c2dca4017b1a3e707a1dd8",
+    "public/native_check.py": "369d7fe7e1419b3bdd5d93affb28888561362c546190c69ce73ba968984cf76c",
+    "public/source-v1.json": "955b25a41d953903d0c2a2c00aa504c1ca88e84f1ea7ededd738c30924d3df33",
+    "public/source-v2.json": "3c85796e795151dd4fe0f6c633a28b886c977183638e471d7bdf9380e4edc001",
+    "public/starter/continuation.json": "28f4d955cac1647a6652cba5f3040288e21799be6dbf52808caef5ed76e12aa5",
+    "public/starter/handoff.en.md": "a9576785ab4676912bf78a163e939f47d0e1dde35474669cf5e8bd57e6802f2c",
+    "public/starter/handoff.ko.md": "5a596357618eede37d6239b7e933634afac4b8aed3e58c376f4f8fdfd72af955"
+  },
+  "private_files": {
+    "private/control_selftest.py": "ca7bddbb824c2508419d6617fd55759148df241bd5654fa9de49f70ff4006824",
+    "private/controls/good/en/continuation.json": "28b41460c6c902d353c146aa63f257a7e50675f3752613ea6f103bb62dd30ab3",
+    "private/controls/good/en/handoff.md": "c923bb755baf52cc3bcdb5af0051df55c7e288e46e8762f2d6967ae7543792fe",
+    "private/controls/good/ko/continuation.json": "e27070051e2520d9d45b519bc264a384900fc31a51fdcc68f58bf6965dc58f45",
+    "private/controls/good/ko/handoff.md": "312ed6cc922ad9356b8d1026d4f954a3d8f159bc523f14ce7f9c9379f7950c57",
+    "private/controls/good/synthetic_state_receipt.json": "0ec6f2e4b7f77f2cd42aca8b3486e6e0bac461187863c63e42f3d6bb0289ff3a",
+    "private/controls/selftest.json": "bfee206131e7eed53450efedfab8ca7b8e4941a7adc945748a72c8fa6185d44b",
+    "private/harness_initial_source.md": "cf54dcaf50b46923811d3382d1de19e51c1ae294131f7a348d5de2d45720cac2",
+    "private/harness_setup.json": "401bd07a9d8028c9faeb1d7693ef0c943ff10fa7476649721cad3859171d0601",
+    "private/maintained_note.en.md": "5292d5c6c2262145e2b5b3bd89e724dc5a07dee2d9fdc9a87213aee4688a2cb0",
+    "private/maintained_note.ko.md": "42e33070bc58ad780fd2d98115cd41634c383bf20bf6cead34e47e76b12f64f1",
+    "private/native_selftest.json": "2ef1105ce6fc82612fc34b2de088f72840fa4ad8dd8662bf2482883f692ee519",
+    "private/verify_continuity.py": "3b27bdc05bd38c8424faecc3ded53d5168145e4ac7c80a7448b46bb07e8a643c"
+  },
+  "episode_count": 8,
+  "control_checks": 36,
+  "control_selftest_passed": true,
+  "native_unique_conditions_checked": 4,
+  "native_static_passed": true,
+  "actual_memory_api_state_verified": false,
+  "tracked_source_format": "Markdown; initial private harness bytes then public final bytes at one path",
+  "note_native_projection": "disabled and empty",
+  "memory_arm_note": "absent",
+  "outcome_calls": 0,
+  "limitations": [
+    "Synthetic state receipts establish checker behavior only; runner-owned real memory API readback is separate.",
+    "The disabled note condition must not be credited as a native memory projection.",
+    "Clarification timing requires observable earlier public messages."
+  ]
+}
