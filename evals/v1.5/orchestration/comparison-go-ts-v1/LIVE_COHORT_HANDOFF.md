@@ -1,5 +1,11 @@
 # Go/TypeScript comparison: three live cohorts
 
+This is the **initial dispatch snapshot**, preserved for exact execution
+identities and operator procedure. O24 and continuity8 have since completed
+their serial post-generation checks. See [INTERIM_RESULTS.md](INTERIM_RESULTS.md)
+for the current completed/pending state. Do not launch a second qualifier from
+the historical instructions below.
+
 Status: **all 56 planned episodes have been dispatched once**. This means
 48 main cells (O24 and S24) plus eight separate EN/KO continuation cells have
 started; it does not mean they have finished or passed. All three runs use
@@ -46,7 +52,8 @@ The scoped demo record is deleted through the existing API. The role has no
 memory mutation authority. `CONTINUITY_API_PREFLIGHT.json` is pre-call
 capability evidence; each live cell's own `memory-setup.json` is its state
 receipt. The private post-generation checker and read-only export/inspect
-comparison remain to be run on exact terminal versions.
+comparison were scheduled for exact terminal versions; their completed
+receipts are linked from the interim results report.
 
 Use the read-only `monitor.py` with each table result root and coordinator PID
 to observe claimed/started/terminal episodes, role starts/completions,

@@ -65,6 +65,17 @@ count of 17 demonstrated arithmetic errors. Program/artifact divergences and
 source-register defects remain separate, real findings where their exact
 receipts support them.
 
+The independently reproduced [O usage report](usage_analysis/O24_USAGE.md)
+reconciles all 54 role receipts, including 17 post-call invalid-output
+assessments, separately from 23 native checks. All five exposed token fields
+are present for those calls: reported input 22,604,903 and output 1,129,228;
+cached input 19,301,120 is a subset of input, and reasoning output 430,962
+is a subset of output. Backend-attempt counts are unavailable for all 54, and
+these counters are not a billed-cost claim. Its [machine-readable receipt](usage_analysis/O24_USAGE.json)
+retains per-field missingness and exact input inventory hashes.
+The usage report's `qualified_candidate` counts describe terminal native
+C/D **unit** states; they are not independently qualified full projects.
+
 The Astra/xhigh A full memo has 107/107 table pointer/value rows
 valid. Its one formal diagnostic miss is the `future_ignored` row lacking a
 `manifest-v2` citation although the cutoff is stated in the public contract
@@ -98,6 +109,35 @@ hashes. No score override was applied. A 124-file allowlisted host-local
 continuity export has SHA-256
 `71ed9fd4b8e66098aeddd0d30530fe0674202c270439001d03c2d7d9dd5ffb3c`.
 Eight examples do not establish a general memory advantage.
+The independently reproduced [continuity usage report](usage_analysis/CONTINUITY8_USAGE.md)
+accounts for all 24 role receipts, including four post-call invalid-output
+assessments, separately from eight native checks. Reported input is 1,648,752
+and output 32,910; cached input 1,254,912 and reasoning output 14,166 remain
+subsets. Backend attempts are unavailable for all 24. Its
+[machine-readable receipt](usage_analysis/CONTINUITY8_USAGE.json) retains the
+eight-cell denominator and null handling. O and continuity totals are not
+pooled as one outcome measure.
+
+The separately sourced [public event-category receipt](evidence/interim/o24-continuity8-observed-event-categories.json),
+SHA-256 `03f5345d0be558455bf2a5bc96f24ee96f8e6270de5780fd204ff0106c64a64d`,
+binds all 32 original summary/response files and keeps the observer categories
+apart:
+
+| Observed category | O24 | Continuity8 |
+| --- | ---: | ---: |
+| Model-role calls | 54 | 24 |
+| `command_execution` starts / completions | 888 / 888 | 196 / 196 |
+| Public message items | 109 | 27 |
+| Unclassified `item.completed type=error` | 58 | 24 |
+| Top-level provider-error events | 20 | 0 |
+| Failed-turn events | 0 | 0 |
+| Local native-check pairs | 23 | 8 |
+| Backend-attempt counts unavailable | 54 | 24 |
+
+Command items are observed within role calls, not additional model calls or
+backend attempts. Public message counts contain no retained message bodies and
+do not establish semantic quality or user receipt. The unclassified item-error
+causes are unknown and are **not** silently combined with provider errors.
 
 ## Full-stack S24 and next qualification
 
