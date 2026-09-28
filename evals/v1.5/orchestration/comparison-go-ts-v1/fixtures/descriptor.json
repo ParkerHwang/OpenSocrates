@@ -1,0 +1,272 @@
+{
+  "baseline_commit": "d0156a86cfd4dc197554f1be0261c258cec7da2e",
+  "schema": "opensocrates.eval.comparison-fixtures/1.0.0",
+  "tasks": {
+    "O": {
+      "constraints": [
+        {
+          "id": "O2-contract",
+          "text": "# Regional repair-network decision, version 2 (synthetic)\n\nProduce an executable Go analysis and a source-linked Markdown recommendation from the frozen data room. This is a synthetic four-facility operation, not evidence of market demand. The decision cutoff is `2026-07-15T23:59:59Z`; the analysis period is the four calendar months March–June 2026. Read only the supplied files and register their source IDs and SHA-256 bytes; include `manifest-v2` for `manifest.json` plus the eight source IDs listed within it. `O-analysis` owns `analysis.go`, `metrics.json`, and `sources.json`; `O-document` depends on that unit and owns `memo.md`. `analysis.go` must run as `go run analysis.go -data <directory> -out <metrics path>` in an isolated copy, and the committed metric file must equal its generated output. Keep currency in integer cents and duration in integer minutes. No unrestricted web research, external accounts, live notifications, or binary office authoring are part of this task.\n\n## Reconcile records before aggregating\n\n`orders.json` has one immutable order per `order_id`, including created time, priority, assigned facility and warranty flag. `events_initial.json` and `events_corrections.json` together form one append-only event stream. For each order, choose the event with greatest `recorded_at` at or before cutoff; break exact-time ties by larger integer `revision`, then lexicographically larger `event_id`. A chosen event fully replaces status, completion time, work minutes, charge and parts. Ignore events recorded after cutoff even if their completion time is earlier. Reject duplicate event IDs or an event referring to an unknown order. Report total, selected, future-ignored, corrected (chosen revision > 1), cancelled and completed counts. Cancelled orders remain in reconciliation counts and are excluded from operating metrics. `open` and `scheduled` chosen statuses count toward backlog. A nonempty warranty job with known zero charge remains a completed/SLA-eligible job. `null` is unknown, numeric zero is known zero; never silently impute unknown as zero. All timestamps are UTC RFC3339. The frozen room contains late corrections, status reversals, tied revisions and missing fields. Keep source grain explicit.\n\n## SLA, parts, labor and capacity\n\nSelect the policy with greatest `effective_at <= order.created_at` for that priority; tie by larger revision. A completed noncancelled job with a completion timestamp is SLA-eligible. Completion at or before creation plus target hours is on time. Report eligible, on-time and late counts, attainment as a decimal string rounded half-up to four places (null for zero denominator), known credit cents and unknown-credit job count. For each late job with known charge, calculate `charge_cents * credit_bps / 10000`, round half-up to integer cents **per job**, then sum. A zero-charge late warranty job contributes known zero; a missing charge increments unknown-credit jobs. Do not select the numerically largest policy target or credit rate instead of the effective revision.\n\nEach selected completed event has a `parts` array. For each line with positive known quantity, select the matching supplier rate with greatest `effective_at <= completed_at`, tie by revision, calculate quantity × unit cents, then sum across lines and jobs. A line with known zero quantity costs zero without needing a rate. A null quantity or positive quantity without an effective rate is unknown; report unknown-part line count and the number of distinct jobs containing one. Do not use a product of aggregate quantities and prices. For labor, select the `capacity.json` row by assigned facility and completion month. Known work minutes × loaded hourly cents / 60 is rounded half-up **per completed job** before summing. Report known labor cents and unknown-labor job count. Missing work minutes do not become free labor. The frozen completed jobs all fall within the four-month analysis period.\n\n`capacity.json` has one row per facility and month with available minutes and loaded hourly cents. Report each row's available minutes and known used minutes from selected completed jobs. Missing work minutes make that site's capacity feasibility unknown rather than safely below capacity. A portfolio is capacity-feasible only if every included site/month has zero unknown-work jobs and used minutes no greater than available minutes. `shared_costs.json` gives monthly pairwise dispatch costs: add each pair once for every active pair in a portfolio, plus each active site's monthly fixed cost, over all four months. `portfolios.json` declares the options; do not invent or omit one. A portfolio covers only completed jobs originally assigned to its included sites; there is no unsupported reassignment. Report covered jobs, covered-job ratio (half-up four-place string), known variable cents (labor + parts + credits of covered jobs), four-month fixed-plus-shared cents, and their sum as a **period cost lower bound**. Unknown charges/parts/labor remain disclosed and make the lower bound uncertain. A declared option is decision-eligible only when capacity-feasible and covered-job ratio is at least the threshold in `manifest.json`. Report each option and sort a separate eligible ranking by lower-bound cost, then name.\n\nRun two scoped sensitivities. First, raise only `relay` supplier rates whose selected rate effective date is at or after `2026-04-01T00:00:00Z` by 10%, rounding half-up **per unit** before line multiplication; report baseline and scenario known-part totals without changing labor, SLA or fixed costs. Second, reduce only west facility's June available minutes by 15%, rounding down to whole minutes, and report which declared portfolios change capacity feasibility and decision eligibility. Do not apply either scenario to unrelated records.\n\nOutput stable JSON sections `selection`, `backlog`, `sla`, `cost`, `capacity`, `portfolios`, `eligible_ranking`, and `sensitivity`, with explicit numerator/denominator/unknown counts and source register. The memo compares **all declared options** in a numeric evidence table whose rows contain JSON pointer, exact value and relevant source IDs (for example `| /backlog | 4 | orders-v2, events-initial-v2, events-corrections-v2 |`). Cover selection orders/corrected/future/cancelled/completed, backlog, SLA eligible/on-time/attainment/unknown-credit/zero-charge, known part/labor/credit and unknown part/labor counts, relay and west-June sensitivities, plus each option's covered jobs, coverage ratio, period cost lower bound, capacity feasibility and decision eligibility. Add plain-text `Recommendation: <declared option>`, `Criterion: ...` and `Uncertainty: ...` lines, an operating plan, and a risk/assumption register. A different decision-eligible recommendation is allowed when its criterion and coverage/cost/unknown-data tradeoffs are explicit; a lower-cost partial-coverage option is not automatically best. Do not claim the synthetic orders forecast demand or that omitted work transfers freely. A polished memo cannot compensate for wrong calculations or fabricated source claims.\n\nNative read-only checks inspect file inventory, Go syntax, JSON structure and source hashes. They do not compile, execute or write Go code, open databases, run a browser or validate numeric outputs. The separate external qualifier compiles/runs Go only in a marked disposable copy under a stricter child sandbox, recomputes a private Python answer key from frozen source bytes, compares the exact returned artifact, and checks numeric/source links in the memo. Human semantic review remains necessary for recommendation quality. This version is a new subject workload; the smaller version-1 packet is retained only as oracle validation control and is never pooled with these outcomes.\n"
+        }
+      ],
+      "data_root": "data",
+      "external_qualification": {
+        "command_template": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "-B",
+          "{entrypoint}",
+          "--candidate",
+          "{marked_disposable_copy}",
+          "--deps",
+          "{deps_root}",
+          "--candidate-policy",
+          "{candidate_policy}"
+        ],
+        "entrypoint": "o_service_network_v2/private/verify_external_v2.py",
+        "obligations": {
+          "analysis": [
+            "frozen_input_bytes",
+            "go_build_run",
+            "program_matches_artifact",
+            "independent_numeric_oracle",
+            "source_register",
+            "source_integrity"
+          ],
+          "full": [
+            "all_analysis",
+            "memo_numeric_source_bindings",
+            "memo_decision_record",
+            "memo_structure"
+          ]
+        },
+        "sandbox": "trusted Python verifier plus strict candidate Go child; run-local writes and loopback only",
+        "scope_args": {
+          "O-analysis": [
+            "--scope",
+            "analysis"
+          ],
+          "O-document": []
+        }
+      },
+      "fixture_version": "2.0.0",
+      "handoff": [
+        "The contract and frozen data room are the complete accepted task facts for every arm.",
+        "Native checks are static only; external analysis/full scopes and independent semantic review remain separate."
+      ],
+      "objective": "Analyze the synthetic four-facility repair network with executable Go and deliver a sourced Markdown decision memo.",
+      "permissions": [
+        "Produce only declared candidate artifacts and run approved read-only native static checks; external qualification occurs in marked disposable copies."
+      ],
+      "prohibitions": [
+        "No existing-project write, live notifications, unrestricted web research, memory enrollment, binary office file or undeclared artifact."
+      ],
+      "public_root": "o_service_network_v2/public",
+      "required_artifacts": [
+        "analysis.go",
+        "metrics.json",
+        "sources.json",
+        "memo.md"
+      ],
+      "sources": [
+        {
+          "id": "contract",
+          "path": "CONTRACT.md",
+          "sha256": "sha256:ad44b913c95d9e27bed597f2caeaaea29644c08435549c520a3b95aea7e859cb"
+        },
+        {
+          "id": "native",
+          "path": "native_check.py",
+          "sha256": "sha256:ce3b693c6508427ae129ca741f35e183b19a7f4bbee52490669be6e9ff0445a1"
+        },
+        {
+          "id": "go-starter",
+          "path": "starter/analysis.go",
+          "sha256": "sha256:0403da8b664d31b20c2fd1e172d4c1cf0ad2b7a14ed3f2660b5cdeb7575e6b9d"
+        },
+        {
+          "id": "manifest-v2",
+          "path": "data/manifest.json",
+          "sha256": "sha256:bb0fae307bd1afc4247746968cff8d60a39bd8d2e895835ad5a363b18f643742"
+        },
+        {
+          "id": "orders-v2",
+          "path": "data/orders.json",
+          "sha256": "sha256:e429df399d91f406ae7799f321c305dbc3d8ae193207fa7aa34ba0e060316831"
+        },
+        {
+          "id": "events-initial-v2",
+          "path": "data/events_initial.json",
+          "sha256": "sha256:0490de483a533b63ff848e7ee4d8efeb1c592a86138e50299f07ec673f35bf6d"
+        },
+        {
+          "id": "events-corrections-v2",
+          "path": "data/events_corrections.json",
+          "sha256": "sha256:a7d361d00c05d61a784da3e3c668d26de1a63032dcff6dfb028101cad34c9916"
+        },
+        {
+          "id": "sla-v2",
+          "path": "data/sla_policies.json",
+          "sha256": "sha256:fdf4add08efdf234769d5e0db0f387e6d79790cbf1adf4a15888c96b768e1806"
+        },
+        {
+          "id": "rates-v2",
+          "path": "data/supplier_rates.json",
+          "sha256": "sha256:2b12f47ee9bebd1128afb903f4bf7c798f1ba8b6caa0ab75ef9726773e904099"
+        },
+        {
+          "id": "capacity-v2",
+          "path": "data/capacity.json",
+          "sha256": "sha256:1632f0adf333c230a6c9fc1da4627b912a264ebe964ff5e24eb1939214d53e92"
+        },
+        {
+          "id": "shared-v2",
+          "path": "data/shared_costs.json",
+          "sha256": "sha256:a9ed91aefcb8ac1f00236cb5b677048f96f690d1743ee5e4de8d879a3a9ce5b0"
+        },
+        {
+          "id": "portfolios-v2",
+          "path": "data/portfolios.json",
+          "sha256": "sha256:ed3223727e3b6b5396855a4414bc58a93c76ba1e9751a6778e58bf1697852d69"
+        }
+      ],
+      "starter_root": "starter",
+      "task_id": "O",
+      "units": [
+        {
+          "checks": [
+            {
+              "argv": [
+                "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+                "-B",
+                "inputs/native/native_check.py",
+                "analysis"
+              ],
+              "authorization_reference": "user:current-request",
+              "check_id": "O2-static",
+              "expected_exit_code": 0,
+              "obligation_ids": [
+                "O2-json-source-structure"
+              ]
+            },
+            {
+              "argv": [
+                "/usr/local/go/bin/gofmt",
+                "-e",
+                "analysis.go"
+              ],
+              "authorization_reference": "user:current-request",
+              "check_id": "O2-gofmt-parse",
+              "expected_exit_code": 0,
+              "obligation_ids": [
+                "O2-go-parse"
+              ]
+            }
+          ],
+          "dependencies": [],
+          "domain": "software",
+          "objective": "Build a reusable Go reconciliation and costing program from the frozen four-facility data room; provide exact metric JSON and source register.",
+          "obligations": [
+            {
+              "description": "Required metric sections and exact source register hashes are present.",
+              "id": "O2-json-source-structure",
+              "required": true,
+              "requirement_id": "O2-contract"
+            },
+            {
+              "description": "Go analysis source parses without a filesystem-writing build.",
+              "id": "O2-go-parse",
+              "required": true,
+              "requirement_id": "O2-contract"
+            }
+          ],
+          "owned_paths": [
+            "analysis.go",
+            "metrics.json",
+            "sources.json"
+          ],
+          "requirement_ids": [
+            "O2-contract"
+          ],
+          "role": "production",
+          "seed": null,
+          "source_ids": [
+            "contract",
+            "native",
+            "go-starter",
+            "manifest-v2",
+            "orders-v2",
+            "events-initial-v2",
+            "events-corrections-v2",
+            "sla-v2",
+            "rates-v2",
+            "capacity-v2",
+            "shared-v2",
+            "portfolios-v2"
+          ],
+          "specialists": [
+            "contracts",
+            "ownership"
+          ],
+          "task_kind": "judgment",
+          "unit_id": "O-analysis"
+        },
+        {
+          "checks": [
+            {
+              "argv": [
+                "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+                "-B",
+                "inputs/native/native_check.py",
+                "document"
+              ],
+              "authorization_reference": "user:current-request",
+              "check_id": "O2-memo-static",
+              "expected_exit_code": 0,
+              "obligation_ids": [
+                "O2-document-structure"
+              ]
+            }
+          ],
+          "dependencies": [
+            "O-analysis"
+          ],
+          "domain": "document",
+          "objective": "Write a source-linked decision memo that compares all declared facility portfolios and respects the qualified analysis.",
+          "obligations": [
+            {
+              "description": "A memo with evidence table and public decision-record fields is present.",
+              "id": "O2-document-structure",
+              "required": true,
+              "requirement_id": "O2-contract"
+            }
+          ],
+          "owned_paths": [
+            "memo.md"
+          ],
+          "requirement_ids": [
+            "O2-contract"
+          ],
+          "role": "production",
+          "seed": null,
+          "source_ids": [
+            "contract",
+            "native",
+            "go-starter",
+            "manifest-v2",
+            "orders-v2",
+            "events-initial-v2",
+            "events-corrections-v2",
+            "sla-v2",
+            "rates-v2",
+            "capacity-v2",
+            "shared-v2",
+            "portfolios-v2"
+          ],
+          "specialists": [],
+          "task_kind": "judgment",
+          "unit_id": "O-document"
+        }
+      ]
+    }
+  }
+}

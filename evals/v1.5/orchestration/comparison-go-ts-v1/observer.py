@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from opensocrates.orchestration.adapter import MAX_OUTPUT, CodexAdapter, reported_usage
+from opensocrates.orchestration.adapter import MAX_OUTPUT, CodexAdapter, null_usage, reported_usage
 from opensocrates.orchestration.paths import BoundaryError, digest
 
 
@@ -27,6 +28,8 @@ class ObservedAdapter(CodexAdapter):
         try:
             with self.observation_path.open("a", encoding="utf-8") as out:
                 out.write(json.dumps(item, sort_keys=True, separators=(",", ":")) + "\n")
+                out.flush()
+                os.fsync(out.fileno())
         except OSError:
             # A completed native receipt/usage must survive observer failure.
             # The runner publishes these bounded post-call harness failures.
@@ -63,6 +66,14 @@ class ObservedAdapter(CodexAdapter):
                 **identity, "phase": "terminal", "utc": ended_utc,
                 "elapsed_ns": ended - started,
                 "status": receipt.get("status", "unavailable"),
+                "reason": receipt.get("reason"),
+                "process_exit_code": receipt.get("process_exit_code"),
+                "input_sha256": receipt.get("input_sha256"),
+                "output_sha256": receipt.get("output_sha256"),
+                "thread_sha256": receipt.get("thread_sha256"),
+                "model": receipt.get("model", assignment.get("model")),
+                "usage": receipt.get("usage") or null_usage(),
+                "backend_attempts": receipt.get("backend_attempts"),
                 "provider_error_events": receipt.get("provider_error_events"),
                 "failed_turn_events": receipt.get("failed_turn_events"),
                 "tool_action_count": None,

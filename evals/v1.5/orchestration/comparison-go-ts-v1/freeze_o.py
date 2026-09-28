@@ -147,9 +147,22 @@ def freeze(source_descriptor: Path) -> dict[str, Any]:
     task = data["tasks"]["O"]
     public = source_descriptor.parent / task["public_root"]
     task_hash = sha(canonical(task))
-    prep = source_descriptor.parent / "o_service_network/private/FREEZE_PREP.json"
-    prep_data = json.loads(prep.read_text()) if prep.exists() else {}
+    packet = source_descriptor.parent / "o_service_network_v2"
+    standalone_path = packet / "descriptor.json"
+    standalone = json.loads(standalone_path.read_text()) if standalone_path.exists() else {}
     blockers = []
+    unprefixed = standalone.get("task") or {}
+    standalone_hash = sha(canonical(unprefixed)) if unprefixed else None
+    expected_integrated = json.loads(json.dumps(unprefixed)) if unprefixed else {}
+    if expected_integrated:
+        expected_integrated["public_root"] = "o_service_network_v2/" + expected_integrated["public_root"]
+        expected_integrated["external_qualification"]["entrypoint"] = (
+            "o_service_network_v2/" + expected_integrated["external_qualification"]["entrypoint"]
+        )
+    if not expected_integrated or canonical(expected_integrated) != canonical(task):
+        blockers.append("integrated_O_task_differs_from_exact_standalone_except_two_path_prefixes")
+    prep = packet / "private/FREEZE_PREP.json"
+    prep_data = json.loads(prep.read_text()) if prep.exists() else {}
     if task_hash == "875a52e2c30526d79831f3df63a593d0c71ad01abd217312b90136c08f1745af":
         blockers.append("O_v1_small_packet_is_controls_only_not_hard_subject")
     if source_descriptor.resolve() != DESCRIPTOR.resolve() or not DESCRIPTOR.is_file():
@@ -174,23 +187,47 @@ def freeze(source_descriptor: Path) -> dict[str, Any]:
         blockers.append("product_source_differs_from_qualified_commit")
     guides = package_guides(task)
     blockers += guides["mismatches"]
+    control_path = packet / "private/controls/selftest.json"
+    native_path = packet / "private/native_selftest.json"
+    control_data = json.loads(control_path.read_text()) if control_path.exists() else {}
+    native_data = json.loads(native_path.read_text()) if native_path.exists() else {}
+    packet_files_match = all(
+        (packet / relative).is_file() and sha((packet / relative).read_bytes()) == expected
+        for mapping in (prep_data.get("public_files", {}), prep_data.get("private_files", {}))
+        for relative, expected in mapping.items()
+    )
+    positives = [item for item in control_data.get("controls", []) if item.get("expected") == "pass"]
+    negatives = [item for item in control_data.get("controls", []) if item.get("expected") != "pass"]
     controls = {
         "prep_manifest_sha256": sha(prep.read_bytes()) if prep.exists() else None,
         "task_descriptor_sha256": task_hash,
+        "standalone_task_descriptor_sha256": standalone_hash,
+        "standalone_descriptor_sha256": sha(standalone_path.read_bytes()) if standalone_path.exists() else None,
         "source_hashes": {item["id"]: item["sha256"] for item in task["sources"]},
-        "positive_passed": prep_data.get("positive_control_passed"),
+        "positive_passed": prep_data.get("positive_controls_passed"),
         "negative_rejected": prep_data.get("negative_controls_rejected"),
-        "negative_total": prep_data.get("negative_controls_total"),
-        "native_static_passed": prep_data.get("native_static_control_passed"),
+        "negative_total": len(negatives),
+        "native_static_passed": prep_data.get("native_static_controls_passed"),
         "candidate_private_read_denied": prep_data.get("child_private_read_denied"),
         "external_verifier_sha256": sha((source_descriptor.parent / task["external_qualification"]["entrypoint"]).read_bytes()),
+        "packet_file_hashes_match": packet_files_match,
+        "control_selftest_sha256": sha(control_path.read_bytes()) if control_path.exists() else None,
+        "native_selftest_sha256": sha(native_path.read_bytes()) if native_path.exists() else None,
+        "private_oracle_sha256": prep_data.get("private_oracle_sha256"),
     }
-    if (controls["positive_passed"] is not True or controls["native_static_passed"] is not True
+    if (controls["positive_passed"] != len(positives) or controls["positive_passed"] < 3
+        or control_data.get("passed") is not True or native_data.get("passed") is not True
+        or native_data.get("good_bytes_unchanged") is not True
+        or native_data.get("bad_bytes_unchanged") is not True
+        or controls["native_static_passed"] is not True
         or controls["candidate_private_read_denied"] is not True or not controls["negative_total"]
         or controls["negative_rejected"] != controls["negative_total"]
-        or prep_data.get("task_descriptor_canonical_sha256") != task_hash
+        or prep_data.get("task_descriptor_canonical_sha256") != standalone_hash
+        or prep_data.get("descriptor_sha256") != controls["standalone_descriptor_sha256"]
         or prep_data.get("external_verifier_sha256") != controls["external_verifier_sha256"]):
         blockers.append("O_fixture_controls_or_hashes_not_frozen")
+    if not packet_files_match or prep_data.get("outcome_calls") != 0:
+        blockers.append("O_v2_packet_bytes_or_pre_call_state_changed")
     deps_entries = sorted(item.name for item in DEPS.iterdir()) if DEPS.is_dir() else []
     if deps_entries != ["browsers", "go-modcache", "npm"]:
         blockers.append("subject_dependency_root_not_generic_only")

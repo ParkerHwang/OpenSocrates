@@ -69,6 +69,35 @@ class ObserverControls(unittest.TestCase):
             self.assertNotIn("private command", json.dumps(summary))
             self.assertNotIn("private output", json.dumps(summary))
 
+    def test_completed_role_receipt_survives_later_failure(self):
+        with tempfile.TemporaryDirectory() as raw:
+            journal = Path(raw) / "journal.jsonl"
+            adapter = ObservedAdapter("/bin/true", journal)
+            native = CallResult({"files": []}, {
+                "status": "completed", "reason": "structured_result",
+                "process_exit_code": 0, "input_sha256": "sha256:input",
+                "output_sha256": "sha256:output", "thread_sha256": "sha256:thread",
+                "model": {"name": "synthetic", "effort": "high"},
+                "usage": {"input_tokens": 17, "cached_input_tokens": 4,
+                          "cache_write_input_tokens": 0, "output_tokens": 5,
+                          "reasoning_output_tokens": 2},
+                "provider_error_events": 0, "failed_turn_events": 0,
+                "backend_attempts": None,
+            })
+            with patch.object(CodexAdapter, "invoke", return_value=native):
+                adapter.invoke({"assignment_id": "role1", "unit_id": "u", "role": "production"}, Path(raw))
+            # Simulate a later role/check failure in the same episode. The
+            # first role's native usage is already durable on disk.
+            try:
+                raise RuntimeError("later step failed")
+            except RuntimeError:
+                pass
+            rows = [json.loads(line) for line in journal.read_text().splitlines()]
+            self.assertEqual([row["phase"] for row in rows], ["start", "terminal"])
+            self.assertEqual(rows[1]["usage"]["input_tokens"], 17)
+            self.assertEqual(rows[1]["process_exit_code"], 0)
+            self.assertEqual(rows[1]["output_sha256"], "sha256:output")
+
 
 if __name__ == "__main__":
     unittest.main()
