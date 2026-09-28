@@ -8,7 +8,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from opensocrates.orchestration.adapter import CodexAdapter
+from opensocrates.orchestration.adapter import MAX_OUTPUT, CodexAdapter, reported_usage
+from opensocrates.orchestration.paths import BoundaryError, digest
 
 
 def utc() -> str:
@@ -20,6 +21,7 @@ class ObservedAdapter(CodexAdapter):
         super().__init__(client_path)
         self.observation_path = observation_path
         self.observation_failures: list[dict[str, str]] = []
+        self.role_event_summaries: list[dict[str, Any]] = []
 
     def _append(self, item: dict[str, Any]) -> None:
         try:
@@ -40,10 +42,21 @@ class ObservedAdapter(CodexAdapter):
                     "unit_id": assignment["unit_id"], "role": assignment["role"]}
         self._append({**identity, "phase": "start", "utc": started_utc})
         result = None
+        current_summary = {
+            "assignment_id": assignment["assignment_id"],
+            "unit_id": assignment["unit_id"], "role": assignment["role"],
+            "event_stream_observed": False, "event_stream_complete": False,
+            "command_started": None, "command_completed": None,
+            "other_tool_started": None, "other_tool_completed": None,
+            "unclassified_error_items": None, "public_message_count": None,
+        }
+        self.role_event_summaries.append(current_summary)
+        self._current_event_summary = current_summary
         try:
             result = super().invoke(assignment, cwd)
             return result
         finally:
+            self._current_event_summary = None
             ended, ended_utc = time.monotonic_ns(), utc()
             receipt = result.receipt if result is not None else {}
             self._append({
@@ -54,6 +67,56 @@ class ObservedAdapter(CodexAdapter):
                 "failed_turn_events": receipt.get("failed_turn_events"),
                 "tool_action_count": None,
             })
+
+    def _events(self, process, receipt):
+        """Native event projection plus typed counts, with every body discarded."""
+        summary = self._current_event_summary
+        summary.update({
+            "event_stream_observed": True,
+            "command_started": 0, "command_completed": 0,
+            "other_tool_started": 0, "other_tool_completed": 0,
+            "unclassified_error_items": 0, "public_message_count": 0,
+        })
+        final = None
+        completed = False
+        non_tools = {"agent_message", "reasoning", "todo_list", "plan"}
+        while line := process.stdout.readline(4 * MAX_OUTPUT + 1):
+            if len(line) > 4 * MAX_OUTPUT:
+                raise BoundaryError("event_size_limit")
+            event = json.loads(line)
+            if not isinstance(event, dict):
+                raise BoundaryError("invalid_event")
+            kind = event.get("type")
+            if kind == "error":
+                receipt["provider_error_events"] += 1
+            elif kind == "turn.failed":
+                receipt["failed_turn_events"] += 1
+            elif kind == "thread.started" and isinstance(event.get("thread_id"), str):
+                receipt["thread_sha256"] = digest(event["thread_id"].encode())
+            elif kind == "turn.completed":
+                completed = True
+                receipt["usage"] = reported_usage(event.get("usage"))
+            elif kind in {"item.started", "item.completed"}:
+                item = event.get("item") or {}
+                item_type = item.get("type")
+                if item_type == "command_execution":
+                    key = "command_started" if kind == "item.started" else "command_completed"
+                    summary[key] += 1
+                elif item_type == "error":
+                    # This is a distinct client item, not evidence of a second
+                    # executed command. Its cause stays unknown.
+                    if kind == "item.completed":
+                        summary["unclassified_error_items"] += 1
+                elif isinstance(item_type, str) and item_type not in non_tools:
+                    key = "other_tool_started" if kind == "item.started" else "other_tool_completed"
+                    summary[key] += 1
+                if kind == "item.completed" and item_type == "agent_message" and isinstance(item.get("text"), str):
+                    if len(item["text"].encode()) > MAX_OUTPUT:
+                        raise BoundaryError("candidate_size_limit")
+                    final = item["text"]
+                    summary["public_message_count"] += 1
+        summary["event_stream_complete"] = completed
+        return final, completed
 
     def check(self, check: dict[str, Any], cwd: Path, files: dict[str, bytes], candidate_sha256: str):
         started_utc, started = utc(), time.monotonic_ns()
