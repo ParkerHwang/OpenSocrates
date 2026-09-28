@@ -1,0 +1,161 @@
+{
+  "schema": "opensocrates.orchestration.request/1.0.0",
+  "operation": "run",
+  "run_id": "05f89867-99c0-46a2-be03-ac322a0fc44b",
+  "task_id": "0c83c094-cef1-4b14-930d-1197f53ef77c",
+  "revision": 1,
+  "authorization": {
+    "reference": "fixture:orchestration-qualification",
+    "attribution": "operator_declared"
+  },
+  "model": {
+    "name": "gpt-6-astra",
+    "effort": "max"
+  },
+  "locale": "en",
+  "objective": "Qualify the fixed office workflow on disposable synthetic text artifacts.",
+  "constraints": [
+    {
+      "id": "office-contract",
+      "text": "# Country calculation and report contract\n\nThe source lists country, quantity, and saving_per_unit. Compute each country's quantity * saving_per_unit, then sum those country products. Never multiply the sum of quantities by the sum of per-unit savings. No money/currency or external factual claim is implied.\n\nThe data producer owns `calculation.json`, with only `source_sha256`, `countries`, and `total_savings`. `source_sha256` is the exact SHA-256 of the source file. Each country result has `country`, `quantity`, `saving_per_unit`, and `savings`. Country order remains source order.\n\nThe document producer depends on the qualified calculation and owns `report.md`. It must include these exact labels, with optional Markdown inline emphasis/backticks around values: `Source SHA-256: <source digest>`, `Calculation SHA-256: <calculation digest>`, and `Total savings: <total>`. Include a four-column Markdown table with header `Country | Quantity | Saving per unit | Savings` and a row for each country. State in prose that the total is the sum of the country products. Every number must reconcile to source and calculation. The check is a numeric/source reconciliation; independent review must also inspect prose.\n\nThe source fixture implies A=6, B=35, total=41. A copied report claiming 70 must fail. Changed calculation bytes invalidate the report's calculation digest even if numeric values did not change.\n"
+    }
+  ],
+  "permissions": [
+    "Read only declared source inputs and qualified dependencies. Produce only the explicitly owned candidate text artifacts through the structured result."
+  ],
+  "prohibitions": [
+    "No external effects, project enrollment, global settings, credential access, deployment, publication, agent redelegation or model substitution.",
+    "No private reasoning, raw transcript or author self-assessment in an acceptance result."
+  ],
+  "source_root": "$FIXTURE",
+  "sources": [
+    {
+      "id": "office-contract",
+      "path": "fixtures/data_document_contract.md",
+      "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88"
+    },
+    {
+      "id": "country-source",
+      "path": "fixtures/country_effects.json",
+      "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82"
+    },
+    {
+      "id": "calculation-oracle",
+      "path": "oracles/check_calculation.py",
+      "sha256": "sha256:328e2e0351cfd19fc0b029787ed9867fb4b21612ba214d5bb7da8a99835727b3"
+    },
+    {
+      "id": "report-oracle",
+      "path": "oracles/check_report.py",
+      "sha256": "sha256:1463e22a1475830499964da10ec539ad3616018abe643edf0e81f686f57c8e67"
+    }
+  ],
+  "candidate_root": "$DEVELOPMENT/live-v1/candidates/office",
+  "client_path": "$CODEX_CLIENT",
+  "repair_limit": 1,
+  "memory": null,
+  "handoff": [
+    "Use the current source and accepted contract. No historical model evaluation or self-rating is part of this assignment."
+  ],
+  "required_artifacts": [
+    "calculation.json",
+    "report.md"
+  ],
+  "units": [
+    {
+      "unit_id": "data-production",
+      "domain": "data",
+      "task_kind": "judgment",
+      "role": "production",
+      "objective": "Produce calculation.json from the exact country source: per-country products then additive total, with source hash. Follow the supplied data contract.",
+      "owned_paths": [
+        "calculation.json"
+      ],
+      "dependencies": [],
+      "source_ids": [
+        "office-contract",
+        "country-source",
+        "calculation-oracle"
+      ],
+      "requirement_ids": [
+        "office-contract"
+      ],
+      "specialists": [],
+      "obligations": [
+        {
+          "id": "data-production-acceptance",
+          "requirement_id": "office-contract",
+          "description": "Produce calculation.json from the exact country source: per-country products then additive total, with source hash. Follow the supplied data contract.",
+          "required": true
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "calculation-oracle",
+          "argv": [
+            "$PYTHON",
+            "-B",
+            "inputs/calculation-oracle/check_calculation.py",
+            "calculation.json",
+            "inputs/country-source/country_effects.json"
+          ],
+          "obligation_ids": [
+            "data-production-acceptance"
+          ],
+          "authorization_reference": "fixture:approved-checks",
+          "expected_exit_code": 0
+        }
+      ],
+      "seed": null
+    },
+    {
+      "unit_id": "document-production",
+      "domain": "document",
+      "task_kind": "judgment",
+      "role": "production",
+      "objective": "Produce report.md with reconciled table and narrative from the qualified calculation, including exact current source/calculation hashes and the required labels. State that total is the sum of country products.",
+      "owned_paths": [
+        "report.md"
+      ],
+      "dependencies": [
+        "data-production"
+      ],
+      "source_ids": [
+        "office-contract",
+        "country-source",
+        "report-oracle"
+      ],
+      "requirement_ids": [
+        "office-contract"
+      ],
+      "specialists": [],
+      "obligations": [
+        {
+          "id": "document-production-acceptance",
+          "requirement_id": "office-contract",
+          "description": "Produce report.md with reconciled table and narrative from the qualified calculation, including exact current source/calculation hashes and the required labels. State that total is the sum of country products.",
+          "required": true
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "report-oracle",
+          "argv": [
+            "$PYTHON",
+            "-B",
+            "inputs/report-oracle/check_report.py",
+            "report.md",
+            "calculation.json",
+            "inputs/country-source/country_effects.json"
+          ],
+          "obligation_ids": [
+            "document-production-acceptance"
+          ],
+          "authorization_reference": "fixture:approved-checks",
+          "expected_exit_code": 0
+        }
+      ],
+      "seed": null
+    }
+  ]
+}

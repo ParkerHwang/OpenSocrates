@@ -1,0 +1,280 @@
+[
+  {
+    "method": "GET",
+    "path": "/accounts/zeta",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "old"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "zeta",
+        "balance": 51,
+        "reserved": 0,
+        "available": 51,
+        "version": 3
+      }
+    },
+    "elapsed_s": 0.00033608300145715475
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/eta",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "old"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "eta",
+        "balance": 24,
+        "reserved": 0,
+        "available": 24,
+        "version": 3
+      }
+    },
+    "elapsed_s": 0.0001698750420473516
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/eta",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "u"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "eta",
+        "balance": 9,
+        "reserved": 0,
+        "available": 9,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.00016562500968575478
+  },
+  {
+    "method": "GET",
+    "path": "/entries?limit=100",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "old"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "entries": [
+        {
+          "seq": 1,
+          "account": "eta",
+          "kind": "opening",
+          "balance_delta": 20,
+          "reserved_delta": 0,
+          "operation_id": "legacy-open-eta"
+        },
+        {
+          "seq": 2,
+          "account": "zeta",
+          "kind": "opening",
+          "balance_delta": 55,
+          "reserved_delta": 0,
+          "operation_id": "legacy-open-zeta"
+        },
+        {
+          "seq": 4,
+          "account": "zeta",
+          "kind": "transfer",
+          "balance_delta": -6,
+          "reserved_delta": 0,
+          "operation_id": "legacy-41",
+          "legacy_id": 41
+        },
+        {
+          "seq": 5,
+          "account": "eta",
+          "kind": "transfer",
+          "balance_delta": 6,
+          "reserved_delta": 0,
+          "operation_id": "legacy-41",
+          "legacy_id": 41
+        },
+        {
+          "seq": 6,
+          "account": "eta",
+          "kind": "transfer",
+          "balance_delta": -2,
+          "reserved_delta": 0,
+          "operation_id": "legacy-44",
+          "legacy_id": 44
+        },
+        {
+          "seq": 7,
+          "account": "zeta",
+          "kind": "transfer",
+          "balance_delta": 2,
+          "reserved_delta": 0,
+          "operation_id": "legacy-44",
+          "legacy_id": 44
+        }
+      ],
+      "has_more": false,
+      "next_after": 7,
+      "snapshot": 7
+    },
+    "elapsed_s": 0.00036766595439985394
+  },
+  {
+    "method": "GET",
+    "path": "/summary?snapshot=7",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "old"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "accounts": [
+        {
+          "name": "eta",
+          "balance": 24,
+          "reserved": 0,
+          "available": 24
+        },
+        {
+          "name": "zeta",
+          "balance": 51,
+          "reserved": 0,
+          "available": 51
+        }
+      ],
+      "entry_count": 6,
+      "snapshot": 7,
+      "totals": {
+        "available": 75,
+        "balance": 75,
+        "reserved": 0
+      }
+    },
+    "elapsed_s": 0.00031754199881106615
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/eta",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "old"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "eta",
+        "balance": 24,
+        "reserved": 0,
+        "available": 24,
+        "version": 3
+      }
+    },
+    "elapsed_s": 0.00018254201859235764
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/zeta",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "old"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "zeta",
+        "balance": 51,
+        "reserved": 0,
+        "available": 51,
+        "version": 3
+      }
+    },
+    "elapsed_s": 0.0002856670180335641
+  },
+  {
+    "method": "GET",
+    "path": "/entries?limit=100",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "u"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "entries": [
+        {
+          "seq": 3,
+          "account": "eta",
+          "kind": "opening",
+          "balance_delta": 9,
+          "reserved_delta": 0,
+          "operation_id": "legacy-open-eta"
+        }
+      ],
+      "has_more": false,
+      "next_after": 3,
+      "snapshot": 3
+    },
+    "elapsed_s": 0.0003524580388329923
+  },
+  {
+    "method": "GET",
+    "path": "/summary?snapshot=3",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "u"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "accounts": [
+        {
+          "name": "eta",
+          "balance": 9,
+          "reserved": 0,
+          "available": 9
+        }
+      ],
+      "entry_count": 1,
+      "snapshot": 3,
+      "totals": {
+        "available": 9,
+        "balance": 9,
+        "reserved": 0
+      }
+    },
+    "elapsed_s": 0.00031820801086723804
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/eta",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "u"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "eta",
+        "balance": 9,
+        "reserved": 0,
+        "available": 9,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.0002720000338740647
+  }
+]

@@ -1,0 +1,267 @@
+{
+  "schema": "auditledger.acceptance.v1",
+  "source_identity": {
+    "binary_sha256": "52cd127558b43b388567bc960dfc0262a51c9aa70a34cc0f64528fdf21ea5271",
+    "binary": "<CELL>/server",
+    "source_files": [
+      [
+        "PROJECT_NOTES.md",
+        "3318adb7f3502db2aaffdd1fc80150ad820c619b77ac40887a73c46d621774f9"
+      ],
+      [
+        "README.md",
+        "69b1c89c5449cda396149234ce28f458072b4b78885c520111921b8b1f2138da"
+      ],
+      [
+        "TASK.md",
+        "b5d78e4ed8b9ce8d5244b087c79a6610f52bd8827a5f001b09e84e6d98596584"
+      ],
+      [
+        "TOOLING.md",
+        "c360ac72c339894e7cb3b5d013c17d3634cc229dec262f150668bbf37ec5e9b1"
+      ],
+      [
+        "cmd/server/main.go",
+        "ca3436103a29749a2660e44307fccd976ce0bd6ed99beb0eb7a137ae91355a8c"
+      ],
+      [
+        "go.mod",
+        "7fe6f165ae787ce64803cba214c0976add53dcf93575fd481a9e178357301cf4"
+      ],
+      [
+        "go.sum",
+        "a52d37317a0824cf7a43ebab8c40f876246bf7c5bd2004fc6a252cf7b97c06da"
+      ],
+      [
+        "internal/platform/api.go",
+        "86e0d542b55bfe78253c24ab2079b7d224abf534f354719f2779888ea42970af"
+      ],
+      [
+        "internal/platform/driver.go",
+        "ba042fc8634a7a7de3341a8dcbfd03f94348df9fab2d383680ff51e626dfb7a1"
+      ],
+      [
+        "internal/platform/driver_test.go",
+        "fdcaf5832cbe4c0503e622b52e9e265171e272e3da0d731d73296511d78577a3"
+      ]
+    ],
+    "source_tree_sha256": "322929717ee9d7f1f46afe36e5f31f7c934bcc619888fa7f0d618258a703d02c"
+  },
+  "groups": [
+    {
+      "name": "01_empty_health_and_summary",
+      "passed": true,
+      "failure": null,
+      "elapsed_s": 0.3886759169981815,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/01_empty_health_and_summary"
+    },
+    {
+      "name": "02_account_opening_zero_and_duplicate",
+      "passed": true,
+      "failure": null,
+      "elapsed_s": 0.0641593339969404,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/02_account_opening_zero_and_duplicate"
+    },
+    {
+      "name": "03_required_body_and_integer_validation",
+      "passed": false,
+      "failure": "POST /accounts: HTTP 201 != 400, {'account': {'name': 'a', 'balance': 0, 'reserved': 0, 'available': 0, 'version': 1}}",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 179, in required\n    s.req(\"POST\",\"/accounts\",key=uuid.uuid4().hex,raw=raw,expected=400,error=\"invalid\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 116, in req\n    if expected is not None: check(status == expected, f\"{method} {path}: HTTP {status} != {expected}, {data}\")\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: POST /accounts: HTTP 201 != 400, {'account': {'name': 'a', 'balance': 0, 'reserved': 0, 'available': 0, 'version': 1}}\n",
+      "elapsed_s": 0.06194362504174933,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/03_required_body_and_integer_validation"
+    },
+    {
+      "name": "04_tenant_and_key_validation",
+      "passed": true,
+      "failure": null,
+      "elapsed_s": 0.059931708965450525,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/04_tenant_and_key_validation"
+    },
+    {
+      "name": "05_tenant_isolation_same_names_and_keys",
+      "passed": false,
+      "failure": "POST /transfers/1790454380380991000-4/reverse: HTTP 409 != 404, {'error': {'code': 'terminal'}}",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 194, in isolation\n    s.write(\"/transfers/\"+transfer[\"id\"]+\"/reverse\",{},tenant=\"u\",expected=404,error=\"not_found\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 120, in write\n    return self.req(\"POST\", path, body, tenant, key or uuid.uuid4().hex, expected, error)[1]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 116, in req\n    if expected is not None: check(status == expected, f\"{method} {path}: HTTP {status} != {expected}, {data}\")\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: POST /transfers/1790454380380991000-4/reverse: HTTP 409 != 404, {'error': {'code': 'terminal'}}\n",
+      "elapsed_s": 0.05709708295762539,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/05_tenant_isolation_same_names_and_keys"
+    },
+    {
+      "name": "06_single_transfer_versions_and_entries",
+      "passed": false,
+      "failure": "/accounts/0/balance: 100 != 93",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 200, in transfer\n    subset(result,{\"transfer\":{\"from\":\"a\",\"to\":\"b\",\"amount\":7,\"reversed\":False},\"accounts\":[{\"name\":\"a\",\"balance\":93,\"version\":2},{\"name\":\"b\",\"balance\":47,\"version\":2}]})\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 32, in subset\n    subset(actual[key], value, path + \"/\" + key)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 36, in subset\n    subset(a, b, path + f\"/{i}\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 32, in subset\n    subset(actual[key], value, path + \"/\" + key)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 38, in subset\n    check(type(actual) is type(expected) and actual == expected, f\"{path}: {actual!r} != {expected!r}\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: /accounts/0/balance: 100 != 93\n",
+      "elapsed_s": 0.0570196250337176,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/06_single_transfer_versions_and_entries"
+    },
+    {
+      "name": "07_transfer_invalid_and_insufficient",
+      "passed": true,
+      "failure": null,
+      "elapsed_s": 0.058645291021093726,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/07_transfer_invalid_and_insufficient"
+    },
+    {
+      "name": "08_idempotency_semantic_replay",
+      "passed": true,
+      "failure": null,
+      "elapsed_s": 0.04910583404125646,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/08_idempotency_semantic_replay"
+    },
+    {
+      "name": "09_idempotency_conflict_and_failed_key_reuse",
+      "passed": true,
+      "failure": null,
+      "elapsed_s": 0.05658241600031033,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/09_idempotency_conflict_and_failed_key_reuse"
+    },
+    {
+      "name": "10_optimistic_stale_atomicity",
+      "passed": true,
+      "failure": null,
+      "elapsed_s": 0.07309245801297948,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/10_optimistic_stale_atomicity"
+    },
+    {
+      "name": "11_batch_sequential_versions_and_replay",
+      "passed": false,
+      "failure": "POST /batches: HTTP 409 != 201, {'error': {'code': 'version_conflict'}}",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 242, in batch\n    first=s.write(\"/batches\",body,\"batch\")\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 120, in write\n    return self.req(\"POST\", path, body, tenant, key or uuid.uuid4().hex, expected, error)[1]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 116, in req\n    if expected is not None: check(status == expected, f\"{method} {path}: HTTP {status} != {expected}, {data}\")\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: POST /batches: HTTP 409 != 201, {'error': {'code': 'version_conflict'}}\n",
+      "elapsed_s": 0.05279987503308803,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/11_batch_sequential_versions_and_replay"
+    },
+    {
+      "name": "12_batch_rollback_late_failure",
+      "passed": true,
+      "failure": null,
+      "elapsed_s": 0.057435541006270796,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/12_batch_rollback_late_failure"
+    },
+    {
+      "name": "13_batch_limits_and_staged_conflict",
+      "passed": false,
+      "failure": "POST /batches: HTTP 201 != 409, {'accounts': [{'name': 'a', 'balance': 100, 'reserved': 0, 'available': 100, 'version': 1}, {'name': 'b', 'balance': 40, 'reserved': 0, 'available': 40, 'version': 1}], 'transfers': [{'amount': 1, 'from': 'a', 'id': '1790454380840475000-4', 'reversed': False, 'to': 'b'}, {'amount': 1, 'from': 'a', 'id': '1790454380840543000-5', 'reversed': False, 'to': 'b'}]}",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 263, in batch_limits\n    s.write(\"/batches\",{\"transfers\":[dict(item,from_version=1),dict(item,from_version=1)]},expected=409,error=\"version_conflict\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 120, in write\n    return self.req(\"POST\", path, body, tenant, key or uuid.uuid4().hex, expected, error)[1]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 116, in req\n    if expected is not None: check(status == expected, f\"{method} {path}: HTTP {status} != {expected}, {data}\")\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: POST /batches: HTTP 201 != 409, {'accounts': [{'name': 'a', 'balance': 100, 'reserved': 0, 'available': 100, 'version': 1}, {'name': 'b', 'balance': 40, 'reserved': 0, 'available': 40, 'version': 1}], 'transfers': [{'amount': 1, 'from': 'a', 'id': '1790454380840475000-4', 'reversed': False, 'to': 'b'}, {'amount': 1, 'from': 'a', 'id': '1790454380840543000-5', 'reversed': False, 'to': 'b'}]}\n",
+      "elapsed_s": 0.05257570801768452,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/13_batch_limits_and_staged_conflict"
+    },
+    {
+      "name": "14_hold_reservation_blocks_spending",
+      "passed": false,
+      "failure": "/account/reserved: 0 != 80",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 269, in holds\n    subset(result,{\"hold\":{\"account\":\"a\",\"amount\":80,\"state\":\"active\"},\"account\":{\"balance\":100,\"reserved\":80,\"available\":20,\"version\":2}})\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 32, in subset\n    subset(actual[key], value, path + \"/\" + key)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 32, in subset\n    subset(actual[key], value, path + \"/\" + key)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 38, in subset\n    check(type(actual) is type(expected) and actual == expected, f\"{path}: {actual!r} != {expected!r}\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: /account/reserved: 0 != 80\n",
+      "elapsed_s": 0.05447299999650568,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/14_hold_reservation_blocks_spending"
+    },
+    {
+      "name": "15_capture_and_terminal_hold",
+      "passed": false,
+      "failure": "/reserved: 0 != 30",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 283, in capture\n    rows=ledger_consistent(s); check([r[\"reserved_delta\"] for r in rows]==[0,0,30,-30,0],\"capture reservations\")\n         ^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 162, in ledger_consistent\n    for acc in accounts: subset(s.state(acc[\"name\"],tenant),acc)\n                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 32, in subset\n    subset(actual[key], value, path + \"/\" + key)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 38, in subset\n    check(type(actual) is type(expected) and actual == expected, f\"{path}: {actual!r} != {expected!r}\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: /reserved: 0 != 30\n",
+      "elapsed_s": 0.058652249979786575,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/15_capture_and_terminal_hold"
+    },
+    {
+      "name": "16_release_replay_and_stale_version",
+      "passed": true,
+      "failure": null,
+      "elapsed_s": 0.058326875034254044,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/16_release_replay_and_stale_version"
+    },
+    {
+      "name": "17_hold_input_and_capture_rollback",
+      "passed": true,
+      "failure": null,
+      "elapsed_s": 0.05850308301160112,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/17_hold_input_and_capture_rollback"
+    },
+    {
+      "name": "18_reverse_compensation_and_terminal",
+      "passed": false,
+      "failure": "POST /transfers/1790454381121386000-3/reverse: HTTP 409 != 200, {'error': {'code': 'terminal'}}",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 311, in reverse\n    result=s.write(path,{\"from_version\":2,\"to_version\":2},\"reverse\",expected=200)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 120, in write\n    return self.req(\"POST\", path, body, tenant, key or uuid.uuid4().hex, expected, error)[1]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 116, in req\n    if expected is not None: check(status == expected, f\"{method} {path}: HTTP {status} != {expected}, {data}\")\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: POST /transfers/1790454381121386000-3/reverse: HTTP 409 != 200, {'error': {'code': 'terminal'}}\n",
+      "elapsed_s": 0.050161541963461787,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/18_reverse_compensation_and_terminal"
+    },
+    {
+      "name": "19_reverse_available_funds_and_capture",
+      "passed": false,
+      "failure": "/error/code: 'terminal' != 'insufficient'",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 324, in reverse_funds\n    s.write(path,{},\"funds\",expected=409,error=\"insufficient\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 120, in write\n    return self.req(\"POST\", path, body, tenant, key or uuid.uuid4().hex, expected, error)[1]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 117, in req\n    if error is not None: subset(data, {\"error\":{\"code\":error}})\n                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 32, in subset\n    subset(actual[key], value, path + \"/\" + key)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 32, in subset\n    subset(actual[key], value, path + \"/\" + key)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 38, in subset\n    check(type(actual) is type(expected) and actual == expected, f\"{path}: {actual!r} != {expected!r}\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: /error/code: 'terminal' != 'insufficient'\n",
+      "elapsed_s": 0.056090958998538554,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/19_reverse_available_funds_and_capture"
+    },
+    {
+      "name": "20_snapshot_pagination_intervening_writes",
+      "passed": true,
+      "failure": null,
+      "elapsed_s": 0.05873612500727177,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/20_snapshot_pagination_intervening_writes"
+    },
+    {
+      "name": "21_snapshot_partial_operation_and_query_validation",
+      "passed": false,
+      "failure": "GET /entries?after=-1: HTTP 200 != 400, {'entries': [{'account': 'a', 'balance_delta': 100, 'kind': 'opening', 'operation_id': '1790454381287478000-1', 'reserved_delta': 0, 'seq': 1}, {'account': 'b', 'balance_delta': 40, 'kind': 'opening', 'operation_id': '1790454381287960000-2', 'reserved_delta': 0, 'seq': 2}, {'account': 'a', 'balance_delta': -9, 'kind': 'transfer', 'operation_id': '1790454381288556000-3', 'reserved_delta': 0, 'seq': 3}, {'account': 'b', 'balance_delta': 9, 'kind': 'transfer', 'operation_id': '1790454381288556000-3', 'reserved_delta': 0, 'seq': 4}], 'has_more': False, 'next_after': 4, 'snapshot': 4}",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 350, in query_validation\n    s.req(\"GET\",path,expected=400,error=\"invalid\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 116, in req\n    if expected is not None: check(status == expected, f\"{method} {path}: HTTP {status} != {expected}, {data}\")\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: GET /entries?after=-1: HTTP 200 != 400, {'entries': [{'account': 'a', 'balance_delta': 100, 'kind': 'opening', 'operation_id': '1790454381287478000-1', 'reserved_delta': 0, 'seq': 1}, {'account': 'b', 'balance_delta': 40, 'kind': 'opening', 'operation_id': '1790454381287960000-2', 'reserved_delta': 0, 'seq': 2}, {'account': 'a', 'balance_delta': -9, 'kind': 'transfer', 'operation_id': '1790454381288556000-3', 'reserved_delta': 0, 'seq': 3}, {'account': 'b', 'balance_delta': 9, 'kind': 'transfer', 'operation_id': '1790454381288556000-3', 'reserved_delta': 0, 'seq': 4}], 'has_more': False, 'next_after': 4, 'snapshot': 4}\n",
+      "elapsed_s": 0.052626750024501234,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/21_snapshot_partial_operation_and_query_validation"
+    },
+    {
+      "name": "22_restart_persistence_of_state_and_retries",
+      "passed": true,
+      "failure": null,
+      "elapsed_s": 0.10501916700741276,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/22_restart_persistence_of_state_and_retries"
+    },
+    {
+      "name": "23_concurrent_identical_key_one_effect",
+      "passed": false,
+      "failure": "POST /transfers: HTTP 500 != 201, {'error': {'code': 'invalid'}}",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 366, in concurrent_retry\n    results=list(pool.map(lambda _:s.write(\"/transfers\",body,\"race\"),range(24)))\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py\", line 619, in result_iterator\n    yield _result_or_cancel(fs.pop())\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py\", line 317, in _result_or_cancel\n    return fut.result(timeout)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py\", line 449, in result\n    return self.__get_result()\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py\", line 401, in __get_result\n    raise self._exception\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 366, in <lambda>\n    results=list(pool.map(lambda _:s.write(\"/transfers\",body,\"race\"),range(24)))\n                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 120, in write\n    return self.req(\"POST\", path, body, tenant, key or uuid.uuid4().hex, expected, error)[1]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 116, in req\n    if expected is not None: check(status == expected, f\"{method} {path}: HTTP {status} != {expected}, {data}\")\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: POST /transfers: HTTP 500 != 201, {'error': {'code': 'invalid'}}\n",
+      "elapsed_s": 0.05648312502307817,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/23_concurrent_identical_key_one_effect"
+    },
+    {
+      "name": "24_two_process_writers_no_lost_updates",
+      "passed": false,
+      "failure": "POST /transfers: HTTP 500 != 201, {'error': {'code': 'invalid'}}",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 379, in two_process\n    results=list(pool.map(post,range(96)))\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py\", line 619, in result_iterator\n    yield _result_or_cancel(fs.pop())\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py\", line 317, in _result_or_cancel\n    return fut.result(timeout)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py\", line 449, in result\n    return self.__get_result()\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py\", line 401, in __get_result\n    raise self._exception\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 377, in post\n    return server.write(\"/transfers\",body,\"parallel\"+str(i))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 120, in write\n    return self.req(\"POST\", path, body, tenant, key or uuid.uuid4().hex, expected, error)[1]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 116, in req\n    if expected is not None: check(status == expected, f\"{method} {path}: HTTP {status} != {expected}, {data}\")\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: POST /transfers: HTTP 500 != 201, {'error': {'code': 'invalid'}}\n",
+      "elapsed_s": 0.10810625000158325,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/24_two_process_writers_no_lost_updates"
+    },
+    {
+      "name": "25_two_process_version_compare_and_hold_overspend",
+      "passed": false,
+      "failure": "CAS exactly one winner",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 393, in conditional_race\n    check(sorted(r[0] for r in results)==[201,409],\"CAS exactly one winner\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: CAS exactly one winner\n",
+      "elapsed_s": 0.11124699999345466,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/25_two_process_version_compare_and_hold_overspend"
+    },
+    {
+      "name": "26_genuine_legacy_and_restart_preservation",
+      "passed": false,
+      "failure": "/balance: 100 != 83",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 445, in migration\n    verify_legacy(s,data,before); old=s.summary(tenant=\"old\"); s.stop(); s.start()\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 421, in verify_legacy\n    balance(s,name,final,0,1+count,tenant)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 143, in balance\n    subset(s.state(name,tenant),expected)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 32, in subset\n    subset(actual[key], value, path + \"/\" + key)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 38, in subset\n    check(type(actual) is type(expected) and actual == expected, f\"{path}: {actual!r} != {expected!r}\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: /balance: 100 != 83\n",
+      "elapsed_s": 0.05703829100821167,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/26_genuine_legacy_and_restart_preservation"
+    },
+    {
+      "name": "27_alternate_legacy_simultaneous_start",
+      "passed": false,
+      "failure": "server exited 1; see migration-peer.log",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 500, in run_checks\n    for future in futures: future.result()\n                           ^^^^^^^^^^^^^^^\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py\", line 449, in result\n    return self.__get_result()\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py\", line 401, in __get_result\n    raise self._exception\n  File \"/Users/parkerhwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 82, in start\n    raise RuntimeError(f\"server exited {self.process.returncode}; see {self.label}.log\")\nRuntimeError: server exited 1; see migration-peer.log\n",
+      "elapsed_s": 0.0556293330155313,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/27_alternate_legacy_simultaneous_start"
+    },
+    {
+      "name": "28_routes_names_missing_objects",
+      "passed": false,
+      "failure": "POST /transfers/absent/reverse: HTTP 409 != 404, {'error': {'code': 'terminal'}}",
+      "traceback": "Traceback (most recent call last):\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 503, in run_checks\n    function(server)\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 465, in routes\n    s.write(\"/transfers/absent/reverse\",{},expected=404,error=\"not_found\")\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 120, in write\n    return self.req(\"POST\", path, body, tenant, key or uuid.uuid4().hex, expected, error)[1]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 116, in req\n    if expected is not None: check(status == expected, f\"{method} {path}: HTTP {status} != {expected}, {data}\")\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<REPO>/evals/v1.5/hard-tasks/v1/coding/acceptance.py\", line 24, in check\n    raise AssertionError(message)\nAssertionError: POST /transfers/absent/reverse: HTTP 409 != 404, {'error': {'code': 'terminal'}}\n",
+      "elapsed_s": 0.0543525000102818,
+      "artifacts": "<CELL>/acceptance-artifacts-fdc67af6/28_routes_names_missing_objects"
+    }
+  ],
+  "passed": false,
+  "passed_count": 12,
+  "group_count": 28
+}

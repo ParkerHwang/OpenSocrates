@@ -1,0 +1,1 @@
+Implement the stated synthetic AuditLedger contracts with tenant isolation, atomic durable changes, retry identity and preserved legacy evidence. Do not deploy, call other models, or change global settings. Existing source facts must be inspected rather than inferred from notes.

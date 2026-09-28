@@ -1,0 +1,65 @@
+--- frozen-v2-runner.py
++++ parallel-v1-runner.py
+@@ -23,7 +23,8 @@
+ import threading
+ import time
+ 
+-HERE = Path(__file__).resolve().parent
++AMENDMENT = Path(__file__).resolve().parent
++HERE = AMENDMENT.parent / "v2"
+ ROOT = HERE.parents[3]
+ sys.path.insert(0, str(ROOT / "evals/v1.5/practical"))
+ SPEC = importlib.util.spec_from_file_location(
+@@ -570,8 +571,12 @@
+ def one(manifest, cell, storage):
+     output = HERE / "results" / cell["id"]
+     output.mkdir(parents=True, exist_ok=True)
+-    if (output / "call.json").exists() or (output / "skipped.json").exists():
++    if (output / "call.json").exists():
+         return
++    transfer = read(output / "skipped.json")
++    assert transfer["reason"] == "transferred_to_parallel_v1"
++    assert transfer["amendment_sha256"] == sha(AMENDMENT / "manifest.json")
++    assert transfer["cell"]["id"] == cell["id"] and transfer["call_attempted"] is False
+     assert not (output / "call.started.json").exists(), (
+         "incomplete prior call; inspect, never auto-rerun"
+     )
+@@ -660,6 +665,9 @@
+             "call_attempted": True,
+             "started_utc": now(),
+             "manifest_sha256": sha(HERE / "manifest.json"),
++            "scheduler_amendment_sha256": sha(AMENDMENT / "manifest.json"),
++            "scheduler_dispatch_sha256": sha(AMENDMENT / "dispatch.json"),
++            "scheduler_regime": "parallel-v1",
+             "service_tier_requested": "default",
+             "fast_mode_enabled": False,
+         }
+@@ -781,9 +789,20 @@
+ 
+ 
+ def execute(manifest, storage):
++    amendment = read(AMENDMENT / "manifest.json")
++    assert sha(HERE / "manifest.json") == amendment["base_manifest_sha256"]
++    for name, digest in amendment["frozen_files"].items():
++        assert sha(AMENDMENT / name) == digest, name
++    dispatch = read(AMENDMENT / "dispatch.json")
++    assert dispatch["amendment_sha256"] == sha(AMENDMENT / "manifest.json")
++    wanted = set(dispatch["transferred_cells"])
++    cells = [c for c in manifest["cells"] if c["id"] in wanted]
++    assert len(cells) == len(wanted) and wanted <= set(amendment["planned_cells"])
+     storage.mkdir(mode=0o700, parents=True, exist_ok=True)
+-    with ThreadPoolExecutor(max_workers=3) as pool:
+-        futures = [pool.submit(one, manifest, c, storage) for c in manifest["cells"]]
++    if not cells:
++        return
++    with ThreadPoolExecutor(max_workers=len(cells)) as pool:
++        futures = [pool.submit(one, manifest, c, storage) for c in cells]
+         for future in futures:
+             future.result()
+ 
+@@ -798,4 +817,4 @@
+     if a.action == "execute":
+         execute(manifest, a.storage)
+     else:
+-        print("frozen inputs verified")
++        print("frozen base inputs verified")

@@ -1,0 +1,13 @@
+{
+  "status": "all original v1 timed cells invalid; no outcome rewrite",
+  "cause": "Closed-loop workers launch asynchronously, so time.After(3s) started immediately and cancelled at warmup end; fixed-arrival dispatch loop had different timing.",
+  "repair": "Drain deadline now anchors to end of warmup+measurement plus3s for either dispatcher.",
+  "original_executed_timed_cells": 6,
+  "affected_stages": [
+    2,
+    3
+  ],
+  "model_calls": 9,
+  "additional_model_calls_authorized_or_planned": 0,
+  "limitation": "All stage3 developers received invalid/unavailable preliminary load feedback. Preserve their code; do not claim measured-feedback optimization. Corrected tool will measure both frozen stage2 and stage3 artifacts."
+}

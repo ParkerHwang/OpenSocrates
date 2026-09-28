@@ -1,0 +1,58 @@
+{
+  "schema": "opensocrates.eval.control-selftest/1.0.0",
+  "task": "S",
+  "scope": "functional_prep_only",
+  "passed": true,
+  "controls": [
+    {
+      "control": "good",
+      "expected": "pass",
+      "observed_pass": true,
+      "target_check_rejected": false,
+      "as_expected": true
+    },
+    {
+      "control": "policy_max_delay",
+      "expected": "reject:s_effective_policy_handover",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "tenant_leak",
+      "expected": "reject:s_tenant_isolation",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "obsolete_outbox",
+      "expected": "reject:s_late_fold_atomicity",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "normal_sync",
+      "expected": "reject:s_active_durability",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "form_reload",
+      "expected": "reject:s_browser_network_ui",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "replay_as_new",
+      "expected": "reject:s_replay_conflict",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    }
+  ],
+  "meaning": "Mechanical good/bad controls only; full workload is independently required."
+}

@@ -1,0 +1,66 @@
+{
+  "schema": "opensocrates.hard-office-prose-review/1",
+  "reviewer": "primary integrator, existing selected model and effort; no separate judge invocation",
+  "reviewer_model_echo": null,
+  "reviewer_effort_receipt": null,
+  "human_scores": null,
+  "blinding": "unblinded",
+  "rubric": "office/PROSE_RUBRIC.md",
+  "input_lock": "review/office-batch6.lock.json",
+  "assessed_unix": 1790454021.6061969,
+  "reviews": [
+    {
+      "cell": "office-luna-medium-vanilla",
+      "scores": {
+        "decision_usability": 3,
+        "evidence_and_predecessor_maintenance": 3,
+        "authority_and_independent_progress": 4,
+        "operational_judgment": 2,
+        "korean_collaboration_quality": 3
+      },
+      "total": 15,
+      "maximum": 20,
+      "objective_checks": "27/27; unchanged frozen checker",
+      "support": [
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "9-15",
+          "finding": "The actual CEDAR recommendation, reserve and66-person budget bound are correct and actionable."
+        },
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "25-29",
+          "finding": "Correct stale-price/roster/calendar corrections, named preparation owners and explicit pending signature. Proposed9/30 review timing is clearly distinguished from a source-imposed deadline."
+        }
+      ],
+      "factual_issues": [
+        {
+          "severity": "material narrative constraint error",
+          "location": "output/decision_memo.md:17 and :21",
+          "finding": "Claims P064 allows S3/S6/S1 and that adding accessible S1 could admit that person. Source A064 and the correctly generated plan both allow only S3/S6; H05 changes access need, not availability. The memo also frames an S1 alternative as merely a higher-cost/lower-optional tradeoff, although it cannot seat all mandatory staff. Main selected plan remains valid; the explanation and proposed recovery are wrong.",
+          "evidence": [
+            "inputs/02_availability.csv:A064",
+            "inputs/03_hr_changes.csv:H05",
+            "output/plan.json:assignments[person_id=P064]"
+          ]
+        },
+        {
+          "severity": "minor amount-label ambiguity",
+          "location": "output/decision_memo.md:11",
+          "finding": "Calls1749600KRW a limit when it is projected total use; the actual approved limit1752600KRW and3000KRW remaining are otherwise correct."
+        },
+        {
+          "severity": "workbook readability defect",
+          "location": "output/operations.xlsx 예산!A2:A15",
+          "finding": "Narrow unwrapped key cells clip labels against populated value cells (for example historical_outstanding_krw). Currency cells use General formatting. Preview and native styles are read-only; source values stay correct."
+        }
+      ],
+      "workbook_observation": "All six sheets and Korean evidence descriptions inspected; numeric mirrors are correct, while the budget preview exposes cramped labels. Other dimensions should not treat27/27 as complete narrative/display correctness.",
+      "public_messages_reviewed": 5,
+      "unnecessary_questions_observed": 0,
+      "operator_can_continue": true,
+      "operator_caveat": "Use the validated selected plan and structured records; correct the P064/alternative explanation and workbook readability before relying on the memo for replanning.",
+      "uncertainty": "One unblinded primary-model review, not human or calibrated ranking. Findings cite contradictions between original input, correct structured artifact and memo; no old score or artifact is rewritten."
+    }
+  ]
+}

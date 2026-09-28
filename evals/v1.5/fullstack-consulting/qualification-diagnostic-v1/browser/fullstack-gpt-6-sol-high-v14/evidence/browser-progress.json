@@ -1,0 +1,48 @@
+{
+  "groups": [
+    {
+      "name": "page_identity_and_login",
+      "pass": true,
+      "details": {
+        "url": "http://127.0.0.1:57798/",
+        "title": "DepotFlow · Fulfillment workspace"
+      }
+    },
+    {
+      "name": "inventory_rendered",
+      "pass": true,
+      "details": "SKU\tITEM\tON HAND\tRESERVED\tAVAILABLE\tUNIT PRICE\tVERSION\nBOLT\tSteel bolt kit\t100\t0\t100\t$12.50\t1\nCABLE\tCable assembly\t60\t0\t60\t$24.99\t1\nSAMPLE\tSample pack\t20\t0\t20\t$0.00\t1"
+    },
+    {
+      "name": "create_reserve_ship_return_flow",
+      "pass": true,
+      "details": "ORDER DETAIL\n\nBROWSER-CHECK\nShipped\nOrder ID\n1\nTotal\n$49.99\nVersion\n3\nLines\n2\nSKU\tQUANTITY\tUNIT PRICE\tRETURNED\nBOLT\t2\t$12.50\t0\nCABLE\t1\t$24.99\t0\nRecord a return\n\nEnter quantities for the items received. Leave others at zero.\n\nBOLT\n2 available to return\nCABLE\n1 available to return\nSubmit return"
+    },
+    {
+      "name": "audit_rendered",
+      "pass": true,
+      "details": "ID\tACTION\tENTITY\tACTOR\tTIME\n1\torder created\t1\tadmin@north.example\t9/27/2026, 9:44:07 PM\n2\torder reserved\t1\tadmin@north.example\t9/27/2026, 9:44:07 PM\n3\torder shipped\t1\tadmin@north.example\t9/27/2026, 9:44:07 PM\n4\torder returned\t1\tadmin@north.example\t9/27/2026, 9:44:07 PM"
+    },
+    {
+      "name": "mobile_layout",
+      "pass": true,
+      "details": {
+        "viewport": 390,
+        "document": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "viewer_workflow_read_only",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "no_uncaught_client_error",
+      "pass": true,
+      "details": null
+    }
+  ],
+  "consoleEvents": [],
+  "errors": []
+}

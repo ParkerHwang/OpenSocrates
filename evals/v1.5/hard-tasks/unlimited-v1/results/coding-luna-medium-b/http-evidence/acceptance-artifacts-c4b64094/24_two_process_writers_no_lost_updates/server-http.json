@@ -1,0 +1,3556 @@
+[
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "7b3368ed209d4206b8e1fe880e68703e"
+    },
+    "request": "{\"name\": \"a\", \"opening\": 1000}",
+    "status": 201,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 1000,
+        "reserved": 0,
+        "available": 1000,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.0007067080005072057
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "e1ddc104b4c44041b54aceb3a58049b5"
+    },
+    "request": "{\"name\": \"b\", \"opening\": 1000}",
+    "status": 201,
+    "response": {
+      "account": {
+        "name": "b",
+        "balance": 1000,
+        "reserved": 0,
+        "available": 1000,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.000568249961361289
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel12"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 999,
+          "reserved": 0,
+          "available": 1000,
+          "version": 6
+        },
+        {
+          "name": "a",
+          "balance": 1001,
+          "reserved": 0,
+          "available": 1000,
+          "version": 6
+        }
+      ],
+      "transfer": {
+        "id": "47f523e5460fdcc8cceffd4c28a82c94",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0022607920109294355
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel6"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 998,
+          "reserved": 0,
+          "available": 999,
+          "version": 7
+        },
+        {
+          "name": "a",
+          "balance": 1002,
+          "reserved": 0,
+          "available": 1001,
+          "version": 7
+        }
+      ],
+      "transfer": {
+        "id": "e5c3fa89eabeb3e0d64ac85b60e9ed45",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.003989916993305087
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel4"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 1001,
+          "reserved": 0,
+          "available": 1002,
+          "version": 8
+        },
+        {
+          "name": "b",
+          "balance": 999,
+          "reserved": 0,
+          "available": 998,
+          "version": 8
+        }
+      ],
+      "transfer": {
+        "id": "5ca775e2e1e4278c384fd18afee8072f",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.004544999974314123
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel2"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 1000,
+          "reserved": 0,
+          "available": 1001,
+          "version": 9
+        },
+        {
+          "name": "b",
+          "balance": 1000,
+          "reserved": 0,
+          "available": 999,
+          "version": 9
+        }
+      ],
+      "transfer": {
+        "id": "5b4709bb0739bc4760c5eec94429da8e",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.005256208009086549
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel18"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1000,
+          "reserved": 0,
+          "available": 1001,
+          "version": 11
+        },
+        {
+          "name": "a",
+          "balance": 1000,
+          "reserved": 0,
+          "available": 999,
+          "version": 11
+        }
+      ],
+      "transfer": {
+        "id": "523adf2589e784f50ef518cf0e3a901e",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0018302919925190508
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel10"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 995,
+          "reserved": 0,
+          "available": 996,
+          "version": 16
+        },
+        {
+          "name": "b",
+          "balance": 1005,
+          "reserved": 0,
+          "available": 1004,
+          "version": 16
+        }
+      ],
+      "transfer": {
+        "id": "360af683541fcce522549394e234b8ec",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.005752332974225283
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel26"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 994,
+          "reserved": 0,
+          "available": 995,
+          "version": 17
+        },
+        {
+          "name": "b",
+          "balance": 1006,
+          "reserved": 0,
+          "available": 1005,
+          "version": 17
+        }
+      ],
+      "transfer": {
+        "id": "891679fd51708c6c92dde90aa34c4b29",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0014432499883696437
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel28"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 993,
+          "reserved": 0,
+          "available": 994,
+          "version": 18
+        },
+        {
+          "name": "b",
+          "balance": 1007,
+          "reserved": 0,
+          "available": 1006,
+          "version": 18
+        }
+      ],
+      "transfer": {
+        "id": "ddb3bb38b40d3b5d3ee8e1ec658a5231",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0010400000028312206
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel22"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 992,
+          "reserved": 0,
+          "available": 993,
+          "version": 19
+        },
+        {
+          "name": "b",
+          "balance": 1008,
+          "reserved": 0,
+          "available": 1007,
+          "version": 19
+        }
+      ],
+      "transfer": {
+        "id": "d88c8bf87322b33d20a3d04dbc986c3c",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.002692874986678362
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel32"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 991,
+          "reserved": 0,
+          "available": 992,
+          "version": 20
+        },
+        {
+          "name": "b",
+          "balance": 1009,
+          "reserved": 0,
+          "available": 1008,
+          "version": 20
+        }
+      ],
+      "transfer": {
+        "id": "c398372296ea0baee37a6e33c9a51333",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.00043066596845164895
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel14"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 991,
+          "reserved": 0,
+          "available": 992,
+          "version": 22
+        },
+        {
+          "name": "b",
+          "balance": 1009,
+          "reserved": 0,
+          "available": 1008,
+          "version": 22
+        }
+      ],
+      "transfer": {
+        "id": "7326d62b27d9d90488be8ef5836f5043",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.005895832960959524
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel36"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1008,
+          "reserved": 0,
+          "available": 1009,
+          "version": 23
+        },
+        {
+          "name": "a",
+          "balance": 992,
+          "reserved": 0,
+          "available": 991,
+          "version": 23
+        }
+      ],
+      "transfer": {
+        "id": "721fd0f482c6c0afed0a61e919138a72",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.00044462503865361214
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel24"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1007,
+          "reserved": 0,
+          "available": 1008,
+          "version": 24
+        },
+        {
+          "name": "a",
+          "balance": 993,
+          "reserved": 0,
+          "available": 992,
+          "version": 24
+        }
+      ],
+      "transfer": {
+        "id": "11a696642c010e982aa96fa481ecd112",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.00412062497343868
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel38"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 986,
+          "reserved": 0,
+          "available": 987,
+          "version": 33
+        },
+        {
+          "name": "b",
+          "balance": 1014,
+          "reserved": 0,
+          "available": 1013,
+          "version": 33
+        }
+      ],
+      "transfer": {
+        "id": "8e1e7bd3cbb60e2da7ce90d0403b8c63",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.003470290976110846
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel42"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1013,
+          "reserved": 0,
+          "available": 1014,
+          "version": 34
+        },
+        {
+          "name": "a",
+          "balance": 987,
+          "reserved": 0,
+          "available": 986,
+          "version": 34
+        }
+      ],
+      "transfer": {
+        "id": "94f205798226ae8f6efcc7067da928be",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0025483749923296273
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel40"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 986,
+          "reserved": 0,
+          "available": 987,
+          "version": 39
+        },
+        {
+          "name": "b",
+          "balance": 1014,
+          "reserved": 0,
+          "available": 1013,
+          "version": 39
+        }
+      ],
+      "transfer": {
+        "id": "d36b27b3a1cbe02e80799691807379eb",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.01929587498307228
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel44"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 985,
+          "reserved": 0,
+          "available": 986,
+          "version": 40
+        },
+        {
+          "name": "b",
+          "balance": 1015,
+          "reserved": 0,
+          "available": 1014,
+          "version": 40
+        }
+      ],
+      "transfer": {
+        "id": "01bce0a5ef00109b5fec722c76c07db5",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.018249584012664855
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel52"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 982,
+          "reserved": 0,
+          "available": 983,
+          "version": 43
+        },
+        {
+          "name": "b",
+          "balance": 1018,
+          "reserved": 0,
+          "available": 1017,
+          "version": 43
+        }
+      ],
+      "transfer": {
+        "id": "5b932a3ba09cdeb4951a1c3f30ff7988",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.00531991699244827
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel56"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 981,
+          "reserved": 0,
+          "available": 982,
+          "version": 44
+        },
+        {
+          "name": "b",
+          "balance": 1019,
+          "reserved": 0,
+          "available": 1018,
+          "version": 44
+        }
+      ],
+      "transfer": {
+        "id": "efb2a95338b5e07d83bc11b64cf0fdfc",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.001106125011574477
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel54"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1018,
+          "reserved": 0,
+          "available": 1019,
+          "version": 45
+        },
+        {
+          "name": "a",
+          "balance": 982,
+          "reserved": 0,
+          "available": 981,
+          "version": 45
+        }
+      ],
+      "transfer": {
+        "id": "a6356cf87fc2cf48edc0f2d8fd442f60",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0019922080100513995
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel48"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1017,
+          "reserved": 0,
+          "available": 1018,
+          "version": 46
+        },
+        {
+          "name": "a",
+          "balance": 983,
+          "reserved": 0,
+          "available": 982,
+          "version": 46
+        }
+      ],
+      "transfer": {
+        "id": "942c1a114a20ef3ccd9d6c50ac1421ab",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.018803292012307793
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel50"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 982,
+          "reserved": 0,
+          "available": 983,
+          "version": 47
+        },
+        {
+          "name": "b",
+          "balance": 1018,
+          "reserved": 0,
+          "available": 1017,
+          "version": 47
+        }
+      ],
+      "transfer": {
+        "id": "5c7e713f3fadab78f8bd7b8742e69efb",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.009303374972660094
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel58"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 981,
+          "reserved": 0,
+          "available": 982,
+          "version": 48
+        },
+        {
+          "name": "b",
+          "balance": 1019,
+          "reserved": 0,
+          "available": 1018,
+          "version": 48
+        }
+      ],
+      "transfer": {
+        "id": "c5fea69d71e0a8370632110d57c391d2",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0011841249652206898
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel60"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1018,
+          "reserved": 0,
+          "available": 1019,
+          "version": 49
+        },
+        {
+          "name": "a",
+          "balance": 982,
+          "reserved": 0,
+          "available": 981,
+          "version": 49
+        }
+      ],
+      "transfer": {
+        "id": "4c459e4295acaf1dcc4404d2df96248d",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0007925830432213843
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel62"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 981,
+          "reserved": 0,
+          "available": 982,
+          "version": 50
+        },
+        {
+          "name": "b",
+          "balance": 1019,
+          "reserved": 0,
+          "available": 1018,
+          "version": 50
+        }
+      ],
+      "transfer": {
+        "id": "5b38ded389e319333cc90695f4323fb0",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.00048633298138156533
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel64"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 980,
+          "reserved": 0,
+          "available": 981,
+          "version": 51
+        },
+        {
+          "name": "b",
+          "balance": 1020,
+          "reserved": 0,
+          "available": 1019,
+          "version": 51
+        }
+      ],
+      "transfer": {
+        "id": "a54311e03b8789ef778dfdc520236ba3",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0005077500245533884
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel66"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1023,
+          "reserved": 0,
+          "available": 1024,
+          "version": 56
+        },
+        {
+          "name": "a",
+          "balance": 977,
+          "reserved": 0,
+          "available": 976,
+          "version": 56
+        }
+      ],
+      "transfer": {
+        "id": "8dad48f208225710e64ef81c3062a075",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.001439124986063689
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel68"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 976,
+          "reserved": 0,
+          "available": 977,
+          "version": 57
+        },
+        {
+          "name": "b",
+          "balance": 1024,
+          "reserved": 0,
+          "available": 1023,
+          "version": 57
+        }
+      ],
+      "transfer": {
+        "id": "74a9fe46577ec7bc6a9d08bec6bad038",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0009026660118252039
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel70"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 975,
+          "reserved": 0,
+          "available": 976,
+          "version": 58
+        },
+        {
+          "name": "b",
+          "balance": 1025,
+          "reserved": 0,
+          "available": 1024,
+          "version": 58
+        }
+      ],
+      "transfer": {
+        "id": "043ff12183dc88b629bcf8f4cbdca9fb",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0003857080009765923
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel72"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1024,
+          "reserved": 0,
+          "available": 1025,
+          "version": 59
+        },
+        {
+          "name": "a",
+          "balance": 976,
+          "reserved": 0,
+          "available": 975,
+          "version": 59
+        }
+      ],
+      "transfer": {
+        "id": "c236144250cedc67f4e7b24bd20e268a",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0003381249844096601
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel8"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 974,
+          "reserved": 0,
+          "available": 975,
+          "version": 63
+        },
+        {
+          "name": "b",
+          "balance": 1026,
+          "reserved": 0,
+          "available": 1025,
+          "version": 63
+        }
+      ],
+      "transfer": {
+        "id": "c9f6cd32279fb9f723d25b8259911bc2",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.03698370902566239
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel76"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 973,
+          "reserved": 0,
+          "available": 974,
+          "version": 64
+        },
+        {
+          "name": "b",
+          "balance": 1027,
+          "reserved": 0,
+          "available": 1026,
+          "version": 64
+        }
+      ],
+      "transfer": {
+        "id": "a8cd54c6030d9ee2757cc066c99e1c2b",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0008418340003117919
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel78"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1028,
+          "reserved": 0,
+          "available": 1029,
+          "version": 67
+        },
+        {
+          "name": "a",
+          "balance": 972,
+          "reserved": 0,
+          "available": 971,
+          "version": 67
+        }
+      ],
+      "transfer": {
+        "id": "d666eb22e1e77ac1aaf4749435df7857",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.001435832993593067
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel80"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 971,
+          "reserved": 0,
+          "available": 972,
+          "version": 68
+        },
+        {
+          "name": "b",
+          "balance": 1029,
+          "reserved": 0,
+          "available": 1028,
+          "version": 68
+        }
+      ],
+      "transfer": {
+        "id": "b037708a8636fb79da21e20bb82325f2",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0010582500253804028
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel82"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 970,
+          "reserved": 0,
+          "available": 971,
+          "version": 69
+        },
+        {
+          "name": "b",
+          "balance": 1030,
+          "reserved": 0,
+          "available": 1029,
+          "version": 69
+        }
+      ],
+      "transfer": {
+        "id": "f7cb8d0d9b45655dc502375f823c2e40",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0003465000190772116
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel74"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 969,
+          "reserved": 0,
+          "available": 970,
+          "version": 70
+        },
+        {
+          "name": "b",
+          "balance": 1031,
+          "reserved": 0,
+          "available": 1030,
+          "version": 70
+        }
+      ],
+      "transfer": {
+        "id": "d1b3e93b33580b269d86f91497afdf31",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0035025000106543303
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel84"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1030,
+          "reserved": 0,
+          "available": 1031,
+          "version": 71
+        },
+        {
+          "name": "a",
+          "balance": 970,
+          "reserved": 0,
+          "available": 969,
+          "version": 71
+        }
+      ],
+      "transfer": {
+        "id": "56b72e9a33332e00556465b3c55c0ce2",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.00032458396162837744
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel86"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 968,
+          "reserved": 0,
+          "available": 969,
+          "version": 77
+        },
+        {
+          "name": "b",
+          "balance": 1032,
+          "reserved": 0,
+          "available": 1031,
+          "version": 77
+        }
+      ],
+      "transfer": {
+        "id": "fe2a2148f7999b2c20a03b2ee4963862",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0014402910019271076
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel90"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1031,
+          "reserved": 0,
+          "available": 1032,
+          "version": 78
+        },
+        {
+          "name": "a",
+          "balance": 969,
+          "reserved": 0,
+          "available": 968,
+          "version": 78
+        }
+      ],
+      "transfer": {
+        "id": "64172a01696d7043be1c08bb3f343761",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0006060839514248073
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel88"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 968,
+          "reserved": 0,
+          "available": 969,
+          "version": 79
+        },
+        {
+          "name": "b",
+          "balance": 1032,
+          "reserved": 0,
+          "available": 1031,
+          "version": 79
+        }
+      ],
+      "transfer": {
+        "id": "861dc374a360764eb987f95eb0aad9d8",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.001460542029235512
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel94"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 966,
+          "reserved": 0,
+          "available": 967,
+          "version": 83
+        },
+        {
+          "name": "b",
+          "balance": 1034,
+          "reserved": 0,
+          "available": 1033,
+          "version": 83
+        }
+      ],
+      "transfer": {
+        "id": "986d5613ea78e518765ae35c2d1be26f",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0015595420263707638
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel92"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 965,
+          "reserved": 0,
+          "available": 966,
+          "version": 84
+        },
+        {
+          "name": "b",
+          "balance": 1035,
+          "reserved": 0,
+          "available": 1034,
+          "version": 84
+        }
+      ],
+      "transfer": {
+        "id": "e688b46802ceb99fd5f87aad9ae501f6",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0035027910489588976
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel46"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 964,
+          "reserved": 0,
+          "available": 965,
+          "version": 85
+        },
+        {
+          "name": "b",
+          "balance": 1036,
+          "reserved": 0,
+          "available": 1035,
+          "version": 85
+        }
+      ],
+      "transfer": {
+        "id": "199d93955fcd05d2329ee5976ec4ce76",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0349356250371784
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel20"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 963,
+          "reserved": 0,
+          "available": 964,
+          "version": 86
+        },
+        {
+          "name": "b",
+          "balance": 1037,
+          "reserved": 0,
+          "available": 1036,
+          "version": 86
+        }
+      ],
+      "transfer": {
+        "id": "183ab140c8d850f0a98b55f94f2aab23",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.04294758301693946
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel0"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1032,
+          "reserved": 0,
+          "available": 1033,
+          "version": 91
+        },
+        {
+          "name": "a",
+          "balance": 968,
+          "reserved": 0,
+          "available": 967,
+          "version": 91
+        }
+      ],
+      "transfer": {
+        "id": "dba96981c11e1d03dd20d349d21f64e3",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.059705000021494925
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel30"
+    },
+    "request": "{\"from\": \"b\", \"to\": \"a\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "b",
+          "balance": 1031,
+          "reserved": 0,
+          "available": 1032,
+          "version": 92
+        },
+        {
+          "name": "a",
+          "balance": 969,
+          "reserved": 0,
+          "available": 968,
+          "version": 92
+        }
+      ],
+      "transfer": {
+        "id": "687e460d0aced7d8ea49b2825512914b",
+        "from": "b",
+        "to": "a",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.06185037497198209
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel16"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 968,
+          "reserved": 0,
+          "available": 969,
+          "version": 93
+        },
+        {
+          "name": "b",
+          "balance": 1032,
+          "reserved": 0,
+          "available": 1031,
+          "version": 93
+        }
+      ],
+      "transfer": {
+        "id": "e219855d93f89629cdb6e0cdf4a3b8ed",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.08186266699340194
+  },
+  {
+    "method": "POST",
+    "path": "/transfers",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "parallel34"
+    },
+    "request": "{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}",
+    "status": 201,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 967,
+          "reserved": 0,
+          "available": 968,
+          "version": 94
+        },
+        {
+          "name": "b",
+          "balance": 1033,
+          "reserved": 0,
+          "available": 1032,
+          "version": 94
+        }
+      ],
+      "transfer": {
+        "id": "cecd61ad8013c4eba2320ef3eaa95cb4",
+        "from": "a",
+        "to": "b",
+        "amount": 1,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.08715612499509007
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/a",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 968,
+        "reserved": 0,
+        "available": 968,
+        "version": 97
+      }
+    },
+    "elapsed_s": 0.000994957983493805
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/b",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "b",
+        "balance": 1032,
+        "reserved": 0,
+        "available": 1032,
+        "version": 97
+      }
+    },
+    "elapsed_s": 0.0006589999538846314
+  },
+  {
+    "method": "GET",
+    "path": "/summary",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 968,
+          "reserved": 0,
+          "available": 968
+        },
+        {
+          "name": "b",
+          "balance": 1032,
+          "reserved": 0,
+          "available": 1032
+        }
+      ],
+      "entry_count": 194,
+      "snapshot": 194,
+      "totals": {
+        "available": 2000,
+        "balance": 2000,
+        "reserved": 0
+      }
+    },
+    "elapsed_s": 0.0009129169629886746
+  },
+  {
+    "method": "GET",
+    "path": "/entries?limit=100",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "entries": [
+        {
+          "seq": 1,
+          "account": "a",
+          "kind": "opening",
+          "balance_delta": 1000,
+          "reserved_delta": 0,
+          "operation_id": "8f18dd06555a317d707c629f7d98a095"
+        },
+        {
+          "seq": 2,
+          "account": "b",
+          "kind": "opening",
+          "balance_delta": 1000,
+          "reserved_delta": 0,
+          "operation_id": "cea90e6a3fecda2db30e5ef67ad0bd8d"
+        },
+        {
+          "seq": 3,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "68d17e069148c7a1059f766bec9e6d6c"
+        },
+        {
+          "seq": 4,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "68d17e069148c7a1059f766bec9e6d6c"
+        },
+        {
+          "seq": 5,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "17dfd67c0f1e6deaba62451f4ef2d94d"
+        },
+        {
+          "seq": 6,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "17dfd67c0f1e6deaba62451f4ef2d94d"
+        },
+        {
+          "seq": 7,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "f5b82191372ba9e1aff9e169cc445596"
+        },
+        {
+          "seq": 8,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "f5b82191372ba9e1aff9e169cc445596"
+        },
+        {
+          "seq": 9,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "dfef0b6ea631f3f161aa6129a452fda2"
+        },
+        {
+          "seq": 10,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "dfef0b6ea631f3f161aa6129a452fda2"
+        },
+        {
+          "seq": 11,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "47f523e5460fdcc8cceffd4c28a82c94"
+        },
+        {
+          "seq": 12,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "47f523e5460fdcc8cceffd4c28a82c94"
+        },
+        {
+          "seq": 13,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "e5c3fa89eabeb3e0d64ac85b60e9ed45"
+        },
+        {
+          "seq": 14,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "e5c3fa89eabeb3e0d64ac85b60e9ed45"
+        },
+        {
+          "seq": 15,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "5ca775e2e1e4278c384fd18afee8072f"
+        },
+        {
+          "seq": 16,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "5ca775e2e1e4278c384fd18afee8072f"
+        },
+        {
+          "seq": 17,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "5b4709bb0739bc4760c5eec94429da8e"
+        },
+        {
+          "seq": 18,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "5b4709bb0739bc4760c5eec94429da8e"
+        },
+        {
+          "seq": 19,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "cee6d4d0cebe6cbf58f0a678d02c66be"
+        },
+        {
+          "seq": 20,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "cee6d4d0cebe6cbf58f0a678d02c66be"
+        },
+        {
+          "seq": 21,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "523adf2589e784f50ef518cf0e3a901e"
+        },
+        {
+          "seq": 22,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "523adf2589e784f50ef518cf0e3a901e"
+        },
+        {
+          "seq": 23,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "bb473d6e7a8ee8b8494c22a41e1b4d2d"
+        },
+        {
+          "seq": 24,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "bb473d6e7a8ee8b8494c22a41e1b4d2d"
+        },
+        {
+          "seq": 25,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "01665d37b8af07ed5feeb1bea2e1e1af"
+        },
+        {
+          "seq": 26,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "01665d37b8af07ed5feeb1bea2e1e1af"
+        },
+        {
+          "seq": 27,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "5633bcdc393b19894dfb845d9be0cf4a"
+        },
+        {
+          "seq": 28,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "5633bcdc393b19894dfb845d9be0cf4a"
+        },
+        {
+          "seq": 29,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "84f69f90283366be7478530314cac4a9"
+        },
+        {
+          "seq": 30,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "84f69f90283366be7478530314cac4a9"
+        },
+        {
+          "seq": 31,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "360af683541fcce522549394e234b8ec"
+        },
+        {
+          "seq": 32,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "360af683541fcce522549394e234b8ec"
+        },
+        {
+          "seq": 33,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "891679fd51708c6c92dde90aa34c4b29"
+        },
+        {
+          "seq": 34,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "891679fd51708c6c92dde90aa34c4b29"
+        },
+        {
+          "seq": 35,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "ddb3bb38b40d3b5d3ee8e1ec658a5231"
+        },
+        {
+          "seq": 36,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "ddb3bb38b40d3b5d3ee8e1ec658a5231"
+        },
+        {
+          "seq": 37,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "d88c8bf87322b33d20a3d04dbc986c3c"
+        },
+        {
+          "seq": 38,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "d88c8bf87322b33d20a3d04dbc986c3c"
+        },
+        {
+          "seq": 39,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "c398372296ea0baee37a6e33c9a51333"
+        },
+        {
+          "seq": 40,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "c398372296ea0baee37a6e33c9a51333"
+        },
+        {
+          "seq": 41,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "e18f2f0373a3fdcb900a31baa2668868"
+        },
+        {
+          "seq": 42,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "e18f2f0373a3fdcb900a31baa2668868"
+        },
+        {
+          "seq": 43,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "7326d62b27d9d90488be8ef5836f5043"
+        },
+        {
+          "seq": 44,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "7326d62b27d9d90488be8ef5836f5043"
+        },
+        {
+          "seq": 45,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "721fd0f482c6c0afed0a61e919138a72"
+        },
+        {
+          "seq": 46,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "721fd0f482c6c0afed0a61e919138a72"
+        },
+        {
+          "seq": 47,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "11a696642c010e982aa96fa481ecd112"
+        },
+        {
+          "seq": 48,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "11a696642c010e982aa96fa481ecd112"
+        },
+        {
+          "seq": 49,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "1a48d95bd6e18a2705c58294df234a2e"
+        },
+        {
+          "seq": 50,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "1a48d95bd6e18a2705c58294df234a2e"
+        },
+        {
+          "seq": 51,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "c983a3e59ea76d8f036d3e368afe7c59"
+        },
+        {
+          "seq": 52,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "c983a3e59ea76d8f036d3e368afe7c59"
+        },
+        {
+          "seq": 53,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "5b65c44e3c72665cbae63f806753c3a3"
+        },
+        {
+          "seq": 54,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "5b65c44e3c72665cbae63f806753c3a3"
+        },
+        {
+          "seq": 55,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "ccd4070fa8aa95e7b6f8d1fc7c061b48"
+        },
+        {
+          "seq": 56,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "ccd4070fa8aa95e7b6f8d1fc7c061b48"
+        },
+        {
+          "seq": 57,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "5f0b534033ba85d642fa9d74d9423680"
+        },
+        {
+          "seq": 58,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "5f0b534033ba85d642fa9d74d9423680"
+        },
+        {
+          "seq": 59,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "a87dd0981cf097c96ae7ffcd1f202baf"
+        },
+        {
+          "seq": 60,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "a87dd0981cf097c96ae7ffcd1f202baf"
+        },
+        {
+          "seq": 61,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "f8cbf61dffab03535766b230d0703f47"
+        },
+        {
+          "seq": 62,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "f8cbf61dffab03535766b230d0703f47"
+        },
+        {
+          "seq": 63,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "60af9b83fff7ff46237364fc458aa02b"
+        },
+        {
+          "seq": 64,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "60af9b83fff7ff46237364fc458aa02b"
+        },
+        {
+          "seq": 65,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "8e1e7bd3cbb60e2da7ce90d0403b8c63"
+        },
+        {
+          "seq": 66,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "8e1e7bd3cbb60e2da7ce90d0403b8c63"
+        },
+        {
+          "seq": 67,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "94f205798226ae8f6efcc7067da928be"
+        },
+        {
+          "seq": 68,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "94f205798226ae8f6efcc7067da928be"
+        },
+        {
+          "seq": 69,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "b6f3ac89f32698fab6a7f59edc6308bd"
+        },
+        {
+          "seq": 70,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "b6f3ac89f32698fab6a7f59edc6308bd"
+        },
+        {
+          "seq": 71,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "9b4665cf3377a9dc1c0480d8a74a0586"
+        },
+        {
+          "seq": 72,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "9b4665cf3377a9dc1c0480d8a74a0586"
+        },
+        {
+          "seq": 73,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "552ba38bb02177d91e2622b3fd09e246"
+        },
+        {
+          "seq": 74,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "552ba38bb02177d91e2622b3fd09e246"
+        },
+        {
+          "seq": 75,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "86a82271179feb28c50f77792f6a5fcf"
+        },
+        {
+          "seq": 76,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "86a82271179feb28c50f77792f6a5fcf"
+        },
+        {
+          "seq": 77,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "d36b27b3a1cbe02e80799691807379eb"
+        },
+        {
+          "seq": 78,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "d36b27b3a1cbe02e80799691807379eb"
+        },
+        {
+          "seq": 79,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "01bce0a5ef00109b5fec722c76c07db5"
+        },
+        {
+          "seq": 80,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "01bce0a5ef00109b5fec722c76c07db5"
+        },
+        {
+          "seq": 81,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "b90f2c86cc371b093e7233363e1002d7"
+        },
+        {
+          "seq": 82,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "b90f2c86cc371b093e7233363e1002d7"
+        },
+        {
+          "seq": 83,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "132844718a5fd2c5726c8e72aa86d11e"
+        },
+        {
+          "seq": 84,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "132844718a5fd2c5726c8e72aa86d11e"
+        },
+        {
+          "seq": 85,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "5b932a3ba09cdeb4951a1c3f30ff7988"
+        },
+        {
+          "seq": 86,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "5b932a3ba09cdeb4951a1c3f30ff7988"
+        },
+        {
+          "seq": 87,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "efb2a95338b5e07d83bc11b64cf0fdfc"
+        },
+        {
+          "seq": 88,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "efb2a95338b5e07d83bc11b64cf0fdfc"
+        },
+        {
+          "seq": 89,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "a6356cf87fc2cf48edc0f2d8fd442f60"
+        },
+        {
+          "seq": 90,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "a6356cf87fc2cf48edc0f2d8fd442f60"
+        },
+        {
+          "seq": 91,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "942c1a114a20ef3ccd9d6c50ac1421ab"
+        },
+        {
+          "seq": 92,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "942c1a114a20ef3ccd9d6c50ac1421ab"
+        },
+        {
+          "seq": 93,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "5c7e713f3fadab78f8bd7b8742e69efb"
+        },
+        {
+          "seq": 94,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "5c7e713f3fadab78f8bd7b8742e69efb"
+        },
+        {
+          "seq": 95,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "c5fea69d71e0a8370632110d57c391d2"
+        },
+        {
+          "seq": 96,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "c5fea69d71e0a8370632110d57c391d2"
+        },
+        {
+          "seq": 97,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "4c459e4295acaf1dcc4404d2df96248d"
+        },
+        {
+          "seq": 98,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "4c459e4295acaf1dcc4404d2df96248d"
+        },
+        {
+          "seq": 99,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "5b38ded389e319333cc90695f4323fb0"
+        },
+        {
+          "seq": 100,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "5b38ded389e319333cc90695f4323fb0"
+        }
+      ],
+      "has_more": true,
+      "next_after": 100,
+      "snapshot": 194
+    },
+    "elapsed_s": 0.0009216670296154916
+  },
+  {
+    "method": "GET",
+    "path": "/entries?limit=100&after=100&snapshot=194",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "entries": [
+        {
+          "seq": 101,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "a54311e03b8789ef778dfdc520236ba3"
+        },
+        {
+          "seq": 102,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "a54311e03b8789ef778dfdc520236ba3"
+        },
+        {
+          "seq": 103,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "974c8926c24d8817b7a6e351e85d351a"
+        },
+        {
+          "seq": 104,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "974c8926c24d8817b7a6e351e85d351a"
+        },
+        {
+          "seq": 105,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "2fc5b776a24df1c5b792f6dd73f65cf9"
+        },
+        {
+          "seq": 106,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "2fc5b776a24df1c5b792f6dd73f65cf9"
+        },
+        {
+          "seq": 107,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "441394d4b6dd2948b3abba548d8bc030"
+        },
+        {
+          "seq": 108,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "441394d4b6dd2948b3abba548d8bc030"
+        },
+        {
+          "seq": 109,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "3e91b4b98ac5343fa5b88ba4d7bd3baf"
+        },
+        {
+          "seq": 110,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "3e91b4b98ac5343fa5b88ba4d7bd3baf"
+        },
+        {
+          "seq": 111,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "8dad48f208225710e64ef81c3062a075"
+        },
+        {
+          "seq": 112,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "8dad48f208225710e64ef81c3062a075"
+        },
+        {
+          "seq": 113,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "74a9fe46577ec7bc6a9d08bec6bad038"
+        },
+        {
+          "seq": 114,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "74a9fe46577ec7bc6a9d08bec6bad038"
+        },
+        {
+          "seq": 115,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "043ff12183dc88b629bcf8f4cbdca9fb"
+        },
+        {
+          "seq": 116,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "043ff12183dc88b629bcf8f4cbdca9fb"
+        },
+        {
+          "seq": 117,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "c236144250cedc67f4e7b24bd20e268a"
+        },
+        {
+          "seq": 118,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "c236144250cedc67f4e7b24bd20e268a"
+        },
+        {
+          "seq": 119,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "709543886651ef2773f0ba0b5147a6a7"
+        },
+        {
+          "seq": 120,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "709543886651ef2773f0ba0b5147a6a7"
+        },
+        {
+          "seq": 121,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "eee03309bbbaf83db42766106f7555e8"
+        },
+        {
+          "seq": 122,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "eee03309bbbaf83db42766106f7555e8"
+        },
+        {
+          "seq": 123,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "5082b03ae649fed28e9d6e3a1d83b233"
+        },
+        {
+          "seq": 124,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "5082b03ae649fed28e9d6e3a1d83b233"
+        },
+        {
+          "seq": 125,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "c9f6cd32279fb9f723d25b8259911bc2"
+        },
+        {
+          "seq": 126,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "c9f6cd32279fb9f723d25b8259911bc2"
+        },
+        {
+          "seq": 127,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "a8cd54c6030d9ee2757cc066c99e1c2b"
+        },
+        {
+          "seq": 128,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "a8cd54c6030d9ee2757cc066c99e1c2b"
+        },
+        {
+          "seq": 129,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "3eabee36d84383cfb04cc7b7675a8fde"
+        },
+        {
+          "seq": 130,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "3eabee36d84383cfb04cc7b7675a8fde"
+        },
+        {
+          "seq": 131,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "1c1365bdf64ea6417ac6885370ddd34f"
+        },
+        {
+          "seq": 132,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "1c1365bdf64ea6417ac6885370ddd34f"
+        },
+        {
+          "seq": 133,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "d666eb22e1e77ac1aaf4749435df7857"
+        },
+        {
+          "seq": 134,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "d666eb22e1e77ac1aaf4749435df7857"
+        },
+        {
+          "seq": 135,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "b037708a8636fb79da21e20bb82325f2"
+        },
+        {
+          "seq": 136,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "b037708a8636fb79da21e20bb82325f2"
+        },
+        {
+          "seq": 137,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "f7cb8d0d9b45655dc502375f823c2e40"
+        },
+        {
+          "seq": 138,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "f7cb8d0d9b45655dc502375f823c2e40"
+        },
+        {
+          "seq": 139,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "d1b3e93b33580b269d86f91497afdf31"
+        },
+        {
+          "seq": 140,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "d1b3e93b33580b269d86f91497afdf31"
+        },
+        {
+          "seq": 141,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "56b72e9a33332e00556465b3c55c0ce2"
+        },
+        {
+          "seq": 142,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "56b72e9a33332e00556465b3c55c0ce2"
+        },
+        {
+          "seq": 143,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "a4b46576360935906cbfc63f363053d1"
+        },
+        {
+          "seq": 144,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "a4b46576360935906cbfc63f363053d1"
+        },
+        {
+          "seq": 145,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "f51361add4254e9bc6c1aa61c6883660"
+        },
+        {
+          "seq": 146,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "f51361add4254e9bc6c1aa61c6883660"
+        },
+        {
+          "seq": 147,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "802c89728aeb3003829daf0cfd272c13"
+        },
+        {
+          "seq": 148,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "802c89728aeb3003829daf0cfd272c13"
+        },
+        {
+          "seq": 149,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "ce6a9b8458906ca446eb4789e1b2b24e"
+        },
+        {
+          "seq": 150,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "ce6a9b8458906ca446eb4789e1b2b24e"
+        },
+        {
+          "seq": 151,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "74c8084316d94face19a8df5d3f1d167"
+        },
+        {
+          "seq": 152,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "74c8084316d94face19a8df5d3f1d167"
+        },
+        {
+          "seq": 153,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "fe2a2148f7999b2c20a03b2ee4963862"
+        },
+        {
+          "seq": 154,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "fe2a2148f7999b2c20a03b2ee4963862"
+        },
+        {
+          "seq": 155,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "64172a01696d7043be1c08bb3f343761"
+        },
+        {
+          "seq": 156,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "64172a01696d7043be1c08bb3f343761"
+        },
+        {
+          "seq": 157,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "861dc374a360764eb987f95eb0aad9d8"
+        },
+        {
+          "seq": 158,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "861dc374a360764eb987f95eb0aad9d8"
+        },
+        {
+          "seq": 159,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "563aa749075abb17be847c87ec0980c4"
+        },
+        {
+          "seq": 160,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "563aa749075abb17be847c87ec0980c4"
+        },
+        {
+          "seq": 161,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "30409efb8fc66a458a8b4841f04b9481"
+        },
+        {
+          "seq": 162,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "30409efb8fc66a458a8b4841f04b9481"
+        },
+        {
+          "seq": 163,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "75b9229872e45773d4d1c888b0773dbf"
+        },
+        {
+          "seq": 164,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "75b9229872e45773d4d1c888b0773dbf"
+        },
+        {
+          "seq": 165,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "986d5613ea78e518765ae35c2d1be26f"
+        },
+        {
+          "seq": 166,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "986d5613ea78e518765ae35c2d1be26f"
+        },
+        {
+          "seq": 167,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "e688b46802ceb99fd5f87aad9ae501f6"
+        },
+        {
+          "seq": 168,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "e688b46802ceb99fd5f87aad9ae501f6"
+        },
+        {
+          "seq": 169,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "199d93955fcd05d2329ee5976ec4ce76"
+        },
+        {
+          "seq": 170,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "199d93955fcd05d2329ee5976ec4ce76"
+        },
+        {
+          "seq": 171,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "183ab140c8d850f0a98b55f94f2aab23"
+        },
+        {
+          "seq": 172,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "183ab140c8d850f0a98b55f94f2aab23"
+        },
+        {
+          "seq": 173,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "bf8a1d31290316e2db5758bd2325f321"
+        },
+        {
+          "seq": 174,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "bf8a1d31290316e2db5758bd2325f321"
+        },
+        {
+          "seq": 175,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "e299c13846a4742934823b633624a6fc"
+        },
+        {
+          "seq": 176,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "e299c13846a4742934823b633624a6fc"
+        },
+        {
+          "seq": 177,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "35cf58eda40fc122ea9d53b75663d1f8"
+        },
+        {
+          "seq": 178,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "35cf58eda40fc122ea9d53b75663d1f8"
+        },
+        {
+          "seq": 179,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "fdbc498e283b971d75e2e267d8fb95b0"
+        },
+        {
+          "seq": 180,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "fdbc498e283b971d75e2e267d8fb95b0"
+        },
+        {
+          "seq": 181,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "dba96981c11e1d03dd20d349d21f64e3"
+        },
+        {
+          "seq": 182,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "dba96981c11e1d03dd20d349d21f64e3"
+        },
+        {
+          "seq": 183,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "687e460d0aced7d8ea49b2825512914b"
+        },
+        {
+          "seq": 184,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "687e460d0aced7d8ea49b2825512914b"
+        },
+        {
+          "seq": 185,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "e219855d93f89629cdb6e0cdf4a3b8ed"
+        },
+        {
+          "seq": 186,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "e219855d93f89629cdb6e0cdf4a3b8ed"
+        },
+        {
+          "seq": 187,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "cecd61ad8013c4eba2320ef3eaa95cb4"
+        },
+        {
+          "seq": 188,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "cecd61ad8013c4eba2320ef3eaa95cb4"
+        },
+        {
+          "seq": 189,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "4ebd47c58d8bb6ae5b017aba0e341387"
+        },
+        {
+          "seq": 190,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "4ebd47c58d8bb6ae5b017aba0e341387"
+        },
+        {
+          "seq": 191,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "a7a767570595434c64d950e016b190c7"
+        },
+        {
+          "seq": 192,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "a7a767570595434c64d950e016b190c7"
+        },
+        {
+          "seq": 193,
+          "account": "b",
+          "kind": "transfer",
+          "balance_delta": -1,
+          "reserved_delta": 0,
+          "operation_id": "fe39d3b0d1e8e16421a5c911d4b4797e"
+        },
+        {
+          "seq": 194,
+          "account": "a",
+          "kind": "transfer",
+          "balance_delta": 1,
+          "reserved_delta": 0,
+          "operation_id": "fe39d3b0d1e8e16421a5c911d4b4797e"
+        }
+      ],
+      "has_more": false,
+      "next_after": 194,
+      "snapshot": 194
+    },
+    "elapsed_s": 0.0008310420089401305
+  },
+  {
+    "method": "GET",
+    "path": "/summary?snapshot=194",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 968,
+          "reserved": 0,
+          "available": 968
+        },
+        {
+          "name": "b",
+          "balance": 1032,
+          "reserved": 0,
+          "available": 1032
+        }
+      ],
+      "entry_count": 194,
+      "snapshot": 194,
+      "totals": {
+        "available": 2000,
+        "balance": 2000,
+        "reserved": 0
+      }
+    },
+    "elapsed_s": 0.0008206670172512531
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/a",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 968,
+        "reserved": 0,
+        "available": 968,
+        "version": 97
+      }
+    },
+    "elapsed_s": 0.0003652920131571591
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/b",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "b",
+        "balance": 1032,
+        "reserved": 0,
+        "available": 1032,
+        "version": 97
+      }
+    },
+    "elapsed_s": 0.00032133300555869937
+  }
+]

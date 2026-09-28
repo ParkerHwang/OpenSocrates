@@ -1,0 +1,165 @@
+{
+  "before": "8c8cec1f6b24c38028298294b7faf4f490b49c27c98e9a38f1f9c8301e7bec0c",
+  "after": "8c8cec1f6b24c38028298294b7faf4f490b49c27c98e9a38f1f9c8301e7bec0c",
+  "inspect": {
+    "recordCount": 7,
+    "truncated": true,
+    "metadata": {
+      "revision": "2hw6az",
+      "target": {
+        "id": "wb/yma2x9",
+        "beforeLines": 0,
+        "afterLines": 0
+      },
+      "kind": {
+        "requested": "workbook,sheet,table",
+        "tokens": [
+          "workbook",
+          "sheet",
+          "table"
+        ]
+      },
+      "include": {
+        "tokens": []
+      },
+      "exclude": {
+        "tokens": []
+      },
+      "notices": []
+    }
+  },
+  "evidence": [
+    [
+      "file",
+      "source_id",
+      "use"
+    ],
+    [
+      "01_roster.csv",
+      "MULTIPLE",
+      "기준 person_id·tier·active·접근성·지역을 확인하고 승인 인사 변경과 결합했습니다."
+    ],
+    [
+      "02_availability.csv",
+      "MULTIPLE",
+      "사람별 원래 허용 세션을 결합해 배정 가능 범위를 보존했습니다."
+    ],
+    [
+      "03_hr_changes.csv",
+      "MULTIPLE",
+      "approved 행만 적용하고 pending 행은 보류했습니다."
+    ],
+    [
+      "04_invoices.csv",
+      "MULTIPLE",
+      "송장 ID별 최신 유효 대표 revision으로 총액과 void를 대사했습니다."
+    ],
+    [
+      "05_credits.csv",
+      "MULTIPLE",
+      "크레딧 대표 revision, 중복, void와 0원 행을 확인했습니다."
+    ],
+    [
+      "06_payments.csv",
+      "MULTIPLE",
+      "지급 중복·reversal·posted 0원 대표를 식별해 잔액에 반영했습니다."
+    ],
+    [
+      "07_session_options.csv",
+      "MULTIPLE",
+      "시설 날짜·수용량·접근성·방 비용을 비교하고 승인 세션을 선택했습니다."
+    ],
+    [
+      "08_supplier_terms.json",
+      "SUPPLIER-TERMS-FINAL-0926",
+      "승인 공급사 가격·세션 허용 범위·인당/기본금·용량 상한을 적용했습니다."
+    ],
+    [
+      "09_approved_constraints.json",
+      "OPS-APPROVAL-0926",
+      "현금 한도·4회·기간·휴일·목표 순서·준비일·미결 상태를 적용했습니다."
+    ],
+    [
+      "10_prior_maintained_note.md",
+      "OPS-NOTE-V3",
+      "담당 역할과 갱신할 과거 가정을 확인했습니다."
+    ],
+    [
+      "11_supplier_correction_email.md",
+      "SUPPLIER-EMAIL-0926",
+      "최종 견적 우선, pilot 미승인, 10/9 휴무와 추가 일일 강사비 부재를 교차 확인했습니다."
+    ],
+    [
+      "12_domain_rules.md",
+      "RULES-0927",
+      "자료 우선순위, 대사·중복·0원·승인·달력·목적 규칙을 적용했습니다."
+    ]
+  ],
+  "budget": [
+    [
+      "key",
+      "value"
+    ],
+    [
+      "total_cash_cap_krw",
+      1752600
+    ],
+    [
+      "historical_outstanding_krw",
+      787600
+    ],
+    [
+      "launch_budget_krw",
+      965000
+    ],
+    [
+      "vendor_id",
+      "CEDAR"
+    ],
+    [
+      "vendor_fixed_krw",
+      240000
+    ],
+    [
+      "vendor_per_person_krw",
+      7000
+    ],
+    [
+      "room_cost_krw",
+      260000
+    ],
+    [
+      "launch_cost_krw",
+      962000
+    ],
+    [
+      "cash_remaining_krw",
+      3000
+    ],
+    [
+      "assigned_count",
+      66
+    ],
+    [
+      "mandatory_count",
+      60
+    ],
+    [
+      "optional_count",
+      6
+    ],
+    [
+      "approval_status",
+      "supplier_selection_pending"
+    ],
+    [
+      "preparation_dates",
+      "2026-10-01;2026-10-02;2026-10-05"
+    ],
+    [
+      null,
+      null
+    ]
+  ],
+  "method": "read-only artifact-tool import; no workbook export"
+}

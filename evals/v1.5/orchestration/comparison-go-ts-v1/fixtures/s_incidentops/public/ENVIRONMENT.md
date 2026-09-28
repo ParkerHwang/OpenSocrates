@@ -1,0 +1,5 @@
+# External qualification environment
+
+The final API/browser checks run in a disposable macOS Seatbelt copy with reads limited to staged inputs, pinned dependencies and system libraries, writes limited to the copy, and outbound connections limited to loopback. Go and TypeScript compilation, SQLite files, and browser profiles are created in that copy. Native OpenSocrates checks remain read-only and do not perform these integrations.
+
+This exact Seatbelt network rule has a verified compatibility limit: Go's `http.FileServer`/sendfile path can advertise a full static asset length but transmit only its first 512 bytes. The supplied starter serves its fixed local assets through ordinary bounded reads and writes, which has passed a real Chromium check under the same rule. A candidate that encounters this transport signature is marked browser-unassessable because the harness caused the truncation; it is not called a semantic application defect. API behavior and other independently observable obligations are still recorded.

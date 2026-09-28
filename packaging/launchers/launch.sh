@@ -12,6 +12,22 @@ pass_through() {
         # Selector hook failures are always literal empty stdout.
         exit 0
     fi
+    if [ "$launch_mode" = assistance ]; then
+        printf '%s\n' '{"schema":"opensocrates.assistance.plan/1.0.0","request_id":null,"status":"unavailable","application":"unverified","limitations":["launcher_unavailable"]}'
+        exit 3
+    fi
+    if [ "$launch_mode" = memory ]; then
+        printf '%s\n' '{"schema":"opensocrates.project-memory.response/1.0.0","request_id":null,"status":"unavailable","result":null,"limitations":["launcher_unavailable"],"retryable":false}'
+        exit 3
+    fi
+    if [ "$launch_mode" = orchestrate ]; then
+        printf '%s\n' '{"schema":"opensocrates.orchestration.response/1.0.0","run_id":null,"status":"unavailable","plan_sha256":null,"model":null,"client_version":null,"client_sha256":null,"units":[],"calls":[],"memory_status":"not_requested","memory_snapshot_sha256":null,"integration":"pending_primary_reconciliation","publication":{"status":"not_started","location_verified":false,"completed_files":[],"pending_path":null},"limitations":["launcher_unavailable"]}'
+        exit 3
+    fi
+    if [ "$launch_mode" = documentation ]; then
+        printf '%s\n' '{"schema":"opensocrates.documentation.pack/1.0.0","request_id":null,"status":"unavailable","application":"unverified","limitations":["launcher_unavailable"]}'
+        exit 3
+    fi
     case "$code" in
         unsupported_platform|missing_runtime|invalid_arguments)
             ;;
@@ -57,7 +73,7 @@ case "$mode" in
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         ;;
-    control)
+    control|assistance|memory|documentation|orchestrate)
         if [ "$#" -ne 2 ]; then
             pass_through invalid_arguments "$mode" "$host"
         fi
@@ -166,6 +182,18 @@ case "$mode" in
         ;;
     control)
         exec "$runtime_path" control apply --host "$host"
+        ;;
+    assistance)
+        exec "$runtime_path" assistance
+        ;;
+    memory)
+        exec "$runtime_path" memory
+        ;;
+    orchestrate)
+        exec "$runtime_path" orchestrate
+        ;;
+    documentation)
+        exec "$runtime_path" documentation
         ;;
 esac
 

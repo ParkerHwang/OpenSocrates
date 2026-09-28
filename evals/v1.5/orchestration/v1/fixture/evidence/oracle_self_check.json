@@ -1,0 +1,224 @@
+{
+  "evidence_scope": "oracle self-checks and fixture-only local sandbox probe; no product acceptance or live model evidence",
+  "environment_keys": [
+    "LANG",
+    "LC_ALL",
+    "PATH",
+    "PYTHONDONTWRITEBYTECODE"
+  ],
+  "client_version": "codex-cli 0.158.0-alpha.2",
+  "python": "Python 3.9.6",
+  "all_oracle_expected_exits": true,
+  "files_unchanged": true,
+  "records": [
+    {
+      "id": "design_positive",
+      "argv": [
+        "$CODEX_LAUNCHER",
+        "sandbox",
+        "-P",
+        ":read-only",
+        "-C",
+        "$FIXTURE",
+        "/usr/bin/python3",
+        "-B",
+        "oracles/check_design.py",
+        "oracles/expected_design.json"
+      ],
+      "expected_exit": 0,
+      "observed_exit": 0,
+      "matches_expected": true,
+      "stdout": "{\"check\": \"design_contract\", \"passed\": true}",
+      "stderr": "python3: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead\npython3: error: couldn't create cache file '/tmp/xcrun_db-mFNC1FHj' (errno=Operation not permitted)\npython3: error: couldn't create cache file '/tmp/xcrun_db-qpL4OxBZ' (errno=Operation not permitted)"
+    },
+    {
+      "id": "design_wrong_order",
+      "argv": [
+        "$CODEX_LAUNCHER",
+        "sandbox",
+        "-P",
+        ":read-only",
+        "-C",
+        "$FIXTURE",
+        "/usr/bin/python3",
+        "-B",
+        "oracles/check_design.py",
+        "oracle_self_tests/wrong_design.json"
+      ],
+      "expected_exit": 1,
+      "observed_exit": 1,
+      "matches_expected": true,
+      "stdout": "{\"check\": \"design_contract\", \"passed\": false}",
+      "stderr": "python3: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead\npython3: error: couldn't create cache file '/tmp/xcrun_db-Afe5rPXZ' (errno=Operation not permitted)\npython3: error: couldn't create cache file '/tmp/xcrun_db-1OgYpDgE' (errno=Operation not permitted)"
+    },
+    {
+      "id": "cost_checker_stub_positive",
+      "argv": [
+        "$CODEX_LAUNCHER",
+        "sandbox",
+        "-P",
+        ":read-only",
+        "-C",
+        "$FIXTURE",
+        "/usr/bin/python3",
+        "-B",
+        "oracles/check_cost.py",
+        "oracle_self_tests/positive_cost_stub.py",
+        "fixtures/cost_cases.json"
+      ],
+      "expected_exit": 0,
+      "observed_exit": 0,
+      "matches_expected": true,
+      "stdout": "{\"check\": \"cost_contract\", \"case_count\": 6, \"failed_case_ids\": [], \"passed\": true}",
+      "stderr": "python3: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead\npython3: error: couldn't create cache file '/tmp/xcrun_db-tW7xzIj0' (errno=Operation not permitted)\npython3: error: couldn't create cache file '/tmp/xcrun_db-Q68KFBf0' (errno=Operation not permitted)"
+    },
+    {
+      "id": "deliberately_defective_cost",
+      "argv": [
+        "$CODEX_LAUNCHER",
+        "sandbox",
+        "-P",
+        ":read-only",
+        "-C",
+        "$FIXTURE",
+        "/usr/bin/python3",
+        "-B",
+        "oracles/check_cost.py",
+        "fixtures/defective_pricing.py",
+        "fixtures/cost_cases.json"
+      ],
+      "expected_exit": 1,
+      "observed_exit": 1,
+      "matches_expected": true,
+      "stdout": "{\"check\": \"cost_contract\", \"case_count\": 6, \"failed_case_ids\": [\"later_cost_lower\", \"explicit_null\", \"unsorted_and_future\"], \"passed\": false}",
+      "stderr": "python3: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead\npython3: error: couldn't create cache file '/tmp/xcrun_db-SynAbN8c' (errno=Operation not permitted)\npython3: error: couldn't create cache file '/tmp/xcrun_db-IvIaI5bK' (errno=Operation not permitted)"
+    },
+    {
+      "id": "calculation_positive",
+      "argv": [
+        "$CODEX_LAUNCHER",
+        "sandbox",
+        "-P",
+        ":read-only",
+        "-C",
+        "$FIXTURE",
+        "/usr/bin/python3",
+        "-B",
+        "oracles/check_calculation.py",
+        "oracle_self_tests/calculation.json",
+        "fixtures/country_effects.json"
+      ],
+      "expected_exit": 0,
+      "observed_exit": 0,
+      "matches_expected": true,
+      "stdout": "{\"check\": \"country_calculation\", \"source_matches_frozen_fixture\": true, \"expected_total\": 41, \"passed\": true}",
+      "stderr": "python3: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead\npython3: error: couldn't create cache file '/tmp/xcrun_db-KCuXHA1i' (errno=Operation not permitted)\npython3: error: couldn't create cache file '/tmp/xcrun_db-bbGGmHlh' (errno=Operation not permitted)"
+    },
+    {
+      "id": "calculation_wrong_total",
+      "argv": [
+        "$CODEX_LAUNCHER",
+        "sandbox",
+        "-P",
+        ":read-only",
+        "-C",
+        "$FIXTURE",
+        "/usr/bin/python3",
+        "-B",
+        "oracles/check_calculation.py",
+        "oracle_self_tests/wrong_calculation.json",
+        "fixtures/country_effects.json"
+      ],
+      "expected_exit": 1,
+      "observed_exit": 1,
+      "matches_expected": true,
+      "stdout": "{\"check\": \"country_calculation\", \"source_matches_frozen_fixture\": true, \"expected_total\": 41, \"passed\": false}",
+      "stderr": "python3: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead\npython3: error: couldn't create cache file '/tmp/xcrun_db-z59oaHpu' (errno=Operation not permitted)\npython3: error: couldn't create cache file '/tmp/xcrun_db-zPQtNApr' (errno=Operation not permitted)"
+    },
+    {
+      "id": "report_positive",
+      "argv": [
+        "$CODEX_LAUNCHER",
+        "sandbox",
+        "-P",
+        ":read-only",
+        "-C",
+        "$FIXTURE",
+        "/usr/bin/python3",
+        "-B",
+        "oracles/check_report.py",
+        "oracle_self_tests/report.md",
+        "oracle_self_tests/calculation.json",
+        "fixtures/country_effects.json"
+      ],
+      "expected_exit": 0,
+      "observed_exit": 0,
+      "matches_expected": true,
+      "stdout": "{\"check\": \"source_results_narrative_reconciliation\", \"passed\": true, \"failed_rules\": []}",
+      "stderr": "python3: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead\npython3: error: couldn't create cache file '/tmp/xcrun_db-x6c6IIi8' (errno=Operation not permitted)\npython3: error: couldn't create cache file '/tmp/xcrun_db-9EYGKQj9' (errno=Operation not permitted)"
+    },
+    {
+      "id": "report_wrong_total",
+      "argv": [
+        "$CODEX_LAUNCHER",
+        "sandbox",
+        "-P",
+        ":read-only",
+        "-C",
+        "$FIXTURE",
+        "/usr/bin/python3",
+        "-B",
+        "oracles/check_report.py",
+        "oracle_self_tests/wrong_report.md",
+        "oracle_self_tests/calculation.json",
+        "fixtures/country_effects.json"
+      ],
+      "expected_exit": 1,
+      "observed_exit": 1,
+      "matches_expected": true,
+      "stdout": "{\"check\": \"source_results_narrative_reconciliation\", \"passed\": false, \"failed_rules\": [\"narrative_total\"]}",
+      "stderr": "python3: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead\npython3: error: couldn't create cache file '/tmp/xcrun_db-cWyWgQUq' (errno=Operation not permitted)\npython3: error: couldn't create cache file '/tmp/xcrun_db-LpYORtcQ' (errno=Operation not permitted)"
+    },
+    {
+      "id": "report_stale_digest",
+      "argv": [
+        "$CODEX_LAUNCHER",
+        "sandbox",
+        "-P",
+        ":read-only",
+        "-C",
+        "$FIXTURE",
+        "/usr/bin/python3",
+        "-B",
+        "oracles/check_report.py",
+        "oracle_self_tests/stale_digest_report.md",
+        "oracle_self_tests/calculation.json",
+        "fixtures/country_effects.json"
+      ],
+      "expected_exit": 1,
+      "observed_exit": 1,
+      "matches_expected": true,
+      "stdout": "{\"check\": \"source_results_narrative_reconciliation\", \"passed\": false, \"failed_rules\": [\"calculation_digest\"]}",
+      "stderr": "python3: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead\npython3: error: couldn't create cache file '/tmp/xcrun_db-M5PycsTo' (errno=Operation not permitted)\npython3: error: couldn't create cache file '/tmp/xcrun_db-IsKGAcvP' (errno=Operation not permitted)"
+    },
+    {
+      "id": "safe_fixture_boundary_probe",
+      "argv": [
+        "$CODEX_LAUNCHER",
+        "sandbox",
+        "-P",
+        ":read-only",
+        "-C",
+        "$FIXTURE",
+        "/usr/bin/python3",
+        "-B",
+        "-c",
+        "import errno,json,socket\nfrom pathlib import Path\nresult={\"fixture_read\":Path(\"fixtures/country_effects.json\").read_text().startswith(\"{\"),\"file_write\":\"unknown\",\"loopback_connect\":\"unknown\"}\ntry:\n Path(\"sandbox-write-should-not-exist\").write_text(\"synthetic fixture only\")\n result[\"file_write\"]=\"allowed\"\nexcept OSError as e:\n result[\"file_write\"]={\"blocked\":True,\"errno\":e.errno}\ntry:\n s=socket.socket();s.settimeout(1);s.connect((\"127.0.0.1\",9))\n result[\"loopback_connect\"]=\"allowed\"\nexcept OSError as e:\n result[\"loopback_connect\"]={\"errno\":e.errno,\"permission_denied\":e.errno in (errno.EPERM,errno.EACCES)}\nprint(json.dumps(result))\n"
+      ],
+      "observed_exit": 0,
+      "stdout": "{\"fixture_read\": true, \"file_write\": {\"blocked\": true, \"errno\": 1}, \"loopback_connect\": {\"errno\": 1, \"permission_denied\": true}}",
+      "stderr": "python3: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead\npython3: error: couldn't create cache file '/tmp/xcrun_db-Y485ekHY' (errno=Operation not permitted)\npython3: error: couldn't create cache file '/tmp/xcrun_db-H6XPOu7Y' (errno=Operation not permitted)",
+      "write_path_absent_after": true
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "source_commit": "4053e21932ce126f552ce41ee0004bf7496634ca",
+  "scope": "Affected schema annotation/EN-KO guidance and deterministic identity-binding checks only. No lifecycle or model reruns.",
+  "changed_asset_hashes": {
+    "plugin-src/shared/orchestration/v0.1.0/execution_verification.en.md": "c51aaeaf4186402c7fd791ee66c887bb9dd7ff849765afb9cefea79cef656ad6",
+    "plugin-src/shared/orchestration/v0.1.0/execution_verification.ko.md": "176bed1ca075ecb86aeb5ce866c2d258314994c09c732efc2a9e7902a6826065",
+    "plugin-src/shared/orchestration/v0.1.0/review.en.md": "58f015f608afdaed34e4efefbf3782c4de57ed83eeb27545711436805f4df09a",
+    "plugin-src/shared/orchestration/v0.1.0/review.ko.md": "ec4788d2d341ee106211341eb56751b85b8983f13d84d50e77a5bffce655b44e",
+    "schemas/v1/orchestration-assessment.schema.json": "7cb1fdf5dde47ffe9f9e747ae0b792f34ec719b81d84c60923e2088acb2c17db",
+    "schemas/v1/orchestration-assignment.schema.json": "bea8c17b33893ffb15ff0a293fc33960d83ec64836d9e001dfaddb89c5770ef8",
+    "schemas/v1/orchestration-response.schema.json": "200265a6435bdfd7d2d1dd951f17e83b4c742477f43b0e42f941ea3f2f723f47"
+  },
+  "static_checks": [
+    {
+      "id": "plugin-src/shared/orchestration/v0.1.0/execution_verification.en.md",
+      "kind": "additive_exact_location_guidance",
+      "passed": true
+    },
+    {
+      "id": "plugin-src/shared/orchestration/v0.1.0/execution_verification.ko.md",
+      "kind": "additive_exact_location_guidance",
+      "passed": true
+    },
+    {
+      "id": "plugin-src/shared/orchestration/v0.1.0/review.en.md",
+      "kind": "additive_exact_location_guidance",
+      "passed": true
+    },
+    {
+      "id": "plugin-src/shared/orchestration/v0.1.0/review.ko.md",
+      "kind": "additive_exact_location_guidance",
+      "passed": true
+    },
+    {
+      "id": "schemas/v1/orchestration-assessment.schema.json",
+      "kind": "description_only_schema_change",
+      "passed": true
+    },
+    {
+      "id": "schemas/v1/orchestration-assignment.schema.json",
+      "kind": "description_only_schema_change",
+      "passed": true
+    },
+    {
+      "id": "schemas/v1/orchestration-response.schema.json",
+      "kind": "description_only_schema_change",
+      "passed": true
+    }
+  ],
+  "runtime_changes": [],
+  "negative_binding_cases": [
+    {
+      "id": "retained_line_suffix_rejected",
+      "expected_error": "finding_identity_mismatch",
+      "observed_error": "finding_identity_mismatch",
+      "candidate_accepted": null,
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "exact_path_valid_repair_judgment",
+      "expected_error": null,
+      "observed_error": null,
+      "candidate_accepted": false,
+      "passed": true,
+      "note": "False without error means a valid repair_required judgment, not a candidate pass."
+    },
+    {
+      "id": "wrong_file_digest",
+      "expected_error": "finding_identity_mismatch",
+      "observed_error": "finding_identity_mismatch",
+      "candidate_accepted": null,
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "wrong_candidate_digest",
+      "expected_error": "assessment_version_mismatch",
+      "observed_error": "assessment_version_mismatch",
+      "candidate_accepted": null,
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "wrong_governing_requirement",
+      "expected_error": "finding_identity_mismatch",
+      "observed_error": "finding_identity_mismatch",
+      "candidate_accepted": null,
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "wrong_assignment_identity",
+      "expected_error": "assessment_version_mismatch",
+      "observed_error": "assessment_version_mismatch",
+      "candidate_accepted": null,
+      "passed": true,
+      "note": ""
+    }
+  ],
+  "all_expected": true,
+  "public_diagnostic_origin": "assessment-diagnostic-v1 retained body; changed only in private synthetic copies for deterministic assertions.",
+  "qualification": "Clarified wording does not establish a successful actual reviewer negative-control workflow. Await live-v3 completion."
+}

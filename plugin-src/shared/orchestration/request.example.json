@@ -1,0 +1,92 @@
+{
+  "schema": "opensocrates.orchestration.request/1.0.0",
+  "operation": "prepare",
+  "run_id": "a1111111-1111-4111-8111-111111111111",
+  "task_id": "b1111111-1111-4111-8111-111111111111",
+  "revision": 1,
+  "authorization": {
+    "reference": "user:current-request",
+    "attribution": "operator_declared"
+  },
+  "model": {
+    "name": "gpt-6-astra",
+    "effort": "max"
+  },
+  "locale": "en",
+  "objective": "Produce a bounded reviewed text candidate.",
+  "required_artifacts": [
+    "result.md"
+  ],
+  "constraints": [
+    {
+      "id": "exact-line",
+      "text": "result.md must contain exactly Reviewed candidate. followed by LF."
+    }
+  ],
+  "permissions": [
+    "Generate the declared candidate and execute the approved exact-line check."
+  ],
+  "prohibitions": [
+    "No existing project writes or external effects."
+  ],
+  "source_root": "/absolute/source-root",
+  "sources": [
+    {
+      "id": "requirements",
+      "path": "requirements.txt",
+      "sha256": "sha256:14cdce6033c2aee6da02217e6a63f1c3123b75f34b607a48998e0dd833fe0fd3"
+    }
+  ],
+  "candidate_root": "/absolute/new-candidate-root",
+  "client_path": "/absolute/path/to/qualified/codex",
+  "repair_limit": 1,
+  "memory": null,
+  "handoff": [
+    "The current constraints contain the complete accepted contract."
+  ],
+  "units": [
+    {
+      "unit_id": "text",
+      "domain": "document",
+      "task_kind": "mechanical",
+      "role": "production",
+      "objective": "Produce result.md with the specified exact line.",
+      "owned_paths": [
+        "result.md"
+      ],
+      "dependencies": [],
+      "source_ids": [
+        "requirements"
+      ],
+      "requirement_ids": [
+        "exact-line"
+      ],
+      "specialists": [],
+      "obligations": [
+        {
+          "id": "content",
+          "requirement_id": "exact-line",
+          "description": "The artifact matches the accepted line.",
+          "required": true
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "exact-content",
+          "argv": [
+            "/usr/bin/cmp",
+            "-s",
+            "result.md",
+            "inputs/requirements/requirements.txt"
+          ],
+          "obligation_ids": [
+            "content"
+          ],
+          "authorization_reference": "user:current-request",
+          "expected_exit_code": 0
+        }
+      ],
+      "seed": null
+    }
+  ]
+}

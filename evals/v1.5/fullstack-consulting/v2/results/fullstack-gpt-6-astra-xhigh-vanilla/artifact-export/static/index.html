@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142e35">
+  <title>DepotFlow · Fulfillment workspace</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/mobile.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to workspace</a>
+  <section id="login-screen" class="login-layout">
+    <div class="login-intro">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">D</span> DepotFlow</div>
+      <div><p class="eyebrow">THE FULFILLMENT WORKSPACE</p><h1>Every unit.<br>Every order.<br>Accounted for.</h1><p class="intro-copy">A clear path from shelf to shipment, with an inventory history you can trust.</p></div>
+      <p class="intro-footer">Receive · Reserve · Ship · Return</p>
+    </div>
+    <div class="login-form-wrap">
+      <form id="login-form" class="login-card">
+        <p class="eyebrow">WELCOME BACK</p><h2>Open your workspace</h2><p class="muted">Sign in to your warehouse organization.</p>
+        <label for="login-email">Email address</label><input id="login-email" data-testid="login-email" type="email" autocomplete="username" required placeholder="operator@north.example">
+        <label for="login-password">Password</label><input id="login-password" data-testid="login-password" type="password" autocomplete="current-password" required>
+        <button class="primary wide" data-testid="login-submit" type="submit">Sign in</button>
+        <p id="login-error" class="error-text" role="alert"></p>
+        <div class="demo-note"><strong>Local demo</strong><p>Use admin, operator, or viewer at <code>@north.example</code> or <code>@south.example</code>.</p><p>Password: <code>DepotDemo!2026</code></p></div>
+      </form>
+    </div>
+  </section>
+  <div id="app" hidden>
+    <header class="topbar"><a class="brand" href="/" aria-label="DepotFlow home"><span class="brand-mark" aria-hidden="true">D</span> DepotFlow</a><div class="account"><span id="account-label"></span><button id="logout" data-testid="logout" class="quiet">Log out</button></div></header>
+    <div class="workspace">
+      <aside class="sidebar"><p class="eyebrow">WORKSPACE</p><nav aria-label="Main navigation"><button data-testid="nav-inventory" data-page="inventory">Inventory & overview</button><button data-testid="nav-orders" data-page="orders">Orders</button><button data-testid="nav-audit" data-page="audit">Activity log</button></nav><div class="sidebar-note"><span class="live-dot"></span> Local warehouse<br><span class="muted">Persistent, connected records</span></div></aside>
+      <main id="main" tabindex="-1">
+        <div id="notice" role="status" aria-live="polite" hidden></div>
+        <div id="page-content"></div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

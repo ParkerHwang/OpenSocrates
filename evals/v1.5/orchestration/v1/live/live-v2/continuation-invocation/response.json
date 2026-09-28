@@ -1,0 +1,384 @@
+{
+  "calls": [
+    {
+      "assignment_id": "ac5c78fd-93d0-4820-b584-f04c56524f8e",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.ko.md",
+          "sha256": "sha256:5d0d4d531c4859632ae3e917037f8a68c8039be27aa56afdbdd00374d6ed5341"
+        },
+        {
+          "id": "orchestration/v0.1.0/production.ko.md",
+          "sha256": "sha256:2a44ec760ae97df289fed6d0825b1cfaf3540a19b1313ee7dbed4814f694ccb7"
+        },
+        {
+          "id": "assistance/verification.ko.md",
+          "sha256": "sha256:e6ffccb9f3041785a494349ddef61dfdea281ca59e3171216821cc6bc6956929"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 488,
+          "kind": "source",
+          "path": "inputs/prior-source/prior.py",
+          "sha256": "sha256:77d00ba07ed8ea07152aae206d235a08119d0bfb6d640d76dc3bdcab4b81dd52",
+          "source_id": "prior-source"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1385,
+          "kind": "source",
+          "path": "inputs/documentation-oracle/check_continuation_v2.py",
+          "sha256": "sha256:3e8f664587dd9659a1548e0114711bfbc8c7567f3bb11bdd57785ddd058d8a7c",
+          "source_id": "documentation-oracle"
+        }
+      ],
+      "input_sha256": "sha256:2772c506535b40128dcc33881cefb2b874e2716f6bc2ccdfeead890a5c2d5bdd",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:34bd7f65a67aa51d95bd60f4274bbb8c1f05dd2f4e393708532bafcf054b2172",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "production",
+      "status": "completed",
+      "thread_sha256": "sha256:c25141767629be674a536eaa67718b110dcca5944bf03ed0eb6790c07646dffd",
+      "unit_id": "software-continuation",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 34560,
+        "input_tokens": 76917,
+        "output_tokens": 2910,
+        "reasoning_output_tokens": 1128
+      }
+    },
+    {
+      "assignment_id": "69f1a5e3-b28a-4706-9817-d204fd6dbb4d",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.ko.md",
+          "sha256": "sha256:5d0d4d531c4859632ae3e917037f8a68c8039be27aa56afdbdd00374d6ed5341"
+        },
+        {
+          "id": "orchestration/v0.1.0/review.ko.md",
+          "sha256": "sha256:b2ad2e6b83c82054ac8d8fed03bc59a1eb9be6ac8f006efbdc55c62e997f4785"
+        },
+        {
+          "id": "assistance/verification.ko.md",
+          "sha256": "sha256:e6ffccb9f3041785a494349ddef61dfdea281ca59e3171216821cc6bc6956929"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 488,
+          "kind": "source",
+          "path": "inputs/prior-source/prior.py",
+          "sha256": "sha256:77d00ba07ed8ea07152aae206d235a08119d0bfb6d640d76dc3bdcab4b81dd52",
+          "source_id": "prior-source"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1385,
+          "kind": "source",
+          "path": "inputs/documentation-oracle/check_continuation_v2.py",
+          "sha256": "sha256:3e8f664587dd9659a1548e0114711bfbc8c7567f3bb11bdd57785ddd058d8a7c",
+          "source_id": "documentation-oracle"
+        },
+        {
+          "bytes": 1133,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:2e2b444bf3a046b438650eaa2a68f78b5fd3c74e775cd4f52ae47af93c9a18e5",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:2f5701f00ff408166359b76cf8760fb3a0477cc5336ef0b2a66c479852e2746c",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:d6a9ad61efeb00bd1cab062bbbf3583e82b156505cf581894cbd0c95c855552d",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "review",
+      "status": "completed",
+      "thread_sha256": "sha256:0b5bdc526aa4a022597a176f7be5582fe25a31553314be3bd44de523e4c37995",
+      "unit_id": "software-continuation",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 55424,
+        "input_tokens": 78533,
+        "output_tokens": 3253,
+        "reasoning_output_tokens": 1035
+      }
+    },
+    {
+      "assignment_id": "649fdb83-073f-4a5d-8084-cb380e206c22",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.ko.md",
+          "sha256": "sha256:5d0d4d531c4859632ae3e917037f8a68c8039be27aa56afdbdd00374d6ed5341"
+        },
+        {
+          "id": "orchestration/v0.1.0/execution_verification.ko.md",
+          "sha256": "sha256:cf5a4fcf1a4c3ea02e1af53cbf421830e2a99a963a813adc4dfa567030bcd0b1"
+        },
+        {
+          "id": "assistance/verification.ko.md",
+          "sha256": "sha256:e6ffccb9f3041785a494349ddef61dfdea281ca59e3171216821cc6bc6956929"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 488,
+          "kind": "source",
+          "path": "inputs/prior-source/prior.py",
+          "sha256": "sha256:77d00ba07ed8ea07152aae206d235a08119d0bfb6d640d76dc3bdcab4b81dd52",
+          "source_id": "prior-source"
+        },
+        {
+          "bytes": 1875,
+          "kind": "source",
+          "path": "inputs/cost-cases/cost_cases.json",
+          "sha256": "sha256:c75b9488461ef64afda9c9a11b3d86797f78593862ef04957248262a0788c0fa",
+          "source_id": "cost-cases"
+        },
+        {
+          "bytes": 903,
+          "kind": "source",
+          "path": "inputs/cost-oracle/check_cost.py",
+          "sha256": "sha256:651e673aea6472bd3a8761653e19705ca57d8e4568daf80aa7bfbd05300c07f7",
+          "source_id": "cost-oracle"
+        },
+        {
+          "bytes": 1385,
+          "kind": "source",
+          "path": "inputs/documentation-oracle/check_continuation_v2.py",
+          "sha256": "sha256:3e8f664587dd9659a1548e0114711bfbc8c7567f3bb11bdd57785ddd058d8a7c",
+          "source_id": "documentation-oracle"
+        },
+        {
+          "bytes": 1133,
+          "kind": "candidate",
+          "path": "pricing.py",
+          "sha256": "sha256:2e2b444bf3a046b438650eaa2a68f78b5fd3c74e775cd4f52ae47af93c9a18e5",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:998892cf4b2258e2b4a45efc3ef8182dfc4153c7be627b0b64e6cec1d43f7d6c",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:ccd0e68aba1a3a217c4c4e14806b83cad7d2fc734c1e287e00863e43eeec8446",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "execution_verification",
+      "status": "completed",
+      "thread_sha256": "sha256:3a9e5aacc1ba6e9c6682a53d201b6c0fd5a799db91e6495b585c766a1745b661",
+      "unit_id": "software-continuation",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 69760,
+        "input_tokens": 80353,
+        "output_tokens": 2522,
+        "reasoning_output_tokens": 1029
+      }
+    }
+  ],
+  "client_sha256": "sha256:c3e30211bd454da70ceb4d9cbc2e05fe6466812ab05c311c3bbff6addeb14202",
+  "client_version": "codex-cli 0.158.0-alpha.2",
+  "integration": "pending_primary_reconciliation",
+  "limitations": [
+    "primary_classification_and_authorization_are_caller_attributed",
+    "configured_model_tuple_not_backend_attestation",
+    "fresh_context_not_account_or_all_filesystem_read_isolation",
+    "read_only_checks_network_disabled_no_scratch_writes",
+    "public_findings_are_model_judgments_with_exact_artifact_binding",
+    "no_raw_prompt_event_reasoning_or_check_output_retention",
+    "candidate_only_primary_must_recheck_affected_final_project_bytes",
+    "no_memory_enrollment_capture_or_schema_migration"
+  ],
+  "memory_snapshot_sha256": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "memory_status": "not_requested",
+  "model": {
+    "effort": "max",
+    "name": "gpt-6-astra"
+  },
+  "plan_sha256": "sha256:ebd4c3a9ad51442e95d18a98b8811b7613f2f588b483928cb2bc7637d61ffb94",
+  "publication": {
+    "completed_files": [
+      {
+        "bytes": 1133,
+        "path": "versions/software-continuation/v1/pricing.py",
+        "sha256": "sha256:2e2b444bf3a046b438650eaa2a68f78b5fd3c74e775cd4f52ae47af93c9a18e5"
+      },
+      {
+        "bytes": 1133,
+        "path": "artifacts/pricing.py",
+        "sha256": "sha256:2e2b444bf3a046b438650eaa2a68f78b5fd3c74e775cd4f52ae47af93c9a18e5"
+      }
+    ],
+    "location_verified": true,
+    "pending_path": null,
+    "status": "complete"
+  },
+  "run_id": "94f3067a-3c0d-47a7-b66e-b30920bcba21",
+  "schema": "opensocrates.orchestration.response/1.0.0",
+  "status": "integration_pending",
+  "units": [
+    {
+      "reason": "independent_obligations_satisfied",
+      "required_open": [],
+      "status": "qualified_candidate",
+      "unit_id": "software-continuation",
+      "versions": [
+        {
+          "artifacts": [
+            {
+              "bytes": 1133,
+              "path": "pricing.py",
+              "sha256": "sha256:2e2b444bf3a046b438650eaa2a68f78b5fd3c74e775cd4f52ae47af93c9a18e5"
+            }
+          ],
+          "candidate_sha256": "sha256:d7851bbeebf2c5d02bd4338eed38b873791c6dcfcdf3388aa8e4cc77a66898b0",
+          "checks": [
+            {
+              "argv_sha256": "sha256:ecf5acacb9df17114821a8091d92ceb673f461cca0d30330429e7dfec535ec68",
+              "candidate_sha256": "sha256:d7851bbeebf2c5d02bd4338eed38b873791c6dcfcdf3388aa8e4cc77a66898b0",
+              "check_id": "cost-oracle",
+              "exit_code": 0,
+              "obligation_ids": [
+                "continuation-behavior"
+              ],
+              "reason": "expected_exit",
+              "status": "passed",
+              "stderr_sha256": "sha256:f7b3135a442bca56c80aee590e57fd6fcd27d4c9b7cffadfd24064714d6cd217",
+              "stdout_sha256": "sha256:1bdba97e2b1ce9da168c14a22dba1a545dc611886904c8736346beca99f1f720"
+            },
+            {
+              "argv_sha256": "sha256:05a8489bf8978620f54d99e6c4c662906c601a987fb17f0f7e11880dbf4bac9d",
+              "candidate_sha256": "sha256:d7851bbeebf2c5d02bd4338eed38b873791c6dcfcdf3388aa8e4cc77a66898b0",
+              "check_id": "documentation-oracle",
+              "exit_code": 0,
+              "obligation_ids": [
+                "continuation-documentation"
+              ],
+              "reason": "expected_exit",
+              "status": "passed",
+              "stderr_sha256": "sha256:e52ea5ce2e2ff7e5ece06ca9ed4ba8b92e3cc2eb1ecc907fe1f50f8a484e8216",
+              "stdout_sha256": "sha256:962f2d8c5686f1cd73e4a17d5addc58e4996ca0a8587f6881b53df6005b73245"
+            }
+          ],
+          "producer_id": "ac5c78fd-93d0-4820-b584-f04c56524f8e",
+          "qualified": true,
+          "review": {
+            "assignment_id": "69f1a5e3-b28a-4706-9817-d204fd6dbb4d",
+            "candidate_sha256": "sha256:d7851bbeebf2c5d02bd4338eed38b873791c6dcfcdf3388aa8e4cc77a66898b0",
+            "findings": [],
+            "obligations": [
+              {
+                "evidence_ids": [
+                  "artifact:sha256:2e2b444bf3a046b438650eaa2a68f78b5fd3c74e775cd4f52ae47af93c9a18e5",
+                  "source:prior-source",
+                  "source:cost-cases",
+                  "source:cost-oracle"
+                ],
+                "expected": "여섯 비용 사례, 최신 적격 날짜 선택, zero/null/missing 구분, 입력 불변성과 effective_cost(rows, as_of) 인터페이스를 보존한다.",
+                "id": "continuation-behavior",
+                "observed": "지정된 여섯 사례 모두 통과했다. 최신 비용은 8이며 미래 행은 제외됐다. null은 unknown, zero는 known, 비용 필드 부재는 missing으로 구분됐다. 적격 행이 없으면 missing과 null 비용·날짜를 반환했다. 추가로 기준일 당일 가격 상승, 이전 가격 이후 zero, 이전 가격 이후 필드 부재도 확인했다. 모든 입력과 인터페이스가 보존됐다.",
+                "reproduction": "지정된 cost-oracle 명령은 종료 코드 0, case_count 6, failed_case_ids []를 반환했다. 별도 직접 호출로 여섯 사례와 추가 세 사례의 반환값 및 호출 전후 입력을 비교했다. 이는 검토 단계의 재현이며 별도 실행 검증을 대체하지 않는다.",
+                "status": "passed"
+              },
+              {
+                "evidence_ids": [
+                  "artifact:sha256:2e2b444bf3a046b438650eaa2a68f78b5fd3c74e775cd4f52ae47af93c9a18e5",
+                  "source:prior-source",
+                  "source:documentation-oracle"
+                ],
+                "expected": "독립된 모듈 docstring 줄만 변경하고 나머지 바이트를 정확히 보존한다. 영어 설명에 effective date, null, zero, missing을 포함한다.",
+                "id": "continuation-documentation",
+                "observed": "후보의 1–11행에 영어 모듈 docstring이 추가됐다. 네 용어와 해당 의미가 설명됐다. 해당 줄을 제거한 488바이트는 prior.py와 완전히 동일하며 SHA-256은 77d00ba07ed8ea07152aae206d235a08119d0bfb6d640d76dc3bdcab4b81dd52다. 추가 빈 줄이나 줄바꿈 변경은 없다. 모든 입력 파일의 크기와 해시도 선언값과 일치했다.",
+                "reproduction": "AST로 docstring의 독립된 줄 범위를 확인하고 해당 줄만 제거한 원시 바이트를 prior.py와 비교했다. 지정된 documentation-oracle 명령도 종료 코드 0과 passed true를 반환했다.",
+                "status": "passed"
+              }
+            ],
+            "schema": "opensocrates.orchestration.assessment/1.0.0",
+            "verdict": "pass"
+          },
+          "reviewer_id": "69f1a5e3-b28a-4706-9817-d204fd6dbb4d",
+          "verification": {
+            "assignment_id": "649fdb83-073f-4a5d-8084-cb380e206c22",
+            "candidate_sha256": "sha256:d7851bbeebf2c5d02bd4338eed38b873791c6dcfcdf3388aa8e4cc77a66898b0",
+            "findings": [],
+            "obligations": [
+              {
+                "evidence_ids": [
+                  "check:cost-oracle"
+                ],
+                "expected": "최신 적격 날짜 선택, 미래 날짜 제외, zero/null/missing 구분과 입력 불변성을 유지하고 지정된 6개 사례를 통과해야 한다.",
+                "id": "continuation-behavior",
+                "observed": "입력과 후보의 파일 해시가 명세와 일치한다. 제공된 영수증은 해당 후보에 대해 통과를 기록했다. 독립 재실행도 종료 코드 0으로 6개 사례 모두 통과했으며 입력 불변성이 확인됐다. 최신 적격 비용은 8이다.",
+                "reproduction": "$PYTHON -B inputs/cost-oracle/check_cost.py pricing.py inputs/cost-cases/cost_cases.json",
+                "status": "passed"
+              },
+              {
+                "evidence_ids": [
+                  "check:documentation-oracle"
+                ],
+                "expected": "독립된 영어 모듈 docstring만 변경하고 나머지 바이트를 그대로 보존하며 effective date, null, zero, missing을 설명해야 한다.",
+                "id": "continuation-documentation",
+                "observed": "제공된 통과 영수증과 독립 재실행 결과가 일치한다. 1~11행의 docstring은 네 용어와 동작을 정확히 설명한다. 이를 제거한 488바이트는 prior.py와 완전히 동일하며, 추가 빈 줄 없이 12행에서 구현이 시작된다.",
+                "reproduction": "$PYTHON -B inputs/documentation-oracle/check_continuation_v2.py pricing.py inputs/prior-source/prior.py",
+                "status": "passed"
+              }
+            ],
+            "schema": "opensocrates.orchestration.assessment/1.0.0",
+            "verdict": "pass"
+          },
+          "verifier_id": "649fdb83-073f-4a5d-8084-cb380e206c22",
+          "version": 1
+        }
+      ]
+    }
+  ]
+}

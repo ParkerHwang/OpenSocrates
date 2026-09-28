@@ -1,0 +1,62 @@
+{
+  "schema": "opensocrates.coding-specialist-review/1",
+  "candidate_version": "0.1.1",
+  "source_baseline": "53e36e08bd79e72466c06eed028fedafecd991ce",
+  "reviewer": "primary integrator; no subagents; unblinded author/source review",
+  "human_review": null,
+  "runtime_prompts": 12,
+  "static_locales": [
+    "en",
+    "ko",
+    "zh-CN"
+  ],
+  "reviewed_repairs": [
+    {
+      "id": "R1",
+      "scope": "ownership KO",
+      "change": "Clarified deterministic calculation as same-input/same-result calculation."
+    },
+    {
+      "id": "R2",
+      "scope": "transitions KO",
+      "change": "Named process/system abnormal termination for crash durability, distinct from concurrent conflict."
+    },
+    {
+      "id": "R3",
+      "scope": "routers EN/KO/zh-CN",
+      "change": "Moved the contracts/transitions/ownership discriminator into runtime context; explicitly not a mandatory pipeline."
+    },
+    {
+      "id": "R4",
+      "scope": "ownership EN/KO/zh-CN",
+      "change": "Preserve unaffected contracts; propagate an explicitly authorized contract change to consumers."
+    },
+    {
+      "id": "R5",
+      "scope": "routers EN/KO/zh-CN",
+      "change": "Package-agnostic provisional status and conditional controller authority; no false absence/installation claim."
+    },
+    {
+      "id": "R6",
+      "scope": "integrated controller",
+      "change": "Scoped the old canonical-only fallback sentence so it no longer conflicts with specialist-primary static delivery."
+    }
+  ],
+  "parity": "All twelve full runtime files read; operational clauses compared directly across EN/KO/zh-CN. This is not independent human or empirical language-equivalence validation.",
+  "structural_checks": {
+    "original_candidate_unchanged_files": 24,
+    "new_candidate_validation_groups_passed": 6,
+    "source_boundary_tests_passed": 5,
+    "normal_hook_composition_tests_passed": 7,
+    "generated_package_members_matched": 13
+  },
+  "failures_and_repairs": [
+    {
+      "stage": "package_inventory_check",
+      "failure": "New checker compared bare SHA-256 with existing release-manifest sha256:-prefixed digests. Exact file bytes already matched.",
+      "repair": "Require the existing prefixed form; added a package-inventory positive/tamper check. Five focused checks and package comparison passed.",
+      "runtime_or_prompt_change": false
+    }
+  ],
+  "effect_status": "Direct and integrated observations are separate, pending results; no quality promotion from these checks."
+}

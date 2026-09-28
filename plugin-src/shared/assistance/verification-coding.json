@@ -1,0 +1,18 @@
+{
+  "schema": "opensocrates.assistance.request/1.1.0",
+  "request_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "locale": "en",
+  "task": {
+    "task_kind": "judgment", "task_family": "coding", "complexity": "coupled",
+    "stakes": "ordinary", "uncertainty": "bounded", "context_need": "none",
+    "completion": "checks_satisfied", "material_change": false
+  },
+  "model_context": {"model": null, "effort": null, "client": null, "attribution": "unknown"},
+  "profile_override": null,
+  "obligations": [
+    {"obligation_id":"api","question_id":"delivery","kind":"work","required":true,"status":"met","evidence_refs":["fixture:api"],"attribution":"agent_reported","depends_on":[]},
+    {"obligation_id":"callers","question_id":"delivery","kind":"work","required":true,"status":"unmet","evidence_refs":["fixture:caller-failure"],"attribution":"agent_reported","depends_on":[]},
+    {"obligation_id":"tests","question_id":"delivery","kind":"work","required":true,"status":"unverified","evidence_refs":[],"attribution":"agent_reported","depends_on":["callers"]},
+    {"obligation_id":"performance","question_id":"performance","kind":"work","required":false,"status":"unverified","evidence_refs":[],"attribution":"agent_reported","depends_on":["api","tests"]}
+  ]
+}

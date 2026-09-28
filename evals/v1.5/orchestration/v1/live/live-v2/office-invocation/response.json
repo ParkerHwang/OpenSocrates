@@ -1,0 +1,664 @@
+{
+  "calls": [
+    {
+      "assignment_id": "19203760-a101-4ad3-a61a-6d3a2007188b",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/production.en.md",
+          "sha256": "sha256:119ca693b91730508655b7ca942dad5d1035a5e94867e5b5c0f03f916ec8ea7f"
+        },
+        {
+          "id": "orchestration/v0.1.0/data.en.md",
+          "sha256": "sha256:ac496f7c10e05ac33fe2769df4279acd77fab036cbcdba693904ea3ea36476ba"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 808,
+          "kind": "source",
+          "path": "inputs/calculation-oracle/check_calculation.py",
+          "sha256": "sha256:328e2e0351cfd19fc0b029787ed9867fb4b21612ba214d5bb7da8a99835727b3",
+          "source_id": "calculation-oracle"
+        }
+      ],
+      "input_sha256": "sha256:8776c0913e2f417b54b244a7c2ef6104e9a2d07a17fcad46ec2c9cb60dee2745",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:1b848cc1f946f2cd8159fd2169c6882f3a8639f6f007935f60ea538e7db1a2d2",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "production",
+      "status": "completed",
+      "thread_sha256": "sha256:8edc3961efe012ef948c79ec377ef4586625e75e6b06e5c9830a5e0fa0426600",
+      "unit_id": "data-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 33024,
+        "input_tokens": 50955,
+        "output_tokens": 776,
+        "reasoning_output_tokens": 227
+      }
+    },
+    {
+      "assignment_id": "e3377aab-8667-47ab-b667-c51be31a5294",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/review.en.md",
+          "sha256": "sha256:017758c1864b75671e09bd6206818673f12bb7205a8f305d88fed484365a6ef3"
+        },
+        {
+          "id": "orchestration/v0.1.0/data.en.md",
+          "sha256": "sha256:ac496f7c10e05ac33fe2769df4279acd77fab036cbcdba693904ea3ea36476ba"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 808,
+          "kind": "source",
+          "path": "inputs/calculation-oracle/check_calculation.py",
+          "sha256": "sha256:328e2e0351cfd19fc0b029787ed9867fb4b21612ba214d5bb7da8a99835727b3",
+          "source_id": "calculation-oracle"
+        },
+        {
+          "bytes": 341,
+          "kind": "candidate",
+          "path": "calculation.json",
+          "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:dad1c844b0a147a998bfef81be6cdb88b732865532af5b2952ca1085aa633279",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:e2701cabcb8a6654c546c81f1d73009e244ea6df22bb12536b8e651b32833a82",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "review",
+      "status": "completed",
+      "thread_sha256": "sha256:e1feb82e5446c24b78b06770c22cb6d6a05804208b920986072c2cd9beae2bac",
+      "unit_id": "data-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 33408,
+        "input_tokens": 51924,
+        "output_tokens": 1908,
+        "reasoning_output_tokens": 1088
+      }
+    },
+    {
+      "assignment_id": "095c1d0c-3b01-4a88-a2c0-d5c5e76843d4",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/execution_verification.en.md",
+          "sha256": "sha256:588c63eb229971fa0adb08ec47dd9e8b67cf04498910a12574be8c17151c35bb"
+        },
+        {
+          "id": "orchestration/v0.1.0/data.en.md",
+          "sha256": "sha256:ac496f7c10e05ac33fe2769df4279acd77fab036cbcdba693904ea3ea36476ba"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 808,
+          "kind": "source",
+          "path": "inputs/calculation-oracle/check_calculation.py",
+          "sha256": "sha256:328e2e0351cfd19fc0b029787ed9867fb4b21612ba214d5bb7da8a99835727b3",
+          "source_id": "calculation-oracle"
+        },
+        {
+          "bytes": 341,
+          "kind": "candidate",
+          "path": "calculation.json",
+          "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:ec347034f9dd1b2573546d278d7b865b2e7e320ebcb79d0166cc6a20e071c569",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:a76474161fc7c3c4550d265bea7cb0a5ec8cfabedc9efb395145d2aff2720267",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "execution_verification",
+      "status": "completed",
+      "thread_sha256": "sha256:6336288530416dbbdbaeb46811360c575df87f899184d170fe2eb213409ccca7",
+      "unit_id": "data-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 33792,
+        "input_tokens": 52285,
+        "output_tokens": 1404,
+        "reasoning_output_tokens": 722
+      }
+    },
+    {
+      "assignment_id": "d408f8cf-cbcf-4541-b82c-8261d5859640",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/production.en.md",
+          "sha256": "sha256:119ca693b91730508655b7ca942dad5d1035a5e94867e5b5c0f03f916ec8ea7f"
+        },
+        {
+          "id": "orchestration/v0.1.0/document.en.md",
+          "sha256": "sha256:1602c5003506d3ee0369fd2161894d073366e4bff70821533721a404c9232b2a"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 1996,
+          "kind": "source",
+          "path": "inputs/report-oracle/check_report.py",
+          "sha256": "sha256:1463e22a1475830499964da10ec539ad3616018abe643edf0e81f686f57c8e67",
+          "source_id": "report-oracle"
+        },
+        {
+          "bytes": 341,
+          "kind": "dependency",
+          "path": "calculation.json",
+          "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6",
+          "source_id": "data-production"
+        }
+      ],
+      "input_sha256": "sha256:7fc4f714cba0819e3bc56ae2b6cdd120f36bf11e5cf54d5dbca3b5dae4c9e717",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:0031052bf39a80187303f3512d7bcb8bc497c4789c5b26039073d2585b5dbe63",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "production",
+      "status": "completed",
+      "thread_sha256": "sha256:498ffeea172180e3404ee3b364e1f15694ef7dc0afe565ad44169a741997b6cb",
+      "unit_id": "document-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 33152,
+        "input_tokens": 52152,
+        "output_tokens": 1329,
+        "reasoning_output_tokens": 603
+      }
+    },
+    {
+      "assignment_id": "4de7c1f8-902a-4e28-ba4f-11b2bd8821fd",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/review.en.md",
+          "sha256": "sha256:017758c1864b75671e09bd6206818673f12bb7205a8f305d88fed484365a6ef3"
+        },
+        {
+          "id": "orchestration/v0.1.0/document.en.md",
+          "sha256": "sha256:1602c5003506d3ee0369fd2161894d073366e4bff70821533721a404c9232b2a"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 1996,
+          "kind": "source",
+          "path": "inputs/report-oracle/check_report.py",
+          "sha256": "sha256:1463e22a1475830499964da10ec539ad3616018abe643edf0e81f686f57c8e67",
+          "source_id": "report-oracle"
+        },
+        {
+          "bytes": 341,
+          "kind": "dependency",
+          "path": "calculation.json",
+          "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6",
+          "source_id": "data-production"
+        },
+        {
+          "bytes": 485,
+          "kind": "candidate",
+          "path": "report.md",
+          "sha256": "sha256:6f9c5ba7890598222e4c3246f60379c89c463e4937ae8dc84b6246d578eba68b",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:e030c5e5392238061152baa4ace6857a0c2696e2c0bf0ee75e1668d603b0e307",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:50f915a0d5b25b16bfacab29e1ce35da35a910521380cfb494a45351a811cb99",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "review",
+      "status": "completed",
+      "thread_sha256": "sha256:483c5ac9d4292d7b682c2de6343962f1408878ddd3e931e5c45882f58ebc5845",
+      "unit_id": "document-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 71424,
+        "input_tokens": 93387,
+        "output_tokens": 3369,
+        "reasoning_output_tokens": 1391
+      }
+    },
+    {
+      "assignment_id": "ef33bea4-0920-45df-b47d-20a174d9559f",
+      "backend_attempts": null,
+      "failed_turn_events": 0,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/execution_verification.en.md",
+          "sha256": "sha256:588c63eb229971fa0adb08ec47dd9e8b67cf04498910a12574be8c17151c35bb"
+        },
+        {
+          "id": "orchestration/v0.1.0/document.en.md",
+          "sha256": "sha256:1602c5003506d3ee0369fd2161894d073366e4bff70821533721a404c9232b2a"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 1996,
+          "kind": "source",
+          "path": "inputs/report-oracle/check_report.py",
+          "sha256": "sha256:1463e22a1475830499964da10ec539ad3616018abe643edf0e81f686f57c8e67",
+          "source_id": "report-oracle"
+        },
+        {
+          "bytes": 341,
+          "kind": "dependency",
+          "path": "calculation.json",
+          "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6",
+          "source_id": "data-production"
+        },
+        {
+          "bytes": 485,
+          "kind": "candidate",
+          "path": "report.md",
+          "sha256": "sha256:6f9c5ba7890598222e4c3246f60379c89c463e4937ae8dc84b6246d578eba68b",
+          "source_id": null
+        }
+      ],
+      "input_sha256": "sha256:1618888e2f176f99b9a7f2cdc8b6e3d40a35792a0440ba102daf26bca79a4fd3",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": "sha256:5b277be3b99a6a1a26cf86fe804973776e068a075e56a5a8014ad066ff2b7bec",
+      "process_exit_code": 0,
+      "provider_error_events": 0,
+      "reason": "structured_result",
+      "role": "execution_verification",
+      "status": "completed",
+      "thread_sha256": "sha256:89c6433cd24cc3b603b4c43f74d6d2687d5c4a623e135222108d0e6b937c1433",
+      "unit_id": "document-production",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 35840,
+        "input_tokens": 56202,
+        "output_tokens": 1725,
+        "reasoning_output_tokens": 872
+      }
+    }
+  ],
+  "client_sha256": "sha256:c3e30211bd454da70ceb4d9cbc2e05fe6466812ab05c311c3bbff6addeb14202",
+  "client_version": "codex-cli 0.158.0-alpha.2",
+  "integration": "pending_primary_reconciliation",
+  "limitations": [
+    "primary_classification_and_authorization_are_caller_attributed",
+    "configured_model_tuple_not_backend_attestation",
+    "fresh_context_not_account_or_all_filesystem_read_isolation",
+    "read_only_checks_network_disabled_no_scratch_writes",
+    "public_findings_are_model_judgments_with_exact_artifact_binding",
+    "no_raw_prompt_event_reasoning_or_check_output_retention",
+    "candidate_only_primary_must_recheck_affected_final_project_bytes",
+    "no_memory_enrollment_capture_or_schema_migration"
+  ],
+  "memory_snapshot_sha256": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "memory_status": "not_requested",
+  "model": {
+    "effort": "max",
+    "name": "gpt-6-astra"
+  },
+  "plan_sha256": "sha256:f2020112ac927069faf02c34db07026dfc624e514e626b664a45ada0f39fd6f7",
+  "publication": {
+    "completed_files": [
+      {
+        "bytes": 341,
+        "path": "versions/data-production/v1/calculation.json",
+        "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6"
+      },
+      {
+        "bytes": 485,
+        "path": "versions/document-production/v1/report.md",
+        "sha256": "sha256:6f9c5ba7890598222e4c3246f60379c89c463e4937ae8dc84b6246d578eba68b"
+      },
+      {
+        "bytes": 341,
+        "path": "artifacts/calculation.json",
+        "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6"
+      },
+      {
+        "bytes": 485,
+        "path": "artifacts/report.md",
+        "sha256": "sha256:6f9c5ba7890598222e4c3246f60379c89c463e4937ae8dc84b6246d578eba68b"
+      }
+    ],
+    "location_verified": true,
+    "pending_path": null,
+    "status": "complete"
+  },
+  "run_id": "f643095b-2b8b-4096-bc9f-52a14d27f9b5",
+  "schema": "opensocrates.orchestration.response/1.0.0",
+  "status": "integration_pending",
+  "units": [
+    {
+      "reason": "independent_obligations_satisfied",
+      "required_open": [],
+      "status": "qualified_candidate",
+      "unit_id": "data-production",
+      "versions": [
+        {
+          "artifacts": [
+            {
+              "bytes": 341,
+              "path": "calculation.json",
+              "sha256": "sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6"
+            }
+          ],
+          "candidate_sha256": "sha256:915e1c95da544b90bd2a360071fd94c0b1634943691b355c58ae9f98f43439f5",
+          "checks": [
+            {
+              "argv_sha256": "sha256:a446de9e3b705def8d03febd31029bfd2efbcba226c4941137ea5f512b409d30",
+              "candidate_sha256": "sha256:915e1c95da544b90bd2a360071fd94c0b1634943691b355c58ae9f98f43439f5",
+              "check_id": "calculation-oracle",
+              "exit_code": 0,
+              "obligation_ids": [
+                "data-production-acceptance"
+              ],
+              "reason": "expected_exit",
+              "status": "passed",
+              "stderr_sha256": "sha256:ea9ae4722bb09b7c51a82cb2c6c35b8a93b69f746ba49e401eacb3396d435dc9",
+              "stdout_sha256": "sha256:204ee0c9ed863e0a75e47ac4777ef34cfe15e0302a9ef8dd583ea46a7694fc42"
+            }
+          ],
+          "producer_id": "19203760-a101-4ad3-a61a-6d3a2007188b",
+          "qualified": true,
+          "review": {
+            "assignment_id": "e3377aab-8667-47ab-b667-c51be31a5294",
+            "candidate_sha256": "sha256:915e1c95da544b90bd2a360071fd94c0b1634943691b355c58ae9f98f43439f5",
+            "findings": [],
+            "obligations": [
+              {
+                "evidence_ids": [
+                  "source:office-contract",
+                  "source:country-source",
+                  "artifact:sha256:2e9bc3f08cf553af2a89140b08ff089750ad124d71f44f69bc3fd4b04e7745f6"
+                ],
+                "expected": "Use only prescribed fields, preserve every source country in source order, retain the exact source SHA-256, compute each country's quantity × saving_per_unit, and sum those products without implying currency.",
+                "id": "data-production-acceptance",
+                "observed": "calculation.json contains exactly the prescribed fields. Source order and values are preserved: A has quantity 2, saving_per_unit 3, savings 6; B has quantity 5, saving_per_unit 7, savings 35. total_savings is 41. source_sha256 matches 05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82. No rows are omitted and no currency claims appear.",
+                "reproduction": "Read the scoped contract, source and candidate; verified their declared hashes using /usr/bin/shasum -a 256. Independently recomputed 2 × 3 = 6, 5 × 7 = 35, and 6 + 35 = 41. Executable calculation-oracle verification remains assigned to the distinct verifier; no execution receipt was supplied or claimed.",
+                "status": "passed"
+              }
+            ],
+            "schema": "opensocrates.orchestration.assessment/1.0.0",
+            "verdict": "pass"
+          },
+          "reviewer_id": "e3377aab-8667-47ab-b667-c51be31a5294",
+          "verification": {
+            "assignment_id": "095c1d0c-3b01-4a88-a2c0-d5c5e76843d4",
+            "candidate_sha256": "sha256:915e1c95da544b90bd2a360071fd94c0b1634943691b355c58ae9f98f43439f5",
+            "findings": [],
+            "obligations": [
+              {
+                "evidence_ids": [
+                  "check:calculation-oracle"
+                ],
+                "expected": "Only prescribed fields; exact source SHA-256; source-order country products A=2×3=6 and B=5×7=35; additive total=41.",
+                "id": "data-production-acceptance",
+                "observed": "All four scoped input hashes match the manifest. Independent inspection confirms the required fields, source digest, country order, products 6 and 35, and total 41. The supplied calculation-oracle receipt reports exit 0 and is bound to this candidate manifest.",
+                "reproduction": "Inspect the declared source and calculation.json, verify their SHA-256 digests, and recompute 2×3 + 5×7 = 41. Approved check: $PYTHON -B inputs/calculation-oracle/check_calculation.py calculation.json inputs/country-source/country_effects.json",
+                "status": "passed"
+              }
+            ],
+            "schema": "opensocrates.orchestration.assessment/1.0.0",
+            "verdict": "pass"
+          },
+          "verifier_id": "095c1d0c-3b01-4a88-a2c0-d5c5e76843d4",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "reason": "independent_obligations_satisfied",
+      "required_open": [],
+      "status": "qualified_candidate",
+      "unit_id": "document-production",
+      "versions": [
+        {
+          "artifacts": [
+            {
+              "bytes": 485,
+              "path": "report.md",
+              "sha256": "sha256:6f9c5ba7890598222e4c3246f60379c89c463e4937ae8dc84b6246d578eba68b"
+            }
+          ],
+          "candidate_sha256": "sha256:b7e951d7cd8f56c1277be91669c9ce05fe6903a6fd1eb7a119328304fa369378",
+          "checks": [
+            {
+              "argv_sha256": "sha256:e8ca67189309ffb476b2b926ceb29a2bc3d7d97ebaaeef2aff1c0f9908dd656d",
+              "candidate_sha256": "sha256:b7e951d7cd8f56c1277be91669c9ce05fe6903a6fd1eb7a119328304fa369378",
+              "check_id": "report-oracle",
+              "exit_code": 0,
+              "obligation_ids": [
+                "document-production-acceptance"
+              ],
+              "reason": "expected_exit",
+              "status": "passed",
+              "stderr_sha256": "sha256:b113353d50e435e97b3576fcf309d2053756826abfbb5b219059d51b9006b058",
+              "stdout_sha256": "sha256:c25101bac6482a38db491cb97b5493c9b5c8402b9f9267118aaddb55b5a6601b"
+            }
+          ],
+          "producer_id": "d408f8cf-cbcf-4541-b82c-8261d5859640",
+          "qualified": true,
+          "review": {
+            "assignment_id": "4de7c1f8-902a-4e28-ba4f-11b2bd8821fd",
+            "candidate_sha256": "sha256:b7e951d7cd8f56c1277be91669c9ce05fe6903a6fd1eb7a119328304fa369378",
+            "findings": [],
+            "obligations": [
+              {
+                "evidence_ids": [
+                  "artifact:sha256:6f9c5ba7890598222e4c3246f60379c89c463e4937ae8dc84b6246d578eba68b",
+                  "source:office-contract",
+                  "source:country-source",
+                  "dependency:data-production"
+                ],
+                "expected": "Report includes exact current source/calculation hashes, required labels, the four-column table in source order, and reconciled prose stating that total savings is the sum of country products.",
+                "id": "document-production-acceptance",
+                "observed": "report.md lines 3–14 satisfy the requirements. Both hashes match current file bytes. Table rows show A: 2 × 3 = 6 and B: 5 × 7 = 35. The labeled total and prose correctly state 6 + 35 = 41. No unsupported currency or external claims appear.",
+                "reproduction": "Independently hashed the files, recomputed country products and their sum, compared the calculation and table, and inspected all prose. Reconciliation assertions passed. The required report-oracle execution remains the distinct verifier's responsibility; no execution receipt was supplied or claimed.",
+                "status": "passed"
+              }
+            ],
+            "schema": "opensocrates.orchestration.assessment/1.0.0",
+            "verdict": "pass"
+          },
+          "reviewer_id": "4de7c1f8-902a-4e28-ba4f-11b2bd8821fd",
+          "verification": {
+            "assignment_id": "ef33bea4-0920-45df-b47d-20a174d9559f",
+            "candidate_sha256": "sha256:b7e951d7cd8f56c1277be91669c9ce05fe6903a6fd1eb7a119328304fa369378",
+            "findings": [],
+            "obligations": [
+              {
+                "evidence_ids": [
+                  "check:report-oracle"
+                ],
+                "expected": "Required labels, current source/calculation hashes, a four-column table in source order, reconciled numbers, and prose stating that the total is the sum of country products.",
+                "id": "document-production-acceptance",
+                "observed": "All five scoped artifacts match their declared byte lengths and SHA-256 digests. Report labels, hashes, header and rows are correct: A=2×3=6, B=5×7=35, total=41. Independent prose inspection confirms the required summation explanation and no unsupported currency or external claims. The supplied receipt passed; rerunning the approved check also exited 0 with no failed rules.",
+                "reproduction": "Run the supplied report-oracle argv unchanged, compare scoped artifact SHA-256 digests with the input manifest, and inspect report.md against the source and calculation, including its table and concluding prose.",
+                "status": "passed"
+              }
+            ],
+            "schema": "opensocrates.orchestration.assessment/1.0.0",
+            "verdict": "pass"
+          },
+          "verifier_id": "ef33bea4-0920-45df-b47d-20a174d9559f",
+          "version": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "packet_id": "fe395bdd38811897",
+  "task_id": "v2-eval04-general-correction",
+  "locale": "en",
+  "initial_request": "Plan a 52-person Saturday workshop using venues.md and calendar.md. My non-negotiable is a step-free venue with a quiet room. Prefer the least costly qualifying venue. Write plan.json with selected_venue (string), attendees (integer), venue_cost_usd (integer), required_features (array of codes step_free and quiet_room), status (string code proposed_unbooked), and basis (object with source_path string and observed_capacity integer). Do not claim a booking. The decision and quiet-room constraint are public project facts I accept for this project.",
+  "followup_request": "Fresh session: venues.md has changed. Revise plan.json for 52 attendees under the existing $1,400 ceiling. Keep my previously accepted step-free and quiet-room conditions. plan.json must contain selected_venue (string), attendees (integer), venue_cost_usd (integer), required_features (array of codes step_free and quiet_room), status (string code proposed_unbooked), and basis (object with source_path string and observed_capacity integer). Correction: Cedar's old 60-person capacity is withdrawn; please forget that scoped fact and use the current source. Explain what changed and do not claim that a booking exists. If an enrolled project memory is unavailable, say so accurately; the maintained-note control has its explicit PROJECT_NOTES.md path.",
+  "source_before_task": {
+    "venues.md": "Current venue inventory for 52 attendees (revised capacity list):\n- Cedar: capacity 48, $1,100, step-free, quiet room available.\n- Harbor: capacity 65, $1,300, step-free, quiet room available.\n- Birch: capacity 70, $900, stairs only, no quiet room.\n",
+    "calendar.md": "The workshop is on Saturday. Venue budget ceiling is $1,400. No booking has been made.\n",
+    "plan.json": "{\"selected_venue\":\"Cedar\",\"attendees\":52,\"venue_cost_usd\":1100,\"required_features\":[\"step_free\",\"quiet_room\"],\"status\":\"proposed_unbooked\",\"basis\":{\"source_path\":\"venues.md\",\"observed_capacity\":60}}\n"
+  },
+  "declared_source_transition": {
+    "venues.md": "Current venue inventory for 52 attendees (revised capacity list):\n- Cedar: capacity 48, $1,100, step-free, quiet room available.\n- Harbor: capacity 65, $1,300, step-free, quiet room available.\n- Birch: capacity 70, $900, stairs only, no quiet room.\n"
+  },
+  "scoped_public_intent": null,
+  "stages": [
+    {
+      "artifacts": {
+        "plan.json": "{\"selected_venue\":\"Harbor\",\"attendees\":52,\"venue_cost_usd\":1300,\"required_features\":[\"step_free\",\"quiet_room\"],\"status\":\"proposed_unbooked\",\"basis\":{\"source_path\":\"venues.md\",\"observed_capacity\":65}}\n"
+      },
+      "public_final": "Updated [plan.json](<disposable>/workspace/plan.json) to propose Harbor for 52 attendees at $1,300, with step-free access and a quiet room. The current [venues.md](<disposable>/workspace/venues.md) lists Harbor’s capacity as 65 and Cedar’s revised capacity as 48. The plan remains `proposed_unbooked`; I made no booking.\n\nI recorded the withdrawn Cedar capacity in [PROJECT_NOTES.md](<disposable>/workspace/PROJECT_NOTES.md). Enrolled project memory was unavailable because no project identifiers were supplied.\n\nLocal checks passed for the JSON fields, budget, required features, source capacities, and note."
+    }
+  ],
+  "designated_artifact_diffs": {
+    "plan.json": "--- before/plan.json\n+++ after/plan.json\n@@ -1 +1 @@\n-{\"selected_venue\":\"Cedar\",\"attendees\":52,\"venue_cost_usd\":1100,\"required_features\":[\"step_free\",\"quiet_room\"],\"status\":\"proposed_unbooked\",\"basis\":{\"source_path\":\"venues.md\",\"observed_capacity\":60}}\n+{\"selected_venue\":\"Harbor\",\"attendees\":52,\"venue_cost_usd\":1300,\"required_features\":[\"step_free\",\"quiet_room\"],\"status\":\"proposed_unbooked\",\"basis\":{\"source_path\":\"venues.md\",\"observed_capacity\":65}}\n"
+  },
+  "human_status": "unavailable",
+  "human_scores": null,
+  "non_blindable_cues": [
+    "Memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed."
+  ],
+  "coverage_limit": "Packets contain declared task sources and designated output artifacts, not a complete post-run filesystem snapshot or raw tool transcript."
+}

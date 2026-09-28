@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DepotFlow</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section id="login-view" class="login-card" aria-labelledby="login-title">
+        <p class="eyebrow">DepotFlow</p>
+        <h1 id="login-title">Warehouse fulfillment, kept in sync.</h1>
+        <p class="muted">Sign in to inspect stock and move orders through fulfillment.</p>
+        <form id="login-form" novalidate>
+          <label for="login-email">Email</label>
+          <input id="login-email" data-testid="login-email" name="email" type="email" autocomplete="username" required>
+          <label for="login-password">Password</label>
+          <input id="login-password" data-testid="login-password" name="password" type="password" autocomplete="current-password" required>
+          <button id="login-submit" data-testid="login-submit" class="primary" type="submit">Sign in</button>
+        </form>
+        <p id="login-message" class="message" role="alert" aria-live="polite"></p>
+        <p class="login-hint">Demo users use password <code>DepotDemo!2026</code>.</p>
+      </section>
+
+      <section id="app-view" class="app-view" hidden>
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">DepotFlow</p>
+            <h1>Fulfillment console</h1>
+          </div>
+          <div class="identity">
+            <span id="identity-text"></span>
+            <button id="logout" data-testid="logout" class="secondary" type="button">Log out</button>
+          </div>
+        </header>
+
+        <nav class="tabs" aria-label="Primary navigation">
+          <button id="nav-inventory" data-testid="nav-inventory" class="tab active" type="button">Inventory</button>
+          <button id="nav-orders" data-testid="nav-orders" class="tab" type="button">Orders</button>
+          <button id="nav-audit" data-testid="nav-audit" class="tab" type="button">Audit</button>
+        </nav>
+
+        <p id="global-message" class="message" role="status" aria-live="polite"></p>
+
+        <section id="inventory-view" class="view" aria-labelledby="inventory-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Operations snapshot</p>
+              <h2 id="inventory-heading">Inventory</h2>
+            </div>
+            <button id="refresh-inventory" class="secondary" type="button">Refresh</button>
+          </div>
+          <div id="dashboard-cards" class="cards" aria-label="Dashboard summary"></div>
+          <div class="panel">
+            <div class="panel-heading">
+              <h3>Stock levels</h3>
+              <span id="inventory-state" class="muted">Loading…</span>
+            </div>
+            <div class="table-wrap">
+              <table id="inventory-table" data-testid="inventory-table">
+                <caption class="sr-only">Current inventory by SKU</caption>
+                <thead>
+                  <tr><th scope="col">SKU</th><th scope="col">Item</th><th scope="col">On hand</th><th scope="col">Reserved</th><th scope="col">Available</th><th scope="col">Unit price</th><th scope="col">Version</th></tr>
+                </thead>
+                <tbody id="inventory-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <section id="stock-adjustment-panel" class="panel writable-only" aria-labelledby="stock-adjustment-heading" hidden>
+            <div class="panel-heading"><h3 id="stock-adjustment-heading">Adjust stock</h3><span class="muted">Admin only</span></div>
+            <form id="stock-adjustment-form" class="inline-form">
+              <label>SKU<select id="adjustment-sku" name="sku"></select></label>
+              <label>Delta<input id="adjustment-delta" name="delta" type="number" step="1" required></label>
+              <label>Reason<input id="adjustment-reason" name="reason" type="text" required></label>
+              <button class="primary" type="submit">Apply adjustment</button>
+            </form>
+          </section>
+        </section>
+
+        <section id="orders-view" class="view" aria-labelledby="orders-heading" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Order desk</p>
+              <h2 id="orders-heading">Orders</h2>
+            </div>
+            <button id="new-order" data-testid="new-order" class="primary writable-only" type="button">New order</button>
+          </div>
+          <form id="order-filter-form" class="filter-form">
+            <label for="order-search">Search client reference</label>
+            <input id="order-search" name="q" type="search" placeholder="e.g. web-1042">
+            <label for="order-status-filter">Status</label>
+            <select id="order-status-filter" name="status">
+              <option value="">All statuses</option>
+              <option value="draft">Draft</option>
+              <option value="reserved">Reserved</option>
+              <option value="shipped">Shipped</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="returned">Returned</option>
+            </select>
+            <button class="secondary" type="submit">Apply</button>
+          </form>
+          <div class="orders-layout">
+            <div class="panel">
+              <div class="panel-heading"><h3>Order list</h3><span id="orders-state" class="muted">Loading…</span></div>
+              <div id="orders-list" class="order-list" aria-live="polite"></div>
+            </div>
+            <div id="order-detail-panel" class="panel detail-panel" hidden>
+              <div id="order-detail" data-testid="order-detail"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="audit-view" class="view" aria-labelledby="audit-heading" hidden>
+          <div class="section-heading">
+            <div><p class="eyebrow">Traceability</p><h2 id="audit-heading">Audit history</h2></div>
+            <button id="refresh-audit" class="secondary" type="button">Refresh</button>
+          </div>
+          <div class="panel">
+            <div class="panel-heading"><h3>Committed events</h3><span id="audit-state" class="muted">Loading…</span></div>
+            <div class="table-wrap">
+              <table id="audit-table" data-testid="audit-table">
+                <caption class="sr-only">Tenant audit events</caption>
+                <thead><tr><th scope="col">Time</th><th scope="col">Action</th><th scope="col">Entity</th><th scope="col">Actor</th></tr></thead>
+                <tbody id="audit-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="order-composer" class="modal-backdrop" hidden aria-labelledby="composer-heading">
+          <div class="modal panel">
+            <div class="panel-heading"><div><p class="eyebrow">Create</p><h2 id="composer-heading">New order</h2></div><button id="close-composer" class="icon-button" type="button" aria-label="Close">×</button></div>
+            <form id="order-form">
+              <label for="order-client-ref">Client reference</label>
+              <input id="order-client-ref" data-testid="order-client-ref" name="client_ref" type="text" required>
+              <div id="order-lines" class="line-editor"></div>
+              <button id="add-line" data-testid="add-line" class="secondary" type="button">Add line</button>
+              <div class="form-actions"><button class="secondary" id="cancel-composer" type="button">Cancel</button><button id="submit-order" data-testid="submit-order" class="primary" type="submit">Create draft</button></div>
+            </form>
+          </div>
+        </section>
+      </section>
+    </main>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "schema": "opensocrates.revision-v4.ci-repair/1",
+  "failed_ci": {
+    "head": "17a673ff91244c03149a4a06e08a2281f7438ae1",
+    "run": 36274805413,
+    "url": "https://github.com/ParkerHwang/OpenSocrates/actions/runs/36274805413",
+    "jobs": {
+      "python_quality": "pass",
+      "product_contracts": "pass",
+      "native_windows_x64": "pass",
+      "installer": "fail",
+      "native_macos": "skipped_due_to_dependency"
+    },
+    "failed_test": "isolated app-server timeout closes stdin and kills an uncooperative child within bounds",
+    "observed_error": "SyntaxError: Unexpected end of JSON input while parsing the fixture trace",
+    "observation": "The process-death assertion preceding trace parsing passed.",
+    "inference": "The 50 ms test-only termination grace can interrupt the fixture while recording stdin EOF on a loaded runner; this does not demonstrate an installer runtime regression."
+  },
+  "repair": {
+    "file": "installer/lifecycle.test.mjs",
+    "sha256": "f28ca3d6d7b01c69be42f75c39a3fa96012d623911baf0d0ad84485327358014",
+    "change": "Remove the 50 ms test override and use the existing production 1000 ms termination grace. Keep the 1500 ms request timeout, five-second overall limit, process-death, stdin-EOF, isolation and unchanged-config assertions.",
+    "product_runtime_changed": false
+  },
+  "commands": [
+    {
+      "command": "node --test --test-name-pattern='isolated app-server timeout closes stdin' installer/lifecycle.test.mjs",
+      "exit_code": 0,
+      "status": "pass",
+      "tests": 1,
+      "test_duration_ms": 2522.12925
+    },
+    {
+      "command": "make installer-check",
+      "exit_code": 0,
+      "status": "pass",
+      "installer_tests": 251
+    }
+  ],
+  "new_model_calls": 0,
+  "subagents": 0,
+  "usage": null
+}

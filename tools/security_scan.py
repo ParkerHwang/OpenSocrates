@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import hashlib
 import json
 import os
 import re
@@ -224,7 +225,214 @@ def _import_findings(tree: ast.AST) -> tuple[int, int, int]:
     return external, network, dynamic_import
 
 
-def _call_findings(tree: ast.AST) -> dict[str, int]:  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
+def _reviewed_ast_bytes(node: ast.AST) -> bytes:
+    """Canonical syntax fields, independent of ast.dump's versioned formatting.
+
+    Python 3.13+ omits empty fields in ast.dump by default; 3.12 includes them.
+    Preserve every syntax field (including empty lists, None and False), list
+    order and typed byte constants. Source locations/comments are not fields.
+    New semantic AST fields therefore fail closed until separately reviewed.
+    """
+
+    def project(value: Any) -> Any:
+        if isinstance(value, ast.AST):
+            return {
+                "node": type(value).__name__,
+                "fields": {name: project(child) for name, child in ast.iter_fields(value)},
+            }
+        if isinstance(value, list):
+            return [project(child) for child in value]
+        if isinstance(value, bytes):
+            return {"bytes": value.hex()}
+        if value is None or type(value) in {str, int, float, bool}:
+            return value
+        raise SecurityScanError("unsupported_reviewed_ast_scalar")
+
+    return json.dumps(
+        project(node), sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False
+    ).encode("utf-8")
+
+
+# Exact reviewed syntax identities for the optional Codex process boundary.
+# Whitespace/comments do not affect these AST digests. Changes to these functions
+# require a fresh boundary review and mutation checks, not automatic regeneration.
+# This is a static release guard, not proof of general Python data-flow safety.
+_ORCHESTRATION_BOUNDARY_AST = {
+    "_role_environment": "10737bb79b5adef978c490ea5f070b530cd968fcc294253c7b647817d5301345",
+    "_check_environment": "cc6f8d72420a042928e20a1da76812d5e8c3418f3ffdedc3467b0ebabaf7ef36",
+    "_hashed_process": "bc91361bb1e5bdfc2d58c73385ea14017b766607eaf008bb1fa29f50bd054836",
+    "CodexAdapter._inspect": "a2700bef6cc61107f9367eac0ce18425f0c1b1408c9adf3bda1466f7ea471a75",
+    "CodexAdapter.probe": "51cddeb9a0e0482fb9fa8adabf88b70e1eb86324548a62acea56229c7b3fffcd",
+    "CodexAdapter._sandbox_argv": "1b91f98ad55eaf7b8f2fcb76f9deb4dd6b598f344dd1cd2d0e80d6f9d33ffa97",
+    "CodexAdapter._probe_sandbox": "22d7a257275bc3682aa452ec744b4f2861f698f95f5e8b30af00727fecbfe836",
+    "CodexAdapter._argv": "40f061e21adba058e417ec2eb2b851fff411f5e0b4f47e6e8f27a98a3d679320",
+    "CodexAdapter.invoke": "dff2037b62a58a43732e473cac2c291bca5e48b14a581aefa6a190a5cd95ef77",
+    "CodexAdapter.check": "0c88bc688735087e1e5d055663aa5e443d65905f7086c719e6f4c4136c79bf4d",
+}
+_ORCHESTRATION_PROCESS_CALLS = {
+    "CodexAdapter._inspect": (
+        "subprocess.run([str(self.client), *args], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=_role_environment(), timeout=15, check=False, shell=False)",
+    ),
+    "CodexAdapter._probe_sandbox": (
+        'subprocess.run(self._sandbox_argv(root, ["/bin/cat", "readable"]), env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=15, check=False, shell=False)',
+        'subprocess.run(self._sandbox_argv(root, ["/usr/bin/touch", "forbidden-write"]), env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15, check=False, shell=False)',
+    ),
+    "CodexAdapter.invoke": (
+        "subprocess.Popen(self._argv(assignment, cwd, output), cwd=cwd, env=_role_environment(), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, start_new_session=True, shell=False)",
+    ),
+    "_hashed_process": (
+        'subprocess.Popen([str(client), "sandbox", "-P", ":read-only", "-C", str(cwd), "--", *argv], cwd=cwd, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True, shell=False)',
+    ),
+}
+
+
+def _orchestration_functions(tree: ast.AST) -> dict[str, ast.FunctionDef]:
+    if not isinstance(tree, ast.Module):
+        return {}
+    result: dict[str, ast.FunctionDef] = {}
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef):
+            if node.name in result:
+                return {}
+            result[node.name] = node
+        elif isinstance(node, ast.ClassDef) and node.name == "CodexAdapter":
+            for member in node.body:
+                if isinstance(member, ast.FunctionDef):
+                    key = "CodexAdapter." + member.name
+                    if key in result:
+                        return {}
+                    result[key] = member
+    return result
+
+
+def _orchestration_references_valid(tree: ast.AST) -> bool:
+    parents = {
+        id(child): parent for parent in ast.walk(tree) for child in ast.iter_child_nodes(parent)
+    }
+    annotations: set[int] = set()
+    for node in ast.walk(tree):
+        annotation = node.annotation if isinstance(node, (ast.arg, ast.AnnAssign)) else None
+        if annotation is not None:
+            annotations.update(id(child) for child in ast.walk(annotation))
+    functions = _orchestration_functions(tree)
+    check = functions.get("CodexAdapter.check")
+    check_helper_refs = (
+        {
+            id(child)
+            for child in ast.walk(check)
+            if isinstance(child, ast.Name) and child.id == "_hashed_process"
+        }
+        if check is not None
+        else set()
+    )
+    process_names = {
+        "Popen",
+        "run",
+        "call",
+        "check_call",
+        "check_output",
+        "getoutput",
+        "getstatusoutput",
+    }
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.Name)
+            and node.id == "_hashed_process"
+            and isinstance(node.ctx, ast.Load)
+            and id(node) not in check_helper_refs
+        ):
+            return False
+        if isinstance(node, ast.Call) and _call_chain(node) in {
+            ("__import__",),
+            ("setattr",),
+            ("delattr",),
+        }:
+            return False
+        if (
+            not isinstance(node, ast.Attribute)
+            or _attribute_chain(node.value) != ("subprocess",)
+            or node.attr not in process_names
+        ):
+            continue
+        parent = parents.get(id(node))
+        if id(node) not in annotations and not (
+            isinstance(parent, ast.Call) and parent.func is node
+        ):
+            return False
+    return True
+
+
+def _orchestration_bindings_valid(tree: ast.AST) -> bool:
+    protected = {name.rsplit(".", 1)[-1] for name in _ORCHESTRATION_BOUNDARY_AST}
+    protected |= {"subprocess", "CodexAdapter", "DISABLED_FEATURES", "SUPPORTED_CLIENT"}
+    for constant in ("DISABLED_FEATURES", "SUPPORTED_CLIENT"):
+        stores = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Name)
+            and isinstance(node.ctx, ast.Store)
+            and node.id == constant
+        ]
+        if len(stores) != 1:
+            return False
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            if any(alias.name == "subprocess" and alias.asname is not None for alias in node.names):
+                return False
+        elif isinstance(node, ast.ImportFrom) and node.module == "subprocess":
+            return False
+        elif (
+            isinstance(node, ast.Attribute)
+            and isinstance(node.ctx, ast.Store)
+            and node.attr in protected
+        ):
+            return False
+        elif (
+            isinstance(node, ast.Name)
+            and isinstance(node.ctx, ast.Store)
+            and node.id in protected - {"DISABLED_FEATURES", "SUPPORTED_CLIENT"}
+        ):
+            return False
+    return True
+
+
+def _orchestration_reviewed_processes(tree: ast.AST) -> tuple[set[int], bool]:
+    functions = _orchestration_functions(tree)
+    if not _orchestration_bindings_valid(tree) or not _orchestration_references_valid(tree):
+        return set(), False
+    for name, expected in _ORCHESTRATION_BOUNDARY_AST.items():
+        function = functions.get(name)
+        if (
+            function is None
+            or hashlib.sha256(_reviewed_ast_bytes(function)).hexdigest() != expected
+        ):
+            return set(), False
+    features = _module_literal_strings(tree, "DISABLED_FEATURES")
+    if features != {
+        "memories",
+        "hooks",
+        "apps",
+        "plugins",
+        "remote_plugin",
+        "multi_agent",
+        "multi_agent_v2",
+        "fast_mode",
+    }:
+        return set(), False
+    if _module_literal_string(tree, "SUPPORTED_CLIENT") != "codex-cli 0.158.0-alpha.2":
+        return set(), False
+    allowed: set[int] = set()
+    for name, expressions in _ORCHESTRATION_PROCESS_CALLS.items():
+        expected_calls = {
+            _reviewed_ast_bytes(ast.parse(text, mode="eval").body) for text in expressions
+        }
+        for call in _function_calls(functions.get(name)):
+            if _reviewed_ast_bytes(call) in expected_calls:
+                allowed.add(id(call))
+    return allowed, len(allowed) == 5
+
+
+def _call_findings(tree: ast.AST, relative_path: str = "") -> dict[str, int]:  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     findings = {
         "dynamic_execution": 0,
         "shell_execution": 0,
@@ -233,6 +441,11 @@ def _call_findings(tree: ast.AST) -> dict[str, int]:  # noqa: C901  # Branch-exp
         "unsafe_deserialization": 0,
     }
     function_stack: list[str] = []
+    reviewed_orchestration: set[int] = set()
+    if relative_path == "orchestration/adapter.py":
+        reviewed_orchestration, valid_boundary = _orchestration_reviewed_processes(tree)
+        if not valid_boundary:
+            findings["shell_execution"] += 1
 
     class Visitor(ast.NodeVisitor):
         def _visit_function(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
@@ -284,8 +497,37 @@ def _call_findings(tree: ast.AST) -> dict[str, int]:  # noqa: C901  # Branch-exp
             ):
                 findings["shell_execution"] += 1
             if owner == "subprocess":
-                findings["shell_execution"] += 1
-            if name in {"connect", "create_connection", "urlopen"} or (
+                # Keep the existing local-Git exception unchanged. The optional
+                # Codex adapter separately requires exact reviewed function/argv
+                # policy identities; no other subprocess surface is authorized.
+                first = node.args[0] if node.args else None
+                fixed_git = (
+                    relative_path == "project_memory/git.py"
+                    and function_stack[-1:] == ["run_git"]
+                    and name == "run"
+                    and isinstance(first, (ast.List, ast.Tuple))
+                    and bool(first.elts)
+                    and isinstance(first.elts[0], ast.Name)
+                    and first.elts[0].id == "binary"
+                    and not any(
+                        item.arg == "shell" and not isinstance(item.value, ast.Constant)
+                        for item in node.keywords
+                    )
+                    and not any(
+                        item.arg == "shell"
+                        and isinstance(item.value, ast.Constant)
+                        and item.value.value is not False
+                        for item in node.keywords
+                    )
+                )
+                if not fixed_git and id(node) not in reviewed_orchestration:
+                    findings["shell_execution"] += 1
+            local_sqlite = (
+                relative_path == "project_memory/store.py"
+                and name == "connect"
+                and owner in {"self", "sqlite3"}
+            )
+            if (name in {"connect", "create_connection", "urlopen"} and not local_sqlite) or (
                 owner in {"requests", "httpx", "socket", "urllib", "urllib_request"}
                 and name in {"get", "post", "put", "request", "open"}
             ):
@@ -581,7 +823,7 @@ def _scan_production(root: Path) -> dict[str, Any]:  # noqa: C901  # Branch-expl
         totals["external_imports"] += external
         totals["network_imports"] += network
         totals["dynamic_imports"] += dynamic_import
-        findings = _call_findings(tree)
+        findings = _call_findings(tree, path.relative_to(source).as_posix())
         for key, value in findings.items():
             totals[key] += value
     violations = sum(value for key, value in totals.items() if key not in {"production_files"})

@@ -1,0 +1,93 @@
+// Run with EVAL_BROWSER_WS set to an existing Playwright Chromium WebSocket.
+const {chromium} = require('playwright');
+const {spawn} = require('child_process');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const net = require('net');
+const assert = require('assert');
+
+const root = path.resolve(__dirname,'..');
+const port = () => new Promise((resolve,reject) => {const server=net.createServer();server.listen(0,'127.0.0.1',()=>{const n=server.address().port;server.close(()=>resolve(n))});server.on('error',reject)});
+const sleep = ms => new Promise(resolve=>setTimeout(resolve,ms));
+async function main(){
+  const dataDir=fs.mkdtempSync(path.join(root,'.browser-data-'));
+  const serverPort=await port();
+  const base=`http://127.0.0.1:${serverPort}`;
+  const server=spawn(path.join(root,'run.sh'),[],{cwd:root,env:{...process.env,PORT:String(serverPort),DATA_DIR:dataDir,SEED_DEMO:'1'},stdio:'ignore'});
+  let browser,context;
+  try{
+    for(let i=0;i<100;i++){try{const response=await fetch(base+'/api/health');if(response.ok)break}catch{}await sleep(50)}
+    browser=process.env.EVAL_BROWSER_WS ? await chromium.connect(process.env.EVAL_BROWSER_WS) : await chromium.launch({headless:true});
+    context=await browser.newContext({viewport:{width:1280,height:800}});
+    const page=await context.newPage();
+    const errors=[];page.on('pageerror',e=>errors.push(e.message));
+    await page.goto(base);
+    await page.getByTestId('login-email').fill('admin@north.example');
+    await page.getByTestId('login-password').fill('DepotDemo!2026');
+    await page.getByTestId('login-submit').click();
+    await page.getByTestId('inventory-table').waitFor();
+    assert.match(await page.getByTestId('inventory-table').innerText(),/Steel bolt kit/);
+    await page.getByTestId('nav-orders').click();
+    await page.getByTestId('new-order').click();
+    await page.getByTestId('order-client-ref').fill('browser-sample');
+    await page.getByTestId('line-sku').first().selectOption('SAMPLE');
+    await page.getByTestId('line-quantity').first().fill('2');
+    await page.getByTestId('submit-order').click();
+    await page.getByTestId('order-detail').getByText('browser-sample').waitFor();
+    assert.match(await page.getByTestId('order-detail').innerText(),/draft/);
+    await page.getByTestId('reserve-order').click();
+    await page.getByTestId('ship-order').click();
+    await page.getByTestId('order-detail').getByText('shipped',{exact:true}).waitFor();
+    assert.match(await page.getByTestId('order-detail').innerText(),/shipped/);
+    await page.getByTestId('return-quantity').first().fill('1');
+    await page.getByTestId('submit-return').click();
+    await page.getByText('Return recorded').waitFor();
+    assert.match(await page.getByTestId('order-detail').innerText(),/shipped/);
+    await page.getByTestId('return-quantity').first().fill('1');
+    await page.getByTestId('submit-return').click();
+    await page.getByTestId('order-detail').getByText('returned',{exact:true}).waitFor();
+    assert.match(await page.getByTestId('order-detail').innerText(),/returned/);
+    await page.getByTestId('new-order').click();
+    await page.getByTestId('order-client-ref').fill('browser-multi');
+    await page.getByTestId('line-sku').first().selectOption('BOLT');
+    await page.getByTestId('line-quantity').first().fill('1');
+    await page.getByTestId('add-line').click();
+    await page.getByTestId('line-sku').nth(1).selectOption('CABLE');
+    await page.getByTestId('line-quantity').nth(1).fill('2');
+    await page.getByTestId('submit-order').click();
+    await page.getByTestId('order-detail').getByText('browser-multi').waitFor();
+    assert.match(await page.getByTestId('order-detail').innerText(),/\$62\.48/);
+    await page.getByTestId('cancel-order').click();
+    await page.getByTestId('order-detail').getByText('cancelled',{exact:true}).waitFor();
+    await page.getByTestId('nav-audit').click();
+    await page.getByTestId('audit-table').getByText('order.returned').first().waitFor();
+    assert.match(await page.getByTestId('audit-table').innerText(),/order.returned/);
+    await page.getByTestId('nav-inventory').click();
+    await page.getByText('Working…').waitFor({state:'hidden'});
+    assert.match(await page.getByTestId('inventory-table').innerText(),/SAMPLE/);
+    await page.screenshot({path:path.join(root,'evidence-browser.png'),fullPage:true});
+    await page.getByTestId('logout').click();
+    await page.getByTestId('login-email').fill('viewer@south.example');
+    await page.getByTestId('login-password').fill('DepotDemo!2026');
+    await page.getByTestId('login-submit').click();
+    await page.getByTestId('inventory-table').waitFor();
+    assert.equal(await page.getByText('Adjust stock').count(),0);
+    await page.getByTestId('nav-orders').click();
+    await page.getByText('No orders match this search.').waitFor();
+    assert.equal(await page.getByTestId('new-order').count(),0);
+    await page.setViewportSize({width:390,height:844});
+    await page.getByTestId('nav-inventory').click();
+    await page.getByTestId('inventory-table').waitFor();
+    assert.equal(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth),true);
+    assert.deepEqual(errors,[]);
+    console.log('Browser workflow passed: admin order lifecycle, multi-line draft/cancel, audit, logout, south viewer read-only, mobile width.');
+    console.log('Screenshot: evidence-browser.png');
+  } finally {
+    if(context)await context.close();
+    if(browser)await browser.close();
+    server.kill('SIGTERM');
+    fs.rmSync(dataDir,{recursive:true,force:true});
+  }
+}
+main().catch(e=>{console.error(e);process.exitCode=1});

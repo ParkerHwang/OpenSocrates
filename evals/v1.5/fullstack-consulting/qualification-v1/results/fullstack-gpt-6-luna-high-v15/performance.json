@@ -1,0 +1,51 @@
+{
+  "eligibility": "frozen critical API checks and restart pass",
+  "serial_across_cells": true,
+  "fresh_database_per_concurrency": true,
+  "measurements": [
+    {
+      "workload": "inventory_get",
+      "concurrency": 1,
+      "requests": 500,
+      "wall_seconds": 0.1992227919981815,
+      "requests_per_second": 2509.7530005731674,
+      "errors": 0,
+      "p50_ms": 0.3652919549494982,
+      "p95_ms": 0.504625029861927,
+      "p99_ms": 0.5725410301238298
+    },
+    {
+      "workload": "draft_order_post",
+      "concurrency": 1,
+      "requests": 200,
+      "wall_seconds": 0.12423745903652161,
+      "requests_per_second": 1609.8204321870971,
+      "errors": 0,
+      "p50_ms": 0.5894170026294887,
+      "p95_ms": 0.6715829949826002,
+      "p99_ms": 0.9030000073835254
+    },
+    {
+      "workload": "inventory_get",
+      "concurrency": 8,
+      "requests": 500,
+      "wall_seconds": 0.14162679202854633,
+      "requests_per_second": 3530.4054609894706,
+      "errors": 0,
+      "p50_ms": 2.175167028326541,
+      "p95_ms": 3.421209054067731,
+      "p99_ms": 3.9542499580420554
+    },
+    {
+      "workload": "draft_order_post",
+      "concurrency": 8,
+      "requests": 200,
+      "wall_seconds": 0.12213899998459965,
+      "requests_per_second": 1637.4786106421188,
+      "errors": 0,
+      "p50_ms": 0.48099999548867345,
+      "p95_ms": 9.458709042519331,
+      "p99_ms": 91.45100001478568
+    }
+  ]
+}

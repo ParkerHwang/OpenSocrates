@@ -1,0 +1,48 @@
+{
+  "groups": [
+    {
+      "name": "page_identity_and_login",
+      "pass": true,
+      "details": {
+        "url": "http://127.0.0.1:58366/",
+        "title": "DepotFlow · Fulfillment workspace"
+      }
+    },
+    {
+      "name": "inventory_rendered",
+      "pass": true,
+      "details": "ITEM\tON HAND\tRESERVED\tAVAILABLE\tUNIT PRICE\tVERSION\n\nBOLT\nSteel bolt kit\t100\t0\t100\t$12.50\t1\n\nCABLE\nCable assembly\t60\t0\t60\t$24.99\t1\n\nSAMPLE\nSample pack\t20\t0\t20\t$0.00\t1"
+    },
+    {
+      "name": "create_reserve_ship_return_flow",
+      "pass": true,
+      "details": "BROWSER-CHECK\nReturned\nTotal $49.99\nVersion 4\n\nOrder ID: d3fee05616cd4527a283f4ce5ab81b33\n\nITEM\tORDERED\tUNIT PRICE\tRETURNED\n\nBOLT\n\t2\t$12.50\t2 / 2\n\nCABLE\n\t1\t$24.99\t1 / 1\nRefresh order\nClose detail"
+    },
+    {
+      "name": "audit_rendered",
+      "pass": true,
+      "details": "EVENT\tENTITY\tACTOR\tRECORDED AT\norder.created\nEvent #1\nChange details\n\td3fee05616cd4527a283f4ce5ab81b33\tadmin@north.example\t9/27/2026, 9:49:34 PM\norder.reserved\nEvent #2\nChange details\n\td3fee05616cd4527a283f4ce5ab81b33\tadmin@north.example\t9/27/2026, 9:49:34 PM\norder.shipped\nEvent #3\nChange details\n\td3fee05616cd4527a283f4ce5ab81b33\tadmin@north.example\t9/27/2026, 9:49:34 PM\norder.returned\nEvent #4\nChange details\n\td3fee05616cd4527a283f4ce5ab81b33\tadmin@north.example\t9/27/2026, 9:49:34 PM"
+    },
+    {
+      "name": "mobile_layout",
+      "pass": true,
+      "details": {
+        "viewport": 390,
+        "document": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "viewer_workflow_read_only",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "no_uncaught_client_error",
+      "pass": true,
+      "details": null
+    }
+  ],
+  "consoleEvents": [],
+  "errors": []
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "opensocrates.go-ts.compatibility-freeze-receipt/1",
+  "status": "prepared_no_model_calls",
+  "purpose": "One separately counted real-role native read-scope compatibility probe before any main comparison outcome.",
+  "episode": "/private/tmp/opensocrates-go-ts-compat-probe-v4-20260928",
+  "manifest_path": "/private/tmp/opensocrates-go-ts-compat-probe-v4-20260928/manifest.json",
+  "manifest_sha256": "3d895bf3b24af5a194cd6354debcae56484260dd17a07c5b527aabc1f7430ee9",
+  "model": {"name": "gpt-6-sol", "effort": "high"},
+  "planned_role_calls": 1,
+  "counts_toward_main_48_or_continuity_8": false,
+  "fast_mode": false,
+  "experimental_budgets": {
+    "wall_clock_seconds": null,
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "tool_calls": null,
+    "output_bytes": null,
+    "internal_retries": null
+  },
+  "component_hashes": {
+    "client_actual_sha256": "sha256:c3e30211bd454da70ceb4d9cbc2e05fe6466812ab05c311c3bbff6addeb14202",
+    "native_profile_client.py": "sha256:7780fac7a7e5527d828da73ada12767442e7fcf2219e955bf3fd077f6698b2c6",
+    "observer.py": "sha256:fd3f46fd76bebec5144bf805a9131137089062c443b370de3a861b00332d58ca",
+    "compat_probe.py": "sha256:58e3b2dcce4c960e44be965a3c7323f348df86703912685cdcae314337c73d44",
+    "probe_canary.py": "sha256:c05e23412b05eb1edb8d11a126f1f2faaeb039e68b3f77079d3033afeedfd0ec"
+  },
+  "argv_hashes": {
+    "adapter_original": "f91c078ca8a9455dea339bc1e116af180e05a004a2318457dc02b056f6cf3e88",
+    "shim_original": "7b08c7ac45ebac05263159937cc4b238a3d64bc66e2723e47d07b50e23593ba2",
+    "shim_effective": "32d046f712ac3f3640c3fa717005a6e1fd4fb718541847478a9df7c6ca7b2148",
+    "approved_helper_command": "520b0922e208d4c2157affa3f330f462cc6a4b4104a093f8043aa6c729a300da"
+  },
+  "no_model_preflight": {
+    "native_adapter_probe": "passed",
+    "direct_helper_via_shim_and_native_sandbox": "six_expected_booleans_true",
+    "real_role_exec": "not_started",
+    "auth_copy_present_after_preflight": false,
+    "attempt_start_marker_present": false
+  },
+  "superseded_preparations": ["v1", "v2", "v3"],
+  "superseded_preparations_model_calls": 0,
+  "entry_command": "PYTHONPATH=src:evals/v1.5/orchestration/comparison-go-ts-v1 python3 -B evals/v1.5/orchestration/comparison-go-ts-v1/compat_probe.py run --manifest /private/tmp/opensocrates-go-ts-compat-probe-v4-20260928/manifest.json --manifest-sha256 3d895bf3b24af5a194cd6354debcae56484260dd17a07c5b527aabc1f7430ee9",
+  "portable_evidence": "Only booleans, command and component hashes, native structured receipt and null-aware usage; no raw prompt, transcript, reasoning, auth or tool-output body."
+}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DepotFlow</title><link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main id="app" class="shell">
+    <section id="login-view" class="login-card" aria-labelledby="login-title">
+      <p class="eyebrow">DEPOTFLOW</p><h1 id="login-title">Fulfillment, clearly handled.</h1>
+      <p class="muted">Sign in to your warehouse workspace.</p>
+      <form id="login-form"><label>Email<input data-testid="login-email" id="login-email" type="email" required autocomplete="username"></label>
+        <label>Password<input data-testid="login-password" id="login-password" type="password" required autocomplete="current-password"></label>
+        <button data-testid="login-submit" type="submit">Sign in</button></form>
+      <p id="login-error" class="error" role="alert"></p>
+    </section>
+    <section id="workspace-view" hidden>
+      <header class="topbar"><div><p class="eyebrow">DEPOTFLOW</p><h1>Warehouse control</h1></div><div class="user-area"><span id="user-label"></span><button data-testid="logout" id="logout" class="secondary">Log out</button></div></header>
+      <nav class="tabs" aria-label="Primary"><button data-testid="nav-inventory" data-view="inventory" class="tab active">Inventory</button><button data-testid="nav-orders" data-view="orders" class="tab">Orders</button><button data-testid="nav-audit" data-view="audit" class="tab">Audit</button></nav>
+      <div id="flash" role="status" aria-live="polite"></div><section id="content"></section>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+{
+  "event_count": 17,
+  "malformed_lines": 0,
+  "usage": {
+    "input_tokens": 86038,
+    "cached_input_tokens": 54656,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 870,
+    "reasoning_output_tokens": 111
+  },
+  "usage_reports": [
+    {
+      "input_tokens": 86038,
+      "cached_input_tokens": 54656,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 870,
+      "reasoning_output_tokens": 111
+    }
+  ],
+  "turn_completed": true,
+  "errors": [],
+  "tool_actions": [
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "3eb46b53d9301695ae785f15d6ecfab8ff8536f417d6c33595bea48e0d77bc1c",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "ee5f5ac3c5f320fca57ab8adc78a58021812fae1550328ff078deca93058ff7f",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "4ee210ef1aca4d8f992f7c607c5ce243b784e10ee76afca7436bd4b88952ca21",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "9aee3347e22b1107290a835d4c365ee0891fbec25f4ada02f86bb4b83fafedbb",
+      "exit_code": 128,
+      "status": "failed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "file_change",
+      "completed": true,
+      "command_sha256": null,
+      "exit_code": null,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "b758ad4c240321a22ff2799e1943965c670f0d8725f39ac42f8b16aed6f6c543",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    }
+  ],
+  "tool_actions_started_or_completed": 6,
+  "failed_tool_actions": 1,
+  "incomplete_tool_actions": 0,
+  "direct_operations_lexical": {},
+  "structured_status_counts": {},
+  "protocol_rejections": 0,
+  "repeated_command_hashes": 0,
+  "native_hook_events": 0,
+  "final_message_sha256": "b5056c0943c55c57f89e65f054f4464b6411a5ba8300ca7d7ebb032a925d5eed",
+  "public_message_count": 2,
+  "billed_cost": null,
+  "server_echoed_model": null,
+  "tool_classification_limit": "Lexical direct calls and structured responses; nested invocations may be missed. Repeated hash does not itself prove unnecessary work.",
+  "public_messages": [
+    "I’ll read the project instructions and OpenSocrates controller, make the one time change, then check the diff.",
+    "Updated [notice.md](<disposable>/workspace/notice.md) so Thursday closes at 18:00. I verified the saved file’s exact contents; no other text changed."
+  ],
+  "commands": [
+    {
+      "command": "/bin/zsh -lc 'cat <disposable>/profile/home/.codex/plugins/cache/os-practical/opensocrates/1.4.0/skills/opensocrates/SKILL.md'",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "command": "/bin/zsh -lc \"pwd && rg --files -g 'AGENTS.md' -g 'notice.md' -g '\"'!**/.git/**'\"'\"",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "command": "/bin/zsh -lc 'cat notice.md'",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "command": "/bin/zsh -lc 'git status --short -- notice.md'",
+      "exit_code": 128,
+      "status": "failed"
+    },
+    {
+      "command": "/bin/zsh -lc \"python3 -c 'from pathlib import Path; p=Path(\\\"notice.md\\\"); actual=p.read_bytes(); expected=b\\\"# Desk hours\\\\n\\\\nMonday desk opens at 09:00.\\\\nThursday desk closes at 18:00.\\\\nContact the front desk.\\\\n\\\"; assert actual == expected, repr(actual); print(p.read_text(), end=\\\"\\\"); print(\\\"Exact content verified.\\\")'\"",
+      "exit_code": 0,
+      "status": "completed"
+    }
+  ],
+  "error_events": [],
+  "trace_boundary": "Synthetic public messages and command templates only; no reasoning or raw event stream retained",
+  "exit_code": 0,
+  "wall_seconds": 33.959,
+  "timed_out": false,
+  "invocation_error": null,
+  "stderr_sha256": "c677116211a817fe8f21aa0cdf36680c559351df35108b40f53fd1138de2d0c9",
+  "model": "gpt-6-sol",
+  "effort": "medium",
+  "client_version": "codex-cli 0.158.0-alpha.2",
+  "process_success": true
+}

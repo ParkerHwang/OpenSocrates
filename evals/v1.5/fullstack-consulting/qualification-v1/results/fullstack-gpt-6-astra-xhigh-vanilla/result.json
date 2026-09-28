@@ -1,0 +1,64 @@
+{
+  "cell": "fullstack-gpt-6-astra-xhigh-vanilla",
+  "started_utc": "2026-09-27T12:36:59.651184+00:00",
+  "candidate_repairs": 0,
+  "api": {
+    "passed": 24,
+    "total": 24,
+    "critical_pass": true
+  },
+  "restart": true,
+  "browser": {
+    "passed": 6,
+    "total": 7
+  },
+  "performance_eligible": true,
+  "performance": [
+    {
+      "workload": "inventory_get",
+      "concurrency": 1,
+      "requests": 500,
+      "wall_seconds": 0.2173009580001235,
+      "requests_per_second": 2300.9562617745837,
+      "errors": 0,
+      "p50_ms": 0.40158297633752227,
+      "p95_ms": 0.518708024173975,
+      "p99_ms": 0.6230419967323542
+    },
+    {
+      "workload": "draft_order_post",
+      "concurrency": 1,
+      "requests": 200,
+      "wall_seconds": 0.15901233302429318,
+      "requests_per_second": 1257.7640752522316,
+      "errors": 0,
+      "p50_ms": 0.726083992049098,
+      "p95_ms": 0.8854580228216946,
+      "p99_ms": 1.9849580130539834
+    },
+    {
+      "workload": "inventory_get",
+      "concurrency": 8,
+      "requests": 500,
+      "wall_seconds": 0.18557129200780764,
+      "requests_per_second": 2694.382275351961,
+      "errors": 0,
+      "p50_ms": 2.8389160288497806,
+      "p95_ms": 4.27445798413828,
+      "p99_ms": 5.014374968595803
+    },
+    {
+      "workload": "draft_order_post",
+      "concurrency": 8,
+      "requests": 200,
+      "wall_seconds": 0.13128412497462705,
+      "requests_per_second": 1523.413436610508,
+      "errors": 0,
+      "p50_ms": 0.8207500213757157,
+      "p95_ms": 11.71520899515599,
+      "p99_ms": 64.50483301887289
+    }
+  ],
+  "original_still_matches_snapshot": true,
+  "ended_utc": "2026-09-27T12:37:03.037146+00:00"
+}

@@ -1,0 +1,280 @@
+[
+  {
+    "method": "GET",
+    "path": "/accounts/zeta",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "old"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "zeta",
+        "balance": 51,
+        "reserved": 0,
+        "available": 51,
+        "version": 3
+      }
+    },
+    "elapsed_s": 0.0004921249928884208
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/eta",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "old"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "eta",
+        "balance": 24,
+        "reserved": 0,
+        "available": 24,
+        "version": 3
+      }
+    },
+    "elapsed_s": 0.0003297500079497695
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/eta",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "u"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "eta",
+        "balance": 9,
+        "reserved": 0,
+        "available": 9,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.0003339579561725259
+  },
+  {
+    "method": "GET",
+    "path": "/entries?limit=100",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "old"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "entries": [
+        {
+          "seq": 1,
+          "account": "eta",
+          "kind": "opening",
+          "balance_delta": 20,
+          "reserved_delta": 0,
+          "operation_id": "07f45670553a6c25346719f826a62395"
+        },
+        {
+          "seq": 2,
+          "account": "zeta",
+          "kind": "opening",
+          "balance_delta": 55,
+          "reserved_delta": 0,
+          "operation_id": "1f9f5d1fb0f42a7becfe9006c417910e"
+        },
+        {
+          "seq": 3,
+          "account": "zeta",
+          "kind": "transfer",
+          "balance_delta": -6,
+          "reserved_delta": 0,
+          "operation_id": "d5edad49af87fe80c7372e4c26852fca",
+          "legacy_id": 41
+        },
+        {
+          "seq": 4,
+          "account": "eta",
+          "kind": "transfer",
+          "balance_delta": 6,
+          "reserved_delta": 0,
+          "operation_id": "d5edad49af87fe80c7372e4c26852fca",
+          "legacy_id": 41
+        },
+        {
+          "seq": 5,
+          "account": "eta",
+          "kind": "transfer",
+          "balance_delta": -2,
+          "reserved_delta": 0,
+          "operation_id": "1e212341a0d16b62ffe9878775be9230",
+          "legacy_id": 44
+        },
+        {
+          "seq": 6,
+          "account": "zeta",
+          "kind": "transfer",
+          "balance_delta": 2,
+          "reserved_delta": 0,
+          "operation_id": "1e212341a0d16b62ffe9878775be9230",
+          "legacy_id": 44
+        }
+      ],
+      "snapshot": 6,
+      "next_after": 6,
+      "has_more": false
+    },
+    "elapsed_s": 0.0004867080133408308
+  },
+  {
+    "method": "GET",
+    "path": "/summary?snapshot=6",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "old"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "snapshot": 6,
+      "accounts": [
+        {
+          "name": "eta",
+          "balance": 24,
+          "reserved": 0,
+          "available": 24
+        },
+        {
+          "name": "zeta",
+          "balance": 51,
+          "reserved": 0,
+          "available": 51
+        }
+      ],
+      "totals": {
+        "balance": 75,
+        "reserved": 0,
+        "available": 75
+      },
+      "entry_count": 6
+    },
+    "elapsed_s": 0.0004728750209324062
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/eta",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "old"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "eta",
+        "balance": 24,
+        "reserved": 0,
+        "available": 24,
+        "version": 3
+      }
+    },
+    "elapsed_s": 0.00022895802976563573
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/zeta",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "old"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "zeta",
+        "balance": 51,
+        "reserved": 0,
+        "available": 51,
+        "version": 3
+      }
+    },
+    "elapsed_s": 0.00016250001499429345
+  },
+  {
+    "method": "GET",
+    "path": "/entries?limit=100",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "u"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "entries": [
+        {
+          "seq": 1,
+          "account": "eta",
+          "kind": "opening",
+          "balance_delta": 9,
+          "reserved_delta": 0,
+          "operation_id": "d87036d362b701ad74fbab1c198ad8e0"
+        }
+      ],
+      "snapshot": 1,
+      "next_after": 1,
+      "has_more": false
+    },
+    "elapsed_s": 0.00017104099970310926
+  },
+  {
+    "method": "GET",
+    "path": "/summary?snapshot=1",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "u"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "snapshot": 1,
+      "accounts": [
+        {
+          "name": "eta",
+          "balance": 9,
+          "reserved": 0,
+          "available": 9
+        }
+      ],
+      "totals": {
+        "balance": 9,
+        "reserved": 0,
+        "available": 9
+      },
+      "entry_count": 1
+    },
+    "elapsed_s": 0.00031633302569389343
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/eta",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "u"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "eta",
+        "balance": 9,
+        "reserved": 0,
+        "available": 9,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.00021191703854128718
+  }
+]

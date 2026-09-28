@@ -1,0 +1,52 @@
+{
+  "cell": "fullstack-gpt-6-astra-xhigh-v14",
+  "exit_code": 0,
+  "stderr": "",
+  "scope": "Auto-wait for asynchronous controls and client reference only; same flow and assertions; original score unchanged",
+  "passed": 7,
+  "total": 7,
+  "groups": [
+    {
+      "name": "page_identity_and_login",
+      "pass": true,
+      "details": {
+        "url": "http://127.0.0.1:57607/",
+        "title": "DepotFlow \u00b7 Warehouse workspace"
+      }
+    },
+    {
+      "name": "inventory_rendered",
+      "pass": true,
+      "details": "Inventory quantities, prices, and versions\nPRODUCT\tON HAND\tRESERVED\tAVAILABLE\tUNIT PRICE\tVERSION\n\nSteel bolt kit\nBOLT\n\t100\t0\t100\t$12.50\t1\n\nCable assembly\nCABLE\n\t60\t0\t60\t$24.99\t1\n\nSample pack\nSAMPLE\n\t20\t0\t20\t$0.00\t1"
+    },
+    {
+      "name": "create_reserve_ship_return_flow",
+      "pass": true,
+      "details": "DEPOTFLOW / OPERATIONS\nBROWSER-CHECK\n\nOrder detail\n\nRefresh order\nSaving changes\u2026\nProducts\n2 lines\nOrder lines and returns\nSKU\tORDERED\tUNIT PRICE\tRETURNED\tRETURN NOW\n\nBOLT\n2\t$12.50\t0\t\n\nCABLE\n1\t$24.99\t0\t\nReceive a return\n\nEnter units received for each product. Leave other quantities at zero.\n\nRecord return\nORDER SUMMARY\nShipped\n\nVersion 3\n\n$49.99\n\nOriginal order total \u00b7 Prices locked at creation\n\nThe order has shipped. Receive partial or complete returns below.\n\n3930e7fc-87d4-4625-8cb7-0f81180d5218"
+    },
+    {
+      "name": "audit_rendered",
+      "pass": true,
+      "details": "Tenant activity, oldest first\nACTIVITY / REFERENCE\tPERFORMED BY\tTIME\tEVENT\n\norder \u00b7 created\nBROWSER-CHECK\nInspect change\n\tadmin@north.example\t9/27/2026, 9:43:57 PM\t#1\n\norder \u00b7 reserved\nBROWSER-CHECK\nInspect change\n\tadmin@north.example\t9/27/2026, 9:43:57 PM\t#2\n\norder \u00b7 shipped\nBROWSER-CHECK\nInspect change\n\tadmin@north.example\t9/27/2026, 9:43:57 PM\t#3\n\norder \u00b7 returned\nBROWSER-CHECK\nInspect change\n\tadmin@north.example\t9/27/2026, 9:43:58 PM\t#4"
+    },
+    {
+      "name": "mobile_layout",
+      "pass": true,
+      "details": {
+        "viewport": 390,
+        "document": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "viewer_workflow_read_only",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "no_uncaught_client_error",
+      "pass": true,
+      "details": null
+    }
+  ]
+}

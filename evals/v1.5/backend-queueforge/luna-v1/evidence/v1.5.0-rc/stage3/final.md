@@ -1,0 +1,5 @@
+Fixed legacy idempotency replay comparison in [queue.go](<WORKSPACE>/internal/queue/queue.go): replay now compares stored priority, schedule, and retry base as well as the original fields. A serialized legacy retry value of zero still replays when the request omitted that field. Added a regression test in [queue_test.go](<WORKSPACE>/internal/queue/queue_test.go).
+
+The focused replay and migration checks passed, as did `go test -race ./...`, `go build -o bin/queueforge ./cmd/server`, and `git diff --check`. Go 1.26.3 was used; `go.mod` and `go.sum` are unchanged. No server was started.
+
+FEEDBACK.json’s independent migration scenario failed, and all six load artifacts had `artifact_gate_pass: false`. Their latency results are diagnostic, so I made no throughput change; WAL and `synchronous=FULL` remain intact. The genuine stage1 API scenario was not rerun, so the repair against its historical command encoding remains unconfirmed. The bounded memory checkpoint was updated and inspected at version 6.

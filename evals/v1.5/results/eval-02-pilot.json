@@ -1,0 +1,648 @@
+{
+  "schema": "opensocrates.v1.5.pilot-results/1.0.0",
+  "lane": "EVAL-02",
+  "completed_at_utc": "2026-09-23T15:25:57.134077+00:00",
+  "freeze_commit": "72e054b3fdfd7e162dacd777ef2b68fdbb3ae177",
+  "freeze_sha256": "a1065c38474c345610740acbf45e95f78354a5332262fe3ca51cea44aed899a0",
+  "client": "codex-cli 0.155.0-alpha.16.3",
+  "held_out": false,
+  "validated_profile": false,
+  "installed_plugin_activation": false,
+  "cells": [
+    {
+      "lane": "EVAL-02",
+      "task": "coding",
+      "language": "en",
+      "arm": "luna_alone",
+      "intervention": "common",
+      "source_hashes_before": {
+        "names.py": "f49b789ad559138e832a7c0a79103368f3e05812b46fd1065e334ac2d74e1d2d",
+        "test_names.py": "8daf5fbce693fb8b0b05c08847eef070ef493e50d29dbb9a589639916a6db344"
+      },
+      "artifact_hashes_after": {
+        "test_names.py": "8daf5fbce693fb8b0b05c08847eef070ef493e50d29dbb9a589639916a6db344",
+        "names.py": "a7258a421ed33bc25795d60f0fff5fab5116cbfa7e98d536bd55fb4da87c5ebe"
+      },
+      "calls": [
+        {
+          "client": "codex-cli 0.155.0-alpha.16.3",
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "stage": "initial",
+          "prompt_sha256": "ffbe25a002933d9a1271af5a71bc3b430443a00905a407faaf86f8f483fa337f",
+          "exit_code": 0,
+          "timed_out": false,
+          "wall_seconds": 25.642,
+          "event_count": 15,
+          "malformed_event_lines": 0,
+          "stderr_sha256": "78dd80b2f3effebbef63b81aab229691faa17e3976a02741f3d081aba12f022a",
+          "failure": false,
+          "thread_id": "01a0cede-cb44-7ba1-8717-b1851b0ea179",
+          "usage": {
+            "input_tokens": 87370,
+            "cached_input_tokens": 81408,
+            "output_tokens": 620,
+            "reasoning_output_tokens": 102
+          },
+          "tool_events": [
+            {
+              "type": "command_execution",
+              "command_sha256": "131d5a8f56994cc58314d9c2da72703f9261027ac0f117cf1b44a12cd038f2ce",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "7f284e8c18c099426e93fb79d57e5badef23d61f32dc5d68563dca493d32b4dd",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "file_change",
+              "command_sha256": null,
+              "exit_code": null,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "4ded151841a8476d570a03a20185086b5c864ac1d407b8de439fceb92dcda1d8",
+              "exit_code": 127,
+              "status": "failed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "c75a19a80b744d2126a4de640b43617cd7236762cc82a537c3266ebf806cb92d",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            }
+          ],
+          "tool_calls": 5,
+          "retrieval_calls": 2,
+          "policy_calls": 0,
+          "error_types": [],
+          "final_message_sha256": "cf3259aff8283cbe32631b5dcff43fb602d6f64a1afbcd6ae18b07d069e94236",
+          "side_question_observation": {
+            "rejects_proof_heuristic": false,
+            "rejects_inaccessible_heuristic": false
+          }
+        }
+      ],
+      "initial_checks": {
+        "safe_none": true,
+        "safe_blank": true,
+        "safe_normal": true,
+        "existing_caller": true,
+        "reuse_helper": true
+      },
+      "final_checks": {
+        "safe_none": true,
+        "safe_blank": true,
+        "safe_normal": true,
+        "existing_caller": true,
+        "reuse_helper": true
+      },
+      "deterministic_success": true,
+      "manual_bilingual_dialogue_score": null,
+      "manual_score_missing_reason": "No independent bilingual human reviewer assigned to this engineering pilot.",
+      "repairs": [],
+      "escalations": []
+    },
+    {
+      "lane": "EVAL-02",
+      "task": "coding",
+      "language": "en",
+      "arm": "luna_v15",
+      "intervention": "adaptive",
+      "source_hashes_before": {
+        "names.py": "f49b789ad559138e832a7c0a79103368f3e05812b46fd1065e334ac2d74e1d2d",
+        "test_names.py": "8daf5fbce693fb8b0b05c08847eef070ef493e50d29dbb9a589639916a6db344"
+      },
+      "artifact_hashes_after": {
+        "test_names.py": "5dbf780961bfc59a60132ea33630eb826efbc022dcb561394fef60023b65f4ff",
+        "names.py": "a7258a421ed33bc25795d60f0fff5fab5116cbfa7e98d536bd55fb4da87c5ebe"
+      },
+      "calls": [
+        {
+          "client": "codex-cli 0.155.0-alpha.16.3",
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "stage": "initial",
+          "prompt_sha256": "0c7a0c82958cd02a3ad29ae6d13447d16759963187558605bcb264174a1a50d5",
+          "exit_code": 0,
+          "timed_out": false,
+          "wall_seconds": 35.813,
+          "event_count": 18,
+          "malformed_event_lines": 0,
+          "stderr_sha256": "6a6aa31f2a09a6685d23abb7477fd96cd6d2dc9ae5b11cb22c4db95eed1fc510",
+          "failure": false,
+          "thread_id": "01a0cede-cb4a-7f10-857c-136e57ef13ce",
+          "usage": {
+            "input_tokens": 111093,
+            "cached_input_tokens": 101632,
+            "output_tokens": 1040,
+            "reasoning_output_tokens": 231
+          },
+          "tool_events": [
+            {
+              "type": "command_execution",
+              "command_sha256": "ae2a93579eeb3a58ea4f2705298256421b4cb3b7b50c8e9074ee7a0d1a42e3fa",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "53369cd3ff156e42043b5c0670d41a2c333e1e6c89698448ba015115e74d5aa6",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "file_change",
+              "command_sha256": null,
+              "exit_code": null,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "4ded151841a8476d570a03a20185086b5c864ac1d407b8de439fceb92dcda1d8",
+              "exit_code": 127,
+              "status": "failed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "eeec8b81b73d7f1f5c7c2b86c883cd69db9e676d252d88bfdad96593439cdfda",
+              "exit_code": 1,
+              "status": "failed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "aece2014b4c026c1c9cfcd6ce96db484980a1504a00b5f178b87464160669a1c",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            }
+          ],
+          "tool_calls": 6,
+          "retrieval_calls": 2,
+          "policy_calls": 0,
+          "error_types": [],
+          "final_message_sha256": "4bb5bcbeb280fa893b22b34122054d2fbbf482f626f43cae18b78f4b0354dc46",
+          "side_question_observation": {
+            "rejects_proof_heuristic": false,
+            "rejects_inaccessible_heuristic": false
+          }
+        }
+      ],
+      "initial_checks": {
+        "safe_none": true,
+        "safe_blank": true,
+        "safe_normal": true,
+        "existing_caller": true,
+        "reuse_helper": true
+      },
+      "final_checks": {
+        "safe_none": true,
+        "safe_blank": true,
+        "safe_normal": true,
+        "existing_caller": true,
+        "reuse_helper": true
+      },
+      "deterministic_success": true,
+      "manual_bilingual_dialogue_score": null,
+      "manual_score_missing_reason": "No independent bilingual human reviewer assigned to this engineering pilot.",
+      "repairs": [],
+      "escalations": []
+    },
+    {
+      "lane": "EVAL-02",
+      "task": "coding",
+      "language": "en",
+      "arm": "sol_alone",
+      "intervention": "common",
+      "source_hashes_before": {
+        "names.py": "f49b789ad559138e832a7c0a79103368f3e05812b46fd1065e334ac2d74e1d2d",
+        "test_names.py": "8daf5fbce693fb8b0b05c08847eef070ef493e50d29dbb9a589639916a6db344"
+      },
+      "artifact_hashes_after": {
+        "test_names.py": "5dbf780961bfc59a60132ea33630eb826efbc022dcb561394fef60023b65f4ff",
+        "names.py": "a7258a421ed33bc25795d60f0fff5fab5116cbfa7e98d536bd55fb4da87c5ebe"
+      },
+      "calls": [
+        {
+          "client": "codex-cli 0.155.0-alpha.16.3",
+          "model": "gpt-6-sol",
+          "effort": "medium",
+          "stage": "initial",
+          "prompt_sha256": "ffbe25a002933d9a1271af5a71bc3b430443a00905a407faaf86f8f483fa337f",
+          "exit_code": 0,
+          "timed_out": false,
+          "wall_seconds": 27.61,
+          "event_count": 22,
+          "malformed_event_lines": 0,
+          "stderr_sha256": "b3390b7b237df06eb8ae786a6c117aba5ef0d962b1c24e22ef9273d877e24357",
+          "failure": false,
+          "thread_id": "01a0cede-cb35-7f30-b553-e2bdf0dd3092",
+          "usage": {
+            "input_tokens": 91671,
+            "cached_input_tokens": 86656,
+            "output_tokens": 869,
+            "reasoning_output_tokens": 76
+          },
+          "tool_events": [
+            {
+              "type": "command_execution",
+              "command_sha256": "1ac5d624f556b64b7d3ec46cdb23da9220e9698a8aa6ea8b394f46a175212da1",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "7678ae510885e9d497cebabe17b6aafa36785e52ba28bb198426fe3313613fb2",
+              "exit_code": 128,
+              "status": "failed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "152c055fbcdff49f9f4f8e3fb0f79720aff410931d0c834fea55d06b029538d8",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "b8b91141031c22856ea7805c873468bf310e7a67c02d34b4cf42973b2e238ed0",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "43aa351e1c3f58ab26f802f716324cd0044f53f7f96988423db179687d90267d",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "file_change",
+              "command_sha256": null,
+              "exit_code": null,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "ad2a6a6af9d5be39d2371636c4682844b4e6f701d197a7cc5a3ed7ae08e0fd22",
+              "exit_code": 1,
+              "status": "failed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "b4111413d5eb1d11d7b9a805d04c3bc1ec8de325d51d84a81eb2e772b7ba112e",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            }
+          ],
+          "tool_calls": 8,
+          "retrieval_calls": 4,
+          "policy_calls": 0,
+          "error_types": [],
+          "final_message_sha256": "37c058c43b63e61d5717036766df1afd4ce4c6d2b0b7f75a94880d3e6cf03cbc",
+          "side_question_observation": {
+            "rejects_proof_heuristic": false,
+            "rejects_inaccessible_heuristic": false
+          }
+        }
+      ],
+      "initial_checks": {
+        "safe_none": true,
+        "safe_blank": true,
+        "safe_normal": true,
+        "existing_caller": true,
+        "reuse_helper": true
+      },
+      "final_checks": {
+        "safe_none": true,
+        "safe_blank": true,
+        "safe_normal": true,
+        "existing_caller": true,
+        "reuse_helper": true
+      },
+      "deterministic_success": true,
+      "manual_bilingual_dialogue_score": null,
+      "manual_score_missing_reason": "No independent bilingual human reviewer assigned to this engineering pilot.",
+      "repairs": [],
+      "escalations": []
+    },
+    {
+      "lane": "EVAL-02",
+      "task": "planning",
+      "language": "en",
+      "arm": "luna_alone",
+      "intervention": "common",
+      "source_hashes_before": {
+        "brief.json": "091145d1dfb50a98bde871bb2e5a2f163028e9cef1a7ea0c13ecf4051761df12"
+      },
+      "artifact_hashes_after": {
+        "plan.json": "ed8562fed55bbbdfa95be36bbc4c1d789770197fc823d4c809dd636123d32640",
+        "brief.json": "091145d1dfb50a98bde871bb2e5a2f163028e9cef1a7ea0c13ecf4051761df12"
+      },
+      "calls": [
+        {
+          "client": "codex-cli 0.155.0-alpha.16.3",
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "stage": "initial",
+          "prompt_sha256": "29dbe20bbcde6069b60045bfbbd7557c5dc6aaa73343ef76887583eb81958e87",
+          "exit_code": 0,
+          "timed_out": false,
+          "wall_seconds": 15.384,
+          "event_count": 11,
+          "malformed_event_lines": 0,
+          "stderr_sha256": "fba665eeb2f6d091476629c3bc355768fcf5fe37c6f74165a2fc4520cb5132ba",
+          "failure": false,
+          "thread_id": "01a0cedf-30bc-7f53-b9f0-635f74d0ba89",
+          "usage": {
+            "input_tokens": 58042,
+            "cached_input_tokens": 53248,
+            "output_tokens": 378,
+            "reasoning_output_tokens": 41
+          },
+          "tool_events": [
+            {
+              "type": "command_execution",
+              "command_sha256": "3d57f5b870b083c38a334fac6a7c45ecb64c730c227f6aba26c674c18df6fa57",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "215ea6bc0addb7f8e0c17ec07f9c486070bb072fb3e9f20864bf0f9e2deb1a4f",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "e4bfc2dc46b9f375f07c317cc2c9b00dcd4deb4b0ac5f67a80a338654e348301",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            }
+          ],
+          "tool_calls": 3,
+          "retrieval_calls": 3,
+          "policy_calls": 0,
+          "error_types": [],
+          "final_message_sha256": "f369794679a28535a0c4c83bfba16292bab05b59330b53ee663e3ff645aba354",
+          "side_question_observation": {
+            "rejects_proof_heuristic": false,
+            "rejects_inaccessible_heuristic": false
+          }
+        }
+      ],
+      "initial_checks": {
+        "venue_A": true,
+        "capacity_24": true,
+        "attendance_20": true,
+        "access": true,
+        "quiet_room": true,
+        "booking_action": true
+      },
+      "final_checks": {
+        "venue_A": true,
+        "capacity_24": true,
+        "attendance_20": true,
+        "access": true,
+        "quiet_room": true,
+        "booking_action": true
+      },
+      "deterministic_success": true,
+      "manual_bilingual_dialogue_score": null,
+      "manual_score_missing_reason": "No independent bilingual human reviewer assigned to this engineering pilot.",
+      "repairs": [],
+      "escalations": []
+    },
+    {
+      "lane": "EVAL-02",
+      "task": "planning",
+      "language": "en",
+      "arm": "luna_v15",
+      "intervention": "adaptive",
+      "source_hashes_before": {
+        "brief.json": "091145d1dfb50a98bde871bb2e5a2f163028e9cef1a7ea0c13ecf4051761df12"
+      },
+      "artifact_hashes_after": {
+        "plan.json": "ed8562fed55bbbdfa95be36bbc4c1d789770197fc823d4c809dd636123d32640",
+        "brief.json": "091145d1dfb50a98bde871bb2e5a2f163028e9cef1a7ea0c13ecf4051761df12"
+      },
+      "calls": [
+        {
+          "client": "codex-cli 0.155.0-alpha.16.3",
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "stage": "initial",
+          "prompt_sha256": "bc3407cdda6bf9ba52a9bd02806bd8a4fd1c01da7beac372f74f3347c69f32e4",
+          "exit_code": 0,
+          "timed_out": false,
+          "wall_seconds": 16.755,
+          "event_count": 11,
+          "malformed_event_lines": 0,
+          "stderr_sha256": "13b810bd643a8acde8695c313da632978a93a0ce1954659d9a1f921637e402dd",
+          "failure": false,
+          "thread_id": "01a0cedf-388a-7381-b56e-a35e2c73cd96",
+          "usage": {
+            "input_tokens": 62082,
+            "cached_input_tokens": 56320,
+            "output_tokens": 480,
+            "reasoning_output_tokens": 45
+          },
+          "tool_events": [
+            {
+              "type": "command_execution",
+              "command_sha256": "dec0b423ad8d1e80b7e38ffab494a202b29a3458ea760c708513af01afa33377",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "215ea6bc0addb7f8e0c17ec07f9c486070bb072fb3e9f20864bf0f9e2deb1a4f",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "8e79be60ee953931695db1de9c26adaadf58540fc3ce66da37d78fb2c2813534",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            }
+          ],
+          "tool_calls": 3,
+          "retrieval_calls": 3,
+          "policy_calls": 0,
+          "error_types": [],
+          "final_message_sha256": "9b1cc73fb0611794b2058c0bf667f9ffdd75377b4bb2ff138a4da6d3e122ca5f",
+          "side_question_observation": {
+            "rejects_proof_heuristic": false,
+            "rejects_inaccessible_heuristic": false
+          }
+        }
+      ],
+      "initial_checks": {
+        "venue_A": true,
+        "capacity_24": true,
+        "attendance_20": true,
+        "access": true,
+        "quiet_room": true,
+        "booking_action": true
+      },
+      "final_checks": {
+        "venue_A": true,
+        "capacity_24": true,
+        "attendance_20": true,
+        "access": true,
+        "quiet_room": true,
+        "booking_action": true
+      },
+      "deterministic_success": true,
+      "manual_bilingual_dialogue_score": null,
+      "manual_score_missing_reason": "No independent bilingual human reviewer assigned to this engineering pilot.",
+      "repairs": [],
+      "escalations": []
+    },
+    {
+      "lane": "EVAL-02",
+      "task": "planning",
+      "language": "en",
+      "arm": "sol_alone",
+      "intervention": "common",
+      "source_hashes_before": {
+        "brief.json": "091145d1dfb50a98bde871bb2e5a2f163028e9cef1a7ea0c13ecf4051761df12"
+      },
+      "artifact_hashes_after": {
+        "plan.json": "41d1edd5ced4d3ce65b922839e4aa14987e4bd960f1538f9dc29a576d48fcb0e",
+        "brief.json": "091145d1dfb50a98bde871bb2e5a2f163028e9cef1a7ea0c13ecf4051761df12"
+      },
+      "calls": [
+        {
+          "client": "codex-cli 0.155.0-alpha.16.3",
+          "model": "gpt-6-sol",
+          "effort": "medium",
+          "stage": "initial",
+          "prompt_sha256": "29dbe20bbcde6069b60045bfbbd7557c5dc6aaa73343ef76887583eb81958e87",
+          "exit_code": 0,
+          "timed_out": false,
+          "wall_seconds": 18.681,
+          "event_count": 11,
+          "malformed_event_lines": 0,
+          "stderr_sha256": "626b00605a6169a65ac6d4caa8740817cf6db6d322d65195a67669ae84c730cd",
+          "failure": false,
+          "thread_id": "01a0cedf-587e-7e11-b914-d125fe52d5ce",
+          "usage": {
+            "input_tokens": 59054,
+            "cached_input_tokens": 55168,
+            "output_tokens": 562,
+            "reasoning_output_tokens": 47
+          },
+          "tool_events": [
+            {
+              "type": "command_execution",
+              "command_sha256": "29bb42dd38a3dccfa41e949a5748f2f7fcf0230f25cef717088c9e9f76baeed0",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": true,
+              "policy_call": false
+            },
+            {
+              "type": "file_change",
+              "command_sha256": null,
+              "exit_code": null,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            },
+            {
+              "type": "command_execution",
+              "command_sha256": "4576ca9942a11deb339fded20c135689240576c78cd341e53db6ea8c0554db45",
+              "exit_code": 0,
+              "status": "completed",
+              "retrieval": false,
+              "policy_call": false
+            }
+          ],
+          "tool_calls": 3,
+          "retrieval_calls": 1,
+          "policy_calls": 0,
+          "error_types": [],
+          "final_message_sha256": "93552df8d7ce200985254be19cb32f8913b03bc581801dfe7089f6fbb9a16cc0",
+          "side_question_observation": {
+            "rejects_proof_heuristic": false,
+            "rejects_inaccessible_heuristic": false
+          }
+        }
+      ],
+      "initial_checks": {
+        "venue_A": true,
+        "capacity_24": true,
+        "attendance_20": true,
+        "access": true,
+        "quiet_room": true,
+        "booking_action": true
+      },
+      "final_checks": {
+        "venue_A": true,
+        "capacity_24": true,
+        "attendance_20": true,
+        "access": true,
+        "quiet_room": true,
+        "booking_action": true
+      },
+      "deterministic_success": true,
+      "manual_bilingual_dialogue_score": null,
+      "manual_score_missing_reason": "No independent bilingual human reviewer assigned to this engineering pilot.",
+      "repairs": [],
+      "escalations": []
+    }
+  ]
+}

@@ -1,0 +1,577 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A16P2",
+  "phase": "evidence",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "0080a54710d9286e",
+      "packet_sha256": "f02deb8d9b1e32f70d63b927f5d566044b9dd1e6be6d9f1e714b0e3d35c0eb6a",
+      "locale": "en",
+      "blinding_status": "intact",
+      "non_blindable_cues": [],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The decision selects the qualifying venue and supplies every requested field, rejection code and unresolved availability issue.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Bay's $1,150 cost, capacity margin of four and qualifying features match the source; availability remains explicitly unknown.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Completes the authorized selection using available facts and records the unresolved availability without making it a blocker to the requested decision.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Briefly explains the qualifying choice and capacity margin, and explicitly identifies the availability limitation.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a venue-selection task with a structured decision artifact.",
+          "evidence": [
+            "packet:/initial_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "No action counts or timing receipts are supplied; brevity does not establish efficiency.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "structured_decision_contract",
+          "status": "pass",
+          "reason": "The JSON parses and contains the requested fields and types, all four constraint codes and one decisive code per rejected venue.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "gate_id": "qualification_and_lowest_cost",
+          "status": "pass",
+          "reason": "Bay alone accommodates 58 and satisfies entry, rain-backup, closing-time and $1,200 ceiling requirements.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "gate_id": "capacity_arithmetic_and_rejections",
+          "status": "pass",
+          "reason": "62 minus 58 gives four; Pine closes early, Dock has stairs only and Elm lacks rain backup.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/capacity_margin",
+            "packet:/stages/0/artifacts/decision.json/rejected"
+          ]
+        },
+        {
+          "gate_id": "availability_and_booking_authority",
+          "status": "pass",
+          "reason": "Availability is explicitly unresolved and neither the artifact nor the supplied public response invents a booking.",
+          "evidence": [
+            "packet:/stages/0/artifacts/decision.json/unresolved",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "public_decision_explanation",
+          "status": "pass",
+          "reason": "The final message explains why Bay qualifies and states the remaining uncertainty.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The artifact distinguishes source-supported suitability from unknown availability and correctly accounts for every rejected venue.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Earlier public messages and action receipts are absent. Full-turn clarification behavior, execution of claimed checks and efficiency are unassessable.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "a6cdffe9725ed1a7aa04c80ef07504fc026675cc7996630bfa7087b9df4ef305",
+        "limitations": [
+          "The supplied check results were reviewed; the checker was not run.",
+          "Aggregate counts and timing are available, but action identities, sequence, verification receipts and earlier public messages remain unavailable."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Venue correctness and booking authority",
+          "category": "no_disagreement",
+          "first_pass_observation": "The venue choice, constraints and absence of invented availability or booking passed static review.",
+          "deterministic_observation": "venue_choice=true; venue_constraints=true; venue_no_booking_claim=true; critical_failures=[]; all_pass=true.",
+          "interpretation": "The disclosed flags corroborate the visible result. No correctness score or critical-gate change is warranted.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "subject": "Action and timing evidence coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Action counts and timing were unavailable; efficiency and execution of claimed verification were unassessable.",
+          "deterministic_observation": "tool_actions=3; failed_tool_actions=0; wall_seconds=20.134.",
+          "interpretation": "Disclosure resolves the missing aggregate measurements. It does not identify the actions or establish whether verification occurred or work was repeated; efficiency remains unassessable.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages/0/public_final",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The complete decision satisfies the request; the disclosed venue checks corroborate the result.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Venue facts, arithmetic and availability uncertainty match the source. Disclosed checks introduce no contradiction.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible result completes the authorized selection while preserving the availability boundary. Earlier interaction remains unavailable.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final message directly explains the selection, capacity margin and unresolved availability.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The task produces a venue decision, not implementation code.",
+          "evidence": [
+            "packet:/initial_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Three tool actions, zero failed actions and 20.134 seconds are reported, but their identities and sequence are absent. Necessity and redundancy cannot be assessed.",
+          "evidence": [
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "structured_decision_contract",
+          "status": "pass",
+          "reason": "The artifact supplies every required field with the requested types and codes.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "gate_id": "qualification_and_lowest_cost",
+          "status": "pass",
+          "reason": "Bay is the only qualifying venue; the disclosed choice and constraint checks agree.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "deterministic:/deterministic_checks/checks/venue_choice",
+            "deterministic:/deterministic_checks/checks/venue_constraints"
+          ]
+        },
+        {
+          "gate_id": "capacity_arithmetic_and_rejections",
+          "status": "pass",
+          "reason": "The four-person margin and each rejected venue's decisive failure match the source.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/capacity_margin",
+            "packet:/stages/0/artifacts/decision.json/rejected"
+          ]
+        },
+        {
+          "gate_id": "availability_and_booking_authority",
+          "status": "pass",
+          "reason": "Availability stays unresolved and the visible response makes no booking claim; the disclosed check agrees.",
+          "evidence": [
+            "packet:/stages/0/artifacts/decision.json/unresolved",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/venue_no_booking_claim"
+          ]
+        },
+        {
+          "gate_id": "public_decision_explanation",
+          "status": "pass",
+          "reason": "The final message explains the qualifying choice and remaining uncertainty.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "33de887cd464b073",
+      "packet_sha256": "77a08feae7596470316101036bffeefb6e86ccd13931ee92eac4dcba7ace5310",
+      "locale": "en",
+      "blinding_status": "intact",
+      "non_blindable_cues": [],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The supplied notice changes only Thursday's closing time from 17:00 to 18:00 and the final response reports completion.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The reported result matches the supplied text: both versions contain 121 ASCII bytes and differ only by 7 becoming 8 in Thursday's time.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible result completes the authorized edit and preserves the requested scope. The broader action sequence is unavailable.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/designated_artifact_diffs/notice.md",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Directly identifies the completed change and correctly states preservation of the remaining content.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The task edits notice text and contains no implementation code.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "EVAL-03 requires action and timing evidence, which this view omits. The small diff and short response cannot establish efficient execution.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "requested_time_change",
+          "status": "pass",
+          "reason": "Thursday's closing time is 18:00 in the resulting notice.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md#L4"
+          ]
+        },
+        {
+          "gate_id": "preserve_every_other_byte",
+          "status": "pass",
+          "reason": "Static comparison of the supplied ASCII strings finds exactly one changed byte at zero-based offset 80; all other content and the trailing newline are preserved.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/designated_artifact_diffs/notice.md"
+          ]
+        },
+        {
+          "gate_id": "report_completed_edit",
+          "status": "pass",
+          "reason": "The public response accurately reports the requested edit, and the artifact corroborates completion.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The designated artifact preserves the exact requested byte boundary, including unrelated hours, whitespace and the final newline.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "Action counts and timing needed for this efficiency task are missing, so redundant checks or post-completion activity cannot be assessed.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "The artifact supports the byte-preservation result, but no receipt establishes the candidate's verification procedure. Earlier public-message behavior is also unavailable.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "4faff1b64a2c632e86ddc46e5d4bb20a915c41edf8987c4649d813749b37a6aa",
+        "limitations": [
+          "The supplied check result was reviewed; the checker was not run.",
+          "Aggregate counts and timing do not identify actions, verification procedures or post-completion activity. Earlier public messages remain unavailable."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Exact notice edit",
+          "category": "no_disagreement",
+          "first_pass_observation": "The supplied artifact changes only the requested closing time and the final response accurately reports completion.",
+          "deterministic_observation": "notice_exact_edit=true; critical_failures=[]; all_pass=true.",
+          "interpretation": "The disclosed result corroborates byte preservation and the requested edit. No correctness score or critical-gate change is warranted.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "subject": "Efficiency evidence coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Action counts and timing required for EVAL-03 were missing, leaving efficiency unassessable.",
+          "deterministic_observation": "tool_actions=4; failed_tool_actions=0; wall_seconds=27.421.",
+          "interpretation": "Disclosure supplies aggregate measurements and narrows the historical missing-evidence finding. Without action identities and order, it still cannot establish necessary checks, redundancy or whether activity continued after completion.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The artifact and completion report satisfy the exact edit request; the disclosed check agrees.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The reported change and preservation of other bytes match the supplied texts and disclosed check. The candidate's verification procedure remains unavailable.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible result completes the authorized edit within scope. Aggregate receipts do not reveal the broader action sequence.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/designated_artifact_diffs/notice.md",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The concise completion report identifies the requested change and accurately describes the resulting content.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a notice-text edit with no implementation code.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Four tool actions, zero failed actions and 27.421 seconds are reported. Missing action identities and order prevent assessment of required checks, redundant work and post-completion activity.",
+          "evidence": [
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "requested_time_change",
+          "status": "pass",
+          "reason": "Thursday's closing time is 18:00; the disclosed exact-edit check agrees.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md#L4",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        {
+          "gate_id": "preserve_every_other_byte",
+          "status": "pass",
+          "reason": "The supplied texts preserve all bytes except the requested digit change, corroborated by the disclosed check.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/designated_artifact_diffs/notice.md",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        {
+          "gate_id": "report_completed_edit",
+          "status": "pass",
+          "reason": "The final response accurately reports completion of the edit shown in the artifact.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "Both assigned packet views, their matching evidence files, the locked judgments and required repository constraints were read completely. All supplied packet, evidence and rubric SHA-256 values matched.",
+    "The specified historical packet fields are preserved exactly from locked-first-pass.json. Evidence-phase conclusions are recorded separately.",
+    "Unrelated packet references in the locked file's top-level limitations were excluded from this assignment; no other packets were opened or assessed.",
+    "Review used read-only static inspection and hashing. No candidate code, tests, plugins, harnesses or checkers were executed.",
+    "Both packets supply final public messages but no earlier public-message history. Absence of earlier questions cannot be inferred.",
+    "Disclosed counts and timing establish aggregate resource measurements, not action sequence, candidate verification procedures or absence of redundant work.",
+    "The caller declared an isolated context; host-level isolation was not independently verified. No treatment identity was inferred.",
+    "These are supplemental provisional judgments from one model assessor. Human scores, host/backend identity echoes and usage remain null. Deterministic passes do not establish human acceptance, model superiority or release readiness."
+  ]
+}

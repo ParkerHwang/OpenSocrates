@@ -1,0 +1,59 @@
+{
+  "schema": "independent-static-affected-review/1.0",
+  "reviewed_commit": "4053e21932ce126f552ce41ee0004bf7496634ca",
+  "comparison_commit": "7893996357b7fcfaa058e91d4bc2694d5f1cb63c",
+  "review_type": "static_source_git_diff_complete_en_ko_acceptance_guides",
+  "verdict": "accept_bounded_metadata_and_guidance_change_no_blocker",
+  "blocking_findings": [],
+  "production_edits": false,
+  "models_probes_mutations_tests_or_subagents_run": false,
+  "conclusions": [
+    {
+      "topic": "canonical_location_metadata",
+      "locations": ["schemas/source/v15_contracts.py:978"],
+      "evidence": "Finding location now copies OC_PATH into its own object and adds only a description. It directs exact equality with an owned current candidate path and places optional line/range details in reproduction. The original path type and length bounds remain intact; OC_PATH itself is not mutated. This clarifies the existing runtime contract without adding a new design policy."
+    },
+    {
+      "topic": "complete_bilingual_guidance",
+      "locations": [
+        "plugin-src/shared/orchestration/v0.1.0/review.en.md:5",
+        "plugin-src/shared/orchestration/v0.1.0/review.ko.md:5",
+        "plugin-src/shared/orchestration/v0.1.0/execution_verification.en.md:5",
+        "plugin-src/shared/orchestration/v0.1.0/execution_verification.ko.md:5"
+      ],
+      "evidence": "All four complete guides were read. EN and KO consistently require an exact candidate-owned path, disallow appended line/range/anchor suffixes, put line details in reproduction, and preserve path-specific artifact digest plus assigned requirement binding. Existing fresh-context, no-patching, failed/unknown obligation and distinct execution-verifier instructions remain intact."
+    },
+    {
+      "topic": "strict_runtime_binding",
+      "locations": ["src/opensocrates/orchestration/runtime.py:97", "src/opensocrates/orchestration/runtime.py:119", "src/opensocrates/orchestration/runtime.py:129"],
+      "evidence": "Runtime is byte-for-byte unchanged. _assessment still checks assignment and candidate identity, complete obligation identities and allowed evidence IDs. Each finding still requires by_path[location] to equal artifact_sha256 and requirement_id to belong to assigned obligations. It performs no suffix stripping, path normalization or permissive fallback. Failed required obligations or blocking findings cannot qualify a candidate."
+    },
+    {
+      "topic": "generated_and_prior_compatibility",
+      "evidence": "The generated assessment, assignment and response diffs contain only the new location description (including intended repair-finding/assessment embeddings). No validation keywords or previous explicit type annotations were removed or changed. Git diff --exit-code returned zero for all source runtime code, launchers and all generated schemas except those three metadata changes; candidate/request and all 47 older schemas remain unchanged. Previous R1/R2/R3 fixes are preserved."
+    },
+    {
+      "topic": "regression_test_source",
+      "locations": ["tools/check_orchestration.py:412"],
+      "evidence": "The new deterministic fixture represents a negative assessment using the exact path and moves line details to reproduction. It expects the valid negative assessment to remain unqualified for both review roles, and expects rejection for appended line/anchor suffixes, another path, wrong artifact hash or unrelated requirement. The preservation helper permits only added type or description keys. Tests were inspected, not executed in this review."
+    }
+  ],
+  "committed_artifact_sha256": {
+    "schemas/source/v15_contracts.py": "4190537fd72a91018fe990788a94191cfdba76a845b0570784ea9cdffc63c033",
+    "schemas/v1/orchestration-assessment.schema.json": "7cb1fdf5dde47ffe9f9e747ae0b792f34ec719b81d84c60923e2088acb2c17db",
+    "schemas/v1/orchestration-assignment.schema.json": "bea8c17b33893ffb15ff0a293fc33960d83ec64836d9e001dfaddb89c5770ef8",
+    "schemas/v1/orchestration-response.schema.json": "200265a6435bdfd7d2d1dd951f17e83b4c742477f43b0e42f941ea3f2f723f47",
+    "plugin-src/shared/orchestration/v0.1.0/review.en.md": "58f015f608afdaed34e4efefbf3782c4de57ed83eeb27545711436805f4df09a",
+    "plugin-src/shared/orchestration/v0.1.0/review.ko.md": "ec4788d2d341ee106211341eb56751b85b8983f13d84d50e77a5bffce655b44e",
+    "plugin-src/shared/orchestration/v0.1.0/execution_verification.en.md": "c51aaeaf4186402c7fd791ee66c887bb9dd7ff849765afb9cefea79cef656ad6",
+    "plugin-src/shared/orchestration/v0.1.0/execution_verification.ko.md": "176bed1ca075ecb86aeb5ce866c2d258314994c09c732efc2a9e7902a6826065",
+    "tools/check_orchestration.py": "85eb641eb96e8f8df3c02435d9d916f292b1fd8033fe888ff83535a68de65f12",
+    "src/opensocrates/orchestration/runtime.py": "dc3ab05991db3791c27372bb44374fb94f30dee0398cb09e5ac06639621817eb"
+  },
+  "limits": [
+    "This is a static acceptance of the nine-file metadata/guidance change, not independent execution or live workflow acceptance.",
+    "The source-suite and native results reported by the parent remain separately attributed evidence.",
+    "Clearer guidance does not establish that a future model output follows it; the actual next workflow needs exact-version acceptance.",
+    "Earlier failed or rejected live outcomes must remain preserved and are not reclassified by this change."
+  ]
+}

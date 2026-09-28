@@ -1,0 +1,207 @@
+{
+  "claim": "CZE+ESP is the preferred staged envelope under the consultant default of maximizing base annual incremental contribution within board constraints.",
+  "claim_type": "Conditional action recommendation informed by a predictive financial model; not a causal claim.",
+  "claim_to_source_table": [
+    {
+      "claim": "2025 cohort economics",
+      "sources": [
+        "S02",
+        "S03",
+        "S07",
+        "S08",
+        "S09",
+        "S11",
+        "S14"
+      ],
+      "type": "synthetic transaction census within frozen exports",
+      "basis": "1254 eligible orders; 241 retained eligible return IDs",
+      "directness": "direct for defined cohort",
+      "status": "computed; downloaded sources checked",
+      "scope": "2025 shipments; returns through inclusive 2026-01-31"
+    },
+    {
+      "claim": "Market context",
+      "sources": [
+        "S05",
+        "S10",
+        "S13"
+      ],
+      "type": "official national aggregate series archive",
+      "basis": "18 country-years, two indicators",
+      "directness": "contextual only for demand",
+      "status": "archive provenance verified",
+      "scope": "2022\u20132024 values; source lastupdated 2026-07-13"
+    },
+    {
+      "claim": "Hub effect",
+      "sources": [
+        "S06",
+        "S12"
+      ],
+      "type": "synthetic planning assumptions",
+      "basis": "six options; low/base/high and joint stress",
+      "directness": "direct for model, no empirical causal evidence",
+      "status": "assumed / unverified effect",
+      "scope": "steady-state annual model"
+    }
+  ],
+  "quality_limits": [
+    "Synthetic transactions and hub assumptions are not observed client demand.",
+    "No payment ledger: booked sales cannot be reconciled to cash.",
+    "Returns are censored at 2026-01-31; later credits are outside the defined base.",
+    "No measured hub volume uplift, service SLA, competitive demand, site quotes, working capital or implementation ramp supplied.",
+    "Archive collected 2026-09-27; World Bank source lastupdated 2026-07-13 can revise historical years.",
+    "Scenario results are steady-state annual arithmetic, not causal estimates or discounted cash flow.",
+    "FX reference means translate sales analytically; they are not realized exchange rates."
+  ],
+  "quality_dimensions": {
+    "synthetic_exports": {
+      "design_rigor": "explicit grain/revision/accounting rules; no external audit",
+      "bias_risk": "synthetic generation; not real demand",
+      "measurement_validity": "supported within dictionary/cutoff",
+      "completeness": "all indexed pages and corrections collected",
+      "applicability": "limited to synthetic case"
+    },
+    "official_archives": {
+      "design_rigor": "official aggregate definitions",
+      "bias_risk": "revision and aggregation limits",
+      "measurement_validity": "strong for stated national units / reference FX",
+      "completeness": "all requested country-years and FX months present",
+      "applicability": "contextual; no product effect"
+    },
+    "hub_assumptions": {
+      "design_rigor": "transparent arithmetic; no causal design",
+      "bias_risk": "possible optimism and unpriced scope",
+      "measurement_validity": "uplift and savings unverified",
+      "completeness": "working capital/ramp/site cash gaps",
+      "applicability": "scenario comparison only"
+    }
+  },
+  "hierarchy_position_and_limits": "Official archive provenance is strongest for macro/FX measures; synthetic exports directly define this case; planning assumptions are weakest for actual hub impact. Prestige does not make macro data direct demand evidence.",
+  "agreement_and_conflicts": "Model reconciles; source types measure different claims, so there is no independent corroboration of demand. Supplied savings exceed recorded fulfillment per unit; scope unresolved.",
+  "missing_evidence": [
+    "measured causal uplift",
+    "supported net unit savings",
+    "site quotes",
+    "working capital",
+    "ramp",
+    "cash collections/refund timing",
+    "service baseline"
+  ],
+  "resulting_evidence_state": "Arithmetic supported within synthetic case; real-world effect unverified; action recommendation provisional.",
+  "calibrated_conclusion": "Reserve a staged Czechia + Spain envelope: highest base, low and high contribution among feasible portfolios; aggregate specified stress remains positive. Start with Spain; release Czechia only after savings, demand and FX validation. Netherlands + Spain is the stronger stress-resilient alternative.",
+  "flip_condition": [
+    "Validate net per-unit saving scope, since all supplied savings exceed historical fulfillment per shipped unit.",
+    "With NLD at 25% uplift and normal FX/returns, reopen CZE selection if validated CZE uplift is below about 17.7%.",
+    "At 25% volume and 3% gross-sales refund shock, NLD overtakes CZE above about a 2.6% Czech net-sales FX haircut.",
+    "Confirm all-in capex, staffing and working-capital needs before binding commitments; remaining budget is headroom, not automatic spending authority."
+  ],
+  "choice_frame": {
+    "options": "defer, six singles, all 15 pairs (11 feasible)",
+    "time": "steady-state annual benefit; separate year-zero capex",
+    "stakeholders": "board capital allocation; operations/HR feasibility; finance control; commercial demand"
+  },
+  "hard_constraints": {
+    "source": "scenario-policy.md, user decision rules",
+    "capex_eur": 450000,
+    "fte": 7,
+    "hub_count": 2,
+    "status": "supplied binding"
+  },
+  "criteria_and_weight_provenance": {
+    "owner": "consultant default for independent task execution, not claimed board preference",
+    "date": "2026-09-27",
+    "criteria": [
+      "maximize base annual increment",
+      "inspect low/high/stress",
+      "capex and FTE efficiency",
+      "stage irreversible commitments"
+    ],
+    "weights": null,
+    "probabilities": null,
+    "scale": "EUR/year, EUR capex, FTE; no composite rating"
+  },
+  "option_comparison": "metrics.json portfolios contains every option/scenario with feasibility and rank.",
+  "dominated_or_incomparable": "CZE+ESP dominates POL+ESP across all four contribution cases, capex and FTE. CZE+ESP and NLD+ESP are incomparable because stress protection trades against normal-case contribution and resources.",
+  "selected_option": [
+    "CZE",
+    "ESP"
+  ],
+  "concessions": {
+    "stress_income_given_up_vs_nld_esp_eur": 75450.42
+  },
+  "accepted_risks": "Unmeasured uplift and savings; CZK shock; implementation timing. Envelope recommendation is conditional, and second-site spend remains gated.",
+  "baseline": {
+    "formula": "C*u + U*(1+u)*s - F",
+    "selected_base_increment_eur": 198099.31,
+    "decision_threshold": "positive annual increment within hard limits; maximize base by default"
+  },
+  "tested_ranges": [
+    {
+      "variable": "volume uplift",
+      "range": [
+        0.1,
+        0.25,
+        0.4
+      ],
+      "provenance": "synthetic scenario policy"
+    },
+    {
+      "variable": "joint stress",
+      "range": {
+        "u": 0.25,
+        "refund_cost_times_gross": 0.03,
+        "fx_haircut_times_net_PLN_CZK": 0.1
+      },
+      "provenance": "synthetic conservative stress, no probability"
+    },
+    {
+      "variable": "supplemental zero uplift",
+      "range": [
+        0
+      ],
+      "provenance": "analyst boundary test"
+    },
+    {
+      "variable": "saving cap",
+      "range": "min(client saving, historical fulfillment/units)",
+      "provenance": "analyst cost-pool bound; not a measured saving"
+    }
+  ],
+  "perturbation_results": "metrics.json hub_scenarios, portfolios and sensitivity; audit CSVs retain exact values. Required stress changes refunds and FX jointly; boundary tests separately label combinations.",
+  "switching_values": {
+    "cze_uplift_to_match_nld_base": 0.17686593439237513,
+    "cze_fx_net_sales_haircut_to_match_nld_with_3pct_refund": 0.025966163170319044,
+    "cze_fx_net_sales_haircut_to_break_even_with_3pct_refund": 0.06288325752737185,
+    "cze_esp_common_uplift_to_break_even": 0.02738349895976709
+  },
+  "robust_or_fragile_conclusion": "CZE+ESP leads normal volume cases but second-hub choice is fragile to FX and saving scope; recommendation provisional.",
+  "research_priority": "Validate net saving bridge and Czech demand relative to Netherlands; Treasury quantifies relevant revenue exposure. Working-capital/site cash gates are separate from estimating uplift.",
+  "public_questions": [
+    {
+      "question": "What are 2025 cohort economics?",
+      "conclusion": "computed and reconciled",
+      "missing_inputs": "cash ledger only for a separate cash reconciliation",
+      "reopen": "valid source correction or cutoff-eligible missing records"
+    },
+    {
+      "question": "Do hubs cause 25% volume uplift?",
+      "conclusion": "unverified; causal claim held",
+      "missing_inputs": "credible pilot/control or demand evidence",
+      "reopen": "measured cohort effect with mix/seasonality/return maturity addressed"
+    },
+    {
+      "question": "Which envelope should the board reserve?",
+      "conclusion": "provisional staged CZE+ESP",
+      "missing_inputs": "no input prevents arithmetic selection; release requires stated quote/cash/saving validation",
+      "reopen": "downside preference or threshold changes"
+    }
+  ],
+  "controller_status": {
+    "native_activation": "unconfirmed",
+    "application": "unverified",
+    "native_selection": "trade-off-analysis and sensitivity-analysis emitted complete procedures; no model calls",
+    "fallback": "evidence-hierarchy complete installed canonical reference read after selector request failures"
+  },
+  "grounding": "OpenSocrates grounding: evidence-hierarchy@3, trade-off-analysis@3, sensitivity-analysis@3"
+}

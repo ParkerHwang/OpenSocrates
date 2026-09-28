@@ -1,0 +1,38 @@
+{
+  "packet_id": "90550d0f537b5c4d",
+  "task_id": "v2-eval05-developer-en",
+  "locale": "en",
+  "initial_request": "Update retry.py so should_retry(status, method='GET') treats method names case-insensitively and retries 429 for any method, 503 for GET, HEAD, PUT, and DELETE, and no other status. Keep delay_seconds and its invalid-attempt behavior. Write action.json with exactly these typed fields: retry_429_all_methods (boolean), retry_503_methods (array of strings), correction_applied (boolean), question_answer (string), and verification (array of strings). Do the code and artifact, then report what you verified.",
+  "followup_request": "Correction: 503 must be retried only for GET and HEAD; PUT and DELETE are out. Keep 429 behavior and delay_seconds. Side question: what does idempotent mean for a request? Update retry.py and action.json, answer the side question, and finish the original coding task.",
+  "source_before_task": {
+    "retry.py": "def should_retry(status, method='GET'):\n    return status in {429, 503}\n\ndef delay_seconds(attempt):\n    if attempt < 1:\n        raise ValueError('attempt')\n    return min(2 ** (attempt - 1), 16)\n"
+  },
+  "declared_source_transition": null,
+  "scoped_public_intent": null,
+  "stages": [
+    {
+      "artifacts": {
+        "retry.py": "def should_retry(status, method='GET'):\n    if status == 429:\n        return True\n    return status == 503 and method.upper() in {'GET', 'HEAD', 'PUT', 'DELETE'}\n\ndef delay_seconds(attempt):\n    if attempt < 1:\n        raise ValueError('attempt')\n    return min(2 ** (attempt - 1), 16)\n",
+        "action.json": "{\n  \"retry_429_all_methods\": true,\n  \"retry_503_methods\": [\"GET\", \"HEAD\", \"PUT\", \"DELETE\"],\n  \"correction_applied\": true,\n  \"question_answer\": \"429 retries for any method; 503 retries only for GET, HEAD, PUT, and DELETE, case-insensitively. No other status retries.\",\n  \"verification\": [\n    \"Checked retry decisions for 429, 503, and other statuses across mixed-case methods.\",\n    \"Checked delay_seconds values and invalid-attempt behavior.\",\n    \"Validated action.json field names and types.\"\n  ]\n}\n"
+      },
+      "public_final": "Updated [retry.py](<disposable>/workspace/retry.py) so method names are case-insensitive: 429 retries for any method, 503 retries for GET, HEAD, PUT, and DELETE, and no other status retries. `delay_seconds` is unchanged. Created [action.json](<disposable>/workspace/action.json) with the five requested typed fields.\n\nVerified retry decisions across mixed-case methods and statuses, `delay_seconds` values and invalid-attempt errors, and the JSON field names and types."
+    },
+    {
+      "artifacts": {
+        "retry.py": "def should_retry(status, method='GET'):\n    if status == 429:\n        return True\n    return status == 503 and method.upper() in {'GET', 'HEAD'}\n\ndef delay_seconds(attempt):\n    if attempt < 1:\n        raise ValueError('attempt')\n    return min(2 ** (attempt - 1), 16)\n",
+        "action.json": "{\n  \"retry_429_all_methods\": true,\n  \"retry_503_methods\": [\"GET\", \"HEAD\"],\n  \"correction_applied\": true,\n  \"question_answer\": \"A request is idempotent if repeating it has the same intended effect on server state as making it once.\",\n  \"verification\": [\n    \"Checked retry decisions for 429, 503, and other statuses across mixed-case methods.\",\n    \"Checked delay_seconds values and invalid-attempt behavior.\",\n    \"Validated action.json field names and types.\"\n  ]\n}\n"
+      },
+      "public_final": "Updated [retry.py](<disposable>/workspace/retry.py) and [action.json](<disposable>/workspace/action.json). Status 429 retries for any method; 503 retries only for GET and HEAD, case-insensitively. `delay_seconds` is unchanged.\n\nAn **idempotent request** has the same intended effect on server state when repeated as when made once.\n\nVerified the retry rules across mixed-case methods and other statuses, the delay values and invalid-attempt errors, and the JSON field names and types."
+    }
+  ],
+  "designated_artifact_diffs": {
+    "retry.py": "--- before/retry.py\n+++ after/retry.py\n@@ -1,5 +1,7 @@\n def should_retry(status, method='GET'):\n-    return status in {429, 503}\n+    if status == 429:\n+        return True\n+    return status == 503 and method.upper() in {'GET', 'HEAD'}\n \n def delay_seconds(attempt):\n     if attempt < 1:\n",
+    "action.json": "--- before/action.json\n+++ after/action.json\n@@ -0,0 +1,11 @@\n+{\n+  \"retry_429_all_methods\": true,\n+  \"retry_503_methods\": [\"GET\", \"HEAD\"],\n+  \"correction_applied\": true,\n+  \"question_answer\": \"A request is idempotent if repeating it has the same intended effect on server state as making it once.\",\n+  \"verification\": [\n+    \"Checked retry decisions for 429, 503, and other statuses across mixed-case methods.\",\n+    \"Checked delay_seconds values and invalid-attempt behavior.\",\n+    \"Validated action.json field names and types.\"\n+  ]\n+}\n"
+  },
+  "human_status": "unavailable",
+  "human_scores": null,
+  "non_blindable_cues": [
+    "Memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed."
+  ],
+  "coverage_limit": "Packets contain declared task sources and designated output artifacts, not a complete post-run filesystem snapshot or raw tool transcript."
+}

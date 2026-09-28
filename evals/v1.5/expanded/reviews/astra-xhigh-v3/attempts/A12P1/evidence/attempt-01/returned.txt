@@ -1,0 +1,667 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A12P1",
+  "phase": "evidence",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "ebaeb83859e2d8a1",
+      "packet_sha256": "a53f0970f424508c25d11b2b5b9aff571597b77d010cae60434b8a618c06be1d",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "Memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed.",
+        "The public final explicitly describes using PROJECT_NOTES.md and unavailable enrolled project memory."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The revised plan is correct, but full completion includes scoped forgetting whose persisted result is absent.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Venue facts match current sources. Material claims about note removal and memory unavailability cannot be corroborated.",
+          "evidence": [
+            "packet:/source_before_task/venues.md",
+            "packet:/source_before_task/calendar.md",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The artifact demonstrates correction uptake and preserved intent; completion of the requested scoped forgetting remains unknown.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/coverage_limit"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Clearly explains the venue change, capacity constraint, cost and unbooked status. Verification of memory-related claims is assessed separately.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a planning-data task without executable code.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "No action counts, timing or verification receipts establish efficiency.",
+          "evidence": [
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "plan_artifact_contract",
+          "status": "pass",
+          "reason": "The artifact contains all required fields, types and codes, including 52 attendees and proposed_unbooked.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "current_source_and_capacity_correction",
+          "status": "pass",
+          "reason": "The plan uses Harbor's current capacity of 65; the explanation correctly rejects Cedar's revised capacity of 48.",
+          "evidence": [
+            "packet:/declared_source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json/basis",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "accepted_constraints_and_lowest_qualifying_cost",
+          "status": "pass",
+          "reason": "Harbor accommodates 52, preserves both accessibility conditions and costs $1,300 within $1,400. Cedar is too small and Birch lacks both required features.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/source_before_task/venues.md",
+            "packet:/source_before_task/calendar.md",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "no_booking_claim",
+          "status": "pass",
+          "reason": "Both the artifact and public response retain the unbooked status supported by calendar.md.",
+          "evidence": [
+            "packet:/source_before_task/calendar.md",
+            "packet:/stages/0/artifacts/plan.json/status",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "persisted_scoped_forgetting",
+          "status": "unassessable",
+          "reason": "The withdrawn capacity is absent from the revised plan, but PROJECT_NOTES.md and any persisted memory changes are not supplied.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "gate_id": "memory_availability_truthfulness",
+          "status": "unassessable",
+          "reason": "The response reports no project identifier and unavailable enrolled memory; enrollment and lookup evidence are absent.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The visible plan replaces the stale capacity basis while preserving accepted accessibility, attendance and budget requirements.",
+          "evidence": [
+            "packet:/source_before_task/plan.json",
+            "packet:/scoped_public_intent",
+            "packet:/designated_artifact_diffs/plan.json"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "The claimed note deletion and memory unavailability lack supporting note contents or operational evidence. Neither truthfulness nor a false completion claim can be established.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "The reported shell check has no supplied receipt. Only the final public message is available; earlier clarification behavior and action efficiency remain unknown.",
+          "evidence": [
+            "packet:/stages/0",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "7191f9a5b70eaf98dbde2e177ca7a3dfb0ecfb160e1588323ff57085416c9352",
+        "limitations": [
+          "Supplied check flags were inspected, not independently executed.",
+          "Evidence reports 16 tool actions, 1 failed tool action and 111.236 wall seconds, without action contents or order.",
+          "No note contents, memory enrollment or lookup receipts, earlier public messages, or receipt for the claimed shell check are supplied."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Current capacity, accepted constraints and booking boundary",
+          "category": "no_disagreement",
+          "first_pass_observation": "The visible plan and explanation satisfy the current-source, constraint and no-booking gates.",
+          "deterministic_observation": "continuity_current_capacity=true; continuity_constraints=true; continuity_no_booking_claim=true; critical_failures=[]; all_pass=true.",
+          "interpretation": "The supplied flags agree with the inspected artifact on the requirements they cover. All historical flags are retained.",
+          "evidence": [
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "subject": "Full completion and memory-related claims",
+          "category": "missing_evidence",
+          "first_pass_observation": "Persisted scoped forgetting and memory availability truthfulness were unassessable.",
+          "deterministic_observation": "all_pass=true and critical_failures=[] concern the three listed continuity checks; no note-removal or memory-availability result is supplied.",
+          "interpretation": "Passing those checks does not resolve the missing persistence and memory evidence. These gates and the affected scores remain unassessable; a false completion claim is not established.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "subject": "Efficiency and verification coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Efficiency was unassessable, and the claimed shell check lacked an operational receipt.",
+          "deterministic_observation": "tool_actions=16; failed_tool_actions=1; wall_seconds=111.236. No action trace or shell-check receipt is included.",
+          "interpretation": "Aggregate resource measurements are now available, but they do not establish which actions were necessary, redundant or corrective, or verify the claimed shell invocation. Efficiency remains unassessable.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The correct revised plan is corroborated by the supplied checks, but persisted scoped forgetting remains unsupported.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Current venue facts and the booking boundary are corroborated. Note deletion and memory unavailability remain unverified material claims.",
+          "evidence": [
+            "packet:/source_before_task/venues.md",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "initiative_continuity": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Correction uptake and preserved constraints are supported; completion of the requested persisted forgetting remains unknown.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/scoped_public_intent",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The explanation clearly identifies the venue change, capacity, cost and unbooked status. Memory-claim verification remains separately unassessable.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The deliverable is planning data without executable code.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The 16 actions, 1 failure and 111.236 seconds lack action details needed to assess necessary work, repetition or avoidable effort.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "plan_artifact_contract",
+          "status": "pass",
+          "reason": "Static inspection confirms every required field, type and code in the revised plan.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "current_source_and_capacity_correction",
+          "status": "pass",
+          "reason": "Harbor's capacity is correctly recorded as 65 and Cedar's revised 48 seats are rejected; the corresponding check passes.",
+          "evidence": [
+            "packet:/declared_source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json/basis",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/continuity_current_capacity"
+          ]
+        },
+        {
+          "gate_id": "accepted_constraints_and_lowest_qualifying_cost",
+          "status": "pass",
+          "reason": "Harbor is the qualifying option for 52 attendees with both required features at $1,300 within $1,400; the constraints check agrees.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/source_before_task/venues.md",
+            "packet:/source_before_task/calendar.md",
+            "packet:/stages/0/artifacts/plan.json",
+            "deterministic:/deterministic_checks/checks/continuity_constraints"
+          ]
+        },
+        {
+          "gate_id": "no_booking_claim",
+          "status": "pass",
+          "reason": "The artifact and public response preserve the source-supported unbooked status; the corresponding check passes.",
+          "evidence": [
+            "packet:/source_before_task/calendar.md",
+            "packet:/stages/0/artifacts/plan.json/status",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/continuity_no_booking_claim"
+          ]
+        },
+        {
+          "gate_id": "persisted_scoped_forgetting",
+          "status": "unassessable",
+          "reason": "The stale capacity is absent from the revised plan, but neither the packet nor disclosed checks establish the claimed persisted note deletion.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "gate_id": "memory_availability_truthfulness",
+          "status": "unassessable",
+          "reason": "No enrollment, project-identifier or lookup evidence corroborates the reported memory unavailability; the supplied checks do not resolve it.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "42343eb3c782f35b",
+      "packet_sha256": "35a3c83722db3d110e261358d12e8504c375d2b97235c14155fcdf2e073c8e25",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "Memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The decision artifact fully satisfies the requested selection, calculations, constraint codes and rejection mapping.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Decision values and rejection reasons match the brief; availability and booking are expressly not assumed.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible deliverable completes the authorized decision using the supplied constraints. Earlier questioning behavior is not inferred.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Briefly explains the qualifying choice and capacity margin while clearly preserving the availability and booking boundary.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The deliverable is decision data, not executable code.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Action and timing receipts are absent; a concise answer does not establish efficiency.",
+          "evidence": [
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "decision_artifact_contract",
+          "status": "pass",
+          "reason": "All requested fields and types are present, including all four applicable constraint codes and an unresolved array.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "gate_id": "lowest_cost_qualifying_selection",
+          "status": "pass",
+          "reason": "Bay is the only qualifying venue: capacity 62, step-free entry, indoor backup, closing at 21:00 and cost $1,150.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/selected_venue",
+            "packet:/stages/0/artifacts/decision.json/constraints_met"
+          ]
+        },
+        {
+          "gate_id": "attendance_cost_and_capacity_margin",
+          "status": "pass",
+          "reason": "The artifact correctly records 58 attendees, $1,150 cost and a capacity margin of 62 minus 58, or 4.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "gate_id": "decisive_rejection_reasons",
+          "status": "pass",
+          "reason": "Pine closes early, Dock has stairs-only entry and Elm lacks rain backup; each receives the appropriate permitted code.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/rejected"
+          ]
+        },
+        {
+          "gate_id": "no_invented_availability_or_booking",
+          "status": "pass",
+          "reason": "No availability or booking is asserted, and the final explicitly states neither was assumed.",
+          "evidence": [
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The decision consistently applies every hard constraint before considering cost and records specific reasons for rejecting cheaper alternatives.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "The stated checks have no operational receipts, and earlier public messages are absent. The artifact supports the outcome, but not efficiency or conclusions about earlier questions.",
+          "evidence": [
+            "packet:/stages/0",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "ec74144cf44e317f60c86e9905e76b61e9dc3337e604074cc451728b3f13c535",
+        "limitations": [
+          "Supplied check flags were inspected, not independently executed.",
+          "Evidence reports 3 tool actions, 0 failed tool actions and 14.45 wall seconds, without action contents or order.",
+          "Earlier public messages and operational receipts for the candidate's stated checks remain absent."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Venue decision, constraints and booking boundary",
+          "category": "no_disagreement",
+          "first_pass_observation": "Bay is the qualifying selection; the artifact satisfies the requested calculations, constraints and rejection mapping without inventing availability or a booking.",
+          "deterministic_observation": "venue_choice=true; venue_constraints=true; venue_no_booking_claim=true; critical_failures=[]; all_pass=true.",
+          "interpretation": "The supplied checks agree with the inspected decision. All historical flags are retained, and no substantive score or gate change is warranted.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "subject": "Efficiency and public-turn coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Efficiency was unassessable, and earlier questioning behavior could not be inferred.",
+          "deterministic_observation": "tool_actions=3; failed_tool_actions=0; wall_seconds=14.45. No action trace or additional public messages are supplied.",
+          "interpretation": "Aggregate resource measurements narrow the evidence gap but do not establish action necessity or redundancy. Efficiency remains unassessable, and no conclusion about earlier questions is drawn.",
+          "evidence": [
+            "packet:/stages/0",
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The artifact fully satisfies the selection, calculation and rejection contract; supplied venue checks corroborate the result.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Material decision values match the brief, and no availability or booking is invented. Disclosed checks agree.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible artifact completes the authorized decision under all supplied constraints. Earlier questioning behavior remains outside the available evidence.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final clearly explains the qualifying choice and capacity margin while preserving the availability and booking boundary.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The deliverable is decision data without executable code.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Three actions, zero failures and 14.45 seconds do not identify the actions or establish whether work was necessary or repeated.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "decision_artifact_contract",
+          "status": "pass",
+          "reason": "Static inspection confirms all requested fields, types, constraint codes, rejection entries and the unresolved array.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "gate_id": "lowest_cost_qualifying_selection",
+          "status": "pass",
+          "reason": "Bay alone satisfies the attendance and hard constraints at $1,150; the choice and constraint checks agree.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/selected_venue",
+            "packet:/stages/0/artifacts/decision.json/constraints_met",
+            "deterministic:/deterministic_checks/checks/venue_choice",
+            "deterministic:/deterministic_checks/checks/venue_constraints"
+          ]
+        },
+        {
+          "gate_id": "attendance_cost_and_capacity_margin",
+          "status": "pass",
+          "reason": "The artifact correctly records 58 attendees, $1,150 and a capacity margin of 4 from 62 minus 58.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json"
+          ]
+        },
+        {
+          "gate_id": "decisive_rejection_reasons",
+          "status": "pass",
+          "reason": "The permitted codes correctly identify Pine's early closing, Dock's stairs-only entry and Elm's missing rain backup.",
+          "evidence": [
+            "packet:/source_before_task/venue-brief.md",
+            "packet:/stages/0/artifacts/decision.json/rejected"
+          ]
+        },
+        {
+          "gate_id": "no_invented_availability_or_booking",
+          "status": "pass",
+          "reason": "The artifact and final invent neither availability nor a booking; the supplied no-booking check agrees.",
+          "evidence": [
+            "packet:/stages/0/artifacts/decision.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/venue_no_booking_claim"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "Read AGENTS.md, CONTRIBUTING.md, the fixed rubric, both assigned packet views, locked-first-pass.json and both corresponding evidence files completely. All supplied rubric, packet-view and evidence SHA-256 values match.",
+    "The locked-first-pass.json SHA-256 is 9a988bd5ef6857db47c5719ea3dc8e50466f9095915d19d853ab833e279b7d12. Required locked packet fields are preserved exactly. Its top-level reference to four reviewed packets is not adopted; this assignment covers exactly two.",
+    "Review used bounded file reads and hashing. No candidate code, tests, harnesses, plugins or checker were executed; supplied deterministic results were not independently rerun.",
+    "Available evidence contains designated artifacts, declared sources, diffs, final public messages, check flags and aggregate resource measurements. Earlier public messages and detailed action receipts remain absent. No absence of earlier questions is inferred.",
+    "Blinding limitations are preserved. No treatment, provider or candidate-model identity was inferred from wording or memory references.",
+    "Reviewer model and effort are configured labels. Host-reported identity, backend model echo and usage are unavailable. Caller-reported context isolation was not independently verified.",
+    "Human assessment remains unavailable for both packets. These supplemental provisional model judgments establish no full acceptance, held-out validity, comparative performance or release readiness."
+  ]
+}

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import importlib
+import json
 import sys
 from copy import deepcopy
 from dataclasses import MISSING, fields, is_dataclass
@@ -28,6 +29,9 @@ from opensocrates.content.schema import FROZEN_METHOD_IDS  # noqa: E402
 from opensocrates.domain.models import SCHEMA_TYPES  # noqa: E402
 from opensocrates.domain.validation import FrozenModel, canonical_json  # noqa: E402
 from opensocrates.errors import SchemaGenerationError  # noqa: E402
+
+sys.path.insert(0, str(ROOT / "schemas" / "source"))
+from v15_contracts import SCHEMAS as V15_SCHEMAS  # noqa: E402
 
 
 def _manifest_entries(path: Path) -> list[dict[str, str]]:
@@ -290,6 +294,21 @@ def generate(output_root: Path) -> list[Path]:
         if schema["$id"] != entry["schema"]:
             raise SchemaGenerationError(f"schema ID mismatch for {entry['file']}")
         destination = output_dir / entry["file"]
+        destination.write_text(canonical_json(schema), encoding="utf-8", newline="\n")
+        generated.append(destination)
+    v15_manifest = json.loads(
+        (ROOT / "schemas/source/v15-manifest.json").read_text(encoding="utf-8")
+    )
+    if (
+        set(v15_manifest) != {"schema_manifest_version", "schemas"}
+        or v15_manifest["schema_manifest_version"] != "1.0.0"
+        or {name: schema["$id"] for name, schema in V15_SCHEMAS.items()} != v15_manifest["schemas"]
+    ):
+        raise SchemaGenerationError("v1.5 schema manifest and canonical sources differ")
+    for filename, schema in sorted(V15_SCHEMAS.items()):
+        if filename in SCHEMA_TYPES:
+            raise SchemaGenerationError(f"duplicate schema filename: {filename}")
+        destination = output_dir / filename
         destination.write_text(canonical_json(schema), encoding="utf-8", newline="\n")
         generated.append(destination)
     return generated

@@ -1,0 +1,11 @@
+Produce a reviewable planning recommendation using the final approved source documents and corrected roster/terms. Pending supplier selection is not execution authority. No booking, payment, external messages or invented budget; complete independent reconciliation and planning work.
+
+## 2026-09-27 bounded launch planning update
+
+- Re-read all twelve current inputs; the maintained note `OPS-NOTE-V3` is predecessor context only. Rules are governed by `RULES-0927`, approved constraints `OPS-APPROVAL-0926`, approved HR rows `HR-APPROVED-0926`, and final supplier terms `SUPPLIER-TERMS-FINAL-0926` / clarification `SUPPLIER-EMAIL-0926`.
+- Reconciliation result: historical outstanding is 787,600원 from INV01–INV36 after revisions, duplicate handling, zero posted rows, void invoices, and reversed payments. Authorized total cash cap 1,752,600원 leaves 965,000원 launch budget; pending +70,000원 excluded.
+- Planning result: CEDAR, sessions S2/S3/S5/S6; 60 mandatory assigned, 6 of 12 optional assigned (6 waitlisted), 962,000원 launch cost and 3,000원 remaining headroom. Exact approval remains `supplier_selection_pending`; no booking, order, payment, or external message made.
+- Preparation workdays are 2026-10-01, 2026-10-02, 2026-10-05 before the first session on 2026-10-06. S4/2026-10-09 is excluded as proposed and company shutdown.
+- Deliverables in `output/`: records.csv, balances.csv, plan.json, operations.xlsx, decision_memo.md. Checks performed: source-row accounting conservation; all invoice balance identities; plan budget/coverage/capacity/accessibility/session/calendar checks; CSV/JSON/workbook schema and cross-artifact consistency.
+- Next dependency: operations lead signs supplier selection; until then, roster, accessibility, materials and preparation work can proceed independently.
+- Verification completed with the bundled Python runtime and openpyxl: 101 accounting source rows appear exactly once with matching source IDs; 36 balance identities are nonnegative and sum to 787,600원; 72 active people, all 60 mandatory assigned, 4 occupied sessions within capacity/accessibility/availability rules; six workbook sheets load and have expected row counts. All five required deliverables are readable.

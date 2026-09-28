@@ -1,0 +1,53 @@
+{
+  "scenario": "continuity",
+  "locale": "en",
+  "arm": "v1.5.0-source-candidate",
+  "package_version": "1.4.0",
+  "package_sha256": "57bae131444b0d7c0048ce2369c9fc232994812c758d617fbc7197763a0f5bd2",
+  "calls": [
+    "call-1.json",
+    "call-2.json"
+  ],
+  "stages": [
+    "stage-1.json",
+    "stage-2.json"
+  ],
+  "checks": [
+    {
+      "current_source_choice": true,
+      "current_source_cost": true,
+      "current_capacity": true,
+      "accepted_constraints": true,
+      "no_booking": true,
+      "audit_adapter_unchanged": true,
+      "native_operation_ids_correlate": true
+    },
+    {
+      "current_source_choice": true,
+      "current_source_cost": true,
+      "current_capacity": true,
+      "accepted_constraints": true,
+      "no_booking": true,
+      "audit_adapter_unchanged": true,
+      "native_operation_ids_correlate": true,
+      "complete_export": true,
+      "retained_intent_accepted": true,
+      "exact_withdrawn_record_absent": true,
+      "withdrawn_fact_absent": true,
+      "unrelated_record_preserved": true,
+      "proposal_not_promoted": true,
+      "observed_exact_delete": true,
+      "observed_acceptance": true
+    }
+  ],
+  "setup_only": false,
+  "all_calls_complete": true,
+  "artifact_and_state_checks_pass": true,
+  "dialogue_review": "pending integrator review of all retained public messages; no independent human score",
+  "native_memory_tables": {
+    "database_present": true,
+    "stage1_outputs": 0,
+    "jobs": 0
+  },
+  "auth_copies_removed": true
+}

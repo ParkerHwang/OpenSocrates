@@ -1,0 +1,31 @@
+{
+  "utc": "2026-09-27T07:01:58.296725+00:00",
+  "model_calls": 0,
+  "arms": [
+    {
+      "arm": "vanilla",
+      "passed": true,
+      "model_calls": 0
+    },
+    {
+      "arm": "v14",
+      "passed": true,
+      "model_calls": 0
+    },
+    {
+      "arm": "v15",
+      "passed": true,
+      "model_calls": 0
+    }
+  ],
+  "observer_selftest": true,
+  "reference_checks": true,
+  "pre_freeze_repairs": [
+    "First matrix batch failed all 36 pre-call isolation checks because /private/tmp is readable under the minimal shell profile. Zero model calls. v2 explicitly denies /tmp and uses the verified per-user temp layout; pending calls stop after a common setup error.",
+    "Native decision catalog envelope and alphanumeric decision ID corrected; no model calls.",
+    "codex --strict-config is unsupported on sandbox/debug; removed from those non-model inspection commands.",
+    "Preparation Python urllib certificate-chain failure; fetched sources using system curl with normal certificate verification.",
+    "Bundled Playwright default headless-shell 1234 was not installed; pin the existing Chromium 1223 executable equally for all arms and verify it before any call. Original failure retained under attempt-01; subsequent direct Chromium startup failures retained under attempts 02/03. A dedicated per-cell browser tool preserves filesystem isolation while permitting browser IPC."
+  ],
+  "no_model_calls_before_freeze": true
+}

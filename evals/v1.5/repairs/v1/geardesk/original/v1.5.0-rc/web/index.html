@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GearDesk · 개발자 데모</title><link rel="stylesheet" href="style.css"><script type="module" src="console.mjs"></script></head>
+<body><main><header><h1>GearDesk</h1><p>장비 대여 운영 · 로컬 개발자 콘솔</p><p>견적과 재고를 확인하고, API 명령으로 예약·출고·반납 흐름을 살펴보세요. 모든 데이터는 가상 예시입니다.</p></header>
+<nav aria-label="조회"><button data-read="catalog">장비·회원</button><button data-read="reservations">예약 목록</button><button data-read="maintenance">정비 목록</button><button data-read="report">운영 집계</button><button id="refresh">새로고침</button></nav>
+<p id="status" role="status" aria-live="polite"></p>
+<div class="columns"><section><h2>요청 보내기</h2><form id="request-form"><label for="operation">작업</label><select id="operation"><option value="quote">견적 조회</option><option value="availability">기간별 재고</option><option value="command">예약·정비·상태 변경 명령</option></select><label for="request">요청 JSON</label><textarea id="request" rows="17" spellcheck="false"></textarea><div class="buttons"><button type="button" id="quote-example">견적 예시</button><button type="button" id="reserve-example">예약 예시</button><button type="button" id="maintenance-example">정비 추가 예시</button><button type="submit">실행</button></div><p class="hint">변경 명령은 화면이 확인한 revision으로 전송합니다. 충돌하면 현재 상태를 확인한 뒤 다시 시도하세요. request ID는 예시를 생성할 때 새로 만듭니다.</p></form></section>
+<section><h2>응답</h2><pre id="response" aria-live="polite">조회할 내용을 선택하세요.</pre></section></div>
+<section><h2>현재 예약</h2><div id="bookings"></div></section><footer>HTTP·CLI 공통 도메인 로직을 확인하기 위한 개발자 도구입니다. 실제 결제·외부 서비스는 사용하지 않습니다.</footer></main></body></html>

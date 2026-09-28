@@ -1,0 +1,183 @@
+[
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "924e797a8f844aca9f399116951a833f"
+    },
+    "request": "{\"name\": \"a\", \"opening\": 100}",
+    "status": 201,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 100,
+        "reserved": 0,
+        "available": 100,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.00064429099438712
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "9a5703a24dd04411a1c601ccb61223de"
+    },
+    "request": "{\"name\": \"b\", \"opening\": 40}",
+    "status": 201,
+    "response": {
+      "account": {
+        "name": "b",
+        "balance": 40,
+        "reserved": 0,
+        "available": 40,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.00047737499698996544
+  },
+  {
+    "method": "POST",
+    "path": "/batches",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "529e71b10fcc4e7db7a162127af47a48"
+    },
+    "request": "{}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.0002667910302989185
+  },
+  {
+    "method": "POST",
+    "path": "/batches",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "5f2a4ebad54e445088a87a3600910be3"
+    },
+    "request": "{\"transfers\": []}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.00026104197604581714
+  },
+  {
+    "method": "POST",
+    "path": "/batches",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "7c6b5f773e214177b11abdf683a119d6"
+    },
+    "request": "{\"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1}]}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.00029612501384690404
+  },
+  {
+    "method": "POST",
+    "path": "/batches",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "20a069f26fb34d558f1ef4575f56edf0"
+    },
+    "request": "{\"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}, {}]}",
+    "status": 400,
+    "response": {
+      "error": {
+        "code": "invalid"
+      }
+    },
+    "elapsed_s": 0.0002517920220270753
+  },
+  {
+    "method": "POST",
+    "path": "/batches",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "b2f4de72ba8a48548fd1b2f92793f5b5"
+    },
+    "request": "{\"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 1, \"from_version\": 1}, {\"from\": \"a\", \"to\": \"b\", \"amount\": 1, \"from_version\": 1}]}",
+    "status": 409,
+    "response": {
+      "error": {
+        "code": "version_conflict"
+      }
+    },
+    "elapsed_s": 0.00025408301735296845
+  },
+  {
+    "method": "GET",
+    "path": "/summary",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 100,
+          "reserved": 0,
+          "available": 100
+        },
+        {
+          "name": "b",
+          "balance": 40,
+          "reserved": 0,
+          "available": 40
+        }
+      ],
+      "entry_count": 2,
+      "snapshot": 2,
+      "totals": {
+        "available": 140,
+        "balance": 140,
+        "reserved": 0
+      }
+    },
+    "elapsed_s": 0.0002452500048093498
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/a",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 100,
+        "reserved": 0,
+        "available": 100,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.00019862496992573142
+  }
+]

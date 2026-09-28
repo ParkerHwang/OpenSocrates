@@ -1,0 +1,52 @@
+{
+  "cell": "fullstack-gpt-6-luna-high-v14",
+  "exit_code": 0,
+  "stderr": "",
+  "scope": "Auto-wait for asynchronous controls and client reference only; same flow and assertions; original score unchanged",
+  "passed": 7,
+  "total": 7,
+  "groups": [
+    {
+      "name": "page_identity_and_login",
+      "pass": true,
+      "details": {
+        "url": "http://127.0.0.1:57629/",
+        "title": "DepotFlow"
+      }
+    },
+    {
+      "name": "inventory_rendered",
+      "pass": true,
+      "details": "SKU\tItem\tOn hand\tReserved\tAvailable\tPrice\tVersion\nBOLT\tSteel bolt kit\t100\t0\t100\t$12.50\t1\nCABLE\tCable assembly\t60\t0\t60\t$24.99\t1\nSAMPLE\tSample pack\t20\t0\t20\t$0.00\t1"
+    },
+    {
+      "name": "create_reserve_ship_return_flow",
+      "pass": true,
+      "details": "Order details\nBROWSER-CHECK\n\nStatus: shipped \u00b7 Version 3 \u00b7 Total $49.99\n\nSKU\tQuantity\tUnit price\tReturned\nBOLT\t2\t$12.50\t0\nCABLE\t1\t$24.99\t0\nRecord return\nBOLT (remaining 2)\nCABLE (remaining 1)\nWorking\u2026"
+    },
+    {
+      "name": "audit_rendered",
+      "pass": true,
+      "details": "Event\tEntity\tActor\tTime (UTC)"
+    },
+    {
+      "name": "mobile_layout",
+      "pass": true,
+      "details": {
+        "viewport": 390,
+        "document": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "viewer_workflow_read_only",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "no_uncaught_client_error",
+      "pass": true,
+      "details": null
+    }
+  ]
+}

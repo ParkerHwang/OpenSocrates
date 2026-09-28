@@ -1,0 +1,107 @@
+{
+  "date": "2026-09-27T08:26:35.063005+00:00",
+  "environment": {
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "architecture": "arm64",
+    "logical_cpus": 10,
+    "python": "3.12.14",
+    "sqlite": "3.53.1",
+    "cpu_model": "Not exposed by the sandbox",
+    "memory": "Not exposed by the sandbox"
+  },
+  "methodology": {
+    "transport": "HTTP/1.1 loopback, one persistent connection per worker, closed-loop concurrency",
+    "concurrency": 1,
+    "tenants": 2,
+    "prefill_orders": 200,
+    "read_mix": "Equal inventory/dashboard/orders(first 20)/audit(first 20)",
+    "write_workflow": "BOLT quantity 2: create/reserve/ship/return 1/return 1; five HTTP mutations",
+    "latency": "Per request send through complete response body, milliseconds; linear-interpolated percentiles",
+    "excluded": "Startup, login, prefill, and warmup; client and server share hardware; no think time",
+    "durability": "SQLite WAL, synchronous FULL; fresh store per run"
+  },
+  "warmup": {
+    "reads": {
+      "requests": 100,
+      "elapsed_seconds": 0.0509,
+      "throughput_rps": 1964.44,
+      "status_counts": {
+        "200": 100
+      },
+      "errors": 0,
+      "error_examples": [],
+      "latency_ms": {
+        "mean": 0.501,
+        "p50": 0.489,
+        "p95": 0.603,
+        "p99": 0.656,
+        "max": 0.676
+      }
+    },
+    "writes": {
+      "requests": 100,
+      "elapsed_seconds": 0.1134,
+      "throughput_rps": 881.81,
+      "status_counts": {
+        "201": 20,
+        "200": 80
+      },
+      "errors": 0,
+      "error_examples": [],
+      "latency_ms": {
+        "mean": 1.127,
+        "p50": 1.12,
+        "p95": 1.231,
+        "p99": 1.33,
+        "max": 1.407
+      }
+    }
+  },
+  "reads": {
+    "requests": 30000,
+    "elapsed_seconds": 14.6746,
+    "throughput_rps": 2044.35,
+    "status_counts": {
+      "200": 30000
+    },
+    "errors": 0,
+    "error_examples": [],
+    "latency_ms": {
+      "mean": 0.488,
+      "p50": 0.476,
+      "p95": 0.589,
+      "p99": 0.644,
+      "max": 1.495
+    }
+  },
+  "writes": {
+    "requests": 30000,
+    "elapsed_seconds": 38.2949,
+    "throughput_rps": 783.39,
+    "status_counts": {
+      "201": 6000,
+      "200": 24000
+    },
+    "errors": 0,
+    "error_examples": [],
+    "latency_ms": {
+      "mean": 1.27,
+      "p50": 1.25,
+      "p95": 1.468,
+      "p99": 1.587,
+      "max": 33.653
+    }
+  },
+  "persisted_state_checks": {
+    "integrity_check": "ok",
+    "foreign_key_violations": [],
+    "audit_events": 30300,
+    "expected_audit_events": 30300,
+    "stock_restored": true,
+    "orders_by_status": {
+      "draft": 200,
+      "returned": 6020
+    },
+    "passed": true
+  }
+}

@@ -1,0 +1,213 @@
+{
+  "groups": [
+    {
+      "name": "health",
+      "pass": true,
+      "critical": false,
+      "details": true
+    },
+    {
+      "name": "login_and_identity",
+      "pass": true,
+      "critical": true,
+      "details": null
+    },
+    {
+      "name": "authentication_and_role",
+      "pass": true,
+      "critical": true,
+      "details": null
+    },
+    {
+      "name": "seed_stock",
+      "pass": true,
+      "critical": false,
+      "details": null
+    },
+    {
+      "name": "input_validation",
+      "pass": true,
+      "critical": true,
+      "details": null
+    },
+    {
+      "name": "nonempty_zero_price_order",
+      "pass": true,
+      "critical": false,
+      "details": null
+    },
+    {
+      "name": "server_price_authority",
+      "pass": true,
+      "critical": false,
+      "details": null
+    },
+    {
+      "name": "tenant_isolation",
+      "pass": true,
+      "critical": true,
+      "details": null
+    },
+    {
+      "name": "operator_permissions",
+      "pass": true,
+      "critical": false,
+      "details": null
+    },
+    {
+      "name": "idempotency_replay_and_conflict",
+      "pass": true,
+      "critical": true,
+      "details": null
+    },
+    {
+      "name": "failed_request_does_not_consume_key",
+      "pass": true,
+      "critical": false,
+      "details": null
+    },
+    {
+      "name": "idempotency_key_required",
+      "pass": true,
+      "critical": false,
+      "details": null
+    },
+    {
+      "name": "client_reference_unique",
+      "pass": true,
+      "critical": false,
+      "details": null
+    },
+    {
+      "name": "reserve_cancel_stock",
+      "pass": true,
+      "critical": true,
+      "details": null
+    },
+    {
+      "name": "multiline_atomic_failure",
+      "pass": true,
+      "critical": true,
+      "details": null
+    },
+    {
+      "name": "stale_version_no_effect",
+      "pass": true,
+      "critical": true,
+      "details": null
+    },
+    {
+      "name": "ship_partial_full_return",
+      "pass": true,
+      "critical": true,
+      "details": null
+    },
+    {
+      "name": "return_quantity_validation",
+      "pass": true,
+      "critical": false,
+      "details": null
+    },
+    {
+      "name": "stock_adjustment_respects_reservations",
+      "pass": true,
+      "critical": true,
+      "details": null
+    },
+    {
+      "name": "concurrent_reservations_no_oversell",
+      "pass": false,
+      "critical": true,
+      "details": "URLError(OSError(22, 'Invalid argument'))"
+    },
+    {
+      "name": "concurrent_idempotent_create",
+      "pass": true,
+      "critical": true,
+      "details": null
+    },
+    {
+      "name": "filter_and_cursor_pagination",
+      "pass": true,
+      "critical": false,
+      "details": null
+    },
+    {
+      "name": "audit_single_effect",
+      "pass": true,
+      "critical": true,
+      "details": null
+    },
+    {
+      "name": "dashboard_consistency",
+      "pass": true,
+      "critical": false,
+      "details": null
+    }
+  ],
+  "passed": 23,
+  "total": 24,
+  "critical_pass": false,
+  "persistence_expectation": {
+    "replay": {
+      "body": {
+        "client_ref": "REPLAY",
+        "lines": [
+          {
+            "sku": "BOLT",
+            "quantity": 1
+          }
+        ]
+      },
+      "response": [
+        201,
+        {
+          "id": 5,
+          "client_ref": "REPLAY",
+          "status": "draft",
+          "version": 1,
+          "total_cents": 1250,
+          "lines": [
+            {
+              "sku": "BOLT",
+              "quantity": 1,
+              "unit_price_cents": 1250,
+              "returned_quantity": 0
+            }
+          ]
+        }
+      ]
+    },
+    "audit": 32,
+    "stock": {
+      "BOLT": {
+        "sku": "BOLT",
+        "name": "Steel bolt kit",
+        "on_hand": 98,
+        "reserved": 0,
+        "available": 98,
+        "price_cents": 1250,
+        "version": 13
+      },
+      "CABLE": {
+        "sku": "CABLE",
+        "name": "Cable assembly",
+        "on_hand": 60,
+        "reserved": 0,
+        "available": 60,
+        "price_cents": 2499,
+        "version": 4
+      },
+      "SAMPLE": {
+        "sku": "SAMPLE",
+        "name": "Sample pack",
+        "on_hand": 20,
+        "reserved": 0,
+        "available": 20,
+        "price_cents": 0,
+        "version": 1
+      }
+    },
+    "order_count": 20
+  }
+}

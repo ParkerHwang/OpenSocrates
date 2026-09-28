@@ -1,0 +1,319 @@
+{
+  "inspect": {
+    "receipt": {
+      "exit_code": 0,
+      "wall_seconds": 0.135,
+      "stdout_sha256": "977fc049a48666648b5ba5ec7a7cf2fc0a685a29fbe9948348aecde6824655fe",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "response": {
+      "limitations": [],
+      "request_id": "77b3cbab-be5d-4dc3-ad10-0069e4fbe9f7",
+      "result": [
+        {
+          "conflict_ids": [],
+          "created_at": "2026-09-26T13:58:08Z",
+          "freshness": "unknown",
+          "kind": "decision",
+          "lifecycle": "accepted",
+          "origin": {
+            "attestation": "operator_declared",
+            "producer_kind": "agent",
+            "source_reference": "fixture:practical-user-intent"
+          },
+          "payload": null,
+          "project_id": "e0c2cccb-0b17-4c4b-bbb1-2ebd7f98416d",
+          "rationale": null,
+          "record_id": "4d57e1d7-9b64-4a6e-9676-60cacc11cd54",
+          "revalidation": {
+            "dependency_paths": [],
+            "negative_claim": false,
+            "on_change": "not_applicable"
+          },
+          "schema": "opensocrates.project-memory.record/1.0.0",
+          "scope": {
+            "level": "project"
+          },
+          "snapshot_id": null,
+          "source_refs": [],
+          "summary": "Current source and task contracts govern facts; bounded continuity summaries do not grant authority.",
+          "supersedes": null,
+          "support": "agent_reported",
+          "updated_at": "2026-09-26T13:58:08Z",
+          "version": 2
+        },
+        {
+          "conflict_ids": [],
+          "created_at": "2026-09-26T13:58:07Z",
+          "freshness": "unknown",
+          "kind": "decision",
+          "lifecycle": "accepted",
+          "origin": {
+            "attestation": "operator_declared",
+            "producer_kind": "agent",
+            "source_reference": "fixture:practical-user-intent"
+          },
+          "payload": null,
+          "project_id": "e0c2cccb-0b17-4c4b-bbb1-2ebd7f98416d",
+          "rationale": null,
+          "record_id": "52dd40ff-76a9-4bd6-9a90-1673cb62a54b",
+          "revalidation": {
+            "dependency_paths": [],
+            "negative_claim": false,
+            "on_change": "not_applicable"
+          },
+          "schema": "opensocrates.project-memory.record/1.0.0",
+          "scope": {
+            "level": "project"
+          },
+          "snapshot_id": null,
+          "source_refs": [],
+          "summary": "Preserve acknowledged jobs and lease fencing across restarts.",
+          "supersedes": null,
+          "support": "agent_reported",
+          "updated_at": "2026-09-26T13:58:07Z",
+          "version": 2
+        },
+        {
+          "conflict_ids": [],
+          "created_at": "2026-09-26T14:09:59Z",
+          "freshness": "unknown",
+          "kind": "checkpoint",
+          "lifecycle": "proposed",
+          "origin": {
+            "attestation": "agent_reported",
+            "producer_kind": "agent",
+            "source_reference": null
+          },
+          "payload": {
+            "blockers": [],
+            "checkpoint_version": 6,
+            "completed_actions": [
+              {
+                "action": "Compared all resolved legacy idempotency command fields, including priority, schedule and retry base; preserved the legacy serialized zero retry value when replay uses the omitted-field default.",
+                "execution_state": "completed",
+                "source_refs": [],
+                "support": "agent_reported"
+              },
+              {
+                "action": "Added a regression check for identical replay and changed scheduling input; ran the focused migration/replay check and go test -race ./... successfully.",
+                "execution_state": "completed",
+                "source_refs": [],
+                "support": "agent_reported"
+              },
+              {
+                "action": "Built bin/queueforge with Go 1.26.3 and confirmed go.mod, go.sum and supplied platform helper files were unchanged.",
+                "execution_state": "completed",
+                "source_refs": [],
+                "support": "agent_reported"
+              }
+            ],
+            "completion_conditions": [
+              "Changed legacy command fields must conflict while unchanged legacy replay remains valid.",
+              "Relevant behavior and race checks run and remaining independent verification limits are stated."
+            ],
+            "conflict_ids": [],
+            "constraints": [
+              "Preserve every current API, tenancy, fencing, idempotency, quota, pagination, migration and durability requirement.",
+              "Keep SQLite WAL and synchronous=FULL; preserve go.mod and go.sum."
+            ],
+            "decision_refs": [],
+            "next_action": "Use the independent stage1 migration API scenario to confirm the repaired comparison against its historical command encoding.",
+            "objective": "Repair legacy idempotency replay comparison based on the supplied correctness feedback.",
+            "parent_checkpoint_id": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+            "pending_effects": [],
+            "remaining_actions": [
+              "The independent genuine stage1 migration API scenario was not rerun in this session."
+            ],
+            "snapshot_id": null,
+            "source_refs": []
+          },
+          "project_id": "e0c2cccb-0b17-4c4b-bbb1-2ebd7f98416d",
+          "rationale": null,
+          "record_id": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+          "revalidation": {
+            "dependency_paths": [],
+            "negative_claim": false,
+            "on_change": "refresh_or_mark_stale"
+          },
+          "schema": "opensocrates.project-memory.record/1.0.0",
+          "scope": {
+            "level": "task",
+            "task_id": "c4a7b000-0000-4000-8000-000000000003",
+            "workspace_id": "10b10385-d8ed-40be-94ab-0c4a59ace241"
+          },
+          "snapshot_id": null,
+          "source_refs": [],
+          "summary": "Repair legacy idempotency replay comparison based on the supplied correctness feedback.",
+          "supersedes": null,
+          "support": "agent_reported",
+          "updated_at": "2026-09-26T14:45:31Z",
+          "version": 6
+        },
+        {
+          "conflict_ids": [],
+          "created_at": "2026-09-26T13:58:08Z",
+          "freshness": "unknown",
+          "kind": "decision",
+          "lifecycle": "accepted",
+          "origin": {
+            "attestation": "operator_declared",
+            "producer_kind": "agent",
+            "source_reference": "fixture:practical-user-intent"
+          },
+          "payload": null,
+          "project_id": "e0c2cccb-0b17-4c4b-bbb1-2ebd7f98416d",
+          "rationale": null,
+          "record_id": "715cf24f-df40-4ab0-b56a-2874c3761b6b",
+          "revalidation": {
+            "dependency_paths": [],
+            "negative_claim": false,
+            "on_change": "not_applicable"
+          },
+          "schema": "opensocrates.project-memory.record/1.0.0",
+          "scope": {
+            "level": "project"
+          },
+          "snapshot_id": null,
+          "source_refs": [],
+          "summary": "SQLite WAL and synchronous=FULL remain required; do not trade durability for throughput.",
+          "supersedes": null,
+          "support": "agent_reported",
+          "updated_at": "2026-09-26T13:58:08Z",
+          "version": 2
+        },
+        {
+          "conflict_ids": [],
+          "created_at": "2026-09-26T13:58:07Z",
+          "freshness": "unknown",
+          "kind": "decision",
+          "lifecycle": "accepted",
+          "origin": {
+            "attestation": "operator_declared",
+            "producer_kind": "agent",
+            "source_reference": "fixture:practical-user-intent"
+          },
+          "payload": null,
+          "project_id": "e0c2cccb-0b17-4c4b-bbb1-2ebd7f98416d",
+          "rationale": null,
+          "record_id": "ea06015b-867f-4e73-bc07-59a070f25564",
+          "revalidation": {
+            "dependency_paths": [],
+            "negative_claim": false,
+            "on_change": "not_applicable"
+          },
+          "schema": "opensocrates.project-memory.record/1.0.0",
+          "scope": {
+            "level": "project"
+          },
+          "snapshot_id": null,
+          "source_refs": [],
+          "summary": "Keep tenant namespaces isolated; synthetic tenant headers are not production authentication.",
+          "supersedes": null,
+          "support": "agent_reported",
+          "updated_at": "2026-09-26T13:58:08Z",
+          "version": 2
+        }
+      ],
+      "retryable": false,
+      "schema": "opensocrates.project-memory.response/1.0.0",
+      "status": "ok"
+    }
+  },
+  "recall": {
+    "receipt": {
+      "exit_code": 0,
+      "wall_seconds": 0.246,
+      "stdout_sha256": "566bc3ad50ab58ae8d3e9a352696a03c4b60a0ad0b529e289a34dbb28478d307",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "response": {
+      "limitations": [],
+      "request_id": "94632234-1980-4699-848a-fd7ecd8cc06e",
+      "result": {
+        "application": "unverified",
+        "budget_bytes": 8192,
+        "capabilities": {
+          "python": "ast",
+          "text": "lexical"
+        },
+        "checked_snapshot": "df0dac42-a41b-4212-a4e7-6b5cd0baba25",
+        "checkpoint_reference": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+        "conflicts": [],
+        "constraints": [
+          {
+            "freshness": "not_applicable",
+            "record_id": "4d57e1d7-9b64-4a6e-9676-60cacc11cd54",
+            "text": "Current source and task contracts govern facts; bounded continuity summaries do not grant authority."
+          },
+          {
+            "freshness": "not_applicable",
+            "record_id": "52dd40ff-76a9-4bd6-9a90-1673cb62a54b",
+            "text": "Preserve acknowledged jobs and lease fencing across restarts."
+          },
+          {
+            "freshness": "not_applicable",
+            "record_id": "715cf24f-df40-4ab0-b56a-2874c3761b6b",
+            "text": "SQLite WAL and synchronous=FULL remain required; do not trade durability for throughput."
+          },
+          {
+            "freshness": "not_applicable",
+            "record_id": "ea06015b-867f-4e73-bc07-59a070f25564",
+            "text": "Keep tenant namespaces isolated; synthetic tenant headers are not production authentication."
+          },
+          {
+            "freshness": "unknown",
+            "record_id": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+            "text": "Preserve every current API, tenancy, fencing, idempotency, quota, pagination, migration and durability requirement."
+          },
+          {
+            "freshness": "unknown",
+            "record_id": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+            "text": "Keep SQLite WAL and synchronous=FULL; preserve go.mod and go.sum."
+          }
+        ],
+        "decisions": [
+          {
+            "freshness": "not_applicable",
+            "record_id": "4d57e1d7-9b64-4a6e-9676-60cacc11cd54",
+            "summary": "Current source and task contracts govern facts; bounded continuity summaries do not grant authority."
+          },
+          {
+            "freshness": "not_applicable",
+            "record_id": "52dd40ff-76a9-4bd6-9a90-1673cb62a54b",
+            "summary": "Preserve acknowledged jobs and lease fencing across restarts."
+          },
+          {
+            "freshness": "not_applicable",
+            "record_id": "715cf24f-df40-4ab0-b56a-2874c3761b6b",
+            "summary": "SQLite WAL and synchronous=FULL remain required; do not trade durability for throughput."
+          },
+          {
+            "freshness": "not_applicable",
+            "record_id": "ea06015b-867f-4e73-bc07-59a070f25564",
+            "summary": "Keep tenant namespaces isolated; synthetic tenant headers are not production authentication."
+          }
+        ],
+        "delivery": "emitted",
+        "excluded_scope": [],
+        "expansion_handle": null,
+        "pack_id": "2f06acfe-5c53-4156-b5f8-b50397a10fd3",
+        "project_id": "e0c2cccb-0b17-4c4b-bbb1-2ebd7f98416d",
+        "schema": "opensocrates.project-memory.context-pack/1.0.0",
+        "searched_scope": [],
+        "source_evidence": [],
+        "task_id": "c4a7b000-0000-4000-8000-000000000003",
+        "unknowns": [
+          "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db:unknown",
+          "checkpoint_source_state_requires_revalidation"
+        ],
+        "used_bytes": 2569,
+        "workspace_id": "10b10385-d8ed-40be-94ab-0c4a59ace241",
+        "workspace_kind": "git_worktree"
+      },
+      "retryable": false,
+      "schema": "opensocrates.project-memory.response/1.0.0",
+      "status": "ok"
+    }
+  }
+}

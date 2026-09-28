@@ -1,0 +1,66 @@
+{
+  "schema": "opensocrates.concurrency-amendment/1",
+  "frozen_at": "2026-09-27T10:10:37.236661+00:00",
+  "authorization": "User explicitly requested maximum simultaneous execution and removal of the three-worker bottleneck.",
+  "base_manifest_sha256": "36903adcbc0805ab1f6ee586fac222a1fe7add6d53c0fb2c26344dc24c47f2bf",
+  "base_runner_sha256": "bfcbf3670e2765723cccf5b3d7a26de6c6dff0af446e50a13a5e5a297764ccc6",
+  "planned_cells": [
+    "consulting-gpt-6-luna-high-v14",
+    "consulting-gpt-5.6-luna-max-v15",
+    "consulting-gpt-5.6-luna-high-vanilla",
+    "consulting-gpt-6-astra-xhigh-v14",
+    "fullstack-gpt-6-sol-high-v15",
+    "fullstack-gpt-6-luna-max-vanilla",
+    "fullstack-gpt-6-luna-high-v14",
+    "fullstack-gpt-5.6-luna-max-v15",
+    "fullstack-gpt-5.6-luna-high-vanilla",
+    "fullstack-gpt-6-astra-xhigh-v14",
+    "consulting-gpt-6-sol-high-vanilla",
+    "consulting-gpt-6-luna-max-v14",
+    "consulting-gpt-6-luna-high-v15",
+    "consulting-gpt-5.6-luna-max-vanilla",
+    "consulting-gpt-5.6-luna-high-v14",
+    "consulting-gpt-6-astra-xhigh-v15"
+  ],
+  "already_active_cells": [
+    "fullstack-gpt-6-astra-xhigh-vanilla",
+    "consulting-gpt-6-sol-high-v15",
+    "consulting-gpt-6-luna-max-vanilla"
+  ],
+  "new_executor_workers": 16,
+  "maximum_expected_total_subjects": 19,
+  "host_observation": {
+    "memory_bytes": 34359738368,
+    "cores": 10,
+    "processor": "Apple M5",
+    "memory_pressure_available_percent": 59,
+    "swap_used_bytes": 0
+  },
+  "subject_budgets": {
+    "wall_clock_seconds": null,
+    "tokens": null,
+    "tool_calls": null,
+    "output_length": null,
+    "internal_retries": null
+  },
+  "usage_fields": [
+    "input_tokens",
+    "cached_input_tokens",
+    "cache_write_input_tokens",
+    "output_tokens",
+    "reasoning_output_tokens"
+  ],
+  "treatment_changes": "scheduling only; all task/source/model/effort/client/package/prompt/profile/permission bytes unchanged",
+  "timing_limitations": "Higher concurrency can affect already-running and new subjects. Preserve this timestamp; do not pool elapsed/self-load metrics as unchanged conditions. Independent performance checks remain serial.",
+  "validation": {
+    "observer_regressions_passed": 18,
+    "atomic_rename_existing_directory_tests": "pass",
+    "model_calls_for_validation": 0
+  },
+  "frozen_files": {
+    "README.md": "9424517eb7ced79319f67bb8df1afd7df20e9f848fcc8a9d73c4e58b94cc7023",
+    "dispatch.py": "541399ed59cc681f7a9db51055a82f7edc442b5cac7780a03ea5b06d4c9d4fa6",
+    "runner.diff": "453cabe3c87b43e3778955b405ef2d1474736223d67f3f6f006cc0ed85efff11",
+    "runner.py": "dca6e67e1b6a370d71c939190980592bb283aa301fc6d816004999151531af9c"
+  }
+}

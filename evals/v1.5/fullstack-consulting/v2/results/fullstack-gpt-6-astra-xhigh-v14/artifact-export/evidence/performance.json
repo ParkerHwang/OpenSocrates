@@ -1,0 +1,217 @@
+{
+  "recorded_at": "2026-09-27T11:06:52.407299+00:00",
+  "hardware": {
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "architecture": "arm64",
+    "logical_cpus": 10,
+    "python": "3.12.14",
+    "sqlite": "3.53.1",
+    "cpu": "unavailable: local permission restriction",
+    "memory_bytes": "unavailable: local permission restriction",
+    "physical_cpus": "unavailable: local permission restriction"
+  },
+  "configuration": {
+    "concurrency": 8,
+    "orders": 5000,
+    "read_requests": 30000,
+    "warmup_requests": 40,
+    "transport": "HTTP/1.1 loopback; one persistent connection per worker",
+    "workload": "write phase: 3-line create/reserve/ship/full return; then equal inventory/dashboard/orders/audit reads",
+    "timing": "HTTP serialization, round trip, and JSON parsing; excludes startup, login, warmup; closed-loop, no pacing or retries",
+    "database": "SQLite WAL, synchronous FULL; new store per run; same host as load generator"
+  },
+  "phases": {
+    "writes": {
+      "requests": 20000,
+      "seconds": 8.8823,
+      "requests_per_second": 2251.67,
+      "latency_ms": {
+        "p50": 0.426,
+        "p95": 5.051,
+        "p99": 57.015,
+        "max": 1321.26
+      },
+      "errors": 0,
+      "statuses": {
+        "201": 5000,
+        "200": 15000
+      },
+      "by_route": {
+        "/api/orders": {
+          "requests": 5000,
+          "seconds": 8.8823,
+          "requests_per_second": 562.92,
+          "latency_ms": {
+            "p50": 0.445,
+            "p95": 5.058,
+            "p99": 49.628,
+            "max": 685.561
+          },
+          "errors": 0,
+          "statuses": {
+            "201": 5000
+          }
+        },
+        "/api/orders/:id/reserve": {
+          "requests": 5000,
+          "seconds": 8.8823,
+          "requests_per_second": 562.92,
+          "latency_ms": {
+            "p50": 0.41,
+            "p95": 4.985,
+            "p99": 45.258,
+            "max": 1321.26
+          },
+          "errors": 0,
+          "statuses": {
+            "200": 5000
+          }
+        },
+        "/api/orders/:id/ship": {
+          "requests": 5000,
+          "seconds": 8.8823,
+          "requests_per_second": 562.92,
+          "latency_ms": {
+            "p50": 0.407,
+            "p95": 5.041,
+            "p99": 68.878,
+            "max": 697.123
+          },
+          "errors": 0,
+          "statuses": {
+            "200": 5000
+          }
+        },
+        "/api/orders/:id/returns": {
+          "requests": 5000,
+          "seconds": 8.8823,
+          "requests_per_second": 562.92,
+          "latency_ms": {
+            "p50": 0.434,
+            "p95": 5.103,
+            "p99": 64.983,
+            "max": 1310.798
+          },
+          "errors": 0,
+          "statuses": {
+            "200": 5000
+          }
+        }
+      }
+    },
+    "reads": {
+      "requests": 30000,
+      "seconds": 15.866,
+      "requests_per_second": 1890.83,
+      "latency_ms": {
+        "p50": 2.77,
+        "p95": 7.691,
+        "p99": 21.579,
+        "max": 30.799
+      },
+      "errors": 0,
+      "statuses": {
+        "200": 30000
+      },
+      "by_route": {
+        "/api/inventory": {
+          "requests": 7500,
+          "seconds": 15.866,
+          "requests_per_second": 472.71,
+          "latency_ms": {
+            "p50": 2.662,
+            "p95": 3.806,
+            "p99": 4.402,
+            "max": 8.287
+          },
+          "errors": 0,
+          "statuses": {
+            "200": 7500
+          }
+        },
+        "/api/dashboard": {
+          "requests": 7500,
+          "seconds": 15.866,
+          "requests_per_second": 472.71,
+          "latency_ms": {
+            "p50": 3.236,
+            "p95": 4.421,
+            "p99": 5.011,
+            "max": 8.82
+          },
+          "errors": 0,
+          "statuses": {
+            "200": 7500
+          }
+        },
+        "/api/orders?limit=20": {
+          "requests": 7500,
+          "seconds": 15.866,
+          "requests_per_second": 472.71,
+          "latency_ms": {
+            "p50": 0.764,
+            "p95": 20.99,
+            "p99": 23.464,
+            "max": 30.799
+          },
+          "errors": 0,
+          "statuses": {
+            "200": 7500
+          }
+        },
+        "/api/audit?limit=20": {
+          "requests": 7500,
+          "seconds": 15.866,
+          "requests_per_second": 472.71,
+          "latency_ms": {
+            "p50": 3.022,
+            "p95": 7.222,
+            "p99": 8.111,
+            "max": 12.522
+          },
+          "errors": 0,
+          "statuses": {
+            "200": 7500
+          }
+        }
+      }
+    }
+  },
+  "postconditions": {
+    "passed": true,
+    "integrity_check": "ok",
+    "foreign_key_violations": [],
+    "counts": {
+      "orders": 5000,
+      "audit": 20000,
+      "idempotency": 20000
+    },
+    "inventory": [
+      [
+        "BOLT",
+        100,
+        0
+      ],
+      [
+        "CABLE",
+        60,
+        0
+      ],
+      [
+        "SAMPLE",
+        20,
+        0
+      ]
+    ],
+    "order_states": {
+      "returned": 5000
+    },
+    "database_bytes_including_wal": 48234496
+  },
+  "limitations": [
+    "One host and one short synthetic workload; no production capacity claim.",
+    "Write/read phases are separate, not a sustained mixed soak.",
+    "Authentication cost, WAN/TLS, large catalogs, and disk failure are outside measured phases.",
+    "Closed-loop clients wait for each response, so this does not measure open-loop overload behavior."
+  ]
+}

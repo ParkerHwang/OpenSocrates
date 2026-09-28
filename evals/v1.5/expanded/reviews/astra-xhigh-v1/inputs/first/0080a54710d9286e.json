@@ -1,0 +1,29 @@
+{
+  "packet_id": "0080a54710d9286e",
+  "task_id": "v2-eval02-general-venue",
+  "locale": "en",
+  "initial_request": "Read venue-brief.md and create decision.json with selected_venue (string), attendees (integer), cost_usd (integer), capacity_margin (integer), constraints_met (array containing applicable codes step_free, indoor_rain_backup, open_through_19, cost_within_1200), rejected (object mapping each rejected venue to one decisive code: closes_early, stairs_only, or no_rain_backup), and unresolved (array of strings). Choose the lowest-cost qualifying venue. Do not invent availability or a booking. Explain the decision briefly in your final message.",
+  "followup_request": null,
+  "source_before_task": {
+    "venue-brief.md": "Choose one venue for 58 participants. Non-negotiable: step-free entry, an indoor rain backup, open through 19:00, and total venue cost no more than $1,200. Prefer the lowest-cost qualifying option.\n\n| Venue | Capacity | Entry | Rain backup | Closes | Total cost |\n| --- | ---: | --- | --- | --- | ---: |\n| Pine | 64 | Step-free | Indoor | 17:00 | $900 |\n| Bay | 62 | Step-free | Indoor | 21:00 | $1,150 |\n| Dock | 90 | Stairs only | Indoor | 22:00 | $800 |\n| Elm | 60 | Step-free | None | 20:00 | $1,000 |\n"
+  },
+  "declared_source_transition": null,
+  "scoped_public_intent": null,
+  "stages": [
+    {
+      "artifacts": {
+        "decision.json": "{\n  \"selected_venue\": \"Bay\",\n  \"attendees\": 58,\n  \"cost_usd\": 1150,\n  \"capacity_margin\": 4,\n  \"constraints_met\": [\n    \"step_free\",\n    \"indoor_rain_backup\",\n    \"open_through_19\",\n    \"cost_within_1200\"\n  ],\n  \"rejected\": {\n    \"Pine\": \"closes_early\",\n    \"Dock\": \"stairs_only\",\n    \"Elm\": \"no_rain_backup\"\n  },\n  \"unresolved\": [\n    \"Availability was not provided.\"\n  ]\n}\n"
+      },
+      "public_final": "Created and checked [decision.json](<disposable>/workspace/decision.json). Bay is the only venue meeting every stated constraint: it fits 58 attendees with a margin of 4, has step-free entry and an indoor rain backup, stays open through 19:00, and costs $1,150. Availability was not provided."
+    }
+  ],
+  "designated_artifact_diffs": {
+    "decision.json": "--- before/decision.json\n+++ after/decision.json\n@@ -0,0 +1,20 @@\n+{\n+  \"selected_venue\": \"Bay\",\n+  \"attendees\": 58,\n+  \"cost_usd\": 1150,\n+  \"capacity_margin\": 4,\n+  \"constraints_met\": [\n+    \"step_free\",\n+    \"indoor_rain_backup\",\n+    \"open_through_19\",\n+    \"cost_within_1200\"\n+  ],\n+  \"rejected\": {\n+    \"Pine\": \"closes_early\",\n+    \"Dock\": \"stairs_only\",\n+    \"Elm\": \"no_rain_backup\"\n+  },\n+  \"unresolved\": [\n+    \"Availability was not provided.\"\n+  ]\n+}\n"
+  },
+  "human_status": "unavailable",
+  "human_scores": null,
+  "non_blindable_cues": [
+    "Memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed."
+  ],
+  "coverage_limit": "Packets contain declared task sources and designated output artifacts, not a complete post-run filesystem snapshot or raw tool transcript."
+}

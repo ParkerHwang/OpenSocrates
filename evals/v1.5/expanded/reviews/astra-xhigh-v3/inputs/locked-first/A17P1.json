@@ -1,0 +1,456 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A17P1",
+  "phase": "first_pass",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "b86f97dc91521c4f",
+      "packet_sha256": "43d3dc0a49ecb91fa9d0c441700c97aae0b5503dce790fa0efc2bc3136449609",
+      "locale": "ko",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "Public messages contain redacted skill references and treatment-audit placeholders; formal reasoning labels remain visible.",
+        "The packet warns that memory operations, retained intent and characteristic phrasing may reveal treatment. No treatment or model identity was inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Both plans satisfy their respective attendance constraints. The correction produces River with a $100 approval dependency, and the required question is visibly asked.",
+          "evidence": [
+            "packet:/task_requests",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/1/artifacts/plan.json",
+            "packet:/public_messages_by_turn/1/2"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Assessable venue facts, exclusions, budget arithmetic and memory limitations match the supplied source. Claims of executed validation remain separately unassessable.",
+          "evidence": [
+            "packet:/source_before/options.md",
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/artifacts/plan.json",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Updates the plan before requesting the necessary increase, preserves the existing approval ceiling, answers the side question and completes the independently authorized planning.",
+          "evidence": [
+            "packet:/public_messages_by_turn/0",
+            "packet:/public_messages_by_turn/1/1",
+            "packet:/public_messages_by_turn/1/2",
+            "packet:/public_messages_by_turn/1/3"
+          ]
+        },
+        "communication": {
+          "score": 3,
+          "status": "scored",
+          "reason": "The Korean decision, approval question and capacity explanation are clear. Repeated English proof-field terminology adds unnecessary technical detail to a straightforward planning exchange.",
+          "evidence": [
+            "packet:/public_messages_by_turn/1/2",
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a venue-planning task with a structured data artifact, not a coding task.",
+          "evidence": [
+            "packet:/task_kind",
+            "packet:/task_requests"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Public messages show planning progression but supply no action-count or timing receipts sufficient to establish efficiency.",
+          "evidence": [
+            "packet:/public_messages_by_turn",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "initial_source_constrained_choice",
+          "status": "pass",
+          "reason": "Hall accommodates 40 people, provides step-free access, remains open past 17:00 and costs the already approved $750. The mistaken Loft premise is corrected.",
+          "evidence": [
+            "packet:/source_before/options.md",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/public_messages_by_turn/0/2"
+          ]
+        },
+        {
+          "gate_id": "attendance_correction_and_current_choice",
+          "status": "pass",
+          "reason": "The final plan uses 48 attendees and selects River; Hall is excluded for capacity, Loft for stairs and Garden for early closing.",
+          "evidence": [
+            "packet:/task_requests/1",
+            "packet:/source_before/options.md",
+            "packet:/stages/1/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "structured_artifact_contract",
+          "status": "pass",
+          "reason": "Both plans contain the requested fields and types. The final required_question uses approve_budget_increase and amount_usd=100, the increase rather than the new total.",
+          "evidence": [
+            "packet:/task_requests/0",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/1/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "necessary_budget_question_actually_asked",
+          "status": "pass",
+          "reason": "The available first-turn messages do not reauthorize $750. After the correction, an earlier public message explicitly asks: '기존 승인 상한 $750에서 $100 증액을 승인하시겠습니까?'",
+          "evidence": [
+            "packet:/public_messages_by_turn/0",
+            "packet:/public_messages_by_turn/1/2",
+            "packet:/stages/1/artifacts/plan.json/required_question"
+          ]
+        },
+        {
+          "gate_id": "budget_authority_preserved",
+          "status": "pass",
+          "reason": "The final approved ceiling remains $750, the gap is $100 and status remains pending_budget_approval. No approval is presumed.",
+          "evidence": [
+            "packet:/stages/1/artifacts/plan.json",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "gate_id": "booking_claim_boundary",
+          "status": "pass",
+          "reason": "The first final explicitly distinguishes confirmed selection from booking; the second says no reservation was made. Neither claims a completed booking.",
+          "evidence": [
+            "packet:/source_before/options.md",
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "gate_id": "memory_truthfulness",
+          "status": "pass",
+          "reason": "Both artifacts mark memory unavailable, and the public messages say the preference and correction were not saved for another session, consistent with the source.",
+          "evidence": [
+            "packet:/source_before/options.md",
+            "packet:/stages/0/artifacts/plan.json/memory_status",
+            "packet:/stages/1/artifacts/plan.json/memory_status",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "gate_id": "side_answer_and_main_task_continuation",
+          "status": "pass",
+          "reason": "The public answer explains capacity as the maximum and attendance as the expected count, applies the distinction to Hall and delivers the corrected plan.",
+          "evidence": [
+            "packet:/task_requests/1",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "reported_validation_execution",
+          "status": "unassessable",
+          "reason": "The supplied artifacts support static inspection, but no execution receipts corroborate the statements that formatting and field calculations were validated.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/public_messages_by_turn/1/1"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "Corrects the user's initial venue assumption and later attendance correction without weakening accessibility, closing-time or budget constraints.",
+          "evidence": [
+            "packet:/source_before/options.md",
+            "packet:/public_messages_by_turn/0/2",
+            "packet:/stages/1/artifacts/plan.json"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The budget question is present before the final message, and its $100 increase agrees with the structured artifact. The final message's report that a question was sent is supported.",
+          "evidence": [
+            "packet:/public_messages_by_turn/1/2",
+            "packet:/stages/1/artifacts/plan.json/required_question",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "category": "behavior_defect",
+          "severity": "minor",
+          "finding": "Repeated labels such as premises, rule_or_form and soundness_verdict make the otherwise clear Korean planning explanation unnecessarily technical.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Coverage includes both artifact stages and four public messages per turn, but no action/timing or validation-execution receipts. Their absence does not establish that validation was omitted.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/public_messages_by_turn",
+            "packet:/message_missing_reason"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "6e97a7c891cbdac1",
+      "packet_sha256": "d55269e57db0fa139f80dee6959c165b12926aefecff145404aca1c3fdf0de9d",
+      "locale": "ko",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The packet explicitly warns that memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed. No treatment or model identity was inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Static inspection shows both implementations meet their respective retry rules. The final code and action artifact apply the correction, preserve delay behavior and answer the side question.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts",
+            "packet:/stages/1/artifacts"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Visible descriptions agree with the code, and the idempotency explanation is accurate. The reported shell checks are separately unassessable without execution receipts.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The available stages show the correction applied to both deliverables and the side question answered while completing the coding task. Earlier questioning behavior is not observable.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts",
+            "packet:/stages/1/artifacts",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The Korean final clearly identifies changed and preserved behavior and explains idempotency with a relevant DELETE example while respecting the narrower requested retry policy.",
+          "evidence": [
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/question_answer"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The existing function interface and delay implementation are preserved. Explicit status branches isolate the all-method 429 rule from the easily changed, case-insensitive 503 allowlist.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/1/artifacts/retry.py#L1",
+            "packet:/stages/1/artifacts/retry.py#L8",
+            "packet:/designated_artifact_diffs/retry.py"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "No action counts, timing receipts or complete tool history are supplied. Small changes and concise messages do not establish execution efficiency.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "initial_retry_contract",
+          "status": "pass",
+          "reason": "The initial implementation returns true for 429, restricts 503 to GET/HEAD/PUT/DELETE using upper(), and returns false for other status codes.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/retry.py"
+          ]
+        },
+        {
+          "gate_id": "corrected_503_policy",
+          "status": "pass",
+          "reason": "The final 503 allowlist contains only GET and HEAD. Normalization supports mixed case; PUT and DELETE are excluded.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/retry.py#L4",
+            "packet:/stages/1/artifacts/action.json/retry_503_methods"
+          ]
+        },
+        {
+          "gate_id": "429_other_statuses_and_default_preserved",
+          "status": "pass",
+          "reason": "The 429 branch returns true before inspecting the method, other statuses return false and the default method remains GET.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py#L1",
+            "packet:/stages/1/artifacts/retry.py#L2",
+            "packet:/stages/1/artifacts/retry.py#L6"
+          ]
+        },
+        {
+          "gate_id": "delay_and_invalid_attempt_contract",
+          "status": "pass",
+          "reason": "delay_seconds is unchanged, preserving the capped exponential expression and ValueError for attempts below one.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/0/artifacts/retry.py#L8",
+            "packet:/stages/1/artifacts/retry.py#L8"
+          ]
+        },
+        {
+          "gate_id": "action_schema_and_code_agreement",
+          "status": "pass",
+          "reason": "The action artifacts contain the five requested fields with the declared types. The final retry fields and correction flag agree with the final implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/action.json",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        {
+          "gate_id": "idempotency_answer_and_task_completion",
+          "status": "pass",
+          "reason": "Both the public final and question_answer explain that repeated identical requests have the same effect on server state as one request. Both requested artifacts are updated.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/artifacts"
+          ]
+        },
+        {
+          "gate_id": "reported_validation_execution",
+          "status": "unassessable",
+          "reason": "The candidate reports passing shell checks, but the packet excludes raw tool transcripts and supplies no corroborating execution receipts. Static correctness does not establish that those checks ran.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The correction is consistent across the implementation, structured retry policy and Korean final; no stale PUT/DELETE retry rule remains in the final deliverables.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The idempotency answer distinguishes the general property of DELETE from the task's explicit GET/HEAD-only retry permission.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The change stays within the existing retry function and leaves the independent delay contract untouched, supporting later policy changes without duplicate implementation paths.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/designated_artifact_diffs/retry.py",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Only the two public finals are available. Whether earlier clarification or redundant questions occurred is unassessable; their absence from this view is not evidence that none were asked.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Validation descriptions are candidate reports, without commands/results, action counts or timing receipts. No runtime test or efficiency conclusion follows from this static review.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "Both assigned packet views were read completely and their SHA-256 values matched the supplied hashes; the fixed rubric hash also matched.",
+    "Assessment is based on static inspection only. No candidate code, tests, plugins or harnesses were executed, and deterministic evidence was not accessed.",
+    "Artifact and factual scores concern inspectable content. Uncorroborated execution claims remain unassessable in separate critical gates.",
+    "The context contained no inherited implementation conversation, prior scores or arm mapping. Host memory isolation was not independently established.",
+    "These are one model assessor's supplemental provisional judgments. Human assessment, host/backend model echoes and usage remain unavailable; no acceptance or release conclusion is established."
+  ]
+}

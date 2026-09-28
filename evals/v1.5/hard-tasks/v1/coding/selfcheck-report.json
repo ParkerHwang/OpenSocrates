@@ -1,0 +1,59 @@
+{
+  "baseline_commit": "8244c9786d289bec9f81314edb4cd9d59a54e093",
+  "acceptance_primitives": {
+    "passed": true,
+    "checks": [
+      "extra_fields",
+      "bad_responses",
+      "legacy_schema",
+      "bad_http_controls",
+      "replay_extensions",
+      "28_groups"
+    ]
+  },
+  "meter_primitives": {
+    "passed": true,
+    "checks": [
+      "boundary_windows",
+      "late_drain",
+      "failed_attempts",
+      "null_missing",
+      "quantiles"
+    ]
+  },
+  "negative_startup_control": {
+    "binary": "/usr/bin/false",
+    "group_count": 28,
+    "passed_count": 0,
+    "failure_isolation": true,
+    "logs_written_verified": true,
+    "artifact_policy": "ephemeral local selfcontrol, deleted after assertions; candidate runs retain artifacts"
+  },
+  "missing_meter_control": {
+    "cells": 12,
+    "interpretation": "diagnostic_only",
+    "stats_null": true
+  },
+  "go_build": {
+    "status": "passed_with_permitted_generic_dependency_cache",
+    "go_version": "go1.26.3 darwin/arm64",
+    "environment": "GOMODCACHE=<generic-dependency-cache> GOCACHE=<fresh-temporary-cache> GOPROXY=off GOTOOLCHAIN=local",
+    "commands": [
+      "go test ./internal/platform",
+      "go test ./...",
+      "go build -o <temporary>/server ./cmd/server"
+    ],
+    "results": [
+      "passed",
+      "passed",
+      "passed"
+    ],
+    "boundary": "starter is a deliberate TODO executable; not a backend implementation or positive API acceptance"
+  },
+  "positive_solution_acceptance": "not_run_no_reference_implementation",
+  "integrator_pre_freeze_repairs": [
+    "Exclude warmup carry-in from start-cohort throughput; add carry-in control",
+    "Clarify independent checker is post-episode",
+    "Normalize private preparation paths"
+  ]
+}

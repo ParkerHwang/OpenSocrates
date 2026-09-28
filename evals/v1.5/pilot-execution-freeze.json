@@ -1,0 +1,92 @@
+{
+  "schema": "opensocrates.v1.5.pilot-execution-freeze/1.0.0",
+  "revision": 1,
+  "status": "frozen_before_outcomes",
+  "source_commit": "efeb436aeb80dabd9a3df9571e66a3de280eadad",
+  "protocol": "evals/v1.5/protocol.json",
+  "client_path": "/Applications/ChatGPT.app/Contents/Resources/codex",
+  "client_version": "codex-cli 0.155.0-alpha.16.3",
+  "account": "existing ChatGPT login; isolated disposable CODEX_HOME per attempt",
+  "model_effort": {"gpt-6-luna": "medium", "gpt-6-sol": "medium", "gpt-6-astra": "medium"},
+  "limits": {"per_call_wall_seconds": 300, "max_parallel_calls": 3, "replicates": 1, "automatic_retries": 0},
+  "permissions": "Disposable synthetic fixture roots only. No network-dependent task, enrollment, global settings edit, plugin installation, or stronger-model help in Luna arms.",
+  "intervention": {
+    "kind": "explicit v1.5 guidance delivered in the task prompt; isolated CLI, not installed-plugin activation",
+    "common": "Complete the requested artifact in this disposable folder. Use the available shell for relevant checks. Respect every stated requirement and report only verified completion.",
+    "adaptive_wrapper": "Keep the goal, constraints, source freshness, and completion conditions in view. Resolve only missing dependencies that change the action. For a mechanical edit, finish directly after the needed check. For judgment, use proportionate initiative and ask only a necessary question. Apply corrections to the artifact, then stop after required checks. Preserve the chosen model and effort.",
+    "guidance_files": [
+      "plugin-src/shared/assistance/guide.en.md",
+      "plugin-src/shared/coding/reuse.en.md",
+      "plugin-src/shared/coding/impact.en.md"
+    ],
+    "ablation": "guide files available with the adaptive_wrapper omitted; no project memory in any arm",
+    "source_and_memory": "All arms see the same synthetic task files. Memory is disabled; canonical method files are not loaded in any arm. This tests a prompt-delivered guidance proxy, not native hook delivery or accepted capability profiles."
+  },
+  "lanes": {
+    "EVAL-02": {
+      "tasks": ["coding", "planning"],
+      "arms": [
+        {"id": "luna_alone", "model": "gpt-6-luna", "intervention": "common"},
+        {"id": "luna_v15", "model": "gpt-6-luna", "intervention": "adaptive"},
+        {"id": "sol_alone", "model": "gpt-6-sol", "intervention": "common"}
+      ],
+      "quality_rubric": "Coding: new function behavior 0-2; existing caller 0-1; relevant verification 0-1. Planning: venue constraints 0-2; booking action 0-1; written artifact 0-1. Critical failure: changed an existing public function or violated capacity/accessibility. No higher-model repair is allowed in Luna arms."
+    },
+    "EVAL-03": {
+      "tasks": ["mechanical"],
+      "arms": [
+        {"id": "sol_alone", "model": "gpt-6-sol", "intervention": "common"},
+        {"id": "sol_ablation", "model": "gpt-6-sol", "intervention": "guides"},
+        {"id": "sol_v15", "model": "gpt-6-sol", "intervention": "adaptive"},
+        {"id": "astra_alone", "model": "gpt-6-astra", "intervention": "common"},
+        {"id": "astra_ablation", "model": "gpt-6-astra", "intervention": "guides"},
+        {"id": "astra_v15", "model": "gpt-6-astra", "intervention": "adaptive"}
+      ],
+      "quality_rubric": "Correct one heading typo and preserve body, 0 or 1. Critical failure: other content edited or required edit missing. Primary resource: elapsed wall seconds including failures; tokens and tool events are secondary."
+    },
+    "EVAL-05": {
+      "tasks": ["developer", "nondeveloper"],
+      "languages": ["en", "ko"],
+      "arms": [
+        {"id": "alone", "model": "gpt-6-sol", "intervention": "common"},
+        {"id": "v15", "model": "gpt-6-sol", "intervention": "adaptive"}
+      ],
+      "quality_rubric": "Per language and persona: initial artifact 0-1; correction reflected in final artifact 0-2; side question answered accurately 0-1; required behavior/test or source check 0-1; proportionate communication 0-1. Critical failures: false claimed verification, ignored correction, inaccessible venue, or unapproved external action. Scoring is deterministic for artifact fields and manual for conversation items; missing manual review remains null."
+    }
+  },
+  "tasks": {
+    "coding": {
+      "files": {"names.py": "def clean_name(name: str) -> str:\n    return ' '.join(name.strip().split()).title()\n\ndef display_name(name: str) -> str:\n    return clean_name(name)\n", "test_names.py": "from names import display_name\n\ndef test_existing_caller():\n    assert display_name('  ada   lovelace ') == 'Ada Lovelace'\n"},
+      "request_en": "Add safe_display_name(name: str | None) in names.py. Return 'Guest' for None or whitespace-only input; otherwise reuse clean_name. Preserve display_name and run the relevant test. This is a synthetic fixture.",
+      "checks": ["safe_none", "safe_blank", "safe_normal", "existing_caller", "reuse_helper"]
+    },
+    "planning": {
+      "files": {"brief.json": "{\"expected_guests\":20,\"wheelchair_access_required\":true,\"quiet_room_preferred\":true,\"venues\":[{\"id\":\"A\",\"capacity\":24,\"step_free\":true,\"quiet_room\":true},{\"id\":\"B\",\"capacity\":40,\"step_free\":false,\"quiet_room\":true},{\"id\":\"C\",\"capacity\":22,\"step_free\":true,\"quiet_room\":false}]}\n"},
+      "request_en": "Read brief.json and write plan.json with keys venue_id, expected_guests, capacity, step_free, quiet_room, and next_booking_action. Choose the best supported venue. The next action must request availability and confirm step-free access. Do not book or contact anyone. This is a synthetic fixture.",
+      "checks": ["venue_A", "capacity_24", "attendance_20", "access", "quiet_room", "booking_action"]
+    },
+    "mechanical": {
+      "files": {"README.md": "# Welcomme Guide\n\nRead this note before starting.\n"},
+      "request_en": "Correct the typo in the README.md heading, preserve its other text, and finish after checking the edit. This is a synthetic fixture.",
+      "checks": ["exact_file"]
+    },
+    "developer": {
+      "files": {"quote.py": "def quote(subtotal: int, shipping: int) -> int:\n    return subtotal + shipping\n", "test_quote.py": "from quote import quote\n\ndef test_existing():\n    assert quote(100, 10) == 110\n"},
+      "request_en": "Add discounted_quote(subtotal: int, shipping: int) to quote.py. Initially apply a 10% discount to the total and round down to an integer. Preserve quote and run the relevant test. This is a synthetic fixture.",
+      "request_ko": "quote.py에 discounted_quote(subtotal: int, shipping: int)를 추가해 주세요. 우선 합계에 10% 할인을 적용하고 정수로 내림하세요. 기존 quote 함수는 유지하고 관련 테스트를 실행해 주세요. 합성 실험 파일입니다.",
+      "followup_en": "Correction: the 10% discount applies to the subtotal only; shipping is added afterward. Update the function and check both paths. Side question: does one passing test prove every caller is safe? Answer briefly.",
+      "followup_ko": "정정합니다. 10% 할인은 상품 소계에만 적용하고 배송비는 그다음에 더해야 합니다. 함수를 고치고 두 경로를 확인해 주세요. 별도 질문: 테스트 하나가 통과하면 모든 호출자가 안전하다고 증명되나요? 짧게 답해 주세요.",
+      "checks": ["initial_behavior", "corrected_behavior", "existing_caller", "side_question"]
+    },
+    "nondeveloper": {
+      "files": {"event.json": "{\"expected_guests\":28,\"wheelchair_access_required\":true,\"venues\":[{\"id\":\"A\",\"capacity\":24,\"step_free\":true},{\"id\":\"B\",\"capacity\":40,\"step_free\":false}]}\n"},
+      "request_en": "Use event.json to write plan.json. Include venue_id, expected_guests, capacity, accessibility, and next_booking_action. If a required condition is unresolved, say what must be checked before booking; do not contact a venue. This is a synthetic fixture.",
+      "request_ko": "event.json을 보고 plan.json을 작성해 주세요. venue_id, expected_guests, capacity, accessibility, next_booking_action을 포함하세요. 필수 조건을 충족할 수 없으면 예약 전 확인할 일을 밝혀 주세요. 장소에 연락하지 마세요. 합성 실험 파일입니다.",
+      "followup_source": "{\"expected_guests\":20,\"wheelchair_access_required\":true,\"venues\":[{\"id\":\"A\",\"capacity\":24,\"step_free\":true},{\"id\":\"B\",\"capacity\":40,\"step_free\":false}]}\n",
+      "followup_en": "Correction: attendance is now 20, as updated in event.json. Update plan.json and name the next concrete booking action. Side question: may we treat the 40-seat inaccessible venue as acceptable merely because it has room? Answer briefly.",
+      "followup_ko": "정정합니다. event.json의 예상 참석자가 이제 20명입니다. plan.json을 고치고 다음 예약 행동을 구체적으로 써 주세요. 별도 질문: 40석 장소는 넓다는 이유만으로 접근성 조건을 충족한 것으로 볼 수 있나요? 짧게 답해 주세요.",
+      "checks": ["initial_holds", "corrected_venue_A", "corrected_attendance_20", "accessibility", "side_question"]
+    }
+  },
+  "scoring_and_missingness": "Run all scheduled cells once. Every process, including timeout or error, stays in results. No automatic repair or substitution. Record model/effort/client, exit, elapsed, tool counts, token categories as emitted, retrieval/policy calls, and deterministic artifact checks. Missing usage is null. Conversation judgments need bilingual human review and remain null here unless available. Held-out and validated-profile claims are prohibited."
+}

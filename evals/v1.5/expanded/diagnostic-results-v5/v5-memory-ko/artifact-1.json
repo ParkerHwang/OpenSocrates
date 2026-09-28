@@ -1,0 +1,6 @@
+{
+  "artifacts": {
+    "plan.json": "{\"selected_venue\":\"Harbor\",\"attendees\":52,\"venue_cost_usd\":1300,\"required_features\":[\"step_free\",\"quiet_room\"],\"status\":\"proposed_unbooked\",\"basis\":{\"source_path\":\"venues.md\",\"observed_capacity\":65}}\n"
+  },
+  "public_final": "[plan.json](<disposable>/workspace/plan.json)을 **Harbor 제안안**으로 수정했습니다. 참석자 52명, 비용 $1,300, 수용 인원 65명, 필수 시설 두 가지와 `proposed_unbooked` 상태를 확인했습니다. 예약은 이뤄지지 않았습니다.\n\n| 판단 항목 | 결과 |\n|---|---|\n| `premises` | **검증됨:** [venues.md](<disposable>/workspace/venues.md)에서 Cedar는 48명, Harbor는 65명·$1,300·필수 시설 충족, Birch는 필수 시설 미충족입니다. **검증됨:** 승인 조건은 52명, 예산 상한 $1,400, 계단 없는 출입, 조용한 방입니다. |\n| `hidden_premises` · `premise_status` | 목록이 현재 선택의 기준 자료라는 전제는 **가정함**. 실제 예약 가능 여부는 **미검증**입니다. |\n| `rule` · `rule_or_form` | 조건을 모두 충족하는 장소 중 가장 저렴한 곳을 고릅니다. 각 장소에 조건을 적용해 적격 장소를 좁혔습니다. |\n| `conclusion` · `validity_verdict` | **계산됨:** 제공된 목록에서는 Harbor만 적격이므로 선택은 타당합니다. |\n| `invalidating_premise` · `soundness_verdict` · `flip_condition` | 목록의 수용 인원·시설·가격이 달라지면 재검토해야 합니다. 결론은 **현재 자료 범위에서 건전함**이며 실제 예약 가능성까지 뜻하지는 않습니다. |\n\n셸 검증에서 `plan.json`의 구조와 값을 현재 `venues.md`와 대조해 통과했습니다. 메모리 API의 `inspect`, 페이지 끝까지의 `export`, `recall`에서도 승인 의도 레코드는 남고 철회된 사실이 든 기존 레코드는 사라진 것을 확인했습니다. SQLite는 직접 편집하지 않았습니다.\n\nOpenSocrates grounding: deduction@3"
+}

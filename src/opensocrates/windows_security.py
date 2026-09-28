@@ -14,6 +14,7 @@ import msvcrt
 import os
 import secrets
 import sys
+import time
 from ctypes import wintypes as w
 from functools import lru_cache
 from pathlib import Path
@@ -389,6 +390,252 @@ def _handle_identity(handle: int) -> tuple[int, int, int]:
         int(information.nFileIndexHigh),
         int(information.nFileIndexLow),
     )
+
+
+class SourceRoot:
+    """Pinned, non-reparse source root. All opened ancestors deny replacement."""
+
+    def __init__(self, path: Path, handles: list[int]) -> None:
+        self.path = path
+        self._handles = handles
+        self.identity: tuple[int, int, int] = _handle_identity(handles[-1])
+
+    def close(self) -> None:
+        _adv, kernel, _ntdll = _api()
+        while self._handles:
+            kernel.CloseHandle(self._handles.pop())
+
+    def _require_active(self) -> None:
+        if not self._handles or _handle_identity(self._handles[-1]) != self.identity:
+            raise ValueError("closed_or_changed_source_root")
+
+    def __enter__(self) -> SourceRoot:
+        return self
+
+    def __exit__(self, _type: object, _value: object, _traceback: object) -> None:
+        self.close()
+
+
+def _source_component(name: str) -> bool:
+    """Reject NT aliases and relative names before any native open."""
+
+    return (
+        bool(name)
+        and name not in {".", ".."}
+        and not name.endswith((" ", "."))
+        and not any(char in name for char in ("/", "\\", ":", "\x00"))
+    )
+
+
+def _source_parts(relative: str) -> tuple[str, ...]:
+    parts = relative.split("/")
+    if not parts or any(not _source_component(part) for part in parts):
+        raise ValueError("unsafe_path")
+    return tuple(parts)
+
+
+def validate_source_relative(relative: str) -> None:
+    """Reject a source-relative locator that could have an NT alias."""
+
+    _source_parts(relative)
+
+
+def source_root_owner_is_current(root: SourceRoot) -> bool:
+    """Check the owner SID of the pinned root handle for enrollment."""
+
+    root._require_active()
+    adv, kernel, _ntdll = _api()
+    owner = ctypes.c_void_p()
+    descriptor = ctypes.c_void_p()
+    result = adv.GetSecurityInfo(
+        root._handles[-1],
+        _SE_FILE_OBJECT,
+        _OWNER_SECURITY_INFORMATION,
+        ctypes.byref(owner),
+        None,
+        None,
+        None,
+        ctypes.byref(descriptor),
+    )
+    if result:
+        raise ctypes.WinError(result)
+    try:
+        return _sid_text(owner.value) == current_sid()
+    finally:
+        kernel.LocalFree(descriptor)
+
+
+def _open_source_path(path: Path, *, directory: bool) -> int:
+    """Open the named object itself, denying rename and reparse mutation."""
+
+    _adv, kernel, _ntdll = _api()
+    handle = kernel.CreateFileW(
+        _native_path(path),
+        _GENERIC_READ,
+        _FILE_SHARE_READ,
+        None,
+        _OPEN_EXISTING,
+        _FILE_FLAG_OPEN_REPARSE_POINT | (_FILE_FLAG_BACKUP_SEMANTICS if directory else 0),
+        None,
+    )
+    if handle == _INVALID_HANDLE_VALUE:
+        raise ctypes.WinError(ctypes.get_last_error())
+    value = int(handle)
+    try:
+        attributes = _handle_attributes(value)
+        if (
+            attributes & _FILE_ATTRIBUTE_REPARSE_POINT
+            or bool(attributes & _FILE_ATTRIBUTE_DIRECTORY) != directory
+        ):
+            raise PermissionError("Windows source component is reparse or has wrong type")
+        return value
+    except Exception:
+        kernel.CloseHandle(value)
+        raise
+
+
+def open_source_root(root: Path) -> SourceRoot:
+    """Pin a drive-local root and every ancestor without traversing reparse points."""
+
+    path = Path(root)
+    parts = path.parts
+    if (
+        not path.is_absolute()
+        or not parts
+        or not parts[0].endswith("\\")
+        or parts[0].startswith("\\")
+    ):
+        raise ValueError("unsafe_path")
+    if any(not _source_component(part) for part in parts[1:]):
+        raise ValueError("unsafe_path")
+    current = Path(parts[0])
+    handles: list[int] = []
+    try:
+        handles.append(_open_source_path(current, directory=True))
+        for part in parts[1:]:
+            current = current / part
+            handles.append(_open_source_path(current, directory=True))
+        return SourceRoot(path, handles)
+    except Exception:
+        _adv, kernel, _ntdll = _api()
+        for handle in reversed(handles):
+            kernel.CloseHandle(handle)
+        raise
+
+
+def _open_source_child_directories(root: SourceRoot, parts: tuple[str, ...]) -> list[int]:
+    handles: list[int] = []
+    current = root.path
+    try:
+        for part in parts:
+            current = current / part
+            handles.append(_open_source_path(current, directory=True))
+        return handles
+    except Exception:
+        _adv, kernel, _ntdll = _api()
+        for handle in reversed(handles):
+            kernel.CloseHandle(handle)
+        raise
+
+
+def read_source_file(
+    root: SourceRoot, relative: str, max_bytes: int
+) -> tuple[bytes | None, str | None, tuple[int, int, int, int] | None]:
+    """Read transient bytes from a pinned regular file below the source root."""
+
+    try:
+        root._require_active()
+        parts = _source_parts(relative)
+        directories = _open_source_child_directories(root, parts[:-1])
+        try:
+            raw = _open_source_path(root.path.joinpath(*parts), directory=False)
+            descriptor: int | None = None
+            try:
+                descriptor = msvcrt.open_osfhandle(raw, os.O_RDONLY | os.O_BINARY)
+                before = os.fstat(descriptor)
+                if before.st_size > max_bytes:
+                    return None, "oversized", None
+                chunks: list[bytes] = []
+                size = 0
+                while True:
+                    chunk = os.read(descriptor, min(65536, max_bytes + 1 - size))
+                    if not chunk:
+                        break
+                    size += len(chunk)
+                    if size > max_bytes:
+                        return None, "oversized", None
+                    chunks.append(chunk)
+                after = os.fstat(descriptor)
+                identity = (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns)
+                if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != identity:
+                    return None, "source_changed_during_read", None
+                return b"".join(chunks), None, identity
+            finally:
+                if descriptor is None:
+                    _adv, kernel, _ntdll = _api()
+                    kernel.CloseHandle(raw)
+                else:
+                    os.close(descriptor)
+        finally:
+            _adv, kernel, _ntdll = _api()
+            for handle in reversed(directories):
+                kernel.CloseHandle(handle)
+    except (OSError, ValueError):
+        return None, "unsafe_path", None
+
+
+def inventory_source_files(  # noqa: C901 - bounded enumeration audits each component
+    root: SourceRoot, *, deadline: float, max_paths: int, excluded_dirs: frozenset[str]
+) -> tuple[tuple[str, ...], bool]:
+    """Enumerate only directories held open and verified as non-reparse."""
+
+    root._require_active()
+    paths: list[str] = []
+    incomplete = False
+
+    def visit(directory: Path, prefix: tuple[str, ...]) -> None:
+        nonlocal incomplete
+        if len(paths) >= max_paths or time.monotonic() >= deadline:
+            incomplete = True
+            return
+        with os.scandir(directory) as iterator:
+            entries = sorted(iterator, key=lambda item: item.name)
+        for entry in entries:
+            if len(paths) >= max_paths or time.monotonic() >= deadline:
+                incomplete = True
+                return
+            name = entry.name
+            if not _source_component(name):
+                incomplete = True
+                continue
+            relative = (*prefix, name)
+            try:
+                attributes = entry.stat(follow_symlinks=False).st_file_attributes
+            except OSError:
+                incomplete = True
+                continue
+            if attributes & _FILE_ATTRIBUTE_REPARSE_POINT:
+                incomplete = True
+                paths.append("/".join(relative))
+                continue
+            if entry.is_dir(follow_symlinks=False):
+                if name.lower() in excluded_dirs:
+                    continue
+                try:
+                    handle = _open_source_path(Path(entry.path), directory=True)
+                except OSError:
+                    incomplete = True
+                    continue
+                try:
+                    visit(Path(entry.path), relative)
+                finally:
+                    _adv, kernel, _ntdll = _api()
+                    kernel.CloseHandle(handle)
+            else:
+                paths.append("/".join(relative))
+
+    visit(root.path, ())
+    return tuple(sorted(paths)), incomplete
 
 
 def _dacl_is_protected(descriptor: ctypes.c_void_p) -> bool:

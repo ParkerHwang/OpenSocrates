@@ -1,0 +1,6 @@
+{
+  "artifacts": {
+    "plan.json": "{\n  \"attendees\": 48,\n  \"cost_usd\": 850,\n  \"approved_ceiling_usd\": 750,\n  \"budget_gap_usd\": 100,\n  \"venue\": \"River\",\n  \"status\": \"pending_budget_approval\",\n  \"memory_status\": \"unavailable\",\n  \"reason\": {\n    \"Loft\": \"stairs\",\n    \"Garden\": \"closes_early\",\n    \"Hall\": \"capacity\"\n  },\n  \"required_question\": {\n    \"type\": \"approve_budget_increase\",\n    \"amount_usd\": 100\n  },\n  \"side_answer\": {\n    \"capacity_is_limit\": true,\n    \"attendance_is_expected_count\": true\n  }\n}\n"
+  },
+  "public_final": "[plan.json](<disposable>/workspace/plan.json)을 48명 기준으로 수정하고 검증했습니다. River는 55명 수용, 계단 없는 출입, 19:00 폐관 조건을 충족하지만 비용 $850이 승인 상한 $750보다 **$100 높아 승인 대기 중**입니다. 증액 승인 여부를 질문으로 보냈으며, 예약은 하지 않았습니다.\n\n수용 인원은 장소가 받을 수 있는 **최대 인원**이고, 참석 인원은 이번 워크숍에 **올 것으로 예상하는 인원**입니다. 따라서 Hall의 수용 한도 45명은 예상 참석자 48명보다 적습니다. 프로젝트 식별자가 제공되지 않았고 이번 실행에서 프로젝트 메모리도 사용할 수 없어 수정 내용을 다음 세션용 메모리에 저장하지 못했습니다.\n\n판단은 제공된 장소 조건과 48명이라는 수정 사실(`premises`, 검증됨)에 “수용 한도가 참석 인원 이상이어야 한다”는 규칙(`rule`)을 적용한 것입니다. 추가로 필요한 중요 전제(`hidden_premises`)는 없습니다. 이 적용 형식(`rule_or_form`)은 타당하며(`validity_verdict`), 현재 자료에 따른 결론(`conclusion`, `soundness_verdict`)은 River 선택과 $100 증액 승인 대기입니다. 장소 조건 또는 참석 인원이 바뀌면(`invalidating_premise`, `flip_condition`) 다시 판단해야 합니다.\n\nOpenSocrates grounding: deduction@3"
+}

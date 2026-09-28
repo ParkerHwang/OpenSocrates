@@ -1,0 +1,12 @@
+@media (max-width: 700px) {
+  [data-testid="order-detail"] .table-scroll { overflow: visible; }
+  [data-testid="order-detail"] table, [data-testid="order-detail"] tbody { display: block; }
+  [data-testid="order-detail"] thead { display: none; }
+  [data-testid="order-detail"] tbody tr { display: grid; grid-template-columns: 1fr 1fr; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+  [data-testid="order-detail"] tbody td { display: flex; flex-direction: column; gap: 6px; border: 0; padding: 10px 12px; }
+  [data-testid="order-detail"] td:before { content: attr(data-label); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  [data-testid="order-detail"] td:last-child:nth-child(5) { grid-column: span 2; }
+  [data-testid="order-detail"] .return-field { max-width: 100%; width: 100%; }
+  [data-testid="order-detail"] .return-field label { font-size: 11px; }
+  [data-testid="order-detail"] .sku { margin: 0; }
+}

@@ -1,0 +1,127 @@
+{
+  "status": "complete_with_disclosed_anomalies",
+  "classification": {
+    "synthetic_client_inputs": "orders, returns, corrections, unit costs, hub options and scenario policy",
+    "archived_public_inputs": "World Bank population/GDP responses and ECB history preserved in source room",
+    "live_research_used": false
+  },
+  "order_reconciliation": {
+    "raw_rows": 1328,
+    "unique_order_ids": 1297,
+    "deduplicated_rows": 1297,
+    "duplicate_order_rows_removed": 31,
+    "same_revision_repeat_rows_removed": 13,
+    "higher_revision_replacements": 18,
+    "eligible_orders": 1254,
+    "excluded_by_reason": {
+      "status_not_shipped": 24,
+      "test_transaction": 18,
+      "shipment_outside_2025": 1
+    },
+    "zero_price_orders_raw": 12,
+    "zero_price_orders_eligible": 12,
+    "currency_mismatches": 0,
+    "missing_required_values_eligible": 0
+  },
+  "return_reconciliation": {
+    "raw_rows": 264,
+    "unique_return_ids": 243,
+    "deduplicated_rows": 243,
+    "duplicate_return_rows_removed": 21,
+    "same_revision_repeat_rows_removed": 20,
+    "higher_revision_replacements": 1,
+    "usable_returns": 241,
+    "excluded_by_reason": {
+      "received_after_cutoff": 1,
+      "orphan_or_ineligible_order": 1
+    },
+    "orphan_return_ids": [
+      "R-ORPHAN"
+    ],
+    "received_cutoff_inclusive": "2026-01-31",
+    "missing_required_values_selected": 0
+  },
+  "fx": {
+    "source_file": "ecb-history.csv",
+    "quote_definition": "local currency units per EUR; EUR=1.0",
+    "months": 12,
+    "currencies": [
+      "PLN",
+      "CZK"
+    ],
+    "observation_counts": {
+      "PLN_2025-01": 22,
+      "PLN_2025-02": 20,
+      "PLN_2025-03": 21,
+      "PLN_2025-04": 20,
+      "PLN_2025-05": 21,
+      "PLN_2025-06": 21,
+      "PLN_2025-07": 23,
+      "PLN_2025-08": 21,
+      "PLN_2025-09": 22,
+      "PLN_2025-10": 23,
+      "PLN_2025-11": 20,
+      "PLN_2025-12": 21,
+      "CZK_2025-01": 22,
+      "CZK_2025-02": 20,
+      "CZK_2025-03": 21,
+      "CZK_2025-04": 20,
+      "CZK_2025-05": 21,
+      "CZK_2025-06": 21,
+      "CZK_2025-07": 23,
+      "CZK_2025-08": 21,
+      "CZK_2025-09": 22,
+      "CZK_2025-10": 23,
+      "CZK_2025-11": 20,
+      "CZK_2025-12": 21
+    },
+    "missing_months": []
+  },
+  "anomalies_and_handling": [
+    "Order rows are deduplicated by order_id and highest numeric revision; higher revisions replace the full prior row.",
+    "Identical repeated order and return rows are counted once; no raw row is treated as a distinct order or return.",
+    "Cancelled, test, and non-2025 shipment records are excluded; valid zero-price eligible shipments remain in the base.",
+    "Returns are deduplicated by return_id/revision, filtered to the inclusive 2026-01-31 cutoff, and only linked to eligible orders. Orphans are quarantined rather than guessed.",
+    "Individual order monetary components are half-up rounded to cents before aggregation; PLN/CZK use the original sale-month ECB business-day mean quote.",
+    "No payment settlement dates, tax, working-capital, or discounted cash-flow data were supplied; cash is not inferred from booked sales or contribution."
+  ],
+  "missing_values": {
+    "eligible_order_rows_with_missing_required_fields": 0,
+    "selected_return_rows_with_missing_required_fields": 0,
+    "eligible_order_rows_without_effective_unit_cost": 0,
+    "monthly_grid_missing_country_months": 0
+  },
+  "reconciliations": {
+    "country_minus_monthly_max_abs": 0.0,
+    "country_minus_monthly_by_metric": {
+      "gross_sales_eur": 0.0,
+      "refunds_eur": 0.0,
+      "net_sales_eur": 0.0,
+      "net_cogs_eur": 0.0,
+      "fulfillment_eur": 0.0,
+      "contribution_eur": 0.0,
+      "shipped_orders": 0.0,
+      "shipped_units": 0.0,
+      "returned_units": 0.0
+    },
+    "order_detail_rows": 1254,
+    "country_total_orders": 1254,
+    "country_total_units": 77436
+  },
+  "scenario_scope": {
+    "all_option_count": 22,
+    "feasible_option_count": 18,
+    "infeasible_pairs": [
+      "DEU+FRA",
+      "DEU+NLD",
+      "DEU+POL",
+      "DEU+ESP"
+    ]
+  },
+  "limitations": [
+    "The hub uplift, savings, fixed costs, and stress are board planning assumptions from the synthetic policy, not measured demand or causal effects.",
+    "World Bank GDP per capita is current US$ and population is not direct evidence of replacement-assembly demand.",
+    "ECB reference rates are analytical translation assumptions, not actual transaction FX or a forecast.",
+    "Simple payback is undiscounted and excludes year-zero capex from annual incremental contribution by policy."
+  ]
+}

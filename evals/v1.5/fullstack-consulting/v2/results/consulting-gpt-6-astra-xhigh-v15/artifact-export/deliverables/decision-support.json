@@ -1,0 +1,138 @@
+{
+  "decision_preference": "Analyst default: maximize base annual contribution inside hard limits, with staged release. No board risk weights supplied; show the alternative if downside preservation is preferred.",
+  "criteria_provenance": [
+    {
+      "criterion": "Capital and staffing feasibility",
+      "status": "hard constraint",
+      "direction": "<= EUR450,000; <=7 FTE; <=2 hubs",
+      "owner": "Board / TASK.md and scenario-policy.md",
+      "evidence": "given"
+    },
+    {
+      "criterion": "Annual incremental contribution after recurring fixed cost",
+      "status": "primary preference",
+      "direction": "maximize base EUR/year",
+      "owner": "Analyst default for this recommendation",
+      "evidence": "computed; synthetic scenario inputs"
+    },
+    {
+      "criterion": "Downside under low volume and defined stress",
+      "status": "risk comparison",
+      "direction": "higher EUR/year preferred; no imposed hurdle",
+      "owner": "Analyst; stress specification from client",
+      "evidence": "computed; probabilities unknown"
+    },
+    {
+      "criterion": "Capex, FTE, payback",
+      "status": "secondary preferences",
+      "direction": "lower resources and faster positive payback preferred",
+      "owner": "Analyst",
+      "evidence": "computed; cash timing omitted"
+    },
+    {
+      "criterion": "Service improvement and incremental demand",
+      "status": "unverified benefit",
+      "direction": "measure pilot results before full commitment",
+      "owner": "COO and Commercial Director (proposed roles)",
+      "evidence": "no actual delivery, conversion or interview evidence"
+    }
+  ],
+  "savings_cap_sensitivity": [
+    {
+      "country": "DEU",
+      "assumed_saving_eur_per_unit": 2.6,
+      "recorded_fulfillment_eur_per_unit": 1.1063687978276968,
+      "ratio_assumed_saving_to_recorded_cost": 2.350030121153975,
+      "capped_base_incremental_eur": -12601.49,
+      "capped_stress_incremental_eur": -36273.17
+    },
+    {
+      "country": "FRA",
+      "assumed_saving_eur_per_unit": 2.9,
+      "recorded_fulfillment_eur_per_unit": 1.221111111111111,
+      "ratio_assumed_saving_to_recorded_cost": 2.374886260236579,
+      "capped_base_incremental_eur": 2201.28,
+      "capped_stress_incremental_eur": -21833.6
+    },
+    {
+      "country": "NLD",
+      "assumed_saving_eur_per_unit": 3.2,
+      "recorded_fulfillment_eur_per_unit": 1.3194274809160305,
+      "ratio_assumed_saving_to_recorded_cost": 2.425294338858515,
+      "capped_base_incremental_eur": 34652.46,
+      "capped_stress_incremental_eur": 8060.87
+    },
+    {
+      "country": "POL",
+      "assumed_saving_eur_per_unit": 2.4,
+      "recorded_fulfillment_eur_per_unit": 1.4205340727797615,
+      "ratio_assumed_saving_to_recorded_cost": 1.68950540926032,
+      "capped_base_incremental_eur": 67496.58,
+      "capped_stress_incremental_eur": -56858.7
+    },
+    {
+      "country": "CZE",
+      "assumed_saving_eur_per_unit": 2.1,
+      "recorded_fulfillment_eur_per_unit": 1.5226257918881527,
+      "ratio_assumed_saving_to_recorded_cost": 1.3791963929599975,
+      "capped_base_incremental_eur": 85471.59,
+      "capped_stress_incremental_eur": -47738.3
+    },
+    {
+      "country": "ESP",
+      "assumed_saving_eur_per_unit": 3.0,
+      "recorded_fulfillment_eur_per_unit": 1.6300301485894768,
+      "ratio_assumed_saving_to_recorded_cost": 1.8404567563342353,
+      "capped_base_incremental_eur": 78860.06,
+      "capped_stress_incremental_eur": 46150.35
+    }
+  ],
+  "savings_cap_portfolios": [
+    {
+      "option": "CZE+ESP",
+      "base_incremental_eur": 164331.65,
+      "stress_incremental_eur": -1587.95
+    },
+    {
+      "option": "NLD+ESP",
+      "base_incremental_eur": 113512.52,
+      "stress_incremental_eur": 54211.22
+    },
+    {
+      "option": "POL+ESP",
+      "base_incremental_eur": 146356.64,
+      "stress_incremental_eur": -10708.35
+    },
+    {
+      "option": "ESP",
+      "base_incremental_eur": 78860.06,
+      "stress_incremental_eur": 46150.35
+    },
+    {
+      "option": "DEFER",
+      "base_incremental_eur": 0.0,
+      "stress_incremental_eur": 0.0
+    }
+  ],
+  "switches": {
+    "cze_uplift_equal_nld_at_nld_base": 0.17686593439237513,
+    "cze_vs_nld_base_gap_eur": 31167.88,
+    "cze_additional_fixed_cost_equal_nld_eur": 31167.88,
+    "joint_stress_severity_fraction_equal_nld": 0.2923314290323519,
+    "simultaneous_refund_gross_fraction_at_switch": 0.008769942870970555,
+    "simultaneous_fx_net_sales_fraction_at_switch": 0.029233142903235185,
+    "cze_stress_positive_uplift": 0.3683547037038629
+  },
+  "interpretation": [
+    "Cap sensitivity assumes savings can only remove existing recorded fulfillment cost. This is a diagnostic upper bound, not a corrected client forecast. Savings may include unrecorded activities, but evidence is absent.",
+    "CZE+ESP dominates POL+ESP on the modeled low/base/high/stress increments, lower capex and fewer FTE. CZE+ESP and NLD+ESP are incomparable because NLD+ESP preserves more contribution in stress.",
+    "The stress-severity switch scales the specified refund and FX shocks together. It is a deterministic interpolation, not a probability threshold.",
+    "The CZE uplift switch varies only CZE; NLD remains at 25%. A common uplift applied to all countries is a different question.",
+    "Defer preserves capital and produces zero modeled hub increment. It remains valid if pilot evidence fails, even though modeled base increments are positive."
+  ],
+  "release_sequence": [
+    "Spain first: conditional EUR130,000 and 3 FTE",
+    "Czechia second: conditional EUR95,000 and 2 FTE after savings/FX gate"
+  ],
+  "acceptance_risk": "Czechia alone loses EUR37,826.95/year in the defined stress; Spain offsets it in the required pair scenario. The pair turns slightly negative under the fulfillment-capped savings stress."
+}

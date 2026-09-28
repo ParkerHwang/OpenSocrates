@@ -1,0 +1,46 @@
+{
+  "schema": "opensocrates.hard-retest-validation/1",
+  "evaluated_product_commit": "a6f3414b8078da1a009e84adbf6a6658db968b25",
+  "qualified_runtime_commit": "0e27afb048f77a1f3f521d2b13e311607f639df3",
+  "input_freeze_commits": [
+    "5742a31aa3e8512c255bdc1d3a706d2df94af0ec",
+    "d912d909d93fb7e243aa9ad211a916f49028a5f3"
+  ],
+  "product_runtime_input_count": 544,
+  "runtime_inputs_match": "../../revision-v4/validation.json runtime_input_hashes",
+  "native_rebuild_required": false,
+  "reason": "Only evaluation and current status documents change; every qualified product/runtime/package input remains byte-identical. Exact-head hosted native CI is still reconciled for handoff.",
+  "integrity": [
+    {
+      "command": "python3 evals/v1.5/hard-tasks/retest-v1/verify.py --complete --storage <OLD_STORAGE>",
+      "status": "pass",
+      "frozen_inputs": 63,
+      "historical_files": 4784,
+      "retained_artifacts": 106,
+      "model_calls": 6,
+      "cli_complete": 3
+    },
+    {
+      "command": "python3 evals/v1.5/hard-tasks/unlimited-v1/verify.py --complete --storage <NEW_STORAGE>",
+      "status": "pass",
+      "frozen_inputs": 75,
+      "historical_files": 4784,
+      "retained_artifacts": 107,
+      "model_calls": 6,
+      "cli_complete": 6
+    }
+  ],
+  "time_policy_selfcheck": "PASS: observation timeouts cannot break/kill/relaunch a model call; both coding continuations naturally exceed1200seconds.",
+  "common_dependency_check": {
+    "command": "go mod verify",
+    "status": "pass",
+    "scope": "offline common pinned dependency cache; no downloads or source changes"
+  },
+  "native_reports_reference": "../../revision-v4/native-release.json",
+  "current_source_suite_and_CI": "Recorded on the exact final commit in PR95/issue94; no unavailable test is claimed passed.",
+  "agent_definition_sha256": "324906ab9460043d75202b199167cf2f8590941014a0a06c2459294a2cfb48d5",
+  "subagents": 0,
+  "stronger_model_outcome_repairs": 0,
+  "human_scores": null,
+  "billed_cost": null
+}

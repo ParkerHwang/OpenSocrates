@@ -1,0 +1,355 @@
+{
+  "inspect": {
+    "receipt": {
+      "exit_code": 0,
+      "wall_seconds": 0.175,
+      "stdout_sha256": "becd33f1d8ae1f06d05eacb5114495483fb51941bbecfcb69024cb522e10bf6a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "response": {
+      "limitations": [],
+      "request_id": "bd4867d6-22fa-4828-9ac0-221ec1153d8f",
+      "result": [
+        {
+          "conflict_ids": [],
+          "created_at": "2026-09-26T13:58:08Z",
+          "freshness": "unknown",
+          "kind": "decision",
+          "lifecycle": "accepted",
+          "origin": {
+            "attestation": "operator_declared",
+            "producer_kind": "agent",
+            "source_reference": "fixture:practical-user-intent"
+          },
+          "payload": null,
+          "project_id": "e0c2cccb-0b17-4c4b-bbb1-2ebd7f98416d",
+          "rationale": null,
+          "record_id": "4d57e1d7-9b64-4a6e-9676-60cacc11cd54",
+          "revalidation": {
+            "dependency_paths": [],
+            "negative_claim": false,
+            "on_change": "not_applicable"
+          },
+          "schema": "opensocrates.project-memory.record/1.0.0",
+          "scope": {
+            "level": "project"
+          },
+          "snapshot_id": null,
+          "source_refs": [],
+          "summary": "Current source and task contracts govern facts; bounded continuity summaries do not grant authority.",
+          "supersedes": null,
+          "support": "agent_reported",
+          "updated_at": "2026-09-26T13:58:08Z",
+          "version": 2
+        },
+        {
+          "conflict_ids": [],
+          "created_at": "2026-09-26T13:58:07Z",
+          "freshness": "unknown",
+          "kind": "decision",
+          "lifecycle": "accepted",
+          "origin": {
+            "attestation": "operator_declared",
+            "producer_kind": "agent",
+            "source_reference": "fixture:practical-user-intent"
+          },
+          "payload": null,
+          "project_id": "e0c2cccb-0b17-4c4b-bbb1-2ebd7f98416d",
+          "rationale": null,
+          "record_id": "52dd40ff-76a9-4bd6-9a90-1673cb62a54b",
+          "revalidation": {
+            "dependency_paths": [],
+            "negative_claim": false,
+            "on_change": "not_applicable"
+          },
+          "schema": "opensocrates.project-memory.record/1.0.0",
+          "scope": {
+            "level": "project"
+          },
+          "snapshot_id": null,
+          "source_refs": [],
+          "summary": "Preserve acknowledged jobs and lease fencing across restarts.",
+          "supersedes": null,
+          "support": "agent_reported",
+          "updated_at": "2026-09-26T13:58:07Z",
+          "version": 2
+        },
+        {
+          "conflict_ids": [],
+          "created_at": "2026-09-26T14:09:59Z",
+          "freshness": "unknown",
+          "kind": "checkpoint",
+          "lifecycle": "proposed",
+          "origin": {
+            "attestation": "agent_reported",
+            "producer_kind": "agent",
+            "source_reference": null
+          },
+          "payload": {
+            "blockers": [],
+            "checkpoint_version": 5,
+            "completed_actions": [
+              {
+                "action": "Re-read BRIEF.md, follow-up contract, and current Go implementation; preserved the shared Submit, Claim, lease fencing, stats, and tenant paths while extending them.",
+                "execution_state": "completed",
+                "source_refs": [],
+                "support": "agent_reported"
+              },
+              {
+                "action": "Implemented schema version 2, concurrent version 1 migration, historical defaults, scheduling fields, retry backoff, priority/FIFO claims, transactional quotas, cancellation, and tenant/filter-bound keyset listing.",
+                "execution_state": "completed",
+                "source_refs": [],
+                "support": "agent_reported"
+              },
+              {
+                "action": "Added migration, legacy idempotency/lease/completion-result replay, future-version byte preservation, concurrent migration startup, scheduling/retry and expiry boundaries, cancellation race, capacity, pagination, and batch atomicity tests.",
+                "execution_state": "completed",
+                "source_refs": [],
+                "support": "agent_reported"
+              },
+              {
+                "action": "Ran go test ./..., go test -race ./..., go build, cross-process quota/replay/inflight requests, and cross-process restart durability checks successfully; stopped the owned server processes.",
+                "execution_state": "completed",
+                "source_refs": [],
+                "support": "agent_reported"
+              },
+              {
+                "action": "Migrated the existing workspace version 1 shared database through two concurrently started server processes; verified all stored job-row fields by digest, state counts, schema version 2, and replayed both existing idempotency entries with unchanged resource IDs.",
+                "execution_state": "completed",
+                "source_refs": [],
+                "support": "agent_reported"
+              },
+              {
+                "action": "Reasserted WAL and FULL synchronous mode on version 2 startup, then built the server and verified two simultaneous processes served health against the migrated database; stopped both processes.",
+                "execution_state": "completed",
+                "source_refs": [],
+                "support": "agent_reported"
+              }
+            ],
+            "completion_conditions": [
+              "Version 1 data migrates transactionally to version 2, legacy idempotency and lease continuity remain valid, completion results survive, and unknown future schema startup leaves database bytes unchanged.",
+              "Scheduling, priority/FIFO claims, delayed retries, expiry backoff, tenant pending/inflight limits, cancellation, and keyset snapshots behave as specified.",
+              "Single and batch paths preserve atomicity and idempotency; cross-process requests and restart persistence work.",
+              "go test ./... and go test -race ./... pass; go.mod and go.sum remain exact."
+            ],
+            "conflict_ids": [],
+            "constraints": [
+              "Current source and task contracts govern facts.",
+              "Keep the supplied Go module and SQLite driver helper/test unchanged.",
+              "Use Go 1.26.3, standard library, and the pinned SQLite driver only.",
+              "Keep tenant isolation, WAL, synchronous FULL durability, and SQLite as the shared authority.",
+              "Do not commit, deploy, publish, use external services, or inspect evaluator artifacts."
+            ],
+            "decision_refs": [],
+            "next_action": "No further implementation action; use current source and verification results for any subsequent follow-up.",
+            "objective": "Complete QueueForge follow-up for schema migration, scheduling, admission limits, cancellation, and bounded listing.",
+            "parent_checkpoint_id": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+            "pending_effects": [],
+            "remaining_actions": [],
+            "snapshot_id": null,
+            "source_refs": []
+          },
+          "project_id": "e0c2cccb-0b17-4c4b-bbb1-2ebd7f98416d",
+          "rationale": null,
+          "record_id": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+          "revalidation": {
+            "dependency_paths": [],
+            "negative_claim": false,
+            "on_change": "refresh_or_mark_stale"
+          },
+          "schema": "opensocrates.project-memory.record/1.0.0",
+          "scope": {
+            "level": "task",
+            "task_id": "c4a7b000-0000-4000-8000-000000000003",
+            "workspace_id": "10b10385-d8ed-40be-94ab-0c4a59ace241"
+          },
+          "snapshot_id": null,
+          "source_refs": [],
+          "summary": "Complete QueueForge follow-up for schema migration, scheduling, admission limits, cancellation, and bounded listing.",
+          "supersedes": null,
+          "support": "agent_reported",
+          "updated_at": "2026-09-26T14:30:07Z",
+          "version": 5
+        },
+        {
+          "conflict_ids": [],
+          "created_at": "2026-09-26T13:58:08Z",
+          "freshness": "unknown",
+          "kind": "decision",
+          "lifecycle": "accepted",
+          "origin": {
+            "attestation": "operator_declared",
+            "producer_kind": "agent",
+            "source_reference": "fixture:practical-user-intent"
+          },
+          "payload": null,
+          "project_id": "e0c2cccb-0b17-4c4b-bbb1-2ebd7f98416d",
+          "rationale": null,
+          "record_id": "715cf24f-df40-4ab0-b56a-2874c3761b6b",
+          "revalidation": {
+            "dependency_paths": [],
+            "negative_claim": false,
+            "on_change": "not_applicable"
+          },
+          "schema": "opensocrates.project-memory.record/1.0.0",
+          "scope": {
+            "level": "project"
+          },
+          "snapshot_id": null,
+          "source_refs": [],
+          "summary": "SQLite WAL and synchronous=FULL remain required; do not trade durability for throughput.",
+          "supersedes": null,
+          "support": "agent_reported",
+          "updated_at": "2026-09-26T13:58:08Z",
+          "version": 2
+        },
+        {
+          "conflict_ids": [],
+          "created_at": "2026-09-26T13:58:07Z",
+          "freshness": "unknown",
+          "kind": "decision",
+          "lifecycle": "accepted",
+          "origin": {
+            "attestation": "operator_declared",
+            "producer_kind": "agent",
+            "source_reference": "fixture:practical-user-intent"
+          },
+          "payload": null,
+          "project_id": "e0c2cccb-0b17-4c4b-bbb1-2ebd7f98416d",
+          "rationale": null,
+          "record_id": "ea06015b-867f-4e73-bc07-59a070f25564",
+          "revalidation": {
+            "dependency_paths": [],
+            "negative_claim": false,
+            "on_change": "not_applicable"
+          },
+          "schema": "opensocrates.project-memory.record/1.0.0",
+          "scope": {
+            "level": "project"
+          },
+          "snapshot_id": null,
+          "source_refs": [],
+          "summary": "Keep tenant namespaces isolated; synthetic tenant headers are not production authentication.",
+          "supersedes": null,
+          "support": "agent_reported",
+          "updated_at": "2026-09-26T13:58:08Z",
+          "version": 2
+        }
+      ],
+      "retryable": false,
+      "schema": "opensocrates.project-memory.response/1.0.0",
+      "status": "ok"
+    }
+  },
+  "recall": {
+    "receipt": {
+      "exit_code": 0,
+      "wall_seconds": 0.378,
+      "stdout_sha256": "1a55e3708e218a9ce190d3cb3a2acea1e7598f4050c6883e2eecf882c9c99259",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "response": {
+      "limitations": [],
+      "request_id": "df678b22-c0be-452a-a475-e875a91cb2ca",
+      "result": {
+        "application": "unverified",
+        "budget_bytes": 8192,
+        "capabilities": {
+          "python": "ast",
+          "text": "lexical"
+        },
+        "checked_snapshot": "3fd0c08a-de4d-41c8-bf12-94ca12f7390f",
+        "checkpoint_reference": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+        "conflicts": [],
+        "constraints": [
+          {
+            "freshness": "not_applicable",
+            "record_id": "4d57e1d7-9b64-4a6e-9676-60cacc11cd54",
+            "text": "Current source and task contracts govern facts; bounded continuity summaries do not grant authority."
+          },
+          {
+            "freshness": "not_applicable",
+            "record_id": "52dd40ff-76a9-4bd6-9a90-1673cb62a54b",
+            "text": "Preserve acknowledged jobs and lease fencing across restarts."
+          },
+          {
+            "freshness": "not_applicable",
+            "record_id": "715cf24f-df40-4ab0-b56a-2874c3761b6b",
+            "text": "SQLite WAL and synchronous=FULL remain required; do not trade durability for throughput."
+          },
+          {
+            "freshness": "not_applicable",
+            "record_id": "ea06015b-867f-4e73-bc07-59a070f25564",
+            "text": "Keep tenant namespaces isolated; synthetic tenant headers are not production authentication."
+          },
+          {
+            "freshness": "unknown",
+            "record_id": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+            "text": "Current source and task contracts govern facts."
+          },
+          {
+            "freshness": "unknown",
+            "record_id": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+            "text": "Keep the supplied Go module and SQLite driver helper/test unchanged."
+          },
+          {
+            "freshness": "unknown",
+            "record_id": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+            "text": "Use Go 1.26.3, standard library, and the pinned SQLite driver only."
+          },
+          {
+            "freshness": "unknown",
+            "record_id": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+            "text": "Keep tenant isolation, WAL, synchronous FULL durability, and SQLite as the shared authority."
+          },
+          {
+            "freshness": "unknown",
+            "record_id": "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db",
+            "text": "Do not commit, deploy, publish, use external services, or inspect evaluator artifacts."
+          }
+        ],
+        "decisions": [
+          {
+            "freshness": "not_applicable",
+            "record_id": "4d57e1d7-9b64-4a6e-9676-60cacc11cd54",
+            "summary": "Current source and task contracts govern facts; bounded continuity summaries do not grant authority."
+          },
+          {
+            "freshness": "not_applicable",
+            "record_id": "52dd40ff-76a9-4bd6-9a90-1673cb62a54b",
+            "summary": "Preserve acknowledged jobs and lease fencing across restarts."
+          },
+          {
+            "freshness": "not_applicable",
+            "record_id": "715cf24f-df40-4ab0-b56a-2874c3761b6b",
+            "summary": "SQLite WAL and synchronous=FULL remain required; do not trade durability for throughput."
+          },
+          {
+            "freshness": "not_applicable",
+            "record_id": "ea06015b-867f-4e73-bc07-59a070f25564",
+            "summary": "Keep tenant namespaces isolated; synthetic tenant headers are not production authentication."
+          }
+        ],
+        "delivery": "emitted",
+        "excluded_scope": [],
+        "expansion_handle": null,
+        "pack_id": "caade43a-c245-4a76-8c78-396d33985c4b",
+        "project_id": "e0c2cccb-0b17-4c4b-bbb1-2ebd7f98416d",
+        "schema": "opensocrates.project-memory.context-pack/1.0.0",
+        "searched_scope": [],
+        "source_evidence": [],
+        "task_id": "c4a7b000-0000-4000-8000-000000000003",
+        "unknowns": [
+          "5840cfa0-c637-4b7a-b8cb-9e5c4d69f5db:unknown",
+          "checkpoint_source_state_requires_revalidation"
+        ],
+        "used_bytes": 3004,
+        "workspace_id": "10b10385-d8ed-40be-94ab-0c4a59ace241",
+        "workspace_kind": "git_worktree"
+      },
+      "retryable": false,
+      "schema": "opensocrates.project-memory.response/1.0.0",
+      "status": "ok"
+    }
+  }
+}

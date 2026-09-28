@@ -1,0 +1,478 @@
+PAGE 1
+Meridian Parts | synthetic client analysis | 2025 base, cutoff 2026-01-31
+Page 1
+Meridian Parts
+European service-hub expansion — board decision brief
+Recommendation: fund Czechia + Spain as a gated option, with €225,000 year-zero capex and 5
+FTE, only after the 90-day launch gates confirm operational readiness. Under the board policy's base
+arithmetic, the option produces €198,099 annual incremental contribution and pays back in 1.14 years;
+it is not a statistically proven or causal forecast.
+Decision at a glance
+Metric
+Selected option
+Strongest alternative
+Defer
+Base annual contribution
+€198,099
+€186,329
+€0
+Year-zero capex
+€225,000
+€240,000
+€0
+FTE
+5
+6
+0
+Payback
+1.14 years
+1.29 years
+—
+Stress annual contribution
+€32,180
+€29,264
+€0
+Why this is the decision
+The recommendation is driven by the observed 2025 contribution base and the client-supplied policy arithmetic, not by
+population or GDP as a demand proxy. The selected option is the highest base-case feasible alternative after applying the
+hard €450,000 capex and 7 FTE limits. Its concession is upfront capital and operating complexity; the strongest alternative
+(POL+ESP) gives up €11,770 of base annual contribution while requiring €-15,000 different capex. That trade-off is
+material enough to require a gate, not a blanket commitment.
+2025 baseline diagnosis
+The reconciled 2025 base contains 1,254 shipped orders and 77,436 units. Gross sales are €4,464,622, refunds €80,831,
+net sales €4,383,792, net COGS €2,246,919, fulfillment €106,862, and contribution €2,030,010 (46.3% margin). Returned
+units are 1,081. Booked revenue is gross sales less refunds in the original sale-month translation; cash timing can differ
+because returns are received through the cutoff, while contribution additionally deducts net COGS and nonrefundable
+fulfillment. These are not interchangeable measures.
+Country
+Orders
+Units
+Net sales
+Contribution
+Margin
+Returned
+units
+Spain
+209
+13,931
+€850,839
+€421,900
+49.6%
+252
+Czechia
+209
+13,733
+€815,307
+€397,335
+48.7%
+288
+Poland
+209
+13,163
+€761,890
+€356,494
+46.8%
+180
+Netherlands
+209
+12,576
+€697,733
+€315,644
+45.2%
+144
+France
+209
+11,880
+€632,231
+€276,271
+43.7%
+144
+Germany
+209
+12,153
+€625,792
+€262,366
+41.9%
+73
+
+
+PAGE 2
+Meridian Parts | synthetic client analysis | 2025 base, cutoff 2026-01-31
+Page 2
+Evidence and accounting controls
+The two order extracts, correction file, returns file, unit-cost table, scenario policy and data dictionary are synthetic client
+inputs. The order pipeline removes exact repeated rows, selects the highest revision per order ID, keeps valid zero-price
+shipments, excludes cancelled/test/future shipments, and counts distinct order IDs. Returns select the highest revision per
+return ID, remove exact repeats, add distinct return IDs, require an eligible linked order, and use the inclusive 2026-01-31
+cutoff. No orphan return is matched by guess. The original sale month's mean ECB business-day quote is used for both
+sale and refund conversion; PLN and CZK are not inverted.
+ scope: 2025 shipped orders and returns received through inclusive 2026-01-31
+ orders_raw_rows: 1328
+ orders_unique_after_dedup: 1297
+ orders_exact_duplicate_rows_removed: 13
+ orders_revision_replacements: 18
+ orders_same_revision_conflicts: 0
+ orders_eligible: 1254
+ orders_excluded_cancelled: 24
+ orders_excluded_test: 18
+ orders_excluded_not_2025: 1
+ valid_zero_price_orders_preserved: 12
+ returns_raw_rows: 264
+ returns_unique_after_dedup: 243
+ returns_exact_duplicate_rows_removed: 20
+ returns_revision_replacements: 1
+ returns_eligible: 241
+ returns_orphan_returns: 1
+ returns_on_ineligible_orders: 0
+ returns_after_cutoff: 1
+ fx_observations_2025: 255
+ fx_pln_months: 12
+ fx_czk_months: 12
+ fx_missing_rate_cells: 0
+ missing_fx_rates: 0
+ missing_unit_costs: 0
+ returns_exceed_shipped_units: 0
+ negative_gross_sales: 0
+ negative_refunds: 0
+ monthly_to_country_reconciliation: True
+ handling: Anomalies are retained in reconciled CSVs and counted here; orphans and ineligible/late returns are excluded per data dictionary, never
+silently matched.
+
+
+PAGE 3
+Meridian Parts | synthetic client analysis | 2025 base, cutoff 2026-01-31
+Page 3
+Market context — context, not demand proof
+Market
+2022–24 population change
+2024 population
+2024 GDP/person (current US$)
+Germany
+0.4%
+83,516,593
+$56,104
+France
+0.5%
+68,551,653
+$46,103
+Spain
+2.2%
+48,848,840
+$35,327
+Poland
+-0.7%
+36,559,233
+$25,104
+Netherlands
+1.7%
+17,993,485
+$67,465
+Czechia
+2.2%
+10,905,028
+$31,828
+The archived World Bank series show differing scale and recent population trajectories, while current-US-dollar GDP per
+capita supplies economic context. Neither series is a direct measure of Meridian Parts demand, service density, customer
+concentration, or hub savings. The source room preserves 2022–2024 values, units, missingness and the 2026-07-13
+revision vintage; the ECB archive preserves the reference-rate observations used in the calculation.
+Hub economics and trade-offs
+The hub policy defines annual incremental contribution as baseline contribution × volume uplift + projected units × (1 +
+uplift) × saving per unit − annual fixed cost. Capex is not subtracted from that annual measure; it is year-zero cash and is
+used in simple undiscounted payback. The stress case jointly applies a 3% gross-sales refund shock and a 10% net-sales
+FX shock for PLN/CZK markets. Pairs add country figures without synergy.
+Alternative
+Low
+Base
+High
+Stress
+Capex
+FTE
+Base
+payback
+CZE+ESP
+€64,619
+€198,099
+€331,580
+€32,180
+€225,000
+5
+1.14
+POL+ESP
+€58,562
+€186,329
+€314,096
+€29,264
+€240,000
+6
+1.29
+POL+CZE
+€56,856
+€178,995
+€301,134
+€-78,570
+€205,000
+5
+1.15
+NLD+ESP
+€43,994
+€166,931
+€289,869
+€107,630
+€270,000
+6
+1.62
+NLD+CZE
+€42,289
+€159,598
+€276,907
+€-203
+€235,000
+5
+1.47
+NLD+POL
+€36,232
+€147,828
+€259,423
+€-3,119
+€250,000
+6
+1.69
+FRA+ESP
+€13,687
+€129,849
+€246,012
+€73,105
+€340,000
+7
+2.62
+FRA+CZE
+€11,981
+€122,516
+€233,050
+€-34,729
+€305,000
+6
+2.49
+FRA+POL
+€5,924
+€110,745
+€215,566
+€-37,645
+€320,000
+7
+2.89
+DEU+CZE
+€-2,549
+€105,472
+€213,492
+€-51,410
+€375,000
+7
+3.56
+ESP
+€33,162
+€102,716
+€172,270
+€70,007
+€130,000
+3
+1.27
+CZE
+€31,457
+€95,383
+€159,309
+€-37,827
+€95,000
+2
+1.00
+FRA+NLD
+€-8,644
+€91,348
+€191,339
+€40,721
+€350,000
+7
+3.83
+POL
+€25,400
+€83,612
+€141,825
+€-40,743
+€110,000
+3
+1.32
+NLD
+€10,832
+€64,215
+€117,598
+€37,623
+€140,000
+3
+2.18
+FRA
+€-19,476
+€27,133
+€73,741
+€3,098
+€210,000
+4
+7.74
+DEU
+€-34,006
+€10,089
+€54,183
+€-13,583
+€280,000
+5
+27.75
+
+
+PAGE 4
+Meridian Parts | synthetic client analysis | 2025 base, cutoff 2026-01-31
+Page 4
+Decision conditions and flip points
+The base-case choice is supported only as a transparent planning estimate. The selected option's policy break-even
+volume uplift is approximately 2.7% under unchanged unit savings and fixed costs; below that, the base arithmetic does
+not cover recurring fixed cost. A second flip condition is operational: if the 90-day gate cannot evidence the uplift/savings
+prerequisites or if the downside KPI indicates stress-like performance, defer capex and retain the central-hub baseline. The
+strongest alternative remains relevant because it uses different capital and staffing; do not treat its lower base contribution
+as a universal ranking outside the stated criteria.
+Staged 90-day implementation
+Stage / owner
+Action and dependency
+Decision gate / KPI
+Days 0–30 — COO +
+Finance
+Lock baseline definitions, order/return controls, site shortlist, labor and
+lease diligence; dependency: finance approves a single contribution
+bridge and source register.
+Gate 1: no unresolved data or legal red flags.
+KPI: ≥99.5% order-ID reconciliation; 100%
+refunds linked or quarantined.
+Days 31–60 — Operations +
+Procurement
+Validate 3PL/lease quotes, staffing plan, pick-pack process,
+service-level design and savings measurement; dependency: site and
+provider quotes.
+Gate 2: all-in capex within budget and
+staffing within 7 FTE. KPI: quoted cost
+variance ≤10%; documented saving €/unit by
+market.
+Days 61–90 — Country lead
++ IT
+Run a controlled launch readiness test using simulated order flow and
+returns, monitor service levels and FX exposure; dependency:
+systems, training and inventory controls.
+Gate 3: release capex only if evidence
+supports at least the break-even uplift and no
+critical control fails. KPI: ≥95% on-time
+dispatch, return processing ≤48h, weekly
+contribution bridge.
+Key risks and mitigations
+Demand uplift and savings are planning assumptions rather than observed hub effects; mitigate with staged release and a
+measured €/unit bridge. Returns could erode savings; monitor return rate, refund EUR and restocked units separately. FX
+reference rates are analytical translations, not transaction hedge outcomes; retain monthly PLN/CZK monitoring. Capex
+and labor quotes may drift; set approval tolerances and a stop-work gate. Hub pairs are modeled without synergy; any
+claimed network benefit is outside this estimate and requires separate evidence.
+
+
+PAGE 5
+Meridian Parts | synthetic client analysis | 2025 base, cutoff 2026-01-31
+Page 5
+Limitations, evidence register and reproducibility
+Material limits: the client inputs are synthetic; no customer interviews, demand experiment, lease quotes, service-level
+observations or actual hub pilot are present. The World Bank/ECB material is an archived official snapshot, not a live pull
+at analysis time. The scenario policy is simple undiscounted arithmetic and does not include tax, working capital, inventory
+holding, cannibalization, network interaction, ramp timing, or discounting. Returns are known only through the cutoff; later
+cash timing can differ. Recommendations therefore require gates and should be reopened if the break-even uplift, fixed
+cost, capex, return rate or FX assumptions change materially.
+ID
+File
+Status
+Period / units
+Original URL
+SR-01
+data-dictionary.md
+synthetic client input
+client accounting policy / see file / not applicable
+http://127.0.0.1:49795/data-dictionary.
+md
+SR-02
+ecb-history.csv
+public archived official snapshot
+1999-01-04 to 2026-09-25 observations / local currency
+units per EUR
+https://www.ecb.europa.eu/stats/eurof
+xref/eurofxref-hist.zip
+SR-03
+ecb-history.zip
+public archived official snapshot
+official ECB history archive / see file / not applicable
+https://www.ecb.europa.eu/stats/eurof
+xref/eurofxref-hist.zip
+SR-04
+gdp-per-capita.json
+public archived official snapshot
+2022-2024 / current US$ per person
+https://api.worldbank.org/v2/country/D
+EU;FRA;NLD;POL;CZE;ESP/indicator/
+NY.GDP.PCAP.CD?date=2022:2024&
+format=json&per_page=1000
+SR-05
+hub-options.csv
+synthetic client input
+planning assumptions / EUR, FTE, EUR per unit
+http://127.0.0.1:49795/hub-options.csv
+SR-06
+order-corrections.csv
+synthetic client input
+2025-02-08 to 2025-11-08 corrections / local currency
+sales; EUR fulfillment
+http://127.0.0.1:49795/order-correction
+s.csv
+SR-07
+orders-part1.csv
+synthetic client input
+2025-01-01 to 2026-01-05 shipment records / local currency
+sales; EUR fulfillment
+http://127.0.0.1:49795/orders-part1.csv
+SR-08
+orders-part2.csv
+synthetic client input
+2025-01-04 to 2026-01-05 shipment records / local currency
+sales; EUR fulfillment
+http://127.0.0.1:49795/orders-part2.csv
+SR-09
+population.json
+public archived official snapshot
+2022-2024 / persons
+https://api.worldbank.org/v2/country/D
+EU;FRA;NLD;POL;CZE;ESP/indicator/
+SP.POP.TOTL?date=2022:2024&form
+at=json&per_page=1000
+SR-10
+returns.csv
+synthetic client input
+2025-01-28 to 2026-02-01 returns / local currency refunds;
+physical units
+http://127.0.0.1:49795/returns.csv
+SR-11
+scenario-policy.md
+synthetic client input
+board scenario policy / see file / not applicable
+http://127.0.0.1:49795/scenario-policy.
+md
+SR-12
+source-register.json
+synthetic client input
+not applicable / see file / not applicable
+http://127.0.0.1:49795/source-register.j
+son
+SR-13
+unit-costs.csv
+synthetic client input
+2025 effective-dated costs / EUR per unit
+http://127.0.0.1:49795/unit-costs.csv
+Reproduce from the workspace: python3 scripts/build_analysis.py. Verification outputs include deliverables/metrics.json,
+deliverables/meridian_parts_analysis.xlsx, the generated report and presentation, reconciled CSVs in analysis/, and hashes in
+evidence/source_register.json.

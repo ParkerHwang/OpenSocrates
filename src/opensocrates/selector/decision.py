@@ -12,6 +12,12 @@ from ..domain.enums import Participation
 from ..domain.models import CompiledContentBundle
 from ..domain.routing import RoutingCatalog, route_features, validate_routing_payload
 from ..rendering.response_policy import response_guidance, validate_response_policy
+from .decision_requests import (
+    DecisionRequestError,
+    diagnose_routing,
+    prepare_request,
+    validate_envelope,
+)
 
 
 @dataclass(repr=False)
@@ -58,32 +64,34 @@ class DecisionSession:
             return self._failure("recursive_request")
         self.busy = True
         try:
-            if not isinstance(value, dict):
-                raise ValueError
+            value = validate_envelope(value)
             operation = value.get("operation")
             if operation == "catalog":
                 return self._catalog(value)
+            if operation == "prepare":
+                return prepare_request(value["locale"])
             if operation == "acknowledge":
                 return self._acknowledge(value)
             if operation == "reset":
-                if set(value) != {"operation"}:
-                    raise ValueError
                 self._reset()
                 return {"status": "reset", "context_eviction": False}
             return self._select(value)
+        except DecisionRequestError as exc:
+            return self._failure("invalid_decision_request", exc.diagnostic)
         except (ValueError, TypeError, KeyError):
             return self._failure("invalid_decision_request")
         finally:
             self.busy = False
 
     @staticmethod
-    def _failure(reason: str) -> dict[str, Any]:
+    def _failure(reason: str, diagnostic: dict[str, Any] | None = None) -> dict[str, Any]:
         return {
             "status": "unavailable",
             "reason": reason,
             "applied": "unverified",
             "continue_ordinary_work": True,
             "constraints_remain_binding": True,
+            **({"diagnostic": diagnostic} if diagnostic is not None else {}),
         }
 
     def _reset(self) -> None:
@@ -95,8 +103,6 @@ class DecisionSession:
         self.available.clear()
 
     def _catalog(self, value: dict[str, Any]) -> dict[str, Any]:
-        if set(value) != {"operation", "locale"} or value["locale"] not in {"en", "ko"}:
-            raise ValueError
         locale = value["locale"]
         return {
             "status": "catalog",
@@ -109,17 +115,15 @@ class DecisionSession:
         }
 
     def _acknowledge(self, value: dict[str, Any]) -> dict[str, Any]:
-        if set(value) != {"operation", "context", "epoch", "digests"}:
-            raise ValueError
+        if (value["context"], value["epoch"]) != self.scope:
+            raise DecisionRequestError("current_session_scope_required", "$.context")
         digests = value["digests"]
         if (
-            type(value["epoch"]) is not int
-            or (value["context"], value["epoch"]) != self.scope
-            or not isinstance(digests, list)
+            not isinstance(digests, list)
             or len(digests) > len(self.bundle.methods)
             or any(not isinstance(d, str) or d not in self.delivered.values() for d in digests)
         ):
-            raise ValueError
+            raise DecisionRequestError("delivered_digests_required", "$.digests")
         self.available.update(
             (identity, digest) for identity, digest in self.delivered.items() if digest in digests
         )
@@ -132,46 +136,14 @@ class DecisionSession:
 
     def _scope(self, value: dict[str, Any]) -> None:
         context, epoch = value["context"], value["epoch"]
-        # Context handles are random opaque IDs, not prompts, workspace paths or host IDs.
-        if (
-            not isinstance(context, str)
-            or len(context) != 32
-            or any(c not in "0123456789abcdef" for c in context)
-            or type(epoch) is not int
-            or epoch < 0
-        ):
-            raise ValueError
         new_scope = (context, epoch)
         if self.scope and self.scope[0] == context and epoch < self.scope[1]:
-            raise ValueError
+            raise DecisionRequestError("epoch_must_not_regress", "$.epoch")
         if new_scope != self.scope:
             self._reset()
             self.scope = new_scope
 
     def _select(self, value: dict[str, Any]) -> dict[str, Any]:
-        expected = {
-            "operation",
-            "context",
-            "epoch",
-            "decision",
-            "revision",
-            "locale",
-            "participation",
-            "routing",
-        }
-        if set(value) != expected or value["operation"] != "select":
-            raise ValueError
-        if (
-            value["locale"] not in {"en", "ko"}
-            or type(value["revision"]) is not int
-            or value["revision"] < 0
-            or not isinstance(value["decision"], str)
-            or not value["decision"].isascii()
-            or not value["decision"].isalnum()
-            or len(value["decision"]) > 64
-        ):
-            raise ValueError
-        self._scope(value)
         participation = Participation(value["participation"])
         payload = validate_routing_payload(value["routing"])
         if (
@@ -179,10 +151,15 @@ class DecisionSession:
             or payload.invalid_feature_list
             or payload.features is None
         ):
-            raise ValueError
+            raise diagnose_routing(value["routing"])
         explicit = payload.features.explicit_method
         if explicit is not None and explicit not in self.assembler.known_method_ids():
-            return self._failure("unknown_method")
+            return self._failure(
+                "unknown_method",
+                {"code": "catalog_method_required", "field_path": "$.routing.explicit_method"},
+            )
+        # Rejected requests must not retire valid content-availability assertions.
+        self._scope(value)
         key = hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
         reused = key == self.last_key
         if reused:

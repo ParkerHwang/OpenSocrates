@@ -1,0 +1,26 @@
+{
+  "schema": "opensocrates.eval.continuity-setup/1.0.0",
+  "scope": "disposable project and workspace only",
+  "memory_api_owner": "evaluation harness, never the read-only continuation role",
+  "pre_correction_records": [
+    {"id": "2a6ef571-6bcc-447e-94cd-64939f350101", "kind": "accepted_decision", "key": "stack", "value": "Go backend and TypeScript frontend", "status": "current"},
+    {"id": "2a6ef571-6bcc-447e-94cd-64939f350102", "kind": "accepted_decision", "key": "notification_target", "value": "fake outbox only", "status": "current"},
+    {"id": "2a6ef571-6bcc-447e-94cd-64939f350103", "kind": "accepted_constraint", "key": "viewer_permission", "value": "read only", "status": "current"},
+    {"id": "2a6ef571-6bcc-447e-94cd-64939f350107", "kind": "accepted_constraint", "key": "focus_rule", "value": "retain keyboard focus after dashboard refresh", "status": "current"},
+    {"id": "2a6ef571-6bcc-447e-94cd-64939f350104", "kind": "source_dependent_accepted_fact", "key": "p1_delay_minutes", "value": 45, "source": "service-policy@1", "status_after_correction": "stale"},
+    {"id": "2a6ef571-6bcc-447e-94cd-64939f350105", "kind": "proposed_preference", "key": "visual_tone", "value": "purple", "status": "proposed_not_accepted"},
+    {"id": "2a6ef571-6bcc-447e-94cd-64939f350106", "kind": "temporary_demo_record", "key": "demo_region", "value": "west-demo", "status_after_scoped_forget": "deleted"}
+  ],
+  "transition": [
+    "In a disposable per-episode source root, first write private/harness_initial_source.md bytes to tracked current-source.md, observe/record/accept the source-dependent P1 fact against that exact path with the existing memory API, then replace current-source.md with public/current-source.md bytes before native request preparation. Verify both byte digests and the stale projection after correction.",
+    "Use the existing memory API to delete only record 2a6ef571-6bcc-447e-94cd-64939f350106. Verify persisted export and next projection omit that record.",
+    "Verify accepted stack/outbox/viewer records survive, proposal remains proposed, and no cache resurrects changed/deleted record.",
+    "Build equivalent maintained-note control from the same valid retained facts and stale/proposed statuses."
+  ],
+  "postconditions": {
+    "deleted_record_absent": "2a6ef571-6bcc-447e-94cd-64939f350106",
+    "retained_record_ids": ["2a6ef571-6bcc-447e-94cd-64939f350101", "2a6ef571-6bcc-447e-94cd-64939f350102", "2a6ef571-6bcc-447e-94cd-64939f350103", "2a6ef571-6bcc-447e-94cd-64939f350107"],
+    "stale_record_id": "2a6ef571-6bcc-447e-94cd-64939f350104",
+    "unaccepted_record_id": "2a6ef571-6bcc-447e-94cd-64939f350105"
+  }
+}

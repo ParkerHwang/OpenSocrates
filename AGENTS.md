@@ -40,7 +40,7 @@ Do not start implementation from an unverified local branch, stale transcript, o
 - Do not hand-edit generated files in `schemas/v1/`, `content/compiled-*.json`, `build/`, or `dist/`.
 - Run `make generate` after changing canonical generated inputs and commit canonical and generated changes together.
 - Keep English and Korean user-facing content semantically aligned.
-- Do not add telemetry, credential collection, raw prompt or transcript logging, workspace-content retention, or hidden reasoning capture.
+- Do not add telemetry, credential collection, raw prompt or transcript logging, source-file copies, or hidden reasoning capture. Optional project memory may retain bounded public decisions, task checkpoints, source references, content digests, and declared document/code-index metadata only after explicit project enrollment under its selected policy. The default `decision` command and ordinary hooks remain content-only and do not initialize or write project memory. Enrolled data must be inspectable, exportable, disableable, and deletable.
 - Preserve fail-open behavior, bounded selection, cleanup, transactional rollback, and explicit unknown/unavailable states.
 - Distinguish implemented, locally validated, release-validated, and live-probe evidence. Never upgrade a claim because implementation or offline CI exists.
 

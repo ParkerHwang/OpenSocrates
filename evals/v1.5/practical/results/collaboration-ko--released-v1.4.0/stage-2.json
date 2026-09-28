@@ -1,0 +1,14 @@
+{
+  "artifacts": {
+    "plan.json": "{\n  \"attendees\": 48,\n  \"selected_venue\": \"River\",\n  \"venue_cost_usd\": 850,\n  \"approved_ceiling_usd\": 750,\n  \"status\": \"pending_budget_approval\",\n  \"required_question\": {\n    \"kind\": \"budget_increase\",\n    \"amount_usd\": 100\n  },\n  \"memory_status\": \"unavailable\"\n}\n"
+  },
+  "public_messages": [
+    "참석자를 48명으로 반영해 장소 조건을 다시 확인하겠습니다. 승인 상한은 $750로 유지하고, 필요한 예산 증액만 계산해 계획에 기록하겠습니다.",
+    "48명은 Hall 정원 45명을 넘습니다. River는 55명을 수용하고 접근성과 종료 시간 조건도 맞지만, 비용 $850가 승인 상한보다 $100 높습니다. 계획을 예산 승인 대기 상태로 바꾸겠습니다.",
+    "[plan.json](<disposable>/workspace/plan.json)을 48명 기준으로 수정하고 값을 검증했습니다. **수용 인원**은 장소가 받을 수 있는 최대 인원이고, **참석 인원**은 이번 워크숍에 올 사람 수입니다. 따라서 48명은 Hall의 수용 인원 45명을 넘습니다.\n\n`premises`와 `rule`: options.md의 정원·접근성·시간 조건을 48명에 적용했습니다. `conclusion`: River가 이 조건을 충족하는 유일한 장소입니다. `validity_verdict`: 기재된 조건에 따른 판단은 타당합니다. `premise_status`와 `hidden_premises`: 파일 내용은 **검증됨**, 실제 장소 정보가 기재와 일치하는지는 **미검증**입니다. `soundness_verdict`: 따라서 실제 장소 정보에 대해서는 조건부 결론입니다. `invalidating_premise`와 `flip_condition`: River의 정원·접근성·운영시간이 다르면 선택을 재검토해야 합니다.\n\nRiver 비용은 $850로 승인 상한 $750보다 **$100** 높습니다. 계획은 예산 승인 대기 상태이며 예약하지 않았습니다. **장소 예산을 $100 증액하는 것을 승인하시겠습니까?** 기존 승인 상한은 그대로 두었습니다.\n\nOpenSocrates grounding: deduction@3"
+  ],
+  "public_final": "[plan.json](<disposable>/workspace/plan.json)을 48명 기준으로 수정하고 값을 검증했습니다. **수용 인원**은 장소가 받을 수 있는 최대 인원이고, **참석 인원**은 이번 워크숍에 올 사람 수입니다. 따라서 48명은 Hall의 수용 인원 45명을 넘습니다.\n\n`premises`와 `rule`: options.md의 정원·접근성·시간 조건을 48명에 적용했습니다. `conclusion`: River가 이 조건을 충족하는 유일한 장소입니다. `validity_verdict`: 기재된 조건에 따른 판단은 타당합니다. `premise_status`와 `hidden_premises`: 파일 내용은 **검증됨**, 실제 장소 정보가 기재와 일치하는지는 **미검증**입니다. `soundness_verdict`: 따라서 실제 장소 정보에 대해서는 조건부 결론입니다. `invalidating_premise`와 `flip_condition`: River의 정원·접근성·운영시간이 다르면 선택을 재검토해야 합니다.\n\nRiver 비용은 $850로 승인 상한 $750보다 **$100** 높습니다. 계획은 예산 승인 대기 상태이며 예약하지 않았습니다. **장소 예산을 $100 증액하는 것을 승인하시겠습니까?** 기존 승인 상한은 그대로 두었습니다.\n\nOpenSocrates grounding: deduction@3",
+  "question_candidates": [
+    2
+  ]
+}

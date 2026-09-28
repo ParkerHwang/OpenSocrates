@@ -1,0 +1,110 @@
+{
+  "cutoff_inclusive": "2026-01-31",
+  "order_revision_audit": {
+    "raw_rows": 1328,
+    "identical_duplicates_removed": 13,
+    "selected_ids": 1297,
+    "superseded_rows": 18
+  },
+  "order_eligibility_counts": {
+    "eligible_shipped_2025_before_value_validation": 1254,
+    "cancelled": 24,
+    "test_flag_true": 18,
+    "shipped_in_2026_excluded": 1
+  },
+  "order_exclusions": {
+    "status_not_shipped": 24,
+    "test_flag_true": 18,
+    "shipped_outside_2025": 1
+  },
+  "order_missing_value_counts_among_eligible_candidates": {},
+  "selected_orders_calculated": 1254,
+  "return_revision_audit": {
+    "raw_rows": 264,
+    "identical_duplicates_removed": 20,
+    "selected_ids": 243,
+    "superseded_rows": 1
+  },
+  "returns_handling_counts": {
+    "included_return_ids": 241,
+    "included_returned_units": 1081,
+    "after_cutoff": 1,
+    "orphan_order_id": 1,
+    "latest_return_ids": 243,
+    "superseded_rows": 1,
+    "identical_duplicates_removed": 20
+  },
+  "unit_cost_effective_date_rule": "latest valid_from on or before original shipped_at; local file rows preserved",
+  "included_valid_zero_price_shipments": 12,
+  "exact_order_revision_conflicts": 0,
+  "monthly_country_reconciliation": "passed for counts and all monetary totals in every country",
+  "anomalies": [
+    {
+      "severity": "handled",
+      "issue": "Exact repeated order rows across extracts/corrections",
+      "count": 13,
+      "handling": "Collapsed as one record before order_id revision selection."
+    },
+    {
+      "severity": "handled",
+      "issue": "Lower order revisions superseded",
+      "count": 18,
+      "handling": "Highest numeric revision selected; the later row replaced the whole earlier row."
+    },
+    {
+      "severity": "handled",
+      "issue": "Cancelled or non-shipped orders",
+      "count": 24,
+      "handling": "Excluded from 2025 shipped revenue and units."
+    },
+    {
+      "severity": "handled",
+      "issue": "Test orders",
+      "count": 18,
+      "handling": "Excluded from 2025 shipped revenue and units."
+    },
+    {
+      "severity": "handled",
+      "issue": "Orders shipped outside 2025",
+      "count": 1,
+      "handling": "Excluded from the 2025 base, including 2026-01 shipments."
+    },
+    {
+      "severity": "handled",
+      "issue": "Zero-price/free shipments",
+      "count": 12,
+      "handling": "Included as valid shipped orders and units; zero sales value retained."
+    },
+    {
+      "severity": "handled",
+      "issue": "Exact repeated return rows",
+      "count": 20,
+      "handling": "Collapsed by exact row equality before return_id revision selection."
+    },
+    {
+      "severity": "handled",
+      "issue": "Lower return revisions superseded",
+      "count": 1,
+      "handling": "Highest numeric revision selected per return_id."
+    },
+    {
+      "severity": "handled",
+      "issue": "Returns received after inclusive cutoff",
+      "count": 1,
+      "handling": "Excluded because received_at is later than 2026-01-31."
+    },
+    {
+      "severity": "review",
+      "issue": "Orphan returns",
+      "count": 1,
+      "handling": "Quarantined; no approximate or guessed order match was made."
+    }
+  ],
+  "limitations": [
+    "Client transaction, return, cost, hub, savings, fixed-cost and volume-uplift inputs are synthetic, not observed customer or operations evidence.",
+    "ECB reference rates are archived analytical translations, not actual settlement rates; same original-sale-month rate is used for gross and refunds.",
+    "Returns are only those received by 2026-01-31; later claims can revise the 2025 view.",
+    "Hub scenario output is a simple annual contribution comparison without causal validation, synergy, tax, discounting, working capital, or terminal value.",
+    "World Bank historical archive vintage is 2026-07-13 last updated and may include revisions made after the reference years."
+  ]
+}

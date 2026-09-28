@@ -1,0 +1,78 @@
+{
+  "browser_or_candidate_reruns": 0,
+  "cases": [
+    {
+      "attribution": "contextual_accessible_name_vs_exact_probe_regex",
+      "browser_transport_passed": true,
+      "browser_transport_unassessable": false,
+      "browser_ui_failed": true,
+      "browser_ui_status": null,
+      "candidate_source_sha256": {
+        "web/api.ts": "51afde85845f5b6251115a09ef499d918a6083daad6f09fcfc799da83e461ba2",
+        "web/app.ts": "9b0ff2737441c60bf2223d0eebbc71bceb1d293d308cbe3b391588b3a51dec90",
+        "web/view.ts": "c5f49e875f990805cdee2f466575b188de5e37bc8e942ff3babcd348c81b999f"
+      },
+      "cell_id": "S-gpt-6-sol-high-B",
+      "formal_status": "deterministic_failure",
+      "receipt_sha256": "0c3a28295163fe1630270408a404a0bbebc65bae2b0494d269820c8425205e50",
+      "source_review_limit": "visible ACK button text with contextual aria-label; exact /^ACK$/ probe cannot match. Public accessible-name wording leaves contextual names ambiguous."
+    },
+    {
+      "attribution": "contextual_accessible_name_vs_exact_probe_regex",
+      "browser_transport_passed": true,
+      "browser_transport_unassessable": false,
+      "browser_ui_failed": true,
+      "browser_ui_status": null,
+      "candidate_source_sha256": {
+        "web/api.ts": "3fd1a3beb44a9a71603df18febc119eb36afa3052e02825b6fda9e84a0a40d83",
+        "web/app.ts": "b2871c66ef66e21a9488d4a887d07b99e0189716ace38da1f44ce9549c9a1c3e",
+        "web/view.ts": "1e943e72b7e916414ad6909d0504796b9dd9229abd70176ce65e57abfba8f0c6"
+      },
+      "cell_id": "S-gpt-5.6-luna-max-B",
+      "formal_status": "deterministic_failure",
+      "receipt_sha256": "2eebb1a7144c37a3a208b0548b013aaef82844b1d32204a439ec0b33deda395e",
+      "source_review_limit": "visible ACK button text with contextual aria-label; exact /^ACK$/ probe cannot match. Public accessible-name wording leaves contextual names ambiguous."
+    },
+    {
+      "attribution": "summary_render_call_omitted",
+      "browser_transport_passed": true,
+      "browser_transport_unassessable": false,
+      "browser_ui_failed": true,
+      "browser_ui_status": null,
+      "candidate_source_sha256": {
+        "web/api.ts": "efbfd6d8c1c507555add556e10f42966b596349ef87ab3c399b5c5d73402349b",
+        "web/app.ts": "0a6bf9e80afe3269493b30eaa5c3fd3c8439baf83278e27fb37ee71bdf81cb36",
+        "web/view.ts": "40d8a8d0dd2f6142ef020c976eda469ee14745206f98dddbfdd3b24a6c58e40f"
+      },
+      "cell_id": "S-gpt-6-luna-high-B",
+      "formal_status": "deterministic_failure",
+      "receipt_sha256": "e8463d2d4548b528cacfde385eeb0b748f368dd9746bac6f6f644ab30d420716",
+      "source_review_limit": "refresh fetches summary but omits imported renderSummary call; public filtered Summary behavior directly unsupported."
+    },
+    {
+      "attribution": "POST_response_timeout_cause_unresolved",
+      "browser_transport_passed": true,
+      "browser_transport_unassessable": false,
+      "browser_ui_failed": true,
+      "browser_ui_status": null,
+      "candidate_source_sha256": {
+        "web/api.ts": "4b0adfac3cad4c097fa01bef8de6599585e208e7ae4277ddbe24194d13ee26b4",
+        "web/app.ts": "f7b215be6bcdebf0e4259383f0c91e2aeab14d46773fa0ac81c18d310242f1fd",
+        "web/view.ts": "c252e1eb2234cef5c797851ff20f2af07121b0a9ec4dc3e4165af4527884c989"
+      },
+      "cell_id": "S-gpt-6-astra-xhigh-B",
+      "failure_screenshot_sha256": "e6926d9f176c60090e7cf1455cdd8cfcbd64f23c6388249796bf6b6ac1a1a8d5",
+      "formal_status": "deterministic_failure",
+      "receipt_sha256": "e4ecfcaaa21dc58b9f1e110d1220dcf40f5dfa35333e894d8ea2cd8b69fa738c",
+      "source_review_limit": "ACK visible and POST path wired in static source; no retained event/console trace to assign timeout cause."
+    }
+  ],
+  "failed_full_browser_rows": 4,
+  "formal_scores_changed": false,
+  "frozen_browser_probe_sha256": "716b08fd1a3601c4a79d9943f4dc95757848d747188a635d3c3e08bed2a31b67",
+  "interpretation": "Two selector-contract ambiguities, one supported candidate Summary defect, one cause-unresolved POST timeout; no FileServer transport signature among these four.",
+  "known_FileServer_truncation_signature_rows": 0,
+  "model_calls": 0,
+  "original_qualification_index_sha256": "c9b83a2380b6300e601e701d814b51e55de394fdd596c33219e86e495645686e",
+  "schema": "opensocrates.go-ts.S24-browser-failure-attribution/1"
+}

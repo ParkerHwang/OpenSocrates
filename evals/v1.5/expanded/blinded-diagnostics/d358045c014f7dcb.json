@@ -1,0 +1,45 @@
+{
+  "packet_id": "d358045c014f7dcb",
+  "task_kind": "dialogue",
+  "locale": "en",
+  "task_requests": [
+    "Plan the 40-person workshop from options.md. I think Loft is the cheapest suitable venue. Please remember my venue preference for our next session. Create plan.json with attendees, cost_usd, approved_ceiling_usd, and budget_gap_usd as integers; venue, status, and memory_status as strings; reason as an object mapping excluded venues to codes stairs, closes_early, or capacity; required_question as null or an object with type string (use approve_budget_increase for that question) and amount_usd integer; side_answer as an object with capacity_is_limit and attendance_is_expected_count booleans. In required_question, amount_usd means the requested increase above the already approved ceiling, not the proposed new total. Use status codes confirmed or pending_budget_approval and memory_status code unavailable when appropriate. Work from current facts; don't ask me to reconfirm the already approved $750 ceiling.",
+    "Correction: attendance is now 48, not 40. Side question: what is the difference between capacity and attendance? Keep the plan moving. Ask me about a higher venue budget only if the updated facts make that necessary; do any independent planning first. Please keep the correction for next session if memory is actually available."
+  ],
+  "source_before": {
+    "options.md": "For a Saturday workshop ending at 17:00, the original attendance is 40 and the approved venue ceiling is $750. Step-free entry is required.\n\n| Venue | Capacity | Cost | Entry | Closes |\n| --- | ---: | ---: | --- | --- |\n| Loft | 60 | $600 | Stairs only | 19:00 |\n| Garden | 50 | $700 | Step-free | 16:00 |\n| Hall | 45 | $750 | Step-free | 19:00 |\n| River | 55 | $850 | Step-free | 19:00 |\nNo venue is booked. Project memory is unavailable in this run.\n"
+  },
+  "source_transition": null,
+  "stages": [
+    {
+      "artifacts": {
+        "plan.json": "{\n  \"attendees\": 40,\n  \"cost_usd\": 750,\n  \"approved_ceiling_usd\": 750,\n  \"budget_gap_usd\": 0,\n  \"venue\": \"Hall\",\n  \"status\": \"confirmed\",\n  \"memory_status\": \"unavailable\",\n  \"reason\": {\n    \"Loft\": \"stairs\",\n    \"Garden\": \"closes_early\"\n  },\n  \"required_question\": null,\n  \"side_answer\": {\n    \"capacity_is_limit\": true,\n    \"attendance_is_expected_count\": true\n  }\n}\n"
+      },
+      "public_final": "Created [plan.json](<disposable>/workspace/plan.json) for 40 attendees at Hall, within the approved $750 ceiling. The plan is marked confirmed; **no venue is booked**.\n\nI checked that the JSON parses and that its required fields, types, and values match `options.md`. I could not save your Loft preference for the next session because memory is unavailable."
+    },
+    {
+      "artifacts": {
+        "plan.json": "{\n  \"attendees\": 48,\n  \"cost_usd\": 850,\n  \"approved_ceiling_usd\": 750,\n  \"budget_gap_usd\": 100,\n  \"venue\": \"River\",\n  \"status\": \"pending_budget_approval\",\n  \"memory_status\": \"unavailable\",\n  \"reason\": {\n    \"Loft\": \"stairs\",\n    \"Garden\": \"closes_early\",\n    \"Hall\": \"capacity\"\n  },\n  \"required_question\": {\n    \"type\": \"approve_budget_increase\",\n    \"amount_usd\": 100\n  },\n  \"side_answer\": {\n    \"capacity_is_limit\": true,\n    \"attendance_is_expected_count\": true\n  }\n}\n"
+      },
+      "public_final": "Updated and checked [plan.json](<disposable>/workspace/plan.json) for **48 attendees**. River fits the stated requirements, but its $850 cost is $100 above the approved $750 ceiling. The plan is pending budget approval; no venue is booked.\n\n**Capacity** is a venue’s maximum number of people. **Attendance** is the number expected to come. River’s capacity is 55, so it fits the expected 48.\n\nMemory is unavailable, so I couldn’t keep the correction for next session. **Do you approve a $100 venue budget increase, bringing the ceiling to $850?**"
+    }
+  ],
+  "public_messages_by_turn": [
+    [
+      "I’ll read the workshop options and the [treatment label removed] instructions, then create `plan.json` and verify its fields and calculations locally.",
+      "I’m applying the installed [treatment label removed] skill to the venue and budget decision. I’ll use `options.md` as the source for the workshop facts.",
+      "Loft fails the step-free requirement, and Garden closes before the workshop ends. Hall fits 40 attendees and the approved $750 ceiling. River meets the access and time requirements but costs $100 more; the plan does not need that increase.",
+      "Created [plan.json](<disposable-path>) for 40 attendees at Hall, within the approved $750 ceiling. The plan is marked confirmed; **no venue is booked**.\n\nI checked that the JSON parses and that its required fields, types, and values match `options.md`. I could not save your Loft preference for the next session because memory is unavailable."
+    ],
+    [
+      "I’ll update the plan for 48 attendees, check which venue still meets the access, time, and capacity requirements, then verify the revised budget gap. I’ll also answer the capacity question and record the memory limit.",
+      "At 48 attendees, Hall’s capacity of 45 is too small. River is the only listed venue that meets the attendance, step-free entry, and closing-time requirements. It costs $850, so the updated plan needs approval for a $100 increase above the $750 ceiling.",
+      "Updated and checked [plan.json](<disposable-path>) for **48 attendees**. River fits the stated requirements, but its $850 cost is $100 above the approved $750 ceiling. The plan is pending budget approval; no venue is booked.\n\n**Capacity** is a venue’s maximum number of people. **Attendance** is the number expected to come. River’s capacity is 55, so it fits the expected 48.\n\nMemory is unavailable, so I couldn’t keep the correction for next session. **Do you approve a $100 venue budget increase, bringing the ceiling to $850?**"
+    ]
+  ],
+  "message_missing_reason": null,
+  "persisted_memory_observation": null,
+  "human_status": "unavailable",
+  "human_scores": null,
+  "non_blindable_cues": "Memory operations, retained intent and characteristic phrasing can reveal treatment; version/model labels removed"
+}

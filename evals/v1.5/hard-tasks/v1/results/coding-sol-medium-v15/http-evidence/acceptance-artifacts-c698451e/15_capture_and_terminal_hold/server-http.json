@@ -1,0 +1,320 @@
+[
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "c44be623a8f64eed83c97e292ec73a9b"
+    },
+    "request": "{\"name\": \"a\", \"opening\": 100}",
+    "status": 201,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 100,
+        "reserved": 0,
+        "available": 100,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.001140250009484589
+  },
+  {
+    "method": "POST",
+    "path": "/accounts",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "3e10371397fa46228d7047b04aa3bea6"
+    },
+    "request": "{\"name\": \"b\", \"opening\": 40}",
+    "status": 201,
+    "response": {
+      "account": {
+        "name": "b",
+        "balance": 40,
+        "reserved": 0,
+        "available": 40,
+        "version": 1
+      }
+    },
+    "elapsed_s": 0.0009354169596917927
+  },
+  {
+    "method": "POST",
+    "path": "/holds",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "74e5dac2b29248f0894f29976f624ee3"
+    },
+    "request": "{\"account\": \"a\", \"amount\": 30}",
+    "status": 201,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 100,
+        "reserved": 30,
+        "available": 70,
+        "version": 2
+      },
+      "hold": {
+        "id": "3a951487a2f832040306f027cd73eb6a",
+        "account": "a",
+        "amount": 30,
+        "state": "active"
+      }
+    },
+    "elapsed_s": 0.0008447080035693944
+  },
+  {
+    "method": "POST",
+    "path": "/holds/3a951487a2f832040306f027cd73eb6a/capture",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "542f1c7ee7ac450590e8f1c89a7924ce"
+    },
+    "request": "{\"to\": \"b\", \"from_version\": 2, \"to_version\": 1}",
+    "status": 200,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 70,
+          "reserved": 0,
+          "available": 70,
+          "version": 3
+        },
+        {
+          "name": "b",
+          "balance": 70,
+          "reserved": 0,
+          "available": 70,
+          "version": 2
+        }
+      ],
+      "hold": {
+        "id": "3a951487a2f832040306f027cd73eb6a",
+        "account": "a",
+        "amount": 30,
+        "state": "captured"
+      },
+      "transfer": {
+        "id": "74be632e8538f2f5f5f8472f8e4c595c",
+        "from": "a",
+        "to": "b",
+        "amount": 30,
+        "reversed": false
+      }
+    },
+    "elapsed_s": 0.0009076249552890658
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/a",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 70,
+        "reserved": 0,
+        "available": 70,
+        "version": 3
+      }
+    },
+    "elapsed_s": 0.00028708402533084154
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/b",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "b",
+        "balance": 70,
+        "reserved": 0,
+        "available": 70,
+        "version": 2
+      }
+    },
+    "elapsed_s": 0.0002934169606305659
+  },
+  {
+    "method": "POST",
+    "path": "/holds/3a951487a2f832040306f027cd73eb6a/capture",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "72634a1271534fbb9889536402b3248c"
+    },
+    "request": "{\"to\": \"b\"}",
+    "status": 409,
+    "response": {
+      "error": {
+        "code": "terminal"
+      }
+    },
+    "elapsed_s": 0.0004022500361315906
+  },
+  {
+    "method": "POST",
+    "path": "/holds/3a951487a2f832040306f027cd73eb6a/release",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t",
+      "Idempotency-Key": "603b8d24b605465f80bba0bc729a7d7a"
+    },
+    "request": "{}",
+    "status": 409,
+    "response": {
+      "error": {
+        "code": "terminal"
+      }
+    },
+    "elapsed_s": 0.0003073749830946326
+  },
+  {
+    "method": "GET",
+    "path": "/entries?limit=100",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "entries": [
+        {
+          "seq": 1,
+          "account": "a",
+          "kind": "opening",
+          "balance_delta": 100,
+          "reserved_delta": 0,
+          "operation_id": "147c14756873eaaf6cccb54256cb6300"
+        },
+        {
+          "seq": 2,
+          "account": "b",
+          "kind": "opening",
+          "balance_delta": 40,
+          "reserved_delta": 0,
+          "operation_id": "2bea1b06c72b091f75c61017395ff4c4"
+        },
+        {
+          "seq": 3,
+          "account": "a",
+          "kind": "hold",
+          "balance_delta": 0,
+          "reserved_delta": 30,
+          "operation_id": "3a951487a2f832040306f027cd73eb6a"
+        },
+        {
+          "seq": 4,
+          "account": "a",
+          "kind": "capture",
+          "balance_delta": -30,
+          "reserved_delta": -30,
+          "operation_id": "74be632e8538f2f5f5f8472f8e4c595c"
+        },
+        {
+          "seq": 5,
+          "account": "b",
+          "kind": "capture",
+          "balance_delta": 30,
+          "reserved_delta": 0,
+          "operation_id": "74be632e8538f2f5f5f8472f8e4c595c"
+        }
+      ],
+      "has_more": false,
+      "next_after": 5,
+      "snapshot": 5
+    },
+    "elapsed_s": 0.00035333301639184356
+  },
+  {
+    "method": "GET",
+    "path": "/summary?snapshot=5",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "accounts": [
+        {
+          "name": "a",
+          "balance": 70,
+          "reserved": 0,
+          "available": 70
+        },
+        {
+          "name": "b",
+          "balance": 70,
+          "reserved": 0,
+          "available": 70
+        }
+      ],
+      "entry_count": 5,
+      "snapshot": 5,
+      "totals": {
+        "available": 140,
+        "balance": 140,
+        "reserved": 0
+      }
+    },
+    "elapsed_s": 0.00031383300665766
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/a",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "a",
+        "balance": 70,
+        "reserved": 0,
+        "available": 70,
+        "version": 3
+      }
+    },
+    "elapsed_s": 0.00021808297606185079
+  },
+  {
+    "method": "GET",
+    "path": "/accounts/b",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Tenant": "t"
+    },
+    "request": null,
+    "status": 200,
+    "response": {
+      "account": {
+        "name": "b",
+        "balance": 70,
+        "reserved": 0,
+        "available": 70,
+        "version": 2
+      }
+    },
+    "elapsed_s": 0.00019345799228176475
+  }
+]

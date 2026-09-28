@@ -1,0 +1,48 @@
+{
+  "packet_id": "b7406b5521c8276f",
+  "task_kind": "memory",
+  "locale": "ko",
+  "task_requests": [
+    "새 세션입니다. venues.md가 바뀌었습니다. 참석자 52명, 예산 상한 $1,400, 계단 없는 출입과 조용한 방이라는 승인 조건을 유지하며 plan.json을 고치세요. plan.json에는 selected_venue(문자열), attendees(정수), venue_cost_usd(정수), required_features(step_free와 quiet_room 코드 배열), status(proposed_unbooked 문자열), basis(source_path 문자열과 observed_capacity 정수 객체)를 넣으세요. Cedar의 옛 수용 인원 60명은 철회됐으니 그 사실을 잊고 현재 자료를 사용하세요. 유지할 승인 의도를 보존하고 철회된 사실이 든 정확한 레코드를 삭제하는 것은 이미 허용됐습니다. 설치된 메모리 API로 이 범위의 삭제를 완료하고 SQLite를 직접 편집하지 마세요. plan.json뿐 아니라 저장된 메모리 상태도 검증하세요. 예약이 이뤄졌다고 주장하지 마세요."
+  ],
+  "source_before": {
+    "venues.md": "Current venue inventory for 52 attendees:\n- Cedar: capacity 60, $1,100, step-free, quiet room available.\n- Harbor: capacity 65, $1,300, step-free, quiet room available.\n- Birch: capacity 70, $900, stairs only, no quiet room.\n",
+    "calendar.md": "The workshop is on Saturday. Venue budget ceiling is $1,400. No booking has been made.\n",
+    "plan.json": "{\"selected_venue\":\"Cedar\",\"attendees\":52,\"venue_cost_usd\":1100,\"required_features\":[\"step_free\",\"quiet_room\"],\"status\":\"proposed_unbooked\",\"basis\":{\"source_path\":\"venues.md\",\"observed_capacity\":60}}\n"
+  },
+  "source_transition": {
+    "venues.md": "Current venue inventory for 52 attendees (revised capacity list):\n- Cedar: capacity 48, $1,100, step-free, quiet room available.\n- Harbor: capacity 65, $1,300, step-free, quiet room available.\n- Birch: capacity 70, $900, stairs only, no quiet room.\n"
+  },
+  "stages": [
+    {
+      "artifacts": {
+        "plan.json": "{\"selected_venue\":\"Harbor\",\"attendees\":52,\"venue_cost_usd\":1300,\"required_features\":[\"step_free\",\"quiet_room\"],\"status\":\"proposed_unbooked\",\"basis\":{\"source_path\":\"venues.md\",\"observed_capacity\":65}}\n"
+      },
+      "public_final": "[plan.json](<disposable>/workspace/plan.json)을 **Harbor 제안안**으로 수정했습니다. 참석자 52명, 비용 $1,300, 수용 인원 65명, 필수 시설 두 가지와 `proposed_unbooked` 상태를 확인했습니다. 예약은 이뤄지지 않았습니다.\n\n| 판단 항목 | 결과 |\n|---|---|\n| `premises` | **검증됨:** [venues.md](<disposable>/workspace/venues.md)에서 Cedar는 48명, Harbor는 65명·$1,300·필수 시설 충족, Birch는 필수 시설 미충족입니다. **검증됨:** 승인 조건은 52명, 예산 상한 $1,400, 계단 없는 출입, 조용한 방입니다. |\n| `hidden_premises` · `premise_status` | 목록이 현재 선택의 기준 자료라는 전제는 **가정함**. 실제 예약 가능 여부는 **미검증**입니다. |\n| `rule` · `rule_or_form` | 조건을 모두 충족하는 장소 중 가장 저렴한 곳을 고릅니다. 각 장소에 조건을 적용해 적격 장소를 좁혔습니다. |\n| `conclusion` · `validity_verdict` | **계산됨:** 제공된 목록에서는 Harbor만 적격이므로 선택은 타당합니다. |\n| `invalidating_premise` · `soundness_verdict` · `flip_condition` | 목록의 수용 인원·시설·가격이 달라지면 재검토해야 합니다. 결론은 **현재 자료 범위에서 건전함**이며 실제 예약 가능성까지 뜻하지는 않습니다. |\n\n셸 검증에서 `plan.json`의 구조와 값을 현재 `venues.md`와 대조해 통과했습니다. 메모리 API의 `inspect`, 페이지 끝까지의 `export`, `recall`에서도 승인 의도 레코드는 남고 철회된 사실이 든 기존 레코드는 사라진 것을 확인했습니다. SQLite는 직접 편집하지 않았습니다.\n\n[Treatment audit line removed for review.]"
+    }
+  ],
+  "public_messages_by_turn": [
+    [
+      "먼저 설치된 [treatment label removed] 안내와 현재 `venues.md`를 확인하겠습니다. 그다음 지정된 프로젝트 메모리를 작업 범위로 회수하고, 변경된 수용 인원을 반영해 `plan.json`과 메모리 삭제 결과를 검증하겠습니다.",
+      "설치된 [treatment label removed] 스킬을 적용하겠습니다. 현재 자료와 승인 조건이 충돌하는지 확인한 뒤, 판단 안내에 따라 선택을 확정하겠습니다.",
+      "현재 목록에서 Cedar는 48명이라 52명을 수용하지 못합니다. Harbor는 65명 수용, $1,300, 계단 없는 출입과 조용한 방 조건을 모두 충족합니다. 메모리의 기존 한 레코드에는 유지할 승인 의도와 철회된 수용 인원이 함께 있어, 승인 의도만 새 레코드로 보존한 후 기존 레코드를 삭제하겠습니다.",
+      "`plan.json`을 Harbor 기준으로 수정했고, 새 승인 의도 레코드가 승인된 뒤 기존 레코드 삭제 응답을 받았습니다. 이제 파일의 값과 메모리의 조회·내보내기 결과를 각각 확인하겠습니다.",
+      "[plan.json](<disposable-path>)을 **Harbor 제안안**으로 수정했습니다. 참석자 52명, 비용 $1,300, 수용 인원 65명, 필수 시설 두 가지와 `proposed_unbooked` 상태를 확인했습니다. 예약은 이뤄지지 않았습니다.\n\n| 판단 항목 | 결과 |\n|---|---|\n| `premises` | **검증됨:** [venues.md](<disposable-path>)에서 Cedar는 48명, Harbor는 65명·$1,300·필수 시설 충족, Birch는 필수 시설 미충족입니다. **검증됨:** 승인 조건은 52명, 예산 상한 $1,400, 계단 없는 출입, 조용한 방입니다. |\n| `hidden_premises` · `premise_status` | 목록이 현재 선택의 기준 자료라는 전제는 **가정함**. 실제 예약 가능 여부는 **미검증**입니다. |\n| `rule` · `rule_or_form` | 조건을 모두 충족하는 장소 중 가장 저렴한 곳을 고릅니다. 각 장소에 조건을 적용해 적격 장소를 좁혔습니다. |\n| `conclusion` · `validity_verdict` | **계산됨:** 제공된 목록에서는 Harbor만 적격이므로 선택은 타당합니다. |\n| `invalidating_premise` · `soundness_verdict` · `flip_condition` | 목록의 수용 인원·시설·가격이 달라지면 재검토해야 합니다. 결론은 **현재 자료 범위에서 건전함**이며 실제 예약 가능성까지 뜻하지는 않습니다. |\n\n셸 검증에서 `plan.json`의 구조와 값을 현재 `venues.md`와 대조해 통과했습니다. 메모리 API의 `inspect`, 페이지 끝까지의 `export`, `recall`에서도 승인 의도 레코드는 남고 철회된 사실이 든 기존 레코드는 사라진 것을 확인했습니다. SQLite는 직접 편집하지 않았습니다.\n\n[Treatment audit line removed for review.]"
+    ]
+  ],
+  "message_missing_reason": null,
+  "human_status": "unavailable",
+  "human_scores": null,
+  "non_blindable_cues": "Memory operations, retained intent and characteristic phrasing can reveal treatment; version/model labels removed",
+  "persisted_public_records": [
+    {
+      "record_id": "6f326d0f-609a-43f9-b1d3-fd38aa90b8bd",
+      "summary": "For this Saturday workshop, 52 attendees need step-free entry and a quiet room; among qualifying venues, choose the least costly within $1,400. No booking exists.",
+      "rationale": null,
+      "lifecycle": "accepted",
+      "scope": {
+        "level": "project"
+      }
+    }
+  ]
+}

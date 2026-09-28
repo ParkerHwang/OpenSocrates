@@ -1,0 +1,50 @@
+{
+  "reviewer": "Primary agent, unblinded; no human score",
+  "sampled_scope": {
+    "report_pages": 18,
+    "board_deck_pages": 18,
+    "workbook_ranges": 18,
+    "additional_native_workbook_first_pages": 3,
+    "browser_contact_sheet_panels": 9
+  },
+  "selection": "For each tuple/arm: a high-text-density representative report/deck page and one named workbook range. Additional readiness screenshots and targeted renderer cross-checks. All generated sample paths and exact pages/ranges are in documents/*/inventory.json and workbook-render.json.",
+  "findings": [
+    {
+      "cell": "consulting-gpt-6-luna-high-v15",
+      "artifact": "meridian_board_report.pdf",
+      "page": 3,
+      "finding": "Owner/dependency text overlaps neighboring cells in the90-day table.",
+      "classification": "candidate document layout defect"
+    },
+    {
+      "cell": "consulting-gpt-5.6-luna-max-vanilla",
+      "artifact": "meridian_parts_board_presentation.pptx",
+      "rendered_page": 1,
+      "finding": "Title/subtitle and decision box/card content overlap in the LibreOffice rendering; underlying pair figures are also wrong.",
+      "classification": "candidate presentation defect observed in declared renderer"
+    },
+    {
+      "cell": "consulting-gpt-6-astra-xhigh-v15",
+      "artifact": "Meridian_analytical_workbook.xlsx",
+      "range": "Dashboard!A1:L24",
+      "finding": "KPI values have insufficient separation; title clipping in imported preview did not reproduce in native conversion.",
+      "classification": "minor layout issue plus renderer-specific difference"
+    },
+    {
+      "cell": "consulting-gpt-6-astra-xhigh-v14",
+      "artifact": "meridian_analysis.xlsx",
+      "range": "Decision!A7",
+      "finding": "Artifact Tool preview showed#VALUE!, but original cached value and LibreOffice recalculation both show198099.31.",
+      "classification": "renderer/calculation compatibility, not established candidate formula defect"
+    },
+    {
+      "cell": "consulting-gpt-6-sol-high-v15",
+      "artifact": "meridian_analytical_workbook.xlsx",
+      "range": "Decision dashboard!A1:L24",
+      "finding": "Imported preview omitted title fill/text. Native conversion restored title. XLSX print layout splits wide content; PDF printing of XLSX was not required.",
+      "classification": "renderer difference; print-layout limitation kept separate"
+    }
+  ],
+  "unverified": "Not every page, chart or workbook what-if interaction was reviewed. No native Excel app review. No exhaustive accessibility or security audit.",
+  "other_sampled_pages": "No material clipping/overlap identified in the other declared representative samples; this does not imply all pages are flawless."
+}

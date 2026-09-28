@@ -1,0 +1,100 @@
+{
+  "schema": "independent-source-review/1.0",
+  "repository": "$REPO",
+  "baseline_commit": "edab8f8d5c8434a705e706422ce5e8d6dc540e32",
+  "candidate_commit": "ca95b2415621921b24d311133522ddf2faec5c30",
+  "governing_contract": "docs/v1.5.0/15-specialized-orchestration.md",
+  "governing_contract_sha256": "a7b8264416f89d1b8aa9d0aa7e95366337e0ab42e10c755a6f80e3b606bade99",
+  "reviewer_role": "independent_read_only_source_reviewer",
+  "verdict": "request_changes",
+  "production_source_modified": false,
+  "model_calls_performed": 0,
+  "findings": [
+    {
+      "id": "R1",
+      "priority": "P1",
+      "blocking": true,
+      "title": "Bind candidate publication to the approved filesystem location",
+      "file": "src/opensocrates/orchestration/runtime.py",
+      "line_start": 527,
+      "line_end": 532,
+      "artifact_sha256": "e9070b202d431fee471feb2e0be9c4dc79c57147dfca8b18ab75d9f5c7d82762",
+      "requirement": "Contract lines 22-24 and 103-108: publish only declared candidates, validate path safety before publication, and leave source-project integration to the primary.",
+      "expected": "A parent-path replacement after validation must fail closed without writing the source project or another unapproved location; publication must remain bound to the approved root through writes.",
+      "observed": "plan() resolves/checks candidate_root but discards that resolved identity. _publish() resolves the caller string again and does not repeat the separate-root test. Replacing the previously validated output parent with a symlink into source_root writes source/candidate/artifacts/result.txt and returns integration_pending.",
+      "reproduction": "Run repro.py with Python 3.12.13 and PYTHONDONTWRITEBYTECODE=1. parent_retarget renames output-parent to original-parent and links output-parent to the disposable source directory after Coordinator construction and before run(). This uses a deterministic stub and launches no model or checker process.",
+      "impact": "The parent writer can mutate an existing source project despite an outside-source approved target; role read-only sandboxing does not protect this coordinator write.",
+      "missing_evidence": ["A passing regression for ancestor/root replacement during publication, not merely an existing leaf symlink at initial validation."],
+      "reproduction_result_key": "parent_retarget"
+    },
+    {
+      "id": "R2",
+      "priority": "P2",
+      "blocking": true,
+      "title": "Preserve accumulated execution evidence when cancellation occurs between calls",
+      "file": "src/opensocrates/cli/orchestration.py",
+      "line_start": 29,
+      "line_end": 32,
+      "artifact_sha256": "2d9c828a23b005423f670688929ff0376ce74a93d998b51b93b5da9ac61f7614",
+      "requirement": "Contract lines 63-68 and 115-117: expose cancellation and retain/count every maker, reviewer, verifier, repair and failed call.",
+      "expected": "Cancellation after work begins retains run identity, all completed/attempted calls and candidate-version/check evidence, while stopping further work.",
+      "observed": "Coordinator.run catches only OSError/ValueError around units. A KeyboardInterrupt outside adapter.invoke/check escapes to the CLI, which creates response('cancelled') with run_id=null, calls=[], units=[]. Interrupting publication after three completed role calls discards all three receipts and the version record in the only wire response.",
+      "reproduction": "repro.py injects KeyboardInterrupt at Coordinator._publish after a complete deterministic three-role sequence, then invokes the actual run_orchestration CLI handler. Coordinator contains 3 calls and 1 version; wire response contains 0 calls, 0 units and null run_id; exit is 3.",
+      "impact": "Users lose actual work/usage/failure lineage on normal caller cancellation between model/check boundaries and cannot distinguish an unstarted run from a completed-but-unpublished run.",
+      "missing_evidence": ["Cancellation tests at role/check setup, cleanup, final validation and publication boundaries that retain accumulated receipts."],
+      "reproduction_result_key": "cancel_after_calls"
+    },
+    {
+      "id": "R3",
+      "priority": "P2",
+      "blocking": true,
+      "title": "Carry failed obligation judgments into the fresh maker repair assignment",
+      "file": "src/opensocrates/orchestration/runtime.py",
+      "line_start": 496,
+      "line_end": 500,
+      "artifact_sha256": "e9070b202d431fee471feb2e0be9c4dc79c57147dfca8b18ab75d9f5c7d82762",
+      "requirement": "Contract lines 54-61 and 70-77: a fresh maker receives the complete scoped context needed for its bounded repair; the designated maker repairs independently diagnosed failures.",
+      "expected": "Every valid failed/unknown required judgment that triggers repair must reach the maker as bounded public failure evidence, or the assessment contract must require an equivalent actionable finding before scheduling repair.",
+      "observed": "The assessment schema permits a failed required obligation with expected/observed/reproduction/evidence_ids and findings=[]. _judgment accepts that assessment, but repair assembly copies only findings. Maker check_receipts are also always empty. Both independently failed judgments and the failed check are retained in the response yet omitted from the next maker context.",
+      "reproduction": "repro.py returns schema-valid review and execution assessments with required status failed, exact candidate binding, concrete bad-versus-good reproduction, and findings=[]. A second maker is invoked with repair_findings=[], check_receipts=[], and no failed-obligation judgments.",
+      "impact": "A supported response shape consumes repair attempts without telling the fresh maker what review/execution found; environment/input verification failures can become blind artifact retries. This does not cause premature qualification, but breaks the intended informed repair loop.",
+      "missing_evidence": ["A regression covering valid failed/unknown obligation-only assessments and verifying equivalent bounded feedback reaches the designated maker."],
+      "reproduction_result_key": "failed_obligation_repair"
+    }
+  ],
+  "verified_positive_boundaries": [
+    "Fresh role assignment IDs and temporary role directories, fixed configured model/effort tuple, exact source/candidate manifests, and distinct reviewer/verifier paths are present.",
+    "Required unknown/failed execution obligations block qualification; changed sources invalidate dependent candidates.",
+    "The subprocess scanner exception is pinned to exact reviewed AST function identities and five process call forms, rather than a blanket path allowance.",
+    "Selected EN/KO role/domain guides are complete and semantically aligned in inspected source; default hooks and decision dispatch are unchanged.",
+    "Memory projection reads existing stores, retains accepted decisions despite record selection, separates freshness/support/lifecycle/unknown review state, and invalidates changed/deleted frozen records in inspected source. No memory-enrollment tests were run in this review."
+  ],
+  "validation": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:tools .venv/bin/python -B tools/check_orchestration.py OrchestrationTests -v",
+      "result": "PASS: 23 deterministic non-memory tests; no live model proof."
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:tools .venv/bin/python -B tools/check_security_scan_memory.py",
+      "result": "PASS: canonical AST, existing scanner cases, 32 rejecting orchestration mutations, mocked adapter guards."
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -B $TEMP/opensocrates-review-ca95b24-CszcU4/repro.py",
+      "result": "PASS: all three defect reproductions assert the observed failures."
+    },
+    {
+      "command": "Independent git show byte comparison of every baseline schemas/v1 and content/methods path against target commit",
+      "result_file": "compatibility-results.json"
+    }
+  ],
+  "nonblocking_limits": [
+    "Prepared contexts and deterministic adapters do not establish live Codex behavior.",
+    "Live software design/seeded repair, calculation-to-document and continuation evidence remain pending; this review did not invoke them.",
+    "Native embedded-package execution, full CONTRIBUTING checks and client network/write enforcement remain the separate execution verifier's responsibility; build/evidence and other agents' reports were not read.",
+    "No account/backend isolation, universal filesystem read isolation or broad quality-benefit claim is established."
+  ],
+  "reproduction_file": "repro.py",
+  "reproduction_results": "repro-results.json",
+  "environment": "macOS; repository .venv Python 3.12.13; PYTHONDONTWRITEBYTECODE=1",
+  "recheck_policy": "All production changes require affected exact-version source review and execution recheck; R1 needs replacement-race coverage, R2 cancellation receipt coverage, R3 complete failed-obligation repair context coverage."
+}

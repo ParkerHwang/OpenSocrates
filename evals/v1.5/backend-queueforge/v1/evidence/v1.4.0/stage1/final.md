@@ -1,0 +1,5 @@
+Implemented the QueueForge backend in [service.go](<WORKSPACE>/internal/queueforge/service.go) and the [server entry point](<WORKSPACE>/cmd/server/main.go). It includes transactional SQLite writes, tenant isolation, idempotent single and batch submission, lease fencing, lifecycle operations, stats, and the optional test clock. I added focused [tests](<WORKSPACE>/internal/queueforge/service_test.go), a [README](<WORKSPACE>/README.md), and updated [PROJECT_NOTES.md](<WORKSPACE>/PROJECT_NOTES.md).
+
+**Verified:** the build, `go test ./...`, and `go test -race ./...` pass. A loopback check confirmed that two server processes share one database, an idempotent replay returns the same job, and the job remains after SIGKILL and restart. That check exposed a concurrent startup lock; bounded initialization retries fixed it. The supplied driver files and exact `go.mod`/`go.sum` are unchanged. No commit was made.
+
+The two-process check did not exercise simultaneous cross-process claims; the shared-database claim test used two service instances. Owned test processes were stopped.

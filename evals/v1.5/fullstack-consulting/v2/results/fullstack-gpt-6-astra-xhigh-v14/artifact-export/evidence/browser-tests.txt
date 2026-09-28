@@ -1,0 +1,16 @@
+
+> depotflow-verification@1.0.0 test:browser
+> node tests/browser.cjs
+
+PASS Bad credentials show a useful error; successful login opens inventory.
+PASS Administrator records stock adjustment and updated dashboard/inventory.
+PASS Multiple order lines reserve, ship, partially return, and fully return with matching stock.
+PASS Zero-price SAMPLE order is valid; reserved cancellation releases stock.
+PASS Stale-version return retains input and can be refreshed, reviewed, and retried.
+PASS Order search, status filters, and empty results work.
+PASS Arbitrary client text is rendered as text, not HTML.
+PASS An interrupted successful write safely replays with the same key and preserved form.
+PASS Audit shows actor, reference, stock before/after, and adjustment reason.
+PASS 390px mobile workflow supports create, reserve, ship, keyboard return, and no page overflow.
+PASS Viewer can inspect orders and audit with no mutation controls.
+PASS South is isolated; operator can fulfill but cannot adjust stock; reload retains session.

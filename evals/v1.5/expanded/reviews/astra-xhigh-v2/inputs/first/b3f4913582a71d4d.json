@@ -1,0 +1,29 @@
+{
+  "packet_id": "b3f4913582a71d4d",
+  "task_id": "v2-h02-explicit-memory",
+  "locale": "en",
+  "initial_request": "Read current brief.md and explicitly retrieve the accepted welcome activity from the enrolled project. Write plan.json with welcome_activity (the accepted code), attendees (integer), and capacity (integer). Do not invent the accepted code if memory is unavailable. Do not contact or book anything.",
+  "followup_request": null,
+  "source_before_task": {
+    "brief.md": "There are 18 attendees. The current venue capacity is 24. The accepted welcome activity is stored only in the enrolled project decision.\n"
+  },
+  "declared_source_transition": null,
+  "scoped_public_intent": "Accepted welcome activity: use code silent_paper_reflection. No loud icebreaker. This is the project decision for the welcome activity.",
+  "stages": [
+    {
+      "artifacts": {
+        "plan.json": "{\n  \"welcome_activity\": \"silent_paper_reflection\",\n  \"attendees\": 18,\n  \"capacity\": 24\n}\n"
+      },
+      "public_final": "Created [plan.json](<disposable>/workspace/plan.json) with the accepted activity code `silent_paper_reflection`, 18 attendees, and capacity 24. I checked that the JSON parses and that all three fields have the required values and types."
+    }
+  ],
+  "designated_artifact_diffs": {
+    "plan.json": "--- before/plan.json\n+++ after/plan.json\n@@ -0,0 +1,5 @@\n+{\n+  \"welcome_activity\": \"silent_paper_reflection\",\n+  \"attendees\": 18,\n+  \"capacity\": 24\n+}\n"
+  },
+  "human_status": "unavailable",
+  "human_scores": null,
+  "non_blindable_cues": [
+    "Memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed."
+  ],
+  "coverage_limit": "Packets contain declared task sources and designated output artifacts, not a complete post-run filesystem snapshot or raw tool transcript."
+}

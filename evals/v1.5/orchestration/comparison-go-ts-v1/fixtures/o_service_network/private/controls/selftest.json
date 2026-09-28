@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.eval.control-selftest/1.0.0",
+  "task": "O",
+  "passed": true,
+  "controls": [
+    {
+      "control": "good",
+      "expected": "pass",
+      "observed_pass": true,
+      "target_check_rejected": false,
+      "as_expected": true
+    },
+    {
+      "control": "latest_vs_max_policy",
+      "expected": "reject:o_program_matches_oracle",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "latest_vs_max_rate",
+      "expected": "reject:o_program_matches_oracle",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "missing_as_zero",
+      "expected": "reject:o_program_matches_oracle",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "product_of_sums",
+      "expected": "reject:o_program_matches_oracle",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "misbound_memo",
+      "expected": "reject:o_memo_evidence",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "missing_criterion",
+      "expected": "reject:o_memo_decision_record",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "missing_portfolio_comparison",
+      "expected": "reject:o_memo_evidence",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "wrong_feasibility",
+      "expected": "reject:o_memo_evidence",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    },
+    {
+      "control": "missing_as_zero_artifact",
+      "expected": "reject:o_oracle_metrics",
+      "observed_pass": false,
+      "target_check_rejected": true,
+      "as_expected": true
+    }
+  ],
+  "isolation_canary": {
+    "checks": [
+      {
+        "exit_code": 0,
+        "id": "candidate_read_allowed",
+        "passed": true
+      },
+      {
+        "exit_code": 1,
+        "id": "private_oracle_direct_denied",
+        "passed": true
+      },
+      {
+        "exit_code": 1,
+        "id": "private_oracle_symlink_denied",
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "policy_sha256": "ebf933b4bbdaa0b1d0f666da10eb48bca6ea69dc46fea0000fb0c128e6401afe"
+  },
+  "meaning": "Mechanical oracle controls only; no subject model or recommendation-quality judgment."
+}

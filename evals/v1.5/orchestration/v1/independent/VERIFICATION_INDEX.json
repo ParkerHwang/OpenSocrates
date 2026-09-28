@@ -1,0 +1,64 @@
+{
+  "schema": "independent-orchestration-verification-index/1",
+  "status": "interim_no_final_source_or_live_acceptance",
+  "product_commit": "5b39c76e5e33c29f12b1aec97cf457e6f1bf4c71",
+  "fixture_freeze_sha256": "b80f6d6676fd62f74848542169274ce3fb863e149578f35511f090347764a80f",
+  "frozen_fixture_files_unchanged": true,
+  "product_input_hashes_still_equal": true,
+  "evidence": {
+    "deterministic_results": {
+      "path": "run-owu2d0jp/results.json",
+      "sha256": "3172d99187b6af91a0f055aa395953c0fc385a1f267bf7ed587df058a49a1df0"
+    },
+    "deterministic_harness": {
+      "path": "run-owu2d0jp/harness.py",
+      "sha256": "0cd4819dfe106c545a3bf6f9b0cedf57ad5032cdc3559382d914a32ba0aabe71"
+    },
+    "synthetic_receipts": {
+      "path": "run-owu2d0jp/synthetic_receipts.json",
+      "sha256": "0f24af4409d6e524f2cc7c0cce329c8787e14170c683471c46035701f2e55ac9"
+    },
+    "native_oracle_results": {
+      "path": "native-d_p3lg98/results.json",
+      "sha256": "f2f007c62b6301eb02a3f04d6c4d71e9b1bbfaae09a8ffcd43c6faa097c3f33d"
+    },
+    "native_oracle_harness": {
+      "path": "native_oracles.py",
+      "sha256": "c1ea10c5d3b6c0545946b58a4963aa97ffd775aeb8769a2561e7a25f1d5c4ece"
+    },
+    "continuation_v2_results": {
+      "path": "continuation-v2-8m2zc245/results.json",
+      "sha256": "5677ab6ada91fbc092973430517a587c4517dccd39a3108cc90d09f2f4770b9b"
+    },
+    "continuation_v2_checker": {
+      "path": "continuation-v2-8m2zc245/check_continuation_v2.py",
+      "sha256": "3e8f664587dd9659a1548e0114711bfbc8c7567f3bb11bdd57785ddd058d8a7c"
+    },
+    "adapter_receipt_results": {
+      "path": "adapter-receipts-mhhiw444/results.json",
+      "sha256": "3dc3cbf41d757a7e477966bc41e7f2e29133334f54e0d8df6931ce3bb47fcaac"
+    },
+    "adapter_receipt_harness": {
+      "path": "adapter_receipts.py",
+      "sha256": "7fbf882e2b536739efd128686b90dee38d0e772dbea52f70e8622b61b340f4f2"
+    },
+    "initial_harness_setup_failures": {
+      "path": "run-ywhkta_n/results.json",
+      "sha256": "da5472764f9727ad06f0491b2b9fea3e18ce5e5517dff97d974541ccf91d393f"
+    }
+  },
+  "evidence_layers": {
+    "deterministic_runtime": "38 result entries, including one memory-group aggregate; roles/check receipts explicitly synthetic except separate native flows.",
+    "real_memory": "Existing real APIs enrolled, captured, observed, accepted, deleted and disabled disposable fixtures only.",
+    "native_checks": "Four synthetic-role flows ran actual read-only native sandbox oracle commands. Software [0,1,0], office [0,0], wrong-report and stale-report each [0,1].",
+    "continuation_v2": "16 adversarial/positive cases match exact byte-preservation contract; v1 two failures retained.",
+    "adapter_events": "Two mocked subprocess event streams verify usage null/zero, error counters, process exit and raw-event dropping; zero native/model launches."
+  },
+  "qualification_limits": [
+    "No real model calls, quality-benefit claim, installation/enrollment of real project, account/backend isolation or final integration claim.",
+    "Full source/security gate and final product revision remain parent-owned and pending.",
+    "Stale-memory literal exclusion annotation in frozen logical fixture was not met; actual stale freshness tagging plus accepted-constraint preservation matches the accepted contract revalidation boundary. No model revalidation-follow-through claim.",
+    "Baseline source schema container gains OC definitions; old generated schema bytes (47) and canonical method bytes (240 files, 48 identities) are unchanged.",
+    "Initial 23/26 harness run contains setup mistakes, not established product failures; corrected exact-source run and unfavorable originals are retained."
+  ]
+}

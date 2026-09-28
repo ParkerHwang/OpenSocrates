@@ -1,0 +1,60 @@
+{
+  "packet_id": "117cc94a4fb2b69d",
+  "task_kind": "memory",
+  "locale": "en",
+  "task_requests": [
+    "Fresh session: venues.md has changed. Revise plan.json for 52 attendees under the existing $1,400 ceiling. Keep my previously accepted step-free and quiet-room conditions. plan.json must contain selected_venue (string), attendees (integer), venue_cost_usd (integer), required_features (array of codes step_free and quiet_room), status (string code proposed_unbooked), and basis (object with source_path string and observed_capacity integer). Correction: Cedar's old 60-person capacity is withdrawn; please forget that scoped fact and use the current source. Explain what changed and do not claim that a booking exists. If an enrolled project memory is unavailable, say so accurately; the maintained-note control has its explicit PROJECT_NOTES.md path. The existing instruction explicitly authorizes preserving the remaining accepted intent and deleting the exact record that contains the withdrawn capacity fact. Complete that scoped forgetting through the installed memory API; do not edit SQLite directly. Verify the persisted result, not just plan.json."
+  ],
+  "source_before": {
+    "venues.md": "Current venue inventory for 52 attendees:\n- Cedar: capacity 60, $1,100, step-free, quiet room available.\n- Harbor: capacity 65, $1,300, step-free, quiet room available.\n- Birch: capacity 70, $900, stairs only, no quiet room.\n",
+    "calendar.md": "The workshop is on Saturday. Venue budget ceiling is $1,400. No booking has been made.\n",
+    "plan.json": "{\"selected_venue\":\"Cedar\",\"attendees\":52,\"venue_cost_usd\":1100,\"required_features\":[\"step_free\",\"quiet_room\"],\"status\":\"proposed_unbooked\",\"basis\":{\"source_path\":\"venues.md\",\"observed_capacity\":60}}\n"
+  },
+  "source_transition": {
+    "venues.md": "Current venue inventory for 52 attendees (revised capacity list):\n- Cedar: capacity 48, $1,100, step-free, quiet room available.\n- Harbor: capacity 65, $1,300, step-free, quiet room available.\n- Birch: capacity 70, $900, stairs only, no quiet room.\n"
+  },
+  "stages": [
+    {
+      "artifacts": {
+        "plan.json": "{\"selected_venue\":\"Harbor\",\"attendees\":52,\"venue_cost_usd\":1300,\"required_features\":[\"step_free\",\"quiet_room\"],\"status\":\"proposed_unbooked\",\"basis\":{\"source_path\":\"venues.md\",\"observed_capacity\":65}}\n"
+      },
+      "public_final": ""
+    }
+  ],
+  "public_messages_by_turn": [
+    null
+  ],
+  "message_missing_reason": "Parser failure; never interpret missing messages as no question or no tool work",
+  "persisted_memory_observation": {
+    "inspect": {
+      "status": "ok",
+      "exit_code": 0
+    },
+    "export": {
+      "status": "ok",
+      "exit_code": 0
+    },
+    "exported_public_records": [
+      {
+        "record_id": "c5486ec9-5215-4427-b6fc-e7bca4842fbf",
+        "summary": "For this Saturday workshop, 52 attendees need step-free entry and a quiet room; among qualifying venues, choose the least costly within $1,400. No booking exists.",
+        "rationale": null,
+        "lifecycle": "proposed",
+        "scope": {
+          "level": "project"
+        }
+      }
+    ],
+    "export_complete": true,
+    "withdrawn_capacity_absent": true,
+    "retained_intent_present": false,
+    "record_count": 1,
+    "recall": {
+      "status": "ok",
+      "exit_code": 0
+    }
+  },
+  "human_status": "unavailable",
+  "human_scores": null,
+  "non_blindable_cues": "Memory operations, retained intent and characteristic phrasing can reveal treatment; version/model labels removed"
+}

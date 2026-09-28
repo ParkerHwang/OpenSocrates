@@ -1,0 +1,149 @@
+{
+  "original-v1.4-main-loopback.json": {
+    "counts": {
+      "pass": 34,
+      "fail": 0,
+      "error": 0,
+      "unassessable": 0
+    },
+    "failures": []
+  },
+  "original-v1.5-main-loopback.json": {
+    "counts": {
+      "pass": 34,
+      "fail": 0,
+      "error": 0,
+      "unassessable": 0
+    },
+    "failures": []
+  },
+  "original-v1.4.0-supplement-v2.json": {
+    "counts": {
+      "pass": 20,
+      "fail": 5,
+      "error": 0,
+      "unassessable": 0
+    },
+    "failures": [
+      {
+        "name": "cli partial date null",
+        "status": "fail"
+      },
+      {
+        "name": "http partial date null",
+        "status": "fail"
+      },
+      {
+        "name": "genuine mixed v1.4.0: ambiguous reject and aggregate return",
+        "status": "fail"
+      },
+      {
+        "name": "domain result/state ownership replay",
+        "status": "fail"
+      },
+      {
+        "name": "domain partial date null",
+        "status": "fail"
+      }
+    ]
+  },
+  "original-v1.5.0-rc-supplement-v2.json": {
+    "counts": {
+      "pass": 14,
+      "fail": 10,
+      "error": 0,
+      "unassessable": 0
+    },
+    "failures": [
+      {
+        "name": "cli partial date omitted",
+        "status": "fail"
+      },
+      {
+        "name": "cli invalid date batch position 0",
+        "status": "fail"
+      },
+      {
+        "name": "cli invalid date batch position 1",
+        "status": "fail"
+      },
+      {
+        "name": "cli invalid date batch position 2",
+        "status": "fail"
+      },
+      {
+        "name": "http partial date omitted",
+        "status": "fail"
+      },
+      {
+        "name": "http invalid date batch position 0",
+        "status": "fail"
+      },
+      {
+        "name": "http invalid date batch position 1",
+        "status": "fail"
+      },
+      {
+        "name": "http invalid date batch position 2",
+        "status": "fail"
+      },
+      {
+        "name": "domain result/state ownership new",
+        "status": "fail"
+      },
+      {
+        "name": "domain partial date undefined",
+        "status": "fail"
+      }
+    ]
+  },
+  "dependency-isolation-control.json": {
+    "counts": {
+      "pass": 33,
+      "fail": 0,
+      "error": 0,
+      "unassessable": 1
+    },
+    "failures": [
+      {
+        "name": "genuine version-1 historical fees preservation and migration",
+        "status": "unassessable"
+      }
+    ]
+  },
+  "frozenHashesVerified": true,
+  "controls": [
+    {
+      "name": "wrong-money rejected",
+      "status": "pass"
+    },
+    {
+      "name": "compatible-additive-zero accepted",
+      "status": "pass"
+    },
+    {
+      "name": "missing-date acceptance rejected",
+      "status": "pass"
+    },
+    {
+      "name": "rejection partial-write detected",
+      "status": "pass"
+    },
+    {
+      "name": "dropped historical lines rejected",
+      "status": "pass"
+    },
+    {
+      "name": "dropped historical refunded rejected",
+      "status": "pass"
+    }
+  ],
+  "status": {
+    "historicalScoresRewritten": false,
+    "derivativeAppsInspected": false,
+    "derivativeRuns": 0,
+    "sourceCheckerV1Preserved": true,
+    "supersededV1CrossFormatProbe": "v1.4 cannot decode v1.5 idempotency records; not classified as application money defect",
+    "initialSandboxRuns": "EPERM loopback startup; preserved environmental attempts, superseded by authorized loopback runs"
+  }
+}

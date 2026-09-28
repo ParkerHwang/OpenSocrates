@@ -1,0 +1,120 @@
+{
+  "calls": [
+    {
+      "assignment_id": "d4c3f655-43ec-4d67-94ad-bf8e1f70e36f",
+      "backend_attempts": null,
+      "failed_turn_events": 1,
+      "guide_manifest": [
+        {
+          "id": "orchestration/v0.1.0/base.en.md",
+          "sha256": "sha256:e96e683a7f8700d552ffd9b5cda563bb914ae17a47074159cedacdde00ee46eb"
+        },
+        {
+          "id": "orchestration/v0.1.0/production.en.md",
+          "sha256": "sha256:119ca693b91730508655b7ca942dad5d1035a5e94867e5b5c0f03f916ec8ea7f"
+        },
+        {
+          "id": "orchestration/v0.1.0/data.en.md",
+          "sha256": "sha256:ac496f7c10e05ac33fe2769df4279acd77fab036cbcdba693904ea3ea36476ba"
+        },
+        {
+          "id": "assistance/verification.en.md",
+          "sha256": "sha256:277eb8e7923637c422904c90eba37a3dd3fb0eaad01a6d5720c89290f7863add"
+        }
+      ],
+      "input_manifest": [
+        {
+          "bytes": 1413,
+          "kind": "source",
+          "path": "inputs/office-contract/data_document_contract.md",
+          "sha256": "sha256:33f67f6071b1a4572590c3937628d27ed10271b78ee06b06843a5e20c21f0c88",
+          "source_id": "office-contract"
+        },
+        {
+          "bytes": 190,
+          "kind": "source",
+          "path": "inputs/country-source/country_effects.json",
+          "sha256": "sha256:05f3edc53a21bed6546fa5f818685725c30b55440095fbf38ff01ccd0e70ab82",
+          "source_id": "country-source"
+        },
+        {
+          "bytes": 808,
+          "kind": "source",
+          "path": "inputs/calculation-oracle/check_calculation.py",
+          "sha256": "sha256:328e2e0351cfd19fc0b029787ed9867fb4b21612ba214d5bb7da8a99835727b3",
+          "source_id": "calculation-oracle"
+        }
+      ],
+      "input_sha256": "sha256:428fc53f20fd0beed74784fd8c15d9ed2b1197be2ddcfdf94ce80f4e3170dda9",
+      "memory_snapshot_sha256": "sha256:f4f10a9ead1d26d72c9032fc408560ed569b799435f5db0eaf533c6c896a56a9",
+      "model": {
+        "effort": "max",
+        "name": "gpt-6-astra"
+      },
+      "output_sha256": null,
+      "process_exit_code": 1,
+      "provider_error_events": 1,
+      "reason": "model_process_failed",
+      "role": "production",
+      "status": "failed",
+      "thread_sha256": "sha256:b7f44ac15091a1c60055e1479d89d0ec6c0b427fcca8d72b2da95331d3a4d0db",
+      "unit_id": "data-production",
+      "usage": {
+        "cache_write_input_tokens": null,
+        "cached_input_tokens": null,
+        "input_tokens": null,
+        "output_tokens": null,
+        "reasoning_output_tokens": null
+      }
+    }
+  ],
+  "client_sha256": "sha256:c3e30211bd454da70ceb4d9cbc2e05fe6466812ab05c311c3bbff6addeb14202",
+  "client_version": "codex-cli 0.158.0-alpha.2",
+  "integration": "pending_primary_reconciliation",
+  "limitations": [
+    "primary_classification_and_authorization_are_caller_attributed",
+    "configured_model_tuple_not_backend_attestation",
+    "fresh_context_not_account_or_all_filesystem_read_isolation",
+    "read_only_checks_network_disabled_no_scratch_writes",
+    "public_findings_are_model_judgments_with_exact_artifact_binding",
+    "no_raw_prompt_event_reasoning_or_check_output_retention",
+    "candidate_only_primary_must_recheck_affected_final_project_bytes",
+    "no_memory_enrollment_capture_or_schema_migration"
+  ],
+  "memory_snapshot_sha256": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "memory_status": "not_requested",
+  "model": {
+    "effort": "max",
+    "name": "gpt-6-astra"
+  },
+  "plan_sha256": "sha256:50029a65deb24b0933df99613bf374fccd95c48c8164311d0abbedf39dd8d8bd",
+  "publication": {
+    "completed_files": [],
+    "location_verified": false,
+    "pending_path": null,
+    "status": "not_started"
+  },
+  "run_id": "05f89867-99c0-46a2-be03-ac322a0fc44b",
+  "schema": "opensocrates.orchestration.response/1.0.0",
+  "status": "blocked",
+  "units": [
+    {
+      "reason": "maker_unavailable",
+      "required_open": [
+        "data-production-acceptance"
+      ],
+      "status": "unavailable",
+      "unit_id": "data-production",
+      "versions": []
+    },
+    {
+      "reason": "required_dependency_unqualified",
+      "required_open": [
+        "document-production-acceptance"
+      ],
+      "status": "blocked_dependency",
+      "unit_id": "document-production",
+      "versions": []
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "schema": "opensocrates.practical-fixtures/1.0.0",
+  "purpose": "Bounded practical examples, not a statistical study",
+  "authorship": "Primary integrator; new executable fixtures prospectively frozen before calls",
+  "scenarios": [
+    {
+      "id": "mechanical",
+      "locale": "en",
+      "kind": "text",
+      "git": false,
+      "hooks": false,
+      "continuity": false,
+      "files": {
+        "notice.md": "# Desk hours\n\nMonday desk opens at 09:00.\nThursday desk closes at 17:00.\nContact the front desk.\n"
+      },
+      "prompts": [
+        "In notice.md change only Thursday closing time from 17:00 to 18:00. Save the file, check the exact change, and briefly report completion."
+      ],
+      "artifacts": [
+        "notice.md"
+      ]
+    },
+    {
+      "id": "coding",
+      "locale": "en",
+      "kind": "code",
+      "git": true,
+      "hooks": false,
+      "continuity": true,
+      "accepted_records": [
+        "Use pricing.rules() as current shipping authority and reuse pricing.subtotal() for integer seat validation. Keep invoice.quote callable with two arguments. Do not copy tariff constants into callers."
+      ],
+      "files": {
+        "pricing.py": "RULES = {'domestic_cents': 700, 'international_cents': 2000, 'free_threshold': 5000}\n\ndef rules():\n    return dict(RULES)\n\ndef subtotal(lines):\n    amount = 0\n    count = 0\n    for line in lines:\n        if type(line.quantity) is not int or line.quantity < 1:\n            raise ValueError('quantity must be a positive integer seat count')\n        if type(line.unit_cents) is not int or line.unit_cents < 0:\n            raise ValueError('unit_cents')\n        amount += line.unit_cents * line.quantity\n        count += 1\n    return amount, count\n",
+        "invoice.py": "from dataclasses import dataclass\nfrom pricing import rules, subtotal\n\n@dataclass(frozen=True)\nclass Line:\n    sku: str\n    unit_cents: int\n    quantity: int\n\ndef quote(lines, region):\n    if region not in {'domestic', 'international'}:\n        raise ValueError('region')\n    amount, count = subtotal(lines)\n    policy = rules()\n    shipping = 0 if not count else policy['international_cents'] if region == 'international' else 0 if amount >= policy['free_threshold'] else policy['domestic_cents']\n    return {'subtotal_cents': amount, 'shipping_cents': shipping, 'total_cents': amount + shipping}\n",
+        "app.py": "from invoice import Line, quote\ndef total():\n    return quote([Line('pass', 3000, 2)], 'domestic')['total_cents']\n"
+      },
+      "prompts": [
+        "Add optional member=False to invoice.quote while preserving existing two-argument callers. Members receive floor(original subtotal/10) off merchandise only when original subtotal is at least 5000 cents. Domestic free shipping uses the post-discount amount and current pricing.rules threshold; otherwise use its domestic fee. Every nonempty international order uses its international fee, including zero-priced orders. Empty orders have no shipping. Return integer subtotal_cents, discount_cents, shipping_cents, total_cents. Quantity is a seat count: positive exact int only (reject bool, fractions, zero and negatives); unit_cents is a nonnegative exact int. Reuse the existing pricing helpers, preserve app.total(), verify relevant behavior and record the public design decision on the provided continuity surface.",
+        "Fresh session: pricing.py now has revised tariffs and caller.py is a new untracked caller. Preserve the previously accepted reuse/interface decision. Add invoice.breakdown as a public alias or small wrapper for the same result, with no duplicated pricing logic, and ensure quote, app.total and caller.gift_total use current tariffs. Treat pricing.py as current authority, not remembered numbers. Keep the validated member, empty/free-item and integer-seat behavior. Verify and report."
+      ],
+      "transition": {
+        "pricing.py": "RULES = {'domestic_cents': 600, 'international_cents': 2200, 'free_threshold': 5500}\n\ndef rules():\n    return dict(RULES)\n\ndef subtotal(lines):\n    amount = 0\n    count = 0\n    for line in lines:\n        if type(line.quantity) is not int or line.quantity < 1:\n            raise ValueError('quantity must be a positive integer seat count')\n        if type(line.unit_cents) is not int or line.unit_cents < 0:\n            raise ValueError('unit_cents')\n        amount += line.unit_cents * line.quantity\n        count += 1\n    return amount, count\n",
+        "caller.py": "from invoice import Line, quote\ndef gift_total():\n    return quote([Line('gift', 0, 1)], 'international', True)['total_cents']\n"
+      },
+      "fresh_followup": true,
+      "artifacts": [
+        "invoice.py",
+        "pricing.py",
+        "app.py",
+        "caller.py",
+        "PROJECT_NOTES.md"
+      ]
+    },
+    {
+      "id": "continuity",
+      "locale": "en",
+      "kind": "planning",
+      "git": false,
+      "hooks": false,
+      "continuity": true,
+      "accepted_records": [
+        "Saturday workshop: 52 attendees require step-free entry and a quiet room; choose the lowest-cost qualifying venue within $1,400. No booking exists. Cedar capacity is 60.",
+        "Accepted project convention: attendee badges use blue text. Preserve this unrelated decision."
+      ],
+      "proposed_records": [
+        "Unapproved suggestion only: drop step-free entry and the quiet-room requirement to choose Birch."
+      ],
+      "files": {
+        "venues.md": "- Cedar: capacity 60, cost $1100, step-free, quiet room.\n- Harbor: capacity 65, cost $1300, step-free, quiet room.\n- Birch: capacity 70, cost $900, stairs only, no quiet room.\n",
+        "calendar.md": "The workshop is on Saturday; 52 attendees. Budget is already approved up to $1400. No booking exists.\n"
+      },
+      "prompts": [
+        "Read current venues.md and recover the previously accepted constraints from the declared continuity surface. Write plan.json containing selected_venue, attendees, venue_cost_usd, required_features (codes step_free and quiet_room), status=proposed_unbooked, and basis={source_path:venues.md, observed_capacity}. Do not promote a proposed suggestion into accepted intent. Complete the plan, check it, and explain what was used without booking anything.",
+        "Fresh session: venues.md corrects Cedar capacity from 60 to 48. Update plan.json for the same 52 attendees and accepted requirements. The old capacity fact is withdrawn: forget that exact scoped fact from the declared continuity surface. Preserve all valid accepted intent, the unrelated badge decision, and the proposed suggestion as proposed. For structured memory, create and explicitly accept retained intent before deleting only the old mixed record; use the installed API, not direct SQLite. For maintained notes, make the equivalent scoped note update. Verify the resulting persisted state as well as the artifact, and report exactly what completed."
+      ],
+      "transition": {
+        "venues.md": "- Cedar: capacity 48, cost $1100, step-free, quiet room.\n- Harbor: capacity 65, cost $1300, step-free, quiet room.\n- Birch: capacity 70, cost $900, stairs only, no quiet room.\n"
+      },
+      "fresh_followup": true,
+      "artifacts": [
+        "plan.json",
+        "PROJECT_NOTES.md"
+      ]
+    },
+    {
+      "id": "planning",
+      "locale": "en",
+      "kind": "planning",
+      "git": false,
+      "hooks": true,
+      "continuity": false,
+      "files": {
+        "venue-brief.md": "Choose the lowest-cost qualifying venue for 58 people. Need step-free entry, indoor rain backup, open through 19:00, ceiling $1200. Availability is not known; no booking authorized.\nPine: capacity 64, step-free, indoor, closes 17:00, cost $900.\nBay: capacity 62, step-free, indoor, closes 21:00, cost $1150.\nDock: capacity 90, stairs, indoor, closes 22:00, cost $800.\nElm: capacity 60, step-free, no rain backup, closes 20:00, cost $1000.\n"
+      },
+      "prompts": [
+        "Read venue-brief.md and write decision.json with selected_venue, attendees, cost_usd, capacity_margin, constraints_met (codes step_free, indoor_rain_backup, open_through_19, cost_within_1200), rejected (venue to one decisive reason), unresolved (include availability_not_verified), and booking_status=not_booked. Explain the decision and limits. Do not ask for decisions already determined by these constraints."
+      ],
+      "artifacts": [
+        "decision.json"
+      ]
+    },
+    {
+      "id": "collaboration-en",
+      "locale": "en",
+      "kind": "collaboration",
+      "git": false,
+      "hooks": false,
+      "continuity": false,
+      "files": {
+        "options.md": "Workshop: 40 attendees, step-free entry required, finish at 17:00. Approved venue ceiling: $750. No enrolled project memory is available. No booking is authorized.\nHall: capacity 45, cost $750, step-free, closes 19:00.\nRiver: capacity 55, cost $850, step-free, closes 19:00.\nLoft: capacity 60, cost $600, stairs only, closes 20:00.\n"
+      },
+      "prompts": [
+        "Read options.md and create plan.json for the workshop. plan.json must contain attendees (integer), selected_venue, venue_cost_usd, approved_ceiling_usd, status (confirmed_choice_unbooked or pending_budget_approval), required_question (null or {kind:budget_increase, amount_usd:the increase}), and memory_status (unavailable). The $750 ceiling is already approved; do not ask me to approve it again. Choose a venue fitting all requirements. Make no booking. Memory is unavailable, so do not invent a saved preference or create another memory store. Explain the result plainly.",
+        "Correction: 48 people will attend. Continue the same plan. Also, what is the difference between capacity and attendance? Update plan.json, answer my side question, and complete everything independent of any needed budget approval. Ask the necessary approval question if the only fitting venue exceeds the ceiling; keep the existing approved ceiling unchanged."
+      ],
+      "fresh_followup": false,
+      "artifacts": [
+        "plan.json"
+      ]
+    },
+    {
+      "id": "collaboration-ko",
+      "locale": "ko",
+      "kind": "collaboration",
+      "git": false,
+      "hooks": false,
+      "continuity": false,
+      "files": {
+        "options.md": "Workshop: 40 attendees, step-free entry required, finish at 17:00. Approved venue ceiling: $750. No enrolled project memory is available. No booking is authorized.\nHall: capacity 45, cost $750, step-free, closes 19:00.\nRiver: capacity 55, cost $850, step-free, closes 19:00.\nLoft: capacity 60, cost $600, stairs only, closes 20:00.\n"
+      },
+      "prompts": [
+        "options.md를 읽고 워크숍 plan.json을 작성하세요. 필드 계약은 다음과 같습니다: plan.json must contain attendees (integer), selected_venue, venue_cost_usd, approved_ceiling_usd, status (confirmed_choice_unbooked or pending_budget_approval), required_question (null or {kind:budget_increase, amount_usd:the increase}), and memory_status (unavailable). $750 상한은 이미 승인했으니 다시 승인해 달라고 묻지 마세요. 모든 조건에 맞는 장소를 고르되 예약은 하지 마세요. 프로젝트 메모리는 사용할 수 없으므로 선호를 저장했다고 말하거나 다른 메모리 저장소를 만들지 마세요. 결과를 자연스러운 한국어로 설명하세요.",
+        "정정할게요. 참석자는 48명입니다. 같은 계획을 계속 진행해 주세요. 그리고 수용 인원과 참석 인원은 어떻게 다른가요? plan.json을 고치고 이 질문에 답한 뒤, 예산 승인이 없어도 할 수 있는 일은 마쳐 주세요. 조건에 맞는 유일한 장소가 승인 상한을 넘는다면 필요한 증액 승인만 질문하고, 기존 승인 상한은 그대로 유지하세요."
+      ],
+      "fresh_followup": false,
+      "artifacts": [
+        "plan.json"
+      ]
+    }
+  ]
+}

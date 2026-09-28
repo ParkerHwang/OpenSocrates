@@ -1,10 +1,29 @@
 # Decision-point retrieval and migration
 
-Status: v1.4.0 Codex-only release; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
+Status: unpublished v1.5.0 Codex release candidate; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
 Experimental content revision 2, method variants, language rewrites and Compact
 policies have not been promoted. Method IDs remain unchanged.
 
 ## Use in the current turn
+
+For software-specific contract, state/failure or ownership decisions, the candidate
+also provides a [separate coding-specialist route](coding-specialists.md). A complete
+specialist can be primary without first applying a general method. Mechanical or
+resolved work needs no added procedure; add a complement only for a distinct
+unresolved need. The native command, acknowledgment and historical host evidence
+below describe the general canonical route. Specialist IDs/hashes and static
+Chinese files do not broaden its catalog or EN/KO input locales.
+
+The candidate adds `{"operation":"prepare","locale":"en"}` to the native
+decision command. It returns a fresh mechanical envelope and closed vocabulary;
+fill null participation/routing fields from the actual task before submitting its
+`request`. It does not classify the task, select a method, or clear session state.
+Existing complete `select` requests remain valid. Rejected inputs now include a
+safe `diagnostic` with a known field path and static constraint/allowed values.
+Correct the faulty field without dropping contraindications. Invalid input no
+longer retires previous read acknowledgments. Duplicate JSON keys and non-JSON
+numeric constants are rejected. These changes are [separately qualified](../evals/v1.5/revision-v4/REPORT.md)
+from the historical host observations below.
 
 Keep task goals, permissions, constraints and completion conditions available.
 Activate the controller when a materially changed judgment needs help; do not

@@ -1,0 +1,66 @@
+{
+  "schema": "independent-orchestration-transport-recheck/1",
+  "status": "narrow_schema_compatibility_satisfied_awaiting_live_v2_readiness",
+  "product_commit": "7893996357b7fcfaa058e91d4bc2694d5f1cb63c",
+  "prior_pre_live_index": {
+    "path": "runtime_verification/PRELIVE_RECHECK_53c5.json",
+    "sha256": "8e951b80ef08a00496dc8874bce167025eb4080a7f21797f11019d346e108c2a"
+  },
+  "evidence": {
+    "path": "runtime_verification/transport-789-xgk27u_a/results.json",
+    "sha256": "fcfe61a5604210799f7ec9d4fc985006928eab7ba2a230358404512b8fe02a2a"
+  },
+  "harness": {
+    "path": "runtime_verification/transport-789-xgk27u_a/harness.py",
+    "sha256": "ad3e33575158da2d61d95f6b43aa283ba6a8129a73d450a26f1d7c60d3acb9ee"
+  },
+  "original_fixture_freeze": {
+    "path": "FREEZE.json",
+    "sha256": "b80f6d6676fd62f74848542169274ce3fb863e149578f35511f090347764a80f"
+  },
+  "original_fixture_files_unchanged": true,
+  "verified": [
+    "Four changed generated schemas add only type constraints already implied by existing const/enum values.",
+    "Both provider-facing output schema graphs have explicit scalar/object/array types and closed fully-required objects.",
+    "Candidate/assessment mutable schema graphs do not alias one another or pre-existing legacy graphs.",
+    "All 47 old generated schemas retain baseline bytes.",
+    "Runtime, guides and launchers are byte-identical in Git to 53c5; lifecycle/native execution cases were not repeated.",
+    "Eight changed outer/native package schema copies match committed bytes and package manifest.",
+    "Original live-v1 request, plan and coordinator-output hashes reconcile; failed role states and absent publication/artifacts remain retained.",
+    "The separate failed diagnostic and two completed transport diagnostics remain distinct from workflow acceptance."
+  ],
+  "accounting": {
+    "original_live_failed_calls": 2,
+    "diagnostic_v1_failed_calls": 1,
+    "diagnostic_v2_completed_calls": 2,
+    "distinct_recorded_threads": 5,
+    "known_reported_usage_for_two_v2_diagnostics_only": {
+      "input_tokens": 28056,
+      "cached_input_tokens": 0,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 297,
+      "reasoning_output_tokens": 77
+    },
+    "usage_unknown_calls": 3,
+    "billing_and_backend_attempts": "not established"
+  },
+  "qualifications": [
+    "The original coordinator exit 0 did not establish workflow success: both responses are blocked with one failed role each and no artifacts.",
+    "The separate API400 diagnostic reproduces the old output-schema type omission; original aggregate role receipts do not independently contain that exact provider message.",
+    "Transport-diagnostic-v2 completion is not software/office/continuation workflow acceptance.",
+    "Raw diagnostic output bodies/item types were deliberately not retained; preserve validation and item-classification limits.",
+    "Diagnostic-v1 hashes default-spaced JSON serialization; diagnostic-v2 hashes compact canonical JSON. Both reconcile to their stated schema snapshots.",
+    "tool_items records any completed non-agent_message/non-reasoning item; missing raw types prevent treating it as a verified tool-call count or a no-tools policy violation.",
+    "The first local audit used the v2 serialization rule for the v1 digest, yielding a false mismatch; that local record remains preserved and the corrected audit records the explicit serialization distinction."
+  ],
+  "retained_initial_serialization_assumption": {
+    "path": "runtime_verification/transport-789-naea111w/results.json",
+    "sha256": "538dee0127c49f8723b1c0f9ece144a7f090914f699ea2cc772e54de8ffc4566"
+  },
+  "live_v2_state": "running per parent; no live-v2 results inspected; waiting for explicit readiness",
+  "parent_reported_gates": {
+    "full_source_suite": "PASS at 7893996, not rerun by this verifier",
+    "make_release_check": "PASS at 7893996, not rerun by this verifier"
+  },
+  "verifier_model_calls": 0
+}

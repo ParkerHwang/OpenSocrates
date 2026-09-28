@@ -1,0 +1,1521 @@
+{
+  "cell": "consulting-gpt-6-astra-xhigh-v14",
+  "read_only": true,
+  "artifacts": [
+    {
+      "source": "deliverables/meridian_analysis.xlsx",
+      "sha256": "27b046d56ab6b2ef1b9662bea95c1561d4f6899195ce520975f7477caf8184d4",
+      "bytes": 323347,
+      "sheets": [
+        {
+          "name": "Decision",
+          "dimensions": "A1:L55",
+          "freeze_panes": null,
+          "autofilter": null,
+          "formula_count": 3,
+          "formula_examples": [
+            {
+              "cell": "A7",
+              "formula": "=Portfolios!G87"
+            },
+            {
+              "cell": "E7",
+              "formula": "=Portfolios!E87"
+            },
+            {
+              "cell": "I7",
+              "formula": "=Portfolios!F87"
+            }
+          ],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Reserve Czechia + Spain; launch in stages",
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              "Provisional recommendation | Spain first; Czechia released after demand, savings and FX review. No measured hub uplift or transaction cash ledger supplied.",
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              "Base annual increment (EUR)",
+              null,
+              null,
+              null,
+              "Year-zero capex (EUR)",
+              null,
+              null,
+              null,
+              "Total hub FTE",
+              null
+            ]
+          ]
+        },
+        {
+          "name": "Guide",
+          "dimensions": "A1:B17",
+          "freeze_panes": "B2",
+          "autofilter": "A1:B17",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Topic",
+              "Definition / use"
+            ],
+            [
+              "Start here",
+              "Decision shows the chosen envelope. Countries and Monthly are formulas from the order ledger. Scenarios and Portfolios link to baseline and editable Inputs; cached results permit immediate viewing."
+            ],
+            [
+              "Evidence states",
+              "Client transactions/options/policy are synthetic. ECB and World Bank are archived official public observations. Archive collection is not a live client account or current market research."
+            ],
+            [
+              "Baseline scope",
+              "Highest numeric revision per ID across both order pages and corrections; full-row replacement. Eligible: shipped, not test, shipment in 2025. Keep zero-price shipments."
+            ],
+            [
+              "Returns",
+              "Highest revision per return ID. Received through inclusive 2026-01-31; link only to eligible orders. Orphans quarantined. Distinct return IDs add; none of the included orders happens to have multiple IDs."
+            ],
+            [
+              "Gross / net sales",
+              "Gross means quantity \u00d7 price minus discount, tax excluded and before refunds. Net = gross less explicit credit amounts. Returns are assigned to the original shipment month for cohort analysis."
+            ]
+          ]
+        },
+        {
+          "name": "Sources",
+          "dimensions": "A1:K15",
+          "freeze_panes": "B2",
+          "autofilter": "A1:K15",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "ID",
+              "File",
+              "Status",
+              "Units",
+              "Period",
+              "Collected UTC",
+              "Archive retrieval UTC",
+              "Source revision",
+              "SHA-256",
+              "Original URL"
+            ],
+            [
+              "S01",
+              "evidence/raw/index.html",
+              "archive_metadata",
+              "metadata / definitions / assumptions",
+              "steady-state annual hub assumptions / archive metadata",
+              "2026-09-27T10:12:04.184464+00:00",
+              null,
+              "Client revision fields govern; scenario version as collected",
+              "7e12a215fdfb75f175b36e100b796f2ad908e9986f5d68f2a16eb9c8f0076604",
+              "http://127.0.0.1:49799/"
+            ],
+            [
+              "S02",
+              "evidence/raw/data-dictionary.md",
+              "synthetic_client",
+              "metadata / definitions / assumptions",
+              "steady-state annual hub assumptions / archive metadata",
+              "2026-09-27T10:12:04.185429+00:00",
+              null,
+              "Client revision fields govern; scenario version as collected",
+              "0a1866e9f89b5c6d40ed2ac24599a118223360fa028e61012d1ecd8ac6b6117f",
+              "http://127.0.0.1:49799/data-dictionary.md"
+            ],
+            [
+              "S03",
+              "evidence/raw/ecb-history.csv",
+              "archived_official_public",
+              "local currency units per EUR",
+              "full ECB history; model uses 2025",
+              "2026-09-27T10:12:04.189253+00:00",
+              "2026-09-27T06:36:40.952057+00:00",
+              "Archive fetched before outcome calls. This vintage may include subsequent revisions of historical years.",
+              "e8136f072d575cb891cb58718fe31602ca2d4feccee67f035106393ed1c4bdbb",
+              "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.zip"
+            ],
+            [
+              "S04",
+              "evidence/raw/ecb-history.zip",
+              "archived_official_public",
+              "local currency units per EUR",
+              "full ECB history; model uses 2025",
+              "2026-09-27T10:12:04.193300+00:00",
+              "2026-09-27T06:36:40.952057+00:00",
+              "Archive fetched before outcome calls. This vintage may include subsequent revisions of historical years.",
+              "dfe9ab070c0679d42a174981e07b240131d2db19d20108a5d0e4653d9f61fc9f",
+              "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.zip"
+            ],
+            [
+              "S05",
+              "evidence/raw/gdp-per-capita.json",
+              "archived_official_public",
+              "current US$ per person",
+              "2022\u20132024",
+              "2026-09-27T10:12:04.194339+00:00",
+              "2026-09-27T06:36:40.951986+00:00",
+              "2026-07-13",
+              "df654256a8803415e2e2c5864d1a00966cfd3150c069b1b897101748471524da",
+              "https://api.worldbank.org/v2/country/DEU;FRA;NLD;POL;CZE;ESP/indicator/NY.GDP.PCAP.CD?date=2022:2024&format=json&per_page=1000"
+            ]
+          ]
+        },
+        {
+          "name": "Quality",
+          "dimensions": "A1:C19",
+          "freeze_panes": "B2",
+          "autofilter": "A1:C19",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Control / anomaly",
+              "Count / quantity",
+              "Handling / limitation"
+            ],
+            [
+              "Order raw rows",
+              1328,
+              "655 + 655 extract rows + 18 corrections"
+            ],
+            [
+              "Order identical duplicates",
+              13,
+              "Removed before revision selection"
+            ],
+            [
+              "Superseded order revisions",
+              18,
+              "Corrections replace the entire previous row"
+            ],
+            [
+              "Retained order IDs",
+              1297,
+              "No equal-revision conflicts"
+            ],
+            [
+              "Eligible 2025 shipments",
+              1254,
+              "24 cancelled + 18 test + 1 future shipment excluded"
+            ]
+          ]
+        },
+        {
+          "name": "Inputs",
+          "dimensions": "A1:I15",
+          "freeze_panes": "B2",
+          "autofilter": null,
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Country",
+              "Capex EUR",
+              "FTE",
+              "Annual fixed EUR",
+              "Saving EUR/unit",
+              null,
+              null,
+              "Policy assumption",
+              "Value"
+            ],
+            [
+              "DEU",
+              280000,
+              5,
+              95000,
+              2.6,
+              null,
+              null,
+              "Low uplift",
+              0.1
+            ],
+            [
+              "FRA",
+              210000,
+              4,
+              85000,
+              2.9,
+              null,
+              null,
+              "Base uplift",
+              0.25
+            ],
+            [
+              "NLD",
+              140000,
+              3,
+              65000,
+              3.2,
+              null,
+              null,
+              "High uplift",
+              0.4
+            ],
+            [
+              "POL",
+              110000,
+              3,
+              45000,
+              2.4,
+              null,
+              null,
+              "Refund shock \u00d7 gross",
+              0.03
+            ],
+            [
+              "CZE",
+              95000,
+              2,
+              40000,
+              2.1,
+              null,
+              null,
+              "PLN/CZK FX shock \u00d7 net",
+              0.1
+            ]
+          ]
+        },
+        {
+          "name": "FX daily",
+          "dimensions": "A1:C511",
+          "freeze_panes": "B2",
+          "autofilter": "A1:C511",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Date",
+              "Currency",
+              "Local units / EUR"
+            ],
+            [
+              "2025-01-02",
+              "CZK",
+              25.177
+            ],
+            [
+              "2025-01-03",
+              "CZK",
+              25.166
+            ],
+            [
+              "2025-01-06",
+              "CZK",
+              25.154
+            ],
+            [
+              "2025-01-07",
+              "CZK",
+              25.137
+            ],
+            [
+              "2025-01-08",
+              "CZK",
+              25.15
+            ]
+          ]
+        },
+        {
+          "name": "FX monthly",
+          "dimensions": "A1:E25",
+          "freeze_panes": "B2",
+          "autofilter": "A1:E25",
+          "formula_count": 48,
+          "formula_examples": [
+            {
+              "cell": "C2",
+              "formula": "=AVERAGEIFS('FX daily'!$C$2:$C$511,'FX daily'!$B$2:$B$511,A2,'FX daily'!$A$2:$A$511,B2&\"*\")"
+            },
+            {
+              "cell": "D2",
+              "formula": "=COUNTIFS('FX daily'!$B$2:$B$511,A2,'FX daily'!$A$2:$A$511,B2&\"*\")"
+            },
+            {
+              "cell": "C3",
+              "formula": "=AVERAGEIFS('FX daily'!$C$2:$C$511,'FX daily'!$B$2:$B$511,A3,'FX daily'!$A$2:$A$511,B3&\"*\")"
+            },
+            {
+              "cell": "D3",
+              "formula": "=COUNTIFS('FX daily'!$B$2:$B$511,A3,'FX daily'!$A$2:$A$511,B3&\"*\")"
+            },
+            {
+              "cell": "C4",
+              "formula": "=AVERAGEIFS('FX daily'!$C$2:$C$511,'FX daily'!$B$2:$B$511,A4,'FX daily'!$A$2:$A$511,B4&\"*\")"
+            }
+          ],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Currency",
+              "Month",
+              "Local units / EUR",
+              "Published observations",
+              "Join key"
+            ],
+            [
+              "PLN",
+              "2025-01",
+              "=AVERAGEIFS('FX daily'!$C$2:$C$511,'FX daily'!$B$2:$B$511,A2,'FX daily'!$A$2:$A$511,B2&\"*\")",
+              "=COUNTIFS('FX daily'!$B$2:$B$511,A2,'FX daily'!$A$2:$A$511,B2&\"*\")",
+              "PLN|2025-01"
+            ],
+            [
+              "PLN",
+              "2025-02",
+              "=AVERAGEIFS('FX daily'!$C$2:$C$511,'FX daily'!$B$2:$B$511,A3,'FX daily'!$A$2:$A$511,B3&\"*\")",
+              "=COUNTIFS('FX daily'!$B$2:$B$511,A3,'FX daily'!$A$2:$A$511,B3&\"*\")",
+              "PLN|2025-02"
+            ],
+            [
+              "PLN",
+              "2025-03",
+              "=AVERAGEIFS('FX daily'!$C$2:$C$511,'FX daily'!$B$2:$B$511,A4,'FX daily'!$A$2:$A$511,B4&\"*\")",
+              "=COUNTIFS('FX daily'!$B$2:$B$511,A4,'FX daily'!$A$2:$A$511,B4&\"*\")",
+              "PLN|2025-03"
+            ],
+            [
+              "PLN",
+              "2025-04",
+              "=AVERAGEIFS('FX daily'!$C$2:$C$511,'FX daily'!$B$2:$B$511,A5,'FX daily'!$A$2:$A$511,B5&\"*\")",
+              "=COUNTIFS('FX daily'!$B$2:$B$511,A5,'FX daily'!$A$2:$A$511,B5&\"*\")",
+              "PLN|2025-04"
+            ],
+            [
+              "PLN",
+              "2025-05",
+              "=AVERAGEIFS('FX daily'!$C$2:$C$511,'FX daily'!$B$2:$B$511,A6,'FX daily'!$A$2:$A$511,B6&\"*\")",
+              "=COUNTIFS('FX daily'!$B$2:$B$511,A6,'FX daily'!$A$2:$A$511,B6&\"*\")",
+              "PLN|2025-05"
+            ]
+          ]
+        },
+        {
+          "name": "Market",
+          "dimensions": "A1:G19",
+          "freeze_panes": "B2",
+          "autofilter": "A1:G19",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Country",
+              "Year",
+              "Population persons",
+              "GDP per capita current US$",
+              "Population source",
+              "GDP source",
+              "WB lastupdated"
+            ],
+            [
+              "DEU",
+              2022,
+              83177813,
+              50506.5179638543,
+              "S10 / SP.POP.TOTL",
+              "S05 / NY.GDP.PCAP.CD",
+              "2026-07-13"
+            ],
+            [
+              "DEU",
+              2023,
+              83287273,
+              54776.7668235491,
+              "S10 / SP.POP.TOTL",
+              "S05 / NY.GDP.PCAP.CD",
+              "2026-07-13"
+            ],
+            [
+              "DEU",
+              2024,
+              83516593,
+              56103.7323182554,
+              "S10 / SP.POP.TOTL",
+              "S05 / NY.GDP.PCAP.CD",
+              "2026-07-13"
+            ],
+            [
+              "FRA",
+              2022,
+              68184457,
+              40988.6396406579,
+              "S10 / SP.POP.TOTL",
+              "S05 / NY.GDP.PCAP.CD",
+              "2026-07-13"
+            ],
+            [
+              "FRA",
+              2023,
+              68372286,
+              44700.1384177544,
+              "S10 / SP.POP.TOTL",
+              "S05 / NY.GDP.PCAP.CD",
+              "2026-07-13"
+            ]
+          ]
+        },
+        {
+          "name": "Orders",
+          "dimensions": "A1:AC1255",
+          "freeze_panes": "E2",
+          "autofilter": "A1:AC1255",
+          "formula_count": 10450,
+          "formula_examples": [
+            {
+              "cell": "L2",
+              "formula": "=I2*J2-K2"
+            },
+            {
+              "cell": "Q2",
+              "formula": "=ROUND(L2/N2,2)"
+            },
+            {
+              "cell": "R2",
+              "formula": "=ROUND(M2/N2,2)"
+            },
+            {
+              "cell": "S2",
+              "formula": "=Q2-R2"
+            },
+            {
+              "cell": "T2",
+              "formula": "=ROUND(I2*O2,2)"
+            }
+          ],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Order ID",
+              "Revision",
+              "Country",
+              "Month",
+              "Shipped at",
+              "SKU",
+              "Currency",
+              "Orders",
+              "Units",
+              "Unit price local"
+            ],
+            [
+              "M1-01-001",
+              1,
+              "DEU",
+              "2025-01",
+              "2025-01-03",
+              "AXLE",
+              "EUR",
+              1,
+              87,
+              33
+            ],
+            [
+              "M1-01-002",
+              1,
+              "DEU",
+              "2025-01",
+              "2025-01-04",
+              "BRAKE",
+              "EUR",
+              1,
+              20,
+              54
+            ],
+            [
+              "M1-01-003",
+              1,
+              "DEU",
+              "2025-01",
+              "2025-01-05",
+              "SENSOR",
+              "EUR",
+              1,
+              34,
+              75
+            ],
+            [
+              "M1-01-004",
+              1,
+              "DEU",
+              "2025-01",
+              "2025-01-06",
+              "AXLE",
+              "EUR",
+              1,
+              54,
+              33
+            ],
+            [
+              "M1-01-005",
+              1,
+              "DEU",
+              "2025-01",
+              "2025-01-07",
+              "BRAKE",
+              "EUR",
+              1,
+              80,
+              54
+            ]
+          ]
+        },
+        {
+          "name": "Monthly",
+          "dimensions": "A1:L73",
+          "freeze_panes": "C2",
+          "autofilter": "A1:L73",
+          "formula_count": 720,
+          "formula_examples": [
+            {
+              "cell": "C2",
+              "formula": "=SUMIFS(Orders!$H$2:$H$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)"
+            },
+            {
+              "cell": "D2",
+              "formula": "=SUMIFS(Orders!$I$2:$I$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)"
+            },
+            {
+              "cell": "E2",
+              "formula": "=SUMIFS(Orders!$Q$2:$Q$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)"
+            },
+            {
+              "cell": "F2",
+              "formula": "=SUMIFS(Orders!$R$2:$R$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)"
+            },
+            {
+              "cell": "G2",
+              "formula": "=SUMIFS(Orders!$S$2:$S$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)"
+            }
+          ],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Country",
+              "Month",
+              "Shipped orders",
+              "Shipped units",
+              "Gross sales EUR",
+              "Refunds EUR",
+              "Net sales EUR",
+              "Net COGS EUR",
+              "Fulfillment EUR",
+              "Contribution EUR"
+            ],
+            [
+              "DEU",
+              "2025-01",
+              "=SUMIFS(Orders!$H$2:$H$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)",
+              "=SUMIFS(Orders!$I$2:$I$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)",
+              "=SUMIFS(Orders!$Q$2:$Q$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)",
+              "=SUMIFS(Orders!$R$2:$R$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)",
+              "=SUMIFS(Orders!$S$2:$S$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)",
+              "=SUMIFS(Orders!$W$2:$W$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)",
+              "=SUMIFS(Orders!$X$2:$X$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)",
+              "=SUMIFS(Orders!$Y$2:$Y$1255,Orders!$C$2:$C$1255,A2,Orders!$D$2:$D$1255,B2)"
+            ],
+            [
+              "DEU",
+              "2025-02",
+              "=SUMIFS(Orders!$H$2:$H$1255,Orders!$C$2:$C$1255,A3,Orders!$D$2:$D$1255,B3)",
+              "=SUMIFS(Orders!$I$2:$I$1255,Orders!$C$2:$C$1255,A3,Orders!$D$2:$D$1255,B3)",
+              "=SUMIFS(Orders!$Q$2:$Q$1255,Orders!$C$2:$C$1255,A3,Orders!$D$2:$D$1255,B3)",
+              "=SUMIFS(Orders!$R$2:$R$1255,Orders!$C$2:$C$1255,A3,Orders!$D$2:$D$1255,B3)",
+              "=SUMIFS(Orders!$S$2:$S$1255,Orders!$C$2:$C$1255,A3,Orders!$D$2:$D$1255,B3)",
+              "=SUMIFS(Orders!$W$2:$W$1255,Orders!$C$2:$C$1255,A3,Orders!$D$2:$D$1255,B3)",
+              "=SUMIFS(Orders!$X$2:$X$1255,Orders!$C$2:$C$1255,A3,Orders!$D$2:$D$1255,B3)",
+              "=SUMIFS(Orders!$Y$2:$Y$1255,Orders!$C$2:$C$1255,A3,Orders!$D$2:$D$1255,B3)"
+            ],
+            [
+              "DEU",
+              "2025-03",
+              "=SUMIFS(Orders!$H$2:$H$1255,Orders!$C$2:$C$1255,A4,Orders!$D$2:$D$1255,B4)",
+              "=SUMIFS(Orders!$I$2:$I$1255,Orders!$C$2:$C$1255,A4,Orders!$D$2:$D$1255,B4)",
+              "=SUMIFS(Orders!$Q$2:$Q$1255,Orders!$C$2:$C$1255,A4,Orders!$D$2:$D$1255,B4)",
+              "=SUMIFS(Orders!$R$2:$R$1255,Orders!$C$2:$C$1255,A4,Orders!$D$2:$D$1255,B4)",
+              "=SUMIFS(Orders!$S$2:$S$1255,Orders!$C$2:$C$1255,A4,Orders!$D$2:$D$1255,B4)",
+              "=SUMIFS(Orders!$W$2:$W$1255,Orders!$C$2:$C$1255,A4,Orders!$D$2:$D$1255,B4)",
+              "=SUMIFS(Orders!$X$2:$X$1255,Orders!$C$2:$C$1255,A4,Orders!$D$2:$D$1255,B4)",
+              "=SUMIFS(Orders!$Y$2:$Y$1255,Orders!$C$2:$C$1255,A4,Orders!$D$2:$D$1255,B4)"
+            ],
+            [
+              "DEU",
+              "2025-04",
+              "=SUMIFS(Orders!$H$2:$H$1255,Orders!$C$2:$C$1255,A5,Orders!$D$2:$D$1255,B5)",
+              "=SUMIFS(Orders!$I$2:$I$1255,Orders!$C$2:$C$1255,A5,Orders!$D$2:$D$1255,B5)",
+              "=SUMIFS(Orders!$Q$2:$Q$1255,Orders!$C$2:$C$1255,A5,Orders!$D$2:$D$1255,B5)",
+              "=SUMIFS(Orders!$R$2:$R$1255,Orders!$C$2:$C$1255,A5,Orders!$D$2:$D$1255,B5)",
+              "=SUMIFS(Orders!$S$2:$S$1255,Orders!$C$2:$C$1255,A5,Orders!$D$2:$D$1255,B5)",
+              "=SUMIFS(Orders!$W$2:$W$1255,Orders!$C$2:$C$1255,A5,Orders!$D$2:$D$1255,B5)",
+              "=SUMIFS(Orders!$X$2:$X$1255,Orders!$C$2:$C$1255,A5,Orders!$D$2:$D$1255,B5)",
+              "=SUMIFS(Orders!$Y$2:$Y$1255,Orders!$C$2:$C$1255,A5,Orders!$D$2:$D$1255,B5)"
+            ],
+            [
+              "DEU",
+              "2025-05",
+              "=SUMIFS(Orders!$H$2:$H$1255,Orders!$C$2:$C$1255,A6,Orders!$D$2:$D$1255,B6)",
+              "=SUMIFS(Orders!$I$2:$I$1255,Orders!$C$2:$C$1255,A6,Orders!$D$2:$D$1255,B6)",
+              "=SUMIFS(Orders!$Q$2:$Q$1255,Orders!$C$2:$C$1255,A6,Orders!$D$2:$D$1255,B6)",
+              "=SUMIFS(Orders!$R$2:$R$1255,Orders!$C$2:$C$1255,A6,Orders!$D$2:$D$1255,B6)",
+              "=SUMIFS(Orders!$S$2:$S$1255,Orders!$C$2:$C$1255,A6,Orders!$D$2:$D$1255,B6)",
+              "=SUMIFS(Orders!$W$2:$W$1255,Orders!$C$2:$C$1255,A6,Orders!$D$2:$D$1255,B6)",
+              "=SUMIFS(Orders!$X$2:$X$1255,Orders!$C$2:$C$1255,A6,Orders!$D$2:$D$1255,B6)",
+              "=SUMIFS(Orders!$Y$2:$Y$1255,Orders!$C$2:$C$1255,A6,Orders!$D$2:$D$1255,B6)"
+            ]
+          ]
+        },
+        {
+          "name": "Countries",
+          "dimensions": "A1:K9",
+          "freeze_panes": "B2",
+          "autofilter": "A1:K7",
+          "formula_count": 70,
+          "formula_examples": [
+            {
+              "cell": "B2",
+              "formula": "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$C$2:$C$73)"
+            },
+            {
+              "cell": "C2",
+              "formula": "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$D$2:$D$73)"
+            },
+            {
+              "cell": "D2",
+              "formula": "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$E$2:$E$73)"
+            },
+            {
+              "cell": "E2",
+              "formula": "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$F$2:$F$73)"
+            },
+            {
+              "cell": "F2",
+              "formula": "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$G$2:$G$73)"
+            }
+          ],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Country",
+              "Shipped orders",
+              "Shipped units",
+              "Gross sales EUR",
+              "Refunds EUR",
+              "Net sales EUR",
+              "Net COGS EUR",
+              "Fulfillment EUR",
+              "Contribution EUR",
+              "Returned units"
+            ],
+            [
+              "DEU",
+              "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$C$2:$C$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$D$2:$D$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$E$2:$E$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$F$2:$F$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$G$2:$G$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$H$2:$H$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$I$2:$I$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$J$2:$J$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A2,Monthly!$K$2:$K$73)"
+            ],
+            [
+              "FRA",
+              "=SUMIF(Monthly!$A$2:$A$73,A3,Monthly!$C$2:$C$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A3,Monthly!$D$2:$D$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A3,Monthly!$E$2:$E$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A3,Monthly!$F$2:$F$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A3,Monthly!$G$2:$G$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A3,Monthly!$H$2:$H$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A3,Monthly!$I$2:$I$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A3,Monthly!$J$2:$J$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A3,Monthly!$K$2:$K$73)"
+            ],
+            [
+              "NLD",
+              "=SUMIF(Monthly!$A$2:$A$73,A4,Monthly!$C$2:$C$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A4,Monthly!$D$2:$D$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A4,Monthly!$E$2:$E$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A4,Monthly!$F$2:$F$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A4,Monthly!$G$2:$G$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A4,Monthly!$H$2:$H$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A4,Monthly!$I$2:$I$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A4,Monthly!$J$2:$J$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A4,Monthly!$K$2:$K$73)"
+            ],
+            [
+              "POL",
+              "=SUMIF(Monthly!$A$2:$A$73,A5,Monthly!$C$2:$C$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A5,Monthly!$D$2:$D$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A5,Monthly!$E$2:$E$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A5,Monthly!$F$2:$F$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A5,Monthly!$G$2:$G$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A5,Monthly!$H$2:$H$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A5,Monthly!$I$2:$I$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A5,Monthly!$J$2:$J$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A5,Monthly!$K$2:$K$73)"
+            ],
+            [
+              "CZE",
+              "=SUMIF(Monthly!$A$2:$A$73,A6,Monthly!$C$2:$C$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A6,Monthly!$D$2:$D$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A6,Monthly!$E$2:$E$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A6,Monthly!$F$2:$F$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A6,Monthly!$G$2:$G$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A6,Monthly!$H$2:$H$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A6,Monthly!$I$2:$I$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A6,Monthly!$J$2:$J$73)",
+              "=SUMIF(Monthly!$A$2:$A$73,A6,Monthly!$K$2:$K$73)"
+            ]
+          ]
+        },
+        {
+          "name": "Scenarios",
+          "dimensions": "A1:P25",
+          "freeze_panes": "C2",
+          "autofilter": "A1:P25",
+          "formula_count": 336,
+          "formula_examples": [
+            {
+              "cell": "C2",
+              "formula": "=Inputs!I2"
+            },
+            {
+              "cell": "D2",
+              "formula": "=Countries!I2"
+            },
+            {
+              "cell": "E2",
+              "formula": "=Countries!C2"
+            },
+            {
+              "cell": "F2",
+              "formula": "=Countries!D2"
+            },
+            {
+              "cell": "G2",
+              "formula": "=Countries!F2"
+            }
+          ],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Country",
+              "Scenario",
+              "Volume uplift",
+              "Baseline C EUR",
+              "Units U",
+              "Gross G EUR",
+              "Net N EUR",
+              "Saving EUR/unit",
+              "Fixed EUR/year",
+              "Capex EUR"
+            ],
+            [
+              "DEU",
+              "low",
+              "=Inputs!I2",
+              "=Countries!I2",
+              "=Countries!C2",
+              "=Countries!D2",
+              "=Countries!F2",
+              "=Inputs!E2",
+              "=Inputs!D2",
+              "=Inputs!B2"
+            ],
+            [
+              "DEU",
+              "base",
+              "=Inputs!I3",
+              "=Countries!I2",
+              "=Countries!C2",
+              "=Countries!D2",
+              "=Countries!F2",
+              "=Inputs!E2",
+              "=Inputs!D2",
+              "=Inputs!B2"
+            ],
+            [
+              "DEU",
+              "high",
+              "=Inputs!I4",
+              "=Countries!I2",
+              "=Countries!C2",
+              "=Countries!D2",
+              "=Countries!F2",
+              "=Inputs!E2",
+              "=Inputs!D2",
+              "=Inputs!B2"
+            ],
+            [
+              "DEU",
+              "stress",
+              "=Inputs!I3",
+              "=Countries!I2",
+              "=Countries!C2",
+              "=Countries!D2",
+              "=Countries!F2",
+              "=Inputs!E2",
+              "=Inputs!D2",
+              "=Inputs!B2"
+            ],
+            [
+              "FRA",
+              "low",
+              "=Inputs!I2",
+              "=Countries!I3",
+              "=Countries!C3",
+              "=Countries!D3",
+              "=Countries!F3",
+              "=Inputs!E3",
+              "=Inputs!D3",
+              "=Inputs!B3"
+            ]
+          ]
+        },
+        {
+          "name": "Portfolios",
+          "dimensions": "A1:K89",
+          "freeze_panes": "B2",
+          "autofilter": "A1:K89",
+          "formula_count": 616,
+          "formula_examples": [
+            {
+              "cell": "E2",
+              "formula": "=SUMIFS(Scenarios!$J$2:$J$25,Scenarios!$A$2:$A$25,B2,Scenarios!$B$2:$B$25,D2)+SUMIFS(Scenarios!$J$2:$J$25,Scenarios!$A$2:$A$25,C2,Scenarios!$B$2:$B$25,D2)"
+            },
+            {
+              "cell": "F2",
+              "formula": "=SUMIFS(Scenarios!$K$2:$K$25,Scenarios!$A$2:$A$25,B2,Scenarios!$B$2:$B$25,D2)+SUMIFS(Scenarios!$K$2:$K$25,Scenarios!$A$2:$A$25,C2,Scenarios!$B$2:$B$25,D2)"
+            },
+            {
+              "cell": "G2",
+              "formula": "=SUMIFS(Scenarios!$O$2:$O$25,Scenarios!$A$2:$A$25,B2,Scenarios!$B$2:$B$25,D2)+SUMIFS(Scenarios!$O$2:$O$25,Scenarios!$A$2:$A$25,C2,Scenarios!$B$2:$B$25,D2)"
+            },
+            {
+              "cell": "H2",
+              "formula": "=IF(G2>0,E2/G2,\"\")"
+            },
+            {
+              "cell": "I2",
+              "formula": "=AND(E2<=Inputs!$I$7,F2<=Inputs!$I$8,COUNTA(B2:C2)<=Inputs!$I$9)"
+            }
+          ],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Portfolio",
+              "Hub 1",
+              "Hub 2",
+              "Scenario",
+              "Capex EUR",
+              "FTE",
+              "Annual increment EUR",
+              "Payback years",
+              "Feasible",
+              "Base/scenario rank"
+            ],
+            [
+              "DEFER",
+              null,
+              null,
+              "low",
+              "=SUMIFS(Scenarios!$J$2:$J$25,Scenarios!$A$2:$A$25,B2,Scenarios!$B$2:$B$25,D2)+SUMIFS(Scenarios!$J$2:$J$25,Scenarios!$A$2:$A$25,C2,Scenarios!$B$2:$B$25,D2)",
+              "=SUMIFS(Scenarios!$K$2:$K$25,Scenarios!$A$2:$A$25,B2,Scenarios!$B$2:$B$25,D2)+SUMIFS(Scenarios!$K$2:$K$25,Scenarios!$A$2:$A$25,C2,Scenarios!$B$2:$B$25,D2)",
+              "=SUMIFS(Scenarios!$O$2:$O$25,Scenarios!$A$2:$A$25,B2,Scenarios!$B$2:$B$25,D2)+SUMIFS(Scenarios!$O$2:$O$25,Scenarios!$A$2:$A$25,C2,Scenarios!$B$2:$B$25,D2)",
+              "=IF(G2>0,E2/G2,\"\")",
+              "=AND(E2<=Inputs!$I$7,F2<=Inputs!$I$8,COUNTA(B2:C2)<=Inputs!$I$9)",
+              "=IF(I2,COUNTIFS($D$2:$D$89,D2,$I$2:$I$89,TRUE,$G$2:$G$89,\">\"&G2)+1,\"\")"
+            ],
+            [
+              "DEFER",
+              null,
+              null,
+              "base",
+              "=SUMIFS(Scenarios!$J$2:$J$25,Scenarios!$A$2:$A$25,B3,Scenarios!$B$2:$B$25,D3)+SUMIFS(Scenarios!$J$2:$J$25,Scenarios!$A$2:$A$25,C3,Scenarios!$B$2:$B$25,D3)",
+              "=SUMIFS(Scenarios!$K$2:$K$25,Scenarios!$A$2:$A$25,B3,Scenarios!$B$2:$B$25,D3)+SUMIFS(Scenarios!$K$2:$K$25,Scenarios!$A$2:$A$25,C3,Scenarios!$B$2:$B$25,D3)",
+              "=SUMIFS(Scenarios!$O$2:$O$25,Scenarios!$A$2:$A$25,B3,Scenarios!$B$2:$B$25,D3)+SUMIFS(Scenarios!$O$2:$O$25,Scenarios!$A$2:$A$25,C3,Scenarios!$B$2:$B$25,D3)",
+              "=IF(G3>0,E3/G3,\"\")",
+              "=AND(E3<=Inputs!$I$7,F3<=Inputs!$I$8,COUNTA(B3:C3)<=Inputs!$I$9)",
+              "=IF(I3,COUNTIFS($D$2:$D$89,D3,$I$2:$I$89,TRUE,$G$2:$G$89,\">\"&G3)+1,\"\")"
+            ],
+            [
+              "DEFER",
+              null,
+              null,
+              "high",
+              "=SUMIFS(Scenarios!$J$2:$J$25,Scenarios!$A$2:$A$25,B4,Scenarios!$B$2:$B$25,D4)+SUMIFS(Scenarios!$J$2:$J$25,Scenarios!$A$2:$A$25,C4,Scenarios!$B$2:$B$25,D4)",
+              "=SUMIFS(Scenarios!$K$2:$K$25,Scenarios!$A$2:$A$25,B4,Scenarios!$B$2:$B$25,D4)+SUMIFS(Scenarios!$K$2:$K$25,Scenarios!$A$2:$A$25,C4,Scenarios!$B$2:$B$25,D4)",
+              "=SUMIFS(Scenarios!$O$2:$O$25,Scenarios!$A$2:$A$25,B4,Scenarios!$B$2:$B$25,D4)+SUMIFS(Scenarios!$O$2:$O$25,Scenarios!$A$2:$A$25,C4,Scenarios!$B$2:$B$25,D4)",
+              "=IF(G4>0,E4/G4,\"\")",
+              "=AND(E4<=Inputs!$I$7,F4<=Inputs!$I$8,COUNTA(B4:C4)<=Inputs!$I$9)",
+              "=IF(I4,COUNTIFS($D$2:$D$89,D4,$I$2:$I$89,TRUE,$G$2:$G$89,\">\"&G4)+1,\"\")"
+            ],
+            [
+              "DEFER",
+              null,
+              null,
+              "stress",
+              "=SUMIFS(Scenarios!$J$2:$J$25,Scenarios!$A$2:$A$25,B5,Scenarios!$B$2:$B$25,D5)+SUMIFS(Scenarios!$J$2:$J$25,Scenarios!$A$2:$A$25,C5,Scenarios!$B$2:$B$25,D5)",
+              "=SUMIFS(Scenarios!$K$2:$K$25,Scenarios!$A$2:$A$25,B5,Scenarios!$B$2:$B$25,D5)+SUMIFS(Scenarios!$K$2:$K$25,Scenarios!$A$2:$A$25,C5,Scenarios!$B$2:$B$25,D5)",
+              "=SUMIFS(Scenarios!$O$2:$O$25,Scenarios!$A$2:$A$25,B5,Scenarios!$B$2:$B$25,D5)+SUMIFS(Scenarios!$O$2:$O$25,Scenarios!$A$2:$A$25,C5,Scenarios!$B$2:$B$25,D5)",
+              "=IF(G5>0,E5/G5,\"\")",
+              "=AND(E5<=Inputs!$I$7,F5<=Inputs!$I$8,COUNTA(B5:C5)<=Inputs!$I$9)",
+              "=IF(I5,COUNTIFS($D$2:$D$89,D5,$I$2:$I$89,TRUE,$G$2:$G$89,\">\"&G5)+1,\"\")"
+            ],
+            [
+              "DEU",
+              "DEU",
+              null,
+              "low",
+              "=SUMIFS(Scenarios!$J$2:$J$25,Scenarios!$A$2:$A$25,B6,Scenarios!$B$2:$B$25,D6)+SUMIFS(Scenarios!$J$2:$J$25,Scenarios!$A$2:$A$25,C6,Scenarios!$B$2:$B$25,D6)",
+              "=SUMIFS(Scenarios!$K$2:$K$25,Scenarios!$A$2:$A$25,B6,Scenarios!$B$2:$B$25,D6)+SUMIFS(Scenarios!$K$2:$K$25,Scenarios!$A$2:$A$25,C6,Scenarios!$B$2:$B$25,D6)",
+              "=SUMIFS(Scenarios!$O$2:$O$25,Scenarios!$A$2:$A$25,B6,Scenarios!$B$2:$B$25,D6)+SUMIFS(Scenarios!$O$2:$O$25,Scenarios!$A$2:$A$25,C6,Scenarios!$B$2:$B$25,D6)",
+              "=IF(G6>0,E6/G6,\"\")",
+              "=AND(E6<=Inputs!$I$7,F6<=Inputs!$I$8,COUNTA(B6:C6)<=Inputs!$I$9)",
+              "=IF(I6,COUNTIFS($D$2:$D$89,D6,$I$2:$I$89,TRUE,$G$2:$G$89,\">\"&G6)+1,\"\")"
+            ]
+          ]
+        },
+        {
+          "name": "Sensitivity",
+          "dimensions": "A1:F25",
+          "freeze_panes": "B2",
+          "autofilter": "A1:F25",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Country",
+              "Boundary test",
+              "Volume uplift",
+              "Saving EUR/unit",
+              "Annual increment EUR",
+              "Provenance"
+            ],
+            [
+              "DEU",
+              "zero_uplift",
+              0,
+              2.6,
+              -63402.2,
+              "Analyst boundary test, not a new client scenario or a probability; cap uses recorded 2025 fulfillment per shipped unit"
+            ],
+            [
+              "DEU",
+              "saving_capped_base",
+              0.25,
+              1.106368797827697,
+              -12601.49,
+              "Analyst boundary test, not a new client scenario or a probability; cap uses recorded 2025 fulfillment per shipped unit"
+            ],
+            [
+              "DEU",
+              "saving_capped_low",
+              0.1,
+              1.106368797827697,
+              -53973.17,
+              "Analyst boundary test, not a new client scenario or a probability; cap uses recorded 2025 fulfillment per shipped unit"
+            ],
+            [
+              "DEU",
+              "saving_capped_stress",
+              0.25,
+              1.106368797827697,
+              -36273.16,
+              "Analyst boundary test, not a new client scenario or a probability; cap uses recorded 2025 fulfillment per shipped unit"
+            ],
+            [
+              "FRA",
+              "zero_uplift",
+              0,
+              2.9,
+              -50548,
+              "Analyst boundary test, not a new client scenario or a probability; cap uses recorded 2025 fulfillment per shipped unit"
+            ]
+          ]
+        },
+        {
+          "name": "Switching values",
+          "dimensions": "A1:C11",
+          "freeze_panes": "B2",
+          "autofilter": "A1:C11",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Metric",
+              "Value",
+              "Meaning / held-constant assumptions"
+            ],
+            [
+              "CZE uplift to equal NLD base",
+              0.1768659343923751,
+              "NLD uplift remains 25%; normal returns/FX; unchanged savings/fixed costs."
+            ],
+            [
+              "CZE net-sales FX haircut to equal NLD",
+              0.02596616317031904,
+              "Both at base 25%; both have additional refunds = 3% of gross sales; no cost recovery."
+            ],
+            [
+              "CZE net-sales FX haircut at break-even",
+              0.06288325752737185,
+              "CZE base volume, 3% refund shock; benchmark remains normal no-hub baseline."
+            ],
+            [
+              "CZE+ESP common uplift at break-even",
+              0.02738349895976709,
+              "Normal FX/returns; client savings; recurring cost included; capex excluded."
+            ],
+            [
+              "DEU individual volume break-even",
+              0.2156806208773774,
+              "Normal FX/returns; client saving and recurring fixed cost."
+            ]
+          ]
+        },
+        {
+          "name": "Exclusions",
+          "dimensions": "A1:G46",
+          "freeze_panes": "B2",
+          "autofilter": "A1:G46",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "record_type",
+              "record_id",
+              "linked_order",
+              "reason",
+              "quantity",
+              "refund_local",
+              "currency"
+            ],
+            [
+              "order",
+              "M1-03-017",
+              "M1-03-017",
+              "non_shipped_status",
+              "28",
+              null,
+              "EUR"
+            ],
+            [
+              "order",
+              "M1-06-017",
+              "M1-06-017",
+              "non_shipped_status",
+              "40",
+              null,
+              "EUR"
+            ],
+            [
+              "order",
+              "M1-09-017",
+              "M1-09-017",
+              "non_shipped_status",
+              "10",
+              null,
+              "EUR"
+            ],
+            [
+              "order",
+              "M1-12-017",
+              "M1-12-017",
+              "non_shipped_status",
+              "92",
+              null,
+              "EUR"
+            ],
+            [
+              "order",
+              "M2-03-017",
+              "M2-03-017",
+              "non_shipped_status",
+              "36",
+              null,
+              "EUR"
+            ]
+          ]
+        },
+        {
+          "name": "Revisions",
+          "dimensions": "A1:E53",
+          "freeze_panes": "B2",
+          "autofilter": "A1:E53",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "record_id",
+              "file",
+              "line",
+              "action",
+              "detail"
+            ],
+            [
+              "M1-01-001",
+              "orders-part1.csv",
+              "650",
+              "identical_duplicate",
+              "Identical to orders-part1.csv:2"
+            ],
+            [
+              "M1-12-009",
+              "orders-part1.csv",
+              "651",
+              "identical_duplicate",
+              "Identical to orders-part1.csv:105"
+            ],
+            [
+              "M2-11-017",
+              "orders-part1.csv",
+              "652",
+              "identical_duplicate",
+              "Identical to orders-part1.csv:208"
+            ],
+            [
+              "M3-11-007",
+              "orders-part1.csv",
+              "653",
+              "identical_duplicate",
+              "Identical to orders-part1.csv:311"
+            ],
+            [
+              "M4-10-015",
+              "orders-part1.csv",
+              "654",
+              "identical_duplicate",
+              "Identical to orders-part1.csv:414"
+            ]
+          ]
+        },
+        {
+          "name": "Returns",
+          "dimensions": "A1:I244",
+          "freeze_panes": "B2",
+          "autofilter": "A1:I244",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "return_id",
+              "revision",
+              "order_id",
+              "received_at",
+              "quantity",
+              "restocked_quantity",
+              "refund_local",
+              "source_file",
+              "source_line"
+            ],
+            [
+              "R-M1-01-003",
+              "2",
+              "M1-01-003",
+              "2025-01-28",
+              "2",
+              "1",
+              "149.00",
+              "returns.csv",
+              "262"
+            ],
+            [
+              "R-M1-01-009",
+              "1",
+              "M1-01-009",
+              "2025-01-28",
+              "2",
+              "1",
+              "150.00",
+              "returns.csv",
+              "3"
+            ],
+            [
+              "R-M1-01-015",
+              "1",
+              "M1-01-015",
+              "2025-01-28",
+              "2",
+              "1",
+              "150.00",
+              "returns.csv",
+              "4"
+            ],
+            [
+              "R-M1-02-003",
+              "1",
+              "M1-02-003",
+              "2025-02-28",
+              "2",
+              "1",
+              "150.00",
+              "returns.csv",
+              "5"
+            ],
+            [
+              "R-M1-02-009",
+              "1",
+              "M1-02-009",
+              "2025-02-28",
+              "2",
+              "1",
+              "150.00",
+              "returns.csv",
+              "6"
+            ]
+          ]
+        },
+        {
+          "name": "Costs",
+          "dimensions": "A1:C7",
+          "freeze_panes": "B2",
+          "autofilter": "A1:C7",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "sku",
+              "valid_from",
+              "unit_cost_eur"
+            ],
+            [
+              "AXLE",
+              "2025-01-01",
+              17.5
+            ],
+            [
+              "AXLE",
+              "2025-07-01",
+              19
+            ],
+            [
+              "BRAKE",
+              "2025-01-01",
+              27
+            ],
+            [
+              "BRAKE",
+              "2025-07-01",
+              29.5
+            ],
+            [
+              "SENSOR",
+              "2025-01-01",
+              43
+            ]
+          ]
+        },
+        {
+          "name": "Chart data",
+          "dimensions": "A1:E6",
+          "freeze_panes": "B2",
+          "autofilter": "A1:E6",
+          "formula_count": 20,
+          "formula_examples": [
+            {
+              "cell": "B2",
+              "formula": "=Portfolios!G86"
+            },
+            {
+              "cell": "C2",
+              "formula": "=Portfolios!G87"
+            },
+            {
+              "cell": "D2",
+              "formula": "=Portfolios!G88"
+            },
+            {
+              "cell": "E2",
+              "formula": "=Portfolios!G89"
+            },
+            {
+              "cell": "B3",
+              "formula": "=Portfolios!G74"
+            }
+          ],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Portfolio",
+              "Low EUR",
+              "Base EUR",
+              "High EUR",
+              "Stress EUR"
+            ],
+            [
+              "CZE+ESP",
+              "=Portfolios!G86",
+              "=Portfolios!G87",
+              "=Portfolios!G88",
+              "=Portfolios!G89"
+            ],
+            [
+              "NLD+ESP",
+              "=Portfolios!G74",
+              "=Portfolios!G75",
+              "=Portfolios!G76",
+              "=Portfolios!G77"
+            ],
+            [
+              "POL+ESP",
+              "=Portfolios!G82",
+              "=Portfolios!G83",
+              "=Portfolios!G84",
+              "=Portfolios!G85"
+            ],
+            [
+              "ESP",
+              "=Portfolios!G26",
+              "=Portfolios!G27",
+              "=Portfolios!G28",
+              "=Portfolios!G29"
+            ],
+            [
+              "DEFER",
+              "=Portfolios!G2",
+              "=Portfolios!G3",
+              "=Portfolios!G4",
+              "=Portfolios!G5"
+            ]
+          ]
+        }
+      ],
+      "render_sheet": "Decision"
+    },
+    {
+      "source": "deliverables/meridian_board.pdf",
+      "sha256": "2fc41bd2ad368dab4a1b2629c47602c67ca1527c5e754750a30f821d894e8654",
+      "bytes": 216917,
+      "pages": 10,
+      "empty_text_pages": [],
+      "rendered_pages": [
+        1,
+        6,
+        8
+      ],
+      "render_images": [
+        {
+          "page": 1,
+          "file": "meridian_board-page-01.png",
+          "exit_code": 0,
+          "stderr": ""
+        },
+        {
+          "page": 6,
+          "file": "meridian_board-page-06.png",
+          "exit_code": 0,
+          "stderr": ""
+        },
+        {
+          "page": 8,
+          "file": "meridian_board-page-08.png",
+          "exit_code": 0,
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "source": "deliverables/meridian_report.pdf",
+      "sha256": "16c1a7df774c827684a1d0bfceac714ff6112bc31303ecaac950497b8b527d93",
+      "bytes": 266662,
+      "pages": 12,
+      "empty_text_pages": [],
+      "rendered_pages": [
+        1,
+        7,
+        10
+      ],
+      "render_images": [
+        {
+          "page": 1,
+          "file": "meridian_report-page-01.png",
+          "exit_code": 0,
+          "stderr": ""
+        },
+        {
+          "page": 7,
+          "file": "meridian_report-page-07.png",
+          "exit_code": 0,
+          "stderr": ""
+        },
+        {
+          "page": 10,
+          "file": "meridian_report-page-10.png",
+          "exit_code": 0,
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "render_scope": "Representative first, densest-text and middle pages; not a complete visual audit. Text extracted from every PDF page. LibreOffice derivatives are separate and may differ from PowerPoint."
+}

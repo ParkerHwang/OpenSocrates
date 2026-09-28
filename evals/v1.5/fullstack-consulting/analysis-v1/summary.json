@@ -1,0 +1,3323 @@
+{
+  "generated_utc": "2026-09-27T13:44:57.315511+00:00",
+  "source_manifest_sha256": "36903adcbc0805ab1f6ee586fac222a1fe7add6d53c0fb2c26344dc24c47f2bf",
+  "outcome_episodes": 36,
+  "prior_setup_failures": 36,
+  "prior_outcome_episodes": 0,
+  "all_process_exit_zero": true,
+  "new_outcome_episodes_in_qualification": 0,
+  "usage_totals": {
+    "input_tokens": {
+      "reported_sum": 208797105,
+      "reported_cells": 36,
+      "missing_attempted_cells": 0
+    },
+    "cached_input_tokens": {
+      "reported_sum": 202480256,
+      "reported_cells": 36,
+      "missing_attempted_cells": 0
+    },
+    "cache_write_input_tokens": {
+      "reported_sum": 0,
+      "reported_cells": 36,
+      "missing_attempted_cells": 0
+    },
+    "output_tokens": {
+      "reported_sum": 2342204,
+      "reported_cells": 36,
+      "missing_attempted_cells": 0
+    },
+    "reasoning_output_tokens": {
+      "reported_sum": 715800,
+      "reported_cells": 36,
+      "missing_attempted_cells": 0
+    }
+  },
+  "public_provider_error_events": 20,
+  "public_tool_items": 2329,
+  "failed_public_tool_items": 237,
+  "coding_summary": {
+    "cells": 18,
+    "restart_pass": 18,
+    "business_flow_pass": 17,
+    "viewer_ready_readonly_pass": 18,
+    "mobile_ready_pass": 17,
+    "login_form_remains_visible": 2,
+    "original_burst_transport_failures": 10,
+    "performance_eligible": 8
+  },
+  "consulting_summary": {
+    "cells": 18,
+    "core_values_match": 17,
+    "pair_arithmetic_match": 16,
+    "sources_preserved": 18
+  },
+  "limitations": [
+    "One episode per tuple/arm/task; no human scores or causal estimate.",
+    "Explicit installed-controller cue, hooks off, product memory unenrolled, English tasks.",
+    "All6 Astra episodes have client retry events; backend attempts and billed cost unavailable.",
+    "Generation concurrency changed during the cohort; latency not a clean speed comparison.",
+    "API burst failures retained; staged-connection diagnostics do not erase transport unreliability.",
+    "Raw frozen checker scores and semantic/readiness diagnostics kept distinct.",
+    "Visual review sampled pages/ranges; not every page or workbook interaction.",
+    "Performance uses short fixed local loopback workloads on eligible servers only; no production SLA or power-loss test."
+  ],
+  "cells": [
+    {
+      "id": "fullstack-gpt-6-sol-high-vanilla",
+      "task": "fullstack",
+      "tuple": "gpt-6-sol-high",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "vanilla",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T07:03:09.152745+00:00",
+      "ended_utc": "2026-09-27T07:35:31.723265+00:00",
+      "generation_wall_seconds": 1942.565,
+      "input_tokens": 2788111,
+      "cached_input_tokens": 2632704,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 42225,
+      "reasoning_output_tokens": 11624,
+      "noncached_input_tokens": 155407,
+      "tool_items": 65,
+      "failed_tool_items": 5,
+      "repeated_command_excess": 20,
+      "missing_tool_duration_items": 0,
+      "public_messages": 8,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 953728,
+      "peak_sampled_browser_tree_rss_kib": 484976,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": null,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "api_failed_groups": [
+        {
+          "name": "concurrent_reservations_no_oversell",
+          "pass": false,
+          "critical": true,
+          "details": "URLError(OSError(22, 'Invalid argument'))"
+        }
+      ],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 7,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": true,
+      "preconnected_state_diagnostic": {
+        "reservations": true,
+        "idempotent_create": true
+      },
+      "performance_eligible": false,
+      "performance": null,
+      "api_receipt": "qualification-v1/results/fullstack-gpt-6-sol-high-vanilla/api.json"
+    },
+    {
+      "id": "fullstack-gpt-6-luna-max-v14",
+      "task": "fullstack",
+      "tuple": "gpt-6-luna-max",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "v14",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T07:03:10.665927+00:00",
+      "ended_utc": "2026-09-27T07:35:29.681088+00:00",
+      "generation_wall_seconds": 1939.009,
+      "input_tokens": 8806946,
+      "cached_input_tokens": 8575872,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 95798,
+      "reasoning_output_tokens": 40411,
+      "noncached_input_tokens": 231074,
+      "tool_items": 69,
+      "failed_tool_items": 7,
+      "repeated_command_excess": 13,
+      "missing_tool_duration_items": 0,
+      "public_messages": 7,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 939360,
+      "peak_sampled_browser_tree_rss_kib": 532576,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "api_failed_groups": [
+        {
+          "name": "concurrent_reservations_no_oversell",
+          "pass": false,
+          "critical": true,
+          "details": "URLError(OSError(22, 'Invalid argument'))"
+        }
+      ],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 6,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": true,
+      "preconnected_state_diagnostic": {
+        "reservations": true,
+        "idempotent_create": true
+      },
+      "performance_eligible": false,
+      "performance": null,
+      "api_receipt": "qualification-v1/results/fullstack-gpt-6-luna-max-v14/api.json"
+    },
+    {
+      "id": "fullstack-gpt-6-luna-high-v15",
+      "task": "fullstack",
+      "tuple": "gpt-6-luna-high",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "v15",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T07:03:10.636288+00:00",
+      "ended_utc": "2026-09-27T07:21:31.201591+00:00",
+      "generation_wall_seconds": 1100.563,
+      "input_tokens": 4132178,
+      "cached_input_tokens": 3986432,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 49039,
+      "reasoning_output_tokens": 12877,
+      "noncached_input_tokens": 145746,
+      "tool_items": 70,
+      "failed_tool_items": 9,
+      "repeated_command_excess": 7,
+      "missing_tool_duration_items": 1,
+      "public_messages": 8,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 959440,
+      "peak_sampled_browser_tree_rss_kib": 481552,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": {
+        "contracts.en.md": 0,
+        "ownership.en.md": 0,
+        "router.en.md": 1,
+        "transitions.en.md": 1
+      },
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "api_failed_groups": [],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 6,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": false,
+      "preconnected_state_diagnostic": null,
+      "performance_eligible": true,
+      "performance": [
+        {
+          "workload": "inventory_get",
+          "concurrency": 1,
+          "requests": 500,
+          "wall_seconds": 0.1992227919981815,
+          "requests_per_second": 2509.7530005731674,
+          "errors": 0,
+          "p50_ms": 0.3652919549494982,
+          "p95_ms": 0.504625029861927,
+          "p99_ms": 0.5725410301238298
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 1,
+          "requests": 200,
+          "wall_seconds": 0.12423745903652161,
+          "requests_per_second": 1609.8204321870971,
+          "errors": 0,
+          "p50_ms": 0.5894170026294887,
+          "p95_ms": 0.6715829949826002,
+          "p99_ms": 0.9030000073835254
+        },
+        {
+          "workload": "inventory_get",
+          "concurrency": 8,
+          "requests": 500,
+          "wall_seconds": 0.14162679202854633,
+          "requests_per_second": 3530.4054609894706,
+          "errors": 0,
+          "p50_ms": 2.175167028326541,
+          "p95_ms": 3.421209054067731,
+          "p99_ms": 3.9542499580420554
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 8,
+          "requests": 200,
+          "wall_seconds": 0.12213899998459965,
+          "requests_per_second": 1637.4786106421188,
+          "errors": 0,
+          "p50_ms": 0.48099999548867345,
+          "p95_ms": 9.458709042519331,
+          "p99_ms": 91.45100001478568
+        }
+      ],
+      "api_receipt": "qualification-v1/results/fullstack-gpt-6-luna-high-v15/api.json"
+    },
+    {
+      "id": "fullstack-gpt-5.6-luna-max-vanilla",
+      "task": "fullstack",
+      "tuple": "gpt-5.6-luna-max",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "vanilla",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T07:21:32.920462+00:00",
+      "ended_utc": "2026-09-27T07:50:22.000901+00:00",
+      "generation_wall_seconds": 1729.074,
+      "input_tokens": 5552920,
+      "cached_input_tokens": 5389312,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 83135,
+      "reasoning_output_tokens": 32294,
+      "noncached_input_tokens": 163608,
+      "tool_items": 74,
+      "failed_tool_items": 4,
+      "repeated_command_excess": 9,
+      "missing_tool_duration_items": 1,
+      "public_messages": 8,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 941296,
+      "peak_sampled_browser_tree_rss_kib": 655712,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": null,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "initial_api": null,
+      "initial_harness_error": "RuntimeError('Server exited before listening: 1; see api-server.log')",
+      "api_after_setup_correction": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "api_failed_groups": [
+        {
+          "name": "concurrent_reservations_no_oversell",
+          "pass": false,
+          "critical": true,
+          "details": "URLError(OSError(22, 'Invalid argument'))"
+        }
+      ],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 6,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": true,
+      "preconnected_state_diagnostic": {
+        "reservations": true,
+        "idempotent_create": true
+      },
+      "performance_eligible": false,
+      "performance": null,
+      "api_receipt": "qualification-diagnostic-v1/results/fullstack-gpt-5.6-luna-max-vanilla/api.json"
+    },
+    {
+      "id": "fullstack-gpt-5.6-luna-high-v14",
+      "task": "fullstack",
+      "tuple": "gpt-5.6-luna-high",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "v14",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T07:35:32.807962+00:00",
+      "ended_utc": "2026-09-27T07:54:40.904173+00:00",
+      "generation_wall_seconds": 1148.092,
+      "input_tokens": 5087800,
+      "cached_input_tokens": 4934912,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 45539,
+      "reasoning_output_tokens": 8233,
+      "noncached_input_tokens": 152888,
+      "tool_items": 59,
+      "failed_tool_items": 7,
+      "repeated_command_excess": 5,
+      "missing_tool_duration_items": 1,
+      "public_messages": 7,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 981296,
+      "peak_sampled_browser_tree_rss_kib": 462688,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "api_failed_groups": [
+        {
+          "name": "concurrent_reservations_no_oversell",
+          "pass": false,
+          "critical": true,
+          "details": "URLError(OSError(22, 'Invalid argument'))"
+        }
+      ],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 6,
+        "total": 7
+      },
+      "readiness_browser_passed": 6,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [
+        "mobile_layout"
+      ],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": false,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": true,
+      "preconnected_state_diagnostic": {
+        "reservations": true,
+        "idempotent_create": true
+      },
+      "performance_eligible": false,
+      "performance": null,
+      "api_receipt": "qualification-v1/results/fullstack-gpt-5.6-luna-high-v14/api.json"
+    },
+    {
+      "id": "fullstack-gpt-6-astra-xhigh-v15",
+      "task": "fullstack",
+      "tuple": "gpt-6-astra-xhigh",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "v15",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T07:35:35.163304+00:00",
+      "ended_utc": "2026-09-27T08:31:07.170655+00:00",
+      "generation_wall_seconds": 3332.0,
+      "input_tokens": 1822802,
+      "cached_input_tokens": 1714176,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 61130,
+      "reasoning_output_tokens": 13249,
+      "noncached_input_tokens": 108626,
+      "tool_items": 49,
+      "failed_tool_items": 3,
+      "repeated_command_excess": 4,
+      "missing_tool_duration_items": 0,
+      "public_messages": 10,
+      "public_provider_error_events": 3,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 977680,
+      "peak_sampled_browser_tree_rss_kib": 558656,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": {
+        "contracts.en.md": 0,
+        "ownership.en.md": 0,
+        "router.en.md": 1,
+        "transitions.en.md": 1
+      },
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "api_failed_groups": [],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 7,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": false,
+      "preconnected_state_diagnostic": null,
+      "performance_eligible": true,
+      "performance": [
+        {
+          "workload": "inventory_get",
+          "concurrency": 1,
+          "requests": 500,
+          "wall_seconds": 0.2637979579740204,
+          "requests_per_second": 1895.3899561619862,
+          "errors": 0,
+          "p50_ms": 0.4953750176355243,
+          "p95_ms": 0.6257909699343145,
+          "p99_ms": 0.6915829726494849
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 1,
+          "requests": 200,
+          "wall_seconds": 0.24424941599136218,
+          "requests_per_second": 818.8351206009555,
+          "errors": 0,
+          "p50_ms": 1.1832499876618385,
+          "p95_ms": 1.367208024021238,
+          "p99_ms": 1.4998330152593553
+        },
+        {
+          "workload": "inventory_get",
+          "concurrency": 8,
+          "requests": 500,
+          "wall_seconds": 0.24047274998156354,
+          "requests_per_second": 2079.2376684607043,
+          "errors": 0,
+          "p50_ms": 3.792750008869916,
+          "p95_ms": 5.117667024023831,
+          "p99_ms": 5.807040957733989
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 8,
+          "requests": 200,
+          "wall_seconds": 0.14766083395807073,
+          "requests_per_second": 1354.4553057095109,
+          "errors": 0,
+          "p50_ms": 0.8109579794108868,
+          "p95_ms": 21.316208003554493,
+          "p99_ms": 91.86316700652242
+        }
+      ],
+      "api_receipt": "qualification-v1/results/fullstack-gpt-6-astra-xhigh-v15/api.json"
+    },
+    {
+      "id": "consulting-gpt-6-sol-high-v14",
+      "task": "consulting",
+      "tuple": "gpt-6-sol-high",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "v14",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T07:50:24.883108+00:00",
+      "ended_utc": "2026-09-27T08:14:32.852936+00:00",
+      "generation_wall_seconds": 1447.966,
+      "input_tokens": 2209937,
+      "cached_input_tokens": 2105856,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 32718,
+      "reasoning_output_tokens": 6089,
+      "noncached_input_tokens": 104081,
+      "tool_items": 44,
+      "failed_tool_items": 3,
+      "repeated_command_excess": 0,
+      "missing_tool_duration_items": 0,
+      "public_messages": 7,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 963776,
+      "peak_sampled_browser_tree_rss_kib": 300064,
+      "source_room_gets": 14,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 16,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [
+        {
+          "group": "hub_scenarios_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 72
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        }
+      ],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-6-luna-max-v15",
+      "task": "consulting",
+      "tuple": "gpt-6-luna-max",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "v15",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T07:54:44.002710+00:00",
+      "ended_utc": "2026-09-27T08:31:46.778145+00:00",
+      "generation_wall_seconds": 2222.77,
+      "input_tokens": 9053317,
+      "cached_input_tokens": 8826880,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 111251,
+      "reasoning_output_tokens": 54180,
+      "noncached_input_tokens": 226437,
+      "tool_items": 85,
+      "failed_tool_items": 7,
+      "repeated_command_excess": 8,
+      "missing_tool_duration_items": 0,
+      "public_messages": 4,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 937520,
+      "peak_sampled_browser_tree_rss_kib": 299856,
+      "source_room_gets": 15,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": {
+        "contracts.en.md": 0,
+        "ownership.en.md": 0,
+        "router.en.md": 0,
+        "transitions.en.md": 0
+      },
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 16,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [
+        {
+          "group": "hub_scenarios_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 72
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        }
+      ],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-6-luna-high-vanilla",
+      "task": "consulting",
+      "tuple": "gpt-6-luna-high",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "vanilla",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T08:14:34.620525+00:00",
+      "ended_utc": "2026-09-27T08:34:00.990358+00:00",
+      "generation_wall_seconds": 1166.366,
+      "input_tokens": 3526016,
+      "cached_input_tokens": 3393024,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 57273,
+      "reasoning_output_tokens": 10931,
+      "noncached_input_tokens": 132992,
+      "tool_items": 43,
+      "failed_tool_items": 2,
+      "repeated_command_excess": 0,
+      "missing_tool_duration_items": 0,
+      "public_messages": 8,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 980464,
+      "peak_sampled_browser_tree_rss_kib": 300176,
+      "source_room_gets": 15,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": null,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 16,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [
+        {
+          "group": "fx_monthly_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 36
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        }
+      ],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-5.6-luna-max-v14",
+      "task": "consulting",
+      "tuple": "gpt-5.6-luna-max",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "v14",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T08:31:10.172596+00:00",
+      "ended_utc": "2026-09-27T09:00:07.152370+00:00",
+      "generation_wall_seconds": 1736.977,
+      "input_tokens": 10794182,
+      "cached_input_tokens": 10557824,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 79581,
+      "reasoning_output_tokens": 24079,
+      "noncached_input_tokens": 236358,
+      "tool_items": 84,
+      "failed_tool_items": 10,
+      "repeated_command_excess": 12,
+      "missing_tool_duration_items": 0,
+      "public_messages": 11,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 1571088,
+      "peak_sampled_browser_tree_rss_kib": 300672,
+      "source_room_gets": 15,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 16,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [
+        {
+          "group": "hub_scenarios_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 72
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        }
+      ],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-5.6-luna-high-v15",
+      "task": "consulting",
+      "tuple": "gpt-5.6-luna-high",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "v15",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T08:31:50.287452+00:00",
+      "ended_utc": "2026-09-27T08:46:46.951956+00:00",
+      "generation_wall_seconds": 896.662,
+      "input_tokens": 4193780,
+      "cached_input_tokens": 4040192,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 41219,
+      "reasoning_output_tokens": 8220,
+      "noncached_input_tokens": 153588,
+      "tool_items": 55,
+      "failed_tool_items": 13,
+      "repeated_command_excess": 9,
+      "missing_tool_duration_items": 0,
+      "public_messages": 6,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 945296,
+      "peak_sampled_browser_tree_rss_kib": 328048,
+      "source_room_gets": 14,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": {
+        "contracts.en.md": 0,
+        "ownership.en.md": 0,
+        "router.en.md": 0,
+        "transitions.en.md": 0
+      },
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 14,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [
+        {
+          "group": "fx_monthly_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 36
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        },
+        {
+          "group": "hub_scenarios_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 68
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        }
+      ],
+      "numeric_annotations": [
+        {
+          "group": "hub_scenarios_values",
+          "mismatch_count": 13,
+          "fields": {
+            "payback_years": 13
+          },
+          "classification": "Payback rounded to two decimals; task did not specify 0.001-year accuracy."
+        }
+      ],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-6-astra-xhigh-vanilla",
+      "task": "consulting",
+      "tuple": "gpt-6-astra-xhigh",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "vanilla",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T08:34:03.622294+00:00",
+      "ended_utc": "2026-09-27T09:42:58.050184+00:00",
+      "generation_wall_seconds": 4134.423,
+      "input_tokens": 1597119,
+      "cached_input_tokens": 1477376,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 55748,
+      "reasoning_output_tokens": 10487,
+      "noncached_input_tokens": 119743,
+      "tool_items": 39,
+      "failed_tool_items": 1,
+      "repeated_command_excess": 1,
+      "missing_tool_duration_items": 0,
+      "public_messages": 7,
+      "public_provider_error_events": 4,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 956736,
+      "peak_sampled_browser_tree_rss_kib": 300448,
+      "source_room_gets": 15,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": null,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 17,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "fullstack-gpt-6-sol-high-v14",
+      "task": "fullstack",
+      "tuple": "gpt-6-sol-high",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "v14",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T08:46:49.959875+00:00",
+      "ended_utc": "2026-09-27T09:17:04.487303+00:00",
+      "generation_wall_seconds": 1814.525,
+      "input_tokens": 4388181,
+      "cached_input_tokens": 4235520,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 51854,
+      "reasoning_output_tokens": 14294,
+      "noncached_input_tokens": 152661,
+      "tool_items": 67,
+      "failed_tool_items": 8,
+      "repeated_command_excess": 16,
+      "missing_tool_duration_items": 0,
+      "public_messages": 7,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 946720,
+      "peak_sampled_browser_tree_rss_kib": 511648,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "api_failed_groups": [],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 6,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": false,
+      "preconnected_state_diagnostic": null,
+      "performance_eligible": true,
+      "performance": [
+        {
+          "workload": "inventory_get",
+          "concurrency": 1,
+          "requests": 500,
+          "wall_seconds": 0.15252999996300787,
+          "requests_per_second": 3278.0436643366015,
+          "errors": 0,
+          "p50_ms": 0.26712502585723996,
+          "p95_ms": 0.3708329750224948,
+          "p99_ms": 0.7726670010015368
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 1,
+          "requests": 200,
+          "wall_seconds": 0.08574370801215991,
+          "requests_per_second": 2332.5326678388647,
+          "errors": 0,
+          "p50_ms": 0.38416695315390825,
+          "p95_ms": 0.60450000455603,
+          "p99_ms": 0.7412910345010459
+        },
+        {
+          "workload": "inventory_get",
+          "concurrency": 8,
+          "requests": 500,
+          "wall_seconds": 0.14516033296240494,
+          "requests_per_second": 3444.4671612147304,
+          "errors": 0,
+          "p50_ms": 2.0992080098949373,
+          "p95_ms": 3.388917015399784,
+          "p99_ms": 4.43520798580721
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 8,
+          "requests": 200,
+          "wall_seconds": 0.10386287496658042,
+          "requests_per_second": 1925.6158667315271,
+          "errors": 0,
+          "p50_ms": 0.5446660215966403,
+          "p95_ms": 10.559250018559396,
+          "p99_ms": 40.33420898485929
+        }
+      ],
+      "api_receipt": "qualification-v1/results/fullstack-gpt-6-sol-high-v14/api.json"
+    },
+    {
+      "id": "fullstack-gpt-6-luna-max-v15",
+      "task": "fullstack",
+      "tuple": "gpt-6-luna-max",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "v15",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T09:00:11.528028+00:00",
+      "ended_utc": "2026-09-27T09:42:01.816026+00:00",
+      "generation_wall_seconds": 2510.284,
+      "input_tokens": 10797338,
+      "cached_input_tokens": 10562816,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 104315,
+      "reasoning_output_tokens": 47327,
+      "noncached_input_tokens": 234522,
+      "tool_items": 88,
+      "failed_tool_items": 16,
+      "repeated_command_excess": 20,
+      "missing_tool_duration_items": 0,
+      "public_messages": 11,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 954256,
+      "peak_sampled_browser_tree_rss_kib": 547600,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": {
+        "contracts.en.md": 1,
+        "ownership.en.md": 1,
+        "router.en.md": 1,
+        "transitions.en.md": 1
+      },
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "api_failed_groups": [
+        {
+          "name": "concurrent_reservations_no_oversell",
+          "pass": false,
+          "critical": true,
+          "details": "URLError(BrokenPipeError(32, 'Broken pipe'))"
+        }
+      ],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 7,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": true,
+      "preconnected_state_diagnostic": {
+        "reservations": true,
+        "idempotent_create": true
+      },
+      "performance_eligible": false,
+      "performance": null,
+      "api_receipt": "qualification-v1/results/fullstack-gpt-6-luna-max-v15/api.json"
+    },
+    {
+      "id": "fullstack-gpt-6-luna-high-vanilla",
+      "task": "fullstack",
+      "tuple": "gpt-6-luna-high",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "vanilla",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T09:17:06.479530+00:00",
+      "ended_utc": "2026-09-27T09:32:25.418169+00:00",
+      "generation_wall_seconds": 918.936,
+      "input_tokens": 2608306,
+      "cached_input_tokens": 2492672,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 34440,
+      "reasoning_output_tokens": 7095,
+      "noncached_input_tokens": 115634,
+      "tool_items": 49,
+      "failed_tool_items": 8,
+      "repeated_command_excess": 5,
+      "missing_tool_duration_items": 0,
+      "public_messages": 6,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 935696,
+      "peak_sampled_browser_tree_rss_kib": 515120,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": null,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "api_failed_groups": [
+        {
+          "name": "concurrent_reservations_no_oversell",
+          "pass": false,
+          "critical": true,
+          "details": "URLError(OSError(22, 'Invalid argument'))"
+        }
+      ],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 7,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": true,
+      "preconnected_state_diagnostic": {
+        "reservations": true,
+        "idempotent_create": true
+      },
+      "performance_eligible": false,
+      "performance": null,
+      "api_receipt": "qualification-v1/results/fullstack-gpt-6-luna-high-vanilla/api.json"
+    },
+    {
+      "id": "fullstack-gpt-5.6-luna-max-v14",
+      "task": "fullstack",
+      "tuple": "gpt-5.6-luna-max",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "v14",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T09:32:28.567730+00:00",
+      "ended_utc": "2026-09-27T09:58:01.060409+00:00",
+      "generation_wall_seconds": 1532.489,
+      "input_tokens": 9118957,
+      "cached_input_tokens": 8909056,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 75889,
+      "reasoning_output_tokens": 25378,
+      "noncached_input_tokens": 209901,
+      "tool_items": 68,
+      "failed_tool_items": 2,
+      "repeated_command_excess": 2,
+      "missing_tool_duration_items": 2,
+      "public_messages": 10,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 959632,
+      "peak_sampled_browser_tree_rss_kib": 654912,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "api_failed_groups": [
+        {
+          "name": "concurrent_reservations_no_oversell",
+          "pass": false,
+          "critical": true,
+          "details": "URLError(ConnectionResetError(54, 'Connection reset by peer'))"
+        }
+      ],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 7,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": true,
+      "preconnected_state_diagnostic": {
+        "reservations": true,
+        "idempotent_create": true
+      },
+      "performance_eligible": false,
+      "performance": null,
+      "api_receipt": "qualification-v1/results/fullstack-gpt-5.6-luna-max-v14/api.json"
+    },
+    {
+      "id": "fullstack-gpt-5.6-luna-high-v15",
+      "task": "fullstack",
+      "tuple": "gpt-5.6-luna-high",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "v15",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T09:42:05.055604+00:00",
+      "ended_utc": "2026-09-27T09:58:15.895545+00:00",
+      "generation_wall_seconds": 970.838,
+      "input_tokens": 3314524,
+      "cached_input_tokens": 3183616,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 42758,
+      "reasoning_output_tokens": 8079,
+      "noncached_input_tokens": 130908,
+      "tool_items": 47,
+      "failed_tool_items": 6,
+      "repeated_command_excess": 7,
+      "missing_tool_duration_items": 0,
+      "public_messages": 7,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 936368,
+      "peak_sampled_browser_tree_rss_kib": 463024,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": {
+        "contracts.en.md": 0,
+        "ownership.en.md": 0,
+        "router.en.md": 0,
+        "transitions.en.md": 0
+      },
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 21,
+        "total": 24,
+        "critical_pass": false
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 21,
+        "total": 24,
+        "critical_pass": false
+      },
+      "api_failed_groups": [
+        {
+          "name": "server_price_authority",
+          "pass": false,
+          "critical": false,
+          "details": "AssertionError((400, {'error': {'code': 'invalid_payload', 'message': 'each line requires sku and quantity'}}))"
+        },
+        {
+          "name": "concurrent_reservations_no_oversell",
+          "pass": false,
+          "critical": true,
+          "details": "URLError(OSError(22, 'Invalid argument'))"
+        },
+        {
+          "name": "concurrent_idempotent_create",
+          "pass": false,
+          "critical": true,
+          "details": "URLError(OSError(22, 'Invalid argument'))"
+        }
+      ],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 6,
+        "total": 7
+      },
+      "readiness_browser_passed": 6,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [
+        "create_reserve_ship_return_flow"
+      ],
+      "business_flow_pass": false,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": true,
+      "preconnected_state_diagnostic": {
+        "reservations": true,
+        "idempotent_create": true
+      },
+      "performance_eligible": false,
+      "performance": null,
+      "api_receipt": "qualification-v1/results/fullstack-gpt-5.6-luna-high-v15/api.json"
+    },
+    {
+      "id": "fullstack-gpt-6-astra-xhigh-vanilla",
+      "task": "fullstack",
+      "tuple": "gpt-6-astra-xhigh",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "vanilla",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T09:42:59.586309+00:00",
+      "ended_utc": "2026-09-27T10:22:48.055671+00:00",
+      "generation_wall_seconds": 2388.468,
+      "input_tokens": 1246449,
+      "cached_input_tokens": 1152768,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 53309,
+      "reasoning_output_tokens": 9805,
+      "noncached_input_tokens": 93681,
+      "tool_items": 44,
+      "failed_tool_items": 2,
+      "repeated_command_excess": 6,
+      "missing_tool_duration_items": 0,
+      "public_messages": 10,
+      "public_provider_error_events": 1,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": true,
+      "peak_sampled_process_tree_rss_kib": 961296,
+      "peak_sampled_browser_tree_rss_kib": 302368,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": null,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "api_failed_groups": [],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 6,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": false,
+      "preconnected_state_diagnostic": null,
+      "performance_eligible": true,
+      "performance": [
+        {
+          "workload": "inventory_get",
+          "concurrency": 1,
+          "requests": 500,
+          "wall_seconds": 0.2173009580001235,
+          "requests_per_second": 2300.9562617745837,
+          "errors": 0,
+          "p50_ms": 0.40158297633752227,
+          "p95_ms": 0.518708024173975,
+          "p99_ms": 0.6230419967323542
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 1,
+          "requests": 200,
+          "wall_seconds": 0.15901233302429318,
+          "requests_per_second": 1257.7640752522316,
+          "errors": 0,
+          "p50_ms": 0.726083992049098,
+          "p95_ms": 0.8854580228216946,
+          "p99_ms": 1.9849580130539834
+        },
+        {
+          "workload": "inventory_get",
+          "concurrency": 8,
+          "requests": 500,
+          "wall_seconds": 0.18557129200780764,
+          "requests_per_second": 2694.382275351961,
+          "errors": 0,
+          "p50_ms": 2.8389160288497806,
+          "p95_ms": 4.27445798413828,
+          "p99_ms": 5.014374968595803
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 8,
+          "requests": 200,
+          "wall_seconds": 0.13128412497462705,
+          "requests_per_second": 1523.413436610508,
+          "errors": 0,
+          "p50_ms": 0.8207500213757157,
+          "p95_ms": 11.71520899515599,
+          "p99_ms": 64.50483301887289
+        }
+      ],
+      "api_receipt": "qualification-v1/results/fullstack-gpt-6-astra-xhigh-vanilla/api.json"
+    },
+    {
+      "id": "consulting-gpt-6-sol-high-v15",
+      "task": "consulting",
+      "tuple": "gpt-6-sol-high",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "v15",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T09:58:04.174835+00:00",
+      "ended_utc": "2026-09-27T10:27:38.993984+00:00",
+      "generation_wall_seconds": 1774.818,
+      "input_tokens": 4065252,
+      "cached_input_tokens": 3957504,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 44552,
+      "reasoning_output_tokens": 8949,
+      "noncached_input_tokens": 107748,
+      "tool_items": 60,
+      "failed_tool_items": 6,
+      "repeated_command_excess": 6,
+      "missing_tool_duration_items": 0,
+      "public_messages": 5,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": true,
+      "peak_sampled_process_tree_rss_kib": 941792,
+      "peak_sampled_browser_tree_rss_kib": 300688,
+      "source_room_gets": 14,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": {
+        "contracts.en.md": 0,
+        "ownership.en.md": 0,
+        "router.en.md": 0,
+        "transitions.en.md": 0
+      },
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 17,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-6-luna-max-vanilla",
+      "task": "consulting",
+      "tuple": "gpt-6-luna-max",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "vanilla",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T09:58:17.500256+00:00",
+      "ended_utc": "2026-09-27T10:41:50.962625+00:00",
+      "generation_wall_seconds": 2613.461,
+      "input_tokens": 14138054,
+      "cached_input_tokens": 13869952,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 111268,
+      "reasoning_output_tokens": 54228,
+      "noncached_input_tokens": 268102,
+      "tool_items": 101,
+      "failed_tool_items": 9,
+      "repeated_command_excess": 30,
+      "missing_tool_duration_items": 0,
+      "public_messages": 7,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "original-three-worker",
+      "overlaps_parallel_amendment": true,
+      "peak_sampled_process_tree_rss_kib": 945296,
+      "peak_sampled_browser_tree_rss_kib": 300528,
+      "source_room_gets": 14,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": null,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 15,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [
+        {
+          "group": "hub_scenarios_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 68
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        }
+      ],
+      "numeric_annotations": [
+        {
+          "group": "hub_scenarios_values",
+          "mismatch_count": 13,
+          "fields": {
+            "payback_years": 13
+          },
+          "classification": "Payback rounded to two decimals; task did not specify 0.001-year accuracy."
+        }
+      ],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-6-luna-high-v14",
+      "task": "consulting",
+      "tuple": "gpt-6-luna-high",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "v14",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:48.698313+00:00",
+      "ended_utc": "2026-09-27T10:39:45.142680+00:00",
+      "generation_wall_seconds": 1736.441,
+      "input_tokens": 9988939,
+      "cached_input_tokens": 9721984,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 82706,
+      "reasoning_output_tokens": 29108,
+      "noncached_input_tokens": 266955,
+      "tool_items": 84,
+      "failed_tool_items": 12,
+      "repeated_command_excess": 8,
+      "missing_tool_duration_items": 0,
+      "public_messages": 10,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 817856,
+      "peak_sampled_browser_tree_rss_kib": 248560,
+      "source_room_gets": 14,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 17,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "NLD",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-5.6-luna-max-v15",
+      "task": "consulting",
+      "tuple": "gpt-5.6-luna-max",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "v15",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:49.523080+00:00",
+      "ended_utc": "2026-09-27T10:36:02.609363+00:00",
+      "generation_wall_seconds": 1513.083,
+      "input_tokens": 8278519,
+      "cached_input_tokens": 8040704,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 74556,
+      "reasoning_output_tokens": 21604,
+      "noncached_input_tokens": 237815,
+      "tool_items": 69,
+      "failed_tool_items": 12,
+      "repeated_command_excess": 8,
+      "missing_tool_duration_items": 0,
+      "public_messages": 5,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 738896,
+      "peak_sampled_browser_tree_rss_kib": 298640,
+      "source_room_gets": 15,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": {
+        "contracts.en.md": 0,
+        "ownership.en.md": 0,
+        "router.en.md": 0,
+        "transitions.en.md": 0
+      },
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 16,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [
+        {
+          "group": "hub_scenarios_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 68
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        }
+      ],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-5.6-luna-high-vanilla",
+      "task": "consulting",
+      "tuple": "gpt-5.6-luna-high",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "vanilla",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:41.938939+00:00",
+      "ended_utc": "2026-09-27T10:23:27.648943+00:00",
+      "generation_wall_seconds": 765.702,
+      "input_tokens": 2374240,
+      "cached_input_tokens": 2245888,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 38309,
+      "reasoning_output_tokens": 6476,
+      "noncached_input_tokens": 128352,
+      "tool_items": 42,
+      "failed_tool_items": 7,
+      "repeated_command_excess": 3,
+      "missing_tool_duration_items": 0,
+      "public_messages": 6,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 637888,
+      "peak_sampled_browser_tree_rss_kib": 255520,
+      "source_room_gets": 14,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": null,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 16,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [
+        {
+          "group": "fx_monthly_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 36
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        }
+      ],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-6-astra-xhigh-v14",
+      "task": "consulting",
+      "tuple": "gpt-6-astra-xhigh",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "v14",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:50.151111+00:00",
+      "ended_utc": "2026-09-27T11:20:13.770784+00:00",
+      "generation_wall_seconds": 4163.61,
+      "input_tokens": 2829786,
+      "cached_input_tokens": 2659584,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 66061,
+      "reasoning_output_tokens": 12703,
+      "noncached_input_tokens": 170202,
+      "tool_items": 48,
+      "failed_tool_items": 1,
+      "repeated_command_excess": 5,
+      "missing_tool_duration_items": 0,
+      "public_messages": 9,
+      "public_provider_error_events": 4,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 807504,
+      "peak_sampled_browser_tree_rss_kib": 320928,
+      "source_room_gets": 15,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 17,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "fullstack-gpt-6-sol-high-v15",
+      "task": "fullstack",
+      "tuple": "gpt-6-sol-high",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "v15",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:49.600769+00:00",
+      "ended_utc": "2026-09-27T10:26:28.278148+00:00",
+      "generation_wall_seconds": 938.675,
+      "input_tokens": 3811383,
+      "cached_input_tokens": 3702272,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 39727,
+      "reasoning_output_tokens": 6401,
+      "noncached_input_tokens": 109111,
+      "tool_items": 66,
+      "failed_tool_items": 8,
+      "repeated_command_excess": 13,
+      "missing_tool_duration_items": 1,
+      "public_messages": 9,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 747312,
+      "peak_sampled_browser_tree_rss_kib": 436016,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": {
+        "contracts.en.md": 0,
+        "ownership.en.md": 0,
+        "router.en.md": 1,
+        "transitions.en.md": 1
+      },
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "api_failed_groups": [
+        {
+          "name": "concurrent_reservations_no_oversell",
+          "pass": false,
+          "critical": true,
+          "details": "URLError(OSError(22, 'Invalid argument'))"
+        }
+      ],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 7,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": true,
+      "preconnected_state_diagnostic": {
+        "reservations": true,
+        "idempotent_create": true
+      },
+      "performance_eligible": false,
+      "performance": null,
+      "api_receipt": "qualification-v1/results/fullstack-gpt-6-sol-high-v15/api.json"
+    },
+    {
+      "id": "fullstack-gpt-6-luna-max-vanilla",
+      "task": "fullstack",
+      "tuple": "gpt-6-luna-max",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "vanilla",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:41.995686+00:00",
+      "ended_utc": "2026-09-27T10:47:11.457007+00:00",
+      "generation_wall_seconds": 2189.454,
+      "input_tokens": 12425031,
+      "cached_input_tokens": 12189952,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 92446,
+      "reasoning_output_tokens": 38828,
+      "noncached_input_tokens": 235079,
+      "tool_items": 99,
+      "failed_tool_items": 2,
+      "repeated_command_excess": 8,
+      "missing_tool_duration_items": 6,
+      "public_messages": 8,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 1109680,
+      "peak_sampled_browser_tree_rss_kib": 1370544,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": null,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "api_failed_groups": [],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 6,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": true,
+      "transport_error_in_original_api": false,
+      "preconnected_state_diagnostic": null,
+      "performance_eligible": true,
+      "performance": [
+        {
+          "workload": "inventory_get",
+          "concurrency": 1,
+          "requests": 500,
+          "wall_seconds": 0.2037520840531215,
+          "requests_per_second": 2453.9626297497985,
+          "errors": 0,
+          "p50_ms": 0.372416980098933,
+          "p95_ms": 0.5024580168537796,
+          "p99_ms": 0.6068340153433383
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 1,
+          "requests": 200,
+          "wall_seconds": 0.13994525000452995,
+          "requests_per_second": 1429.130320561263,
+          "errors": 0,
+          "p50_ms": 0.6763330311514437,
+          "p95_ms": 0.7589170127175748,
+          "p99_ms": 0.7855409639887512
+        },
+        {
+          "workload": "inventory_get",
+          "concurrency": 8,
+          "requests": 500,
+          "wall_seconds": 0.16347458300879225,
+          "requests_per_second": 3058.579448849906,
+          "errors": 0,
+          "p50_ms": 2.522541966754943,
+          "p95_ms": 3.99070797720924,
+          "p99_ms": 4.459249961655587
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 8,
+          "requests": 200,
+          "wall_seconds": 0.11647670797538012,
+          "requests_per_second": 1717.081496175822,
+          "errors": 0,
+          "p50_ms": 0.6684170220978558,
+          "p95_ms": 10.577416978776455,
+          "p99_ms": 90.63074999721721
+        }
+      ],
+      "api_receipt": "qualification-v1/results/fullstack-gpt-6-luna-max-vanilla/api.json"
+    },
+    {
+      "id": "fullstack-gpt-6-luna-high-v14",
+      "task": "fullstack",
+      "tuple": "gpt-6-luna-high",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "v14",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:49.640186+00:00",
+      "ended_utc": "2026-09-27T10:28:48.412891+00:00",
+      "generation_wall_seconds": 1078.768,
+      "input_tokens": 4616826,
+      "cached_input_tokens": 4455680,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 49313,
+      "reasoning_output_tokens": 14258,
+      "noncached_input_tokens": 161146,
+      "tool_items": 67,
+      "failed_tool_items": 13,
+      "repeated_command_excess": 12,
+      "missing_tool_duration_items": 0,
+      "public_messages": 9,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 773488,
+      "peak_sampled_browser_tree_rss_kib": 471696,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "api_failed_groups": [],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 6,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": false,
+      "preconnected_state_diagnostic": null,
+      "performance_eligible": true,
+      "performance": [
+        {
+          "workload": "inventory_get",
+          "concurrency": 1,
+          "requests": 500,
+          "wall_seconds": 0.20331754098879173,
+          "requests_per_second": 2459.2073933628944,
+          "errors": 0,
+          "p50_ms": 0.3707089927047491,
+          "p95_ms": 0.5017499788664281,
+          "p99_ms": 0.6434170063585043
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 1,
+          "requests": 200,
+          "wall_seconds": 0.14095512498170137,
+          "requests_per_second": 1418.891296261585,
+          "errors": 0,
+          "p50_ms": 0.6377500249072909,
+          "p95_ms": 0.7920420030131936,
+          "p99_ms": 1.9297500257380307
+        },
+        {
+          "workload": "inventory_get",
+          "concurrency": 8,
+          "requests": 500,
+          "wall_seconds": 0.14720087498426437,
+          "requests_per_second": 3396.71893970365,
+          "errors": 0,
+          "p50_ms": 2.246999996714294,
+          "p95_ms": 3.6154580302536488,
+          "p99_ms": 4.345000023022294
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 8,
+          "requests": 200,
+          "wall_seconds": 0.09925537498202175,
+          "requests_per_second": 2015.004225576965,
+          "errors": 0,
+          "p50_ms": 0.5636669811792672,
+          "p95_ms": 10.080249980092049,
+          "p99_ms": 64.11974999355152
+        }
+      ],
+      "api_receipt": "qualification-v1/results/fullstack-gpt-6-luna-high-v14/api.json"
+    },
+    {
+      "id": "fullstack-gpt-5.6-luna-max-v15",
+      "task": "fullstack",
+      "tuple": "gpt-5.6-luna-max",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "v15",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:49.994445+00:00",
+      "ended_utc": "2026-09-27T10:39:08.954827+00:00",
+      "generation_wall_seconds": 1698.957,
+      "input_tokens": 8387891,
+      "cached_input_tokens": 8163328,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 80417,
+      "reasoning_output_tokens": 29835,
+      "noncached_input_tokens": 224563,
+      "tool_items": 83,
+      "failed_tool_items": 12,
+      "repeated_command_excess": 18,
+      "missing_tool_duration_items": 0,
+      "public_messages": 9,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 838480,
+      "peak_sampled_browser_tree_rss_kib": 478256,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": {
+        "contracts.en.md": 1,
+        "ownership.en.md": 1,
+        "router.en.md": 1,
+        "transitions.en.md": 1
+      },
+      "human_quality_score": null,
+      "initial_api": null,
+      "initial_harness_error": "RuntimeError('Server exited before listening: 1; see api-server.log')",
+      "api_after_setup_correction": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "api_failed_groups": [],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 7,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": false,
+      "preconnected_state_diagnostic": null,
+      "performance_eligible": true,
+      "performance": [
+        {
+          "workload": "inventory_get",
+          "concurrency": 1,
+          "requests": 500,
+          "wall_seconds": 0.2026113749598153,
+          "requests_per_second": 2467.7785247702254,
+          "errors": 0,
+          "p50_ms": 0.3743330016732216,
+          "p95_ms": 0.48504199367016554,
+          "p99_ms": 0.5716669838875532
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 1,
+          "requests": 200,
+          "wall_seconds": 0.12831979198381305,
+          "requests_per_second": 1558.6060178871633,
+          "errors": 0,
+          "p50_ms": 0.6197500042617321,
+          "p95_ms": 0.7033750298433006,
+          "p99_ms": 0.8193749818019569
+        },
+        {
+          "workload": "inventory_get",
+          "concurrency": 8,
+          "requests": 500,
+          "wall_seconds": 0.1484003749792464,
+          "requests_per_second": 3369.263723692911,
+          "errors": 0,
+          "p50_ms": 2.308499999344349,
+          "p95_ms": 3.5794160212390125,
+          "p99_ms": 4.226125020068139
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 8,
+          "requests": 200,
+          "wall_seconds": 0.09543649997795,
+          "requests_per_second": 2095.634270391399,
+          "errors": 0,
+          "p50_ms": 0.5037080263718963,
+          "p95_ms": 10.866458003874868,
+          "p99_ms": 61.550041020382196
+        }
+      ],
+      "api_receipt": "qualification-diagnostic-v1/results/fullstack-gpt-5.6-luna-max-v15/api.json"
+    },
+    {
+      "id": "fullstack-gpt-5.6-luna-high-vanilla",
+      "task": "fullstack",
+      "tuple": "gpt-5.6-luna-high",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "vanilla",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:42.160403+00:00",
+      "ended_utc": "2026-09-27T10:27:34.045313+00:00",
+      "generation_wall_seconds": 1011.871,
+      "input_tokens": 3370233,
+      "cached_input_tokens": 3239936,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 47520,
+      "reasoning_output_tokens": 7846,
+      "noncached_input_tokens": 130297,
+      "tool_items": 54,
+      "failed_tool_items": 5,
+      "repeated_command_excess": 5,
+      "missing_tool_duration_items": 0,
+      "public_messages": 7,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 633264,
+      "peak_sampled_browser_tree_rss_kib": 368576,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": null,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 23,
+        "total": 24,
+        "critical_pass": false
+      },
+      "api_failed_groups": [
+        {
+          "name": "concurrent_reservations_no_oversell",
+          "pass": false,
+          "critical": true,
+          "details": "URLError(OSError(22, 'Invalid argument'))"
+        }
+      ],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 7,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": true,
+      "transport_error_in_original_api": true,
+      "preconnected_state_diagnostic": {
+        "reservations": true,
+        "idempotent_create": true
+      },
+      "performance_eligible": false,
+      "performance": null,
+      "api_receipt": "qualification-v1/results/fullstack-gpt-5.6-luna-high-vanilla/api.json"
+    },
+    {
+      "id": "fullstack-gpt-6-astra-xhigh-v14",
+      "task": "fullstack",
+      "tuple": "gpt-6-astra-xhigh",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "v14",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:48.389489+00:00",
+      "ended_utc": "2026-09-27T11:14:56.366310+00:00",
+      "generation_wall_seconds": 3847.969,
+      "input_tokens": 1576443,
+      "cached_input_tokens": 1453568,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 57833,
+      "reasoning_output_tokens": 9604,
+      "noncached_input_tokens": 122875,
+      "tool_items": 40,
+      "failed_tool_items": 2,
+      "repeated_command_excess": 1,
+      "missing_tool_duration_items": 0,
+      "public_messages": 8,
+      "public_provider_error_events": 4,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 762432,
+      "peak_sampled_browser_tree_rss_kib": 555264,
+      "source_room_gets": 0,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "initial_api": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "initial_harness_error": null,
+      "api_after_setup_correction": {
+        "passed": 24,
+        "total": 24,
+        "critical_pass": true
+      },
+      "api_failed_groups": [],
+      "restart_pass": true,
+      "first_pass_browser": {
+        "passed": 6,
+        "total": 7
+      },
+      "readiness_browser_passed": 7,
+      "readiness_browser_total": 7,
+      "readiness_browser_failed_groups": [],
+      "business_flow_pass": true,
+      "viewer_ready_readonly_pass": true,
+      "mobile_ready_pass": true,
+      "login_form_visible_after_authentication": false,
+      "transport_error_in_original_api": false,
+      "preconnected_state_diagnostic": null,
+      "performance_eligible": true,
+      "performance": [
+        {
+          "workload": "inventory_get",
+          "concurrency": 1,
+          "requests": 500,
+          "wall_seconds": 0.21873058401979506,
+          "requests_per_second": 2285.9171809039294,
+          "errors": 0,
+          "p50_ms": 0.4012910067103803,
+          "p95_ms": 0.5491249612532556,
+          "p99_ms": 0.6712499889545143
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 1,
+          "requests": 200,
+          "wall_seconds": 0.16032791702309623,
+          "requests_per_second": 1247.4433879858163,
+          "errors": 0,
+          "p50_ms": 0.722791999578476,
+          "p95_ms": 0.9496249840594828,
+          "p99_ms": 2.0271249813959002
+        },
+        {
+          "workload": "inventory_get",
+          "concurrency": 8,
+          "requests": 500,
+          "wall_seconds": 0.1915747500024736,
+          "requests_per_second": 2609.9472920807366,
+          "errors": 0,
+          "p50_ms": 2.9707910143770278,
+          "p95_ms": 4.241249989718199,
+          "p99_ms": 5.259958037640899
+        },
+        {
+          "workload": "draft_order_post",
+          "concurrency": 8,
+          "requests": 200,
+          "wall_seconds": 0.1228927499614656,
+          "requests_per_second": 1627.4353048712169,
+          "errors": 0,
+          "p50_ms": 0.6587920361198485,
+          "p95_ms": 10.85683301789686,
+          "p99_ms": 91.84608299983665
+        }
+      ],
+      "api_receipt": "qualification-v1/results/fullstack-gpt-6-astra-xhigh-v14/api.json"
+    },
+    {
+      "id": "consulting-gpt-6-sol-high-vanilla",
+      "task": "consulting",
+      "tuple": "gpt-6-sol-high",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "vanilla",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:42.222729+00:00",
+      "ended_utc": "2026-09-27T10:26:10.201288+00:00",
+      "generation_wall_seconds": 927.974,
+      "input_tokens": 3208066,
+      "cached_input_tokens": 3094144,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 42509,
+      "reasoning_output_tokens": 9459,
+      "noncached_input_tokens": 113922,
+      "tool_items": 66,
+      "failed_tool_items": 2,
+      "repeated_command_excess": 0,
+      "missing_tool_duration_items": 0,
+      "public_messages": 6,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 759328,
+      "peak_sampled_browser_tree_rss_kib": 255520,
+      "source_room_gets": 14,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": null,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 16,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [
+        {
+          "group": "hub_scenarios_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 72
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        }
+      ],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "ESP",
+        "CZE"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-6-luna-max-v14",
+      "task": "consulting",
+      "tuple": "gpt-6-luna-max",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "v14",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:49.239681+00:00",
+      "ended_utc": "2026-09-27T11:03:20.366515+00:00",
+      "generation_wall_seconds": 3151.107,
+      "input_tokens": 16943439,
+      "cached_input_tokens": 16581248,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 134813,
+      "reasoning_output_tokens": 59047,
+      "noncached_input_tokens": 362191,
+      "tool_items": 117,
+      "failed_tool_items": 7,
+      "repeated_command_excess": 19,
+      "missing_tool_duration_items": 0,
+      "public_messages": 9,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 802992,
+      "peak_sampled_browser_tree_rss_kib": 310512,
+      "source_room_gets": 15,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 17,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-6-luna-high-v15",
+      "task": "consulting",
+      "tuple": "gpt-6-luna-high",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "v15",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:49.898945+00:00",
+      "ended_utc": "2026-09-27T11:02:50.775732+00:00",
+      "generation_wall_seconds": 3120.869,
+      "input_tokens": 9201750,
+      "cached_input_tokens": 8979328,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 77246,
+      "reasoning_output_tokens": 21062,
+      "noncached_input_tokens": 222422,
+      "tool_items": 83,
+      "failed_tool_items": 6,
+      "repeated_command_excess": 0,
+      "missing_tool_duration_items": 0,
+      "public_messages": 6,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 849184,
+      "peak_sampled_browser_tree_rss_kib": 300736,
+      "source_room_gets": 16,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": {
+        "contracts.en.md": 0,
+        "ownership.en.md": 0,
+        "router.en.md": 0,
+        "transitions.en.md": 0
+      },
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 13,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": false,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 44,
+      "strict_shape_annotations": [
+        {
+          "group": "hub_scenarios_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 68
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        }
+      ],
+      "numeric_annotations": [
+        {
+          "group": "monthly_values",
+          "mismatch_count": 108,
+          "fields": {
+            "net_cogs_eur": 36,
+            "contribution_eur": 36,
+            "margin": 36
+          },
+          "classification": "Substantive numerical mismatch; trace shared upstream defects rather than count correlated groups as independent failures."
+        },
+        {
+          "group": "countries_values",
+          "mismatch_count": 18,
+          "fields": {
+            "net_cogs_eur": 6,
+            "contribution_eur": 6,
+            "margin": 6
+          },
+          "classification": "Substantive numerical mismatch; trace shared upstream defects rather than count correlated groups as independent failures."
+        },
+        {
+          "group": "hub_scenarios_values",
+          "mismatch_count": 43,
+          "fields": {
+            "incremental_contribution_eur": 24,
+            "payback_years": 19
+          },
+          "classification": "Substantive numerical mismatch; trace shared upstream defects rather than count correlated groups as independent failures."
+        }
+      ],
+      "recommendation_countries": [
+        "NLD",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-5.6-luna-max-vanilla",
+      "task": "consulting",
+      "tuple": "gpt-5.6-luna-max",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "vanilla",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:42.286015+00:00",
+      "ended_utc": "2026-09-27T10:37:38.358488+00:00",
+      "generation_wall_seconds": 1616.066,
+      "input_tokens": 5870379,
+      "cached_input_tokens": 5671296,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 80442,
+      "reasoning_output_tokens": 20041,
+      "noncached_input_tokens": 199083,
+      "tool_items": 62,
+      "failed_tool_items": 11,
+      "repeated_command_excess": 3,
+      "missing_tool_duration_items": 0,
+      "public_messages": 6,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 759568,
+      "peak_sampled_browser_tree_rss_kib": 288448,
+      "source_room_gets": 15,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": null,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 16,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 44,
+      "strict_shape_annotations": [
+        {
+          "group": "hub_scenarios_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 72
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        }
+      ],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "NLD",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-5.6-luna-high-v14",
+      "task": "consulting",
+      "tuple": "gpt-5.6-luna-high",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "v14",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:48.918881+00:00",
+      "ended_utc": "2026-09-27T10:27:27.093364+00:00",
+      "generation_wall_seconds": 998.17,
+      "input_tokens": 4753014,
+      "cached_input_tokens": 4557696,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 47893,
+      "reasoning_output_tokens": 10614,
+      "noncached_input_tokens": 195318,
+      "tool_items": 42,
+      "failed_tool_items": 6,
+      "repeated_command_excess": 4,
+      "missing_tool_duration_items": 0,
+      "public_messages": 9,
+      "public_provider_error_events": 0,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 599072,
+      "peak_sampled_browser_tree_rss_kib": 289920,
+      "source_room_gets": 14,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": null,
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 16,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [
+        {
+          "group": "hub_scenarios_shape",
+          "strict_detail": {
+            "expected": 24,
+            "actual": 68
+          },
+          "classification": "Exact array membership is stricter than the task; verify required rows, extra pairs/defer/EUR and their values separately."
+        }
+      ],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    },
+    {
+      "id": "consulting-gpt-6-astra-xhigh-v15",
+      "task": "consulting",
+      "tuple": "gpt-6-astra-xhigh",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "v15",
+      "subject_attempt": 1,
+      "process_exit_code": 0,
+      "started_utc": "2026-09-27T10:10:49.654727+00:00",
+      "ended_utc": "2026-09-27T11:14:32.071594+00:00",
+      "generation_wall_seconds": 3822.399,
+      "input_tokens": 1918997,
+      "cached_input_tokens": 1725184,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 57372,
+      "reasoning_output_tokens": 11085,
+      "noncached_input_tokens": 193813,
+      "tool_items": 47,
+      "failed_tool_items": 3,
+      "repeated_command_excess": 2,
+      "missing_tool_duration_items": 0,
+      "public_messages": 7,
+      "public_provider_error_events": 4,
+      "scheduler_regime": "parallel-v1",
+      "overlaps_parallel_amendment": false,
+      "peak_sampled_process_tree_rss_kib": 764464,
+      "peak_sampled_browser_tree_rss_kib": 300096,
+      "source_room_gets": 15,
+      "billed_cost": null,
+      "backend_model_echo": null,
+      "native_memory": {
+        "database_present": true,
+        "stage1_outputs": 0,
+        "jobs": 0
+      },
+      "product_memory_enrolled": false,
+      "protected_inputs_unchanged": true,
+      "package_members_unchanged": true,
+      "specialist_delivery": {
+        "contracts.en.md": 0,
+        "ownership.en.md": 0,
+        "router.en.md": 0,
+        "transitions.en.md": 0
+      },
+      "human_quality_score": null,
+      "strict_office_score": {
+        "passed": 17,
+        "total": 17
+      },
+      "core_accounting_and_official_values_match": true,
+      "pair_scenarios_covered": 44,
+      "material_pair_scenario_mismatches": 0,
+      "strict_shape_annotations": [],
+      "numeric_annotations": [],
+      "recommendation_countries": [
+        "CZE",
+        "ESP"
+      ],
+      "all_13_substantive_source_files_preserved": true
+    }
+  ],
+  "matched_ratios": [
+    {
+      "task": "fullstack",
+      "comparison": "v15/vanilla",
+      "paired_ratios": [
+        {
+          "tuple": "gpt-6-sol-high",
+          "input_tokens": 1.3670126476313174,
+          "noncached_input_tokens": 0.7020983610776863,
+          "output_tokens": 0.9408407341622261,
+          "reasoning_output_tokens": 0.550671025464556,
+          "tool_items": 1.0153846153846153,
+          "generation_wall_seconds": 0.48321420390051295
+        },
+        {
+          "tuple": "gpt-6-luna-max",
+          "input_tokens": 0.8689988781516923,
+          "noncached_input_tokens": 0.9976305837612037,
+          "output_tokens": 1.128388464617182,
+          "reasoning_output_tokens": 1.2188884310291541,
+          "tool_items": 0.8888888888888888,
+          "generation_wall_seconds": 1.1465342500915754
+        },
+        {
+          "tuple": "gpt-6-luna-high",
+          "input_tokens": 1.5842381990456642,
+          "noncached_input_tokens": 1.2604078385250013,
+          "output_tokens": 1.4238966318234612,
+          "reasoning_output_tokens": 1.814940098661029,
+          "tool_items": 1.4285714285714286,
+          "generation_wall_seconds": 1.1976492378141677
+        },
+        {
+          "tuple": "gpt-5.6-luna-max",
+          "input_tokens": 1.5105369787427156,
+          "noncached_input_tokens": 1.372567356119505,
+          "output_tokens": 0.9673061887291754,
+          "reasoning_output_tokens": 0.9238558246113829,
+          "tool_items": 1.1216216216216217,
+          "generation_wall_seconds": 0.9825820063224593
+        },
+        {
+          "tuple": "gpt-5.6-luna-high",
+          "input_tokens": 0.9834702823217267,
+          "noncached_input_tokens": 1.004689286783272,
+          "output_tokens": 0.8997895622895623,
+          "reasoning_output_tokens": 1.0296966607188376,
+          "tool_items": 0.8703703703703703,
+          "generation_wall_seconds": 0.9594483881838692
+        },
+        {
+          "tuple": "gpt-6-astra-xhigh",
+          "input_tokens": 1.4623959744843151,
+          "noncached_input_tokens": 1.1595307479638348,
+          "output_tokens": 1.14671068675083,
+          "reasoning_output_tokens": 1.3512493625701172,
+          "tool_items": 1.1136363636363635,
+          "generation_wall_seconds": 1.3950364836372102
+        }
+      ],
+      "median_of_six_ratios": {
+        "input_tokens": 1.4147043110578164,
+        "noncached_input_tokens": 1.0821100173735534,
+        "output_tokens": 1.0478473266731787,
+        "reasoning_output_tokens": 1.1242925458739959,
+        "tool_items": 1.0645104895104893,
+        "generation_wall_seconds": 1.0645581282070173
+      },
+      "interpretation": "Descriptive one-episode ratios; unequal outcomes, scheduler overlap and provider errors prevent causal or equivalent-quality efficiency claims."
+    },
+    {
+      "task": "fullstack",
+      "comparison": "v15/v14",
+      "paired_ratios": [
+        {
+          "tuple": "gpt-6-sol-high",
+          "input_tokens": 0.8685564702094102,
+          "noncached_input_tokens": 0.7147274025455094,
+          "output_tokens": 0.7661318316812589,
+          "reasoning_output_tokens": 0.44781027004337487,
+          "tool_items": 0.9850746268656716,
+          "generation_wall_seconds": 0.5173116931428334
+        },
+        {
+          "tuple": "gpt-6-luna-max",
+          "input_tokens": 1.2260025211917958,
+          "noncached_input_tokens": 1.0149216268381558,
+          "output_tokens": 1.0889058226685318,
+          "reasoning_output_tokens": 1.1711415208730296,
+          "tool_items": 1.2753623188405796,
+          "generation_wall_seconds": 1.294622149768258
+        },
+        {
+          "tuple": "gpt-6-luna-high",
+          "input_tokens": 0.8950257168019761,
+          "noncached_input_tokens": 0.9044344879798444,
+          "output_tokens": 0.9944436558311196,
+          "reasoning_output_tokens": 0.9031420956655912,
+          "tool_items": 1.044776119402985,
+          "generation_wall_seconds": 1.0202036026281833
+        },
+        {
+          "tuple": "gpt-5.6-luna-max",
+          "input_tokens": 0.9198300858310879,
+          "noncached_input_tokens": 1.069851977837171,
+          "output_tokens": 1.0596660912648737,
+          "reasoning_output_tokens": 1.1756245567026558,
+          "tool_items": 1.2205882352941178,
+          "generation_wall_seconds": 1.1086259020456264
+        },
+        {
+          "tuple": "gpt-5.6-luna-high",
+          "input_tokens": 0.6514650733126303,
+          "noncached_input_tokens": 0.8562346292711004,
+          "output_tokens": 0.9389314653374031,
+          "reasoning_output_tokens": 0.9812947892627232,
+          "tool_items": 0.7966101694915254,
+          "generation_wall_seconds": 0.8456099336986931
+        },
+        {
+          "tuple": "gpt-6-astra-xhigh",
+          "input_tokens": 1.1562752348166092,
+          "noncached_input_tokens": 0.8840366225839268,
+          "output_tokens": 1.0570089741151245,
+          "reasoning_output_tokens": 1.3795293627655143,
+          "tool_items": 1.225,
+          "generation_wall_seconds": 0.8659113418013502
+        }
+      ],
+      "median_of_six_ratios": {
+        "input_tokens": 0.9074279013165321,
+        "noncached_input_tokens": 0.8942355552818856,
+        "output_tokens": 1.025726314973122,
+        "reasoning_output_tokens": 1.0762181550678764,
+        "tool_items": 1.1326821773485514,
+        "generation_wall_seconds": 0.9430574722147668
+      },
+      "interpretation": "Descriptive one-episode ratios; unequal outcomes, scheduler overlap and provider errors prevent causal or equivalent-quality efficiency claims."
+    },
+    {
+      "task": "consulting",
+      "comparison": "v15/vanilla",
+      "paired_ratios": [
+        {
+          "tuple": "gpt-6-sol-high",
+          "input_tokens": 1.2671971212562334,
+          "noncached_input_tokens": 0.9458050244904408,
+          "output_tokens": 1.0480604107365499,
+          "reasoning_output_tokens": 0.9460830954646369,
+          "tool_items": 0.9090909090909091,
+          "generation_wall_seconds": 1.9125729815706043
+        },
+        {
+          "tuple": "gpt-6-luna-max",
+          "input_tokens": 0.640350998800825,
+          "noncached_input_tokens": 0.8445927296327517,
+          "output_tokens": 0.9998472157313872,
+          "reasoning_output_tokens": 0.9991148484177915,
+          "tool_items": 0.8415841584158416,
+          "generation_wall_seconds": 0.8505081958368617
+        },
+        {
+          "tuple": "gpt-6-luna-high",
+          "input_tokens": 2.6096733537227284,
+          "noncached_input_tokens": 1.6724464629451397,
+          "output_tokens": 1.3487332600003492,
+          "reasoning_output_tokens": 1.9268136492544141,
+          "tool_items": 1.930232558139535,
+          "generation_wall_seconds": 2.6757201427339274
+        },
+        {
+          "tuple": "gpt-5.6-luna-max",
+          "input_tokens": 1.4102188291420366,
+          "noncached_input_tokens": 1.19455202101636,
+          "output_tokens": 0.926829268292683,
+          "reasoning_output_tokens": 1.0779901202534803,
+          "tool_items": 1.1129032258064515,
+          "generation_wall_seconds": 0.9362754986491889
+        },
+        {
+          "tuple": "gpt-5.6-luna-high",
+          "input_tokens": 1.766367342812858,
+          "noncached_input_tokens": 1.1966155572176516,
+          "output_tokens": 1.0759612623665458,
+          "reasoning_output_tokens": 1.269302038295244,
+          "tool_items": 1.3095238095238095,
+          "generation_wall_seconds": 1.1710325949259635
+        },
+        {
+          "tuple": "gpt-6-astra-xhigh",
+          "input_tokens": 1.2015366419158497,
+          "noncached_input_tokens": 1.6185747809892854,
+          "output_tokens": 1.0291310899045705,
+          "reasoning_output_tokens": 1.0570229808334128,
+          "tool_items": 1.205128205128205,
+          "generation_wall_seconds": 0.9245302186060788
+        }
+      ],
+      "median_of_six_ratios": {
+        "input_tokens": 1.338707975199135,
+        "noncached_input_tokens": 1.1955837891170058,
+        "output_tokens": 1.0385957503205603,
+        "reasoning_output_tokens": 1.0675065505434467,
+        "tool_items": 1.1590157154673282,
+        "generation_wall_seconds": 1.0536540467875761
+      },
+      "interpretation": "Descriptive one-episode ratios; unequal outcomes, scheduler overlap and provider errors prevent causal or equivalent-quality efficiency claims."
+    },
+    {
+      "task": "consulting",
+      "comparison": "v15/v14",
+      "paired_ratios": [
+        {
+          "tuple": "gpt-6-sol-high",
+          "input_tokens": 1.8395329821619348,
+          "noncached_input_tokens": 1.0352321749406712,
+          "output_tokens": 1.3616969252399291,
+          "reasoning_output_tokens": 1.469699458039087,
+          "tool_items": 1.3636363636363635,
+          "generation_wall_seconds": 1.225731819669799
+        },
+        {
+          "tuple": "gpt-6-luna-max",
+          "input_tokens": 0.5343258237008437,
+          "noncached_input_tokens": 0.6251867108790665,
+          "output_tokens": 0.8252245703307545,
+          "reasoning_output_tokens": 0.917574135857876,
+          "tool_items": 0.7264957264957265,
+          "generation_wall_seconds": 0.7053933744553899
+        },
+        {
+          "tuple": "gpt-6-luna-high",
+          "input_tokens": 0.9211939326088586,
+          "noncached_input_tokens": 0.8331816223708116,
+          "output_tokens": 0.9339830242062245,
+          "reasoning_output_tokens": 0.72358114607668,
+          "tool_items": 0.9880952380952381,
+          "generation_wall_seconds": 1.7972790322274124
+        },
+        {
+          "tuple": "gpt-5.6-luna-max",
+          "input_tokens": 0.7669426919056951,
+          "noncached_input_tokens": 1.0061643777659313,
+          "output_tokens": 0.9368567874241339,
+          "reasoning_output_tokens": 0.8972133394243947,
+          "tool_items": 0.8214285714285714,
+          "generation_wall_seconds": 0.8711013444622467
+        },
+        {
+          "tuple": "gpt-5.6-luna-high",
+          "input_tokens": 0.88234118393087,
+          "noncached_input_tokens": 0.7863484164285933,
+          "output_tokens": 0.8606476938174681,
+          "reasoning_output_tokens": 0.7744488411531939,
+          "tool_items": 1.3095238095238095,
+          "generation_wall_seconds": 0.8983058997966279
+        },
+        {
+          "tuple": "gpt-6-astra-xhigh",
+          "input_tokens": 0.6781420927236194,
+          "noncached_input_tokens": 1.138723399255003,
+          "output_tokens": 0.8684700504079563,
+          "reasoning_output_tokens": 0.8726285129496969,
+          "tool_items": 0.9791666666666666,
+          "generation_wall_seconds": 0.9180492409231412
+        }
+      ],
+      "median_of_six_ratios": {
+        "input_tokens": 0.8246419379182826,
+        "noncached_input_tokens": 0.9196730000683715,
+        "output_tokens": 0.9012265373070905,
+        "reasoning_output_tokens": 0.8849209261870459,
+        "tool_items": 0.9836309523809523,
+        "generation_wall_seconds": 0.9081775703598846
+      },
+      "interpretation": "Descriptive one-episode ratios; unequal outcomes, scheduler overlap and provider errors prevent causal or equivalent-quality efficiency claims."
+    }
+  ]
+}

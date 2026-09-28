@@ -1,0 +1,120 @@
+{
+  "schema": "opensocrates.practical-rc-qualification/1.0.0",
+  "source_commit": "7cf2777bc55e847c77396f46ad9b75835dd30f8c",
+  "product_version": "1.5.0",
+  "publication_status": "unpublished_release_candidate",
+  "comparison": {
+    "manifest": "manifest.v1.json",
+    "model_invocations": 20,
+    "failed_model_invocations": 0,
+    "model_retries": 0,
+    "passing_episodes": 12,
+    "total_episodes": 12,
+    "functional_sources_unchanged": 205,
+    "metadata_transition": "Practical calls used the frozen guide-5 source candidate labelled 1.4.0; native RC acceptance separately verifies the 1.5.0 archive. Outcomes are not relabelled."
+  },
+  "client": {
+    "path": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex",
+    "version": "codex-cli 0.158.0-alpha.2",
+    "sha256": "50ab38ba21d0d9f8346f32f41848382f15b556190f3c7a07e885a4fb73e379c8"
+  },
+  "model": "gpt-6-sol",
+  "effort": "medium",
+  "local_validation": [
+    {
+      "command": "make bootstrap format-check lint generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check",
+      "status": "pass",
+      "source_scope": "Pre-commit 1.5.0 working tree subsequently committed as 7cf2777; do not describe this invocation as run after that commit.",
+      "log_sha256": "5000527ba6624bb45750d5f2f0c91d06734ae5cc9c3e03400652183d6e5b965c"
+    },
+    {
+      "command": "make release-check",
+      "status": "pass",
+      "source_scope": "7cf2777bc55e847c77396f46ad9b75835dd30f8c",
+      "evidence": "rc-acceptance/native-release-check.json",
+      "log_sha256": "f4af08e3ec64f26d92201b4e883cd5e83424fd99e6776a223f82c909d9833127"
+    },
+    {
+      "command": "python3 evals/v1.5/practical/qualify_rc.py",
+      "status": "pass",
+      "source_scope": "Product inputs at 7cf2777; untracked non-model acceptance helper. A later explicit closure-binding lint repair did not change the synchronous behavior. The receipt records the completed run, not a claim that the final helper bytes were replayed.",
+      "evidence": "rc-acceptance/summary.json",
+      "model_calls": 0
+    },
+    {
+      "command": "shasum -a 256 opensocrates-1.5.0-codex-plugin.zip > opensocrates-1.5.0-codex-plugin.zip.sha256",
+      "working_directory": "dist",
+      "status": "pass",
+      "source": ".github/workflows/release.yml checksum step"
+    },
+    {
+      "command": "node installer/opensocrates.mjs verify --host all --asset-codex dist/opensocrates-1.5.0-codex-plugin.zip --checksum-codex dist/opensocrates-1.5.0-codex-plugin.zip.sha256",
+      "status": "pass",
+      "source_scope": "7cf2777bc55e847c77396f46ad9b75835dd30f8c",
+      "verified_files": 324,
+      "output_wording_limit": "The installer prints release as its generic archive-verification label. No publication is implied."
+    },
+    {
+      "command": "npm pack --ignore-scripts --pack-destination dist/qualification-artifacts --json",
+      "status": "pass",
+      "source_scope": "7cf2777bc55e847c77396f46ad9b75835dd30f8c",
+      "package_files": 9,
+      "published": false
+    }
+  ],
+  "hosted_ci_at_product_commit": {
+    "head_sha": "7cf2777bc55e847c77396f46ad9b75835dd30f8c",
+    "ci_run_id": 36211196104,
+    "governance_run_id": 36211195875,
+    "all_six_checks": "success",
+    "scope": "CI run head matches source commit. Native macOS job explicitly checks out the PR head; normal PR jobs use the tested merge ref. Final evidence-only handoff commit CI is reconciled in PR #95 and issue #94."
+  },
+  "artifacts": {
+    "dist/opensocrates-1.5.0-codex-plugin.zip": {
+      "sha256": "d1b8f9b4c1879bc1dcdee87c9e4ae45f1d93f484343e94c248d582b251709bc6",
+      "size_bytes": 129424219
+    },
+    "dist/opensocrates-1.5.0-codex-plugin.zip.sha256": {
+      "sha256": "413c8b036d3e5187b7bb17f70b9489488c7962929836b5270c89e7dcc62a9b10",
+      "size_bytes": 102
+    },
+    "dist/opensocrates-1.5.0-release-manifest.json": {
+      "sha256": "2efd870f780c97ec3e252e49cd9db3781b899af275675ed20486cc8fb20a776f",
+      "size_bytes": 3959
+    },
+    "dist/opensocrates-1.5.0-checksums.sha256": {
+      "sha256": "8aafcdc1cdb469f6d09e959c31acacf5ee436f181979f2968ba81079b17f06ef",
+      "size_bytes": 63455
+    },
+    "dist/opensocrates-1.5.0-limitations.json": {
+      "sha256": "5f9c96b69d5476c1c21ff9362c447b6ac3438351d042b9c9ab73b1480468f796",
+      "size_bytes": 689
+    },
+    "dist/opensocrates-1.5.0-sbom.spdx.json": {
+      "sha256": "8fa8b0a9ecbdfe55e51b95f0fb9519eb35c7b8a31e97a7b043341e245a03d041",
+      "size_bytes": 13735
+    },
+    "dist/qualification-artifacts/opensocrates-1.5.0.tgz": {
+      "sha256": "81294d96cff40c79e0f24b27b912fe402450e4f00224ecf88dc84cd2d85b0f7b",
+      "size_bytes": 57680
+    }
+  },
+  "privacy_and_authority": {
+    "only_disposable_projects_enrolled": true,
+    "disposable_auth_copies_removed": true,
+    "active_installation_and_global_config_unchanged": true,
+    "user_owned_definition_unchanged": true,
+    "product_memory_raw_prompts_transcripts_code_credentials_or_reasoning": false,
+    "destructive_account_home_test": "not_run",
+    "publication_merge_tag_deploy": "not_performed"
+  },
+  "limits": [
+    "Live Windows Codex and separate physical clean-machine acceptance were unavailable; hosted Windows native/package fixtures are separate evidence.",
+    "Account-side memory isolation, billed cost, independent backend model echo and human quality scores remain unavailable; no broad superiority, causal memory effect or savings is claimed.",
+    "Normal-hook permission is exercised in the planning pair; no universal native receipt proves model application of every delivered pack.",
+    "Optional model profiles remain experimental and excluded from normal routing.",
+    "The older ignored guide-4 local ZIP identity was not re-established; historical-package-preservation.json records this separately from unchanged tracked historical results.",
+    "Local dist has artifacts from more than one version. This receipt identifies the candidate files explicitly; the versioned aggregate checksum file is not permission to publish all local outputs."
+  ],
+  "remaining_action": "Separately authorize protected-branch review/merge and v1.5.0 tag/publication at the approved merged commit; verify public assets/npm/provenance. Active-install replacement requires separate explicit authority."
+}

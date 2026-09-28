@@ -1,0 +1,115 @@
+{
+  "verified_at_utc": "2026-09-27T08:29:12.725875+00:00",
+  "status": "pass",
+  "checks": [
+    {
+      "check": "metrics top-level schema",
+      "status": "pass",
+      "detail": "All required top-level metrics fields exist."
+    },
+    {
+      "check": "monthly schema and grid",
+      "status": "pass",
+      "detail": "72 rows; required fields and month present."
+    },
+    {
+      "check": "country schema and grid",
+      "status": "pass",
+      "detail": "Six rows; required fields present."
+    },
+    {
+      "check": "country-month-to-year reconciliation",
+      "status": "pass",
+      "detail": "Every country's 12 months equal its country total for counts and monetary fields."
+    },
+    {
+      "check": "order ledger population",
+      "status": "pass",
+      "detail": "1254 eligible order records match the metrics quality count."
+    },
+    {
+      "check": "order accounting formulas",
+      "status": "pass",
+      "detail": "Each eligible order satisfies gross\u2212refunds=net sales and net sales\u2212net COGS\u2212fulfillment=contribution."
+    },
+    {
+      "check": "FX grid",
+      "status": "pass",
+      "detail": "12 monthly mean quotes each for PLN and CZK; EUR=1 is disclosed as convention."
+    },
+    {
+      "check": "ECB monthly means",
+      "status": "pass",
+      "detail": "All PLN/CZK monthly means independently recomputed from saved daily CSV within 1e-7."
+    },
+    {
+      "check": "World Bank context grid",
+      "status": "pass",
+      "detail": "18 country-year rows for six markets and 2022\u20132024; nulls remain representable."
+    },
+    {
+      "check": "hub scenario coverage",
+      "status": "pass",
+      "detail": "Four scenarios for six singles, 11 feasible pairs and DEFER."
+    },
+    {
+      "check": "scenario payback",
+      "status": "pass",
+      "detail": "Positive scenarios use capex/annual contribution; nonpositive scenarios have null payback."
+    },
+    {
+      "check": "recommendation capex constraint",
+      "status": "pass",
+      "detail": "EUR 225,000 <= EUR 450,000"
+    },
+    {
+      "check": "recommendation staffing constraint",
+      "status": "pass",
+      "detail": "5 FTE; 2 hubs."
+    },
+    {
+      "check": "recommendation and alternative",
+      "status": "pass",
+      "detail": "Base-ranked alternative and stress-resilient alternative are explicit."
+    },
+    {
+      "check": "saved evidence hashes",
+      "status": "pass",
+      "detail": "All 14 collected source-room objects match their recorded SHA-256."
+    },
+    {
+      "check": "source register fields",
+      "status": "pass",
+      "detail": "14 source rows carry URL/time/hash/units/period/status."
+    },
+    {
+      "check": "workbook structure",
+      "status": "pass",
+      "detail": "15 sheets; monthly=72, country=6, scenario=72 records plus header."
+    },
+    {
+      "check": "workbook charts",
+      "status": "pass",
+      "detail": "Two native Excel charts are embedded."
+    },
+    {
+      "check": "workbook values",
+      "status": "pass",
+      "detail": "Country totals in workbook equal metrics.json for all count and monetary fields."
+    },
+    {
+      "check": "PDF structure and content",
+      "status": "pass",
+      "detail": "Report has 8 pages, presentation 6 pages; required recommendation, alternatives, cutoff and funding values extract from PDF text."
+    },
+    {
+      "check": "PDF visual render",
+      "status": "pass",
+      "detail": "Both PDFs were rasterized with pypdfium2 and contact sheets reviewed; page layouts fit without observed table overlaps after revisions."
+    }
+  ],
+  "limitations": [
+    "The workbook was structurally reopened and its tables/charts/data were checked with openpyxl; an installed spreadsheet GUI renderer was unavailable, so workbook visual rendering was not directly inspected.",
+    "PDFs were rasterized and visually reviewed. Source observations are frozen archive snapshots and client data is synthetic."
+  ]
+}

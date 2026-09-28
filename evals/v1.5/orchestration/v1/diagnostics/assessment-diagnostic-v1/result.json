@@ -1,0 +1,66 @@
+{
+  "receipt": {
+    "assignment_id": "c1945a98-cc9c-417f-9a97-da90ea16631a",
+    "unit_id": "software-production",
+    "role": "review",
+    "input_sha256": "sha256:3d617a3dcf50baacbaa337ad92bfb172b55aeb87be64701a553c273cac09774c",
+    "output_sha256": "sha256:453a7caedd45774f9e14016884bd93bef88006e12d4fc32ac818f031af9f4371",
+    "thread_sha256": "sha256:eee15fc92fae08eb12afc93e4662c4a7d77db227430cb5b68ee35ed86e0016d4",
+    "model": {
+      "name": "gpt-6-astra",
+      "effort": "max"
+    },
+    "status": "completed",
+    "usage": {
+      "input_tokens": 105625,
+      "cached_input_tokens": 79488,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 4248,
+      "reasoning_output_tokens": 1924
+    },
+    "provider_error_events": 0,
+    "failed_turn_events": 0,
+    "process_exit_code": 0,
+    "backend_attempts": null,
+    "reason": "structured_result"
+  },
+  "inputs_unchanged": true,
+  "assessment_public": {
+    "assignment_id": "c1945a98-cc9c-417f-9a97-da90ea16631a",
+    "candidate_sha256": "sha256:9abfe24f365353847437e66bb91623f717b4eb7771d4e13ed887c20701805be2",
+    "findings": [
+      {
+        "artifact_sha256": "sha256:a383112c48b5909b6b3e7aa28983d09f81683f208dde3171896bb5334ee9a12a",
+        "expected": "Select the latest eligible effective_date regardless of cost. Preserve the selected row's numeric, zero, null or absent-cost state.",
+        "impact": "Returns stale prices and dates, overriding newer unknown, missing and zero-cost results.",
+        "location": "pricing.py:6-7",
+        "missing_evidence": [],
+        "observed": "The implementation maximizes numeric cost. Four independent probes returned {\"state\":\"known\",\"cost\":10,\"effective_date\":\"2026-01-01\"} despite a newer eligible row.",
+        "reproduction": "Call effective_cost with as_of='2026-07-01', an older row {'effective_date':'2026-01-01','cost':10}, and a newer row dated '2026-07-01'. Independently tested newer costs 8, None, an absent cost field, and 0. Expected states/costs respectively: known/8, unknown/null, missing/null, known/0, all dated '2026-07-01'. Every probe returned the older row. The cost-8 probe additionally included an ineligible '2026-10-01' row costing 100.",
+        "requirement_id": "cost-contract",
+        "severity": "blocking"
+      }
+    ],
+    "obligations": [
+      {
+        "evidence_ids": [
+          "artifact:sha256:a383112c48b5909b6b3e7aa28983d09f81683f208dde3171896bb5334ee9a12a",
+          "source:design-contract",
+          "source:cost-cases",
+          "source:cost-oracle",
+          "dependency:software-design"
+        ],
+        "expected": "effective_cost selects the latest date <= as_of, returns exactly state/cost/effective_date, distinguishes null, absent and zero, and leaves inputs unchanged.",
+        "id": "software-production-acceptance",
+        "observed": "Failed four independent selection probes. Empty rows, future-only rows and a single zero-cost row at equality produced expected results. Inputs remained unchanged in all seven probes. The required cost-oracle check has no supplied receipt and remains assigned to the separate verifier.",
+        "reproduction": "Verified all five supplied input digests, inspected pricing.py against design.json and the contract, then executed seven independent in-memory probes against the digest-verified candidate. These probes did not execute or replace the required cost-oracle check.",
+        "status": "failed"
+      }
+    ],
+    "schema": "opensocrates.orchestration.assessment/1.0.0",
+    "verdict": "repair_required"
+  },
+  "contract_accepted": false,
+  "qualified": false,
+  "rejection_reason": "finding_identity_mismatch"
+}

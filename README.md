@@ -1,4 +1,13 @@
 <p align="center">
+
+**v1.5.0 release candidate — not yet published.** This branch adds task-aware
+assistance, opt-in project memory, and coding/collaboration guidance. The 1.4.0
+commands below still install the published stable version. See the
+[candidate status and qualification](docs/v1.5.0/RELEASE_CANDIDATE.md) and
+[project continuity guide](docs/project-memory.md).
+The candidate also includes [three provisional coding specialists](docs/coding-specialists.md)
+in EN/KO/zh-CN, selectable as primary software-decision support. The general native
+catalog remains 48 methods in EN/KO; static Chinese files do not extend its API.
   <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
 </p>
 
@@ -109,3 +118,33 @@ response-time improvement is claimed. Current release validation is tracked in
 
 OpenSocrates is [MIT licensed](LICENSE), independent of OpenAI, and not endorsed
 by OpenAI.
+
+## What the v1.5.0 candidate adds
+
+- Optional task-based support: complete straightforward work directly, and use
+  appropriate evidence and structure for consequential judgments.
+- Opt-in local memory for Git and non-Git projects, with accepted/proposed intent,
+  current-source validation, checkpoints, inspect/export and exact scoped forgetting.
+- Coding guidance for existing implementation reuse, affected callers and follow-ups.
+- Selective official-document reference prompts with declared URL/version/read
+  provenance, plus read-only checkpoint preparation and scoped completion evidence.
+  [Official references](docs/official-documentation.md) explains the limits.
+- Aligned EN/KO collaboration guidance: answer side questions, continue the main
+  task and reuse settled permissions. Missing memory does not invent facts.
+
+The [six-scenario comparison](evals/v1.5/practical/RESULTS.md) reports correctness
+ties, the added structured-memory workflow, one avoided repeated approval request,
+and higher work in memory-backed episodes. It is not a broad quality or efficiency
+guarantee. Model profiles remain experimental; the normal task fallback works
+without a validated model profile. [Privacy and controls](docs/project-memory.md)
+and the [technical protocol](docs/project-memory-development.md) describe what is
+retained and how to disable or delete it.
+
+The candidate also offers an explicit [specialized orchestration command](docs/orchestration.md).
+It sends bounded selected context/source to fresh maker, independent reviewer and
+execution-verifier processes in the caller's authenticated Codex client and consumes
+that account's usage. All roles retain the same authorized model/effort. Ordinary
+hooks and default decision retrieval do not start it. Only new candidate directories
+are written; required unknown/failed checks block qualification, and the primary
+owns final integration and affected-byte rechecks. This text-artifact adapter does
+not imply binary office rendering, account isolation or a measured quality benefit.

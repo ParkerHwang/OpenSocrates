@@ -1,0 +1,390 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A10P1",
+  "phase": "first_pass",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "86229fee73f79bc2",
+      "packet_sha256": "ef8b62e841050b336b7807a0207172099cf85715c528fe33833ded0184744858",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The public final explicitly discusses enrolled-memory recall and rejected supersession commands. These reveal a memory-related condition cue; no treatment identity was inferred.",
+        "The packet includes a generic warning about memory/note references and characteristic wording."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 3,
+          "status": "scored",
+          "reason": "The revised plan satisfies the venue contract. Requested scoped forgetting remains incomplete in the reported outcome.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Venue facts match current sources, but material claims about successful recall and rejected memory updates cannot be corroborated from the supplied evidence.",
+          "evidence": [
+            "packet:/source_before_task/venues.md",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 3,
+          "status": "scored",
+          "reason": "Applies the capacity correction and completes the independent planning work while disclosing an unresolved memory dependency. Earlier question behavior is unavailable.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Clearly explains the venue change, retained constraints, unbooked status, and reported memory limitation without claiming successful forgetting.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a venue-planning task with a structured decision artifact, not a coding task.",
+          "evidence": [
+            "packet:/initial_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Action counts, timing, and execution receipts are absent.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "current_capacity_over_stale_fact",
+          "status": "pass",
+          "reason": "The final plan uses Harbor's current capacity of 65; the explanation rejects Cedar because its revised capacity is 48.",
+          "evidence": [
+            "packet:/declared_source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json/basis",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "accepted_constraints_and_budget",
+          "status": "pass",
+          "reason": "Harbor accommodates 52 people, provides both required features, and costs $1,300 within $1,400. It is the only qualifying listed venue.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/source_before_task/venues.md",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "plan_artifact_contract",
+          "status": "pass",
+          "reason": "The artifact contains all required fields with the requested types and current source attribution.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "no_booking_claim",
+          "status": "pass",
+          "reason": "The artifact remains proposed_unbooked and the final explicitly says no booking was made.",
+          "evidence": [
+            "packet:/stages/0/artifacts/plan.json/status",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "scoped_memory_retirement",
+          "status": "unassessable",
+          "reason": "The final reports rejected supersession requests and possible future recurrence. No memory-state snapshot establishes whether the scoped fact was retired.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "gate_id": "memory_operation_truthfulness",
+          "status": "unassessable",
+          "reason": "Successful recall and command rejection are reported without corresponding receipts. Neither truth nor falsity is established.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "Preserves accepted accessibility requirements while replacing the withdrawn capacity fact with current source values.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/declared_source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "Memory recall, update rejection, and persistent retirement cannot be verified. The candidate discloses the reported limitation rather than asserting that forgetting succeeded.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Only the stage final is supplied as public assistant communication. Earlier clarification, action sequence, and efficiency cannot be reconstructed.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "8e48a0b14bf3147a",
+      "packet_sha256": "b48b04c66fea3dda0114ab64617df375798dd2212e4fc763982d1c7692a7f807",
+      "locale": "en",
+      "blinding_status": "intact",
+      "non_blindable_cues": [
+        "The packet includes a generic warning about memory/note references and characteristic wording; no concrete treatment or model identifier was observed."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Static inspection establishes the corrected retry behavior, preserved delay contract, matching action artifact, and answered side question.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The functional explanation and idempotence definition are accurate, but the specific test-execution claims lack receipts. Their accuracy cannot be established by static inspection.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible stages show correction uptake in both artifacts and completion of the original task alongside the side answer. Earlier clarification behavior is unavailable.",
+          "evidence": [
+            "packet:/stages/0/artifacts/retry.py",
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Directly explains idempotence, including potentially different responses, and clearly reports the corrected work and claimed verification scope.",
+          "evidence": [
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 4,
+          "status": "scored",
+          "reason": "A localized predicate preserves the existing interface and delay function. Method normalization and status handling are straightforward, with no duplicated implementation paths.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/1/artifacts/retry.py#L1",
+            "packet:/stages/1/artifacts/retry.py#L4",
+            "packet:/stages/1/artifacts/retry.py#L6"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "No action or timing receipts establish retrieval cost, repeated checks, or post-completion activity.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "retry_429_all_methods",
+          "status": "pass",
+          "reason": "The unconditional 429 branch returns True before inspecting the method.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/1/artifacts/retry.py#L2"
+          ]
+        },
+        {
+          "gate_id": "corrected_503_case_insensitive_policy",
+          "status": "pass",
+          "reason": "The final 503 branch uppercases the method and permits only GET and HEAD, excluding PUT and DELETE.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/retry.py#L4",
+            "packet:/stages/1/artifacts/action.json/retry_503_methods"
+          ]
+        },
+        {
+          "gate_id": "other_statuses_and_default_method",
+          "status": "pass",
+          "reason": "Other statuses return False and the GET default is preserved.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py#L1",
+            "packet:/stages/1/artifacts/retry.py#L4"
+          ]
+        },
+        {
+          "gate_id": "delay_contract_preserved",
+          "status": "pass",
+          "reason": "delay_seconds is unchanged, including ValueError below attempt 1 and the capped exponential expression.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/1/artifacts/retry.py#L6"
+          ]
+        },
+        {
+          "gate_id": "action_schema_and_code_agreement",
+          "status": "pass",
+          "reason": "The final JSON has exactly the five requested typed fields; its retry policy and correction flag agree with the final code.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        {
+          "gate_id": "side_answer_and_task_continuation",
+          "status": "pass",
+          "reason": "Both the action artifact and public final explain the same intended effect of repeated requests, and both requested files are updated.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        {
+          "gate_id": "reported_verification_execution",
+          "status": "unassessable",
+          "reason": "Claims about six statuses, thirteen method spellings, and passed checks have no supplied execution receipts or test source.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The correction is consistently applied to executable logic and structured output while preserving the original delay behavior.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The idempotence explanation correctly distinguishes intended server-state effects from potentially differing responses.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "Specific verification claims cannot be authenticated from the frozen view. This does not establish that they are false.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Both stage finals were reviewed, but earlier public messages and action receipts are absent; full-turn clarification and efficiency remain unavailable.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "withheld",
+        "sha256": null,
+        "limitations": [
+          "First pass precedes deterministic evidence"
+        ]
+      },
+      "disagreements": [],
+      "post_evidence_scores": null,
+      "post_evidence_critical_gates": [],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "Read AGENTS.md, CONTRIBUTING.md, the fixed rubric, reviewer-definition.toml, response.schema.json, and all four assigned packets completely. All supplied packet hashes and the rubric hash matched.",
+    "Assessment used only static inspection, JSON parsing, hashing, and text comparison. No candidate code, tests, harnesses, or plugins were executed; deterministic evidence was not accessed.",
+    "All available stage finals, source snapshots, transitions, designated artifacts, and diffs were reviewed. Earlier public messages, complete filesystem snapshots, and action/timing receipts were unavailable.",
+    "Configured model and effort match reviewer-definition.toml. Actual host/backend model identity and usage were unavailable.",
+    "The caller declared a fresh isolated context; host isolation was not independently verified. No prior implementation conversation, treatment map, or assessor scores were supplied.",
+    "These are provisional judgments from one model assessor. Human assessment remains unavailable, and these ratings establish no release, efficiency, or comparative model claim."
+  ]
+}

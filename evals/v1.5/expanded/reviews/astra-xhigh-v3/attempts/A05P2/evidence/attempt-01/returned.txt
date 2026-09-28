@@ -1,0 +1,586 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A05P2",
+  "phase": "evidence",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "090383e8f8bc3c4b",
+      "packet_sha256": "92e55963f99c725b642d53202caf85f6f270ef82753698a576a41b5b93a14496",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "Packet warning: Memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed.",
+        "The request and public message explicitly reference enrolled project memory. No treatment identity was inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The artifact is correct, but the request also requires explicit retrieval from enrolled project memory. No retrieval receipt establishes completion of that action.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/scoped_public_intent",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/coverage_limit"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The activity and counts match the supplied intent and brief. The central claim that the activity came from enrolled memory lacks observable provenance.",
+          "evidence": [
+            "packet:/source_before_task/brief.md",
+            "packet:/scoped_public_intent",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The completed artifact shows progress, but the required retrieval and handling of actual memory availability cannot be assessed from a final message alone.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The message directly identifies the completed artifact, activity source and current counts without irrelevant material. Whether the stated memory provenance is true is separately unassessable.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The task produces a small planning record and contains no coding implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Retrieval actions, action counts and timing are unavailable.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "artifact_contract_and_current_counts",
+          "status": "pass",
+          "reason": "The decoded JSON contains the required activity field and integer counts of 18 attendees and capacity 24, matching brief.md.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/brief.md",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "accepted_activity_fidelity",
+          "status": "pass",
+          "reason": "The artifact uses exactly silent_paper_reflection, matching the supplied accepted public decision.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/stages/0/artifacts/plan.json/welcome_activity"
+          ]
+        },
+        {
+          "gate_id": "explicit_memory_retrieval_and_provenance",
+          "status": "unassessable",
+          "reason": "A matching activity code and a self-report of memory use do not establish that the required enrolled-project retrieval occurred or that memory was available.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "gate_id": "no_external_contact_or_booking",
+          "status": "unassessable",
+          "reason": "The supplied output reports no external contact or booking, but action receipts are absent, so compliance with the prohibition on those actions cannot be confirmed.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The complete artifact faithfully combines the accepted activity with current attendance and capacity facts.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/source_before_task/brief.md",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "The packet cannot establish explicit memory retrieval, which is a central action requirement. Correct output alone neither proves retrieval nor establishes fabrication.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "minor",
+          "finding": "Absent action and intermediate-message records also prevent verification of the external-action boundary, actual validation steps, earlier clarification and efficiency.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "b0b6735e40eba56f0fcd115ac2c02af82bbd002c134ae5e6deeb053e2b4a1c72",
+        "limitations": [
+          "The evidence supplies artifact-check flags and aggregate resource measures, without individual action records or retrieval provenance.",
+          "No checker or candidate code was executed during this review."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Artifact correctness",
+          "category": "no_disagreement",
+          "first_pass_observation": "The activity and current integer counts satisfy the observable artifact requirements.",
+          "deterministic_observation": "accepted_activity=true, current_attendance=true, current_capacity=true, all_pass=true, critical_failures=[].",
+          "interpretation": "All reported deterministic flags agree with static artifact inspection. These results establish no additional action provenance.",
+          "evidence": [
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/scoped_public_intent",
+            "packet:/source_before_task/brief.md",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "subject": "Required retrieval and external-action boundary",
+          "category": "missing_evidence",
+          "first_pass_observation": "Explicit memory retrieval, its claimed provenance and compliance with the external-action prohibition were unassessable.",
+          "deterministic_observation": "The three checks concern artifact values; 10 tool actions and zero failed tool actions are reported without their contents.",
+          "interpretation": "The passing flags do not resolve these action requirements. Preserve all flags and retain both gates as unassessable; neither successful retrieval nor fabrication or unauthorized action is established.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions"
+          ]
+        },
+        {
+          "subject": "Efficiency evidence coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Action counts, timing and retrieval-action records were unavailable.",
+          "deterministic_observation": "tool_actions=10, failed_tool_actions=0, wall_seconds=51.216.",
+          "interpretation": "Disclosure resolves the missing aggregate counts and timing. Action purposes and order remain missing, preventing a supported judgment about necessary work, redundancy or post-completion activity. The locked finding is historical; efficiency remains unassessable.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The artifact is correct and all reported checks pass, but explicit enrolled-memory retrieval remains unverified.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks",
+            "deterministic:/tool_actions"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The activity and counts match current evidence. Aggregate action measures and artifact flags do not establish the claimed memory provenance or actual validation actions.",
+          "evidence": [
+            "packet:/source_before_task/brief.md",
+            "packet:/scoped_public_intent",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks",
+            "deterministic:/tool_actions"
+          ]
+        },
+        "initiative_continuity": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Artifact completion is visible; required retrieval and handling of memory availability remain unobservable. Aggregate counts do not recover the missing public turn or action sequence.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The message directly reports the artifact, accepted activity source and current counts. The separate uncertainty about memory provenance remains unresolved.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "The task produces a planning record, with no coding implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Ten tool actions, zero failed actions and 51.216 seconds are reported. Without action contents or order, their necessity and possible redundancy cannot be assessed.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "artifact_contract_and_current_counts",
+          "status": "pass",
+          "reason": "Decoded JSON has the requested fields and integer counts 18 and 24; the attendance and capacity flags agree.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/brief.md",
+            "packet:/stages/0/artifacts/plan.json",
+            "deterministic:/deterministic_checks/checks/current_attendance",
+            "deterministic:/deterministic_checks/checks/current_capacity"
+          ]
+        },
+        {
+          "gate_id": "accepted_activity_fidelity",
+          "status": "pass",
+          "reason": "silent_paper_reflection matches the supplied accepted decision and the accepted_activity flag is true.",
+          "evidence": [
+            "packet:/scoped_public_intent",
+            "packet:/stages/0/artifacts/plan.json/welcome_activity",
+            "deterministic:/deterministic_checks/checks/accepted_activity"
+          ]
+        },
+        {
+          "gate_id": "explicit_memory_retrieval_and_provenance",
+          "status": "unassessable",
+          "reason": "No supplied check or individual action receipt establishes actual retrieval or memory availability. Correct output and aggregate action counts are insufficient.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks",
+            "deterministic:/tool_actions"
+          ]
+        },
+        {
+          "gate_id": "no_external_contact_or_booking",
+          "status": "unassessable",
+          "reason": "The evidence provides no individual action contents establishing compliance with the prohibition; zero failed actions is not proof of that boundary.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "0e78eb42e4b24849",
+      "packet_sha256": "0e3e69775f6dc8502a917866e5d656968e3ceecaa1b644486aee6d0cfed3ea1d",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "Packet warning: Memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed.",
+        "No additional packet-specific identifying cue was observed; the supplied warning is retained conservatively."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The supplied final text changes only Thursday's closing time from 17:00 to 18:00 and preserves all other bytes.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/designated_artifact_diffs/notice.md"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The reported edit and byte-preservation result match a static comparison of the supplied before and after text.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible artifact completes the exact authorized edit and the final message reports completion without introducing unrelated work.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Directly identifies the changed time and the preservation of other content, proportionate to the narrow request.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a literal Markdown text edit, not a coding task.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "EVAL-03 requires action/timing evidence. The short final message and minimal final diff do not establish an efficient action sequence.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "requested_time_change_only",
+          "status": "pass",
+          "reason": "The supplied before and after strings are each 121 ASCII bytes and differ only at zero-based offset 80, where '7' becomes '8'. All remaining bytes, including newlines, are preserved.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/designated_artifact_diffs/notice.md"
+          ]
+        },
+        {
+          "gate_id": "accurate_completion_report",
+          "status": "pass",
+          "reason": "The public message accurately reports the requested completed edit and the observable preservation result.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/source_before_task/notice.md"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The delivered text meets the unusually strict byte-preservation requirement exactly within the supplied artifact view.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "The action counts and timing required for EVAL-03 efficiency assessment are absent. Redundant retrieval, repeated checks or post-completion activity cannot be determined.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "04d19b1bda49c0ab5f7f5e28a9758879a513fe0cd6904e5555ef0b80c21320fa",
+        "limitations": [
+          "The evidence supplies an exact-edit flag and aggregate resource measures, without individual action contents or ordering.",
+          "No checker or candidate code was executed during this review."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Exact edit and completion",
+          "category": "no_disagreement",
+          "first_pass_observation": "Only the requested Thursday closing-time byte changed, and the completion report matches the delivered text.",
+          "deterministic_observation": "notice_exact_edit=true, all_pass=true, critical_failures=[].",
+          "interpretation": "The reported flag agrees with static byte comparison. Both inspectable critical gates remain passed.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "subject": "Efficiency evidence coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Action counts and timing were absent, leaving efficiency unassessable.",
+          "deterministic_observation": "tool_actions=3, failed_tool_actions=0, wall_seconds=23.4.",
+          "interpretation": "Counts and timing are now available, partially resolving the historical missing-evidence finding. They do not identify which checks or other actions occurred, whether work was repeated, or whether activity continued after completion. Efficiency remains unassessable; no inefficiency defect is established.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The artifact exactly implements the requested time change while preserving every other byte; the deterministic flag agrees.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The reported edit and preservation result match the supplied text and exact-edit flag. The candidate's actual verification procedure remains unobserved.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The exact authorized edit and completion report are delivered. The evidence introduces no unresolved task dependency or artifact defect.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final message clearly and proportionately reports the changed time and preservation result.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a literal Markdown edit without a coding implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/notice.md"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Three tool actions, zero failed actions and 23.4 seconds are reported. Without action contents or order, required verification, redundancy and post-completion activity cannot be assessed.",
+          "evidence": [
+            "packet:/task_id",
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "requested_time_change_only",
+          "status": "pass",
+          "reason": "Static comparison confirms two 121-byte strings differing only at offset 80, from '7' to '8'; notice_exact_edit is true.",
+          "evidence": [
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        },
+        {
+          "gate_id": "accurate_completion_report",
+          "status": "pass",
+          "reason": "The completion message correctly describes the requested edit and the observed preservation of all other bytes.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/source_before_task/notice.md",
+            "packet:/stages/0/artifacts/notice.md",
+            "deterministic:/deterministic_checks/checks/notice_exact_edit"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "Read AGENTS.md, CONTRIBUTING.md, the fixed rubric, this assignment's locked judgments, both assigned packet views and both corresponding evidence files completely. All supplied rubric, packet-view and deterministic-evidence hashes matched.",
+    "The SHA-256 of locked-first-pass.json is 878cc2c7484da60cfb35c8b4c2c9fc0b73ba37adb51a09ea04bfd462ca8435d8. Required historical packet fields are preserved unchanged; subsequent judgments and evidence-coverage changes are separately recorded.",
+    "Coverage includes all supplied requests, declared sources, intent, transition fields, artifacts, diffs and public final messages. Earlier public messages, full filesystem snapshots and individual action records remain unavailable. Their absence does not prove that an earlier question or action never occurred.",
+    "Aggregate action counts, failed-action counts and wall times are now available for both packets. They do not establish action purpose, ordering, memory provenance or freedom from redundant activity.",
+    "Inspection used bounded reads, hashing, JSON parsing and static byte comparison. An initial heredoc parse was blocked by the read-only sandbox; inline parsing subsequently completed despite launcher cache warnings. No candidate code, checker, tests, harnesses or plugins were executed, and no files were modified.",
+    "Configured model and effort follow the supplied role. Host identity, backend echo and usage remain unavailable. The caller's isolation statement was not independently verified.",
+    "Both assigned packets are English; no Korean partner or cross-language comparison was reviewed.",
+    "All ratings are supplemental provisional model judgments. Human scores remain missing. Passing deterministic flags do not resolve unassessable requirements or establish full acceptance, held-out validity, model superiority or release readiness."
+  ]
+}

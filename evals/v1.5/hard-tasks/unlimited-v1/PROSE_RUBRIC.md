@@ -1,0 +1,11 @@
+# Frozen semantic review rubric (primary reviewer only)
+
+This rubric is fixed before outcome generation. Review the final Korean memo and workbook explanations unblinded after deterministic checks. Do not call a model judge panel. Keep prose judgment separate from objective computation/artifact scores. Each dimension is 0–4 (total 20); factual disagreement is explained with source IDs rather than silently relabeled as writing quality.
+
+- **Decision usability:** 0 no recommendation; 1 vague choice; 2 clear selection with gaps; 3 actionable choice, coverage and headroom; 4 concise decision-ready explanation of the lexicographic goal and material tradeoffs.
+- **Evidence and predecessor maintenance:** 0 no evidence; 1 generic citations; 2 some correct corrections; 3 identifies stale prices/roster/calendar/bank treatment with traceable authority; 4 clearly updates the predecessor note's working assumptions without overstating what sources establish.
+- **Authority and independent progress:** 0 falsely claims execution or approval; 1 missing pending decision; 2 identifies pending signature but stops useful work; 3 separates current work from dependent procurement and assigns owners; 4 offers concrete next actions/timing and a coherent approval handoff without external execution.
+- **Operational judgment:** 0 unusable plan; 1 ignores material staff/access/calendar impact; 2 mentions constraints without explaining implications; 3 gives feasible schedule, waiting-list rationale and preparation implications; 4 explains choices and recovery options without inventing budget, priorities or access exceptions.
+- **Korean collaboration quality:** 0 unreadable; 1 mostly mechanical data dump; 2 understandable but hard to act on; 3 natural, specific Korean with well-placed evidence; 4 clear hierarchy and compact explanation appropriate to an operations lead. English schema keys/identifiers are not penalized.
+
+Review note fields: dimension scores; supporting artifact passages; specific factual issues; uncertainty; whether a real operator could continue from the files. A missing memo is unassessable; do not assign invented prose quality. Structural presence checks do not substitute for this review.

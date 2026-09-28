@@ -1,0 +1,744 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A15P1",
+  "phase": "evidence",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "fe395bdd38811897",
+      "packet_sha256": "3cf30c44e1a2925f074f1037b3353ee9d383611d748f65cbce5faccc6dcf22e5",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The packet flags memory/note references and characteristic wording as potentially condition-revealing.",
+        "The public final explicitly references PROJECT_NOTES.md and unavailable enrolled project memory. No treatment identity was inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The designated plan and explanation satisfy the venue, capacity, budget, feature and unbooked-status contract. Persistence-related claims remain separately unassessable.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/source_before_task/venues.md",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Venue facts match current sources, but material claims about memory unavailability, its cause, the note update and successful checks lack corroborating evidence.",
+          "evidence": [
+            "packet:/source_before_task",
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible revision applies the capacity correction and preserves the conditions restated in the follow-up. This does not establish memory recovery or earlier interaction behavior.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/designated_artifact_diffs/plan.json",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Clearly identifies the replacement venue, revised capacities, price and unbooked status. The truth of operational memory and verification claims is assessed separately.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This is a planning task with a structured data artifact, not a code change.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/followup_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "No action counts, timing or complete interaction trace supports an efficiency judgment.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "current_source_and_capacity_correction",
+          "status": "pass",
+          "reason": "The final plan replaces Cedar with Harbor and records current capacity 65; the explanation correctly identifies Cedar's revised capacity as 48.",
+          "evidence": [
+            "packet:/declared_source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json/basis",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "qualifying_venue_and_budget",
+          "status": "pass",
+          "reason": "Harbor accommodates 52 people, provides both required features and costs $1,300 within the $1,400 ceiling. The cheaper listed venues fail capacity or feature requirements.",
+          "evidence": [
+            "packet:/source_before_task/venues.md",
+            "packet:/source_before_task/calendar.md",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "plan_schema",
+          "status": "pass",
+          "reason": "The decoded plan contains all required fields with the requested types, feature codes and source basis.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "no_booking_claim",
+          "status": "pass",
+          "reason": "The artifact remains proposed_unbooked and the public final explicitly disclaims a booking.",
+          "evidence": [
+            "packet:/stages/0/artifacts/plan.json/status",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        {
+          "gate_id": "scoped_forgetting_and_note_update",
+          "status": "unassessable",
+          "reason": "The active plan stops using the withdrawn fact, but PROJECT_NOTES.md and persistence receipts are absent, so the claimed durable correction cannot be inspected.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "gate_id": "memory_availability_truthfulness",
+          "status": "unassessable",
+          "reason": "The supplied view does not establish whether enrolled memory was unavailable or whether missing project identifiers caused that condition.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/scoped_public_intent",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "gate_id": "reported_verification_execution",
+          "status": "unassessable",
+          "reason": "The final reports successful local checks, including the unavailable note, but no execution receipts are supplied.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The revision separates current source facts from the stale plan: Harbor replaces Cedar while accessibility, quiet-room and budget constraints remain satisfied.",
+          "evidence": [
+            "packet:/source_before_task",
+            "packet:/designated_artifact_diffs/plan.json"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "major",
+          "finding": "The note contents and memory-operation evidence are missing. Neither successful scoped forgetting nor false memory reporting can be established from this view.",
+          "evidence": [
+            "packet:/stages/0/artifacts",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Only the final public message is supplied for this stage. Earlier questions, repeated work, check execution and timing cannot be assessed; their absence from the view is not a demonstrated behavior defect.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "7ae6e1be4891f5b0d631042c163f0cc9cef588ad4291d7ae2d8ef25779eaac72",
+        "limitations": [
+          "The supplied evidence reports three check flags and aggregate action/time receipts; checker implementation and individual execution records were not supplied or inspected.",
+          "No note contents, memory-operation receipts, project-identifier evidence or earlier public messages were added.",
+          "Reported checker success does not establish that the candidate performed every local check claimed in its final message."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Current-source planning and booking boundaries",
+          "category": "no_disagreement",
+          "first_pass_observation": "The revised plan uses Harbor's current capacity, satisfies the stated constraints and makes no booking claim.",
+          "deterministic_observation": "continuity_current_capacity=true; continuity_constraints=true; continuity_no_booking_claim=true; critical_failures=[]; all_pass=true.",
+          "interpretation": "The supplied flags agree with static inspection. Their all_pass result does not resolve requirements outside the reported checks.",
+          "evidence": [
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "subject": "Memory, note and claimed local verification",
+          "category": "missing_evidence",
+          "first_pass_observation": "Scoped forgetting, the note update, memory availability and claimed local-check execution were unassessable.",
+          "deterministic_observation": "The reported checks address capacity, constraints and booking claims; no corresponding note, memory or candidate-verification receipts are supplied.",
+          "interpretation": "These gates and factual-accuracy scoring remain unassessable. This coverage gap establishes neither a false claim nor a checker defect.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        {
+          "subject": "Efficiency evidence coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Action counts, timing and the complete interaction trace were unavailable.",
+          "deterministic_observation": "tool_actions=13; failed_tool_actions=0; wall_seconds=100.113.",
+          "interpretation": "Counts and timing are now available, but action identities and sequencing remain absent. The aggregates cannot establish redundant retrieval, repeated checks or post-completion activity, so the efficiency score remains null.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The designated plan satisfies the artifact contract, with corresponding deterministic flags passing. Durable correction remains separately unassessable.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Planning facts are corroborated; memory availability, its stated cause, the note update and candidate-performed local checks still lack supporting records.",
+          "evidence": [
+            "packet:/source_before_task",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible revision incorporates the correction and preserves accepted constraints. The passing continuity flags support this bounded judgment without establishing earlier behavior or memory recovery.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/designated_artifact_diffs/plan.json",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The explanation clearly reports the venue change, capacities, price and unbooked status. Operational claims remain separately unassessable.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/continuity_no_booking_claim"
+          ]
+        },
+        "coding_maintainability": {
+          "score": null,
+          "status": "not_applicable",
+          "reason": "This planning task changes structured data, not code.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/followup_request"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "The evidence reports 13 actions, zero failed actions and 100.113 seconds, but lacks the action sequence needed to judge necessity or repetition.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "current_source_and_capacity_correction",
+          "status": "pass",
+          "reason": "The plan and explanation use current capacities; the corresponding deterministic flag also passes.",
+          "evidence": [
+            "packet:/declared_source_transition/venues.md",
+            "packet:/stages/0/artifacts/plan.json/basis",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/continuity_current_capacity"
+          ]
+        },
+        {
+          "gate_id": "qualifying_venue_and_budget",
+          "status": "pass",
+          "reason": "Harbor satisfies capacity, feature and budget requirements and is the least costly qualifying listed venue. The constraints flag passes.",
+          "evidence": [
+            "packet:/source_before_task/venues.md",
+            "packet:/source_before_task/calendar.md",
+            "packet:/stages/0/artifacts/plan.json",
+            "deterministic:/deterministic_checks/checks/continuity_constraints"
+          ]
+        },
+        {
+          "gate_id": "plan_schema",
+          "status": "pass",
+          "reason": "Static inspection confirms all required fields, types, feature codes and source basis.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts/plan.json"
+          ]
+        },
+        {
+          "gate_id": "no_booking_claim",
+          "status": "pass",
+          "reason": "The artifact and final retain unbooked status; the corresponding deterministic flag passes.",
+          "evidence": [
+            "packet:/stages/0/artifacts/plan.json/status",
+            "packet:/stages/0/public_final",
+            "deterministic:/deterministic_checks/checks/continuity_no_booking_claim"
+          ]
+        },
+        {
+          "gate_id": "scoped_forgetting_and_note_update",
+          "status": "unassessable",
+          "reason": "The active plan is corrected, but neither the note nor persistence receipts are supplied by the packet or disclosed evidence.",
+          "evidence": [
+            "packet:/stages/0/artifacts",
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        {
+          "gate_id": "memory_availability_truthfulness",
+          "status": "unassessable",
+          "reason": "No disclosed evidence establishes memory availability or whether missing project identifiers caused unavailability.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/scoped_public_intent",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        {
+          "gate_id": "reported_verification_execution",
+          "status": "unassessable",
+          "reason": "Passing evaluation flags and aggregate action receipts do not identify the candidate's claimed local checks, including its note check.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks",
+            "deterministic:/tool_actions"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    },
+    {
+      "packet_id": "0062e8954f9daa30",
+      "packet_sha256": "fb48e0ca2ff516ffb171f31d29ac1b5a79fabe5f9d0a37bff4d91d24eef20a52",
+      "locale": "en",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The packet supplies a generic warning that memory/note references and characteristic wording may reveal condition. No explicit treatment or model identity was observed or inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Static inspection supports all specified pricing, validation, output and interface requirements for the declared integer-valued Line inputs.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Functional descriptions match the code, but the claimed execution of nine pricing cases and additional checks cannot be corroborated from the supplied view.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts/invoice.py",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The visible artifact completes the authorized change and handles the nonempty zero-priced-order edge case. Earlier questions and action sequencing are unavailable.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L13",
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Directly reports the interface change, pricing behavior and verification categories without unnecessary detail; execution claims remain separately unconfirmed.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Preserves Line and the two-argument API, validates within one traversal, and clearly separates original subtotal, discount, merchandise and shipping. The occupancy flag supports iterables without conflating empty and zero-priced orders.",
+          "evidence": [
+            "packet:/source_before_task/invoice.py",
+            "packet:/stages/0/artifacts/invoice.py#L9",
+            "packet:/stages/0/artifacts/invoice.py#L13",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "No action or timing evidence establishes interaction efficiency or redundant verification.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "existing_interface_preserved",
+          "status": "pass",
+          "reason": "Line is unchanged and member defaults to False, preserving existing two-argument calls.",
+          "evidence": [
+            "packet:/source_before_task/invoice.py",
+            "packet:/stages/0/artifacts/invoice.py#L3",
+            "packet:/stages/0/artifacts/invoice.py#L9"
+          ]
+        },
+        {
+          "gate_id": "member_discount",
+          "status": "pass",
+          "reason": "The discount uses floor division of the original subtotal and applies only to members at or above 5000 cents.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        {
+          "gate_id": "domestic_shipping_after_discount",
+          "status": "pass",
+          "reason": "Domestic shipping compares the post-discount merchandise amount with 5000 cents and otherwise charges 700 cents.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L20",
+            "packet:/stages/0/artifacts/invoice.py#L26"
+          ]
+        },
+        {
+          "gate_id": "empty_and_international_shipping",
+          "status": "pass",
+          "reason": "Empty orders ship free; every nonempty international order costs 2000 cents, including zero-priced merchandise.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L13",
+            "packet:/stages/0/artifacts/invoice.py#L21"
+          ]
+        },
+        {
+          "gate_id": "required_validation",
+          "status": "pass",
+          "reason": "Unknown string regions, negative unit prices and quantities below one raise ValueError.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L10",
+            "packet:/stages/0/artifacts/invoice.py#L16"
+          ]
+        },
+        {
+          "gate_id": "output_fields_and_total",
+          "status": "pass",
+          "reason": "Returns all four fields, retains the pre-discount subtotal and calculates total as discounted merchandise plus shipping using integer arithmetic for declared inputs.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L27"
+          ]
+        },
+        {
+          "gate_id": "reported_verification_execution",
+          "status": "unassessable",
+          "reason": "The final names checks but the packet contains no test bodies or execution receipts confirming they ran.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/0/artifacts",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "Explicit order occupancy correctly distinguishes an empty order from a nonempty order whose merchandise subtotal is zero.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L13",
+            "packet:/stages/0/artifacts/invoice.py#L21"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "A single calculation path applies the discount before the domestic shipping threshold while preserving the existing public interface.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L9",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L26"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Static correctness is assessable, but reported test execution, earlier clarification behavior and action efficiency are not. No candidate code was executed during this review.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "08c0e4ef19689e35875a704a7c58bd47535306cb9a2b58f6dde035d7d093c5b6",
+        "limitations": [
+          "The supplied evidence reports three check flags and aggregate action/time receipts; individual test cases and checker implementation were not supplied or inspected.",
+          "Passing evaluation checks do not establish that the candidate executed its separately claimed nine pricing cases and additional checks.",
+          "Earlier public messages and the action sequence remain unavailable."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Invoice behavior",
+          "category": "no_disagreement",
+          "first_pass_observation": "Static inspection supports the requested member pricing, existing-call compatibility, validation and shipping behavior.",
+          "deterministic_observation": "invoice_member_order=true; invoice_nonmember_regression=true; invoice_invalid_inputs=true; critical_failures=[]; all_pass=true.",
+          "interpretation": "All supplied flags agree with the functional assessment. Maintainability remains grounded in the visible implementation; undisclosed test coverage is not inferred.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        {
+          "subject": "Candidate's reported verification",
+          "category": "missing_evidence",
+          "first_pass_observation": "The final reports nine pricing cases, a two-argument call and three ValueError cases, without execution receipts.",
+          "deterministic_observation": "Three evaluation check flags pass, but no candidate-authored test bodies or individual action receipts are disclosed.",
+          "interpretation": "Evaluation success corroborates behavior, not the historical execution of every claimed local check. Factual accuracy and the verification-execution gate remain unassessable; no false claim is established.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks",
+            "deterministic:/tool_actions"
+          ]
+        },
+        {
+          "subject": "Efficiency evidence coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Action and timing evidence were unavailable.",
+          "deterministic_observation": "tool_actions=9; failed_tool_actions=0; wall_seconds=46.072.",
+          "interpretation": "Aggregate resource evidence is now available, but cannot identify avoidable or repeated work. The efficiency score remains null.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Static inspection supports the full functional contract for declared integer-valued inputs, and all supplied invoice checks pass.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Functional claims agree with the artifact and passing evaluation flags, but the candidate's specific local-test execution claims remain uncorroborated.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The completed artifact handles the authorized change and zero-priced nonempty orders. Passing checks support completion; earlier interaction behavior remains unavailable.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L13",
+            "packet:/stages/0/artifacts/invoice.py#L21",
+            "deterministic:/deterministic_checks"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The final directly summarizes compatibility, pricing and verification categories. The truth of specific execution claims remains separately unassessable.",
+          "evidence": [
+            "packet:/stages/0/public_final"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The single traversal preserves the interface and separates subtotal, discount and shipping clearly. Explicit occupancy handles iterables and zero-priced orders without duplicate calculation paths.",
+          "evidence": [
+            "packet:/source_before_task/invoice.py",
+            "packet:/stages/0/artifacts/invoice.py#L9",
+            "packet:/stages/0/artifacts/invoice.py#L13",
+            "packet:/stages/0/artifacts/invoice.py#L19"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Nine actions, zero failed actions and 46.072 seconds are reported, but action identities and sequencing are unavailable for judging redundant work.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "existing_interface_preserved",
+          "status": "pass",
+          "reason": "Line and existing two-argument calls remain supported; the nonmember regression flag also passes.",
+          "evidence": [
+            "packet:/source_before_task/invoice.py",
+            "packet:/stages/0/artifacts/invoice.py#L3",
+            "packet:/stages/0/artifacts/invoice.py#L9",
+            "deterministic:/deterministic_checks/checks/invoice_nonmember_regression"
+          ]
+        },
+        {
+          "gate_id": "member_discount",
+          "status": "pass",
+          "reason": "The implementation applies the specified floor discount using the original subtotal and threshold; the member-order flag passes.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "deterministic:/deterministic_checks/checks/invoice_member_order"
+          ]
+        },
+        {
+          "gate_id": "domestic_shipping_after_discount",
+          "status": "pass",
+          "reason": "The domestic threshold uses post-discount merchandise. Supplied member and nonmember flags agree with the functional assessment.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L20",
+            "packet:/stages/0/artifacts/invoice.py#L26",
+            "deterministic:/deterministic_checks/checks/invoice_member_order",
+            "deterministic:/deterministic_checks/checks/invoice_nonmember_regression"
+          ]
+        },
+        {
+          "gate_id": "empty_and_international_shipping",
+          "status": "pass",
+          "reason": "Static inspection confirms free shipping for empty orders and 2000-cent shipping for every nonempty international order, including zero-priced orders.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L13",
+            "packet:/stages/0/artifacts/invoice.py#L21"
+          ]
+        },
+        {
+          "gate_id": "required_validation",
+          "status": "pass",
+          "reason": "Required invalid regions, negative prices and quantities below one raise ValueError; the invalid-inputs flag passes.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L10",
+            "packet:/stages/0/artifacts/invoice.py#L16",
+            "deterministic:/deterministic_checks/checks/invoice_invalid_inputs"
+          ]
+        },
+        {
+          "gate_id": "output_fields_and_total",
+          "status": "pass",
+          "reason": "The artifact returns all four fields and computes the total using discounted merchandise plus shipping, preserving integer arithmetic for declared inputs.",
+          "evidence": [
+            "packet:/stages/0/artifacts/invoice.py#L19",
+            "packet:/stages/0/artifacts/invoice.py#L27"
+          ]
+        },
+        {
+          "gate_id": "reported_verification_execution",
+          "status": "unassessable",
+          "reason": "The disclosed evaluator results and aggregate action count do not establish execution of the candidate's specifically reported local checks.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks",
+            "deterministic:/tool_actions"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "Read AGENTS.md, CONTRIBUTING.md, the fixed rubric, this assignment's locked judgments, both complete packet views and both corresponding evidence files. All supplied rubric, packet-view and evidence SHA-256 values match.",
+    "Preserved the required locked packet fields exactly. Post-evidence judgments are recorded separately; no numerical score or gate status changed.",
+    "Review used read-only inspection and hashing. No candidate code, tests, checker, harness or plugin was executed, and no files were modified.",
+    "Aggregate action counts and timing are available after disclosure; individual action records, earlier public messages and candidate-verification receipts remain unavailable. Missing earlier messages do not establish that no question was asked.",
+    "The planning packet still lacks note contents and memory-operation evidence. Unassessable requirements do not pass by default, and missing receipts do not establish false claims.",
+    "Configured model and effort follow the supplied role. Host/backend identity and usage are unavailable; host memory isolation was not independently established.",
+    "This is one supplemental provisional model assessment with human scores missing. Passing deterministic flags do not establish full acceptance, held-out validity, model superiority or release readiness."
+  ]
+}

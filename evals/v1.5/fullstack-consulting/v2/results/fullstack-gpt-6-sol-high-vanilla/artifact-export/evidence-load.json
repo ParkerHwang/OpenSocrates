@@ -1,0 +1,40 @@
+{
+  "environment": {
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "python": "3.12.14",
+    "logical_cpus": 10,
+    "server": "Python ThreadingHTTPServer + SQLite WAL, loopback"
+  },
+  "method": "Fresh seeded SQLite store; persistent HTTP/1.1 connections per worker; GET /api/inventory then POST /api/orders with unique one-line SAMPLE references; each phase uses a fixed thread pool; client-side wall-clock latency includes HTTP and JSON; no warmup excluded.",
+  "reads": {
+    "requests": 500,
+    "concurrency": 8,
+    "elapsed_seconds": 0.119,
+    "throughput_rps": 4218.8,
+    "latency_ms_p50": 1.59,
+    "latency_ms_p95": 2.9,
+    "latency_ms_max": 31.39,
+    "errors": 0,
+    "successes": 500,
+    "error_types": {}
+  },
+  "writes": {
+    "requests": 100,
+    "concurrency": 8,
+    "elapsed_seconds": 0.081,
+    "throughput_rps": 1227.7,
+    "latency_ms_p50": 0.55,
+    "latency_ms_p95": 27.25,
+    "latency_ms_max": 72.66,
+    "errors": 0,
+    "successes": 100,
+    "error_types": {}
+  },
+  "postcondition": {
+    "orders_by_status": {
+      "draft": 100
+    },
+    "inventory_units": 180,
+    "reserved_units": 0
+  }
+}

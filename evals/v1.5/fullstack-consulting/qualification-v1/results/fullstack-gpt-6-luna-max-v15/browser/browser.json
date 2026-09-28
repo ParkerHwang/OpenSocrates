@@ -1,0 +1,52 @@
+{
+  "groups": [
+    {
+      "name": "page_identity_and_login",
+      "pass": true,
+      "details": {
+        "url": "http://127.0.0.1:63857/",
+        "title": "DepotFlow · Fulfillment"
+      }
+    },
+    {
+      "name": "inventory_rendered",
+      "pass": true,
+      "details": "SKU\tITEM\tON HAND\tRESERVED\tAVAILABLE\tUNIT PRICE\tVERSION\nBOLT\tSteel bolt kit\t100\t0\t100\t$12.50\t1\nCABLE\tCable assembly\t60\t0\t60\t$24.99\t1\nSAMPLE\tSample pack\t20\t0\t20\t$0.00\t1"
+    },
+    {
+      "name": "create_reserve_ship_return_flow",
+      "pass": true,
+      "details": "BROWSER-CHECK\nShipped\nOrder bedd124d-dd99-49c5-bf3f-c994576cd50b · version 3\nClose detail\nSKU\tQUANTITY\tRETURNED\tUNIT PRICE\tLINE TOTAL\nBOLT\t2\t0\t$12.50\t$25.00\nCABLE\t1\t0\t$24.99\t$24.99\n\nOrder total: $49.99\n\nRecord a return\n\nEnter the quantity received back for each line. Leave other lines at zero.\n\nBOLT · 2 remaining\nCABLE · 1 remaining\nWorking…"
+    },
+    {
+      "name": "audit_rendered",
+      "pass": true,
+      "details": "TIME\tACTION\tENTITY\tACTOR\n9/27/2026, 9:36:22 PM\torder.created\tbedd124d-dd99-49c5-bf3f-c994576cd50b\tadmin@north.example\n9/27/2026, 9:36:23 PM\torder.reserved\tbedd124d-dd99-49c5-bf3f-c994576cd50b\tadmin@north.example\n9/27/2026, 9:36:23 PM\torder.shipped\tbedd124d-dd99-49c5-bf3f-c994576cd50b\tadmin@north.example\n9/27/2026, 9:36:23 PM\torder.returned\tbedd124d-dd99-49c5-bf3f-c994576cd50b\tadmin@north.example"
+    },
+    {
+      "name": "mobile_layout",
+      "pass": true,
+      "details": {
+        "viewport": 390,
+        "document": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "viewer_workflow_read_only",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "no_uncaught_client_error",
+      "pass": true,
+      "details": null
+    }
+  ],
+  "passed": 7,
+  "total": 7,
+  "consoleEvents": [],
+  "errors": [],
+  "automation": "bundled Playwright; fresh headless Chromium context; library native wait behavior",
+  "flow": "login -> inventory -> create multi-line order -> reserve -> ship -> return -> audit -> viewer"
+}

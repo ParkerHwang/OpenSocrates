@@ -1,0 +1,433 @@
+{
+  "schema": "opensocrates.provisional-ai-review/1.0.0",
+  "assignment_id": "A17P1S2",
+  "phase": "evidence",
+  "assessor": {
+    "agent": "opensocrates_bilingual_reviewer",
+    "kind": "model",
+    "configured_model": "gpt-6-astra",
+    "configured_effort": "xhigh",
+    "host_reported_model": null,
+    "backend_model_echo": null,
+    "human_assessor": false,
+    "provisional": true
+  },
+  "rubric": {
+    "path": "evals/v1.5/expanded/JUDGE_PROCEDURE.v2.md",
+    "sha256": "be161958546ac752ce516805cdbfad97a1c5b08b0a1f9bcee04e26d36782e12e"
+  },
+  "packets": [
+    {
+      "packet_id": "6e97a7c891cbdac1",
+      "packet_sha256": "d55269e57db0fa139f80dee6959c165b12926aefecff145404aca1c3fdf0de9d",
+      "locale": "ko",
+      "blinding_status": "limited",
+      "non_blindable_cues": [
+        "The packet explicitly warns that memory/note references and characteristic wording may reveal condition; complete blinding is not guaranteed. No treatment or model identity was inferred."
+      ],
+      "first_pass_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Static inspection shows both implementations meet their respective retry rules. The final code and action artifact apply the correction, preserve delay behavior and answer the side question.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts",
+            "packet:/stages/1/artifacts"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Visible descriptions agree with the code, and the idempotency explanation is accurate. The reported shell checks are separately unassessable without execution receipts.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The available stages show the correction applied to both deliverables and the side question answered while completing the coding task. Earlier questioning behavior is not observable.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts",
+            "packet:/stages/1/artifacts",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The Korean final clearly identifies changed and preserved behavior and explains idempotency with a relevant DELETE example while respecting the narrower requested retry policy.",
+          "evidence": [
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/question_answer"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The existing function interface and delay implementation are preserved. Explicit status branches isolate the all-method 429 rule from the easily changed, case-insensitive 503 allowlist.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/1/artifacts/retry.py#L1",
+            "packet:/stages/1/artifacts/retry.py#L8",
+            "packet:/designated_artifact_diffs/retry.py"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "No action counts, timing receipts or complete tool history are supplied. Small changes and concise messages do not establish execution efficiency.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "packet:/stages"
+          ]
+        }
+      },
+      "critical_gates": [
+        {
+          "gate_id": "initial_retry_contract",
+          "status": "pass",
+          "reason": "The initial implementation returns true for 429, restricts 503 to GET/HEAD/PUT/DELETE using upper(), and returns false for other status codes.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/retry.py"
+          ]
+        },
+        {
+          "gate_id": "corrected_503_policy",
+          "status": "pass",
+          "reason": "The final 503 allowlist contains only GET and HEAD. Normalization supports mixed case; PUT and DELETE are excluded.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/retry.py#L4",
+            "packet:/stages/1/artifacts/action.json/retry_503_methods"
+          ]
+        },
+        {
+          "gate_id": "429_other_statuses_and_default_preserved",
+          "status": "pass",
+          "reason": "The 429 branch returns true before inspecting the method, other statuses return false and the default method remains GET.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py#L1",
+            "packet:/stages/1/artifacts/retry.py#L2",
+            "packet:/stages/1/artifacts/retry.py#L6"
+          ]
+        },
+        {
+          "gate_id": "delay_and_invalid_attempt_contract",
+          "status": "pass",
+          "reason": "delay_seconds is unchanged, preserving the capped exponential expression and ValueError for attempts below one.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/0/artifacts/retry.py#L8",
+            "packet:/stages/1/artifacts/retry.py#L8"
+          ]
+        },
+        {
+          "gate_id": "action_schema_and_code_agreement",
+          "status": "pass",
+          "reason": "The action artifacts contain the five requested fields with the declared types. The final retry fields and correction flag agree with the final implementation.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/action.json",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        {
+          "gate_id": "idempotency_answer_and_task_completion",
+          "status": "pass",
+          "reason": "Both the public final and question_answer explain that repeated identical requests have the same effect on server state as one request. Both requested artifacts are updated.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/artifacts"
+          ]
+        },
+        {
+          "gate_id": "reported_validation_execution",
+          "status": "unassessable",
+          "reason": "The candidate reports passing shell checks, but the packet excludes raw tool transcripts and supplies no corroborating execution receipts. Static correctness does not establish that those checks ran.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The correction is consistent across the implementation, structured retry policy and Korean final; no stale PUT/DELETE retry rule remains in the final deliverables.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The idempotency answer distinguishes the general property of DELETE from the task's explicit GET/HEAD-only retry permission.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/public_final"
+          ]
+        },
+        {
+          "category": "strength",
+          "severity": "info",
+          "finding": "The change stays within the existing retry function and leaves the independent delay contract untouched, supporting later policy changes without duplicate implementation paths.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/designated_artifact_diffs/retry.py",
+            "packet:/stages/1/artifacts/retry.py"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Only the two public finals are available. Whether earlier clarification or redundant questions occurred is unassessable; their absence from this view is not evidence that none were asked.",
+          "evidence": [
+            "packet:/stages",
+            "packet:/coverage_limit"
+          ]
+        },
+        {
+          "category": "missing_evidence",
+          "severity": "info",
+          "finding": "Validation descriptions are candidate reports, without commands/results, action counts or timing receipts. No runtime test or efficiency conclusion follows from this static review.",
+          "evidence": [
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        }
+      ],
+      "deterministic_evidence_status": {
+        "status": "reviewed",
+        "sha256": "816dcb2beedb5739e8608fe53aa0f45bf9972d160c838d7b7c644d72439711a1",
+        "limitations": [
+          "Evidence reports developer_retry_behavior=true, developer_action_fields=true, critical_failures=[] and all_pass=true; individual assertions and execution transcripts are absent.",
+          "Aggregate measurements report 14 tool actions, 1 failed tool action and 89.127 wall seconds, without an action sequence or failure cause.",
+          "The supplied checker results do not establish that the candidate ran the specific shell checks claimed in its public messages."
+        ]
+      },
+      "disagreements": [
+        {
+          "subject": "Retry behavior and structured artifact",
+          "category": "no_disagreement",
+          "first_pass_observation": "Static inspection found the corrected retry policy and action fields consistent with the request.",
+          "deterministic_observation": "developer_retry_behavior=true; developer_action_fields=true; critical_failures=[]; all_pass=true.",
+          "interpretation": "The reported deterministic results corroborate the visible implementation and artifact. No score or functional gate changes.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json",
+            "deterministic:/deterministic_checks/checks/developer_retry_behavior",
+            "deterministic:/deterministic_checks/checks/developer_action_fields",
+            "deterministic:/deterministic_checks/critical_failures",
+            "deterministic:/deterministic_checks/all_pass"
+          ]
+        },
+        {
+          "subject": "Efficiency evidence coverage",
+          "category": "missing_evidence",
+          "first_pass_observation": "Action counts and timing were unavailable, so efficiency discipline was unassessable.",
+          "deterministic_observation": "The evidence supplies 14 tool actions, 1 failed tool action and 89.127 wall seconds.",
+          "interpretation": "The aggregate measurement gap is partly resolved. Without action details, necessity, redundancy and the cause of the failed action remain unknown; efficiency stays unassessable.",
+          "evidence": [
+            "packet:/coverage_limit",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds"
+          ]
+        },
+        {
+          "subject": "Candidate-reported validation",
+          "category": "missing_evidence",
+          "first_pass_observation": "The candidate's claims that its shell checks passed lacked corroborating execution receipts.",
+          "deterministic_observation": "Both reported checker flags pass, while one tool action is recorded as failed without further details.",
+          "interpretation": "Checker success supports artifact correctness but does not verify the candidate's exact validation claims. The unidentified failed action does not prove a failed test or false report. The validation-execution gate remains unassessable.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks",
+            "deterministic:/failed_tool_actions"
+          ]
+        }
+      ],
+      "post_evidence_scores": {
+        "task_outcome": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The artifacts satisfy the initial and corrected contracts; reported behavior and action-field checks corroborate the final result.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts",
+            "packet:/stages/1/artifacts",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        "evidence_factual_accuracy": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The retry descriptions and idempotency explanation match the visible artifacts. Passing checker flags add corroboration; candidate-reported validation remains separately unassessable.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks/checks"
+          ]
+        },
+        "initiative_continuity": {
+          "score": 4,
+          "status": "scored",
+          "reason": "Both deliverables incorporate the correction, and the side question is answered while the coding task is completed. Earlier questioning remains outside the available evidence.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/0/artifacts",
+            "packet:/stages/1/artifacts",
+            "packet:/stages/1/public_final",
+            "packet:/coverage_limit"
+          ]
+        },
+        "communication": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The Korean final clearly explains the correction, retained behavior and idempotency, including why DELETE remains excluded by the requested policy.",
+          "evidence": [
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/question_answer"
+          ]
+        },
+        "coding_maintainability": {
+          "score": 4,
+          "status": "scored",
+          "reason": "The small change preserves the interface and delay implementation, with separate status branches and a clear case-insensitive allowlist. Deterministic evidence introduces no contrary finding.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/1/artifacts/retry.py",
+            "packet:/designated_artifact_diffs/retry.py",
+            "deterministic:/deterministic_checks/checks/developer_retry_behavior"
+          ]
+        },
+        "efficiency_discipline": {
+          "score": null,
+          "status": "unassessable",
+          "reason": "Counts and timing are now available, but no action sequence establishes whether work was necessary, repeated or avoidable. One unidentified failed action cannot determine an efficiency score.",
+          "evidence": [
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions",
+            "deterministic:/wall_seconds",
+            "packet:/coverage_limit"
+          ]
+        }
+      },
+      "post_evidence_critical_gates": [
+        {
+          "gate_id": "initial_retry_contract",
+          "status": "pass",
+          "reason": "The initial implementation statically satisfies the all-method 429 rule, case-insensitive four-method 503 rule and rejection of other statuses.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/retry.py"
+          ]
+        },
+        {
+          "gate_id": "corrected_503_policy",
+          "status": "pass",
+          "reason": "The final code and structured policy restrict 503 to GET and HEAD; the reported behavior check passes.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/artifacts/retry.py#L4",
+            "packet:/stages/1/artifacts/action.json/retry_503_methods",
+            "deterministic:/deterministic_checks/checks/developer_retry_behavior"
+          ]
+        },
+        {
+          "gate_id": "429_other_statuses_and_default_preserved",
+          "status": "pass",
+          "reason": "The code preserves all-method 429 retries, rejects other statuses and retains the GET default, consistent with the passing behavior flag.",
+          "evidence": [
+            "packet:/stages/1/artifacts/retry.py#L1",
+            "packet:/stages/1/artifacts/retry.py#L2",
+            "packet:/stages/1/artifacts/retry.py#L6",
+            "deterministic:/deterministic_checks/checks/developer_retry_behavior"
+          ]
+        },
+        {
+          "gate_id": "delay_and_invalid_attempt_contract",
+          "status": "pass",
+          "reason": "The delay function remains identical to the source, including the cap and ValueError condition.",
+          "evidence": [
+            "packet:/source_before_task/retry.py",
+            "packet:/stages/0/artifacts/retry.py#L8",
+            "packet:/stages/1/artifacts/retry.py#L8"
+          ]
+        },
+        {
+          "gate_id": "action_schema_and_code_agreement",
+          "status": "pass",
+          "reason": "The action artifacts have the requested fields and types, and the final values agree with the code. The reported action-field check also passes.",
+          "evidence": [
+            "packet:/initial_request",
+            "packet:/stages/0/artifacts/action.json",
+            "packet:/stages/1/artifacts/action.json",
+            "packet:/stages/1/artifacts/retry.py",
+            "deterministic:/deterministic_checks/checks/developer_action_fields"
+          ]
+        },
+        {
+          "gate_id": "idempotency_answer_and_task_completion",
+          "status": "pass",
+          "reason": "The public and structured answers accurately explain repeated requests having the same effect, and both requested artifacts incorporate the correction.",
+          "evidence": [
+            "packet:/followup_request",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/question_answer",
+            "packet:/stages/1/artifacts"
+          ]
+        },
+        {
+          "gate_id": "reported_validation_execution",
+          "status": "unassessable",
+          "reason": "Passing checker flags and aggregate action counts do not identify the candidate's commands or their results. The claimed shell validation remains uncorroborated.",
+          "evidence": [
+            "packet:/stages/0/public_final",
+            "packet:/stages/1/public_final",
+            "packet:/stages/1/artifacts/action.json/verification",
+            "packet:/coverage_limit",
+            "deterministic:/deterministic_checks",
+            "deterministic:/tool_actions",
+            "deterministic:/failed_tool_actions"
+          ]
+        }
+      ],
+      "human_scores": null,
+      "assessment_status": "provisional_ai"
+    }
+  ],
+  "unreviewed_packets": [],
+  "usage": null,
+  "limitations": [
+    "Read AGENTS.md, CONTRIBUTING.md, the fixed rubric, this assignment's locked judgments, the single assigned packet and its matching evidence completely. Rubric, packet and evidence hashes match the supplied values.",
+    "All required locked packet fields are preserved exactly. Post-evidence judgments and evidence-coverage changes are recorded separately.",
+    "Review used read-only hashing and static inspection. No candidate code, tests, plugins or harnesses were executed.",
+    "Only two public finals are supplied. Earlier clarification behavior and detailed tool activity remain unavailable.",
+    "This evidence-phase context received the explicitly authorized locked judgments. No implementation conversation, treatment mapping or other assignment was accessed; host memory isolation was not independently established.",
+    "These are one model assessor's supplemental provisional judgments. Human assessment, host/backend model echoes and usage remain unavailable. No full acceptance, held-out, model-profile or release conclusion follows."
+  ]
+}

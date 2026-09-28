@@ -427,6 +427,7 @@ const trace = () => {
   traceRecorded = true;
   record({
     kind: "app-server",
+    requestReceived: request !== undefined,
     targetTrustCount: (contents.match(/opensocrates@opensocrates:hooks\\/hooks\\.json:[a-z_]+:0:0/g) ?? []).length,
     isolated:
       process.env.HOME === process.env.CODEX_HOME &&
@@ -470,6 +471,15 @@ const sendResponse = () => {
   if (MODE === "extra-response") process.stdout.write(response);
 };
 const handleRequest = () => {
+  // Negative responses may be rejected and killed before stdin reaches EOF.
+  // Record the isolated request boundary before emitting those responses.
+  if (new Set([
+    "reject", "malformed", "line-oversize", "total-oversize",
+    "extra-response", "wrong-id", "bad-result", "error-response",
+    "server-request", "unknown-notification", "invalid-notification-method",
+    "invalid-notification-params", "invalid-notification-timestamp",
+    "notification-overflow",
+  ]).has(MODE)) trace();
   if (MODE === "timeout") {
     if (PID !== null) writeFileSync(PID, String(process.pid), { mode: 0o600 });
     setInterval(() => {}, 1000);
@@ -761,6 +771,43 @@ function seedUnrelatedPluginData(home) {
   ];
   for (const target of targets) mkdirSync(target, { recursive: true });
   return targets;
+}
+
+const MEMORY_PROJECT_ID = "12345678-1234-4234-8234-123456789abc";
+
+function seedMemoryDeletionFixture(box, { unknown = false } = {}) {
+  const data = join(box.root, "memory-data");
+  const project = join(data, "projects", MEMORY_PROJECT_ID);
+  mkdirSync(project, { recursive: true });
+  writeFileSync(join(data, "projects", "registry.json"), "registered project\n");
+  writeFileSync(join(project, "memory.sqlite3"), "fixture database\n");
+  writeFileSync(join(project, "memory.lock"), "fixture lock\n");
+  if (unknown) writeFileSync(join(project, "user-note.txt"), "preserve me\n");
+  const launcher = `#!/bin/sh\nexec node "$(dirname "$0")/memory-fixture.mjs" "$@"\n`;
+  const responder = `import { readFileSync, readdirSync, unlinkSync, rmdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+const root = process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR;
+const req = JSON.parse(readFileSync(0, "utf8"));
+if (process.argv.slice(2).join(" ") !== "memory codex" ||
+    req.schema !== "opensocrates.project-memory.request/1.0.0" ||
+    req.operation !== "delete" || req.project_id !== ${JSON.stringify(MEMORY_PROJECT_ID)} ||
+    req.payload.intent !== "delete_project" || req.payload.expected_policy_version !== 3) process.exit(12);
+writeFileSync(join(root, "called.json"), JSON.stringify(req));
+const project = join(root, "projects", req.project_id);
+const unknown = readdirSync(project).filter((name) => !["memory.sqlite3", "memory.lock", "memory.sqlite3-journal"].includes(name));
+if (unknown.length) {
+  process.stdout.write(JSON.stringify({schema:"opensocrates.project-memory.response/1.0.0",request_id:req.request_id,status:"partial",result:{project_id:req.project_id},limitations:["unknown_managed_files_preserved"]}));
+} else {
+  for (const name of readdirSync(project)) unlinkSync(join(project, name));
+  rmdirSync(project);
+  unlinkSync(join(root, "projects", "registry.json"));
+  process.stdout.write(JSON.stringify({schema:"opensocrates.project-memory.response/1.0.0",request_id:req.request_id,status:"ok",result:{deleted_project_id:req.project_id,registration_removed:true},limitations:[]}));
+}
+`;
+  const pkg = buildPackage(box.root, "codex", {
+    extraFiles: { "bin/launch.sh": launcher, "bin/memory-fixture.mjs": responder },
+  });
+  return { data, project, pkg };
 }
 
 function replaceAllHostBinary(box, host, name, options) {
@@ -1725,14 +1772,15 @@ test("isolated app-server validation rejects malformed, oversized, extra, and mi
           !error.message.includes(box.root),
       );
       assert.equal(readFileSync(config, "utf8"), original);
-      const trace = readFileSync(tracePath, "utf8")
-        .trim()
+      const traceText = existsSync(tracePath) ? readFileSync(tracePath, "utf8").trim() : "";
+      assert.notEqual(traceText, "", `validator did not start for ${mode}`);
+      const trace = traceText
         .split("\n")
         .map((line) => JSON.parse(line));
       assert.equal(trace.length, 1);
       assert.equal(trace[0].kind, "app-server");
       assert.equal(trace[0].isolated, true);
-      assert.equal(trace[0].stdinClosed, true);
+      assert.equal(trace[0].requestReceived, true);
       assert.equal(trace[0].environmentClean, true);
       assert.deepEqual(
         readdirSync(box.home).filter((name) =>
@@ -1766,7 +1814,9 @@ test("isolated app-server timeout closes stdin and kills an uncooperative child 
         codexBin,
         hooks: {
           validationTimeoutMilliseconds: 1_500,
-          validationTerminationMilliseconds: 50,
+          // Use the production termination grace. A 50 ms test-only grace can
+          // kill the fixture while it records stdin EOF on a loaded CI runner.
+          // The five-second deadline and process-death assertion still apply.
         },
       }),
       (error) =>
@@ -1844,6 +1894,97 @@ test("trust reset preserves recovery bytes when a post-replace edit makes rollba
     assert.equal(readFileSync(recovery, "utf8"), original);
     assert.equal(statSync(recovery).mode & 0o7777, 0o600);
   } finally {
+    box.cleanup();
+  }
+});
+
+test("default purge preserves enrolled project memory even when a memory launcher is installed", async () => {
+  const box = makeSandbox("codex");
+  const previous = process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR;
+  try {
+    const fixture = seedMemoryDeletionFixture(box);
+    process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR = fixture.data;
+    const install = await withDarwinArm64(() => quiet(() => main([
+      "install", "--asset", fixture.pkg.asset, "--checksum", fixture.pkg.checksum,
+    ])));
+    assert.equal(install.error, undefined, install.error?.message);
+    const result = await quiet(() => main(["remove", "--purge"]));
+    assert.equal(result.error, undefined, result.error?.message);
+    assert.match(result.output, /Enrolled project memory was preserved/);
+    assert.equal(existsSync(fixture.project), true);
+    assert.equal(existsSync(join(fixture.data, "projects", "registry.json")), true);
+    assert.equal(existsSync(join(fixture.data, "called.json")), false);
+  } finally {
+    if (previous === undefined) delete process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR;
+    else process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR = previous;
+    box.cleanup();
+  }
+});
+
+test("explicit memory purge waits on unknown project files and succeeds after exact-scope cleanup", async () => {
+  const box = makeSandbox("codex");
+  const previous = process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR;
+  try {
+    const fixture = seedMemoryDeletionFixture(box, { unknown: true });
+    process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR = fixture.data;
+    const install = await withDarwinArm64(() => quiet(() => main([
+      "install", "--asset", fixture.pkg.asset, "--checksum", fixture.pkg.checksum,
+    ])));
+    assert.equal(install.error, undefined, install.error?.message);
+    const args = [
+      "remove", "--purge", "--delete-project-memory", MEMORY_PROJECT_ID,
+      "--memory-policy-version", "3",
+    ];
+    const first = await quiet(() => main(args));
+    assert.notEqual(first.error, undefined, "partial memory deletion reported complete purge");
+    assert.match(first.output, /unknown project files were preserved/);
+    assert.match(first.output, /purge is incomplete/);
+    assert.doesNotMatch(first.output, /purge completed/);
+    assert.equal(readFileSync(join(fixture.project, "user-note.txt"), "utf8"), "preserve me\n");
+    assert.equal(existsSync(box.managedRoot), true, "retry launcher was removed");
+    assert.equal(box.state().plugins.length, 1, "registration was removed before memory cleanup");
+    const request = JSON.parse(readFileSync(join(fixture.data, "called.json"), "utf8"));
+    assert.equal(request.project_id, MEMORY_PROJECT_ID);
+    assert.equal(request.payload.expected_policy_version, 3);
+
+    rmSync(join(fixture.project, "user-note.txt"));
+    const second = await quiet(() => main(args));
+    assert.equal(second.error, undefined, second.error?.message);
+    assert.match(second.output, /Project memory deletion confirmed/);
+    assert.equal(existsSync(fixture.project), false);
+    assert.equal(existsSync(join(fixture.data, "projects", "registry.json")), false);
+    assert.equal(existsSync(box.managedRoot), false);
+  } finally {
+    if (previous === undefined) delete process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR;
+    else process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR = previous;
+    box.cleanup();
+  }
+});
+
+test("explicit memory purge refuses a changed installed launcher before touching the project", async () => {
+  const box = makeSandbox("codex");
+  const previous = process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR;
+  try {
+    const fixture = seedMemoryDeletionFixture(box);
+    process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR = fixture.data;
+    const install = await withDarwinArm64(() => quiet(() => main([
+      "install", "--asset", fixture.pkg.asset, "--checksum", fixture.pkg.checksum,
+    ])));
+    assert.equal(install.error, undefined, install.error?.message);
+    const launcher = join(box.managedRoot, "build", "generated", "plugins", "codex", "bin", "launch.sh");
+    writeFileSync(launcher, "#!/bin/sh\nexit 0\n");
+    const result = await quiet(() => main([
+      "remove", "--purge", "--delete-project-memory", MEMORY_PROJECT_ID,
+      "--memory-policy-version", "3",
+    ]));
+    assert.notEqual(result.error, undefined);
+    assert.match(result.output, /purge is incomplete/);
+    assert.equal(existsSync(fixture.project), true);
+    assert.equal(existsSync(join(fixture.data, "called.json")), false);
+    assert.equal(existsSync(box.managedRoot), true);
+  } finally {
+    if (previous === undefined) delete process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR;
+    else process.env.OPENSOCRATES_MEMORY_FIXTURE_DIR = previous;
     box.cleanup();
   }
 });

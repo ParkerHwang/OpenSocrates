@@ -1,0 +1,200 @@
+{
+  "records": [
+    {
+      "conflict_ids": [],
+      "created_at": "2026-09-26T09:45:34Z",
+      "freshness": "unknown",
+      "kind": "decision",
+      "lifecycle": "accepted",
+      "origin": {
+        "attestation": "operator_declared",
+        "producer_kind": "agent",
+        "source_reference": "fixture:practical-user-intent"
+      },
+      "payload": null,
+      "project_id": "d9972ef4-8890-4bf4-b683-1a3fc6fe3d2c",
+      "rationale": null,
+      "record_id": "3ac91dd2-2721-4ffd-85a1-141e84a9aaad",
+      "revalidation": {
+        "dependency_paths": [],
+        "negative_claim": false,
+        "on_change": "not_applicable"
+      },
+      "schema": "opensocrates.project-memory.record/1.0.0",
+      "scope": {
+        "level": "project"
+      },
+      "snapshot_id": null,
+      "source_refs": [],
+      "summary": "Plan for 48 attendees with step-free access. Do not book any venue.",
+      "supersedes": null,
+      "support": "agent_reported",
+      "updated_at": "2026-09-26T09:45:34Z",
+      "version": 2
+    },
+    {
+      "conflict_ids": [],
+      "created_at": "2026-09-26T09:46:40Z",
+      "freshness": "unknown",
+      "kind": "checkpoint",
+      "lifecycle": "proposed",
+      "origin": {
+        "attestation": "agent_reported",
+        "producer_kind": "agent",
+        "source_reference": null
+      },
+      "payload": {
+        "blockers": [],
+        "checkpoint_version": 4,
+        "completed_actions": [
+          {
+            "action": "Recalled and inspected the prior task checkpoint, version 2.",
+            "execution_state": "completed",
+            "source_refs": [],
+            "support": "agent_reported"
+          },
+          {
+            "action": "Re-read venues.json revision 2; Cedar capacity 40 is insufficient, while Bay capacity 80 and step-free access meet the requirement.",
+            "execution_state": "completed",
+            "source_refs": [],
+            "support": "agent_reported"
+          },
+          {
+            "action": "Wrote plan.json selecting Bay and validated its exact contract, source facts, constraints, and unbooked status.",
+            "execution_state": "completed",
+            "source_refs": [],
+            "support": "agent_reported"
+          },
+          {
+            "action": "Inspected checkpoint version 3 and confirmed the saved Bay plan state.",
+            "execution_state": "completed",
+            "source_refs": [],
+            "support": "agent_reported"
+          }
+        ],
+        "completion_conditions": [
+          "plan.json matches the exact venue-plan/1 contract and current venues.json facts.",
+          "The updated checkpoint is inspected."
+        ],
+        "conflict_ids": [],
+        "constraints": [
+          "Choose Cedar if feasible under current venue facts.",
+          "Do not book a venue.",
+          "Preserve the accepted 48-attendee and step-free intent."
+        ],
+        "decision_refs": [
+          "3ac91dd2-2721-4ffd-85a1-141e84a9aaad"
+        ],
+        "next_action": "No further task action; plan remains unbooked.",
+        "objective": "Produce a synthetic venue plan for 48 attendees with step-free access.",
+        "parent_checkpoint_id": "f6b1e989-d1ec-43ef-9b99-7ffd2db3ca6a",
+        "pending_effects": [],
+        "remaining_actions": [],
+        "snapshot_id": null,
+        "source_refs": []
+      },
+      "project_id": "d9972ef4-8890-4bf4-b683-1a3fc6fe3d2c",
+      "rationale": null,
+      "record_id": "f6b1e989-d1ec-43ef-9b99-7ffd2db3ca6a",
+      "revalidation": {
+        "dependency_paths": [],
+        "negative_claim": false,
+        "on_change": "refresh_or_mark_stale"
+      },
+      "schema": "opensocrates.project-memory.record/1.0.0",
+      "scope": {
+        "level": "task",
+        "task_id": "b7a99fda-40d0-4bca-bf4e-000000000048",
+        "workspace_id": "1d8e0bb8-53d3-452b-991a-75c0eada6760"
+      },
+      "snapshot_id": null,
+      "source_refs": [],
+      "summary": "Produce a synthetic venue plan for 48 attendees with step-free access.",
+      "supersedes": null,
+      "support": "agent_reported",
+      "updated_at": "2026-09-26T09:49:24Z",
+      "version": 4
+    }
+  ],
+  "recall": {
+    "limitations": [],
+    "request_id": "fadee415-2b66-4420-aa24-5eb7184e28ba",
+    "result": {
+      "application": "unverified",
+      "budget_bytes": 8192,
+      "capabilities": {
+        "python": "unavailable",
+        "text": "lexical"
+      },
+      "checked_snapshot": "ee9e818b-c3ef-4ee7-9f71-6136fedff3cc",
+      "checkpoint_reference": "f6b1e989-d1ec-43ef-9b99-7ffd2db3ca6a",
+      "conflicts": [],
+      "constraints": [
+        {
+          "freshness": "not_applicable",
+          "record_id": "3ac91dd2-2721-4ffd-85a1-141e84a9aaad",
+          "text": "Plan for 48 attendees with step-free access. Do not book any venue."
+        },
+        {
+          "freshness": "unknown",
+          "record_id": "f6b1e989-d1ec-43ef-9b99-7ffd2db3ca6a",
+          "text": "Choose Cedar if feasible under current venue facts."
+        },
+        {
+          "freshness": "unknown",
+          "record_id": "f6b1e989-d1ec-43ef-9b99-7ffd2db3ca6a",
+          "text": "Do not book a venue."
+        },
+        {
+          "freshness": "unknown",
+          "record_id": "f6b1e989-d1ec-43ef-9b99-7ffd2db3ca6a",
+          "text": "Preserve the accepted 48-attendee and step-free intent."
+        }
+      ],
+      "decisions": [
+        {
+          "freshness": "not_applicable",
+          "record_id": "3ac91dd2-2721-4ffd-85a1-141e84a9aaad",
+          "summary": "Plan for 48 attendees with step-free access. Do not book any venue."
+        }
+      ],
+      "delivery": "emitted",
+      "excluded_scope": [],
+      "expansion_handle": null,
+      "pack_id": "52fad694-f4d7-4765-a0b4-ef5b190c0c4c",
+      "project_id": "d9972ef4-8890-4bf4-b683-1a3fc6fe3d2c",
+      "schema": "opensocrates.project-memory.context-pack/1.0.0",
+      "searched_scope": [],
+      "source_evidence": [],
+      "task_id": "b7a99fda-40d0-4bca-bf4e-000000000048",
+      "unknowns": [
+        "f6b1e989-d1ec-43ef-9b99-7ffd2db3ca6a:unknown",
+        "checkpoint_source_state_requires_revalidation"
+      ],
+      "used_bytes": 1496,
+      "workspace_id": "1d8e0bb8-53d3-452b-991a-75c0eada6760",
+      "workspace_kind": "directory"
+    },
+    "retryable": false,
+    "schema": "opensocrates.project-memory.response/1.0.0",
+    "status": "ok"
+  },
+  "operations": [
+    {
+      "exit_code": 0,
+      "wall_seconds": 0.129,
+      "stdout_sha256": "0d8531b9dfa5d2eadf5912a7bb0c455acacadf5cb81cdd21a367a9d70cde3e7a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "operation": "inspect",
+      "status": "ok"
+    },
+    {
+      "exit_code": 0,
+      "wall_seconds": 0.116,
+      "stdout_sha256": "5af9d6d333fcc740850da8e203a5262309da102a76c6e9fce5185747252698a0",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "operation": "recall",
+      "status": "ok"
+    }
+  ]
+}

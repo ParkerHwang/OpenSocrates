@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DepotFlow</title><link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main id="login-view" class="login-shell">
+    <section class="card login-card" aria-labelledby="login-title">
+      <div class="brand-mark">DF</div><p class="eyebrow">FULFILLMENT OPERATIONS</p>
+      <h1 id="login-title">DepotFlow</h1><p class="muted">A calm control room for small warehouse teams.</p>
+      <form id="login-form">
+        <label for="login-email">Email</label><input id="login-email" data-testid="login-email" type="email" autocomplete="username" required placeholder="operator@north.example">
+        <label for="login-password">Password</label><input id="login-password" data-testid="login-password" type="password" autocomplete="current-password" required value="DepotDemo!2026">
+        <button data-testid="login-submit" class="primary" type="submit">Sign in</button>
+      </form><p id="login-message" class="message" role="alert"></p>
+      <p class="hint">Demo users use password <code>DepotDemo!2026</code>.</p>
+    </section>
+  </main>
+  <div id="app-view" hidden>
+    <header class="topbar"><a class="wordmark" href="#inventory">Depot<span>Flow</span></a><nav aria-label="Primary">
+      <button data-testid="nav-inventory" data-view="inventory">Inventory</button><button data-testid="nav-orders" data-view="orders">Orders</button><button data-testid="nav-audit" data-view="audit">Audit</button>
+    </nav><div class="session"><span id="user-pill"></span><button data-testid="logout" class="quiet">Log out</button></div></header>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <main class="content">
+      <section id="inventory-view" class="view" aria-labelledby="inventory-title">
+        <div class="page-heading"><div><p class="eyebrow">WAREHOUSE PULSE</p><h1 id="inventory-title">Inventory</h1><p class="muted">Live stock position for your tenant.</p></div><button id="refresh-inventory" class="quiet">Refresh</button></div>
+        <div id="dashboard-cards" class="metrics"></div>
+        <section class="card"><div class="section-heading"><h2>Stock position</h2><span id="inventory-status" class="muted"></span></div><div class="table-scroll"><table data-testid="inventory-table"><thead><tr><th>SKU</th><th>Product</th><th>On hand</th><th>Reserved</th><th>Available</th><th>Unit price</th><th>Version</th></tr></thead><tbody id="inventory-body"></tbody></table></div></section>
+        <section id="adjustment-panel" class="card admin-only" hidden><div class="section-heading"><h2>Adjust stock</h2><span class="muted">Admin only</span></div><form id="adjust-form" class="inline-form"><label>SKU<select id="adjust-sku"></select></label><label>Delta<input id="adjust-delta" type="number" required></label><label>Reason<input id="adjust-reason" required placeholder="Cycle count"></label><button class="primary" type="submit">Apply adjustment</button></form></section>
+      </section>
+      <section id="orders-view" class="view" aria-labelledby="orders-title" hidden>
+        <div class="page-heading"><div><p class="eyebrow">WORK QUEUE</p><h1 id="orders-title">Orders</h1><p class="muted">Receive, reserve, ship and reconcile customer work.</p></div><button id="new-order" data-testid="new-order" class="primary writable-only">New order</button></div>
+        <section class="card"><form id="order-filters" class="filter-row"><label>Search client ref<input id="order-search" type="search" placeholder="e.g. web-104"></label><label>Status<select id="order-status"><option value="">All statuses</option><option>draft</option><option>reserved</option><option>shipped</option><option>returned</option><option>cancelled</option></select></label><button class="quiet" type="submit">Filter</button></form><div id="orders-status" class="message"></div><div class="table-scroll"><table><thead><tr><th>Client ref</th><th>Status</th><th>Lines</th><th>Total</th><th></th></tr></thead><tbody id="orders-body"></tbody></table></div></section>
+        <section id="order-form-panel" class="card" hidden><div class="section-heading"><h2>Create an order</h2><button id="close-order-form" class="quiet" type="button">Close</button></div><form id="create-order-form"><label for="order-client-ref">Client reference</label><input id="order-client-ref" data-testid="order-client-ref" required placeholder="shop-1001"><div id="order-lines"></div><button id="add-line" data-testid="add-line" class="quiet" type="button">+ Add line</button><div class="form-actions"><button id="submit-order" data-testid="submit-order" class="primary" type="submit">Create draft</button></div><p id="create-order-message" class="message" role="alert"></p></form></section>
+        <section id="order-detail" data-testid="order-detail" class="card detail-card" hidden></section>
+      </section>
+      <section id="audit-view" class="view" aria-labelledby="audit-title" hidden>
+        <div class="page-heading"><div><p class="eyebrow">TRACEABILITY</p><h1 id="audit-title">Audit trail</h1><p class="muted">Committed mutations for this tenant, oldest first.</p></div><button id="refresh-audit" class="quiet">Refresh</button></div>
+        <section class="card"><div id="audit-status" class="message"></div><div class="table-scroll"><table data-testid="audit-table"><thead><tr><th>Time</th><th>Action</th><th>Entity</th><th>Actor</th></tr></thead><tbody id="audit-body"></tbody></table></div></section>
+      </section>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

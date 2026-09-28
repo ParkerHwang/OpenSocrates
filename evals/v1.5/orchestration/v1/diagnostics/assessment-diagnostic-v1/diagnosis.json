@@ -1,0 +1,38 @@
+{
+  "observation": {
+    "status": "verified",
+    "text": "A fresh diagnostic independently identified the seeded selection defect, but exact-path identity validation rejected pricing.py:6-7."
+  },
+  "candidate_explanations": [
+    {
+      "id": "location",
+      "status": "verified_for_new_diagnostic_only",
+      "text": "Location has a line-range suffix, while current validator requires exact candidate path."
+    },
+    {
+      "id": "other-binding",
+      "status": "refuted_for_new_diagnostic",
+      "text": "Artifact hash and requirement match the actual candidate and accepted cost contract."
+    },
+    {
+      "id": "public-filter",
+      "status": "refuted_for_new_diagnostic",
+      "text": "The returned object passed schema and public filter before identity validation."
+    }
+  ],
+  "comparison_criteria": [
+    "Observed validation rule and actual closed output, not inferred earlier content."
+  ],
+  "discriminating_evidence": {
+    "rejection": "finding_identity_mismatch",
+    "location": "pricing.py:6-7",
+    "expected_path": "pricing.py",
+    "file_hash_matches": true,
+    "requirement_id": "cost-contract"
+  },
+  "provisional_best_explanation": "Confirmed ambiguity for this new diagnostic; the two original discarded outputs remain unknown.",
+  "next_test": "Clarify the unchanged exact-path contract in schema and bilingual guides; run the affected seeded negative-review/repair workflow once.",
+  "flip_condition": "Any new exact-path output rejection would require a separately recorded diagnostic, not assumption of this cause.",
+  "method": "abduction@3",
+  "native_application": "unverified"
+}

@@ -1,0 +1,6 @@
+{
+  "artifacts": {
+    "offer.py": "from catalog import lookup\n\ndef quote(label, seats, savings_cents=0):\n    return breakdown(label, seats, savings_cents)['total_cents']\n\ndef breakdown(label, seats, savings_cents=0):\n    plan = lookup(label)\n    if type(seats) is not int or seats < 1 or seats > plan['max_seats']:\n        raise ValueError('seats')\n    subtotal = plan['seat_cents'] * seats\n    if type(savings_cents) is not int or savings_cents < 0 or savings_cents > subtotal:\n        raise ValueError('savings_cents')\n    return {\n        'plan_code': plan['code'],\n        'subtotal_cents': subtotal,\n        'savings_cents': savings_cents,\n        'total_cents': subtotal - savings_cents,\n    }\n"
+  },
+  "public_final": "Updated [offer.py](<disposable>/workspace/offer.py). `breakdown()` returns the requested fields using the current `catalog.lookup`; `quote()` still returns an integer. Invalid savings and seats raise `ValueError`.\n\nChecked all current plans, including `squad` resolving to `studio`, calculation and validation boundaries, and `git diff --check`. All passed. The pre-existing `catalog.py` change was left intact.\n\nOpenSocrates native activation is unconfirmed; this was a mechanical edit."
+}

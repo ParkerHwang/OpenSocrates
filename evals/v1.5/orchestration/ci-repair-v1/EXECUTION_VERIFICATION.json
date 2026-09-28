@@ -1,0 +1,204 @@
+{
+  "schema": "independent-ci-portability-bridge/1",
+  "source_commit": "6eb8d3774f3a9032f580359b38b8bf11208f70d3",
+  "prior_commit": "b32dbdba4e53ad08e90e4a4a97a30d4fe57c5a27",
+  "scope": "Required-flag rejection/cleanup/platform availability, local Windows-target typing, current native source/sandbox boundary and unchanged schema/guide identity only.",
+  "checks": [
+    {
+      "id": "nofollow_missing",
+      "passed": true,
+      "reason": "directory_capability_unavailable",
+      "scope": "source-level simulated missing/invalid flag"
+    },
+    {
+      "id": "directory_zero",
+      "passed": true,
+      "reason": "directory_capability_unavailable",
+      "scope": "source-level simulated missing/invalid flag"
+    },
+    {
+      "id": "nofollow_boolean",
+      "passed": true,
+      "reason": "directory_capability_unavailable",
+      "scope": "source-level simulated missing/invalid flag"
+    },
+    {
+      "id": "partial_initialization_closes_handles",
+      "passed": true,
+      "opened_handles": 1,
+      "all_closed": true
+    },
+    {
+      "id": "cleanup_win32",
+      "passed": true,
+      "actions": [
+        "terminate",
+        "wait",
+        "kill",
+        "wait"
+      ],
+      "group_signals": [],
+      "scope": "mocked process, no signals sent"
+    },
+    {
+      "id": "cleanup_darwin",
+      "passed": true,
+      "actions": [
+        "wait",
+        "wait"
+      ],
+      "group_signals": [
+        15,
+        9
+      ],
+      "scope": "mocked process, no signals sent"
+    },
+    {
+      "id": "windows_adapter_explicitly_unavailable",
+      "passed": true,
+      "reason": "sandbox_platform_unavailable",
+      "inspection_calls": 0
+    },
+    {
+      "id": "nonposix_directory_explicitly_unavailable",
+      "passed": true,
+      "reason": "directory_capability_unavailable"
+    },
+    {
+      "id": "windows_target_typing",
+      "passed": true,
+      "argv": [
+        "$REPO/.venv/bin/python",
+        "-B",
+        "-m",
+        "mypy",
+        "--platform",
+        "win32",
+        "--cache-dir",
+        "$VERIFIER_TEMP/mypy-cache",
+        "--config-file",
+        "$REPO/pyproject.toml",
+        "src"
+      ],
+      "exit_code": 0,
+      "stdout": "Success: no issues found in 156 source files",
+      "stderr": "",
+      "scope": "macOS host with mypy --platform win32; not hosted Windows execution"
+    },
+    {
+      "id": "native_expected_identity",
+      "passed": true,
+      "sha256": "329d71719667bebdf42df29d2dc2440429d3c9e70b212ae745f8ebfd949434f9"
+    },
+    {
+      "id": "native_source_regular",
+      "passed": true,
+      "exit_code": 3,
+      "status": "unavailable",
+      "calls": 0,
+      "limitations": [
+        "primary_classification_and_authorization_are_caller_attributed",
+        "configured_model_tuple_not_backend_attestation",
+        "fresh_context_not_account_or_all_filesystem_read_isolation",
+        "read_only_checks_network_disabled_no_scratch_writes",
+        "public_findings_are_model_judgments_with_exact_artifact_binding",
+        "no_raw_prompt_event_reasoning_or_check_output_retention",
+        "candidate_only_primary_must_recheck_affected_final_project_bytes",
+        "no_memory_enrollment_capture_or_schema_migration",
+        "same_validated_plan_can_be_handed_to_qualified_host"
+      ],
+      "scope": "real frozen runtime, intentionally nonexistent client; no outcome calls"
+    },
+    {
+      "id": "native_source_symlink",
+      "passed": true,
+      "exit_code": 3,
+      "status": "unavailable",
+      "calls": 0,
+      "limitations": [
+        "primary_classification_and_authorization_are_caller_attributed",
+        "configured_model_tuple_not_backend_attestation",
+        "fresh_context_not_account_or_all_filesystem_read_isolation",
+        "read_only_checks_network_disabled_no_scratch_writes",
+        "public_findings_are_model_judgments_with_exact_artifact_binding",
+        "no_raw_prompt_event_reasoning_or_check_output_retention",
+        "candidate_only_primary_must_recheck_affected_final_project_bytes",
+        "no_memory_enrollment_capture_or_schema_migration",
+        "setup_capability_or_source_unavailable"
+      ],
+      "scope": "real frozen runtime, intentionally nonexistent client; no outcome calls"
+    },
+    {
+      "id": "native_sandbox_read",
+      "passed": true,
+      "argv": [
+        "$CODEX_CLIENT",
+        "sandbox",
+        "-P",
+        ":read-only",
+        "-C",
+        "$VERIFIER_TEMP/fixture",
+        "--",
+        "/bin/cat",
+        "source.txt"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "dc979357ca411e6c40bee080078b75755484f5771990ee12717b27590a9b2541",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "actual local sandbox, no model process"
+    },
+    {
+      "id": "native_sandbox_write",
+      "passed": true,
+      "argv": [
+        "$CODEX_CLIENT",
+        "sandbox",
+        "-P",
+        ":read-only",
+        "-C",
+        "$VERIFIER_TEMP/fixture",
+        "--",
+        "/usr/bin/touch",
+        "forbidden-write"
+      ],
+      "exit_code": 1,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "3d3888dc74b365e1aa3453df4c83b6b57423018723bf09fb5664ed55eb43f359",
+      "scope": "actual local sandbox, no model process"
+    },
+    {
+      "id": "exact_source_identity_bridge",
+      "passed": true,
+      "prior_input_count": 587,
+      "changed": [
+        "src/opensocrates/orchestration/adapter.py",
+        "src/opensocrates/orchestration/paths.py"
+      ],
+      "unchanged": 585,
+      "working_tree_mismatches": []
+    },
+    {
+      "id": "schema_guide_native_identity_bridge",
+      "passed": true,
+      "schemas": 52,
+      "guides": 32,
+      "copies_checked": 168,
+      "mismatches": []
+    }
+  ],
+  "all_expected": true,
+  "outcome_model_calls": 0,
+  "native_binary_sha256": "329d71719667bebdf42df29d2dc2440429d3c9e70b212ae745f8ebfd949434f9",
+  "codex_client_sha256": "c3e30211bd454da70ceb4d9cbc2e05fe6466812ab05c311c3bbff6addeb14202",
+  "affected_source_hashes": {
+    "src/opensocrates/orchestration/adapter.py": "a95401c3be02ba09b26ab3643c0d8a6910971b302d4e8f679b9be3004b5cf4cd",
+    "src/opensocrates/orchestration/paths.py": "9f9878d99cfbbafd6f05ab91f12b4ac1df6c2cbb87bd96c19383e8989f70ecdb",
+    "tools/check_orchestration.py": "279ffbd66c42073b2581864c007ebe99018689d2513a4a4f0320b2ccd40955a6"
+  },
+  "frozen_v1_snapshot_hash": "30f64d78d4aff1257cdd761a68750f18831441653b11f00f0e36f6a9aab8c704",
+  "limits": [
+    "Missing/invalid OS flags and Windows process cleanup were source-level simulations on macOS; no hosted Windows runtime test.",
+    "Native macOS exercised positive required flags and actual no-follow/sandbox write denial. It did not simulate missing native OS constants.",
+    "Hosted Windows CI after push remains separate and pending. No prior live-v2/v3 model or outcome re-execution."
+  ]
+}

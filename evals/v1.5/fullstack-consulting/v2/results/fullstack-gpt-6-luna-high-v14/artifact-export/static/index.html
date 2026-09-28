@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DepotFlow</title><link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<header class="topbar"><div><strong>DepotFlow</strong><span class="subtitle">Warehouse operations</span></div><div id="session-area"></div></header>
+<main>
+  <section id="login-panel" class="panel login-panel">
+    <h1>Sign in</h1><p>Use your warehouse account to manage fulfillment.</p>
+    <form id="login-form">
+      <label>Email<input data-testid="login-email" id="login-email" type="email" autocomplete="username" required></label>
+      <label>Password<input data-testid="login-password" id="login-password" type="password" autocomplete="current-password" required></label>
+      <button data-testid="login-submit" type="submit">Sign in</button>
+    </form><p id="login-error" class="error" role="alert"></p>
+    <p class="hint">Demo users: admin@north.example, operator@north.example, viewer@north.example (password: DepotDemo!2026)</p>
+  </section>
+  <div id="app" hidden>
+    <nav class="tabs" aria-label="Main navigation">
+      <button data-testid="nav-inventory" data-view="inventory">Inventory</button>
+      <button data-testid="nav-orders" data-view="orders">Orders</button>
+      <button data-testid="nav-audit" data-view="audit">Audit</button>
+    </nav>
+    <div id="notice" role="status" aria-live="polite"></div>
+    <section id="view-inventory" class="view">
+      <h1>Dashboard &amp; inventory</h1><div id="dashboard" class="stats"></div>
+      <div class="panel"><h2>Inventory</h2><div class="table-wrap"><table data-testid="inventory-table"><thead><tr><th>SKU</th><th>Item</th><th>On hand</th><th>Reserved</th><th>Available</th><th>Price</th><th>Version</th></tr></thead><tbody id="inventory-body"></tbody></table></div></div>
+    </section>
+    <section id="view-orders" class="view" hidden>
+      <div class="heading-row"><h1>Orders</h1><button id="new-order" data-testid="new-order" class="primary">New order</button></div>
+      <div class="panel filters"><label>Search reference<input id="order-search" type="search" placeholder="Find client reference"></label><label>Status<select id="order-filter"><option value="">All statuses</option><option>draft</option><option>reserved</option><option>shipped</option><option>cancelled</option><option>returned</option></select></label><button id="refresh-orders">Search</button></div>
+      <div class="orders-layout"><div class="panel"><h2>Order list</h2><div id="order-list" class="order-list"></div><button id="more-orders" hidden>Load more</button></div><div id="order-detail" data-testid="order-detail" class="panel detail"><p>Select an order to see its details.</p></div></div>
+    </section>
+    <section id="view-audit" class="view" hidden><h1>Audit history</h1><div class="panel"><div class="table-wrap"><table data-testid="audit-table"><thead><tr><th>Event</th><th>Entity</th><th>Actor</th><th>Time (UTC)</th></tr></thead><tbody id="audit-body"></tbody></table></div><button id="more-audit" hidden>Load more</button></div></section>
+  </div>
+</main>
+<dialog id="order-dialog"><form id="order-form" method="dialog"><div class="heading-row"><h2>Create order</h2><button type="button" class="icon-button" id="close-order" aria-label="Close">×</button></div><label>Client reference<input id="order-client-ref" data-testid="order-client-ref" required maxlength="120"></label><div id="line-editor"></div><div class="button-row"><button type="button" id="add-line" data-testid="add-line">Add line</button><button type="submit" id="submit-order" data-testid="submit-order" class="primary">Create order</button></div><p id="order-form-error" class="error" role="alert"></p></form></dialog>
+<script src="/app.js" defer></script>
+</body></html>

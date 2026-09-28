@@ -1,0 +1,142 @@
+{
+  "product_commit": "ca95b2415621921b24d311133522ddf2faec5c30",
+  "scope": "Independent exact-object scanner positives and selected rejecting mutations only. No native or model launches; not a general Python data-flow proof.",
+  "python": "3.14.4 (main, Apr 14 2026, 14:46:33) [Clang 22.1.3 ]",
+  "python_executable": "$USER_HOME/.local/share/uv/python/cpython-3.14.4-macos-aarch64-none/bin/python3.14",
+  "scanner_sha256": "0f00115a4ac748e7555049f4c9d61737ce6d43a7b59b3a0904febca9757c5e7e",
+  "adapter_sha256": "c112a3dd6ce7a96f99dc117a90491c9692a8c4d4aeb9bf81ee7925cd693b8b73",
+  "results": [
+    {
+      "id": "exact_boundary",
+      "passed": true,
+      "category": "shell_execution",
+      "observed_count": 0,
+      "expected": 0,
+      "mutant_sha256": "c112a3dd6ce7a96f99dc117a90491c9692a8c4d4aeb9bf81ee7925cd693b8b73"
+    },
+    {
+      "id": "same_code_other_module",
+      "passed": true,
+      "category": "shell_execution",
+      "observed_count": 5,
+      "expected": 5,
+      "mutant_sha256": "c112a3dd6ce7a96f99dc117a90491c9692a8c4d4aeb9bf81ee7925cd693b8b73"
+    },
+    {
+      "id": "comment_only",
+      "passed": true,
+      "category": "shell_execution",
+      "observed_count": 0,
+      "expected": 0,
+      "mutant_sha256": "385ba10a1f112072c6167c7b551e3df78885eef2a2cec5078fb19d9400bca5c1"
+    },
+    {
+      "id": "new_process_outside_reviewed_sites",
+      "passed": true,
+      "category": "shell_execution",
+      "observed_count": 1,
+      "expected": "positive",
+      "mutant_sha256": "b3947af407e14145e7df78cdc206a559b82afe15b530d21f4970e8bfa8eed62a"
+    },
+    {
+      "id": "capability_allowlist_expanded",
+      "passed": true,
+      "category": "shell_execution",
+      "observed_count": 6,
+      "expected": "positive",
+      "mutant_sha256": "d9ee25b598d808cafe27741101d586eadfce812dcb36fc1ad72a9d8f1dbedec6"
+    },
+    {
+      "id": "literal_shell_opt_in",
+      "passed": true,
+      "category": "shell_execution",
+      "observed_count": 6,
+      "expected": "positive",
+      "mutant_sha256": "f2aa70125b30e2a70fb99f4989f45591b8beb7b95d80b1d621c025bf7411af3b"
+    },
+    {
+      "id": "sandbox_profile_changed",
+      "passed": true,
+      "category": "shell_execution",
+      "observed_count": 6,
+      "expected": "positive",
+      "mutant_sha256": "3855e32fdc5953b462a1ff26663f0c13088f99397713daa98fc81f2561b38aa8"
+    },
+    {
+      "id": "helper_accepts_full_raw_command",
+      "passed": true,
+      "category": "shell_execution",
+      "observed_count": 6,
+      "expected": "positive",
+      "mutant_sha256": "4b0cbeaac34e751bddc2f101e545ffdce3473f9af40ca2e456340df5a12e4103"
+    },
+    {
+      "id": "other_dynamic_rules_retained",
+      "passed": true,
+      "category": "dynamic_execution",
+      "observed_count": 1,
+      "expected": "positive",
+      "mutant_sha256": "4de7c1f7ceec43b35ab2aa2a86e26d8dfaa6860c66009e5e8ce2f8c9906a09d3"
+    },
+    {
+      "id": "other_network_rules_retained",
+      "passed": true,
+      "category": "network_calls",
+      "observed_count": 1,
+      "expected": "positive",
+      "mutant_sha256": "ef62b45fcf8d5500ba6a6c95c4600986d9a484556c7382d2b01fa3ea98e4e99b"
+    },
+    {
+      "id": "bool_vs_zero",
+      "passed": true,
+      "left_sha256": "1be3cd03c71ed3c1a5739a65d9aa2db622abbdca3e49cdcc447fdaef86cd34b0",
+      "right_sha256": "3408d037546bced25f0cd028d9b402f4b024a1a34c01febb9d0727f0869dc198"
+    },
+    {
+      "id": "bytes_vs_text",
+      "passed": true,
+      "left_sha256": "81a065ca91f431d95ae07476993550d53ba699932be18bc24fabc3741c41c5ff",
+      "right_sha256": "8615fbcfff35504dfead04c4e977fb31e8ae2277d93a7b5014ac49d50b6d3029"
+    },
+    {
+      "id": "ordered_list",
+      "passed": true,
+      "left_sha256": "c3a3823fdf48c25c336f8cb87239d0cf64a121cc54aff9c023717c7c6f6180f0",
+      "right_sha256": "e08dff55ee16dfcd16e97ce3d9bbc4f5681de7585123dc8a6913d0db658b500b"
+    },
+    {
+      "id": "empty_argument_vs_absent",
+      "passed": true,
+      "left_sha256": "a36eb9e32d2f74a2fe01a06cb0bf4b60f07b75e8eeeb53022f99b707107c48bf",
+      "right_sha256": "d41083d52d8d34d25bac0846befbede13965bdcf59ce6e3bbe4cbc2d886b22c3"
+    }
+  ],
+  "passed": 14,
+  "total": 14,
+  "registered_fingerprint_mismatches": [],
+  "canonical_function_fingerprints": {
+    "_role_environment": "10737bb79b5adef978c490ea5f070b530cd968fcc294253c7b647817d5301345",
+    "_check_environment": "cc6f8d72420a042928e20a1da76812d5e8c3418f3ffdedc3467b0ebabaf7ef36",
+    "_hashed_process": "bc91361bb1e5bdfc2d58c73385ea14017b766607eaf008bb1fa29f50bd054836",
+    "CodexAdapter._inspect": "a2700bef6cc61107f9367eac0ce18425f0c1b1408c9adf3bda1466f7ea471a75",
+    "CodexAdapter.probe": "51cddeb9a0e0482fb9fa8adabf88b70e1eb86324548a62acea56229c7b3fffcd",
+    "CodexAdapter._sandbox_argv": "1b91f98ad55eaf7b8f2fcb76f9deb4dd6b598f344dd1cd2d0e80d6f9d33ffa97",
+    "CodexAdapter._probe_sandbox": "22d7a257275bc3682aa452ec744b4f2861f698f95f5e8b30af00727fecbfe836",
+    "CodexAdapter._argv": "40f061e21adba058e417ec2eb2b851fff411f5e0b4f47e6e8f27a98a3d679320",
+    "CodexAdapter.invoke": "dff2037b62a58a43732e473cac2c291bca5e48b14a581aefa6a190a5cd95ef77",
+    "CodexAdapter.check": "0c88bc688735087e1e5d055663aa5e443d65905f7086c719e6f4c4136c79bf4d"
+  },
+  "carried_input_comparison": {
+    "unchanged_count": 106,
+    "changed": {
+      "tools/security_scan.py": {
+        "old": "sha256:d76ab2bf97c6f328602b92a4b78ba36ed4d580d1bf196e769f395f2d436186fc",
+        "final": "sha256:0f00115a4ac748e7555049f4c9d61737ce6d43a7b59b3a0904febca9757c5e7e"
+      },
+      "tools/check_security_scan_memory.py": {
+        "old": "sha256:b072fecd835d657b4ba3b2d07486a0eab4abb0bfbc7a8ef5d3a422de3837e3e9",
+        "final": "sha256:ce224cc2e27a08ddf625807673ff1120016c6bac6de7a721f4521f261f4cfcc3"
+      }
+    }
+  }
+}

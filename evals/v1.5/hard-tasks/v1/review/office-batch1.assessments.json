@@ -1,0 +1,145 @@
+{
+  "schema": "opensocrates.hard-office-prose-review/1",
+  "reviewer": "primary integrator, existing selected model and effort; no separate judge invocation",
+  "reviewer_model_echo": null,
+  "reviewer_effort_receipt": null,
+  "human_scores": null,
+  "blinding": "unblinded",
+  "rubric": "office/PROSE_RUBRIC.md",
+  "input_lock": "review/office-batch1.lock.json",
+  "assessed_unix": 1790449586.369678,
+  "reviews": [
+    {
+      "cell": "office-luna-medium-v14",
+      "scores": {
+        "decision_usability": 3,
+        "evidence_and_predecessor_maintenance": 4,
+        "authority_and_independent_progress": 4,
+        "operational_judgment": 3,
+        "korean_collaboration_quality": 4
+      },
+      "support": [
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "8-18",
+          "finding": "Clear CEDAR recommendation, correct reserve/headroom and 60 mandatory plus 6 optional; same-headcount vendor comparison is correct but does not explain the cheaper lower-coverage alternative or the 67-person upper bound."
+        },
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "22-28",
+          "finding": "Current calendar, prices, roster and bank treatment replace predecessor assumptions; named owners can continue preparation before the signature."
+        },
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "14-16",
+          "finding": "Feasible assignment is correct, but the memo does not explain that waitlisted P064 remains infeasible even if budget increases, because the only allowed sessions are inaccessible."
+        },
+        {
+          "artifact": "PROJECT_NOTES.md",
+          "lines": "3-13",
+          "finding": "Maintained note preserves scoped intent and updates current arithmetic and pending authority."
+        }
+      ],
+      "factual_issues": [
+        {
+          "severity": "minor",
+          "location": "public_messages[0]",
+          "finding": "Initially promises six deliverables; the terminal message and actual five files correct this count."
+        }
+      ],
+      "workbook_observation": "All six sheets and Korean evidence descriptions inspected. Budget values are typed correctly; budget B2 uses General formatting without thousands separators. This is a minor readability observation, not a retroactive deterministic failure.",
+      "public_messages_reviewed": 5,
+      "unnecessary_questions_observed": 0,
+      "operator_can_continue": true,
+      "total": 18,
+      "maximum": 20,
+      "objective_checks": "27/27; unchanged frozen checker",
+      "uncertainty": "One unblinded primary-model assessment, not an independent human judgment or a calibrated interval; inspected artifact facts and public messages only"
+    },
+    {
+      "cell": "office-luna-max-v15",
+      "scores": {
+        "decision_usability": 4,
+        "evidence_and_predecessor_maintenance": 4,
+        "authority_and_independent_progress": 4,
+        "operational_judgment": 3,
+        "korean_collaboration_quality": 4
+      },
+      "support": [
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "9-34",
+          "finding": "Actionable selection, exact reserve and headroom, detailed physical-row reconciliation and pending signature are tied to source IDs."
+        },
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "38-54",
+          "finding": "Explains the 67-person cost bound, lower-coverage alternatives, and P064 access restriction; no invented budget increase or priority rule."
+        },
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "58-64",
+          "finding": "Correct predecessor corrections, preparation dates, named owners and no invented signature deadline."
+        }
+      ],
+      "factual_issues": [
+        {
+          "severity": "minor",
+          "location": "output/decision_memo.md:19",
+          "finding": "The rejected S1 alternative is described as removing both S2 and S5, then loading S5; the actual alternative is S1/S3/S5/S6. It also says 25 mandatory people are forced to S5, but the approved H06 and H08 changes yield 26. Both counts exceed capacity18, so the selected plan and deterministic pass remain valid.",
+          "independent_calculation": "Final mandatory rows whose allowed_sessions intersect {S1,S3,S5,S6} only at S5: P001,P002,P003,P004,P006,P007,P008,P009,P011,P012,P013,P014,P020,P031,P032,P033,P034,P036,P037,P038,P039,P041,P042,P043,P044,P045. H08 removes S1 from P045."
+        }
+      ],
+      "workbook_observation": "All six sheets and Korean evidence descriptions inspected. XLSX budget currency format is ₩#,##0;[Red]-₩#,##0;₩0. The artifact-tool preview does not display that format faithfully; do not attribute that preview omission to the candidate.",
+      "public_messages_reviewed": 7,
+      "unnecessary_questions_observed": 0,
+      "language_observation": "Public progress and terminal answer are English; required memo/workbook explanations are Korean. The task restricts language for artifacts, so no invented language-contract failure is assigned.",
+      "operator_can_continue": true,
+      "total": 19,
+      "maximum": 20,
+      "objective_checks": "27/27; unchanged frozen checker",
+      "uncertainty": "One unblinded primary-model assessment, not an independent human judgment or a calibrated interval; inspected artifact facts and public messages only"
+    },
+    {
+      "cell": "office-sol-medium-vanilla",
+      "scores": {
+        "decision_usability": 4,
+        "evidence_and_predecessor_maintenance": 4,
+        "authority_and_independent_progress": 4,
+        "operational_judgment": 4,
+        "korean_collaboration_quality": 4
+      },
+      "support": [
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "9-19",
+          "finding": "Concise decision, budget equation and concrete zero/void/reversal evidence are accurate."
+        },
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "23-29",
+          "finding": "Correctly distinguishes waitlist from priority, explains P064 incompatibility and why two more attendees outrank ORCHID saving1000KRW."
+        },
+        {
+          "artifact": "output/decision_memo.md",
+          "lines": "33-35",
+          "finding": "Specific predecessor corrections, preparation dates and named independent versus approval-dependent actions."
+        },
+        {
+          "artifact": "PROJECT_NOTES.md",
+          "lines": "3-13",
+          "finding": "Maintained note records evidence and its own Excel blank-versus-empty-string check repair without changing the business result."
+        }
+      ],
+      "factual_issues": [],
+      "workbook_observation": "All six sheets and Korean evidence descriptions inspected; typed budget values use thousands separators and frozen headers. No material issue found in inspected ranges.",
+      "public_messages_reviewed": 5,
+      "unnecessary_questions_observed": 0,
+      "operator_can_continue": true,
+      "total": 20,
+      "maximum": 20,
+      "objective_checks": "27/27; unchanged frozen checker",
+      "uncertainty": "One unblinded primary-model assessment, not an independent human judgment or a calibrated interval; inspected artifact facts and public messages only"
+    }
+  ]
+}

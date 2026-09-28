@@ -1,0 +1,83 @@
+{
+  "schema": "opensocrates.orchestration.design-review/1",
+  "source_baseline": "edab8f8d5c8434a705e706422ce5e8d6dc540e32",
+  "artifact": "docs/v1.5.0/15-specialized-orchestration.md",
+  "design_author": "orchestration_design",
+  "integrator": "primary",
+  "reviewer": "orchestration_design_review",
+  "author_reviewer_distinct": true,
+  "fresh_contexts": true,
+  "configured_model": "gpt-6-astra",
+  "configured_effort": "max",
+  "initial_review": {
+    "sha256": "9f45cda3d1d6bec4b840c44f7755febe649d10c561aba7aba4bacfa44e5ebc50",
+    "verdict": "changes_required",
+    "findings": [
+      {
+        "id": "D1",
+        "priority": "P1",
+        "requirement": "Constrain actual execution verification effects",
+        "location": "contract original lines 97-102",
+        "expected": "Checks run under enforced read-only policy with fixed cwd/env, no network and immutable candidate",
+        "observed": "Approved argv provenance alone left checker effects unspecified",
+        "impact": "Generated code could run with host permissions outside candidate boundary"
+      },
+      {
+        "id": "D2",
+        "priority": "P2",
+        "requirement": "Preserve configured primary tuple for every delegated role",
+        "location": "contract original lines 48-49 and 81-85",
+        "expected": "Every role must equal caller-authorized primary model and effort",
+        "observed": "Only fixed/explicit values were required; equality was not stated",
+        "impact": "Role-specific substitutions could satisfy the written design"
+      }
+    ]
+  },
+  "repair": {
+    "owner": "primary_integrator",
+    "changes": [
+      "Bound actual checks to codex sandbox :read-only, controlled env/cwd/network and post-check hashes",
+      "Require primary tuple equality and unavailable without model substitution",
+      "Preserve independent memory-review state unknown unless exact-version receipt"
+    ]
+  },
+  "targeted_rereview": {
+    "sha256": "a7b8264416f89d1b8aa9d0aa7e95366337e0ab42e10c755a6f80e3b606bade99",
+    "verdict": "design_accepted",
+    "resolved": [
+      "D1",
+      "D2"
+    ],
+    "execution_evidence": "not_yet_available"
+  },
+  "development_agent_calls": [
+    {
+      "role": "design",
+      "agent": "orchestration_design",
+      "fresh_context": true,
+      "configured_model": "inherited gpt-6-astra",
+      "configured_effort": "inherited max",
+      "usage": null
+    },
+    {
+      "role": "review",
+      "agent": "orchestration_design_review",
+      "fresh_context": true,
+      "configured_model": "gpt-6-astra",
+      "configured_effort": "max",
+      "usage": null
+    },
+    {
+      "role": "review_recheck",
+      "agent": "orchestration_design_review",
+      "fresh_context": false,
+      "same_bounded_role": true,
+      "usage": null
+    }
+  ],
+  "limitations": [
+    "Design acceptance is separate from runtime validation",
+    "Collaboration surface did not expose per-agent token usage; values remain null",
+    "No private reasoning or raw conversation retained"
+  ]
+}

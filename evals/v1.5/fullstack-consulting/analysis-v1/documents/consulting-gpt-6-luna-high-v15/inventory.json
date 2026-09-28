@@ -1,0 +1,534 @@
+{
+  "cell": "consulting-gpt-6-luna-high-v15",
+  "read_only": true,
+  "artifacts": [
+    {
+      "source": "deliverables/meridian_analysis.xlsx",
+      "sha256": "86f40d45ee433ba730edf3d0d19ee2c243382f6a6e399186985c3efe6c45a7c6",
+      "bytes": 23296,
+      "sheets": [
+        {
+          "name": "Start here",
+          "dimensions": "A1:A7",
+          "freeze_panes": null,
+          "autofilter": null,
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Meridian Parts | Board decision workbook"
+            ],
+            [
+              "Recommendation: stage Netherlands + Spain; capex after 90-day validation."
+            ],
+            [
+              "Base EUR268,160/year; stress EUR208,859; capex EUR270,000; six FTE."
+            ],
+            [
+              "Czechia + Spain: base EUR284,389; stress EUR12,115; capex EUR225,000; five FTE."
+            ],
+            [
+              "Hard limits: EUR450,000; seven FTE; two hubs; defer allowed."
+            ],
+            [
+              "Client operational data are synthetic; macro/FX are archived official observations."
+            ]
+          ]
+        },
+        {
+          "name": "Countries",
+          "dimensions": "A1:K9",
+          "freeze_panes": "A4",
+          "autofilter": "A3:K9",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Countries",
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              "2025 totals; additive metrics reconcile to months; margin=contribution/net sales.",
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              "country",
+              "shipped_orders",
+              "shipped_units",
+              "gross_sales_eur",
+              "refunds_eur",
+              "net_sales_eur",
+              "net_cogs_eur",
+              "fulfillment_eur",
+              "contribution_eur",
+              "returned_units"
+            ],
+            [
+              "DEU",
+              209,
+              12153,
+              631244.76,
+              5453,
+              625791.76,
+              353186,
+              13445.7,
+              259160.06,
+              73
+            ],
+            [
+              "FRA",
+              209,
+              11880,
+              640929.94,
+              8699.04,
+              632230.9,
+              344166.5,
+              14506.8,
+              273557.6,
+              144
+            ],
+            [
+              "NLD",
+              209,
+              12576,
+              709108.84,
+              11376,
+              697732.84,
+              368551,
+              16593.12,
+              312588.72,
+              144
+            ]
+          ]
+        },
+        {
+          "name": "Monthly",
+          "dimensions": "A1:L75",
+          "freeze_panes": "A4",
+          "autofilter": "A3:L75",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Monthly",
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              "EUR; original shipment month FX applies to gross sales and refunds.",
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              "country",
+              "month",
+              "shipped_orders",
+              "shipped_units",
+              "gross_sales_eur",
+              "refunds_eur",
+              "net_sales_eur",
+              "net_cogs_eur",
+              "fulfillment_eur",
+              "contribution_eur"
+            ],
+            [
+              "DEU",
+              "2025-01",
+              18,
+              962,
+              48962.64,
+              449,
+              48513.64,
+              26373,
+              1081.8,
+              21058.84
+            ],
+            [
+              "DEU",
+              "2025-02",
+              18,
+              892,
+              44273.52,
+              450,
+              43823.52,
+              23462.5,
+              1018.8,
+              19342.22
+            ],
+            [
+              "DEU",
+              "2025-03",
+              17,
+              864,
+              39088.56,
+              450,
+              38638.56,
+              22211,
+              981.6,
+              15445.96
+            ]
+          ]
+        },
+        {
+          "name": "Market context",
+          "dimensions": "A1:D21",
+          "freeze_panes": "A4",
+          "autofilter": "A3:D21",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Market context",
+              null,
+              null,
+              null
+            ],
+            [
+              "World Bank archive; population persons; GDP current US dollars; null preserved.",
+              null,
+              null,
+              null
+            ],
+            [
+              "country",
+              "year",
+              "population",
+              "gdp_per_capita_usd"
+            ],
+            [
+              "DEU",
+              2022,
+              83177813,
+              50506.5179638543
+            ],
+            [
+              "DEU",
+              2023,
+              83287273,
+              54776.7668235491
+            ],
+            [
+              "DEU",
+              2024,
+              83516593,
+              56103.7323182554
+            ]
+          ]
+        },
+        {
+          "name": "FX monthly",
+          "dimensions": "A1:C27",
+          "freeze_panes": "A4",
+          "autofilter": "A3:C27",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "FX monthly",
+              null,
+              null
+            ],
+            [
+              "ECB mean of 2025 business days; local units per EUR; EUR=1.",
+              null,
+              null
+            ],
+            [
+              "currency",
+              "month",
+              "local_per_eur"
+            ],
+            [
+              "PLN",
+              "2025-01",
+              4.246654545454545
+            ],
+            [
+              "PLN",
+              "2025-02",
+              4.172225
+            ],
+            [
+              "PLN",
+              "2025-03",
+              4.182009523809524
+            ]
+          ]
+        },
+        {
+          "name": "Hub scenarios",
+          "dimensions": "A1:F71",
+          "freeze_panes": "A4",
+          "autofilter": "A3:F71",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Hub scenarios",
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              "All single options and feasible pairs; capex is year zero; null payback if nonpositive annual increment.",
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              "country",
+              "scenario",
+              "incremental_contribution_eur",
+              "capex_eur",
+              "fte",
+              "payback_years"
+            ],
+            [
+              "DEU",
+              "low",
+              -34326.41,
+              280000,
+              5,
+              null
+            ],
+            [
+              "DEU",
+              "base",
+              9287.27,
+              280000,
+              5,
+              30.1488
+            ],
+            [
+              "DEU",
+              "high",
+              52900.94,
+              280000,
+              5,
+              5.2929
+            ]
+          ]
+        },
+        {
+          "name": "Quality",
+          "dimensions": "A1:B31",
+          "freeze_panes": "A4",
+          "autofilter": "A3:B31",
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Quality",
+              null
+            ],
+            [
+              "Detected anomalies and handling; see evidence/source-register.json.",
+              null
+            ],
+            [
+              "item",
+              "value"
+            ],
+            [
+              "raw_order_rows",
+              1328
+            ],
+            [
+              "distinct_order_ids",
+              1297
+            ],
+            [
+              "identical_duplicate_rows",
+              13
+            ]
+          ]
+        },
+        {
+          "name": "Decision chart",
+          "dimensions": "A1:C8",
+          "freeze_panes": null,
+          "autofilter": null,
+          "formula_count": 0,
+          "formula_examples": [],
+          "stored_errors": [],
+          "preview": [
+            [
+              "Portfolio",
+              "Base annual increment",
+              "Stress annual increment"
+            ],
+            [
+              "NLD+ESP",
+              268159.8,
+              208858.51
+            ],
+            [
+              "CZE+ESP",
+              284389.43,
+              12114.97
+            ],
+            [
+              "POL+ESP",
+              275779.09,
+              12359.24
+            ],
+            [
+              "NLD+CZE",
+              245892.37,
+              -1125.71
+            ],
+            [
+              "POL+CZE",
+              253049.28,
+              -4515.88
+            ]
+          ]
+        }
+      ],
+      "render_sheet": "Countries"
+    },
+    {
+      "source": "deliverables/meridian_board_presentation.pdf",
+      "sha256": "4e28bd90f2c6d90d8e55a97247440514bd6e975eb736f6773e173e082d10fe59",
+      "bytes": 116084,
+      "pages": 7,
+      "empty_text_pages": [],
+      "rendered_pages": [
+        1,
+        4,
+        5
+      ],
+      "render_images": [
+        {
+          "page": 1,
+          "file": "meridian_board_presentation-page-01.png",
+          "exit_code": 0,
+          "stderr": "Fontconfig error: Cannot load default config file: File not found\n"
+        },
+        {
+          "page": 4,
+          "file": "meridian_board_presentation-page-04.png",
+          "exit_code": 0,
+          "stderr": "Fontconfig error: Cannot load default config file: File not found\n"
+        },
+        {
+          "page": 5,
+          "file": "meridian_board_presentation-page-05.png",
+          "exit_code": 0,
+          "stderr": "Fontconfig error: Cannot load default config file: File not found\n"
+        }
+      ]
+    },
+    {
+      "source": "deliverables/meridian_board_presentation.pptx",
+      "sha256": "649816ad3160e4221b95170cebc16c1f356fad54f9b4c51a49b74788f947cc83",
+      "bytes": 101193,
+      "render_conversion": {
+        "exit_code": 0,
+        "stdout": "convert <LOCKED_ORIGINAL>/deliverables/meridian_board_presentation.pptx as a Impress document -> <ANALYSIS>/documents/consulting-gpt-6-luna-high-v15/pptx-render/meridian_board_presentation/meridian_board_presentation.pdf using filter : impress_pdf_Export\n",
+        "stderr": "Fontconfig warning: no <cachedir> elements found. Check configuration.\nFontconfig warning: adding <cachedir>/@.__________________________________________________OOO/var/cache/fontconfig</cachedir>\nFontconfig warning: adding <cachedir prefix=\"xdg\">fontconfig</cachedir>\n"
+      },
+      "pages": 7,
+      "empty_text_pages": [],
+      "rendered_pages": [
+        1,
+        4,
+        5
+      ],
+      "render_images": [
+        {
+          "page": 1,
+          "file": "meridian_board_presentation-page-01.png",
+          "exit_code": 0,
+          "stderr": ""
+        },
+        {
+          "page": 4,
+          "file": "meridian_board_presentation-page-04.png",
+          "exit_code": 0,
+          "stderr": ""
+        },
+        {
+          "page": 5,
+          "file": "meridian_board_presentation-page-05.png",
+          "exit_code": 0,
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "source": "deliverables/meridian_board_report.pdf",
+      "sha256": "82b1fe86facbc8984f7f50d95273d013810321126d91db608da6d787daa39914",
+      "bytes": 117271,
+      "pages": 3,
+      "empty_text_pages": [],
+      "rendered_pages": [
+        1,
+        2,
+        3
+      ],
+      "render_images": [
+        {
+          "page": 1,
+          "file": "meridian_board_report-page-01.png",
+          "exit_code": 0,
+          "stderr": "Fontconfig error: Cannot load default config file: File not found\n"
+        },
+        {
+          "page": 2,
+          "file": "meridian_board_report-page-02.png",
+          "exit_code": 0,
+          "stderr": "Fontconfig error: Cannot load default config file: File not found\n"
+        },
+        {
+          "page": 3,
+          "file": "meridian_board_report-page-03.png",
+          "exit_code": 0,
+          "stderr": "Fontconfig error: Cannot load default config file: File not found\n"
+        }
+      ]
+    }
+  ],
+  "render_scope": "Representative first, densest-text and middle pages; not a complete visual audit. Text extracted from every PDF page. LibreOffice derivatives are separate and may differ from PowerPoint."
+}

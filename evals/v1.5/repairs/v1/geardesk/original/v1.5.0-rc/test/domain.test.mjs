@@ -1,0 +1,43 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {emptyStore,quote,availability,command,report} from '../src/domain.mjs';
+const catalog=JSON.parse(await readFile(new URL('../fixtures/catalog.json',import.meta.url),'utf8'));
+const base={memberId:'club',start:'2026-11-06',end:'2026-11-09',lines:[{itemId:'camera',quantity:1}]};
+const make=(store,type,id,key,extra={})=>command(catalog,store,{type,id,idempotencyKey:key,expectedRevision:store.revision,...extra}).store;
+test('quote arithmetic, zero rate, and validation',()=>{
+  const q=quote(catalog,emptyStore(),{...base,lines:[{itemId:'camera',quantity:2},{itemId:'projector',quantity:1}]});
+  assert.deepEqual([q.rentalSubtotal,q.discount,q.rentalTotal,q.deposit,q.totalDue],[9600,300,9300,12000,21300]);
+  assert.equal(quote(catalog,emptyStore(),{...base,lines:[{itemId:'projector',quantity:1}]}).totalDue,2000);
+  for(const bad of [[],[{itemId:'camera',quantity:1.5}],[{itemId:'camera',quantity:true}],[{itemId:'camera',quantity:1},{itemId:'camera',quantity:1}]]) assert.throws(()=>quote(catalog,emptyStore(),{...base,lines:bad}),{code:'VALIDATION'});
+  assert.throws(()=>quote(catalog,emptyStore(),{...base,start:'2026-02-30'}),{code:'VALIDATION'});
+  assert.throws(()=>quote(catalog,emptyStore(),{...base,lines:[{itemId:'camera',quantity:4}]}),{code:'CAPACITY'});
+  assert.throws(()=>quote({...catalog,items:[{...catalog.items[0],rate:Number.MAX_SAFE_INTEGER}]},emptyStore(),base),{code:'VALIDATION'});
+});
+test('daily capacity uses simultaneous occupancy and transitions release it',()=>{
+  let store=emptyStore();
+  store=make(store,'reserve','a','a',{...base,start:'2026-11-01',end:'2026-11-03',lines:[{itemId:'camera',quantity:2}]});
+  store=make(store,'reserve','b','b',{...base,start:'2026-11-03',end:'2026-11-05',lines:[{itemId:'camera',quantity:2}]});
+  assert.equal(availability(catalog,store,{start:'2026-11-01',end:'2026-11-05'})[0].available,1);
+  assert.throws(()=>quote(catalog,store,{...base,start:'2026-11-02',end:'2026-11-04',lines:[{itemId:'camera',quantity:2}]}),{code:'CAPACITY'});
+  store=make(store,'checkout','a','c');
+  store=make(store,'return','a','d');
+  assert.equal(availability(catalog,store,{start:'2026-11-01',end:'2026-11-03'})[0].available,3);
+  assert.equal(report(store).refunded,10000);
+  assert.equal(report(store).depositHeld,10000);
+  assert.equal(report(store).auditCount,4);
+});
+test('replay precedes revision check, status rules and frozen values',()=>{
+  let store=emptyStore();
+  const request={type:'reserve',id:'x',idempotencyKey:'one',expectedRevision:0,...base};
+  const first=command(catalog,store,request);store=first.store;
+  const replay=command({...catalog,items:catalog.items.map(i=>({...i,rate:9999}))},store,{...request,lines:[{quantity:1,itemId:'camera'}]});
+  assert.equal(replay.replay,true);assert.equal(replay.store.revision,1);
+  assert.equal(store.reservations[0].quote.rentalTotal,4500);
+  assert.throws(()=>command(catalog,store,{...request,id:'different'}),{code:'IDEMPOTENCY_CONFLICT'});
+  assert.throws(()=>command(catalog,store,{type:'checkout',id:'x',idempotencyKey:'two',expectedRevision:0}),{code:'REVISION_CONFLICT'});
+  assert.throws(()=>command(catalog,store,{type:'return',id:'x',idempotencyKey:'two',expectedRevision:1}),{code:'INVALID_TRANSITION'});
+  assert.equal(store.revision,1);assert.equal(store.audit.length,1);
+  store=make(store,'cancel','x','two');
+  assert.equal(report(store).rentalRevenue,0);
+});

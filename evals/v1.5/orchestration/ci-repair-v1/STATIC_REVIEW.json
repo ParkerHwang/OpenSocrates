@@ -1,0 +1,52 @@
+{
+  "schema": "independent-static-affected-review/1.0",
+  "reviewed_commit": "6eb8d3774f3a9032f580359b38b8bf11208f70d3",
+  "comparison_commit": "b32dbdba4e53ad08e90e4a4a97a30d4fe57c5a27",
+  "review_type": "static_portability_source_and_git_diff_only",
+  "scope": [
+    "src/opensocrates/orchestration/paths.py",
+    "src/opensocrates/orchestration/adapter.py",
+    "tools/check_orchestration.py"
+  ],
+  "verdict": "accept_bounded_portability_repair_no_blocker",
+  "blocking_findings": [],
+  "production_edits": false,
+  "models_probes_mutations_tests_or_subagents_run": false,
+  "conclusions": [
+    {
+      "topic": "required_posix_flags",
+      "locations": ["src/opensocrates/orchestration/paths.py:142", "src/opensocrates/orchestration/paths.py:199", "src/opensocrates/orchestration/paths.py:265", "src/opensocrates/orchestration/paths.py:344"],
+      "evidence": "The helper returns the exact existing positive int flag value. Missing, zero, negative, bool and non-int values raise directory_capability_unavailable; there is no zero fallback for O_DIRECTORY or O_NOFOLLOW. Directory binding, source reads and candidate writes therefore preserve the same required POSIX flag bits on supported hosts. The pre-existing optional O_CLOEXEC fallback is unchanged."
+    },
+    {
+      "topic": "process_stop_and_cleanup",
+      "locations": ["src/opensocrates/orchestration/adapter.py:52"],
+      "evidence": "The added sys.platform != win32 guard makes POSIX-only attributes unreachable on Windows. On supported macOS/POSIX the same process-group SIGTERM, five-second wait and SIGKILL escalation remain. Windows continues to use process.terminate/process.kill. Directory cleanup, held descriptors, exclusive creation and error handling are unchanged by this diff."
+    },
+    {
+      "topic": "unsupported_platform_boundary",
+      "locations": ["src/opensocrates/orchestration/paths.py:177", "src/opensocrates/orchestration/adapter.py:140"],
+      "evidence": "BoundDirectory retains its POSIX/capability prerequisite checks. CodexAdapter.probe still rejects every platform except darwin before capability commands. This typing repair does not enable Windows orchestration or introduce a weaker execution fallback."
+    },
+    {
+      "topic": "focused_test_source",
+      "locations": ["tools/check_orchestration.py:962", "tools/check_orchestration.py:981"],
+      "evidence": "Added source tests cover missing/zero/bool/non-int required flags, exact supported flag values, mocked Windows termination without POSIX attributes, macOS group-signal escalation and unchanged Windows unavailability. They were inspected, not executed by this reviewer."
+    },
+    {
+      "topic": "scope_preservation",
+      "evidence": "The fixed-commit diff contains exactly the three assigned files. Schemas, guides, role orchestration, permission configuration and recorded model outcomes are not changed. Original 28 model outcomes remain attributable to their existing older source identities rather than this portability commit."
+    }
+  ],
+  "committed_artifact_sha256": {
+    "src/opensocrates/orchestration/paths.py": "9f9878d99cfbbafd6f05ab91f12b4ac1df6c2cbb87bd96c19383e8989f70ecdb",
+    "src/opensocrates/orchestration/adapter.py": "a95401c3be02ba09b26ab3643c0d8a6910971b302d4e8f679b9be3004b5cf4cd",
+    "tools/check_orchestration.py": "279ffbd66c42073b2581864c007ebe99018689d2513a4a4f0320b2ccd40955a6"
+  },
+  "limits": [
+    "This is static acceptance of the portability/typechecking change, not a claim that mypy, CI or native packaging was executed by this reviewer.",
+    "The parent's source-suite and native results remain separately attributed evidence.",
+    "No filesystem reproduction, model call or prior blocked probe was executed or retried.",
+    "The adapter remains macOS-only; no live Windows support or new model-quality claim follows."
+  ]
+}

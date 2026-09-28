@@ -1,0 +1,47 @@
+cli_auth_credentials_store = "file"
+service_tier = "default"
+web_search = "live"
+default_permissions = "evaluation"
+allow_login_shell = false
+
+[features]
+fast_mode = false
+memories = false
+external_agent_memory_import = false
+apps = false
+remote_plugin = false
+multi_agent = false
+multi_agent_v2 = false
+hooks = false
+
+[memories]
+use_memories = false
+generate_memories = false
+
+[apps._default]
+enabled = false
+
+[analytics]
+enabled = false
+
+[shell_environment_policy]
+inherit = "all"
+experimental_use_profile = false
+
+[permissions.evaluation.filesystem]
+":minimal" = "read"
+":workspace_roots" = "write"
+"/usr" = "read"
+"/bin" = "read"
+"/System" = "read"
+"/Library" = "read"
+"/opt" = "read"
+"/Applications/ChatGPT.app/Contents/Resources/codex-cli" = "read"
+"{runtime_root}" = "read"
+"{browser_root}" = "read"
+"{home}" = "write"
+"{temporary}" = "write"
+"{home}/.codex/auth.json" = "deny"
+
+[permissions.evaluation.network]
+enabled = true

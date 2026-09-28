@@ -1,0 +1,182 @@
+[
+  {
+    "id": "ownership_overlap",
+    "mutation": "Two units own a.txt and a.txt/child.txt",
+    "expected": "reject_before_launch",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "ownership_duplicate",
+    "mutation": "Two units own exactly pricing.py",
+    "expected": "reject_before_launch",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "unowned_required_artifact",
+    "mutation": "Required artifact has no producer",
+    "expected": "reject_before_launch",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "missing_dependency",
+    "mutation": "Dependency references absent unit",
+    "expected": "reject_before_launch",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "cycle",
+    "mutation": "Two units depend on each other",
+    "expected": "reject_before_launch",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "unknown_specialty",
+    "mutation": "Unit domain is unknown",
+    "expected": "explicit_classification_gap_no_launch",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "same_author_review",
+    "mutation": "Author runtime identity reused for review",
+    "expected": "reject_acceptance",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "same_author_verification",
+    "mutation": "Author runtime identity reused for execution verification",
+    "expected": "reject_acceptance",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "duplicate_native_thread",
+    "mutation": "Distinct roles receive same native thread identifier",
+    "expected": "reject_acceptance",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "wrong_candidate_hash",
+    "mutation": "Review binds digest other than frozen candidate",
+    "expected": "reject_acceptance",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "stale_hash_after_repair",
+    "mutation": "Candidate bytes change but old review receipt retained",
+    "expected": "re_review_and_re_verify_required",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "mandatory_failed",
+    "mutation": "A required obligation is fail",
+    "expected": "leave_open_not_qualified",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "mandatory_unknown",
+    "mutation": "A required obligation is unknown",
+    "expected": "leave_open_not_qualified",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "current_source_conflict",
+    "mutation": "Source bytes change after freeze",
+    "expected": "source_conflict_not_qualified",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "memory_absent",
+    "mutation": "No memory binding/storage",
+    "expected": "explicit_lost_continuity_handoff_no_storage_initialization",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "memory_disabled",
+    "mutation": "Bound disposable memory disabled",
+    "expected": "explicit_lost_continuity_handoff_no_storage_initialization",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "memory_stale",
+    "mutation": "Remembered source cost is 10, current source yields 8",
+    "expected": "revalidate_source_preserve_accepted_constraints",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "memory_deleted",
+    "mutation": "Deleted record requested or cached",
+    "expected": "do_not_recall_or_restore_deleted_content",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "memory_scope",
+    "mutation": "Other task/path record present",
+    "expected": "exclude_unrelated_record",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "scoped_forgetting",
+    "mutation": "Forget matching task/path",
+    "expected": "matching_absent_unrelated_preserved",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "long_constraint",
+    "mutation": "Accepted constraint is longer than 1024 chars",
+    "expected": "full_bytes_preserved_or_explicit_budget_failure_no_truncation",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "self_eval_blinding",
+    "mutation": "Current maker self-evaluation/checkpoint/proposed lesson exists",
+    "expected": "exclude_first_review",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "independent_review_unknown",
+    "mutation": "Accepted fresh record lacks exact version independent receipt",
+    "expected": "independent_review_unknown",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "raw_input_echo",
+    "mutation": "Rejected invalid request contains SYNTHETIC_REJECTED_RAW_SECRET_91A0",
+    "expected": "sentinel_absent_from_public_error_receipt",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "model_effort_substitution",
+    "mutation": "A role differs from fixed gpt-6-astra/max",
+    "expected": "reject_before_launch",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "check_byte_mutation",
+    "mutation": "Approved check changes candidate bytes",
+    "expected": "fail_closed",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "unsafe_output_path",
+    "mutation": "Candidate path escapes owned root",
+    "expected": "reject_candidate",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "wrong_report_copy",
+    "mutation": "Report copies total 70 or old calculation digest",
+    "expected": "reconciliation_fail",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "legacy_schema_bytes",
+    "mutation": "Compare all baseline old schema paths",
+    "expected": "all_baseline_hashes_unchanged",
+    "evidence_status": "pending_runtime"
+  },
+  {
+    "id": "canonical_methods",
+    "mutation": "Compare canonical methods",
+    "expected": "48_method_identities_and_baseline_hashes_unchanged",
+    "evidence_status": "pending_runtime"
+  }
+]

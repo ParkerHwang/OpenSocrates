@@ -1,5 +1,11 @@
 # Codex on Windows — OpenSocrates 1.4.0
 
+For the v1.5.0 candidate, Windows x64 native source/package qualification is tied
+to final-commit CI. No live Windows Codex host is connected, so that cell remains
+unavailable. This limits the live-support statement, not completion of other RC
+work. The 1.4.0 instructions below remain the published-release reference; see the
+[unpublished candidate handoff](v1.5.0/RELEASE_CANDIDATE.md).
+
 OpenSocrates 1.4.0 supports **Codex on Windows x64**, using native Windows
 processes. Other host integrations are removed. Windows ARM64, Windows 10,
 signing, SmartScreen reputation, and a separate clean PC remain unvalidated.

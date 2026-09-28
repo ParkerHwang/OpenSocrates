@@ -1,0 +1,114 @@
+{
+  "event_count": 13,
+  "malformed_lines": 0,
+  "usage": {
+    "input_tokens": 69754,
+    "cached_input_tokens": 62976,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 742,
+    "reasoning_output_tokens": 102
+  },
+  "usage_reports": [
+    {
+      "input_tokens": 69754,
+      "cached_input_tokens": 62976,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 742,
+      "reasoning_output_tokens": 102
+    }
+  ],
+  "turn_completed": true,
+  "errors": [],
+  "tool_actions": [
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "92482f6dd034930d41f248dbbf8506437de02de43d9547622b83024a01bb33d0",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "d927f327c7300fa4b8d08274797f4cba747884a6240395b569c506774f3c7916",
+      "exit_code": 128,
+      "status": "failed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "b6cb59d204e65e02e4a4cf5f09b6250b5dff390b8c5a2dc081a732b62c491768",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": true
+    },
+    {
+      "type": "command_execution",
+      "completed": true,
+      "command_sha256": "7439910c0e12462f016412fc0e25c0556ee7f7a4fa312373d48fd0f719c19ff0",
+      "exit_code": 0,
+      "status": "completed",
+      "direct_operations_lexical": [],
+      "structured_responses": [],
+      "source_scan_heuristic": false
+    }
+  ],
+  "tool_actions_started_or_completed": 4,
+  "failed_tool_actions": 1,
+  "incomplete_tool_actions": 0,
+  "direct_operations_lexical": {},
+  "structured_status_counts": {},
+  "protocol_rejections": 0,
+  "repeated_command_hashes": 0,
+  "native_hook_events": 0,
+  "final_message_sha256": "1013004d1be371b65ca6912d8c3bd15c1f7e45b922dc44948d2b8dad67768c0e",
+  "public_message_count": 2,
+  "billed_cost": null,
+  "server_echoed_model": null,
+  "tool_classification_limit": "Lexical direct calls and structured responses; nested invocations may be missed. Repeated hash does not itself prove unnecessary work.",
+  "public_messages": [
+    "I’ll read the controller guidance and `notice.md`, change the Thursday closing time, then check the diff.",
+    "Updated [notice.md](<disposable>/workspace/notice.md:4) so Thursday closes at 18:00. Verified that this was the only change."
+  ],
+  "commands": [
+    {
+      "command": "/bin/zsh -lc 'cat <disposable>/profile/home/.codex/plugins/cache/os-practical/opensocrates/1.4.0/skills/opensocrates/SKILL.md'",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "command": "/bin/zsh -lc \"pwd && rg --files -g 'AGENTS.md' -g 'notice.md' -g '\"'!**/.git/**'\"' && git status --short\"",
+      "exit_code": 128,
+      "status": "failed"
+    },
+    {
+      "command": "/bin/zsh -lc 'cat -n notice.md'",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "command": "/bin/zsh -lc \"python3 - <<'PY'\nfrom pathlib import Path\npath = Path('notice.md')\nbefore = path.read_bytes()\nold = b'Thursday desk closes at 17:00.'\nnew = b'Thursday desk closes at 18:00.'\nassert before.count(old) == 1\nassert before.count(b'17:00') == 1\npath.write_bytes(before.replace(old, new, 1))\nafter = path.read_bytes()\nassert after == before.replace(old, new, 1)\nprint(after.decode())\nPY\"",
+      "exit_code": 0,
+      "status": "completed"
+    }
+  ],
+  "error_events": [],
+  "trace_boundary": "Synthetic public messages and command templates only; no reasoning or raw event stream retained",
+  "exit_code": 0,
+  "wall_seconds": 33.008,
+  "timed_out": false,
+  "invocation_error": null,
+  "stderr_sha256": "6cc8f9a7718b40a8ffbfd423193c4155b82c3b3bd51069b6013550887e3ead3d",
+  "model": "gpt-6-sol",
+  "effort": "medium",
+  "client_version": "codex-cli 0.158.0-alpha.2",
+  "process_success": true
+}

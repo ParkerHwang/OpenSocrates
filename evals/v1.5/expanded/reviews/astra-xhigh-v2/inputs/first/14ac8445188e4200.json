@@ -1,0 +1,51 @@
+{
+  "packet_id": "14ac8445188e4200",
+  "task_kind": "memory",
+  "locale": "ko",
+  "task_requests": [
+    "새 세션입니다. venues.md가 바뀌었습니다. 참석자 52명, 예산 상한 $1,400, 계단 없는 출입과 조용한 방이라는 승인 조건을 유지하며 plan.json을 고치세요. plan.json에는 selected_venue(문자열), attendees(정수), venue_cost_usd(정수), required_features(step_free와 quiet_room 코드 배열), status(proposed_unbooked 문자열), basis(source_path 문자열과 observed_capacity 정수 객체)를 넣으세요. Cedar의 옛 수용 인원 60명은 철회됐으니 그 사실을 잊고 현재 자료를 사용하세요. 유지할 승인 의도를 보존하고 철회된 사실이 든 정확한 레코드를 삭제하는 것은 이미 허용됐습니다. 설치된 메모리 API로 이 범위의 삭제를 완료하고 SQLite를 직접 편집하지 마세요. plan.json뿐 아니라 저장된 메모리 상태도 검증하세요. 예약이 이뤄졌다고 주장하지 마세요."
+  ],
+  "source_before": {
+    "venues.md": "Current venue inventory for 52 attendees:\n- Cedar: capacity 60, $1,100, step-free, quiet room available.\n- Harbor: capacity 65, $1,300, step-free, quiet room available.\n- Birch: capacity 70, $900, stairs only, no quiet room.\n",
+    "calendar.md": "The workshop is on Saturday. Venue budget ceiling is $1,400. No booking has been made.\n",
+    "plan.json": "{\"selected_venue\":\"Cedar\",\"attendees\":52,\"venue_cost_usd\":1100,\"required_features\":[\"step_free\",\"quiet_room\"],\"status\":\"proposed_unbooked\",\"basis\":{\"source_path\":\"venues.md\",\"observed_capacity\":60}}\n"
+  },
+  "source_transition": {
+    "venues.md": "Current venue inventory for 52 attendees (revised capacity list):\n- Cedar: capacity 48, $1,100, step-free, quiet room available.\n- Harbor: capacity 65, $1,300, step-free, quiet room available.\n- Birch: capacity 70, $900, stairs only, no quiet room.\n"
+  },
+  "stages": [
+    {
+      "artifacts": {
+        "plan.json": "{\"selected_venue\":\"Harbor\",\"attendees\":52,\"venue_cost_usd\":1300,\"required_features\":[\"step_free\",\"quiet_room\"],\"status\":\"proposed_unbooked\",\"basis\":{\"source_path\":\"venues.md\",\"observed_capacity\":65}}\n"
+      },
+      "public_final": ""
+    }
+  ],
+  "public_messages_by_turn": [
+    null
+  ],
+  "message_missing_reason": "Parser failure; never interpret missing messages as no question or no tool work",
+  "human_status": "unavailable",
+  "human_scores": null,
+  "non_blindable_cues": "Memory operations, retained intent and characteristic phrasing can reveal treatment; version/model labels removed",
+  "persisted_public_records": [
+    {
+      "record_id": "5b7f62e3-5d0e-468a-8e5e-60e251425ca2",
+      "summary": "For this Saturday workshop, 52 attendees need step-free entry and a quiet room; among qualifying venues, choose the least costly within $1,400. Initial Cedar selection was based on capacity 60 and is revisable when source facts change. No booking exists.",
+      "rationale": null,
+      "lifecycle": "accepted",
+      "scope": {
+        "level": "project"
+      }
+    },
+    {
+      "record_id": "5ca91de8-bbd5-42b1-8da1-36933ed3bf3c",
+      "summary": "For this Saturday workshop, 52 attendees need step-free entry and a quiet room; among qualifying venues, choose the least costly within $1,400. No booking has been made.",
+      "rationale": null,
+      "lifecycle": "proposed",
+      "scope": {
+        "level": "project"
+      }
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "groups": [
+    {
+      "name": "page_identity_and_login",
+      "pass": true,
+      "details": {
+        "url": "http://127.0.0.1:58208/",
+        "title": "DepotFlow · Fulfillment"
+      }
+    },
+    {
+      "name": "inventory_rendered",
+      "pass": true,
+      "details": "SKU\tITEM\tON HAND\tRESERVED\tAVAILABLE\tUNIT PRICE\tVERSION\nBOLT\tSteel bolt kit\t100\t0\t100\t$12.50\t1\nCABLE\tCable assembly\t60\t0\t60\t$24.99\t1\nSAMPLE\tSample pack\t20\t0\t20\t$0.00\t1"
+    },
+    {
+      "name": "create_reserve_ship_return_flow",
+      "pass": true,
+      "details": "BROWSER-CHECK\nReturned\nOrder 18fcd7d1-7661-41d4-8d1c-d95a31a2f4f2 · version 4\nClose detail\nSKU\tQUANTITY\tRETURNED\tUNIT PRICE\tLINE TOTAL\nBOLT\t2\t2\t$12.50\t$25.00\nCABLE\t1\t1\t$24.99\t$24.99\n\nOrder total: $49.99"
+    },
+    {
+      "name": "audit_rendered",
+      "pass": true,
+      "details": "TIME\tACTION\tENTITY\tACTOR\n9/27/2026, 9:48:57 PM\torder.created\t18fcd7d1-7661-41d4-8d1c-d95a31a2f4f2\tadmin@north.example\n9/27/2026, 9:48:57 PM\torder.reserved\t18fcd7d1-7661-41d4-8d1c-d95a31a2f4f2\tadmin@north.example\n9/27/2026, 9:48:57 PM\torder.shipped\t18fcd7d1-7661-41d4-8d1c-d95a31a2f4f2\tadmin@north.example\n9/27/2026, 9:48:57 PM\torder.returned\t18fcd7d1-7661-41d4-8d1c-d95a31a2f4f2\tadmin@north.example"
+    },
+    {
+      "name": "mobile_layout",
+      "pass": true,
+      "details": {
+        "viewport": 390,
+        "document": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "viewer_workflow_read_only",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "no_uncaught_client_error",
+      "pass": true,
+      "details": null
+    }
+  ],
+  "passed": 7,
+  "total": 7,
+  "consoleEvents": [],
+  "errors": [],
+  "automation": "bundled Playwright; fresh headless Chromium context; library native wait behavior",
+  "flow": "login -> inventory -> create multi-line order -> reserve -> ship -> return -> audit -> viewer"
+}

@@ -1,0 +1,161 @@
+{
+  "label": "new-checker-original",
+  "project": "$DEMO/apps/v1.5.0-rc",
+  "counts": {
+    "pass": 14,
+    "fail": 10,
+    "error": 0,
+    "unassessable": 0
+  },
+  "checks": [
+    {
+      "name": "cli partial date omitted",
+      "group": "cli partial date omitted",
+      "status": "fail",
+      "detail": "expected explicit rejection"
+    },
+    {
+      "name": "cli partial date null",
+      "group": "cli partial date null",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "cli partial date invalid",
+      "group": "cli partial date invalid",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "cli full date default",
+      "group": "cli full date default",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "cli invalid date batch position 0",
+      "group": "cli invalid date batch position 0",
+      "status": "fail",
+      "detail": "expected explicit rejection"
+    },
+    {
+      "name": "cli invalid date batch position 1",
+      "group": "cli invalid date batch position 1",
+      "status": "fail",
+      "detail": "expected explicit rejection"
+    },
+    {
+      "name": "cli invalid date batch position 2",
+      "group": "cli invalid date batch position 2",
+      "status": "fail",
+      "detail": "expected explicit rejection"
+    },
+    {
+      "name": "http partial date omitted",
+      "group": "http partial date omitted",
+      "status": "fail",
+      "detail": "expected explicit rejection"
+    },
+    {
+      "name": "http partial date null",
+      "group": "http partial date null",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "http partial date invalid",
+      "group": "http partial date invalid",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "http full date default",
+      "group": "http full date default",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "http invalid date batch position 0",
+      "group": "http invalid date batch position 0",
+      "status": "fail",
+      "detail": "expected explicit rejection"
+    },
+    {
+      "name": "http invalid date batch position 1",
+      "group": "http invalid date batch position 1",
+      "status": "fail",
+      "detail": "expected explicit rejection"
+    },
+    {
+      "name": "http invalid date batch position 2",
+      "group": "http invalid date batch position 2",
+      "status": "fail",
+      "detail": "expected explicit rejection"
+    },
+    {
+      "name": "genuine mixed v1.5.0-rc: known line refund",
+      "group": "genuine mixed v1.5.0-rc: known line refund",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "domain result/state ownership new",
+      "group": "domain",
+      "status": "fail",
+      "detail": "AssertionError [ERR_ASSERTION]: mutating command result alters next state/replay evidence\n+ actual - expected\n\n+ '{\"schemaVersion\":2,\"revision\":1,\"reservations\":[],\"maintenance\":[{\"id\":\"alias\",\"itemId\":\"camera\",\"start\":\"2026-11-20\",\"end\":\"2026-11-21\",\"quantity\":2}],\"audit\":[{\"revision\":1,\"type\":\"maintenance.add\",\"id\":\"alias\",\"timestamp\":\"fixed\"}],\"idempotency\":{\"alias\":{\"fingerprint\":\"{\\\\\"end\\\\\":\\\\\"2026-11-21\\\\\",\\\\\"id\\\\\":\\\\\"alias\\\\\",\\\\\"itemId\\\\\":\\\\\"camera\\\\\",\\\\\"quantity\\\\\":1,\\\\\"start\\\\\":\\\\\"2026-11-20\\\\\",\\\\\"type\\\\\":\\\\\"maintenance.add\\\\\"}\",\"result\":{\"id\":\"alias\",\"itemId\":\"camera\",\"start\":\"2026-11-20\",\"end\":\"2026-11-21\",\"quantity\":1}}},\"batchIdempotency\":{}}'\n- '{\"schemaVersion\":2,\"revision\":1,\"reservations\":[],\"maintenance\":[{\"id\":\"alias\",\"itemId\":\"camera\",\"start\":\"2026-11-20\",\"end\":\"2026-11-21\",\"quantity\":1}],\"audit\":[{\"revision\":1,\"type\":\"maintenance.add\",\"id\":\"alias\",\"timestamp\":\"fixed\"}],\"idempotency\":{\"alias\":{\"fingerprint\":\"{\\\\\"end\\\\\":\\\\\"2026-11-21\\\\\",\\\\\"id\\\\\":\\\\\"alias\\\\\",\\\\\"itemId\\\\\":\\\\\"camera\\\\\",\\\\\"quantity\\\\\":1,\\\\\"start\\\\\":\\\\\"2026-11-20\\\\\",\\\\\"type\\\\\":\\\\\"maintenance.add\\\\\"}\",\"result\":{\"id\":\"alias\",\"itemId\":\"camera\",\"start\":\"2026-11-20\",\"end\":\"2026-11-21\",\"quantity\":1}}},\"batchIdempotency\":{}}'\n"
+    },
+    {
+      "name": "domain result/state ownership replay",
+      "group": "domain",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "domain rejected batch position 0",
+      "group": "domain",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "domain rejected batch position 1",
+      "group": "domain",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "domain rejected batch position 2",
+      "group": "domain",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "domain partial date undefined",
+      "group": "domain",
+      "status": "fail",
+      "detail": "AssertionError [ERR_ASSERTION]: Missing expected exception."
+    },
+    {
+      "name": "domain partial date null",
+      "group": "domain",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "domain partial date 2026-02-30",
+      "group": "domain",
+      "status": "pass",
+      "detail": null
+    },
+    {
+      "name": "domain batch results remain snapshots",
+      "group": "domain",
+      "status": "pass",
+      "detail": null
+    }
+  ],
+  "limitations": [
+    "Cross-format known allocation requires consumer support; unsupported import is a limitation, not missing historical evidence.",
+    "Output alias failures concern mutable result ownership, not input purity or determinism.",
+    "No model judgments collected; historical counts unchanged."
+  ]
+}

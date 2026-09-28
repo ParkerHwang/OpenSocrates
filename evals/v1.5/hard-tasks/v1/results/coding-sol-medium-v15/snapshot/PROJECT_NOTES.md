@@ -1,0 +1,5 @@
+AuditLedger implementation completed in `cmd/server/main.go` and `internal/platform/driver.go`. Current schema is v2; all writes and success retry records share a SQLite `BEGIN IMMEDIATE` transaction. Legacy v1 import preserves original tables and infers openings from final balances and movements. Tenant-local entries drive historical summaries.
+
+Checks run: `go build -o server ./cmd/server`; `go test ./...`; localhost functional checks for retry, batch rollback, holds, capture, reversal, tenant isolation, paging and snapshots; v1 fixture migration with notes preservation; two-process concurrent same-key and distinct-key writes; successful replay and summary after process restart; final functional pass after validation changes. No performance sweep run. The supplied task, fixture, tooling and memory files were preserved. No server should remain running from these checks.
+
+Independent acceptance and performance results are unavailable in this session. Recheck source and current behavior before using these notes for later work.
