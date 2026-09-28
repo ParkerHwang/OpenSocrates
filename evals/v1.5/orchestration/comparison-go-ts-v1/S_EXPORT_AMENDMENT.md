@@ -42,3 +42,10 @@ completed S candidate directories at the preparation checkpoint. Audit the
 final source hash and ZIP membership before
 claiming a portable S evidence package. S external qualification remains
 pending until every S episode has a terminal or explicit unknown marker.
+
+Pre-use `export_s.py` SHA-256:
+`19f44705b69a128149bc340b06cb4ee8c9db7b9a96b50258b9caa39f52a6d937`.
+An independent read-only pre-use audit (SHA-256
+`2f38ed79e786799c596ca492e81a9808e12d176e53998a7d402bf5ecd5398178`)
+matched the frozen descriptor, all eight controls and the 23 then-terminal
+episodes. This is source readiness, not proof of a final archive or S quality.
