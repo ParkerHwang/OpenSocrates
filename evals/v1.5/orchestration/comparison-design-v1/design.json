@@ -1,0 +1,687 @@
+{
+  "schema": "opensocrates.orchestration.comparison-design/1",
+  "status": "draft_not_execution_frozen",
+  "date": "2026-09-28",
+  "outcome_calls_started_by_this_design": 0,
+  "execution_authorization_from_this_document": false,
+  "inspected_head": "d0156a86cfd4dc197554f1be0261c258cec7da2e",
+  "inspected_main": "5a2ff3c312e92aa8a44d0905465674d9a4e4f645",
+  "pull_request": 95,
+  "issue": 94,
+  "draft_pr": true,
+  "existing_ci": {
+    "run": 36343827304,
+    "conclusion": "success",
+    "newly_executed_for_this_design": false
+  },
+  "client": {
+    "required_version": "codex-cli 0.158.0-alpha.2",
+    "actual_execution_sha256": null,
+    "access_reverified_for_new_cells": false
+  },
+  "fast_mode": false,
+  "same_model_and_effort_for_every_role": true,
+  "experimenter_model_budgets": {
+    "wall_clock_seconds": null,
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "tool_calls": null,
+    "output_bytes": null,
+    "internal_retries": null
+  },
+  "product_contract_bounds_are_not_removed": true,
+  "arms": [
+    {
+      "id": "A",
+      "label": "vanilla_single_author",
+      "workflow": "single_author",
+      "nominal_no_repair_calls": 1
+    },
+    {
+      "id": "B",
+      "label": "pre_orchestration_v15_single_author",
+      "workflow": "single_author",
+      "nominal_no_repair_calls": 1,
+      "product_commit": "035fafcd208bf9577ca55ff5e42a93df4ca608ea",
+      "package_sha256": "52994553d51e8fd65285165d39ea004be819e56da8dab99c22968591a165dc76"
+    },
+    {
+      "id": "C",
+      "label": "vanilla_role_matched_control",
+      "workflow": "two_units_three_roles_each",
+      "nominal_no_repair_calls": 6,
+      "native_repair_limit": 2,
+      "evaluation_only": true
+    },
+    {
+      "id": "D",
+      "label": "current_v15_orchestration",
+      "workflow": "two_units_three_roles_each",
+      "nominal_no_repair_calls": 6,
+      "native_repair_limit": 2,
+      "product_source_commit": "6eb8d3774f3a9032f580359b38b8bf11208f70d3",
+      "recorded_package_sha256": "01c5c1852a4c6293d835a5cf3b73fee22c6eef3bb62a9ecc2f1e1cd2651cf9c9"
+    }
+  ],
+  "models": [
+    {
+      "name": "gpt-6-sol",
+      "effort": "high"
+    },
+    {
+      "name": "gpt-6-luna",
+      "effort": "max"
+    },
+    {
+      "name": "gpt-6-luna",
+      "effort": "high"
+    },
+    {
+      "name": "gpt-5.6-luna",
+      "effort": "max"
+    },
+    {
+      "name": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "name": "gpt-6-astra",
+      "effort": "xhigh"
+    }
+  ],
+  "main_cells": [
+    {
+      "id": "S-incidentops-gpt-6-sol-high-A",
+      "task": "S-incidentops",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "A",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-sol-high-B",
+      "task": "S-incidentops",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "B",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-sol-high-C",
+      "task": "S-incidentops",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "C",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-sol-high-D",
+      "task": "S-incidentops",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "D",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-luna-max-A",
+      "task": "S-incidentops",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "A",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-luna-max-B",
+      "task": "S-incidentops",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "B",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-luna-max-C",
+      "task": "S-incidentops",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "C",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-luna-max-D",
+      "task": "S-incidentops",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "D",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-luna-high-A",
+      "task": "S-incidentops",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "A",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-luna-high-B",
+      "task": "S-incidentops",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "B",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-luna-high-C",
+      "task": "S-incidentops",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "C",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-luna-high-D",
+      "task": "S-incidentops",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "D",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-5.6-luna-max-A",
+      "task": "S-incidentops",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "A",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-5.6-luna-max-B",
+      "task": "S-incidentops",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "B",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-5.6-luna-max-C",
+      "task": "S-incidentops",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "C",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-5.6-luna-max-D",
+      "task": "S-incidentops",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "D",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-5.6-luna-high-A",
+      "task": "S-incidentops",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "A",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-5.6-luna-high-B",
+      "task": "S-incidentops",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "B",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-5.6-luna-high-C",
+      "task": "S-incidentops",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "C",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-5.6-luna-high-D",
+      "task": "S-incidentops",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "D",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-astra-xhigh-A",
+      "task": "S-incidentops",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "A",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-astra-xhigh-B",
+      "task": "S-incidentops",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "B",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-astra-xhigh-C",
+      "task": "S-incidentops",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "C",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "S-incidentops-gpt-6-astra-xhigh-D",
+      "task": "S-incidentops",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "D",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-sol-high-A",
+      "task": "O-service_network",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "A",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-sol-high-B",
+      "task": "O-service_network",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "B",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-sol-high-C",
+      "task": "O-service_network",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "C",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-sol-high-D",
+      "task": "O-service_network",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "arm": "D",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-luna-max-A",
+      "task": "O-service_network",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "A",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-luna-max-B",
+      "task": "O-service_network",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "B",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-luna-max-C",
+      "task": "O-service_network",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "C",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-luna-max-D",
+      "task": "O-service_network",
+      "model": "gpt-6-luna",
+      "effort": "max",
+      "arm": "D",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-luna-high-A",
+      "task": "O-service_network",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "A",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-luna-high-B",
+      "task": "O-service_network",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "B",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-luna-high-C",
+      "task": "O-service_network",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "C",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-luna-high-D",
+      "task": "O-service_network",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "arm": "D",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-5.6-luna-max-A",
+      "task": "O-service_network",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "A",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-5.6-luna-max-B",
+      "task": "O-service_network",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "B",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-5.6-luna-max-C",
+      "task": "O-service_network",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "C",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-5.6-luna-max-D",
+      "task": "O-service_network",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "arm": "D",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-5.6-luna-high-A",
+      "task": "O-service_network",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "A",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-5.6-luna-high-B",
+      "task": "O-service_network",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "B",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-5.6-luna-high-C",
+      "task": "O-service_network",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "C",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-5.6-luna-high-D",
+      "task": "O-service_network",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "arm": "D",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-astra-xhigh-A",
+      "task": "O-service_network",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "A",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-astra-xhigh-B",
+      "task": "O-service_network",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "B",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-astra-xhigh-C",
+      "task": "O-service_network",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "C",
+      "locale": "en",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "O-service_network-gpt-6-astra-xhigh-D",
+      "task": "O-service_network",
+      "model": "gpt-6-astra",
+      "effort": "xhigh",
+      "arm": "D",
+      "locale": "en",
+      "state": "proposed_not_started"
+    }
+  ],
+  "continuity_cells": [
+    {
+      "id": "continuity-gpt-6-sol-high-en-scoped_disposable_memory",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "locale": "en",
+      "context_condition": "scoped_disposable_memory",
+      "workflow": "one_unit_three_roles",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "continuity-gpt-6-sol-high-en-disabled_memory_with_equivalent_note",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "locale": "en",
+      "context_condition": "disabled_memory_with_equivalent_note",
+      "workflow": "one_unit_three_roles",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "continuity-gpt-6-sol-high-ko-scoped_disposable_memory",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "locale": "ko",
+      "context_condition": "scoped_disposable_memory",
+      "workflow": "one_unit_three_roles",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "continuity-gpt-6-sol-high-ko-disabled_memory_with_equivalent_note",
+      "model": "gpt-6-sol",
+      "effort": "high",
+      "locale": "ko",
+      "context_condition": "disabled_memory_with_equivalent_note",
+      "workflow": "one_unit_three_roles",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "continuity-gpt-6-luna-high-en-scoped_disposable_memory",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "locale": "en",
+      "context_condition": "scoped_disposable_memory",
+      "workflow": "one_unit_three_roles",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "continuity-gpt-6-luna-high-en-disabled_memory_with_equivalent_note",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "locale": "en",
+      "context_condition": "disabled_memory_with_equivalent_note",
+      "workflow": "one_unit_three_roles",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "continuity-gpt-6-luna-high-ko-scoped_disposable_memory",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "locale": "ko",
+      "context_condition": "scoped_disposable_memory",
+      "workflow": "one_unit_three_roles",
+      "state": "proposed_not_started"
+    },
+    {
+      "id": "continuity-gpt-6-luna-high-ko-disabled_memory_with_equivalent_note",
+      "model": "gpt-6-luna",
+      "effort": "high",
+      "locale": "ko",
+      "context_condition": "disabled_memory_with_equivalent_note",
+      "workflow": "one_unit_three_roles",
+      "state": "proposed_not_started"
+    }
+  ],
+  "counts": {
+    "main_episodes": 48,
+    "continuity_episodes": 8,
+    "main_nominal_no_repair_role_calls": 168,
+    "continuity_nominal_no_repair_role_calls": 24,
+    "combined_nominal_no_repair_role_calls": 192,
+    "new_external_model_judge_calls_planned": 0
+  },
+  "count_interpretation": "Nominal successful first-pass process count, not a token/time budget or guaranteed minimum. Early blocking can reduce it; all repairs, probes and failed invocations count separately.",
+  "not_included": [
+    "new_v14_arm",
+    "language_free_greenfield_comparison",
+    "live_web_research",
+    "native_binary_office_authoring",
+    "stronger_model_assistance",
+    "human_review_recruitment",
+    "account_side_isolation_proof",
+    "backend_model_echo",
+    "billing_proof",
+    "active_installation_changes",
+    "release_actions"
+  ],
+  "control_isolation_scope": "C versus D matches coordinator mechanics and isolates added guidance; C is evaluation-only, not an unmodified installed vanilla product.",
+  "historical_evidence_not_pooled": [
+    "evals/v1.5/fullstack-consulting/v2",
+    "evals/v1.5/fullstack-consulting/analysis-v1",
+    "evals/v1.5/orchestration/v1"
+  ],
+  "execution_freeze_pending": [
+    "executable_task_and_transition_bytes",
+    "public_checks_and_sequestered_oracles",
+    "known_good_and_faulty_oracle_controls",
+    "all_owned_paths_and_graphs",
+    "neutral_control_implementation_and_guides",
+    "package_and_client_execution_copy_rehash",
+    "new_adapter_filesystem_isolation_canaries",
+    "external_integration_sandbox_and_commands",
+    "performance_request_bodies_seeding_checks_and_timing",
+    "assignment_order_and_atomic_dispatch",
+    "privacy_safe_usage_and_missingness_fields",
+    "failure_policy_and_portable_export_allowlist"
+  ],
+  "execution_manifest_sha256": null,
+  "plan_sha256": "4546b04f0319a468d6cee856e5bded103d12225442c2476e6a92a44b344f4d8e",
+  "improvement_cycle": {
+    "plan_objective_measure": "Verified implementation and historical failures are the baseline; new correctness, review/repair, continuity and total-usage benefit remain unverified.",
+    "do_scope": "Not started. Proposed 48 main and eight separate continuation episodes on disposable resources.",
+    "check_rule": "Freeze tasks, oracles, arms and permissions before calls; retain every failure and compare exact candidate versions.",
+    "act_standardize_decision": "Hold benefit and default-profile claims pending outcomes. No favorable-result-only expansion."
+  },
+  "performance_design": {
+    "concurrency": [
+      1,
+      8,
+      32
+    ],
+    "operations": [
+      "incident_list",
+      "unique_event_ingestion"
+    ],
+    "seed_incidents": 10000,
+    "measured_requests_per_operation_and_concurrency": 1000,
+    "warmup_requests_per_operation_and_concurrency": 100,
+    "database_per_operation_and_concurrency": "fresh",
+    "durability": "starter SQLite WAL/FULL",
+    "model_invocations": 0
+  },
+  "native_and_external_acceptance_obligations_separate": true,
+  "unit_classification": {
+    "S-design": {
+      "domain": "software",
+      "role": "design"
+    },
+    "S-implementation": {
+      "domain": "software",
+      "role": "production"
+    },
+    "O-analysis": {
+      "domain": "software",
+      "role": "production"
+    },
+    "O-document": {
+      "domain": "document",
+      "role": "production"
+    }
+  }
+}
