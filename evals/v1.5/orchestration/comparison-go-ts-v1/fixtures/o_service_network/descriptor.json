@@ -1,0 +1,242 @@
+{
+  "schema": "opensocrates.eval.single-task-fixture/1.0.0",
+  "base_commit": "d0156a86cfd4dc197554f1be0261c258cec7da2e",
+  "task": {
+    "task_id": "O",
+    "objective": "Deliver a Go analysis and Markdown decision memo for the synthetic regional service network.",
+    "public_root": "o_service_network/public",
+    "starter_root": "starter",
+    "sources": [
+      {
+        "id": "contract",
+        "path": "CONTRACT.md",
+        "sha256": "sha256:a80b8f08ce9b6b6aa8aff52dca5476687c30a93cef5a6776f338cc06af44673f"
+      },
+      {
+        "id": "native",
+        "path": "native_check.py",
+        "sha256": "sha256:fa10912a6ea144c3db9ad599d8b0143f4458848597b0dee64a2a4998c310aa46"
+      },
+      {
+        "id": "go-starter",
+        "path": "starter/analysis.go",
+        "sha256": "sha256:675d5ad8a745d4e1f5decb6f6daaa74073b3edb3e360f020f0de06bedcfebc94"
+      },
+      {
+        "id": "data-manifest",
+        "path": "data/manifest.json",
+        "sha256": "sha256:83514eb9da14280ce680f17b4afac94d087b454eff7b38d9f1641071188a1285"
+      },
+      {
+        "id": "orders-v1",
+        "path": "data/orders.json",
+        "sha256": "sha256:991ebf521f9f5ee7f7b42d479eb62cd4f216f5b4704b48e51939124e038569dd"
+      },
+      {
+        "id": "events-v1",
+        "path": "data/events.json",
+        "sha256": "sha256:0f0e1a66de10bfc18c84f510d246116ee9c2e1f350a482e00353e319c3fe42c7"
+      },
+      {
+        "id": "sla-v1",
+        "path": "data/sla_policies.json",
+        "sha256": "sha256:044964ed07bfb0c87fa200be079aef23ce4b1a23de2c5a5dc6fa8b5bce3a5c51"
+      },
+      {
+        "id": "capacity-v1",
+        "path": "data/capacity.json",
+        "sha256": "sha256:22c0775c5288bce1ec0950b4f3fa743e596a53e46afb36602a4a8f8910433ef1"
+      },
+      {
+        "id": "rates-v1",
+        "path": "data/supplier_rates.json",
+        "sha256": "sha256:c984462616605f4122f9e32904f36a68f6fc781c8b43420da588709b4cd54412"
+      },
+      {
+        "id": "shared-v1",
+        "path": "data/shared_costs.json",
+        "sha256": "sha256:1a9131e5fc9ffc4fcd4f346d9721d7ee2a2be4e1a0c66fb144d6b11bc2578dde"
+      }
+    ],
+    "constraints": [
+      {
+        "id": "O-contract",
+        "text": "# Regional service-network decision (synthetic)\n\nBuild a reusable Go analysis program and a Markdown decision memo from this frozen data room. All figures describe a synthetic operation; do not infer market demand. The decision date is `2026-06-30T23:59:59Z`. Source IDs in `data/manifest.json` bind every claim. The unit `O-analysis` owns `analysis.go`, `metrics.json`, and `sources.json`; `O-document` owns `memo.md` and depends on the qualified analysis. Use Go for calculation. `analysis.go` must run as `go run analysis.go -data <data directory> -out <metrics path>` in an isolated copy. The committed `metrics.json` must match this program's output for the frozen data. The source register records relative path, SHA-256 and source ID for every used file.\n\n## Grain and selection\n\n`orders.json` has one immutable order per `order_id`. `events.json` has append-only updates; for each `order_id`, select the event with greatest `recorded_at <= decision_date`, breaking ties by larger integer `revision`, then event ID. Do not pick the greatest status, amount, or occurrence time. An event can correct a previous status, work duration, charge, part quantity or completion time. The selected event fully replaces those fields; `null` means missing, whereas numeric zero is known zero. Cancelled orders are excluded from operating metrics but remain in reconciliation counts. Nonempty warranty work with zero charge remains an eligible job. Duplicate event ID is invalid input. No selected event is an unknown status.\n\nSLA policy is selected by greatest `effective_at <= order.created_at` for its priority; tied policies use larger revision. The policy has an integer target in hours and credit rate in basis points. A completed noncancelled job is SLA eligible when `completed_at` is present. On-time means completion at or before created time plus target hours. Attainment is on-time count divided by eligible count; output ratio as a decimal rounded half-up to 4 places (null when denominator zero). Credit is calculated per late job as charge cents times credit basis points / 10000, rounded half-up to integer cents, then summed. A late job with missing charge contributes no known cents and increments `unknown_credit_jobs`; a late warranty zero-charge job contributes known zero cents. Do not silently impute a missing charge as zero.\n\nBacklog is the count of noncancelled selected events in `open` or `scheduled` state. Capacity is available technician minutes by facility from `capacity.json`, minus completed noncancelled work minutes assigned to that facility; report both available and used minutes. For `part_cost_cents`, select supplier unit rate by part ID and greatest `effective_at <= completed_at` (tie by revision), multiply by each completed event's quantity, then sum. Missing quantity/rate is unknown, not zero; report `unknown_part_cost_jobs`. Units are cents and minutes. No floating-point currency arithmetic.\n\n## Facility decision\n\nCompare three feasible portfolios: `east`, `west`, and `east+west`. Each facility has fixed monthly cost in `capacity.json`; a portfolio with two facilities also incurs one shared dispatch cost from `shared_costs.json`. The only forecast demand in this exercise is the frozen assigned order set, so report observed completed work and available minutes by portfolio; do not claim customer demand can move freely between facilities. Feasible means available minutes at least used minutes for the observed portfolio. Rank feasible portfolios by monthly fixed plus shared costs, but state the lost coverage/assignment caveat for a single-facility option. Sensitivity: increase only part `relay` rates effective from `2026-04-01T00:00:00Z` by 10%, rounded half-up per unit before multiplication. Show baseline and sensitivity part cost; do not change labor minutes, SLA, or fixed facility costs.\n\nOutput stable JSON keys for selection counts, `backlog`, `sla`, `capacity`, `part_cost`, `portfolios`, and `sensitivity`; include numerator/denominator and unknown counts, not only percentages. `memo.md` cites metric JSON keys and relevant source IDs, compares all three portfolios, recommends one with stated criteria and uncertainty, sets an operating plan, and keeps a risk/assumption register. Put each material numeric claim in an evidence table with a JSON pointer and its value (for example, `| /backlog | 2 | orders-v1, events-v1 |`); prose may refer to that table. Include the monthly cost, assigned completed-job count, available and used minutes, and feasibility value for **each** portfolio. Add plain-text lines `Recommendation: <east|west|east+west>`, `Criterion: ...`, and `Uncertainty: ...`; these are stable decision-record fields, not a fixed answer. A single-facility recommendation must explicitly address coverage/assignment loss and a validation step before closure. A different recommendation is acceptable when it follows the data and stated criteria. A polished memo with wrong arithmetic is not acceptable.\n\nNative read-only checks may inspect valid JSON, source register hashes and Markdown references. The external qualification stage compiles/runs Go in a disposable copy, independently calculates numeric answers, and checks document bindings. No write or network operation is part of native product checks.\n"
+      }
+    ],
+    "permissions": [
+      "Create only declared candidate artifacts and run approved read-only public checks; external qualification runs later in marked disposable copies."
+    ],
+    "prohibitions": [
+      "No real notification, external accounts, network research, existing-project write, or undeclared artifact."
+    ],
+    "handoff": [
+      "The source contract is the complete accepted public task; all arms receive identical facts.",
+      "Native qualification covers only declared static obligations. Final build/API/browser/restart/performance and private oracle evidence are external and pending until verified."
+    ],
+    "required_artifacts": [
+      "analysis.go",
+      "metrics.json",
+      "sources.json",
+      "memo.md"
+    ],
+    "units": [
+      {
+        "unit_id": "O-analysis",
+        "domain": "software",
+        "task_kind": "judgment",
+        "role": "production",
+        "objective": "Author executable Go service-network reconciliation and frozen metric/source JSON.",
+        "owned_paths": [
+          "analysis.go",
+          "metrics.json",
+          "sources.json"
+        ],
+        "dependencies": [],
+        "source_ids": [
+          "contract",
+          "native",
+          "go-starter",
+          "data-manifest",
+          "orders-v1",
+          "events-v1",
+          "sla-v1",
+          "capacity-v1",
+          "rates-v1",
+          "shared-v1"
+        ],
+        "requirement_ids": [
+          "O-contract"
+        ],
+        "specialists": [
+          "contracts",
+          "ownership"
+        ],
+        "obligations": [
+          {
+            "id": "O-json-source-structure",
+            "requirement_id": "O-contract",
+            "description": "Metric JSON has required sections and source register hashes match staged data bytes.",
+            "required": true
+          },
+          {
+            "id": "O-go-parse",
+            "requirement_id": "O-contract",
+            "description": "Go analysis file parses as Go source.",
+            "required": true
+          }
+        ],
+        "checks": [
+          {
+            "check_id": "O-static",
+            "argv": [
+              "/usr/bin/python3",
+              "-B",
+              "inputs/native/native_check.py",
+              "analysis"
+            ],
+            "obligation_ids": [
+              "O-json-source-structure"
+            ],
+            "authorization_reference": "user:current-request",
+            "expected_exit_code": 0
+          },
+          {
+            "check_id": "O-gofmt-parse",
+            "argv": [
+              "/usr/local/go/bin/gofmt",
+              "-e",
+              "analysis.go"
+            ],
+            "obligation_ids": [
+              "O-go-parse"
+            ],
+            "authorization_reference": "user:current-request",
+            "expected_exit_code": 0
+          }
+        ],
+        "seed": null
+      },
+      {
+        "unit_id": "O-document",
+        "domain": "document",
+        "task_kind": "judgment",
+        "role": "production",
+        "objective": "Write a source-linked Markdown decision memo using the qualified numeric analysis.",
+        "owned_paths": [
+          "memo.md"
+        ],
+        "dependencies": [
+          "O-analysis"
+        ],
+        "source_ids": [
+          "contract",
+          "native",
+          "go-starter",
+          "data-manifest",
+          "orders-v1",
+          "events-v1",
+          "sla-v1",
+          "capacity-v1",
+          "rates-v1",
+          "shared-v1"
+        ],
+        "requirement_ids": [
+          "O-contract"
+        ],
+        "specialists": [],
+        "obligations": [
+          {
+            "id": "O-document-structure",
+            "requirement_id": "O-contract",
+            "description": "Memo exists with a source-linked evidence table and risk section.",
+            "required": true
+          }
+        ],
+        "checks": [
+          {
+            "check_id": "O-memo-static",
+            "argv": [
+              "/usr/bin/python3",
+              "-B",
+              "inputs/native/native_check.py",
+              "document"
+            ],
+            "obligation_ids": [
+              "O-document-structure"
+            ],
+            "authorization_reference": "user:current-request",
+            "expected_exit_code": 0
+          }
+        ],
+        "seed": null
+      }
+    ],
+    "external_qualification": {
+      "entrypoint": "verify_external.py",
+      "task_arg": "O",
+      "command_template": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "-B",
+        "{entrypoint}",
+        "--task",
+        "O",
+        "--candidate",
+        "{marked_disposable_copy}",
+        "--deps",
+        "{deps_root}",
+        "--candidate-policy",
+        "{candidate_policy}"
+      ],
+      "obligations": [
+        "go_build",
+        "program_artifact_match",
+        "independent_numeric_oracle",
+        "source_hashes",
+        "document_bindings"
+      ],
+      "sandbox": "copy_scoped_writes_and_loopback_only"
+    }
+  },
+  "scope": "O24 preparation; S and continuity are separate and pending"
+}
