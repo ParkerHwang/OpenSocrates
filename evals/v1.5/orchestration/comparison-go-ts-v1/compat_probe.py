@@ -272,7 +272,15 @@ def execute(manifest_path: Path, expected_sha: str) -> dict[str, Any]:
     child_env.update({
         "HOME": str(episode / "home"), "CODEX_HOME": str(episode / "home/.codex"),
         "TMPDIR": str(episode / "tmp"), "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPATH": os.pathsep.join((str(HERE.parents[3] / "src"), str(HERE))),
     })
+    import_check = subprocess.run(
+        [sys.executable, "-B", "-c", "import opensocrates; import compat_probe"],
+        env=child_env, cwd=role, stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False,
+    )
+    if import_check.returncode != 0:
+        raise ValueError("child_import_preflight_failed")
     # Execute in a fresh process so the host's HOME/CODEX_HOME stay untouched.
     write_new(episode / "attempt-start.json", {
         "schema": "opensocrates.go-ts.compatibility-attempt/1",
@@ -310,6 +318,7 @@ def child_execute(manifest_path: Path, expected_sha: str) -> None:
     started = utc()
     adapter.probe()
     result = adapter.invoke(task, role)
+    write_new(episode / "role-receipt.json", result.receipt)
     matches = adapter.matching
     argv_map = episode / "argv-map.jsonl"
     mapped = [item for raw in (argv_map.read_text().splitlines() if argv_map.exists() else [])
@@ -373,7 +382,17 @@ def main() -> None:
     else:
         if args.manifest is None or args.manifest_sha256 is None:
             parser.error("_child needs manifest identity")
-        child_execute(args.manifest, args.manifest_sha256)
+        try:
+            child_execute(args.manifest, args.manifest_sha256)
+        except BaseException as error:
+            episode = args.manifest.parent
+            if not (episode / "child-failure.json").exists():
+                write_new(episode / "child-failure.json", {
+                    "schema": "opensocrates.go-ts.compatibility-child-failure/1",
+                    "utc": utc(), "error_type": type(error).__name__,
+                    "detail": "No automatic retry; inspect durable attempt and call receipts.",
+                })
+            raise SystemExit(1)
 
 
 if __name__ == "__main__":
