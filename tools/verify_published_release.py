@@ -14,17 +14,25 @@ from typing import Any
 from release_identity import remote_tag_commit
 
 HOSTS = ("codex",)
+MACOS_STAGE_PROFILES = (("claude", "plugin"), ("claude-chat", "skills"), ("antigravity", "plugin"))
 
 
 def expected_asset_names(version: str) -> set[str]:
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
         raise ValueError("invalid release version")
     zips = {f"opensocrates-{version}-{host}-plugin.zip" for host in HOSTS}
-    windows = tuple(map(int, version.split("."))) >= (1, 4, 0)
+    version_tuple = tuple(map(int, version.split(".")))
+    windows = version_tuple >= (1, 4, 0)
+    macos_stage = version_tuple >= (1, 5, 0)
     if windows:
         zips.update(f"opensocrates-{version}-{host}-plugin-windows-x64.zip" for host in ("codex",))
+    if macos_stage:
+        zips.update(
+            f"opensocrates-{version}-{host}-{kind}.zip" for host, kind in MACOS_STAGE_PROFILES
+        )
     return (
         ({"windows.ps1"} if windows else set())
+        | ({"managed-hosts.mjs"} if macos_stage else set())
         | zips
         | {name + ".sha256" for name in zips}
         | {
