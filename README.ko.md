@@ -100,6 +100,8 @@ OpenSocrates는 로컬에서 실행되며 제품 텔레메트리, 호스팅 서�
 - [설치·업데이트·제거·런타임 안내](docs/advanced-usage.ko.md)
 - [사고 방법 원문](content/methods/)
 - [변경 이력](CHANGELOG.md)
+- [v1.5.0 구현 준비](docs/v1.5.0/README.md): 원래 사고 지원에 집중하는 새 방향과
+  Claude·Antigravity 연동 계획을 정리했습니다. 실제 구현은 아직 시작 전입니다.
 - [기여 안내](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md)
 
 OpenSocrates는 [MIT 라이선스](LICENSE)를 따르는 독립 프로젝트이며 OpenAI의

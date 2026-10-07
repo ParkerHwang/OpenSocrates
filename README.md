@@ -105,6 +105,8 @@ response-time improvement is claimed. Current release validation is tracked in
 - [Installation, updates, removal, and runtime reference](docs/advanced-usage.md)
 - [Authored method catalog](content/methods/)
 - [Changelog](CHANGELOG.md)
+- [v1.5.0 implementation preparation](docs/v1.5.0/README.md): revised original
+  reasoning focus and Claude/Antigravity host plans; implementation is pending.
 - [Contributing](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
 
 OpenSocrates is [MIT licensed](LICENSE), independent of OpenAI, and not endorsed
