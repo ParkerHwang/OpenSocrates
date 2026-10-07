@@ -79,6 +79,15 @@ publishers; their unresolved-path validation now rejects junctions and all four
 overwrite/ancestor fixtures pass. File-symlink privileges were not enabled to
 manufacture coverage; privileged cases are explicit skips.
 
+The first Draft PR CI run at `be125168a0b960c04dc5edf23a0c8e1c120c7b79`
+failed two installer checks. The closed npm publishing contract still named only
+the old Windows suite; it now includes the managed Windows suite exactly as
+`package.json` does. A synthetic rejected-app-server fixture could be killed
+before its EOF trace was written on a busy runner. Its test-only termination
+grace is now 500 ms; production limits and the separate bounded-timeout test
+are unchanged. The [initial failed run](https://github.com/ParkerHwang/OpenSocrates/actions/runs/37584772262)
+is retained; the Draft PR records the corrected final-head run.
+
 ## Artifact identities
 
 Portable final content ZIPs use fixed regular 0644 modes on both platforms:
