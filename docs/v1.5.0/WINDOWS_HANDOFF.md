@@ -23,6 +23,20 @@ content bytes have no executable surface.
 
 ## First Windows work
 
+The implementation branch is `feat/v1.5-macos`, not `main` or the withdrawn
+`feat/v1.5.0-implementation`. On a fresh Windows machine:
+
+```powershell
+git clone https://github.com/ParkerHwang/OpenSocrates.git
+cd OpenSocrates
+git switch --track origin/feat/v1.5-macos
+git rev-parse HEAD
+```
+
+Compare that commit with the implementation PR's latest verified head before
+editing. This branch contains the preparation documents and Mac implementation
+together, so no separate preparation cherry-pick is needed.
+
 Use a focused checkout of the exact Mac integration commit, LF files, Windows
 11 x64, Python 3.12, Node.js 20+, and the locked environment. Preserve the Codex
 Windows baseline before extending any shared path:

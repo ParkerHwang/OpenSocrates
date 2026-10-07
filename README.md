@@ -28,7 +28,7 @@ or a release download exists. The npm badge describes published registry state.
 | Host | Implemented delivery | Qualification boundary |
 | --- | --- | --- |
 | Codex, Apple-silicon Mac | Existing hooks, controller, native decision runtime | Existing Codex behavior and regression gates preserved |
-| Claude Code CLI / Desktop local Code, Apple-silicon Mac | Stateless native entry plus complete installed references | CLI registration confirmed; authenticated CLI and revised reader-case retest pending |
+| Claude Code CLI / Desktop local Code, Apple-silicon Mac | Stateless native entry plus complete installed references | CLI registration and Desktop local reader cases observed; authenticated terminal delivery pending; draft limitations recorded |
 | Claude web / Desktop ordinary Chat / Cowork | Standalone content-only account skill ZIP | ZIP format accepted; temporary old-skill replacement and live treatment pending |
 | Antigravity conversation application, Mac | Owned modular rule and skill, workspace or global scope | One ordinary-request workspace reader case observed; global/app lifecycle needs its own evidence |
 

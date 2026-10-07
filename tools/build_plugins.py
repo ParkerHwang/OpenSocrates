@@ -355,9 +355,17 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
 ) -> dict[str, Any]:
     """Generate one host package and return its deterministic release manifest."""
 
-    pass
-    if host != "codex":
-        raise PluginBuildError("only Codex is supported")
+    if host in {"claude-chat", "antigravity"}:
+        if __package__:
+            from .build_content_hosts import build_content_host
+        else:
+            from build_content_hosts import build_content_host
+
+        return build_content_host(root=root, host=host, output=output)
+    if host not in {"codex", "claude"}:
+        raise PluginBuildError("native packages support Codex and Claude only")
+    if host == "claude" and target != "darwin-arm64":
+        raise PluginBuildError("native Claude Windows qualification is pending")
     repository = Path(root).resolve()
     _prepare_import_path(repository)
     source_base = Path(source_root)

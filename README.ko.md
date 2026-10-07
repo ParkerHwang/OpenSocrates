@@ -29,7 +29,7 @@ v1.5의 독자 안내는 결론을 맥락과 다음 행동에 연결합니다. �
 | 호스트 | 구현된 전달 방식 | 확인 범위 |
 | --- | --- | --- |
 | Codex, Apple Silicon Mac | 기존 훅·컨트롤러·네이티브 판단 런타임 | 기존 동작과 회귀 검증 유지 |
-| Claude Code CLI / Desktop의 로컬 Code, Apple Silicon Mac | 상태를 저장하지 않는 네이티브 진입과 설치된 전체 참조 | CLI 등록 확인; 인증된 CLI 사용과 수정한 독자 사례 재시험 보류 |
+| Claude Code CLI / Desktop의 로컬 Code, Apple Silicon Mac | 상태를 저장하지 않는 네이티브 진입과 설치된 전체 참조 | CLI 등록과 Desktop 로컬 독자 사례 확인; 인증한 터미널 검증은 보류이며 초안 한계는 기록 |
 | Claude 웹 / Desktop의 일반 Chat / Cowork | 실행 코드가 없는 독립 계정 스킬 ZIP | ZIP 형식 수용 확인; 기존 스킬의 임시 교체와 실제 적용 시험 보류 |
 | Antigravity 대화 애플리케이션, Mac | 소유 범위가 명확한 모듈형 규칙·스킬; 작업공간 또는 전역 | 일반 요청의 작업공간 독자 사례 1건 확인; 전역·앱 생명주기는 별도 확인 필요 |
 

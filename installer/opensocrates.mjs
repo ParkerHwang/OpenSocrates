@@ -34,15 +34,16 @@ import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 
-export const PRODUCT_VERSION = "1.4.0";
+export const PRODUCT_VERSION = "1.5.0";
 export const REPOSITORY = "ParkerHwang/OpenSocrates";
 export const MARKETPLACE_NAME = "opensocrates";
 export const PLUGIN_NAME = "opensocrates";
 export const PLUGIN_ID = `${PLUGIN_NAME}@${MARKETPLACE_NAME}`;
 export const DEFAULT_HOST = "codex";
 export const SUPPORTED_HOSTS = Object.freeze(["codex"]);
+export const MACOS_PROFILE_HOSTS = Object.freeze(["claude", "antigravity", "claude-chat"]);
 export const ALL_HOST = "all";
-export const HOST_CHOICES = Object.freeze([ALL_HOST, ...SUPPORTED_HOSTS]);
+export const HOST_CHOICES = Object.freeze([ALL_HOST, ...SUPPORTED_HOSTS, ...MACOS_PROFILE_HOSTS]);
 export function assetNameFor(host = DEFAULT_HOST) {
   if (!SUPPORTED_HOSTS.includes(host)) {
     fail(`unsupported host ${JSON.stringify(host)}`);
@@ -1599,6 +1600,10 @@ export function parseCli(argv) {
     "verify",
     "auto-update",
     "help",
+    "diagnose",
+    "disable",
+    "enable",
+    "export",
   ]);
   const args = [...argv];
   let action = "install";
@@ -1635,6 +1640,8 @@ export function parseCli(argv) {
     force: false,
     purge: false,
     resetTrust: false,
+    workspace: null,
+    output: null,
   };
   const seenOptions = new Set();
   while (args.length > 0) {
@@ -1650,6 +1657,12 @@ export function parseCli(argv) {
         fail(`--host must be one of: ${HOST_CHOICES.join(", ")}`);
       }
       options.host = host;
+      continue;
+    }
+    if (flag === "--workspace" || flag === "--output") {
+      const value = args.shift();
+      if (!value || value.startsWith("-")) fail(`${flag} requires a path`);
+      options[flag === "--workspace" ? "workspace" : "output"] = resolve(value);
       continue;
     }
     if (flag === "--allow-major") {
@@ -1738,7 +1751,7 @@ export function parseCli(argv) {
   ) {
     fail("host-qualified asset options are only valid with --host all");
   }
-  if (["status", "remove", "help"].includes(options.action) && options.asset !== null) {
+  if (["status", "remove", "help", "diagnose", "disable", "enable"].includes(options.action) && options.asset !== null) {
     fail(`${options.action} does not accept --asset or --checksum`);
   }
   if (
@@ -1785,7 +1798,56 @@ export function parseCli(argv) {
   if (autoUpdateRun && seenOptions.has("host") && options.host !== ALL_HOST) {
     fail("auto-update run always reconciles desired state and only accepts --host all");
   }
+  if (options.workspace !== null && options.host !== "antigravity") {
+    fail("--workspace is only valid for Antigravity");
+  }
+  if (options.output !== null && !(options.host === "claude-chat" && options.action === "export")) {
+    fail("--output is only valid for the Claude account export");
+  }
+  if (options.host === "claude-chat" && !["export", "verify", "help"].includes(options.action)) {
+    fail("Claude account delivery uses export/verify; account activation is a separate UI action");
+  }
+  if (MACOS_PROFILE_HOSTS.includes(options.host) && (options.purge || options.resetTrust || options.action === "auto-update")) {
+    fail("new macOS profiles do not broaden purge, trust reset or automatic updates");
+  }
+  if (!MACOS_PROFILE_HOSTS.includes(options.host) && ["diagnose", "disable", "enable", "export"].includes(options.action)) {
+    fail(`${options.action} requires a new macOS profile`);
+  }
   return options;
+}
+
+function macosProfileAssetName(host) {
+  if (!MACOS_PROFILE_HOSTS.includes(host)) fail("unknown content/native profile");
+  const suffix = host === "claude-chat" ? "skills" : "plugin";
+  return `opensocrates-${PRODUCT_VERSION}-${host}-${suffix}.zip`;
+}
+
+async function prepareMacosProfilePackage(host, options) {
+  const scratch = await mkdtemp(join(tmpdir(), "opensocrates-macos-profile-"));
+  try {
+    const name = macosProfileAssetName(host);
+    let asset = options.asset;
+    let checksum = options.checksum;
+    if (asset === null) {
+      asset = join(scratch, name);
+      checksum = join(scratch, name + ".sha256");
+      const base = `https://github.com/${REPOSITORY}/releases/download/v${PRODUCT_VERSION}`;
+      await downloadFile(base + "/" + name, asset);
+      await downloadFile(base + "/" + name + ".sha256", checksum);
+    }
+    const expected = parseChecksumText(await readFile(checksum, "utf8"), basename(asset));
+    if (await sha256File(asset) !== expected) fail("profile archive checksum mismatch");
+    archiveEntries(asset);
+    const zipinfo = run("/usr/bin/zipinfo", ["-l", asset]);
+    if (/^l[-rwx]/mu.test(zipinfo.stdout)) fail("profile archive contains linked entries");
+    const root = join(scratch, "package");
+    await extractArchive(asset, root);
+    await walkFiles(root);
+    return { root, asset, cleanup: async () => rm(scratch, { recursive: true, force: true }) };
+  } catch (error) {
+    await rm(scratch, { recursive: true, force: true });
+    throw error;
+  }
 }
 
 function showHelp() {
@@ -1797,6 +1859,15 @@ Usage:
   opensocrates update [--host codex|all] [--asset ZIP --checksum FILE]
   opensocrates remove [--host codex|all] [--purge [--reset-trust]]
   opensocrates verify [--host codex|all] [--asset ZIP --checksum FILE]
+  opensocrates install|update --host claude [--asset ZIP --checksum FILE]
+  opensocrates install|update --host antigravity [--workspace FOLDER]
+      [--asset ZIP --checksum FILE]
+  opensocrates status|diagnose|disable|enable|remove --host claude|antigravity
+      [--workspace FOLDER]
+  opensocrates verify --host claude|antigravity|claude-chat
+      [--asset ZIP --checksum FILE]
+  opensocrates export --host claude-chat --output ZIP
+      [--asset ZIP --checksum FILE]
   opensocrates auto-update enable [--host codex|all]
       [--channel stable|next] [--interval-hours ${AUTO_UPDATE_DEFAULT_INTERVAL_HOURS}]
       [--allow-major]
@@ -1807,7 +1878,12 @@ Without --asset, install, update, and verify download the v${PRODUCT_VERSION}
 package and checksum from GitHub Releases. The default lifecycle host is codex.
 With --host all, supplied host-qualified asset/checksum pairs define the exact
 transaction set and are never mixed with downloads for other hosts. Without
-qualified assets, every ready host participates. Automatic updates are opt-in.
+qualified assets, ready Codex hosts participate. The additional macOS profiles
+require an explicit --host; all does not activate them. Automatic updates are opt-in
+for Codex. Claude native lifecycle requires macOS arm64 and the Claude CLI.
+Antigravity installs owned rules and skills globally or in the explicit workspace.
+Claude Chat exports a verified skill ZIP; upload and account activation happen
+through Claude's interface. These profiles do not accept purge or reset-trust.
 
 Ordinary remove unregisters the selected host and removes installer-managed
 files, but may leave host-owned caches, installer state, and Codex hook trust.
@@ -4344,9 +4420,22 @@ async function verifyPackages(options) {
 
 export async function main(argv = process.argv.slice(2), internalDependencies = {}) {
   const options = parseCli(argv);
+  if (MACOS_PROFILE_HOSTS.includes(options.host) && options.action !== "help") {
+    const { runManagedHost } = await import("./managed-hosts.mjs");
+    const operation = () => runManagedHost(options, {
+      version: PRODUCT_VERSION,
+      platform: process.platform,
+      claudeBinary: process.env.CLAUDE_BIN || "claude",
+      preparePackage: prepareMacosProfilePackage,
+    });
+    const result = ["status", "diagnose", "verify", "export"].includes(options.action)
+      ? await operation() : await withOperationLock(operation);
+    console.log(JSON.stringify(result, null, 2));
+    return 0;
+  }
   if (process.platform === "win32" && options.action === "auto-update") {
     const message =
-      "Automatic updates: unavailable on Windows in 1.4.0. Use opensocrates update --host all manually.";
+      `Automatic updates: unavailable on Windows in ${PRODUCT_VERSION}. Use opensocrates update --host all manually.`;
     if (options.autoUpdateAction === "status" || options.autoUpdateAction === "disable") {
       console.log(message);
       return 0;

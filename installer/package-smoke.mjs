@@ -302,7 +302,9 @@ try {
   assert.equal(help.status, 0, help.stderr);
   assert.match(help.stdout, /remove \[--host .*\] \[--purge \[--reset-trust\]\]/u);
   assert.match(help.stdout, /host security trust, and user history are reported separately/u);
-  assert.equal(help.stdout.match(/--asset ZIP --checksum FILE/gu)?.length, 3);
+  assert.equal(help.stdout.match(/--asset ZIP --checksum FILE/gu)?.length, 7);
+  assert.match(help.stdout, /additional macOS profiles\nrequire an explicit --host/u);
+  assert.match(help.stdout, /export --host claude-chat --output ZIP/u);
   assert.doesNotMatch(help.stdout, /--checksum SHA256/u);
 
   purgeSandbox = seedPackedPurgeSandbox();

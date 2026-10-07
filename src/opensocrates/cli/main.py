@@ -29,6 +29,7 @@ def _parser() -> argparse.ArgumentParser:
 
     decision = sub.add_parser("decision", help="retrieve canonical methods at an in-turn decision")
     decision.add_argument("--stream", action="store_true", help="volatile NDJSON session")
+    sub.add_parser("claude-hook", help="bounded stateless Claude native entry")
 
     control = sub.add_parser("control", help="apply one bounded host control")
     control_sub = control.add_subparsers(dest="control_command", required=True)
@@ -273,6 +274,11 @@ def main(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
         from .decision import run_decision
 
         return run_decision(stdin or sys.stdin, output_stream, stream=args.stream)
+
+    if args.command == "claude-hook":
+        from .claude_hook import run_claude_hook
+
+        return run_claude_hook(stdin or sys.stdin, output_stream)
 
     host = getattr(args, "host", None)
     runtime = _services_for(services, host=host)

@@ -1,5 +1,11 @@
 # OpenSocrates v1.5.0 implementation preparation
 
+The Mac implementation now lives on `feat/v1.5-macos`. See the
+[Mac guide](../macos-v1.5.md), [practical observations](../../evals/v1.5-macos/REPORT.md)
+and [Windows continuation](WINDOWS_HANDOFF.md). The preparation materials below
+remain the original scope and source contracts; they are not final implementation
+or release evidence.
+
 Prepared 2026-10-07 from released v1.4.0 source
 `5a2ff3c312e92aa8a44d0905465674d9a4e4f645`. This package fixes the revised
 product scope, host approach, source seams, work order, and practical acceptance

@@ -161,9 +161,9 @@ live cells must remain in the implementation handoff/PR.
 
 | Cell | Observed result / next check |
 | --- | --- |
-| Local source/package | Claude contract checks 31/31; existing installer checks 245/245; new managed-host checks 17/17; Codex baseline/native gates passed. These are separate offline/package checks. |
+| Local source/package | Claude contract checks 31/31; portable content checks 245/245; new managed-host checks 17/17; Codex baseline/native gates passed. These are separate offline/package checks. |
 | Claude CLI 2.1.285 | Actual user-scope companion registration confirmed. CLI authentication was unavailable and login requested; authenticated ordinary-task delivery remains pending. |
-| Claude Desktop local Code, R1 | Read the reader guide. First output overstated a commitment and omitted the photography gap. Guidance was revised to keep absence unknown and avoid reopening known facts; retest pending. |
+| Claude Desktop local Code, R1 | Read the reader guide. First output asserted an absent photography person and reopened settled capacity. Guide2 corrected R1 source reconciliation; R2 updated confirmed booking/capacity but regressed on unknown photography assignment. Both attempts and remaining draft commitments are retained in the [observation record](../evals/v1.5-macos/REPORT.md). |
 | Antigravity application, workspace R1 | Ordinary prompt led to controller/reader-guide reads and two usable stakeholder drafts. This bounded observation does not establish general improvement or global loading. |
 | Account ZIP | Upload format accepted and replacement of the old skill requested. Existing skill's configured text names 1.1.2; its backup is complete. Temporary swap/restore authorization and live treatment remain pending. |
 

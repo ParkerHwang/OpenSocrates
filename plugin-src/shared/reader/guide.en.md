@@ -1,5 +1,10 @@
 # Reader purpose and usable judgment
 
+An omitted fact is unknown, not proof that it does not exist. If the sources do
+not identify an owner or condition, say that the information is not provided.
+Do not reopen a current established value or role merely because older material
+differs; ask only about a genuinely unresolved fact that changes the work.
+
 Use this guidance when synthesizing source material, explaining a decision, or
 preparing a message for someone who needs to understand and act. Skip it for
 mechanical work. This is a presentation check, not another reasoning method.
