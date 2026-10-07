@@ -4,10 +4,13 @@
 
 # OpenSocrates
 
-**A method for the judgment your Codex agent is making.**
+**Reasoning help for results you can understand, judge, and use.**
 
-OpenSocrates brings 48 authored reasoning methods to Codex. Examine assumptions,
-compare options, and weigh evidence within the task you are already doing.
+OpenSocrates brings 48 authored reasoning methods into the task you are already
+doing: synthesize evidence, understand stakeholder perspectives, compare choices,
+and write useful messages. The original English/Korean procedures remain intact.
+The v1.5 reader guides connect their conclusions to context and next actions;
+dedicated coding-specialist features are outside this version.
 
 **English** | [한국어](README.ko.md)
 
@@ -15,99 +18,84 @@ compare options, and weigh evidence within the task you are already doing.
 [![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Get started
+## v1.5.0 Mac stage
 
-Version **1.4.0 supports Codex only**, on **Apple-silicon macOS and Windows x64**.
-Install Node.js 20 or later, make the Codex CLI available, and sign in to Codex.
-The native runtime is bundled; users do not need Python.
+This checkout implements the Mac profiles below and builds their local archives.
+**v1.5.0 has not been published to npm or GitHub Releases.** Use the source
+installer with a verified local archive; do not assume `npx opensocrates@1.5.0`
+or a release download exists. The npm badge describes published registry state.
 
-```sh
-npx --yes opensocrates@1.4.0 install
-```
-
-Start a new interactive Codex session and review the seven OpenSocrates command
-hooks. Approve those hooks before relying on native discovery. Non-interactive
-`codex exec` skips untrusted hooks; installation alone does not establish hook
-approval or actual delivery. You can explicitly ask Codex to use the
-`opensocrates` controller skill.
-
-If you previously disabled these hooks, enable them in Codex's `/hooks` view.
-Updating the plugin preserves your hook enablement and trust preferences.
-
-```sh
-npx --yes opensocrates@1.4.0 status
-npx --yes opensocrates@1.4.0 update
-```
-
-`--host codex` is optional. The compatibility alias `--host all` now means Codex
-only. Other host names are rejected before installation or removal.
-
-## Upgrading from a multi-host release
-
-Claude Code, Cowork, Claude Chat, Antigravity, Cursor, Grok Build, and OpenCode
-integrations and archives are removed in 1.4.0. Existing non-Codex installations
-are not silently erased. If your previous desired state includes another host,
-first use the version that installed it to remove that host, then update Codex:
-
-```sh
-# Example for an installation managed by 1.3.1:
-npx --yes opensocrates@1.3.1 remove --host claude --purge
-npx --yes opensocrates@1.4.0 update --host codex
-```
-
-Use the corresponding old host name for each retired integration. Review any
-pending cleanup reported by the old installer. User conversation history and
-unrelated files must be preserved. See [installation and removal](docs/advanced-usage.md).
-
-## What it does
-
-- Choose a method for a judgment: compare alternatives, check a causal claim,
-  examine assumptions, or identify evidence that could change a recommendation.
-- Revisit a decision when the facts change, including multiple decision points
-  within one request. Mechanical steps need no method.
-- Read complete instructions, examples, applicability limits, and required public
-  results. All 48 methods retain their English and Korean procedure bodies.
-- Keep conclusions connected to evidence, uncertainty, and reopening conditions
-  while preserving the user's requested format.
-
-Codex hooks provide lightweight discovery guidance. The active agent retrieves
-eligible methods through the packaged native decision command. A constrained
-complete-reference fallback remains when the runtime is unavailable. This path
-makes no separate selector-model call and adds no prompt or transcript storage.
-The integration fails open so ordinary work can continue when it is unavailable.
-See [decision-point retrieval](docs/decision-points.md) for the exact contract.
-
-## Platforms and limits
-
-| Platform | Package | Updates |
+| Host | Implemented delivery | Qualification boundary |
 | --- | --- | --- |
-| Apple-silicon macOS | Native runtime and `bin/launch.sh` | Manual; optional macOS LaunchAgent |
-| Windows x64 | Native `.exe` and `node bin/launch.mjs` | Manual only |
+| Codex, Apple-silicon Mac | Existing hooks, controller, native decision runtime | Existing Codex behavior and regression gates preserved |
+| Claude Code CLI / Desktop local Code, Apple-silicon Mac | Stateless native entry plus complete installed references | CLI registration confirmed; authenticated CLI and revised reader-case retest pending |
+| Claude web / Desktop ordinary Chat / Cowork | Standalone content-only account skill ZIP | ZIP format accepted; temporary old-skill replacement and live treatment pending |
+| Antigravity conversation application, Mac | Owned modular rule and skill, workspace or global scope | One ordinary-request workspace reader case observed; global/app lifecycle needs its own evidence |
 
-Windows does not require WSL or a Unix shell. Windows automatic updates,
-Windows ARM64, Windows 10, macOS Intel, and Linux native packages are not claimed
-as validated. Signing and SmartScreen reputation are unvalidated.
-See the [Windows guide](docs/windows-support.md).
+Normal requests need no repeated OpenSocrates command. Trusted native hooks and
+Antigravity's standing rule provide entry; account skills are selected by the
+host model and may be missed. Installation, loading, complete reads, application,
+and useful outcomes are separate evidence levels. No general quality, token-cost,
+or latency improvement is claimed.
 
-## Privacy and evidence
+## Start from the local Mac candidate
 
-OpenSocrates runs locally, adds no product telemetry, and has no hosted backend or
-separate account. Your ordinary Codex model requests use Codex authentication and
-its service terms. Read [SECURITY.md](SECURITY.md) for integrity, rollback,
-permissions, and the retained legacy selector boundary.
+Install Node.js 20+, make the chosen host available, and sign in to that host.
+The native Mac runtime is bundled; installation does not require Python.
+From this repository, verify a local Claude companion before installing it:
 
-Package verification, hook delivery, complete reference reads, and actual method
-application are distinct evidence levels. No general quality, token-cost, or
-response-time improvement is claimed. Current release validation is tracked in
-[PR #93](https://github.com/ParkerHwang/OpenSocrates/pull/93) and the
-[release plan](docs/v1.4.0-release-plan.md); older evidence describes older versions.
+```sh
+node installer/opensocrates.mjs verify --host claude \
+  --asset dist/opensocrates-1.5.0-claude-plugin.zip \
+  --checksum dist/opensocrates-1.5.0-claude-plugin.zip.sha256
+node installer/opensocrates.mjs install --host claude \
+  --asset dist/opensocrates-1.5.0-claude-plugin.zip \
+  --checksum dist/opensocrates-1.5.0-claude-plugin.zip.sha256
+node installer/opensocrates.mjs status --host claude
+```
 
-- [Installation, updates, removal, and runtime reference](docs/advanced-usage.md)
-- [Authored method catalog](content/methods/)
-- [Changelog](CHANGELOG.md)
-- [v1.5.0 implementation preparation](docs/v1.5.0/README.md): revised original
-  reasoning focus and Claude/Antigravity host plans; implementation is pending.
-- [Contributing](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
+Review the host's plugin/hook permissions and start a fresh conversation.
+`status` reports installation and integrity; it does not prove automatic entry.
+For Antigravity workspace installation, account export, updates, disabling,
+removal, and actual pending checks, use the [Mac guide](docs/macos-v1.5.md).
 
-OpenSocrates is [MIT licensed](LICENSE), independent of OpenAI, and not endorsed
-by OpenAI.
+New profiles require explicit `--host claude`, `--host antigravity`, or
+`--host claude-chat`. The default and `--host all` retain the existing Codex
+desired-state lane; they do not install every new host. New profiles have no
+purge, trust-reset, or automatic-update route.
+
+## Existing released Codex and Windows
+
+The published v1.4.0 package remains a Codex-only release for Apple-silicon Mac
+and Windows x64:
+
+```sh
+npx --yes opensocrates@1.4.0 install --host codex
+npx --yes opensocrates@1.4.0 status --host codex
+```
+
+Review the seven Codex hooks in an interactive session. Non-interactive execution
+may skip untrusted hooks. Existing Codex Windows support is preserved; **new
+v1.5 Claude/Antigravity Windows integration is the next stage**, not a completed
+support claim. See [existing Windows support](docs/windows-support.md) and the
+[Windows implementation handoff](docs/v1.5.0/WINDOWS_HANDOFF.md).
+
+Old multi-host installations are not silently adopted or erased. Reconcile their
+exact origin and ownership before installing a new profile. Preserve the existing
+account skill until a backed-up replacement qualifies.
+
+## Privacy and development
+
+The default decision path makes no extra selector-model call and stores no raw
+prompts, transcripts, screenshots, or hidden reasoning. The new Claude entry does
+not read transcripts or initialize a database. The account skill has no executable
+surface; normal host conversations and model requests follow the host's own
+authentication, permissions, retention settings, and terms. See [SECURITY.md](SECURITY.md).
+
+- [Mac installation and qualification](docs/macos-v1.5.md)
+- [Authored methods](content/methods/) · [Decision-point contract](docs/decision-points.md)
+- [Current implementation scope](docs/v1.5.0/IMPLEMENTATION_PLAN.md)
+- [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
+
+OpenSocrates is [MIT licensed](LICENSE), independent of OpenAI, Anthropic, and
+Google, and not endorsed by them.

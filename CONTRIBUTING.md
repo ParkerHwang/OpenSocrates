@@ -44,15 +44,19 @@ Node.js 20 or later is also required when changing the GitHub/npx installer.
   method's `content_revision`. Generated procedures plus `source_tree_hash` and
   `normalized_semantic_hash` bind the overlay into package identity.
 - Canonical schemas belong under `schemas/source/`.
-- Codex package templates belong under `plugin-src/codex/`. Review controller,
-  teacher-question, procedure, grounding, and wording changes across the Codex
-  package and its English/Korean canonical references. Only Codex is supported.
-  Codex uses hidden trusted hook context only after the host trust flow.
+- Distribution templates belong under `plugin-src/<host>/`. The Mac stage adds
+  native Claude entry, a portable content-only Claude account skill, and modular
+  Antigravity rules/skills; preserve existing Codex behavior. Shared reader and
+  decision guidance belongs under `plugin-src/shared/`. Review controller,
+  teacher-question, procedure, grounding, and wording changes across all affected
+  English/Korean packages. Distribution profiles are separate from the retained
+  legacy Codex selector runtime; native Claude must not invoke it.
+  Hooks require host trust, and account matching requires its own live evidence.
 - Do not edit generated files in `schemas/v1/`,
   `content/compiled-*.json`, `build/`, or `dist/` by hand.
 - Keep English and Korean user-facing documentation semantically aligned.
-- Do not add telemetry, credential collection, raw prompt logging, or hidden
-  reasoning capture.
+- Do not add telemetry, credential collection, raw prompt or transcript logging,
+  screenshot retention, or hidden reasoning capture.
 
 Regenerate canonical outputs when their sources change:
 
@@ -85,6 +89,22 @@ Native release work additionally requires Apple-silicon macOS:
 ```bash
 make release-check
 ```
+
+This retains the Codex native gate and then assembles the Claude Mac companion,
+Claude account ZIP, and Antigravity content package. It does not publish them.
+Use [the Mac guide](docs/macos-v1.5.md) for local archive installation and current
+qualification. Focused new-profile checks are:
+
+```bash
+uv run --locked python tools/check_claude_host.py
+uv run --locked python tools/check_content_hosts.py
+node --test installer/managed-hosts.test.mjs
+```
+
+Record each claimed CLI, Desktop, account, workspace, and global cell separately.
+Native entry emission is not a complete read, application, or useful-result
+receipt. Do not turn a missing application receipt into an extra completion gate.
+A practical result defect reopens the affected guide/case and needs a retest.
 
 For Codex, this native check measures the generated package's configured
 `SessionStart` command before the runtime version smoke. The exact process model,
@@ -127,3 +147,8 @@ repository's [MIT License](LICENSE).
 ## Native Windows development
 
 Use the PowerShell commands and exact evidence boundaries in [Windows support](docs/windows-support.md). Run `uv run --locked python tools/check_windows.py --packages` after `tools/build_windows.py`; keep the existing macOS release gate. LF checkout is required for pinned evidence hashes.
+
+That guide records the existing Codex Windows baseline. The new v1.5 host work
+continues through [WINDOWS_HANDOFF.md](docs/v1.5.0/WINDOWS_HANDOFF.md); Darwin-only
+addon lifecycle and missing native Claude Windows launchers are explicit staged
+boundaries, not evidence that existing Codex Windows support disappeared.

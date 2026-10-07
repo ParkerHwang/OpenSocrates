@@ -4,10 +4,13 @@
 
 # OpenSocrates
 
-**Codex 에이전트가 지금 내리는 판단에 맞는 사고 방법.**
+**이해하고 판단하고 사용할 수 있는 결과를 위한 사고 지원.**
 
-OpenSocrates는 Codex에 직접 작성한 48개 사고 방법을 제공합니다. 진행 중인
-작업에서 가정을 점검하고, 대안을 비교하고, 근거를 평가하도록 돕습니다.
+OpenSocrates는 진행 중인 작업에 직접 작성한 48개 사고 방법을 제공합니다.
+자료를 종합하고, 이해관계자의 관점을 파악하고, 선택지를 비교하고, 필요한
+메시지를 쓰도록 돕습니다. 원래 영어·한국어 절차는 그대로 유지합니다.
+v1.5의 독자 안내는 결론을 맥락과 다음 행동에 연결합니다. 코딩 전문가 전용
+기능은 이번 버전에 포함하지 않습니다.
 
 [English](README.md) | **한국어**
 
@@ -15,94 +18,84 @@ OpenSocrates는 Codex에 직접 작성한 48개 사고 방법을 제공합니다
 [![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 시작하기
+## v1.5.0 Mac 단계
 
-**1.4.0은 Codex만 지원**하며, **Apple Silicon macOS와 Windows x64**에서 사용합니다.
-Node.js 20 이상을 설치하고 Codex CLI를 실행할 수 있게 한 뒤 Codex에 로그인하세요.
-네이티브 런타임을 포함하므로 사용자가 Python을 설치할 필요는 없습니다.
+이 체크아웃에는 아래 Mac 연동과 로컬 배포 파일을 만드는 기능이 구현되어
+있습니다. **v1.5.0은 아직 npm이나 GitHub Releases에 게시되지 않았습니다.**
+검증한 로컬 파일과 소스 설치기를 사용하세요. `npx opensocrates@1.5.0`이나
+릴리스 다운로드가 있다고 가정하지 않습니다. npm 배지는 실제 게시 상태를
+나타냅니다.
 
-```sh
-npx --yes opensocrates@1.4.0 install
-```
-
-새 대화형 Codex 세션에서 OpenSocrates의 명령 훅 7개를 검토하세요. 네이티브
-안내에 의존하기 전에 해당 훅을 승인해야 합니다. 비대화형 `codex exec`는
-신뢰되지 않은 훅을 건너뜁니다. 설치만으로 승인이나 실제 전달이 입증되지는
-않습니다. Codex에 `opensocrates` 컨트롤러 스킬 사용을 직접 요청할 수도 있습니다.
-
-이전에 훅을 껐다면 Codex의 `/hooks` 화면에서 활성화하세요. 플러그인을
-업데이트해도 기존 훅 활성화 및 신뢰 설정은 유지됩니다.
-
-```sh
-npx --yes opensocrates@1.4.0 status
-npx --yes opensocrates@1.4.0 update
-```
-
-`--host codex`는 생략할 수 있습니다. 기존 명령과의 호환성을 위한 `--host all`도
-이제 Codex만 뜻합니다. 다른 호스트 이름은 설치·제거 전에 거부합니다.
-
-## 여러 호스트를 지원하던 버전에서 업데이트
-
-1.4.0에서는 Claude Code, Cowork, Claude Chat, Antigravity, Cursor, Grok Build,
-OpenCode 연동과 배포 파일을 제거했습니다. 이미 설치된 다른 호스트의 파일을
-자동 삭제하지 않습니다. 기존 설치 상태에 다른 호스트가 포함되어 있다면,
-설치했던 버전으로 해당 호스트를 먼저 제거한 다음 Codex를 업데이트하세요.
-
-```sh
-# 1.3.1로 관리하던 설치의 예:
-npx --yes opensocrates@1.3.1 remove --host claude --purge
-npx --yes opensocrates@1.4.0 update --host codex
-```
-
-제거할 연동마다 해당 이전 호스트 이름을 사용하세요. 이전 설치기가 보고하는
-정리 보류 항목을 확인해야 합니다. 대화 기록과 무관한 파일은 보존합니다.
-[설치·제거 안내](docs/advanced-usage.ko.md)를 참고하세요.
-
-## 하는 일
-
-- 대안 비교, 인과관계 검토, 가정 점검, 추천을 바꿀 근거 식별 등 판단에 맞는 방법을 찾습니다.
-- 새로운 사실이 생기면 판단을 재검토합니다. 한 요청 안의 여러 판단 지점에서
-  사용할 수 있으며, 기계적인 작업에는 방법을 불러올 필요가 없습니다.
-- 지침, 예시, 적용 한계, 공개 결과 요건을 온전히 읽습니다. 48개 방법의
-  영어·한국어 절차 본문을 모두 유지합니다.
-- 사용자가 요구한 형식을 지키면서 결론을 근거·불확실성·재검토 조건과 연결합니다.
-
-Codex 훅은 가벼운 탐색 안내를 제공합니다. 작업 중인 에이전트가 패키지의
-네이티브 판단 명령으로 적용 가능한 방법을 가져옵니다. 런타임을 사용할 수
-없으면 제약을 유지한 전체 참조 파일 경로를 사용합니다. 이 경로는 별도의
-선택 모델을 호출하거나 프롬프트·대화를 저장하지 않습니다. 연동에 문제가
-생겨도 일반 작업은 계속할 수 있습니다. 정확한 계약은
-[판단 지점별 조회](docs/decision-points.ko.md)를 참고하세요.
-
-## 운영체제와 한계
-
-| 운영체제 | 패키지 | 업데이트 |
+| 호스트 | 구현된 전달 방식 | 확인 범위 |
 | --- | --- | --- |
-| Apple Silicon macOS | 네이티브 런타임과 `bin/launch.sh` | 수동; macOS LaunchAgent 선택 가능 |
-| Windows x64 | 네이티브 `.exe`와 `node bin/launch.mjs` | 수동만 지원 |
+| Codex, Apple Silicon Mac | 기존 훅·컨트롤러·네이티브 판단 런타임 | 기존 동작과 회귀 검증 유지 |
+| Claude Code CLI / Desktop의 로컬 Code, Apple Silicon Mac | 상태를 저장하지 않는 네이티브 진입과 설치된 전체 참조 | CLI 등록 확인; 인증된 CLI 사용과 수정한 독자 사례 재시험 보류 |
+| Claude 웹 / Desktop의 일반 Chat / Cowork | 실행 코드가 없는 독립 계정 스킬 ZIP | ZIP 형식 수용 확인; 기존 스킬의 임시 교체와 실제 적용 시험 보류 |
+| Antigravity 대화 애플리케이션, Mac | 소유 범위가 명확한 모듈형 규칙·스킬; 작업공간 또는 전역 | 일반 요청의 작업공간 독자 사례 1건 확인; 전역·앱 생명주기는 별도 확인 필요 |
 
-Windows에는 WSL이나 Unix 셸이 필요하지 않습니다. Windows 자동 업데이트,
-Windows ARM64, Windows 10, Intel Mac, Linux 네이티브 패키지는 검증된 지원으로
-주장하지 않습니다. 서명과 SmartScreen 평판도 미검증입니다.
-[Windows 안내](docs/windows-support.ko.md)를 참고하세요.
+매번 OpenSocrates 명령을 입력할 필요는 없습니다. 신뢰된 네이티브 훅과
+Antigravity 상시 규칙은 진입 안내를 제공합니다. 계정 스킬은 호스트 모델이
+선택하므로 호출되지 않을 수 있습니다. 설치·불러오기·전체 읽기·실제 적용·
+결과의 유용성은 서로 다른 증거이며, 일반적인 품질·토큰 비용·속도 향상을
+주장하지 않습니다.
 
-## 개인정보와 검증 범위
+## 로컬 Mac 후보로 시작하기
 
-OpenSocrates는 로컬에서 실행되며 제품 텔레메트리, 호스팅 서버, 별도 계정을
-추가하지 않습니다. 일반 Codex 모델 요청은 Codex 인증과 서비스 약관을 따릅니다.
-무결성·롤백·권한·기존 선택기의 경계는 [보안 정책](SECURITY.md)에 설명합니다.
+Node.js 20 이상과 사용할 호스트를 설치하고 그 호스트에 로그인하세요.
+Mac 네이티브 런타임은 포함되어 있으므로 설치에 Python이 필요하지 않습니다.
+저장소에서 Claude 연동 파일을 검증한 뒤 설치하는 예입니다.
 
-패키지 검증, 훅 전달, 전체 참조 읽기, 실제 방법 적용은 서로 다른 증거입니다.
-일반적인 품질·토큰 비용·응답 속도 개선을 주장하지 않습니다. 이번 버전의 검증은
-[PR #93](https://github.com/ParkerHwang/OpenSocrates/pull/93)과
-[릴리스 계획](docs/v1.4.0-release-plan.md)에 기록하며, 과거 증거는 과거 버전에만 해당합니다.
+```sh
+node installer/opensocrates.mjs verify --host claude \
+  --asset dist/opensocrates-1.5.0-claude-plugin.zip \
+  --checksum dist/opensocrates-1.5.0-claude-plugin.zip.sha256
+node installer/opensocrates.mjs install --host claude \
+  --asset dist/opensocrates-1.5.0-claude-plugin.zip \
+  --checksum dist/opensocrates-1.5.0-claude-plugin.zip.sha256
+node installer/opensocrates.mjs status --host claude
+```
 
-- [설치·업데이트·제거·런타임 안내](docs/advanced-usage.ko.md)
-- [사고 방법 원문](content/methods/)
-- [변경 이력](CHANGELOG.md)
-- [v1.5.0 구현 준비](docs/v1.5.0/README.md): 원래 사고 지원에 집중하는 새 방향과
-  Claude·Antigravity 연동 계획을 정리했습니다. 실제 구현은 아직 시작 전입니다.
-- [기여 안내](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md)
+호스트의 플러그인·훅 권한을 검토하고 새 대화를 시작하세요. `status`는 설치와
+무결성을 보고하며 자동 진입을 증명하지 않습니다. Antigravity 작업공간
+설치, 계정 파일 내보내기, 업데이트·비활성화·제거와 보류 항목은
+[Mac 안내](docs/macos-v1.5.ko.md)에 설명합니다.
 
-OpenSocrates는 [MIT 라이선스](LICENSE)를 따르는 독립 프로젝트이며 OpenAI의
-공식 제품이나 보증을 받은 제품이 아닙니다.
+새 연동에는 `--host claude`, `--host antigravity`, `--host claude-chat`를
+명시해야 합니다. 기본값과 `--host all`은 기존 Codex 설치 상태를 관리하는
+경로를 유지하며 새 호스트를 전부 설치하지 않습니다. 새 연동에는 purge,
+신뢰 초기화, 자동 업데이트가 없습니다.
+
+## 기존 Codex 릴리스와 Windows
+
+게시된 v1.4.0은 Apple Silicon Mac과 Windows x64에서 Codex만 지원합니다.
+
+```sh
+npx --yes opensocrates@1.4.0 install --host codex
+npx --yes opensocrates@1.4.0 status --host codex
+```
+
+대화형 세션에서 Codex 훅 7개를 검토하세요. 비대화형 실행은 신뢰되지 않은
+훅을 건너뛸 수 있습니다. 기존 Codex Windows 지원은 유지하며, **v1.5의 새
+Claude·Antigravity Windows 연동은 다음 단계**입니다. 완료된 지원으로
+주장하지 않습니다. [기존 Windows 안내](docs/windows-support.ko.md)와
+[Windows 구현 인계](docs/v1.5.0/WINDOWS_HANDOFF.md)를 참고하세요.
+
+과거 여러 호스트 연동을 자동으로 인수하거나 삭제하지 않습니다. 새 설치
+전에 정확한 출처와 소유 범위를 확인하고, 기존 계정 스킬은 백업한 교체본이
+검증될 때까지 보존합니다.
+
+## 개인정보와 개발
+
+기본 판단 경로는 별도의 선택 모델을 호출하거나 원시 프롬프트·대화·스크린샷·
+숨겨진 추론을 저장하지 않습니다. 새 Claude 진입은 대화를 읽거나 데이터베이스를
+초기화하지 않습니다. 계정 스킬에는 실행 코드가 없습니다. 일반 대화와 모델
+요청은 호스트 자체의 인증·권한·보관 설정·약관을 따릅니다.
+[보안 정책](SECURITY.md)에 정확한 경계를 설명합니다.
+
+- [Mac 설치와 확인 범위](docs/macos-v1.5.ko.md)
+- [사고 방법 원문](content/methods/) · [판단 지점 계약](docs/decision-points.ko.md)
+- [현재 구현 범위](docs/v1.5.0/IMPLEMENTATION_PLAN.md)
+- [변경 이력](CHANGELOG.md) · [기여 안내](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md)
+
+OpenSocrates는 [MIT 라이선스](LICENSE)를 따르는 독립 프로젝트이며
+OpenAI·Anthropic·Google의 공식 제품이나 보증을 받은 제품이 아닙니다.

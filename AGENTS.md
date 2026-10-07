@@ -33,14 +33,21 @@ Do not start implementation from an unverified local branch, stale transcript, o
 - Runtime code belongs under `src/opensocrates/`.
 - Canonical reasoning content belongs under `content/methods/`.
 - Canonical schemas belong under `schemas/source/`.
-- Codex package templates belong under `plugin-src/codex/`. Review controller,
-  teacher-question, procedure, grounding, and wording changes across the Codex
-  package and its English/Korean canonical references. Only Codex is supported.
-  Codex uses hidden trusted hook context only after the host trust flow.
+- Distribution templates belong under `plugin-src/<host>/`; shared reader and
+  decision guidance belongs under `plugin-src/shared/`. The v1.5 Mac stage adds
+  native Claude Code, the content-only Claude account skill, and Antigravity's
+  modular rule/skill transport while preserving the Codex package. Review
+  controller, teacher-question, procedure, grounding, and wording changes across
+  every affected package and its English/Korean canonical references.
+  Distinguish distribution profiles from the retained legacy Codex selector
+  runtime. Native Claude entry does not invoke that selector or read transcripts.
+  Hooks require the host trust flow; account matching is model-selected. New
+  Windows host qualification remains a separate stage.
 - Do not hand-edit generated files in `schemas/v1/`, `content/compiled-*.json`, `build/`, or `dist/`.
 - Run `make generate` after changing canonical generated inputs and commit canonical and generated changes together.
 - Keep English and Korean user-facing content semantically aligned.
-- Do not add telemetry, credential collection, raw prompt or transcript logging, workspace-content retention, or hidden reasoning capture.
+- Do not add telemetry, credential collection, raw prompt or transcript logging,
+  screenshot retention, workspace-content retention, or hidden reasoning capture.
 - Preserve fail-open behavior, bounded selection, cleanup, transactional rollback, and explicit unknown/unavailable states.
 - Distinguish implemented, locally validated, release-validated, and live-probe evidence. Never upgrade a claim because implementation or offline CI exists.
 
@@ -81,8 +88,10 @@ Known limitations: <explicit boundaries>
 
 For the revised v1.5.0 work, read the
 [implementation preparation](docs/v1.5.0/README.md) and its current handoff first.
-It defines future goals and work packages; current released support remains
-Codex-only. The earlier candidate PR #95 is historical reference, not the new
+It records scope and work packages; use [the Mac implementation guide](docs/macos-v1.5.md)
+for implemented profiles and current qualification boundaries. Public v1.4
+remains the released Codex baseline until v1.5 publication. The earlier
+candidate PR #95 is historical reference, not the new
 implementation baseline. It is closed and withdrawn in full. Preserve its frozen
 evidence; do not merge, cherry-pick, or copy its code/guides. Develop the revised
 release from v1.4 rather than its coding, memory, or orchestration candidate.
