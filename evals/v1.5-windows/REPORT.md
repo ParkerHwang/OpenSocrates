@@ -108,6 +108,37 @@ normalization changes transport metadata only, not staged controller/procedures.
 
 ## Live host matrix
 
+The [Windows-only resume](native-resume-observations.json) preserves the newer
+native attempt separately. Antigravity and Claude Desktop now returned their own
+screenshots, but project/customize/menu/window inputs produced no visible change
+after refreshed window selection and one bounded recovery. The isolated project
+was not created. Zero candidate model requests were made on both apps; no account
+skills, private history, permissions or actual global app settings were changed.
+The original observation below remains the earlier failed capture attempt.
+
+The resumed staged workspace update also exposed a real product defect: moving
+the existing skill to a deeper transaction backup crossed MAX_PATH, and Windows
+PowerShell 5.1's `FileSystemInfo.GetAccessControl()` raised an invalid-name error.
+Status/diagnose still verified the content, and rollback retained the original.
+Three original/diagnostic attempts are retained. A controlled 318/332-character
+fixture failed normal-path ACL queries and passed extended-path queries and
+reapplication. The helper now uses normalized extended Win32 paths internally;
+ZIP slashes are translated only after portable-path validation. The same staged
+workspace update passed, with source/sentinel hashes unchanged.
+
+New long-path fixtures initially exposed a test-only normal-path file lock and
+a .NET ZIP using backslashes. The archive was correctly refused; validation was
+not widened. The lock now uses extended paths and the extraction test uses the
+actual portable product ZIP. Focused >260-character Unicode lifecycle/locked
+rollback and ZIP/export/foreign-writer/lease cases pass. The final combined suite
+has 20 cases; exact-head results are recorded in PR #105 and CI. Existing owner,
+DACL, junction, containment, lock and rollback requirements remain in force.
+
+Web qualification is now a separate Mac handoff at the user's request to focus
+this continuation on Windows-only work. Use the same portable account artifact
+and Web account, and label the OS/surface explicitly. It cannot qualify Windows
+Desktop Chat/Cowork or Antigravity.
+
 | Windows cell | Installation/export | Ordinary entry / reads / application / result |
 | --- | --- | --- |
 | Existing Codex | Native package regression verified | Authenticated Desktop/host outcome not newly measured here |
@@ -137,7 +168,11 @@ The browser policy refused internal downloads-manager navigation; no workaround
 was used. A distinct `opensocrates-windows-synthetic-test` copy was then created
 and immediately disabled. Replace was opened on that copy only, but selecting
 the verified candidate ZIP failed because the Chrome ChatGPT extension lacks
-"Allow access to file URLs". No ZIP was uploaded and no model request was made.
+the requested file-URL capability according to the tool's error. The user then
+reported enabling it, but reload/fresh-tab attempts still returned the same
+permission error. The actual extension setting was not independently confirmed;
+do not attribute the repeated refusal to user inaction. No ZIP was uploaded and
+no model request was made.
 A native file-picker alternative stopped before input because the native helper
 could not determine the browser URL sufficiently to enforce policy. No more
 computer input was attempted in that turn. The original remained enabled;

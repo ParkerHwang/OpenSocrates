@@ -62,12 +62,27 @@ Generated directories are ignored and rebuilt by their canonical generators.
 
 ## Live qualification and next actions
 
+The Windows-only follow-up found and repaired a real long-path ACL failure while
+checking a renamed skill backup. The helper now uses normalized extended Win32
+paths and native ZIP separators; the same staged workspace update succeeds.
+Two additional native regressions cover a >260-character Unicode workspace,
+locked-update rollback, disabled update, remove, exact account export, extraction,
+foreign-writer refusal and ancestor leases. The suite is now 20 combined cases.
+See [resume observations](../../evals/v1.5-windows/native-resume-observations.json)
+and the latest exact-head CI in PR #105; preserve the earlier failure records.
+
+Both native apps now yielded their own screenshots, but navigation inputs had
+no observed effect after bounded recovery. No candidate model request occurred.
+Web testing can continue on Mac with the same portable ZIP and Web account;
+record it as Mac Web evidence. The user requested the remaining work here be
+Windows-only. Desktop Chat/Cowork and Antigravity live cells remain unavailable.
+
 Consult the report before repeating a cell. Installation, entry, complete
 canonical reads, actual application and artifact usefulness remain separate.
 Web and Desktop use different accounts; no credentials are copied between them.
 Account skill recovery must preserve original bytes or keep the original skill
 intact with its enabled state restored. Native app input tooling could not target
-the Antigravity window reliably; do not infer loading from managed files.
+or actuate the apps reliably; do not infer loading from managed files.
 
 1. Review exact final CI head in the Windows Draft PR, including Linux source,
    installer and Mac native package jobs. Fix material failures before release.

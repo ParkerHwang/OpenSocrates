@@ -159,6 +159,17 @@ transport fallback, not an authenticated account or host probe.
 
 ## Windows fixture and qualification use
 
+The Windows-only resume reproduced a PowerShell 5.1 ACL failure beyond MAX_PATH
+when inspecting a deeper renamed backup. The local controlled comparison and
+repair are in [resume observations](../../evals/v1.5-windows/native-resume-observations.json).
+The helper now normalizes ordinary local drive paths and uses extended Win32
+paths internally; ZIP portable separators are translated after validation.
+Microsoft documents the extended path prefix and its lack of normal slash/dot
+translation in [Windows path limits](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation).
+The framework's long-path behavior depends on the application's target and
+configuration: [official .NET compatibility note](https://github.com/microsoft/dotnet/blob/main/Documentation/compatibility/long-path-support.md).
+No OS/PowerShell configuration or ownership requirements were loosened to pass.
+
 [Fixed EN/KO cases](../../evals/v1.5-windows/fixtures/cases.json) cover workshop
 synthesis and separate stakeholder drafts, a changed-capacity continuation,
 an exact mechanical table, a settled private-draft decision, and a changed-date

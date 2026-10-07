@@ -23,10 +23,10 @@ function powershell(source, environment = {}) {
     env: { ...process.env, ...environment },
   });
 }
-function windows(action, path) {
+function windows(action, path, environment = {}) {
   return spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", HELPER, "-Action", action], {
     encoding: "utf8", windowsHide: true, timeout: 30_000, maxBuffer: 1024 * 1024,
-    env: { ...process.env, OPENSOCRATES_WINDOWS_PATH: path },
+    env: { ...process.env, ...environment, OPENSOCRATES_WINDOWS_PATH: path },
   });
 }
 function requireHelper(action, path) {
@@ -73,7 +73,7 @@ async function hold(path, { directory = false } = {}) {
   const args = directory
     ? ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", HELPER, "-Action", "lease"]
     : ["-NoProfile", "-NonInteractive", "-Command",
-      "$ErrorActionPreference='Stop'; $stream=[IO.File]::Open($env:OPENSOCRATES_WINDOWS_PATH,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite); " +
+      "$ErrorActionPreference='Stop'; $stream=[IO.File]::Open(('\\\\?\\'+$env:OPENSOCRATES_WINDOWS_PATH),[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite); " +
       "try {[Console]::WriteLine('ready');[Console]::Out.Flush();[void][Console]::In.ReadLine()} finally {$stream.Dispose()}"];
   const child = spawn("powershell.exe", args, {
     windowsHide: true, stdio: ["pipe", "pipe", "pipe"],
@@ -221,6 +221,62 @@ test("Windows workspace lifecycle uses explicit Unicode paths and preserves AGEN
   await runManagedHost(options("remove"), b.helpers(pkg));
   assert.equal(await fs.readFile(join(workspace, "AGENTS.md"), "utf8"), "Synthetic user workspace instructions");
   await assert.rejects(runManagedHost(b.options("antigravity", "install", { workspace: "relative" }), b.helpers(pkg)), { code: "invalid_scope" });
+});
+
+async function longWorkspace(b) {
+  const parent = await privateDirectory(join(b.base, "합성 경로 space ".repeat(9).trim()));
+  const workspace = await privateDirectory(join(parent, "긴 작업 폴더 space ".repeat(8).trim()));
+  assert.ok(workspace.length > 260, "Fixture must exercise MAX_PATH rather than only Unicode");
+  return workspace;
+}
+
+test("Windows long Unicode workspace lifecycle and locked update preserve the complete preimage", { ...NATIVE, timeout: 420_000 }, async (t) => {
+  const b = await box(t), pkg = await contentPackage(b, "antigravity"), workspace = await longWorkspace(b);
+  const sentinel = join(workspace, "AGENTS.md");
+  await fs.writeFile(sentinel, "Synthetic unrelated instructions in a long path\n");
+  const options = (action) => b.options("antigravity", action, { workspace });
+  await runManagedHost(options("install"), b.helpers(pkg));
+  const activeSkill = join(workspace, ".agents/skills/opensocrates");
+  const before = await snapshot(workspace);
+  const release = await hold(join(activeSkill, "SKILL.md"));
+  try { await assert.rejects(runManagedHost(options("update"), b.helpers(pkg))); }
+  finally { await release(); }
+  assert.deepEqual(await snapshot(workspace), before);
+  await runManagedHost(options("update"), b.helpers(pkg)); // Inspect deep renamed backup before deleting it.
+  assert.equal((await runManagedHost(options("disable"), b.helpers(pkg))).enabled, false);
+  assert.equal((await runManagedHost(options("update"), b.helpers(pkg))).enabled, false);
+  assert.equal(await exists(activeSkill), false);
+  await runManagedHost(options("enable"), b.helpers(pkg));
+  assert.equal((await runManagedHost(options("diagnose"), b.helpers(pkg))).integrity, "verified");
+  await runManagedHost(options("remove"), b.helpers(pkg));
+  assert.equal(await fs.readFile(sentinel, "utf8"), "Synthetic unrelated instructions in a long path\n");
+  assert.equal(await exists(activeSkill), false);
+});
+
+test("Windows long paths retain ZIP bytes, extraction containment, DACL checks and ancestor leases", NATIVE, async (t) => {
+  const b = await box(t), pkg = await contentPackage(b, "claude-chat"), workspace = await longWorkspace(b);
+  // The generic .NET fixture ZIP uses Windows separators. Exercise the actual
+  // portable product archive here; the helper continues to reject backslashes.
+  pkg.asset = join(ROOT, "dist/opensocrates-1.5.0-claude-chat-skills.zip");
+  const output = join(workspace, "계정 export.zip");
+  const result = await runManagedHost(b.options("claude-chat", "export", { output }), b.helpers(pkg));
+  assert.equal(result.sha256, digest(await fs.readFile(pkg.asset)));
+  assert.deepEqual(await fs.readFile(output), await fs.readFile(pkg.asset));
+  requireHelper("check", output);
+  const extraction = await privateDirectory(join(workspace, "압축 해제"));
+  const unpacked = windows("extract", output, { OPENSOCRATES_WINDOWS_DESTINATION: extraction });
+  assert.equal(unpacked.status, 0, `Cannot extract the portable ZIP under a long path: ${unpacked.stderr.replaceAll(workspace, "<synthetic-workspace>").replaceAll(b.base, "<synthetic-base>").replaceAll(ROOT, "<source>")}`);
+  assert.deepEqual(await snapshot(extraction), await snapshot(pkg.root));
+  requireHelper("seal-new", extraction);
+  requireHelper("check-tree", extraction);
+  const release = await hold(workspace, { directory: true });
+  try { await assert.rejects(fs.rename(workspace, `${workspace}-replacement`), (error) => ["EPERM", "EACCES", "EBUSY"].includes(error.code)); }
+  finally { await release(); }
+  const changed = powershell("$item=Get-Item -LiteralPath ('\\\\?\\'+$env:TEST_PATH); $acl=$item.GetAccessControl(); $acl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new([Security.Principal.SecurityIdentifier]::new('S-1-1-0'),'Write','None','None','Allow')); $item.SetAccessControl($acl)", { TEST_PATH: workspace });
+  assert.equal(changed.status, 0);
+  const before = await snapshot(workspace);
+  await assert.rejects(runManagedHost(b.options("claude-chat", "export", { output: join(workspace, "refused.zip") }), b.helpers(pkg)), { code: "unsafe_windows_path" });
+  assert.deepEqual(await snapshot(workspace), before);
 });
 
 test("Windows owned lifecycle refuses unknown or modified files without removing them", NATIVE, async (t) => {

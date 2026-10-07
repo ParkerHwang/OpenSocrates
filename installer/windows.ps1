@@ -2,7 +2,16 @@
 param([ValidateSet('entries','extract','private','check','check-tree','mkdir-private','seal-new','lease')][string]$Action)
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
-$targetPath = $env:OPENSOCRATES_WINDOWS_PATH
+function Native-Path([string]$path) {
+    $absolute = [IO.Path]::GetFullPath($path)
+    # PowerShell 5.1's FileSystemInfo ACL methods otherwise fail beyond MAX_PATH,
+    # including an owned tree temporarily moved below a transaction backup.
+    # Convert an already absolute local drive path; caller path/alias policy and
+    # every ownership, DACL and reparse check remain in force.
+    if ($absolute -match '^[a-zA-Z]:\\') { return '\\?\' + $absolute }
+    return $absolute
+}
+$targetPath = Native-Path $env:OPENSOCRATES_WINDOWS_PATH
 $currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $currentSid = $currentIdentity.User
 $trustedSids = @($currentSid.Value,'S-1-5-18','S-1-5-32-544')
@@ -142,10 +151,11 @@ try {
         }
     }
     if ($Action -eq 'entries') { ConvertTo-Json -InputObject @($zip.Entries | ForEach-Object { $_.FullName }) -Compress; exit 0 }
-    $destination = [IO.Path]::GetFullPath($env:OPENSOCRATES_WINDOWS_DESTINATION).TrimEnd('\') + '\'
+    $destination = (Native-Path $env:OPENSOCRATES_WINDOWS_DESTINATION).TrimEnd('\') + '\'
     Assert-Parents $destination
     foreach ($entry in $zip.Entries) {
-        $output = [IO.Path]::GetFullPath([IO.Path]::Combine($destination,$entry.FullName))
+        # Extended Win32 paths do not translate the ZIP's portable slash syntax.
+        $output = [IO.Path]::GetFullPath([IO.Path]::Combine($destination,$entry.FullName.Replace('/','\')))
         if (!$output.StartsWith($destination,[StringComparison]::OrdinalIgnoreCase)) { throw 'ZIP path escape' }
         if ($entry.FullName.EndsWith('/')) { [void][IO.Directory]::CreateDirectory($output); continue }
         [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($output))

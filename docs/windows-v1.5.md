@@ -137,6 +137,11 @@ Workspace and global loading must be qualified separately.
 
 ## Safety, recovery and evidence limits
 
+The Windows helper normalizes local drive paths before using extended Win32
+paths internally. This supports Unicode/spaces and paths beyond 260 characters,
+including deeper transaction backups, without changing OS long-path settings.
+It does not relax ownership, DACL, junction/reparse or archive-containment checks.
+
 Windows paths must have the expected owner and no untrusted write access.
 Junctions, symlinks and other reparse points in managed paths or ancestors are
 refused. Operations use an exclusive lock and pin ancestors against replacement;

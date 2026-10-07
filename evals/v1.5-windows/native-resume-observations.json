@@ -1,0 +1,78 @@
+{
+  "schema": "opensocrates.windows-native-resume-observation/1.0.0",
+  "date": "2026-10-07",
+  "source_boundary": "Follow-up to verified Windows commit 8533b646baffa2e318467923b5ad482bd28584d2; exact repair head and CI are recorded in Draft PR #105.",
+  "scope": "Windows-only filesystem qualification and native Antigravity/Claude Desktop UI recovery. Claude Web qualification is a separate Mac handoff, never a Windows pass.",
+  "privacy": "Only public synthetic fixture hashes, program versions, counts and categorical observations. No screenshots, raw conversations, account identifiers, personal paths, credentials or hidden reasoning retained.",
+  "environment": {"os": "Windows 11 Pro", "build": "26300", "architecture": "x64", "powershell_helper": "Windows PowerShell 5.1", "node": "24.15.0"},
+  "candidate": {
+    "antigravity_zip_sha256": "327809e06876ca59efec879f3e18ff84203692ff0d49a17b73c2f0d4210f30c7",
+    "account_zip_sha256": "a7fed8155dd209ee3b5ec4c4249a81dc68d66d36e715d23858f5075a9c68244f",
+    "sources_sha256": "4fd037aa0eb6eadc82616d1a462f8330ea744a4f2a2d0621ca208a580b7b3426",
+    "unrelated_sentinel_sha256": "5f55de1d1b5ff2d9d852881441f86e89ee35f50c5919bfc9e75ba4e0d6d3a77c"
+  },
+  "antigravity": {
+    "surface": "conversation application 2.19.1",
+    "existing_ui_model": "Gemini 3.8 Flash High",
+    "isolated_project_model": "unknown; project creation did not complete",
+    "capture": "Selected Antigravity window now produced its own bounded screenshot and accessibility tree. Existing conversations were not opened.",
+    "input_attempts": {"create_project_accessibility": 2, "maximize_accessibility": 1, "file_menu_coordinate": 1, "window_selection_recovery": 1},
+    "input_outcome": "Calls returned without an error, but immediate fresh state showed no project dialog, window-size change or menu. Refreshed returned-window selection and one create-project retry also produced no visible change.",
+    "project_creation_confirmed": false,
+    "actual_model_requests": 0,
+    "ordinary_entry": "unavailable",
+    "complete_canonical_reads": "unknown",
+    "method_application": "unverified",
+    "useful_result": "unavailable",
+    "workspace_origin_loaded": "unknown",
+    "global_origin_loaded": "not attempted; actual user global settings untouched"
+  },
+  "claude_desktop": {
+    "app_version": "2.26454.0",
+    "surfaces_visible": ["Chat", "Cowork"],
+    "account_relationship": "User reports Desktop account differs from Web; no credentials copied.",
+    "capture": "Own Claude Desktop screenshot showed its Chat/Cowork start screen; accessibility exposed only the window root.",
+    "input_attempts": {"customize_coordinate": 2, "window_selection_recovery": 1},
+    "input_outcome": "Customize navigation produced no visible change before or after refreshed window selection and one retry. No candidate upload, skill state change or synthetic request was made.",
+    "actual_model_requests": 0,
+    "chat_candidate_result": "unavailable",
+    "cowork_candidate_result": "unavailable"
+  },
+  "filesystem_iteration": {
+    "before_repair": "Workspace status/diagnose reported verified owned content, while update failed and restored the preimage.",
+    "retained_failures": [
+      "Three update attempts, including two increasingly specific diagnostic traces, failed while inspecting the renamed deep skill backup. PowerShell FileSystemInfo.GetAccessControl raised ArgumentException: invalid name.",
+      "Initial extended-path repair exposed that ZIP portable slashes must be converted before extended Win32 path extraction; extraction refused the malformed native destination and left the installation intact.",
+      "Initial new long-path fixture used a normal-path .NET file lock and a .NET-created ZIP with Windows separators. The fixture lock failed and archive validation correctly rejected its backslashes. Fixtures were corrected to use an extended-path file lock and the actual portable product ZIP; validation was not weakened."
+    ],
+    "repair": "Convert normalized absolute local-drive helper paths to extended Win32 paths and translate validated ZIP separators before combining the extraction destination. Ownership, protected DACL, reparse, alias, containment, lock and rollback checks remain mandatory.",
+    "actual_staged_workspace_update": "pass after repair; current portable artifact installed",
+    "settings_preservation": "Only the separately staged synthetic workspace was mutated. Its fixture and unrelated sentinel are retained; actual global app settings and account skills were not changed."
+  },
+  "diagnostic_decisions": [
+    {
+      "locale": "ko",
+      "observation": "검증됨: 짧은 CI 경로의 검사는 통과했지만 실제 긴 합성 폴더의 업데이트는 깊어진 백업의 권한 조회에서 실패했습니다. 설치 상태·내용은 검증됐고 롤백이 보존했습니다.",
+      "candidate_explanations": ["추론됨: 실제 외부 소유자나 쓰기 권한 충돌", "추론됨: MAX_PATH를 넘는 .NET 권한 조회 제한", "미검증: 별도 파일 변경이나 일시적인 I/O 실패"],
+      "comparison_criteria": "같은 내용·소유권의 상태 검사, 실패 단계, 경로 길이와 접두어만 바꾼 권한 조회, 실제 업데이트 재실행으로 비교했습니다. 확률은 추정하지 않았습니다.",
+      "discriminating_evidence": "검증됨: 318/332자 합성 경로의 일반 조회는 실패하고 확장 경로의 조회·권한 재적용은 성공했습니다. 실패는 이동된 backup-1 조회였으며 확장 경로와 압축 구분자 수정 후 동일 작업공간 업데이트가 성공했습니다.",
+      "provisional_best_explanation": "현재 가장 나은 설명은 긴 경로의 .NET 조회 제한입니다. 위 통제 관찰과 재실행이 이를 지지하며, 다른 소유권 문제 전반의 부재까지 주장하지 않습니다.",
+      "next_test": "260자를 넘는 작업공간 전체 수명주기, 잠긴 파일 롤백, 계정 ZIP 내보내기·압축 해제, 권한 충돌 거부와 상위 경로 임대 회귀를 실행합니다.",
+      "flip_condition": "수정 후 같은 긴 경로에서 같은 권한 조회가 실패하거나 내용·DACL 변경이 드러나면 재진단합니다. 실제 외부 쓰기 권한은 계속 거부해야 합니다."
+    },
+    {
+      "locale": "ko",
+      "observation": "검증됨: 두 앱 모두 대상 화면을 읽었지만 기본 탐색 입력 후 화면 변화가 없었습니다. 모델 요청은 0회입니다.",
+      "candidate_explanations": ["추론됨: 네이티브 도구의 입력 전달 또는 대상 연결 문제", "미검증: 앱 자체의 탐색 응답 문제"],
+      "comparison_criteria": "서로 다른 앱의 기본 탐색, 접근성 입력과 화면 좌표 입력, 새 창 선택 뒤 한 번의 복구 결과를 비교했습니다.",
+      "discriminating_evidence": "검증됨: Antigravity의 프로젝트·최대화·메뉴와 Claude Desktop의 사용자 지정 탐색 모두 새 상태에서 변화가 없었습니다. OpenSocrates가 동작하는 단계에 도달하지 못했습니다.",
+      "provisional_best_explanation": "현재 입력 도구의 측정 한계가 앞서는 작업 가설입니다. 입력 도달 증거가 없어 앱의 원인이나 OpenSocrates 발견 여부는 보류합니다.",
+      "next_test": "정상 작동하는 네이티브 입력 세션에서 합성 작업공간 연결이 실제로 완료되는지 확인한 다음 고정 R1–R5를 실행합니다.",
+      "flip_condition": "프로젝트 연결이나 스킬 관리 탐색이 관찰되면 실사용 검증을 재개합니다. 설치 파일 존재로 그 결과를 대체하지 않습니다."
+    }
+  ],
+  "diagnostic_grounding": "OpenSocrates grounding: abduction@3",
+  "grounding_limit": "Complete installed Korean procedure was read through documented fallback after prior native lookup failure. Agent-directed application is not a native grounding receipt.",
+  "stop": "Bounded native input recovery exhausted. No coordinate guessing, internal app APIs, permission changes, private history access or unrelated app input used. Continue source checks and GitHub handoff independently.",
+  "historical_boundary": "Earlier Mac and Windows observations remain preserved. No prior failed case is regraded by a source change, filesystem success or unavailable native proof."
+}
