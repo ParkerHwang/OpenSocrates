@@ -1,0 +1,60 @@
+---
+name: opensocrates
+description: "Uses grounded judgment to synthesize source material, explain decisions, compare choices, and prepare useful stakeholder messages. Use when a task requires interpretation, evidence reconciliation or consequential judgment; skip mechanical formatting and transcription."
+---
+
+# OpenSocrates controller
+
+Before a materially changed judgment in this turn, read the
+[file-delivery decision guide](references/decision/guide.en.md) or
+[파일 전달 판단 안내](references/decision/guide.ko.md). Use its current catalogs
+and features to check eligibility, then read only the complete required
+procedures. No native runtime or extra model request is part of this skill.
+Empty selection is valid. Mechanical work needs no method.
+
+For synthesis, decisions and stakeholder messages, use the
+[reader guide](references/reader/guide.en.md) or
+[독자를 위한 안내](references/reader/guide.ko.md). Keep the task's goal,
+permissions, constraints and completion conditions available. Do not wait for
+another user message to reconsider judgment within the same turn.
+
+## English controller
+
+{{CONTROLLER_EN}}
+
+## 한국어 컨트롤러
+
+{{CONTROLLER_KO}}
+
+## Mandatory grounding gate
+
+Apply, name or cite a method only after reading its complete installed canonical
+procedure in the current conversation. Record its exact `Method ID` and
+`Content revision`; prior model knowledge is not a substitute. An unavailable
+or incomplete read means no application of that method. Preserve its teacher
+questions, use conditions, contraindications, required public output, evidence
+and stop contracts. Settle the questions for yourself rather than interviewing
+the user unless a missing answer changes the work.
+
+End a grounded final response with exactly
+`OpenSocrates grounding: <method-id>@<content-revision>`; join multiple actually
+applied methods with comma-space. Do not include abandoned, unread or ineligible
+methods. A completed read and reported application are separate from native
+proof or improved outcomes. Native application receipts are unavailable on this
+content-only surface. Finish after the task's actual required checks; do not
+seek unavailable proof or repeat unchanged checks. Restore the complete
+references after compaction or handoff before reusing them.
+
+한국어 접지 규칙: 현재 대화에서 설치된 정식 절차 전체를 읽고 적용 조건을
+확인한 방법만 사용합니다. 방법의 ID와 콘텐츠 개정을 직접 확인합니다.
+필수 공개 결과, 근거 상태, 중단 조건과 접지 표기를 보존합니다. 읽지 못했거나
+적합하지 않은 방법은 적용하지 않습니다. 읽기, 적용했다는 보고, 실제 결과의
+유용성은 서로 다른 증거입니다. 과제의 실제 완료 조건을 충족하면 마무리합니다.
+
+{{RESPONSE_POLICY_EN}}
+
+{{RESPONSE_POLICY_KO}}
+
+OpenSocrates {{PRODUCT_VERSION}}, content revision {{CONTENT_REVISION}}.
+This package contains one public skill and {{METHOD_COUNT}} internal canonical
+methods. It contains no hooks, runtime, launcher, credential access or telemetry.

@@ -16,4 +16,7 @@ ENTRY_GUIDANCE = (
     "unfinished task or a demand to seek unavailable native proof. Finish after the "
     "actual required checks and do not repeat unchanged checks. No initial method is "
     "selected by this entry."
+    " For synthesis, decisions and stakeholder messages, use the installed controller's "
+    "references/reader/guide.en.md or guide.ko.md to make the result understandable "
+    "and useful to its intended reader."
 )
