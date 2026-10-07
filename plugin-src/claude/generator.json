@@ -1,0 +1,39 @@
+{
+  "host": "claude",
+  "template_revision": "1",
+  "launcher_host": "claude",
+  "release_targets": ["darwin-arm64"],
+  "launchers": ["bin/launch.sh"],
+  "manifest_template": ".claude-plugin/plugin.json.tmpl",
+  "manifest_output": ".claude-plugin/plugin.json",
+  "hooks_builder": "opensocrates.hosts.claude.commands:build_hooks",
+  "hooks_template": "hooks/hooks.json.tmpl",
+  "hooks_output": "hooks/hooks.json",
+  "shared_templates": [
+    {"template": "skills/opensocrates/SKILL.md.tmpl", "output": "skills/opensocrates/SKILL.md"},
+    {"template": "references/decision/guide.en.md.tmpl", "output": "skills/opensocrates/references/decision/guide.en.md"},
+    {"template": "references/decision/guide.ko.md.tmpl", "output": "skills/opensocrates/references/decision/guide.ko.md"}
+  ],
+  "method_template": "references/method.md.tmpl",
+  "method_output": "skills/opensocrates/references/methods/{method_id}.md",
+  "command_templates": [
+    {"template": "README.md.tmpl", "output": "README.md"},
+    {"template": "THIRD_PARTY_NOTICES.md.tmpl", "output": "THIRD_PARTY_NOTICES.md"}
+  ],
+  "copy_files": [
+    {"source": "packaging/launchers/claude-launch.sh", "output": "bin/launch.sh"},
+    {"source": "plugin-src/shared/decision/request.json", "output": "skills/opensocrates/references/decision/request.json"},
+    {"source": "plugin-src/shared/decision/features.json", "output": "skills/opensocrates/references/decision/features.json"},
+    {"source": "schemas/v1", "output": "schemas/v1"},
+    {"source": "LICENSE", "output": "LICENSE"}
+  ],
+  "bundle_output": "content/compiled-content.bundle.json",
+  "runtime_output": "runtime",
+  "public_skills": ["opensocrates"],
+  "capability_evidence": {
+    "status": "unknown",
+    "reason": "source and package contracts do not establish a current live Claude host receipt",
+    "windows_native": "unavailable",
+    "account_delivery": "separate content-only export"
+  }
+}
