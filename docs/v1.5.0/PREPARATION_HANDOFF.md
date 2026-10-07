@@ -9,12 +9,12 @@ and developer navigation only; implementation of the revised hosts has not begun
 
 Parent tracker: [#94](https://github.com/ParkerHwang/OpenSocrates/issues/94).
 Preparation review: [#96](https://github.com/ParkerHwang/OpenSocrates/issues/96).
-Historical candidate: [Draft PR #95](https://github.com/ParkerHwang/OpenSocrates/pull/95),
+Historical candidate: [Closed PR #95](https://github.com/ParkerHwang/OpenSocrates/pull/95),
 `f04d57fa84a82fbb0e3feb6894ec1210f135b3a8`; preserve source and frozen outcomes.
 
 | Order | Issue | Dependency |
 | --- | --- | --- |
-| W1 Core reasoning and recoverable requests | [#97](https://github.com/ParkerHwang/OpenSocrates/issues/97) | Prepared scope and baseline |
+| W1 Reader-useful original reasoning | [#97](https://github.com/ParkerHwang/OpenSocrates/issues/97) | Prepared scope and baseline |
 | W2 Native Claude Code | [#98](https://github.com/ParkerHwang/OpenSocrates/issues/98) | W1 shared contract |
 | W3 Claude account delivery | [#99](https://github.com/ParkerHwang/OpenSocrates/issues/99) | W1 shared contract |
 | W4 Antigravity application | [#100](https://github.com/ParkerHwang/OpenSocrates/issues/100) | W1 shared contract |
@@ -81,6 +81,6 @@ and narrow support claims to actual cells. Source/package tests do not prove
 method application, universal benefit or savings.
 
 The repository description and released support remain Codex-only until the new
-support is implemented and qualified. PR #95 is historical reference. Its earlier
+support is implemented and qualified. PR #95 is closed historical reference. Its earlier
 scores, failed versions and claim limits are preserved; no blanket candidate
-merge or retroactive regrading is part of the revised implementation.
+merge, code/guide import or retroactive regrading is part of the revised implementation.

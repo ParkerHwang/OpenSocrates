@@ -83,7 +83,8 @@ For the revised v1.5.0 work, read the
 [implementation preparation](docs/v1.5.0/README.md) and its current handoff first.
 It defines future goals and work packages; current released support remains
 Codex-only. The earlier candidate PR #95 is historical reference, not the new
-implementation baseline. Preserve its frozen evidence and use focused reviewed
-changes rather than importing its coding, memory, or orchestration scope.
+implementation baseline. It is closed and withdrawn in full. Preserve its frozen
+evidence; do not merge, cherry-pick, or copy its code/guides. Develop the revised
+release from v1.4 rather than its coding, memory, or orchestration candidate.
 
 Work is complete only when requested behavior is implemented, canonical and generated outputs agree, required checks pass, documentation and claim boundaries are accurate, privacy and rollback properties are preserved, and GitHub contains a durable handoff. Merge through the protected branch workflow. Closed or merged items move to `Done`; stable behavior begins with the corresponding tagged release, not merely a Project card or Draft PR.

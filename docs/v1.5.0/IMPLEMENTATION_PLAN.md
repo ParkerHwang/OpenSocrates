@@ -13,8 +13,9 @@ fixed. One primary integrator owns shared files and final verification.
    applicability, stop, evidence, grounding, privacy, and fail-open contracts.
 2. Keep selection task-based, with no extra selector-model call, hidden model
    switch, default capture, or automatic project enrollment. Project memory and
-   broad orchestration from the old candidate are deferred; no new store is
-   needed for this release. Dedicated coding-specialist content is excluded.
+   broad orchestration from the old candidate are excluded from this release,
+   together with dedicated coding-specialist content. Do not import old v1.5
+   candidate code or guides into the new implementation.
 3. Make a standalone account skill ZIP the first Claude Chat/Cowork transport,
    matching the existing Customize > Skills path. Supply a small opt-in persistent
    instruction. A binless account plugin is a later distribution option; local
@@ -43,7 +44,7 @@ access, duplicate origin, permissions, or lifecycle checks fail.
 | Package | Dependencies and ownership | Work and completion |
 | --- | --- | --- |
 | W0 Preparation | Primary; documentation and GitHub only | Scope, research, source map, starter fixtures and GitHub handoff are reviewable. Runtime remains v1.4.0. |
-| W1 Core behavior and recoverable requests | W0; primary owns shared controller, EN/KO guidance and decision interfaces | Preserve the methods; improve reader-purpose/context/action connections against concrete cases. Port only independent safe request preparation/diagnostics if needed. Mechanical work stays light; invalid requests preserve valid read state. Generate and check affected content together. |
+| W1 Reader-useful original reasoning | W0; primary owns shared controller and EN/KO guidance | Preserve the methods; improve reader-purpose/context/action connections against concrete cases from the v1.4 baseline. No old v1.5 code/guide imports. Mechanical work stays light. Generate and check affected content together. |
 | W2 Claude native Code | W1 contract; sole owner of Claude host adapter and fixtures | Explicit Claude event/response normalization, short entry hooks, platform-safe launchers, deterministic decision support and bounded cleanup. CLI and Desktop local Code on macOS/Windows are separate cells. |
 | W3 Claude account delivery | W1 contract; sole owner of account export and migration guide | Binless complete skill export, normal matched requests, standing instruction, old enabled 1.1.2-text skill preserved until replacement qualifies. Ordinary Chat and cloud Cowork are separate cells. Runtime hooks are not bundled into the first account export. |
 | W4 Antigravity application | W1 contract; sole owner of Antigravity rules/skill templates and fixtures | Current always_on syntax, complete references, modular owned workspace route, then global route. Qualify conversation app on macOS/Windows. IDE observations cannot substitute for application acceptance. |
@@ -70,25 +71,22 @@ its mutation checks together when new runtime/package behavior is implemented.
 Do not rename the installed support statement merely because a plan exists.
 Do not remove the current checks to make a new host appear supported.
 
-## Reuse and pruning of old work
+## Withdrawn candidate and retained history
 
-The historical multi-host source before the Codex-only transition is
-`01eb35b75efc706b55079e7688cf04618e883b6d`. Its Claude/Antigravity adapters and
-templates identify seams, but need current payload and package-schema review.
-The old Claude adapter inherits Codex parsing; the old Antigravity package has
-explicit skill delivery only. Neither is the current automatic-entry solution.
+The earlier v1.5 coding/memory/orchestration candidate is withdrawn in full.
+PR #95 is closed, unmerged, and retained only for historical source and frozen
+results. It is not an implementation baseline, future optional feature backlog,
+or planned source of code or guide imports. Do not merge, cherry-pick, or copy its
+implementation into this release. Develop new improvements from the v1.4 source
+against the current user need.
 
-From `f04d57fa`, inspect `selector/decision_requests.py` with its calling session
-and CLI changes for mechanical request preparation, strict JSON rejection, safe
-field diagnostics and acknowledgment preservation. Review only relevant EN/KO
-collaboration phrases about side questions, settled permissions and repeated
-checks. These files contain memory/coding/orchestration connections; do not
-copy them wholesale or cherry-pick a broad implementation commit.
-
-Pruned release work: dedicated coding specialists and coding benchmark targets;
-new project-memory storage; broad maker/reviewer/verifier orchestration;
-unrequested Gemini web/mobile/CLI; all-host legacy restoration; unsupported native
-architectures. Their original evidence remains on the historical branch.
+Older pre-v1.4 multi-host records can identify past host-contract pitfalls, but
+current vendor APIs and new surface-specific qualification govern restoration.
+Dedicated coding specialists, coding benchmark targets, new project-memory
+storage and broad maker/reviewer/verifier orchestration are outside this version.
+Original results and failures are retained without regrading or deleting history.
+Unrequested Gemini web/mobile/CLI and unsupported native architectures also remain
+outside the requested host scope.
 
 ## First execution and reopening conditions
 

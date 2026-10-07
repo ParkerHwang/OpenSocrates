@@ -88,10 +88,10 @@ promoting another platform's result to a pass.
 
 Keep the existing privacy, user-authority, canonical evidence/stop, and explicit
 unknown-state contracts. This v1.4-based implementation includes no new project
-memory store; the old candidate's opt-in memory remains a deferred historical
-scope with its original privacy requirements.
+memory store; the old candidate is withdrawn in full and retained only as
+historical source and results. No old v1.5 code or guide import is planned.
 Broad orchestration, coding specialist procedures, and coding benchmark success
-are not prerequisites for this product direction. Historical results stay intact.
+are excluded from this version. Historical results stay intact.
 Release publication and active installation changes remain separate actions.
 
 ## Host references

@@ -37,11 +37,11 @@ Use `prep/v1.5-product-refocus` as the preparation branch. Runtime, canonical
 methods, schemas, installer, package versions, and dependency pins still match
 v1.4.0. Existing local product settings remain unchanged.
 
-The earlier [Draft PR #95](https://github.com/ParkerHwang/OpenSocrates/pull/95),
+The earlier [Closed PR #95](https://github.com/ParkerHwang/OpenSocrates/pull/95),
 source `f04d57fa84a82fbb0e3feb6894ec1210f135b3a8`, preserves the old coding,
 memory, orchestration, and comparison record. Do not merge that candidate into
-this implementation. Review small request-recovery or collaboration changes
-individually against the revised goal. The earlier 01-15 specifications belong
+this implementation. Do not import its code or guides; new improvements start
+from v1.4 and the current user need. The earlier 01-15 specifications belong
 to that historical branch, not this preparation package.
 
 All original 48 methods, teacher questions, common system content, and EN/KO

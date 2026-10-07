@@ -12,7 +12,7 @@ messages. Preserve Codex and the original 48 procedures. Add Claude Code native
 macOS/Windows, Claude account web/Desktop/Cowork, and Antigravity conversation
 app macOS/Windows support without repeated manual OpenSocrates commands. Do not
 implement dedicated coding-specialist features, a new memory store or broad
-orchestration as prerequisites.
+orchestration; all are outside this version.
 
 ## Reconcile first
 
@@ -21,12 +21,12 @@ Read this package's [index](README.md), [accepted scope](16-product-refocus-and-
 then AGENTS.md, CONTRIBUTING.md and SECURITY.md. Verify current main, preparation
 PR/head, worktree and working changes before edits. Use the prepared branch's
 reviewed source or current main plus its documentation changes. Do not merge the
-old PR95 candidate; keep its frozen results unchanged.
+closed old PR95 candidate or import its code/guides; keep its frozen results unchanged.
 
 ## Execution
 
 Start W1 with the existing content identity and practical reader cases. Make the
-smallest supported controller/guidance or request-recovery change, align EN/KO,
+smallest reader-useful controller/guidance change from v1.4, align EN/KO,
 and generate canonical outputs together. Avoid replacing complete procedures
 with summaries or adding obligatory ceremonies to mechanical work.
 
