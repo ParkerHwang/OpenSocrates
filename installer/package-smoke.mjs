@@ -303,7 +303,9 @@ try {
   assert.match(help.stdout, /remove \[--host .*\] \[--purge \[--reset-trust\]\]/u);
   assert.match(help.stdout, /host security trust, and user history are reported separately/u);
   assert.equal(help.stdout.match(/--asset ZIP --checksum FILE/gu)?.length, 7);
-  assert.match(help.stdout, /additional macOS profiles\nrequire an explicit --host/u);
+  assert.match(help.stdout, /additional profiles\nrequire an explicit --host/u);
+  assert.match(help.stdout, /Claude native lifecycle requires macOS arm64/u);
+  assert.match(help.stdout, /Antigravity installs owned rules and skills[\s\S]*Windows x64/u);
   assert.match(help.stdout, /export --host claude-chat --output ZIP/u);
   assert.doesNotMatch(help.stdout, /--checksum SHA256/u);
 

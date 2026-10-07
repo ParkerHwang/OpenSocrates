@@ -87,6 +87,11 @@ before its EOF trace was written on a busy runner. Its test-only termination
 grace is now 500 ms; production limits and the separate bounded-timeout test
 are unchanged. The [initial failed run](https://github.com/ParkerHwang/OpenSocrates/actions/runs/37584772262)
 is retained; the Draft PR records the corrected final-head run.
+The next run passed the full installer unit suite and reached the packed npx
+smoke gate, which still expected Mac-only help wording. The smoke assertion now
+checks explicit addon selection, the retained Mac native Claude boundary and
+Windows x64 Antigravity wording. That [failed smoke run](https://github.com/ParkerHwang/OpenSocrates/actions/runs/37585080238)
+also remains available; no product behavior was changed for this repair.
 
 ## Artifact identities
 
