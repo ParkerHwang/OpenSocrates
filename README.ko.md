@@ -18,7 +18,15 @@ v1.5의 독자 안내는 결론을 맥락과 다음 행동에 연결합니다. �
 [![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## v1.5.0 Mac 단계
+## v1.5.0 구현 단계
+
+Windows 후속 구현은 Claude 웹·Desktop Chat·Cowork용 계정 ZIP 검증·내보내기와
+Antigravity의 Windows x64 작업 폴더·전역 설치 수명 주기를 추가합니다.
+이번 Windows 범위에서 Claude Code는 제외하며 기존 Mac 네이티브 구현은 유지합니다.
+[Windows 안내](docs/windows-v1.5.ko.md),
+[검증 기록](evals/v1.5-windows/REPORT.md),
+[구현 인계](docs/v1.5.0/WINDOWS_IMPLEMENTATION_HANDOFF.md)를 참고하세요.
+파일 시스템 검사와 실제 호스트 결과는 별도로 기록합니다.
 
 이 체크아웃에는 아래 Mac 연동과 로컬 배포 파일을 만드는 기능이 구현되어
 있습니다. **v1.5.0은 아직 npm이나 GitHub Releases에 게시되지 않았습니다.**

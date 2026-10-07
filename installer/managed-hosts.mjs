@@ -2,9 +2,10 @@
 import fs from "node:fs/promises";
 import { constants } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { dirname, isAbsolute, join, parse, relative, resolve, sep } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const HOSTS = new Set(["claude", "antigravity", "claude-chat"]);
 const ACTIONS = new Set(["install", "update", "status", "diagnose", "remove", "disable", "enable", "verify", "export"]);
@@ -26,6 +27,52 @@ export class ManagedHostError extends Error {
 }
 
 function fail(code, message) { throw new ManagedHostError(code, message); }
+function windowsArgs(action) {
+  return ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", fileURLToPath(new URL("./windows.ps1", import.meta.url)), "-Action", action];
+}
+function windows(action, path) {
+  if (process.platform !== "win32") return;
+  const value = spawnSync("powershell.exe", windowsArgs(action), { encoding: "utf8", windowsHide: true, timeout: 30_000, maxBuffer: 1024 * 1024, env: { ...process.env, OPENSOCRATES_WINDOWS_PATH: path } });
+  if (value.error || value.status !== 0) fail("unsafe_windows_path", "Windows ownership, DACL or reparse validation failed; no unowned path is modified.");
+}
+async function privateDirectory(path) {
+  if (process.platform === "win32") windows("mkdir-private", path);
+  else await fs.mkdir(path, { mode: 0o700 });
+}
+async function privateScratch(parent, prefix) {
+  const path = join(parent, `${prefix}${randomUUID()}`);
+  await privateDirectory(path);
+  return path;
+}
+async function withWindowsLease(path, action) {
+  if (process.platform !== "win32") return action();
+  const lease = spawn("powershell.exe", windowsArgs("lease"), { windowsHide: true, stdio: ["pipe", "pipe", "pipe"], env: { ...process.env, OPENSOCRATES_WINDOWS_PATH: path } });
+  let ready = false, exited = false;
+  lease.on("exit", () => { exited = true; });
+  lease.stderr.resume(); // Host/user paths and raw helper errors are never retained.
+  try {
+    await new Promise((accept, reject) => {
+      let output = "";
+      const timer = setTimeout(() => reject(new ManagedHostError("unsafe_windows_path", "Cannot acquire the Windows directory lease.")), 30_000);
+      const failed = () => { clearTimeout(timer); reject(new ManagedHostError("unsafe_windows_path", "Windows directory lease was unavailable.")); };
+      lease.once("error", failed); lease.once("exit", failed);
+      lease.stdout.on("data", (data) => {
+        output += data.toString("utf8");
+        if (output.length > 64) failed();
+        if (output === "ready\r\n" || output === "ready\n") { ready = true; clearTimeout(timer); accept(); }
+      });
+    });
+    const value = await action();
+    if (exited) fail("lease_interrupted", "Windows ancestor protection was interrupted; inspect the owned recovery state before retrying.");
+    return value;
+  } finally {
+    if (ready && !exited) {
+      const closed = new Promise((accept) => lease.once("exit", accept));
+      lease.stdin.end("done\n");
+      await closed;
+    } else if (!exited) lease.kill();
+  }
+}
 function object(value) { return value !== null && typeof value === "object" && !Array.isArray(value); }
 function hash(bytes) { return createHash("sha256").update(bytes).digest("hex"); }
 function digest(value) {
@@ -36,6 +83,7 @@ function safeRelative(value) {
   if (typeof value !== "string" || !value || value.includes("\\") || value.includes("\0") || isAbsolute(value) || value.split("/").some((p) => !p || p === "." || p === "..")) {
     fail("unsafe_path", "Package inventory contains an unsafe relative path.");
   }
+  if (value.split("/").some((part) => /[\x00-\x1f<>:"|?*]/u.test(part) || /[. ]$/u.test(part) || /^(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/iu.test(part))) fail("unsafe_path", "Package paths must not use Windows aliases or alternate streams.");
   return value;
 }
 async function entry(path) {
@@ -48,12 +96,14 @@ async function regular(path) {
 }
 async function safeParents(path, { create = false } = {}) {
   const absolute = resolve(path);
-  const parts = absolute.split(sep).filter(Boolean);
-  let current = sep;
+  if (process.platform === "win32" && !/^[a-z]:[\\/]/iu.test(absolute)) fail("unsafe_path", "Managed Windows paths require a local absolute drive path.");
+  const root = parse(absolute).root;
+  const parts = absolute.slice(root.length).split(sep).filter(Boolean);
+  let current = root;
   for (const part of parts) {
     current = join(current, part);
     let info = await entry(current);
-    if (!info && create) { await fs.mkdir(current, { mode: 0o700 }); info = await fs.lstat(current); }
+    if (!info && create) { await privateDirectory(current); info = await fs.lstat(current); }
     if (!info || !info.isDirectory() || info.isSymbolicLink()) fail("unsafe_path", "Managed directory or ancestor is missing, linked or not a directory.");
   }
   return absolute;
@@ -67,6 +117,7 @@ async function json(path) {
   return result;
 }
 async function files(root) {
+  windows("check-tree", root);
   const rootInfo = await entry(root);
   if (!rootInfo || !rootInfo.isDirectory() || rootInfo.isSymbolicLink()) fail("unsafe_path", "Package or managed root is not a regular directory.");
   const result = {};
@@ -164,7 +215,8 @@ async function verifyPackage(root, host, version) {
     for (const name of Object.keys(actual)) {
       if (host === "claude-chat" ? !name.startsWith("opensocrates/") : name !== manifestPath && name !== ".agents/rules/opensocrates.md" && !name.startsWith(`${skillRoot}/`)) fail("invalid_layout", "Unexpected content package layout.");
       if (name.split("/").some((part) => ["bin", "runtime", "hooks", ".claude-plugin"].includes(part))) fail("unexpected_executable_surface", "Content package contains a native integration surface.");
-      if ((await regular(join(root, name))).mode & 0o111) fail("unexpected_executable_surface", "Content package contains an executable file.");
+      if (process.platform !== "win32" && (await regular(join(root, name))).mode & 0o111) fail("unexpected_executable_surface", "Content package contains an executable file.");
+      if (/\.(?:exe|dll|com|cmd|bat|ps1|sh|mjs|py|pyc)$/iu.test(name)) fail("unexpected_executable_surface", "Content packages contain authored references only.");
     }
     if (!Object.hasOwn(expected, `${skillRoot}/SKILL.md`)) fail("invalid_layout", "Discovery skill is missing.");
     canonical(manifest, expected, skillRoot);
@@ -186,6 +238,7 @@ function validateMarker(value, host, scope) {
 }
 async function writeJson(path, value) {
   await fs.writeFile(path, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600, flag: "wx" });
+  windows("seal-new", path);
 }
 async function atomicMarker(path, value) {
   const temporary = join(dirname(path), `.opensocrates-marker-${randomUUID()}`);
@@ -194,12 +247,19 @@ async function atomicMarker(path, value) {
 }
 async function withLock(root, host, action) {
   await safeParents(root, { create: true });
+  windows("check", root);
   const lock = join(root, `.opensocrates-${host}-operation.lock`);
   let descriptor;
   try { descriptor = await fs.open(lock, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600); }
   catch (error) { if (error.code === "EEXIST" || error.code === "ELOOP") fail("operation_locked", "Another managed-host operation is active; no stale lock is removed automatically."); throw error; }
-  try { return await action(); }
-  finally { await descriptor.close(); await fs.unlink(lock); }
+  const identity = await descriptor.stat();
+  try { windows("seal-new", lock); return await withWindowsLease(root, action); }
+  finally {
+    const current = await entry(lock);
+    await descriptor.close();
+    if (!current || current.dev !== identity.dev || current.ino !== identity.ino || current.isSymbolicLink()) fail("operation_lock_changed", "Operation lock changed; no replacement lock is deleted.");
+    await fs.unlink(lock);
+  }
 }
 
 function basePaths(options) {
@@ -262,6 +322,7 @@ function unregisterNative(helpers, state) {
 async function nativeOwned(paths) {
   if (!(await entry(paths.base))) return null;
   await safeParents(paths.base);
+  windows("check", paths.base);
   const info = await entry(paths.root);
   if (!info) return null;
   if (!info.isDirectory() || info.isSymbolicLink()) fail("unsafe_path", "Claude managed root is linked or not a directory.");
@@ -381,6 +442,7 @@ async function antiOwned(paths) {
   const baseInfo = await entry(paths.base);
   if (!baseInfo) return null;
   await safeParents(paths.base);
+  windows("check", paths.base);
   // A legacy plugin is a separate owned scope; never overwrite or duplicate it silently.
   const legacy = join(paths.base, "plugins/opensocrates");
   if (await entry(legacy)) fail("unowned_collision", "A legacy Antigravity OpenSocrates plugin must be reconciled separately.");
@@ -389,7 +451,9 @@ async function antiOwned(paths) {
     return null;
   }
   await safeParents(paths.root);
+  windows("check-tree", paths.root);
   const owned = validateMarker(await json(join(paths.root, MARKER)), "antigravity", paths.scope);
+  if (owned.enabled) windows("check", paths.rule);
   const actual = {};
   for (const name of Object.keys(owned.hashes)) {
     const path = antiPhysical(paths, name, owned.enabled);
@@ -412,9 +476,15 @@ async function antiOwned(paths) {
   if (!equalInventory(store, expectedStore)) fail("owned_files_modified", "Antigravity metadata contains unknown or modified files.");
   return owned;
 }
+async function antiParents(paths) {
+  const parents = [...new Set([dirname(paths.rule), dirname(paths.skill), dirname(paths.root)])];
+  for (const parent of parents) { await safeParents(parent, { create: true }); windows("check", parent); }
+  return parents;
+}
 async function antiStage(paths, source, enabled, version, hashes) {
   await safeParents(paths.base, { create: true });
-  const scratch = await fs.mkdtemp(join(paths.base, ".opensocrates-transaction-"));
+  await antiParents(paths);
+  const scratch = await privateScratch(paths.base, ".opensocrates-transaction-");
   try {
     const store = join(scratch, "store");
     await fs.mkdir(store, { mode: 0o700 });
@@ -428,10 +498,26 @@ async function antiStage(paths, source, enabled, version, hashes) {
       await fs.rename(skill, join(store, "disabled/skill"));
     }
     await writeJson(join(store, MARKER), marker("antigravity", paths.scope, version, hashes, enabled));
+    windows("seal-new", scratch);
     return { scratch, store, rule: enabled ? rule : null, skill: enabled ? skill : null };
   } catch (error) { await fs.rm(scratch, { recursive: true, force: true }); throw error; }
 }
 async function antiSwap(paths, stage, previous) {
+  // Pin the actual mutation parents as well as the operation root. A root
+  // handle alone does not prevent a rules/skills directory being replaced.
+  let entered = false;
+  try {
+    const parents = await antiParents(paths);
+    const held = (index) => index === parents.length
+      ? (entered = true, antiSwapHeld(paths, stage, previous))
+      : withWindowsLease(parents[index], () => held(index + 1));
+    return await held(0);
+  } catch (error) {
+    if (!entered) throw new ManagedHostError(error.code ?? "transaction_unavailable", `Transaction parent protection failed; preserve the prepared recovery directory: ${stage.scratch}`);
+    throw error;
+  }
+}
+async function antiSwapHeld(paths, stage, previous) {
   const targets = [
     { target: paths.rule, staged: stage.rule },
     { target: paths.skill, staged: stage.skill },
@@ -448,7 +534,8 @@ async function antiSwap(paths, stage, previous) {
       const priorInfo = await entry(item.target);
       if (priorInfo && (priorInfo.isSymbolicLink() || (!priorInfo.isFile() && !priorInfo.isDirectory()))) fail("unsafe_path", "A transaction target changed to an unsafe filesystem entry.");
       const beforeHashes = priorInfo ? priorInfo.isDirectory() && !priorInfo.isSymbolicLink() ? await files(item.target) : { ".": hash(await fs.readFile(item.target)) } : null;
-      const change = { ...item, beforeHashes, backup: join(stage.scratch, `backup-${index}`), backedUp: false, placed: false };
+      const placedHashes = item.staged ? (await fs.lstat(item.staged)).isDirectory() ? await files(item.staged) : { ".": hash(await fs.readFile(item.staged)) } : null;
+      const change = { ...item, beforeHashes, placedHashes, backup: join(stage.scratch, `backup-${index}`), backedUp: false, placed: false };
       changes.push(change);
       if (await entry(item.target)) { await fs.rename(item.target, change.backup); change.backedUp = true; }
       if (item.staged) { await fs.rename(item.staged, item.target); change.placed = true; }
@@ -463,11 +550,19 @@ async function antiSwap(paths, stage, previous) {
   } catch (error) {
     for (const change of [...changes].reverse()) {
       try {
-        if (change.placed) await fs.rm(change.target, { recursive: true });
+        if (change.placed) {
+          await safeParents(dirname(change.target));
+          const info = await fs.lstat(change.target);
+          if (info.isSymbolicLink()) fail("unsafe_path", "Rollback target became linked.");
+          const actual = info.isDirectory() ? await files(change.target) : { ".": hash(await fs.readFile(change.target)) };
+          if (!equalInventory(actual, change.placedHashes)) fail("owned_files_modified", "Rollback target changed; preserve it and the backup.");
+          windows("check", change.target);
+          await fs.rm(change.target, { recursive: true });
+        }
         if (change.backedUp) await fs.rename(change.backup, change.target);
       } catch { rollbackComplete = false; }
     }
-    if (!rollbackComplete) fail("rollback_incomplete", "Antigravity rollback was incomplete; backups remain for recovery.");
+    if (!rollbackComplete) fail("rollback_incomplete", `Antigravity rollback was incomplete; preserve the recovery directory: ${stage.scratch}`);
     throw error;
   } finally {
     if (rollbackComplete) await fs.rm(stage.scratch, { recursive: true, force: true });
@@ -478,7 +573,7 @@ async function antiAction(options, helpers, paths, prepared = null) {
   if (options.action === "status" || options.action === "diagnose") return result(options, { installation: owned ? "managed-files" : "missing", version: owned?.version ?? null, enabled: owned?.enabled ?? false, scope: paths.scope, integrity: owned ? "verified" : "not-installed", registration: "modular-files" });
   if (options.action === "remove") {
     if (!owned) return result(options, { installation: "missing", version: null, enabled: false, scope: paths.scope });
-    const scratch = await fs.mkdtemp(join(paths.base, ".opensocrates-removal-"));
+    const scratch = await privateScratch(paths.base, ".opensocrates-removal-");
     await antiSwap(paths, { scratch, store: null, rule: null, skill: null }, owned);
     return result(options, { installation: "missing", version: null, enabled: false, scope: paths.scope });
   }
@@ -491,7 +586,7 @@ async function antiAction(options, helpers, paths, prepared = null) {
   if (!owned) fail("not_installed", "Enable or disable requires an owned Antigravity installation.");
   const enabled = options.action === "enable";
   if (owned.enabled === enabled) return result(options, { installation: "managed-files", version: owned.version, enabled, scope: paths.scope });
-  const scratch = await fs.mkdtemp(join(paths.base, ".opensocrates-source-"));
+  const scratch = await privateScratch(paths.base, ".opensocrates-source-");
   try {
     for (const name of Object.keys(owned.hashes)) {
       const target = join(scratch, name);
@@ -507,6 +602,10 @@ async function exportChat(options, prepared) {
   if (typeof options.output !== "string" || !isAbsolute(options.output) || !options.output.endsWith(".zip")) fail("invalid_output", "Export requires an explicit absolute ZIP output path.");
   const target = resolve(options.output);
   await safeParents(dirname(target));
+  windows("check", dirname(target));
+  return withWindowsLease(dirname(target), () => exportChatHeld(options, prepared, target));
+}
+async function exportChatHeld(options, prepared, target) {
   const sourceInfo = await regular(prepared.asset);
   const sourceHash = hash(await fs.readFile(prepared.asset));
   const existing = await entry(target);
@@ -514,8 +613,9 @@ async function exportChat(options, prepared) {
     if (!existing.isFile() || existing.isSymbolicLink() || hash(await fs.readFile(target)) !== sourceHash) fail("export_conflict", "Export output already exists with different bytes or an unsafe type.");
   } else {
     await fs.copyFile(prepared.asset, target, constants.COPYFILE_EXCL);
+    windows("seal-new", target);
     await fs.chmod(target, sourceInfo.mode & 0o777 & ~0o111);
-    if (hash(await fs.readFile(target)) !== sourceHash) { await fs.unlink(target); fail("export_mismatch", "Exported ZIP did not preserve the verified bytes."); }
+    if (hash(await fs.readFile(target)) !== sourceHash) fail("export_mismatch", "Export changed during verification; preserve the output for inspection.");
   }
   return result(options, { installation: "export-only", version: prepared.version, output: target, sha256: sourceHash, account_activation: "unverified" });
 }
@@ -527,8 +627,8 @@ export async function runManagedHost(options, helpers) {
   if (options.action === "export" && options.host !== "claude-chat") fail("invalid_action", "Standalone export is only available for claude-chat.");
   if (options.host === "claude-chat" && !["verify", "export"].includes(options.action)) fail("account_action_unavailable", "Claude account installation and activation require the account UI; export/verify are local only.");
   const offline = options.action === "verify" || options.action === "export";
-  if (!offline && (helpers.platform ?? process.platform) !== "darwin") fail("unsupported_platform", "Managed addon lifecycle is Mac-only in this version; Windows qualification follows separately.");
-  if (!offline && options.host === "claude" && (helpers.arch ?? process.arch) !== "arm64") fail("unsupported_platform", "The native Claude companion is qualified only for Apple-silicon Mac.");
+  const platform = helpers.platform ?? process.platform, arch = helpers.arch ?? process.arch;
+  if (!offline && !((platform === "darwin" && arch === "arm64") || (platform === "win32" && arch === "x64" && options.host === "antigravity"))) fail("unsupported_platform", "Addon lifecycle supports Apple-silicon Mac and Windows x64 Antigravity. Windows Claude account delivery uses verify/export; native Code is outside this scope.");
   const needsPackage = ["install", "update", "verify", "export"].includes(options.action);
   let prepared;
   try {

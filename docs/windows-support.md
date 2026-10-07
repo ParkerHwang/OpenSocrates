@@ -1,5 +1,8 @@
 # Codex on Windows — OpenSocrates 1.4.0
 
+See the [unpublished v1.5 Windows continuation](windows-v1.5.md) for Claude account
+content and Antigravity. The complete v1.4 baseline below is retained.
+
 OpenSocrates 1.4.0 supports **Codex on Windows x64**, using native Windows
 processes. Other host integrations are removed. Windows ARM64, Windows 10,
 signing, SmartScreen reputation, and a separate clean PC remain unvalidated.

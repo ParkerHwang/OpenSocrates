@@ -10,9 +10,11 @@ import os
 import subprocess
 import sys
 import tempfile
+import zipfile
 from functools import partial
 from pathlib import Path
 from typing import Any, Callable
+from unittest.mock import patch
 
 _CHECK_COUNT = 0
 
@@ -42,6 +44,18 @@ def _reject(action: Callable[[], Any], message: str) -> None:
     raise AssertionError(message)
 
 
+def _executable_stat(target: Path) -> Callable[..., os.stat_result]:
+    original_stat = Path.stat
+
+    def stat(member: Path, *, follow_symlinks: bool = True) -> os.stat_result:
+        result = original_stat(member, follow_symlinks=follow_symlinks)
+        if member == target:
+            result = os.stat_result((result.st_mode | 0o111, *result[1:]))
+        return result
+
+    return stat
+
+
 def check(root: Path) -> int:
     global _CHECK_COUNT
     _CHECK_COUNT = 0
@@ -54,6 +68,7 @@ def check(root: Path) -> int:
         verify_content_host_package,
     )
     from tools.build_plugins import generate_plugin
+    from tools.release_check import _write_deterministic_zip
 
     from opensocrates.selector.entry import ENTRY_GUIDANCE
 
@@ -84,6 +99,22 @@ def check(root: Path) -> int:
             other = temporary / f"second-{host}"
             build_content_host(root=root, host=host, output=other)
             _require(_tree(other) == first, "path-dependent package content")
+            archive = temporary / f"{host}-portable.zip"
+            second_archive = temporary / f"{host}-portable-second.zip"
+            _write_deterministic_zip(output, archive, content_only=True)
+            with patch.object(
+                Path, "stat", _executable_stat(other / LAYOUTS[host][0] / "SKILL.md")
+            ):
+                _write_deterministic_zip(other, second_archive, content_only=True)
+            _require(
+                archive.read_bytes() == second_archive.read_bytes(),
+                "portable ZIP depends on local file modes",
+            )
+            with zipfile.ZipFile(archive) as bundle:
+                _require(
+                    all((member.external_attr >> 16) == 0o100644 for member in bundle.infolist()),
+                    "content ZIP carries an executable or platform-dependent mode",
+                )
             skill = output / LAYOUTS[host][0]
             _require(
                 [p.relative_to(output).as_posix() for p in output.rglob("SKILL.md")]
@@ -91,8 +122,8 @@ def check(root: Path) -> int:
                 "more than one public skill",
             )
             _require(
-                "control codex" not in (skill / "SKILL.md").read_text()
-                and "${PLUGIN_ROOT}" not in (skill / "SKILL.md").read_text(),
+                "control codex" not in (skill / "SKILL.md").read_text(encoding="utf-8")
+                and "${PLUGIN_ROOT}" not in (skill / "SKILL.md").read_text(encoding="utf-8"),
                 "portable controller has a native control command",
             )
             _require(
@@ -152,12 +183,21 @@ def check(root: Path) -> int:
                 victim.read_bytes().endswith(b"tampered\n"), "failed build modified tampered output"
             )
             victim.write_bytes(original)
-            victim.chmod(0o755)
-            _reject(
-                partial(verify_content_host_package, output, host=host),
-                "executable member accepted",
-            )
-            victim.chmod(0o644)
+            if os.name == "nt":
+                # Windows chmod cannot set POSIX execute bits. Exercise the
+                # verifier's mode rejection without claiming native bit evidence.
+                with patch.object(Path, "stat", _executable_stat(victim)):
+                    _reject(
+                        partial(verify_content_host_package, output, host=host),
+                        "injected executable member mode accepted",
+                    )
+            else:
+                victim.chmod(0o755)
+                _reject(
+                    partial(verify_content_host_package, output, host=host),
+                    "executable member accepted",
+                )
+                victim.chmod(0o644)
             extra = output / "hooks.json"
             extra.write_text("{}\n")
             _reject(
@@ -238,9 +278,9 @@ def check(root: Path) -> int:
             lambda: build_content_host(root=root, host="claude-chat", output=unowned),
             "unowned output accepted",
         )
-        _require(sentinel.read_text() == "preserve", "unowned output was changed")
-    english = (root / "plugin-src/shared/reader/guide.en.md").read_text()
-    korean = (root / "plugin-src/shared/reader/guide.ko.md").read_text()
+        _require(sentinel.read_text(encoding="utf-8") == "preserve", "unowned output was changed")
+    english = (root / "plugin-src/shared/reader/guide.en.md").read_text(encoding="utf-8")
+    korean = (root / "plugin-src/shared/reader/guide.ko.md").read_text(encoding="utf-8")
     _require(
         "Skip it for" in english
         and "mechanical work" in english

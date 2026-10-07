@@ -45,6 +45,11 @@ def merge(root: Path) -> None:
         "clean_machine": "unvalidated",
         "arm64": "unvalidated",
         "live_delivery": "see candidate worklog; CI is not live evidence",
+        "claude_code": "excluded by Windows scope; Mac native profile retained",
+        "claude_account": "portable content-only ZIP; verified export is not live account selection",
+        "antigravity": "owned modular workspace/global lifecycle; app loading/results need separate observations",
+        "content_archives": "shared portable assets; fixed 0644 modes; no native runtime",
+        "paths": "local absolute drives only; owner/DACL/reparse checks; network shares unqualified",
     }
     for path, document in ((manifest_path, manifest), (limitations_path, limitations)):
         path.write_text(

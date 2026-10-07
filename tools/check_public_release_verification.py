@@ -69,6 +69,17 @@ def fixture(root: Path, version: str = "1.3.0"):
 
 
 class PublicReleaseVerificationChecks(unittest.TestCase):
+    def _file_symlink(self, link: Path, target: Path) -> None:
+        try:
+            link.symlink_to(target)
+        except OSError as error:
+            if os.name == "nt" and error.winerror == 1314:
+                self.skipTest(
+                    f"{link.name}: file symlink fixture requires Windows privilege "
+                    "(WinError 1314); other public-byte mutations still run"
+                )
+            raise
+
     @unittest.skipUnless(shutil.which("bash"), "release shell fixture requires Bash")
     def test_workflow_publishes_exact_1_4_and_1_5_assets_with_a_fake_publisher(self):
         script = workflow_script("Publish GitHub Release")
@@ -263,7 +274,7 @@ class PublicReleaseVerificationChecks(unittest.TestCase):
                         (local / asset).unlink()
                     elif mutation == "linked":
                         (public / asset).unlink()
-                        (public / asset).symlink_to(local / asset)
+                        self._file_symlink(public / asset, local / asset)
                     if mutation == "none":
                         result = verify_public_bytes(
                             metadata, "1.5.0", "a" * 40, "a" * 40, local, public, installer

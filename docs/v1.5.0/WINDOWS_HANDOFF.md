@@ -1,5 +1,12 @@
 # v1.5 Windows continuation after the Mac stage
 
+**Historical preparation handoff.** The implemented Windows continuation and
+current scope supersede the native Windows Claude requirements below. Read
+[WINDOWS_IMPLEMENTATION_HANDOFF.md](WINDOWS_IMPLEMENTATION_HANDOFF.md) and
+[Windows observations](../../evals/v1.5-windows/REPORT.md) first. The user now
+requests only Claude account Web/Desktop Chat/Cowork, plus Antigravity Windows
+x64. Existing Mac native Claude and Codex are retained.
+
 The user requested Mac completion first, then Windows optimization. Continue
 from the revised Mac implementation and its final Git commit/PR, not withdrawn
 candidate #95. Original 48 methods and EN/KO canonical procedures remain intact.

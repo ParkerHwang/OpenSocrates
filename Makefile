@@ -85,6 +85,11 @@ docs-check:
 		--path docs/macos-v1.5.md \
 		--path docs/macos-v1.5.ko.md \
 		--path docs/v1.5.0/WINDOWS_HANDOFF.md \
+		--path docs/v1.5.0/WINDOWS_IMPLEMENTATION_HANDOFF.md \
+		--path docs/v1.5.0/WINDOWS_HOST_RESEARCH.md \
+		--path docs/windows-v1.5.md \
+		--path docs/windows-v1.5.ko.md \
+		--path evals/v1.5-windows/REPORT.md \
 		--path evals/v1.5-macos/REPORT.md \
 		--path docs/v1.2-adjudication-report.md \
 		--path evals/v1.2/ADJUDICATION_GUIDE.md \

@@ -376,19 +376,19 @@ def _unresolved_absolute(path: Path) -> Path:
 
 
 def _checked_output_path(path: Path, *, label: str) -> Path:
-    """Reject symlinks in an unresolved output path before following any component."""
+    """Reject links/reparse points before following any unresolved output component."""
 
     absolute = _unresolved_absolute(path)
     current = Path(absolute.anchor)
     for part in absolute.parts[1:]:
         current /= part
         try:
-            mode = current.lstat().st_mode
+            info = current.lstat()
         except FileNotFoundError:
             continue
         except OSError as exc:
             raise SystemExit(f"cannot inspect {label} component {current}: {exc}") from exc
-        if stat.S_ISLNK(mode):
+        if stat.S_ISLNK(info.st_mode) or getattr(info, "st_file_attributes", 0) & 0x400:
             raise SystemExit(f"refusing symlink {label} component: {current}")
     return absolute
 

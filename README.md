@@ -18,7 +18,15 @@ dedicated coding-specialist features are outside this version.
 [![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## v1.5.0 Mac stage
+## v1.5.0 implementation stages
+
+The Windows continuation adds Claude Web/Desktop Chat/Cowork account ZIP
+verification/export and Antigravity workspace/global lifecycle on Windows x64.
+Windows Claude Code is outside the requested scope; the existing Mac native
+implementation remains. See the [Windows guide](docs/windows-v1.5.md),
+[observations](evals/v1.5-windows/REPORT.md) and
+[implementation handoff](docs/v1.5.0/WINDOWS_IMPLEMENTATION_HANDOFF.md).
+Filesystem validation and live host outcomes are recorded separately.
 
 This checkout implements the Mac profiles below and builds their local archives.
 **v1.5.0 has not been published to npm or GitHub Releases.** Use the source

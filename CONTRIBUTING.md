@@ -148,7 +148,16 @@ repository's [MIT License](LICENSE).
 
 Use the PowerShell commands and exact evidence boundaries in [Windows support](docs/windows-support.md). Run `uv run --locked python tools/check_windows.py --packages` after `tools/build_windows.py`; keep the existing macOS release gate. LF checkout is required for pinned evidence hashes.
 
-That guide records the existing Codex Windows baseline. The new v1.5 host work
-continues through [WINDOWS_HANDOFF.md](docs/v1.5.0/WINDOWS_HANDOFF.md); Darwin-only
-addon lifecycle and missing native Claude Windows launchers are explicit staged
-boundaries, not evidence that existing Codex Windows support disappeared.
+That guide records the existing Codex Windows baseline. Use the
+[v1.5 Windows guide](docs/windows-v1.5.md) and current
+[implementation handoff](docs/v1.5.0/WINDOWS_IMPLEMENTATION_HANDOFF.md) for the
+account-only Claude scope and Antigravity lifecycle. Build first, then run
+`npm run test:windows` (Codex and managed addon native tests),
+`uv run --locked python tools/check_content_hosts.py` and
+`uv run --locked python tools/check_claude_host.py`. The older POSIX fixture
+installer suite runs on Linux/Mac CI; do not report it as a native Windows pass.
+Portable content ZIP modes are fixed at 0644 on both build platforms. Keep the
+Mac runtime, hook and full release gates in Mac CI. Live Web, Desktop Chat,
+Cowork, Antigravity workspace and global cells remain distinct, including when
+Web and Desktop use different accounts. Native Windows Claude Code is excluded
+by the current user scope, not a missing Windows deliverable.
