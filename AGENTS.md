@@ -89,8 +89,8 @@ Known limitations: <explicit boundaries>
 For the revised v1.5.0 work, read the
 [implementation preparation](docs/v1.5.0/README.md) and its current handoff first.
 It records scope and work packages; use [the Mac implementation guide](docs/macos-v1.5.md)
-for implemented profiles and current qualification boundaries. Public v1.4
-remains the released Codex baseline until v1.5 publication. The earlier
+for implemented profiles and current qualification boundaries. The v1.5 release
+preserves the v1.4 Codex foundation and adds the documented host profiles. The earlier
 candidate PR #95 is historical reference, not the new
 implementation baseline. It is closed and withdrawn in full. Preserve its frozen
 evidence; do not merge, cherry-pick, or copy its code/guides. Develop the revised

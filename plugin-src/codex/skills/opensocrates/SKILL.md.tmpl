@@ -60,9 +60,14 @@ installed canonical procedure was read in the current session. Capture its exact
 If the read is unavailable or incomplete, do not use that method and state that
 its grounding source was unavailable. Trusted hook context may inline selected
 `Do not use when` and `Stop conditions`; these are immediately binding but do
-not replace the full read. End a grounded final response with exactly
-`OpenSocrates grounding: <method-id>@<content-revision>` and join multiple
-methods with comma-space. Do not emit this line for an ungrounded method.
+not replace the full read. After actually applying one or more eligible,
+completely read canonical methods, end the grounded final response with one
+line exactly: `Powered by OpenSocrates`. Use the same English wording in every
+locale, without method IDs, revisions, punctuation, or Markdown decoration on
+that line. Keep exact method IDs and revisions in the current context and any
+existing permitted evidence; this footer does not require new logging.
+Do not emit it for unread, ineligible, abandoned, or unapplied methods, for
+reader guidance alone, or for mechanical work.
 
 Method availability is not activation evidence. Exact model-initiated method
 activation and public-artifact confirmation remain unknown until a matching

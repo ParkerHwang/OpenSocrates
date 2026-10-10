@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import unittest
 from pathlib import Path
 
 from opensocrates.cli.decision import run_decision
+from opensocrates.constants import PUBLIC_ATTRIBUTION_FOOTER
 from opensocrates.content.injection import ProjectionInstructionAssembler
 from opensocrates.content.loader import load_compiled_bundle, load_reasoning_content_projections
 from opensocrates.selector.decision import DecisionSession
@@ -64,11 +66,23 @@ class DecisionChecks(unittest.TestCase):
                         self.assembler.assemble((method,), requested_locale=locale).instructions,
                     )
                     self.assertEqual(result["applied"], "unverified")
+                    self.assertEqual(result["audit_if_applied"], "Powered by OpenSocrates")
+                    self.assertEqual(result["audit_if_applied"], PUBLIC_ATTRIBUTION_FOOTER)
+                    self.assertEqual(result["content_revision"], self.bundle.content_revision)
+                    self.assertEqual(
+                        result["methods"][0]["content_revision"], self.bundle.content_revision
+                    )
+                    self.assertEqual(
+                        result["methods"][0]["sha256"],
+                        "sha256:" + hashlib.sha256(body.encode("utf-8")).hexdigest(),
+                    )
 
     def test_mechanical_even_explicit(self):
         result = self.session.handle(request("critical-thinking", participation="mechanical"))
         self.assertEqual(result["status"], "no_intervention")
         self.assertEqual(result["methods"], [])
+        self.assertIsNone(result["audit_if_applied"])
+        self.assertEqual(result["applied"], "unverified")
 
     def test_later_decision_reopen_and_reuse(self):
         first = self.session.handle(request("assumption-mapping"))
@@ -121,6 +135,7 @@ class DecisionChecks(unittest.TestCase):
         ]:
             result = self.session.handle(request(method, features))
             self.assertEqual(result["selected"], [])
+            self.assertIsNone(result["audit_if_applied"])
         self.assertEqual(self.session.handle(request("unknown-method"))["reason"], "unknown_method")
         bad = request("deduction")
         bad["routing"]["features"].append({"key": "injected", "strength": 3, "basis": "task_shape"})

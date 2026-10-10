@@ -1,35 +1,43 @@
 # Changelog
 
-## [1.5.0] - Unreleased, Mac and Windows implementation stages
+## [1.5.0] - 2026-10-10
 
-- Add native Windows x64 Antigravity modular lifecycle and portable Claude account
-  ZIP verification/export. Preserve existing Mac native Claude and Codex lanes;
-  Windows terminal Code and Desktop local Code are excluded by current scope.
-- Use explicit Windows owner/DACL creation, ancestor leases, reparse refusal,
-  safe ZIP extraction and rollback that retains changed content and recovery backups.
-  Add native filesystem regressions, portable 0644 archive modes and Windows SBOM/CI.
-- Tighten EN/KO reader guidance for absent source mentions, settled follow-up facts,
-  persistent unknowns and unauthorized draft commitments. Preserve historical
-  failed observations; guide checks do not prove live outcome improvement.
-- Windows x64 Antigravity 설치·업데이트·비활성화·복구와 Claude 계정 ZIP을 추가합니다.
-  Windows Claude Code는 요청 범위에서 제외하며 Mac 구현과 Codex는 유지합니다.
-  자료의 부재·확인된 후속 정보·미확인 사항·승인 없는 약속을 다루는 정본 외 안내를
-  강화합니다. 실제 호스트 검증은 설치 성공과 구분해 기록합니다.
-
-- Preserve the v1.4 Codex baseline and all 48 authored reasoning methods. Add
-  English/Korean reader guidance for source reconciliation, stakeholder context,
-  and useful messages without changing canonical procedures or public contracts.
-- Add a bounded, stateless macOS arm64 Claude Code entry, a separate executable-free
-  Claude account skill ZIP, and modular Antigravity conversation-app rules/skills.
-- Add owned install/update/status/diagnose/disable/enable/remove operations for
-  native Claude and Antigravity, plus verified account export. Keep Codex's
-  existing lifecycle and `--host all` behavior separate.
-- Withdraw the previous coding/memory/orchestration v1.5 candidate completely.
-  Windows host optimization continues this Mac implementation; account matching,
-  authenticated CLI delivery, and result improvement need separate qualification.
-- v1.4의 Codex와 정본 48개 방법을 유지하고, 자료·이해관계자 맥락을 사람이 이해하고
-  사용할 수 있게 정리하는 영어·한국어 안내와 Mac용 Claude·Antigravity 배포를
-  추가합니다. 이전 코딩 중심 v1.5는 전부 폐기했으며 Windows 후속 구현을 이어갑니다.
+- Preserve the v1.4 Codex baseline and all 48 authored reasoning methods with
+  complete English/Korean procedures. Add reader guidance for source
+  reconciliation, stakeholder context, decisions and useful messages.
+- Add bounded, stateless native Claude Code entry on Apple-silicon Mac, a separate
+  executable-free Claude account skill ZIP, and modular Antigravity conversation
+  application rules/skills on Apple-silicon Mac and Windows x64.
+- Support Claude web Chat, Desktop Chat and Cowork through account ZIP
+  verification/export on Mac and Windows. Upload and activation remain separate
+  account UI operations. Native Windows Claude Code is outside the release scope.
+- Add owned native Claude/Antigravity install, update, status, diagnose, disable,
+  enable and remove; preserve disabled state on update. Add Windows owner/DACL,
+  ancestor protection, reparse refusal, safe ZIP extraction and recoverable rollback,
+  native filesystem regressions, portable 0644 archive modes and Windows SBOM/CI.
+- Unify conditional attribution across profiles as the exact final line
+  `Powered by OpenSocrates`. Require an eligible authored method to be read in
+  full and actually applied; reader guidance alone and mechanical work do not
+  qualify. Keep structured method identities/revisions, read receipts and repair
+  behavior unchanged. Attribution does not prove native application or better results.
+- Publish version-pinned installation/update guides for Mac and Windows.
+  The default and `--host all` still select Codex; new profiles require an explicit
+  host and have no purge, trust-reset or automatic-update route.
+- Tighten EN/KO reader guidance for absent source mentions, settled follow-up
+  facts, persistent unknowns and unauthorized draft commitments. Preserve dated
+  observations; source checks do not regrade historical outcomes or establish
+  universal quality, token-cost or latency gains.
+- v1.4 Codex와 정본 사고 방법 48개·영어·한국어 전체 절차를 유지하고, 자료·
+  이해관계자 맥락·판단·메시지를 위한 독자 안내를 추가합니다. Apple Silicon
+  Mac의 Claude Code 네이티브 연동, Mac·Windows의 계정 ZIP 검증·내보내기,
+  Mac·Windows x64의 Antigravity 작업공간·전역 설치 상태 관리를 제공합니다.
+- Windows Claude Code 네이티브 연동은 이번 범위에서 제외합니다. 계정 업로드·
+  활성화는 계정 화면에서 별도로 진행합니다. 업데이트는 비활성화 상태를
+  유지하며 기본값과 `--host all`은 계속 Codex를 선택합니다.
+- 정본 전체를 읽은 적격한 방법을 실제로 적용했을 때만 마지막에
+  `Powered by OpenSocrates`를 그대로 표시합니다. 독자 안내만 사용하거나
+  기계적인 작업만 했다면 표시하지 않으며, 문구 자체는 적용 증명이 아닙니다.
+  과거 관찰은 당시 결과로 보존하고 일반적인 품질·비용·속도 향상은 주장하지 않습니다.
 
 ## [1.4.0] - 2026-09-16
 

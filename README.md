@@ -9,7 +9,7 @@
 OpenSocrates brings 48 authored reasoning methods into the task you are already
 doing: synthesize evidence, understand stakeholder perspectives, compare choices,
 and write useful messages. The original English/Korean procedures remain intact.
-The v1.5 reader guides connect their conclusions to context and next actions;
+The v1.5 reader guides connect conclusions to context and next actions;
 dedicated coding-specialist features are outside this version.
 
 **English** | [한국어](README.ko.md)
@@ -18,27 +18,24 @@ dedicated coding-specialist features are outside this version.
 [![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## v1.5.0 implementation stages
+## v1.5.0 on Mac and Windows
 
-The Windows continuation adds Claude Web/Desktop Chat/Cowork account ZIP
-verification/export and Antigravity workspace/global lifecycle on Windows x64.
-Windows Claude Code is outside the requested scope; the existing Mac native
-implementation remains. See the [Windows guide](docs/windows-v1.5.md),
-[observations](evals/v1.5-windows/REPORT.md) and
-[implementation handoff](docs/v1.5.0/WINDOWS_IMPLEMENTATION_HANDOFF.md).
-Filesystem validation and live host outcomes are recorded separately.
+Version 1.5.0 preserves Codex and adds native Claude Code on Apple-silicon Mac,
+a portable Claude account skill, and Antigravity workspace/global rules and
+skills on Mac and Windows x64. Download archives and SHA-256 files from the
+[v1.5.0 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.0),
+or use the [npm installer](https://www.npmjs.com/package/opensocrates/v/1.5.0).
 
-This checkout implements the Mac profiles below and builds their local archives.
-**v1.5.0 has not been published to npm or GitHub Releases.** Use the source
-installer with a verified local archive; do not assume `npx opensocrates@1.5.0`
-or a release download exists. The npm badge describes published registry state.
-
-| Host | Implemented delivery | Qualification boundary |
+| Host | Delivery | Platform and activation |
 | --- | --- | --- |
-| Codex, Apple-silicon Mac | Existing hooks, controller, native decision runtime | Existing Codex behavior and regression gates preserved |
-| Claude Code CLI / Desktop local Code, Apple-silicon Mac | Stateless native entry plus complete installed references | CLI registration and Desktop local reader cases observed; authenticated terminal delivery pending; draft limitations recorded |
-| Claude web / Desktop ordinary Chat / Cowork | Standalone content-only account skill ZIP | ZIP format accepted; temporary old-skill replacement and live treatment pending |
-| Antigravity conversation application, Mac | Owned modular rule and skill, workspace or global scope | One ordinary-request workspace reader case observed; global/app lifecycle needs its own evidence |
+| Codex | Existing hooks, controller and native decision runtime | Apple-silicon Mac and Windows x64; review the seven hooks in an interactive session |
+| Claude Code CLI / Desktop local Code | Stateless native entry and complete installed references | Apple-silicon Mac; requires the Claude CLI, host login and plugin/hook permissions |
+| Claude web / Desktop Chat / Cowork | Standalone content-only account skill ZIP | Export on Mac or Windows; upload and enable through the account's Skills interface |
+| Antigravity conversation application | Owned modular rule and skill | Apple-silicon Mac and Windows x64; choose workspace or global scope |
+
+Windows native Claude Code in a terminal or Desktop Code is outside this
+release's scope. Account content does not install a native Claude integration.
+See the [Mac guide](docs/macos-v1.5.md) and [Windows guide](docs/windows-v1.5.md).
 
 Normal requests need no repeated OpenSocrates command. Trusted native hooks and
 Antigravity's standing rule provide entry; account skills are selected by the
@@ -46,63 +43,83 @@ host model and may be missed. Installation, loading, complete reads, application
 and useful outcomes are separate evidence levels. No general quality, token-cost,
 or latency improvement is claimed.
 
-## Start from the local Mac candidate
+## Install or update
 
 Install Node.js 20+, make the chosen host available, and sign in to that host.
-The native Mac runtime is bundled; installation does not require Python.
-From this repository, verify a local Claude companion before installing it:
+Native runtimes are bundled; installation does not require Python. Start with
+Codex on either supported platform:
 
 ```sh
-node installer/opensocrates.mjs verify --host claude \
-  --asset dist/opensocrates-1.5.0-claude-plugin.zip \
-  --checksum dist/opensocrates-1.5.0-claude-plugin.zip.sha256
-node installer/opensocrates.mjs install --host claude \
-  --asset dist/opensocrates-1.5.0-claude-plugin.zip \
-  --checksum dist/opensocrates-1.5.0-claude-plugin.zip.sha256
-node installer/opensocrates.mjs status --host claude
+npx --yes opensocrates@1.5.0 install --host codex
+npx --yes opensocrates@1.5.0 status --host codex
 ```
 
-Review the host's plugin/hook permissions and start a fresh conversation.
-`status` reports installation and integrity; it does not prove automatic entry.
-For Antigravity workspace installation, account export, updates, disabling,
-removal, and actual pending checks, use the [Mac guide](docs/macos-v1.5.md).
+For an existing v1.4 Codex installation, use:
+
+```sh
+npx --yes opensocrates@1.5.0 update --host codex
+```
+
+Review the seven Codex hooks in an interactive session and start a fresh
+conversation. Non-interactive execution may skip untrusted hooks. `status`
+reports installation and integrity; it does not prove automatic delivery.
+
+On Apple-silicon Mac, install the native Claude companion with:
+
+```sh
+npx --yes opensocrates@1.5.0 install --host claude
+npx --yes opensocrates@1.5.0 status --host claude
+```
+
+For Antigravity, choose an existing absolute workspace directory:
+
+```sh
+npx --yes opensocrates@1.5.0 install --host antigravity --workspace /absolute/path/to/workspace
+```
+
+On Windows, replace the directory with an absolute local-drive path such as
+`C:\Work\Reading Workshop` and quote it. Omit `--workspace` for the global scope.
+For Claude account content, export to an absolute ZIP filename in an existing
+folder, then upload and enable the ZIP in Claude's Customize > Skills interface:
+
+```sh
+npx --yes opensocrates@1.5.0 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.0-account.zip
+```
+
+The platform guides cover Windows paths, account replacement, updates, disabling,
+removal, and verified local-archive alternatives. With no local asset flags,
+the installer downloads the pinned v1.5.0 archive and checksum from GitHub Releases.
 
 New profiles require explicit `--host claude`, `--host antigravity`, or
-`--host claude-chat`. The default and `--host all` retain the existing Codex
-desired-state lane; they do not install every new host. New profiles have no
-purge, trust-reset, or automatic-update route.
-
-## Existing released Codex and Windows
-
-The published v1.4.0 package remains a Codex-only release for Apple-silicon Mac
-and Windows x64:
-
-```sh
-npx --yes opensocrates@1.4.0 install --host codex
-npx --yes opensocrates@1.4.0 status --host codex
-```
-
-Review the seven Codex hooks in an interactive session. Non-interactive execution
-may skip untrusted hooks. Existing Codex Windows support is preserved; **new
-v1.5 Claude/Antigravity Windows integration is the next stage**, not a completed
-support claim. See [existing Windows support](docs/windows-support.md) and the
-[Windows implementation handoff](docs/v1.5.0/WINDOWS_HANDOFF.md).
+`--host claude-chat`. The default and `--host all` continue to select Codex;
+they do not install every new host. New profiles have no purge, trust-reset,
+or automatic-update route.
 
 Old multi-host installations are not silently adopted or erased. Reconcile their
-exact origin and ownership before installing a new profile. Preserve the existing
-account skill until a backed-up replacement qualifies.
+exact origin and ownership before installing a new profile. Back up an existing
+OpenSocrates account skill and its enabled state before replacing it.
+
+## When attribution appears
+
+A final answer ends with the exact line `Powered by OpenSocrates` only when an
+eligible authored method was read in full and actually applied to that answer.
+The wording is the same in English and Korean. Reader guidance alone and
+mechanical work do not qualify. The line is attribution, not proof of native
+application or a better result.
 
 ## Privacy and development
 
 The default decision path makes no extra selector-model call and stores no raw
-prompts, transcripts, screenshots, or hidden reasoning. The new Claude entry does
-not read transcripts or initialize a database. The account skill has no executable
-surface; normal host conversations and model requests follow the host's own
-authentication, permissions, retention settings, and terms. See [SECURITY.md](SECURITY.md).
+prompts, transcripts, screenshots, or hidden reasoning. The native Claude entry
+does not read transcripts or initialize a database. The account skill has no
+executable surface; normal host conversations and model requests follow the
+host's own authentication, permissions, retention settings, and terms.
+See [SECURITY.md](SECURITY.md).
 
-- [Mac installation and qualification](docs/macos-v1.5.md)
+- [Mac installation and evidence boundaries](docs/macos-v1.5.md)
+- [Windows installation and evidence boundaries](docs/windows-v1.5.md)
 - [Authored methods](content/methods/) · [Decision-point contract](docs/decision-points.md)
-- [Current implementation scope](docs/v1.5.0/IMPLEMENTATION_PLAN.md)
+- [Implementation scope](docs/v1.5.0/IMPLEMENTATION_PLAN.md)
 - [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
 
 OpenSocrates is [MIT licensed](LICENSE), independent of OpenAI, Anthropic, and
