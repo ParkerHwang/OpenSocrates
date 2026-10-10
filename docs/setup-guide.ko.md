@@ -123,7 +123,7 @@ Team·Enterprise에서 설정이 잠겨 있으면 조직 관리자에게 Skills�
 
 처음 설치한다면 `Customize → Skills → + → Create skill → Upload a skill`로
 이동합니다. 메뉴 이름이 바뀐 버전에서는 Skills의 만들기 메뉴에서 업로드를
-찾으세요. **`opensocrates-1.5.0-claude-chat-skills.zip`**을 사용합니다.
+찾으세요. `opensocrates-1.5.0-claude-chat-skills.zip` 파일을 사용합니다.
 네이티브 Code용 `claude-plugin.zip`과 구분하세요.
 
 계정용 파일은 [릴리스 페이지](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.0)에서
