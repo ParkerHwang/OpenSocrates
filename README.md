@@ -43,6 +43,8 @@ host model and may be missed. Installation, loading, complete reads, application
 and useful outcomes are separate evidence levels. No general quality, token-cost,
 or latency improvement is claimed.
 
+**After installation:** follow the [visual setup guide](docs/setup-guide.md) for hook review, account skill switches, and host readiness. It also includes a request you can paste into an agent.
+
 ## Install or update
 
 Install Node.js 20+, make the chosen host available, and sign in to that host.

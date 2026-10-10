@@ -2,6 +2,8 @@
 
 [English](macos-v1.5.md) · [README](../README.ko.md)
 
+설치가 끝나면 [화면으로 보는 설정 가이드](setup-guide.ko.md)에서 앱별 후속 설정과 에이전트에게 맡기는 요청문을 확인하세요.
+
 v1.5.0은 원래 직접 작성한 48개 사고 방법과 영어·한국어 전체 절차를
 유지합니다. 독자 안내, Claude Code 네이티브 진입, 독립 계정 스킬과
 Antigravity 모듈형 콘텐츠를 추가하며 Codex도 계속 제공합니다.
