@@ -2,6 +2,8 @@
 
 [한국어](windows-v1.5.ko.md) · [README](../README.md)
 
+For post-installation steps, see the [setup guide](setup-guide.md). Its screenshots are from Mac; the guide distinguishes Windows support and host/account boundaries.
+
 Version 1.5.0 preserves Codex on Windows x64 and adds verified export of the
 portable Claude account skill and owned Antigravity workspace/global lifecycle.
 Claude's Windows surfaces are **web Chat, Desktop Chat and Cowork through

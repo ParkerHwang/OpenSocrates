@@ -2,6 +2,8 @@
 
 [한국어](macos-v1.5.ko.md) · [README](../README.md)
 
+After installation, follow the [visual setup guide](setup-guide.md) for the remaining host steps or an agent-assisted setup request.
+
 Version 1.5.0 preserves the original 48 authored reasoning methods and complete
 English/Korean procedures. It adds reader guidance, native Claude Code entry,
 a standalone Claude account skill, and Antigravity modular content. Codex

@@ -2,6 +2,8 @@
 
 [English](windows-v1.5.md) · [README](../README.ko.md)
 
+설치 후에는 [설정 가이드](setup-guide.ko.md)를 참고하세요. 캡처는 Mac 화면이며, 본문에서 Windows 지원 범위와 계정·로컬 설치를 구분합니다.
+
 v1.5.0은 기존 Codex Windows x64 지원을 보존하고, 휴대 가능한 Claude 계정
 스킬의 검증·내보내기와 Antigravity 작업공간·전역 설치 상태 관리를 추가합니다.
 Claude의 Windows 범위는 **계정 콘텐츠를 통한 웹 Chat·Desktop Chat·Cowork**입니다.
