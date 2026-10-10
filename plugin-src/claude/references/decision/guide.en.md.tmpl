@@ -1,0 +1,38 @@
+# Claude decision-point retrieval
+
+Keep the user's purpose, permissions, constraints, and completion conditions
+available. Retrieve methods before a judgment whose objective, alternatives,
+evidence, assumptions, or consequential risk materially changes, including
+later in the same turn. Mechanical steps need none. Separate distinct questions
+and their dependencies rather than imposing one combined stop condition.
+
+When the installed native runtime is available, run `bin/launch.sh decision claude`
+at this package root. Send one JSON line using `request.json` and the closed
+values in `features.json`. First use `catalog` with the task locale, then
+`select` with observed features, including absent prerequisites and known
+contraindications. Set `explicit_method` only for a user-requested method.
+Selection uses no model, network, authentication, or persistence. An empty
+eligible selection is valid; do not bypass it with direct file selection.
+
+Read the complete delivered procedure and explicitly required dependencies
+before application. The selector validates declared features, not semantic
+classification or actual application. Its `applied: unverified` and conditional
+audit template are measurement boundaries. Emitted content alone proves no read.
+
+If the runtime is unavailable or fails, use `catalog.en.json` or `catalog.ko.json`
+and the complete `methods/<locale>/<method-id>.md` files. Apply the same
+eligibility and contraindication checks. Do not invent substitute procedures,
+retry unchanged failures, or treat empty selection as runtime failure. Retire
+ineligible/abandoned candidates without claiming they were applied.
+
+The optional `bin/launch.sh decision claude --stream` uses volatile NDJSON.
+Reuse complete content only while its exact identity remains available to this
+agent. `acknowledge` is an agent assertion, never native application proof.
+Use a fresh opaque context on handoff and increment epoch after compaction.
+Reset or close the stream at task end; do not persist prompts or reasoning.
+
+Finish the requested artifact after its actual required checks. Preserve each
+used method's required public evidence, uncertainty, stops, and grounding audit.
+For multiple questions, make each conclusion, missing input, and reopening
+evidence separately traceable in the user's requested format. An estimate's
+missing input does not automatically prevent a separate action decision.

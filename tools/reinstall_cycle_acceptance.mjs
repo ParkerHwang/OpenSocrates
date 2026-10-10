@@ -152,19 +152,21 @@ const NPM_PACKAGE_FILES = Object.freeze([
   "README.md",
   "SECURITY.md",
   "VERSION",
+  "installer/managed-hosts.mjs",
   "installer/opensocrates.mjs",
   "installer/windows.ps1",
   "package.json",
 ]);
 const NPM_PACKAGE_FILES_FIELD = Object.freeze([
   "installer/opensocrates.mjs",
+  "installer/managed-hosts.mjs",
   "installer/windows.ps1",
   "CHANGELOG.md",
   "SECURITY.md",
   "VERSION",
 ]);
 const NPM_PACKAGE_SCRIPTS = Object.freeze({
-  test: "node --test installer/opensocrates.test.mjs installer/lifecycle.test.mjs tools/clean_machine_acceptance.test.mjs tools/reinstall_cycle_acceptance.test.mjs tools/release_gate.test.mjs && npm run test:npx",
+  test: "node --test installer/opensocrates.test.mjs installer/lifecycle.test.mjs installer/managed-hosts.test.mjs tools/clean_machine_acceptance.test.mjs tools/reinstall_cycle_acceptance.test.mjs tools/release_gate.test.mjs && npm run test:npx",
   "test:npx": "node installer/package-smoke.mjs",
   "pack:check": "npm pack --dry-run",
   prepublishOnly: "npm test",
@@ -9399,7 +9401,7 @@ function validateNpmPackMetadata(item) {
     !Array.isArray(item?.bundled) ||
     item.bundled.length !== 0
   ) {
-    fail("npm-package", "npm pack metadata does not match the exact nine-file package contract");
+    fail("npm-package", "npm pack metadata does not match the closed package file contract");
   }
 }
 

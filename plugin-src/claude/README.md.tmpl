@@ -1,0 +1,47 @@
+# OpenSocrates for local Claude Code
+
+OpenSocrates {{PRODUCT_VERSION}} provides the original {{METHOD_COUNT}} canonical
+reasoning methods, content revision {{CONTENT_REVISION}}, through one controller.
+Use ordinary requests for synthesis, stakeholder context, decisions, and useful
+messages. Mechanical work stays light. No additional selector model, automatic
+memory enrollment, private transcript reader, or Claude credential copy is used.
+
+## Native package boundary
+
+This profile targets Apple-silicon macOS only. Its manifest is
+`.claude-plugin/plugin.json`, hooks are in `hooks/hooks.json`, and the fixed
+launcher is `bin/launch.sh`. The runtime is under
+`runtime/darwin-arm64/opensocrates-runtime/`. It never resolves from the current
+working directory. Windows native Claude delivery is unavailable in this profile;
+existing Codex Windows support has a separate package.
+
+Enabled/trusted SessionStart and UserPromptSubmit hooks deliver the bounded
+standing entry and complete installed controller/decision-guide locations.
+SessionStart after compaction and the next ordinary submission restore entry.
+PostCompact is not used for injection because it has no decision control.
+Stop and SessionEnd are literal no-ops: there is no read-repair gate, stored
+task record, or false application receipt. Malformed, excessive, unknown-event,
+or unavailable-runtime input fails open with empty hook output.
+
+The active agent reads complete canonical procedures at materially changed
+judgments, using `bin/launch.sh decision claude` or its volatile `--stream`
+variant. Full reads, applicability, dependencies, contraindications, stops, and
+the grounding audit remain required. Emitted instructions and read assertions
+do not prove application or improved outcomes.
+
+## Host trust and evidence
+
+Review the generated manifest and hook commands through Claude's supported
+plugin management before enabling. Installation, package generation, and
+synthetic probes do not prove live hook delivery. CLI and Desktop local Code
+are separate validation cells; cloud, SSH, and WSL are outside this native claim.
+Documented Claude hooks: https://code.claude.com/docs/en/hooks (checked 2026-10-07).
+
+Ordinary Chat and Cowork use a separate content-only account skill export.
+Do not upload this native profile there: its top-level executable `bin/` tree
+is incompatible with that account-plugin transport. Preserve an existing account
+skill until its replacement qualifies and avoid duplicate public controllers.
+No application settings or unrelated hooks are owned by the package payload.
+
+Semantic identity: `{{SEMANTIC_HASH}}`.
+Canonical source identity: `{{SOURCE_TREE_HASH}}`.

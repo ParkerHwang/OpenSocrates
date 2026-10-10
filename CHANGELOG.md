@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.5.0] - Unreleased, Mac implementation stage
+
+- Preserve the v1.4 Codex baseline and all 48 authored reasoning methods. Add
+  English/Korean reader guidance for source reconciliation, stakeholder context,
+  and useful messages without changing canonical procedures or public contracts.
+- Add a bounded, stateless macOS arm64 Claude Code entry, a separate executable-free
+  Claude account skill ZIP, and modular Antigravity conversation-app rules/skills.
+- Add owned install/update/status/diagnose/disable/enable/remove operations for
+  native Claude and Antigravity, plus verified account export. Keep Codex's
+  existing lifecycle and `--host all` behavior separate.
+- Withdraw the previous coding/memory/orchestration v1.5 candidate completely.
+  New Windows host optimization follows this Mac implementation; account matching,
+  authenticated CLI delivery, and result improvement need separate qualification.
+- v1.4의 Codex와 정본 48개 방법을 유지하고, 자료·이해관계자 맥락을 사람이 이해하고
+  사용할 수 있게 정리하는 영어·한국어 안내와 Mac용 Claude·Antigravity 배포를
+  추가합니다. 이전 코딩 중심 v1.5는 전부 폐기했으며 Windows 최적화는 다음 단계입니다.
+
 ## [1.4.0] - 2026-09-16
 
 - Focus OpenSocrates on Codex only. Remove Claude Code/Cowork/Chat,

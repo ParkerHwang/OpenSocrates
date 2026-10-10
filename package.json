@@ -1,20 +1,21 @@
 {
   "name": "opensocrates",
-  "version": "1.4.0",
-  "description": "Install and manage OpenSocrates for Codex on macOS and Windows.",
+  "version": "1.5.0",
+  "description": "Original reasoning assistance with macOS Codex, Claude and Antigravity delivery.",
   "type": "module",
   "bin": {
     "opensocrates": "installer/opensocrates.mjs"
   },
   "files": [
     "installer/opensocrates.mjs",
+    "installer/managed-hosts.mjs",
     "installer/windows.ps1",
     "CHANGELOG.md",
     "SECURITY.md",
     "VERSION"
   ],
   "scripts": {
-    "test": "node --test installer/opensocrates.test.mjs installer/lifecycle.test.mjs tools/clean_machine_acceptance.test.mjs tools/reinstall_cycle_acceptance.test.mjs tools/release_gate.test.mjs && npm run test:npx",
+    "test": "node --test installer/opensocrates.test.mjs installer/lifecycle.test.mjs installer/managed-hosts.test.mjs tools/clean_machine_acceptance.test.mjs tools/reinstall_cycle_acceptance.test.mjs tools/release_gate.test.mjs && npm run test:npx",
     "test:npx": "node installer/package-smoke.mjs",
     "pack:check": "npm pack --dry-run",
     "prepublishOnly": "npm test",

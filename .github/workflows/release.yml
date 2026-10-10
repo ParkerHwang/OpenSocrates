@@ -101,6 +101,15 @@ jobs:
         run: make bootstrap
       - name: Activate locked native build toolchain
         run: uv sync --locked --no-install-project --group build
+      - name: Stage standalone installer dependency for the Mac release profiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          if python -c 'import sys; sys.exit(tuple(map(int, sys.argv[1].split("."))) < (1, 5, 0))' "${RELEASE_VERSION}"; then
+            mkdir -p dist
+            cp installer/managed-hosts.mjs dist/managed-hosts.mjs
+            cmp installer/managed-hosts.mjs dist/managed-hosts.mjs
+          fi
       - name: Run complete release gate
         run: make release-check
 
@@ -118,6 +127,23 @@ jobs:
           node installer/opensocrates.mjs verify --host all \
             --asset-codex "dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip" \
             --checksum-codex "dist/opensocrates-${RELEASE_VERSION}-codex-plugin.zip.sha256"
+          if python -c 'import sys; sys.exit(tuple(map(int, sys.argv[1].split("."))) < (1, 5, 0))' "${RELEASE_VERSION}"; then
+            for profile in claude-plugin claude-chat-skills antigravity-plugin; do
+              asset="opensocrates-${RELEASE_VERSION}-${profile}.zip"
+              (
+                cd dist
+                shasum -a 256 -c "${asset}.sha256"
+              )
+            done
+            for host in claude claude-chat antigravity; do
+              kind=plugin
+              if [[ "${host}" == claude-chat ]]; then kind=skills; fi
+              asset="dist/opensocrates-${RELEASE_VERSION}-${host}-${kind}.zip"
+              node installer/opensocrates.mjs verify --host "${host}" \
+                --asset "${asset}" --checksum "${asset}.sha256"
+            done
+            cmp installer/managed-hosts.mjs dist/managed-hosts.mjs
+          fi
 
       - uses: actions/download-artifact@v7
         with:
@@ -165,6 +191,13 @@ jobs:
             "dist/opensocrates-${RELEASE_VERSION}-codex-plugin-windows-x64.zip"
             "dist/opensocrates-${RELEASE_VERSION}-codex-plugin-windows-x64.zip.sha256"
           )
+          if python -c 'import sys; sys.exit(tuple(map(int, sys.argv[1].split("."))) < (1, 5, 0))' "${RELEASE_VERSION}"; then
+            release_assets+=("dist/managed-hosts.mjs")
+            for profile in claude-plugin claude-chat-skills antigravity-plugin; do
+              asset="dist/opensocrates-${RELEASE_VERSION}-${profile}.zip"
+              release_assets+=("${asset}" "${asset}.sha256")
+            done
+          fi
           if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
             echo "Release collision: ${RELEASE_TAG} already exists; refusing overwrite." >&2
             exit 1

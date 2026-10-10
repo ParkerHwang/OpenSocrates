@@ -1302,7 +1302,7 @@ test("native package workflow and receipt pin the pull-request head commit and t
     assert.equal(existsSync(rejectedOutput), false);
   }));
 
-test("npm pack metadata is an exact nine-file closed set", () => {
+test("npm pack metadata is an exact closed set including the managed host driver", () => {
   const files = [
     "CHANGELOG.md",
     "LICENSE",
@@ -1310,6 +1310,7 @@ test("npm pack metadata is an exact nine-file closed set", () => {
     "README.md",
     "SECURITY.md",
     "VERSION",
+    "installer/managed-hosts.mjs",
     "installer/opensocrates.mjs",
     "installer/windows.ps1",
     "package.json",

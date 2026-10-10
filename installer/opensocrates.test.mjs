@@ -6,6 +6,7 @@ import {
   CODEX_TRUST_EVENTS,
   InstallerError,
   PURGE_RESULT_SCHEMA,
+  PRODUCT_VERSION,
   assetNameFor,
   createPurgeResult,
   errorCategory,
@@ -70,11 +71,13 @@ test("parses the expected release checksum", () => {
 
 test("derives host-specific release assets", () => {
   const nativeSuffix = process.platform === "win32" ? "-windows-x64" : "";
-  assert.equal(assetNameFor("codex"), `opensocrates-1.4.0-codex-plugin${nativeSuffix}.zip`);
+  assert.equal(assetNameFor("codex"), `opensocrates-${PRODUCT_VERSION}-codex-plugin${nativeSuffix}.zip`);
   for (const host of ["claude", "cursor", "grok", "opencode", "antigravity", "unknown"]) {
     assert.throws(() => assetNameFor(host), InstallerError);
     for (const action of ["install", "update", "status", "remove", "verify"]) {
-      assert.throws(() => parseCli([action, "--host", host]), InstallerError);
+      if (["claude", "antigravity"].includes(host)) {
+        assert.equal(parseCli([action, "--host", host]).host, host);
+      } else assert.throws(() => parseCli([action, "--host", host]), InstallerError);
     }
     assert.throws(
       () =>

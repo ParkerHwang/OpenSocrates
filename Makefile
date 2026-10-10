@@ -27,18 +27,21 @@ generate:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host codex --runtime-root "$(ROOT)/dist/runtime/codex" --output "$(ROOT)/build/generated/plugins/codex" >/dev/null
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host claude --runtime-root "$(ROOT)/dist/runtime/claude" --output "$(ROOT)/build/generated/plugins/claude" >/dev/null
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_content_hosts.py --root "$(ROOT)" --host claude-chat >/dev/null
+	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_content_hosts.py --root "$(ROOT)" --host antigravity >/dev/null
 
 generated-check:
 	@set -eu; tmp="$$(mktemp -d)"; trap 'rm -rf "$$tmp"' EXIT; out="$$tmp/generated output — 日本語"; mkdir -p "$$out"; \
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py --output-dir "$$out/schemas"; \
 	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$$out/content/compiled-content.bundle.json" --reasoning-projections-output "$$out/content/compiled-reasoning-content.bundle.json"; \
 	diff -ru "$(ROOT)/schemas/v1" "$$out/schemas/v1"; diff -u "$(ROOT)/content/compiled-content.bundle.json" "$$out/content/compiled-content.bundle.json"; diff -u "$(ROOT)/content/compiled-reasoning-content.bundle.json" "$$out/content/compiled-reasoning-content.bundle.json"; diff -u "$(ROOT)/content/compiled-response-policy.json" "$$out/content/compiled-response-policy.json"; \
-	for host in codex; do \
+	for host in codex claude; do \
 		PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host "$$host" --output "$(ROOT)/build/generated/plugins/$$host" >/dev/null; \
 		PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host "$$host" --output "$$out/plugins/$$host" >/dev/null; \
 		diff -ru "$(ROOT)/build/generated/plugins/$$host" "$$out/plugins/$$host"; \
 	done; \
-	echo "generated-check: byte-identical schemas, content bundles, and the Codex host package"
+	echo "generated-check: byte-identical schemas, content bundles, and native host packages"
 
 content-check:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
@@ -79,6 +82,10 @@ docs-check:
 		--path docs/grok-support.md \
 		--path docs/opencode-support.md \
 		--path docs/opencode-support.ko.md \
+		--path docs/macos-v1.5.md \
+		--path docs/macos-v1.5.ko.md \
+		--path docs/v1.5.0/WINDOWS_HANDOFF.md \
+		--path evals/v1.5-macos/REPORT.md \
 		--path docs/v1.2-adjudication-report.md \
 		--path evals/v1.2/ADJUDICATION_GUIDE.md \
 		--path evals/v1.2/ADJUDICATION_AI_AMENDMENT.md \
@@ -99,6 +106,8 @@ security-scan: generate
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/security_scan.py --root "$(ROOT)" --report build/evidence/security-scan.json
 
 smoke:
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_claude_host.py
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_content_hosts.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_public_release_verification.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_response_policy.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_release_identity.py
@@ -116,9 +125,11 @@ codex-hook-timing:
 
 package:
 	@if command -v uv >/dev/null 2>&1; then PYTHONPATH="$(PYTHONPATH)" uv run --locked --group build python tools/release_check.py --root "$(ROOT)" --assemble; else PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/release_check.py --root "$(ROOT)" --assemble; fi
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_macos_hosts.py --root "$(ROOT)"
 
 release-check: adjudication-check
 	@if command -v uv >/dev/null 2>&1; then PYTHONPATH="$(PYTHONPATH)" uv run --locked --group build python tools/release_check.py --root "$(ROOT)" --assemble --report build/evidence/release-check.json; else PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/release_check.py --root "$(ROOT)" --assemble --report build/evidence/release-check.json; fi
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_macos_hosts.py --root "$(ROOT)"
 
 version:
 	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m opensocrates version --json

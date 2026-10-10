@@ -2,8 +2,11 @@
 
 ## Supported versions
 
-Security fixes are provided for the latest `1.x` release. OpenSocrates 1.4.0
-supports Codex only. Pre-1.0 builds and retired host integrations are unsupported.
+Security fixes are provided for the latest `1.x` release. Public v1.4.0 is the
+Codex baseline. This checkout's unpublished v1.5 Mac profiles add native Claude
+Code, content-only Claude account delivery, and modular Antigravity content.
+New host Windows qualification is staged separately. Pre-1.0 builds and retired
+host integrations are unsupported; they are not silently adopted by a new profile.
 
 ## Report a vulnerability
 
@@ -18,7 +21,7 @@ severity, safe fixes, and maintainer availability.
 
 ## Security boundary
 
-The default Codex submission entry emits discovery guidance only. It starts no
+The default native submission entry emits discovery guidance only. It starts no
 selector-model request and creates no initial method artifact. The decision
 command loads fixed canonical content and retains only volatile, context-scoped
 delivery identities and agent availability assertions. It never treats an agent
@@ -26,6 +29,17 @@ assertion as proof of applied reasoning. Missing fixed package/source content
 does not authorize a CWD-controlled fallback. This command adds no disk state,
 raw prompt logging, conversation retention, screenshot capture, authentication
 call, or telemetry.
+
+The Claude adapter has its own bounded JSON normalization and native response
+shape. It drops private prompt/transcript fields, resolves complete controller
+locations only inside the installed package, and never opens a transcript or
+initializes a database. Stop and SessionEnd do not require a repair or assert a
+native application receipt. Unavailable native entry fails open with empty output.
+
+Claude account exports and Antigravity modular packages contain complete authored
+content without hooks, runtimes, or credential access. An Antigravity standing
+rule links the owned controller; it never authorizes unrelated account or file
+actions. Workspace/global origins and existing user instructions remain separate.
 
 The retained legacy Codex selector is a separate compatibility path. It uses the
 pinned SDK and existing Codex authentication in an isolated worker, with bounded
@@ -36,7 +50,10 @@ it cannot prove model understanding, method application, or improved answers.
 Legacy SDK credential-copy and POSIX context access are unavailable on Windows.
 
 OpenSocrates has no backend, telemetry, separate account, or API-key requirement.
-Ordinary model requests remain subject to Codex service terms. Host-managed policy
+Ordinary model requests and host conversation storage remain subject to the
+chosen host's authentication, privacy settings, permissions, and service terms.
+The product's no-retention contract does not replace the host's retention policy.
+Host-managed policy
 and hook approvals remain part of the host trust boundary. Installation and
 synthetic fixtures do not establish live hook delivery.
 
@@ -53,8 +70,14 @@ and reports its exact recovery path. Purge refuses unknown, changed, linked, or
 in-use payloads. Codex trust is preserved unless the explicit `--reset-trust`
 option requests removal of the seven exact OpenSocrates trust entries through a
 validated transactional configuration update. Conversation history is preserved.
-Retired-host installation state must be cleaned up with the installer version
-that owned it; 1.4.0 does not reinterpret it as Codex state.
+Retired-host installation state must be reconciled with the installer version
+that owned it; the new profiles do not reinterpret it as Codex or addon state.
+The additive Mac driver verifies exact package inventories and owned markers,
+preserves disabled state, and rejects unknown or modified collisions. Native
+Claude registration uses supported host operations; Antigravity touches only its
+owned rule/skill files. New profiles support exact owned removal, without purge,
+trust reset, or automatic updates. Account export never activates an account
+skill; preserve the old skill and its backup until replacement qualification.
 
 The optional macOS LaunchAgent uses the verified installer and the selected npm
 channel. It does not read or terminate active Codex sessions. Its owner-only
@@ -62,6 +85,11 @@ receipt contains version, timestamp, host result, and an error category, without
 prompts, transcripts, credentials, workspace paths, or raw errors. Automatic
 updates and automatic major upgrades are opt-in. Windows scheduled updates are
 unavailable; use manual updates.
+
+Those scheduler controls remain in the existing Codex lane. `--host all` does
+not expand it to the new Mac profiles. Until v1.5 publication, local candidates
+require paired `--asset` and `--checksum`; checksum matching does not create a
+published release or establish live host trust.
 
 Windows x64 packages use real owner/DACL checks, binary I/O, file locks, and ZIP
 path validation. Signing, notarization, SmartScreen reputation, Windows ARM64,
