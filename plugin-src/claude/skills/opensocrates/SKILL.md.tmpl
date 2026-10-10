@@ -47,15 +47,24 @@ agent-reported reads, application, and result usefulness are separate states.
 Unverified application is a measurement limit; finish after the task's actual
 required checks and do not repeat unchanged checks to seek unavailable proof.
 
-For actually used, completely read methods, preserve the canonical audit line:
-`OpenSocrates grounding: <method-id>@<content-revision>`. Join multiple used
-methods with comma-space, and omit unread or abandoned methods.
+After actually applying one or more eligible, completely read canonical
+methods, end the grounded final response with one line exactly:
+`Powered by OpenSocrates`. Use the same English wording in every locale,
+without method IDs, revisions, punctuation, or Markdown decoration on that
+line. Keep exact method IDs and revisions in the current context and any
+existing permitted evidence; this footer does not require new logging.
+Do not emit it for unread, ineligible, abandoned, or unapplied methods, for
+reader guidance alone, or for mechanical work.
 
 한국어 접지 규칙: 현재 문맥에서 설치된 정본 절차 전체를 읽고 적용 조건,
 금기, 필요한 의존 절차와 중단 조건을 확인한 방법만 사용합니다. 읽지
 못했거나 불완전하면 그 방법은 사용하지 않습니다. 선택·출력·읽었다는
-보고·실제 적용·결과의 유용성은 구별합니다. 실제 사용한 방법에만 위
-접지 줄을 남기고, 존재하지 않는 네이티브 영수증을 요구하지 않습니다.
+보고·실제 적용·결과의 유용성은 구별합니다. 적합한 정본 방법 전체를 읽고
+실제로 적용했을 때만 마지막에 `Powered by OpenSocrates`를 한 줄로
+그대로 표시합니다. 방법 ID·개정 번호나 장식을 이 줄에 덧붙이지 않습니다.
+독자 안내만 사용하거나 기계적인 작업만 했다면 표시하지 않습니다.
+방법 ID와 개정은 현재 문맥과 기존에 허용된 근거에 유지하며, 새 로그나
+존재하지 않는 네이티브 영수증을 요구하지 않습니다.
 
 {{RESPONSE_POLICY_EN}}
 

@@ -7,6 +7,7 @@ import json
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
+from ..constants import PUBLIC_ATTRIBUTION_FOOTER
 from ..content.injection import ProjectionInstructionAssembler
 from ..domain.enums import Participation
 from ..domain.models import CompiledContentBundle
@@ -212,12 +213,7 @@ class DecisionSession:
             ),
             "scope": {"context": value["context"], "epoch": value["epoch"]},
             "applied": "unverified",
-            "audit_if_applied": (
-                "OpenSocrates grounding: "
-                + ", ".join(f"{method}@{self.bundle.content_revision}" for method in selected)
-                if selected
-                else None
-            ),
+            "audit_if_applied": PUBLIC_ATTRIBUTION_FOOTER if selected else None,
             "context_eviction": False,
         }
 

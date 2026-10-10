@@ -44,6 +44,21 @@ def _reject(action: Callable[[], Any], message: str) -> None:
     raise AssertionError(message)
 
 
+def _check_attribution(skill: Path, footer: str) -> None:
+    """All host controllers and both decision guides use the runtime's footer."""
+
+    paths = [skill / "SKILL.md"] + [
+        skill / f"references/decision/guide.{locale}.md" for locale in ("en", "ko")
+    ]
+    for path in paths:
+        text = path.read_text(encoding="utf-8")
+        _require(f"`{footer}`" in text, f"unified attribution missing: {path.name}")
+        _require(
+            "OpenSocrates grounding:" not in text,
+            f"old visible footer remains in active guidance: {path.name}",
+        )
+
+
 def _executable_stat(target: Path) -> Callable[..., os.stat_result]:
     original_stat = Path.stat
 
@@ -70,6 +85,7 @@ def check(root: Path) -> int:
     from tools.build_plugins import generate_plugin
     from tools.release_check import _write_deterministic_zip
 
+    from opensocrates.constants import PUBLIC_ATTRIBUTION_FOOTER
     from opensocrates.selector.entry import ENTRY_GUIDANCE
 
     _require(len(ENTRY_GUIDANCE.encode("utf-8")) <= 1400, "discovery entry exceeds byte budget")
@@ -82,6 +98,15 @@ def check(root: Path) -> int:
         generate_plugin(
             root=root, host="codex", output=native, runtime_root=temporary / "absent-runtime"
         )
+        _check_attribution(native / "skills/opensocrates", PUBLIC_ATTRIBUTION_FOOTER)
+        claude_native = temporary / "claude-native"
+        generate_plugin(
+            root=root,
+            host="claude",
+            output=claude_native,
+            runtime_root=temporary / "absent-runtime",
+        )
+        _check_attribution(claude_native / "skills/opensocrates", PUBLIC_ATTRIBUTION_FOOTER)
         baseline = native / "skills/opensocrates/references/decision"
         for host in HOSTS:
             output = temporary / f"{host} output — 한국어"
@@ -116,6 +141,7 @@ def check(root: Path) -> int:
                     "content ZIP carries an executable or platform-dependent mode",
                 )
             skill = output / LAYOUTS[host][0]
+            _check_attribution(skill, PUBLIC_ATTRIBUTION_FOOTER)
             _require(
                 [p.relative_to(output).as_posix() for p in output.rglob("SKILL.md")]
                 == [f"{LAYOUTS[host][0]}/SKILL.md"],

@@ -9,6 +9,7 @@ paths, credentials, or exception details.
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import os
 import stat
@@ -32,6 +33,7 @@ from measure_codex_hook_timing import (
     measure_codex_session_start,
 )
 from opensocrates.clock import FrozenClock
+from opensocrates.constants import PUBLIC_ATTRIBUTION_FOOTER
 from opensocrates.content.hashes import normalized_semantic_hash, source_tree_hash
 from opensocrates.content.injection import (
     MAX_INJECTION_ESTIMATED_TOKENS,
@@ -1339,6 +1341,104 @@ def _test_codex_selector_host_contract() -> None:
         _require(not stale.path.exists())
         with patch.object(InstructionFileStore, "sweep_expired", side_effect=OSError):
             _require(cleanup_only.handle(_native_payload("UserPromptSubmit")).stdout == "")
+
+
+@_check("VSC-09A-public-attribution-and-authenticated-legacy-grounding")
+def _test_public_attribution_and_legacy_grounding() -> None:
+    _require(PUBLIC_ATTRIBUTION_FOOTER == "Powered by OpenSocrates")
+    selected = (_METHODS[0], _METHODS[1])
+    assembled = ProjectionInstructionAssembler(_projections()).assemble(
+        selected, requested_locale="en"
+    )
+    cases = (
+        ("Powered by OpenSocrates", True, True),
+        ("Synthetic answer.\n  Powered by OpenSocrates\t \n\n", True, True),
+        ("Powered by OpenSocrates suffix", True, False),
+        ("powered by opensocrates", True, False),
+        ("**Powered by OpenSocrates**", True, False),
+        (f"OpenSocrates grounding: {selected[0]}@{_REVISION}", True, False),
+        ("Powered by OpenSocrates\nMore text", True, False),
+        ("Synthetic answer without attribution.", True, False),
+        ("Powered by OpenSocrates", False, False),
+    )
+    with tempfile.TemporaryDirectory(prefix="opensocrates-attribution-check-") as name:
+        store = InstructionFileStore(
+            installation_key=b"p" * 32,
+            directory=Path(name) / "artifacts",
+        )
+        adapter = CodexAdapter(
+            CodexAdapterConfig(
+                selector_mode=True,
+                decision_point_mode=False,
+                require_instruction_read_receipt=True,
+                instruction_file_store=store,
+            )
+        )
+        for final_message, complete_read, accepted in cases:
+            artifact = store.create("synthetic-session", "turn-a", assembled)
+            _require(artifact.grounding_footer() == PUBLIC_ATTRIBUTION_FOOTER)
+            _require(artifact.selected_reasoning_systems == selected)
+            _require(artifact.content_revision == _REVISION)
+            artifact_bytes = artifact.path.read_bytes()
+            if complete_read:
+                read = adapter.handle(
+                    _native_payload(
+                        "PostToolUse",
+                        tool_name="Read",
+                        tool_use_id="synthetic-full-read",
+                        tool_input={"file_path": str(artifact.path), "offset": 0},
+                        tool_response=artifact_bytes.decode("utf-8"),
+                    )
+                )
+                _require(read.stdout == "")
+                _require(store.has_complete_read_receipt(artifact))
+                receipt = json.loads((artifact.path.parent / ".grounding-receipt.json").read_text())
+                _require(receipt["content_revision"] == _REVISION)
+                _require(receipt["selected_reasoning_systems"] == list(selected))
+                _require(
+                    receipt["artifact_sha256"]
+                    == "sha256:" + hashlib.sha256(artifact_bytes).hexdigest()
+                )
+                foreign_key = InstructionFileStore(
+                    installation_key=b"q" * 32,
+                    directory=store.directory,
+                )
+                _require(not foreign_key.has_complete_read_receipt(artifact))
+            else:
+                _require(not store.has_complete_read_receipt(artifact))
+            stopped = adapter.handle(
+                _native_payload(
+                    "Stop", last_assistant_message=final_message, stop_hook_active=False
+                )
+            )
+            if accepted:
+                _require(stopped.stdout == "")
+                _require(not artifact.path.exists())
+            else:
+                _require(stopped.status == "grounding_repair")
+                repair = json.loads(stopped.stdout)
+                _require(repair["decision"] == "block")
+                _require(PUBLIC_ATTRIBUTION_FOOTER in repair["reason"])
+                _require(artifact.path.read_bytes() == artifact_bytes)
+                if not complete_read:
+                    _require("complete read receipt" in repair["reason"])
+                # The host marks the single continuation active; failure to repair
+                # never creates a second blocking pass.
+                second = adapter.handle(
+                    _native_payload(
+                        "Stop", last_assistant_message=final_message, stop_hook_active=True
+                    )
+                )
+                _require(second.stdout == "")
+                _require(not artifact.path.exists())
+
+        artifact = store.create("synthetic-session", "turn-a", assembled)
+        with patch.object(InstructionFileStore, "has_complete_read_receipt", side_effect=OSError):
+            failed_check = adapter.handle(
+                _native_payload("Stop", last_assistant_message=PUBLIC_ATTRIBUTION_FOOTER)
+            )
+        _require(failed_check.stdout == "")
+        _require(not artifact.path.exists())
 
 
 @_check("VSC-10-hook-entrypoint-empty-stdout-and-recursion-guard")

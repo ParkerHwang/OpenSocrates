@@ -21,6 +21,7 @@ MAX_SCHEMA_NAME_LENGTH = 128
 MAX_SAFE_TEXT = 4096
 MAX_REVIEWED_PROCEDURE_TEXT = 16_384
 INSTRUCTION_ARTIFACT_END_MARKER = "<!-- OPENSOCRATES_INSTRUCTION_END -->"
+PUBLIC_ATTRIBUTION_FOOTER = "Powered by OpenSocrates"
 
 # Content-free selector outcome vocabulary.  This is shared by the transient
 # selector and the bounded aggregate store so persistence cannot accept a

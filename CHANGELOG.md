@@ -2,6 +2,16 @@
 
 ## [1.5.0] - Unreleased, Mac and Windows implementation stages
 
+- Unify the conditional user-visible footer across Codex, native Claude, Claude
+  account skills, and Antigravity as `Powered by OpenSocrates`. Keep full-read
+  and eligible-method application requirements, structured method IDs/revisions,
+  read receipts, and existing repair behavior unchanged. The footer is not a
+  native application receipt and does not appear for reader-only or mechanical work.
+- Codex·Claude·Antigravity의 조건부 사용 표기를 `Powered by OpenSocrates`로
+  통일합니다. 정본 전체 읽기와 적합한 방법의 실제 사용 조건, 내부 방법 ID·개정,
+  읽기 영수증과 기존 복구 동작은 유지합니다. 독자 안내만 사용하거나 기계적인
+  작업만 했다면 표시하지 않으며, 문구 자체가 네이티브 적용 증명은 아닙니다.
+
 - Add native Windows x64 Antigravity modular lifecycle and portable Claude account
   ZIP verification/export. Preserve existing Mac native Claude and Codex lanes;
   Windows terminal Code and Desktop local Code are excluded by current scope.
@@ -18,7 +28,7 @@
 
 - Preserve the v1.4 Codex baseline and all 48 authored reasoning methods. Add
   English/Korean reader guidance for source reconciliation, stakeholder context,
-  and useful messages without changing canonical procedures or public contracts.
+  and useful messages without changing canonical procedures.
 - Add a bounded, stateless macOS arm64 Claude Code entry, a separate executable-free
   Claude account skill ZIP, and modular Antigravity conversation-app rules/skills.
 - Add owned install/update/status/diagnose/disable/enable/remove operations for

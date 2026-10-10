@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import cast
 
 from ..clock import Clock, SystemClock
-from ..constants import INSTRUCTION_ARTIFACT_END_MARKER
+from ..constants import INSTRUCTION_ARTIFACT_END_MARKER, PUBLIC_ATTRIBUTION_FOOTER
 from ..content.injection import (
     MAX_INJECTION_ESTIMATED_TOKENS,
     AssembledInstruction,
@@ -454,12 +454,9 @@ class InstructionArtifact:
             raise InstructionArtifactError("instruction artifact guardrail/method counts differ")
 
     def grounding_footer(self) -> str:
-        """Return the exact public audit line required after a grounded response."""
+        """Return the exact public attribution required after a grounded response."""
 
-        methods = ", ".join(
-            f"{method_id}@{self.content_revision}" for method_id in self.selected_reasoning_systems
-        )
-        return f"OpenSocrates grounding: {methods}"
+        return PUBLIC_ATTRIBUTION_FOOTER
 
     def grounding_repair_message(self, *, missing_read: bool, missing_footer: bool) -> str:
         """Return one bounded Stop-hook instruction for the single repair pass."""
