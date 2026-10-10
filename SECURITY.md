@@ -2,8 +2,8 @@
 
 ## Supported versions
 
-Security fixes are provided for the latest `1.x` release. Public v1.4.0 is the
-Codex baseline. This checkout's unpublished v1.5 Mac profiles add native Claude
+Security fixes are provided for the latest `1.x` release. Version 1.5.0 preserves
+the v1.4 Codex foundation and adds native Mac Claude
 Code, content-only Claude account delivery, and modular Antigravity content.
 The Windows continuation supports content-only Claude account verification/export
 and Antigravity modular lifecycle on x64; native Windows Claude Code is excluded.
@@ -102,8 +102,8 @@ updates and automatic major upgrades are opt-in. Windows scheduled updates are
 unavailable; use manual updates.
 
 Those scheduler controls remain in the existing Codex lane. `--host all` does
-not expand it to the new Mac profiles. Until v1.5 publication, local candidates
-require paired `--asset` and `--checksum`; checksum matching does not create a
+not expand it to the additional profiles. Local archive installation
+requires paired `--asset` and `--checksum`; checksum matching does not create a
 published release or establish live host trust.
 
 Windows x64 packages use real owner/DACL checks, binary I/O, file locks, and ZIP

@@ -1,10 +1,10 @@
 # Decision-point retrieval and migration
 
-Status: v1.4.0 Codex-only release; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
+Status: v1.5.0 Codex, Claude and Antigravity release; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
 Experimental content revision 2, method variants, language rewrites and Compact
 policies have not been promoted. Method IDs remain unchanged.
 
-## v1.5 candidate attribution
+## v1.5 attribution
 
 The v1.5 Codex, native Claude, Claude account and Antigravity packages use the
 same final line in every language: `Powered by OpenSocrates`. It replaces the

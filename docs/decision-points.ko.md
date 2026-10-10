@@ -1,10 +1,10 @@
 # 결정 지점 조회와 이전 안내
 
-상태: v1.4.0 Codex 전용 릴리스이며 콘텐츠 revision 3, 라우터 1.1.0입니다. 방법 절차 본문은 v1.2.1 원문을 유지합니다.
+상태: v1.5.0 Codex·Claude·Antigravity 릴리스이며 콘텐츠 revision 3, 라우터 1.1.0입니다. 방법 절차 본문은 v1.2.1 원문을 유지합니다.
 실험용 콘텐츠 revision 2, 방법 변형, 언어 수정안과 Compact 정책을 승격하지
 않았습니다. Method ID는 바뀌지 않습니다.
 
-## v1.5 후보의 사용 표기
+## v1.5 사용 표기
 
 v1.5의 Codex, 네이티브 Claude, Claude 계정과 Antigravity 패키지는 모든 언어에서
 답변 마지막 한 줄을 `Powered by OpenSocrates`로 통일합니다. 기존의 방법 ID·개정

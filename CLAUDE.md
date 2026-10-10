@@ -2,11 +2,11 @@
 
 <!-- make governance-check asserts distinctive policy strings in this file. -->
 
-These instructions govern repository development. The unpublished v1.5 Mac
-stage implements a native Claude Code companion and a separate content-only
-account skill while preserving the released Codex baseline. This contributor
+These instructions govern repository development. The v1.5 release
+provides a native Mac Claude Code companion and a separate content-only
+account skill while preserving the Codex baseline. This contributor
 file is not the installed product controller. See [the Mac guide](docs/macos-v1.5.md)
-for current behavior, local installation, and pending live qualification.
+for current behavior, installation, and live qualification boundaries.
 
 Read and follow [`AGENTS.md`](AGENTS.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md) before making changes. They are the shared cross-agent and human workflow contract.
 

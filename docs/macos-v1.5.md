@@ -2,17 +2,162 @@
 
 [한국어](macos-v1.5.ko.md) · [README](../README.md)
 
-The Mac stage implements the original 48-method reasoning foundation, shared
-EN/KO reader guidance, native Claude entry, a standalone Claude account skill,
-and Antigravity modular content. Existing Codex support remains intact. These
-are **local v1.5.0 candidates**, not published npm/GitHub release assets. The
-new Windows profiles are the [next stage](v1.5.0/WINDOWS_HANDOFF.md).
+Version 1.5.0 preserves the original 48 authored reasoning methods and complete
+English/Korean procedures. It adds reader guidance, native Claude Code entry,
+a standalone Claude account skill, and Antigravity modular content. Codex
+remains available. Windows x64 Codex, account export and Antigravity have their
+own [Windows guide](windows-v1.5.md); Windows native Claude Code is outside scope.
 
-## Obtain the local artifacts
+## Install from the release
 
-Use Node.js 20+ for the installer. Native Codex/Claude archives target
-Apple-silicon Mac and bundle their runtime. Building from source additionally
-requires Python 3.12 and the locked uv environment:
+Use Node.js 20+, the chosen host, and its supported login flow. Native
+Codex/Claude archives target Apple-silicon Mac and bundle their runtime;
+installation needs no Python. The pinned npm installer downloads the v1.5.0
+archive and SHA-256 companion from
+[GitHub Releases](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.0).
+Local archive alternatives are described below.
+
+For Codex, install or update the existing v1.4 installation:
+
+```sh
+npx --yes opensocrates@1.5.0 install --host codex
+npx --yes opensocrates@1.5.0 status --host codex
+# For an existing installation:
+npx --yes opensocrates@1.5.0 update --host codex
+```
+
+Review the seven Codex hooks in an interactive session and start a fresh
+conversation. Non-interactive sessions may skip untrusted hooks. `status`
+reports installation and integrity, not host trust or automatic delivery.
+
+## Native Claude Code
+
+Make the Claude Code CLI available and sign in with its supported login flow.
+Desktop local Code and terminal authentication/delivery are separate checks.
+Install the native companion:
+
+```sh
+npx --yes opensocrates@1.5.0 verify --host claude
+npx --yes opensocrates@1.5.0 install --host claude
+npx --yes opensocrates@1.5.0 status --host claude
+npx --yes opensocrates@1.5.0 diagnose --host claude
+```
+
+The driver owns the `opensocrates-macos` marketplace in user scope and confirms
+the exact plugin version/enabled state. It preserves unrelated plugins/settings
+and refuses an unowned collision. Review host permissions, then start a fresh
+local Code session. Describe the task normally; repeated slash commands are not
+required. Cloud/SSH/WSL Code sessions are outside this Mac native claim.
+
+SessionStart and UserPromptSubmit emit bounded entry guidance and installed
+controller/guide locations. The active agent reads complete eligible procedures
+at materially changed judgments. The stateless entry reads no transcript,
+initializes no database, and calls no extra selector model. Stop and SessionEnd
+do not force a read-repair or assert native application evidence.
+
+To update, run `npx --yes opensocrates@1.5.0 update --host claude`.
+Update preserves disabled state. Lifecycle controls need no asset flags:
+
+```sh
+npx --yes opensocrates@1.5.0 disable --host claude
+npx --yes opensocrates@1.5.0 enable --host claude
+npx --yes opensocrates@1.5.0 remove --host claude
+```
+
+Reload/restart the host and verify the effective plugin origin/version. Removal
+touches the owned registration/files, not the Claude application, account skill,
+conversation history, or unrelated permissions. New profiles do not support
+`--purge`, `--reset-trust`, or automatic updates.
+
+## Antigravity conversation application
+
+Choose one scope. For a workspace, pass an existing absolute directory every
+time; use the same scope for status, update, disable, enable, and remove:
+
+```sh
+npx --yes opensocrates@1.5.0 install --host antigravity \
+  --workspace /absolute/path/to/workspace
+npx --yes opensocrates@1.5.0 update --host antigravity \
+  --workspace /absolute/path/to/workspace
+npx --yes opensocrates@1.5.0 status --host antigravity \
+  --workspace /absolute/path/to/workspace
+npx --yes opensocrates@1.5.0 disable --host antigravity \
+  --workspace /absolute/path/to/workspace
+npx --yes opensocrates@1.5.0 enable --host antigravity \
+  --workspace /absolute/path/to/workspace
+npx --yes opensocrates@1.5.0 remove --host antigravity \
+  --workspace /absolute/path/to/workspace
+```
+
+Omitting `--workspace` chooses the global owned rule/skill under
+`~/.gemini/config/rules/opensocrates.md` and
+`~/.gemini/config/skills/opensocrates/`. Those global locations may affect both
+the application and IDE; do not duplicate global and workspace entry.
+`ANTIGRAVITY_CONFIG_DIR`, when set, overrides the default global base.
+`diagnose` accepts the same scope as `status`. Update preserves disabled state.
+
+The driver preserves `GEMINI.md`, `AGENTS.md`, unrelated rules, and modified or
+unowned collisions. It moves disabled owned content out of active rule/skill
+locations and records ownership for reversible lifecycle operations. Start a
+fresh conversation in the **conversation application**, then ask normally.
+Loaded context remains in an existing conversation after file disable/removal,
+so a fresh conversation is needed to test those actions. File integrity or an
+IDE observation does not prove conversation-app loading.
+
+## Claude account skill: web Chat, Desktop Chat, Cowork
+
+Export a verified standalone ZIP to a new absolute filename in an existing
+owner-controlled directory. The exporter does not create its parent:
+
+```sh
+npx --yes opensocrates@1.5.0 verify --host claude-chat
+npx --yes opensocrates@1.5.0 export --host claude-chat \
+  --output /absolute/path/to/opensocrates-1.5.0-account.zip
+```
+
+An existing output with different bytes is preserved and reported as a conflict.
+`verify --host claude-chat` validates the downloaded ZIP without uploading it. `install`, `update`, `status`, `diagnose`, `enable`, `disable`, and `remove`
+are not account CLI actions; use the account's Customize > Skills interface.
+`--output` is valid only for account export, and `--workspace` only for Antigravity.
+
+Ensure the account's Skills/code-execution capability is available, upload the
+standalone skill ZIP, review its contents, and enable it. If the name already
+exists, first back up **only the existing OpenSocrates skill**, preserve its
+enabled state, and qualify the replacement before deleting the original. Avoid
+simultaneous duplicate controller origins in Code when account content syncs.
+Upload acceptance is not activation or result proof.
+
+Describe ordinary synthesis/decision/message tasks. Account matching is chosen
+by the host model; a missed selection can be retried with an explicit request to
+use OpenSocrates. Chat, Desktop Chat, and current cloud Cowork need separate
+observations. The account ZIP does not provide native hooks or every-message
+enforcement, and the native companion ZIP must not be uploaded in its place.
+
+## Attribution and evidence boundaries
+
+A final answer ends with the exact line `Powered by OpenSocrates` only after an
+eligible authored method has been read in full and actually applied to that
+answer. Use the same English wording in every locale. Reader guidance alone,
+mechanical work, availability or emitted entry guidance do not qualify.
+The footer is not a native application receipt or proof of improved results.
+
+Source checks, archive integrity, installation, host loading, complete procedure
+reads and useful outcomes remain distinct. CLI and Desktop local Code delivery,
+web Chat, Desktop Chat, Cowork, and Antigravity workspace/global loading depend
+on the actual host/account and are not interchangeable. This guide does not
+claim universal answer-quality, token-cost or latency improvements. The
+[Mac observation record](../evals/v1.5-macos/REPORT.md) preserves dated results
+and limitations; it does not describe the current state of every installation.
+
+The default and `--host all` continue to select Codex. The additional profiles
+require an explicit host. Product and host retention boundaries are in
+[SECURITY.md](../SECURITY.md); contributor verification and release gates are in
+[CONTRIBUTING.md](../CONTRIBUTING.md).
+
+## Contributor alternative: local archives
+
+Contributors can build the same profiles from source on Apple-silicon Mac.
+Use Python 3.12 and the locked uv environment in addition to Node.js 20+:
 
 ```sh
 uv sync --locked --all-groups
@@ -41,15 +186,8 @@ Inspect layouts without activating anything:
 /usr/bin/zipinfo -1 dist/opensocrates-1.5.0-claude-chat-skills.zip
 ```
 
-Use the paired local `--asset` and `--checksum` on every install/update/verify
-or export command below. Omitting them attempts a release download; v1.5.0 has
-not been published. Run these commands from this source checkout.
-
-## Native Claude Code
-
-Make the Claude Code CLI available and sign in with its supported login flow.
-Desktop local Code and terminal authentication/delivery are separate checks.
-Install the companion through the source installer:
+When using an archive from `dist/` or the release page, pass its paired
+`--asset` and `--checksum` on install/update/verify/export. For example:
 
 ```sh
 node installer/opensocrates.mjs verify --host claude \
@@ -58,123 +196,9 @@ node installer/opensocrates.mjs verify --host claude \
 node installer/opensocrates.mjs install --host claude \
   --asset dist/opensocrates-1.5.0-claude-plugin.zip \
   --checksum dist/opensocrates-1.5.0-claude-plugin.zip.sha256
-node installer/opensocrates.mjs status --host claude
-node installer/opensocrates.mjs diagnose --host claude
 ```
 
-The driver owns the `opensocrates-macos` marketplace in user scope and confirms
-the exact plugin version/enabled state. It preserves unrelated plugins/settings
-and refuses an unowned collision. Review host permissions, then start a fresh
-local Code session. Describe the task normally; repeated slash commands are not
-required. Cloud/SSH/WSL Code sessions are outside this Mac native claim.
-
-SessionStart and UserPromptSubmit emit bounded entry guidance and installed
-controller/guide locations. The active agent reads complete eligible procedures
-at materially changed judgments. The stateless entry reads no transcript,
-initializes no database, and calls no extra selector model. Stop and SessionEnd
-do not force a read-repair or assert native application evidence.
-
-To update, replace `install` with `update` and supply the new local ZIP/checksum
-pair. Update preserves disabled state. Lifecycle controls need no asset flags:
-
-```sh
-node installer/opensocrates.mjs disable --host claude
-node installer/opensocrates.mjs enable --host claude
-node installer/opensocrates.mjs remove --host claude
-```
-
-Reload/restart the host and verify the effective plugin origin/version. Removal
-touches the owned registration/files, not the Claude application, account skill,
-conversation history, or unrelated permissions. New profiles do not support
-`--purge`, `--reset-trust`, or automatic updates.
-
-## Antigravity conversation application
-
-Choose one scope. For a workspace, pass an existing absolute directory every
-time; use the same scope for status, update, disable, enable, and remove:
-
-```sh
-node installer/opensocrates.mjs install --host antigravity \
-  --workspace /absolute/path/to/workspace \
-  --asset dist/opensocrates-1.5.0-antigravity-plugin.zip \
-  --checksum dist/opensocrates-1.5.0-antigravity-plugin.zip.sha256
-node installer/opensocrates.mjs status --host antigravity \
-  --workspace /absolute/path/to/workspace
-node installer/opensocrates.mjs disable --host antigravity \
-  --workspace /absolute/path/to/workspace
-node installer/opensocrates.mjs enable --host antigravity \
-  --workspace /absolute/path/to/workspace
-node installer/opensocrates.mjs remove --host antigravity \
-  --workspace /absolute/path/to/workspace
-```
-
-Omitting `--workspace` chooses the global owned rule/skill under
-`~/.gemini/config/rules/opensocrates.md` and
-`~/.gemini/config/skills/opensocrates/`. Those global locations may affect both
-the application and IDE; do not duplicate global and workspace entry.
-`diagnose` accepts the same scope as `status`. Update uses `update` with the
-same archive/checksum flags as installation.
-
-The driver preserves `GEMINI.md`, `AGENTS.md`, unrelated rules, and modified or
-unowned collisions. It moves disabled owned content out of active rule/skill
-locations and records ownership for reversible lifecycle operations. Start a
-fresh conversation in the **conversation application**, then ask normally.
-Loaded context remains in an existing conversation after file disable/removal,
-so a fresh conversation is needed to test those actions. File integrity or an
-IDE observation does not prove conversation-app loading.
-
-## Claude account skill: web Chat, Desktop Chat, Cowork
-
-Export a verified standalone ZIP to a new absolute filename:
-
-```sh
-node installer/opensocrates.mjs export --host claude-chat \
-  --asset dist/opensocrates-1.5.0-claude-chat-skills.zip \
-  --checksum dist/opensocrates-1.5.0-claude-chat-skills.zip.sha256 \
-  --output /absolute/path/to/opensocrates-1.5.0-account.zip
-```
-
-An existing output with different bytes is preserved and reported as a conflict.
-`verify --host claude-chat` with the asset/checksum validates locally without
-upload. `install`, `update`, `status`, `diagnose`, `enable`, `disable`, and `remove`
-are not account CLI actions; use the account's Customize > Skills interface.
-`--output` is valid only for account export, and `--workspace` only for Antigravity.
-
-Ensure the account's Skills/code-execution capability is available, upload the
-standalone skill ZIP, review its contents, and enable it. If the name already
-exists, first back up **only the existing OpenSocrates skill**, preserve its
-enabled state, and qualify the replacement before deleting the original. Avoid
-simultaneous duplicate controller origins in Code when account content syncs.
-For a temporary test, agree on replacement/restoration first, then restore the
-saved skill/state afterward. Upload acceptance is not activation or result proof.
-
-Describe ordinary synthesis/decision/message tasks. Account matching is chosen
-by the host model; a missed selection can be retried with an explicit request to
-use OpenSocrates. Chat, Desktop Chat, and current cloud Cowork need separate
-observations. The account ZIP does not provide native hooks or every-message
-enforcement, and the native companion ZIP must not be uploaded in its place.
-
-## Current practical evidence
-
-Recorded during the 2026-10-07 Mac implementation; final exact-commit checks and
-live cells must remain in the implementation handoff/PR.
-
-| Cell | Observed result / next check |
-| --- | --- |
-| Local source/package | Claude contract checks 31/31; portable content checks 245/245; new managed-host checks 17/17; Codex baseline/native gates passed. These are separate offline/package checks. |
-| Claude CLI 2.1.285 | Actual user-scope companion registration confirmed. CLI authentication was unavailable and login requested; authenticated ordinary-task delivery remains pending. |
-| Claude Desktop local Code, R1 | Read the reader guide. First output asserted an absent photography person and reopened settled capacity. Guide2 corrected R1 source reconciliation; R2 updated confirmed booking/capacity but regressed on unknown photography assignment. Both attempts and remaining draft commitments are retained in the [observation record](../evals/v1.5-macos/REPORT.md). |
-| Antigravity application, workspace R1 | Ordinary prompt led to controller/reader-guide reads and two usable stakeholder drafts. This bounded observation does not establish general improvement or global loading. |
-| Account ZIP | Upload format accepted and replacement of the old skill requested. Existing skill's configured text names 1.1.2; its backup is complete. Temporary swap/restore authorization and live treatment remain pending. |
-
-The R1 case combines five dated workshop notes, current capacity 24 versus old
-35, a preference for 30 participants, tentative booking, and a check-in volunteer
-without an agreed photography owner. A successful result preserves those
-distinctions and gives each stakeholder relevant context and a specific next
-request. No message sending or booking is part of the test. Pending practical
-cells are not described as unimplemented source code.
-
-`--host all` retains the Codex desired-state lane. Existing public v1.4 Codex
-installation, trust, and Windows boundaries remain in the older version-specific
-guides. See [SECURITY.md](../SECURITY.md) for product versus host retention and
-[CONTRIBUTING.md](../CONTRIBUTING.md) for verification and publication gates.
+The source installer runs from this checkout. If using the standalone
+`opensocrates.mjs` release asset, keep the verified `managed-hosts.mjs` dependency
+beside it; the npm package includes that dependency. Local verification and
+export do not activate an account skill or change host trust.
