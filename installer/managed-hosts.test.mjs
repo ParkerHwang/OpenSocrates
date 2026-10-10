@@ -291,7 +291,7 @@ test("Chat export preserves verified ZIP bytes, refuses replacement and makes no
 
 test("Mac lifecycle guard and destructive-option rejection happen before package or host effects", async (t) => {
   const b = await box(t), pkg = await fixture(b.base, "antigravity");
-  for (const platform of ["win32", "linux"]) await assert.rejects(runManagedHost(b.options("antigravity", "install"), { ...b.helpers(pkg), platform }), { code: "unsupported_platform" });
+  for (const platform of ["win32", "linux"]) await assert.rejects(runManagedHost(b.options("antigravity", "install"), { ...b.helpers(pkg), platform, arch: "arm64" }), { code: "unsupported_platform" });
   await assert.rejects(runManagedHost(b.options("claude", "install"), { ...b.helpers(pkg), arch: "x64" }), { code: "unsupported_platform" });
   for (const flag of ["purge", "resetTrust"]) await assert.rejects(runManagedHost(b.options("antigravity", "remove", { [flag]: true }), b.helpers(pkg)), { code: "unsupported_destructive_action" });
   assert.equal(b.cleanupCount(), 0); assert.equal(await exists(process.env.ANTIGRAVITY_CONFIG_DIR), false);

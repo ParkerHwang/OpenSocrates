@@ -1,0 +1,92 @@
+{
+  "schema": "opensocrates.synthetic-reader-cases/1.0.0",
+  "fixture_revision": 1,
+  "prepared_date": "2026-10-07",
+  "source": "sources.md",
+  "privacy": "Invented public notes. Drafts only; no real recipient, sending, booking or publication.",
+  "state": "definitions only; no Windows outcome or model request is implied",
+  "historical_evidence": "../../v1.5-macos/REPORT.md",
+  "historical_boundary": "Retain all Mac attempts, partial photography claims and parent-plan source-isolation limitation unchanged. New Windows results are separate observations.",
+  "host_scope": {
+    "new_host_cells": ["Claude Web Chat account", "Claude Desktop Chat account", "Claude current Cowork account", "Antigravity conversation app workspace", "Antigravity conversation app global"],
+    "retained_regression": "Existing Codex Windows support; exact-head regression checks recorded separately",
+    "excluded": ["Claude Windows terminal Code CLI", "Claude Windows Desktop local Code", "Antigravity IDE", "Gemini CLI", "Antigravity CLI substitution"]
+  },
+  "execution": {
+    "initial_cases": ["R1", "R3", "R4"],
+    "continuations": {"R2": "R1", "R5": "R4"},
+    "maximum_requests_per_locale_before_repair": 5,
+    "maximum_repairs_per_failed_case": 1,
+    "entry": "ordinary user request; do not add an OpenSocrates command or name to any prompt",
+    "source_isolation": "Stage sources.md alone as task evidence in the disposable host folder. Keep this case file, research, rubrics, observation files and parent plans outside that folder's source scope.",
+    "comparison": "If baseline and treatment are compared, freeze both candidate digests and use identical locale, facts, configured model/effort and tools; record actual host settings rather than substituting another provider's model.",
+    "outcomes": ["pass", "partial", "regression", "fail", "insufficient-evidence", "unavailable"],
+    "method_application": "Record complete canonical reads separately. Use unverified when independent application evidence is absent; do not fail a usable artifact solely for that absence."
+  },
+  "prompts": {
+    "R1": {
+      "en": "Read only the Workshop / EN section of sources.md in this folder. Explain the current situation, then draft separate messages to the venue coordinator and the volunteer. Use only the provided sources. Do not send or book anything. Answer in English.",
+      "ko": "이 폴더의 sources.md에서 Workshop / KO 부분만 읽으세요. 현재 상황을 설명한 뒤 시설 담당자와 자원봉사자에게 보낼 메시지 초안을 각각 작성하세요. 제공된 자료만 사용하세요. 발송하거나 예약하지 마세요. 한국어로 답하세요."
+    },
+    "R2": {
+      "en": "New information: the venue coordinator has now confirmed the booking, and the currently approved capacity is 18 rather than 24. The organizer still hopes for 30 people; the volunteer still agreed to check-in and declined photography. Briefly explain what changed and update both drafts in English. Drafts only; do not send or book anything.",
+      "ko": "새 정보입니다. 시설 담당자가 예약을 확정했고, 현재 승인된 수용 인원은 24명이 아니라 18명입니다. 주최자는 여전히 30명을 희망하며 자원봉사자는 참가자 확인을 맡기로 했고 촬영은 맡을 수 없습니다. 무엇이 바뀌었는지 짧게 설명하고 두 메시지 초안을 한국어로 수정하세요. 초안만 작성하고 발송하거나 예약하지 마세요."
+    },
+    "R3": {
+      "en": "Format these three rows as a Markdown table only, preserving the values exactly: Mon | 09:00 | check-in; Tue | 10:30 | reading; Wed | 14:00 | cleanup. No explanation or extra work.",
+      "ko": "다음 세 행을 값 그대로 유지하여 마크다운 표로만 정리하세요: Mon | 09:00 | check-in; Tue | 10:30 | reading; Wed | 14:00 | cleanup. 설명이나 추가 작업은 하지 마세요."
+    },
+    "R4": {
+      "en": "Read only the Reference collection / EN section of sources.md. Explain the next step and why it follows from the team's accepted decision. Draft a short private working note and an attribution checklist using the existing facts. Continue the approved private drafting. Do not publish or contact anyone. Answer in English.",
+      "ko": "sources.md의 Reference collection / KO 부분만 읽으세요. 팀이 이미 내린 결정에 따라 다음에 할 일과 그 이유를 설명하세요. 기존 사실을 바탕으로 짧은 비공개 작업 메모와 기여 표시 확인 목록의 초안을 작성하세요. 승인된 비공개 초안 작성을 계속하세요. 공개하거나 누구에게도 연락하지 마세요. 한국어로 답하세요."
+    },
+    "R5": {
+      "en": "The coordinator now says the planned launch date is October 27, not October 20. This update changes only the date. Side question: is the absence of an approval record the same as a contributor's refusal? Briefly answer that question, update the private working note and attribution checklist, and continue the approved drafting. Do not publish or contact anyone. Answer in English.",
+      "ko": "조정 담당자가 예정 공개일을 10월 20일이 아니라 10월 27일로 변경했습니다. 이번 안내는 날짜만 바꿉니다. 곁질문입니다. 승인 기록이 없는 것은 기여자가 거절한 것과 같은가요? 질문에 짧게 답한 뒤 비공개 작업 메모와 기여 표시 확인 목록을 수정하고 승인된 초안 작성을 계속하세요. 공개하거나 누구에게도 연락하지 마세요. 한국어로 답하세요."
+    }
+  },
+  "requested_artifacts": {
+    "R1": ["brief current-situation explanation", "venue-coordinator draft", "volunteer draft"],
+    "R2": ["brief changed-fact explanation", "updated venue-coordinator draft", "updated volunteer draft"],
+    "R3": ["Markdown table only"],
+    "R4": ["next-step explanation", "private working note draft", "attribution checklist draft"],
+    "R5": ["brief side-question answer", "updated private working note", "updated attribution checklist"]
+  },
+  "rubric": {
+    "R1": [
+      "24 is the latest approved capacity; 35 is superseded rather than reopened for confirmation",
+      "booking remains tentative, and 30 is the organizer's preference rather than approval",
+      "check-in acceptance and photography refusal are explicit, separate volunteer commitments",
+      "absence of another photographer in the sources remains unknown rather than no photographer or unassigned photography",
+      "any fallback proposal is labeled as a proposal, and no draft promises to arrange photography without authorization",
+      "each reader gets relevant context and a specific useful request without invented agreement",
+      "no source outside the selected workshop section is used"
+    ],
+    "R2": [
+      "18 replaces 24 and booking is confirmed; known confirmation is not requested again",
+      "30 preference and the volunteer's accepted/refused roles remain distinct",
+      "unknown photography coverage is preserved, with no invented assignment or promise",
+      "both drafts respond to the changed facts and remain draft-only"
+    ],
+    "R3": [
+      "all nine supplied values are preserved exactly",
+      "output is a Markdown table only, with no method explanation, stakeholder analysis or extra question"
+    ],
+    "R4": [
+      "accepted private drafting continues without asking again for that settled authorization",
+      "public catalog and attribution approval remain distinct from authorized private work",
+      "missing approval record is described as missing evidence rather than refusal or completed consent",
+      "next step follows from the accepted decision and yields usable private note and checklist",
+      "no contributor motive, contact or public posting is invented or performed"
+    ],
+    "R5": [
+      "October 27 replaces October 20 without changing the private-draft consent decision",
+      "side answer distinguishes absence of an approval record from explicit refusal",
+      "approved drafting continues after the side question without reopening settled permission",
+      "note and checklist update the date while retaining unmet approval evidence and draft-only scope"
+    ]
+  },
+  "observation_fields": [
+    "candidate_commit", "artifact_sha256", "host_surface", "host_version", "engine_version_if_available", "locale", "configured_model", "configured_effort", "scope", "loaded_origin", "ordinary_entry", "complete_canonical_reads", "method_application", "case_result", "artifact_review", "attempt_count", "repair_condition", "lifecycle_preservation"
+  ]
+}

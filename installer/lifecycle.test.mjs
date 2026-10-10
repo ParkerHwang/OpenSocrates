@@ -1712,7 +1712,9 @@ test("isolated app-server validation rejects malformed, oversized, extra, and mi
           codexBin,
           hooks: {
             validationTimeoutMilliseconds: 1_000,
-            validationTerminationMilliseconds: 50,
+            // Busy CI runners need time to record the synthetic EOF trace before
+            // forced termination. The separate timeout case checks the bound.
+            validationTerminationMilliseconds: 500,
           },
         }),
         (error) =>

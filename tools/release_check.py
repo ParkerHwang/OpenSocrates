@@ -983,7 +983,9 @@ class _StrictUtf8ZipInfo(zipfile.ZipInfo):
         return self.filename.encode("utf-8"), self.flag_bits | 0x0800
 
 
-def _write_deterministic_zip(source: Path, destination: Path) -> None:
+def _write_deterministic_zip(
+    source: Path, destination: Path, *, content_only: bool = False
+) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
         destination.unlink()
@@ -1002,7 +1004,8 @@ def _write_deterministic_zip(source: Path, destination: Path) -> None:
             info.create_system = 3
             info.create_version = 20
             info.extract_version = 20
-            info.external_attr = ((stat.S_IFREG | stat.S_IMODE(path.stat().st_mode)) & 0xFFFF) << 16
+            mode = 0o644 if content_only else stat.S_IMODE(path.stat().st_mode)
+            info.external_attr = ((stat.S_IFREG | mode) & 0xFFFF) << 16
             archive.writestr(info, path.read_bytes())
 
 

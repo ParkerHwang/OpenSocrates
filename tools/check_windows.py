@@ -684,6 +684,89 @@ class WindowsChecks(unittest.TestCase):
                 self.assertFalse((root / "escape").exists())
 
     @unittest.skipUnless(PACKAGES, "requires --packages after build_windows.py")
+    def test_real_portable_content_archives(self):
+        version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+        for host, suffix in (("claude-chat", "skills"), ("antigravity", "plugin")):
+            archive = ROOT / "dist" / f"opensocrates-{version}-{host}-{suffix}.zip"
+            with zipfile.ZipFile(archive) as bundle:
+                self.assertTrue(bundle.infolist())
+                self.assertTrue(
+                    all((row.external_attr >> 16) == 0o100644 for row in bundle.infolist())
+                )
+                self.assertFalse(
+                    any(
+                        row.filename.endswith((".exe", ".cmd", ".ps1", ".mjs"))
+                        for row in bundle.infolist()
+                    )
+                )
+            result = subprocess.run(
+                [
+                    "node",
+                    "installer/opensocrates.mjs",
+                    "verify",
+                    "--host",
+                    host,
+                    "--asset",
+                    str(archive),
+                    "--checksum",
+                    str(archive) + ".sha256",
+                ],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                timeout=180,
+            )
+            self.assertEqual(json.loads(result.stdout)["installation"], "verified-package")
+
+    def test_content_zip_special_entries_and_windows_aliases_are_refused(self):
+        import hashlib
+
+        version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+        with tempfile.TemporaryDirectory(prefix="OpenSocrates archive 한글 space ") as name:
+            root = Path(name)
+            for host, suffix in (("claude-chat", "skills"), ("antigravity", "plugin")):
+                archive = root / f"opensocrates-{version}-{host}-{suffix}.zip"
+                for entries, mode in (
+                    (("../escape",), 0o100644),
+                    (("file:stream",), 0o100644),
+                    (("NUL.txt",), 0o100644),
+                    (("file.",), 0o100644),
+                    (("A.txt", "a.txt"), 0o100644),
+                    (("a", "a/child"), 0o100644),
+                    (("symlink",), 0o120777),
+                    (("fifo",), 0o010644),
+                ):
+                    with zipfile.ZipFile(archive, "w") as bundle:
+                        for entry in entries:
+                            info = zipfile.ZipInfo(entry)
+                            info.create_system = 3
+                            info.external_attr = mode << 16
+                            bundle.writestr(info, "synthetic")
+                    checksum = archive.with_suffix(".zip.sha256")
+                    checksum.write_text(
+                        f"{hashlib.sha256(archive.read_bytes()).hexdigest()}  {archive.name}\n",
+                        encoding="utf-8",
+                    )
+                    result = subprocess.run(
+                        [
+                            "node",
+                            "installer/opensocrates.mjs",
+                            "verify",
+                            "--host",
+                            host,
+                            "--asset",
+                            str(archive),
+                            "--checksum",
+                            str(checksum),
+                        ],
+                        cwd=ROOT,
+                        capture_output=True,
+                        timeout=30,
+                    )
+                    self.assertNotEqual(result.returncode, 0, (host, entries, mode))
+                    self.assertFalse((root / "escape").exists())
+
+    @unittest.skipUnless(PACKAGES, "requires --packages after build_windows.py")
     def test_real_packaged_runtime_and_checksum(self):
         version = (ROOT / "VERSION").read_text().strip()
         for host in ("codex",):

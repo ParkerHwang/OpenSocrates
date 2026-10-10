@@ -159,7 +159,7 @@ def assemble(root: Path) -> dict[str, Any]:
         archives.append((host, package, "skills" if host == "claude-chat" else "plugin"))
     for host, package, kind in archives:
         archive = root / "dist" / f"opensocrates-{version}-{host}-{kind}.zip"
-        _write_deterministic_zip(package, archive)
+        _write_deterministic_zip(package, archive, content_only=host != "claude")
         hashed = digest(archive)
         archive.with_name(archive.name + ".sha256").write_text(f"{hashed}  {archive.name}\n")
         artifacts[archive.name] = "sha256:" + hashed

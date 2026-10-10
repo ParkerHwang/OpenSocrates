@@ -170,7 +170,7 @@ const NPM_PACKAGE_SCRIPTS = Object.freeze({
   "test:npx": "node installer/package-smoke.mjs",
   "pack:check": "npm pack --dry-run",
   prepublishOnly: "npm test",
-  "test:windows": "node --test installer/windows.test.mjs",
+  "test:windows": "node --test installer/windows.test.mjs installer/managed-windows.test.mjs",
 });
 const CHECKPOINT_PHASES = new Set([
   "ready-to-purge",

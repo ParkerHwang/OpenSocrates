@@ -5,7 +5,10 @@
 Security fixes are provided for the latest `1.x` release. Public v1.4.0 is the
 Codex baseline. This checkout's unpublished v1.5 Mac profiles add native Claude
 Code, content-only Claude account delivery, and modular Antigravity content.
-New host Windows qualification is staged separately. Pre-1.0 builds and retired
+The Windows continuation supports content-only Claude account verification/export
+and Antigravity modular lifecycle on x64; native Windows Claude Code is excluded.
+Live account selection and conversation-app loading require separate observations.
+Pre-1.0 builds and retired
 host integrations are unsupported; they are not silently adopted by a new profile.
 
 ## Report a vulnerability
@@ -40,6 +43,18 @@ Claude account exports and Antigravity modular packages contain complete authore
 content without hooks, runtimes, or credential access. An Antigravity standing
 rule links the owned controller; it never authorizes unrelated account or file
 actions. Workspace/global origins and existing user instructions remain separate.
+
+Windows addon operations refuse junctions/reparse ancestors, foreign ownership,
+untrusted writable DACLs, unknown files and changed inventories. New directories
+are created with the current user's explicit owner and protected DACL. A held
+directory lease blocks ancestor rename during mutations; an exclusive operation
+lock is never removed as stale automatically. Rollback preserves changed
+replacement content and its recovery backup. Local drive paths are required;
+network shares are not qualified. Existing settings are not normalized by
+rewriting permissions. ZIP paths reject aliases, streams, links, special entries,
+case collisions and file/directory conflicts before extraction. Portable content
+archives carry fixed regular-file modes and no executables. Account exports use
+verified captured bytes and refuse conflicting output files.
 
 The retained legacy Codex selector is a separate compatibility path. It uses the
 pinned SDK and existing Codex authentication in an isolated worker, with bounded

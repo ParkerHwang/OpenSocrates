@@ -9,6 +9,8 @@ jobs:
     env:
       PYTHONUTF8: "1"
     steps:
+      - name: Preserve LF checkout
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
@@ -23,6 +25,8 @@ jobs:
       - run: uv run --locked python tools/check_windows.py
       - run: uv run --locked python tools/build_windows.py
       - run: uv run --locked python tools/check_windows.py --packages
+      - run: uv run --locked python tools/check_content_hosts.py
+      - run: uv run --locked python tools/check_claude_host.py
       - run: npm run test:windows
       - run: npm pack --dry-run
       - name: Write exact Windows package source provenance
@@ -35,6 +39,14 @@ jobs:
           path: |
             dist/*-windows-x64.zip
             dist/*-windows-x64.zip.sha256
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows-content-packages-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          path: |
+            dist/*-claude-chat-skills.zip
+            dist/*-claude-chat-skills.zip.sha256
+            dist/*-antigravity-plugin.zip
+            dist/*-antigravity-plugin.zip.sha256
       - uses: actions/upload-artifact@v7
         if: always()
         with:

@@ -1,5 +1,8 @@
 # Windows의 Codex — OpenSocrates 1.4.0
 
+미공개 v1.5의 Claude 계정 스킬·Antigravity 후속 구현은
+[Windows v1.5 안내](windows-v1.5.ko.md)를 참고하세요. 아래는 기존 v1.4 기준선입니다.
+
 OpenSocrates 1.4.0은 네이티브 Windows 프로세스로 **Windows x64의 Codex**를
 지원합니다. 다른 호스트 연동은 제거했습니다. Windows ARM64, Windows 10,
 서명, SmartScreen 평판, 별도의 깨끗한 PC는 미검증입니다.

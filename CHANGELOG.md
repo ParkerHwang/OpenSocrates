@@ -1,6 +1,20 @@
 # Changelog
 
-## [1.5.0] - Unreleased, Mac implementation stage
+## [1.5.0] - Unreleased, Mac and Windows implementation stages
+
+- Add native Windows x64 Antigravity modular lifecycle and portable Claude account
+  ZIP verification/export. Preserve existing Mac native Claude and Codex lanes;
+  Windows terminal Code and Desktop local Code are excluded by current scope.
+- Use explicit Windows owner/DACL creation, ancestor leases, reparse refusal,
+  safe ZIP extraction and rollback that retains changed content and recovery backups.
+  Add native filesystem regressions, portable 0644 archive modes and Windows SBOM/CI.
+- Tighten EN/KO reader guidance for absent source mentions, settled follow-up facts,
+  persistent unknowns and unauthorized draft commitments. Preserve historical
+  failed observations; guide checks do not prove live outcome improvement.
+- Windows x64 Antigravity 설치·업데이트·비활성화·복구와 Claude 계정 ZIP을 추가합니다.
+  Windows Claude Code는 요청 범위에서 제외하며 Mac 구현과 Codex는 유지합니다.
+  자료의 부재·확인된 후속 정보·미확인 사항·승인 없는 약속을 다루는 정본 외 안내를
+  강화합니다. 실제 호스트 검증은 설치 성공과 구분해 기록합니다.
 
 - Preserve the v1.4 Codex baseline and all 48 authored reasoning methods. Add
   English/Korean reader guidance for source reconciliation, stakeholder context,
@@ -11,11 +25,11 @@
   native Claude and Antigravity, plus verified account export. Keep Codex's
   existing lifecycle and `--host all` behavior separate.
 - Withdraw the previous coding/memory/orchestration v1.5 candidate completely.
-  New Windows host optimization follows this Mac implementation; account matching,
+  Windows host optimization continues this Mac implementation; account matching,
   authenticated CLI delivery, and result improvement need separate qualification.
 - v1.4의 Codex와 정본 48개 방법을 유지하고, 자료·이해관계자 맥락을 사람이 이해하고
   사용할 수 있게 정리하는 영어·한국어 안내와 Mac용 Claude·Antigravity 배포를
-  추가합니다. 이전 코딩 중심 v1.5는 전부 폐기했으며 Windows 최적화는 다음 단계입니다.
+  추가합니다. 이전 코딩 중심 v1.5는 전부 폐기했으며 Windows 후속 구현을 이어갑니다.
 
 ## [1.4.0] - 2026-09-16
 

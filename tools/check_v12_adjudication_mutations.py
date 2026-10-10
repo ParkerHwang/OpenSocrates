@@ -683,6 +683,36 @@ def _comparison_regressions(parent: Path, failures: list[str]) -> None:  # noqa:
     )
 
 
+def _directory_link(link: Path, target: Path) -> None:
+    if os.name != "nt":
+        link.symlink_to(target, target_is_directory=True)
+        return
+    subprocess.run(
+        [
+            "powershell.exe",
+            "-NoProfile",
+            "-NonInteractive",
+            "-Command",
+            "New-Item -ItemType Junction -Path $env:OPENSOCRATES_TEST_LINK "
+            "-Target $env:OPENSOCRATES_TEST_TARGET -ErrorAction Stop | Out-Null",
+        ],
+        env={
+            **os.environ,
+            "OPENSOCRATES_TEST_LINK": str(link),
+            "OPENSOCRATES_TEST_TARGET": str(target),
+        },
+        capture_output=True,
+        check=True,
+        timeout=30,
+    )
+    if not link.is_junction():
+        raise AssertionError("native Windows junction fixture was not created")
+
+
+def _is_directory_link(path: Path) -> bool:
+    return path.is_symlink() or (os.name == "nt" and path.is_junction())
+
+
 def _overwrite_regressions(parent: Path, failures: list[str]) -> None:  # noqa: C901 - exercises each overwrite failure stage explicitly
     parent = parent.resolve()
     for label, publish, patch_target in (
@@ -716,7 +746,7 @@ def _overwrite_regressions(parent: Path, failures: list[str]) -> None:  # noqa: 
         sentinel.mkdir()
         (sentinel / "lock.json").write_text("sentinel", encoding="utf-8")
         symlink_target = parent / f"{label}-symlink-output"
-        symlink_target.symlink_to(sentinel, target_is_directory=True)
+        _directory_link(symlink_target, sentinel)
         symlink_staged = parent / f"{label}-symlink-staged"
         symlink_staged.mkdir()
         (symlink_staged / "lock.json").write_text("replacement", encoding="utf-8")
@@ -725,13 +755,15 @@ def _overwrite_regressions(parent: Path, failures: list[str]) -> None:  # noqa: 
         except SystemExit:
             pass
         else:
-            failures.append(f"{label}-publish: symlink output was accepted")
+            failures.append(f"{label}-publish: directory link output was accepted")
         if (
-            not symlink_target.is_symlink()
+            not _is_directory_link(symlink_target)
             or (sentinel / "lock.json").read_text(encoding="utf-8") != "sentinel"
             or not symlink_staged.is_dir()
         ):
-            failures.append(f"{label}-publish: symlink refusal did not preserve sentinel/stage")
+            failures.append(
+                f"{label}-publish: directory link refusal did not preserve sentinel/stage"
+            )
 
         real_parent = parent / f"{label}-real-parent"
         real_parent.mkdir()
@@ -739,7 +771,7 @@ def _overwrite_regressions(parent: Path, failures: list[str]) -> None:  # noqa: 
         nested_sentinel.mkdir()
         (nested_sentinel / "lock.json").write_text("nested-sentinel", encoding="utf-8")
         linked_parent = parent / f"{label}-linked-parent"
-        linked_parent.symlink_to(real_parent, target_is_directory=True)
+        _directory_link(linked_parent, real_parent)
         parent_staged = parent / f"{label}-parent-link-staged"
         parent_staged.mkdir()
         try:
@@ -747,9 +779,9 @@ def _overwrite_regressions(parent: Path, failures: list[str]) -> None:  # noqa: 
         except SystemExit:
             pass
         else:
-            failures.append(f"{label}-publish: symlink parent component was accepted")
+            failures.append(f"{label}-publish: directory link parent component was accepted")
         if (nested_sentinel / "lock.json").read_text(encoding="utf-8") != "nested-sentinel":
-            failures.append(f"{label}-publish: symlink parent target was modified")
+            failures.append(f"{label}-publish: directory link parent target was modified")
 
         rollback_target = parent / f"{label}-rollback-target"
         rollback_target.mkdir()

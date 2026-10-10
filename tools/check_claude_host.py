@@ -47,6 +47,32 @@ def _install_references(root: Path) -> None:
         path.write_text("synthetic-complete-reference\n", encoding="utf-8")
 
 
+def _directory_link(path: Path, target: Path) -> None:
+    """Use a native junction on unprivileged Windows; never follow it on cleanup."""
+
+    if os.name != "nt":
+        path.symlink_to(target, target_is_directory=True)
+        return
+    subprocess.run(
+        [
+            "powershell.exe",
+            "-NoProfile",
+            "-NonInteractive",
+            "-Command",
+            "New-Item -ItemType Junction -Path $env:OPENSOCRATES_TEST_LINK "
+            "-Target $env:OPENSOCRATES_TEST_TARGET | Out-Null",
+        ],
+        env={
+            **os.environ,
+            "OPENSOCRATES_TEST_LINK": str(path),
+            "OPENSOCRATES_TEST_TARGET": str(target),
+        },
+        capture_output=True,
+        check=True,
+        timeout=10,
+    )
+
+
 class ClaudeContractTests(unittest.TestCase):
     def setUp(self) -> None:
         self.scratch = tempfile.TemporaryDirectory(prefix="opensocrates-claude-contract-")
@@ -72,7 +98,9 @@ class ClaudeContractTests(unittest.TestCase):
         self.assertEqual(specific["hookEventName"], "SessionStart")
         self.assertIn(ENTRY_GUIDANCE, specific["additionalContext"])
         for path in REFERENCE_PATHS:
-            self.assertIn(str(self.root / path), specific["additionalContext"])
+            self.assertIn(
+                json.dumps(str(self.root / path), ensure_ascii=False), specific["additionalContext"]
+            )
 
     def test_submit_ignores_private_and_new_host_fields(self) -> None:
         raw = _payload(
@@ -174,14 +202,19 @@ class ClaudeContractTests(unittest.TestCase):
         path.unlink()
         outside = Path(self.scratch.name) / "outside.md"
         outside.write_text("synthetic-outside", encoding="utf-8")
-        path.symlink_to(outside)
+        try:
+            path.symlink_to(outside)
+        except OSError as error:
+            if os.name == "nt" and error.winerror == 1314:
+                self.skipTest("native file symlink creation requires Windows privilege")
+            raise
         self.assertEqual(self.call(_payload()), "")
 
     def test_parent_symlink_rejected(self) -> None:
         original = self.root / "skills"
-        moved = self.root / "moved-skills"
+        moved = Path(self.scratch.name) / "moved-skills"
         original.rename(moved)
-        original.symlink_to(moved, target_is_directory=True)
+        _directory_link(original, moved)
         self.assertEqual(self.call(_payload()), "")
 
     def test_relative_root_rejected(self) -> None:
