@@ -1,6 +1,7 @@
 package devtools
 
 import (
+	"errors"
 	"fmt"
 	"golang.org/x/text/unicode/norm"
 	"html"
@@ -73,6 +74,14 @@ func linkAnchors(path string) map[string]bool {
 	return anchors
 }
 func checkLinks(root string, selected []string) ([]string, any, error) {
+	absolute, e := filepath.Abs(root)
+	if e != nil {
+		return nil, nil, e
+	}
+	root, e = filepath.EvalSymlinks(absolute)
+	if e != nil {
+		return nil, nil, e
+	}
 	if len(selected) == 0 {
 		selected = []string{"README.md", "README.ko.md", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md", "CODE_OF_CONDUCT.md", "AGENTS.md", "CLAUDE.md", ".github/copilot-instructions.md", ".github/pull_request_template.md", ".github/release-notes", "docs/v1.6.0"}
 	}
@@ -88,7 +97,14 @@ func checkLinks(root string, selected []string) ([]string, any, error) {
 			}
 			ext := strings.ToLower(filepath.Ext(p))
 			if !d.IsDir() && (ext == ".md" || ext == ".markdown" || ext == ".html" || ext == ".htm") {
-				files[p] = true
+				actual, e := filepath.EvalSymlinks(p)
+				if e != nil {
+					return e
+				}
+				if !linkPathWithinRoot(root, actual) {
+					return errors.New("document_escapes_repository")
+				}
+				files[actual] = true
 			}
 			return nil
 		})
@@ -139,11 +155,12 @@ func checkLinks(root string, selected []string) ([]string, any, error) {
 						}
 					}
 					actual, e := filepath.EvalSymlinks(candidate)
-					if e != nil {
+					if !linkPathWithinRoot(root, candidate) {
+						code = "link_escapes_repository"
+					} else if e != nil {
 						code = "target_missing"
 					} else {
-						r, e := filepath.Rel(root, actual)
-						if e != nil || r == ".." || strings.HasPrefix(r, ".."+string(filepath.Separator)) {
+						if !linkPathWithinRoot(root, actual) {
 							code = "link_escapes_repository"
 						} else if u.Fragment != "" {
 							ext := strings.ToLower(filepath.Ext(actual))
@@ -161,4 +178,9 @@ func checkLinks(root string, selected []string) ([]string, any, error) {
 	}
 	sort.Strings(codes)
 	return codes, map[string]any{"documents": len(files), "checked_links": checked, "external_links_not_fetched": external}, nil
+}
+
+func linkPathWithinRoot(root, path string) bool {
+	relative, e := filepath.Rel(root, path)
+	return e == nil && relative != ".." && !strings.HasPrefix(relative, ".."+string(filepath.Separator))
 }

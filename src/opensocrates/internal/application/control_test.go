@@ -44,11 +44,13 @@ func resultOK(t *testing.T, r domain.ControlResult, durable bool) {
 		want = "accepted"
 	}
 	if r.Status != want || r.DurableMutation != durable {
-		t.Fatalf("unexpected result: %+v", r)
+		t.Fatalf("unexpected result: status=%s durable=%t error=%s reason=%s want=%s durable=%t", r.Status, r.DurableMutation, resultCode(r.ErrorCode), resultCode(r.ReasonCode), want, durable)
 	}
 	v, e := domain.Normalize(r)
-	if e != nil || contracts.Validate("host-control-result", v) != nil {
-		t.Fatalf("invalid result %+v: %v", r, e)
+	schemaError := contracts.Validate("host-control-result", v)
+	if e != nil || schemaError != nil {
+		raw, _ := contracts.CanonicalCompact(v)
+		t.Fatalf("invalid result %s: normalize=%v schema=%v", raw, e, schemaError)
 	}
 }
 func framingPayload() map[string]any {
@@ -216,4 +218,11 @@ func TestControlFeedbackAuthorityAndLargeRevision(t *testing.T) {
 	if pref["next_sequence"] != json.Number("9007199254740993123456790") {
 		t.Fatal("feedback sequence lost precision")
 	}
+}
+
+func resultCode(v *string) string {
+	if v == nil {
+		return "null"
+	}
+	return *v
 }

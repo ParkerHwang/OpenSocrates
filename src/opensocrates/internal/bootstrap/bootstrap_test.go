@@ -68,7 +68,7 @@ func fixtureBundle(t *testing.T, dir, version, goos, goarch string, binary []byt
 	if err != nil {
 		t.Fatal(err)
 	}
-	manifest := transport.Manifest{Schema: transport.BundleSchema, ProductVersion: version, Target: platformTarget(goos, goarch), Files: []transport.File{}}
+	manifest := transport.Manifest{Schema: transport.BundleSchema, ProductVersion: version, ContentRevision: "3", Target: platformTarget(goos, goarch), Files: []transport.File{}}
 	for _, entry := range inventory.Entries {
 		if !entry.Directory {
 			manifest.Files = append(manifest.Files, transport.File{Path: entry.Path, SHA256: entry.SHA256, Mode: entry.Mode, Size: entry.Size})

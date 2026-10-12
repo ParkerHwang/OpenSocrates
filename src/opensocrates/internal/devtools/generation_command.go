@@ -150,7 +150,9 @@ func Run(args []string, out, errout io.Writer) int {
 		fmt.Fprintln(errout, command+": FAIL:", e)
 		return 1
 	}
-	if result != nil {
+	if result != nil && command == "package" {
+		fmt.Fprintf(out, "package: OK version=%v target=%v files=%d\n", result["product_version"], result["target"], len(arr(result["files"])))
+	} else if result != nil {
 		b, e := Canonical(result)
 		if e != nil {
 			return 1

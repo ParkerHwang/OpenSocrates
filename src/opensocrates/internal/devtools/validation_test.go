@@ -96,6 +96,38 @@ func TestLinkFragmentAndEscape(t *testing.T) {
 		t.Fatalf("bad links: %v %v", codes, e)
 	}
 }
+
+func TestLinksResolveRootAliasesAndRejectExternalTargets(t *testing.T) {
+	base := t.TempDir()
+	root := filepath.Join(base, "repository")
+	if e := os.Mkdir(root, 0700); e != nil {
+		t.Fatal(e)
+	}
+	alias := filepath.Join(base, "repository-alias")
+	if e := os.Symlink(root, alias); e != nil {
+		t.Skip("directory symlink requires native platform permission")
+	}
+	outside := filepath.Join(base, "outside.md")
+	for path, body := range map[string]string{
+		filepath.Join(root, "target.md"): "# Inside\n",
+		outside:                          "# Outside\n",
+		filepath.Join(root, "source.md"): "[inside](target.md#inside)\n[symlink](escaped.md#outside)\n[lexical](../outside.md#outside)\n",
+	} {
+		if e := os.WriteFile(path, []byte(body), 0600); e != nil {
+			t.Fatal(e)
+		}
+	}
+	if e := os.Symlink(outside, filepath.Join(root, "escaped.md")); e != nil {
+		t.Fatal(e)
+	}
+	codes, _, e := checkLinks(alias, []string{"source.md"})
+	if e != nil || len(codes) != 2 || !strings.Contains(strings.Join(codes, " "), "source.md:2:link_escapes_repository") || !strings.Contains(strings.Join(codes, " "), "source.md:3:link_escapes_repository") {
+		t.Fatalf("root alias or external-target boundary failed: %v %v", codes, e)
+	}
+	if _, _, e := checkLinks(alias, []string{"escaped.md"}); e == nil {
+		t.Fatal("selected document outside the canonical repository root was accepted")
+	}
+}
 func TestGeneratedComparisonDetectsExtraAndChangedFiles(t *testing.T) {
 	a, b := t.TempDir(), t.TempDir()
 	if e := os.WriteFile(filepath.Join(a, "a.json"), []byte("{}\n"), 0600); e != nil {

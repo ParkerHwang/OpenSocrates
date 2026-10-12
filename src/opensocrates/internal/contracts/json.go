@@ -252,6 +252,9 @@ func canonical(b *bytes.Buffer, v any) error {
 	case float32:
 		return canonicalFloat(b, float64(x))
 	case map[string]any:
+		if x == nil {
+			return canonical(b, nil)
+		}
 		keys := make([]string, 0, len(x))
 		for k := range x {
 			keys = append(keys, k)
@@ -272,6 +275,9 @@ func canonical(b *bytes.Buffer, v any) error {
 		}
 		b.WriteByte('}')
 	case []any:
+		if x == nil {
+			return canonical(b, nil)
+		}
 		b.WriteByte('[')
 		for i, a := range x {
 			if i > 0 {

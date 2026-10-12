@@ -69,7 +69,10 @@ func TestSettingsRefuseLinkedStateAndExport(t *testing.T) {
 	if e != nil || string(bytes) != "first" {
 		t.Fatal("export changed")
 	}
-	if e := SafeExport(filepath.Join(root, "..", "escape"), []byte("no"), false); e == nil {
+	// Join cleans dot segments before the API receives them. Keep the original
+	// spelling here to exercise SafeExport's lexical traversal boundary.
+	traversal := root + string(os.PathSeparator) + ".." + string(os.PathSeparator) + "escape"
+	if e := SafeExport(traversal, []byte("no"), false); e == nil {
 		t.Fatal("lexical traversal accepted")
 	}
 }

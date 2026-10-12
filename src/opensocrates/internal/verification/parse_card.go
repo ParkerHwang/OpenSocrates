@@ -258,13 +258,13 @@ func ParseCard(markdown, locale string, messages map[string]string, context Trus
 					if e != nil {
 						return card, e
 					}
-					g.SourceRefs = append(g.SourceRefs, domain.CardSourceReference{name, &uri})
+					g.SourceRefs = append(g.SourceRefs, domain.CardSourceReference{DisplayName: name, URI: &uri})
 				case strings.HasPrefix(part, messages["card.source.user_provided"]+": "):
 					name, e := UnescapeInline(strings.TrimPrefix(part, messages["card.source.user_provided"]+": "))
 					if e != nil {
 						return card, e
 					}
-					g.SourceRefs = append(g.SourceRefs, domain.CardSourceReference{name, nil})
+					g.SourceRefs = append(g.SourceRefs, domain.CardSourceReference{DisplayName: name, URI: nil})
 				default:
 					return invalid()
 				}
