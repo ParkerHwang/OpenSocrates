@@ -3,6 +3,8 @@ package devtools
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
@@ -76,13 +78,20 @@ func nativeLifecycleAcceptance(o acceptanceOptions) (map[string]any, error) {
 	cases := report["cases"].(map[string]any)
 	allPass := true
 	run := func(name string, args ...string) bool {
-		_, stderr, e := runAcceptanceProcess(binary, args, nil, env, work, 30*time.Second)
-		passed := e == nil && len(stderr) == 0
+		commandContext, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		started := time.Now()
+		child, e := platform.Run(commandContext, binary, args, platform.RunOptions{Env: env, Dir: work, Stdin: bytes.NewReader(nil), OutputLimit: 8 << 20})
+		deadlineExceeded := commandContext.Err() == context.DeadlineExceeded
+		cancel()
+		passed := e == nil && len(child.Stderr) == 0
 		result := map[string]any{"pass": passed}
 		if e != nil {
 			result["failure_stage"] = "command_exit_or_deadline"
-		} else if len(stderr) != 0 {
+		} else if len(child.Stderr) != 0 {
 			result["failure_stage"] = "unexpected_content_free_diagnostic"
+		}
+		if !passed {
+			result["diagnostic"] = acceptanceLifecycleCommandDiagnostic(child, e, time.Since(started), deadlineExceeded, name)
 		}
 		cases[name] = result
 		allPass = allPass && passed
@@ -119,6 +128,36 @@ func nativeLifecycleAcceptance(o acceptanceOptions) (map[string]any, error) {
 	}
 	report["pass"] = allPass
 	return report, nil
+}
+
+// Process output is reduced to bounded metadata and closed first-party error
+// enums. No OS error wording, path, account identifier or arbitrary stage text
+// may enter a public native receipt.
+func acceptanceLifecycleCommandDiagnostic(child platform.Result, err error, elapsed time.Duration, deadlineExceeded bool, commandStage string) map[string]any {
+	category := "none"
+	if err != nil {
+		category = string(diagnostics.CodeOf(err))
+	}
+	stdoutHash, stderrHash := sha256.Sum256(child.Stdout), sha256.Sum256(child.Stderr)
+	report := map[string]any{"error_category": category, "child_exit_code": child.ExitCode, "deadline_exceeded": deadlineExceeded, "elapsed_ms": elapsed.Milliseconds(), "stdout_len": len(child.Stdout), "stderr_len": len(child.Stderr), "stdout_sha256": hex.EncodeToString(stdoutHash[:]), "stderr_sha256": hex.EncodeToString(stderrHash[:]), "command_stage": commandStage, "cli_error_code": "unrecognized", "cli_stage": "unrecognized"}
+	// Management errors use one line `stage: error_code`. Match the complete
+	// closed code token, rather than searching private output for substrings.
+	if len(child.Stderr) <= 512 {
+		parts := strings.Split(strings.TrimSpace(string(child.Stderr)), ": ")
+		if len(parts) == 2 && !strings.ContainsAny(parts[0], "\r\n") {
+			for _, code := range []diagnostics.Code{diagnostics.Verification, diagnostics.Network, diagnostics.Permission, diagnostics.Locked, diagnostics.HostUnavailable, diagnostics.ProtocolIncompatible, diagnostics.Activation, diagnostics.RollbackIncomplete, diagnostics.Unsupported} {
+				if parts[1] == string(code) {
+					report["cli_error_code"] = string(code)
+				}
+			}
+			for _, stage := range strings.Fields("management arguments checksum filesystem process bundle package registration host lifecycle install candidate package_identity scheduler replacement manager-parent probe") {
+				if parts[0] == stage {
+					report["cli_stage"] = stage
+				}
+			}
+		}
+	}
+	return report
 }
 func mustAcceptanceRead(p string) []byte { b, _ := os.ReadFile(p); return b }
 func acceptanceStateDisabled(state map[string]any) bool {
