@@ -32,6 +32,26 @@ Native CI evidence is linked from the [implementation handoff](../IMPLEMENTATION
 Each workflow uploads receipts and build artifacts with exact source provenance.
 Production trust, platform signing and live activation remain separate gates.
 
+The resumed fix at **bc151afdb9a9d6845906b05ec2efb022961fd45f** passed all
+source/macOS ARM64/Windows x64/Windows ARM64 jobs in
+[CI 38239135183](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38239135183).
+Retained lifecycle receipts: [Mac](native-lifecycle-darwin-arm64-bc151af.json),
+[Windows x64](native-lifecycle-windows-x64-bc151af.json), and
+[Windows ARM64](native-lifecycle-windows-arm64-bc151af.json).
+The native tests include an exact 341,142,832-byte synthetic legacy-runtime
+copy and rejection above the corrected finite 512 MiB file bound.
+
+[Actual Windows v1.5 payload adoption](native-npm-adoption-windows-arm64-bc151af.json)
+is explicitly **PARTIAL**: native Go adoption/status/recovery, disabled-state,
+settings/trust/npm preservation and exact payload rollback passed; original
+v1.5 installer completion did not. Its elevated VM owner mismatch required
+source-equivalent initialization from the authentic release ZIP. This does not
+claim successful original-installer adoption. The
+[artifact identities](native-npm-adoption-artifacts-windows-arm64-bc151af.json)
+and [frozen reproducer](qualification/windows-actual-payload/README.md) preserve
+the native ARM64 manager and transferred source hashes. CI and VM artifacts
+are separate builds of the same source revision.
+
 The retained native receipts and package provenance are from
 [run 38216709561](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38216709561)
 at d156c27feefa64dd57ae7e64a0ee114456c0ebd7: actual macOS ARM64, Windows x64

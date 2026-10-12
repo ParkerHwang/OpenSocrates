@@ -1,0 +1,161 @@
+{
+  "schema": "opensocrates.native-acceptance/1.0.0",
+  "target": "windows-arm64",
+  "execution_platform": "Windows 11 ARM64; processor architecture 12",
+  "baseline_execution": "Windows x64 Node under Windows ARM64 emulation; original released installer; authentic windows-x64 v1.5 payload",
+  "evidence_scope": "isolated_interactive_user_owned_fixture; actual_public_release_payload; external_Codex_Go_fixture; legacy_scheduler_unavailable_on_Windows_v1_5",
+  "source_git_commit": "bc151afdb9a9d6845906b05ec2efb022961fd45f",
+  "artifact_identity": "sha256:3a9f14f6ed52c8e45cfad0faecea4b9596cfc915ff93d0dfca261786c20597f7",
+  "native_manager_sha256": "5fbbf573ca299e2dda000e2a42f7af090a37539fcbef87776e00ba9c24b9d1a3",
+  "baseline_tag": "v1.5.0",
+  "baseline_commit": "cf6634310afcf5d5ce58484e67a73151bb4c5999",
+  "original_npm_entry_installer_executed": true,
+  "actual_npm_global_private_prefix_install": true,
+  "real_npm_global_install_claimed": false,
+  "user_installation_modified": false,
+  "live_host_delivery_claimed": false,
+  "production_signing_claimed": false,
+  "per_user_clean_machine_claimed": false,
+  "privacy": {
+    "absolute_paths_recorded": false,
+    "environment_recorded": false,
+    "process_output_recorded": false,
+    "prompt_recorded": false
+  },
+  "cases": {
+    "official_payload_checksum": {
+      "pass": true
+    },
+    "pinned_npm_global_private_prefix_install": {
+      "exit": 0,
+      "pass": true
+    },
+    "original_released_v1_5_installer": {
+      "exit": 1,
+      "pass": false,
+      "evidence_scope": "original_unchanged_installer_rejected_Administrators_default_file_owner"
+    },
+    "source_equivalent_actual_release_layout": {
+      "exit": 0,
+      "pass": true
+    },
+    "legacy_fixture_marketplace_register": {
+      "exit": 0,
+      "pass": true
+    },
+    "legacy_fixture_plugin_register": {
+      "exit": 0,
+      "pass": true
+    },
+    "actual_legacy_marker": {
+      "pass": true
+    },
+    "disable_legacy_fixture": {
+      "exit": 0,
+      "pass": true
+    },
+    "original_desired_state": {
+      "pass": true
+    },
+    "seal_synthetic_protected_files": {
+      "exit": 0,
+      "pass": true
+    },
+    "native_cli_adopt": {
+      "exit": 0,
+      "pass": true
+    },
+    "disabled_state_preserved": {
+      "pass": true
+    },
+    "single_native_update_owner": {
+      "pass": true
+    },
+    "settings_trust_foreign_npm_bytes_preserved": {
+      "pass": true
+    },
+    "legacy_desired_state_preserved": {
+      "pass": true
+    },
+    "native_cli_status": {
+      "exit": 0,
+      "pass": true
+    },
+    "activation_boundary": {
+      "pass": true
+    },
+    "native_cli_recover": {
+      "exit": 0,
+      "pass": true
+    },
+    "actual_npm_prefix_preserved": {
+      "pass": true
+    },
+    "exact_legacy_payload_rollback": {
+      "pass": true
+    }
+  },
+  "commands": [
+    {
+      "command": "node <official-npm-cli> install --global <integrity-verified-opensocrates-1.5.0-tgz> --offline --ignore-scripts --prefix <private-prefix> --cache <private-cache> --userconfig <private-npmrc>",
+      "exit": 0
+    },
+    {
+      "command": "node opensocrates.mjs install --host codex --asset <official-v1.5-windows-x64-zip> --checksum <published-sha256>",
+      "exit": 1
+    },
+    {
+      "command": "<isolated-fixture-initialization> actual checksum-verified released ZIP to original three-field owned layout",
+      "exit": 0
+    },
+    {
+      "command": "<isolated-Go-host-fixture> plugin marketplace add <owned-legacy-root> --json",
+      "exit": 0
+    },
+    {
+      "command": "<isolated-Go-host-fixture> plugin add opensocrates@opensocrates --json",
+      "exit": 0
+    },
+    {
+      "command": "<isolated-Go-host-fixture> plugin disable opensocrates@opensocrates",
+      "exit": 0
+    },
+    {
+      "command": "<private-fixture-initialization> seal owned synthetic files",
+      "exit": 0
+    },
+    {
+      "command": "<native-WindowsARM64-manager> adopt --host codex --package <native-WindowsARM64-bundle>",
+      "exit": 0
+    },
+    {
+      "command": "<native-WindowsARM64-manager> status --host codex",
+      "exit": 0
+    },
+    {
+      "command": "<native-WindowsARM64-manager> recover --transaction <adoption-transaction>",
+      "exit": 0
+    }
+  ],
+  "required_external_evidence": [
+    "real_host_trust_and_activation",
+    "production_signing"
+  ],
+  "legacy_scheduler_takeover": "not_applicable; released v1.5 explicitly unavailable on Windows",
+  "baseline_asset_sha256": "f16360daaabb7e1d66084afcb50257d9ac395e561d72b7a630d4136ac19f2425",
+  "baseline_installer_sha256": "ceab84379b6889d621b41b6e6de7f4bb7f7d61cd4fac7b706491d5f91048bfbe",
+  "baseline_windows_helper_sha256": "6396e4ecf00890898fcd682724414bc5770bce7f5e1521650b25f149f4798bab",
+  "generated_at": "2026-10-12T11:13:28.345Z",
+  "original_npm_installer_completed": false,
+  "legacy_installer_environment_gap": "Windows VM user token is elevated even via WinR; released v1.5 exact-current-SID guard rejects Administrators default owner",
+  "native_adoption_pass": true,
+  "pass": false,
+  "qualification_status": "native_actual_payload_pass_original_installer_blocked",
+  "limitations": [
+    "Actual released npm tgz and v1.5 ZIP used under private prefix; original installer did not complete in this elevated VM",
+    "Legacy layout initialized from checksum-verified release using frozen installer schema, not an original-installer success",
+    "Codex host responses came from an isolated Go fixture",
+    "Production signing, live host delivery and clean-machine evidence remain unavailable"
+  ],
+  "status": "partial"
+}

@@ -252,11 +252,13 @@ architecture/actual ARM64 loading remains separately unverified. / 공식 배포
 가용성과 실제 실행·호스트 적용을 구분합니다.
 
 The previous Windows VM is ARM64; x64-emulated observations are supplementary
-and not native ARM64 acceptance. Native ARM64 runtime/lifecycle/ACL/reparse/
-scheduler/helper/interruption/rollback/live evidence is pending and must be
-recorded at its exact commit. Production signing/root/credentials, clean-machine
-and actual host gates remain unsatisfied until evidenced. / 에뮬레이션 결과를
-네이티브 통과로 승격하지 않으며 새 대상 증거를 앞으로 실제로 수집합니다.
+and not native ARM64 acceptance. The [implementation handoff](IMPLEMENTATION_HANDOFF.md)
+now records exact-commit native ARM64 runtime/lifecycle/ACL/reparse/scheduler/
+helper/interruption/rollback evidence. Production signing/root/credentials,
+original-installer adoption, clean-machine and actual host gates remain
+unsatisfied until evidenced. / 에뮬레이션 결과를 네이티브 통과로 승격하지 않습니다.
+인계에 실제 ARM64 네이티브 검사 커밋·결과를 기록하며 운영 서명·루트·자격,
+원본 설치기부터의 이전, 새 기기·실제 호스트 검증은 별도 조건으로 남깁니다.
 
 ARM64 production signing uses protected environment
 `opensocrates-release-signing-windows-arm64` and an architecture-enforced native
