@@ -204,8 +204,12 @@ func publicationReadInventory(root string) (publicationInventory, error) {
 			return inventory, errors.New("release_inventory_bytes_mismatch")
 		}
 	}
-	// Installer, both bundles, production trust and all online metadata are required.
-	required := []string{"opensocrates-v" + version + "-darwin-arm64", "opensocrates-v" + version + "-windows-x64.exe", "opensocrates-v" + version + "-darwin-arm64.zip", "opensocrates-v" + version + "-windows-x64.zip", "root.json", "targets.json", "snapshot.json", "timestamp.json"}
+	// Every qualified native installer/bundle, production trust and all online
+	// metadata are required. Architecture-specific assets cannot replace each other.
+	required := []string{"root.json", "targets.json", "snapshot.json", "timestamp.json"}
+	for _, target := range publicationNativeTargets() {
+		required = append(required, publicationInstallerName(version, target), "opensocrates-v"+version+"-"+target+".zip")
+	}
 	for _, name := range required {
 		if !names[name] {
 			return inventory, errors.New("release_required_asset_missing")

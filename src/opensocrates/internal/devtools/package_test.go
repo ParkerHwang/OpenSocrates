@@ -66,8 +66,10 @@ func TestContentPackagesAndPortableExport(t *testing.T) {
 }
 func TestNativeProfileBoundaries(t *testing.T) {
 	root := generatorRepository(t)
-	if _, e := GeneratePlugin(root, "claude", "windows-x64", "", filepath.Join(t.TempDir(), "claude")); e == nil {
-		t.Fatal("added Windows Claude")
+	for _, target := range []string{"windows-x64", "windows-arm64"} {
+		if _, e := GeneratePlugin(root, "claude", target, "", filepath.Join(t.TempDir(), "claude")); e == nil {
+			t.Fatal("added Windows Claude")
+		}
 	}
 	out := filepath.Join(t.TempDir(), "codex")
 	manifest, e := GeneratePlugin(root, "codex", "windows-x64", "", out)
@@ -88,7 +90,7 @@ func TestNativeProfileBoundaries(t *testing.T) {
 
 func TestNativeDecisionReferenceTransport(t *testing.T) {
 	root := generatorRepository(t)
-	for _, target := range []string{"darwin-arm64", "windows-x64"} {
+	for _, target := range []string{"darwin-arm64", "windows-x64", "windows-arm64"} {
 		output := filepath.Join(t.TempDir(), target)
 		if _, e := GeneratePlugin(root, "codex", target, "", output); e != nil {
 			t.Fatal(e)
@@ -107,9 +109,70 @@ func TestNativeDecisionReferenceTransport(t *testing.T) {
 			if !strings.Contains(text, "\" decision --stream") {
 				t.Fatal("native volatile session reference missing")
 			}
-			if target == "windows-x64" && !strings.Contains(text, "`& \"./runtime/windows-x64/opensocrates.exe\" decision") {
+			if windowsNativeTarget(target) && !strings.Contains(text, "`& \"./runtime/"+target+"/opensocrates.exe\" decision") {
 				t.Fatal("PowerShell invocation missing")
 			}
 		}
+	}
+}
+
+func TestWindowsARM64NativeProfile(t *testing.T) {
+	root := generatorRepository(t)
+	output := filepath.Join(t.TempDir(), "arm64")
+	manifest, err := GeneratePlugin(root, "codex", "windows-arm64", "", output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if manifest["shell_requirement"] != "powershell" || strings.Join(manifestStrings(manifest["release_targets"]), ",") != "windows-arm64" {
+		t.Fatal("native ARM64 platform or shell metadata missing")
+	}
+	hooks, err := ReadObject(filepath.Join(output, "hooks/hooks.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for event, handlers := range obj(hooks["hooks"]) {
+		for _, handler := range arr(handlers) {
+			for _, raw := range arr(obj(handler)["hooks"]) {
+				command := str(obj(raw)["command"])
+				if !strings.HasPrefix(command, `& "$env:PLUGIN_ROOT\runtime\windows-arm64\opensocrates.exe" hook codex `) || strings.Contains(command, "windows-x64") || !configuredHookMatches(command, "codex", "windows-arm64", event) {
+					t.Fatal("ARM64 hook uses wrong executable or command", event)
+				}
+			}
+		}
+	}
+	if codes, err := checkPackageTree(output); err != nil || len(codes) != 0 {
+		t.Fatalf("ARM64 profile validation: %v %v", codes, err)
+	}
+}
+
+func TestContentExportsEquivalentAcrossNativeTargets(t *testing.T) {
+	root := generatorRepository(t)
+	for _, host := range []string{"claude-chat", "antigravity"} {
+		t.Run(host, func(t *testing.T) {
+			var first []byte
+			for _, target := range []string{"darwin-arm64", "windows-x64", "windows-arm64"} {
+				output := filepath.Join(t.TempDir(), host)
+				manifest, err := GeneratePlugin(root, host, target, "", output)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if len(arr(manifest["runtime_targets"])) != 0 || len(arr(manifest["release_targets"])) != 0 {
+					t.Fatal("content-only export gained platform/runtime dependency")
+				}
+				archive := filepath.Join(t.TempDir(), host+".zip")
+				if err = WritePortableZIP(output, archive); err != nil {
+					t.Fatal(err)
+				}
+				data, err := os.ReadFile(archive)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if first == nil {
+					first = data
+				} else if !bytes.Equal(first, data) {
+					t.Fatalf("content export differs by native target %s", target)
+				}
+			}
+		})
 	}
 }

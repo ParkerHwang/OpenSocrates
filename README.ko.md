@@ -29,13 +29,18 @@ v1.6.0에서 제외하고 v1.6.1 이후로 분리합니다. 코딩 전문가 전
 
 | 호스트 | 전달 방식 | 플랫폼과 활성화 |
 | --- | --- | --- |
-| Codex CLI / Desktop | 네이티브 훅·컨트롤러·Go 판단 런타임 | macOS ARM64·Windows x64(기본 PowerShell); 훅 7개 검토 후 새 세션 |
+| Codex CLI / Desktop | 네이티브 훅·컨트롤러·Go 판단 런타임 | macOS ARM64·Windows x64/ARM64(기본 PowerShell); 훅 7개 검토 후 새 세션 |
 | Claude Code CLI / Desktop의 로컬 Code | 상태 없는 네이티브 진입·설치된 전체 참조 | macOS ARM64; Claude CLI·로그인·플러그인과 훅 권한 필요 |
-| Claude 웹 / Desktop Chat / Cowork | 실행 코드 없는 독립 계정 ZIP | 두 플랫폼에서 검증·내보내기; 계정에서 별도 업로드·활성화 |
-| Antigravity 대화 앱 | 소유 범위가 명확한 모듈형 규칙·스킬 | macOS ARM64·Windows x64; 작업공간 또는 전역 명시 |
+| Claude 웹 / Desktop Chat / Cowork | 실행 코드 없는 독립 계정 ZIP | 모든 지원 대상에서 검증·내보내기; 계정에서 별도 업로드·활성화 |
+| Antigravity 대화 앱 | 소유 범위가 명확한 모듈형 규칙·스킬 | macOS ARM64·Windows x64/ARM64; 작업공간 또는 전역 명시 |
+
+구현 중 사용자의 명시적 요청으로 Windows ARM64를 추가했습니다. 전용 네이티브
+`.exe`·묶음·보조 프로그램과 같은 사용자 예약 정책을 사용합니다. 실제 ARM64
+실행·설치/복구·예약·호스트 증거는 아직 대기 중이며 x64 에뮬레이션 관찰은
+보조 증거입니다.
 
 기본값과 `--host all`은 **Codex만** 선택합니다. 다른 프로필은 호스트를 명시해야
-합니다. Windows 네이티브 Claude Code, Linux, macOS Intel, Windows ARM64,
+합니다. Windows 네이티브 Claude Code, Linux, macOS Intel,
 WSL, 원격 호스트는 이번 범위 밖입니다.
 
 설치·불러오기·전체 읽기·실제 적용·결과 유용성은 각각 다른 증거입니다.
@@ -55,7 +60,7 @@ WSL, 원격 호스트는 이번 범위 밖입니다.
 ./opensocrates status --host codex
 ```
 
-Windows x64에서는 `opensocrates.exe`와 따옴표로 감싼 로컬 드라이브 절대 경로를
+Windows x64·ARM64에서는 `opensocrates.exe`와 따옴표로 감싼 로컬 드라이브 절대 경로를
 사용합니다.
 
 ```text
@@ -81,6 +86,10 @@ Antigravity는 `--host antigravity`와 선택적인
 ```text
 ./opensocrates export --host claude-chat --package /absolute/path/to/account.zip --output /absolute/path/to/opensocrates-account.zip
 ```
+
+ARM64에서는 `opensocrates-v1.6.0-windows-arm64.exe`와
+`opensocrates-v1.6.0-windows-arm64.zip`을 선택하며 x64 에뮬레이션 결과로
+네이티브 검증을 대신하지 않습니다. 외부 호스트 가용성은 네이티브 안내를 따릅니다.
 
 대화형 Codex 세션에서 훅 7개를 검토하세요. 비대화형 실행에서는 승인되지 않은
 훅을 건너뛸 수 있습니다. 꺼 둔 연동은 인수·갱신 후에도 꺼진 상태로 유지하며

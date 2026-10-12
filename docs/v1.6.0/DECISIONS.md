@@ -57,12 +57,12 @@ requiring the custom gates; it is not adopted. / 공식 기능을 확인했으�
 신뢰·콘텐츠·네이티브 검증을 제공하지 않습니다. 이번에는 자체 Go 도구를 선택하고
 후보 기능을 검증 없이 보안 보장으로 해석하지 않습니다.
 
-The supported matrix is macOS ARM64 and Windows x64. Release bundles use
+The supported matrix is macOS ARM64 and Windows x64/ARM64. Release bundles use
 `opensocrates-v1.6.0-<target>.zip`, a `native-bundle/1.0.0` manifest, native manager
 and update helper, version/content/schema identities and explicit host packages.
 Native Claude is Mac-only. `--host all` remains Codex only. Account exports have
-no executable, upload or activation. / 두 플랫폼과 기존 프로필만 유지하며 계정
-활성화·Windows Claude·추가 플랫폼을 확대하지 않습니다.
+no executable, upload or activation. / 명시적으로 추가한 Windows ARM64와 기존
+프로필을 지원하며 계정 활성화·Windows Claude·다른 플랫폼을 확대하지 않습니다.
 
 GitHub's [immutable release workflow](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)
 permits preparing Draft assets before publishing to lock the release. Source
@@ -170,11 +170,11 @@ context; the configured command directly invokes the native binary using
 `$env:PLUGIN_ROOT`. Custom/cmd fallback shells are unsupported and fail open.
 This external OS/host one-command configuration is not a first-party wrapper.
 Mac commands use quoted `$PLUGIN_ROOT`/`$CLAUDE_PLUGIN_ROOT` environment references
-rather than textual macros. / 셸·경로 경계를 명시하며 새로운 플랫폼·자체 셸 구현을
+rather than textual macros. / 셸·경로 경계를 유지하며 사용자 요청의 ARM64 외 추가 플랫폼·자체 셸 구현을
 추가하지 않습니다.
 
 Production release orchestration is manual exact-tag execution through protected
-signing/publication environments and ephemeral native macOS ARM64/Windows x64
+signing/publication environments and ephemeral native macOS ARM64/Windows x64/ARM64
 signing runners. Online metadata keys are separate from platform signing;
 approved root/identities remain canonical data. Monotonic role versions require
 previous signed metadata, except explicit initial repository version 1. Native
@@ -206,3 +206,41 @@ continue using the contents:write workflow token. Missing permission blocks
 before publication, with no immutability fallback. / 해당 조회는 별도 저장소 범위
 Administration:read secret이 필요합니다. 값은 문서·로그에 기록하지 않으며
 권한 부재를 검사 우회나 릴리스 검증 완료로 해석하지 않습니다.
+
+## Material plan adjustment: Windows ARM64 / 명시적 범위 조정
+
+The user explicitly added Windows ARM64 after implementation started, overriding
+the original x64-only preparation scope. Include native ARM64 Codex CLI/Desktop
+and Antigravity global/workspace lifecycle, installation/adoption/removal,
+helper self-replacement and per-user opt-in stable updates. Preserve the same
+frozen v1.5.0 48-method/content revision-3 baseline. Native Windows Claude Code
+and account upload remain excluded; `--host all` remains Codex. / 구현 중 사용자의
+명시적 요청으로 ARM64를 추가했으며 본문·프로필 의미·계정 경계는 유지합니다.
+
+ARM64 assets are `opensocrates-v1.6.0-windows-arm64.exe` and
+`opensocrates-v1.6.0-windows-arm64.zip`, containing native manager/helper binaries
+with the existing `bin/` names. Platform-qualified TUF target and Windows
+Task Scheduler ownership/rollback policy remain architecture-specific. The
+[official Codex 0.144.4 release](https://github.com/openai/codex/releases/tag/rust-v0.144.4)
+contains aarch64 Windows CLI/app-server assets; GitHub's
+[official runner matrix](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
+provides `windows-11-arm`. Neither proves live host delivery. Antigravity native
+architecture/actual ARM64 loading remains separately unverified. / 공식 배포·CI
+가용성과 실제 실행·호스트 적용을 구분합니다.
+
+The previous Windows VM is ARM64; x64-emulated observations are supplementary
+and not native ARM64 acceptance. Native ARM64 runtime/lifecycle/ACL/reparse/
+scheduler/helper/interruption/rollback/live evidence is pending and must be
+recorded at its exact commit. Production signing/root/credentials, clean-machine
+and actual host gates remain unsatisfied until evidenced. / 에뮬레이션 결과를
+네이티브 통과로 승격하지 않으며 새 대상 증거를 앞으로 실제로 수집합니다.
+
+ARM64 production signing uses protected environment
+`opensocrates-release-signing-windows-arm64` and an architecture-enforced native
+`[Windows, ARM64, opensocrates-release]` runner. Windows CI separates
+`windows-2025` x64 and `windows-11-arm` ARM64 lifecycle/timing/scheduler gates.
+Metadata signing requires both `--windows-archive` and
+`--windows-arm64-archive`; all three targets require native provenance, signing,
+SBOM and platform-neutral content/export parity. These are configured gates,
+not observed passes. / ARM64 서명·CI·메타데이터를 x64와 별도로 지정하며 설정만으로
+실제 네이티브 통과나 운영 서명 완료를 주장하지 않습니다.

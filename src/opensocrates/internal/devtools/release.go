@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"debug/buildinfo"
+	"debug/pe"
 	"fmt"
 	"io"
 	"os"
@@ -19,12 +20,9 @@ import (
 // BuildNative uses only the pinned Go toolchain. User distribution embeds all
 // runtime data and never invokes that toolchain on an installed machine.
 func BuildNative(root, target, output string) error {
-	goos, arch := "darwin", "arm64"
-	suffix := ""
-	if target == "windows-x64" {
-		goos, arch, suffix = "windows", "amd64", ".exe"
-	} else if target != "darwin-arm64" {
-		return fmt.Errorf("unsupported target")
+	goos, arch, suffix, err := nativeBuildTarget(target)
+	if err != nil {
+		return err
 	}
 	if output == "" {
 		output = filepath.Join(root, "dist/runtime")
@@ -51,8 +49,8 @@ func BuildNative(root, target, output string) error {
 }
 
 func PackageNative(root, target, runtimeRoot, output string) (map[string]any, error) {
-	if target != "darwin-arm64" && target != "windows-x64" {
-		return nil, fmt.Errorf("unsupported target")
+	if _, _, _, err := nativeBuildTarget(target); err != nil {
+		return nil, err
 	}
 	if runtimeRoot == "" {
 		runtimeRoot = filepath.Join(root, "dist/runtime")
@@ -97,7 +95,7 @@ func PackageNative(root, target, runtimeRoot, output string) (map[string]any, er
 		}
 	}
 	suffix := ""
-	if target == "windows-x64" {
+	if windowsNativeTarget(target) {
 		suffix = ".exe"
 	}
 	for _, name := range []string{"opensocrates", "opensocrates-update-helper"} {
@@ -169,9 +167,9 @@ func verifyGoBinary(path, target string) error {
 	if e != nil {
 		return fmt.Errorf("native runtime must be a Go executable")
 	}
-	wantOS, wantArch := "darwin", "arm64"
-	if target == "windows-x64" {
-		wantOS, wantArch = "windows", "amd64"
+	wantOS, wantArch, _, err := nativeBuildTarget(target)
+	if err != nil {
+		return err
 	}
 	settings := map[string]string{}
 	for _, setting := range info.Settings {
@@ -179,6 +177,41 @@ func verifyGoBinary(path, target string) error {
 	}
 	if settings["GOOS"] != wantOS || settings["GOARCH"] != wantArch || settings["CGO_ENABLED"] != "0" {
 		return fmt.Errorf("native runtime target or static build mismatch")
+	}
+	if windowsNativeTarget(target) {
+		return verifyNativePE(path, target)
+	}
+	return nil
+}
+
+func verifyNativePE(path, target string) error {
+	binary, err := pe.Open(path)
+	if err != nil {
+		return fmt.Errorf("native Windows PE header invalid")
+	}
+	defer binary.Close()
+	want := uint16(pe.IMAGE_FILE_MACHINE_AMD64)
+	if target == "windows-arm64" {
+		want = pe.IMAGE_FILE_MACHINE_ARM64
+	} else if target != "windows-x64" {
+		return fmt.Errorf("unsupported Windows PE target")
+	}
+	if binary.FileHeader.Machine != want {
+		return fmt.Errorf("native Windows PE machine mismatch")
+	}
+	if _, ok := binary.OptionalHeader.(*pe.OptionalHeader64); !ok {
+		return fmt.Errorf("native Windows PE64 header required")
+	}
+	return nil
+}
+
+func requireNativeExecution(target, goos, arch string) error {
+	wantOS, wantArch, _, err := nativeBuildTarget(target)
+	if err != nil {
+		return err
+	}
+	if goos != wantOS || arch != wantArch {
+		return fmt.Errorf("native target execution required")
 	}
 	return nil
 }
@@ -349,12 +382,21 @@ func CheckNativeRelease(root, path, target string, out io.Writer) error {
 	if e != nil || strings.TrimSpace(current) != "" {
 		return fmt.Errorf("release checkout must be clean")
 	}
-	if (target == "darwin-arm64" && (runtime.GOOS != "darwin" || runtime.GOARCH != "arm64")) || (target == "windows-x64" && (runtime.GOOS != "windows" || runtime.GOARCH != "amd64")) {
-		return fmt.Errorf("native target execution required")
+	if e = requireNativeExecution(target, runtime.GOOS, runtime.GOARCH); e != nil {
+		return e
 	}
 	binary := "opensocrates"
-	if target == "windows-x64" {
+	if windowsNativeTarget(target) {
 		binary += ".exe"
+	}
+	helper := "opensocrates-update-helper"
+	if windowsNativeTarget(target) {
+		helper += ".exe"
+	}
+	for _, executable := range []string{binary, helper} {
+		if e = verifyGoBinary(filepath.Join(path, "bin", executable), target); e != nil {
+			return e
+		}
 	}
 	command := exec.Command(filepath.Join(path, "bin", binary), "--version")
 	b, e := command.Output()
@@ -373,10 +415,6 @@ func CheckNativeRelease(root, path, target string, out io.Writer) error {
 		if e = cmd.Run(); e != nil {
 			return fmt.Errorf("production Authenticode signature required")
 		}
-	}
-	helper := "opensocrates-update-helper"
-	if target == "windows-x64" {
-		helper += ".exe"
 	}
 	if e = verifyHelperSignature(filepath.Join(path, "bin", helper), target); e != nil {
 		return e

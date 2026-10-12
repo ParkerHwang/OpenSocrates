@@ -129,12 +129,7 @@ func (m *Manager) ManagerPath() string {
 	}
 	return filepath.Join(m.StateDir, "bin", exe)
 }
-func (m *Manager) Target() string {
-	if m.GOOS == "windows" && m.GOARCH == "amd64" {
-		return "windows-x64"
-	}
-	return m.GOOS + "-" + m.GOARCH
-}
+func (m *Manager) Target() string { return hosts.DistributionTarget(m.GOOS, m.GOARCH) }
 func scopeKey(host string, p Paths) string {
 	h := sha256.Sum256([]byte(p.Root))
 	return host + ":" + p.Scope + ":" + hex.EncodeToString(h[:8])

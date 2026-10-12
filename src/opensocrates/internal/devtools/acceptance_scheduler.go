@@ -471,6 +471,9 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 		delete(report, "pass")
 		return report, errors.New("native_scheduler_fixture_unavailable")
 	}
+	if !acceptanceExecutableMatchesTarget(fixture, target) {
+		return report, errors.New("native_scheduler_fixture_architecture_mismatch")
+	}
 	var token [16]byte
 	if _, e = rand.Read(token[:]); e != nil {
 		return report, e
@@ -965,7 +968,7 @@ func nativeSchedulerFixtureCleanup(id string) (map[string]any, error) {
 				return report, errors.New("fixture_cleanup_changed_definition")
 			}
 		case "receipt.json":
-			if !readSchedulerReceipt(filepath.Join(root, entry.Name()), "windows-x64") {
+			if !readSchedulerReceipt(filepath.Join(root, entry.Name()), nativeAcceptanceTarget()) {
 				return report, errors.New("fixture_cleanup_changed_receipt")
 			}
 		default:

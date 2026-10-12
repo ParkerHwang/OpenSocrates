@@ -1,11 +1,22 @@
-name: Native Windows x64
+name: Native Windows x64 and ARM64
 on:
   workflow_call:
 permissions:
   contents: read
 jobs:
   windows:
-    runs-on: windows-2025
+    name: Native ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: windows-x64
+            runner: windows-2025
+          # Official standard native ARM64 runner; no x64 emulation or
+          # cross-compilation result is substituted for ARM64 execution.
+          - target: windows-arm64
+            runner: windows-11-arm
+    runs-on: ${{ matrix.runner }}
     env:
       GOTOOLCHAIN: go1.27.2
       CGO_ENABLED: "0"
@@ -22,28 +33,28 @@ jobs:
       - name: Exact native source provenance
         env:
           OPENSOCRATES_EXPECTED_SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-        run: go run ./src/opensocrates/cmd/opensocrates-dev release-provenance --output build/evidence/package-source-provenance-windows-x64.json
+        run: go run ./src/opensocrates/cmd/opensocrates-dev release-provenance --output build/evidence/package-source-provenance-${{ matrix.target }}.json
       - name: Execute Windows ACL, reparse, locking, recovery and helper tests
         run: go test ./src/opensocrates/...
-      - name: Build native Windows x64 binaries
-        run: go run ./src/opensocrates/cmd/opensocrates-dev build --target windows-x64 --output dist/runtime
+      - name: Build native Windows binaries
+        run: go run ./src/opensocrates/cmd/opensocrates-dev build --target ${{ matrix.target }} --output dist/runtime
       - name: Assemble native bundle
-        run: go run ./src/opensocrates/cmd/opensocrates-dev package --target windows-x64 --runtime-root dist/runtime --output dist/native/windows-x64
+        run: go run ./src/opensocrates/cmd/opensocrates-dev package --target ${{ matrix.target }} --runtime-root dist/runtime --output dist/native/${{ matrix.target }}
       - name: Verify native Windows package
-        run: go run ./src/opensocrates/cmd/opensocrates-dev check package --package dist/native/windows-x64/packages/codex --report build/evidence/native-package-windows-x64.json
+        run: go run ./src/opensocrates/cmd/opensocrates-dev check package --package dist/native/${{ matrix.target }}/packages/codex --report build/evidence/native-package-${{ matrix.target }}.json
       - name: Build isolated host registration fixture
         run: go build -o build/opensocrates-host-fixture.exe ./src/opensocrates/cmd/opensocrates-host-fixture
       - name: Native install, status and removal acceptance
-        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance lifecycle --binary dist/runtime/windows-x64/opensocrates.exe --package dist/native/windows-x64 --host-binary build/opensocrates-host-fixture.exe --report build/evidence/native-lifecycle-windows-x64.json
+        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance lifecycle --binary dist/runtime/${{ matrix.target }}/opensocrates.exe --package dist/native/${{ matrix.target }} --host-binary build/opensocrates-host-fixture.exe --report build/evidence/native-lifecycle-${{ matrix.target }}.json
       - name: Native hook startup timing
-        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance timing --binary dist/runtime/windows-x64/opensocrates.exe --package dist/native/windows-x64/packages/codex --report build/evidence/codex-hook-timing-windows-x64.json
+        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance timing --binary dist/runtime/${{ matrix.target }}/opensocrates.exe --package dist/native/${{ matrix.target }}/packages/codex --report build/evidence/codex-hook-timing-${{ matrix.target }}.json
       - name: Isolated native OS scheduler acceptance
-        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance scheduler --host-binary build/opensocrates-host-fixture.exe --report build/evidence/native-scheduler-windows-x64.json
+        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance scheduler --host-binary build/opensocrates-host-fixture.exe --report build/evidence/native-scheduler-${{ matrix.target }}.json
       - name: Upload native Windows evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: native-windows-x64-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          name: native-${{ matrix.target }}-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
           path: |
             dist/
             build/evidence/

@@ -17,6 +17,7 @@ with native `opensocrates`/`opensocrates.exe` and the matching bundle:
 | --- | --- |
 | macOS ARM64 | `opensocrates-v1.6.0-darwin-arm64.zip` |
 | Windows x64 | `opensocrates-v1.6.0-windows-x64.zip` |
+| Windows ARM64 | `opensocrates-v1.6.0-windows-arm64.zip` |
 
 The bundle includes `bundle-manifest.json`, the management/runtime executable,
 Go update helper, schemas/content identity and host packages. Windows has no
@@ -35,7 +36,8 @@ are established. Development root fixtures are for isolated testing only.
 
 Use absolute package paths. On Mac, `./opensocrates` below names the native
 executable. On Windows use `.\opensocrates.exe` and quoted local-drive absolute
-paths such as `"C:\Downloads\opensocrates-v1.6.0-windows-x64.zip"`. Global/workspace
+paths such as `"C:\Downloads\opensocrates-v1.6.0-windows-x64.zip"` or its
+`windows-arm64` counterpart. Global/workspace
 scope must remain the same for status, updates, disable/enable and removal.
 
 ```text
@@ -122,7 +124,7 @@ rollback does not lower the persisted network rollback floor. Root rotation
 requires existing/new-root authorization. Missing/expired/invalid metadata and
 unprovisioned production root leave updates unavailable without weakening trust.
 
-Only Codex macOS ARM64/Windows x64 are scheduled-update targets in v1.6.0.
+Codex macOS ARM64 and Windows x64/ARM64 are scheduled-update targets in v1.6.0.
 Claude/Antigravity retain manual lifecycle until each registration, reload,
 disabled-state, integrity and recovery gate is satisfied. Account ZIPs stay
 manual export/upload; no account automation is claimed.
@@ -200,7 +202,8 @@ normal inherited default PowerShell command context:
 
 This is one command in external OS/host scheduling configuration, not a
 first-party PowerShell wrapper. Custom/cmd fallback shells are unsupported and
-fail open explicitly. No shell change or new platform is implied.
+fail open explicitly. ARM64 uses the corresponding `runtime/windows-arm64/`
+path with the same command shape; this does not change the shell boundary.
 
 Canonical production trust data is `config/update/root.json` and
 `config/update/identities.json`, embedded by Go generation under
@@ -247,3 +250,46 @@ Release mutations still use the ordinary contents:write workflow token. Missing
 or insufficient read permission blocks publication without weakening the
 immutable-release check. This credential is a release prerequisite alongside
 production root/identity/signing resources, not evidence of release validation.
+
+## User-directed Windows ARM64 scope adjustment
+
+The original preparation limited Windows to x64. The user's subsequent explicit
+instruction adds native Windows ARM64 to v1.6.0 Codex CLI/Desktop integration,
+Antigravity global/workspace lifecycle, native installation/adoption/removal,
+Go helper self-replacement and per-user scheduled updates. It does not change
+`--host all`, add native Windows Claude Code, automate account upload or alter
+the frozen 48-method v1.5.0 content baseline. Account content verification/export
+remains content-only on all supported targets.
+
+Download standalone `opensocrates-v1.6.0-windows-arm64.exe` and matching
+`opensocrates-v1.6.0-windows-arm64.zip`. Bundle binaries remain
+`bin/opensocrates.exe` and `bin/opensocrates-update-helper.exe`; host runtime is
+`runtime/windows-arm64/opensocrates.exe`. TUF target
+`stable/windows-arm64/opensocrates.archive` has independent platform identity.
+For first installation from the standalone ARM64 executable:
+
+```text
+.\opensocrates-v1.6.0-windows-arm64.exe install --host codex --package "C:\Downloads\opensocrates-v1.6.0-windows-arm64.zip"
+.\opensocrates-v1.6.0-windows-arm64.exe status --host codex
+```
+
+Examples using `.\opensocrates.exe` refer to the bundle's extracted native
+`bin/` executable; use the actual downloaded filename when running standalone.
+
+The scheduler remains per-user, opt-in stable/24-hour/delayed-login, preserving
+trust/disabled state and one update owner. Native ARM64 evidence is not yet
+claimed; actual installation, ACL/reparse/locks, helper replacement, interruption,
+rollback, scheduler and host activation require an ARM64 run.
+
+The official [Codex 0.144.4 release](https://github.com/openai/codex/releases/tag/rust-v0.144.4)
+provides `aarch64-pc-windows-msvc` CLI/app-server executables. These upstream
+assets establish distribution availability, not authenticated CLI/Desktop live
+delivery. GitHub's [runner documentation](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
+lists `windows-11-arm` for native CI. Antigravity's native app architecture and
+actual ARM64 loading remain separately unverified; supported OpenSocrates owned
+rule/skill lifecycle does not establish native external-host availability.
+
+The previously used Windows VM is ARM64. Any x64 execution there used emulation
+and remains supplementary; it cannot qualify native Go ARM64 behavior. Missing
+production signing/root/publisher credentials and clean-machine/live evidence
+remain release gates for this target too.

@@ -11,7 +11,7 @@ func qualifiedHookShell(target string) string {
 	if target == "darwin-arm64" {
 		return "zsh_posix"
 	}
-	if target == "windows-x64" {
+	if windowsAcceptanceTarget(target) {
 		return "windows_powershell_5_1"
 	}
 	return "unsupported"
@@ -33,8 +33,8 @@ func configuredHookMatches(command, host, target, event string) bool {
 			root = "$CLAUDE_PLUGIN_ROOT"
 		}
 		return command == "\""+root+"/runtime/darwin-arm64/opensocrates\""+suffix
-	case "windows-x64":
-		return host == "codex" && command == `& "$env:PLUGIN_ROOT\runtime\windows-x64\opensocrates.exe"`+suffix
+	case "windows-x64", "windows-arm64":
+		return host == "codex" && command == `& "$env:PLUGIN_ROOT\runtime\`+target+`\opensocrates.exe"`+suffix
 	}
 	return false
 }
@@ -52,7 +52,7 @@ func configuredHookInvocation(command, host, target string) (string, []string, e
 			return "", nil, e
 		}
 		return shell, []string{"-c", command}, nil
-	case "windows-x64":
+	case "windows-x64", "windows-arm64":
 		shell, e := platform.SystemExecutable("powershell.exe")
 		if e != nil {
 			return "", nil, e

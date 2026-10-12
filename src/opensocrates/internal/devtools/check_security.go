@@ -252,7 +252,7 @@ func checkSecurity(root string) ([]string, any, error) {
 			target = str(m["value"])
 		}
 	}
-	if target != "darwin-arm64" && target != "windows-x64" {
+	if _, _, _, targetError := nativeBuildTarget(target); targetError != nil {
 		codes = append(codes, "sbom_target_invalid")
 	}
 	bundleRoot := filepath.Join(root, "dist/native", target)
@@ -291,11 +291,8 @@ func checkSecurity(root string) ([]string, any, error) {
 				for _, setting := range info.Settings {
 					settings[setting.Key] = setting.Value
 				}
-				wantOS, wantArch := "darwin", "arm64"
-				if target == "windows-x64" {
-					wantOS, wantArch = "windows", "amd64"
-				}
-				if settings["GOOS"] != wantOS || settings["GOARCH"] != wantArch || settings["CGO_ENABLED"] != "0" {
+				wantOS, wantArch, _, targetError := nativeBuildTarget(target)
+				if targetError != nil || settings["GOOS"] != wantOS || settings["GOARCH"] != wantArch || settings["CGO_ENABLED"] != "0" || verifyGoBinary(p, target) != nil {
 					codes = append(codes, "native_binary_target_invalid")
 				}
 			}

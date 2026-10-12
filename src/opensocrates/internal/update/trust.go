@@ -34,7 +34,8 @@ type Repository struct {
 // target length and every signed hash. Runtime rollback never reverts trust.
 func (r Repository) Fetch(ctx context.Context, stateDir, target string) (Candidate, error) {
 	var none Candidate
-	if !validTarget(target) {
+	goos, goarch, supported := metadataPlatform(target)
+	if !validTarget(target) || !supported {
 		return none, closed(diagnostics.Verification, "target")
 	}
 	anchor, e := metadata.Root().FromBytes(r.BootstrapRoot)
@@ -169,7 +170,7 @@ func (r Repository) Fetch(ctx context.Context, stateDir, target string) (Candida
 		return none, closed(diagnostics.Verification, "target")
 	}
 	var rel Release
-	if strict(*info.Custom, &rel) != nil || rel.Schema != "opensocrates.release/1.0.0" || !validTarget(rel.PackagePath) {
+	if strict(*info.Custom, &rel) != nil || rel.Schema != "opensocrates.release/1.0.0" || rel.OS != goos || rel.Arch != goarch || !validTarget(rel.PackagePath) {
 		return none, closed(diagnostics.Verification, "release")
 	}
 	// Disable library target persistence: write through protected native API.

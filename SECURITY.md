@@ -4,8 +4,9 @@
 
 Security fixes apply to the latest released `1.x` version. v1.6.0 is an
 implementation candidate until its release gates, approval and publication are
-complete. The supported scope remains Codex on macOS ARM64/Windows x64, native
-Claude Code on macOS ARM64, Antigravity workspace/global on both platforms and
+complete. The requested supported scope is Codex on macOS ARM64 and Windows
+x64/ARM64, native Claude Code on macOS ARM64, Antigravity workspace/global on
+these platforms and
 Claude account content verification/export. Native Windows Claude Code,
 additional platforms and retired integrations are excluded.
 
@@ -121,7 +122,7 @@ fresh session is required. Never terminate/read conversations to force updates.
 ## Release evidence
 
 Require exact source/content identity, deterministic generation, native macOS
-ARM64 and Windows x64 lifecycle evidence, authenticated host observations where
+ARM64 and Windows x64/ARM64 lifecycle evidence, authenticated host observations where
 claimed, clean-machine acceptance, verified public GitHub transport and immutable
 release policy. Platform signing/notarization, Authenticode/SmartScreen,
 production root/signing custody and metadata publication remain independent

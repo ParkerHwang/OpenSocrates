@@ -32,13 +32,18 @@ The current released baseline remains
 
 | Host | Delivery | Platform and activation |
 | --- | --- | --- |
-| Codex CLI / Desktop | Native hooks, controller and Go decision runtime | macOS ARM64 and Windows x64 (default PowerShell); review seven hooks and start a fresh session |
+| Codex CLI / Desktop | Native hooks, controller and Go decision runtime | macOS ARM64 and Windows x64/ARM64 (default PowerShell); review seven hooks and start a fresh session |
 | Claude Code CLI / Desktop local Code | Stateless native entry and complete installed references | macOS ARM64; requires Claude CLI, login and plugin/hook permissions |
-| Claude web / Desktop Chat / Cowork | Standalone content-only account ZIP | Verify/export on either platform; upload and enable separately in the account |
-| Antigravity conversation application | Owned modular rule and skill | macOS ARM64 and Windows x64; explicitly choose workspace or global scope |
+| Claude web / Desktop Chat / Cowork | Standalone content-only account ZIP | Verify/export on all supported targets; upload and enable separately in the account |
+| Antigravity conversation application | Owned modular rule and skill | macOS ARM64 and Windows x64/ARM64; explicitly choose workspace or global scope |
+
+Windows ARM64 was added by explicit user direction during implementation. It
+uses its own native `.exe`/bundle/helper and the same per-user update policy.
+Native ARM64 runtime, install/recovery/scheduler and live host evidence remain
+pending; x64 execution under emulation is supplementary evidence only.
 
 The default and `--host all` select **Codex only**. Other profiles require an
-explicit host. Windows native Claude Code, Linux, macOS Intel, Windows ARM64,
+explicit host. Windows native Claude Code, Linux, macOS Intel,
 WSL and remote-host qualification are outside this release scope.
 
 Installation, loading, complete reads, application and useful outcomes are
@@ -60,7 +65,7 @@ published. On macOS, run the downloaded native executable:
 ./opensocrates status --host codex
 ```
 
-On Windows x64, use `opensocrates.exe` and a quoted absolute local-drive path:
+On Windows x64 or ARM64, use `opensocrates.exe` and a quoted absolute local-drive path:
 
 ```text
 .\opensocrates.exe install --host codex --package "C:\Downloads\bundle.zip"
@@ -86,6 +91,10 @@ for global scope. Account content uses:
 ```text
 ./opensocrates export --host claude-chat --package /absolute/path/to/account.zip --output /absolute/path/to/opensocrates-account.zip
 ```
+
+For ARM64 choose `opensocrates-v1.6.0-windows-arm64.exe` and
+`opensocrates-v1.6.0-windows-arm64.zip`; do not substitute x64-emulated candidate
+results for native evidence. See the native guide for external host availability.
 
 Review Codex's seven hooks in an interactive session. Non-interactive execution
 may skip untrusted hooks. Existing disabled integrations stay disabled after

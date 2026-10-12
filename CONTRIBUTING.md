@@ -47,7 +47,9 @@ base to reuse blindly; issue #109 tracks preparation only.
 - Distribution templates belong under `plugin-src/<host>/`; shared reader and
   decision guidance belongs under `plugin-src/shared/`. Distribution profiles
   and runtime adapters have separate capability lists. `--host all` means
-  Codex only. Native Windows Claude Code and additional platforms are excluded.
+  Codex only. The supported native targets are macOS ARM64 and Windows x64/ARM64.
+  Windows ARM64 is an explicit user-directed expansion; native Windows Claude
+  Code and other additional platforms remain excluded.
 - Do not hand-edit generated files in `schemas/v1/`,
   `content/compiled-*.json`, `build/`, or `dist/`. Commit canonical and generated
   changes together. Regenerate with `make generate`.
@@ -85,7 +87,10 @@ Native distribution work additionally runs `make release-check` on the required
 native platforms. Use [the native guide](docs/native-v1.6.md) for supported
 profiles, installation/adoption, scheduler, recovery and release gates. Exact
 commands, results, environment and the verified commit belong in the PR and
-handoff. Missing evidence remains missing; cross-compilation does not validate
+handoff. Run Windows x64 and ARM64 gates on their respective native targets.
+The user's existing Windows VM is ARM64: previous x64-emulated observations are
+supplementary, not native ARM64 qualification. Missing evidence remains missing;
+cross-compilation does not validate
 Windows ACLs, reparse points, Task Scheduler, running executable replacement or
 native host registration. Existing v1.5 evidence is historical and does not
 qualify the Go release.
@@ -95,7 +100,9 @@ interrupted transactions, rollback, updater/management executable replacement,
 signed metadata, expiry/rollback rejection, disabled state, modified foreign
 files, host reload boundaries and deterministic generated outputs. Mac
 LaunchAgent and Windows Task Scheduler evidence must come from their respective
-OS. Separate fresh-machine acceptance from reinstalling on a used machine.
+OS and executable architecture. Windows ARM64 requires its own native binaries,
+helper/self-replacement, ACL/reparse, adoption, removal, interrupted recovery and
+signed-update checks. Native CLI/Desktop/Antigravity observations are separate. Separate fresh-machine acceptance from reinstalling on a used machine.
 Signing credentials, trusted production root, notarization/Authenticode and
 public transport verification are release gates, not consequences of a local
 build. Do not replace an active installation to gather evidence without the

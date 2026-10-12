@@ -32,6 +32,7 @@ func MetadataCommand(args []string) error {
 	rootPath := fs.String("root", "", "approved signed public root")
 	mac := fs.String("macos-archive", "", "macOS archive")
 	win := fs.String("windows-archive", "", "Windows archive")
+	winARM := fs.String("windows-arm64-archive", "", "native Windows ARM64 archive")
 	ver := fs.String("version", "", "product version")
 	rev := fs.String("content-revision", "", "frozen content revision")
 	out := fs.String("output", "dist", "public metadata output")
@@ -45,7 +46,7 @@ func MetadataCommand(args []string) error {
 	fs.Var(&tk, "targets-key", "external PKCS8 private PEM")
 	fs.Var(&sk, "snapshot-key", "external PKCS8 private PEM")
 	fs.Var(&tsk, "timestamp-key", "external PKCS8 private PEM")
-	if fs.Parse(args) != nil || fs.NArg() != 0 || *rootPath == "" || *mac == "" || *win == "" || *rev == "" {
+	if fs.Parse(args) != nil || fs.NArg() != 0 || *rootPath == "" || *mac == "" || *win == "" || *winARM == "" || *rev == "" {
 		return closed(diagnostics.Verification, "signing_arguments")
 	}
 	if _, ok := version(*ver); !ok {
@@ -76,7 +77,7 @@ func MetadataCommand(args []string) error {
 			in.Signers[k.role] = append(in.Signers[k.role], s)
 		}
 	}
-	for _, a := range []struct{ os, arch, path string }{{"darwin", "arm64", *mac}, {"windows", "amd64", *win}} {
+	for _, a := range []struct{ os, arch, path string }{{"darwin", "arm64", *mac}, {"windows", "amd64", *win}, {"windows", "arm64", *winARM}} {
 		b, err := readReleaseInput(a.path, MaxArchiveSize)
 		if err != nil {
 			return err

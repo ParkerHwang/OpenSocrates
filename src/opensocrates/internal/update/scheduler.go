@@ -422,7 +422,7 @@ type Configuration struct {
 func (e Engine) PrepareConfiguration(ctx context.Context, enabled bool, a *SchedulerAdapter) (Configuration, error) {
 	var c Configuration
 	if e.OS != "darwin" || e.Arch != "arm64" {
-		if e.OS != "windows" || e.Arch != "amd64" {
+		if e.OS != "windows" || (e.Arch != "amd64" && e.Arch != "arm64") {
 			return c, closed(diagnostics.Unsupported, "scheduler")
 		}
 	}

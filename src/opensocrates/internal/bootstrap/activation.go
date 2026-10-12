@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/hosts"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/lifecycle"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/management"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
@@ -61,7 +62,7 @@ func ScheduleManagerReplacement() (bool, error) {
 		if err != nil {
 			return false, diagnostics.New(diagnostics.HostUnavailable, "manager-parent")
 		}
-		if _, err = replacementParent(dir, parentExecutable); err != nil {
+		if _, err = replacementParent(dir, parentExecutable, runtime.GOARCH); err != nil {
 			return false, err
 		}
 	}
@@ -85,10 +86,10 @@ func ActivateManager(ctx context.Context, dir string, parentPID int) error {
 }
 
 func ActivateManagerForParent(ctx context.Context, dir string, parentPID int, parentExecutable string) error {
-	if runtime.GOOS != "windows" || runtime.GOARCH != "amd64" {
+	if runtime.GOOS != "windows" || !hosts.NativePlatformSupported(runtime.GOOS, runtime.GOARCH) {
 		return diagnostics.New(diagnostics.Unsupported, "manager-activation")
 	}
-	_, root, err := readActive(dir, "windows-x64")
+	_, root, err := readActive(dir, platformTarget(runtime.GOOS, runtime.GOARCH))
 	if err != nil {
 		return err
 	}
@@ -96,10 +97,10 @@ func ActivateManagerForParent(ctx context.Context, dir string, parentPID int, pa
 	if err != nil || !samePath(executable, filepath.Join(root, "bin", "opensocrates-update-helper.exe"), "windows") {
 		return diagnostics.New(diagnostics.Verification, "manager-helper")
 	}
-	return (&Activator{StateDir: dir, GOOS: "windows", GOARCH: "amd64", ParentExecutable: parentExecutable}).Activate(ctx, parentPID)
+	return (&Activator{StateDir: dir, GOOS: runtime.GOOS, GOARCH: runtime.GOARCH, ParentExecutable: parentExecutable}).Activate(ctx, parentPID)
 }
 
-func replacementParent(dir, executable string) (string, error) {
+func replacementParent(dir, executable, goarch string) (string, error) {
 	stable := managerPath(dir, "windows")
 	if executable == "" || samePath(executable, stable, "windows") {
 		return stable, nil
@@ -115,14 +116,14 @@ func replacementParent(dir, executable string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	active, _, err := readActive(dir, "windows-x64")
+	active, _, err := readActive(dir, platformTarget("windows", goarch))
 	if err != nil || active.Bundle != pending.Bundle {
 		return "", diagnostics.New(diagnostics.Verification, "manager-parent")
 	}
 	// Publication verifies that this standalone native installer has exactly the
 	// bytes of the signed bundle's manager. It has no sibling manifest; bind its
 	// complete snapshot to the already verified candidate instead.
-	standalone := "opensocrates-v" + active.Version + "-windows-x64.exe"
+	standalone := "opensocrates-v" + active.Version + "-" + platformTarget("windows", goarch) + ".exe"
 	if strings.EqualFold(filepath.Base(executable), standalone) && lifecycle.Equal(snapshot, pending.After) {
 		return executable, nil
 	}
@@ -133,7 +134,7 @@ func replacementParent(dir, executable string) (string, error) {
 	// complete owned bundle and one of the exact pending manager snapshots, rather
 	// than accepting an environment-supplied executable as a trust assertion.
 	root := filepath.Dir(filepath.Dir(executable))
-	if _, err := transport.VerifyBundle(root, "", "windows-x64"); err != nil {
+	if _, err := transport.VerifyBundle(root, "", platformTarget("windows", goarch)); err != nil {
 		return "", err
 	}
 	if !lifecycle.Equal(snapshot, pending.Before) && !lifecycle.Equal(snapshot, pending.After) {
@@ -143,12 +144,12 @@ func replacementParent(dir, executable string) (string, error) {
 }
 
 func (a *Activator) Activate(ctx context.Context, parentPID int) error {
-	if a.GOOS != "windows" || a.GOARCH != "amd64" || parentPID < 1 || !filepath.IsAbs(a.StateDir) {
+	if a.GOOS != "windows" || !hosts.NativePlatformSupported(a.GOOS, a.GOARCH) || parentPID < 1 || !filepath.IsAbs(a.StateDir) {
 		return diagnostics.New(diagnostics.Verification, "manager-activation")
 	}
 	dir := a.StateDir
 	stable := managerPath(dir, a.GOOS)
-	parentExecutable, err := replacementParent(dir, a.ParentExecutable)
+	parentExecutable, err := replacementParent(dir, a.ParentExecutable, a.GOARCH)
 	if err != nil {
 		return err
 	}

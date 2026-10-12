@@ -10,14 +10,18 @@ import (
 	"testing"
 )
 
-func nativeArchiveFixture(t *testing.T) (string, string) {
+func nativeArchiveFixture(t *testing.T, requested ...string) (string, string) {
 	t.Helper()
+	target := "windows-x64"
+	if len(requested) == 1 {
+		target = requested[0]
+	}
 	source := t.TempDir()
 	files := map[string][]byte{
-		"bin/opensocrates.exe":                                []byte("synthetic native executable"),
-		"bin/opensocrates-update-helper.exe":                  []byte("synthetic Go replacement helper"),
-		"packages/codex/runtime/windows-x64/opensocrates.exe": []byte("synthetic bundled runtime"),
-		"packages/codex/README.md":                            []byte("synthetic portable data\n"),
+		"bin/opensocrates.exe":                                   []byte("synthetic native executable"),
+		"bin/opensocrates-update-helper.exe":                     []byte("synthetic Go replacement helper"),
+		"packages/codex/runtime/" + target + "/opensocrates.exe": []byte("synthetic bundled runtime"),
+		"packages/codex/README.md":                               []byte("synthetic portable data\n"),
 	}
 	modes := map[string]os.FileMode{}
 	for name, data := range files {
@@ -30,7 +34,7 @@ func nativeArchiveFixture(t *testing.T) (string, string) {
 			t.Fatal(err)
 		}
 	}
-	manifest := map[string]any{"schema": "opensocrates.native-bundle/1.0.0", "target": "windows-x64", "files": fileInventory(files, modes)}
+	manifest := map[string]any{"schema": "opensocrates.native-bundle/1.0.0", "target": target, "files": fileInventory(files, modes)}
 	if err := writeJSON(filepath.Join(source, "bundle-manifest.json"), manifest); err != nil {
 		t.Fatal(err)
 	}
@@ -41,26 +45,30 @@ func nativeArchiveFixture(t *testing.T) (string, string) {
 }
 
 func TestNativeArchivePortableInventoryModes(t *testing.T) {
-	source, archive := nativeArchiveFixture(t)
-	if err := WritePortableZIP(source, archive); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := publicationBundleManifest(archive); err != nil {
-		t.Fatalf("ZIP differs from its declared portable inventory: %v", err)
-	}
-	reader, err := zip.OpenReader(archive)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer reader.Close()
-	for _, member := range reader.File {
-		want := os.FileMode(0644)
-		if strings.HasSuffix(member.Name, ".exe") {
-			want = 0755
-		}
-		if !member.Mode().IsRegular() || member.Mode().Perm() != want {
-			t.Fatalf("%s: portable mode %o, expected %o", member.Name, member.Mode().Perm(), want)
-		}
+	for _, target := range []string{"windows-x64", "windows-arm64"} {
+		t.Run(target, func(t *testing.T) {
+			source, archive := nativeArchiveFixture(t, target)
+			if err := WritePortableZIP(source, archive); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := publicationBundleManifest(archive); err != nil {
+				t.Fatalf("ZIP differs from its declared portable inventory: %v", err)
+			}
+			reader, err := zip.OpenReader(archive)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer reader.Close()
+			for _, member := range reader.File {
+				want := os.FileMode(0644)
+				if strings.HasSuffix(member.Name, ".exe") {
+					want = 0755
+				}
+				if !member.Mode().IsRegular() || member.Mode().Perm() != want {
+					t.Fatalf("%s: portable mode %o, expected %o", member.Name, member.Mode().Perm(), want)
+				}
+			}
+		})
 	}
 }
 

@@ -22,7 +22,8 @@ runtime rollback never restores an older trust envelope.
 
 Metadata: `https://parkerhwang.github.io/OpenSocrates/updates/stable/metadata/`.
 Signed target aliases: `stable/darwin-arm64/opensocrates.archive` and
-`stable/windows-amd64/opensocrates.archive`. Their signed custom
+`stable/windows-amd64/opensocrates.archive` and
+`stable/windows-arm64/opensocrates.archive`. Their signed custom
 `package_path` identifies an immutable GitHub Release tag and asset; every
 archive has a signed length and SHA256. HTTPS redirect hosts are explicitly
 allowlisted, downloads and timeouts bounded, and custom release compatibility

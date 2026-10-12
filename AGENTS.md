@@ -73,7 +73,7 @@ Never claim a command passed unless you ran that exact command against the repor
 - required authenticated or clean-machine evidence still missing.
 
 Platform-dependent work must state its environment. Native release and packaging
-claims require the documented Apple-silicon macOS gates and native Windows x64
+claims require the documented Apple-silicon macOS gates and native Windows x64/ARM64
 evidence for Windows claims. Cross-compilation is not Windows runtime evidence.
 A green offline suite does not prove live host delivery or answer-quality improvement.
 

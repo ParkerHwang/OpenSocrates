@@ -1,6 +1,7 @@
 package runtimecli
 
 import (
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/hosts"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/transport"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/version"
 	"os"
@@ -21,10 +22,7 @@ func RuntimeIntegrity(host string) map[string]any {
 		return result
 	}
 	current := filepath.Dir(executable)
-	target := runtime.GOOS + "-" + runtime.GOARCH
-	if runtime.GOARCH == "amd64" {
-		target = runtime.GOOS + "-x64"
-	}
+	target := hosts.DistributionTarget(runtime.GOOS, runtime.GOARCH)
 	for i := 0; i < 7; i++ {
 		manifest := filepath.Join(current, "release-manifest.json")
 		if _, e := os.Lstat(manifest); e == nil {

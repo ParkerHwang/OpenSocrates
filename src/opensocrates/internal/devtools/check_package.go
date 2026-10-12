@@ -89,7 +89,12 @@ func checkPackageTree(p string) ([]string, error) {
 	}
 	targets := manifestStrings(m["release_targets"])
 	if host == "codex" || host == "claude" {
-		if len(targets) != 1 || (targets[0] != "darwin-arm64" && targets[0] != "windows-x64") || host == "claude" && targets[0] != "darwin-arm64" {
+		validTarget := false
+		if len(targets) == 1 {
+			_, _, _, targetError := nativeBuildTarget(targets[0])
+			validTarget = targetError == nil
+		}
+		if !validTarget || host == "claude" && targets[0] != "darwin-arm64" {
 			codes = append(codes, "native_target_invalid")
 		}
 	}
@@ -150,6 +155,12 @@ func checkPackageTree(p string) ([]string, error) {
 		if (host == "claude-chat" || host == "antigravity") && (strings.HasPrefix(relative, "bin/") || strings.HasPrefix(relative, "runtime/") || strings.HasSuffix(relative, ".exe")) {
 			codes = append(codes, "content_package_executable:"+relative)
 		}
+		if len(targets) == 1 && strings.HasPrefix(relative, "runtime/") {
+			_, _, suffix, targetError := nativeBuildTarget(targets[0])
+			if targetError != nil || relative != "runtime/"+targets[0]+"/opensocrates"+suffix || verifyGoBinary(path, targets[0]) != nil {
+				codes = append(codes, "native_package_binary_target_invalid:"+relative)
+			}
+		}
 	}
 	e = filepath.WalkDir(p, func(path string, d os.DirEntry, e error) error {
 		if e != nil {
@@ -199,7 +210,7 @@ func checkPackageTree(p string) ([]string, error) {
 	}
 	if host == "codex" || host == "claude" {
 		expectedShell := "posix"
-		if len(targets) == 1 && targets[0] == "windows-x64" {
+		if len(targets) == 1 && windowsNativeTarget(targets[0]) {
 			expectedShell = "powershell"
 		}
 		if m["shell_requirement"] != expectedShell {

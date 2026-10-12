@@ -97,13 +97,22 @@ func RunAcceptance(args []string, out, errout io.Writer) int {
 	return 0
 }
 func nativeAcceptanceTarget() string {
-	if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
+	return nativeAcceptanceTargetFor(runtime.GOOS, runtime.GOARCH)
+}
+func nativeAcceptanceTargetFor(goos, goarch string) string {
+	if goos == "darwin" && goarch == "arm64" {
 		return "darwin-arm64"
 	}
-	if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" {
+	if goos == "windows" && goarch == "amd64" {
 		return "windows-x64"
 	}
+	if goos == "windows" && goarch == "arm64" {
+		return "windows-arm64"
+	}
 	return "unsupported"
+}
+func windowsAcceptanceTarget(target string) bool {
+	return target == "windows-x64" || target == "windows-arm64"
 }
 func isolatedAcceptanceEnvironment(root string) ([]string, string, error) {
 	home := filepath.Join(root, "home")

@@ -157,6 +157,22 @@ func TestSchedulerReceiptOwnershipAndClosedArgs(t *testing.T) {
 	}
 }
 
+func TestSchedulerReceiptDoesNotConflateWindowsNativeArchitectures(t *testing.T) {
+	root, e := platform.MkdirTemp("", "opensocrates-native-scheduler-synthetic-")
+	if e != nil {
+		t.Fatal(e)
+	}
+	t.Cleanup(func() { _ = platform.RemoveTree(root) })
+	path := filepath.Join(root, "receipt.json")
+	data, e := Canonical(map[string]any{"schema": schedulerFixtureSchema, "target": "windows-arm64", "native_go_entry_executed": true})
+	if e != nil || platform.ExclusiveWrite(path, data, 0600) != nil {
+		t.Fatal("native ARM64 receipt fixture unavailable")
+	}
+	if !readSchedulerReceipt(path, "windows-arm64") || readSchedulerReceipt(path, "windows-x64") {
+		t.Fatal("ARM64 scheduler receipt conflated with x64 emulation evidence")
+	}
+}
+
 func TestSchedulerQueryProjectionOmitsPersonalDataAndShowsApprovedDefaults(t *testing.T) {
 	canonical := fixtureWindowsTask("synthetic-private-id", `C:\private\host.exe`, `C:\private\receipt.json`, "S-1-5-21-123-456-789-1000")
 	exported := strings.Replace(string(canonical), "<RegistrationInfo>", `<RegistrationInfo><Author>private-account-name</Author><URI>\PrivateTaskName</URI>`, 1)

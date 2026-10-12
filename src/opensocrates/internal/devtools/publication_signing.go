@@ -15,10 +15,17 @@ import (
 )
 
 func publicationNativeTarget(target string) error {
-	if target == "darwin-arm64" && runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
+	return publicationNativeTargetFor(target, runtime.GOOS, runtime.GOARCH)
+}
+
+func publicationNativeTargetFor(target, goos, goarch string) error {
+	if target == "darwin-arm64" && goos == "darwin" && goarch == "arm64" {
 		return nil
 	}
-	if target == "windows-x64" && runtime.GOOS == "windows" && runtime.GOARCH == "amd64" {
+	if target == "windows-x64" && goos == "windows" && goarch == "amd64" {
+		return nil
+	}
+	if target == "windows-arm64" && goos == "windows" && goarch == "arm64" {
 		return nil
 	}
 	return errors.New("release_native_platform_required")

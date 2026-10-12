@@ -37,15 +37,20 @@ env:
 jobs:
   native:
     name: Sign and qualify ${{ matrix.target }}
-    environment: opensocrates-release-signing
+    environment: ${{ matrix.signing_environment }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - target: darwin-arm64
             runner: '["self-hosted", "macOS", "ARM64", "opensocrates-release"]'
+            signing_environment: opensocrates-release-signing
           - target: windows-x64
             runner: '["self-hosted", "Windows", "X64", "opensocrates-release"]'
+            signing_environment: opensocrates-release-signing
+          - target: windows-arm64
+            runner: '["self-hosted", "Windows", "ARM64", "opensocrates-release"]'
+            signing_environment: opensocrates-release-signing-windows-arm64
     # Signing runners must be ephemeral, isolated and pre-provisioned with OS
     # signing identities. Secrets are never placed in source, process output or
     # artifact receipts; only configured identity/key references reach Go.
@@ -162,6 +167,7 @@ jobs:
           --root config/update/root.json
           --macos-archive dist/opensocrates-v1.6.0-darwin-arm64.zip
           --windows-archive dist/opensocrates-v1.6.0-windows-x64.zip
+          --windows-arm64-archive dist/opensocrates-v1.6.0-windows-arm64.zip
           --version 1.6.0 --content-revision 3
           --targets-version "$TARGETS_VERSION"
           --snapshot-version "$SNAPSHOT_VERSION"

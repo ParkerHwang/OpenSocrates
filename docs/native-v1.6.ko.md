@@ -16,6 +16,7 @@
 | --- | --- |
 | macOS ARM64 | `opensocrates-v1.6.0-darwin-arm64.zip` |
 | Windows x64 | `opensocrates-v1.6.0-windows-x64.zip` |
+| Windows ARM64 | `opensocrates-v1.6.0-windows-arm64.zip` |
 
 묶음에는 `bundle-manifest.json`, 관리·런타임 실행파일, Go 교체 보조 프로그램,
 스키마·콘텐츠 식별 정보, 호스트 패키지가 들어갑니다. Windows에는 네이티브
@@ -32,7 +33,8 @@ Claude Code가 없습니다. 사용자 기기에 Go·Python·Node.js·npm은 필
 
 패키지는 절대 경로를 사용합니다. Mac 예제의 `./opensocrates`는 네이티브
 실행파일입니다. Windows에서는 `.\opensocrates.exe`와
-`"C:\Downloads\opensocrates-v1.6.0-windows-x64.zip"` 같은 로컬 드라이브 절대
+`"C:\Downloads\opensocrates-v1.6.0-windows-x64.zip"` 또는 `windows-arm64`
+대응 파일 같은 로컬 드라이브 절대
 경로를 사용하세요. 상태 확인·갱신·끄기·켜기·제거에서 동일한 전역/작업공간
 범위를 선택합니다.
 
@@ -109,7 +111,7 @@ TUF root/timestamp/snapshot/targets의 서명 임계값·만료·단조 버전·
 낮추지 않습니다. 루트 교체는 이전·새 루트의 승인이 필요합니다. 없거나 만료·
 불일치한 메타데이터와 미제공 운영 루트는 신뢰를 완화하지 않고 사용 불가로 남깁니다.
 
-v1.6.0 예약 대상은 Codex macOS ARM64·Windows x64만입니다. Claude·Antigravity는
+v1.6.0 예약 대상은 Codex macOS ARM64·Windows x64/ARM64입니다. Claude·Antigravity는
 각 등록·reload·비활성·무결성·복구 검증을 마칠 때까지 수동 관리합니다. 계정 ZIP은
 수동 내보내기·업로드이며 계정 자동화를 주장하지 않습니다.
 
@@ -176,7 +178,8 @@ Windows Codex CLI/Desktop 훅은 정상적으로 상속한 기본 PowerShell 문
 
 이는 외부 OS·호스트 설정의 명령 하나이며 자체 PowerShell 래퍼가 아닙니다.
 사용자 지정·cmd fallback 셸은 지원하지 않고 명시적으로 안전하게 통과합니다.
-셸 변경이나 플랫폼 확대를 뜻하지 않습니다.
+ARM64는 같은 명령 형식의 `runtime/windows-arm64/` 경로를 사용하며
+셸 경계를 변경하지 않습니다.
 
 운영 신뢰 정본은 `config/update/root.json`·`config/update/identities.json`이며
 Go 생성으로 `internal/update/trustconfig`에 내장합니다. 후보에는 승인된 운영
@@ -217,3 +220,43 @@ npm 패키지, 대화·기록·다른 파일은 남깁니다. 미확인·수정�
 contents:write workflow 토큰으로 수행합니다. 읽기 권한이 없거나 부족하면
 immutable 검사를 완화하지 않고 게시를 막습니다. 운영 루트·게시자·서명 자원과
 함께 필요한 게시 자격이지 릴리스 검증 증거는 아닙니다.
+
+## 사용자 요청에 따른 Windows ARM64 범위 조정
+
+원래 준비는 Windows x64만 대상으로 했지만 사용자가 이후 명시적으로
+Windows ARM64를 v1.6.0에 추가했습니다. Codex CLI/Desktop, Antigravity 전역/
+작업공간 관리, 네이티브 설치·인수·제거, Go 보조 프로그램 자체 교체, 사용자
+예약 갱신이 대상입니다. `--host all`의 의미, Windows 네이티브 Claude Code
+제외, 수동 계정 업로드, v1.5.0의 48개 본문 기준은 바꾸지 않습니다. 계정
+검증·내보내기는 모든 지원 대상에서 실행 코드 없는 콘텐츠 경로입니다.
+
+단독 `opensocrates-v1.6.0-windows-arm64.exe`와
+`opensocrates-v1.6.0-windows-arm64.zip`을 받습니다. 묶음 내부는
+`bin/opensocrates.exe`·`bin/opensocrates-update-helper.exe`, 호스트 런타임은
+`runtime/windows-arm64/opensocrates.exe`입니다. TUF 대상
+`stable/windows-arm64/opensocrates.archive`는 별도 플랫폼 식별을 갖습니다.
+단독 ARM64 실행파일로 처음 설치하는 예입니다.
+
+```text
+.\opensocrates-v1.6.0-windows-arm64.exe install --host codex --package "C:\Downloads\opensocrates-v1.6.0-windows-arm64.zip"
+.\opensocrates-v1.6.0-windows-arm64.exe status --host codex
+```
+
+`.\opensocrates.exe` 예제는 묶음의 `bin/`에서 푼 네이티브 실행파일을 뜻합니다.
+단독 다운로드 파일은 실제 내려받은 이름으로 실행하세요.
+
+예약은 사용자 opt-in·stable·24시간·로그인 지연이며 신뢰·비활성·단일 소유자를
+보존합니다. 실제 ARM64 설치·ACL/reparse/잠금·보조 프로그램·중단·롤백·예약·
+호스트 적용 증거는 아직 주장하지 않으며 해당 아키텍처에서 검증해야 합니다.
+
+공식 [Codex 0.144.4 릴리스](https://github.com/openai/codex/releases/tag/rust-v0.144.4)에
+`aarch64-pc-windows-msvc` CLI·app-server 실행파일이 있습니다. 배포 가용성
+증거이지 인증된 CLI/Desktop 실제 전달 증거는 아닙니다. GitHub
+[runner 안내](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)는
+네이티브 CI용 `windows-11-arm`을 명시합니다. Antigravity의 네이티브 앱
+아키텍처와 실제 ARM64 불러오기는 별도 미검증입니다. OpenSocrates 소유 규칙·
+스킬 관리 지원이 외부 앱의 네이티브 가용성까지 증명하지 않습니다.
+
+기존 Windows VM은 ARM64입니다. 그곳의 x64 실행은 에뮬레이션 보조 증거이며
+Go ARM64 네이티브 검증을 대신하지 않습니다. 운영 서명·루트·게시 자격과
+새 기기·실제 호스트 증거는 이 대상도 별도 릴리스 조건입니다.

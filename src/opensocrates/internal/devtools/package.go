@@ -12,16 +12,35 @@ import (
 
 var tokenPattern = regexp.MustCompile(`\{\{([A-Z][A-Z0-9_]*)\}\}`)
 
+func windowsNativeTarget(target string) bool {
+	return target == "windows-x64" || target == "windows-arm64"
+}
+
+// nativeBuildTarget is the closed first-party release matrix. Windows x64 is
+// named explicitly for backward compatibility; native ARM64 is a separate asset.
+func nativeBuildTarget(target string) (goos, arch, suffix string, err error) {
+	switch target {
+	case "darwin-arm64":
+		return "darwin", "arm64", "", nil
+	case "windows-x64":
+		return "windows", "amd64", ".exe", nil
+	case "windows-arm64":
+		return "windows", "arm64", ".exe", nil
+	default:
+		return "", "", "", fmt.Errorf("unsupported native target")
+	}
+}
+
 func specializeNativeCommands(text, host, target string) string {
 	binary := "runtime/" + target + "/opensocrates"
-	if target == "windows-x64" {
+	if windowsNativeTarget(target) {
 		binary += ".exe"
 	}
 	root := "$PLUGIN_ROOT"
 	if host == "claude" {
 		root = "$CLAUDE_PLUGIN_ROOT"
 	}
-	if target == "windows-x64" {
+	if windowsNativeTarget(target) {
 		root = "$env:PLUGIN_ROOT"
 	}
 	for _, prefix := range []string{"${PLUGIN_ROOT}", "${CLAUDE_PLUGIN_ROOT}"} {
@@ -35,7 +54,7 @@ func specializeNativeCommands(text, host, target string) string {
 	text = strings.ReplaceAll(text, "source CLI is", "native CLI is")
 	text = strings.ReplaceAll(text, "The source\nCLI is", "The native\nCLI is")
 	text = strings.ReplaceAll(text, "소스 CLI는", "네이티브 CLI는")
-	if target == "windows-x64" {
+	if windowsNativeTarget(target) {
 		text = strings.ReplaceAll(text, "`\"./"+binary+"\" ", "`& \"./"+binary+"\" ")
 		text = strings.ReplaceAll(text, "`\""+root+"/"+binary+"\" ", "`& \""+root+"/"+binary+"\" ")
 	}
@@ -200,7 +219,7 @@ func commonValues(bundle, policy map[string]any, host, target string) (map[strin
 	values["RESPONSE_POLICY_JSON"] = jsonToken(policy)
 	values["RESPONSE_POLICY_SHA_JSON"] = jsonToken(digest([]byte(jsonToken(policy))))
 	values["METHOD_REFERENCE_INDEX"] = methodIndex(arr(bundle["methods"]))
-	if target == "windows-x64" {
+	if windowsNativeTarget(target) {
 		values["PACKAGE_LAUNCHER_PATH"] += ".exe"
 	}
 	return values, nil
@@ -244,8 +263,8 @@ func nativeHooks(host, target string) map[string]any {
 	}
 	binary := prefix + "/runtime/" + target + "/opensocrates"
 	invoker := ""
-	if target == "windows-x64" {
-		binary = `$env:PLUGIN_ROOT\runtime\windows-x64\opensocrates.exe`
+	if windowsNativeTarget(target) {
+		binary = `$env:PLUGIN_ROOT\runtime\` + target + `\opensocrates.exe`
 		invoker = "& "
 	}
 	hooks := map[string]any{}
@@ -275,8 +294,8 @@ func nativeHooks(host, target string) map[string]any {
 }
 
 func GeneratePlugin(root, host, target, runtimeRoot, output string) (map[string]any, error) {
-	if target != "darwin-arm64" && target != "windows-x64" {
-		return nil, fmt.Errorf("unsupported native target")
+	if _, _, _, err := nativeBuildTarget(target); err != nil {
+		return nil, err
 	}
 	if host != "codex" && host != "claude" && host != "antigravity" && host != "claude-chat" {
 		return nil, fmt.Errorf("unsupported profile")
@@ -417,7 +436,7 @@ func GeneratePlugin(root, host, target, runtimeRoot, output string) (map[string]
 		}
 		if runtimeRoot != "" {
 			binary := "opensocrates"
-			if target == "windows-x64" {
+			if windowsNativeTarget(target) {
 				binary += ".exe"
 			}
 			b, e := regularRead(runtimeRoot, target+"/"+binary)
@@ -473,7 +492,7 @@ func GeneratePlugin(root, host, target, runtimeRoot, output string) (map[string]
 	} else {
 		manifest["launcher_host"] = host
 		manifest["shell_requirement"] = "posix"
-		if target == "windows-x64" {
+		if windowsNativeTarget(target) {
 			manifest["shell_requirement"] = "powershell"
 		}
 		if runtimeRoot != "" {

@@ -31,6 +31,12 @@ func nativeLifecycleAcceptance(o acceptanceOptions) (map[string]any, error) {
 	if e != nil {
 		return report, e
 	}
+	if !acceptanceExecutableMatchesTarget(binary, target) || !acceptanceExecutableMatchesTarget(fixture, target) {
+		return report, errors.New("native_acceptance_executable_architecture_mismatch")
+	}
+	report["executed_artifact_architecture_verified"] = true
+	report["runtime_goos"] = runtime.GOOS
+	report["runtime_goarch"] = runtime.GOARCH
 	packageRoot, e := filepath.Abs(o.packagePath)
 	if e != nil {
 		return report, e
@@ -108,6 +114,9 @@ func nativeLifecycleAcceptance(o acceptanceOptions) (map[string]any, error) {
 	allPass = allPass && migrationPass
 	recoveryPass := acceptanceRecoveryCases(home, binary, env, work, cases)
 	allPass = allPass && recoveryPass
+	if windowsAcceptanceTarget(target) {
+		allPass = acceptanceWindowsNativeHelper(tmp, packageRoot, fixture, target, cases) && allPass
+	}
 	report["pass"] = allPass
 	return report, nil
 }

@@ -18,6 +18,7 @@ import (
 
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/hosts"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/lifecycle"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/management"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
@@ -70,12 +71,7 @@ func managerPath(dir, goos string) string {
 	return filepath.Join(dir, "bin", name)
 }
 
-func platformTarget(goos, goarch string) string {
-	if goos == "windows" && goarch == "amd64" {
-		return "windows-x64"
-	}
-	return goos + "-" + goarch
-}
+func platformTarget(goos, goarch string) string { return hosts.DistributionTarget(goos, goarch) }
 
 func samePath(a, b, goos string) bool {
 	if goos == "windows" {

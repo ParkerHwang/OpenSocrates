@@ -194,6 +194,9 @@ func TestForwardRejectsModifiedStableManager(t *testing.T) {
 }
 
 func activationFixture(t *testing.T) (*Activator, string, lifecycle.Snapshot, lifecycle.Snapshot) {
+	return activationFixtureForArch(t, "amd64")
+}
+func activationFixtureForArch(t *testing.T, goarch string) (*Activator, string, lifecycle.Snapshot, lifecycle.Snapshot) {
 	t.Helper()
 	dir := privateFixtureDir(t)
 	stable := managerPath(dir, "windows")
@@ -202,14 +205,14 @@ func activationFixture(t *testing.T) (*Activator, string, lifecycle.Snapshot, li
 	if err != nil {
 		t.Fatal(err)
 	}
-	id := fixtureBundle(t, dir, "1.6.1", "windows", "amd64", []byte("new native manager"))
+	id := fixtureBundle(t, dir, "1.6.1", "windows", goarch, []byte("new native manager"))
 	after, err := lifecycle.Inspect(filepath.Join(dir, "bundles", id, "bin", "opensocrates.exe"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	writeActive(t, dir, id, "1.6.1", "windows", "amd64", before)
+	writeActive(t, dir, id, "1.6.1", "windows", goarch, before)
 	putJSON(t, filepath.Join(dir, "manager-pending.json"), management.ManagerReplacement{Schema: "opensocrates.manager-replacement/1.0.0", Bundle: id, Source: "bin/opensocrates.exe", Before: before, After: after})
-	return &Activator{StateDir: dir, GOOS: "windows", GOARCH: "amd64", WaitParent: func(context.Context, int, string) error { return nil }}, stable, before, after
+	return &Activator{StateDir: dir, GOOS: "windows", GOARCH: goarch, WaitParent: func(context.Context, int, string) error { return nil }}, stable, before, after
 }
 
 func TestManagerActivationTransaction(t *testing.T) {
@@ -404,5 +407,65 @@ func TestManagerActivationRejectsUnverifiedDevelopmentParent(t *testing.T) {
 	actual, err := lifecycle.Inspect(stable)
 	if err != nil || !lifecycle.Equal(actual, before) {
 		t.Fatal("development parent changed installation", err)
+	}
+}
+
+func TestARM64ManagerActivationAndStandaloneParent(t *testing.T) {
+	a, stable, _, after := activationFixtureForArch(t, "arm64")
+	parent := filepath.Join(a.StateDir, "downloads", "opensocrates-v1.6.1-windows-arm64.exe")
+	put(t, parent, []byte("new native manager"), 0755)
+	a.ParentExecutable = parent
+	observed := ""
+	a.WaitParent = func(_ context.Context, _ int, path string) error { observed = path; return nil }
+	if e := a.Activate(context.Background(), 123); e != nil {
+		t.Fatal(e)
+	}
+	if observed != parent {
+		t.Fatal("ARM64 standalone parent identity lost")
+	}
+	actual, e := lifecycle.Inspect(stable)
+	if e != nil || !lifecycle.Equal(actual, after) {
+		t.Fatal("ARM64 manager activation differs")
+	}
+}
+func TestARM64ManagerRefusesX64ActiveBundle(t *testing.T) {
+	a, stable, before, _ := activationFixture(t)
+	a.GOARCH = "arm64"
+	if e := a.Activate(context.Background(), 123); e == nil {
+		t.Fatal("x64 bundle activated as ARM64")
+	}
+	actual, e := lifecycle.Inspect(stable)
+	if e != nil || !lifecycle.Equal(actual, before) {
+		t.Fatal("cross-architecture attempt changed active executable")
+	}
+}
+func TestARM64ManagerRefusesX64StandaloneAlias(t *testing.T) {
+	a, stable, before, _ := activationFixtureForArch(t, "arm64")
+	parent := filepath.Join(a.StateDir, "downloads", "opensocrates-v1.6.1-windows-x64.exe")
+	put(t, parent, []byte("new native manager"), 0755)
+	a.ParentExecutable = parent
+	if e := a.Activate(context.Background(), 123); e == nil {
+		t.Fatal("x64 standalone name accepted for ARM64 parent")
+	}
+	actual, e := lifecycle.Inspect(stable)
+	if e != nil || !lifecycle.Equal(actual, before) {
+		t.Fatal("foreign standalone alias changed manager")
+	}
+}
+func TestARM64ManagerAcceptsVerifiedVersionedParent(t *testing.T) {
+	a, _, _, _ := activationFixtureForArch(t, "arm64")
+	pending, e := management.ReadPendingManager(a.StateDir)
+	if e != nil {
+		t.Fatal(e)
+	}
+	parent := filepath.Join(a.StateDir, "bundles", pending.Bundle, "bin", "opensocrates.exe")
+	a.ParentExecutable = parent
+	observed := ""
+	a.WaitParent = func(_ context.Context, _ int, path string) error { observed = path; return nil }
+	if e = a.Activate(context.Background(), 123); e != nil {
+		t.Fatal(e)
+	}
+	if observed != parent {
+		t.Fatal("ARM64 versioned parent identity lost")
 	}
 }

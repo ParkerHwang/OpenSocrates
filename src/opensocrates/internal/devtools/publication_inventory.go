@@ -16,6 +16,18 @@ import (
 	"strings"
 )
 
+func publicationNativeTargets() []string {
+	return []string{"darwin-arm64", "windows-x64", "windows-arm64"}
+}
+
+func publicationInstallerName(version, target string) string {
+	name := "opensocrates-v" + version + "-" + target
+	if strings.HasPrefix(target, "windows-") {
+		name += ".exe"
+	}
+	return name
+}
+
 func publicationBundleManifest(archive string) (map[string]any, error) {
 	reader, err := zip.OpenReader(archive)
 	if err != nil {
@@ -133,7 +145,7 @@ func publicationMerge(o publicationOptions) error {
 	}
 	dist := filepath.Join(o.root, "dist")
 	manifests := map[string]map[string]any{}
-	for _, target := range []string{"darwin-arm64", "windows-x64"} {
+	for _, target := range publicationNativeTargets() {
 		archive := filepath.Join(dist, "opensocrates-v"+version+"-"+target+".zip")
 		manifest, err := publicationBundleManifest(archive)
 		if err != nil {
@@ -147,27 +159,30 @@ func publicationMerge(o publicationOptions) error {
 		}
 		manifests[target] = manifest
 	}
-	mac, windows := manifests["darwin-arm64"], manifests["windows-x64"]
-	for _, field := range []string{"source_tree_hash", "normalized_semantic_hash", "content_revision"} {
-		if jsonToken(mac[field]) != jsonToken(windows[field]) {
-			return errors.New("release_cross_platform_content_mismatch")
-		}
-	}
-	for _, profile := range []string{"claude-chat", "antigravity"} {
-		inventory := func(bundle map[string]any) map[string]any {
-			result := map[string]any{}
-			for _, entry := range arr(bundle["files"]) {
-				record := obj(entry)
-				name := str(record["path"])
-				if strings.HasPrefix(name, "packages/"+profile+"/") {
-					result[name] = record
-				}
+	mac := manifests["darwin-arm64"]
+	for _, target := range publicationNativeTargets()[1:] {
+		windows := manifests[target]
+		for _, field := range []string{"source_tree_hash", "normalized_semantic_hash", "content_revision"} {
+			if jsonToken(mac[field]) != jsonToken(windows[field]) {
+				return errors.New("release_cross_platform_content_mismatch")
 			}
-			return result
 		}
-		macFiles, windowsFiles := inventory(mac), inventory(windows)
-		if len(macFiles) == 0 || jsonToken(macFiles) != jsonToken(windowsFiles) {
-			return errors.New("release_portable_export_mismatch")
+		for _, profile := range []string{"claude-chat", "antigravity"} {
+			inventory := func(bundle map[string]any) map[string]any {
+				result := map[string]any{}
+				for _, entry := range arr(bundle["files"]) {
+					record := obj(entry)
+					name := str(record["path"])
+					if strings.HasPrefix(name, "packages/"+profile+"/") {
+						result[name] = record
+					}
+				}
+				return result
+			}
+			macFiles, windowsFiles := inventory(mac), inventory(windows)
+			if len(macFiles) == 0 || jsonToken(macFiles) != jsonToken(windowsFiles) {
+				return errors.New("release_portable_export_mismatch")
+			}
 		}
 	}
 	// Native notarization must bind the exact final macOS ZIP bytes.
@@ -180,7 +195,7 @@ func publicationMerge(o publicationOptions) error {
 	if err != nil || notary["sha256"] != hash {
 		return errors.New("release_notarization_bytes_mismatch")
 	}
-	for _, target := range []string{"darwin-arm64", "windows-x64"} {
+	for _, target := range publicationNativeTargets() {
 		provenance, err := ReadObject(filepath.Join(o.root, "build", "evidence", "package-source-provenance-"+target+".json"))
 		if err != nil || provenance["commit"] != commit || provenance["repository"] != publicationRepository {
 			return errors.New("release_native_provenance_mismatch")
@@ -201,7 +216,7 @@ func publicationMerge(o publicationOptions) error {
 			return err
 		}
 	}
-	return writeJSON(filepath.Join(dist, "opensocrates-v"+version+"-release-manifest.json"), map[string]any{"schema": "opensocrates.native-release/1.0.0", "product_version": version, "source_git_commit": commit, "content_revision": mac["content_revision"], "source_tree_hash": mac["source_tree_hash"], "normalized_semantic_hash": mac["normalized_semantic_hash"], "bundles": manifests, "native_targets": []string{"darwin-arm64", "windows-x64"}, "account_activation": "separate user upload/activation", "running_conversations": "unchanged until host reload or fresh session"})
+	return writeJSON(filepath.Join(dist, "opensocrates-v"+version+"-release-manifest.json"), map[string]any{"schema": "opensocrates.native-release/1.0.0", "product_version": version, "source_git_commit": commit, "content_revision": mac["content_revision"], "source_tree_hash": mac["source_tree_hash"], "normalized_semantic_hash": mac["normalized_semantic_hash"], "bundles": manifests, "native_targets": publicationNativeTargets(), "account_activation": "separate user upload/activation", "running_conversations": "unchanged until host reload or fresh session"})
 }
 
 // publicationFinalize runs after online TUF metadata signing and records one
@@ -216,9 +231,12 @@ func publicationFinalize(o publicationOptions) error {
 	if err != nil {
 		return err
 	}
-	names := []string{"opensocrates-v" + version + "-darwin-arm64", "opensocrates-v" + version + "-windows-x64.exe", "opensocrates-v" + version + "-darwin-arm64.zip", "opensocrates-v" + version + "-windows-x64.zip", "opensocrates-v" + version + "-release-manifest.json", "root.json", "targets.json", "snapshot.json", "timestamp.json"}
+	names := []string{"opensocrates-v" + version + "-release-manifest.json", "root.json", "targets.json", "snapshot.json", "timestamp.json"}
+	for _, target := range publicationNativeTargets() {
+		names = append(names, publicationInstallerName(version, target), "opensocrates-v"+version+"-"+target+".zip")
+	}
 	names = append(names, "opensocrates-claude-chat-v"+version+".zip", "opensocrates-antigravity-v"+version+".zip")
-	for _, target := range []string{"darwin-arm64", "windows-x64"} {
+	for _, target := range publicationNativeTargets() {
 		names = append(names, "opensocrates-v"+version+"-"+target+"-sbom.cdx.json")
 	}
 	entries, err := os.ReadDir(filepath.Join(o.root, "dist"))
@@ -245,11 +263,8 @@ func publicationFinalize(o publicationOptions) error {
 	if err != nil || string(staged) != string(rootData) {
 		return errors.New("release_production_root_mismatch")
 	}
-	for _, target := range []string{"darwin-arm64", "windows-x64"} {
-		file := "opensocrates-v" + version + "-" + target
-		if target == "windows-x64" {
-			file += ".exe"
-		}
+	for _, target := range publicationNativeTargets() {
+		file := publicationInstallerName(version, target)
 		// Verify the standalone installer is the same signed executable in the bundle.
 		expected := ""
 		manifest, err := publicationBundleManifest(filepath.Join(o.root, "dist", "opensocrates-v"+version+"-"+target+".zip"))
@@ -257,7 +272,7 @@ func publicationFinalize(o publicationOptions) error {
 			return err
 		}
 		binary := "bin/opensocrates"
-		if target == "windows-x64" {
+		if strings.HasPrefix(target, "windows-") {
 			binary += ".exe"
 		}
 		for _, entry := range arr(manifest["files"]) {

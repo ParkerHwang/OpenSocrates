@@ -59,10 +59,8 @@ func (e Engine) receipt(r Receipt) error {
 // re-read under one update lock; the lifecycle callback obtains mutation lock.
 func (e Engine) Run(ctx context.Context, scheduled, force bool) (Receipt, error) {
 	r := Receipt{Schema: "opensocrates.native-update-receipt/1.0.0", CheckedAt: e.now(), Host: "codex", Scope: "user", Phase: "check", Result: "unchanged"}
-	if e.OS != "darwin" || e.Arch != "arm64" {
-		if e.OS != "windows" || e.Arch != "amd64" {
-			return r, closed(diagnostics.Unsupported, "platform")
-		}
+	if _, err := MetadataTarget(e.OS, e.Arch); err != nil {
+		return r, err
 	}
 	if err := platform.Mkdir(e.StateDir); err != nil {
 		return r, err
@@ -91,7 +89,7 @@ func (e Engine) Run(ctx context.Context, scheduled, force bool) (Receipt, error)
 	if err = e.savePolicy(p); err != nil {
 		return r, err
 	}
-	target := "stable/" + e.OS + "-" + e.Arch + "/opensocrates.archive"
+	target, _ := MetadataTarget(e.OS, e.Arch)
 	candidate, err := e.Repository.Fetch(ctx, filepath.Join(e.StateDir, "trust"), target)
 	if err != nil {
 		r.Result = "unavailable"
