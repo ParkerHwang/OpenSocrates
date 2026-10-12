@@ -87,3 +87,19 @@ func TestExpiryCanonicalSixHours(t *testing.T) {
 		}
 	}
 }
+
+func TestControlRootErrorCategories(t *testing.T) {
+	for _, tc := range []struct{ raw, want string }{
+		{`[]`, "invalid_json"}, {`[{}]`, "invalid_json"}, {`null`, "invalid_json"},
+		{`"control"`, "invalid_json"}, {`true`, "invalid_json"}, {`false`, "invalid_json"},
+		{`0`, "invalid_json"}, {`1.5`, "invalid_json"},
+		{`{}`, "invalid_payload"}, {`{"schema":null}`, "invalid_payload"},
+	} {
+		t.Run(tc.raw, func(t *testing.T) {
+			_, e := ParseControl([]byte(tc.raw))
+			if e == nil || e.Error() != tc.want {
+				t.Fatalf("error=%v want=%s", e, tc.want)
+			}
+		})
+	}
+}

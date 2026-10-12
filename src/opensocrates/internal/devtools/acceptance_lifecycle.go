@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/lifecycle"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/management"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
@@ -65,7 +66,13 @@ func nativeLifecycleAcceptance(o acceptanceOptions) (map[string]any, error) {
 	run := func(name string, args ...string) bool {
 		_, stderr, e := runAcceptanceProcess(binary, args, nil, env, work, 30*time.Second)
 		passed := e == nil && len(stderr) == 0
-		cases[name] = map[string]any{"pass": passed}
+		result := map[string]any{"pass": passed}
+		if e != nil {
+			result["failure_stage"] = "command_exit_or_deadline"
+		} else if len(stderr) != 0 {
+			result["failure_stage"] = "unexpected_content_free_diagnostic"
+		}
+		cases[name] = result
 		allPass = allPass && passed
 		return passed
 	}
@@ -169,7 +176,11 @@ func AcceptanceHostFixture(args []string, out interface{ Write([]byte) (int, err
 		entry := map[string]any{"pluginId": "opensocrates@opensocrates", "name": "opensocrates", "marketplaceName": "opensocrates", "version": version, "enabled": state["enabled"], "marketplaceRoot": root}
 		installed := []any{}
 		if state["installed"] == true {
-			installed = append(installed, entry)
+			cached := clone(entry)
+			if cachedVersion, ok := state["version"].(string); ok && cachedVersion != "" {
+				cached["version"] = cachedVersion
+			}
+			installed = append(installed, cached)
 		}
 		available := []any{}
 		if root != "" {
@@ -205,6 +216,14 @@ func AcceptanceHostFixture(args []string, out interface{ Write([]byte) (int, err
 	case "install", "add":
 		state["installed"] = true
 		state["enabled"] = true
+		// A local package replacement does not refresh the host's installed cache
+		// until its next session. Keep that activation boundary in the fixture.
+		marketplaceRoot, _ := state["marketplace"].(string)
+		manifest, e := checkObject(filepath.Join(marketplaceRoot, "build/generated/plugins/codex/release-manifest.json"))
+		if e != nil || str(manifest["product_version"]) == "" {
+			return 2
+		}
+		state["version"] = manifest["product_version"]
 		return save()
 	case "uninstall", "remove":
 		state["installed"] = false
@@ -280,8 +299,15 @@ func (r acceptanceRegistrationRunner) Run(_ context.Context, binary string, args
 	return out, e
 }
 func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]any) bool {
+	stage := "prepare_environment"
+	failureCode := diagnostics.Verification
 	record := func(passed bool) bool {
-		cases["npm_owned_state_adoption_fixture"] = map[string]any{"pass": passed, "evidence_scope": "synthetic_legacy_marker_state_and_registration; native_scheduler_commands_mocked; not_real_npm_release"}
+		result := map[string]any{"pass": passed, "evidence_scope": "synthetic_legacy_marker_state_and_registration; native_scheduler_commands_mocked; not_real_npm_release", "legacy_runtime_execution_claimed": false}
+		if !passed {
+			result["failure_stage"] = stage
+			result["error_code"] = failureCode
+		}
+		cases["npm_owned_state_adoption_fixture"] = result
 		return passed
 	}
 	root := filepath.Join(tmp, "migration")
@@ -293,11 +319,13 @@ func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]
 	home := filepath.Join(root, "home")
 	stateDir := filepath.Join(home, ".opensocrates")
 	legacyPackage := filepath.Join(root, "legacy-package")
+	stage = "copy_legacy_payload_fixture"
 	if e := copyCheckTree(filepath.Join(packageRoot, "packages/codex"), legacyPackage); e != nil {
 		return record(false)
 	}
 	// Freeze the original desired-state and three-field ownership marker formats.
 	// The payload is a synthetic released-content fixture, not a live npm binary.
+	stage = "prepare_legacy_plugin_identity"
 	pluginPath := filepath.Join(legacyPackage, ".codex-plugin/plugin.json")
 	plugin, e := checkObject(pluginPath)
 	if e != nil {
@@ -309,6 +337,7 @@ func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]
 		return record(false)
 	}
 	manifestPath := filepath.Join(legacyPackage, "release-manifest.json")
+	stage = "prepare_legacy_manifest_identity"
 	manifest, e := checkObject(manifestPath)
 	if e != nil {
 		return record(false)
@@ -334,39 +363,58 @@ func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]
 	scheduler := update.NewSchedulerAdapter(runtime.GOOS, home, filepath.Join(stateDir, "bin", filepath.Base(fixture)), stateDir)
 	scheduler.Command = func(_ context.Context, _ string, _ ...string) ([]byte, error) { return []byte{}, nil }
 	manager.Scheduler = scheduler
-	if _, e := manager.Handle(context.Background(), management.Request{Action: "install", Host: "codex", Package: legacyPackage}); e != nil {
+	// Simulate the previous installer's already-owned layout directly. Running a
+	// new install here would correctly reject the synthetic 1.5 identity because
+	// its copied Go executable is 1.6. Only the actual new adoption candidate is
+	// executed by the production preactivation/version probe below.
+	hostRoot := filepath.Join(root, "codex/managed-marketplaces/opensocrates")
+	stage = "prepare_legacy_owned_layout"
+	if e := copyCheckTree(legacyPackage, filepath.Join(hostRoot, "build/generated/plugins/codex")); e != nil {
 		return record(false)
 	}
-	hostRoot := filepath.Join(root, "codex/managed-marketplaces/opensocrates")
+	marketplacePath := filepath.Join(hostRoot, ".agents/plugins/marketplace.json")
+	if platform.Mkdir(filepath.Dir(marketplacePath)) != nil || platform.Mkdir(stateDir) != nil {
+		return record(false)
+	}
+	marketplace := []byte(`{"name":"opensocrates","interface":{"displayName":"OpenSocrates"},"plugins":[{"name":"opensocrates","source":{"source":"local","path":"./build/generated/plugins/codex"},"policy":{"installation":"AVAILABLE","authentication":"ON_INSTALL"},"category":"Productivity"}]}` + "\n")
+	if platform.AtomicWrite(marketplacePath, marketplace, 0600) != nil {
+		return record(false)
+	}
 	marker := []byte("{\"schemaVersion\":1,\"marketplaceName\":\"opensocrates\",\"pluginName\":\"opensocrates\"}\n")
 	if platform.AtomicWrite(filepath.Join(hostRoot, management.MarkerName), marker, 0600) != nil {
-		return record(false)
-	}
-	if platform.Remove(filepath.Join(stateDir, "native-state.json")) != nil {
 		return record(false)
 	}
 	// Unknown fields and disabled integrations belong to the user. Adoption keeps
 	// the full prior JSON in the new state and never deletes an npm package.
 	desired := []byte(`{"schema":"opensocrates.desired-state/1.0.0","channel":"stable","installedHosts":["codex"],"activeVersion":"1.5.0","updatePolicy":{"intervalHours":24,"allowMajor":false},"autoUpdate":{"enabled":false,"hosts":[],"nextCheckAt":null},"future_user_owned_field":{"unicode":"한국","exact_integer":9007199254740993}}` + "\n")
+	stage = "prepare_legacy_desired_state"
 	if platform.AtomicWrite(filepath.Join(stateDir, "desired-state.json"), desired, 0600) != nil {
 		return record(false)
 	}
 	npmSentinel := filepath.Join(root, "npm-user-owned.json")
 	npmBytes := []byte("{\"do_not_remove\":true}\n")
+	stage = "prepare_foreign_npm_state"
 	if platform.AtomicWrite(npmSentinel, npmBytes, 0600) != nil {
 		return record(false)
 	}
-	if _, _, e := runAcceptanceProcess(fixture, []string{"plugin", "disable", "opensocrates@opensocrates"}, nil, env, work, 10*time.Second); e != nil {
-		return record(false)
+	stage = "prepare_legacy_registration"
+	for _, args := range [][]string{{"plugin", "marketplace", "add", hostRoot, "--json"}, {"plugin", "add", "opensocrates@opensocrates", "--json"}, {"plugin", "disable", "opensocrates@opensocrates"}} {
+		if _, stderr, e := runAcceptanceProcess(fixture, args, nil, env, work, 10*time.Second); e != nil || len(stderr) != 0 {
+			return record(false)
+		}
 	}
+	stage = "adopt_actual_native_candidate"
 	if _, e := manager.Handle(context.Background(), management.Request{Action: "adopt", Host: "codex", Package: packageRoot}); e != nil {
+		failureCode = diagnostics.CodeOf(e)
 		return record(false)
 	}
 	state, e := checkObject(filepath.Join(stateDir, "native-state.json"))
+	stage = "verify_update_owner_and_disabled_state"
 	if e != nil || state["update_owner"] != "native" || !acceptanceStateDisabled(state) {
 		return record(false)
 	}
 	old, e := checkJSON(filepath.Join(stateDir, "desired-state.json"))
+	stage = "verify_preserved_legacy_state"
 	if e != nil {
 		return record(false)
 	}
@@ -378,6 +426,7 @@ func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]
 		return record(false)
 	}
 	policy, e := checkObject(filepath.Join(stateDir, "update-policy.json"))
+	stage = "verify_disabled_update_policy"
 	if e != nil || policy["enabled"] != false {
 		return record(false)
 	}

@@ -131,6 +131,11 @@ func ParseControl(raw []byte) (Control, error) {
 	if e != nil {
 		return c, errors.New("invalid_json")
 	}
+	// The released parser classifies valid JSON with a non-object root as
+	// invalid_json; malformed object fields belong to invalid_payload.
+	if _, ok := v.(map[string]any); !ok {
+		return c, errors.New("invalid_json")
+	}
 	m, e := contracts.Object(v, "schema", "message_id", "turn_token", "message_type", "published", "payload")
 	if e != nil {
 		return c, ErrControl
