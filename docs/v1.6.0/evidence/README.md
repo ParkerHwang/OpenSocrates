@@ -72,3 +72,13 @@ The user's Windows 11 ARM64 VM supplies separate
 [native scheduler](native-vm-windows-arm64-scheduler.json) observations.
 Earlier x64 binaries executed through ARM64 emulation are supplemental only;
 they are never relabeled as native x64 or native ARM64 release qualification.
+
+## Additional preparation at 306b74c
+
+- [Development HTTPS update](development-https-update-306b74c.json): successful real TLS exchange and shared lifecycle activation/rollback under ephemeral development trust; production signing/public delivery/native self-update are false.
+- [Authenticated legacy selector](authenticated-legacy-selector-306b74c.json): actual pinned external CLI and protected existing login; synthetic request, content-free success within 8.5 seconds; no live conversation/quality claim.
+- [Actual Codex private registration](real-codex-registration-darwin-arm64-306b74c.json): real installed CLI and disposable configuration; supported lifecycle PASS, active auth/config unchanged; host-disabled/different-version/live activation explicitly not verified.
+- [Mac Developer ID signatures](macos-developer-id-signature-306b74c.json): actual user-authorized identity on manager/helper copies with hardened runtime/timestamps; notarization/production release remain false. Private keys/keychain credentials stay outside source and public evidence.
+
+Exact commands, account-resource boundaries and remaining prerequisites are in
+[release preparation](../RELEASE_PREPARATION.md) and the updated handoff.

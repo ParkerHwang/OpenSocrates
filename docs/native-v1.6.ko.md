@@ -4,7 +4,8 @@
 
 아직 출시하지 않은 Go 구현입니다. 아래 명령은 후보 동작을 설명하며 소스 검사
 통과가 운영 릴리스 검증은 아닙니다. 실제 결과·커밋·환경·남은 조건은 구현 인계에
-기록합니다. 운영 서명 자격과 신뢰 루트는 아직 제공하지 않았습니다. 별도 승인
+기록합니다. 현재 Mac의 Developer ID identity와 정본 Team ID는 확인했습니다.
+공증·보호된 CI 서명 환경·Windows 서명·운영 업데이트 루트는 별도 조건입니다. 별도 승인
 없이 사용 중인 설치를 후보로 교체하지 마세요.
 
 ## 다운로드와 최초 설치 신뢰
@@ -44,10 +45,12 @@ Claude Code가 없습니다. 사용자 기기에 Go·Python·Node.js·npm은 필
 ./opensocrates status --host codex
 ./opensocrates manage diagnose --host codex
 ./opensocrates update --host codex --package /absolute/path/to/new-bundle.zip
-./opensocrates disable --host codex
-./opensocrates enable --host codex
 ./opensocrates remove --host codex
 ```
+
+Codex 활성 상태는 호스트 자체 설정에서 관리합니다. Go 관리 도구는 설치·이전·
+업데이트 때 그 상태를 보존합니다. `enable`·`disable` 관리 명령은 Claude와
+Antigravity를 지원하며 Codex에서는 미지원 결과를 반환합니다.
 
 기본값과 `--host all`은 Codex만 가리키며 모든 연동을 다루지 않습니다. 다른
 프로필은 명시합니다.

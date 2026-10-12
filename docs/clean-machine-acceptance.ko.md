@@ -2,7 +2,7 @@
 
 [English](clean-machine-acceptance.md) · [네이티브 안내](native-v1.6.ko.md)
 
-관리 설치·등록·상태·예약 작업이 없던 별도 macOS ARM64 또는 Windows x64
+관리 설치·등록·상태·예약 작업이 없던 별도 macOS ARM64 또는 Windows x64/ARM64
 기기를 사용합니다. 사용한 기기나 임시 home은 새 기기 증거가 아닙니다.
 승인된 자산·소스 커밋·콘텐츠 기준·성공한 네이티브 CI를 연결한 뒤 변경합니다.
 사용자는 네이티브 자산·외부 호스트 앱/로그인만 필요하며 Go·Python·Node.js·
@@ -26,7 +26,7 @@ go run ./src/opensocrates/cmd/opensocrates-dev acceptance lifecycle --binary /ab
 ```
 
 이 검사는 **fixture 증거**이며 새 기기·인증된 실제 호스트 증거가 아닙니다.
-통합 후 명시한 네이티브 대상에서 실행합니다. Windows 결과는 실제 Windows x64가
+통합 후 명시한 네이티브 대상에서 실행합니다. Windows 결과는 실제 Windows x64/ARM64가
 필요하며 크로스 컴파일은 불충분합니다.
 
 공개 결과에는 커밋·플랫폼/자산 식별·명령 이름과 결과·제한된 범주 관찰·누락만

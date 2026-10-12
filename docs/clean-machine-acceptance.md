@@ -2,7 +2,7 @@
 
 [한국어](clean-machine-acceptance.ko.md) · [Native guide](native-v1.6.md)
 
-Use a separately configured macOS ARM64 or Windows x64 machine that has never
+Use a separately configured macOS ARM64 or Windows x64/ARM64 machine that has never
 had the managed installation, registrations, user state or scheduler. A used
 machine or a temporary home is not clean-machine evidence. Bind approved
 candidate assets, source commit, content baseline and successful native CI run
@@ -33,7 +33,7 @@ go run ./src/opensocrates/cmd/opensocrates-dev acceptance lifecycle --binary /ab
 
 This harness is **fixture evidence**, not clean-machine or authenticated live
 host evidence. Run it only after integration and on the reported native target.
-Windows results must come from Windows x64; cross-compilation is insufficient.
+Windows results must come from the reported x64 or ARM64 architecture; cross-compilation and x64 emulation on ARM64 are insufficient.
 
 Public reports contain only exact commit, platform/artifact identities, command
 names/results, bounded categorical observations and missing evidence. Exclude

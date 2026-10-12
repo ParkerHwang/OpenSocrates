@@ -5,7 +5,9 @@
 This is the unreleased Go implementation. Commands describe candidate behavior;
 passing source checks does not qualify a production release. Actual results,
 commit, environment and remaining gates belong in the implementation handoff.
-No production signing credentials or trusted production root are provisioned.
+The current Mac has a verified Developer ID identity and canonical Team ID.
+Notarization, protected signing runners, Windows signing and the production
+update root remain unqualified; see the release preparation/handoff.
 Do not install this candidate over an active installation without authorization.
 
 ## Download and first-install trust
@@ -46,10 +48,12 @@ scope must remain the same for status, updates, disable/enable and removal.
 ./opensocrates status --host codex
 ./opensocrates manage diagnose --host codex
 ./opensocrates update --host codex --package /absolute/path/to/new-bundle.zip
-./opensocrates disable --host codex
-./opensocrates enable --host codex
 ./opensocrates remove --host codex
 ```
+
+Codex enabled state belongs to the host's own controls. Go management preserves
+that state during installation/adoption/update; `enable`/`disable` management
+commands support Claude and Antigravity, and return unsupported for Codex.
 
 The default and `--host all` mean Codex only. They do not install, update or
 remove every integration. Additional profiles require explicit selection:
@@ -207,8 +211,9 @@ path with the same command shape; this does not change the shell boundary.
 
 Canonical production trust data is `config/update/root.json` and
 `config/update/identities.json`, embedded by Go generation under
-`internal/update/trustconfig`. The candidate has no approved production root or
-platform publisher identities. Mutable update policy, categorical receipts and
+`internal/update/trustconfig`. The candidate has no approved production root or Windows publisher identity.
+The Mac Team ID is bound to the user-authorized Developer ID certificate; local
+signing evidence does not replace notarization and production qualification. Mutable update policy, categorical receipts and
 accepted TUF trust state remain separate in installation-private storage.
 
 The compiled content bundle changes only release metadata `product_version` to

@@ -39,11 +39,11 @@ Prerequisite failures remain unavailable. / 명시적인 검증에서 기존 로
 
 ## Observed prerequisites / 확인한 준비 상태
 
-Read-only checks on 2026-10-12 found no valid code-signing identities in the
+Initial read-only checks on 2026-10-12 found no valid code-signing identities in the
 current Mac keychain, no repository release environments or self-hosted runners
 listed by GitHub, and empty production publisher IDs/root inputs. The GitHub
 Pages GET returned 404: the API did not establish a configured accessible site.
-Immutable releases were verified enabled. / 현재 Mac의 서명 identity는 0개,
+Immutable releases were verified enabled. / 최초 확인 시 Mac의 서명 identity는 0개,
 GitHub 배포 환경·전용 runner 목록도 0개입니다. 운영 identity는 비어 있고 루트는
 `{}`입니다. Pages 조회는 404로 설정·접근 가능 상태를 확인하지 못했습니다.
 Immutable release 설정은 켜짐을 확인했습니다.
@@ -58,12 +58,47 @@ identity/contact details or credentials are retained here. / Apple 유료 회원
 발급 목록은 미확인입니다. 계약 검토 화면만 열었으며 동의·인증서 변경은 하지
 않았습니다. 개인정보·자격 증명은 이 문서에 기록하지 않습니다.
 
+## Completed in this follow-up / 이번에 완료한 준비
+
+The user accepted the account agreement, then authorized Developer ID
+Application issuance for OpenSocrates. The public certificate was issued and
+matched to the locally generated private key; the code-signing usage, account
+team, validity and Apple certificate chain were verified. Only the public CSR
+was uploaded. The private key and a dedicated signing keychain remain on this
+Mac, outside the repository. Existing keychain item ACLs were not changed; a
+new owned signing keychain avoids changing access rules for unrelated keys.
+The public Mac Team ID is now bound in canonical/embedded publisher configuration.
+The TUF root remains `{}` and the Windows identity remains unprovisioned.
+/ 사용자가 계약에 동의했고 OpenSocrates용 인증서를 발급했습니다. 개인키 일치·
+용도·팀·유효기간·Apple 인증 경로를 확인했습니다. 공개 CSR만 업로드했으며
+개인키·전용 키체인은 Mac에만 있습니다. 기존 키의 접근 규칙은 변경하지 않았고,
+공개 Mac Team ID만 정본·임베드 설정에 반영합니다. TUF 루트는 비어 있습니다.
+
+Actual Developer ID signatures, hardened runtime, trusted team and secure
+Apple timestamps passed for disposable copies of the manager and update helper
+at source 306b74c. This does not qualify notarization, Gatekeeper activation,
+protected CI signing runners or a production release. / 관리자·도우미 복사본의 실제
+서명·강화 런타임·팀·타임스탬프가 통과했습니다. 공증·Gatekeeper·CI 서명 환경·
+운영 릴리스 검증과 구분합니다.
+
+The explicit authenticated 0.144.4 selector passed one synthetic selection
+within 8.5 seconds. A post-run observation found zero matching selector
+processes and zero selector temporary directories. Actual Codex
+0.162.0-alpha.17.2 private install/status/diagnose/same-version-update/remove
+also passed, with active auth/config bytes unchanged. Different-version update,
+host-disabled preservation and user-approved live session activation are not
+claimed by that private registration probe. The development HTTPS gate passed
+signed retrieval, bounded archive/lifecycle rollback and rejection preservation.
+/ 실제 인증된 선택은 8.5초에 통과했고 종료 뒤 해당 프로세스·임시 디렉터리가
+남지 않았습니다. 실제 Codex의 격리 설치·진단·동일 버전 갱신·제거도 통과했습니다.
+새 버전 적용·비활성 호스트 보존·신뢰 승인·실제 대화 적용을 과장하지 않습니다.
+
 ## User resources and approvals / 사용자 준비·승인
 
 | Area / 구분 | Concrete prerequisite / 준비할 항목 | Boundary / 구분 |
 | --- | --- | --- |
-| Apple account / Apple 계정 | Review/accept the displayed latest Developer Program agreement; access Certificates / 표시된 새 약관 검토·동의 후 인증서 목록 접근 | Contract consent is a distinct account-owner decision / 계약 동의는 별도 결정 |
-| Mac signing / Mac 서명 | Developer ID Application certificate plus its private key in the isolated Mac signing runner's keychain / 인증서·개인키를 격리 Mac runner 키체인에 준비 | `OPENSOCRATES_MAC_SIGN_IDENTITY`, `OPENSOCRATES_MAC_TEAM_ID`; verify public `darwin_team_id` |
+| Apple account / Apple 계정 | Completed: agreement accepted and certificate issued / 계약 동의·인증서 발급 완료 | Contract consent is a distinct account-owner decision / 계약 동의는 별도 결정 |
+| Mac signing / Mac 서명 | Current Mac ready; separately provision the isolated CI signing runner / 현재 Mac 준비 완료, 격리 CI 서명 runner는 별도 준비 | `OPENSOCRATES_MAC_SIGN_IDENTITY`, `OPENSOCRATES_MAC_TEAM_ID`; verify public `darwin_team_id` |
 | Mac notarization / Mac 공증 | An authenticated notarytool keychain profile / 공증용 키체인 프로필 | `OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE` names the profile; passwords/API keys stay outside source/chat |
 | Windows signing / Windows 서명 | SignPath Foundation application handled in the separate user chat; approved project/policy and hosted integration details / 별도 채팅의 무료 신청 승인·프로젝트/policy 정보 | Application and release signing approval are different; see hosted workflow constraints below |
 | Update trust / 업데이트 신뢰 | Independently approved public threshold root, publisher certificate identity, offline root custody and online metadata key handling / 승인한 공개 루트·서명자·오프라인 키 보관·온라인 역할 키 운영 | Root threshold at least 2, consistent snapshots, expiry beyond 30 days; no test keys promoted |

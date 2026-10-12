@@ -42,13 +42,27 @@ Commands/results:
 
 The user VM is Windows 11 ARM64. Its [native lifecycle](evidence/native-vm-windows-arm64-lifecycle.json) and [native scheduler](evidence/native-vm-windows-arm64-scheduler.json) passed with verified ARM64 artifacts, including packaged helper replacement/recovery. Earlier x64-emulation observations are supplemental. A contaminated disposable Mac transfer ZIP was rejected for 465 AppleDouble extras; the unchanged payload passed after metadata-free transfer into fresh staging. All temporary scheduler tasks were removed. Older diagnostic folders without a byte-identity sidecar were retained intentionally; modified/unverifiable files are never deleted indiscriminately. Existing installations, accounts, settings and trust decisions were preserved.
 
+## Additional release preparation at 306b74c
+
+[CI 38247473916](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38247473916)
+passed source and native macOS ARM64/Windows x64/Windows ARM64 at
+306b74cdf0efa4000dcee8a5656e287890d8a45d. The exact full local Make suite also
+passed at that revision. New explicit Go acceptance commands are documented in
+[release preparation](RELEASE_PREPARATION.md); ordinary tests do not call models.
+
+- [Development HTTPS update](evidence/development-https-update-306b74c.json): real verified HTTPS through production transport/repository, authentic development metadata/archive, bounded synthetic extraction, shared lifecycle commit/rollback; tamper/expiry/metadata rollback/offline preserve payload. Production public delivery/native self-update remain separate.
+- [Authenticated legacy selector](evidence/authenticated-legacy-selector-306b74c.json): actual official external Codex 0.144.4, existing protected login, one synthetic request with transcript off, completed valid catalog selection in 8.5 seconds. Post-success observation: zero matching processes/temporary selector directories. This qualifies authenticated adapter operation, not live host delivery/answer quality.
+- [Real Codex private lifecycle](evidence/real-codex-registration-darwin-arm64-306b74c.json): installed actual CLI 0.162.0-alpha.17.2, private install/status/diagnose/same-version update/remove/final status PASS; active auth/config unchanged. Codex toggle state belongs to host controls; unsupported manager toggle examples are corrected in EN/KO. Host-disabled/different-version/live activation are not claimed by this probe.
+- [Actual Mac Developer ID signature](evidence/macos-developer-id-signature-306b74c.json): user-authorized certificate issuance after direct agreement acceptance, public/private pair and Apple chain verified, dedicated owned keychain, manager/helper copies signed with verified hardened runtime, matching team and secure timestamp. Private signing material never entered source or left the Mac. Local signing does not establish notarization or protected release runner qualification.
+- Canonical/embedded Mac Team ID now matches that approved account. Production TUF root remains `{}`; Windows publisher pin is empty. Existing protected-tag/publication guards were not bypassed. No release/active-installation replacement was performed.
+
 ## Remaining release gates
 
 Available implementation acceptance passes; this candidate is **not production-release validated**.
 
-1. Provision an independently approved threshold-signed TUF root/publisher identities, platform signing/notarization/Authenticode resources, metadata service/key custody and scoped Administration-read publication credential. Test trust cannot become production trust. Release-check fails closed without production platform signatures.
+1. Provision an independently approved threshold-signed TUF root, Windows publisher identity, Mac notarization credentials and protected signing runners, Windows hosted signing, metadata service/key custody and scoped Administration-read publication credential. Local Mac Developer ID issuance and signature checks now pass; production release qualification remains separate. Test trust cannot become production trust. Release-check fails closed without production platform signatures.
 2. Qualify public signed network updates and complete production installer/manager/updater self-update/rollback with production trust, security prompts and timestamps.
 3. Complete Windows adoption beginning with a successfully executed original v1.5 installer in a compatible user environment. Actual-payload Go adoption/rollback now passes, but its source-equivalent initialization does not meet that original-installer gate. Also complete macOS production fixed-label/updater-execution qualification. Released v1.5.0 explicitly supported automatic updates only on macOS ARM64; its Windows installer reports them unavailable, so there is no supported enabled Windows legacy scheduler to adopt. Enabled macOS takeover and rollback now have integrated real-OS evidence under the disclosed unique-label and suppressed-execution fixture boundaries.
-4. Obtain clean-machine and real host trust/activation, authenticated legacy app-server, account/workspace/global and CLI/Desktop evidence. Local updates cannot modify account content or running conversations. External host ARM64 availability/loading remains host-specific qualification.
+4. Obtain clean-machine and real host trust/activation, account/workspace/global and CLI/Desktop evidence. Authenticated macOS legacy adapter operation now has a synthetic live-account receipt; actual delivery/answer quality remain distinct. Local updates cannot modify account content or running conversations. External host ARM64 availability/loading remains host-specific qualification.
 
 Next: complete these release gates, then protected review/release workflow. No merge/tag/production publication/active-installation replacement is authorized. PR remains Draft. SSH upload and workflow editing access are verified; production signing/trust is a separate requirement.
