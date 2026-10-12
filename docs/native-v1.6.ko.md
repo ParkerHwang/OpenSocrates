@@ -186,7 +186,9 @@ ARM64는 같은 명령 형식의 `runtime/windows-arm64/` 경로를 사용하며
 
 운영 신뢰 정본은 `config/update/root.json`·`config/update/identities.json`이며
 Go 생성으로 `internal/update/trustconfig`에 내장합니다. 후보에는 승인된 운영
-루트·플랫폼 게시자 식별이 없습니다. 업데이트 정책·범주형 결과·승인한 TUF 상태는
+루트·Windows 게시자 식별이 없습니다. Mac Team ID는 사용자 요청으로 발급한
+Developer ID 인증서에 연결되며 로컬 서명과 공증·운영 검증은 구분합니다.
+업데이트 정책·범주형 결과·승인한 TUF 상태는
 별도 비공개 설치 상태입니다.
 
 컴파일 콘텐츠 묶음은 릴리스 메타데이터 `product_version`만 `1.6.0`으로 바꿉니다.
@@ -249,8 +251,9 @@ Windows ARM64를 v1.6.0에 추가했습니다. Codex CLI/Desktop, Antigravity �
 단독 다운로드 파일은 실제 내려받은 이름으로 실행하세요.
 
 예약은 사용자 opt-in·stable·24시간·로그인 지연이며 신뢰·비활성·단일 소유자를
-보존합니다. 실제 ARM64 설치·ACL/reparse/잠금·보조 프로그램·중단·롤백·예약·
-호스트 적용 증거는 아직 주장하지 않으며 해당 아키텍처에서 검증해야 합니다.
+보존합니다. 실제 ARM64 네이티브 CI의 설치·ACL/reparse/잠금·보조 프로그램·
+중단·롤백·예약 결과는 구현 인계에 기록합니다. 운영 서명·새 기기·실제 호스트
+적용 증거는 별도이며 에뮬레이션 결과를 네이티브 통과로 승격하지 않습니다.
 
 공식 [Codex 0.144.4 릴리스](https://github.com/openai/codex/releases/tag/rust-v0.144.4)에
 `aarch64-pc-windows-msvc` CLI·app-server 실행파일이 있습니다. 배포 가용성

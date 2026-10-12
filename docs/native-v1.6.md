@@ -282,9 +282,10 @@ Examples using `.\opensocrates.exe` refer to the bundle's extracted native
 `bin/` executable; use the actual downloaded filename when running standalone.
 
 The scheduler remains per-user, opt-in stable/24-hour/delayed-login, preserving
-trust/disabled state and one update owner. Native ARM64 evidence is not yet
-claimed; actual installation, ACL/reparse/locks, helper replacement, interruption,
-rollback, scheduler and host activation require an ARM64 run.
+trust/disabled state and one update owner. Native ARM64 CI installation,
+ACL/reparse/locks, helper replacement, interruption, rollback and scheduler
+results are recorded in the implementation handoff. Production signing,
+clean-machine and actual host activation remain separate evidence gates.
 
 The official [Codex 0.144.4 release](https://github.com/openai/codex/releases/tag/rust-v0.144.4)
 provides `aarch64-pc-windows-msvc` CLI/app-server executables. These upstream
