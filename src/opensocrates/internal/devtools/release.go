@@ -7,6 +7,7 @@ import (
 	"debug/buildinfo"
 	"debug/pe"
 	"fmt"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/update"
 	"io"
@@ -232,6 +233,24 @@ func verifyHelperSignature(path, target string) error {
 }
 
 func verifyMacReleaseSignature(path string) error {
+	if !filepath.IsAbs(path) {
+		// The documented release package path is relative to the checkout.
+		// Resolve it without relaxing the platform's lexical-alias policy.
+		clean := filepath.Clean(path)
+		if path == "" || strings.ContainsRune(path, 0) || (clean != path && clean+string(os.PathSeparator) != path) {
+			return diagnostics.New(diagnostics.Permission, "filesystem")
+		}
+		for _, component := range strings.Split(clean, string(os.PathSeparator)) {
+			if component == "." || component == ".." {
+				return diagnostics.New(diagnostics.Permission, "filesystem")
+			}
+		}
+		absolute, e := filepath.Abs(path)
+		if e != nil {
+			return diagnostics.New(diagnostics.Permission, "filesystem")
+		}
+		path = absolute
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	return platform.VerifyNativeSignature(ctx, path, update.DefaultNativeTrust())

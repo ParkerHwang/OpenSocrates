@@ -1,15 +1,64 @@
 package devtools
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
 	"reflect"
 	"runtime"
 	"testing"
+	"time"
 
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 )
+
+func TestMacReleaseRelativePackagePathReachesCodeVerifier(t *testing.T) {
+	if runtime.GOOS != "darwin" {
+		t.Skip("requires native Apple code-signing tools")
+	}
+	self, err := os.Executable()
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(self)
+	if err != nil {
+		t.Fatal(err)
+	}
+	root := filepath.Join(t.TempDir(), "private")
+	if err = platform.Mkdir(root); err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(root, "bare-cli")
+	if err = platform.AtomicWrite(path, data, 0755); err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	if _, err = platform.Run(ctx, "/usr/bin/codesign", []string{"--force", "--sign", "-", path}, platform.RunOptions{OutputLimit: 64 << 10}); err != nil {
+		t.Fatal("could not prepare ad-hoc Mach-O fixture")
+	}
+	t.Chdir(root)
+	for _, candidate := range []string{path, "bare-cli"} {
+		err = verifyMacReleaseSignature(candidate)
+		var typed *diagnostics.Error
+		if !errors.As(err, &typed) || typed.Code != diagnostics.Verification || typed.Stage != "native_trust" {
+			t.Fatalf("owned ad-hoc path did not reach the native signature verifier: %v", err)
+		}
+	}
+	link := "bare-cli-link"
+	if err = os.Symlink("bare-cli", link); err != nil {
+		t.Fatal(err)
+	}
+	for _, candidate := range []string{link, "./bare-cli", "unused/../bare-cli", "../private/bare-cli", root + "/../private/bare-cli"} {
+		err = verifyMacReleaseSignature(candidate)
+		var typed *diagnostics.Error
+		if !errors.As(err, &typed) || typed.Code != diagnostics.Permission || typed.Stage != "filesystem" {
+			t.Fatalf("symlink or lexical alias bypassed the filesystem guard: %v", err)
+		}
+	}
+}
 
 func TestNativeReleaseAuthenticatesBothExecutablesBeforeExecution(t *testing.T) {
 	for _, target := range []string{"darwin-arm64", "windows-x64", "windows-arm64"} {
