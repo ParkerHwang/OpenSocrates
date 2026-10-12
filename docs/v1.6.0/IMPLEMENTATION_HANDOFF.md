@@ -87,6 +87,39 @@ environments, Actions variables/secrets and final tag. The
 migration proposal, runner choices and cloud-secret/reviewer decisions. No
 production pipeline or cloud credential transfer was performed by these checks.
 
+Final candidate platform qualification at
+**8b677f58828b3e3d5dea0d4d53017f18d7caf809** is retained in the
+[exact notarization receipt](evidence/macos-candidate-notarization-8b677f5.json).
+The rebuilt native ZIP and standalone installer both received Apple `Accepted`
+with zero issues and matching archive/code hashes. All four packaged Mach-O
+files and the standalone installer pass the full pinned Developer ID/team/
+notarized requirement. Wrong-team code is rejected. Native unsigned, ad-hoc,
+modified-code and signed-but-unnotarized negatives retain their d5f55fc source
+identity; that native trust code is unchanged by the relative-path follow-up.
+`make release-check` now exits 0 and reports `RELEASE_PLATFORM_INTEGRITY_OK` using
+its documented relative package path. The path adapter keeps lexical-alias,
+symlink and ownership rejection rather than relaxing the platform guard.
+
+The exact full Make suite passed at d5f55fc; incremental
+`make format-check lint`, `go test ./src/opensocrates/internal/devtools`, native
+build/package/provenance and final signed `make release-check` passed at
+8b677f5. Code/security reviews found no actionable findings in either source
+change. Apple acceptance briefly preceded local ticket availability at d5f55fc;
+unchanged files later passed without OS/cache changes or resubmission. The
+cause between cache and server propagation was not established. Clean-machine
+quarantined download, offline ticket behavior, protected signing runners and
+final merged-tag production trust/publication remain separate gates.
+
+CI run 38271650284 passed source and native macOS ARM64/Windows x64/Windows
+ARM64 at 8b677f5 after rerunning only its failed Windows x64 job at the same
+commit. No source, deadline or check changed between attempts.
+The Windows x64 native-install attempt hit its unchanged 30-second deadline
+after 30.004 seconds with empty stdout/stderr. The
+[original failure receipt](evidence/windows-x64-ci-timeout-8b677f5.json) is
+retained. The initial timeout's cause remains unknown. The production
+`release-identity` command on this untagged candidate exits 1 with
+`release_exact_tag_required`, as required; no Actions/tag inputs were faked.
+
 Additional original-Windows qualification at 001c75a used an isolated restricted
 current-user primary token. The new file owner matched the user and original
 owner/groups/privileges/default DACL remained unchanged. The original installer
@@ -100,7 +133,7 @@ needed; do not weaken guards or change account/system/desktop policies.
 
 Available implementation acceptance passes; this candidate is **not production-release validated**.
 
-1. Provision an independently approved threshold-signed TUF root, Windows publisher identity and protected signing runners, Windows hosted signing, metadata service/key custody and scoped Administration-read publication credential. Local Mac Developer ID issuance, signature checks and saved-profile notarization authentication now pass; the isolated runner and actual archive notarization remain unqualified. Test trust cannot become production trust. Release-check fails closed without production platform signatures.
+1. Provision an independently approved threshold-signed TUF root, Windows publisher identity and protected signing runners, Windows hosted signing, metadata service/key custody and scoped Administration-read publication credential. Local Mac Developer ID issuance, authentication and exact candidate signing/notarization/platform integrity now pass; the isolated runner and final merged-tag bytes remain unqualified. Test trust cannot become production trust. Apply the reviewed Go required-check migration only with the user's approval.
 2. Qualify public signed network updates and complete production installer/manager/updater self-update/rollback with production trust, security prompts and timestamps.
 3. Complete Windows adoption beginning with a successfully executed original v1.5 installer in a compatible user environment. Actual-payload Go adoption/rollback now passes, but its source-equivalent initialization does not meet that original-installer gate. Also complete macOS production fixed-label/updater-execution qualification. Released v1.5.0 explicitly supported automatic updates only on macOS ARM64; its Windows installer reports them unavailable, so there is no supported enabled Windows legacy scheduler to adopt. Enabled macOS takeover and rollback now have integrated real-OS evidence under the disclosed unique-label and suppressed-execution fixture boundaries.
 4. Obtain clean-machine and real host trust/activation, account/workspace/global and CLI/Desktop evidence. Authenticated macOS legacy adapter operation now has a synthetic live-account receipt; actual delivery/answer quality remain distinct. Local updates cannot modify account content or running conversations. External host ARM64 availability/loading remains host-specific qualification.

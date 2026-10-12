@@ -114,6 +114,18 @@ Apple 공증 승인을 받았고 처리 로그의 경고·오류는 0개입니�
 관리자와 도우미를 모두 인증한 뒤 버전 명령을 실행합니다. 재빌드 결과는 구현 인계에
 기록하며 바이너리가 바뀌면 다시 공증합니다.
 
+The rebuilt candidate at 8b677f5 also received Apple acceptance for its native
+ZIP and separate installer with zero issues. Full pinned notarization checks
+pass for all five distributed files, and the documented relative-path
+`make release-check` now passes. The exact
+[candidate receipt](evidence/macos-candidate-notarization-8b677f5.json) retains
+hashes, submission identities, source and qualification boundaries. This is
+candidate platform integrity, not final merged-tag, protected-runner or
+clean-machine qualification. / 8b677f5의 재빌드 ZIP·별도 설치기도 공증 승인을 받았고
+경고·오류는 없습니다. 배포 실행파일 5개의 고정 서명·공증 검사와 기본 상대 경로의
+배포 검사가 통과했습니다. 정확한 소스·해시·제출 식별자를 후보 증거에 기록합니다.
+최종 병합 태그·보호된 실행 환경·새 기기 검증은 별도 조건입니다.
+
 The read-only [release environment review](RELEASE_ENVIRONMENT_REVIEW.md) records
 missing runners/environments and the required-check migration proposal. It does
 not configure cloud secrets or authorize publication. / 릴리스 환경 검토는 필요한
