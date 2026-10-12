@@ -58,12 +58,16 @@ upload the standalone account ZIP, review it and enable it. If an OpenSocrates
 skill already exists, back up that skill and its enabled state before replacing
 it. Qualify the replacement while preserving the original backup. Do not upload a native Mac companion ZIP in place of the account ZIP.
 
-Ask ordinary synthesis, decision or message-drafting tasks. The host model
-selects the account skill; there is no hook or every-turn enforcement. An
-explicit request to use OpenSocrates can diagnose a missed selection, but does
-not prove automatic matching. Web Chat, Desktop Chat and current cloud Cowork
-require separate observations. Successful export or upload is not proof of
-selection, complete procedure reading, application or a useful result.
+For ordinary requests without repeating `/opensocrates`, append the
+[one-time standing instruction](setup-guide.md#claude-standing-instructions)
+to **Settings → General → Instructions for Claude** (older Cowork:
+**Settings → Cowork → Global instructions**). Preserve existing instructions and
+configure each account you use, then start a fresh conversation. The host model
+still selects the skill; there is no native hook or every-turn enforcement. An
+explicit request can diagnose missed selection but does not prove automatic
+matching. Web Chat, Desktop Chat and current cloud Cowork require separate
+observations. Export or upload alone does not prove selection, complete procedure
+reading, application or a useful result.
 
 ## Antigravity conversation application
 

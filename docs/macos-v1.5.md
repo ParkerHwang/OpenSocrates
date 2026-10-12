@@ -129,11 +129,15 @@ enabled state, and qualify the replacement before deleting the original. Avoid
 simultaneous duplicate controller origins in Code when account content syncs.
 Upload acceptance is not activation or result proof.
 
-Describe ordinary synthesis/decision/message tasks. Account matching is chosen
-by the host model; a missed selection can be retried with an explicit request to
-use OpenSocrates. Chat, Desktop Chat, and current cloud Cowork need separate
-observations. The account ZIP does not provide native hooks or every-message
-enforcement, and the native companion ZIP must not be uploaded in its place.
+For ordinary requests without repeating `/opensocrates`, append the
+[one-time standing instruction](setup-guide.md#claude-standing-instructions)
+to the account's **Settings → General → Instructions for Claude** (older Cowork:
+**Settings → Cowork → Global instructions**). Preserve existing instructions and
+configure each account you use, then start a fresh conversation. Account matching
+is still model-selected. An explicit request can diagnose missed selection but
+does not prove automatic use. Chat, Desktop Chat and current cloud Cowork remain
+separate observations. The account ZIP supplies no native hooks or every-message
+enforcement; do not upload the native companion ZIP in its place.
 
 ## Attribution and evidence boundaries
 

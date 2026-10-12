@@ -57,12 +57,15 @@ npx --yes opensocrates@1.5.0 export --host claude-chat --output $accountOutput
 교체 전에 해당 스킬과 활성화 상태를 백업합니다. 원본 백업을 보존한 채
 교체본을 검증합니다. 계정 ZIP 대신 네이티브 Mac 연동 ZIP을 업로드하지 않습니다.
 
-평소처럼 자료 종합·판단·메시지 작성을 요청합니다. 호스트 모델이 계정
-스킬을 선택하며 훅이나 매 턴 강제 적용은 없습니다. OpenSocrates를 사용해
-달라는 명시적 요청으로 선택 누락을 확인할 수 있지만 자동 선택의 증거가
-되지는 않습니다. 웹 Chat·Desktop Chat·현재 클라우드 Cowork는 각각
-관찰해야 합니다. 내보내기나 업로드 성공만으로 선택, 전체 절차 읽기,
-적용 또는 쓸 수 있는 결과가 증명되지는 않습니다.
+`/opensocrates`를 반복하지 않고 일반 요청에서 쓰려면
+[상시 지침을 한 번 추가](setup-guide.ko.md#claude-standing-instructions)합니다.
+계정의 **Settings → General → Instructions for Claude**(이전 Cowork:
+**Settings → Cowork → Global instructions**)에 기존 지침을 보존하면서
+추가하고, 사용하는 각 계정에 설정한 뒤 새 대화를 시작합니다. 호스트 모델이
+여전히 스킬을 선택하며 네이티브 훅이나 매 턴 강제 적용은 없습니다. 직접 사용을
+요청해 선택 누락을 확인할 수 있지만 자동 선택의 증거는 아닙니다. 웹 Chat·Desktop
+Chat·현재 클라우드 Cowork는 각각 관찰합니다. 내보내기나 업로드만으로 선택,
+전체 절차 읽기, 적용 또는 쓸 수 있는 결과가 증명되지는 않습니다.
 
 ## Antigravity 대화 애플리케이션
 

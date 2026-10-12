@@ -30,16 +30,17 @@ or use the [npm installer](https://www.npmjs.com/package/opensocrates/v/1.5.0).
 | --- | --- | --- |
 | Codex | Existing hooks, controller and native decision runtime | Apple-silicon Mac and Windows x64; review the seven hooks in an interactive session |
 | Claude Code CLI / Desktop local Code | Stateless native entry and complete installed references | Apple-silicon Mac; requires the Claude CLI, host login and plugin/hook permissions |
-| Claude web / Desktop Chat / Cowork | Standalone content-only account skill ZIP | Export on Mac or Windows; upload and enable through the account's Skills interface |
+| Claude web / Desktop Chat / Cowork | Standalone content-only account skill ZIP | Export on Mac or Windows; upload, enable and add the one-time account instructions below |
 | Antigravity conversation application | Owned modular rule and skill | Apple-silicon Mac and Windows x64; choose workspace or global scope |
 
 Windows native Claude Code in a terminal or Desktop Code is outside this
 release's scope. Account content does not install a native Claude integration.
 See the [Mac guide](docs/macos-v1.5.md) and [Windows guide](docs/windows-v1.5.md).
 
-Normal requests need no repeated OpenSocrates command. Trusted native hooks and
-Antigravity's standing rule provide entry; account skills are selected by the
-host model and may be missed. Installation, loading, complete reads, application,
+Trusted native hooks and Antigravity's standing rule provide entry during normal
+requests. For Claude account skills, add the standing instruction below to use
+OpenSocrates without repeating its name. Selection still depends on the host
+model and can be missed. Installation, loading, complete reads, application,
 and useful outcomes are separate evidence levels. No general quality, token-cost,
 or latency improvement is claimed.
 
@@ -87,6 +88,28 @@ folder, then upload and enable the ZIP in Claude's Customize > Skills interface:
 ```sh
 npx --yes opensocrates@1.5.0 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.0-account.zip
 ```
+
+### Claude Chat and Cowork: one-time account instructions
+
+For use without typing `/opensocrates` on each request, enable the account skill
+and append this instruction in **Settings → General → Instructions for Claude**.
+Preserve your existing instructions. In older Cowork interfaces, use
+**Settings → Cowork → Global instructions**; if Web and Desktop use different
+accounts, configure each account you use.
+
+```text
+For requests that require interpretation or judgment, such as synthesizing
+sources, comparing options, making decisions or drafting messages, load the
+enabled OpenSocrates skill and follow its instructions even when I do not
+mention it. Read the complete procedure and check applicability before applying
+a reasoning method. Do not add unnecessary procedures to mechanical work such
+as formatting.
+```
+
+Save once, then start a fresh conversation and describe your task normally.
+The instruction guides model-selected skill use; it adds no native hook or
+guaranteed every-turn enforcement. See the [step-by-step setup guide](docs/setup-guide.md#claude-standing-instructions)
+and [Claude's official instruction settings](https://support.claude.com/en/articles/10185728-understanding-claude-s-personalization-features).
 
 The platform guides cover Windows paths, account replacement, updates, disabling,
 removal, and verified local-archive alternatives. With no local asset flags,

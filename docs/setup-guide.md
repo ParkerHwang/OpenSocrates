@@ -4,11 +4,12 @@
 
 After installation, check **only the apps you use**. Codex requires hook trust
 approval. Claude account skills need the required capability and the skill to
-be enabled. Claude Code needs its plugin enabled. In Antigravity, check the
+be enabled, plus a one-time standing instruction for use without naming the
+skill. Claude Code needs its plugin enabled. In Antigravity, check the
 installed rule and skill.
 
-This guide is current as of October 10, 2026. Screenshots come from Claude
-Desktop 2.31226.1 and Antigravity 2.22.0 on macOS. Codex CLI 0.145.0 commands and
+Instruction steps were updated on October 12, 2026. The October 10 screenshots
+come from Claude Desktop 2.31226.1 and Antigravity 2.22.0 on macOS. Codex CLI 0.145.0 commands and
 the official hook guide were inspected. No Windows screenshots are included.
 Menu names may vary by app version, language and account policy.
 
@@ -17,7 +18,7 @@ Menu names may vary by app version, language and account policy.
 | Where you use it | What the installer handles | What to check afterward |
 | --- | --- | --- |
 | Codex | Package verification, plugin registration and activation | OpenSocrates hook trust in `/hooks`, any required approval, then a fresh conversation |
-| Claude web / Desktop Chat / Cowork | Account ZIP verification and export | Code execution and the OpenSocrates skill enabled in the correct account |
+| Claude web / Desktop Chat / Cowork | Account ZIP verification and export | Code execution and skill enabled in the correct account; standing instruction saved for use without naming the skill |
 | Claude Code, local Mac | Native plugin installation, registration and activation | Plugin enabled in local Code, then a fresh session |
 | Antigravity | Rule and skill files in the selected global or workspace scope | Rule and skill visible in that scope in the app, then a fresh conversation |
 
@@ -46,6 +47,9 @@ Respect that --host all handles Codex only.
 Avoid duplicate global and workspace Antigravity entries. Preserve intentionally
 disabled test copies and unrelated settings.
 Before replacing a Claude account skill, back up its files and enabled state.
+For use without naming the account skill, append the standing instruction in
+section 2-4 to the account's Instructions for Claude (older Cowork: Global
+instructions). Preserve existing instructions; configure each account I use.
 
 Proceed with installation, file verification, plugin registration, permitted
 ordinary settings and completion checks. If a step requires my login,
@@ -105,7 +109,7 @@ The Codex section follows the official CLI procedure. Actual screenshots are
 in the Claude and Antigravity sections below; the [capture scope](assets/setup-v1.5/README.md)
 is recorded separately.
 
-## 2. Claude account skill: enable the capability and skill
+## 2. Claude account skill: enable it and add account instructions
 
 This section is for **web Chat, ordinary Desktop Chat and Cowork**. The local
 Claude Code plugin is separate. If your browser and Desktop use different
@@ -168,9 +172,43 @@ revision number for this skill in the Claude account. **It is separate from the
 OpenSocrates product version, 1.5.0.** To check the product version, look for
 `OpenSocrates 1.5.0` in `Contents → SKILL.md`.
 
-**Complete when:** the account skill is in the correct account, and both the
-required capability and skill are enabled. Account skills have no native hook
-approval process like Codex.
+<a id="claude-standing-instructions"></a>
+
+### 2-4. Add a standing instruction for use without a name cue
+
+An enabled skill can be missed by Claude's automatic selection. For ordinary
+requests without `/opensocrates` or an explicit name cue, append the following
+instruction once; preserve your existing account instructions.
+
+1. Open **Settings → General → Instructions for Claude**. Some versions show
+   **Instructions for Claude** directly in Settings. In older Cowork interfaces,
+   open **Settings → Cowork → Global instructions → Edit**.
+2. Add the text below and save. Web and Desktop may use different accounts;
+   configure the actual account used on each surface. A project-only instruction
+   applies only inside that project.
+3. Start a fresh conversation and describe an ordinary synthesis, comparison,
+   decision or message task without naming OpenSocrates.
+
+```text
+For requests that require interpretation or judgment, such as synthesizing
+sources, comparing options, making decisions or drafting messages, load the
+enabled OpenSocrates skill and follow its instructions even when I do not
+mention it. Read the complete procedure and check applicability before applying
+a reasoning method. Do not add unnecessary procedures to mechanical work such
+as formatting.
+```
+
+This instruction guides model-selected use. It does not create a native hook,
+force every-turn application or make mechanical work require a method. A
+missing `Powered by OpenSocrates` line alone does not establish a loading failure.
+[Official account instruction guide](https://support.claude.com/en/articles/10185728-understanding-claude-s-personalization-features)
+· [Official Cowork global instruction guide](https://support.claude.com/en/articles/13345190-get-started-with-claude-cowork)
+
+**Setup complete when:** the correct account has its required capability and
+skill enabled, and the standing instruction is saved for use without naming the
+skill. Account skills have no native hook approval process like Codex. Observing
+automatic selection in a fresh eligible task is separate from checking these
+settings; the installer's export result cannot establish it.
 
 ## 3. Claude Code: check the local Mac plugin
 
@@ -253,6 +291,7 @@ content from before removal or update.
 | --- | --- |
 | Codex reports installation but does not use hooks | Separate installation from approval; check current definitions' trust in interactive `/hooks` |
 | Claude has the skill, but it is gray | Check code execution, organization policy and the skill's enabled state |
+| Claude uses it only when `/opensocrates` is named | Save the standing instruction in section 2-4 in the actual account, then check a fresh eligible task without a name cue |
 | It appears in Claude Chat but not in Code | Check the account skill and local plugin installation separately |
 | OpenSocrates is absent from Antigravity Plugins | Search **Skills & Rules** under Installed |
 | After updating, an answer shows `OpenSocrates grounding: …@3` | Check the actual installed version, older copies in other accounts/scopes and retained context in an existing conversation |
