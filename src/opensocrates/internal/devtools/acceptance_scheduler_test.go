@@ -23,6 +23,14 @@ func TestSchedulerDocumentsKeepUniqueIdentityAndPathData(t *testing.T) {
 	if !ownedFixtureWindowsTask(document, "synthetic-private-id", fixture, receipt, sid) {
 		t.Fatal("owned native task rejected")
 	}
+	withoutDefault := bytes.Replace(document, []byte("<RunLevel>LeastPrivilege</RunLevel>"), nil, 1)
+	if !ownedFixtureWindowsTask(withoutDefault, "synthetic-private-id", fixture, receipt, sid) {
+		t.Fatal("documented omitted least-privilege default rejected")
+	}
+	explicitEmpty := bytes.Replace(document, []byte("<RunLevel>LeastPrivilege</RunLevel>"), []byte("<RunLevel/>"), 1)
+	if ownedFixtureWindowsTask(explicitEmpty, "synthetic-private-id", fixture, receipt, sid) {
+		t.Fatal("explicit empty RunLevel treated as default")
+	}
 	if strings.Index(string(document), "<Repetition>") > strings.Index(string(document), "<UserId>") {
 		t.Fatal("base trigger repetition must precede logon-specific fields")
 	}
@@ -144,5 +152,103 @@ func TestSchedulerReceiptOwnershipAndClosedArgs(t *testing.T) {
 	}
 	if schedulerReceipt(receipt) == 0 {
 		t.Fatal("receipt overwritten")
+	}
+}
+
+func TestSchedulerQueryProjectionOmitsPersonalDataAndShowsApprovedDefaults(t *testing.T) {
+	canonical := fixtureWindowsTask("synthetic-private-id", `C:\private\host.exe`, `C:\private\receipt.json`, "S-1-5-21-123-456-789-1000")
+	exported := strings.Replace(string(canonical), "<RegistrationInfo>", `<RegistrationInfo><Author>private-account-name</Author><URI>\PrivateTaskName</URI>`, 1)
+	exported = strings.Replace(exported, "<Settings>", `<Settings><Priority>7</Priority><AllowHardTerminate>true</AllowHardTerminate><IdleSettings><Duration>PT10M</Duration><WaitTimeout>PT1H</WaitTimeout></IdleSettings><UnknownPrivateTag>private-value</UnknownPrivateTag>`, 1)
+	projection := schedulerQueryProjection([]byte(exported), canonical)
+	settings := projection["approved_settings"].(map[string]any)
+	if settings["Task/Settings/Priority"] != 7 || settings["Task/Settings/AllowHardTerminate"] != true || settings["Task/Settings/IdleSettings/Duration"] != "PT10M" || projection["xml_parsed"] != true {
+		t.Fatal("approved OS defaults not projected")
+	}
+	encoded, e := json.Marshal(projection)
+	if e != nil {
+		t.Fatal(e)
+	}
+	for _, private := range []string{"private-account-name", "PrivateTaskName", "S-1-5-21", "C:\\private", "UnknownPrivateTag", "private-value", "synthetic-private-id"} {
+		if bytes.Contains(encoded, []byte(private)) {
+			t.Fatal("personal or unapproved query metadata leaked")
+		}
+	}
+	equivalent := bytes.Replace(canonical, []byte("PT24H"), []byte("P1D"), 1)
+	if !ownedFixtureWindowsTask(equivalent, "synthetic-private-id", `C:\private\host.exe`, `C:\private\receipt.json`, "S-1-5-21-123-456-789-1000") {
+		t.Fatal("exact 24-hour duration reserialization rejected")
+	}
+}
+
+func TestSchedulerPriorFixtureCleanupRejectsForeignIdentityActionAndRoot(t *testing.T) {
+	id := "9661c9a0b58687fe5b565db800e91073"
+	sid := "S-1-5-21-123-456-789-1000"
+	root := filepath.Join(t.TempDir(), "opensocrates-native-scheduler-"+id+"-1234")
+	fixture := filepath.Join(root, "native-scheduler-entry.exe")
+	receipt := filepath.Join(root, "receipt.json")
+	doc := fixtureWindowsTask(id, fixture, receipt, sid)
+	actualRoot, actualFixture, ok := schedulerCleanupDefinition(doc, id, sid)
+	if !ok || actualRoot != root || actualFixture != fixture {
+		t.Fatal("exact retained fixture rejected")
+	}
+	for _, changedID := range []string{"com.opensocrates.auto-update", "9661c9a0b58687fe5b565db800e91074", strings.ToUpper(id), "", id + "/../"} {
+		if _, _, ok := schedulerCleanupDefinition(doc, changedID, sid); ok {
+			t.Fatal("foreign fixture identity accepted")
+		}
+	}
+	for _, changed := range [][]byte{
+		bytes.Replace(doc, []byte("--scheduler-receipt"), []byte("--foreign-command"), 1),
+		fixtureWindowsTask(id, filepath.Join(t.TempDir(), "native-scheduler-entry.exe"), receipt, sid),
+		fixtureWindowsTask(id, filepath.Join(filepath.Dir(root), "opensocrates-native-scheduler-"+id+"-", "native-scheduler-entry.exe"), receipt, sid),
+		bytes.Replace(doc, []byte("<Settings>"), []byte("<Settings><UnknownForeignSetting>true</UnknownForeignSetting>"), 1),
+		bytes.Replace(doc, []byte("<Actions Context=\"User\">"), []byte("<Actions Context=\"User\"><ComHandler><ClassId>foreign</ClassId></ComHandler>"), 1),
+		bytes.Replace(doc, []byte("<Triggers>"), []byte("<Triggers><BootTrigger><Enabled>true</Enabled></BootTrigger>"), 1),
+		bytes.Replace(doc, []byte("<Settings>"), []byte("<Settings><Hidden>true</Hidden>"), 1),
+	} {
+		if _, _, ok := schedulerCleanupDefinition(changed, id, sid); ok {
+			t.Fatal("changed or foreign fixture definition accepted")
+		}
+	}
+	if _, _, ok := schedulerCleanupDefinition(doc, id, "S-1-5-18"); ok {
+		t.Fatal("foreign owner accepted")
+	}
+}
+
+func TestSchedulerCapturedExportRestoreRetainsOSDefaultsAndRejectsChanges(t *testing.T) {
+	id := "9661c9a0b58687fe5b565db800e91073"
+	sid := "S-1-5-21-123-456-789-1000"
+	fixture, receipt := `C:\private\native-scheduler-entry.exe`, `C:\private\receipt.json`
+	exported := fixtureWindowsTask(id, fixture, receipt, sid)
+	exported = bytes.Replace(exported, []byte("<RunLevel>LeastPrivilege</RunLevel>"), nil, 1)
+	// This is the actual exported subset: both trigger and task Enabled=true
+	// disappear along with default least privilege and other schema defaults.
+	exported = bytes.ReplaceAll(exported, []byte("<Enabled>true</Enabled>"), nil)
+	exported = bytes.Replace(exported, []byte("<AllowStartOnDemand>true</AllowStartOnDemand>"), nil, 1)
+	exported = bytes.Replace(exported, []byte("<StopAtDurationEnd>false</StopAtDurationEnd>"), nil, 1)
+	exported = bytes.Replace(exported, []byte("PT24H"), []byte("P1D"), 1)
+	exported = bytes.Replace(exported, []byte("<Settings>"), []byte("<Settings><UseUnifiedSchedulingEngine>true</UseUnifiedSchedulingEngine><IdleSettings><StopOnIdleEnd>true</StopOnIdleEnd><RestartOnIdle>false</RestartOnIdle></IdleSettings>"), 1)
+	exported = bytes.Replace(exported, []byte("<RegistrationInfo>"), []byte(`<RegistrationInfo><URI>\OpenSocratesAcceptance-`+id+`</URI>`), 1)
+	if !ownedFixtureWindowsTask(exported, id, fixture, receipt, sid) {
+		t.Fatal("observed native task defaults rejected")
+	}
+	for _, disabled := range []string{"<Enabled>false</Enabled>", "<Enabled/>"} {
+		changed := bytes.Replace(exported, []byte("<LogonTrigger>"), []byte("<LogonTrigger>"+disabled), 1)
+		if ownedFixtureWindowsTask(changed, id, fixture, receipt, sid) {
+			t.Fatal("explicit disabled or empty trigger Enabled accepted as default")
+		}
+	}
+	transport, e := update.EncodeTaskImportXML(exported)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if !update.TaskDocumentMatches(transport, exported, fixture) {
+		t.Fatal("captured restore changed the complete task tree")
+	}
+	foreign := bytes.Replace(exported, []byte("<Settings>"), []byte("<Settings><UnknownForeignSetting>true</UnknownForeignSetting>"), 1)
+	if update.TaskDocumentMatches(foreign, exported, fixture) || ownedFixtureWindowsTask(foreign, id, fixture, receipt, sid) {
+		t.Fatal("unknown foreign policy treated as equivalent or owned")
+	}
+	changed := bytes.Replace(exported, []byte("<RestartOnIdle>false"), []byte("<RestartOnIdle>true"), 1)
+	if update.TaskDocumentMatches(changed, exported, fixture) || ownedFixtureWindowsTask(changed, id, fixture, receipt, sid) {
+		t.Fatal("modified captured OS default accepted")
 	}
 }

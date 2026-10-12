@@ -504,3 +504,157 @@ func TestEncodeTaskImportXMLRejectsMalformedInput(t *testing.T) {
 		})
 	}
 }
+
+func TestWindowsTaskRecoveryRecognizesOnlyKnownAfterSemantics(t *testing.T) {
+	const manager = `C:\Users\예시 사용자 🧠\OpenSocrates\opensocrates.exe`
+	generated, err := WindowsTask(manager, "S-1-5-21-12345-67890-13579-1001")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Task Scheduler exports XML with indentation, rearranged xs:all children,
+	// its registration URI and documented default settings made explicit.
+	exported := bytes.Replace(generated, []byte("<Settings>"), []byte(`<Settings><AllowHardTerminate>true</AllowHardTerminate><AllowStartOnDemand>true</AllowStartOnDemand><RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable><WakeToRun>false</WakeToRun><Hidden>false</Hidden><Priority>7</Priority><RunOnlyIfIdle>false</RunOnlyIfIdle><IdleSettings><Duration>PT10M</Duration><WaitTimeout>PT1H</WaitTimeout><StopOnIdleEnd>true</StopOnIdleEnd><RestartOnIdle>false</RestartOnIdle></IdleSettings>`), 1)
+	exported = bytes.Replace(exported, []byte("</RegistrationInfo>"), []byte(`<URI>\`+TaskName+`</URI></RegistrationInfo>`), 1)
+	exported = bytes.ReplaceAll(exported, []byte("><"), []byte(">\r\n    <"))
+	importXML, err := EncodeTaskImportXML(exported)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !TaskDocumentMatches(importXML, generated, manager) {
+		t.Fatal("known after-state changed only by encoding, formatting and schema defaults was rejected")
+	}
+	normalized, err := normalizeTaskXML(importXML)
+	if err != nil {
+		t.Fatal(err)
+	}
+	adapter := NewSchedulerAdapter("windows", t.TempDir(), manager, t.TempDir())
+	// These are the same conflict guards called by Replace after interrupted
+	// activation, with generated After becoming Before during rollback.
+	if !adapter.knownDocument(string(normalized), string(generated)) {
+		t.Fatal("interrupted registration cannot roll back its known after-state")
+	}
+	if !adapter.knownDocument(string(normalized), string(normalized)) {
+		t.Fatal("captured exact before-state not recognized")
+	}
+	differentlyFormattedCapture := bytes.ReplaceAll(normalized, []byte("\r\n    "), nil)
+	if !adapter.knownDocument(string(differentlyFormattedCapture), string(normalized)) {
+		t.Fatal("captured before-state values changed only by formatting were rejected")
+	}
+	metadataCapture := bytes.Replace(normalized, []byte("</RegistrationInfo>"), []byte("<Author>original author</Author><Date>2026-10-12T00:00:00Z</Date></RegistrationInfo>"), 1)
+	changedAuthor := bytes.Replace(metadataCapture, []byte("original author"), []byte("foreign author"), 1)
+	if adapter.knownDocument(string(changedAuthor), string(metadataCapture)) {
+		t.Fatal("captured before-state author modification accepted")
+	}
+	removedDefault := bytes.Replace(normalized, []byte("<WakeToRun>false</WakeToRun>"), nil, 1)
+	if adapter.knownDocument(string(removedDefault), string(normalized)) {
+		t.Fatal("captured before-state unexpectedly received generated-after default allowances")
+	}
+	equivalentDuration := bytes.Replace(generated, []byte("<Interval>PT24H</Interval>"), []byte("<Interval>P1D</Interval>"), 1)
+	if !TaskDocumentMatches(equivalentDuration, generated, manager) || !ownedTask(equivalentDuration, manager) {
+		t.Fatal("equivalent schema day/hour interval was not recognized")
+	}
+}
+
+func TestWindowsTaskRecoveryRejectsModifiedForeignDefinitions(t *testing.T) {
+	const manager = `C:\Users\example\OpenSocrates\opensocrates.exe`
+	generated, err := WindowsTask(manager, "S-1-5-21-12345-67890-13579-1001")
+	if err != nil {
+		t.Fatal(err)
+	}
+	changes := map[string][]byte{
+		"changed_default":          bytes.Replace(generated, []byte("<Settings>"), []byte("<Settings><WakeToRun>true</WakeToRun>"), 1),
+		"changed_explicit_setting": bytes.Replace(generated, []byte("<StartWhenAvailable>true"), []byte("<StartWhenAvailable>false"), 1),
+		"changed_execution_limit":  bytes.Replace(generated, []byte("<ExecutionTimeLimit>PT10M"), []byte("<ExecutionTimeLimit>PT72H"), 1),
+		"extra_setting":            bytes.Replace(generated, []byte("<Settings>"), []byte("<Settings><UnknownSetting>false</UnknownSetting>"), 1),
+		"extra_trigger":            bytes.Replace(generated, []byte("</Triggers>"), []byte("<TimeTrigger><Enabled>true</Enabled></TimeTrigger></Triggers>"), 1),
+		"changed_trigger":          bytes.Replace(generated, []byte("<Delay>PT5M"), []byte("<Delay>PT6M"), 1),
+		"extra_exec_action":        bytes.Replace(generated, []byte("</Actions>"), []byte("<Exec><Command>foreign.exe</Command></Exec></Actions>"), 1),
+		"changed_exec_directory":   bytes.Replace(generated, []byte("</Exec>"), []byte(`<WorkingDirectory>C:\foreign</WorkingDirectory></Exec>`), 1),
+		"changed_principal":        bytes.Replace(generated, []byte("LeastPrivilege"), []byte("HighestAvailable"), 1),
+		"extra_principal_property": bytes.Replace(generated, []byte("</Principal>"), []byte("<ProcessTokenSidType>None</ProcessTokenSidType></Principal>"), 1),
+		"foreign_uri":              bytes.Replace(generated, []byte("</RegistrationInfo>"), []byte(`<URI>\foreign-task</URI></RegistrationInfo>`), 1),
+	}
+	for name, document := range changes {
+		t.Run(name, func(t *testing.T) {
+			if TaskDocumentMatches(document, generated, manager) {
+				t.Fatal("modified foreign task matched generated after-state")
+			}
+		})
+	}
+}
+
+func TestWindowsObservedExportDefaultsOwnershipAndRecovery(t *testing.T) {
+	const manager = `C:\Users\예시 사용자 🧠\OpenSocrates\opensocrates.exe`
+	const sid = "S-1-5-21-12345-67890-13579-1001"
+	generated, err := WindowsTask(manager, sid)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Contains(generated, []byte("<UseUnifiedSchedulingEngine>true</UseUnifiedSchedulingEngine>")) {
+		t.Fatal("Task 1.4 engine choice must be explicit")
+	}
+	// This projection follows the actual Windows 11 export observed after native
+	// UTF-16 import: absent default-valued RunLevel/Enabled/AllowStartOnDemand,
+	// P1D interval, exact task URI, and its two exported IdleSettings defaults.
+	queried := bytes.ReplaceAll(generated, []byte("<RunLevel>LeastPrivilege</RunLevel>"), nil)
+	queried = bytes.ReplaceAll(queried, []byte("<Enabled>true</Enabled>"), nil)
+	queried = bytes.ReplaceAll(queried, []byte("<StopAtDurationEnd>false</StopAtDurationEnd>"), nil)
+	queried = bytes.ReplaceAll(queried, []byte("<Interval>PT24H</Interval>"), []byte("<Interval>P1D</Interval>"))
+	queried = bytes.Replace(queried, []byte("</Settings>"), []byte("<IdleSettings><StopOnIdleEnd>true</StopOnIdleEnd><RestartOnIdle>false</RestartOnIdle></IdleSettings></Settings>"), 1)
+	queried = bytes.Replace(queried, []byte("</RegistrationInfo>"), []byte(`<URI>\`+TaskName+`</URI></RegistrationInfo>`), 1)
+	queried = bytes.ReplaceAll(queried, []byte("><"), []byte(">\r\n  <"))
+	if !ownedTask(queried, manager) {
+		t.Fatal("Inspect's ownership gate rejected absent least-privilege/enabled defaults")
+	}
+	wire, err := EncodeTaskImportXML(queried)
+	if err != nil {
+		t.Fatal(err)
+	}
+	normalized, err := normalizeTaskXML(wire)
+	if err != nil || !TaskDocumentMatches(normalized, generated, manager) {
+		t.Fatal("actual exported default subset does not match generated after-state")
+	}
+	restoreWire, err := EncodeTaskImportXML(normalized)
+	if err != nil {
+		t.Fatal(err)
+	}
+	restored, err := normalizeTaskXML(restoreWire)
+	if err != nil || !TaskDocumentMatches(restored, normalized, manager) || !ownedTask(restored, manager) {
+		t.Fatal("captured before-state import/query restoration lost ownership or fields")
+	}
+	for name, field := range map[string]string{
+		"higher_privilege": "<RunLevel>HighestAvailable</RunLevel>",
+		"empty_privilege":  "<RunLevel></RunLevel>",
+	} {
+		t.Run(name, func(t *testing.T) {
+			foreign := bytes.Replace(queried, []byte("</Principal>"), []byte(field+"</Principal>"), 1)
+			if ownedTask(foreign, manager) || TaskDocumentMatches(foreign, generated, manager) {
+				t.Fatal("explicit elevated or empty privilege was treated as an absent default")
+			}
+		})
+	}
+	for name, field := range map[string]string{
+		"disabled_settings":      "<Enabled>false</Enabled>",
+		"empty_enabled_settings": "<Enabled></Enabled>",
+		"disallowed_demand":      "<AllowStartOnDemand>false</AllowStartOnDemand>",
+	} {
+		t.Run(name, func(t *testing.T) {
+			foreign := bytes.Replace(queried, []byte("</Settings>"), []byte(field+"</Settings>"), 1)
+			if ownedTask(foreign, manager) || TaskDocumentMatches(foreign, generated, manager) {
+				t.Fatal("explicit disabled or empty setting was treated as an absent default")
+			}
+		})
+	}
+	disabledTrigger := bytes.Replace(queried, []byte("<LogonTrigger>"), []byte("<LogonTrigger><Enabled>false</Enabled>"), 1)
+	if ownedTask(disabledTrigger, manager) || TaskDocumentMatches(disabledTrigger, generated, manager) {
+		t.Fatal("disabled trigger accepted")
+	}
+	changedEngine := bytes.Replace(queried, []byte("<UseUnifiedSchedulingEngine>true</UseUnifiedSchedulingEngine>"), []byte("<UseUnifiedSchedulingEngine>false</UseUnifiedSchedulingEngine>"), 1)
+	if TaskDocumentMatches(changedEngine, generated, manager) || TaskDocumentMatches(changedEngine, normalized, manager) {
+		t.Fatal("explicit engine change ignored during activation or restoration")
+	}
+	foreignSetting := bytes.Replace(queried, []byte("</Settings>"), []byte("<ForeignSetting>ignored</ForeignSetting></Settings>"), 1)
+	if TaskDocumentMatches(foreignSetting, generated, manager) || TaskDocumentMatches(foreignSetting, normalized, manager) {
+		t.Fatal("foreign setting ignored")
+	}
+}

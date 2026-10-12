@@ -45,15 +45,21 @@ func init() {
 	save := func() {
 		path := os.Getenv("OPENSOCRATES_NATIVE_STDIN_RECEIPT")
 		if path == "" {
-			return
+			os.Exit(2)
 		}
 		b, e := json.Marshal(receipt)
-		if e == nil {
-			if _, statError := os.Lstat(path); os.IsNotExist(statError) {
-				_ = platform.ExclusiveWrite(path, append(b, '\n'), 0600)
-			} else if statError == nil {
-				_ = platform.AtomicWrite(path, append(b, '\n'), 0600)
-			}
+		if e != nil {
+			os.Exit(2)
+		}
+		if _, statError := os.Lstat(path); os.IsNotExist(statError) {
+			e = platform.ExclusiveWrite(path, append(b, '\n'), 0600)
+		} else if statError == nil {
+			e = platform.AtomicWrite(path, append(b, '\n'), 0600)
+		} else {
+			e = statError
+		}
+		if e != nil {
+			os.Exit(2)
 		}
 	}
 	if !receipt.ArgvMatched || (!receipt.EchoMode && !receipt.StaticMode) {
@@ -140,6 +146,23 @@ func TestActualConfiguredShellPreservesNativeStdinAndUnsafeLookingPaths(t *testi
 		t.Fatal(e)
 	}
 	env = append(env, "PLUGIN_ROOT="+root, "OPENSOCRATES_NATIVE_STDIN_FIXTURE=1")
+	if target == "windows-x64" {
+		// Initialize only this developer test fixture's private shell profile/cache.
+		// Actual packaged timing below has no warmup and retains every cold sample.
+		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+		started := time.Now()
+		ready := []byte("opensocrates-fixture-shell-ready")
+		result, setupError := platform.Run(ctx, shell, []string{"-NoProfile", "-Command", "[Console]::Out.Write('opensocrates-fixture-shell-ready')"}, platform.RunOptions{Env: env, Dir: work, OutputLimit: 4096})
+		cancel()
+		category := "none"
+		if setupError != nil {
+			category = string(diagnostics.CodeOf(setupError))
+		}
+		t.Logf("native_fixture_shell_setup elapsed_ms=%d error_category=%s exit_code=%d stdout_len=%d stderr_len=%d", time.Since(started).Milliseconds(), category, result.ExitCode, len(result.Stdout), len(result.Stderr))
+		if setupError != nil || len(result.Stderr) != 0 || !bytes.Equal(result.Stdout, ready) {
+			t.Fatal("private native shell fixture initialization failed")
+		}
+	}
 	input := []byte("{\"unicode\":\"한국\",\"numeric\":9007199254740993,\"text\":\"$ dollar ` tick\"}\n")
 	// Transport probes use the copied development test executable. Packaged hook
 	// qualification retains its independent two-second deadline/one-second p95.

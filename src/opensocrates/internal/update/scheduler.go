@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -68,7 +69,7 @@ func WindowsTask(manager, sid string) ([]byte, error) {
 <RegistrationInfo><Description>OpenSocrates native stable updater; owned by opensocrates-native</Description></RegistrationInfo>
 <Triggers><LogonTrigger><Enabled>true</Enabled><Repetition><Interval>PT24H</Interval><StopAtDurationEnd>false</StopAtDurationEnd></Repetition><UserId>` + escape(sid) + `</UserId><Delay>PT5M</Delay></LogonTrigger></Triggers>
 <Principals><Principal id="User"><UserId>` + escape(sid) + `</UserId><LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
-<Settings><MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries><StopIfGoingOnBatteries>false</StopIfGoingOnBatteries><StartWhenAvailable>true</StartWhenAvailable><Enabled>true</Enabled><ExecutionTimeLimit>PT10M</ExecutionTimeLimit></Settings>
+<Settings><MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries><StopIfGoingOnBatteries>false</StopIfGoingOnBatteries><StartWhenAvailable>true</StartWhenAvailable><Enabled>true</Enabled><UseUnifiedSchedulingEngine>true</UseUnifiedSchedulingEngine><ExecutionTimeLimit>PT10M</ExecutionTimeLimit></Settings>
 <Actions Context="User"><Exec><Command>` + escape(manager) + `</Command><Arguments>auto-update run --scheduled</Arguments></Exec></Actions></Task>
 `), nil
 }
@@ -182,13 +183,13 @@ func (a *SchedulerAdapter) Replace(ctx context.Context, before, after registrati
 	if e != nil {
 		return e
 	}
-	if actual.Installed == after.Installed && actual.Registered == after.Registered && actual.Data["document"] == after.Data["document"] {
+	if actual.Installed == after.Installed && actual.Registered == after.Registered && a.knownDocument(actual.Data["document"], after.Data["document"]) {
 		return nil
 	}
 	// A journaled command may have stopped the task or replaced its document
 	// before interruption. Only either known document (or an absent identity)
 	// can participate in recovery; changed foreign documents always conflict.
-	if actual.Installed && actual.Data["document"] != before.Data["document"] && actual.Data["document"] != after.Data["document"] {
+	if actual.Installed && !a.knownDocument(actual.Data["document"], before.Data["document"]) && !a.knownDocument(actual.Data["document"], after.Data["document"]) {
 		return closed(diagnostics.Verification, "scheduler_conflict")
 	}
 	before = actual
@@ -257,7 +258,7 @@ func (a *SchedulerAdapter) Verify(ctx context.Context, want registration.State) 
 	if got.Installed != want.Installed || got.Registered != want.Registered {
 		return closed(diagnostics.Activation, "scheduler_verify")
 	}
-	if want.Installed && a.OS == "darwin" && got.Data["document"] != want.Data["document"] {
+	if want.Installed && !a.knownDocument(got.Data["document"], want.Data["document"]) {
 		return closed(diagnostics.Verification, "scheduler_verify")
 	}
 	return nil
@@ -346,15 +347,19 @@ func ownedTask(b []byte, manager string) bool {
 			Command   string `xml:"Command"`
 			Arguments string `xml:"Arguments"`
 		} `xml:"Actions>Exec"`
-		UserID        string `xml:"Principals>Principal>UserId"`
-		TriggerUserID string `xml:"Triggers>LogonTrigger>UserId"`
-		LogonType     string `xml:"Principals>Principal>LogonType"`
-		RunLevel      string `xml:"Principals>Principal>RunLevel"`
-		Delay         string `xml:"Triggers>LogonTrigger>Delay"`
-		Interval      string `xml:"Triggers>LogonTrigger>Repetition>Interval"`
-		Instances     string `xml:"Settings>MultipleInstancesPolicy"`
+		UserID             string  `xml:"Principals>Principal>UserId"`
+		TriggerUserID      string  `xml:"Triggers>LogonTrigger>UserId"`
+		LogonType          string  `xml:"Principals>Principal>LogonType"`
+		RunLevel           *string `xml:"Principals>Principal>RunLevel"`
+		TriggerEnabled     *bool   `xml:"Triggers>LogonTrigger>Enabled"`
+		SettingsEnabled    *bool   `xml:"Settings>Enabled"`
+		AllowStartOnDemand *bool   `xml:"Settings>AllowStartOnDemand"`
+		StopAtDurationEnd  *bool   `xml:"Triggers>LogonTrigger>Repetition>StopAtDurationEnd"`
+		Delay              string  `xml:"Triggers>LogonTrigger>Delay"`
+		Interval           string  `xml:"Triggers>LogonTrigger>Repetition>Interval"`
+		Instances          string  `xml:"Settings>MultipleInstancesPolicy"`
 	}
-	if xml.Unmarshal(b, &t) != nil || len(t.Actions) != 1 || t.Actions[0].Command != manager || t.Actions[0].Arguments != "auto-update run --scheduled" || t.LogonType != "InteractiveToken" || t.RunLevel != "LeastPrivilege" || !strings.Contains(t.Description, "owned by "+Owner) || t.Delay != "PT5M" || t.Interval != "PT24H" || t.Instances != "IgnoreNew" || !strings.HasPrefix(t.UserID, "S-1-") || t.TriggerUserID != t.UserID {
+	if xml.Unmarshal(b, &t) != nil || len(t.Actions) != 1 || t.Actions[0].Command != manager || t.Actions[0].Arguments != "auto-update run --scheduled" || t.LogonType != "InteractiveToken" || (t.RunLevel != nil && *t.RunLevel != "LeastPrivilege") || (t.TriggerEnabled != nil && !*t.TriggerEnabled) || (t.SettingsEnabled != nil && !*t.SettingsEnabled) || (t.AllowStartOnDemand != nil && !*t.AllowStartOnDemand) || (t.StopAtDurationEnd != nil && *t.StopAtDurationEnd) || !strings.Contains(t.Description, "owned by "+Owner) || taskDurationValue("Task/Triggers/LogonTrigger/Delay", t.Delay) != "PT5M" || taskDurationValue("Task/Triggers/LogonTrigger/Repetition/Interval", t.Interval) != "PT24H" || t.Instances != "IgnoreNew" || !strings.HasPrefix(t.UserID, "S-1-") || t.TriggerUserID != t.UserID {
 		return false
 	}
 	d := xml.NewDecoder(bytes.NewReader(b))
@@ -546,4 +551,214 @@ func normalizeTaskXML(raw []byte) ([]byte, error) {
 		return nil, err
 	}
 	return document, nil
+}
+
+func (a *SchedulerAdapter) knownDocument(actual, known string) bool {
+	if actual == known {
+		return true
+	}
+	if a.OS != "windows" {
+		return false
+	}
+	return TaskDocumentMatches([]byte(actual), []byte(known), a.ManagerPath)
+}
+
+// TaskDocumentMatches permits OS representation/default expansion only for an
+// exact definition produced by WindowsTask. Captured before-state remains an
+// exact value match after representation normalization. Ownership alone never authorizes overwriting a task:
+// the complete normalized tree, including unknown fields, must agree.
+func TaskDocumentMatches(actual, known []byte, manager string) bool {
+	if bytes.Equal(actual, known) {
+		return true
+	}
+	sid := taskUser(known)
+	generated, err := WindowsTask(manager, sid)
+	generatedAfter := err == nil && bytes.Equal(generated, known)
+	actualTree, err := taskTree(actual)
+	if err != nil {
+		return false
+	}
+	knownTree, err := taskTree(known)
+	if err != nil {
+		return false
+	}
+	if !normalizeTaskTree(actualTree, "Task", generatedAfter) || !normalizeTaskTree(knownTree, "Task", generatedAfter) {
+		return false
+	}
+	a, err := json.Marshal(actualTree)
+	if err != nil {
+		return false
+	}
+	b, err := json.Marshal(knownTree)
+	return err == nil && bytes.Equal(a, b)
+}
+
+type taskXMLNode struct {
+	Name       xml.Name
+	Attributes []xml.Attr
+	Text       string
+	Children   []*taskXMLNode
+}
+
+func taskTree(raw []byte) (*taskXMLNode, error) {
+	normalized, err := normalizeTaskXML(raw)
+	if err != nil {
+		return nil, err
+	}
+	decoder := xml.NewDecoder(bytes.NewReader(normalized))
+	var root *taskXMLNode
+	var stack []*taskXMLNode
+	count := 0
+	for {
+		token, err := decoder.Token()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, closed(diagnostics.Verification, "scheduler_xml")
+		}
+		switch v := token.(type) {
+		case xml.StartElement:
+			count++
+			if count > 4096 || len(stack) >= 32 {
+				return nil, closed(diagnostics.Verification, "scheduler_xml")
+			}
+			node := &taskXMLNode{Name: v.Name}
+			for _, attr := range v.Attr {
+				if attr.Name.Local == "xmlns" || attr.Name.Space == "xmlns" {
+					continue
+				}
+				node.Attributes = append(node.Attributes, attr)
+			}
+			sort.Slice(node.Attributes, func(i, j int) bool {
+				a, b := node.Attributes[i].Name, node.Attributes[j].Name
+				return a.Space+"/"+a.Local < b.Space+"/"+b.Local
+			})
+			if len(stack) == 0 {
+				root = node
+			} else {
+				parent := stack[len(stack)-1]
+				parent.Children = append(parent.Children, node)
+			}
+			stack = append(stack, node)
+		case xml.EndElement:
+			stack = stack[:len(stack)-1]
+		case xml.CharData:
+			if len(stack) > 0 {
+				stack[len(stack)-1].Text += string(v)
+			}
+		}
+	}
+	return root, nil
+}
+
+// Only defaults documented by the Microsoft Task Scheduler schema may be
+// omitted. A changed value, extra action/trigger, unknown node or attribute
+// remains in the full tree and causes comparison failure.
+var taskSchemaDefaults = map[string]string{
+	"Task/Principals/Principal/RunLevel":                      "LeastPrivilege",
+	"Task/Settings/AllowStartOnDemand":                        "true",
+	"Task/Settings/MultipleInstancesPolicy":                   "IgnoreNew",
+	"Task/Settings/DisallowStartIfOnBatteries":                "true",
+	"Task/Settings/StopIfGoingOnBatteries":                    "true",
+	"Task/Settings/AllowHardTerminate":                        "true",
+	"Task/Settings/StartWhenAvailable":                        "false",
+	"Task/Settings/RunOnlyIfNetworkAvailable":                 "false",
+	"Task/Settings/WakeToRun":                                 "false",
+	"Task/Settings/Enabled":                                   "true",
+	"Task/Settings/Hidden":                                    "false",
+	"Task/Settings/DeleteExpiredTaskAfter":                    "PT0S",
+	"Task/Settings/ExecutionTimeLimit":                        "PT72H",
+	"Task/Settings/Priority":                                  "7",
+	"Task/Settings/RunOnlyIfIdle":                             "false",
+	"Task/Settings/DisallowStartOnRemoteAppSession":           "false",
+	"Task/Settings/IdleSettings/Duration":                     "PT10M",
+	"Task/Settings/IdleSettings/WaitTimeout":                  "PT1H",
+	"Task/Settings/IdleSettings/StopOnIdleEnd":                "true",
+	"Task/Settings/IdleSettings/RestartOnIdle":                "false",
+	"Task/Triggers/LogonTrigger/Enabled":                      "true",
+	"Task/Triggers/LogonTrigger/ExecutionTimeLimit":           "PT72H",
+	"Task/Triggers/LogonTrigger/Repetition/StopAtDurationEnd": "false",
+}
+
+func normalizeTaskTree(node *taskXMLNode, path string, generatedAfter bool) bool {
+	if node == nil || node.Name.Space != "http://schemas.microsoft.com/windows/2004/02/mit/task" {
+		return false
+	}
+	if len(node.Children) == 0 {
+		node.Text = taskDurationValue(path, node.Text)
+	}
+	if len(node.Children) > 0 {
+		if len(strings.TrimSpace(node.Text)) != 0 {
+			return false
+		}
+		node.Text = ""
+		kept := node.Children[:0]
+		for _, child := range node.Children {
+			childPath := path + "/" + child.Name.Local
+			if !normalizeTaskTree(child, childPath, generatedAfter) {
+				return false
+			}
+			if generatedAfter && len(child.Children) == 0 && len(child.Attributes) == 0 {
+				if want, ok := taskSchemaDefaults[childPath]; ok && child.Text == want {
+					continue
+				}
+				if childPath == "Task/RegistrationInfo/URI" && child.Text == "\\"+TaskName {
+					continue
+				}
+				if childPath == "Task/Settings/IdleSettings" && child.Text == "" {
+					continue
+				}
+			}
+			kept = append(kept, child)
+		}
+		node.Children = kept
+		sort.Slice(node.Children, func(i, j int) bool {
+			a, _ := json.Marshal(node.Children[i])
+			b, _ := json.Marshal(node.Children[j])
+			return bytes.Compare(a, b) < 0
+		})
+	}
+	return true
+}
+
+// XML Schema duration uses day/hour/minute/second value units. These narrow
+// aliases cover only the fixed scheduler policy and documented default values;
+// unknown durations, calendar months/years and changed values remain untouched.
+// https://www.w3.org/TR/xmlschema-2/#duration
+func taskDurationValue(path, value string) string {
+	switch path {
+	case "Task/Triggers/LogonTrigger/Repetition/Interval":
+		switch value {
+		case "P1D", "PT1440M", "PT86400S":
+			return "PT24H"
+		}
+	case "Task/Triggers/LogonTrigger/Delay":
+		if value == "PT300S" {
+			return "PT5M"
+		}
+	case "Task/Settings/ExecutionTimeLimit", "Task/Settings/IdleSettings/Duration":
+		switch value {
+		case "PT600S":
+			return "PT10M"
+		case "P3D", "PT4320M", "PT259200S":
+			return "PT72H"
+		}
+	case "Task/Settings/IdleSettings/WaitTimeout":
+		switch value {
+		case "PT60M", "PT3600S":
+			return "PT1H"
+		}
+	case "Task/Triggers/LogonTrigger/ExecutionTimeLimit":
+		switch value {
+		case "P3D", "PT4320M", "PT259200S":
+			return "PT72H"
+		}
+	case "Task/Settings/DeleteExpiredTaskAfter":
+		switch value {
+		case "P0D", "PT0M", "PT0H":
+			return "PT0S"
+		}
+	}
+	return value
 }
