@@ -19,6 +19,14 @@ later documentation commits do not relabel old evidence as a new execution.
   revision, not the canonical content tag commit. No global npm installation,
   live host, enabled legacy scheduler, production signature, or user installation
   replacement is claimed.
+- [Enabled legacy updater takeover](native-npm-enabled-updater-darwin-arm64.json):
+  original v1.5 installer/payload, actual macOS ARM64 launchd registration,
+  native adoption with one update owner, and exact live-identity/byte rollback.
+  A fixed logical label maps to one unique disposable OS label; RunAtLoad is
+  suppressed only in the mapped OS copy. Codex and npx are Go fixtures; actual
+  scheduled execution, network updates and production fixed-label installation
+  are outside this observation. The [frozen reproducer](qualification/macos-enabled-legacy/README.md)
+  records exact commands, hashes and boundaries.
 
 Native CI evidence is linked from the [implementation handoff](../IMPLEMENTATION_HANDOFF.md).
 Each workflow uploads receipts and build artifacts with exact source provenance.
@@ -30,6 +38,14 @@ at d156c27feefa64dd57ae7e64a0ee114456c0ebd7: actual macOS ARM64, Windows x64
 and Windows ARM64. Each platform ran the native lifecycle, exact-command hook
 timing and OS scheduler gates. Windows also executed packaged Go helper
 replacement/recovery probes and captured scheduler XML restoration.
+
+Final source/native CI [run 38219463804](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38219463804)
+passed at 3724bf803661b34cd2b8c54e1d5852dbc4f3e457. Its first Windows x64
+lifecycle attempt reached the outer 30-second install deadline with empty
+output; the unchanged failed job passed on rerun. Both the
+[first attempt](native-lifecycle-windows-x64-3724-first-attempt.json) and
+[rerun](native-lifecycle-windows-x64-3724-rerun.json) are retained. No deadline
+or acceptance requirement changed, and the timeout's cause remains unestablished.
 
 The user's Windows 11 ARM64 VM supplies separate
 [native lifecycle](native-vm-windows-arm64-lifecycle.json) and

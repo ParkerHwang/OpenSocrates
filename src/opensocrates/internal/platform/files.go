@@ -111,12 +111,52 @@ func ReadOwnedFile(path string, max int64) ([]byte, error) {
 	return b, nil
 }
 func SHA256File(path string, max int64) (string, error) {
-	b, err := ReadOwnedFile(path, max)
+	if max < 0 || max > 2<<30 {
+		return "", failure()
+	}
+	f, err := openOwned(path, os.O_RDONLY, 0)
 	if err != nil {
 		return "", err
 	}
-	h := sha256.Sum256(b)
-	return hex.EncodeToString(h[:]), nil
+	defer f.Close()
+	h := sha256.New()
+	n, err := io.Copy(h, io.LimitReader(f, max+1))
+	if err != nil || n > max {
+		return "", failure()
+	}
+	return hex.EncodeToString(h.Sum(nil)), nil
+}
+
+// CopyOwnedFile streams bounded contents between owner-checked handles into a
+// new durable object. Failure preserves the owned partial object for recovery.
+func CopyOwnedFile(from, to string, max int64, mode os.FileMode) error {
+	if max < 0 || max > 2<<30 || mode.Perm()&0022 != 0 || mode&^os.ModePerm != 0 {
+		return failure()
+	}
+	source, err := openOwned(from, os.O_RDONLY, 0)
+	if err != nil {
+		return err
+	}
+	defer source.Close()
+	target, err := openOwned(to, os.O_WRONLY|os.O_CREATE|os.O_EXCL, mode)
+	if err != nil {
+		return err
+	}
+	n, err := io.Copy(target, io.LimitReader(source, max+1))
+	if err == nil && n > max {
+		err = failure()
+	}
+	if err == nil {
+		err = modeWrittenFile(target, mode)
+	}
+	if err == nil {
+		err = target.Sync()
+	}
+	closeErr := target.Close()
+	if err != nil || closeErr != nil {
+		return failure()
+	}
+	return syncParent(to)
 }
 func Lock(path string) (io.Closer, error) {
 	lock, e := acquireLock(path)

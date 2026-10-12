@@ -17,7 +17,10 @@ import (
 )
 
 const MaxFiles = 10000
-const MaxFileBytes int64 = 256 << 20
+
+// Released v1.5 Windows payloads include a 341,142,832-byte Codex executable.
+// Adoption and rollback must accept that baseline while retaining finite limits.
+const MaxFileBytes int64 = 512 << 20
 const MaxTotalBytes int64 = 2 << 30
 
 type Entry struct {
@@ -75,12 +78,11 @@ func Inspect(path string) (Snapshot, error) {
 			if info.Size() > MaxFileBytes || total > MaxTotalBytes {
 				return diagnostics.New(diagnostics.Verification, "inventory")
 			}
-			b, e := platform.ReadOwnedFile(p, MaxFileBytes)
+			hash, e := platform.SHA256File(p, MaxFileBytes)
 			if e != nil {
 				return e
 			}
-			h := sha256.Sum256(b)
-			row.SHA256 = hex.EncodeToString(h[:])
+			row.SHA256 = hash
 		}
 		entries = append(entries, row)
 		return nil
@@ -142,11 +144,7 @@ func copyVerified(from, to string, expected Snapshot) error {
 			if entry.Path != "" {
 				source = filepath.Join(from, filepath.FromSlash(entry.Path))
 			}
-			b, e := platform.ReadOwnedFile(source, MaxFileBytes)
-			if e != nil {
-				return e
-			}
-			if e := platform.ExclusiveWrite(target, b, os.FileMode(entry.Mode)); e != nil {
+			if e := platform.CopyOwnedFile(source, target, MaxFileBytes, os.FileMode(entry.Mode)); e != nil {
 				return e
 			}
 		}

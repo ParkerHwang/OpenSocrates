@@ -2,6 +2,9 @@ package lifecycle
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -10,6 +13,58 @@ import (
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/registration"
 )
+
+type zeroPayload struct{}
+
+func (zeroPayload) Read(p []byte) (int, error) {
+	clear(p)
+	return len(p), nil
+}
+
+func TestCopyVerifiedAcceptsReleasedWindowsRuntimeSize(t *testing.T) {
+	// Exact size of codex.exe inside the published v1.5 Windows x64 archive.
+	const size int64 = 341142832
+	root := privateLifecycleTestDir(t)
+	source, target := filepath.Join(root, "legacy.exe"), filepath.Join(root, "backup.exe")
+	if e := platform.ExclusiveWrite(source, nil, 0600); e != nil {
+		t.Fatal(e)
+	}
+	if e := os.Truncate(source, size); e != nil {
+		t.Fatal(e)
+	}
+	expected, e := Inspect(source)
+	if e != nil || len(expected.Entries) != 1 || expected.Entries[0].Size != size {
+		t.Fatalf("released runtime size rejected: %v", e)
+	}
+	h := sha256.New()
+	if _, e := io.CopyN(h, zeroPayload{}, size); e != nil {
+		t.Fatal(e)
+	}
+	if expected.Entries[0].SHA256 != hex.EncodeToString(h.Sum(nil)) {
+		t.Fatal("large payload hash differs")
+	}
+	if e := CopyVerified(source, target, expected); e != nil {
+		t.Fatal(e)
+	}
+	actual, e := Inspect(target)
+	if e != nil || !Equal(expected, actual) {
+		t.Fatalf("large recovery copy differs: %v", e)
+	}
+}
+
+func TestInspectRejectsFileBeyondLifecycleLimit(t *testing.T) {
+	root := privateLifecycleTestDir(t)
+	p := filepath.Join(root, "oversized.exe")
+	if e := platform.ExclusiveWrite(p, nil, 0600); e != nil {
+		t.Fatal(e)
+	}
+	if e := os.Truncate(p, MaxFileBytes+1); e != nil {
+		t.Fatal(e)
+	}
+	if _, e := Inspect(p); e == nil {
+		t.Fatal("unbounded file accepted")
+	}
+}
 
 func TestPortableInventoryModePreservesWindowsReadonly(t *testing.T) {
 	cases := []struct {

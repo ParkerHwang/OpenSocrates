@@ -40,6 +40,22 @@ precision, omitted/null/empty and unknown-field semantics. Do not equate Go's
 JSON defaults with compatibility. / 전달·작업/복구·등록·OS와 배포 프로필·런타임
 어댑터를 분리하며 직렬화·저장·검증 계약을 명시적으로 보존합니다.
 
+### Released Windows payload size / 기존 Windows 패키지 크기
+
+The authentic v1.5.0 Windows x64 archive contains a **341,142,832-byte**
+`runtime/windows-x64/opensocrates-runtime/_internal/codex_cli_bin/bin/codex.exe`.
+The initial Go lifecycle's 256 MiB per-file bound rejected that valid baseline
+before adoption. Raise the per-file bound to **512 MiB**, retaining the 2 GiB
+aggregate and 10,000-entry bounds. Stream owned-file hashing and verified
+recovery copies rather than allocating the full legacy executable. Existing
+owner, ACL, reparse, exclusive-create and durable-write checks still apply.
+Files above the bound remain rejected. This corrects migration compatibility;
+it does not expand platform or host support. / 실제 v1.5 Windows 패키지의
+341,142,832바이트 실행파일이 초기 256 MiB 제한에 거부되는 호환성 문제를
+수정합니다. 파일당 512 MiB, 전체 2 GiB, 10,000개 항목으로 제한하고 해시·복구
+복사를 스트리밍 처리합니다. 소유권·ACL·reparse·배타 생성·내구성 검사를
+유지하며 제한 초과 파일은 계속 거부합니다.
+
 ## Distribution candidate: GoReleaser / 배포 후보 평가
 
 GoReleaser supports [Go build matrices](https://goreleaser.com/customization/builds/builders/go/),
@@ -125,6 +141,13 @@ Rollback restores the previous scheduler or reports incomplete recovery with
 bytes retained. Do not indiscriminately remove npm packages/user data or
 reinterpret retired profiles. / 검증한 기존 v1.5 설치를 한 번 명시적으로 인수하고
 업데이트 소유자는 하나로 유지합니다. 기존 패키지의 무차별 삭제를 하지 않습니다.
+
+The released v1.5.0 updater supports macOS ARM64 only. Windows automatic-update
+commands report unavailable, so Windows adoption must preserve the absence of
+an old supported scheduler rather than invent one. Enabled legacy-scheduler
+takeover is a macOS qualification requirement. / v1.5.0 자동 업데이트는 macOS
+ARM64 전용이므로 Windows에서는 이전 예약 작업이 없던 상태를 보존합니다.
+켜진 이전 업데이트 작업의 인수 검증은 macOS에서 수행합니다.
 
 ## Compatibility versus intentional changes / 호환과 의도한 변경
 
