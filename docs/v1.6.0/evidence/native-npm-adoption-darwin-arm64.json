@@ -1,0 +1,110 @@
+{
+  "schema": "opensocrates.native-acceptance/1.0.0",
+  "target": "darwin-arm64",
+  "source_git_commit": "c5a822c6d97779d507f38d8344ec82ebe591bd8e",
+  "generated_at": "2026-10-12T04:22:20.389Z",
+  "evidence_scope": "actual_github_v1_5_payload_and_original_release_installer; isolated_external_codex_go_fixture; legacy_scheduler_disabled",
+  "baseline_tag": "v1.5.0",
+  "baseline_commit": "1329df26dc78a079ce9b895ca1235a4981d0d591",
+  "baseline_asset_sha256": "49852b3887d350e858b0d7ba77f5799bad83af10f8d211135cd21dde06d8a7c0",
+  "baseline_installer_sha256": "ceab84379b6889d621b41b6e6de7f4bb7f7d61cd4fac7b706491d5f91048bfbe",
+  "artifact_identity": "sha256:4f788a5fd843246ec6e6809eab7790797f97d12c8ffe1a878e31b1cddc50d303",
+  "cases": {
+    "published_checksum": {
+      "pass": true,
+      "sha256": "49852b3887d350e858b0d7ba77f5799bad83af10f8d211135cd21dde06d8a7c0"
+    },
+    "original_released_v1_5_installer": {
+      "exit": 0,
+      "pass": true
+    },
+    "actual_legacy_three_field_marker": {
+      "pass": true
+    },
+    "disable_legacy_fixture": {
+      "exit": 0,
+      "pass": true
+    },
+    "original_desired_state": {
+      "pass": true
+    },
+    "native_cli_adopt": {
+      "exit": 0,
+      "pass": true
+    },
+    "disabled_integration_preserved": {
+      "pass": true
+    },
+    "single_update_owner": {
+      "pass": true
+    },
+    "settings_trust_foreign_npm_bytes_preserved": {
+      "pass": true
+    },
+    "legacy_desired_state_exact_preserved": {
+      "pass": true
+    },
+    "deferred_activation": {
+      "pass": true
+    },
+    "native_cli_status": {
+      "exit": 0,
+      "pass": true
+    },
+    "native_cli_recover_adoption": {
+      "exit": 0,
+      "pass": true
+    },
+    "exact_legacy_payload_rollback": {
+      "pass": true
+    },
+    "baseline_installer_published_digest": {
+      "pass": true
+    }
+  },
+  "commands": [
+    {
+      "command": "node opensocrates.mjs install --host codex --asset <official-v1.5-codex-zip> --checksum <official-v1.5-codex-sha256>",
+      "exit": 0
+    },
+    {
+      "command": "<isolated-go-codex-fixture> plugin disable opensocrates@opensocrates",
+      "exit": 0
+    },
+    {
+      "command": "<native-manager> adopt --host codex --package <native-darwin-arm64-bundle>",
+      "exit": 0
+    },
+    {
+      "command": "<native-manager> status --host codex",
+      "exit": 0
+    },
+    {
+      "command": "<native-manager> recover --transaction <adoption-transaction-id>",
+      "exit": 0
+    }
+  ],
+  "pass": true,
+  "live_host_delivery_claimed": false,
+  "real_npm_global_install_claimed": false,
+  "original_npm_entry_installer_executed": true,
+  "user_installation_modified": false,
+  "production_signing_claimed": false,
+  "privacy": {
+    "absolute_paths_recorded": false,
+    "environment_recorded": false,
+    "process_output_recorded": false,
+    "prompt_recorded": false
+  },
+  "required_external_evidence": [
+    "real_host_trust_and_activation",
+    "active_legacy_scheduler_migration",
+    "actual_windows_x64_npm_adoption",
+    "production_signing"
+  ],
+  "status": "pass",
+  "native_manager_sha256": "08ece103469a81dc07e3fd60222595b1ae2023cd39fbef393a756564eea6907b",
+  "baseline_runtime_execution_claimed": false,
+  "native_scheduler_activation_claimed": false,
+  "native_management_environment": "isolated HOME/CODEX_HOME/OPENSOCRATES_STATE_DIR; PATH contains only isolated Go host fixture and operating-system executables"
+}
