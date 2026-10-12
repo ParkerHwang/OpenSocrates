@@ -15,6 +15,7 @@ func meaningfulPR(s string) bool {
 	return !meaningfulPlaceholders[strings.ToLower(strings.TrimSpace(s))]
 }
 func prSections(body string) map[string]string {
+	body = regexp.MustCompile(`(?s)<!--.*?-->`).ReplaceAllString(body, "")
 	result := map[string]string{}
 	name := ""
 	for _, line := range strings.Split(body, "\n") {
@@ -42,12 +43,22 @@ func prField(section, name string) (string, bool) {
 
 // ValidatePullRequest preserves the existing durable handoff and draft rules.
 func ValidatePullRequest(event map[string]any) []string {
-	pr, ok := event["pull_request"].(map[string]any)
-	if !ok {
+	raw, present := event["pull_request"]
+	if !present {
 		return nil
 	}
-	body, _ := pr["body"].(string)
-	draft, _ := pr["draft"].(bool)
+	pr, ok := raw.(map[string]any)
+	if !ok {
+		return []string{"pull_request_event_shape_invalid"}
+	}
+	body, bodyOK := pr["body"].(string)
+	if !bodyOK && pr["body"] != nil {
+		return []string{"pull_request_body_shape_invalid"}
+	}
+	draft, draftOK := pr["draft"].(bool)
+	if !draftOK {
+		return []string{"pull_request_draft_shape_invalid"}
+	}
 	s := prSections(body)
 	codes := []string{}
 	for _, heading := range requiredPRSections {
@@ -82,17 +93,23 @@ func ValidatePullRequest(event map[string]any) []string {
 		}
 	}
 	if !draft {
-		if !regexp.MustCompile(`(?im)^\s*-\s*\[[xX]\]\s*Relevant tests pass\.`).MatchString(s["Validation"]) {
-			codes = append(codes, "ready_tests_unchecked")
-		}
-		if regexp.MustCompile(`(?im)^\s*-\s*\[[ xX]\]\s*Required checks not run are explained below\.`).MatchString(s["Validation"]) && !regexp.MustCompile(`(?im)^\s*-\s*\[[xX]\]\s*Required checks not run are explained below\.`).MatchString(s["Validation"]) {
-			codes = append(codes, "ready_unavailable_checks_unexplained")
+		for _, attestation := range []struct{ phrase, code string }{
+			{"Relevant tests pass.", "ready_tests_unchecked"},
+			{"Generated files were produced by their canonical generators or no generated inputs changed.", "ready_generated_unchecked"},
+			{"English and Korean user-facing documentation remain aligned or no localized user-facing text changed.", "ready_localization_unchecked"},
+			{"No credentials, private prompts, transcripts, sensitive paths, or local-only artifacts were added.", "ready_privacy_unchecked"},
+			{"Required checks not run are explained below.", "ready_unavailable_checks_unexplained"},
+		} {
+			if !regexp.MustCompile(`(?im)^\s*-\s*\[[xX]\]\s*` + regexp.QuoteMeta(attestation.phrase) + `\s*$`).MatchString(s["Validation"]) {
+				codes = append(codes, attestation.code)
+			}
 		}
 	}
 	return codes
 }
 func foldCheckText(s string) string { return strings.ToLower(strings.Join(strings.Fields(s), " ")) }
-func checkGovernance(root, eventPath string) ([]string, error) {
+func checkGovernance(root, eventPath string) ([]string, any, error) {
+	detail := map[string]any{"event_scope": "not_provided", "pull_request_checked": false}
 	required := map[string][]string{"AGENTS.md": {"protected `main`", "hand-edit", "semantically aligned", "telemetry", "last verified commit", "plugin-src/<host>/", "retained legacy Codex selector", "Native Claude entry does not invoke that selector or read transcripts", "New Windows host qualification remains a separate stage"}, "CLAUDE.md": {"repository development", "AGENTS.md", "file is not the installed product controller"}, ".github/copilot-instructions.md": {"AGENTS.md", "protected `main`", "hand-edit"}, ".github/pull_request_template.md": {}}
 	codes := []string{}
 	for rel, phrases := range required {
@@ -126,9 +143,44 @@ func checkGovernance(root, eventPath string) ([]string, error) {
 		}
 		event, e := checkObject(eventPath)
 		if e != nil {
-			return codes, e
+			detail["event_scope"] = "unavailable"
+			return codes, detail, e
 		}
-		codes = append(codes, ValidatePullRequest(event)...)
+		switch {
+		case event["pull_request"] != nil:
+			detail["event_scope"] = "pull_request"
+			detail["pull_request_checked"] = true
+			codes = append(codes, ValidatePullRequest(event)...)
+		case isGovernancePush(event):
+			detail["event_scope"] = "push_source_only"
+		case os.Getenv("GITHUB_EVENT_NAME") == "workflow_dispatch" && isGovernanceDispatch(event):
+			detail["event_scope"] = "workflow_dispatch_source_only"
+		default:
+			detail["event_scope"] = "unrecognized"
+			codes = append(codes, "github_event_shape_unrecognized")
+		}
 	}
-	return codes, nil
+	return codes, detail, nil
+}
+
+func isGovernancePush(event map[string]any) bool {
+	if _, exists := event["pull_request"]; exists {
+		return false
+	}
+	ref, ok := event["ref"].(string)
+	if !ok || !(strings.HasPrefix(ref, "refs/heads/") || strings.HasPrefix(ref, "refs/tags/")) {
+		return false
+	}
+	sha := regexp.MustCompile(`^[0-9a-f]{40}$`)
+	before, beforeOK := event["before"].(string)
+	after, afterOK := event["after"].(string)
+	return beforeOK && afterOK && sha.MatchString(before) && sha.MatchString(after)
+}
+
+func isGovernanceDispatch(event map[string]any) bool {
+	if _, exists := event["pull_request"]; exists {
+		return false
+	}
+	_, ok := event["inputs"].(map[string]any)
+	return ok
 }

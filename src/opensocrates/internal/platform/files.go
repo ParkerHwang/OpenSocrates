@@ -63,6 +63,9 @@ func ExclusiveWrite(path string, data []byte, mode os.FileMode) error {
 	}
 	_, e = f.Write(data)
 	if e == nil {
+		e = modeWrittenFile(f, mode)
+	}
+	if e == nil {
 		e = f.Sync()
 	}
 	closeErr := f.Close()
@@ -70,6 +73,12 @@ func ExclusiveWrite(path string, data []byte, mode os.FileMode) error {
 		return failure()
 	}
 	return syncParent(path)
+}
+func SetOwnedMode(path string, mode os.FileMode) error {
+	if mode.Perm()&0022 != 0 || mode&^os.ModePerm != 0 {
+		return failure()
+	}
+	return chmodOwned(path, mode)
 }
 func ReadFile(path string, max int64) ([]byte, error) {
 	if max < 0 || max > 2<<30 {

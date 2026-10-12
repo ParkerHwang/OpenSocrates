@@ -48,7 +48,7 @@ func RunChecks(args []string, out, errout io.Writer) int {
 	f := flag.NewFlagSet("check", flag.ContinueOnError)
 	f.SetOutput(errout)
 	f.StringVar(&o.root, "root", ".", "repository root")
-	f.StringVar(&o.event, "event", "", "GitHub event JSON")
+	f.StringVar(&o.event, "event", os.Getenv("GITHUB_EVENT_PATH"), "GitHub event JSON (defaults to the Actions event payload)")
 	f.StringVar(&o.report, "report", "", "evidence JSON")
 	f.StringVar(&o.packagePath, "package", "", "package directory")
 	f.StringVar(&o.mode, "mode", "committed", "adjudication evidence scope")
@@ -86,7 +86,7 @@ func RunChecks(args []string, out, errout io.Writer) int {
 		case "docs", "links":
 			codes, detail, e = checkLinks(o.root, o.paths)
 		case "governance":
-			codes, e = checkGovernance(o.root, o.event)
+			codes, detail, e = checkGovernance(o.root, o.event)
 		case "package", "package-docs", "windows", "macos-hosts", "content-hosts", "claude-host":
 			codes, e = checkPackages(o.root, o.packagePath)
 		case "security", "security-scan":
@@ -247,11 +247,11 @@ func checkGenerated(o checkOptions) ([]string, error) {
 			return nil, e
 		}
 	}
-	bundle, e := checkObject(filepath.Join(o.root, "content/compiled-content.bundle.json"))
+	versionBytes, e := os.ReadFile(filepath.Join(o.root, "VERSION"))
 	if e != nil {
 		return nil, e
 	}
-	version, _ := bundle["product_version"].(string)
+	version := strings.TrimSpace(string(versionBytes))
 	if e = GenerateContent(tmp, version); e != nil {
 		return []string{"content_generation_failed"}, e
 	}
@@ -270,9 +270,15 @@ func checkGenerated(o checkOptions) ([]string, error) {
 			trustCodes = append(trustCodes, "generated_mismatch:"+filepath.ToSlash(rel))
 		}
 	}
-	codes, e := compareCheckTree(filepath.Join(o.root, "schemas/v1"), filepath.Join(tmp, "schemas/v1"))
-	if e != nil {
-		return codes, e
+	codes := []string{}
+	for _, relative := range []string{"schemas/v1", "src/opensocrates/internal/content/assets", "src/opensocrates/internal/contracts/assets"} {
+		mismatches, e := compareCheckTree(filepath.Join(o.root, relative), filepath.Join(tmp, relative))
+		if e != nil {
+			return codes, e
+		}
+		for _, mismatch := range mismatches {
+			codes = append(codes, "generated_mismatch:"+relative+"/"+strings.TrimPrefix(mismatch, "generated_mismatch:"))
+		}
 	}
 	codes = append(codes, trustCodes...)
 	entries, e := os.ReadDir(filepath.Join(tmp, "content"))

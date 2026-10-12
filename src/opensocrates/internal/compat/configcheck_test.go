@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -116,5 +117,41 @@ func TestConfigValidatorFeatureProbe(t *testing.T) {
 		if _, err := configCheckTransport(help); err == nil {
 			t.Fatal("unknown transport or strict validation guessed")
 		}
+	}
+}
+
+func TestConfigRequestWriteWithoutPipeDeadline(t *testing.T) {
+	reader, writer := io.Pipe()
+	defer reader.Close()
+	defer writer.Close()
+	read := make(chan []byte, 1)
+	go func() {
+		data := make([]byte, 3)
+		_, err := io.ReadFull(reader, data)
+		if err != nil {
+			read <- nil
+			return
+		}
+		read <- data
+	}()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	if err := writeConfigRequest(ctx, writer, []byte("abc"), func() { reader.Close() }); err != nil {
+		t.Fatal("nonpollable request pipe rejected")
+	}
+	if string(<-read) != "abc" {
+		t.Fatal("request frame changed")
+	}
+}
+
+func TestConfigRequestBlockedWriteCancellation(t *testing.T) {
+	reader, writer := io.Pipe()
+	defer reader.Close()
+	defer writer.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
+	defer cancel()
+	stopped := false
+	if err := writeConfigRequest(ctx, writer, []byte("abc"), func() { stopped = true; reader.Close() }); err == nil || !stopped {
+		t.Fatal("blocked write did not cancel its process")
 	}
 }

@@ -76,14 +76,11 @@ func (s *Selector) Select(parent context.Context, r Request) (*Candidate, error)
 	s.active[id] = cancel
 	s.mu.Unlock()
 	defer func() { s.mu.Lock(); delete(s.active, id); s.mu.Unlock() }()
-	root, err := os.MkdirTemp(systemTempDirectory(), "opensocrates-selector-")
+	root, err := platform.MkdirTemp(systemTempDirectory(), "opensocrates-selector-")
 	if err != nil {
 		return nil, failure(diagnostics.Permission)
 	}
 	defer os.RemoveAll(root)
-	if os.Chmod(root, 0700) != nil {
-		return nil, failure(diagnostics.Permission)
-	}
 	env, workspace, err := isolatedEnvironment(root)
 	if err != nil {
 		return nil, err

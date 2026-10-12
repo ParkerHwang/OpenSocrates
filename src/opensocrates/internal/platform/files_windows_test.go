@@ -28,7 +28,17 @@ func TestWindowsProtectedDACLAndAncestorLease(t *testing.T) {
 	if e = os.Rename(root, root+"-moved"); e == nil {
 		t.Fatal("held parent could be renamed")
 	}
-	lease.Close()
+	if e = lease.Close(); e != nil {
+		t.Fatal(e)
+	}
+	// The rename must become possible after release. This distinguishes an
+	// effective held lease from an unrelated directory/ACL rename failure.
+	if e = os.Rename(root, root+"-moved"); e != nil {
+		t.Fatal("released parent lease still prevents rename")
+	}
+	if e = os.Rename(root+"-moved", root); e != nil {
+		t.Fatal("cannot restore released parent")
+	}
 	sd, e := windows.SecurityDescriptorFromString("D:P(A;;FA;;;WD)")
 	if e != nil {
 		t.Fatal(e)
@@ -118,5 +128,68 @@ func TestWindowsNativeRenameAlignment(t *testing.T) {
 	}
 	if unsafe.Offsetof(header{}.Root)%unsafe.Alignof(windows.Handle(0)) != 0 {
 		t.Fatal("native rename layout misaligned")
+	}
+}
+
+func TestWindowsReadonlyCreationAndOwnedMutation(t *testing.T) {
+	root := privateTestDir(t)
+	atomic := filepath.Join(root, "readonly.exe")
+	if e := AtomicWrite(atomic, []byte("owned readonly binary"), 0555); e != nil {
+		t.Fatal(e)
+	}
+	assertReadonly := func(path string) {
+		t.Helper()
+		info, e := os.Stat(path)
+		if e != nil || info.Mode().Perm()&0200 != 0 {
+			t.Fatal("requested readonly attribute missing")
+		}
+		if e = GuardOwned(path); e != nil {
+			t.Fatal("readonly mode weakened owner/DACL boundary")
+		}
+	}
+	assertReadonly(atomic)
+	backup := filepath.Join(root, "readonly.exe.backup")
+	if e := Rename(atomic, backup); e != nil {
+		t.Fatal("owned readonly backup rename failed")
+	}
+	assertReadonly(backup)
+	if e := SetOwnedMode(backup, 0755); e != nil {
+		t.Fatal(e)
+	}
+	info, e := os.Stat(backup)
+	if e != nil || info.Mode().Perm()&0200 == 0 {
+		t.Fatal("owner-write attribute not restored")
+	}
+	if e = SetOwnedMode(backup, 0555); e != nil {
+		t.Fatal(e)
+	}
+	if e = Remove(backup); e != nil {
+		t.Fatal("owned readonly removal failed")
+	}
+	exclusive := filepath.Join(root, "exclusive-readonly.json")
+	if e = ExclusiveWrite(exclusive, []byte("private readonly"), 0400); e != nil {
+		t.Fatal(e)
+	}
+	assertReadonly(exclusive)
+	if e = ExclusiveWrite(exclusive, []byte("overwrite"), 0600); e == nil {
+		t.Fatal("exclusive readonly original overwritten")
+	}
+	if e = SetOwnedMode(exclusive, 0666); e == nil {
+		t.Fatal("unsafe writable mode accepted")
+	}
+	directory := filepath.Join(root, "readonly-directory")
+	if e = Mkdir(directory); e != nil {
+		t.Fatal(e)
+	}
+	if e = SetOwnedMode(directory, 0555); e != nil {
+		t.Fatal(e)
+	}
+	u, _ := windows.UTF16PtrFromString(nativePath(directory))
+	attributes, e := windows.GetFileAttributes(u)
+	if e != nil || attributes&windows.FILE_ATTRIBUTE_READONLY == 0 {
+		t.Fatal("directory readonly attribute missing")
+	}
+	if e = SetOwnedMode(directory, 0755); e != nil {
+		t.Fatal(e)
 	}
 }

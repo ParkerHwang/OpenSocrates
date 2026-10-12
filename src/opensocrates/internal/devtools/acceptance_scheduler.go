@@ -147,7 +147,7 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 		return report, errors.New("native_scheduler_fixture_required")
 	}
 	fixture, e := filepath.Abs(o.hostBinary)
-	if e != nil || platform.GuardOwned(fixture) != nil {
+	if e != nil {
 		delete(report, "pass")
 		return report, errors.New("native_scheduler_fixture_unavailable")
 	}
@@ -157,13 +157,23 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 	}
 	id := hex.EncodeToString(token[:])
 	report["fixture_id"] = id
-	root, e := os.MkdirTemp("", "opensocrates-native-scheduler-"+id+"-")
+	root, e := platform.MkdirTemp("", "opensocrates-native-scheduler-"+id+"-")
 	if e != nil {
 		return report, e
 	}
 	if e = platform.Guard(root); e != nil {
 		return report, e
 	}
+	ownedFixture := filepath.Join(root, "native-scheduler-entry")
+	if runtime.GOOS == "windows" {
+		ownedFixture += ".exe"
+	}
+	if e = copyAcceptanceTree(fixture, ownedFixture); e != nil {
+		_ = platform.RemoveTree(root)
+		return report, e
+	}
+	fixture = ownedFixture
+	report["fixture_preparation"] = "private_owned_copy_of_explicit_go_fixture"
 	receipt := filepath.Join(root, "receipt.json")
 	cases := report["cases"].(map[string]any)
 	registered := false

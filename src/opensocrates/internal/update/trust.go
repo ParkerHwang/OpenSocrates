@@ -67,7 +67,7 @@ func (r Repository) Fetch(ctx context.Context, stateDir, target string) (Candida
 		return none, closed(diagnostics.Verification, "trust_state")
 	}
 	// Cache is disposable; trusted role bytes live only in the atomic envelope.
-	scratch, e := os.MkdirTemp(stateDir, "tuf-")
+	scratch, e := platform.MkdirTemp(stateDir, "tuf-")
 	if e != nil {
 		return none, closed(diagnostics.Permission, "trust_state")
 	}

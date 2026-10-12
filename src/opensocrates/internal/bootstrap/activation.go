@@ -244,7 +244,7 @@ func (a *Activator) Activate(ctx context.Context, parentPID int) error {
 	if err != nil {
 		return err
 	}
-	scratch, err := os.MkdirTemp(dir, ".manager-activation-")
+	scratch, err := platform.MkdirTemp(dir, ".manager-activation-")
 	if err != nil {
 		return diagnostics.New(diagnostics.Permission, "manager-stage")
 	}

@@ -188,6 +188,9 @@ func atomicWrite(path string, b []byte, mode os.FileMode) error {
 	if _, e = f.Write(b); e != nil {
 		return failure()
 	}
+	if e = modeWrittenFile(f, mode); e != nil {
+		return e
+	}
 	if e = f.Sync(); e != nil {
 		return failure()
 	}
@@ -342,3 +345,10 @@ func chmodOwned(path string, mode os.FileMode) error {
 }
 
 func openLegacyRecovery(path string) (*os.File, error) { return openPrivate(path, os.O_RDWR, 0) }
+
+func modeWrittenFile(f *os.File, mode os.FileMode) error {
+	if unix.Fchmod(int(f.Fd()), uint32(mode.Perm())) != nil {
+		return failure()
+	}
+	return nil
+}

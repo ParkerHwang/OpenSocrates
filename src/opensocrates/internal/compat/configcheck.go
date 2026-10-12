@@ -3,8 +3,6 @@ package compat
 import (
 	"bufio"
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"io"
 	"os"
 	"os/exec"
@@ -190,12 +188,8 @@ func ValidateConfig(parent context.Context, binary string, contents []byte) erro
 		done <- nil
 	}()
 	request := []byte("{\"id\":1,\"method\":\"initialize\",\"params\":{\"clientInfo\":{\"name\":\"opensocrates_config_validation\",\"title\":\"OpenSocrates\",\"version\":\"1.6.0\"}}}\n")
-	deadline, _ := ctx.Deadline()
-	if inputWrite.SetWriteDeadline(deadline) != nil {
-		return failure(diagnostics.HostUnavailable)
-	}
-	if _, err = inputWrite.Write(request); err != nil {
-		return failure(diagnostics.HostUnavailable)
+	if err = writeConfigRequest(ctx, inputWrite, request, func() { process.Close() }); err != nil {
+		return err
 	}
 	select {
 	case err = <-done:
@@ -216,6 +210,36 @@ func ValidateConfig(parent context.Context, binary string, contents []byte) erro
 		return failure(diagnostics.HostUnavailable)
 	}
 	return nil
+}
+
+// Windows anonymous os.Pipe handles do not support SetWriteDeadline. The
+// process context owns cancellation instead: kill its contained tree before
+// closing stdin, releasing even a blocked synchronous pipe write. This seam
+// also handles a partial write without assuming one Write publishes the frame.
+func writeConfigRequest(ctx context.Context, input io.WriteCloser, request []byte, stop func()) error {
+	if ctx.Err() != nil {
+		return failure(diagnostics.HostUnavailable)
+	}
+	written := make(chan error, 1)
+	go func() {
+		for len(request) > 0 {
+			n, err := input.Write(request)
+			if err != nil || n <= 0 {
+				written <- failure(diagnostics.HostUnavailable)
+				return
+			}
+			request = request[n:]
+		}
+		written <- nil
+	}()
+	select {
+	case err := <-written:
+		return err
+	case <-ctx.Done():
+		stop()
+		input.Close()
+		return failure(diagnostics.HostUnavailable)
+	}
 }
 
 func configCheckTransport(help string) ([]string, error) {
@@ -280,15 +304,8 @@ func configCheckEnvironment() (string, []string, string, string, error) {
 	if err != nil {
 		return "", nil, "", "", failure(diagnostics.Permission)
 	}
-	nonce := make([]byte, 16)
-	if _, err = rand.Read(nonce); err != nil {
-		return "", nil, "", "", failure(diagnostics.Permission)
-	}
-	root := filepath.Join(temp, "opensocrates-config-check-"+hex.EncodeToString(nonce))
-	if _, err = os.Lstat(root); !os.IsNotExist(err) {
-		return "", nil, "", "", failure(diagnostics.Permission)
-	}
-	if err = platform.Mkdir(root); err != nil {
+	root, err := platform.MkdirTemp(temp, "opensocrates-config-check-")
+	if err != nil {
 		return "", nil, "", "", failure(diagnostics.Permission)
 	}
 	failed := true

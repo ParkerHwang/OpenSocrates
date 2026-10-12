@@ -20,4 +20,6 @@ jobs:
           go-version: "1.27.2"
           cache: true
       - name: Validate policy and pull request handoff
+        # The Go entrypoint reads GITHUB_EVENT_PATH directly, including edited
+        # and ready_for_review events. No shell interpolation of event paths.
         run: go run ./src/opensocrates/cmd/opensocrates-dev check governance --report build/evidence/governance.json

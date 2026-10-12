@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"sort"
 
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
@@ -66,7 +67,7 @@ func Inspect(path string) (Snapshot, error) {
 		if rel == "." {
 			rel = ""
 		}
-		row := Entry{Path: filepath.ToSlash(rel), Mode: uint32(info.Mode().Perm()), Directory: info.IsDir(), Size: info.Size()}
+		row := Entry{Path: filepath.ToSlash(rel), Mode: uint32(portableInventoryMode(runtime.GOOS, p, info.Mode(), info.IsDir())), Directory: info.IsDir(), Size: info.Size()}
 		if info.IsDir() {
 			row.Size = 0
 		} else {
@@ -145,12 +146,13 @@ func copyVerified(from, to string, expected Snapshot) error {
 			if e != nil {
 				return e
 			}
-			if e := platform.AtomicWrite(target, b, os.FileMode(entry.Mode)); e != nil {
+			if e := platform.ExclusiveWrite(target, b, os.FileMode(entry.Mode)); e != nil {
 				return e
 			}
 		}
 	}
-	// Directory modes are preserved after constructing the private tree.
+	// Unix directory modes and Windows readonly attributes are preserved only
+	// on the newly constructed, owner-checked staging tree.
 	for i := len(current.Entries) - 1; i >= 0; i-- {
 		entry := current.Entries[i]
 		if entry.Directory {
@@ -158,7 +160,7 @@ func copyVerified(from, to string, expected Snapshot) error {
 			if entry.Path != "" {
 				p = filepath.Join(to, filepath.FromSlash(entry.Path))
 			}
-			if e := os.Chmod(p, os.FileMode(entry.Mode)); e != nil {
+			if e := platform.SetOwnedMode(p, os.FileMode(entry.Mode)); e != nil {
 				return diagnostics.New(diagnostics.Permission, "stage")
 			}
 		}
@@ -182,3 +184,23 @@ func copyVerified(from, to string, expected Snapshot) error {
 
 // CopyVerified copies only a bound, owned regular tree and verifies both ends.
 func CopyVerified(from, to string, expected Snapshot) error { return copyVerified(from, to, expected) }
+
+// portableInventoryMode records Windows's readonly attribute and supported
+// directory/file distinction without treating its synthetic 0666/0777 bits
+// as ACL authority. A Windows file has no POSIX execute bit: its name and
+// transaction aliases must never change its snapshot identity.
+// Every caller has already validated ownership, DACLs and reparse boundaries.
+// Unix modes remain exact; no existing source or foreign object is chmodded.
+func portableInventoryMode(goos, _ string, mode os.FileMode, directory bool) os.FileMode {
+	if goos != "windows" {
+		return mode.Perm()
+	}
+	portable := os.FileMode(0644)
+	if directory {
+		portable = 0755
+	}
+	if mode.Perm()&0200 == 0 {
+		portable &^= 0222
+	}
+	return portable
+}

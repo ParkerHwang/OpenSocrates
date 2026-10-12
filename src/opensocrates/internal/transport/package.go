@@ -355,7 +355,7 @@ func Prepare(source, host, version, target string) (Package, error) {
 	root := source
 	cleanup := ""
 	if !info.IsDir() {
-		parent, e := os.MkdirTemp("", "opensocrates-package-")
+		parent, e := platform.MkdirTemp("", "opensocrates-package-")
 		if e != nil {
 			return Package{}, diagnostics.New(diagnostics.Permission, "stage")
 		}
@@ -426,7 +426,7 @@ func Export(p Package, target string) error {
 	if e := platform.Mkdir(parent); e != nil {
 		return e
 	}
-	tmp, e := os.CreateTemp(parent, ".opensocrates-export-")
+	tmp, e := platform.CreateTemp(parent, ".opensocrates-export-")
 	if e != nil {
 		return diagnostics.New(diagnostics.Permission, "export")
 	}

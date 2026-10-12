@@ -35,6 +35,16 @@ func nativeLifecycleAcceptance(o acceptanceOptions) (map[string]any, error) {
 	if e != nil {
 		return report, e
 	}
+	tmp, e := platform.MkdirTemp("", "opensocrates-native-acceptance-")
+	if e != nil {
+		return report, e
+	}
+	defer os.RemoveAll(tmp)
+	ownedPackage := filepath.Join(tmp, "candidate-bundle")
+	if e = copyAcceptanceTree(packageRoot, ownedPackage); e != nil {
+		return report, e
+	}
+	packageRoot = ownedPackage
 	bundle, e := checkObject(filepath.Join(packageRoot, "bundle-manifest.json"))
 	if e != nil {
 		return report, e
@@ -44,11 +54,7 @@ func nativeLifecycleAcceptance(o acceptanceOptions) (map[string]any, error) {
 	}
 	report["source_git_commit"] = bundle["source_git_commit"]
 	report["artifact_identity"] = digest(mustAcceptanceRead(filepath.Join(packageRoot, "bundle-manifest.json")))
-	tmp, e := os.MkdirTemp("", "opensocrates-native-acceptance-")
-	if e != nil {
-		return report, e
-	}
-	defer os.RemoveAll(tmp)
+	report["package_preparation"] = "private_owned_copy_of_explicit_developer_fixture"
 	env, work, e := isolatedAcceptanceEnvironment(tmp)
 	if e != nil {
 		return report, e
@@ -58,7 +64,7 @@ func nativeLifecycleAcceptance(o acceptanceOptions) (map[string]any, error) {
 	home := filepath.Join(tmp, "home")
 	unrelated := filepath.Join(codexRoot, "foreign-owned.txt")
 	sentinel := []byte("unrelated synthetic state\n")
-	if e = os.WriteFile(unrelated, sentinel, 0600); e != nil {
+	if e = platform.ExclusiveWrite(unrelated, sentinel, 0600); e != nil {
 		return report, e
 	}
 	cases := report["cases"].(map[string]any)
@@ -144,10 +150,13 @@ func AcceptanceHostFixture(args []string, out interface{ Write([]byte) (int, err
 	}
 	statePath := filepath.Join(root, "host-fixture.json")
 	state := map[string]any{"marketplace": "", "installed": false, "enabled": true}
-	if b, e := os.ReadFile(statePath); e == nil {
-		if json.Unmarshal(b, &state) != nil {
+	if _, e := os.Lstat(statePath); e == nil {
+		b, e := platform.ReadFile(statePath, 8<<20)
+		if e != nil || json.Unmarshal(b, &state) != nil {
 			return 2
 		}
+	} else if !os.IsNotExist(e) {
+		return 2
 	}
 	if len(args) < 2 || args[0] != "plugin" {
 		return 2
@@ -157,7 +166,15 @@ func AcceptanceHostFixture(args []string, out interface{ Write([]byte) (int, err
 		if e != nil {
 			return 2
 		}
-		if os.WriteFile(statePath, b, 0600) != nil {
+		var writeErr error
+		if _, e := os.Lstat(statePath); os.IsNotExist(e) {
+			writeErr = platform.ExclusiveWrite(statePath, b, 0600)
+		} else if e == nil {
+			writeErr = platform.AtomicWrite(statePath, b, 0600)
+		} else {
+			return 2
+		}
+		if writeErr != nil {
 			return 2
 		}
 		return 0
@@ -320,7 +337,7 @@ func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]
 	stateDir := filepath.Join(home, ".opensocrates")
 	legacyPackage := filepath.Join(root, "legacy-package")
 	stage = "copy_legacy_payload_fixture"
-	if e := copyCheckTree(filepath.Join(packageRoot, "packages/codex"), legacyPackage); e != nil {
+	if e := copyAcceptanceTree(filepath.Join(packageRoot, "packages/codex"), legacyPackage); e != nil {
 		return record(false)
 	}
 	// Freeze the original desired-state and three-field ownership marker formats.
@@ -369,7 +386,7 @@ func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]
 	// executed by the production preactivation/version probe below.
 	hostRoot := filepath.Join(root, "codex/managed-marketplaces/opensocrates")
 	stage = "prepare_legacy_owned_layout"
-	if e := copyCheckTree(legacyPackage, filepath.Join(hostRoot, "build/generated/plugins/codex")); e != nil {
+	if e := copyAcceptanceTree(legacyPackage, filepath.Join(hostRoot, "build/generated/plugins/codex")); e != nil {
 		return record(false)
 	}
 	marketplacePath := filepath.Join(hostRoot, ".agents/plugins/marketplace.json")
@@ -431,4 +448,59 @@ func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]
 		return record(false)
 	}
 	return record(true)
+}
+
+// copyAcceptanceTree prepares newly created fixture objects with explicit
+// current-user ownership. It never repairs source ACLs or overwrites a target.
+func copyAcceptanceTree(from, to string) error {
+	var count int
+	var total int64
+	return filepath.WalkDir(from, func(path string, entry os.DirEntry, e error) error {
+		if e != nil {
+			return e
+		}
+		if entry.Type()&os.ModeSymlink != 0 {
+			return errors.New("linked_acceptance_source")
+		}
+		relative, e := filepath.Rel(from, path)
+		if e != nil {
+			return e
+		}
+		destination := filepath.Join(to, relative)
+		info, e := entry.Info()
+		if e != nil {
+			return e
+		}
+		count++
+		if count > lifecycle.MaxFiles {
+			return errors.New("acceptance_source_inventory_limit")
+		}
+		if info.IsDir() {
+			lease, e := platform.Lease(filepath.Join(path, ".acceptance-source-validation"))
+			if e != nil {
+				return e
+			}
+			lease.Close()
+			return platform.Mkdir(destination)
+		}
+		if !info.Mode().IsRegular() {
+			return errors.New("nonregular_acceptance_source")
+		}
+		total += info.Size()
+		if info.Size() > lifecycle.MaxFileBytes || total > lifecycle.MaxTotalBytes {
+			return errors.New("acceptance_source_size_limit")
+		}
+		data, e := readAcceptanceSource(path, lifecycle.MaxFileBytes)
+		if e != nil {
+			return e
+		}
+		if int64(len(data)) != info.Size() {
+			return errors.New("acceptance_source_changed")
+		}
+		if e = platform.Mkdir(filepath.Dir(destination)); e != nil {
+			return e
+		}
+		mode := info.Mode().Perm() &^ 0022
+		return platform.ExclusiveWrite(destination, data, mode)
+	})
 }

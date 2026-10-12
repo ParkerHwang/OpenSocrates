@@ -198,11 +198,80 @@ func verifyHelperSignature(path, target string) error {
 	return nil
 }
 
-// WritePortableZIP emits ordered regular entries, a fixed UTC timestamp and
-// portable Unix file modes. Symlinks and special files are rejected.
+// portableArchiveModes uses generated inventory modes, never host permission
+// bits. Windows regular-file metadata cannot represent portable Unix modes.
+func portableArchiveModes(source string) (map[string]os.FileMode, map[string]map[string]any, error) {
+	rootInfo, err := os.Lstat(source)
+	if err != nil || !rootInfo.IsDir() || rootInfo.Mode()&os.ModeSymlink != 0 {
+		return nil, nil, fmt.Errorf("archive root must be a regular directory")
+	}
+	manifestPath := ""
+	for _, candidate := range []string{"bundle-manifest.json", "release-manifest.json", "opensocrates/release-manifest.json"} {
+		if _, err = os.Lstat(filepath.Join(source, filepath.FromSlash(candidate))); err == nil {
+			manifestPath = candidate
+			break
+		} else if !os.IsNotExist(err) {
+			return nil, nil, err
+		}
+	}
+	if manifestPath == "" {
+		return nil, nil, fmt.Errorf("generated archive manifest required")
+	}
+	manifestBytes, err := regularRead(source, manifestPath)
+	if err != nil {
+		return nil, nil, err
+	}
+	manifest, err := ReadObject(filepath.Join(source, filepath.FromSlash(manifestPath)))
+	if err != nil {
+		return nil, nil, err
+	}
+	canonical, err := Canonical(manifest)
+	if err != nil || !bytes.Equal(manifestBytes, canonical) {
+		return nil, nil, fmt.Errorf("noncanonical archive manifest")
+	}
+	contentOnly := manifest["schema"] == schema("content-host-manifest")
+	if !contentOnly && manifest["schema"] != schema("plugin-release-manifest") && manifest["schema"] != "opensocrates.native-bundle/1.0.0" {
+		return nil, nil, fmt.Errorf("unknown archive manifest schema")
+	}
+	modes := map[string]os.FileMode{manifestPath: 0644}
+	records := map[string]map[string]any{}
+	if len(arr(manifest["files"])) == 0 {
+		return nil, nil, fmt.Errorf("empty archive inventory")
+	}
+	for _, raw := range arr(manifest["files"]) {
+		record := obj(raw)
+		name := str(record["path"])
+		if !safeRelative(name) || modes[name] != 0 {
+			return nil, nil, fmt.Errorf("unsafe or duplicate archive inventory member")
+		}
+		var mode os.FileMode
+		switch jsonToken(record["mode"]) {
+		case "420":
+			mode = 0644
+		case "493":
+			mode = 0755
+		default:
+			return nil, nil, fmt.Errorf("archive inventory mode must be 0644 or 0755")
+		}
+		if contentOnly && mode != 0644 {
+			return nil, nil, fmt.Errorf("executable content archive member")
+		}
+		modes[name] = mode
+		records[name] = record
+	}
+	return modes, records, nil
+}
+
+// WritePortableZIP emits inventoried regular entries with fixed portable modes
+// and timestamp. Hashes, sizes and exact membership are checked before writing;
+// host permission bits never determine an archive member's declared mode.
 func WritePortableZIP(source, destination string) error {
+	modes, records, e := portableArchiveModes(source)
+	if e != nil {
+		return e
+	}
 	var paths []string
-	e := filepath.WalkDir(source, func(path string, d os.DirEntry, e error) error {
+	e = filepath.WalkDir(source, func(path string, d os.DirEntry, e error) error {
 		if e != nil {
 			return e
 		}
@@ -214,6 +283,10 @@ func WritePortableZIP(source, destination string) error {
 			if e != nil || !info.Mode().IsRegular() {
 				return fmt.Errorf("nonregular archive input")
 			}
+			rel, e := filepath.Rel(source, path)
+			if e != nil || modes[filepath.ToSlash(rel)] == 0 {
+				return fmt.Errorf("unlisted archive member")
+			}
 			paths = append(paths, path)
 		}
 		return nil
@@ -221,23 +294,26 @@ func WritePortableZIP(source, destination string) error {
 	if e != nil {
 		return e
 	}
+	if len(paths) != len(modes) {
+		return fmt.Errorf("missing archive inventory member")
+	}
 	sort.Strings(paths)
 	var b bytes.Buffer
 	writer := zip.NewWriter(&b)
 	for _, path := range paths {
-		info, e := os.Stat(path)
+		rel, _ := filepath.Rel(source, path)
+		name := filepath.ToSlash(rel)
+		data, e := regularRead(source, name)
 		if e != nil {
 			return e
 		}
-		rel, _ := filepath.Rel(source, path)
-		header := &zip.FileHeader{Name: filepath.ToSlash(rel), Method: zip.Deflate}
-		header.SetMode(info.Mode().Perm())
+		if record := records[name]; record != nil && (digest(data) != record["sha256"] || jsonToken(record["size"]) != fmt.Sprint(len(data))) {
+			return fmt.Errorf("archive inventory hash or size mismatch")
+		}
+		header := &zip.FileHeader{Name: name, Method: zip.Deflate}
+		header.SetMode(modes[name])
 		header.SetModTime(time.Date(1980, 1, 1, 0, 0, 0, 0, time.UTC))
 		entry, e := writer.CreateHeader(header)
-		if e != nil {
-			return e
-		}
-		data, e := os.ReadFile(path)
 		if e != nil {
 			return e
 		}

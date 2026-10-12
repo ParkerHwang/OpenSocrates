@@ -62,7 +62,10 @@ func TestActualConfiguredShellPreservesNativeStdinAndUnsafeLookingPaths(t *testi
 	}
 	env = append(env, "PLUGIN_ROOT="+root, "OPENSOCRATES_NATIVE_STDIN_FIXTURE=1")
 	input := []byte("{\"unicode\":\"한국\",\"numeric\":9007199254740993,\"text\":\"$ dollar ` tick\"}\n")
-	out, errout, e := runAcceptanceProcess(shell, args, input, env, work, 2*time.Second)
+	// This test checks byte transport through a copied development test executable.
+	// Cold PowerShell/test initialization has a separate deadline; packaged hook
+	// qualification still requires its two-second host deadline and one-second p95.
+	out, errout, e := runAcceptanceProcess(shell, args, input, env, work, 15*time.Second)
 	if e != nil || len(errout) != 0 || !bytes.Equal(out, input) {
 		t.Fatal("configured host shell changed native input/output or failed")
 	}

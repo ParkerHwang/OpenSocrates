@@ -4,11 +4,43 @@ import (
 	"archive/zip"
 	"bytes"
 	"encoding/json"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
+
+func TestPublicationAdministrationReadCredentialIsMandatoryAndNarrow(t *testing.T) {
+	t.Setenv("GH_TOKEN", "fixture-content-token")
+	t.Setenv("GITHUB_TOKEN", "fixture-fallback-token")
+	t.Setenv("OPENSOCRATES_RELEASE_ADMIN_READ_TOKEN", "")
+	endpoint, _ := url.Parse("https://api.github.com/repos/" + publicationRepository + "/immutable-releases")
+	if _, err := publicationCredential(http.MethodGet, endpoint); err == nil || !strings.Contains(err.Error(), "admin_read_credential_unavailable") {
+		t.Fatal("ordinary contents token must not satisfy administration-read gate")
+	}
+	t.Setenv("OPENSOCRATES_RELEASE_ADMIN_READ_TOKEN", "fixture-admin-read-token")
+	token, err := publicationCredential(http.MethodGet, endpoint)
+	if err != nil || token != "fixture-admin-read-token" {
+		t.Fatal("approved administration-read credential was not selected")
+	}
+	if _, err := publicationCredential(http.MethodPut, endpoint); err == nil {
+		t.Fatal("administration credential allowed a write method")
+	}
+	for _, address := range []string{"https://api.github.com/repos/" + publicationRepository + "/releases", "https://uploads.github.com/repos/" + publicationRepository + "/releases/1/assets?name=test.zip"} {
+		ordinary, _ := url.Parse(address)
+		token, err := publicationCredential(http.MethodPost, ordinary)
+		if err != nil || token != "fixture-content-token" {
+			t.Fatal("administration credential escaped its read-only endpoint")
+		}
+	}
+	first := &http.Request{URL: endpoint}
+	redirect, _ := url.Parse("https://api.github.com/repos/" + publicationRepository + "/releases")
+	if err := publicationHTTP().CheckRedirect(&http.Request{URL: redirect}, []*http.Request{first}); err == nil {
+		t.Fatal("administration credential followed a different endpoint redirect")
+	}
+}
 
 func TestPublicationRemoteTag(t *testing.T) {
 	commit := strings.Repeat("a", 40)

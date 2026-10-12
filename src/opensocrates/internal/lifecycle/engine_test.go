@@ -14,7 +14,7 @@ import (
 
 func fixture(t *testing.T) (*Engine, string, string) {
 	t.Helper()
-	base := t.TempDir()
+	base := privateLifecycleTestDir(t)
 	state := filepath.Join(base, "state")
 	target := filepath.Join(base, "owned")
 	source := filepath.Join(base, "candidate")
@@ -140,4 +140,13 @@ func TestLegacyLockExcludedAndNeverEvicted(t *testing.T) {
 	if _, err := os.Lstat(path); err != nil {
 		t.Fatal("existing lock discarded")
 	}
+}
+
+func privateLifecycleTestDir(t *testing.T) string {
+	t.Helper()
+	base := filepath.Join(t.TempDir(), "private-fixture")
+	if err := platform.Mkdir(base); err != nil {
+		t.Fatal(err)
+	}
+	return base
 }

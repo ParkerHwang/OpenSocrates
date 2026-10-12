@@ -80,7 +80,7 @@ func (m *Manager) purge(ctx context.Context, r Request) (Result, error) {
 	} else if len(pending) > 0 {
 		return result, diagnostics.New(diagnostics.Locked, "recovery-required")
 	}
-	scratch, e := os.MkdirTemp(m.StateDir, ".management-")
+	scratch, e := platform.MkdirTemp(m.StateDir, ".management-")
 	if e != nil {
 		return result, diagnostics.New(diagnostics.Permission, "stage")
 	}

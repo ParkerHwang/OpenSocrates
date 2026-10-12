@@ -185,7 +185,24 @@ production publication safely. / 운영 서명·메타데이터·게시 권한�
 Explicit Codex purge/trust reset retains its existing bounded purpose. The
 intentional safer ordering preflights every removable payload before mutation.
 Reset only seven exact managed hook-state entries after isolated pinned
-app-server configuration validation; preserve unrelated TOML bytes and do not
+app-server strict-configuration capability validation; preserve unrelated TOML bytes and do not
 auto-approve trust. Shared manager bundles, npm packages and conversation data
 remain. / purge 대상 전체를 사전 확인하는 순서 개선이며 신뢰 초기화는 기존의
 정확한 7개 항목에 한정합니다. 실제 네이티브 증거는 별도입니다.
+
+Trust-reset configuration validation is a separate bounded management capability
+probe requiring advertised stdio transport and `--strict-config`, not the legacy
+selector version pin. Unknown support is unavailable. Reset completes its own
+verified transaction under the lifecycle lock before purge; later purge failure
+does not undo that explicit reset. / 관리 설정 검증과 이전 선택기의 버전 고정을
+구분하며 신뢰 초기화·purge의 별도 완료 상태를 정확히 보고합니다.
+
+GitHub's repository
+[immutable-release status API](https://docs.github.com/en/rest/repos/repos#check-if-immutable-releases-are-enabled-for-a-repository)
+requires Administration:read. The protected publication environment therefore
+requires `OPENSOCRATES_RELEASE_ADMIN_READ_TOKEN` scoped to this repository/read
+permission, used only for the exact `/immutable-releases` GET; release mutations
+continue using the contents:write workflow token. Missing permission blocks
+before publication, with no immutability fallback. / 해당 조회는 별도 저장소 범위
+Administration:read secret이 필요합니다. 값은 문서·로그에 기록하지 않으며
+권한 부재를 검사 우회나 릴리스 검증 완료로 해석하지 않습니다.

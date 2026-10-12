@@ -56,6 +56,9 @@ func publicationHTTP() *http.Client {
 		if !allowed[req.URL.Hostname()] {
 			return errors.New("release_redirect_host_invalid")
 		}
+		if len(via) > 0 && publicationAdministrationEndpoint(via[0].URL) && req.URL.String() != via[0].URL.String() {
+			return errors.New("release_immutability_redirect_forbidden")
+		}
 		// Tokens never follow cross-host redirects, including asset/CDN redirects.
 		if len(via) > 0 && via[0].URL.Hostname() != req.URL.Hostname() {
 			req.Header.Del("Authorization")
@@ -69,12 +72,9 @@ func publicationRequest(method, address, contentType string, body io.Reader) (*h
 	if err != nil || parsed.Scheme != "https" || (parsed.Host != "api.github.com" && parsed.Host != "uploads.github.com") {
 		return nil, errors.New("release_endpoint_invalid")
 	}
-	token := os.Getenv("GH_TOKEN")
-	if token == "" {
-		token = os.Getenv("GITHUB_TOKEN")
-	}
-	if token == "" {
-		return nil, errors.New("release_token_unavailable")
+	token, err := publicationCredential(method, parsed)
+	if err != nil {
+		return nil, err
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 	req, err := http.NewRequestWithContext(ctx, method, address, body)
@@ -96,6 +96,35 @@ func publicationRequest(method, address, contentType string, body io.Reader) (*h
 	}
 	response.Body = &publicationClosingBody{ReadCloser: response.Body, cancel: cancel}
 	return response, nil
+}
+
+// GitHub's immutable-release settings endpoint needs Administration:read;
+// Actions' contents:write token cannot grant it. Keep this separate approved
+// credential restricted to one read-only endpoint and never fall back to the
+// ordinary release token for that check.
+func publicationCredential(method string, endpoint *url.URL) (string, error) {
+	if publicationAdministrationEndpoint(endpoint) {
+		if method != http.MethodGet {
+			return "", errors.New("release_immutability_credential_read_only")
+		}
+		token := os.Getenv("OPENSOCRATES_RELEASE_ADMIN_READ_TOKEN")
+		if token == "" {
+			return "", errors.New("release_immutability_admin_read_credential_unavailable")
+		}
+		return token, nil
+	}
+	token := os.Getenv("GH_TOKEN")
+	if token == "" {
+		token = os.Getenv("GITHUB_TOKEN")
+	}
+	if token == "" {
+		return "", errors.New("release_token_unavailable")
+	}
+	return token, nil
+}
+
+func publicationAdministrationEndpoint(endpoint *url.URL) bool {
+	return endpoint.Scheme == "https" && endpoint.Host == "api.github.com" && endpoint.Path == "/repos/"+publicationRepository+"/immutable-releases"
 }
 
 type publicationClosingBody struct {
@@ -140,7 +169,7 @@ func publicationImmutableEnabled() error {
 		Enabled bool `json:"enabled"`
 	}
 	if err := publicationAPI("GET", "/immutable-releases", nil, &value); err != nil {
-		return err
+		return publicationError("release_immutability_administration_read_check", err)
 	}
 	if !value.Enabled {
 		return errors.New("release_immutability_required")

@@ -128,6 +128,12 @@ jobs:
           cache: true
       - name: Require exact merged remote tag
         run: go run ./src/opensocrates/cmd/opensocrates-dev release-identity
+      - name: Require immutable release settings with approved administration-read credential
+        env:
+          # A separate fine-grained/App token scoped to this repository with
+          # Administration:read is required; contents:write cannot read this API.
+          OPENSOCRATES_RELEASE_ADMIN_READ_TOKEN: ${{ secrets.OPENSOCRATES_RELEASE_ADMIN_READ_TOKEN }}
+        run: go run ./src/opensocrates/cmd/opensocrates-dev release-immutability
       - uses: actions/download-artifact@v7
         with:
           pattern: signed-native-*-${{ github.sha }}
@@ -170,6 +176,8 @@ jobs:
       - name: Final exact publication inventory
         run: go run ./src/opensocrates/cmd/opensocrates-dev release-finalize
       - name: Publish immutable GitHub Release
+        env:
+          OPENSOCRATES_RELEASE_ADMIN_READ_TOKEN: ${{ secrets.OPENSOCRATES_RELEASE_ADMIN_READ_TOKEN }}
         run: go run ./src/opensocrates/cmd/opensocrates-dev release-publish
       - name: Download and verify every public asset byte
         run: go run ./src/opensocrates/cmd/opensocrates-dev release-verify-public

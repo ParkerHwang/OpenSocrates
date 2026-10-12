@@ -108,7 +108,7 @@ func isolatedAcceptanceEnvironment(root string) ([]string, string, error) {
 	tmp := filepath.Join(root, "tmp")
 	work := filepath.Join(root, "workspace")
 	for _, p := range []string{home, codex, tmp, work} {
-		if e := os.MkdirAll(p, 0700); e != nil {
+		if e := platform.Mkdir(p); e != nil {
 			return nil, "", e
 		}
 	}
@@ -210,7 +210,7 @@ func measureNativeHook(packageRoot string, runs int) (map[string]any, error) {
 	}
 	report["artifact_identity"] = digest(manifestBytes)
 	report["qualified_shell"] = qualifiedHookShell(target)
-	tmp, e := os.MkdirTemp("", "opensocrates-timing-")
+	tmp, e := platform.MkdirTemp("", "opensocrates-timing-")
 	if e != nil {
 		return report, e
 	}
@@ -218,7 +218,7 @@ func measureNativeHook(packageRoot string, runs int) (map[string]any, error) {
 	// Environment expansion, never textual root replacement, must preserve these
 	// characters as path data. The receipt records only the scenario name.
 	measuredRoot := filepath.Join(tmp, "한국 $ dollar ` tick and spaces")
-	if e = copyCheckTree(root, measuredRoot); e != nil {
+	if e = copyAcceptanceTree(root, measuredRoot); e != nil {
 		return report, e
 	}
 	sources := map[string]any{}

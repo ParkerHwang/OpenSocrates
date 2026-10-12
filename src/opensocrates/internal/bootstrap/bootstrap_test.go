@@ -56,6 +56,17 @@ func putJSON(t *testing.T, path string, value any) {
 	put(t, path, data, 0600)
 }
 
+func privateFixtureDir(t *testing.T) string {
+	t.Helper()
+	// Go's test temp root may inherit an Administrators owner on Windows. Create
+	// a new current-user private child rather than changing that foreign root.
+	dir := filepath.Join(t.TempDir(), "private")
+	if err := platform.Mkdir(dir); err != nil {
+		t.Fatal(err)
+	}
+	return dir
+}
+
 func fixtureBundle(t *testing.T, dir, version, goos, goarch string, binary []byte) string {
 	t.Helper()
 	id := version + "-" + platformTarget(goos, goarch) + "-fixture"
@@ -104,7 +115,7 @@ func executableBytes(t *testing.T) []byte {
 }
 
 func TestForwardVersionPinArgumentsAndExit(t *testing.T) {
-	dir := t.TempDir()
+	dir := privateFixtureDir(t)
 	binary := executableBytes(t)
 	stable := managerPath(dir, runtime.GOOS)
 	put(t, stable, binary, 0755)
@@ -137,7 +148,7 @@ func TestForwardVersionPinArgumentsAndExit(t *testing.T) {
 }
 
 func TestForwardRejectsBundleModificationAndKeepsHooksFailOpen(t *testing.T) {
-	dir := t.TempDir()
+	dir := privateFixtureDir(t)
 	binary := executableBytes(t)
 	stable := managerPath(dir, runtime.GOOS)
 	put(t, stable, binary, 0755)
@@ -159,7 +170,7 @@ func TestForwardRejectsBundleModificationAndKeepsHooksFailOpen(t *testing.T) {
 }
 
 func TestForwardRejectsModifiedStableManager(t *testing.T) {
-	dir := t.TempDir()
+	dir := privateFixtureDir(t)
 	binary := executableBytes(t)
 	stable := managerPath(dir, runtime.GOOS)
 	put(t, stable, binary, 0755)
@@ -184,7 +195,7 @@ func TestForwardRejectsModifiedStableManager(t *testing.T) {
 
 func activationFixture(t *testing.T) (*Activator, string, lifecycle.Snapshot, lifecycle.Snapshot) {
 	t.Helper()
-	dir := t.TempDir()
+	dir := privateFixtureDir(t)
 	stable := managerPath(dir, "windows")
 	put(t, stable, []byte("old native manager"), 0755)
 	before, err := lifecycle.Inspect(stable)

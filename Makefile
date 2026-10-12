@@ -36,6 +36,7 @@ docs-check:
 	@$(DEV) check docs --report build/evidence/links.json
 
 governance-check:
+	# Go reads GITHUB_EVENT_PATH directly; PR bodies are checked without shell interpolation.
 	@$(DEV) check governance --report build/evidence/governance.json
 
 package-check: generate

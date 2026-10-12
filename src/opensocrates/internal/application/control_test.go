@@ -17,7 +17,10 @@ const controlToken = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 
 func controlFixture(t *testing.T, recording bool) (*application.ControlApplication, *persistence.TurnStore) {
 	t.Helper()
-	root := t.TempDir()
+	root := filepath.Join(t.TempDir(), "owned-control")
+	if e := platform.Mkdir(root); e != nil {
+		t.Fatal(e)
+	}
 	store, e := persistence.NewTurnStore(root)
 	if e != nil {
 		t.Fatal(e)

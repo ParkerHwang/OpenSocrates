@@ -52,7 +52,7 @@ func TestSchemaUniqueNumbersCompareMathematically(t *testing.T) {
 	}
 }
 func validTestPR() string {
-	return "## Summary\nPort runtime to Go.\n## Impact\nNative installation preserves trust.\n## Tracking\nCloses #111\nPriority: P1\nWorkstream: Migration\n## Validation\n- [x] Relevant tests pass.\n- [x] Required checks not run are explained below.\n## Evidence level\n- [x] Implemented\n## Remaining limitations\nWindows live host evidence unavailable.\n## Handoff\nLast verified commit: 0123456789abcdef\nCommands run: go test ./... passed\nCommands not run: signed release unavailable\nRemaining work: obtain native receipts\nKnown limitations: pending live evidence\n"
+	return "## Summary\nPort runtime to Go.\n## Impact\nNative installation preserves trust.\n## Tracking\nCloses #111\nPriority: P1\nWorkstream: Migration\n## Validation\n- [x] Relevant tests pass.\n- [x] Generated files were produced by their canonical generators or no generated inputs changed.\n- [x] English and Korean user-facing documentation remain aligned or no localized user-facing text changed.\n- [x] No credentials, private prompts, transcripts, sensitive paths, or local-only artifacts were added.\n- [x] Required checks not run are explained below.\n## Evidence level\n- [x] Implemented\n## Remaining limitations\nWindows live host evidence unavailable.\n## Handoff\nLast verified commit: 0123456789abcdef\nCommands run: go test ./... passed\nCommands not run: signed release unavailable\nRemaining work: obtain native receipts\nKnown limitations: pending live evidence\n"
 }
 func TestGovernanceBodyMutations(t *testing.T) {
 	body := validTestPR()

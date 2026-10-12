@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"github.com/theupdateframework/go-tuf/v2/metadata"
 	"github.com/theupdateframework/go-tuf/v2/metadata/config"
 	"github.com/theupdateframework/go-tuf/v2/metadata/updater"
@@ -48,7 +49,7 @@ func MetadataFetchCommand(args []string) error {
 		}
 		return nil
 	}
-	scratch, err := os.MkdirTemp("", "opensocrates-sign-metadata-")
+	scratch, err := platform.MkdirTemp("", "opensocrates-sign-metadata-")
 	if err != nil {
 		return closed(diagnostics.Permission, "metadata_fetch")
 	}

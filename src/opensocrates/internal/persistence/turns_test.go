@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/domain"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"os"
 	"path/filepath"
 	"strings"
@@ -20,7 +21,7 @@ func testTurn(t *testing.T, store *TurnStore, token string) map[string]any {
 	return map[string]any{"schema": "opensocrates.ephemeral-turn-state/1.0.0", "token_tag": tag, "host_session_key": "sha256:" + strings.Repeat("1", 64), "host_turn_key": nil, "host": "codex_cli", "issued_at": "2026-10-12T00:00:00.000Z", "expires_at": "2026-10-12T06:00:00.000Z", "recording_eligible": false, "onboarding_disclosure_turn": false, "task_id": nil, "judgment_id": nil, "task_state": "new", "participation": nil, "effective_rigor": "together", "primary_method": nil, "secondary_method": nil, "repair_count": contracts.Number(0), "accepted_controls": []any{}, "observation_tags": []any{}}
 }
 func TestTurnStoreContentFreeAndCAS(t *testing.T) {
-	root := t.TempDir()
+	root := ownedTurnFixtureRoot(t)
 	store, e := NewTurnStore(root)
 	if e != nil {
 		t.Fatal(e)
@@ -59,7 +60,7 @@ func TestTurnStoreContentFreeAndCAS(t *testing.T) {
 	}
 }
 func TestTurnStoreConcurrentMutation(t *testing.T) {
-	store, e := NewTurnStore(t.TempDir())
+	store, e := NewTurnStore(ownedTurnFixtureRoot(t))
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -95,7 +96,7 @@ func TestTurnStoreConcurrentMutation(t *testing.T) {
 	}
 }
 func TestTurnStatePrivacyAndUnknownFields(t *testing.T) {
-	store, e := NewTurnStore(t.TempDir())
+	store, e := NewTurnStore(ownedTurnFixtureRoot(t))
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -111,7 +112,7 @@ func TestTurnStatePrivacyAndUnknownFields(t *testing.T) {
 	}
 }
 func TestExistingTurnStoreDoesNotInitialize(t *testing.T) {
-	root := t.TempDir()
+	root := ownedTurnFixtureRoot(t)
 	if _, e := ExistingTurnStore(root); e == nil {
 		t.Fatal("missing existing key accepted")
 	}
@@ -119,4 +120,16 @@ func TestExistingTurnStoreDoesNotInitialize(t *testing.T) {
 	if len(entries) != 0 {
 		t.Fatal("reader initialized installation")
 	}
+}
+
+// Elevated Windows runners can create t.TempDir with an Administrators owner.
+// Exercise the real owner-only store boundary against a child created through
+// the platform adapter, rather than weakening that production ownership check.
+func ownedTurnFixtureRoot(t *testing.T) string {
+	t.Helper()
+	root := filepath.Join(t.TempDir(), "owned-turns")
+	if e := platform.Mkdir(root); e != nil {
+		t.Fatal(e)
+	}
+	return root
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"os"
 	"path/filepath"
 
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
@@ -68,7 +67,7 @@ func (m *Manager) existing(ctx context.Context, r Request) (Result, error) {
 	if e != nil {
 		return result, e
 	}
-	scratch, e := os.MkdirTemp(m.StateDir, ".management-")
+	scratch, e := platform.MkdirTemp(m.StateDir, ".management-")
 	if e != nil {
 		return result, diagnostics.New(diagnostics.Permission, "stage")
 	}
@@ -250,7 +249,7 @@ func (m *Manager) ApplyRegistrationChange(ctx context.Context, change registrati
 		return e
 	}
 	defer unlock()
-	scratch, e := os.MkdirTemp(m.StateDir, ".management-")
+	scratch, e := platform.MkdirTemp(m.StateDir, ".management-")
 	if e != nil {
 		return diagnostics.New(diagnostics.Permission, "stage")
 	}
@@ -297,7 +296,7 @@ func (m *Manager) ApplyUpdateConfiguration(ctx context.Context, configuration up
 	} else if len(pending) > 0 {
 		return diagnostics.New(diagnostics.Locked, "recovery-required")
 	}
-	scratch, e := os.MkdirTemp(m.StateDir, ".management-")
+	scratch, e := platform.MkdirTemp(m.StateDir, ".management-")
 	if e != nil {
 		return diagnostics.New(diagnostics.Permission, "stage")
 	}

@@ -9,8 +9,20 @@ import (
 	"testing"
 )
 
+func privateSettingsTestRoot(t *testing.T) string {
+	t.Helper()
+	// On Windows an elevated token's temporary directory can be owned by the
+	// Administrators group. Create a new explicitly owned state directory;
+	// existing foreign ownership must never be repaired by these fixtures.
+	root := filepath.Join(t.TempDir(), "private-settings")
+	if err := platform.Mkdir(root); err != nil {
+		t.Fatal(err)
+	}
+	return root
+}
+
 func TestSettingsAtomicRevisionAndPreservation(t *testing.T) {
-	root := t.TempDir()
+	root := privateSettingsTestRoot(t)
 	store := SettingsStore{Root: root}
 	first := store.Load()
 	if first.Rigor() != "together" || first.Revision() != 1 {
@@ -47,9 +59,9 @@ func TestSettingsAtomicRevisionAndPreservation(t *testing.T) {
 	}
 }
 func TestSettingsRefuseLinkedStateAndExport(t *testing.T) {
-	root := t.TempDir()
+	root := privateSettingsTestRoot(t)
 	foreign := filepath.Join(root, "foreign.json")
-	if e := os.WriteFile(foreign, []byte("keep"), 0600); e != nil {
+	if e := platform.ExclusiveWrite(foreign, []byte("keep"), 0600); e != nil {
 		t.Fatal(e)
 	}
 	if e := os.Symlink(foreign, filepath.Join(root, "settings.json")); e != nil {

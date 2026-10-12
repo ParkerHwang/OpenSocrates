@@ -53,6 +53,14 @@ func RunPublication(root, command string, args []string) error {
 	case "release-identity":
 		_, err = publicationIdentity(o.root)
 		return err
+	case "release-immutability":
+		if err = publicationRequireEnvironment(); err != nil {
+			return err
+		}
+		if _, err = publicationIdentity(o.root); err != nil {
+			return err
+		}
+		return publicationImmutableEnabled()
 	case "release-provenance":
 		return publicationProvenance(o)
 	case "release-merge-windows":

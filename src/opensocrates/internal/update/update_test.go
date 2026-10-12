@@ -159,8 +159,9 @@ func TestStableCompatibilityPolicy(t *testing.T) {
 	}
 }
 func TestSchedulerDocumentsAndOwnership(t *testing.T) {
-	p, e := LaunchAgent("/Users/example/Application Support/OpenSocrates/bin/opensocrates")
-	if e != nil || !ownedPlist(p, "/Users/example/Application Support/OpenSocrates/bin/opensocrates") {
+	manager := filepath.Join(t.TempDir(), "Application Support", "OpenSocrates", "bin", "opensocrates")
+	p, e := LaunchAgent(manager)
+	if e != nil || !ownedPlist(p, manager) {
 		t.Fatal("invalid owned plist")
 	}
 	if ownedPlist(p, "/other/manager") {

@@ -68,7 +68,7 @@ func crashChild(t *testing.T, root, mode, id string) {
 	}
 }
 func TestActualProcessDeathRecoversBoundLockAndFiles(t *testing.T) {
-	root := t.TempDir()
+	root := privateLifecycleTestDir(t)
 	target := filepath.Join(root, "owned")
 	if e := platform.AtomicWrite(target, []byte("before"), 0600); e != nil {
 		t.Fatal(e)

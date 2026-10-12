@@ -228,6 +228,22 @@ linked or in-use `.in_use` caches block/pause completion safely.
 `--reset-trust` explicitly removes only the seven exact OpenSocrates hook-state
 entries. Preserve unrelated TOML bytes, comments, BOM/newlines and host settings.
 Validate original/candidate configuration through an isolated no-authentication
-Codex app-server pinned to `0.144.4` before journaled replacement. Do not use this
+Codex app-server with bounded version/stdio capability probes and required
+`--strict-config` support before journaled replacement. This management probe is
+separate from the legacy selector's `0.144.4` pin; unknown capabilities are
+unavailable rather than allowing invalid configuration to fall back to defaults. Do not use this
 flag when you want existing approvals preserved; trust is never auto-approved.
 Actual native removal/rollback and host trust evidence remain required.
+
+Trust reset is a separately verified transaction under the same lifecycle lock,
+completed before purge snapshots/register changes because the host unregister
+operation can also modify its configuration. A later purge failure does not undo
+the explicitly completed trust reset; report its `trust_transaction` separately.
+
+Production publication additionally requires protected-environment secret
+`OPENSOCRATES_RELEASE_ADMIN_READ_TOKEN`, scoped to this repository with
+Administration:read solely for the exact GitHub `/immutable-releases` GET.
+Release mutations still use the ordinary contents:write workflow token. Missing
+or insufficient read permission blocks publication without weakening the
+immutable-release check. This credential is a release prerequisite alongside
+production root/identity/signing resources, not evidence of release validation.

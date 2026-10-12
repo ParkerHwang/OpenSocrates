@@ -93,7 +93,10 @@ func windowsParents(path string) (*windowsLease, error) {
 			l.Close()
 			return nil, failure()
 		}
-		h, e := windows.CreateFile(u, windows.READ_CONTROL|windows.FILE_READ_ATTRIBUTES, windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE, nil, windows.OPEN_EXISTING, windows.FILE_FLAG_BACKUP_SEMANTICS|windows.FILE_FLAG_OPEN_REPARSE_POINT, 0)
+		// A metadata-only handle does not participate in Windows share-access
+		// enforcement. Request directory data access as well, so omitting
+		// FILE_SHARE_DELETE really pins this ancestor against rename/removal.
+		h, e := windows.CreateFile(u, windows.READ_CONTROL|windows.FILE_READ_ATTRIBUTES|windows.FILE_LIST_DIRECTORY, windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE, nil, windows.OPEN_EXISTING, windows.FILE_FLAG_BACKUP_SEMANTICS|windows.FILE_FLAG_OPEN_REPARSE_POINT, 0)
 		if e != nil {
 			l.Close()
 			if windowsMissing(e) {
@@ -365,6 +368,9 @@ func atomicWrite(path string, b []byte, mode os.FileMode) error {
 		return e
 	}
 	renamed = true
+	if e = modeWrittenFile(f, mode); e != nil {
+		return e
+	}
 	if e = f.Sync(); e != nil {
 		return failure()
 	}
@@ -392,7 +398,7 @@ func removePrivate(path string) error {
 	}
 	defer l.Close()
 	u, _ := windows.UTF16PtrFromString(nativePath(path))
-	h, e := windows.CreateFile(u, windows.DELETE|windows.READ_CONTROL|windows.FILE_READ_ATTRIBUTES, windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE, nil, windows.OPEN_EXISTING, windows.FILE_FLAG_BACKUP_SEMANTICS|windows.FILE_FLAG_OPEN_REPARSE_POINT, 0)
+	h, e := windows.CreateFile(u, windows.DELETE|windows.FILE_WRITE_ATTRIBUTES|windows.READ_CONTROL|windows.FILE_READ_ATTRIBUTES, windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE, nil, windows.OPEN_EXISTING, windows.FILE_FLAG_BACKUP_SEMANTICS|windows.FILE_FLAG_OPEN_REPARSE_POINT, 0)
 	if e == windows.ERROR_FILE_NOT_FOUND {
 		return nil
 	}
@@ -403,7 +409,25 @@ func removePrivate(path string) error {
 	if inspectOwnedHandle(h) != nil {
 		return failure()
 	}
-	return deleteHandle(h)
+	var info windows.ByHandleFileInformation
+	if windows.GetFileInformationByHandle(h, &info) != nil {
+		return failure()
+	}
+	readonly := info.FileAttributes&windows.FILE_ATTRIBUTE_READONLY != 0
+	if readonly {
+		if e = readonlyHandle(h, 0600); e != nil {
+			return e
+		}
+	}
+	if e = deleteHandle(h); e != nil {
+		if readonly {
+			if restore := readonlyHandle(h, 0400); restore != nil {
+				return diagnostics.New(diagnostics.RollbackIncomplete, "readonly_remove")
+			}
+		}
+		return e
+	}
+	return nil
 }
 func renamePrivate(from, to string) error {
 	a, e := windowsParents(from)
@@ -421,6 +445,19 @@ func renamePrivate(from, to string) error {
 	}
 	u, _ := windows.UTF16PtrFromString(nativePath(from))
 	h, e := windows.CreateFile(u, windows.GENERIC_WRITE|windows.DELETE|windows.READ_CONTROL|windows.FILE_READ_ATTRIBUTES, windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE, nil, windows.OPEN_EXISTING, windows.FILE_FLAG_BACKUP_SEMANTICS|windows.FILE_FLAG_OPEN_REPARSE_POINT, 0)
+	readonly := false
+	if e == windows.ERROR_ACCESS_DENIED {
+		h, e = windows.CreateFile(u, windows.GENERIC_READ|windows.DELETE|windows.READ_CONTROL, windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE, nil, windows.OPEN_EXISTING, windows.FILE_FLAG_BACKUP_SEMANTICS|windows.FILE_FLAG_OPEN_REPARSE_POINT, 0)
+		if e != nil {
+			return failure()
+		}
+		var attributes windows.ByHandleFileInformation
+		if windows.GetFileInformationByHandle(h, &attributes) != nil || attributes.FileAttributes&windows.FILE_ATTRIBUTE_READONLY == 0 {
+			windows.CloseHandle(h)
+			return failure()
+		}
+		readonly = true
+	}
 	if e != nil {
 		return failure()
 	}
@@ -435,7 +472,7 @@ func renamePrivate(from, to string) error {
 	if windows.GetFileInformationByHandle(h, &info) != nil {
 		return failure()
 	}
-	if info.FileAttributes&windows.FILE_ATTRIBUTE_DIRECTORY == 0 && windows.FlushFileBuffers(h) != nil {
+	if !readonly && info.FileAttributes&windows.FILE_ATTRIBUTE_DIRECTORY == 0 && windows.FlushFileBuffers(h) != nil {
 		return failure()
 	}
 	return nil
@@ -486,8 +523,59 @@ func openLegacy(path string) (*os.File, error) {
 	}
 	return os.NewFile(uintptr(h), "private"), nil
 }
-func deleteOpened(path string, f *os.File) error     { return deleteHandle(windows.Handle(f.Fd())) }
-func chmodOwned(path string, mode os.FileMode) error { return GuardOwned(path) } // Windows access is defined by the protected DACL, not POSIX mode bits.
+func deleteOpened(path string, f *os.File) error { return deleteHandle(windows.Handle(f.Fd())) }
+
+// chmodOwned changes only the Windows readonly attribute. Authorization is
+// exclusively current SID/DACL/type/reparse validation through a stable handle.
+func chmodOwned(path string, mode os.FileMode) error {
+	l, e := windowsParents(path)
+	if e != nil {
+		return e
+	}
+	defer l.Close()
+	u, _ := windows.UTF16PtrFromString(nativePath(path))
+	h, e := windows.CreateFile(u, windows.GENERIC_READ|windows.FILE_WRITE_ATTRIBUTES|windows.READ_CONTROL, windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE, nil, windows.OPEN_EXISTING, windows.FILE_FLAG_BACKUP_SEMANTICS|windows.FILE_FLAG_OPEN_REPARSE_POINT, 0)
+	if e != nil {
+		return failure()
+	}
+	defer windows.CloseHandle(h)
+	if e = inspectOwnedHandle(h); e != nil {
+		return e
+	}
+	return readonlyHandle(h, mode)
+}
+func modeWrittenFile(f *os.File, mode os.FileMode) error {
+	return readonlyHandle(windows.Handle(f.Fd()), mode)
+}
+func readonlyHandle(h windows.Handle, mode os.FileMode) error {
+	var info windows.ByHandleFileInformation
+	if windows.GetFileInformationByHandle(h, &info) != nil {
+		return failure()
+	}
+	attributes := info.FileAttributes
+	if mode.Perm()&0200 == 0 {
+		attributes |= windows.FILE_ATTRIBUTE_READONLY
+	} else {
+		attributes &^= windows.FILE_ATTRIBUTE_READONLY
+	}
+	if attributes == info.FileAttributes {
+		return nil
+	}
+	if attributes == 0 {
+		attributes = windows.FILE_ATTRIBUTE_NORMAL
+	}
+	// FILE_BASIC_INFO's zero timestamps preserve existing times. Preserve all
+	// unrelated attributes; only readonly reflects the portable owner-write bit.
+	type basicInfo struct {
+		CreationTime, LastAccessTime, LastWriteTime, ChangeTime int64
+		Attributes                                              uint32
+	}
+	basic := basicInfo{Attributes: attributes}
+	if windows.SetFileInformationByHandle(h, windows.FileBasicInfo, (*byte)(unsafe.Pointer(&basic)), uint32(unsafe.Sizeof(basic))) != nil {
+		return failure()
+	}
+	return nil
+}
 
 func openLegacyRecovery(path string) (*os.File, error) {
 	l, e := windowsParents(path)

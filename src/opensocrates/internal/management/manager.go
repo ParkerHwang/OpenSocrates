@@ -288,7 +288,7 @@ func (m *Manager) ApplyPackage(ctx context.Context, r Request) (Result, error) {
 	if before.Installed {
 		enabled = before.Enabled
 	}
-	scratch, e := os.MkdirTemp(m.StateDir, ".management-")
+	scratch, e := platform.MkdirTemp(m.StateDir, ".management-")
 	if e != nil {
 		return result, diagnostics.New(diagnostics.Permission, "stage")
 	}
