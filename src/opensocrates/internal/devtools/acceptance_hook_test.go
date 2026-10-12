@@ -4,20 +4,17 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
-	"encoding/base64"
-	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
-	"unicode/utf16"
 )
 
 type nativePipeFixtureReceipt struct {
@@ -154,23 +151,7 @@ func TestActualConfiguredShellPreservesNativeStdinAndUnsafeLookingPaths(t *testi
 		started := time.Now()
 		var result platform.Result
 		var e error
-		if strings.HasPrefix(name, "plain_") {
-			command := exec.CommandContext(ctx, binary, arguments...)
-			command.Env = probeEnv
-			command.Dir = work
-			command.Stdin = bytes.NewReader(stdin)
-			command.WaitDelay = time.Second
-			var stdoutBuffer, stderrBuffer bytes.Buffer
-			command.Stdout = &stdoutBuffer
-			command.Stderr = &stderrBuffer
-			e = command.Run()
-			result.Stdout, result.Stderr = stdoutBuffer.Bytes(), stderrBuffer.Bytes()
-			if command.ProcessState != nil {
-				result.ExitCode = command.ProcessState.ExitCode()
-			}
-		} else {
-			result, e = platform.Run(ctx, binary, arguments, platform.RunOptions{Env: probeEnv, Dir: work, Stdin: bytes.NewReader(stdin), OutputLimit: 8 << 20})
-		}
+		result, e = platform.Run(ctx, binary, arguments, platform.RunOptions{Env: probeEnv, Dir: work, Stdin: bytes.NewReader(stdin), OutputLimit: 8 << 20})
 		category := "none"
 		if e != nil {
 			category = string(diagnostics.CodeOf(e))
@@ -195,77 +176,76 @@ func TestActualConfiguredShellPreservesNativeStdinAndUnsafeLookingPaths(t *testi
 		}
 		t.Logf("native_pipe_diagnostic probe=%s target=%s error_category=%s exit_code=%d deadline_exceeded=%t elapsed_ms=%d expected_len=%d stdout_len=%d stderr_len=%d first_mismatch=%d expected_sha256=%s stdout_sha256=%s stderr_sha256=%s suffix_lf=%t suffix_crlf=%t receipt_present=%t marker_observed=%t argv_count=%d argv_match=%t echo_mode=%t static_mode=%t native_input_len=%d native_input_sha256=%s eof_observed=%t native_read_ok=%t native_stdout_write_ok=%t", name, target, category, result.ExitCode, ctx.Err() == context.DeadlineExceeded, time.Since(started).Milliseconds(), len(expected), len(result.Stdout), len(result.Stderr), firstMismatch, hex.EncodeToString(expectedHash[:]), hex.EncodeToString(observedHash[:]), hex.EncodeToString(stderrHash[:]), bytes.HasSuffix(result.Stdout, []byte{'\n'}), bytes.HasSuffix(result.Stdout, []byte{'\r', '\n'}), receiptPresent, receipt.MarkerObserved, receipt.ArgvCount, receipt.ArgvMatched, receipt.EchoMode, receipt.StaticMode, receipt.NativeInputLen, receipt.NativeInputSHA256, receipt.EOFObserved, receipt.ReadOK, receipt.StdoutWriteOK)
 		t.Logf("native_receipt_phase probe=%s native_read_started=%t native_read_completed=%t", name, receipt.ReadStarted, receipt.ReadCompleted)
-		t.Logf("shell_fixed_marker probe=%s before_seen=%t after_seen=%t fixture_flag_true=%t root_present=%t", name, bytes.Contains(result.Stdout, []byte("opensocrates-before;")), bytes.Contains(result.Stdout, []byte("opensocrates-after;")), bytes.Contains(result.Stdout, []byte("fixture=True;")), bytes.Contains(result.Stdout, []byte("root=True;")))
 		return e == nil && len(result.Stderr) == 0 && bytes.Equal(result.Stdout, expected) && receiptPresent && receipt.ArgvMatched && receipt.StdoutWriteOK
 	}
 	direct := run("direct_echo", native, []string{"hook", "codex", "session_started"}, "echo", input, input)
 	actual := run("configured_shell_echo", shell, args, "echo", input, input)
 	static := run("configured_shell_static_utf8", shell, args, "static", nil, nativePipeStaticOutput)
-	if target == "windows-x64" {
-		run("plain_current_shell_echo", shell, args, "echo", input, input)
-		// Fixed ASCII controls have no native child, so plain execution can be
-		// compared to containment without launching an uncontrolled host process.
-		ascii := `Write-Output 'opensocrates-probe'`
-		for _, inherited := range []bool{false, true} {
-			controlEnv := env
-			if inherited {
-				controlEnv = os.Environ()
-			}
-			for _, encoded := range []bool{false, true} {
-				controlArgs := []string{"-NoProfile", "-Command", ascii}
-				if encoded {
-					controlArgs = []string{"-NoProfile", "-EncodedCommand", encodePipeDiagnosticCommand(ascii)}
-				}
-				for _, plain := range []bool{false, true} {
-					ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-					started := time.Now()
-					var out, stderr []byte
-					var err error
-					exitCode := 0
-					if plain {
-						command := exec.CommandContext(ctx, shell, controlArgs...)
-						command.Env = controlEnv
-						command.Dir = work
-						var stdoutBuffer, stderrBuffer bytes.Buffer
-						command.Stdout = &stdoutBuffer
-						command.Stderr = &stderrBuffer
-						err = command.Run()
-						out, stderr = stdoutBuffer.Bytes(), stderrBuffer.Bytes()
-						if command.ProcessState != nil {
-							exitCode = command.ProcessState.ExitCode()
-						}
-					} else {
-						result, e := platform.Run(ctx, shell, controlArgs, platform.RunOptions{Env: controlEnv, Dir: work, OutputLimit: 8192})
-						out, stderr, err, exitCode = result.Stdout, result.Stderr, e, result.ExitCode
-					}
-					category := "none"
-					if err != nil {
-						category = string(diagnostics.CodeOf(err))
-					}
-					hash := sha256.Sum256(out)
-					t.Logf("ascii_shell_control plain_exec=%t inherited_env=%t encoded_command=%t error_category=%s exit_code=%d deadline_exceeded=%t elapsed_ms=%d stdout_len=%d stderr_len=%d stdout_sha256=%s ascii_marker_seen=%t", plain, inherited, encoded, category, exitCode, ctx.Err() == context.DeadlineExceeded, time.Since(started).Milliseconds(), len(out), len(stderr), hex.EncodeToString(hash[:]), bytes.Contains(out, []byte("opensocrates-probe")))
-					cancel()
-				}
-			}
-		}
-		wrapped := `[Console]::Out.Write('opensocrates-before;'); [Console]::Out.Write(('fixture=' + [bool]($env:OPENSOCRATES_NATIVE_STDIN_FIXTURE -eq '1') + ';root=' + [bool]($env:PLUGIN_ROOT) + ';')); & "$env:PLUGIN_ROOT\runtime\windows-x64\opensocrates.exe" hook codex session_started; [Console]::Out.Write('opensocrates-after;')`
-		run("wrapped_shell_command", shell, []string{"-NoProfile", "-Command", wrapped}, "echo", input, input)
-		run("wrapped_shell_encoded", shell, []string{"-NoProfile", "-EncodedCommand", encodePipeDiagnosticCommand(wrapped)}, "echo", input, input)
-		// Exploratory OS-launch candidate only: no production configuration is
-		// changed until native receipts establish its byte/exit behavior.
-		candidate := `exit (Start-Process -FilePath "$env:PLUGIN_ROOT\runtime\windows-x64\opensocrates.exe" -ArgumentList 'hook codex session_started' -NoNewWindow -Wait -PassThru).ExitCode`
-		run("exploratory_os_launcher_echo", shell, []string{"-NoProfile", "-Command", candidate}, "echo", input, input)
-	}
+
 	if !direct || !actual || !static {
 		t.Fatal("configured host shell changed native input/output or failed")
 	}
 }
 
-func encodePipeDiagnosticCommand(command string) string {
-	words := utf16.Encode([]rune(command))
-	raw := make([]byte, len(words)*2)
-	for i, w := range words {
-		binary.LittleEndian.PutUint16(raw[i*2:], w)
+func TestIsolatedAcceptanceEnvironmentKeepsOSDiscoveryAndExcludesCredentials(t *testing.T) {
+	for _, key := range []string{"OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GOOGLE_API_KEY", "GITHUB_TOKEN", "AWS_SECRET_ACCESS_KEY", "HTTPS_PROXY", "COMPLUS_Profiling", "COR_ENABLE_PROFILING", "PSExecutionPolicyPreference"} {
+		t.Setenv(key, "synthetic-value-that-must-not-be-inherited")
 	}
-	return base64.StdEncoding.EncodeToString(raw)
+	t.Setenv("PSModulePath", "synthetic-user-module-path")
+	t.Setenv("ProgramData", "synthetic-os-program-data")
+	t.Setenv("PATHEXT", ".PS1;.JS;.UNKNOWN")
+	root, e := platform.MkdirTemp("", "opensocrates-environment-test-")
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer os.RemoveAll(root)
+	values, work, e := isolatedAcceptanceEnvironment(root)
+	if e != nil {
+		t.Fatal(e)
+	}
+	env := map[string]string{}
+	for _, entry := range values {
+		parts := strings.SplitN(entry, "=", 2)
+		env[strings.ToUpper(parts[0])] = parts[1]
+	}
+	for _, key := range []string{"OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GOOGLE_API_KEY", "GITHUB_TOKEN", "AWS_SECRET_ACCESS_KEY", "HTTPS_PROXY", "COMPLUS_PROFILING", "COR_ENABLE_PROFILING", "PSEXECUTIONPOLICYPREFERENCE"} {
+		if _, exists := env[key]; exists {
+			t.Fatal("credential or caller code-loading override inherited")
+		}
+	}
+	for _, key := range []string{"HOME", "USERPROFILE", "CODEX_HOME", "OPENSOCRATES_STATE_DIR", "TMPDIR", "TMP", "TEMP"} {
+		relative, e := filepath.Rel(root, env[key])
+		if e != nil || relative == ".." || strings.HasPrefix(relative, ".."+string(filepath.Separator)) {
+			t.Fatal("fixture state or temporary directory escaped isolated root")
+		}
+	}
+	if work != filepath.Join(root, "workspace") {
+		t.Fatal("fixture workspace was not isolated")
+	}
+	if runtime.GOOS == "windows" {
+		for _, key := range []string{"APPDATA", "LOCALAPPDATA"} {
+			relative, e := filepath.Rel(root, env[key])
+			if e != nil || relative == ".." || strings.HasPrefix(relative, ".."+string(filepath.Separator)) {
+				t.Fatal("Windows special folder escaped isolated root")
+			}
+			if platform.Guard(env[key]) != nil {
+				t.Fatal("Windows private special folder missing")
+			}
+		}
+		if env["PROGRAMDATA"] != "synthetic-os-program-data" || env["PATHEXT"] != ".COM;.EXE;.BAT;.CMD" {
+			t.Fatal("closed OS environment not preserved")
+		}
+		if env["HOMEDRIVE"]+env["HOMEPATH"] != env["USERPROFILE"] {
+			t.Fatal("Windows home variables were inconsistent")
+		}
+		if strings.Contains(env["PSMODULEPATH"], "synthetic-user-module-path") {
+			t.Fatal("user PowerShell module path inherited")
+		}
+		if !strings.Contains(env["PSMODULEPATH"], filepath.Join(env["USERPROFILE"], "Documents", "WindowsPowerShell", "Modules")) {
+			t.Fatal("isolated module directory missing")
+		}
+		if filepath.Dir(env["PSMODULEANALYSISCACHEPATH"]) != filepath.Join(env["LOCALAPPDATA"], "Microsoft", "Windows", "PowerShell") {
+			t.Fatal("PowerShell analysis cache was not isolated")
+		}
+	}
 }

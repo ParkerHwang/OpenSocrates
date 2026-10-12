@@ -114,12 +114,30 @@ func isolatedAcceptanceEnvironment(root string) ([]string, string, error) {
 	}
 	env := []string{"HOME=" + home, "USERPROFILE=" + home, "CODEX_HOME=" + codex, "TMPDIR=" + tmp, "TMP=" + tmp, "TEMP=" + tmp, "OPENSOCRATES_STATE_DIR=" + filepath.Join(home, ".opensocrates"), "LANG=C", "LC_ALL=C"}
 	if runtime.GOOS == "windows" {
-		for _, key := range []string{"SystemRoot", "WINDIR", "ComSpec"} {
+		// A real Windows shell requires OS/.NET discovery variables as well as
+		// its executable path. Keep a closed OS allowlist; model/account secrets,
+		// caller overrides and user module/search paths are never inherited.
+		for _, key := range []string{"SystemRoot", "WINDIR", "ComSpec", "SystemDrive", "ProgramFiles", "ProgramFiles(x86)", "ProgramW6432", "CommonProgramFiles", "CommonProgramFiles(x86)", "CommonProgramW6432", "ProgramData", "ALLUSERSPROFILE", "PROCESSOR_ARCHITECTURE", "PROCESSOR_ARCHITEW6432", "PROCESSOR_IDENTIFIER", "PROCESSOR_LEVEL", "PROCESSOR_REVISION", "NUMBER_OF_PROCESSORS", "OS", "USERNAME", "USERDOMAIN", "COMPUTERNAME"} {
 			if value := os.Getenv(key); value != "" {
 				env = append(env, key+"="+value)
 			}
 		}
-		env = append(env, "PATH="+filepath.Join(os.Getenv("SystemRoot"), "System32"))
+		appData := filepath.Join(home, "AppData", "Roaming")
+		localAppData := filepath.Join(home, "AppData", "Local")
+		modules := filepath.Join(home, "Documents", "WindowsPowerShell", "Modules")
+		cache := filepath.Join(localAppData, "Microsoft", "Windows", "PowerShell")
+		for _, directory := range []string{appData, localAppData, modules, cache} {
+			if e := platform.Mkdir(directory); e != nil {
+				return nil, "", e
+			}
+		}
+		shell, e := platform.SystemExecutable("powershell.exe")
+		if e != nil {
+			return nil, "", e
+		}
+		psHome := filepath.Dir(shell)
+		systemDirectory := filepath.Dir(filepath.Dir(psHome))
+		env = append(env, "APPDATA="+appData, "LOCALAPPDATA="+localAppData, "HOMEDRIVE="+filepath.VolumeName(home), "HOMEPATH="+strings.TrimPrefix(home, filepath.VolumeName(home)), "PATHEXT=.COM;.EXE;.BAT;.CMD", "PSModulePath="+filepath.Join(psHome, "Modules")+";"+modules, "PSModuleAnalysisCachePath="+filepath.Join(cache, "ModuleAnalysisCache"), "PSDisableModuleAnalysisCacheCleanup=1", "PATH="+systemDirectory+";"+psHome+";"+filepath.Join(systemDirectory, "Wbem"))
 	} else {
 		env = append(env, "PATH=/usr/bin:/bin:/usr/sbin:/sbin")
 	}
