@@ -2,6 +2,10 @@ package devtools
 
 import (
 	"bytes"
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"io"
 	"os"
@@ -65,8 +69,32 @@ func TestActualConfiguredShellPreservesNativeStdinAndUnsafeLookingPaths(t *testi
 	// This test checks byte transport through a copied development test executable.
 	// Cold PowerShell/test initialization has a separate deadline; packaged hook
 	// qualification still requires its two-second host deadline and one-second p95.
-	out, errout, e := runAcceptanceProcess(shell, args, input, env, work, 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	started := time.Now()
+	result, e := platform.Run(ctx, shell, args, platform.RunOptions{Env: env, Dir: work, Stdin: bytes.NewReader(input), OutputLimit: 8 << 20})
+	out, errout := result.Stdout, result.Stderr
 	if e != nil || len(errout) != 0 || !bytes.Equal(out, input) {
+		category := "none"
+		if e != nil {
+			category = string(diagnostics.CodeOf(e))
+		}
+		expectedHash := sha256.Sum256(input)
+		observedHash := sha256.Sum256(out)
+		stderrHash := sha256.Sum256(errout)
+		firstMismatch := -1
+		for i := 0; i < len(input) && i < len(out); i++ {
+			if input[i] != out[i] {
+				firstMismatch = i
+				break
+			}
+		}
+		if firstMismatch < 0 && len(input) != len(out) {
+			firstMismatch = min(len(input), len(out))
+		}
+		// The payload is a fixed synthetic literal. Report only bounded outcome
+		// metadata, never command text, paths, environment values or stderr bytes.
+		t.Logf("native_pipe_diagnostic target=%s error_category=%s exit_code=%d deadline_exceeded=%t elapsed_ms=%d expected_len=%d stdout_len=%d stderr_len=%d first_mismatch=%d expected_sha256=%s stdout_sha256=%s stderr_sha256=%s suffix_lf=%t suffix_crlf=%t", target, category, result.ExitCode, ctx.Err() == context.DeadlineExceeded, time.Since(started).Milliseconds(), len(input), len(out), len(errout), firstMismatch, hex.EncodeToString(expectedHash[:]), hex.EncodeToString(observedHash[:]), hex.EncodeToString(stderrHash[:]), bytes.HasSuffix(out, []byte{'\n'}), bytes.HasSuffix(out, []byte{'\r', '\n'}))
 		t.Fatal("configured host shell changed native input/output or failed")
 	}
 }
