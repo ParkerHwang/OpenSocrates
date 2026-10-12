@@ -38,7 +38,10 @@ func checkBoundaries(root string) ([]string, error) {
 				codes = append(codes, "source_import_invalid:"+r)
 				continue
 			}
-			if domain && (name == "os" || name == "os/exec" || strings.HasPrefix(name, "net") || strings.Contains(name, "/internal/lifecycle") || strings.Contains(name, "/internal/hosts") || strings.Contains(name, "/internal/persistence") || strings.Contains(name, "/internal/compat") || strings.Contains(name, "/internal/management") || strings.Contains(name, "/internal/runtimecli")) {
+			// URI parsing is a pure validation rule; network clients and sockets
+			// remain outside the domain boundary.
+			networkIO := name == "net" || strings.HasPrefix(name, "net/") && name != "net/url"
+			if domain && (name == "os" || name == "os/exec" || networkIO || strings.Contains(name, "/internal/lifecycle") || strings.Contains(name, "/internal/hosts") || strings.Contains(name, "/internal/persistence") || strings.Contains(name, "/internal/compat") || strings.Contains(name, "/internal/management") || strings.Contains(name, "/internal/runtimecli")) {
 				codes = append(codes, "domain_boundary_violation:"+r)
 			}
 			if name == "os/exec" && !(strings.HasPrefix(r, "internal/platform/") || strings.HasPrefix(r, "internal/compat/") || strings.HasPrefix(r, "internal/update/") || strings.HasPrefix(r, "internal/devtools/") || strings.HasPrefix(r, "internal/management/") || strings.HasPrefix(r, "internal/hosts/") || strings.HasPrefix(r, "internal/runtimecli/")) {
