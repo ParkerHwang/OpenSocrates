@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/binary"
 	"encoding/csv"
 	"encoding/hex"
@@ -11,11 +12,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"os"
 	"os/user"
 	"path/filepath"
+	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf16"
@@ -57,7 +61,7 @@ func fixtureLaunchAgent(label, fixture, receipt, work string) []byte {
 func fixtureWindowsArguments(receipt string) string { return `--scheduler-receipt "` + receipt + `"` }
 func fixtureWindowsTask(id, fixture, receipt, sid string) []byte {
 	return []byte(`<?xml version="1.0" encoding="UTF-8"?>
-<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task"><RegistrationInfo><Description>OpenSocrates isolated native scheduler fixture ` + id + `</Description></RegistrationInfo><Principals><Principal id="User"><UserId>` + schedulerXMLText(sid) + `</UserId><LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals><Settings><MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries><StopIfGoingOnBatteries>false</StopIfGoingOnBatteries><AllowStartOnDemand>true</AllowStartOnDemand><Enabled>true</Enabled><ExecutionTimeLimit>PT2M</ExecutionTimeLimit></Settings><Actions Context="User"><Exec><Command>` + schedulerXMLText(fixture) + `</Command><Arguments>` + schedulerXMLText(fixtureWindowsArguments(receipt)) + `</Arguments></Exec></Actions></Task>
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task"><RegistrationInfo><Description>OpenSocrates isolated native scheduler fixture ` + id + `</Description></RegistrationInfo><Triggers><LogonTrigger><Enabled>true</Enabled><Repetition><Interval>PT24H</Interval><StopAtDurationEnd>false</StopAtDurationEnd></Repetition><UserId>` + schedulerXMLText(sid) + `</UserId><Delay>PT5M</Delay></LogonTrigger></Triggers><Principals><Principal id="User"><UserId>` + schedulerXMLText(sid) + `</UserId><LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals><Settings><MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries><StopIfGoingOnBatteries>false</StopIfGoingOnBatteries><AllowStartOnDemand>true</AllowStartOnDemand><Enabled>true</Enabled><ExecutionTimeLimit>PT2M</ExecutionTimeLimit></Settings><Actions Context="User"><Exec><Command>` + schedulerXMLText(fixture) + `</Command><Arguments>` + schedulerXMLText(fixtureWindowsArguments(receipt)) + `</Arguments></Exec></Actions></Task>
 `)
 }
 func schedulerWindowsText(raw []byte) []byte {
@@ -86,6 +90,16 @@ func ownedFixtureWindowsTask(raw []byte, id, fixture, receipt, sid string) bool 
 			LogonType string `xml:"LogonType"`
 			RunLevel  string `xml:"RunLevel"`
 		} `xml:"Principals>Principal"`
+		Triggers []struct {
+			Enabled    bool `xml:"Enabled"`
+			Repetition struct {
+				Interval          string `xml:"Interval"`
+				Duration          string `xml:"Duration"`
+				StopAtDurationEnd bool   `xml:"StopAtDurationEnd"`
+			} `xml:"Repetition"`
+			UserID string `xml:"UserId"`
+			Delay  string `xml:"Delay"`
+		} `xml:"Triggers>LogonTrigger"`
 		Actions struct {
 			Context string `xml:"Context,attr"`
 			Exec    []struct {
@@ -97,10 +111,14 @@ func ownedFixtureWindowsTask(raw []byte, id, fixture, receipt, sid string) bool 
 	if xml.Unmarshal(bytes.ReplaceAll(schedulerWindowsText(raw), []byte(`encoding="UTF-16"`), []byte(`encoding="UTF-8"`)), &doc) != nil {
 		return false
 	}
-	if doc.RegistrationInfo.Description != "OpenSocrates isolated native scheduler fixture "+id || len(doc.Principals) != 1 || len(doc.Actions.Exec) != 1 {
+	if doc.RegistrationInfo.Description != "OpenSocrates isolated native scheduler fixture "+id || len(doc.Principals) != 1 || len(doc.Actions.Exec) != 1 || len(doc.Triggers) != 1 {
 		return false
 	}
 	p := doc.Principals[0]
+	trigger := doc.Triggers[0]
+	if !trigger.Enabled || trigger.UserID != sid || trigger.Delay != "PT5M" || trigger.Repetition.Interval != "PT24H" || trigger.Repetition.Duration != "" || trigger.Repetition.StopAtDurationEnd {
+		return false
+	}
 	action := doc.Actions.Exec[0]
 	return p.ID != "" && p.UserID == sid && p.LogonType == "InteractiveToken" && p.RunLevel == "LeastPrivilege" && doc.Actions.Context == p.ID && action.Command == fixture && action.Arguments == fixtureWindowsArguments(receipt)
 }
@@ -292,9 +310,15 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 			err = errors.New("scheduler_fixture_cleanup_incomplete")
 		}
 	}()
-	_, e = run(tool, "/Create", "/TN", task, "/XML", xmlPath)
+	registrationContext, registrationCancel := context.WithTimeout(ctx, 15*time.Second)
+	registrationResult, registrationError := platform.Run(registrationContext, tool, []string{"/Create", "/TN", task, "/XML", xmlPath, "/HResult"}, platform.RunOptions{OutputLimit: 1 << 20})
+	registrationCancel()
+	e = registrationError
 	registered = e == nil
 	record("native_registration", registered)
+	if !registered {
+		cases["native_registration"].(map[string]any)["diagnostic"] = schedulerRegistrationDiagnostic(registrationResult, registrationError)
+	}
 	if !registered {
 		return report, errors.New("scheduler_fixture_registration_failed")
 	}
@@ -309,6 +333,46 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 	record("native_go_entry_executed", executed)
 	report["pass"] = registered && owned && executed
 	return report, nil
+}
+
+// This projection never returns OS output, paths, account identifiers or
+// arbitrary error text. /HResult gives a locale-independent numeric outcome.
+func schedulerRegistrationDiagnostic(result platform.Result, err error) map[string]any {
+	category := "none"
+	if err != nil {
+		category = string(diagnostics.CodeOf(err))
+	}
+	stdoutHash := sha256.Sum256(result.Stdout)
+	stderrHash := sha256.Sum256(result.Stderr)
+	status := uint32(result.ExitCode)
+	classification := "unclassified"
+	switch status {
+	case 0x80070005:
+		classification = "access_denied"
+	case 0x80070534:
+		classification = "account_unmapped"
+	case 0x80041316:
+		classification = "xml_node_unexpected"
+	case 0x80041317:
+		classification = "xml_namespace_invalid"
+	case 0x80041318:
+		classification = "xml_value_invalid"
+	case 0x80041319:
+		classification = "xml_required_node_missing"
+	case 0x8004131a:
+		classification = "xml_malformed"
+	case 0x80070057:
+		classification = "invalid_parameter"
+	}
+	report := map[string]any{"error_category": category, "exit_code": result.ExitCode, "hresult": fmt.Sprintf("0x%08x", status), "known_error_class": classification, "stdout_len": len(result.Stdout), "stderr_len": len(result.Stderr), "stdout_sha256": hex.EncodeToString(stdoutHash[:]), "stderr_sha256": hex.EncodeToString(stderrHash[:])}
+	text := string(schedulerWindowsText(append(append([]byte(nil), result.Stdout...), result.Stderr...)))
+	if match := regexp.MustCompile(`\(([0-9]{1,6}),([0-9]{1,6})\)`).FindStringSubmatch(text); len(match) == 3 {
+		line, _ := strconv.Atoi(match[1])
+		column, _ := strconv.Atoi(match[2])
+		report["xml_line"] = line
+		report["xml_column"] = column
+	}
+	return report
 }
 
 func schedulerCleanupRun(exe string, args ...string) ([]byte, error) {

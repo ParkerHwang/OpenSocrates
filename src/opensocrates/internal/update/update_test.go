@@ -7,12 +7,15 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/json"
+	"encoding/xml"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"github.com/sigstore/sigstore/pkg/signature"
 	"github.com/theupdateframework/go-tuf/v2/metadata"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -354,5 +357,85 @@ func TestSchedulerRefusesModifiedForeignDocument(t *testing.T) {
 	b, e := platform.ReadFile(a.Root(), 1<<20)
 	if e != nil || !bytes.Equal(b, foreign) {
 		t.Fatal("foreign scheduler changed")
+	}
+}
+
+func TestWindowsTaskSchemaOrderAndPolicy(t *testing.T) {
+	const manager = `C:\Users\예시 사용자\OpenSocrates\opensocrates.exe`
+	const sid = "S-1-5-21-12345-67890-13579-1001"
+	document, err := WindowsTask(manager, sid)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Microsoft's schema extends triggerBaseType with logonTriggerType.
+	// The base sequence must finish before derived UserId and Delay appear:
+	// https://learn.microsoft.com/en-us/windows/win32/taskschd/task-scheduler-schema
+	decoder := xml.NewDecoder(bytes.NewReader(document))
+	depth, triggerDepth := 0, -1
+	var children []string
+	for {
+		token, err := decoder.Token()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+		switch element := token.(type) {
+		case xml.StartElement:
+			depth++
+			if element.Name.Local == "LogonTrigger" {
+				triggerDepth = depth
+			}
+			if triggerDepth >= 0 && depth == triggerDepth+1 {
+				children = append(children, element.Name.Local)
+			}
+		case xml.EndElement:
+			if element.Name.Local == "LogonTrigger" {
+				triggerDepth = -1
+			}
+			depth--
+		}
+	}
+	if !reflect.DeepEqual(children, []string{"Enabled", "Repetition", "UserId", "Delay"}) {
+		t.Fatalf("LogonTrigger violates base-before-derived schema order: %v", children)
+	}
+	var task struct {
+		Trigger struct {
+			Enabled    bool `xml:"Enabled"`
+			Repetition struct {
+				Interval string `xml:"Interval"`
+				Stop     bool   `xml:"StopAtDurationEnd"`
+			} `xml:"Repetition"`
+			UserID string `xml:"UserId"`
+			Delay  string `xml:"Delay"`
+		} `xml:"Triggers>LogonTrigger"`
+		Principal struct {
+			UserID    string `xml:"UserId"`
+			LogonType string `xml:"LogonType"`
+			RunLevel  string `xml:"RunLevel"`
+		} `xml:"Principals>Principal"`
+		Instances string `xml:"Settings>MultipleInstancesPolicy"`
+		Action    struct {
+			Command   string `xml:"Command"`
+			Arguments string `xml:"Arguments"`
+		} `xml:"Actions>Exec"`
+	}
+	if err := xml.Unmarshal(document, &task); err != nil {
+		t.Fatal(err)
+	}
+	if !task.Trigger.Enabled || task.Trigger.Repetition.Interval != "PT24H" || task.Trigger.Repetition.Stop || task.Trigger.Delay != "PT5M" || task.Trigger.UserID != sid {
+		t.Fatalf("unexpected stable login policy: %+v", task.Trigger)
+	}
+	if task.Principal.UserID != sid || task.Principal.LogonType != "InteractiveToken" || task.Principal.RunLevel != "LeastPrivilege" || task.Instances != "IgnoreNew" {
+		t.Fatalf("unexpected user privilege or concurrency policy: %+v", task.Principal)
+	}
+	if task.Action.Command != manager || task.Action.Arguments != "auto-update run --scheduled" || !ownedTask(document, manager) {
+		t.Fatal("scheduler command or ownership policy changed")
+	}
+	engine := Engine{StateDir: filepath.Join(t.TempDir(), "state"), Version: "1.6.0", OS: "windows", Arch: "amd64"}
+	policy, err := engine.Policy()
+	if err != nil || policy.Enabled || policy.Channel != "stable" {
+		t.Fatal("automatic updates must remain stable-channel opt-in")
 	}
 }

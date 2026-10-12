@@ -65,7 +65,7 @@ func WindowsTask(manager, sid string) ([]byte, error) {
 	return []byte(`<?xml version="1.0" encoding="UTF-8"?>
 <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
 <RegistrationInfo><Description>OpenSocrates native stable updater; owned by opensocrates-native</Description></RegistrationInfo>
-<Triggers><LogonTrigger><Enabled>true</Enabled><UserId>` + escape(sid) + `</UserId><Delay>PT5M</Delay><Repetition><Interval>PT24H</Interval><StopAtDurationEnd>false</StopAtDurationEnd></Repetition></LogonTrigger></Triggers>
+<Triggers><LogonTrigger><Enabled>true</Enabled><Repetition><Interval>PT24H</Interval><StopAtDurationEnd>false</StopAtDurationEnd></Repetition><UserId>` + escape(sid) + `</UserId><Delay>PT5M</Delay></LogonTrigger></Triggers>
 <Principals><Principal id="User"><UserId>` + escape(sid) + `</UserId><LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
 <Settings><MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries><StopIfGoingOnBatteries>false</StopIfGoingOnBatteries><StartWhenAvailable>true</StartWhenAvailable><Enabled>true</Enabled><ExecutionTimeLimit>PT10M</ExecutionTimeLimit></Settings>
 <Actions Context="User"><Exec><Command>` + escape(manager) + `</Command><Arguments>auto-update run --scheduled</Arguments></Exec></Actions></Task>

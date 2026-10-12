@@ -3,7 +3,9 @@ package devtools
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"os"
 	"path/filepath"
@@ -20,7 +22,10 @@ func TestSchedulerDocumentsKeepUniqueIdentityAndPathData(t *testing.T) {
 	if !ownedFixtureWindowsTask(document, "synthetic-private-id", fixture, receipt, sid) {
 		t.Fatal("owned native task rejected")
 	}
-	for _, changed := range []string{strings.Replace(string(document), "LeastPrivilege", "HighestAvailable", 1), strings.Replace(string(document), sid, "S-1-5-18", 1), strings.Replace(string(document), "synthetic-private-id", "another-task", 1), strings.Replace(string(document), "--scheduler-receipt", "--malicious", 1)} {
+	if strings.Index(string(document), "<Repetition>") > strings.Index(string(document), "<UserId>") {
+		t.Fatal("base trigger repetition must precede logon-specific fields")
+	}
+	for _, changed := range []string{strings.Replace(string(document), "LeastPrivilege", "HighestAvailable", 1), strings.Replace(string(document), sid, "S-1-5-18", 1), strings.Replace(string(document), "synthetic-private-id", "another-task", 1), strings.Replace(string(document), "--scheduler-receipt", "--malicious", 1), strings.Replace(string(document), "PT24H", "PT48H", 1), strings.Replace(string(document), "PT5M", "PT1M", 1), strings.Replace(string(document), "<Enabled>true</Enabled>", "<Enabled>false</Enabled>", 1)} {
 		if ownedFixtureWindowsTask([]byte(changed), "synthetic-private-id", fixture, receipt, sid) {
 			t.Fatal("foreign scheduler task accepted")
 		}
@@ -49,6 +54,28 @@ func TestSchedulerDocumentsKeepUniqueIdentityAndPathData(t *testing.T) {
 	}
 	if bytes.Contains(mac, []byte("com.opensocrates.auto-update")) {
 		t.Fatal("fixture touched production identity")
+	}
+}
+
+func TestSchedulerRegistrationDiagnosticsAreBoundedAndContentFree(t *testing.T) {
+	raw := []byte("ERROR: (2,198):UserId: S-1-5-21-123-456-789-1000 C:\\private\\fixture.xml\n")
+	result := platform.Result{ExitCode: int(int64(0x80041318)), Stderr: raw}
+	diagnostic := schedulerRegistrationDiagnostic(result, errors.New("synthetic_failure"))
+	if diagnostic["hresult"] != "0x80041318" || diagnostic["known_error_class"] != "xml_value_invalid" || diagnostic["xml_line"] != 2 || diagnostic["xml_column"] != 198 || diagnostic["stderr_len"] != len(raw) {
+		t.Fatal("bounded scheduler error classification missing")
+	}
+	encoded, e := json.Marshal(diagnostic)
+	if e != nil {
+		t.Fatal(e)
+	}
+	for _, private := range []string{"S-1-5-21", "C:\\private", "fixture.xml", "synthetic_failure", "ERROR:"} {
+		if bytes.Contains(encoded, []byte(private)) {
+			t.Fatal("raw account/path/error data leaked into scheduler evidence")
+		}
+	}
+	denied := schedulerRegistrationDiagnostic(platform.Result{ExitCode: int(int64(0x80070005))}, errors.New("synthetic_failure"))
+	if denied["known_error_class"] != "access_denied" {
+		t.Fatal("access error misclassified")
 	}
 }
 func TestSchedulerCleanupRequiresProvenAbsence(t *testing.T) {
