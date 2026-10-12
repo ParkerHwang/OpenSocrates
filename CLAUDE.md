@@ -2,10 +2,10 @@
 
 <!-- make governance-check asserts distinctive policy strings in this file. -->
 
-These instructions govern repository development. The v1.5 release
+These instructions govern repository development. The v1.6 candidate
 provides a native Mac Claude Code companion and a separate content-only
 account skill while preserving the Codex baseline. This contributor
-file is not the installed product controller. See [the Mac guide](docs/macos-v1.5.md)
+file is not the installed product controller. See [the native guide](docs/native-v1.6.md)
 for current behavior, installation, and live qualification boundaries.
 
 Read and follow [`AGENTS.md`](AGENTS.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md) before making changes. They are the shared cross-agent and human workflow contract.
@@ -27,3 +27,10 @@ Claude-specific requirements:
   skills and unrelated host settings during any authorized migration.
 - Do not import the withdrawn v1.5 coding/memory/orchestration candidate. Original
   48-method contracts remain intact; dedicated coding specialists are excluded.
+
+- v1.6.0 active first-party implementation uses Go only. Freeze v1.5.0 content;
+  method-body upgrades belong to a separate later release. Implement fully,
+  integrate, then verify stable files; defer routine checks during implementation.
+- Keep update ownership exclusive during npm adoption. Preserve trust, disabled
+  integrations and unrelated files. Production signing, native platform evidence,
+  clean-machine and live host evidence remain separate release gates.

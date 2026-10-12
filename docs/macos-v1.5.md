@@ -1,5 +1,10 @@
 # OpenSocrates v1.5.0 on Mac
 
+This is the **historical v1.5.0 guide**. Its npm commands and observations
+are not the active installation/verification path for the v1.6.0 Go candidate.
+Use [the native v1.6 guide](native-v1.6.md). The original is
+[version-pinned here](https://github.com/ParkerHwang/OpenSocrates/blob/v1.5.0/docs/macos-v1.5.md).
+
 [한국어](macos-v1.5.ko.md) · [README](../README.md)
 
 After installation, follow the [visual setup guide](setup-guide.md) for the remaining host steps or an agent-assisted setup request.

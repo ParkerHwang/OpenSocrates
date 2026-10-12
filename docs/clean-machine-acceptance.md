@@ -1,52 +1,48 @@
-# Clean Apple-silicon Mac acceptance
+# Native clean-machine acceptance
 
-[한국어](clean-machine-acceptance.ko.md)
+[한국어](clean-machine-acceptance.ko.md) · [Native guide](native-v1.6.md)
 
-This procedure tests Codex on a real newly configured Mac. It uses the actual
-account's default Codex home. It is not an isolated fixture or same-machine
-reinstall. Existing OpenSocrates state, registrations, managed roots or updater
-files block the clean baseline.
+Use a separately configured macOS ARM64 or Windows x64 machine that has never
+had the managed installation, registrations, user state or scheduler. A used
+machine or a temporary home is not clean-machine evidence. Bind approved
+candidate assets, source commit, content baseline and successful native CI run
+before mutation. End-user prerequisites are the native assets and the external
+host app/login; no Go, Python, Node.js or npm is required.
 
-Install Node.js 20+, Codex CLI, Git and GitHub CLI. Sign in to Codex and GitHub.
-Check out the current pull request and wait for successful native macOS CI at
-its exact head. The checkout must be clean.
+Do not run against the user's active installation without authorization. First
+record a content-free baseline with the platform, exact source/artifact hashes,
+absence of managed state/registrations/scheduler and host version. Unknown or
+foreign paths block installation. Install through the native commands in the
+native guide, verify status/inventory/registration, restart the host where
+required, review hooks through the host trust interface and inspect actual
+activation. Never fabricate trust records or infer delivery from registration.
 
-```sh
-gh repo clone ParkerHwang/OpenSocrates
-cd OpenSocrates
-gh pr checkout YOUR_PR_NUMBER
-node tools/clean_machine_acceptance.mjs
+Test manual update, disabled-state preservation, selected owned removal,
+opt-in scheduler enable/status/run/disable, offline behavior, interruption,
+recovery and verified rollback. Keep state, registration and updater ownership
+consistent after each completed transaction. Production update tests require
+approved trusted root/signed metadata and platform signing policy. Development
+fixtures do not establish public-release authenticity.
+
+The Go developer harness can additionally run isolated native filesystem and
+host fixtures:
+
+```text
+go run ./src/opensocrates/cmd/opensocrates-dev acceptance lifecycle --binary /absolute/path/to/opensocrates --package /absolute/path/to/bundle --report build/evidence/native-lifecycle.json
 ```
 
-The harness verifies architecture, authentication and the unused baseline;
-binds the PR, CI run and native artifact to the exact commit; checks the Codex
-archive against the combined manifest; and packs the nine-file npm installer.
-It installs Codex from these candidate bytes, checks desired state, registration,
-managed layout and status, and writes a privacy-safe report. It does not enable
-automatic updates or prove the public npm/GitHub download path. After publication,
-that path needs a separate check.
+This harness is **fixture evidence**, not clean-machine or authenticated live
+host evidence. Run it only after integration and on the reported native target.
+Windows results must come from Windows x64; cross-compilation is insufficient.
 
-Complete the two categorical fields in the printed `manual-observations.md`:
-Codex plugin recognition and host runtime loading. Use a fresh interactive Codex
-task, review its OpenSocrates hooks, and record observed results only. Change
-`PENDING` to `PASS` or `FAIL`; add no free-form text, raw output, prompts,
-transcripts, identities, credentials or local paths. Run the printed `--pack`
-command. The ZIP contains only `result.json`, `result.md` and
-`manual-observations.md`.
+Public reports contain only exact commit, platform/artifact identities, command
+names/results, bounded categorical observations and missing evidence. Exclude
+prompts, transcripts, credentials, environment values, paths and raw process
+output. Keep any recovery data private. Record CLI/Desktop activation and
+account/Antigravity scope separately. No result asserts method understanding,
+application or answer improvement.
 
-A checksum or baseline failure blocks installation. Registration failure attempts
-rollback; a post-install assertion failure leaves state available for diagnosis.
-A failure bundle is produced automatically. A package check alone is not live
-hook or method-application evidence.
-
-To remove the test installation after collecting the result, close Codex and run:
-
-```sh
-node installer/opensocrates.mjs remove --host codex --purge
-# Only when resetting the seven exact OpenSocrates hook approvals is intended:
-node installer/opensocrates.mjs remove --host codex --purge --reset-trust
-```
-
-A live cache keeps purge incomplete. Do not report success until the named
-process is closed and the command completes. Authentication, user history and
-unrelated configuration remain intact. Purge does not restore removed caches.
+Removal must preserve unrelated files, credentials/history, trust unless
+explicitly reset through a supported operation, and unknown/modified payloads.
+Incomplete recovery is a blocker with retained bytes, not success. Public
+GitHub transport/signing verification is a separate postpublication gate.

@@ -6,96 +6,108 @@
 
 **이해하고 판단하고 사용할 수 있는 결과를 위한 사고 지원.**
 
-OpenSocrates는 진행 중인 작업에 직접 작성한 48개 사고 방법을 제공합니다.
-자료를 종합하고, 이해관계자의 관점을 파악하고, 선택지를 비교하고, 필요한
-메시지를 쓰도록 돕습니다. 원래 영어·한국어 절차는 그대로 유지합니다.
-v1.5의 독자 안내는 결론을 맥락과 다음 행동에 연결합니다. 코딩 전문가 전용
-기능은 이번 버전에 포함하지 않습니다.
+OpenSocrates는 진행 중인 자료 종합, 이해관계자 관점 파악, 선택지 비교, 메시지
+작성에 정본 사고 방법 48개를 제공합니다. 영어·한국어 절차, 교사 질문, 응답 정책,
+공통 독자 안내는 출시된 v1.5.0 기준을 유지합니다. 별도 본문 업그레이드는
+v1.6.0에서 제외하고 v1.6.1 이후로 분리합니다. 코딩 전문가 전용 기능도 이번
+범위에 포함하지 않습니다.
 
 [English](README.md) | **한국어**
 
 [![CI](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml/badge.svg)](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Mac과 Windows에서 쓰는 v1.5.0
+## v1.6.0 네이티브 전환
 
-v1.5.0은 Codex를 유지하면서 Apple Silicon Mac의 Claude Code 네이티브 연동,
-휴대 가능한 Claude 계정 스킬, Mac·Windows x64의 Antigravity 작업공간·전역
-규칙과 스킬을 추가합니다. 배포 파일과 SHA-256 파일은
-[v1.5.0 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.0)에서
-받거나 [npm 설치기](https://www.npmjs.com/package/opensocrates/v/1.5.0)를 사용하세요.
+이 브랜치는 **아직 출시하지 않은 v1.6.0 구현 후보**입니다. Go 런타임, 관리 CLI,
+설치기, 업데이터, 개발 도구가 기존의 활성 Python·JavaScript·npm 경로를
+대체합니다. 사용자는 Go·Python·Node.js·npm을 설치하지 않습니다. 정식 자산은
+[GitHub Releases](https://github.com/ParkerHwang/OpenSocrates/releases)에서
+배포합니다. 운영 서명·신뢰 루트와 네이티브 릴리스 검증을 완료해야 게시하거나
+안정 버전으로 권장할 수 있습니다. 현재 출시 기준은
+[v1.5.0](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.0)입니다.
 
 | 호스트 | 전달 방식 | 플랫폼과 활성화 |
 | --- | --- | --- |
-| Codex | 기존 훅·컨트롤러·네이티브 판단 런타임 | Apple Silicon Mac·Windows x64; 대화형 세션에서 훅 7개 검토 |
-| Claude Code CLI / Desktop의 로컬 Code | 상태를 저장하지 않는 네이티브 진입과 설치된 전체 참조 | Apple Silicon Mac; Claude CLI·호스트 로그인·플러그인과 훅 권한 필요 |
-| Claude 웹 / Desktop Chat / Cowork | 실행 코드가 없는 독립 계정 스킬 ZIP | Mac·Windows에서 내보낸 뒤 업로드·활성화하고 아래 계정 지침을 한 번 추가 |
-| Antigravity 대화 애플리케이션 | 소유 범위가 명확한 모듈형 규칙과 스킬 | Apple Silicon Mac·Windows x64; 작업공간 또는 전역 선택 |
+| Codex CLI / Desktop | 네이티브 훅·컨트롤러·Go 판단 런타임 | macOS ARM64·Windows x64(기본 PowerShell); 훅 7개 검토 후 새 세션 |
+| Claude Code CLI / Desktop의 로컬 Code | 상태 없는 네이티브 진입·설치된 전체 참조 | macOS ARM64; Claude CLI·로그인·플러그인과 훅 권한 필요 |
+| Claude 웹 / Desktop Chat / Cowork | 실행 코드 없는 독립 계정 ZIP | 두 플랫폼에서 검증·내보내기; 계정에서 별도 업로드·활성화 |
+| Antigravity 대화 앱 | 소유 범위가 명확한 모듈형 규칙·스킬 | macOS ARM64·Windows x64; 작업공간 또는 전역 명시 |
 
-Windows 터미널이나 Desktop Code의 Claude Code 네이티브 연동은 이번 릴리스
-범위에서 제외합니다. 계정 콘텐츠는 네이티브 Claude 연동을 설치하지 않습니다.
-[Mac 안내](docs/macos-v1.5.ko.md)와 [Windows 안내](docs/windows-v1.5.ko.md)를 참고하세요.
+기본값과 `--host all`은 **Codex만** 선택합니다. 다른 프로필은 호스트를 명시해야
+합니다. Windows 네이티브 Claude Code, Linux, macOS Intel, Windows ARM64,
+WSL, 원격 호스트는 이번 범위 밖입니다.
 
-신뢰된 네이티브 훅과 Antigravity 상시 규칙은 일반 요청에서 진입 안내를
-제공합니다. Claude 계정 스킬은 아래 상시 지침을 추가해 이름을 반복하지 않고
-사용하도록 설정하세요. 선택은 여전히 호스트 모델에 맡겨져 누락될 수 있습니다.
-설치·불러오기·전체 읽기·실제 적용·
-결과의 유용성은 서로 다른 증거이며, 일반적인 품질·토큰 비용·속도 향상을
-주장하지 않습니다.
+설치·불러오기·전체 읽기·실제 적용·결과 유용성은 각각 다른 증거입니다.
+로컬 검사와 파일 설치는 실제 호스트 전달이나 일반적인 품질·비용·속도 향상을
+증명하지 않습니다. 명령·이전 설치 인수·자동업데이트·복구·누락 릴리스 증거는
+[네이티브 안내](docs/native-v1.6.ko.md), 호스트 승인 화면은
+[설치 후 설정](docs/setup-guide.ko.md)을 참고하세요.
 
-**설치 다음 단계:** [화면으로 보는 설정 가이드](docs/setup-guide.ko.md)에서 훅 승인, 계정 스킬 켜기, 앱별 완료 상태를 확인하세요. 에이전트에게 붙여 넣을 설치 요청문도 포함합니다.
+## 설치·이전 설치 인수·업데이트
 
-## 설치 또는 업데이트
+승인된 GitHub Release에서 네이티브 실행파일과 플랫폼에 맞는 묶음을 받습니다.
+실행 전 해당 릴리스의 출처·서명 안내를 확인하세요. 릴리스 전 후보 묶음은 로컬
+빌드 산출물입니다. Mac에서는 내려받은 실행파일을 사용합니다.
 
-Node.js 20 이상과 사용할 호스트를 설치하고 그 호스트에 로그인하세요.
-네이티브 런타임은 포함되어 있으므로 설치에 Python이 필요하지 않습니다.
-지원하는 두 플랫폼에서 Codex를 설치하는 예입니다.
-
-```sh
-npx --yes opensocrates@1.5.0 install --host codex
-npx --yes opensocrates@1.5.0 status --host codex
+```text
+./opensocrates install --host codex --package /absolute/path/to/bundle.zip
+./opensocrates status --host codex
 ```
 
-기존 v1.4 Codex 설치는 다음 명령으로 업데이트합니다.
+Windows x64에서는 `opensocrates.exe`와 따옴표로 감싼 로컬 드라이브 절대 경로를
+사용합니다.
 
-```sh
-npx --yes opensocrates@1.5.0 update --host codex
+```text
+.\opensocrates.exe install --host codex --package "C:\Downloads\bundle.zip"
+.\opensocrates.exe status --host codex
 ```
 
-대화형 세션에서 Codex 훅 7개를 검토하고 새 대화를 시작하세요. 비대화형 실행은
-신뢰되지 않은 훅을 건너뛸 수 있습니다. `status`는 설치와 무결성을 보고하며
-자동 전달을 증명하지 않습니다.
+소유권을 확인한 기존 v1.5 npm 설치는 네이티브 묶음과 함께 `adopt`를 한 번
+실행합니다. 이전 업데이터를 조정하며 소유 상태·설정·등록·신뢰·비활성 상태를
+보존합니다. npm 패키지나 사용자 데이터를 무차별 삭제하지 않습니다.
 
-Apple Silicon Mac에서는 Claude 네이티브 연동을 설치할 수 있습니다.
-
-```sh
-npx --yes opensocrates@1.5.0 install --host claude
-npx --yes opensocrates@1.5.0 status --host claude
+```text
+./opensocrates adopt --host codex --package /absolute/path/to/bundle.zip
 ```
 
-Antigravity는 이미 존재하는 작업공간의 절대 경로를 선택합니다.
+이후 수동 갱신은 검증한 로컬 묶음과 `update`를 사용합니다. `verify`, `manage diagnose`,
+`enable`, `disable`, `remove`도 같은 호스트·범위를 명시합니다. 알 수 없거나
+수정된 파일은 보존하고 충돌을 보고합니다. Mac Claude는 `--host claude`,
+Antigravity는 `--host antigravity`와 선택적인
+`--workspace /absolute/path/to/existing/workspace`를 사용합니다. 작업공간을
+생략하면 전역 범위입니다. 계정 콘텐츠는 다음처럼 내보냅니다.
 
-```sh
-npx --yes opensocrates@1.5.0 install --host antigravity --workspace /absolute/path/to/workspace
+```text
+./opensocrates export --host claude-chat --package /absolute/path/to/account.zip --output /absolute/path/to/opensocrates-account.zip
 ```
 
-Windows에서는 `C:\Work\Reading Workshop`처럼 로컬 드라이브의 절대 경로로
-바꾸고 따옴표로 감싸세요. `--workspace`를 생략하면 전역 범위를 선택합니다.
-Claude 계정 콘텐츠는 이미 존재하는 폴더의 절대 ZIP 경로로 내보낸 뒤,
-Claude의 Customize > Skills 화면에서 업로드하고 활성화합니다.
+대화형 Codex 세션에서 훅 7개를 검토하세요. 비대화형 실행에서는 승인되지 않은
+훅을 건너뛸 수 있습니다. 꺼 둔 연동은 인수·갱신 후에도 꺼진 상태로 유지하며
+원할 때 명시적으로 켭니다. `status`는 설치·무결성을 확인할 뿐 자동 전달이나
+진행 중 대화가 불러온 버전을 증명하지 않습니다.
 
-```sh
-npx --yes opensocrates@1.5.0 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.0-account.zip
-```
+## 자동업데이트
 
-### Claude Chat·Cowork: 계정 지침을 한 번 추가하기
+Codex는 사용자 opt-in 후 훅 밖에서 `stable`을 24시간마다 확인하며 로그인 확인에
+지연을 둡니다. Mac은 사용자 LaunchAgent, Windows는 작업 스케줄러를 사용합니다.
+네이티브 관리 CLI의 `auto-update enable`, `status`, `run`, `disable`로 관리합니다.
+적용 전 서명·만료·롤백 방지·플랫폼 무결성·호환성을 검증합니다. 메이저·호환성을
+깨는 스키마 변경은 자동 적용하지 않습니다. 오프라인에서는 현재 버전을 유지합니다.
+시작한 프로세스는 그 묶음을 유지하며 호스트 reload나 새 세션이 필요할 수 있습니다.
+로컬 갱신은 계정 콘텐츠를 업로드하거나 이미 진행 중인 대화를 바꾸지 않습니다.
 
-요청마다 `/opensocrates`를 입력하지 않고 사용하려면 계정 스킬을 켜고
-**Settings → General → Instructions for Claude**에 아래 지침을 추가하세요.
-기존 지침은 보존합니다. 이전 Cowork 화면에서는
-**Settings → Cowork → Global instructions**를 사용합니다. 웹과 Desktop의
-계정이 다르면 사용하는 각 계정에 설정하세요.
+후보의 운영 업데이트 신뢰 루트·서명 서비스는 아직 제공하지 않았습니다. 이
+릴리스 조건을 충족하기 전에는 운영 확인을 사용 불가로 보고합니다. 다른 연동은
+수동 lifecycle을 유지하며 각 활성화·복구 검증을 마치기 전에는 예약 갱신에서
+제외합니다.
+
+### Claude Chat·Cowork: 계정 지침 한 번 추가
+
+계정 스킬을 켜고 기존 지침을 보존하면서
+**Settings → General → Instructions for Claude**에 아래를 추가하세요.
+이전 Cowork 화면은 **Settings → Cowork → Global instructions**를 사용합니다.
+웹과 Desktop 계정이 다르면 사용하는 계정마다 설정합니다.
 
 ```text
 자료 종합, 선택지 비교, 판단, 메시지 작성처럼 해석이나 판단이 필요한
@@ -105,42 +117,26 @@ npx --yes opensocrates@1.5.0 export --host claude-chat --output /absolute/path/t
 추가하지 마세요.
 ```
 
-한 번 저장한 뒤 새 대화에서 평소처럼 작업을 요청하세요. 이 지침은 모델의
-스킬 선택을 안내하며 네이티브 훅이나 매 턴 강제 적용을 추가하지 않습니다.
-[단계별 설정 안내](docs/setup-guide.ko.md#claude-standing-instructions)와
-[Claude 공식 지침 설정](https://support.claude.com/en/articles/10185728-understanding-claude-s-personalization-features)을 참고하세요.
+저장 후 새 대화를 시작하세요. 모델의 스킬 선택을 안내할 뿐 네이티브 훅이나
+매 턴 강제 적용을 추가하지 않습니다. 업로드·필수 기능·활성 상태는
+[설정 가이드](docs/setup-guide.ko.md#claude-standing-instructions)에서 별도로
+확인합니다.
 
-플랫폼별 안내에는 Windows 경로, 계정 스킬 교체, 업데이트·비활성화·제거와
-검증한 로컬 파일 사용법을 설명합니다. 로컬 파일 옵션을 생략하면 설치기는
-GitHub Releases에서 버전을 고정한 v1.5.0 ZIP과 체크섬을 받습니다.
+## 출처 표기·개인정보·개발
 
-새 연동에는 `--host claude`, `--host antigravity`, `--host claude-chat`를
-명시해야 합니다. 기본값과 `--host all`은 계속 Codex를 선택하며 새 호스트를
-전부 설치하지 않습니다. 새 연동에는 purge, 신뢰 초기화, 자동 업데이트가 없습니다.
+적격한 방법의 정본 전체를 읽고 실제로 적용했을 때만 답변 마지막에
+`Powered by OpenSocrates`를 그대로 표시합니다. 독자 안내만 사용하거나 기계적인
+작업만 했다면 표시하지 않으며 이 문구는 적용이나 결과 향상의 증명이 아닙니다.
 
-과거 여러 호스트 연동을 자동으로 인수하거나 삭제하지 않습니다. 새 설치 전에
-정확한 출처와 소유 범위를 확인하세요. 기존 OpenSocrates 계정 스킬은 교체 전에
-백업하고 활성화 상태를 보존합니다.
+일반 판단 경로에는 추가 선택 모델·인증 호출이 없고 원시 프롬프트·대화·
+스크린샷·숨겨진 추론을 저장하지 않습니다. Claude 네이티브 진입은 대화를 읽거나
+DB를 초기화하지 않습니다. 계정 콘텐츠에는 실행 코드가 없습니다. 호스트의
+대화·인증·보관 정책은 호스트가 관리합니다. [보안 정책](SECURITY.md)을 참고하세요.
 
-## 사용 표기가 나오는 조건
-
-적격한 사고 방법의 정본 전체를 읽고 현재 답변에 실제로 적용했을 때만 답변
-마지막에 `Powered by OpenSocrates`를 한 줄로 그대로 표시합니다. 영어·한국어에서
-같은 문구를 사용합니다. 독자 안내만 사용하거나 기계적인 작업만 했다면 표시하지
-않습니다. 이 문구는 출처 표기이며 네이티브 적용이나 더 나은 결과의 증명은 아닙니다.
-
-## 개인정보와 개발
-
-기본 판단 경로는 별도의 선택 모델을 호출하거나 원시 프롬프트·대화·스크린샷·
-숨겨진 추론을 저장하지 않습니다. Claude 네이티브 진입은 대화를 읽거나
-데이터베이스를 초기화하지 않습니다. 계정 스킬에는 실행 코드가 없습니다.
-일반 대화와 모델 요청은 호스트 자체의 인증·권한·보관 설정·약관을 따릅니다.
-[보안 정책](SECURITY.md)에 정확한 경계를 설명합니다.
-
-- [Mac 설치와 증거의 범위](docs/macos-v1.5.ko.md)
-- [Windows 설치와 증거의 범위](docs/windows-v1.5.ko.md)
-- [사고 방법 원문](content/methods/) · [판단 지점 계약](docs/decision-points.ko.md)
-- [구현 범위](docs/v1.5.0/IMPLEMENTATION_PLAN.md)
+- [네이티브 설치와 증거 범위](docs/native-v1.6.ko.md)
+- [런타임 참고](docs/advanced-usage.ko.md) · [Windows 범위](docs/windows-support.ko.md)
+- [정본 방법](content/methods/) · [판단 계약](docs/decision-points.ko.md)
+- [v1.6 구현 계획](docs/v1.6.0/IMPLEMENTATION_PLAN.md) · [결정 기록](docs/v1.6.0/DECISIONS.md)
 - [변경 이력](CHANGELOG.md) · [기여 안내](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md)
 
 OpenSocrates는 [MIT 라이선스](LICENSE)를 따르는 독립 프로젝트이며

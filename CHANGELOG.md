@@ -1,5 +1,46 @@
 # Changelog
 
+## [1.6.0] - Unreleased
+
+- Migrate active first-party runtime, CLI, lifecycle, updater, generation,
+  validation, governance and release tooling to Go; native users require no
+  Python, Node.js, npm or Go toolchain. Preserve the v1.5.0 revision-3 content
+  baseline and all 48 methods, EN/KO semantics, teacher questions and guides.
+  Separate method-body upgrades are excluded and belong to v1.6.1 or later.
+- Refactor typed services/contracts, distribution profiles versus runtime
+  adapters, package transport, shared transaction/recovery, host registration
+  and OS protection while preserving wire/state/serialization/hook boundaries.
+  Port legacy SDK compatibility to a separate external Codex app-server adapter.
+- Add native GitHub Release bundle distribution, explicit one-time npm adoption,
+  durable recovery and versioned bundles separated from user state. Preserve
+  owned settings, registrations, hook trust and disabled integrations; maintain
+  one update owner and do not broadly uninstall npm packages/user data.
+- Add opt-in stable Codex scheduled updates for macOS ARM64 and Windows x64,
+  signed metadata verification, expiry/rollback/compatibility guards and Go
+  helper support for executable self-replacement. Major/breaking-schema updates
+  are not automatic; reload/fresh-session and account-upload boundaries remain.
+- Intentionally reject duplicate JSON keys/unpaired Unicode surrogates and
+  validate complete decision requests before changing context/scope, so malformed
+  routing cannot erase previous availability. Preserve unsafe/newer settings
+  instead of overwriting them with defaults. Purge preflights every removable
+  payload before mutation; explicit trust reset stays limited to seven entries. Preserve --host all as Codex only;
+  native Windows Claude Code/additional platforms remain excluded.
+- Candidate only: exact final checks belong in the implementation handoff.
+  Native/clean-machine/live host qualification, production trusted root/signing,
+  platform signatures and published asset verification remain release gates.
+  No merge, tag, publication or active-installation replacement is implied.
+- 활성 실행·설치·갱신·생성·검증·릴리스 도구를 Go로 전환합니다. 사용자는
+  Python·Node.js·npm·Go를 설치하지 않습니다. v1.5.0 콘텐츠 리비전 3과 48개
+  방법·영어/한국어 의미를 유지하고 본문 개선은 후속 릴리스로 분리합니다.
+- 공통 작업·복구와 명확한 서비스·프로필·OS 보호를 정리하고 네이티브 배포·
+  일회성 npm 인수·Codex 두 플랫폼의 선택적 서명 안정 갱신을 추가합니다.
+  기존 설정·신뢰·비활성 상태와 단일 업데이트 소유자를 보존합니다.
+- 중복 JSON 키·짝 없는 surrogate와 잘못된 판단 요청을 문맥·scope 변경 전에
+  거부하고 안전하지 않거나 새 설정은 덮어쓰지 않습니다. purge는 모든 제거
+  대상을 먼저 확인하며 신뢰 초기화는 정확한 항목 7개만 다룹니다. --host all은 Codex만
+  선택하며 계정 업로드·진행 중 대화 적용·새 플랫폼을 자동 지원하지 않습니다.
+  운영 서명·네이티브·새 기기·실제 호스트 증거가 필요한 미출시 후보입니다.
+
 ## [1.5.0] - 2026-10-10
 
 - Preserve the v1.4 Codex baseline and all 48 authored reasoning methods with

@@ -15,10 +15,8 @@ build time; they are not host or manifest claims.
 
 - Manifest: `.codex-plugin/plugin.json`
 - Hook definition: `hooks/hooks.json`
-- Fixed launcher: `{{PACKAGE_LAUNCHER_PATH}}`; this exact `bin/` placement is required and
-  no root-level or PowerShell launcher is shipped.
-- Native runtime: `runtime/<target>/opensocrates-runtime/`, resolved by
-  the launcher relative to the plugin root
+- Native executable: `{{PACKAGE_LAUNCHER_PATH}}`, resolved from the plugin root.
+- Hooks invoke the bundled Go executable directly.
 - Writable product data, when enabled by the host, is owned by the host's
   `PLUGIN_DATA` location; this package does not request a remote service.
 - Complete selected reasoning content is written only to an owner-only OS
@@ -35,8 +33,7 @@ method activation, or public-artifact confirmation.
 After installation, open one interactive Codex session and complete the
 one-time interactive hook approval before relying on automatic selection.
 Until then, non-interactive `codex exec` silently skips untrusted hooks. The
-package and launcher are release-validated, but there is no live Codex
-hook-delivery receipt for this release.
+package has no live Codex hook-delivery receipt solely from generation.
 
 ## Default decision-point entry
 
@@ -63,8 +60,8 @@ Other session-start, tool, compaction, Stop, and SessionEnd paths finish with
 literal empty stdout.
 
 For each `UserPromptSubmit`, the package starts one fresh ephemeral
-`openai-codex` selector using the pinned local SDK/runtime and the user's
-existing Codex OAuth/app-server session. It evaluates the current prompt
+external Codex app-server through the isolated Go compatibility adapter and the user's
+existing Codex session. It evaluates the current prompt
 first, then may read transcript, workspace, transcript-referenced files, or
 tool data only on demand and read-only as untrusted data. Set
 `OPENSOCRATES_SELECTOR_TRANSCRIPT_ACCESS=0` to disable transcript access.
@@ -126,4 +123,12 @@ for a volatile NDJSON session. No active host installation is needed for file lo
 
 ## Windows x64
 
-The Windows x64 archive uses `node bin/launch.mjs` and a bundled `.exe`. Node.js 20+ is required; Python and a Unix shell are not required for method retrieval. See the repository Windows support guide for the current validation boundary. Legacy SDK context/credential-copy selection is unavailable on Windows; decision-point retrieval is the supported path. Scheduled updates are unavailable; use a manual installer update.
+The Windows x64 archive invokes its bundled Go `.exe` directly. Installation and
+execution require no Python, Node.js, npm or Go toolchain. Native Windows execution
+and signed release qualification are separate gates. Stable updates are opt-in,
+run outside hooks, and may await a fresh host session before activation.
+This native Windows profile requires Codex's inherited default PowerShell
+executor. Its hook configuration invokes the Go executable through an expanded
+environment variable. Cmd and custom Windows shells are outside this package's
+qualification; an unavailable or disabled hook keeps the ordinary host task
+running and does not establish a delivery receipt.

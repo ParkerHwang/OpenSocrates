@@ -1,64 +1,33 @@
-# Codex `SessionStart` 시간 게이트
+# Codex SessionStart 시간 검사
 
 [English](codex-session-start-timing.md)
 
-네이티브 `darwin-arm64` 릴리스 게이트는 합성 실행 파일이나 `version --json`
-대리 지표가 아니라 사용자가 받는 다음 명령을 측정합니다.
+Go 네이티브 시간 검사는 생성한 `hooks/hooks.json`의 정확한 SessionStart 명령과
+2초 제한을 읽습니다. 명령은 패키지 `runtime/<target>/opensocrates[.exe]`를 직접
+실행하며 자체 셸·PowerShell·JavaScript·Python 런처가 없습니다. 전체 패키지를
+조립한 뒤 버전 smoke로 예열하기 전에 실행합니다.
 
 ```text
-${PLUGIN_ROOT}/bin/launch.sh hook codex session_started
+go run ./src/opensocrates/cmd/opensocrates-dev acceptance timing --package /absolute/path/to/codex-package --runs 20 --report build/evidence/codex-hook-timing.json
 ```
 
-게이트는 생성된 `hooks/hooks.json`에서 이 명령과 2초 제한을 읽고, 생성된 onedir
-패키지에서 명령을 실행합니다. `startup`과 `compact` 두 source를 모두 표본으로
-삼으며, 각 source마다 생성된 유효한 `SessionStart` envelope와 서로 다른 격리
-HOME, 임시 디렉터리, Codex home, workspace를 사용하는 새 프로세스 20개를
-시작합니다. 빈 소유자 전용 OAuth 메타데이터 표식은 어느 source든 전체 런타임
-구성으로 회귀할 때 selector-available 분기를 거치게 하지만 selector 요청은
-시작하지 않습니다.
+실행하는 macOS ARM64·Windows x64와 패키지 대상이 같아야 합니다. 실행 전
+전체 목록·릴리스 식별을 검증합니다. `startup`·`compact` 각각 20–100개 새
+프로세스를 독립 home/temp/Codex-home/작업공간과 합성 입력으로 실행합니다.
+실제 대화·인증 증거가 아닌 합성 시간 검사입니다.
 
-Codex 런타임 빌드에서는 warm-up이 비용을 숨기지 못하도록 첫 configured hook을 모든
-`version --json` smoke보다 먼저 실행합니다. 최종 릴리스 조립도 최종 패키지 버전
-smoke 전에 `dist/codex`에서 게이트를 다시 실행합니다. 통과 조건은 다음과 같습니다.
+각 프로세스는 exit 0·빈 stderr, startup은 빈 출력, compact는 정확한 제한된
+판단 안내를 반환해야 합니다. 모든 표본은 2,000ms 미만, nearest-rank p95는
+1,000ms 이하여야 하며 50% 여유를 유지합니다. 첫 프로세스는 smoke 전에
+기록합니다. 결과에는 대상·자산 식별·제한·프로세스 모델·source별 표본 수와
+first/p50/p95/max·통과 여부만 넣습니다. callback 원문·프롬프트·인증·환경값·
+로컬 경로는 저장하지 않습니다.
 
-- 모든 프로세스는 종료 코드 0과 빈 stderr로 끝나야 합니다. startup의 stdout은
-  비어 있어야 하며 compact는 정확한 v1.3 결정 지점 안내 envelope여야 합니다.
-- 각 source 집합의 첫 configured hook과 모든 표본이 설정된 2,000 ms 제한보다
-  짧게 끝나야 합니다.
-- 각 source의 nearest-rank p95가 1,000 ms 이하여야 하며 50% 예산 여유를 유지해야
-  합니다.
-- 각 source마다 새 프로세스 표본을 최소 20개 측정해야 합니다(도구의 상한은
-  source마다 100개입니다).
+일반 startup/resume/clear는 안전한 no-op이며 compact는 방법 선택·저장소 초기화
+없이 탐색 안내를 복원합니다. 입력은 제한해 메모리에서 처리합니다. 이전 정리는
+명시적 호환 lifecycle이 맡고 기본 탐색은 저장소·인증을 만들지 않습니다.
+없거나 안전하지 않거나 읽기 전용 정리 상태는 고치지 않고 건너뜁니다.
 
-닫힌 JSON 증거에는 target, release-manifest identity, process model, configured timeout,
-그리고 `startup`·`compact` source별 결과만 기록합니다. 각 source 결과에는 sample
-count, first/p50/p95/max latency, pass/fail이 있고, 두 source 결과가 모두 통과해야
-전체 pass가 됩니다. callback 입력·출력, 사용자 prompt, credential, 환경 값, 로컬
-경로는 기록하지 않습니다. 네이티브 패키지를 조립한 뒤 다음 명령으로 게이트를 실행할
-수 있습니다.
-
-```bash
-make codex-hook-timing
-```
-
-게이트는 `source: "startup"`과 `source: "compact"` payload를 모두 전달합니다.
-일반 `startup`, `resume`, `clear` callback은 런타임 구성 전의 fail-open no-op입니다.
-고정 launcher는 callback 입력을 최대 4 MiB까지만 프로세스 메모리에 보관하고 macOS
-시스템 parser로 최상위 `source: "compact"`가 정확히 일치할 때만 통과시킵니다. 이
-입력을 disk, argument, environment 또는 diagnostic에 기록하지 않습니다. 크기 초과,
-malformed, source 누락 및 일반 시작 callback은 완전히 빈 출력으로 끝납니다.
-`compact`만 경계 안의 정확한 입력을 런타임에 다시 전달하며, 런타임은 전체 native-event
-검증을 수행하고 기존 instruction reference 복원에 필요한 최소 artifact store를 엽니다.
-24시간 crash-residue sweep은 `UserPromptSubmit`과 compact 복원 전에 실행되므로 일반
-시작을 전체 경로에서 분리해도 privacy cleanup은 사라지지 않습니다.
-
-이 게이트는 실행한 Apple Silicon Mac에서 해당 빌드 artifact만 뒷받침합니다. 실제
-Codex hook 전달, 서명/notarization, quarantine 동작, clean-machine 설치를 입증하지는
-않습니다.
-
-## v1.3 복원 경계
-
-기본 compact 경로는 상세 방법이나 artifact store 없이 조회 안내만 복원합니다.
-기본 경로는 방법 artifact를 만들지 않습니다. 기존 잔여 파일은 UserPromptSubmit,
-Stop, SessionEnd에서 정리하며 호환 복원 함수는 이전 참조를 복원하기 전에 만료
-검사를 유지합니다. 시간 제한과 p95 기준은 바꾸지 않았습니다.
+주장하는 대상마다 실제로 실행합니다. Mac 통과가 Windows 시간·실제 전달·
+신뢰·서명·quarantine·SmartScreen·새 기기 증거는 아닙니다. 과거 시간 관찰을
+Go 실행파일 검증으로 승격하지 않습니다.

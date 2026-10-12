@@ -1,46 +1,39 @@
-# 새 Apple silicon Mac 인수검증
+# 네이티브 새 기기 검증
 
-[English](clean-machine-acceptance.md)
+[English](clean-machine-acceptance.md) · [네이티브 안내](native-v1.6.ko.md)
 
-실제로 새로 설정한 Mac의 기본 Codex 홈과 실제 계정으로 검증합니다. 격리된 테스트
-데이터나 동일 기기 재설치와 다릅니다. 기존 OpenSocrates 설치 상태, 등록, 관리 루트,
-자동 업데이트 파일이 있으면 새 기기 기준에 맞지 않아 중단합니다.
+관리 설치·등록·상태·예약 작업이 없던 별도 macOS ARM64 또는 Windows x64
+기기를 사용합니다. 사용한 기기나 임시 home은 새 기기 증거가 아닙니다.
+승인된 자산·소스 커밋·콘텐츠 기준·성공한 네이티브 CI를 연결한 뒤 변경합니다.
+사용자는 네이티브 자산·외부 호스트 앱/로그인만 필요하며 Go·Python·Node.js·
+npm이 필요하지 않습니다.
 
-Node.js 20 이상, Codex CLI, Git, GitHub CLI를 설치하고 Codex와 GitHub에 로그인합니다.
-현재 PR을 체크아웃하고 정확한 최신 커밋의 macOS 네이티브 CI 성공을 기다립니다.
-작업 트리는 변경 없이 깨끗해야 합니다.
+별도 승인 없이 사용자의 활성 설치를 대상으로 하지 않습니다. 먼저 플랫폼·
+정확한 소스/자산 해시·관리 상태/등록/예약 부재·호스트 버전을 원문 없는 기준으로
+기록합니다. 미확인·다른 소유 경로는 설치를 막습니다. 네이티브 안내의 명령으로
+설치하고 상태·목록·등록을 확인합니다. 필요한 재시작과 호스트 신뢰 화면 검토 후
+실제 활성화를 관찰합니다. 승인 기록을 만들거나 등록으로 전달을 추정하지 않습니다.
 
-```sh
-gh repo clone ParkerHwang/OpenSocrates
-cd OpenSocrates
-gh pr checkout YOUR_PR_NUMBER
-node tools/clean_machine_acceptance.mjs
+수동 갱신·비활성 보존·선택 소유 제거·예약 enable/status/run/disable·오프라인·
+중단·복구·검증한 롤백을 확인합니다. 작업 완료 후 상태·등록·업데이트 소유권이
+일치해야 합니다. 운영 갱신 검사는 승인 루트·서명 메타데이터·플랫폼 서명 정책이
+필요합니다. 개발 fixture는 공개 릴리스 출처를 증명하지 않습니다.
+
+개발자는 추가로 격리된 네이티브 파일·호스트 fixture를 실행할 수 있습니다.
+
+```text
+go run ./src/opensocrates/cmd/opensocrates-dev acceptance lifecycle --binary /absolute/path/to/opensocrates --package /absolute/path/to/bundle --report build/evidence/native-lifecycle.json
 ```
 
-도구는 아키텍처, 인증, 미사용 기준 상태를 확인합니다. PR·CI 실행·네이티브 배포물을
-동일 커밋에 연결하고 Codex 압축 파일을 통합 매니페스트와 대조한 뒤 9개 파일의
-npm 설치기를 만듭니다. 해당 후보 파일로 Codex를 설치하고 설치 상태, 등록, 관리 루트,
-상태 명령을 확인해 개인정보를 배제한 결과를 저장합니다. 자동 업데이트는 켜지 않으며
-공개 npm·GitHub 다운로드 경로는 배포 후 따로 검증해야 합니다.
+이 검사는 **fixture 증거**이며 새 기기·인증된 실제 호스트 증거가 아닙니다.
+통합 후 명시한 네이티브 대상에서 실행합니다. Windows 결과는 실제 Windows x64가
+필요하며 크로스 컴파일은 불충분합니다.
 
-안내된 `manual-observations.md`의 Codex 플러그인 인식과 호스트 런타임 로딩 두 항목을
-완료합니다. 새 대화형 Codex 작업에서 OpenSocrates 훅을 검토하고 실제 관찰만 기록합니다.
-`PENDING`을 `PASS` 또는 `FAIL`로 바꾸며 자유 형식 메모, 원문 출력·프롬프트·대화,
-계정 정보, 인증 정보, 로컬 경로를 추가하지 않습니다. 안내된 `--pack` 명령을 실행하면
-`result.json`, `result.md`, `manual-observations.md`만 포함한 ZIP을 만듭니다.
+공개 결과에는 커밋·플랫폼/자산 식별·명령 이름과 결과·제한된 범주 관찰·누락만
+기록합니다. 프롬프트·대화·인증·환경값·경로·원문 출력을 제외하고 복구 자료는
+비공개로 둡니다. CLI/Desktop·계정·Antigravity 범위를 구분하며 이해·적용·결과
+향상을 주장하지 않습니다.
 
-체크섬이나 기준 상태 검사 실패는 설치를 차단합니다. 등록 실패는 복구를 시도하고,
-설치 후 검증 실패는 진단할 수 있도록 상태를 남깁니다. 실패 결과는 자동으로 묶습니다.
-패키지 검사만으로 실제 훅 실행이나 방법 적용을 입증할 수는 없습니다.
-
-결과를 보관한 뒤 테스트 설치를 제거하려면 Codex를 닫고 실행합니다.
-
-```sh
-node installer/opensocrates.mjs remove --host codex --purge
-# OpenSocrates의 정확한 7개 훅 승인을 초기화하려는 경우에만:
-node installer/opensocrates.mjs remove --host codex --purge --reset-trust
-```
-
-사용 중인 캐시가 있으면 정리가 미완료로 남습니다. 안내된 프로세스를 닫고 명령이
-완료되기 전에는 성공으로 기록하지 않습니다. 인증, 대화 기록, 다른 설정은 보존하며
-삭제한 캐시는 복원하지 않습니다.
+제거는 관련 없는 파일·인증·기록·신뢰와 미확인/수정 파일을 보존합니다. 신뢰
+초기화는 지원하는 명시적 작업만 사용합니다. 미완료 복구는 파일을 보존한 차단
+상태이지 성공이 아닙니다. 공개 GitHub 전달·서명 확인은 게시 후 별도 조건입니다.

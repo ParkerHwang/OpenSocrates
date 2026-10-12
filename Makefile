@@ -1,143 +1,71 @@
-PYTHON ?= $(shell if command -v uv >/dev/null 2>&1; then uv python find 3.12; else command -v python3; fi)
-PYTHONPATH := src
-ROOT := $(CURDIR)
+GO ?= go
+DEV := $(GO) run ./src/opensocrates/cmd/opensocrates-dev
+TARGET ?= darwin-arm64
 
-.PHONY: bootstrap format format-check lint typecheck generate generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check codex-hook-timing package release-check version
+.PHONY: bootstrap format format-check lint typecheck generate generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check codex-hook-timing package release-check version windows-check macos-check
 
 bootstrap:
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" -c 'import pathlib,sys,tomllib; assert sys.version_info[:2] == (3, 12), sys.version; root=pathlib.Path("."); project=tomllib.loads((root/"pyproject.toml").read_text()); lock=tomllib.loads((root/"uv.lock").read_text()); expected=("openai-codex==0.144.4", "openai-codex-cli-bin==0.144.4", "pydantic>=2.12,<3"); assert tuple(project["project"].get("dependencies", [])) == expected; packages={item.get("name"): item for item in lock.get("package", []) if isinstance(item, dict) and isinstance(item.get("name"), str)}; assert packages.get("openai-codex", {}).get("version") == "0.144.4"; assert packages.get("openai-codex-cli-bin", {}).get("version") == "0.144.4"; pydantic=packages.get("pydantic", {}).get("version", ""); assert pydantic.startswith("2.") and tuple(map(int, pydantic.split(".")[:2])) >= (2, 12); assert packages.get("pydantic-core", {}).get("version"); opensocrates=packages.get("opensocrates", {}); direct={item.get("name") for item in opensocrates.get("dependencies", []) if isinstance(item, dict)}; assert {"openai-codex", "openai-codex-cli-bin", "pydantic"} <= direct; print("Python 3.12 and locked Codex SDK/runtime metadata ready")'
-	@if command -v uv >/dev/null 2>&1; then uv lock --check && uv sync --locked --no-install-project; else "$(PYTHON)" -m mypy --version && "$(PYTHON)" -m ruff --version; fi
+	@$(GO) mod download
 
 format:
-	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff format src tools; else "$(PYTHON)" -m ruff format src tools; fi
+	@$(DEV) format
 
 format-check:
-	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff format --check src tools; else "$(PYTHON)" -m ruff format --check src tools; fi
+	@$(DEV) format --check
 
-lint: typecheck
-	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) tools/check_import_boundaries.py
-	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) tools/check_generated_contract.py
-	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff check src tools; else "$(PYTHON)" -m ruff check src tools; fi
+lint:
+	@$(GO) vet ./src/opensocrates/...
+	@$(DEV) check boundaries
 
 typecheck:
-	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m compileall -q src tools
-	@if command -v uv >/dev/null 2>&1; then MYPYPATH=$(PYTHONPATH) uv run --locked --no-sync mypy src; else MYPYPATH=$(PYTHONPATH) "$(PYTHON)" -m mypy src; fi
+	@$(GO) vet ./src/opensocrates/...
 
 generate:
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host codex --runtime-root "$(ROOT)/dist/runtime/codex" --output "$(ROOT)/build/generated/plugins/codex" >/dev/null
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host claude --runtime-root "$(ROOT)/dist/runtime/claude" --output "$(ROOT)/build/generated/plugins/claude" >/dev/null
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_content_hosts.py --root "$(ROOT)" --host claude-chat >/dev/null
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_content_hosts.py --root "$(ROOT)" --host antigravity >/dev/null
+	@$(DEV) generate
 
 generated-check:
-	@set -eu; tmp="$$(mktemp -d)"; trap 'rm -rf "$$tmp"' EXIT; out="$$tmp/generated output — 日本語"; mkdir -p "$$out"; \
-	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/generate_schemas.py --output-dir "$$out/schemas"; \
-	PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$$out/content/compiled-content.bundle.json" --reasoning-projections-output "$$out/content/compiled-reasoning-content.bundle.json"; \
-	diff -ru "$(ROOT)/schemas/v1" "$$out/schemas/v1"; diff -u "$(ROOT)/content/compiled-content.bundle.json" "$$out/content/compiled-content.bundle.json"; diff -u "$(ROOT)/content/compiled-reasoning-content.bundle.json" "$$out/content/compiled-reasoning-content.bundle.json"; diff -u "$(ROOT)/content/compiled-response-policy.json" "$$out/content/compiled-response-policy.json"; \
-	for host in codex claude; do \
-		PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host "$$host" --output "$(ROOT)/build/generated/plugins/$$host" >/dev/null; \
-		PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_plugins.py --root "$(ROOT)" --host "$$host" --output "$$out/plugins/$$host" >/dev/null; \
-		diff -ru "$(ROOT)/build/generated/plugins/$$host" "$$out/plugins/$$host"; \
-	done; \
-	echo "generated-check: byte-identical schemas, content bundles, and native host packages"
+	@$(DEV) check generated --report build/evidence/generated.json
 
 content-check:
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/validate_content.py --output "$(ROOT)/content/compiled-content.bundle.json" --reasoning-projections-output "$(ROOT)/content/compiled-reasoning-content.bundle.json"
+	@$(DEV) check content --report build/evidence/content.json
 
 adjudication-check:
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_v12_adjudication.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_v12_adjudication_mutations.py
+	@$(DEV) check adjudication --report build/evidence/adjudication.json
 
 docs-check:
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_links.py --root "$(ROOT)" \
-		--path docs/advanced-usage.md \
-		--path docs/advanced-usage.ko.md \
-		--path docs/decision-points.md \
-		--path docs/decision-points.ko.md \
-		--path docs/setup-guide.md \
-		--path docs/setup-guide.ko.md \
-		--path docs/assets/setup-v1.5/README.md \
-		--path README.md \
-		--path README.ko.md \
-		--path CHANGELOG.md \
-		--path CONTRIBUTING.md \
-		--path AGENTS.md \
-		--path CLAUDE.md \
-		--path .github/copilot-instructions.md \
-		--path .github/pull_request_template.md \
-		--path SECURITY.md \
-		--path CODE_OF_CONDUCT.md \
-		--path docs/claude-payload-receipts.md \
-		--path docs/real-claude-selector.md \
-		--path docs/claude-structured-output-reliability.md \
-		--path docs/claude-hook-timing.md \
-		--path docs/codex-session-start-timing.md \
-		--path docs/codex-session-start-timing.ko.md \
-		--path docs/reinstall-cycle-acceptance.md \
-		--path docs/reinstall-cycle-acceptance.ko.md \
-		--path docs/claude-desktop-live-probe.md \
-		--path docs/claude-cowork-live-probe.md \
-		--path docs/claude-chat-upload-probe.md \
-		--path docs/antigravity-support.md \
-		--path docs/cursor-support.md \
-		--path docs/grok-support.md \
-		--path docs/opencode-support.md \
-		--path docs/opencode-support.ko.md \
-		--path docs/macos-v1.5.md \
-		--path docs/macos-v1.5.ko.md \
-		--path docs/v1.5.0/WINDOWS_HANDOFF.md \
-		--path docs/v1.5.0/WINDOWS_IMPLEMENTATION_HANDOFF.md \
-		--path docs/v1.5.0/WINDOWS_HOST_RESEARCH.md \
-		--path docs/windows-v1.5.md \
-		--path docs/windows-v1.5.ko.md \
-		--path evals/v1.5-windows/REPORT.md \
-		--path evals/v1.5-macos/REPORT.md \
-		--path docs/v1.2-adjudication-report.md \
-		--path evals/v1.2/ADJUDICATION_GUIDE.md \
-		--path evals/v1.2/ADJUDICATION_AI_AMENDMENT.md \
-		--path .github/release-notes \
-		--report build/evidence/links.json
+	@$(DEV) check docs --report build/evidence/links.json
 
 governance-check:
-	@if [ -n "$${GITHUB_EVENT_PATH:-}" ]; then PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_pr_governance.py --root "$(ROOT)" --event "$$GITHUB_EVENT_PATH" --report build/evidence/governance.json; else PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_pr_governance.py --root "$(ROOT)" --report build/evidence/governance.json; fi
-	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_pr_governance_mutations.py
+	@$(DEV) check governance --report build/evidence/governance.json
 
 package-check: generate
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_packaged_launcher.py --root "$(ROOT)" --report build/evidence/packaged-launcher.json
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_package_docs.py --root "$(ROOT)" --report build/evidence/package-docs.json
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_package_docs_mutations.py
+	@$(DEV) check package --report build/evidence/package.json
 
-security-scan: generate
-	@set -eu; set -- --artifact content/compiled-content.bundle.json --artifact content/compiled-reasoning-content.bundle.json; for artifact in $$(find "$(ROOT)/dist/runtime" -type f -name opensocrates-runtime -perm -111 2>/dev/null); do set -- "$$@" --artifact "$${artifact#$(ROOT)/}"; done; for artifact in "$(ROOT)"/dist/opensocrates-*.zip; do if [ -f "$$artifact" ]; then set -- "$$@" --artifact "$${artifact#$(ROOT)/}"; fi; done; PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/build_sbom.py --root "$(ROOT)" --output build/evidence/sbom.spdx.json --report build/evidence/sbom.json "$$@"
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/security_scan.py --root "$(ROOT)" --report build/evidence/security-scan.json
+security-scan: package
+	@$(DEV) sbom --package dist/native/$(TARGET) --output build/evidence/sbom.json
+	@$(DEV) check security --report build/evidence/security-scan.json
 
 smoke:
-	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_claude_host.py
-	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_content_hosts.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_public_release_verification.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_response_policy.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_release_identity.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_decision_hook_runtime.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_decision_points.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/smoke_product.py
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_selector.py
+	@$(GO) test ./src/opensocrates/...
 
 installer-check:
-	@npm test
-	@npm pack --dry-run
+	@$(GO) test ./src/opensocrates/internal/lifecycle ./src/opensocrates/internal/platform ./src/opensocrates/internal/update
 
 codex-hook-timing:
-	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/measure_codex_hook_timing.py
+	@$(DEV) acceptance timing --package dist/native/$(TARGET)/packages/codex --report build/evidence/codex-hook-timing.json
 
 package:
-	@if command -v uv >/dev/null 2>&1; then PYTHONPATH="$(PYTHONPATH)" uv run --locked --group build python tools/release_check.py --root "$(ROOT)" --assemble; else PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/release_check.py --root "$(ROOT)" --assemble; fi
-	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_macos_hosts.py --root "$(ROOT)"
+	@$(DEV) build --target $(TARGET) --output dist/runtime
+	@$(DEV) package --target $(TARGET) --runtime-root dist/runtime --output dist/native/$(TARGET)
 
-release-check: adjudication-check
-	@if command -v uv >/dev/null 2>&1; then PYTHONPATH="$(PYTHONPATH)" uv run --locked --group build python tools/release_check.py --root "$(ROOT)" --assemble --report build/evidence/release-check.json; else PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/release_check.py --root "$(ROOT)" --assemble --report build/evidence/release-check.json; fi
-	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_macos_hosts.py --root "$(ROOT)"
+release-check:
+	@$(DEV) release-check --target $(TARGET) --package dist/native/$(TARGET)
+
+windows-check:
+	@$(DEV) check windows --report build/evidence/windows-package.json
+
+macos-check:
+	@$(DEV) check macos-hosts --report build/evidence/macos-package.json
 
 version:
-	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m opensocrates version --json
+	@$(GO) run ./src/opensocrates/cmd/opensocrates version --json

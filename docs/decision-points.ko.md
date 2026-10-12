@@ -1,5 +1,11 @@
 # 결정 지점 조회와 이전 안내
 
+v1.6.0 후보는 v1.5.0 콘텐츠 리비전 3과 의미를 유지합니다. 아래 과거 증거표는
+당시 버전에 한정됩니다. Go 후보의 실제 검증은 [네이티브 안내](native-v1.6.ko.md)와
+구현 인계에서 확인합니다. 잘못된 요청은 scope 변경 전에 거부하며 이전
+가용 상태를 지우지 않는 것이 의도한 변경입니다. 중복 JSON 키와 짝 없는 Unicode
+surrogate도 거부하며 전체 요청은 문맥·scope 변경 전에 검증합니다.
+
 상태: v1.5.0 Codex·Claude·Antigravity 릴리스이며 콘텐츠 revision 3, 라우터 1.1.0입니다. 방법 절차 본문은 v1.2.1 원문을 유지합니다.
 실험용 콘텐츠 revision 2, 방법 변형, 언어 수정안과 Compact 정책을 승격하지
 않았습니다. Method ID는 바뀌지 않습니다.
@@ -41,10 +47,10 @@ v1.5의 Codex, 네이티브 Claude, Claude 계정과 Antigravity 패키지는 �
 공유합니다. 적용 불가를 확인하기 위해 읽은 방법의 출력 요건을 다른 질문으로
 옮기거나 그 방법을 적용했다고 인용하지 않습니다.
 
-설치된 Codex 패키지에서는 다음 명령을 사용할 수 있습니다.
+macOS ARM64에 설치된 Codex 패키지에서는 다음 명령을 사용할 수 있습니다.
 
 ```sh
-cat skills/opensocrates/references/decision/request.json | ./bin/launch.sh decision codex
+cat skills/opensocrates/references/decision/request.json | ./runtime/darwin-arm64/opensocrates decision codex
 ```
 
 예제의 닫힌 feature와 context 값을 현재 판단에 맞게 바꿉니다. 라우팅 필드에
@@ -52,7 +58,7 @@ cat skills/opensocrates/references/decision/request.json | ./bin/launch.sh decis
 소스 체크아웃에서는 다음과 같이 임시 세션을 유지할 수 있습니다.
 
 ```sh
-PYTHONPATH=src .venv/bin/python -m opensocrates decision --stream
+go run ./src/opensocrates/cmd/opensocrates decision codex --stream
 ```
 
 입력은 줄마다 JSON 객체 하나입니다. `select`는 기존 routing feature 스키마와
@@ -126,7 +132,7 @@ decision 명령을 사용하세요. 이전 경로의 대응 참조는
 
 ## 설치 런처의 세션과 훅 정리 범위
 
-설치된 런처는 `./bin/launch.sh decision codex --stream`도 지원합니다.
+설치된 런처는 `./runtime/darwin-arm64/opensocrates decision codex --stream`도 지원합니다.
 같은 프로세스를 유지해야 가용성 신고를 재사용할
 수 있습니다. 단발 호출을 반복하면 매번 상태가 초기화됩니다.
 

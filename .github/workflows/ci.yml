@@ -3,9 +3,7 @@ name: OpenSocrates CI
 on:
   pull_request:
   push:
-    branches:
-      - dev
-      - main
+    branches: [dev, main]
 
 permissions:
   contents: read
@@ -15,118 +13,94 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHONUTF8: "1"
-  PYTHONDONTWRITEBYTECODE: "1"
+  GOTOOLCHAIN: go1.27.2
+  CGO_ENABLED: "0"
 
 jobs:
-  windows:
-    name: Native Windows x64
-    uses: ./.github/workflows/windows.yml
-
-  python-quality:
-    name: Python quality
+  source:
+    name: Go source and product contracts
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
         with:
-          python-version: "3.12"
-      # setup-uv stopped publishing floating major tags after v7, so the
-      # current maintained release is pinned exactly rather than by major.
-      - uses: astral-sh/setup-uv@v9.0.0
-      - name: Bootstrap locked environment
-        run: make bootstrap
-      - name: Check formatting
-        run: make format-check
-      - name: Run Ruff, mypy, and import-boundary checks
-        run: make lint
-
-  product-contracts:
-    name: Product contracts
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-go@v6
         with:
-          python-version: "3.12"
-      - uses: astral-sh/setup-uv@v9.0.0
-      - name: Bootstrap locked environment
-        run: make bootstrap
-      - name: Check generated schemas and content
-        run: make generated-check
-      - name: Validate content and locale parity
-        run: make content-check
-      - name: Validate committed adjudication snapshot
-        run: make adjudication-check
-      - name: Check documentation
-        run: make docs-check
-      - name: Check repository governance
-        run: make governance-check
-      - name: Execute generated package launcher and documentation checks
-        run: make package-check
-      - name: Run source security and dependency scans
-        run: make security-scan
-      - name: Run product smoke tests
-        run: make smoke
-      - name: Upload source-level evidence
+          go-version: "1.27.2"
+          cache: true
+      - name: Exact source provenance
+        env:
+          OPENSOCRATES_EXPECTED_SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: go run ./src/opensocrates/cmd/opensocrates-dev release-provenance --output build/evidence/source-provenance.json
+      - name: Source preparation
+        run: go mod download
+      - name: Formatting
+        run: go run ./src/opensocrates/cmd/opensocrates-dev format --check
+      - name: Static analysis
+        run: go vet ./src/opensocrates/...
+      - name: Generated content equivalence
+        run: go run ./src/opensocrates/cmd/opensocrates-dev check generated --report build/evidence/generated.json
+      - name: Generate distributions for source inspection
+        run: go run ./src/opensocrates/cmd/opensocrates-dev generate
+      - name: Build supported target for archive inspection only
+        run: go run ./src/opensocrates/cmd/opensocrates-dev build --target darwin-arm64 --output dist/runtime
+      - name: Assemble archive for source inspection
+        run: go run ./src/opensocrates/cmd/opensocrates-dev package --target darwin-arm64 --runtime-root dist/runtime --output dist/native/darwin-arm64
+      - name: Inventory Go dependencies and package bytes
+        run: go run ./src/opensocrates/cmd/opensocrates-dev sbom --package dist/native/darwin-arm64 --output build/evidence/sbom.json
+      - name: Source, content, adjudication, documentation and governance
+        run: go run ./src/opensocrates/cmd/opensocrates-dev check all --report build/evidence/source-contracts.json
+      - name: Behavioral source tests
+        run: go test ./src/opensocrates/...
+      - name: Upload source evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: source-evidence-${{ github.run_id }}
+          name: source-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/evidence/
           if-no-files-found: warn
 
-  installer:
-    name: GitHub and npx installer
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: "20"
-      - name: Test installer
-        run: npm test
-      - name: Inspect npm package contents
-        run: npm pack --dry-run
-
-  package:
-    # Runs on pull requests too. Skipping it here let CI go green while every
-    # new packaging surface -- the Codex native package -- remained unbuilt and unverified.
-    name: Native package (darwin-arm64)
-    needs:
-      - python-quality
-      - product-contracts
-      - installer
+  macos:
+    name: Native macOS ARM64
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-go@v6
         with:
-          python-version: "3.12"
-      - uses: actions/setup-node@v7
-        with:
-          node-version: "20"
-      - uses: astral-sh/setup-uv@v9.0.0
-      - name: Bootstrap locked environment
-        run: make bootstrap
-      - name: Activate locked native build toolchain
-        run: uv sync --locked --no-install-project --group build
-      - name: Build and validate native package
-        run: make package
-      - name: Write exact package source provenance
+          go-version: "1.27.2"
+          cache: true
+      - name: Exact native source provenance
         env:
           OPENSOCRATES_EXPECTED_SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-        run: node tools/write_package_provenance.mjs
-      - name: Exercise Codex install in a fresh macOS runner
-        run: npm test
-      - name: Upload native package evidence
+        run: go run ./src/opensocrates/cmd/opensocrates-dev release-provenance --output build/evidence/package-source-provenance-darwin-arm64.json
+      - name: Execute native platform, runtime, updater and recovery tests
+        run: go test ./src/opensocrates/...
+      - name: Build native binaries
+        run: go run ./src/opensocrates/cmd/opensocrates-dev build --target darwin-arm64 --output dist/runtime
+      - name: Assemble native bundle
+        run: go run ./src/opensocrates/cmd/opensocrates-dev package --target darwin-arm64 --runtime-root dist/runtime --output dist/native/darwin-arm64
+      - name: Validate native package
+        run: go run ./src/opensocrates/cmd/opensocrates-dev check package --package dist/native/darwin-arm64/packages/codex --report build/evidence/native-package-darwin-arm64.json
+      - name: Build isolated host registration fixture
+        run: go build -o build/opensocrates-host-fixture ./src/opensocrates/cmd/opensocrates-host-fixture
+      - name: Native install, status and removal acceptance
+        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance lifecycle --binary dist/runtime/darwin-arm64/opensocrates --package dist/native/darwin-arm64 --host-binary build/opensocrates-host-fixture --report build/evidence/native-lifecycle-darwin-arm64.json
+      - name: Native hook startup timing
+        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance timing --binary dist/runtime/darwin-arm64/opensocrates --package dist/native/darwin-arm64/packages/codex --report build/evidence/codex-hook-timing-darwin-arm64.json
+      - name: Isolated native OS scheduler acceptance
+        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance scheduler --host-binary build/opensocrates-host-fixture --report build/evidence/native-scheduler-darwin-arm64.json
+      - name: Upload native evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: package-darwin-arm64-${{ github.run_id }}-${{ github.run_attempt }}
+          name: native-darwin-arm64-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
           path: |
             dist/
             build/evidence/
           if-no-files-found: warn
+
+  windows:
+    name: Native Windows x64
+    uses: ./.github/workflows/windows.yml

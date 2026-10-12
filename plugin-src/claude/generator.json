@@ -3,10 +3,11 @@
   "template_revision": "1",
   "launcher_host": "claude",
   "release_targets": ["darwin-arm64"],
-  "launchers": ["bin/launch.sh"],
+  "launchers": ["runtime/darwin-arm64/opensocrates"],
   "manifest_template": ".claude-plugin/plugin.json.tmpl",
   "manifest_output": ".claude-plugin/plugin.json",
-  "hooks_builder": "opensocrates.hosts.claude.commands:build_hooks",
+  "hooks_builder": "go-native-claude",
+  "shell_requirements": {"darwin-arm64": "posix"},
   "hooks_template": "hooks/hooks.json.tmpl",
   "hooks_output": "hooks/hooks.json",
   "shared_templates": [
@@ -21,7 +22,6 @@
     {"template": "THIRD_PARTY_NOTICES.md.tmpl", "output": "THIRD_PARTY_NOTICES.md"}
   ],
   "copy_files": [
-    {"source": "packaging/launchers/claude-launch.sh", "output": "bin/launch.sh"},
     {"source": "plugin-src/shared/decision/request.json", "output": "skills/opensocrates/references/decision/request.json"},
     {"source": "plugin-src/shared/decision/features.json", "output": "skills/opensocrates/references/decision/features.json"},
     {"source": "plugin-src/shared/reader", "output": "skills/opensocrates/references/reader"},
