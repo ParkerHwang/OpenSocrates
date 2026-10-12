@@ -439,3 +439,68 @@ func TestWindowsTaskSchemaOrderAndPolicy(t *testing.T) {
 		t.Fatal("automatic updates must remain stable-channel opt-in")
 	}
 }
+
+func TestEncodeTaskImportXMLUnicodeRoundTrip(t *testing.T) {
+	const manager = `C:\Users\예시 사용자 🧠\OpenSocrates\opensocrates.exe`
+	canonical, err := WindowsTask(manager, "S-1-5-21-12345-67890-13579-1001")
+	if err != nil {
+		t.Fatal(err)
+	}
+	importXML, err := EncodeTaskImportXML(canonical)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(importXML)%2 != 0 || len(importXML) < 2 || importXML[0] != 0xff || importXML[1] != 0xfe {
+		t.Fatal("task import requires a UTF-16LE BOM and complete code units")
+	}
+	decoded := decodeWindows(importXML)
+	if !bytes.HasPrefix(decoded, []byte(taskUTF16Declaration)) || !bytes.Contains(decoded, []byte(manager)) {
+		t.Fatal("declaration or Unicode path corrupted at native import boundary")
+	}
+	normalized, err := normalizeTaskXML(importXML)
+	if err != nil || !bytes.Equal(normalized, canonical) || !ownedTask(normalized, manager) {
+		t.Fatal("import/query round trip changed canonical ownership document")
+	}
+	if !bytes.HasPrefix(canonical, []byte(taskUTF8Declaration)) {
+		t.Fatal("import transformation mutated canonical recovery state")
+	}
+}
+
+func TestEncodeTaskImportXMLRejectsMalformedInput(t *testing.T) {
+	canonical, err := WindowsTask(`C:\Users\example\OpenSocrates\opensocrates.exe`, "S-1-5-21-12345-67890-13579-1001")
+	if err != nil {
+		t.Fatal(err)
+	}
+	invalidUTF8 := append(append([]byte(nil), canonical...), 0xff)
+	for name, input := range map[string][]byte{
+		"invalid_utf8":        invalidUTF8,
+		"utf8_bom":            append([]byte{0xef, 0xbb, 0xbf}, canonical...),
+		"wrong_declaration":   bytes.Replace(canonical, []byte(taskUTF8Declaration), []byte(taskUTF16Declaration), 1),
+		"missing_declaration": canonical[len(taskUTF8Declaration):],
+		"truncated_xml":       canonical[:len(canonical)-8],
+		"wrong_root":          []byte(taskUTF8Declaration + `<Other xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task"/>`),
+		"external_directive":  bytes.Replace(canonical, []byte("\n<Task"), []byte("\n<!DOCTYPE Task SYSTEM \"https://unexpected.example/task.dtd\">\n<Task"), 1),
+		"oversized":           append(append([]byte(nil), canonical...), bytes.Repeat([]byte(" "), maxTaskXMLBytes)...),
+	} {
+		t.Run(name, func(t *testing.T) {
+			if _, err := EncodeTaskImportXML(input); err == nil {
+				t.Fatal("malformed task import accepted")
+			}
+		})
+	}
+	importXML, err := EncodeTaskImportXML(canonical)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for name, input := range map[string][]byte{
+		"odd_utf16_length":      append(append([]byte(nil), importXML...), 0),
+		"unpaired_surrogate":    append(append([]byte(nil), importXML...), 0x00, 0xd8),
+		"unexpected_endian_bom": append([]byte{0xfe, 0xff}, importXML[2:]...),
+	} {
+		t.Run(name, func(t *testing.T) {
+			if _, err := normalizeTaskXML(input); err == nil {
+				t.Fatal("malformed query encoding accepted")
+			}
+		})
+	}
+}

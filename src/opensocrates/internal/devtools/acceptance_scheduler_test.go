@@ -7,6 +7,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/update"
 	"os"
 	"path/filepath"
 	"strings"
@@ -76,6 +77,37 @@ func TestSchedulerRegistrationDiagnosticsAreBoundedAndContentFree(t *testing.T) 
 	denied := schedulerRegistrationDiagnostic(platform.Result{ExitCode: int(int64(0x80070005))}, errors.New("synthetic_failure"))
 	if denied["known_error_class"] != "access_denied" {
 		t.Fatal("access error misclassified")
+	}
+}
+
+func TestSchedulerFixtureUsesNativeTaskImportEncoding(t *testing.T) {
+	id := "synthetic-private-id"
+	fixture := `C:\Users\native test\한국 $ dollar ` + "`" + ` tick\host.exe`
+	receipt := `C:\Users\native test\receipt.json`
+	sid := "S-1-5-21-123-456-789-1000"
+	canonical := fixtureWindowsTask(id, fixture, receipt, sid)
+	before := append([]byte(nil), canonical...)
+	transport, e := update.EncodeTaskImportXML(canonical)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if !bytes.HasPrefix(transport, []byte{0xff, 0xfe}) {
+		t.Fatal("native import BOM missing")
+	}
+	decoded := schedulerWindowsText(transport)
+	if !bytes.HasPrefix(decoded, []byte(`<?xml version="1.0" encoding="UTF-16"?>`)) {
+		t.Fatal("task import declaration mismatches transport encoding")
+	}
+	if !bytes.Equal(decoded, bytes.Replace(canonical, []byte(`encoding="UTF-8"`), []byte(`encoding="UTF-16"`), 1)) {
+		t.Fatal("task import changed canonical content")
+	}
+	if !bytes.Equal(canonical, before) || !ownedFixtureWindowsTask(transport, id, fixture, receipt, sid) {
+		t.Fatal("native import weakened canonical ownership")
+	}
+	for _, bad := range [][]byte{[]byte("<Task>"), {0xff, 0xfe, 0xff}, []byte(`<?xml version="1.0" encoding="UTF-16"?><Task/>`)} {
+		if _, e := update.EncodeTaskImportXML(bad); e == nil {
+			t.Fatal("invalid canonical task source accepted")
+		}
 	}
 }
 func TestSchedulerCleanupRequiresProvenAbsence(t *testing.T) {

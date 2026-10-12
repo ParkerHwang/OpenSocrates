@@ -14,6 +14,7 @@ import (
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/update"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -285,8 +286,12 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 		return report, errors.New("scheduler_fixture_identity_collision")
 	}
 	document := fixtureWindowsTask(id, fixture, receipt, identity.Uid)
+	importDocument, e := update.EncodeTaskImportXML(document)
+	if e != nil {
+		return report, e
+	}
 	xmlPath := filepath.Join(root, "fixture-task.xml")
-	if e = platform.ExclusiveWrite(xmlPath, document, 0600); e != nil {
+	if e = platform.ExclusiveWrite(xmlPath, importDocument, 0600); e != nil {
 		return report, e
 	}
 	defer func() {

@@ -18,6 +18,7 @@ import (
 	"strings"
 	"time"
 	"unicode/utf16"
+	"unicode/utf8"
 )
 
 const SchedulerLabel = "com.opensocrates.auto-update"
@@ -156,10 +157,13 @@ func (a *SchedulerAdapter) Inspect(ctx context.Context, root string) (registrati
 		return s, nil
 	}
 	b, e := a.command(ctx, a.tool(), "/Query", "/TN", TaskName, "/XML")
-	b = decodeWindows(b)
 	if e != nil {
 		return s, e
 	} // Unknown access failure is never interpreted as absence.
+	b, e = normalizeTaskXML(b)
+	if e != nil {
+		return s, e
+	}
 	if !ownedTask(b, a.ManagerPath) {
 		return s, closed(diagnostics.Verification, "scheduler_ownership")
 	}
@@ -230,7 +234,11 @@ func (a *SchedulerAdapter) Replace(ctx context.Context, before, after registrati
 		return e
 	}
 	task := filepath.Join(a.StateDir, "scheduled-task.xml")
-	if e = platform.AtomicWrite(task, doc, 0600); e != nil {
+	importXML, err := EncodeTaskImportXML(doc)
+	if err != nil {
+		return err
+	}
+	if e = platform.AtomicWrite(task, importXML, 0600); e != nil {
 		return e
 	}
 	if before.Installed {
@@ -431,4 +439,111 @@ func (e Engine) PrepareConfiguration(ctx context.Context, enabled bool, a *Sched
 		return c, closed(diagnostics.Verification, "policy")
 	}
 	return Configuration{Registration: *change, PolicyPath: filepath.Join(e.StateDir, "update-policy.json"), PolicyJSON: append(b, '\n')}, nil
+}
+
+const maxTaskXMLBytes = 1 << 20
+const taskUTF8Declaration = `<?xml version="1.0" encoding="UTF-8"?>`
+const taskUTF16Declaration = `<?xml version="1.0" encoding="UTF-16"?>`
+
+// EncodeTaskImportXML is the native schtasks /XML file boundary. Ownership and
+// registration policy are checked by the caller before this pure transform.
+// Canonical recovery state stays UTF-8; the import file is UTF-16LE with a BOM
+// and a matching declaration, including Unicode and supplementary characters.
+func EncodeTaskImportXML(canonicalUTF8 []byte) ([]byte, error) {
+	if err := validateCanonicalTaskXML(canonicalUTF8); err != nil {
+		return nil, err
+	}
+	text := taskUTF16Declaration + string(canonicalUTF8[len(taskUTF8Declaration):])
+	units := utf16.Encode([]rune(text))
+	encoded := make([]byte, 2+len(units)*2)
+	encoded[0], encoded[1] = 0xff, 0xfe
+	for i, unit := range units {
+		binary.LittleEndian.PutUint16(encoded[2+i*2:], unit)
+	}
+	return encoded, nil
+}
+
+func validateCanonicalTaskXML(document []byte) error {
+	if len(document) > maxTaskXMLBytes || !utf8.Valid(document) || !bytes.HasPrefix(document, []byte(taskUTF8Declaration)) {
+		return closed(diagnostics.Verification, "scheduler_xml")
+	}
+	decoder := xml.NewDecoder(bytes.NewReader(document))
+	roots, depth := 0, 0
+	for {
+		token, err := decoder.Token()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return closed(diagnostics.Verification, "scheduler_xml")
+		}
+		switch value := token.(type) {
+		case xml.StartElement:
+			if depth == 0 {
+				roots++
+				if roots != 1 || value.Name.Local != "Task" || value.Name.Space != "http://schemas.microsoft.com/windows/2004/02/mit/task" {
+					return closed(diagnostics.Verification, "scheduler_xml")
+				}
+			}
+			depth++
+		case xml.EndElement:
+			depth--
+		case xml.Directive:
+			return closed(diagnostics.Verification, "scheduler_xml")
+		case xml.CharData:
+			if depth == 0 && len(bytes.TrimSpace(value)) != 0 {
+				return closed(diagnostics.Verification, "scheduler_xml")
+			}
+		}
+	}
+	if roots != 1 || depth != 0 {
+		return closed(diagnostics.Verification, "scheduler_xml")
+	}
+	return nil
+}
+
+// normalizeTaskXML decodes bounded Windows query output and normalizes only its
+// encoding declaration. A malformed BOM, UTF-16 pair, or XML document fails
+// closed before ownership inspection or recovery state capture.
+func normalizeTaskXML(raw []byte) ([]byte, error) {
+	if len(raw) > 2*maxTaskXMLBytes+2 {
+		return nil, closed(diagnostics.Verification, "scheduler_xml")
+	}
+	var document []byte
+	if len(raw) >= 2 && raw[0] == 0xff && raw[1] == 0xfe {
+		if len(raw)%2 != 0 {
+			return nil, closed(diagnostics.Verification, "scheduler_xml")
+		}
+		units := make([]uint16, (len(raw)-2)/2)
+		for i := range units {
+			units[i] = binary.LittleEndian.Uint16(raw[2+i*2:])
+		}
+		for i := 0; i < len(units); i++ {
+			u := units[i]
+			if u >= 0xd800 && u <= 0xdbff {
+				if i+1 >= len(units) || units[i+1] < 0xdc00 || units[i+1] > 0xdfff {
+					return nil, closed(diagnostics.Verification, "scheduler_xml")
+				}
+				i++
+			} else if u >= 0xdc00 && u <= 0xdfff {
+				return nil, closed(diagnostics.Verification, "scheduler_xml")
+			}
+		}
+		document = []byte(string(utf16.Decode(units)))
+		if !bytes.HasPrefix(document, []byte(taskUTF16Declaration)) {
+			return nil, closed(diagnostics.Verification, "scheduler_xml")
+		}
+	} else {
+		document = append([]byte(nil), raw...)
+	}
+	if bytes.HasPrefix(document, []byte{0xef, 0xbb, 0xbf}) {
+		document = document[3:]
+	}
+	if bytes.HasPrefix(document, []byte(taskUTF16Declaration)) {
+		document = []byte(taskUTF8Declaration + string(document[len(taskUTF16Declaration):]))
+	}
+	if err := validateCanonicalTaskXML(document); err != nil {
+		return nil, err
+	}
+	return document, nil
 }
