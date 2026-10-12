@@ -365,12 +365,6 @@ func diagnose() map[string]any {
 		selector = map[string]any{"status": status, "attempt_count": total, "outcome_counts": counts}
 	}
 	osName, arch := runtime.GOOS, runtime.GOARCH
-	if osName == "windows" {
-		arch = "amd64"
-	}
-	if arch == "arm64" && osName == "darwin" {
-		arch = "arm64"
-	}
 	return map[string]any{"versions": identities, "platform": map[string]any{"os": osName, "architecture": arch}, "capabilities": map[string]any{"codex": p}, "manifest": RuntimeIntegrity("codex"), "selector": selector, "health": health}
 }
 func diagnoseMarkdown(r map[string]any) string {

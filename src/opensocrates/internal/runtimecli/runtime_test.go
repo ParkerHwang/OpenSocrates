@@ -7,9 +7,25 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
+
+func TestDiagnoseReportsNativeProcessArchitecture(t *testing.T) {
+	code, output, stderr := invoke([]string{"diagnose", "--json"}, "")
+	if code != 0 || stderr != "" {
+		t.Fatal("native architecture diagnosis unavailable")
+	}
+	value, err := contracts.Decode([]byte(output))
+	if err != nil {
+		t.Fatal(err)
+	}
+	platform := value.(map[string]any)["platform"].(map[string]any)
+	if platform["os"] != runtime.GOOS || platform["architecture"] != runtime.GOARCH {
+		t.Fatal("diagnostic relabeled process architecture")
+	}
+}
 
 func invoke(args []string, input string) (int, string, string) {
 	var out, err bytes.Buffer

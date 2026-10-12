@@ -119,7 +119,11 @@ func TestNativeDecisionReferenceTransport(t *testing.T) {
 func TestWindowsARM64NativeProfile(t *testing.T) {
 	root := generatorRepository(t)
 	output := filepath.Join(t.TempDir(), "arm64")
-	manifest, err := GeneratePlugin(root, "codex", "windows-arm64", "", output)
+	_, err := GeneratePlugin(root, "codex", "windows-arm64", "", output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	manifest, err := ReadObject(filepath.Join(output, "release-manifest.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
