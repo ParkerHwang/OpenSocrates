@@ -9,7 +9,9 @@ import (
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/update"
 	"os"
+	"os/user"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"unicode/utf16"
@@ -250,5 +252,141 @@ func TestSchedulerCapturedExportRestoreRetainsOSDefaultsAndRejectsChanges(t *tes
 	changed := bytes.Replace(exported, []byte("<RestartOnIdle>false"), []byte("<RestartOnIdle>true"), 1)
 	if update.TaskDocumentMatches(changed, exported, fixture) || ownedFixtureWindowsTask(changed, id, fixture, receipt, sid) {
 		t.Fatal("modified captured OS default accepted")
+	}
+}
+
+func TestSchedulerFixtureIdentityPreservesModifiedOrForeignFiles(t *testing.T) {
+	id := "9661c9a0b58687fe5b565db800e91073"
+	setup := func(t *testing.T) (string, []byte) {
+		t.Helper()
+		root, e := platform.MkdirTemp("", "opensocrates-native-scheduler-"+id+"-")
+		if e != nil {
+			t.Fatal(e)
+		}
+		t.Cleanup(func() { _ = platform.RemoveTree(root) })
+		if e = platform.ExclusiveWrite(filepath.Join(root, "native-scheduler-entry.exe"), []byte("synthetic-native-go-fixture-bytes"), 0755); e != nil {
+			t.Fatal(e)
+		}
+		identity, e := createSchedulerFixtureIdentity(root, id, "native-scheduler-entry.exe")
+		if e != nil {
+			t.Fatal(e)
+		}
+		return root, identity
+	}
+	t.Run("exact inventory and durable recorded files", func(t *testing.T) {
+		root, identity := setup(t)
+		if ok, e := verifySchedulerFixtureFiles(root, id, "native-scheduler-entry.exe", identity); e != nil || !ok {
+			t.Fatal("exact copied executable identity rejected")
+		}
+		document := fixtureWindowsTask(id, filepath.Join(root, "native-scheduler-entry.exe"), filepath.Join(root, "receipt.json"), "S-1-5-21-123-456-789-1000")
+		if e := platform.ExclusiveWrite(filepath.Join(root, "fixture-task.xml"), document, 0600); e != nil {
+			t.Fatal(e)
+		}
+		updated, e := recordSchedulerFixtureFile(root, identity, "fixture-task.xml")
+		if e != nil {
+			t.Fatal(e)
+		}
+		if ok, e := verifySchedulerFixtureFiles(root, id, "native-scheduler-entry.exe", updated); e != nil || !ok {
+			t.Fatal("durable closed generated file inventory rejected")
+		}
+		if e = platform.AtomicWrite(filepath.Join(root, "fixture-task.xml"), bytes.Replace(document, []byte("PT24H"), []byte("PT48H"), 1), 0600); e != nil {
+			t.Fatal(e)
+		}
+		if ok, e := verifySchedulerFixtureFiles(root, id, "native-scheduler-entry.exe", nil); e == nil || ok {
+			t.Fatal("modified generated definition eligible for deletion")
+		}
+	})
+	for _, name := range []string{"executable", "identity", "extra file"} {
+		t.Run(name, func(t *testing.T) {
+			root, identity := setup(t)
+			switch name {
+			case "executable":
+				if e := platform.AtomicWrite(filepath.Join(root, "native-scheduler-entry.exe"), []byte("modified-foreign-bytes"), 0755); e != nil {
+					t.Fatal(e)
+				}
+			case "identity":
+				changed := bytes.Replace(identity, []byte(id), []byte("9661c9a0b58687fe5b565db800e91074"), 1)
+				if e := platform.AtomicWrite(filepath.Join(root, "fixture-identity.json"), changed, 0600); e != nil {
+					t.Fatal(e)
+				}
+			case "extra file":
+				if e := platform.ExclusiveWrite(filepath.Join(root, "foreign.txt"), []byte("preserve this"), 0600); e != nil {
+					t.Fatal(e)
+				}
+			}
+			if ok, e := verifySchedulerFixtureFiles(root, id, "native-scheduler-entry.exe", nil); e == nil || ok {
+				t.Fatal("modified or foreign files eligible for deletion")
+			}
+			if _, e := os.Stat(root); e != nil {
+				t.Fatal("verification removed retained files")
+			}
+		})
+	}
+	t.Run("legacy fixture has no removal authority", func(t *testing.T) {
+		root, e := platform.MkdirTemp("", "opensocrates-native-scheduler-"+id+"-")
+		if e != nil {
+			t.Fatal(e)
+		}
+		t.Cleanup(func() { _ = platform.RemoveTree(root) })
+		if e = platform.ExclusiveWrite(filepath.Join(root, "native-scheduler-entry.exe"), []byte("legacy-unknown-bytes"), 0755); e != nil {
+			t.Fatal(e)
+		}
+		if ok, e := verifySchedulerFixtureFiles(root, id, "native-scheduler-entry.exe", nil); e != nil || ok {
+			t.Fatal("legacy fixture gained unverified file deletion authority")
+		}
+	})
+}
+
+func TestSchedulerIdentityDiagnosticShowsOnlyBoundedComparisons(t *testing.T) {
+	id, sid := "9661c9a0b58687fe5b565db800e91073", "S-1-5-21-123-456-789-1000"
+	fixture, receipt := `C:\private\native-scheduler-entry.exe`, `C:\private\receipt.json`
+	doc := fixtureWindowsTask(id, fixture, receipt, sid)
+	doc = bytes.ReplaceAll(doc, []byte(`id="User"`), []byte(`id="Author"`))
+	doc = bytes.ReplaceAll(doc, []byte(`Context="User"`), []byte(`Context="Author"`))
+	diagnostic := fixtureTaskIdentityDiagnostic(doc, id, fixture, receipt, sid)
+	if diagnostic["principal_id_enum"] != "Author" || diagnostic["action_context_enum"] != "Author" || diagnostic["context_reference_match"] != true || diagnostic["full_closed_policy_match"] != false || diagnostic["current_sid_match"] != true {
+		t.Fatal("identity mismatch not distinguished by bounded comparisons")
+	}
+	encoded, e := json.Marshal(diagnostic)
+	if e != nil {
+		t.Fatal(e)
+	}
+	for _, private := range []string{id, sid, "C:\\private", "native-scheduler-entry.exe", "receipt.json", "--scheduler-receipt"} {
+		if bytes.Contains(encoded, []byte(private)) {
+			t.Fatal("private identity data recorded")
+		}
+	}
+}
+
+func TestSchedulerNativeWindowsAccountAliasPreservesCapturedRoundtrip(t *testing.T) {
+	if runtime.GOOS != "windows" {
+		t.Skip("native Windows account resolver required")
+	}
+	current, e := user.Current()
+	if e != nil || !strings.HasPrefix(current.Uid, "S-1-") || current.Username == "" {
+		t.Fatal("native current account identity unavailable")
+	}
+	id := "9661c9a0b58687fe5b565db800e91073"
+	fixture, receipt := `C:\private\native-scheduler-entry.exe`, `C:\private\receipt.json`
+	canonical := fixtureWindowsTask(id, fixture, receipt, current.Uid)
+	// Only the first UserId belongs to the logon trigger. The Principal keeps
+	// its SID, exactly as observed in the native Task Scheduler export.
+	aliasExport := bytes.Replace(canonical, []byte("<UserId>"+current.Uid+"</UserId>"), []byte("<UserId>"+schedulerXMLText(current.Username)+"</UserId>"), 1)
+	if !ownedFixtureWindowsTask(aliasExport, id, fixture, receipt, current.Uid) {
+		t.Fatal("OS-resolved same-account trigger rejected")
+	}
+	transport, e := update.EncodeTaskImportXML(aliasExport)
+	if e != nil || !update.TaskDocumentMatches(transport, aliasExport, fixture) {
+		t.Fatal("captured account-alias export changed during restore transport")
+	}
+	if update.TaskDocumentMatches(transport, canonical, fixture) {
+		t.Fatal("captured-before account field silently rewritten")
+	}
+	foreign := bytes.Replace(aliasExport, []byte(schedulerXMLText(current.Username)), []byte("OpenSocrates-nonexistent-fixture-account-9661c9a0"), 1)
+	if ownedFixtureWindowsTask(foreign, id, fixture, receipt, current.Uid) {
+		t.Fatal("unresolved account alias inherited current-user ownership")
+	}
+	if update.TaskUserIdentityMatches(current.Username, "S-1-5-18") {
+		t.Fatal("same-name lookup accepted a different SID")
 	}
 }

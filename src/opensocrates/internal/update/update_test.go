@@ -14,8 +14,10 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os/user"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -656,5 +658,87 @@ func TestWindowsObservedExportDefaultsOwnershipAndRecovery(t *testing.T) {
 	foreignSetting := bytes.Replace(queried, []byte("</Settings>"), []byte("<ForeignSetting>ignored</ForeignSetting></Settings>"), 1)
 	if TaskDocumentMatches(foreignSetting, generated, manager) || TaskDocumentMatches(foreignSetting, normalized, manager) {
 		t.Fatal("foreign setting ignored")
+	}
+}
+
+func TestWindowsTaskResolvedTriggerAliasAndForeignRejection(t *testing.T) {
+	const manager = `C:\Users\예시 사용자\OpenSocrates\opensocrates.exe`
+	const sid = "S-1-5-21-12345-67890-13579-1001"
+	const alias = `MACHINE\예시 사용자`
+	generated, err := WindowsTask(manager, sid)
+	if err != nil {
+		t.Fatal(err)
+	}
+	exported := bytes.Replace(generated, []byte("<UserId>"+sid+"</UserId><Delay>"), []byte("<UserId>"+alias+"</UserId><Delay>"), 1)
+	resolver := func(identity string) (string, error) {
+		switch identity {
+		case alias:
+			return sid, nil
+		case `OTHERDOMAIN\예시 사용자`:
+			return "S-1-5-21-12345-67890-13579-2002", nil
+		default:
+			return "", closed("verification", "scheduler_identity")
+		}
+	}
+	if !ownedTaskWithResolver(exported, manager, resolver) || !TaskDocumentMatchesWithResolver(exported, generated, manager, resolver) {
+		t.Fatal("OS-resolved current-user alias not accepted by ownership/generated-after recovery")
+	}
+	if !TaskUserIdentityMatchesWithResolver(alias, sid, resolver) || TaskUserIdentityMatchesWithResolver(`OTHERDOMAIN\예시 사용자`, sid, resolver) {
+		t.Fatal("domain-qualified accounts were guessed rather than resolved")
+	}
+	// Captured before-state preserves the exact account spelling. A restored
+	// query may be reformatted, but its identity must not silently be rewritten.
+	formatted := bytes.ReplaceAll(exported, []byte("><"), []byte(">\r\n  <"))
+	if !TaskDocumentMatchesWithResolver(formatted, exported, manager, resolver) {
+		t.Fatal("captured alias field failed representation-only restoration")
+	}
+	if TaskDocumentMatchesWithResolver(generated, exported, manager, resolver) {
+		t.Fatal("captured before-state alias was silently replaced with SID")
+	}
+	for name, identity := range map[string]string{"foreign_domain": `OTHERDOMAIN\예시 사용자`, "unknown": "unknown-account", "foreign_sid": "S-1-5-21-12345-67890-13579-2002", "empty": ""} {
+		t.Run(name, func(t *testing.T) {
+			foreign := bytes.Replace(exported, []byte("<UserId>"+alias+"</UserId><Delay>"), []byte("<UserId>"+identity+"</UserId><Delay>"), 1)
+			if ownedTaskWithResolver(foreign, manager, resolver) || TaskDocumentMatchesWithResolver(foreign, generated, manager, resolver) {
+				t.Fatal("unresolved or foreign trigger identity accepted")
+			}
+		})
+	}
+	tooLong := strings.Repeat("x", 257)
+	for _, identity := range []string{"", tooLong, "name\x00extra", "name\nextra"} {
+		if TaskUserIdentityMatchesWithResolver(identity, sid, func(string) (string, error) { return sid, nil }) {
+			t.Fatal("malformed identity passed resolver boundary")
+		}
+	}
+	if TaskUserIdentityMatchesWithResolver(alias, sid, func(string) (string, error) { return sid, closed("verification", "scheduler_identity") }) {
+		t.Fatal("lookup failure accepted despite SID result")
+	}
+}
+
+func TestWindowsNativeCurrentAccountTriggerAlias(t *testing.T) {
+	if runtime.GOOS != "windows" {
+		t.Skip("native Windows account-to-SID API required")
+	}
+	current, err := user.Current()
+	if err != nil || !windowsSID(current.Uid) || current.Username == "" {
+		t.Fatal("current Windows account identity unavailable")
+	}
+	resolved, err := ResolveAccountSID(current.Username)
+	if err != nil || resolved != current.Uid || !TaskUserIdentityMatches(current.Username, current.Uid) {
+		t.Fatal("Windows LookupAccountName alias did not resolve to current SID")
+	}
+	manager := filepath.Join(t.TempDir(), "opensocrates.exe")
+	generated, err := WindowsTask(manager, current.Uid)
+	if err != nil {
+		t.Fatal(err)
+	}
+	query := bytes.Replace(generated, []byte("<UserId>"+current.Uid+"</UserId><Delay>"), []byte("<UserId>"+escape(current.Username)+"</UserId><Delay>"), 1)
+	if !ownedTask(query, manager) || !TaskDocumentMatches(query, generated, manager) {
+		t.Fatal("native exported current-account trigger alias rejected")
+	}
+	if TaskDocumentMatches(generated, query, manager) {
+		t.Fatal("captured native before-state alias was rewritten")
+	}
+	if TaskUserIdentityMatches(current.Username, "S-1-5-21-1-2-3-4294967294") {
+		t.Fatal("current alias incorrectly matched a foreign SID")
 	}
 }

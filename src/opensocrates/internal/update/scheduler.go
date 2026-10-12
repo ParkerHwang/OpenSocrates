@@ -341,6 +341,9 @@ func ownedPlist(b []byte, manager string) bool {
 	return len(args) == 5 && filepath.Base(args[0]) == "npx" && args[1] == "--yes" && (args[2] == "opensocrates@latest" || args[2] == "opensocrates@next") && args[3] == "auto-update" && args[4] == "run"
 }
 func ownedTask(b []byte, manager string) bool {
+	return ownedTaskWithResolver(b, manager, ResolveAccountSID)
+}
+func ownedTaskWithResolver(b []byte, manager string, resolver AccountSIDResolver) bool {
 	var t struct {
 		Description string `xml:"RegistrationInfo>Description"`
 		Actions     []struct {
@@ -359,7 +362,7 @@ func ownedTask(b []byte, manager string) bool {
 		Interval           string  `xml:"Triggers>LogonTrigger>Repetition>Interval"`
 		Instances          string  `xml:"Settings>MultipleInstancesPolicy"`
 	}
-	if xml.Unmarshal(b, &t) != nil || len(t.Actions) != 1 || t.Actions[0].Command != manager || t.Actions[0].Arguments != "auto-update run --scheduled" || t.LogonType != "InteractiveToken" || (t.RunLevel != nil && *t.RunLevel != "LeastPrivilege") || (t.TriggerEnabled != nil && !*t.TriggerEnabled) || (t.SettingsEnabled != nil && !*t.SettingsEnabled) || (t.AllowStartOnDemand != nil && !*t.AllowStartOnDemand) || (t.StopAtDurationEnd != nil && *t.StopAtDurationEnd) || !strings.Contains(t.Description, "owned by "+Owner) || taskDurationValue("Task/Triggers/LogonTrigger/Delay", t.Delay) != "PT5M" || taskDurationValue("Task/Triggers/LogonTrigger/Repetition/Interval", t.Interval) != "PT24H" || t.Instances != "IgnoreNew" || !strings.HasPrefix(t.UserID, "S-1-") || t.TriggerUserID != t.UserID {
+	if xml.Unmarshal(b, &t) != nil || len(t.Actions) != 1 || t.Actions[0].Command != manager || t.Actions[0].Arguments != "auto-update run --scheduled" || t.LogonType != "InteractiveToken" || (t.RunLevel != nil && *t.RunLevel != "LeastPrivilege") || (t.TriggerEnabled != nil && !*t.TriggerEnabled) || (t.SettingsEnabled != nil && !*t.SettingsEnabled) || (t.AllowStartOnDemand != nil && !*t.AllowStartOnDemand) || (t.StopAtDurationEnd != nil && *t.StopAtDurationEnd) || !strings.Contains(t.Description, "owned by "+Owner) || taskDurationValue("Task/Triggers/LogonTrigger/Delay", t.Delay) != "PT5M" || taskDurationValue("Task/Triggers/LogonTrigger/Repetition/Interval", t.Interval) != "PT24H" || t.Instances != "IgnoreNew" || !strings.HasPrefix(t.UserID, "S-1-") || !TaskUserIdentityMatchesWithResolver(t.TriggerUserID, t.UserID, resolver) {
 		return false
 	}
 	d := xml.NewDecoder(bytes.NewReader(b))
@@ -568,6 +571,13 @@ func (a *SchedulerAdapter) knownDocument(actual, known string) bool {
 // exact value match after representation normalization. Ownership alone never authorizes overwriting a task:
 // the complete normalized tree, including unknown fields, must agree.
 func TaskDocumentMatches(actual, known []byte, manager string) bool {
+	return TaskDocumentMatchesWithResolver(actual, known, manager, ResolveAccountSID)
+}
+
+// TaskDocumentMatchesWithResolver makes the OS identity boundary injectable for
+// cross-platform tests; production uses ResolveAccountSID. Captured before-state
+// account spellings are preserved, not replaced with guessed account names.
+func TaskDocumentMatchesWithResolver(actual, known []byte, manager string, resolver AccountSIDResolver) bool {
 	if bytes.Equal(actual, known) {
 		return true
 	}
@@ -580,6 +590,9 @@ func TaskDocumentMatches(actual, known []byte, manager string) bool {
 	}
 	knownTree, err := taskTree(known)
 	if err != nil {
+		return false
+	}
+	if generatedAfter && (!normalizeGeneratedTaskUser(actualTree, "Task", sid, resolver) || !normalizeGeneratedTaskUser(knownTree, "Task", sid, resolver)) {
 		return false
 	}
 	if !normalizeTaskTree(actualTree, "Task", generatedAfter) || !normalizeTaskTree(knownTree, "Task", generatedAfter) {
@@ -761,4 +774,76 @@ func taskDurationValue(path, value string) string {
 		}
 	}
 	return value
+}
+
+// AccountSIDResolver is the OS account identity boundary. It never strips a
+// domain or equates display names; the returned SID must match exactly.
+type AccountSIDResolver func(identity string) (string, error)
+
+func ResolveAccountSID(identity string) (string, error) {
+	if identity == "" || len(identity) > 256 || strings.ContainsAny(identity, "\x00\r\n") {
+		return "", closed(diagnostics.Verification, "scheduler_identity")
+	}
+	if windowsSID(identity) {
+		return identity, nil
+	}
+	if strings.HasPrefix(identity, "S-") {
+		return "", closed(diagnostics.Verification, "scheduler_identity")
+	}
+	account, err := user.Lookup(identity)
+	if err != nil || !windowsSID(account.Uid) {
+		return "", closed(diagnostics.Verification, "scheduler_identity")
+	}
+	return account.Uid, nil
+}
+
+func TaskUserIdentityMatches(identity, expectedSID string) bool {
+	return TaskUserIdentityMatchesWithResolver(identity, expectedSID, ResolveAccountSID)
+}
+func TaskUserIdentityMatchesWithResolver(identity, expectedSID string, resolver AccountSIDResolver) bool {
+	if !windowsSID(expectedSID) || identity == "" || len(identity) > 256 || strings.ContainsAny(identity, "\x00\r\n") {
+		return false
+	}
+	if identity == expectedSID {
+		return true
+	}
+	if windowsSID(identity) || strings.HasPrefix(identity, "S-") || resolver == nil {
+		return false
+	}
+	resolved, err := resolver(identity)
+	return err == nil && resolved == expectedSID
+}
+func windowsSID(s string) bool {
+	if len(s) > 184 || !strings.HasPrefix(s, "S-1-") {
+		return false
+	}
+	parts := strings.Split(s, "-")
+	if len(parts) < 4 {
+		return false
+	}
+	for _, part := range parts[2:] {
+		if part == "" {
+			return false
+		}
+		for _, c := range part {
+			if c < '0' || c > '9' {
+				return false
+			}
+		}
+	}
+	return true
+}
+func normalizeGeneratedTaskUser(node *taskXMLNode, path, sid string, resolver AccountSIDResolver) bool {
+	if path == "Task/Triggers/LogonTrigger/UserId" {
+		if len(node.Children) != 0 || !TaskUserIdentityMatchesWithResolver(node.Text, sid, resolver) {
+			return false
+		}
+		node.Text = sid
+	}
+	for _, child := range node.Children {
+		if !normalizeGeneratedTaskUser(child, path+"/"+child.Name.Local, sid, resolver) {
+			return false
+		}
+	}
+	return true
 }

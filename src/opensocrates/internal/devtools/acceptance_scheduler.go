@@ -29,6 +29,133 @@ import (
 )
 
 const schedulerFixtureSchema = "opensocrates.native-scheduler-receipt/1.0.0"
+const schedulerFixtureIdentitySchema = "opensocrates.native-scheduler-fixture-identity/1.0.0"
+
+func schedulerFixtureFileIdentity(path string) (map[string]any, error) {
+	data, err := platform.ReadOwnedFile(path, 128<<20)
+	if err != nil {
+		return nil, err
+	}
+	info, err := os.Lstat(path)
+	if err != nil || !info.Mode().IsRegular() || info.Size() != int64(len(data)) {
+		return nil, errors.New("scheduler_fixture_file_invalid")
+	}
+	hash := sha256.Sum256(data)
+	return map[string]any{"sha256": hex.EncodeToString(hash[:]), "size": int64(len(data)), "mode": uint32(info.Mode().Perm())}, nil
+}
+
+func createSchedulerFixtureIdentity(root, id, executable string) ([]byte, error) {
+	file, err := schedulerFixtureFileIdentity(filepath.Join(root, executable))
+	if err != nil {
+		return nil, err
+	}
+	data, err := Canonical(map[string]any{"schema": schedulerFixtureIdentitySchema, "fixture_id": id, "files": map[string]any{executable: file}})
+	if err != nil {
+		return nil, err
+	}
+	if err = platform.ExclusiveWrite(filepath.Join(root, "fixture-identity.json"), data, 0600); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+// Record newly generated files without replacing a modified identity record.
+// Every cleanup compares the complete closed inventory, including file bytes.
+func recordSchedulerFixtureFile(root string, previous []byte, name string) ([]byte, error) {
+	current, err := platform.ReadFile(filepath.Join(root, "fixture-identity.json"), 16384)
+	if err != nil || !bytes.Equal(current, previous) {
+		return nil, errors.New("scheduler_fixture_identity_changed")
+	}
+	value, err := contracts.Decode(previous)
+	if err != nil {
+		return nil, errors.New("scheduler_fixture_identity_invalid")
+	}
+	identity, ok := value.(map[string]any)
+	if !ok {
+		return nil, errors.New("scheduler_fixture_identity_invalid")
+	}
+	files, ok := identity["files"].(map[string]any)
+	if !ok || files[name] != nil {
+		return nil, errors.New("scheduler_fixture_inventory_invalid")
+	}
+	file, err := schedulerFixtureFileIdentity(filepath.Join(root, name))
+	if err != nil {
+		return nil, err
+	}
+	files[name] = file
+	updated, err := Canonical(identity)
+	if err != nil {
+		return nil, err
+	}
+	if err = platform.AtomicWrite(filepath.Join(root, "fixture-identity.json"), updated, 0600); err != nil {
+		return nil, err
+	}
+	return updated, nil
+}
+
+func verifySchedulerFixtureFiles(root, id, executable string, expectedIdentity []byte) (bool, error) {
+	if err := platform.GuardOwned(root); err != nil {
+		return false, err
+	}
+	if _, err := os.Lstat(filepath.Join(root, "fixture-identity.json")); os.IsNotExist(err) {
+		return false, nil
+	}
+	data, err := platform.ReadFile(filepath.Join(root, "fixture-identity.json"), 16384)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	if expectedIdentity != nil && !bytes.Equal(data, expectedIdentity) {
+		return false, errors.New("scheduler_fixture_identity_changed")
+	}
+	value, err := contracts.Decode(data)
+	if err != nil {
+		return false, errors.New("scheduler_fixture_identity_invalid")
+	}
+	identity, ok := value.(map[string]any)
+	if !ok || len(identity) != 3 || identity["schema"] != schedulerFixtureIdentitySchema || identity["fixture_id"] != id {
+		return false, errors.New("scheduler_fixture_identity_invalid")
+	}
+	canonical, err := Canonical(identity)
+	if err != nil || !bytes.Equal(canonical, data) {
+		return false, errors.New("scheduler_fixture_identity_invalid")
+	}
+	files, ok := identity["files"].(map[string]any)
+	if !ok || len(files) == 0 || len(files) > 4 || files[executable] == nil {
+		return false, errors.New("scheduler_fixture_inventory_invalid")
+	}
+	allowed := map[string]bool{executable: true, "receipt.json": true}
+	if executable == "native-scheduler-entry.exe" {
+		allowed["fixture-task.xml"] = true
+		allowed["restored-task.xml"] = true
+	} else {
+		allowed["fixture.plist"] = true
+	}
+	entries, err := os.ReadDir(root)
+	if err != nil || len(entries) != len(files)+1 {
+		return false, errors.New("scheduler_fixture_inventory_changed")
+	}
+	for _, entry := range entries {
+		if entry.Name() == "fixture-identity.json" {
+			continue
+		}
+		if entry.IsDir() || !allowed[entry.Name()] {
+			return false, errors.New("scheduler_fixture_foreign_file")
+		}
+		file, err := schedulerFixtureFileIdentity(filepath.Join(root, entry.Name()))
+		if err != nil {
+			return false, err
+		}
+		actual, err := Canonical(file)
+		known, knownErr := Canonical(files[entry.Name()])
+		if err != nil || knownErr != nil || !bytes.Equal(actual, known) {
+			return false, errors.New("scheduler_fixture_file_changed")
+		}
+	}
+	return true, nil
+}
 
 func schedulerReceipt(path string) int {
 	if !filepath.IsAbs(path) || filepath.Base(path) != "receipt.json" || !strings.HasPrefix(filepath.Base(filepath.Dir(path)), "opensocrates-native-scheduler-") {
@@ -82,35 +209,38 @@ func schedulerWindowsText(raw []byte) []byte {
 	}
 	return []byte(string(utf16.Decode(words)))
 }
+
+type fixtureTaskDocument struct {
+	RegistrationInfo struct {
+		Description string `xml:"Description"`
+	} `xml:"RegistrationInfo"`
+	Principals []struct {
+		ID        string  `xml:"id,attr"`
+		UserID    string  `xml:"UserId"`
+		LogonType string  `xml:"LogonType"`
+		RunLevel  *string `xml:"RunLevel"`
+	} `xml:"Principals>Principal"`
+	Triggers []struct {
+		Enabled    *bool `xml:"Enabled"`
+		Repetition struct {
+			Interval          string `xml:"Interval"`
+			Duration          string `xml:"Duration"`
+			StopAtDurationEnd bool   `xml:"StopAtDurationEnd"`
+		} `xml:"Repetition"`
+		UserID string `xml:"UserId"`
+		Delay  string `xml:"Delay"`
+	} `xml:"Triggers>LogonTrigger"`
+	Actions struct {
+		Context string `xml:"Context,attr"`
+		Exec    []struct {
+			Command   string `xml:"Command"`
+			Arguments string `xml:"Arguments"`
+		} `xml:"Exec"`
+	} `xml:"Actions"`
+}
+
 func ownedFixtureWindowsTask(raw []byte, id, fixture, receipt, sid string) bool {
-	var doc struct {
-		RegistrationInfo struct {
-			Description string `xml:"Description"`
-		} `xml:"RegistrationInfo"`
-		Principals []struct {
-			ID        string  `xml:"id,attr"`
-			UserID    string  `xml:"UserId"`
-			LogonType string  `xml:"LogonType"`
-			RunLevel  *string `xml:"RunLevel"`
-		} `xml:"Principals>Principal"`
-		Triggers []struct {
-			Enabled    *bool `xml:"Enabled"`
-			Repetition struct {
-				Interval          string `xml:"Interval"`
-				Duration          string `xml:"Duration"`
-				StopAtDurationEnd bool   `xml:"StopAtDurationEnd"`
-			} `xml:"Repetition"`
-			UserID string `xml:"UserId"`
-			Delay  string `xml:"Delay"`
-		} `xml:"Triggers>LogonTrigger"`
-		Actions struct {
-			Context string `xml:"Context,attr"`
-			Exec    []struct {
-				Command   string `xml:"Command"`
-				Arguments string `xml:"Arguments"`
-			} `xml:"Exec"`
-		} `xml:"Actions"`
-	}
+	var doc fixtureTaskDocument
 	if xml.Unmarshal(bytes.ReplaceAll(schedulerWindowsText(raw), []byte(`encoding="UTF-16"`), []byte(`encoding="UTF-8"`)), &doc) != nil {
 		return false
 	}
@@ -124,7 +254,7 @@ func ownedFixtureWindowsTask(raw []byte, id, fixture, receipt, sid string) bool 
 	trigger := doc.Triggers[0]
 	// Scheduler exports may omit the schema-default true Enabled value.
 	enabled := trigger.Enabled == nil || *trigger.Enabled
-	if !enabled || trigger.UserID != sid || trigger.Delay != "PT5M" || (trigger.Repetition.Interval != "PT24H" && trigger.Repetition.Interval != "P1D") || trigger.Repetition.Duration != "" || trigger.Repetition.StopAtDurationEnd {
+	if !enabled || !update.TaskUserIdentityMatches(trigger.UserID, sid) || trigger.Delay != "PT5M" || (trigger.Repetition.Interval != "PT24H" && trigger.Repetition.Interval != "P1D") || trigger.Repetition.Duration != "" || trigger.Repetition.StopAtDurationEnd {
 		return false
 	}
 	action := doc.Actions.Exec[0]
@@ -132,6 +262,42 @@ func ownedFixtureWindowsTask(raw []byte, id, fixture, receipt, sid string) bool 
 	// An explicit empty/unknown/elevated value is never equivalent to omission.
 	leastPrivilege := p.RunLevel == nil || (p.RunLevel != nil && *p.RunLevel == "LeastPrivilege")
 	return p.ID != "" && p.UserID == sid && p.LogonType == "InteractiveToken" && leastPrivilege && doc.Actions.Context == p.ID && action.Command == fixture && action.Arguments == fixtureWindowsArguments(receipt)
+}
+
+func fixtureTaskIdentityDiagnostic(raw []byte, id, fixture, receipt, sid string) map[string]any {
+	var doc fixtureTaskDocument
+	parsed := xml.Unmarshal(bytes.ReplaceAll(schedulerWindowsText(raw), []byte(`encoding="UTF-16"`), []byte(`encoding="UTF-8"`)), &doc) == nil
+	result := map[string]any{"xml_parsed": parsed, "description_match": doc.RegistrationInfo.Description == "OpenSocrates isolated native scheduler fixture "+id, "principal_count": len(doc.Principals), "action_count": len(doc.Actions.Exec), "trigger_count": len(doc.Triggers), "full_closed_policy_match": fixtureTaskClosedPolicy(raw, id, fixture, receipt, sid)}
+	for _, key := range strings.Fields("current_sid_match trigger_sid_match privilege_default_ok trigger_enabled_default_ok interval_ok delay_ok action_command_match action_args_match context_reference_match") {
+		result[key] = false
+	}
+	publicEnum := func(value string) string {
+		if value == "User" || value == "Author" {
+			return value
+		}
+		return "other"
+	}
+	result["action_context_enum"] = publicEnum(doc.Actions.Context)
+	if len(doc.Principals) == 1 {
+		p := doc.Principals[0]
+		result["principal_id_enum"] = publicEnum(p.ID)
+		result["current_sid_match"] = p.UserID == sid
+		result["privilege_default_ok"] = p.RunLevel == nil || *p.RunLevel == "LeastPrivilege"
+		result["context_reference_match"] = p.ID != "" && doc.Actions.Context == p.ID
+		result["interactive_token_match"] = p.LogonType == "InteractiveToken"
+	}
+	if len(doc.Triggers) == 1 {
+		t := doc.Triggers[0]
+		result["trigger_sid_match"] = update.TaskUserIdentityMatches(t.UserID, sid)
+		result["trigger_enabled_default_ok"] = t.Enabled == nil || *t.Enabled
+		result["interval_ok"] = (t.Repetition.Interval == "PT24H" || t.Repetition.Interval == "P1D") && t.Repetition.Duration == "" && !t.Repetition.StopAtDurationEnd
+		result["delay_ok"] = t.Delay == "PT5M"
+	}
+	if len(doc.Actions.Exec) == 1 {
+		result["action_command_match"] = doc.Actions.Exec[0].Command == fixture
+		result["action_args_match"] = doc.Actions.Exec[0].Arguments == fixtureWindowsArguments(receipt)
+	}
+	return result
 }
 
 // Only the fixture policy and observed/documented Scheduler defaults are
@@ -238,6 +404,12 @@ func fixtureTaskClosedPolicy(raw []byte, id, fixture, receipt, sid string) bool 
 					return false
 				}
 			} else {
+				if path == "Task/Triggers/LogonTrigger/UserId" {
+					if !update.TaskUserIdentityMatches(text, sid) {
+						return false
+					}
+					text = sid
+				}
 				if path == "Task/Triggers/LogonTrigger/Repetition/Interval" && text == "P1D" {
 					text = "PT24H"
 				}
@@ -317,10 +489,21 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 		ownedFixture += ".exe"
 	}
 	if e = copyAcceptanceTree(fixture, ownedFixture); e != nil {
-		_ = platform.RemoveTree(root)
 		return report, e
 	}
 	fixture = ownedFixture
+	fixtureIdentity, e := createSchedulerFixtureIdentity(root, id, filepath.Base(fixture))
+	if e != nil {
+		return report, e
+	}
+	cleanupFixtureFiles := func() bool {
+		verified, verifyError := verifySchedulerFixtureFiles(root, id, filepath.Base(fixture), fixtureIdentity)
+		if !verified || verifyError != nil {
+			report["unverified_fixture_files_retained"] = true
+			return false
+		}
+		return platform.RemoveTree(root) == nil
+	}
 	report["fixture_preparation"] = "private_owned_copy_of_explicit_go_fixture"
 	receipt := filepath.Join(root, "receipt.json")
 	cases := report["cases"].(map[string]any)
@@ -347,16 +530,20 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 		domainBefore, domainErr := run(tool, "print", domain)
 		if domainErr != nil {
 			delete(report, "pass")
-			_ = platform.RemoveTree(root)
+			_ = cleanupFixtureFiles()
 			return report, errors.New("native_user_launchd_domain_unavailable")
 		}
 		if bytes.Contains(domainBefore, []byte(label)) {
-			_ = platform.RemoveTree(root)
+			_ = cleanupFixtureFiles()
 			return report, errors.New("scheduler_fixture_identity_collision")
 		}
 		plist := filepath.Join(root, "fixture.plist")
 		document := fixtureLaunchAgent(label, fixture, receipt, root)
 		if e = platform.ExclusiveWrite(plist, document, 0600); e != nil {
+			return report, e
+		}
+		fixtureIdentity, e = recordSchedulerFixtureFile(root, fixtureIdentity, "fixture.plist")
+		if e != nil {
 			return report, e
 		}
 		defer func() {
@@ -375,10 +562,11 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 					}
 				}
 			}
-			record("exact_owned_cleanup", cleaned)
 			if cleaned {
-				_ = platform.RemoveTree(root)
-			} else {
+				cleaned = cleanupFixtureFiles()
+			}
+			record("exact_owned_cleanup", cleaned)
+			if !cleaned {
 				report["pass"] = false
 				report["cleanup_required"] = true
 				err = errors.New("scheduler_fixture_cleanup_incomplete")
@@ -395,6 +583,12 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 		record("registration_identity_verified", owned)
 		executed := awaitSchedulerReceipt(receipt, target)
 		record("native_go_entry_executed", executed)
+		if executed {
+			fixtureIdentity, e = recordSchedulerFixtureFile(root, fixtureIdentity, "receipt.json")
+			if e != nil {
+				return report, e
+			}
+		}
 		report["pass"] = registered && owned && executed
 		return report, nil
 	}
@@ -411,7 +605,7 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 	task := "OpenSocratesAcceptance-" + id
 	allTasks, listErr := run(tool, "/Query", "/FO", "CSV", "/NH")
 	if listErr != nil || !schedulerTaskAbsent(allTasks, task) {
-		_ = platform.RemoveTree(root)
+		_ = cleanupFixtureFiles()
 		return report, errors.New("scheduler_fixture_identity_collision")
 	}
 	document := fixtureWindowsTask(id, fixture, receipt, identity.Uid)
@@ -421,6 +615,10 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 	}
 	xmlPath := filepath.Join(root, "fixture-task.xml")
 	if e = platform.ExclusiveWrite(xmlPath, importDocument, 0600); e != nil {
+		return report, e
+	}
+	fixtureIdentity, e = recordSchedulerFixtureFile(root, fixtureIdentity, "fixture-task.xml")
+	if e != nil {
 		return report, e
 	}
 	defer func() {
@@ -435,10 +633,11 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 				cleaned = allErr == nil && schedulerTaskAbsent(all, task)
 			}
 		}
-		record("exact_owned_cleanup", cleaned)
 		if cleaned {
-			_ = platform.RemoveTree(root)
-		} else {
+			cleaned = cleanupFixtureFiles()
+		}
+		record("exact_owned_cleanup", cleaned)
+		if !cleaned {
 			report["pass"] = false
 			report["cleanup_required"] = true
 			err = errors.New("scheduler_fixture_cleanup_incomplete")
@@ -463,6 +662,9 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 	owned := e == nil && ownedFixtureWindowsTask(raw, id, fixture, receipt, identity.Uid)
 	record("registration_identity_verified", owned)
 	if !owned {
+		if e == nil {
+			cases["registration_identity_verified"].(map[string]any)["diagnostic"] = fixtureTaskIdentityDiagnostic(raw, id, fixture, receipt, identity.Uid)
+		}
 		return report, errors.New("scheduler_fixture_identity_unverified")
 	}
 	_, e = run(tool, "/Run", "/TN", task)
@@ -470,6 +672,10 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 	record("native_go_entry_executed", executed)
 	if !executed {
 		return report, errors.New("scheduler_fixture_entry_unverified")
+	}
+	fixtureIdentity, e = recordSchedulerFixtureFile(root, fixtureIdentity, "receipt.json")
+	if e != nil {
+		return report, e
 	}
 	// Capture and restore the OS-exported document, retaining every OS default
 	// and unknown field. A second query must match the entire captured tree
@@ -485,6 +691,10 @@ func nativeSchedulerAcceptance(o acceptanceOptions) (report map[string]any, err 
 	}
 	restorePath := filepath.Join(root, "restored-task.xml")
 	if e = platform.ExclusiveWrite(restorePath, restoreTransport, 0600); e != nil {
+		return report, e
+	}
+	fixtureIdentity, e = recordSchedulerFixtureFile(root, fixtureIdentity, "restored-task.xml")
+	if e != nil {
 		return report, e
 	}
 	if _, e = run(tool, "/Delete", "/TN", task, "/F"); e != nil {
@@ -728,6 +938,10 @@ func nativeSchedulerFixtureCleanup(id string) (map[string]any, error) {
 	if rootError != nil || !rootInfo.IsDir() || rootInfo.Mode()&os.ModeSymlink != 0 || fixtureError != nil || !fixtureInfo.Mode().IsRegular() || fixtureInfo.Size() == 0 {
 		return report, errors.New("fixture_cleanup_object_invalid")
 	}
+	verifiedFiles, e := verifySchedulerFixtureFiles(root, id, filepath.Base(fixture), nil)
+	if e != nil {
+		return report, e
+	}
 	// Refuse unknown or changed local objects. These files are fixture-owned;
 	// no parent, host state, npm package or production task may be targeted.
 	entries, e := os.ReadDir(root)
@@ -735,11 +949,16 @@ func nativeSchedulerFixtureCleanup(id string) (map[string]any, error) {
 		return report, e
 	}
 	for _, entry := range entries {
+		// Old fixtures have no durable byte identity. Their strictly verified
+		// scheduler registration may be removed, but all files remain intact.
+		if !verifiedFiles {
+			break
+		}
 		if entry.IsDir() {
 			return report, errors.New("fixture_cleanup_foreign_object")
 		}
 		switch entry.Name() {
-		case "native-scheduler-entry.exe":
+		case "native-scheduler-entry.exe", "fixture-identity.json":
 		case "fixture-task.xml", "restored-task.xml":
 			data, e := platform.ReadFile(filepath.Join(root, entry.Name()), 1<<20)
 			if e != nil || !ownedFixtureWindowsTask(data, id, fixture, filepath.Join(root, "receipt.json"), identity.Uid) {
@@ -763,6 +982,18 @@ func nativeSchedulerFixtureCleanup(id string) (map[string]any, error) {
 	all, e = schedulerCleanupRun(tool, "/Query", "/FO", "CSV", "/NH")
 	if e != nil || !schedulerTaskAbsent(all, task) {
 		return report, errors.New("fixture_cleanup_absence_unverified")
+	}
+	report["exact_owned_task_cleanup"] = true
+	if !verifiedFiles {
+		report["pass"] = true
+		report["exact_owned_cleanup"] = false
+		report["unverified_fixture_files_retained"] = true
+		return report, nil
+	}
+	verifiedFiles, e = verifySchedulerFixtureFiles(root, id, filepath.Base(fixture), nil)
+	if e != nil || !verifiedFiles {
+		report["unverified_fixture_files_retained"] = true
+		return report, errors.New("fixture_cleanup_files_changed")
 	}
 	if e = platform.RemoveTree(root); e != nil {
 		return report, e
