@@ -6,8 +6,12 @@ This is the unreleased Go implementation. Commands describe candidate behavior;
 passing source checks does not qualify a production release. Actual results,
 commit, environment and remaining gates belong in the implementation handoff.
 The current Mac has a verified Developer ID identity and canonical Team ID.
-Notarization, protected signing runners, Windows signing and the production
-update root remain unqualified; see the release preparation/handoff.
+Actual candidate ZIP and standalone installer notarization has received Apple
+acceptance; exact source/file identities belong in the release handoff.
+Bare CLI trust uses the pinned Developer ID, team and notarization code
+requirement. Protected signing runners, final merged-tag notarization, Windows
+signing, the production update root and clean-machine download/activation
+remain separate gates; see the release preparation/handoff.
 Do not install this candidate over an active installation without authorization.
 
 ## Download and first-install trust

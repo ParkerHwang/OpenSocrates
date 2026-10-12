@@ -67,6 +67,26 @@ exited 0 with a valid history response. Temporary credential transfer was
 removed and iCloud synchronization was not enabled. Actual archive notarization,
 Gatekeeper and isolated release-runner qualification remain separate gates.
 
+The actual native Mac ZIP and standalone installer at c9da20d each received
+Apple `Accepted`, with zero issues, exact submitted ZIP hashes and code hashes
+matching the returned tickets. The installer was submitted after payload
+acceptance. [Candidate receipt](evidence/macos-candidate-notarization-c9da20d.json)
+retains the source/file identities and the initial release-check failure:
+all five distributed files pass notarized `codesign` requirements, but the
+former `spctl` app assessor exits 3 for valid bare CLI code. The shared native
+trust/release path now retains Apple Developer ID/team/notarized pinning, adds
+online notarization checking, and removes that app-only assessor. Both manager
+and helper authenticate before version execution. Changed bytes must be rebuilt,
+re-signed and re-notarized; later evidence must retain its own source identity.
+
+[Release environment observation](evidence/release-environment-c9da20d.json)
+confirms source/native CI PASS at c9da20d (run 38265091598), active main ruleset
+protection with obsolete required-check names, and absent release runners,
+environments, Actions variables/secrets and final tag. The
+[environment review](RELEASE_ENVIRONMENT_REVIEW.md) records the exact Go-check
+migration proposal, runner choices and cloud-secret/reviewer decisions. No
+production pipeline or cloud credential transfer was performed by these checks.
+
 Additional original-Windows qualification at 001c75a used an isolated restricted
 current-user primary token. The new file owner matched the user and original
 owner/groups/privileges/default DACL remained unchanged. The original installer

@@ -97,6 +97,29 @@ archive submission, Apple acceptance, Gatekeeper or CI-runner qualification.
 사용하지 않습니다. 비밀값·계정 정보는 저장소에 기록하지 않습니다. 로컬 로그인
 준비가 완료된 것이며 실제 배포 파일 공증·Gatekeeper·CI 환경 검증은 남아 있습니다.
 
+The actual native ZIP and byte-identical standalone installer at c9da20d each
+received Apple's `Accepted` status, with zero issues in their processing logs.
+The native ZIP log matches its SHA256 and all four distributed Mach-O code
+hashes; the installer was submitted in a temporary ZIP after payload acceptance.
+All five files pass `codesign`'s notarization requirement. The former app-only
+`spctl --type execute` check rejects these bare CLI files as valid code that is
+not an app, so native runtime/release verification now uses the shared pinned
+Developer ID/team/notarized code requirement with `--check-notarization`.
+Both manager and helper are authenticated before any candidate version command
+executes. Exact final rebuild/check results are retained in the handoff; changed
+binary bytes require new notarization. / c9da20d의 실제 Mac ZIP과 별도 설치 프로그램은
+Apple 공증 승인을 받았고 처리 로그의 경고·오류는 0개입니다. ZIP 해시·실행파일
+4개의 코드 해시·설치 프로그램의 바이트 일치를 확인했습니다. CLI에 앱용 검사를
+적용하던 오류를 수정하고 Developer ID·팀·공증을 고정한 공통 코드 검사를 사용합니다.
+관리자와 도우미를 모두 인증한 뒤 버전 명령을 실행합니다. 재빌드 결과는 구현 인계에
+기록하며 바이너리가 바뀌면 다시 공증합니다.
+
+The read-only [release environment review](RELEASE_ENVIRONMENT_REVIEW.md) records
+missing runners/environments and the required-check migration proposal. It does
+not configure cloud secrets or authorize publication. / 릴리스 환경 검토는 필요한
+실행 환경·승인 설정·필수 검사 수정안을 기록합니다. 클라우드 비밀 보관·게시 승인과
+구분합니다.
+
 The explicit authenticated 0.144.4 selector passed one synthetic selection
 within 8.5 seconds. A post-run observation found zero matching selector
 processes and zero selector temporary directories. Actual Codex
@@ -115,7 +138,7 @@ signed retrieval, bounded archive/lifecycle rollback and rejection preservation.
 | --- | --- | --- |
 | Apple account / Apple 계정 | Completed: agreement accepted and certificate issued / 계약 동의·인증서 발급 완료 | Contract consent is a distinct account-owner decision / 계약 동의는 별도 결정 |
 | Mac signing / Mac 서명 | Current Mac ready; separately provision the isolated CI signing runner / 현재 Mac 준비 완료, 격리 CI 서명 runner는 별도 준비 | `OPENSOCRATES_MAC_SIGN_IDENTITY`, `OPENSOCRATES_MAC_TEAM_ID`; verify public `darwin_team_id` |
-| Mac notarization / Mac 공증 | Current Mac authentication ready: `opensocrates-notary`; separately provision the release runner and qualify the signed archive / 현재 Mac 로그인 준비 완료, 릴리스 runner 준비·배포 파일 공증은 별도 | `OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE` names the profile; passwords/API keys stay outside source/chat |
+| Mac notarization / Mac 공증 | Local profile and actual candidate archive/installer accepted; separately provision the release runner and notarize the final merged-tag bytes / 현재 Mac 로그인·실제 후보 공증 완료, 릴리스 runner·최종 태그 파일 공증은 별도 | `OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE` names the profile; passwords/API keys stay outside source/chat |
 | Windows signing / Windows 서명 | SignPath Foundation application handled in the separate user chat; approved project/policy and hosted integration details / 별도 채팅의 무료 신청 승인·프로젝트/policy 정보 | Application and release signing approval are different; see hosted workflow constraints below |
 | Update trust / 업데이트 신뢰 | Independently approved public threshold root, publisher certificate identity, offline root custody and online metadata key handling / 승인한 공개 루트·서명자·오프라인 키 보관·온라인 역할 키 운영 | Root threshold at least 2, consistent snapshots, expiry beyond 30 days; no test keys promoted |
 | Release infrastructure / 배포 환경 | Isolated signing runners and protected environments / 격리 서명 runner·보호 환경 | `opensocrates-release-signing`, `opensocrates-release-signing-windows-arm64`, `opensocrates-release-publication`, `github-pages`; approvers/tag policy require user choice |

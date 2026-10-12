@@ -7,6 +7,8 @@ import (
 	"debug/buildinfo"
 	"debug/pe"
 	"fmt"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/update"
 	"io"
 	"os"
 	"os/exec"
@@ -218,15 +220,56 @@ func requireNativeExecution(target, goos, arch string) error {
 
 func verifyHelperSignature(path, target string) error {
 	if target == "darwin-arm64" {
-		for _, args := range [][]string{{"codesign", "--verify", "--deep", "--strict", path}, {"spctl", "--assess", "--type", "execute", path}} {
-			if e := exec.Command(args[0], args[1:]...).Run(); e != nil {
-				return fmt.Errorf("production helper signature required")
-			}
+		if e := verifyMacReleaseSignature(path); e != nil {
+			return fmt.Errorf("production helper signature required")
 		}
 	} else {
 		if e := exec.Command("signtool.exe", "verify", "/pa", "/all", "/tw", path).Run(); e != nil {
 			return fmt.Errorf("production helper Authenticode required")
 		}
+	}
+	return nil
+}
+
+func verifyMacReleaseSignature(path string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	return platform.VerifyNativeSignature(ctx, path, update.DefaultNativeTrust())
+}
+
+func verifyManagerSignature(path, target string) error {
+	if target == "darwin-arm64" {
+		if e := verifyMacReleaseSignature(path); e != nil {
+			return fmt.Errorf("production platform signature required")
+		}
+	} else {
+		if e := exec.Command("signtool.exe", "verify", "/pa", "/all", "/tw", path).Run(); e != nil {
+			return fmt.Errorf("production Authenticode signature required")
+		}
+	}
+	return nil
+}
+
+type nativeReleaseCommands struct {
+	verifyManager func(string, string) error
+	verifyHelper  func(string, string) error
+	version       func(string) ([]byte, error)
+}
+
+// Keep both executable trust gates ahead of executing any candidate code.
+// Production callers supply only the fixed OS verifiers and version command;
+// the explicit command dependencies allow failure-order tests without signing
+// credentials or running an untrusted candidate.
+func checkNativeReleaseExecutables(manager, helper, target, version string, commands nativeReleaseCommands) error {
+	if e := commands.verifyManager(manager, target); e != nil {
+		return e
+	}
+	if e := commands.verifyHelper(helper, target); e != nil {
+		return e
+	}
+	b, e := commands.version(manager)
+	if e != nil || !strings.Contains(string(b), version) {
+		return fmt.Errorf("native version execution failed")
 	}
 	return nil
 }
@@ -398,25 +441,14 @@ func CheckNativeRelease(root, path, target string, out io.Writer) error {
 			return e
 		}
 	}
-	command := exec.Command(filepath.Join(path, "bin", binary), "--version")
-	b, e := command.Output()
-	if e != nil || !strings.Contains(string(b), str(manifest["product_version"])) {
-		return fmt.Errorf("native version execution failed")
+	commands := nativeReleaseCommands{
+		verifyManager: verifyManagerSignature,
+		verifyHelper:  verifyHelperSignature,
+		version: func(path string) ([]byte, error) {
+			return exec.Command(path, "--version").Output()
+		},
 	}
-	if target == "darwin-arm64" {
-		for _, args := range [][]string{{"codesign", "--verify", "--deep", "--strict", filepath.Join(path, "bin", binary)}, {"spctl", "--assess", "--type", "execute", filepath.Join(path, "bin", binary)}} {
-			cmd := exec.Command(args[0], args[1:]...)
-			if e = cmd.Run(); e != nil {
-				return fmt.Errorf("production platform signature required")
-			}
-		}
-	} else {
-		cmd := exec.Command("signtool.exe", "verify", "/pa", "/all", "/tw", filepath.Join(path, "bin", binary))
-		if e = cmd.Run(); e != nil {
-			return fmt.Errorf("production Authenticode signature required")
-		}
-	}
-	if e = verifyHelperSignature(filepath.Join(path, "bin", helper), target); e != nil {
+	if e = checkNativeReleaseExecutables(filepath.Join(path, "bin", binary), filepath.Join(path, "bin", helper), target, str(manifest["product_version"]), commands); e != nil {
 		return e
 	}
 	fmt.Fprintln(out, "RELEASE_PLATFORM_INTEGRITY_OK; authenticated/live host evidence remains a separate gate")
