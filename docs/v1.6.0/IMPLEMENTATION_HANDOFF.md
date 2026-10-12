@@ -56,6 +56,15 @@ passed at that revision. New explicit Go acceptance commands are documented in
 - [Actual Mac Developer ID signature](evidence/macos-developer-id-signature-306b74c.json): user-authorized certificate issuance after direct agreement acceptance, public/private pair and Apple chain verified, dedicated owned keychain, manager/helper copies signed with verified hardened runtime, matching team and secure timestamp. Private signing material never entered source or left the Mac. Local signing does not establish notarization or protected release runner qualification.
 - Canonical/embedded Mac Team ID now matches that approved account. Production TUF root remains `{}`; Windows publisher pin is empty. Existing protected-tag/publication guards were not bypassed. No release/active-installation replacement was performed.
 
+Additional original-Windows qualification at 001c75a used an isolated restricted
+current-user primary token. The new file owner matched the user and original
+owner/groups/privileges/default DACL remained unchanged. The original installer
+still exited 1 at its Windows private-helper call; no fallback initialization
+or adoption occurred. [Receipt](evidence/windows-original-installer-restricted-001c75a.json)
+and [inactive reproducer](evidence/qualification/windows-restricted-owner/README.md)
+retain this unavailable result. A compatible normal user environment is still
+needed; do not weaken guards or change account/system/desktop policies.
+
 ## Remaining release gates
 
 Available implementation acceptance passes; this candidate is **not production-release validated**.

@@ -142,6 +142,14 @@ for this chosen SignPath application. / 현재 DER 인증서 pin은 승인한 �
 연결할 수 있으나 갱신 시 신뢰 전환이 필요합니다. 선택한 SignPath 신청에 다른
 서비스의 설정을 혼용하지 않습니다.
 
+A restricted-current-user Windows probe kept original token/account/security
+settings unchanged and created user-owned files, but the original v1.5 private
+helper still failed. No fallback layout was used. This remains unavailable
+original-installer qualification; see the exact receipt in the handoff.
+/ 계정·보안 설정을 유지한 제한 권한 프로세스에서도 원본 Windows 설치기의
+private helper가 통과하지 않았습니다. 호환되는 일반 사용자 환경은 여전히
+필요하며 권한·소유권 검사를 완화하지 않습니다.
+
 ## Primary references / 공식 근거
 
 - [Apple Developer ID certificates](https://developer.apple.com/help/account/certificates/create-developer-id-certificates/)
