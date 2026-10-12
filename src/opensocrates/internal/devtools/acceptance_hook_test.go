@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"io"
@@ -14,20 +15,68 @@ import (
 	"time"
 )
 
-// Re-execution is a native Go process fixture. The shell receives the same hook
-// command/arguments as a generated package, with no first-party script wrapper.
-func init() {
-	if os.Getenv("OPENSOCRATES_NATIVE_STDIN_FIXTURE") == "1" && len(os.Args) == 4 && os.Args[1] == "hook" && os.Args[2] == "codex" && os.Args[3] == "session_started" {
-		raw, e := io.ReadAll(io.LimitReader(os.Stdin, 8193))
-		if e != nil || len(raw) > 8192 {
-			os.Exit(2)
-		}
-		if _, e = os.Stdout.Write(raw); e != nil {
-			os.Exit(2)
-		}
-		os.Exit(0)
-	}
+type nativePipeFixtureReceipt struct {
+	MarkerObserved    bool   `json:"marker_observed"`
+	ArgvCount         int    `json:"argv_count"`
+	ArgvMatched       bool   `json:"argv_matched"`
+	EchoMode          bool   `json:"echo_mode"`
+	StaticMode        bool   `json:"static_mode"`
+	NativeInputLen    int    `json:"native_input_len"`
+	NativeInputSHA256 string `json:"native_input_sha256"`
+	EOFObserved       bool   `json:"eof_observed"`
+	ReadOK            bool   `json:"read_ok"`
+	StdoutWriteOK     bool   `json:"stdout_write_ok"`
 }
+
+var nativePipeStaticOutput = []byte("한국 $ dollar ` tick\n")
+
+// This native Go fixture records only bounded metadata for fixed synthetic
+// input. The receipt distinguishes native execution/EOF from shell capture.
+func init() {
+	if os.Getenv("OPENSOCRATES_NATIVE_STDIN_FIXTURE") != "1" {
+		return
+	}
+	mode := os.Getenv("OPENSOCRATES_NATIVE_STDIN_MODE")
+	receipt := nativePipeFixtureReceipt{MarkerObserved: true, ArgvCount: len(os.Args), ArgvMatched: len(os.Args) == 4 && os.Args[1] == "hook" && os.Args[2] == "codex" && os.Args[3] == "session_started", EchoMode: mode == "" || mode == "echo", StaticMode: mode == "static"}
+	save := func() {
+		path := os.Getenv("OPENSOCRATES_NATIVE_STDIN_RECEIPT")
+		if path == "" {
+			return
+		}
+		b, e := json.Marshal(receipt)
+		if e == nil {
+			_ = platform.ExclusiveWrite(path, append(b, '\n'), 0600)
+		}
+	}
+	if !receipt.ArgvMatched || (!receipt.EchoMode && !receipt.StaticMode) {
+		save()
+		os.Exit(2)
+	}
+	var output []byte
+	if receipt.EchoMode {
+		raw, e := io.ReadAll(io.LimitReader(os.Stdin, 8193))
+		receipt.NativeInputLen = len(raw)
+		sum := sha256.Sum256(raw)
+		receipt.NativeInputSHA256 = hex.EncodeToString(sum[:])
+		receipt.ReadOK = e == nil
+		receipt.EOFObserved = e == nil && len(raw) <= 8192
+		if e != nil || len(raw) > 8192 {
+			save()
+			os.Exit(2)
+		}
+		output = raw
+	} else {
+		output = nativePipeStaticOutput
+	}
+	_, e := os.Stdout.Write(output)
+	receipt.StdoutWriteOK = e == nil
+	save()
+	if e != nil {
+		os.Exit(2)
+	}
+	os.Exit(0)
+}
+
 func TestActualConfiguredShellPreservesNativeStdinAndUnsafeLookingPaths(t *testing.T) {
 	target := nativeAcceptanceTarget()
 	if target == "unsupported" {
@@ -66,35 +115,50 @@ func TestActualConfiguredShellPreservesNativeStdinAndUnsafeLookingPaths(t *testi
 	}
 	env = append(env, "PLUGIN_ROOT="+root, "OPENSOCRATES_NATIVE_STDIN_FIXTURE=1")
 	input := []byte("{\"unicode\":\"한국\",\"numeric\":9007199254740993,\"text\":\"$ dollar ` tick\"}\n")
-	// This test checks byte transport through a copied development test executable.
-	// Cold PowerShell/test initialization has a separate deadline; packaged hook
-	// qualification still requires its two-second host deadline and one-second p95.
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	started := time.Now()
-	result, e := platform.Run(ctx, shell, args, platform.RunOptions{Env: env, Dir: work, Stdin: bytes.NewReader(input), OutputLimit: 8 << 20})
-	out, errout := result.Stdout, result.Stderr
-	if e != nil || len(errout) != 0 || !bytes.Equal(out, input) {
+	// Transport probes use the copied development test executable. Packaged hook
+	// qualification retains its independent two-second deadline/one-second p95.
+	run := func(name, binary string, arguments []string, mode string, stdin, expected []byte) bool {
+		receiptPath := filepath.Join(root, name+"-receipt.json")
+		probeEnv := append(append([]string(nil), env...), "OPENSOCRATES_NATIVE_STDIN_MODE="+mode, "OPENSOCRATES_NATIVE_STDIN_RECEIPT="+receiptPath)
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		started := time.Now()
+		result, e := platform.Run(ctx, binary, arguments, platform.RunOptions{Env: probeEnv, Dir: work, Stdin: bytes.NewReader(stdin), OutputLimit: 8 << 20})
 		category := "none"
 		if e != nil {
 			category = string(diagnostics.CodeOf(e))
 		}
-		expectedHash := sha256.Sum256(input)
-		observedHash := sha256.Sum256(out)
-		stderrHash := sha256.Sum256(errout)
+		expectedHash := sha256.Sum256(expected)
+		observedHash := sha256.Sum256(result.Stdout)
+		stderrHash := sha256.Sum256(result.Stderr)
 		firstMismatch := -1
-		for i := 0; i < len(input) && i < len(out); i++ {
-			if input[i] != out[i] {
+		for i := 0; i < len(expected) && i < len(result.Stdout); i++ {
+			if expected[i] != result.Stdout[i] {
 				firstMismatch = i
 				break
 			}
 		}
-		if firstMismatch < 0 && len(input) != len(out) {
-			firstMismatch = min(len(input), len(out))
+		if firstMismatch < 0 && len(expected) != len(result.Stdout) {
+			firstMismatch = min(len(expected), len(result.Stdout))
 		}
-		// The payload is a fixed synthetic literal. Report only bounded outcome
-		// metadata, never command text, paths, environment values or stderr bytes.
-		t.Logf("native_pipe_diagnostic target=%s error_category=%s exit_code=%d deadline_exceeded=%t elapsed_ms=%d expected_len=%d stdout_len=%d stderr_len=%d first_mismatch=%d expected_sha256=%s stdout_sha256=%s stderr_sha256=%s suffix_lf=%t suffix_crlf=%t", target, category, result.ExitCode, ctx.Err() == context.DeadlineExceeded, time.Since(started).Milliseconds(), len(input), len(out), len(errout), firstMismatch, hex.EncodeToString(expectedHash[:]), hex.EncodeToString(observedHash[:]), hex.EncodeToString(stderrHash[:]), bytes.HasSuffix(out, []byte{'\n'}), bytes.HasSuffix(out, []byte{'\r', '\n'}))
+		receipt := nativePipeFixtureReceipt{}
+		receiptPresent := false
+		if b, e := platform.ReadFile(receiptPath, 4096); e == nil && json.Unmarshal(b, &receipt) == nil {
+			receiptPresent = true
+		}
+		t.Logf("native_pipe_diagnostic probe=%s target=%s error_category=%s exit_code=%d deadline_exceeded=%t elapsed_ms=%d expected_len=%d stdout_len=%d stderr_len=%d first_mismatch=%d expected_sha256=%s stdout_sha256=%s stderr_sha256=%s suffix_lf=%t suffix_crlf=%t receipt_present=%t marker_observed=%t argv_count=%d argv_match=%t echo_mode=%t static_mode=%t native_input_len=%d native_input_sha256=%s eof_observed=%t native_read_ok=%t native_stdout_write_ok=%t", name, target, category, result.ExitCode, ctx.Err() == context.DeadlineExceeded, time.Since(started).Milliseconds(), len(expected), len(result.Stdout), len(result.Stderr), firstMismatch, hex.EncodeToString(expectedHash[:]), hex.EncodeToString(observedHash[:]), hex.EncodeToString(stderrHash[:]), bytes.HasSuffix(result.Stdout, []byte{'\n'}), bytes.HasSuffix(result.Stdout, []byte{'\r', '\n'}), receiptPresent, receipt.MarkerObserved, receipt.ArgvCount, receipt.ArgvMatched, receipt.EchoMode, receipt.StaticMode, receipt.NativeInputLen, receipt.NativeInputSHA256, receipt.EOFObserved, receipt.ReadOK, receipt.StdoutWriteOK)
+		return e == nil && len(result.Stderr) == 0 && bytes.Equal(result.Stdout, expected) && receiptPresent && receipt.ArgvMatched && receipt.StdoutWriteOK
+	}
+	direct := run("direct_echo", native, []string{"hook", "codex", "session_started"}, "echo", input, input)
+	actual := run("configured_shell_echo", shell, args, "echo", input, input)
+	static := run("configured_shell_static_utf8", shell, args, "static", nil, nativePipeStaticOutput)
+	if target == "windows-x64" {
+		// Exploratory OS-launch candidate only: no production configuration is
+		// changed until native receipts establish its byte/exit behavior.
+		candidate := `exit (Start-Process -FilePath "$env:PLUGIN_ROOT\runtime\windows-x64\opensocrates.exe" -ArgumentList 'hook codex session_started' -NoNewWindow -Wait -PassThru).ExitCode`
+		run("exploratory_os_launcher_echo", shell, []string{"-NoProfile", "-Command", candidate}, "echo", input, input)
+	}
+	if !direct || !actual || !static {
 		t.Fatal("configured host shell changed native input/output or failed")
 	}
 }
