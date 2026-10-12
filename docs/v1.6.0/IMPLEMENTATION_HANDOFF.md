@@ -56,6 +56,17 @@ passed at that revision. New explicit Go acceptance commands are documented in
 - [Actual Mac Developer ID signature](evidence/macos-developer-id-signature-306b74c.json): user-authorized certificate issuance after direct agreement acceptance, public/private pair and Apple chain verified, dedicated owned keychain, manager/helper copies signed with verified hardened runtime, matching team and secure timestamp. Private signing material never entered source or left the Mac. Local signing does not establish notarization or protected release runner qualification.
 - Canonical/embedded Mac Team ID now matches that approved account. Production TUF root remains `{}`; Windows publisher pin is empty. Existing protected-tag/publication guards were not bypassed. No release/active-installation replacement was performed.
 
+Local notarization authentication was completed on 2026-10-12 at checkout
+3b0ed4ec334f34549677af3c0baf72a703784c3d on macOS ARM64. After direct user
+authentication, a dedicated app-specific password was registered as
+`opensocrates-notary` in the local login keychain. `notarytool store-credentials`
+with `--validate` exited 0; private account arguments and the secure password
+input are intentionally omitted from this public handoff. The exact check
+`xcrun notarytool history --keychain-profile opensocrates-notary --output-format json`
+exited 0 with a valid history response. Temporary credential transfer was
+removed and iCloud synchronization was not enabled. Actual archive notarization,
+Gatekeeper and isolated release-runner qualification remain separate gates.
+
 Additional original-Windows qualification at 001c75a used an isolated restricted
 current-user primary token. The new file owner matched the user and original
 owner/groups/privileges/default DACL remained unchanged. The original installer
@@ -69,7 +80,7 @@ needed; do not weaken guards or change account/system/desktop policies.
 
 Available implementation acceptance passes; this candidate is **not production-release validated**.
 
-1. Provision an independently approved threshold-signed TUF root, Windows publisher identity, Mac notarization credentials and protected signing runners, Windows hosted signing, metadata service/key custody and scoped Administration-read publication credential. Local Mac Developer ID issuance and signature checks now pass; production release qualification remains separate. Test trust cannot become production trust. Release-check fails closed without production platform signatures.
+1. Provision an independently approved threshold-signed TUF root, Windows publisher identity and protected signing runners, Windows hosted signing, metadata service/key custody and scoped Administration-read publication credential. Local Mac Developer ID issuance, signature checks and saved-profile notarization authentication now pass; the isolated runner and actual archive notarization remain unqualified. Test trust cannot become production trust. Release-check fails closed without production platform signatures.
 2. Qualify public signed network updates and complete production installer/manager/updater self-update/rollback with production trust, security prompts and timestamps.
 3. Complete Windows adoption beginning with a successfully executed original v1.5 installer in a compatible user environment. Actual-payload Go adoption/rollback now passes, but its source-equivalent initialization does not meet that original-installer gate. Also complete macOS production fixed-label/updater-execution qualification. Released v1.5.0 explicitly supported automatic updates only on macOS ARM64; its Windows installer reports them unavailable, so there is no supported enabled Windows legacy scheduler to adopt. Enabled macOS takeover and rollback now have integrated real-OS evidence under the disclosed unique-label and suppressed-execution fixture boundaries.
 4. Obtain clean-machine and real host trust/activation, account/workspace/global and CLI/Desktop evidence. Authenticated macOS legacy adapter operation now has a synthetic live-account receipt; actual delivery/answer quality remain distinct. Local updates cannot modify account content or running conversations. External host ARM64 availability/loading remains host-specific qualification.

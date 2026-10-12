@@ -81,6 +81,22 @@ protected CI signing runners or a production release. / 관리자·도우미 복
 서명·강화 런타임·팀·타임스탬프가 통과했습니다. 공증·Gatekeeper·CI 서명 환경·
 운영 릴리스 검증과 구분합니다.
 
+On 2026-10-12, the user completed Apple's direct account authentication and
+authorized a dedicated notarization app-specific password. The local
+`opensocrates-notary` profile was stored in the Mac login keychain with
+credential validation enabled (exit 0). The exact saved-profile check
+`xcrun notarytool history --keychain-profile opensocrates-notary --output-format json`
+exited 0 with a valid history response on macOS ARM64 at checkout 3b0ed4e.
+The temporary credential transfer file was removed; iCloud synchronization was
+not enabled. No password or private account arguments are retained in source
+or this public handoff. This completes local authentication preparation, not
+archive submission, Apple acceptance, Gatekeeper or CI-runner qualification.
+/ 사용자가 Apple 본인 인증을 직접 완료했고 공증 전용 앱 암호를 발급했습니다.
+`opensocrates-notary`를 Mac 로그인 키체인에 등록하고 Apple 인증과 저장된 프로필의
+실제 서비스 접근을 확인했습니다. 임시 암호 파일은 삭제했고 iCloud 동기화는
+사용하지 않습니다. 비밀값·계정 정보는 저장소에 기록하지 않습니다. 로컬 로그인
+준비가 완료된 것이며 실제 배포 파일 공증·Gatekeeper·CI 환경 검증은 남아 있습니다.
+
 The explicit authenticated 0.144.4 selector passed one synthetic selection
 within 8.5 seconds. A post-run observation found zero matching selector
 processes and zero selector temporary directories. Actual Codex
@@ -99,7 +115,7 @@ signed retrieval, bounded archive/lifecycle rollback and rejection preservation.
 | --- | --- | --- |
 | Apple account / Apple 계정 | Completed: agreement accepted and certificate issued / 계약 동의·인증서 발급 완료 | Contract consent is a distinct account-owner decision / 계약 동의는 별도 결정 |
 | Mac signing / Mac 서명 | Current Mac ready; separately provision the isolated CI signing runner / 현재 Mac 준비 완료, 격리 CI 서명 runner는 별도 준비 | `OPENSOCRATES_MAC_SIGN_IDENTITY`, `OPENSOCRATES_MAC_TEAM_ID`; verify public `darwin_team_id` |
-| Mac notarization / Mac 공증 | An authenticated notarytool keychain profile / 공증용 키체인 프로필 | `OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE` names the profile; passwords/API keys stay outside source/chat |
+| Mac notarization / Mac 공증 | Current Mac authentication ready: `opensocrates-notary`; separately provision the release runner and qualify the signed archive / 현재 Mac 로그인 준비 완료, 릴리스 runner 준비·배포 파일 공증은 별도 | `OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE` names the profile; passwords/API keys stay outside source/chat |
 | Windows signing / Windows 서명 | SignPath Foundation application handled in the separate user chat; approved project/policy and hosted integration details / 별도 채팅의 무료 신청 승인·프로젝트/policy 정보 | Application and release signing approval are different; see hosted workflow constraints below |
 | Update trust / 업데이트 신뢰 | Independently approved public threshold root, publisher certificate identity, offline root custody and online metadata key handling / 승인한 공개 루트·서명자·오프라인 키 보관·온라인 역할 키 운영 | Root threshold at least 2, consistent snapshots, expiry beyond 30 days; no test keys promoted |
 | Release infrastructure / 배포 환경 | Isolated signing runners and protected environments / 격리 서명 runner·보호 환경 | `opensocrates-release-signing`, `opensocrates-release-signing-windows-arm64`, `opensocrates-release-publication`, `github-pages`; approvers/tag policy require user choice |
