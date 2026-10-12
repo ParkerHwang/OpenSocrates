@@ -128,11 +128,15 @@ OpenSocrates 스킬만** 먼저 백업하고 활성화 상태를 보존합니다
 때 컨트롤러 출처가 중복되지 않게 확인합니다. 업로드 수용은 활성화나
 유용한 결과의 증거가 아닙니다.
 
-평소처럼 자료 종합·판단·메시지 작성을 요청하세요. 호스트 모델이 스킬을
-선택하므로 누락되면 OpenSocrates를 사용해 달라고 직접 요청할 수 있습니다.
-Chat·Desktop Chat·현재 클라우드 Cowork는 따로 확인합니다. 계정 ZIP에는
-네이티브 훅이나 매 메시지 강제 진입이 없으며 네이티브 연동 ZIP을 대신
-올려서는 안 됩니다.
+`/opensocrates`를 반복하지 않고 일반 요청에서 쓰려면
+[상시 지침을 한 번 추가](setup-guide.ko.md#claude-standing-instructions)하세요.
+계정의 **Settings → General → Instructions for Claude**(이전 Cowork:
+**Settings → Cowork → Global instructions**)에 기존 지침을 보존하면서
+추가하고, 사용하는 각 계정에 설정한 뒤 새 대화를 시작합니다. 스킬 선택은
+여전히 모델에 맡겨집니다. 직접 사용을 요청해 선택 누락을 확인할 수 있지만
+자동 사용의 증거는 아닙니다. Chat·Desktop Chat·현재 클라우드 Cowork는 따로
+관찰합니다. 계정 ZIP에는 네이티브 훅이나 매 메시지 강제 진입이 없으며
+네이티브 연동 ZIP을 대신 올려서는 안 됩니다.
 
 ## 사용 표기와 증거의 범위
 

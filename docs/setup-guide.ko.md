@@ -3,11 +3,12 @@
 [English](setup-guide.md) · [설치 명령과 지원 환경](../README.ko.md) · [v1.5.0 다운로드](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.0)
 
 설치가 끝났다면 **사용하는 앱의 항목만** 확인하세요. Codex는 훅 신뢰 승인이
-필요합니다. Claude 계정 스킬은 기능과 스킬을 켜야 하고, Claude Code는 플러그인이
+필요합니다. Claude 계정 스킬은 기능과 스킬을 켜고 이름을 언급하지 않고 쓸
+상시 지침을 한 번 추가합니다. Claude Code는 플러그인이
 켜져 있어야 합니다. Antigravity는 설치된 규칙과 스킬을 확인하면 됩니다.
 
-이 안내는 2026년 10월 10일 기준입니다. 캡처는 macOS의 Claude Desktop
-2.31226.1과 Antigravity 2.22.0에서 가져왔습니다. Codex CLI 0.145.0의 명령과
+지침 설정 단계는 2026년 10월 12일에 갱신했습니다. 10월 10일 캡처는 macOS의
+Claude Desktop 2.31226.1과 Antigravity 2.22.0에서 가져왔습니다. Codex CLI 0.145.0의 명령과
 공식 훅 안내를 확인했습니다. Windows 화면 캡처는 포함하지 않았으며, 메뉴 이름은
 앱 버전·언어·계정 정책에 따라 달라질 수 있습니다.
 
@@ -16,7 +17,7 @@
 | 사용하는 곳 | 설치 프로그램이 처리하는 일 | 설치 뒤 확인할 일 |
 | --- | --- | --- |
 | Codex | 패키지 검증, 플러그인 등록·활성화 | `/hooks`에서 OpenSocrates 훅 신뢰 상태 확인, 필요한 승인, 새 대화 |
-| Claude 웹·Desktop Chat·Cowork | 계정용 ZIP 검증·내보내기 | 올바른 계정에서 코드 실행 기능과 OpenSocrates 스킬 켜짐 확인 |
+| Claude 웹·Desktop Chat·Cowork | 계정용 ZIP 검증·내보내기 | 올바른 계정에서 코드 실행·스킬 켜짐 확인; 이름 없이 사용할 상시 지침 저장 |
 | Claude Code · Mac 로컬 | 네이티브 플러그인 설치·등록·활성화 | 로컬 Code 환경에서 플러그인 켜짐 확인, 새 세션 |
 | Antigravity | 선택한 전역 또는 작업 공간에 규칙·스킬 배치 | 해당 범위의 규칙·스킬이 앱에 보이는지 확인, 새 대화 |
 
@@ -45,6 +46,9 @@ Codex, Claude 계정 스킬, Mac 로컬 Claude Code, Antigravity를 구분해줘
 Antigravity는 전역·작업 공간이 중복되지 않게 하고, 의도적으로 꺼둔
 테스트 사본과 관련 없는 설정은 그대로 둬.
 Claude 계정 스킬을 교체할 때는 기존 파일과 켜짐 상태를 먼저 백업해줘.
+계정 스킬 이름을 언급하지 않고 쓰도록 2-4의 상시 지침을 Instructions for
+Claude(이전 Cowork: Global instructions)에 추가해줘. 기존 지침을 보존하고
+내가 사용하는 각 계정에 설정해줘.
 
 설치, 파일 검증, 플러그인 등록, 허용된 일반 설정과 완료 확인은 진행해줘.
 로그인, 조직 관리자 권한, 실제 호스트의 훅 신뢰 승인처럼 내가 해야 하는
@@ -99,7 +103,7 @@ Claude 계정 스킬을 교체할 때는 기존 파일과 켜짐 상태를 먼�
 Codex는 공식 CLI 절차로 안내합니다. 실제 화면 캡처는 아래 Claude와
 Antigravity 항목에 있으며, [캡처 범위](assets/setup-v1.5/README.md)를 별도로 기록했습니다.
 
-## 2. Claude 계정 스킬: 기능과 스킬을 켜기
+## 2. Claude 계정 스킬: 켜고 계정 지침 추가하기
 
 이 항목은 **웹 Chat, Desktop의 일반 Chat, Cowork**용입니다. 로컬 Claude Code
 플러그인과는 별도입니다. 브라우저와 Desktop이 서로 다른 계정이면 각 계정의
@@ -156,8 +160,42 @@ npx --yes opensocrates@1.5.0 export --host claude-chat --output /absolute/path/o
 스킬을 수정한 회차입니다. **OpenSocrates 제품 버전 1.5.0과 다른 번호**입니다.
 제품 버전은 `Contents → SKILL.md`의 `OpenSocrates 1.5.0` 표기를 확인하세요.
 
-**완료 기준:** 올바른 계정에 계정용 스킬이 있고, 필요한 기능과 스킬이 켜져
-있습니다. 계정 스킬에는 Codex와 같은 네이티브 훅 승인 절차가 없습니다.
+<a id="claude-standing-instructions"></a>
+
+### 2-4. 이름을 언급하지 않고 사용할 상시 지침 추가
+
+스킬을 켜도 Claude의 자동 선택에서 누락될 수 있습니다. `/opensocrates`나
+이름을 매번 언급하지 않고 일반 요청에서 쓰려면 아래 지침을 한 번 추가하세요.
+계정의 기존 지침은 보존합니다.
+
+1. **Settings → General → Instructions for Claude**를 엽니다. 일부 버전은
+   Settings에서 **Instructions for Claude**를 바로 보여줍니다. 이전 Cowork
+   화면은 **Settings → Cowork → Global instructions → Edit**를 엽니다.
+2. 아래 문구를 추가하고 저장합니다. 웹과 Desktop의 계정이 다를 수 있으므로
+   각 화면에서 실제 사용하는 계정에 설정합니다. 프로젝트에만 추가한 지침은
+   해당 프로젝트 안에서만 적용됩니다.
+3. 새 대화에서 자료 종합·비교·판단·메시지 작성 같은 작업을 OpenSocrates
+   이름 없이 평소처럼 요청합니다.
+
+```text
+자료 종합, 선택지 비교, 판단, 메시지 작성처럼 해석이나 판단이 필요한
+요청에서는 내가 이름을 언급하지 않아도 활성화된 OpenSocrates 스킬을 먼저
+불러와 그 지침을 따르세요. 적용할 사고 방법의 전체 절차를 읽고 조건을
+확인하세요. 단순 서식 변환 같은 기계적인 작업에는 불필요한 절차를
+추가하지 마세요.
+```
+
+이 지침은 모델의 스킬 선택을 안내합니다. 네이티브 훅이나 매 턴 강제 적용을
+추가하지 않으며 기계적인 작업에 사고 방법을 요구하지 않습니다.
+`Powered by OpenSocrates`가 없다는 사실만으로 불러오기 실패를 판정하지 마세요.
+[공식 계정 지침 안내](https://support.claude.com/en/articles/10185728-understanding-claude-s-personalization-features)
+· [공식 Cowork 전역 지침 안내](https://support.claude.com/en/articles/13345190-get-started-with-claude-cowork)
+
+**설정 완료 기준:** 올바른 계정에서 필요한 기능과 계정 스킬이 켜져 있고,
+이름 없이 사용하기 위한 상시 지침이 저장돼 있습니다. 계정 스킬에는 Codex와
+같은 네이티브 훅 승인 절차가 없습니다. 새 판단 과제에서 자동 선택을 관찰하는
+일과 이 설정을 확인하는 일은 구분하며, 설치기의 내보내기 성공으로 실제
+자동 선택을 증명하지 않습니다.
 
 ## 3. Claude Code: Mac 로컬 플러그인 확인
 
@@ -233,6 +271,7 @@ OpenSocrates의 Antigravity 배포는 규칙·스킬 파일 방식입니다. **�
 | --- | --- |
 | 설치됐다고 나오지만 Codex가 훅을 쓰지 않음 | 설치와 승인 구분. 대화형 `/hooks`에서 현재 정의의 신뢰 상태 확인 |
 | Claude에 스킬이 있지만 회색으로 보임 | 코드 실행 기능·조직 정책·해당 스킬의 켜짐 상태 확인 |
+| `/opensocrates`를 언급해야만 Claude가 사용함 | 실제 계정에 2-4의 상시 지침을 저장하고 새 판단 과제에서 이름 없이 확인 |
 | Claude Chat에서는 되는데 Code에서는 안 보임 | 계정 스킬과 로컬 플러그인 설치를 각각 확인 |
 | Antigravity Plugins에 OpenSocrates가 없음 | Installed의 **Skills & Rules**에서 검색 |
 | 업데이트했는데 `OpenSocrates grounding: …@3`가 나옴 | 실제 설치 버전, 다른 계정·범위의 오래된 사본, 기존 대화의 남은 문맥 확인 |

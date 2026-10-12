@@ -30,16 +30,17 @@ v1.5.0은 Codex를 유지하면서 Apple Silicon Mac의 Claude Code 네이티브
 | --- | --- | --- |
 | Codex | 기존 훅·컨트롤러·네이티브 판단 런타임 | Apple Silicon Mac·Windows x64; 대화형 세션에서 훅 7개 검토 |
 | Claude Code CLI / Desktop의 로컬 Code | 상태를 저장하지 않는 네이티브 진입과 설치된 전체 참조 | Apple Silicon Mac; Claude CLI·호스트 로그인·플러그인과 훅 권한 필요 |
-| Claude 웹 / Desktop Chat / Cowork | 실행 코드가 없는 독립 계정 스킬 ZIP | Mac·Windows에서 내보낸 뒤 계정의 Skills 화면에서 업로드·활성화 |
+| Claude 웹 / Desktop Chat / Cowork | 실행 코드가 없는 독립 계정 스킬 ZIP | Mac·Windows에서 내보낸 뒤 업로드·활성화하고 아래 계정 지침을 한 번 추가 |
 | Antigravity 대화 애플리케이션 | 소유 범위가 명확한 모듈형 규칙과 스킬 | Apple Silicon Mac·Windows x64; 작업공간 또는 전역 선택 |
 
 Windows 터미널이나 Desktop Code의 Claude Code 네이티브 연동은 이번 릴리스
 범위에서 제외합니다. 계정 콘텐츠는 네이티브 Claude 연동을 설치하지 않습니다.
 [Mac 안내](docs/macos-v1.5.ko.md)와 [Windows 안내](docs/windows-v1.5.ko.md)를 참고하세요.
 
-매번 OpenSocrates 명령을 입력할 필요는 없습니다. 신뢰된 네이티브 훅과
-Antigravity 상시 규칙은 진입 안내를 제공합니다. 계정 스킬은 호스트 모델이
-선택하므로 호출되지 않을 수 있습니다. 설치·불러오기·전체 읽기·실제 적용·
+신뢰된 네이티브 훅과 Antigravity 상시 규칙은 일반 요청에서 진입 안내를
+제공합니다. Claude 계정 스킬은 아래 상시 지침을 추가해 이름을 반복하지 않고
+사용하도록 설정하세요. 선택은 여전히 호스트 모델에 맡겨져 누락될 수 있습니다.
+설치·불러오기·전체 읽기·실제 적용·
 결과의 유용성은 서로 다른 증거이며, 일반적인 품질·토큰 비용·속도 향상을
 주장하지 않습니다.
 
@@ -87,6 +88,27 @@ Claude의 Customize > Skills 화면에서 업로드하고 활성화합니다.
 ```sh
 npx --yes opensocrates@1.5.0 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.0-account.zip
 ```
+
+### Claude Chat·Cowork: 계정 지침을 한 번 추가하기
+
+요청마다 `/opensocrates`를 입력하지 않고 사용하려면 계정 스킬을 켜고
+**Settings → General → Instructions for Claude**에 아래 지침을 추가하세요.
+기존 지침은 보존합니다. 이전 Cowork 화면에서는
+**Settings → Cowork → Global instructions**를 사용합니다. 웹과 Desktop의
+계정이 다르면 사용하는 각 계정에 설정하세요.
+
+```text
+자료 종합, 선택지 비교, 판단, 메시지 작성처럼 해석이나 판단이 필요한
+요청에서는 내가 이름을 언급하지 않아도 활성화된 OpenSocrates 스킬을 먼저
+불러와 그 지침을 따르세요. 적용할 사고 방법의 전체 절차를 읽고 조건을
+확인하세요. 단순 서식 변환 같은 기계적인 작업에는 불필요한 절차를
+추가하지 마세요.
+```
+
+한 번 저장한 뒤 새 대화에서 평소처럼 작업을 요청하세요. 이 지침은 모델의
+스킬 선택을 안내하며 네이티브 훅이나 매 턴 강제 적용을 추가하지 않습니다.
+[단계별 설정 안내](docs/setup-guide.ko.md#claude-standing-instructions)와
+[Claude 공식 지침 설정](https://support.claude.com/en/articles/10185728-understanding-claude-s-personalization-features)을 참고하세요.
 
 플랫폼별 안내에는 Windows 경로, 계정 스킬 교체, 업데이트·비활성화·제거와
 검증한 로컬 파일 사용법을 설명합니다. 로컬 파일 옵션을 생략하면 설치기는
