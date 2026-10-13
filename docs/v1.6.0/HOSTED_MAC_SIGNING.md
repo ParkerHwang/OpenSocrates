@@ -65,12 +65,16 @@ approval policy creation is not execution evidence. / Windows 서명·메타데�
 ## Pre-merge qualification / 병합 전 검증
 
 The separate owner-reviewed `opensocrates-macos-signing-qualification` environment
-allows only `codex/v1.6-go-native` pushes. Scheduling additionally requires
+allows only `codex/v1.6-go-native` pushes through the dedicated
+`macos-signing-qualification.yml` workflow. It emits no normal required-check
+names; normal CI retains its PR and `dev/main` push triggers. Scheduling additionally requires
 `OPENSOCRATES_MAC_SIGNING_QUALIFICATION_ENABLED=true` and a separate
 `OPENSOCRATES_MAC_SIGNING_QUALIFICATION_SHA` equal to the push SHA. Other refs,
 forks and later commits cannot schedule the enabled target. / 후보 환경은 지정
 브랜치 push만 허용하고 같은 직접 승인·우회 금지 조건을 적용합니다. 실행 스위치와
 별도 지정 SHA도 일치해야 하므로 fork·다른 ref·후속 커밋에는 적용되지 않습니다.
+후보 검증은 별도 workflow에서 실행해 일반 필수 검사와 같은 이름의 건너뜀 결과를
+남기지 않습니다. 일반 CI의 PR 및 dev/main push 조건은 유지합니다.
 
 The Go gate checks native hosted execution, repository/branch, clean exact
 source/build identity and owned prepared keychain. It signs/packages, notarizes

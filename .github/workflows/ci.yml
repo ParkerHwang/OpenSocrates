@@ -3,7 +3,7 @@ name: OpenSocrates CI
 on:
   pull_request:
   push:
-    branches: [dev, main, codex/v1.6-go-native]
+    branches: [dev, main]
 
 permissions:
   contents: read
@@ -19,7 +19,6 @@ env:
 jobs:
   source:
     name: Go source and product contracts
-    if: github.event_name != 'push' || github.ref != 'refs/heads/codex/v1.6-go-native'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -63,7 +62,6 @@ jobs:
 
   macos:
     name: Native macOS ARM64
-    if: github.event_name != 'push' || github.ref != 'refs/heads/codex/v1.6-go-native'
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v7
@@ -105,72 +103,4 @@ jobs:
 
   windows:
     name: Native Windows x64 and ARM64
-    if: github.event_name != 'push' || github.ref != 'refs/heads/codex/v1.6-go-native'
     uses: ./.github/workflows/windows.yml
-
-  macos_signing_qualification:
-    name: Mac signing infrastructure qualification
-    if: >-
-      github.event_name == 'push' &&
-      github.repository == 'ParkerHwang/OpenSocrates' &&
-      github.ref == 'refs/heads/codex/v1.6-go-native' &&
-      vars.OPENSOCRATES_MAC_SIGNING_QUALIFICATION_ENABLED == 'true' &&
-      vars.OPENSOCRATES_MAC_SIGNING_QUALIFICATION_SHA == github.sha
-    runs-on: macos-15
-    timeout-minutes: 75
-    environment: opensocrates-macos-signing-qualification
-    permissions:
-      contents: read
-    env:
-      OPENSOCRATES_EXPECTED_SOURCE_SHA: ${{ github.sha }}
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-go@v6
-        with:
-          go-version: "1.27.2"
-          cache: true
-      - name: Execute native source tests before credential access
-        run: go test ./src/opensocrates/...
-      - name: Build exact candidate runtime before credential access
-        run: go run ./src/opensocrates/cmd/opensocrates-dev build --target darwin-arm64 --output dist/runtime
-      - name: Compile reviewed signing tools before credential access
-        id: signing_tool
-        run: go build -trimpath -o build/opensocrates-dev ./src/opensocrates/cmd/opensocrates-dev
-      - name: Prepare temporary candidate signing keychain after owner approval
-        env:
-          OPENSOCRATES_RUNNER_ENVIRONMENT: ${{ runner.environment }}
-          OPENSOCRATES_RUNNER_ARCH: ${{ runner.arch }}
-          OPENSOCRATES_MAC_SIGN_IDENTITY: ${{ vars.OPENSOCRATES_MAC_SIGN_IDENTITY }}
-          OPENSOCRATES_MAC_TEAM_ID: ${{ vars.OPENSOCRATES_MAC_TEAM_ID }}
-          OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE: ${{ vars.OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE }}
-          OPENSOCRATES_MAC_CERTIFICATE_P12_BASE64: ${{ secrets.OPENSOCRATES_MAC_CERTIFICATE_P12_BASE64 }}
-          OPENSOCRATES_MAC_CERTIFICATE_PASSWORD: ${{ secrets.OPENSOCRATES_MAC_CERTIFICATE_PASSWORD }}
-          OPENSOCRATES_NOTARY_APPLE_ID: ${{ secrets.OPENSOCRATES_NOTARY_APPLE_ID }}
-          OPENSOCRATES_NOTARY_APP_PASSWORD: ${{ secrets.OPENSOCRATES_NOTARY_APP_PASSWORD }}
-        run: build/opensocrates-dev macos-signing-prepare --purpose qualification
-      - name: Sign and notarize exact candidate without production publication
-        env:
-          OPENSOCRATES_RUNNER_ENVIRONMENT: ${{ runner.environment }}
-          OPENSOCRATES_RUNNER_ARCH: ${{ runner.arch }}
-          OPENSOCRATES_MAC_SIGN_IDENTITY: ${{ vars.OPENSOCRATES_MAC_SIGN_IDENTITY }}
-          OPENSOCRATES_MAC_TEAM_ID: ${{ vars.OPENSOCRATES_MAC_TEAM_ID }}
-          OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE: ${{ vars.OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE }}
-        run: build/opensocrates-dev macos-signing-qualify
-      - name: Remove candidate credentials and restore keychain search list
-        if: always() && steps.signing_tool.outcome == 'success'
-        run: build/opensocrates-dev macos-signing-cleanup --purpose qualification
-      - name: Retain closed candidate and cleanup evidence
-        if: always() && steps.signing_tool.outcome == 'success'
-        uses: actions/upload-artifact@v7
-        with:
-          name: hosted-macos-signing-candidate-${{ github.sha }}-${{ github.run_id }}
-          path: |
-            dist/opensocrates-v1.6.0-darwin-arm64.zip
-            dist/opensocrates-v1.6.0-darwin-arm64
-            build/evidence/macos-signing-candidate-*.json
-            build/evidence/macos-keychain-cleanup.json
-          if-no-files-found: warn

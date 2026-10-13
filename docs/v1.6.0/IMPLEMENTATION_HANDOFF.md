@@ -158,6 +158,36 @@ Windows에서는 Mac 전용 경로·권한을 가정한 테스트만 Mac 파일�
 검사와 Windows/Linux 호스트 거부 검사를 보존했습니다. 기존 서명 산출물의 소스
 9be0e5e를 후속 테스트·문서 커밋의 실행 결과로 바꾸지 않습니다.
 
+At test/documentation revision `30877e7dec8fb053b760905ad18d68a869114de9`,
+affected local format/lint/docs/governance and `go test
+./src/opensocrates/internal/devtools -run TestMacSigning` passed.
+[CI 38332733383](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38332733383)
+then passed actual source/Mac ARM64/Windows x64/Windows ARM64 jobs without reruns.
+Final inspection also found duplicate source/Mac required-check names emitted as
+skipped by the qualification push run. The qualification job is now moved
+unchanged into its own push-only workflow; normal CI triggers are restored and
+the five protected-main rule names are unchanged. The ambiguity was observed;
+an actual merge bypass was not established. / 30877e7의 후속 소스·3개 플랫폼 CI는
+재실행 없이 통과했습니다. 후보 push가 일반 필수 검사와 같은 건너뜀 이름을 남겨
+후보 작업을 그대로 별도 workflow로 옮겼습니다. 필수 규칙 이름은 유지하며 실제
+병합 우회가 발생했다고 주장하지 않습니다.
+
+The user then authorized using the running Windows VM. A new
+[read-only boundary receipt](evidence/windows-vm-current-user-boundary-20261013.json)
+directly observed native OS/process ARM64, an administrator-effective interactive
+token with default owner different from the user, and QEMU-GA Running. Both
+PowerShell and minimal cmd guest-agent RPC calls timed out; input automation
+and shared-directory output worked. The diagnostic used process-only
+ExecutionPolicy Bypass, with no persistent account/UAC/service/policy changes
+or product execution. This VM boundary does not meet ordinary-user original
+installer qualification. The prior restricted-token helper exit 1 has no
+measured cause; a harness catch label alone does not establish owner refusal.
+/ 사용자가 제공한 VM을 실제 진단했고 ARM64와 관리자 토큰·사용자와 다른 기본
+소유자를 확인했습니다. 내부 명령 연결은 시간 초과였으나 입력과 공유 폴더로 결과를
+받았습니다. 진단 프로세스에만 실행 정책 플래그를 사용했고 계정·UAC·서비스·영구
+정책·제품 설치는 변경하지 않았습니다. 일반 사용자 환경 조건은 아직 충족하지
+못하며 이전 제한 토큰 helper 실패의 구체 원인은 미측정입니다.
+
 ## Remaining release gates
 
 Available implementation acceptance passes; this candidate is **not production-release validated**.
