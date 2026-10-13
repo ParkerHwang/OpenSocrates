@@ -65,7 +65,7 @@ case "$mode" in
             set)
                 [ "$#" -eq 4 ] || pass_through invalid_arguments "$mode" "$host"
                 case "$locale_value" in
-                    en|ko|zh|ja|follow) ;;
+                    en|ko|zh|ja|fr|de|it|es|pt|th|follow) ;;
                     *) pass_through invalid_arguments "$mode" "$host" ;;
                 esac
                 ;;
