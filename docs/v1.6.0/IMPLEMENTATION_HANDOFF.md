@@ -84,6 +84,33 @@ public/live delivery remain separate qualification. / 소스·의미·스키마�
 독립 대조했고 코드·보안 검토에서 수정할 결함은 없었습니다. 새 파일 공증과
 실제 npm 설치기부터의 인수·운영 신뢰·공개 전달은 별도입니다.
 
+Native CI at documentation head `3ff8063` then passed source contracts but
+found three new fixture setup issues: Windows settings/package roots lacked
+explicit protected DACLs, and Mac legacy preparation applied private-file reads
+to public package modes 0644/0755. The ordinary Mac lifecycle steps passed;
+only six legacy fixture preparation cases failed before adoption commands.
+Fix `fdb693c3fef1b7fc766e8876c19343c2f87f9481` creates new owned fixture
+subdirectories through production protection APIs and uses `ReadOwnedFile` only
+for public package payloads, retaining private settings/state reads. Runtime
+ownership, ACL, reparse and unsupported-selector guards are unchanged. /
+원격 검사는 새 시험 폴더의 Windows 권한과 Mac 공개 파일 읽기 준비 오류를
+찾았습니다. 제품 검증을 완화하지 않고 전용 폴더와 적절한 읽기 경계를 사용했습니다.
+
+At `fdb693c`, `make format-check lint`, `make package TARGET=darwin-arm64`,
+`go build -o build/opensocrates-host-fixture
+./src/opensocrates/cmd/opensocrates-host-fixture`, and native
+`go run ./src/opensocrates/cmd/opensocrates-dev acceptance lifecycle --binary
+dist/runtime/darwin-arm64/opensocrates --package dist/native/darwin-arm64
+--host-binary build/opensocrates-host-fixture --report
+build/evidence/native-lifecycle-darwin-arm64.json` all passed. The receipt now
+passes all six v1.5.0/v1.5.1 synthetic adoption/recovery cases as well as ordinary
+lifecycle. `go test ./src/opensocrates/internal/compat
+./src/opensocrates/internal/transport ./src/opensocrates/internal/management
+./src/opensocrates/internal/devtools` passed. Incremental code/security reviews
+found no actionable findings. Native Windows re-execution is still recorded
+through CI at the final pushed head. / 수정 후 실제 Mac 수락과 관련 Go 검사는
+통과했습니다. Windows 실제 결과는 새 소스의 CI에서 기록합니다.
+
 Historical native evidence for the resumed large-payload fix: **bc151afdb9a9d6845906b05ec2efb022961fd45f**. [CI 38239135183](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38239135183) passed source and actual macOS ARM64, Windows x64 and Windows ARM64 execution after the resumed large-payload fix. Git tree `29d6306880d0e09f42b59bdbc78cfbe816ad02c4` matches all three native provenance receipts. The documentation/evidence follow-up does not relabel these observations as a new execution.
 
 Earlier [CI 38219463804](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38219463804) passed source and actual macOS ARM64, Windows x64 and Windows ARM64 execution. The first Windows x64 attempt reached the outer lifecycle acceptance deadline after 30.006 seconds during install, with empty output; the same commit passed when only that failed job was rerun, with unchanged deadlines. This observation does not establish the cause of the initial timeout. Earlier complete native runs [38218166860](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38218166860) at 6011249 and [38216709561](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38216709561) at d156c27 also passed. [Retained receipts](evidence/README.md) keep their original revisions; documentation does not relabel old results.
