@@ -157,6 +157,27 @@ reduction. Actual Windows timing is pending current-head CI in PR #112.
 독립 파일의 내구성 복사를 최대 네 개씩 처리하고 오류 뒤 추가 배정을 멈추며,
 모든 작업 종료 후 기존 검증·복구로 넘어갑니다. 원본과 검사·저장·제한 시간은 유지합니다.
 
+At `d3517cb1899739e5bc58fe1352dd30fd44cb1d77`, full local source/package/security
+checks and focused race checks passed, as did source/native Mac CI and both
+Windows source/ACL suites. Windows initial install still reached the original
+budget at 30,042/30,004 milliseconds, with the same full-bundle operation pending:
+[x64](evidence/v1.5.2-native-install-d351-windows-x64.json),
+[ARM64](evidence/v1.5.2-native-install-d351-windows-arm64.json).
+Bounded copying is therefore not established as a complete timing correction.
+
+The next observation uses separate `acceptance install-profile`: one fresh
+private synthetic initial install, a finite 120-second diagnostic window and
+guarded cleanup after the child joins. It records actual elapsed time, completion
+and `within_original_install_budget` independently. The diagnostic has its own
+schema/status and never a PASS or native-qualification claim. Source-cache state
+and individual operation costs remain unmeasured. Windows CI runs it only after
+the normal lifecycle step fails; the normal 30-second qualification still fails
+honestly. No authentication home, real host/account/scheduler or user installation
+is reused. This is a measurement, not a threshold change or production proof.
+/ 완료 시간을 측정하는 별도 진단은 개인 테스트 폴더에서 초기 설치 한 번만
+최대 120초 관측합니다. 완료와 기존 30초 충족 여부를 구분하고 통과·릴리스
+자격을 주장하지 않습니다. 정상 검증의 실패 판정과 사용자 환경은 그대로입니다.
+
 ## Historical released v1.5.1 reconciliation
 
 The original Go preparation and all revision-3 receipts retain their historical

@@ -47,6 +47,9 @@ func RunAcceptance(args []string, out, errout io.Writer) int {
 	if len(f.Args()) != 0 {
 		return 2
 	}
+	if name == "install-profile" {
+		return runInstallProfile(o, out, errout)
+	}
 	var report map[string]any
 	var e error
 	switch name {
