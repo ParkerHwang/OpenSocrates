@@ -2,7 +2,9 @@ package persistence
 
 import (
 	"bytes"
+	"errors"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/domain"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"os"
@@ -69,30 +71,72 @@ func TestTurnStoreConcurrentMutation(t *testing.T) {
 		t.Fatal(e)
 	}
 	var wg sync.WaitGroup
-	errs := make(chan error, 4)
+	var ready sync.WaitGroup
+	start := make(chan struct{})
+	type mutationResult struct {
+		err       error
+		callbacks int
+	}
+	results := make(chan mutationResult, 4)
+	mutate := func() mutationResult {
+		result := mutationResult{}
+		result.err = store.WithTurn(token, func(state map[string]any) (map[string]any, bool, error) {
+			result.callbacks++
+			n, _ := contracts.Int(state["repair_count"])
+			state["repair_count"] = contracts.Number(n)
+			observations := state["observation_tags"].([]any)
+			tag := "sha256:" + strings.Repeat(string(rune('a'+len(observations))), 64)
+			return state, false, domain.AppendObservationTag(state, tag)
+		})
+		return result
+	}
 	for i := 0; i < 4; i++ {
 		wg.Add(1)
+		ready.Add(1)
 		go func() {
 			defer wg.Done()
-			errs <- store.WithTurn(token, func(state map[string]any) (map[string]any, bool, error) {
-				n, _ := contracts.Int(state["repair_count"])
-				state["repair_count"] = contracts.Number(n)
-				observations := state["observation_tags"].([]any)
-				tag := "sha256:" + strings.Repeat(string(rune('a'+len(observations))), 64)
-				return state, false, domain.AppendObservationTag(state, tag)
-			})
+			ready.Done()
+			<-start
+			results <- mutate()
 		}()
 	}
+	ready.Wait()
+	close(start)
 	wg.Wait()
-	close(errs)
-	for e := range errs {
-		if e != nil {
-			t.Fatal(e)
+	close(results)
+	accepted, rejected := 0, 0
+	for result := range results {
+		if result.err == nil && result.callbacks == 1 {
+			accepted++
+			continue
 		}
+		var locked *diagnostics.Error
+		if !errors.As(result.err, &locked) || locked.Code != diagnostics.Locked || locked.Stage != "lock" || result.callbacks != 0 {
+			t.Fatal("concurrent mutation failed outside the bounded lock contract", result.err)
+		}
+		rejected++
 	}
 	state, e := store.Load(token)
+	if accepted == 0 || e != nil || len(state["observation_tags"].([]any)) != accepted {
+		t.Fatal("accepted concurrent mutation lost or rejected mutation applied", e)
+	}
+	// Production locks deliberately stop waiting after 500ms. After all first
+	// contenders join, finish each rejected operation once, sequentially in this
+	// test only; no production retry or longer lock deadline is introduced.
+	for i := 0; i < rejected; i++ {
+		result := mutate()
+		if result.err != nil || result.callbacks != 1 {
+			t.Fatal("uncontended mutation failed after bounded contention", result.err)
+		}
+	}
+	state, e = store.Load(token)
 	if e != nil || len(state["observation_tags"].([]any)) != 4 {
 		t.Fatal("lost concurrent mutation", e)
+	}
+	for i, tag := range state["observation_tags"].([]any) {
+		if tag != "sha256:"+strings.Repeat(string(rune('a'+i)), 64) {
+			t.Fatal("concurrent mutation duplicated or reordered a stored tag")
+		}
 	}
 }
 func TestTurnStatePrivacyAndUnknownFields(t *testing.T) {

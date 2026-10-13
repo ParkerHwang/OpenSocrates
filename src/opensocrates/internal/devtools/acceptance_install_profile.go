@@ -23,7 +23,8 @@ const originalInstallBudget = 30 * time.Second
 const installProfileFixturePrefix = "opensocrates-native-acceptance-install-profile-"
 
 // nativeInstallProfile is an independent single-install timing diagnostic. Its
-// success cannot qualify the unchanged nativeLifecycleAcceptance 30-second gate.
+// success cannot qualify nativeLifecycleAcceptance; the 30-second comparison
+// records the historical generic command window independently of qualification.
 // As in that gate, all developer inputs are copied into a newly owned private
 // fixture before the timed install. Source cache state is not measured.
 func nativeInstallProfile(o acceptanceOptions) (report map[string]any, profileError error) {

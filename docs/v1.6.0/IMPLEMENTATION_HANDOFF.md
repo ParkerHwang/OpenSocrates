@@ -38,16 +38,16 @@ v1.5.0/v1.5.1 package coverage remains versioned, without silently relabeling it
 
 Local source, generation, package and installer tests passed at
 `76e67c7ce976fbf319191e460bac6db21f179ebe`, on macOS ARM64 / Go 1.27.2.
-Exact commands and the independent source audit are recorded below. Final native
-CI and the bounded test-only cost correction are still being verified.
+Exact commands and the independent source audit are recorded below. Latest native
+CI results and the measured command-budget correction are recorded below.
 
-Not verified at this documentation stage: new native CI, authentic v1.5.2 npm-installer adoption, new artifact
+Not verified at this documentation stage: complete native Windows qualification, authentic v1.5.2 npm-installer adoption, new artifact
 signing/notarization, production trust/public update transport, clean-machine or
 actual-host delivery. Prior successful d297b76 CI and earlier hosted Mac Accepted
 receipts remain historical and do not qualify the current revision-5 artifacts.
 PR #112 records the final exact head, commands and CI results after completion.
 
-Next: verify the bounded test-only correction and final native acceptance. Keep the protected-main required-check
+Next: verify final native acceptance. Keep the protected-main required-check
 transition and any release deployment under the user's existing approval rules.
 No merge, tag, publication or active installation replacement follows from this
 reconciliation. Method-body upgrades remain v1.6.1+ and native Windows Claude
@@ -177,6 +177,45 @@ is reused. This is a measurement, not a threshold change or production proof.
 / 완료 시간을 측정하는 별도 진단은 개인 테스트 폴더에서 초기 설치 한 번만
 최대 120초 관측합니다. 완료와 기존 30초 충족 여부를 구분하고 통과·릴리스
 자격을 주장하지 않습니다. 정상 검증의 실패 판정과 사용자 환경은 그대로입니다.
+
+### Measured installation and scoped acceptance budgets
+
+[CI 38412234956](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38412234956)
+at `493cc26f31a85ba378f2abd944abe98a2a7b972c` passed source and native Mac checks.
+Windows x64 [normal acceptance](evidence/v1.5.2-native-lifecycle-493-windows-x64.json)
+reached its historical 30-second deadline. Its separate
+[diagnostic](evidence/v1.5.2-native-install-profile-493-windows-x64.json)
+completed an actual native installation in 35,449 milliseconds: 1,647 declared
+files / 83,093,585 bytes, committed state, preserved foreign sentinel and verified
+private-fixture cleanup. All diagnostic qualification flags remain false.
+The fresh private evidence child retained this report. The earlier unavailable
+writer's precise failure cause was not measured; a particular DACL condition is
+not established by that failure.
+
+Windows ARM64 failed `TestTurnStoreConcurrentMutation` with the typed `locked`
+result before packaging or native acceptance. Its completion time is unmeasured.
+The same test had previously failed on x64. The production lock deliberately
+stops waiting after 500 milliseconds; concurrent acceptance must not require
+every competing caller to acquire that bounded lock.
+The corrected test starts four actual contenders together, accepts only success
+or exact typed `Locked`/`lock` rejection before any callback, and verifies the
+persisted tag count equals successful calls before retry. Once all contenders
+join, each rejected operation runs once sequentially in the test, with exactly
+four unique final tags. Production locking and retries remain unchanged.
+
+The 30-second value was a generic outer acceptance-command timeout, not a
+documented installation latency SLA. The scoped correction gives only initial
+install and full-bundle offline update a finite 60-second acceptance window.
+Status, diagnose, remove and recovery retain their existing budgets; hook and
+selector runtime deadlines, source/OS guards, durable writes, rollback and all
+acceptance assertions remain unchanged. Each command receipt records elapsed
+time and its applied budget on success and failure. Historical failures remain
+failures. Final qualification requires a new complete lifecycle run on Mac,
+Windows x64 and native ARM64, not promotion of the independent timing diagnostic.
+/ x64에서 실제 설치는 35.449초에 완료됐으며 진단은 릴리스 통과를 주장하지
+않습니다. 설치·전체 번들 업데이트 검사만 최대 60초로 구분하고 나머지 명령과
+제품 실행 제한은 유지합니다. 새 실행의 설치·비활성 보존·제거·복구 결과로
+판정하며, ARM64는 동시 잠금 시험 실패로 이번 설치 시간을 관측하지 못했습니다.
 
 ## Historical released v1.5.1 reconciliation
 

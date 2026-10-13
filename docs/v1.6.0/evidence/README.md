@@ -32,6 +32,15 @@ Native CI evidence is linked from the [implementation handoff](../IMPLEMENTATION
 Each workflow uploads receipts and build artifacts with exact source provenance.
 Production trust, platform signing and live activation remain separate gates.
 
+Released v1.5.2 reconciliation at `493cc26` retains the actual
+[Windows x64 lifecycle deadline](v1.5.2-native-lifecycle-493-windows-x64.json)
+and a separate [single-install diagnostic](v1.5.2-native-install-profile-493-windows-x64.json).
+The diagnostic completed in 35,449ms with private cleanup and foreign-state
+preservation, but exceeded the historical 30-second command window and claims
+no native qualification. ARM64 stopped in source concurrency tests in that run;
+no ARM64 installation result is inferred. New command budgets and final native
+results belong to their own source/receipt identities in the implementation handoff.
+
 The resumed fix at **bc151afdb9a9d6845906b05ec2efb022961fd45f** passed all
 source/macOS ARM64/Windows x64/Windows ARM64 jobs in
 [CI 38239135183](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38239135183).

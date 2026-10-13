@@ -23,6 +23,16 @@ import (
 	"time"
 )
 
+// Full ten-language owned-bundle installation measured 35,449ms on native
+// Windows x64. Give only installation and bundle update a finite 60-second
+// acceptance window; this is not a product latency SLA or a hook timeout.
+func nativeLifecycleCommandBudget(name string) time.Duration {
+	if name == "native_install" || name == "offline_update_same_bundle" {
+		return 60 * time.Second
+	}
+	return 30 * time.Second
+}
+
 func nativeLifecycleAcceptance(o acceptanceOptions) (map[string]any, error) {
 	target := nativeAcceptanceTarget()
 	report := map[string]any{"target": target, "evidence_scope": "isolated_native_fixture", "live_host_delivery_claimed": false, "user_installation_modified": false, "production_signing_claimed": false, "cases": map[string]any{}, "required_external_evidence": []string{"real_host_trust_and_activation", "production_signing_and_timestamping", "actual_clean_machine", "native_scheduler_activation", "signed_network_update_and_self_update"}}
@@ -82,20 +92,22 @@ func nativeLifecycleAcceptance(o acceptanceOptions) (map[string]any, error) {
 	cases := report["cases"].(map[string]any)
 	allPass := true
 	run := func(name string, args ...string) bool {
-		commandContext, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		budget := nativeLifecycleCommandBudget(name)
+		commandContext, cancel := context.WithTimeout(context.Background(), budget)
 		started := time.Now()
 		child, e := platform.Run(commandContext, binary, args, platform.RunOptions{Env: env, Dir: work, Stdin: bytes.NewReader(nil), OutputLimit: 8 << 20})
+		elapsed := time.Since(started)
 		deadlineExceeded := commandContext.Err() == context.DeadlineExceeded
 		cancel()
-		passed := e == nil && len(child.Stderr) == 0
-		result := map[string]any{"pass": passed}
-		if e != nil {
+		passed := e == nil && child.ExitCode == 0 && len(child.Stderr) == 0 && !deadlineExceeded
+		result := map[string]any{"pass": passed, "elapsed_ms": elapsed.Milliseconds(), "command_budget_ms": budget.Milliseconds()}
+		if e != nil || child.ExitCode != 0 || deadlineExceeded {
 			result["failure_stage"] = "command_exit_or_deadline"
 		} else if len(child.Stderr) != 0 {
 			result["failure_stage"] = "unexpected_content_free_diagnostic"
 		}
 		if !passed {
-			result["diagnostic"] = acceptanceLifecycleCommandDiagnostic(child, e, time.Since(started), deadlineExceeded, name)
+			result["diagnostic"] = acceptanceLifecycleCommandDiagnostic(child, e, elapsed, deadlineExceeded, name)
 			if name == "native_install" {
 				result["owned_fixture_observation"] = acceptanceInstallFailureObservation(tmp)
 			}
