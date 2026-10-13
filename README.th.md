@@ -1,121 +1,153 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
+  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="320">
 </p>
 
 # OpenSocrates
 
-**ช่วยคิดอย่างมีเหตุผล เพื่อผลลัพธ์ที่คุณเข้าใจ ประเมิน และนำไปใช้ได้**
+**นำวิธีคิด 48 วิธีมาใช้ในการสนทนากับ AI ของคุณ**
 
-OpenSocrates มีวิธีคิด 48 วิธีสำหรับการสังเคราะห์แหล่งข้อมูล เข้าใจมุมมอง
-เปรียบเทียบทางเลือก และเขียนข้อความที่ใช้ได้จริง รุ่น 1.5.2 เพิ่มภาษาไทย (`th`)
-ฝรั่งเศส เยอรมัน อิตาลี สเปน และโปรตุเกส จากเดิมที่มีอังกฤษ เกาหลี จีนตัวย่อ และญี่ปุ่น
-รวมสิบภาษา มีไฟล์ขั้นตอนฉบับเต็ม 480 ไฟล์ กรณีตัวอย่างมาตรฐาน 3,840 กรณี
-และคำถามสำหรับเอเจนต์ 1,440 ข้อ โดยมีสามข้อต่อวิธีต่อภาษา รุ่นแก้ไขเนื้อหาเป็น 5
-ข้อความและค่าของสี่ภาษาเดิมยังคงเดิม แต่หมายเลขรุ่นแก้ไขของแต่ละวิธีเปลี่ยนจาก 4 เป็น 5
-รุ่นนี้ไม่เพิ่มวิธีเฉพาะทางสำหรับการเขียนโปรแกรม
+OpenSocrates มีขั้นตอนการคิดที่นำกลับมาใช้ได้สำหรับ **Claude, Codex และ
+Antigravity** เปรียบเทียบทางเลือก ทำความเข้าใจข้อมูลที่ขัดแย้งกัน และมองแผนจากอีกมุม
+เล่างานด้วยคำพูดของคุณเอง แต่ละวิธีมีคำถาม จุดตรวจสอบ และขั้นตอนให้หยิบมาใช้
 
-[English](README.md) | [한국어](README.ko.md) | [简体中文](README.zh.md) | [日本語](README.ja.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | **ไทย**
+[เริ่มจากแอปที่คุณใช้](#start-with-your-app) · [ดูตัวอย่าง](#see-it-in-a-task) · [สำรวจวิธีคิด](#a-method-for-the-question)
 
-## แอปและแพลตฟอร์มที่รองรับ
+**48 วิธีคิด · คำแนะนำ 10 ภาษา · สัญญาอนุญาต MIT**
 
-| แอป | รูปแบบการส่งมอบ | แพลตฟอร์มและการเปิดใช้งาน |
-| --- | --- | --- |
-| Codex | ฮุกเดิมและรันไทม์ตัดสินใจแบบเนทีฟ | Mac Apple Silicon และ Windows x64; ตรวจสอบความเชื่อถือของฮุก 7 รายการในเซสชันโต้ตอบ |
-| Claude Code CLI / Code แบบ Local ใน Desktop | จุดเข้าเนทีฟที่ไม่เก็บสถานะและเอกสารอ้างอิงฉบับเต็ม | Mac Apple Silicon; ต้องมี Claude CLI การเข้าสู่ระบบ และสิทธิ์ปลั๊กอิน/ฮุก |
-| Claude Web / Desktop Chat / Cowork | สกิลบัญชีเป็น ZIP ที่ไม่มีโค้ดเรียกทำงาน | ส่งออกบน Mac หรือ Windows แล้วอัปโหลดและเปิดใช้ในบัญชีแยกต่างหาก |
-| Antigravity | กฎและสกิลแบบโมดูล | Mac Apple Silicon และ Windows x64; เลือกขอบเขตเวิร์กสเปซหรือส่วนกลาง |
+[English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh.md) · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · **ไทย**
 
-ขอบเขตแพลตฟอร์มยังเหมือน v1.5.0 และไม่รวม Claude Code แบบเนทีฟบน Windows
-การรองรับ Windows ARM64 และการย้ายไป Go เป็นงานแยกของ v1.6.0
-สกิลบัญชีไม่ได้ติดตั้งการเชื่อมต่อ Claude แบบเนทีฟ
+## เครื่องมือคิดสำหรับงานตรงหน้า
 
-## ติดตั้งหรืออัปเดต
+- **เริ่มจากงานของคุณ** แต่ละวิธีมีคำถามและจุดตรวจสอบที่เขียนไว้แล้ว พร้อมใช้ซ้ำในบทสนทนาต่างๆ
+- **หามุมมองที่ช่วยงาน** เลือกใช้วิธีสำหรับเปรียบเทียบทางเลือก ประเมินหลักฐาน สำรวจสมมติฐาน และวางแผนล่วงหน้า
+- **ปรับให้เข้ากับงานของคุณ** อ่านขั้นตอนทุกวิธี ศึกษาตัวอย่าง และปรับเนื้อหาโอเพนซอร์สให้เหมาะกับงาน
 
-เตรียม Node.js 20 ขึ้นไป ติดตั้งและเข้าสู่ระบบแอปที่ต้องการ รันไทม์เนทีฟรวมอยู่แล้ว
-จึงไม่ต้องติดตั้ง Python เพิ่ม ดาวน์โหลดไฟล์และค่า SHA-256 ได้จาก
-[หน้าเผยแพร่ v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
+<a id="see-it-in-a-task"></a>
+
+## ลองใช้กับงานจริง
+
+หลังตั้งค่าแล้ว ลองถามแบบนี้:
+
+> เรากำลังจะซื้อเครื่องมือที่ให้บริการบนคลาวด์ แต่ตอนนี้งานต้องทำแบบออฟไลน์
+> ควรซื้อ สร้างเครื่องมือเอง หรือทำด้วยมือไปก่อน?
+
+สำหรับการตัดสินแบบนี้ [การวิเคราะห์ข้อแลกเปลี่ยน](content/methods/trade-off-analysis/procedure.th.md)
+มีลำดับขั้นที่ใช้ซ้ำได้: ระบุข้อกำหนด เปรียบเทียบทางเลือกที่ทำได้ แยกข้อเท็จจริงที่รู้
+ออกจากสมมติฐาน และอธิบายว่าอะไรจะเปลี่ยนคำแนะนำ วิธีนี้ให้โครงสร้างดังกล่าว
+สำหรับใช้ร่วมกับคำขอที่คุณถามตามปกติ
+
+<a id="start-with-your-app"></a>
+
+## เริ่มจากแอปที่คุณใช้
+
+เลือกแอปที่คุณต้องการใช้ OpenSocrates
+[ดาวน์โหลด v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
+
+<details>
+<summary><strong>Claude Chat และ Cowork</strong> — อัปโหลดสกิลแล้วเริ่มสนทนา</summary>
+
+สำหรับ Claude บนเว็บ, Desktop Chat และ Cowork:
+
+1. เปิด **Code execution and file creation** ใน **Settings → Capabilities** หากองค์กรดูแลบัญชีของคุณ ให้ยืนยันว่านโยบายองค์กรอนุญาตให้ใช้ Skills และเรียกใช้โค้ด
+2. ดาวน์โหลด [ZIP สกิลบัญชี](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip) และ [ไฟล์ SHA-256](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256)
+3. เปิด **Customize → Skills → + → Create skill → Upload a skill** อัปโหลด ZIP และเปิดใช้สกิล สำรองสกิล OpenSocrates เดิมก่อนแทนที่
+4. เพิ่ม [คำแนะนำบัญชีหนึ่งครั้ง](docs/setup-guide.md#claude-standing-instructions) ในแต่ละบัญชี Claude ที่คุณใช้ โดยคงคำแนะนำเดิมไว้ เริ่มบทสนทนาใหม่และเล่างานที่ต้องการทำ
+
+ZIP สกิลแบบพกพามีวิธีคิดและตัวอย่างฉบับเต็ม
+[คู่มือตั้งค่าพร้อมภาพ](docs/setup-guide.md#2-claude-account-skill-enable-it-and-add-account-instructions) · [คู่มือ Skills ของ Claude](https://support.claude.com/en/articles/12512180-use-skills-in-claude)
+
+</details>
+
+<details>
+<summary><strong>Claude Code</strong> — Mac Apple Silicon</summary>
+
+คุณต้องมี [Node.js 20+](https://nodejs.org/en/download), Claude CLI และบัญชี Claude
+ที่เข้าสู่ระบบแล้ว ใช้ได้กับ Claude Code ในเทอร์มินัลและ Code แบบ local ใน
+Claude Desktop เรียกคำสั่งใน **Terminal**:
+
+```sh
+npx --yes opensocrates@1.5.2 install --host claude
+npx --yes opensocrates@1.5.2 diagnose --host claude
+```
+
+ยืนยัน `enabled: true`, `integrity: verified` และ `registration: confirmed`
+ตรวจคำขอความเชื่อถือของโปรเจกต์ที่ปรากฏ แล้วเริ่มเซสชัน local ใหม่
+[คู่มือตั้งค่าพร้อมภาพ](docs/setup-guide.md#3-claude-code-check-the-local-mac-plugin)
+
+</details>
+
+<details>
+<summary><strong>Codex</strong> — Mac Apple Silicon หรือ Windows x64</summary>
+
+คุณต้องมี [Node.js 20+](https://nodejs.org/en/download) และ Codex รันไทม์เนทีฟ
+รวมอยู่ในแพ็กเกจแล้ว เรียกคำสั่งใน **Terminal บน Mac** หรือ **PowerShell บน Windows**:
 
 ```sh
 npx --yes opensocrates@1.5.2 install --host codex
 npx --yes opensocrates@1.5.2 status --host codex
+```
+
+เปิด Codex แบบโต้ตอบและพิมพ์ `/hooks` ในช่องรับข้อความ ตรวจและอนุมัติข้อกำหนด
+ฮุก OpenSocrates ทั้งเจ็ดรายการที่คุณเชื่อถือ แล้วเริ่มบทสนทนาใหม่
+[คู่มือตั้งค่าพร้อมภาพ](docs/setup-guide.md#1-codex-review-and-approve-opensocrates-hooks)
+
+หากต้องการอัปเดตการติดตั้ง Codex ที่มีอยู่:
+
+```sh
 npx --yes opensocrates@1.5.2 update --host codex
 ```
 
-หากมีการติดตั้งอยู่แล้ว ให้ใช้ `update` แทน `install` เปิด `/hooks` ใน Codex
-แบบโต้ตอบ ตรวจสอบฮุก OpenSocrates ทั้ง 7 รายการ และอนุมัติรายการที่ต้องการผ่าน
-ระบบความเชื่อถือของแอป จากนั้นเริ่มบทสนทนาใหม่ `status` แสดงสถานะการติดตั้ง
-และความถูกต้องของไฟล์ แต่ไม่ได้ยืนยันการอนุมัติฮุกหรือการนำวิธีไปใช้จริง
+</details>
 
-สำหรับ Claude Code บน Mac Apple Silicon ใช้ `install --host claude`
-สำหรับ Antigravity ให้เลือกโฟลเดอร์เวิร์กสเปซที่มีอยู่ด้วยพาธแบบเต็ม หากไม่ใส่
-`--workspace` จะใช้ขอบเขตส่วนกลาง หลีกเลี่ยงการเปิดใช้ทั้งสองขอบเขตซ้ำในงานเดียวกัน
-บน Windows ใช้พาธไดรฟ์ภายในเครื่องและครอบด้วยเครื่องหมายคำพูด เช่น
-`"C:\Work\Reading Workshop"`
+<details>
+<summary><strong>Antigravity</strong> — Mac Apple Silicon หรือ Windows x64</summary>
+
+คุณต้องมี [Node.js 20+](https://nodejs.org/en/download) เลือกเวิร์กสเปซและแทนพาธ
+ในตัวอย่างด้วยพาธเต็มของโฟลเดอร์ที่มีอยู่แล้ว เรียกคำสั่งใน **Terminal บน Mac**
+หรือ **PowerShell บน Windows**:
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host claude
-npx --yes opensocrates@1.5.2 install --host antigravity --workspace /absolute/path/to/workspace
-npx --yes opensocrates@1.5.2 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.2-account.zip
+npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
 ```
 
-ส่งออกสกิลบัญชีเป็นไฟล์ ZIP ด้วยพาธแบบเต็มในโฟลเดอร์ที่มีอยู่ แล้วอัปโหลดและเปิดใช้
-ใน Claude ที่ **Customize → Skills** ก่อนแทนที่สกิล OpenSocrates เดิม ให้สำรองไฟล์
-และบันทึกสถานะเปิดใช้งาน การส่งออกสำเร็จไม่ได้แปลว่าอัปโหลด เปิดใช้ หรือถูกเลือกโดย
-อัตโนมัติแล้ว เพิ่มคำสั่งต่อไปนี้ใน **Settings → General → Instructions for Claude**
-โดยเก็บคำสั่งเดิมไว้:
+บน Windows ใช้พาธไดรฟ์ในเครื่องที่ครอบด้วยเครื่องหมายคำพูด เช่น
+`"C:\Work\Reading Workshop"` หากต้องการตั้งค่าแบบส่วนกลาง ให้ละ `--workspace`
+เลือกติดตั้งแบบส่วนกลางหรือในเวิร์กสเปซสำหรับโปรเจกต์นั้น แล้วเริ่มบทสนทนาใหม่
+[ตรวจสกิลและกฎ](docs/setup-guide.md#4-antigravity-check-both-the-skill-and-rule)
 
-```text
-สำหรับคำขอที่ต้องตีความหรือใช้วิจารณญาณ เช่น สังเคราะห์แหล่งข้อมูล เปรียบเทียบ
-ทางเลือก ตัดสินใจ หรือเขียนข้อความ ให้โหลดสกิล OpenSocrates ที่เปิดใช้อยู่และทำตาม
-คำสั่ง แม้ฉันจะไม่ได้เอ่ยชื่อ ก่อนใช้วิธีคิดให้อ่านขั้นตอนทั้งหมดและตรวจสอบเงื่อนไข
-การใช้ อย่าเพิ่มขั้นตอนที่ไม่จำเป็นให้กับงานเชิงกล เช่น การจัดรูปแบบ
-```
+</details>
 
-ใน Cowork รุ่นเก่าใช้ **Settings → Cowork → Global instructions** หาก Web
-และ Desktop ใช้คนละบัญชี ให้ตั้งค่าแต่ละบัญชีแล้วเริ่มบทสนทนาใหม่ โมเดลเป็นผู้เลือก
-สกิลและอาจไม่เลือก คำสั่งนี้ไม่ได้เพิ่มฮุกเนทีฟหรือรับประกันการใช้ทุกข้อความ
-ค่าเริ่มต้นและ `--host all` ยังคงเลือกเฉพาะ Codex
+**ให้เอเจนต์ช่วยตั้งค่า?** ใช้ [ข้อความขอให้ตั้งค่า](docs/setup-guide.md#ask-an-agent-to-finish-setup)
+หรือ [คู่มือติดตั้งปัจจุบัน](docs/agent-discovery.md) เลือกแต่ละแอปด้วยตัวเลือก
+`--host` ตามชื่อแอป ค่าเริ่มต้นและ `--host all` เลือก Codex
 
-## เลือกภาษาของคำสั่งวิธีคิด
+<a id="a-method-for-the-question"></a>
 
-ภาษาไทยตรวจได้จากอักษรไทยที่มีจำนวนมากกว่าอักษรกลุ่มอื่น แต่คุณสามารถระบุภาษา
-หรือบันทึกค่าที่ต้องการได้โดยตรง จากโฟลเดอร์หลักของแพ็กเกจ Codex ที่ติดตั้งบน Mac:
+## วิธีคิดที่เหมาะกับคำถาม
 
-```sh
-bin/launch.sh locale codex set th
-bin/launch.sh locale codex get
-bin/launch.sh locale codex reset
-```
+| งานที่คุณกำลังทำ | วิธีคิดที่ลองศึกษาได้ |
+| --- | --- |
+| เลือกระหว่างทางเลือกที่มีลำดับความสำคัญต่างกัน | [การวิเคราะห์ข้อแลกเปลี่ยน](content/methods/trade-off-analysis/procedure.th.md) |
+| ทำความเข้าใจสิ่งที่แผนถือเป็นสมมติฐานตั้งต้น | [การทำแผนผังสมมติฐาน](content/methods/assumption-mapping/procedure.th.md) |
+| ชั่งน้ำหนักหลักฐานรองรับข้ออ้าง | [การคิดเชิงวิพากษ์](content/methods/critical-thinking/procedure.th.md) |
+| เตรียมรับสิ่งที่อาจผิดพลาดในแผน | [การวิเคราะห์ความล้มเหลวล่วงหน้า](content/methods/premortem-analysis/procedure.th.md) |
 
-บน Windows ใช้ `node bin/launch.mjs locale codex set th`
-`set follow` หรือ `reset` ล้างเฉพาะค่าภาษาที่บันทึกไว้ ค่านี้ใช้กับตัวเลือกวิธีเดิม
-คำขอตัดสินใจที่ไม่เก็บสถานะต้องระบุฟิลด์ JSON `locale` และไม่อ่านค่าที่บันทึกไว้
-แพ็กเกจบัญชีหรือเนื้อหาใช้คู่มือและเอกสารอ้างอิงของภาษานั้น
+แต่ละวิธีมีวัตถุประสงค์ เงื่อนไขการใช้ ขั้นตอนฉบับเต็ม ตัวอย่าง และคำถามสำหรับผู้ช่วย
+สำรวจเนื้อหา ทำตามขั้นตอนการคิด และนำวิธีกลับมาใช้ในงานต่างๆ
 
-ลำดับคือภาษาที่ระบุอย่างเชื่อถือได้ ค่าที่บันทึกไว้ แล้วจึงตรวจอักษรของข้อมูลปัจจุบัน
-หากมีคานะจะเลือกญี่ปุ่นก่อน มิฉะนั้นกลุ่มอักษรไทย ฮันกึล หรือฮั่นที่มีจำนวนมากที่สุด
-จะเลือกไทย เกาหลี หรือจีนตามลำดับ หากเสมอกัน ว่าง หรือเป็นอักษรที่ไม่รู้จัก จะใช้อังกฤษ
-ภาษาฝรั่งเศส เยอรมัน อิตาลี สเปน และโปรตุเกสใช้อักษรละตินร่วมกัน จึงต้องระบุหรือ
-บันทึกภาษา ไม่คาดเดาจากอักษร ญี่ปุ่นที่มีแต่คันจิต้องระบุ `ja` โปรตุเกสใช้รหัส `pt`
-และการสะกดแบบบราซิล ไม่อ้างว่ารองรับทุกภูมิภาคแยกกัน ภาษาของคำสั่ง คำตอบ
-หน้าจอแอป และข้อความตัวติดตั้ง npm เป็นคนละส่วน ตัวติดตั้งไม่มีตัวเลือก `--locale`
+[ดูวิธีคิดทั้งหมด 48 วิธี](content/methods/)
 
-## การระบุที่มา ความเป็นส่วนตัว และข้อจำกัด
+## เนื้อหาวิธีคิดฉบับเต็มในสิบภาษา
 
-บรรทัดสุดท้ายที่เขียนตรงตัวว่า `Powered by OpenSocrates` ใช้เฉพาะเมื่ออ่านวิธี
-มาตรฐานที่เข้าเงื่อนไขครบแล้ว และนำไปใช้จริงกับคำตอบ การใช้เพียงคำแนะนำการอ่าน
-หรืองานเชิงกลไม่เข้าเงื่อนไข บรรทัดนี้ระบุที่มา ไม่ได้พิสูจน์การใช้แบบเนทีฟหรือคุณภาพที่ดีขึ้น
+อังกฤษ เกาหลี จีนตัวย่อ ญี่ปุ่น ฝรั่งเศส เยอรมัน อิตาลี สเปน โปรตุเกส และไทย
+ทุกภาษามีขั้นตอนและตัวอย่างฉบับเต็มสำหรับทั้ง 48 วิธี
 
-เส้นทางตัดสินใจเริ่มต้นไม่เรียกโมเดลเลือกวิธีเพิ่ม และไม่เก็บพรอมป์ต์ดิบ บทสนทนา
-ภาพหน้าจอ หรือการให้เหตุผลที่ซ่อนอยู่ จุดเข้า Claude แบบเนทีฟไม่อ่านบทสนทนา
-และไม่สร้างฐานข้อมูล คำขอทั่วไปยังอยู่ภายใต้การยืนยันตัวตน สิทธิ์ การเก็บรักษา และ
-ข้อกำหนดของแอป การติดตั้ง โหลด อ่านครบ นำไปใช้ และผลลัพธ์ที่มีประโยชน์เป็นหลักฐาน
-คนละระดับ ไม่มีการอ้างว่าคุณภาพ ค่าใช้จ่าย หรือความเร็วดีขึ้นในทุกกรณี
+นี่คือภาษาของเนื้อหาวิธีคิดที่ผู้ช่วยของคุณอ่าน
+[คู่มือภาษา](docs/v1.5.2.md) · [ตั้งค่าภาษาของคำแนะนำใน Codex](docs/settings.md)
 
-อ่าน [คู่มือภาษา](docs/v1.5.2.md), [การตั้งค่า](docs/settings.md),
-[คู่มือตั้งค่าพร้อมภาพ](docs/setup-guide.md) และ [นโยบายความปลอดภัย](SECURITY.md)
-คู่มือ [Mac](docs/macos-v1.5.md) และ [Windows](docs/windows-v1.5.md) เก็บหลักฐาน
-ในอดีตไว้ ให้ใช้คำสั่งรุ่น 1.5.2 ในหน้านี้สำหรับรุ่นปัจจุบัน
+## โอเพนซอร์สที่พร้อมให้สำรวจ
 
-OpenSocrates เป็นโครงการอิสระภายใต้ [สัญญาอนุญาต MIT](LICENSE) ไม่ได้เป็นส่วนหนึ่ง
-หรือได้รับการรับรองจาก OpenAI, Anthropic หรือ Google [ประวัติการเปลี่ยนแปลง](CHANGELOG.md)
+อ่านวิธีคิดและซอร์สฉบับเต็ม ปรับให้เข้ากับงาน หรือร่วมเพิ่มตัวอย่างใหม่
+OpenSocrates เป็นโครงการอิสระภายใต้ [สัญญาอนุญาต MIT](LICENSE)
+
+[รุ่นที่เผยแพร่](https://github.com/ParkerHwang/OpenSocrates/releases) · [คู่มือตั้งค่า](docs/setup-guide.md) · [ความเป็นส่วนตัวและความปลอดภัย](SECURITY.md) · [ร่วมพัฒนา](CONTRIBUTING.md) · [แจ้งปัญหา](https://github.com/ParkerHwang/OpenSocrates/issues/new/choose) · [ประวัติการเปลี่ยนแปลง](CHANGELOG.md)

@@ -1,178 +1,151 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
+  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="320">
 </p>
 
 # OpenSocrates
 
-**Reasoning help for results you can understand, judge, and use.**
+**Put 48 reasoning methods to work in your AI conversations.**
 
-OpenSocrates brings 48 authored reasoning methods into the task you are already
-doing: synthesize evidence, understand stakeholder perspectives, compare choices,
-and write useful messages. The original English/Korean procedures remain intact.
-The v1.5 reader guides connect conclusions to context and next actions;
-dedicated coding-specialist features are outside this version.
+OpenSocrates brings reusable reasoning procedures to **Claude, Codex and
+Antigravity**. Compare choices, make sense of conflicting information, and explore
+a plan from another angle. Describe your task in your own words; the methods
+provide questions, checks and steps to draw on.
 
-**English** | [한국어](README.ko.md) | [简体中文](README.zh.md) | [日本語](README.ja.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | [ไทย](README.th.md)
+[Start with your app](#start-with-your-app) · [See an example](#see-it-in-a-task) · [Explore the methods](#a-method-for-the-question)
 
-**For agents finding tools:** [Assess task fit, choose a released package and verify setup](docs/agent-discovery.md).
+**48 methods · 10 instruction languages · MIT licensed**
 
-[![CI](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml/badge.svg)](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+**English** · [한국어](README.ko.md) · [简体中文](README.zh.md) · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [ไทย](README.th.md)
 
-## v1.5.2 on Mac and Windows
+## A toolkit for the work in front of you
 
-Version 1.5.2 adds French (`fr`), German (`de`), Italian (`it`), Spanish (`es`),
-Portuguese (`pt`) and Thai (`th`) reasoning instructions to the existing English,
-Korean, Simplified Chinese and Japanese, across all four host profiles. It preserves the v1.5.0 platform scope: Apple-silicon Mac and Windows
-x64, with native Claude Code on Mac only. Download archives and SHA-256 files from the
-[v1.5.2 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2),
-or use the [npm installer](https://www.npmjs.com/package/opensocrates/v/1.5.2).
+- **Start with your task.** The questions and checks are already written into each method, ready to reuse across conversations.
+- **Find a useful angle.** Draw on methods for comparing options, evaluating evidence, exploring assumptions and planning ahead.
+- **Make it your own.** Read every procedure, study its examples and adapt the open-source material to your work.
 
-| Host | Delivery | Platform and activation |
-| --- | --- | --- |
-| Codex | Existing hooks, controller and native decision runtime | Apple-silicon Mac and Windows x64; review the seven hooks in an interactive session |
-| Claude Code CLI / Desktop local Code | Stateless native entry and complete installed references | Apple-silicon Mac; requires the Claude CLI, host login and plugin/hook permissions |
-| Claude web / Desktop Chat / Cowork | Standalone content-only account skill ZIP | Export on Mac or Windows; upload, enable and add the one-time account instructions below |
-| Antigravity conversation application | Owned modular rule and skill | Apple-silicon Mac and Windows x64; choose workspace or global scope |
+## See it in a task
 
-Windows native Claude Code in a terminal or Desktop Code is outside this
-release's scope. Account content does not install a native Claude integration.
-See the [Mac guide](docs/macos-v1.5.md) and [Windows guide](docs/windows-v1.5.md).
+Try a request like this after setup:
 
-Trusted native hooks and Antigravity's standing rule provide entry during normal
-requests. For Claude account skills, add the standing instruction below to use
-OpenSocrates without repeating its name. Selection still depends on the host
-model and can be missed. Installation, loading, complete reads, application,
-and useful outcomes are separate evidence levels. No general quality, token-cost,
-or latency improvement is claimed.
+> We were about to buy a hosted tool, but now the workflow has to run offline.
+> Should we buy, build our own, or handle it manually for now?
 
-**After installation:** follow the [visual setup guide](docs/setup-guide.md) for hook review, account skill switches, and host readiness. It also includes a request you can paste into an agent.
+For a decision like this, [trade-off analysis](content/methods/trade-off-analysis/procedure.en.md)
+provides a reusable sequence: identify the requirements, compare viable options,
+separate known facts from assumptions, and explain what would change the
+recommendation. The method supplies that structure alongside your everyday request.
 
-## Install or update
+## Start with your app
 
-Install Node.js 20+, make the chosen host available, and sign in to that host.
-Native runtimes are bundled; installation does not require Python. Start with
-Codex on either supported platform:
+Choose where you want to use OpenSocrates.
+[Get v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2).
+
+<details>
+<summary><strong>Claude Chat & Cowork</strong> — upload a skill and start a conversation</summary>
+
+For Claude web, Desktop Chat and Cowork:
+
+1. In **Settings → Capabilities**, enable **Code execution and file creation**. For an organization-managed account, confirm that your organization's policy allows Skills and code execution.
+2. Download the [account skill ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip) and its [SHA-256 file](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256).
+3. Open **Customize → Skills → + → Create skill → Upload a skill**, upload the ZIP and enable it. Back up an existing OpenSocrates skill before replacing it.
+4. Add the [one-time account instruction](docs/setup-guide.md#claude-standing-instructions) to each Claude account you use, preserving your existing instructions. Start a fresh conversation and describe your task.
+
+The portable skill ZIP contains the complete methods and examples.
+[Visual setup guide](docs/setup-guide.md#2-claude-account-skill-enable-it-and-add-account-instructions) · [Claude's Skills guide](https://support.claude.com/en/articles/12512180-use-skills-in-claude)
+
+</details>
+
+<details>
+<summary><strong>Claude Code</strong> — Apple-silicon Mac</summary>
+
+You need [Node.js 20+](https://nodejs.org/en/download), the Claude CLI and a
+signed-in Claude account. This works with terminal Claude Code and local Code
+in Claude Desktop. Run in **Terminal**:
+
+```sh
+npx --yes opensocrates@1.5.2 install --host claude
+npx --yes opensocrates@1.5.2 diagnose --host claude
+```
+
+Confirm `enabled: true`, `integrity: verified` and `registration: confirmed`.
+Review any project trust prompt, then start a fresh local session.
+[Visual setup guide](docs/setup-guide.md#3-claude-code-check-the-local-mac-plugin)
+
+</details>
+
+<details>
+<summary><strong>Codex</strong> — Apple-silicon Mac or Windows x64</summary>
+
+You need [Node.js 20+](https://nodejs.org/en/download) and Codex. The native runtime
+comes with the package. Run in **Terminal on Mac** or **PowerShell on Windows**:
 
 ```sh
 npx --yes opensocrates@1.5.2 install --host codex
 npx --yes opensocrates@1.5.2 status --host codex
 ```
 
-For an existing Codex installation, including v1.5.0, use:
+Open interactive Codex and enter `/hooks` in its input field. Review and approve
+the seven OpenSocrates hook definitions you trust, then start a fresh conversation.
+[Visual setup guide](docs/setup-guide.md#1-codex-review-and-approve-opensocrates-hooks)
+
+To update an existing Codex installation:
 
 ```sh
 npx --yes opensocrates@1.5.2 update --host codex
 ```
 
-Review the seven Codex hooks in an interactive session and start a fresh
-conversation. Non-interactive execution may skip untrusted hooks. `status`
-reports installation and integrity; it does not prove automatic delivery.
+</details>
 
-On Apple-silicon Mac, install the native Claude companion with:
+<details>
+<summary><strong>Antigravity</strong> — Apple-silicon Mac or Windows x64</summary>
 
-```sh
-npx --yes opensocrates@1.5.2 install --host claude
-npx --yes opensocrates@1.5.2 status --host claude
-```
-
-For Antigravity, choose an existing absolute workspace directory:
+You need [Node.js 20+](https://nodejs.org/en/download). Choose a workspace and
+replace the example with the full path of a folder that already exists. Run in
+**Terminal on Mac** or **PowerShell on Windows**:
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host antigravity --workspace /absolute/path/to/workspace
+npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
 ```
 
-On Windows, replace the directory with an absolute local-drive path such as
-`C:\Work\Reading Workshop` and quote it. Omit `--workspace` for the global scope.
-For Claude account content, export to an absolute ZIP filename in an existing
-folder, then upload and enable the ZIP in Claude's Customize > Skills interface:
+On Windows, use a quoted local-drive path such as `"C:\Work\Reading Workshop"`.
+For a global setup, omit `--workspace`. Pick global or workspace installation
+for a given project, then start a fresh conversation.
+[Confirm the skill and rule](docs/setup-guide.md#4-antigravity-check-both-the-skill-and-rule)
 
-```sh
-npx --yes opensocrates@1.5.2 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.2-account.zip
-```
+</details>
 
-### Claude Chat and Cowork: one-time account instructions
+**Setting up with an agent?** Use the [setup request](docs/setup-guide.md#ask-an-agent-to-finish-setup)
+or the [current installation guide](docs/agent-discovery.md). Select each app
+with its named `--host` option; the default and `--host all` select Codex.
 
-For use without typing `/opensocrates` on each request, enable the account skill
-and append this instruction in **Settings → General → Instructions for Claude**.
-Preserve your existing instructions. In older Cowork interfaces, use
-**Settings → Cowork → Global instructions**; if Web and Desktop use different
-accounts, configure each account you use.
+## A method for the question
 
-```text
-For requests that require interpretation or judgment, such as synthesizing
-sources, comparing options, making decisions or drafting messages, load the
-enabled OpenSocrates skill and follow its instructions even when I do not
-mention it. Read the complete procedure and check applicability before applying
-a reasoning method. Do not add unnecessary procedures to mechanical work such
-as formatting.
-```
+| What you're working on | A method to explore |
+| --- | --- |
+| Choosing between options with competing priorities | [Trade-off analysis](content/methods/trade-off-analysis/procedure.en.md) |
+| Understanding what a plan takes for granted | [Assumption mapping](content/methods/assumption-mapping/procedure.en.md) |
+| Weighing the support behind a claim | [Critical thinking](content/methods/critical-thinking/procedure.en.md) |
+| Preparing for what could go wrong with a plan | [Premortem](content/methods/premortem-analysis/procedure.en.md) |
 
-Save once, then start a fresh conversation and describe your task normally.
-The instruction guides model-selected skill use; it adds no native hook or
-guaranteed every-turn enforcement. See the [step-by-step setup guide](docs/setup-guide.md#claude-standing-instructions)
-and [Claude's official instruction settings](https://support.claude.com/en/articles/10185728-understanding-claude-s-personalization-features).
+Each method includes its purpose, use conditions, complete procedure, examples
+and questions for the assistant. Explore the text, follow the reasoning steps,
+and reuse the methods across your work.
 
-The platform guides cover Windows paths, account replacement, updates, disabling,
-removal, and verified local-archive alternatives. With no local asset flags,
-the installer downloads the pinned v1.5.2 archive and checksum from GitHub Releases.
+[Browse all 48 methods](content/methods/)
 
-New profiles require explicit `--host claude`, `--host antigravity`, or
-`--host claude-chat`. The default and `--host all` continue to select Codex;
-they do not install every new host. New profiles have no purge, trust-reset,
-or automatic-update route.
+## Complete method text in ten languages
 
-Old multi-host installations are not silently adopted or erased. Reconcile their
-exact origin and ownership before installing a new profile. Back up an existing
-OpenSocrates account skill and its enabled state before replacing it.
+English, Korean, Simplified Chinese, Japanese, French, German, Italian,
+Spanish, Portuguese and Thai. Every language includes the full procedures and
+examples for all 48 methods.
 
-## Reasoning instruction languages
+These are the languages of the method text your assistant reads.
+[Language guide](docs/v1.5.2.md) · [Codex instruction-language settings](docs/settings.md)
 
-All 48 methods include complete procedures and examples in ten languages:
-English, Korean, Simplified Chinese, Japanese, French, German, Italian, Spanish,
-Portuguese and Thai. The release contains 480 procedure files, 3,840 canonical
-cases and 1,440 teacher questions, three per method per language. Content
-revision 5 preserves the existing four languages' body text and values while
-updating each method's revision identity from 4 to 5.
+## Open source, ready to explore
 
-An explicit trusted locale takes precedence over a stored preference, then
-current-input script detection applies. Kana selects Japanese first; otherwise
-dominant Thai, Hangul or Han selects Thai, Korean or Chinese. Latin-script
-French, German, Italian, Spanish and Portuguese need an explicit or stored
-choice; they are not reliably identified by script. Han-only Japanese also
-needs an explicit choice. Empty, unknown-script and tied input falls back to
-English. Portuguese uses Brazilian orthography under the generic `pt` code;
-separate regional variants are not claimed.
+Read the complete methods and source, adapt them to your work, or contribute a
+new example. OpenSocrates is an independent project, available under the
+[MIT license](LICENSE).
 
-See the [v1.5.2 language guide](docs/v1.5.2.md) and
-[locale settings](docs/settings.md) for exact runtime commands and JSON requests.
-Instruction language is separate from answer language, npm installer output and
-host UI. Windows ARM64 and the Go migration remain separate v1.6.0 work.
-
-## When attribution appears
-
-A final answer ends with the exact line `Powered by OpenSocrates` only when an
-eligible authored method was read in full and actually applied to that answer.
-The wording is the same in all ten languages. Reader guidance alone and
-mechanical work do not qualify. The line is attribution, not proof of native
-application or a better result.
-
-## Privacy and development
-
-The default decision path makes no extra selector-model call and stores no raw
-prompts, transcripts, screenshots, or hidden reasoning. The native Claude entry
-does not read transcripts or initialize a database. The account skill has no
-executable surface; normal host conversations and model requests follow the
-host's own authentication, permissions, retention settings, and terms.
-See [SECURITY.md](SECURITY.md).
-
-- [Mac installation and evidence boundaries](docs/macos-v1.5.md)
-- [Windows installation and evidence boundaries](docs/windows-v1.5.md)
-- [Authored methods](content/methods/) · [Decision-point contract](docs/decision-points.md)
-- [v1.5.2 languages, selection and scope](docs/v1.5.2.md)
-- [v1.5.0 implementation baseline](docs/v1.5.0/IMPLEMENTATION_PLAN.md)
-- [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
-
-OpenSocrates is [MIT licensed](LICENSE), independent of OpenAI, Anthropic, and
-Google, and not endorsed by them.
+[Releases](https://github.com/ParkerHwang/OpenSocrates/releases) · [Setup guide](docs/setup-guide.md) · [Privacy and security](SECURITY.md) · [Contributing](CONTRIBUTING.md) · [Issues](https://github.com/ParkerHwang/OpenSocrates/issues/new/choose) · [Changelog](CHANGELOG.md)

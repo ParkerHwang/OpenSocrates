@@ -1,172 +1,157 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
+  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="320">
 </p>
 
 # OpenSocrates
 
-**이해하고 판단하고 사용할 수 있는 결과를 위한 사고 지원.**
+**AI와의 대화에 48가지 사고 방법을 더하세요.**
 
-OpenSocrates는 진행 중인 작업에 직접 작성한 48개 사고 방법을 제공합니다.
-자료를 종합하고, 이해관계자의 관점을 파악하고, 선택지를 비교하고, 필요한
-메시지를 쓰도록 돕습니다. 원래 영어·한국어 절차는 그대로 유지합니다.
-v1.5의 독자 안내는 결론을 맥락과 다음 행동에 연결합니다. 코딩 전문가 전용
-기능은 이번 버전에 포함하지 않습니다.
+OpenSocrates는 **Claude, Codex, Antigravity**에서 활용할 수 있는 사고 절차를
+제공합니다. 선택지를 비교하고, 엇갈린 정보를 정리하고, 계획을 다른 관점에서
+살펴보세요. 어떤 일인지 평소의 말로 설명하면 됩니다. 각 방법에는 활용할
+질문과 점검 항목, 단계별 절차가 준비되어 있습니다.
 
-[English](README.md) | **한국어** | [简体中文](README.zh.md) | [日本語](README.ja.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | [ไทย](README.th.md)
+[사용하는 앱에서 시작하기](#start-with-your-app) · [사용 예시](#see-it-in-a-task) · [사고 방법 둘러보기](#a-method-for-the-question)
 
-**도구를 찾는 에이전트에게:** [작업 적합성 판단·배포 패키지 선택·설정 확인 안내](docs/agent-discovery.ko.md).
+**사고 방법 48개 · 지시문 언어 10개 · MIT 라이선스**
 
-[![CI](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml/badge.svg)](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[English](README.md) · **한국어** · [简体中文](README.zh.md) · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [ไทย](README.th.md)
 
-## Mac과 Windows에서 쓰는 v1.5.2
+## 지금 하는 일에 꺼내 쓰는 사고 도구
 
-v1.5.2는 기존 영어·한국어·간체 중국어·일본어에 프랑스어(`fr`)·독일어(`de`)·
-이탈리아어(`it`)·스페인어(`es`)·포르투갈어(`pt`)·태국어(`th`) 사고 지시문을
-추가하며 기존 네 호스트 프로필에 제공합니다. v1.5.0의 Apple Silicon Mac·Windows x64
-지원 범위를 유지하며 Claude Code 네이티브 연동은 Mac만 지원합니다. 배포 파일과 SHA-256 파일은
-[v1.5.2 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)에서
-받거나 [npm 설치기](https://www.npmjs.com/package/opensocrates/v/1.5.2)를 사용하세요.
+- **어떤 일인지부터 이야기하세요.** 각 방법에 질문과 점검 항목이 미리 작성되어 있어 여러 대화에서 재사용할 수 있습니다.
+- **도움이 되는 관점을 찾아보세요.** 선택지 비교, 근거 평가, 가정 탐색, 계획 검토에 맞는 방법을 활용할 수 있습니다.
+- **내 작업에 맞게 응용하세요.** 모든 절차와 사례가 공개되어 있어 직접 읽고, 살펴보고, 필요한 방식으로 바꿔 쓸 수 있습니다.
 
-| 호스트 | 전달 방식 | 플랫폼과 활성화 |
-| --- | --- | --- |
-| Codex | 기존 훅·컨트롤러·네이티브 판단 런타임 | Apple Silicon Mac·Windows x64; 대화형 세션에서 훅 7개 검토 |
-| Claude Code CLI / Desktop의 로컬 Code | 상태를 저장하지 않는 네이티브 진입과 설치된 전체 참조 | Apple Silicon Mac; Claude CLI·호스트 로그인·플러그인과 훅 권한 필요 |
-| Claude 웹 / Desktop Chat / Cowork | 실행 코드가 없는 독립 계정 스킬 ZIP | Mac·Windows에서 내보낸 뒤 업로드·활성화하고 아래 계정 지침을 한 번 추가 |
-| Antigravity 대화 애플리케이션 | 소유 범위가 명확한 모듈형 규칙과 스킬 | Apple Silicon Mac·Windows x64; 작업공간 또는 전역 선택 |
+<a id="see-it-in-a-task"></a>
 
-Windows 터미널이나 Desktop Code의 Claude Code 네이티브 연동은 이번 릴리스
-범위에서 제외합니다. 계정 콘텐츠는 네이티브 Claude 연동을 설치하지 않습니다.
-[Mac 안내](docs/macos-v1.5.ko.md)와 [Windows 안내](docs/windows-v1.5.ko.md)를 참고하세요.
+## 이렇게 요청해 보세요
 
-신뢰된 네이티브 훅과 Antigravity 상시 규칙은 일반 요청에서 진입 안내를
-제공합니다. Claude 계정 스킬은 아래 상시 지침을 추가해 이름을 반복하지 않고
-사용하도록 설정하세요. 선택은 여전히 호스트 모델에 맡겨져 누락될 수 있습니다.
-설치·불러오기·전체 읽기·실제 적용·
-결과의 유용성은 서로 다른 증거이며, 일반적인 품질·토큰 비용·속도 향상을
-주장하지 않습니다.
+설정을 마친 뒤, 평소처럼 질문해 보세요.
 
-**설치 다음 단계:** [화면으로 보는 설정 가이드](docs/setup-guide.ko.md)에서 훅 승인, 계정 스킬 켜기, 앱별 완료 상태를 확인하세요. 에이전트에게 붙여 넣을 설치 요청문도 포함합니다.
+> 클라우드 도구를 사려던 참인데, 이제 작업이 오프라인에서 돌아가야 해요.
+> 구매할지, 직접 만들지, 당분간 수작업으로 할지 같이 봐 주세요.
 
-## 설치 또는 업데이트
+이런 결정에 활용할 수 있는
+[트레이드오프 분석](content/methods/trade-off-analysis/procedure.ko.md)에는
+필수 조건을 찾고, 실행 가능한 선택지를 비교하고, 확인된 사실과 가정을 나누고,
+추천을 바꿀 근거를 설명하는 절차가 담겨 있습니다.
+평소의 요청에 활용할 수 있는 사고의 틀이 미리 준비되어 있는 것입니다.
 
-Node.js 20 이상과 사용할 호스트를 설치하고 그 호스트에 로그인하세요.
-네이티브 런타임은 포함되어 있으므로 설치에 Python이 필요하지 않습니다.
-지원하는 두 플랫폼에서 Codex를 설치하는 예입니다.
+<a id="start-with-your-app"></a>
+
+## 사용하는 앱에서 시작하기
+
+OpenSocrates를 사용할 앱을 선택하세요.
+[v1.5.2 다운로드](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
+
+<details>
+<summary><strong>Claude Chat · Cowork</strong> — 스킬을 올리고 대화 시작하기</summary>
+
+Claude 웹·Desktop Chat·Cowork에서:
+
+1. **Settings → Capabilities**에서 **Code execution and file creation**을 켭니다. 조직에서 관리하는 계정이라면 Skills와 코드 실행이 조직 정책상 허용되는지 확인하세요.
+2. [계정 스킬 ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip)과 [SHA-256 파일](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256)을 내려받습니다.
+3. **Customize → Skills → + → Create skill → Upload a skill**에서 ZIP을 업로드하고 켭니다. 기존 OpenSocrates 스킬을 교체한다면 먼저 백업하세요.
+4. 사용하는 Claude 계정마다 기존 지침을 유지하며 [계정 지침을 한 번 추가](docs/setup-guide.ko.md#claude-standing-instructions)합니다. 새 대화를 열고 하려는 일을 설명하세요.
+
+전체 사고 방법과 사례가 하나의 계정 스킬 ZIP에 담겨 있습니다.
+[화면으로 보는 설정 가이드](docs/setup-guide.ko.md) · [Claude 공식 Skills 안내](https://support.claude.com/en/articles/12512180-use-skills-in-claude)
+
+</details>
+
+<details>
+<summary><strong>Claude Code</strong> — Apple Silicon Mac</summary>
+
+[Node.js 20 이상](https://nodejs.org/en/download), Claude CLI와 로그인한 Claude 계정이
+필요합니다. 터미널의 Claude Code와 Claude Desktop의 로컬 Code에서 사용할 수 있습니다.
+**터미널**에서 실행하세요.
+
+```sh
+npx --yes opensocrates@1.5.2 install --host claude
+npx --yes opensocrates@1.5.2 diagnose --host claude
+```
+
+`enabled: true`, `integrity: verified`, `registration: confirmed`를 확인하세요.
+프로젝트 신뢰 안내가 표시되면 내용을 확인한 뒤 새 로컬 세션을 시작합니다.
+[화면으로 보는 설정 가이드](docs/setup-guide.ko.md)
+
+</details>
+
+<details>
+<summary><strong>Codex</strong> — Apple Silicon Mac 또는 Windows x64</summary>
+
+[Node.js 20 이상](https://nodejs.org/en/download)과 Codex가 필요합니다.
+네이티브 런타임은 패키지에 포함되어 있습니다.
+**Mac은 터미널**, **Windows는 PowerShell**에서 실행하세요.
 
 ```sh
 npx --yes opensocrates@1.5.2 install --host codex
 npx --yes opensocrates@1.5.2 status --host codex
 ```
 
-v1.5.0을 포함한 기존 Codex 설치는 다음 명령으로 업데이트합니다.
+대화형 Codex의 입력창에 `/hooks`를 입력하세요. OpenSocrates 훅 7개의 내용을
+검토하고 신뢰하는 정의를 승인한 뒤, 새 대화를 시작합니다.
+[화면으로 보는 설정 가이드](docs/setup-guide.ko.md)
+
+기존 Codex 설치를 업데이트하려면:
 
 ```sh
 npx --yes opensocrates@1.5.2 update --host codex
 ```
 
-대화형 세션에서 Codex 훅 7개를 검토하고 새 대화를 시작하세요. 비대화형 실행은
-신뢰되지 않은 훅을 건너뛸 수 있습니다. `status`는 설치와 무결성을 보고하며
-자동 전달을 증명하지 않습니다.
+</details>
 
-Apple Silicon Mac에서는 Claude 네이티브 연동을 설치할 수 있습니다.
+<details>
+<summary><strong>Antigravity</strong> — Apple Silicon Mac 또는 Windows x64</summary>
 
-```sh
-npx --yes opensocrates@1.5.2 install --host claude
-npx --yes opensocrates@1.5.2 status --host claude
-```
-
-Antigravity는 이미 존재하는 작업공간의 절대 경로를 선택합니다.
+[Node.js 20 이상](https://nodejs.org/en/download)이 필요합니다. 사용할 작업공간을
+정하고 아래 경로를 이미 존재하는 폴더의 절대 경로로 바꾸세요.
+**Mac은 터미널**, **Windows는 PowerShell**에서 실행합니다.
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host antigravity --workspace /absolute/path/to/workspace
+npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
 ```
 
-Windows에서는 `C:\Work\Reading Workshop`처럼 로컬 드라이브의 절대 경로로
-바꾸고 따옴표로 감싸세요. `--workspace`를 생략하면 전역 범위를 선택합니다.
-Claude 계정 콘텐츠는 이미 존재하는 폴더의 절대 ZIP 경로로 내보낸 뒤,
-Claude의 Customize > Skills 화면에서 업로드하고 활성화합니다.
+Windows에서는 `"C:\Work\Reading Workshop"`처럼 따옴표로 감싼 로컬 드라이브
+경로를 사용하세요. 전역으로 설치하려면 `--workspace`를 생략합니다.
+한 프로젝트에 사용할 범위를 전역 또는 작업공간 중 하나로 정하고 새 대화를 시작하세요.
+[스킬과 규칙 확인](docs/setup-guide.ko.md)
 
-```sh
-npx --yes opensocrates@1.5.2 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.2-account.zip
-```
+</details>
 
-### Claude Chat·Cowork: 계정 지침을 한 번 추가하기
+**에이전트에게 설정을 맡기려면** [설정 요청문](docs/setup-guide.ko.md)이나
+[현재 버전의 설치 안내](docs/agent-discovery.ko.md)를 사용하세요.
+각 앱은 이름이 있는 `--host` 옵션으로 선택합니다. 기본값과 `--host all`은 Codex를 선택합니다.
 
-요청마다 `/opensocrates`를 입력하지 않고 사용하려면 계정 스킬을 켜고
-**Settings → General → Instructions for Claude**에 아래 지침을 추가하세요.
-기존 지침은 보존합니다. 이전 Cowork 화면에서는
-**Settings → Cowork → Global instructions**를 사용합니다. 웹과 Desktop의
-계정이 다르면 사용하는 각 계정에 설정하세요.
+<a id="a-method-for-the-question"></a>
 
-```text
-자료 종합, 선택지 비교, 판단, 메시지 작성처럼 해석이나 판단이 필요한
-요청에서는 내가 이름을 언급하지 않아도 활성화된 OpenSocrates 스킬을 먼저
-불러와 그 지침을 따르세요. 적용할 사고 방법의 전체 절차를 읽고 조건을
-확인하세요. 단순 서식 변환 같은 기계적인 작업에는 불필요한 절차를
-추가하지 마세요.
-```
+## 질문에 맞는 사고 방법
 
-한 번 저장한 뒤 새 대화에서 평소처럼 작업을 요청하세요. 이 지침은 모델의
-스킬 선택을 안내하며 네이티브 훅이나 매 턴 강제 적용을 추가하지 않습니다.
-[단계별 설정 안내](docs/setup-guide.ko.md#claude-standing-instructions)와
-[Claude 공식 지침 설정](https://support.claude.com/en/articles/10185728-understanding-claude-s-personalization-features)을 참고하세요.
+| 지금 하는 일 | 살펴볼 사고 방법 |
+| --- | --- |
+| 서로 다른 우선순위에 따라 선택지 비교하기 | [트레이드오프 분석](content/methods/trade-off-analysis/procedure.ko.md) |
+| 계획이 당연하게 여기는 가정 파악하기 | [가정 매핑](content/methods/assumption-mapping/procedure.ko.md) |
+| 주장을 뒷받침하는 근거 살펴보기 | [비판적 사고](content/methods/critical-thinking/procedure.ko.md) |
+| 계획에서 일어날 수 있는 문제에 대비하기 | [사전부검](content/methods/premortem-analysis/procedure.ko.md) |
 
-플랫폼별 안내에는 Windows 경로, 계정 스킬 교체, 업데이트·비활성화·제거와
-검증한 로컬 파일 사용법을 설명합니다. 로컬 파일 옵션을 생략하면 설치기는
-GitHub Releases에서 버전을 고정한 v1.5.2 ZIP과 체크섬을 받습니다.
+각 방법에는 목적과 적용 조건, 전체 절차, 사례, AI가 확인할 질문이 담겨 있습니다.
+내용을 읽고 사고의 흐름을 살펴보며 여러 작업에 재사용할 수 있습니다.
 
-새 연동에는 `--host claude`, `--host antigravity`, `--host claude-chat`를
-명시해야 합니다. 기본값과 `--host all`은 계속 Codex를 선택하며 새 호스트를
-전부 설치하지 않습니다. 새 연동에는 purge, 신뢰 초기화, 자동 업데이트가 없습니다.
+[사고 방법 48개 전체 보기](content/methods/)
 
-과거 여러 호스트 연동을 자동으로 인수하거나 삭제하지 않습니다. 새 설치 전에
-정확한 출처와 소유 범위를 확인하세요. 기존 OpenSocrates 계정 스킬은 교체 전에
-백업하고 활성화 상태를 보존합니다.
+## 사고 방법의 전체 내용을 10개 언어로
 
-## 사고 지시문 언어
+영어·한국어·간체 중국어·일본어·프랑스어·독일어·이탈리아어·스페인어·
+포르투갈어·태국어로 제공합니다. 모든 언어에 사고 방법 48개의 전체 절차와
+사례가 포함되어 있습니다.
 
-48개 방법마다 영어·한국어·간체 중국어·일본어·프랑스어·독일어·이탈리아어·
-스페인어·포르투갈어·태국어의 전체 절차와 사례를 제공합니다. 전체 절차 파일은
-480개, 정본 사례는 3,840개이며 방법·언어마다 교사 질문 3개씩 총 1,440개입니다.
-콘텐츠 리비전 5에서 기존 네 언어의 본문 바이트·값은 유지하고 각 방법의
-리비전 식별자는 4에서 5로 변경합니다.
+AI가 읽는 사고 방법 본문을 이 언어들로 제공합니다.
+[언어 안내](docs/v1.5.2.ko.md) · [Codex 지시문 언어 설정](docs/settings.ko.md)
 
-신뢰된 명시적 언어, 저장한 언어 선호, 현재 입력 문자 판별 순으로 선택합니다.
-가나가 있으면 일본어가 우선이며 그 외에는 태국 문자·한글·한자 중 우세한 문자에
-따라 태국어·한국어·중국어를 선택합니다. 라틴 문자를 사용하는 프랑스어·독일어·
-이탈리아어·스페인어·포르투갈어는 명시적 또는 저장한 선택이 필요합니다.
-한자만 있는 일본어도 명시하세요. 빈 입력·알 수 없는 문자·동률은 영어입니다.
-포르투갈어는 일반 `pt` 코드 아래 브라질식 철자를 사용하며 지역별 별도 지원을
-주장하지 않습니다.
+## 읽고, 활용하고, 함께 발전시키는 오픈소스
 
-정확한 런타임 명령·JSON 요청은 [v1.5.2 안내](docs/v1.5.2.ko.md)와
-[언어 선호 설정](docs/settings.ko.md)을 참고하세요. 사고 지시문은 답변 언어·
-npm 설치기 출력·호스트 화면 언어와 별개입니다. Windows ARM64·Go 전환은
-별도 v1.6.0 작업입니다.
+전체 사고 방법과 소스를 읽고, 내 작업에 맞게 응용하거나 새 사례를 더할 수 있습니다.
+OpenSocrates는 [MIT 라이선스](LICENSE)로 공개된 독립 프로젝트입니다.
 
-## 사용 표기가 나오는 조건
-
-적격한 사고 방법의 정본 전체를 읽고 현재 답변에 실제로 적용했을 때만 답변
-마지막에 `Powered by OpenSocrates`를 한 줄로 그대로 표시합니다. 열 언어에서
-같은 문구를 사용합니다. 독자 안내만 사용하거나 기계적인 작업만 했다면 표시하지
-않습니다. 이 문구는 출처 표기이며 네이티브 적용이나 더 나은 결과의 증명은 아닙니다.
-
-## 개인정보와 개발
-
-기본 판단 경로는 별도의 선택 모델을 호출하거나 원시 프롬프트·대화·스크린샷·
-숨겨진 추론을 저장하지 않습니다. Claude 네이티브 진입은 대화를 읽거나
-데이터베이스를 초기화하지 않습니다. 계정 스킬에는 실행 코드가 없습니다.
-일반 대화와 모델 요청은 호스트 자체의 인증·권한·보관 설정·약관을 따릅니다.
-[보안 정책](SECURITY.md)에 정확한 경계를 설명합니다.
-
-- [Mac 설치와 증거의 범위](docs/macos-v1.5.ko.md)
-- [Windows 설치와 증거의 범위](docs/windows-v1.5.ko.md)
-- [사고 방법 원문](content/methods/) · [판단 지점 계약](docs/decision-points.ko.md)
-- [v1.5.2 언어 선택과 지원 범위](docs/v1.5.2.ko.md)
-- [v1.5.0 구현 기준](docs/v1.5.0/IMPLEMENTATION_PLAN.md)
-- [변경 이력](CHANGELOG.md) · [기여 안내](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md)
-
-OpenSocrates는 [MIT 라이선스](LICENSE)를 따르는 독립 프로젝트이며
-OpenAI·Anthropic·Google의 공식 제품이나 보증을 받은 제품이 아닙니다.
+[릴리스](https://github.com/ParkerHwang/OpenSocrates/releases) · [설정 가이드](docs/setup-guide.ko.md) · [개인정보와 보안](SECURITY.md) · [기여 안내](CONTRIBUTING.md) · [문제 제보](https://github.com/ParkerHwang/OpenSocrates/issues/new/choose) · [변경 기록](CHANGELOG.md)
