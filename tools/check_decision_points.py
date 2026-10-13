@@ -575,6 +575,72 @@ class DecisionChecks(unittest.TestCase):
 
 
 class LocaleCompatibilityChecks(unittest.TestCase):
+    def test_exported_participation_api_preserves_typed_gate_in_all_locales(self):
+        from opensocrates.domain.enums import Participation, ParticipationReasonCode
+        from opensocrates.domain.models import ParticipationDecision
+        from opensocrates.domain.participation import validate_participation_decision
+        from opensocrates.domain.validation import model_from_dict
+        from opensocrates.prompting import participation_prompt
+        from opensocrates.prompting.participation_prompt import (
+            build_participation_prompt,
+            get_participation_prompt,
+        )
+
+        english = participation_prompt("en")
+        for locale in ("en", "ko", "zh", "ja"):
+            with self.subTest(locale=locale):
+                text = participation_prompt(locale)
+                self.assertEqual(build_participation_prompt(locale), text)
+                self.assertEqual(get_participation_prompt(locale), text)
+                if locale != "en":
+                    self.assertNotEqual(text, english)
+                envelopes = [json.loads(line) for line in text.splitlines() if line.startswith("{")]
+                self.assertEqual(len(envelopes), 1)
+                payload = envelopes[0]
+                self.assertEqual(
+                    set(payload),
+                    {
+                        "participation",
+                        "reason_code",
+                        "judgment_targets",
+                        "mechanical_targets",
+                        "confidence_basis",
+                        "explicit_method",
+                    },
+                )
+                self.assertEqual(payload["confidence_basis"], "rule_plus_model_policy")
+                self.assertIsNone(payload["explicit_method"])
+                self.assertEqual(payload["judgment_targets"], [])
+                self.assertEqual(payload["mechanical_targets"], [])
+                for code in (*Participation, *ParticipationReasonCode):
+                    self.assertIn(code.value, text)
+                # A named method alone remains mechanical at the typed gate in
+                # every locale; the shared envelope cannot force a judgment route.
+                payload.update(
+                    participation="mechanical",
+                    reason_code="explicit_method_without_judgment",
+                    explicit_method="deduction",
+                )
+                decision = model_from_dict(ParticipationDecision, payload, require_schema=False)
+                self.assertEqual(
+                    validate_participation_decision(decision).participation,
+                    Participation.MECHANICAL,
+                )
+        for invalid in ("fr", "ZH", "zh-CN", "", None, []):
+            with self.subTest(invalid=invalid):
+                with self.assertRaises(ValueError):
+                    participation_prompt(invalid)
+
+    def test_codex_adapter_rejects_unsupported_explicit_locale_before_selection(self):
+        from opensocrates.hosts.codex.adapter import CodexAdapterConfig
+
+        for locale in (None, "en", "ko", "zh", "ja"):
+            self.assertEqual(CodexAdapterConfig(locale_preference=locale).locale_preference, locale)
+        for invalid in ("fr", "ZH", "zh-CN", "", False):
+            with self.subTest(invalid=invalid):
+                with self.assertRaises(ValueError):
+                    CodexAdapterConfig(locale_preference=invalid)
+
     def test_locale_commands_persist_without_resetting_existing_preferences(self):
         import tempfile
         from types import SimpleNamespace

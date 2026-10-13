@@ -65,6 +65,7 @@ docs-check:
 		--path README.ja.md \
 		--path docs/v1.5.1.md \
 		--path docs/v1.5.1.ko.md \
+		--path docs/v1.5.1-language-review.md \
 		--path CHANGELOG.md \
 		--path CONTRIBUTING.md \
 		--path AGENTS.md \

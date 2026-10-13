@@ -10,6 +10,7 @@ from typing import Any, Callable
 
 from ...clock import Clock
 from ...domain.enums import EventType, HostActionKind, HostId
+from ...domain.locales import SUPPORTED_LOCALES, SupportedLocale
 from ...domain.models import CapabilityProfile, HostControlResult, NormalizedEvent
 from ...selector import SelectorApplication, SelectorConfig, SelectorDecision, SelectorRequest
 from ...version import PRODUCT_VERSION
@@ -48,7 +49,7 @@ class CodexAdapterConfig:
     host_version: str = "unknown"
     adapter_version: str = PRODUCT_VERSION
     locale: str = "en"
-    locale_preference: str | None = None
+    locale_preference: SupportedLocale | None = None
     bundle_path: str | Path = DEFAULT_BUNDLE_PATH
     content_repository: Any | None = None
     control_application: ControlApplicationPort | None = None
@@ -76,6 +77,10 @@ class CodexAdapterConfig:
     selector_config: SelectorConfig | None = field(default=None, repr=False)
     instruction_file_store: Any | None = field(default=None, repr=False)
     require_instruction_read_receipt: bool = False
+
+    def __post_init__(self) -> None:
+        if self.locale_preference is not None and self.locale_preference not in SUPPORTED_LOCALES:
+            raise ValueError("Codex locale preference is unsupported")
 
 
 @dataclass(frozen=True, slots=True)
