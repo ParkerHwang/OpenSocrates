@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import re
 import unittest
+from collections import Counter
 from pathlib import Path
 
 from opensocrates.content.loader import load_reasoning_content_projections
@@ -13,6 +14,13 @@ from validate_content import parse_yaml_file
 ROOT = Path(__file__).resolve().parents[1]
 LOCALES = ("en", "ko", "zh", "ja")
 IDENTIFIER = re.compile(r"`([A-Za-z][A-Za-z0-9_-]*)`")
+NUMBER_WORDS = dict(
+    zip(
+        ("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"),
+        (str(value) for value in range(1, 11)),
+        strict=True,
+    )
+)
 
 
 class LocalizationContracts(unittest.TestCase):
@@ -66,10 +74,19 @@ class LocalizationContracts(unittest.TestCase):
                                 self.assertEqual(target[field], value)
                         for field in ("prompt", "rationale"):
                             self.assertNotEqual(target[field], source[field])
-                            self.assertEqual(
-                                re.findall(r"\d+(?:\.\d+)?", target[field]),
-                                re.findall(r"\d+(?:\.\d+)?", source[field]),
+                            source_numbers = Counter(re.findall(r"\d+(?:\.\d+)?", source[field]))
+                            translated_numbers = Counter(
+                                re.findall(r"\d+(?:\.\d+)?", target[field])
                             )
+                            # Native prose may render English "two" as 2 while
+                            # explicit numerical data must retain its value.
+                            word_numbers = Counter(
+                                NUMBER_WORDS[word]
+                                for word in re.findall(r"\b\w+\b", source[field].lower())
+                                if word in NUMBER_WORDS
+                            )
+                            self.assertTrue(source_numbers <= translated_numbers)
+                            self.assertTrue(translated_numbers <= source_numbers + word_numbers)
 
     def test_teacher_question_counts_and_contract(self) -> None:
         catalog = json.loads((ROOT / "content/teacher-questions.yaml").read_text(encoding="utf-8"))
