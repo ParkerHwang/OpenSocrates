@@ -22,7 +22,7 @@ languages. Compiled product metadata remains 1.6.0. All earlier evidence retains
 its original source/revision and does not qualify these new revision-5 files.
 See [baseline](CONTENT_BASELINE.json) and [intentional changes](DECISIONS.md).
 
-## Released v1.5.2 reconciliation — implemented, verification pending
+## Released v1.5.2 reconciliation — locally verified, final CI pending
 
 Current release source: `9838db16910c5f22d9dcc3c7180350cb406fd236`.
 Annotated tag object: `4c27d59da54eb1591ba24c0ebae62d6ab3168b60`.
@@ -36,22 +36,59 @@ The existing four languages' authored procedure/case bytes and metadata/question
 values remain unchanged; method identity advances from revision 4 to 5. Historical
 v1.5.0/v1.5.1 package coverage remains versioned, without silently relabeling it.
 
-Not verified at this documentation stage: final integrated source/generation/
-package tests, new native CI, authentic v1.5.2 npm-installer adoption, new artifact
+Local source, generation, package and installer tests passed at
+`76e67c7ce976fbf319191e460bac6db21f179ebe`, on macOS ARM64 / Go 1.27.2.
+Exact commands and the independent source audit are recorded below. Final native
+CI and the bounded test-only cost correction are still being verified.
+
+Not verified at this documentation stage: new native CI, authentic v1.5.2 npm-installer adoption, new artifact
 signing/notarization, production trust/public update transport, clean-machine or
 actual-host delivery. Prior successful d297b76 CI and earlier hosted Mac Accepted
 receipts remain historical and do not qualify the current revision-5 artifacts.
-The parent records final exact commands, revision and results after integration.
+PR #112 records the final exact head, commands and CI results after completion.
 
-Next: finish integration, generate canonical outputs, then perform final source
-and native acceptance and bounded reviews. Keep the protected-main required-check
+Next: verify the bounded test-only correction and final native acceptance. Keep the protected-main required-check
 transition and any release deployment under the user's existing approval rules.
 No merge, tag, publication or active installation replacement follows from this
 reconciliation. Method-body upgrades remain v1.6.1+ and native Windows Claude
 Code remains excluded. / 출시된 v1.5.2를 현재 기준으로 포팅했습니다. 이 단계는
-구현 기록이며 최종 통합 검사·새 CI·새 파일 서명/공증은 별도로 기록합니다.
+소스·생성·패키지·설치기 검사를 통과했으며, 새 CI·새 파일 서명/공증은 별도로 기록합니다.
 
 ## Exact evidence
+
+At `76e67c7ce976fbf319191e460bac6db21f179ebe`, all commands below passed:
+
+```text
+make bootstrap format-check lint generated-check content-check adjudication-check docs-check governance-check
+make package TARGET=darwin-arm64
+make package TARGET=windows-x64
+make package TARGET=windows-arm64
+make package-check security-scan smoke installer-check
+```
+
+Local Windows package builds are cross-compilation. An independent audit verified
+1,133 tagged canonical/shared/generated-schema files (only compiled product
+version changes to 1.6.0), all 33 schema sources, 480 references/procedures,
+3,840 cases, 1,440 teacher questions, exact source/semantic hashes, the 384
+earlier-four-language procedure/case files and all 59 earlier evidence files.
+Code and security reviews found no actionable defects at that source.
+
+The initial CI source job stopped at missing PR handoff labels in its event
+snapshot, before source tests. The labels were corrected without relaxing policy;
+[governance run 38391577636](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38391577636)
+passed at the same source. A subsequent documentation/test-only commit supplies a
+fresh event with the corrected handoff. Current full results belong in PR #112.
+
+The first local management suite took 595.258 seconds. The bounded test-only
+correction keeps full physical lifecycle cases for v1.5.0 EN/KO, v1.5.1 ZH/JA
+and v1.5.2 FR/TH; both v1.5.2 cases still inspect the entire ten-language,
+480-reference tree and every rollback/ownership/foreign-file assertion.
+Only four redundant Latin preference repetitions were removed. All ten settings
+values, the inexpensive six-language opaque-state table and all sixteen native
+legacy adoption/recovery fixtures remain covered. No production deadline,
+Go timeout, OS guard or assertion was weakened. / 처음 전체 관리 검사는 통과했지만
+시간 한도에 가까워, 같은 파일 처리를 반복하는 라틴 언어 사례만 줄였습니다.
+열 언어 설정·전체 파일·원복·소유권 검증과 실제 제한 시간은 유지합니다.
 
 ## Historical released v1.5.1 reconciliation
 

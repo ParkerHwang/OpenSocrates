@@ -73,7 +73,10 @@ func contentLocalePackage(t *testing.T, version string) string {
 
 func TestReleasedAntigravityLocalesSurviveDisableEnableAndForeignCollision(t *testing.T) {
 	for _, version := range []string{"1.5.0", "1.5.1", "1.5.2"} {
-		preferences := []string{"fr", "de", "it", "es", "pt", "th"}
+		// Latin and Thai preferences exercise byte-preserving lifecycle behavior.
+		// Both v1.5.2 cases still verify the complete ten-language package; all
+		// preference values have separate persistence and state-preservation tests.
+		preferences := []string{"fr", "th"}
 		switch version {
 		case "1.5.0":
 			preferences = []string{"en", "ko"}
