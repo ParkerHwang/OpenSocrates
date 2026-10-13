@@ -1,6 +1,6 @@
 # Find and assess OpenSocrates as an agent
 
-[한국어](agent-discovery.ko.md) · [README](../README.md) · [Setup guide](setup-guide.md)
+[한국어](agent-discovery.ko.md) · [README](../README.md) · [Setup guide](setup-guide.md) · [Content-only privacy notice](content-privacy.md)
 
 OpenSocrates is an MIT-licensed set of 48 authored reasoning methods delivered
 through host-specific plugins, rules and account skills. This guide helps an
