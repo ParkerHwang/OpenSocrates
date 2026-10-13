@@ -79,16 +79,28 @@ snapshot, before source tests. The labels were corrected without relaxing policy
 passed at the same source. A subsequent documentation/test-only commit supplies a
 fresh event with the corrected handoff. Current full results belong in PR #112.
 
-The first local management suite took 595.258 seconds. The bounded test-only
-correction keeps full physical lifecycle cases for v1.5.0 EN/KO, v1.5.1 ZH/JA
-and v1.5.2 FR/TH; both v1.5.2 cases still inspect the entire ten-language,
-480-reference tree and every rollback/ownership/foreign-file assertion.
-Only four redundant Latin preference repetitions were removed. All ten settings
-values, the inexpensive six-language opaque-state table and all sixteen native
-legacy adoption/recovery fixtures remain covered. No production deadline,
-Go timeout, OS guard or assertion was weakened. / 처음 전체 관리 검사는 통과했지만
-시간 한도에 가까워, 같은 파일 처리를 반복하는 라틴 언어 사례만 줄였습니다.
-열 언어 설정·전체 파일·원복·소유권 검증과 실제 제한 시간은 유지합니다.
+The first local management suite took 595.258 seconds. The first test-only
+reduction passed affected format/docs/governance/smoke/installer checks at
+`ff0ee96118d8e70d10dfde2ac26587f49820e5e4`, with management reduced to
+233.808 seconds. Its source CI job also passed. Windows source tests at the
+original `76e67c7` had reached the Go package-level ten-minute limit during
+physical fixture writes/copies, including old-version cases; individual
+storage/ACL latency and a separate concurrent-lock failure cause are unmeasured.
+See [bounded failure observation](evidence/v1.5.2-native-test-cost-76e67c7.json).
+
+The final bounded test-only correction keeps one full physical lifecycle per
+version: v1.5.0 KO, v1.5.1 JA and v1.5.2 TH. The v1.5.2 case inspects the entire
+ten-language, 480-reference tree and every rollback/ownership/foreign-file
+assertion. Transport creates one private physical fixture per host, retaining
+all four version combinations, eight inventory attacks per host and four
+canonical-row attacks per content host. Each case still invokes full package
+verification and restores its changes; no validator results are cached.
+All ten settings values, the inexpensive six-language opaque-state table and
+all sixteen native legacy adoption/recovery fixtures remain covered.
+No production deadline, Go timeout, OS guard or assertion was weakened.
+/ Windows 기록에서 반복 파일 생성·복사 중 시험 시간이 만료된 것을 확인했습니다.
+버전별 전체 수명주기와 모든 오류 사례를 유지하고 테스트 폴더를 재사용하도록
+준비 비용을 줄였습니다. 열 언어 설정·전체 파일·원복·소유권과 제한 시간은 유지합니다.
 
 ## Historical released v1.5.1 reconciliation
 

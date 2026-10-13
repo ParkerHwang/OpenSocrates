@@ -1,0 +1,70 @@
+{
+  "schema": "opensocrates.candidate-ci-failure-observation/1.0.0",
+  "source_commit": "76e67c7ce976fbf319191e460bac6db21f179ebe",
+  "ci_run": "https://github.com/ParkerHwang/OpenSocrates/actions/runs/38391400285",
+  "overall_conclusion": "cancelled",
+  "source_job": {
+    "conclusion": "failure",
+    "stage": "source_contracts_before_behavioral_tests",
+    "cause": "PR event snapshot lacked four required handoff labels",
+    "labels": [
+      "Commands not run",
+      "Commands run",
+      "Last verified commit",
+      "Remaining work"
+    ],
+    "corrected_governance_run": "https://github.com/ParkerHwang/OpenSocrates/actions/runs/38391577636"
+  },
+  "macos_job": {
+    "conclusion": "cancelled",
+    "boundary": "superseded by next candidate push; no complete native acceptance success claimed"
+  },
+  "windows_x64": {
+    "management": {
+      "go_test_limit_seconds": 600,
+      "duration_seconds": 600.328,
+      "active_test": "TestReleasedAntigravityLocalesSurviveDisableEnableAndForeignCollision/1.5.1/ja",
+      "observed_stack": [
+        "FlushFileBuffers",
+        "CopyOwnedFile",
+        "lifecycle.CopyVerified",
+        "management.stageHost",
+        "management.existing",
+        "locale_package_test.go:127"
+      ]
+    },
+    "transport": {
+      "go_test_limit_seconds": 600,
+      "duration_seconds": 600.18,
+      "active_test": "TestNewPackagesRefuseConsistentIncompleteOrSubstitutedMethodInventories/codex/wrong-filename",
+      "observed_stack": [
+        "FlushFileBuffers",
+        "platform.atomicWrite",
+        "writeLocaleFixture:95"
+      ]
+    },
+    "persistence": {
+      "test": "TestTurnStoreConcurrentMutation",
+      "diagnostic": "lock: locked",
+      "cause": "unmeasured; resource contention is not established"
+    }
+  },
+  "windows_arm64": {
+    "management": {
+      "go_test_limit_seconds": 600,
+      "duration_seconds": 600.083,
+      "active_test": "TestReleasedAntigravityLocalesSurviveDisableEnableAndForeignCollision/1.5.2/de",
+      "observed_stack": [
+        "currentSID",
+        "GuardOwned",
+        "CopyVerified",
+        "management.existing",
+        "locale_package_test.go:127"
+      ]
+    }
+  },
+  "correction_scope": "test fixture setup reuse and representative physical lifecycle coverage; all unique package versions, inventory attack cases, all ten setting values, full tree/rollback/ownership assertions and sixteen native legacy fixtures retained",
+  "limits_changed": false,
+  "production_guards_changed": false,
+  "claim_boundary": "Package-level test deadlines during repeated test physical I/O observed. Individual storage/ACL latency and concurrent lock cause unmeasured. This is distinct from prior d84 native-install 30-second deadlines. No raw logs, private paths, prompts, credentials or successful new release qualification claimed."
+}
