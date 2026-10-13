@@ -96,6 +96,42 @@ Fresh-machine quarantined download/host activation, production trust/key custody
 Windows signing and metadata/publication remain separate gates. / 새 기기의 다운로드·
 호스트 적용·운영 루트와 키 보관·Windows 서명·게시 검증은 별도 조건입니다.
 
+## Actual qualification / 실제 검증
+
+At source `9be0e5e879364e7f259b4ad7815c122d0a7860e1`,
+[run 38331988614](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38331988614)
+completed after `ParkerHwang` directly approved the qualification environment.
+The API retains that human approval. The runner was native ARM64, macOS 15.7.9
+build 24G830, Go 1.27.2 and notarytool 1.0.0 (38). / 해당 소스에서 사용자가
+후보 환경을 직접 승인한 뒤 실제 작업이 완료됐습니다. API에도 본인 승인 기록이
+남으며 실제 ARM64 운영체제와 도구 버전은 위와 같습니다.
+
+Payload ZIP submission `d6b2f121-8dcc-44e6-b974-4f14ccca64a8` and standalone
+installer submission `193488a0-4ca7-410f-9ad1-8c25b4722463` were both Accepted
+with zero issues, exact archive/code hash bindings and four plus one tickets.
+All five distributed code paths passed pinned Developer ID/team/notarized
+verification, and the candidate native release check passed. The cleanup
+receipt confirms deletion of the owned keychain/private files and restoration
+of the original search list. / ZIP과 단독 설치기가 모두 오류 없이 공증 승인됐고
+정확한 해시·티켓·파일 5개의 서명 및 공증·배포 검사를 통과했습니다. 정리 기록은
+전용 키체인과 비밀 파일 삭제 및 원래 검색 목록 복원을 확인합니다.
+
+[Public receipts](evidence/hosted-macos-signing-9be0e5e/macos-signing-candidate-qualification.json)
+retain their actual source identity. The qualification switch is now false,
+its expected-SHA variable was removed, and its four temporary encrypted secret
+copies were deleted. The four production Mac secrets remain in the protected
+release environment. Six environments retain the sole owner reviewer,
+administrator bypass disabled and their original tag/branch restrictions.
+/ 공개 기록은 실행한 소스를 그대로 표시합니다. 후보 실행 스위치를 끄고 지정 SHA
+변수와 후보 비밀 사본 4개를 삭제했습니다. 운영 Mac 비밀 4개는 보호 환경에 보관하며
+환경 6개의 본인 승인·관리자 우회 금지·태그 및 브랜치 제한을 유지합니다.
+
+This qualifies hosted candidate signing, notarization and cleanup. Final
+merged-tag bytes require their own approved release run; production TUF,
+publication, quarantined download and host activation remain unverified.
+/ GitHub 후보 서명·공증·정리 검증을 완료했습니다. 최종 병합 태그는 별도 직접 승인
+릴리스로 다시 검증해야 하며 운영 TUF·게시·격리된 다운로드·호스트 적용은 미검증입니다.
+
 ## Primary references / 공식 근거
 
 - [Hosted ARM64 runners](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)

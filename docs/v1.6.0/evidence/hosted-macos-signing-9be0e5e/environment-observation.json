@@ -1,0 +1,144 @@
+{
+  "schema": "opensocrates.hosted-mac-signing-environment-observation/1.0.0",
+  "observed_at": "2026-10-13T01:33:16.153919+00:00",
+  "source_commit": "9be0e5e879364e7f259b4ad7815c122d0a7860e1",
+  "workflow_run_id": 38331988614,
+  "workflow_run_url": "https://github.com/ParkerHwang/OpenSocrates/actions/runs/38331988614",
+  "required_human_approval": [
+    {
+      "user": "ParkerHwang",
+      "state": "approved",
+      "environments": [
+        "opensocrates-macos-signing-qualification"
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "name": "opensocrates-release-signing-macos",
+      "can_admins_bypass": false,
+      "prevent_self_review": false,
+      "reviewers": [
+        "ParkerHwang"
+      ],
+      "deployment_branch_policy": {
+        "protected_branches": false,
+        "custom_branch_policies": true
+      },
+      "ref_policies": [
+        {
+          "name": "v*",
+          "type": "tag"
+        }
+      ],
+      "encrypted_secret_names": [
+        "OPENSOCRATES_MAC_CERTIFICATE_P12_BASE64",
+        "OPENSOCRATES_MAC_CERTIFICATE_PASSWORD",
+        "OPENSOCRATES_NOTARY_APPLE_ID",
+        "OPENSOCRATES_NOTARY_APP_PASSWORD"
+      ]
+    },
+    {
+      "name": "opensocrates-release-signing",
+      "can_admins_bypass": false,
+      "prevent_self_review": false,
+      "reviewers": [
+        "ParkerHwang"
+      ],
+      "deployment_branch_policy": {
+        "protected_branches": false,
+        "custom_branch_policies": true
+      },
+      "ref_policies": [
+        {
+          "name": "v*",
+          "type": "tag"
+        }
+      ],
+      "encrypted_secret_names": []
+    },
+    {
+      "name": "opensocrates-release-signing-windows-arm64",
+      "can_admins_bypass": false,
+      "prevent_self_review": false,
+      "reviewers": [
+        "ParkerHwang"
+      ],
+      "deployment_branch_policy": {
+        "protected_branches": false,
+        "custom_branch_policies": true
+      },
+      "ref_policies": [
+        {
+          "name": "v*",
+          "type": "tag"
+        }
+      ],
+      "encrypted_secret_names": []
+    },
+    {
+      "name": "opensocrates-release-publication",
+      "can_admins_bypass": false,
+      "prevent_self_review": false,
+      "reviewers": [
+        "ParkerHwang"
+      ],
+      "deployment_branch_policy": {
+        "protected_branches": false,
+        "custom_branch_policies": true
+      },
+      "ref_policies": [
+        {
+          "name": "v*",
+          "type": "tag"
+        }
+      ],
+      "encrypted_secret_names": []
+    },
+    {
+      "name": "github-pages",
+      "can_admins_bypass": false,
+      "prevent_self_review": false,
+      "reviewers": [
+        "ParkerHwang"
+      ],
+      "deployment_branch_policy": {
+        "protected_branches": false,
+        "custom_branch_policies": true
+      },
+      "ref_policies": [
+        {
+          "name": "v*",
+          "type": "tag"
+        }
+      ],
+      "encrypted_secret_names": []
+    },
+    {
+      "name": "opensocrates-macos-signing-qualification",
+      "can_admins_bypass": false,
+      "prevent_self_review": false,
+      "reviewers": [
+        "ParkerHwang"
+      ],
+      "deployment_branch_policy": {
+        "protected_branches": false,
+        "custom_branch_policies": true
+      },
+      "ref_policies": [
+        {
+          "name": "codex/v1.6-go-native",
+          "type": "branch"
+        }
+      ],
+      "encrypted_secret_names": []
+    }
+  ],
+  "qualification_enabled": "false",
+  "qualification_sha_variable_removed": true,
+  "artifact": {
+    "id": 11782564955,
+    "archive_sha256": "12e7c660fab13bf75c63011fa161774cc49ce138988a8d6b5e132c9f3c06b1a2",
+    "inventory_file_count": 7
+  }
+}

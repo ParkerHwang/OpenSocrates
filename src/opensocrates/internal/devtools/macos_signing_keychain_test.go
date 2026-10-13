@@ -9,12 +9,11 @@ import (
 	"encoding/asn1"
 	"encoding/base64"
 	"encoding/hex"
-	"encoding/json"
 	"encoding/pem"
-	"errors"
 	"math/big"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -48,164 +47,6 @@ func macSigningFixture(t *testing.T) (string, string, []byte, []byte) {
 	t.Setenv("OPENSOCRATES_MAC_SIGN_IDENTITY", identity)
 	identities := []byte("  1) " + strings.ToUpper(identity) + " \"Developer ID Application: Fixture (6HM2UD6746)\"\n     1 valid identities found\n")
 	return temp, identity, identities, pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der})
-}
-
-type macSigningFake struct {
-	t                 *testing.T
-	list              []string
-	identities, certs []byte
-	fail              string
-	calls             []string
-}
-
-func (f *macSigningFake) run(root, name string, args ...string) ([]byte, error) {
-	f.t.Helper()
-	f.calls = append(f.calls, name+":"+args[0])
-	if args[0] == f.fail {
-		return nil, errors.New("mac_signing_private_command_failed")
-	}
-	switch args[0] {
-	case "list-keychains":
-		if len(args) > 3 {
-			f.list = append([]string{}, args[4:]...)
-			return nil, nil
-		}
-		rows := []string{}
-		for _, path := range f.list {
-			rows = append(rows, "\""+path+"\"")
-		}
-		return []byte(strings.Join(rows, "\n")), nil
-	case "create-keychain":
-		path := args[len(args)-1]
-		if err := os.WriteFile(path, []byte("encrypted fixture keychain"), 0600); err != nil {
-			f.t.Fatal(err)
-		}
-		f.list = append([]string{path}, f.list...)
-	case "delete-keychain":
-		return nil, os.Remove(args[1])
-	case "find-identity":
-		return f.identities, nil
-	case "find-certificate":
-		return f.certs, nil
-	}
-	return nil, nil
-}
-
-func TestMacSigningPrepareAndCleanupPreserveExistingKeychains(t *testing.T) {
-	temp, _, ids, certs := macSigningFixture(t)
-	root := filepath.Join(temp, "source")
-	os.Mkdir(root, 0700)
-	original := []string{"/Users/runner/Library/Keychains/login.keychain-db", "/Library/Keychains/System.keychain"}
-	fake := &macSigningFake{t: t, list: append([]string{}, original...), identities: ids, certs: certs}
-	if err := macSigningPrepare(root, fake.run); err != nil {
-		t.Fatal(err)
-	}
-	path, err := macSigningOwnedKeychain()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(fake.list) != 3 || fake.list[0] != path {
-		t.Fatal("private keychain not explicitly searched")
-	}
-	state, err := os.ReadFile(os.Getenv("OPENSOCRATES_MAC_SIGNING_STATE"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, secret := range []string{"fixture-secret-app-password", "fixture-secret-p12-password", "fixture-private-p12"} {
-		if strings.Contains(string(state), secret) {
-			t.Fatal("private state retained credentials")
-		}
-	}
-	if _, err = os.Stat(filepath.Join(filepath.Dir(path), "certificate.p12")); !os.IsNotExist(err) {
-		t.Fatal("P12 remained after import")
-	}
-	if err = macSigningCleanup(root, fake.run); err != nil {
-		t.Fatal(err)
-	}
-	if !macSigningSameList(fake.list, original) {
-		t.Fatal("original search list not restored")
-	}
-	if _, err = os.Stat(filepath.Dir(path)); !os.IsNotExist(err) {
-		t.Fatal("private directory remained")
-	}
-	if err = macSigningCleanup(root, fake.run); err != nil {
-		t.Fatal("repeat cleanup failed")
-	}
-	receipt, err := os.ReadFile(filepath.Join(root, "build/evidence/macos-keychain-cleanup.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if strings.Contains(string(receipt), temp) || strings.Contains(string(receipt), "fixture-secret") {
-		t.Fatal("cleanup receipt leaked private metadata")
-	}
-}
-
-func TestMacSigningPartialFailuresRollbackAndDoNotLogSecrets(t *testing.T) {
-	for _, stage := range []string{"create-keychain", "import", "set-key-partition-list", "find-identity", "notarytool"} {
-		t.Run(stage, func(t *testing.T) {
-			temp, _, ids, certs := macSigningFixture(t)
-			fake := &macSigningFake{t: t, list: []string{"/original.keychain-db"}, identities: ids, certs: certs, fail: stage}
-			err := macSigningPrepare(temp, fake.run)
-			if err == nil || strings.Contains(err.Error(), "fixture") || strings.Contains(err.Error(), temp) {
-				t.Fatalf("unsafe failure: %v", err)
-			}
-			if !macSigningSameList(fake.list, []string{"/original.keychain-db"}) {
-				t.Fatal("failed setup altered existing search list")
-			}
-			if _, err = os.Stat(filepath.Dir(os.Getenv("OPENSOCRATES_MAC_SIGNING_STATE"))); !os.IsNotExist(err) {
-				t.Fatal("failed setup retained private material")
-			}
-		})
-	}
-}
-
-func TestMacSigningCleanupPreservesForeignSearchListChanges(t *testing.T) {
-	temp, _, ids, certs := macSigningFixture(t)
-	fake := &macSigningFake{t: t, list: []string{"/original.keychain-db"}, identities: ids, certs: certs}
-	if err := macSigningPrepare(temp, fake.run); err != nil {
-		t.Fatal(err)
-	}
-	directory := filepath.Dir(os.Getenv("OPENSOCRATES_MAC_SIGNING_STATE"))
-	fake.list = append(fake.list, "/foreign.keychain-db")
-	err := macSigningCleanup(temp, fake.run)
-	if err == nil || err.Error() != "mac_signing_cleanup_foreign_search_list_preserved" {
-		t.Fatal("foreign changes not reported")
-	}
-	if !macSigningSameList(fake.list, []string{"/original.keychain-db", "/foreign.keychain-db"}) {
-		t.Fatal("foreign keychain changed")
-	}
-	if _, err = os.Stat(directory); !os.IsNotExist(err) {
-		t.Fatal("foreign search change retained credentials")
-	}
-}
-
-func TestMacSigningCleanupRejectsForeignStateAndPartialKeychainCannotSign(t *testing.T) {
-	temp, _, ids, certs := macSigningFixture(t)
-	fake := &macSigningFake{t: t, list: []string{"/original.keychain-db"}, identities: ids, certs: certs}
-	if err := macSigningPrepare(temp, fake.run); err != nil {
-		t.Fatal(err)
-	}
-	statePath := os.Getenv("OPENSOCRATES_MAC_SIGNING_STATE")
-	data, _ := os.ReadFile(statePath)
-	var state macSigningState
-	json.Unmarshal(data, &state)
-	state.Prepared = false
-	changed, _ := json.Marshal(state)
-	os.WriteFile(statePath, changed, 0600)
-	if _, err := macSigningOwnedKeychain(); err == nil {
-		t.Fatal("partial preparation accepted")
-	}
-	state.RunID = "999"
-	changed, _ = json.Marshal(state)
-	os.WriteFile(statePath, changed, 0600)
-	before := len(fake.calls)
-	if err := macSigningCleanup(temp, fake.run); err == nil || len(fake.calls) != before {
-		t.Fatal("foreign marker authorized cleanup")
-	}
-	os.WriteFile(statePath, data, 0600)
-	if err := macSigningCleanup(temp, fake.run); err != nil {
-		t.Fatal(err)
-	}
 }
 
 func TestMacSigningRejectsWrongIdentityCertificateTeamAndInvalidP12(t *testing.T) {
@@ -244,8 +85,13 @@ func TestMacSigningHostedGateAndChildEnvironment(t *testing.T) {
 	if err := macSigningHostedEnvironment("darwin", "arm64"); err != nil {
 		t.Fatal(err)
 	}
-	if err := macSigningHostedEnvironment("darwin", "amd64"); err == nil {
-		t.Fatal("Intel accepted")
+	for _, host := range []struct{ goos, goarch string }{
+		{"darwin", "amd64"}, {"windows", "amd64"}, {"windows", "arm64"},
+		{"linux", "amd64"}, {"linux", "arm64"},
+	} {
+		if err := macSigningHostedEnvironment(host.goos, host.goarch); err == nil {
+			t.Fatalf("foreign native host accepted: %s/%s", host.goos, host.goarch)
+		}
 	}
 	for _, name := range []string{"OPENSOCRATES_RUNNER_ENVIRONMENT", "OPENSOCRATES_RUNNER_ARCH", "GITHUB_REPOSITORY", "GITHUB_ACTIONS"} {
 		previous := os.Getenv(name)
@@ -274,22 +120,21 @@ func TestMacSigningHostedGateAndChildEnvironment(t *testing.T) {
 	}
 }
 
-func TestMacSigningCleanupStillDeletesPrivateFilesWhenSearchInspectionFails(t *testing.T) {
-	temp, _, ids, certs := macSigningFixture(t)
-	fake := &macSigningFake{t: t, list: []string{"/original.keychain-db"}, identities: ids, certs: certs}
-	if err := macSigningPrepare(temp, fake.run); err != nil {
-		t.Fatal(err)
+// The production entrypoint checks the native platform before reading signing
+// credentials or invoking Apple tools, even when Actions runner fields claim Mac.
+func TestMacSigningPrepareRejectsForeignNativeHost(t *testing.T) {
+	if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
+		t.Skip("native Mac ARM64; foreign platforms are covered by the portable gate table")
 	}
-	directory := filepath.Dir(os.Getenv("OPENSOCRATES_MAC_SIGNING_STATE"))
-	fake.fail = "list-keychains"
-	for _, name := range []string{"GITHUB_REF", "GITHUB_SHA", "OPENSOCRATES_NOTARY_APP_PASSWORD", "OPENSOCRATES_MAC_CERTIFICATE_PASSWORD", "OPENSOCRATES_MAC_CERTIFICATE_P12_BASE64", "OPENSOCRATES_MAC_SIGNING_KEYCHAIN"} {
-		t.Setenv(name, "")
+	for name, value := range map[string]string{
+		"GITHUB_ACTIONS": "true", "GITHUB_REPOSITORY": publicationRepository,
+		"OPENSOCRATES_RUNNER_ENVIRONMENT": "github-hosted", "OPENSOCRATES_RUNNER_ARCH": "ARM64",
+		"RUNNER_OS": "macOS", "RUNNER_ARCH": "ARM64",
+	} {
+		t.Setenv(name, value)
 	}
-	err := macSigningCleanup(temp, fake.run)
-	if err == nil || err.Error() != "mac_signing_cleanup_search_list_failed" {
-		t.Fatal("search-list failure hidden")
-	}
-	if _, err = os.Stat(directory); !os.IsNotExist(err) {
-		t.Fatal("cancelled job retained credentials")
+	err := RunMacOSSigningSetup(t.TempDir(), "macos-signing-prepare", []string{"--purpose", "qualification"})
+	if err == nil || err.Error() != "mac_signing_hosted_arm64_required" {
+		t.Fatalf("foreign native prepare reached signing setup: %v", err)
 	}
 }

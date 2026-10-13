@@ -129,11 +129,40 @@ and [inactive reproducer](evidence/qualification/windows-restricted-owner/README
 retain this unavailable result. A compatible normal user environment is still
 needed; do not weaken guards or change account/system/desktop policies.
 
+## Hosted Mac signing follow-up
+
+The complete local Make suite passed at `9be0e5e879364e7f259b4ad7815c122d0a7860e1`
+on native macOS ARM64 / Go 1.27.2. Code and security reviews found no concrete
+findings. [Hosted run 38331988614](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38331988614)
+then passed after the owner's direct environment approval: actual ephemeral
+keychain import, separate Accepted payload/installer notarizations with zero
+issues, all five pinned code checks, native release check and credential cleanup.
+The [qualification receipt](evidence/hosted-macos-signing-9be0e5e/macos-signing-candidate-qualification.json),
+[notarization receipt](evidence/hosted-macos-signing-9be0e5e/macos-signing-candidate-notarization.json),
+[cleanup receipt](evidence/hosted-macos-signing-9be0e5e/macos-keychain-cleanup.json)
+and [environment observation](evidence/hosted-macos-signing-9be0e5e/environment-observation.json)
+retain exact source identity. Production encrypted Mac secrets remain; the
+qualification switch/SHA and temporary credential copies were disabled/removed.
+See [custody and direct approval](HOSTED_MAC_SIGNING.md).
+
+The same head's normal PR CI passed source and Mac jobs but exposed deterministic
+Windows failures in new POSIX Mac-keychain fixtures. Those five lifecycle tests
+now live in a Darwin-specific test file, preserving all assertions and production
+guards. Portable certificate/secret-isolation/bounds tests remain, with explicit
+Windows/Linux native-host rejection coverage added. This test/documentation
+follow-up does not relabel the signed `9be0e5e` bytes as a new candidate execution.
+
+GitHub 후보 환경의 본인 승인 뒤 실제 서명·공증·파일 5개·배포 검사·키체인 정리를
+통과했습니다. 검증용 비밀 사본은 제거하고 운영 비밀과 직접 승인 정책을 유지합니다.
+Windows에서는 Mac 전용 경로·권한을 가정한 테스트만 Mac 파일로 옮기고, 공통 보안
+검사와 Windows/Linux 호스트 거부 검사를 보존했습니다. 기존 서명 산출물의 소스
+9be0e5e를 후속 테스트·문서 커밋의 실행 결과로 바꾸지 않습니다.
+
 ## Remaining release gates
 
 Available implementation acceptance passes; this candidate is **not production-release validated**.
 
-1. Provision an independently approved threshold-signed TUF root, Windows publisher identity and protected signing runners, Windows hosted signing, metadata service/key custody and scoped Administration-read publication credential. Local Mac Developer ID issuance, authentication and exact candidate signing/notarization/platform integrity now pass; the isolated runner and final merged-tag bytes remain unqualified. Test trust cannot become production trust. Apply the reviewed Go required-check migration only with the user's approval.
+1. Provision an independently approved threshold-signed TUF root, Windows publisher identity/signing integration, metadata service/key custody and scoped Administration-read publication credential. Local and hosted Mac candidate signing/notarization/platform integrity now pass; final merged-tag bytes still require their own directly approved execution. Test trust cannot become production trust. The user-approved Go required-check migration and six protected release/qualification environment policies are applied.
 2. Qualify public signed network updates and complete production installer/manager/updater self-update/rollback with production trust, security prompts and timestamps.
 3. Complete Windows adoption beginning with a successfully executed original v1.5 installer in a compatible user environment. Actual-payload Go adoption/rollback now passes, but its source-equivalent initialization does not meet that original-installer gate. Also complete macOS production fixed-label/updater-execution qualification. Released v1.5.0 explicitly supported automatic updates only on macOS ARM64; its Windows installer reports them unavailable, so there is no supported enabled Windows legacy scheduler to adopt. Enabled macOS takeover and rollback now have integrated real-OS evidence under the disclosed unique-label and suppressed-execution fixture boundaries.
 4. Obtain clean-machine and real host trust/activation, account/workspace/global and CLI/Desktop evidence. Authenticated macOS legacy adapter operation now has a synthetic live-account receipt; actual delivery/answer quality remain distinct. Local updates cannot modify account content or running conversations. External host ARM64 availability/loading remains host-specific qualification.

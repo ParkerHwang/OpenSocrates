@@ -82,3 +82,18 @@ they are never relabeled as native x64 or native ARM64 release qualification.
 
 Exact commands, account-resource boundaries and remaining prerequisites are in
 [release preparation](../RELEASE_PREPARATION.md) and the updated handoff.
+
+## Hosted Mac candidate at 9be0e5e
+
+[Run 38331988614](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38331988614)
+passed after direct owner approval. Original runner-produced receipts are retained
+under [hosted-macos-signing-9be0e5e](hosted-macos-signing-9be0e5e/macos-signing-candidate-qualification.json):
+qualification, two Accepted notarizations, owned-keychain cleanup, source
+provenance and CycloneDX SBOM. The accompanying environment observation records
+the human approval, six protected policies, retained production secret names and
+removed qualification credential copies. No secret values or private keychain
+paths are retained. Candidate source identity remains `9be0e5e` after later
+test/documentation changes; merged-tag/public delivery remains separate.
+
+실제 GitHub Mac 작업과 본인 승인·공증·정리 기록이며 비밀값이나 개인 키체인 경로는
+포함하지 않습니다. 이후 커밋으로 실행 소스를 바꾸지 않으며 최종 태그·게시와 구분합니다.

@@ -94,12 +94,16 @@ reviewers would require one of them, not all of them, to approve.
 선택한 단독 운영 정책은 직접 시작한 작업을 본인이 승인할 수 있고 자동 승인은
 하지 않습니다. 여러 승인자 등록이 전원 승인을 요구하는 설정은 아닙니다.
 
-Final release qualification still needs the chosen runner's actual execution,
-approved production trust/key custody, Windows signing, immutable publication
+The hosted Mac candidate's actual approved execution, signing/notarization and
+credential cleanup passed at `9be0e5e`; see the exact receipts and subsequent
+cleanup in [hosted signing](HOSTED_MAC_SIGNING.md). Final release qualification
+still needs merged-tag execution, approved production trust/key custody,
+Windows signing, immutable publication
 credentials, maintained metadata hosting, clean-machine quarantined download
 and actual host activation. Candidate notarization does not satisfy these gates.
-/ 선택한 환경에서의 실제 실행·운영 루트와 키 보관·Windows 서명·게시 자격·메타데이터
-운영·새 기기의 다운로드·실제 호스트 적용은 별도 릴리스 조건으로 남습니다.
+/ GitHub Mac 후보는 9be0e5e에서 직접 승인 후 실제 실행·서명·공증·비밀 정리까지
+통과했습니다. 최종 병합 태그·운영 루트와 키 보관·Windows 서명·게시 자격·메타데이터
+운영·새 기기의 다운로드·실제 호스트 적용은 별도 조건으로 남습니다.
 
 ## Primary references / 공식 근거
 
