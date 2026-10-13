@@ -243,13 +243,26 @@ class PromptCompilerLocaleBudgetChecks(unittest.TestCase):
             Rigor.TOGETHER,
             RiskFloorReason.ORDINARY_JUDGMENT,
         )
+        locales = ("fr", "de", "it", "es", "pt", "th")
+        eligible_preferred = {
+            method.id: next(
+                (
+                    hint
+                    for hint in method.complements["preferred"]
+                    if hint != method.id and self.methods[hint].family != method.family
+                ),
+                None,
+            )
+            for method in self.bundle.methods
+        }
         checked = 0
-        for locale in ("fr", "de", "it", "es", "pt", "th"):
+        for locale in locales:
             start_limit = (24 if locale == "th" else 12) * 1024
             primary_limit = 900 if locale == "th" else 1200
             for method in self.bundle.methods:
-                preferred = method.complements["preferred"][0]
-                for secondary_id in (None, preferred):
+                preferred = eligible_preferred[method.id]
+                secondaries = (None,) if preferred is None else (None, preferred)
+                for secondary_id in secondaries:
                     route = _method_route(self.bundle, method.id, secondary_id)
                     for event in (
                         PromptEvent.START,
@@ -317,7 +330,27 @@ class PromptCompilerLocaleBudgetChecks(unittest.TestCase):
                                         request.rigor.effective_rigor is Rigor.STRICT,
                                     )
                                 checked += 1
-        self.assertEqual(checked, 6 * 48 * 2 * 3 * 2)
+        self.assertEqual(len(self.bundle.methods), 48)
+        expected_routes = len(self.bundle.methods) + sum(
+            preferred is not None for preferred in eligible_preferred.values()
+        )
+        self.assertEqual(checked, len(locales) * expected_routes * 3 * 2)
+
+    def test_same_family_complement_hints_are_not_simultaneous_weighted_routes(self):
+        from compile_prompts import _method_route
+        from opensocrates.errors import ValidationError
+
+        same_family_hints = [
+            (method.id, hint)
+            for method in self.bundle.methods
+            for hint in method.complements["preferred"]
+            if hint != method.id and self.methods[hint].family == method.family
+        ]
+        self.assertTrue(same_family_hints)
+        for primary, secondary in same_family_hints:
+            with self.subTest(primary=primary, secondary=secondary):
+                with self.assertRaises(ValidationError):
+                    _method_route(self.bundle, primary, secondary)
 
     def test_legacy_and_default_start_limits_reject_unsegmented_oversize_output(self):
         from opensocrates.prompting.context_budget import ContextSizeError, enforce_context_budget
