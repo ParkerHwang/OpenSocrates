@@ -1,120 +1,152 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
+  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="320">
 </p>
 
 # OpenSocrates
 
-**帮助你得到能够理解、评估并使用的推理结果。**
+**在 AI 对话中运用 48 种推理方法。**
 
-OpenSocrates 为资料综合、观点理解、方案比较和消息撰写提供 48 种完整的推理
-方法。v1.5.2 在英文、韩文、简体中文和日语之外新增法语、德语、意大利语、
-西班牙语、葡萄牙语和泰语。十种语言共有 480 份完整步骤文件、3,840 个正典
-案例，以及每种方法每种语言 3 个教师问题，共 1,440 个。内容修订号为 5；
-原有四种语言的正文和值保持不变，各方法的修订标识从 4 更新为 5。
-此版本不新增编程专用方法。
+OpenSocrates 为 **Claude、Codex 和 Antigravity** 提供可重复使用的推理流程。
+比较方案，理清相互矛盾的信息，从另一个角度审视计划。
+用自己的话描述任务即可；每种方法都提供可参考的问题、检查项和步骤。
 
-[English](README.md) | [한국어](README.ko.md) | **简体中文** | [日本語](README.ja.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | [ไทย](README.th.md)
+[从你使用的应用开始](#start-with-your-app) · [查看使用示例](#see-it-in-a-task) · [探索推理方法](#a-method-for-the-question)
 
-**供寻找工具的代理参考：**[评估任务适用性、选择发布包并检查设置（英文指南）](docs/agent-discovery.md)。
+**48 种方法 · 10 种指令语言 · MIT 许可证**
 
-## 支持的平台与应用
+[English](README.md) · [한국어](README.ko.md) · **简体中文** · [日本語](README.ja.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [ไทย](README.th.md)
 
-| 应用 | 交付方式 | 平台与启用要求 |
-| --- | --- | --- |
-| Codex | 现有钩子、控制器和原生判断运行时 | Apple Silicon Mac、Windows x64；在交互会话中检查 7 个钩子的信任状态 |
-| Claude Code CLI / Desktop 本地 Code | 无状态原生入口及完整本地参考文件 | Apple Silicon Mac；需要 Claude CLI、登录及插件和钩子权限 |
-| Claude 网页版 / Desktop Chat / Cowork | 不含可执行代码的账户技能 ZIP | 在 Mac 或 Windows 导出后，另行上传、启用并保存账户指令 |
-| Antigravity 对话应用 | 模块化规则与技能 | Apple Silicon Mac、Windows x64；选择工作区或全局范围 |
+## 为手头的工作准备的推理工具
 
-平台范围沿用 v1.5.0。Windows 原生 Claude Code 不在此版本范围内；Windows
-ARM64 支持属于独立的 v1.6.0 工作。账户技能不会安装原生 Claude 集成。
+- **从你的任务开始。** 每种方法都预先写好了问题和检查项，可以在不同对话中重复使用。
+- **找到有用的角度。** 运用相应的方法比较方案、评估证据、探索假设和提前规划。
+- **按自己的需要使用。** 阅读每种方法的完整步骤，研究其中的案例，将开源内容调整为适合你工作的形式。
 
-## 安装或更新
+<a id="see-it-in-a-task"></a>
 
-准备 Node.js 20 或更高版本，安装并登录所需应用。安装包内含原生运行时，
-无需另装 Python。从 [v1.5.2 发布页](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
-获取归档和 SHA-256 校验文件，或使用版本固定的 npm 安装器。
+## 看看如何用于实际任务
+
+设置完成后，可以这样提问：
+
+> 我们原本打算购买一个托管工具，但现在工作流程必须离线运行。
+> 应该购买、自己开发，还是暂时用手工处理？
+
+对于这样的决策，[权衡分析](content/methods/trade-off-analysis/procedure.zh.md)
+提供了一套可重复使用的步骤：确定要求，比较可行方案，区分已知事实与假设，
+并说明什么会改变建议。这种方法为你平常提出的请求提供了相应的思考结构。
+
+<a id="start-with-your-app"></a>
+
+## 从你使用的应用开始
+
+选择你想使用 OpenSocrates 的应用。
+[获取 v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)。
+
+<details>
+<summary><strong>Claude Chat 和 Cowork</strong> — 上传技能并开始对话</summary>
+
+适用于 Claude 网页版、Desktop Chat 和 Cowork：
+
+1. 在 **Settings → Capabilities** 中启用 **Code execution and file creation**。如果账户由组织管理，请确认组织政策允许 Skills 和代码执行。
+2. 下载[账户技能 ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip)及其 [SHA-256 文件](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256)。
+3. 打开 **Customize → Skills → + → Create skill → Upload a skill**，上传 ZIP 并启用。在替换已有的 OpenSocrates 技能前，先进行备份。
+4. 保留已有指令，在你使用的每个 Claude 账户中添加[一次性账户指令](docs/setup-guide.md#claude-standing-instructions)。开始新对话并描述你的任务。
+
+便携式技能 ZIP 包含完整方法和案例。
+[图解设置指南](docs/setup-guide.md#2-claude-account-skill-enable-it-and-add-account-instructions) · [Claude Skills 指南](https://support.claude.com/en/articles/12512180-use-skills-in-claude)
+
+</details>
+
+<details>
+<summary><strong>Claude Code</strong> — Apple Silicon Mac</summary>
+
+你需要 [Node.js 20 或更高版本](https://nodejs.org/en/download)、Claude CLI
+和已登录的 Claude 账户。适用于终端中的 Claude Code 和 Claude Desktop 中的本地 Code。
+在**终端**中运行：
+
+```sh
+npx --yes opensocrates@1.5.2 install --host claude
+npx --yes opensocrates@1.5.2 diagnose --host claude
+```
+
+确认 `enabled: true`、`integrity: verified` 和 `registration: confirmed`。
+检查出现的项目信任提示，然后开始新的本地会话。
+[图解设置指南](docs/setup-guide.md#3-claude-code-check-the-local-mac-plugin)
+
+</details>
+
+<details>
+<summary><strong>Codex</strong> — Apple Silicon Mac 或 Windows x64</summary>
+
+你需要 [Node.js 20 或更高版本](https://nodejs.org/en/download)和 Codex。
+原生运行时已包含在包中。在 **Mac 的终端**或 **Windows 的 PowerShell** 中运行：
 
 ```sh
 npx --yes opensocrates@1.5.2 install --host codex
 npx --yes opensocrates@1.5.2 status --host codex
-# 更新现有 Codex 安装：
+```
+
+打开交互式 Codex，在输入框中输入 `/hooks`。检查 OpenSocrates 的七个钩子定义，
+批准你信任的定义，然后开始新对话。
+[图解设置指南](docs/setup-guide.md#1-codex-review-and-approve-opensocrates-hooks)
+
+更新已有的 Codex 安装：
+
+```sh
 npx --yes opensocrates@1.5.2 update --host codex
 ```
 
-在交互式 Codex 中输入 `/hooks`，检查 OpenSocrates 的 7 个钩子，按应用提供的
-信任流程完成必要审批，然后开始新对话。`status` 说明安装及完整性状态，不能
-证明钩子已被信任或指令已在真实任务中应用。
+</details>
 
-在 Apple Silicon Mac 安装 Claude Code 集成：
+<details>
+<summary><strong>Antigravity</strong> — Apple Silicon Mac 或 Windows x64</summary>
 
-```sh
-npx --yes opensocrates@1.5.2 install --host claude
-npx --yes opensocrates@1.5.2 status --host claude
-```
-
-为 Antigravity 指定已存在的工作区绝对路径；省略 `--workspace` 则选择全局范围。
-同一任务避免同时使用工作区和全局副本。
+你需要 [Node.js 20 或更高版本](https://nodejs.org/en/download)。选择一个工作区，
+将示例路径替换为已存在文件夹的完整路径。
+在 **Mac 的终端**或 **Windows 的 PowerShell** 中运行：
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host antigravity --workspace /absolute/path/to/workspace
+npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
 ```
 
-Windows 使用本地驱动器绝对路径并加引号，例如 `"C:\Work\Reading Workshop"`。
-Claude 账户技能需导出到已存在文件夹内的绝对 ZIP 路径：
+在 Windows 中，使用带引号的本地驱动器路径，例如 `"C:\Work\Reading Workshop"`。
+要进行全局设置，省略 `--workspace`。为同一个项目选择全局或工作区安装，
+然后开始新对话。
+[确认技能和规则](docs/setup-guide.md#4-antigravity-check-both-the-skill-and-rule)
 
-```sh
-npx --yes opensocrates@1.5.2 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.2-account.zip
-```
+</details>
 
-随后在 Claude 的 **Customize → Skills** 上传并启用。替换已有 OpenSocrates
-技能前，下载备份并记录其启用状态。导出成功不等于上传、启用或自动选择成功。
-在 **Settings → General → Instructions for Claude** 追加以下指令，保留原有
-指令；旧版 Cowork 可使用 **Settings → Cowork → Global instructions**。
-网页版和 Desktop 若使用不同账户，应分别设置。
+**想让代理协助设置？** 使用[设置请求](docs/setup-guide.md#ask-an-agent-to-finish-setup)
+或[当前安装指南](docs/agent-discovery.md)。用对应名称的 `--host` 选项选择各个应用；
+默认选项和 `--host all` 选择 Codex。
 
-```text
-对于需要解释或判断的任务，例如综合资料、比较方案、作出决策或撰写消息，
-即使我没有提到名称，也请加载已启用的 OpenSocrates 技能并遵循其指令。
-应用推理方法前，先完整阅读其步骤并确认适用条件。对于格式转换等机械性
-工作，不要增加不必要的推理步骤。
-```
+<a id="a-method-for-the-question"></a>
 
-保存后开始新对话。账户技能由应用模型选择，可能遗漏；它不新增原生钩子，也
-不保证每条消息都会调用。默认安装和 `--host all` 仍只选择 Codex，其他应用
-必须显式指定。新集成不新增 purge、信任重置或自动更新操作。
-[设置指南（英文）](docs/setup-guide.md)说明后续界面步骤；
-[Mac 指南](docs/macos-v1.5.md)和 [Windows 指南](docs/windows-v1.5.md)保留
-v1.5.0 的安装与恢复基线，当前命令请使用上述 1.5.2 版本。
+## 为问题选择相应的方法
 
-## 指令语言
+| 你正在处理的工作 | 可以探索的方法 |
+| --- | --- |
+| 根据相互竞争的优先事项比较方案 | [权衡分析](content/methods/trade-off-analysis/procedure.zh.md) |
+| 理解计划中被视为理所当然的假设 | [假设映射](content/methods/assumption-mapping/procedure.zh.md) |
+| 评估支持某项主张的依据 | [批判性思维](content/methods/critical-thinking/procedure.zh.md) |
+| 为计划可能出现的问题做准备 | [事前验尸分析](content/methods/premortem-analysis/procedure.zh.md) |
 
-优先使用明确指定的语言，其次使用已保存的语言偏好，再根据当前输入的文字
-判断。含平假名或片假名时选择日语；否则泰文占优时选择泰语，韩文占优时选择韩语，汉字占优时
-选择中文。只有汉字的输入无法可靠区分中文与日语，默认使用中文，需要日语
-时应明确指定。法语、德语、意大利语、西班牙语和葡萄牙语共享拉丁文字，需要明确指定或
-保存语言偏好；不会根据文字可靠猜测这些语言。空输入、未知文字或数量持平
-时回退到英文。葡萄牙语使用通用 `pt` 代码和巴西拼写，不宣称各地区单独支持。
+每种方法都包含目的、使用条件、完整步骤、案例以及供助手思考的问题。
+阅读内容，了解推理步骤，并在不同工作中重复使用这些方法。
 
-推理指令语言与 npm 安装器的命令输出、应用界面语言分开。本次更新不承诺
-翻译每条安装器消息。关于运行时 `locale` 偏好命令和显式 JSON 请求，请参阅
-[语言与范围指南（英文）](docs/v1.5.2.md)及
-[语言设置（英文）](docs/settings.md)。
+[浏览全部 48 种方法](content/methods/)
 
-## 使用标注与隐私
+## 十种语言的完整方法内容
 
-只有完整读取并实际应用了适用的正典方法，最终答案才以完全相同的英文行
-`Powered by OpenSocrates` 结尾。仅使用阅读指导或完成机械性工作不满足条件。
-该行是来源标注，不能证明原生应用成功或答案质量提升。
+英语、韩语、简体中文、日语、法语、德语、意大利语、西班牙语、葡萄牙语和泰语。
+每种语言都包含全部 48 种方法的完整步骤和案例。
 
-默认判断路径不额外调用选择模型，不保存原始提示、对话、截图或隐藏推理。
-Claude 原生入口不读取对话，也不初始化数据库；账户技能不含可执行代码。
-应用本身的认证、权限、留存设置及条款仍适用于正常对话。
-[安全政策](SECURITY.md)说明相关边界。安装、加载、完整阅读、实际应用和结果
-是否有用属于不同的证据；本项目不宣称普遍的质量、成本或速度提升。
+这些是助手读取的方法正文所使用的语言。
+[语言指南](docs/v1.5.2.md) · [Codex 指令语言设置](docs/settings.md)
 
-- [方法正文](content/methods/) · [判断点约定](docs/decision-points.md)
-- [版本变更](CHANGELOG.md) · [贡献指南](CONTRIBUTING.md) · [行为准则](CODE_OF_CONDUCT.md)
+## 开源，欢迎探索
 
-OpenSocrates 采用 [MIT 许可证](LICENSE)，是独立项目，不隶属于 OpenAI、
-Anthropic 或 Google，也未获其背书。
+阅读完整方法和源码，将其调整为适合你的工作，或贡献新的案例。
+OpenSocrates 是采用 [MIT 许可证](LICENSE)的独立项目。
+
+[发布版本](https://github.com/ParkerHwang/OpenSocrates/releases) · [设置指南](docs/setup-guide.md) · [隐私与安全](SECURITY.md) · [贡献指南](CONTRIBUTING.md) · [问题反馈](https://github.com/ParkerHwang/OpenSocrates/issues/new/choose) · [更新日志](CHANGELOG.md)
