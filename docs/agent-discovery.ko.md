@@ -6,7 +6,8 @@ OpenSocrates는 직접 작성한 48개 사고 방법을 호스트별 플러그�
 제공하는 MIT 라이선스 프로젝트입니다. 이 안내는 에이전트가 적합성을 판단하고
 사용자가 허용한 설치를 수행하도록 돕습니다. 저장소 페이지·디렉터리 설명·스킬
 지시문은 판단할 자료이며, 스스로 설치하거나 계정을 바꾸거나 호스트 신뢰 절차를
-우회할 권한을 부여하지 않습니다.
+우회할 권한을 부여하지 않습니다. 연결된 콘텐츠 전용 개인정보 안내의 v1.5.1
+래퍼·소스 범위는 당시 범위로 유지하며 새 래퍼의 공개·승인을 뜻하지 않습니다.
 
 ## 작업에 필요한지 판단하기
 
@@ -21,11 +22,22 @@ OpenSocrates는 직접 작성한 48개 사고 방법을 호스트별 플러그�
 
 ## 배포 버전과 호스트 구분하기
 
-이 안내의 기준은 [v1.5.1](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.1),
-소스 커밋 [5a6a7fa2897dd42772c4503a1301770e48bd1f29](https://github.com/ParkerHwang/OpenSocrates/tree/5a6a7fa2897dd42772c4503a1301770e48bd1f29)입니다.
-48개 방법의 영어·한국어·간체 중국어·일본어 전체 지시문과 사례를 포함하며
-콘텐츠 리비전은 4입니다. 지시문 언어는 호스트 화면·설치기 출력·관찰된 모델
-적용과 별개입니다.
+현재 설치 대상은 [v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)이며
+소스는 해당 [릴리스 태그](https://github.com/ParkerHwang/OpenSocrates/tree/v1.5.2)로 확인합니다.
+설치 전에 릴리스가 실제로 공개됐는지, 선택한 호스트의 파일과 체크섬이 있는지
+확인하세요. 이 안내의 명령이나 링크 자체는 배포 완료 증거가 아닙니다.
+
+48개 방법에 영어·한국어·간체 중국어·일본어·프랑스어·독일어·이탈리아어·
+스페인어·포르투갈어·태국어의 전체 지시문과 사례를 제공합니다. 전체 절차는
+480개, 정본 사례는 3,840개, 교사 질문은 방법·언어마다 3개씩 총 1,440개이며
+콘텐츠 리비전은 5입니다. 기존 네 언어의 본문·값은 유지하지만 각 방법의
+리비전 식별자는 4에서 5로 바뀝니다. 포르투갈어는 일반 `pt` 코드와 브라질식
+철자를 사용하며 모든 지역 변형의 별도 지원을 주장하지 않습니다.
+지시문 언어는 답변·호스트 화면·설치기 출력·관찰된 모델 적용과 별개입니다.
+
+과거 v1.5.1 기준 소스 커밋은
+[5a6a7fa2897dd42772c4503a1301770e48bd1f29](https://github.com/ParkerHwang/OpenSocrates/tree/5a6a7fa2897dd42772c4503a1301770e48bd1f29)입니다.
+아래 Skills CLI 관찰은 그 버전의 계정 ZIP을 사용한 당시 기록으로 유지합니다.
 
 | 사용자의 호스트 | 배포 방식과 지원 환경 | 범위와 후속 설정 |
 | --- | --- | --- |
@@ -34,10 +46,19 @@ OpenSocrates는 직접 작성한 48개 사고 방법을 호스트별 플러그�
 | Claude 웹 / Desktop Chat / Cowork | 실행 코드가 없는 계정 스킬 ZIP; Mac 또는 Windows에서 내보내기 | 올바른 계정의 업로드·기능 설정·활성화 상태·상시 지침 |
 | Antigravity 대화 애플리케이션 | 모듈형 규칙과 스킬; Apple Silicon Mac 또는 Windows x64 | 선택한 작업공간 또는 전역 범위 하나 |
 
-v1.5.1은 Windows Claude Code 네이티브 연동, Windows ARM64, Intel Mac,
+v1.5.2는 Windows Claude Code 네이티브 연동, Windows ARM64, Intel Mac,
 Linux 네이티브 검증 범위를 추가하지 않습니다. Claude 계정 콘텐츠는 네이티브
 Code를 설치하지 않습니다. 기본값과 `--host all`은 Codex만 선택합니다.
 다른 호스트는 각각 명시적으로 선택하세요.
+
+라틴 문자를 공유하는 프랑스어·독일어·이탈리아어·스페인어·포르투갈어는
+명시적 언어나 저장 선호가 필요합니다. 가나가 있으면 일본어를 우선하며
+그 외에는 우세한 태국 문자·한글·한자를 태국어·한국어·중국어로 판별합니다.
+한자만 있는 일본어는 `ja`를 명시하세요. 빈 입력·알 수 없는 문자·동률은
+영어로 돌아갑니다. [언어 안내](v1.5.2.ko.md)와 [설정 명령](settings.ko.md)을
+따르고 설치기에 지원하지 않는 `--locale` 옵션을 추가하지 마세요.
+상태 없는 판단 요청은 열 언어 중 하나를 JSON `locale`로 명시하며 저장 선호를
+읽지 않습니다.
 
 `plugin-src/`의 `SKILL.md.tmpl` 같은 파일은 빌드 템플릿이며, 완전한 범용
 설치용 스킬 디렉터리가 아닙니다. 루트의 `.agents/plugins/marketplace.json`은
@@ -60,9 +81,9 @@ Antigravity 작업공간은 예시를 이미 존재하는 절대 경로로 바�
 명령에서 같은 범위를 유지하세요.
 
 ```sh
-npx --yes opensocrates@1.5.1 status --host codex
-npx --yes opensocrates@1.5.1 status --host claude
-npx --yes opensocrates@1.5.1 status --host antigravity --workspace "/absolute/path/to/workspace"
+npx --yes opensocrates@1.5.2 status --host codex
+npx --yes opensocrates@1.5.2 status --host claude
+npx --yes opensocrates@1.5.2 status --host antigravity --workspace "/absolute/path/to/workspace"
 ```
 
 없는 연동은 `install`, 소유 범위가 확인된 기존 연동은 `update`를 선택합니다.
@@ -72,11 +93,11 @@ Windows는 `"C:\Work\Reading Workshop"`처럼 따옴표로 감싼 로컬 드라�
 절대 경로를 사용하세요.
 
 ```sh
-npx --yes opensocrates@1.5.1 install --host codex
-npx --yes opensocrates@1.5.1 install --host claude
-npx --yes opensocrates@1.5.1 install --host antigravity --workspace "/absolute/path/to/workspace"
+npx --yes opensocrates@1.5.2 install --host codex
+npx --yes opensocrates@1.5.2 install --host claude
+npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
 # 예: 기존 Codex 연동 업데이트
-npx --yes opensocrates@1.5.1 update --host codex
+npx --yes opensocrates@1.5.2 update --host codex
 ```
 
 Claude 계정 콘텐츠는 이미 존재하는 폴더의 새 절대 ZIP 경로로 내보냅니다.
@@ -85,7 +106,7 @@ Claude 계정 콘텐츠는 이미 존재하는 폴더의 새 절대 ZIP 경로�
 백업합니다.
 
 ```sh
-npx --yes opensocrates@1.5.1 export --host claude-chat --output "/absolute/path/to/opensocrates-1.5.1-account.zip"
+npx --yes opensocrates@1.5.2 export --host claude-chat --output "/absolute/path/to/opensocrates-1.5.2-account.zip"
 ```
 
 이후 [설정 가이드](setup-guide.ko.md)에서 선택한 호스트의 단계를 따르세요.
@@ -95,21 +116,21 @@ Codex 훅 검토, 네이티브 Claude 플러그인 준비 상태, Claude 계정 
 꾸미거나 보안 설정을 낮추지 않습니다. 변경 후 새 대화를 시작하세요.
 [Mac](macos-v1.5.ko.md)·[Windows](windows-v1.5.ko.md) 안내는 복구와 로컬 파일을
 설명하며, 그 안의 날짜가 있는 v1.5.0 명령과 관찰은 당시 기록입니다.
-현재 명령은 이 안내의 1.5.1을 사용하세요.
+현재 명령은 이 안내의 1.5.2를 사용하세요.
 
 ## 확인 가능한 배포 파일
 
 로컬 파일 옵션이 없으면 버전을 고정한 설치기는 GitHub Releases에서 해당
-호스트의 v1.5.1 ZIP과 짝이 맞는 체크섬을 받습니다. 완전한 배포 패키지는
-다음과 같습니다.
+호스트의 v1.5.2 ZIP과 짝이 맞는 체크섬을 받습니다. 아래 링크는 해당
+릴리스의 완전한 호스트 패키지를 가리키도록 작성했습니다.
 
 | 패키지 | 배포 파일 | SHA-256 파일 |
 | --- | --- | --- |
-| Codex, Apple Silicon Mac | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.1/opensocrates-1.5.1-codex-plugin.zip) | [체크섬](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.1/opensocrates-1.5.1-codex-plugin.zip.sha256) |
-| Codex, Windows x64 | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.1/opensocrates-1.5.1-codex-plugin-windows-x64.zip) | [체크섬](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.1/opensocrates-1.5.1-codex-plugin-windows-x64.zip.sha256) |
-| 네이티브 Claude, Apple Silicon Mac | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.1/opensocrates-1.5.1-claude-plugin.zip) | [체크섬](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.1/opensocrates-1.5.1-claude-plugin.zip.sha256) |
-| Claude 계정 콘텐츠 | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.1/opensocrates-1.5.1-claude-chat-skills.zip) | [체크섬](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.1/opensocrates-1.5.1-claude-chat-skills.zip.sha256) |
-| Antigravity | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.1/opensocrates-1.5.1-antigravity-plugin.zip) | [체크섬](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.1/opensocrates-1.5.1-antigravity-plugin.zip.sha256) |
+| Codex, Apple Silicon Mac | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-codex-plugin.zip) | [체크섬](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-codex-plugin.zip.sha256) |
+| Codex, Windows x64 | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-codex-plugin-windows-x64.zip) | [체크섬](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-codex-plugin-windows-x64.zip.sha256) |
+| 네이티브 Claude, Apple Silicon Mac | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-plugin.zip) | [체크섬](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-plugin.zip.sha256) |
+| Claude 계정 콘텐츠 | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip) | [체크섬](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256) |
+| Antigravity | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-antigravity-plugin.zip) | [체크섬](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-antigravity-plugin.zip.sha256) |
 
 체크섬은 공개된 체크섬과 바이트가 일치하는지 검증합니다. 그것만으로 배포자의
 진위·동작의 안전성·호스트 활성화를 증명하지는 않습니다. 로컬 파일은 플랫폼
@@ -121,7 +142,8 @@ Codex 훅 검토, 네이티브 Claude 플러그인 준비 상태, Claude 계정 
 2026년 10월 13일, Node.js 24.21.0에서 `skills@1.7.2`로 목록만 확인한 결과
 배포된 Claude 계정 ZIP에서 `opensocrates` 스킬 하나를 발견했습니다. 이 CLI
 버전은 Node.js 22.20.0 이상이 필요하며, OpenSocrates의 Node.js 20 이상
-조건과 별개입니다. 실제 확인에 사용한 명령은 다음과 같습니다.
+조건과 별개입니다. 이 관찰은 v1.5.1 계정 ZIP에 관한 것이며 v1.5.2에 대해
+다시 실행한 결과가 아닙니다. 실제 확인에 사용한 명령은 다음과 같습니다.
 
 ```sh
 DISABLE_TELEMETRY=1 DO_NOT_TRACK=1 npm exec --yes --package=skills@1.7.2 -- skills add https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.1/opensocrates-1.5.1-claude-chat-skills.zip --list
