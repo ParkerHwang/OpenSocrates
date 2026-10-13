@@ -10,6 +10,7 @@ from typing import Any, Callable
 
 from ...clock import Clock
 from ...domain.enums import EventType, HostActionKind, HostId
+from ...domain.locales import SUPPORTED_LOCALES, SupportedLocale
 from ...domain.models import CapabilityProfile, HostControlResult, NormalizedEvent
 from ...selector import SelectorApplication, SelectorConfig, SelectorDecision, SelectorRequest
 from ...version import PRODUCT_VERSION
@@ -48,6 +49,7 @@ class CodexAdapterConfig:
     host_version: str = "unknown"
     adapter_version: str = PRODUCT_VERSION
     locale: str = "en"
+    locale_preference: SupportedLocale | None = None
     bundle_path: str | Path = DEFAULT_BUNDLE_PATH
     content_repository: Any | None = None
     control_application: ControlApplicationPort | None = None
@@ -75,6 +77,10 @@ class CodexAdapterConfig:
     selector_config: SelectorConfig | None = field(default=None, repr=False)
     instruction_file_store: Any | None = field(default=None, repr=False)
     require_instruction_read_receipt: bool = False
+
+    def __post_init__(self) -> None:
+        if self.locale_preference is not None and self.locale_preference not in SUPPORTED_LOCALES:
+            raise ValueError("Codex locale preference is unsupported")
 
 
 @dataclass(frozen=True, slots=True)
@@ -452,8 +458,7 @@ class CodexAdapter:
             or self.config.selector_application is not None
         )
 
-    @staticmethod
-    def _selector_user_prompt_request(native: CodexNativeEvent) -> SelectorRequest | None:
+    def _selector_user_prompt_request(self, native: CodexNativeEvent) -> SelectorRequest | None:
         """Project only approved transient native values into one selector request."""
 
         if not isinstance(native.prompt, str) or not native.prompt:
@@ -462,8 +467,18 @@ class CodexAdapter:
             # ``model`` remains a bounded transient host fact for diagnostics
             # isolation only.  The selector SDK request intentionally has no
             # model field and never receives this value.
+            preference = None
+            repository = self.config.settings_repository
+            if repository is not None:
+                try:
+                    preference = repository.load().locale_preference
+                except Exception:
+                    # Settings unavailability must preserve ordinary prompt-based selection.
+                    preference = None
             return SelectorRequest(
                 prompt=native.prompt,
+                locale_preference=self.config.locale_preference,
+                settings_locale_preference=preference,
                 transcript_path=native.transcript_path,
                 cwd=native.cwd,
                 session_id=native.session_id,

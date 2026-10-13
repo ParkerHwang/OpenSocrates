@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: assumption-mapping-positive-1
+    kind: positive
+    prompt: "共同の献立計画サービスを検討しています。成立していなければならない仮定を一覧にし、重要性と証拠を区別して、最初の安全な検証を選んでください。インタビューのメモはユーザー提供で、独立した確認はまだ行っていません。"
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, testable_claim, plan]
+    rationale: "仮定一覧、重要性と証拠の軸、高リスクの仮定群、次の検証を明示的に求めています。メモは確認済みではなくユーザー提供なので、確率を付けずに不確実性を示す必要があります。"
+  - id: assumption-mapping-positive-2
+    kind: positive
+    prompt: "請求書の審査を自動化したいチームですが、顧客にとっての望ましさ、データの実現性、法令順守の成立性のどれが障害か不明です。仮定を図にし、調達前にリスクの低い確認手順を選んでください。"
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, irreversible_choice, testable_claim]
+    rationale: "複数の仮定領域と、約束に踏み切る前の決定があります。求める確認はまだ優先順位の問題であり、情報源に基づく事実、仮定、不足する順守の証拠を示す必要があります。"
+  - id: assumption-mapping-positive-3
+    kind: positive
+    prompt: "ボランティアの勤務日程を変える実験案が五つあります。決定上の重要性と証拠の強さで仮定を順位付けし、安全な観察と計画を変える判断規則を添えてください。"
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [prioritized_assumptions, testable_claim, chosen_plan]
+    rationale: "完了した実験ではなく、この手法の中心となる優先順位付けを求めています。順位ラベルと verified、unverified、assumed、conflicted を使い、点数を捏造しません。"
+  - id: assumption-mapping-negative-1
+    kind: negative
+    prompt: "決済サービスが今週三回失敗しました。因果の連鎖、統制上の弱点、予防の担当者を示してください。製品の仮定図は提案しないでください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "仮定マッピングと混同しやすい根本原因分析の依頼です。必要なのは因果診断と統制の行動であり、検証可能な信念の優先順位ではありません。"
+  - id: assumption-mapping-negative-2
+    kind: negative
+    prompt: "対象顧客とランディングページの実験はすでに選びました。行動に使える指標、観察期間、方向転換か継続かの判断規則を定めてください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, chosen_plan, plan]
+    rationale: "仮定はすでに選ばれ、市場実験の具体化が求められています。lean-startup の課題であり、ここへ振り分けると指標や検証を定めずに図を繰り返してしまいます。"
+  - id: assumption-mapping-mechanical-1
+    kind: mechanical
+    prompt: "この六つの仮定ラベルをアルファベット順に並べ、番号付き一覧で返してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "ラベルの並べ替えには判断、不確実性、実験の優先順位付けが不要で、直接の機械的回答が適切です。"
+  - id: assumption-mapping-explicit-1
+    kind: explicit
+    prompt: "このアイデアに assumption-mapping を使ってください。仮定、重要性と証拠の軸、高リスクの仮定群、次の安全な検証を示し、支持のない主張は未確認と明示してください。"
+    expected_route: assumption-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions, prioritized_assumptions, testable_claim]
+    rationale: "ユーザーが手法と公開結果を明示しています。明示的な呼び出しが主となり、求める証拠ラベルが出所の境界を維持します。"
+  - id: assumption-mapping-insufficiency-1
+    kind: insufficiency
+    prompt: "提案を支える仮定を優先順位付けし、何を最初に検証すべきか教えてください。決定の問い、望む結果、候補の仮定、検証の制約はまだありません。"
+    expected_route: assumption-mapping
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, hidden_assumptions, prioritized_assumptions, no_testable_implication]
+    rationale: "手法は合っていますが決定的な入力がありません。仮定や検証を作らず保留し、次に決定と許可された安全な境界を確定する必要があります。"

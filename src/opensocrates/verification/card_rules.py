@@ -321,7 +321,7 @@ def collect_card_violations(  # noqa: C901  # Branch-explicit contract; reviewed
     if not isinstance(card, ConclusionCard):
         raise ValidationError("card rules: expected ConclusionCard")
     violations: list[Violation] = []
-    if str(card.locale) not in {"en", "ko"}:
+    if str(card.locale) not in {"en", "ko", "zh", "ja"}:
         _append(violations, "OSV-LOCALE-001", "locale", "locale.unsupported")
     if not 1 <= len(card.grounds) <= MAX_CARD_GROUNDS:
         _append(violations, "OSV-CARD-005", "grounds", "card.ground_count")

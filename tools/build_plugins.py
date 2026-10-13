@@ -17,6 +17,8 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping
 
+LOCALES = ("en", "ko", "zh", "ja")
+
 _SEMANTIC_FIELDS = (
     "content_revision",
     "method_ids",
@@ -198,6 +200,14 @@ def _method_values(method: Mapping[str, Any], common: Mapping[str, str]) -> dict
             "METHOD_COMPLEMENTS_JSON": _json_token(method.get("complements", {})),
         }
     )
+    for locale in ("zh", "ja"):
+        for token, field in (
+            ("DISPLAY_NAME", "display_name"),
+            ("PLAIN_ACTION", "plain_action"),
+            ("PROCEDURE", "procedure"),
+            ("COMPLEMENT", "complement_fragment"),
+        ):
+            values[f"METHOD_{token}_{locale.upper()}"] = nested(field, locale)
     return values
 
 
@@ -215,14 +225,22 @@ def _method_reference_index(methods: list[Any]) -> str:
         display_ko = display.get("ko", "") if isinstance(display, Mapping) else ""
         action_en = plain_action.get("en", "") if isinstance(plain_action, Mapping) else ""
         action_ko = plain_action.get("ko", "") if isinstance(plain_action, Mapping) else ""
+        display_zh = display.get("zh", "") if isinstance(display, Mapping) else ""
+        display_ja = display.get("ja", "") if isinstance(display, Mapping) else ""
+        action_zh = plain_action.get("zh", "") if isinstance(plain_action, Mapping) else ""
+        action_ja = plain_action.get("ja", "") if isinstance(plain_action, Mapping) else ""
         sections.extend(
             [
                 f"## `{method_id}` — {display_en}",
                 "",
                 f"- Korean name: {display_ko}",
+                f"- 中文名称: {display_zh}",
+                f"- 日本語名: {display_ja}",
                 f"- Family: `{raw.get('family', '')}`",
                 f"- Use for: {action_en}",
                 f"- 한국어: {action_ko}",
+                f"- 简体中文: {action_zh}",
+                f"- 日本語: {action_ja}",
                 f"- Routing metadata: `{_json_token(raw.get('routing', {}))}`",
                 f"- Procedure: [methods/{method_id}.md](methods/{method_id}.md)",
                 "",
@@ -276,16 +294,25 @@ def _common_values(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0
             values["CONTROLLER_KO"] = str(controller.get("ko", ""))
             values["CONTROLLER_EN_JSON"] = _json_token(str(controller.get("en", "")))
             values["CONTROLLER_KO_JSON"] = _json_token(str(controller.get("ko", "")))
+            for locale in ("zh", "ja"):
+                values[f"CONTROLLER_{locale.upper()}"] = str(controller.get(locale, ""))
+                values[f"CONTROLLER_{locale.upper()}_JSON"] = _json_token(
+                    str(controller.get(locale, ""))
+                )
         if isinstance(capability_notice, Mapping):
             values["CAPABILITY_NOTICE_EN"] = str(capability_notice.get("en", ""))
             values["CAPABILITY_NOTICE_KO"] = str(capability_notice.get("ko", ""))
+            for locale in ("zh", "ja"):
+                values[f"CAPABILITY_NOTICE_{locale.upper()}"] = str(
+                    capability_notice.get(locale, "")
+                )
         for key, locale_values in fragments.items():
             if isinstance(locale_values, Mapping):
-                for locale in ("en", "ko"):
+                for locale in LOCALES:
                     token = f"FRAGMENT_{str(key).upper()}_{locale.upper()}"
                     values[token] = str(locale_values.get(locale, ""))
     if isinstance(messages, Mapping):
-        for locale in ("en", "ko"):
+        for locale in LOCALES:
             locale_values = messages.get(locale, {})
             values[f"LOCALE_MESSAGES_{locale.upper()}_JSON"] = _json_token(locale_values)
     return values
@@ -446,11 +473,11 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
     response_policy = load_response_policy(repository / "content/response-policy.yaml")
     values["RESPONSE_POLICY_JSON"] = _json_token(response_policy)
     values["RESPONSE_POLICY_SHA_JSON"] = _json_token(policy_identity(response_policy))
-    for locale in ("en", "ko"):
+    for locale in LOCALES:
         values[f"RESPONSE_POLICY_{locale.upper()}"] = render_response_guidance(
             response_policy, locale
         )
-    for locale in ("en", "ko"):
+    for locale in LOCALES:
         guard = (repository / f"plugin-src/shared/rigor/activation.{locale}.md").read_text(
             encoding="utf-8"
         )
@@ -554,7 +581,7 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
     assembler = ProjectionInstructionAssembler(projections)
     if projections.content_revision != raw_bundle["content_revision"]:
         raise PluginBuildError("decision references: revision mismatch")
-    for locale in ("en", "ko"):
+    for locale in LOCALES:
         entries = []
         for method in methods:
             method_id = method["id"]

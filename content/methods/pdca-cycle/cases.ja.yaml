@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pdca-cycle-positive-1
+    kind: positive
+    prompt: "サポートの待ち行列には検証済みの基準値があり、小さな振り分け変更で解決品質を下げずに待ち時間を減らせるという仮説があります。一回の可逆な循環の Plan、限定した Do、Check 規則、Act 判断を定めてください。"
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, chosen_plan]
+    rationale: "基準値、測定可能な目的、安全な範囲、標準化か修正かの判断を伴う管理された業務改善です。検証済みの基準値を保ち、新しい比較証拠は別に表示します。"
+  - id: pdca-cycle-positive-2
+    kind: positive
+    prompt: "倉庫の一つの区画で一週間だけ梱包ラベルを変更する案があります。目的と指標、防護条件、停止条件を設定し、期待と観察を比較して標準化か修正かを判断してください。"
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, chosen_plan]
+    rationale: "一つの区画と一週間の期間は限定した PDCA 循環を支えます。比較は局所に留め、一回の循環を恒久的な標準の証明にしません。"
+  - id: pdca-cycle-positive-3
+    kind: positive
+    prompt: "既知の業務の障害箇所に、変更案、担当者、再現可能な測定があります。逸脱を記録し、次の版の改善仮説を作る Plan–Do–Check–Act の概要を示してください。"
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, practical_consequence]
+    rationale: "業務条件と測定が確立しているので、根因探索ではなく反復的な改善です。次の循環状態を示すことで、学びと標準の改訂が見えるようになります。"
+  - id: pdca-cycle-negative-1
+    kind: negative
+    prompt: "製造上の不具合には複数の原因候補があり、信頼できる時系列もありません。直ちに新しい承認手順を試し、不具合が消えるか確認してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [diagnose, causal_question, confounding, decisive_input_missing]
+    rationale: "根本条件が未知で証拠も欠けるため、改善循環が失敗を隠すおそれがあります。別の変更を試す前に root-cause-analysis で因果の境界を定めます。"
+  - id: pdca-cycle-negative-2
+    kind: negative
+    prompt: "化学物質の流出が続いています。事故対応チームを呼ぶ前に現場の取扱標準を変え、次の曝露から学んでください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [safety_critical_validation, recurring_failure]
+    rationale: "進行中の危害と緊急安全対応は、即興の PDCA 循環の禁忌です。封じ込めと適切な事故対応手順が反復的な学習より優先します。"
+  - id: pdca-cycle-mechanical-1
+    kind: mechanical
+    prompt: "与えられた四つの日次件数を足して合計を返し、工程の解釈や変更の推奨はしないでください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "与えられた数の加算は決定的な計算であり、Plan–Do–Check–Act の改善判断ではありません。"
+  - id: pdca-cycle-explicit-1
+    kind: explicit
+    prompt: "この業務改善に PDCA 循環を使ってください。目的と測定、限定した Do 範囲、Check 規則、Act 判断、証拠状態、次の循環仮説を示してください。"
+    expected_route: pdca-cycle
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, repeat_iteration, plan, testable_hypothesis]
+    rationale: "利用者は方法と必須の公開出力を明示しています。決定的な測定や安全な範囲が欠ければ保留します。"
+  - id: pdca-cycle-insufficiency-1
+    kind: insufficiency
+    prompt: "PDCA で工程を良くしてください。目的、基準値、変更案、測定、安全な範囲、担当者、標準化の規則はありません。"
+    expected_route: pdca-cycle
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, repeat_iteration, plan, testable_hypothesis]
+    rationale: "PDCA は明示されていますが、決定的な入力がすべて欠けています。範囲を限定しない変更や未測定結果の標準化を行わず、保留します。"

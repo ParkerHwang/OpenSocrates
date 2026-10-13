@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "systems-thinking-positive-01",
+      "kind": "positive",
+      "prompt": "审核积压随延迟增加而扩大；延迟让用户沮丧，产生更多重复举报。团队想了解这一模式背后的结构。",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question",
+        "deep_uncertainty"
+      ],
+      "rationale": "重复模式涉及相互作用的流量、反馈与延迟，不是单一孤立原因。"
+    },
+    {
+      "id": "systems-thinking-positive-02",
+      "kind": "positive",
+      "prompt": "保护性补贴起初增加种植，随后缺水和执法反应使结果随季节振荡。",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "deep_uncertainty",
+        "causal_question"
+      ],
+      "rationale": "季节性行为与政策阻力需要分析存量、流量、平衡回路及延迟。"
+    },
+    {
+      "id": "systems-thinking-positive-03",
+      "kind": "positive",
+      "prompt": "客户信任缓慢累积，推荐强化增长，削减支持造成延迟的下降；请找出杠杆点。",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "请求明确针对累积、增强效果、延迟结果及干预杠杆。"
+    },
+    {
+      "id": "systems-thinking-negative-01",
+      "kind": "negative",
+      "prompt": "两个匹配群体接受不同培训，用户问一个月后培训是否改变了测试成绩。",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "有界干预比较足够，不需要完整动态系统。"
+    },
+    {
+      "id": "systems-thinking-negative-02",
+      "kind": "negative",
+      "prompt": "一次数据库故障有明确且带时间戳的触发因素，团队需要直接原因及可控的根本条件。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "diagnose",
+        "recurring_failure"
+      ],
+      "rationale": "应以有界事件诊断为主，除非后续证据揭示重复的反馈模式。"
+    },
+    {
+      "id": "systems-thinking-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "将存量与流量笔记转成 Markdown 项目符号，不解释系统。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "排版是机械任务，不要求判断系统结构。"
+    },
+    {
+      "id": "systems-thinking-explicit-01",
+      "kind": "explicit",
+      "prompt": "使用 systems-thinking 解释为何局部人员配置修复反复被长期积压增长抵消。",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "用户明确对延迟、重复的系统模式调用该方法。"
+    },
+    {
+      "id": "systems-thinking-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "昨天出现一次投诉；在没有时间模式的情况下，画增强回路并建议全系统干预。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "feedback_delay",
+        "decisive_input_missing"
+      ],
+      "rationale": "一次性观察无法建立动态行为或回路方向。"
+    }
+  ]
+}

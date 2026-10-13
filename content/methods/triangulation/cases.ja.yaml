@@ -1,0 +1,104 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "triangulation-positive-01",
+      "kind": "positive",
+      "prompt": "独立した調査、行動、行政のデータで、この継続率の主張を裏付けられますか。",
+      "expected_route": "triangulation",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources",
+        "source_quality"
+      ],
+      "rationale": "異なる証拠の流れの独立性、一致、対立、不足を確認する必要があります。"
+    },
+    {
+      "id": "triangulation-positive-02",
+      "kind": "positive",
+      "prompt": "関係者が異なる手法を引用しています。証拠が本当に同じ結果へ収束するか判断してください。",
+      "expected_route": "triangulation",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources"
+      ],
+      "rationale": "証拠の流れを比べ、同じ上流データの反復を裏付けに見せかけないための作業です。"
+    },
+    {
+      "id": "triangulation-positive-03",
+      "kind": "positive",
+      "prompt": "定性インタビューと実験が一致しません。重要な対立を解消する追加の独立した確認は何ですか。",
+      "expected_route": "triangulation",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources",
+        "source_quality"
+      ],
+      "rationale": "重要な不一致には独立性の確認と、対象を絞った次の証拠の流れが必要です。"
+    },
+    {
+      "id": "triangulation-negative-01",
+      "kind": "negative",
+      "prompt": "出典ごとに研究設計の質、直接性、対象集団への適用可能性で順位を付けてください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "個別の出典品質を評価する作業であり、流れの間の独立性ではありません。"
+    },
+    {
+      "id": "triangulation-negative-02",
+      "kind": "negative",
+      "prompt": "新しい試験結果を受け、これらの仮説の事前の確信度を更新してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "new_evidence",
+        "unknown_probability",
+        "competing_explanations"
+      ],
+      "rationale": "定義された事前から事後への更新はベイズ更新であり、三角検証ではありません。"
+    },
+    {
+      "id": "triangulation-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "提示した三つの証拠表を一つにまとめ、全行を保ってください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "表の統合は機械的で、独立性や一致を評価しません。"
+    },
+    {
+      "id": "triangulation-explicit-01",
+      "kind": "explicit",
+      "prompt": "triangulation を明示的に使い、顧客への影響の主張が独立した確認に耐えるか検証してください。",
+      "expected_route": "triangulation",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "reconcile_evidence"
+      ],
+      "rationale": "重要な主張について、流れをまたぐ裏付けをユーザーが明示しています。"
+    },
+    {
+      "id": "triangulation-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "裏付けを報告してください。ただし全出典が一つの不明な上流データを繰り返し、独立した流れはありません。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "reconcile_evidence",
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "依存する反復出典では三角検証を確立できず、裏付けは保留すべきです。"
+    }
+  ]
+}

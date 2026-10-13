@@ -1,0 +1,103 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "scenario-planning-positive-1",
+      "kind": "positive",
+      "prompt": "市は十年の住宅戦略を準備する必要があり、人の移動と建設技術は独立に変わりえます。二つの重要な不確実性を定め、確率なしで整合する四つの未来を作り、無後悔の行動、条件付き行動、兆候を特定してください。",
+      "expected_route": "scenario-planning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "長期と外部要因は単一予測でなく構造的な分岐を求めます。独立軸、四シナリオ、行動、兆候を明示し、確率を除外しています。"
+    },
+    {
+      "id": "scenario-planning-positive-2",
+      "kind": "positive",
+      "prompt": "五年の公衆衛生事業は、制度への信頼と病原体の移動性の異なる組合せに直面しえます。2×2 シナリオ行列を作り、各世界の実現過程を説明し、現計画を試し、見直しのための観察できるシグナルを定めてください。",
+      "expected_route": "scenario-planning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "new_evidence"
+      ],
+      "rationale": "整合する外部未来、行列、現計画の風洞試験、兆候を求めており、尤度で順位付けした予測ではありません。"
+    },
+    {
+      "id": "scenario-planning-positive-3",
+      "kind": "positive",
+      "prompt": "十年の教育基盤投資にどう備えるか判断しています。規制と学習者の行動は影響が大きく予測困難です。予測できる前提は共通にし、独立軸を選び、頑健な準備と将来のシグナルで動く行動を分けてください。",
+      "expected_route": "scenario-planning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "irreversible_choice",
+        "plan"
+      ],
+      "rationale": "影響の大きい外部不確実性を伴う長期準備の判断で、共通と条件付きの行動を分ける要求です。確率を割り当てるべきではありません。"
+    },
+    {
+      "id": "scenario-planning-negative-1",
+      "kind": "negative",
+      "prompt": "四半期収益モデルには一つの基準式があります。妥当な範囲で転換率と価格の仮定を変え、選択が逆転する閾値と、どの入力をさらに調査すべきかの順位を示してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "sensitive_inputs"
+      ],
+      "rationale": "感度分析と混同しやすい例です。モデル、入力範囲、切替閾値があり、独立する外部軸や整合する未来ではありません。"
+    },
+    {
+      "id": "scenario-planning-negative-2",
+      "kind": "negative",
+      "prompt": "完了した製品公開について明確な参照クラスを使い、次の公開の納品範囲を推定して内部の日付と比較してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases"
+      ],
+      "rationale": "完了した参照事例からの外側の視点の予測で、分岐シナリオではなく参照クラス予測の仕事です。"
+    },
+    {
+      "id": "scenario-planning-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "日付のある十二の節目を時系列に並べ、有順序の一覧を返してください。将来の不確実性や準備の判断はありません。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "決定論的な並べ替えです。シナリオ・プランニングで構造化する外部不確実性や戦略選択はありません。"
+    },
+    {
+      "id": "scenario-planning-explicit-1",
+      "kind": "explicit",
+      "prompt": "十年のエネルギー転換戦略に scenario-planning を主な方法として使ってください。確率を除き、独立した二つの重要な不確実性から名前付きの四つの未来を説明し、無後悔の行動と兆候を付けてください。",
+      "expected_route": "scenario-planning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "deep_uncertainty",
+        "macro_environment"
+      ],
+      "rationale": "方法を明示し、必要な非確率のシナリオ出力を示しています。選択には証拠、範囲、保留の規則が適用されます。"
+    },
+    {
+      "id": "scenario-planning-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "未来のシナリオを四つください。支える判断、期間、システム境界、重要な外部不確実性はまだ示していません。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "焦点の問い、期間、境界、判断がないと、四つの話は装飾的で無制約になります。保留し、不足する枠組みだけを求めるべきです。"
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "steelman-reasoning-positive-01",
+      "kind": "positive",
+      "prompt": "董事会将隐私异议斥为制造恐慌；重构其最有力的公正版本，并说明它是否改变上线决定。",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "反对方忧虑被否定，其中可能含有值得以最强公正形式审视的重要风险。"
+    },
+    {
+      "id": "steelman-reasoning-positive-02",
+      "kind": "positive",
+      "prompt": "两个团队对远程工作意见不同，各自都有一贯目标与证据；在回应前，识别对方立场最强的版本。",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "真实反对立场需要善意重构、支持要求及公正回应。"
+    },
+    {
+      "id": "steelman-reasoning-positive-03",
+      "kind": "positive",
+      "prompt": "一位政策批评者仅以敌意标签被引用；恢复实际主张、最好的前提及提案应改变的部分。",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "critique"
+      ],
+      "rationale": "任务明确要求将公开主张与薄弱刻画分开，并检验其后果。"
+    },
+    {
+      "id": "steelman-reasoning-negative-01",
+      "kind": "negative",
+      "prompt": "一项原则与几个经过审视的棘手案例冲突，团队必须修正原则或判断，以增强一致性。",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "主要输出是原则与案例间的相互修正，而非重构对手。"
+    },
+    {
+      "id": "steelman-reasoning-negative-02",
+      "kind": "negative",
+      "prompt": "报告中有主张、依据、异议与回应；在评价反对方前，需要一张中性图谱。",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "应先建立主张结构图，再选择是否进行钢人论证。"
+    },
+    {
+      "id": "steelman-reasoning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "将引用的反对意见译成韩语，保持语气，不评价或加强其立场。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "翻译是机械任务，不应触发论证重构。"
+    },
+    {
+      "id": "steelman-reasoning-explicit-01",
+      "kind": "explicit",
+      "prompt": "使用 steelman-reasoning 审视反对我们合并的最强论证，并说明什么证据会使我们改变方向。",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "用户明确要求对重大决策的反对论证进行公正处理。"
+    },
+    {
+      "id": "steelman-reasoning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "不存在反对声明；编造一个高明对手，将其归给这个社群，以便我们击败它。",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "dismissed_opposition",
+        "decisive_input_missing"
+      ],
+      "rationale": "没有真实公开立场；编造立场是歪曲人群，而非公正强化他们的论证。"
+    }
+  ]
+}

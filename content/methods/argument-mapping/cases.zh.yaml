@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: argument-mapping-positive-01
+    kind: positive
+    prompt: "绘制这份政策论证的主张、依据、反驳和回应，让我们看到哪些连接缺少支持。"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique, tangled_hierarchy]
+    rationale: "任务明确需要主张—依据—反驳结构及无支持连接检测。"
+  - id: argument-mapping-positive-02
+    kind: positive
+    prompt: "究竟哪个前提支持建议，哪些反驳仍未得到回答？"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "必须先理清多个支持和攻击关系，才能判断建议。"
+  - id: argument-mapping-positive-03
+    kind: positive
+    prompt: "为合同立场建立论证图，包括共同假设及最强回应。"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, tangled_hierarchy]
+    rationale: "要求的公开结果是由主张、共同前提和反驳组成的结构化图。"
+  - id: argument-mapping-negative-01
+    kind: negative
+    prompt: "比较两项研究的证据质量，并说明哪项适用于我们的人群。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "核心瓶颈是来源设计及适用性，属于证据核查。"
+  - id: argument-mapping-negative-02
+    kind: negative
+    prompt: "先写面向管理层的建议，再写分成三组的理由与支持细节。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "请求是自上而下的沟通结构，而非检验支持连接。"
+  - id: argument-mapping-mechanical-01
+    kind: mechanical
+    prompt: "将提供的前提列表转为 Markdown 项目符号。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "对提供的列表调整格式不需要论证分析。"
+  - id: argument-mapping-explicit-01
+    kind: explicit
+    prompt: "明确使用 argument-mapping，审查这份投资备忘录最强的反驳。"
+    expected_route: argument-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, argument_dispute]
+    rationale: "用户明确调用方法以审查反驳及支持结构。"
+  - id: argument-mapping-insufficiency-01
+    kind: insufficiency
+    prompt: "绘制论证并判断最弱连接，但不提供结论、前提或来源文本。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [argument_dispute, decisive_input_missing]
+    rationale: "没有可绘图的论证材料，因此方法必须保留判断，而不是编造前提。"

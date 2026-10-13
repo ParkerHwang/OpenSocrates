@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "induction-positive-01",
+      "kind": "positive",
+      "prompt": "これらの繰り返した観察は、大多数のユーザーについての一般的主張を支持しますか。一般化はどれほど強いですか。",
+      "expected_route": "induction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "観察事例から限定した集団の主張へ進む課題で、標本と反例の確認が必要です。"
+    },
+    {
+      "id": "induction-positive-02",
+      "kind": "positive",
+      "prompt": "この調査標本が、顧客は新しい業務手順を好むという主張を正当化するか評価してください。",
+      "expected_route": "induction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "代表性、選択バイアス、一般化の強さが中心です。"
+    },
+    {
+      "id": "induction-positive-03",
+      "kind": "positive",
+      "prompt": "過去の事故から、妥当な反例も含め、次の四半期について何を合理的に推定できますか。",
+      "expected_route": "induction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "予測は反復事例を広げるため、範囲と反例リスクを示す必要があります。"
+    },
+    {
+      "id": "induction-negative-01",
+      "kind": "negative",
+      "prompt": "厳格な規則では、適格な記録はすべて承認されます。この事例が規則に従うか判定してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules",
+        "explain"
+      ],
+      "rationale": "演繹的な規則適用であり、標本からの一般化ではありません。"
+    },
+    {
+      "id": "induction-negative-02",
+      "kind": "negative",
+      "prompt": "複数の説明が故障に合います。比較し、区別できる観察を特定してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "アブダクションによる診断であり、標本から集団への拡張ではありません。"
+    },
+    {
+      "id": "induction-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "新しい観察を既存データセットに追記し、値を一切変更しないでください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "提供されたデータの追記は機械的です。"
+    },
+    {
+      "id": "induction-explicit-01",
+      "kind": "explicit",
+      "prompt": "帰納法を明示的に使い、この小規模実験が広い製品の主張を支持するか評価してください。",
+      "expected_route": "induction",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "repeated_observations"
+      ],
+      "rationale": "ユーザーは標本から一般化への分析を明示しています。"
+    },
+    {
+      "id": "induction-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "標本から一般化しますが、対象母集団、抽出過程、観察、測定定義は提供しません。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample",
+        "decisive_input_missing"
+      ],
+      "rationale": "標本の根拠と対象範囲がなければ、一般化を限定できません。"
+    }
+  ]
+}

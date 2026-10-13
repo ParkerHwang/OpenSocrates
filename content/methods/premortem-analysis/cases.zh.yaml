@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "premortem-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "团队即将迁移客户数据，希望设想迁移失败，独立收集原因，并设定早期预警。",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "具体的选定计划需要失败叙述、先行信号、缓解措施和停止条件。"
+    },
+    {
+      "id": "premortem-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "开设新诊所之前，识别计划在人员配置、需求、运营和监管方面可能如何失败，不编造概率。",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "明确要求在计划层面进行反事实失败练习，应采用有序等级描述并注意证据状态。"
+    },
+    {
+      "id": "premortem-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "发布团队全员赞同方案，希望在承诺前通过结构化质疑揭示未说出的假设、先行指标和暂停条件。",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "hidden_assumptions",
+        "failure_risk"
+      ],
+      "rationale": "请求针对围绕选定行动的从众和乐观规划。"
+    },
+    {
+      "id": "premortem-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "对工作流的每个步骤，在前瞻性风险登记表中列出失效模式、后果、原因、控制措施及负责人。",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "流程层面的失效与控制清单，比想象中的计划回顾更具体。"
+    },
+    {
+      "id": "premortem-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "缺陷已反复出现数月，团队需要找到能够防止复发的可控系统条件。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "已存在的复发需要因果诊断，而非承诺前的练习。"
+    },
+    {
+      "id": "premortem-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "把已批准的发布计划复制到风险模板中，不添加失败情景或建议。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "复制属于机械任务，不要求判断选定计划。"
+    },
+    {
+      "id": "premortem-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "对招聘计划开展事前验尸分析，列出最早会让我们暂停的信号。",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "用户明确要求在承诺前对具体计划使用本方法。"
+    },
+    {
+      "id": "premortem-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "没有选定计划，但请编造失败回顾，并以 90% 的确定性宣称哪个选项会失败。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "chosen_plan",
+        "decisive_input_missing"
+      ],
+      "rationale": "没有计划或可辩护的参照类别，练习无法支持概率或建议。"
+    }
+  ]
+}

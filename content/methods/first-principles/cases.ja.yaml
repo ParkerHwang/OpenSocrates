@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "first-principles-positive-01",
+      "kind": "positive",
+      "prompt": "席単位の価格設定のうち、本当に必要な部分と、古い販売工程から引き継いだ部分はどれですか。",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "stale_options"
+      ],
+      "rationale": "再設計には、根本的な要件を慣行や引き継いだ仮定から分ける必要があります。"
+    },
+    {
+      "id": "first-principles-positive-02",
+      "kind": "positive",
+      "prompt": "現行の順序をコピーせず、実際の安全制約から承認手順を再設計できますか。",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "stale_options"
+      ],
+      "rationale": "手順の分解、必要性の検証、再構成を求めています。"
+    },
+    {
+      "id": "first-principles-positive-03",
+      "kind": "positive",
+      "prompt": "既存ベンダーの構成を仮定せずにデータパイプラインを再構築する場合、維持すべき条件は何ですか。",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "stale_options"
+      ],
+      "rationale": "中心の問いは、引き継いだ構成を問い直した後に残る制約です。"
+    },
+    {
+      "id": "first-principles-negative-01",
+      "kind": "negative",
+      "prompt": "必須の保存規則を各記録に適用し、違反を報告してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules"
+      ],
+      "rationale": "拘束的規則を適用する課題であり、再考や再構成ではありません。"
+    },
+    {
+      "id": "first-principles-negative-02",
+      "kind": "negative",
+      "prompt": "固定されたパラメータの組み合わせを5件作り、実現可能性で絞り込んでください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "combinable_dimensions",
+        "stale_options"
+      ],
+      "rationale": "要件は既に固定され、課題は組み合わせ探索です。"
+    },
+    {
+      "id": "first-principles-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "既存のデプロイ用チェックリストを、内容を変えず新しい書式にコピーしてください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "提供されたリストのコピーは機械的で、再設計の判断を起動すべきではありません。"
+    },
+    {
+      "id": "first-principles-explicit-01",
+      "kind": "explicit",
+      "prompt": "first-principles を使い、すべてのサポート依頼に人の確認が必要という仮定を問い直してください。",
+      "expected_route": "first-principles",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "hidden_assumptions"
+      ],
+      "rationale": "ユーザーは慣習的な仮定を分解して確認する方法を明示しています。"
+    },
+    {
+      "id": "first-principles-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "第一原理からシステムを再構築しますが、目標結果、譲れない制約、安全を導く規則は示さないでください。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "hidden_assumptions",
+        "decisive_input_missing"
+      ],
+      "rationale": "目標と固定境界がなければ、再構成は可能性を実行可能で安全な設計と混同します。"
+    }
+  ]
+}

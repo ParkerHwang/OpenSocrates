@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Build deterministic bilingual prompt outputs from a compiled JSON bundle.
+"""Build deterministic four-locale prompt outputs from a compiled JSON bundle.
 
 This focused build tool deliberately imports no YAML parser and never reads the
 authoring tree.  It loads one validated ``compiled-content.bundle.json`` and
-compiles representative English/Korean start, tool-observation, and Stop-repair
+compiles representative English/Korean/Chinese/Japanese start, tool-observation, and Stop-repair
 contexts into a caller-supplied directory.
 """
 
@@ -149,7 +149,7 @@ def main(argv: list[str] | None = None) -> int:
             (PromptEvent.TOOL_OBSERVATION, "tool-observation.md"),
             (PromptEvent.STOP_REPAIR, "stop-repair.md"),
         )
-        for locale in ("en", "ko"):
+        for locale in ("en", "ko", "zh", "ja"):
             locale_dir = output_dir / locale
             locale_dir.mkdir(parents=True, exist_ok=True)
             for event, filename in event_files:
@@ -183,7 +183,7 @@ def main(argv: list[str] | None = None) -> int:
         }
         (output_dir / "manifest.json").write_bytes(_canonical_json(manifest))
         print(
-            f"PROMPTS_OK locales=2 events=3 output={output_dir} "
+            f"PROMPTS_OK locales=4 events=3 output={output_dir} "
             f"content_revision={bundle.content_revision}"
         )
         return 0

@@ -15,7 +15,7 @@ from typing import Literal, Mapping
 from ..errors import IdentifierError
 from ..ids import validate_method_id
 
-SelectorLocale = Literal["en", "ko"]
+SelectorLocale = Literal["en", "ko", "zh", "ja"]
 DEFAULT_SELECTOR_DEADLINE_SECONDS = 30
 MAX_SELECTOR_DEADLINE_SECONDS = 30
 MAX_TRANSIENT_PROMPT_BYTES = 256 * 1024
@@ -143,6 +143,8 @@ class SelectorRequest:
     """One transient UserPromptSubmit request; never a persistence model."""
 
     prompt: str = field(repr=False)
+    locale_preference: SelectorLocale | None = field(default=None, repr=False)
+    settings_locale_preference: SelectorLocale | None = field(default=None, repr=False)
     transcript_path: Path | None = field(default=None, repr=False)
     cwd: Path | None = field(default=None, repr=False)
     session_id: str | None = field(default=None, repr=False)
@@ -153,6 +155,9 @@ class SelectorRequest:
 
     def __post_init__(self) -> None:
         _require_bounded_text(self.prompt, "prompt", maximum=MAX_TRANSIENT_PROMPT_BYTES)
+        for preference in (self.locale_preference, self.settings_locale_preference):
+            if preference is not None and preference not in {"en", "ko", "zh", "ja"}:
+                raise SelectorModelError("selector locale preference is unsupported")
         object.__setattr__(
             self, "transcript_path", _optional_path(self.transcript_path, "transcript_path")
         )

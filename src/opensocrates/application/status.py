@@ -103,8 +103,8 @@ def project_status(
         raise TypeError("status projection requires UserSettings")
     if not isinstance(profile, CapabilityProfile):
         raise TypeError("status projection requires CapabilityProfile")
-    if locale not in {"en", "ko"}:
-        raise ValueError("status locale must be en or ko")
+    if locale not in {"en", "ko", "zh", "ja"}:
+        raise ValueError("status locale must be en, ko, zh, or ja")
     statuses = _profile_statuses(profile)
     storage = statuses["local_record_write"]
     complete = settings.onboarding_version_seen == current_onboarding_version

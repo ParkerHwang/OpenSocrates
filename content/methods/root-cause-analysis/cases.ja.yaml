@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "root-cause-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "倉庫で新たなピッキング手順を導入して以来、数週間ごとに違う商品を出荷しており、チームは再び謝罪するより予防を必要としています。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "反復する運用の失敗では、症状、原因、管理策、再発の検証を分ける必要があります。"
+    },
+    {
+      "id": "root-cause-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "局所的な再起動後もサービス停止が繰り返します。因果連鎖を作るためのログ、引継ぎ、アラート担当の情報があります。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose",
+        "failure_risk"
+      ],
+      "rationale": "直近の引き金だけでなく、制御できるシステム条件と予防担当を求めています。"
+    },
+    {
+      "id": "root-cause-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "品質問題の見逃しが複数のシフトで再発し、管理者は作業者の行動と画面、負荷、管理策の不足を区別したいと考えています。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "反復する再発と階層を分ける要求は、根本原因分析への直接の手掛かりです。"
+    },
+    {
+      "id": "root-cause-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "新しい価格案内メールの後に登録が増えました。対照群との比較で、そのメールが増加の原因かが問いです。",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "対象は介入効果と反事実比較であり、反復する失敗の連鎖ではありません。"
+    },
+    {
+      "id": "root-cause-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "顧客の苦情、人員配置、滞留が一年間相互に強め合っています。ユーザーは動的なパターンの介入点を求めています。",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "遅延を含むフィードバック構造は、具体的な事案診断より広いものです。"
+    },
+    {
+      "id": "root-cause-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "失敗が起きた理由を診断せず、事案の時系列を二列の表にしてください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "原文が反復する事案を述べていても、書式調整は機械的です。"
+    },
+    {
+      "id": "root-cause-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "繰り返す引継ぎ失敗に root-cause-analysis を使い、個人を責めずに予防の担当者を特定してください。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "ユーザーが反復する運用上の失敗に方法を明示しています。"
+    },
+    {
+      "id": "root-cause-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "一件の匿名報告が、リリース失敗はある技術者のせいと述べています。ログなしでその人を根本原因として挙げてください。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "recurring_failure",
+        "decisive_input_missing"
+      ],
+      "rationale": "事象の境界と証拠が不足し、非難は安全でなく裏付けもありません。"
+    }
+  ]
+}

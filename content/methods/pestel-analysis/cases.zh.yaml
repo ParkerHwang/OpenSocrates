@@ -1,0 +1,74 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "pestel-analysis-positive-1"
+    kind: positive
+    prompt: "进入这个国家前，扫描可能改变发布计划的现行选举议程、通胀与汇率状况、人口变化、平台技术、排放规则与许可要求。"
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "提示明确限定外部扫描与战略决策。应保留来源日期与管辖区，不能声称未经验证的政策或预测已确定。"
+  - id: "pestel-analysis-positive-2"
+    kind: positive
+    prompt: "产品扩展依赖客户老龄化、数据保护规则、云成本及可能的能源价格冲击。识别应改变投资选择的重要因素、机制与信号。"
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "请求的是重要外部因素及战略影响，不是一般趋势列表。提示提供的是假设，因此分析须标为已检查、推论或未验证。"
+  - id: "pestel-analysis-positive-3"
+    kind: positive
+    prompt: "为我们的五年战略建立有证据支持的外部情境，展示哪些变化属于机会、威胁或监测信号，以及什么会改变每项战略影响。"
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "所要求输出是与战略时期关联的重要因素清单。需要证据状态与可观察标志，而非编造预测或概率。"
+  - id: "pestel-analysis-negative-1"
+    kind: negative
+    prompt: "仓库存在重复拣货错误。追踪局部流程、识别故障原因并提出纠正行动。"
+    expected_route: "root-cause-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "recurring_failure"
+      - "diagnose"
+    rationale: "问题在局部流程内部，不是宏观环境。因果故障分析更适合，不应为填满分类而添加外部因素。"
+  - id: "pestel-analysis-negative-2"
+    kind: negative
+    prompt: "新政策会影响员工、承包商、客户与一个没有代表的社区。梳理其权力、利益、可能担忧与沟通负责人。"
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "政策背景虽是外部，决定性输出却是参与者与沟通图。这容易与利益相关者分析混淆，并非请求六类环境因素。"
+  - id: "pestel-analysis-mechanical-1"
+    kind: mechanical
+    prompt: "不改变措辞，将给定六项因素描述放入 P、E、S、T、E、L 各列。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - "mechanical"
+      - "mechanical"
+    rationale: "用户只要求格式化已有内容，不需要判断重要性、证据或战略。"
+  - id: "pestel-analysis-explicit-1"
+    kind: explicit
+    prompt: "使用 PESTEL 分析审查市场进入决策。只保留重要因素，标明证据状态与时间跨度，并说明机会或威胁影响。"
+    expected_route: "pestel-analysis"
+    expected_behavior: explicit_primary
+    decisive_features:
+      - "explicit_method"
+      - "macro_environment"
+    rationale: "用户明确要求方法及其公开输出契约。分析须注意来源，依赖未经检查的现行规则的战略影响应暂缓。"
+  - id: "pestel-analysis-insufficiency-1"
+    kind: insufficiency
+    prompt: "我们该进入市场吗？我尚未提供国家或管辖区、决策时期、产品范围、基线或当前外部条件的来源。"
+    expected_route: "pestel-analysis"
+    expected_behavior: hold
+    decisive_features:
+      - "boundary_sensitive"
+      - "decisive_input_missing"
+    rationale: "问题适合外部扫描，但缺失边界与来源日期可能改变战略影响。方法应暂缓，只询问决定性范围事实，不编造市场情境。"

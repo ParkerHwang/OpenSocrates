@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Any, Final
 
+from ..domain.locales import complete_locale_set
 from ..domain.models import CompiledContentBundle
 
 
@@ -30,7 +31,7 @@ class PlaceholderMismatch(MessageCatalogError):
 
 
 _PLACEHOLDER_RE: Final[re.Pattern[str]] = re.compile(r"\{([A-Za-z][A-Za-z0-9_.-]*)\}")
-_LOCALES: Final[frozenset[str]] = frozenset({"en", "ko"})
+_LOCALES: Final[frozenset[str]] = frozenset({"en", "ko", "zh", "ja"})
 _STATUS_STATES: Final[frozenset[str]] = frozenset(
     {"full", "degraded", "prompt_only", "unavailable", "unknown"}
 )
@@ -40,7 +41,7 @@ _STORAGE_STATES: Final[frozenset[str]] = frozenset(
     {"supported", "degraded", "unavailable", "unknown"}
 )
 _RIGOR_STATES: Final[frozenset[str]] = frozenset({"quiet", "together", "strict"})
-_LOCALE_STATES: Final[frozenset[str]] = frozenset({"follow", "en", "ko"})
+_LOCALE_STATES: Final[frozenset[str]] = frozenset({"follow", "en", "ko", "zh", "ja"})
 
 
 def placeholder_names(template: str) -> frozenset[str]:
@@ -54,24 +55,31 @@ def placeholder_names(template: str) -> frozenset[str]:
 def validate_placeholder_parity(
     locale_messages: Mapping[str, Mapping[str, str]],
 ) -> None:
-    """Require EN/KO key and placeholder parity for a complete catalog."""
+    """Require four-locale key and placeholder parity for a complete catalog."""
 
-    if set(locale_messages) != _LOCALES:
-        raise MessageCatalogError("locale catalog must contain exactly en and ko")
+    if not complete_locale_set(set(locale_messages)):
+        raise MessageCatalogError("locale catalog must contain exactly en, ko, zh, and ja")
     en = locale_messages["en"]
-    ko = locale_messages["ko"]
-    if set(en) != set(ko):
-        missing_en = sorted(set(ko) - set(en))
-        missing_ko = sorted(set(en) - set(ko))
-        raise MessageCatalogError(f"locale key parity mismatch: en={missing_en}, ko={missing_ko}")
-    mismatches = [key for key in en if placeholder_names(en[key]) != placeholder_names(ko[key])]
-    if mismatches:
-        raise PlaceholderMismatch("placeholder parity mismatch: " + ", ".join(sorted(mismatches)))
+    for locale in sorted(set(locale_messages) - {"en"}):
+        messages = locale_messages[locale]
+        if set(en) != set(messages):
+            missing = sorted(set(en) - set(messages))
+            extra = sorted(set(messages) - set(en))
+            raise MessageCatalogError(
+                f"locale key parity mismatch: {locale} missing={missing}, extra={extra}"
+            )
+        mismatches = [
+            key for key in en if placeholder_names(en[key]) != placeholder_names(messages[key])
+        ]
+        if mismatches:
+            raise PlaceholderMismatch(
+                f"{locale} placeholder parity mismatch: " + ", ".join(sorted(mismatches))
+            )
 
 
 @dataclass(frozen=True, slots=True)
 class LocaleCatalog:
-    """Immutable view over the compiled bundle's EN/KO message maps."""
+    """Immutable view over the compiled bundle's four-locale message maps."""
 
     locale_messages: Mapping[str, Mapping[str, str]]
 
@@ -229,7 +237,7 @@ def render_status(
     recording_on = bool(getattr(projection, "recording_effective", False))
     onboarding_complete = bool(getattr(projection, "onboarding_complete", False))
     locale_preference = getattr(projection, "locale_preference", None)
-    locale_state = locale_preference if locale_preference in {"en", "ko"} else "follow"
+    locale_state = locale_preference if locale_preference in {"en", "ko", "zh", "ja"} else "follow"
     lines = [catalog.lookup(locale, "message.status.title")]
     lines.append(
         catalog.lookup(

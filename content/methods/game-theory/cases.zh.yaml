@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "game-theory-positive-1",
+      "kind": "positive",
+      "prompt": "如果我们降低订阅价格，主要竞争者可跟进降价或保持价格，其回应会改变我们的留存与利润率。推荐行动前比较可信的回应。",
+      "expected_route": "game-theory",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "choose"
+      ],
+      "rationale": "请求明确了相互依赖的定价行动并要求回应分析。路由应显示利润率与留存的证据，而非编造收益表或概率。"
+    },
+    {
+      "id": "game-theory-positive-2",
+      "kind": "positive",
+      "prompt": "我们正在谈判多年供应合同。我们的采购量承诺可能降低供应商成本，但若预测薄弱，供应商可优先其他买家。梳理激励、信息和可信承诺。",
+      "expected_route": "game-theory",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "choose"
+      ],
+      "rationale": "双方均可调整，收益取决于对方承诺。请求提供的是结构假设而非已验证成本，须标记假设与不确定性。"
+    },
+    {
+      "id": "game-theory-positive-3",
+      "kind": "positive",
+      "prompt": "两家平台考虑共同的互操作标准。采用能为双方创造价值，但任一平台可能等另一方先承担整合成本。分析可能回应，以及使合作可信的设计行动。",
+      "expected_route": "game-theory",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "choose"
+      ],
+      "rationale": "决策依赖双方采用和先行成本。条件性稳定结果可能有用，但激励未获支持前不得称为均衡。"
+    },
+    {
+      "id": "game-theory-negative-1",
+      "kind": "negative",
+      "prompt": "通过比较延迟、存储成本和工程能力，选择内部数据库。没有其他行动者能改变结果。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "no_meaningful_interdependence"
+      ],
+      "rationale": "环境固定，没有参与者的回应影响结果。没有战略相互依赖，因此不应路由到此方法。"
+    },
+    {
+      "id": "game-theory-negative-2",
+      "kind": "negative",
+      "prompt": "评估可能影响我们进入该市场的政治、经济、社会、技术、环境和法律力量。",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "请求可能影响战略，但决定性输出是外部因素扫描，而非参与者回应或激励。这是易混淆的方法类别，不得编造博弈均衡。"
+    },
+    {
+      "id": "game-theory-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "用所提供的采购量计算这4项合同价格的加权平均值。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "输入已提供，结果是机械计算，不需要建模其他行动者的回应。"
+    },
+    {
+      "id": "game-theory-explicit-1",
+      "kind": "explicit",
+      "prompt": "用博弈论分析这次采购拍卖。显示参与者、行动、信息、时序及任何条件性稳定结果，但不编造缺失收益。",
+      "expected_route": "game-theory",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "interacting_actors"
+      ],
+      "rationale": "用户明确命名方法并要求其公开结构。方法保持主要地位，同时保留收益信息的缺失，不编造概率。"
+    },
+    {
+      "id": "game-theory-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "是否应以价格回应威胁竞争者？我尚未明确竞争者可行行动、我方后果、双方信息或关系是否重复。",
+      "expected_route": "game-theory",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "interacting_actors"
+      ],
+      "rationale": "问题存在战略相互依赖，但缺失结构决定威胁是否可信。方法应保留，只询问决定性事实，不预测回应。"
+    }
+  ]
+}

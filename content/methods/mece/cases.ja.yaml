@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: mece-positive-01
+    kind: positive
+    prompt: "この一回の購入判断に関して、顧客区分は互いに重ならず全体を漏れなく覆っていますか。"
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "利用者は一つの分類軸の下で、重複と網羅性を別々に確認するよう求めています。"
+  - id: mece-positive-02
+    kind: positive
+    prompt: "どの事例も二つの分類に入らず、重要な事例を漏らさないようにリスク分類を再設計してください。"
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "重複、不足、粒度の確認を伴う分類規則が求められています。"
+  - id: mece-positive-03
+    kind: positive
+    prompt: "問題ツリーの分岐が一つの軸を使い、粒度がそろい、示した全体集合を覆うか確認してください。"
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "広い再帰的診断ではなく、集中した ME／CE の監査です。"
+  - id: mece-negative-01
+    kind: negative
+    prompt: "停止障害の原因を再帰的に分解し、すべての末端分岐に試験を付けてください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "分類品質の確認だけでなく、完全なロジックツリーが必要です。"
+  - id: mece-negative-02
+    kind: negative
+    prompt: "重なり自体が意味のある顧客のアイデンティティを示すので、重複したラベルを保ってください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [ambiguous_terms, human_need]
+    rationale: "自然な重なりは意図的なので、排他性を強制すると現象を歪めます。"
+  - id: mece-mechanical-01
+    kind: mechanical
+    prompt: "与えられた分類をアルファベット順に並べ、説明を保ってください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "アルファベット順への並べ替えは機械的で、分類の論理を評価しません。"
+  - id: mece-explicit-01
+    kind: explicit
+    prompt: "mece を明示的に使い、この運営モデルの担当区分を監査してください。"
+    expected_route: mece
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, category_overlap]
+    rationale: "利用者は単一軸での重複・網羅性監査を明示しています。"
+  - id: mece-insufficiency-01
+    kind: insufficiency
+    prompt: "分類が MECE か答えてください。ただし全体集合、分類目的、分類規則は示さないでください。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [category_overlap, decisive_input_missing]
+    rationale: "限定した全体集合、目的、所属規則なしでは ME と CE を評価できません。"

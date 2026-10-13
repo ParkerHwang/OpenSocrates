@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "reflective-equilibrium-positive-01",
+      "kind": "positive",
+      "prompt": "公平性の原則は正しく思えますが、三つの難しい事例に適用すると疑問が生じます。残る緊張を可視化し、原則か判断を修正してください。",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "熟慮した判断、原則、難しい事例を相互に調整する仕事です。"
+    },
+    {
+      "id": "reflective-equilibrium-positive-02",
+      "kind": "positive",
+      "prompt": "ある組織はプライバシーと説明責任を重視しますが、難しい事案が対立を生みました。可能な限り両方を保つ修正案を比較してください。",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "裁量を伴う価値の対立には、原則、事例、修正、残る緊張の明示が必要です。"
+    },
+    {
+      "id": "reflective-equilibrium-positive-03",
+      "kind": "positive",
+      "prompt": "専門チームの受け入れている事例判断が、明示した原則と対立します。反例を試し、どの背景前提を変えるべきか特定してください。",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "事例、原則、背景前提の間を反復して調整する判断です。"
+    },
+    {
+      "id": "reflective-equilibrium-negative-01",
+      "kind": "negative",
+      "prompt": "明示された規制が提案する行動を明確に禁止し、裁量を残しません。許される代替策を定めてください。",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "拘束的な規則が状態を決めるため、原則間の反省的調整は不要です。"
+    },
+    {
+      "id": "reflective-equilibrium-negative-02",
+      "kind": "negative",
+      "prompt": "チームは関係者の反論を、最も強く公正な前提や必要な証拠を再構成せずに退けています。",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "直近の不足は未試験の反対事例であり、熟慮した原則と判断の対立ではありません。"
+    },
+    {
+      "id": "reflective-equilibrium-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "原則と事例の説明を、比較や修正をせずレビュー文書にコピーしてください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "コピーは機械的で、規範の整合性を求めません。"
+    },
+    {
+      "id": "reflective-equilibrium-explicit-01",
+      "kind": "explicit",
+      "prompt": "reflective-equilibrium を使い、この難しい事例で公平性の原則を調べ、何が緊張として残るか示してください。",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "ユーザーが事例と原則の反復調整を明示的に求めています。"
+    },
+    {
+      "id": "reflective-equilibrium-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "拘束力のある安全規則が適用されますが、一事例が不公平に感じられるので、助手にその規則を衡量で取り除くよう求めてください。",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "value_conflict",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "方法は裁量を作り出したり拘束的な安全規則を覆したりしてはいけません。"
+    }
+  ]
+}

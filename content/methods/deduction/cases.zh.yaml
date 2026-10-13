@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deduction-positive-01
+    kind: positive
+    prompt: "该结论是否必然由这些政策前提和所述例外规则推出？"
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "用户要求从明确前提和规则推出形式后果。"
+  - id: deduction-positive-02
+    kind: positive
+    prompt: "检查这个合同论证是否有效，以及其前提是否实际获得支持。"
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "明确的规则论证必须区分有效性和健全性。"
+  - id: deduction-positive-03
+    kind: positive
+    prompt: "找出使这个合规结论看似可推出的隐藏前提。"
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "任务要求规范化论证、揭示隐藏前提并检查形式有效性。"
+  - id: deduction-negative-01
+    kind: negative
+    prompt: "几个解释都符合中断情况；选择最佳解释并说明下一项有区分力的测试。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "竞争原因与区分性证据需要溯因推理，而非蕴涵。"
+  - id: deduction-negative-02
+    kind: negative
+    prompt: "估计这些观察在多大范围内支持关于未来用户的一般主张。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "所要求的扩展是归纳性的，取决于样本代表性。"
+  - id: deduction-mechanical-01
+    kind: mechanical
+    prompt: "为提供的前提编号，保留措辞。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "为提供列表编号是机械任务。"
+  - id: deduction-explicit-01
+    kind: explicit
+    prompt: "明确使用 deduction，检验所述资格规则是否蕴涵此案例结果。"
+    expected_route: deduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, explicit_rules]
+    rationale: "用户明确调用形式规则应用与蕴涵检验。"
+  - id: deduction-insufficiency-01
+    kind: insufficiency
+    prompt: "判断结论是否有效，但不提供前提、规则、范围或结论文本。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [explicit_rules, decisive_input_missing]
+    rationale: "没有论证形式和重要前提就无法评估有效性。"

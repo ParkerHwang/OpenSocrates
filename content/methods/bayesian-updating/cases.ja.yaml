@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: bayesian-updating-positive-01
+    kind: positive
+    prompt: "競合する診断の基礎率がそれぞれ異なる場合、この陽性検査でオッズをどう変えるべきですか。"
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "事前の根拠、証拠の方向、事後の変化、基礎率への感度が必要です。"
+  - id: bayesian-updating-positive-02
+    kind: positive
+    prompt: "信号が順次得られるにつれ、二つの発売仮説への確信度を更新してください。"
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "順次得られる証拠で競合仮説を更新し、信号を二重に数えない必要があります。"
+  - id: bayesian-updating-positive-03
+    kind: positive
+    prompt: "事前の発生率と尤度の仮定を信頼できる範囲で変えたとき、推奨が逆転するかを示してください。"
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability]
+    rationale: "事後値と行動閾値の感度についての証拠判断を求めています。"
+  - id: bayesian-updating-negative-01
+    kind: negative
+    prompt: "主張をどの程度強く述べられるか決める前に、情報源を直接性と研究の質で順位付けしてください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "定義済みの仮説集合の更新ではなく、情報源の質の評価が課題です。"
+  - id: bayesian-updating-negative-02
+    kind: negative
+    prompt: "この異常の競合説明を列挙し、候補を見分ける検査を提案してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "事前の更新を求めていない場合、説明の生成と候補を見分ける検査は abduction に属します。"
+  - id: bayesian-updating-mechanical-01
+    kind: mechanical
+    prompt: "提供された事前値を分析ワークシートにコピーしてください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "数値のコピーは機械的な作業であり、確率推論を起動してはいけません。"
+  - id: bayesian-updating-explicit-01
+    kind: explicit
+    prompt: "bayesian-updating を明示的に使い、この新しい不正信号を得た後の確信度を修正してください。"
+    expected_route: bayesian-updating
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, new_evidence]
+    rationale: "証拠による確信度の更新をユーザーが明示的に選んでいます。"
+  - id: bayesian-updating-insufficiency-01
+    kind: insufficiency
+    prompt: "事後確率を示してください。ただし競合仮説、事前の根拠、尤度情報は提供しません。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [new_evidence, unknown_probability, decisive_input_missing]
+    rationale: "仮説と入力の出所がない数値的な事後確率は、捏造した精密さになります。"

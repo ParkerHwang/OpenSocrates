@@ -193,6 +193,17 @@ class ClaudeContractTests(unittest.TestCase):
         (self.root / REFERENCE_PATHS[1]).unlink()
         self.assertEqual(self.call(_payload()), "")
 
+    def test_each_locale_guide_is_required_for_native_entry(self) -> None:
+        for locale in ("en", "ko", "zh", "ja"):
+            with self.subTest(locale=locale):
+                guide = self.root / f"skills/opensocrates/references/decision/guide.{locale}.md"
+                contents = guide.read_bytes()
+                guide.unlink()
+                try:
+                    self.assertEqual(self.call(_payload()), "")
+                finally:
+                    guide.write_bytes(contents)
+
     def test_empty_reference(self) -> None:
         (self.root / REFERENCE_PATHS[0]).write_text("", encoding="utf-8")
         self.assertEqual(self.call(_payload()), "")
@@ -326,6 +337,31 @@ class ClaudeLauncherTests(unittest.TestCase):
             "argv:decision --stream\nsynthetic-stdin\n",
         )
 
+    def test_locale_dispatch_preserves_closed_arguments(self) -> None:
+        for action in ("get", "reset"):
+            result = self.invoke("locale", "claude", action)
+            self.assertEqual(result.stdout, f"argv:locale {action}\nsynthetic-stdin\n")
+            self.assertEqual((result.returncode, result.stderr), (0, ""))
+        for locale in ("en", "ko", "zh", "ja", "follow"):
+            result = self.invoke("locale", "claude", "set", locale)
+            self.assertEqual(result.stdout, f"argv:locale set {locale}\nsynthetic-stdin\n")
+            self.assertEqual((result.returncode, result.stderr), (0, ""))
+
+    def test_invalid_locale_arguments_never_reach_runtime(self) -> None:
+        for args in (
+            ("locale", "claude"),
+            ("locale", "claude", "set"),
+            ("locale", "claude", "set", "zh;bad"),
+            ("locale", "claude", "set", "zh", "extra"),
+            ("locale", "claude", "get", "zh"),
+            ("locale", "codex", "get"),
+        ):
+            with self.subTest(args=args):
+                result = self.invoke(*args)
+                self.assertEqual(json.loads(result.stdout)["status"], "unavailable")
+                self.assertNotIn("argv:", result.stdout)
+                self.assertEqual((result.returncode, result.stderr), (0, ""))
+
     def test_noops_and_bad_host_arguments(self) -> None:
         for args in (
             ("hook", "claude", "completion_candidate"),
@@ -334,6 +370,7 @@ class ClaudeLauncherTests(unittest.TestCase):
             ("hook", "codex", "user_prompt_submitted"),
             ("hook", "claude", "user_prompt_submitted;bad"),
             ("control", "claude"),
+            ("hook", "claude", "user_prompt_submitted", "extra"),
         ):
             with self.subTest(args=args):
                 result = self.invoke(*args)

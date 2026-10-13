@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lateral-thinking-positive-01
+    kind: positive
+    prompt: "团队反复优化同一条配送路线，希望挑战“每个订单都必须经过中央仓库”的假设。"
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "选项集已经僵化，需要先通过改变框架的挑战性设想生成新方案，再进行评估。"
+  - id: lateral-thinking-positive-02
+    kind: positive
+    prompt: "公共服务队列已无法再靠加快处理改善；请通过反转谁出行、何时提供服务或什么算作队列来生成构想。"
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "任务明确要求不同框架和多个构想，并随后进行筛选。"
+  - id: lateral-thinking-positive-03
+    kind: positive
+    prompt: "产品团队不断添加功能来应对参与度下降；请挑战这一框架，提出不增加功能的替代方案。"
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "现有优化框架阻碍新选项，应有意打破。"
+  - id: lateral-thinking-negative-01
+    kind: negative
+    prompt: "访谈证据不完整，团队需要发现人的需求，为服务制作原型，并安全地测试用户行为。"
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "需求发现与用户测试是主要任务；仅有挑战性设想会跳过必需证据。"
+  - id: lateral-thinking-negative-02
+    kind: negative
+    prompt: "机器防护装置必须符合强制安全规范，团队想知道设计是否通过必需测试。"
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, explicit_rules]
+    rationale: "安全关键验证应采用严谨证据和权威规范，而非开放式挑战性设想。"
+  - id: lateral-thinking-mechanical-01
+    kind: mechanical
+    prompt: "将已有选项列表按字母顺序排列，保留每项描述，不生成新替代方案。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "排序是机械任务，不要求挑战框架。"
+  - id: lateral-thinking-explicit-01
+    kind: explicit
+    prompt: "使用 lateral-thinking 寻找三个非显而易见的会议减废方法，且不改变安全规则。"
+    expected_route: lateral-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, stale_options, choose]
+    rationale: "用户明确要求突破框架的替代方案，并保留受保护约束。"
+  - id: lateral-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "问题与不可妥协约束均未知；请编造一个激进选项并立即推荐。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [stale_options, decisive_input_missing]
+    rationale: "没有框架或受保护约束，就不能安全筛选挑战性设想。"

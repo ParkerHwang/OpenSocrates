@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Collection
 from typing import Protocol
 
+from ..domain.locales import detect_prompt_locale
 from .models import SelectorLocale, SelectorModelError, SelectorRequest
 
 
@@ -12,7 +13,7 @@ class PromptLocalePolicy(Protocol):
     """Choose the requested authored-content locale from the current prompt."""
 
     def locale_for(self, request: SelectorRequest) -> SelectorLocale:
-        """Return ``en`` or ``ko`` without retaining the prompt."""
+        """Return a supported locale without retaining the prompt."""
 
 
 class ReasoningEffortPolicy(Protocol):
@@ -23,20 +24,20 @@ class ReasoningEffortPolicy(Protocol):
 
 
 class CurrentPromptLocalePolicy:
-    """Use Korean/English character counts; ties and other scripts fall back to English."""
+    """Prefer trusted locale settings; otherwise detect Kana, Hangul, Han, or English."""
 
     def locale_for(self, request: SelectorRequest) -> SelectorLocale:
         if not isinstance(request, SelectorRequest):
             raise SelectorModelError("locale policy requires a selector request")
-        korean = 0
-        english = 0
-        for character in request.prompt:
-            codepoint = ord(character)
-            if 0xAC00 <= codepoint <= 0xD7A3:
-                korean += 1
-            elif (0x41 <= codepoint <= 0x5A) or (0x61 <= codepoint <= 0x7A):
-                english += 1
-        return "ko" if korean > english else "en"
+        try:
+            return detect_prompt_locale(
+                request.prompt,
+                explicit_locale=request.locale_preference,
+                settings_locale=request.settings_locale_preference,
+                count_ascii_digits=False,
+            )
+        except ValueError as error:
+            raise SelectorModelError(str(error)) from error
 
 
 class MediumReasoningEffortPolicy:
@@ -53,7 +54,7 @@ def locale_with_english_fallback(
 ) -> SelectorLocale:
     """Return the requested locale when complete, otherwise English when complete."""
 
-    if requested not in {"en", "ko"}:
+    if requested not in {"en", "ko", "zh", "ja"}:
         raise SelectorModelError("requested locale is unsupported")
     available = frozenset(available_locales)
     if requested in available:

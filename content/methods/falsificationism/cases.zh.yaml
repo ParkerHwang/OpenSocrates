@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "falsificationism-positive-01",
+      "kind": "positive",
+      "prompt": "什么观察会对这项偏爱的产品假设构成决定性反对证据？",
+      "expected_route": "falsificationism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_claim",
+        "critique"
+      ],
+      "rationale": "主张需要可能失败的预测和可观察的反证条件，而非更多确认性轶事。"
+    },
+    {
+      "id": "falsificationism-positive-02",
+      "kind": "positive",
+      "prompt": "将这项解释变成预测，区分辅助假设，并在检验前定义失败阈值。",
+      "expected_route": "falsificationism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_claim",
+        "critique"
+      ],
+      "rationale": "要求的输出是预先规定、带测量条件的反驳尝试。"
+    },
+    {
+      "id": "falsificationism-positive-03",
+      "kind": "positive",
+      "prompt": "预测失败削弱的是理论、测量，还是辅助设定假设？",
+      "expected_route": "falsificationism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_claim",
+        "critique"
+      ],
+      "rationale": "方法须定位失败的检验实际挑战了什么。"
+    },
+    {
+      "id": "falsificationism-negative-01",
+      "kind": "negative",
+      "prompt": "为异常生成多个解释，比较哪个最能说明观察事实。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "没有规定可能失败的预测时，生成候选解释属于溯因。"
+    },
+    {
+      "id": "falsificationism-negative-02",
+      "kind": "negative",
+      "prompt": "按设计严谨性对这些来源排序，并根据适用性调整主张强度。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "任务是校准证据层级，而非尝试反驳。"
+    },
+    {
+      "id": "falsificationism-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "把预注册的预测和阈值复制到检验表。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "复制已提供的检验规范是机械操作。"
+    },
+    {
+      "id": "falsificationism-explicit-01",
+      "kind": "explicit",
+      "prompt": "明确调用证伪主义，挑战“这项干预总能改善留存”的主张。",
+      "expected_route": "falsificationism",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "testable_claim"
+      ],
+      "rationale": "用户明确选择以反驳为导向检验普遍主张。"
+    },
+    {
+      "id": "falsificationism-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "对一项没有可观察预测、也无法说明什么会构成反对证据的主张使用证伪主义。",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "testable_claim"
+      ],
+      "rationale": "固定的禁用条件适用：没有可检验的推论时，方法须拒绝，不能编造反证条件。"
+    }
+  ]
+}

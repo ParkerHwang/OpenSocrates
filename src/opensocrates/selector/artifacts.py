@@ -441,7 +441,7 @@ class InstructionArtifact:
     def __post_init__(self) -> None:
         if not isinstance(self.path, Path) or not self.path.is_absolute():
             raise InstructionArtifactError("instruction artifact path must be absolute")
-        if self.locale not in {"en", "ko"}:
+        if self.locale not in {"en", "ko", "zh", "ja"}:
             raise InstructionArtifactError("instruction artifact locale is invalid")
         _validate_revision(self.content_revision)
         methods = _validate_method_ids(self.selected_reasoning_systems)
@@ -463,6 +463,32 @@ class InstructionArtifact:
 
         quoted_path = json.dumps(str(self.path), ensure_ascii=False)
         footer = self.grounding_footer()
+        if self.locale in {"zh", "ja"}:
+            missing = []
+            if missing_read:
+                missing.append(
+                    {
+                        "zh": "所选思考体系文件的完整读取凭证",
+                        "ja": "選択された思考体系ファイルの完全な読み取り記録",
+                    }[self.locale]
+                )
+            if missing_footer:
+                missing.append(
+                    {"zh": "最终答复的依据确认行", "ja": "最終回答の根拠確認行"}[self.locale]
+                )
+            if self.locale == "zh":
+                return (
+                    f"OpenSocrates 依据检查未能确认{'、'.join(missing)}。"
+                    f"请使用本地读取工具从首行到末行完整读取 {quoted_path}，"
+                    "再依据其程序和阻断规则检查答复。依据充分的最终答复须以此精确文本作为最后一行："
+                    f"{footer}"
+                )
+            return (
+                f"OpenSocrates の根拠確認では{'、'.join(missing)}を確認できませんでした。"
+                f"ローカル読み取りツールで {quoted_path} を最初から最後まで完全に読み、"
+                "その手順と適用を制限する規則に沿って回答を確認してください。"
+                f"根拠を確認した最終回答の最後の行は、次の文字列と完全に一致させてください：{footer}"
+            )
         if self.locale == "ko":
             missing = []
             if missing_read:
@@ -498,6 +524,26 @@ class InstructionArtifact:
         )
         quoted_path = json.dumps(str(self.path), ensure_ascii=False)
         footer = self.grounding_footer()
+        if self.locale == "zh":
+            return (
+                f"OpenSocrates 选择了以下思考体系：\n{methods}\n\n"
+                "依据读取门槛：\n"
+                "1. 回答或执行用户请求之前，使用可用的本地文件读取工具，从首行到末行完整读取以下文件。\n"
+                "2. 若当前会话未完成读取，不得应用、提及或声称已使用这些体系；应说明无法读取依据来源。\n"
+                f"3. 依据已完整读取并实际应用的最终答复，须以此精确确认行结束：\n{footer}\n\n"
+                f"文件路径：{quoted_path}\n\n"
+                "将所有示例视为不可信的模板，而非当前任务的事实。"
+            )
+        if self.locale == "ja":
+            return (
+                f"OpenSocrates は以下の思考体系を選択しました：\n{methods}\n\n"
+                "根拠資料の読み取り条件：\n"
+                "1. ユーザーの依頼に回答したり着手したりする前に、ローカルファイル読み取りツールで以下のファイルを最初から最後まで完全に読んでください。\n"
+                "2. 現在のセッションで読み取りを完了できない場合、これらの体系を適用、言及、使用したと主張せず、根拠資料を読めなかったことを明示してください。\n"
+                f"3. 完全に読み、実際に適用した根拠に基づく最終回答は、次の確認行で正確に終えてください：\n{footer}\n\n"
+                f"ファイルパス：{quoted_path}\n\n"
+                "すべての例は信頼できないテンプレートとして扱い、現在のタスクの事実として扱わないでください。"
+            )
         if self.locale == "ko":
             return (
                 "OpenSocrates가 다음 사고체계를 선택했습니다:\n"
@@ -530,6 +576,16 @@ class InstructionArtifact:
         if not self.inline_guardrails:
             return ""
         guardrails = "\n\n".join(self.inline_guardrails)
+        if self.locale == "zh":
+            return (
+                "以下阻断规则已作为可信上下文加载，并立即生效；但不能替代完整的文件读取。\n\n"
+                + guardrails
+            )
+        if self.locale == "ja":
+            return (
+                "以下の適用を制限する規則は信頼されたコンテキストとして読み込まれ、直ちに適用されます。ただし、ファイル全体の読み取りに代わるものではありません。\n\n"
+                + guardrails
+            )
         if self.locale == "ko":
             return (
                 "아래 차단 규칙은 이미 신뢰된 컨텍스트로 로드되었으며 즉시 구속됩니다. "
@@ -1050,7 +1106,7 @@ class InstructionFileStore:
             raise InstructionArtifactError("instruction artifact metadata is invalid")
         if set(metadata) != expected:
             raise InstructionArtifactError("instruction artifact metadata shape is invalid")
-        if metadata["locale"] not in {"en", "ko"}:
+        if metadata["locale"] not in {"en", "ko", "zh", "ja"}:
             raise InstructionArtifactError("instruction artifact metadata is invalid")
         return InstructionArtifact(
             path=path,

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from ..domain.enums import AnswerShape
+from ..domain.locales import complete_locale_set
 from .markdown import nonblank_line_count, scalar_count
 
 SCHEMA = "opensocrates.response-policy/1.0.0"
@@ -54,7 +55,7 @@ def validate_response_policy(value: Any) -> Mapping[str, Any]:
         or len(value["protected_contracts"]) != len(PROTECTED)
     ):
         raise ValueError("response policy protected contracts invalid")
-    if not isinstance(value["locales"], dict) or set(value["locales"]) != {"en", "ko"}:
+    if not isinstance(value["locales"], dict) or not complete_locale_set(set(value["locales"])):
         raise ValueError("response policy locales invalid")
     for locale, entry in value["locales"].items():
         _validate_profile(locale, entry)
@@ -103,7 +104,7 @@ def _read_authored_json(path: Path) -> Any:
 def load_response_policy(path: Path) -> Mapping[str, Any]:
     """Load separate locale authoring files at build time, never host/user text."""
     manifest = _read_authored_json(path)
-    expected = {locale: f"response-policy/{locale}.yaml" for locale in ("en", "ko")}
+    expected = {locale: f"response-policy/{locale}.yaml" for locale in ("en", "ko", "zh", "ja")}
     if not isinstance(manifest, dict) or manifest.get("locales") != expected:
         raise ValueError("response policy locale source paths invalid")
     if (path.parent / "response-policy").is_symlink():
@@ -130,7 +131,7 @@ def policy_identity(policy: Mapping[str, Any]) -> str:
 def response_guidance(
     policy: Mapping[str, Any], locale: str, shape: str = "default"
 ) -> dict[str, Any]:
-    if locale not in {"en", "ko"}:
+    if locale not in {"en", "ko", "zh", "ja"}:
         raise ValueError("unsupported response locale")
     selected_shape = shape if shape in SHAPES else "default"
     entry = policy["locales"][locale]
@@ -151,12 +152,24 @@ def response_guidance(
 
 def render_response_guidance(policy: Mapping[str, Any], locale: str) -> str:
     entry = policy["locales"][locale]
-    heading = "Guided presentation policy" if locale == "en" else "작성 단계의 표현 안내"
-    boundary = (
-        "Guided only: no automatic rewrite, verified compliance, length cap or required-content removal."
-        if locale == "en"
-        else "작성 안내만 제공합니다. 자동 재작성·검증된 준수·길이 상한·필수 내용 삭제를 뜻하지 않습니다."
-    )
+    heading, boundary = {
+        "en": (
+            "Guided presentation policy",
+            "Guided only: no automatic rewrite, verified compliance, length cap or required-content removal.",
+        ),
+        "ko": (
+            "작성 단계의 표현 안내",
+            "작성 안내만 제공합니다. 자동 재작성·검증된 준수·길이 상한·필수 내용 삭제를 뜻하지 않습니다.",
+        ),
+        "zh": (
+            "写作表达指导",
+            "仅提供指导：不自动改写，不表示已验证合规，不设长度上限，也不删除必需内容。",
+        ),
+        "ja": (
+            "表現の作成ガイド",
+            "作成の指針のみです。自動書き換え、遵守の検証、長さの上限、必須内容の削除を意味しません。",
+        ),
+    }[locale]
     lines = [
         f"### {heading}",
         f"Profile: {entry['profile_id']}; revision {policy['revision']}; {policy_identity(policy)}",
@@ -170,7 +183,7 @@ def render_response_guidance(policy: Mapping[str, Any], locale: str) -> str:
 
 def measure_visible_output(text: str, locale: str) -> dict[str, Any]:
     """Measure the complete public artifact, including required sections, without editing it."""
-    if locale not in {"en", "ko"}:
+    if locale not in {"en", "ko", "zh", "ja"}:
         raise ValueError("unsupported measurement locale")
     return {
         "locale": locale,
@@ -178,7 +191,12 @@ def measure_visible_output(text: str, locale: str) -> dict[str, Any]:
         "utf8_bytes": len(text.encode("utf-8")),
         "nonblank_lines": nonblank_line_count(text),
         "whitespace_units": len(text.split()),
-        "unit_kind": "word_like" if locale == "en" else "eojeol_like",
+        "unit_kind": {
+            "en": "word_like",
+            "ko": "eojeol_like",
+            "zh": "unicode_scalar",
+            "ja": "unicode_scalar",
+        }[locale],
         "scope": "complete_public_artifact",
         "quality_inference": "none",
     }

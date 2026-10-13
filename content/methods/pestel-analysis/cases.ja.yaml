@@ -1,0 +1,74 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "pestel-analysis-positive-1"
+    kind: positive
+    prompt: "この国への参入前に、公開計画を変え得る現在の選挙議題、インフレと通貨の状況、人口変化、プラットフォーム技術、排出規則、許認可要件を調べてください。"
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "範囲を定めた外部調査と戦略判断が示されています。出典の日付と管轄を保ち、未検証の政策や予測を確定事項にしません。"
+  - id: "pestel-analysis-positive-2"
+    kind: positive
+    prompt: "製品の拡大は顧客の高齢化、データ保護規則、クラウド費用、エネルギー価格の急変の可能性に依存します。投資の選択を変える重要要因、仕組み、信号を特定してください。"
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "一般的な動向一覧ではなく、重要な外部要因と戦略上の示唆が求められています。与えられた内容は仮説なので、確認済み、推論、未検証を区別します。"
+  - id: "pestel-analysis-positive-3"
+    kind: positive
+    prompt: "五年戦略について、証拠に基づく外部状況を整理し、どの変化が機会、脅威、監視信号か、各示唆を何が変えるかを示してください。"
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "戦略の期間に結びついた重要要因一覧が要求されています。証拠状態と観察可能な指標が必要で、予測や確率を作ってはなりません。"
+  - id: "pestel-analysis-negative-1"
+    kind: negative
+    prompt: "倉庫でピッキングミスが繰り返されています。局所的な工程を追い、失敗原因と是正策を示してください。"
+    expected_route: "root-cause-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "recurring_failure"
+      - "diagnose"
+    rationale: "問題はマクロ環境ではなく工程内部です。因果に関する失敗分析が近く、分類を埋めるためだけに外部要因を加えません。"
+  - id: "pestel-analysis-negative-2"
+    kind: negative
+    prompt: "新しい政策は従業員、請負業者、顧客、代表者のいない地域社会に影響します。権力、利害、懸念、関与の担当者を整理してください。"
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "政策の背景は外部ですが、決定的な出力は主体と関与の対応図です。利害関係者分析との混同が起こりやすく、六つの環境分類の依頼ではありません。"
+  - id: "pestel-analysis-mechanical-1"
+    kind: mechanical
+    prompt: "与えられた六つの要因の説明を、表現を変えずに P、E、S、T、E、L の列へ入れてください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - "mechanical"
+      - "mechanical"
+    rationale: "既存内容の整形だけが求められ、重要性、証拠、戦略の判断は不要です。"
+  - id: "pestel-analysis-explicit-1"
+    kind: explicit
+    prompt: "市場参入の判断を PESTEL 分析で検討してください。重要な要因だけを残し、証拠状態と期間、機会または脅威としての示唆を示してください。"
+    expected_route: "pestel-analysis"
+    expected_behavior: explicit_primary
+    decisive_features:
+      - "explicit_method"
+      - "macro_environment"
+    rationale: "方法と公開出力契約が明示されています。出典に注意し、未確認の現行規則に依存する示唆は保留します。"
+  - id: "pestel-analysis-insufficiency-1"
+    kind: insufficiency
+    prompt: "市場へ参入すべきですか。国や管轄、判断の期間、製品の範囲、基準状態、現在の外部条件の出典は示していません。"
+    expected_route: "pestel-analysis"
+    expected_behavior: hold
+    decisive_features:
+      - "boundary_sensitive"
+      - "decisive_input_missing"
+    rationale: "外部調査に適した問いですが、境界や出典日付の不足で示唆が変わり得ます。市場状況を作らず保留し、決定的な範囲の事実だけを尋ねます。"

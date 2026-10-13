@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "game-theory-positive-1",
+      "kind": "positive",
+      "prompt": "サブスクリプション価格を下げると、主な競合は追随するか据え置くかを選べ、その応答が継続率と利益率を変えます。行動を勧める前に、信頼できる応答を比較してください。",
+      "expected_route": "game-theory",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "choose"
+      ],
+      "rationale": "相互依存する価格行動を挙げ、応答分析を求めています。利得表や確率を捏造せず、利益率と継続率の証拠を示す必要があります。"
+    },
+    {
+      "id": "game-theory-positive-2",
+      "kind": "positive",
+      "prompt": "複数年の供給契約を交渉しています。当方の数量確約は供給者の費用を下げ得ますが、予測が弱ければ供給者は他の買い手を優先できます。誘因、情報、信頼できる確約を整理してください。",
+      "expected_route": "game-theory",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "choose"
+      ],
+      "rationale": "双方が適応でき、利得が相手の確約に依存します。構造上の仮説であり検証済み費用ではないため、仮定と不確実性を示します。"
+    },
+    {
+      "id": "game-theory-positive-3",
+      "kind": "positive",
+      "prompt": "二つのプラットフォームは相互運用の共通規格を検討しています。採用は双方に価値を生みますが、相手が統合費用を負担するまで待つこともできます。可能な応答と、協力を信頼できるものにする設計上の行動を分析してください。",
+      "expected_route": "game-theory",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "choose"
+      ],
+      "rationale": "決定は相互の採用と先に動く費用に依存します。条件付き安定結果は役立ち得ますが、誘因の裏付けなしに均衡と呼べません。"
+    },
+    {
+      "id": "game-theory-negative-1",
+      "kind": "negative",
+      "prompt": "遅延、保存費用、技術者の能力を比較し、内部データベースを選んでください。他の主体が結果を変えることはありません。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "no_meaningful_interdependence"
+      ],
+      "rationale": "環境は固定され、他のプレイヤーの応答は結果を変えません。戦略的相互依存がないため、この方法へルーティングしません。"
+    },
+    {
+      "id": "game-theory-negative-2",
+      "kind": "negative",
+      "prompt": "この市場への参入に影響する政治、経済、社会、技術、環境、法律の要因を評価してください。",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "戦略に関わっても、決定的出力は主体の応答や誘因ではなく外部要因の調査です。方法群を混同しやすい例で、ゲーム理論の均衡を作ってはいけません。"
+    },
+    {
+      "id": "game-theory-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "提供した数量を使い、4件の契約価格の加重平均を計算してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "入力が与えられた機械的計算であり、別の主体の応答をモデル化する必要はありません。"
+    },
+    {
+      "id": "game-theory-explicit-1",
+      "kind": "explicit",
+      "prompt": "ゲーム理論でこの調達オークションを分析してください。プレイヤー、行動、情報、時点、条件付きの安定結果を示し、不足する利得を捏造しないでください。",
+      "expected_route": "game-theory",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "interacting_actors"
+      ],
+      "rationale": "ユーザーは方法と公開構造を明示しています。方法を主としつつ、利得情報の不足を保ち、確率を捏造しません。"
+    },
+    {
+      "id": "game-theory-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "価格で対抗すると競合を脅すべきでしょうか。相手の実行可能な行動、当方の結果、双方の情報、関係の反復性は特定していません。",
+      "expected_route": "game-theory",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "interacting_actors"
+      ],
+      "rationale": "戦略的相互依存はありますが、不足する構造が脅しの信頼性を決めます。応答を予測せず、保留して決定的事実だけを求めます。"
+    }
+  ]
+}

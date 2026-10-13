@@ -34,7 +34,7 @@ class ResponsePolicyChecks(unittest.TestCase):
     def setUpClass(cls):
         cls.policy = load_response_policy(ROOT / "content/response-policy.yaml")
 
-    def test_all_eighteen_profiles_and_deterministic_default(self):
+    def test_all_thirty_six_profiles_and_deterministic_default(self):
         seen = 0
         for locale, profile in self.policy["locales"].items():
             for shape in profile["shapes"]:
@@ -47,7 +47,7 @@ class ResponsePolicyChecks(unittest.TestCase):
             self.assertEqual(
                 response_guidance(self.policy, locale, "unknown")["answer_shape"], "default"
             )
-        self.assertEqual(seen, 18)
+        self.assertEqual(seen, 36)
 
     def test_no_cap_or_missing_protected_contract_can_enter_policy(self):
         for mutate in (
@@ -64,7 +64,8 @@ class ResponsePolicyChecks(unittest.TestCase):
     def test_locale_sources_are_separate_and_compiled_identity_matches(self):
         manifest = json.loads((ROOT / "content/response-policy.yaml").read_text())
         self.assertEqual(
-            manifest["locales"], {"en": "response-policy/en.yaml", "ko": "response-policy/ko.yaml"}
+            manifest["locales"],
+            {locale: f"response-policy/{locale}.yaml" for locale in ("en", "ko", "zh", "ja")},
         )
         self.assertEqual(
             self.policy,
@@ -79,7 +80,7 @@ class ResponsePolicyChecks(unittest.TestCase):
             )
         )
         session = DecisionSession(bundle, assembler, response_policy=self.policy)
-        for locale in ("en", "ko"):
+        for locale in ("en", "ko", "zh", "ja"):
             result = session.handle(request("deduction", locale=locale))
             self.assertEqual(
                 result["methods"][0]["instructions"],
@@ -102,6 +103,8 @@ class ResponsePolicyChecks(unittest.TestCase):
             self.assertIn(policy_identity(self.policy), text)
             self.assertIn("en-natural-v1", text)
             self.assertIn("ko-natural-v1", text)
+            self.assertIn("zh-natural-v1", text)
+            self.assertIn("ja-natural-v1", text)
             self.assertEqual(
                 load_compiled_response_policy(root / "content/compiled-response-policy.json"),
                 self.policy,
@@ -111,7 +114,7 @@ class ResponsePolicyChecks(unittest.TestCase):
         from opensocrates.prompting.strict_prompt import strict_second_pass_fragment
 
         bundle = load_compiled_bundle(ROOT / "content/compiled-content.bundle.json")
-        for locale in ("en", "ko"):
+        for locale in ("en", "ko", "zh", "ja"):
             raw = strict_second_pass_fragment(bundle, locale)
             guard = (ROOT / f"plugin-src/shared/rigor/activation.{locale}.md").read_text().strip()
             for host in ("codex",):
@@ -134,7 +137,7 @@ class ResponsePolicyChecks(unittest.TestCase):
         bundle = load_compiled_bundle(ROOT / "content/compiled-content.bundle.json")
         route = _method_route(bundle, "critical-thinking", None)
         compiler = PromptCompiler(bundle)
-        for locale in ("en", "ko"):
+        for locale in ("en", "ko", "zh", "ja"):
             request = _representative_request(bundle, locale, PromptEvent.STOP_REPAIR, route)
             self.assertNotIn("strict_second_pass", compiler.compile(request).fragment_ids)
             explicit = build_rigor_decision(
@@ -150,7 +153,7 @@ class ResponsePolicyChecks(unittest.TestCase):
                 )
 
     def test_all_host_decision_guides_preserve_question_scope_contract(self):
-        for locale in ("en", "ko"):
+        for locale in ("en", "ko", "zh", "ja"):
             source = (ROOT / f"plugin-src/shared/decision/guide.{locale}.md").read_bytes()
             for host in ("codex",):
                 generated = ROOT / "build/generated/plugins" / host
@@ -162,7 +165,7 @@ class ResponsePolicyChecks(unittest.TestCase):
                 )
 
     def test_measurement_counts_complete_protected_artifact(self):
-        for locale in ("en", "ko"):
+        for locale in ("en", "ko", "zh", "ja"):
             text = '판정: 보류\n\n`ID-04` 12 kg [source](https://example.com)\n{"ok":false}\n'
             result = measure_visible_output(text, locale)
             self.assertEqual(result["unicode_scalars"], len(text))
@@ -170,6 +173,13 @@ class ResponsePolicyChecks(unittest.TestCase):
             self.assertEqual(result["whitespace_units"], len(text.split()))
             self.assertEqual(result["quality_inference"], "none")
             self.assertEqual(result["scope"], "complete_public_artifact")
+
+    def test_cjk_measurement_and_profile_are_distinct(self):
+        for locale, text in (("zh", "结论：暂缓。"), ("ja", "結論は保留です。")):
+            result = measure_visible_output(text, locale)
+            self.assertEqual(result["unit_kind"], "unicode_scalar")
+            self.assertEqual(result["unicode_scalars"], len(text))
+            self.assertEqual(response_guidance(self.policy, locale)["locale"], locale)
 
     @unittest.skipUnless(hasattr(os, "mkfifo"), "POSIX FIFO")
     def test_compiled_policy_fifo_fails_without_blocking(self):

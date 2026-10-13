@@ -14,6 +14,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+LOCALES = ("en", "ko", "zh", "ja")
 HOSTS = ("claude-chat", "antigravity")
 LAYOUTS = {
     "claude-chat": ("opensocrates", "opensocrates/release-manifest.json"),
@@ -81,7 +82,7 @@ def _canonical_sources(root: Path, host: str) -> tuple[dict[str, Any], Any, dict
         raise ContentHostError("canonical projection identity mismatch")
     values = _common_values(bundle, host=host, template_revision="1")
     policy = load_response_policy(root / "content/response-policy.yaml")
-    for locale in ("en", "ko"):
+    for locale in LOCALES:
         values[f"RESPONSE_POLICY_{locale.upper()}"] = render_response_guidance(policy, locale)
     return bundle, assembler, values
 
@@ -109,13 +110,13 @@ def _files(root: Path, host: str) -> tuple[dict[str, bytes], dict[str, Any]]:
             root, "plugin-src/shared/decision/features.json"
         ),
     }
-    for locale in ("en", "ko"):
+    for locale in LOCALES:
         for target, source in (("reader", "shared/reader"), ("decision", "claude-chat")):
             files[f"{skill}/references/{target}/guide.{locale}.md"] = _read(
                 root, f"plugin-src/{source}/guide.{locale}.md"
             )
     canonical = []
-    for locale in ("en", "ko"):
+    for locale in LOCALES:
         entries = []
         for method in bundle["methods"]:
             method_id = method["id"]
@@ -158,10 +159,11 @@ def _files(root: Path, host: str) -> tuple[dict[str, bytes], dict[str, Any]]:
         f"plugin-src/{host}/generator.json",
         f"plugin-src/{host}/README.md.tmpl",
         "plugin-src/shared/decision/features.json",
-        "plugin-src/shared/reader/guide.en.md",
-        "plugin-src/shared/reader/guide.ko.md",
-        "plugin-src/claude-chat/guide.en.md",
-        "plugin-src/claude-chat/guide.ko.md",
+        *(
+            f"plugin-src/{directory}/guide.{locale}.md"
+            for directory in ("shared/reader", "claude-chat")
+            for locale in LOCALES
+        ),
     ]
     if host == "antigravity":
         source_paths.append("plugin-src/antigravity/rule.md.tmpl")
@@ -241,10 +243,19 @@ def _verify_metadata(manifest: dict[str, Any], host: str) -> None:
         raise ContentHostError("invalid content source identity")
 
 
+def _manifest_locales(manifest: dict[str, Any]) -> tuple[str, ...]:
+    """Retain verified EN/KO v1.5.0 outputs for safe replacement and rollback."""
+    version = manifest.get("product_version")
+    if not isinstance(version, str) or not re.fullmatch(r"\d+\.\d+\.\d+", version):
+        raise ContentHostError("invalid content product version")
+    return LOCALES if tuple(map(int, version.split("."))) >= (1, 5, 1) else ("en", "ko")
+
+
 def _verify_canonical_pairs(manifest: dict[str, Any], host: str) -> None:
+    locales = _manifest_locales(manifest)
     canonical = manifest.get("canonical_methods")
-    if not isinstance(canonical, list) or len(canonical) != 96:
-        raise ContentHostError("missing bilingual canonical identities")
+    if not isinstance(canonical, list) or len(canonical) != 48 * len(locales):
+        raise ContentHostError("missing version-required canonical identities")
     identities = set()
     hashes = {item["path"]: item["sha256"] for item in manifest["files"]}
     for item in canonical:
@@ -254,7 +265,7 @@ def _verify_canonical_pairs(manifest: dict[str, Any], host: str) -> None:
         relative = f"{LAYOUTS[host][0]}/references/decision/methods/{pair[1]}/{pair[0]}.md"
         if (
             pair[0] not in manifest["method_ids"]
-            or pair[1] not in ("en", "ko")
+            or pair[1] not in locales
             or pair in identities
             or item.get("path") != relative
             or item.get("sha256") != hashes.get(relative)
@@ -275,7 +286,9 @@ def _actual_members(root: Path) -> set[str]:
     return actual
 
 
-def _expected_members(host: str, method_ids: list[str]) -> set[str]:
+def _expected_members(
+    host: str, method_ids: list[str], locales: tuple[str, ...] = LOCALES
+) -> set[str]:
     skill, manifest_path = LAYOUTS[host]
     members = {
         manifest_path,
@@ -285,7 +298,7 @@ def _expected_members(host: str, method_ids: list[str]) -> set[str]:
         ),
         f"{skill}/references/decision/features.json",
     }
-    for locale in ("en", "ko"):
+    for locale in locales:
         members.add(f"{skill}/references/reader/guide.{locale}.md")
         members.add(f"{skill}/references/decision/guide.{locale}.md")
         members.add(f"{skill}/references/decision/catalog.{locale}.json")
@@ -329,7 +342,8 @@ def verify_content_host_package(path: Path | str, *, host: str) -> dict[str, Any
         ):
             raise ContentHostError(f"modified or executable content member: {relative}")
     actual = _actual_members(root)
-    if actual != seen or actual != _expected_members(host, manifest["method_ids"]):
+    expected_members = _expected_members(host, manifest["method_ids"], _manifest_locales(manifest))
+    if actual != seen or actual != expected_members:
         raise ContentHostError("unexpected or missing content member")
     if (root / manifest_path).stat().st_mode & 0o111:
         raise ContentHostError("executable manifest")

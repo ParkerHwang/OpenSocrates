@@ -12,19 +12,20 @@ and write useful messages. The original English/Korean procedures remain intact.
 The v1.5 reader guides connect conclusions to context and next actions;
 dedicated coding-specialist features are outside this version.
 
-**English** | [한국어](README.ko.md)
+**English** | [한국어](README.ko.md) | [简体中文](README.zh.md) | [日本語](README.ja.md)
 
 [![CI](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml/badge.svg)](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## v1.5.0 on Mac and Windows
+## v1.5.1 on Mac and Windows
 
-Version 1.5.0 preserves Codex and adds native Claude Code on Apple-silicon Mac,
-a portable Claude account skill, and Antigravity workspace/global rules and
-skills on Mac and Windows x64. Download archives and SHA-256 files from the
-[v1.5.0 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.0),
-or use the [npm installer](https://www.npmjs.com/package/opensocrates/v/1.5.0).
+Version 1.5.1 adds Simplified Chinese (`zh`) and Japanese (`ja`) reasoning
+instructions alongside English and Korean, across all four existing host
+profiles. It preserves the v1.5.0 platform scope: Apple-silicon Mac and Windows
+x64, with native Claude Code on Mac only. Download archives and SHA-256 files from the
+[v1.5.1 release](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.1),
+or use the [npm installer](https://www.npmjs.com/package/opensocrates/v/1.5.1).
 
 | Host | Delivery | Platform and activation |
 | --- | --- | --- |
@@ -53,14 +54,14 @@ Native runtimes are bundled; installation does not require Python. Start with
 Codex on either supported platform:
 
 ```sh
-npx --yes opensocrates@1.5.0 install --host codex
-npx --yes opensocrates@1.5.0 status --host codex
+npx --yes opensocrates@1.5.1 install --host codex
+npx --yes opensocrates@1.5.1 status --host codex
 ```
 
-For an existing v1.4 Codex installation, use:
+For an existing Codex installation, including v1.5.0, use:
 
 ```sh
-npx --yes opensocrates@1.5.0 update --host codex
+npx --yes opensocrates@1.5.1 update --host codex
 ```
 
 Review the seven Codex hooks in an interactive session and start a fresh
@@ -70,14 +71,14 @@ reports installation and integrity; it does not prove automatic delivery.
 On Apple-silicon Mac, install the native Claude companion with:
 
 ```sh
-npx --yes opensocrates@1.5.0 install --host claude
-npx --yes opensocrates@1.5.0 status --host claude
+npx --yes opensocrates@1.5.1 install --host claude
+npx --yes opensocrates@1.5.1 status --host claude
 ```
 
 For Antigravity, choose an existing absolute workspace directory:
 
 ```sh
-npx --yes opensocrates@1.5.0 install --host antigravity --workspace /absolute/path/to/workspace
+npx --yes opensocrates@1.5.1 install --host antigravity --workspace /absolute/path/to/workspace
 ```
 
 On Windows, replace the directory with an absolute local-drive path such as
@@ -86,7 +87,7 @@ For Claude account content, export to an absolute ZIP filename in an existing
 folder, then upload and enable the ZIP in Claude's Customize > Skills interface:
 
 ```sh
-npx --yes opensocrates@1.5.0 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.0-account.zip
+npx --yes opensocrates@1.5.1 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.1-account.zip
 ```
 
 ### Claude Chat and Cowork: one-time account instructions
@@ -113,7 +114,7 @@ and [Claude's official instruction settings](https://support.claude.com/en/artic
 
 The platform guides cover Windows paths, account replacement, updates, disabling,
 removal, and verified local-archive alternatives. With no local asset flags,
-the installer downloads the pinned v1.5.0 archive and checksum from GitHub Releases.
+the installer downloads the pinned v1.5.1 archive and checksum from GitHub Releases.
 
 New profiles require explicit `--host claude`, `--host antigravity`, or
 `--host claude-chat`. The default and `--host all` continue to select Codex;
@@ -124,11 +125,28 @@ Old multi-host installations are not silently adopted or erased. Reconcile their
 exact origin and ownership before installing a new profile. Back up an existing
 OpenSocrates account skill and its enabled state before replacing it.
 
+## Reasoning instruction languages
+
+All 48 methods include complete English, Korean, Simplified Chinese and Japanese
+procedures and examples: 192 procedure files and three teacher questions per
+method per language, 576 questions in total. Content revision 4 adds the two
+languages while preserving the original English/Korean method text.
+
+Language selection prefers an explicit request over a stored locale preference,
+then uses the current input's script. Kana selects Japanese; otherwise a dominant
+Hangul script selects Korean and dominant Han characters select Chinese.
+Han-only text is ambiguous, so explicitly choose Japanese when needed. Empty,
+Latin-only and tied inputs fall back to English. See the
+[language guide](docs/v1.5.1.md) for exact invocation and preference details.
+The npm installer's command output is separate from reasoning instruction
+language; this release does not translate every installer message or host UI.
+Windows ARM64 support remains separate v1.6.0 work.
+
 ## When attribution appears
 
 A final answer ends with the exact line `Powered by OpenSocrates` only when an
 eligible authored method was read in full and actually applied to that answer.
-The wording is the same in English and Korean. Reader guidance alone and
+The wording is the same in all four languages. Reader guidance alone and
 mechanical work do not qualify. The line is attribution, not proof of native
 application or a better result.
 
@@ -144,7 +162,8 @@ See [SECURITY.md](SECURITY.md).
 - [Mac installation and evidence boundaries](docs/macos-v1.5.md)
 - [Windows installation and evidence boundaries](docs/windows-v1.5.md)
 - [Authored methods](content/methods/) · [Decision-point contract](docs/decision-points.md)
-- [Implementation scope](docs/v1.5.0/IMPLEMENTATION_PLAN.md)
+- [v1.5.1 languages, selection and scope](docs/v1.5.1.md)
+- [v1.5.0 implementation baseline](docs/v1.5.0/IMPLEMENTATION_PLAN.md)
 - [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
 
 OpenSocrates is [MIT licensed](LICENSE), independent of OpenAI, Anthropic, and

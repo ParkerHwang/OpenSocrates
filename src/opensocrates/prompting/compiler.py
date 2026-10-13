@@ -1,4 +1,4 @@
-"""Deterministic, bilingual prompt assembly from the validated content bundle.
+"""Deterministic, four-locale prompt assembly from the validated content bundle.
 
 The compiler is intentionally a pure projection boundary.  It accepts one
 validated :class:`CompiledContentBundle` and typed domain decisions, never a
@@ -18,6 +18,7 @@ from ..content.hashes import sha256_hex
 from ..content.schema import PROMPT_FRAGMENT_IDS
 from ..domain.capability import validate_capability_profile
 from ..domain.enums import CapabilityStatus, Participation, Rigor, TaskState
+from ..domain.locales import complete_locale_set
 from ..domain.models import (
     CapabilityProfile,
     CompiledContentBundle,
@@ -179,7 +180,7 @@ def _event(value: PromptEvent | str) -> PromptEvent:
 
 def _locale(value: Locale | str) -> str:
     normalized = str(value)
-    if normalized not in {"en", "ko"}:
+    if normalized not in {"en", "ko", "zh", "ja"}:
         raise MissingLocaleError(f"unsupported locale: {normalized!r}")
     return normalized
 
@@ -217,8 +218,8 @@ def _validate_bundle(bundle: CompiledContentBundle, locale: str) -> None:  # noq
         bundle.method_ids
     ):
         raise PromptCompilerError("bundle method IDs are not deterministically ordered")
-    if set(bundle.locale_messages) != {"en", "ko"}:
-        raise MissingLocaleError("bundle must contain exactly en and ko locale messages")
+    if not complete_locale_set(set(bundle.locale_messages)):
+        raise MissingLocaleError("bundle must contain exactly en, ko, zh, and ja locale messages")
     if locale not in bundle.locale_messages or not isinstance(
         bundle.locale_messages[locale], Mapping
     ):
@@ -230,10 +231,16 @@ def _validate_bundle(bundle: CompiledContentBundle, locale: str) -> None:  # noq
         raise MissingFragmentError(f"bundle fixed prompt fragment set mismatch: {detail}")
     for fragment_id in PROMPT_FRAGMENT_IDS:
         localized = bundle.prompt_fragments.get(fragment_id)
-        if not isinstance(localized, Mapping) or set(localized) != {"en", "ko"}:
-            raise MissingFragmentError(f"fragment {fragment_id} is missing an en/ko version")
+        if not isinstance(localized, Mapping) or set(localized) != set(bundle.locale_messages):
+            raise MissingFragmentError(
+                f"fragment {fragment_id} is missing a supported locale version"
+            )
         for fragment_locale, text in localized.items():
-            if fragment_locale not in {"en", "ko"} or not isinstance(text, str) or not text.strip():
+            if (
+                fragment_locale not in {"en", "ko", "zh", "ja"}
+                or not isinstance(text, str)
+                or not text.strip()
+            ):
                 raise MissingFragmentError(
                     f"fragment {fragment_id}.{fragment_locale} is empty or invalid"
                 )
@@ -258,7 +265,7 @@ def _validate_method(
         )
     field_name = "complement_fragment" if complement else "procedure"
     localized = getattr(method, field_name)
-    if not isinstance(localized, Mapping) or set(localized) != {"en", "ko"}:
+    if not isinstance(localized, Mapping) or set(localized) != set(bundle.locale_messages):
         raise MissingMethodContentError(
             f"method {method.id} has no complete {field_name} locale map"
         )

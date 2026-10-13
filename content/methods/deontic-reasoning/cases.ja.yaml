@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deontic-reasoning-positive-01
+    kind: positive
+    prompt: "データ共有案は有用かもしれませんが、同意条件とプライバシー政策が、チームのすべきこと、できること、してはならないことを決めます。"
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "義務、許可、禁止、同意、特定可能な政策出典が判断を制約します。"
+  - id: deontic-reasoning-positive-02
+    kind: positive
+    prompt: "臨床担当者が、指定の専門職規範で二つの義務が衝突するか、どの暫定行動が許されるか尋ねています。"
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "求められるのは出典のある規範状態と対立の扱いで、結果の最適化だけではありません。"
+  - id: deontic-reasoning-positive-03
+    kind: positive
+    prompt: "職場の政策は報告を要求し、同意による例外を認め、機微な詳細の共有を禁じるようです。許される選択肢を明確にしてください。"
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "行動集合には政策に基づく必須、許容、禁止、例外の状態があります。"
+  - id: deontic-reasoning-negative-01
+    kind: negative
+    prompt: "規則が選択を制約しない中、二つのサービス戦略を観察可能な結果と元に戻せる試行で比較してください。"
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "規範上の権限がボトルネックではない、実務上の選択肢比較です。"
+  - id: deontic-reasoning-negative-02
+    kind: negative
+    prompt: "原則と複数の難しい事例が衝突し、チームは裁量がある範囲で整合性を高める修正を望んでいます。"
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "原則と判断の相互調整が、より具体的な経路です。"
+  - id: deontic-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "行動が必須か許容かを解釈せず、政策条項をチェックリストにコピーしてください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "政策文のコピーは機械的で、規範的解釈を求めません。"
+  - id: deontic-reasoning-explicit-01
+    kind: explicit
+    prompt: "deontic-reasoning を使い、契約が許容、要求、禁止する事項と未解決の事項を分けてください。"
+    expected_route: deontic-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, duties_rights, explicit_rules]
+    rationale: "出典に基づく規範分類を明示的に求めています。"
+  - id: deontic-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "適用政策、役割、管轄、同意条件がないまま、行動が法的に必須と断定してください。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [duties_rights, decisive_input_missing]
+    rationale: "権限と範囲が欠けるため、拘束力のある義務を作り出せません。"

@@ -1,0 +1,86 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: decision-tree-analysis-positive-1
+    kind: positive
+    prompt: "我们可现在启动试点或等待，测得的试点结果决定扩大、修订或停止。历史项目记录界定分支结果，决策负责人可在所述审查时点行动。"
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - sequential_choice
+      - unknown_probability
+    rationale: "顺序和有条件的下一步行动重要，历史记录提供可核查的概率与结果来源。"
+  - id: decision-tree-analysis-positive-2
+    kind: positive
+    prompt: "分阶段上线时，在立即扩大与先收集测试结果之间选择。每个结果都有记录的结果范围，后续行动随观察而异；展示回退点及各分支来源。"
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - multiple_options
+      - sensitive_inputs
+    rationale: "这是有机会结果和有意义回退点的顺序选择。请求要求来源和范围，不要求无依据的精确性。"
+  - id: decision-tree-analysis-positive-3
+    kind: positive
+    prompt: "可现在决定供应商，或在锁定合同前进行有记录的检查。检查发现将导向不同供应商或停止，合同负责人已说明结果值和审查日期。"
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - irreversible_choice
+      - information_purchase
+    rationale: "检查会在不可逆承诺前改变后续选项。决策树可展示条件行动和回退点，不编造分支概率。"
+  - id: decision-tree-analysis-negative-1
+    kind: negative
+    prompt: "按价格、无障碍性、支持和可靠性为三个软件产品排名。没有后续观察或条件行动；请求者想要包含利益相关方权重的明确标准比较。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "可能的同族混淆是 trade-off-analysis：这是静态多标准比较，不是顺序决策树。"
+  - id: decision-tree-analysis-negative-2
+    kind: negative
+    prompt: "政策规定，每项合格请求在满足记录条件时都必须批准。判断团队可否改选更便宜方案；规则适用后没有裁量空间。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "约束规则决定行动，没有真正决策节点。不得用树规避规则。"
+  - id: decision-tree-analysis-mechanical-1
+    kind: mechanical
+    prompt: "用已核实输入执行此固定 if-then 流程图，返回终端标签。没有机会节点、不确定结果或裁量选择。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "这是确定性执行所提供程序，不是对顺序不确定性的判断。"
+  - id: decision-tree-analysis-explicit-1
+    kind: explicit
+    prompt: "使用 decision-tree-analysis 处理分阶段上线。展示决策和机会节点，只用有记录的分支范围，识别可回退的时点。"
+    expected_route: decision-tree-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - sequential_choice
+      - multiple_options
+    rationale: "用户明确调用方法并提供公开输出需求。无依据分支值必须保持 unverified，不能补入。"
+  - id: decision-tree-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "我们应现在上线还是等待？后续行动不清楚，没有来源界定可能结果，也无人说明什么观察会允许回退。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - unknown_probability
+      - decisive_input_missing
+    rationale: "顺序、分支依据和回退条件都是会改变决策的缺口。方法必须暂缓，不编造概率或策略。"

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: boundary-critique-positive-01
+    kind: positive
+    prompt: "本市是否应该仅按现有乘客的平均通勤时间判断公交改造？"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "若将非乘客、无障碍可达性、街区或时间跨度纳入边界，结论会改变。"
+  - id: boundary-critique-positive-02
+    kind: positive
+    prompt: "判断工作场所监控试点是否成功时，应该把谁计入？"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "要求的成功判断取决于纳入的员工、被排除的合同人员、所有权和衡量的结果。"
+  - id: boundary-critique-positive-03
+    kind: positive
+    prompt: "如果纳入租户和未来三十年的搬迁成本，沿海防洪计划仍合理吗？"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "改变受影响行动者和时间跨度，可能逆转谁受益、谁付费及哪项方案更可取。"
+  - id: boundary-critique-negative-01
+    kind: negative
+    prompt: "按三个固定的价格与延迟标准，比较范围已明确的两家供应商。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [multiple_options, choose]
+    rationale: "边界、决策者、时间跨度和标准已明确；剩余任务是选项比较。"
+  - id: boundary-critique-negative-02
+    kind: negative
+    prompt: "对于指定主张，哪段的引用支持更强？"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "这是来源支持问题，而非谁或什么属于系统边界的问题。"
+  - id: boundary-critique-mechanical-01
+    kind: mechanical
+    prompt: "将列出的利益相关者移入 CSV，列为姓名和角色。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "调整提供的列表格式是机械性任务，不得触发判断方法。"
+  - id: boundary-critique-explicit-01
+    kind: explicit
+    prompt: "使用 boundary-critique 审查我们的气候承诺是否排除了供应链工人。"
+    expected_route: boundary-critique
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, boundary_sensitive]
+    rationale: "用户就受影响行动者和范围问题明确调用方法。"
+  - id: boundary-critique-insufficiency-01
+    kind: insufficiency
+    prompt: "告诉我纳入所有受影响的人后建议是否会改变，但不提供决策、人群或时间跨度。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [boundary_sensitive, decisive_input_missing]
+    rationale: "定义边界的决定性输入缺失，方法必须保留判断，而非编造受影响集合。"

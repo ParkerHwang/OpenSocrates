@@ -255,8 +255,8 @@ def build_local_metric(
         raise MetricValidationError("task_scoped must be boolean")
     if scoped and not recording_enabled:
         return None
-    if not isinstance(locale, str) or locale not in {"en", "ko"}:
-        raise MetricValidationError("metric locale must be en or ko")
+    if not isinstance(locale, str) or locale not in {"en", "ko", "zh", "ja"}:
+        raise MetricValidationError("metric locale must be en, ko, zh, or ja")
     try:
         metric_host = host if isinstance(host, HostId) else HostId(host)
         metric_rigor = rigor if isinstance(rigor, Rigor) else Rigor(rigor)

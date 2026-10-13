@@ -12,19 +12,19 @@ OpenSocrates는 진행 중인 작업에 직접 작성한 48개 사고 방법을 
 v1.5의 독자 안내는 결론을 맥락과 다음 행동에 연결합니다. 코딩 전문가 전용
 기능은 이번 버전에 포함하지 않습니다.
 
-[English](README.md) | **한국어**
+[English](README.md) | **한국어** | [简体中文](README.zh.md) | [日本語](README.ja.md)
 
 [![CI](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml/badge.svg)](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Mac과 Windows에서 쓰는 v1.5.0
+## Mac과 Windows에서 쓰는 v1.5.1
 
-v1.5.0은 Codex를 유지하면서 Apple Silicon Mac의 Claude Code 네이티브 연동,
-휴대 가능한 Claude 계정 스킬, Mac·Windows x64의 Antigravity 작업공간·전역
-규칙과 스킬을 추가합니다. 배포 파일과 SHA-256 파일은
-[v1.5.0 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.0)에서
-받거나 [npm 설치기](https://www.npmjs.com/package/opensocrates/v/1.5.0)를 사용하세요.
+v1.5.1은 기존 네 호스트 프로필의 영어·한국어 사고 지시문에 간체 중국어
+(`zh`)와 일본어(`ja`)를 추가합니다. v1.5.0의 Apple Silicon Mac·Windows x64
+지원 범위를 유지하며 Claude Code 네이티브 연동은 Mac만 지원합니다. 배포 파일과 SHA-256 파일은
+[v1.5.1 릴리스](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.1)에서
+받거나 [npm 설치기](https://www.npmjs.com/package/opensocrates/v/1.5.1)를 사용하세요.
 
 | 호스트 | 전달 방식 | 플랫폼과 활성화 |
 | --- | --- | --- |
@@ -53,14 +53,14 @@ Node.js 20 이상과 사용할 호스트를 설치하고 그 호스트에 로그
 지원하는 두 플랫폼에서 Codex를 설치하는 예입니다.
 
 ```sh
-npx --yes opensocrates@1.5.0 install --host codex
-npx --yes opensocrates@1.5.0 status --host codex
+npx --yes opensocrates@1.5.1 install --host codex
+npx --yes opensocrates@1.5.1 status --host codex
 ```
 
-기존 v1.4 Codex 설치는 다음 명령으로 업데이트합니다.
+v1.5.0을 포함한 기존 Codex 설치는 다음 명령으로 업데이트합니다.
 
 ```sh
-npx --yes opensocrates@1.5.0 update --host codex
+npx --yes opensocrates@1.5.1 update --host codex
 ```
 
 대화형 세션에서 Codex 훅 7개를 검토하고 새 대화를 시작하세요. 비대화형 실행은
@@ -70,14 +70,14 @@ npx --yes opensocrates@1.5.0 update --host codex
 Apple Silicon Mac에서는 Claude 네이티브 연동을 설치할 수 있습니다.
 
 ```sh
-npx --yes opensocrates@1.5.0 install --host claude
-npx --yes opensocrates@1.5.0 status --host claude
+npx --yes opensocrates@1.5.1 install --host claude
+npx --yes opensocrates@1.5.1 status --host claude
 ```
 
 Antigravity는 이미 존재하는 작업공간의 절대 경로를 선택합니다.
 
 ```sh
-npx --yes opensocrates@1.5.0 install --host antigravity --workspace /absolute/path/to/workspace
+npx --yes opensocrates@1.5.1 install --host antigravity --workspace /absolute/path/to/workspace
 ```
 
 Windows에서는 `C:\Work\Reading Workshop`처럼 로컬 드라이브의 절대 경로로
@@ -86,7 +86,7 @@ Claude 계정 콘텐츠는 이미 존재하는 폴더의 절대 ZIP 경로로 �
 Claude의 Customize > Skills 화면에서 업로드하고 활성화합니다.
 
 ```sh
-npx --yes opensocrates@1.5.0 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.0-account.zip
+npx --yes opensocrates@1.5.1 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.1-account.zip
 ```
 
 ### Claude Chat·Cowork: 계정 지침을 한 번 추가하기
@@ -112,7 +112,7 @@ npx --yes opensocrates@1.5.0 export --host claude-chat --output /absolute/path/t
 
 플랫폼별 안내에는 Windows 경로, 계정 스킬 교체, 업데이트·비활성화·제거와
 검증한 로컬 파일 사용법을 설명합니다. 로컬 파일 옵션을 생략하면 설치기는
-GitHub Releases에서 버전을 고정한 v1.5.0 ZIP과 체크섬을 받습니다.
+GitHub Releases에서 버전을 고정한 v1.5.1 ZIP과 체크섬을 받습니다.
 
 새 연동에는 `--host claude`, `--host antigravity`, `--host claude-chat`를
 명시해야 합니다. 기본값과 `--host all`은 계속 Codex를 선택하며 새 호스트를
@@ -122,10 +122,25 @@ GitHub Releases에서 버전을 고정한 v1.5.0 ZIP과 체크섬을 받습니�
 정확한 출처와 소유 범위를 확인하세요. 기존 OpenSocrates 계정 스킬은 교체 전에
 백업하고 활성화 상태를 보존합니다.
 
+## 사고 지시문 언어
+
+48개 방법마다 영어·한국어·간체 중국어·일본어의 전체 절차와 사례를 제공합니다.
+전체 절차 파일은 192개이며 방법·언어마다 교사 질문 3개씩 총 576개입니다.
+콘텐츠 리비전 4에서 두 언어를 추가하고 원래 영어·한국어 방법 본문은 유지합니다.
+
+언어는 명시적 요청, 저장한 언어 선호, 현재 입력의 문자 판별 순서로 선택합니다.
+가나가 있으면 일본어를 선택하고, 그 외에는 한글이 우세하면 한국어, 한자가
+우세하면 중국어를 선택합니다. 한자만 있는 입력은 중국어·일본어 구분이
+모호하므로 일본어가 필요할 때 명시하세요. 빈 입력·라틴 문자만 있는 입력·동률은
+영어로 돌아갑니다. 정확한 호출·선호 설정은 [언어 안내](docs/v1.5.1.ko.md)를
+참고하세요. npm 설치기의 명령 출력은 사고 지시문 언어와 별개이며 이번
+릴리스가 모든 설치기 메시지나 호스트 화면을 번역하는 것은 아닙니다.
+Windows ARM64 지원은 별도 v1.6.0 작업으로 유지합니다.
+
 ## 사용 표기가 나오는 조건
 
 적격한 사고 방법의 정본 전체를 읽고 현재 답변에 실제로 적용했을 때만 답변
-마지막에 `Powered by OpenSocrates`를 한 줄로 그대로 표시합니다. 영어·한국어에서
+마지막에 `Powered by OpenSocrates`를 한 줄로 그대로 표시합니다. 네 언어에서
 같은 문구를 사용합니다. 독자 안내만 사용하거나 기계적인 작업만 했다면 표시하지
 않습니다. 이 문구는 출처 표기이며 네이티브 적용이나 더 나은 결과의 증명은 아닙니다.
 
@@ -140,7 +155,8 @@ GitHub Releases에서 버전을 고정한 v1.5.0 ZIP과 체크섬을 받습니�
 - [Mac 설치와 증거의 범위](docs/macos-v1.5.ko.md)
 - [Windows 설치와 증거의 범위](docs/windows-v1.5.ko.md)
 - [사고 방법 원문](content/methods/) · [판단 지점 계약](docs/decision-points.ko.md)
-- [구현 범위](docs/v1.5.0/IMPLEMENTATION_PLAN.md)
+- [v1.5.1 언어 선택과 지원 범위](docs/v1.5.1.ko.md)
+- [v1.5.0 구현 기준](docs/v1.5.0/IMPLEMENTATION_PLAN.md)
 - [변경 이력](CHANGELOG.md) · [기여 안내](CONTRIBUTING.md) · [행동 강령](CODE_OF_CONDUCT.md)
 
 OpenSocrates는 [MIT 라이선스](LICENSE)를 따르는 독립 프로젝트이며

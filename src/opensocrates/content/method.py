@@ -82,11 +82,22 @@ def validate_procedure(text: str, *, method_id: str, locale: str) -> str:
         raise ContentValidationError(
             f"{method_id}.procedure.{locale}: expected exact nine headings"
         )
-    words = _word_count(normalized)
-    if not 350 <= words <= 900:
-        raise ContentValidationError(
-            f"{method_id}.procedure.{locale}: expected 350-900 words, got {words}"
-        )
+    if locale not in {"en", "ko", "zh", "ja"}:
+        raise ContentValidationError(f"{method_id}.procedure: unsupported locale")
+    if locale in {"zh", "ja"}:
+        # Whitespace token counts do not bound Chinese or Japanese prose.
+        characters = sum(not character.isspace() for character in normalized)
+        if not 700 <= characters <= 6000:
+            raise ContentValidationError(
+                f"{method_id}.procedure.{locale}: expected 700-6000 non-whitespace characters, "
+                f"got {characters}"
+            )
+    else:
+        words = _word_count(normalized)
+        if not 350 <= words <= 900:
+            raise ContentValidationError(
+                f"{method_id}.procedure.{locale}: expected 350-900 words, got {words}"
+            )
     procedure_index = headings.index("Procedure")
     next_heading_index = procedure_index + 1
     positions = _heading_positions(normalized)
@@ -266,7 +277,7 @@ def _validate_question_list(value: Any, path: str) -> tuple[str, ...]:
 def validate_teacher_question_catalog(  # noqa: C901 - explicit malformed-shape diagnostics
     value: Any,
 ) -> dict[str, dict[str, tuple[str, ...]]]:
-    """Validate the bilingual teacher-question catalog for the frozen 48 methods."""
+    """Validate the four-locale teacher-question catalog for the frozen 48 methods."""
 
     if not isinstance(value, Mapping):
         raise ContentValidationError("teacher-questions: expected an object")
@@ -293,13 +304,15 @@ def validate_teacher_question_catalog(  # noqa: C901 - explicit malformed-shape 
             "teacher-questions.methods: expected exactly the frozen 48 IDs"
         )
     catalog: dict[str, dict[str, tuple[str, ...]]] = {}
-    seen_by_locale: dict[str, set[str]] = {"en": set(), "ko": set()}
+    seen_by_locale: dict[str, set[str]] = {locale: set() for locale in ("en", "ko", "zh", "ja")}
     for method_id in FROZEN_METHOD_IDS:
         localized = methods[method_id]
-        if not isinstance(localized, Mapping) or set(localized) != {"en", "ko"}:
-            raise ContentValidationError(f"teacher-questions.{method_id}: expected en and ko")
+        if not isinstance(localized, Mapping) or set(localized) != {"en", "ko", "zh", "ja"}:
+            raise ContentValidationError(
+                f"teacher-questions.{method_id}: expected en, ko, zh, and ja"
+            )
         catalog[method_id] = {}
-        for locale in ("en", "ko"):
+        for locale in ("en", "ko", "zh", "ja"):
             questions = _validate_question_list(
                 localized[locale], f"teacher-questions.{method_id}.{locale}"
             )
@@ -328,15 +341,20 @@ def compile_method_content_projections(
 
     data = validate_method_authoring(authoring)
     method_id = data["id"]
-    if set(procedures) != {"en", "ko"} or set(cases_by_locale) != {"en", "ko"}:
-        raise ContentValidationError(f"{method_id}: expected en and ko procedures/cases")
+    if set(procedures) != {"en", "ko", "zh", "ja"} or set(cases_by_locale) != {
+        "en",
+        "ko",
+        "zh",
+        "ja",
+    }:
+        raise ContentValidationError(f"{method_id}: expected en, ko, zh, and ja procedures/cases")
     normalized_procedures = {
         locale: validate_procedure(procedures[locale], method_id=method_id, locale=locale)
-        for locale in ("en", "ko")
+        for locale in ("en", "ko", "zh", "ja")
     }
     normalized_cases = {
         locale: validate_cases(cases_by_locale[locale], method_id=method_id)
-        for locale in ("en", "ko")
+        for locale in ("en", "ko", "zh", "ja")
     }
     routing = data["routing"]
     suitable_features = _ordered_unique(list(routing["positive_features"]))
@@ -385,7 +403,7 @@ def compile_method_content_projections(
             theory=_theory_with_questions(normalized_procedures[locale], teacher_questions, locale),
             template_examples=_template_examples(normalized_cases[locale]),
         )
-        for locale in ("en", "ko")
+        for locale in ("en", "ko", "zh", "ja")
     )
     return catalog_entry, injectable
 
@@ -436,19 +454,19 @@ def compile_method(
 ) -> dict[str, Any]:
     data = validate_method_authoring(authoring)
     method_id = data["id"]
-    if set(procedures) != {"en", "ko"}:
-        raise ContentValidationError(f"{method_id}.procedure: expected en and ko")
+    if set(procedures) != {"en", "ko", "zh", "ja"}:
+        raise ContentValidationError(f"{method_id}.procedure: expected en, ko, zh, and ja")
     normalized = {
         locale: _theory_with_questions(
             validate_procedure(procedures[locale], method_id=method_id, locale=locale),
             teacher_questions,
             locale,
         )
-        for locale in ("en", "ko")
+        for locale in ("en", "ko", "zh", "ja")
     }
     fragments = {
         locale: complement_fragment(procedures[locale], method_id=method_id, locale=locale)
-        for locale in ("en", "ko")
+        for locale in ("en", "ko", "zh", "ja")
     }
     participation_data = data["participation"]
     routing_data = data["routing"]

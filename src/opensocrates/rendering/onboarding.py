@@ -16,6 +16,7 @@ class OnboardingRenderError(ValueError):
 
 EN_WORD_LIMIT: Final[int] = 90
 KO_SPACING_LIMIT: Final[int] = 180
+CJK_CHARACTER_LIMIT: Final[int] = 600
 _EN_WORD_RE: Final[re.Pattern[str]] = re.compile(r"[A-Za-z0-9]+(?:['’\-][A-Za-z0-9]+)*")
 
 
@@ -62,15 +63,15 @@ def render_onboarding(
     version: str = CURRENT_ONBOARDING_VERSION,
     prompt_only: bool = False,
 ) -> OnboardingDisclosure:
-    """Render exactly one authored disclosure screen in EN or KO.
+    """Render exactly one authored disclosure screen in a supported locale.
 
     The body is authored once per locale and receives only the three authored
     rigor labels as placeholders.  The prompt-only sentence is a separate
     authored catalog value and is appended exactly once when requested.
     """
 
-    if locale not in {"en", "ko"}:
-        raise OnboardingRenderError("onboarding locale must be en or ko")
+    if locale not in {"en", "ko", "zh", "ja"}:
+        raise OnboardingRenderError("onboarding locale must be en, ko, zh, or ja")
     if not isinstance(version, str) or not version:
         raise OnboardingRenderError("onboarding version is required")
     title = _authored(catalog, locale, "onboarding.title")
@@ -102,6 +103,8 @@ def render_onboarding(
         raise OnboardingRenderError("base English onboarding disclosure exceeds 90 words")
     if locale == "ko" and base_korean_units > KO_SPACING_LIMIT:
         raise OnboardingRenderError("base Korean onboarding disclosure exceeds 180 spacing units")
+    if locale in {"zh", "ja"} and sum(not char.isspace() for char in base) > CJK_CHARACTER_LIMIT:
+        raise OnboardingRenderError("base CJK onboarding disclosure exceeds 600 characters")
     if not text or text != text.strip():
         raise OnboardingRenderError("onboarding disclosure must be nonblank and trimmed")
     return OnboardingDisclosure(
@@ -121,6 +124,7 @@ render_disclosure = render_onboarding
 
 __all__ = [
     "EN_WORD_LIMIT",
+    "CJK_CHARACTER_LIMIT",
     "KO_SPACING_LIMIT",
     "OnboardingDisclosure",
     "OnboardingRenderError",

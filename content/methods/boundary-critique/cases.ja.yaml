@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: boundary-critique-positive-01
+    kind: positive
+    prompt: "現在の乗客の平均通勤時間だけで、市のバス再編を判断してよいでしょうか。"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "非乗客、アクセシビリティ、地域、時間範囲を境界に含めると結論が変わります。"
+  - id: boundary-critique-positive-02
+    kind: positive
+    prompt: "職場監視の試行が成功したかを判断するとき、誰を含めるべきですか。"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "成功の判断は、含める労働者、除外される契約労働者、所有、測定する結果に依存します。"
+  - id: boundary-critique-positive-03
+    kind: positive
+    prompt: "借家人と今後三十年間の移転費用を含めても、沿岸の洪水対策は妥当ですか。"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "影響を受ける行為者と時間範囲を変えると、受益者、費用負担者、望ましい選択肢が逆転しえます。"
+  - id: boundary-critique-negative-01
+    kind: negative
+    prompt: "範囲が明示された二社を、価格と遅延に関する三つの固定基準で比較してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [multiple_options, choose]
+    rationale: "境界、決定権者、時間範囲、基準はすでに明確で、残る課題は選択肢の比較です。"
+  - id: boundary-critique-negative-02
+    kind: negative
+    prompt: "示された主張について、どちらの段落の引用がより強く支えていますか。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "システム境界に誰や何を含めるかではなく、情報源による支持の問いです。"
+  - id: boundary-critique-mechanical-01
+    kind: mechanical
+    prompt: "列挙された関係者を、名前と役割の列がある CSV に移してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "提供された一覧の整形は機械的で、判断手法を起動してはいけません。"
+  - id: boundary-critique-explicit-01
+    kind: explicit
+    prompt: "boundary-critique を使い、私たちの気候に関する誓約が供給網の労働者を除外していないか検討してください。"
+    expected_route: boundary-critique
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, boundary_sensitive]
+    rationale: "影響を受ける行為者と範囲の問いについて、ユーザーが手法を明示しています。"
+  - id: boundary-critique-insufficiency-01
+    kind: insufficiency
+    prompt: "影響を受ける全員を含めると推奨が変わるか教えてください。ただし決定、集団、時間範囲は提供しません。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [boundary_sensitive, decisive_input_missing]
+    rationale: "境界を定める決定的な入力が欠けるため、影響を受ける集合を作り上げず保留する必要があります。"

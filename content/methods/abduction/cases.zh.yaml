@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: abduction-positive-01
+    kind: positive
+    prompt: "多种原因都可能解释转化率突然下降；哪种解释最符合观察到的事实？"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "多种解释都符合异常，需要区分性证据才能给出暂定的当前最佳解释。"
+  - id: abduction-positive-02
+    kind: positive
+    prompt: "服务仅在部分地区故障。比较合理解释，并提出能够区分它们的下一项观察。"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "任务是在信息不完整时诊断，并要求提出具有区分力的核查。"
+  - id: abduction-positive-03
+    kind: positive
+    prompt: "对于这个意外实验结果，当前最佳解释是什么？什么会让你改变判断？"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "答案必须比较候选解释，并明确保持暂定状态。"
+  - id: abduction-negative-01
+    kind: negative
+    prompt: "根据这些明确的前提和规则，结论是否必然成立？"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules, explain]
+    rationale: "已确定的前提与规则要求演绎，而非寻找最佳解释。"
+  - id: abduction-negative-02
+    kind: negative
+    prompt: "用重复的样本观察估计该模式在总体中出现的频率。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "任务是从样本推广，而不是比较竞争解释。"
+  - id: abduction-mechanical-01
+    kind: mechanical
+    prompt: "将提供的三个假设复制到调查模板中。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "复制假设是机械性任务，不应触发诊断。"
+  - id: abduction-explicit-01
+    kind: explicit
+    prompt: "明确调用 abduction，诊断为何配置变更后部署失败。"
+    expected_route: abduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, competing_explanations]
+    rationale: "用户为异常结果的诊断明确指定了方法。"
+  - id: abduction-insufficiency-01
+    kind: insufficiency
+    prompt: "选择最佳解释，但只给出结论，不提供观察、替代解释或可检验的证据。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [competing_explanations, decisive_input_missing]
+    rationale: "没有观察和竞争候选时，选择最佳解释是在编故事，而非推断。"

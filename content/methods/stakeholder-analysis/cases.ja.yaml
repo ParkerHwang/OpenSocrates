@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "stakeholder-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "現場職員、管理職、顧客、労働者代表に影響する勤務予定の変更を導入します。利害、決定権、予想される懸念、同意の必要性、関与担当者を整理してください。",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "一般的な連絡先ではなく、実施に結び付く主体の図が必要です。記録や対話で支持されるまで懸念や影響は仮説なので、その不確実性を示すべきです。"
+    },
+    {
+      "id": "stakeholder-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "公共政策が正式な決定集団にいない住民に影響します。決定者、影響を受けるが代表されない集団、権力と影響、対立点、責任の明確な参加計画を特定してください。",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "代表と実施が重要と明示されています。正式な権限と影響力を区別し、証拠なく害や同意を推定すべきではありません。"
+    },
+    {
+      "id": "stakeholder-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "複数の組織が共通のデータ標準を導入する必要があります。承認、阻止、受益、費用負担をする主体を分析し、関与担当者と展開計画を変える反応を定めてください。",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "導入は分散した権限と実施支援に依存します。組織の役割を合意の証拠とせず、利害と影響の証拠状態を公開すべきです。"
+    },
+    {
+      "id": "stakeholder-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "決定の参加者は全員目標に合意し、影響を受ける集団は重要ではありません。実行可能な二つの業者を費用、信頼性、納期で比べてください。",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "人に関する問いは解決しており、残る判断はトレードオフです。関係者分析は選択を解決せず、飾りの図を追加します。"
+    },
+    {
+      "id": "stakeholder-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "製品戦略に影響する政治、経済、社会、技術、環境、法律の変化を調べてください。",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "戦略に関係しますが、決定的な出力は外部要因の一覧です。関係者図ではなく PESTEL 分析との混同が想定されます。"
+    },
+    {
+      "id": "stakeholder-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "連絡先一覧の重複名を除き、残る名前をアルファベット順にしてください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "mechanical"
+      ],
+      "rationale": "提示文の変換だけで、利害、権力、同意、実施の評価は不要です。"
+    },
+    {
+      "id": "stakeholder-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "病院の業務変更にステークホルダー分析を使ってください。決定権、対象集団、権力・影響の証拠、対立、関与担当者、反転条件を示してください。",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "stakeholder_conflict"
+      ],
+      "rationale": "ユーザーが手法と公開項目を直接指定しており、主手法になります。ただし推定した懸念と未検証の影響は確定事項とせず明示する必要があります。"
+    },
+    {
+      "id": "stakeholder-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "新しい出勤方針を進めるべきでしょうか。決定責任者、対象集団、権限の経路、期間、方針の影響の証拠は未特定です。",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "interacting_actors"
+      ],
+      "rationale": "実施支援は決定的になりえますが、主体の境界と権限がありません。同意や反対を宣言せず、保留して最小限の不足事実を求めるべきです。"
+    }
+  ]
+}

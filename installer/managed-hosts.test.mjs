@@ -8,6 +8,7 @@ import { runManagedHost, ManagedHostError } from "./managed-hosts.mjs";
 
 const VERSION = "1.5.0";
 const IDS = Array.from({ length: 48 }, (_, i) => `method-${i + 1}`);
+const LOCALES = ["en", "ko", "zh", "ja"];
 const HASH = `sha256:${"a".repeat(64)}`;
 const digest = (value) => createHash("sha256").update(value).digest("hex");
 const jsonBytes = (value) => `${JSON.stringify(value, null, 2)}\n`;
@@ -29,13 +30,13 @@ async function snapshot(root) {
   await visit(root); return output;
 }
 
-async function fixture(base, host, { version = VERSION, variant = "original" } = {}) {
+async function fixture(base, host, { version = VERSION, variant = "original", locales = version === "1.5.0" ? ["en", "ko"] : LOCALES } = {}) {
   const root = join(base, `package-${host}-${variant}`);
   const skill = host === "claude-chat" ? "opensocrates" : host === "antigravity" ? ".agents/skills/opensocrates" : "skills/opensocrates";
   const payload = {};
   const add = (name, value) => { payload[name] = Buffer.from(value); };
   add(`${skill}/SKILL.md`, `---\nname: opensocrates\ndescription: Synthetic fixture\n---\n${variant}\n`);
-  for (const locale of ["en", "ko"]) for (const id of IDS) add(`${skill}/references/decision/methods/${locale}/${id}.md`, `Method ID: ${id}\nContent revision: 3\nLocale: ${locale}\nComplete synthetic procedure ${variant}.\n`);
+  for (const locale of locales) for (const id of IDS) add(`${skill}/references/decision/methods/${locale}/${id}.md`, `Method ID: ${id}\nContent revision: 3\nLocale: ${locale}\nComplete synthetic procedure ${variant}.\n`);
   if (host === "antigravity") add(".agents/rules/opensocrates.md", `---\ntrigger: always_on\ndescription: Synthetic fixture\n---\nRead the installed controller. ${variant}\n`);
   const manifest = {
     schema: host === "claude" ? "opensocrates.plugin-release-manifest/1.0.0" : "opensocrates.content-host-manifest/1.0.0",
@@ -52,7 +53,7 @@ async function fixture(base, host, { version = VERSION, variant = "original" } =
     add("runtime/darwin-arm64/opensocrates-runtime/opensocrates-runtime", "#!/bin/sh\nexit 0\n");
   } else {
     manifest.canonical_methods = [];
-    for (const locale of ["en", "ko"]) for (const id of IDS) {
+    for (const locale of locales) for (const id of IDS) {
       const path = `${skill}/references/decision/methods/${locale}/${id}.md`;
       manifest.canonical_methods.push({ method_id: id, locale, path, sha256: `sha256:${digest(payload[path])}` });
     }
@@ -134,6 +135,20 @@ test("content verification rejects incomplete canonical identities and executabl
   const pkg2 = await fixture(b.base, "claude-chat", { variant: "executable" });
   await fs.chmod(join(pkg2.root, "opensocrates/SKILL.md"), 0o700);
   await assert.rejects(runManagedHost(b.options("claude-chat", "verify"), b.helpers(pkg2)), { code: "unexpected_executable_surface" });
+});
+
+test("v1.5.1 requires all four locales while legacy v1.5.0 packages remain valid", async (t) => {
+  const b = await box(t);
+  for (const host of ["claude", "claude-chat", "antigravity"]) {
+    const legacy = await fixture(b.base, host, { variant: "legacy" });
+    assert.equal((await runManagedHost(b.options(host, "verify"), b.helpers(legacy))).installation, "verified-package");
+    const complete = await fixture(b.base, host, { version: "1.5.1", variant: "multilingual" });
+    assert.equal((await runManagedHost(b.options(host, "verify"), b.helpers(complete, "1.5.1"))).installation, "verified-package");
+    for (const missing of ["zh", "ja"]) {
+      const incomplete = await fixture(b.base, host, { version: "1.5.1", variant: `missing-${missing}`, locales: LOCALES.filter((locale) => locale !== missing) });
+      await assert.rejects(runManagedHost(b.options(host, "verify"), b.helpers(incomplete, "1.5.1")), { code: "invalid_canonical_content" });
+    }
+  }
 });
 
 test("Antigravity global install, disable, update, enable and exact remove preserve sentinels", async (t) => {

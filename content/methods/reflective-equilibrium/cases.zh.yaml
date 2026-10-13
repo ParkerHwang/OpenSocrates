@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "reflective-equilibrium-positive-01",
+      "kind": "positive",
+      "prompt": "公平原则看似正确，直到用于三个困难案例；修改原则或判断，并让剩余张力可见。",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "任务要求在审慎判断、原则及困难案例之间相互调整。"
+    },
+    {
+      "id": "reflective-equilibrium-positive-02",
+      "kind": "positive",
+      "prompt": "机构重视隐私和问责，但一次困难事件造成冲突；比较尽可能保留两者的修改方案。",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "具有裁量余地的价值冲突，需要明确原则、案例、修改及剩余张力。"
+    },
+    {
+      "id": "reflective-equilibrium-positive-03",
+      "kind": "positive",
+      "prompt": "专业团队认可的案例判断与其声明的原则冲突；检验反例，并识别应改变哪个背景假设。",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "决定依赖在案例、原则及背景假设之间反复调整。"
+    },
+    {
+      "id": "reflective-equilibrium-negative-01",
+      "kind": "negative",
+      "prompt": "一项明确的法规禁止拟议行动且不留裁量余地；确定允许的替代行动。",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "约束规则决定其状态，无须反思性地调整原则。"
+    },
+    {
+      "id": "reflective-equilibrium-negative-02",
+      "kind": "negative",
+      "prompt": "团队否定了利益相关者的反对意见，却没有重构其最强且公平的前提或证据需求。",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "当前缺口是未经检验的反方案例，而非审慎原则与判断之间的冲突。"
+    },
+    {
+      "id": "reflective-equilibrium-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "把列出的原则和案例描述复制到审查文档中，不比较或修改。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "复制属于机械任务，不要求规范层面的一致性判断。"
+    },
+    {
+      "id": "reflective-equilibrium-explicit-01",
+      "kind": "explicit",
+      "prompt": "使用 reflective-equilibrium 将我们的公平原则用于这些困难案例，说明哪些张力仍存在。",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "用户明确要求反复调整案例与原则。"
+    },
+    {
+      "id": "reflective-equilibrium-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "适用一项约束性安全规则，但请让助手因为一个案例感觉不公平就通过权衡消解规则。",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "value_conflict",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "方法不得制造裁量空间或推翻约束性安全规则。"
+    }
+  ]
+}

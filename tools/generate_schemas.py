@@ -172,6 +172,8 @@ def _schema_for_annotation(annotation: Any, metadata: Mapping[str, Any]) -> dict
             result["pattern"] = r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$"
         elif scalar == "date":
             result["pattern"] = r"^\d{4}-\d{2}-\d{2}$"
+        if new_type_name == "Locale":
+            result["enum"] = ["en", "ko", "zh", "ja"]
         if new_type_name == "ReviewedProcedureText":
             result["maxLength"] = MAX_REVIEWED_PROCEDURE_TEXT
         if "max_length" in metadata:

@@ -12,6 +12,7 @@ import { runManagedHost } from "./managed-hosts.mjs";
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const HELPER = join(ROOT, "installer/windows.ps1");
 const VERSION = (await fs.readFile(join(ROOT, "VERSION"), "utf8")).trim();
+const LOCALES = ["en", "ko", "zh", "ja"];
 const NATIVE = { skip: process.platform !== "win32" || process.arch !== "x64", timeout: 240_000 };
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const jsonBytes = (value) => `${JSON.stringify(value, null, 2)}\n`;
@@ -134,20 +135,30 @@ async function box(t) {
     store: join(process.env.ANTIGRAVITY_CONFIG_DIR, ".opensocrates-managed/antigravity"),
   };
 }
-async function contentPackage(b, host, { version = VERSION, changed = false } = {}) {
+async function contentPackage(b, host, { version = VERSION, changed = false, locales = version === "1.5.0" ? ["en", "ko"] : LOCALES } = {}) {
   const source = join(ROOT, "dist", `${host === "claude-chat" ? "claude-chat" : "antigravity"}-content`);
   assert.ok(await exists(source), "Build generated content packages before Windows managed tests");
   const root = await privateDirectory(join(b.base, `package ${host} 한글 ${randomUUID()}`));
   await fs.cp(source, root, { recursive: true, dereference: false });
   const manifestPath = join(root, host === "claude-chat" ? "opensocrates/release-manifest.json" : "release-manifest.json");
+  const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
+  let altered = changed || manifest.product_version !== version;
+  manifest.product_version = version;
+  for (const row of [...manifest.files]) {
+    const match = /\/methods\/(en|ko|zh|ja)\/|\/(?:guide|catalog)\.(en|ko|zh|ja)\.(?:md|json)$/u.exec(row.path);
+    if (match && !locales.includes(match[1] ?? match[2])) {
+      await fs.unlink(join(root, row.path));
+      manifest.files = manifest.files.filter((candidate) => candidate.path !== row.path);
+      altered = true;
+    }
+  }
+  manifest.canonical_methods = manifest.canonical_methods.filter((row) => locales.includes(row.locale));
   if (changed) {
-    const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
-    manifest.product_version = version;
     const path = ".agents/rules/opensocrates.md";
     await fs.appendFile(join(root, path), "\nSynthetic updated fixture.\n");
     manifest.files.find((row) => row.path === path).sha256 = `sha256:${digest(await fs.readFile(join(root, path)))}`;
-    await fs.writeFile(manifestPath, jsonBytes(manifest));
   }
+  if (altered) await fs.writeFile(manifestPath, jsonBytes(manifest));
   requireHelper("seal-new", root); // Only the newly copied generated fixture is sealed.
   let asset;
   if (host === "claude-chat") {
@@ -188,6 +199,20 @@ test("Windows private creation has the current user SID at creation and rejects 
   await fs.writeFile(join(child, "sentinel"), "preserve private collision");
   assert.notEqual(windows("mkdir-private", child).status, 0);
   assert.equal(await fs.readFile(join(child, "sentinel"), "utf8"), "preserve private collision");
+});
+
+test("Windows canonical verification accepts legacy packages and requires both added locales", NATIVE, async (t) => {
+  const b = await box(t);
+  for (const host of ["claude-chat", "antigravity"]) {
+    const legacy = await contentPackage(b, host, { version: "1.5.0" });
+    assert.equal((await runManagedHost(b.options(host, "verify"), b.helpers(legacy, "1.5.0"))).installation, "verified-package");
+    const complete = await contentPackage(b, host);
+    assert.equal((await runManagedHost(b.options(host, "verify"), b.helpers(complete))).installation, "verified-package");
+    for (const missing of ["zh", "ja"]) {
+      const incomplete = await contentPackage(b, host, { locales: LOCALES.filter((locale) => locale !== missing) });
+      await assert.rejects(runManagedHost(b.options(host, "verify"), b.helpers(incomplete)), { code: "invalid_canonical_content" });
+    }
+  }
 });
 
 test("Windows Antigravity full global lifecycle preserves settings and disabled updates", NATIVE, async (t) => {
@@ -257,7 +282,7 @@ test("Windows long paths retain ZIP bytes, extraction containment, DACL checks a
   const b = await box(t), pkg = await contentPackage(b, "claude-chat"), workspace = await longWorkspace(b);
   // The generic .NET fixture ZIP uses Windows separators. Exercise the actual
   // portable product archive here; the helper continues to reject backslashes.
-  pkg.asset = join(ROOT, "dist/opensocrates-1.5.0-claude-chat-skills.zip");
+  pkg.asset = join(ROOT, `dist/opensocrates-${VERSION}-claude-chat-skills.zip`);
   const output = join(workspace, "계정 export.zip");
   const result = await runManagedHost(b.options("claude-chat", "export", { output }), b.helpers(pkg));
   assert.equal(result.sha256, digest(await fs.readFile(pkg.asset)));

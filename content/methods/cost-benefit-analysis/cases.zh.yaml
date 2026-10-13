@@ -1,0 +1,87 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: cost-benefit-analysis-positive-1
+    kind: positive
+    prompt: "我们必须在新服务与当前基线之间选择。财务账目提供实施和运营成本，试点报告提供测得的使用情况，主要问题是在规定期间内效益是否足以证明成本合理。"
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "基线和多个方案明确，重要效益与成本有可识别来源。非货币影响可另列，但比较与决策相关。"
+  - id: cost-benefit-analysis-positive-2
+    kind: positive
+    prompt: "将两个公共卫生方案与不采取行动比较。行政记录描述交付成本，评估报告给出测得的结果，决策必须说明谁付出、谁受益，以及哪些安全或公平影响无法简化为金钱。"
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - practical_consequence
+    rationale: "任务要求包含分配与不可补偿价值的基线经济比较。结果证据按来源标注，不当作保证。"
+  - id: cost-benefit-analysis-positive-3
+    kind: positive
+    prompt: "更换项目有前期成本，效益在不同时点到来。使用获批规划期间和组织已记录的折现规则，再说明有记录的假设在其有支持的范围内变化时净影响如何改变。"
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - sensitive_inputs
+    rationale: "时点、真实计算边界及对有来源假设的敏感性，使此任务成为成本效益比较。请求提供了来源，而非要求默认利率或编造确定性。"
+  - id: cost-benefit-analysis-negative-1
+    kind: negative
+    prompt: "安全法规要求每处设施都执行一项检查，团队询问跳过检查是否合法。没有裁量选项；适用文本是决定性证据。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "这是义务与规则问题，没有真正选择。不得用净效益计算换掉约束要求。"
+  - id: cost-benefit-analysis-negative-2
+    kind: negative
+    prompt: "依据可靠性、无障碍性、生态影响和用户尊严，从三种设计中选出最佳。请求者明确拒绝将尊严货币化，其他标准也没有可辩护的价格；他们要求透明的标准比较。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - no_coherent_dimensions
+    rationale: "可能的同族混淆是 trade-off-analysis：决策需要明确标准和不可补偿约束，不是强行计算货币总量。"
+  - id: cost-benefit-analysis-mechanical-1
+    kind: mechanical
+    prompt: "将所提供的电子表格公式应用于这些已经核实的成本和效益，返回算术合计。没有要求方案、基线判断、不确定性或建议。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "这是固定计算，无需裁量性比较。该方法应保持静默，由机械计算路径处理公式。"
+  - id: cost-benefit-analysis-explicit-1
+    kind: explicit
+    prompt: "使用 cost-benefit-analysis 处理这项拨款决策。将获资助方案与有记录的基线比较，明确显示分配影响，无依据的估值暂缓，不补入数值。"
+    expected_route: cost-benefit-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - choose
+      - multiple_options
+    rationale: "用户明确调用方法并说明所需比较范围。它保持主要方法，无依据的数值仍为 assumed 或 unverified。"
+  - id: cost-benefit-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "告诉我这两个项目哪个更好。我没有商定基线、时间跨度、成本记录，效益也只有宣传性主张。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - decisive_input_missing
+    rationale: "会改变决策的基线和重要输入缺失，现有效益主张无来源。方法必须暂缓，只请求最小的决定性补充。"

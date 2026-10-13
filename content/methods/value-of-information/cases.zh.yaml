@@ -1,0 +1,110 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "value-of-information-positive-1",
+      "kind": "positive",
+      "prompt": "我们可立即上线，或先做用户研究。关于采用情况的结果会触发不同上线行动，研究方法与直接成本已知，团队也有一个固定日期，超过该日延迟就不可接受。",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "new_evidence",
+        "sensitive_inputs"
+      ],
+      "rationale": "信息有明确的改变行动路径及有界收集负担。本例不需要编造成功概率或货币价值。"
+    },
+    {
+      "id": "value-of-information-positive-2",
+      "kind": "positive",
+      "prompt": "签供应商合同前，我们能检查可能改变供应商选择的故障风险变量。检查来源、成本、延迟及决策阈值均有记录；判断是否值得检查。",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "irreversible_choice",
+        "sensitive_inputs"
+      ],
+      "rationale": "信息在不可逆决定前到达，并对应不同的行动。可说明来源和延迟，无需编造后验概率。"
+    },
+    {
+      "id": "value-of-information-positive-3",
+      "kind": "positive",
+      "prompt": "政策团队须决定扩大项目，或暂停以做针对性评估。评估可区分应扩大与应停止项目的结果，风险暴露及评估期限已说明。",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "testable_hypothesis",
+        "feedback_delay"
+      ],
+      "rationale": "问题是可行测试能否在明确期限前改变行动，不是无限制增加研究的请求。"
+    },
+    {
+      "id": "value-of-information-negative-1",
+      "kind": "negative",
+      "prompt": "找出所有关于远程工作的有趣内容并提供文献总结。没有指定决策、行动阈值、不确定变量或期限。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explain",
+        "source_quality"
+      ],
+      "rationale": "这是没有改变行动决策的开放研究。未给出决定与阈值前，无法评估信息价值。"
+    },
+    {
+      "id": "value-of-information-negative-2",
+      "kind": "negative",
+      "prompt": "安全规则要求经批准的防护装备。判断更多研究能否证明使用较便宜未批准装备合理；规则不留裁量空间。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "binding_rule_without_discretion",
+        "single_feasible_option"
+      ],
+      "rationale": "可能混淆的是 deontic-reasoning 或合格安全审查：新信息不能授权放弃约束性规则。"
+    },
+    {
+      "id": "value-of-information-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "用所给样本量公式及已核实输入返回所需样本量。不要选择是否开展研究，也不要解释其决策价值。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "这是固定计算，不是信息能否改变行动的判断。"
+    },
+    {
+      "id": "value-of-information-explicit-1",
+      "kind": "explicit",
+      "prompt": "使用 value-of-information 判断此检查是否值得其成本与延迟。说明什么发现会改变供应商决定，以及在哪里停止检查。",
+      "expected_route": "value-of-information",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "information_purchase",
+        "irreversible_choice"
+      ],
+      "rationale": "用户明确调用方法，要求阈值、行动变化、成本、延迟及停止契约。"
+    },
+    {
+      "id": "value-of-information-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "行动前应继续调查吗？当前行动、替代行动、不确定变量、可用测试及可容忍延迟尚未说明。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "decisive_input_missing"
+      ],
+      "rationale": "没有行动阈值和可行信息路径，就不能确定改变行动的价值。方法必须暂缓并请求最小的安全澄清。"
+    }
+  ]
+}

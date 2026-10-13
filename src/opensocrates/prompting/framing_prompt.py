@@ -23,7 +23,7 @@ def get_prompt_fragment(bundle: CompiledContentBundle, locale: str, fragment_id:
 
     if not isinstance(bundle, CompiledContentBundle):
         raise PromptFragmentError("prompt projection requires a validated CompiledContentBundle")
-    if locale not in {"en", "ko"}:
+    if locale not in {"en", "ko", "zh", "ja"}:
         raise PromptFragmentError(f"unsupported prompt locale: {locale!r}")
     if not isinstance(fragment_id, str) or not fragment_id:
         raise PromptFragmentError("prompt fragment ID must be non-empty text")

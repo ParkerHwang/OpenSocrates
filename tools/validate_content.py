@@ -211,9 +211,11 @@ def _catalog_phase(
         for policy_id, filename in _POLICY_FILES.items()
     }
     validate_routing_policy(policies["routing"])
-    en = load_locale(_read(content_root, "locales/en.yaml"), expected_locale="en")
-    ko = load_locale(_read(content_root, "locales/ko.yaml"), expected_locale="ko")
-    validate_locale_parity(en, ko)
+    locales = {
+        locale: load_locale(_read(content_root, f"locales/{locale}.yaml"), expected_locale=locale)
+        for locale in ("en", "ko", "zh", "ja")
+    }
+    validate_locale_parity(locales["en"], *(locales[locale] for locale in ("ko", "zh", "ja")))
     method_data: dict[str, Any] = {}
     for method_id in FROZEN_METHOD_IDS:
         relative = f"methods/{method_id}/method.yaml"
@@ -228,16 +230,15 @@ def _catalog_phase(
     teacher_questions = validate_teacher_question_catalog(
         _read(content_root, "teacher-questions.yaml")
     )
-    return catalog, method_data, policies, {"en": en, "ko": ko}, teacher_questions
+    return catalog, method_data, policies, locales, teacher_questions
 
 
 def _asset_paths(content_root: Path, method_id: str) -> dict[str, Path]:
     directory = content_root / "methods" / method_id
     return {
-        "procedure.en": directory / "procedure.en.md",
-        "procedure.ko": directory / "procedure.ko.md",
-        "cases.en": directory / "cases.en.yaml",
-        "cases.ko": directory / "cases.ko.yaml",
+        f"{kind}.{locale}": directory / f"{kind}.{locale}.{extension}"
+        for kind, extension in (("procedure", "md"), ("cases", "yaml"))
+        for locale in ("en", "ko", "zh", "ja")
     }
 
 
@@ -265,7 +266,7 @@ def _full_phase(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
             problems.append(f"MISSING_ASSET {relative}")
         procedures: dict[str, str] = {}
         cases_by_locale: dict[str, Any] = {}
-        for locale in ("en", "ko"):
+        for locale in ("en", "ko", "zh", "ja"):
             path = paths[f"procedure.{locale}"]
             if path.is_file():
                 try:
@@ -274,7 +275,7 @@ def _full_phase(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
                     )
                 except ContentValidationError as exc:
                     problems.extend(f"INVALID {item}" for item in exc.errors)
-        for locale in ("en", "ko"):
+        for locale in ("en", "ko", "zh", "ja"):
             path = paths[f"cases.{locale}"]
             if path.is_file():
                 try:
@@ -284,8 +285,8 @@ def _full_phase(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
                 except ContentValidationError as exc:
                     problems.extend(f"INVALID {item}" for item in exc.errors)
         if (
-            len(procedures) == 2
-            and len(cases_by_locale) == 2
+            len(procedures) == 4
+            and len(cases_by_locale) == 4
             and not any(f"MISSING_ASSET methods/{method_id}" in problem for problem in problems)
         ):
             try:

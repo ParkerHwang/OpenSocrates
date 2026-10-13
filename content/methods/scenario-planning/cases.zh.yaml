@@ -1,0 +1,103 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "scenario-planning-positive-1",
+      "kind": "positive",
+      "prompt": "城市需要准备十年住房战略，人口迁移与建筑技术可能独立变化。定义两个关键不确定性，建立四个一致的未来，不加概率，识别无悔行动、条件性行动及信号指标。",
+      "expected_route": "scenario-planning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "长期跨度与外部驱动因素需要结构化分支，而非一个预测。明确请求独立轴、四个情景、行动和信号指标，排除概率。"
+    },
+    {
+      "id": "scenario-planning-positive-2",
+      "kind": "positive",
+      "prompt": "五年公共卫生项目可能面临机构信任与病原体流动性的不同组合。构建 2×2 情景矩阵，解释每个世界可能如何形成，测试当前计划，并定义用于复查的可观察信号。",
+      "expected_route": "scenario-planning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "new_evidence"
+      ],
+      "rationale": "用户要求一致的外部未来、矩阵、当前计划的风洞测试及信号指标，不要求按可能性排名的预测。"
+    },
+    {
+      "id": "scenario-planning-positive-3",
+      "kind": "positive",
+      "prompt": "我们正在决定如何为十年教育平台投资作准备。监管及学习者行为影响很大，却难以预测。把可预测前提设为共同前提，选择独立轴，区分稳健准备与未来信号触发的行动。",
+      "expected_route": "scenario-planning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "irreversible_choice",
+        "plan"
+      ],
+      "rationale": "这是长期准备决策，有影响大的外部不确定性，且要求区分共同和条件性行动。方法应避免分配概率。"
+    },
+    {
+      "id": "scenario-planning-negative-1",
+      "kind": "negative",
+      "prompt": "季度收入模型有一个基准公式。在可辩护范围内改变转化率和价格假设，展示选择转变的阈值，并排序哪些输入值得进一步研究。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "sensitive_inputs"
+      ],
+      "rationale": "容易与敏感性分析的同族方法混淆：有模型、输入范围及切换阈值，而非独立的外部轴与一致未来。"
+    },
+    {
+      "id": "scenario-planning-negative-2",
+      "kind": "negative",
+      "prompt": "用定义明确的已完成产品发布参照类别，估计下一次发布可能的交付范围，并与内部日期比较。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases"
+      ],
+      "rationale": "任务要求从已完成参照案例得到外部视角预测，应归属参照类别预测，而非分支情景。"
+    },
+    {
+      "id": "scenario-planning-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "把这十二个有日期的里程碑按时间排序，返回有序列表。不涉及未来不确定性或准备决策。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "请求是确定性的排序。没有外部不确定性或可由情景规划组织的战略选择。"
+    },
+    {
+      "id": "scenario-planning-explicit-1",
+      "kind": "explicit",
+      "prompt": "将 scenario-planning 作为十年能源转型战略的主要方法。不加概率，用两个独立的关键不确定性描述四个具名称的未来，附无悔行动及信号指标。",
+      "expected_route": "scenario-planning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "deep_uncertainty",
+        "macro_environment"
+      ],
+      "rationale": "方法被明确命名，所需的非概率情景输出也已给出。路由仍受证据、范围及保留规则约束。"
+    },
+    {
+      "id": "scenario-planning-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "给我四个未来情景。我还没说明它们应支持什么决定、时间跨度、系统边界或哪些外部不确定性重要。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "没有焦点问题、时限、边界和决定，四段叙述会只是装饰且不受约束。方法应保留并仅请求缺失框架。"
+    }
+  ]
+}

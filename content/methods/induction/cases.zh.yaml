@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "induction-positive-01",
+      "kind": "positive",
+      "prompt": "这些重复观察是否支持针对大多数用户的一般主张？一般化有多强？",
+      "expected_route": "induction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "任务从观察案例推向限定的总体主张，需要样本与反例检查。"
+    },
+    {
+      "id": "induction-positive-02",
+      "kind": "positive",
+      "prompt": "评估这项调查样本是否足以支持客户偏好新工作流程的主张。",
+      "expected_route": "induction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "代表性、选择偏倚和一般化强度是核心。"
+    },
+    {
+      "id": "induction-positive-03",
+      "kind": "positive",
+      "prompt": "根据这些过去事件，考虑合理反例，我们能对下季度作出什么合理推断？",
+      "expected_route": "induction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "所需预测扩展了重复案例，须说明范围和反例风险。"
+    },
+    {
+      "id": "induction-negative-01",
+      "kind": "negative",
+      "prompt": "严格规则规定每条符合条件的记录均获批准；判断本案例是否遵循规则。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules",
+        "explain"
+      ],
+      "rationale": "任务是演绎式规则应用，不是基于样本的一般化。"
+    },
+    {
+      "id": "induction-negative-02",
+      "kind": "negative",
+      "prompt": "多种解释符合故障；比较它们并识别能加以区分的观察。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "这是溯因诊断，而非从样本扩展到总体。"
+    },
+    {
+      "id": "induction-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "将这些新观察追加到现有数据集，不改变任何数值。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "追加已提供的数据是机械操作。"
+    },
+    {
+      "id": "induction-explicit-01",
+      "kind": "explicit",
+      "prompt": "明确使用归纳法，评估这个小型实验是否支持更广的产品主张。",
+      "expected_route": "induction",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "repeated_observations"
+      ],
+      "rationale": "用户明确选择从样本到一般化的分析。"
+    },
+    {
+      "id": "induction-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "从样本推广，但不提供目标总体、抽样过程、观察或测量定义。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample",
+        "decisive_input_missing"
+      ],
+      "rationale": "缺少样本依据与目标范围时，无法限定一般化。"
+    }
+  ]
+}

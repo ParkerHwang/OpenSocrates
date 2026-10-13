@@ -10,6 +10,7 @@ import re
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from ..domain.locales import complete_locale_set
 from ..version import CONTENT_REVISION
 
 AUTHORING_SCHEMA = "opensocrates.method-authoring/1.0.0"
@@ -684,10 +685,12 @@ def validate_method_authoring(value: Any, *, expected_id: str | None = None) -> 
         )
     for field in ("display_name", "plain_action"):
         labels = _mapping(data[field], f"{method_id}.{field}")
-        if set(labels) != {"en", "ko"}:
-            raise ContentValidationError(f"{method_id}.{field}: locales must be exactly en and ko")
-        _string(labels["en"], f"{method_id}.{field}.en")
-        _string(labels["ko"], f"{method_id}.{field}.ko")
+        if set(labels) != {"en", "ko", "zh", "ja"}:
+            raise ContentValidationError(
+                f"{method_id}.{field}: locales must be exactly en, ko, zh, and ja"
+            )
+        for locale in ("en", "ko", "zh", "ja"):
+            _string(labels[locale], f"{method_id}.{field}.{locale}")
     participation = _mapping(data["participation"], f"{method_id}.participation")
     _keys(
         participation,
@@ -781,7 +784,7 @@ def validate_method_authoring(value: Any, *, expected_id: str | None = None) -> 
         raise ContentValidationError(
             f"{method_id}.complements.incompatible_secondary: v1 must be empty"
         )
-    if data["locales"] != ["en", "ko"]:
+    if data["locales"] != ["en", "ko", "zh", "ja"]:
         raise ContentValidationError(f"{method_id}.locales: expected ['en', 'ko']")
     provenance = _mapping(data["source_provenance"], f"{method_id}.source_provenance")
     _keys(
@@ -886,6 +889,9 @@ def validate_compiled_bundle_shape(value: Any) -> dict[str, Any]:  # noqa: C901 
         or method_ids != sorted(FROZEN_METHOD_IDS)
     ):
         raise ContentValidationError("bundle.method_ids: expected sorted frozen IDs")
+    locale_keys = set(_mapping(data["locale_messages"], "bundle.locale_messages"))
+    if not complete_locale_set(locale_keys):
+        raise ContentValidationError("bundle.locale_messages: incomplete supported locale set")
     methods = data["methods"]
     if (
         not isinstance(methods, list)
@@ -898,22 +904,18 @@ def validate_compiled_bundle_shape(value: Any) -> dict[str, Any]:  # noqa: C901 
             raise ContentValidationError(f"bundle.method.{compiled.get('id')}: unexpected fields")
         if compiled.get("schema") != COMPILED_METHOD_SCHEMA:
             raise ContentValidationError(f"bundle.method.{compiled.get('id')}: unsupported schema")
-        if set(_mapping(compiled.get("procedure"), "bundle.method.procedure")) != {"en", "ko"}:
-            raise ContentValidationError(
-                f"bundle.method.{compiled.get('id')}.procedure: locale mismatch"
-            )
-        if set(
-            _mapping(compiled.get("complement_fragment"), "bundle.method.complement_fragment")
-        ) != {"en", "ko"}:
-            raise ContentValidationError(
-                f"bundle.method.{compiled.get('id')}.complement_fragment: locale mismatch"
-            )
-    if set(_mapping(data["locale_messages"], "bundle.locale_messages")) != {"en", "ko"}:
-        raise ContentValidationError("bundle.locale_messages: expected exactly en and ko")
+        for field in ("procedure", "complement_fragment", "display_name", "plain_action"):
+            if set(_mapping(compiled.get(field), f"bundle.method.{field}")) != locale_keys:
+                raise ContentValidationError(
+                    f"bundle.method.{compiled.get('id')}.{field}: locale mismatch"
+                )
     if set(_mapping(data["prompt_fragments"], "bundle.prompt_fragments")) != set(
         PROMPT_FRAGMENT_IDS
     ):
         raise ContentValidationError("bundle.prompt_fragments: fixed fragment set mismatch")
+    for fragment_id, localized in data["prompt_fragments"].items():
+        if set(_mapping(localized, f"bundle.prompt_fragments.{fragment_id}")) != locale_keys:
+            raise ContentValidationError(f"bundle.prompt_fragments.{fragment_id}: locale mismatch")
     if set(_mapping(data["policy_versions"], "bundle.policy_versions")) != set(POLICY_IDS):
         raise ContentValidationError("bundle.policy_versions: fixed policy set mismatch")
     for field in ("source_tree_hash", "normalized_semantic_hash"):
@@ -940,8 +942,8 @@ def _unique_strings(value: Any, path: str) -> tuple[str, ...]:
 def _localized_text(value: Any, path: str) -> dict[str, str]:
     localized = dict(_mapping(value, path))
     locale_keys = set(localized)
-    if "en" not in locale_keys or locale_keys - {"en", "ko"}:
-        raise ContentValidationError(f"{path}: English is required; only en/ko are supported")
+    if "en" not in locale_keys or locale_keys - {"en", "ko", "zh", "ja"}:
+        raise ContentValidationError(f"{path}: English is required; only en/ko/zh/ja are supported")
     if any(not isinstance(text, str) or not text.strip() for text in localized.values()):
         raise ContentValidationError(f"{path}: localized values must be non-empty strings")
     return localized
@@ -1043,7 +1045,7 @@ def validate_reasoning_content_projections_shape(value: Any) -> dict[str, Any]: 
             raise ContentValidationError(f"{path}.schema: unsupported schema")
         method_id = _string(content["method_id"], f"{path}.method_id")
         locale = content["locale"]
-        if method_id not in catalog_by_id or locale not in {"en", "ko"}:
+        if method_id not in catalog_by_id or locale not in {"en", "ko", "zh", "ja"}:
             raise ContentValidationError(f"{path}: unknown method or locale")
         if (
             _positive_content_revision(content["content_revision"], f"{path}.content_revision")

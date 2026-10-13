@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pragmatism-positive-01
+    kind: positive
+    prompt: "二つのプロジェクト管理の枠組みは、会議、優先順位、フィードバックの選択が異なります。どちらかを選ぶ前に観察可能な帰結を比較してください。"
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "解釈が行動上で異なり、範囲を限定した実践上の帰結で判断できます。"
+  - id: pragmatism-positive-02
+    kind: positive
+    prompt: "市は二つのアウトリーチ政策から選ぶ必要があり、合意した観察期間と安全制約の下で可逆な試行が可能です。"
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose, value_conflict]
+    rationale: "安全な学習試験を伴う実践的な政策選択が中心の課題です。"
+  - id: pragmatism-positive-03
+    kind: positive
+    prompt: "二つの呼び名について長く議論していますが、判断も予測も変わりません。この状況で実践上同等か確かめてください。"
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "不一致に観察可能な実践上の違いがあるかを確かめるべきです。"
+  - id: pragmatism-negative-01
+    kind: negative
+    prompt: "政策の出典は報告義務を課し、情報開示を禁止しています。許されている行動だけを比較してください。"
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "拘束力のある義務と禁止は、実践上の帰結を比較する前に行動集合を制限します。"
+  - id: pragmatism-negative-02
+    kind: negative
+    prompt: "製品チームは解決策を選ぶ前に、利用者が困る瞬間、機能的・感情的・社会的な用事、切り替えを促す力を特定する必要があります。"
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "障害は利用者の進歩の探索であり、既知の解釈の帰結比較ではありません。"
+  - id: pragmatism-mechanical-01
+    kind: mechanical
+    prompt: "二つの政策説明を隣り合う列に入れ、帰結の比較や一方の推奨はしないでください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "列への整形は機械的な作業です。"
+  - id: pragmatism-explicit-01
+    kind: explicit
+    prompt: "プラグマティズムを使い、二つの事故対応手順書が実際に何を変えるかを、可逆な机上演習で比較してください。"
+    expected_route: pragmatism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, practical_consequence, choose]
+    rationale: "利用者は状況を限定した帰結の比較と試験を明示的に求めています。"
+  - id: pragmatism-insufficiency-01
+    kind: insufficiency
+    prompt: "選択肢と成功の基準は不明です。安心できる解釈が有用に感じられるので、真だと宣言してください。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [practical_consequence, decisive_input_missing]
+    rationale: "選択肢、基準、観察可能な帰結なしでは有用性を評価できません。"
