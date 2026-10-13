@@ -52,6 +52,38 @@ pending, not this baseline; recheck publication before final v1.6.0 release.
 
 ## Historical exact evidence
 
+Local reconciliation verification at `c9c8bd54d2f5c81556ddfd6b8888bb348341ab9c`
+(native macOS ARM64 / Go 1.27.2): bootstrap, format-check, lint,
+generated-check, content-check, adjudication-check, docs-check and
+governance-check passed. Initial package-check included ten old revision-3
+`dist/native` packages and correctly rejected their obsolete content. Those
+generated artifacts were preserved outside the inspection path; regenerating
+all three native targets with `make package TARGET=darwin-arm64`,
+`TARGET=windows-x64`, and `TARGET=windows-arm64` made package-check and
+security-scan pass. Windows local builds are cross-compilation, not native
+Windows execution. / 처음에는 이전 리비전 3 산출물 10개를 거부했으며, 기존 파일을
+보존하고 현재 소스로 재생성한 뒤 패키지·보안 검사를 통과했습니다. Windows
+로컬 빌드는 실제 Windows 실행 증거가 아닙니다.
+
+The first smoke run found an invalid cancellation-reason value in one new
+test. The test-only correction at `66f757f435dd9cce205abe880705f08b110f22ea`
+uses the existing closed `user_cancelled` reason and exposes validation errors.
+`make format-check` and `make smoke installer-check` then passed. Production
+code and canonical inputs are unchanged by that correction; successful earlier
+checks and code/security audit are reused for those same inputs. This does not
+claim that the aborted combined Make invocation passed. / 시험 데이터의 취소
+사유만 고친 후 전체 런타임·설치기 검사를 통과했습니다. 런타임 검증 규칙은
+완화하지 않았고 실패한 최초 통합 명령을 통과했다고 표시하지 않습니다.
+
+Independent source audit verified exact v1.5.1 content/schema parity, all
+192 original EN/KO procedure/case files, 192 references, 576 questions and
+unchanged historical evidence. Code/security review found no actionable
+defects. Current native CI results belong in PR #112 at the pushed head;
+new-file notarization, actual v1.5.1 npm-installer adoption, production trust and
+public/live delivery remain separate qualification. / 소스·의미·스키마·과거 기록을
+독립 대조했고 코드·보안 검토에서 수정할 결함은 없었습니다. 새 파일 공증과
+실제 npm 설치기부터의 인수·운영 신뢰·공개 전달은 별도입니다.
+
 Historical native evidence for the resumed large-payload fix: **bc151afdb9a9d6845906b05ec2efb022961fd45f**. [CI 38239135183](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38239135183) passed source and actual macOS ARM64, Windows x64 and Windows ARM64 execution after the resumed large-payload fix. Git tree `29d6306880d0e09f42b59bdbc78cfbe816ad02c4` matches all three native provenance receipts. The documentation/evidence follow-up does not relabel these observations as a new execution.
 
 Earlier [CI 38219463804](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38219463804) passed source and actual macOS ARM64, Windows x64 and Windows ARM64 execution. The first Windows x64 attempt reached the outer lifecycle acceptance deadline after 30.006 seconds during install, with empty output; the same commit passed when only that failed job was rerun, with unchanged deadlines. This observation does not establish the cause of the initial timeout. Earlier complete native runs [38218166860](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38218166860) at 6011249 and [38216709561](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38216709561) at d156c27 also passed. [Retained receipts](evidence/README.md) keep their original revisions; documentation does not relabel old results.
