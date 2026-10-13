@@ -102,6 +102,35 @@ No production deadline, Go timeout, OS guard or assertion was weakened.
 버전별 전체 수명주기와 모든 오류 사례를 유지하고 테스트 폴더를 재사용하도록
 준비 비용을 줄였습니다. 열 언어 설정·전체 파일·원복·소유권과 제한 시간은 유지합니다.
 
+At `bd8eb5d83c01f62d236a207dde15925abacec2f8`, affected
+`make format-check lint docs-check governance-check smoke installer-check` passed
+locally, with management 128.971 seconds and transport 45.361 seconds.
+[CI 38394764452](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38394764452)
+passed source and complete native Mac acceptance; both Windows source/ACL suites
+also passed. Windows initial install then reached the unchanged 30-second
+deadline, at 30,003/30,004 milliseconds for x64/ARM64, respectively.
+The owned fixture journal was `preparing`, registration had not started and
+native/active state was absent. Original bounded receipts:
+[x64](evidence/v1.5.2-native-install-bd8-windows-x64.json),
+[ARM64](evidence/v1.5.2-native-install-bd8-windows-arm64.json).
+Which candidate operation and individual delay caused the deadline are not yet
+measured. This is separate from the package-level ten-minute test-cost failure.
+
+The follow-up removes only `Inspect`'s redundant regular-leaf metadata guard:
+`SHA256File` already validates ownership, ancestor/reparse/link protection and
+the live regular-file handle it hashes. Root/directory guards, full snapshots,
+file/hash/mode/size limits, copy-before/destination/copy-after checks, durable
+writes and rollback remain intact. New Unix and Windows unsafe-leaf tests retain
+the rejection boundary. A failure-only operation counter observes at most 64
+known phases from the existing private journal, exporting counts and the next
+planned ordinal without paths, IDs, role inference or contents. The existing
+eight-MiB read guard, 30-second limit and pass criteria are unchanged.
+This code-grounded duplication removal is not yet proof of the deadline cause
+or a passing Windows install; current exact-head results are recorded in PR #112.
+/ 등록 전 후보 준비까지 진행된 것을 확인했습니다. 실제 읽기 핸들의 소유권 검사를
+유지하며 정규 파일의 중복 검사만 제거하고, 경로·원문 없는 준비 개수 관측을
+보완했습니다. Windows 설치의 통과 여부는 현재 커밋에서 다시 확인합니다.
+
 ## Historical released v1.5.1 reconciliation
 
 The original Go preparation and all revision-3 receipts retain their historical

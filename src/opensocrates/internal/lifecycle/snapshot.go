@@ -60,8 +60,10 @@ func Inspect(path string) (Snapshot, error) {
 		if len(entries) >= MaxFiles || (!info.IsDir() && !info.Mode().IsRegular()) {
 			return diagnostics.New(diagnostics.Verification, "inventory")
 		}
-		if err := platform.GuardOwned(p); err != nil {
-			return err
+		if info.IsDir() {
+			if err := platform.GuardOwned(p); err != nil {
+				return err
+			}
 		}
 		rel, e := filepath.Rel(path, p)
 		if e != nil {
@@ -78,6 +80,9 @@ func Inspect(path string) (Snapshot, error) {
 			if info.Size() > MaxFileBytes || total > MaxTotalBytes {
 				return diagnostics.New(diagnostics.Verification, "inventory")
 			}
+			// SHA256File validates the regular leaf and its ancestors using the
+			// same owned handle it hashes. Avoid a separate metadata-only check
+			// of that leaf; directories still require their own ownership guard.
 			hash, e := platform.SHA256File(p, MaxFileBytes)
 			if e != nil {
 				return e

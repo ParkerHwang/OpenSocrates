@@ -180,7 +180,10 @@ func acceptanceInstallFailureObservation(root string) map[string]any {
 		"native_state_status": "unavailable", "active_state_status": "unavailable",
 		"transaction_dir_status": "unavailable", "journal_count": -1,
 		"journal_status": "unavailable", "last_transaction_stage": "unavailable",
-		"registration_started_status": "unavailable", "registration_started": false,
+		"file_operations_status": "unavailable", "file_operation_count": -1,
+		"planned_operation_count": -1, "prepared_operation_count": -1,
+		"next_planned_operation_index": -1,
+		"registration_started_status":  "unavailable", "registration_started": false,
 		"synthetic_registration_status": "unavailable", "synthetic_installed": false,
 		"synthetic_enabled": false, "synthetic_marketplace_nonempty": false,
 	}
@@ -227,13 +230,16 @@ func acceptanceInstallFailureObservation(root string) map[string]any {
 	entries, status = acceptanceObserverEntries(transactions)
 	if status == "absent" {
 		report["journal_count"], report["journal_status"], report["last_transaction_stage"] = 0, "absent", "none"
+		acceptanceObserverAbsentOperations(report)
 	} else if status == "available" {
 		report["journal_count"] = len(entries)
 		if len(entries) == 0 {
 			report["journal_status"], report["last_transaction_stage"] = "absent", "none"
+			acceptanceObserverAbsentOperations(report)
 		} else if len(entries) > 1 {
 			// Enumeration order and private timestamps cannot identify a latest journal.
 			report["journal_status"], report["last_transaction_stage"] = "unknown", "unknown"
+			report["file_operations_status"] = "unknown"
 		} else if acceptanceObserverJournalName(entries[0].Name()) {
 			data, err := platform.ReadFile(filepath.Join(transactions, entries[0].Name()), 8<<20)
 			if err == nil {
@@ -241,6 +247,7 @@ func acceptanceInstallFailureObservation(root string) map[string]any {
 				journal := obj(value)
 				if err == nil && journal["schema"] == lifecycle.JournalSchema {
 					report["journal_status"] = "available"
+					acceptanceObserverFileOperations(journal, report)
 					report["last_transaction_stage"] = "unknown"
 					for _, stage := range strings.Fields("preparing prepared applying verifying committed rolling-back rolled-back cleaning finalized") {
 						if journal["stage"] == stage {
@@ -255,6 +262,7 @@ func acceptanceInstallFailureObservation(root string) map[string]any {
 		}
 	} else {
 		report["journal_status"], report["last_transaction_stage"] = status, status
+		report["file_operations_status"] = status
 	}
 	registration := filepath.Join(root, "codex/host-fixture.json")
 	status = acceptanceObserverPresence(registration, false)
@@ -275,6 +283,54 @@ func acceptanceInstallFailureObservation(root string) map[string]any {
 		}
 	}
 	return report
+}
+
+// Only persisted phase names are counted. No path or operation role is read,
+// and an ordinal does not prove why the child stopped at that operation.
+// A valid next index is zero-based; -1 means no planned operation when the
+// status is available. Counts are -1 when the observation is uncertain.
+func acceptanceObserverFileOperations(journal map[string]any, report map[string]any) {
+	files, ok := journal["files"].([]any)
+	if !ok || len(files) == 0 {
+		return
+	}
+	if len(files) > min(64, lifecycle.MaxFiles) {
+		report["file_operations_status"] = "unknown"
+		return
+	}
+	planned, prepared, next := 0, 0, -1
+	for i, raw := range files {
+		entry, ok := raw.(map[string]any)
+		if !ok {
+			return
+		}
+		phase, ok := entry["phase"].(string)
+		if !ok {
+			return
+		}
+		switch phase {
+		case "planned":
+			planned++
+			if next < 0 {
+				next = i
+			}
+		case "prepared":
+			prepared++
+		case "backup-intent", "activate-intent", "applied", "restored", "cleanup-intent", "cleaned":
+			// These are the other closed engine phases. Counts describe current phases,
+			// not cumulative completion, latency, or a claim that the install succeeded.
+		default:
+			report["file_operations_status"] = "unknown"
+			return
+		}
+	}
+	report["file_operations_status"] = "available"
+	report["file_operation_count"], report["planned_operation_count"], report["prepared_operation_count"], report["next_planned_operation_index"] = len(files), planned, prepared, next
+}
+
+func acceptanceObserverAbsentOperations(report map[string]any) {
+	report["file_operations_status"] = "absent"
+	report["file_operation_count"], report["planned_operation_count"], report["prepared_operation_count"], report["next_planned_operation_index"] = 0, 0, 0, -1
 }
 
 func acceptanceObserverJournalName(name string) bool {
