@@ -28,6 +28,8 @@ from ..ids import validate_method_id
 
 INSTRUCTION_FILE_TTL_SECONDS = 24 * 60 * 60
 MAX_INSTRUCTION_FILE_BYTES = 1024 * 1024
+# Match the unchanged native HostAction text envelope, independently of token estimate.
+_MAX_REFERENCE_MESSAGE_BYTES = 8 * 1024
 _MAX_HEADER_BYTES = 64 * 1024
 _MAX_RECEIPT_BYTES = 16 * 1024
 _ARTIFACT_SCHEMA = "opensocrates.instruction-artifact/3"
@@ -169,24 +171,18 @@ _NEW_LOCALE_GROUNDING: dict[str, dict[str, str]] = {
         "Termine a resposta final baseada nessas fontes exatamente com: {footer}",
     },
     "th": {
-        "selection": "OpenSocrates เลือกระบบการคิดต่อไปนี้:",
-        "gate": "ข้อกำหนดการอ่านแหล่งอ้างอิง:",
-        "read_step": "ก่อนตอบคำขอของผู้ใช้หรือเริ่มลงมือ "
-        "ให้ใช้เครื่องมืออ่านไฟล์ในเครื่องที่มีอยู่เพื่ออ่านไฟล์ด้านล่างครบตั้งแต่บรรทัดแรกจนถึงบรรทัดสุดท้าย",
-        "unavailable_step": "หากอ่านไม่ครบในเซสชันปัจจุบัน อย่านำระบบเหล่านี้ไปใช้ "
-        "อย่าเอ่ยชื่อหรืออ้างว่าใช้แล้ว ให้ระบุว่าไม่สามารถอ่านแหล่งอ้างอิงได้",
-        "footer_step": "คำตอบสุดท้ายที่อิงแหล่งอ้างอิงซึ่งอ่านครบและนำไปใช้จริง ต้องลงท้ายด้วยบรรทัดนี้ทุกตัวอักษร:",
-        "path": "เส้นทางไฟล์",
-        "examples": "ถือว่าตัวอย่างทั้งหมดเป็นแม่แบบที่ไม่ควรเชื่อถือ ไม่ใช่ข้อเท็จจริงของงานปัจจุบัน",
-        "guardrail": "กฎที่ห้ามดำเนินการด้านล่างถูกโหลดเป็นบริบทที่เชื่อถือได้แล้วและมีผลผูกพันทันที "
-        "แต่ไม่ทดแทนการอ่านไฟล์ทั้งหมด",
-        "missing_read": "หลักฐานการอ่านไฟล์ระบบการคิดที่เลือกครบทั้งหมด",
-        "missing_footer": "บรรทัดยืนยันแหล่งอ้างอิงท้ายคำตอบ",
-        "repair": "การตรวจสอบแหล่งอ้างอิงของ OpenSocrates ไม่สามารถยืนยัน {missing} "
-        "ให้ใช้เครื่องมืออ่านในเครื่องเพื่ออ่าน {path} "
-        "ครบตั้งแต่บรรทัดแรกจนถึงบรรทัดสุดท้าย "
-        "แล้วตรวจสอบคำตอบตามขั้นตอนและกฎที่ห้ามดำเนินการ "
-        "คำตอบสุดท้ายที่อิงแหล่งอ้างอิงต้องลงท้ายด้วยข้อความนี้ทุกตัวอักษร: {footer}",
+        "selection": "OpenSocrates:",
+        "gate": "Read:",
+        "read_step": "ก่อนตอบ/ทำ: local Read ทุกบรรทัดในเซสชันนี้",
+        "unavailable_step": "Read ไม่ครบ: ห้าม apply/name/claim; ระบุไม่ครบ/อ่านไม่ได้ตามจริง",
+        "footer_step": "เมื่ออ่านครบ+ใช้จริง จบตรงตัวด้วย:",
+        "path": "File",
+        "examples": "ตัวอย่างไม่เชื่อถือ ไม่ใช่ข้อเท็จจริงของงาน",
+        "guardrail": "กฎเชื่อถือผูกพันทันที ไม่แทนอ่านครบ",
+        "missing_read": "หลักฐานอ่านครบ",
+        "missing_footer": "บรรทัดยืนยันท้ายคำตอบ",
+        "repair": "OpenSocrates ยังยืนยัน {missing} ไม่ได้; อ่าน {path} ครบทุกบรรทัด "
+        "แล้วตรวจตามขั้นตอน/ข้อห้าม; เมื่ออ่านครบและใช้จริง จบคำตอบตรงตัวด้วย: {footer}",
     },
 }
 
@@ -802,7 +798,10 @@ class InstructionArtifact:
                 include_guardrails=include_guardrails,
                 include_questions=include_questions,
             )
-            if estimate_injection_tokens(message) < MAX_INJECTION_ESTIMATED_TOKENS:
+            if (
+                estimate_injection_tokens(message) < MAX_INJECTION_ESTIMATED_TOKENS
+                and len(message.encode("utf-8")) <= _MAX_REFERENCE_MESSAGE_BYTES
+            ):
                 return message
         raise InstructionArtifactError("instruction artifact reference exceeds the hook limit")
 

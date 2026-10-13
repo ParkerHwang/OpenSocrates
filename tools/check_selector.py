@@ -449,7 +449,7 @@ def _test_teacher_catalog_schema_and_overlay_identity() -> None:
     candidate["methods"][first].pop("ko")
     malformed.append(candidate)
     candidate = deepcopy(raw)
-    candidate["methods"][first]["fr"] = deepcopy(candidate["methods"][first]["en"])
+    candidate["methods"][first]["ru"] = deepcopy(candidate["methods"][first]["en"])
     malformed.append(candidate)
     candidate = deepcopy(raw)
     candidate["methods"][first]["en"] = candidate["methods"][first]["en"][:2]
@@ -567,6 +567,37 @@ def _test_hook_fallback_keeps_guardrails_before_questions() -> None:
     _require(question not in message)
     _require("questions below" not in message)
     _require(estimate_injection_tokens(message) < MAX_INJECTION_ESTIMATED_TOKENS)
+    _require(len(message.encode("utf-8")) <= 8 * 1024)
+
+
+@_check("VSC-01D2-hook-fallback-enforces-actual-native-byte-envelope")
+def _test_hook_fallback_enforces_actual_native_byte_envelope() -> None:
+    from dataclasses import replace
+    from opensocrates.hosts.common import HostAction
+
+    questions = tuple(f"Bounded question {number} " + "q" * 150 + "?" for number in range(3))
+    initial = InstructionArtifact(
+        path=Path("/synthetic/instruction-artifact.md"),
+        content_revision=1,
+        locale="en",
+        selected_reasoning_systems=("triangulation",),
+        selected_display_names=("Triangulation",),
+        inline_guardrails=("GUARDRAIL_SENTINEL",),
+        inline_teacher_questions=questions,
+    )
+    without_questions = initial._reference_message(include_guardrails=True, include_questions=False)
+    guardrail = "GUARDRAIL_SENTINEL" + "g" * (8100 - len(without_questions.encode("utf-8")))
+    artifact = replace(initial, inline_guardrails=(guardrail,))
+    full = artifact._reference_message(include_guardrails=True, include_questions=True)
+    _require(len(full.encode("utf-8")) > 8 * 1024)
+    _require(estimate_injection_tokens(full) < MAX_INJECTION_ESTIMATED_TOKENS)
+    bounded = artifact.reference_message()
+    _require(len(bounded.encode("utf-8")) <= 8 * 1024)
+    _require(guardrail in bounded)
+    _require(all(question not in bounded for question in questions))
+    _require(HostAction.add_context(bounded).additional_context == bounded)
+    too_large_path = replace(initial, path=Path("/synthetic/" + "p" * 9000))
+    _expect_raises(too_large_path.reference_message)
 
 
 @_check("VSC-01E-hook-budgets-all-one-two-three-methods-ten-locales")
@@ -631,6 +662,7 @@ def _test_hook_budgets_all_one_two_three_methods_ten_locales() -> None:
                 )
                 reference = artifact.reference_message()
                 _require(estimate_injection_tokens(reference) < MAX_INJECTION_ESTIMATED_TOKENS)
+                _require(len(reference.encode("utf-8")) <= 8 * 1024)
                 _require(all(value in reference for value in (*guardrails, *questions)))
                 checked += 1
     _require(checked == 10 * (48 + 1_128 + 17_296))
