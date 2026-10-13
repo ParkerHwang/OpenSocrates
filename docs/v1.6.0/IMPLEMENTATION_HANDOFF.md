@@ -180,6 +180,16 @@ is reused. This is a measurement, not a threshold change or production proof.
 
 ### Measured installation and scoped acceptance budgets
 
+At `e28c41cbf0eb9d343770c66ba6870ec184f5d83a`, affected local formatting,
+lint, docs, governance, complete devtools/persistence tests and five race-enabled
+concurrency repetitions passed; incremental code/security reviews passed.
+CI source/governance initially rejected its PR event because the condensed body
+omitted the exact `Evidence level` and `Remaining limitations` headings.
+Those headings were restored; `GITHUB_EVENT_PATH=<current PR body fixture>
+make governance-check` then passed. A fresh event is required for CI; rerunning
+the old event would retain its original missing headings. Platform and final
+source results must retain their actual source identity.
+
 [CI 38412234956](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38412234956)
 at `493cc26f31a85ba378f2abd944abe98a2a7b972c` passed source and native Mac checks.
 Windows x64 [normal acceptance](evidence/v1.5.2-native-lifecycle-493-windows-x64.json)
