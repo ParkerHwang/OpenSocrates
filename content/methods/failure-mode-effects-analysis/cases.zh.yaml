@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "failure-mode-effects-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "在发布药品配发流程前，列出失效模式、影响、原因、现有控制，以及哪些控制需要负责人。",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "明确的流程需要前瞻性失效登记和控制责任，不应编造分数。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "重新设计的数据管道可能在接入、验证或告警阶段失效；用顺序等级规则排列失效模式并提出控制。",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan"
+      ],
+      "rationale": "任务要求为计划设计给出失效模式、影响、原因、顺序优先级和控制。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "上线前审查结账流程，识别用户可能被错误收费的方式，以及团队如何预防或检测每种失效。",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "发布前的流程审查与控制分配是本方法的具体输出。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "产品发布计划已选定；设想它已经失败，识别合理原因、先行信号和缓解措施。",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "要求从承诺前设想计划整体失败的角度分析。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "生产缺陷反复发生，团队需要区分症状、近因和可控制的系统条件。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "当前需要诊断重现，而不是前瞻性的 FMEA 登记表。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "按字母顺序排列现有失效模式行，保留所有字段，不评估优先级。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "即使行记录描述风险，排序也是机械操作。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "对这份发布检查表使用 failure-mode-effects-analysis，不编造严重度、发生频度或可探测度分数。",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "failure_risk",
+        "plan"
+      ],
+      "rationale": "用户明确请求方法及其防止虚假精度的保护措施。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "没有流程边界或预期功能；仍然给假想失效分配精确的风险优先数。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "failure_risk",
+        "decisive_input_missing"
+      ],
+      "rationale": "缺少明确定义的功能和有依据的尺度时，评估必须保留，而不能量化。"
+    }
+  ]
+}

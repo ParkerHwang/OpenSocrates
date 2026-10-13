@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "premortem-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "チームは顧客データの移行を控え、移行が失敗したと想定して理由を独立に集め、早期警告を設定したいと考えています。",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "具体的に選んだ計画には、失敗の説明、先行シグナル、緩和策、停止条件が必要です。"
+    },
+    {
+      "id": "premortem-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "新しい診療所を開く前に、偽の確率を付けず、人員、需要、運用、規制の面で計画がどう失敗しうるか特定してください。",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "計画全体の反事実的な失敗演習が明示されており、順序尺度と証拠への配慮を保つべきです。"
+    },
+    {
+      "id": "premortem-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "全員が賛成するリリースチームが、確約前に暗黙の前提、先行指標、一時停止条件を浮かび上がらせる構造的な異議検討を求めています。",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "hidden_assumptions",
+        "failure_risk"
+      ],
+      "rationale": "選んだ行動を巡る同調と楽観的な計画が対象です。"
+    },
+    {
+      "id": "premortem-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "ワークフローの工程ごとに、将来のリスク一覧として故障モード、影響、原因、管理策、担当者を挙げてください。",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "工程レベルの失敗と管理策の一覧は、想定した計画の振り返りより具体的です。"
+    },
+    {
+      "id": "premortem-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "欠陥が数か月繰り返しており、チームは再発を防ぐ制御可能なシステム条件を見つける必要があります。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "既存の再発には、確約前の演習でなく因果診断が必要です。"
+    },
+    {
+      "id": "premortem-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "失敗シナリオや提案を加えず、承認済みのリリース計画をリスクの雛形にコピーしてください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "コピーは機械的で、選んだ計画についての判断を求めません。"
+    },
+    {
+      "id": "premortem-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "採用計画のプレモーテムを行い、停止の判断につながる最も早いシグナルを挙げてください。",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "ユーザーが確約前の具体的計画に対して方法を明示しています。"
+    },
+    {
+      "id": "premortem-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "選んだ計画はありませんが、失敗の振り返りを作り、どの選択肢が失敗するかを 90% の確実性で宣言してください。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "chosen_plan",
+        "decisive_input_missing"
+      ],
+      "rationale": "計画や妥当な参照クラスなしに、この演習で確率や提案を支持することはできません。"
+    }
+  ]
+}

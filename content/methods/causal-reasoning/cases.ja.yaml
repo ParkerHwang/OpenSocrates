@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-reasoning-positive-01
+    kind: positive
+    prompt: "条件を合わせた試行で二つの診療所を比較し、一方が予約確認の電話を導入すると、その診療所だけで無断キャンセルが減りました。電話が変化を起こしましたか。"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "介入が結果を変えたかを問い、時点、比較、競合説明が必要です。"
+  - id: causal-reasoning-positive-02
+    kind: positive
+    prompt: "決済画面の再設計後、独立して観察した複数のコホートで完了率が上がりました。季節的な需要ではなく再設計が増加を起こしたかを知りたいという依頼です。"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, testable_claim, confounding]
+    rationale: "反復する介入と結果の関係でも、仕組み、反事実、交絡要因の確認が必要です。"
+  - id: causal-reasoning-positive-03
+    kind: positive
+    prompt: "管理者が週四日勤務で定着率が改善したかを尋ねています。開始日、比較チーム、業務量という交絡候補が分かっています。"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "因果の対象、時点、比較、妥当な交絡候補が十分に明示され、範囲を限定した因果説明が可能です。"
+  - id: causal-reasoning-negative-01
+    kind: negative
+    prompt: "サポートの滞留が六か月間増え、人員、需要、応答遅延が互いに影響しています。ユーザーはなぜこのパターンが続くかを尋ねています。"
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty]
+    rationale: "主な対象は遅延のある反復フィードバックであり、一つの因果比較よりシステムの説明を優先すべきです。"
+  - id: causal-reasoning-negative-02
+    kind: negative
+    prompt: "複数の引き継ぎ後に工場の不良が再発し、症状、工程の原因、不足する統制を分けるよう求めています。"
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "曝露の効果だけではなく、因果の連鎖と予防担当者を示す運用上の再発診断です。"
+  - id: causal-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "政策変更とその結果についての文を、政策が何かを引き起こしたか評価せずに韓国語に翻訳してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "翻訳は機械的であり、因果表現を含んでいても手法は介入しません。"
+  - id: causal-reasoning-explicit-01
+    kind: explicit
+    prompt: "causal-reasoning を使い、新しい導入メールが利用開始率を変えたかを評価し、必要な比較を示してください。"
+    expected_route: causal-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, causal_question]
+    rationale: "ユーザーが判断の対象に使う手法を明示しているため、証拠の約定に従って主要手法とします。"
+  - id: causal-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "従業員一人がサプリメントを飲んだ後に回復しました。サプリメントが回復の原因と結論し、チーム全員に勧めてください。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [causal_question, decisive_input_missing]
+    rationale: "対照のない一件の逸話には妥当な比較がなく、因果や重大な推奨を支持できません。"

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: logic-tree-positive-01
+    kind: positive
+    prompt: "客户流失为什么增加？如何将原因分解成不重叠、可测试的分支？"
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, diagnose, plan]
+    rationale: "宽泛诊断需要明确分解轴、MECE 检查与末端测试的原因树。"
+  - id: logic-tree-positive-02
+    kind: positive
+    prompt: "构建完整的问题树以减少入门流程失败，每个末端都附上验证步骤。"
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, plan]
+    rationale: "所请求输出是覆盖充分、可行动的分解。"
+  - id: logic-tree-positive-03
+    kind: positive
+    prompt: "把这个宽泛风险问题拆成不重叠的分支，让运营团队可分配责任并测试。"
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "任务需要层次分支、覆盖检查与可执行末端。"
+  - id: logic-tree-negative-01
+    kind: negative
+    prompt: "检查已有类别是否重叠，以及是否遗漏任何案例。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "这是狭窄的分类审查，属于 MECE，不是递归构建树。"
+  - id: logic-tree-negative-02
+    kind: negative
+    prompt: "画出这些变量之间的反馈环，识别强化与平衡动态。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "相互依赖的反馈环不适合层次结构，需要系统方法。"
+  - id: logic-tree-mechanical-01
+    kind: mechanical
+    prompt: "将给定标题缩进成示例所示的相同树结构。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "按给定方式缩进是机械格式任务。"
+  - id: logic-tree-explicit-01
+    kind: explicit
+    prompt: "明确使用 logic-tree 组织我们发布延迟的原因。"
+    expected_route: logic-tree
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, tangled_hierarchy]
+    rationale: "用户明确选择了层次化诊断结构。"
+  - id: logic-tree-insufficiency-01
+    kind: insufficiency
+    prompt: "创建完整问题树，但不要说明根问题、范围或成功衡量标准。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [tangled_hierarchy, decisive_input_missing]
+    rationale: "没有有边界的根问题，就不能安全判断覆盖与末端可行动性。"

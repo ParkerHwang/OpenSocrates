@@ -375,7 +375,7 @@ def _build_decision_hook_services(
 def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     *,
     host: str | None = None,
-    locale: str = "en",
+    locale: str | None = None,
     bundle_path: str | Path | None = None,
     reasoning_content_path: str | Path | None = None,
     data_root: DataRoot | None = None,
@@ -392,7 +392,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
         if not decision_point_mode:
             raise ValueError("hook-only composition requires decision-point mode")
         return _build_decision_hook_services(host=host, workspace=workspace, data_root=data_root)
-    selected_locale = locale if locale in {"en", "ko"} else "en"
+    selected_locale = locale if locale in {"en", "ko", "zh", "ja"} else "en"
     selected_bundle_path = discover_bundle_path(bundle_path)
     selected_reasoning_content_path = discover_reasoning_content_path(reasoning_content_path)
     content_repository = BundleRepository(selected_bundle_path)
@@ -443,6 +443,15 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
             selector_outcome_store = SelectorOutcomeStore(selected_root)
         except Exception:
             selector_outcome_store = None
+
+    if locale is None and settings_store is not None:
+        try:
+            preference = settings_store.load().locale_preference
+            if preference in {"en", "ko", "zh", "ja"}:
+                selected_locale = preference
+        except Exception:
+            # Unavailable settings retain explicit English/unknown fallback.
+            pass
 
     selector_config: SelectorConfig | None = None
     reasoning_content_projections: Any | None = None
@@ -519,6 +528,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
                 capability_profile=profiles[name],
                 installation_key=getattr(turn_store, "installation_key", None),
                 locale=selected_locale,
+                locale_preference=locale,
                 # Defense in depth: every selector-capable adapter stays on the
                 # selector-only path even when it is not the selected host, so
                 # a mis-wired caller can never fall through to the legacy

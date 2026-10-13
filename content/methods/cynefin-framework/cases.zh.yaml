@@ -1,0 +1,58 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "cynefin-framework-positive-1"
+    kind: positive
+    prompt: "我们的账单支持团队遵循有记录的决策树，相同输入可靠地产生相同修复。我们应标准化应对并监控例外吗？"
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, diagnose]
+    rationale: "用户描述稳定关系并询问适当应对方式。观察由用户提供，路由应分类情境，但不能声称未来每个案例都属于 clear。"
+  - id: "cynefin-framework-positive-2"
+    kind: positive
+    prompt: "几个团队在设法减少倦怠，但每项干预都会以意想不到的方式改变工作量、信任和行为。帮助我们选择小型试探、观察结果，并决定下一步尝试。"
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, deep_uncertainty]
+    rationale: "请求描述适应性模式而非固定程序。路由应明确 complex 情境和学习信号，不得编造任何试探的成功概率。"
+  - id: "cynefin-framework-positive-3"
+    kind: positive
+    prompt: "生产服务在多个地区故障，客户现在正在失去访问权限。我们需要立即控制事件，再使用新观察调整恢复过程的应对方式。"
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, diagnose]
+    rationale: "请求取决于选择紧急行动方式及后续重新评估信号。这里未独立核实事件事实，路由应在支持控制的同时保留不确定性。"
+  - id: "cynefin-framework-negative-1"
+    kind: negative
+    prompt: "将这些已获批准的操作步骤转换为编号检查表，完全保留措辞。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "这是固定指令的格式整理任务，不是情境分类判断。无需方法路由，也不应添加证据主张。"
+  - id: "cynefin-framework-negative-2"
+    kind: negative
+    prompt: "扫描可能影响我们扩张计划的政治、经济、社会、技术、环境和法律变化。"
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features: [macro_environment, forecast]
+    rationale: "请求涉及战略不确定性，因而相近，但决定性输出是重要外部因素清单，而非领域分类和应对方式。这是可能的同族混淆。"
+  - id: "cynefin-framework-mechanical-1"
+    kind: mechanical
+    prompt: "按时间顺序排列这些事件时间戳，并以 CSV 返回。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "任务输出机械，没有关于情境或行动的实质决策。方法路由应保持静默。"
+  - id: "cynefin-framework-explicit-1"
+    kind: explicit
+    prompt: "使用 Cynefin 框架判断我们的服务中断需要即时行动、专家分析还是安全实验。展示证据及会改变分类的信号。"
+    expected_route: "cynefin-framework"
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, context_disorder]
+    rationale: "用户点名该方法并要求其公开输出，因此它保持主要方法。回应仍须标明用户提供的观察，避免将分类呈现为确定事实。"
+  - id: "cynefin-framework-insufficiency-1"
+    kind: insufficiency
+    prompt: "我们应标准化这个问题还是运行实验？我还没有描述问题、原因、时间压力或我们有什么证据。"
+    expected_route: "cynefin-framework"
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, context_disorder]
+    rationale: "这是实际的应对方式决策，但决定性观察缺失。方法可暂缓并请求最少的缺失事实，不能编造领域或概率。"

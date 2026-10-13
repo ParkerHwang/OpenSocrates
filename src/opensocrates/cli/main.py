@@ -16,7 +16,13 @@ from .capabilities import probe_capabilities, show_capabilities
 from .diagnose import render_diagnose
 from .integrity import verify_runtime_integrity
 from .metrics import export_metrics, reset_metrics, show_metrics
-from .settings import handle_rigor_get, handle_rigor_reset, handle_rigor_set
+from .settings import (
+    handle_locale_get,
+    handle_locale_set,
+    handle_rigor_get,
+    handle_rigor_reset,
+    handle_rigor_set,
+)
 
 
 class CliCommandError(ValueError):
@@ -52,6 +58,13 @@ def _parser() -> argparse.ArgumentParser:
     rigor_set.add_argument("level", choices=("quiet", "together", "strict"))
     rigor_set.add_argument("--once", action="store_true")
     rigor_sub.add_parser("reset")
+
+    locale = sub.add_parser("locale", help="read or change the authored-content locale preference")
+    locale_sub = locale.add_subparsers(dest="locale_command", required=True)
+    locale_sub.add_parser("get")
+    locale_set = locale_sub.add_parser("set")
+    locale_set.add_argument("locale", choices=("en", "ko", "zh", "ja", "follow"))
+    locale_sub.add_parser("reset")
 
     trace = sub.add_parser("trace", help="list, show, or export a public trace")
     trace_sub = trace.add_subparsers(dest="trace_command", required=True)
@@ -302,6 +315,15 @@ def main(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
             result = handle_rigor_set(repository, args.level, once=args.once)
         else:
             result = handle_rigor_reset(repository)
+    elif args.command == "locale":
+        repository = getattr(runtime, "settings_store", None)
+        result = (
+            handle_locale_get(repository)
+            if args.locale_command == "get"
+            else handle_locale_set(
+                repository, args.locale if args.locale_command == "set" else "follow"
+            )
+        )
     elif args.command == "capabilities":
         profiles = getattr(runtime, "capability_profiles", {}) or {}
         profile = profiles.get(args.host) if isinstance(profiles, dict) else None

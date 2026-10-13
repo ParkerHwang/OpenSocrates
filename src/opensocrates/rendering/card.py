@@ -59,8 +59,8 @@ _DIRECTION_KEY = {
 def _messages_from_catalog(locale_catalog: Mapping[str, Any], locale: str) -> dict[str, str]:
     """Extract one locale's flat message map and enforce the card key set."""
 
-    if locale not in {"en", "ko"}:
-        raise ValidationError("card.locale: locale must be en or ko")
+    if locale not in {"en", "ko", "zh", "ja"}:
+        raise ValidationError("card.locale: locale must be en, ko, zh, or ja")
     if not isinstance(locale_catalog, Mapping):
         raise ValidationError("card.locale: a locale catalog is required")
 

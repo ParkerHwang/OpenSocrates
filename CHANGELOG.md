@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.5.1] - 2026-10-13
+
+- Add Simplified Chinese (`zh`) and Japanese (`ja`) alongside English and Korean
+  across the 48 authored reasoning methods, canonical examples, teacher-question
+  overlay, locale messages and four host instruction packages. Ship 192 complete
+  procedure files and 576 teacher questions; content revision 4 preserves the
+  original English/Korean authored method text.
+- Resolve reasoning locale through explicit preference, stored preference and
+  current-input script detection. Kana identifies Japanese; Han-only text
+  defaults to Chinese and needs an explicit Japanese preference when ambiguous.
+  Empty, Latin-only and tied inputs fall back to English.
+- Add Chinese/Japanese READMEs and version-pinned installation commands. Preserve
+  v1.5.0 host/platform boundaries, conditional attribution, privacy, fail-open
+  behavior and lifecycle ownership. Windows ARM64 remains separate v1.6.0 work.
+- 사고 방법 48개, 정본 사례·교사 질문·언어 메시지·네 호스트 지시문에 간체
+  중국어(`zh`)와 일본어(`ja`)를 추가합니다. 전체 절차 192개와 교사 질문
+  576개를 제공하며 콘텐츠 리비전 4에서 기존 영어·한국어 방법 본문을 유지합니다.
+- 명시적 선호 → 저장된 선호 → 현재 입력의 문자 순으로 언어를 선택합니다.
+  가나가 있으면 일본어, 한자만 있으면 기본 중국어이며 일본어를 명시할 수
+  있습니다. 빈 입력·라틴 문자만 있는 입력·동률은 영어로 돌아갑니다.
+- 중국어·일본어 README와 버전 고정 설치 안내를 추가합니다. v1.5.0의 호스트·
+  플랫폼·조건부 사용 표기·개인정보·fail-open·설치 소유권 경계를 유지합니다.
+  Windows ARM64는 별도 v1.6.0 범위입니다.
+
 ## [1.5.0] - 2026-10-10
 
 - Preserve the v1.4 Codex baseline and all 48 authored reasoning methods with

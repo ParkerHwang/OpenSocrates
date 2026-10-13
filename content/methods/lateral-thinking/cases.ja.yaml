@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lateral-thinking-positive-01
+    kind: positive
+    prompt: "チームは同じ配送経路を何度も最適化してきました。すべての注文が中央倉庫を経由しなければならないという仮定を問い直したいと考えています。"
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "選択肢が固定化しており、評価の前に枠組みを変える揺さぶりが求められています。"
+  - id: lateral-thinking-positive-02
+    kind: positive
+    prompt: "公共サービスの待ち行列は処理を速める余地がありません。誰が移動するか、いつサービスを提供するか、何を待ち行列とみなすかを反転して案を作ってください。"
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "異なる枠組みと複数の案を生み、その後に審査することが明示的に求められています。"
+  - id: lateral-thinking-positive-03
+    kind: positive
+    prompt: "製品チームは利用意欲の低下に機能追加で対処し続けています。その枠組みを問い直し、機能を追加しない代替案を作ってください。"
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "既存の最適化の枠組みが新しい選択肢を妨げており、意図的に崩す必要があります。"
+  - id: lateral-thinking-negative-01
+    kind: negative
+    prompt: "インタビューの証拠が不十分です。チームは人のニーズを発見し、サービスの試作品を作り、利用者の行動を安全に試す必要があります。"
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "ニーズの探索と利用者による試験が主な課題であり、揺さぶりだけでは必須の証拠を飛ばしてしまいます。"
+  - id: lateral-thinking-negative-02
+    kind: negative
+    prompt: "機械の防護装置は必須の安全仕様を満たす必要があります。設計が所定の試験に合格するかを判断してください。"
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, explicit_rules]
+    rationale: "安全性が重要な検証には厳密な証拠と権威ある仕様を使うべきで、自由な揺さぶりは適しません。"
+  - id: lateral-thinking-mechanical-01
+    kind: mechanical
+    prompt: "既存の選択肢をアルファベット順に並べ、説明をすべて保ち、新たな案は作らないでください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "並べ替えは機械的な作業であり、枠組みの問い直しは求められていません。"
+  - id: lateral-thinking-explicit-01
+    kind: explicit
+    prompt: "lateral-thinking を使い、安全規則を変えずに会議の廃棄物を減らす意外な方法を三つ見つけてください。"
+    expected_route: lateral-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, stale_options, choose]
+    rationale: "利用者は守るべき制約とともに、枠組みを崩す代替案を明示的に求めています。"
+  - id: lateral-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "問題も譲れない制約も不明ですが、急進的な選択肢を考案して直ちに推奨してください。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [stale_options, decisive_input_missing]
+    rationale: "枠組みや守る制約がなければ、揺さぶりを安全に審査できません。"

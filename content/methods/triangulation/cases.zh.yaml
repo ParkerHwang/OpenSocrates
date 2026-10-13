@@ -1,0 +1,104 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "triangulation-positive-01",
+      "kind": "positive",
+      "prompt": "独立的调查、行为及行政数据能否佐证这一留存率主张？",
+      "expected_route": "triangulation",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources",
+        "source_quality"
+      ],
+      "rationale": "必须检查不同证据流的独立性、一致、冲突及缺口。"
+    },
+    {
+      "id": "triangulation-positive-02",
+      "kind": "positive",
+      "prompt": "这些相关方引用不同方法；判断他们的证据是否确实指向同一结果。",
+      "expected_route": "triangulation",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources"
+      ],
+      "rationale": "任务是比较证据流，防止重复的上游数据冒充佐证。"
+    },
+    {
+      "id": "triangulation-positive-03",
+      "kind": "positive",
+      "prompt": "我们的定性访谈与实验不一致；增加哪项独立检查能解决重要冲突？",
+      "expected_route": "triangulation",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources",
+        "source_quality"
+      ],
+      "rationale": "重要分歧需要独立性检查及有针对性的下一项证据流。"
+    },
+    {
+      "id": "triangulation-negative-01",
+      "kind": "negative",
+      "prompt": "按设计质量、直接性及对目标人口的适用性，给各来源排序。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "任务评价个别来源质量，而非跨证据流的独立性。"
+    },
+    {
+      "id": "triangulation-negative-02",
+      "kind": "negative",
+      "prompt": "新测试结果出现后，更新对这些假说的先前信心。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "new_evidence",
+        "unknown_probability",
+        "competing_explanations"
+      ],
+      "rationale": "明确的先验到后验更新属于贝叶斯更新，而非三角互证。"
+    },
+    {
+      "id": "triangulation-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "将所给三张证据表合并为一张，保留所有行。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "合并表格是机械操作，不评估独立性或一致性。"
+    },
+    {
+      "id": "triangulation-explicit-01",
+      "kind": "explicit",
+      "prompt": "明确使用 triangulation，核实客户影响主张是否经得起独立检查。",
+      "expected_route": "triangulation",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "reconcile_evidence"
+      ],
+      "rationale": "用户明确对重要主张调用跨证据流佐证。"
+    },
+    {
+      "id": "triangulation-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "报告佐证结果，但所有来源都重复一个未知上游数据集，且没有可用独立证据流。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "reconcile_evidence",
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "相互依赖的重复来源不能建立三角互证，因此必须暂缓佐证结论。"
+    }
+  ]
+}

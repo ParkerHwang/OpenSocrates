@@ -1,4 +1,4 @@
-"""Locale catalog loading and build-time EN/KO parity checks."""
+"""Locale catalog loading and build-time four-locale parity checks."""
 
 from __future__ import annotations
 
@@ -31,8 +31,10 @@ def load_locale(value: Any, *, expected_locale: str | None = None) -> dict[str, 
     if value.get("schema") != LOCALE_SCHEMA:
         raise ContentValidationError("locale.schema: unsupported schema")
     locale = value.get("locale")
-    if locale not in {"en", "ko"} or (expected_locale is not None and locale != expected_locale):
-        raise ContentValidationError("locale.locale: expected en or ko")
+    if locale not in {"en", "ko", "zh", "ja"} or (
+        expected_locale is not None and locale != expected_locale
+    ):
+        raise ContentValidationError("locale.locale: expected en, ko, zh, or ja")
     messages = value.get("messages")
     if not isinstance(messages, Mapping):
         raise ContentValidationError("locale.messages: expected an object")
@@ -49,28 +51,34 @@ def placeholders(text: str) -> frozenset[str]:
     return frozenset(_PLACEHOLDER_RE.findall(text))
 
 
-def validate_locale_parity(en: Mapping[str, Any], ko: Mapping[str, Any]) -> None:
+def validate_locale_parity(en: Mapping[str, Any], *others: Mapping[str, Any]) -> None:
+    """Require every supplied locale to preserve English keys and placeholders."""
     en_messages = dict(en["messages"])
-    ko_messages = dict(ko["messages"])
-    if set(en_messages) != set(ko_messages):
-        missing_en = sorted(set(ko_messages) - set(en_messages))
-        missing_ko = sorted(set(en_messages) - set(ko_messages))
-        raise ContentValidationError(
-            f"locale parity: missing en={missing_en}, missing ko={missing_ko}"
-        )
-    mismatches = [
-        key
-        for key in en_messages
-        if placeholders(en_messages[key]) != placeholders(ko_messages[key])
-    ]
-    if mismatches:
-        raise ContentValidationError(
-            f"locale parity: placeholder mismatch for {', '.join(sorted(mismatches))}"
-        )
+    for localized in others:
+        messages = dict(localized["messages"])
+        locale = localized.get("locale", "other")
+        if set(en_messages) != set(messages):
+            missing = sorted(set(en_messages) - set(messages))
+            extra = sorted(set(messages) - set(en_messages))
+            raise ContentValidationError(
+                f"locale parity: {locale} missing={missing}, extra={extra}"
+            )
+        mismatches = [
+            key
+            for key in en_messages
+            if placeholders(en_messages[key]) != placeholders(messages[key])
+        ]
+        if mismatches:
+            raise ContentValidationError(
+                f"locale parity: {locale} placeholder mismatch for {', '.join(sorted(mismatches))}"
+            )
 
 
-def prompt_fragments(en: Mapping[str, Any], ko: Mapping[str, Any]) -> dict[str, dict[str, str]]:
-    validate_locale_parity(en, ko)
+def prompt_fragments(
+    en: Mapping[str, Any], *others: Mapping[str, Any]
+) -> dict[str, dict[str, str]]:
+    validate_locale_parity(en, *others)
+    locales = {str(item["locale"]): item for item in (en, *others)}
     keys = {
         "controller": "prompt.controller",
         "participation_rigor": "prompt.participation_rigor",
@@ -83,7 +91,7 @@ def prompt_fragments(en: Mapping[str, Any], ko: Mapping[str, Any]) -> dict[str, 
     }
     result: dict[str, dict[str, str]] = {}
     for fragment, key in keys.items():
-        if key not in en["messages"] or key not in ko["messages"]:
+        if any(key not in item["messages"] for item in locales.values()):
             raise ContentValidationError(f"locale: missing prompt fragment key {key}")
-        result[fragment] = {"en": en["messages"][key], "ko": ko["messages"][key]}
+        result[fragment] = {locale: item["messages"][key] for locale, item in locales.items()}
     return result

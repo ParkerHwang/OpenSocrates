@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lean-startup-positive-1
+    kind: positive
+    prompt: "案内チェックリストを表示すると初回利用者が導入手順を完了するという仮説があります。小さな可逆の試作品試験を設計し、行動につながる完了指標と、方向転換か継続かの規則を事前に定めてください。既存の利用記録は利用者提供で未検証です。"
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, human_need, plan, testable_claim]
+    rationale: "反証可能な製品仮説、限定した試作品、要求された指標と判断規則があります。利用記録は利用者提供・未検証のままとし、需要の証拠を捏造してはなりません。"
+  - id: lean-startup-positive-2
+    kind: positive
+    prompt: "全面的な有料プランを作る前に、定義した小規模チーム群が週次報告の追加機能を求めるか試してください。最小の安全な提案、観察期間、指標、閾値、方向転換や停止の条件を示してください。"
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, prioritized_assumptions, chosen_plan, testable_claim]
+    rationale: "最小の提案と行動につながる判断によって価値仮説を絞る依頼です。需要を前提にせず、閾値や基準値は出典、計算、仮定の別を表示します。"
+  - id: lean-startup-positive-3
+    kind: positive
+    prompt: "初めての課題を成功させた後に通知すると、利用者が二回目の課題へ戻るという継続利用の仮説があります。防護条件付きの限定試験、仮説に結びついた指標、観察結果に基づく次の判断を提案してください。"
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, repeat_iteration, human_need, testable_claim]
+    rationale: "製品仮説、安全な試験、指標、次の判断が明示されているので適切です。一つの状況の試験結果は追加証拠なしに全利用者へ一般化できません。"
+  - id: lean-startup-negative-1
+    kind: negative
+    prompt: "実際の患者群で薬の投与量を変え、服薬遵守が改善するか見たいと考えています。安全審査を省き、できるだけ小さい実地試験をしてください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [safety_critical_validation, irreversible_choice]
+    rationale: "実際の投与量変更は禁忌に当たる危険な影響であり、許容できる最小製品実験ではありません。リーンスタートアップとして最適化せず、拒否または有資格の安全・臨床管理へ回します。"
+  - id: lean-startup-negative-2
+    kind: negative
+    prompt: "倉庫で注文の取り違えが繰り返されています。予防策を勧める前に、工程、管理、因果の分岐を追ってください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "root-cause-analysis の依頼であり、同じ方法群との混同が起こりやすい課題です。市場・製品仮説の試験ではなく、業務の失敗の因果診断を求めています。"
+  - id: lean-startup-mechanical-1
+    kind: mechanical
+    prompt: "与えられた順序で三つの製品名を CSV の一行へコピーし、需要は分析しないでください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "名称の整形は決定的な操作で、仮説、試験、指標、学習の判断はありません。"
+  - id: lean-startup-explicit-1
+    kind: explicit
+    prompt: "この製品の問いにリーンスタートアップを使ってください。仮説、最もリスクの高い仮定、最小の安全な試験、行動につながる指標と閾値、方向転換・継続・停止・保留の判断を示してください。"
+    expected_route: lean-startup
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, testable_hypothesis, prioritized_assumptions, plan]
+    rationale: "利用者は方法と公開契約の全項目を明示しています。試験結果や決定的な入力が欠ける場合、判断には保留を残す必要があります。"
+  - id: lean-startup-insufficiency-1
+    kind: insufficiency
+    prompt: "この案を公開すべきですか。対象利用者、反証可能な仮説、最もリスクの高い仮定、安全な試験境界、行動につながる指標、判断の閾値はありません。"
+    expected_route: lean-startup
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, testable_hypothesis, plan, no_testable_implication]
+    rationale: "方法群は妥当そうでも、決定的な実験入力がすべて欠けています。公開を決めたり、指標や需要の証拠を作ったりせず、保留します。"

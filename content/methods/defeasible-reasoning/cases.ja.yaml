@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: defeasible-reasoning-positive-01
+    kind: positive
+    prompt: "通常はこの政策が適用されますが、どの例外や新事実が現在の推奨を撤回させますか。"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "デフォルト規則を使う判断で、明示的な敗北要因と撤回条件が必要です。"
+  - id: defeasible-reasoning-positive-02
+    kind: positive
+    prompt: "結論を直接否定する証拠と、結論を支える規則を弱める証拠を分けてください。"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "修正可能な判断の反駁型と根拠切断型の敗北要因を求めています。"
+  - id: defeasible-reasoning-positive-03
+    kind: positive
+    prompt: "一般規則と、より具体的な例外がともに適用されます。現在の暫定状態は何ですか。"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "具体性と未解決の例外を扱い、無条件の結果があるように装わない必要があります。"
+  - id: defeasible-reasoning-negative-01
+    kind: negative
+    prompt: "厳格な保管規則を全記録に適用し、決定的な結果を報告してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "例外のない規則は演繹または機械的な適用の課題です。"
+  - id: defeasible-reasoning-negative-02
+    kind: negative
+    prompt: "これらの出典を研究設計の質で順位付けし、最も強い適用出典に合わせて主張の強さを調整してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "課題は証拠の階層であり、デフォルト規則の敗北要因の管理ではありません。"
+  - id: defeasible-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "デフォルト規則と例外一覧を政策テンプレートにコピーしてください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "提示した政策文のコピーは機械的です。"
+  - id: defeasible-reasoning-explicit-01
+    kind: explicit
+    prompt: "defeasible-reasoning を明示的に使い、通常有効な承認規則と例外を評価してください。"
+    expected_route: defeasible-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, exception_prone_rule]
+    rationale: "デフォルト規則、敗北要因、撤回条件の分析を明示的に求めています。"
+  - id: defeasible-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "規則の出典、発動事実、範囲、あり得る例外を提示せず、デフォルト規則を適用してください。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [exception_prone_rule, decisive_input_missing]
+    rationale: "デフォルトと発動事実がなければ、暫定結論は恣意的になります。"

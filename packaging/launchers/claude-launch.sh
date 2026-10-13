@@ -5,16 +5,19 @@ set -eu
 unavailable() {
     if [ "${1:-}" = decision ]; then
         printf '%s\n' '{"status":"unavailable","reason":"native_launcher_unavailable","applied":"unverified"}'
+    elif [ "${1:-}" = locale ]; then
+        printf '%s\n' '{"status":"unavailable","reason":"native_launcher_unavailable"}'
     fi
     exit 0
 }
 
-if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
+if [ "$#" -lt 2 ] || [ "$#" -gt 4 ] || { [ "$#" -eq 4 ] && [ "${1:-}" != locale ]; }; then
     unavailable "${1:-}"
 fi
 mode=$1
 host=$2
 event=${3:-}
+locale_value=${4:-}
 [ "$host" = claude ] || unavailable "$mode"
 case "$mode" in
     hook)
@@ -29,6 +32,19 @@ case "$mode" in
         if [ "$#" -eq 3 ] && [ "$event" != --stream ]; then
             unavailable "$mode"
         fi
+        ;;
+    locale)
+        case "$event" in
+            get|reset) [ "$#" -eq 3 ] || unavailable "$mode" ;;
+            set)
+                [ "$#" -eq 4 ] || unavailable "$mode"
+                case "$locale_value" in
+                    en|ko|zh|ja|follow) ;;
+                    *) unavailable "$mode" ;;
+                esac
+                ;;
+            *) unavailable "$mode" ;;
+        esac
         ;;
     *) unavailable "$mode" ;;
 esac
@@ -63,5 +79,11 @@ case "$mode" in
             exec "$runtime_path" decision --stream
         fi
         exec "$runtime_path" decision
+        ;;
+    locale)
+        if [ "$event" = set ]; then
+            exec "$runtime_path" locale set "$locale_value"
+        fi
+        exec "$runtime_path" locale "$event"
         ;;
 esac

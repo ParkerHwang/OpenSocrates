@@ -219,10 +219,10 @@ def set_default_rigor(settings: UserSettings, level: Rigor) -> UserSettings:
 
 
 def set_locale(settings: UserSettings, locale: str | None) -> UserSettings:
-    """Pure locale command accepting only follow-user, English, or Korean."""
+    """Pure locale command accepting follow-user or one supported authored-content locale."""
 
-    if locale not in {None, "en", "ko"}:
-        raise ValueError("locale must be null, en, or ko")
+    if locale not in {None, "en", "ko", "zh", "ja"}:
+        raise ValueError("locale must be null, en, ko, zh, or ja")
     return _pure_change(settings, locale_preference=locale)
 
 

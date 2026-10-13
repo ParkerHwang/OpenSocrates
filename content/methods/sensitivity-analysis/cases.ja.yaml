@@ -1,0 +1,106 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "sensitivity-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "事業評価で、需要、人件費、エネルギーの仮定から二つの倉庫設計を比較しています。基準式と判断閾値は文書化済みで、入力には妥当な範囲があります。範囲を試し、切替値を示し、選択が頑健か脆弱か特定してください。",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "multiple_objectives",
+        "choose"
+      ],
+      "rationale": "モデル、比較、記録された基準、入力範囲、選択閾値があります。入力を変えて判断の逆転を示す要求で、確率を作るものではありません。"
+    },
+    {
+      "id": "sensitivity-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "サービスセンターの人員モデルと公開された応答時間目標があります。情報源で支える範囲で到着量、処理時間、人員の仮定の影響を、依存関係を守って試し、人員判断を変えうる調査を優先してください。",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "unknown_probability",
+        "choose",
+        "information_purchase"
+      ],
+      "rationale": "モデル、閾値、不確実な入力があり、依存を保つことと情報の優先付けを明示的に求めています。感度分析は確率を作らず計算や順序の変化を報告できます。"
+    },
+    {
+      "id": "sensitivity-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "投資委員会は費用、影響、実行リスクで三つの事業を採点しています。重みは文書化されていますが争われ、提案は逆転しえます。根拠のある範囲で重みと入力点数を変え、切替値と脆弱な前提を示してください。",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "multiple_objectives",
+        "choose"
+      ],
+      "rationale": "不確実な重みと提案の逆転がある構造的比較です。トレードオフ提案で重みを確定扱いする前に、モデルの感度を示すべきです。"
+    },
+    {
+      "id": "sensitivity-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "モデルや判断閾値はありません。対立する研究を調べ、情報源の信頼性を判断し、安全性の主張について証拠を調整してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "conflicting_sources",
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "証拠の階層や証拠調整と混同しやすい例です。モデル、規則、閾値がないと変動させる入力関係がありません。"
+    },
+    {
+      "id": "sensitivity-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "組織の異なる四つの十年先の外部未来を探り、それぞれへの準備を説明してください。変える定量モデル、選択肢の点数、変数の関係はありません。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "decisive_input_missing"
+      ],
+      "rationale": "深い不確実性の下のシナリオ構築で、モデルや関係がないことを明示しています。感度分析では試せない基準を作ることになります。"
+    },
+    {
+      "id": "sensitivity-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "検証済みの各数量に指定の単位換算係数を掛け、換算一覧を返してください。モデル、比較、判断閾値はありません。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "決定論的な単位換算です。不確実な入力範囲や脆弱性を分析できる判断結果はありません。"
+    },
+    {
+      "id": "sensitivity-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "価格判断の主な方法として sensitivity-analysis を使ってください。基準の貢献利益モデル、争われている数量と利益率の範囲、最低許容利益率は記録済みです。切替値を見つけ、範囲の来歴が不足するなら保留してください。",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "sensitive_inputs",
+        "choose"
+      ],
+      "rationale": "ユーザーが方法を明示し、基準、不確実な範囲、閾値、来歴不足時の保留規則を示しています。出力は計算結果か状態付きのものにし、確率として扱いません。"
+    },
+    {
+      "id": "sensitivity-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "提案に感度があるか教えてください。基準モデル、入力、範囲、判断閾値、提案に使った式は提示していません。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "基準、変動できる入力、範囲、閾値はすべて決定的です。一般的な感度の主張を出さず、保留して限定した不足入力を求めます。"
+    }
+  ]
+}

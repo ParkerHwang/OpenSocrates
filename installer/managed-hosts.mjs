@@ -15,6 +15,7 @@ const NAMESPACE = "opensocrates-macos";
 const PLUGIN_ID = `opensocrates@${NAMESPACE}`;
 const SHA = /^(?:sha256:)?[a-f0-9]{64}$/u;
 const METHOD = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
+const LOCALES = ["en", "ko", "zh", "ja"];
 const MAX_FILES = 10_000;
 const MAX_JSON_BYTES = 8 * 1024 * 1024;
 
@@ -152,13 +153,20 @@ function equalInventory(actual, expected) {
   const names = Object.keys(actual).sort();
   return JSON.stringify(names) === JSON.stringify(Object.keys(expected).sort()) && names.every((name) => actual[name] === expected[name]);
 }
+function packageLocales(version) {
+  const match = /^(\d+)\.(\d+)\.(\d+)$/u.exec(version);
+  if (!match) fail("package_identity_mismatch", "Invalid package version.");
+  const [major, minor, patch] = match.slice(1).map(Number);
+  return major > 1 || (major === 1 && (minor > 5 || (minor === 5 && patch >= 1))) ? LOCALES : ["en", "ko"];
+}
 function canonical(manifest, expected, skillRoot) {
+  const locales = packageLocales(manifest.product_version);
   const ids = manifest.method_ids;
   if (manifest.method_count !== 48 || !Array.isArray(ids) || ids.length !== 48 || new Set(ids).size !== 48 || ids.some((id) => typeof id !== "string" || !METHOD.test(id))) fail("invalid_canonical_content", "Expected 48 unique canonical methods.");
-  if (!Array.isArray(manifest.canonical_methods) || manifest.canonical_methods.length !== 96) fail("invalid_canonical_content", "Expected all 96 EN/KO canonical procedures.");
+  if (!Array.isArray(manifest.canonical_methods) || manifest.canonical_methods.length !== 48 * locales.length) fail("invalid_canonical_content", "Expected the complete canonical procedure inventory for this version.");
   const seen = new Set();
   for (const row of manifest.canonical_methods) {
-    if (!object(row) || Object.keys(row).sort().join(",") !== "locale,method_id,path,sha256" || !ids.includes(row.method_id) || !["en", "ko"].includes(row.locale)) fail("invalid_canonical_content", "Canonical procedure identity is invalid.");
+    if (!object(row) || Object.keys(row).sort().join(",") !== "locale,method_id,path,sha256" || !ids.includes(row.method_id) || !locales.includes(row.locale)) fail("invalid_canonical_content", "Canonical procedure identity is invalid.");
     const name = `${skillRoot}/references/decision/methods/${row.locale}/${row.method_id}.md`;
     const key = `${row.locale}:${row.method_id}`;
     if (row.path !== name || seen.has(key) || expected[name] !== digest(row.sha256)) fail("invalid_canonical_content", "Canonical procedure path or hash is inconsistent.");
@@ -200,12 +208,13 @@ async function verifyPackage(root, host, version) {
     const launcher = join(root, "bin/launch.sh");
     if ((process.platform !== "win32" && !((await regular(launcher)).mode & 0o111)) || JSON.stringify(manifest.launchers) !== '["bin/launch.sh"]') fail("invalid_runtime", "The Mac launcher identity is invalid.");
     await regular(launcher);
-    const localeIds = { en: new Set(), ko: new Set() };
+    const locales = packageLocales(version);
+    const localeIds = Object.fromEntries(locales.map((locale) => [locale, new Set()]));
     for (const name of Object.keys(expected)) {
-      const match = /^skills\/opensocrates\/references\/decision\/methods\/(en|ko)\/([a-z0-9-]+)\.md$/u.exec(name);
-      if (match) localeIds[match[1]].add(match[2]);
+      const match = /^skills\/opensocrates\/references\/decision\/methods\/(en|ko|zh|ja)\/([a-z0-9-]+)\.md$/u.exec(name);
+      if (match && Object.hasOwn(localeIds, match[1])) localeIds[match[1]].add(match[2]);
     }
-    for (const locale of ["en", "ko"]) if (localeIds[locale].size !== 48 || manifest.method_ids.some((id) => !localeIds[locale].has(id))) fail("invalid_canonical_content", "The native companion is missing full EN/KO canonical procedures.");
+    for (const locale of locales) if (localeIds[locale].size !== 48 || manifest.method_ids.some((id) => !localeIds[locale].has(id))) fail("invalid_canonical_content", "The native companion is missing a complete required locale of canonical procedures.");
   } else {
     if (manifest.schema !== "opensocrates.content-host-manifest/1.0.0" || !equalInventory(rest, expected)) fail("inventory_mismatch", "Content package has modified, missing or unknown files.");
     const skillRoot = host === "claude-chat" ? "opensocrates" : ".agents/skills/opensocrates";

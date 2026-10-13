@@ -375,8 +375,8 @@ def parse_card(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     catalog = locale_messages if locale_messages is not None else locale_catalog
     if catalog is None:
         raise ValidationError("card parser: locale catalog is required")
-    if not isinstance(locale, str) or locale not in {"en", "ko"}:
-        raise ValidationError("card parser: locale must be en or ko")
+    if not isinstance(locale, str) or locale not in {"en", "ko", "zh", "ja"}:
+        raise ValidationError("card parser: locale must be en, ko, zh, or ja")
     messages = card_locale_messages(catalog, locale)
     normalized, lines = _clean_lines(markdown)
     heading_data = _heading(lines[0])

@@ -55,7 +55,7 @@ def participation_prompt(locale: str = "en") -> str:
     try:
         return PARTICIPATION_PROMPTS[locale]
     except (KeyError, TypeError) as exc:
-        raise ValueError("locale must be en or ko") from exc
+        raise ValueError("locale must be en, ko, zh, or ja") from exc
 
 
 get_participation_prompt = participation_prompt

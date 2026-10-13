@@ -1,0 +1,117 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "trade-off-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "以交付速度、可靠性、无障碍及总成本选择三家供应商之一。采购组记录了哪项要求是硬性否决条件，每个相关方也为其余标准提供了带日期的偏好。",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "stakeholder_conflict"
+      ],
+      "rationale": "多个方案在明确标准上竞争，约束与权重来源已分开。比较能揭示让步，而不假装所有价值可互换。"
+    },
+    {
+      "id": "trade-off-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "产品团队须选择平衡性能、可维护性、隐私及用户投入的设计。有些评级由测试数据支持，有些由用户访谈支持；隐私是最低要求而非分数。",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "source_quality"
+      ],
+      "rationale": "任务需要关注来源的竞争标准比较，及不可补偿的隐私约束。混合证据可以标注，不必被拉平成同一种。"
+    },
+    {
+      "id": "trade-off-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "两个人员配置计划在覆盖、连续性、成本及工作负荷上效果不同。团队已同意偏好的序位顺序，但未确定精确数值尺度；说明按此顺序哪个计划胜出，以及什么变化会逆转结果。",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "sensitive_inputs"
+      ],
+      "rationale": "请求明确要求序位权衡，反转条件很重要。方法可避免虚假精度，同时让选择可见。"
+    },
+    {
+      "id": "trade-off-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "建筑规范要求特定消防标准。只剩一个合规设计；请求者问能否偏爱较便宜的不合规设计，因为它在便利性上分数更高。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "single_feasible_option",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "约束性要求被当成可补偿标准。可能适用的是 deontic-reasoning 或合格的合规审查，而非权衡分析。"
+    },
+    {
+      "id": "trade-off-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "我们不确定选择设计前是否要做客户研究。问题是研究能多大程度改变决定，以及其延迟是否值得，而非今天如何比较设计。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "new_evidence",
+        "sensitive_inputs"
+      ],
+      "rationale": "可能混淆的同类方法是 value-of-information：当前任务是评估额外信息价值，不是给现有方案加权。"
+    },
+    {
+      "id": "trade-off-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "按给定单列分数给这些已核实记录排序，返回顺序列表。不要求选择标准、处理偏好冲突或解释建议。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "固定排序是机械操作，没有裁量性的权衡。"
+    },
+    {
+      "id": "trade-off-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "对这项选址决定使用 trade-off-analysis。区分硬性否决约束与偏好，保留每项评级来源，展示建议牺牲了什么。",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "choose",
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "用户明确指定方法并要求其公开比较契约。无支持的评级仍为假设或未核实。"
+    },
+    {
+      "id": "trade-off-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "从这些未命名的替代方案中选最佳。我们尚未同意标准、最低可接受条件或应考虑谁的优先事项。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "decisive_input_missing"
+      ],
+      "rationale": "可行方案集、决定性标准及偏好来源缺失。建议会变成事后评分，因此必须暂缓比较。"
+    }
+  ]
+}

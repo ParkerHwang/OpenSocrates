@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: conceptual-analysis-positive-01
+    kind: positive
+    prompt: "工程师与合规团队对“安全发布”使用不同含义，我们团队应如何定义？"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms, argument_dispute]
+    rationale: "竞争含义和边界案例必须经过检验，发布标准才能指导行动。"
+  - id: conceptual-analysis-positive-02
+    kind: positive
+    prompt: "员工对公平是平等待遇还是平等机会意见不同时，这项政策公平吗？"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms, argument_dispute]
+    rationale: "决策取决于竞争的操作性含义及其对案例的后果。"
+  - id: conceptual-analysis-positive-03
+    kind: positive
+    prompt: "定义“准备发布”，让产品和支持团队能一致分类边界案例。"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms]
+    rationale: "可用定义需要必要条件、充分条件及边界案例检验。"
+  - id: conceptual-analysis-negative-01
+    kind: negative
+    prompt: "用已发布的 API 规范检查请求是否满足文档规定的必填字段。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "操作性定义已有权威规定；任务是直接应用规则。"
+  - id: conceptual-analysis-negative-02
+    kind: negative
+    prompt: "按研究设计质量排列三项研究，并解释哪项直接支持效应主张。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "瓶颈是证据质量与适用性，而非争议术语的含义。"
+  - id: conceptual-analysis-mechanical-01
+    kind: mechanical
+    prompt: "把文件中每处“launch-ready”替换为“ready for launch”。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "字面文本替换是机械性任务，不需要概念分析。"
+  - id: conceptual-analysis-explicit-01
+    kind: explicit
+    prompt: "明确使用 conceptual-analysis，定义客户报告中“可信”的含义。"
+    expected_route: conceptual-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, ambiguous_terms]
+    rationale: "用户为具有报告后果的模糊术语明确调用方法。"
+  - id: conceptual-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "判断争议概念是否得到满足，但不提供背景、案例或其决定的决策。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [ambiguous_terms, decisive_input_missing]
+    rationale: "没有背景和案例，操作性含义会任意选定，无法安全指导决策。"

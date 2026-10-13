@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deduction-positive-01
+    kind: positive
+    prompt: "この結論は、これらの政策の前提と記載した例外規則から必然的に導かれますか。"
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "明示した前提と規則による形式的な帰結を求めています。"
+  - id: deduction-positive-02
+    kind: positive
+    prompt: "この契約の論証が妥当か、前提が実際に裏付けられるか確認してください。"
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "明示的な規則に基づく論証では、妥当性と健全性を分ける必要があります。"
+  - id: deduction-positive-03
+    kind: positive
+    prompt: "この遵守の結論が導かれるように見せる隠れた前提を探してください。"
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "標準化、隠れた前提の明示、形式的妥当性の確認が必要です。"
+  - id: deduction-negative-01
+    kind: negative
+    prompt: "複数の説明が障害に合います。最善の説明と、次の区別に役立つ試験を示してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "競合する原因と区別する証拠には、含意ではなくアブダクションが必要です。"
+  - id: deduction-negative-02
+    kind: negative
+    prompt: "これらの観察が将来のユーザーに関する一般的主張をどこまで支持するか推定してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "要求される拡張は帰納的で、標本の代表性に依存します。"
+  - id: deduction-mechanical-01
+    kind: mechanical
+    prompt: "提示した前提に番号を付け、文言を保ってください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "提示された一覧への番号付けは機械的です。"
+  - id: deduction-explicit-01
+    kind: explicit
+    prompt: "deduction を明示的に使い、記載した適格性規則がこの事例の結果を含意するか試してください。"
+    expected_route: deduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, explicit_rules]
+    rationale: "形式的な規則適用と含意の確認を明示的に求めています。"
+  - id: deduction-insufficiency-01
+    kind: insufficiency
+    prompt: "前提、規則、範囲、結論文を提示せずに、結論が妥当か答えてください。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [explicit_rules, decisive_input_missing]
+    rationale: "論証形式と重要な前提がなければ、妥当性は評価できません。"

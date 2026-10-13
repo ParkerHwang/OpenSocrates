@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pdca-cycle-positive-1
+    kind: positive
+    prompt: "客服队列有已验证基线，以及小规模分流变更可降低等待时间而不降低解决质量的假设。为一次可逆循环定义 Plan、范围有限的 Do、Check 规则与 Act 决策。"
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, chosen_plan]
+    rationale: "这是有基线、可衡量目标、安全范围与标准化或修订决策的受控运营迭代。循环应保留已验证基线，另行标明新比较证据。"
+  - id: pdca-cycle-positive-2
+    kind: positive
+    prompt: "我们拟在一个仓库区域开展一周包装标签变更。设定目标与指标，定义防护边界与停止条件，比较预期和观察结果，并决定标准化还是修订。"
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, chosen_plan]
+    rationale: "单一区域与一周窗口适合有限 PDCA 循环。结果须限制比较在局部，不将一次循环当作永久标准的证明。"
+  - id: pdca-cycle-positive-3
+    kind: positive
+    prompt: "已知工作流瓶颈有拟议变更、负责人及可复现测量。给出 Plan–Do–Check–Act 提纲，记录偏差，并形成带版本的下一改进假设。"
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, practical_consequence]
+    rationale: "工作流条件与测量已确立，任务是迭代改进而非发现根因。所要求的下一循环状态使学习与标准修订可见。"
+  - id: pdca-cycle-negative-1
+    kind: negative
+    prompt: "生产缺陷有多个可能原因，且没有可靠时间线。立即试验新的审批步骤，看看缺陷是否消失。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [diagnose, causal_question, confounding, decisive_input_missing]
+    rationale: "未知根本条件与缺失证据可能让改进循环掩盖故障。测试另一变更前，应由 root-cause-analysis 明确因果边界。"
+  - id: pdca-cycle-negative-2
+    kind: negative
+    prompt: "化学品泄漏仍在持续。先现场改变处理标准，从下一次暴露学习，再联系事件响应团队。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [safety_critical_validation, recurring_failure]
+    rationale: "持续伤害与紧急安全响应排除了临时拼凑的 PDCA 循环。控制事件及合格事件程序优先于迭代学习。"
+  - id: pdca-cycle-mechanical-1
+    kind: mechanical
+    prompt: "将给定四个每日计数相加并返回总数，不解释流程或推荐变更。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "给定计数求和是确定性计算，不是 Plan–Do–Check–Act 改进决策。"
+  - id: pdca-cycle-explicit-1
+    kind: explicit
+    prompt: "对此运营改进使用 PDCA 循环。展示目标与测量、有限 Do 范围、Check 规则、Act 决策、证据状态及下一循环假设。"
+    expected_route: pdca-cycle
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, repeat_iteration, plan, testable_hypothesis]
+    rationale: "用户明确指定方法与必需公开输出。决定性测量或安全范围缺失时，程序应暂缓。"
+  - id: pdca-cycle-insufficiency-1
+    kind: insufficiency
+    prompt: "用 PDCA 改善我们的流程。我们没有目标、基线、拟议变更、测量、安全范围、负责人或结果标准化规则。"
+    expected_route: pdca-cycle
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, repeat_iteration, plan, testable_hypothesis]
+    rationale: "明确要求 PDCA，但全部决定性输入缺失。应暂缓，而非开展无边界变更或标准化未经测量的结果。"

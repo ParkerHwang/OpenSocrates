@@ -1,0 +1,87 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: cost-benefit-analysis-positive-1
+    kind: positive
+    prompt: "新しいサービスと現在の基準状態から選ぶ必要があります。財務帳簿に実施・運用費用、試行報告に測定された利用状況があり、主な問いは記載期間内の便益が費用を正当化するかです。"
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "基準状態と複数の選択肢が明示され、重要な便益と費用の出典を特定できます。非金銭的影響は別扱いでも、比較は判断に関係します。"
+  - id: cost-benefit-analysis-positive-2
+    kind: positive
+    prompt: "二つの公衆衛生施策を何もしない場合と比較してください。行政記録には提供費用、評価報告には測定結果があり、負担者、受益者、金銭に還元できない安全・公平への影響を示す必要があります。"
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - practical_consequence
+    rationale: "分配と補償不能な価値を含む、基準状態との経済的比較を求めています。結果の証拠は出典を付け、保証とは扱いません。"
+  - id: cost-benefit-analysis-positive-3
+    kind: positive
+    prompt: "交換事業には初期費用があり、便益は異なる時期に生じます。承認済みの計画期間と組織の記録された割引規則を使い、記録された仮定が裏付けのある範囲で変わると結果がどう変わるかを示してください。"
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - sensitive_inputs
+    rationale: "時期、実際の計算境界、出典のある仮定への感度から、費用便益比較に当たります。既定の率や架空の確実性を求めず、出典を提供しています。"
+  - id: cost-benefit-analysis-negative-1
+    kind: negative
+    prompt: "安全規則は全施設に一つの検査工程を義務付けており、省略が法的に可能かをチームが尋ねています。裁量のある選択肢はなく、適用文書が決定的な証拠です。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "真の選択がない義務・規則の問いです。純便益の計算で拘束要件を手放してはいけません。"
+  - id: cost-benefit-analysis-negative-2
+    kind: negative
+    prompt: "信頼性、アクセシビリティ、環境影響、ユーザーの尊厳で三つの設計から最善を選んでください。依頼者は尊厳の金銭化を明確に拒否し、他の基準にも妥当な価格がなく、透明な基準比較を求めています。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - no_coherent_dimensions
+    rationale: "同系統で混同しやすいのは trade-off-analysis です。明示的な基準と補償不能な制約が必要であり、金額の合計を強制する判断ではありません。"
+  - id: cost-benefit-analysis-mechanical-1
+    kind: mechanical
+    prompt: "既に確認された費用と便益に提示した表計算式を適用し、算術の合計を返してください。選択肢、基準状態の判断、不確実性、推奨は求めません。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "裁量的な比較のない固定計算です。方法は介入せず、機械的な計算経路で式を処理します。"
+  - id: cost-benefit-analysis-explicit-1
+    kind: explicit
+    prompt: "この助成判断に cost-benefit-analysis を使ってください。助成される案と記録済みの基準状態を比較し、分配への影響を明示し、裏付けのない評価値を補わず保留してください。"
+    expected_route: cost-benefit-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - choose
+      - multiple_options
+    rationale: "ユーザーが方法と必要な比較範囲を明示しています。この方法を主とし、裏付けのない値は assumed または unverified のままにします。"
+  - id: cost-benefit-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "二つの事業のどちらがよいか教えてください。合意済みの基準状態、期間、費用記録はなく、便益については宣伝の主張しかありません。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - decisive_input_missing
+    rationale: "判断を変える基準状態と重要な入力が欠け、便益の主張に出典がありません。方法は保留し、最小限の決定的な補足だけを求めます。"

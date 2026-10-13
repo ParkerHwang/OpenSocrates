@@ -1,0 +1,110 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "double-loop-learning-positive-1",
+      "kind": "positive",
+      "prompt": "サポートチームは新しいチェックリストで応答時間を短縮しましたが、2か月後に顧客のエスカレーションが再発しました。期待と実際を比較し、リストを形作ったサービス目標と規則を調べ、改訂規則の安全な学習試験を設計してください。",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "governing_rule",
+        "repeat_iteration",
+        "testable_claim"
+      ],
+      "rationale": "手順修正で再発を防げなかったため、目標や規則を変えるべきかを問います。リストの措置と規則の仮説を分け、エスカレーション記録に出所を示す必要があります。"
+    },
+    {
+      "id": "double-loop-learning-positive-2",
+      "kind": "positive",
+      "prompt": "リリース方針は予定日どおりの出荷を評価し、チームはそのために信頼性の作業を繰り返し延期しています。方針の目標、誘因、権限、仮定を調べ、限定的な規則変更試験を提案してください。",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "governing_rule",
+        "feedback_delay",
+        "recurring_failure",
+        "chosen_plan"
+      ],
+      "rationale": "反復する行動は単一の実行ミスでなく方針から生じる可能性があります。改訂候補を比較しつつ、試験までは因果説明を推定または未検証とします。"
+    },
+    {
+      "id": "double-loop-learning-positive-3",
+      "kind": "positive",
+      "prompt": "研修を2回改訂しても、同じ引き継ぎ漏れが複数のチームに現れます。結果のずれを記録し、シングルループの研修修正と引き継ぎ規則の変更を分け、それぞれを支持する証拠を示してください。",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "governing_rule",
+        "repeat_iteration",
+        "testable_claim"
+      ],
+      "rationale": "複数の再発と過去のシングルループ修正により、規則の検討が適切です。出力はずれ、規則、証拠、学習試験であり、責任追及や再発確率ではありません。"
+    },
+    {
+      "id": "double-loop-learning-negative-1",
+      "kind": "negative",
+      "prompt": "一度のデプロイに誤記があり、既存のレビュー対策ですぐ検出されました。リリース方針を変えず、正確な実行不備を特定して修正してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "explicit_rules"
+      ],
+      "rationale": "限定した単一の実行不備は証拠で説明済みで、ユーザーは方針変更を除外しています。ダブルループ学習は範囲を超えるため、限定した不備への対応が適切です。"
+    },
+    {
+      "id": "double-loop-learning-negative-2",
+      "kind": "negative",
+      "prompt": "対象ユーザーと価格仮説があります。可逆的なランディングページ試験、行動につながる指標、転換か継続かの判定規則を設計してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "plan",
+        "human_need"
+      ],
+      "rationale": "これはリーンスタートアップの実験設計で、方法群を混同しやすい例です。反復する結果のずれや行動指針の改訂は求めていません。"
+    },
+    {
+      "id": "double-loop-learning-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "3件の事故の継続時間を分から時間に換算し、同じ順番で返してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "単位換算は決定的で、反復するずれ、支配変数、学習試験の判断を含みません。"
+    },
+    {
+      "id": "double-loop-learning-explicit-1",
+      "kind": "explicit",
+      "prompt": "ダブルループ学習を使ってください。結果のずれ、行動を導く仮定や規則、証拠状態、改訂候補、安全な学習試験を示し、個人を責めないでください。",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "recurring_failure",
+        "governing_rule",
+        "testable_claim"
+      ],
+      "rationale": "ユーザーは方法と公開契約を明示しています。責めない指示は、意図の推定ではなく規則、権限、誘因、証拠の検討に一致します。"
+    },
+    {
+      "id": "double-loop-learning-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "チームは失敗を繰り返しています。変えるべき信念や方針、実施すべき実験を教えてください。期待結果、観察記録、再発範囲、検討できる現行規則はありません。",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "recurring_failure",
+        "governing_rule"
+      ],
+      "rationale": "方法は適合し得ますが、決定的なずれと規則が欠けています。深い説明を作ったり心構えに原因を帰したりせず、保留しなければなりません。"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "cynefin-framework-positive-1"
+    kind: positive
+    prompt: "請求サポートチームは記録済みの決定木に従い、同じ入力から安定して同じ修正を得ます。対応を標準化し、例外を監視すべきでしょうか。"
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, diagnose]
+    rationale: "安定した関係を説明し、適切な対応を尋ねています。観察はユーザー提供なので状況を分類しますが、将来の全事例が clear とは主張しません。"
+  - id: "cynefin-framework-positive-2"
+    kind: positive
+    prompt: "複数のチームが燃え尽きの低減に取り組んでいますが、介入ごとに仕事量、信頼、行動が予想外に変わります。小さな試行を選び、結果を観察して次の試行を決めるのを手伝ってください。"
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, deep_uncertainty]
+    rationale: "固定手順でなく適応的なパターンです。complex な文脈と学習信号を明示し、試行の成功確率を捏造しません。"
+  - id: "cynefin-framework-positive-3"
+    kind: positive
+    prompt: "本番サービスが複数地域で故障し、顧客は今アクセスを失っています。直ちに事故を封じ込め、その後新たな観察で復旧を調整する対応が必要です。"
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, diagnose]
+    rationale: "緊急の行動方法と後の再評価信号の選択が必要です。事実はここで独立に確認されていないため、不確実性を残しながら封じ込めを支えます。"
+  - id: "cynefin-framework-negative-1"
+    kind: negative
+    prompt: "承認済みの操作手順を番号付きのチェックリストにし、文言を完全に保ってください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "固定指示の書式整理であり、状況の分類判断ではありません。方法の選択は不要で、証拠に関する主張も加えません。"
+  - id: "cynefin-framework-negative-2"
+    kind: negative
+    prompt: "拡張計画に影響し得る政治、経済、社会、技術、環境、法律の変化を調べてください。"
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features: [macro_environment, forecast]
+    rationale: "戦略的不確実性があるため近い依頼ですが、決定的な出力は重要な外部要因一覧で、領域分類と対応方法ではありません。同系統で混同しやすい事例です。"
+  - id: "cynefin-framework-mechanical-1"
+    kind: mechanical
+    prompt: "事故のタイムスタンプを時系列で並べ、CSV で返してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "機械的な出力で、文脈や行動の意味ある判断はありません。方法の選択には介入しません。"
+  - id: "cynefin-framework-explicit-1"
+    kind: explicit
+    prompt: "Cynefin フレームワークを使い、サービス障害に即時行動、専門家の分析、安全な実験のどれが必要か判断してください。証拠と分類を変える信号を示してください。"
+    expected_route: "cynefin-framework"
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, context_disorder]
+    rationale: "方法名と公開出力を明示しているため、主な方法となります。それでもユーザー提供の観察を示し、分類を確実な事実としません。"
+  - id: "cynefin-framework-insufficiency-1"
+    kind: insufficiency
+    prompt: "この問題は標準化すべきですか、実験すべきですか。問題、原因、時間の切迫度、証拠はまだ説明していません。"
+    expected_route: "cynefin-framework"
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, context_disorder]
+    rationale: "実際の対応方法の問いですが、決定的な観察がありません。保留して最小限の不足事実を求められますが、領域や確率を捏造してはいけません。"

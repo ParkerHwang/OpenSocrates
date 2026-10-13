@@ -377,7 +377,7 @@ def _test_teacher_catalog_schema_and_overlay_identity() -> None:
     raw = json.loads(teacher_path.read_text(encoding="utf-8"))
     catalog = validate_teacher_question_catalog(raw)
     _require(len(catalog) == 48 and tuple(catalog) == FROZEN_METHOD_IDS)
-    for locale in ("en", "ko"):
+    for locale in ("en", "ko", "zh", "ja"):
         questions = [question for localized in catalog.values() for question in localized[locale]]
         _require(len(questions) == 48 * 3 and len(set(questions)) == 48 * 3)
 
@@ -393,9 +393,11 @@ def _test_teacher_catalog_schema_and_overlay_identity() -> None:
     _require("runtime-only invariant" in methods_schema["description"])
     localized_schema = methods_schema["properties"][FROZEN_METHOD_IDS[0]]
     _require(set(localized_schema["required"]) == {"en", "ko"})
-    for locale in ("en", "ko"):
+    _require(set(localized_schema["properties"]) == {"en", "ko", "zh", "ja"})
+    for locale in ("en", "ko", "zh", "ja"):
         questions_schema = localized_schema["properties"][locale]
-        _require(questions_schema["minItems"] == questions_schema["maxItems"] == 3)
+        _require(questions_schema["minItems"] == (0 if locale in {"zh", "ja"} else 3))
+        _require(questions_schema["maxItems"] == 3)
         _require(questions_schema["uniqueItems"] is True)
         _require(questions_schema["items"]["minLength"] == 20)
         _require(questions_schema["items"]["maxLength"] == 220)
@@ -477,7 +479,7 @@ def _test_teacher_catalog_schema_and_overlay_identity() -> None:
     _require(bundle["content_revision"] == raw["content_revision"] == CONTENT_REVISION)
     for method_id, localized in catalog.items():
         _require(compiled[method_id]["content_revision"] == raw["content_revision"])
-        for locale in ("en", "ko"):
+        for locale in ("en", "ko", "zh", "ja"):
             procedure = compiled[method_id]["procedure"][locale]
             _require(procedure.startswith("## Teacher questions"))
             _require(all(question in procedure for question in localized[locale]))
@@ -564,15 +566,15 @@ def _test_hook_fallback_keeps_guardrails_before_questions() -> None:
     _require(estimate_injection_tokens(message) < MAX_INJECTION_ESTIMATED_TOKENS)
 
 
-@_check("VSC-01E-hook-budgets-all-one-two-three-methods-bilingual")
-def _test_hook_budgets_all_one_two_three_methods_bilingual() -> None:
+@_check("VSC-01E-hook-budgets-all-one-two-three-methods-four-locales")
+def _test_hook_budgets_all_one_two_three_methods_four_locales() -> None:
     projections = load_reasoning_content_projections(
         Path("content/compiled-reasoning-content.bundle.json")
     )
     method_ids = tuple(entry.method_id for entry in projections.selection_catalog.entries)
     _require(len(method_ids) == 48)
     checked = 0
-    for locale in ("en", "ko"):
+    for locale in ("en", "ko", "zh", "ja"):
         singles = {
             method_id: assemble_requested_locale_instruction(
                 projections,
@@ -628,7 +630,7 @@ def _test_hook_budgets_all_one_two_three_methods_bilingual() -> None:
                 _require(estimate_injection_tokens(reference) < MAX_INJECTION_ESTIMATED_TOKENS)
                 _require(all(value in reference for value in (*guardrails, *questions)))
                 checked += 1
-    _require(checked == 2 * (48 + 1_128 + 17_296))
+    _require(checked == 4 * (48 + 1_128 + 17_296))
 
 
 @_check("VSC-01F-codex-generated-question-procedures")
@@ -641,7 +643,7 @@ def _test_codex_generated_question_procedures() -> None:
     for method_id in FROZEN_METHOD_IDS:
         reference = package / "skills/opensocrates/references/methods" / (method_id + ".md")
         _require(f"Method ID: `{method_id}`" in reference.read_text(encoding="utf-8"))
-        for locale in ("en", "ko"):
+        for locale in ("en", "ko", "zh", "ja"):
             method = (
                 package
                 / "skills/opensocrates/references/decision/methods"
@@ -665,6 +667,38 @@ def _test_codex_generated_question_procedures() -> None:
 @_check("VSC-02-locale-current-prompt-and-english-fallback")
 def _test_locale_resolution() -> None:
     projections = _projections()
+    for prompt, expected in (
+        ("中文支持新增说明", "zh"),
+        ("中国語と日本語を追加してください", "ja"),
+        ("ﾃｽﾄ", "ja"),
+        ("東京", "zh"),
+        ("한국어 요청입니다 中文", "ko"),
+        ("中文内容更多 가", "zh"),
+        ("", "en"),
+        ("тест", "en"),
+        ("12345", "en"),
+    ):
+        _require(resolve_prompt_locale(prompt) == expected)
+    _require(resolve_prompt_locale("東京", explicit_locale="ja") == "ja")
+    _require(resolve_prompt_locale("日本語です", settings_locale="zh") == "zh")
+    _require(resolve_prompt_locale("中文", explicit_locale="ko", settings_locale="ja") == "ko")
+    _expect_raises(lambda: resolve_prompt_locale("中文", explicit_locale="fr"))
+    from opensocrates.selector.policy import CurrentPromptLocalePolicy
+
+    policy = CurrentPromptLocalePolicy()
+    _require(policy.locale_for(SelectorRequest(prompt="가123")) == "ko")
+    _require(resolve_prompt_locale("가123") == "en")
+    _require(policy.locale_for(SelectorRequest(prompt="中文内容")) == "zh")
+    _require(policy.locale_for(SelectorRequest(prompt="日本語です")) == "ja")
+    _require(
+        policy.locale_for(
+            SelectorRequest(prompt="中文", locale_preference="ja", settings_locale_preference="ko")
+        )
+        == "ja"
+    )
+    _require(
+        policy.locale_for(SelectorRequest(prompt="日本語", settings_locale_preference="zh")) == "zh"
+    )
     _require(resolve_prompt_locale("가나다") == "ko")
     _require(resolve_prompt_locale("가ab") == "en")
     _require(
@@ -693,6 +727,66 @@ def _test_locale_resolution() -> None:
     )
     _require(fallback.locale == "en")
     _require("합성" not in fallback.instructions)
+
+
+@_check("VSC-02B-cjk-procedure-length-and-completeness")
+def _test_cjk_procedure_contract() -> None:
+    from opensocrates.content.method import PROCEDURE_HEADINGS, validate_procedure
+    from opensocrates.content.locale import load_locale, validate_locale_parity
+
+    def procedure(body: str) -> str:
+        return (
+            "\n\n".join(
+                f"## {heading}\n\n"
+                + (
+                    "\n".join(f"{step}. {body}" for step in range(1, 6))
+                    if heading == "Procedure"
+                    else body
+                )
+                for heading in PROCEDURE_HEADINGS
+            )
+            + "\n"
+        )
+
+    for locale, script in (("zh", "证据"), ("ja", "証拠")):
+        text = procedure(script * 35)
+        _require(validate_procedure(text, method_id="deduction", locale=locale) == text)
+        _expect_raises(
+            lambda: validate_procedure(procedure(script), method_id="deduction", locale=locale)
+        )
+        _expect_raises(
+            lambda: validate_procedure(
+                procedure(script * 1000), method_id="deduction", locale=locale
+            )
+        )
+        _expect_raises(
+            lambda: validate_procedure(
+                text.replace("## Stop conditions", "## Missing"),
+                method_id="deduction",
+                locale=locale,
+            )
+        )
+    for locale in ("en", "ko", "zh", "ja"):
+        en = load_locale(
+            {
+                "schema": "opensocrates.locale-catalog/1.0.0",
+                "locale": "en",
+                "messages": {"status": "Value {value}"},
+            }
+        )
+        localized = load_locale(
+            {
+                "schema": "opensocrates.locale-catalog/1.0.0",
+                "locale": locale,
+                "messages": {"status": "值 {value}"},
+            }
+        )
+        validate_locale_parity(en, localized)
+        _expect_raises(
+            lambda: validate_locale_parity(
+                en, {"locale": locale, "messages": {"status": "值 {other}"}}
+            )
+        )
 
 
 @_check("VSC-03-raw-candidate-three-field-and-no-cap")

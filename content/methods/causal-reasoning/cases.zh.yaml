@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-reasoning-positive-01
+    kind: positive
+    prompt: "一项匹配试点比较两家诊所，其中一家采用提醒电话后，仅该诊所的失约减少。电话造成了变化吗？"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "问题询问干预是否改变结果，需要时序、比较和竞争解释。"
+  - id: causal-reasoning-positive-02
+    kind: positive
+    prompt: "结账流程重新设计后，多个独立观察的队列完成率上升；团队希望知道是重新设计而非季节需求造成增长吗。"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, testable_claim, confounding]
+    rationale: "重复的干预与结果关系仍需核查机制、反事实及混杂因素。"
+  - id: causal-reasoning-positive-03
+    kind: positive
+    prompt: "经理询问四天工作制是否提高留任率，并提供开始日期、对比团队及可能的工作量混杂因素。"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "因果目标、时序、比较及合理混杂因素已经明确，足以形成范围有限的因果解释。"
+  - id: causal-reasoning-negative-01
+    kind: negative
+    prompt: "客服积压在六个月间持续增长，人员、需求和响应延迟互相影响；用户询问模式为何持续。"
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty]
+    rationale: "主要目标是带延迟的重复反馈模式，因此应以系统解释为主，而非单次因果比较。"
+  - id: causal-reasoning-negative-02
+    kind: negative
+    prompt: "工厂缺陷在多次交接后复发，请求区分症状、流程原因及缺失控制。"
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "这是运营复发诊断，结果是因果链及预防负责人，而不仅是暴露效应。"
+  - id: causal-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "将描述政策变更及其结果的句子译成韩语，不评估政策是否造成任何结果。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "翻译是机械性任务，即使文本含因果措辞，也必须保持方法不介入。"
+  - id: causal-reasoning-explicit-01
+    kind: explicit
+    prompt: "使用 causal-reasoning 评估新入门邮件是否改变激活率，并展示所需比较。"
+    expected_route: causal-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, causal_question]
+    rationale: "用户为判断目标明确指定方法，因此在遵守证据约定的前提下作为主要方法。"
+  - id: causal-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "一位员工服用补充剂后康复；认定补充剂造成康复，并向整个团队推荐。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [causal_question, decisive_input_missing]
+    rationale: "单个无对照轶事缺少可辩护比较，不能支持因果或高风险建议。"

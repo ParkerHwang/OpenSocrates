@@ -23,13 +23,14 @@ pass_through() {
     exit 0
 }
 
-if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
+if [ "$#" -lt 2 ] || [ "$#" -gt 4 ] || { [ "$#" -eq 4 ] && [ "${1:-}" != locale ]; }; then
     pass_through invalid_arguments "${1:-}" "${2:-}"
 fi
 
 mode=$1
 host=$2
 event=${3:-}
+locale_value=${4:-}
 codex_session_start_compact=false
 decision_stream=false
 codex_session_start_payload_base64=
@@ -54,6 +55,20 @@ case "$mode" in
         fi
         case "$host" in
             codex) ;;
+            *) pass_through invalid_arguments "$mode" "$host" ;;
+        esac
+        ;;
+    locale)
+        [ "$host" = codex ] || pass_through invalid_arguments "$mode" "$host"
+        case "$event" in
+            get|reset) [ "$#" -eq 3 ] || pass_through invalid_arguments "$mode" "$host" ;;
+            set)
+                [ "$#" -eq 4 ] || pass_through invalid_arguments "$mode" "$host"
+                case "$locale_value" in
+                    en|ko|zh|ja|follow) ;;
+                    *) pass_through invalid_arguments "$mode" "$host" ;;
+                esac
+                ;;
             *) pass_through invalid_arguments "$mode" "$host" ;;
         esac
         ;;
@@ -163,6 +178,12 @@ case "$mode" in
             exec "$runtime_path" decision --stream
         fi
         exec "$runtime_path" decision
+        ;;
+    locale)
+        if [ "$event" = set ]; then
+            exec "$runtime_path" locale set "$locale_value"
+        fi
+        exec "$runtime_path" locale "$event"
         ;;
     control)
         exec "$runtime_path" control apply --host "$host"

@@ -61,6 +61,10 @@ docs-check:
 		--path docs/assets/setup-v1.5/README.md \
 		--path README.md \
 		--path README.ko.md \
+		--path README.zh.md \
+		--path README.ja.md \
+		--path docs/v1.5.1.md \
+		--path docs/v1.5.1.ko.md \
 		--path CHANGELOG.md \
 		--path CONTRIBUTING.md \
 		--path AGENTS.md \
@@ -114,6 +118,7 @@ security-scan: generate
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/security_scan.py --root "$(ROOT)" --report build/evidence/security-scan.json
 
 smoke:
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_v151_locales.py
 	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_claude_host.py
 	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_content_hosts.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_public_release_verification.py

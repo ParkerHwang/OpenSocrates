@@ -1,0 +1,103 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "evidence-hierarchy-positive-01",
+      "kind": "positive",
+      "prompt": "これらの研究のうち、どれが効果の主張を直接支持し、表現をどこまで強くできるでしょうか。",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence",
+        "conflicting_sources"
+      ],
+      "rationale": "主張と情報源の対応、質の限界、調整した証拠の強さが必要です。"
+    },
+    {
+      "id": "evidence-hierarchy-positive-02",
+      "kind": "positive",
+      "prompt": "専門家の意見、ユーザー調査、対照実験について、この政策判断への適用可能性を比較してください。",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "異なる証拠設計を、直接性、バイアス、状況への適合性で評価する必要があります。"
+    },
+    {
+      "id": "evidence-hierarchy-positive-03",
+      "kind": "positive",
+      "prompt": "情報源がメカニズムについて食い違っています。質の限界と、主張を保留すべきかを示してください。",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "conflicting_sources",
+        "reconcile_evidence"
+      ],
+      "rationale": "重要な情報源の対立には、単純な多数決ではなく証拠状態の調整が必要です。"
+    },
+    {
+      "id": "evidence-hierarchy-negative-01",
+      "kind": "negative",
+      "prompt": "独立したデータと方法で、対立する情報源が同じ主張に収束するか確認してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources",
+        "source_quality"
+      ],
+      "rationale": "主な課題は証拠の流れの独立性と収束であり、トライアンギュレーションです。"
+    },
+    {
+      "id": "evidence-hierarchy-negative-02",
+      "kind": "negative",
+      "prompt": "明示した価値観に最も合う結果を基準に、これらの選択肢から選んでください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "value_conflict",
+        "choose"
+      ],
+      "rationale": "情報源があるだけで価値上の好みが証拠階層の問題になるわけではありません。"
+    },
+    {
+      "id": "evidence-hierarchy-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "提供した引用を出版日順に並べ、題名を維持してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "引用の並べ替えは機械的で、質や適用可能性を評価しません。"
+    },
+    {
+      "id": "evidence-hierarchy-explicit-01",
+      "kind": "explicit",
+      "prompt": "evidence-hierarchy を明示的に使い、この医学的な主張を利用可能な研究設計に応じて調整してください。",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "source_quality"
+      ],
+      "rationale": "ユーザーは混在した情報源の証拠強度調整を明示的に指定しています。"
+    },
+    {
+      "id": "evidence-hierarchy-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "主張の範囲、情報源、設計、対象の状況を示さず、強く支持されているか答えてください。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "主張と情報源の入力や適用状況がなければ、強度表示は恣意的になります。"
+    }
+  ]
+}

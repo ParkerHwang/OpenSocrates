@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: morphological-analysis-positive-01
+    kind: positive
+    prompt: "公共事業では利用経路、資格、時期、要員、フィードバックを変えられます。整合した行列を作り、モデルを選ぶ前に組合せを審査してください。"
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "複数の独立した次元が定性的な選択肢空間を作り、二つずつの両立性確認が必要です。"
+  - id: morphological-analysis-positive-02
+    kind: positive
+    prompt: "サービスの再設計では一つの経路ばかり最適化しています。提供方法、頻度、所有、支援水準の組合せを探索してください。"
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "単一変数の再調整ではなく、整合した次元をまたぐ意外な組合せが必要です。"
+  - id: morphological-analysis-positive-03
+    kind: positive
+    prompt: "戦略研修で、四つの独立した選択による従来型、極端型、均衡型の構成が必要です。両立しない組も示してください。"
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, choose]
+    rationale: "パラメータ行列、組合せ空間、整合性審査、代表案が要求されています。"
+  - id: morphological-analysis-negative-01
+    kind: negative
+    prompt: "次元を独立に定義できません。主な不確実性は、どの慣習的仮定が本当に還元できない制約なのかという点です。"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, no_coherent_dimensions]
+    rationale: "形態的な組合せ空間を作る前に、基礎的な制約を明らかにする必要があります。"
+  - id: morphological-analysis-negative-02
+    kind: negative
+    prompt: "実現可能な選択肢は二つだけで、組合せの探索ではなく明示した基準とトレードオフで判断が決まります。"
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features: [multiple_options, choose]
+    rationale: "探索する意味のある次元空間がないなら、簡潔な比較で十分です。"
+  - id: morphological-analysis-mechanical-01
+    kind: mechanical
+    prompt: "既存のパラメータ行列を CSV に出力し、値を解釈したり組み合わせたりしないでください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "出力は機械的な作業です。"
+  - id: morphological-analysis-explicit-01
+    kind: explicit
+    prompt: "morphological-analysis を使い、経路、時期、所有、強度をまたぐサービス構成を作り、審査してください。"
+    expected_route: morphological-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, combinable_dimensions]
+    rationale: "利用者は方法と次元の組合せ課題を明示しています。"
+  - id: morphological-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "分離できない次元が一つしかなく、整合する値もありませんが、大きな行列を作り、精密な最善の組合せを選んでください。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [combinable_dimensions, no_coherent_dimensions]
+    rationale: "整合した次元や値なしでは、行列は偽の構造と精密さを生みます。"

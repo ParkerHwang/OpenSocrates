@@ -1,0 +1,103 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "evidence-hierarchy-positive-01",
+      "kind": "positive",
+      "prompt": "这些研究中，哪项直接支持效果主张？我们的措辞应有多强？",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence",
+        "conflicting_sources"
+      ],
+      "rationale": "任务需要主张与来源对应、质量局限和校准后的证据强度。"
+    },
+    {
+      "id": "evidence-hierarchy-positive-02",
+      "kind": "positive",
+      "prompt": "比较专家意见、用户调查和对照实验对这项政策决策的适用性。",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "须按直接性、偏倚及情境适合度衡量不同证据设计。"
+    },
+    {
+      "id": "evidence-hierarchy-positive-03",
+      "kind": "positive",
+      "prompt": "各来源对机制存在分歧；识别质量局限，并判断是否应保留该主张。",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "conflicting_sources",
+        "reconcile_evidence"
+      ],
+      "rationale": "重要的来源冲突需要校准证据状态，不能简单投票。"
+    },
+    {
+      "id": "evidence-hierarchy-negative-01",
+      "kind": "negative",
+      "prompt": "用独立的数据和方法检查相互冲突的来源是否趋向同一主张。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources",
+        "source_quality"
+      ],
+      "rationale": "主要任务是检查证据流的独立性和趋同，属于三角互证。"
+    },
+    {
+      "id": "evidence-hierarchy-negative-02",
+      "kind": "negative",
+      "prompt": "根据哪种结果最符合我们声明的价值观，在这些方案之间选择。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "value_conflict",
+        "choose"
+      ],
+      "rationale": "不能只因存在来源，就把价值偏好变成证据层级问题。"
+    },
+    {
+      "id": "evidence-hierarchy-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "按出版日期排列所提供的引用，保留标题。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "排序引用是机械操作，不评估质量或适用性。"
+    },
+    {
+      "id": "evidence-hierarchy-explicit-01",
+      "kind": "explicit",
+      "prompt": "明确使用 evidence-hierarchy，根据可用的研究设计校准这项医学类主张。",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "source_quality"
+      ],
+      "rationale": "用户明确调用混合来源的证据强度校准。"
+    },
+    {
+      "id": "evidence-hierarchy-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "说明主张是否得到强支持，但不提供主张范围、来源、设计或目标情境。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "缺少主张与来源输入及适用情境时，强度标签将是任意的。"
+    }
+  ]
+}

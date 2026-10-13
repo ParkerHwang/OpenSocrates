@@ -1,0 +1,86 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: decision-tree-analysis-positive-1
+    kind: positive
+    prompt: "今試行を始めるか待つか選べ、測定された試行結果が拡大、修正、停止を決めます。過去の施策記録が分岐結果を限定し、決定責任者は記載した審査時点で行動できます。"
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - sequential_choice
+      - unknown_probability
+    rationale: "順序と条件付きの次の行動が重要で、過去の記録に確認可能な確率・結果の出典があります。"
+  - id: decision-tree-analysis-positive-2
+    kind: positive
+    prompt: "段階的公開で、直ちに拡大するか先に試験結果を集めるか選んでください。各結果に記録された範囲があり、観察により後の行動が変わります。撤回地点と各分岐の出典を示してください。"
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - multiple_options
+      - sensitive_inputs
+    rationale: "偶然の結果と意味のある撤回地点を持つ順次選択です。裏付けのない精密さではなく、出典と範囲を求めています。"
+  - id: decision-tree-analysis-positive-3
+    kind: positive
+    prompt: "供給者は今決めるか、契約を固定する前に記録された検査を行えます。検査所見により供給者を変えるか停止し、契約責任者は結果の値と審査日を示しています。"
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - irreversible_choice
+      - information_purchase
+    rationale: "検査が不可逆な約束の前に後の選択肢を変えます。分岐確率を捏造せず、条件付き行動と撤回地点を示せます。"
+  - id: decision-tree-analysis-negative-1
+    kind: negative
+    prompt: "三つのソフトウェアを価格、アクセシビリティ、支援、信頼性で順位付けしてください。後の観察や条件付き行動はなく、関係者の重みを含む明示的な基準比較を求めています。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "同系統で混同しやすいのは trade-off-analysis です。静的な多基準比較で、順次選択の木ではありません。"
+  - id: decision-tree-analysis-negative-2
+    kind: negative
+    prompt: "政策は記録条件を満たす全適格申請の承認を要求しています。代わりに安価な案を選べるか判断してください。適用後は裁量がありません。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "拘束規則が行動を決め、真の決定ノードはありません。木を規則の回避に使ってはいけません。"
+  - id: decision-tree-analysis-mechanical-1
+    kind: mechanical
+    prompt: "確認済み入力で固定の if-then フローチャートを実行し、終端ラベルを返してください。偶然ノード、不確実な結果、裁量選択はありません。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "提示された手順の決定的な実行であり、順次的な不確実性の判断ではありません。"
+  - id: decision-tree-analysis-explicit-1
+    kind: explicit
+    prompt: "段階的公開に decision-tree-analysis を使ってください。決定と偶然のノードを示し、記録済みの分岐範囲だけを使い、撤回できる地点を特定してください。"
+    expected_route: decision-tree-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - sequential_choice
+      - multiple_options
+    rationale: "方法と必要な公開出力を明示しています。裏付けのない分岐値を補わず、unverified のままにします。"
+  - id: decision-tree-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "今公開するべきか待つべきか。後の行動は不明で、可能な結果を限定する出典もなく、どの観察が撤回を許すか誰も示していません。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - unknown_probability
+      - decisive_input_missing
+    rationale: "順序、分岐の根拠、撤回条件はいずれも判断を変える不足です。確率や戦略を捏造せず保留する必要があります。"

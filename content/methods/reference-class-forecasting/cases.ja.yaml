@@ -1,0 +1,106 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "reference-class-forecasting-positive-1",
+      "kind": "positive",
+      "prompt": "地域鉄道プロジェクトの納品日を推定しています。範囲、調達、地形が比較可能な多数の完了プロジェクトについて、情報源付きの記録があります。内部日程を観測された完了分布と比較し、確率を作らず調整を説明してください。",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "source_quality"
+      ],
+      "rationale": "予測対象と単位が示され、妥当な参照クラスがあり、外側の視点の範囲を求めています。情報源の記録は観測結果を支えますが、確率の捏造を認めません。"
+    },
+    {
+      "id": "reference-class-forecasting-positive-2",
+      "kind": "positive",
+      "prompt": "製品チームの新基盤への顧客移行の時間と費用の見積りは楽観的です。他チームの完了した類似移行と実績を特定できます。その事例で内側の視点の信頼性を試し、範囲を変える証拠を示してください。",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "hidden_assumptions"
+      ],
+      "rationale": "完了した比較可能な事例での較正であり、因果診断や好みのシナリオではありません。来歴に配慮した調整と転換条件を求め、架空の基準率は求めていません。"
+    },
+    {
+      "id": "reference-class-forecasting-positive-3",
+      "kind": "positive",
+      "prompt": "非営利団体が初年度の事業参加者数を予測しています。過去の複数の開始事例には参加実績、対象集団、開始条件の記録がありますが、網羅性は不均等です。外側の視点の範囲を作り、網羅性の限界を示して計画と比較してください。",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "weak_sample"
+      ],
+      "rationale": "対象と完了事例があり、網羅性の偏りは保つべき明示的な不確実性です。観測分布を使い、欠損が決定的なら結論を保留するか弱めます。"
+    },
+    {
+      "id": "reference-class-forecasting-negative-1",
+      "kind": "negative",
+      "prompt": "一回限りのこの科学機器には完了した比較可能な事例がありません。どの工学的選択が遅延を招いたか説明し、修正の実験を提案してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "no_defensible_reference_class",
+        "diagnose"
+      ],
+      "rationale": "妥当な参照クラスがないことを明示し、因果説明を求めています。この方法では外部分布なしに内側の視点を繰り返すだけになります。"
+    },
+    {
+      "id": "reference-class-forecasting-negative-2",
+      "kind": "negative",
+      "prompt": "五年戦略のために異なる四つの外部未来を構成し、それぞれに名前を付け、早期シグナルと行動を特定してください。過去事例から納期や費用の対象を推定しないでください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "plan"
+      ],
+      "rationale": "シナリオ・プランニングと混同しやすい例です。求めるのは分岐した未来と兆候で、予測の参照分布ではありません。"
+    },
+    {
+      "id": "reference-class-forecasting-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "検証済みの五件の請求額を合計し、指定通貨で総額を返してください。予測、比較クラス、判断は不要です。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "範囲のある計算です。不確実な予測対象や参照クラスの判断がなく、方法を起動しません。"
+    },
+    {
+      "id": "reference-class-forecasting-explicit-1",
+      "kind": "explicit",
+      "prompt": "ソフトウェア公開日には参照クラス予測を主な方法として使ってください。類似の公開について情報源付きの結果があります。その分布と内部計画を比較し、クラスが妥当でなければ結論を保留してください。",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "forecast",
+        "reference_cases"
+      ],
+      "rationale": "ユーザーが方法を明示し、対象、比較結果、保留規則を示しています。明示的な呼出しでも証拠ラベルが必要で、確率を作ることは許されません。"
+    },
+    {
+      "id": "reference-class-forecasting-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "このプロジェクトがいつ終わるか教えてください。内部目標日しかなく、完了した類似事例、合意した結果定義、明示された期限の判断もありません。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "no_defensible_reference_class",
+        "boundary_sensitive",
+        "decisive_input_missing"
+      ],
+      "rationale": "決定的な参照クラス、対象の定義、判断の境界が不足しています。誠実な結果は保留と不足入力に限った確認であり、架空の分布ではありません。"
+    }
+  ]
+}

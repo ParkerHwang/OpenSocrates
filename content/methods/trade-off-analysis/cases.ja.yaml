@@ -1,0 +1,117 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "trade-off-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "納期の速さ、信頼性、アクセシビリティ、総費用で三社から選んでください。調達側は拒否条件を記録し、各関係者は残る基準の好みを日付付きで示しています。",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "stakeholder_conflict"
+      ],
+      "rationale": "複数案が明示基準で競合し、制約と重みの由来は分離されています。すべての価値を交換可能とせず、譲歩を示せます。"
+    },
+    {
+      "id": "trade-off-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "製品チームは性能、保守性、プライバシー、ユーザー負担を両立する設計を選びます。評価の一部は試験、別の一部はインタビューによるもので、プライバシーは点数でなく最低条件です。",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "source_quality"
+      ],
+      "rationale": "由来を考慮した競合基準の比較と、補償不能なプライバシー制約が必要です。異なる証拠を一律にせず、明示できます。"
+    },
+    {
+      "id": "trade-off-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "二つの人員計画は対応範囲、継続性、費用、負荷で異なります。チームは好みの順序に合意しましたが、精密な数値尺度はありません。その順で勝つ計画と逆転条件を示してください。",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "sensitive_inputs"
+      ],
+      "rationale": "順序尺度のトレードオフが明示的に求められ、反転条件が重要です。偽の精度を避けつつ選択を示せます。"
+    },
+    {
+      "id": "trade-off-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "建築規則が特定の防火水準を要求し、適合案は一つです。依頼者は便利さの得点が高い安価な不適合案を選べるか尋ねています。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "single_feasible_option",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "拘束要件を補償可能な基準として扱っています。トレードオフではなく deontic-reasoning または有資格者の適合性審査が想定されます。"
+    },
+    {
+      "id": "trade-off-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "設計の選択前に顧客調査を行うか迷っています。問いは調査がどれほど決定を変え、遅れに見合うかであり、今日の設計比較ではありません。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "new_evidence",
+        "sensitive_inputs"
+      ],
+      "rationale": "value-of-information との混同が想定されます。直接の作業は追加情報の価値判断で、現在の案の重み付けではありません。"
+    },
+    {
+      "id": "trade-off-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "検証済みの記録を指定された一列の点数で並べ替えて返してください。基準の選択、好みの対立、推奨の説明は求めません。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "固定の並べ替えは機械的で、裁量を伴うトレードオフはありません。"
+    },
+    {
+      "id": "trade-off-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "立地の決定に trade-off-analysis を使ってください。拒否制約と好みを分け、全評価の出典を保ち、推奨で諦めるものを示してください。",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "choose",
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "手法と公開比較の要件を明示しています。裏付けのない評価は仮定または未検証のままです。"
+    },
+    {
+      "id": "trade-off-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "名前のない代替案から最善を選んでください。基準、最低許容条件、誰の優先順位を考慮するかは未合意です。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "decisive_input_missing"
+      ],
+      "rationale": "実行可能な集合、決定的基準、好みの由来がありません。推奨は後付けの採点になるため、比較を保留すべきです。"
+    }
+  ]
+}

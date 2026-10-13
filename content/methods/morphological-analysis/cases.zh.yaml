@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: morphological-analysis-positive-01
+    kind: positive
+    prompt: "公共项目可改变接入渠道、资格、时机、人员配置与反馈；请构建连贯矩阵，在选择模式前筛选组合。"
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "多个独立维度构成有结构的定性选项空间，并要求两两兼容性检查。"
+  - id: morphological-analysis-positive-02
+    kind: positive
+    prompt: "服务重设计不断优化同一渠道；请探索交付方式、频率、归属与支持级别的组合。"
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "团队需要跨连贯维度的非显而易见组合，而非再次调整单一变量。"
+  - id: morphological-analysis-positive-03
+    kind: positive
+    prompt: "战略研讨会需要四项独立选择的常规、极端与均衡配置，并展示不兼容配对。"
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, choose]
+    rationale: "所需输出是参数矩阵、组合空间、兼容性筛选与代表构想。"
+  - id: morphological-analysis-negative-01
+    kind: negative
+    prompt: "团队无法独立定义维度，主要不确定性是哪项惯常假设真正属于不可再简化的约束。"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, no_coherent_dimensions]
+    rationale: "建立形态组合空间前，须先发现基础约束。"
+  - id: morphological-analysis-negative-02
+    kind: negative
+    prompt: "只有两个可行选项，决策取决于明确标准与取舍，而非探索组合。"
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features: [multiple_options, choose]
+    rationale: "没有有意义的维度空间可探索时，简洁比较已足够。"
+  - id: morphological-analysis-mechanical-01
+    kind: mechanical
+    prompt: "将已有参数矩阵导出为 CSV，不解释或组合任何取值。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "导出是机械任务。"
+  - id: morphological-analysis-explicit-01
+    kind: explicit
+    prompt: "使用 morphological-analysis 生成跨渠道、时机、归属与强度的服务配置，再进行筛选。"
+    expected_route: morphological-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, combinable_dimensions]
+    rationale: "用户明确指定方法与维度组合任务。"
+  - id: morphological-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "只有一个不可分离的维度，且没有连贯取值；请创建大矩阵并选出精确的最佳组合。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [combinable_dimensions, no_coherent_dimensions]
+    rationale: "没有连贯维度或取值，矩阵只会制造虚假结构与精度。"

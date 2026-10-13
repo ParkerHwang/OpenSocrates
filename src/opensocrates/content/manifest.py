@@ -38,18 +38,20 @@ def build_content_bundle(
     policies: Mapping[str, Mapping[str, Any]],
     source_tree_hash: str,
 ) -> dict[str, Any]:
-    if set(locales) != {"en", "ko"}:
-        raise ContentValidationError("bundle locales: expected exactly en and ko")
-    validate_locale_parity(locales["en"], locales["ko"])
+    if set(locales) != {"en", "ko", "zh", "ja"}:
+        raise ContentValidationError("bundle locales: expected exactly en, ko, zh, and ja")
+    validate_locale_parity(locales["en"], *(locales[locale] for locale in ("ko", "zh", "ja")))
     ordered_methods = sorted((dict(method) for method in methods), key=lambda method: method["id"])
     method_ids = [method["id"] for method in ordered_methods]
     if method_ids != sorted(FROZEN_METHOD_IDS):
         raise ContentValidationError("bundle methods: expected sorted frozen IDs")
-    fragments = prompt_fragments(locales["en"], locales["ko"])
+    fragments = prompt_fragments(locales["en"], *(locales[locale] for locale in ("ko", "zh", "ja")))
     if set(fragments) != set(PROMPT_FRAGMENT_IDS):
         raise ContentValidationError("bundle prompt fragments: fixed set mismatch")
     policy_versions = policy_digests(policies)
-    locale_messages = {locale: dict(locales[locale]["messages"]) for locale in ("en", "ko")}
+    locale_messages = {
+        locale: dict(locales[locale]["messages"]) for locale in ("en", "ko", "zh", "ja")
+    }
     projection = {
         "content_revision": content_revision,
         "method_ids": method_ids,

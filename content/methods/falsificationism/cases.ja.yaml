@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "falsificationism-positive-01",
+      "kind": "positive",
+      "prompt": "支持したい製品仮説に決定的に反する観察は何でしょうか。",
+      "expected_route": "falsificationism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_claim",
+        "critique"
+      ],
+      "rationale": "主張には、確認する逸話を増やすのではなく、外れ得る予測と観察可能な反証条件が必要です。"
+    },
+    {
+      "id": "falsificationism-positive-02",
+      "kind": "positive",
+      "prompt": "この説明を予測に変え、補助仮定を分け、試験前に失敗の閾値を定義してください。",
+      "expected_route": "falsificationism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_claim",
+        "critique"
+      ],
+      "rationale": "求められる出力は、測定条件を伴う事前指定の反証の試みです。"
+    },
+    {
+      "id": "falsificationism-positive-03",
+      "kind": "positive",
+      "prompt": "予測の失敗は理論、測定、補助的な設定仮定のどれを弱めましたか。",
+      "expected_route": "falsificationism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_claim",
+        "critique"
+      ],
+      "rationale": "失敗した試験が実際に何を問題にするか特定する必要があります。"
+    },
+    {
+      "id": "falsificationism-negative-01",
+      "kind": "negative",
+      "prompt": "異常について複数の説明を作り、観察事実を最もよく説明するものを比較してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "外れ得る予測が指定されていない候補説明の生成は、アブダクションです。"
+    },
+    {
+      "id": "falsificationism-negative-02",
+      "kind": "negative",
+      "prompt": "設計の厳密さで情報源を順位付けし、適用可能性に応じて主張の強さを調整してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "課題は証拠の階層の調整であり、反証の試みではありません。"
+    },
+    {
+      "id": "falsificationism-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "事前登録した予測と閾値を試験の書式にコピーしてください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "提供された試験仕様のコピーは機械的です。"
+    },
+    {
+      "id": "falsificationism-explicit-01",
+      "kind": "explicit",
+      "prompt": "反証主義を明示的に用い、この介入は常に継続率を改善するという主張に挑んでください。",
+      "expected_route": "falsificationism",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "testable_claim"
+      ],
+      "rationale": "ユーザーは普遍的主張への反証を目的とした試験を明示しています。"
+    },
+    {
+      "id": "falsificationism-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "観察可能な予測も、何が反対証拠となるかも示せない主張に反証主義を使ってください。",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "testable_claim"
+      ],
+      "rationale": "固定された禁忌が適用されます。検証可能な含意がなければ、反証条件を作らず拒否しなければなりません。"
+    }
+  ]
+}

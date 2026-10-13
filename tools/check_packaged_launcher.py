@@ -388,6 +388,38 @@ def _check_control_mode(package: Path, host: str, target: str, *, runtime_output
         shutil.rmtree(stage, ignore_errors=True)
 
 
+def _check_locale_mode(package: Path, host: str, target: str, *, runtime_output: str) -> None:
+    stage, runtime = _stage(package, target, runtime_parent=runtime_output)
+    assert runtime is not None
+    try:
+        for arguments in (
+            ["get"],
+            ["reset"],
+            *(["set", locale] for locale in ("en", "ko", "zh", "ja", "follow")),
+        ):
+            _assert_dispatch(
+                stage, runtime, ["locale", host, *arguments], ["locale", *arguments], target
+            )
+        for arguments in (
+            [],
+            ["get", "extra"],
+            ["reset", "extra"],
+            ["set"],
+            ["set", "de"],
+            ["set", "ja", "extra"],
+        ):
+            result = _run(stage, ["locale", host, *arguments], _environment(stage, target))
+            _require(result.returncode == 0, "invalid locale command did not fail open")
+            diagnostic = json.loads(result.stdout)
+            _require(
+                diagnostic["diagnostic"]["code"] == "invalid_arguments",
+                "invalid locale was forwarded",
+            )
+            _require(not (stage / "marker.txt").exists(), "invalid locale reached runtime")
+    finally:
+        shutil.rmtree(stage, ignore_errors=True)
+
+
 def _assert_fail_open(package: Path, host: str, target: str, runtime_parent: str | None) -> None:
     """A hook that cannot reach the runtime exits 0 with literal-empty stdout."""
 
@@ -610,6 +642,7 @@ def _check_package(package: Path, host: str, *, runtime_output: str) -> dict[str
             runtime_output=runtime_output,
         )
         _check_control_mode(package, host, target, runtime_output=runtime_output)
+        _check_locale_mode(package, host, target, runtime_output=runtime_output)
         _assert_canonical_runtime_precedence(
             package,
             host,

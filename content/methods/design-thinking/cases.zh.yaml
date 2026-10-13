@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: design-thinking-positive-01
+    kind: positive
+    prompt: "家长反映遗漏学校通知，但观察到的变通办法不同；发现需求、界定观点，并测试三个服务概念。"
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "观察到的人的情境和开放概念生成是核心，投入前须进行原型测试。"
+  - id: design-thinking-positive-02
+    kind: positive
+    prompt: "诊所希望减少患者登记时的困惑；访谈与观察应为低风险原型和反证规则提供依据。"
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "请求是以用户为中心的服务设计，有观察到的摩擦和可测试原型。"
+  - id: design-thinking-positive-03
+    kind: positive
+    prompt: "团队要求仪表板功能，但无人知道该功能会防止什么失败；先发现情境与期望进展。"
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "选择概念前须将所述功能与底层需求分开。"
+  - id: design-thinking-negative-01
+    kind: negative
+    prompt: "用户在特定困难时刻更换工具，决策取决于功能、情绪、社会任务及习惯力量。"
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "主要输出是任务与转换力量的解释，而不是构思与原型循环。"
+  - id: design-thinking-negative-02
+    kind: negative
+    prompt: "显而易见的方案已经陈旧，团队想用激发思考的方法，在筛选前产生三个截然不同的方案。"
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "主要需求是打破框架，而非由用户观察引导的设计。"
+  - id: design-thinking-mechanical-01
+    kind: mechanical
+    prompt: "将访谈引语放入编号文档，不解释需求或提出概念。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "转录和格式整理是机械任务。"
+  - id: design-thinking-explicit-01
+    kind: explicit
+    prompt: "使用 design-thinking，根据观察到的用户摩擦重新设计志愿者报名流程，并测试小型原型。"
+    expected_route: design-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, human_need]
+    rationale: "用户明确要求人的需求发现和原型流程。"
+  - id: design-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "没有用户或观察可用；宣布普遍需求，并不经测试就推出首个功能。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [human_need, decisive_input_missing]
+    rationale: "没有用户证据就无法支持需求和测试，因此概念必须保持暂缓。"

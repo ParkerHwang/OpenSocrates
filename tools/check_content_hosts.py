@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Callable
 from unittest.mock import patch
 
+LOCALES = ("en", "ko", "zh", "ja")
 _CHECK_COUNT = 0
 
 
@@ -45,10 +46,10 @@ def _reject(action: Callable[[], Any], message: str) -> None:
 
 
 def _check_attribution(skill: Path, footer: str) -> None:
-    """All host controllers and both decision guides use the runtime's footer."""
+    """All host controllers and all four decision guides use the runtime's footer."""
 
     paths = [skill / "SKILL.md"] + [
-        skill / f"references/decision/guide.{locale}.md" for locale in ("en", "ko")
+        skill / f"references/decision/guide.{locale}.md" for locale in LOCALES
     ]
     for path in paths:
         text = path.read_text(encoding="utf-8")
@@ -153,9 +154,10 @@ def check(root: Path) -> int:
                 "portable controller has a native control command",
             )
             _require(
-                len(manifest["canonical_methods"]) == 96, "bilingual procedure inventory incomplete"
+                len(manifest["canonical_methods"]) == 192,
+                "four-locale procedure inventory incomplete",
             )
-            for locale in ("en", "ko"):
+            for locale in LOCALES:
                 decision = skill / "references/decision"
                 _require(
                     (decision / f"catalog.{locale}.json").read_bytes()

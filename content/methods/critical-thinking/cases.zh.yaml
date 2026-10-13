@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: critical-thinking-positive-01
+    kind: positive
+    prompt: "供应商报告根据自身调查声称生产力提升 40%；采购前评估来源、框架、缺失比较及推论。"
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, source_quality]
+    rationale: "这组主张需要来源、框架、逻辑和替代解释的检查，而非单次引文查询。"
+  - id: critical-thinking-positive-02
+    kind: positive
+    prompt: "高管备忘录声称一个试点就证明政策在所有地方有效；识别最强主张、假设、遗漏及反论。"
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, argument_dispute]
+    rationale: "请求明确要求对一组主张及其概括进行全面批判评估。"
+  - id: critical-thinking-positive-03
+    kind: positive
+    prompt: "两位可信评论者对安全计划是否有效意见不同，用户要求公允判定，不将分歧当作任何一方成立的证明。"
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, conflicting_sources, argument_dispute]
+    rationale: "来源可信度、框架、逻辑支持和未解决冲突均重要，须分别处理。"
+  - id: critical-thinking-negative-01
+    kind: negative
+    prompt: "一场辩论有核心主张、支持依据、异议和回应，需要可见地映射它们的连接。"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "具体需求是主张—依据—异议的结构映射，不是宽泛的三轴批评。"
+  - id: critical-thinking-negative-02
+    kind: negative
+    prompt: "来源层级必须确定临床主张是由原始证据直接支持，还是只由摘要支持。"
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "来源质量及主张与来源之间的支持关系是决定性输出。"
+  - id: critical-thinking-mechanical-01
+    kind: mechanical
+    prompt: "将引用主张和来源名称复制到审查模板，不判断真假或相关性。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "即使内容是主张，复制到模板仍是机械任务。"
+  - id: critical-thinking-explicit-01
+    kind: explicit
+    prompt: "使用 critical-thinking 审查这份投资备忘录，说明哪些已核实、缺失或仍不确定。"
+    expected_route: critical-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, critique]
+    rationale: "用户明确要求使用该方法判断一组主张。"
+  - id: critical-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "来源是无署名、无日期且无底层数据的截图；因为标题看起来合理，就宣布它为真。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [critique, source_quality, decisive_input_missing]
+    rationale: "核心来源和前提无法核查，判定必须保持暂缓，不能变成接受。"

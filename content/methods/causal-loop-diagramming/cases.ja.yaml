@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-loop-diagramming-positive-01
+    kind: positive
+    prompt: "行列が待ち時間を増やし、長い待ち時間が離脱を生み、離脱が将来の必要人員を変えます。符号付きループと遅延を図にしてください。"
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "命名された変数、符号付きのつながり、ループの種類、パターンを形作る遅延効果を求めています。"
+  - id: causal-loop-diagramming-positive-02
+    kind: positive
+    prompt: "ユーザー増加がレビューを増やし、レビューがさらにユーザーを呼ぶ一方、容量の制約が均衡反応を生みます。両方のループを特定してください。"
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "複数の方向を持つループと均衡の制約を明示する必要があります。"
+  - id: causal-loop-diagramming-positive-03
+    kind: positive
+    prompt: "施策は即時の緩和を生みますが、実施が行動を変えるまで長い遅延があるため後に反動が起きます。フィードバックの説明を図にしてください。"
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "単一の効果推定ではなく、遅延による施策への抵抗を符号付きループで説明する結果を求めています。"
+  - id: causal-loop-diagramming-negative-01
+    kind: negative
+    prompt: "大きな組織に多くの行為者、ストック、副作用があります。簡潔なループ図を選ぶ前に、最善のレバレッジポイントを決めてください。"
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "限定したループ図の前に、広いシステム境界とレバレッジの問いを確定すべきです。"
+  - id: causal-loop-diagramming-negative-02
+    kind: negative
+    prompt: "反復する動的パターンがない試験で、ある薬が対照群との比較で測定結果を引き起こしたかを問います。"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "範囲を限定した反事実的な効果の問いには、フィードバックループは不要です。"
+  - id: causal-loop-diagramming-mechanical-01
+    kind: mechanical
+    prompt: "既存のループラベルをプレゼンテーションにコピーし、関係を評価せずに順序を維持してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "コピーと整形には因果判断は不要です。"
+  - id: causal-loop-diagramming-explicit-01
+    kind: explicit
+    prompt: "causal-loop-diagramming を適用し、値引きが需要を増やす一方、後に欠品と信頼の低下を生む理由を示してください。"
+    expected_route: causal-loop-diagramming
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay]
+    rationale: "ユーザーが手法を指定し、反復する強化と均衡のパターンを示しています。"
+  - id: causal-loop-diagramming-insufficiency-01
+    kind: insufficiency
+    prompt: "二つの変数が一度一緒に動きましたが、方向、時点、反復パターンは不明です。確認済みの強化ループを描いてください。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "方向や時点のない一度の共変動では、符号付きループを支持できません。"

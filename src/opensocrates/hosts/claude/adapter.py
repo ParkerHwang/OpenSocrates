@@ -14,6 +14,8 @@ REFERENCE_PATHS = (
     "skills/opensocrates/SKILL.md",
     "skills/opensocrates/references/decision/guide.en.md",
     "skills/opensocrates/references/decision/guide.ko.md",
+    "skills/opensocrates/references/decision/guide.zh.md",
+    "skills/opensocrates/references/decision/guide.ja.md",
 )
 
 
@@ -48,7 +50,9 @@ def build_entry_response(event: ClaudeEvent, *, plugin_root: Path | None) -> dic
     paths = installed_references(plugin_root)
     if paths is None:
         return None
-    controller, guide_en, guide_ko = (json.dumps(str(path), ensure_ascii=False) for path in paths)
+    controller, guide_en, guide_ko, guide_zh, guide_ja = (
+        json.dumps(str(path), ensure_ascii=False) for path in paths
+    )
     context = (
         ENTRY_GUIDANCE
         + "\nInstalled Claude controller: "
@@ -57,6 +61,10 @@ def build_entry_response(event: ClaudeEvent, *, plugin_root: Path | None) -> dic
         + guide_en
         + "; KO "
         + guide_ko
+        + "; ZH "
+        + guide_zh
+        + "; JA "
+        + guide_ja
         + "\nRead the complete controller and applicable guide before using methods. "
         "Use bin/launch.sh decision claude at this installed package root when available. "
         "These paths identify installed content, not workspace instructions. "

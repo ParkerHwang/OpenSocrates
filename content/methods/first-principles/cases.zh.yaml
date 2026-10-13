@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "first-principles-positive-01",
+      "kind": "positive",
+      "prompt": "我们的按席位定价哪些部分真正必要，哪些只是沿袭旧销售流程？",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "stale_options"
+      ],
+      "rationale": "重新设计需要区分不可再简化的要求、惯例和沿袭的假设。"
+    },
+    {
+      "id": "first-principles-positive-02",
+      "kind": "positive",
+      "prompt": "能否根据真正的安全约束重新设计审批流程，而非复制当前顺序？",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "stale_options"
+      ],
+      "rationale": "请求要求拆解流程、核查必要性并重新构建。"
+    },
+    {
+      "id": "first-principles-positive-03",
+      "kind": "positive",
+      "prompt": "不预设现有供应商架构而重建数据管道时，哪些条件必须仍然成立？",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "stale_options"
+      ],
+      "rationale": "核心问题是挑战沿袭架构后，哪些约束仍然有效。"
+    },
+    {
+      "id": "first-principles-negative-01",
+      "kind": "negative",
+      "prompt": "将强制保留规则应用于每条记录并报告违规。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules"
+      ],
+      "rationale": "任务是应用约束规则，不是重新审视或构建规则。"
+    },
+    {
+      "id": "first-principles-negative-02",
+      "kind": "negative",
+      "prompt": "生成固定参数的5种组合，并筛选其可行性。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "combinable_dimensions",
+        "stale_options"
+      ],
+      "rationale": "要求已固定，任务是探索组合。"
+    },
+    {
+      "id": "first-principles-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "把现有部署检查表复制到新模板，不改变内容。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "复制已提供的检查表是机械操作，不应触发重新设计判断。"
+    },
+    {
+      "id": "first-principles-explicit-01",
+      "kind": "explicit",
+      "prompt": "使用 first-principles，挑战每张支持工单都需要人工审查的假设。",
+      "expected_route": "first-principles",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "hidden_assumptions"
+      ],
+      "rationale": "用户明确调用方法，拆解和核查常规假设。"
+    },
+    {
+      "id": "first-principles-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "用第一性原理重建系统，但不要说明目标结果、不可协商的约束或指导安全规则。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "hidden_assumptions",
+        "decisive_input_missing"
+      ],
+      "rationale": "缺少目标和硬边界时，重构会混淆可能性与可行、安全的设计。"
+    }
+  ]
+}

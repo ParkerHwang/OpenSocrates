@@ -1,0 +1,110 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "double-loop-learning-positive-1",
+      "kind": "positive",
+      "prompt": "支持团队通过新检查表缩短了回应时间，但客户升级投诉在2个月后再次出现。比较预期与实际结果，审查塑造检查表的服务目标和规则，并为修订规则设计安全的学习试验。",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "governing_rule",
+        "repeat_iteration",
+        "testable_claim"
+      ],
+      "rationale": "程序修正未能阻止重现，因此任务要求判断是否应改变指导目标或规则。路由应区分检查表行动与规则层面假设，并按出处标注升级投诉记录。"
+    },
+    {
+      "id": "double-loop-learning-positive-2",
+      "kind": "positive",
+      "prompt": "发布政策奖励按计划日期交付，团队为此反复推迟可靠性工作。审查政策背后的目标、激励、权限和假设，再提出限定的规则变更试验。",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "governing_rule",
+        "feedback_delay",
+        "recurring_failure",
+        "chosen_plan"
+      ],
+      "rationale": "反复出现的行为可能来自指导政策，而非单一执行错误。程序可比较修订规则候选，在检验前将因果解释维持为推断或未验证。"
+    },
+    {
+      "id": "double-loop-learning-positive-3",
+      "kind": "positive",
+      "prompt": "培训经过2次修订后，同一交接遗漏仍在多个团队出现。建立结果差距记录，区分单环培训纠正与交接规则变更，并说明各自需要什么证据支持。",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "governing_rule",
+        "repeat_iteration",
+        "testable_claim"
+      ],
+      "rationale": "多次重现和既往单环纠正使规则审查适用。所需输出是差距、规则、证据和学习试验，而非责备或重现概率。"
+    },
+    {
+      "id": "double-loop-learning-negative-1",
+      "kind": "negative",
+      "prompt": "一次部署有个拼写错误，现有审查控制立即发现了它。识别具体执行缺陷并修正，不改变发布政策。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "explicit_rules"
+      ],
+      "rationale": "现有证据已解释单一、限定的执行缺陷，用户明确排除政策变更。双环学习会超出范围；应聚焦缺陷响应。"
+    },
+    {
+      "id": "double-loop-learning-negative-2",
+      "kind": "negative",
+      "prompt": "我们有目标用户和定价假设。设计可逆的落地页试验，选择可行动的指标，并定义转型或坚持的判定规则。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "plan",
+        "human_need"
+      ],
+      "rationale": "这是精益创业实验设计请求，容易混淆方法类别。它没有报告重复的结果差距，也未要求修订指导规则。"
+    },
+    {
+      "id": "double-loop-learning-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "将这3次事故的持续时间从分钟转换成小时，按原顺序返回结果。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "单位换算是确定性操作，不涉及重复差距、支配变量或学习试验判断。"
+    },
+    {
+      "id": "double-loop-learning-explicit-1",
+      "kind": "explicit",
+      "prompt": "使用双环学习。显示结果差距、指导假设或规则、证据状态、修订规则候选和安全的学习试验；不要归咎于个人。",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "recurring_failure",
+        "governing_rule",
+        "testable_claim"
+      ],
+      "rationale": "用户明确调用方法及其公开契约。不责备的要求符合对规则、权限、激励和证据的审查，而非推断意图。"
+    },
+    {
+      "id": "double-loop-learning-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "团队不断失败。告诉我们必须改变哪种信念或政策，以及应做什么实验。我们没有预期结果、观察记录、重现边界或可审查的现行规则。",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "recurring_failure",
+        "governing_rule"
+      ],
+      "rationale": "方法可能适用，但缺少决定性差距和指导规则。必须保留判断，不编造深层解释或归咎于思维模式。"
+    }
+  ]
+}

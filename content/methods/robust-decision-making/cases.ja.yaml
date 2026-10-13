@@ -1,0 +1,109 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "robust-decision-making-positive-1",
+      "kind": "positive",
+      "prompt": "数十年使うインフラの洪水防御設計を選ぶ必要があります。雨量、土地利用、資金の条件は深く不確実です。一つの予測で勝つ案ではなく、もっともらしい複数の世界で公開された安全下限を超える案が必要です。",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "irreversible_choice",
+        "choose",
+        "failure_risk"
+      ],
+      "rationale": "重大で撤回しにくい判断で複数の不確実性が相互作用し、ユーザーは複数世界で許容できる行動を求めています。確率加重の最適解は不要です。"
+    },
+    {
+      "id": "robust-decision-making-positive-2",
+      "kind": "positive",
+      "prompt": "供給網戦略は今後八年の不確実な関税、需要、供給者の信頼性に耐える必要があります。実行可能な戦略を失敗と後悔の基準で比較し、トレードオフを示し、適応行動への監視トリガーを加えてください。",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "irreversible_choice",
+        "failure_risk",
+        "feedback_delay"
+      ],
+      "rationale": "シナリオ別・戦略別の負荷試験、明示的な失敗基準、適応のトリガーを求めています。深い不確実性での頑健な意思決定の公開出力です。"
+    },
+    {
+      "id": "robust-decision-making-positive-3",
+      "kind": "positive",
+      "prompt": "地域交通投資に三つの案がありますが、リモート勤務、燃料価格、公的資金の将来の組合せを一予測にするには信頼が足りません。許容できる初動、残る弱点、それを変える証拠を示してください。",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "multiple_options",
+        "choose",
+        "new_evidence"
+      ],
+      "rationale": "実際の選択と深い不確実性があり、最も起こりやすい戦略ではなく許容できる戦略を求めています。残る弱点と転換条件は頑健性の過大主張を防ぎます。"
+    },
+    {
+      "id": "robust-decision-making-negative-1",
+      "kind": "negative",
+      "prompt": "基準となる需要予測は十分に検証済みで、試行は来月ほぼ費用なしで撤回できます。経営陣はそのケースで期待収益が最も高い行動だけを求めています。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "sequential_choice",
+        "choose"
+      ],
+      "rationale": "単一の期待ケースが信頼でき撤回が容易という、明示的な回避条件に当たります。頑健性試験に必要な判断価値はありません。"
+    },
+    {
+      "id": "robust-decision-making-negative-2",
+      "kind": "negative",
+      "prompt": "エネルギー市場について名前付きの四つの外部未来を作り、各実現過程と早期シグナルを示してください。現在の行動を失敗や後悔の基準と比較しないでください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "plan"
+      ],
+      "rationale": "シナリオ・プランニングと混同しやすい例です。未来と兆候を求める一方、戦略の負荷試験や許容基準を明示的に除いています。"
+    },
+    {
+      "id": "robust-decision-making-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "検証済みキャッシュフローから、指定式で年率収益を計算し、算術を示してください。戦略は選ばないでください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "指定式のある限定的な計算で、不確実な判断集合はありません。算術を頑健性の判断に変えてはいけません。"
+    },
+    {
+      "id": "robust-decision-making-explicit-1",
+      "kind": "explicit",
+      "prompt": "沿岸適応の選択で robust-decision-making を主な方法にしてください。気候と予算のもっともらしい世界で各案を試し、最低サービス水準を失敗閾値にし、世界や閾値が不足するなら保留してください。",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "deep_uncertainty",
+        "irreversible_choice",
+        "failure_risk"
+      ],
+      "rationale": "ユーザーは方法を明示し、判断の枠組み、世界での試験、許容下限、保留規則を示しています。明示呼出しでも証拠や不確実性の制約は残ります。"
+    },
+    {
+      "id": "robust-decision-making-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "どの長期戦略が頑健か教えてください。実行可能な行動、失敗の意味、期間、試すべき不確実性をまだ挙げていません。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "行動集合、許容下限、期間、不確実性の一覧は決定的な入力です。頑健な提案は支持できず、保留して不足する判断入力だけを求めるべきです。"
+    }
+  ]
+}

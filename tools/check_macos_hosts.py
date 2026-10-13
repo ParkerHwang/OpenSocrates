@@ -147,6 +147,18 @@ def assemble(root: Path) -> dict[str, Any]:
     manifest = generate_plugin(root=root, host="claude", output=native)
     if manifest["runtime_targets"] != ["darwin-arm64"] or manifest["method_count"] != 48:
         raise ValueError("invalid native Claude closure")
+    decision = native / "skills/opensocrates/references/decision"
+    for locale in ("en", "ko", "zh", "ja"):
+        procedures = {path.stem for path in (decision / "methods" / locale).glob("*.md")}
+        if procedures != set(manifest["method_ids"]):
+            raise ValueError("incomplete native canonical locale inventory")
+        for guide in (
+            decision / f"guide.{locale}.md",
+            decision / f"catalog.{locale}.json",
+            native / f"skills/opensocrates/references/reader/guide.{locale}.md",
+        ):
+            if not guide.is_file() or not guide.read_bytes():
+                raise ValueError("missing native locale delivery guidance")
     _write_package_checksums(native)
     timings = check_entry(native)
 
@@ -173,7 +185,7 @@ def assemble(root: Path) -> dict[str, Any]:
         "shared_runtime_source": "codex",
         "content_profiles": ["claude-chat", "antigravity"],
         "canonical_method_count": 48,
-        "locale_procedure_count": 96,
+        "locale_procedure_count": 192,
         "native_entry": "emitted",
         "generated_hook_elapsed_ms": timings,
         "generated_hook_timeouts": "actual 3s entry / 1s no-op budgets",

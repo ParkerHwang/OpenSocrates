@@ -127,3 +127,22 @@ for a volatile NDJSON session. No active host installation is needed for file lo
 ## Windows x64
 
 The Windows x64 archive uses `node bin/launch.mjs` and a bundled `.exe`. Node.js 20+ is required; Python and a Unix shell are not required for method retrieval. See the repository Windows support guide for the current validation boundary. Legacy SDK context/credential-copy selection is unavailable on Windows; decision-point retrieval is the supported path. Scheduled updates are unavailable; use a manual installer update.
+
+
+Canonical procedures, decision catalogs, reader guides, controllers and presentation
+guidance are available in English (`en`), Korean (`ko`), Simplified Chinese (`zh`)
+and Japanese (`ja`). Each locale contains all {{METHOD_COUNT}} canonical methods.
+Locale availability is content delivery, not live host application evidence.
+
+
+To inspect the local native language preference, run
+`bin/launch.sh locale codex get`. Set it with
+`bin/launch.sh locale codex set zh` or `set ja`; `en`, `ko` and `follow`
+are also accepted. `bin/launch.sh locale codex reset` restores the follow preference.
+This setting applies to the retained selector path. Decision requests use their
+explicit JSON `locale`, and content-only account/workspace packages use the
+matching guide and catalog without a local runtime setting.
+
+On Windows, use `node bin/launch.mjs locale codex get`,
+`node bin/launch.mjs locale codex set zh` (or another supported preference),
+and `node bin/launch.mjs locale codex reset`.

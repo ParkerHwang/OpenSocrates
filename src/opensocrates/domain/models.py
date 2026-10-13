@@ -635,6 +635,8 @@ class MethodDisplayName(FrozenModel):
 
     en: SafeText = _text(200)
     ko: SafeText = _text(200)
+    zh: SafeText = _text(200)
+    ja: SafeText = _text(200)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -643,6 +645,8 @@ class MethodPlainAction(FrozenModel):
 
     en: SafeText = _text(500)
     ko: SafeText = _text(500)
+    zh: SafeText = _text(500)
+    ja: SafeText = _text(500)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -719,9 +723,41 @@ class TeacherQuestionLocales(FrozenModel):
         }
     )
 
+    # Empty new-language arrays preserve legacy EN/KO round trips; build-time
+    # authoring validation separately requires three questions in all four locales.
+    zh: tuple[SafeText, ...] = dc_field(
+        default=(),
+        metadata={
+            "min_items": 0,
+            "max_items": 3,
+            "unique_items": True,
+            "item_min_length": 20,
+            "item_max_length": 220,
+            "item_pattern": r"^(?!\s)(?!.*\s$)[^\r\n\u0000]+\?$",
+        },
+    )
+
+    ja: tuple[SafeText, ...] = dc_field(
+        default=(),
+        metadata={
+            "min_items": 0,
+            "max_items": 3,
+            "unique_items": True,
+            "item_min_length": 20,
+            "item_max_length": 220,
+            "item_pattern": r"^(?!\s)(?!.*\s$)[^\r\n\u0000]+\?$",
+        },
+    )
+
     def __post_init__(self) -> None:
         FrozenModel.__post_init__(self)
-        for locale, questions in (("en", self.en), ("ko", self.ko)):
+        if bool(self.zh) != bool(self.ja):
+            raise ValidationError("teacher question locales: zh and ja must be supplied together")
+        for locale, questions in (
+            (locale, getattr(self, locale)) for locale in ("en", "ko", "zh", "ja")
+        ):
+            if locale in {"zh", "ja"} and not questions:
+                continue
             if len(questions) != 3 or len(set(questions)) != len(questions):
                 raise ValidationError(
                     f"teacher question locales: {locale} requires three unique questions"
@@ -739,7 +775,7 @@ class TeacherQuestionLocales(FrozenModel):
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TeacherQuestionCatalog(FrozenModel):
-    """Canonical bilingual overlay applied without changing authored method revisions."""
+    """Canonical four-locale overlay applied without changing authored method revisions."""
 
     __schema_id__: ClassVar[str] = "opensocrates.teacher-questions/1.0.0"
     schema: str = _schema(__schema_id__)
@@ -758,9 +794,11 @@ class TeacherQuestionCatalog(FrozenModel):
             raise ValidationError(
                 "teacher question catalog: overlay revision/count does not match canonical content"
             )
-        seen: dict[str, set[str]] = {"en": set(), "ko": set()}
+        seen: dict[str, set[str]] = {locale: set() for locale in ("en", "ko", "zh", "ja")}
         for localized in self.methods.values():
-            for locale, questions in (("en", localized.en), ("ko", localized.ko)):
+            for locale, questions in (
+                (locale, getattr(localized, locale)) for locale in ("en", "ko", "zh", "ja")
+            ):
                 if seen[locale].intersection(questions):
                     raise ValidationError(
                         f"teacher question catalog: duplicate {locale} question across methods"
@@ -844,7 +882,7 @@ class SelectionCatalogEntry(FrozenModel):
         if not self.family.strip():
             raise ValidationError("selection catalog entry: family cannot be blank")
         locale_keys = set(self.display_name)
-        if "en" not in locale_keys or locale_keys - {"en", "ko"}:
+        if "en" not in locale_keys or locale_keys - {"en", "ko", "zh", "ja"}:
             raise ValidationError("selection catalog entry: English name is required")
         if set(self.core_purpose) != locale_keys or any(
             not value.strip()

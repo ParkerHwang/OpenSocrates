@@ -807,8 +807,11 @@ class WindowsChecks(unittest.TestCase):
                 environment["PYTHONUTF8"] = "0"
                 launcher = package / "bin/launch.mjs"
                 result = subprocess.run(
-                    ["node", str(launcher), "decision", host],
-                    input=json.dumps({"operation": "catalog", "locale": "ko"}),
+                    ["node", str(launcher), "decision", host, "--stream"],
+                    input="".join(
+                        json.dumps({"operation": "catalog", "locale": locale}) + "\n"
+                        for locale in ("en", "ko", "zh", "ja")
+                    ),
                     text=True,
                     encoding="utf-8",
                     capture_output=True,
@@ -817,7 +820,26 @@ class WindowsChecks(unittest.TestCase):
                     timeout=30,
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertEqual(len(json.loads(result.stdout)["methods"]), 48)
+                catalogs = [json.loads(line) for line in result.stdout.splitlines()]
+                self.assertEqual(len(catalogs), 4)
+                for catalog in catalogs:
+                    self.assertEqual(catalog["status"], "catalog")
+                    self.assertEqual(len(catalog["methods"]), 48)
+                    self.assertEqual(catalog["evidence"], "metadata_only")
+                for arguments in ([], ["set", "de"], ["get", "extra"], ["set", "ja", "extra"]):
+                    rejected = subprocess.run(
+                        ["node", str(launcher), "locale", host, *arguments],
+                        text=True,
+                        encoding="utf-8",
+                        capture_output=True,
+                        cwd=package,
+                        env=environment,
+                        timeout=30,
+                    )
+                    self.assertEqual(rejected.returncode, 0)
+                    self.assertEqual(
+                        json.loads(rejected.stdout)["diagnostic"]["code"], "invalid_arguments"
+                    )
                 payload = (
                     package / "skills/opensocrates/references/decision/request.json"
                 ).read_text(encoding="utf-8")

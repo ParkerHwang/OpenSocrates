@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..application.change_settings import persist_preferences_reset, persist_rigor
+from ..application.change_settings import persist_locale, persist_preferences_reset, persist_rigor
 from ..domain.enums import Rigor
 
 
@@ -75,4 +75,37 @@ def handle_rigor_reset(repository: Any) -> dict[str, object]:
         return {"status": "unavailable", "error_code": "settings_write_unavailable"}
 
 
-__all__ = ["handle_rigor_get", "handle_rigor_reset", "handle_rigor_set"]
+def handle_locale_get(repository: Any) -> dict[str, object]:
+    if repository is None or not callable(getattr(repository, "load", None)):
+        return {"status": "unavailable", "error_code": "settings_store_unavailable"}
+    try:
+        settings = repository.load()
+        preference = settings.locale_preference
+        return {"status": "ok", "locale": preference or "follow", "revision": settings.revision}
+    except Exception:
+        return {"status": "unavailable", "error_code": "settings_store_unavailable"}
+
+
+def handle_locale_set(repository: Any, locale: str) -> dict[str, object]:
+    if locale not in {"en", "ko", "zh", "ja", "follow"}:
+        return {"status": "rejected", "error_code": "invalid_locale"}
+    if repository is None:
+        return {"status": "unavailable", "error_code": "settings_store_unavailable"}
+    try:
+        settings = persist_locale(repository, None if locale == "follow" else locale)
+        return {
+            "status": "ok",
+            "locale": settings.locale_preference or "follow",
+            "revision": settings.revision,
+        }
+    except Exception:
+        return {"status": "unavailable", "error_code": "settings_write_unavailable"}
+
+
+__all__ = [
+    "handle_locale_get",
+    "handle_locale_set",
+    "handle_rigor_get",
+    "handle_rigor_reset",
+    "handle_rigor_set",
+]

@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "failure-mode-effects-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "薬剤を払い出す業務の開始前に、故障モード、影響、原因、現行対策、担当者が必要な対策を列挙してください。",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "定義された工程には、架空の点数を使わない予測的な故障一覧と対策の責任者が必要です。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "データパイプラインの再設計は取り込み、検証、通知で失敗し得ます。順序尺度の規則で優先度を付け、対策を提案してください。",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan"
+      ],
+      "rationale": "計画した設計に対して故障モード、影響、原因、順序尺度の優先度、対策を求めています。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "公開前に決済工程を調べ、利用者へ誤請求する可能性と、各モードをチームがどう予防・検出するか確認してください。",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "公開前の工程確認と対策の割り当てが、この方法の具体的出力です。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "製品発売の計画は決まりました。既に失敗したと想定し、妥当な原因、先行信号、軽減策を特定してください。",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "求められる視点は、確約する前に計画全体の失敗を想像することです。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "本番環境の不具合が再発し、チームは症状、直接原因、制御可能なシステム条件を分ける必要があります。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "直近の必要は再発の診断であり、予測的な FMEA の一覧ではありません。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "既存の故障モード行をアルファベット順に並べ、優先度を評価せず全項目を維持してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "行がリスクを記述していても、並べ替えは機械的です。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "この発売チェックリストに failure-mode-effects-analysis を使い、重大度、発生度、検出度の点数を捏造しないでください。",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "failure_risk",
+        "plan"
+      ],
+      "rationale": "ユーザーは方法と偽の精密さを防ぐ保護措置を明示的に指定しています。"
+    },
+    {
+      "id": "failure-mode-effects-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "工程境界や意図した機能はありません。それでも想像上の故障に正確なリスク優先数を付けてください。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "failure_risk",
+        "decisive_input_missing"
+      ],
+      "rationale": "機能の定義と妥当な尺度がなければ、数量化せず評価を保留する必要があります。"
+    }
+  ]
+}

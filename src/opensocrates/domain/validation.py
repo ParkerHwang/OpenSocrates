@@ -68,6 +68,7 @@ from .enums import (
     RouterReasonCode,
     VerificationOutcome,
 )
+from .locales import complete_locale_set
 
 TaskId: TypeAlias = Annotated[str, "TaskId"]
 JudgmentId: TypeAlias = Annotated[str, "JudgmentId"]
@@ -465,8 +466,8 @@ def validate_date(value: Any, *, field_name: str = "date") -> str:
 
 
 def validate_locale(value: Any, *, field_name: str = "locale") -> str:
-    if not isinstance(value, str) or value not in {"en", "ko"}:
-        raise ValidationError(f"{field_name}: locale must be en or ko")
+    if not isinstance(value, str) or value not in {"en", "ko", "zh", "ja"}:
+        raise ValidationError(f"{field_name}: locale must be en, ko, zh, or ja")
     return value
 
 
@@ -1120,8 +1121,8 @@ def _validate_compiled_content_bundle(model: Any) -> None:
         raise ValidationError("compiled content method_ids must be lexicographically sorted")
     if [method.id for method in model.methods] != list(model.method_ids):
         raise ValidationError("compiled content methods must align with method_ids")
-    if set(model.locale_messages) != {"en", "ko"}:
-        raise ValidationError("compiled content requires en and ko locale messages")
+    if not complete_locale_set(set(model.locale_messages)):
+        raise ValidationError("compiled content requires en, ko, zh, and ja locale messages")
 
 
 def _validate_trace_view(model: Any) -> None:
@@ -1185,8 +1186,15 @@ def _validate_method_complements(model: Any) -> None:
 
 
 def _validate_method_authoring(model: Any) -> None:
-    if set(model.locales) != {"en", "ko"} or tuple(model.locales) != ("en", "ko"):
-        raise ValidationError("method authoring requires exactly en and ko locales in en,ko order")
+    if set(model.locales) != {"en", "ko", "zh", "ja"} or tuple(model.locales) != (
+        "en",
+        "ko",
+        "zh",
+        "ja",
+    ):
+        raise ValidationError(
+            "method authoring requires exactly en, ko, zh, and ja locales in en,ko,zh,ja order"
+        )
     if len(model.routing.positive_features) < 2:
         raise ValidationError("method authoring requires at least two positive routing features")
     if not model.participation.judgment_only:
