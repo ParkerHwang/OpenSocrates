@@ -49,7 +49,7 @@ jobs:
         run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance lifecycle --binary dist/runtime/${{ matrix.target }}/opensocrates.exe --package dist/native/${{ matrix.target }} --host-binary build/opensocrates-host-fixture.exe --report build/evidence/native-lifecycle-${{ matrix.target }}.json
       - name: Bounded initial-install diagnostic after acceptance failure
         if: failure() && steps.native_lifecycle.outcome == 'failure'
-        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance install-profile --binary dist/runtime/${{ matrix.target }}/opensocrates.exe --package dist/native/${{ matrix.target }} --host-binary build/opensocrates-host-fixture.exe --report build/evidence/native-install-profile-${{ matrix.target }}.json
+        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance install-profile --binary dist/runtime/${{ matrix.target }}/opensocrates.exe --package dist/native/${{ matrix.target }} --host-binary build/opensocrates-host-fixture.exe --report build/evidence/install-profile-private/native-install-profile-${{ matrix.target }}.json
       - name: Native hook startup timing
         run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance timing --binary dist/runtime/${{ matrix.target }}/opensocrates.exe --package dist/native/${{ matrix.target }}/packages/codex --report build/evidence/codex-hook-timing-${{ matrix.target }}.json
       - name: Isolated native OS scheduler acceptance
