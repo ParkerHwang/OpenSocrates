@@ -185,16 +185,12 @@ func publicationMerge(o publicationOptions) error {
 			}
 		}
 	}
-	// Native notarization must bind the exact final macOS ZIP bytes.
-	var notary map[string]any
-	data, err := os.ReadFile(filepath.Join(o.root, "build", "evidence", "notarization-darwin-arm64.json"))
-	if err != nil || json.Unmarshal(data, &notary) != nil || notary["status"] != "Accepted" || notary["commit"] != commit {
-		return errors.New("release_notarization_evidence_missing")
+	// Both final payload and separately distributed manager require their own
+	// accepted submission, bound to the exact public bytes.
+	if err = publicationRequireNotarization(o.root, version, commit); err != nil {
+		return err
 	}
-	hash, _, err := publicationHash(filepath.Join(dist, "opensocrates-v"+version+"-darwin-arm64.zip"))
-	if err != nil || notary["sha256"] != hash {
-		return errors.New("release_notarization_bytes_mismatch")
-	}
+
 	for _, target := range publicationNativeTargets() {
 		provenance, err := ReadObject(filepath.Join(o.root, "build", "evidence", "package-source-provenance-"+target+".json"))
 		if err != nil || provenance["commit"] != commit || provenance["repository"] != publicationRepository {
@@ -229,6 +225,9 @@ func publicationFinalize(o publicationOptions) error {
 	}
 	version, err := publicationVersion(o.root)
 	if err != nil {
+		return err
+	}
+	if err = publicationRequireNotarization(o.root, version, commit); err != nil {
 		return err
 	}
 	names := []string{"opensocrates-v" + version + "-release-manifest.json", "root.json", "targets.json", "snapshot.json", "timestamp.json"}
@@ -307,4 +306,75 @@ func publicationFinalize(o publicationOptions) error {
 	}
 	inventory.Assets = append(inventory.Assets, publicationAsset{Name: checksumName, Size: size, SHA256: hash})
 	return writeJSON(filepath.Join(o.root, "dist", "opensocrates-v"+version+"-publication-inventory.json"), inventory)
+}
+
+func publicationReceiptInteger(value any, want int64) bool {
+	switch n := value.(type) {
+	case int:
+		return int64(n) == want
+	case int64:
+		return n == want
+	}
+	number, ok := schemaNumber(value)
+	return ok && number.IsInt() && number.Num().Int64() == want
+}
+func publicationAcceptedLog(value any, tickets int64) bool {
+	log := obj(value)
+	return log["status"] == "Accepted" && log["sha256_matches"] == true && publicationReceiptInteger(log["issue_count"], 0) && publicationReceiptInteger(log["ticket_count"], tickets) && log["all_runtime_cdhashes_ticketed"] == true
+}
+func publicationRequireNotarization(root, version, commit string) error {
+	notary, err := ReadObject(filepath.Join(root, "build", "evidence", "notarization-darwin-arm64.json"))
+	if err != nil || notary["schema"] != "opensocrates.notarization/1.0.0" || notary["status"] != "Accepted" || notary["commit"] != commit || !macSubmissionPattern.MatchString(str(notary["submission_id"])) || !publicationAcceptedLog(notary["apple_log"], 4) {
+		return errors.New("release_notarization_evidence_missing")
+	}
+	archive := "opensocrates-v" + version + "-darwin-arm64.zip"
+	hash, size, err := publicationHash(filepath.Join(root, "dist", archive))
+	if err != nil || notary["archive"] != archive || notary["sha256"] != hash || !publicationReceiptInteger(notary["size"], size) {
+		return errors.New("release_notarization_bytes_mismatch")
+	}
+	manifest, err := publicationBundleManifest(filepath.Join(root, "dist", archive))
+	if err != nil {
+		return err
+	}
+	indexed := map[string]map[string]any{}
+	for _, entry := range arr(manifest["files"]) {
+		record := obj(entry)
+		indexed[str(record["path"])] = record
+	}
+	files := arr(notary["runtime_files"])
+	expected := map[string]bool{"bin/opensocrates": true, "bin/opensocrates-update-helper": true, "packages/codex/runtime/darwin-arm64/opensocrates": true, "packages/claude/runtime/darwin-arm64/opensocrates": true}
+	seen := map[string]bool{}
+	for _, entry := range files {
+		record := obj(entry)
+		name := str(record["path"])
+		asset := indexed[name]
+		if !expected[name] || seen[name] || !regexp.MustCompile(`^[a-f0-9]{40}$`).MatchString(str(record["cdhash"])) || asset == nil || strings.TrimPrefix(str(asset["sha256"]), "sha256:") != str(record["sha256"]) || jsonToken(asset["size"]) != jsonToken(record["size"]) {
+			return errors.New("release_notarization_runtime_binding_invalid")
+		}
+		seen[name] = true
+	}
+	if len(files) != 4 {
+		return errors.New("release_notarization_runtime_binding_invalid")
+	}
+	installer := obj(notary["standalone_installer"])
+	name := publicationInstallerName(version, "darwin-arm64")
+	hash, size, err = publicationHash(filepath.Join(root, "dist", name))
+	if err != nil || installer["status"] != "Accepted" || !macSubmissionPattern.MatchString(str(installer["submission_id"])) || installer["submission_id"] == notary["submission_id"] || installer["payload_submission_id"] != notary["submission_id"] || installer["payload_notarized_first"] != true || installer["installer"] != name || installer["installer_sha256"] != hash || !publicationReceiptInteger(installer["installer_size"], size) || strings.TrimPrefix(str(indexed["bin/opensocrates"]["sha256"]), "sha256:") != hash || !publicationHashPattern.MatchString(str(installer["sha256"])) || installer["archive"] != "installer-notary.zip" || !publicationAcceptedLog(installer["apple_log"], 1) {
+		return errors.New("release_notarization_installer_binding_invalid")
+	}
+	runtimeFiles := arr(installer["runtime_files"])
+	if len(runtimeFiles) != 1 || obj(runtimeFiles[0])["path"] != name || obj(runtimeFiles[0])["sha256"] != hash || !publicationReceiptInteger(obj(runtimeFiles[0])["size"], size) {
+		return errors.New("release_notarization_installer_binding_invalid")
+	}
+	managerCDHash := ""
+	for _, entry := range files {
+		record := obj(entry)
+		if record["path"] == "bin/opensocrates" {
+			managerCDHash = str(record["cdhash"])
+		}
+	}
+	if obj(runtimeFiles[0])["cdhash"] != managerCDHash {
+		return errors.New("release_notarization_installer_binding_invalid")
+	}
+	return nil
 }

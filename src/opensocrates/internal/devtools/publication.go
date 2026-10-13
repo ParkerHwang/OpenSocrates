@@ -85,6 +85,7 @@ func publicationGit(root string, args ...string) (string, error) {
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "git", args...)
 	cmd.Dir = root
+	cmd.Env = publicationChildEnvironment()
 	output, err := cmd.Output()
 	if err != nil {
 		return "", errors.New("release_git_inspection_failed")
@@ -93,6 +94,21 @@ func publicationGit(root string, args ...string) (string, error) {
 		return "", errors.New("release_git_response_oversize")
 	}
 	return strings.TrimSpace(string(output)), nil
+}
+
+// Git and other source inspection never need the hosted signing credentials.
+// Preserve authentication/configuration needed by release metadata operations.
+func publicationChildEnvironment() []string {
+	result := []string{}
+	for _, value := range os.Environ() {
+		name, _, _ := strings.Cut(value, "=")
+		switch name {
+		case "OPENSOCRATES_MAC_CERTIFICATE_P12_BASE64", "OPENSOCRATES_MAC_CERTIFICATE_PASSWORD", "OPENSOCRATES_NOTARY_APPLE_ID", "OPENSOCRATES_NOTARY_APP_PASSWORD":
+			continue
+		}
+		result = append(result, value)
+	}
+	return result
 }
 
 func publicationRemoteTag(output, tag string) (string, error) {

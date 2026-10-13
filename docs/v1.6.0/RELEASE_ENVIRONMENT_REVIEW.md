@@ -5,6 +5,13 @@ transfer signing secrets. Exact live observations and execution results belong
 in the implementation handoff. / PR #112의 릴리스 준비 문서입니다. 병합·태그·게시·
 서명 비밀 전송 승인과 구분하며 실제 관찰·실행 결과는 구현 인계에 기록합니다.
 
+Subsequent user approvals applied the Go required-check migration and selected
+hosted Mac signing, encrypted GitHub custody and direct owner approval on every
+release. [Hosted signing](HOSTED_MAC_SIGNING.md) records the implementation;
+the observations below retain their initial source/date. / 이후 사용자 승인으로 Go
+필수 검사 변경을 적용하고 GitHub Mac 서명·암호화 비밀 보관·매번 본인 승인 방식을
+선택했습니다. 실제 구현은 별도 문서에 기록하며 아래 최초 관찰은 과거 상태입니다.
+
 ## Observed configuration / 확인한 설정
 
 At source c9da20d, GitHub lists zero release environments, zero self-hosted
@@ -20,20 +27,21 @@ v1.6.0 태그와 운영 TUF 루트는 아직 없으며, 소스·네이티브 CI 
 Main is protected by active repository ruleset `20467374`, despite the classic
 branch-protection API returning 404. Effective rules require a PR, current-main
 checks, resolved review threads, and prohibit deletion/force pushes with no
-bypass actors. Required check names still refer to the previous Python/npm
-implementation. / main은 활성 ruleset으로 보호됩니다. 고전 branch-protection
+bypass actors. Required check names referred to the previous Python/npm
+implementation at that observation; the approved Go replacement is now applied.
+/ main은 활성 ruleset으로 보호됩니다. 고전 branch-protection
 API의 404를 보호 없음으로 해석하지 않습니다. PR 경유·최신 main 기준 검사·리뷰
 대화 해결·삭제/강제 푸시 차단·우회 불가 조건을 유지합니다. 필수 검사 이름은
-이전 Python/npm 구현 기준이어서 수정이 필요합니다.
+최초 관찰 당시에는 이전 Python/npm 기준이었고 이후 승인한 Go 목록으로 교체했습니다.
 
 ## Required-check proposal / 필수 검사 수정안
 
 Replace only the required status-check list with these observed Go workflow
-check names; keep every other ruleset field, strict checking and GitHub Actions
-integration binding unchanged. Application requires the user's approval because
-this changes the repository's merge conditions. / 아래 실제 Go 검사 이름으로 필수
+check names; every other ruleset field, strict checking and GitHub Actions
+integration binding is unchanged. The user approved the change and effective
+main rules/API readback were verified. / 아래 실제 Go 검사 이름으로 필수
 검사 목록만 교체하고 나머지 보호 조건·엄격한 검사·GitHub Actions 연결은 유지합니다.
-저장소 병합 조건을 바꾸는 설정이므로 적용은 사용자 승인 후 진행합니다.
+저장소 병합 조건 변경을 사용자 승인 후 적용했고 실제 main 규칙과 API를 확인했습니다.
 
 | Required check / 필수 검사 |
 | --- |
@@ -49,7 +57,7 @@ release-evidence boundaries remain in force. / 관리자 우회나 누락 검사
 
 ## Mac signing execution options / Mac 서명 실행 환경
 
-The current workflow requires an isolated ephemeral self-hosted Mac ARM64
+The initial workflow required an isolated ephemeral self-hosted Mac ARM64
 runner. A normal development Mac or an `--ephemeral` registration alone does
 not prove a fresh/discarded filesystem. / 현재 workflow는 격리된 일회성 Mac ARM64
 runner를 요구합니다. 개발 Mac이나 일회성 runner 등록만으로 파일시스템 초기화·
@@ -57,35 +65,34 @@ runner를 요구합니다. 개발 Mac이나 일회성 runner 등록만으로 파
 
 A supported alternative is a fixed GitHub-hosted `macos-15` ARM64 job with a
 protected signing environment and a temporary per-job keychain. Standard hosted
-Mac jobs use fresh VMs. This alternative requires a reviewed workflow change;
-the existing self-hosted configuration does not implement it. / 대안은 보호 환경과
+Mac jobs use fresh VMs. This alternative is implemented by the subsequent
+workflow change; actual execution is recorded separately. / 대안은 보호 환경과
 작업별 임시 키체인을 사용하는 고정 `macos-15` ARM64 GitHub 실행 환경입니다.
-표준 hosted Mac 작업은 새 VM을 사용합니다. 현재 self-hosted 설정에 바로 적용되는
-값이 아니라 별도 구현·리뷰가 필요한 대안입니다.
+표준 hosted Mac 작업은 새 VM을 사용합니다. 이후 workflow 변경으로 구현했으며
+실제 실행 증거는 별도로 기록합니다.
 
-Hosted signing needs explicit approval to place the purpose-specific Developer
-ID private-key P12, P12 password and CI notarization credential in encrypted
-GitHub environment secrets. Local `opensocrates-notary` registration does not
-provision remote authentication. Create a separate CI credential and use only a
-temporary owned keychain, with unconditional cleanup. No signing secret has
-been transferred by this preparation. / hosted 서명은 개인키가 포함된 P12·P12 암호·
-CI 전용 공증 자격 증명을 GitHub 암호화 비밀에 맡기는 승인이 필요합니다. 로컬
-프로필 이름만으로 원격 인증은 준비되지 않습니다. CI 자격 증명을 분리하고 임시
-키체인을 종료 때 정리해야 합니다. 이번 준비에서는 비밀값을 전송하지 않았습니다.
+The user approved encrypted GitHub custody of the purpose-specific Developer
+ID P12/password and separate CI notarization credential. They are registered in
+the owner-protected Mac environment, with temporary copies for qualification.
+Local temporary export/password files were removed. The CI credential validated
+against Apple; actual hosted import/signing/notarization/cleanup is recorded
+separately. / 개인키 P12·암호·별도 CI 공증 자격 증명의 GitHub 암호화 보관을 사용자
+승인 후 Mac 보호 환경에 등록했습니다. 후보 검증용 사본은 임시이며 로컬 내보내기·
+암호 파일은 삭제했습니다. CI 자격 증명은 Apple에서 확인했고 실제 GitHub 가져오기·
+서명·공증·정리 실행 결과는 별도입니다.
 
 ## Environment policy decisions / 승인 환경 결정
 
-Signing/publication environments should require a designated reviewer, prohibit
-administrator bypass, and allow only selected release tags. A tag rule such as
+Signing/publication environments require the sole designated user reviewer,
+prohibit administrator bypass, and allow only selected release tags. A tag rule such as
 `v*` does not replace the exact merged-main/tag/source checks in the Go publisher.
-An independent reviewer permits `prevent_self_review=true`; a sole maintainer
-must explicitly choose a solo manual-review policy or add a real second reviewer.
-Listing multiple reviewers requires one of them, not all of them, to approve.
-/ 서명·게시 환경에는 지정 승인자·관리자 우회 금지·릴리스 태그 제한이 필요합니다.
+The selected solo policy uses `prevent_self_review=false`, permitting the owner
+to approve their own initiated run without automatic approval. Listing multiple
+reviewers would require one of them, not all of them, to approve.
+/ 서명·게시 환경에는 사용자 한 명의 직접 승인·관리자 우회 금지·태그 제한을 적용했습니다.
 태그 이름 제한은 Go 게시자의 정확한 태그·병합 main·소스 검사를 대신하지 않습니다.
-본인 승인 금지를 쓰려면 실제 독립 승인자가 필요합니다. 단독 운영이라면 별도
-승인 정책을 결정하거나 두 번째 승인자를 지정해야 하며, 여러 승인자 등록은 전원의
-승인을 요구하는 설정이 아닙니다.
+선택한 단독 운영 정책은 직접 시작한 작업을 본인이 승인할 수 있고 자동 승인은
+하지 않습니다. 여러 승인자 등록이 전원 승인을 요구하는 설정은 아닙니다.
 
 Final release qualification still needs the chosen runner's actual execution,
 approved production trust/key custody, Windows signing, immutable publication

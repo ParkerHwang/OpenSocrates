@@ -38,22 +38,23 @@ jobs:
   native:
     name: Sign and qualify ${{ matrix.target }}
     environment: ${{ matrix.signing_environment }}
+    timeout-minutes: 75
     strategy:
       fail-fast: false
       matrix:
         include:
           - target: darwin-arm64
-            runner: '["self-hosted", "macOS", "ARM64", "opensocrates-release"]'
-            signing_environment: opensocrates-release-signing
+            runner: '["macos-15"]'
+            signing_environment: opensocrates-release-signing-macos
           - target: windows-x64
             runner: '["self-hosted", "Windows", "X64", "opensocrates-release"]'
             signing_environment: opensocrates-release-signing
           - target: windows-arm64
             runner: '["self-hosted", "Windows", "ARM64", "opensocrates-release"]'
             signing_environment: opensocrates-release-signing-windows-arm64
-    # Signing runners must be ephemeral, isolated and pre-provisioned with OS
-    # signing identities. Secrets are never placed in source, process output or
-    # artifact receipts; only configured identity/key references reach Go.
+    # Mac uses a fresh hosted ARM64 VM and an owned per-job keychain. Every
+    # signing/publication environment requires the owner's explicit approval.
+    # Windows signing runners retain their separate qualification requirements.
     runs-on: ${{ fromJSON(matrix.runner) }}
     env:
       OPENSOCRATES_RELEASE_APPROVED: "true"
@@ -83,7 +84,32 @@ jobs:
         run: go test ./src/opensocrates/...
       - name: Build native binaries
         run: go run ./src/opensocrates/cmd/opensocrates-dev build --target ${{ matrix.target }} --output dist/runtime
+      - name: Compile reviewed Mac signing tools before credential access
+        id: mac_tool
+        if: matrix.target == 'darwin-arm64'
+        run: go build -trimpath -o build/opensocrates-dev ./src/opensocrates/cmd/opensocrates-dev
+      - name: Prepare temporary Mac signing keychain
+        if: matrix.target == 'darwin-arm64'
+        env:
+          OPENSOCRATES_RUNNER_ENVIRONMENT: ${{ runner.environment }}
+          OPENSOCRATES_RUNNER_ARCH: ${{ runner.arch }}
+          OPENSOCRATES_MAC_SIGN_IDENTITY: ${{ vars.OPENSOCRATES_MAC_SIGN_IDENTITY }}
+          OPENSOCRATES_MAC_TEAM_ID: ${{ vars.OPENSOCRATES_MAC_TEAM_ID }}
+          OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE: ${{ vars.OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE }}
+          OPENSOCRATES_MAC_CERTIFICATE_P12_BASE64: ${{ secrets.OPENSOCRATES_MAC_CERTIFICATE_P12_BASE64 }}
+          OPENSOCRATES_MAC_CERTIFICATE_PASSWORD: ${{ secrets.OPENSOCRATES_MAC_CERTIFICATE_PASSWORD }}
+          OPENSOCRATES_NOTARY_APPLE_ID: ${{ secrets.OPENSOCRATES_NOTARY_APPLE_ID }}
+          OPENSOCRATES_NOTARY_APP_PASSWORD: ${{ secrets.OPENSOCRATES_NOTARY_APP_PASSWORD }}
+        run: build/opensocrates-dev macos-signing-prepare --purpose production
+      - name: Sign and verify Mac binaries on hosted ARM64
+        if: matrix.target == 'darwin-arm64'
+        env:
+          OPENSOCRATES_MAC_SIGN_IDENTITY: ${{ vars.OPENSOCRATES_MAC_SIGN_IDENTITY }}
+          OPENSOCRATES_MAC_TEAM_ID: ${{ vars.OPENSOCRATES_MAC_TEAM_ID }}
+          OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE: ${{ vars.OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE }}
+        run: build/opensocrates-dev release-sign --target darwin-arm64
       - name: Sign and verify binaries on native OS
+        if: matrix.target != 'darwin-arm64'
         run: go run ./src/opensocrates/cmd/opensocrates-dev release-sign --target ${{ matrix.target }}
       - name: Assemble signed native archive and installer
         run: go run ./src/opensocrates/cmd/opensocrates-dev package --target ${{ matrix.target }} --runtime-root dist/runtime --output dist/native/${{ matrix.target }}
@@ -97,7 +123,11 @@ jobs:
         run: go run ./src/opensocrates/cmd/opensocrates-dev sbom --package dist/native/${{ matrix.target }} --output build/evidence/sbom-${{ matrix.target }}.json
       - name: Notarize final macOS archive
         if: matrix.target == 'darwin-arm64'
-        run: go run ./src/opensocrates/cmd/opensocrates-dev release-notarize
+        env:
+          OPENSOCRATES_MAC_SIGN_IDENTITY: ${{ vars.OPENSOCRATES_MAC_SIGN_IDENTITY }}
+          OPENSOCRATES_MAC_TEAM_ID: ${{ vars.OPENSOCRATES_MAC_TEAM_ID }}
+          OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE: ${{ vars.OPENSOCRATES_NOTARY_KEYCHAIN_PROFILE }}
+        run: build/opensocrates-dev release-notarize
       - name: Verify signed native package
         run: go run ./src/opensocrates/cmd/opensocrates-dev release-check --target ${{ matrix.target }} --package dist/native/${{ matrix.target }}
       - uses: actions/upload-artifact@v7
@@ -112,6 +142,16 @@ jobs:
             build/evidence/notarization-${{ matrix.target }}.json
             build/evidence/sbom-${{ matrix.target }}.json
           if-no-files-found: error
+      - name: Remove temporary Mac credentials and restore keychain search list
+        if: always() && matrix.target == 'darwin-arm64' && steps.mac_tool.outcome == 'success'
+        run: build/opensocrates-dev macos-signing-cleanup --purpose production
+      - name: Retain Mac keychain cleanup result
+        if: always() && matrix.target == 'darwin-arm64' && steps.mac_tool.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: macos-signing-cleanup-${{ github.sha }}-${{ github.run_id }}
+          path: build/evidence/macos-keychain-cleanup.json
+          if-no-files-found: warn
 
   publish:
     name: Publish exact immutable Release and signed update metadata

@@ -44,6 +44,22 @@ func Run(args []string, out, errout io.Writer) int {
 		fmt.Fprintln(out, command+": OK")
 		return 0
 	}
+	if command == "macos-signing-qualify" {
+		if e := RunMacOSSigningQualification(".", args); e != nil {
+			fmt.Fprintln(errout, e)
+			return 1
+		}
+		fmt.Fprintln(out, command+": PASS")
+		return 0
+	}
+	if command == "macos-signing-prepare" || command == "macos-signing-cleanup" {
+		if e := RunMacOSSigningSetup(".", command, args); e != nil {
+			fmt.Fprintln(errout, e)
+			return 1
+		}
+		fmt.Fprintln(out, command+": PASS")
+		return 0
+	}
 	if command == "check" {
 		return RunChecks(args, out, errout)
 	}
