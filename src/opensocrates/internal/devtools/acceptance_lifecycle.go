@@ -434,7 +434,7 @@ func acceptanceMigrationVersionCase(tmp, packageRoot, fixture, legacyVersion, pr
 			locale := str(entry["locale"])
 			if locale == "en" || locale == "ko" {
 				path := filepath.Join(legacyPackage, filepath.FromSlash(str(entry["path"])))
-				body, readError := platform.ReadFile(path, lifecycle.MaxFileBytes)
+				body, readError := platform.ReadOwnedFile(path, lifecycle.MaxFileBytes)
 				if readError != nil {
 					return record(false)
 				}
@@ -471,7 +471,7 @@ func acceptanceMigrationVersionCase(tmp, packageRoot, fixture, legacyVersion, pr
 	for _, raw := range arr(manifest["files"]) {
 		entry := obj(raw)
 		path := filepath.Join(legacyPackage, filepath.FromSlash(str(entry["path"])))
-		body, readError := platform.ReadFile(path, lifecycle.MaxFileBytes)
+		body, readError := platform.ReadOwnedFile(path, lifecycle.MaxFileBytes)
 		if readError != nil {
 			return record(false)
 		}

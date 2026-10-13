@@ -7,10 +7,12 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/content"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/domain"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 )
 
 func localePointer(value string) *string { return &value }
@@ -164,7 +166,12 @@ func TestLegacyWholeSelectionEnglishFallback(t *testing.T) {
 
 func TestLegacyHookReadsStoredLocaleWithoutRetainingPromptOrChangingSettings(t *testing.T) {
 	app, _ := localeApplication(t)
-	root := privateDirectory(t)
+	// A POSIX mode on an ordinary temporary file does not establish a protected
+	// Windows DACL. Use the same owned state creation boundary as production.
+	root := filepath.Join(privateDirectory(t), "private-settings")
+	if err := platform.Mkdir(root); err != nil {
+		t.Fatal(err)
+	}
 	settings := domain.DefaultSettings()
 	settings.Value["locale_preference"] = "ja"
 	raw, err := contracts.CanonicalCompact(settings.Value)
@@ -172,7 +179,7 @@ func TestLegacyHookReadsStoredLocaleWithoutRetainingPromptOrChangingSettings(t *
 		t.Fatal(err)
 	}
 	settingsPath := filepath.Join(root, "settings.json")
-	if err := os.WriteFile(settingsPath, raw, 0600); err != nil {
+	if err := platform.AtomicWrite(settingsPath, raw, 0600); err != nil {
 		t.Fatal(err)
 	}
 	hook := &HookServices{Application: app, SettingsRoot: root}
@@ -200,5 +207,50 @@ func TestLegacyHookReadsStoredLocaleWithoutRetainingPromptOrChangingSettings(t *
 		if strings.Contains(output, prompt) || strings.Contains(output, "SECRET_") {
 			t.Fatal("transient request diagnostics exposed locale metadata or prompt")
 		}
+	}
+}
+
+func TestLegacyLocaleRequestFailsOpenOnUnsupportedSelectorPlatform(t *testing.T) {
+	if contextAvailable() {
+		t.Skip("unsupported legacy selector boundary is exercised on non-POSIX hosts")
+	}
+	app, _ := localeApplication(t)
+	root := filepath.Join(privateDirectory(t), "private-settings")
+	if err := platform.Mkdir(root); err != nil {
+		t.Fatal(err)
+	}
+	settings := domain.DefaultSettings()
+	settings.Value["locale_preference"] = "ja"
+	raw, err := contracts.CanonicalCompact(settings.Value)
+	if err != nil {
+		t.Fatal(err)
+	}
+	settingsPath := filepath.Join(root, "settings.json")
+	if err := platform.AtomicWrite(settingsPath, raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	// No executable or auth home exists. The unsupported-platform guard must
+	// reject before either is inspected and before any credential copying.
+	absentHome := filepath.Join(root, "absent-codex-home")
+	selector := &Selector{Binary: filepath.Join(root, "absent-codex"), CodexHome: absentHome}
+	request := Request{Prompt: "PRIVATE_UNSUPPORTED_PROMPT", Catalog: app.Bundle.SelectionCatalog, StoredPreference: localePointer("ja"), Deadline: 3 * time.Second, ReasoningEffort: "medium"}
+	candidate, err := selector.Select(context.Background(), request)
+	outcome, ok := err.(*OutcomeError)
+	if candidate != nil || !ok || outcome.Outcome != "request_rejected" {
+		t.Fatal("unsupported platform reached selector process/auth work")
+	}
+	app.Selector = selector
+	hook := &HookServices{Application: app, SettingsRoot: root}
+	payload, _ := contracts.CanonicalCompact(map[string]any{"hook_event_name": "UserPromptSubmit", "session_id": "unsupported-locale-session", "turn_id": "unsupported-locale-turn", "prompt": request.Prompt})
+	result, err := hook.HandleLegacy(payload, "UserPromptSubmit")
+	if err != nil || result != nil || app.Artifacts.Latest("unsupported-locale-session") != nil {
+		t.Fatal("unsupported selector hook failed to continue ordinary work without an artifact")
+	}
+	stored, err := platform.ReadFile(settingsPath, 128<<10)
+	if err != nil || string(stored) != string(raw) {
+		t.Fatal("unsupported selector changed stored locale settings")
+	}
+	if _, err := os.Stat(absentHome); !os.IsNotExist(err) {
+		t.Fatal("unsupported selector created an auth home")
 	}
 }

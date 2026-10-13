@@ -17,7 +17,13 @@ import (
 // content identity/completeness from a simple file-hash mismatch.
 func localeFixture(t *testing.T, host, version string) (string, Manifest, map[string][]byte) {
 	t.Helper()
-	root := t.TempDir()
+	// Windows may give testing's temporary root an Administrators owner.
+	// Create a new explicitly current-user-owned package root; never repair
+	// existing ownership or weaken the verifier to accommodate a fixture.
+	root := filepath.Join(t.TempDir(), "private-package")
+	if e := platform.Mkdir(root); e != nil {
+		t.Fatal(e)
+	}
 	digest := strings.Repeat("a", 64)
 	m := Manifest{Host: host, ProductVersion: version, ContentRevision: "4", SourceTreeHash: digest, NormalizedSemanticHash: digest, MethodCount: 48}
 	files := map[string][]byte{}

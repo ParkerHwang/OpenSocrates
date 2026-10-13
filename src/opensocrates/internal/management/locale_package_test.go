@@ -19,7 +19,12 @@ import (
 
 func contentLocalePackage(t *testing.T, version string) string {
 	t.Helper()
-	root := t.TempDir()
+	// A newly created platform directory establishes the current user's owner
+	// and protected Windows DACL before transport inspects the package root.
+	root := filepath.Join(t.TempDir(), "private-package")
+	if e := platform.Mkdir(root); e != nil {
+		t.Fatal(e)
+	}
 	digest := strings.Repeat("a", 64)
 	skill := ".agents/skills/opensocrates"
 	m := transport.Manifest{Schema: "opensocrates.content-host-manifest/1.0.0", Host: "antigravity", ProductVersion: version, ContentRevision: "4", SourceTreeHash: digest, NormalizedSemanticHash: digest, MethodCount: 48, RuntimeTargets: []string{}, Launchers: []string{}, PublicSkills: []string{"opensocrates"}, SkillRoot: skill, SourceIdentity: map[string]string{"canonical": digest, "templates": digest}}
@@ -68,7 +73,10 @@ func TestReleasedAntigravityLocalesSurviveDisableEnableAndForeignCollision(t *te
 		}
 		for _, preference := range preferences {
 			t.Run(version+"/"+preference, func(t *testing.T) {
-				base := t.TempDir()
+				base := filepath.Join(t.TempDir(), "private-home")
+				if e := platform.Mkdir(base); e != nil {
+					t.Fatal(e)
+				}
 				stateDir := filepath.Join(base, "state")
 				if e := platform.Mkdir(stateDir); e != nil {
 					t.Fatal(e)
