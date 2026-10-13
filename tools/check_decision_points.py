@@ -661,7 +661,7 @@ class LocaleCompatibilityChecks(unittest.TestCase):
                 locale_preference="ko",
                 default_rigor=Rigor.STRICT,
                 revision=7,
-                recording_mode=RecordingMode.ON,
+                recording_mode=RecordingMode.LOCAL_PUBLIC_ARTIFACTS,
                 record_retention_days=37,
                 onboarding_version_seen="1.5.0",
                 intervention_preferences={
