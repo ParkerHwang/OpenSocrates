@@ -14,6 +14,8 @@ v1.5의 독자 안내는 결론을 맥락과 다음 행동에 연결합니다. �
 
 [English](README.md) | **한국어** | [简体中文](README.zh.md) | [日本語](README.ja.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | [ไทย](README.th.md)
 
+**도구를 찾는 에이전트에게:** [작업 적합성 판단·배포 패키지 선택·설정 확인 안내](docs/agent-discovery.ko.md).
+
 [![CI](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml/badge.svg)](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/opensocrates)](https://www.npmjs.com/package/opensocrates)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)

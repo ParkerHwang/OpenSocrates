@@ -16,6 +16,8 @@ OpenSocrates は、資料の統合、関係者の視点の理解、選択肢の�
 
 [English](README.md) | [한국어](README.ko.md) | [简体中文](README.zh.md) | **日本語** | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | [ไทย](README.th.md)
 
+**ツールを探すエージェントへ：**[課題への適合性、リリースパッケージの選択、設定確認（英語ガイド）](docs/agent-discovery.md)。
+
 ## 対応環境とアプリ
 
 | アプリ | 提供方式 | 環境と有効化 |

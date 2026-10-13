@@ -58,6 +58,10 @@ docs-check:
 		--path docs/decision-points.ko.md \
 		--path docs/setup-guide.md \
 		--path docs/setup-guide.ko.md \
+		--path docs/agent-discovery.md \
+		--path docs/agent-discovery.ko.md \
+		--path docs/content-privacy.md \
+		--path docs/content-privacy.ko.md \
 		--path docs/assets/setup-v1.5/README.md \
 		--path README.md \
 		--path README.ko.md \

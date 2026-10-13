@@ -573,6 +573,7 @@ def _test_hook_fallback_keeps_guardrails_before_questions() -> None:
 @_check("VSC-01D2-hook-fallback-enforces-actual-native-byte-envelope")
 def _test_hook_fallback_enforces_actual_native_byte_envelope() -> None:
     from dataclasses import replace
+
     from opensocrates.hosts.common import HostAction
 
     questions = tuple(f"Bounded question {number} " + "q" * 150 + "?" for number in range(3))
