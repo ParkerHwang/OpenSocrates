@@ -131,6 +131,32 @@ or a passing Windows install; current exact-head results are recorded in PR #112
 유지하며 정규 파일의 중복 검사만 제거하고, 경로·원문 없는 준비 개수 관측을
 보완했습니다. Windows 설치의 통과 여부는 현재 커밋에서 다시 확인합니다.
 
+At `940ac715076a7d76bfa3fc920742382b73fa284a`, the complete local source suite,
+three-target package generation and package/security checks passed. Current code
+and security reviews confirmed live-handle guard equivalence. Source and native
+Mac CI also passed, while both Windows source/ACL suites passed before initial
+install again reached 30 seconds. The new counters showed exactly five
+operations, one prepared and four planned, with next planned index 1. This binds
+the interruption to the full immutable-bundle candidate operation after host
+preparation: [x64](evidence/v1.5.2-native-install-940-windows-x64.json),
+[ARM64](evidence/v1.5.2-native-install-940-windows-arm64.json).
+Individual copy/hash/ACL/storage latency remains unmeasured.
+
+The original verified bundle is already passed directly into that operation;
+there is no duplicate full-bundle source copy to remove. The next bounded
+follow-up overlaps independent regular-file copies with at most four workers.
+All owned directories are created serially first; every file still uses the
+unchanged owned, bounded and durable copy API. Assignment and first-error
+recording share one mutex; new work stops after a recorded error and all
+in-flight work is joined before returning. Partial owned output is preserved
+for the engine. Directory modes apply after successful join, and source-before,
+destination and source-after snapshots remain exact. There is no input-tree
+consumption, cached validator result, timeout extension or trust/durability
+reduction. Actual Windows timing is pending current-head CI in PR #112.
+/ 호스트 준비 후 전체 불변 번들 후보에서 제한에 도달한 것을 확인했습니다.
+독립 파일의 내구성 복사를 최대 네 개씩 처리하고 오류 뒤 추가 배정을 멈추며,
+모든 작업 종료 후 기존 검증·복구로 넘어갑니다. 원본과 검사·저장·제한 시간은 유지합니다.
+
 ## Historical released v1.5.1 reconciliation
 
 The original Go preparation and all revision-3 receipts retain their historical

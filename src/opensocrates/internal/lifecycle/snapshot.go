@@ -11,6 +11,7 @@ import (
 	"reflect"
 	"runtime"
 	"sort"
+	"sync"
 
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
@@ -135,24 +136,8 @@ func copyVerified(from, to string, expected Snapshot) error {
 	if absent.Exists {
 		return diagnostics.New(diagnostics.Verification, "stage")
 	}
-	for _, entry := range current.Entries {
-		target := to
-		if entry.Path != "" {
-			target = filepath.Join(to, filepath.FromSlash(entry.Path))
-		}
-		if entry.Directory {
-			if e := platform.Mkdir(target); e != nil {
-				return e
-			}
-		} else {
-			source := from
-			if entry.Path != "" {
-				source = filepath.Join(from, filepath.FromSlash(entry.Path))
-			}
-			if e := platform.CopyOwnedFile(source, target, MaxFileBytes, os.FileMode(entry.Mode)); e != nil {
-				return e
-			}
-		}
+	if e := copySnapshotEntries(from, to, current.Entries, platform.CopyOwnedFile); e != nil {
+		return e
 	}
 	// Unix directory modes and Windows readonly attributes are preserved only
 	// on the newly constructed, owner-checked staging tree.
@@ -183,6 +168,93 @@ func copyVerified(from, to string, expected Snapshot) error {
 		return diagnostics.New(diagnostics.Verification, "stage")
 	}
 	return nil
+}
+
+const ownedCopyWorkers = 4
+
+// A job reservation and a recorded failure share one lock: after a failure is
+// recorded, only already reserved jobs may finish. Partial owned objects remain
+// available to the transaction's recovery path.
+type ownedCopyQueue struct {
+	mu    sync.Mutex
+	files []Entry
+	next  int
+	err   error
+}
+
+func (q *ownedCopyQueue) claim() (Entry, bool) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	if q.err != nil || q.next >= len(q.files) {
+		return Entry{}, false
+	}
+	entry := q.files[q.next]
+	q.next++
+	return entry, true
+}
+
+func (q *ownedCopyQueue) failed(err error) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	if q.err == nil {
+		q.err = err
+	}
+}
+
+// copySnapshotEntries accepts only the already inspected snapshot. Directories
+// are constructed serially before disjoint regular leaves enter the fixed pool.
+// The injected copy function is local to the call; production always uses the
+// unchanged owner-checked, durable platform.CopyOwnedFile operation.
+func copySnapshotEntries(from, to string, entries []Entry, copyFile func(string, string, int64, os.FileMode) error) error {
+	files := make([]Entry, 0, len(entries))
+	for _, entry := range entries {
+		if !entry.Directory {
+			files = append(files, entry)
+			continue
+		}
+		target := to
+		if entry.Path != "" {
+			target = filepath.Join(to, filepath.FromSlash(entry.Path))
+		}
+		if err := platform.Mkdir(target); err != nil {
+			return err
+		}
+	}
+	copyEntry := func(entry Entry) error {
+		source, target := from, to
+		if entry.Path != "" {
+			source = filepath.Join(from, filepath.FromSlash(entry.Path))
+			target = filepath.Join(to, filepath.FromSlash(entry.Path))
+		}
+		return copyFile(source, target, MaxFileBytes, os.FileMode(entry.Mode))
+	}
+	if len(files) == 0 {
+		return nil
+	}
+	if len(files) == 1 {
+		return copyEntry(files[0])
+	}
+	queue := ownedCopyQueue{files: files}
+	workers := min(ownedCopyWorkers, len(files))
+	var joined sync.WaitGroup
+	joined.Add(workers)
+	for i := 0; i < workers; i++ {
+		go func() {
+			defer joined.Done()
+			for {
+				entry, ok := queue.claim()
+				if !ok {
+					return
+				}
+				if err := copyEntry(entry); err != nil {
+					queue.failed(err)
+					return
+				}
+			}
+		}()
+	}
+	joined.Wait()
+	return queue.err
 }
 
 // CopyVerified copies only a bound, owned regular tree and verifies both ends.
