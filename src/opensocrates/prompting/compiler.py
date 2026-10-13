@@ -14,11 +14,11 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any
 
-from ..domain.locales import complete_locale_set
 from ..content.hashes import sha256_hex
 from ..content.schema import PROMPT_FRAGMENT_IDS
 from ..domain.capability import validate_capability_profile
 from ..domain.enums import CapabilityStatus, Participation, Rigor, TaskState
+from ..domain.locales import complete_locale_set
 from ..domain.models import (
     CapabilityProfile,
     CompiledContentBundle,

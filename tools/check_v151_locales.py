@@ -7,9 +7,8 @@ import re
 import unittest
 from pathlib import Path
 
-from validate_content import parse_yaml_file
-
 from opensocrates.content.loader import load_reasoning_content_projections
+from validate_content import parse_yaml_file
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCALES = ("en", "ko", "zh", "ja")

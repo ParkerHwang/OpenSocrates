@@ -731,8 +731,8 @@ def _test_locale_resolution() -> None:
 
 @_check("VSC-02B-cjk-procedure-length-and-completeness")
 def _test_cjk_procedure_contract() -> None:
-    from opensocrates.content.method import PROCEDURE_HEADINGS, validate_procedure
     from opensocrates.content.locale import load_locale, validate_locale_parity
+    from opensocrates.content.method import PROCEDURE_HEADINGS, validate_procedure
 
     def procedure(body: str) -> str:
         return (
@@ -752,15 +752,17 @@ def _test_cjk_procedure_contract() -> None:
         text = procedure(script * 35)
         _require(validate_procedure(text, method_id="deduction", locale=locale) == text)
         _expect_raises(
-            lambda: validate_procedure(procedure(script), method_id="deduction", locale=locale)
+            lambda script=script, locale=locale: validate_procedure(
+                procedure(script), method_id="deduction", locale=locale
+            )
         )
         _expect_raises(
-            lambda: validate_procedure(
+            lambda script=script, locale=locale: validate_procedure(
                 procedure(script * 1000), method_id="deduction", locale=locale
             )
         )
         _expect_raises(
-            lambda: validate_procedure(
+            lambda text=text, locale=locale: validate_procedure(
                 text.replace("## Stop conditions", "## Missing"),
                 method_id="deduction",
                 locale=locale,
@@ -783,7 +785,7 @@ def _test_cjk_procedure_contract() -> None:
         )
         validate_locale_parity(en, localized)
         _expect_raises(
-            lambda: validate_locale_parity(
+            lambda en=en, locale=locale: validate_locale_parity(
                 en, {"locale": locale, "messages": {"status": "值 {other}"}}
             )
         )

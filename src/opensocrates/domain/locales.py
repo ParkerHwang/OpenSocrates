@@ -14,26 +14,7 @@ def complete_locale_set(locales: object) -> bool:
     return locales == LEGACY_LOCALES or locales == frozenset(SUPPORTED_LOCALES)
 
 
-def detect_prompt_locale(
-    prompt: str,
-    *,
-    explicit_locale: SupportedLocale | None = None,
-    settings_locale: SupportedLocale | None = None,
-    count_ascii_digits: bool = True,
-) -> SupportedLocale:
-    """Prefer trusted choices, then Kana, dominant Hangul/Han, then English.
-
-    Han-only text is ambiguous between Chinese and Japanese and defaults to zh;
-    callers can supply ja explicitly. Unknown scripts and ties default to en.
-    This recognizes scripts, not instructions to change locale inside a source.
-    """
-    if not isinstance(prompt, str):
-        raise ValueError("current prompt must be text")
-    for preference in (explicit_locale, settings_locale):
-        if preference is not None:
-            if preference not in SUPPORTED_LOCALES:
-                raise ValueError("locale preference is unsupported")
-            return preference
+def _script_counts(prompt: str, count_ascii_digits: bool) -> tuple[bool, int, int, int]:
     korean = english = han = 0
     kana = False
     for character in prompt:
@@ -56,6 +37,30 @@ def detect_prompt_locale(
             character.isalpha() or (count_ascii_digits and character.isdigit())
         ):
             english += 1
+    return kana, korean, english, han
+
+
+def detect_prompt_locale(
+    prompt: str,
+    *,
+    explicit_locale: SupportedLocale | None = None,
+    settings_locale: SupportedLocale | None = None,
+    count_ascii_digits: bool = True,
+) -> SupportedLocale:
+    """Prefer trusted choices, then Kana, dominant Hangul/Han, then English.
+
+    Han-only text is ambiguous between Chinese and Japanese and defaults to zh;
+    callers can supply ja explicitly. Unknown scripts and ties default to en.
+    This recognizes scripts, not instructions to change locale inside a source.
+    """
+    if not isinstance(prompt, str):
+        raise ValueError("current prompt must be text")
+    for preference in (explicit_locale, settings_locale):
+        if preference is not None:
+            if preference not in SUPPORTED_LOCALES:
+                raise ValueError("locale preference is unsupported")
+            return preference
+    kana, korean, english, han = _script_counts(prompt, count_ascii_digits)
     if kana:
         return "ja"
     if korean > max(english, han):
