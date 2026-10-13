@@ -63,6 +63,17 @@ docs-check:
 		--path README.ko.md \
 		--path README.zh.md \
 		--path README.ja.md \
+		--path README.fr.md \
+		--path README.de.md \
+		--path README.it.md \
+		--path README.es.md \
+		--path README.pt.md \
+		--path README.th.md \
+		--path docs/v1.5.2.md \
+		--path docs/v1.5.2.ko.md \
+		--path docs/v1.5.2-language-review.md \
+		--path docs/settings.md \
+		--path docs/settings.ko.md \
 		--path docs/v1.5.1.md \
 		--path docs/v1.5.1.ko.md \
 		--path docs/v1.5.1-language-review.md \

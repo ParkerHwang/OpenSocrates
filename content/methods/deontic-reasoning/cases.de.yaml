@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deontic-reasoning-positive-01
+    kind: positive
+    prompt: "Datenteilung könnte nützen, doch Zustimmung und Datenschutzrichtlinie bestimmen Muss, Darf und Verbot."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "Pflichten, Erlaubnis, Verbot, Zustimmung und identifizierbare Regelquelle begrenzen Entscheidung."
+  - id: deontic-reasoning-positive-02
+    kind: positive
+    prompt: "Eine klinische Fachperson fragt nach Konflikt zweier Pflichten im benannten Berufskodex und erlaubten Zwischenhandlungen."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "Gefordert sind quellenbasierter normativer Status und Konfliktbehandlung statt nur Ergebnisoptimierung."
+  - id: deontic-reasoning-positive-03
+    kind: positive
+    prompt: "Arbeitsrichtlinie scheint Meldung zu verlangen, Zustimmungsausnahme zu erlauben und sensible Weitergabe zu verbieten; kläre Optionen."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "Handlungssatz enthält erforderliche, erlaubte, verbotene und Ausnahmezustände aus Richtlinie."
+  - id: deontic-reasoning-negative-01
+    kind: negative
+    prompt: "Vergleiche zwei Dienststrategien nach beobachtbaren Folgen und umkehrbarem Pilot ohne begrenzende Regel."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "Praktischer Optionenvergleich ohne normative Autoritätsfrage."
+  - id: deontic-reasoning-negative-02
+    kind: negative
+    prompt: "Prinzip und schwierige Fälle widersprechen sich; revidiere sie bei Ermessen für bessere Kohärenz."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "Gegenseitige Anpassung von Prinzipien und Urteilen ist spezifischere Route."
+  - id: deontic-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Kopiere Richtlinienklauseln in Checkliste ohne Pflicht- oder Erlaubnisdeutung."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Textkopieren ist mechanisch, keine normative Auslegung gefragt."
+  - id: deontic-reasoning-explicit-01
+    kind: explicit
+    prompt: "Nutze deontic-reasoning zur Trennung von Erlaubtem, Erforderlichem, Verbotenem und Offenem in diesem Vertrag."
+    expected_route: deontic-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, duties_rights, explicit_rules]
+    rationale: "Nutzer fordert ausdrücklich quellenbasierte normative Klassifikation."
+  - id: deontic-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "Ohne Regel, Rolle, Rechtsraum oder Zustimmungsvorgabe erkläre die Handlung rechtlich erforderlich."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [duties_rights, decisive_input_missing]
+    rationale: "Autorität und Umfang fehlen; bindende Pflicht darf nicht erfunden werden."

@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "mece-positive-01",
+      "kind": "positive",
+      "prompt": "กลุ่มลูกค้าเหล่านี้ไม่ซ้อนและครอบคลุมร่วมกันสำหรับการตัดสินซื้อเดียวนี้หรือไม่",
+      "expected_route": "mece",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "category_overlap",
+        "tangled_hierarchy"
+      ],
+      "rationale": "ผู้ใช้ขอตรวจซ้อนและครอบคลุมแยกภายใต้แกนหมวดเดียว"
+    },
+    {
+      "id": "mece-positive-02",
+      "kind": "positive",
+      "prompt": "ออกแบบหมวดเสี่ยงใหม่ให้ไม่มีกรณีลงสองหมวดและไม่ละกรณีสำคัญ",
+      "expected_route": "mece",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "category_overlap",
+        "tangled_hierarchy"
+      ],
+      "rationale": "ผลที่ขอคือกฎหมวดพร้อมตรวจซ้อน ช่องว่าง และละเอียด"
+    },
+    {
+      "id": "mece-positive-03",
+      "kind": "positive",
+      "prompt": "ตรวจว่ากิ่งต้นไม้ประเด็นใช้แกนเดียว ละเอียดสม่ำเสมอ และครอบคลุมจักรวาลระบุหรือไม่",
+      "expected_route": "mece",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "category_overlap",
+        "tangled_hierarchy"
+      ],
+      "rationale": "เป็นการตรวจ ME/CE เฉพาะ ไม่ใช่วินิจฉัยกว้างแบบแตกซ้ำ"
+    },
+    {
+      "id": "mece-negative-01",
+      "kind": "negative",
+      "prompt": "แตกเหตุระบบล่มซ้ำเป็นระดับและแนบทดสอบทุกปลายกิ่ง",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "tangled_hierarchy",
+        "diagnose"
+      ],
+      "rationale": "งานต้องต้นไม้ตรรกะครบ ไม่ใช่เพียงตรวจคุณภาพหมวด"
+    },
+    {
+      "id": "mece-negative-02",
+      "kind": "negative",
+      "prompt": "เก็บป้ายที่ซ้อนเพราะการซ้อนแทนอัตลักษณ์ลูกค้ามีความหมาย",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "ambiguous_terms",
+        "human_need"
+      ],
+      "rationale": "ซ้อนธรรมชาติตั้งใจ การฝืนไม่ซ้อนบิดสิ่งศึกษา"
+    },
+    {
+      "id": "mece-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "เรียงหมวดที่ให้ตามอักษรและรักษาคำอธิบาย",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "เรียงอักษรเป็นเชิงกล ไม่ประเมินตรรกะหมวด"
+    },
+    {
+      "id": "mece-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ mece ชัดเจนตรวจกลุ่มเจ้าของในโมเดลดำเนินงานนี้",
+      "expected_route": "mece",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "category_overlap"
+      ],
+      "rationale": "ผู้ใช้ระบุการตรวจซ้อนและครอบคลุมแกนเดียวชัด"
+    },
+    {
+      "id": "mece-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "บอกว่าหมวดเป็น MECE หรือไม่ แต่ไม่ระบุจักรวาล เป้าหมายจัดหมวด หรือกฎหมวด",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "category_overlap",
+        "decisive_input_missing"
+      ],
+      "rationale": "ประเมิน ME และ CE ไม่ได้โดยไร้จักรวาลมีขอบ เป้าหมาย และกฎสมาชิก"
+    }
+  ]
+}

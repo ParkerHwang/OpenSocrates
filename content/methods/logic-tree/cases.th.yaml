@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "logic-tree-positive-01",
+      "kind": "positive",
+      "prompt": "ทำไมลูกค้าเลิกใช้เพิ่ม และจะแตกเหตุเป็นกิ่งทดสอบได้ไม่ซ้อนอย่างไร",
+      "expected_route": "logic-tree",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "tangled_hierarchy",
+        "diagnose",
+        "plan"
+      ],
+      "rationale": "วินิจฉัยกว้างต้องต้นไม้ why พร้อมแกนชัด ตรวจ MECE และทดสอบปลายกิ่ง"
+    },
+    {
+      "id": "logic-tree-positive-02",
+      "kind": "positive",
+      "prompt": "สร้างต้นไม้ประเด็นครบเพื่อลดการเริ่มใช้ล้มเหลว พร้อมขั้นตรวจทุกปลายกิ่ง",
+      "expected_route": "logic-tree",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "tangled_hierarchy",
+        "plan"
+      ],
+      "rationale": "ผลที่ขอคือความครอบคลุมและการแตกที่ลงมือได้"
+    },
+    {
+      "id": "logic-tree-positive-03",
+      "kind": "positive",
+      "prompt": "แตกคำถามเสี่ยงกว้างเป็นกิ่งไม่ซ้อนที่ทีมปฏิบัติการมอบหมายและทดสอบได้",
+      "expected_route": "logic-tree",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "tangled_hierarchy",
+        "diagnose"
+      ],
+      "rationale": "งานต้องกิ่งลำดับชั้น ตรวจครอบคลุม และปลายกิ่งทำได้"
+    },
+    {
+      "id": "logic-tree-negative-01",
+      "kind": "negative",
+      "prompt": "ตรวจว่าหมวดเดิมซ้อนหรือมีกรณีขาดหรือไม่",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "category_overlap",
+        "tangled_hierarchy"
+      ],
+      "rationale": "ตรวจหมวดเฉพาะเป็นงาน MECE ไม่ใช่สร้างต้นไม้ซ้ำระดับ"
+    },
+    {
+      "id": "logic-tree-negative-02",
+      "kind": "negative",
+      "prompt": "วาดวงป้อนกลับระหว่างตัวแปรและระบุพลวัตเสริมแรงกับสมดุล",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "วงป้อนกลับพึ่งกันไม่เหมาะลำดับชั้น ต้องวิธีระบบ"
+    },
+    {
+      "id": "logic-tree-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "เยื้องหัวข้อให้เป็นต้นไม้โครงเดียวกับตัวอย่าง",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "จัดเยื้องตามที่ให้เป็นงานรูปแบบเชิงกล"
+    },
+    {
+      "id": "logic-tree-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ logic-tree โดยชัดแจ้งจัดโครงเหตุการปล่อยรุ่นล่าช้า",
+      "expected_route": "logic-tree",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "tangled_hierarchy"
+      ],
+      "rationale": "ผู้ใช้เลือกโครงสร้างวินิจฉัยลำดับชั้นชัด"
+    },
+    {
+      "id": "logic-tree-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "สร้างต้นไม้ประเด็นครบแต่ไม่ระบุคำถามราก ขอบเขต หรือตัววัดสำเร็จ",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "tangled_hierarchy",
+        "decisive_input_missing"
+      ],
+      "rationale": "ไม่มีรากมีขอบ จึงตัดสินความครอบคลุมและลงมือปลายกิ่งปลอดภัยไม่ได้"
+    }
+  ]
+}

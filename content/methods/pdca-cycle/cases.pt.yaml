@@ -1,0 +1,112 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "pdca-cycle-positive-1",
+      "kind": "positive",
+      "prompt": "Uma fila de suporte tem referência verificada e hipótese de que pequena mudança de triagem reduzirá espera sem piorar qualidade da resolução. Defina Plan, Do delimitado, regra Check e decisão Act para um ciclo reversível.",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis",
+        "chosen_plan"
+      ],
+      "rationale": "É iteração operacional controlada com referência, objetivo mensurável, escopo seguro e decisão de padronizar ou revisar. Preserve a referência verificada e rotule separadamente novas evidências de comparação."
+    },
+    {
+      "id": "pdca-cycle-positive-2",
+      "kind": "positive",
+      "prompt": "Propomos mudar rótulos de embalagem por uma semana em uma zona do depósito. Defina objetivo, métrica, salvaguardas e parada; compare esperado e observado e decida padronizar ou revisar.",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis",
+        "chosen_plan"
+      ],
+      "rationale": "Zona pequena e uma semana permitem PDCA delimitado. Mantenha comparação local sem chamar um ciclo de prova de padrão permanente."
+    },
+    {
+      "id": "pdca-cycle-positive-3",
+      "kind": "positive",
+      "prompt": "Um gargalo conhecido do fluxo tem mudança proposta, responsável e medida reproduzível. Faça um roteiro Plan–Do–Check–Act que registre desvios e crie a próxima hipótese versionada de melhoria.",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis",
+        "practical_consequence"
+      ],
+      "rationale": "Condição e medida estão estabelecidas: melhoria iterativa, não descoberta de causa raiz. O próximo estado torna visíveis aprendizagem e revisão do padrão."
+    },
+    {
+      "id": "pdca-cycle-negative-1",
+      "kind": "negative",
+      "prompt": "Um defeito de produção tem várias causas possíveis e nenhuma cronologia confiável. Experimente imediatamente uma aprovação nova para ver se o defeito desaparece.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "diagnose",
+        "causal_question",
+        "confounding",
+        "decisive_input_missing"
+      ],
+      "rationale": "Causa desconhecida e evidências ausentes tornam o ciclo propenso a mascarar falha. Análise de causa raiz deve delimitar causalidade antes de testar outra mudança."
+    },
+    {
+      "id": "pdca-cycle-negative-2",
+      "kind": "negative",
+      "prompt": "Um derramamento químico continua ativo. Mude o padrão de manuseio no local e aprenda com a próxima exposição antes de chamar a equipe de incidentes.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "safety_critical_validation",
+        "recurring_failure"
+      ],
+      "rationale": "Dano ativo e emergência contraindicam PDCA improvisado. Contenção e procedimentos qualificados precedem aprendizagem iterativa."
+    },
+    {
+      "id": "pdca-cycle-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Some as quatro contagens diárias fornecidas e retorne o total sem interpretar o processo ou recomendar mudança.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Somar contagens é cálculo determinístico, não decisão PDCA de melhoria."
+    },
+    {
+      "id": "pdca-cycle-explicit-1",
+      "kind": "explicit",
+      "prompt": "Use ciclo PDCA nesta melhoria operacional. Mostre objetivo e medida, escopo Do delimitado, regra Check, decisão Act, estado das evidências e hipótese do próximo ciclo.",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis"
+      ],
+      "rationale": "O usuário nomeia método e saídas exigidas. Suspenda se faltar medida decisiva ou escopo seguro."
+    },
+    {
+      "id": "pdca-cycle-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Melhore nosso processo com PDCA. Não temos objetivo, referência, mudança proposta, medida, escopo seguro, responsável ou regra para padronizar resultado.",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis"
+      ],
+      "rationale": "PDCA é pedido, mas faltam entradas decisivas. Suspenda em vez de executar mudança ilimitada ou padronizar resultado não medido."
+    }
+  ]
+}

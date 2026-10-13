@@ -104,7 +104,10 @@ def _read_authored_json(path: Path) -> Any:
 def load_response_policy(path: Path) -> Mapping[str, Any]:
     """Load separate locale authoring files at build time, never host/user text."""
     manifest = _read_authored_json(path)
-    expected = {locale: f"response-policy/{locale}.yaml" for locale in ("en", "ko", "zh", "ja")}
+    expected = {
+        locale: f"response-policy/{locale}.yaml"
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
+    }
     if not isinstance(manifest, dict) or manifest.get("locales") != expected:
         raise ValueError("response policy locale source paths invalid")
     if (path.parent / "response-policy").is_symlink():
@@ -131,7 +134,7 @@ def policy_identity(policy: Mapping[str, Any]) -> str:
 def response_guidance(
     policy: Mapping[str, Any], locale: str, shape: str = "default"
 ) -> dict[str, Any]:
-    if locale not in {"en", "ko", "zh", "ja"}:
+    if locale not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
         raise ValueError("unsupported response locale")
     selected_shape = shape if shape in SHAPES else "default"
     entry = policy["locales"][locale]
@@ -169,6 +172,30 @@ def render_response_guidance(policy: Mapping[str, Any], locale: str) -> str:
             "表現の作成ガイド",
             "作成の指針のみです。自動書き換え、遵守の検証、長さの上限、必須内容の削除を意味しません。",
         ),
+        "fr": (
+            "Conseils de rédaction",
+            "Conseils uniquement : aucune réécriture automatique, conformité vérifiée, limite de longueur ou suppression de contenu obligatoire.",
+        ),
+        "de": (
+            "Hinweise zur Formulierung",
+            "Nur Hinweise: keine automatische Umschreibung, bestätigte Regelkonformität, Längenbegrenzung oder Entfernung erforderlicher Inhalte.",
+        ),
+        "it": (
+            "Guida alla formulazione",
+            "Solo indicazioni: nessuna riscrittura automatica, conformità verificata, limite di lunghezza o rimozione di contenuti obbligatori.",
+        ),
+        "es": (
+            "Orientación para redactar",
+            "Solo orientación: sin reescritura automática, cumplimiento verificado, límite de longitud ni eliminación de contenido obligatorio.",
+        ),
+        "pt": (
+            "Orientação de redação",
+            "Apenas orientação: sem reescrita automática, conformidade verificada, limite de tamanho ou remoção de conteúdo obrigatório.",
+        ),
+        "th": (
+            "แนวทางการเรียบเรียง",
+            "เป็นเพียงแนวทาง ไม่ใช่การเขียนใหม่อัตโนมัติ การยืนยันว่าทำตามข้อกำหนด การจำกัดความยาว หรือการลบเนื้อหาที่จำเป็น",
+        ),
     }[locale]
     lines = [
         f"### {heading}",
@@ -183,7 +210,7 @@ def render_response_guidance(policy: Mapping[str, Any], locale: str) -> str:
 
 def measure_visible_output(text: str, locale: str) -> dict[str, Any]:
     """Measure the complete public artifact, including required sections, without editing it."""
-    if locale not in {"en", "ko", "zh", "ja"}:
+    if locale not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
         raise ValueError("unsupported measurement locale")
     return {
         "locale": locale,
@@ -196,6 +223,12 @@ def measure_visible_output(text: str, locale: str) -> dict[str, Any]:
             "ko": "eojeol_like",
             "zh": "unicode_scalar",
             "ja": "unicode_scalar",
+            "fr": "word_like",
+            "de": "word_like",
+            "it": "word_like",
+            "es": "word_like",
+            "pt": "word_like",
+            "th": "unicode_scalar",
         }[locale],
         "scope": "complete_public_artifact",
         "quality_inference": "none",

@@ -1,0 +1,87 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: cost-benefit-analysis-positive-1
+    kind: positive
+    prompt: "Precisamos escolher entre um novo serviço e a referência atual. O livro financeiro informa custos de implementação e operação, o relatório piloto informa adesão medida e a questão principal é se os benefícios justificam os custos no horizonte declarado."
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "Referência e várias opções são explícitas, e benefícios e custos relevantes têm proveniência identificável. Efeitos não monetários podem ficar separados, mas a comparação é relevante à decisão."
+  - id: cost-benefit-analysis-positive-2
+    kind: positive
+    prompt: "Compare dois programas de saúde pública com não fazer nada. Registros administrativos descrevem custos de prestação, uma avaliação relata resultados medidos e a decisão deve mostrar quem paga, quem se beneficia e quais efeitos de segurança ou equidade não podem virar dinheiro."
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - practical_consequence
+    rationale: "A tarefa pede comparação econômica com referência, distribuição e valores não compensáveis. As evidências de resultado são rotuladas pela fonte, não tratadas como garantidas."
+  - id: cost-benefit-analysis-positive-3
+    kind: positive
+    prompt: "Um projeto de substituição tem custos iniciais e benefícios em tempos diferentes. Use o horizonte aprovado e a regra documentada de desconto da organização; mostre como a implicação muda se os pressupostos documentados variarem dentro dos intervalos sustentados."
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - sensitive_inputs
+    rationale: "Temporalidade, limites reais do cálculo e sensibilidade a pressupostos com fontes tornam esta uma comparação custo-benefício. O pedido fornece proveniência, não uma taxa padrão nem certeza inventada."
+  - id: cost-benefit-analysis-negative-1
+    kind: negative
+    prompt: "Uma norma de segurança exige uma etapa de inspeção em todas as instalações; a equipe pergunta se é legal omiti-la. Não há opção discricionária; o texto aplicável é a evidência decisiva."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "É uma questão de deveres e regras sem escolha real. Um cálculo de benefício líquido não pode eliminar uma exigência vinculante."
+  - id: cost-benefit-analysis-negative-2
+    kind: negative
+    prompt: "Escolha o melhor dos três projetos por confiabilidade, acessibilidade, impacto ecológico e dignidade. O solicitante rejeita monetizar dignidade e não tem preços defensáveis para outros critérios; quer comparar critérios com transparência."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - no_coherent_dimensions
+    rationale: "A provável confusão é trade-off-analysis: a decisão precisa de critérios explícitos e restrições não compensáveis, não de total monetário forçado."
+  - id: cost-benefit-analysis-mechanical-1
+    kind: mechanical
+    prompt: "Aplique a fórmula fornecida na planilha a estes custos e benefícios já verificados e retorne o total aritmético. Não se pede opção, julgamento da referência, incerteza ou recomendação."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "É um cálculo fixo sem comparação discricionária. O método deve permanecer silencioso enquanto um caminho mecânico aplica a fórmula."
+  - id: cost-benefit-analysis-explicit-1
+    kind: explicit
+    prompt: "Use cost-benefit-analysis nesta decisão de financiamento. Compare a opção financiada com a referência documentada, mantenha visíveis efeitos distributivos e suspenda avaliações sem suporte em vez de preenchê-las."
+    expected_route: cost-benefit-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - choose
+      - multiple_options
+    rationale: "O usuário invoca explicitamente o método e sua comparação pública exigida. Ele permanece primário; valores sem suporte ficam pressupostos ou não verificados."
+  - id: cost-benefit-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "Diga qual destes dois projetos é melhor. Não tenho referência acordada, horizonte temporal, registros de custos e só tenho alegações promocionais sobre benefícios."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - decisive_input_missing
+    rationale: "Faltam referência e entradas relevantes que mudariam a decisão; as alegações disponíveis não têm proveniência. O método deve suspender e pedir apenas o menor reparo decisivo."

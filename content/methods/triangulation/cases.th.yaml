@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: triangulation-positive-01
+    kind: positive
+    prompt: "ข้อมูลสำรวจ พฤติกรรม และข้อมูลบริหารที่อิสระกันยืนยันข้ออ้างการคงอยู่ของลูกค้านี้ได้หรือไม่"
+    expected_route: triangulation
+    expected_behavior: route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "ต้องตรวจสายหลักฐานต่างกันเรื่องความอิสระ การสอดคล้อง ความขัดแย้ง และช่องว่าง"
+  - id: triangulation-positive-02
+    kind: positive
+    prompt: "ผู้เกี่ยวข้องเหล่านี้อ้างวิธีต่างกัน ตรวจว่าหลักฐานบรรจบผลเดียวกันจริงหรือไม่"
+    expected_route: triangulation
+    expected_behavior: route
+    decisive_features: [reconcile_evidence, conflicting_sources]
+    rationale: "งานเทียบสายหลักฐานและป้องกันข้อมูลต้นทางซ้ำแอบอ้างเป็นการยืนยันร่วม"
+  - id: triangulation-positive-03
+    kind: positive
+    prompt: "สัมภาษณ์เชิงคุณภาพกับการทดลองของเราขัดกัน การตรวจอิสระใดเพิ่มเติมจะแก้ความขัดแย้งสำคัญ"
+    expected_route: triangulation
+    expected_behavior: route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "ความเห็นต่างสำคัญต้องตรวจความอิสระและสายถัดไปที่เจาะจง"
+  - id: triangulation-negative-01
+    kind: negative
+    prompt: "จัดอันดับแต่ละแหล่งตามคุณภาพรูปแบบ ความตรง และการใช้กับประชากรเป้าหมาย"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "งานประเมินคุณภาพแต่ละแหล่ง ไม่ใช่ความอิสระข้ามสายหลักฐาน"
+  - id: triangulation-negative-02
+    kind: negative
+    prompt: "ปรับความมั่นใจก่อนหน้าในสมมติฐานเหล่านี้หลังผลทดสอบใหม่"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "การปรับจากความเชื่อก่อนสู่หลังที่กำหนดเป็น Bayesian updating ไม่ใช่การตรวจสอบหลายทาง"
+  - id: triangulation-mechanical-01
+    kind: mechanical
+    prompt: "รวมตารางหลักฐานสามตารางที่ให้เป็นตารางเดียวและรักษาทุกแถว"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "รวมตารางเป็นเชิงกล ไม่ประเมินความอิสระหรือการสอดคล้อง"
+  - id: triangulation-explicit-01
+    kind: explicit
+    prompt: "ใช้ triangulation อย่างชัดเพื่อตรวจว่าข้ออ้างผลกระทบต่อลูกค้ายังยืนได้หลังการตรวจอิสระหรือไม่"
+    expected_route: triangulation
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, reconcile_evidence]
+    rationale: "ผู้ใช้เรียกการยืนยันข้ามสายอย่างชัดสำหรับข้ออ้างสำคัญ"
+  - id: triangulation-insufficiency-01
+    kind: insufficiency
+    prompt: "รายงานการยืนยันร่วม แต่ทุกแหล่งซ้ำชุดข้อมูลต้นทางเดียวที่ไม่รู้จักและไม่มีสายอิสระ"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [reconcile_evidence, source_quality, decisive_input_missing]
+    rationale: "แหล่งซ้ำที่พึ่งกันทำให้การตรวจสอบหลายทางไม่ได้ จึงต้องพักคำยืนยันร่วม"

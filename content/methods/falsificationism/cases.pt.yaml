@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: falsificationism-positive-01
+    kind: positive
+    prompt: "Qual observação contaria decisivamente contra esta hipótese favorita de produto?"
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "A alegação precisa de previsão arriscada e refutador observável, não mais anedotas confirmatórias."
+  - id: falsificationism-positive-02
+    kind: positive
+    prompt: "Transforme esta explicação em previsão, separe pressupostos auxiliares e defina limiar de falha antes de testar."
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "O resultado pedido é tentativa de refutação preespecificada com condições de medição."
+  - id: falsificationism-positive-03
+    kind: positive
+    prompt: "A previsão fracassada enfraqueceu a teoria, a medição ou um pressuposto auxiliar da configuração?"
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "O método deve localizar o que o teste fracassado realmente questiona."
+  - id: falsificationism-negative-01
+    kind: negative
+    prompt: "Gere várias explicações da anomalia e compare qual melhor explica fatos observados."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Gerar explicações candidatas é abdução quando não há previsão arriscada especificada."
+  - id: falsificationism-negative-02
+    kind: negative
+    prompt: "Classifique fontes por rigor do desenho e ajuste força da alegação à aplicabilidade."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "A tarefa calibra hierarquia de evidências, não tenta refutar."
+  - id: falsificationism-mechanical-01
+    kind: mechanical
+    prompt: "Copie previsão e limiar pré-registrados para o formulário de teste."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copiar especificação fornecida é mecânico."
+  - id: falsificationism-explicit-01
+    kind: explicit
+    prompt: "Invoque falsificationism explicitamente para questionar a alegação de que esta intervenção sempre melhora retenção."
+    expected_route: falsificationism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, testable_claim]
+    rationale: "O usuário seleciona explicitamente teste orientado à refutação de alegação universal."
+  - id: falsificationism-insufficiency-01
+    kind: insufficiency
+    prompt: "Use falsificationism em alegação sem previsão observável e incapaz de declarar o que contaria contra ela."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [testable_claim]
+    rationale: "Aplica-se a contraindicação congelada: sem implicação testável, o método deve recusar, não fabricar refutador."

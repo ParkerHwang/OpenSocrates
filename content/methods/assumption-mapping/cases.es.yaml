@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: assumption-mapping-positive-1
+    kind: positive
+    prompt: "Consideramos un servicio compartido de planificación de comidas. Enumera los supuestos que deben cumplirse, separa importancia y evidencia e identifica la primera prueba segura. Las notas de entrevistas provienen del usuario y no se han comprobado independientemente."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, testable_claim, plan]
+    rationale: "Se requiere explícitamente un registro de supuestos, ejes de importancia y evidencia, conjunto de mayor riesgo y siguiente prueba. Las notas son aportadas por el usuario, no verificadas; debe mostrarse esa incertidumbre sin asignar probabilidades."
+  - id: assumption-mapping-positive-2
+    kind: positive
+    prompt: "Un equipo quiere automatizar la revisión de facturas, pero no sabe si el obstáculo es la deseabilidad para clientes, la factibilidad de los datos o la viabilidad normativa. Mapea los supuestos y elige una validación de baja exposición antes de comprar."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, irreversible_choice, testable_claim]
+    rationale: "Hay varios ámbitos de supuestos y una decisión previa al compromiso. La validación solicitada sigue siendo priorización; debe etiquetar hechos respaldados, supuestos y evidencia normativa ausente."
+  - id: assumption-mapping-positive-3
+    kind: positive
+    prompt: "Tenemos cinco experimentos propuestos para cambiar la programación de voluntarios. Ordena los supuestos por importancia decisoria y solidez probatoria, y adjunta una observación segura y una regla sobre qué cambiaría el plan."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [prioritized_assumptions, testable_claim, chosen_plan]
+    rationale: "El usuario solicita la base de priorización del método, no un experimento terminado. Puede usar etiquetas ordinales y estados verified, unverified, assumed o conflicted sin puntuaciones inventadas."
+  - id: assumption-mapping-negative-1
+    kind: negative
+    prompt: "Nuestro servicio de pago falló tres veces esta semana. Traza la cadena causal, identifica debilidades de control y asigna un responsable de prevención; no propongas un mapa de supuestos de producto."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "Es una solicitud de root-cause-analysis, una posible confusión de familia con el mapeo de supuestos. El resultado requerido es diagnóstico causal y control, no creencias comprobables priorizadas."
+  - id: assumption-mapping-negative-2
+    kind: negative
+    prompt: "Ya seleccionamos un cliente objetivo y un experimento de página de destino. Define la métrica accionable, la ventana de observación y la regla de pivotar o perseverar."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, chosen_plan, plan]
+    rationale: "El supuesto ya está elegido y se solicita operacionalizar un experimento de mercado. Corresponde a lean-startup; este método repetiría el mapa en vez de definir prueba y métrica."
+  - id: assumption-mapping-mechanical-1
+    kind: mechanical
+    prompt: "Ordena alfabéticamente estas seis etiquetas de supuestos y devuélvelas como lista numerada."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Ordenar etiquetas no requiere juicio, incertidumbre ni priorización experimental. Corresponde una respuesta mecánica directa."
+  - id: assumption-mapping-explicit-1
+    kind: explicit
+    prompt: "Usa el mapeo de supuestos para esta idea. Muestra supuestos, ejes de importancia y evidencia, conjunto de mayor riesgo y siguiente prueba segura; deja visibles como no verificadas las afirmaciones sin apoyo."
+    expected_route: assumption-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions, prioritized_assumptions, testable_claim]
+    rationale: "El usuario nombra explícitamente el método y sus resultados públicos. La invocación explícita es principal y las etiquetas solicitadas preservan los límites de procedencia."
+  - id: assumption-mapping-insufficiency-1
+    kind: insufficiency
+    prompt: "Prioriza los supuestos de nuestra propuesta e indica cuál probar primero. Aún no hay pregunta decisoria, resultado deseado, supuestos candidatos ni restricciones de prueba."
+    expected_route: assumption-mapping
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, hidden_assumptions, prioritized_assumptions, no_testable_implication]
+    rationale: "El método encaja, pero faltan datos decisivos. Debe suspender el juicio sin inventar supuestos ni pruebas; la siguiente solicitud debe establecer la decisión y el límite seguro autorizado."

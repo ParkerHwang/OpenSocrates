@@ -129,7 +129,18 @@ def _area(rule_id: str) -> str:
 def _message_map(catalog: Any, locale: str) -> Mapping[str, str] | None:  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
     """Extract one locale's messages from supported compiled-catalog shapes."""
 
-    if not isinstance(locale, str) or locale not in {"en", "ko", "zh", "ja"}:
+    if not isinstance(locale, str) or locale not in {
+        "en",
+        "ko",
+        "zh",
+        "ja",
+        "fr",
+        "de",
+        "it",
+        "es",
+        "pt",
+        "th",
+    }:
         raise RepairRenderError("repair locale is unsupported")
     if isinstance(catalog, Mapping):
         if "locale_messages" in catalog and isinstance(catalog["locale_messages"], Mapping):

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: reflective-equilibrium-positive-01
+    kind: positive
+    prompt: "Ein Fairnessprinzip überzeugt bis zu drei schwierigen Fällen; revidieren Sie Prinzip oder Urteile und halten Sie Restspannung sichtbar."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "Gegenseitige Anpassung überlegter Urteile, Prinzipien und schwieriger Fälle."
+  - id: reflective-equilibrium-positive-02
+    kind: positive
+    prompt: "Eine Institution schätzt Datenschutz und Rechenschaft, aber ein schwieriger Vorfall erzeugt Konflikt; vergleichen Sie möglichst beide bewahrende Revisionen."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "Wertekonflikt mit Spielraum braucht Prinzipien, Fälle, Revision und Restspannung."
+  - id: reflective-equilibrium-positive-03
+    kind: positive
+    prompt: "Akzeptierte Fallurteile eines Berufsteams widersprechen seinem Prinzip; prüfen Sie Gegenbeispiele und zu ändernde Hintergrundannahmen."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "Entscheidend ist Iteration zwischen Fällen, Prinzipien und Annahmen."
+  - id: reflective-equilibrium-negative-01
+    kind: negative
+    prompt: "Eine benannte Vorschrift verbietet die Aktion eindeutig ohne Spielraum; bestimmen Sie erlaubte Alternative."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "Bindende Regel entscheidet Status ohne reflektierende Prinzipienanpassung."
+  - id: reflective-equilibrium-negative-02
+    kind: negative
+    prompt: "Ein Team hat den Einwand eines Beteiligten ohne stärkste faire Prämissen oder Evidenzbedarf verworfen."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute]
+    rationale: "Lücke ist ungeprüfte Gegenposition statt überlegtem Prinzipien-Urteilskonflikt."
+  - id: reflective-equilibrium-mechanical-01
+    kind: mechanical
+    prompt: "Kopieren Sie Prinzipien und Fallbeschreibungen ins Prüfdokument ohne Vergleich oder Revision."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Mechanisches Kopieren ohne normative Kohärenzfrage."
+  - id: reflective-equilibrium-explicit-01
+    kind: explicit
+    prompt: "Nutzen Sie reflective-equilibrium für unser Fairnessprinzip gegenüber schwierigen Fällen und nennen Sie Restspannung."
+    expected_route: reflective-equilibrium
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, value_conflict, argument_dispute]
+    rationale: "Ausdrücklich iterative Fall-Prinzipien-Anpassung."
+  - id: reflective-equilibrium-insufficiency-01
+    kind: insufficiency
+    prompt: "Eine bindende Sicherheitsregel gilt, aber lassen Sie den Assistenten sie wegabwägen, weil ein Fall unfair wirkt."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [value_conflict, binding_rule_without_discretion]
+    rationale: "Die Methode darf keinen Spielraum erfinden oder bindende Sicherheitsregel aufheben."

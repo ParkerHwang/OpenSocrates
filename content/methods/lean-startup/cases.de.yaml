@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lean-startup-positive-1
+    kind: positive
+    prompt: "Wir vermuten, dass Erstnutzer mit einer geführten Checkliste das Onboarding abschließen. Entwerfen Sie einen kleinen umkehrbaren Prototyptest, wählen Sie eine handlungsrelevante Abschlusskennzahl und legen Sie Kurswechsel- oder Fortsetzungsregel vorab fest. Bestehende Nutzungsnotizen stammen vom Nutzer und sind ungeprüft."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, human_need, plan, testable_claim]
+    rationale: "Falsifizierbare Produkthypothese mit begrenztem Prototyp, Kennzahl und Regel. Nutzungsnotizen bleiben nutzerbereitgestellt und ungeprüft statt erfundener Nachfrageevidenz."
+  - id: lean-startup-positive-2
+    kind: positive
+    prompt: "Prüfen Sie vor Aufbau eines vollständigen Bezahlplans, ob eine bestimmte Gruppe kleiner Teams eine Erweiterung für wöchentliche Berichte anfragt. Definieren Sie kleinstes sicheres Angebot, Fenster, Kennzahl, Schwelle und Bedingungen für Kurswechsel oder Abbruch."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, prioritized_assumptions, chosen_plan, testable_claim]
+    rationale: "Ein Minimalangebot reduziert Unsicherheit einer Werthypothese mit handlungsrelevanter Entscheidung. Nachfrage wird nicht vorausgesetzt; Schwelle und Ausgangswert als quellenbasiert, berechnet oder angenommen kennzeichnen."
+  - id: lean-startup-positive-3
+    kind: positive
+    prompt: "Unsere Bindungshypothese lautet, dass eine Erinnerung nach der ersten erfolgreichen Aufgabe Nutzer zu einer zweiten zurückbringt. Schlagen Sie einen begrenzten Test mit Schutzgrenze, hypothesenbezogener Kennzahl und beobachtungsbasierter Folgeentscheidung vor."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, repeat_iteration, human_need, testable_claim]
+    rationale: "Produkthypothese, sicherer Test, Kennzahl und Folgeentscheidung sind ausdrücklich vorhanden. Ein getesteter Kontext darf ohne weitere Evidenz nicht auf alle Nutzer übertragen werden."
+  - id: lean-startup-negative-1
+    kind: negative
+    prompt: "Wir wollen die Medikamentendosis einer realen Patientengruppe ändern, um bessere Therapietreue zu prüfen. Überspringen Sie Sicherheitsprüfung und führen Sie den kleinstmöglichen Realtest aus."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [safety_critical_validation, irreversible_choice]
+    rationale: "Dosisänderung ist kontraindizierte unsichere Exposition, kein zulässiges Minimalexperiment. Ablehnen oder qualifizierter Sicherheits- und klinischer Aufsicht zuführen statt als Lean Startup optimieren."
+  - id: lean-startup-negative-2
+    kind: negative
+    prompt: "Im Lager werden Bestellungen wiederholt falsch kommissioniert. Verfolgen Sie Prozess, Kontrollen und kausale Zweige vor einer Präventionsempfehlung."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "Dies verlangt root-cause-analysis und ist eine mögliche Familienverwechslung: operative Ursachenanalyse statt Markt- oder Produkthypothesentest."
+  - id: lean-startup-mechanical-1
+    kind: mechanical
+    prompt: "Kopieren Sie die drei Produktnamen in der vorgegebenen Reihenfolge in eine CSV-Zeile, ohne Nachfrage zu analysieren."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Deterministische Formatierung ohne Hypothese, Test, Kennzahl oder Lernentscheidung."
+  - id: lean-startup-explicit-1
+    kind: explicit
+    prompt: "Nutzen Sie Lean Startup für diese Produktfrage. Nennen Sie Hypothese, riskanteste Annahme, kleinsten sicheren Test, handlungsrelevante Kennzahl und Schwelle sowie Kurswechsel, Fortsetzung, Abbruch oder Zurückstellung."
+    expected_route: lean-startup
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, testable_hypothesis, prioritized_assumptions, plan]
+    rationale: "Der Nutzer benennt Methode und alle öffentlichen Vertragsfelder. Bei fehlendem Testergebnis oder entscheidender Eingabe muss Zurückstellung verfügbar bleiben."
+  - id: lean-startup-insufficiency-1
+    kind: insufficiency
+    prompt: "Sollen wir diese Idee einführen? Zielnutzer, falsifizierbare Hypothese, riskanteste Annahme, sichere Testgrenze, Kennzahl und Entscheidungsschwelle fehlen."
+    expected_route: lean-startup
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, testable_hypothesis, plan, no_testable_implication]
+    rationale: "Die Familie ist plausibel, aber alle entscheidenden Experimentangaben fehlen. Zurückstellen statt Einführung, Kennzahl oder Nachfrageevidenz zu erfinden."

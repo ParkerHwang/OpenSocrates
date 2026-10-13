@@ -1,0 +1,58 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "game-theory-positive-1"
+    kind: positive
+    prompt: "Se reduzirmos a assinatura, o concorrente principal pode acompanhar ou manter preço; sua resposta muda retenção e margem. Compare respostas críveis antes de recomendar movimento."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "O pedido nomeia preços interdependentes e análise de respostas. Exponha evidências de margem e retenção, sem inventar tabela de ganhos ou probabilidade."
+  - id: "game-theory-positive-2"
+    kind: positive
+    prompt: "Negociamos contrato plurianual. Compromisso de volume pode reduzir custo do fornecedor, mas ele pode priorizar outro comprador se nossa previsão for fraca. Mapeie incentivos, informação e compromissos críveis."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "Ambas as partes se adaptam e ganhos dependem do compromisso da outra. É hipótese estrutural, não custos verificados; rotule pressupostos e incerteza."
+  - id: "game-theory-positive-3"
+    kind: positive
+    prompt: "Duas plataformas consideram padrão compartilhado de interoperabilidade. Adotar gera valor para ambas, mas cada uma pode esperar a outra arcar com integração. Analise respostas e mudança que torne cooperação crível."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "A decisão depende de adoção recíproca e custo de agir primeiro. Resultado estável condicional pode ajudar, mas não o chame equilíbrio sem incentivos sustentados."
+  - id: "game-theory-negative-1"
+    kind: negative
+    prompt: "Escolha banco de dados interno por latência, custo de armazenamento e capacidade de engenharia. Nenhum outro ator pode mudar resultado."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [no_meaningful_interdependence]
+    rationale: "O ambiente é fixo e resposta de jogador não afeta resultado. Não há interdependência estratégica; o método não deve ser selecionado."
+  - id: "game-theory-negative-2"
+    kind: negative
+    prompt: "Avalie forças políticas, econômicas, sociais, tecnológicas, ambientais e jurídicas que afetariam nossa entrada no mercado."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features: [macro_environment, forecast]
+    rationale: "Pode influenciar estratégia, mas exige exame externo, não respostas ou incentivos de jogadores. Provável confusão de família; não invente equilíbrio."
+  - id: "game-theory-mechanical-1"
+    kind: mechanical
+    prompt: "Calcule média ponderada destes quatro preços contratuais com volumes fornecidos."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "É cálculo mecânico de entradas fornecidas; não exige modelar resposta de outro ator."
+  - id: "game-theory-explicit-1"
+    kind: explicit
+    prompt: "Use teoria dos jogos neste leilão de compras. Mostre jogadores, ações, informação, temporalidade e resultado estável condicional, sem inventar ganhos ausentes."
+    expected_route: "game-theory"
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, interacting_actors]
+    rationale: "O usuário nomeia método e estrutura pública. Permanece primário preservando ganhos ausentes e evitando probabilidades inventadas."
+  - id: "game-theory-insufficiency-1"
+    kind: insufficiency
+    prompt: "Devemos ameaçar concorrente com resposta de preços? Não identifiquei ações viáveis dele, nossas consequências, informação de cada lado ou repetição da relação."
+    expected_route: "game-theory"
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, interacting_actors]
+    rationale: "Há interdependência estratégica, mas a estrutura ausente determina credibilidade da ameaça. Suspenda e peça só fatos decisivos, sem prever resposta."

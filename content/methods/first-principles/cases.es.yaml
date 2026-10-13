@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: first-principles-positive-01
+    kind: positive
+    prompt: "¿Qué partes de nuestros precios por usuario son realmente necesarias y cuáles proceden del antiguo proceso comercial?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "El rediseño requiere separar requisitos irreductibles de convenciones y supuestos heredados."
+  - id: first-principles-positive-02
+    kind: positive
+    prompt: "¿Podemos rediseñar este flujo de aprobación desde sus restricciones reales de seguridad en vez de copiar la secuencia actual?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "Se pide descomponer el flujo, verificar necesidades y reconstruirlo."
+  - id: first-principles-positive-03
+    kind: positive
+    prompt: "¿Qué debe seguir siendo cierto al reconstruir este flujo de datos sin asumir la arquitectura del proveedor existente?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "La pregunta central es qué restricciones sobreviven al cuestionar arquitectura heredada."
+  - id: first-principles-negative-01
+    kind: negative
+    prompt: "Aplica la regla obligatoria de conservación a cada registro e informa de infracciones."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "Se aplica una regla vinculante, no se reconsidera ni reconstruye."
+  - id: first-principles-negative-02
+    kind: negative
+    prompt: "Genera cinco combinaciones de parámetros fijos y filtra su factibilidad."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "Los requisitos ya están fijos; la tarea es explorar combinaciones."
+  - id: first-principles-mechanical-01
+    kind: mechanical
+    prompt: "Copia la lista de despliegue existente en la nueva plantilla sin cambiar contenido."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copiar una lista aportada es mecánico y no debe activar razonamiento de rediseño."
+  - id: first-principles-explicit-01
+    kind: explicit
+    prompt: "Usa first-principles para cuestionar que todo ticket de soporte necesite revisión humana."
+    expected_route: first-principles
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions]
+    rationale: "El usuario invoca explícitamente descomponer y verificar un supuesto convencional."
+  - id: first-principles-insufficiency-01
+    kind: insufficiency
+    prompt: "Reconstruye el sistema desde primeros principios sin declarar resultado objetivo, restricciones no negociables ni reglas rectoras de seguridad."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [hidden_assumptions, decisive_input_missing]
+    rationale: "Sin objetivo ni límites duros, se confundiría posibilidad con diseño viable y seguro."

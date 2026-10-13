@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: boundary-critique-positive-01
+    kind: positive
+    prompt: "¿Debe nuestra ciudad juzgar el rediseño de autobuses solo por el tiempo medio de desplazamiento de los pasajeros actuales?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "La conclusión cambia si se incluyen no usuarios, accesibilidad, barrios u horizonte temporal."
+  - id: boundary-critique-positive-02
+    kind: positive
+    prompt: "¿Quién debe contar al decidir si tuvo éxito el piloto de vigilancia laboral?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "El juicio de éxito depende de trabajadores incluidos, contratistas excluidos, titularidad y resultados medidos."
+  - id: boundary-critique-positive-03
+    kind: positive
+    prompt: "¿Sigue teniendo sentido el plan costero contra inundaciones si incluimos inquilinos y los próximos treinta años de costes de traslado?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "Cambiar actores afectados y horizonte puede invertir quién se beneficia, quién paga y qué opción se prefiere."
+  - id: boundary-critique-negative-01
+    kind: negative
+    prompt: "Compara los dos proveedores con alcance explícito según los tres criterios fijos de precio y latencia."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [multiple_options, choose]
+    rationale: "Límite, responsable, horizonte y criterios ya son explícitos; queda comparar opciones."
+  - id: boundary-critique-negative-02
+    kind: negative
+    prompt: "¿Qué párrafo tiene la cita más sólida para la afirmación indicada?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Es una pregunta sobre apoyo de fuentes, no quién o qué pertenece al límite del sistema."
+  - id: boundary-critique-mechanical-01
+    kind: mechanical
+    prompt: "Pasa los actores interesados enumerados a un CSV con columnas de nombre y función."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Dar formato a una lista proporcionada es mecánico y no debe activar un método de juicio."
+  - id: boundary-critique-explicit-01
+    kind: explicit
+    prompt: "Usa boundary-critique para revisar si nuestro compromiso climático excluye a trabajadores de la cadena de suministro."
+    expected_route: boundary-critique
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, boundary_sensitive]
+    rationale: "El usuario invoca explícitamente el método para una pregunta de actores afectados y alcance."
+  - id: boundary-critique-insufficiency-01
+    kind: insufficiency
+    prompt: "Indica si la recomendación cambia al incluir a cualquiera afectado, pero no proporciones decisión, población ni horizonte."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [boundary_sensitive, decisive_input_missing]
+    rationale: "Faltan los datos decisivos que definen el límite; debe suspenderse el juicio sin inventar un conjunto afectado."

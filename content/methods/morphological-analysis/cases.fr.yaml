@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "morphological-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "Un programme public peut varier selon le canal d’accès, l’admissibilité, le calendrier, le personnel et le retour d’information ; construisez une matrice cohérente et filtrez les combinaisons avant de choisir un modèle.",
+      "expected_route": "morphological-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "combinable_dimensions",
+        "stale_options"
+      ],
+      "rationale": "Plusieurs dimensions indépendantes créent un espace d’options qualitatives structuré avec des vérifications de compatibilité par paires."
+    },
+    {
+      "id": "morphological-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "Une refonte de service optimise toujours un seul canal ; explorez les combinaisons du mode de prestation, de la cadence, de la responsabilité et du niveau d’assistance.",
+      "expected_route": "morphological-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "combinable_dimensions",
+        "stale_options"
+      ],
+      "rationale": "L’équipe a besoin de combinaisons non évidentes entre dimensions cohérentes plutôt que d’une nouvelle retouche d’une seule variable."
+    },
+    {
+      "id": "morphological-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "Un atelier stratégique nécessite des configurations conventionnelles, extrêmes et équilibrées selon quatre choix indépendants, avec les paires incompatibles affichées.",
+      "expected_route": "morphological-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "combinable_dimensions",
+        "choose"
+      ],
+      "rationale": "Le résultat requis est une matrice de paramètres, un espace de combinaisons, un examen de cohérence et des concepts représentatifs."
+    },
+    {
+      "id": "morphological-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "L’équipe ne peut définir les dimensions indépendamment et l’incertitude principale porte sur les hypothèses conventionnelles qui sont réellement des contraintes irréductibles.",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "no_coherent_dimensions"
+      ],
+      "rationale": "La découverte des contraintes fondamentales doit précéder l’espace de combinaisons morphologiques."
+    },
+    {
+      "id": "morphological-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "Seules deux options sont faisables et la décision dépend de critères et compromis explicites plutôt que de l’exploration de combinaisons.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "multiple_options",
+        "choose"
+      ],
+      "rationale": "Une comparaison concise suffit sans espace significatif de dimensions à explorer."
+    },
+    {
+      "id": "morphological-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Exportez la matrice de paramètres existante au format CSV sans interpréter ni combiner les valeurs.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "L’exportation est mécanique."
+    },
+    {
+      "id": "morphological-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez morphological-analysis pour produire des configurations de service selon canal, calendrier, responsabilité et intensité, puis filtrez-les.",
+      "expected_route": "morphological-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "combinable_dimensions"
+      ],
+      "rationale": "L’utilisateur nomme explicitement la méthode et sa tâche de combinaison de dimensions."
+    },
+    {
+      "id": "morphological-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Il n’y a qu’une dimension indivisible et aucune valeur cohérente ; créez une grande matrice et choisissez précisément la meilleure combinaison.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "combinable_dimensions",
+        "no_coherent_dimensions"
+      ],
+      "rationale": "Sans dimensions ni valeurs cohérentes, une matrice créerait une fausse structure et une fausse précision."
+    }
+  ]
+}

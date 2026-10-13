@@ -78,7 +78,7 @@ class CompatibilityRequest:
     def __post_init__(self) -> None:
         if not isinstance(self.name, str) or not self.name or len(self.name) > 128:
             raise CompatibilityError("invalid_name", "compatibility name is invalid")
-        if self.locale not in {"en", "ko", "zh", "ja"}:
+        if self.locale not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
             raise CompatibilityError("invalid_locale", "compatibility locale is unsupported")
         if not isinstance(self.private_reasoning_requested, bool):
             raise CompatibilityError("invalid_request", "private reasoning flag is invalid")

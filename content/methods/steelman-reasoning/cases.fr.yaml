@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "steelman-reasoning-positive-01",
+      "kind": "positive",
+      "prompt": "Un conseil écarte une objection de confidentialité comme alarmiste ; reconstruisez sa version loyale la plus forte et dites si elle change le lancement.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "La préoccupation opposée est écartée et peut contenir un risque substantiel méritant sa forme loyale la plus forte."
+    },
+    {
+      "id": "steelman-reasoning-positive-02",
+      "kind": "positive",
+      "prompt": "Deux équipes divergent sur le télétravail ; chaque camp a un objectif cohérent et des preuves. Identifiez la version la plus forte de l’autre camp avant de répondre.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "Une position opposée réelle nécessite reconstruction charitable, soutien requis et réponse loyale."
+    },
+    {
+      "id": "steelman-reasoning-positive-03",
+      "kind": "positive",
+      "prompt": "Un critique de politique n’est cité que sous une étiquette hostile ; retrouvez son affirmation réelle, ses meilleures prémisses et ce que la proposition devrait changer.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "critique"
+      ],
+      "rationale": "La tâche sépare explicitement affirmation publique et caractérisation faible et teste ses conséquences."
+    },
+    {
+      "id": "steelman-reasoning-negative-01",
+      "kind": "negative",
+      "prompt": "Un principe contredit plusieurs jugements réfléchis sur des cas difficiles ; le groupe doit réviser principe ou jugements pour plus de cohérence.",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "La révision mutuelle des principes et cas est le résultat principal, pas la reconstruction d’un adversaire."
+    },
+    {
+      "id": "steelman-reasoning-negative-02",
+      "kind": "negative",
+      "prompt": "Un rapport contient affirmations, fondements, objections et réponses à cartographier neutralement avant d’évaluer le camp opposé.",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "La carte structurelle des affirmations doit être établie avant de choisir une reconstruction loyale."
+    },
+    {
+      "id": "steelman-reasoning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Traduisez l’opposition citée en coréen et préservez son ton sans évaluer ni renforcer la position.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "La traduction est mécanique et ne doit pas déclencher une reconstruction argumentative."
+    },
+    {
+      "id": "steelman-reasoning-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez steelman-reasoning sur l’argument le plus fort contre notre fusion et dites quelles preuves nous feraient changer de cap.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "L’utilisateur demande explicitement un argument opposé loyal pour une décision importante."
+    },
+    {
+      "id": "steelman-reasoning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Aucune déclaration opposée n’existe ; inventez un adversaire sophistiqué et attribuez-le à la communauté pour pouvoir le vaincre.",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "dismissed_opposition",
+        "decisive_input_missing"
+      ],
+      "rationale": "Aucune position publique réelle n’existe ; en inventer une dénaturerait les personnes plutôt que de reconstruire loyalement leur argument."
+    }
+  ]
+}

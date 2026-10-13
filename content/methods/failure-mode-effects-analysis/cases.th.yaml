@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "failure-mode-effects-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "ก่อนปล่อยขั้นตอนจ่ายยา ระบุรูปแบบความล้มเหลว ผล สาเหตุ มาตรการเดิม และมาตรการใดต้องมีเจ้าของ",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "กระบวนการที่นิยามแล้วต้องมีทะเบียนความล้มเหลวล่วงหน้าและเจ้าของมาตรการโดยไม่สร้างคะแนน"
+    },
+    {
+      "id": "failure-mode-effects-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "การออกแบบไปป์ไลน์ข้อมูลใหม่อาจล้มเหลวตอนรับข้อมูล ตรวจข้อมูล หรือแจ้งเตือน จัดลำดับรูปแบบด้วยกฎเชิงลำดับและเสนอมาตรการ",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan"
+      ],
+      "rationale": "งานขอรูปแบบล้มเหลว ผล สาเหตุ ลำดับเชิงคุณภาพ และมาตรการสำหรับแบบที่วางแผน"
+    },
+    {
+      "id": "failure-mode-effects-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "ตรวจขั้นตอนชำระเงินก่อนเปิดตัวว่าผู้ใช้อาจถูกคิดเงินผิดอย่างไร และทีมจะป้องกันหรือตรวจจับแต่ละรูปแบบอย่างไร",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "การตรวจขั้นตอนก่อนปล่อยและกำหนดผู้รับผิดชอบมาตรการเป็นผลเฉพาะของวิธี"
+    },
+    {
+      "id": "failure-mode-effects-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "เลือกแผนเปิดตัวผลิตภัณฑ์แล้ว สมมติว่ามันล้มเหลวไปแล้ว และระบุสาเหตุที่เป็นไปได้ สัญญาณนำ และวิธีลดผลกระทบ",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "มุมมองที่ขอคือจินตนาการความล้มเหลวระดับแผนก่อนผูกมัด"
+    },
+    {
+      "id": "failure-mode-effects-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "ข้อบกพร่องระบบผลิตเกิดซ้ำ ทีมต้องแยกอาการ สาเหตุใกล้เหตุ และสภาพระบบที่ควบคุมได้",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "ความต้องการทันทีคือวินิจฉัยการเกิดซ้ำ ไม่ใช่ทะเบียน FMEA ล่วงหน้า"
+    },
+    {
+      "id": "failure-mode-effects-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "เรียงแถวรูปแบบความล้มเหลวเดิมตามตัวอักษรและคงทุกฟิลด์โดยไม่ประเมินลำดับความสำคัญ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "การเรียงเป็นงานเชิงกลแม้แถวอธิบายความเสี่ยง"
+    },
+    {
+      "id": "failure-mode-effects-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ failure-mode-effects-analysis กับรายการตรวจเปิดตัวนี้ และอย่าสร้างคะแนนความรุนแรง ความถี่ หรือความสามารถตรวจจับ",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "failure_risk",
+        "plan"
+      ],
+      "rationale": "ผู้ใช้ขอวิธีและมาตรการป้องกันความแม่นยำเท็จอย่างชัดเจน"
+    },
+    {
+      "id": "failure-mode-effects-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "ไม่มีขอบเขตกระบวนการหรือหน้าที่ที่ตั้งใจ ถึงอย่างนั้นให้กำหนดตัวเลขลำดับความเสี่ยงแม่นยำแก่ความล้มเหลวที่จินตนาการ",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "failure_risk",
+        "decisive_input_missing"
+      ],
+      "rationale": "เมื่อไม่มีหน้าที่ชัดและมาตราที่รองรับ ต้องพักการประเมินแทนหาปริมาณ"
+    }
+  ]
+}

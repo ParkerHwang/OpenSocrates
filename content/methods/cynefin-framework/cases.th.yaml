@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "cynefin-framework-positive-1",
+      "kind": "positive",
+      "prompt": "ทีมสนับสนุนการเรียกเก็บเงินใช้ต้นไม้ตัดสินใจที่บันทึก และข้อมูลเข้าเดียวให้การแก้เดียวอย่างน่าเชื่อถือ ควรทำการตอบสนองให้เป็นมาตรฐานและติดตามข้อยกเว้นหรือไม่?",
+      "expected_route": "cynefin-framework",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "context_disorder",
+        "diagnose"
+      ],
+      "rationale": "ผู้ใช้บอกความสัมพันธ์คงที่และถามรูปแบบตอบเหมาะสม ข้อสังเกตมาจากผู้ใช้ ควรจำแนกโดยไม่อ้างว่าทุกกรณีอนาคตชัดเจน"
+    },
+    {
+      "id": "cynefin-framework-positive-2",
+      "kind": "positive",
+      "prompt": "หลายทีมพยายามลดหมดไฟ แต่ทุกการแทรกแซงเปลี่ยนภาระงาน ความเชื่อถือ และพฤติกรรมแบบไม่คาดคิด ช่วยเลือกการทดลองเล็ก สังเกตผล และตัดสินว่าจะลองอะไรถัดไป",
+      "expected_route": "cynefin-framework",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "context_disorder",
+        "deep_uncertainty"
+      ],
+      "rationale": "เป็นรูปแบบปรับตัว ไม่ใช่กระบวนการตายตัว ควรแสดงบริบทซับซ้อนและสัญญาณเรียนรู้ชัด ไม่แต่งความน่าจะเป็นสำเร็จของการทดลอง"
+    },
+    {
+      "id": "cynefin-framework-positive-3",
+      "kind": "positive",
+      "prompt": "บริการจริงล้มเหลวหลายภูมิภาคและลูกค้าสูญเสียการเข้าถึงตอนนี้ ต้องตอบสนองควบคุมเหตุทันที แล้วใช้ข้อสังเกตใหม่ปรับการกู้คืน",
+      "expected_route": "cynefin-framework",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "context_disorder",
+        "diagnose"
+      ],
+      "rationale": "ต้องเลือกรูปแบบเร่งด่วนและสัญญาณประเมินใหม่ภายหลัง ข้อเท็จจริงเหตุยังไม่ตรวจอิสระที่นี่ จึงคงความไม่แน่นอนพร้อมสนับสนุนการควบคุม"
+    },
+    {
+      "id": "cynefin-framework-negative-1",
+      "kind": "negative",
+      "prompt": "แปลงขั้นตอนดำเนินงานที่อนุมัติแล้วเหล่านี้เป็นรายการตรวจมีหมายเลขและคงถ้อยคำตรง",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "เป็นงานจัดรูปแบบคำสั่งตายตัว ไม่ใช่ตัดสินจำแนกสถานการณ์ ไม่ต้องส่งวิธีหรือเพิ่มข้ออ้างหลักฐาน"
+    },
+    {
+      "id": "cynefin-framework-negative-2",
+      "kind": "negative",
+      "prompt": "สำรวจการเปลี่ยนการเมือง เศรษฐกิจ สังคม เทคโนโลยี สิ่งแวดล้อม และกฎหมายที่อาจกระทบแผนขยาย",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "ใกล้เคียงเพราะเป็นความไม่แน่นอนกลยุทธ์ แต่ผลชี้ขาดคือทะเบียนปัจจัยภายนอกสำคัญ ไม่ใช่หมวดสถานการณ์กับรูปแบบตอบ อาจสับสนระดับตระกูล"
+    },
+    {
+      "id": "cynefin-framework-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "เรียงเวลาที่เกิดเหตุเหล่านี้ตามลำดับและส่งคืน CSV",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "ผลเป็นเชิงกลและไม่มีการตัดสินบริบทหรือการกระทำที่มีความหมาย ควรเงียบเรื่องส่งวิธี"
+    },
+    {
+      "id": "cynefin-framework-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้กรอบ Cynefin ตัดสินว่าบริการล่มต้องลงมือทันที วิเคราะห์ผู้เชี่ยวชาญ หรือทดลองปลอดภัย แสดงหลักฐานและสัญญาณที่จะเปลี่ยนหมวด",
+      "expected_route": "cynefin-framework",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "context_disorder"
+      ],
+      "rationale": "ผู้ใช้ตั้งชื่อวิธีและขอผลสาธารณะ จึงเป็นหลัก แต่ยังต้องกำกับข้อสังเกตผู้ใช้และไม่เสนอหมวดเป็นความแน่นอน"
+    },
+    {
+      "id": "cynefin-framework-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "ควรทำปัญหานี้เป็นมาตรฐานหรือทดลอง? ยังไม่ได้บอกปัญหา สาเหตุ แรงกดดันเวลา หรือหลักฐานที่มี",
+      "expected_route": "cynefin-framework",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "context_disorder"
+      ],
+      "rationale": "เป็นคำถามรูปแบบตอบจริง แต่ขาดข้อสังเกตชี้ขาด วิธีอาจพักและถามข้อเท็จจริงน้อยที่สุด ห้ามแต่งหมวดหรือความน่าจะเป็น"
+    }
+  ]
+}

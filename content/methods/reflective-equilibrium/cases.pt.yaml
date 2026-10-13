@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "reflective-equilibrium-positive-01",
+      "kind": "positive",
+      "prompt": "Um princípio de justiça parece certo até ser aplicado a três casos difíceis; revise princípio ou julgamentos preservando tensão restante.",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "Pede ajuste mútuo de julgamentos ponderados, princípios e casos difíceis."
+    },
+    {
+      "id": "reflective-equilibrium-positive-02",
+      "kind": "positive",
+      "prompt": "Uma instituição valoriza privacidade e responsabilização, mas incidente difícil cria conflito; compare revisões que preservem ambas o máximo possível.",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "Conflito com margem decisória exige princípios, casos, revisões e tensão explícitos."
+    },
+    {
+      "id": "reflective-equilibrium-positive-03",
+      "kind": "positive",
+      "prompt": "Os julgamentos de casos aceitos por equipe profissional conflitam com seu princípio declarado; teste contraexemplos e identifique suposição de fundo a alterar.",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "A decisão depende de iterar entre casos, princípios e suposições."
+    },
+    {
+      "id": "reflective-equilibrium-negative-01",
+      "kind": "negative",
+      "prompt": "Um regulamento nomeado proíbe claramente a ação sem deixar margem de decisão; determine alternativa permitida.",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "Regra vinculante decide estado sem ajuste reflexivo entre princípios."
+    },
+    {
+      "id": "reflective-equilibrium-negative-02",
+      "kind": "negative",
+      "prompt": "Uma equipe descartou objeção de uma parte interessada sem reconstruir premissas mais fortes e justas ou evidências necessárias.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "A lacuna imediata é oposição não testada, não conflito entre princípios e julgamentos ponderados."
+    },
+    {
+      "id": "reflective-equilibrium-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Copie princípios e descrições de casos para documento de revisão sem comparar nem revisar.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Copiar é mecânico e não pede coerência normativa."
+    },
+    {
+      "id": "reflective-equilibrium-explicit-01",
+      "kind": "explicit",
+      "prompt": "Use reflective-equilibrium para examinar nosso princípio de justiça nestes casos difíceis e declarar a tensão restante.",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "O usuário pede ajuste iterativo entre casos e princípios."
+    },
+    {
+      "id": "reflective-equilibrium-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Há regra vinculante de segurança, mas peça ao assistente para eliminá-la por ponderação porque um caso parece injusto.",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "value_conflict",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "O método não fabrica margem nem sobrepõe regra vinculante de segurança."
+    }
+  ]
+}

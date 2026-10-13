@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deduction-positive-01
+    kind: positive
+    prompt: "A conclusão decorre necessariamente destas premissas de política e da regra de exceção declarada?"
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "O usuário pede consequência formal de premissas e regras explícitas."
+  - id: deduction-positive-02
+    kind: positive
+    prompt: "Verifique se este argumento contratual é válido e se suas premissas realmente têm suporte."
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Validade e solidez devem ser separadas em argumento explícito baseado em regras."
+  - id: deduction-positive-03
+    kind: positive
+    prompt: "Encontre a premissa oculta que faz esta conclusão de conformidade parecer decorrente."
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "A tarefa exige padronizar, revelar premissas ocultas e verificar validade formal."
+  - id: deduction-negative-01
+    kind: negative
+    prompt: "Várias explicações se ajustam à interrupção; escolha a melhor e nomeie o próximo teste discriminante."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Causas concorrentes e evidências discriminantes exigem abdução, não implicação necessária."
+  - id: deduction-negative-02
+    kind: negative
+    prompt: "Estime com que abrangência estas observações sustentam uma alegação geral sobre usuários futuros."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "A extensão pedida é indutiva e depende de representatividade amostral."
+  - id: deduction-mechanical-01
+    kind: mechanical
+    prompt: "Numere as premissas fornecidas e preserve sua redação."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Numerar uma lista fornecida é mecânico."
+  - id: deduction-explicit-01
+    kind: explicit
+    prompt: "Use deduction explicitamente para testar se a regra de elegibilidade declarada implica o resultado deste caso."
+    expected_route: deduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, explicit_rules]
+    rationale: "O usuário invoca explicitamente aplicação formal de regras e verificação de implicação."
+  - id: deduction-insufficiency-01
+    kind: insufficiency
+    prompt: "Diga se a conclusão é válida, sem fornecer premissas, regra, escopo ou texto da conclusão."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [explicit_rules, decisive_input_missing]
+    rationale: "Não se pode avaliar validade sem forma argumentativa e premissas relevantes."

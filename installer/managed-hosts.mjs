@@ -15,7 +15,7 @@ const NAMESPACE = "opensocrates-macos";
 const PLUGIN_ID = `opensocrates@${NAMESPACE}`;
 const SHA = /^(?:sha256:)?[a-f0-9]{64}$/u;
 const METHOD = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
-const LOCALES = ["en", "ko", "zh", "ja"];
+const LOCALES = ["en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"];
 const MAX_FILES = 10_000;
 const MAX_JSON_BYTES = 8 * 1024 * 1024;
 
@@ -157,7 +157,8 @@ function packageLocales(version) {
   const match = /^(\d+)\.(\d+)\.(\d+)$/u.exec(version);
   if (!match) fail("package_identity_mismatch", "Invalid package version.");
   const [major, minor, patch] = match.slice(1).map(Number);
-  return major > 1 || (major === 1 && (minor > 5 || (minor === 5 && patch >= 1))) ? LOCALES : ["en", "ko"];
+  if (major > 1 || (major === 1 && (minor > 5 || (minor === 5 && patch >= 2)))) return LOCALES;
+  return major === 1 && minor === 5 && patch === 1 ? LOCALES.slice(0, 4) : LOCALES.slice(0, 2);
 }
 function canonical(manifest, expected, skillRoot) {
   const locales = packageLocales(manifest.product_version);
@@ -165,12 +166,17 @@ function canonical(manifest, expected, skillRoot) {
   if (manifest.method_count !== 48 || !Array.isArray(ids) || ids.length !== 48 || new Set(ids).size !== 48 || ids.some((id) => typeof id !== "string" || !METHOD.test(id))) fail("invalid_canonical_content", "Expected 48 unique canonical methods.");
   if (!Array.isArray(manifest.canonical_methods) || manifest.canonical_methods.length !== 48 * locales.length) fail("invalid_canonical_content", "Expected the complete canonical procedure inventory for this version.");
   const seen = new Set();
+  const procedurePaths = new Set();
   for (const row of manifest.canonical_methods) {
     if (!object(row) || Object.keys(row).sort().join(",") !== "locale,method_id,path,sha256" || !ids.includes(row.method_id) || !locales.includes(row.locale)) fail("invalid_canonical_content", "Canonical procedure identity is invalid.");
     const name = `${skillRoot}/references/decision/methods/${row.locale}/${row.method_id}.md`;
     const key = `${row.locale}:${row.method_id}`;
     if (row.path !== name || seen.has(key) || expected[name] !== digest(row.sha256)) fail("invalid_canonical_content", "Canonical procedure path or hash is inconsistent.");
     seen.add(key);
+    procedurePaths.add(name);
+  }
+  for (const name of Object.keys(expected)) {
+    if (name.startsWith(`${skillRoot}/references/decision/methods/`) && !procedurePaths.has(name)) fail("invalid_canonical_content", "Unexpected canonical procedure outside this version's locale inventory.");
   }
 }
 async function verifyPackage(root, host, version) {
@@ -211,8 +217,11 @@ async function verifyPackage(root, host, version) {
     const locales = packageLocales(version);
     const localeIds = Object.fromEntries(locales.map((locale) => [locale, new Set()]));
     for (const name of Object.keys(expected)) {
-      const match = /^skills\/opensocrates\/references\/decision\/methods\/(en|ko|zh|ja)\/([a-z0-9-]+)\.md$/u.exec(name);
-      if (match && Object.hasOwn(localeIds, match[1])) localeIds[match[1]].add(match[2]);
+      const match = /^skills\/opensocrates\/references\/decision\/methods\/(en|ko|zh|ja|fr|de|it|es|pt|th)\/([a-z0-9-]+)\.md$/u.exec(name);
+      if (name.startsWith("skills/opensocrates/references/decision/methods/")) {
+        if (!match || !Object.hasOwn(localeIds, match[1])) fail("invalid_canonical_content", "Unexpected canonical procedure locale or path.");
+        localeIds[match[1]].add(match[2]);
+      }
     }
     for (const locale of locales) if (localeIds[locale].size !== 48 || manifest.method_ids.some((id) => !localeIds[locale].has(id))) fail("invalid_canonical_content", "The native companion is missing a complete required locale of canonical procedures.");
   } else {

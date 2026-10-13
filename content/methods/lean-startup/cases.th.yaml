@@ -1,0 +1,111 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "lean-startup-positive-1",
+      "kind": "positive",
+      "prompt": "คิดว่าผู้ใช้ครั้งแรกจะเริ่มใช้สำเร็จถ้าแสดงรายการตรวจนำทาง ออกแบบทดสอบต้นแบบเล็กย้อนกลับ เลือกตัววัดสำเร็จใช้ตัดสินได้ และประกาศกฎ pivot-or-persevere ล่วงหน้า บันทึกใช้เดิมมาจากผู้ใช้และยังไม่ตรวจสอบ",
+      "expected_route": "lean-startup",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "human_need",
+        "plan",
+        "testable_claim"
+      ],
+      "rationale": "เป็นสมมติฐานผลิตภัณฑ์หักล้างได้ มีต้นแบบจำกัดและขอตัววัด/กฎ บันทึกใช้ต้องคง user-provided และ unverified ไม่กลายเป็นหลักฐานอุปสงค์แต่ง"
+    },
+    {
+      "id": "lean-startup-positive-2",
+      "kind": "positive",
+      "prompt": "ก่อนสร้างแผนเสียเงินเต็ม ทดสอบว่ากลุ่มทีมเล็กที่กำหนดจะขอส่วนเพิ่มรายงานรายสัปดาห์หรือไม่ ระบุข้อเสนอปลอดภัยขั้นต่ำ ช่วงสังเกต ตัววัด เกณฑ์ และสิ่งทำให้ปรับทิศหรือหยุด",
+      "expected_route": "lean-startup",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "prioritized_assumptions",
+        "chosen_plan",
+        "testable_claim"
+      ],
+      "rationale": "คำขอลดสมมติฐานคุณค่าด้วยข้อเสนอน้อยและการตัดสินใช้ได้ ไม่สมมติอุปสงค์ เกณฑ์และฐานต้องกำกับมีแหล่ง คำนวณ หรือสมมติ"
+    },
+    {
+      "id": "lean-startup-positive-3",
+      "kind": "positive",
+      "prompt": "สมมติฐานรักษาผู้ใช้คือเตือนหลังงานแรกสำเร็จจะให้กลับสู่งานสอง เสนอทดสอบจำกัดมีข้อคุ้มครอง ตัววัดผูกสมมติฐาน และการตัดสินถัดไปจากผลพบ",
+      "expected_route": "lean-startup",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "repeat_iteration",
+        "human_need",
+        "testable_claim"
+      ],
+      "rationale": "เหมาะเพราะสมมติฐานผลิตภัณฑ์ ทดสอบปลอดภัย ตัววัด และการตัดสินชัด ผลบริบทเดียวห้ามขยายทุกผู้ใช้โดยไม่มีหลักฐานเพิ่ม"
+    },
+    {
+      "id": "lean-startup-negative-1",
+      "kind": "negative",
+      "prompt": "ต้องการเปลี่ยนขนาดยากับผู้ป่วยจริงกลุ่มหนึ่งดูว่ากินยาตามดีขึ้นไหม ข้ามทบทวนปลอดภัยและทดสอบจริงเล็กที่สุด",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "safety_critical_validation",
+        "irreversible_choice"
+      ],
+      "rationale": "เปลี่ยนขนาดยาจริงคือผลไม่ปลอดภัยข้อห้าม ไม่ใช่ทดลองผลิตภัณฑ์ขั้นต่ำยอมรับ ต้องปฏิเสธหรือส่งผู้มีคุณสมบัติด้านความปลอดภัย/ธรรมาภิบาลคลินิก ไม่ปรับเป็น lean startup"
+    },
+    {
+      "id": "lean-startup-negative-2",
+      "kind": "negative",
+      "prompt": "หยิบคำสั่งซื้อผิดซ้ำในคลัง สืบกระบวนการ การควบคุม และกิ่งเหตุก่อนเสนอป้องกัน",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "recurring_failure",
+        "causal_question",
+        "diagnose"
+      ],
+      "rationale": "เป็นคำขอ root-cause-analysis ที่อาจสับสนครอบครัว ต้องวินิจฉัยความล้มเหลวปฏิบัติ ไม่ทดสอบตลาดหรือผลิตภัณฑ์"
+    },
+    {
+      "id": "lean-startup-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "คัดชื่อผลิตภัณฑ์สามชื่อเป็นแถว CSV ตามลำดับให้ ไม่วิเคราะห์อุปสงค์",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "จัดชื่อที่ให้เป็นงานกำหนดตายตัว ไม่มีสมมติฐาน ทดสอบ ตัววัด หรือการตัดสินเรียนรู้"
+    },
+    {
+      "id": "lean-startup-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้ Lean Startup กับคำถามผลิตภัณฑ์นี้ ระบุสมมติฐาน ข้อเสี่ยงสุด ทดสอบขั้นต่ำปลอดภัย ตัววัด/เกณฑ์ใช้ตัดสิน และ pivot, persevere, stop หรือ hold",
+      "expected_route": "lean-startup",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "testable_hypothesis",
+        "prioritized_assumptions",
+        "plan"
+      ],
+      "rationale": "ผู้ใช้ระบุวิธีและฟิลด์สาธารณะครบ ต้องเก็บ hold เมื่อผลทดสอบหรือข้อมูลชี้ขาดขาด"
+    },
+    {
+      "id": "lean-startup-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "ควรเปิดตัวแนวคิดนี้ไหม ไม่มีผู้ใช้เป้าหมาย สมมติฐานหักล้างได้ ข้อเสี่ยงสุด ขอบทดสอบปลอดภัย ตัววัดใช้ตัดสิน หรือเกณฑ์ตัดสิน",
+      "expected_route": "lean-startup",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "testable_hypothesis",
+        "plan",
+        "no_testable_implication"
+      ],
+      "rationale": "ครอบครัวเป็นไปได้แต่ข้อมูลทดลองชี้ขาดขาดทั้งหมด ต้องพัก ไม่เรียกเปิดตัว แต่งตัววัด หรือหลักฐานอุปสงค์"
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "root-cause-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "Un entrepôt expédie le mauvais article toutes les quelques semaines depuis un nouveau processus de préparation ; l’équipe veut de la prévention plutôt qu’une nouvelle excuse.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "La défaillance répétée exige de séparer symptôme, cause, contrôle et vérification de récurrence."
+    },
+    {
+      "id": "root-cause-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "Une panne de service revient après des redémarrages locaux ; journaux, relais et responsables d’alertes sont disponibles pour une chaîne causale.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose",
+        "failure_risk"
+      ],
+      "rationale": "La demande recherche une condition systémique contrôlable et un responsable de prévention, pas seulement le déclencheur immédiat."
+    },
+    {
+      "id": "root-cause-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "Un défaut échappe régulièrement aux contrôles sur plusieurs équipes ; les managers veulent distinguer action de l’opérateur, interface, charge et contrôles manquants.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "Récurrence et demande de séparation des niveaux sont des signaux directs pour l’analyse des causes profondes."
+    },
+    {
+      "id": "root-cause-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "Un nouveau courriel de tarification a augmenté les inscriptions ; la question est de savoir s’il a causé cette hausse par rapport à un groupe témoin.",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "La cible est l’effet d’une intervention et une comparaison contrefactuelle, pas une chaîne de défaillance récurrente."
+    },
+    {
+      "id": "root-cause-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "Plaintes clients, effectifs et arriéré se renforcent sur un an ; l’utilisateur veut le point de levier du schéma dynamique.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "Une structure de rétroaction avec délais dépasse un diagnostic d’incident concret."
+    },
+    {
+      "id": "root-cause-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Mettez la chronologie de l’incident dans un tableau à deux colonnes sans diagnostiquer les raisons des défaillances.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "La mise en forme est mécanique même si le texte décrit des incidents répétés."
+    },
+    {
+      "id": "root-cause-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "Conduisez root-cause-analysis sur le relais raté récurrent et identifiez le responsable de prévention sans blâmer un individu.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "L’utilisateur invoque explicitement la méthode pour une défaillance opérationnelle récurrente."
+    },
+    {
+      "id": "root-cause-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Un seul rapport anonyme dit qu’une livraison a échoué à cause d’un ingénieur ; nommez cette personne comme cause profonde sans journaux.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "recurring_failure",
+        "decisive_input_missing"
+      ],
+      "rationale": "Limite de l’événement et preuves sont insuffisantes ; une accusation serait dangereuse et non étayée."
+    }
+  ]
+}

@@ -82,10 +82,10 @@ def validate_procedure(text: str, *, method_id: str, locale: str) -> str:
         raise ContentValidationError(
             f"{method_id}.procedure.{locale}: expected exact nine headings"
         )
-    if locale not in {"en", "ko", "zh", "ja"}:
+    if locale not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
         raise ContentValidationError(f"{method_id}.procedure: unsupported locale")
-    if locale in {"zh", "ja"}:
-        # Whitespace token counts do not bound Chinese or Japanese prose.
+    if locale in {"zh", "ja", "th"}:
+        # Whitespace token counts do not bound Chinese, Japanese, or Thai prose.
         characters = sum(not character.isspace() for character in normalized)
         if not 700 <= characters <= 6000:
             raise ContentValidationError(
@@ -94,9 +94,12 @@ def validate_procedure(text: str, *, method_id: str, locale: str) -> str:
             )
     else:
         words = _word_count(normalized)
-        if not 350 <= words <= 900:
+        # Faithful European translations can expand beyond the EN/KO source;
+        # preserve every required condition while retaining a finite upper bound.
+        maximum_words = 1200 if locale in {"fr", "de", "it", "es", "pt"} else 900
+        if not 350 <= words <= maximum_words:
             raise ContentValidationError(
-                f"{method_id}.procedure.{locale}: expected 350-900 words, got {words}"
+                f"{method_id}.procedure.{locale}: expected 350-{maximum_words} words, got {words}"
             )
     procedure_index = headings.index("Procedure")
     next_heading_index = procedure_index + 1
@@ -277,7 +280,7 @@ def _validate_question_list(value: Any, path: str) -> tuple[str, ...]:
 def validate_teacher_question_catalog(  # noqa: C901 - explicit malformed-shape diagnostics
     value: Any,
 ) -> dict[str, dict[str, tuple[str, ...]]]:
-    """Validate the four-locale teacher-question catalog for the frozen 48 methods."""
+    """Validate the ten-locale teacher-question catalog for the frozen 48 methods."""
 
     if not isinstance(value, Mapping):
         raise ContentValidationError("teacher-questions: expected an object")
@@ -304,15 +307,28 @@ def validate_teacher_question_catalog(  # noqa: C901 - explicit malformed-shape 
             "teacher-questions.methods: expected exactly the frozen 48 IDs"
         )
     catalog: dict[str, dict[str, tuple[str, ...]]] = {}
-    seen_by_locale: dict[str, set[str]] = {locale: set() for locale in ("en", "ko", "zh", "ja")}
+    seen_by_locale: dict[str, set[str]] = {
+        locale: set() for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
+    }
     for method_id in FROZEN_METHOD_IDS:
         localized = methods[method_id]
-        if not isinstance(localized, Mapping) or set(localized) != {"en", "ko", "zh", "ja"}:
+        if not isinstance(localized, Mapping) or set(localized) != {
+            "en",
+            "ko",
+            "zh",
+            "ja",
+            "fr",
+            "de",
+            "it",
+            "es",
+            "pt",
+            "th",
+        }:
             raise ContentValidationError(
-                f"teacher-questions.{method_id}: expected en, ko, zh, and ja"
+                f"teacher-questions.{method_id}: expected all ten supported locales"
             )
         catalog[method_id] = {}
-        for locale in ("en", "ko", "zh", "ja"):
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
             questions = _validate_question_list(
                 localized[locale], f"teacher-questions.{method_id}.{locale}"
             )
@@ -341,20 +357,19 @@ def compile_method_content_projections(
 
     data = validate_method_authoring(authoring)
     method_id = data["id"]
-    if set(procedures) != {"en", "ko", "zh", "ja"} or set(cases_by_locale) != {
-        "en",
-        "ko",
-        "zh",
-        "ja",
-    }:
-        raise ContentValidationError(f"{method_id}: expected en, ko, zh, and ja procedures/cases")
+    if set(procedures) != {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} or set(
+        cases_by_locale
+    ) != {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
+        raise ContentValidationError(
+            f"{method_id}: expected all ten supported locales procedures/cases"
+        )
     normalized_procedures = {
         locale: validate_procedure(procedures[locale], method_id=method_id, locale=locale)
-        for locale in ("en", "ko", "zh", "ja")
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
     }
     normalized_cases = {
         locale: validate_cases(cases_by_locale[locale], method_id=method_id)
-        for locale in ("en", "ko", "zh", "ja")
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
     }
     routing = data["routing"]
     suitable_features = _ordered_unique(list(routing["positive_features"]))
@@ -403,7 +418,7 @@ def compile_method_content_projections(
             theory=_theory_with_questions(normalized_procedures[locale], teacher_questions, locale),
             template_examples=_template_examples(normalized_cases[locale]),
         )
-        for locale in ("en", "ko", "zh", "ja")
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
     )
     return catalog_entry, injectable
 
@@ -454,19 +469,19 @@ def compile_method(
 ) -> dict[str, Any]:
     data = validate_method_authoring(authoring)
     method_id = data["id"]
-    if set(procedures) != {"en", "ko", "zh", "ja"}:
-        raise ContentValidationError(f"{method_id}.procedure: expected en, ko, zh, and ja")
+    if set(procedures) != {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
+        raise ContentValidationError(f"{method_id}.procedure: expected all ten supported locales")
     normalized = {
         locale: _theory_with_questions(
             validate_procedure(procedures[locale], method_id=method_id, locale=locale),
             teacher_questions,
             locale,
         )
-        for locale in ("en", "ko", "zh", "ja")
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
     }
     fragments = {
         locale: complement_fragment(procedures[locale], method_id=method_id, locale=locale)
-        for locale in ("en", "ko", "zh", "ja")
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
     }
     participation_data = data["participation"]
     routing_data = data["routing"]

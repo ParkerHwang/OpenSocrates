@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lateral-thinking-positive-01
+    kind: positive
+    prompt: "Il gruppo ha ottimizzato ripetutamente lo stesso percorso di consegna e vuole contestare il presupposto che ogni ordine debba transitare per un magazzino centrale."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "Le opzioni sono ormai ripetitive e si richiede una provocazione che cambi il quadro prima della valutazione."
+  - id: lateral-thinking-positive-02
+    kind: positive
+    prompt: "La coda di un servizio pubblico non consente ulteriori accelerazioni; genera concetti rovesciando chi si sposta, quando avviene il servizio o cosa viene considerato una coda."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "Il compito cerca esplicitamente un quadro diverso e più concetti, seguiti da una selezione."
+  - id: lateral-thinking-positive-03
+    kind: positive
+    prompt: "Un gruppo di prodotto continua ad aggiungere funzioni per contrastare il calo del coinvolgimento; contesta il quadro e crea alternative che non aggiungano funzioni."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "Il quadro di ottimizzazione esistente blocca nuove opzioni e deve essere deliberatamente superato."
+  - id: lateral-thinking-negative-01
+    kind: negative
+    prompt: "Le prove raccolte nelle interviste sono incomplete e il gruppo deve scoprire il bisogno umano, creare il prototipo di un servizio e testare in sicurezza il comportamento degli utenti."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "La scoperta dei bisogni e i test con gli utenti sono prioritari; la sola provocazione salterebbe prove essenziali."
+  - id: lateral-thinking-negative-02
+    kind: negative
+    prompt: "La protezione di una macchina deve rispettare una specifica di sicurezza obbligatoria e il gruppo chiede se il progetto supera i test richiesti."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, explicit_rules]
+    rationale: "Una validazione critica per la sicurezza richiede prove rigorose e la specifica autorevole, non provocazioni senza limiti."
+  - id: lateral-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Ordina alfabeticamente l’elenco esistente delle opzioni e conserva tutte le descrizioni senza creare nuove alternative."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Ordinare è un’attività meccanica e non richiede di contestare il quadro."
+  - id: lateral-thinking-explicit-01
+    kind: explicit
+    prompt: "Usa lateral-thinking per trovare tre modi non ovvi di ridurre i rifiuti di una conferenza senza modificare le regole di sicurezza."
+    expected_route: lateral-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, stale_options, choose]
+    rationale: "L’utente richiede esplicitamente alternative che rompano il quadro mantenendo un vincolo protetto."
+  - id: lateral-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "Il problema e i vincoli non negoziabili sono sconosciuti; inventa un’opzione radicale e raccomandala immediatamente."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [stale_options, decisive_input_missing]
+    rationale: "Senza un quadro o vincoli protetti, la provocazione non può essere sottoposta a una selezione sicura."

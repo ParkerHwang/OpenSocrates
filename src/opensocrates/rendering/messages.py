@@ -31,7 +31,9 @@ class PlaceholderMismatch(MessageCatalogError):
 
 
 _PLACEHOLDER_RE: Final[re.Pattern[str]] = re.compile(r"\{([A-Za-z][A-Za-z0-9_.-]*)\}")
-_LOCALES: Final[frozenset[str]] = frozenset({"en", "ko", "zh", "ja"})
+_LOCALES: Final[frozenset[str]] = frozenset(
+    {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}
+)
 _STATUS_STATES: Final[frozenset[str]] = frozenset(
     {"full", "degraded", "prompt_only", "unavailable", "unknown"}
 )
@@ -41,7 +43,9 @@ _STORAGE_STATES: Final[frozenset[str]] = frozenset(
     {"supported", "degraded", "unavailable", "unknown"}
 )
 _RIGOR_STATES: Final[frozenset[str]] = frozenset({"quiet", "together", "strict"})
-_LOCALE_STATES: Final[frozenset[str]] = frozenset({"follow", "en", "ko", "zh", "ja"})
+_LOCALE_STATES: Final[frozenset[str]] = frozenset(
+    {"follow", "en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}
+)
 
 
 def placeholder_names(template: str) -> frozenset[str]:
@@ -55,10 +59,10 @@ def placeholder_names(template: str) -> frozenset[str]:
 def validate_placeholder_parity(
     locale_messages: Mapping[str, Mapping[str, str]],
 ) -> None:
-    """Require four-locale key and placeholder parity for a complete catalog."""
+    """Require ten-locale key and placeholder parity for a complete catalog."""
 
     if not complete_locale_set(set(locale_messages)):
-        raise MessageCatalogError("locale catalog must contain exactly en, ko, zh, and ja")
+        raise MessageCatalogError("locale catalog must contain exactly the ten supported locales")
     en = locale_messages["en"]
     for locale in sorted(set(locale_messages) - {"en"}):
         messages = locale_messages[locale]
@@ -79,7 +83,7 @@ def validate_placeholder_parity(
 
 @dataclass(frozen=True, slots=True)
 class LocaleCatalog:
-    """Immutable view over the compiled bundle's four-locale message maps."""
+    """Immutable view over the compiled bundle's ten-locale message maps."""
 
     locale_messages: Mapping[str, Mapping[str, str]]
 
@@ -237,7 +241,11 @@ def render_status(
     recording_on = bool(getattr(projection, "recording_effective", False))
     onboarding_complete = bool(getattr(projection, "onboarding_complete", False))
     locale_preference = getattr(projection, "locale_preference", None)
-    locale_state = locale_preference if locale_preference in {"en", "ko", "zh", "ja"} else "follow"
+    locale_state = (
+        locale_preference
+        if locale_preference in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}
+        else "follow"
+    )
     lines = [catalog.lookup(locale, "message.status.title")]
     lines.append(
         catalog.lookup(

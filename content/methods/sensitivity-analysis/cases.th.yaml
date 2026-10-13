@@ -1,0 +1,106 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "sensitivity-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "กรณีธุรกิจเทียบสองแบบคลังผ่านอุปสงค์ แรงงาน และพลังงาน สูตรฐานและเกณฑ์ตัดสินมีเอกสาร แต่ข้อมูลมีช่วงปกป้องได้ ทดสอบช่วง แสดงค่าสลับ และว่าทางเลือกทนทานหรือเปราะ",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "multiple_objectives",
+        "choose"
+      ],
+      "rationale": "มีโมเดล การเทียบ ฐานเอกสาร ช่วงข้อมูล และเกณฑ์เลือก ขอปรับข้อมูล/เผยสลับเฉพาะ ไม่แต่งโอกาส"
+    },
+    {
+      "id": "sensitivity-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "มีโมเดลบุคลากรศูนย์บริการกับเป้าระยะตอบประกาศ ทดสอบผลปริมาณเข้า เวลาจัดการ และบุคลากรในช่วงมีแหล่ง เคารพการพึ่ง และจัดวิจัยที่เปลี่ยนตัดสินบุคลากร",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "unknown_probability",
+        "choose",
+        "information_purchase"
+      ],
+      "rationale": "มีโมเดล เกณฑ์ ข้อมูลไม่แน่นอน ต้องรักษาพึ่งและจัดลำดับข้อมูล Sensitivity analysis รายงานคำนวณหรืออันดับโดยไม่แต่งโอกาส"
+    },
+    {
+      "id": "sensitivity-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "คณะลงทุนให้คะแนนสามโครงการด้านต้นทุน ผล และเสี่ยงลงมือ น้ำหนักมีเอกสารแต่พิพาท คำแนะนำอาจสลับ ปรับน้ำหนักและคะแนนตามช่วงมีเหตุ บันทึกค่าสลับและสมมติฐานเปราะ",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "multiple_objectives",
+        "choose"
+      ],
+      "rationale": "เป็นการเทียบโครงมีน้ำหนักไม่แน่นอนและอาจสลับ วิธีต้องเผยความไวโมเดลก่อนคำแนะนำสิ่งยอมเสียถือน้ำหนักยุติ"
+    },
+    {
+      "id": "sensitivity-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "ไม่มีโมเดลหรือเกณฑ์ตัดสิน ทบทวนงานศึกษาขัด ตัดสินแหล่งน่าเชื่อ และประสานหลักฐานคำอ้างปลอดภัย",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "conflicting_sources",
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "อาจสับสน evidence-hierarchy หรือประสานหลักฐาน ไม่มีโมเดล กฎ หรือเกณฑ์ก็ไม่มีสัมพันธ์ข้อมูลให้ปรับ"
+    },
+    {
+      "id": "sensitivity-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "สำรวจสี่อนาคตภายนอกสิบปีต่างสำหรับองค์กรและเตรียมแต่ละแบบ ไม่มีโมเดลปริมาณ คะแนนทางเลือก หรือสัมพันธ์ตัวแปรให้เปลี่ยน",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "decisive_input_missing"
+      ],
+      "rationale": "ขอสร้างสถานการณ์ใต้ไม่แน่นอนลึกและขาดโมเดล/สัมพันธ์ชัด Sensitivity analysis จะสร้างฐานทดสอบไม่ได้"
+    },
+    {
+      "id": "sensitivity-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "คูณแต่ละปริมาณ verified ด้วยตัวแปลงหน่วยระบุ คืนรายการ ไม่เกี่ยวโมเดล เปรียบ หรือเกณฑ์ตัดสิน",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "เป็นแปลงหน่วยกำหนดตายตัว ไม่มีช่วงข้อมูลไม่แน่นอนหรือผลตัดสินให้วิเคราะห์เปราะ"
+    },
+    {
+      "id": "sensitivity-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้ sensitivity-analysis เป็นหลักเลือกราคา โมเดลส่วนกำไรฐาน ช่วงปริมาณ/กำไรพิพาท และกำไรขั้นต่ำยอมรับมีเอกสาร หาค่าสลับและพักหากช่วงใดขาดที่มา",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "sensitive_inputs",
+        "choose"
+      ],
+      "rationale": "ผู้ใช้ขอชัดพร้อมฐาน ช่วงไม่แน่นอน เกณฑ์ และกฎพักที่มา ผลต้องคำนวณหรือกำกับ ไม่เป็นโอกาส"
+    },
+    {
+      "id": "sensitivity-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "บอกคำแนะนำไวต่อการเปลี่ยนไหม ยังไม่ให้โมเดลฐาน ข้อมูล ช่วง เกณฑ์ หรือสูตรแนะนำ",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "ฐาน ข้อมูลปรับได้ ช่วง และเกณฑ์ชี้ขาดทั้งหมด ต้องพักขอข้อมูลมีขอบแทนอ้างไวทั่วไป"
+    }
+  ]
+}

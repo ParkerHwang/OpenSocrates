@@ -1,0 +1,74 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "pestel-analysis-positive-1"
+    kind: positive
+    prompt: "Prüfen Sie vor Eintritt in dieses Land aktuelle Wahlagenda, Inflation und Währung, demografischen Wandel, Plattformtechnik, Emissionsregeln und Genehmigungen, die unsere Einführung verändern könnten."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "Begrenzte externe Suche und Strategieentscheidung. Datum und Rechtsraum bewahren; ungeprüfte Politik oder Prognose nicht als geklärt darstellen."
+  - id: "pestel-analysis-positive-2"
+    kind: positive
+    prompt: "Unsere Expansion hängt von alternden Kunden, Datenschutzregeln, Cloudkosten und möglichem Energiepreisschock ab. Identifizieren Sie wesentliche Faktoren, Mechanismen und Signale für eine andere Investitionswahl."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "Wesentliche externe Faktoren und strategische Folgerungen statt Trendliste. Vorgegebene Hypothesen als geprüft, abgeleitet oder ungeprüft kennzeichnen."
+  - id: "pestel-analysis-positive-3"
+    kind: positive
+    prompt: "Erstellen Sie evidenzbasierten externen Kontext unserer Fünfjahresstrategie: Chancen, Bedrohungen, Beobachtungssignale und Umkehrbedingungen jeder Folgerung."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "Faktorenregister mit Strategiehorizont. Evidenzstatus und beobachtbare Indikatoren statt erfundener Prognosen oder Wahrscheinlichkeiten."
+  - id: "pestel-analysis-negative-1"
+    kind: negative
+    prompt: "Unser Lager hat wiederkehrende Kommissionierfehler. Verfolgen Sie lokalen Prozess, identifizieren Sie Ursache und schlagen Sie Korrektur vor."
+    expected_route: "root-cause-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "recurring_failure"
+      - "diagnose"
+    rationale: "Lokaler Prozess statt Makroumwelt. Kausale Fehleranalyse passt näher; keine externen Faktoren allein zum Kategorienfüllen."
+  - id: "pestel-analysis-negative-2"
+    kind: negative
+    prompt: "Eine neue Richtlinie betrifft Beschäftigte, Auftragnehmer, Kunden und eine unvertretene Gemeinschaft. Ordnen Sie Macht, Interessen, Bedenken und Beteiligungsverantwortliche zu."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "Externer Kontext, aber entscheidend sind Akteurs- und Beteiligungskarte. Mögliche Verwechslung mit Stakeholder-Analyse statt sechs Umweltkategorien."
+  - id: "pestel-analysis-mechanical-1"
+    kind: mechanical
+    prompt: "Ordnen Sie die sechs vorgegebenen Faktorenbeschreibungen den Spalten P, E, S, T, E und L zu, ohne Wortlautänderung."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - "mechanical"
+      - "mechanical"
+    rationale: "Nur Formatierung; keine Beurteilung von Wesentlichkeit, Evidenz oder Strategie."
+  - id: "pestel-analysis-explicit-1"
+    kind: explicit
+    prompt: "Nutzen Sie PESTEL für unseren Markteintritt. Nur wesentliche Faktoren, Evidenzstatus, Horizont und Chancen- oder Bedrohungsfolgerung nennen."
+    expected_route: "pestel-analysis"
+    expected_behavior: explicit_primary
+    decisive_features:
+      - "explicit_method"
+      - "macro_environment"
+    rationale: "Methode mit öffentlichem Ausgabevertrag ausdrücklich verlangt. Quellen beachten; regelabhängige Folgerung bei ungeprüftem aktuellem Recht zurückstellen."
+  - id: "pestel-analysis-insufficiency-1"
+    kind: insufficiency
+    prompt: "Sollen wir in den Markt eintreten? Land oder Rechtsraum, Horizont, Produktumfang, Ausgangslage und Quellen aktueller Bedingungen fehlen."
+    expected_route: "pestel-analysis"
+    expected_behavior: hold
+    decisive_features:
+      - "boundary_sensitive"
+      - "decisive_input_missing"
+    rationale: "Externe Suche passt, aber fehlende Grenze und Quellendatum können Folgerungen ändern. Zurückstellen und entscheidende Reichweitenangaben erfragen statt Kontext erfinden."

@@ -1,0 +1,74 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "stakeholder-analysis-positive-1"
+    kind: positive
+    prompt: "Eine Dienstplanänderung betrifft Frontpersonal, Leitung, Kunden und Arbeitnehmervertretung. Ordnen Sie Interessen, Rechte, Sorgen, Einwilligungsbedarf und Verantwortliche zu."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "Umsetzungsbezogene Akteurskarte statt Kontaktliste. Sorgen und Wirkungen bleiben bis Protokoll oder Gespräch Hypothesen mit sichtbarer Unsicherheit."
+  - id: "stakeholder-analysis-positive-2"
+    kind: positive
+    prompt: "Eine öffentliche Richtlinie betrifft Bewohner außerhalb der Entscheidungsgruppe. Identifizieren Sie Entscheider, unvertretene Gruppen, Macht, Wirkung, Konflikte und verantwortlichen Beteiligungsplan."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "Vertretung und Umsetzung sind wesentlich. Autorität von Einfluss trennen; Schaden und Einwilligung nicht unbelegt folgern."
+  - id: "stakeholder-analysis-positive-3"
+    kind: positive
+    prompt: "Mehrere Organisationen müssen gemeinsamen Datenstandard übernehmen. Analysieren Sie Freigabe, Blockade, Nutzen, Kosten und ordnen Sie Beteiligungsverantwortlichen samt planändernder Antwort zu."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "Übernahme hängt von verteilter Autorität und Umsetzungshilfe ab. Interessen und Wirkung mit Evidenzstatus; Rollen beweisen keine Einigkeit."
+  - id: "stakeholder-analysis-negative-1"
+    kind: negative
+    prompt: "Alle Entscheider sind über das Ziel einig, betroffene Gruppe unwesentlich. Vergleichen Sie zwei Anbieter nach Kosten, Zuverlässigkeit und Lieferzeit."
+    expected_route: "trade-off-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "multiple_options"
+      - "multiple_objectives"
+    rationale: "Menschenfrage geklärt; verbleibender Zielkonfliktvergleich statt dekorativer Karte."
+  - id: "stakeholder-analysis-negative-2"
+    kind: negative
+    prompt: "Prüfen Sie politische, wirtschaftliche, gesellschaftliche, technologische, ökologische und rechtliche Änderungen unserer Produktstrategie."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "Strategiekontext, aber entscheidend externes Faktorenregister. PESTEL statt Akteurskarte."
+  - id: "stakeholder-analysis-mechanical-1"
+    kind: mechanical
+    prompt: "Entfernen Sie doppelte Namen aus Kontaktliste und sortieren Sie alphabetisch."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - "mechanical"
+      - "mechanical"
+    rationale: "Nur Texttransformation ohne Interessen-, Macht-, Einwilligungs- oder Umsetzungsurteil."
+  - id: "stakeholder-analysis-explicit-1"
+    kind: explicit
+    prompt: "Nutzen Sie stakeholder analysis für diesen Krankenhausablauf. Zeigen Sie Rechte, Gruppen, Macht- und Wirkungsevidenz, Konflikte, Beteiligungsverantwortliche und Umkehrbedingung."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: explicit_primary
+    decisive_features:
+      - "explicit_method"
+      - "stakeholder_conflict"
+    rationale: "Methode und Felder direkt benannt; Hauptmethode bleibt. Abgeleitete Sorgen und ungeprüfte Wirkungen nicht als geklärt darstellen."
+  - id: "stakeholder-analysis-insufficiency-1"
+    kind: insufficiency
+    prompt: "Sollen wir die Anwesenheitsrichtlinie einführen? Verantwortlicher, Gruppen, Autoritätsweg, Horizont und Wirkungsevidenz fehlen."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: hold
+    decisive_features:
+      - "decisive_input_missing"
+      - "interacting_actors"
+    rationale: "Umsetzungshilfe könnte entscheidend sein; Akteursgrenze und Autorität fehlen. Zurückstellen und kleinste Fakten erfragen statt Einwilligung oder Widerstand erklären."

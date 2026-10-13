@@ -171,9 +171,12 @@ class PublicReleaseVerificationChecks(unittest.TestCase):
             archive = f"opensocrates-1.5.0-{host}-{kind}.zip"
             self.assertIn(archive, macos)
             self.assertIn(archive + ".sha256", macos)
-        self.assertEqual(
-            expected_asset_names("1.5.1"), {name.replace("1.5.0", "1.5.1") for name in macos}
-        )
+        for version in ("1.5.1", "1.5.2"):
+            with self.subTest(version=version):
+                self.assertEqual(
+                    expected_asset_names(version),
+                    {name.replace("1.5.0", version) for name in macos},
+                )
 
     def test_public_identity_and_bytes(self):
         for mutation in (

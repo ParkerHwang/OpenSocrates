@@ -1,4 +1,4 @@
-"""Locale catalog loading and build-time four-locale parity checks."""
+"""Locale catalog loading and build-time ten-locale parity checks."""
 
 from __future__ import annotations
 
@@ -31,10 +31,12 @@ def load_locale(value: Any, *, expected_locale: str | None = None) -> dict[str, 
     if value.get("schema") != LOCALE_SCHEMA:
         raise ContentValidationError("locale.schema: unsupported schema")
     locale = value.get("locale")
-    if locale not in {"en", "ko", "zh", "ja"} or (
+    if locale not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} or (
         expected_locale is not None and locale != expected_locale
     ):
-        raise ContentValidationError("locale.locale: expected en, ko, zh, or ja")
+        raise ContentValidationError(
+            "locale.locale: expected en, ko, zh, ja, fr, de, it, es, pt, or th"
+        )
     messages = value.get("messages")
     if not isinstance(messages, Mapping):
         raise ContentValidationError("locale.messages: expected an object")

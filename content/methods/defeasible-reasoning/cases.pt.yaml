@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: defeasible-reasoning-positive-01
+    kind: positive
+    prompt: "Esta política normalmente se aplica, mas quais exceções ou novos fatos fariam retirar a recomendação atual?"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "O julgamento usa regra padrão e precisa de refutadores e condições explícitas de retirada."
+  - id: defeasible-reasoning-positive-02
+    kind: positive
+    prompt: "Separe a evidência que contradiz diretamente a conclusão da que enfraquece a regra que a sustenta."
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "O usuário pede refutadores da conclusão versus do vínculo em julgamento revisável."
+  - id: defeasible-reasoning-positive-03
+    kind: positive
+    prompt: "Uma regra geral e uma exceção mais específica se aplicam; qual é o estado provisório atual?"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "Especificidade e exceções não resolvidas devem ser tratadas sem fingir resultado incondicional."
+  - id: defeasible-reasoning-negative-01
+    kind: negative
+    prompt: "Aplique a regra estrita de retenção a cada registro e relate o resultado determinístico."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "Regra sem exceções exige dedução ou aplicação mecânica."
+  - id: defeasible-reasoning-negative-02
+    kind: negative
+    prompt: "Classifique estas fontes por qualidade do desenho e ajuste a força da alegação à fonte aplicável mais forte."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "A tarefa é hierarquia de evidências, não gestão de refutação de regra padrão."
+  - id: defeasible-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Copie a regra padrão e a lista de exceções para o modelo de política."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copiar texto normativo fornecido é mecânico."
+  - id: defeasible-reasoning-explicit-01
+    kind: explicit
+    prompt: "Use defeasible-reasoning explicitamente para avaliar esta regra de aprovação normalmente válida e suas exceções."
+    expected_route: defeasible-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, exception_prone_rule]
+    rationale: "O usuário pede explicitamente análise de regra padrão, refutadores e condições de retirada."
+  - id: defeasible-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "Aplique a regra padrão, sem fornecer fonte, fatos acionadores, escopo ou possíveis exceções."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [exception_prone_rule, decisive_input_missing]
+    rationale: "Sem regra padrão e fatos acionadores, a conclusão provisória seria arbitrária."

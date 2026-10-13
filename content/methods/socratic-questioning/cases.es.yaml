@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: socratic-questioning-positive-01
+    kind: positive
+    prompt: "Hazme solo preguntas que cambiarían si debemos lanzar el servicio este trimestre."
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "Se pide conjunto acotado decisivo, no entrevista abierta."
+  - id: socratic-questioning-positive-02
+    kind: positive
+    prompt: "Ayúdame a examinar supuestos de mi afirmación, con como máximo tres preguntas y explicando por qué importa cada una."
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "Se necesita explícitamente un conjunto pequeño vinculado a consecuencias para aclarar un juicio."
+  - id: socratic-questioning-positive-03
+    kind: positive
+    prompt: "No sé qué significa aquí buena evidencia; pregunta lo poco que cambiaría el estándar de revisión."
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "Respuestas ausentes pueden cambiar el estándar y deben hacerse visibles sin sobrecargar de preguntas."
+  - id: socratic-questioning-negative-01
+    kind: negative
+    prompt: "Comprueba finalización de la implementación con los requisitos suministrados y enumera campos ausentes."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [review_completion, explicit_rules]
+    rationale: "Hay regla fija y comprobación directa, no juicio guiado por aclaraciones."
+  - id: socratic-questioning-negative-02
+    kind: negative
+    prompt: "Define el término disputado comparando casos positivos, negativos y fronterizos."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [ambiguous_terms]
+    rationale: "Se pide análisis conceptual, no secuencia acotada de preguntas."
+  - id: socratic-questioning-mechanical-01
+    kind: mechanical
+    prompt: "Convierte estas cinco preguntas en una lista numerada Markdown."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Formatear preguntas es mecánico y no debe generar más preguntas."
+  - id: socratic-questioning-explicit-01
+    kind: explicit
+    prompt: "Invoca explícitamente socratic-questioning para comprobar si mi decisión depende de una premisa oculta."
+    expected_route: socratic-questioning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions]
+    rationale: "Se nombra método y se piden preguntas para probar premisas."
+  - id: socratic-questioning-insufficiency-01
+    kind: insufficiency
+    prompt: "Haz preguntas decisivas sin revelar decisión, afirmación, alcance ni consecuencia afectados."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing]
+    rationale: "Sin objetivo o consecuencia no pueden acotarse preguntas ni saber qué es decisivo."

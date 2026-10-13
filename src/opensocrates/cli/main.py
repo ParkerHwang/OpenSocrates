@@ -63,7 +63,9 @@ def _parser() -> argparse.ArgumentParser:
     locale_sub = locale.add_subparsers(dest="locale_command", required=True)
     locale_sub.add_parser("get")
     locale_set = locale_sub.add_parser("set")
-    locale_set.add_argument("locale", choices=("en", "ko", "zh", "ja", "follow"))
+    locale_set.add_argument(
+        "locale", choices=("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th", "follow")
+    )
     locale_sub.add_parser("reset")
 
     trace = sub.add_parser("trace", help="list, show, or export a public trace")

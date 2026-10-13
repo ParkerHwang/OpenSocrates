@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-loop-diagramming-positive-01
+    kind: positive
+    prompt: "Una coda allunga le attese, le attese causano abbandono e l’abbandono cambia la futura domanda di personale; mappa il ciclo con segni e ritardo."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "Il compito chiede variabili nominate, collegamenti con segno, tipo di ciclo ed effetto ritardato che determina lo schema."
+  - id: causal-loop-diagramming-positive-02
+    kind: positive
+    prompt: "La crescita degli utenti aumenta le recensioni, le recensioni attirano utenti, mentre limiti di capacità creano una risposta bilanciante; identifica entrambi i cicli."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Più cicli direzionali e un vincolo bilanciante devono essere rappresentati esplicitamente."
+  - id: causal-loop-diagramming-positive-03
+    kind: positive
+    prompt: "Una politica dà rapido sollievo ma poi rimbalza perché l’applicazione cambia il comportamento con un lungo ritardo; disegna la spiegazione di retroazione."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "Il risultato richiesto è una spiegazione con segni della resistenza ritardata alla politica, non una stima di un singolo effetto."
+  - id: causal-loop-diagramming-negative-01
+    kind: negative
+    prompt: "Un’organizzazione ampia ha molti attori, scorte ed effetti collaterali; scegli il migliore punto di leva prima di un diagramma compatto dei cicli."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "Occorre stabilire confine del sistema più ampio e domanda sulla leva prima di un diagramma mirato."
+  - id: causal-loop-diagramming-negative-02
+    kind: negative
+    prompt: "Uno studio chiede se un farmaco ha causato un esito misurato rispetto a un controllo, senza schemi dinamici ricorrenti."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "Una domanda delimitata sull’effetto controfattuale non necessita di un ciclo di retroazione."
+  - id: causal-loop-diagramming-mechanical-01
+    kind: mechanical
+    prompt: "Copia le etichette dei cicli esistenti in una presentazione mantenendo l’ordine e senza valutare relazioni."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copiare e formattare non richiede giudizio causale."
+  - id: causal-loop-diagramming-explicit-01
+    kind: explicit
+    prompt: "Applica causal-loop-diagramming per mostrare perché gli sconti aumentano la domanda ma poi causano esaurimento delle scorte e perdita di fiducia."
+    expected_route: causal-loop-diagramming
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay]
+    rationale: "L’utente nomina il metodo e fornisce uno schema ricorrente rinforzante e bilanciante."
+  - id: causal-loop-diagramming-insufficiency-01
+    kind: insufficiency
+    prompt: "Due variabili sono cambiate insieme una volta, ma direzione, tempi e ripetizione sono ignoti; disegna un ciclo rinforzante verificato."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "Una singola variazione congiunta senza direzione o tempi non sostiene un ciclo con segni."

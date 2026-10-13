@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pdca-cycle-positive-1
+    kind: positive
+    prompt: "Eine Supportwarteschlange hat einen verifizierten Ausgangswert und die Hypothese, dass eine kleine Triageänderung Wartezeiten ohne Qualitätsverlust senkt. Definieren Sie Plan, begrenztes Do, Check-Regel und Act für einen umkehrbaren Zyklus."
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, chosen_plan]
+    rationale: "Kontrollierte operative Iteration mit Ausgangswert, messbarem Ziel, sicherem Umfang und Standardisierungs- oder Revisionsentscheidung. Verifizierten Ausgangswert erhalten und neue Vergleichsevidenz getrennt kennzeichnen."
+  - id: pdca-cycle-positive-2
+    kind: positive
+    prompt: "Wir schlagen eine einwöchige Verpackungsetikettenänderung in einer Lagerzone vor. Ziel, Kennzahl, Schutzgrenzen und Stopp definieren, Erwartungen mit Beobachtungen vergleichen und Standardisierung oder Revision entscheiden."
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, chosen_plan]
+    rationale: "Kleine Zone und einwöchiges Fenster ermöglichen begrenztes PDCA. Vergleich bleibt lokal; ein Zyklus beweist keinen dauerhaften Standard."
+  - id: pdca-cycle-positive-3
+    kind: positive
+    prompt: "Für einen bekannten Ablaufengpass gibt es Änderungsvorschlag, Verantwortlichen und reproduzierbares Maß. Entwerfen Sie Plan–Do–Check–Act mit Abweichungsprotokoll und nächster versionierter Verbesserungshypothese."
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, practical_consequence]
+    rationale: "Bedingung und Messung sind bekannt; iterative Verbesserung statt Ursachenentdeckung. Der Folgezyklus macht Lernen und Standardrevision sichtbar."
+  - id: pdca-cycle-negative-1
+    kind: negative
+    prompt: "Ein Produktionsfehler hat mehrere mögliche Ursachen ohne zuverlässigen Zeitablauf. Experimentieren Sie sofort mit einem Freigabeschritt, um zu sehen, ob der Fehler verschwindet."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [diagnose, causal_question, confounding, decisive_input_missing]
+    rationale: "Unbekannte Grundursache und fehlende Evidenz machen einen Verbesserungszyklus zur möglichen Verschleierung. Root-cause-analysis soll zuerst die kausale Grenze klären."
+  - id: pdca-cycle-negative-2
+    kind: negative
+    prompt: "Ein Chemikalienaustritt dauert an. Ändern Sie den Handhabungsstandard vor Ort und lernen Sie aus weiterer Exposition, bevor Sie das Einsatzteam rufen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [safety_critical_validation, recurring_failure]
+    rationale: "Aktiver Schaden und dringende Sicherheitsreaktion schließen improvisiertes PDCA aus. Eindämmung und qualifizierte Vorfallsverfahren haben Vorrang."
+  - id: pdca-cycle-mechanical-1
+    kind: mechanical
+    prompt: "Addieren Sie die vier vorgegebenen Tageszahlen, ohne Prozessdeutung oder Änderungsempfehlung."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Deterministische Addition, keine PDCA-Verbesserungsentscheidung."
+  - id: pdca-cycle-explicit-1
+    kind: explicit
+    prompt: "Nutzen Sie PDCA für diese operative Verbesserung. Zeigen Sie Ziel und Maß, begrenztes Do, Check, Act, Evidenzstatus und Folgezyklushypothese."
+    expected_route: pdca-cycle
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, repeat_iteration, plan, testable_hypothesis]
+    rationale: "Methode und erforderliche öffentliche Ergebnisse sind ausdrücklich genannt. Bei fehlendem entscheidendem Maß oder sicherem Umfang zurückstellen."
+  - id: pdca-cycle-insufficiency-1
+    kind: insufficiency
+    prompt: "Verbessern Sie den Prozess mit PDCA. Ziel, Ausgangswert, Änderung, Maß, sicherer Umfang, Verantwortlicher und Standardisierungsregel fehlen."
+    expected_route: pdca-cycle
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, repeat_iteration, plan, testable_hypothesis]
+    rationale: "PDCA ist ausdrücklich verlangt, aber entscheidende Angaben fehlen. Zurückstellen statt unbegrenzter Änderung oder Standardisierung ungemessener Ergebnisse."

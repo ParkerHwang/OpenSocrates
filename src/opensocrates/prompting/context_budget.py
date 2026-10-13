@@ -2,7 +2,7 @@
 
 The production runtime deliberately avoids a tokenizer dependency.  Its
 documented approximation counts non-whitespace runs (``len(text.split())``
-with empty runs removed) as tokens.  This is stable for both supported locales
+with empty runs removed) as tokens.  This is stable for all supported locales
 and is used consistently for fragment, group, and total checks.
 
 The authored total ceiling is 2,440 estimated tokens.  Build/runtime prompt

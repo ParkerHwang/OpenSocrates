@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "abduction-positive-01",
+      "kind": "positive",
+      "prompt": "Plusieurs causes pourraient expliquer la chute soudaine de la conversion ; quelle explication correspond le mieux aux faits observés ?",
+      "expected_route": "abduction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "Plusieurs explications correspondent à une anomalie et exigent des éléments discriminants avant de proposer la meilleure explication provisoire."
+    },
+    {
+      "id": "abduction-positive-02",
+      "kind": "positive",
+      "prompt": "Le service tombe en panne uniquement dans certaines régions. Comparez les explications plausibles et proposez la prochaine observation qui les départagera.",
+      "expected_route": "abduction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "Il s'agit d'un diagnostic avec des informations incomplètes et une demande de vérification discriminante."
+    },
+    {
+      "id": "abduction-positive-03",
+      "kind": "positive",
+      "prompt": "Quelle est la meilleure explication actuelle de ce résultat de laboratoire inattendu, et qu'est-ce qui vous ferait changer d'avis ?",
+      "expected_route": "abduction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "La réponse doit comparer les explications candidates et rester explicitement provisoire."
+    },
+    {
+      "id": "abduction-negative-01",
+      "kind": "negative",
+      "prompt": "Avec ces prémisses et cette règle explicites, la conclusion suit-elle nécessairement ?",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules",
+        "explain"
+      ],
+      "rationale": "Des prémisses établies et une règle appellent une déduction plutôt qu'une recherche de la meilleure explication."
+    },
+    {
+      "id": "abduction-negative-02",
+      "kind": "negative",
+      "prompt": "Utilisez les observations répétées de l'échantillon pour estimer la fréquence de ce phénomène dans la population.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "La tâche généralise à partir d'un échantillon plutôt que de comparer des explications concurrentes."
+    },
+    {
+      "id": "abduction-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Copiez les trois hypothèses fournies dans le modèle d'enquête.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Copier des hypothèses est une opération mécanique qui ne doit pas déclencher de diagnostic."
+    },
+    {
+      "id": "abduction-explicit-01",
+      "kind": "explicit",
+      "prompt": "Invoquez explicitement abduction pour diagnostiquer pourquoi le déploiement échoue après le changement de configuration.",
+      "expected_route": "abduction",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "competing_explanations"
+      ],
+      "rationale": "L'utilisateur nomme explicitement la méthode pour un résultat anormal et un diagnostic."
+    },
+    {
+      "id": "abduction-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Choisissez la meilleure explication, mais donnez seulement la conclusion, sans observation, alternatives ni éléments testables.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "competing_explanations",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans observation et sans candidats concurrents, choisir une meilleure explication produirait un récit plutôt qu'une inférence."
+    }
+  ]
+}

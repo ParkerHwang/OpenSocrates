@@ -20,7 +20,7 @@ from .schema import (
     validate_reasoning_content_projections_shape,
 )
 
-MAX_COMPILED_CONTENT_BYTES = 4 * 1024 * 1024
+MAX_COMPILED_CONTENT_BYTES = 8 * 1024 * 1024
 
 
 def _open_regular_json(path: str | Path, *, label: str) -> int:

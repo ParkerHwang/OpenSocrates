@@ -1,0 +1,79 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: sensitivity-analysis-positive-1
+    kind: positive
+    prompt: "Il business case confronta due progetti di magazzino usando domanda, costo del lavoro ed energia. Formula iniziale e soglia decisionale sono documentate ma i dati hanno intervalli difendibili. Testali, mostra valori di cambio e identifica robustezza o fragilità della scelta."
+    expected_route: sensitivity-analysis
+    expected_behavior: route
+    decisive_features:
+      - sensitive_inputs
+      - multiple_objectives
+      - choose
+    rationale: "Esistono modello, confronto, riferimento documentato, intervalli e soglia. Si richiedono perturbazioni e cambi decisionali, non probabilità inventate."
+  - id: sensitivity-analysis-positive-2
+    kind: positive
+    prompt: "Abbiamo un modello del personale per un centro servizi con obiettivo pubblicato di risposta. Testa effetti di volume degli arrivi, tempi di gestione e personale entro intervalli sostenuti da fonti, rispettando dipendenze, e dai priorità alla ricerca che potrebbe cambiare la decisione sul personale."
+    expected_route: sensitivity-analysis
+    expected_behavior: route
+    decisive_features:
+      - sensitive_inputs
+      - unknown_probability
+      - choose
+      - information_purchase
+    rationale: "Esistono modello, soglia, dati incerti e necessità esplicita di preservare dipendenze e priorità informative. Sensitivity analysis riporta cambiamenti calcolati o ordinali senza inventare probabilità."
+  - id: sensitivity-analysis-positive-3
+    kind: positive
+    prompt: "Un comitato di investimento assegna punteggi a tre progetti per costo, impatto e rischio esecutivo. I pesi sono documentati ma controversi e la raccomandazione può cambiare. Varia pesi e punteggi entro intervalli giustificati, registra valori di cambio e presupposti fragili."
+    expected_route: sensitivity-analysis
+    expected_behavior: route
+    decisive_features:
+      - sensitive_inputs
+      - multiple_objectives
+      - choose
+    rationale: "È un confronto strutturato con pesi incerti e possibile cambio di raccomandazione. Esponi sensibilità prima che una raccomandazione sui compromessi consideri definiti i pesi."
+  - id: sensitivity-analysis-negative-1
+    kind: negative
+    prompt: "Non abbiamo modello o soglia decisionale. Rivedi studi contrastanti, giudica fonti credibili e riconcilia prove sull’affermazione di sicurezza."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - conflicting_sources
+      - source_quality
+      - decisive_input_missing
+    rationale: "È una probabile confusione con evidence-hierarchy o riconciliazione delle prove. Senza modello, regola o soglia non esiste relazione fra dati da perturbare."
+  - id: sensitivity-analysis-negative-2
+    kind: negative
+    prompt: "Esplora quattro futuri esterni decennali distinti per l’organizzazione e descrivi preparazioni per ciascuno. Non esistono modello quantitativo, punteggi delle opzioni o relazione fra variabili da variare."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - decisive_input_missing
+    rationale: "È costruzione di scenari nell’incertezza profonda senza modello o relazione espliciti. Sensitivity analysis inventerebbe un riferimento non testabile."
+  - id: sensitivity-analysis-mechanical-1
+    kind: mechanical
+    prompt: "Moltiplica ogni quantità verificata per il fattore di conversione dichiarato e restituisci l’elenco convertito. Non sono coinvolti modello, confronto o soglia decisionale."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "È conversione deterministica delle unità senza intervallo incerto o risultato decisionale di cui analizzare la fragilità."
+  - id: sensitivity-analysis-explicit-1
+    kind: explicit
+    prompt: "Usa sensitivity-analysis come metodo principale per la decisione sui prezzi. Sono documentati modello iniziale di contribuzione, intervalli controversi di volume e margine e margine minimo accettabile; trova valori di cambio e sospendi se manca provenienza di un intervallo."
+    expected_route: sensitivity-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - sensitive_inputs
+      - choose
+    rationale: "L’utente invoca il metodo e fornisce riferimento, intervalli incerti, soglia e sospensione per provenienza mancante. Il risultato resta calcolato o etichettato, non probabilistico."
+  - id: sensitivity-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "Dimmi se la raccomandazione è sensibile. Non ho fornito modello iniziale, dati, intervalli, soglia decisionale o formula della raccomandazione."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - decisive_input_missing
+    rationale: "Riferimento, dati perturbabili, intervalli e soglia sono tutti decisivi. Sospendi e chiedi questi dati delimitati senza produrre affermazioni generiche di sensibilità."

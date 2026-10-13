@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: conceptual-analysis-positive-01
+    kind: positive
+    prompt: "¿Qué debe entender nuestro equipo por una publicación segura si ingeniería y cumplimiento usan el término de manera distinta?"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms, argument_dispute]
+    rationale: "Deben probarse significados rivales y casos límite antes de que el criterio de publicación guíe la acción."
+  - id: conceptual-analysis-positive-02
+    kind: positive
+    prompt: "¿Es justa esta política si los empleados discrepan sobre si justicia significa igualdad de trato o de oportunidades?"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms, argument_dispute]
+    rationale: "La decisión depende de significados operativos rivales y de sus consecuencias para los casos."
+  - id: conceptual-analysis-positive-03
+    kind: positive
+    prompt: "Define «listo para lanzar» para que producto y soporte clasifiquen consistentemente los casos límite."
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms]
+    rationale: "Una definición utilizable requiere condiciones necesarias y suficientes y pruebas de casos límite."
+  - id: conceptual-analysis-negative-01
+    kind: negative
+    prompt: "Usa la especificación publicada de la API para comprobar si esta solicitud cumple los campos obligatorios documentados."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "La definición operativa ya es autorizada; corresponde aplicar directamente la regla."
+  - id: conceptual-analysis-negative-02
+    kind: negative
+    prompt: "Clasifica estos tres estudios por calidad de diseño e indica cuál apoya directamente la afirmación sobre el efecto."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "El obstáculo es calidad y aplicabilidad de evidencia, no el significado de un término disputado."
+  - id: conceptual-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Sustituye cada aparición de «preparado para lanzar» por «listo para lanzar» en este archivo."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Un reemplazo literal de texto es mecánico y no requiere análisis conceptual."
+  - id: conceptual-analysis-explicit-01
+    kind: explicit
+    prompt: "Usa explícitamente conceptual-analysis para definir qué significa «fiable» en este informe para clientes."
+    expected_route: conceptual-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, ambiguous_terms]
+    rationale: "El usuario invoca explícitamente el método para un término ambiguo con consecuencias informativas."
+  - id: conceptual-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "Decide si se cumple el concepto disputado, pero no proporciones contexto, casos ni decisión controlada."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [ambiguous_terms, decisive_input_missing]
+    rationale: "Sin contexto y casos, el significado operativo sería arbitrario y no podría controlar una decisión con seguridad."

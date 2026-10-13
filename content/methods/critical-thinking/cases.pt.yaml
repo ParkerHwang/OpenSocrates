@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: critical-thinking-positive-01
+    kind: positive
+    prompt: "Um relatório de fornecedor afirma ganho de produtividade de 40% em sua própria pesquisa; avalie fonte, enquadramento, comparação ausente e inferência antes da compra."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, source_quality]
+    rationale: "O conjunto exige verificar fontes, enquadramento, lógica e alternativas, não apenas consultar uma citação."
+  - id: critical-thinking-positive-02
+    kind: positive
+    prompt: "Um memorando executivo diz que um piloto prova que a política funciona em todo lugar; identifique alegação mais forte, pressupostos, omissões e contra-argumento."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, argument_dispute]
+    rationale: "O pedido exige explicitamente avaliação crítica ampla do conjunto de alegações e sua generalização."
+  - id: critical-thinking-positive-03
+    kind: positive
+    prompt: "Dois comentaristas confiáveis discordam sobre a eficácia de um programa de segurança; o usuário quer um veredito justo, sem tratar divergência como prova de qualquer lado."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, conflicting_sources, argument_dispute]
+    rationale: "Credibilidade das fontes, enquadramento, suporte lógico e conflito não resolvido são todos relevantes."
+  - id: critical-thinking-negative-01
+    kind: negative
+    prompt: "Um debate tem alegação central, fundamentos de apoio, objeções e respostas cujos vínculos precisam de mapa visível."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "A necessidade específica é mapear estruturalmente alegações, fundamentos e objeções, não uma crítica ampla em três eixos."
+  - id: critical-thinking-negative-02
+    kind: negative
+    prompt: "Uma hierarquia de fontes deve determinar se uma alegação clínica é sustentada diretamente por evidência primária ou apenas por resumo."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Qualidade das fontes e suporte entre alegação e fonte são o resultado decisivo."
+  - id: critical-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Copie a alegação citada e os nomes das fontes para um modelo de revisão, sem julgar verdade ou relevância."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copiar para um modelo é mecânico, mesmo que o conteúdo seja uma alegação."
+  - id: critical-thinking-explicit-01
+    kind: explicit
+    prompt: "Use critical-thinking para revisar este memorando de investimento e declarar o que está verificado, ausente e ainda incerto."
+    expected_route: critical-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, critique]
+    rationale: "O método é pedido explicitamente para julgar um conjunto de alegações."
+  - id: critical-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "A fonte é uma captura de tela sem atribuição, data ou dados subjacentes; declare a manchete verdadeira porque parece plausível."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [critique, source_quality, decisive_input_missing]
+    rationale: "A fonte e a premissa centrais não podem ser verificadas; o veredito deve permanecer suspenso, não virar aceitação."

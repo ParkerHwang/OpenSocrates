@@ -1,0 +1,111 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "assumption-mapping-positive-1",
+      "kind": "positive",
+      "prompt": "เรากำลังพิจารณาบริการวางแผนอาหารร่วมกัน ระบุสมมติฐานที่ต้องเป็นจริง แยกความสำคัญจากหลักฐาน และเลือกการทดสอบแรกที่ปลอดภัย บันทึกสัมภาษณ์มาจากผู้ใช้และยังไม่ตรวจอย่างอิสระ",
+      "expected_route": "assumption-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "prioritized_assumptions",
+        "testable_claim",
+        "plan"
+      ],
+      "rationale": "คำขอต้องการทะเบียนสมมติฐาน แกนความสำคัญ/หลักฐาน ชุดเสี่ยงที่สุด และการทดสอบถัดไป บันทึกสัมภาษณ์ได้จากผู้ใช้ ไม่ใช่ตรวจยืนยันแล้ว จึงต้องแสดงความไม่แน่นอนโดยไม่กำหนดความน่าจะเป็น"
+    },
+    {
+      "id": "assumption-mapping-positive-2",
+      "kind": "positive",
+      "prompt": "ทีมอยากทำการตรวจใบแจ้งหนี้อัตโนมัติ แต่ไม่ชัดว่าข้อจำกัดคือความต้องการของลูกค้า ความเป็นไปได้ด้านข้อมูล หรือความอยู่รอดด้านการปฏิบัติตามกฎ ทำแผนผังสมมติฐานและเลือกการตรวจที่เสี่ยงต่ำก่อนจัดซื้อ",
+      "expected_route": "assumption-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "prioritized_assumptions",
+        "irreversible_choice",
+        "testable_claim"
+      ],
+      "rationale": "มีหลายหมวดสมมติฐานและการตัดสินใจก่อนผูกมัด การตรวจที่ขอยังเป็นปัญหาจัดลำดับความสำคัญ ผลควรกำกับข้อเท็จจริงจากแหล่งข้อมูล สมมติฐาน และหลักฐานการปฏิบัติตามกฎที่ขาด"
+    },
+    {
+      "id": "assumption-mapping-positive-3",
+      "kind": "positive",
+      "prompt": "เรามีการทดลองที่เสนอห้าข้อสำหรับการเปลี่ยนตารางอาสาสมัคร จัดอันดับสมมติฐานตามความสำคัญต่อการตัดสินใจและความแข็งแรงของหลักฐาน แล้วแนบข้อสังเกตที่ปลอดภัยและกฎว่าจะเปลี่ยนแผนเมื่อใด",
+      "expected_route": "assumption-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "prioritized_assumptions",
+        "testable_claim",
+        "chosen_plan"
+      ],
+      "rationale": "ผู้ใช้ขอกรอบจัดลำดับความสำคัญหลักของวิธี ไม่ใช่การทดลองเสร็จแล้ว ผลใช้ระดับลำดับและกำกับหลักฐานว่าตรวจแล้ว ยังไม่ตรวจ สมมติ หรือขัดแย้ง โดยไม่แต่งคะแนน"
+    },
+    {
+      "id": "assumption-mapping-negative-1",
+      "kind": "negative",
+      "prompt": "บริการชำระเงินของเราล้มเหลวสามครั้งสัปดาห์นี้ ไล่ห่วงโซ่เหตุ ระบุจุดอ่อนของการควบคุม และมอบหมายผู้รับผิดชอบการป้องกัน อย่าเสนอแผนผังสมมติฐานผลิตภัณฑ์",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "recurring_failure",
+        "causal_question",
+        "diagnose"
+      ],
+      "rationale": "เป็นคำขอ root-cause-analysis ซึ่งอาจสับสนกับตระกูลการทำแผนผังสมมติฐาน ผลที่ต้องการคือการวินิจฉัยเหตุและการควบคุม ไม่ใช่ชุดความเชื่อที่ทดสอบได้และจัดลำดับแล้ว"
+    },
+    {
+      "id": "assumption-mapping-negative-2",
+      "kind": "negative",
+      "prompt": "เราเลือกลูกค้าเป้าหมายและการทดลองหน้ารับสมัครแล้ว กำหนดตัวชี้วัดที่ใช้ตัดสินใจ ช่วงสังเกต และกฎเปลี่ยนทิศทางหรือเดินหน้าสำหรับการทดสอบ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "chosen_plan",
+        "plan"
+      ],
+      "rationale": "เลือกสมมติฐานแล้วและผู้ใช้ขอทำการทดลองตลาดให้ปฏิบัติได้ เป็นงาน lean-startup การส่งมาที่นี่จะทำแผนผังซ้ำแทนกำหนดการทดสอบและตัวชี้วัด"
+    },
+    {
+      "id": "assumption-mapping-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "เรียงป้ายสมมติฐานหกข้อเหล่านี้ตามตัวอักษรและส่งคืนรายการมีหมายเลข",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การเรียงป้ายไม่มีข้อกำหนดด้านการตัดสิน ความไม่แน่นอน หรือการจัดลำดับทดลอง ควรตอบเชิงกลโดยตรง"
+    },
+    {
+      "id": "assumption-mapping-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้การทำแผนผังสมมติฐานกับแนวคิดนี้ แสดงสมมติฐาน แกนความสำคัญ/หลักฐาน ชุดเสี่ยงที่สุด และการทดสอบปลอดภัยถัดไป กำกับข้อกล่าวอ้างไร้ฐานว่ายังไม่ตรวจให้เห็น",
+      "expected_route": "assumption-mapping",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "hidden_assumptions",
+        "prioritized_assumptions",
+        "testable_claim"
+      ],
+      "rationale": "ผู้ใช้ระบุวิธีและผลสาธารณะโดยตรง การเรียกชัดแจ้งเป็นวิธีหลัก และป้ายหลักฐานคงขอบเขตที่มา"
+    },
+    {
+      "id": "assumption-mapping-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "จัดลำดับสมมติฐานเบื้องหลังข้อเสนอเราและบอกว่าควรทดสอบข้อใดก่อน ยังไม่มีคำถามตัดสินใจ ผลที่ต้องการ สมมติฐานที่เสนอ หรือข้อจำกัดทดสอบ",
+      "expected_route": "assumption-mapping",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "hidden_assumptions",
+        "prioritized_assumptions",
+        "no_testable_implication"
+      ],
+      "rationale": "วิธีเหมาะแต่ขาดข้อมูลชี้ขาด ต้องพักแทนแต่งสมมติฐานหรือการทดสอบ คำขอถัดไปควรกำหนดการตัดสินใจและขอบเขตปลอดภัยที่อนุญาต"
+    }
+  ]
+}

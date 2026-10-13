@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pdca-cycle-positive-1
+    kind: positive
+    prompt: "Una coda di assistenza ha un riferimento iniziale verificato e l’ipotesi che una piccola modifica al triage riduca l’attesa senza peggiorare la qualità della soluzione. Definisci Plan, Do delimitato, regola Check e decisione Act per un ciclo reversibile."
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, chosen_plan]
+    rationale: "La richiesta è un’iterazione operativa controllata con riferimento iniziale, obiettivo misurabile, ambito sicuro e decisione di standardizzare o rivedere. Il ciclo conserva il riferimento verificato ed etichetta separatamente nuove prove comparative."
+  - id: pdca-cycle-positive-2
+    kind: positive
+    prompt: "Proponiamo una modifica di una settimana alle etichette di imballaggio in una zona del magazzino. Imposta obiettivo e metrica, definisci limiti protettivi e arresto, confronta atteso e osservato e decidi se standardizzare o rivedere."
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, chosen_plan]
+    rationale: "La zona piccola e la finestra di una settimana sostengono un ciclo PDCA delimitato. Il risultato mantiene il confronto locale ed evita di trattare un ciclo come prova di uno standard permanente."
+  - id: pdca-cycle-positive-3
+    kind: positive
+    prompt: "Un collo di bottiglia noto nel flusso ha una modifica proposta, un responsabile e una misura riproducibile. Delinea Plan–Do–Check–Act registrando deviazioni e creando la prossima ipotesi versionata di miglioramento."
+    expected_route: pdca-cycle
+    expected_behavior: route
+    decisive_features: [repeat_iteration, plan, testable_hypothesis, practical_consequence]
+    rationale: "Condizione del flusso e misurazione sono stabilite, quindi il compito è miglioramento iterativo, non scoperta della causa originaria. Lo stato richiesto del prossimo ciclo rende visibili apprendimento e revisione dello standard."
+  - id: pdca-cycle-negative-1
+    kind: negative
+    prompt: "Un difetto produttivo ha varie cause possibili e nessuna cronologia affidabile. Sperimenta subito una nuova fase di approvazione per vedere se scompare."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [diagnose, causal_question, confounding, decisive_input_missing]
+    rationale: "Causa originaria sconosciuta e prove mancanti rischiano di far mascherare il guasto da un ciclo di miglioramento. Root-cause-analysis deve stabilire i limiti causali prima di testare altre modifiche."
+  - id: pdca-cycle-negative-2
+    kind: negative
+    prompt: "È ancora in corso uno sversamento chimico. Cambia sul campo lo standard di gestione e impara dalla prossima esposizione prima di chiamare la squadra di risposta agli incidenti."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [safety_critical_validation, recurring_failure]
+    rationale: "Danno attivo e risposta urgente di sicurezza controindicano un ciclo PDCA improvvisato. Contenimento e procedure qualificate hanno precedenza sull’apprendimento iterativo."
+  - id: pdca-cycle-mechanical-1
+    kind: mechanical
+    prompt: "Somma i quattro conteggi giornalieri forniti e restituisci il totale senza interpretare il processo o raccomandare modifiche."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Sommare conteggi forniti è un calcolo deterministico, non una decisione di miglioramento Plan–Do–Check–Act."
+  - id: pdca-cycle-explicit-1
+    kind: explicit
+    prompt: "Usa un ciclo PDCA per questo miglioramento operativo. Mostra obiettivo e misura, ambito Do delimitato, regola Check, decisione Act, stato delle prove e ipotesi del prossimo ciclo."
+    expected_route: pdca-cycle
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, repeat_iteration, plan, testable_hypothesis]
+    rationale: "L’utente nomina esplicitamente metodo e risultati pubblici richiesti. La procedura sospende se manca la misura decisiva o l’ambito sicuro."
+  - id: pdca-cycle-insufficiency-1
+    kind: insufficiency
+    prompt: "Migliora il nostro processo con PDCA. Non abbiamo obiettivo, riferimento iniziale, modifica proposta, misura, ambito sicuro, responsabile o regola per standardizzare il risultato."
+    expected_route: pdca-cycle
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, repeat_iteration, plan, testable_hypothesis]
+    rationale: "PDCA è richiesto esplicitamente ma mancano tutti i dati decisivi. Occorre sospendere invece di eseguire modifiche senza limiti o standardizzare risultati non misurati."

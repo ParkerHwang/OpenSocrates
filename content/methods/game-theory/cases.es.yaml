@@ -1,0 +1,58 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "game-theory-positive-1"
+    kind: positive
+    prompt: "Si bajamos la suscripción, el competidor principal puede igualar o mantener precio y su respuesta cambiará retención y margen. Compara respuestas creíbles antes de recomendar."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "Se nombran precios interdependientes y se pide análisis de respuestas. Debe exponerse evidencia de margen y retención sin inventar matriz de beneficios ni probabilidades."
+  - id: "game-theory-positive-2"
+    kind: positive
+    prompt: "Negociamos un contrato de suministro plurianual. Nuestro compromiso de volumen puede reducir costes, pero el proveedor puede priorizar a otro comprador si el pronóstico es débil. Mapea incentivos, información y compromisos creíbles."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "Ambas partes pueden adaptarse y sus beneficios dependen del compromiso ajeno. Hay hipótesis estructural, no costes verificados; deben etiquetarse supuestos e incertidumbre."
+  - id: "game-theory-positive-3"
+    kind: positive
+    prompt: "Dos plataformas consideran un estándar de interoperabilidad. Adoptarlo crea valor mutuo, pero cada una puede esperar a que la otra pague integración. Analiza respuestas y diseño que haría creíble la cooperación."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "La decisión depende de adopción recíproca y coste de adelantarse. Un resultado estable condicional puede servir sin llamarlo equilibrio sin incentivos respaldados."
+  - id: "game-theory-negative-1"
+    kind: negative
+    prompt: "Elige una base de datos interna por latencia, almacenamiento y capacidad de ingeniería. Ningún otro actor modifica el resultado."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [no_meaningful_interdependence]
+    rationale: "El entorno es fijo y ninguna respuesta de jugador afecta el resultado. No hay interdependencia estratégica ni debe seleccionarse el método."
+  - id: "game-theory-negative-2"
+    kind: negative
+    prompt: "Evalúa fuerzas políticas, económicas, sociales, tecnológicas, ambientales y jurídicas que afectan nuestra entrada al mercado."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features: [macro_environment, forecast]
+    rationale: "Puede orientar estrategia, pero requiere examen de factores externos, no respuestas e incentivos de jugadores. Es confusión posible; no debe inventarse equilibrio."
+  - id: "game-theory-mechanical-1"
+    kind: mechanical
+    prompt: "Calcula el promedio ponderado de estos cuatro precios contractuales con volúmenes proporcionados."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Es cálculo mecánico con datos suministrados, sin necesidad de modelar respuestas ajenas."
+  - id: "game-theory-explicit-1"
+    kind: explicit
+    prompt: "Usa teoría de juegos para esta subasta de compras. Muestra jugadores, acciones, información, temporalidad y resultados estables condicionales sin inventar beneficios ausentes."
+    expected_route: "game-theory"
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, interacting_actors]
+    rationale: "El usuario nombra método y estructura pública. Sigue siendo principal conservando beneficios ausentes y evitando probabilidades inventadas."
+  - id: "game-theory-insufficiency-1"
+    kind: insufficiency
+    prompt: "¿Debemos amenazar al competidor con responder en precios? No identifiqué sus acciones factibles, nuestras consecuencias, información de cada lado ni repetición."
+    expected_route: "game-theory"
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, interacting_actors]
+    rationale: "Existe interdependencia estratégica, pero la estructura ausente determina credibilidad de amenaza. Debe suspender y pedir solo hechos decisivos sin predecir respuestas."

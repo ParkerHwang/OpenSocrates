@@ -1,0 +1,103 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "bayesian-updating-positive-01",
+      "kind": "positive",
+      "prompt": "Comment ce test positif doit-il modifier les chances des diagnostics concurrents compte tenu de leurs taux de base différents ?",
+      "expected_route": "bayesian-updating",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "new_evidence",
+        "unknown_probability",
+        "competing_explanations"
+      ],
+      "rationale": "La tâche exige un fondement préalable, le sens des éléments, la variation a posteriori et la sensibilité aux taux de base."
+    },
+    {
+      "id": "bayesian-updating-positive-02",
+      "kind": "positive",
+      "prompt": "Actualisez notre confiance dans les deux hypothèses de lancement au fil de l'arrivée de ces signaux.",
+      "expected_route": "bayesian-updating",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "new_evidence",
+        "unknown_probability",
+        "competing_explanations"
+      ],
+      "rationale": "Les éléments séquentiels doivent actualiser les hypothèses concurrentes sans compter les signaux plusieurs fois."
+    },
+    {
+      "id": "bayesian-updating-positive-03",
+      "kind": "positive",
+      "prompt": "Montrez si la recommandation s'inverse lorsque le taux préalable et les hypothèses de vraisemblance varient dans des intervalles crédibles.",
+      "expected_route": "bayesian-updating",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "new_evidence",
+        "unknown_probability"
+      ],
+      "rationale": "Le jugement demandé porte sur la sensibilité d'une probabilité a posteriori et d'un seuil d'action."
+    },
+    {
+      "id": "bayesian-updating-negative-01",
+      "kind": "negative",
+      "prompt": "Classez ces sources selon leur caractère direct et la qualité des études avant de décider de la force de l'affirmation.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "La tâche calibre la qualité des sources plutôt que d'actualiser des hypothèses définies."
+    },
+    {
+      "id": "bayesian-updating-negative-02",
+      "kind": "negative",
+      "prompt": "Listez les explications concurrentes de cette anomalie et proposez un test qui les départage.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "La génération d'explications et les tests discriminants relèvent de l'abduction lorsqu'aucune actualisation préalable n'est demandée."
+    },
+    {
+      "id": "bayesian-updating-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Copiez les valeurs préalables fournies dans la feuille d'analyse.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Copier des valeurs est mécanique et ne doit pas déclencher de raisonnement probabiliste."
+    },
+    {
+      "id": "bayesian-updating-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez explicitement bayesian-updating pour réviser la confiance après ce nouveau signal de fraude.",
+      "expected_route": "bayesian-updating",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "new_evidence"
+      ],
+      "rationale": "L'utilisateur choisit explicitement une actualisation de confiance fondée sur de nouveaux éléments."
+    },
+    {
+      "id": "bayesian-updating-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Donnez la probabilité a posteriori, mais sans hypothèses concurrentes, fondement préalable ni information de vraisemblance.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "new_evidence",
+        "unknown_probability",
+        "decisive_input_missing"
+      ],
+      "rationale": "Une probabilité a posteriori numérique sans hypothèses ni provenance des entrées serait une précision fabriquée."
+    }
+  ]
+}

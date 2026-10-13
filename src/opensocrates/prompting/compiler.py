@@ -1,4 +1,4 @@
-"""Deterministic, four-locale prompt assembly from the validated content bundle.
+"""Deterministic, ten-locale prompt assembly from the validated content bundle.
 
 The compiler is intentionally a pure projection boundary.  It accepts one
 validated :class:`CompiledContentBundle` and typed domain decisions, never a
@@ -180,7 +180,7 @@ def _event(value: PromptEvent | str) -> PromptEvent:
 
 def _locale(value: Locale | str) -> str:
     normalized = str(value)
-    if normalized not in {"en", "ko", "zh", "ja"}:
+    if normalized not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
         raise MissingLocaleError(f"unsupported locale: {normalized!r}")
     return normalized
 
@@ -219,7 +219,9 @@ def _validate_bundle(bundle: CompiledContentBundle, locale: str) -> None:  # noq
     ):
         raise PromptCompilerError("bundle method IDs are not deterministically ordered")
     if not complete_locale_set(set(bundle.locale_messages)):
-        raise MissingLocaleError("bundle must contain exactly en, ko, zh, and ja locale messages")
+        raise MissingLocaleError(
+            "bundle must contain exactly the ten supported locales locale messages"
+        )
     if locale not in bundle.locale_messages or not isinstance(
         bundle.locale_messages[locale], Mapping
     ):
@@ -237,7 +239,7 @@ def _validate_bundle(bundle: CompiledContentBundle, locale: str) -> None:  # noq
             )
         for fragment_locale, text in localized.items():
             if (
-                fragment_locale not in {"en", "ko", "zh", "ja"}
+                fragment_locale not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}
                 or not isinstance(text, str)
                 or not text.strip()
             ):

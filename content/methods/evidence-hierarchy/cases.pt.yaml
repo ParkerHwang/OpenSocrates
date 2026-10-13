@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: evidence-hierarchy-positive-01
+    kind: positive
+    prompt: "Qual destes estudos sustenta diretamente a alegação de efeito e quão forte deve ser nossa redação?"
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence, conflicting_sources]
+    rationale: "Exige mapear alegação-fonte, limites de qualidade e força calibrada da evidência."
+  - id: evidence-hierarchy-positive-02
+    kind: positive
+    prompt: "Compare opinião especializada, pesquisa de usuários e experimento controlado pela aplicabilidade a esta decisão de política."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Desenhos distintos devem ser ponderados por relação direta, viés e adequação ao contexto."
+  - id: evidence-hierarchy-positive-03
+    kind: positive
+    prompt: "As fontes discordam sobre o mecanismo; identifique limites de qualidade e se a alegação deve ser suspensa."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, conflicting_sources, reconcile_evidence]
+    rationale: "Conflito relevante de fontes exige calibrar estados das evidências, não votação simples."
+  - id: evidence-hierarchy-negative-01
+    kind: negative
+    prompt: "Use dados e métodos independentes para verificar se fontes conflitantes convergem sobre a mesma alegação."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "A tarefa primária é independência e convergência entre fluxos, o que pertence à triangulação."
+  - id: evidence-hierarchy-negative-02
+    kind: negative
+    prompt: "Escolha entre estas opções conforme o resultado que melhor corresponde aos valores declarados."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [value_conflict, choose]
+    rationale: "Preferência de valor não vira hierarquia de evidências apenas porque existem fontes."
+  - id: evidence-hierarchy-mechanical-01
+    kind: mechanical
+    prompt: "Ordene as citações fornecidas por data de publicação e preserve títulos."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Ordenar citações é mecânico e não avalia qualidade ou aplicabilidade."
+  - id: evidence-hierarchy-explicit-01
+    kind: explicit
+    prompt: "Use explicitamente evidence-hierarchy para calibrar esta alegação de caráter médico aos desenhos disponíveis."
+    expected_route: evidence-hierarchy
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, source_quality]
+    rationale: "O usuário invoca explicitamente calibração da força das evidências de fontes mistas."
+  - id: evidence-hierarchy-insufficiency-01
+    kind: insufficiency
+    prompt: "Diga se a alegação é fortemente sustentada, sem fornecer escopo, fontes, desenhos ou contexto-alvo."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [source_quality, decisive_input_missing]
+    rationale: "Sem entradas alegação-fonte e contexto de aplicabilidade, o rótulo de força seria arbitrário."

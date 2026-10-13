@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "causal-loop-diagramming-positive-01",
+      "kind": "positive",
+      "prompt": "คิวทำให้รอนานขึ้น การรอนานทำให้ละทิ้ง และการละทิ้งเปลี่ยนความต้องการพนักงานในอนาคต ทำแผนผังวงจรมีเครื่องหมายและความล่าช้า",
+      "expected_route": "causal-loop-diagramming",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "recurring_failure"
+      ],
+      "rationale": "งานขอตัวแปรตั้งชื่อ ความเชื่อมโยงมีเครื่องหมาย ประเภทวงจร และผลล่าช้าที่กำหนดรูปแบบ"
+    },
+    {
+      "id": "causal-loop-diagramming-positive-02",
+      "kind": "positive",
+      "prompt": "ผู้ใช้เพิ่มทำให้รีวิวเพิ่ม รีวิวดึงผู้ใช้เพิ่ม ขณะที่ข้อจำกัดกำลังรองรับสร้างการถ่วงดุล ระบุทั้งสองวงจร",
+      "expected_route": "causal-loop-diagramming",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "ต้องแสดงหลายวงจรมีทิศทางและข้อจำกัดถ่วงดุลชัด"
+    },
+    {
+      "id": "causal-loop-diagramming-positive-03",
+      "kind": "positive",
+      "prompt": "นโยบายบรรเทาได้เร็วแต่กลับแย่ภายหลัง เพราะการบังคับใช้เปลี่ยนพฤติกรรมด้วยความล่าช้ายาว วาดคำอธิบายการป้อนกลับ",
+      "expected_route": "causal-loop-diagramming",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "recurring_failure"
+      ],
+      "rationale": "ผลที่ขอคือวงจรมีเครื่องหมายของการต้านนโยบายล่าช้า ไม่ใช่ประมาณผลเดียว"
+    },
+    {
+      "id": "causal-loop-diagramming-negative-01",
+      "kind": "negative",
+      "prompt": "องค์กรกว้างมีผู้เกี่ยวข้อง ปริมาณสะสม และผลข้างเคียงมาก ตัดสินจุดคานงัดดีที่สุดก่อนเลือกแผนผังวงจรกระชับ",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "deep_uncertainty",
+        "causal_question"
+      ],
+      "rationale": "ควรกำหนดขอบระบบกว้างและคำถามจุดคานงัดก่อนแผนผังวงจรเจาะจง"
+    },
+    {
+      "id": "causal-loop-diagramming-negative-02",
+      "kind": "negative",
+      "prompt": "การทดลองถามว่ายาหนึ่งชนิดทำให้ผลที่วัดเกิดเมื่อเทียบกลุ่มควบคุมหรือไม่ โดยไม่มีรูปแบบพลวัตเกิดซ้ำ",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "คำถามผลเทียบสถานการณ์ตรงข้ามที่มีขอบเขตไม่ต้องใช้วงจรป้อนกลับ"
+    },
+    {
+      "id": "causal-loop-diagramming-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "คัดลอกป้ายวงจรที่มีอยู่ใส่สไลด์และคงลำดับโดยไม่ประเมินความสัมพันธ์ใด",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "การคัดลอกและจัดรูปแบบไม่ต้องตัดสินเชิงเหตุ"
+    },
+    {
+      "id": "causal-loop-diagramming-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ causal-loop-diagramming แสดงว่าทำไมส่วนลดเพิ่มความต้องการ แต่ภายหลังทำให้สินค้าขาดและสูญเสียความเชื่อถือ",
+      "expected_route": "causal-loop-diagramming",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "feedback_delay"
+      ],
+      "rationale": "ผู้ใช้ตั้งชื่อวิธีและให้รูปแบบเสริมแรงกับถ่วงดุลที่เกิดซ้ำ"
+    },
+    {
+      "id": "causal-loop-diagramming-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "สองตัวแปรเปลี่ยนพร้อมกันครั้งเดียว แต่ไม่ทราบทิศทาง เวลา หรือรูปแบบซ้ำ วาดวงจรเสริมแรงที่ตรวจยืนยันแล้ว",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "feedback_delay",
+        "decisive_input_missing"
+      ],
+      "rationale": "การเปลี่ยนร่วมครั้งเดียวที่ไร้ทิศทางหรือเวลาไม่รองรับวงจรมีเครื่องหมาย"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: defeasible-reasoning-positive-01
+    kind: positive
+    prompt: "Normalmente questa politica si applica, ma quali eccezioni o fatti nuovi farebbero ritirare la raccomandazione attuale?"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "Il giudizio usa una regola di norma e richiede elementi contrari e condizioni di ritiro espliciti."
+  - id: defeasible-reasoning-positive-02
+    kind: positive
+    prompt: "Separa le prove che contraddicono direttamente la conclusione da quelle che indeboliscono la regola a sostegno."
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "L’utente chiede di distinguere confutazione e indebolimento del collegamento in un giudizio rivedibile."
+  - id: defeasible-reasoning-positive-03
+    kind: positive
+    prompt: "Si applicano sia una regola generale sia un’eccezione più specifica; qual è lo stato provvisorio attuale?"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "Specificità ed eccezioni irrisolte vanno gestite senza fingere un risultato incondizionato."
+  - id: defeasible-reasoning-negative-01
+    kind: negative
+    prompt: "Applica la regola rigorosa di conservazione a ogni registro e riporta il risultato deterministico."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "Una regola senza eccezioni richiede deduzione o applicazione meccanica."
+  - id: defeasible-reasoning-negative-02
+    kind: negative
+    prompt: "Ordina queste fonti per qualità del disegno e adatta la forza dell’affermazione alla fonte applicabile più forte."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Il compito è gerarchia delle prove, non gestione di elementi che superano regole di norma."
+  - id: defeasible-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Copia la regola di norma e l’elenco delle eccezioni nel modello normativo."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copiare testo normativo fornito è meccanico."
+  - id: defeasible-reasoning-explicit-01
+    kind: explicit
+    prompt: "Usa esplicitamente defeasible-reasoning per valutare questa regola di approvazione normalmente valida e le sue eccezioni."
+    expected_route: defeasible-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, exception_prone_rule]
+    rationale: "L’utente richiede esplicitamente analisi di regola di norma, elementi contrari e condizioni di ritiro."
+  - id: defeasible-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "Applica la regola di norma, senza fornire fonte della regola, fatti attivanti, ambito o possibili eccezioni."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [exception_prone_rule, decisive_input_missing]
+    rationale: "Senza regola di norma e fatti attivanti una conclusione provvisoria sarebbe arbitraria."

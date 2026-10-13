@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lateral-thinking-positive-01
+    kind: positive
+    prompt: "El equipo ha optimizado repetidamente la misma ruta de reparto y quiere cuestionar el supuesto de que todo pedido debe pasar por un almacén central."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "Las opciones se han estancado y se solicita una provocación que cambie el marco antes de evaluarlas."
+  - id: lateral-thinking-positive-02
+    kind: positive
+    prompt: "Una cola de un servicio público ya no permite acelerar el procesamiento; genera conceptos invirtiendo quién se desplaza, cuándo se presta el servicio o qué se considera la cola."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "Se busca explícitamente otro marco y varios conceptos, seguidos de una evaluación."
+  - id: lateral-thinking-positive-03
+    kind: positive
+    prompt: "Un equipo de producto sigue añadiendo funciones para resolver la caída de participación; cuestiona el marco y crea alternativas que no añadan funciones."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "El marco de optimización existente bloquea nuevas opciones y debe romperse deliberadamente."
+  - id: lateral-thinking-negative-01
+    kind: negative
+    prompt: "La evidencia de entrevistas está incompleta y el equipo necesita descubrir la necesidad humana, crear un prototipo del servicio y probar de forma segura el comportamiento de los usuarios."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "Son prioritarios descubrir necesidades y realizar pruebas con usuarios; la provocación por sí sola omitiría evidencia esencial."
+  - id: lateral-thinking-negative-02
+    kind: negative
+    prompt: "Un resguardo de máquina debe cumplir una especificación de seguridad obligatoria; el equipo pregunta si el diseño supera las pruebas exigidas."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, explicit_rules]
+    rationale: "La validación crítica para la seguridad requiere evidencia rigurosa y la especificación autorizada, no provocaciones abiertas."
+  - id: lateral-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Ordena alfabéticamente la lista existente de opciones y conserva todas las descripciones sin crear alternativas nuevas."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Ordenar es mecánico y no pide cuestionar el marco."
+  - id: lateral-thinking-explicit-01
+    kind: explicit
+    prompt: "Usa lateral-thinking para encontrar tres formas poco evidentes de reducir residuos en una conferencia sin cambiar las reglas de seguridad."
+    expected_route: lateral-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, stale_options, choose]
+    rationale: "El usuario solicita explícitamente alternativas que rompan el marco respetando una restricción protegida."
+  - id: lateral-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "Se desconocen el problema y las restricciones irrenunciables; inventa una opción radical y recomiéndala inmediatamente."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [stale_options, decisive_input_missing]
+    rationale: "Sin marco ni restricciones protegidas no puede evaluarse una provocación de forma segura."

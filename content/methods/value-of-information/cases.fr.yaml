@@ -1,0 +1,110 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "value-of-information-positive-1",
+      "kind": "positive",
+      "prompt": "Nous pouvons lancer maintenant ou mener d’abord une étude utilisateur. Un résultat d’adoption déclencherait différentes actions de lancement, méthode et coût direct sont connus et une date fixe marque le délai désormais inacceptable.",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "new_evidence",
+        "sensitive_inputs"
+      ],
+      "rationale": "L’information a une voie déclarée de changement d’action et une charge de collecte délimitée. Aucune probabilité de succès ni valeur monétaire inventée n’est nécessaire."
+    },
+    {
+      "id": "value-of-information-positive-2",
+      "kind": "positive",
+      "prompt": "Avant de signer un contrat fournisseur, nous pouvons inspecter une variable de risque susceptible de changer le fournisseur choisi. Source, coût, délai et seuil sont documentés ; décidez si l’inspection en vaut la peine.",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "irreversible_choice",
+        "sensitive_inputs"
+      ],
+      "rationale": "L’information arrive avant une décision irréversible et mène à une action différente. Provenance et délai se montrent sans fabriquer une probabilité a posteriori."
+    },
+    {
+      "id": "value-of-information-positive-3",
+      "kind": "positive",
+      "prompt": "Une équipe politique doit choisir entre étendre un programme ou suspendre pour une évaluation ciblée. Celle-ci distingue un résultat menant à l’extension d’un résultat menant à l’arrêt ; exposition et échéance sont déclarées.",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "testable_hypothesis",
+        "feedback_delay"
+      ],
+      "rationale": "La question porte sur un test faisable changeant l’action avant une échéance, pas une recherche supplémentaire ouverte."
+    },
+    {
+      "id": "value-of-information-negative-1",
+      "kind": "negative",
+      "prompt": "Trouvez tout ce qui est intéressant sur le télétravail et faites une synthèse bibliographique. Aucune décision, seuil d’action, variable incertaine ou échéance n’est précisé.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explain",
+        "source_quality"
+      ],
+      "rationale": "C’est une recherche ouverte sans décision changeant l’action. La valeur d’information ne peut être évaluée sans décision ni seuil."
+    },
+    {
+      "id": "value-of-information-negative-2",
+      "kind": "negative",
+      "prompt": "Une règle de sécurité exige l’équipement approuvé. Décidez si des recherches pourraient justifier un équipement non approuvé moins cher ; la règle ne laisse aucune latitude.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "binding_rule_without_discretion",
+        "single_feasible_option"
+      ],
+      "rationale": "Confusion probable avec deontic-reasoning ou examen de sécurité qualifié : l’information nouvelle ne permet pas de négocier une règle contraignante."
+    },
+    {
+      "id": "value-of-information-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Avec l’équation de taille d’échantillon fournie et les entrées vérifiées, renvoyez l’effectif requis. Ne décidez pas de conduire l’étude ni n’interprétez sa valeur décisionnelle.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "C’est un calcul fixe, pas un jugement sur la possibilité de changer une action par l’information."
+    },
+    {
+      "id": "value-of-information-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez value-of-information pour décider si cette inspection vaut coût et délai. Dites quel résultat changerait le fournisseur choisi et où l’inspection s’arrête.",
+      "expected_route": "value-of-information",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "information_purchase",
+        "irreversible_choice"
+      ],
+      "rationale": "L’utilisateur invoque explicitement la méthode et son contrat de seuil, changement d’action, coût, délai et arrêt."
+    },
+    {
+      "id": "value-of-information-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Faut-il enquêter davantage avant d’agir ? Action actuelle, alternative, variable incertaine, test possible et délai tolérable n’ont pas été déclarés.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans seuil d’action ni voie faisable d’information, aucune valeur de changement ne peut être établie. Il faut suspendre et demander la plus petite clarification sûre."
+    }
+  ]
+}

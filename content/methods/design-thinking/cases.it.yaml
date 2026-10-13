@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: design-thinking-positive-01
+    kind: positive
+    prompt: "I genitori riferiscono di perdere aggiornamenti scolastici, ma gli espedienti osservati differiscono; scopri il bisogno, formula un punto di vista e verifica tre concetti di servizio."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "Contesto umano osservato e generazione aperta di concetti sono centrali, con verifica del prototipo prima dell’impegno."
+  - id: design-thinking-positive-02
+    kind: positive
+    prompt: "Una clinica vuole ridurre la confusione all’accettazione; interviste e osservazioni devono informare un prototipo a basso rischio e regola di smentita."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "È progettazione di servizio centrata sull’utente con ostacoli osservati e prototipo verificabile."
+  - id: design-thinking-positive-03
+    kind: positive
+    prompt: "Un gruppo chiede una funzione del pannello, ma nessuno sa quale errore eviterebbe; scopri prima situazione e progresso desiderato."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "La funzione richiesta va separata dal bisogno sottostante prima di scegliere concetti."
+  - id: design-thinking-negative-01
+    kind: negative
+    prompt: "Gli utenti cambiano strumenti in un preciso momento di difficoltà; la decisione dipende da compiti funzionali, emotivi e sociali e forze d’abitudine."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Il risultato principale è una spiegazione di compiti e forze di cambio, non un ciclo di ideazione e prototipo."
+  - id: design-thinking-negative-02
+    kind: negative
+    prompt: "Le soluzioni ovvie sono obsolete; il gruppo vuole provocazioni che creino tre opzioni radicalmente diverse prima del vaglio."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "Occorre principalmente rompere il quadro, non progettare da osservazioni degli utenti."
+  - id: design-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Inserisci le citazioni delle interviste in un documento numerato senza interpretare bisogni o proporre concetti."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Trascrizione e formattazione sono meccaniche."
+  - id: design-thinking-explicit-01
+    kind: explicit
+    prompt: "Usa design-thinking per riprogettare l’iscrizione dei volontari dagli ostacoli osservati e verificare un piccolo prototipo."
+    expected_route: design-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, human_need]
+    rationale: "L’utente chiede esplicitamente scoperta dei bisogni umani e processo di prototipazione."
+  - id: design-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "Non sono disponibili utenti o osservazioni; dichiara un bisogno universale e lancia la prima funzionalità senza verifica."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [human_need, decisive_input_missing]
+    rationale: "Bisogno e verifica non sono sostenibili senza prove sugli utenti: il concetto deve restare sospeso."

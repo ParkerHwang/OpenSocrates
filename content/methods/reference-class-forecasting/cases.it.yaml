@@ -1,0 +1,79 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: reference-class-forecasting-positive-1
+    kind: positive
+    prompt: "Stimiamo la data di consegna di un progetto ferroviario regionale. Abbiamo registri collegati alle fonti di molti progetti completati con ambito, appalti e terreno comparabili. Confronta programma interno e distribuzione osservata dei completamenti, spiegando gli aggiustamenti senza inventare probabilità."
+    expected_route: reference-class-forecasting
+    expected_behavior: route
+    decisive_features:
+      - forecast
+      - reference_cases
+      - source_quality
+    rationale: "Sono definiti obiettivo previsionale e unità, esiste una classe difendibile e si richiede un intervallo esterno. I registri sostengono risultati osservati; non autorizzano probabilità inventate."
+  - id: reference-class-forecasting-positive-2
+    kind: positive
+    prompt: "Il nostro gruppo di prodotto stima ottimisticamente tempi e costi della migrazione dei clienti a una nuova piattaforma. Possiamo identificare migrazioni comparabili completate da altri team e risultati effettivi. Usali per testare la credibilità della visione interna e indica le prove che cambierebbero l’intervallo."
+    expected_route: reference-class-forecasting
+    expected_behavior: route
+    decisive_features:
+      - forecast
+      - reference_cases
+      - hidden_assumptions
+    rationale: "Il compito è calibrazione rispetto a casi comparabili completati, non diagnosi causale o scenario preferito. Richiede aggiustamenti attenti alla provenienza e una condizione di cambiamento, non un tasso di base inventato."
+  - id: reference-class-forecasting-positive-3
+    kind: positive
+    prompt: "Un’organizzazione non profit prevede le iscrizioni al programma nel primo anno. Vari lanci precedenti documentano iscrizioni, popolazioni destinatarie e condizioni del lancio, ma la copertura è disomogenea. Costruisci un intervallo esterno, mostra il limite di copertura e confrontalo con il piano."
+    expected_route: reference-class-forecasting
+    expected_behavior: route
+    decisive_features:
+      - forecast
+      - reference_cases
+      - weak_sample
+    rationale: "Esistono obiettivo e casi completati, mentre la copertura disomogenea è un’incertezza esplicita da conservare. Usa la distribuzione osservata e sospendi o indebolisci la conclusione se i dati mancanti sono decisivi."
+  - id: reference-class-forecasting-negative-1
+    kind: negative
+    prompt: "Non abbiamo casi comparabili completati per questo strumento scientifico unico. Spiega quale scelta ingegneristica ha causato il ritardo e proponi un esperimento correttivo."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - no_defensible_reference_class
+      - diagnose
+    rationale: "La richiesta manca esplicitamente di classe difendibile e chiede spiegazione causale. Questo instradamento ripeterebbe la visione interna senza distribuzione esterna."
+  - id: reference-class-forecasting-negative-2
+    kind: negative
+    prompt: "Costruisci quattro futuri esterni distinti per la strategia quinquennale, nominali e identifica segnali precoci e azioni. Non stimare consegne o costi da casi passati."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - plan
+    rationale: "È una probabile confusione con scenario planning: richiede futuri ramificati e segnali, non una distribuzione di riferimento previsionale."
+  - id: reference-class-forecasting-mechanical-1
+    kind: mechanical
+    prompt: "Somma i cinque importi verificati delle fatture e restituisci il totale nella valuta indicata. Non servono previsione, classe comparativa o decisione."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "È un calcolo delimitato senza obiettivo previsionale incerto o giudizio sulla classe; il metodo resta inattivo."
+  - id: reference-class-forecasting-explicit-1
+    kind: explicit
+    prompt: "Usa reference-class forecasting come metodo principale per la data di lancio del software. Abbiamo risultati collegati alle fonti di lanci comparabili; confronta la distribuzione con il piano interno e sospendi la conclusione se la classe non è difendibile."
+    expected_route: reference-class-forecasting
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - forecast
+      - reference_cases
+    rationale: "L’utente nomina il metodo e fornisce obiettivo specifico, risultati comparabili e regola di sospensione. L’invocazione esplicita richiede comunque etichette delle prove e non ammette probabilità inventate."
+  - id: reference-class-forecasting-insufficiency-1
+    kind: insufficiency
+    prompt: "Dimmi quando finirà il progetto. Ho soltanto una data obiettivo interna, nessun caso comparabile completato, nessuna definizione concordata del risultato e nessuna decisione dichiarata relativa alla scadenza."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - no_defensible_reference_class
+      - boundary_sensitive
+      - decisive_input_missing
+    rationale: "Mancano classe decisiva, definizione dell’obiettivo e confine decisionale. L’esito onesto è sospensione e richiesta delimitata dei dati mancanti, non una distribuzione inventata."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pragmatism-positive-01
+    kind: positive
+    prompt: "Zwei Projektmanagementansätze unterscheiden sich bei Sitzungen, Priorisierung und Rückmeldung; vergleichen Sie beobachtbare Folgen vor der Auswahl."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "Deutungen verändern Handlungen und lassen sich anhand begrenzter praktischer Folgen beurteilen."
+  - id: pragmatism-positive-02
+    kind: positive
+    prompt: "Eine Stadt wählt zwischen zwei Beteiligungsrichtlinien und kann einen umkehrbaren Pilotversuch mit vereinbartem Fenster und Sicherheitsgrenzen durchführen."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose, value_conflict]
+    rationale: "Praktische Richtlinienwahl mit sicherem Lerntest steht im Mittelpunkt."
+  - id: pragmatism-positive-03
+    kind: positive
+    prompt: "Langer Streit über zwei Bezeichnungen ändert weder Entscheidung noch Vorhersage; prüfen Sie praktische Gleichwertigkeit in diesem Kontext."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "Prüfung, ob der Streit beobachtbare praktische Unterschiede hat."
+  - id: pragmatism-negative-01
+    kind: negative
+    prompt: "Eine Richtlinienquelle schreibt Berichterstattung vor und verbietet Offenlegung; vergleichen Sie nur weiterhin erlaubte Handlungen."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "Verbindliche Pflichten und Verbote begrenzen Optionen vor dem Folgenvergleich."
+  - id: pragmatism-negative-02
+    kind: negative
+    prompt: "Ein Produktteam muss schwierigen Nutzungsmoment, funktionale/emotionale/soziale Aufgabe und Wechselkräfte vor der Lösung entdecken."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Engpass ist Entdeckung des Nutzerfortschritts statt Folgenvergleich bekannter Deutungen."
+  - id: pragmatism-mechanical-01
+    kind: mechanical
+    prompt: "Setzen Sie die zwei Richtlinienbeschreibungen in benachbarte Spalten ohne Folgenvergleich oder Empfehlung."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Spaltenformatierung ist mechanisch."
+  - id: pragmatism-explicit-01
+    kind: explicit
+    prompt: "Nutzen Sie pragmatism zum praktischen Vergleich dieser zwei Vorfallsleitfäden mit umkehrbarer Planspielprüfung."
+    expected_route: pragmatism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, practical_consequence, choose]
+    rationale: "Der Nutzer fordert ausdrücklich kontextgebundenen Folgenvergleich und Test."
+  - id: pragmatism-insufficiency-01
+    kind: insufficiency
+    prompt: "Optionen und Erfolgskriterium fehlen; erklären Sie die tröstliche Deutung für wahr, weil sie nützlich wirkt."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [practical_consequence, decisive_input_missing]
+    rationale: "Nützlichkeit braucht Optionen, Kriterium und beobachtbare Folgen."

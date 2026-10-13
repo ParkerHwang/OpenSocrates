@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "systems-thinking-positive-01",
+      "kind": "positive",
+      "prompt": "L’arretrato della moderazione cresce mentre i ritardi aumentano la frustrazione degli utenti, generando più segnalazioni duplicate; il gruppo vuole capire la struttura dell’andamento.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question",
+        "deep_uncertainty"
+      ],
+      "rationale": "L’andamento ricorrente contiene flussi interagenti, retroazioni e ritardi, non una singola causa isolata."
+    },
+    {
+      "id": "systems-thinking-positive-02",
+      "kind": "positive",
+      "prompt": "Un sussidio per la conservazione aumenta inizialmente le piantagioni, poi scarsità d’acqua e risposte di controllo producono risultati oscillanti tra le stagioni.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "deep_uncertainty",
+        "causal_question"
+      ],
+      "rationale": "Il comportamento stagionale e la resistenza alle misure richiedono stock, flussi, circuiti bilancianti e ritardi."
+    },
+    {
+      "id": "systems-thinking-positive-03",
+      "kind": "positive",
+      "prompt": "La fiducia dei clienti si accumula lentamente, le raccomandazioni rafforzano la crescita e un taglio all’assistenza produce un declino ritardato; trova un punto di leva.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "La richiesta mira esplicitamente ad accumulo, effetti rinforzanti, esiti ritardati e leva d’intervento."
+    },
+    {
+      "id": "systems-thinking-negative-01",
+      "kind": "negative",
+      "prompt": "Due gruppi abbinati hanno ricevuto formazione diversa e l’utente chiede se la formazione abbia cambiato i punteggi dei test dopo un mese.",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "È sufficiente un confronto circoscritto degli interventi; non serve un sistema dinamico completo."
+    },
+    {
+      "id": "systems-thinking-negative-02",
+      "kind": "negative",
+      "prompt": "Un singolo guasto al database ha un fattore scatenante chiaro e datato e il gruppo cerca la condizione prossima e la causa di fondo controllabile.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "diagnose",
+        "recurring_failure"
+      ],
+      "rationale": "Dovrebbe prevalere una diagnosi circoscritta dell’incidente, salvo che evidenze successive rivelino un andamento ricorrente di retroazione."
+    },
+    {
+      "id": "systems-thinking-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Converti le note su stock e flussi in punti Markdown senza spiegare il sistema.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "La riformattazione è meccanica e non richiede un giudizio sulla struttura del sistema."
+    },
+    {
+      "id": "systems-thinking-explicit-01",
+      "kind": "explicit",
+      "prompt": "Usa systems-thinking per spiegare perché la nostra correzione locale dell’organico viene ripetutamente compensata dalla crescita dell’arretrato nel lungo periodo.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "L’utente invoca esplicitamente il metodo per un andamento sistemico ricorrente con ritardi."
+    },
+    {
+      "id": "systems-thinking-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Ieri è avvenuto un solo reclamo; disegna un circuito rinforzante e raccomanda un intervento sull’intero sistema senza un andamento temporale.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "feedback_delay",
+        "decisive_input_missing"
+      ],
+      "rationale": "Un’osservazione isolata non può stabilire un comportamento dinamico o la direzione di un circuito."
+    }
+  ]
+}

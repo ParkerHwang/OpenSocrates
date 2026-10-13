@@ -685,11 +685,11 @@ def validate_method_authoring(value: Any, *, expected_id: str | None = None) -> 
         )
     for field in ("display_name", "plain_action"):
         labels = _mapping(data[field], f"{method_id}.{field}")
-        if set(labels) != {"en", "ko", "zh", "ja"}:
+        if set(labels) != {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
             raise ContentValidationError(
-                f"{method_id}.{field}: locales must be exactly en, ko, zh, and ja"
+                f"{method_id}.{field}: locales must be exactly the ten supported locales"
             )
-        for locale in ("en", "ko", "zh", "ja"):
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
             _string(labels[locale], f"{method_id}.{field}.{locale}")
     participation = _mapping(data["participation"], f"{method_id}.participation")
     _keys(
@@ -784,8 +784,10 @@ def validate_method_authoring(value: Any, *, expected_id: str | None = None) -> 
         raise ContentValidationError(
             f"{method_id}.complements.incompatible_secondary: v1 must be empty"
         )
-    if data["locales"] != ["en", "ko", "zh", "ja"]:
-        raise ContentValidationError(f"{method_id}.locales: expected ['en', 'ko']")
+    if data["locales"] != ["en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"]:
+        raise ContentValidationError(
+            f"{method_id}.locales: expected the ten supported locale codes in canonical order"
+        )
     provenance = _mapping(data["source_provenance"], f"{method_id}.source_provenance")
     _keys(
         provenance,
@@ -942,8 +944,21 @@ def _unique_strings(value: Any, path: str) -> tuple[str, ...]:
 def _localized_text(value: Any, path: str) -> dict[str, str]:
     localized = dict(_mapping(value, path))
     locale_keys = set(localized)
-    if "en" not in locale_keys or locale_keys - {"en", "ko", "zh", "ja"}:
-        raise ContentValidationError(f"{path}: English is required; only en/ko/zh/ja are supported")
+    if "en" not in locale_keys or locale_keys - {
+        "en",
+        "ko",
+        "zh",
+        "ja",
+        "fr",
+        "de",
+        "it",
+        "es",
+        "pt",
+        "th",
+    }:
+        raise ContentValidationError(
+            f"{path}: English is required; only supported locale codes are supported"
+        )
     if any(not isinstance(text, str) or not text.strip() for text in localized.values()):
         raise ContentValidationError(f"{path}: localized values must be non-empty strings")
     return localized
@@ -1045,7 +1060,18 @@ def validate_reasoning_content_projections_shape(value: Any) -> dict[str, Any]: 
             raise ContentValidationError(f"{path}.schema: unsupported schema")
         method_id = _string(content["method_id"], f"{path}.method_id")
         locale = content["locale"]
-        if method_id not in catalog_by_id or locale not in {"en", "ko", "zh", "ja"}:
+        if method_id not in catalog_by_id or locale not in {
+            "en",
+            "ko",
+            "zh",
+            "ja",
+            "fr",
+            "de",
+            "it",
+            "es",
+            "pt",
+            "th",
+        }:
             raise ContentValidationError(f"{path}: unknown method or locale")
         if (
             _positive_content_revision(content["content_revision"], f"{path}.content_revision")

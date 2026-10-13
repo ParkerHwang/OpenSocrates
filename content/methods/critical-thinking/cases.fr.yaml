@@ -1,0 +1,102 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "critical-thinking-positive-01",
+      "kind": "positive",
+      "prompt": "Un rapport fournisseur revendique un gain de productivité de 40% d'après sa propre enquête ; évaluez source, cadrage, comparaison absente et inférence avant l'achat.",
+      "expected_route": "critical-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "critique",
+        "hidden_assumptions",
+        "source_quality"
+      ],
+      "rationale": "L'ensemble exige des vérifications de source, cadrage, logique et alternatives plutôt qu'une seule recherche de citation."
+    },
+    {
+      "id": "critical-thinking-positive-02",
+      "kind": "positive",
+      "prompt": "Une note de direction affirme qu'un essai pilote prouve l'efficacité universelle de la politique ; identifiez l'affirmation la plus forte, les hypothèses, omissions et contre-argument.",
+      "expected_route": "critical-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "critique",
+        "hidden_assumptions",
+        "argument_dispute"
+      ],
+      "rationale": "La demande exige explicitement une évaluation critique large de l'ensemble et de sa généralisation."
+    },
+    {
+      "id": "critical-thinking-positive-03",
+      "kind": "positive",
+      "prompt": "Deux commentateurs crédibles divergent sur l'efficacité d'un programme de sécurité ; l'utilisateur souhaite un verdict équitable sans prendre le désaccord pour une preuve en faveur d'un camp.",
+      "expected_route": "critical-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "critique",
+        "conflicting_sources",
+        "argument_dispute"
+      ],
+      "rationale": "Crédibilité de source, cadrage, soutien logique et conflit non résolu sont tous importants et distincts."
+    },
+    {
+      "id": "critical-thinking-negative-01",
+      "kind": "negative",
+      "prompt": "Un débat comporte une affirmation centrale, des fondements, objections et réponses nécessitant une carte visible de leurs liens.",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "Le besoin précis est une cartographie structurelle affirmation-fondement-objection, pas une critique large sur trois axes."
+    },
+    {
+      "id": "critical-thinking-negative-02",
+      "kind": "negative",
+      "prompt": "Une hiérarchie de sources doit déterminer si une affirmation clinique est directement soutenue par des éléments primaires ou seulement un résumé.",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "La qualité des sources et le soutien affirmation-source sont le résultat décisif."
+    },
+    {
+      "id": "critical-thinking-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Copiez l'affirmation citée et les noms de ses sources dans un modèle d'examen sans juger vérité ou pertinence.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "La copie dans un modèle est mécanique même si le contenu est une affirmation."
+    },
+    {
+      "id": "critical-thinking-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez critical-thinking pour examiner cette note d'investissement et indiquer ce qui est vérifié, manquant et encore incertain.",
+      "expected_route": "critical-thinking",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "critique"
+      ],
+      "rationale": "La méthode est explicitement demandée pour juger un ensemble d'affirmations."
+    },
+    {
+      "id": "critical-thinking-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "La source est une capture d'écran sans attribution, date ni données sous-jacentes ; déclarez le titre vrai parce qu'il paraît plausible.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "critique",
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "La source et la prémisse centrales ne peuvent être vérifiées ; le verdict doit rester suspendu plutôt que devenir une acceptation."
+    }
+  ]
+}

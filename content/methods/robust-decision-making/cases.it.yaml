@@ -1,0 +1,82 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: robust-decision-making-positive-1
+    kind: positive
+    prompt: "Dobbiamo scegliere un progetto di protezione dalle alluvioni per infrastrutture operative per decenni. Piogge, uso del territorio e finanziamenti sono profondamente incerti; serve l’opzione che rimanga sopra una soglia di sicurezza pubblicata in mondi plausibili, non quella vincente con una sola previsione."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - irreversible_choice
+      - choose
+      - failure_risk
+    rationale: "La decisione è rilevante e difficile da invertire, interagiscono più incertezze e si richiede un’azione accettabile in mondi plausibili. Non occorre un optimum ponderato per probabilità."
+  - id: robust-decision-making-positive-2
+    kind: positive
+    prompt: "La strategia della catena di fornitura deve sopravvivere a dazi, domanda e affidabilità dei fornitori incerti nei prossimi otto anni. Confronta strategie fattibili secondo fallimento e rimpianto, rendi visibili compromessi e aggiungi trigger di monitoraggio per azioni adattive."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - irreversible_choice
+      - failure_risk
+      - feedback_delay
+    rationale: "Si richiedono stress test scenario-strategia, criteri di fallimento espliciti e trigger adattivi: risultati pubblici di robust decision making nell’incertezza profonda."
+  - id: robust-decision-making-positive-3
+    kind: positive
+    prompt: "Abbiamo tre opzioni per un investimento regionale nei trasporti ma il mix futuro di lavoro remoto, prezzi dei carburanti e fondi pubblici non è abbastanza credibile per un’unica previsione. Identifica una prima mossa accettabile, debolezze residue e prove che la cambierebbero."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - multiple_options
+      - choose
+      - new_evidence
+    rationale: "L’utente ha una scelta reale, incertezza profonda e richiede una strategia accettabile, non la più probabile. Debolezza residua e condizione di cambiamento impediscono affermazioni eccessive di robustezza."
+  - id: robust-decision-making-negative-1
+    kind: negative
+    prompt: "La previsione di domanda del caso base è ben validata, il progetto pilota si può invertire il prossimo mese a costo trascurabile e la direzione vuole solo l’azione dal rendimento atteso più alto in quel caso."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - source_quality
+      - sequential_choice
+      - choose
+    rationale: "Un caso atteso affidabile e reversibilità banale sono condizioni esplicite per evitare il metodo. Uno stress test robusto non aggiunge qui valore decisionale necessario."
+  - id: robust-decision-making-negative-2
+    kind: negative
+    prompt: "Crea quattro futuri esterni nominati sul mercato energetico, descrivi come sorgono ed elenca segnali precoci. Non confrontare azioni attuali secondo criteri di fallimento o rimpianto."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - plan
+    rationale: "È una probabile confusione con scenario planning: costruzione di futuri e segnali, con esclusione deliberata di stress test strategici e criteri di accettazione."
+  - id: robust-decision-making-mechanical-1
+    kind: mechanical
+    prompt: "Calcola il rendimento annualizzato da questi flussi di cassa verificati usando la formula dichiarata e mostra l’aritmetica. Non scegliere fra strategie."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "È un calcolo delimitato con formula fornita e nessun insieme decisionale incerto. Il metodo non deve trasformare aritmetica in giudizio di robustezza."
+  - id: robust-decision-making-explicit-1
+    kind: explicit
+    prompt: "Usa robust-decision-making come metodo principale per la scelta di adattamento costiero. Testa opzioni in mondi climatici e finanziari plausibili, usa il servizio minimo come soglia di fallimento e sospendi se mancano mondi o soglia."
+    expected_route: robust-decision-making
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - deep_uncertainty
+      - irreversible_choice
+      - failure_risk
+    rationale: "L’utente invoca il metodo e fornisce quadro, test nei mondi, soglia e regola di sospensione. L’invocazione non rimuove vincoli sulle prove e sull’incertezza."
+  - id: robust-decision-making-insufficiency-1
+    kind: insufficiency
+    prompt: "Dimmi quale strategia a lungo termine è robusta. Non ho elencato azioni fattibili, significato del fallimento, orizzonte o incertezze da testare."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - decisive_input_missing
+    rationale: "Azioni, soglia, orizzonte e registro delle incertezze sono decisivi. Una raccomandazione robusta non è sostenibile: sospendi e chiedi solo i dati decisionali mancanti."

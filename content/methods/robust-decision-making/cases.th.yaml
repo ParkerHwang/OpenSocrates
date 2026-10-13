@@ -1,0 +1,109 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "robust-decision-making-positive-1",
+      "kind": "positive",
+      "prompt": "ต้องเลือกแบบป้องกันน้ำท่วมโครงสร้างที่จะใช้หลายทศวรรษ ฝน การใช้ที่ดิน และเงินไม่แน่นอนลึก ต้องทางเลือกเหนือขั้นต่ำปลอดภัยประกาศข้ามโลกเป็นไปได้ แทนชนะพยากรณ์เดียว",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "irreversible_choice",
+        "choose",
+        "failure_risk"
+      ],
+      "rationale": "การตัดสินผลสูงและย้อนยาก ความไม่แน่นอนหลายข้อปฏิสัมพันธ์ ผู้ใช้ขอการกระทำยอมรับข้ามโลก ไม่ต้องดีที่สุดถ่วงโอกาส"
+    },
+    {
+      "id": "robust-decision-making-positive-2",
+      "kind": "positive",
+      "prompt": "กลยุทธ์ห่วงโซ่อุปทานต้องอยู่รอดภาษี อุปสงค์ และผู้ส่งเชื่อถือไม่แน่นอนแปดปีหน้า เทียบกลยุทธ์ทำได้กับเกณฑ์ล้ม/เสียใจ แสดงสิ่งยอมเสีย และตัวกระตุ้นเฝ้าดูเพื่อปรับ",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "irreversible_choice",
+        "failure_risk",
+        "feedback_delay"
+      ],
+      "rationale": "โจทย์ขอทดสอบสถานการณ์/กลยุทธ์ เกณฑ์ล้มชัด และตัวกระตุ้นปรับ เป็นผลสาธารณะ robust decision making ใต้ความไม่แน่นอนลึก"
+    },
+    {
+      "id": "robust-decision-making-positive-3",
+      "kind": "positive",
+      "prompt": "มีสามทางเลือกระบบขนส่งภูมิภาค แต่ส่วนผสมงานทางไกล ราคาเชื้อเพลิง และทุนสาธารณะอนาคตไม่น่าเชื่อพอพยากรณ์เดียว หาก้าวแรกยังยอมรับ ระบุจุดอ่อนคง และหลักฐานเปลี่ยน",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "multiple_options",
+        "choose",
+        "new_evidence"
+      ],
+      "rationale": "มีทางเลือกจริง ไม่แน่นอนลึก และขอกลยุทธ์ยอมรับแทนมีโอกาสที่สุด จุดอ่อนคงและเงื่อนไขเปลี่ยนป้องกันอ้างทนทานเกิน"
+    },
+    {
+      "id": "robust-decision-making-negative-1",
+      "kind": "negative",
+      "prompt": "พยากรณ์อุปสงค์ฐานตรวจดี ทดลองย้อนเดือนหน้าได้แทบไม่มีต้นทุน ผู้บริหารต้องการการกระทำผลตอบแทนคาดสูงสุดกรณีนั้นเท่านั้น",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "sequential_choice",
+        "choose"
+      ],
+      "rationale": "โจทย์บอกกรณีคาดเดียวเชื่อถือและย้อนง่าย เป็นเงื่อนไขหลีกชัด ทดสอบทนทานไม่เพิ่มคุณค่าตัดสินจำเป็น"
+    },
+    {
+      "id": "robust-decision-making-negative-2",
+      "kind": "negative",
+      "prompt": "สร้างสี่อนาคตภายนอกตลาดพลังงานมีชื่อ อธิบายเส้นเกิด และสัญญาณต้น ไม่เทียบการกระทำปัจจุบันกับเกณฑ์ล้มหรือเสียใจ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "plan"
+      ],
+      "rationale": "อาจสับสน scenario planning ขอสร้างอนาคต/สัญญาณแต่จงใจละทดสอบกลยุทธ์และเกณฑ์ยอมรับ"
+    },
+    {
+      "id": "robust-decision-making-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "คำนวณผลตอบแทนต่อปีจากกระแสเงิน verified ตามสูตรให้และแสดงเลข ไม่เลือกกลยุทธ์",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "เป็นคำนวณจำกัดมีสูตร ไม่มีชุดตัดสินไม่แน่นอน ห้ามเปลี่ยนเลขเป็นคำตัดสินทนทาน"
+    },
+    {
+      "id": "robust-decision-making-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้ robust-decision-making เป็นหลักเลือกปรับตัวชายฝั่ง ทดสอบทางเลือกข้ามโลกภูมิอากาศและงบ ใช้บริการขั้นต่ำเราเป็นเกณฑ์ล้ม และพักถ้าโลกหรือเกณฑ์ขาด",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "deep_uncertainty",
+        "irreversible_choice",
+        "failure_risk"
+      ],
+      "rationale": "ผู้ใช้ขอชัดพร้อมกรอบ ทดสอบโลก ขั้นต่ำ และกฎพัก ไม่ลบข้อจำกัดหลักฐาน/ความไม่แน่นอน"
+    },
+    {
+      "id": "robust-decision-making-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "บอกกลยุทธ์ยาวใดทนทาน ยังไม่ให้การกระทำทำได้ นิยามล้ม เวลา หรือความไม่แน่นอนทดสอบ",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "ชุดการกระทำ ขั้นต่ำ เวลา และทะเบียนไม่แน่นอนเป็นข้อมูลชี้ขาด แนะนำทนทานไม่มีรองรับ ต้องพักและขอเฉพาะข้อมูลตัดสินขาด"
+    }
+  ]
+}

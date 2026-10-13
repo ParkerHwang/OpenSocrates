@@ -1,0 +1,110 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "value-of-information-positive-1",
+      "kind": "positive",
+      "prompt": "Podemos lançar agora ou estudar usuários primeiro. Achado sobre adoção levaria a ações distintas; método e custo são conhecidos e há data fixa após a qual atraso é inaceitável.",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "new_evidence",
+        "sensitive_inputs"
+      ],
+      "rationale": "Há caminho explícito de mudança e encargo limitado. Não exige probabilidade de sucesso nem valor monetário inventados."
+    },
+    {
+      "id": "value-of-information-positive-2",
+      "kind": "positive",
+      "prompt": "Antes de assinar contrato, podemos inspecionar variável de risco que muda fornecedor. Fonte, custo, atraso e limiar estão documentados; decida se vale inspecionar.",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "irreversible_choice",
+        "sensitive_inputs"
+      ],
+      "rationale": "Informação precede decisão irreversível e muda ação. Mostre proveniência e atraso sem fabricar probabilidade posterior."
+    },
+    {
+      "id": "value-of-information-positive-3",
+      "kind": "positive",
+      "prompt": "Uma equipe política decide ampliar programa ou pausar para avaliação direcionada. O teste distingue resultado de ampliar e de encerrar; exposição e prazo estão declarados.",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "testable_hypothesis",
+        "feedback_delay"
+      ],
+      "rationale": "A pergunta é se teste viável muda ação antes do prazo, não pesquisa aberta adicional."
+    },
+    {
+      "id": "value-of-information-negative-1",
+      "kind": "negative",
+      "prompt": "Encontre tudo de interessante sobre trabalho remoto e resuma literatura. Não há decisão, limiar, variável incerta ou prazo.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explain",
+        "source_quality"
+      ],
+      "rationale": "Pesquisa aberta sem decisão mudável; valor da informação exige decisão e limiar."
+    },
+    {
+      "id": "value-of-information-negative-2",
+      "kind": "negative",
+      "prompt": "Regra exige equipamento protetor aprovado. Decida se pesquisa justificaria equipamento não aprovado mais barato; não há margem.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "binding_rule_without_discretion",
+        "single_feasible_option"
+      ],
+      "rationale": "É confusão provável com raciocínio deôntico ou segurança qualificada. Informação nova não autoriza trocar regra vinculante."
+    },
+    {
+      "id": "value-of-information-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Use equação fornecida e entradas verificadas para retornar amostra exigida. Não decida realizar estudo nem interprete valor decisório.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Cálculo fixo, não julgamento de mudança de ação pela informação."
+    },
+    {
+      "id": "value-of-information-explicit-1",
+      "kind": "explicit",
+      "prompt": "Use value-of-information para decidir se inspeção vale custo e atraso. Declare achado que muda fornecedor e ponto de parada.",
+      "expected_route": "value-of-information",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "information_purchase",
+        "irreversible_choice"
+      ],
+      "rationale": "Nomeia método e contrato de limiar, mudança, custo, atraso e encerramento."
+    },
+    {
+      "id": "value-of-information-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Devemos investigar antes de agir? Ação atual, alternativa, variável, teste possível e atraso tolerável não foram declarados.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sem limiar e caminho viável, não se estabelece valor de mudança. Suspenda e peça menor esclarecimento seguro."
+    }
+  ]
+}

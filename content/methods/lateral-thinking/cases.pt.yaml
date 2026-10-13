@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "lateral-thinking-positive-01",
+      "kind": "positive",
+      "prompt": "A equipe otimizou repetidamente a mesma rota de entrega e quer questionar a suposição de que todo pedido deve passar por um depósito central.",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "As opções estão estagnadas e solicita-se uma provocação que mude o enquadramento antes da avaliação."
+    },
+    {
+      "id": "lateral-thinking-positive-02",
+      "kind": "positive",
+      "prompt": "Uma fila de serviço público não permite processamento mais rápido; gere conceitos invertendo quem se desloca, quando ocorre o atendimento ou o que constitui a fila.",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "A tarefa pede explicitamente outro enquadramento e vários conceitos, seguidos de triagem."
+    },
+    {
+      "id": "lateral-thinking-positive-03",
+      "kind": "positive",
+      "prompt": "Uma equipe de produto continua acrescentando funcionalidades para resolver a queda de engajamento; questione o enquadramento e crie alternativas que não acrescentem funcionalidades.",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "O enquadramento de otimização existente bloqueia novas opções e deve ser deliberadamente rompido."
+    },
+    {
+      "id": "lateral-thinking-negative-01",
+      "kind": "negative",
+      "prompt": "As evidências de entrevistas estão incompletas e a equipe precisa descobrir a necessidade humana, prototipar um serviço e testar com segurança o comportamento dos usuários.",
+      "expected_route": "design-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "human_need",
+        "user_progress"
+      ],
+      "rationale": "Descoberta de necessidades e testes com usuários são prioritários; só provocar pularia evidências essenciais."
+    },
+    {
+      "id": "lateral-thinking-negative-02",
+      "kind": "negative",
+      "prompt": "Uma proteção de máquina deve cumprir uma especificação obrigatória de segurança, e a equipe pergunta se o projeto passa nos testes exigidos.",
+      "expected_route": "critical-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "critique",
+        "explicit_rules"
+      ],
+      "rationale": "A validação crítica para segurança exige evidências disciplinadas e a especificação autorizada, não provocações abertas."
+    },
+    {
+      "id": "lateral-thinking-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Ordene alfabeticamente a lista existente de opções e preserve todas as descrições sem criar alternativas.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Ordenar é mecânico e não pede questionamento do enquadramento."
+    },
+    {
+      "id": "lateral-thinking-explicit-01",
+      "kind": "explicit",
+      "prompt": "Use lateral-thinking para encontrar três maneiras pouco óbvias de reduzir resíduos de conferências sem mudar as regras de segurança.",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "O usuário pede explicitamente alternativas que rompam o enquadramento preservando uma restrição."
+    },
+    {
+      "id": "lateral-thinking-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "O problema e as restrições inegociáveis são desconhecidos; invente uma opção radical e recomende-a imediatamente.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "stale_options",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sem enquadramento ou restrições protegidas, não é possível fazer triagem segura da provocação."
+    }
+  ]
+}

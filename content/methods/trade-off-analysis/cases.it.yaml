@@ -1,0 +1,117 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "trade-off-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Scegli fra tre fornitori usando velocità di consegna, affidabilità, accessibilità e costo totale. Il gruppo acquisti ha documentato quale requisito costituisce un veto e ciascuna parte interessata ha fornito una preferenza datata per i criteri restanti.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Diverse opzioni competono su criteri espliciti, con vincolo separato e provenienza dei pesi. Il confronto può mostrare le rinunce senza fingere che tutti i valori siano intercambiabili."
+    },
+    {
+      "id": "trade-off-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "Un gruppo di prodotto deve scegliere un progetto che bilanci prestazioni, manutenibilità, riservatezza e sforzo dell’utente. I dati di test sostengono alcune valutazioni, le interviste altre; la riservatezza è una condizione minima, non un punteggio.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "source_quality"
+      ],
+      "rationale": "Il compito richiede un confronto attento alla provenienza dei criteri concorrenti e un vincolo di riservatezza non compensabile. Le evidenze miste possono essere etichettate anziché appiattite."
+    },
+    {
+      "id": "trade-off-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Due piani di organico hanno effetti diversi su copertura, continuità, costi e carico di lavoro. Il gruppo concorda un ordine di preferenza ordinale, non una scala numerica precisa; mostra quale piano prevale e quale cambiamento lo invertirebbe.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "sensitive_inputs"
+      ],
+      "rationale": "Sono richiesti esplicitamente un confronto ordinale e una condizione di cambiamento. Il metodo può evitare falsa precisione mantenendo visibile la scelta."
+    },
+    {
+      "id": "trade-off-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Una norma edilizia richiede uno specifico standard antincendio. Resta un solo progetto conforme e il richiedente domanda se si possa preferire un progetto più economico non conforme perché ottiene un punteggio migliore sulla comodità.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "single_feasible_option",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "Un requisito vincolante viene trattato come criterio compensabile. La famiglia probabile è deontic-reasoning o una revisione qualificata di conformità, non l’analisi dei compromessi."
+    },
+    {
+      "id": "trade-off-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Non sappiamo se svolgere uno studio sui clienti prima di scegliere un progetto. La domanda è quanto lo studio potrebbe cambiare la decisione e se valga il ritardo, non come confrontare oggi i progetti.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "new_evidence",
+        "sensitive_inputs"
+      ],
+      "rationale": "La probabile confusione di famiglia riguarda value-of-information: il compito immediato è valutare informazioni aggiuntive, non pesare le opzioni attuali."
+    },
+    {
+      "id": "trade-off-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Ordina questi record già verificati in base al punteggio fornito in una sola colonna e restituisci l’elenco ordinato. Non sono richieste scelta dei criteri, conflitti di preferenze o spiegazioni della raccomandazione.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Un ordinamento fisso è meccanico e non presenta compromessi discrezionali."
+    },
+    {
+      "id": "trade-off-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Usa trade-off-analysis per questa decisione sulla sede. Separa vincoli di veto e preferenze, conserva la fonte di ogni valutazione e mostra a cosa rinuncia la raccomandazione.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "choose",
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "L’utente nomina esplicitamente il metodo e richiede il suo contratto di confronto pubblico. Valutazioni non sostenute restano assunte o non verificate."
+    },
+    {
+      "id": "trade-off-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Scegli l’opzione migliore fra queste alternative senza nome. Non abbiamo concordato criteri, condizioni minime accettabili o priorità da considerare.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "decisive_input_missing"
+      ],
+      "rationale": "Mancano insieme fattibile, criteri decisivi e provenienza delle preferenze. Una raccomandazione sarebbe un punteggio costruito a posteriori, quindi il confronto deve essere sospeso."
+    }
+  ]
+}

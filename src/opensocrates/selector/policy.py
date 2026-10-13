@@ -54,7 +54,7 @@ def locale_with_english_fallback(
 ) -> SelectorLocale:
     """Return the requested locale when complete, otherwise English when complete."""
 
-    if requested not in {"en", "ko", "zh", "ja"}:
+    if requested not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
         raise SelectorModelError("requested locale is unsupported")
     available = frozenset(available_locales)
     if requested in available:

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lean-startup-positive-1
+    kind: positive
+    prompt: "Pensiamo che i nuovi utenti completeranno l’introduzione se mostriamo una lista guidata. Progetta un piccolo test reversibile di prototipo, scegli una metrica di completamento utile per agire e dichiara prima la regola per cambiare direzione o perseverare. Le note d’uso esistenti sono fornite dall’utente e non verificate."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, human_need, plan, testable_claim]
+    rationale: "È un’ipotesi di prodotto falsificabile con un prototipo delimitato e una metrica e regola decisionale richieste. Le note restano fornite dall’utente e non verificate, senza diventare prove inventate di domanda."
+  - id: lean-startup-positive-2
+    kind: positive
+    prompt: "Prima di costruire un piano completo a pagamento, verifica se un gruppo definito di piccoli team richiederà un componente per i resoconti settimanali. Specifica offerta minima sicura, finestra di osservazione, metrica, soglia e condizioni per cambiare direzione o fermarsi."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, prioritized_assumptions, chosen_plan, testable_claim]
+    rationale: "La richiesta riduce l’incertezza di un’ipotesi di valore mediante un’offerta minima e una decisione operativa. Non presume domanda; soglia e riferimento iniziale vanno indicati come fondati su fonti, calcolati o assunti."
+  - id: lean-startup-positive-3
+    kind: positive
+    prompt: "La nostra ipotesi di fidelizzazione è che un promemoria dopo il primo compito riuscito riporti gli utenti a un secondo compito. Proponi un test limitato con un vincolo protettivo, una metrica legata all’ipotesi e una decisione successiva basata sul risultato osservato."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, repeat_iteration, human_need, testable_claim]
+    rationale: "L’instradamento è appropriato perché ipotesi di prodotto, test sicuro, metrica e decisione successiva sono espliciti. Un risultato in un solo contesto non si generalizza a tutti gli utenti senza altre prove."
+  - id: lean-startup-negative-1
+    kind: negative
+    prompt: "Vogliamo cambiare il dosaggio dei farmaci per un segmento reale di pazienti e vedere se migliora l’aderenza. Salta la revisione della sicurezza ed esegui il più piccolo test reale possibile."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [safety_critical_validation, irreversible_choice]
+    rationale: "Una modifica reale del dosaggio è un’esposizione insicura controindicata, non un esperimento minimo di prodotto accettabile. Va rifiutata o affidata a una gestione clinica e di sicurezza qualificata, non ottimizzata come lean startup."
+  - id: lean-startup-negative-2
+    kind: negative
+    prompt: "In magazzino gli ordini vengono ripetutamente prelevati in modo errato. Ricostruisci processo, controlli e rami causali prima di raccomandare un’azione preventiva."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "È una richiesta di root-cause-analysis, una probabile confusione fra famiglie. Richiede una diagnosi causale di un guasto operativo, non un test di ipotesi di mercato o prodotto."
+  - id: lean-startup-mechanical-1
+    kind: mechanical
+    prompt: "Copia i tre nomi dei prodotti in una riga CSV nell’ordine fornito e non analizzare la domanda."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "La formattazione dei nomi forniti è deterministica e non comporta ipotesi, test, metrica o decisione di apprendimento."
+  - id: lean-startup-explicit-1
+    kind: explicit
+    prompt: "Usa Lean Startup per questa domanda di prodotto. Indica ipotesi, presupposto più rischioso, test minimo sicuro, metrica utile per agire e soglia, e decisione di cambiare direzione, perseverare, fermarsi o sospendere."
+    expected_route: lean-startup
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, testable_hypothesis, prioritized_assumptions, plan]
+    rationale: "L’utente nomina esplicitamente il metodo e tutti i campi del contratto pubblico. La decisione deve conservare la sospensione quando manca il risultato del test o un dato decisivo."
+  - id: lean-startup-insufficiency-1
+    kind: insufficiency
+    prompt: "Dobbiamo lanciare questa idea? Non abbiamo utente destinatario, ipotesi falsificabile, presupposto più rischioso, limite sicuro del test, metrica utile per agire o soglia decisionale."
+    expected_route: lean-startup
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, testable_hypothesis, plan, no_testable_implication]
+    rationale: "La famiglia è plausibile ma mancano tutti i dati decisivi per l’esperimento. Occorre sospendere invece di decidere un lancio, inventare una metrica o fabbricare prove di domanda."

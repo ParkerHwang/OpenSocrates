@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: critical-thinking-positive-01
+    kind: positive
+    prompt: "Un rapporto del fornitore afferma un aumento di produttività del 40% dalla propria indagine; valuta fonte, quadro, confronto mancante e inferenza prima dell’acquisto."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, source_quality]
+    rationale: "Le affermazioni richiedono controlli di fonte, quadro, logica e alternative, non una sola ricerca di citazione."
+  - id: critical-thinking-positive-02
+    kind: positive
+    prompt: "Un memorandum dirigenziale dice che un progetto pilota dimostra l’efficacia della politica ovunque; identifica affermazione più forte, ipotesi, omissioni e controargomentazione."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, argument_dispute]
+    rationale: "La richiesta chiede esplicitamente valutazione critica ampia delle affermazioni e generalizzazione."
+  - id: critical-thinking-positive-03
+    kind: positive
+    prompt: "Due commentatori credibili discordano sull’efficacia di un programma di sicurezza; l’utente vuole un giudizio equo senza trattare il disaccordo come prova per una parte."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, conflicting_sources, argument_dispute]
+    rationale: "Credibilità delle fonti, quadro, sostegno logico e conflitto irrisolto separati sono tutti rilevanti."
+  - id: critical-thinking-negative-01
+    kind: negative
+    prompt: "Un dibattito contiene affermazione centrale, fondamenti, obiezioni e risposte che necessitano di una mappa visibile dei collegamenti."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "Occorre specificamente una mappatura strutturale affermazioni-fondamenti-obiezioni, non una critica ampia su tre assi."
+  - id: critical-thinking-negative-02
+    kind: negative
+    prompt: "Una gerarchia delle fonti deve determinare se un’affermazione clinica sia sostenuta direttamente da prove primarie o soltanto da un riepilogo."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Qualità delle fonti e sostegno tra affermazioni e fonti sono il risultato decisivo."
+  - id: critical-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Copia l’affermazione citata e i nomi delle fonti in un modello di revisione senza giudicare verità o pertinenza."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copiare in un modello è meccanico anche se il contenuto è un’affermazione."
+  - id: critical-thinking-explicit-01
+    kind: explicit
+    prompt: "Usa critical-thinking per esaminare questo memorandum d’investimento e indicare ciò che è verificato, mancante e ancora incerto."
+    expected_route: critical-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, critique]
+    rationale: "Il metodo è richiesto esplicitamente per giudicare un insieme di affermazioni."
+  - id: critical-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "La fonte è uno screenshot senza attribuzione, data o dati sottostanti; dichiara vero il titolo perché sembra plausibile."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [critique, source_quality, decisive_input_missing]
+    rationale: "Fonte e premessa centrali non sono controllabili: il giudizio deve restare sospeso, non diventare accettazione."

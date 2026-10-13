@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pyramid-principle-positive-01
+    kind: positive
+    prompt: "Convierte este análisis validado en un memorando ejecutivo con recomendación primero, luego razones agrupadas y detalles."
+    expected_route: pyramid-principle
+    expected_behavior: route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "El juicio está preparado y el obstáculo es comunicar primero la conclusión."
+  - id: pyramid-principle-positive-02
+    kind: positive
+    prompt: "Reorganiza el informe con idea rectora arriba y secciones que la apoyen sin solapamientos."
+    expected_route: pyramid-principle
+    expected_behavior: route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "Se requieren respuesta principal, razones agrupadas, resumen vertical y orden horizontal."
+  - id: pyramid-principle-positive-03
+    kind: positive
+    prompt: "Haz que los ejecutivos puedan examinar este largo análisis sin ocultar incertidumbre ni alternativas."
+    expected_route: pyramid-principle
+    expected_behavior: route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "Estructura un análisis ya juzgado conservando incertidumbre material."
+  - id: pyramid-principle-negative-01
+    kind: negative
+    prompt: "¿Qué premisa apoya la recomendación y cuál es la objeción pendiente más fuerte?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [argument_dispute, critique]
+    rationale: "Se inspecciona apoyo argumental, no se reordena una respuesta resuelta."
+  - id: pyramid-principle-negative-02
+    kind: negative
+    prompt: "Decide si esta recomendación tiene respaldo, pero aún no se han revisado evidencia ni alternativas."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, critique]
+    rationale: "La estructura comunicativa no sustituye el juicio subyacente pendiente."
+  - id: pyramid-principle-mechanical-01
+    kind: mechanical
+    prompt: "Aplica los encabezados de estilo de la organización y conserva el orden de todas las frases."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Aplicar formato fijo es mecánico."
+  - id: pyramid-principle-explicit-01
+    kind: explicit
+    prompt: "Usa explícitamente pyramid-principle para reescribir esta actualización al consejo con la conclusión primero."
+    expected_route: pyramid-principle
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, explain]
+    rationale: "Se pide el método para comunicación ejecutiva que comienza por la conclusión."
+  - id: pyramid-principle-insufficiency-01
+    kind: insufficiency
+    prompt: "Pon la conclusión primero, pero no proporciones pregunta rectora, conclusión, evidencia ni decisión del público."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [explain, decisive_input_missing]
+    rationale: "Sin juicio estable ni decisión del público se inventaría la respuesta principal."

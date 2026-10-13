@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: socratic-questioning-positive-01
+    kind: positive
+    prompt: "ถามเฉพาะคำถามที่จะเปลี่ยนว่าเราควรเปิดบริการนี้ในไตรมาสนี้หรือไม่"
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "ผู้ใช้ขอคำถามที่มีขอบเขตและเปลี่ยนการตัดสินใจ ไม่ใช่การสัมภาษณ์ปลายเปิด"
+  - id: socratic-questioning-positive-02
+    kind: positive
+    prompt: "ช่วยตรวจสมมติฐานเบื้องหลังข้ออ้างของฉัน แต่ถามไม่เกินสามข้อและอธิบายว่าแต่ละข้อสำคัญอย่างไร"
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "งานต้องการคำถามจำนวนจำกัดที่เชื่อมกับผลตามมาอย่างชัดเจนเพื่อชี้แจงการตัดสิน"
+  - id: socratic-questioning-positive-03
+    kind: positive
+    prompt: "ฉันไม่แน่ใจว่า “หลักฐานที่ดี” ในกรณีนี้หมายถึงอะไร ถามเพียงไม่กี่ข้อที่จะเปลี่ยนมาตรฐานการทบทวน"
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "คำตอบที่ขาดอาจเปลี่ยนมาตรฐานหลักฐาน และควรเปิดเผยโดยไม่ถามล้นเกิน"
+  - id: socratic-questioning-negative-01
+    kind: negative
+    prompt: "ใช้ข้อกำหนดที่ให้ตรวจว่าการพัฒนาเสร็จครบหรือไม่ และแจกแจงช่องข้อมูลที่ขาด"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [review_completion, explicit_rules]
+    rationale: "งานมีกฎตายตัวและขอตรวจความครบถ้วนโดยตรง ไม่ใช่ตัดสินโดยอาศัยการชี้แจงนำ"
+  - id: socratic-questioning-negative-02
+    kind: negative
+    prompt: "นิยามคำที่โต้แย้งโดยเทียบกรณีบวก กรณีลบ และกรณีขอบเขต"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [ambiguous_terms]
+    rationale: "ผู้ใช้ขอการวิเคราะห์แนวคิดโดยตรง ไม่ใช่ลำดับคำถามที่มีขอบเขต"
+  - id: socratic-questioning-mechanical-01
+    kind: mechanical
+    prompt: "เปลี่ยนคำถามห้าข้อนี้เป็นรายการ Markdown มีเลขลำดับ"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "จัดรูปแบบคำถามที่ให้เป็นงานเชิงกล และต้องไม่กระตุ้นคำถามเพิ่ม"
+  - id: socratic-questioning-explicit-01
+    kind: explicit
+    prompt: "เรียกใช้ socratic-questioning อย่างชัดเจนเพื่อทดสอบว่าการตัดสินใจของฉันขึ้นกับข้อสมมติที่ซ่อนอยู่หรือไม่"
+    expected_route: socratic-questioning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions]
+    rationale: "ผู้ใช้ระบุชื่อวิธีชัดและขอคำถามทดสอบข้อสมมติ"
+  - id: socratic-questioning-insufficiency-01
+    kind: insufficiency
+    prompt: "ถามคำถามชี้ขาด แต่ไม่เปิดเผยการตัดสินใจ ข้ออ้าง ขอบเขต หรือผลตามมาที่คำถามควรมีผล"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing]
+    rationale: "หากไม่มีการตัดสินใจหรือผลตามมาเป้าหมาย วิธีนี้กำหนดขอบเขตคำถามหรือรู้ว่าอะไรชี้ขาดไม่ได้"

@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "induction-positive-01",
+      "kind": "positive",
+      "prompt": "การสังเกตซ้ำเหล่านี้รองรับข้ออ้างทั่วไปเกี่ยวกับผู้ใช้ส่วนใหญ่หรือไม่ และการสรุปทั่วไปมีน้ำหนักเท่าใด?",
+      "expected_route": "induction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "งานขยายจากกรณีสังเกตไปข้ออ้างประชากรที่มีขอบเขต ต้องตรวจตัวอย่างและตัวอย่างโต้แย้ง"
+    },
+    {
+      "id": "induction-positive-02",
+      "kind": "positive",
+      "prompt": "ประเมินว่าตัวอย่างแบบสำรวจนี้รองรับข้ออ้างว่าลูกค้าชอบขั้นตอนใหม่หรือไม่",
+      "expected_route": "induction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "ความเป็นตัวแทน อคติเลือก และน้ำหนักการสรุปทั่วไปเป็นประเด็นหลัก"
+    },
+    {
+      "id": "induction-positive-03",
+      "kind": "positive",
+      "prompt": "เราอนุมานเรื่องไตรมาสหน้าจากเหตุที่ผ่านมาอย่างสมเหตุผลได้อะไร รวมตัวอย่างโต้แย้งที่เป็นไปได้?",
+      "expected_route": "induction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "การพยากรณ์ที่ขอขยายกรณีซ้ำ ต้องระบุขอบเขตและความเสี่ยงตัวอย่างโต้แย้ง"
+    },
+    {
+      "id": "induction-negative-01",
+      "kind": "negative",
+      "prompt": "กฎเคร่งครัดระบุว่าทุกบันทึกที่เข้าเกณฑ์ได้รับอนุมัติ ตัดสินว่ากรณีนี้เป็นไปตามกฎหรือไม่",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules",
+        "explain"
+      ],
+      "rationale": "งานใช้กฎแบบ deduction ไม่ใช่สรุปทั่วไปจากตัวอย่าง"
+    },
+    {
+      "id": "induction-negative-02",
+      "kind": "negative",
+      "prompt": "หลายคำอธิบายตรงกับความล้มเหลว เปรียบเทียบและระบุการสังเกตที่แยกระหว่างคำอธิบายได้",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "นี่เป็นการวินิจฉัยแบบ abduction แทนขยายจากตัวอย่างไปประชากร"
+    },
+    {
+      "id": "induction-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "เพิ่มการสังเกตใหม่เหล่านี้ต่อท้ายชุดข้อมูลเดิมโดยไม่เปลี่ยนค่าใด",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การเพิ่มข้อมูลที่ให้เป็นงานเชิงกล"
+    },
+    {
+      "id": "induction-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ induction อย่างชัดเจนเพื่อประเมินว่าการทดลองเล็กนี้รองรับข้ออ้างผลิตภัณฑ์ที่กว้างขึ้นหรือไม่",
+      "expected_route": "induction",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "repeated_observations"
+      ],
+      "rationale": "ผู้ใช้เลือกการวิเคราะห์จากตัวอย่างสู่การสรุปทั่วไปอย่างชัดเจน"
+    },
+    {
+      "id": "induction-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "สรุปทั่วไปจากตัวอย่าง แต่ไม่ให้ประชากรเป้าหมาย กระบวนการเลือกตัวอย่าง การสังเกต หรือนิยามการวัด",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample",
+        "decisive_input_missing"
+      ],
+      "rationale": "เมื่อไม่มีฐานตัวอย่างและขอบเขตเป้าหมาย จำกัดการสรุปทั่วไปไม่ได้"
+    }
+  ]
+}

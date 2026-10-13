@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: jobs-to-be-done-positive-01
+    kind: positive
+    prompt: "Piccole imprese ricorrono a un commercialista dopo una scadenza fiscale stressante; scopri il progresso, la rassicurazione emotiva, il segnale sociale e le alternative coinvolte."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Un momento specifico di difficoltà e più dimensioni del compito spiegano il ricorso al servizio meglio di funzionalità o dati demografici."
+  - id: jobs-to-be-done-positive-02
+    kind: positive
+    prompt: "Gli utenti mantengono un foglio di calcolo lento invece di adottare il nuovo strumento; mappa spinta, attrazione, abitudine, ansia e progresso desiderato."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "La domanda si concentra sulle forze del cambiamento, sul mancato consumo e sul progresso che la persona cerca."
+  - id: jobs-to-be-done-positive-03
+    kind: positive
+    prompt: "Un servizio di trasporto vuole sapere che cosa i passeggeri cercano di ottenere usandolo durante un viaggio notturno e come osservare il successo."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Sono richiesti progressi funzionali, emotivi e sociali specifici della situazione e una misura di successo."
+  - id: jobs-to-be-done-negative-01
+    kind: negative
+    prompt: "La frustrazione osservata degli utenti deve diventare tre concetti di prototipo e un test sicuro prima di qualsiasi impegno sul prodotto."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "Il bisogno principale è generare concetti e prototipi guidati dall'osservazione, non soltanto analizzare compiti e forze."
+  - id: jobs-to-be-done-negative-02
+    kind: negative
+    prompt: "Un gruppo di prodotto deve confrontare due opzioni di onboarding in base a conseguenze misurabili durante un progetto pilota reversibile."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "Il punto critico della decisione è un confronto pratico delle opzioni, non la scoperta del compito sottostante."
+  - id: jobs-to-be-done-mechanical-01
+    kind: mechanical
+    prompt: "Metti le trascrizioni delle interviste ai clienti in file separati e non inferire compiti o motivazioni."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "L'organizzazione dei file è meccanica anche se gli input sono interviste agli utenti."
+  - id: jobs-to-be-done-explicit-01
+    kind: explicit
+    prompt: "Usa jobs-to-be-done per spiegare perché i pendolari passano dagli autobus ai monopattini durante un turno fino a tardi."
+    expected_route: jobs-to-be-done
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, user_progress]
+    rationale: "L'utente richiede esplicitamente un'analisi della situazione e delle forze del cambiamento."
+  - id: jobs-to-be-done-insufficiency-01
+    kind: insufficiency
+    prompt: "È disponibile soltanto un elenco di funzionalità; dichiara il compito universale di ogni cliente e stabilisci un tasso di successo per l'intero mercato."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [user_progress, decisive_input_missing]
+    rationale: "Un elenco di funzionalità non può stabilire un compito specifico della situazione o un tasso per l'intero mercato."

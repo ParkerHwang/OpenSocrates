@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "pestel-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Antes de entrar neste país, examine agenda eleitoral atual, inflação e câmbio, mudanças demográficas, tecnologia de plataformas, regras de emissões e licenças que possam mudar o lançamento.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "O pedido nomeia busca externa delimitada e decisão estratégica. Preserve datas e jurisdição, sem tratar política ou previsão não verificada como definitiva."
+    },
+    {
+      "id": "pestel-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "A expansão do produto depende do envelhecimento dos clientes, proteção de dados, custos de nuvem e possível choque de energia. Identifique fatores materiais, mecanismos e sinais que mudariam o investimento.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "Pede fatores externos materiais e implicações, não lista genérica. São hipóteses fornecidas; rotule-as como verificadas, inferidas ou não verificadas."
+    },
+    {
+      "id": "pestel-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Construa contexto externo baseado em evidências para a estratégia de cinco anos, mostrando oportunidades, ameaças, sinais de monitoramento e o que mudaria cada implicação.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "O resultado é registro de fatores ligado a horizonte estratégico, com evidências e sinais observáveis, não previsões ou probabilidades fabricadas."
+    },
+    {
+      "id": "pestel-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Nosso depósito tem erro recorrente de separação de pedidos. Rastreie processo local, identifique causa e proponha correção.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "O problema é interno ao processo local, não macroambiental. Análise causal é mais próxima; não acrescente fatores só para preencher categorias."
+    },
+    {
+      "id": "pestel-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Uma política afetará empregados, prestadores, clientes e comunidade sem representação. Mapeie poder, interesses, preocupações prováveis e responsáveis pelo diálogo.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Embora haja política externa, o resultado decisivo é mapa de atores e diálogo. É confusão provável com stakeholders, não pedido de seis categorias ambientais."
+    },
+    {
+      "id": "pestel-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Coloque estas seis descrições fornecidas nas colunas P, E, S, T, E e L sem mudar as palavras.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "mechanical"
+      ],
+      "rationale": "É apenas formatação do conteúdo, sem julgamento de materialidade, evidência ou estratégia."
+    },
+    {
+      "id": "pestel-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Use análise PESTEL para revisar nossa entrada no mercado. Mantenha só fatores materiais, identifique estado das evidências e horizonte e declare oportunidade ou ameaça.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "macro_environment"
+      ],
+      "rationale": "O método e contrato público são explícitos. Preserve fontes e suspenda implicações dependentes de regra atual não verificada."
+    },
+    {
+      "id": "pestel-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Devemos entrar no mercado? Não forneci país ou jurisdição, horizonte, escopo do produto, referência inicial ou fontes das condições externas atuais.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "boundary_sensitive",
+        "decisive_input_missing"
+      ],
+      "rationale": "A busca externa é adequada, mas limites e datas ausentes mudam implicações. Suspenda e peça só fatos decisivos de escopo, sem inventar contexto."
+    }
+  ]
+}

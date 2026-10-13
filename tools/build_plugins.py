@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping
 
-LOCALES = ("en", "ko", "zh", "ja")
+LOCALES = ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
 
 _SEMANTIC_FIELDS = (
     "content_revision",
@@ -200,7 +200,7 @@ def _method_values(method: Mapping[str, Any], common: Mapping[str, str]) -> dict
             "METHOD_COMPLEMENTS_JSON": _json_token(method.get("complements", {})),
         }
     )
-    for locale in ("zh", "ja"):
+    for locale in LOCALES[2:]:
         for token, field in (
             ("DISPLAY_NAME", "display_name"),
             ("PLAIN_ACTION", "plain_action"),
@@ -229,6 +229,18 @@ def _method_reference_index(methods: list[Any]) -> str:
         display_ja = display.get("ja", "") if isinstance(display, Mapping) else ""
         action_zh = plain_action.get("zh", "") if isinstance(plain_action, Mapping) else ""
         action_ja = plain_action.get("ja", "") if isinstance(plain_action, Mapping) else ""
+        extra_metadata = []
+        for locale, label in (
+            ("fr", "Français"),
+            ("de", "Deutsch"),
+            ("it", "Italiano"),
+            ("es", "Español"),
+            ("pt", "Português"),
+            ("th", "ไทย"),
+        ):
+            name = display.get(locale, "") if isinstance(display, Mapping) else ""
+            action = plain_action.get(locale, "") if isinstance(plain_action, Mapping) else ""
+            extra_metadata.extend((f"- {label}: {name}", f"- {label} — action: {action}"))
         sections.extend(
             [
                 f"## `{method_id}` — {display_en}",
@@ -241,6 +253,7 @@ def _method_reference_index(methods: list[Any]) -> str:
                 f"- 한국어: {action_ko}",
                 f"- 简体中文: {action_zh}",
                 f"- 日本語: {action_ja}",
+                *extra_metadata,
                 f"- Routing metadata: `{_json_token(raw.get('routing', {}))}`",
                 f"- Procedure: [methods/{method_id}.md](methods/{method_id}.md)",
                 "",
@@ -294,7 +307,7 @@ def _common_values(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0
             values["CONTROLLER_KO"] = str(controller.get("ko", ""))
             values["CONTROLLER_EN_JSON"] = _json_token(str(controller.get("en", "")))
             values["CONTROLLER_KO_JSON"] = _json_token(str(controller.get("ko", "")))
-            for locale in ("zh", "ja"):
+            for locale in LOCALES[2:]:
                 values[f"CONTROLLER_{locale.upper()}"] = str(controller.get(locale, ""))
                 values[f"CONTROLLER_{locale.upper()}_JSON"] = _json_token(
                     str(controller.get(locale, ""))
@@ -302,7 +315,7 @@ def _common_values(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0
         if isinstance(capability_notice, Mapping):
             values["CAPABILITY_NOTICE_EN"] = str(capability_notice.get("en", ""))
             values["CAPABILITY_NOTICE_KO"] = str(capability_notice.get("ko", ""))
-            for locale in ("zh", "ja"):
+            for locale in LOCALES[2:]:
                 values[f"CAPABILITY_NOTICE_{locale.upper()}"] = str(
                     capability_notice.get(locale, "")
                 )
@@ -586,6 +599,8 @@ def generate_plugin(  # noqa: C901  # Branch-explicit contract; reviewed for v1.
         for method in methods:
             method_id = method["id"]
             assembled = assembler.assemble((method_id,), requested_locale=locale)
+            if assembled.locale != locale:
+                raise PluginBuildError("decision references: canonical locale unavailable")
             reference_path = (
                 output_path
                 / "skills/opensocrates/references/decision"

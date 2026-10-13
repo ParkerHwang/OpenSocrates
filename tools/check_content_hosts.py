@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any, Callable
 from unittest.mock import patch
 
-LOCALES = ("en", "ko", "zh", "ja")
+LOCALES = ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
 _CHECK_COUNT = 0
 
 
@@ -46,7 +46,7 @@ def _reject(action: Callable[[], Any], message: str) -> None:
 
 
 def _check_attribution(skill: Path, footer: str) -> None:
-    """All host controllers and all four decision guides use the runtime's footer."""
+    """All host controllers and all ten decision guides use the runtime's footer."""
 
     paths = [skill / "SKILL.md"] + [
         skill / f"references/decision/guide.{locale}.md" for locale in LOCALES
@@ -87,6 +87,7 @@ def check(root: Path) -> int:
     from tools.release_check import _write_deterministic_zip
 
     from opensocrates.constants import PUBLIC_ATTRIBUTION_FOOTER
+    from opensocrates.content.injection import ProjectionInstructionAssembler
     from opensocrates.selector.entry import ENTRY_GUIDANCE
 
     _require(len(ENTRY_GUIDANCE.encode("utf-8")) <= 1400, "discovery entry exceeds byte budget")
@@ -154,8 +155,8 @@ def check(root: Path) -> int:
                 "portable controller has a native control command",
             )
             _require(
-                len(manifest["canonical_methods"]) == 192,
-                "four-locale procedure inventory incomplete",
+                len(manifest["canonical_methods"]) == 480,
+                "ten-locale procedure inventory incomplete",
             )
             for locale in LOCALES:
                 decision = skill / "references/decision"
@@ -289,6 +290,37 @@ def check(root: Path) -> int:
                 result.returncode == 0 and _tree(temporary / f"cli-{host}") == first,
                 "explicit-root CLI depends on working directory",
             )
+        original_assemble = ProjectionInstructionAssembler.assemble
+
+        def fallback_assemble(self: Any, method_ids: Any, *, requested_locale: Any) -> Any:
+            return original_assemble(
+                self,
+                method_ids,
+                requested_locale="en" if requested_locale == "fr" else requested_locale,
+            )
+
+        with patch.object(ProjectionInstructionAssembler, "assemble", fallback_assemble):
+            for host in ("codex", "claude"):
+                _reject(
+                    partial(
+                        generate_plugin,
+                        root=root,
+                        host=host,
+                        output=temporary / f"fallback-{host}",
+                        runtime_root=temporary / "absent-runtime",
+                    ),
+                    "native generator accepted mislabeled locale fallback",
+                )
+            for host in HOSTS:
+                _reject(
+                    partial(
+                        build_content_host,
+                        root=root,
+                        host=host,
+                        output=temporary / f"fallback-{host}",
+                    ),
+                    "content generator accepted mislabeled locale fallback",
+                )
         _reject(
             lambda: build_content_host(root=root, host="gemini", output=temporary / "unsupported"),
             "unsupported host accepted",

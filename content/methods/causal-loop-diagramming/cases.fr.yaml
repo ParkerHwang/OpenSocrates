@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "causal-loop-diagramming-positive-01",
+      "kind": "positive",
+      "prompt": "Une file accroît l'attente, l'attente accroît les abandons et les abandons modifient le besoin futur de personnel ; cartographiez la boucle signée et le délai.",
+      "expected_route": "causal-loop-diagramming",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "recurring_failure"
+      ],
+      "rationale": "La tâche demande des variables nommées, des liens signés, un type de boucle et l'effet retardé qui façonne le phénomène."
+    },
+    {
+      "id": "causal-loop-diagramming-positive-02",
+      "kind": "positive",
+      "prompt": "La croissance des usagers augmente les avis, qui attirent davantage d'usagers, tandis que la capacité limitée crée une réponse de régulation ; identifiez les deux boucles.",
+      "expected_route": "causal-loop-diagramming",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "Plusieurs boucles orientées et une contrainte de régulation doivent être représentées explicitement."
+    },
+    {
+      "id": "causal-loop-diagramming-positive-03",
+      "kind": "positive",
+      "prompt": "Une politique soulage rapidement mais le problème revient ensuite, car le contrôle change les comportements avec un long délai ; dessinez l'explication par rétroaction.",
+      "expected_route": "causal-loop-diagramming",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "recurring_failure"
+      ],
+      "rationale": "Le résultat demandé est une explication en boucle signée d'une résistance retardée à la politique, pas une estimation d'effet unique."
+    },
+    {
+      "id": "causal-loop-diagramming-negative-01",
+      "kind": "negative",
+      "prompt": "Une vaste organisation comporte de nombreux acteurs, stocks et effets secondaires ; choisissez le meilleur levier avant de retenir un diagramme de boucle compact.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "deep_uncertainty",
+        "causal_question"
+      ],
+      "rationale": "Le périmètre plus large et la question du levier doivent être établis avant un diagramme ciblé."
+    },
+    {
+      "id": "causal-loop-diagramming-negative-02",
+      "kind": "negative",
+      "prompt": "Un essai demande si un médicament a causé un résultat mesuré par comparaison avec un témoin, sans phénomène dynamique récurrent.",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "Une question bornée d'effet contrefactuel n'exige pas de boucle de rétroaction."
+    },
+    {
+      "id": "causal-loop-diagramming-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Copiez les intitulés de boucle existants dans une présentation et conservez leur ordre sans évaluer de relation.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "La copie et la mise en forme n'exigent pas de jugement causal."
+    },
+    {
+      "id": "causal-loop-diagramming-explicit-01",
+      "kind": "explicit",
+      "prompt": "Appliquez causal-loop-diagramming pour montrer pourquoi les remises augmentent la demande mais créent ensuite des ruptures de stock et une perte de confiance.",
+      "expected_route": "causal-loop-diagramming",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "feedback_delay"
+      ],
+      "rationale": "L'utilisateur nomme la méthode et fournit un phénomène récurrent de renforcement et de régulation."
+    },
+    {
+      "id": "causal-loop-diagramming-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Deux variables ont évolué ensemble une fois, mais direction, temporalité et récurrence sont inconnues ; dessinez une boucle de renforcement vérifiée.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "feedback_delay",
+        "decisive_input_missing"
+      ],
+      "rationale": "Un mouvement commun unique sans direction ni temporalité ne peut étayer une boucle signée."
+    }
+  ]
+}

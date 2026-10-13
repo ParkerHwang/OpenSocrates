@@ -1,0 +1,74 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "stakeholder-analysis-positive-1"
+    kind: positive
+    prompt: "Un cambio de horarios afecta personal de primera línea, responsables, clientes y representación laboral. Mapea intereses, derechos decisorios, preocupaciones probables, consentimiento y responsables de contacto."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "Se requiere mapa ligado a ejecución, no contactos genéricos. Preocupaciones y efectos son hipótesis hasta respaldarse por registros o conversaciones."
+  - id: "stakeholder-analysis-positive-2"
+    kind: positive
+    prompt: "Una política afecta residentes fuera del grupo decisorio. Identifica decisor, grupos no representados, poder, impacto, conflictos y participación con responsables."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "Representación y ejecución son materiales. Distingue autoridad e influencia; no infieras daño ni consentimiento sin evidencia."
+  - id: "stakeholder-analysis-positive-3"
+    kind: positive
+    prompt: "Varias organizaciones deben adoptar un estándar de datos. Identifica aprobadores, bloqueadores, beneficiarios y quienes soportan costes; asigna contacto y respuesta que cambiaría el despliegue."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "La adopción depende de autoridad distribuida y apoyo. Publica evidencia de intereses e impactos; los cargos no prueban acuerdo."
+  - id: "stakeholder-analysis-negative-1"
+    kind: negative
+    prompt: "Todos los participantes acuerdan objetivo y el grupo afectado no es material. Compara dos proveedores viables según coste, fiabilidad y entrega."
+    expected_route: "trade-off-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "multiple_options"
+      - "multiple_objectives"
+    rationale: "La cuestión de actores está resuelta; queda comparar compensaciones. Un mapa decorativo no resolvería la elección."
+  - id: "stakeholder-analysis-negative-2"
+    kind: negative
+    prompt: "Examina cambios políticos, económicos, sociales, tecnológicos, ambientales y legales que afecten la estrategia de producto."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "El resultado decisivo es un registro externo. Posible confusión con PESTEL, no mapa de actores."
+  - id: "stakeholder-analysis-mechanical-1"
+    kind: mechanical
+    prompt: "Elimina nombres duplicados de los contactos y ordénalos alfabéticamente."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - "mechanical"
+      - "mechanical"
+    rationale: "Solo transforma texto; no evalúa intereses, poder, consentimiento ni ejecución."
+  - id: "stakeholder-analysis-explicit-1"
+    kind: explicit
+    prompt: "Usa stakeholder-analysis para un cambio hospitalario. Muestra derechos, grupos, evidencia de poder e impacto, conflictos, responsables y condición de cambio."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: explicit_primary
+    decisive_features:
+      - "explicit_method"
+      - "stakeholder_conflict"
+    rationale: "La invocación directa mantiene el método principal; preocupaciones inferidas y efectos no verificados no deben parecer asentados."
+  - id: "stakeholder-analysis-insufficiency-1"
+    kind: insufficiency
+    prompt: "¿Seguimos con la nueva política de asistencia? No he identificado decisor, afectados, autoridad, horizonte ni evidencia de efectos."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: hold
+    decisive_features:
+      - "decisive_input_missing"
+      - "interacting_actors"
+    rationale: "El apoyo podría ser decisivo, pero faltan límite y autoridad. Suspende y pide mínimos datos sin declarar consentimiento u oposición."

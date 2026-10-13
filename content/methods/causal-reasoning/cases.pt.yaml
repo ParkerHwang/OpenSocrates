@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-reasoning-positive-01
+    kind: positive
+    prompt: "Um piloto pareado compara duas clínicas após uma adotar ligações de lembrete; as faltas caem apenas nessa clínica. As ligações causaram a mudança?"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "A pergunta trata de uma intervenção que mudou um resultado e exige temporalidade, comparação e explicações concorrentes."
+  - id: causal-reasoning-positive-02
+    kind: positive
+    prompt: "Após reformular o pagamento, a conclusão aumenta em várias coortes observadas independentemente; a equipe quer saber se a reformulação causou o aumento, e não a demanda sazonal."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, testable_claim, confounding]
+    rationale: "Uma relação repetida entre intervenção e resultado ainda exige mecanismo, contrafactual e verificação de fatores de confusão."
+  - id: causal-reasoning-positive-03
+    kind: positive
+    prompt: "Um gestor pergunta se uma semana de quatro dias melhorou a retenção, com datas de início, equipes de comparação e possível confusão por carga de trabalho disponíveis."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "Alvo causal, temporalidade, comparação e fator de confusão plausível são explícitos o suficiente para uma análise delimitada."
+  - id: causal-reasoning-negative-01
+    kind: negative
+    prompt: "O acúmulo de atendimento cresce por seis meses enquanto pessoal, demanda e atrasos de resposta se alimentam mutuamente; o usuário pergunta por que o padrão persiste."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty]
+    rationale: "O alvo principal é um padrão recorrente de retroalimentação com atrasos; deve começar uma análise sistêmica, não uma única comparação causal."
+  - id: causal-reasoning-negative-02
+    kind: negative
+    prompt: "Um defeito de fábrica se repete após várias transferências; o pedido é separar sintomas, causas de processo e controles ausentes."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "É um diagnóstico de recorrência operacional cujo resultado é cadeia causal e responsável pela prevenção, não apenas efeito de exposição."
+  - id: causal-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Traduza para coreano a frase sobre uma mudança de política e seu resultado, sem avaliar se a política causou algo."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "A tradução é mecânica e não deve acionar o método, mesmo que o texto contenha linguagem causal."
+  - id: causal-reasoning-explicit-01
+    kind: explicit
+    prompt: "Use causal-reasoning para avaliar se o novo e-mail de integração mudou a ativação e mostre a comparação necessária."
+    expected_route: causal-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, causal_question]
+    rationale: "O usuário nomeia explicitamente o método para um julgamento; ele é primário, sujeito ao contrato de evidências."
+  - id: causal-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "Um funcionário se recuperou após tomar um suplemento; conclua que ele causou a recuperação e recomende-o à equipe inteira."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [causal_question, decisive_input_missing]
+    rationale: "Uma anedota sem controle carece de comparação defensável e não sustenta causalidade nem recomendação de alto impacto."

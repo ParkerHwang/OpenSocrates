@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "causal-reasoning-positive-01",
+      "kind": "positive",
+      "prompt": "โครงการนำร่องจับคู่เปรียบเทียบคลินิกสองแห่งหลังแห่งหนึ่งใช้โทรเตือน และการขาดนัดลดเฉพาะแห่งที่ใช้ การโทรทำให้เปลี่ยนหรือไม่?",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "คำถามว่าการแทรกแซงเปลี่ยนผลหรือไม่ต้องมีเวลา การเปรียบเทียบ และคำอธิบายแข่งขัน"
+    },
+    {
+      "id": "causal-reasoning-positive-02",
+      "kind": "positive",
+      "prompt": "หลังออกแบบชำระเงินใหม่ อัตราทำเสร็จเพิ่มในหลายกลุ่มที่สังเกตอย่างอิสระ ทีมอยากรู้ว่าแบบใหม่ทำให้เพิ่มแทนอุปสงค์ตามฤดูกาลหรือไม่",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "testable_claim",
+        "confounding"
+      ],
+      "rationale": "ความสัมพันธ์การแทรกแซง–ผลที่เกิดซ้ำยังต้องมีกลไก สถานการณ์ตรงข้าม และการตรวจปัจจัยกวน"
+    },
+    {
+      "id": "causal-reasoning-positive-03",
+      "kind": "positive",
+      "prompt": "ผู้จัดการถามว่าตารางทำงานสี่วันเพิ่มการรักษาพนักงานหรือไม่ โดยมีวันเริ่ม ทีมเปรียบเทียบ และปัจจัยกวนภาระงานที่เป็นไปได้",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "เป้าหมายเหตุ เวลา การเปรียบเทียบ และปัจจัยกวนชัดพอสำหรับคำอธิบายเหตุมีขอบเขต"
+    },
+    {
+      "id": "causal-reasoning-negative-01",
+      "kind": "negative",
+      "prompt": "งานค้างฝ่ายสนับสนุนเพิ่มตลอดหกเดือน ขณะที่จำนวนพนักงาน อุปสงค์ และเวลาตอบสนองป้อนกลับกัน ผู้ใช้ถามว่าทำไมรูปแบบคงอยู่",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "deep_uncertainty"
+      ],
+      "rationale": "เป้าหมายหลักเป็นรูปแบบป้อนกลับซ้ำมีความล่าช้า ควรให้คำอธิบายระบบนำแทนการเปรียบเทียบเหตุเดียว"
+    },
+    {
+      "id": "causal-reasoning-negative-02",
+      "kind": "negative",
+      "prompt": "ข้อบกพร่องโรงงานเกิดซ้ำหลังหลายการส่งงาน คำขอต้องการแยกอาการ สาเหตุกระบวนการ และการควบคุมที่ขาด",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "เป็นการวินิจฉัยการเกิดซ้ำในการดำเนินงาน โดยผลคือห่วงโซ่เหตุและเจ้าของการป้องกัน ไม่ใช่เพียงผลการได้รับปัจจัย"
+    },
+    {
+      "id": "causal-reasoning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "แปลประโยคเกี่ยวกับการเปลี่ยนนโยบายและผลเป็นภาษาเกาหลี โดยไม่ประเมินว่านโยบายทำให้เกิดอะไรหรือไม่",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "การแปลเป็นเชิงกลและต้องไม่เรียกวิธีแม้ข้อความมีภาษาเชิงเหตุ"
+    },
+    {
+      "id": "causal-reasoning-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ causal-reasoning ประเมินว่าอีเมลเริ่มใช้งานใหม่เปลี่ยนการเปิดใช้หรือไม่ และแสดงการเปรียบเทียบที่ต้องการ",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "causal_question"
+      ],
+      "rationale": "ผู้ใช้ระบุวิธีสำหรับเป้าหมายตัดสินโดยตรง จึงเป็นวิธีหลักภายใต้สัญญาหลักฐาน"
+    },
+    {
+      "id": "causal-reasoning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "พนักงานหนึ่งคนหายหลังรับอาหารเสริม สรุปว่าอาหารเสริมทำให้หายและแนะนำให้ทั้งทีม",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "causal_question",
+        "decisive_input_missing"
+      ],
+      "rationale": "เรื่องเล่าเดียวที่ไร้กลุ่มควบคุมขาดการเปรียบเทียบมีฐาน และรองรับข้อแนะนำเชิงเหตุหรือเดิมพันสูงไม่ได้"
+    }
+  ]
+}

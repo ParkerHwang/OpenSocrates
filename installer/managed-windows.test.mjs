@@ -12,7 +12,7 @@ import { runManagedHost } from "./managed-hosts.mjs";
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const HELPER = join(ROOT, "installer/windows.ps1");
 const VERSION = (await fs.readFile(join(ROOT, "VERSION"), "utf8")).trim();
-const LOCALES = ["en", "ko", "zh", "ja"];
+const LOCALES = ["en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"];
 const NATIVE = { skip: process.platform !== "win32" || process.arch !== "x64", timeout: 240_000 };
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const jsonBytes = (value) => `${JSON.stringify(value, null, 2)}\n`;
@@ -135,7 +135,7 @@ async function box(t) {
     store: join(process.env.ANTIGRAVITY_CONFIG_DIR, ".opensocrates-managed/antigravity"),
   };
 }
-async function contentPackage(b, host, { version = VERSION, changed = false, locales = version === "1.5.0" ? ["en", "ko"] : LOCALES } = {}) {
+async function contentPackage(b, host, { version = VERSION, changed = false, locales = version === "1.5.0" ? LOCALES.slice(0, 2) : version === "1.5.1" ? LOCALES.slice(0, 4) : LOCALES } = {}) {
   const source = join(ROOT, "dist", `${host === "claude-chat" ? "claude-chat" : "antigravity"}-content`);
   assert.ok(await exists(source), "Build generated content packages before Windows managed tests");
   const root = await privateDirectory(join(b.base, `package ${host} 한글 ${randomUUID()}`));
@@ -145,7 +145,7 @@ async function contentPackage(b, host, { version = VERSION, changed = false, loc
   let altered = changed || manifest.product_version !== version;
   manifest.product_version = version;
   for (const row of [...manifest.files]) {
-    const match = /\/methods\/(en|ko|zh|ja)\/|\/(?:guide|catalog)\.(en|ko|zh|ja)\.(?:md|json)$/u.exec(row.path);
+    const match = /\/methods\/(en|ko|zh|ja|fr|de|it|es|pt|th)\/|\/(?:guide|catalog)\.(en|ko|zh|ja|fr|de|it|es|pt|th)\.(?:md|json)$/u.exec(row.path);
     if (match && !locales.includes(match[1] ?? match[2])) {
       await fs.unlink(join(root, row.path));
       manifest.files = manifest.files.filter((candidate) => candidate.path !== row.path);
@@ -201,14 +201,16 @@ test("Windows private creation has the current user SID at creation and rejects 
   assert.equal(await fs.readFile(join(child, "sentinel"), "utf8"), "preserve private collision");
 });
 
-test("Windows canonical verification accepts legacy packages and requires both added locales", NATIVE, async (t) => {
+test("Windows canonical verification preserves prior inventories and requires all ten locales", NATIVE, async (t) => {
   const b = await box(t);
   for (const host of ["claude-chat", "antigravity"]) {
     const legacy = await contentPackage(b, host, { version: "1.5.0" });
     assert.equal((await runManagedHost(b.options(host, "verify"), b.helpers(legacy, "1.5.0"))).installation, "verified-package");
+    const previous = await contentPackage(b, host, { version: "1.5.1" });
+    assert.equal((await runManagedHost(b.options(host, "verify"), b.helpers(previous, "1.5.1"))).installation, "verified-package");
     const complete = await contentPackage(b, host);
     assert.equal((await runManagedHost(b.options(host, "verify"), b.helpers(complete))).installation, "verified-package");
-    for (const missing of ["zh", "ja"]) {
+    for (const missing of LOCALES.slice(2)) {
       const incomplete = await contentPackage(b, host, { locales: LOCALES.filter((locale) => locale !== missing) });
       await assert.rejects(runManagedHost(b.options(host, "verify"), b.helpers(incomplete)), { code: "invalid_canonical_content" });
     }

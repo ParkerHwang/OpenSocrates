@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "pragmatism-positive-01",
+      "kind": "positive",
+      "prompt": "Duas estruturas de gestão de projetos fazem escolhas diferentes de reuniões, prioridades e retorno; compare consequências observáveis antes de selecionar uma.",
+      "expected_route": "pragmatism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "practical_consequence",
+        "choose"
+      ],
+      "rationale": "As interpretações diferem na ação e admitem julgamento por consequências práticas delimitadas."
+    },
+    {
+      "id": "pragmatism-positive-02",
+      "kind": "positive",
+      "prompt": "Uma cidade precisa escolher entre duas políticas de contato comunitário e pode fazer piloto reversível com janela acordada e restrições de segurança.",
+      "expected_route": "pragmatism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "practical_consequence",
+        "choose",
+        "value_conflict"
+      ],
+      "rationale": "A necessidade central é escolha política prática com teste seguro de aprendizagem."
+    },
+    {
+      "id": "pragmatism-positive-03",
+      "kind": "positive",
+      "prompt": "Uma discussão longa sobre dois rótulos não muda decisão nem previsão; determine se são praticamente equivalentes neste contexto.",
+      "expected_route": "pragmatism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "practical_consequence",
+        "choose"
+      ],
+      "rationale": "O método testa se o desacordo tem diferença prática observável."
+    },
+    {
+      "id": "pragmatism-negative-01",
+      "kind": "negative",
+      "prompt": "Uma fonte normativa impõe dever de relatório e proíbe divulgação; compare somente ações ainda permitidas.",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "Deveres e proibições vinculantes restringem opções antes de comparar consequências."
+    },
+    {
+      "id": "pragmatism-negative-02",
+      "kind": "negative",
+      "prompt": "Uma equipe de produto precisa identificar momento de dificuldade, trabalho funcional/emocional/social do usuário e forças de mudança antes de escolher solução.",
+      "expected_route": "jobs-to-be-done",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "user_progress",
+        "human_need"
+      ],
+      "rationale": "O gargalo é descobrir progresso do usuário, não comparar consequências de interpretações conhecidas."
+    },
+    {
+      "id": "pragmatism-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Coloque as duas políticas em colunas adjacentes sem comparar consequências nem recomendar uma.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Formatação em colunas é mecânica."
+    },
+    {
+      "id": "pragmatism-explicit-01",
+      "kind": "explicit",
+      "prompt": "Use pragmatism para comparar estes dois roteiros de resposta a incidentes pelas mudanças práticas, com simulação de mesa reversível.",
+      "expected_route": "pragmatism",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "practical_consequence",
+        "choose"
+      ],
+      "rationale": "O usuário pede explicitamente comparação e teste delimitados pelo contexto."
+    },
+    {
+      "id": "pragmatism-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Opções e critério de sucesso não estão especificados; declare verdadeira a interpretação reconfortante porque parece útil.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "practical_consequence",
+        "decisive_input_missing"
+      ],
+      "rationale": "Não se avalia utilidade sem opções, critério ou consequências observáveis."
+    }
+  ]
+}

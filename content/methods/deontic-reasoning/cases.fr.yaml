@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "deontic-reasoning-positive-01",
+      "kind": "positive",
+      "prompt": "Une proposition de partage de données peut être utile, mais les conditions de consentement et la politique de confidentialité déterminent ce que l'équipe doit, peut ou ne doit pas faire.",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "La décision est contrainte par devoirs, permission, interdiction, consentement et une source de politique identifiable."
+    },
+    {
+      "id": "deontic-reasoning-positive-02",
+      "kind": "positive",
+      "prompt": "Un clinicien demande si deux obligations entrent en conflit selon le code professionnel nommé et quelles actions intermédiaires sont permises.",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "Le résultat demandé est un statut normatif sourcé et une gestion de conflit, pas seulement une optimisation des conséquences."
+    },
+    {
+      "id": "deontic-reasoning-positive-03",
+      "kind": "positive",
+      "prompt": "Une politique du travail semble exiger un signalement, permettre une exception avec consentement et interdire un détail sensible ; clarifiez les options autorisées.",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "L'ensemble d'actions comprend des états obligatoires, permis, interdits et d'exception issus d'une politique."
+    },
+    {
+      "id": "deontic-reasoning-negative-01",
+      "kind": "negative",
+      "prompt": "Comparez deux stratégies de service par conséquences observables et pilote réversible, sans règle contraignant le choix.",
+      "expected_route": "pragmatism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "practical_consequence",
+        "choose"
+      ],
+      "rationale": "La question est une comparaison pratique sans blocage d'autorité normative."
+    },
+    {
+      "id": "deontic-reasoning-negative-02",
+      "kind": "negative",
+      "prompt": "Un principe contredit plusieurs cas difficiles et l'équipe veut les réviser pour accroître leur cohérence là où elle dispose de latitude.",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "L'ajustement mutuel des principes et jugements est l'orientation plus spécifique."
+    },
+    {
+      "id": "deontic-reasoning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Copiez les clauses de politique dans une liste sans interpréter si une action est obligatoire ou permise.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Copier un texte de politique est mécanique et ne demande pas d'interprétation normative."
+    },
+    {
+      "id": "deontic-reasoning-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez deontic-reasoning pour distinguer ce que ce contrat permet, exige, interdit et laisse non résolu.",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "L'utilisateur demande explicitement une classification normative sourcée."
+    },
+    {
+      "id": "deontic-reasoning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Aucune politique applicable, aucun rôle, juridiction ou condition de consentement n'est fourni ; déclarez l'action légalement obligatoire.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "duties_rights",
+        "decisive_input_missing"
+      ],
+      "rationale": "L'autorité et le périmètre manquent ; une obligation contraignante ne peut être inventée."
+    }
+  ]
+}

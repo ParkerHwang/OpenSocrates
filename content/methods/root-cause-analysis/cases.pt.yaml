@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "root-cause-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "Um depósito envia item errado a cada poucas semanas após novo fluxo de separação, e a equipe precisa de prevenção, não outro pedido de desculpas.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "Falha operacional repetida exige separar sintoma, causa, controle e verificação da recorrência."
+    },
+    {
+      "id": "root-cause-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "Uma indisponibilidade retorna após reinícios locais; há registros, transferências e responsáveis por alertas para construir cadeia causal.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose",
+        "failure_risk"
+      ],
+      "rationale": "Busca condição sistêmica controlável e responsável por prevenção, não só gatilho imediato."
+    },
+    {
+      "id": "root-cause-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "Uma falha escapa ao controle de qualidade em vários turnos; gestores querem separar ação do operador de interface, carga e controles ausentes.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "Recorrência e separação de camadas sinalizam diretamente análise de causa raiz."
+    },
+    {
+      "id": "root-cause-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "Um novo e-mail de preços aumentou cadastros; queremos saber se causou o aumento comparado com grupo de controle.",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "O alvo é efeito de intervenção e comparação contrafactual, não cadeia de falha recorrente."
+    },
+    {
+      "id": "root-cause-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "Reclamações, pessoal e acúmulo de trabalho se reforçam por um ano; o usuário quer ponto de alavancagem no padrão dinâmico.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "Retroalimentação com atrasos é mais ampla que diagnóstico de incidente concreto."
+    },
+    {
+      "id": "root-cause-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Formate cronologia de incidentes em tabela de duas colunas sem diagnosticar causas.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Formatação é mecânica mesmo com texto sobre incidentes repetidos."
+    },
+    {
+      "id": "root-cause-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "Execute root-cause-analysis na transferência malsucedida recorrente e identifique responsável por prevenção sem culpar indivíduo.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "O usuário invoca explicitamente método para falha operacional recorrente."
+    },
+    {
+      "id": "root-cause-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Um único relato anônimo diz que lançamento falhou por um engenheiro; nomeie essa pessoa como causa raiz sem registros.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "recurring_failure",
+        "decisive_input_missing"
+      ],
+      "rationale": "Limite do evento e evidências são insuficientes; a acusação seria insegura e infundada."
+    }
+  ]
+}

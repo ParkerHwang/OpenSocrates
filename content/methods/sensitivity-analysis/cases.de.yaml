@@ -1,0 +1,79 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: sensitivity-analysis-positive-1
+    kind: positive
+    prompt: "Unser Geschäftsfall vergleicht zwei Lagerentwürfe nach Nachfrage, Arbeit und Energie. Basisformel und Schwelle sind dokumentiert, Eingaben haben begründbare Bereiche. Prüfen Sie Bereiche, Wechselwerte und robuste oder fragile Wahl."
+    expected_route: sensitivity-analysis
+    expected_behavior: route
+    decisive_features:
+      - sensitive_inputs
+      - multiple_objectives
+      - choose
+    rationale: "Modell, Vergleich, Basis, Bereiche und Schwelle vorhanden. Eingaben variieren und Entscheidungswechsel zeigen statt Wahrscheinlichkeiten erfinden."
+  - id: sensitivity-analysis-positive-2
+    kind: positive
+    prompt: "Unser Servicecenter hat Personalmodell und veröffentlichtes Antwortzeitziel. Prüfen Sie Zugänge, Bearbeitungszeit und Personal in quellenbasierten abhängigen Bereichen; priorisieren Sie entscheidungsändernde Recherche."
+    expected_route: sensitivity-analysis
+    expected_behavior: route
+    decisive_features:
+      - sensitive_inputs
+      - unknown_probability
+      - choose
+      - information_purchase
+    rationale: "Modell, Schwelle und Unsicherheit mit Abhängigkeit und Informationspriorität. Berechnete oder ordinale Änderungen ohne erfundene Wahrscheinlichkeiten."
+  - id: sensitivity-analysis-positive-3
+    kind: positive
+    prompt: "Ein Komitee bewertet drei Projekte nach Kosten, Wirkung und Ausführungsrisiko. Gewichte sind dokumentiert, umstritten und könnten Empfehlung ändern. Variieren Sie Gewichte und Werte begründet, protokollieren Sie Wechsel und fragile Annahmen."
+    expected_route: sensitivity-analysis
+    expected_behavior: route
+    decisive_features:
+      - sensitive_inputs
+      - multiple_objectives
+      - choose
+    rationale: "Strukturierter Vergleich mit unsicheren Gewichten und möglichem Wechsel. Sensitivität vor als geklärt behandelter Zielkonfliktempfehlung zeigen."
+  - id: sensitivity-analysis-negative-1
+    kind: negative
+    prompt: "Modell und Schwelle fehlen. Prüfen Sie widersprüchliche Studien, Quellenglaubwürdigkeit und Sicherheitsevidenz."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - conflicting_sources
+      - source_quality
+      - decisive_input_missing
+    rationale: "Mögliche Verwechslung mit Evidenzhierarchie oder Abgleich. Ohne Modell, Regel oder Schwelle keine Variationsbeziehung."
+  - id: sensitivity-analysis-negative-2
+    kind: negative
+    prompt: "Erkunden Sie vier externe Zehnjahreswelten und Vorbereitung. Zahlenmodell, Optionsbewertung oder variierbare Beziehung fehlen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - decisive_input_missing
+    rationale: "Szenarien unter tiefer Unsicherheit ohne Modell; Sensitivität würde unprüfbare Basis erfinden."
+  - id: sensitivity-analysis-mechanical-1
+    kind: mechanical
+    prompt: "Multiplizieren Sie verifizierte Mengen mit gegebenem Umrechnungsfaktor. Modell, Vergleich oder Schwelle sind nicht beteiligt."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "Deterministische Umrechnung ohne unsicheren Bereich oder fragile Entscheidungsfolge."
+  - id: sensitivity-analysis-explicit-1
+    kind: explicit
+    prompt: "Nutzen Sie sensitivity-analysis primär zur Preiswahl. Deckungsbeitragsmodell, strittige Mengen-/Margenbereiche und Mindestmarge sind dokumentiert. Wechselwerte finden; herkunftslose Bereiche zurückstellen."
+    expected_route: sensitivity-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - sensitive_inputs
+      - choose
+    rationale: "Methode ausdrücklich mit Basis, Unsicherheit, Schwelle und Herkunftsregel. Ergebnis bleibt berechnet oder gekennzeichnet statt probabilistisch."
+  - id: sensitivity-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "Ist die Empfehlung sensitiv? Basismodell, Eingaben, Bereiche, Schwelle und Empfehlungsformel fehlen."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - decisive_input_missing
+    rationale: "Alle Angaben sind entscheidend. Zurückstellen und begrenzte Eingaben erfragen statt allgemeiner Sensitivitätsbehauptung."

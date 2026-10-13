@@ -1,0 +1,74 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "stakeholder-analysis-positive-1"
+    kind: positive
+    prompt: "เรากำลังเปลี่ยนตารางงานที่กระทบพนักงานหน้างาน ผู้จัดการ ลูกค้า และตัวแทนแรงงาน ทำแผนที่ส่วนได้เสีย สิทธิตัดสินใจ ความกังวลที่คาด ความยินยอมที่ต้องมี และผู้รับผิดชอบการมีส่วนร่วม"
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "คำขอต้องการแผนที่ผู้เกี่ยวข้องเชื่อมกับการดำเนินงาน ไม่ใช่รายชื่อติดต่อทั่วไป ความกังวลและผลกระทบเป็นสมมติฐานจนมีบันทึกหรือการสนทนารองรับ แนวทางจึงควรเผยความไม่แน่นอน"
+  - id: "stakeholder-analysis-positive-2"
+    kind: positive
+    prompt: "นโยบายสาธารณะจะกระทบผู้อยู่อาศัยนอกกลุ่มตัดสินใจทางการ ระบุผู้ตัดสินใจ กลุ่มที่ได้รับผลแต่ไม่มีตัวแทน อำนาจและผลกระทบ จุดขัดแย้ง และแผนมีส่วนร่วมที่มีผู้รับผิดชอบ"
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "โจทย์กำหนดให้การมีตัวแทนและการดำเนินงานสำคัญชัด แผนที่ต้องแยกอำนาจทางการจากอิทธิพล และไม่อนุมานอันตรายหรือความยินยอมโดยไร้หลักฐาน"
+  - id: "stakeholder-analysis-positive-3"
+    kind: positive
+    prompt: "หลายองค์กรต้องรับมาตรฐานข้อมูลร่วม วิเคราะห์ว่าใครอนุมัติ ขวาง ได้ประโยชน์ หรือแบกรับต้นทุน แล้วกำหนดผู้รับผิดชอบการมีส่วนร่วมและการตอบสนองที่จะเปลี่ยนแผนเปิดใช้"
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "การยอมรับขึ้นกับอำนาจกระจายและการสนับสนุนดำเนินงาน แนวทางต้องเผยสถานะหลักฐานของผลประโยชน์และผลกระทบ ไม่ถือบทบาทองค์กรเป็นหลักฐานความเห็นพ้อง"
+  - id: "stakeholder-analysis-negative-1"
+    kind: negative
+    prompt: "ผู้ร่วมตัดสินใจทุกคนเห็นพ้องเป้าหมายและกลุ่มได้รับผลไม่สำคัญ เปรียบเทียบผู้ขายสองรายที่เป็นไปได้ตามต้นทุน ความน่าเชื่อถือ และเวลาส่งมอบ"
+    expected_route: "trade-off-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "multiple_options"
+      - "multiple_objectives"
+    rationale: "ประเด็นผู้คนยุติแล้ว การตัดสินที่เหลือคือเทียบข้อแลกเปลี่ยน การวิเคราะห์ผู้มีส่วนได้เสียจะเพิ่มแผนที่ตกแต่งแทนแก้การเลือก"
+  - id: "stakeholder-analysis-negative-2"
+    kind: negative
+    prompt: "สำรวจการเปลี่ยนแปลงการเมือง เศรษฐกิจ สังคม เทคโนโลยี สิ่งแวดล้อม และกฎหมายที่อาจกระทบกลยุทธ์ผลิตภัณฑ์"
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "คำขออาจเกี่ยวกลยุทธ์ แต่ผลชี้ขาดคือทะเบียนปัจจัยภายนอก เป็นความสับสนตระกูลวิธีกับ PESTEL ไม่ใช่แผนที่ผู้มีส่วนได้เสีย"
+  - id: "stakeholder-analysis-mechanical-1"
+    kind: mechanical
+    prompt: "ลบชื่อซ้ำจากรายชื่อติดต่อนี้และเรียงชื่อที่เหลือตามตัวอักษร"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - "mechanical"
+      - "mechanical"
+    rationale: "งานเพียงแปลงข้อความที่ให้ ไม่ต้องประเมินส่วนได้เสีย อำนาจ ความยินยอม หรือการดำเนินงาน"
+  - id: "stakeholder-analysis-explicit-1"
+    kind: explicit
+    prompt: "ใช้การวิเคราะห์ผู้มีส่วนได้เสียกับการเปลี่ยนกระบวนการโรงพยาบาลนี้ แสดงสิทธิตัดสินใจ กลุ่มได้รับผล หลักฐานอำนาจและผลกระทบ ความขัดแย้ง ผู้รับผิดชอบการมีส่วนร่วม และเงื่อนไขเปลี่ยนข้อสรุป"
+    expected_route: "stakeholder-analysis"
+    expected_behavior: explicit_primary
+    decisive_features:
+      - "explicit_method"
+      - "stakeholder_conflict"
+    rationale: "ผู้ใช้ระบุวิธีและช่องผลสาธารณะโดยตรง จึงคงเป็นวิธีหลัก แต่ต้องกำกับความกังวลที่อนุมานและผลที่ยังไม่ตรวจ ไม่เสนอว่าแน่นอนแล้ว"
+  - id: "stakeholder-analysis-insufficiency-1"
+    kind: insufficiency
+    prompt: "เราควรดำเนินนโยบายการมาปฏิบัติงานใหม่หรือไม่ ฉันยังไม่ระบุผู้รับผิดชอบการตัดสินใจ กลุ่มได้รับผล เส้นทางอำนาจ ระยะเวลา หรือหลักฐานผลนโยบาย"
+    expected_route: "stakeholder-analysis"
+    expected_behavior: hold
+    decisive_features:
+      - "decisive_input_missing"
+      - "interacting_actors"
+    rationale: "การสนับสนุนดำเนินงานอาจชี้ขาด แต่ขาดขอบเขตผู้เกี่ยวข้องและอำนาจ วิธีต้องพักและขอข้อเท็จจริงขั้นต่ำที่ขาด แทนประกาศว่ามีความยินยอมหรือการคัดค้าน"

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: double-loop-learning-positive-1
+    kind: positive
+    prompt: "Nuestro soporte redujo tiempos con una nueva lista, pero las escalaciones regresaron tras dos meses. Compara expectativa y realidad, inspecciona objetivo y regla del servicio y diseña una prueba segura de una regla revisada."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [recurring_failure, governing_rule, repeat_iteration, testable_claim]
+    rationale: "La corrección procedimental no evitó recurrencia; se pregunta si debe cambiar objetivo o regla rectores. Deben separarse acción de lista e hipótesis normativa y etiquetar registros por procedencia."
+  - id: double-loop-learning-positive-2
+    kind: positive
+    prompt: "Una política recompensa publicar en la fecha prevista y los equipos posponen repetidamente fiabilidad para cumplirla. Examina objetivo, incentivo, autoridad y supuesto, y propone una prueba acotada de cambio normativo."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [governing_rule, feedback_delay, recurring_failure, chosen_plan]
+    rationale: "La conducta recurrente puede proceder de una política rectora y no de un error aislado. Pueden compararse reglas revisadas manteniendo causalidad inferida o no verificada hasta probarse."
+  - id: double-loop-learning-positive-3
+    kind: positive
+    prompt: "Tras dos revisiones de formación, varios equipos repiten la misma omisión de traspaso. Registra la brecha, distingue formación de bucle simple de un cambio de regla e indica qué evidencia apoyaría cada opción."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [recurring_failure, governing_rule, repeat_iteration, testable_claim]
+    rationale: "Recurrencias múltiples y correcciones previas justifican revisar reglas rectoras. Se requieren brecha, regla, evidencia y prueba, no culpa ni probabilidad de recurrencia."
+  - id: double-loop-learning-negative-1
+    kind: negative
+    prompt: "Un despliegue tiene una errata que el control existente detectó de inmediato. Identifica y corrige el defecto exacto sin cambiar la política de publicación."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical, explicit_rules]
+    rationale: "La evidencia explica un defecto de ejecución acotado y el usuario excluye cambios normativos. El doble bucle excedería el alcance; corresponde respuesta enfocada."
+  - id: double-loop-learning-negative-2
+    kind: negative
+    prompt: "Tenemos usuario objetivo e hipótesis de precios. Diseña una prueba reversible de página de destino, elige métrica accionable y regla de pivotar o perseverar."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, plan, human_need]
+    rationale: "Es diseño experimental de lean-startup, una posible confusión de familia. No comunica brecha recurrente ni pide revisar reglas rectoras."
+  - id: double-loop-learning-mechanical-1
+    kind: mechanical
+    prompt: "Convierte las tres duraciones de incidentes de minutos a horas y devuelve resultados en el mismo orden."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "La conversión es determinista y no contiene juicio de brecha recurrente, variable rectora ni prueba."
+  - id: double-loop-learning-explicit-1
+    kind: explicit
+    prompt: "Usa aprendizaje de doble bucle. Muestra brecha, supuesto o regla rectores, estado probatorio, regla revisada candidata y prueba segura; no atribuyas culpa personal."
+    expected_route: double-loop-learning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, recurring_failure, governing_rule, testable_claim]
+    rationale: "El usuario invoca método y contrato público. Evitar culpa concuerda con examinar reglas, autoridad, incentivos y evidencia sin inferir intenciones."
+  - id: double-loop-learning-insufficiency-1
+    kind: insufficiency
+    prompt: "Nuestro equipo sigue fallando. Indica qué creencia o política cambiar y qué experimentar. No tenemos resultado esperado, registros, límite de recurrencia ni regla actual."
+    expected_route: double-loop-learning
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, recurring_failure, governing_rule]
+    rationale: "Puede encajar el método, pero faltan brecha y regla decisivas. Debe suspender sin inventar explicaciones profundas ni atribuir el problema a mentalidad."

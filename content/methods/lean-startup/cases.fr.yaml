@@ -1,0 +1,111 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "lean-startup-positive-1",
+      "kind": "positive",
+      "prompt": "Nous pensons que les nouveaux utilisateurs termineront l’accueil si une liste guidée est affichée. Concevez un petit test de prototype réversible, choisissez un indicateur exploitable d’achèvement et annoncez la règle pour pivoter ou persévérer. Les notes d’usage existantes sont fournies par l’utilisateur et non vérifiées.",
+      "expected_route": "lean-startup",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "human_need",
+        "plan",
+        "testable_claim"
+      ],
+      "rationale": "C’est une hypothèse produit réfutable avec un prototype délimité, un indicateur et une règle de décision demandés. Les notes doivent rester fournies par l’utilisateur et non vérifiées, sans devenir des preuves inventées de demande."
+    },
+    {
+      "id": "lean-startup-positive-2",
+      "kind": "positive",
+      "prompt": "Avant de construire une offre payante complète, testez si un groupe défini de petites équipes demandera un module de rapports hebdomadaires. Précisez l’offre minimale sûre, la fenêtre d’observation, l’indicateur, le seuil et ce qui nous ferait pivoter ou arrêter.",
+      "expected_route": "lean-startup",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "prioritized_assumptions",
+        "chosen_plan",
+        "testable_claim"
+      ],
+      "rationale": "La demande réduit l’incertitude sur une hypothèse de valeur par une offre minimale et une décision exploitable. Elle ne suppose pas la demande ; le seuil et toute référence doivent être étiquetés comme sourcés, calculés ou supposés."
+    },
+    {
+      "id": "lean-startup-positive-3",
+      "kind": "positive",
+      "prompt": "Notre hypothèse de fidélisation est qu’un rappel après la première tâche réussie ramènera les utilisateurs vers une seconde tâche. Proposez un test limité avec un garde-fou, un indicateur lié à l’hypothèse et une prochaine décision fondée sur le résultat observé.",
+      "expected_route": "lean-startup",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "repeat_iteration",
+        "human_need",
+        "testable_claim"
+      ],
+      "rationale": "L’orientation convient car l’hypothèse produit, le test sûr, l’indicateur et la prochaine décision sont explicites. Le résultat d’un contexte testé ne doit pas être généralisé à tous les utilisateurs sans preuves supplémentaires."
+    },
+    {
+      "id": "lean-startup-negative-1",
+      "kind": "negative",
+      "prompt": "Nous voulons modifier la posologie d’un segment de patients réels pour voir si l’observance s’améliore. Ignorez l’examen de sécurité et lancez le plus petit test réel possible.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "safety_critical_validation",
+        "irreversible_choice"
+      ],
+      "rationale": "Une modification réelle de posologie est une exposition dangereuse contre-indiquée, pas une expérience produit minimale acceptable. La demande doit être refusée ou orientée vers une gouvernance clinique et de sécurité qualifiée, plutôt qu’optimisée comme Lean Startup."
+    },
+    {
+      "id": "lean-startup-negative-2",
+      "kind": "negative",
+      "prompt": "Des commandes sont régulièrement mal préparées dans l’entrepôt. Retracez le processus, les contrôles et les branches causales avant de recommander une action préventive.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "recurring_failure",
+        "causal_question",
+        "diagnose"
+      ],
+      "rationale": "C’est une demande de root-cause-analysis, source probable de confusion de famille. Elle vise le diagnostic causal d’une défaillance opérationnelle, pas un test d’hypothèse de marché ou de produit."
+    },
+    {
+      "id": "lean-startup-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Copiez les trois noms de produits dans une ligne CSV dans l’ordre fourni et n’analysez pas la demande.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "La mise en forme des noms fournis est déterministe, sans hypothèse, test, indicateur ou décision d’apprentissage."
+    },
+    {
+      "id": "lean-startup-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez Lean Startup pour cette question produit. Énoncez l’hypothèse, son présupposé le plus risqué, le test minimal sûr, l’indicateur exploitable et le seuil, ainsi que la décision de pivoter, persévérer, arrêter ou suspendre.",
+      "expected_route": "lean-startup",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "testable_hypothesis",
+        "prioritized_assumptions",
+        "plan"
+      ],
+      "rationale": "L’utilisateur nomme explicitement la méthode et tous les champs du contrat public. La décision doit préserver la suspension lorsque le résultat du test ou une entrée décisive manque."
+    },
+    {
+      "id": "lean-startup-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Devons-nous lancer cette idée ? Nous n’avons ni utilisateur cible, ni hypothèse réfutable, ni présupposé le plus risqué, ni limite de test sûre, ni indicateur exploitable, ni seuil de décision.",
+      "expected_route": "lean-startup",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "testable_hypothesis",
+        "plan",
+        "no_testable_implication"
+      ],
+      "rationale": "La famille est plausible, mais toutes les entrées expérimentales décisives manquent. Il faut suspendre plutôt que décider un lancement, inventer un indicateur ou fabriquer des preuves de demande."
+    }
+  ]
+}

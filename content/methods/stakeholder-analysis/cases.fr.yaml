@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "stakeholder-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Nous déployons un changement de planning affectant personnel de terrain, managers, clients et représentant syndical. Cartographiez enjeux, droits décisionnels, préoccupations probables, consentement nécessaire et responsables de l’engagement.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "La demande exige une carte des acteurs liée à la mise en œuvre, pas un carnet de contacts. Préoccupations et effets restent hypothèses sans dossiers ou conversations ; leur incertitude doit apparaître."
+    },
+    {
+      "id": "stakeholder-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "Une politique publique affectera des habitants hors du groupe décisionnel formel. Identifiez décideur, groupes affectés non représentés, pouvoir et impact, conflits et plan de participation avec responsabilités.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "La consigne rend représentation et mise en œuvre déterminantes. La carte distingue autorité formelle et influence sans inférer préjudice ou consentement sans preuves."
+    },
+    {
+      "id": "stakeholder-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Plusieurs organisations doivent adopter une norme de données commune. Analysez qui peut approuver, bloquer, bénéficier ou supporter le coût ; attribuez ensuite responsable d’engagement et réponse modifiant le déploiement.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "L’adoption dépend d’une autorité distribuée et d’un soutien à la mise en œuvre. Il faut publier les états probants des intérêts et impacts plutôt que prendre les rôles organisationnels pour preuves d’accord."
+    },
+    {
+      "id": "stakeholder-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Tous les participants décisionnels s’accordent sur l’objectif et le groupe affecté n’est pas déterminant. Comparez les deux fournisseurs faisables selon coût, fiabilité et délai.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "La question des personnes est réglée ; reste une comparaison de compromis. Une carte décorative ne résoudrait pas le choix."
+    },
+    {
+      "id": "stakeholder-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Examinez les évolutions politiques, économiques, sociales, technologiques, environnementales et juridiques susceptibles d’affecter notre stratégie produit.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "La demande est stratégique, mais le résultat décisif est un registre de facteurs externes. Confusion probable avec PESTEL, pas une carte des parties prenantes."
+    },
+    {
+      "id": "stakeholder-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Supprimez les doublons de ce carnet de contacts et triez les noms restants alphabétiquement.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "mechanical"
+      ],
+      "rationale": "La tâche transforme seulement du texte fourni, sans évaluation des enjeux, pouvoirs, consentement ou mise en œuvre."
+    },
+    {
+      "id": "stakeholder-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez l’analyse des parties prenantes pour ce changement de flux hospitalier. Montrez droits décisionnels, groupes affectés, preuves de pouvoir et impact, conflits, responsables d’engagement et condition de basculement.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "stakeholder_conflict"
+      ],
+      "rationale": "L’utilisateur nomme directement méthode et champs publics ; elle reste principale. La réponse étiquette encore préoccupations inférées et effets non vérifiés au lieu de les présenter comme établis."
+    },
+    {
+      "id": "stakeholder-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Devons-nous appliquer la nouvelle politique de présence ? Je n’ai identifié ni responsable, groupes affectés, parcours d’autorité, horizon ni preuves des effets.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "interacting_actors"
+      ],
+      "rationale": "Le soutien à la mise en œuvre peut être décisif, mais limites des acteurs et autorité manquent. Il faut suspendre et demander les faits minimaux, pas déclarer consentement ou opposition."
+    }
+  ]
+}

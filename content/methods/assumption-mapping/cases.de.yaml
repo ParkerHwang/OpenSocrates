@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: assumption-mapping-positive-1
+    kind: positive
+    prompt: "Wir erwägen einen gemeinsamen Essensplanungsdienst. Liste notwendige Annahmen, trenne Wichtigkeit von Belegen und benenne den ersten sicheren Test. Interviewnotizen stammen vom Nutzer und sind nicht unabhängig geprüft."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, testable_claim, plan]
+    rationale: "Gefordert sind Annahmenregister, Wichtigkeits-/Belegachsen, Risikomenge und nächster Test. Nutzerseitige statt geprüfte Notizen verlangen sichtbare Unsicherheit ohne Wahrscheinlichkeiten."
+  - id: assumption-mapping-positive-2
+    kind: positive
+    prompt: "Ein Team will Rechnungsprüfung automatisieren, aber der Engpass könnte Kundenerwünschtheit, Datenmachbarkeit oder regelkonforme Tragfähigkeit sein. Kartiere Annahmen und wähle einen risikoarmen Prüfschritt vor Beschaffung."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, irreversible_choice, testable_claim]
+    rationale: "Mehrere Annahmenbereiche und eine Entscheidung vor Festlegung liegen vor. Validierung ist noch Priorisierung; Quellenfakten, Annahmen und fehlende Konformitätsbelege müssen gekennzeichnet werden."
+  - id: assumption-mapping-positive-3
+    kind: positive
+    prompt: "Für eine Dienstplanänderung bei Ehrenamtlichen gibt es fünf Experimente. Ordne Annahmen nach Entscheidungswicht und Belegstärke; ergänze sichere Beobachtung und planändernde Regel."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [prioritized_assumptions, testable_claim, chosen_plan]
+    rationale: "Gefragt ist Kernpriorisierung statt durchgeführtem Experiment. Ordinale Angaben und verified, unverified, assumed oder conflicted ersetzen erfundene Scores."
+  - id: assumption-mapping-negative-1
+    kind: negative
+    prompt: "Unser Bezahldienst fiel diese Woche dreimal aus. Verfolge Kausalkette, Kontrollschwächen und Präventionsverantwortlichen; schlage keine Produktannahmenkarte vor."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "Dies ist root-cause-analysis, eine wahrscheinliche Verwechslung mit Annahmenkartierung. Gefordert sind Diagnose und Kontrolle statt priorisierter prüfbarer Überzeugungen."
+  - id: assumption-mapping-negative-2
+    kind: negative
+    prompt: "Zielkunde und Landingpage-Experiment stehen fest. Definiere handlungsfähige Kennzahl, Beobachtungszeitraum und Kurswechsel-oder-Fortsetzungsregel."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, chosen_plan, plan]
+    rationale: "Die Annahme ist ausgewählt; ein Marktexperiment soll operationalisiert werden. Das gehört zu lean-startup; erneute Kartierung würde Test und Kennzahl verdrängen."
+  - id: assumption-mapping-mechanical-1
+    kind: mechanical
+    prompt: "Sortiere diese sechs Annahmenbezeichnungen alphabetisch und liefere eine nummerierte Liste."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Sortierung enthält kein Urteil, Unsicherheits- oder Experimentpriorisierungsbedarf; direkte mechanische Antwort."
+  - id: assumption-mapping-explicit-1
+    kind: explicit
+    prompt: "Nutze Annahmenkartierung für diese Idee. Zeige Annahmen, Wichtigkeits-/Belegachsen, Risikomenge und nächsten sicheren Test; markiere unbelegte Aussagen sichtbar ungeprüft."
+    expected_route: assumption-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions, prioritized_assumptions, testable_claim]
+    rationale: "Nutzer benennt Verfahren und öffentliche Ausgaben. Ausdrücklicher Aufruf ist primär; Belegkennzeichnung schützt Herkunftsgrenzen."
+  - id: assumption-mapping-insufficiency-1
+    kind: insufficiency
+    prompt: "Priorisiere Annahmen unseres Vorschlags und sage, welche zuerst geprüft werden soll. Entscheidungsfrage, Ziel, Kandidatenannahmen und Testgrenzen fehlen noch."
+    expected_route: assumption-mapping
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, hidden_assumptions, prioritized_assumptions, no_testable_implication]
+    rationale: "Verfahren passt, aber entscheidende Eingaben fehlen. Aussetzen statt Annahmen oder Test erfinden; als Nächstes Entscheidung und autorisierte sichere Grenze klären."

@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "defeasible-reasoning-positive-01",
+      "kind": "positive",
+      "prompt": "โดยปกตินโยบายนี้ใช้ แต่ข้อยกเว้นหรือข้อเท็จจริงใหม่ใดจะถอนคำแนะนำปัจจุบัน?",
+      "expected_route": "defeasible-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "exception_prone_rule",
+        "explicit_rules"
+      ],
+      "rationale": "การตัดสินใช้กฎปริยายและต้องมีสิ่งหักล้างกับเงื่อนไขถอนชัด"
+    },
+    {
+      "id": "defeasible-reasoning-positive-02",
+      "kind": "positive",
+      "prompt": "แยกหลักฐานที่ขัดข้อสรุปโดยตรงจากหลักฐานที่ลดความแข็งแรงของกฎรองรับ",
+      "expected_route": "defeasible-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "exception_prone_rule",
+        "explicit_rules"
+      ],
+      "rationale": "ผู้ใช้ขอแยกสิ่งหักล้างข้อสรุปจากสิ่งบั่นทอนฐานในการตัดสินแก้ได้"
+    },
+    {
+      "id": "defeasible-reasoning-positive-03",
+      "kind": "positive",
+      "prompt": "กฎทั่วไปและข้อยกเว้นเฉพาะกว่าต่างใช้ได้ สถานะชั่วคราวปัจจุบันคืออะไร?",
+      "expected_route": "defeasible-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "exception_prone_rule",
+        "explicit_rules"
+      ],
+      "rationale": "ต้องจัดการความเฉพาะและข้อยกเว้นค้างโดยไม่แสร้งว่าผลไม่มีเงื่อนไข"
+    },
+    {
+      "id": "defeasible-reasoning-negative-01",
+      "kind": "negative",
+      "prompt": "ใช้กฎเก็บรักษาเคร่งครัดกับทุกบันทึกและรายงานผลกำหนดแน่นอน",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules"
+      ],
+      "rationale": "กฎไม่มีข้อยกเว้นเป็นงานนิรนัยหรือใช้เชิงกล"
+    },
+    {
+      "id": "defeasible-reasoning-negative-02",
+      "kind": "negative",
+      "prompt": "จัดอันดับแหล่งตามคุณภาพแบบศึกษาและปรับความหนักแน่นข้ออ้างตามแหล่งที่ใช้ได้แข็งแรงที่สุด",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "เป็นลำดับชั้นหลักฐาน ไม่ใช่จัดการหักล้างกฎปริยาย"
+    },
+    {
+      "id": "defeasible-reasoning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "คัดลอกกฎปริยายและรายชื่อข้อยกเว้นใส่แบบนโยบาย",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การคัดลอกข้อความนโยบายที่ให้เป็นเชิงกล"
+    },
+    {
+      "id": "defeasible-reasoning-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ defeasible-reasoning โดยชัดแจ้งประเมินกฎอนุมัติที่ใช้ได้โดยปกตินี้และข้อยกเว้น",
+      "expected_route": "defeasible-reasoning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "exception_prone_rule"
+      ],
+      "rationale": "ผู้ใช้ขอวิเคราะห์กฎปริยาย สิ่งหักล้าง และเงื่อนไขถอนโดยตรง"
+    },
+    {
+      "id": "defeasible-reasoning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "ใช้กฎปริยาย แต่ไม่ให้แหล่งกฎ ข้อเท็จจริงกระตุ้น ขอบเขต หรือข้อยกเว้นที่เป็นไปได้",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "exception_prone_rule",
+        "decisive_input_missing"
+      ],
+      "rationale": "หากไม่มีกฎปริยายและข้อเท็จจริงกระตุ้น ข้อสรุปชั่วคราวจะตามอำเภอใจ"
+    }
+  ]
+}

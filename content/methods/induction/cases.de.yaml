@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: induction-positive-01
+    kind: positive
+    prompt: "Stützen wiederholte Beobachtungen eine allgemeine Aussage über die meisten Nutzer, und wie stark?"
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "Übergang von Fällen zu begrenzter Population braucht Stichproben-/Gegenbeispielprüfung."
+  - id: induction-positive-02
+    kind: positive
+    prompt: "Rechtfertigt diese Umfragestichprobe die Behauptung, Kunden bevorzugten neuen Ablauf?"
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "Repräsentativität, Auswahlverzerrung und Stärke zentral."
+  - id: induction-positive-03
+    kind: positive
+    prompt: "Was lässt sich aus Vorfällen über nächstes Quartal schließen, einschließlich plausibler Gegenbeispiele?"
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "Prognose erweitert Fälle und muss Umfang und Gegenbeispielrisiko nennen."
+  - id: induction-negative-01
+    kind: negative
+    prompt: "Strikte Regel genehmigt jeden berechtigten Datensatz; folgt dieser Fall der Regel?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Deduktive Regelanwendung statt Stichprobenverallgemeinerung."
+  - id: induction-negative-02
+    kind: negative
+    prompt: "Mehrere Erklärungen passen zum Scheitern; vergleiche und benenne unterscheidende Beobachtung."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Abduktive Diagnose statt Stichproben-Populations-Erweiterung."
+  - id: induction-mechanical-01
+    kind: mechanical
+    prompt: "Hänge neue Beobachtungen unverändert an Datensatz an."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Datenanhängen ist mechanisch."
+  - id: induction-explicit-01
+    kind: explicit
+    prompt: "Nutze ausdrücklich Induktion zur Prüfung, ob kleines Experiment breitere Produktbehauptung stützt."
+    expected_route: induction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, repeated_observations]
+    rationale: "Nutzer wählt Stichproben-Verallgemeinerungs-Analyse."
+  - id: induction-insufficiency-01
+    kind: insufficiency
+    prompt: "Verallgemeinere ohne Zielpopulation, Auswahlprozess, Beobachtungen oder Messdefinition."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [repeated_observations, weak_sample, decisive_input_missing]
+    rationale: "Ohne Stichprobengrundlage und Zielumfang keine begrenzte Verallgemeinerung."

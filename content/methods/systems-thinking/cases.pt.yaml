@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "systems-thinking-positive-01",
+      "kind": "positive",
+      "prompt": "Acúmulo de moderação cresce porque atrasos frustram usuários e geram relatos duplicados; a equipe quer estrutura por trás do padrão.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question",
+        "deep_uncertainty"
+      ],
+      "rationale": "O padrão recorrente contém fluxos, retroalimentação e atraso interativos, não causa isolada."
+    },
+    {
+      "id": "systems-thinking-positive-02",
+      "kind": "positive",
+      "prompt": "Subsídio de conservação aumenta plantio inicialmente; depois escassez de água e fiscalização produzem oscilações entre estações.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "deep_uncertainty",
+        "causal_question"
+      ],
+      "rationale": "Comportamento sazonal e resistência política exigem estoques, fluxos, equilíbrio e atrasos."
+    },
+    {
+      "id": "systems-thinking-positive-03",
+      "kind": "positive",
+      "prompt": "Confiança de clientes acumula lentamente, indicações reforçam crescimento e corte de suporte causa declínio atrasado; encontre alavancagem.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "Alvo explícito em acumulação, reforço, atraso e alavancagem de intervenção."
+    },
+    {
+      "id": "systems-thinking-negative-01",
+      "kind": "negative",
+      "prompt": "Dois grupos pareados receberam treinamentos diferentes; o usuário pergunta se treinamento mudou notas após um mês.",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "Comparação delimitada de intervenção basta; não exige sistema dinâmico completo."
+    },
+    {
+      "id": "systems-thinking-negative-02",
+      "kind": "negative",
+      "prompt": "Uma indisponibilidade única do banco tem gatilho datado claro; a equipe precisa de causa próxima e condição raiz controlável.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "diagnose",
+        "recurring_failure"
+      ],
+      "rationale": "Diagnóstico delimitado deve liderar, salvo evidência posterior de padrão recorrente de retroalimentação."
+    },
+    {
+      "id": "systems-thinking-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Converta notas de estoques e fluxos em tópicos Markdown sem explicar sistema.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Reformatar é mecânico e não pede julgamento estrutural."
+    },
+    {
+      "id": "systems-thinking-explicit-01",
+      "kind": "explicit",
+      "prompt": "Use systems-thinking para explicar por que nossa correção local de pessoal é repetidamente compensada por crescimento posterior do acúmulo.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "Invoca método para padrão sistêmico recorrente e atrasado."
+    },
+    {
+      "id": "systems-thinking-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Houve uma reclamação ontem; desenhe ciclo de reforço e recomende intervenção sistêmica sem padrão temporal.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "feedback_delay",
+        "decisive_input_missing"
+      ],
+      "rationale": "Observação isolada não estabelece dinâmica nem direção de ciclo."
+    }
+  ]
+}

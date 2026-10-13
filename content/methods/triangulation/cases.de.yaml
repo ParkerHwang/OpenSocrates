@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: triangulation-positive-01
+    kind: positive
+    prompt: "Können unabhängige Umfrage-, Verhaltens- und Verwaltungsdaten diese Bindungsbehauptung bestätigen?"
+    expected_route: triangulation
+    expected_behavior: route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "Verschiedene Stränge auf Unabhängigkeit, Übereinstimmung, Konflikt und Lücke prüfen."
+  - id: triangulation-positive-02
+    kind: positive
+    prompt: "Beteiligte zitieren verschiedene Methoden; stimmt ihre Evidenz tatsächlich zum selben Ergebnis überein?"
+    expected_route: triangulation
+    expected_behavior: route
+    decisive_features: [reconcile_evidence, conflicting_sources]
+    rationale: "Stränge vergleichen und wiederholte Ursprungsdaten nicht als Bestätigung tarnen."
+  - id: triangulation-positive-03
+    kind: positive
+    prompt: "Unsere Interviews und unser Experiment widersprechen sich; welche zusätzliche unabhängige Prüfung löst den wesentlichen Konflikt?"
+    expected_route: triangulation
+    expected_behavior: route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "Materielle Uneinigkeit verlangt Unabhängigkeitsprüfung und gezielten neuen Strang."
+  - id: triangulation-negative-01
+    kind: negative
+    prompt: "Ordnen Sie jede Quelle nach Entwurfsqualität, Direktheit und Zielgruppenanwendbarkeit."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Einzelquellenqualität statt strängeübergreifender Unabhängigkeit."
+  - id: triangulation-negative-02
+    kind: negative
+    prompt: "Aktualisieren Sie bisheriges Hypothesenvertrauen nach neuem Testergebnis."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "Definierte Vorher-/Nachher-Aktualisierung ist bayesianisch statt Triangulation."
+  - id: triangulation-mechanical-01
+    kind: mechanical
+    prompt: "Vereinigen Sie die drei Evidenztabellen und bewahren Sie alle Zeilen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Mechanisches Zusammenführen ohne Unabhängigkeits- oder Übereinstimmungsprüfung."
+  - id: triangulation-explicit-01
+    kind: explicit
+    prompt: "Nutzen Sie ausdrücklich triangulation: Übersteht die Kundenwirkungsbehauptung unabhängige Prüfungen?"
+    expected_route: triangulation
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, reconcile_evidence]
+    rationale: "Ausdrückliche strängeübergreifende Bestätigung wesentlicher Aussage."
+  - id: triangulation-insufficiency-01
+    kind: insufficiency
+    prompt: "Berichten Sie Bestätigung; alle Quellen wiederholen einen unbekannten Datensatz ohne unabhängigen Strang."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [reconcile_evidence, source_quality, decisive_input_missing]
+    rationale: "Abhängige Wiederholung erlaubt keine Triangulation; Bestätigung zurückstellen."

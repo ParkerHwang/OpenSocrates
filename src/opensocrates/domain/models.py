@@ -55,6 +55,7 @@ from .enums import (
     VerificationOutcome,
     ViolationSeverity,
 )
+from .locales import SUPPORTED_LOCALES, complete_locale_set
 from .validation import (
     AlternativeId,
     ClaimId,
@@ -638,6 +639,13 @@ class MethodDisplayName(FrozenModel):
     zh: SafeText = _text(200)
     ja: SafeText = _text(200)
 
+    fr: SafeText = _text(200)
+    de: SafeText = _text(200)
+    it: SafeText = _text(200)
+    es: SafeText = _text(200)
+    pt: SafeText = _text(200)
+    th: SafeText = _text(200)
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MethodPlainAction(FrozenModel):
@@ -647,6 +655,13 @@ class MethodPlainAction(FrozenModel):
     ko: SafeText = _text(500)
     zh: SafeText = _text(500)
     ja: SafeText = _text(500)
+
+    fr: SafeText = _text(500)
+    de: SafeText = _text(500)
+    it: SafeText = _text(500)
+    es: SafeText = _text(500)
+    pt: SafeText = _text(500)
+    th: SafeText = _text(500)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -724,7 +739,7 @@ class TeacherQuestionLocales(FrozenModel):
     )
 
     # Empty new-language arrays preserve legacy EN/KO round trips; build-time
-    # authoring validation separately requires three questions in all four locales.
+    # authoring validation separately requires three questions in all ten locales.
     zh: tuple[SafeText, ...] = dc_field(
         default=(),
         metadata={
@@ -749,14 +764,90 @@ class TeacherQuestionLocales(FrozenModel):
         },
     )
 
+    fr: tuple[SafeText, ...] = dc_field(
+        default=(),
+        metadata={
+            "min_items": 0,
+            "max_items": 3,
+            "unique_items": True,
+            "item_min_length": 20,
+            "item_max_length": 220,
+            "item_pattern": r"^(?!\s)(?!.*\s$)[^\r\n\u0000]+\?$",
+        },
+    )
+
+    de: tuple[SafeText, ...] = dc_field(
+        default=(),
+        metadata={
+            "min_items": 0,
+            "max_items": 3,
+            "unique_items": True,
+            "item_min_length": 20,
+            "item_max_length": 220,
+            "item_pattern": r"^(?!\s)(?!.*\s$)[^\r\n\u0000]+\?$",
+        },
+    )
+
+    it: tuple[SafeText, ...] = dc_field(
+        default=(),
+        metadata={
+            "min_items": 0,
+            "max_items": 3,
+            "unique_items": True,
+            "item_min_length": 20,
+            "item_max_length": 220,
+            "item_pattern": r"^(?!\s)(?!.*\s$)[^\r\n\u0000]+\?$",
+        },
+    )
+
+    es: tuple[SafeText, ...] = dc_field(
+        default=(),
+        metadata={
+            "min_items": 0,
+            "max_items": 3,
+            "unique_items": True,
+            "item_min_length": 20,
+            "item_max_length": 220,
+            "item_pattern": r"^(?!\s)(?!.*\s$)[^\r\n\u0000]+\?$",
+        },
+    )
+
+    pt: tuple[SafeText, ...] = dc_field(
+        default=(),
+        metadata={
+            "min_items": 0,
+            "max_items": 3,
+            "unique_items": True,
+            "item_min_length": 20,
+            "item_max_length": 220,
+            "item_pattern": r"^(?!\s)(?!.*\s$)[^\r\n\u0000]+\?$",
+        },
+    )
+
+    th: tuple[SafeText, ...] = dc_field(
+        default=(),
+        metadata={
+            "min_items": 0,
+            "max_items": 3,
+            "unique_items": True,
+            "item_min_length": 20,
+            "item_max_length": 220,
+            "item_pattern": r"^(?!\s)(?!.*\s$)[^\r\n\u0000]+\?$",
+        },
+    )
+
     def __post_init__(self) -> None:
         FrozenModel.__post_init__(self)
-        if bool(self.zh) != bool(self.ja):
-            raise ValidationError("teacher question locales: zh and ja must be supplied together")
+        present = {locale for locale in SUPPORTED_LOCALES if getattr(self, locale)}
+        if not complete_locale_set(present):
+            raise ValidationError(
+                "teacher question locales: expected complete legacy or current set"
+            )
         for locale, questions in (
-            (locale, getattr(self, locale)) for locale in ("en", "ko", "zh", "ja")
+            (locale, getattr(self, locale))
+            for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
         ):
-            if locale in {"zh", "ja"} and not questions:
+            if locale not in {"en", "ko"} and not questions:
                 continue
             if len(questions) != 3 or len(set(questions)) != len(questions):
                 raise ValidationError(
@@ -775,7 +866,7 @@ class TeacherQuestionLocales(FrozenModel):
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TeacherQuestionCatalog(FrozenModel):
-    """Canonical four-locale overlay applied without changing authored method revisions."""
+    """Canonical ten-locale overlay applied without changing authored method revisions."""
 
     __schema_id__: ClassVar[str] = "opensocrates.teacher-questions/1.0.0"
     schema: str = _schema(__schema_id__)
@@ -794,10 +885,13 @@ class TeacherQuestionCatalog(FrozenModel):
             raise ValidationError(
                 "teacher question catalog: overlay revision/count does not match canonical content"
             )
-        seen: dict[str, set[str]] = {locale: set() for locale in ("en", "ko", "zh", "ja")}
+        seen: dict[str, set[str]] = {
+            locale: set() for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
+        }
         for localized in self.methods.values():
             for locale, questions in (
-                (locale, getattr(localized, locale)) for locale in ("en", "ko", "zh", "ja")
+                (locale, getattr(localized, locale))
+                for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
             ):
                 if seen[locale].intersection(questions):
                     raise ValidationError(
@@ -882,7 +976,18 @@ class SelectionCatalogEntry(FrozenModel):
         if not self.family.strip():
             raise ValidationError("selection catalog entry: family cannot be blank")
         locale_keys = set(self.display_name)
-        if "en" not in locale_keys or locale_keys - {"en", "ko", "zh", "ja"}:
+        if "en" not in locale_keys or locale_keys - {
+            "en",
+            "ko",
+            "zh",
+            "ja",
+            "fr",
+            "de",
+            "it",
+            "es",
+            "pt",
+            "th",
+        }:
             raise ValidationError("selection catalog entry: English name is required")
         if set(self.core_purpose) != locale_keys or any(
             not value.strip()

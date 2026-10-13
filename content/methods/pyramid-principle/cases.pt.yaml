@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "pyramid-principle-positive-01",
+      "kind": "positive",
+      "prompt": "Transforme esta análise validada em memorando executivo com recomendação primeiro, depois razões agrupadas e detalhes.",
+      "expected_route": "pyramid-principle",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "explain",
+        "tangled_hierarchy"
+      ],
+      "rationale": "O julgamento está pronto; o gargalo é comunicação com conclusão primeiro."
+    },
+    {
+      "id": "pyramid-principle-positive-02",
+      "kind": "positive",
+      "prompt": "Reorganize o relatório com ideia central no topo e cada seção apoiando-a sem sobreposição.",
+      "expected_route": "pyramid-principle",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "explain",
+        "tangled_hierarchy"
+      ],
+      "rationale": "Exige resposta principal, razões agrupadas, resumo vertical e ordem horizontal."
+    },
+    {
+      "id": "pyramid-principle-positive-03",
+      "kind": "positive",
+      "prompt": "Torne esta longa análise decisória fácil de percorrer para executivos sem esconder incerteza ou alternativas.",
+      "expected_route": "pyramid-principle",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "explain",
+        "tangled_hierarchy"
+      ],
+      "rationale": "Estrutura análise já julgada preservando incerteza material."
+    },
+    {
+      "id": "pyramid-principle-negative-01",
+      "kind": "negative",
+      "prompt": "Que premissa sustenta a recomendação e qual é a objeção não resolvida mais forte?",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "A tarefa inspeciona sustentação do argumento, não reordena resposta resolvida."
+    },
+    {
+      "id": "pyramid-principle-negative-02",
+      "kind": "negative",
+      "prompt": "Decida se esta recomendação é sustentada, mas evidências e alternativas ainda não foram revisadas.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "critique"
+      ],
+      "rationale": "Estrutura comunicativa não substitui julgamento subjacente pendente."
+    },
+    {
+      "id": "pyramid-principle-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Aplique títulos do padrão editorial e mantenha todas as frases na ordem atual.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Aplicar formatação fixa é mecânico."
+    },
+    {
+      "id": "pyramid-principle-explicit-01",
+      "kind": "explicit",
+      "prompt": "Use explicitamente pyramid-principle para reescrever esta atualização ao conselho com conclusão primeiro.",
+      "expected_route": "pyramid-principle",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "explain"
+      ],
+      "rationale": "O usuário pede método para comunicação executiva com conclusão primeiro."
+    },
+    {
+      "id": "pyramid-principle-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Coloque conclusão primeiro sem fornecer pergunta central, conclusão, evidências ou decisão do público.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "explain",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sem julgamento estável e decisão do público, a resposta principal seria inventada."
+    }
+  ]
+}

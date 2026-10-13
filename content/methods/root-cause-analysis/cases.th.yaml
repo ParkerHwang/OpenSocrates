@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "root-cause-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "คลังส่งของผิดทุกไม่กี่สัปดาห์หลังใช้ขั้นหยิบใหม่ ทีมต้องป้องกันไม่ใช่ขอโทษอีก",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "ความล้มเหลวปฏิบัติซ้ำต้องแยกอาการ เหตุ ควบคุม และตรวจซ้ำ"
+    },
+    {
+      "id": "root-cause-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "บริการล่มกลับหลังเริ่มใหม่เฉพาะที่ มีบันทึก ส่งต่อ และเจ้าของเตือนสำหรับโซ่เหตุ",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose",
+        "failure_risk"
+      ],
+      "rationale": "ต้องเงื่อนไขระบบควบคุมได้และเจ้าของป้องกัน ไม่เฉพาะตัวกระตุ้นทันที"
+    },
+    {
+      "id": "root-cause-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "คุณภาพหลุดซ้ำข้ามกะ ผู้จัดการต้องแยกการกระทำคนจากหน้าตาเครื่องมือ ภาระ และเงื่อนไขควบคุมขาด",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "ซ้ำและขอแยกชั้นเป็นสัญญาณตรงสำหรับ root-cause analysis"
+    },
+    {
+      "id": "root-cause-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "อีเมลราคาใหม่เพิ่มสมัคร คำถามคืออีเมลก่อเพิ่มไหมเทียบกลุ่มควบคุม",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "เป้าเป็นผลการแทรกแซงและเปรียบสมมติ ไม่โซ่ล้มซ้ำ"
+    },
+    {
+      "id": "root-cause-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "ร้องเรียนลูกค้า บุคลากร และงานค้างเสริมกันตลอดปี ผู้ใช้ต้องจุดคานงัดในรูปแบบพลวัต",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "โครงป้อนกลับมีหน่วงกว้างกว่าวินิจฉัยเหตุรูปธรรม"
+    },
+    {
+      "id": "root-cause-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "จัดลำดับเหตุเป็นตารางสองคอลัมน์ ไม่วินิจฉัยว่าทำไมล้ม",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "จัดรูปเป็นเชิงกลแม้แหล่งบอกเหตุซ้ำ"
+    },
+    {
+      "id": "root-cause-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "ทำ root-cause-analysis กับส่งต่องานล้มซ้ำและระบุเจ้าของป้องกันโดยไม่โทษบุคคล",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "ผู้ใช้ขอวิธีชัดกับความล้มเหลวปฏิบัติซ้ำ"
+    },
+    {
+      "id": "root-cause-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "รายงานนิรนามเดียวบอกปล่อยล้มเพราะวิศวกรหนึ่งคน ชี้คนนั้นเป็นรากเหตุโดยไร้บันทึก",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "recurring_failure",
+        "decisive_input_missing"
+      ],
+      "rationale": "ขอบเหตุและหลักฐานไม่พอ คำโทษไม่ปลอดภัยและไร้รองรับ"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: induction-positive-01
+    kind: positive
+    prompt: "¿Estas observaciones repetidas apoyan una afirmación general sobre la mayoría de usuarios y cuán sólida es la generalización?"
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "Se pasa de casos observados a una población acotada y se necesitan comprobaciones muestrales y de contraejemplos."
+  - id: induction-positive-02
+    kind: positive
+    prompt: "Evalúa si esta muestra de encuesta justifica que los clientes prefieren el nuevo flujo."
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "Son centrales representatividad, sesgo de selección y solidez de generalización."
+  - id: induction-positive-03
+    kind: positive
+    prompt: "¿Qué podemos inferir razonablemente del próximo trimestre desde estos incidentes pasados, incluidos contraejemplos plausibles?"
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "El pronóstico extiende casos repetidos y debe declarar alcance y riesgo de contraejemplo."
+  - id: induction-negative-01
+    kind: negative
+    prompt: "Una regla estricta aprueba cada registro elegible; determina si este caso cumple la regla."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Es aplicación deductiva de reglas, no generalización desde muestras."
+  - id: induction-negative-02
+    kind: negative
+    prompt: "Varias explicaciones encajan con el fallo; compáralas e identifica una observación que las distinga."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Es diagnóstico abductivo y no extensión de muestra a población."
+  - id: induction-mechanical-01
+    kind: mechanical
+    prompt: "Añade estas observaciones nuevas al conjunto existente sin cambiar valores."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Añadir datos proporcionados es mecánico."
+  - id: induction-explicit-01
+    kind: explicit
+    prompt: "Usa explícitamente induction para evaluar si este pequeño experimento apoya una afirmación de producto más amplia."
+    expected_route: induction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, repeated_observations]
+    rationale: "El usuario elige explícitamente análisis desde muestra hasta generalización."
+  - id: induction-insufficiency-01
+    kind: insufficiency
+    prompt: "Generaliza desde la muestra sin proporcionar población objetivo, muestreo, observaciones ni definición de medición."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [repeated_observations, weak_sample, decisive_input_missing]
+    rationale: "Sin fundamento muestral ni alcance objetivo, la generalización no puede acotarse."

@@ -1,0 +1,103 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "evidence-hierarchy-positive-01",
+      "kind": "positive",
+      "prompt": "Laquelle de ces études soutient directement l'affirmation d'effet, et quelle force doit avoir notre formulation ?",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence",
+        "conflicting_sources"
+      ],
+      "rationale": "La tâche exige liens affirmation-source, limites de qualité et force probante calibrée."
+    },
+    {
+      "id": "evidence-hierarchy-positive-02",
+      "kind": "positive",
+      "prompt": "Comparez l'applicabilité d'un avis expert, d'une enquête utilisateur et de l'expérience contrôlée à cette décision de politique.",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "Les différents plans doivent être pesés selon caractère direct, biais et adéquation au contexte."
+    },
+    {
+      "id": "evidence-hierarchy-positive-03",
+      "kind": "positive",
+      "prompt": "Les sources divergent sur le mécanisme ; identifiez les limites de qualité et si l'affirmation doit être suspendue.",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "conflicting_sources",
+        "reconcile_evidence"
+      ],
+      "rationale": "Un conflit important exige le calibrage de l'état probant plutôt qu'un simple vote."
+    },
+    {
+      "id": "evidence-hierarchy-negative-01",
+      "kind": "negative",
+      "prompt": "Utilisez des données et méthodes indépendantes pour vérifier si les sources contradictoires convergent sur la même affirmation.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources",
+        "source_quality"
+      ],
+      "rationale": "La tâche principale est l'indépendance et la convergence entre flux, ce qui relève de la triangulation."
+    },
+    {
+      "id": "evidence-hierarchy-negative-02",
+      "kind": "negative",
+      "prompt": "Choisissez entre ces options selon le résultat qui correspond le mieux à nos valeurs explicites.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "value_conflict",
+        "choose"
+      ],
+      "rationale": "Une préférence de valeurs ne devient pas un problème de hiérarchie probante simplement parce que des sources existent."
+    },
+    {
+      "id": "evidence-hierarchy-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Triez les références fournies par date de publication et conservez leurs titres.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Trier des références est mécanique et n'évalue ni qualité ni applicabilité."
+    },
+    {
+      "id": "evidence-hierarchy-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez explicitement evidence-hierarchy pour calibrer cette affirmation de type médical aux plans d'étude disponibles.",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "source_quality"
+      ],
+      "rationale": "L'utilisateur invoque explicitement un calibrage de force probante pour des sources mélangées."
+    },
+    {
+      "id": "evidence-hierarchy-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Dites si l'affirmation est fortement étayée, mais sans périmètre, sources, plans d'étude ni contexte cible.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans entrées affirmation-source et contexte d'applicabilité, l'étiquette de force serait arbitraire."
+    }
+  ]
+}

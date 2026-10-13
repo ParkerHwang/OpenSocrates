@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: defeasible-reasoning-positive-01
+    kind: positive
+    prompt: "Normalmente se aplica esta política, pero ¿qué excepciones o hechos nuevos retirarían la recomendación actual?"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "El juicio usa una regla por defecto y necesita refutadores y condiciones explícitas de retirada."
+  - id: defeasible-reasoning-positive-02
+    kind: positive
+    prompt: "Separa evidencia que contradice directamente la conclusión de la que debilita la regla de apoyo."
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "Se solicitan refutadores de contradicción frente a debilitamiento en un juicio revisable."
+  - id: defeasible-reasoning-positive-03
+    kind: positive
+    prompt: "Se aplican una regla general y una excepción más específica; ¿cuál es el estado provisional actual?"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "Deben tratarse especificidad y excepciones pendientes sin fingir resultado incondicional."
+  - id: defeasible-reasoning-negative-01
+    kind: negative
+    prompt: "Aplica la regla estricta de conservación a todos los registros y comunica el resultado determinista."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "Una regla sin excepciones requiere deducción o aplicación mecánica."
+  - id: defeasible-reasoning-negative-02
+    kind: negative
+    prompt: "Clasifica estas fuentes por calidad de diseño y ajusta la solidez de la afirmación a la fuente aplicable más fuerte."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "La tarea es jerarquía de evidencia, no gestión de refutación de reglas por defecto."
+  - id: defeasible-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Copia la regla por defecto y la lista de excepciones en la plantilla de política."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copiar texto proporcionado de políticas es mecánico."
+  - id: defeasible-reasoning-explicit-01
+    kind: explicit
+    prompt: "Usa explícitamente defeasible-reasoning para evaluar esta regla de aprobación normalmente válida y sus excepciones."
+    expected_route: defeasible-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, exception_prone_rule]
+    rationale: "El usuario pide explícitamente analizar regla por defecto, refutadores y condiciones de retirada."
+  - id: defeasible-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "Aplica la regla por defecto, pero no proporciones fuente de regla, hechos activadores, alcance ni posibles excepciones."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [exception_prone_rule, decisive_input_missing]
+    rationale: "Sin regla por defecto ni hechos activadores, una conclusión provisional sería arbitraria."

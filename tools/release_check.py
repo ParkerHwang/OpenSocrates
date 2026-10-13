@@ -396,11 +396,13 @@ def _check_bundle_shape(bundle: Mapping[str, Any], version: str) -> dict[str, An
         errors.add("bundle_method_ids_not_unique")
     locales = bundle.get("locale_messages")
     fragments = bundle.get("prompt_fragments")
-    expected_locales = (
-        {"en", "ko", "zh", "ja"}
-        if tuple(map(int, version.split("."))) >= (1, 5, 1)
-        else {"en", "ko"}
-    )
+    parsed_version = tuple(map(int, version.split(".")))
+    if parsed_version >= (1, 5, 2):
+        expected_locales = {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}
+    elif parsed_version >= (1, 5, 1):
+        expected_locales = {"en", "ko", "zh", "ja"}
+    else:
+        expected_locales = {"en", "ko"}
     if not isinstance(locales, Mapping) or set(locales) != expected_locales:
         errors.add("bundle_locales_invalid")
     if not isinstance(fragments, Mapping) or set(fragments) != {

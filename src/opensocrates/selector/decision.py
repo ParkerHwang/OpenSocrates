@@ -96,7 +96,18 @@ class DecisionSession:
         self.available.clear()
 
     def _catalog(self, value: dict[str, Any]) -> dict[str, Any]:
-        if set(value) != {"operation", "locale"} or value["locale"] not in {"en", "ko", "zh", "ja"}:
+        if set(value) != {"operation", "locale"} or value["locale"] not in {
+            "en",
+            "ko",
+            "zh",
+            "ja",
+            "fr",
+            "de",
+            "it",
+            "es",
+            "pt",
+            "th",
+        }:
             raise ValueError
         locale = value["locale"]
         return {
@@ -163,7 +174,7 @@ class DecisionSession:
         if set(value) != expected or value["operation"] != "select":
             raise ValueError
         if (
-            value["locale"] not in {"en", "ko", "zh", "ja"}
+            value["locale"] not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}
             or type(value["revision"]) is not int
             or value["revision"] < 0
             or not isinstance(value["decision"], str)
