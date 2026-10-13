@@ -273,15 +273,15 @@ class PromptCompilerLocaleBudgetChecks(unittest.TestCase):
                             _representative_request(self.bundle, locale, event, route),
                             capability_profile=unavailable_profile,
                         )
-                        for request in (default, replace(default, rigor=strict)):
+                        for prompt_request in (default, replace(default, rigor=strict)):
                             with self.subTest(
                                 locale=locale,
                                 primary=method.id,
                                 secondary=secondary_id,
                                 event=event,
-                                rigor=request.rigor.effective_rigor,
+                                rigor=prompt_request.rigor.effective_rigor,
                             ):
-                                result = compiler.compile(request)
+                                result = compiler.compile(prompt_request)
                                 self.assertEqual(result.locale, locale)
                                 self.assertEqual(
                                     result.context_bytes, len(result.text.encode("utf-8"))
@@ -327,7 +327,7 @@ class PromptCompilerLocaleBudgetChecks(unittest.TestCase):
                                 if event is PromptEvent.STOP_REPAIR:
                                     self.assertEqual(
                                         "strict_second_pass" in result.fragment_ids,
-                                        request.rigor.effective_rigor is Rigor.STRICT,
+                                        prompt_request.rigor.effective_rigor is Rigor.STRICT,
                                     )
                                 checked += 1
         self.assertEqual(len(self.bundle.methods), 48)
