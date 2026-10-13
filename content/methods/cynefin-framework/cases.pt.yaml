@@ -1,0 +1,58 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "cynefin-framework-positive-1"
+    kind: positive
+    prompt: "Nossa equipe de suporte de faturamento segue uma árvore de decisão documentada; a mesma entrada produz confiavelmente a mesma correção. Devemos padronizar a resposta e monitorar exceções?"
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, diagnose]
+    rationale: "O usuário descreve relação estável e pede modo de resposta adequado. As observações são fornecidas pelo usuário; a seleção deve classificar sem afirmar que todos os casos futuros serão claros."
+  - id: "cynefin-framework-positive-2"
+    kind: positive
+    prompt: "Várias equipes tentam reduzir esgotamento, mas cada intervenção muda carga, confiança e comportamento de formas inesperadas. Ajude a escolher pequenas sondagens, observar resultados e decidir o que tentar depois."
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, deep_uncertainty]
+    rationale: "O pedido descreve padrão adaptativo, não procedimento fixo. A seleção deve explicitar contexto complexo e sinais de aprendizagem, sem inventar probabilidade de sucesso."
+  - id: "cynefin-framework-positive-3"
+    kind: positive
+    prompt: "Um serviço de produção falha em várias regiões e clientes perdem acesso agora. Precisamos conter o incidente imediatamente e usar novas observações para ajustar a recuperação."
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, diagnose]
+    rationale: "O pedido depende de escolher modo urgente e sinal posterior de reavaliação. Os fatos do incidente não são verificados independentemente aqui; preserve a incerteza enquanto apoia a contenção."
+  - id: "cynefin-framework-negative-1"
+    kind: negative
+    prompt: "Converta estas etapas operacionais já aprovadas em lista numerada e preserve exatamente a redação."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "É formatação com instrução fixa, não julgamento de classificação. Não precisa de método nem alegação adicional de evidência."
+  - id: "cynefin-framework-negative-2"
+    kind: negative
+    prompt: "Examine mudanças políticas, econômicas, sociais, tecnológicas, ambientais e jurídicas que poderiam afetar nossa expansão."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features: [macro_environment, forecast]
+    rationale: "É próximo por envolver incerteza estratégica, mas exige registro de fatores externos relevantes, não classificação de domínio e modo de resposta. É provável confusão de família."
+  - id: "cynefin-framework-mechanical-1"
+    kind: mechanical
+    prompt: "Ordene cronologicamente estes horários de incidentes e retorne CSV."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "A tarefa tem resultado mecânico, sem decisão significativa sobre contexto ou ação. Não deve acionar seleção de método."
+  - id: "cynefin-framework-explicit-1"
+    kind: explicit
+    prompt: "Use o framework Cynefin para decidir se a interrupção do serviço exige ação imediata, análise especializada ou experimentos seguros. Mostre evidências e o sinal que mudaria a classificação."
+    expected_route: "cynefin-framework"
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, context_disorder]
+    rationale: "O usuário nomeia o método e pede seus resultados públicos; ele permanece primário. A resposta ainda deve marcar observações do usuário e evitar certeza de classificação."
+  - id: "cynefin-framework-insufficiency-1"
+    kind: insufficiency
+    prompt: "Devemos padronizar este problema ou executar experimentos? Não descrevi o problema, suas causas, urgência nem evidências disponíveis."
+    expected_route: "cynefin-framework"
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, context_disorder]
+    rationale: "A decisão realmente trata de modo de resposta, mas faltam observações decisivas. O método pode suspender e pedir os menores fatos ausentes; não deve inventar domínio ou probabilidade."

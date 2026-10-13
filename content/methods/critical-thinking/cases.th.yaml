@@ -1,0 +1,102 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "critical-thinking-positive-01",
+      "kind": "positive",
+      "prompt": "รายงานผู้ขายอ้างผลิตภาพเพิ่ม 40% จากแบบสำรวจของตน ประเมินแหล่ง กรอบ การเปรียบเทียบที่ขาด และการอนุมานก่อนจัดซื้อ",
+      "expected_route": "critical-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "critique",
+        "hidden_assumptions",
+        "source_quality"
+      ],
+      "rationale": "ชุดข้ออ้างต้องตรวจแหล่ง กรอบ ตรรกะ และทางเลือก ไม่ใช่ค้นอ้างอิงเดียว"
+    },
+    {
+      "id": "critical-thinking-positive-02",
+      "kind": "positive",
+      "prompt": "บันทึกผู้บริหารบอกว่าโครงการนำร่องเดียวพิสูจน์ว่านโยบายใช้ได้ทุกแห่ง ระบุข้ออ้างที่แข็งแรงที่สุด สมมติฐาน สิ่งที่ละ และข้อคัดค้าน",
+      "expected_route": "critical-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "critique",
+        "hidden_assumptions",
+        "argument_dispute"
+      ],
+      "rationale": "คำขอต้องการประเมินวิพากษ์กว้างต่อชุดข้ออ้างและการขยายข้อสรุป"
+    },
+    {
+      "id": "critical-thinking-positive-03",
+      "kind": "positive",
+      "prompt": "ผู้ให้ความเห็นน่าเชื่อถือสองคนไม่ตรงกันว่าโครงการความปลอดภัยได้ผลหรือไม่ ผู้ใช้ต้องการคำตัดสินเป็นธรรมโดยไม่ถือความไม่เห็นพ้องเป็นข้อพิสูจน์ของฝ่ายใด",
+      "expected_route": "critical-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "critique",
+        "conflicting_sources",
+        "argument_dispute"
+      ],
+      "rationale": "ความน่าเชื่อถือแหล่ง กรอบ ฐานตรรกะ และความขัดแย้งค้างแยกกันล้วนสำคัญ"
+    },
+    {
+      "id": "critical-thinking-negative-01",
+      "kind": "negative",
+      "prompt": "การอภิปรายมีข้ออ้างกลาง ฐานสนับสนุน ข้อคัดค้าน และคำตอบที่ต้องมีแผนผังความเชื่อมโยงให้เห็น",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "ต้องการแผนผังโครงสร้างข้ออ้าง–ฐาน–ข้อคัดค้านเฉพาะ ไม่ใช่วิพากษ์กว้างสามแกน"
+    },
+    {
+      "id": "critical-thinking-negative-02",
+      "kind": "negative",
+      "prompt": "ลำดับชั้นแหล่งต้องตัดสินว่าข้ออ้างคลินิกมีหลักฐานปฐมภูมิรองรับตรงหรือมีเพียงบทสรุป",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "คุณภาพแหล่งและฐานข้ออ้างสู่แหล่งเป็นผลชี้ขาด"
+    },
+    {
+      "id": "critical-thinking-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "คัดลอกข้ออ้างที่ยกมาและชื่อแหล่งใส่แบบทบทวนโดยไม่ตัดสินความจริงหรือความเกี่ยวข้อง",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "คัดลอกใส่แบบเป็นเชิงกล แม้เนื้อหาเป็นข้อกล่าวอ้าง"
+    },
+    {
+      "id": "critical-thinking-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ critical-thinking ทบทวนบันทึกการลงทุนนี้และระบุสิ่งตรวจแล้ว สิ่งขาด และสิ่งยังไม่แน่นอน",
+      "expected_route": "critical-thinking",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "critique"
+      ],
+      "rationale": "ผู้ใช้ขอวิธีโดยตรงเพื่อตัดสินชุดข้อกล่าวอ้าง"
+    },
+    {
+      "id": "critical-thinking-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "แหล่งเป็นภาพหน้าจอไม่ระบุที่มา ไม่มีวันที่หรือข้อมูลเบื้องหลัง จงประกาศว่าหัวเรื่องจริงเพราะฟังดูเป็นไปได้",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "critique",
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "ตรวจแหล่งกลางและข้อเสนอไม่ได้ คำตัดสินต้องพักแทนยอมรับ"
+    }
+  ]
+}

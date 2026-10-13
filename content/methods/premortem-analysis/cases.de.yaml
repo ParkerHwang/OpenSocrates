@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: premortem-analysis-positive-01
+    kind: positive
+    prompt: "Das Team plant Kundendatenmigration und möchte ihr Scheitern vorstellen, unabhängige Gründe sammeln und Frühwarnungen festlegen."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "Konkreter Plan braucht Fehlererzählung, Frühindikatoren, Schutz und Stopps."
+  - id: premortem-analysis-positive-02
+    kind: positive
+    prompt: "Identifizieren Sie vor einer Kliniköffnung mögliches Scheitern bei Personal, Nachfrage, Betrieb und Regulierung ohne erfundene Wahrscheinlichkeiten."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "Kontrafaktisches Planscheitern ist ausdrücklich verlangt; ordinal und evidenzbewusst bleiben."
+  - id: premortem-analysis-positive-03
+    kind: positive
+    prompt: "Ein einstimmiges Einführungsteam möchte stille Annahmen, Frühindikatoren und Pausebedingungen vor Festlegung strukturiert hinterfragen."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, hidden_assumptions, failure_risk]
+    rationale: "Ausgewählte Aktion mit Anpassungsdruck und optimistischer Planung."
+  - id: premortem-analysis-negative-01
+    kind: negative
+    prompt: "Listen Sie je Ablaufschritt Fehlermodi, Folgen, Ursachen, Kontrollen und Verantwortliche in einem vorausschauenden Risikoregister."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "Prozessbezogene Fehler- und Kontrollinventur passt genauer als vorgestellte Planrückschau."
+  - id: premortem-analysis-negative-02
+    kind: negative
+    prompt: "Ein Fehler kehrt seit Monaten zurück; gesucht ist die kontrollierbare Systembedingung zur Verhinderung weiterer Wiederholung."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "Bestehende Wiederholung braucht Ursachendiagnose statt Vorabübung."
+  - id: premortem-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Kopieren Sie den genehmigten Einführungsplan in die Risikovorlage ohne Szenarien oder Empfehlungen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Mechanisches Kopieren ohne Planurteil."
+  - id: premortem-analysis-explicit-01
+    kind: explicit
+    prompt: "Führen Sie ein Premortem des Einstellungsplans durch und nennen Sie früheste Signale für eine Pause."
+    expected_route: premortem-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, chosen_plan, failure_risk]
+    rationale: "Methode ist ausdrücklich für konkreten Plan vor Festlegung verlangt."
+  - id: premortem-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "Es gibt keinen gewählten Plan; erfinden Sie eine Scheiternsrückschau und erklären Sie mit 90% Gewissheit, welche Option scheitert."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [chosen_plan, decisive_input_missing]
+    rationale: "Ohne Plan oder belastbare Referenzklasse keine Wahrscheinlichkeit oder Empfehlung."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: mece-positive-01
+    kind: positive
+    prompt: "¿Son estos segmentos de clientes mutuamente excluyentes y colectivamente exhaustivos para esta única decisión de compra?"
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "Se solicitan comprobaciones separadas de solapamiento y cobertura bajo un único eje."
+  - id: mece-positive-02
+    kind: positive
+    prompt: "Rediseña estas categorías de riesgo para que ningún caso pertenezca a dos categorías ni quede fuera ningún caso material."
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "Se solicita una regla de clasificación con comprobaciones de solapamiento, vacíos y granularidad."
+  - id: mece-positive-03
+    kind: positive
+    prompt: "Comprueba si las ramas de nuestro árbol de problemas usan un eje, tienen granularidad uniforme y cubren el universo declarado."
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "Es una auditoría ME/CE específica, no un diagnóstico recursivo amplio."
+  - id: mece-negative-01
+    kind: negative
+    prompt: "Descompón recursivamente las causas de la interrupción y asigna una prueba a cada rama terminal."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "Se requiere un árbol lógico completo, no solo comprobar calidad clasificatoria."
+  - id: mece-negative-02
+    kind: negative
+    prompt: "Conserva estas etiquetas solapadas porque el propio solapamiento representa una identidad significativa del cliente."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [ambiguous_terms, human_need]
+    rationale: "El solapamiento natural es intencionado; forzar exclusión mutua distorsionaría el fenómeno."
+  - id: mece-mechanical-01
+    kind: mechanical
+    prompt: "Ordena alfabéticamente las categorías proporcionadas y conserva sus descripciones."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Ordenar es mecánico y no evalúa lógica clasificatoria."
+  - id: mece-explicit-01
+    kind: explicit
+    prompt: "Usa explícitamente mece para auditar los grupos de responsabilidad de este modelo operativo."
+    expected_route: mece
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, category_overlap]
+    rationale: "Se solicita explícitamente una auditoría de solapamiento y cobertura bajo un eje único."
+  - id: mece-insufficiency-01
+    kind: insufficiency
+    prompt: "Dime si las categorías son MECE, pero no indiques universo, propósito ni reglas de pertenencia."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [category_overlap, decisive_input_missing]
+    rationale: "ME y CE no pueden evaluarse sin universo y propósito acotados y reglas de pertenencia."

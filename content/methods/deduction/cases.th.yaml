@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "deduction-positive-01",
+      "kind": "positive",
+      "prompt": "ข้อสรุปตามมาอย่างจำเป็นจากข้อเสนอนโยบายและกฎข้อยกเว้นที่ระบุเหล่านี้หรือไม่?",
+      "expected_route": "deduction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "explicit_rules",
+        "explain"
+      ],
+      "rationale": "ผู้ใช้ถามผลเชิงรูปแบบจากข้อเสนอและกฎชัด"
+    },
+    {
+      "id": "deduction-positive-02",
+      "kind": "positive",
+      "prompt": "ตรวจว่าข้อโต้แย้งสัญญานี้มีรูปแบบถูกต้องหรือไม่ และข้อเสนอมีหลักฐานรองรับจริงหรือไม่",
+      "expected_route": "deduction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "explicit_rules",
+        "explain"
+      ],
+      "rationale": "ต้องแยกความถูกต้องรูปแบบจากความสมบูรณ์สำหรับข้อโต้แย้งตามกฎชัด"
+    },
+    {
+      "id": "deduction-positive-03",
+      "kind": "positive",
+      "prompt": "ค้นข้อเสนอแฝงที่ทำให้ข้อสรุปการปฏิบัติตามกฎนี้ดูตามมา",
+      "expected_route": "deduction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "explicit_rules",
+        "explain"
+      ],
+      "rationale": "งานต้องจัดรูปมาตรฐาน เปิดข้อเสนอแฝง และตรวจความถูกต้องรูปแบบ"
+    },
+    {
+      "id": "deduction-negative-01",
+      "kind": "negative",
+      "prompt": "หลายคำอธิบายเข้ากับการล่ม เลือกดีที่สุดและระบุการทดสอบถัดไปที่แยกได้",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "สาเหตุแข่งขันและหลักฐานแยกต้องใช้ abduction ไม่ใช่การตามอย่างจำเป็น"
+    },
+    {
+      "id": "deduction-negative-02",
+      "kind": "negative",
+      "prompt": "ประมาณว่าข้อสังเกตเหล่านี้รองรับข้ออ้างทั่วไปเกี่ยวกับผู้ใช้อนาคตกว้างเพียงใด",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "การขยายที่ขอเป็นอุปนัยและพึ่งความเป็นตัวแทนของตัวอย่าง"
+    },
+    {
+      "id": "deduction-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "ใส่หมายเลขข้อเสนอที่ให้มาและคงถ้อยคำ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การใส่หมายเลขรายการที่ให้เป็นเชิงกล"
+    },
+    {
+      "id": "deduction-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ deduction โดยชัดแจ้งทดสอบว่ากฎคุณสมบัติที่ระบุทำให้ผลกรณีนี้ตามมาอย่างจำเป็นหรือไม่",
+      "expected_route": "deduction",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "explicit_rules"
+      ],
+      "rationale": "ผู้ใช้เรียกการใช้กฎทางการและการตรวจการตามโดยตรง"
+    },
+    {
+      "id": "deduction-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "บอกว่าข้อสรุปมีรูปแบบถูกหรือไม่ แต่ไม่ให้ข้อเสนอ กฎ ขอบเขต หรือข้อความข้อสรุป",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "explicit_rules",
+        "decisive_input_missing"
+      ],
+      "rationale": "ประเมินความถูกต้องไม่ได้เมื่อไม่มีรูปแบบข้อโต้แย้งและข้อเสนอสำคัญ"
+    }
+  ]
+}

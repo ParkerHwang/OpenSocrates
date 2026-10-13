@@ -199,6 +199,9 @@ func assembledArtifact(b *content.Bundle, ids []string, locale string) (Artifact
 		case "ja":
 			title, noTitle, stopTitle = "適用を制限する規則", "使用しない条件", "停止条件"
 		}
+		if labels, ok := extendedGuardrailLabels[locale]; ok {
+			title, noTitle, stopTitle = labels["title"], labels["do_not_use"], labels["stop"]
+		}
 		a.Guardrails = append(a.Guardrails, fmt.Sprintf("### %s: %s (`%s`@%d)\n\n**%s**\n\n%s\n\n**%s**\n\n%s", title, p.Name, id, b.Revision, noTitle, no, stopTitle, stop))
 	}
 	if !allGuardrails || estimated(strings.Join(a.Guardrails, "\n\n")) >= 1200 {

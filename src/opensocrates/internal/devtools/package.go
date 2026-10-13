@@ -174,19 +174,8 @@ func copyPackageTree(root, source, output string, files map[string][]byte) error
 }
 func responseText(policy map[string]any, locale string) string {
 	entry := obj(obj(policy["locales"])[locale])
-	heading := "Guided presentation policy"
-	boundary := "Guided only: no automatic rewrite, verified compliance, length cap or required-content removal."
-	if locale == "ko" {
-		heading = "작성 단계의 표현 안내"
-		boundary = "작성 안내만 제공합니다. 자동 재작성·검증된 준수·길이 상한·필수 내용 삭제를 뜻하지 않습니다."
-	}
-	if locale == "zh" {
-		heading = "写作表达指导"
-		boundary = "仅提供指导：不自动改写，不表示已验证合规，不设长度上限，也不删除必需内容。"
-	} else if locale == "ja" {
-		heading = "表現の作成ガイド"
-		boundary = "作成の指針のみです。自動書き換え、遵守の検証、長さの上限、必須内容の削除を意味しません。"
-	}
+	labels := responseLocaleLabels[locale]
+	heading, boundary := labels[0], labels[1]
 	identity := digest([]byte(jsonToken(policy)))
 	lines := []string{"### " + heading, fmt.Sprintf("Profile: %s; revision %s; %s", str(entry["profile_id"]), jsonToken(policy["revision"]), identity), boundary, str(entry["protected_rule"])}
 	for _, r := range arr(entry["rules"]) {
@@ -237,7 +226,21 @@ func methodIndex(methods []any) string {
 	for _, raw := range methods {
 		m := obj(raw)
 		id := str(m["id"])
-		sections = append(sections, fmt.Sprintf("## `%s` — %s\n\n- Korean name: %s\n- 中文名称: %s\n- 日本語名: %s\n- Family: `%s`\n- Use for: %s\n- 한국어: %s\n- 简体中文: %s\n- 日本語: %s\n- Routing metadata: `%s`\n- Procedure: [methods/%s.md](methods/%s.md)\n", id, str(obj(m["display_name"])["en"]), str(obj(m["display_name"])["ko"]), str(obj(m["display_name"])["zh"]), str(obj(m["display_name"])["ja"]), str(m["family"]), str(obj(m["plain_action"])["en"]), str(obj(m["plain_action"])["ko"]), str(obj(m["plain_action"])["zh"]), str(obj(m["plain_action"])["ja"]), jsonToken(m["routing"]), id, id))
+		lines := []string{fmt.Sprintf("## `%s` — %s", id, str(obj(m["display_name"])["en"])), "",
+			"- Korean name: " + str(obj(m["display_name"])["ko"]),
+			"- 中文名称: " + str(obj(m["display_name"])["zh"]),
+			"- 日本語名: " + str(obj(m["display_name"])["ja"]),
+			fmt.Sprintf("- Family: `%s`", str(m["family"])),
+			"- Use for: " + str(obj(m["plain_action"])["en"]),
+			"- 한국어: " + str(obj(m["plain_action"])["ko"]),
+			"- 简体中文: " + str(obj(m["plain_action"])["zh"]),
+			"- 日本語: " + str(obj(m["plain_action"])["ja"]),
+		}
+		for _, pair := range [][2]string{{"fr", "Français"}, {"de", "Deutsch"}, {"it", "Italiano"}, {"es", "Español"}, {"pt", "Português"}, {"th", "ไทย"}} {
+			lines = append(lines, "- "+pair[1]+": "+str(obj(m["display_name"])[pair[0]]), "- "+pair[1]+" — action: "+str(obj(m["plain_action"])[pair[0]]))
+		}
+		lines = append(lines, "- Routing metadata: `"+jsonToken(m["routing"])+"`", fmt.Sprintf("- Procedure: [methods/%s.md](methods/%s.md)", id, id), "")
+		sections = append(sections, strings.Join(lines, "\n"))
 	}
 	return strings.TrimRight(strings.Join(sections, "\n"), "\n")
 }
@@ -688,4 +691,17 @@ func VerifyPackage(root, manifestRelative string) (map[string]any, error) {
 		return nil, fmt.Errorf("incomplete inventory")
 	}
 	return v, nil
+}
+
+var responseLocaleLabels = map[string][2]string{
+	"en": {"Guided presentation policy", "Guided only: no automatic rewrite, verified compliance, length cap or required-content removal."},
+	"ko": {"작성 단계의 표현 안내", "작성 안내만 제공합니다. 자동 재작성·검증된 준수·길이 상한·필수 내용 삭제를 뜻하지 않습니다."},
+	"zh": {"写作表达指导", "仅提供指导：不自动改写，不表示已验证合规，不设长度上限，也不删除必需内容。"},
+	"ja": {"表現の作成ガイド", "作成の指針のみです。自動書き換え、遵守の検証、長さの上限、必須内容の削除を意味しません。"},
+	"fr": {"Conseils de rédaction", "Conseils uniquement : aucune réécriture automatique, conformité vérifiée, limite de longueur ou suppression de contenu obligatoire."},
+	"de": {"Hinweise zur Formulierung", "Nur Hinweise: keine automatische Umschreibung, bestätigte Regelkonformität, Längenbegrenzung oder Entfernung erforderlicher Inhalte."},
+	"it": {"Guida alla formulazione", "Solo indicazioni: nessuna riscrittura automatica, conformità verificata, limite di lunghezza o rimozione di contenuti obbligatori."},
+	"es": {"Orientación para redactar", "Solo orientación: sin reescritura automática, cumplimiento verificado, límite de longitud ni eliminación de contenido obligatorio."},
+	"pt": {"Orientação de redação", "Apenas orientação: sem reescrita automática, conformidade verificada, limite de tamanho ou remoção de conteúdo obrigatório."},
+	"th": {"แนวทางการเรียบเรียง", "เป็นเพียงแนวทาง ไม่ใช่การเขียนใหม่อัตโนมัติ การยืนยันว่าทำตามข้อกำหนด การจำกัดความยาว หรือการลบเนื้อหาที่จำเป็น"},
 }

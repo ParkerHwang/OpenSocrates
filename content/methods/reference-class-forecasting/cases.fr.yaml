@@ -1,0 +1,106 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "reference-class-forecasting-positive-1",
+      "kind": "positive",
+      "prompt": "Nous estimons la date de livraison d’un projet ferroviaire régional. Nous avons des dossiers sourcés de nombreux projets achevés comparables en périmètre, achats et terrain. Comparez le calendrier interne à la distribution observée d’achèvement et expliquez les ajustements sans inventer de probabilité.",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "source_quality"
+      ],
+      "rationale": "Cible et unité prévisionnelles sont énoncées, une classe défendable est disponible et un intervalle externe est demandé. Les dossiers soutiennent les résultats observés, pas des probabilités fabriquées."
+    },
+    {
+      "id": "reference-class-forecasting-positive-2",
+      "kind": "positive",
+      "prompt": "Notre équipe produit estime avec optimisme le délai et le coût de migration des clients vers une plateforme. Nous connaissons des migrations comparables achevées par d’autres équipes et leurs résultats réels. Testez la crédibilité de notre vision interne et précisez les preuves qui changeraient l’intervalle.",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "hidden_assumptions"
+      ],
+      "rationale": "La tâche calibre sur des cas achevés comparables, pas sur un diagnostic causal ou scénario favori. Elle exige des ajustements attentifs à la provenance et une condition de basculement plutôt qu’un taux de base inventé."
+    },
+    {
+      "id": "reference-class-forecasting-positive-3",
+      "kind": "positive",
+      "prompt": "Une association prévoit les inscriptions d’un programme la première année. Plusieurs lancements passés documentent inscriptions, populations cibles et conditions, mais la couverture est inégale. Construisez un intervalle externe, montrez cette limite et comparez-le à notre plan.",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "weak_sample"
+      ],
+      "rationale": "Une cible et des cas achevés existent ; la couverture inégale est une incertitude explicite à préserver. Il faut utiliser la distribution observée et suspendre ou affaiblir la conclusion si les manques sont décisifs."
+    },
+    {
+      "id": "reference-class-forecasting-negative-1",
+      "kind": "negative",
+      "prompt": "Nous n’avons aucun cas achevé comparable pour cet instrument scientifique unique. Expliquez quel choix d’ingénierie a causé le retard et proposez une expérience corrective.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "no_defensible_reference_class",
+        "diagnose"
+      ],
+      "rationale": "La consigne manque explicitement de classe défendable et demande une explication causale. Cette orientation répéterait la vision interne sans distribution externe."
+    },
+    {
+      "id": "reference-class-forecasting-negative-2",
+      "kind": "negative",
+      "prompt": "Construisez quatre futurs externes distincts pour notre stratégie à cinq ans, nommez-les et identifiez signaux précoces et actions. N’estimez pas une cible de délai ou de coût à partir de cas passés.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "plan"
+      ],
+      "rationale": "Confusion probable avec scenario-planning : la tâche demande des futurs divergents et indicateurs, pas une distribution de référence prévisionnelle."
+    },
+    {
+      "id": "reference-class-forecasting-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Additionnez ces cinq montants de factures vérifiés et renvoyez le total dans la devise indiquée. Aucune prévision, classe comparative ou décision n’est nécessaire.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "La tâche est un calcul délimité, sans cible prévisionnelle incertaine ni jugement de classe ; la méthode reste inactive."
+    },
+    {
+      "id": "reference-class-forecasting-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez la prévision par classe de référence comme méthode principale pour notre date de lancement logiciel. Nous avons des résultats sourcés de lancements comparables ; comparez la distribution au plan interne et suspendez si la classe n’est pas défendable.",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "forecast",
+        "reference_cases"
+      ],
+      "rationale": "L’utilisateur nomme explicitement méthode, cible spécifique, résultats comparables et règle de suspension. L’invocation exige toujours les étiquettes probantes et n’autorise pas les probabilités fabriquées."
+    },
+    {
+      "id": "reference-class-forecasting-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Dites-moi quand ce projet finira. Je n’ai qu’une date cible interne, aucun cas achevé comparable, aucune définition de résultat convenue et aucune décision d’échéance déclarée.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "no_defensible_reference_class",
+        "boundary_sensitive",
+        "decisive_input_missing"
+      ],
+      "rationale": "Classe décisive, définition de cible et limite décisionnelle manquent. L’issue honnête est une suspension et une demande délimitée des entrées manquantes, pas une distribution inventée."
+    }
+  ]
+}

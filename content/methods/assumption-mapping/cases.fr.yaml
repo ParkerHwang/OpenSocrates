@@ -1,0 +1,111 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "assumption-mapping-positive-1",
+      "kind": "positive",
+      "prompt": "Nous envisageons un service partagé de planification des repas. Listez les hypothèses nécessaires, séparez importance et éléments probants, puis identifiez le premier test sûr. Les notes d'entretien viennent de l'utilisateur et n'ont pas été vérifiées indépendamment.",
+      "expected_route": "assumption-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "prioritized_assumptions",
+        "testable_claim",
+        "plan"
+      ],
+      "rationale": "La demande exige explicitement un registre d'hypothèses, les axes importance/éléments probants, l'ensemble le plus risqué et un prochain test. Les notes d'entretien sont fournies par l'utilisateur et non vérifiées ; l'orientation doit exposer cette incertitude sans attribuer de probabilités."
+    },
+    {
+      "id": "assumption-mapping-positive-2",
+      "kind": "positive",
+      "prompt": "Une équipe souhaite automatiser l'examen des factures, mais ignore si le blocage porte sur la désirabilité client, la faisabilité des données ou la viabilité réglementaire. Cartographiez les hypothèses et choisissez une validation à faible exposition avant l'achat.",
+      "expected_route": "assumption-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "prioritized_assumptions",
+        "irreversible_choice",
+        "testable_claim"
+      ],
+      "rationale": "Plusieurs domaines d'hypothèses et une décision avant engagement sont présents. La validation demandée reste une question de priorité ; le résultat doit distinguer faits étayés, hypothèses et éléments réglementaires manquants."
+    },
+    {
+      "id": "assumption-mapping-positive-3",
+      "kind": "positive",
+      "prompt": "Nous avons cinq expériences proposées pour modifier les plannings de bénévoles. Classez les hypothèses selon leur importance décisionnelle et la solidité des éléments, puis ajoutez une observation sûre et une règle de modification du plan.",
+      "expected_route": "assumption-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "prioritized_assumptions",
+        "testable_claim",
+        "chosen_plan"
+      ],
+      "rationale": "L'utilisateur demande la hiérarchisation centrale de la méthode, pas une expérience accomplie. Le résultat peut employer des niveaux ordinaux et marquer les éléments comme vérifiés, non vérifiés, supposés ou conflictuels, sans scores inventés."
+    },
+    {
+      "id": "assumption-mapping-negative-1",
+      "kind": "negative",
+      "prompt": "Notre service de paiement a échoué trois fois cette semaine. Retracez la chaîne causale, identifiez les faiblesses de contrôle et attribuez un responsable de prévention ; ne proposez pas de carte d'hypothèses produit.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "recurring_failure",
+        "causal_question",
+        "diagnose"
+      ],
+      "rationale": "Il s'agit d'une demande de root-cause-analysis, confusion de famille probable avec la cartographie d'hypothèses. Le résultat requis est un diagnostic causal et une action de contrôle, pas un ensemble hiérarchisé de croyances testables."
+    },
+    {
+      "id": "assumption-mapping-negative-2",
+      "kind": "negative",
+      "prompt": "Nous avons déjà choisi un client cible et une expérience sur une page d'accueil. Définissez la mesure exploitable, la fenêtre d'observation et la règle de pivot ou de poursuite.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "chosen_plan",
+        "plan"
+      ],
+      "rationale": "L'hypothèse est déjà sélectionnée et l'utilisateur demande d'opérationnaliser une expérience de marché. Cela relève de lean-startup ; revenir ici répéterait la cartographie au lieu de définir le test et la mesure."
+    },
+    {
+      "id": "assumption-mapping-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Triez ces six intitulés d'hypothèses par ordre alphabétique et renvoyez une liste numérotée.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Trier des intitulés n'exige ni jugement, ni incertitude, ni priorisation d'expériences. Une réponse mécanique directe convient."
+    },
+    {
+      "id": "assumption-mapping-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez la cartographie d'hypothèses pour cette idée. Montrez hypothèses, axes importance/éléments probants, ensemble le plus risqué et prochain test sûr ; gardez les affirmations sans soutien visiblement non vérifiées.",
+      "expected_route": "assumption-mapping",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "hidden_assumptions",
+        "prioritized_assumptions",
+        "testable_claim"
+      ],
+      "rationale": "L'utilisateur nomme explicitement la méthode et ses résultats publics. L'invocation explicite est principale, tandis que les étiquettes probantes préservent la frontière de provenance."
+    },
+    {
+      "id": "assumption-mapping-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Hiérarchisez les hypothèses de notre proposition et dites laquelle tester d'abord. Aucune question de décision, aucun résultat souhaité, aucune hypothèse candidate ni contrainte de test ne sont encore disponibles.",
+      "expected_route": "assumption-mapping",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "hidden_assumptions",
+        "prioritized_assumptions",
+        "no_testable_implication"
+      ],
+      "rationale": "La méthode convient, mais les entrées décisives manquent. Elle doit suspendre le résultat plutôt qu'inventer des hypothèses ou un test ; la prochaine demande doit établir la décision et les limites sûres autorisées."
+    }
+  ]
+}

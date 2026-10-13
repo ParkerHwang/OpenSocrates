@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "triz-positive-01",
+      "kind": "positive",
+      "prompt": "Un drone per consegne necessita di maggiore capacità della batteria, ma il peso aggiunto riduce l’autonomia; trova un concetto che separi o rimuova la contraddizione.",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "Un miglioramento tecnico peggiora un altro parametro e richiede risultato ideale, separazione e mosse inventive."
+    },
+    {
+      "id": "triz-positive-02",
+      "kind": "positive",
+      "prompt": "Una stanza ospedaliera deve garantire maggiore riservatezza e un’osservazione più facile nello stesso momento; esplora separazioni per tempo, spazio, condizioni e interfaccia.",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "Il problema descrive una contraddizione fisica o tecnica con condizioni separabili e vincoli di sicurezza."
+    },
+    {
+      "id": "triz-positive-03",
+      "kind": "positive",
+      "prompt": "Una linea d’imballaggio deve essere più veloce senza aumentare i danni; cerca risorse già disponibili di tempo, spazio, informazioni e materiali per un progetto che superi il compromesso.",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "L’utente vuole concetti inventivi che eliminino un compromesso progettuale, non l’ottimizzazione di un solo parametro."
+    },
+    {
+      "id": "triz-negative-01",
+      "kind": "negative",
+      "prompt": "La decisione è fra due valori pubblici e riguarda quali diritti o doveri abbiano precedenza, non una contraddizione progettuale tecnica.",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "duties_rights"
+      ],
+      "rationale": "Sono autorità normativa e diritti, non le mosse inventive, a determinare il percorso."
+    },
+    {
+      "id": "triz-negative-02",
+      "kind": "negative",
+      "prompt": "Un sistema ha circuiti di retroazione interagenti ed effetti collaterali ritardati; mappa struttura più ampia e punto di leva prima di scegliere un concetto locale.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "Il bisogno dominante riguarda dinamica sistemica e leva, non la risoluzione di una contraddizione locale."
+    },
+    {
+      "id": "triz-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Elenca i parametri di prodotto esistenti nell’ordine richiesto senza individuare contraddizioni o proporre concetti.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Elencare è meccanico e non richiede la soluzione inventiva dei problemi."
+    },
+    {
+      "id": "triz-explicit-01",
+      "kind": "explicit",
+      "prompt": "Usa triz per affrontare la contraddizione tra imballaggio più leggero e maggiore protezione dagli urti, poi proponi una verifica reversibile.",
+      "expected_route": "triz",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "technical_contradiction"
+      ],
+      "rationale": "L’utente invoca esplicitamente il metodo per una contraddizione tecnica e una verifica."
+    },
+    {
+      "id": "triz-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Le proprietà che migliorano e peggiorano sono sconosciute; dichiara raggiunto il progetto ideale e afferma un guadagno prestazionale garantito.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "technical_contradiction",
+        "decisive_input_missing"
+      ],
+      "rationale": "Senza contraddizione o verifica definite, idealità e miglioramento non possono essere stabiliti onestamente."
+    }
+  ]
+}

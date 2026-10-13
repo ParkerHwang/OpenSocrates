@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "causal-reasoning-positive-01",
+      "kind": "positive",
+      "prompt": "Un essai pilote apparié compare deux cliniques après l'adoption d'un appel de rappel par une seule ; les rendez-vous manqués diminuent uniquement dans cette clinique. Les appels ont-ils causé le changement ?",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "La question demande si une intervention a changé un résultat et exige temporalité, comparaison et explications concurrentes."
+    },
+    {
+      "id": "causal-reasoning-positive-02",
+      "kind": "positive",
+      "prompt": "Après une refonte du paiement, la finalisation augmente dans plusieurs cohortes observées indépendamment ; l'équipe veut savoir si la refonte a causé la hausse plutôt que la demande saisonnière.",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "testable_claim",
+        "confounding"
+      ],
+      "rationale": "Même une relation répétée intervention-résultat exige mécanisme, contrefactuel et examen des facteurs de confusion."
+    },
+    {
+      "id": "causal-reasoning-positive-03",
+      "kind": "positive",
+      "prompt": "Un responsable demande si la semaine de quatre jours a amélioré la rétention ; les dates de début, équipes de comparaison et un facteur de confusion possible de charge de travail sont disponibles.",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "La cible causale, la temporalité, la comparaison et un facteur de confusion plausible sont assez explicites pour une analyse causale bornée."
+    },
+    {
+      "id": "causal-reasoning-negative-01",
+      "kind": "negative",
+      "prompt": "Le retard du support augmente pendant six mois tandis que personnel, demande et délais de réponse s'alimentent mutuellement ; l'utilisateur demande pourquoi ce phénomène persiste.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "deep_uncertainty"
+      ],
+      "rationale": "La cible principale est une rétroaction récurrente avec délais ; une analyse systémique doit mener plutôt qu'une comparaison causale unique."
+    },
+    {
+      "id": "causal-reasoning-negative-02",
+      "kind": "negative",
+      "prompt": "Un défaut industriel se répète après plusieurs transmissions et la demande consiste à distinguer symptômes, causes de processus et contrôles absents.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "Ce diagnostic de récurrence opérationnelle exige une chaîne causale et un responsable de prévention, pas seulement un effet d'exposition."
+    },
+    {
+      "id": "causal-reasoning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Traduisez en coréen la phrase sur un changement de politique et son résultat sans évaluer si la politique a causé quoi que ce soit.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "La traduction est mécanique et la méthode doit rester silencieuse malgré le langage causal du texte."
+    },
+    {
+      "id": "causal-reasoning-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez causal-reasoning pour évaluer si le nouvel e-mail d'accueil a changé l'activation, et montrez la comparaison nécessaire.",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "causal_question"
+      ],
+      "rationale": "L'utilisateur nomme explicitement la méthode pour une cible de jugement ; elle est donc principale sous réserve du contrat probant."
+    },
+    {
+      "id": "causal-reasoning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Un salarié a guéri après avoir pris un complément ; concluez que le complément a causé la guérison et recommandez-le à toute l'équipe.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "causal_question",
+        "decisive_input_missing"
+      ],
+      "rationale": "Une anecdote unique sans contrôle n'offre pas de comparaison défendable et ne peut étayer une recommandation causale ou à forts enjeux."
+    }
+  ]
+}

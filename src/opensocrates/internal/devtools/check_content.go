@@ -140,7 +140,7 @@ func checkContent(root string) ([]string, error) {
 	for _, key := range []string{"locale_messages", "prompt_fragments"} {
 		fields := obj(bundle[key])
 		if key == "locale_messages" {
-			if len(fields) != 4 {
+			if len(fields) != len(releasedLocales) {
 				codes = append(codes, "locale_message_coverage_invalid")
 			}
 			for _, locale := range releasedLocales {

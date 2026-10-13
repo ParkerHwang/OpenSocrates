@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: triz-positive-01
+    kind: positive
+    prompt: "โดรนส่งของต้องมีความจุแบตเตอรี่มากขึ้น แต่น้ำหนักเพิ่มลดระยะทาง หาแนวคิดที่แยกหรือกำจัดความขัดแย้ง"
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "การปรับเทคนิคดีขึ้นทำอีกพารามิเตอร์แย่ลง จึงเหมาะกับผลอุดมคติ การแยก และแนวคิดประดิษฐ์"
+  - id: triz-positive-02
+    kind: positive
+    prompt: "ห้องโรงพยาบาลต้องเป็นส่วนตัวมากขึ้นและสังเกตง่ายขึ้นพร้อมกัน สำรวจการแยกตามเวลา พื้นที่ เงื่อนไข และอินเทอร์เฟซ"
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "ปัญหาเป็นความขัดแย้งกายภาพหรือเทคนิคที่แยกเงื่อนไขได้และมีข้อจำกัดปลอดภัย"
+  - id: triz-positive-03
+    kind: positive
+    prompt: "สายบรรจุต้องเร็วขึ้นโดยไม่เพิ่มความเสียหาย ค้นทรัพยากรเวลา พื้นที่ ข้อมูล และวัสดุเดิมเพื่อแบบที่ไม่ประนีประนอม"
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "ผู้ใช้ต้องการแนวประดิษฐ์ที่กำจัดข้อแลกเปลี่ยนการออกแบบ ไม่ใช่ปรับพารามิเตอร์เดียวให้เหมาะที่สุด"
+  - id: triz-negative-01
+    kind: negative
+    prompt: "การตัดสินใจอยู่ระหว่างคุณค่าสาธารณะสองอย่าง ปัญหาคือสิทธิหรือหน้าที่ใครมาก่อน ไม่ใช่ความขัดแย้งออกแบบเทคนิค"
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [value_conflict, duties_rights]
+    rationale: "อำนาจเชิงบรรทัดฐานและสิทธิ ไม่ใช่แนวประดิษฐ์ กำหนดวิธี"
+  - id: triz-negative-02
+    kind: negative
+    prompt: "ระบบมีวงจรป้อนกลับที่ปฏิสัมพันธ์และผลข้างเคียงล่าช้า ทำแผนที่โครงสร้างกว้างและจุดแทรกแซงก่อนเลือกแนวคิดเฉพาะจุด"
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "ความต้องการหลักคือพลวัตระบบกับจุดแทรกแซง ไม่ใช่แก้ความขัดแย้งเฉพาะจุด"
+  - id: triz-mechanical-01
+    kind: mechanical
+    prompt: "แจกแจงพารามิเตอร์ผลิตภัณฑ์เดิมตามลำดับที่ขอโดยไม่ระบุความขัดแย้งหรือเสนอแนวคิด"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "แจกแจงเป็นเชิงกล ไม่ได้ขอแก้ปัญหาเชิงประดิษฐ์"
+  - id: triz-explicit-01
+    kind: explicit
+    prompt: "ใช้ triz แก้ความขัดแย้งระหว่างบรรจุภัณฑ์เบากับป้องกันแรงกระแทกดีขึ้น แล้วเสนอการทดสอบย้อนกลับได้"
+    expected_route: triz
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, technical_contradiction]
+    rationale: "ผู้ใช้เรียกวิธีชัดสำหรับความขัดแย้งเทคนิคและการทดสอบ"
+  - id: triz-insufficiency-01
+    kind: insufficiency
+    prompt: "ไม่ทราบคุณสมบัติที่ดีขึ้นและแย่ลง ประกาศว่าบรรลุแบบอุดมคติและอ้างสมรรถนะเพิ่มที่รับประกัน"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [technical_contradiction, decisive_input_missing]
+    rationale: "หากไม่กำหนดความขัดแย้งหรือการทดสอบ ยืนยันอุดมคติและการปรับดีอย่างซื่อตรงไม่ได้"

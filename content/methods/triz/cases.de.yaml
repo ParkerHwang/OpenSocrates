@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: triz-positive-01
+    kind: positive
+    prompt: "Eine Lieferdrohne braucht mehr Batterie, aber zusätzliches Gewicht verkürzt Reichweite; finden Sie trennendes oder aufhebendes Konzept."
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "Technische Verbesserung verschlechtert anderen Parameter; Idealziel, Trennung und Erfindung passen."
+  - id: triz-positive-02
+    kind: positive
+    prompt: "Ein Krankenhauszimmer braucht zugleich mehr Privatsphäre und leichtere Beobachtung; erkunden Sie Zeit-, Raum-, Bedingungs- und Schnittstellentrennung."
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "Physikalischer oder technischer Widerspruch mit trennbaren Bedingungen und Sicherheitsgrenzen."
+  - id: triz-positive-03
+    kind: positive
+    prompt: "Eine Verpackungslinie soll schneller ohne mehr Schaden werden; suchen Sie vorhandene Zeit, Raum, Information und Material für kompromisslosen Entwurf."
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "Erfinderische Konzepte sollen Konflikt aufheben statt einzelnen Parameter optimieren."
+  - id: triz-negative-01
+    kind: negative
+    prompt: "Entscheidend sind zwei öffentliche Werte und Vorrang von Rechten oder Pflichten statt technischem Widerspruch."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [value_conflict, duties_rights]
+    rationale: "Normative Autorität und Rechte bestimmen Route statt Erfindung."
+  - id: triz-negative-02
+    kind: negative
+    prompt: "System hat Rückkopplungen und verzögerte Nebenfolgen; kartieren Sie Struktur und Hebel vor lokalem Konzept."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Systemdynamik und Hebel dominieren statt lokaler Widerspruchslösung."
+  - id: triz-mechanical-01
+    kind: mechanical
+    prompt: "Listen Sie bestehende Produktparameter in verlangter Reihenfolge ohne Widersprüche oder Konzepte."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Mechanische Liste ohne erfinderisches Problemlösen."
+  - id: triz-explicit-01
+    kind: explicit
+    prompt: "Nutzen Sie triz für leichtere Verpackung bei stärkerem Aufprallschutz und schlagen Sie umkehrbaren Test vor."
+    expected_route: triz
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, technical_contradiction]
+    rationale: "Ausdrückliche Methode für technischen Widerspruch und Test."
+  - id: triz-insufficiency-01
+    kind: insufficiency
+    prompt: "Verbesserte und verschlechterte Eigenschaften sind unbekannt; erklären Sie ideales Design erreicht und garantieren Sie Leistungsgewinn."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [technical_contradiction, decisive_input_missing]
+    rationale: "Ohne Widerspruchsdefinition oder Test keine ehrliche Idealitäts- oder Verbesserungsfeststellung."

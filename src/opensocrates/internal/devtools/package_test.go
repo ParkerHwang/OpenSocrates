@@ -26,7 +26,7 @@ func TestContentPackagesAndPortableExport(t *testing.T) {
 				t.Fatal(e)
 			}
 			if len(arr(manifest["canonical_methods"])) != 48*len(releasedLocales) {
-				t.Fatal("missing four-locale methods")
+				t.Fatal("missing ten-locale methods")
 			}
 			archive := filepath.Join(t.TempDir(), "skill.zip")
 			if e = WritePortableZIP(output, archive); e != nil {

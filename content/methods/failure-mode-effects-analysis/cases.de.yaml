@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "failure-mode-effects-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "Liste vor Medikamentenausgabe-Ablaufstart Fehlermodi, Wirkungen, Ursachen, Kontrollen und Kontrollen, denen noch eine verantwortliche Person zugewiesen werden muss.",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "Definierter Prozess braucht vorausschauendes Register und Kontrollverantwortung ohne erfundene Scores."
+    },
+    {
+      "id": "failure-mode-effects-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "Pipeline-Neugestaltung könnte bei Aufnahme, Validierung oder Alarm scheitern; priorisiere ordinal und schlage Kontrollen vor.",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan"
+      ],
+      "rationale": "Geplantes Design verlangt Fehlermodi, Wirkungen, Ursachen, ordinale Priorität und Kontrollen."
+    },
+    {
+      "id": "failure-mode-effects-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "Prüfe Bezahlen vor Einführung auf mögliche Fehlbelastungen und deren Verhinderung oder Erkennung.",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "Vorfreigabeprüfung und Kontrollzuweisung sind spezifische Ausgaben."
+    },
+    {
+      "id": "failure-mode-effects-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "Einführungsplan steht fest; stelle dir Scheitern vor und benenne Ursachen, Frühzeichen und Minderungen.",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "Planbezogenes vorgestelltes Scheitern vor Festlegung gefragt."
+    },
+    {
+      "id": "failure-mode-effects-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "Produktionsfehler kehrt wieder; trenne Symptome, nahe Ursachen und kontrollierbare Systembedingungen.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "Unmittelbarer Bedarf ist Wiederkehrdiagnose statt vorausschauendem FMEA-Register."
+    },
+    {
+      "id": "failure-mode-effects-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Sortiere bestehende Fehlermoduszeilen alphabetisch und bewahre Felder ohne Prioritätsprüfung.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Trotz Risikoinhalt ist Sortierung mechanisch."
+    },
+    {
+      "id": "failure-mode-effects-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "Nutze failure-mode-effects-analysis für Einführungsliste ohne erfundene Schwere-, Auftretens- oder Erkennbarkeitswerte.",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "failure_risk",
+        "plan"
+      ],
+      "rationale": "Nutzer fordert Verfahren und Schutz vor falscher Präzision."
+    },
+    {
+      "id": "failure-mode-effects-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Prozessgrenze und Sollfunktion fehlen; vergib dennoch genaue Risikoprioritätszahlen für vorgestellte Fehler.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "failure_risk",
+        "decisive_input_missing"
+      ],
+      "rationale": "Ohne Funktion und vertretbare Skala Bewertung aussetzen statt quantifizieren."
+    }
+  ]
+}

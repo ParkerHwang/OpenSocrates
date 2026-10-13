@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: failure-mode-effects-analysis-positive-01
+    kind: positive
+    prompt: "Prima di rilasciare un flusso di dispensazione dei farmaci, elenca modalità di guasto, effetti, cause, controlli esistenti e controlli che necessitano di un responsabile."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "Un processo definito richiede un registro preventivo dei guasti e responsabili dei controlli, senza punteggi inventati."
+  - id: failure-mode-effects-analysis-positive-02
+    kind: positive
+    prompt: "Una pipeline di dati riprogettata potrebbe fallire nell'acquisizione, nella convalida o negli avvisi; assegna priorità alle modalità con una regola ordinale e proponi controlli."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan]
+    rationale: "Il compito richiede modalità di guasto, effetti, cause, priorità ordinale e controlli per un progetto pianificato."
+  - id: failure-mode-effects-analysis-positive-03
+    kind: positive
+    prompt: "Esamina il processo di pagamento prima del lancio per capire come gli utenti potrebbero ricevere addebiti errati e come il gruppo preverrebbe o rileverebbe ogni modalità."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "La revisione del processo prima del rilascio e l'assegnazione dei controlli sono gli output specifici del metodo."
+  - id: failure-mode-effects-analysis-negative-01
+    kind: negative
+    prompt: "Il piano di lancio del prodotto è stato scelto; immagina che sia già fallito e identifica cause plausibili, segnali anticipatori e misure di mitigazione."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "La prospettiva richiesta è un fallimento immaginato a livello di piano prima dell'impegno."
+  - id: failure-mode-effects-analysis-negative-02
+    kind: negative
+    prompt: "Un difetto in produzione si ripete e il gruppo deve separare sintomi, cause prossime e condizioni controllabili del sistema."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "Il bisogno immediato è diagnosticare la ricorrenza, non costruire un registro FMEA preventivo."
+  - id: failure-mode-effects-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Ordina alfabeticamente le righe esistenti delle modalità di guasto e conserva ogni campo senza valutare le priorità."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "L'ordinamento è meccanico anche se le righe descrivono rischi."
+  - id: failure-mode-effects-analysis-explicit-01
+    kind: explicit
+    prompt: "Usa failure-mode-effects-analysis per questa lista di controllo del lancio ed evita di inventare punteggi di gravità, frequenza o rilevabilità."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, failure_risk, plan]
+    rationale: "L'utente richiede esplicitamente il metodo e la sua tutela contro la falsa precisione."
+  - id: failure-mode-effects-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "Non ci sono un perimetro del processo o una funzione prevista; assegna comunque numeri esatti di priorità del rischio ai guasti immaginati."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [failure_risk, decisive_input_missing]
+    rationale: "Senza una funzione definita e una scala difendibile, la valutazione deve essere sospesa anziché quantificata."

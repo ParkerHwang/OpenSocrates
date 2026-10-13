@@ -6,7 +6,7 @@ Tracking: [implementation issue #111](https://github.com/ParkerHwang/OpenSocrate
 
 | Package | Completed scope |
 | --- | --- |
-| V0 | Reconciled released v1.5.1 baseline, 48 methods, EN/KO/ZH/JA, revision 4 |
+| V0 | Reconciled released v1.5.2 baseline, 48 methods, ten languages, revision 5 |
 | V1–V2 | Typed Go contracts, services, content, domain, decision, runtime CLI and persistence |
 | V3 | Native OS protection and pinned external Codex app-server compatibility |
 | V4–V5 | Shared lifecycle journals, transport, host registration, native management and npm adoption |
@@ -16,19 +16,52 @@ Tracking: [implementation issue #111](https://github.com/ParkerHwang/OpenSocrate
 
 The user subsequently added **Windows ARM64** to v1.6.0. It has separate native binaries, PE/build checks, signed target selection, helper/installer paths, publication assets and native CI. This is a material user-directed adjustment to the original two-platform plan. Codex and Antigravity retain their profile boundaries; native Windows Claude Code is excluded and --host all still means Codex. Claude account upload/activation remains separate.
 
-Methods, teacher questions, response policies and shared guides now freeze released v1.5.1 tag source 5a6a7fa2897dd42772c4503a1301770e48bd1f29, revision 4 and EN/KO/ZH/JA. Original v1.5.0 EN/KO procedures and cases remain byte-identical. Compiled product metadata becomes 1.6.0. The separate method-body session and unreviewed v1.5.2 inputs were not modified or imported. Historical revision-3 evidence below retains its original source and does not qualify new revision-4 files. See [baseline](CONTENT_BASELINE.json) and [intentional changes](DECISIONS.md).
+Methods, teacher questions, response policies and shared guides now freeze released
+v1.5.2 source `9838db16910c5f22d9dcc3c7180350cb406fd236`, revision 5 and ten
+languages. Compiled product metadata remains 1.6.0. All earlier evidence retains
+its original source/revision and does not qualify these new revision-5 files.
+See [baseline](CONTENT_BASELINE.json) and [intentional changes](DECISIONS.md).
+
+## Released v1.5.2 reconciliation — implemented, verification pending
+
+Current release source: `9838db16910c5f22d9dcc3c7180350cb406fd236`.
+Annotated tag object: `4c27d59da54eb1591ba24c0ebae62d6ab3168b60`.
+Reconciled main merge: `8f08b9a90d711fa3fc60cc7db6f962e3dda43c42`, same tree as the tagged source, distinct commit.
+
+Completed: import the released revision-5, 48-method, ten-language content and
+port its runtime/preference/script-detection/reference/package contracts to Go;
+retain the native 1.6.0 commands, toolchain and macOS ARM64 / Windows x64/ARM64
+scope. Canonical totals are 480 procedures, 3,840 cases and 1,440 teacher questions.
+The existing four languages' authored procedure/case bytes and metadata/question
+values remain unchanged; method identity advances from revision 4 to 5. Historical
+v1.5.0/v1.5.1 package coverage remains versioned, without silently relabeling it.
+
+Not verified at this documentation stage: final integrated source/generation/
+package tests, new native CI, authentic v1.5.2 npm-installer adoption, new artifact
+signing/notarization, production trust/public update transport, clean-machine or
+actual-host delivery. Prior successful d297b76 CI and earlier hosted Mac Accepted
+receipts remain historical and do not qualify the current revision-5 artifacts.
+The parent records final exact commands, revision and results after integration.
+
+Next: finish integration, generate canonical outputs, then perform final source
+and native acceptance and bounded reviews. Keep the protected-main required-check
+transition and any release deployment under the user's existing approval rules.
+No merge, tag, publication or active installation replacement follows from this
+reconciliation. Method-body upgrades remain v1.6.1+ and native Windows Claude
+Code remains excluded. / 출시된 v1.5.2를 현재 기준으로 포팅했습니다. 이 단계는
+구현 기록이며 최종 통합 검사·새 CI·새 파일 서명/공증은 별도로 기록합니다.
 
 ## Exact evidence
 
-## Released v1.5.1 reconciliation
+## Historical released v1.5.1 reconciliation
 
 The original Go preparation and all revision-3 receipts retain their historical
 source identity. After release v1.5.1, merge current main
 `5a6a7fa2897dd42772c4503a1301770e48bd1f29` into the existing PR branch, retain
 the native Go tooling/workflows and VERSION 1.6.0, and port released four-locale
 runtime behavior. Canonical/schema generation now targets revision 4,
-EN/KO/ZH/JA, 192 complete references and 576 teacher questions. Exact baseline
-hashes are in [CONTENT_BASELINE.json](CONTENT_BASELINE.json). / 초기 준비와
+EN/KO/ZH/JA, 192 complete references and 576 teacher questions. Historical baseline
+hashes remain in [the decisions](DECISIONS.md); the baseline JSON now tracks v1.5.2. / 초기 준비와
 리비전 3 기록은 그대로 보존하고 출시된 v1.5.1을 병합·포팅했습니다. Go 실행·개발
 경로와 1.6.0 버전은 유지하며 네 언어의 전체 참조와 질문을 생성합니다.
 
@@ -40,15 +73,11 @@ Default decision and Claude entry remain stateless. / 언어 명령·이전 선�
 완전한 참조·버전별 패키지 검사와 설정·꺼진 상태·다른 파일·복구 보존을 반영했으며
 기본 판단과 Claude 진입에 설정·대화 읽기를 추가하지 않았습니다.
 
-Source and platform qualification for this new merge must be recorded at its
-own commit. Prior 9be0e5e hosted Mac notarization does not qualify these new
-revision-4 bytes. Current main requires the maintenance pipeline's six legacy
-checks; preserve that shared policy while the separate v1.5.2 work is active,
-then coordinate the final Go check transition. v1.5.2's FR/DE/IT/ES/PT/TH are
-pending, not this baseline; recheck publication before final v1.6.0 release.
-/ 새 소스의 검증은 새 SHA에 기록하고 과거 공증을 재사용해 새 파일이 통과했다고
-주장하지 않습니다. v1.5.2 진행 중 공용 보호 정책은 보존하고 최종 Go 전환을
-조정합니다. 미출시 6개 언어는 포함했다고 주장하지 않습니다.
+At the historical v1.5.1 reconciliation, current main required the maintenance
+pipeline's six legacy checks and v1.5.2 was still draft. That policy and pending
+status were observed then, not a claim about the released current baseline.
+Prior 9be0e5e hosted Mac notarization did not qualify the revision-4 merge.
+The original results and limitations below retain their source and date.
 
 ## Historical exact evidence
 

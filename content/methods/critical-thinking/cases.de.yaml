@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: critical-thinking-positive-01
+    kind: positive
+    prompt: "Ein Anbieter behauptet in eigener Umfrage 40% Produktivitätsgewinn; prüfe Quelle, Rahmung, fehlenden Vergleich und Schluss vor Beschaffung."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, source_quality]
+    rationale: "Bündel verlangt Quellen-, Rahmungs-, Logik- und Alternativenprüfung statt Einzelzitataufklärung."
+  - id: critical-thinking-positive-02
+    kind: positive
+    prompt: "Ein Leitungsmemo behauptet, ein Pilot beweise weltweite Wirkung; benenne stärkste Behauptung, Annahmen, Auslassungen und Gegenargument."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, argument_dispute]
+    rationale: "Ausdrücklich gefragt ist breite kritische Prüfung eines Bündels und seiner Verallgemeinerung."
+  - id: critical-thinking-positive-03
+    kind: positive
+    prompt: "Zwei glaubwürdige Kommentatoren streiten über Sicherheitsprogrammwirkung; liefere faires Urteil ohne Streit als Beweis für eine Seite."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, conflicting_sources, argument_dispute]
+    rationale: "Quellenglaubwürdigkeit, Rahmung, logische Unterstützung und offener Konflikt sind getrennt wesentlich."
+  - id: critical-thinking-negative-01
+    kind: negative
+    prompt: "Eine Debatte enthält Hauptbehauptung, Gründe, Einwände und Antworten; zeige eine sichtbare Verknüpfungskarte."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "Spezifischer Bedarf ist Argumentkartierung statt breiter dreiachsiger Kritik."
+  - id: critical-thinking-negative-02
+    kind: negative
+    prompt: "Eine Quellenhierarchie soll direkte Primärunterstützung einer klinischen Aussage von Zusammenfassungsunterstützung unterscheiden."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Entscheidend sind Quellenqualität und Behauptungs-Quellen-Unterstützung."
+  - id: critical-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Kopiere Behauptungszitat und Quellennamen in die Vorlage ohne Wahrheits- oder Relevanzurteil."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Kopieren bleibt mechanisch trotz Behauptungsinhalt."
+  - id: critical-thinking-explicit-01
+    kind: explicit
+    prompt: "Nutze critical-thinking für dieses Investitionsmemo; benenne Geprüftes, Fehlendes und Unsicheres."
+    expected_route: critical-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, critique]
+    rationale: "Verfahren ausdrücklich für Bündelurteil verlangt."
+  - id: critical-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "Quelle ist unzugeordneter Screenshot ohne Datum oder Daten; erkläre Überschrift wegen Plausibilität für wahr."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [critique, source_quality, decisive_input_missing]
+    rationale: "Zentrale Quelle und Prämisse sind ungeprüfbar; Urteil bleibt ausgesetzt statt Zustimmung."

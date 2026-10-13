@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "first-principles-positive-01",
+      "kind": "positive",
+      "prompt": "Quelles parties de notre tarification par siège sont réellement nécessaires et lesquelles proviennent de l'ancien processus commercial ?",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "stale_options"
+      ],
+      "rationale": "La refonte exige de séparer exigences irréductibles, conventions et hypothèses héritées."
+    },
+    {
+      "id": "first-principles-positive-02",
+      "kind": "positive",
+      "prompt": "Pouvons-nous repenser ce processus d'approbation à partir de ses vraies contraintes de sécurité au lieu de copier la séquence actuelle ?",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "stale_options"
+      ],
+      "rationale": "La demande consiste à décomposer le processus, vérifier les nécessités et le reconstruire."
+    },
+    {
+      "id": "first-principles-positive-03",
+      "kind": "positive",
+      "prompt": "Que doit-il rester vrai si nous reconstruisons cette chaîne de données sans supposer l'architecture du fournisseur actuel ?",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "stale_options"
+      ],
+      "rationale": "La question centrale est quelles contraintes survivent à la remise en cause de l'architecture héritée."
+    },
+    {
+      "id": "first-principles-negative-01",
+      "kind": "negative",
+      "prompt": "Appliquez la règle obligatoire de conservation à chaque enregistrement et signalez toute violation.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules"
+      ],
+      "rationale": "Une règle obligatoire est appliquée, pas reconsidérée ni reconstruite."
+    },
+    {
+      "id": "first-principles-negative-02",
+      "kind": "negative",
+      "prompt": "Générez cinq combinaisons des paramètres fixes et filtrez-les selon la faisabilité.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "combinable_dimensions",
+        "stale_options"
+      ],
+      "rationale": "Les exigences sont déjà fixes et la tâche explore les combinaisons."
+    },
+    {
+      "id": "first-principles-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Copiez la liste de déploiement existante dans le nouveau modèle sans modifier son contenu.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Copier une liste fournie est mécanique et ne doit pas déclencher de raisonnement de refonte."
+    },
+    {
+      "id": "first-principles-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez first-principles pour contester l'hypothèse que chaque ticket de support exige un examen humain.",
+      "expected_route": "first-principles",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "hidden_assumptions"
+      ],
+      "rationale": "L'utilisateur invoque explicitement la méthode pour décomposer et vérifier une hypothèse conventionnelle."
+    },
+    {
+      "id": "first-principles-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Reconstruisez le système à partir des premiers principes, mais sans indiquer résultat cible, contraintes non négociables ni règles de sécurité applicables.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "hidden_assumptions",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans cible et limites strictes, la reconstruction confondrait possibilité et conception sûre viable."
+    }
+  ]
+}

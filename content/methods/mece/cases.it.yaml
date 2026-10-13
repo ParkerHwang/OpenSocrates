@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: mece-positive-01
+    kind: positive
+    prompt: "Questi segmenti di clienti sono mutuamente esclusivi e collettivamente esaustivi per questa singola decisione di acquisto?"
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "L’utente richiede controlli separati di sovrapposizione e copertura sotto un solo asse di classificazione."
+  - id: mece-positive-02
+    kind: positive
+    prompt: "Riprogetta queste categorie di rischio affinché nessun caso appartenga a due categorie e nessun caso rilevante resti escluso."
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "Il risultato richiesto è una regola di classificazione con controlli di sovrapposizioni, lacune e granularità."
+  - id: mece-positive-03
+    kind: positive
+    prompt: "Verifica se i rami del nostro albero del problema usano un solo asse, hanno granularità coerente e coprono l’universo dichiarato."
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "È una verifica mirata ME/CE, non una diagnosi ricorsiva ampia."
+  - id: mece-negative-01
+    kind: negative
+    prompt: "Scomponi ricorsivamente le cause dell’interruzione e associa un test a ogni ramo terminale."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "Il compito richiede un albero logico completo, non soltanto un controllo della qualità della classificazione."
+  - id: mece-negative-02
+    kind: negative
+    prompt: "Mantieni queste etichette sovrapposte perché la sovrapposizione rappresenta un’identità significativa del cliente."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [ambiguous_terms, human_need]
+    rationale: "La sovrapposizione naturale è intenzionale, quindi imporre l’esclusività reciproca distorcerebbe il fenomeno."
+  - id: mece-mechanical-01
+    kind: mechanical
+    prompt: "Ordina alfabeticamente le categorie fornite e conserva le loro descrizioni."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "L’ordinamento alfabetico è meccanico e non valuta la logica delle categorie."
+  - id: mece-explicit-01
+    kind: explicit
+    prompt: "Usa esplicitamente mece per verificare i gruppi di responsabilità in questo modello operativo."
+    expected_route: mece
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, category_overlap]
+    rationale: "L’utente nomina esplicitamente una verifica di sovrapposizioni e copertura su un solo asse."
+  - id: mece-insufficiency-01
+    kind: insufficiency
+    prompt: "Dimmi se le categorie sono MECE ma non indicare universo, scopo della classificazione o regole delle categorie."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [category_overlap, decisive_input_missing]
+    rationale: "ME e CE non sono valutabili senza universo delimitato, scopo e regole di appartenenza."

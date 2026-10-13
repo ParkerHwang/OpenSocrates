@@ -7,14 +7,14 @@ import (
 )
 
 func TestUserSettingsSchemaAdmitsReleasedLocalesAndNullOnly(t *testing.T) {
-	for _, locale := range []any{"en", "ko", "zh", "ja", nil} {
+	for _, locale := range []any{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th", nil} {
 		s := domain.DefaultSettings()
 		s.Value["locale_preference"] = locale
 		if e := contracts.Validate("user-settings", s.Value); e != nil {
 			t.Fatal(locale, e)
 		}
 	}
-	for _, locale := range []any{"follow", "zh-CN", "ja-JP", "", true, contracts.Number(1)} {
+	for _, locale := range []any{"follow", "zh-CN", "ja-JP", "fr-FR", "pt-BR", "th-TH", "ru", "", true, contracts.Number(1)} {
 		s := domain.DefaultSettings()
 		s.Value["locale_preference"] = locale
 		if e := contracts.Validate("user-settings", s.Value); e == nil {

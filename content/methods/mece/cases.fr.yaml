@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "mece-positive-01",
+      "kind": "positive",
+      "prompt": "Ces segments clients sont-ils mutuellement exclusifs et collectivement exhaustifs pour cette seule décision d’achat ?",
+      "expected_route": "mece",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "category_overlap",
+        "tangled_hierarchy"
+      ],
+      "rationale": "L’utilisateur demande des vérifications distinctes de recoupement et de couverture selon un axe de classification unique."
+    },
+    {
+      "id": "mece-positive-02",
+      "kind": "positive",
+      "prompt": "Redessinez ces catégories de risque pour qu’aucun cas ne relève de deux catégories et qu’aucun cas substantiel ne soit omis.",
+      "expected_route": "mece",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "category_overlap",
+        "tangled_hierarchy"
+      ],
+      "rationale": "Le résultat demandé est une règle de classification avec vérifications des recoupements, lacunes et granularité."
+    },
+    {
+      "id": "mece-positive-03",
+      "kind": "positive",
+      "prompt": "Vérifiez si les branches de notre arbre des problèmes suivent un seul axe, ont une granularité cohérente et couvrent l’univers annoncé.",
+      "expected_route": "mece",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "category_overlap",
+        "tangled_hierarchy"
+      ],
+      "rationale": "Il s’agit d’un audit ME/CE ciblé plutôt que d’un vaste diagnostic récursif."
+    },
+    {
+      "id": "mece-negative-01",
+      "kind": "negative",
+      "prompt": "Décomposez récursivement les causes de la panne et associez un test à chaque branche terminale.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "tangled_hierarchy",
+        "diagnose"
+      ],
+      "rationale": "La tâche nécessite un arbre logique complet, pas seulement une vérification de qualité de la classification."
+    },
+    {
+      "id": "mece-negative-02",
+      "kind": "negative",
+      "prompt": "Conservez ces étiquettes qui se recoupent, car le recoupement lui-même représente une identité client significative.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "ambiguous_terms",
+        "human_need"
+      ],
+      "rationale": "Le recoupement naturel est intentionnel ; forcer l’exclusion mutuelle déformerait le phénomène."
+    },
+    {
+      "id": "mece-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Triez les catégories fournies par ordre alphabétique et préservez leurs descriptions.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Le tri alphabétique est mécanique et n’évalue pas la logique des catégories."
+    },
+    {
+      "id": "mece-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez explicitement mece pour auditer les groupes de responsabilités de ce modèle opérationnel.",
+      "expected_route": "mece",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "category_overlap"
+      ],
+      "rationale": "L’utilisateur nomme explicitement un audit des recoupements et de la couverture sur un axe unique."
+    },
+    {
+      "id": "mece-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Dites-moi si les catégories sont MECE, mais n’énoncez ni l’univers, ni l’objectif de classification, ni les règles des catégories.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "category_overlap",
+        "decisive_input_missing"
+      ],
+      "rationale": "ME et CE ne peuvent être évalués sans univers délimité, objectif et règles d’appartenance."
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: design-thinking-positive-01
+    kind: positive
+    prompt: "Pais relatam perder atualizações escolares, mas as soluções improvisadas observadas diferem; descubra a necessidade, enquadre um ponto de vista e teste três conceitos de serviço."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "Contexto humano observado e geração aberta de conceitos são centrais; exige teste de protótipo antes do compromisso."
+  - id: design-thinking-positive-02
+    kind: positive
+    prompt: "Uma clínica quer reduzir confusão no registro de chegada; entrevistas e observações devem orientar protótipo de baixo risco e regra de refutação."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "O pedido é projeto de serviço centrado no usuário com dificuldade observada e protótipo testável."
+  - id: design-thinking-positive-03
+    kind: positive
+    prompt: "Uma equipe pede funcionalidade de painel, mas ninguém sabe qual falha evitaria; descubra primeiro situação e progresso desejado."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "É preciso separar funcionalidade declarada da necessidade subjacente antes de escolher conceitos."
+  - id: design-thinking-negative-01
+    kind: negative
+    prompt: "Usuários trocam ferramentas em momento específico de dificuldade; a decisão depende de tarefas funcionais, emocionais e sociais e forças do hábito."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "O resultado principal é descrição da tarefa e forças de troca, não ciclo de ideação e protótipo."
+  - id: design-thinking-negative-02
+    kind: negative
+    prompt: "As soluções óbvias estão esgotadas; a equipe quer provocações que criem três opções radicalmente diferentes antes da seleção."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "A necessidade principal é romper enquadramento, não projetar com base em observação de usuários."
+  - id: design-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Coloque citações de entrevistas em documento numerado, sem interpretar necessidades nem propor conceitos."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Transcrever e formatar são tarefas mecânicas."
+  - id: design-thinking-explicit-01
+    kind: explicit
+    prompt: "Use design-thinking para redesenhar a inscrição de voluntários a partir das dificuldades observadas e testar um pequeno protótipo."
+    expected_route: design-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, human_need]
+    rationale: "O usuário pede explicitamente descoberta de necessidades humanas e processo de protótipo."
+  - id: design-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "Não há usuários nem observações; declare necessidade universal e lance a primeira funcionalidade sem teste."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [human_need, decisive_input_missing]
+    rationale: "Sem evidências de usuários não se pode sustentar necessidade e teste; o conceito deve permanecer suspenso."

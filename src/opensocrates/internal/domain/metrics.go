@@ -163,7 +163,7 @@ func ValidateLocalMetricWire(value any) error {
 	if _, e := time.Parse("2006-01-02", day); e != nil {
 		return contracts.ErrInvalid
 	}
-	if !contracts.Is(m["locale"], "en", "ko", "zh", "ja") {
+	if !contracts.Is(m["locale"], "en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th") {
 		return contracts.ErrInvalid
 	}
 	attrs, ok := m["attributes"].(map[string]any)

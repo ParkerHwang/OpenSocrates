@@ -1,0 +1,104 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "triangulation-positive-01",
+      "kind": "positive",
+      "prompt": "Dados independentes de pesquisa, comportamento e administração podem corroborar esta afirmação de retenção?",
+      "expected_route": "triangulation",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources",
+        "source_quality"
+      ],
+      "rationale": "Verifique independência, convergência, conflito e lacunas de linhas distintas."
+    },
+    {
+      "id": "triangulation-positive-02",
+      "kind": "positive",
+      "prompt": "Estas partes citam métodos diferentes; determine se as evidências realmente convergem para o mesmo resultado.",
+      "expected_route": "triangulation",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources"
+      ],
+      "rationale": "Compare linhas e impeça dados de origem repetidos de fingirem corroboração."
+    },
+    {
+      "id": "triangulation-positive-03",
+      "kind": "positive",
+      "prompt": "Entrevistas qualitativas e experimento discordam; que verificação independente adicional resolveria conflito material?",
+      "expected_route": "triangulation",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources",
+        "source_quality"
+      ],
+      "rationale": "Desacordo material exige independência e próxima linha direcionada."
+    },
+    {
+      "id": "triangulation-negative-01",
+      "kind": "negative",
+      "prompt": "Classifique cada fonte por qualidade do desenho, evidência direta e aplicabilidade à população alvo.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "Avalia qualidade individual, não independência entre linhas."
+    },
+    {
+      "id": "triangulation-negative-02",
+      "kind": "negative",
+      "prompt": "Atualize confiança anterior nas hipóteses após resultado novo do teste.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "new_evidence",
+        "unknown_probability",
+        "competing_explanations"
+      ],
+      "rationale": "Atualização definida de anterior para posterior é bayesiana, não triangulação."
+    },
+    {
+      "id": "triangulation-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Una as três tabelas de evidências fornecidas em uma e preserve todas as linhas.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Unir tabelas é mecânico; não avalia independência ou convergência."
+    },
+    {
+      "id": "triangulation-explicit-01",
+      "kind": "explicit",
+      "prompt": "Use explicitamente triangulation para verificar se a afirmação de impacto nos clientes resiste a verificações independentes.",
+      "expected_route": "triangulation",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "reconcile_evidence"
+      ],
+      "rationale": "Invoca corroboração entre linhas de afirmação material."
+    },
+    {
+      "id": "triangulation-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Reporte corroboração, mas todas as fontes repetem dados originais desconhecidos e nenhuma linha independente existe.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "reconcile_evidence",
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "Fontes repetidas dependentes não estabelecem triangulação; suspenda corroboração."
+    }
+  ]
+}

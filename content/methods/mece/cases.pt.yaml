@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "mece-positive-01",
+      "kind": "positive",
+      "prompt": "Estes segmentos de clientes são mutuamente exclusivos e coletivamente exaustivos para esta única decisão de compra?",
+      "expected_route": "mece",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "category_overlap",
+        "tangled_hierarchy"
+      ],
+      "rationale": "O usuário pede testes separados de sobreposição e cobertura sob um eixo."
+    },
+    {
+      "id": "mece-positive-02",
+      "kind": "positive",
+      "prompt": "Redesenhe estas categorias de risco para que nenhum caso pertença a duas categorias e nenhum caso material fique fora.",
+      "expected_route": "mece",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "category_overlap",
+        "tangled_hierarchy"
+      ],
+      "rationale": "O resultado pedido é regra de classificação com testes de sobreposição, lacunas e granularidade."
+    },
+    {
+      "id": "mece-positive-03",
+      "kind": "positive",
+      "prompt": "Verifique se os ramos da nossa árvore de questões usam um eixo, têm granularidade consistente e cobrem o universo declarado.",
+      "expected_route": "mece",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "category_overlap",
+        "tangled_hierarchy"
+      ],
+      "rationale": "É auditoria focada ME/CE, não diagnóstico recursivo amplo."
+    },
+    {
+      "id": "mece-negative-01",
+      "kind": "negative",
+      "prompt": "Decomponha recursivamente as causas da indisponibilidade e associe teste a cada ramo terminal.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "tangled_hierarchy",
+        "diagnose"
+      ],
+      "rationale": "Exige árvore lógica completa, não só verificação da qualidade da classificação."
+    },
+    {
+      "id": "mece-negative-02",
+      "kind": "negative",
+      "prompt": "Mantenha estes rótulos sobrepostos porque a sobreposição representa uma identidade significativa dos clientes.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "ambiguous_terms",
+        "human_need"
+      ],
+      "rationale": "A sobreposição natural é intencional; forçar exclusão mútua distorceria o fenômeno."
+    },
+    {
+      "id": "mece-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Ordene alfabeticamente as categorias fornecidas e preserve as descrições.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Ordenar é mecânico e não avalia lógica das categorias."
+    },
+    {
+      "id": "mece-explicit-01",
+      "kind": "explicit",
+      "prompt": "Use explicitamente mece para auditar os grupos de responsabilidade deste modelo operacional.",
+      "expected_route": "mece",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "category_overlap"
+      ],
+      "rationale": "O usuário nomeia auditoria de sobreposição e cobertura em um eixo."
+    },
+    {
+      "id": "mece-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Diga se as categorias são MECE sem declarar universo, finalidade ou regras das categorias.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "category_overlap",
+        "decisive_input_missing"
+      ],
+      "rationale": "Não é possível avaliar ME e CE sem universo, finalidade e regras de pertencimento delimitados."
+    }
+  ]
+}

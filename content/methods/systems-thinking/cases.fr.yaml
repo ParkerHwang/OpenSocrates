@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "systems-thinking-positive-01",
+      "kind": "positive",
+      "prompt": "Un arriéré de modération croît quand les délais augmentent la frustration, qui crée davantage de signalements dupliqués ; l’équipe veut la structure derrière le schéma.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question",
+        "deep_uncertainty"
+      ],
+      "rationale": "Le schéma récurrent contient flux interactifs, rétroactions et délais plutôt qu’une cause isolée."
+    },
+    {
+      "id": "systems-thinking-positive-02",
+      "kind": "positive",
+      "prompt": "Une subvention de conservation accroît d’abord les plantations, puis pénurie d’eau et réponses de contrôle produisent des résultats oscillants selon les saisons.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "deep_uncertainty",
+        "causal_question"
+      ],
+      "rationale": "Comportement saisonnier et résistance à la politique demandent stocks, flux, boucles équilibrantes et délais."
+    },
+    {
+      "id": "systems-thinking-positive-03",
+      "kind": "positive",
+      "prompt": "La confiance client s’accumule lentement, les recommandations renforcent la croissance et une réduction d’assistance crée un déclin retardé ; trouvez un levier.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "La demande cible explicitement accumulation, renforcement, résultats retardés et levier d’intervention."
+    },
+    {
+      "id": "systems-thinking-negative-01",
+      "kind": "negative",
+      "prompt": "Deux groupes appariés ont reçu des formations différentes ; l’utilisateur demande si la formation a changé les scores après un mois.",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "Une comparaison d’intervention délimitée suffit ; un système dynamique complet n’est pas requis."
+    },
+    {
+      "id": "systems-thinking-negative-02",
+      "kind": "negative",
+      "prompt": "Une panne unique de base de données a un déclencheur horodaté clair ; l’équipe veut la cause immédiate et la condition profonde contrôlable.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "diagnose",
+        "recurring_failure"
+      ],
+      "rationale": "Le diagnostic d’incident délimité prime sauf si les preuves révèlent ensuite un schéma de rétroaction récurrent."
+    },
+    {
+      "id": "systems-thinking-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Transformez les notes de stocks et flux en puces Markdown sans expliquer le système.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "La remise en forme est mécanique et ne demande pas de jugement sur la structure."
+    },
+    {
+      "id": "systems-thinking-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez systems-thinking pour expliquer pourquoi notre correction locale d’effectifs est régulièrement compensée par la croissance durable de l’arriéré.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "L’utilisateur invoque explicitement la méthode pour un schéma systémique récurrent et retardé."
+    },
+    {
+      "id": "systems-thinking-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Une seule plainte a été reçue hier ; dessinez une boucle renforçante et recommandez une intervention globale sans schéma temporel.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "feedback_delay",
+        "decisive_input_missing"
+      ],
+      "rationale": "Une observation unique n’établit ni comportement dynamique ni direction de boucle."
+    }
+  ]
+}

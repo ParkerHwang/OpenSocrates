@@ -1,0 +1,112 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "pdca-cycle-positive-1",
+      "kind": "positive",
+      "prompt": "Une file d’assistance a une référence vérifiée et l’hypothèse qu’un petit changement de triage réduira l’attente sans réduire la qualité de résolution. Définissez Plan, un Do délimité, la règle Check et la décision Act pour un cycle réversible.",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis",
+        "chosen_plan"
+      ],
+      "rationale": "La demande concerne une itération opérationnelle contrôlée avec référence, objectif mesurable, périmètre sûr et décision de standardiser ou réviser. Le cycle doit préserver la référence vérifiée et étiqueter séparément les nouvelles preuves de comparaison."
+    },
+    {
+      "id": "pdca-cycle-positive-2",
+      "kind": "positive",
+      "prompt": "Nous proposons un changement d’étiquette d’emballage d’une semaine dans une zone d’entrepôt. Fixez objectif et indicateur, garde-fous et condition d’arrêt, comparez résultats attendus et observés et décidez de standardiser ou réviser.",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis",
+        "chosen_plan"
+      ],
+      "rationale": "La petite zone et la fenêtre d’une semaine permettent un cycle PDCA délimité. La comparaison doit rester locale, sans faire d’un cycle la preuve d’un standard permanent."
+    },
+    {
+      "id": "pdca-cycle-positive-3",
+      "kind": "positive",
+      "prompt": "Un goulet d’étranglement connu a un changement proposé, un responsable et une mesure reproductible. Produisez un schéma Plan–Do–Check–Act consignant les écarts et créant la prochaine hypothèse d’amélioration versionnée.",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis",
+        "practical_consequence"
+      ],
+      "rationale": "Le fonctionnement et la mesure sont établis ; la tâche relève donc de l’amélioration itérative, pas de la découverte de cause profonde. L’état du prochain cycle rend apprentissage et révision du standard visibles."
+    },
+    {
+      "id": "pdca-cycle-negative-1",
+      "kind": "negative",
+      "prompt": "Un défaut de production a plusieurs causes possibles et aucune chronologie fiable. Expérimentez immédiatement une nouvelle étape d’approbation pour voir si le défaut disparaît.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "diagnose",
+        "causal_question",
+        "confounding",
+        "decisive_input_missing"
+      ],
+      "rationale": "Une cause profonde inconnue et des preuves manquantes font courir au cycle le risque de masquer la défaillance. Root-cause-analysis doit établir la limite causale avant un autre changement testé."
+    },
+    {
+      "id": "pdca-cycle-negative-2",
+      "kind": "negative",
+      "prompt": "Un déversement chimique est toujours actif. Modifiez le standard de manipulation sur le terrain et apprenez de la prochaine exposition avant d’appeler l’équipe d’intervention.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "safety_critical_validation",
+        "recurring_failure"
+      ],
+      "rationale": "Le préjudice actif et l’urgence de sécurité contre-indiquent un cycle PDCA improvisé. Confinement et procédures d’incident qualifiées priment sur l’apprentissage itératif."
+    },
+    {
+      "id": "pdca-cycle-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Additionnez les quatre décomptes quotidiens fournis et renvoyez le total sans interpréter le processus ni recommander de changement.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Additionner des décomptes fournis est un calcul déterministe, pas une décision d’amélioration Plan–Do–Check–Act."
+    },
+    {
+      "id": "pdca-cycle-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez un cycle PDCA pour cette amélioration opérationnelle. Montrez objectif et mesure, périmètre Do délimité, règle Check, décision Act, état des preuves et hypothèse du prochain cycle.",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis"
+      ],
+      "rationale": "L’utilisateur nomme explicitement la méthode et ses résultats publics requis. La procédure doit suspendre si la mesure décisive ou le périmètre sûr manque."
+    },
+    {
+      "id": "pdca-cycle-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Améliorez notre processus avec PDCA. Nous n’avons ni objectif, référence, changement proposé, mesure, périmètre sûr, responsable ni règle de standardisation du résultat.",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis"
+      ],
+      "rationale": "PDCA est explicitement demandé, mais toutes les entrées décisives manquent. Il faut suspendre plutôt que lancer un changement illimité ou standardiser un résultat non mesuré."
+    }
+  ]
+}

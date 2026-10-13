@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: jobs-to-be-done-positive-01
+    kind: positive
+    prompt: "Pequeñas empresas contratan contabilidad tras un plazo fiscal estresante; descubre progreso, tranquilidad emocional, señal social y alternativas."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Un momento específico de dificultad y múltiples dimensiones explican la contratación mejor que funciones o demografía."
+  - id: jobs-to-be-done-positive-02
+    kind: positive
+    prompt: "Usuarios conservan una hoja lenta en vez de adoptar la herramienta nueva; mapea empuje, atracción, hábito, ansiedad y progreso."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "La pregunta se centra en fuerzas de cambio, no consumo y progreso buscado."
+  - id: jobs-to-be-done-positive-03
+    kind: positive
+    prompt: "Un servicio de transporte quiere saber para qué lo contratan los pasajeros durante viajes nocturnos y cómo observar éxito."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Se necesitan progreso funcional, emocional y social específicos y una medida de éxito."
+  - id: jobs-to-be-done-negative-01
+    kind: negative
+    prompt: "La frustración observada debe convertirse en tres prototipos y una prueba segura antes de comprometerse con producto."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "Se necesitan conceptos y prototipos guiados por observación, no solo análisis de trabajos y fuerzas."
+  - id: jobs-to-be-done-negative-02
+    kind: negative
+    prompt: "Un equipo debe comparar dos opciones de incorporación por consecuencias medibles en un piloto reversible."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "El obstáculo decisorio es comparación práctica, no descubrir un trabajo subyacente."
+  - id: jobs-to-be-done-mechanical-01
+    kind: mechanical
+    prompt: "Pon las transcripciones de entrevistas en archivos separados sin inferir trabajos ni motivos."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Organizar archivos es mecánico aunque sean entrevistas de usuarios."
+  - id: jobs-to-be-done-explicit-01
+    kind: explicit
+    prompt: "Usa jobs-to-be-done para explicar por qué los viajeros cambian de autobuses a patinetes durante un turno tardío."
+    expected_route: jobs-to-be-done
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, user_progress]
+    rationale: "El usuario solicita explícitamente analizar situación y fuerzas de cambio."
+  - id: jobs-to-be-done-insufficiency-01
+    kind: insufficiency
+    prompt: "Solo hay una lista de funciones; declara el trabajo universal de todo cliente y fija una tasa de éxito para todo el mercado."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [user_progress, decisive_input_missing]
+    rationale: "Una lista de funciones no establece trabajos específicos ni tasas de mercado."

@@ -1,0 +1,117 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "trade-off-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Elige entre tres proveedores según rapidez, fiabilidad, accesibilidad y coste total. Compras documentó vetos y cada actor aportó preferencias fechadas para el resto.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Hay opciones y criterios explícitos, restricción separada y procedencia de pesos. Muestra concesiones sin fingir valores intercambiables."
+    },
+    {
+      "id": "trade-off-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "El equipo debe elegir diseño equilibrando rendimiento, mantenimiento, privacidad y esfuerzo. Algunas valoraciones tienen pruebas, otras entrevistas; privacidad es mínimo, no puntuación.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "source_quality"
+      ],
+      "rationale": "Se necesita comparación con procedencia y privacidad no compensable. Etiqueta evidencia mixta sin aplanarla."
+    },
+    {
+      "id": "trade-off-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Dos planes de personal difieren en cobertura, continuidad, coste y carga. Hay orden ordinal acordado, no escala numérica; muestra ganador y cambio que lo invertiría.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "sensitive_inputs"
+      ],
+      "rationale": "Se solicita compensación ordinal y condición de cambio, evitando falsa precisión."
+    },
+    {
+      "id": "trade-off-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "La norma exige protección contra incendios específica. Solo queda un diseño conforme; se pregunta si otro barato no conforme puede ganar por comodidad.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "single_feasible_option",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "Se trata obligación como compensable. Encaja deontic-reasoning o revisión cualificada, no compensaciones."
+    },
+    {
+      "id": "trade-off-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "No sabemos si estudiar clientes antes de elegir diseño. Se pregunta cuánto cambiaría decisión y si vale la demora, no cómo comparar diseños hoy.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "new_evidence",
+        "sensitive_inputs"
+      ],
+      "rationale": "La confusión probable es value-of-information: valorar información adicional, no ponderar opciones actuales."
+    },
+    {
+      "id": "trade-off-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Ordena registros verificados por la única puntuación suministrada. No se pide elegir criterios, resolver preferencias ni explicar recomendación.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Ordenación fija mecánica sin compensaciones discrecionales."
+    },
+    {
+      "id": "trade-off-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Usa trade-off-analysis para ubicaciones. Separa vetos y preferencias, conserva fuentes de valoraciones y muestra renuncias de la recomendación.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "choose",
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "Invocación explícita con contrato comparativo; valoraciones sin respaldo siguen supuestas o no verificadas."
+    },
+    {
+      "id": "trade-off-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Elige la mejor de alternativas sin nombre. No acordamos criterios, mínimos ni de quién deben contar las prioridades.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "decisive_input_missing"
+      ],
+      "rationale": "Faltan viabilidad, criterios y procedencia. Recomendar sería puntuación posterior; suspende."
+    }
+  ]
+}

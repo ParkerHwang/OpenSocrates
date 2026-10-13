@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/domain"
@@ -556,19 +557,31 @@ func (r acceptanceRegistrationRunner) Run(_ context.Context, binary string, args
 }
 func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]any) bool {
 	passed := true
-	for _, version := range []string{"1.5.0", "1.5.1"} {
-		preferences := []string{"en", "ko"}
-		if version == "1.5.1" {
-			preferences = releasedLocales
-		}
+	for _, version := range []string{"1.5.0", "1.5.1", "1.5.2"} {
+		preferences, _ := acceptanceLegacyFixtureIdentity(version)
 		for _, locale := range preferences {
 			if !acceptanceMigrationVersionCase(tmp, packageRoot, fixture, version, locale, cases) {
 				passed = false
 			}
 		}
 	}
-	cases["npm_owned_state_adoption_fixture"] = map[string]any{"pass": passed, "evidence_scope": "synthetic_legacy_1.5.0_and_1.5.1_marker_state_locale_registration_and_rollback; native_scheduler_commands_mocked; not_real_npm_release", "legacy_runtime_execution_claimed": false}
+	cases["npm_owned_state_adoption_fixture"] = map[string]any{"pass": passed, "evidence_scope": "synthetic_legacy_1.5.0_1.5.1_and_1.5.2_marker_state_locale_registration_and_rollback; native_scheduler_commands_mocked; not_real_npm_release", "legacy_runtime_execution_claimed": false}
 	return passed
+}
+
+// Previous releases retain their own closed coverage when the current frozen
+// content baseline grows. These are synthetic ownership/adoption fixtures.
+func acceptanceLegacyFixtureIdentity(version string) ([]string, int) {
+	switch version {
+	case "1.5.0":
+		return []string{"en", "ko"}, 3
+	case "1.5.1":
+		return []string{"en", "ko", "zh", "ja"}, 4
+	case "1.5.2":
+		return releasedLocales, 5
+	default:
+		return nil, 0
+	}
 }
 
 func acceptanceMigrationVersionCase(tmp, packageRoot, fixture, legacyVersion, preference string, cases map[string]any) bool {
@@ -616,32 +629,48 @@ func acceptanceMigrationVersionCase(tmp, packageRoot, fixture, legacyVersion, pr
 		return record(false)
 	}
 	manifest["product_version"] = legacyVersion
-	if legacyVersion == "1.5.0" {
-		manifest["content_revision"] = 3
+	allowedLocales, legacyRevision := acceptanceLegacyFixtureIdentity(legacyVersion)
+	if legacyRevision == 0 {
+		return record(false)
+	}
+	manifest["content_revision"] = legacyRevision
+	if len(allowedLocales) < len(releasedLocales) {
+		allowed := map[string]bool{}
+		for _, locale := range allowedLocales {
+			allowed[locale] = true
+		}
 		retained := []any{}
 		for _, raw := range arr(manifest["canonical_methods"]) {
 			entry := obj(raw)
 			locale := str(entry["locale"])
-			if locale == "en" || locale == "ko" {
-				path := filepath.Join(legacyPackage, filepath.FromSlash(str(entry["path"])))
-				body, readError := platform.ReadOwnedFile(path, lifecycle.MaxFileBytes)
-				if readError != nil {
-					return record(false)
-				}
-				text := strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(string(body), "Content revision: 4", "Content revision: 3"), "콘텐츠 리비전: 4", "콘텐츠 리비전: 3"), "`@4)", "`@3)")
-				if e = platform.AtomicWrite(path, []byte(text), 0644); e != nil {
-					return record(false)
-				}
-				entry["sha256"] = digest([]byte(text))
-				retained = append(retained, raw)
+			if !allowed[locale] {
+				continue
 			}
+			path := filepath.Join(legacyPackage, filepath.FromSlash(str(entry["path"])))
+			body, readError := platform.ReadOwnedFile(path, lifecycle.MaxFileBytes)
+			if readError != nil {
+				return record(false)
+			}
+			labels := referenceLocaleLabels[locale]
+			text := strings.ReplaceAll(string(body), labels.revision+": 5", fmt.Sprintf("%s: %d", labels.revision, legacyRevision))
+			text = strings.ReplaceAll(text, "`@5)", fmt.Sprintf("`@%d)", legacyRevision))
+			if e = platform.AtomicWrite(path, []byte(text), 0644); e != nil {
+				return record(false)
+			}
+			entry["sha256"] = digest([]byte(text))
+			retained = append(retained, raw)
 		}
 		manifest["canonical_methods"] = retained
 		inventory := []any{}
 		for _, raw := range arr(manifest["files"]) {
 			entry := obj(raw)
 			path := str(entry["path"])
-			remove := strings.HasPrefix(path, "skills/opensocrates/references/decision/methods/zh/") || strings.HasPrefix(path, "skills/opensocrates/references/decision/methods/ja/")
+			remove := false
+			for _, locale := range releasedLocales {
+				if !allowed[locale] && strings.HasPrefix(path, "skills/opensocrates/references/decision/methods/"+locale+"/") {
+					remove = true
+				}
+			}
 			if remove {
 				if e = platform.Remove(filepath.Join(legacyPackage, filepath.FromSlash(path))); e != nil {
 					return record(false)
@@ -651,9 +680,11 @@ func acceptanceMigrationVersionCase(tmp, packageRoot, fixture, legacyVersion, pr
 			inventory = append(inventory, raw)
 		}
 		manifest["files"] = inventory
-		for _, locale := range []string{"zh", "ja"} {
-			if e = platform.RemoveTree(filepath.Join(legacyPackage, "skills/opensocrates/references/decision/methods", locale)); e != nil {
-				return record(false)
+		for _, locale := range releasedLocales {
+			if !allowed[locale] {
+				if e = platform.RemoveTree(filepath.Join(legacyPackage, "skills/opensocrates/references/decision/methods", locale)); e != nil {
+					return record(false)
+				}
 			}
 		}
 	}

@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "reflective-equilibrium-positive-01",
+      "kind": "positive",
+      "prompt": "หลักการยุติธรรมดูถูกต้อง จนกระทั่งนำไปใช้กับกรณียากสามกรณี แก้หลักการหรือคำตัดสินและรักษาความตึงค้างให้เห็น",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "งานขอปรับร่วมระหว่างคำตัดสินไตร่ตรอง หลักการ และกรณียาก"
+    },
+    {
+      "id": "reflective-equilibrium-positive-02",
+      "kind": "positive",
+      "prompt": "สถาบันให้ค่าความเป็นส่วนตัวและรับผิดชอบแต่เหตุยากก่อขัด เทียบการแก้ที่รักษาทั้งคู่เท่าที่ทำได้",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "คุณค่าขัดและมีดุลพินิจต้องหลักการ กรณี การแก้ และตึงค้างชัด"
+    },
+    {
+      "id": "reflective-equilibrium-positive-03",
+      "kind": "positive",
+      "prompt": "คำตัดสินกรณีที่ทีมวิชาชีพรับขัดหลักการที่กล่าว ทดสอบตัวอย่างค้านและระบุสมมติฐานพื้นหลังที่ควรเปลี่ยน",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "การตัดสินพึ่งวนกรณี หลักการ และสมมติฐานพื้นหลัง"
+    },
+    {
+      "id": "reflective-equilibrium-negative-01",
+      "kind": "negative",
+      "prompt": "กฎระเบียบที่ระบุห้ามการกระทำเสนอชัดและไม่มีดุลพินิจ หาทางเลือกอนุญาต",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "กฎผูกพันตัดสินสถานะ ไม่ใช่ปรับสะท้อนหลักการ"
+    },
+    {
+      "id": "reflective-equilibrium-negative-02",
+      "kind": "negative",
+      "prompt": "ทีมปัดข้อคัดค้านผู้เกี่ยวข้องโดยไม่สร้างเหตุยุติธรรมแข็งสุดหรือหลักฐานต้องการใหม่",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "ช่องทันทีคือกรณีค้านยังไม่ทดสอบ ไม่ใช่ขัดระหว่างหลักการ/คำตัดสินไตร่ตรอง"
+    },
+    {
+      "id": "reflective-equilibrium-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "คัดหลักการและคำอธิบายกรณีลงเอกสารทบทวนโดยไม่เปรียบหรือแก้",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "คัดลอกเป็นเชิงกล ไม่ขอสอดคล้องบรรทัดฐาน"
+    },
+    {
+      "id": "reflective-equilibrium-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ reflective-equilibrium ตรวจหลักการยุติธรรมกับกรณียากเหล่านี้และระบุตึงค้าง",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "ผู้ใช้ขอปรับกรณี-หลักการเป็นรอบชัด"
+    },
+    {
+      "id": "reflective-equilibrium-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "มีกฎปลอดภัยผูกพันใช้ แต่ขอผู้ช่วยถ่วงให้กฎหายเพราะกรณีหนึ่งรู้สึกไม่ยุติธรรม",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "value_conflict",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "วิธีห้ามสร้างดุลพินิจหรือข้ามกฎปลอดภัยผูกพัน"
+    }
+  ]
+}

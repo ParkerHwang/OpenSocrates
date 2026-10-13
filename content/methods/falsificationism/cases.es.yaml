@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: falsificationism-positive-01
+    kind: positive
+    prompt: "¿Qué observación contaría decisivamente contra esta hipótesis de producto preferida?"
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "Se necesita una predicción arriesgada y refutador observable, no más anécdotas confirmatorias."
+  - id: falsificationism-positive-02
+    kind: positive
+    prompt: "Convierte esta explicación en pronóstico, separa supuestos auxiliares y define el umbral de fallo antes de probar."
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "Se solicita intento de refutación previamente especificado con condiciones de medición."
+  - id: falsificationism-positive-03
+    kind: positive
+    prompt: "¿La predicción fallida debilitó teoría, medición o un supuesto auxiliar de configuración?"
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "El método debe localizar qué cuestiona realmente una prueba fallida."
+  - id: falsificationism-negative-01
+    kind: negative
+    prompt: "Genera varias explicaciones de la anomalía y compara cuál da mejor cuenta de los hechos."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Generar explicaciones candidatas es abductivo sin predicción arriesgada especificada."
+  - id: falsificationism-negative-02
+    kind: negative
+    prompt: "Clasifica fuentes por rigor de diseño y ajusta la solidez de la afirmación a su aplicabilidad."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "La tarea calibra jerarquía probatoria en lugar de intentar refutar."
+  - id: falsificationism-mechanical-01
+    kind: mechanical
+    prompt: "Copia la predicción preregistrada y el umbral en el formulario de prueba."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copiar una especificación proporcionada es mecánico."
+  - id: falsificationism-explicit-01
+    kind: explicit
+    prompt: "Invoca explícitamente falsificationism para cuestionar que esta intervención siempre mejore la retención."
+    expected_route: falsificationism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, testable_claim]
+    rationale: "El usuario elige una prueba orientada a refutar una afirmación universal."
+  - id: falsificationism-insufficiency-01
+    kind: insufficiency
+    prompt: "Usa falsificationism con una afirmación sin predicción observable ni posibilidad de indicar qué contaría en su contra."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [testable_claim]
+    rationale: "Se aplica la contraindicación fijada: sin implicación comprobable, debe rechazarse el método en lugar de fabricar un refutador."

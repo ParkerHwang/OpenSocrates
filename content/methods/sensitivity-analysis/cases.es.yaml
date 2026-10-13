@@ -1,0 +1,106 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "sensitivity-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Comparamos dos almacenes según demanda, coste de mano de obra y energía. Fórmula y umbral están documentados, con intervalos defendibles de entradas. Prueba intervalos, muestra valores de cambio y robustez o fragilidad.",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "multiple_objectives",
+        "choose"
+      ],
+      "rationale": "Hay modelo, comparación, referencia, intervalos y umbral; se pide variar entradas y revelar cambio, no inventar probabilidades."
+    },
+    {
+      "id": "sensitivity-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "Tenemos modelo de personal con objetivo publicado de respuesta. Prueba volumen, duración y personal en intervalos con fuentes respetando dependencias; prioriza investigación decisiva.",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "unknown_probability",
+        "choose",
+        "information_purchase"
+      ],
+      "rationale": "Modelo, umbral, incertidumbre y dependencias están presentes. Puede reportarse cambio calculado u ordinal sin probabilidades fabricadas."
+    },
+    {
+      "id": "sensitivity-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Un comité puntúa tres proyectos según coste, impacto y riesgo de ejecución. Pesos documentados pero disputados podrían cambiar recomendación. Varía pesos y notas en intervalos justificados, registra umbrales y supuestos frágiles.",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "multiple_objectives",
+        "choose"
+      ],
+      "rationale": "Comparación estructurada con pesos inciertos y posible cambio. Revela sensibilidad antes de tratar ponderaciones como asentadas."
+    },
+    {
+      "id": "sensitivity-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "No hay modelo ni umbral. Revisa estudios contradictorios, credibilidad de fuentes y conciliación de evidencia sobre seguridad.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "conflicting_sources",
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "Posible confusión con evidence-hierarchy o conciliación: sin modelo, regla ni umbral no hay relación que variar."
+    },
+    {
+      "id": "sensitivity-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Explora cuatro futuros externos de diez años y preparaciones. No hay modelo cuantitativo, puntuación ni relación variable.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "decisive_input_missing"
+      ],
+      "rationale": "Se construyen escenarios con incertidumbre profunda y sin modelo. Sensibilidad fabricaría una referencia no comprobable."
+    },
+    {
+      "id": "sensitivity-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Multiplica cantidades verificadas por el factor indicado y devuelve conversiones. No hay modelo, comparación ni umbral decisorio.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Conversión determinista sin intervalos inciertos ni fragilidad decisoria."
+    },
+    {
+      "id": "sensitivity-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Usa sensitivity-analysis para precios. Modelo base de contribución, intervalos disputados de volumen y margen y mínimo aceptable están documentados; encuentra umbrales y suspende intervalos sin procedencia.",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "sensitive_inputs",
+        "choose"
+      ],
+      "rationale": "Invocación explícita con referencia, intervalos, umbral y suspensión. El resultado sigue calculado o etiquetado, no probabilístico."
+    },
+    {
+      "id": "sensitivity-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Dime si la recomendación es sensible. No he dado modelo, entradas, intervalos, umbral ni fórmula.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "Todos son decisivos; suspende y solicita esas entradas acotadas sin afirmaciones genéricas."
+    }
+  ]
+}

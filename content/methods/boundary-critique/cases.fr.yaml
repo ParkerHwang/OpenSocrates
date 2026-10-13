@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "boundary-critique-positive-01",
+      "kind": "positive",
+      "prompt": "Notre ville doit-elle juger la refonte des bus uniquement selon le trajet moyen des usagers actuels ?",
+      "expected_route": "boundary-critique",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "boundary_sensitive",
+        "stakeholder_conflict"
+      ],
+      "rationale": "La conclusion change si les non-usagers, l'accessibilité, les quartiers ou l'horizon temporel entrent dans le périmètre."
+    },
+    {
+      "id": "boundary-critique-positive-02",
+      "kind": "positive",
+      "prompt": "Qui doit compter pour décider si l'essai de surveillance au travail a réussi ?",
+      "expected_route": "boundary-critique",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "boundary_sensitive",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Le jugement de réussite dépend des salariés inclus, des prestataires exclus, des responsabilités et des résultats mesurés."
+    },
+    {
+      "id": "boundary-critique-positive-03",
+      "kind": "positive",
+      "prompt": "Le plan contre les inondations côtières reste-t-il pertinent si nous incluons les locataires et les coûts de relocalisation des trente prochaines années ?",
+      "expected_route": "boundary-critique",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "boundary_sensitive",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Changer les acteurs touchés et l'horizon temporel peut inverser qui bénéficie, qui paie et quelle option est préférée."
+    },
+    {
+      "id": "boundary-critique-negative-01",
+      "kind": "negative",
+      "prompt": "Comparez les deux fournisseurs au périmètre explicite selon les trois critères fixes de prix et de latence.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "multiple_options",
+        "choose"
+      ],
+      "rationale": "Le périmètre, le responsable, l'horizon et les critères sont déjà explicites ; il reste à comparer les options."
+    },
+    {
+      "id": "boundary-critique-negative-02",
+      "kind": "negative",
+      "prompt": "Quel paragraphe contient la citation la plus solide pour l'affirmation donnée ?",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "C'est une question de soutien par les sources, pas d'inclusion dans le périmètre du système."
+    },
+    {
+      "id": "boundary-critique-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Placez les parties prenantes listées dans un CSV avec les colonnes nom et rôle.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "La mise en forme d'une liste fournie est mécanique et ne doit pas déclencher de méthode de jugement."
+    },
+    {
+      "id": "boundary-critique-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez boundary-critique pour vérifier si notre engagement climatique exclut les travailleurs de la chaîne d'approvisionnement.",
+      "expected_route": "boundary-critique",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "boundary_sensitive"
+      ],
+      "rationale": "L'utilisateur invoque explicitement la méthode pour une question d'acteurs touchés et de périmètre."
+    },
+    {
+      "id": "boundary-critique-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Dites si la recommandation change en incluant toutes les personnes touchées, mais sans fournir la décision, la population ni l'horizon temporel.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "boundary_sensitive",
+        "decisive_input_missing"
+      ],
+      "rationale": "Les entrées qui définissent le périmètre sont décisives et absentes ; la méthode doit suspendre le résultat plutôt qu'inventer un ensemble touché."
+    }
+  ]
+}

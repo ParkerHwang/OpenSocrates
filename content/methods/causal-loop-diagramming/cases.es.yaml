@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-loop-diagramming-positive-01
+    kind: positive
+    prompt: "Una cola alarga la espera, la espera causa abandono y el abandono modifica la demanda futura de personal; mapea el bucle con signos y el retraso."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "Se solicitan variables nombradas, vínculos con signos, tipo de bucle y efecto tardío que configura el patrón."
+  - id: causal-loop-diagramming-positive-02
+    kind: positive
+    prompt: "El crecimiento de usuarios aumenta las reseñas, las reseñas atraen usuarios y los límites de capacidad crean una respuesta compensadora; identifica ambos bucles."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Deben representarse explícitamente varios bucles direccionales y una restricción compensadora."
+  - id: causal-loop-diagramming-positive-03
+    kind: positive
+    prompt: "Una política alivia rápido, pero luego rebota porque la aplicación modifica el comportamiento con gran retraso; dibuja la explicación de retroalimentación."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "Se solicita una explicación mediante bucles con signos de resistencia tardía a políticas, no estimar un único efecto."
+  - id: causal-loop-diagramming-negative-01
+    kind: negative
+    prompt: "Una organización amplia tiene muchos actores, existencias y efectos secundarios; decide el mejor punto de intervención antes de elegir un diagrama compacto de bucles."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "La pregunta de límite sistémico amplio y punto de intervención debe establecerse antes del diagrama enfocado."
+  - id: causal-loop-diagramming-negative-02
+    kind: negative
+    prompt: "Un ensayo pregunta si un medicamento causó un resultado medido frente a un control, sin patrón dinámico recurrente."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "Una pregunta acotada de efecto contrafactual no requiere un bucle de retroalimentación."
+  - id: causal-loop-diagramming-mechanical-01
+    kind: mechanical
+    prompt: "Copia las etiquetas de bucles existentes en una presentación y conserva su orden sin evaluar ninguna relación."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copiar y dar formato no requieren juicio causal."
+  - id: causal-loop-diagramming-explicit-01
+    kind: explicit
+    prompt: "Aplica causal-loop-diagramming para mostrar por qué los descuentos aumentan demanda pero luego generan falta de existencias y pérdida de confianza."
+    expected_route: causal-loop-diagramming
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay]
+    rationale: "El usuario nombra el método y proporciona un patrón recurrente reforzador y compensador."
+  - id: causal-loop-diagramming-insufficiency-01
+    kind: insufficiency
+    prompt: "Dos variables se movieron juntas una vez, pero se desconocen dirección, temporalidad y repetición; dibuja un bucle reforzador verificado."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "Un único movimiento conjunto sin dirección ni temporalidad no respalda un bucle con signos."

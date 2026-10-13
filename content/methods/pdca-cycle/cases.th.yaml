@@ -1,0 +1,112 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "pdca-cycle-positive-1",
+      "kind": "positive",
+      "prompt": "คิวสนับสนุนมีฐาน verified และสมมติฐานว่าปรับคัดงานเล็กจะลดรอไม่ลดคุณภาพแก้ กำหนด Plan, Do จำกัด, กฎ Check และ Act สำหรับวงย้อนกลับหนึ่งวง",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis",
+        "chosen_plan"
+      ],
+      "rationale": "เป็นการปรับปฏิบัติการควบคุม มีฐาน เป้าวัด ขอบปลอดภัย และตัดสินมาตรฐาน/แก้ รักษาฐาน verified และกำกับหลักฐานเทียบใหม่แยก"
+    },
+    {
+      "id": "pdca-cycle-positive-2",
+      "kind": "positive",
+      "prompt": "เสนอเปลี่ยนป้ายบรรจุหนึ่งสัปดาห์ในเขตคลังหนึ่ง ตั้งเป้าและตัววัด ข้อคุ้มครอง/หยุด เทียบคาดกับพบ และตัดสินมาตรฐานหรือแก้",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis",
+        "chosen_plan"
+      ],
+      "rationale": "เขตเล็กกับหนึ่งสัปดาห์รองรับ PDCA จำกัด ผลต้องคงการเทียบเฉพาะที่ ไม่ถือวงเดียวพิสูจน์มาตรฐานถาวร"
+    },
+    {
+      "id": "pdca-cycle-positive-3",
+      "kind": "positive",
+      "prompt": "คอขวดงานที่ทราบมีข้อเปลี่ยน เจ้าของ และตัววัดทำซ้ำได้ ทำโครง Plan–Do–Check–Act ที่บันทึกคลาดและสร้างสมมติฐานปรับปรุงรุ่นถัดไป",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis",
+        "practical_consequence"
+      ],
+      "rationale": "ทราบเงื่อนไขงานและการวัดแล้ว งานคือปรับซ้ำไม่ค้นราก สถานะวงถัดไปที่ขอทำการเรียนและแก้มาตรฐานเห็นได้"
+    },
+    {
+      "id": "pdca-cycle-negative-1",
+      "kind": "negative",
+      "prompt": "ข้อบกพร่องผลิตมีหลายเหตุเป็นไปได้และไม่มีเวลาเชื่อถือ ทดลองเพิ่มอนุมัติทันทีดูว่าหายไหม",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "diagnose",
+        "causal_question",
+        "confounding",
+        "decisive_input_missing"
+      ],
+      "rationale": "รากไม่ทราบและหลักฐานขาดทำวงปรับกลบล้มได้ Root-cause-analysis ควรสร้างขอบเหตุก่อนทดสอบเปลี่ยนอีก"
+    },
+    {
+      "id": "pdca-cycle-negative-2",
+      "kind": "negative",
+      "prompt": "สารเคมียังหกอยู่ เปลี่ยนมาตรฐานจัดการในพื้นที่และเรียนจากการเผชิญถัดไปก่อนเรียกทีมตอบเหตุ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "safety_critical_validation",
+        "recurring_failure"
+      ],
+      "rationale": "อันตรายกำลังเกิดและตอบฉุกเฉินห้ามวง PDCA ด้นสด ควบคุมเหตุและกระบวนการผู้มีคุณสมบัติมาก่อนเรียนซ้ำ"
+    },
+    {
+      "id": "pdca-cycle-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "บวกจำนวนรายวันสี่ค่าที่ให้และคืนผลรวม ไม่ตีความกระบวนการหรือเสนอเปลี่ยน",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "บวกค่าที่ให้เป็นคำนวณกำหนดตายตัว ไม่ใช่ตัดสินปรับ Plan–Do–Check–Act"
+    },
+    {
+      "id": "pdca-cycle-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้วง PDCA กับปรับปฏิบัติการนี้ แสดงเป้า/ตัววัด ขอบ Do กฎ Check การตัดสิน Act สถานะหลักฐาน และสมมติฐานวงถัดไป",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis"
+      ],
+      "rationale": "ผู้ใช้ระบุวิธีและผลสาธารณะจำเป็น ต้องพักหากตัววัดชี้ขาดหรือขอบปลอดภัยขาด"
+    },
+    {
+      "id": "pdca-cycle-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "ทำกระบวนการให้ดีด้วย PDCA ไม่มีเป้า ฐาน ข้อเปลี่ยน ตัววัด ขอบปลอดภัย เจ้าของ หรือกฎมาตรฐานผล",
+      "expected_route": "pdca-cycle",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "repeat_iteration",
+        "plan",
+        "testable_hypothesis"
+      ],
+      "rationale": "ขอ PDCA ชัดแต่ข้อมูลชี้ขาดหมดขาด ต้องพักแทนเปลี่ยนไร้ขอบหรือทำผลไม่วัดเป็นมาตรฐาน"
+    }
+  ]
+}

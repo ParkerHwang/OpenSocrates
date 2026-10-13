@@ -108,7 +108,9 @@ Generated source identity: `{{SOURCE_TREE_HASH}}`.
 
 ## Decision-point retrieval (v{{PRODUCT_VERSION}})
 
-The controller links `skills/opensocrates/references/decision/guide.en.md` and `skills/opensocrates/references/decision/guide.ko.md`.
+The controller links the language-specific
+`skills/opensocrates/references/decision/guide.<locale>.md` guides for all ten
+locales listed below.
 Read routing metadata and complete selected locale-specific canonical references
 at a materially changed judgment within the same request. Mechanical steps need
 none. This is agent-directed in-turn lookup, not automatic observation of every
@@ -132,3 +134,19 @@ executor. Its hook configuration invokes the Go executable through an expanded
 environment variable. Cmd and custom Windows shells are outside this package's
 qualification; an unavailable or disabled hook keeps the ordinary host task
 running and does not establish a delivery receipt.
+
+Canonical procedures, decision catalogs, reader guides, controllers and presentation
+guidance are available in English (`en`), Korean (`ko`), Simplified Chinese (`zh`),
+Japanese (`ja`), French (`fr`), German (`de`), Italian (`it`), Spanish (`es`),
+Portuguese (`pt`) and Thai (`th`). Each locale contains all {{METHOD_COUNT}}
+canonical methods.
+Locale availability is content delivery, not live host application evidence.
+
+
+To inspect the local native language preference, run
+`bin/launch.sh locale codex get`. Set it with
+`bin/launch.sh locale codex set zh` or `set ja`; `en`, `ko`, `fr`, `de`, `it`, `es`, `pt`, `th` and `follow`
+are also accepted. `bin/launch.sh locale codex reset` restores the follow preference.
+This setting applies to the retained selector path. Decision requests use their
+explicit JSON `locale`, and content-only account/workspace packages use the
+matching guide and catalog without a local runtime setting.

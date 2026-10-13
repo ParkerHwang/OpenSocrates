@@ -33,12 +33,12 @@ base to reuse blindly; issue #109 tracks preparation only.
   `src/opensocrates/`; OS filesystem/process protection and host registration
   remain separate from transaction/recovery and package transport.
 - Canonical reasoning content belongs under `content/methods/`. v1.6.0 freezes
-  the released v1.5.1 baseline: 48 methods and EN/KO/ZH/JA, content revision 4.
+  the released v1.5.2 baseline: 48 methods and ten languages, content revision 5.
   The original v1.5.0/revision-3 preparation is historical. The separate 48 method-body upgrades belong to
   v1.6.1 or later. Preserve English/Korean methods, teacher questions,
   applicability, evidence/stop conditions, response policy and shared guides.
-- Teacher questions belong in `content/teacher-questions.yaml`: four locales,
-  three per method (576 total), unique within each locale, addressed to the active agent.
+- Teacher questions belong in `content/teacher-questions.yaml`: ten locales,
+  three per method (1,440 total), unique within each locale, addressed to the active agent.
   The overlay revision must match the canonical content revision; changing it
   does not rewrite an authored method's revision.
 - Schemas belong under `schemas/source/`. Preserve wire formats, persisted
@@ -59,10 +59,13 @@ base to reuse blindly; issue #109 tracks preparation only.
   workspace-content retention or hidden reasoning capture. Preserve fail-open
   hooks, bounded selection, cleanup, ownership checks and verified rollback.
 
-Reconcile any newly published maintenance release before final v1.6.0
-publication. The separate v1.5.2 language expansion remains draft work until its
-source and publication are verified; no ten-language support claim follows from
-an in-progress task. Preserve old evidence with its original revision.
+The released v1.5.2 baseline is source
+`9838db16910c5f22d9dcc3c7180350cb406fd236`, not its annotated tag object
+`4c27d59da54eb1591ba24c0ebae62d6ab3168b60`. Current main merge
+`8f08b9a90d711fa3fc60cc7db6f962e3dda43c42` has the same release tree, but remains a distinct commit identity.
+Reconcile any later maintenance release before final v1.6.0 publication.
+Preserve old evidence with its original revision and source; revision-4 receipts
+do not qualify revision-5 files even when original body text is unchanged.
 
 ## Implementation and final verification
 

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: conceptual-analysis-positive-01
+    kind: positive
+    prompt: "Was soll unser Team unter sicherer Freigabe verstehen, wenn Technik und Compliance den Begriff anders nutzen?"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms, argument_dispute]
+    rationale: "Bedeutungen und Grenzfälle müssen vor handlungsleitendem Freigabekriterium geprüft werden."
+  - id: conceptual-analysis-positive-02
+    kind: positive
+    prompt: "Ist diese Regel fair, wenn Beschäftigte Gleichbehandlung oder Chancengleichheit als Fairness verstehen?"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms, argument_dispute]
+    rationale: "Entscheidung hängt von konkurrierenden operationalen Bedeutungen und Fallfolgen ab."
+  - id: conceptual-analysis-positive-03
+    kind: positive
+    prompt: "Definiere „bereit zur Einführung“, damit Produkt und Support Grenzfälle konsistent einordnen."
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms]
+    rationale: "Brauchbare Definition verlangt notwendige/hinreichende Bedingungen und Grenztests."
+  - id: conceptual-analysis-negative-01
+    kind: negative
+    prompt: "Prüfe mit veröffentlichter API-Spezifikation, ob die Anfrage dokumentierte Pflichtfelder erfüllt."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "Operationale Definition ist verbindlich; direkte Regelanwendung."
+  - id: conceptual-analysis-negative-02
+    kind: negative
+    prompt: "Ordne diese drei Studien nach Designqualität und erkläre direkte Unterstützung der Wirkungsbehauptung."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Engpass ist Belegqualität und Anwendbarkeit statt strittiger Wortbedeutung."
+  - id: conceptual-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Ersetze in dieser Datei jedes „einführungsbereit“ durch „bereit zur Einführung“."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Wörtlicher Textersatz ist mechanisch und braucht keine Begriffsanalyse."
+  - id: conceptual-analysis-explicit-01
+    kind: explicit
+    prompt: "Nutze ausdrücklich conceptual-analysis, um „vertrauenswürdig“ für diesen Kundenbericht zu definieren."
+    expected_route: conceptual-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, ambiguous_terms]
+    rationale: "Nutzer benennt Verfahren für mehrdeutigen Begriff mit Berichtsfolge."
+  - id: conceptual-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "Entscheide, ob der strittige Begriff erfüllt ist, aber ohne Kontext, Fälle oder gesteuerte Entscheidung."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [ambiguous_terms, decisive_input_missing]
+    rationale: "Ohne Kontext und Fälle wäre operationale Bedeutung willkürlich und nicht sicher entscheidungsfähig."

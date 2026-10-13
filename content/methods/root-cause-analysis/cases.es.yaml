@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: root-cause-analysis-positive-01
+    kind: positive
+    prompt: "Un almacén envía artículos incorrectos cada pocas semanas tras un nuevo proceso de recogida; necesita prevención, no otra disculpa."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "El fallo repetido requiere separar síntomas, causas, controles y verificación de recurrencia."
+  - id: root-cause-analysis-positive-02
+    kind: positive
+    prompt: "Una interrupción reaparece tras reinicios locales; hay registros, traspasos y responsables de alertas para construir cadena causal."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose, failure_risk]
+    rationale: "Se busca condición sistémica controlable y responsable de prevención, no solo desencadenante inmediato."
+  - id: root-cause-analysis-positive-03
+    kind: positive
+    prompt: "Un fallo de calidad se repite entre turnos y se quiere distinguir acción del operador, interfaz, carga y controles ausentes."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "Recurrencia y separación de niveles son señales directas de análisis de causa raíz."
+  - id: root-cause-analysis-negative-01
+    kind: negative
+    prompt: "Un correo de precios aumentó registros; se pregunta si causó el incremento frente a un grupo de control."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "Se evalúa efecto de intervención y comparación contrafactual, no cadena de fallos recurrentes."
+  - id: root-cause-analysis-negative-02
+    kind: negative
+    prompt: "Quejas, personal y trabajo atrasado se refuerzan durante un año; se busca punto de intervención en esa dinámica."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "La retroalimentación con retrasos es más amplia que diagnosticar un incidente concreto."
+  - id: root-cause-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Da formato de tabla de dos columnas a la cronología sin diagnosticar por qué ocurrieron fallos."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "El formato es mecánico incluso si el texto describe incidentes repetidos."
+  - id: root-cause-analysis-explicit-01
+    kind: explicit
+    prompt: "Usa root-cause-analysis para el traspaso fallido recurrente e identifica responsable de prevención sin culpar a una persona."
+    expected_route: root-cause-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, recurring_failure, diagnose]
+    rationale: "Se invoca explícitamente método para fallo operativo recurrente."
+  - id: root-cause-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "Un único informe anónimo atribuye un lanzamiento fallido a un ingeniero; nombra a esa persona como causa raíz sin registros."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [recurring_failure, decisive_input_missing]
+    rationale: "Límites y evidencia son insuficientes; acusar sería inseguro y sin respaldo."

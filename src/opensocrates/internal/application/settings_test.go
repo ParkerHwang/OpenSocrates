@@ -30,7 +30,7 @@ func TestLocaleCommandsAreClosedAndPreserveNoops(t *testing.T) {
 	if got := LocaleGet(r); got["locale"] != "follow" {
 		t.Fatal(got)
 	}
-	for _, locale := range []string{"en", "ko", "zh", "ja", "follow"} {
+	for _, locale := range []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th", "follow"} {
 		got := LocaleSet(r, locale)
 		if got["status"] != "ok" || got["locale"] != locale {
 			t.Fatal(got)
@@ -44,7 +44,7 @@ func TestLocaleCommandsAreClosedAndPreserveNoops(t *testing.T) {
 		t.Fatal(got)
 	}
 	mutations := r.mutations
-	for _, locale := range []string{"", "zh-CN", "jp", "JA"} {
+	for _, locale := range []string{"", "zh-CN", "jp", "JA", "fr-FR", "pt-BR", "th-TH", "ru"} {
 		if got := LocaleSet(r, locale); got["error_code"] != "invalid_locale" {
 			t.Fatal(got)
 		}
@@ -62,7 +62,7 @@ func TestLocaleCommandsAreClosedAndPreserveNoops(t *testing.T) {
 }
 
 func TestControlPublicEventsPreserveAllReleasedLocales(t *testing.T) {
-	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+	for _, locale := range []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} {
 		a := ControlApplication{Locale: locale}
 		state := map[string]any{"task_id": domain.NewTaskID(), "host": "codex_cli"}
 		event := a.event(state, ControlRequest{}, 1, "task_cancelled", map[string]any{"reason": "user_cancelled"})

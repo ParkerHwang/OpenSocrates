@@ -1,0 +1,83 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: value-of-information-positive-1
+    kind: positive
+    prompt: "Wir können jetzt einführen oder zuerst Nutzerstudie durchführen. Nutzungsbefund löst verschiedene Einführungsaktionen aus; Methode und Kosten sind bekannt, Verzögerung hat festen Endtermin."
+    expected_route: value-of-information
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - new_evidence
+      - sensitive_inputs
+    rationale: "Information hat aktionsändernden Weg und begrenzte Last. Keine erfundene Erfolgswahrscheinlichkeit oder Geldbewertung nötig."
+  - id: value-of-information-positive-2
+    kind: positive
+    prompt: "Vor Liefervertrag können wir wahländernde Fehlerrisikovariable prüfen. Quelle, Kosten, Verzug und Schwelle sind dokumentiert; lohnt Inspektion?"
+    expected_route: value-of-information
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - irreversible_choice
+      - sensitive_inputs
+    rationale: "Information vor unumkehrbarer Entscheidung mit anderer Folgeaktion. Herkunft und Zeit ohne erfundene Nachherwahrscheinlichkeit zeigen."
+  - id: value-of-information-positive-3
+    kind: positive
+    prompt: "Ein Politikteam wählt Ausbau oder gezielte Evaluation. Prüfung unterscheidet Ausbau von Programmabbruch; Exposition und Frist sind genannt."
+    expected_route: value-of-information
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - testable_hypothesis
+      - feedback_delay
+    rationale: "Machbarer Test kann Aktion vor Frist ändern; keine offene Mehrrecherche."
+  - id: value-of-information-negative-1
+    kind: negative
+    prompt: "Finden Sie alles Interessante über Fernarbeit und Literaturübersicht. Entscheidung, Schwelle, Variable und Frist fehlen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - explain
+      - source_quality
+    rationale: "Offene Forschung ohne aktionsändernde Entscheidung; Wert erst nach Entscheidung und Schwelle beurteilbar."
+  - id: value-of-information-negative-2
+    kind: negative
+    prompt: "Sicherheitsregel verlangt genehmigte Schutzausrüstung. Könnte Recherche billigere ungenehmigte rechtfertigen? Kein Spielraum."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - binding_rule_without_discretion
+      - single_feasible_option
+    rationale: "Deontic-reasoning oder qualifizierte Sicherheitsprüfung: Information autorisiert keinen Regelverzicht."
+  - id: value-of-information-mechanical-1
+    kind: mechanical
+    prompt: "Berechnen Sie benötigte Stichprobe aus gegebener Gleichung und verifizierten Eingaben. Keine Studienwahl oder Informationswertdeutung."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "Feste Berechnung statt Urteil zur Aktionsänderung."
+  - id: value-of-information-explicit-1
+    kind: explicit
+    prompt: "Nutzen Sie value-of-information für Inspektionskosten und Verzögerung. Welcher Befund ändert Lieferantenwahl, und wo endet Inspektion?"
+    expected_route: value-of-information
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - information_purchase
+      - irreversible_choice
+    rationale: "Methode mit Schwelle, Aktionsänderung, Kosten, Verzug und Stopp ausdrücklich verlangt."
+  - id: value-of-information-insufficiency-1
+    kind: insufficiency
+    prompt: "Sollen wir vor Handeln weiter untersuchen? Aktuelle und alternative Aktion, Variable, Test und tolerierbarer Verzug fehlen."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - information_purchase
+      - decisive_input_missing
+    rationale: "Ohne Schwelle und machbaren Informationsweg keine Aktionswertfeststellung. Zurückstellen und kleinste sichere Klärung erfragen."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: root-cause-analysis-positive-01
+    kind: positive
+    prompt: "Un magazzino spedisce articoli sbagliati ogni poche settimane dopo un nuovo flusso di prelievo e il gruppo necessita di prevenzione invece di altre scuse."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "Il guasto operativo ripetuto richiede di separare sintomo, causa, controllo e verifica della ricorrenza."
+  - id: root-cause-analysis-positive-02
+    kind: positive
+    prompt: "Un’interruzione di servizio continua a ripresentarsi dopo riavvii locali; registri, passaggi di consegne e responsabilità degli avvisi sono disponibili per una catena causale."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose, failure_risk]
+    rationale: "Si cerca una condizione sistemica controllabile e un responsabile della prevenzione, non solo il trigger immediato."
+  - id: root-cause-analysis-positive-03
+    kind: positive
+    prompt: "Un difetto sfuggito ai controlli ricorre fra turni e i responsabili vogliono distinguere azioni degli operatori da interfacce, carico e controlli mancanti."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "Ricorrenza e richiesta di separare livelli sono segnali diretti per root-cause analysis."
+  - id: root-cause-analysis-negative-01
+    kind: negative
+    prompt: "Una nuova email sui prezzi ha aumentato le iscrizioni e si chiede se l’email abbia causato l’aumento rispetto a un gruppo di controllo."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "L’obiettivo è l’effetto di un intervento e un confronto controfattuale, non una catena di guasti ricorrenti."
+  - id: root-cause-analysis-negative-02
+    kind: negative
+    prompt: "Reclami, personale e arretrato si rinforzano reciprocamente nell’arco di un anno; l’utente desidera il punto di leva nella dinamica."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Una struttura di retroazione con ritardi è più ampia di una diagnosi di incidente concreto."
+  - id: root-cause-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Formatta la cronologia dell’incidente come tabella a due colonne senza diagnosticare perché si siano verificati i guasti."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "La formattazione resta meccanica anche quando il testo descrive incidenti ripetuti."
+  - id: root-cause-analysis-explicit-01
+    kind: explicit
+    prompt: "Esegui root-cause-analysis sul passaggio di consegne fallito ricorrente e identifica il responsabile della prevenzione senza accusare un individuo."
+    expected_route: root-cause-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, recurring_failure, diagnose]
+    rationale: "L’utente invoca esplicitamente il metodo per un guasto operativo ricorrente."
+  - id: root-cause-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "Un unico rapporto anonimo dice che un rilascio è fallito per un ingegnere; nomina quella persona come causa radice senza registri."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [recurring_failure, decisive_input_missing]
+    rationale: "Confine dell’evento e prove sono insufficienti; l’accusa sarebbe insicura e infondata."

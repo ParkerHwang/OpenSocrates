@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: first-principles-positive-01
+    kind: positive
+    prompt: "Quais partes dos preços por usuário são realmente obrigatórias e quais foram herdadas do processo antigo de vendas?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "A reformulação depende de separar requisitos irredutíveis de convenções e pressupostos herdados."
+  - id: first-principles-positive-02
+    kind: positive
+    prompt: "Podemos redesenhar este fluxo de aprovação pelas restrições reais de segurança, em vez de copiar a sequência atual?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "O pedido exige decompor fluxo, verificar necessidades e reconstruí-lo."
+  - id: first-principles-positive-03
+    kind: positive
+    prompt: "O que deve continuar verdadeiro se reconstruirmos este fluxo de dados sem pressupor a arquitetura existente do fornecedor?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "A questão central é quais restrições sobrevivem ao questionamento da arquitetura herdada."
+  - id: first-principles-negative-01
+    kind: negative
+    prompt: "Aplique a regra obrigatória de retenção a cada registro e relate violações."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "Aplica-se uma regra vinculante, sem reconsiderá-la ou reconstruí-la."
+  - id: first-principles-negative-02
+    kind: negative
+    prompt: "Gere cinco combinações dos parâmetros fixos e examine sua viabilidade."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "Os requisitos já são fixos; a tarefa é explorar combinações."
+  - id: first-principles-mechanical-01
+    kind: mechanical
+    prompt: "Copie a lista existente de implantação para o novo modelo sem mudar conteúdo."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copiar uma lista fornecida é mecânico e não deve acionar raciocínio de reformulação."
+  - id: first-principles-explicit-01
+    kind: explicit
+    prompt: "Use first-principles para questionar o pressuposto de que todo chamado de suporte exige revisão humana."
+    expected_route: first-principles
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions]
+    rationale: "O usuário invoca explicitamente método para decompor e verificar pressuposto convencional."
+  - id: first-principles-insufficiency-01
+    kind: insufficiency
+    prompt: "Reconstrua o sistema a partir de primeiros princípios, mas sem declarar resultado-alvo, restrições inegociáveis ou regras de segurança aplicáveis."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [hidden_assumptions, decisive_input_missing]
+    rationale: "Sem alvo e limites rígidos, reconstruir confundiria possibilidade com projeto seguro viável."

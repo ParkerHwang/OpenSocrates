@@ -405,7 +405,7 @@ func (a *ControlApplication) event(state map[string]any, request ControlRequest,
 			adapter = s
 		}
 		payload, _ := request.CurrentEvent["payload"].(map[string]any)
-		if contracts.Is(payload["locale"], "en", "ko", "zh", "ja") {
+		if contracts.Is(payload["locale"], "en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th") {
 			locale = payload["locale"].(string)
 		}
 	}

@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "triz-positive-01",
+      "kind": "positive",
+      "prompt": "Um drone de entregas precisa de mais bateria, mas peso extra reduz alcance; encontre conceito que separe ou remova contradição.",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "Melhoria técnica piora outro parâmetro e exige ideal, separação e movimentos inventivos."
+    },
+    {
+      "id": "triz-positive-02",
+      "kind": "positive",
+      "prompt": "Um quarto hospitalar precisa de mais privacidade e observação mais fácil ao mesmo tempo; explore separações de tempo, espaço, condição e interface.",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "Há contradição física ou técnica com condições separáveis e segurança."
+    },
+    {
+      "id": "triz-positive-03",
+      "kind": "positive",
+      "prompt": "Uma linha de embalagem precisa ser mais rápida sem aumentar danos; busque tempo, espaço, informação e materiais existentes para projeto sem compromisso.",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "Pede conceitos que removam compromisso, não otimização de parâmetro único."
+    },
+    {
+      "id": "triz-negative-01",
+      "kind": "negative",
+      "prompt": "A decisão envolve dois valores públicos e prioridade de direitos ou deveres, não contradição técnica.",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "duties_rights"
+      ],
+      "rationale": "Autoridade normativa e direitos, não movimentos inventivos, determinam encaminhamento."
+    },
+    {
+      "id": "triz-negative-02",
+      "kind": "negative",
+      "prompt": "Há ciclos interativos e efeitos atrasados; mapeie estrutura ampla e alavancagem antes de escolher conceito local.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "A necessidade dominante é dinâmica sistêmica, não solução de contradição local."
+    },
+    {
+      "id": "triz-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Liste parâmetros existentes na ordem pedida sem identificar contradições ou propor conceitos.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Listar é mecânico e não pede solução inventiva."
+    },
+    {
+      "id": "triz-explicit-01",
+      "kind": "explicit",
+      "prompt": "Use triz para tratar contradição entre embalagem mais leve e maior proteção ao impacto, propondo teste reversível.",
+      "expected_route": "triz",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "technical_contradiction"
+      ],
+      "rationale": "O usuário invoca método para contradição técnica e teste."
+    },
+    {
+      "id": "triz-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Propriedades de melhora e piora são desconhecidas; declare ideal atingido e ganho garantido.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "technical_contradiction",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sem contradição ou teste definidos, não se estabelece idealidade ou melhoria honestamente."
+    }
+  ]
+}

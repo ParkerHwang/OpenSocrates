@@ -8,11 +8,11 @@ import (
 	"testing"
 )
 
-func fourGuideFixture(t *testing.T) string {
+func tenGuideFixture(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
 	references := []string{"skills/opensocrates/SKILL.md"}
-	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+	for _, locale := range []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} {
 		references = append(references, "skills/opensocrates/references/decision/guide."+locale+".md")
 	}
 	for _, relative := range references {
@@ -28,9 +28,9 @@ func fourGuideFixture(t *testing.T) string {
 }
 
 func TestClaudeNativeEntryRequiresEveryReleasedLocaleGuide(t *testing.T) {
-	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+	for _, locale := range []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} {
 		t.Run(locale, func(t *testing.T) {
-			root := fourGuideFixture(t)
+			root := tenGuideFixture(t)
 			if err := os.Remove(filepath.Join(root, "skills", "opensocrates", "references", "decision", "guide."+locale+".md")); err != nil {
 				t.Fatal(err)
 			}
@@ -44,8 +44,8 @@ func TestClaudeNativeEntryRequiresEveryReleasedLocaleGuide(t *testing.T) {
 	}
 }
 
-func TestClaudeNativeEntryAdvertisesFourLocalesWithoutReadingPromptOrCreatingState(t *testing.T) {
-	root, home := fourGuideFixture(t), t.TempDir()
+func TestClaudeNativeEntryAdvertisesTenLocalesWithoutReadingPromptOrCreatingState(t *testing.T) {
+	root, home := tenGuideFixture(t), t.TempDir()
 	t.Setenv("HOME", home)
 	t.Setenv("USERPROFILE", home)
 	t.Setenv("LOCALAPPDATA", home)
@@ -55,6 +55,8 @@ func TestClaudeNativeEntryAdvertisesFourLocalesWithoutReadingPromptOrCreatingSta
 		`{"hook_event_name":"UserPromptSubmit","prompt":"PRIVATE_SENTINEL 中文","transcript_path":"/PRIVATE_TRANSCRIPT","locale":"zh"}`,
 		`{"hook_event_name":"UserPromptSubmit","prompt":"PRIVATE_SENTINEL 日本語かな","transcript_path":"/PRIVATE_TRANSCRIPT","locale":"ja"}`,
 		`{"hook_event_name":"UserPromptSubmit","prompt":"PRIVATE_SENTINEL 한국어","transcript_path":"/PRIVATE_TRANSCRIPT","locale":"ko"}`,
+		`{"hook_event_name":"UserPromptSubmit","prompt":"PRIVATE_SENTINEL français","transcript_path":"/PRIVATE_TRANSCRIPT","locale":"fr"}`,
+		`{"hook_event_name":"UserPromptSubmit","prompt":"PRIVATE_SENTINEL ภาษาไทย","transcript_path":"/PRIVATE_TRANSCRIPT","locale":"th"}`,
 	}
 	var previous string
 	for _, input := range inputs {
@@ -66,7 +68,7 @@ func TestClaudeNativeEntryAdvertisesFourLocalesWithoutReadingPromptOrCreatingSta
 		if strings.Contains(text, "PRIVATE_SENTINEL") || strings.Contains(text, "PRIVATE_TRANSCRIPT") {
 			t.Fatal("native entry disclosed private host context")
 		}
-		for _, locale := range []string{"en", "ko", "zh", "ja"} {
+		for _, locale := range []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} {
 			if !strings.Contains(text, "guide."+locale+".md") {
 				t.Fatal("native entry omitted installed guide", locale)
 			}
@@ -83,8 +85,8 @@ func TestClaudeNativeEntryAdvertisesFourLocalesWithoutReadingPromptOrCreatingSta
 }
 
 func TestClaudeNativeEntryRejectsLinkedAdditionalLocaleGuide(t *testing.T) {
-	root := fourGuideFixture(t)
-	path := filepath.Join(root, "skills", "opensocrates", "references", "decision", "guide.ja.md")
+	root := tenGuideFixture(t)
+	path := filepath.Join(root, "skills", "opensocrates", "references", "decision", "guide.th.md")
 	if err := os.Remove(path); err != nil {
 		t.Fatal(err)
 	}

@@ -102,7 +102,7 @@ func TestCardsRoundTripAllReleasedLocalesAndTrustedIdentity(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+	for _, locale := range []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} {
 		card := validCard(locale)
 		rendered, e := RenderCard(card, bundle.Messages[locale], 2)
 		if e != nil {
@@ -179,7 +179,7 @@ func TestTraceAndMetricClosedLocalesAcrossReleasedLanguages(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+	for _, locale := range []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} {
 		task := domain.NewTaskID()
 		event := map[string]any{"schema": "opensocrates.judgment-event/1.0.0", "event_id": domain.NewMessageID(), "task_id": task, "sequence": contracts.Number(1), "event_type": "task_started", "occurred_at": "2026-10-12T00:00:00.000Z", "host": "codex_cli", "host_version": "1.0.0", "adapter_version": "1.6.0", "locale": locale, "payload": map[string]any{"requested_rigor": "quiet", "effective_rigor": "together", "capability_gaps": []any{}, "participation_reason": "judgment_choice", "host_session_key": "sha256:" + strings.Repeat("0", 64)}}
 		if e := domain.ValidateRecord(event); e != nil {
@@ -214,7 +214,7 @@ func TestTraceAndMetricClosedLocalesAcrossReleasedLanguages(t *testing.T) {
 			t.Fatal("trace locale alias admitted")
 		}
 	}
-	card := validCard("fr")
+	card := validCard("ru")
 	if len(CardViolations(card, nil)) == 0 {
 		t.Fatal("unsupported card locale admitted")
 	}

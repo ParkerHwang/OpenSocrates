@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: assumption-mapping-positive-1
+    kind: positive
+    prompt: "Estamos considerando um serviço compartilhado de planejamento de refeições. Liste os pressupostos que precisam ser verdadeiros, separe importância de evidência e identifique o primeiro teste seguro. As notas de entrevista foram fornecidas pelo usuário e não verificadas independentemente."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, testable_claim, plan]
+    rationale: "O pedido exige explicitamente registro de pressupostos, eixos de importância/evidência, conjunto mais arriscado e próximo teste. As notas foram fornecidas pelo usuário, não verificadas; a seleção deve expor essa incerteza sem atribuir probabilidades."
+  - id: assumption-mapping-positive-2
+    kind: positive
+    prompt: "Uma equipe quer automatizar a revisão de faturas, mas não sabe se o gargalo é desejabilidade para clientes, viabilidade dos dados ou viabilidade de conformidade. Mapeie os pressupostos e escolha uma validação de baixa exposição antes da compra."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, irreversible_choice, testable_claim]
+    rationale: "Há vários domínios de pressupostos e uma decisão anterior ao compromisso. A validação solicitada ainda é um problema de priorização; o resultado deve rotular fatos apoiados em fontes, pressupostos e evidências de conformidade ausentes."
+  - id: assumption-mapping-positive-3
+    kind: positive
+    prompt: "Temos cinco experimentos propostos para mudar a escala de voluntários. Classifique os pressupostos por importância decisória e força da evidência; associe uma observação segura e uma regra sobre o que mudaria o plano."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [prioritized_assumptions, testable_claim, chosen_plan]
+    rationale: "O usuário pede a base de priorização central do método, não um experimento concluído. O resultado pode usar rótulos ordinais e evidências verificadas, não verificadas, pressupostas ou conflitantes, sem escores inventados."
+  - id: assumption-mapping-negative-1
+    kind: negative
+    prompt: "Nosso serviço de pagamento falhou três vezes nesta semana. Rastreie a cadeia causal, identifique fragilidades nos controles e designe um responsável pela prevenção; não proponha um mapa de pressupostos do produto."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "Este é um pedido de análise de causa raiz, uma possível confusão de família com o mapeamento de pressupostos. Exige diagnóstico causal e ação de controle, não crenças testáveis priorizadas."
+  - id: assumption-mapping-negative-2
+    kind: negative
+    prompt: "Já selecionamos um cliente-alvo e um experimento de página de apresentação. Defina a métrica acionável, a janela de observação e a regra de mudar de direção ou perseverar no teste."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, chosen_plan, plan]
+    rationale: "O pressuposto já foi selecionado e o usuário pede operacionalizar um experimento de mercado. Isso pertence a lean-startup; selecionar este método repetiria o mapeamento em vez de definir teste e métrica."
+  - id: assumption-mapping-mechanical-1
+    kind: mechanical
+    prompt: "Ordene alfabeticamente estes seis rótulos de pressupostos e retorne uma lista numerada."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Ordenar rótulos não exige julgamento, tratamento de incerteza nem priorização de experimentos. Deve receber uma resposta mecânica direta."
+  - id: assumption-mapping-explicit-1
+    kind: explicit
+    prompt: "Use mapeamento de pressupostos nesta ideia. Mostre os pressupostos, os eixos de importância/evidência, o conjunto mais arriscado e o próximo teste seguro; mantenha alegações sem suporte visivelmente não verificadas."
+    expected_route: assumption-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions, prioritized_assumptions, testable_claim]
+    rationale: "O usuário nomeia explicitamente o método e seus resultados públicos. A invocação explícita é primária; os rótulos pedidos preservam os limites de proveniência."
+  - id: assumption-mapping-insufficiency-1
+    kind: insufficiency
+    prompt: "Priorize os pressupostos da nossa proposta e diga qual testar primeiro. Ainda não há pergunta de decisão, resultado desejado, pressupostos candidatos nem restrições de teste."
+    expected_route: assumption-mapping
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, hidden_assumptions, prioritized_assumptions, no_testable_implication]
+    rationale: "O método é adequado, mas faltam entradas decisivas. Deve suspender o resultado, sem inventar pressupostos ou teste; o próximo pedido deve estabelecer a decisão e o limite seguro autorizado."

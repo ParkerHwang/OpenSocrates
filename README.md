@@ -6,16 +6,18 @@
 
 **Reasoning help for results you can understand, judge, and use.**
 
-OpenSocrates brings 48 authored reasoning methods into the task you are already
-doing: synthesize evidence, understand stakeholder perspectives, compare choices,
-and write useful messages. English, Korean, Simplified Chinese (`zh`) and Japanese (`ja`) procedures,
-teacher questions, response policies and shared reader guides retain the released
-v1.5.1 baseline: content revision 4, 192 complete procedures and 576 teacher
-questions. The original English/Korean method bodies remain unchanged.
-The separate method-body upgrades are excluded from v1.6.0 and belong to v1.6.1
-or later. Dedicated coding-specialist features remain outside this scope.
+OpenSocrates brings 48 authored reasoning methods into your current work:
+synthesize evidence, understand stakeholder perspectives, compare choices, and
+write useful messages. The released v1.5.2 baseline provides content revision 5,
+480 complete procedures, 3,840 canonical cases and 1,440 teacher questions in
+English, Korean, Simplified Chinese, Japanese, French, German, Italian, Spanish,
+Portuguese and Thai. Portuguese uses Brazilian orthography under generic `pt`.
+The existing four languages' authored procedure/case body bytes and metadata/question
+values remain unchanged; their method revision identity advances from 4 to 5.
+Separate method-body upgrades belong to v1.6.1 or later. Dedicated coding
+specialist features remain outside this scope.
 
-**English** | [한국어](README.ko.md) | [简体中文](README.zh.md) | [日本語](README.ja.md)
+**English** | [한국어](README.ko.md) | [简体中文](README.zh.md) | [日本語](README.ja.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | [ไทย](README.th.md)
 
 **For agents finding tools:** [Assess task fit, choose a released package and verify setup](docs/agent-discovery.md).
 
@@ -31,11 +33,10 @@ Native release assets come from
 [GitHub Releases](https://github.com/ParkerHwang/OpenSocrates/releases).
 Remaining production signing/trusted-root and native release conditions must be
 completed before publishing or recommending this candidate as a stable release.
-The current released baseline remains
-[v1.5.1](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.1).
-The separate v1.5.2 language expansion is in progress; its proposed French,
-German, Italian, Spanish, Portuguese and Thai additions are not this candidate
-'s current baseline. Reconcile that work before the v1.6.0 release.
+The current released baseline is
+[v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2).
+This candidate reconciles its ten-language content and locale contracts;
+released npm commands remain historical maintenance-channel guidance.
 
 | Host | Delivery | Platform and activation |
 | --- | --- | --- |
@@ -151,10 +152,11 @@ upload, capability and enabled-state checks.
 
 ## Reasoning instruction language
 
-The current content supports `en`, `ko`, `zh` and `ja`. The optional legacy
+The current content supports `en`, `ko`, `zh`, `ja`, `fr`, `de`, `it`, `es`, `pt` and `th`. The optional legacy
 selector resolves explicit preference, stored preference, then current-input
-script detection. Kana chooses Japanese; otherwise dominant Hangul chooses
-Korean and dominant Han chooses Chinese. Han-only Japanese needs an explicit
+script detection. Kana chooses Japanese; otherwise dominant Thai, Hangul or Han chooses
+Thai, Korean or Chinese. Latin-script European languages need an explicit or
+stored preference. Han-only Japanese needs an explicit
 Japanese preference. Empty, Latin-only and tied inputs fall back to English.
 
 ```text
@@ -163,6 +165,12 @@ Japanese preference. Empty, Latin-only and tied inputs fall back to English.
 ./opensocrates locale set ko
 ./opensocrates locale set zh
 ./opensocrates locale set ja
+./opensocrates locale set fr
+./opensocrates locale set de
+./opensocrates locale set it
+./opensocrates locale set es
+./opensocrates locale set pt
+./opensocrates locale set th
 ./opensocrates locale set follow
 ./opensocrates locale reset
 ```
@@ -174,7 +182,7 @@ JSON requires an explicit `locale`; native Claude entry reads no stored
 preference. Account skills and Antigravity use their language guides and complete
 references. Instruction language is separate from answer language, host UI and
 management CLI output; not every CLI message is translated. Method IDs, JSON
-keys and the attribution line stay unchanged across all four languages.
+keys and the attribution line stay unchanged across all ten languages.
 
 ## Attribution, privacy and development
 

@@ -1,0 +1,109 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "robust-decision-making-positive-1",
+      "kind": "positive",
+      "prompt": "Precisamos escolher proteção contra enchentes para infraestrutura que operará por décadas. Chuva, uso do solo e financiamento são profundamente incertos; queremos opção acima do mínimo de segurança publicado em mundos plausíveis, não vencedora de uma previsão.",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "irreversible_choice",
+        "choose",
+        "failure_risk"
+      ],
+      "rationale": "É decisão consequente e difícil de reverter, com incertezas interativas e ação aceitável em vários mundos. Não exige ótimo ponderado por probabilidades."
+    },
+    {
+      "id": "robust-decision-making-positive-2",
+      "kind": "positive",
+      "prompt": "Nossa estratégia de suprimentos deve sobreviver a tarifas, demanda e confiabilidade incertas por oito anos. Compare estratégias viáveis por falha e arrependimento, mostre compromissos e gatilhos de ações adaptativas.",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "irreversible_choice",
+        "failure_risk",
+        "feedback_delay"
+      ],
+      "rationale": "Pede testes de esforço cenário/estratégia, critérios de falha e gatilhos adaptativos, saídas da decisão robusta sob incerteza profunda."
+    },
+    {
+      "id": "robust-decision-making-positive-3",
+      "kind": "positive",
+      "prompt": "Temos três opções de investimento em transporte regional, mas trabalho remoto, combustíveis e financiamento futuros não sustentam previsão única. Identifique primeiro passo aceitável, fraquezas restantes e evidência que o mudaria.",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "multiple_options",
+        "choose",
+        "new_evidence"
+      ],
+      "rationale": "Há escolha real e incerteza profunda, com pedido de estratégia aceitável, não mais provável. Fraqueza residual e condição de mudança limitam alegações."
+    },
+    {
+      "id": "robust-decision-making-negative-1",
+      "kind": "negative",
+      "prompt": "A previsão base de demanda foi bem validada, o piloto pode ser revertido no próximo mês por custo insignificante e a gestão quer só o maior retorno esperado nesse caso.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "sequential_choice",
+        "choose"
+      ],
+      "rationale": "Caso único confiável e reversão trivial são condições de evitar. Teste robusto não agrega valor decisório necessário."
+    },
+    {
+      "id": "robust-decision-making-negative-2",
+      "kind": "negative",
+      "prompt": "Crie quatro futuros externos nomeados do mercado de energia, explique sua origem e sinais. Não compare ação atual por falha ou arrependimento.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "plan"
+      ],
+      "rationale": "É confusão provável com cenários: construção de futuros e sinais sem testes de estratégias e aceitação."
+    },
+    {
+      "id": "robust-decision-making-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Calcule retorno anualizado destes fluxos verificados pela fórmula fornecida e mostre contas. Não escolha estratégias.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "É cálculo delimitado sem conjunto decisório incerto. Não transforme aritmética em julgamento de robustez."
+    },
+    {
+      "id": "robust-decision-making-explicit-1",
+      "kind": "explicit",
+      "prompt": "Use robust-decision-making como método principal de adaptação costeira. Teste opções em mundos plausíveis de clima e orçamento, use serviço mínimo como limiar de falha e suspenda se faltarem mundos ou limiar.",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "deep_uncertainty",
+        "irreversible_choice",
+        "failure_risk"
+      ],
+      "rationale": "Invocação explícita fornece enquadramento, mundos, mínimo e suspensão. Não remove restrições de evidência e incerteza."
+    },
+    {
+      "id": "robust-decision-making-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Diga qual estratégia de longo prazo é robusta. Não listei ações viáveis, definição de falha, horizonte ou incertezas a testar.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "Opções, mínimo, horizonte e registro de incertezas são decisivos. Suspenda e peça apenas entradas decisórias ausentes."
+    }
+  ]
+}

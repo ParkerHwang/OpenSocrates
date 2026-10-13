@@ -9,7 +9,7 @@ import (
 )
 
 var publicIdentifier = regexp.MustCompile("`([A-Za-z][A-Za-z0-9_-]*)`")
-var numericData = regexp.MustCompile(`\d+(?:\.\d+)?`)
+var numericData = regexp.MustCompile(`\p{Nd}+(?:\.\p{Nd}+)?`)
 var proseWord = regexp.MustCompile(`\b\w+\b`)
 var englishNumbers = map[string]string{"one": "1", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10"}
 
@@ -26,7 +26,7 @@ func exactReleasedLocales(v any) bool {
 	return true
 }
 
-// validateReleasedLocaleSources ports the released v1.5.1 locale contracts.
+// validateReleasedLocaleSources ports the released v1.5.2 locale contracts.
 // It preserves public identifiers and numeric/routing case data without claiming
 // that structural checks constitute a semantic translation review.
 func validateReleasedLocaleSources(root string, catalog, teachers map[string]any) error {
@@ -93,7 +93,7 @@ func validateReleasedLocaleSources(root string, catalog, teachers map[string]any
 				}
 				seenQuestions[locale][question] = true
 			}
-			if locale != "zh" && locale != "ja" {
+			if locale == "en" || locale == "ko" {
 				continue
 			}
 			translated, err := os.ReadFile(filepath.Join(dir, "procedure."+locale+".md"))
@@ -125,6 +125,9 @@ func validateReleasedLocaleSources(root string, catalog, teachers map[string]any
 					return fmt.Errorf("translated case fields invalid: %s.%s", id, locale)
 				}
 				for field, value := range source {
+					if _, ok := target[field]; !ok {
+						return fmt.Errorf("translated case field missing: %s.%s.%s", id, locale, field)
+					}
 					if field != "prompt" && field != "rationale" {
 						if !schemaEqual(value, target[field]) {
 							return fmt.Errorf("translated case routing changed: %s.%s.%s", id, locale, field)

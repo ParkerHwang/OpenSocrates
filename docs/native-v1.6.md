@@ -8,7 +8,7 @@ commit, environment and remaining gates belong in the implementation handoff.
 The current Mac has a verified Developer ID identity and canonical Team ID.
 Historical candidate ZIP and standalone installer notarization received Apple
 acceptance; those receipts bind their recorded source/files and do not qualify
-this candidate after the v1.5.1 merge. Exact identities belong in the handoff.
+this candidate after maintenance-release reconciliation. Exact identities belong in the handoff.
 Bare CLI trust uses the pinned Developer ID, team and notarization code
 requirement. Protected hosted Mac signing setup is implemented; its earlier
 qualification does not sign or notarize newly merged files. Final merged-tag
@@ -86,7 +86,7 @@ purge, trust-reset or npm-uninstall behavior from `remove`.
 
 ## One-time adoption of npm installations
 
-Use the released v1.5.1 installation as the current migration baseline; retained
+Use the released v1.5.2 installation as the current migration baseline; retained
 v1.5.0 evidence remains historical. Confirm exact
 ownership, version, desired state, inventory, registration, disabled state and
 old update scheduler before adoption. The Go manager adopts only the explicitly
@@ -183,22 +183,30 @@ JSON input rejects duplicate keys and unpaired Unicode surrogates. Complete
 decision requests are validated before changing context/scope: an invalid route
 must not erase previous availability. Unsafe or unsupported newer settings are
 never overwritten by fallback defaults. The 48 method-body upgrades are
-excluded. The current released v1.5.1 tag is
-`5a6a7fa2897dd42772c4503a1301770e48bd1f29`, content revision `4`: 48 methods,
-192 complete procedures and 576 teacher questions across `en`, `ko`, `zh`, `ja`.
-Original English/Korean method bodies remain unchanged. Hashes and the complete
-baseline inventory belong to `docs/v1.6.0/CONTENT_BASELINE.json`. The original
-v1.5.0 revision-3 observations remain historical; guide/transport changes do
-not authorize new method semantics. Pending v1.5.2 work proposes French, German,
-Italian, Spanish, Portuguese and Thai; reconcile it before v1.6.0 release, without
-claiming those languages as this candidate's current baseline.
+excluded. The current released baseline is v1.5.2 source
+`9838db16910c5f22d9dcc3c7180350cb406fd236`, content revision `5`: 48 methods,
+480 complete procedures, 3,840 canonical cases and 1,440 teacher questions in
+`en`, `ko`, `zh`, `ja`, `fr`, `de`, `it`, `es`, `pt`, `th`.
+The existing four languages' authored procedure/case bytes and metadata/question
+values are unchanged; individual method revision identity advances from 4 to 5.
+Hashes and full inventory belong to `docs/v1.6.0/CONTENT_BASELINE.json`.
+Original v1.5.0/revision-3 and v1.5.1/revision-4 observations stay historical;
+unchanged text does not turn old signing or reading receipts into revision-5 evidence.
+
+The former compiled START/OBSERVE/REPAIR full-prompt renderer has no Go runtime
+counterpart in this migration. Native Go uses stateless canonical retrieval and
+the opt-in legacy selector artifacts. Selector references remain bounded to
+8 KiB across all ten languages; existing HostAction and raw-artifact bounds are
+unchanged. Historical START-only compiled envelopes of 8/12/24 KiB do not
+describe a supported Go runtime output path.
 
 ## Reasoning instruction language
 
-The current content supports `en`, `ko`, `zh` and `ja`. The optional legacy
+The current content supports `en`, `ko`, `zh`, `ja`, `fr`, `de`, `it`, `es`, `pt`, `th`. The optional legacy
 selector resolves explicit preference, stored preference, then current-input
-script detection. Kana chooses Japanese; otherwise dominant Hangul chooses
-Korean and dominant Han chooses Chinese. Han-only Japanese needs an explicit
+script detection. Kana chooses Japanese; otherwise dominant Thai, Hangul or Han chooses
+Thai, Korean or Chinese. Latin-script European languages need explicit or
+stored preference. Han-only Japanese needs an explicit
 Japanese preference. Empty, Latin-only and tied inputs fall back to English.
 
 ```text
@@ -207,6 +215,12 @@ Japanese preference. Empty, Latin-only and tied inputs fall back to English.
 ./opensocrates locale set ko
 ./opensocrates locale set zh
 ./opensocrates locale set ja
+./opensocrates locale set fr
+./opensocrates locale set de
+./opensocrates locale set it
+./opensocrates locale set es
+./opensocrates locale set pt
+./opensocrates locale set th
 ./opensocrates locale set follow
 ./opensocrates locale reset
 ```
@@ -218,7 +232,7 @@ JSON requires an explicit `locale`; native Claude entry reads no stored
 preference. Account skills and Antigravity use their language guides and complete
 references. Instruction language is separate from answer language, host UI and
 management CLI output; not every CLI message is translated. Method IDs, JSON
-keys and the attribution line stay unchanged across all four languages.
+keys and the attribution line stay unchanged across all ten languages.
 
 ## Qualification still required
 
@@ -257,7 +271,7 @@ signing evidence does not replace notarization and production qualification. Mut
 accepted TUF trust state remain separate in installation-private storage.
 
 The compiled content bundle changes release metadata `product_version` to
-`1.6.0` while preserving the released v1.5.1 content revision `4`, four-language
+`1.6.0` while preserving the released v1.5.2 content revision `5`, ten-language
 procedures/teacher questions and response-policy identity. This packaging metadata
 change is not a method-body upgrade.
 
@@ -304,7 +318,7 @@ instruction adds native Windows ARM64 to v1.6.0 Codex CLI/Desktop integration,
 Antigravity global/workspace lifecycle, native installation/adoption/removal,
 Go helper self-replacement and per-user scheduled updates. It does not change
 `--host all`, add native Windows Claude Code, automate account upload or alter
-the released four-language, 48-method v1.5.1 content baseline. Account content verification/export
+the released ten-language, 48-method v1.5.2 content baseline. Account content verification/export
 remains content-only on all supported targets.
 
 Download standalone `opensocrates-v1.6.0-windows-arm64.exe` and matching

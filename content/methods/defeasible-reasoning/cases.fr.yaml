@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "defeasible-reasoning-positive-01",
+      "kind": "positive",
+      "prompt": "Cette politique s'applique normalement, mais quelles exceptions ou faits nouveaux retireraient la recommandation actuelle ?",
+      "expected_route": "defeasible-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "exception_prone_rule",
+        "explicit_rules"
+      ],
+      "rationale": "Le jugement utilise une règle par défaut et exige réfutateurs explicites et conditions de retrait."
+    },
+    {
+      "id": "defeasible-reasoning-positive-02",
+      "kind": "positive",
+      "prompt": "Séparez les éléments contredisant directement la conclusion de ceux affaiblissant la règle qui la soutient.",
+      "expected_route": "defeasible-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "exception_prone_rule",
+        "explicit_rules"
+      ],
+      "rationale": "L'utilisateur demande de distinguer réfutation de conclusion et objection au lien justificatif dans un jugement révisable."
+    },
+    {
+      "id": "defeasible-reasoning-positive-03",
+      "kind": "positive",
+      "prompt": "Une règle générale et une exception plus spécifique s'appliquent toutes deux ; quel est le statut provisoire actuel ?",
+      "expected_route": "defeasible-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "exception_prone_rule",
+        "explicit_rules"
+      ],
+      "rationale": "La spécificité et les exceptions non résolues doivent être traitées sans prétendre à un résultat inconditionnel."
+    },
+    {
+      "id": "defeasible-reasoning-negative-01",
+      "kind": "negative",
+      "prompt": "Appliquez la règle stricte de conservation à chaque enregistrement et rapportez le résultat déterministe.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules"
+      ],
+      "rationale": "Une règle sans exception relève de la déduction ou d'une application mécanique."
+    },
+    {
+      "id": "defeasible-reasoning-negative-02",
+      "kind": "negative",
+      "prompt": "Classez ces sources selon la qualité de conception et ajustez la force de l'affirmation à la meilleure source applicable.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "La tâche porte sur la hiérarchie des éléments probants, pas la gestion des réfutateurs d'une règle par défaut."
+    },
+    {
+      "id": "defeasible-reasoning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Copiez la règle par défaut et les exceptions dans le modèle de politique.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Copier un texte de politique fourni est mécanique."
+    },
+    {
+      "id": "defeasible-reasoning-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez explicitement defeasible-reasoning pour évaluer cette règle d'approbation normalement valable et ses exceptions.",
+      "expected_route": "defeasible-reasoning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "exception_prone_rule"
+      ],
+      "rationale": "L'utilisateur demande explicitement l'analyse de règle par défaut, réfutateurs et conditions de retrait."
+    },
+    {
+      "id": "defeasible-reasoning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Appliquez la règle par défaut, mais sans source de règle, faits déclencheurs, périmètre ni exceptions possibles.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "exception_prone_rule",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans règle par défaut ni faits déclencheurs, une conclusion provisoire serait arbitraire."
+    }
+  ]
+}

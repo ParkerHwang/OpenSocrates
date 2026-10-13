@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "failure-mode-effects-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "Avant de publier un processus de dispensation de médicaments, listez modes de défaillance, effets, causes, contrôles existants et contrôles nécessitant un responsable.",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "Un processus défini exige un registre prospectif et des responsables de contrôle, sans scores fabriqués."
+    },
+    {
+      "id": "failure-mode-effects-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "La refonte d'une chaîne de données peut échouer à l'ingestion, la validation ou l'alerte ; priorisez les modes avec une règle ordinale et proposez des contrôles.",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan"
+      ],
+      "rationale": "La tâche demande modes, effets, causes, priorité ordinale et contrôles d'une conception prévue."
+    },
+    {
+      "id": "failure-mode-effects-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "Examinez le paiement avant lancement pour identifier les facturations erronées possibles et comment l'équipe préviendrait ou détecterait chaque mode.",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "L'examen de processus avant publication et l'attribution des contrôles sont les résultats spécifiques de cette méthode."
+    },
+    {
+      "id": "failure-mode-effects-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "Le plan de lancement du produit est choisi ; imaginez qu'il a déjà échoué et identifiez causes plausibles, signaux précurseurs et mesures d'atténuation.",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "La perspective demandée est un échec imaginé au niveau du plan avant engagement."
+    },
+    {
+      "id": "failure-mode-effects-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "Un défaut de production revient et l'équipe doit distinguer symptômes, causes proches et conditions systémiques contrôlables.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "Le besoin immédiat est un diagnostic de récurrence plutôt qu'un registre FMEA prospectif."
+    },
+    {
+      "id": "failure-mode-effects-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Triez les lignes de défaillance existantes par ordre alphabétique et conservez tous les champs sans évaluer la priorité.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Le tri est mécanique même si les lignes décrivent des risques."
+    },
+    {
+      "id": "failure-mode-effects-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez failure-mode-effects-analysis pour cette liste de lancement et évitez d'inventer des scores de gravité, occurrence ou détectabilité.",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "failure_risk",
+        "plan"
+      ],
+      "rationale": "L'utilisateur demande explicitement la méthode et sa protection contre la fausse précision."
+    },
+    {
+      "id": "failure-mode-effects-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Il n'y a ni périmètre de processus ni fonction prévue ; attribuez quand même des nombres précis de priorité de risque aux défaillances imaginées.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "failure_risk",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans fonction définie et échelle défendable, l'évaluation doit être suspendue plutôt que quantifiée."
+    }
+  ]
+}

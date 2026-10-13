@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: root-cause-analysis-positive-01
+    kind: positive
+    prompt: "Ein Lager versendet nach neuem Kommissionierablauf alle paar Wochen falsche Artikel; das Team braucht Prävention statt weiterer Entschuldigung."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "Wiederholtes Versagen verlangt getrennte Symptome, Ursachen, Kontrollen und Wiederholungsprüfung."
+  - id: root-cause-analysis-positive-02
+    kind: positive
+    prompt: "Nach Neustarts kehren Dienstausfälle zurück; Protokolle, Übergaben und Alarmverantwortlichkeit ermöglichen Ursachenkette."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose, failure_risk]
+    rationale: "Kontrollierbare Systembedingung und Präventionsverantwortlicher statt unmittelbarem Auslöser gesucht."
+  - id: root-cause-analysis-positive-03
+    kind: positive
+    prompt: "Ein unentdeckter Qualitätsfehler wiederholt sich schichtübergreifend; Leitung will Bedienhandlung von Schnittstelle, Last und fehlender Kontrolle trennen."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "Wiederholung und Ebenentrennung sind direkte Signale für Grundursachenanalyse."
+  - id: root-cause-analysis-negative-01
+    kind: negative
+    prompt: "Eine neue Preis-E-Mail erhöht Anmeldungen; verursachte sie den Anstieg gegenüber einer Kontrollgruppe?"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "Interventionswirkung und kontrafaktischer Vergleich statt wiederkehrender Fehlerkette."
+  - id: root-cause-analysis-negative-02
+    kind: negative
+    prompt: "Beschwerden, Personal und Rückstand verstärken sich über ein Jahr; der Nutzer sucht dynamischen Hebelpunkt."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Verzögerte Rückkopplungsstruktur ist breiter als konkrete Vorfalldiagnose."
+  - id: root-cause-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Formatieren Sie den Vorfallzeitablauf als zweispaltige Tabelle ohne Ursachendiagnose."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Formatierung bleibt mechanisch auch bei wiederholten Vorfällen im Text."
+  - id: root-cause-analysis-explicit-01
+    kind: explicit
+    prompt: "Nutzen Sie root-cause-analysis für wiederkehrende misslungene Übergabe und benennen Sie Präventionsverantwortlichen ohne Individualschuld."
+    expected_route: root-cause-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, recurring_failure, diagnose]
+    rationale: "Ausdrückliche Methode für wiederkehrenden operativen Fehler."
+  - id: root-cause-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "Ein anonymer Einzelbericht behauptet Scheitern wegen eines Ingenieurs; nennen Sie diese Person ohne Protokolle als Grundursache."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [recurring_failure, decisive_input_missing]
+    rationale: "Ereignisgrenze und Evidenz fehlen; Schuldbehauptung wäre unsicher und unbelegt."

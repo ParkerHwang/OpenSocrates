@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "stakeholder-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Implantamos mudança de horários que afeta pessoal da linha de frente, gestores, clientes e representante trabalhista. Mapeie interesses, direitos, preocupações prováveis, consentimento e responsáveis pelo diálogo.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Exige atores ligados à execução, não contatos genéricos. Preocupações e efeitos são hipóteses até apoio por registros ou conversas; revele incerteza."
+    },
+    {
+      "id": "stakeholder-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "Uma política afeta moradores fora do grupo decisório formal. Identifique decisor, grupos afetados sem representação, poder, impacto, conflitos e plano de participação com responsabilidade.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Representação e execução são materiais. Distinga autoridade de influência e não infira dano ou consentimento sem evidência."
+    },
+    {
+      "id": "stakeholder-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Organizações precisam adotar padrão comum de dados. Analise quem aprova, bloqueia, beneficia ou suporta custo; atribua responsável pelo diálogo e resposta que mudaria implantação.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Adoção depende de autoridade distribuída e apoio. Publique evidências de interesses e impactos; papel organizacional não prova acordo."
+    },
+    {
+      "id": "stakeholder-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Todos os decisores concordam com objetivo e grupo afetado não é material. Compare dois fornecedores viáveis por custo, confiabilidade e entrega.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "A questão humana está resolvida; resta comparação de compromissos. Mapa seria decorativo."
+    },
+    {
+      "id": "stakeholder-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Examine mudanças políticas, econômicas, sociais, tecnológicas, ambientais e legais que podem afetar estratégia do produto.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "O resultado decisivo é registro externo de fatores. É confusão provável com PESTEL, não mapa de atores."
+    },
+    {
+      "id": "stakeholder-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Remova nomes duplicados desta lista de contatos e ordene os restantes alfabeticamente.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "mechanical"
+      ],
+      "rationale": "Só transforma texto fornecido; não avalia interesses, poder, consentimento ou execução."
+    },
+    {
+      "id": "stakeholder-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Use análise de partes interessadas nesta mudança hospitalar. Mostre direitos, grupos afetados, evidências de poder/impacto, conflitos, responsáveis e condição de mudança.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Nomeia método e campos, permanecendo principal. Rotule preocupações inferidas e efeitos não verificados."
+    },
+    {
+      "id": "stakeholder-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Devemos seguir com a política de frequência? Não identifiquei decisor, grupos, autoridade, horizonte ou evidências dos efeitos.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "interacting_actors"
+      ],
+      "rationale": "Apoio pode ser decisivo, mas limites e autoridade faltam. Suspenda e peça menores fatos ausentes, sem declarar consentimento ou oposição."
+    }
+  ]
+}

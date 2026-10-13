@@ -1,19 +1,21 @@
 <p align="center">
+  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
+</p>
 
 **供代理参考：** [选择已发布的软件包并验证设置](docs/agent-discovery.md)。Go 候选版请使用下文和原生指南。
-
-</p>
 
 # OpenSocrates
 
 **帮助你得到能够理解、评估并使用的推理结果。**
 
-OpenSocrates 为资料综合、观点理解、方案比较和消息撰写提供 48 种完整的推理
-方法。当前内容沿用已发布的 v1.5.1：英文、韩文、简体中文（`zh`）与日语（`ja`）
-共有 192 份完整步骤文件、576 个教师问题，内容修订号为 4。原有英文、韩文方法
-正文保持不变。方法正文升级另行安排在 v1.6.1 或之后；编程专用功能不在本次范围内。
+OpenSocrates 提供 48 种完整推理方法，帮助综合资料、理解观点、比较方案和撰写消息。
+当前基线为已发布的 v1.5.2：英文、韩文、简体中文、日语、法语、德语、意大利语、
+西班牙语、葡萄牙语和泰语，共 480 份完整步骤、3,840 个标准案例和 1,440 个教师
+问题，内容修订号为 5。葡萄牙语使用通用 `pt` 代码和巴西拼写。原有四种语言的
+步骤和案例正文、元数据和问题值保持不变；方法修订标识从 4 升至 5。方法正文
+升级另行安排在 v1.6.1 或之后，编程专用功能不在本次范围内。
 
-[English](README.md) | [한국어](README.ko.md) | **简体中文** | [日本語](README.ja.md)
+[English](README.md) | [한국어](README.ko.md) | **简体中文** | [日本語](README.ja.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | [ไทย](README.th.md)
 
 ## v1.6.0 原生迁移候选
 
@@ -21,9 +23,8 @@ OpenSocrates 为资料综合、观点理解、方案比较和消息撰写提供 
 和开发工具替代原有 Python、JavaScript、npm 路径。用户无需安装 Go、Python、
 Node.js 或 npm。正式资产通过 [GitHub Releases](https://github.com/ParkerHwang/OpenSocrates/releases)
 分发；生产签名、更新信任根和原生发布验证仍须满足对应发布条件。
-当前已发布版本为 [v1.5.1](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.1)。
-正在进行的 v1.5.2 计划增加法语、德语、意大利语、西班牙语、葡萄牙语和泰语，
-尚未纳入此候选的当前基线；v1.6.0 发布前需再次核对。
+当前已发布版本为 [v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)。
+此候选已同步十种语言的内容和语言设置契约；npm 命令属于独立维护渠道。
 
 | 应用 | 交付方式 | 平台与启用要求 |
 | --- | --- | --- |
@@ -108,10 +109,10 @@ Codex 的原生管理工具提供 `auto-update enable`、`status`、`run`、`dis
 
 ## 推理指令语言
 
-当前支持 `en`、`ko`、`zh`、`ja`。可选旧选择器按明确偏好、保存偏好、当前
-输入文字判断的顺序选择。含假名时选择日语；否则韩文占优时选韩语，汉字
-占优时选中文。只有汉字的日语应明确指定；空输入、仅拉丁字母和数量相同时
-回退到英文。
+当前支持 `en`、`ko`、`zh`、`ja`、`fr`、`de`、`it`、`es`、`pt`、`th`。
+可选旧选择器按明确偏好、保存偏好、当前文字判别的顺序选择。假名优先选日语，
+否则占优势的泰文、韩文或汉字选择泰语、韩语或中文。拉丁字母的欧洲语言需要
+明确或保存的偏好。只有汉字的日语需明确 `ja`；空输入、同票或未知文字回退英文。
 
 ```text
 ./opensocrates locale get
@@ -119,6 +120,12 @@ Codex 的原生管理工具提供 `auto-update enable`、`status`、`run`、`dis
 ./opensocrates locale set ko
 ./opensocrates locale set zh
 ./opensocrates locale set ja
+./opensocrates locale set fr
+./opensocrates locale set de
+./opensocrates locale set it
+./opensocrates locale set es
+./opensocrates locale set pt
+./opensocrates locale set th
 ./opensocrates locale set follow
 ./opensocrates locale reset
 ```
@@ -138,7 +145,7 @@ Codex 的原生管理工具提供 `auto-update enable`、`status`、`run`、`dis
 可执行代码。正常会话仍受应用自身认证、权限和数据保留政策约束。
 
 安装、加载、完整阅读、实际应用和结果有用性属于不同证据。旧候选的签名或
-公证凭据不验证合并 v1.5.1 后的新文件，也不证明此候选已发布或所有应用都
+公证凭据不验证合并 v1.5.2 后的新文件，也不证明此候选已发布或所有应用都
 已启用。本项目不宣称普遍的质量、费用或速度改善。
 
 - [原生安装、接管和证据说明（英文）](docs/native-v1.6.md)

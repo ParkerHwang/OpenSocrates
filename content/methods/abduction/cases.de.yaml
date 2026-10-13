@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: abduction-positive-01
+    kind: positive
+    prompt: "Mehrere Ursachen könnten den plötzlichen Konversionsrückgang erklären; welche passt am besten zu den beobachteten Tatsachen?"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Mehrere Erklärungen passen zur Auffälligkeit und verlangen unterscheidende Belege vor einer vorläufig besten Erklärung."
+  - id: abduction-positive-02
+    kind: positive
+    prompt: "Der Dienst versagt nur in einigen Regionen. Vergleiche plausible Erklärungen und schlage die nächste unterscheidende Beobachtung vor."
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Diagnose bei unvollständiger Information mit angeforderter unterscheidender Prüfung."
+  - id: abduction-positive-03
+    kind: positive
+    prompt: "Was erklärt dieses unerwartete Laborergebnis derzeit am besten, und was würde deine Meinung ändern?"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Die Antwort muss Kandidatenerklärungen vergleichen und ausdrücklich vorläufig bleiben."
+  - id: abduction-negative-01
+    kind: negative
+    prompt: "Folgt der Schluss notwendig aus diesen ausdrücklichen Prämissen und dieser Regel?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Gesicherte Prämissen und Regel verlangen Deduktion statt Suche nach bester Erklärung."
+  - id: abduction-negative-02
+    kind: negative
+    prompt: "Schätze anhand wiederholter Stichprobenbeobachtungen die Häufigkeit dieses Musters in der Population."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "Verallgemeinerung aus einer Stichprobe statt Vergleich konkurrierender Erklärungen."
+  - id: abduction-mechanical-01
+    kind: mechanical
+    prompt: "Kopiere die drei vorgegebenen Hypothesen in die Untersuchungsvorlage."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Hypothesenkopieren ist mechanisch und soll keine Diagnose auslösen."
+  - id: abduction-explicit-01
+    kind: explicit
+    prompt: "Nutze ausdrücklich abduction zur Diagnose, warum die Bereitstellung nach der Konfigurationsänderung scheitert."
+    expected_route: abduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, competing_explanations]
+    rationale: "Der Nutzer benennt das Verfahren ausdrücklich für auffälliges Ergebnis und Diagnose."
+  - id: abduction-insufficiency-01
+    kind: insufficiency
+    prompt: "Wähle die beste Erklärung, aber liefere nur den Schluss ohne Beobachtung, Alternativen oder prüfbare Belege."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [competing_explanations, decisive_input_missing]
+    rationale: "Ohne Beobachtung und konkurrierende Kandidaten wäre die beste Erklärung eine Geschichte statt Schlussfolgerung."

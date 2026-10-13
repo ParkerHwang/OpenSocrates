@@ -237,7 +237,7 @@ func semantic(name string, v any) error {
 	switch name {
 	case "user-settings":
 		revision, ok := Integer(m["revision"])
-		if !ok || revision.Sign() < 1 || !Is(m["locale_preference"], "en", "ko", "zh", "ja") && m["locale_preference"] != nil {
+		if !ok || revision.Sign() < 1 || !Is(m["locale_preference"], "en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th") && m["locale_preference"] != nil {
 			return ErrInvalid
 		}
 		days, ok := Int(m["record_retention_days"])

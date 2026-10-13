@@ -25,6 +25,9 @@ var procedureHeadings = []string{"Purpose", "Use when", "Do not use when", "Inpu
 func validateProcedure(text string) error { return validateProcedureLocale(text, "en") }
 
 func validateProcedureLocale(text, locale string) error {
+	if !releasedLocale(locale) {
+		return fmt.Errorf("unsupported procedure locale")
+	}
 	headings := []string{}
 	for _, line := range strings.Split(text, "\n") {
 		if strings.HasPrefix(line, "## ") {
@@ -34,7 +37,7 @@ func validateProcedureLocale(text, locale string) error {
 	if strings.Join(headings, "\x00") != strings.Join(procedureHeadings, "\x00") {
 		return fmt.Errorf("expected exact nine procedure headings")
 	}
-	if locale == "zh" || locale == "ja" {
+	if locale == "zh" || locale == "ja" || locale == "th" {
 		characters := 0
 		for _, r := range text {
 			if !unicode.IsSpace(r) {
@@ -46,8 +49,13 @@ func validateProcedureLocale(text, locale string) error {
 		}
 	} else {
 		words := len(strings.Fields(text))
-		if words < 350 || words > 900 {
-			return fmt.Errorf("expected 350-900 words")
+		maximum := 900
+		switch locale {
+		case "fr", "de", "it", "es", "pt":
+			maximum = 1200
+		}
+		if words < 350 || words > maximum {
+			return fmt.Errorf("expected 350-%d words", maximum)
 		}
 	}
 	start := strings.Index(text, "## Procedure\n")

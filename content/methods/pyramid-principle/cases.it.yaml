@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pyramid-principle-positive-01
+    kind: positive
+    prompt: "Trasforma questa analisi validata in un memorandum per decisori con la raccomandazione prima, poi motivazioni raggruppate e dettagli."
+    expected_route: pyramid-principle
+    expected_behavior: route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "Il giudizio sottostante è pronto e il collo di bottiglia richiesto è la comunicazione con conclusione iniziale."
+  - id: pyramid-principle-positive-02
+    kind: positive
+    prompt: "Riorganizza la relazione mettendo in cima l’idea guida e facendo sì che ogni sezione la sostenga senza sovrapposizioni."
+    expected_route: pyramid-principle
+    expected_behavior: route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "Il compito richiede risposta principale, motivazioni raggruppate, sintesi verticale e ordine orizzontale."
+  - id: pyramid-principle-positive-03
+    kind: positive
+    prompt: "Rendi questa lunga analisi decisionale facilmente consultabile dai dirigenti senza nascondere incertezza o alternative."
+    expected_route: pyramid-principle
+    expected_behavior: route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "Il metodo struttura un’analisi già valutata conservando l’incertezza rilevante."
+  - id: pyramid-principle-negative-01
+    kind: negative
+    prompt: "Quale premessa sostiene la raccomandazione e qual è l’obiezione irrisolta più forte?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [argument_dispute, critique]
+    rationale: "Il compito esamina il sostegno argomentativo, non riordina una risposta definita."
+  - id: pyramid-principle-negative-02
+    kind: negative
+    prompt: "Decidi se questa raccomandazione è sostenuta ma le prove e le alternative non sono ancora state riviste."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, critique]
+    rationale: "La struttura comunicativa non deve sostituire un giudizio sottostante irrisolto."
+  - id: pyramid-principle-mechanical-01
+    kind: mechanical
+    prompt: "Applica i titoli secondo lo stile aziendale e conserva tutte le frasi nell’ordine attuale."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Applicare istruzioni fisse di formattazione è meccanico."
+  - id: pyramid-principle-explicit-01
+    kind: explicit
+    prompt: "Usa esplicitamente pyramid-principle per riscrivere questo aggiornamento al consiglio mettendo prima la conclusione."
+    expected_route: pyramid-principle
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, explain]
+    rationale: "L’utente richiede esplicitamente il metodo per comunicazione esecutiva con conclusione iniziale."
+  - id: pyramid-principle-insufficiency-01
+    kind: insufficiency
+    prompt: "Metti prima la conclusione ma non fornire domanda guida, conclusione, prove o decisione del destinatario."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [explain, decisive_input_missing]
+    rationale: "Senza giudizio stabile e decisione del destinatario, la risposta principale sarebbe inventata."

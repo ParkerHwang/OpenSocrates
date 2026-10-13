@@ -1,0 +1,110 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "double-loop-learning-positive-1",
+      "kind": "positive",
+      "prompt": "ทีมสนับสนุนของเราลดเวลาตอบด้วยรายการตรวจใหม่ แต่ลูกค้ากลับมายกระดับปัญหาหลังสองเดือน เปรียบเทียบผลที่คาดและผลจริง ตรวจเป้าหมายบริการและกฎที่กำกับรายการตรวจ แล้วออกแบบการทดสอบเรียนรู้อย่างปลอดภัยสำหรับกฎใหม่",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "governing_rule",
+        "repeat_iteration",
+        "testable_claim"
+      ],
+      "rationale": "การแก้ขั้นตอนไม่ป้องกันการเกิดซ้ำ งานจึงถามว่าควรเปลี่ยนเป้าหมายหรือกฎกำกับหรือไม่ การเลือกวิธีควรแยกการทำตามรายการตรวจจากสมมติฐานระดับกฎ และกำกับบันทึกการยกระดับตามที่มา"
+    },
+    {
+      "id": "double-loop-learning-positive-2",
+      "kind": "positive",
+      "prompt": "นโยบายปล่อยผลิตภัณฑ์ให้รางวัลการส่งตามวันที่วางไว้ และทีมเลื่อนงานความเชื่อถือได้ซ้ำๆ เพื่อทำตามวันนั้น ตรวจเป้าหมาย แรงจูงใจ อำนาจ และสมมติฐานเบื้องหลังนโยบาย แล้วเสนอการทดสอบเปลี่ยนกฎที่มีขอบเขต",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "governing_rule",
+        "feedback_delay",
+        "recurring_failure",
+        "chosen_plan"
+      ],
+      "rationale": "พฤติกรรมซ้ำอาจมาจากนโยบายกำกับแทนข้อผิดพลาดปฏิบัติครั้งเดียว ขั้นตอนเปรียบเทียบกฎใหม่ที่เสนอได้ โดยคงคำอธิบายเชิงเหตุเป็นการอนุมานหรือยังไม่ได้ตรวจสอบจนทดสอบ"
+    },
+    {
+      "id": "double-loop-learning-positive-3",
+      "kind": "positive",
+      "prompt": "หลังปรับการฝึกสองครั้ง การตกหล่นในการส่งต่องานแบบเดิมปรากฏในหลายทีม ทำบันทึกช่องว่างผล แยกการแก้การฝึกแบบวงจรเดียวจากการเปลี่ยนกฎส่งต่อ และระบุหลักฐานที่จะรองรับแต่ละแบบ",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "governing_rule",
+        "repeat_iteration",
+        "testable_claim"
+      ],
+      "rationale": "การเกิดซ้ำหลายครั้งและการแก้วงจรเดียวก่อนหน้าทำให้เหมาะตรวจทบทวนกฎกำกับ ผลที่ขอคือช่องว่าง กฎ หลักฐาน และการทดสอบเรียนรู้ ไม่ใช่การกล่าวโทษหรือความน่าจะเป็นเกิดซ้ำ"
+    },
+    {
+      "id": "double-loop-learning-negative-1",
+      "kind": "negative",
+      "prompt": "การนำขึ้นระบบครั้งหนึ่งมีคำพิมพ์ผิดที่มาตรการตรวจเดิมจับทันที ระบุข้อบกพร่องในการปฏิบัติที่แน่นอนและแก้โดยไม่เปลี่ยนนโยบายปล่อย",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "explicit_rules"
+      ],
+      "rationale": "หลักฐานที่มีอธิบายข้อบกพร่องปฏิบัติเดียวที่มีขอบเขตแล้ว และผู้ใช้ห้ามเปลี่ยนนโยบายชัด การเรียนรู้สองวงจรจะเกินขอบเขต ควรตอบสนองข้อบกพร่องเฉพาะ"
+    },
+    {
+      "id": "double-loop-learning-negative-2",
+      "kind": "negative",
+      "prompt": "เรามีผู้ใช้เป้าหมายและสมมติฐานราคา ออกแบบการทดสอบหน้าแนะนำผลิตภัณฑ์ที่ย้อนกลับได้ เลือกตัววัดที่นำไปตัดสินได้ และนิยามกฎตัดสินว่าจะเปลี่ยนแนวทางหรือเดินหน้าต่อ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "plan",
+        "human_need"
+      ],
+      "rationale": "นี่เป็นคำขอออกแบบการทดลอง lean-startup ที่อาจสับสนในกลุ่มวิธี ไม่ได้รายงานช่องว่างผลที่ซ้ำหรือขอปรับกฎกำกับ"
+    },
+    {
+      "id": "double-loop-learning-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "แปลงระยะเวลาเหตุการณ์ทั้งสามจากนาทีเป็นชั่วโมง และส่งผลตามลำดับเดิม",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การแปลงหน่วยแน่นอนตามกฎ ไม่มีการตัดสินเรื่องช่องว่างซ้ำ ตัวแปรกำกับ หรือการทดสอบเรียนรู้"
+    },
+    {
+      "id": "double-loop-learning-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้การเรียนรู้แบบสองวงจร แสดงช่องว่างผล สมมติฐานหรือกฎกำกับ สถานะหลักฐาน กฎใหม่ที่เสนอ และการทดสอบเรียนรู้ที่ปลอดภัย อย่าโยนความผิดส่วนบุคคล",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "recurring_failure",
+        "governing_rule",
+        "testable_claim"
+      ],
+      "rationale": "ผู้ใช้เรียกวิธีและข้อกำหนดสาธารณะชัด คำสั่งไม่กล่าวโทษสอดคล้องกับการตรวจกฎ อำนาจ แรงจูงใจ และหลักฐานแทนอนุมานเจตนา"
+    },
+    {
+      "id": "double-loop-learning-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "ทีมเราล้มเหลวซ้ำ บอกว่าความเชื่อหรือนโยบายใดต้องเปลี่ยนและควรทดลองอะไร เราไม่มีผลที่คาด บันทึกที่สังเกต ขอบเขตการเกิดซ้ำ หรือกฎปัจจุบันให้ตรวจ",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "recurring_failure",
+        "governing_rule"
+      ],
+      "rationale": "วิธีอาจตรงงาน แต่ขาดช่องว่างชี้ขาดและกฎกำกับ ต้องพักแทนสร้างคำอธิบายลึกหรือโยนปัญหาให้กรอบความคิด"
+    }
+  ]
+}

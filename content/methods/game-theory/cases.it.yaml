@@ -1,0 +1,58 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "game-theory-positive-1"
+    kind: positive
+    prompt: "Se riduciamo il prezzo dell'abbonamento, il concorrente principale può adeguarsi alla riduzione o mantenere il proprio prezzo, e la sua risposta cambierà fidelizzazione e margine. Confronta le risposte credibili prima di raccomandare una mossa."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "Il prompt nomina azioni di prezzo interdipendenti e chiede un'analisi delle risposte. L'instradamento deve rendere visibili le evidenze su margini e fidelizzazione anziché inventare una matrice dei guadagni o una probabilità."
+  - id: "game-theory-positive-2"
+    kind: positive
+    prompt: "Stiamo negoziando un contratto di fornitura pluriennale. Il nostro impegno sui volumi potrebbe ridurre i costi del fornitore, ma il fornitore può dare priorità a un altro acquirente se la nostra previsione è debole. Mappa incentivi, informazioni e impegni credibili."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "Entrambe le parti possono adattarsi e i loro guadagni dipendono dall'impegno dell'altra. Il prompt fornisce un'ipotesi strutturale, non costi verificati, quindi il metodo deve etichettare assunzioni e incertezza."
+  - id: "game-theory-positive-3"
+    kind: positive
+    prompt: "Due piattaforme stanno considerando uno standard condiviso di interoperabilità. L'adozione crea valore per entrambe, ma ciascuna potrebbe aspettare che l'altra sostenga il costo di integrazione. Analizza le possibili risposte e la modifica progettuale che potrebbe rendere credibile la cooperazione."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "La decisione dipende dall'adozione reciproca e dal costo di muoversi per primi. Un risultato stabile condizionale può essere utile, ma l'instradamento non deve chiamarlo equilibrio senza incentivi supportati."
+  - id: "game-theory-negative-1"
+    kind: negative
+    prompt: "Scegli un database interno confrontando latenza, costi di archiviazione e capacità del nostro gruppo di sviluppo. Nessun altro attore può cambiare il risultato."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [no_meaningful_interdependence]
+    rationale: "L'ambiente è considerato fisso e nessuna risposta di un giocatore influenza il risultato. Non si tratta di interdipendenza strategica, quindi il metodo non deve essere selezionato."
+  - id: "game-theory-negative-2"
+    kind: negative
+    prompt: "Valuta le forze politiche, economiche, sociali, tecnologiche, ambientali e legali che potrebbero influenzare il nostro ingresso in questo mercato."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features: [macro_environment, forecast]
+    rationale: "La richiesta può influenzare una strategia, ma l'output decisivo è un esame dei fattori esterni, non delle risposte o degli incentivi dei giocatori. È una probabile confusione fra famiglie; non va inventato un equilibrio della teoria dei giochi."
+  - id: "game-theory-mechanical-1"
+    kind: mechanical
+    prompt: "Calcola la media ponderata di questi quattro prezzi contrattuali usando i volumi forniti."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Il risultato richiesto è un calcolo meccanico con input forniti. Non richiede di modellare la risposta di un altro attore."
+  - id: "game-theory-explicit-1"
+    kind: explicit
+    prompt: "Usa la teoria dei giochi per analizzare questa asta di approvvigionamento. Mostra giocatori, azioni, informazioni, tempi e ogni risultato stabile condizionale, ma non inventare guadagni mancanti."
+    expected_route: "game-theory"
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, interacting_actors]
+    rationale: "L'utente nomina esplicitamente il metodo e richiede la sua struttura pubblica. Il metodo resta principale, mantenendo visibili le informazioni mancanti sui guadagni ed evitando probabilità inventate."
+  - id: "game-theory-insufficiency-1"
+    kind: insufficiency
+    prompt: "Dovremmo minacciare il concorrente con una risposta sui prezzi? Non ho identificato le azioni praticabili del concorrente, le nostre conseguenze, le informazioni di ciascuna parte o se la relazione si ripete."
+    expected_route: "game-theory"
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, interacting_actors]
+    rationale: "La domanda implica interdipendenza strategica, ma la struttura mancante determina la credibilità della minaccia. Il metodo deve sospendere e chiedere soltanto i fatti decisivi anziché prevedere una risposta."

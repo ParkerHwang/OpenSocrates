@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: morphological-analysis-positive-01
+    kind: positive
+    prompt: "Ein öffentliches Programm kann Zugangskanal, Berechtigung, Zeitpunkt, Personal und Rückmeldung variieren; erstellen Sie eine kohärente Matrix und prüfen Sie Kombinationen vor der Modellwahl."
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "Mehrere unabhängige Dimensionen bilden einen qualitativen Optionsraum mit paarweisen Verträglichkeitsprüfungen."
+  - id: morphological-analysis-positive-02
+    kind: positive
+    prompt: "Eine Dienstleistungsneugestaltung optimiert ständig denselben Kanal; erkunden Sie Kombinationen aus Liefermodus, Takt, Verantwortlichkeit und Unterstützungsniveau."
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "Benötigt werden ungewöhnliche Kombinationen kohärenter Dimensionen statt weiterer Änderung einer Variablen."
+  - id: morphological-analysis-positive-03
+    kind: positive
+    prompt: "Ein Strategieworkshop braucht konventionelle, extreme und ausgewogene Konfigurationen für vier unabhängige Entscheidungen samt unvereinbaren Paaren."
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, choose]
+    rationale: "Gefordert sind Parametermatrix, Kombinationsraum, Kohärenzprüfung und repräsentative Konzepte."
+  - id: morphological-analysis-negative-01
+    kind: negative
+    prompt: "Das Team kann Dimensionen nicht unabhängig definieren; unsicher ist vor allem, welche konventionellen Annahmen tatsächlich irreduzible Einschränkungen sind."
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, no_coherent_dimensions]
+    rationale: "Grundlegende Einschränkungen müssen vor dem morphologischen Kombinationsraum entdeckt werden."
+  - id: morphological-analysis-negative-02
+    kind: negative
+    prompt: "Es gibt nur zwei machbare Optionen; ausdrückliche Kriterien und Zielkonflikte entscheiden, nicht Kombinationserkundung."
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features: [multiple_options, choose]
+    rationale: "Ein knapper Vergleich genügt ohne sinnvollen Dimensionsraum."
+  - id: morphological-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Exportieren Sie die vorhandene Parametermatrix als CSV, ohne Werte zu deuten oder zu kombinieren."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Exportieren ist mechanisch."
+  - id: morphological-analysis-explicit-01
+    kind: explicit
+    prompt: "Nutzen Sie morphological-analysis für Dienstleistungskonfigurationen nach Kanal, Zeitpunkt, Verantwortlichkeit und Intensität, und prüfen Sie sie anschließend."
+    expected_route: morphological-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, combinable_dimensions]
+    rationale: "Der Nutzer benennt Methode und Dimensionskombination ausdrücklich."
+  - id: morphological-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "Es gibt nur eine unteilbare Dimension ohne kohärente Werte; erstellen Sie eine große Matrix und wählen Sie präzise die beste Kombination."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [combinable_dimensions, no_coherent_dimensions]
+    rationale: "Ohne kohärente Dimensionen und Werte erzeugt die Matrix falsche Struktur und Präzision."

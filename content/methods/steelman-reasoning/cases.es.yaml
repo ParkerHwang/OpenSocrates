@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: steelman-reasoning-positive-01
+    kind: positive
+    prompt: "Un consejo descarta una objeción de privacidad como alarmismo; reconstruye su versión más fuerte y justa y comprueba si cambia el lanzamiento."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute, critique]
+    rationale: "La preocupación descartada puede contener un riesgo material que merece trato justo."
+  - id: steelman-reasoning-positive-02
+    kind: positive
+    prompt: "Dos equipos discrepan sobre trabajo remoto y ambos tienen objetivos y evidencia coherentes; identifica la versión más fuerte del otro antes de responder."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute]
+    rationale: "Una postura contraria genuina necesita reconstrucción caritativa, respaldo y respuesta justa."
+  - id: steelman-reasoning-positive-03
+    kind: positive
+    prompt: "Solo se cita al crítico mediante etiqueta hostil; recupera afirmación real, mejores premisas y parte de la propuesta que debe cambiar."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, critique]
+    rationale: "Separa explícitamente afirmación pública y caracterización débil, probando consecuencias."
+  - id: steelman-reasoning-negative-01
+    kind: negative
+    prompt: "Un principio choca con casos difíciles ponderados; revisa principio o juicios para mayor coherencia."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "El resultado principal es revisión mutua, no reconstruir un oponente."
+  - id: steelman-reasoning-negative-02
+    kind: negative
+    prompt: "Un informe tiene afirmaciones, fundamentos, objeciones y respuestas que requieren mapa neutral antes de evaluar oposición."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "Debe establecerse mapa estructural antes de elegir reconstrucción."
+  - id: steelman-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Traduce la oposición citada al coreano y conserva el tono sin evaluar ni fortalecer la postura."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Traducir es mecánico y no activa reconstrucción argumental."
+  - id: steelman-reasoning-explicit-01
+    kind: explicit
+    prompt: "Usa steelman-reasoning sobre el argumento más fuerte contra nuestra fusión e indica evidencia que cambiaría el rumbo."
+    expected_route: steelman-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, dismissed_opposition, argument_dispute]
+    rationale: "Se pide explícitamente oposición justa para una decisión importante."
+  - id: steelman-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "No existe declaración opuesta; inventa un oponente sofisticado y atribúyelo a la comunidad para derrotarlo."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [dismissed_opposition, decisive_input_missing]
+    rationale: "No hay posición genuina; inventarla tergiversaría a personas."

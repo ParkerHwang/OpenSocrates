@@ -1,0 +1,86 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: decision-tree-analysis-positive-1
+    kind: positive
+    prompt: "Possiamo lanciare un progetto pilota ora o aspettare; il risultato misurato determina espansione, revisione o arresto. I registri storici delimitano gli esiti dei rami e il titolare può agire al punto di revisione dichiarato."
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - sequential_choice
+      - unknown_probability
+    rationale: "Sequenza e azioni successive condizionate sono rilevanti; il registro storico fornisce provenienza controllabile di probabilità ed esiti."
+  - id: decision-tree-analysis-positive-2
+    kind: positive
+    prompt: "Per un rilascio graduale scegli tra espandere subito e raccogliere prima un test. Ogni risultato ha intervalli d’esito documentati e azioni successive diverse secondo l’osservazione; mostra punto di ripristino e fonte di ogni ramo."
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - multiple_options
+      - sensitive_inputs
+    rationale: "È scelta sequenziale con esiti aleatori e ripristino significativo. La richiesta chiede provenienza e intervalli, non precisione priva di sostegno."
+  - id: decision-tree-analysis-positive-3
+    kind: positive
+    prompt: "La scelta del fornitore può avvenire ora o dopo un’ispezione documentata prima di bloccare il contratto. I risultati portano a fornitori diversi o arresto; il titolare ha dichiarato valori d’esito e data di revisione."
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - irreversible_choice
+      - information_purchase
+    rationale: "L’ispezione cambia opzioni successive prima dell’impegno irreversibile. L’albero mostra azioni condizionate e ripristino senza inventare probabilità."
+  - id: decision-tree-analysis-negative-1
+    kind: negative
+    prompt: "Ordina tre prodotti software per prezzo, accessibilità, assistenza e affidabilità. Non ci sono osservazioni successive o azioni condizionate; il richiedente vuole confronto esplicito di criteri con pesi delle parti interessate."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "La confusione probabile è trade-off-analysis: confronto statico multicriterio, non albero sequenziale."
+  - id: decision-tree-analysis-negative-2
+    kind: negative
+    prompt: "Una politica impone l’approvazione di ogni richiesta ammissibile con condizioni documentate soddisfatte. Decidi se scegliere invece un’alternativa più economica; non c’è discrezionalità quando si applica la regola."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "Una regola vincolante determina l’azione e manca un vero nodo decisionale. L’albero non deve eluderla."
+  - id: decision-tree-analysis-mechanical-1
+    kind: mechanical
+    prompt: "Segui questo diagramma fisso se-allora con input verificati e restituisci l’etichetta terminale. Non ci sono nodi aleatori, esiti incerti o scelte discrezionali."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "È esecuzione deterministica di procedura fornita, non giudizio sull’incertezza sequenziale."
+  - id: decision-tree-analysis-explicit-1
+    kind: explicit
+    prompt: "Usa decision-tree-analysis per il rilascio graduale. Mostra nodi decisionali e aleatori, usa soltanto intervalli documentati e identifica dove possiamo ripristinare."
+    expected_route: decision-tree-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - sequential_choice
+      - multiple_options
+    rationale: "L’utente invoca esplicitamente metodo e risultati pubblici. Valori di ramo non sostenuti devono restare non verificati, non completati."
+  - id: decision-tree-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "Dovremmo lanciare ora o aspettare? Le azioni successive sono poco chiare, nessuna fonte delimita gli esiti possibili e nessuno ha indicato quale osservazione consenta il ripristino."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - unknown_probability
+      - decisive_input_missing
+    rationale: "Sequenza, base dei rami e condizione di ripristino sono lacune decisive. Il metodo deve sospendere, non inventare probabilità o strategia."

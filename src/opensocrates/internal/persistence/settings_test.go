@@ -90,8 +90,8 @@ func TestSettingsRefuseLinkedStateAndExport(t *testing.T) {
 	}
 }
 
-func TestV151LocaleSettingsRoundTripAndUnrelatedRigorWrite(t *testing.T) {
-	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+func TestV152LocaleSettingsRoundTripAndUnrelatedRigorWrite(t *testing.T) {
+	for _, locale := range []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} {
 		t.Run(locale, func(t *testing.T) {
 			root := privateSettingsTestRoot(t)
 			original := domain.DefaultSettings()

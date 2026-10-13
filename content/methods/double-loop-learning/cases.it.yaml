@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: double-loop-learning-positive-1
+    kind: positive
+    prompt: "Il nostro gruppo di assistenza ha ridotto i tempi di risposta con una nuova lista di controllo, ma dopo due mesi sono tornate le escalation dei clienti. Confronta risultati attesi ed effettivi, esamina l'obiettivo del servizio e la regola che ha orientato la lista, e progetta una prova di apprendimento sicura per una regola rivista."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [recurring_failure, governing_rule, repeat_iteration, testable_claim]
+    rationale: "Una correzione procedurale non ha evitato la ricorrenza, quindi il compito chiede se debba cambiare l'obiettivo o la regola guida. L'instradamento deve separare l'azione sulla lista di controllo dall'ipotesi a livello di regola ed etichettare i registri delle escalation secondo la provenienza."
+  - id: double-loop-learning-positive-2
+    kind: positive
+    prompt: "Una politica di rilascio premia la consegna nella data pianificata e i gruppi rimandano ripetutamente gli interventi sull'affidabilità per rispettarla. Esamina obiettivo, incentivo, autorità e assunzione dietro la politica, poi proponi una prova delimitata di modifica della regola."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [governing_rule, feedback_delay, recurring_failure, chosen_plan]
+    rationale: "Il comportamento ricorrente può plausibilmente derivare da una politica guida anziché da un singolo errore di esecuzione. La procedura può confrontare regole riviste candidate mantenendo la spiegazione causale inferita o non verificata fino alla prova."
+  - id: double-loop-learning-positive-3
+    kind: positive
+    prompt: "Dopo due revisioni della formazione, la stessa omissione nei passaggi di consegne compare in diversi gruppi. Crea un registro dello scarto nei risultati, distingui una correzione formativa a ciclo singolo da una modifica della regola di passaggio e specifica le evidenze che supporterebbero ciascuna."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [recurring_failure, governing_rule, repeat_iteration, testable_claim]
+    rationale: "Più casi di ricorrenza e precedenti correzioni a ciclo singolo rendono appropriato un esame della regola guida. L'output richiesto comprende scarto, regola, evidenze e prova di apprendimento, non colpe o probabilità di ricorrenza."
+  - id: double-loop-learning-negative-1
+    kind: negative
+    prompt: "Una distribuzione contiene un refuso che il controllo di revisione esistente ha rilevato subito. Identifica l'esatto difetto di esecuzione e correggilo senza cambiare la politica di rilascio."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical, explicit_rules]
+    rationale: "Un singolo difetto delimitato di esecuzione è già spiegato dalle evidenze disponibili e l'utente esclude esplicitamente una modifica della politica. L'apprendimento a doppio ciclo andrebbe oltre l'ambito; è appropriata una risposta mirata al difetto."
+  - id: double-loop-learning-negative-2
+    kind: negative
+    prompt: "Abbiamo un utente di riferimento e un'ipotesi sui prezzi. Progetta un test reversibile di una pagina di presentazione, scegli una metrica che guidi le azioni e definisci la regola decisionale per cambiare rotta o perseverare."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, plan, human_need]
+    rationale: "Questa richiesta riguarda la progettazione di un esperimento lean-startup, una probabile confusione fra famiglie. Non segnala uno scarto ricorrente nei risultati né chiede di rivedere una regola guida."
+  - id: double-loop-learning-mechanical-1
+    kind: mechanical
+    prompt: "Converti da minuti a ore le tre durate degli incidenti e restituisci i risultati nello stesso ordine."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "La conversione delle unità è deterministica e non contiene giudizi su scarti ricorrenti, variabili guida o prove di apprendimento."
+  - id: double-loop-learning-explicit-1
+    kind: explicit
+    prompt: "Usa l'apprendimento a doppio ciclo. Mostra lo scarto nei risultati, l'assunzione o regola guida, lo stato delle evidenze, una regola rivista candidata e una prova di apprendimento sicura; non attribuire colpe personali."
+    expected_route: double-loop-learning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, recurring_failure, governing_rule, testable_claim]
+    rationale: "L'utente richiama esplicitamente il metodo e il suo contratto pubblico. Il divieto di attribuire colpe è coerente con l'esame di regole, autorità, incentivi ed evidenze anziché con la deduzione di intenzioni."
+  - id: double-loop-learning-insufficiency-1
+    kind: insufficiency
+    prompt: "Il nostro gruppo continua a fallire. Dicci quale convinzione o politica deve cambiare e quale esperimento eseguire. Non abbiamo un risultato atteso, un registro osservato, un perimetro della ricorrenza o una regola corrente da esaminare."
+    expected_route: double-loop-learning
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, recurring_failure, governing_rule]
+    rationale: "Il metodo potrebbe essere adatto, ma mancano lo scarto decisivo e la regola guida. Deve sospendere il giudizio anziché inventare una spiegazione profonda o attribuire il problema alla mentalità."

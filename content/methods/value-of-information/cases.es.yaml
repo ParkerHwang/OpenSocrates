@@ -1,0 +1,83 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: value-of-information-positive-1
+    kind: positive
+    prompt: "Podemos lanzar ahora o estudiar usuarios primero. Adopción cambiaría acciones, método y coste directo se conocen y hay fecha fija tras la que demorar es inaceptable."
+    expected_route: value-of-information
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - new_evidence
+      - sensitive_inputs
+    rationale: "Hay vía de cambio de acción y carga acotada; no requiere probabilidades ni valores monetarios inventados."
+  - id: value-of-information-positive-2
+    kind: positive
+    prompt: "Antes de firmar contrato podemos inspeccionar riesgo de fallo que cambiaría proveedor. Fuente, coste, demora y umbral están documentados; decide si merece inspección."
+    expected_route: value-of-information
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - irreversible_choice
+      - sensitive_inputs
+    rationale: "Información previa a decisión irreversible y acción alternativa. Muestra procedencia y demora sin fabricar posterior."
+  - id: value-of-information-positive-3
+    kind: positive
+    prompt: "Debemos ampliar programa o pausar para evaluación específica. La prueba distingue ampliar o detener, con exposición y plazo establecidos."
+    expected_route: value-of-information
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - testable_hypothesis
+      - feedback_delay
+    rationale: "Se valora prueba viable que cambia acción antes del plazo, no investigación abierta."
+  - id: value-of-information-negative-1
+    kind: negative
+    prompt: "Encuentra todo lo interesante del trabajo remoto y resume literatura. No hay decisión, umbral, variable ni plazo."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - explain
+      - source_quality
+    rationale: "Investigación abierta sin acción decisiva; no puede valorarse información sin decisión y umbral."
+  - id: value-of-information-negative-2
+    kind: negative
+    prompt: "La regla exige equipos protectores aprobados sin discreción. Decide si investigar justificaría otros no aprobados más baratos."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - binding_rule_without_discretion
+      - single_feasible_option
+    rationale: "Posible confusión con deontic-reasoning o seguridad: información no autoriza negociar regla vinculante."
+  - id: value-of-information-mechanical-1
+    kind: mechanical
+    prompt: "Usa la ecuación de tamaño de muestra y datos verificados para devolver la muestra necesaria. No decidas ejecutar estudio ni interpretes valor decisorio."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "Es cálculo fijo, no juicio de información que cambia acciones."
+  - id: value-of-information-explicit-1
+    kind: explicit
+    prompt: "Usa value-of-information para decidir si inspección merece coste y demora. Indica hallazgo decisivo para proveedor y dónde termina inspección."
+    expected_route: value-of-information
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - information_purchase
+      - irreversible_choice
+    rationale: "Se invoca método y contrato de umbral, cambio de acción, coste, demora y cierre."
+  - id: value-of-information-insufficiency-1
+    kind: insufficiency
+    prompt: "¿Investigamos más antes de actuar? No se indican acción actual, alternativa, variable, prueba ni demora tolerable."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - information_purchase
+      - decisive_input_missing
+    rationale: "Sin umbral y vía viable no puede establecerse valor decisorio. Suspende y pide mínima aclaración segura."

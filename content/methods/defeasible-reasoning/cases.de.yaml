@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: defeasible-reasoning-positive-01
+    kind: positive
+    prompt: "Normalerweise gilt diese Regel; welche Ausnahmen oder neuen Tatsachen würden die Empfehlung zurücknehmen?"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "Standardregelurteil braucht ausdrückliche Gegenargumente und Rücknahmebedingungen."
+  - id: defeasible-reasoning-positive-02
+    kind: positive
+    prompt: "Trenne direkt widersprechende Belege von solchen, die die tragende Regel schwächen."
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "Gefragt sind widerlegende und untergrabende Einwände in revidierbarem Urteil."
+  - id: defeasible-reasoning-positive-03
+    kind: positive
+    prompt: "Allgemeine Regel und speziellere Ausnahme gelten beide; welcher vorläufige Status besteht?"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "Spezifität und offene Ausnahmen ohne vorgetäuschte Unbedingtheit behandeln."
+  - id: defeasible-reasoning-negative-01
+    kind: negative
+    prompt: "Wende strikte Aufbewahrungsregel auf jeden Datensatz an und liefere deterministisches Ergebnis."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "Ausnahmslose Regel verlangt Deduktion oder mechanische Anwendung."
+  - id: defeasible-reasoning-negative-02
+    kind: negative
+    prompt: "Ordne Quellen nach Designqualität und passe Aussage an stärkste anwendbare Quelle an."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Beleghierarchie statt Verwaltung von Standardregel-Gegenargumenten."
+  - id: defeasible-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Kopiere Standardregel und Ausnahmen in die Richtlinienvorlage."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Vorgegebenen Regeltext kopieren ist mechanisch."
+  - id: defeasible-reasoning-explicit-01
+    kind: explicit
+    prompt: "Nutze ausdrücklich defeasible-reasoning zur Prüfung normalerweise gültiger Genehmigungsregel und ihrer Ausnahmen."
+    expected_route: defeasible-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, exception_prone_rule]
+    rationale: "Nutzer fordert Standardregel-, Gegenargument- und Rücknahmeanalyse."
+  - id: defeasible-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "Wende Standardregel ohne Quelle, Auslösetatsachen, Umfang oder mögliche Ausnahmen an."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [exception_prone_rule, decisive_input_missing]
+    rationale: "Ohne Standard und Auslöser wäre vorläufiger Schluss willkürlich."

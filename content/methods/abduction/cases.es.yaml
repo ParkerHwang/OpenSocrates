@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: abduction-positive-01
+    kind: positive
+    prompt: "Varias causas podrían explicar la caída repentina de la conversión; ¿qué explicación encaja mejor con los hechos observados?"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Varias explicaciones encajan con una anomalía y requieren evidencia discriminante antes de elegir una mejor explicación provisional."
+  - id: abduction-positive-02
+    kind: positive
+    prompt: "El servicio falla solo en algunas regiones. Compara explicaciones plausibles y propone la siguiente observación que las distinga."
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "La tarea es un diagnóstico con información incompleta y solicita una comprobación discriminante."
+  - id: abduction-positive-03
+    kind: positive
+    prompt: "¿Cuál es la mejor explicación actual de este resultado inesperado de laboratorio y qué te haría cambiar de opinión?"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "La respuesta debe comparar explicaciones candidatas y mantenerse explícitamente provisional."
+  - id: abduction-negative-01
+    kind: negative
+    prompt: "Dadas estas premisas y esta regla explícitas, ¿se sigue necesariamente la conclusión?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Las premisas establecidas y una regla requieren deducción, no la búsqueda de la mejor explicación."
+  - id: abduction-negative-02
+    kind: negative
+    prompt: "Usa las observaciones repetidas de la muestra para estimar con qué frecuencia aparece este patrón en la población."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "La tarea generaliza a partir de una muestra en lugar de comparar explicaciones rivales."
+  - id: abduction-mechanical-01
+    kind: mechanical
+    prompt: "Copia las tres hipótesis proporcionadas en la plantilla de investigación."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copiar hipótesis es una tarea mecánica y no debe activar un diagnóstico."
+  - id: abduction-explicit-01
+    kind: explicit
+    prompt: "Invoca explícitamente abduction para diagnosticar por qué falla el despliegue tras cambiar la configuración."
+    expected_route: abduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, competing_explanations]
+    rationale: "El usuario nombra explícitamente el método para un resultado anómalo y un diagnóstico."
+  - id: abduction-insufficiency-01
+    kind: insufficiency
+    prompt: "Elige la mejor explicación, pero proporciona solo la conclusión, sin observaciones, alternativas ni evidencia comprobable."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [competing_explanations, decisive_input_missing]
+    rationale: "Sin una observación y candidatas rivales, elegir la mejor explicación sería una historia y no una inferencia."

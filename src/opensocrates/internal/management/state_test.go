@@ -3,6 +3,7 @@ package management
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"path/filepath"
 	"reflect"
@@ -79,53 +80,65 @@ func TestRetireLegacyUpdateOwnerPreservesOpaqueNumbers(t *testing.T) {
 	}
 }
 
-func TestReleased151LegacyStatePreservesLocaleAndUnrelatedMetadata(t *testing.T) {
-	for _, locale := range []string{"zh", "ja"} {
-		t.Run(locale, func(t *testing.T) {
-			dir := t.TempDir()
-			raw := []byte(`{"schema":"opensocrates.desired-state/1.0.0","channel":"stable","installedHosts":["codex"],"activeVersion":"1.5.1","contentRevision":4,"updatePolicy":{"intervalHours":24,"allowMajor":false},"autoUpdate":{"enabled":false,"hosts":[],"nextCheckAt":null},"future":{"locale_preference":"` + locale + `","large":9007199254740993,"unicode":"中文 日本語 한글😀","npm":{"unrelated":"keep"},"integrations":{"claude":false}}}`)
-			if e := platform.AtomicWrite(filepath.Join(dir, "desired-state.json"), raw, 0600); e != nil {
-				t.Fatal(e)
-			}
-			state, preserved, e := ReadLegacy(dir)
-			if e != nil || state.ActiveVersion == nil || *state.ActiveVersion != "1.5.1" || !bytes.Equal(raw, preserved) {
-				t.Fatalf("released v1.5.1 state changed: %v", e)
-			}
-			retired, e := RetireLegacyUpdater(preserved)
-			if e != nil {
-				t.Fatal(e)
-			}
-			var before, after map[string]json.RawMessage
-			if json.Unmarshal(raw, &before) != nil || json.Unmarshal(retired, &after) != nil {
-				t.Fatal("invalid state")
-			}
-			for _, key := range []string{"activeVersion", "contentRevision", "future", "installedHosts", "updatePolicy"} {
-				if !bytes.Equal(before[key], after[key]) {
-					// Marshaling may change formatting, but must preserve every value
-					// and arbitrary-precision number in opaque legacy fields.
-					var a, z any
-					d1 := json.NewDecoder(bytes.NewReader(before[key]))
-					d2 := json.NewDecoder(bytes.NewReader(after[key]))
-					d1.UseNumber()
-					d2.UseNumber()
-					if d1.Decode(&a) != nil || d2.Decode(&z) != nil || !reflect.DeepEqual(a, z) {
-						t.Fatalf("unrelated v1.5.1 field changed: %s", key)
+func TestReleasedLegacyStatePreservesLocaleAndUnrelatedMetadata(t *testing.T) {
+	for _, tc := range []struct {
+		version  string
+		revision int
+		locales  []string
+	}{
+		{"1.5.1", 4, []string{"zh", "ja"}},
+		{"1.5.2", 5, []string{"fr", "de", "it", "es", "pt", "th"}},
+	} {
+		for _, locale := range tc.locales {
+			t.Run(tc.version+"/"+locale, func(t *testing.T) {
+				dir := filepath.Join(t.TempDir(), "private-state")
+				if e := platform.Mkdir(dir); e != nil {
+					t.Fatal(e)
+				}
+				raw := []byte(fmt.Sprintf(`{"schema":"opensocrates.desired-state/1.0.0","channel":"stable","installedHosts":["codex"],"activeVersion":"%s","contentRevision":%d,"updatePolicy":{"intervalHours":24,"allowMajor":false},"autoUpdate":{"enabled":false,"hosts":[],"nextCheckAt":null},"future":{"locale_preference":"%s","large":9007199254740993,"unicode":"中文 日本語 한글😀","npm":{"unrelated":"keep"},"integrations":{"claude":false}}}`, tc.version, tc.revision, locale))
+				if e := platform.AtomicWrite(filepath.Join(dir, "desired-state.json"), raw, 0600); e != nil {
+					t.Fatal(e)
+				}
+				state, preserved, e := ReadLegacy(dir)
+				if e != nil || state.ActiveVersion == nil || *state.ActiveVersion != tc.version || !bytes.Equal(raw, preserved) {
+					t.Fatalf("released %s state changed: %v", tc.version, e)
+				}
+				retired, e := RetireLegacyUpdater(preserved)
+				if e != nil {
+					t.Fatal(e)
+				}
+				var before, after map[string]json.RawMessage
+				if json.Unmarshal(raw, &before) != nil || json.Unmarshal(retired, &after) != nil {
+					t.Fatal("invalid state")
+				}
+				for _, key := range []string{"activeVersion", "contentRevision", "future", "installedHosts", "updatePolicy"} {
+					if !bytes.Equal(before[key], after[key]) {
+						// Marshaling may change formatting, but must preserve every value
+						// and arbitrary-precision number in opaque legacy fields.
+						var a, z any
+						d1 := json.NewDecoder(bytes.NewReader(before[key]))
+						d2 := json.NewDecoder(bytes.NewReader(after[key]))
+						d1.UseNumber()
+						d2.UseNumber()
+						if d1.Decode(&a) != nil || d2.Decode(&z) != nil || !reflect.DeepEqual(a, z) {
+							t.Fatalf("unrelated %s field changed: %s", tc.version, key)
+						}
 					}
 				}
-			}
-			persisted, e := StateBytes(State{Schema: StateSchema, Installations: map[string]Installation{}, UpdateOwner: "native", LegacyDesiredState: retired})
-			if e != nil {
-				t.Fatal(e)
-			}
-			var native map[string]json.RawMessage
-			var opaque map[string]json.RawMessage
-			if json.Unmarshal(persisted, &native) != nil || json.Unmarshal(native["legacy_desired_state"], &opaque) != nil {
-				t.Fatal("native migration state invalid")
-			}
-			var future map[string]json.RawMessage
-			if json.Unmarshal(opaque["future"], &future) != nil || string(future["locale_preference"]) != `"`+locale+`"` || string(future["large"]) != "9007199254740993" {
-				t.Fatal("locale/opaque precision lost in native migration state")
-			}
-		})
+				persisted, e := StateBytes(State{Schema: StateSchema, Installations: map[string]Installation{}, UpdateOwner: "native", LegacyDesiredState: retired})
+				if e != nil {
+					t.Fatal(e)
+				}
+				var native map[string]json.RawMessage
+				var opaque map[string]json.RawMessage
+				if json.Unmarshal(persisted, &native) != nil || json.Unmarshal(native["legacy_desired_state"], &opaque) != nil {
+					t.Fatal("native migration state invalid")
+				}
+				var future map[string]json.RawMessage
+				if json.Unmarshal(opaque["future"], &future) != nil || string(future["locale_preference"]) != `"`+locale+`"` || string(future["large"]) != "9007199254740993" {
+					t.Fatal("locale/opaque precision lost in native migration state")
+				}
+			})
+		}
 	}
 }

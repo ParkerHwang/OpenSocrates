@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: evidence-hierarchy-positive-01
+    kind: positive
+    prompt: "Welche Studien stützen die Wirkungsbehauptung direkt, und wie stark sollten wir formulieren?"
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence, conflicting_sources]
+    rationale: "Gefragt sind Quellenzuordnung, Qualitätsgrenzen und angepasste Stärke."
+  - id: evidence-hierarchy-positive-02
+    kind: positive
+    prompt: "Vergleiche Fachmeinung, Nutzerumfrage und kontrolliertes Experiment auf Anwendbarkeit dieser Politikentscheidung."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Designs nach Unmittelbarkeit, Verzerrung und Kontextpassung abwägen."
+  - id: evidence-hierarchy-positive-03
+    kind: positive
+    prompt: "Quellen streiten über Mechanismus; benenne Qualitätsgrenzen und ob die Behauptung ausgesetzt werden sollte."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, conflicting_sources, reconcile_evidence]
+    rationale: "Wesentlicher Konflikt verlangt Statuskalibrierung statt einfacher Abstimmung."
+  - id: evidence-hierarchy-negative-01
+    kind: negative
+    prompt: "Prüfe mit unabhängigen Daten und Methoden, ob widersprüchliche Quellen bei derselben Behauptung zusammenlaufen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "Hauptfrage ist Unabhängigkeit und Konvergenz, also triangulation."
+  - id: evidence-hierarchy-negative-02
+    kind: negative
+    prompt: "Wähle Optionen nach bester Übereinstimmung des Ergebnisses mit unseren Werten."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [value_conflict, choose]
+    rationale: "Wertpräferenz wird durch vorhandene Quellen nicht zur Beleghierarchiefrage."
+  - id: evidence-hierarchy-mechanical-01
+    kind: mechanical
+    prompt: "Sortiere vorgegebene Zitate nach Veröffentlichungsdatum mit unveränderten Titeln."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Sortierung bewertet weder Qualität noch Anwendbarkeit."
+  - id: evidence-hierarchy-explicit-01
+    kind: explicit
+    prompt: "Nutze ausdrücklich evidence-hierarchy zur Anpassung dieser medizinähnlichen Aussage an verfügbare Studiendesigns."
+    expected_route: evidence-hierarchy
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, source_quality]
+    rationale: "Nutzer fordert Stärkeanpassung gemischter Quellen ausdrücklich."
+  - id: evidence-hierarchy-insufficiency-01
+    kind: insufficiency
+    prompt: "Beurteile starke Unterstützung ohne Behauptungsumfang, Quellen, Designs oder Zielkontext."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [source_quality, decisive_input_missing]
+    rationale: "Ohne Quellenzuordnung und Anwendbarkeit wäre Stärke willkürlich."

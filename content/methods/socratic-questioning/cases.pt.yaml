@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "socratic-questioning-positive-01",
+      "kind": "positive",
+      "prompt": "Faça só perguntas que mudariam nossa decisão de lançar este serviço neste trimestre.",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "Pede conjunto delimitado que muda decisão, não entrevista aberta."
+    },
+    {
+      "id": "socratic-questioning-positive-02",
+      "kind": "positive",
+      "prompt": "Ajude a examinar suposições da minha afirmação, com no máximo três perguntas e justificativa da importância de cada.",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "Exige poucas perguntas ligadas às consequências para esclarecer julgamento."
+    },
+    {
+      "id": "socratic-questioning-positive-03",
+      "kind": "positive",
+      "prompt": "Não sei o que boa evidência significa aqui; faça poucas perguntas capazes de mudar padrão de revisão.",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "Respostas ausentes podem mudar padrão e devem surgir sem excesso de perguntas."
+    },
+    {
+      "id": "socratic-questioning-negative-01",
+      "kind": "negative",
+      "prompt": "Use requisitos fornecidos para verificar conclusão da implementação e listar campos ausentes.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "review_completion",
+        "explicit_rules"
+      ],
+      "rationale": "Há regra fixa e verificação direta de conclusão, não julgamento por esclarecimento."
+    },
+    {
+      "id": "socratic-questioning-negative-02",
+      "kind": "negative",
+      "prompt": "Defina o termo disputado comparando casos positivos, negativos e de fronteira.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "ambiguous_terms"
+      ],
+      "rationale": "Pede análise conceitual, não sequência delimitada de perguntas."
+    },
+    {
+      "id": "socratic-questioning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Transforme estas cinco perguntas em lista Markdown numerada.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Formatar perguntas é mecânico e não deve disparar outras."
+    },
+    {
+      "id": "socratic-questioning-explicit-01",
+      "kind": "explicit",
+      "prompt": "Invoque explicitamente socratic-questioning para testar se minha decisão se apoia em premissa oculta.",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "hidden_assumptions"
+      ],
+      "rationale": "O usuário nomeia método e perguntas para testar premissa."
+    },
+    {
+      "id": "socratic-questioning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Faça perguntas decisivas sem revelar decisão, afirmação, escopo ou consequência que devem afetar.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "Sem decisão ou consequência alvo, não se delimitam perguntas nem sua relevância."
+    }
+  ]
+}

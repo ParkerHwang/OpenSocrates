@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: first-principles-positive-01
+    kind: positive
+    prompt: "Welche Teile unserer Preise pro Sitzplatz sind notwendig, welche vom alten Vertrieb übernommen?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "Neugestaltung trennt unreduzierbare Anforderungen von Konventionen und geerbten Annahmen."
+  - id: first-principles-positive-02
+    kind: positive
+    prompt: "Können wir Genehmigung aus echten Sicherheitsgrenzen neu gestalten statt Folge kopieren?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "Gefragt sind Zerlegung, Notwendigkeitsprüfung und Rekonstruktion."
+  - id: first-principles-positive-03
+    kind: positive
+    prompt: "Was muss beim Pipeline-Neuaufbau ohne angenommene Anbieterarchitektur wahr bleiben?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "Hauptfrage sind nach Architekturhinterfragung verbleibende Grenzen."
+  - id: first-principles-negative-01
+    kind: negative
+    prompt: "Wende bindende Aufbewahrungsregel je Datensatz an und melde Verstöße."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "Bindende Regel wird angewendet, nicht rekonstruiert."
+  - id: first-principles-negative-02
+    kind: negative
+    prompt: "Erzeuge fünf Kombinationen fester Parameter und prüfe Machbarkeit."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "Anforderungen stehen fest; Kombinationserkundung verbleibt."
+  - id: first-principles-mechanical-01
+    kind: mechanical
+    prompt: "Kopiere bestehende Bereitstellungsliste unverändert in neue Vorlage."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Listenkopieren ist mechanisch, keine Neugestaltung."
+  - id: first-principles-explicit-01
+    kind: explicit
+    prompt: "Nutze first-principles gegen Annahme notwendiger menschlicher Prüfung jedes Supporttickets."
+    expected_route: first-principles
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions]
+    rationale: "Nutzer fordert Zerlegung und Prüfung üblicher Annahme ausdrücklich."
+  - id: first-principles-insufficiency-01
+    kind: insufficiency
+    prompt: "Baue System aus Grundprinzipien neu, aber ohne Ziel, feste Grenzen oder Sicherheitsregeln."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [hidden_assumptions, decisive_input_missing]
+    rationale: "Ohne Ziel und harte Grenzen verwechselt Rekonstruktion Möglichkeit mit sicherer Tragfähigkeit."

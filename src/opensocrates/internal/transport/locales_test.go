@@ -4,12 +4,14 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
 
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 )
 
@@ -51,9 +53,14 @@ func localeFixture(t *testing.T, host, version string) (string, Manifest, map[st
 		m.SkillRoot = skill
 	}
 	files[skill+"/SKILL.md"] = []byte("Read each authored method completely.\n")
-	locales := []string{"en", "ko", "zh", "ja"}
-	if version == "1.5.0" {
-		locales = []string{"en", "ko"}
+	locales := []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}
+	switch version {
+	case "1.5.0":
+		locales, m.ContentRevision = []string{"en", "ko"}, "3"
+	case "1.5.1":
+		locales, m.ContentRevision = []string{"en", "ko", "zh", "ja"}, "4"
+	default:
+		m.ContentRevision = "5"
 	}
 	for i := 0; i < 48; i++ {
 		id := fmt.Sprintf("method-%d", i)
@@ -106,7 +113,7 @@ func writeLocaleFixture(t *testing.T, root string, m Manifest, files map[string]
 
 func TestReleasedMethodLocaleVersionBoundary(t *testing.T) {
 	for _, host := range []string{"codex", "claude", "antigravity", "claude-chat"} {
-		for _, version := range []string{"1.5.0", "1.5.1", "1.6.0"} {
+		for _, version := range []string{"1.5.0", "1.5.1", "1.5.2", "1.6.0"} {
 			t.Run(host+"/"+version, func(t *testing.T) {
 				root, m, files := localeFixture(t, host, version)
 				writeLocaleFixture(t, root, m, files)
@@ -121,7 +128,7 @@ func TestReleasedMethodLocaleVersionBoundary(t *testing.T) {
 
 func TestNewPackagesRefuseConsistentIncompleteOrSubstitutedMethodInventories(t *testing.T) {
 	for _, host := range []string{"codex", "claude", "antigravity", "claude-chat"} {
-		for _, mutation := range []string{"missing-ja", "old-two-locales", "unknown-locale", "unknown-method", "wrong-filename"} {
+		for _, mutation := range []string{"missing-th", "old-two-locales", "old-four-locales", "unknown-locale", "unknown-method", "wrong-filename", "extra-locale", "extra-method"} {
 			t.Run(host+"/"+mutation, func(t *testing.T) {
 				root, m, files := localeFixture(t, host, "1.6.0")
 				skill := "skills/opensocrates"
@@ -131,16 +138,26 @@ func TestNewPackagesRefuseConsistentIncompleteOrSubstitutedMethodInventories(t *
 				prefix := skill + "/references/decision/methods/"
 				path := prefix + "ja/method-0.md"
 				switch mutation {
-				case "missing-ja":
-					delete(files, path)
+				case "missing-th":
+					delete(files, prefix+"th/method-0.md")
 				case "old-two-locales":
 					for name := range files {
-						if strings.HasPrefix(name, prefix+"ja/") || strings.HasPrefix(name, prefix+"zh/") {
+						if strings.HasPrefix(name, prefix) && !strings.HasPrefix(name, prefix+"en/") && !strings.HasPrefix(name, prefix+"ko/") {
 							delete(files, name)
 						}
 					}
+				case "old-four-locales":
+					for name := range files {
+						if strings.HasPrefix(name, prefix) && !strings.HasPrefix(name, prefix+"en/") && !strings.HasPrefix(name, prefix+"ko/") && !strings.HasPrefix(name, prefix+"zh/") && !strings.HasPrefix(name, prefix+"ja/") {
+							delete(files, name)
+						}
+					}
+				case "extra-locale":
+					files[prefix+"ru/method-0.md"] = files[path]
+				case "extra-method":
+					files[prefix+"th/unknown.md"] = files[path]
 				case "unknown-locale":
-					files[prefix+"fr/method-0.md"] = files[path]
+					files[prefix+"ru/method-0.md"] = files[path]
 					delete(files, path)
 				case "unknown-method":
 					files[prefix+"ja/unknown.md"] = files[path]
@@ -150,8 +167,10 @@ func TestNewPackagesRefuseConsistentIncompleteOrSubstitutedMethodInventories(t *
 					delete(files, path)
 				}
 				writeLocaleFixture(t, root, m, files)
-				if _, e := Verify(root, host, "1.6.0", "darwin-arm64"); e == nil {
-					t.Fatal("consistent but incomplete canonical package accepted")
+				_, e := Verify(root, host, "1.6.0", "darwin-arm64")
+				var category *diagnostics.Error
+				if !errors.As(e, &category) || category.Code != diagnostics.Verification || category.Stage != "methods" {
+					t.Fatalf("expected canonical rejection, got %v", e)
 				}
 			})
 		}
@@ -162,22 +181,50 @@ func TestCanonicalMethodRowsRequireExactIdentityPathAndDigest(t *testing.T) {
 	for _, host := range []string{"antigravity", "claude-chat"} {
 		for _, mutation := range []string{"duplicate", "unknown-locale", "path", "digest"} {
 			t.Run(host+"/"+mutation, func(t *testing.T) {
-				root, m, files := localeFixture(t, host, "1.5.1")
+				root, m, files := localeFixture(t, host, "1.5.2")
 				switch mutation {
 				case "duplicate":
 					m.CanonicalMethods[1] = m.CanonicalMethods[0]
 				case "unknown-locale":
-					m.CanonicalMethods[0].Locale = "fr"
+					m.CanonicalMethods[0].Locale = "ru"
 				case "path":
 					m.CanonicalMethods[0].Path = m.CanonicalMethods[1].Path
 				case "digest":
 					m.CanonicalMethods[0].SHA256 = strings.Repeat("b", 64)
 				}
 				writeLocaleFixture(t, root, m, files)
-				if _, e := Verify(root, host, "1.5.1", ""); e == nil {
+				if _, e := Verify(root, host, "1.5.2", ""); e == nil {
 					t.Fatal("misbound canonical reference accepted")
 				}
 			})
+		}
+	}
+}
+
+func TestMethodLocaleGenerationsFollowReleasedNumericVersionGuards(t *testing.T) {
+	for _, tc := range []struct {
+		version string
+		count   int
+	}{
+		{"0.9.99", 2}, {"1.4.999", 2}, {"1.5.0", 2},
+		{"1.5.1", 4}, {"1.05.001", 4}, {"1.5.2", 10},
+		{"1.5.999999999999999999999999", 10}, {"1.6.0", 10}, {"2.0.0", 10},
+	} {
+		if got := len(methodLocales(tc.version)); got != tc.count {
+			t.Fatalf("version %s requires %d locales, got %d", tc.version, tc.count, got)
+		}
+	}
+}
+
+func TestCanonicalMethodWireRejectsAdditionalOrMissingKeys(t *testing.T) {
+	for _, raw := range []string{
+		`{"locale":"th","method_id":"deduction","path":"p","sha256":"h","future":true}`,
+		`{"locale":"th","method_id":"deduction","path":"p"}`,
+		`{"locale":"th","locale":"fr","method_id":"deduction","path":"p","sha256":"h"}`,
+	} {
+		var row CanonicalMethod
+		if json.Unmarshal([]byte(raw), &row) == nil {
+			t.Fatal("noncanonical reference object accepted")
 		}
 	}
 }

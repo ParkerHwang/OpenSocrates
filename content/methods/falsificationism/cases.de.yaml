@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: falsificationism-positive-01
+    kind: positive
+    prompt: "Welche Beobachtung würde entscheidend gegen diese bevorzugte Produkthypothese sprechen?"
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "Behauptung braucht riskante Vorhersage und beobachtbare Widerlegung statt bestätigender Anekdoten."
+  - id: falsificationism-positive-02
+    kind: positive
+    prompt: "Mache Erklärung zur Prognose, trenne Hilfsannahmen und definiere Fehlschlagsschwelle vor Test."
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "Vorab festgelegter Widerlegungsversuch mit Messbedingungen gefordert."
+  - id: falsificationism-positive-03
+    kind: positive
+    prompt: "Schwächte die gescheiterte Vorhersage Theorie, Messung oder Hilfsannahme des Aufbaus?"
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "Lokalisieren, was fehlgeschlagener Test tatsächlich infrage stellt."
+  - id: falsificationism-negative-01
+    kind: negative
+    prompt: "Erzeuge mehrere Auffälligkeitserklärungen und vergleiche ihre Passung zu Tatsachen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Erklärungskandidaten ohne riskante Vorhersage gehören zur Abduktion."
+  - id: falsificationism-negative-02
+    kind: negative
+    prompt: "Ordne Quellen nach Designstrenge und passe Aussage an Anwendbarkeit an."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Beleghierarchiekalibrierung statt Widerlegungsversuch."
+  - id: falsificationism-mechanical-01
+    kind: mechanical
+    prompt: "Kopiere vorregistrierte Vorhersage und Schwelle in das Testformular."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Vorgegebene Testspezifikation kopieren ist mechanisch."
+  - id: falsificationism-explicit-01
+    kind: explicit
+    prompt: "Nutze ausdrücklich falsificationism gegen Behauptung, dieser Eingriff verbessere Bindung immer."
+    expected_route: falsificationism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, testable_claim]
+    rationale: "Nutzer wählt Widerlegungstest universeller Aussage."
+  - id: falsificationism-insufficiency-01
+    kind: insufficiency
+    prompt: "Nutze falsificationism für Behauptung ohne beobachtbare Vorhersage oder benennbare Gegenbelege."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [testable_claim]
+    rationale: "Festgelegte Gegenanzeige: ohne prüfbare Konsequenz ablehnen statt Widerlegungskriterium erfinden."

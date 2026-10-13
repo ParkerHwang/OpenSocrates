@@ -1,21 +1,23 @@
 <p align="center">
+  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
+</p>
 
 **エージェント向け:** [公開済みパッケージの選択とセットアップ](docs/agent-discovery.md)。Go候補版の手順は下記とネイティブガイドを参照してください。
-
-</p>
 
 # OpenSocrates
 
 **理解し、評価し、使える結果を得るための思考支援。**
 
 資料の統合、関係者の視点の理解、選択肢の比較、メッセージ作成を支える
-48 種類の思考法を提供します。現在の内容はリリース済み v1.5.1 が基準です。
-英語、韓国語、簡体字中国語（`zh`）、日本語（`ja`）に対応し、完全な手順は
-192 個、教師向けの問いは 576 個、コンテンツリビジョンは 4 です。元の英語・
-韓国語の方法本文は維持します。方法本文の改善は v1.6.1 以降の別作業で、
-プログラミング専用機能は今回の対象外です。
+48 種類の思考法を提供します。現在の基準は公開済み v1.5.2 です。英語、韓国語、
+簡体字中国語、日本語、フランス語、ドイツ語、イタリア語、スペイン語、ポルトガル語、
+タイ語の10言語で、完全な手順480個、標準事例3,840個、教師向けの問い1,440個を
+提供します。コンテンツリビジョンは5です。ポルトガル語は一般コード `pt` と
+ブラジル式綴りを使います。既存4言語の手順・事例本文、メタデータ・問いの値は
+維持し、方法のリビジョン識別を4から5に進めます。本文改善は v1.6.1 以降の
+別作業で、プログラミング専用機能は対象外です。
 
-[English](README.md) | [한국어](README.ko.md) | [简体中文](README.zh.md) | **日本語**
+[English](README.md) | [한국어](README.ko.md) | [简体中文](README.zh.md) | **日本語** | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | [ไทย](README.th.md)
 
 ## v1.6.0 ネイティブ移行候補
 
@@ -24,10 +26,9 @@
 置き換えます。利用者は Go、Python、Node.js、npm をインストールする必要は
 ありません。正式な配布先は [GitHub Releases](https://github.com/ParkerHwang/OpenSocrates/releases)
 です。本番署名、更新の信頼ルート、ネイティブリリース検証の条件を満たしてから
-公開します。現在の公開版は [v1.5.1](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.1)
-です。進行中の v1.5.2 はフランス語、ドイツ語、イタリア語、スペイン語、
-ポルトガル語、タイ語を追加する計画ですが、この候補の現時点の基準には
-含めません。v1.6.0 公開前に再度照合します。
+公開します。現在の公開版は [v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
+です。この候補に10言語の内容と言語設定の契約を反映します。npm コマンドは
+別の保守チャネルの案内です。
 
 | アプリ | 提供方式 | 環境と有効化 |
 | --- | --- | --- |
@@ -117,10 +118,11 @@ Codex の管理ツールは `auto-update enable`、`status`、`run`、`disable` 
 
 ## 思考指示の言語
 
-現在の対応言語は `en`、`ko`、`zh`、`ja` です。任意の旧セレクターは明示的な
-設定、保存した設定、現在の入力の文字判定の順に選びます。仮名があれば日本語、
-それ以外はハングルが優勢なら韓国語、漢字が優勢なら中国語です。漢字のみの
-日本語は明示的に指定します。空入力、ラテン文字のみ、同数の場合は英語です。
+現在の対応言語は `en`、`ko`、`zh`、`ja`、`fr`、`de`、`it`、`es`、`pt`、`th` です。
+任意の旧セレクターは明示設定、保存設定、文字判定の順に選びます。仮名は日本語を
+優先し、その他はタイ文字・ハングル・漢字の多数でタイ語・韓国語・中国語を選びます。
+ラテン文字のヨーロッパ言語には明示設定か保存設定が必要です。漢字だけの日本語は
+`ja` を指定し、空入力・同数・未知の文字は英語に戻ります。
 
 ```text
 ./opensocrates locale get
@@ -128,6 +130,12 @@ Codex の管理ツールは `auto-update enable`、`status`、`run`、`disable` 
 ./opensocrates locale set ko
 ./opensocrates locale set zh
 ./opensocrates locale set ja
+./opensocrates locale set fr
+./opensocrates locale set de
+./opensocrates locale set it
+./opensocrates locale set es
+./opensocrates locale set pt
+./opensocrates locale set th
 ./opensocrates locale set follow
 ./opensocrates locale reset
 ```
@@ -151,7 +159,7 @@ Codex の管理ツールは `auto-update enable`、`status`、`run`、`disable` 
 通常の会話に引き続き適用されます。
 
 導入、読み込み、完全な読解、実際の適用、結果の有用性は別の証拠です。旧候補の
-署名・公証記録は v1.5.1 統合後の新しいファイルを検証しません。公開済みや全アプリ
+署名・公証記録は v1.5.2 統合後の新しいファイルを検証しません。公開済みや全アプリ
 有効化済みとも主張しません。一般的な品質、費用、速度の改善は保証しません。
 
 - [ネイティブ導入・移行と証拠の説明（英語）](docs/native-v1.6.md)

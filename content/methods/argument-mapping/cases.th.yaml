@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "argument-mapping-positive-01",
+      "kind": "positive",
+      "prompt": "ทำแผนผังข้อกล่าวอ้าง ฐานสนับสนุน ข้อคัดค้าน และคำโต้กลับในข้อโต้แย้งนโยบายนี้ เพื่อเห็นว่าความเชื่อมโยงใดไม่มีการสนับสนุน",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "critique",
+        "tangled_hierarchy"
+      ],
+      "rationale": "งานต้องการโครงสร้างข้อกล่าวอ้าง–ฐานสนับสนุน–ข้อคัดค้านและการตรวจความเชื่อมโยงที่ไร้การสนับสนุนโดยตรง"
+    },
+    {
+      "id": "argument-mapping-positive-02",
+      "kind": "positive",
+      "prompt": "ข้อเสนอใดรองรับคำแนะนำจริง และข้อโต้แย้งคัดค้านใดยังไม่มีคำตอบ?",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "ต้องแยกความสัมพันธ์สนับสนุนและโจมตีหลายรายการก่อนตัดสินคำแนะนำ"
+    },
+    {
+      "id": "argument-mapping-positive-03",
+      "kind": "positive",
+      "prompt": "สร้างแผนผังข้อโต้แย้งสำหรับจุดยืนเรื่องสัญญา รวมสมมติฐานร่วมและคำโต้กลับที่แข็งแรงที่สุด",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "tangled_hierarchy"
+      ],
+      "rationale": "ผลสาธารณะที่ขอเป็นแผนผังมีโครงสร้างของข้อกล่าวอ้าง ข้อเสนอร่วม และข้อคัดค้าน"
+    },
+    {
+      "id": "argument-mapping-negative-01",
+      "kind": "negative",
+      "prompt": "เปรียบเทียบคุณภาพหลักฐานของการศึกษาสองชิ้นนี้ และบอกว่าชิ้นใดใช้กับประชากรของเราได้",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "ข้อจำกัดหลักคือแบบแหล่งข้อมูลและการนำมาใช้ ซึ่งเป็นงานตรวจหลักฐาน"
+    },
+    {
+      "id": "argument-mapping-negative-02",
+      "kind": "negative",
+      "prompt": "เขียนคำแนะนำสำหรับผู้บริหารก่อน ตามด้วยเหตุผลสามกลุ่มและรายละเอียดสนับสนุน",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explain",
+        "tangled_hierarchy"
+      ],
+      "rationale": "คำขอต้องการโครงสร้างการสื่อสารจากบนลงล่าง แทนทดสอบความเชื่อมโยงสนับสนุน"
+    },
+    {
+      "id": "argument-mapping-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "แปลงรายการข้อเสนอที่ให้มาเป็นรายการหัวข้อย่อย Markdown",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การจัดรูปแบบรายการที่ให้มาไม่ต้องวิเคราะห์ข้อโต้แย้ง"
+    },
+    {
+      "id": "argument-mapping-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ argument-mapping โดยชัดแจ้งเพื่อทบทวนข้อคัดค้านที่แข็งแรงที่สุดต่อบันทึกการลงทุนนี้",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "argument_dispute"
+      ],
+      "rationale": "ผู้ใช้เรียกวิธีโดยตรงเพื่อทบทวนข้อคัดค้านและโครงสร้างสนับสนุน"
+    },
+    {
+      "id": "argument-mapping-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "ทำแผนผังข้อโต้แย้งและตัดสินจุดอ่อนที่สุด แต่ไม่ให้ข้อสรุป ข้อเสนอ หรือข้อความต้นฉบับใด",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "argument_dispute",
+        "decisive_input_missing"
+      ],
+      "rationale": "ไม่มีเนื้อหาข้อโต้แย้งให้ทำแผนผัง จึงต้องพักแทนแต่งข้อเสนอ"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: scenario-planning-positive-1
+    kind: positive
+    prompt: "La città deve preparare una strategia abitativa decennale mentre migrazione e tecnologie costruttive possono evolvere indipendentemente. Definisci due incertezze critiche, quattro futuri coerenti senza probabilità e azioni utili in ogni scenario, azioni condizionate e segnali."
+    expected_route: scenario-planning
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - forecast
+    rationale: "Orizzonte lungo e fattori esterni richiedono ramificazioni strutturate, non una previsione. Si richiedono assi indipendenti, quattro scenari, azioni e segnali, escludendo probabilità."
+  - id: scenario-planning-positive-2
+    kind: positive
+    prompt: "Un programma sanitario quinquennale può affrontare combinazioni diverse di fiducia nelle istituzioni e mobilità dei patogeni. Costruisci una matrice 2×2, spiega come nasce ogni mondo, testa il piano attuale e definisci segnali osservabili per rivederlo."
+    expected_route: scenario-planning
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - new_evidence
+    rationale: "L’utente chiede futuri esterni coerenti, matrice, stress test del piano e segnali. Non richiede previsioni ordinate per probabilità."
+  - id: scenario-planning-positive-3
+    kind: positive
+    prompt: "Decidiamo come prepararci a un investimento decennale in una piattaforma educativa. Regolamentazione e comportamento degli studenti hanno alto impatto ma sono difficili da prevedere. Mantieni comuni le premesse prevedibili, scegli assi indipendenti e separa preparazioni robuste da azioni attivate da segnali futuri."
+    expected_route: scenario-planning
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - irreversible_choice
+      - plan
+    rationale: "È una decisione preparatoria di lungo periodo con incertezze esterne influenti e richiesta di distinguere azioni comuni e condizionate. Il metodo evita di assegnare probabilità."
+  - id: scenario-planning-negative-1
+    kind: negative
+    prompt: "Il modello trimestrale dei ricavi ha una formula di base. Varia tasso di conversione e prezzi entro intervalli difendibili, mostra la soglia di cambio della scelta e ordina i dati meritevoli di ricerca."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - sensitive_inputs
+    rationale: "È una probabile confusione con sensitivity analysis: modello, intervalli e soglie di cambio, non assi esterni indipendenti e futuri coerenti."
+  - id: scenario-planning-negative-2
+    kind: negative
+    prompt: "Usando una classe di riferimento ben definita di lanci completati, stima l’intervallo plausibile di consegna del prossimo lancio e confrontalo con la data interna."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - forecast
+      - reference_cases
+    rationale: "Si richiede una previsione esterna da casi completati, propria di reference-class forecasting invece di scenari ramificati."
+  - id: scenario-planning-mechanical-1
+    kind: mechanical
+    prompt: "Ordina cronologicamente le dodici tappe datate e restituisci l’elenco ordinato. Non sono coinvolte incertezze future o decisioni preparatorie."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "È un ordinamento deterministico senza incertezza esterna o scelta strategica da strutturare."
+  - id: scenario-planning-explicit-1
+    kind: explicit
+    prompt: "Usa scenario-planning come metodo principale per la strategia decennale di transizione energetica. Escludi probabilità, usa due incertezze critiche indipendenti, descrivi quattro futuri nominati e associa azioni utili in ogni scenario e segnali."
+    expected_route: scenario-planning
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - deep_uncertainty
+      - macro_environment
+    rationale: "Il metodo è nominato esplicitamente e sono forniti i risultati non probabilistici richiesti. L’instradamento resta soggetto a prove, ambito e sospensione."
+  - id: scenario-planning-insufficiency-1
+    kind: insufficiency
+    prompt: "Dammi quattro scenari futuri. Non ho indicato decisione da informare, orizzonte, confine del sistema o incertezze esterne rilevanti."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - decisive_input_missing
+    rationale: "Senza domanda focale, orizzonte, confine e decisione, quattro storie sarebbero decorative e senza limiti. Sospendi e chiedi soltanto il quadro mancante."

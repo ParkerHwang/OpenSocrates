@@ -1,0 +1,104 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "triangulation-positive-01",
+      "kind": "positive",
+      "prompt": "Dati indipendenti da sondaggi, comportamenti e amministrazione possono corroborare questa affermazione sulla fidelizzazione?",
+      "expected_route": "triangulation",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources",
+        "source_quality"
+      ],
+      "rationale": "Flussi diversi devono essere verificati per indipendenza, convergenza, conflitto e lacune."
+    },
+    {
+      "id": "triangulation-positive-02",
+      "kind": "positive",
+      "prompt": "Queste parti interessate citano metodi diversi; stabilisci se le loro evidenze convergano davvero sullo stesso risultato.",
+      "expected_route": "triangulation",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources"
+      ],
+      "rationale": "Il compito consiste nel confrontare flussi ed evitare che dati ripetuti provenienti dalla stessa origine sembrino corroborazione."
+    },
+    {
+      "id": "triangulation-positive-03",
+      "kind": "positive",
+      "prompt": "Le nostre interviste qualitative e l’esperimento sono discordanti; quale ulteriore verifica indipendente risolverebbe il conflitto rilevante?",
+      "expected_route": "triangulation",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources",
+        "source_quality"
+      ],
+      "rationale": "Un disaccordo rilevante richiede una verifica d’indipendenza e un prossimo flusso mirato."
+    },
+    {
+      "id": "triangulation-negative-01",
+      "kind": "negative",
+      "prompt": "Classifica ogni fonte per qualità del disegno, grado di sostegno diretto e applicabilità alla popolazione obiettivo.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "Il compito valuta la qualità delle singole fonti, non l’indipendenza tra flussi."
+    },
+    {
+      "id": "triangulation-negative-02",
+      "kind": "negative",
+      "prompt": "Aggiorna la fiducia a priori in queste ipotesi dopo il nuovo risultato del test.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "new_evidence",
+        "unknown_probability",
+        "competing_explanations"
+      ],
+      "rationale": "Un aggiornamento definito da priori a posteriori è aggiornamento bayesiano, non triangolazione."
+    },
+    {
+      "id": "triangulation-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Unisci le tre tabelle di evidenze fornite in un’unica tabella e conserva tutte le righe.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Unire tabelle è meccanico; non valuta indipendenza o convergenza."
+    },
+    {
+      "id": "triangulation-explicit-01",
+      "kind": "explicit",
+      "prompt": "Usa esplicitamente triangulation per verificare se l’affermazione sull’impatto sui clienti resista a controlli indipendenti.",
+      "expected_route": "triangulation",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "reconcile_evidence"
+      ],
+      "rationale": "L’utente invoca esplicitamente la corroborazione tra flussi per un’affermazione rilevante."
+    },
+    {
+      "id": "triangulation-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Riporta una corroborazione, ma tutte le fonti ripetono un insieme di dati a monte sconosciuto e non è disponibile alcun flusso indipendente.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "reconcile_evidence",
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "Fonti dipendenti e ripetute non stabiliscono una triangolazione; la corroborazione deve quindi essere sospesa."
+    }
+  ]
+}

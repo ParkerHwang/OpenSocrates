@@ -1,0 +1,106 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "reference-class-forecasting-positive-1",
+      "kind": "positive",
+      "prompt": "Estimamos a entrega de um projeto ferroviário regional. Temos registros ligados a fontes de muitos projetos concluídos com escopo, aquisição e terreno comparáveis. Compare cronograma interno e distribuição observada e explique ajustes sem inventar probabilidade.",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "source_quality"
+      ],
+      "rationale": "Alvo e unidade são declarados, há classe defensável e solicita-se intervalo externo. Registros sustentam resultados observados, não probabilidades fabricadas."
+    },
+    {
+      "id": "reference-class-forecasting-positive-2",
+      "kind": "positive",
+      "prompt": "Nossa equipe estima com otimismo tempo e custo de migrar clientes para plataforma nova. Temos migrações comparáveis concluídas e resultados reais de outras equipes. Teste credibilidade da visão interna e declare evidência que mudaria o intervalo.",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "hidden_assumptions"
+      ],
+      "rationale": "É calibração por casos concluídos, não diagnóstico ou cenário preferido. Exige ajustes com proveniência e condição de mudança, não taxa base inventada."
+    },
+    {
+      "id": "reference-class-forecasting-positive-3",
+      "kind": "positive",
+      "prompt": "Uma organização sem fins lucrativos prevê inscrições do primeiro ano. Lançamentos anteriores documentam resultados, públicos e condições, mas cobertura é desigual. Construa intervalo externo, mostre limitação e compare com plano.",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "weak_sample"
+      ],
+      "rationale": "Há alvo e casos concluídos; preserve cobertura desigual. Use distribuição observada e suspenda ou reduza conclusão se ausências forem decisivas."
+    },
+    {
+      "id": "reference-class-forecasting-negative-1",
+      "kind": "negative",
+      "prompt": "Não temos casos concluídos comparáveis deste instrumento científico único. Explique que escolha de engenharia causou atraso e proponha experimento corretivo.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "no_defensible_reference_class",
+        "diagnose"
+      ],
+      "rationale": "Falta explicitamente classe defensável, e o pedido é causal. Este método repetiria visão interna sem distribuição externa."
+    },
+    {
+      "id": "reference-class-forecasting-negative-2",
+      "kind": "negative",
+      "prompt": "Construa quatro futuros externos distintos para nossa estratégia de cinco anos, nomeie cada futuro e identifique sinais e ações. Não estime entrega ou custo por casos passados.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "plan"
+      ],
+      "rationale": "É confusão provável com cenários: futuros ramificados e sinais, não distribuição de referência para previsão."
+    },
+    {
+      "id": "reference-class-forecasting-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Some estes cinco valores verificados de faturas e retorne total na moeda indicada. Não precisamos de previsão, classe comparativa ou decisão.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "É cálculo delimitado sem alvo incerto nem julgamento de classe; o método permanece inativo."
+    },
+    {
+      "id": "reference-class-forecasting-explicit-1",
+      "kind": "explicit",
+      "prompt": "Use previsão por classe de referência como método principal para nosso lançamento de software. Temos resultados de lançamentos comparáveis ligados a fontes; compare distribuição e plano e suspenda se a classe não for defensável.",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "forecast",
+        "reference_cases"
+      ],
+      "rationale": "O usuário nomeia método e fornece alvo, comparáveis e suspensão. Invocação explícita exige estados das evidências e proíbe probabilidades fabricadas."
+    },
+    {
+      "id": "reference-class-forecasting-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Diga quando o projeto termina. Tenho apenas data interna, nenhum caso concluído comparável, nenhuma definição acordada de resultado e nenhuma decisão declarada sobre prazo.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "no_defensible_reference_class",
+        "boundary_sensitive",
+        "decisive_input_missing"
+      ],
+      "rationale": "Faltam classe decisiva, alvo e limite. O resultado honesto é suspensão e pedido delimitado das entradas, não distribuição inventada."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "deontic-reasoning-positive-01",
+      "kind": "positive",
+      "prompt": "ข้อเสนอแชร์ข้อมูลอาจมีประโยชน์ แต่เงื่อนไขยินยอมและนโยบายความเป็นส่วนตัวกำหนดว่าทีมต้อง ทำได้ หรือต้องไม่ทำอะไร",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "การตัดสินใจถูกจำกัดด้วยหน้าที่ สิทธิอนุญาต ข้อห้าม ความยินยอม และแหล่งนโยบายระบุได้"
+    },
+    {
+      "id": "deontic-reasoning-positive-02",
+      "kind": "positive",
+      "prompt": "แพทย์ถามว่าพันธะสองข้อขัดกันภายใต้จรรยาบรรณวิชาชีพที่ระบุหรือไม่ และการกระทำชั่วคราวใดอนุญาต",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "ผลที่ขอคือสถานะบรรทัดฐานมีแหล่งและจัดการความขัดแย้ง ไม่ใช่เพิ่มผลดีอย่างเดียว"
+    },
+    {
+      "id": "deontic-reasoning-positive-03",
+      "kind": "positive",
+      "prompt": "นโยบายที่ทำงานดูบังคับให้รายงาน อนุญาตข้อยกเว้นเมื่อยินยอม และห้ามแชร์รายละเอียดอ่อนไหว ทำทางเลือกอนุญาตให้ชัด",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "ชุดการกระทำมีสถานะบังคับ อนุญาต ห้าม และยกเว้นจากนโยบาย"
+    },
+    {
+      "id": "deontic-reasoning-negative-01",
+      "kind": "negative",
+      "prompt": "ควรเปรียบเทียบกลยุทธ์บริการสองข้อด้วยผลสังเกตและการนำร่องย้อนกลับได้ โดยไม่มีกฎจำกัดทางเลือก",
+      "expected_route": "pragmatism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "practical_consequence",
+        "choose"
+      ],
+      "rationale": "เป็นเปรียบเทียบทางปฏิบัติที่ไม่มีข้อจำกัดอำนาจบรรทัดฐาน"
+    },
+    {
+      "id": "deontic-reasoning-negative-02",
+      "kind": "negative",
+      "prompt": "หลักการกับกรณียากหลายกรณีขัดกัน ทีมอยากปรับให้สอดคล้องยิ่งขึ้นในส่วนที่มีดุลยพินิจ",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "การปรับร่วมกันระหว่างหลักการและการตัดสินเป็นเส้นทางเฉพาะกว่า"
+    },
+    {
+      "id": "deontic-reasoning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "คัดลอกข้อนโยบายเป็นรายการตรวจ โดยไม่ตีความว่าการกระทำใดบังคับหรืออนุญาต",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "คัดลอกนโยบายเป็นเชิงกล ไม่ขอตีความบรรทัดฐาน"
+    },
+    {
+      "id": "deontic-reasoning-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ deontic-reasoning แยกว่าสัญญานี้อนุญาต บังคับ ห้าม และปล่อยอะไรยังไม่คลี่คลาย",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "ผู้ใช้ขอจำแนกบรรทัดฐานมีแหล่งโดยตรง"
+    },
+    {
+      "id": "deontic-reasoning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "ไม่มีนโยบายกำกับ บทบาท เขตอำนาจ หรือเงื่อนไขยินยอม จงประกาศว่าการกระทำเป็นข้อบังคับกฎหมาย",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "duties_rights",
+        "decisive_input_missing"
+      ],
+      "rationale": "ขาดอำนาจและขอบเขต จึงแต่งหน้าที่ผูกพันไม่ได้"
+    }
+  ]
+}

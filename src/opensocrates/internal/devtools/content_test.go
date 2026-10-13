@@ -51,7 +51,7 @@ func TestReleasedContentGenerationEquivalence(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if generated["source_tree_hash"] != "sha256:993c30191b0d2b67af88a25c2631d9e8fddeeaf9dadfd0ff4fb07dd62539dcab" || generated["normalized_semantic_hash"] != "sha256:835a1e32695e863b3696c3bf5dcf1acb7faa580d889129e617524fbc0d9908e6" {
+	if generated["source_tree_hash"] != "sha256:e1e11f7a772cb2a3f6c8dc0e3b22b0787cdc903de69842de957577a177cee7be" || generated["normalized_semantic_hash"] != "sha256:b5fc82f5ce8725bd23b7d270014f90853e39474e7b00ae4f20553a484524c659" {
 		t.Fatal("frozen source or semantic identity changed")
 	}
 }
@@ -94,17 +94,17 @@ func TestSourceHashUnicodeAndFormatting(t *testing.T) {
 	}
 }
 
-// These identities are taken from v1.5.1 release commit 5a6a7fa2, independently
+// These identities are taken from v1.5.2 release commit 9838db16, independently
 // of the Go implementation and outputs generated during this migration.
 func TestReleasedProjectionAndPolicyBytes(t *testing.T) {
 	root := generatorRepository(t)
-	for name, want := range map[string]string{"compiled-reasoning-content.bundle.json": "sha256:470a959d91432f1f2fdb0bcda20e6d3e8293e75e892bd72a64f40fa996646e57", "compiled-response-policy.json": "sha256:89b5bdf18ff449cf8c40e7431703170a2cd392eea47ecf9d4c09da24f10c1a8b"} {
+	for name, want := range map[string]string{"compiled-reasoning-content.bundle.json": "sha256:92705b167dad181fb808880833d95dc4721d8cdcc683833f70b63a6856b6b38a", "compiled-response-policy.json": "sha256:2e6b28af5a1c47ae097bac6021b35c6511afab1bc7ff17ce5a0a66c0482ee85b"} {
 		b, e := os.ReadFile(filepath.Join(root, "content", name))
 		if e != nil {
 			t.Fatal(e)
 		}
 		if digest(b) != want {
-			t.Errorf("%s is not byte-equivalent to v1.5.1", name)
+			t.Errorf("%s is not byte-equivalent to v1.5.2", name)
 		}
 	}
 }

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: bayesian-updating-positive-01
+    kind: positive
+    prompt: "Wie sollte dieser positive Test die Chancen konkurrierender Diagnosen bei unterschiedlichen Basisraten ändern?"
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "Gefordert sind Prior, Belegrichtung, Posterioränderung und Basisratensensitivität."
+  - id: bayesian-updating-positive-02
+    kind: positive
+    prompt: "Aktualisiere unser Vertrauen in die beiden Einführungshypothesen bei nacheinander eintreffenden Signalen."
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "Sequentielle Belege aktualisieren Konkurrenzhypothesen ohne Signal-Doppelzählung."
+  - id: bayesian-updating-positive-03
+    kind: positive
+    prompt: "Zeige, ob die Empfehlung bei Variation von Priorrate und Likelihood-Annahmen innerhalb glaubwürdiger Bereiche kippt."
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability]
+    rationale: "Gefragt ist Sensitivität von Posterior und Handlungsschwelle."
+  - id: bayesian-updating-negative-01
+    kind: negative
+    prompt: "Ordne Quellen nach Unmittelbarkeit und Studienqualität vor Wahl der Behauptungsstärke."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Quellenqualitätskalibrierung statt Aktualisierung definierter Hypothesen."
+  - id: bayesian-updating-negative-02
+    kind: negative
+    prompt: "Liste konkurrierende Erklärungen der Auffälligkeit und schlage einen unterscheidenden Test vor."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Erklärungserzeugung und unterscheidende Tests gehören ohne angeforderte Prioraktualisierung zu abduction."
+  - id: bayesian-updating-mechanical-01
+    kind: mechanical
+    prompt: "Kopiere vorgegebene Priorwerte in das Analyseblatt."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Werteübertragung ist mechanisch und darf kein probabilistisches Denken auslösen."
+  - id: bayesian-updating-explicit-01
+    kind: explicit
+    prompt: "Nutze ausdrücklich bayesian-updating zur Vertrauensrevision nach diesem neuen Betrugssignal."
+    expected_route: bayesian-updating
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, new_evidence]
+    rationale: "Der Nutzer wählt ausdrücklich beleggetriebene Vertrauensaktualisierung."
+  - id: bayesian-updating-insufficiency-01
+    kind: insufficiency
+    prompt: "Nenne die Posteriorwahrscheinlichkeit ohne Konkurrenzhypothesen, Priorgrundlage oder Likelihood-Informationen."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [new_evidence, unknown_probability, decisive_input_missing]
+    rationale: "Numerischer Posterior ohne Hypothesen und Eingabeherkunft wäre erfundene Präzision."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: systems-thinking-positive-01
+    kind: positive
+    prompt: "El atraso de moderación crece: retrasos frustran usuarios y generan más informes duplicados; buscamos estructura del patrón."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question, deep_uncertainty]
+    rationale: "Hay flujos, retroalimentación y retraso, no causa aislada."
+  - id: systems-thinking-positive-02
+    kind: positive
+    prompt: "Un subsidio aumenta plantación inicialmente; luego escasez de agua y controles generan oscilaciones estacionales."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "Comportamiento estacional y resistencia requieren reservas, flujos, bucles equilibradores y retrasos."
+  - id: systems-thinking-positive-03
+    kind: positive
+    prompt: "La confianza se acumula lentamente, recomendaciones refuerzan crecimiento y recortar soporte causa declive demorado; identifica intervención."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Se buscan acumulación, refuerzo, retrasos y punto de intervención."
+  - id: systems-thinking-negative-01
+    kind: negative
+    prompt: "Dos grupos emparejados recibieron distinta formación; pregunta si cambió notas tras un mes."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "Basta comparar intervención acotada; no hace falta sistema dinámico completo."
+  - id: systems-thinking-negative-02
+    kind: negative
+    prompt: "Una única interrupción de base de datos tiene desencadenante fechado claro; buscamos causa próxima y raíz controlable."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [diagnose, recurring_failure]
+    rationale: "Debe liderar diagnóstico acotado salvo evidencia posterior de retroalimentación recurrente."
+  - id: systems-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Convierte notas de reservas y flujos en viñetas Markdown sin explicar el sistema."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Reformatear es mecánico y no juzga estructura."
+  - id: systems-thinking-explicit-01
+    kind: explicit
+    prompt: "Usa systems-thinking para explicar por qué mejoras locales de personal se contrarrestan repetidamente con atraso duradero."
+    expected_route: systems-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay, causal_question]
+    rationale: "Se invoca método para patrón demorado y recurrente."
+  - id: systems-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "Ayer hubo una queja; dibuja bucle reforzador y recomienda intervención general sin patrón temporal."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "Una observación única no establece dinámica ni direcciones de bucles."

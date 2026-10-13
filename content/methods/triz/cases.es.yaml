@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: triz-positive-01
+    kind: positive
+    prompt: "Un dron necesita mayor batería, pero el peso reduce alcance; encuentra concepto que separe o elimine contradicción."
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "Mejorar un parámetro empeora otro y requiere ideal, separación y movimientos inventivos."
+  - id: triz-positive-02
+    kind: positive
+    prompt: "Una habitación hospitalaria requiere más privacidad y observación fácil simultáneas; explora separación por tiempo, espacio, condición e interfaz."
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "Describe contradicción física o técnica con condiciones separables y restricciones de seguridad."
+  - id: triz-positive-03
+    kind: positive
+    prompt: "La línea de embalaje debe acelerar sin daño adicional; busca recursos existentes de tiempo, espacio, información y materiales para diseño sin compromiso."
+    expected_route: triz
+    expected_behavior: route
+    decisive_features: [technical_contradiction, plan]
+    rationale: "Se piden conceptos que eliminen la compensación, no optimicen solo un parámetro."
+  - id: triz-negative-01
+    kind: negative
+    prompt: "Se decide entre dos valores públicos y qué derechos o deberes prevalecen, no una contradicción técnica."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [value_conflict, duties_rights]
+    rationale: "Autoridad normativa y derechos determinan ruta, no movimientos inventivos."
+  - id: triz-negative-02
+    kind: negative
+    prompt: "Hay bucles y efectos demorados; mapea estructura amplia e intervención antes de elegir concepto local."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Domina dinámica sistémica, no resolver contradicción local."
+  - id: triz-mechanical-01
+    kind: mechanical
+    prompt: "Enumera parámetros actuales en orden solicitado sin identificar contradicciones ni proponer conceptos."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Enumerar es mecánico, no resolución inventiva."
+  - id: triz-explicit-01
+    kind: explicit
+    prompt: "Usa triz para la contradicción entre embalaje ligero y protección contra impactos, y propone prueba reversible."
+    expected_route: triz
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, technical_contradiction]
+    rationale: "Se invoca método para contradicción técnica y prueba."
+  - id: triz-insufficiency-01
+    kind: insufficiency
+    prompt: "Se desconocen propiedades mejorada y empeorada; declara diseño ideal logrado y ganancia garantizada."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [technical_contradiction, decisive_input_missing]
+    rationale: "Sin contradicción y prueba no pueden establecerse idealidad ni mejora honestamente."

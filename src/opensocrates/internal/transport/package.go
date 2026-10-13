@@ -34,6 +34,24 @@ type CanonicalMethod struct {
 	Path     string `json:"path"`
 	SHA256   string `json:"sha256"`
 }
+
+func (row *CanonicalMethod) UnmarshalJSON(b []byte) error {
+	value, e := contracts.Decode(b)
+	if e != nil {
+		return invalid("methods")
+	}
+	if _, e := contracts.Object(value, "locale", "method_id", "path", "sha256"); e != nil {
+		return invalid("methods")
+	}
+	type plain CanonicalMethod
+	var decoded plain
+	if json.Unmarshal(b, &decoded) != nil {
+		return invalid("methods")
+	}
+	*row = CanonicalMethod(decoded)
+	return nil
+}
+
 type Manifest struct {
 	Schema                 string            `json:"schema"`
 	Host                   string            `json:"host"`
@@ -330,24 +348,35 @@ func Verify(root, host, version, target string) (Package, error) {
 	return Package{Root: root, Manifest: m, ManifestPath: path, Hashes: hashes}, nil
 }
 
-// The released v1.5.1 adds Chinese and Japanese references. Older owned
-// installations retain their exact two-language layout during adoption/removal.
+// Preserve the locale inventory from each released package generation:
+// before v1.5.1 two languages, v1.5.1 four, v1.5.2 and newer ten.
 func methodLocales(version string) []string {
-	parts := strings.Split(version, ".")
-	baseline := []string{"1", "5", "1"}
+	if versionAtLeast(version, "1.5.2") {
+		return []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}
+	}
+	if versionAtLeast(version, "1.5.1") {
+		return []string{"en", "ko", "zh", "ja"}
+	}
+	return []string{"en", "ko"}
+}
+
+// Manifest versions have already passed versionRE. Decimal comparison avoids
+// losing precision or overflowing on a valid numeric version component.
+func versionAtLeast(version, baseline string) bool {
+	parts, minimum := strings.Split(version, "."), strings.Split(baseline, ".")
 	for i, part := range parts {
 		part = strings.TrimLeft(part, "0")
 		if part == "" {
 			part = "0"
 		}
-		if len(part) < len(baseline[i]) || len(part) == len(baseline[i]) && part < baseline[i] {
-			return []string{"en", "ko"}
+		if len(part) != len(minimum[i]) {
+			return len(part) > len(minimum[i])
 		}
-		if len(part) > len(baseline[i]) || part > baseline[i] {
-			return []string{"en", "ko", "zh", "ja"}
+		if part != minimum[i] {
+			return part > minimum[i]
 		}
 	}
-	return []string{"en", "ko", "zh", "ja"}
+	return true
 }
 
 // Inventory integrity alone cannot establish locale/method completeness: an

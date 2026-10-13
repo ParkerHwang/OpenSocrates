@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deduction-positive-01
+    kind: positive
+    prompt: "La conclusione segue necessariamente da queste premesse normative e dalla regola di eccezione dichiarata?"
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "L’utente chiede una conseguenza formale da premesse e regole esplicite."
+  - id: deduction-positive-02
+    kind: positive
+    prompt: "Controlla se questa argomentazione contrattuale sia valida e se le premesse siano effettivamente sostenute."
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Validità e solidità vanno separate per un’argomentazione basata su regole esplicite."
+  - id: deduction-positive-03
+    kind: positive
+    prompt: "Trova la premessa nascosta che fa sembrare conseguente questa conclusione di conformità."
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Occorrono standardizzazione, esposizione delle premesse nascoste e controllo della validità formale."
+  - id: deduction-negative-01
+    kind: negative
+    prompt: "Più spiegazioni corrispondono all’interruzione; scegli la migliore e nomina la prossima verifica discriminante."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Cause concorrenti e prove discriminanti richiedono abduzione, non implicazione necessaria."
+  - id: deduction-negative-02
+    kind: negative
+    prompt: "Stima quanto ampiamente queste osservazioni sostengano un’affermazione generale sui futuri utenti."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "L’estensione richiesta è induttiva e dipende dalla rappresentatività del campione."
+  - id: deduction-mechanical-01
+    kind: mechanical
+    prompt: "Numera le premesse fornite mantenendone le parole."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Numerare un elenco fornito è meccanico."
+  - id: deduction-explicit-01
+    kind: explicit
+    prompt: "Usa esplicitamente deduction per verificare se la regola di ammissibilità dichiarata implichi l’esito di questo caso."
+    expected_route: deduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, explicit_rules]
+    rationale: "L’utente invoca esplicitamente applicazione formale di regole e controllo dell’implicazione."
+  - id: deduction-insufficiency-01
+    kind: insufficiency
+    prompt: "Indica se la conclusione sia valida, senza fornire premesse, regola, ambito o testo della conclusione."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [explicit_rules, decisive_input_missing]
+    rationale: "Non si valuta la validità senza forma argomentativa e premesse rilevanti."

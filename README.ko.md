@@ -7,14 +7,15 @@
 **이해하고 판단하고 사용할 수 있는 결과를 위한 사고 지원.**
 
 OpenSocrates는 진행 중인 자료 종합, 이해관계자 관점 파악, 선택지 비교, 메시지
-작성에 정본 사고 방법 48개를 제공합니다. 영어·한국어·간체 중국어(`zh`)·
-일본어(`ja`) 절차, 교사 질문, 응답 정책, 공통 독자 안내는 출시된 v1.5.1
-기준을 유지합니다. 콘텐츠 리비전 4, 전체 절차 192개와 교사 질문 576개를
-제공하며 원래 영어·한국어 방법 본문은 그대로입니다. 별도 본문 업그레이드는
-v1.6.0에서 제외하고 v1.6.1 이후로 분리합니다. 코딩 전문가 전용 기능도 이번
-범위에 포함하지 않습니다.
+작성에 정본 사고 방법 48개를 제공합니다. 출시된 v1.5.2 기준은 영어·한국어·
+간체 중국어·일본어·프랑스어·독일어·이탈리아어·스페인어·포르투갈어·태국어의
+열 언어, 콘텐츠 리비전 5, 전체 절차 480개·정본 사례 3,840개·교사 질문
+1,440개입니다. 포르투갈어는 일반 `pt` 코드와 브라질식 철자를 사용합니다.
+기존 네 언어의 절차·사례 본문 바이트와 메타데이터·질문 값은 유지하고 개별
+방법의 리비전 식별만 4에서 5로 올라갑니다. 별도 본문 업그레이드는 v1.6.1
+이후로 분리하며 코딩 전문가 전용 기능은 이번 범위에 포함하지 않습니다.
 
-[English](README.md) | **한국어** | [简体中文](README.zh.md) | [日本語](README.ja.md)
+[English](README.md) | **한국어** | [简体中文](README.zh.md) | [日本語](README.ja.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | [ไทย](README.th.md)
 
 **도구를 찾는 에이전트에게:** [작업 적합성 판단·배포 패키지 선택·설정 확인 안내](docs/agent-discovery.ko.md).
 
@@ -29,10 +30,9 @@ v1.6.0에서 제외하고 v1.6.1 이후로 분리합니다. 코딩 전문가 전
 [GitHub Releases](https://github.com/ParkerHwang/OpenSocrates/releases)에서
 배포합니다. 남은 운영 서명·신뢰 루트와 네이티브 릴리스 조건을 충족해야 게시하거나
 안정 버전으로 권장할 수 있습니다. 현재 출시 기준은
-[v1.5.1](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.1)입니다.
-별도 v1.5.2 언어 확장은 진행 중이며 제안된 프랑스어·독일어·이탈리아어·
-스페인어·포르투갈어·태국어는 이 후보의 현재 기준에 포함하지 않습니다.
-v1.6.0 출시 전에 해당 작업과 다시 대조해야 합니다.
+[v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)이며,
+이 후보에 열 언어 콘텐츠와 언어 설정 계약을 반영합니다. npm 명령은 별도
+유지보수 채널의 안내로 구분합니다.
 
 | 호스트 | 전달 방식 | 플랫폼과 활성화 |
 | --- | --- | --- |
@@ -141,10 +141,10 @@ Codex는 사용자 opt-in 후 훅 밖에서 `stable`을 24시간마다 확인하
 
 ## 사고 지시문의 언어
 
-현재 콘텐츠는 `en`, `ko`, `zh`, `ja`를 지원합니다. 선택적 이전 선택기는
+현재 콘텐츠는 `en`, `ko`, `zh`, `ja`, `fr`, `de`, `it`, `es`, `pt`, `th`를 지원합니다. 선택적 이전 선택기는
 명시적 선호 → 저장된 선호 → 현재 입력의 문자 순으로 언어를 정합니다.
-가나가 있으면 일본어, 그 외에는 한글 우세 시 한국어, 한자 우세 시 중국어를
-선택합니다. 한자만 있는 일본어는 일본어를 명시해야 합니다. 빈 입력·라틴
+가나가 있으면 일본어, 그 외에는 태국 문자·한글·한자 우세 시 태국어·한국어·
+중국어를 선택합니다. 라틴 문자 유럽 언어는 명시적 또는 저장된 선호가 필요합니다. 한자만 있는 일본어는 일본어를 명시해야 합니다. 빈 입력·라틴
 문자만 있는 입력·동률은 영어로 돌아갑니다.
 
 ```text
@@ -153,6 +153,12 @@ Codex는 사용자 opt-in 후 훅 밖에서 `stable`을 24시간마다 확인하
 ./opensocrates locale set ko
 ./opensocrates locale set zh
 ./opensocrates locale set ja
+./opensocrates locale set fr
+./opensocrates locale set de
+./opensocrates locale set it
+./opensocrates locale set es
+./opensocrates locale set pt
+./opensocrates locale set th
 ./opensocrates locale set follow
 ./opensocrates locale reset
 ```
@@ -163,7 +169,7 @@ Codex는 사용자 opt-in 후 훅 밖에서 `stable`을 24시간마다 확인하
 판단 JSON에는 `locale`을 명시해야 하고 네이티브 Claude 진입은 저장된 선호를
 읽지 않습니다. 계정 스킬과 Antigravity는 해당 언어 안내와 전체 참조를 사용합니다.
 지시문 언어는 답변 언어·호스트 UI·관리 CLI 출력과 별도이며 모든 CLI 메시지의
-번역을 약속하지 않습니다. 방법 ID·JSON 키·출처 표기는 네 언어에서 같습니다.
+번역을 약속하지 않습니다. 방법 ID·JSON 키·출처 표기는 열 언어에서 같습니다.
 
 ## 출처 표기·개인정보·개발
 

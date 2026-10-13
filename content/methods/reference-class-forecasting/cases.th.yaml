@@ -1,0 +1,106 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "reference-class-forecasting-positive-1",
+      "kind": "positive",
+      "prompt": "ประเมินวันส่งโครงการรถไฟภูมิภาค มีบันทึกเชื่อมแหล่งของหลายโครงการเสร็จที่ขอบ จัดซื้อ และภูมิประเทศเทียบได้ เทียบกำหนดภายในกับการแจกแจงเสร็จที่พบ และอธิบายการปรับไม่แต่งโอกาส",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "source_quality"
+      ],
+      "rationale": "ระบุเป้าพยากรณ์และหน่วย มีชั้นอ้างอิงปกป้องได้ และขอช่วงมุมภายนอก บันทึกรองรับผลพบ ไม่อนุญาตโอกาสแต่ง"
+    },
+    {
+      "id": "reference-class-forecasting-positive-2",
+      "kind": "positive",
+      "prompt": "ทีมมีประมาณเวลา/ต้นทุนมองดีในการย้ายลูกค้าแพลตฟอร์มใหม่ ระบุการย้ายเทียบได้ที่ทีมอื่นทำเสร็จพร้อมผลจริง ใช้กรณีตรวจมุมภายในน่าเชื่อไหมและหลักฐานใดเปลี่ยนช่วง",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "hidden_assumptions"
+      ],
+      "rationale": "งานสอบเทียบกรณีเสร็จเทียบได้ ไม่วินิจฉัยเหตุหรือสถานการณ์ชอบ ขอปรับรู้ที่มาและเงื่อนไขเปลี่ยน ไม่อัตราฐานแต่ง"
+    },
+    {
+      "id": "reference-class-forecasting-positive-3",
+      "kind": "positive",
+      "prompt": "องค์กรไม่แสวงกำไรพยากรณ์สมัครโครงการปีแรก การเปิดก่อนหลายครั้งมีผลสมัคร ประชากรเป้า และสภาพเปิดบันทึก แม้ครอบคลุมไม่เสมอ สร้างช่วงภายนอก แสดงข้อจำกัดครอบคลุม และเทียบแผน",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "weak_sample"
+      ],
+      "rationale": "มีเป้าและกรณีเสร็จ ครอบคลุมไม่เสมอเป็นไม่แน่นอนต้องรักษา ใช้การแจกแจงพบและพักหรือลดถ้าขาดชี้ขาด"
+    },
+    {
+      "id": "reference-class-forecasting-negative-1",
+      "kind": "negative",
+      "prompt": "ไม่มีกรณีเสร็จเทียบได้สำหรับเครื่องมือวิทยาศาสตร์ครั้งเดียวนี้ อธิบายการเลือกวิศวกรรมใดทำกำหนดหลุดและเสนอทดลองแก้",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "no_defensible_reference_class",
+        "diagnose"
+      ],
+      "rationale": "โจทย์ขาดชั้นอ้างอิงปกป้องได้ชัดและขออธิบายเหตุ การเลือกวิธีนี้ย้ำมุมภายในโดยไม่มีการแจกแจงภายนอก"
+    },
+    {
+      "id": "reference-class-forecasting-negative-2",
+      "kind": "negative",
+      "prompt": "สร้างสี่อนาคตภายนอกต่างสำหรับกลยุทธ์ห้าปี ตั้งชื่อแต่ละอนาคต ระบุสัญญาณต้นและการกระทำ อย่าประเมินเป้าส่งหรือต้นทุนจากอดีต",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "plan"
+      ],
+      "rationale": "อาจสับสน scenario planning: ขอกิ่งอนาคตและสัญญาณ ไม่การแจกแจงอ้างอิงพยากรณ์"
+    },
+    {
+      "id": "reference-class-forecasting-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "บวกใบแจ้งหนี้ห้าจำนวน verified คืนยอดในเงินระบุ ไม่ต้องพยากรณ์ ชั้นเทียบ หรือการตัดสิน",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "เป็นคำนวณจำกัด ไม่มีเป้าพยากรณ์ไม่แน่นอนหรือคำตัดสินชั้นอ้างอิง วิธีต้องไม่ทำงาน"
+    },
+    {
+      "id": "reference-class-forecasting-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้ reference-class forecasting เป็นหลักกับวันเปิดซอฟต์แวร์ มีผลเชื่อมแหล่งจากเปิดเทียบได้ เทียบการแจกแจงกับแผนภายในและพักถ้าชั้นปกป้องไม่ได้",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "forecast",
+        "reference_cases"
+      ],
+      "rationale": "ผู้ใช้ระบุวิธีพร้อมเป้าเฉพาะ ผลเทียบ และกฎพัก การขอชัดยังต้องป้ายหลักฐาน ไม่อนุญาตโอกาสแต่ง"
+    },
+    {
+      "id": "reference-class-forecasting-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "บอกโครงการเสร็จเมื่อไร มีเพียงวันเป้าภายใน ไม่มีกรณีเสร็จเทียบ ไม่มีนิยามผลตกลง และไม่ระบุการตัดสินเส้นตาย",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "no_defensible_reference_class",
+        "boundary_sensitive",
+        "decisive_input_missing"
+      ],
+      "rationale": "ขาดชั้นชี้ขาด นิยามเป้า และขอบตัดสิน ผลซื่อตรงคือพักและขอข้อมูลขาดจำกัด ไม่แต่งการแจกแจง"
+    }
+  ]
+}

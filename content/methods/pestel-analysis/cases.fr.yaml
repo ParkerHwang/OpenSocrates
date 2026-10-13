@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "pestel-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Avant d’entrer dans ce pays, examinez le programme électoral actuel, l’inflation et les devises, les évolutions démographiques, les technologies de plateforme, les règles d’émissions et les exigences de licence susceptibles de modifier notre lancement.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "La consigne nomme une recherche externe délimitée et une décision stratégique. L’orientation préserve dates et juridiction et ne considère pas comme établie une politique ou prévision non vérifiée."
+    },
+    {
+      "id": "pestel-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "L’expansion de notre produit dépend du vieillissement des clients, des règles de protection des données, des coûts cloud et d’un possible choc des prix de l’énergie. Identifiez facteurs substantiels, mécanismes et signaux devant changer l’investissement.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "La demande vise les facteurs externes substantiels et leurs implications stratégiques plutôt qu’une liste générique. La consigne fournit des hypothèses ; l’analyse doit les marquer vérifiées, inférées ou non vérifiées."
+    },
+    {
+      "id": "pestel-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Construisez un contexte externe étayé pour notre stratégie à cinq ans, en montrant quels changements sont opportunités, menaces ou signaux de surveillance et ce qui ferait basculer chaque implication.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "Le résultat demandé est un registre de facteurs substantiels lié à un horizon stratégique. Il exige état des preuves et indicateurs observables, pas de prévisions ou probabilités fabriquées."
+    },
+    {
+      "id": "pestel-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Notre entrepôt a une erreur de préparation récurrente. Retracez le processus local, identifiez la cause et proposez une action corrective.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "Le problème est interne à un processus local plutôt qu’au macro-environnement. L’analyse causale de défaillance est plus proche ; il ne faut pas ajouter des facteurs externes pour remplir les catégories."
+    },
+    {
+      "id": "pestel-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Une nouvelle politique affectera salariés, prestataires, clients et une communauté non représentée. Cartographiez leurs pouvoirs, intérêts, préoccupations probables et responsables de l’engagement.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Le contexte politique est externe, mais le résultat décisif est une carte des acteurs et de l’engagement. C’est une confusion probable avec stakeholder-analysis, pas une demande de six catégories environnementales."
+    },
+    {
+      "id": "pestel-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Placez les six descriptions de facteurs fournies dans les colonnes P, E, S, T, E et L sans modifier leur formulation.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "mechanical"
+      ],
+      "rationale": "L’utilisateur ne demande que la mise en forme d’un contenu fourni, sans jugement sur l’importance, les preuves ou la stratégie."
+    },
+    {
+      "id": "pestel-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez l’analyse PESTEL pour examiner notre entrée sur un marché. Gardez seulement les facteurs substantiels, identifiez état des preuves et horizon et énoncez les implications d’opportunité ou de menace.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "macro_environment"
+      ],
+      "rationale": "La méthode est explicitement demandée avec son contrat public. L’analyse doit rester attentive aux sources et suspendre toute implication dépendant d’une règle actuelle non vérifiée."
+    },
+    {
+      "id": "pestel-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Devons-nous entrer sur le marché ? Je n’ai fourni ni pays ou juridiction, ni horizon décisionnel, ni périmètre produit, ni référence, ni sources des conditions externes actuelles.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "boundary_sensitive",
+        "decisive_input_missing"
+      ],
+      "rationale": "La question convient à une recherche externe, mais limites et dates de sources manquantes peuvent changer l’implication. Il faut suspendre et ne demander que les faits décisifs de périmètre plutôt qu’inventer le marché."
+    }
+  ]
+}

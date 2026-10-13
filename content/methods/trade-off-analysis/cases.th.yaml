@@ -1,0 +1,90 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: trade-off-analysis-positive-1
+    kind: positive
+    prompt: "เลือกระหว่างผู้ขายสามรายตามความเร็วส่งมอบ ความน่าเชื่อถือ การเข้าถึง และต้นทุนรวม กลุ่มจัดซื้อบันทึกว่าข้อใดยับยั้งได้ และผู้เกี่ยวข้องแต่ละรายให้ความชอบเกณฑ์ที่เหลือพร้อมวันที่"
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - stakeholder_conflict
+    rationale: "หลายทางแข่งตามเกณฑ์ชัดโดยแยกข้อจำกัดและที่มาน้ำหนัก การเทียบเผยสิ่งยอมเสียได้โดยไม่แสร้งว่าทุกคุณค่าแลกแทนกันได้"
+  - id: trade-off-analysis-positive-2
+    kind: positive
+    prompt: "ทีมผลิตภัณฑ์ต้องเลือกแบบที่สมดุลสมรรถนะ การบำรุงรักษา ความเป็นส่วนตัว และแรงผู้ใช้ ข้อมูลทดสอบรองรับคะแนนบางส่วน สัมภาษณ์ผู้ใช้รองรับส่วนอื่น และความเป็นส่วนตัวเป็นเงื่อนไขขั้นต่ำไม่ใช่คะแนน"
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - source_quality
+    rationale: "งานต้องเทียบเกณฑ์แข่งขันโดยรักษาที่มาและข้อจำกัดความเป็นส่วนตัวที่ชดเชยไม่ได้ กำกับหลักฐานต่างชนิดได้แทนบีบให้เหมือนกัน"
+  - id: trade-off-analysis-positive-3
+    kind: positive
+    prompt: "แผนบุคลากรสองแผนมีผลต่างด้านการครอบคลุม ความต่อเนื่อง ต้นทุน และภาระงาน ทีมตกลงลำดับความชอบเชิงอันดับแต่ไม่ใช่มาตรตัวเลขแม่นยำ แสดงว่าแผนใดชนะตามลำดับนี้และอะไรจะกลับผล"
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - sensitive_inputs
+    rationale: "ขอการแลกเปลี่ยนเชิงอันดับชัดและเงื่อนไขเปลี่ยนสำคัญ วิธีเลี่ยงความแม่นยำเทียมพร้อมทำให้การเลือกเห็นได้"
+  - id: trade-off-analysis-negative-1
+    kind: negative
+    prompt: "กฎหมายอาคารกำหนดมาตรฐานความปลอดภัยอัคคีภัยเฉพาะ เหลือแบบผ่านเกณฑ์เพียงแบบเดียว ผู้ขอถามว่าควรเลือกแบบถูกกว่าที่ไม่ผ่านเพราะคะแนนความสะดวกดีกว่าหรือไม่"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "ข้อกำหนดผูกพันถูกปฏิบัติเป็นเกณฑ์ชดเชยได้ ตระกูลที่เหมาะน่าจะเป็น deontic-reasoning หรือผู้มีคุณสมบัติทบทวนการปฏิบัติตาม ไม่ใช่การวิเคราะห์ข้อแลกเปลี่ยน"
+  - id: trade-off-analysis-negative-2
+    kind: negative
+    prompt: "เราไม่แน่ใจควรศึกษาลูกค้าก่อนเลือกแบบหรือไม่ คำถามคือการศึกษาเปลี่ยนการตัดสินใจได้เท่าใดและคุ้มความล่าช้าหรือไม่ ไม่ใช่เทียบแบบวันนี้"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - new_evidence
+      - sensitive_inputs
+    rationale: "ความสับสนตระกูลน่าจะเป็น value-of-information งานทันทีคือประเมินข้อมูลเพิ่ม ไม่ใช่ให้น้ำหนักทางปัจจุบัน"
+  - id: trade-off-analysis-mechanical-1
+    kind: mechanical
+    prompt: "เรียงบันทึกที่ตรวจยืนยันแล้วตามคะแนนคอลัมน์เดียวที่ให้และส่งรายการเรียง ไม่มีคำขอเลือกเกณฑ์ แก้ความชอบขัดกัน หรืออธิบายข้อเสนอ"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "เรียงแบบตายตัวเป็นเชิงกลและไม่มีพื้นที่ข้อแลกเปลี่ยนที่ใช้ดุลยพินิจ"
+  - id: trade-off-analysis-explicit-1
+    kind: explicit
+    prompt: "ใช้ trade-off-analysis กับการเลือกสถานที่นี้ แยกข้อจำกัดยับยั้งจากความชอบ รักษาแหล่งทุกคะแนน และแสดงสิ่งที่ข้อเสนอต้องเสีย"
+    expected_route: trade-off-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "ผู้ใช้ระบุวิธีและขอข้อกำหนดผลเทียบสาธารณะชัด คะแนนไร้ฐานยังเป็นสมมติหรือยังไม่ตรวจ"
+  - id: trade-off-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "เลือกทางดีที่สุดจากทางเลือกไม่มีชื่อเหล่านี้ เรายังไม่ตกลงเกณฑ์ เงื่อนไขขั้นต่ำยอมรับ หรือความสำคัญของใครควรนับ"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - decisive_input_missing
+    rationale: "ขาดชุดทางเป็นไปได้ เกณฑ์ชี้ขาด และที่มาความชอบ ข้อเสนอจะเป็นการให้คะแนนหลังเห็นผล จึงต้องพักการเทียบ"

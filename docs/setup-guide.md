@@ -31,13 +31,14 @@ Windows uses the account skill. Native Windows Claude Code remains outside scope
 
 ## Current content and instruction language
 
-The candidate preserves released v1.5.1 content revision 4: 48 methods,
-192 complete procedures and 576 teacher questions in English, Korean,
-Simplified Chinese (`zh`) and Japanese (`ja`). Original English/Korean method
-bodies remain unchanged. Pending v1.5.2 proposes six more languages; it is not
-this candidate's current baseline and must be reconciled before release.
+The candidate preserves released v1.5.2 content revision 5: 48 methods,
+480 procedures, 3,840 canonical cases and 1,440 teacher questions across
+`en`, `ko`, `zh`, `ja`, `fr`, `de`, `it`, `es`, `pt`, `th`. The existing four
+languages' authored procedure/case bytes and metadata/question values remain
+unchanged; method revision identity advances from 4 to 5. Separate method-body
+upgrades remain outside the migration.
 
-The native commands `./opensocrates locale get`, `locale set en|ko|zh|ja|follow`
+The native commands `./opensocrates locale get`, `locale set en|ko|zh|ja|fr|de|it|es|pt|th|follow`
 and `locale reset` have no host argument; choose one value after `set`.
 On Windows use `.\opensocrates.exe`. Stored preference affects only the optional
 legacy selector; `follow`/`reset` clear that preference without unrelated changes.

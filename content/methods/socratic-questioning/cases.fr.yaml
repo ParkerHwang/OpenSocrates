@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "socratic-questioning-positive-01",
+      "kind": "positive",
+      "prompt": "Posez-moi seulement les questions qui modifieraient la décision de lancer ce service ce trimestre.",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "L’utilisateur demande un ensemble délimité de questions changeant la décision plutôt qu’un entretien ouvert."
+    },
+    {
+      "id": "socratic-questioning-positive-02",
+      "kind": "positive",
+      "prompt": "Aidez-moi à examiner les hypothèses de mon affirmation, mais posez au plus trois questions et expliquez pourquoi chacune compte.",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "La tâche exige explicitement quelques questions liées aux conséquences pour préciser un jugement."
+    },
+    {
+      "id": "socratic-questioning-positive-03",
+      "kind": "positive",
+      "prompt": "Je ne sais pas ce que « bonnes preuves » signifie ici ; posez les quelques questions qui changeraient le niveau d’examen.",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "Les réponses manquantes peuvent changer le niveau probant et doivent être révélées sans surcharge de questions."
+    },
+    {
+      "id": "socratic-questioning-negative-01",
+      "kind": "negative",
+      "prompt": "Avec les exigences fournies, vérifiez si l’implémentation est complète et listez les champs manquants.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "review_completion",
+        "explicit_rules"
+      ],
+      "rationale": "La tâche a une règle fixe et demande une vérification directe d’achèvement, pas un jugement conduit par clarification."
+    },
+    {
+      "id": "socratic-questioning-negative-02",
+      "kind": "negative",
+      "prompt": "Définissez le terme contesté en comparant cas positifs, négatifs et limites.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "ambiguous_terms"
+      ],
+      "rationale": "L’utilisateur demande l’analyse conceptuelle elle-même plutôt qu’une séquence de questions délimitée."
+    },
+    {
+      "id": "socratic-questioning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Transformez ces cinq questions en liste Markdown numérotée.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Mettre en forme les questions fournies est mécanique et ne doit pas déclencher d’autres questions."
+    },
+    {
+      "id": "socratic-questioning-explicit-01",
+      "kind": "explicit",
+      "prompt": "Invoquez explicitement socratic-questioning pour tester si ma décision repose sur une prémisse cachée.",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "hidden_assumptions"
+      ],
+      "rationale": "L’utilisateur nomme explicitement la méthode et demande des questions testant les prémisses."
+    },
+    {
+      "id": "socratic-questioning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Posez les questions décisives, mais ne révélez ni décision, affirmation, périmètre ni conséquence qu’elles doivent affecter.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans décision ni conséquence cible, la méthode ne peut délimiter les questions ou savoir ce qui est décisif."
+    }
+  ]
+}

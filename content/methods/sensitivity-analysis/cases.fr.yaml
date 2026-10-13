@@ -1,0 +1,106 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "sensitivity-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Notre dossier économique compare deux entrepôts selon demande, coût du travail et énergie. Formule de référence et seuil sont documentés, mais les entrées ont des plages défendables. Testez-les, montrez les valeurs de basculement et dites si le choix est robuste ou fragile.",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "multiple_objectives",
+        "choose"
+      ],
+      "rationale": "Modèle, comparaison, référence documentée, plages et seuil existent. La demande fait varier des entrées et expose un basculement, sans inventer de probabilités."
+    },
+    {
+      "id": "sensitivity-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "Notre modèle d’effectifs d’un centre de service a une cible de délai publiée. Testez volume d’arrivée, durée de traitement et effectifs dans des plages sourcées en respectant leurs dépendances ; priorisez la recherche pouvant changer les effectifs choisis.",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "unknown_probability",
+        "choose",
+        "information_purchase"
+      ],
+      "rationale": "Modèle, seuil, entrées incertaines et besoin de préserver dépendances et prioriser information existent. La sensibilité rapporte changements calculés ou ordinaux sans fabriquer de probabilités."
+    },
+    {
+      "id": "sensitivity-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Un comité note trois projets selon coût, impact et risque d’exécution. Les poids sont documentés mais contestés et la recommandation peut basculer. Faites varier poids et notes sur des plages justifiées, relevez valeurs de basculement et hypothèses fragiles.",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "multiple_objectives",
+        "choose"
+      ],
+      "rationale": "La comparaison est structurée avec poids incertains et possible basculement. Il faut exposer la sensibilité avant de prendre les poids pour établis dans une recommandation de compromis."
+    },
+    {
+      "id": "sensitivity-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Nous n’avons ni modèle ni seuil. Examinez ces études contradictoires, jugez la crédibilité des sources et rapprochez leurs preuves sur l’affirmation de sécurité.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "conflicting_sources",
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "Confusion probable avec evidence-hierarchy ou rapprochement de preuves. Sans modèle, règle ou seuil, aucun lien d’entrée ne peut varier."
+    },
+    {
+      "id": "sensitivity-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Explorez quatre futurs externes distincts à dix ans pour notre organisation et préparez chacun. Il n’y a ni modèle quantitatif, ni score d’option, ni relation entre variables à faire varier.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "decisive_input_missing"
+      ],
+      "rationale": "C’est une construction de scénarios sous incertitude profonde, explicitement sans modèle ni relation. La sensibilité fabriquerait une référence impossible à tester."
+    },
+    {
+      "id": "sensitivity-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Multipliez chaque quantité vérifiée par le facteur de conversion fourni et renvoyez la liste convertie. Aucun modèle, comparaison ou seuil décisionnel n’intervient.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Conversion d’unités déterministe, sans plage incertaine ni résultat décisionnel dont analyser la fragilité."
+    },
+    {
+      "id": "sensitivity-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez sensitivity-analysis comme méthode principale pour notre tarif. Modèle de marge contributive de référence, plages contestées de volume et marge et marge minimale sont documentés ; trouvez les valeurs de basculement et suspendez si une plage manque de provenance.",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "sensitive_inputs",
+        "choose"
+      ],
+      "rationale": "L’utilisateur invoque explicitement méthode, référence, plages incertaines, seuil et règle de suspension liée à la provenance. Le résultat reste calculé ou étiqueté, pas probabiliste."
+    },
+    {
+      "id": "sensitivity-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Dites si la recommandation est sensible. Je n’ai fourni ni modèle de référence, ni entrées, ni plages, ni seuil, ni formule de recommandation.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "Référence, entrées variables, plages et seuil sont décisifs. Il faut suspendre et demander ces entrées délimitées au lieu d’un constat générique de sensibilité."
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "jobs-to-be-done-positive-01",
+      "kind": "positive",
+      "prompt": "ธุรกิจเล็กจ้างนักบัญชีหลังวันกำหนดส่งภาษีที่ตึงเครียด ค้นหาความก้าวหน้า ความอุ่นใจทางอารมณ์ สัญญาณสังคม และทางเลือกที่เกี่ยวข้อง",
+      "expected_route": "jobs-to-be-done",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "user_progress",
+        "human_need"
+      ],
+      "rationale": "ช่วงติดขัดเฉพาะและงานหลายมิติอธิบายการจ้างดีกว่าฟีเจอร์หรือประชากร"
+    },
+    {
+      "id": "jobs-to-be-done-positive-02",
+      "kind": "positive",
+      "prompt": "ผู้ใช้ยังใช้สเปรดชีตช้าแทนรับเครื่องมือใหม่ ทำแผนที่แรงผลัก แรงดึง นิสัย ความกังวล และความก้าวหน้าที่ต้องการ",
+      "expected_route": "jobs-to-be-done",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "user_progress",
+        "human_need"
+      ],
+      "rationale": "คำถามเน้นแรงเปลี่ยน การไม่บริโภค และความก้าวหน้าที่บุคคลพยายามทำ"
+    },
+    {
+      "id": "jobs-to-be-done-positive-03",
+      "kind": "positive",
+      "prompt": "บริการขนส่งต้องการรู้ว่าผู้โดยสารเลือกใช้ให้ทำอะไรสำเร็จระหว่างเดินทางดึก และควรสังเกตความสำเร็จอย่างไร",
+      "expected_route": "jobs-to-be-done",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "user_progress",
+        "human_need"
+      ],
+      "rationale": "ต้องมีความก้าวหน้าด้านการใช้งาน อารมณ์ และสังคมที่เฉพาะสถานการณ์พร้อมตัววัดสำเร็จ"
+    },
+    {
+      "id": "jobs-to-be-done-negative-01",
+      "kind": "negative",
+      "prompt": "ความคับข้องใจผู้ใช้ที่สังเกตควรกลายเป็นแนวคิดต้นแบบสามแบบและการทดสอบปลอดภัยก่อนผูกมัดผลิตภัณฑ์",
+      "expected_route": "design-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "human_need",
+        "user_progress"
+      ],
+      "rationale": "ความต้องการหลักคือสร้างแนวคิดจากการสังเกตและทำต้นแบบ แทนวิเคราะห์งานและแรงอย่างเดียว"
+    },
+    {
+      "id": "jobs-to-be-done-negative-02",
+      "kind": "negative",
+      "prompt": "ทีมผลิตภัณฑ์ต้องเปรียบเทียบทางเลือกเริ่มใช้งานสองแบบจากผลที่วัดได้ระหว่างโครงการนำร่องที่ย้อนกลับได้",
+      "expected_route": "pragmatism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "practical_consequence",
+        "choose"
+      ],
+      "rationale": "คอขวดตัดสินคือเปรียบเทียบทางเลือกทางปฏิบัติ ไม่ใช่ค้นหางานเบื้องหลัง"
+    },
+    {
+      "id": "jobs-to-be-done-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "แยกข้อความสัมภาษณ์ลูกค้าเป็นไฟล์ต่างๆ และอย่าอนุมานงานหรือแรงจูงใจ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "การจัดไฟล์เป็นงานเชิงกลแม้ข้อมูลเข้าเป็นสัมภาษณ์ผู้ใช้"
+    },
+    {
+      "id": "jobs-to-be-done-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ jobs-to-be-done อธิบายว่าทำไมผู้เดินทางเปลี่ยนจากรถเมล์เป็นสกู๊ตเตอร์ระหว่างกะดึก",
+      "expected_route": "jobs-to-be-done",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "user_progress"
+      ],
+      "rationale": "ผู้ใช้ขอวิเคราะห์สถานการณ์และแรงเปลี่ยนอย่างชัดเจน"
+    },
+    {
+      "id": "jobs-to-be-done-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "มีเพียงรายการฟีเจอร์ ประกาศงานสากลของลูกค้าทุกคนและกำหนดอัตราสำเร็จทั้งตลาด",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "user_progress",
+        "decisive_input_missing"
+      ],
+      "rationale": "รายการฟีเจอร์ไม่พิสูจน์งานเฉพาะสถานการณ์หรืออัตราทั้งตลาด"
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "design-thinking-positive-01",
+      "kind": "positive",
+      "prompt": "Les parents disent manquer les actualités scolaires, mais leurs contournements observés diffèrent ; découvrez le besoin, cadrez un point de vue et testez trois concepts de service.",
+      "expected_route": "design-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "human_need",
+        "user_progress"
+      ],
+      "rationale": "Le contexte humain observé et la génération ouverte de concepts sont centraux, avec un test de prototype requis avant engagement."
+    },
+    {
+      "id": "design-thinking-positive-02",
+      "kind": "positive",
+      "prompt": "Une clinique veut réduire la confusion à l'accueil ; entretiens et observations doivent guider un prototype peu risqué et une règle d'infirmation.",
+      "expected_route": "design-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "human_need",
+        "user_progress"
+      ],
+      "rationale": "La demande est une conception de service centrée utilisateur avec friction observée et prototype testable."
+    },
+    {
+      "id": "design-thinking-positive-03",
+      "kind": "positive",
+      "prompt": "Une équipe demande un tableau de bord, mais personne ne sait quel échec il éviterait ; découvrez d'abord la situation et le progrès souhaité.",
+      "expected_route": "design-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "human_need",
+        "user_progress"
+      ],
+      "rationale": "La fonctionnalité demandée doit être séparée du besoin sous-jacent avant de choisir les concepts."
+    },
+    {
+      "id": "design-thinking-negative-01",
+      "kind": "negative",
+      "prompt": "Les utilisateurs changent d'outil à un moment précis de difficulté ; la décision dépend des besoins fonctionnels, émotionnels et sociaux et des forces de l'habitude.",
+      "expected_route": "jobs-to-be-done",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "user_progress",
+        "human_need"
+      ],
+      "rationale": "Le résultat principal est une analyse du besoin et des forces de changement, plutôt qu'un cycle d'idéation et de prototype."
+    },
+    {
+      "id": "design-thinking-negative-02",
+      "kind": "negative",
+      "prompt": "Les solutions évidentes sont usées et l'équipe veut des provocations créant trois options radicalement différentes avant filtrage.",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "Le besoin principal est de casser le cadre, pas une conception guidée par l'observation utilisateur."
+    },
+    {
+      "id": "design-thinking-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Placez les citations d'entretien dans un document numéroté sans interpréter les besoins ni proposer de concepts.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Transcription et mise en forme sont mécaniques."
+    },
+    {
+      "id": "design-thinking-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez design-thinking pour repenser l'inscription des bénévoles à partir des frictions observées et tester un petit prototype.",
+      "expected_route": "design-thinking",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "human_need"
+      ],
+      "rationale": "L'utilisateur demande explicitement une découverte des besoins humains et un processus de prototype."
+    },
+    {
+      "id": "design-thinking-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Aucun utilisateur ni observation n'est disponible ; déclarez un besoin universel et lancez la première fonctionnalité sans test.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "human_need",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans éléments utilisateur, besoin et test ne peuvent être étayés ; le concept doit rester suspendu."
+    }
+  ]
+}

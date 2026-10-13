@@ -143,8 +143,8 @@ func GenerateContent(root, productVersion string) error {
 		return err
 	}
 	revision := catalog["content_revision"]
-	if jsonToken(revision) != "4" || jsonToken(teachers["content_revision"]) != "4" {
-		return fmt.Errorf("v1.6.0 requires released content revision 4")
+	if jsonToken(revision) != "5" || jsonToken(teachers["content_revision"]) != "5" {
+		return fmt.Errorf("v1.6.0 requires released content revision 5")
 	}
 	ids := []any{}
 	for _, f := range arr(catalog["families"]) {
@@ -308,16 +308,16 @@ func GenerateContent(root, productVersion string) error {
 	if e != nil {
 		return e
 	}
-	if tree != "sha256:993c30191b0d2b67af88a25c2631d9e8fddeeaf9dadfd0ff4fb07dd62539dcab" {
-		return fmt.Errorf("revision 4 source differs from released v1.5.1 baseline; a separate content revision is required")
+	if tree != "sha256:e1e11f7a772cb2a3f6c8dc0e3b22b0787cdc903de69842de957577a177cee7be" {
+		return fmt.Errorf("revision 5 source differs from released v1.5.2 baseline; a separate content revision is required")
 	}
 	bundle := map[string]any{"schema": schema("compiled-content-bundle"), "product_version": productVersion, "content_revision": revision, "method_ids": sortedIDs, "methods": methods, "locale_messages": messages, "prompt_fragments": fragments, "policy_versions": policies, "source_tree_hash": tree}
 	semantic, e := SemanticHash(bundle)
 	if e != nil {
 		return e
 	}
-	if semantic != "sha256:835a1e32695e863b3696c3bf5dcf1acb7faa580d889129e617524fbc0d9908e6" {
-		return fmt.Errorf("released v1.5.1 semantic identity changed")
+	if semantic != "sha256:b5fc82f5ce8725bd23b7d270014f90853e39474e7b00ae4f20553a484524c659" {
+		return fmt.Errorf("released v1.5.2 semantic identity changed")
 	}
 	bundle["normalized_semantic_hash"] = semantic
 	projections := map[string]any{"schema": schema("reasoning-content-projections"), "content_revision": revision, "selection_catalog": map[string]any{"schema": schema("selection-catalog"), "content_revision": revision, "entries": entries}, "injectable_content": injectable}

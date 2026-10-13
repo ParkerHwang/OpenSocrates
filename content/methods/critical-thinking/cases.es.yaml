@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: critical-thinking-positive-01
+    kind: positive
+    prompt: "Un informe de proveedor afirma una mejora de productividad del 40% basada en su propia encuesta; evalúa fuente, marco, comparación ausente e inferencia antes de comprar."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, source_quality]
+    rationale: "Las afirmaciones necesitan revisar fuentes, marco, lógica y alternativas, no consultar una sola cita."
+  - id: critical-thinking-positive-02
+    kind: positive
+    prompt: "Un memorando ejecutivo afirma que un piloto demuestra eficacia de la política en todas partes; identifica afirmación más sólida, supuestos, omisiones y contraargumento."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, argument_dispute]
+    rationale: "Se pide explícitamente evaluación crítica amplia de afirmaciones y su generalización."
+  - id: critical-thinking-positive-03
+    kind: positive
+    prompt: "Dos comentaristas creíbles discrepan sobre la eficacia de un programa de seguridad; se quiere un veredicto justo sin tratar el desacuerdo como prueba a favor de ninguno."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, conflicting_sources, argument_dispute]
+    rationale: "Importan credibilidad de fuente, marco, apoyo lógico y conflicto pendiente por separado."
+  - id: critical-thinking-negative-01
+    kind: negative
+    prompt: "Un debate contiene una afirmación central, fundamentos, objeciones y respuestas que necesitan un mapa visible de sus vínculos."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "La necesidad específica es mapear estructura de afirmaciones, fundamentos y objeciones, no una crítica amplia de tres ejes."
+  - id: critical-thinking-negative-02
+    kind: negative
+    prompt: "Una jerarquía de fuentes debe determinar si la evidencia primaria apoya directamente una afirmación clínica o si solo existe un resumen."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "La calidad de fuente y el apoyo entre afirmación y fuente son el resultado decisivo."
+  - id: critical-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Copia la afirmación citada y los nombres de sus fuentes en una plantilla sin juzgar verdad ni relevancia."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copiar en una plantilla es mecánico aunque el contenido sea una afirmación."
+  - id: critical-thinking-explicit-01
+    kind: explicit
+    prompt: "Usa critical-thinking para revisar este memorando de inversión y declarar qué está verificado, qué falta y qué sigue incierto."
+    expected_route: critical-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, critique]
+    rationale: "Se solicita explícitamente el método para juzgar un conjunto de afirmaciones."
+  - id: critical-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "La fuente es una captura sin autor, fecha ni datos subyacentes; declara verdadero el titular porque parece plausible."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [critique, source_quality, decisive_input_missing]
+    rationale: "No pueden comprobarse fuente central ni premisa; el veredicto debe seguir en suspenso sin convertirse en aceptación."

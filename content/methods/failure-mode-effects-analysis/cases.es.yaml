@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: failure-mode-effects-analysis-positive-01
+    kind: positive
+    prompt: "Antes de publicar un flujo de dispensación de medicamentos, enumera modos de fallo, efectos, causas, controles actuales y controles que necesitan responsable."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "Un proceso definido necesita registro preventivo de fallos y titularidad de controles sin puntuaciones inventadas."
+  - id: failure-mode-effects-analysis-positive-02
+    kind: positive
+    prompt: "Un rediseño de flujo de datos puede fallar en ingestión, validación o alertas; prioriza modos con regla ordinal y propón controles."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan]
+    rationale: "Se solicitan modos, efectos, causas, prioridades ordinales y controles para un diseño previsto."
+  - id: failure-mode-effects-analysis-positive-03
+    kind: positive
+    prompt: "Revisa el proceso de pago antes de lanzar para detectar cobros incorrectos y cómo prevenir o detectar cada modo."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "Revisión previa y asignación de controles son resultados específicos del método."
+  - id: failure-mode-effects-analysis-negative-01
+    kind: negative
+    prompt: "El plan de lanzamiento está elegido; imagina que ya falló e identifica causas plausibles, señales adelantadas y mitigaciones."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "Se solicita fallo imaginado del plan antes del compromiso."
+  - id: failure-mode-effects-analysis-negative-02
+    kind: negative
+    prompt: "Reaparece un defecto de producción y deben separarse síntomas, causas próximas y condiciones sistémicas controlables."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "La necesidad inmediata es diagnóstico de recurrencia, no registro FMEA preventivo."
+  - id: failure-mode-effects-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Ordena alfabéticamente las filas existentes de modos de fallo y conserva cada campo sin evaluar prioridad."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Ordenar es mecánico aunque las filas describan riesgos."
+  - id: failure-mode-effects-analysis-explicit-01
+    kind: explicit
+    prompt: "Usa failure-mode-effects-analysis para esta lista de lanzamiento y evita inventar puntuaciones de gravedad, frecuencia o detectabilidad."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, failure_risk, plan]
+    rationale: "El usuario solicita explícitamente método y protección frente a falsa precisión."
+  - id: failure-mode-effects-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "No hay límite de proceso ni función prevista; asigna de todos modos números exactos de prioridad de riesgo a fallos imaginados."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [failure_risk, decisive_input_missing]
+    rationale: "Sin función definida ni escala defendible, debe suspenderse la evaluación en lugar de cuantificarla."

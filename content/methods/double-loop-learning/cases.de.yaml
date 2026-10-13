@@ -1,0 +1,110 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "double-loop-learning-positive-1",
+      "kind": "positive",
+      "prompt": "Support senkte Antwortzeit mit neuer Checkliste, aber Eskalationen kehrten nach zwei Monaten zurück. Vergleiche Soll/Ist, prüfe Ziel und Regel hinter Checkliste und entwirf sicheren Regel-Lerntest.",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "governing_rule",
+        "repeat_iteration",
+        "testable_claim"
+      ],
+      "rationale": "Verfahrenskorrektur verhinderte Wiederkehr nicht; Leitziele/-regeln stehen zur Prüfung. Checklistenhandlung von Regelhypothese trennen und Eskalationsunterlagen nach Herkunft markieren."
+    },
+    {
+      "id": "double-loop-learning-positive-2",
+      "kind": "positive",
+      "prompt": "Freigaberegel belohnt geplantes Lieferdatum; Teams verschieben wiederholt Zuverlässigkeitsarbeit. Prüfe Ziel, Anreiz, Befugnis und Annahme und schlage begrenzten Regeländerungstest vor.",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "governing_rule",
+        "feedback_delay",
+        "recurring_failure",
+        "chosen_plan"
+      ],
+      "rationale": "Wiederkehr könnte aus leitender Regel statt Einzelfehler entstehen. Regelkandidaten vergleichbar, Kausalerklärung bis Test inferred oder unverified."
+    },
+    {
+      "id": "double-loop-learning-positive-3",
+      "kind": "positive",
+      "prompt": "Nach zwei Schulungsrevisionen fehlt dieselbe Übergabeangabe in mehreren Teams. Erfasse Lücke, trenne Schulungskorrektur von Regeländerung und benenne jeweilige Belege.",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "governing_rule",
+        "repeat_iteration",
+        "testable_claim"
+      ],
+      "rationale": "Wiederkehr und vorherige einfache Korrekturen rechtfertigen Leitregelprüfung. Gefordert sind Lücke, Regel, Belege und Lerntest statt Schuld oder Wiederkehrwahrscheinlichkeit."
+    },
+    {
+      "id": "double-loop-learning-negative-1",
+      "kind": "negative",
+      "prompt": "Eine Bereitstellung enthält Tippfehler, sofort von vorhandener Kontrolle erkannt. Finde und korrigiere Ausführungsfehler ohne Freigaberegeländerung.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "explicit_rules"
+      ],
+      "rationale": "Begrenzter Einzelfehler ist belegt erklärt; Nutzer schließt Regeländerung aus. Double-loop learning wäre Übergriff; gezielte Fehlerreaktion passt."
+    },
+    {
+      "id": "double-loop-learning-negative-2",
+      "kind": "negative",
+      "prompt": "Zielnutzer und Preishypothese stehen fest. Entwirf umkehrbaren Landingpage-Test, handlungsfähige Kennzahl und Kurswechsel-oder-Fortsetzungsregel.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "plan",
+        "human_need"
+      ],
+      "rationale": "lean-startup-Experiment, mögliche Familienverwechslung. Keine Wiederkehrlücke oder Leitregelrevision genannt."
+    },
+    {
+      "id": "double-loop-learning-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Wandle drei Vorfalldauern von Minuten in Stunden um und bewahre Reihenfolge.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Deterministische Einheitenumrechnung ohne Wiederkehr-, Leitvariablen- oder Lerntesturteil."
+    },
+    {
+      "id": "double-loop-learning-explicit-1",
+      "kind": "explicit",
+      "prompt": "Nutze double-loop learning. Zeige Lücke, Leitannahme oder Regel, Belegstatus, Regelkandidat und sicheren Lerntest; keine persönliche Schuldzuweisung.",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "recurring_failure",
+        "governing_rule",
+        "testable_claim"
+      ],
+      "rationale": "Nutzer fordert Verfahren und Vertrag. Keine-Schuld-Vorgabe passt zu Regel-, Befugnis-, Anreiz- und Belegprüfung statt Absichtsinferenz."
+    },
+    {
+      "id": "double-loop-learning-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Team scheitert ständig. Welche Überzeugung oder Regel muss sich ändern, welches Experiment? Keine Sollwerte, Beobachtungsunterlagen, Wiederkehrgrenze oder aktuelle Regel vorhanden.",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "recurring_failure",
+        "governing_rule"
+      ],
+      "rationale": "Mögliches Verfahren ohne entscheidende Lücke und Regel. Aussetzen statt Tiefenerklärung oder Denkhaltungsschuld erfinden."
+    }
+  ]
+}

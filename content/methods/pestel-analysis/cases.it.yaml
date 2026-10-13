@@ -1,0 +1,74 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "pestel-analysis-positive-1"
+    kind: positive
+    prompt: "Prima di entrare in questo paese, esamina agenda elettorale attuale, inflazione e condizioni valutarie, cambiamenti demografici, tecnologie delle piattaforme, regole sulle emissioni e requisiti di licenza che possono cambiare il piano di lancio."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "La richiesta identifica un’esplorazione esterna delimitata e una decisione strategica. Conserva date delle fonti e giurisdizione, senza dichiarare certe politiche o previsioni non verificate."
+  - id: "pestel-analysis-positive-2"
+    kind: positive
+    prompt: "L’espansione del prodotto dipende da clienti che invecchiano, regole di protezione dei dati, costi del cloud e un possibile shock dei prezzi energetici. Identifica fattori rilevanti, meccanismi e segnali che dovrebbero cambiare la scelta d’investimento."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "Si richiedono fattori esterni rilevanti e implicazioni strategiche, non un elenco generico di tendenze. Le ipotesi fornite vanno etichettate come controllate, inferite o non verificate."
+  - id: "pestel-analysis-positive-3"
+    kind: positive
+    prompt: "Costruisci un contesto esterno fondato su prove per la strategia quinquennale, mostrando opportunità, minacce o segnali di monitoraggio e cosa cambierebbe ogni implicazione."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "macro_environment"
+      - "forecast"
+    rationale: "Il risultato è un registro dei fattori rilevanti collegato a un orizzonte strategico. Richiede stato delle prove e segnali osservabili, non previsioni o probabilità inventate."
+  - id: "pestel-analysis-negative-1"
+    kind: negative
+    prompt: "Il magazzino ha un errore ricorrente di prelievo. Ricostruisci il processo locale, identifica la causa del guasto e proponi un’azione correttiva."
+    expected_route: "root-cause-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "recurring_failure"
+      - "diagnose"
+    rationale: "Il problema è interno a un processo locale, non al macroambiente. L’analisi causale del guasto è più vicina; non aggiungere fattori esterni solo per riempire categorie."
+  - id: "pestel-analysis-negative-2"
+    kind: negative
+    prompt: "Una nuova politica interesserà dipendenti, collaboratori, clienti e una comunità non rappresentata. Mappa potere, interessi, probabili preoccupazioni e responsabili del coinvolgimento."
+    expected_route: "stakeholder-analysis"
+    expected_behavior: route
+    decisive_features:
+      - "interacting_actors"
+      - "stakeholder_conflict"
+    rationale: "Il contesto è esterno ma il risultato decisivo è una mappa degli attori e del coinvolgimento. È una probabile confusione con stakeholder analysis, non una richiesta di sei categorie ambientali."
+  - id: "pestel-analysis-mechanical-1"
+    kind: mechanical
+    prompt: "Inserisci le sei descrizioni di fattori fornite nelle colonne P, E, S, T, E e L senza cambiarne le parole."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - "mechanical"
+      - "mechanical"
+    rationale: "L’utente richiede solo formattazione di contenuti forniti, senza giudizio su rilevanza, prove o strategia."
+  - id: "pestel-analysis-explicit-1"
+    kind: explicit
+    prompt: "Usa PESTEL analysis per rivedere la decisione di ingresso sul mercato. Mantieni solo fattori rilevanti, identifica stato delle prove e orizzonte e indica implicazioni di opportunità o minaccia."
+    expected_route: "pestel-analysis"
+    expected_behavior: explicit_primary
+    decisive_features:
+      - "explicit_method"
+      - "macro_environment"
+    rationale: "Il metodo è richiesto esplicitamente con il contratto pubblico. L’analisi resta attenta alle fonti e sospende implicazioni dipendenti da regole attuali non controllate."
+  - id: "pestel-analysis-insufficiency-1"
+    kind: insufficiency
+    prompt: "Dobbiamo entrare nel mercato? Non ho fornito paese o giurisdizione, orizzonte decisionale, ambito del prodotto, riferimento iniziale o fonti delle condizioni esterne attuali."
+    expected_route: "pestel-analysis"
+    expected_behavior: hold
+    decisive_features:
+      - "boundary_sensitive"
+      - "decisive_input_missing"
+    rationale: "La domanda è adatta a un’esplorazione esterna ma confini e date mancanti possono cambiare l’implicazione. Sospendi e chiedi solo fatti decisivi sull’ambito senza inventare un contesto di mercato."

@@ -72,8 +72,8 @@ func clone(v map[string]any) map[string]any {
 }
 func schema(name string) string { return "opensocrates." + name + "/1.0.0" }
 
-// releasedLocales is the exact v1.5.1 content contract inherited by v1.6.0.
-var releasedLocales = []string{"en", "ko", "zh", "ja"}
+// releasedLocales is the exact v1.5.2 content contract inherited by v1.6.0.
+var releasedLocales = []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}
 
 func releasedLocale(value string) bool {
 	for _, locale := range releasedLocales {

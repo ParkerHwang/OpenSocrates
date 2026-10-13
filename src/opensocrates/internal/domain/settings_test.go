@@ -67,7 +67,7 @@ func TestSettingsPresenceAndUnknownContracts(t *testing.T) {
 }
 
 func TestLocaleMutationsPreserveReleasedSettingsAndRevision(t *testing.T) {
-	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+	for _, locale := range []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} {
 		s := DefaultSettings()
 		s.Value["revision"] = json.Number("123456789012345678901234567890")
 		s.Value["recording_mode"] = "local_public_artifacts"

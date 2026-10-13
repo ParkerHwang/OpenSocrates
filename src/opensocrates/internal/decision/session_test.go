@@ -94,7 +94,7 @@ func TestDecisionCatalogAndDeliveryAllReleasedLocales(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+	for _, locale := range []string{"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} {
 		s := New(b)
 		catalog := s.Handle(map[string]any{"operation": "catalog", "locale": locale})
 		if catalog["status"] != "catalog" || len(catalog["methods"].([]any)) != 48 {
@@ -115,7 +115,7 @@ func TestDecisionCatalogAndDeliveryAllReleasedLocales(t *testing.T) {
 			t.Fatal("localized instructions mismatch", locale, e)
 		}
 	}
-	for _, locale := range []string{"follow", "zh-CN", "JA", "fr", ""} {
+	for _, locale := range []string{"follow", "zh-CN", "JA", "fr-FR", "pt-BR", "th-TH", "ru", ""} {
 		if got := New(b).Handle(request(locale)); got["status"] != "unavailable" {
 			t.Fatal("decision accepted unsupported locale", locale)
 		}

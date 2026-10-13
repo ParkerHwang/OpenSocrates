@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "premortem-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "ทีมกำลังจะย้ายข้อมูลลูกค้าและต้องการจินตนาการว่าย้ายล้ม รวบรวมเหตุอิสระ และตั้งเตือนต้น",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "แผนที่เลือกชัดต้องเรื่องล้ม สัญญาณนำ มาตรการ และหยุด"
+    },
+    {
+      "id": "premortem-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "ก่อนเปิดคลินิกใหม่ ระบุแผนพังได้อย่างไรด้านบุคลากร อุปสงค์ ปฏิบัติการ และกฎ โดยไม่ใส่โอกาสปลอม",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "ขอการสมมติแผนล้มชัด ต้องคงอันดับและรู้สถานะหลักฐาน"
+    },
+    {
+      "id": "premortem-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "ทีมเปิดตัวเห็นพ้องทั้งหมดต้องโครงท้าทายเพื่อเผยสมมติฐานเงียบ ตัวบ่งชี้นำ และพักก่อนผูกพัน",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "hidden_assumptions",
+        "failure_risk"
+      ],
+      "rationale": "คำขอมุ่งตามกลุ่มและวางแผนมองดีรอบการกระทำเลือก"
+    },
+    {
+      "id": "premortem-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "ทุกขั้นงานให้รายการรูปแบบล้ม ผล เหตุ ควบคุม และเจ้าของในทะเบียนเสี่ยงอนาคต",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "บัญชีล้มและควบคุมระดับกระบวนการเฉพาะกว่าย้อนแผนจินตนาการ"
+    },
+    {
+      "id": "premortem-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "ข้อบกพร่องซ้ำมาหลายเดือน ทีมต้องหาเงื่อนไขระบบควบคุมได้ที่ป้องกันซ้ำ",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "เกิดซ้ำอยู่แล้วต้องวินิจฉัยเหตุ ไม่ฝึกก่อนผูกพัน"
+    },
+    {
+      "id": "premortem-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "คัดแผนเปิดตัวอนุมัติลงแม่แบบเสี่ยง ไม่เพิ่มสถานการณ์ล้มหรือคำแนะนำ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "คัดลอกเป็นเชิงกล ไม่ถามคำตัดสินแผนเลือก"
+    },
+    {
+      "id": "premortem-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "ทำ premortem กับแผนจ้างและระบุสัญญาณแรกสุดที่ทำให้พัก",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "ผู้ใช้ระบุวิธีกับแผนชัดก่อนผูกพัน"
+    },
+    {
+      "id": "premortem-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "ไม่มีแผนเลือก แต่แต่งย้อนหลังล้มแล้วประกาศทางเลือกใดจะพังด้วยแน่นอน 90%",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "chosen_plan",
+        "decisive_input_missing"
+      ],
+      "rationale": "ไม่มีแผนหรือชั้นอ้างอิงปกป้องได้ การฝึกรองรับโอกาสหรือคำแนะนำไม่ได้"
+    }
+  ]
+}

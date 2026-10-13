@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: argument-mapping-positive-01
+    kind: positive
+    prompt: "Mapeie a alegação, os fundamentos, as objeções e as refutações neste argumento de política para vermos quais vínculos não têm suporte."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique, tangled_hierarchy]
+    rationale: "A tarefa exige explicitamente uma estrutura de alegações, fundamentos e objeções e a detecção de vínculos sem suporte."
+  - id: argument-mapping-positive-02
+    kind: positive
+    prompt: "Qual premissa realmente sustenta a recomendação e quais contra-argumentos continuam sem resposta?"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "É preciso separar várias relações de apoio e ataque antes de julgar a recomendação."
+  - id: argument-mapping-positive-03
+    kind: positive
+    prompt: "Construa um mapa de argumentos para a posição contratual, incluindo pressupostos compartilhados e a refutação mais forte."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, tangled_hierarchy]
+    rationale: "O resultado público solicitado é um mapa estruturado de alegações, premissas compartilhadas e objeções."
+  - id: argument-mapping-negative-01
+    kind: negative
+    prompt: "Compare a qualidade das evidências destes dois estudos e diga qual se aplica à nossa população."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "O gargalo central é o desenho das fontes e sua aplicabilidade, o que pertence à verificação de evidências."
+  - id: argument-mapping-negative-02
+    kind: negative
+    prompt: "Escreva primeiro a recomendação executiva, seguida de três razões agrupadas e detalhes de apoio."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "O pedido é uma estrutura de comunicação do geral para o detalhe, em vez de testar vínculos de apoio."
+  - id: argument-mapping-mechanical-01
+    kind: mechanical
+    prompt: "Converta esta lista fornecida de premissas em tópicos Markdown."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Formatar uma lista fornecida não exige análise de argumentos."
+  - id: argument-mapping-explicit-01
+    kind: explicit
+    prompt: "Use argument-mapping explicitamente para examinar a objeção mais forte a este memorando de investimento."
+    expected_route: argument-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, argument_dispute]
+    rationale: "O usuário invoca explicitamente o método para examinar uma objeção e a estrutura de apoio."
+  - id: argument-mapping-insufficiency-01
+    kind: insufficiency
+    prompt: "Mapeie o argumento e julgue seu vínculo mais fraco, mas não forneça conclusão, premissas nem texto de fonte."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [argument_dispute, decisive_input_missing]
+    rationale: "Não há material argumentativo disponível para mapear; o método deve suspender o julgamento em vez de inventar premissas."

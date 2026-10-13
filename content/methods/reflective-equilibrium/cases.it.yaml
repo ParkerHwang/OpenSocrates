@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: reflective-equilibrium-positive-01
+    kind: positive
+    prompt: "Un principio di equità sembra giusto finché viene applicato a tre casi difficili; rivedi principio o giudizi mantenendo visibile la tensione residua."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "Il compito richiede aggiustamento reciproco fra giudizi ponderati, principi e casi difficili."
+  - id: reflective-equilibrium-positive-02
+    kind: positive
+    prompt: "Un’istituzione valorizza privacy e responsabilità ma un incidente difficile crea conflitto; confronta revisioni che preservino entrambe per quanto possibile."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "Un conflitto di valori con discrezionalità richiede principi, casi, revisioni e tensione residua espliciti."
+  - id: reflective-equilibrium-positive-03
+    kind: positive
+    prompt: "I giudizi accettati sui casi di un gruppo professionale confliggono con il principio dichiarato; testa controesempi e identifica quale presupposto di fondo debba cambiare."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "La decisione dipende dall’iterazione fra casi, principi e presupposti di fondo."
+  - id: reflective-equilibrium-negative-01
+    kind: negative
+    prompt: "Una normativa identificata vieta chiaramente l’azione proposta senza discrezionalità; determina l’alternativa consentita."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "Una regola vincolante decide lo stato senza aggiustamenti riflessivi fra principi."
+  - id: reflective-equilibrium-negative-02
+    kind: negative
+    prompt: "Un gruppo ha scartato l’obiezione di una parte interessata senza ricostruirne le premesse corrette più forti o le prove necessarie."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute]
+    rationale: "La lacuna immediata è un caso opposto non testato, non un conflitto fra principi e giudizi ponderati."
+  - id: reflective-equilibrium-mechanical-01
+    kind: mechanical
+    prompt: "Copia principi elencati e descrizioni dei casi in un documento di revisione senza confrontarli o rivederli."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copiare è meccanico e non richiede coerenza normativa."
+  - id: reflective-equilibrium-explicit-01
+    kind: explicit
+    prompt: "Usa reflective-equilibrium per esaminare il nostro principio di equità con questi casi difficili e indica le tensioni residue."
+    expected_route: reflective-equilibrium
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, value_conflict, argument_dispute]
+    rationale: "L’utente richiede esplicitamente un aggiustamento iterativo fra casi e principi."
+  - id: reflective-equilibrium-insufficiency-01
+    kind: insufficiency
+    prompt: "Si applica una regola vincolante di sicurezza ma chiedi all’assistente di bilanciarla fino a eliminarla perché un caso sembra ingiusto."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [value_conflict, binding_rule_without_discretion]
+    rationale: "Il metodo non deve creare discrezionalità né superare una regola vincolante di sicurezza."

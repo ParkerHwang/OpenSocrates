@@ -18,12 +18,12 @@ After the v1.5.1 maintenance release, a fresh readback of active ruleset
 `20467374` requires the six legacy checks: Python quality, Product contracts,
 GitHub and npx installer, Native package (darwin-arm64), Native Windows x64 /
 windows, and Repository governance. The earlier approved five-Go-check change
-below is historical. The independent v1.5.2 maintenance work still uses that
-legacy pipeline; this reconciliation does not change shared protection policy.
+below is historical. The v1.5.2 maintenance release used that legacy pipeline. The Go reconciliation
+does not by itself change shared protection policy.
 The final Go transition must align required checks with its verified workflow
 while preserving every other guard. / v1.5.1 출시 후 실제 필수 검사는 Python 기준
-6개로 돌아온 것을 확인했습니다. 아래 Go 검사 변경은 당시 기록입니다. 진행 중인
-v1.5.2의 보호 절차를 방해하지 않도록 공용 정책은 바꾸지 않았으며, 최종 Go 전환
+6개로 돌아온 것을 확인했습니다. 아래 Go 검사 변경은 당시 기록입니다. v1.5.2 유지보수
+릴리스의 공용 정책은 이 콘텐츠 동기화만으로 바꾸지 않으며, 최종 Go 전환
 시 검증한 검사 목록과 다른 보호 조건을 함께 유지해야 합니다.
 
 At source c9da20d, GitHub lists zero release environments, zero self-hosted

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: boundary-critique-positive-01
+    kind: positive
+    prompt: "Sollte unsere Stadt einen Busumbau nur nach durchschnittlicher Pendelzeit heutiger Fahrgäste beurteilen?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "Nichtfahrgäste, Zugänglichkeit, Viertel oder Horizont innerhalb der Grenze ändern den Schluss."
+  - id: boundary-critique-positive-02
+    kind: positive
+    prompt: "Wer sollte zählen, wenn wir den Erfolg des Arbeitsplatzüberwachungspiloten beurteilen?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "Erfolgsurteil hängt von erfassten Beschäftigten, ausgeschlossenen Auftragnehmern, Zuständigkeit und gemessenen Ergebnissen ab."
+  - id: boundary-critique-positive-03
+    kind: positive
+    prompt: "Ist der Küstenhochwasserplan noch sinnvoll, wenn Mieter und Umsiedlungskosten der nächsten dreißig Jahre einbezogen werden?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "Andere Betroffene und Horizonte können Nutzen, Kostenträger und bevorzugte Option umkehren."
+  - id: boundary-critique-negative-01
+    kind: negative
+    prompt: "Vergleiche die beiden ausdrücklich abgegrenzten Anbieter anhand der drei festen Preis- und Latenzkriterien."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [multiple_options, choose]
+    rationale: "Grenze, Verantwortlicher, Horizont und Kriterien sind ausdrücklich; Optionenvergleich verbleibt."
+  - id: boundary-critique-negative-02
+    kind: negative
+    prompt: "Welcher Absatz hat den stärkeren Beleg für die genannte Behauptung?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Quellenunterstützung statt Frage nach Einbeziehung in Systemgrenzen."
+  - id: boundary-critique-mechanical-01
+    kind: mechanical
+    prompt: "Übertrage die genannten Interessengruppen in CSV mit Name und Rolle."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Listenformatierung ist mechanisch und darf kein Urteilsverfahren auslösen."
+  - id: boundary-critique-explicit-01
+    kind: explicit
+    prompt: "Nutze boundary-critique zur Prüfung, ob unser Klimaversprechen Lieferkettenarbeiter ausschließt."
+    expected_route: boundary-critique
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, boundary_sensitive]
+    rationale: "Nutzer benennt Verfahren ausdrücklich für Betroffene und Umfang."
+  - id: boundary-critique-insufficiency-01
+    kind: insufficiency
+    prompt: "Sage, ob die Empfehlung bei Einbeziehung aller Betroffenen anders wird, aber ohne Entscheidung, Population oder Zeithorizont."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [boundary_sensitive, decisive_input_missing]
+    rationale: "Entscheidende grenzdefinierende Eingaben fehlen; aussetzen statt Betroffenenmenge erfinden."

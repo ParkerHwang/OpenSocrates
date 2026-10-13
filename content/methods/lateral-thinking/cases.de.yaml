@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lateral-thinking-positive-01
+    kind: positive
+    prompt: "Das Team hat dieselbe Lieferroute wiederholt optimiert und möchte die Annahme hinterfragen, dass jede Bestellung ein Zentrallager durchlaufen muss."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "Die Optionen sind festgefahren; vor der Bewertung wird eine rahmenverändernde Provokation verlangt."
+  - id: lateral-thinking-positive-02
+    kind: positive
+    prompt: "Eine Warteschlange einer öffentlichen Dienstleistung lässt sich nicht schneller abarbeiten; erzeugen Sie Konzepte durch Umkehrung dessen, wer fährt, wann die Leistung erfolgt oder was als Warteschlange zählt."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "Gefordert sind ausdrücklich ein anderer Rahmen, mehrere Konzepte und anschließende Prüfung."
+  - id: lateral-thinking-positive-03
+    kind: positive
+    prompt: "Ein Produktteam ergänzt ständig Funktionen gegen sinkende Nutzung; hinterfragen Sie den Rahmen und erzeugen Sie Alternativen ohne zusätzliche Funktionen."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "Der Optimierungsrahmen blockiert neue Optionen und sollte bewusst aufgebrochen werden."
+  - id: lateral-thinking-negative-01
+    kind: negative
+    prompt: "Interviewevidenz ist unvollständig; das Team muss menschlichen Bedarf ermitteln, eine Dienstleistung prototypisch entwickeln und Nutzerverhalten sicher testen."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "Bedarfsermittlung und Nutzertests haben Vorrang; reine Provokation würde wesentliche Evidenz überspringen."
+  - id: lateral-thinking-negative-02
+    kind: negative
+    prompt: "Ein Maschinenschutz muss eine verbindliche Sicherheitsvorgabe erfüllen; das Team fragt, ob der Entwurf die vorgeschriebenen Tests besteht."
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, explicit_rules]
+    rationale: "Sicherheitskritische Validierung braucht disziplinierte Evidenz und die maßgebliche Spezifikation statt offener Provokation."
+  - id: lateral-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Sortieren Sie die vorhandenen Optionen alphabetisch und bewahren Sie alle Beschreibungen, ohne neue Alternativen zu erzeugen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Sortieren ist mechanisch und verlangt kein Hinterfragen des Rahmens."
+  - id: lateral-thinking-explicit-01
+    kind: explicit
+    prompt: "Nutzen Sie lateral-thinking, um drei nicht offensichtliche Wege zur Abfallverringerung bei Konferenzen zu finden, ohne Sicherheitsregeln zu ändern."
+    expected_route: lateral-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, stale_options, choose]
+    rationale: "Der Nutzer verlangt ausdrücklich rahmenverändernde Alternativen unter einer geschützten Einschränkung."
+  - id: lateral-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "Problem und unverhandelbare Einschränkungen sind unbekannt; erfinden Sie eine radikale Option und empfehlen Sie sie sofort."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [stale_options, decisive_input_missing]
+    rationale: "Ohne Rahmen und Schutzvorgaben lässt sich Provokation nicht sicher prüfen."

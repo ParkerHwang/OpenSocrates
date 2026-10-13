@@ -282,7 +282,7 @@ func checkPackageTree(p string) ([]string, error) {
 			codes = append(codes, "canonical_method_content_mismatch")
 		}
 	}
-	if m["source_tree_hash"] != "sha256:993c30191b0d2b67af88a25c2631d9e8fddeeaf9dadfd0ff4fb07dd62539dcab" || m["normalized_semantic_hash"] != "sha256:835a1e32695e863b3696c3bf5dcf1acb7faa580d889129e617524fbc0d9908e6" {
+	if m["source_tree_hash"] != "sha256:e1e11f7a772cb2a3f6c8dc0e3b22b0787cdc903de69842de957577a177cee7be" || m["normalized_semantic_hash"] != "sha256:b5fc82f5ce8725bd23b7d270014f90853e39474e7b00ae4f20553a484524c659" {
 		codes = append(codes, "package_released_content_identity_changed")
 	}
 	return codes, nil

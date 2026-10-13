@@ -1,0 +1,103 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "bayesian-updating-positive-01",
+      "kind": "positive",
+      "prompt": "ผลทดสอบบวกนี้ควรเปลี่ยนอัตราส่วนโอกาสของการวินิจฉัยที่แข่งขันกันอย่างไร เมื่ออัตราฐานของมันต่างกัน?",
+      "expected_route": "bayesian-updating",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "new_evidence",
+        "unknown_probability",
+        "competing_explanations"
+      ],
+      "rationale": "งานต้องมีฐานก่อนหน้า ทิศทางหลักฐาน การเปลี่ยนความเชื่อภายหลัง และความไวต่ออัตราฐาน"
+    },
+    {
+      "id": "bayesian-updating-positive-02",
+      "kind": "positive",
+      "prompt": "ปรับความเชื่อมั่นของเราในสมมติฐานการเปิดตัวสองข้อเมื่อสัญญาณเหล่านี้ทยอยมาถึง",
+      "expected_route": "bayesian-updating",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "new_evidence",
+        "unknown_probability",
+        "competing_explanations"
+      ],
+      "rationale": "หลักฐานที่มาเป็นลำดับควรปรับสมมติฐานแข่งขันโดยไม่ซ้ำสัญญาณ"
+    },
+    {
+      "id": "bayesian-updating-positive-03",
+      "kind": "positive",
+      "prompt": "แสดงว่าคำแนะนำกลับทิศหรือไม่เมื่ออัตราก่อนหน้าและสมมติฐานค่าความเป็นไปได้เปลี่ยนในช่วงน่าเชื่อถือ",
+      "expected_route": "bayesian-updating",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "new_evidence",
+        "unknown_probability"
+      ],
+      "rationale": "คำขอคือการตัดสินหลักฐานเรื่องความไวของความเชื่อภายหลังและเกณฑ์กระทำ"
+    },
+    {
+      "id": "bayesian-updating-negative-01",
+      "kind": "negative",
+      "prompt": "จัดอันดับแหล่งข้อมูลเหล่านี้ตามความตรงและคุณภาพการศึกษา ก่อนตัดสินว่าควรกล่าวข้อกล่าวอ้างหนักแน่นเพียงใด",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "งานปรับน้ำหนักคุณภาพแหล่งข้อมูล แทนปรับชุดสมมติฐานที่กำหนด"
+    },
+    {
+      "id": "bayesian-updating-negative-02",
+      "kind": "negative",
+      "prompt": "ระบุคำอธิบายแข่งขันสำหรับความผิดปกตินี้ และเสนอการทดสอบที่แยกมันได้",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "การสร้างคำอธิบายและการทดสอบแยกเป็นงาน abduction เมื่อไม่ได้ขอปรับฐานก่อนหน้า"
+    },
+    {
+      "id": "bayesian-updating-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "คัดลอกค่าฐานก่อนหน้าที่ให้มาใส่แบบวิเคราะห์",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การคัดลอกค่าเป็นเชิงกลและต้องไม่เรียกการใช้เหตุผลความน่าจะเป็น"
+    },
+    {
+      "id": "bayesian-updating-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ bayesian-updating โดยชัดแจ้งเพื่อปรับความเชื่อมั่นหลังสัญญาณทุจริตใหม่นี้",
+      "expected_route": "bayesian-updating",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "new_evidence"
+      ],
+      "rationale": "ผู้ใช้เลือกการปรับความเชื่อมั่นตามหลักฐานโดยตรง"
+    },
+    {
+      "id": "bayesian-updating-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "ให้ความน่าจะเป็นภายหลัง แต่ไม่ให้สมมติฐานแข่งขัน ฐานก่อนหน้า หรือข้อมูลค่าความเป็นไปได้",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "new_evidence",
+        "unknown_probability",
+        "decisive_input_missing"
+      ],
+      "rationale": "ความน่าจะเป็นภายหลังแบบตัวเลขที่ไม่มีสมมติฐานและที่มาข้อมูลเข้าจะเป็นความแม่นยำที่แต่งขึ้น"
+    }
+  ]
+}

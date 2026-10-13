@@ -7,7 +7,7 @@
 - 작성일: 2026-10-12.
 - 저장소: [ParkerHwang/OpenSocrates](https://github.com/ParkerHwang/OpenSocrates).
 - 확인한 당시 `main`: `9572db2c71a455d4ada24c78402d0f874002cec9`.
-- 초기 본문 기준은 v1.5.0 태그 `cf6634310afcf5d5ce58484e67a73151bb4c5999`였다. 출시 후 현재 기준은 [v1.5.1](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.1)의 `5a6a7fa2897dd42772c4503a1301770e48bd1f29`, 리비전 4·EN/KO/ZH/JA다. 실제 기준은 [CONTENT_BASELINE.json](CONTENT_BASELINE.json)에 기록한다.
+- 초기 본문 기준은 v1.5.0 태그 `cf6634310afcf5d5ce58484e67a73151bb4c5999`였다. v1.5.1·리비전 4 동기화 이후 현재 기준은 [v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)의 소스 `9838db16910c5f22d9dcc3c7180350cb406fd236`, 리비전 5·열 언어다. 태그 객체 `4c27d59da54eb1591ba24c0ebae62d6ab3168b60`는 소스 커밋과 구분하며 같은 트리의 main 병합 `8f08b9a90d711fa3fc60cc7db6f962e3dda43c42`로 대체하지 않는다. 실제 기준은 [CONTENT_BASELINE.json](CONTENT_BASELINE.json)에 기록한다.
 - 준비 문서 소유 범위: `docs/v1.6.0/`.
 - GitHub 추적: 준비 작업의 issue/PR은 이 문서가 포함된 PR의 Tracking을 따른다. 구현 착수 시 구현 추적 작업을 별도로 만든다.
 
@@ -22,7 +22,7 @@ Go 전체 전환, 공통 설치 엔진, 언어 중립 계약, 기본 선택·이
 | 항목 | 기준과 확정할 내용 |
 | --- | --- |
 | 소스 기준 | 준비 당시 main SHA는 위에 고정. 구현 시작 시 최신 소스와 후속 본문 변경의 혼입 여부 확인 |
-| 방법과 언어 | v1.5.1의 48개 방법과 EN/KO/ZH/JA 본문·선택 메타데이터 유지 |
+| 방법과 언어 | v1.5.2의 48개 방법과 열 언어 본문·선택 메타데이터 유지 |
 | 콘텐츠 묶음 | V0에서 기존 콘텐츠의 `content_revision`, `source_tree_hash`, `normalized_semantic_hash`와 기준 생성물 위치 기록 |
 | 관련 입력 | 기존 teacher-question overlay, 공통 시스템·응답 정책과 공유 reader·decision 가이드 유지. Go 실행 경로에 필요한 프로필 변경은 별도 |
 | 데이터 계약 | 기존 소비자·저장 상태와 호환되는 타입·검증. 의도한 형식 변경은 버전과 변환 규칙으로 구분 |
@@ -62,4 +62,4 @@ Go 전체 전환, 공통 설치 엔진, 언어 중립 계약, 기본 선택·이
 
 ## 유지보수 릴리스 동기화
 
-v1.5.2의 FR/DE/IT/ES/PT/TH는 별도 진행 중이다. 미검증 초안을 고정 기준에 넣지 않고 최종 v1.6.0 검증·게시 전에 실제 출시 상태를 다시 확인한다. 이전 소스·공증·호스트 기록은 기존 SHA와 함께 보존하며 새 언어 기준의 결과로 재표기하지 않는다.
+출시된 v1.5.2의 FR/DE/IT/ES/PT/TH를 현재 열 언어 기준에 반영한다. 미검증 초안은 고정 기준에 넣지 않으며 최종 v1.6.0 검증·게시 전에 후속 출시 상태를 다시 확인한다. 이전 소스·공증·호스트 기록은 기존 SHA와 함께 보존하며 새 리비전 결과로 재표기하지 않는다.

@@ -1,0 +1,117 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "trade-off-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Escolha entre três fornecedores por velocidade, confiabilidade, acessibilidade e custo total. Compras documentou requisito de veto e cada parte forneceu preferência datada dos demais critérios.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Opções competem por critérios explícitos com restrição separada e pesos rastreáveis. Exponha concessões sem fingir valores intercambiáveis."
+    },
+    {
+      "id": "trade-off-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "Equipe deve escolher projeto equilibrando desempenho, manutenção, privacidade e esforço. Testes sustentam algumas avaliações, entrevistas outras; privacidade é mínimo, não nota.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "source_quality"
+      ],
+      "rationale": "Exige comparação com proveniência e privacidade não compensável. Evidência mista pode ser rotulada sem uniformização."
+    },
+    {
+      "id": "trade-off-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Dois planos de pessoal diferem em cobertura, continuidade, custo e carga. Há ordem ordinal acordada, não escala precisa; mostre vencedor e mudança que inverteria escolha.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "sensitive_inputs"
+      ],
+      "rationale": "Compromisso ordinal e condição de mudança são pedidos. Evite precisão falsa mantendo escolha visível."
+    },
+    {
+      "id": "trade-off-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Código exige padrão específico contra incêndios. Só um projeto conforme resta; o solicitante quer projeto barato não conforme porque pontua melhor em conveniência.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "single_feasible_option",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "Requisito vinculante vira critério compensável. Família provável é raciocínio deôntico ou revisão qualificada, não compromissos."
+    },
+    {
+      "id": "trade-off-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Não sabemos se estudar clientes antes de escolher projeto. Queremos saber quanto o estudo mudaria decisão e se vale atraso, não comparar projetos hoje.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "new_evidence",
+        "sensitive_inputs"
+      ],
+      "rationale": "É confusão provável com valor da informação: valorar informação adicional, não ponderar opções atuais."
+    },
+    {
+      "id": "trade-off-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Ordene registros verificados pela nota fornecida de uma coluna. Não há escolha de critérios, conflito ou explicação solicitada.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Ordenação fixa é mecânica sem compromissos discricionários."
+    },
+    {
+      "id": "trade-off-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Use trade-off-analysis na escolha de localização. Separe vetos de preferências, preserve fonte de toda avaliação e mostre concessões.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "choose",
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "Nomeia método e contrato comparativo. Avaliações sem apoio seguem assumidas ou não verificadas."
+    },
+    {
+      "id": "trade-off-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Escolha a melhor destas alternativas sem nome. Não acordamos critérios, mínimos ou prioridades de quem contam.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "decisive_input_missing"
+      ],
+      "rationale": "Faltam opções viáveis, critérios e proveniência de preferências. Recomendar seria pontuação posterior; suspenda."
+    }
+  ]
+}
