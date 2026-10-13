@@ -18,7 +18,7 @@ from ..content.hashes import sha256_hex
 from ..content.schema import PROMPT_FRAGMENT_IDS
 from ..domain.capability import validate_capability_profile
 from ..domain.enums import CapabilityStatus, Participation, Rigor, TaskState
-from ..domain.locales import complete_locale_set
+from ..domain.locales import SupportedLocale, complete_locale_set
 from ..domain.models import (
     CapabilityProfile,
     CompiledContentBundle,
@@ -178,11 +178,24 @@ def _event(value: PromptEvent | str) -> PromptEvent:
         raise PromptCompilerError(f"unknown prompt event: {value!r}") from exc
 
 
-def _locale(value: Locale | str) -> str:
+def _locale(value: Locale | str) -> SupportedLocale:
     normalized = str(value)
-    if normalized not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
-        raise MissingLocaleError(f"unsupported locale: {normalized!r}")
-    return normalized
+    supported: dict[str, SupportedLocale] = {
+        "en": "en",
+        "ko": "ko",
+        "zh": "zh",
+        "ja": "ja",
+        "fr": "fr",
+        "de": "de",
+        "it": "it",
+        "es": "es",
+        "pt": "pt",
+        "th": "th",
+    }
+    try:
+        return supported[normalized]
+    except KeyError:
+        raise MissingLocaleError("unsupported locale") from None
 
 
 def _phase(value: TaskState | str) -> TaskState:
@@ -338,7 +351,7 @@ class PromptCompiler:
                     "mechanical participation cannot inject a method procedure"
                 )
             text = ""
-            report = enforce_context_budget(event.value, (), text)
+            report = enforce_context_budget(event.value, (), text, locale=locale)
             return PromptCompileResult(
                 text=text,
                 event=event,
@@ -501,7 +514,7 @@ class PromptCompiler:
             )
 
         text = _assemble(texts)
-        report = enforce_context_budget(event.value, budget_fragments, text)
+        report = enforce_context_budget(event.value, budget_fragments, text, locale=locale)
         return PromptCompileResult(
             text=text,
             event=event,

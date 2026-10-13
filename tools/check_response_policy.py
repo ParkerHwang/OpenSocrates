@@ -220,5 +220,170 @@ class ResponsePolicyChecks(unittest.TestCase):
             self.assertTrue(path.is_fifo())
 
 
+class PromptCompilerLocaleBudgetChecks(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.bundle = load_compiled_bundle(ROOT / "content/compiled-content.bundle.json")
+        cls.methods = {method.id: method for method in cls.bundle.methods}
+
+    def test_all_new_locale_primary_and_preferred_pairs_preserve_complete_content(self):
+        from dataclasses import replace
+
+        from compile_prompts import _method_route, _representative_request
+        from opensocrates.domain.enums import Rigor, RiskFloorReason
+        from opensocrates.domain.rigor import build_rigor_decision
+        from opensocrates.hosts.codex.capability import default_capability_profile
+        from opensocrates.prompting.compiler import PromptCompiler, PromptEvent
+
+        compiler = PromptCompiler(self.bundle)
+        unavailable_profile = default_capability_profile()
+        strict = build_rigor_decision(
+            Rigor.TOGETHER,
+            Rigor.STRICT,
+            Rigor.TOGETHER,
+            RiskFloorReason.ORDINARY_JUDGMENT,
+        )
+        checked = 0
+        for locale in ("fr", "de", "it", "es", "pt", "th"):
+            start_limit = (24 if locale == "th" else 12) * 1024
+            primary_limit = 900 if locale == "th" else 1200
+            for method in self.bundle.methods:
+                preferred = method.complements["preferred"][0]
+                for secondary_id in (None, preferred):
+                    route = _method_route(self.bundle, method.id, secondary_id)
+                    for event in (
+                        PromptEvent.START,
+                        PromptEvent.TOOL_OBSERVATION,
+                        PromptEvent.STOP_REPAIR,
+                    ):
+                        default = replace(
+                            _representative_request(self.bundle, locale, event, route),
+                            capability_profile=unavailable_profile,
+                        )
+                        for request in (default, replace(default, rigor=strict)):
+                            with self.subTest(
+                                locale=locale,
+                                primary=method.id,
+                                secondary=secondary_id,
+                                event=event,
+                                rigor=request.rigor.effective_rigor,
+                            ):
+                                result = compiler.compile(request)
+                                self.assertEqual(result.locale, locale)
+                                self.assertEqual(
+                                    result.context_bytes, len(result.text.encode("utf-8"))
+                                )
+                                limit = start_limit if event is PromptEvent.START else 2 * 1024
+                                self.assertEqual(result.budget.context_limit_bytes, limit)
+                                self.assertLessEqual(result.context_bytes, limit)
+                                self.assertLessEqual(result.estimated_tokens, 2318)
+                                self.assertTrue(
+                                    all(ref.locale == locale for ref in result.fragments)
+                                )
+                                self.assertIn("capability_notice", result.fragment_ids)
+                                self.assertIn(
+                                    self.bundle.prompt_fragments["capability_notice"][
+                                        locale
+                                    ].rstrip("\n"),
+                                    result.text,
+                                )
+                                self.assertTrue(result.text.endswith("\n"))
+                                if event is PromptEvent.START:
+                                    self.assertIn(
+                                        method.procedure[locale].rstrip("\n"), result.text
+                                    )
+                                    self.assertIn(f"procedure:{method.id}", result.fragment_ids)
+                                    self.assertLessEqual(
+                                        result.budget.bucket_tokens["primary_procedure"],
+                                        primary_limit,
+                                    )
+                                    if secondary_id is not None:
+                                        secondary = self.methods[secondary_id]
+                                        self.assertIn(
+                                            secondary.complement_fragment[locale].rstrip("\n"),
+                                            result.text,
+                                        )
+                                        self.assertIn(
+                                            f"complement:{secondary_id}", result.fragment_ids
+                                        )
+                                        self.assertNotIn(
+                                            secondary.procedure[locale].rstrip("\n"), result.text
+                                        )
+                                else:
+                                    self.assertNotIn(f"procedure:{method.id}", result.fragment_ids)
+                                if event is PromptEvent.STOP_REPAIR:
+                                    self.assertEqual(
+                                        "strict_second_pass" in result.fragment_ids,
+                                        request.rigor.effective_rigor is Rigor.STRICT,
+                                    )
+                                checked += 1
+        self.assertEqual(checked, 6 * 48 * 2 * 3 * 2)
+
+    def test_legacy_and_default_start_limits_reject_unsegmented_oversize_output(self):
+        from opensocrates.prompting.context_budget import ContextSizeError, enforce_context_budget
+
+        oversize = "é" * 4097
+        for kwargs in ({}, *({"locale": locale} for locale in ("en", "ko", "zh", "ja"))):
+            with self.subTest(**kwargs):
+                with self.assertRaises(ContextSizeError):
+                    enforce_context_budget("start", (), oversize, **kwargs)
+        for locale in ("fr", "de", "it", "es", "pt", "th"):
+            limit = (24 if locale == "th" else 12) * 1024
+            with self.assertRaises(ContextSizeError):
+                enforce_context_budget("start", (), "x" * (limit + 1), locale=locale)
+            for event in ("tool_observation", "stop_repair"):
+                with self.assertRaises(ContextSizeError):
+                    enforce_context_budget(event, (), "é" * 1025, locale=locale)
+
+    def test_locale_primary_exception_preserves_other_group_and_total_rejections(self):
+        from opensocrates.prompting.context_budget import (
+            FragmentBudgetError,
+            TotalPromptBudgetError,
+            enforce_context_budget,
+            enforce_fragment_budgets,
+        )
+
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
+            primary_limit = 1200 if locale in {"fr", "de", "it", "es", "pt"} else 900
+            with self.subTest(locale=locale):
+                with self.assertRaises(FragmentBudgetError):
+                    enforce_fragment_budgets(
+                        {"procedure:deduction": "x " * (primary_limit + 1)}, locale=locale
+                    )
+                with self.assertRaises(FragmentBudgetError):
+                    enforce_fragment_budgets({"complement:deduction": "x " * 221}, locale=locale)
+                with self.assertRaises(TotalPromptBudgetError):
+                    enforce_context_budget("start", (), "x " * 2319, locale=locale)
+        with self.assertRaises(FragmentBudgetError):
+            enforce_fragment_budgets({"procedure:deduction": "x " * 901})
+
+    def test_budget_helpers_and_compiler_reject_unknown_locale_without_fallback(self):
+        from dataclasses import replace
+
+        from compile_prompts import _method_route, _representative_request
+        from opensocrates.prompting.compiler import MissingLocaleError, PromptCompiler, PromptEvent
+        from opensocrates.prompting.context_budget import (
+            context_limit,
+            enforce_context_budget,
+            enforce_fragment_budgets,
+        )
+
+        route = _method_route(self.bundle, "critical-thinking", None)
+        original = _representative_request(self.bundle, "en", PromptEvent.START, route)
+        compiler = PromptCompiler(self.bundle)
+        for locale in ("ru", "FR", "fr-FR", "th-TH", "", "PRIVATE_LOCALE_SENTINEL"):
+            with self.subTest(locale=locale):
+                with self.assertRaises(ValueError) as error:
+                    context_limit("start", locale=locale)
+                self.assertNotIn("PRIVATE_LOCALE_SENTINEL", str(error.exception))
+                with self.assertRaises(ValueError):
+                    enforce_fragment_budgets({}, locale=locale)
+                with self.assertRaises(ValueError):
+                    enforce_context_budget("start", (), "", locale=locale)
+                with self.assertRaises(MissingLocaleError) as error:
+                    compiler.compile(replace(original, locale=locale))
+                self.assertNotIn("PRIVATE_LOCALE_SENTINEL", str(error.exception))
+
+
 if __name__ == "__main__":
     unittest.main()

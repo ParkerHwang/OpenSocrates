@@ -9,7 +9,11 @@ The authored total ceiling is 2,440 estimated tokens.  Build/runtime prompt
 validation uses 95 percent of that ceiling (2,318 tokens, rounded down) so a
 host renderer can add its own envelope without silently truncating canonical
 content.  Context-size limits are measured on the complete UTF-8 prompt,
-including the terminal LF.
+including the terminal LF. These are canonical compiled-output envelopes,
+not raw-input or native HostAction limits; the latter remain unchanged.
+The default and original four locales keep 8KiB START output. New European
+locales allow 12KiB START and 1,200 primary whitespace units; Thai allows
+24KiB START while retaining 900 primary units. Other limits remain fixed.
 """
 
 from __future__ import annotations
@@ -20,12 +24,19 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import Final
 
+from ..domain.locales import SUPPORTED_LOCALES, SupportedLocale
+
+# Default and v1.5.0/v1.5.1 envelopes retain their original limits. Only the
+# additional v1.5.2 authored locales use explicit START-only output envelopes.
 MAX_START_CONTEXT_BYTES: Final[int] = 8 * 1024
+MAX_EUROPEAN_START_CONTEXT_BYTES: Final[int] = 12 * 1024
+MAX_THAI_START_CONTEXT_BYTES: Final[int] = 24 * 1024
 MAX_TOOL_OBSERVATION_CONTEXT_BYTES: Final[int] = 2 * 1024
 MAX_STOP_REPAIR_CONTEXT_BYTES: Final[int] = 2 * 1024
 
 MAX_PARTICIPATION_RIGOR_TOKENS: Final[int] = 450
 MAX_PRIMARY_PROCEDURE_TOKENS: Final[int] = 900
+MAX_EUROPEAN_PRIMARY_PROCEDURE_TOKENS: Final[int] = 1200
 MAX_SECONDARY_COMPLEMENT_TOKENS: Final[int] = 220
 MAX_EVIDENCE_CARD_COMPLETION_TOKENS: Final[int] = 750
 MAX_CAPABILITY_NOTICE_TOKENS: Final[int] = 120
@@ -147,12 +158,24 @@ def utf8_bytes(text: str) -> int:
     return len(text.encode("utf-8"))
 
 
-def context_limit(event: str) -> int:
-    """Return the byte limit for ``start``, ``tool_observation``, or ``stop_repair``."""
+def _validate_budget_locale(locale: SupportedLocale) -> None:
+    if not isinstance(locale, str) or locale not in SUPPORTED_LOCALES:
+        raise ValueError("unsupported prompt budget locale")
+
+
+def context_limit(event: str, *, locale: SupportedLocale = "en") -> int:
+    """Return the closed locale's output envelope; observation/Stop remain 2KiB."""
+
+    _validate_budget_locale(locale)
 
     value = getattr(event, "value", event)
     if not isinstance(value, str) or value not in EVENT_CONTEXT_LIMITS:
         raise ValueError(f"unknown prompt event: {event!r}")
+    if value == "start":
+        if locale == "th":
+            return MAX_THAI_START_CONTEXT_BYTES
+        if locale in {"fr", "de", "it", "es", "pt"}:
+            return MAX_EUROPEAN_START_CONTEXT_BYTES
     return EVENT_CONTEXT_LIMITS[value]
 
 
@@ -185,6 +208,8 @@ def _coerce_fragments(
 
 def enforce_fragment_budgets(
     fragments: Iterable[BudgetFragment] | Mapping[str, str],
+    *,
+    locale: SupportedLocale = "en",
 ) -> tuple[dict[str, int], dict[str, int]]:
     """Enforce each canonical fragment group and return measured counts.
 
@@ -193,6 +218,7 @@ def enforce_fragment_budgets(
     controller, participation/rigor, and optional classifier fragments.
     """
 
+    _validate_budget_locale(locale)
     fragment_tokens: dict[str, int] = {}
     bucket_tokens = {bucket: 0 for bucket in BUCKET_LIMITS}
     for fragment in _coerce_fragments(fragments):
@@ -207,6 +233,8 @@ def enforce_fragment_budgets(
 
     for bucket, used in bucket_tokens.items():
         limit = BUCKET_LIMITS[bucket]
+        if bucket == "primary_procedure" and locale in {"fr", "de", "it", "es", "pt"}:
+            limit = MAX_EUROPEAN_PRIMARY_PROCEDURE_TOKENS
         if used > limit:
             raise FragmentBudgetError(
                 f"{bucket} fragments use {used} estimated tokens; maximum is {limit}"
@@ -220,6 +248,7 @@ def enforce_context_budget(
     assembled_text: str,
     *,
     total_limit_tokens: int = MAX_VALIDATED_TOTAL_TOKENS,
+    locale: SupportedLocale = "en",
 ) -> PromptBudgetReport:
     """Enforce group, total, and event-specific UTF-8 byte budgets.
 
@@ -228,7 +257,7 @@ def enforce_context_budget(
     """
 
     event_value = getattr(event, "value", event)
-    limit_bytes = context_limit(event_value)
+    limit_bytes = context_limit(event_value, locale=locale)
     if (
         not isinstance(total_limit_tokens, int)
         or isinstance(total_limit_tokens, bool)
@@ -236,7 +265,7 @@ def enforce_context_budget(
     ):
         raise ValueError("total_limit_tokens must be a positive integer")
     fragment_list = _coerce_fragments(fragments)
-    fragment_counts, bucket_counts = enforce_fragment_budgets(fragment_list)
+    fragment_counts, bucket_counts = enforce_fragment_budgets(fragment_list, locale=locale)
     total = estimated_tokens(assembled_text)
     if total > total_limit_tokens:
         raise TotalPromptBudgetError(
@@ -277,6 +306,9 @@ __all__ = [
     "MAX_PRIMARY_PROCEDURE_TOKENS",
     "MAX_SECONDARY_COMPLEMENT_TOKENS",
     "MAX_START_CONTEXT_BYTES",
+    "MAX_EUROPEAN_START_CONTEXT_BYTES",
+    "MAX_THAI_START_CONTEXT_BYTES",
+    "MAX_EUROPEAN_PRIMARY_PROCEDURE_TOKENS",
     "MAX_STOP_REPAIR_CONTEXT_BYTES",
     "MAX_TOOL_OBSERVATION_CONTEXT_BYTES",
     "MAX_TOTAL_TOKENS",
