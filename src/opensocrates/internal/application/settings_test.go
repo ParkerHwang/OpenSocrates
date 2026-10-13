@@ -65,9 +65,9 @@ func TestControlPublicEventsPreserveAllReleasedLocales(t *testing.T) {
 	for _, locale := range []string{"en", "ko", "zh", "ja"} {
 		a := ControlApplication{Locale: locale}
 		state := map[string]any{"task_id": domain.NewTaskID(), "host": "codex_cli"}
-		event := a.event(state, ControlRequest{}, 1, "task_cancelled", map[string]any{"reason": "cancelled by user"})
-		if event["locale"] != locale || domain.ValidateRecord(event) != nil {
-			t.Fatal("public event locale rejected", locale, event)
+		event := a.event(state, ControlRequest{}, 1, "task_cancelled", map[string]any{"reason": "user_cancelled"})
+		if err := domain.ValidateRecord(event); event["locale"] != locale || err != nil {
+			t.Fatal("public event locale rejected", locale, err, event)
 		}
 		metric, e := domain.BuildLocalMetric("card_rendered", "codex_cli", locale, domain.Together, domain.MetricAttributes{}, "2026-10-12", "1.6.0", nil, false, nil)
 		if e != nil || metric != nil {
@@ -75,7 +75,7 @@ func TestControlPublicEventsPreserveAllReleasedLocales(t *testing.T) {
 		}
 	}
 	a := ControlApplication{Locale: "invalid"}
-	event := a.event(map[string]any{"task_id": domain.NewTaskID(), "host": "codex_cli"}, ControlRequest{}, 1, "task_cancelled", map[string]any{"reason": "cancelled by user"})
+	event := a.event(map[string]any{"task_id": domain.NewTaskID(), "host": "codex_cli"}, ControlRequest{}, 1, "task_cancelled", map[string]any{"reason": "user_cancelled"})
 	if event["locale"] != "en" {
 		t.Fatal("unknown locale fallback changed")
 	}
