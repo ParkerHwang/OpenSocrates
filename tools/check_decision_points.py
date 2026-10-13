@@ -645,9 +645,10 @@ class LocaleCompatibilityChecks(unittest.TestCase):
         import tempfile
         from types import SimpleNamespace
 
+        from opensocrates.application.change_settings import normalize_settings
         from opensocrates.cli.main import main
-        from opensocrates.domain.enums import Rigor
-        from opensocrates.domain.models import UserSettings
+        from opensocrates.domain.enums import FeedbackOutcome, RecordingMode, Rigor
+        from opensocrates.domain.models import FeedbackEntry, InterventionPreference, UserSettings
         from opensocrates.persistence.paths import DataRootLayout
         from opensocrates.persistence.settings_store import SettingsStore
 
@@ -656,7 +657,26 @@ class LocaleCompatibilityChecks(unittest.TestCase):
             root.chmod(0o700)
             layout = DataRootLayout.from_root(root)
             # This is an existing EN/KO settings shape, not a fresh-install default.
-            original = UserSettings(locale_preference="ko", default_rigor=Rigor.STRICT, revision=7)
+            original = UserSettings(
+                locale_preference="ko",
+                default_rigor=Rigor.STRICT,
+                revision=7,
+                recording_mode=RecordingMode.ON,
+                record_retention_days=37,
+                onboarding_version_seen="1.5.0",
+                intervention_preferences={
+                    "reframe": InterventionPreference(
+                        next_sequence=23,
+                        recent_feedback=(
+                            FeedbackEntry(
+                                sequence=22, day="2026-10-01", outcome=FeedbackOutcome.DISMISSED
+                            ),
+                        ),
+                        reduced_since_sequence=22,
+                        reduced_until="2026-10-20",
+                    )
+                },
+            )
             layout.settings_file.write_text(original.to_json())
             layout.settings_file.chmod(0o600)
             store = SettingsStore(layout)
@@ -673,8 +693,13 @@ class LocaleCompatibilityChecks(unittest.TestCase):
                 self.assertEqual(current.default_rigor, Rigor.STRICT)
                 self.assertEqual(current.recording_mode, original.recording_mode)
                 self.assertEqual(
-                    current.intervention_preferences, original.intervention_preferences
+                    current.intervention_preferences,
+                    normalize_settings(before).intervention_preferences,
                 )
+                self.assertEqual(current.record_retention_days, original.record_retention_days)
+                self.assertEqual(current.record_size_limit_bytes, original.record_size_limit_bytes)
+                self.assertEqual(current.onboarding_version_seen, original.onboarding_version_seen)
+                self.assertEqual(current.metrics_consent, original.metrics_consent)
                 self.assertEqual(current.revision, before.revision + 1)
             output = io.StringIO()
             main(["locale", "get"], services=runtime, stdout=output)
