@@ -1,0 +1,82 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: robust-decision-making-positive-1
+    kind: positive
+    prompt: "Wir wählen Hochwasserschutz für jahrzehntelang betriebene Infrastruktur. Regen, Landnutzung und Finanzierung sind tief unsicher. Gesucht ist Erfüllung einer veröffentlichten Sicherheitsuntergrenze in plausiblen Welten statt Gewinn unter Einzelprognose."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - irreversible_choice
+      - choose
+      - failure_risk
+    rationale: "Folgenreiche schwer umkehrbare Wahl mit wechselwirkender Unsicherheit und akzeptabler Aktion über Welten. Kein wahrscheinlichkeitsgewichtetes Optimum nötig."
+  - id: robust-decision-making-positive-2
+    kind: positive
+    prompt: "Unsere Lieferstrategie muss unsichere Zölle, Nachfrage und Lieferzuverlässigkeit über acht Jahre überstehen. Vergleichen Sie machbare Strategien nach Fehler und Bedauern, zeigen Sie Zielkonflikte und Anpassungssignale."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - irreversible_choice
+      - failure_risk
+      - feedback_delay
+    rationale: "Strategie-Szenario-Belastungstest, ausdrückliche Fehlerkriterien und Anpassungsauslöser sind öffentliche Ergebnisse robuster Entscheidung."
+  - id: robust-decision-making-positive-3
+    kind: positive
+    prompt: "Drei regionale Verkehrsoptionen stehen zur Wahl, aber Fernarbeit, Treibstoff und öffentliche Finanzierung tragen keine Einzelprognose. Identifizieren Sie akzeptablen Erstschritt, Restschwächen und Änderungsevidenz."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - multiple_options
+      - choose
+      - new_evidence
+    rationale: "Echte Wahl, tiefe Unsicherheit und akzeptable statt wahrscheinlichste Strategie. Restschwäche und Umkehrbedingung begrenzen Robustheitsbehauptung."
+  - id: robust-decision-making-negative-1
+    kind: negative
+    prompt: "Die Basisnachfrage ist gut validiert; der Pilot nächsten Monat fast kostenlos umkehrbar. Leitung will nur höchsten Erwartungsertrag dieses Falls."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - source_quality
+      - sequential_choice
+      - choose
+    rationale: "Zuverlässiger Einzelwert und triviale Umkehr erfüllen ausdrücklichen Ausschluss. Robustheitsprüfung schafft keinen notwendigen Nutzen."
+  - id: robust-decision-making-negative-2
+    kind: negative
+    prompt: "Erstellen Sie vier benannte externe Energiemarktwelten mit Entstehungspfaden und Frühindikatoren. Keine Aktionsprüfung nach Fehler oder Bedauern."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - plan
+    rationale: "Szenarioplanung: Zukunftsbau und Signale ohne Strategietest und Akzeptanzkriterien."
+  - id: robust-decision-making-mechanical-1
+    kind: mechanical
+    prompt: "Berechnen Sie annualisierte Rendite aus verifizierten Geldflüssen nach Formel samt Rechenweg. Keine Strategiewahl."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "Begrenzte vorgegebene Berechnung ohne unsichere Auswahl; Arithmetik ist kein Robustheitsurteil."
+  - id: robust-decision-making-explicit-1
+    kind: explicit
+    prompt: "Nutzen Sie robust-decision-making primär für Küstenanpassung. Prüfen Sie Klima- und Budgetwelten mit Mindestleistung als Fehlergrenze; bei fehlenden Welten oder Grenze zurückstellen."
+    expected_route: robust-decision-making
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - deep_uncertainty
+      - irreversible_choice
+      - failure_risk
+    rationale: "Ausdrückliche Methode mit Rahmen, Tests, Untergrenze und Zurückstellung. Evidenz- und Unsicherheitsgrenzen bleiben."
+  - id: robust-decision-making-insufficiency-1
+    kind: insufficiency
+    prompt: "Welche Langfriststrategie ist robust? Machbare Aktionen, Fehlerdefinition, Horizont und Unsicherheiten sind nicht genannt."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - decisive_input_missing
+    rationale: "Entscheidende Aktionsmenge, Untergrenze, Horizont und Register fehlen. Zurückstellen und nur fehlende Entscheidungsangaben verlangen."

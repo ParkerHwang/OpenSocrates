@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: logic-tree-positive-01
+    kind: positive
+    prompt: "Perché è aumentato l’abbandono dei clienti e come possiamo scomporre le cause in rami testabili senza sovrapposizione?"
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, diagnose, plan]
+    rationale: "La diagnosi ampia richiede un albero del perché con asse esplicito, controlli MECE e test alle foglie."
+  - id: logic-tree-positive-02
+    kind: positive
+    prompt: "Costruisci un albero completo del problema per ridurre gli errori nell’introduzione, con una verifica a ogni foglia."
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, plan]
+    rationale: "Il risultato richiesto è copertura e scomposizione traducibile in azioni."
+  - id: logic-tree-positive-03
+    kind: positive
+    prompt: "Scomponi questa domanda ampia sul rischio in rami non sovrapposti che un gruppo operativo possa assegnare e testare."
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "Il compito richiede rami gerarchici, controlli di copertura e foglie eseguibili."
+  - id: logic-tree-negative-01
+    kind: negative
+    prompt: "Verifica se le categorie esistenti si sovrappongono e se manca qualche caso."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "La verifica mirata della classificazione è un compito MECE, non la costruzione ricorsiva di un albero."
+  - id: logic-tree-negative-02
+    kind: negative
+    prompt: "Disegna i circuiti di retroazione fra queste variabili e identifica le dinamiche di rinforzo e bilanciamento."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "I circuiti interdipendenti si adattano male a una gerarchia e richiedono un metodo sistemico."
+  - id: logic-tree-mechanical-01
+    kind: mechanical
+    prompt: "Rientra questi titoli forniti nella stessa struttura ad albero mostrata nell’esempio."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Applicare i rientri forniti è un compito meccanico di formattazione."
+  - id: logic-tree-explicit-01
+    kind: explicit
+    prompt: "Usa esplicitamente logic-tree per strutturare le cause del nostro rilascio in ritardo."
+    expected_route: logic-tree
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, tangled_hierarchy]
+    rationale: "L’utente seleziona esplicitamente una struttura diagnostica gerarchica."
+  - id: logic-tree-insufficiency-01
+    kind: insufficiency
+    prompt: "Crea l’albero completo del problema ma non indicare domanda radice, ambito o misura di successo."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [tangled_hierarchy, decisive_input_missing]
+    rationale: "Senza una radice delimitata non si possono giudicare in sicurezza copertura e operatività delle foglie."

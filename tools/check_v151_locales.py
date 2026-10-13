@@ -12,7 +12,7 @@ from opensocrates.content.loader import load_reasoning_content_projections
 from validate_content import parse_yaml_file
 
 ROOT = Path(__file__).resolve().parents[1]
-LOCALES = ("en", "ko", "zh", "ja")
+LOCALES = ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
 IDENTIFIER = re.compile(r"`([A-Za-z][A-Za-z0-9_-]*)`")
 NUMBER_WORDS = dict(
     zip(
@@ -53,7 +53,7 @@ class LocalizationContracts(unittest.TestCase):
             directory = ROOT / "content/methods" / entry.method_id
             english = (directory / "procedure.en.md").read_text(encoding="utf-8")
             expected = set(IDENTIFIER.findall(english))
-            for locale in ("zh", "ja"):
+            for locale in LOCALES[2:]:
                 translated = (directory / f"procedure.{locale}.md").read_text(encoding="utf-8")
                 with self.subTest(method=entry.method_id, locale=locale):
                     self.assertTrue(expected <= set(IDENTIFIER.findall(translated)))
@@ -62,7 +62,7 @@ class LocalizationContracts(unittest.TestCase):
     def test_translated_examples_preserve_routing_and_numbers(self) -> None:
         for directory in sorted((ROOT / "content/methods").iterdir()):
             original = parse_yaml_file(directory / "cases.en.yaml")
-            for locale in ("zh", "ja"):
+            for locale in LOCALES[2:]:
                 translated = parse_yaml_file(directory / f"cases.{locale}.yaml")
                 self.assertEqual(translated["schema"], original["schema"])
                 self.assertEqual(len(translated["cases"]), len(original["cases"]))

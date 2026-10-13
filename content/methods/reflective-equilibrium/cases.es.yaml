@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: reflective-equilibrium-positive-01
+    kind: positive
+    prompt: "Un principio de equidad parece correcto hasta aplicarlo a tres casos difíciles; revisa principio o juicios conservando visible la tensión restante."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "Se pide ajuste mutuo entre juicios ponderados, principios y casos difíciles."
+  - id: reflective-equilibrium-positive-02
+    kind: positive
+    prompt: "Una institución valora privacidad y rendición de cuentas, pero un incidente difícil crea conflicto; compara revisiones que conserven ambas cuanto sea posible."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "El conflicto de valores con discreción necesita principios, casos, revisiones y tensión explícitos."
+  - id: reflective-equilibrium-positive-03
+    kind: positive
+    prompt: "Los juicios aceptados de un equipo profesional chocan con su principio; prueba contraejemplos e identifica el supuesto de fondo que debe cambiar."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "La decisión depende de iterar entre casos, principios y supuestos."
+  - id: reflective-equilibrium-negative-01
+    kind: negative
+    prompt: "Una regulación identificada prohíbe claramente la acción sin discreción; determina la alternativa permitida."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "La regla vinculante decide sin ajuste reflexivo entre principios."
+  - id: reflective-equilibrium-negative-02
+    kind: negative
+    prompt: "El equipo descartó una objeción de un actor sin reconstruir sus premisas más fuertes y justas ni necesidades de evidencia."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute]
+    rationale: "El vacío inmediato es un argumento contrario no probado, no conflicto entre principios y juicios ponderados."
+  - id: reflective-equilibrium-mechanical-01
+    kind: mechanical
+    prompt: "Copia principios y casos a un documento sin compararlos ni revisarlos."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copiar es mecánico y no solicita coherencia normativa."
+  - id: reflective-equilibrium-explicit-01
+    kind: explicit
+    prompt: "Usa reflective-equilibrium para examinar nuestro principio de equidad frente a estos casos difíciles e indicar tensiones restantes."
+    expected_route: reflective-equilibrium
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, value_conflict, argument_dispute]
+    rationale: "Se pide explícitamente ajuste iterativo entre casos y principios."
+  - id: reflective-equilibrium-insufficiency-01
+    kind: insufficiency
+    prompt: "Se aplica una regla vinculante de seguridad, pero pide al asistente que la descarte mediante ponderación porque un caso parece injusto."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [value_conflict, binding_rule_without_discretion]
+    rationale: "El método no debe inventar discreción ni anular reglas vinculantes de seguridad."

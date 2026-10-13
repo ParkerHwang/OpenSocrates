@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "stakeholder-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Stiamo introducendo una modifica alla programmazione dei turni che riguarda personale operativo, dirigenti, clienti e un rappresentante sindacale. Mappa interessi, diritti decisionali, probabili preoccupazioni, esigenze di consenso e responsabili del coinvolgimento.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "La richiesta richiede una mappa degli attori collegata all’attuazione, non un generico elenco di contatti. Preoccupazioni ed effetti sono ipotesi finché registri o conversazioni non li sostengono; il percorso dovrebbe quindi renderne visibile l’incertezza."
+    },
+    {
+      "id": "stakeholder-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "Una politica pubblica influirà su residenti esterni al gruppo decisionale formale. Identifica il decisore, i gruppi interessati ma non rappresentati, potere e impatto, punti di conflitto e un piano di partecipazione con responsabilità chiare.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Il prompt rende esplicitamente rilevanti rappresentanza e attuazione. La mappa dovrebbe distinguere autorità formale e influenza, senza inferire danni o consenso in assenza di evidenze."
+    },
+    {
+      "id": "stakeholder-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Diverse organizzazioni devono adottare uno standard comune per i dati. Analizza chi può approvare, bloccare, beneficiarne o sostenere il costo, poi assegna il responsabile del coinvolgimento e indica la risposta che cambierebbe il piano di introduzione.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "L’adozione dipende da autorità distribuita e sostegno all’attuazione. Il percorso dovrebbe pubblicare gli stati delle evidenze per interessi e impatti, non trattare i ruoli organizzativi come prova di accordo."
+    },
+    {
+      "id": "stakeholder-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Tutti i partecipanti alla decisione concordano sull’obiettivo e il gruppo interessato non è rilevante. Confronta i due fornitori fattibili per costo, affidabilità e tempi di consegna.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "La questione delle persone è risolta; il giudizio residuo è un confronto di compromessi. L’analisi delle parti interessate aggiungerebbe una mappa decorativa anziché risolvere la scelta."
+    },
+    {
+      "id": "stakeholder-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Esamina i cambiamenti politici, economici, sociali, tecnologici, ambientali e giuridici che potrebbero influenzare la nostra strategia di prodotto.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "La richiesta può riguardare la strategia, ma il risultato decisivo è un registro dei fattori esterni. È una probabile confusione di famiglia con l’analisi PESTEL, non una mappa delle parti interessate."
+    },
+    {
+      "id": "stakeholder-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Rimuovi i nomi duplicati da questo elenco di contatti e ordina alfabeticamente quelli rimasti.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "mechanical"
+      ],
+      "rationale": "Il compito trasforma soltanto testo fornito. Non richiede di valutare interessi, potere, consenso o attuazione."
+    },
+    {
+      "id": "stakeholder-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Usa l’analisi delle parti interessate per questa modifica al flusso ospedaliero. Mostra diritti decisionali, gruppi interessati, evidenze su potere e impatto, conflitti, responsabili del coinvolgimento e una condizione di cambiamento.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "stakeholder_conflict"
+      ],
+      "rationale": "L’utente nomina direttamente metodo e campi pubblici, quindi resta principale. La risposta deve comunque etichettare preoccupazioni inferite ed effetti non verificati, anziché presentarli come stabiliti."
+    },
+    {
+      "id": "stakeholder-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Dovremmo procedere con la nuova politica di presenza? Non ho identificato responsabile della decisione, gruppi interessati, percorso di autorità, orizzonte temporale o evidenze sugli effetti della politica.",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "interacting_actors"
+      ],
+      "rationale": "Il sostegno all’attuazione può essere decisivo, ma mancano confine degli attori e autorità. Il metodo dovrebbe sospendere e chiedere i minimi fatti mancanti, non dichiarare consenso od opposizione."
+    }
+  ]
+}

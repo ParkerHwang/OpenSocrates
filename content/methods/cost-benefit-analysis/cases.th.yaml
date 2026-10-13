@@ -1,0 +1,114 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "cost-benefit-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "เราต้องเลือกระหว่างบริการใหม่กับภาวะฐานปัจจุบัน บัญชีการเงินให้ต้นทุนนำไปใช้และดำเนินงาน รายงานนำร่องให้การใช้ที่วัดได้ คำถามหลักคือประโยชน์คุ้มต้นทุนตลอดช่วงเวลาที่ระบุหรือไม่",
+      "expected_route": "cost-benefit-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "ภาวะฐานและหลายทางเลือกชัด ข้อมูลประโยชน์และต้นทุนสำคัญระบุที่มาได้ ผลไม่ใช่เงินอาจแยกไว้ แต่การเปรียบเทียบเกี่ยวข้องกับการตัดสินใจ"
+    },
+    {
+      "id": "cost-benefit-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "เปรียบเทียบโครงการสาธารณสุขสองโครงการกับไม่ทำอะไร บันทึกบริหารอธิบายต้นทุนส่งมอบ การประเมินรายงานผลที่วัดได้ การตัดสินใจต้องแสดงว่าใครจ่าย ใครได้ประโยชน์ และผลความปลอดภัยหรือความเสมอภาคใดลดเป็นเงินไม่ได้",
+      "expected_route": "cost-benefit-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "practical_consequence"
+      ],
+      "rationale": "งานขอเปรียบเทียบเศรษฐกิจกับภาวะฐานพร้อมการกระจายและคุณค่าชดเชยไม่ได้ หลักฐานผลกำกับตามแหล่ง ไม่ถือว่ารับประกัน"
+    },
+    {
+      "id": "cost-benefit-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "โครงการเปลี่ยนอุปกรณ์มีต้นทุนล่วงหน้าและประโยชน์ต่างเวลา ใช้ช่วงวางแผนที่อนุมัติและกฎคิดลดขององค์กรที่บันทึก แล้วแสดงนัยที่เปลี่ยนเมื่อสมมติฐานที่บันทึกเคลื่อนในช่วงมีฐาน",
+      "expected_route": "cost-benefit-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "sensitive_inputs"
+      ],
+      "rationale": "เวลา ขอบคำนวณจริง และความไวต่อสมมติฐานมีแหล่งทำให้เป็นการเปรียบเทียบต้นทุน–ประโยชน์ คำขอให้ที่มา ไม่ใช่ชวนใส่อัตราเริ่มต้นหรือความแน่นอนที่แต่ง"
+    },
+    {
+      "id": "cost-benefit-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "กฎความปลอดภัยบังคับขั้นตรวจหนึ่งขั้นทุกสถานประกอบการ ทีมถามว่าข้ามได้ตามกฎหมายหรือไม่ ไม่มีทางเลือกใช้ดุลยพินิจเหลือ ข้อความกำกับเป็นหลักฐานชี้ขาด",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "single_feasible_option",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "เป็นคำถามหน้าที่และกฎที่ไม่มีทางเลือกจริง ห้ามใช้ประโยชน์สุทธิแลกข้อบังคับผูกพัน"
+    },
+    {
+      "id": "cost-benefit-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "เลือกดีที่สุดจากแบบสามแบบตามความเชื่อถือได้ การเข้าถึง ผลระบบนิเวศ และศักดิ์ศรีผู้ใช้ ผู้ขอปฏิเสธตีราคาศักดิ์ศรีและไม่มีราคาที่มีฐานสำหรับเกณฑ์อื่น ต้องการเปรียบเทียบเกณฑ์โปร่งใส",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "no_coherent_dimensions"
+      ],
+      "rationale": "อาจสับสนกับ trade-off-analysis การตัดสินใจต้องการเกณฑ์ชัดและข้อจำกัดชดเชยไม่ได้ ไม่ใช่ยอดเงินที่ฝืนรวม"
+    },
+    {
+      "id": "cost-benefit-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "ใช้สูตรตารางที่ให้กับต้นทุนและประโยชน์ที่ตรวจแล้ว แล้วคืนยอดคำนวณ ไม่ได้ขอทางเลือก การตัดสินภาวะฐาน ความไม่แน่นอน หรือคำแนะนำ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "เป็นคำนวณตายตัวไม่มีการเปรียบเทียบใช้ดุลยพินิจ วิธีควรเงียบและให้เส้นทางคำนวณเชิงกลจัดการสูตร"
+    },
+    {
+      "id": "cost-benefit-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้ cost-benefit-analysis กับการตัดสินทุนนี้ เปรียบเทียบทางเลือกได้รับทุนกับภาวะฐานที่บันทึก แสดงผลกระจาย และพักการประเมินค่าที่ไร้ฐานแทนเติม",
+      "expected_route": "cost-benefit-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "choose",
+        "multiple_options"
+      ],
+      "rationale": "ผู้ใช้เรียกวิธีตรงและระบุกรอบเปรียบเทียบที่ต้องการ ยังคงเป็นหลักโดยค่าที่ไม่มีฐานอยู่ในสถานะสมมติหรือยังไม่ตรวจ"
+    },
+    {
+      "id": "cost-benefit-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "บอกว่าโครงการสองข้อนี้ข้อใดดีกว่า ไม่มีภาวะฐานที่ตกลง ไม่มีช่วงเวลา ไม่มีบันทึกต้นทุน และมีเพียงคำโฆษณาประโยชน์",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "decisive_input_missing"
+      ],
+      "rationale": "ขาดภาวะฐานและข้อมูลสำคัญที่เปลี่ยนการตัดสินใจ ข้ออ้างประโยชน์ไร้ที่มา ต้องพักและขอซ่อมข้อมูลชี้ขาดที่เล็กที่สุด"
+    }
+  ]
+}

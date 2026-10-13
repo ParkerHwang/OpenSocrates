@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "lateral-thinking-positive-01",
+      "kind": "positive",
+      "prompt": "L’équipe a optimisé à répétition le même itinéraire de livraison et veut remettre en cause l’hypothèse selon laquelle chaque commande doit passer par un entrepôt central.",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "Les options sont figées et une provocation changeant le cadre est demandée avant l’évaluation."
+    },
+    {
+      "id": "lateral-thinking-positive-02",
+      "kind": "positive",
+      "prompt": "Une file d’attente de service public ne permet plus d’accélérer le traitement ; produisez des concepts en inversant qui se déplace, quand le service a lieu ou ce qui constitue la file.",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "La tâche recherche explicitement un autre cadre et plusieurs concepts, suivis d’un filtrage."
+    },
+    {
+      "id": "lateral-thinking-positive-03",
+      "kind": "positive",
+      "prompt": "Une équipe produit ajoute toujours des fonctionnalités pour répondre à la baisse d’engagement ; remettez le cadre en cause et créez des alternatives sans ajouter de fonctionnalités.",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "Le cadre d’optimisation existant bloque les nouvelles options et doit être délibérément rompu."
+    },
+    {
+      "id": "lateral-thinking-negative-01",
+      "kind": "negative",
+      "prompt": "Les données d’entretien sont incomplètes et l’équipe doit découvrir le besoin humain, prototyper un service et tester sans risque le comportement des utilisateurs.",
+      "expected_route": "design-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "human_need",
+        "user_progress"
+      ],
+      "rationale": "La découverte du besoin et les tests utilisateurs sont prioritaires ; la provocation seule omettrait des preuves essentielles."
+    },
+    {
+      "id": "lateral-thinking-negative-02",
+      "kind": "negative",
+      "prompt": "Un protecteur de machine doit satisfaire à une spécification de sécurité obligatoire ; l’équipe demande si la conception réussit les essais requis.",
+      "expected_route": "critical-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "critique",
+        "explicit_rules"
+      ],
+      "rationale": "La validation critique pour la sécurité doit utiliser des preuves rigoureuses et la spécification faisant autorité, pas une provocation ouverte."
+    },
+    {
+      "id": "lateral-thinking-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Classez les options existantes par ordre alphabétique et préservez toutes les descriptions sans créer d’alternatives.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Le tri est mécanique et ne demande pas de remettre le cadre en cause."
+    },
+    {
+      "id": "lateral-thinking-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez lateral-thinking pour trouver trois moyens non évidents de réduire les déchets d’une conférence sans modifier les règles de sécurité.",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "L’utilisateur demande explicitement des alternatives rompant le cadre tout en préservant une contrainte protégée."
+    },
+    {
+      "id": "lateral-thinking-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Le problème et les contraintes non négociables sont inconnus ; inventez une option radicale et recommandez-la immédiatement.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "stale_options",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans cadre ni contraintes protégées, une provocation ne peut être filtrée en toute sécurité."
+    }
+  ]
+}

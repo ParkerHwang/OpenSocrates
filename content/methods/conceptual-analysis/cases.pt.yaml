@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: conceptual-analysis-positive-01
+    kind: positive
+    prompt: "O que nossa equipe deve entender por lançamento seguro quando engenharia e conformidade usam o termo de modos diferentes?"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms, argument_dispute]
+    rationale: "Significados concorrentes e casos limítrofes precisam ser testados antes de o critério orientar a ação."
+  - id: conceptual-analysis-positive-02
+    kind: positive
+    prompt: "Esta política é justa se os funcionários discordam sobre justiça significar tratamento igual ou oportunidade igual?"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms, argument_dispute]
+    rationale: "A decisão depende de significados operacionais concorrentes e suas consequências nos casos."
+  - id: conceptual-analysis-positive-03
+    kind: positive
+    prompt: "Defina “pronto para lançamento” para produto e suporte classificarem casos limítrofes de forma consistente."
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms]
+    rationale: "Uma definição utilizável exige condições necessárias e suficientes e testes de casos limítrofes."
+  - id: conceptual-analysis-negative-01
+    kind: negative
+    prompt: "Use a especificação de API publicada para verificar se esta solicitação contém os campos obrigatórios documentados."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "A definição operacional já é autorizada; a tarefa é aplicar regras diretamente."
+  - id: conceptual-analysis-negative-02
+    kind: negative
+    prompt: "Classifique estes três estudos pela qualidade do desenho e explique qual sustenta diretamente a alegação de efeito."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "O gargalo é qualidade e aplicabilidade das evidências, não o significado de um termo contestado."
+  - id: conceptual-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Substitua cada ocorrência de “launch-ready” por “ready for launch” neste arquivo."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Uma substituição literal de texto é mecânica e não exige análise conceitual."
+  - id: conceptual-analysis-explicit-01
+    kind: explicit
+    prompt: "Use explicitamente conceptual-analysis para definir o que “confiável” significa neste relatório ao cliente."
+    expected_route: conceptual-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, ambiguous_terms]
+    rationale: "O usuário invoca explicitamente o método para um termo ambíguo com consequência no relatório."
+  - id: conceptual-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "Decida se o conceito contestado é satisfeito, sem fornecer contexto, casos ou a decisão que ele controla."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [ambiguous_terms, decisive_input_missing]
+    rationale: "Sem contexto e casos, o significado operacional seria arbitrário e não poderia orientar uma decisão com segurança."

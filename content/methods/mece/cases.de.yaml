@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: mece-positive-01
+    kind: positive
+    prompt: "Sind diese Kundensegmente für diese einzelne Kaufentscheidung gegenseitig ausschließend und gemeinsam vollständig?"
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "Gefordert sind getrennte Überschneidungs- und Abdeckungsprüfungen unter einer Achse."
+  - id: mece-positive-02
+    kind: positive
+    prompt: "Gestalten Sie diese Risikokategorien so neu, dass kein Fall zwei Kategorien zugehört und kein wesentlicher fehlt."
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "Ergebnis ist eine Klassifikationsregel mit Überschneidungs-, Lücken- und Granularitätsprüfungen."
+  - id: mece-positive-03
+    kind: positive
+    prompt: "Prüfen Sie, ob unsere Problembaumzweige eine einzige Achse, einheitliche Granularität und Abdeckung der genannten Grundgesamtheit haben."
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "Eine gezielte ME/CE-Prüfung statt breiter rekursiver Diagnose."
+  - id: mece-negative-01
+    kind: negative
+    prompt: "Zerlegen Sie die Ausfallursachen rekursiv und ordnen Sie jedem Endzweig einen Test zu."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "Gefordert ist ein vollständiger Logikbaum statt reiner Klassifikationsprüfung."
+  - id: mece-negative-02
+    kind: negative
+    prompt: "Behalten Sie diese überlappenden Bezeichnungen, weil gerade ihre Überschneidung eine bedeutsame Kundenidentität darstellt."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [ambiguous_terms, human_need]
+    rationale: "Natürliche Überschneidung ist gewollt; erzwungene Ausschließlichkeit würde das Phänomen verzerren."
+  - id: mece-mechanical-01
+    kind: mechanical
+    prompt: "Sortieren Sie die vorgegebenen Kategorien alphabetisch und bewahren Sie ihre Beschreibungen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Alphabetisches Sortieren ist mechanisch und bewertet keine Kategorienlogik."
+  - id: mece-explicit-01
+    kind: explicit
+    prompt: "Nutzen Sie ausdrücklich mece zur Prüfung der Verantwortungsbereiche dieses Betriebsmodells."
+    expected_route: mece
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, category_overlap]
+    rationale: "Der Nutzer benennt ausdrücklich die einachsige Überschneidungs- und Abdeckungsprüfung."
+  - id: mece-insufficiency-01
+    kind: insufficiency
+    prompt: "Sagen Sie, ob die Kategorien MECE sind, ohne Grundgesamtheit, Klassifikationszweck oder Kategorienregeln zu nennen."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [category_overlap, decisive_input_missing]
+    rationale: "ME und CE sind ohne begrenzte Grundgesamtheit, Zweck und Zuordnungsregeln nicht beurteilbar."

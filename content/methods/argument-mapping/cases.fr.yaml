@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "argument-mapping-positive-01",
+      "kind": "positive",
+      "prompt": "Cartographiez les affirmations, fondements, objections et réfutations de cet argument de politique publique pour repérer les liens non étayés.",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "critique",
+        "tangled_hierarchy"
+      ],
+      "rationale": "La tâche exige explicitement une structure affirmation-fondement-objection et la détection des liens sans soutien."
+    },
+    {
+      "id": "argument-mapping-positive-02",
+      "kind": "positive",
+      "prompt": "Quelle prémisse soutient réellement la recommandation et quels contre-arguments restent sans réponse ?",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "Plusieurs relations de soutien et d'attaque doivent être démêlées avant de juger la recommandation."
+    },
+    {
+      "id": "argument-mapping-positive-03",
+      "kind": "positive",
+      "prompt": "Construisez une carte argumentative de la position contractuelle, incluant les hypothèses partagées et la réfutation la plus solide.",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "tangled_hierarchy"
+      ],
+      "rationale": "Le résultat public demandé est une carte structurée des affirmations, prémisses communes et objections."
+    },
+    {
+      "id": "argument-mapping-negative-01",
+      "kind": "negative",
+      "prompt": "Comparez la qualité des éléments probants de ces deux études et indiquez laquelle s'applique à notre population.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "Le point bloquant principal est le plan d'étude et son applicabilité, ce qui relève de la vérification des éléments probants."
+    },
+    {
+      "id": "argument-mapping-negative-02",
+      "kind": "negative",
+      "prompt": "Écrivez d'abord la recommandation destinée à la direction, suivie de trois raisons regroupées et des détails qui les étayent.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explain",
+        "tangled_hierarchy"
+      ],
+      "rationale": "La demande porte sur une communication descendante structurée plutôt que sur la vérification des liens de soutien."
+    },
+    {
+      "id": "argument-mapping-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Transformez cette liste fournie de prémisses en puces Markdown.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Mettre en forme une liste fournie n'exige pas d'analyse argumentative."
+    },
+    {
+      "id": "argument-mapping-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez explicitement argument-mapping pour examiner la plus forte objection à cette note d'investissement.",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "argument_dispute"
+      ],
+      "rationale": "L'utilisateur invoque explicitement la méthode pour examiner une objection et la structure de soutien."
+    },
+    {
+      "id": "argument-mapping-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Cartographiez l'argument et jugez son lien le plus faible, mais ne fournissez ni conclusion, ni prémisses, ni texte source.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "argument_dispute",
+        "decisive_input_missing"
+      ],
+      "rationale": "Aucun contenu argumentatif n'est disponible ; la méthode doit suspendre le résultat au lieu d'inventer des prémisses."
+    }
+  ]
+}

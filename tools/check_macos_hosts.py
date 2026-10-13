@@ -148,7 +148,7 @@ def assemble(root: Path) -> dict[str, Any]:
     if manifest["runtime_targets"] != ["darwin-arm64"] or manifest["method_count"] != 48:
         raise ValueError("invalid native Claude closure")
     decision = native / "skills/opensocrates/references/decision"
-    for locale in ("en", "ko", "zh", "ja"):
+    for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
         procedures = {path.stem for path in (decision / "methods" / locale).glob("*.md")}
         if procedures != set(manifest["method_ids"]):
             raise ValueError("incomplete native canonical locale inventory")
@@ -185,7 +185,7 @@ def assemble(root: Path) -> dict[str, Any]:
         "shared_runtime_source": "codex",
         "content_profiles": ["claude-chat", "antigravity"],
         "canonical_method_count": 48,
-        "locale_procedure_count": 192,
+        "locale_procedure_count": 480,
         "native_entry": "emitted",
         "generated_hook_elapsed_ms": timings,
         "generated_hook_timeouts": "actual 3s entry / 1s no-op budgets",

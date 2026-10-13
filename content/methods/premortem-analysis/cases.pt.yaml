@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "premortem-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "A equipe vai migrar dados de clientes e quer imaginar a migração fracassada, reunir razões independentes e estabelecer alertas antecipados.",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "Um plano concreto escolhido exige narrativa de falha, sinais, mitigação e parada."
+    },
+    {
+      "id": "premortem-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "Antes de abrir uma clínica, identifique falhas possíveis de pessoal, demanda, operações e regulação sem atribuir probabilidades falsas.",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "O exercício contrafactual do plano é explícito e deve continuar ordinal e atento às evidências."
+    },
+    {
+      "id": "premortem-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "Uma equipe de lançamento unânime quer questionamento estruturado para revelar suposições silenciosas, indicadores antecipados e condições de pausa antes do compromisso.",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "hidden_assumptions",
+        "failure_risk"
+      ],
+      "rationale": "O pedido combate conformismo e planejamento otimista em torno da ação escolhida."
+    },
+    {
+      "id": "premortem-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "Para cada etapa do fluxo, liste modos de falha, efeitos, causas, controles e responsáveis em um registro prospectivo de riscos.",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "Inventário de falhas e controles no processo é mais específico que retrospectiva imaginada do plano."
+    },
+    {
+      "id": "premortem-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "Um defeito se repete há meses, e a equipe precisa achar condição sistêmica controlável que impeça recorrência.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "Recorrência existente exige diagnóstico causal, não exercício antes do compromisso."
+    },
+    {
+      "id": "premortem-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Copie o plano de lançamento aprovado para o modelo de risco sem acrescentar cenários de falha ou recomendações.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Copiar é mecânico e não pede julgamento do plano."
+    },
+    {
+      "id": "premortem-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "Faça um pré-mortem do plano de contratação e liste os primeiros sinais que nos fariam pausar.",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "O usuário nomeia método para plano concreto antes do compromisso."
+    },
+    {
+      "id": "premortem-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Não há plano escolhido, mas invente retrospectiva de falha e declare qual opção fracassará com 90% de certeza.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "chosen_plan",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sem plano ou classe defensável, o exercício não sustenta probabilidade nem recomendação."
+    }
+  ]
+}

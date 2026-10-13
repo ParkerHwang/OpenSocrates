@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pragmatism-positive-01
+    kind: positive
+    prompt: "Due quadri di gestione dei progetti fanno scelte diverse su riunioni, priorità e feedback; confronta le conseguenze osservabili prima di selezionarne uno."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "Le interpretazioni differiscono nell’azione e possono essere giudicate tramite conseguenze pratiche delimitate."
+  - id: pragmatism-positive-02
+    kind: positive
+    prompt: "Una città deve scegliere fra due politiche di coinvolgimento e può eseguire un progetto pilota reversibile con finestra concordata e vincoli di sicurezza."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose, value_conflict]
+    rationale: "La necessità centrale è una scelta pratica di politica con un test sicuro di apprendimento."
+  - id: pragmatism-positive-03
+    kind: positive
+    prompt: "Una lunga disputa su due etichette non cambia decisioni né previsioni; stabilisci se siano praticamente equivalenti in questo contesto."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "Il metodo deve verificare se il disaccordo produca differenze pratiche osservabili."
+  - id: pragmatism-negative-01
+    kind: negative
+    prompt: "Una fonte normativa impone un dovere di rendicontazione e vieta la divulgazione; confronta solo le azioni ancora consentite."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "Doveri e divieti vincolanti limitano le azioni prima del confronto delle conseguenze pratiche."
+  - id: pragmatism-negative-02
+    kind: negative
+    prompt: "Un gruppo di prodotto deve identificare momento di difficoltà dell’utente, compito funzionale/emotivo/sociale e forze di cambiamento prima di scegliere una soluzione."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Il collo di bottiglia è la scoperta del progresso dell’utente, non il confronto delle conseguenze di interpretazioni note."
+  - id: pragmatism-mechanical-01
+    kind: mechanical
+    prompt: "Disponi le due descrizioni delle politiche in colonne adiacenti senza confrontare conseguenze o raccomandarne una."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Formattare colonne è meccanico."
+  - id: pragmatism-explicit-01
+    kind: explicit
+    prompt: "Usa pragmatism per confrontare questi due manuali di risposta agli incidenti secondo i cambiamenti pratici, con un test da tavolo reversibile."
+    expected_route: pragmatism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, practical_consequence, choose]
+    rationale: "L’utente richiede esplicitamente confronto contestuale delle conseguenze e test."
+  - id: pragmatism-insufficiency-01
+    kind: insufficiency
+    prompt: "Opzioni e criterio di successo non sono specificati; dichiara vera l’interpretazione consolatoria perché sembra utile."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [practical_consequence, decisive_input_missing]
+    rationale: "L’utilità non si valuta senza opzioni, criterio o conseguenze osservabili."

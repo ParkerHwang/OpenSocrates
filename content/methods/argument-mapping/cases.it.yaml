@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: argument-mapping-positive-01
+    kind: positive
+    prompt: "Mappa affermazione, fondamenti, obiezioni e confutazioni di questa argomentazione politica per vedere quali collegamenti non sono sostenuti."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique, tangled_hierarchy]
+    rationale: "Il compito richiede esplicitamente struttura affermazione-fondamenti-obiezioni e individuazione di collegamenti privi di sostegno."
+  - id: argument-mapping-positive-02
+    kind: positive
+    prompt: "Quale premessa sostiene effettivamente la raccomandazione e quali controargomentazioni restano senza risposta?"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "Prima di giudicare la raccomandazione bisogna distinguere più rapporti di sostegno e contestazione."
+  - id: argument-mapping-positive-03
+    kind: positive
+    prompt: "Costruisci una mappa argomentativa della posizione contrattuale, includendo ipotesi condivise e la confutazione più forte."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, tangled_hierarchy]
+    rationale: "Il risultato pubblico richiesto è una mappa strutturata di affermazioni, premesse condivise e obiezioni."
+  - id: argument-mapping-negative-01
+    kind: negative
+    prompt: "Confronta la qualità probatoria di questi due studi e indica quale si applica alla nostra popolazione."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Il collo di bottiglia centrale è il disegno delle fonti e la loro applicabilità, che riguarda la verifica delle prove."
+  - id: argument-mapping-negative-02
+    kind: negative
+    prompt: "Scrivi prima la raccomandazione per i dirigenti, seguita da tre ragioni raggruppate e dai dettagli a sostegno."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "La richiesta riguarda una struttura comunicativa dall’alto verso il basso, anziché verifica dei collegamenti di sostegno."
+  - id: argument-mapping-mechanical-01
+    kind: mechanical
+    prompt: "Converti questo elenco di premesse in punti elenco Markdown."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Formattare un elenco fornito non richiede analisi argomentativa."
+  - id: argument-mapping-explicit-01
+    kind: explicit
+    prompt: "Usa esplicitamente argument-mapping per esaminare l’obiezione più forte a questo memorandum d’investimento."
+    expected_route: argument-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, argument_dispute]
+    rationale: "L’utente invoca esplicitamente il metodo per esaminare un’obiezione e la struttura del sostegno."
+  - id: argument-mapping-insufficiency-01
+    kind: insufficiency
+    prompt: "Mappa l’argomentazione e giudicane il collegamento più debole, senza fornire conclusione, premesse o testo della fonte."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [argument_dispute, decisive_input_missing]
+    rationale: "Non è disponibile materiale argomentativo da mappare: il metodo deve sospendere, anziché inventare premesse."

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-reasoning-positive-01
+    kind: positive
+    prompt: "Ein abgestimmter Pilot vergleicht zwei Kliniken; eine führt Erinnerungsanrufe ein, und nur dort sinken verpasste Termine. Verursachten Anrufe die Änderung?"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "Eingriffswirkung verlangt Timing, Vergleich und konkurrierende Erklärungen."
+  - id: causal-reasoning-positive-02
+    kind: positive
+    prompt: "Nach einem Kassenumbau steigen Abschlüsse in mehreren unabhängig beobachteten Kohorten; war der Umbau statt saisonaler Nachfrage ursächlich?"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, testable_claim, confounding]
+    rationale: "Wiederholter Eingriff-Ergebnis-Zusammenhang verlangt trotzdem Mechanismus, kontrafaktischen Vergleich und Störfaktorenprüfung."
+  - id: causal-reasoning-positive-03
+    kind: positive
+    prompt: "Eine Führungskraft fragt, ob eine Vier-Tage-Woche Bindung verbesserte; Startdaten, Vergleichsteams und mögliche Arbeitslaststörung liegen vor."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "Kausalziel, Timing, Vergleich und Störfaktor sind hinreichend ausdrücklich für begrenzte Analyse."
+  - id: causal-reasoning-negative-01
+    kind: negative
+    prompt: "Support-Rückstau wächst sechs Monate; Personal, Nachfrage und Antwortverzögerungen beeinflussen einander. Warum hält das Muster an?"
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty]
+    rationale: "Hauptziel ist wiederkehrende Rückkopplung mit Verzögerung; Systemdarstellung statt einzelner Kausalvergleich."
+  - id: causal-reasoning-negative-02
+    kind: negative
+    prompt: "Ein Fabrikfehler wiederholt sich nach mehreren Übergaben; trenne Symptome, Prozessursachen und fehlende Kontrollen."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "Betriebliche Wiederkehrdiagnose verlangt Kausalkette und Präventionsverantwortlichen statt bloßer Expositionswirkung."
+  - id: causal-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Übersetze den Satz über Richtlinienänderung und Ergebnis ins Koreanische, ohne Verursachung zu prüfen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Übersetzung ist mechanisch; trotz Kausalsprache bleibt das Verfahren inaktiv."
+  - id: causal-reasoning-explicit-01
+    kind: explicit
+    prompt: "Nutze causal-reasoning zur Prüfung, ob die neue Einstiegsmail Aktivierung änderte, und zeige den nötigen Vergleich."
+    expected_route: causal-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, causal_question]
+    rationale: "Nutzer benennt Verfahren ausdrücklich für Urteilsziel; primär unter Belegvertrag."
+  - id: causal-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "Ein Beschäftigter erholte sich nach Nahrungsergänzung; folgere Verursachung und empfehle sie dem ganzen Team."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [causal_question, decisive_input_missing]
+    rationale: "Unkontrollierte Einzelanekdote ohne vertretbaren Vergleich stützt keine kausale oder folgenschwere Empfehlung."

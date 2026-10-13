@@ -1,5 +1,45 @@
 # Changelog
 
+## [1.5.2] - 2026-10-13
+
+- Add French (`fr`), German (`de`), Italian (`it`), Spanish (`es`), Portuguese
+  (`pt`) and Thai (`th`) to the existing English, Korean, Simplified Chinese and
+  Japanese content across all four host profiles. Provide 480 complete procedure
+  files, 3,840 canonical cases and 1,440 teacher questions for 48 methods in ten
+  languages. Portuguese uses Brazilian orthography under the generic `pt` code;
+  separate regional variants are not claimed.
+- Advance bundle, overlay and individual method identity to content revision 5.
+  Preserve the existing four languages' authored procedure/case body bytes and
+  metadata/question values; prior revision 4 read evidence does not become
+  revision 5 evidence merely because body text is unchanged.
+- Extend closed runtime preferences, decision JSON locales and package inventories
+  to all ten languages. Preserve explicit preference over stored preference,
+  then script detection; add dominant Thai-script detection and retain Kana
+  priority. Latin-script European languages require an explicit or stored choice;
+  ties, empty input and unknown scripts use English. Keep complete historical
+  two-/four-language runtime content compatibility without silently upgrading it.
+- Add six native-language READMEs, current settings/language guides and a separate
+  language-review record. Preserve the four existing profiles, Mac ARM64 and
+  Windows x64 qualification, privacy, attribution, ownership, rollback and
+  fail-open boundaries. Go migration and Windows ARM64 remain v1.6.0 work.
+- 기존 영어·한국어·간체 중국어·일본어에 프랑스어·독일어·이탈리아어·스페인어·
+  포르투갈어·태국어를 추가합니다. 열 언어·사고 방법 48개의 전체 절차 480개,
+  정본 사례 3,840개, 교사 질문 1,440개를 네 호스트 프로필에 제공합니다.
+  포르투갈어는 일반 `pt` 코드와 브라질식 철자를 사용하며 지역별 지원을
+  별도로 주장하지 않습니다.
+- 번들·오버레이·개별 방법의 콘텐츠 리비전은 5로 바뀝니다. 기존 네 언어의
+  절차·사례 본문 바이트와 메타데이터·질문 값은 유지합니다. 본문이 같다는
+  이유로 리비전 4의 읽기 증거를 리비전 5의 증거로 간주하지 않습니다.
+- 폐쇄된 언어 선호·판단 JSON·패키지 목록을 열 언어로 확장합니다. 명시적
+  선호 → 저장 선호 → 문자 판별 순서를 유지하고 태국 문자 우세 판별을
+  추가합니다. 가나 우선순위를 유지하며 라틴 문자 언어에는 명시적·저장
+  선택이 필요합니다. 동률·빈 입력·알 수 없는 문자는 영어입니다. 완전한
+  과거 두 언어·네 언어 콘텐츠의 런타임 호환성을 유지하되 새 언어로 자동
+  변경하지 않습니다.
+- 여섯 언어 README와 현재 설정·언어 안내, 별도 언어 검토 기록을 추가합니다.
+  기존 네 프로필·Mac ARM64·Windows x64 검증 범위와 개인정보·사용 표기·
+  소유권·롤백·fail-open 경계를 유지합니다. Go·Windows ARM64는 v1.6.0입니다.
+
 ## [1.5.1] - 2026-10-13
 
 - Add Simplified Chinese (`zh`) and Japanese (`ja`) alongside English and Korean

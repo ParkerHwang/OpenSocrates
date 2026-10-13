@@ -640,7 +640,18 @@ class RecordEvent:
         except (TypeError, ValueError) as error:
             raise RecordEventError("invalid record host") from error
         object.__setattr__(self, "host", normalized_host)
-        if not isinstance(self.locale, str) or self.locale not in {"en", "ko", "zh", "ja"}:
+        if not isinstance(self.locale, str) or self.locale not in {
+            "en",
+            "ko",
+            "zh",
+            "ja",
+            "fr",
+            "de",
+            "it",
+            "es",
+            "pt",
+            "th",
+        }:
             raise RecordEventError("record locale is closed")
         _text(self.host_version, "host_version", max_length=64)
         if not isinstance(self.payload, tuple(_PAYLOAD_TYPES.values())):

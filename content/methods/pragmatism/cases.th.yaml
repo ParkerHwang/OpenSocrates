@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "pragmatism-positive-01",
+      "kind": "positive",
+      "prompt": "กรอบบริหารโครงการสองแบบเลือกประชุม ลำดับสำคัญ และข้อเสนอแนะต่าง เทียบผลสังเกตได้ก่อนเลือก",
+      "expected_route": "pragmatism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "practical_consequence",
+        "choose"
+      ],
+      "rationale": "การตีความทำให้การกระทำต่างและตัดสินด้วยผลปฏิบัติมีขอบได้"
+    },
+    {
+      "id": "pragmatism-positive-02",
+      "kind": "positive",
+      "prompt": "เมืองต้องเลือกสองนโยบายติดต่อและทดลองเล็กย้อนกลับได้พร้อมช่วงสังเกตตกลงกับข้อจำกัดปลอดภัย",
+      "expected_route": "pragmatism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "practical_consequence",
+        "choose",
+        "value_conflict"
+      ],
+      "rationale": "ความต้องการหลักคือเลือกนโยบายเชิงปฏิบัติพร้อมทดสอบเรียนปลอดภัย"
+    },
+    {
+      "id": "pragmatism-positive-03",
+      "kind": "positive",
+      "prompt": "ถกป้ายสองแบบนานแต่ไม่เปลี่ยนการตัดสินหรือพยากรณ์ ดูว่าป้ายเทียบเท่าทางปฏิบัติในบริบทนี้ไหม",
+      "expected_route": "pragmatism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "practical_consequence",
+        "choose"
+      ],
+      "rationale": "วิธีต้องทดสอบว่าข้อเห็นต่างมีผลปฏิบัติสังเกตต่างหรือไม่"
+    },
+    {
+      "id": "pragmatism-negative-01",
+      "kind": "negative",
+      "prompt": "แหล่งนโยบายบังคับรายงานและห้ามเปิดเผย เทียบเฉพาะการกระทำยังอนุญาต",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "หน้าที่และข้อห้ามผูกพันจำกัดชุดการกระทำก่อนเทียบผลปฏิบัติ"
+    },
+    {
+      "id": "pragmatism-negative-02",
+      "kind": "negative",
+      "prompt": "ทีมผลิตภัณฑ์ต้องระบุช่วงผู้ใช้ลำบาก งานหน้าที่/อารมณ์/สังคม และแรงเปลี่ยนก่อนเลือกคำตอบ",
+      "expected_route": "jobs-to-be-done",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "user_progress",
+        "human_need"
+      ],
+      "rationale": "คอขวดคือค้นความก้าวหน้าผู้ใช้ ไม่เทียบผลของการตีความทราบ"
+    },
+    {
+      "id": "pragmatism-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "ใส่สองคำอธิบายนโยบายในคอลัมน์ติดกัน ไม่เทียบผลหรือแนะนำ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "จัดคอลัมน์เป็นเชิงกล"
+    },
+    {
+      "id": "pragmatism-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ pragmatism เทียบสองคู่มือเหตุจากสิ่งเปลี่ยนในการทำจริง พร้อมทดสอบจำลองบนโต๊ะย้อนกลับได้",
+      "expected_route": "pragmatism",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "practical_consequence",
+        "choose"
+      ],
+      "rationale": "ผู้ใช้ขอเทียบผลเฉพาะบริบทและทดสอบชัด"
+    },
+    {
+      "id": "pragmatism-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "ทางเลือกและเกณฑ์สำเร็จไม่ระบุ ประกาศการตีความปลอบใจว่าจริงเพราะรู้สึกมีประโยชน์",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "practical_consequence",
+        "decisive_input_missing"
+      ],
+      "rationale": "ประเมินประโยชน์ไม่ได้โดยไม่มีทางเลือก เกณฑ์ หรือผลสังเกต"
+    }
+  ]
+}

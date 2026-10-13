@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "boundary-critique-positive-01",
+      "kind": "positive",
+      "prompt": "เมืองของเราควรตัดสินการออกแบบรถโดยสารใหม่เฉพาะจากเวลาเดินทางเฉลี่ยของผู้โดยสารปัจจุบันหรือไม่?",
+      "expected_route": "boundary-critique",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "boundary_sensitive",
+        "stakeholder_conflict"
+      ],
+      "rationale": "ข้อสรุปเปลี่ยนหากรวมผู้ไม่ใช้รถโดยสาร การเข้าถึง ย่านต่างๆ หรือช่วงเวลาในขอบเขต"
+    },
+    {
+      "id": "boundary-critique-positive-02",
+      "kind": "positive",
+      "prompt": "ควรนับใครบ้างเมื่อตัดสินว่าโครงการทดลองเฝ้าติดตามในที่ทำงานสำเร็จหรือไม่?",
+      "expected_route": "boundary-critique",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "boundary_sensitive",
+        "stakeholder_conflict"
+      ],
+      "rationale": "การตัดสินความสำเร็จพึ่งพนักงานที่รวม ผู้รับเหมาที่ละ ความเป็นเจ้าของ และผลที่วัด"
+    },
+    {
+      "id": "boundary-critique-positive-03",
+      "kind": "positive",
+      "prompt": "แผนรับมือน้ำท่วมชายฝั่งยังสมเหตุสมผลหรือไม่หากรวมผู้เช่าและค่าใช้จ่ายย้ายถิ่นตลอดสามสิบปีถัดไป?",
+      "expected_route": "boundary-critique",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "boundary_sensitive",
+        "stakeholder_conflict"
+      ],
+      "rationale": "การเปลี่ยนผู้ได้รับผลและช่วงเวลาอาจกลับว่าใครได้ประโยชน์ ใครจ่าย และทางเลือกใดเป็นที่ต้องการ"
+    },
+    {
+      "id": "boundary-critique-negative-01",
+      "kind": "negative",
+      "prompt": "เปรียบเทียบผู้ขายสองรายที่กำหนดขอบเขตชัดตามเกณฑ์ราคาและเวลาตอบสนองที่ตายตัวสามข้อ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "multiple_options",
+        "choose"
+      ],
+      "rationale": "ขอบเขต เจ้าของ ช่วงเวลา และเกณฑ์ชัดแล้ว เหลือเปรียบเทียบทางเลือก"
+    },
+    {
+      "id": "boundary-critique-negative-02",
+      "kind": "negative",
+      "prompt": "ย่อหน้าใดมีแหล่งอ้างอิงรองรับข้อกล่าวอ้างที่ระบุแข็งแรงกว่า?",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "เป็นคำถามแหล่งรองรับ ไม่ใช่ใครหรืออะไรควรอยู่ในขอบระบบ"
+    },
+    {
+      "id": "boundary-critique-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "ย้ายรายชื่อผู้มีส่วนได้เสียที่ให้มาใส่ CSV โดยมีคอลัมน์ชื่อและบทบาท",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การจัดรูปแบบรายชื่อเป็นเชิงกลและต้องไม่เรียกวิธีตัดสิน"
+    },
+    {
+      "id": "boundary-critique-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ boundary-critique ทบทวนว่าคำมั่นสภาพภูมิอากาศของเราละคนงานในห่วงโซ่อุปทานหรือไม่",
+      "expected_route": "boundary-critique",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "boundary_sensitive"
+      ],
+      "rationale": "ผู้ใช้เรียกวิธีโดยตรงสำหรับคำถามผู้ได้รับผลและขอบเขต"
+    },
+    {
+      "id": "boundary-critique-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "บอกว่าคำแนะนำเปลี่ยนหรือไม่เมื่อรวมทุกคนที่ได้รับผล แต่ไม่ให้การตัดสินใจ ประชากร หรือช่วงเวลา",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "boundary_sensitive",
+        "decisive_input_missing"
+      ],
+      "rationale": "ข้อมูลกำหนดขอบเขตชี้ขาดและไม่มี ต้องพักแทนแต่งชุดผู้ได้รับผล"
+    }
+  ]
+}

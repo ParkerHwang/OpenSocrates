@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "reflective-equilibrium-positive-01",
+      "kind": "positive",
+      "prompt": "Un principe d’équité paraît juste jusqu’à son application à trois cas difficiles ; révisez principe ou jugements en gardant la tension restante visible.",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "La tâche demande un ajustement mutuel entre jugements réfléchis, principes et cas difficiles."
+    },
+    {
+      "id": "reflective-equilibrium-positive-02",
+      "kind": "positive",
+      "prompt": "Une institution valorise vie privée et responsabilité, mais un incident difficile crée un conflit ; comparez les révisions préservant les deux autant que possible.",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "Un conflit de valeurs avec latitude exige principes, cas, révisions et tension restante explicites."
+    },
+    {
+      "id": "reflective-equilibrium-positive-03",
+      "kind": "positive",
+      "prompt": "Les jugements de cas acceptés d’une équipe professionnelle contredisent son principe déclaré ; testez des contre-exemples et identifiez l’hypothèse de fond à modifier.",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "La décision dépend d’itérations entre cas, principes et hypothèses de fond."
+    },
+    {
+      "id": "reflective-equilibrium-negative-01",
+      "kind": "negative",
+      "prompt": "Une réglementation nommée interdit clairement l’action proposée sans laisser de latitude ; déterminez l’alternative permise.",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "Une règle contraignante tranche le statut sans ajustement réflexif des principes."
+    },
+    {
+      "id": "reflective-equilibrium-negative-02",
+      "kind": "negative",
+      "prompt": "Une équipe a écarté l’objection d’une partie prenante sans reconstruire ses prémisses loyales les plus fortes ni ses besoins probants.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "La lacune immédiate est un argument opposé non testé, pas un conflit entre principes et jugements réfléchis."
+    },
+    {
+      "id": "reflective-equilibrium-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Copiez les principes et descriptions de cas listés dans un document d’examen sans les comparer ni les réviser.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "La copie est mécanique et ne demande pas de cohérence normative."
+    },
+    {
+      "id": "reflective-equilibrium-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez reflective-equilibrium pour examiner notre principe d’équité sur ces cas difficiles et préciser la tension restante.",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "L’utilisateur demande explicitement un ajustement itératif entre cas et principes."
+    },
+    {
+      "id": "reflective-equilibrium-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Une règle de sécurité contraignante s’applique, mais demandez à l’assistant de l’écarter par une mise en balance parce qu’un cas paraît injuste.",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "value_conflict",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "La méthode ne doit pas fabriquer de latitude ni outrepasser une règle de sécurité contraignante."
+    }
+  ]
+}

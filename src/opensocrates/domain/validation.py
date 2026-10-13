@@ -466,8 +466,21 @@ def validate_date(value: Any, *, field_name: str = "date") -> str:
 
 
 def validate_locale(value: Any, *, field_name: str = "locale") -> str:
-    if not isinstance(value, str) or value not in {"en", "ko", "zh", "ja"}:
-        raise ValidationError(f"{field_name}: locale must be en, ko, zh, or ja")
+    if not isinstance(value, str) or value not in {
+        "en",
+        "ko",
+        "zh",
+        "ja",
+        "fr",
+        "de",
+        "it",
+        "es",
+        "pt",
+        "th",
+    }:
+        raise ValidationError(
+            f"{field_name}: locale must be en, ko, zh, ja, fr, de, it, es, pt, or th"
+        )
     return value
 
 
@@ -1186,14 +1199,11 @@ def _validate_method_complements(model: Any) -> None:
 
 
 def _validate_method_authoring(model: Any) -> None:
-    if set(model.locales) != {"en", "ko", "zh", "ja"} or tuple(model.locales) != (
-        "en",
-        "ko",
-        "zh",
-        "ja",
-    ):
+    if set(model.locales) != {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} or tuple(
+        model.locales
+    ) != ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
         raise ValidationError(
-            "method authoring requires exactly en, ko, zh, and ja locales in en,ko,zh,ja order"
+            "method authoring requires exactly the ten supported locales in en,ko,zh,ja,fr,de,it,es,pt,th order"
         )
     if len(model.routing.positive_features) < 2:
         raise ValidationError("method authoring requires at least two positive routing features")

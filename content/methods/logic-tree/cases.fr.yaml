@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "logic-tree-positive-01",
+      "kind": "positive",
+      "prompt": "Pourquoi l’attrition des clients a-t-elle augmenté, et comment décomposer les causes en branches testables sans recoupement ?",
+      "expected_route": "logic-tree",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "tangled_hierarchy",
+        "diagnose",
+        "plan"
+      ],
+      "rationale": "Ce diagnostic vaste nécessite un arbre des causes avec un axe explicite, des vérifications MECE et des tests des feuilles."
+    },
+    {
+      "id": "logic-tree-positive-02",
+      "kind": "positive",
+      "prompt": "Construisez un arbre des problèmes complet pour réduire les échecs d’accueil, avec une étape de vérification à chaque feuille.",
+      "expected_route": "logic-tree",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "tangled_hierarchy",
+        "plan"
+      ],
+      "rationale": "La couverture et une décomposition exploitable sont le résultat demandé."
+    },
+    {
+      "id": "logic-tree-positive-03",
+      "kind": "positive",
+      "prompt": "Décomposez cette vaste question de risque en branches sans recoupement qu’une équipe opérationnelle peut attribuer et tester.",
+      "expected_route": "logic-tree",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "tangled_hierarchy",
+        "diagnose"
+      ],
+      "rationale": "La tâche exige des branches hiérarchiques, des vérifications de couverture et des feuilles exécutables."
+    },
+    {
+      "id": "logic-tree-negative-01",
+      "kind": "negative",
+      "prompt": "Vérifiez si les catégories existantes se recoupent et si un cas manque.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "category_overlap",
+        "tangled_hierarchy"
+      ],
+      "rationale": "Cet audit ciblé de classification relève de MECE, pas d’une construction récursive d’arbre."
+    },
+    {
+      "id": "logic-tree-negative-02",
+      "kind": "negative",
+      "prompt": "Dessinez les boucles de rétroaction entre ces variables et identifiez les dynamiques de renforcement et d’équilibrage.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "Des boucles de rétroaction interdépendantes se prêtent mal à une hiérarchie et nécessitent une méthode systémique."
+    },
+    {
+      "id": "logic-tree-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Indentez ces titres fournis selon la structure d’arbre montrée dans l’exemple.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Appliquer une indentation fournie est une tâche mécanique de mise en forme."
+    },
+    {
+      "id": "logic-tree-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez explicitement logic-tree pour structurer les causes du retard de notre livraison.",
+      "expected_route": "logic-tree",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "tangled_hierarchy"
+      ],
+      "rationale": "L’utilisateur choisit explicitement une structure de diagnostic hiérarchique."
+    },
+    {
+      "id": "logic-tree-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Créez l’arbre des problèmes complet, mais n’énoncez ni la question racine, ni le périmètre, ni la mesure de réussite.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "tangled_hierarchy",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans racine délimitée, la couverture et le caractère exploitable des feuilles ne peuvent être évalués de façon sûre."
+    }
+  ]
+}

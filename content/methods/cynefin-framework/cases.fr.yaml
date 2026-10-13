@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "cynefin-framework-positive-1",
+      "kind": "positive",
+      "prompt": "Notre équipe de support facturation suit un arbre de décision documenté ; la même entrée produit fiablement la même correction. Devons-nous standardiser la réponse et surveiller les exceptions ?",
+      "expected_route": "cynefin-framework",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "context_disorder",
+        "diagnose"
+      ],
+      "rationale": "L'utilisateur décrit une relation stable et demande un mode de réponse approprié. Les observations viennent de lui ; l'orientation doit classer la situation sans affirmer que tous les cas futurs seront clairs."
+    },
+    {
+      "id": "cynefin-framework-positive-2",
+      "kind": "positive",
+      "prompt": "Plusieurs équipes essaient de réduire l'épuisement, mais chaque intervention modifie charge, confiance et comportements de manière inattendue. Aidez-nous à choisir de petits essais, observer les résultats et décider du prochain essai.",
+      "expected_route": "cynefin-framework",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "context_disorder",
+        "deep_uncertainty"
+      ],
+      "rationale": "La demande décrit une dynamique adaptative plutôt qu'une procédure fixe. L'orientation doit expliciter contexte complexe et signaux d'apprentissage, sans inventer de probabilité de réussite d'un essai."
+    },
+    {
+      "id": "cynefin-framework-positive-3",
+      "kind": "positive",
+      "prompt": "Un service de production échoue dans plusieurs régions et les clients perdent actuellement l'accès. Il faut une réponse qui contienne immédiatement l'incident, puis ajuste la reprise selon de nouvelles observations.",
+      "expected_route": "cynefin-framework",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "context_disorder",
+        "diagnose"
+      ],
+      "rationale": "La demande dépend d'un mode d'action urgent et d'un signal ultérieur de réévaluation. Les faits de l'incident ne sont pas vérifiés indépendamment ici ; l'orientation doit préserver cette incertitude tout en soutenant le confinement."
+    },
+    {
+      "id": "cynefin-framework-negative-1",
+      "kind": "negative",
+      "prompt": "Transformez ces étapes opérationnelles déjà approuvées en liste numérotée et conservez exactement les mots.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "C'est une mise en forme avec instruction fixe, pas un jugement de classification. Aucune orientation de méthode ni affirmation probante n'est nécessaire."
+    },
+    {
+      "id": "cynefin-framework-negative-2",
+      "kind": "negative",
+      "prompt": "Examinez les changements politiques, économiques, sociaux, technologiques, environnementaux et juridiques susceptibles d'affecter notre expansion.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "La proximité vient de l'incertitude stratégique, mais le résultat décisif est un registre de facteurs externes importants plutôt qu'une classification et un mode de réponse. C'est une confusion probable de famille."
+    },
+    {
+      "id": "cynefin-framework-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Triez ces horodatages d'incident par ordre chronologique et renvoyez-les en CSV.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "La tâche a un résultat mécanique sans décision significative sur contexte ou action. L'orientation de méthode doit rester silencieuse."
+    },
+    {
+      "id": "cynefin-framework-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez le cadre Cynefin pour décider si notre panne de service exige action immédiate, analyse experte ou expériences sûres. Montrez les éléments et le signal qui changerait la classification.",
+      "expected_route": "cynefin-framework",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "context_disorder"
+      ],
+      "rationale": "L'utilisateur nomme la méthode et ses résultats publics ; elle reste principale. Il faut encore étiqueter les observations utilisateur et éviter de présenter la classification comme certaine."
+    },
+    {
+      "id": "cynefin-framework-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Devons-nous standardiser ce problème ou expérimenter ? Je n'ai décrit ni problème, ni causes, ni urgence, ni éléments disponibles.",
+      "expected_route": "cynefin-framework",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "context_disorder"
+      ],
+      "rationale": "C'est une véritable question de mode de réponse, mais les observations décisives manquent. La méthode peut suspendre et demander les plus petits faits manquants ; elle ne doit fabriquer ni domaine ni probabilité."
+    }
+  ]
+}

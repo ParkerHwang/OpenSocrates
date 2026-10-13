@@ -392,7 +392,9 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
         if not decision_point_mode:
             raise ValueError("hook-only composition requires decision-point mode")
         return _build_decision_hook_services(host=host, workspace=workspace, data_root=data_root)
-    selected_locale = locale if locale in {"en", "ko", "zh", "ja"} else "en"
+    selected_locale = (
+        locale if locale in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"} else "en"
+    )
     selected_bundle_path = discover_bundle_path(bundle_path)
     selected_reasoning_content_path = discover_reasoning_content_path(reasoning_content_path)
     content_repository = BundleRepository(selected_bundle_path)
@@ -447,7 +449,7 @@ def build_runtime_services(  # noqa: C901  # Branch-explicit contract; reviewed 
     if locale is None and settings_store is not None:
         try:
             preference = settings_store.load().locale_preference
-            if preference in {"en", "ko", "zh", "ja"}:
+            if preference in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
                 selected_locale = preference
         except Exception:
             # Unavailable settings retain explicit English/unknown fallback.

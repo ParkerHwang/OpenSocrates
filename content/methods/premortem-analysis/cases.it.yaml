@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: premortem-analysis-positive-01
+    kind: positive
+    prompt: "Il gruppo sta per migrare dati dei clienti e vuole immaginare il fallimento della migrazione, raccogliere motivi indipendenti e stabilire avvisi precoci."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "Un piano concreto scelto richiede narrazione del fallimento, segnali anticipatori, mitigazioni e condizioni di arresto."
+  - id: premortem-analysis-positive-02
+    kind: positive
+    prompt: "Prima di aprire una nuova clinica, identifica come il piano potrebbe fallire per personale, domanda, operazioni e regolamentazione senza assegnare probabilità false."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "L’esercizio controfattuale sul fallimento del piano è esplicito e deve restare ordinale e attento alle prove."
+  - id: premortem-analysis-positive-03
+    kind: positive
+    prompt: "Un gruppo unanime sul lancio desidera una contestazione strutturata che faccia emergere presupposti taciti, indicatori anticipatori e condizioni di pausa prima dell’impegno."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, hidden_assumptions, failure_risk]
+    rationale: "La richiesta affronta conformismo e pianificazione ottimistica attorno a un’azione scelta."
+  - id: premortem-analysis-negative-01
+    kind: negative
+    prompt: "Per ogni fase del flusso, elenca modalità di guasto, effetti, cause, controlli e responsabili in un registro prospettico dei rischi."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "Un inventario di guasti e controlli a livello di processo è più specifico di una retrospettiva immaginata del piano."
+  - id: premortem-analysis-negative-02
+    kind: negative
+    prompt: "Un difetto ricorre da mesi e il gruppo deve trovare la condizione controllabile del sistema che ne impedisca la ricorrenza."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "Una ricorrenza esistente richiede diagnosi causale, non un esercizio precedente all’impegno."
+  - id: premortem-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Copia il piano di lancio approvato nel modello dei rischi senza aggiungere scenari di fallimento o raccomandazioni."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copiare è meccanico e non richiede giudizi sul piano scelto."
+  - id: premortem-analysis-explicit-01
+    kind: explicit
+    prompt: "Esegui un premortem sul piano di assunzione ed elenca i primi segnali che ci farebbero mettere in pausa."
+    expected_route: premortem-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, chosen_plan, failure_risk]
+    rationale: "L’utente nomina esplicitamente il metodo per un piano concreto prima dell’impegno."
+  - id: premortem-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "Non esiste un piano scelto ma inventa una retrospettiva del fallimento e dichiara quale opzione fallirà con certezza del 90%."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [chosen_plan, decisive_input_missing]
+    rationale: "Senza piano o classe di riferimento difendibile, l’esercizio non sostiene probabilità né raccomandazioni."

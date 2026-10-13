@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: morphological-analysis-positive-01
+    kind: positive
+    prompt: "Un programma pubblico può variare canale di accesso, ammissibilità, tempistiche, personale e feedback; costruisci una matrice coerente e filtra le combinazioni prima di scegliere un modello."
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "Più dimensioni indipendenti creano uno spazio qualitativo strutturato delle opzioni con controlli di compatibilità a coppie."
+  - id: morphological-analysis-positive-02
+    kind: positive
+    prompt: "La riprogettazione di un servizio continua a ottimizzare un solo canale; esplora combinazioni di modalità di erogazione, cadenza, responsabilità e livello di supporto."
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "Il gruppo necessita di combinazioni non ovvie fra dimensioni coerenti, non di un’altra modifica di una sola variabile."
+  - id: morphological-analysis-positive-03
+    kind: positive
+    prompt: "Un laboratorio strategico necessita di configurazioni convenzionali, estreme ed equilibrate lungo quattro scelte indipendenti, mostrando le coppie incompatibili."
+    expected_route: morphological-analysis
+    expected_behavior: route
+    decisive_features: [combinable_dimensions, choose]
+    rationale: "Il risultato richiesto è una matrice dei parametri, uno spazio combinatorio, una verifica di coerenza e concetti rappresentativi."
+  - id: morphological-analysis-negative-01
+    kind: negative
+    prompt: "Il gruppo non può definire dimensioni indipendenti e l’incertezza principale riguarda quali presupposti convenzionali siano davvero vincoli irriducibili."
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, no_coherent_dimensions]
+    rationale: "La scoperta dei vincoli fondamentali deve precedere lo spazio di combinazioni morfologiche."
+  - id: morphological-analysis-negative-02
+    kind: negative
+    prompt: "Esistono soltanto due opzioni fattibili e la decisione dipende da criteri e compromessi espliciti, non dall’esplorazione di combinazioni."
+    expected_route: trade-off-analysis
+    expected_behavior: route
+    decisive_features: [multiple_options, choose]
+    rationale: "Un confronto compatto basta quando non esiste uno spazio significativo di dimensioni da esplorare."
+  - id: morphological-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Esporta la matrice dei parametri esistente in CSV senza interpretare né combinare alcun valore."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Esportare è un’attività meccanica."
+  - id: morphological-analysis-explicit-01
+    kind: explicit
+    prompt: "Usa morphological-analysis per generare configurazioni di servizio lungo canale, tempistiche, responsabilità e intensità, poi filtrale."
+    expected_route: morphological-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, combinable_dimensions]
+    rationale: "L’utente nomina esplicitamente metodo e compito di combinazione delle dimensioni."
+  - id: morphological-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "Esiste una sola dimensione inseparabile e nessun valore coerente; crea una grande matrice e seleziona la migliore combinazione con precisione."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [combinable_dimensions, no_coherent_dimensions]
+    rationale: "Senza dimensioni o valori coerenti, una matrice produrrebbe struttura e precisione false."

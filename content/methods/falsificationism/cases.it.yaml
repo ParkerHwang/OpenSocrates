@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: falsificationism-positive-01
+    kind: positive
+    prompt: "Quale osservazione conterebbe in modo decisivo contro questa ipotesi di prodotto preferita?"
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "L'affermazione richiede una previsione rischiosa e un falsificatore osservabile anziché altri aneddoti di conferma."
+  - id: falsificationism-positive-02
+    kind: positive
+    prompt: "Trasforma questa spiegazione in una previsione, separa le assunzioni ausiliarie e definisci la soglia di fallimento prima del test."
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "L'output richiesto è un tentativo di confutazione specificato in anticipo, con condizioni di misurazione."
+  - id: falsificationism-positive-03
+    kind: positive
+    prompt: "La previsione fallita ha indebolito la teoria, la misurazione o un'assunzione ausiliaria dell'assetto?"
+    expected_route: falsificationism
+    expected_behavior: route
+    decisive_features: [testable_claim, critique]
+    rationale: "Il metodo deve localizzare ciò che un test fallito mette realmente in discussione."
+  - id: falsificationism-negative-01
+    kind: negative
+    prompt: "Genera più spiegazioni dell'anomalia e confronta quale rende meglio conto dei fatti osservati."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "La generazione di spiegazioni candidate è abduttiva quando non è specificata una previsione rischiosa."
+  - id: falsificationism-negative-02
+    kind: negative
+    prompt: "Ordina queste fonti in base al rigore del disegno e adatta la forza dell'affermazione alla loro applicabilità."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Il compito calibra la gerarchia delle evidenze anziché tentare una confutazione."
+  - id: falsificationism-mechanical-01
+    kind: mechanical
+    prompt: "Copia la previsione e la soglia preregistrate nel modulo del test."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copiare una specifica di test fornita è meccanico."
+  - id: falsificationism-explicit-01
+    kind: explicit
+    prompt: "Richiama esplicitamente falsificationism per mettere in discussione l'affermazione che questo intervento migliora sempre la fidelizzazione."
+    expected_route: falsificationism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, testable_claim]
+    rationale: "L'utente seleziona esplicitamente un test orientato alla confutazione di un'affermazione universale."
+  - id: falsificationism-insufficiency-01
+    kind: insufficiency
+    prompt: "Usa falsificationism su un'affermazione che non produce previsioni osservabili e non può indicare che cosa conterebbe contro di essa."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [testable_claim]
+    rationale: "Si applica la controindicazione fissata: senza un'implicazione verificabile, il metodo deve rifiutare anziché inventare un falsificatore."

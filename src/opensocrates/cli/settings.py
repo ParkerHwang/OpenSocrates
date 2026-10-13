@@ -87,7 +87,7 @@ def handle_locale_get(repository: Any) -> dict[str, object]:
 
 
 def handle_locale_set(repository: Any, locale: str) -> dict[str, object]:
-    if locale not in {"en", "ko", "zh", "ja", "follow"}:
+    if locale not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th", "follow"}:
         return {"status": "rejected", "error_code": "invalid_locale"}
     if repository is None:
         return {"status": "unavailable", "error_code": "settings_store_unavailable"}

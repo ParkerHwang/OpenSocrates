@@ -1,0 +1,114 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "cost-benefit-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Nous devons choisir entre un nouveau service et la référence actuelle. Le registre financier donne les coûts de mise en œuvre et d'exploitation, le rapport pilote l'adoption mesurée ; la question principale est si les bénéfices justifient les coûts sur l'horizon indiqué.",
+      "expected_route": "cost-benefit-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "Une référence et plusieurs options sont explicites, et les coûts et bénéfices importants ont une provenance identifiable. Les effets non monétaires peuvent rester séparés, mais la comparaison est pertinente pour la décision."
+    },
+    {
+      "id": "cost-benefit-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "Comparez deux programmes de santé publique à l'inaction. Les registres administratifs décrivent les coûts de prestation, une évaluation rapporte les résultats mesurés ; la décision doit montrer qui paie, qui bénéficie et quels effets de sécurité ou d'équité ne peuvent être réduits à l'argent.",
+      "expected_route": "cost-benefit-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "practical_consequence"
+      ],
+      "rationale": "La tâche demande une comparaison économique de référence avec répartition et valeurs non compensables. Les résultats sont étiquetés par source plutôt que traités comme garantis."
+    },
+    {
+      "id": "cost-benefit-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Un projet de remplacement comporte des coûts initiaux et des bénéfices à différentes dates. Utilisez l'horizon de planification approuvé et la règle d'actualisation documentée de l'organisation ; montrez comment l'implication change si les hypothèses documentées varient dans leur intervalle étayé.",
+      "expected_route": "cost-benefit-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "sensitive_inputs"
+      ],
+      "rationale": "Le calendrier, un périmètre réel de calcul et la sensibilité à des hypothèses sourcées constituent une comparaison coûts-bénéfices. La demande fournit une provenance plutôt qu'un taux par défaut ou une certitude inventée."
+    },
+    {
+      "id": "cost-benefit-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Une règle de sécurité impose une inspection à chaque établissement ; l'équipe demande si elle peut légalement l'omettre. Aucune option discrétionnaire ne reste ; le texte applicable est l'élément décisif.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "single_feasible_option",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "C'est une question de devoirs et règles sans véritable choix. Un calcul net ne doit pas servir à abandonner une exigence obligatoire."
+    },
+    {
+      "id": "cost-benefit-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Choisissez le meilleur de trois modèles selon fiabilité, accessibilité, impact écologique et dignité utilisateur. Le demandeur refuse explicitement de monétiser la dignité et n'a pas de prix défendables pour les autres critères ; il souhaite une comparaison transparente des critères.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "no_coherent_dimensions"
+      ],
+      "rationale": "La confusion probable est avec trade-off-analysis : la décision exige des critères explicites et des contraintes non compensables, pas un total monétaire forcé."
+    },
+    {
+      "id": "cost-benefit-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Appliquez la formule de tableur fournie à ces coûts et bénéfices déjà vérifiés et renvoyez le total arithmétique. Aucune option, évaluation de référence, incertitude ou recommandation n'est demandée.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "C'est un calcul fixe sans comparaison discrétionnaire. La méthode doit rester silencieuse pendant qu'un traitement mécanique applique la formule."
+    },
+    {
+      "id": "cost-benefit-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez cost-benefit-analysis pour cette subvention. Comparez l'option financée à la référence documentée, rendez la répartition visible et suspendez toute valorisation non étayée au lieu de la compléter.",
+      "expected_route": "cost-benefit-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "choose",
+        "multiple_options"
+      ],
+      "rationale": "L'utilisateur invoque explicitement cette méthode et sa comparaison requise. Elle reste principale tandis que les valeurs sans soutien restent supposées ou non vérifiées."
+    },
+    {
+      "id": "cost-benefit-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Dites lequel de ces deux projets est meilleur. Nous n'avons ni référence convenue, ni horizon temporel, ni registre de coûts, seulement des affirmations promotionnelles sur les bénéfices.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "decisive_input_missing"
+      ],
+      "rationale": "La référence déterminante et les entrées importantes manquent, et les bénéfices revendiqués n'ont pas de provenance. La méthode doit suspendre le résultat et ne demander que la plus petite correction décisive."
+    }
+  ]
+}

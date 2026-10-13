@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-loop-diagramming-positive-01
+    kind: positive
+    prompt: "Eine Warteschlange verlängert Wartezeit, diese erhöht Abbrüche und Abbrüche ändern künftigen Personalbedarf; kartiere Schleife mit Vorzeichen und Verzögerung."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "Gefragt sind Variablen, Verbindungen mit Vorzeichen, Schleifentyp und musterprägende Verzögerung."
+  - id: causal-loop-diagramming-positive-02
+    kind: positive
+    prompt: "Nutzerwachstum erhöht Bewertungen, diese ziehen Nutzer an, während Kapazitätsgrenzen ausgleichen; benenne beide Schleifen."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Mehrere gerichtete Schleifen und ausgleichende Grenze müssen ausdrücklich dargestellt werden."
+  - id: causal-loop-diagramming-positive-03
+    kind: positive
+    prompt: "Eine Maßnahme entlastet rasch, wirkt später aber zurück, weil Durchsetzung Verhalten stark verzögert ändert; zeichne die Rückkopplungserklärung."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "Gefordert ist Schleifenerklärung verzögerter Maßnahmenresistenz, keine Einzeleffektschätzung."
+  - id: causal-loop-diagramming-negative-01
+    kind: negative
+    prompt: "Eine große Organisation hat viele Akteure, Bestände und Nebenwirkungen; bestimme besten Hebel vor kompaktem Schleifendiagramm."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "Umfassende Systemgrenze und Hebelfrage sollten vor gezieltem Diagramm feststehen."
+  - id: causal-loop-diagramming-negative-02
+    kind: negative
+    prompt: "Eine Studie fragt, ob ein Medikament gegenüber Kontrolle ein gemessenes Ergebnis verursachte, ohne wiederkehrende Dynamik."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "Begrenzte kontrafaktische Wirkungsfrage braucht keine Rückkopplungsschleife."
+  - id: causal-loop-diagramming-mechanical-01
+    kind: mechanical
+    prompt: "Kopiere vorhandene Schleifenbezeichnungen in eine Präsentation und bewahre Reihenfolge ohne Beziehungsbewertung."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Kopieren und Formatieren brauchen kein Kausalurteil."
+  - id: causal-loop-diagramming-explicit-01
+    kind: explicit
+    prompt: "Nutze causal-loop-diagramming, um Nachfrageanstieg durch Rabatte und spätere Fehlbestände sowie Vertrauensverlust zu zeigen."
+    expected_route: causal-loop-diagramming
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay]
+    rationale: "Nutzer benennt Verfahren und wiederkehrendes verstärkendes/ausgleichendes Muster."
+  - id: causal-loop-diagramming-insufficiency-01
+    kind: insufficiency
+    prompt: "Zwei Variablen bewegten sich einmal gemeinsam; Richtung, Timing und Wiederholung sind unbekannt. Zeichne eine geprüfte verstärkende Schleife."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "Einmalige gemeinsame Bewegung ohne Richtung und Timing stützt keine Schleife mit Vorzeichen."

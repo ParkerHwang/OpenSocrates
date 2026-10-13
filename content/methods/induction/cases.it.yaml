@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: induction-positive-01
+    kind: positive
+    prompt: "Queste osservazioni ripetute supportano un'affermazione generale sulla maggior parte degli utenti, e quanto è forte la generalizzazione?"
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "Il compito passa da casi osservati a un'affermazione delimitata sulla popolazione e richiede controlli del campione e dei controesempi."
+  - id: induction-positive-02
+    kind: positive
+    prompt: "Valuta se questo campione del sondaggio giustifica l'affermazione che i clienti preferiscono il nuovo flusso di lavoro."
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "Rappresentatività, distorsione di selezione e forza della generalizzazione sono centrali."
+  - id: induction-positive-03
+    kind: positive
+    prompt: "Che cosa possiamo ragionevolmente inferire sul prossimo trimestre da questi incidenti passati, inclusi controesempi plausibili?"
+    expected_route: induction
+    expected_behavior: route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "La previsione richiesta estende casi ripetuti e deve dichiarare ambito e rischio di controesempi."
+  - id: induction-negative-01
+    kind: negative
+    prompt: "Una regola rigorosa stabilisce che ogni record idoneo riceve approvazione; determina se questo caso segue la regola."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Il compito è un'applicazione deduttiva della regola, non una generalizzazione basata sul campione."
+  - id: induction-negative-02
+    kind: negative
+    prompt: "Più spiegazioni corrispondono al fallimento; confrontale e identifica l'osservazione che permetterebbe di distinguerle."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "È una diagnosi abduttiva, non un'estensione dal campione alla popolazione."
+  - id: induction-mechanical-01
+    kind: mechanical
+    prompt: "Aggiungi queste nuove osservazioni al dataset esistente senza modificare alcun valore."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Aggiungere dati forniti è meccanico."
+  - id: induction-explicit-01
+    kind: explicit
+    prompt: "Usa esplicitamente l'induzione per valutare se questo piccolo esperimento supporta un'affermazione più ampia sul prodotto."
+    expected_route: induction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, repeated_observations]
+    rationale: "L'utente seleziona esplicitamente l'analisi del passaggio dal campione alla generalizzazione."
+  - id: induction-insufficiency-01
+    kind: insufficiency
+    prompt: "Generalizza dal campione, ma non fornire popolazione di riferimento, processo di campionamento, osservazioni o definizione della misurazione."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [repeated_observations, weak_sample, decisive_input_missing]
+    rationale: "Senza base del campione e ambito di riferimento, la generalizzazione non può essere delimitata."

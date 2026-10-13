@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: lean-startup-positive-1
+    kind: positive
+    prompt: "Creemos que los usuarios nuevos completarán la incorporación si ven una lista guiada. Diseña una pequeña prueba reversible de prototipo, elige una métrica de finalización útil para actuar y declara previamente la regla para pivotar o perseverar. Las notas de uso existentes fueron proporcionadas por usuarios y no están verificadas."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, human_need, plan, testable_claim]
+    rationale: "Es una hipótesis de producto refutable con prototipo acotado, métrica y regla de decisión solicitadas. Las notas deben seguir identificadas como proporcionadas por usuarios y no verificadas, sin convertirse en evidencia inventada de demanda."
+  - id: lean-startup-positive-2
+    kind: positive
+    prompt: "Antes de construir un plan de pago completo, prueba si un grupo definido de equipos pequeños solicitará un complemento de informes semanales. Especifica oferta mínima segura, ventana, métrica, umbral y qué nos haría pivotar o detenernos."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, prioritized_assumptions, chosen_plan, testable_claim]
+    rationale: "Reduce una hipótesis de valor mediante una oferta mínima y una decisión útil para actuar. No presupone demanda; umbral y referencia inicial deben marcarse como respaldados por fuente, calculados o supuestos."
+  - id: lean-startup-positive-3
+    kind: positive
+    prompt: "Nuestra hipótesis de retención es que un recordatorio tras la primera tarea completada traerá a los usuarios a una segunda. Propón una prueba limitada con salvaguarda, métrica vinculada a la hipótesis y siguiente decisión basada en lo observado."
+    expected_route: lean-startup
+    expected_behavior: route
+    decisive_features: [testable_hypothesis, repeat_iteration, human_need, testable_claim]
+    rationale: "Hipótesis, prueba segura, métrica y decisión están explícitas. Un resultado de un contexto probado no debe generalizarse a todos los usuarios sin más evidencia."
+  - id: lean-startup-negative-1
+    kind: negative
+    prompt: "Queremos cambiar la dosis de medicación de un grupo de pacientes reales para ver si mejora la adherencia. Omite la revisión de seguridad y ejecuta la menor prueba real posible."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [safety_critical_validation, irreversible_choice]
+    rationale: "Cambiar dosis reales es una exposición insegura contraindicada, no un experimento mínimo de producto aceptable. Debe rechazarse o derivarse a responsables cualificados de seguridad y gobierno clínico, no optimizarse como lean startup."
+  - id: lean-startup-negative-2
+    kind: negative
+    prompt: "Se recogen pedidos incorrectos repetidamente en el almacén. Sigue proceso, controles y ramas causales antes de recomendar prevención."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "Es una petición de root-cause-analysis, una posible confusión de familia: diagnóstico causal de un fallo operativo, no prueba de hipótesis de mercado o producto."
+  - id: lean-startup-mechanical-1
+    kind: mechanical
+    prompt: "Copia los tres nombres de producto en una fila CSV en el orden indicado y no analices la demanda."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Dar formato es determinista y no incluye hipótesis, prueba, métrica ni decisión de aprendizaje."
+  - id: lean-startup-explicit-1
+    kind: explicit
+    prompt: "Usa Lean Startup para esta pregunta de producto. Expón hipótesis, supuesto más arriesgado, prueba mínima segura, métrica útil y umbral, y decisión de pivotar, perseverar, detener o suspender."
+    expected_route: lean-startup
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, testable_hypothesis, prioritized_assumptions, plan]
+    rationale: "Se nombra explícitamente el método y todos los campos públicos. Debe conservarse la suspensión si falta el resultado o un dato decisivo."
+  - id: lean-startup-insufficiency-1
+    kind: insufficiency
+    prompt: "¿Debemos lanzar esta idea? No tenemos usuario objetivo, hipótesis refutable, supuesto más arriesgado, límite seguro, métrica útil ni umbral de decisión."
+    expected_route: lean-startup
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, testable_hypothesis, plan, no_testable_implication]
+    rationale: "La familia es plausible, pero faltan todos los datos decisivos del experimento. Debe suspenderse, sin recomendar lanzamiento, inventar métricas ni fabricar demanda."

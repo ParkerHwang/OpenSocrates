@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "pestel-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "ก่อนเข้าประเทศนี้ สำรวจวาระเลือกตั้งปัจจุบัน เงินเฟ้อและเงินตรา ประชากรเปลี่ยน เทคโนโลยีแพลตฟอร์ม กฎปล่อยสาร และข้อใบอนุญาตที่เปลี่ยนแผนเปิดตัวได้",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "โจทย์ระบุสำรวจภายนอกมีขอบและการตัดสินกลยุทธ์ ต้องรักษาวันแหล่ง/เขตอำนาจ ไม่ถือข้อกำหนดหรือพยากรณ์ยังไม่ตรวจเป็นยุติ"
+    },
+    {
+      "id": "pestel-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "ขยายผลิตภัณฑ์พึ่งลูกค้าอายุมาก กฎคุ้มครองข้อมูล ต้นทุนคลาวด์ และการเปลี่ยนแปลงฉับพลันของราคาพลังงานที่อาจเกิดขึ้น ระบุปัจจัยสำคัญ กลไก และสัญญาณที่ควรเปลี่ยนการลงทุน",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "ขอปัจจัยภายนอกสำคัญและนัยกลยุทธ์ไม่ใช่แนวโน้มทั่วไป โจทย์ให้สมมติฐาน ต้องกำกับตรวจแล้ว อนุมาน หรือยังไม่ตรวจ"
+    },
+    {
+      "id": "pestel-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "สร้างบริบทภายนอกมีหลักฐานสำหรับกลยุทธ์ห้าปี แสดงการเปลี่ยนเป็นโอกาส ภัย หรือสัญญาณเฝ้าดู และสิ่งเปลี่ยนแต่ละนัย",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "ผลคือทะเบียนปัจจัยสำคัญเชื่อมเวลากลยุทธ์ ต้องสถานะหลักฐานและสัญญาณสังเกต ไม่พยากรณ์/โอกาสแต่ง"
+    },
+    {
+      "id": "pestel-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "คลังหยิบผิดซ้ำ สืบกระบวนการท้องถิ่น ระบุเหตุล้ม และเสนอแก้",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "ปัญหาในกระบวนการท้องถิ่นไม่มหภาค วิเคราะห์เหตุตรงกว่า อย่าเพิ่มภายนอกเพื่อเติมหมวด"
+    },
+    {
+      "id": "pestel-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "นโยบายใหม่กระทบพนักงาน ผู้รับจ้าง ลูกค้า และชุมชนไม่มีตัวแทน ทำแผนกำลัง อำนาจ ผลประโยชน์ ข้อกังวล และเจ้าของติดต่อ",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "บริบทนโยบายภายนอกแต่ผลชี้ขาดเป็นแผนผู้กระทำ/ติดต่อ อาจสับสน stakeholder analysis ไม่ขอหกหมวดสิ่งแวดล้อม"
+    },
+    {
+      "id": "pestel-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "ใส่คำอธิบายปัจจัยหกข้อที่ให้ในคอลัมน์ P, E, S, T, E และ L ไม่เปลี่ยนถ้อยคำ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "mechanical"
+      ],
+      "rationale": "ผู้ใช้ขอรูปแบบเนื้อหาให้เท่านั้น ไม่ต้องตัดสินความสำคัญ หลักฐาน หรือกลยุทธ์"
+    },
+    {
+      "id": "pestel-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้ PESTEL analysis ทบทวนเข้าตลาด เก็บเฉพาะปัจจัยสำคัญ ระบุสถานะหลักฐาน เวลา และนัยโอกาสหรือภัย",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "macro_environment"
+      ],
+      "rationale": "ขอวิธีชัดพร้อมสัญญาผลสาธารณะ ต้องตระหนักแหล่งและพักนัยที่พึ่งกฎปัจจุบันยังไม่ตรวจ"
+    },
+    {
+      "id": "pestel-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "ควรเข้าตลาดไหม ยังไม่ให้ประเทศ/เขตอำนาจ เวลาตัดสิน ขอบผลิตภัณฑ์ ฐาน หรือแหล่งสภาพภายนอกปัจจุบัน",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "boundary_sensitive",
+        "decisive_input_missing"
+      ],
+      "rationale": "เหมาะสำรวจภายนอกแต่ขอบและวันแหล่งขาดเปลี่ยนนัย ต้องพักและถามขอบชี้ขาด ไม่แต่งบริบทตลาด"
+    }
+  ]
+}

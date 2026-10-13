@@ -1,0 +1,83 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: value-of-information-positive-1
+    kind: positive
+    prompt: "เราเปิดตัวทันทีหรือศึกษาผู้ใช้ก่อนได้ ผลเรื่องการยอมรับจะนำไปสู่การกระทำเปิดตัวต่างกัน รู้วิธีศึกษาและต้นทุนตรงแล้ว และทีมมีวันที่ตายตัวซึ่งเลยไปจะยอมรับความล่าช้าไม่ได้"
+    expected_route: value-of-information
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - new_evidence
+      - sensitive_inputs
+    rationale: "ข้อมูลมีเส้นทางเปลี่ยนการกระทำที่ระบุและภาระเก็บที่มีขอบเขต กรณีไม่ต้องสร้างโอกาสสำเร็จหรือมูลค่าเงิน"
+  - id: value-of-information-positive-2
+    kind: positive
+    prompt: "ก่อนเซ็นสัญญาผู้จัดหา เราตรวจตัวแปรความเสี่ยงล้มเหลวที่อาจเปลี่ยนการเลือกผู้จัดหาได้ แหล่งตรวจ ต้นทุน ความล่าช้า และเกณฑ์ตัดสินมีเอกสาร ตัดสินว่าคุ้มตรวจหรือไม่"
+    expected_route: value-of-information
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - irreversible_choice
+      - sensitive_inputs
+    rationale: "ข้อมูลมาก่อนการตัดสินใจย้อนกลับไม่ได้และเชื่อมการกระทำต่าง แสดงที่มาและความล่าช้าได้โดยไม่สร้างความน่าจะเป็นหลังรับหลักฐาน"
+  - id: value-of-information-positive-3
+    kind: positive
+    prompt: "ทีมนโยบายต้องเลือกระหว่างขยายโครงการกับพักเพื่อประเมินเจาะจง การประเมินแยกผลที่จะขยายกับผลที่จะหยุดโครงการได้ และระบุความเสี่ยงกับเส้นตายประเมินแล้ว"
+    expected_route: value-of-information
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - information_purchase
+      - testable_hypothesis
+      - feedback_delay
+    rationale: "คำถามคือการทดสอบทำได้จริงเปลี่ยนการกระทำก่อนเส้นตายได้หรือไม่ ไม่ใช่คำขอวิจัยเพิ่มไร้ขอบเขต"
+  - id: value-of-information-negative-1
+    kind: negative
+    prompt: "หาทุกเรื่องน่าสนใจเกี่ยวกับทำงานทางไกลและสรุปวรรณกรรม ไม่ได้ระบุการตัดสินใจ เกณฑ์การกระทำ ตัวแปรไม่แน่นอน หรือเส้นตาย"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - explain
+      - source_quality
+    rationale: "เป็นวิจัยปลายเปิดไม่มีการตัดสินใจที่เปลี่ยนการกระทำ ประเมินคุณค่าข้อมูลไม่ได้จนให้การตัดสินใจและเกณฑ์"
+  - id: value-of-information-negative-2
+    kind: negative
+    prompt: "กฎความปลอดภัยกำหนดอุปกรณ์ป้องกันที่อนุมัติ ตัดสินว่าการวิจัยเพิ่มอาจทำให้ใช้อุปกรณ์ไม่อนุมัติได้เพราะถูกกว่าหรือไม่ กฎไม่ให้ดุลยพินิจ"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - binding_rule_without_discretion
+      - single_feasible_option
+    rationale: "ความสับสนตระกูลน่าจะเป็น deontic-reasoning หรือทบทวนความปลอดภัยโดยผู้มีคุณสมบัติ ข้อมูลใหม่ไม่ให้อำนาจแลกทิ้งกฎผูกพัน"
+  - id: value-of-information-mechanical-1
+    kind: mechanical
+    prompt: "ใช้สมการขนาดตัวอย่างและข้อมูลตรวจยืนยันที่ให้เพื่อส่งขนาดตัวอย่างที่ต้องมี อย่าเลือกว่าให้ทำการศึกษาหรือตีความคุณค่าต่อการตัดสินใจหรือไม่"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "เป็นการคำนวณตายตัว ไม่ใช่ตัดสินว่าข้อมูลเปลี่ยนการกระทำได้หรือไม่"
+  - id: value-of-information-explicit-1
+    kind: explicit
+    prompt: "ใช้ value-of-information ตัดสินว่าการตรวจนี้คุ้มต้นทุนและความล่าช้าหรือไม่ ระบุผลที่จะเปลี่ยนการเลือกผู้จัดหาและจุดที่หยุดตรวจ"
+    expected_route: value-of-information
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - information_purchase
+      - irreversible_choice
+    rationale: "ผู้ใช้เรียกวิธีชัดและขอข้อกำหนดเกณฑ์ การเปลี่ยนการกระทำ ต้นทุน ความล่าช้า และการหยุด"
+  - id: value-of-information-insufficiency-1
+    kind: insufficiency
+    prompt: "ควรสำรวจเพิ่มก่อนลงมือหรือไม่ ยังไม่ระบุการกระทำปัจจุบัน ทางอื่น ตัวแปรไม่แน่นอน การทดสอบที่เป็นไปได้ และความล่าช้าที่ยอมรับ"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - information_purchase
+      - decisive_input_missing
+    rationale: "หากไม่มีเกณฑ์การกระทำและเส้นทางข้อมูลทำได้จริง ระบุคุณค่าที่เปลี่ยนการกระทำไม่ได้ วิธีต้องพักและขอการชี้แจงขั้นต่ำที่ปลอดภัย"

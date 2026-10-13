@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "lateral-thinking-positive-01",
+      "kind": "positive",
+      "prompt": "ทีมปรับเส้นทางส่งเดิมซ้ำแล้วซ้ำอีกและต้องการท้าทายสมมติฐานว่าทุกคำสั่งซื้อต้องผ่านคลังกลาง",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "ชุดทางเลือกเก่าและต้องการการกระตุ้นเปลี่ยนกรอบก่อนประเมิน"
+    },
+    {
+      "id": "lateral-thinking-positive-02",
+      "kind": "positive",
+      "prompt": "คิวบริการสาธารณะไม่มีทางประมวลผลเร็วขึ้นแล้ว สร้างแนวคิดโดยกลับว่าใครเดินทาง บริการเมื่อไร หรืออะไรนับเป็นคิว",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "งานขอกรอบต่างและหลายแนวคิดชัดเจน แล้วจึงคัดกรอง"
+    },
+    {
+      "id": "lateral-thinking-positive-03",
+      "kind": "positive",
+      "prompt": "ทีมผลิตภัณฑ์เพิ่มฟีเจอร์ซ้ำเพื่อแก้การมีส่วนร่วมลด ท้าทายกรอบและสร้างทางเลือกที่ไม่เพิ่มฟีเจอร์",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "กรอบปรับปรุงเดิมขวางทางเลือกใหม่และควรถูกทำลายอย่างจงใจ"
+    },
+    {
+      "id": "lateral-thinking-negative-01",
+      "kind": "negative",
+      "prompt": "หลักฐานสัมภาษณ์ไม่ครบ ทีมต้องค้นความต้องการมนุษย์ สร้างต้นแบบบริการ และทดสอบพฤติกรรมผู้ใช้อย่างปลอดภัย",
+      "expected_route": "design-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "human_need",
+        "user_progress"
+      ],
+      "rationale": "ค้นความต้องการและทดสอบผู้ใช้เป็นหลัก การกระตุ้นลำพังข้ามหลักฐานจำเป็น"
+    },
+    {
+      "id": "lateral-thinking-negative-02",
+      "kind": "negative",
+      "prompt": "การ์ดป้องกันเครื่องจักรต้องตรงข้อกำหนดความปลอดภัยบังคับ ทีมถามว่าแบบผ่านการทดสอบจำเป็นหรือไม่",
+      "expected_route": "critical-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "critique",
+        "explicit_rules"
+      ],
+      "rationale": "การรับรองที่สำคัญต่อความปลอดภัยต้องใช้หลักฐานมีวินัยและข้อกำหนดมีอำนาจ ไม่ใช่กระตุ้นไร้ขอบ"
+    },
+    {
+      "id": "lateral-thinking-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "เรียงรายการทางเลือกตามอักษร รักษาทุกคำอธิบายและไม่สร้างทางเลือกใหม่",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "เรียงเป็นงานเชิงกล ไม่ขอท้าทายกรอบ"
+    },
+    {
+      "id": "lateral-thinking-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ lateral-thinking หาแนวทางที่ไม่เห็นได้ชัดสามแบบลดขยะงานประชุมโดยไม่เปลี่ยนกฎความปลอดภัย",
+      "expected_route": "lateral-thinking",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "stale_options",
+        "choose"
+      ],
+      "rationale": "ผู้ใช้ขอทางเลือกเปลี่ยนกรอบชัดพร้อมข้อจำกัดคุ้มครอง"
+    },
+    {
+      "id": "lateral-thinking-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "ไม่ทราบปัญหาและข้อจำกัดที่ต่อรองไม่ได้ คิดทางเลือกสุดขั้วแล้วแนะนำทันที",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "stale_options",
+        "decisive_input_missing"
+      ],
+      "rationale": "ไม่มีกรอบและข้อจำกัดคุ้มครอง จึงคัดกรองการกระตุ้นอย่างปลอดภัยไม่ได้"
+    }
+  ]
+}

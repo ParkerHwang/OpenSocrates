@@ -1,0 +1,110 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "double-loop-learning-positive-1",
+      "kind": "positive",
+      "prompt": "Le support a réduit son délai de réponse avec une nouvelle liste de contrôle, mais les escalades clients sont revenues après deux mois. Comparez attendu et réel, examinez objectif et règle ayant façonné la liste, puis concevez un test sûr pour une règle révisée.",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "governing_rule",
+        "repeat_iteration",
+        "testable_claim"
+      ],
+      "rationale": "Une correction de procédure n'a pas empêché la récurrence ; la tâche demande donc si objectif ou règle directrice doit changer. L'orientation sépare action de liste et hypothèse de règle, en étiquetant la provenance des escalades."
+    },
+    {
+      "id": "double-loop-learning-positive-2",
+      "kind": "positive",
+      "prompt": "Une politique de publication récompense la livraison à la date prévue et les équipes reportent régulièrement la fiabilité pour s'y tenir. Examinez objectif, incitation, autorité et hypothèse de cette politique, puis proposez un test borné de modification de règle.",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "governing_rule",
+        "feedback_delay",
+        "recurring_failure",
+        "chosen_plan"
+      ],
+      "rationale": "Le comportement récurrent pourrait être produit par la politique directrice plutôt qu'une erreur d'exécution. La procédure compare les règles candidates tout en gardant l'explication causale inférée ou non vérifiée jusqu'au test."
+    },
+    {
+      "id": "double-loop-learning-positive-3",
+      "kind": "positive",
+      "prompt": "Après deux révisions de formation, la même omission de transmission apparaît dans plusieurs équipes. Consignez l'écart, distinguez correction simple boucle de formation et changement de règle de transmission, puis précisez les éléments soutenant chacune.",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "governing_rule",
+        "repeat_iteration",
+        "testable_claim"
+      ],
+      "rationale": "Plusieurs récurrences et corrections simple boucle antérieures justifient l'examen de la règle directrice. Le résultat demandé concerne écart, règle, éléments et test d'apprentissage, pas blâme ou probabilité de récurrence."
+    },
+    {
+      "id": "double-loop-learning-negative-1",
+      "kind": "negative",
+      "prompt": "Un déploiement contient une coquille immédiatement détectée par le contrôle existant. Identifiez le défaut exact et corrigez-le sans changer la politique de publication.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "explicit_rules"
+      ],
+      "rationale": "Un défaut d'exécution borné est déjà expliqué et l'utilisateur exclut explicitement le changement de politique. La double boucle serait excessive ; une réponse ciblée au défaut convient."
+    },
+    {
+      "id": "double-loop-learning-negative-2",
+      "kind": "negative",
+      "prompt": "Nous avons un utilisateur cible et une hypothèse de prix. Concevez un test réversible sur une page d'accueil, choisissez une mesure exploitable et définissez la règle de pivot ou poursuite.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "plan",
+        "human_need"
+      ],
+      "rationale": "C'est une conception d'expérience lean-startup, confusion probable de famille. Aucun écart récurrent ni demande de révision de règle directrice n'est rapporté."
+    },
+    {
+      "id": "double-loop-learning-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Convertissez les trois durées d'incident de minutes en heures et renvoyez-les dans le même ordre.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "La conversion est déterministe et ne comporte aucun jugement d'écart récurrent, variable directrice ou test d'apprentissage."
+    },
+    {
+      "id": "double-loop-learning-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez l'apprentissage en double boucle. Montrez écart, hypothèse ou règle directrice, état probant, règle révisée candidate et test sûr ; n'attribuez pas de blâme personnel.",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "recurring_failure",
+        "governing_rule",
+        "testable_claim"
+      ],
+      "rationale": "L'utilisateur invoque explicitement méthode et contrat public. L'absence de blâme correspond à l'examen des règles, autorité, incitations et éléments plutôt qu'à l'inférence d'intention."
+    },
+    {
+      "id": "double-loop-learning-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Notre équipe échoue sans cesse. Dites quelle croyance ou politique changer et quelle expérience lancer. Nous n'avons ni résultat attendu, ni registre observé, ni limites de récurrence, ni règle actuelle à examiner.",
+      "expected_route": "double-loop-learning",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "recurring_failure",
+        "governing_rule"
+      ],
+      "rationale": "La méthode peut convenir, mais écart décisif et règle directrice manquent. Elle doit suspendre plutôt qu'inventer une explication profonde ou attribuer le problème à la mentalité."
+    }
+  ]
+}

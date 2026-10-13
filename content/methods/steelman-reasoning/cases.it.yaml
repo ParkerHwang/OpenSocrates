@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "steelman-reasoning-positive-01",
+      "kind": "positive",
+      "prompt": "Un consiglio liquida un’obiezione sulla riservatezza come allarmismo; ricostruiscine la versione più forte ed equa e indica se cambia la decisione di lancio.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "La preoccupazione contraria viene liquidata e può contenere un rischio rilevante che merita la sua formulazione equa più forte."
+    },
+    {
+      "id": "steelman-reasoning-positive-02",
+      "kind": "positive",
+      "prompt": "Due gruppi discutono sul lavoro da remoto e ciascuna parte ha obiettivo ed evidenze coerenti; identifica la versione più forte della posizione altrui prima di rispondere.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "Una posizione contraria autentica richiede ricostruzione benevola, requisiti di sostegno e una risposta equa."
+    },
+    {
+      "id": "steelman-reasoning-positive-03",
+      "kind": "positive",
+      "prompt": "Un critico di una politica viene citato solo mediante un’etichetta ostile; recupera l’affermazione effettiva, le sue premesse migliori e la parte che dovrebbe cambiare nella proposta.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "critique"
+      ],
+      "rationale": "Il compito separa esplicitamente l’affermazione pubblica da una caratterizzazione debole e ne verifica le conseguenze."
+    },
+    {
+      "id": "steelman-reasoning-negative-01",
+      "kind": "negative",
+      "prompt": "Un principio contrasta con diversi casi difficili ponderati e il gruppo deve rivedere il principio o i giudizi per ottenere maggiore coerenza.",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "Il risultato principale è la revisione reciproca tra principi e casi, non la ricostruzione di un avversario."
+    },
+    {
+      "id": "steelman-reasoning-negative-02",
+      "kind": "negative",
+      "prompt": "Un rapporto contiene affermazioni, ragioni, obiezioni e risposte che richiedono una mappa neutrale prima di valutare la parte contraria.",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "La mappa strutturale delle affermazioni dovrebbe essere stabilita prima di selezionare una ricostruzione steelman."
+    },
+    {
+      "id": "steelman-reasoning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Traduci in coreano l’opinione contraria citata e conservane il tono senza valutare o rafforzare la posizione.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "La traduzione è meccanica e non deve attivare la ricostruzione dell’argomentazione."
+    },
+    {
+      "id": "steelman-reasoning-explicit-01",
+      "kind": "explicit",
+      "prompt": "Usa steelman-reasoning sulla tesi più forte contro la nostra fusione e dimmi quali evidenze ci farebbero cambiare direzione.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "L’utente richiede esplicitamente una tesi contraria equa per una decisione dalle conseguenze rilevanti."
+    },
+    {
+      "id": "steelman-reasoning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Non esiste una dichiarazione contraria; inventa un avversario sofisticato e attribuiscilo alla comunità, così da poterlo sconfiggere.",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "dismissed_opposition",
+        "decisive_input_missing"
+      ],
+      "rationale": "Non esiste una vera posizione pubblica e inventarla falserebbe la rappresentazione delle persone anziché rafforzarne equamente l’argomento."
+    }
+  ]
+}

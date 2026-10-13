@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "falsificationism-positive-01",
+      "kind": "positive",
+      "prompt": "การสังเกตใดจะนับเป็นหลักฐานชี้ขาดขัดกับสมมติฐานผลิตภัณฑ์ที่เราชอบนี้?",
+      "expected_route": "falsificationism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_claim",
+        "critique"
+      ],
+      "rationale": "ข้ออ้างต้องมีคำทำนายเสี่ยงผิดและตัวหักล้างสังเกตได้ แทนเรื่องเล่ายืนยันเพิ่ม"
+    },
+    {
+      "id": "falsificationism-positive-02",
+      "kind": "positive",
+      "prompt": "เปลี่ยนคำอธิบายนี้เป็นการพยากรณ์ แยกสมมติฐานประกอบ และนิยามเกณฑ์ความล้มเหลวก่อนทดสอบ",
+      "expected_route": "falsificationism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_claim",
+        "critique"
+      ],
+      "rationale": "ผลที่ขอคือความพยายามหักล้างที่กำหนดก่อน พร้อมเงื่อนไขการวัด"
+    },
+    {
+      "id": "falsificationism-positive-03",
+      "kind": "positive",
+      "prompt": "คำทำนายที่ผิดทำให้น้ำหนักทฤษฎี การวัด หรือสมมติฐานประกอบของชุดทดสอบลดลง?",
+      "expected_route": "falsificationism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_claim",
+        "critique"
+      ],
+      "rationale": "วิธีต้องระบุว่าการทดสอบผิดท้าทายส่วนใดจริง"
+    },
+    {
+      "id": "falsificationism-negative-01",
+      "kind": "negative",
+      "prompt": "สร้างคำอธิบายหลายแบบสำหรับความผิดปกติ แล้วเปรียบเทียบว่าแบบใดอธิบายข้อเท็จจริงที่สังเกตได้ดีที่สุด",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "การสร้างคำอธิบายที่เป็นตัวเลือกเป็น abduction เมื่อยังไม่ระบุคำทำนายเสี่ยงผิด"
+    },
+    {
+      "id": "falsificationism-negative-02",
+      "kind": "negative",
+      "prompt": "จัดอันดับแหล่งเหล่านี้ตามความเข้มงวดรูปแบบ และปรับน้ำหนักข้ออ้างตามความเกี่ยวข้อง",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "งานปรับลำดับชั้นหลักฐานแทนพยายามหักล้าง"
+    },
+    {
+      "id": "falsificationism-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "คัดลอกคำทำนายและเกณฑ์ที่ลงทะเบียนล่วงหน้าลงแบบฟอร์มทดสอบ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การคัดลอกข้อกำหนดทดสอบที่ให้เป็นงานเชิงกล"
+    },
+    {
+      "id": "falsificationism-explicit-01",
+      "kind": "explicit",
+      "prompt": "เรียก falsificationism อย่างชัดเจนเพื่อท้าทายข้ออ้างว่าการแทรกแซงนี้เพิ่มการรักษาผู้ใช้เสมอ",
+      "expected_route": "falsificationism",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "testable_claim"
+      ],
+      "rationale": "ผู้ใช้เลือกการทดสอบมุ่งหักล้างข้ออ้างสากลอย่างชัดเจน"
+    },
+    {
+      "id": "falsificationism-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "ใช้ falsificationism กับข้ออ้างที่ไม่มีคำทำนายสังเกตได้และระบุสิ่งที่จะนับว่าขัดมันไม่ได้",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "testable_claim"
+      ],
+      "rationale": "ข้อห้ามใช้ที่คงไว้มีผล เมื่อไม่มีผลตามมาที่ทดสอบได้ วิธีต้องปฏิเสธแทนสร้างตัวหักล้าง"
+    }
+  ]
+}

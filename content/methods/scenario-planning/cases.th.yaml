@@ -1,0 +1,103 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "scenario-planning-positive-1",
+      "kind": "positive",
+      "prompt": "เมืองต้องเตรียมกลยุทธ์ที่อยู่อาศัยสิบปีขณะที่ย้ายถิ่นและเทคโนโลยีก่อสร้างอาจต่างอิสระ นิยามสองความไม่แน่นอนหลัก สร้างสี่อนาคตสอดคล้องไร้โอกาส และระบุ no-regret การกระทำตามเงื่อนไข และสัญญาณ",
+      "expected_route": "scenario-planning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "เวลาไกลและแรงภายนอกต้องกิ่งโครงแทนพยากรณ์เดียว ขอแกนอิสระ สี่สถานการณ์ การกระทำ/สัญญาณ และห้ามโอกาสชัด"
+    },
+    {
+      "id": "scenario-planning-positive-2",
+      "kind": "positive",
+      "prompt": "โครงการสุขภาพสาธารณะห้าปีอาจเจอความเชื่อสถาบันกับการเคลื่อนเชื้อแบบต่าง สร้างเมทริกซ์ 2×2 อธิบายแต่ละโลก ทดสอบแผน และสัญญาณสังเกตเพื่อทบทวน",
+      "expected_route": "scenario-planning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "new_evidence"
+      ],
+      "rationale": "ผู้ใช้ขออนาคตภายนอกสอดคล้อง เมทริกซ์ ทดสอบแรงแผนปัจจุบัน และสัญญาณ ไม่ขอพยากรณ์อันดับโอกาส"
+    },
+    {
+      "id": "scenario-planning-positive-3",
+      "kind": "positive",
+      "prompt": "กำลังเลือกเตรียมลงทุนแพลตฟอร์มศึกษาสิบปี กฎและพฤติกรรมผู้เรียนผลสูงแต่คาดยาก รักษาเหตุคาดได้ร่วม เลือกแกนอิสระ แยกการเตรียมทนทานจากการกระทำตามสัญญาณอนาคต",
+      "expected_route": "scenario-planning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "irreversible_choice",
+        "plan"
+      ],
+      "rationale": "เป็นเตรียมกรอบยาวกับไม่แน่นอนภายนอกสูง ขอแยกการกระทำร่วม/ตามเงื่อนไข วิธีต้องไม่ใส่โอกาส"
+    },
+    {
+      "id": "scenario-planning-negative-1",
+      "kind": "negative",
+      "prompt": "โมเดลรายได้รายไตรมาสมีสูตรฐานหนึ่ง เปลี่ยนอัตราแปลงและราคาผ่านช่วงปกป้องได้ แสดงเกณฑ์สลับ และจัดลำดับข้อมูลควรวิจัย",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "sensitive_inputs"
+      ],
+      "rationale": "อาจสับสน sensitivity analysis: มีโมเดล ช่วงข้อมูล และเกณฑ์สลับ ไม่แกนภายนอกอิสระ/อนาคตสอดคล้อง"
+    },
+    {
+      "id": "scenario-planning-negative-2",
+      "kind": "negative",
+      "prompt": "ใช้ชั้นอ้างอิงกำหนดดีของเปิดผลิตภัณฑ์เสร็จ ประเมินช่วงส่งที่เป็นไปได้ครั้งหน้าและเทียบวันภายใน",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases"
+      ],
+      "rationale": "ขอพยากรณ์ภายนอกจากกรณีอ้างเสร็จ เป็น reference-class forecasting ไม่กิ่งสถานการณ์"
+    },
+    {
+      "id": "scenario-planning-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "เรียงหมุดหมายมีวันสิบสองข้อเวลาและคืนรายการ ไม่มีอนาคตไม่แน่นอนหรือการตัดสินเตรียม",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "เป็นจัดลำดับกำหนดตายตัว ไม่มีภายนอกไม่แน่นอนหรือเลือกกลยุทธ์ให้ scenario planning จัด"
+    },
+    {
+      "id": "scenario-planning-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้ scenario-planning เป็นหลักกลยุทธ์เปลี่ยนพลังงานสิบปี ไม่ใส่โอกาส ใช้สองความไม่แน่นอนหลักอิสระ อธิบายสี่อนาคตชื่อและแนบ no-regret กับสัญญาณ",
+      "expected_route": "scenario-planning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "deep_uncertainty",
+        "macro_environment"
+      ],
+      "rationale": "ระบุวิธีและผลสถานการณ์ไร้โอกาสจำเป็นชัด การเลือกยังอยู่ใต้กฎหลักฐาน ขอบ และพัก"
+    },
+    {
+      "id": "scenario-planning-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "ให้สี่สถานการณ์อนาคต ไม่บอกการตัดสินสนับสนุน เวลา ขอบระบบ หรือไม่แน่นอนภายนอกสำคัญ",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "ไร้คำถาม เวลา ขอบ และการตัดสิน สี่เรื่องเป็นตกแต่งไร้ข้อจำกัด ต้องพักและขอเฉพาะกรอบขาด"
+    }
+  ]
+}

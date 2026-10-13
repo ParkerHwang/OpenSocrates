@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pragmatism-positive-01
+    kind: positive
+    prompt: "Dos marcos de gestión de proyectos cambian reuniones, prioridades y retroalimentación; compara consecuencias observables antes de elegir."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "Las interpretaciones difieren en acciones y pueden juzgarse mediante consecuencias prácticas acotadas."
+  - id: pragmatism-positive-02
+    kind: positive
+    prompt: "Una ciudad debe elegir entre dos políticas de acercamiento y puede ejecutar un piloto reversible con ventana y restricciones de seguridad acordadas."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose, value_conflict]
+    rationale: "La necesidad central es una elección práctica de política con prueba segura de aprendizaje."
+  - id: pragmatism-positive-03
+    kind: positive
+    prompt: "Una larga discusión sobre dos etiquetas no cambia decisiones ni predicciones; determina si son prácticamente equivalentes aquí."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "Debe comprobarse si el desacuerdo produce alguna diferencia práctica observable."
+  - id: pragmatism-negative-01
+    kind: negative
+    prompt: "Una fuente normativa impone informar y prohíbe divulgar; compara solo acciones que sigan permitidas."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "Deberes y prohibiciones vinculantes restringen las acciones antes de comparar consecuencias."
+  - id: pragmatism-negative-02
+    kind: negative
+    prompt: "Un equipo necesita identificar el momento difícil, la tarea funcional/emocional/social y fuerzas de cambio del usuario antes de elegir solución."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "El obstáculo es descubrir progreso del usuario, no comparar consecuencias de interpretaciones conocidas."
+  - id: pragmatism-mechanical-01
+    kind: mechanical
+    prompt: "Coloca las dos políticas en columnas contiguas sin comparar consecuencias ni recomendar ninguna."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "El formato en columnas es mecánico."
+  - id: pragmatism-explicit-01
+    kind: explicit
+    prompt: "Usa pragmatism para comparar dos manuales de respuesta a incidentes por sus cambios prácticos, con un ejercicio de mesa reversible."
+    expected_route: pragmatism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, practical_consequence, choose]
+    rationale: "Se solicita explícitamente comparación contextual de consecuencias y prueba."
+  - id: pragmatism-insufficiency-01
+    kind: insufficiency
+    prompt: "Opciones y criterio de éxito no están definidos; declara verdadera la interpretación reconfortante porque parece útil."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [practical_consequence, decisive_input_missing]
+    rationale: "Sin opciones, criterio y consecuencias observables no puede evaluarse utilidad."

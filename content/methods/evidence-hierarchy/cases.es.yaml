@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: evidence-hierarchy-positive-01
+    kind: positive
+    prompt: "¿Cuál de estos estudios apoya directamente la afirmación sobre el efecto y con qué firmeza debemos redactarla?"
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence, conflicting_sources]
+    rationale: "Se requieren correspondencia entre afirmaciones y fuentes, límites de calidad y solidez calibrada."
+  - id: evidence-hierarchy-positive-02
+    kind: positive
+    prompt: "Compara opinión experta, encuesta de usuarios y experimento controlado por aplicabilidad a esta decisión de política."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Deben ponderarse diseños distintos por carácter directo, sesgo y adecuación contextual."
+  - id: evidence-hierarchy-positive-03
+    kind: positive
+    prompt: "Las fuentes discrepan sobre el mecanismo; identifica límites de calidad y si debe suspenderse la afirmación."
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, conflicting_sources, reconcile_evidence]
+    rationale: "Un conflicto relevante exige calibrar el estado probatorio, no votar simplemente."
+  - id: evidence-hierarchy-negative-01
+    kind: negative
+    prompt: "Usa datos y métodos independientes para ver si las fuentes contradictorias convergen en la misma afirmación."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [reconcile_evidence, conflicting_sources, source_quality]
+    rationale: "La tarea principal es independencia y convergencia entre vías, propia de triangulation."
+  - id: evidence-hierarchy-negative-02
+    kind: negative
+    prompt: "Elige entre estas opciones según qué resultado encaje mejor con nuestros valores declarados."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [value_conflict, choose]
+    rationale: "La existencia de fuentes no convierte una preferencia de valores en problema de jerarquía probatoria."
+  - id: evidence-hierarchy-mechanical-01
+    kind: mechanical
+    prompt: "Ordena las citas proporcionadas por fecha de publicación y conserva sus títulos."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Ordenar citas es mecánico y no evalúa calidad ni aplicabilidad."
+  - id: evidence-hierarchy-explicit-01
+    kind: explicit
+    prompt: "Usa explícitamente evidence-hierarchy para ajustar esta afirmación de tipo médico a los diseños disponibles."
+    expected_route: evidence-hierarchy
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, source_quality]
+    rationale: "El usuario invoca explícitamente calibración de solidez probatoria para fuentes mixtas."
+  - id: evidence-hierarchy-insufficiency-01
+    kind: insufficiency
+    prompt: "Indica si la afirmación está fuertemente respaldada, pero no proporciones alcance, fuentes, diseños ni contexto objetivo."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [source_quality, decisive_input_missing]
+    rationale: "Sin datos de afirmación y fuentes ni contexto de aplicabilidad, la etiqueta de solidez sería arbitraria."

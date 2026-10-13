@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "conceptual-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "Que doit signifier une version sûre pour notre équipe lorsque les ingénieurs et la conformité emploient ce terme différemment ?",
+      "expected_route": "conceptual-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "ambiguous_terms",
+        "argument_dispute"
+      ],
+      "rationale": "Les sens concurrents et cas limites doivent être testés avant que le critère de publication puisse guider l'action."
+    },
+    {
+      "id": "conceptual-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "Cette politique est-elle équitable si les salariés divergent sur le sens d'équité : égalité de traitement ou égalité des chances ?",
+      "expected_route": "conceptual-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "ambiguous_terms",
+        "argument_dispute"
+      ],
+      "rationale": "La décision dépend de sens opérationnels concurrents et de leurs conséquences pour les cas."
+    },
+    {
+      "id": "conceptual-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "Définissez « prêt pour le lancement » pour que produit et support classent les cas limites de manière cohérente.",
+      "expected_route": "conceptual-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "ambiguous_terms"
+      ],
+      "rationale": "Une définition utilisable exige conditions nécessaires et suffisantes et tests de cas limites."
+    },
+    {
+      "id": "conceptual-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "Utilisez la spécification d'API publiée pour vérifier si cette requête respecte les champs obligatoires documentés.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules"
+      ],
+      "rationale": "La définition opérationnelle fait déjà autorité ; la tâche est une application directe de règle."
+    },
+    {
+      "id": "conceptual-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "Classez ces trois études selon leur qualité de conception et expliquez laquelle soutient directement l'affirmation d'effet.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "Le problème porte sur la qualité et l'applicabilité des éléments, pas le sens d'un terme contesté."
+    },
+    {
+      "id": "conceptual-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Remplacez chaque occurrence de « launch-ready » par « ready for launch » dans ce fichier.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Un remplacement littéral est mécanique et ne demande pas d'analyse conceptuelle."
+    },
+    {
+      "id": "conceptual-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez explicitement conceptual-analysis pour définir ce que « digne de confiance » signifie dans ce rapport client.",
+      "expected_route": "conceptual-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "ambiguous_terms"
+      ],
+      "rationale": "L'utilisateur invoque explicitement la méthode pour un terme ambigu ayant une conséquence sur le rapport."
+    },
+    {
+      "id": "conceptual-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Décidez si le concept contesté est satisfait, mais sans contexte, cas ni décision qu'il gouverne.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "ambiguous_terms",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans contexte ni cas, le sens opérationnel serait arbitraire et ne peut gouverner une décision sans risque."
+    }
+  ]
+}

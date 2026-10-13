@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "game-theory-positive-1",
+      "kind": "positive",
+      "prompt": "Si nous baissons le prix de notre abonnement, le concurrent principal peut suivre ou conserver son prix ; sa réponse changera notre rétention et marge. Comparez les réponses crédibles avant de recommander un coup.",
+      "expected_route": "game-theory",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "choose"
+      ],
+      "rationale": "La demande nomme des prix interdépendants et exige une analyse des réponses. L'orientation doit exposer les éléments de marge et rétention plutôt qu'inventer matrice de gains ou probabilité."
+    },
+    {
+      "id": "game-theory-positive-2",
+      "kind": "positive",
+      "prompt": "Nous négocions un contrat d'approvisionnement pluriannuel. Notre engagement de volume peut réduire le coût du fournisseur, mais il peut privilégier un autre acheteur si notre prévision est faible. Cartographiez incitations, informations et engagements crédibles.",
+      "expected_route": "game-theory",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "choose"
+      ],
+      "rationale": "Les deux parties s'adaptent et leurs gains dépendent de l'engagement adverse. La demande fournit une hypothèse structurelle, pas des coûts vérifiés ; la méthode doit étiqueter hypothèses et incertitude."
+    },
+    {
+      "id": "game-theory-positive-3",
+      "kind": "positive",
+      "prompt": "Deux plateformes envisagent une norme partagée d'interopérabilité. L'adoption crée de la valeur pour les deux, mais chacune peut attendre que l'autre paie l'intégration. Analysez réponses possibles et changement de conception rendant la coopération crédible.",
+      "expected_route": "game-theory",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "choose"
+      ],
+      "rationale": "La décision dépend de l'adoption réciproque et du coût du premier mouvement. Un résultat stable conditionnel peut aider, mais l'orientation ne doit pas l'appeler équilibre sans incitations étayées."
+    },
+    {
+      "id": "game-theory-negative-1",
+      "kind": "negative",
+      "prompt": "Choisissez une base de données interne selon latence, coût de stockage et capacité d'ingénierie. Aucun autre acteur ne peut changer le résultat.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "no_meaningful_interdependence"
+      ],
+      "rationale": "L'environnement est fixe et aucune réponse de joueur n'affecte le résultat. Ce n'est pas une interdépendance stratégique ; la méthode ne doit pas être sélectionnée."
+    },
+    {
+      "id": "game-theory-negative-2",
+      "kind": "negative",
+      "prompt": "Évaluez les forces politiques, économiques, sociales, technologiques, environnementales et juridiques susceptibles d'affecter notre entrée sur ce marché.",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "La demande peut influencer une stratégie, mais son résultat décisif est un examen de facteurs externes plutôt que réponses ou incitations de joueurs. C'est une confusion probable de famille ; aucun équilibre ne doit être inventé."
+    },
+    {
+      "id": "game-theory-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Calculez la moyenne pondérée de ces quatre prix contractuels avec les volumes fournis.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Le résultat est un calcul mécanique avec entrées fournies. Il n'exige pas de modéliser la réponse d'un autre acteur."
+    },
+    {
+      "id": "game-theory-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez la théorie des jeux pour analyser cette enchère d'achat. Montrez joueurs, actions, informations, temporalité et résultat stable conditionnel éventuel, sans inventer les gains manquants.",
+      "expected_route": "game-theory",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "interacting_actors"
+      ],
+      "rationale": "L'utilisateur nomme explicitement méthode et structure publique. Elle reste principale en préservant les gains manquants et sans probabilités fabriquées."
+    },
+    {
+      "id": "game-theory-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Devons-nous menacer le concurrent d'une réponse de prix ? Je n'ai identifié ni ses actions faisables, ni nos conséquences, ni les informations de chaque côté, ni si la relation se répète.",
+      "expected_route": "game-theory",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "interacting_actors"
+      ],
+      "rationale": "La question est stratégiquement interdépendante, mais la structure manquante détermine la crédibilité de la menace. La méthode doit suspendre et demander seulement les faits décisifs au lieu de prédire une réponse."
+    }
+  ]
+}

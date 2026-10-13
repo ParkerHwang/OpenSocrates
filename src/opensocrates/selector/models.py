@@ -15,7 +15,7 @@ from typing import Literal, Mapping
 from ..errors import IdentifierError
 from ..ids import validate_method_id
 
-SelectorLocale = Literal["en", "ko", "zh", "ja"]
+SelectorLocale = Literal["en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"]
 DEFAULT_SELECTOR_DEADLINE_SECONDS = 30
 MAX_SELECTOR_DEADLINE_SECONDS = 30
 MAX_TRANSIENT_PROMPT_BYTES = 256 * 1024
@@ -156,7 +156,18 @@ class SelectorRequest:
     def __post_init__(self) -> None:
         _require_bounded_text(self.prompt, "prompt", maximum=MAX_TRANSIENT_PROMPT_BYTES)
         for preference in (self.locale_preference, self.settings_locale_preference):
-            if preference is not None and preference not in {"en", "ko", "zh", "ja"}:
+            if preference is not None and preference not in {
+                "en",
+                "ko",
+                "zh",
+                "ja",
+                "fr",
+                "de",
+                "it",
+                "es",
+                "pt",
+                "th",
+            }:
                 raise SelectorModelError("selector locale preference is unsupported")
         object.__setattr__(
             self, "transcript_path", _optional_path(self.transcript_path, "transcript_path")

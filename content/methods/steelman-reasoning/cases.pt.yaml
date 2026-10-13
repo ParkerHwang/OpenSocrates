@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "steelman-reasoning-positive-01",
+      "kind": "positive",
+      "prompt": "Um conselho descarta objeção de privacidade como alarmismo; reconstrua versão mais forte e justa e diga se muda lançamento.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "A oposição descartada pode conter risco material que merece sua forma mais forte e justa."
+    },
+    {
+      "id": "steelman-reasoning-positive-02",
+      "kind": "positive",
+      "prompt": "Duas equipes discordam de trabalho remoto com objetivos e evidências coerentes; identifique melhor versão do outro lado antes de responder.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "Oposição genuína exige reconstrução caridosa, requisitos de apoio e resposta justa."
+    },
+    {
+      "id": "steelman-reasoning-positive-03",
+      "kind": "positive",
+      "prompt": "Um crítico de política aparece só por rótulo hostil; recupere afirmação real, melhores premissas e parte que a proposta deveria mudar.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "critique"
+      ],
+      "rationale": "Separa afirmação pública de caracterização fraca e testa consequências."
+    },
+    {
+      "id": "steelman-reasoning-negative-01",
+      "kind": "negative",
+      "prompt": "Um princípio conflita com casos difíceis ponderados; o grupo deve revisar princípio ou julgamentos para maior coerência.",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "A saída principal é revisão mútua de princípios e casos, não reconstrução de oponente."
+    },
+    {
+      "id": "steelman-reasoning-negative-02",
+      "kind": "negative",
+      "prompt": "Um relatório tem afirmações, fundamentos, objeções e respostas que precisam de mapa neutro antes de avaliar oposição.",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "O mapa estrutural deve preceder seleção de steelman."
+    },
+    {
+      "id": "steelman-reasoning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Traduza a oposição citada para coreano e preserve tom sem avaliar ou fortalecer posição.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "Tradução é mecânica e não deve disparar reconstrução do argumento."
+    },
+    {
+      "id": "steelman-reasoning-explicit-01",
+      "kind": "explicit",
+      "prompt": "Use steelman-reasoning no caso mais forte contra nossa fusão e diga que evidência nos faria mudar rumo.",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "O usuário pede oposição justa para decisão consequente."
+    },
+    {
+      "id": "steelman-reasoning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Não existe afirmação oposta; invente oponente sofisticado e atribua-o à comunidade para derrotá-lo.",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "dismissed_opposition",
+        "decisive_input_missing"
+      ],
+      "rationale": "Não há posição pública genuína; inventá-la deturpa pessoas em vez de reconstruí-las justamente."
+    }
+  ]
+}

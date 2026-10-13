@@ -56,7 +56,7 @@ class DecisionChecks(unittest.TestCase):
 
     def test_full_catalog_exact_locales(self):
         for method in self.bundle.method_ids:
-            for locale in ("en", "ko", "zh", "ja"):
+            for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
                 with self.subTest(method=method, locale=locale):
                     result = self.session.handle(request(method, locale=locale))
                     self.assertEqual(result["selected"], [method])
@@ -150,7 +150,7 @@ class DecisionChecks(unittest.TestCase):
         ko = self.session.handle(request("deduction", locale="ko"))
         self.assertNotEqual(en["methods"][0]["sha256"], ko["methods"][0]["sha256"])
         self.assertEqual(
-            self.session.handle(request("deduction", locale="fr"))["status"], "unavailable"
+            self.session.handle(request("deduction", locale="ru"))["status"], "unavailable"
         )
         self.session.handle({"operation": "reset"})
         self.assertEqual(self.session.available, set())
@@ -250,7 +250,7 @@ class DecisionChecks(unittest.TestCase):
         from opensocrates.domain.enums import Participation
         from opensocrates.domain.routing import route_features, validate_routing_payload
 
-        for locale in ("en", "ko", "zh", "ja"):
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
             for missing in ("no_defensible_prior_basis", "no_likelihood_direction"):
                 cues = ["new_evidence", "unknown_probability", "competing_explanations", missing]
                 for method in ("bayesian-updating", None):
@@ -275,7 +275,7 @@ class DecisionChecks(unittest.TestCase):
     def test_bayesian_ordinal_prior_and_direction_remain_eligible(self):
         # Fixture: a defensible ordinal prior ranks H1 above H2; a new signal
         # supports H2 over H1. Exact numeric probabilities are not available.
-        for locale in ("en", "ko", "zh", "ja"):
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
             result = self.session.handle(
                 request(
                     "bayesian-updating",
@@ -289,11 +289,10 @@ class DecisionChecks(unittest.TestCase):
             entry = next(m for m in catalog["methods"] if m["id"] == "bayesian-updating")
             self.assertIn("no_defensible_prior_basis", entry["routing"]["contraindications"])
             self.assertIn("no_likelihood_direction", entry["routing"]["contraindications"])
+            method = self.bundle.methods[self.bundle.method_ids.index("bayesian-updating")]
+            self.assertEqual(entry["use_for"], method.plain_action[locale])
             self.assertIn(
-                entry["use_for"],
-                self.bundle.methods[self.bundle.method_ids.index("bayesian-updating")].procedure[
-                    locale
-                ],
+                method.procedure[locale].rstrip("\n"), result["methods"][0]["instructions"]
             )
 
     def test_bayesian_compiled_projection_retains_prerequisite_exclusions(self):
@@ -501,7 +500,7 @@ class DecisionChecks(unittest.TestCase):
             root = (
                 ROOT / "build/generated/plugins" / host / "skills/opensocrates/references/decision"
             )
-            for locale in ("en", "ko", "zh", "ja"):
+            for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
                 catalog = json.loads((root / f"catalog.{locale}.json").read_text())
                 self.assertEqual({m["id"] for m in catalog["methods"]}, set(self.bundle.method_ids))
                 for item in catalog["methods"]:
@@ -548,7 +547,7 @@ class DecisionChecks(unittest.TestCase):
         for method in self.bundle.methods:
             hard_features = [*method.routing["contraindications"], "mechanical"]
             for forbidden in hard_features:
-                for locale in ("en", "ko", "zh", "ja"):
+                for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
                     with self.subTest(method=method.id, forbidden=forbidden, locale=locale):
                         result = self.session.handle(request(method.id, [forbidden], locale=locale))
                         self.assertEqual(result["selected"], [])
@@ -587,7 +586,7 @@ class LocaleCompatibilityChecks(unittest.TestCase):
         )
 
         english = participation_prompt("en")
-        for locale in ("en", "ko", "zh", "ja"):
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
             with self.subTest(locale=locale):
                 text = participation_prompt(locale)
                 self.assertEqual(build_participation_prompt(locale), text)
@@ -626,17 +625,54 @@ class LocaleCompatibilityChecks(unittest.TestCase):
                     validate_participation_decision(decision).participation,
                     Participation.MECHANICAL,
                 )
-        for invalid in ("fr", "ZH", "zh-CN", "", None, []):
+        for invalid in ("ru", "ZH", "zh-CN", "", None, []):
             with self.subTest(invalid=invalid):
                 with self.assertRaises(ValueError):
                     participation_prompt(invalid)
 
+    def test_exported_routing_api_preserves_closed_payload_in_all_locales(self):
+        from opensocrates.domain.routing import validate_routing_payload
+        from opensocrates.prompting import routing_prompt
+        from opensocrates.prompting.routing_prompt import build_routing_prompt, get_routing_prompt
+
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
+            with self.subTest(locale=locale):
+                text = routing_prompt(locale)
+                self.assertEqual(build_routing_prompt(locale), text)
+                self.assertEqual(get_routing_prompt(locale), text)
+                envelopes = [json.loads(line) for line in text.splitlines() if line.startswith("{")]
+                self.assertEqual(len(envelopes), 1)
+                payload = envelopes[0]
+                self.assertEqual(
+                    set(payload),
+                    {
+                        "schema",
+                        "answer_shape",
+                        "features",
+                        "classification_confidence",
+                        "explicit_method",
+                    },
+                )
+                self.assertEqual(payload["schema"], "opensocrates.routing-features/1.0.0")
+                self.assertIsNone(payload["explicit_method"])
+                payload.update(
+                    answer_shape="direct_judgment",
+                    classification_confidence="high",
+                    features=[{"key": "judgment", "strength": 3, "basis": "task_shape"}],
+                )
+                parsed = validate_routing_payload(payload)
+                self.assertTrue(parsed.structurally_valid)
+                self.assertFalse(parsed.invalid_feature_list)
+        for invalid in ("ru", "FR", "pt-BR", "th-TH", "", None, []):
+            with self.assertRaises(ValueError):
+                routing_prompt(invalid)
+
     def test_codex_adapter_rejects_unsupported_explicit_locale_before_selection(self):
         from opensocrates.hosts.codex.adapter import CodexAdapterConfig
 
-        for locale in (None, "en", "ko", "zh", "ja"):
+        for locale in (None, "en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
             self.assertEqual(CodexAdapterConfig(locale_preference=locale).locale_preference, locale)
-        for invalid in ("fr", "ZH", "zh-CN", "", False):
+        for invalid in ("ru", "ZH", "zh-CN", "", False):
             with self.subTest(invalid=invalid):
                 with self.assertRaises(ValueError):
                     CodexAdapterConfig(locale_preference=invalid)
@@ -681,7 +717,7 @@ class LocaleCompatibilityChecks(unittest.TestCase):
             layout.settings_file.chmod(0o600)
             store = SettingsStore(layout)
             runtime = SimpleNamespace(settings_store=store)
-            for locale in ("zh", "ja", "en", "ko", "follow"):
+            for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th", "follow"):
                 before = store.load()
                 output = io.StringIO()
                 self.assertEqual(
@@ -757,6 +793,75 @@ class LocaleCompatibilityChecks(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_compiled_bundle_shape(partial)
 
+    def test_v151_four_locale_bundle_shape_remains_compatible(self):
+        import tempfile
+        from copy import deepcopy
+
+        from opensocrates.content.hashes import normalized_semantic_hash
+        from opensocrates.content.schema import validate_compiled_bundle_shape
+        from opensocrates.domain.validation import canonical_json
+        from opensocrates.rendering.messages import LocaleCatalog
+        from opensocrates.rendering.response_policy import (
+            load_compiled_response_policy,
+            response_guidance,
+            validate_response_policy,
+        )
+
+        four = ("en", "ko", "zh", "ja")
+        legacy = json.loads((ROOT / "content/compiled-content.bundle.json").read_text())
+        legacy["product_version"] = "1.5.1"
+        legacy["content_revision"] = 4
+        legacy["locale_messages"] = {locale: legacy["locale_messages"][locale] for locale in four}
+        legacy["prompt_fragments"] = {
+            key: {locale: localized[locale] for locale in four}
+            for key, localized in legacy["prompt_fragments"].items()
+        }
+        for method in legacy["methods"]:
+            method["content_revision"] = 4
+            for field in ("procedure", "complement_fragment", "display_name", "plain_action"):
+                method[field] = {locale: method[field][locale] for locale in four}
+        semantic_fields = (
+            "content_revision",
+            "method_ids",
+            "methods",
+            "locale_messages",
+            "prompt_fragments",
+            "policy_versions",
+        )
+        legacy["normalized_semantic_hash"] = normalized_semantic_hash(
+            {key: legacy[key] for key in semantic_fields}
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "v151.bundle.json"
+            path.write_text(canonical_json(legacy))
+            loaded = load_compiled_bundle(path)
+            catalog = LocaleCatalog.from_bundle(loaded)
+            self.assertEqual(set(loaded.locale_messages), set(four))
+            self.assertEqual(loaded.content_revision, 4)
+            for locale in four:
+                self.assertTrue(catalog.lookup(locale, "message.status.title"))
+        policy = deepcopy(
+            load_compiled_response_policy(ROOT / "content/compiled-response-policy.json")
+        )
+        policy["locales"] = {locale: policy["locales"][locale] for locale in four}
+        validate_response_policy(policy)
+        for locale in four:
+            self.assertEqual(
+                response_guidance(policy, locale)["profile_id"], f"{locale}-natural-v1"
+            )
+        for partial_locales in (
+            {"en", "ko", "zh"},
+            {"en", "ko", "zh", "ja", "fr"},
+            {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt"},
+        ):
+            partial = deepcopy(legacy)
+            full = json.loads((ROOT / "content/compiled-content.bundle.json").read_text())
+            partial["locale_messages"] = {
+                locale: full["locale_messages"][locale] for locale in partial_locales
+            }
+            with self.assertRaises(ValueError):
+                validate_compiled_bundle_shape(partial)
+
     def test_legacy_teacher_question_model_round_trip_and_cjk_completeness(self):
         from opensocrates.domain.models import TeacherQuestionLocales
         from opensocrates.errors import ValidationError
@@ -772,6 +877,13 @@ class LocaleCompatibilityChecks(unittest.TestCase):
         full = TeacherQuestionLocales.from_dict(raw)
         self.assertEqual(len(full.zh), 3)
         self.assertEqual(len(full.ja), 3)
+        four = TeacherQuestionLocales.from_dict(
+            {locale: raw[locale] for locale in ("en", "ko", "zh", "ja")}
+        )
+        self.assertEqual(four.fr, ())
+        self.assertEqual(TeacherQuestionLocales.from_dict(four.to_dict()), four)
+        for locale in ("fr", "de", "it", "es", "pt", "th"):
+            self.assertEqual(len(getattr(full, locale)), 3)
         with self.assertRaises(ValidationError):
             TeacherQuestionLocales.from_dict({**pair, "zh": raw["zh"]})
 

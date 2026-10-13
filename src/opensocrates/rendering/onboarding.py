@@ -70,8 +70,10 @@ def render_onboarding(
     authored catalog value and is appended exactly once when requested.
     """
 
-    if locale not in {"en", "ko", "zh", "ja"}:
-        raise OnboardingRenderError("onboarding locale must be en, ko, zh, or ja")
+    if locale not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
+        raise OnboardingRenderError(
+            "onboarding locale must be en, ko, zh, ja, fr, de, it, es, pt, or th"
+        )
     if not isinstance(version, str) or not version:
         raise OnboardingRenderError("onboarding version is required")
     title = _authored(catalog, locale, "onboarding.title")
@@ -103,8 +105,13 @@ def render_onboarding(
         raise OnboardingRenderError("base English onboarding disclosure exceeds 90 words")
     if locale == "ko" and base_korean_units > KO_SPACING_LIMIT:
         raise OnboardingRenderError("base Korean onboarding disclosure exceeds 180 spacing units")
-    if locale in {"zh", "ja"} and sum(not char.isspace() for char in base) > CJK_CHARACTER_LIMIT:
-        raise OnboardingRenderError("base CJK onboarding disclosure exceeds 600 characters")
+    if (
+        locale in {"zh", "ja", "th"}
+        and sum(not char.isspace() for char in base) > CJK_CHARACTER_LIMIT
+    ):
+        raise OnboardingRenderError(
+            "base unsegmented-script onboarding disclosure exceeds 600 characters"
+        )
     if not text or text != text.strip():
         raise OnboardingRenderError("onboarding disclosure must be nonblank and trimmed")
     return OnboardingDisclosure(

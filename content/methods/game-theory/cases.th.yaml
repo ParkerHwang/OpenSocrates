@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "game-theory-positive-1",
+      "kind": "positive",
+      "prompt": "หากเราลดราคาสมาชิก คู่แข่งหลักลดตามหรือคงราคาได้ และการตอบสนองจะเปลี่ยนการรักษาผู้ใช้และกำไรของเรา เปรียบเทียบการตอบสนองที่น่าเชื่อถือก่อนแนะนำการเคลื่อนไหว",
+      "expected_route": "game-theory",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "choose"
+      ],
+      "rationale": "พรอมป์ต์ระบุการตั้งราคาที่พึ่งพากันและขอวิเคราะห์การตอบสนอง การเลือกวิธีควรเผยหลักฐานกำไรและการรักษาผู้ใช้แทนสร้างตารางผลตอบแทนหรือความน่าจะเป็น"
+    },
+    {
+      "id": "game-theory-positive-2",
+      "kind": "positive",
+      "prompt": "เรากำลังเจรจาสัญญาจัดหาหลายปี ข้อผูกพันปริมาณของเราอาจลดต้นทุนผู้จัดหา แต่ผู้จัดหาอาจให้ความสำคัญผู้ซื้ออื่นหากการพยากรณ์เราอ่อน ทำแผนที่แรงจูงใจ ข้อมูล และข้อผูกพันน่าเชื่อถือ",
+      "expected_route": "game-theory",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "choose"
+      ],
+      "rationale": "ทั้งสองฝ่ายปรับตัวได้และผลตอบแทนขึ้นกับข้อผูกพันอีกฝ่าย พรอมป์ต์ให้สมมติฐานโครงสร้าง ไม่ใช่ต้นทุนตรวจสอบแล้ว วิธีจึงต้องกำกับสมมติฐานและความไม่แน่นอน"
+    },
+    {
+      "id": "game-theory-positive-3",
+      "kind": "positive",
+      "prompt": "สองแพลตฟอร์มกำลังพิจารณามาตรฐานทำงานร่วมกัน การยอมรับสร้างคุณค่าให้ทั้งคู่ แต่ฝ่ายใดอาจรอให้อีกฝ่ายแบกต้นทุนเชื่อมระบบ วิเคราะห์การตอบสนองที่เป็นไปได้และการออกแบบที่ทำให้ความร่วมมือน่าเชื่อถือ",
+      "expected_route": "game-theory",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "choose"
+      ],
+      "rationale": "การตัดสินพึ่งการยอมรับตอบกันและต้นทุนลงมือก่อน ผลเสถียรมีเงื่อนไขอาจมีประโยชน์ แต่ห้ามเรียกดุลยภาพโดยไม่มีแรงจูงใจมีหลักฐานรองรับ"
+    },
+    {
+      "id": "game-theory-negative-1",
+      "kind": "negative",
+      "prompt": "เลือกฐานข้อมูลภายในโดยเทียบความหน่วง ต้นทุนเก็บข้อมูล และกำลังวิศวกรรม ไม่มีฝ่ายอื่นเปลี่ยนผลได้",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "no_meaningful_interdependence"
+      ],
+      "rationale": "สภาพแวดล้อมถือว่าคงที่และไม่มีการตอบสนองผู้เล่นกระทบผล ไม่ใช่การพึ่งพาเชิงกลยุทธ์ จึงไม่ควรเลือกวิธี"
+    },
+    {
+      "id": "game-theory-negative-2",
+      "kind": "negative",
+      "prompt": "ประเมินแรงด้านการเมือง เศรษฐกิจ สังคม เทคโนโลยี สิ่งแวดล้อม และกฎหมายที่อาจกระทบการเข้าตลาดนี้ของเรา",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "คำขออาจส่งผลต่อกลยุทธ์ แต่ผลชี้ขาดคือสำรวจปัจจัยภายนอกแทนการตอบสนองหรือแรงจูงใจผู้เล่น อาจสับสนในกลุ่มวิธี ห้ามสร้างดุลยภาพทฤษฎีเกม"
+    },
+    {
+      "id": "game-theory-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "คำนวณค่าเฉลี่ยถ่วงน้ำหนักของราคาสัญญาทั้งสี่โดยใช้ปริมาณที่ให้",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "ผลที่ขอเป็นการคำนวณเชิงกลจากข้อมูลเข้า ไม่ต้องจำลองการตอบสนองอีกฝ่าย"
+    },
+    {
+      "id": "game-theory-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้ทฤษฎีเกมวิเคราะห์การประมูลจัดซื้อนี้ แสดงผู้เล่น การกระทำ ข้อมูล เวลา และผลเสถียรมีเงื่อนไขใดๆ แต่อย่าสร้างผลตอบแทนที่ขาด",
+      "expected_route": "game-theory",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "interacting_actors"
+      ],
+      "rationale": "ผู้ใช้เอ่ยวิธีชัดและขอโครงสร้างสาธารณะ วิธีคงเป็นวิธีหลักโดยรักษาข้อมูลผลตอบแทนที่ขาดและเลี่ยงความน่าจะเป็นที่สร้างเอง"
+    },
+    {
+      "id": "game-theory-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "เราควรขู่คู่แข่งว่าจะตอบโต้ราคาหรือไม่? ฉันยังไม่ระบุการกระทำที่คู่แข่งทำได้ ผลต่อเรา ข้อมูลแต่ละฝ่าย หรือความสัมพันธ์จะเกิดซ้ำหรือไม่",
+      "expected_route": "game-theory",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "interacting_actors"
+      ],
+      "rationale": "คำถามมีการพึ่งพาเชิงกลยุทธ์ แต่โครงสร้างที่ขาดกำหนดว่าคำขู่น่าเชื่อถือหรือไม่ วิธีควรพักและขอเฉพาะข้อเท็จจริงชี้ขาดแทนทำนายการตอบสนอง"
+    }
+  ]
+}

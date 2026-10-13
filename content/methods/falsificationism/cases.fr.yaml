@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "falsificationism-positive-01",
+      "kind": "positive",
+      "prompt": "Quelle observation compterait de manière décisive contre cette hypothèse produit favorite ?",
+      "expected_route": "falsificationism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_claim",
+        "critique"
+      ],
+      "rationale": "L'affirmation exige une prédiction risquée et un réfutateur observable, plutôt que davantage d'anecdotes confirmatives."
+    },
+    {
+      "id": "falsificationism-positive-02",
+      "kind": "positive",
+      "prompt": "Transformez cette explication en prévision, séparez les hypothèses auxiliaires et définissez le seuil d'échec avant le test.",
+      "expected_route": "falsificationism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_claim",
+        "critique"
+      ],
+      "rationale": "Le résultat demandé est une tentative de réfutation préspécifiée avec conditions de mesure."
+    },
+    {
+      "id": "falsificationism-positive-03",
+      "kind": "positive",
+      "prompt": "L'échec de prédiction a-t-il affaibli la théorie, la mesure ou une hypothèse auxiliaire du dispositif ?",
+      "expected_route": "falsificationism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_claim",
+        "critique"
+      ],
+      "rationale": "La méthode doit localiser ce que le test échoué conteste réellement."
+    },
+    {
+      "id": "falsificationism-negative-01",
+      "kind": "negative",
+      "prompt": "Générez plusieurs explications de l'anomalie et comparez celle qui rend le mieux compte des faits observés.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "Générer des candidats relève de l'abduction si aucune prédiction risquée n'est précisée."
+    },
+    {
+      "id": "falsificationism-negative-02",
+      "kind": "negative",
+      "prompt": "Classez ces sources par rigueur de conception et ajustez la force de l'affirmation à leur applicabilité.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "La tâche calibre la hiérarchie probante plutôt qu'elle ne tente une réfutation."
+    },
+    {
+      "id": "falsificationism-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Copiez la prédiction préenregistrée et le seuil dans le formulaire de test.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Copier une spécification de test fournie est mécanique."
+    },
+    {
+      "id": "falsificationism-explicit-01",
+      "kind": "explicit",
+      "prompt": "Invoquez explicitement falsificationism pour contester l'affirmation que cette intervention améliore toujours la rétention.",
+      "expected_route": "falsificationism",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "testable_claim"
+      ],
+      "rationale": "L'utilisateur choisit explicitement un test orienté réfutation d'une affirmation universelle."
+    },
+    {
+      "id": "falsificationism-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Utilisez falsificationism sur une affirmation sans prédiction observable et qui ne peut préciser ce qui compterait contre elle.",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "testable_claim"
+      ],
+      "rationale": "La contre-indication figée s'applique : sans implication testable, la méthode doit refuser plutôt que fabriquer un réfutateur."
+    }
+  ]
+}

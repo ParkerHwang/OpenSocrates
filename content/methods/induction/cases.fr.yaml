@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "induction-positive-01",
+      "kind": "positive",
+      "prompt": "Ces observations répétées soutiennent-elles une affirmation générale sur la plupart des utilisateurs, et quelle est la force de cette généralisation ?",
+      "expected_route": "induction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "La tâche passe de cas observés à une affirmation de population bornée et exige vérifications d'échantillon et contre-exemples."
+    },
+    {
+      "id": "induction-positive-02",
+      "kind": "positive",
+      "prompt": "Évaluez si cet échantillon d'enquête justifie l'affirmation que les clients préfèrent le nouveau processus.",
+      "expected_route": "induction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "Représentativité, biais de sélection et force de généralisation sont centraux."
+    },
+    {
+      "id": "induction-positive-03",
+      "kind": "positive",
+      "prompt": "Que peut-on raisonnablement inférer pour le prochain trimestre de ces incidents passés, avec des contre-exemples plausibles ?",
+      "expected_route": "induction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "La prévision étend des cas répétés et doit indiquer périmètre et risque de contre-exemple."
+    },
+    {
+      "id": "induction-negative-01",
+      "kind": "negative",
+      "prompt": "Une règle stricte dit que chaque enregistrement admissible reçoit une approbation ; déterminez si ce cas suit la règle.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules",
+        "explain"
+      ],
+      "rationale": "La tâche est une application déductive, pas une généralisation d'échantillon."
+    },
+    {
+      "id": "induction-negative-02",
+      "kind": "negative",
+      "prompt": "Plusieurs explications correspondent à l'échec ; comparez-les et identifiez l'observation qui les départagerait.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "C'est un diagnostic abductif plutôt qu'une extension de l'échantillon à la population."
+    },
+    {
+      "id": "induction-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Ajoutez ces nouvelles observations à la base existante sans modifier aucune valeur.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Ajouter des données fournies est mécanique."
+    },
+    {
+      "id": "induction-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez explicitement induction pour évaluer si cette petite expérience soutient une affirmation produit plus large.",
+      "expected_route": "induction",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "repeated_observations"
+      ],
+      "rationale": "L'utilisateur choisit explicitement l'analyse du passage échantillon-généralisation."
+    },
+    {
+      "id": "induction-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Généralisez à partir de l'échantillon, mais sans population cible, processus d'échantillonnage, observations ni définition de mesure.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans fondement d'échantillon ni périmètre cible, la généralisation ne peut être bornée."
+    }
+  ]
+}

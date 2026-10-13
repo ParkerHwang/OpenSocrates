@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: jobs-to-be-done-positive-01
+    kind: positive
+    prompt: "Kleinbetriebe engagieren nach stressiger Steuerfrist Buchhalter; kläre Fortschritt, emotionale Beruhigung, soziales Signal und Alternativen."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Konkreter Problemmoment und mehrere Dimensionen erklären Beauftragung besser als Funktionen oder Demografie."
+  - id: jobs-to-be-done-positive-02
+    kind: positive
+    prompt: "Nutzer behalten langsame Tabelle statt neuem Werkzeug; kartiere Druck, Anziehung, Gewohnheit, Angst und Fortschritt."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Wechselkräfte, Nichtkonsum und beabsichtigter Fortschritt zentral."
+  - id: jobs-to-be-done-positive-03
+    kind: positive
+    prompt: "Verkehrsdienst fragt nach Fahrgastaufgabe auf nächtlicher Fahrt und beobachtbarem Erfolg."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Situationsbezogener funktionaler, emotionaler, sozialer Fortschritt samt Erfolgsmaß erforderlich."
+  - id: jobs-to-be-done-negative-01
+    kind: negative
+    prompt: "Beobachteter Nutzerfrust soll drei Prototypkonzepte und sicheren Test vor Produktbindung erzeugen."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "Hauptbedarf ist beobachtungsgeleitete Konzeptentwicklung und Prototyp statt allein Aufgabenkräfte."
+  - id: jobs-to-be-done-negative-02
+    kind: negative
+    prompt: "Produktteam vergleicht zwei Einstiegsoptionen anhand messbarer Folgen eines umkehrbaren Piloten."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "Praktischer Optionenvergleich statt Aufgabenentdeckung ist Engpass."
+  - id: jobs-to-be-done-mechanical-01
+    kind: mechanical
+    prompt: "Organisiere Kundeninterviewprotokolle in getrennte Dateien ohne Aufgaben- oder Motivinferenz."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Dateiordnung ist trotz Nutzerinterviews mechanisch."
+  - id: jobs-to-be-done-explicit-01
+    kind: explicit
+    prompt: "Nutze jobs-to-be-done zur Erklärung des Pendlerwechsels von Bus zu Roller bei Spätschicht."
+    expected_route: jobs-to-be-done
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, user_progress]
+    rationale: "Nutzer fordert Situations- und Wechselkräfteanalyse."
+  - id: jobs-to-be-done-insufficiency-01
+    kind: insufficiency
+    prompt: "Nur Funktionenliste vorhanden; erkläre universelle Aufgabe aller Kunden und marktweite Erfolgsrate."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [user_progress, decisive_input_missing]
+    rationale: "Funktionenliste belegt weder Situationsaufgabe noch Marktrate."

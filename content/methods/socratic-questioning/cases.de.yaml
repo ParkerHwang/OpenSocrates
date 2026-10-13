@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: socratic-questioning-positive-01
+    kind: positive
+    prompt: "Fragen Sie mich nur, was ändern würde, ob wir diese Leistung dieses Quartal einführen sollten."
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "Begrenzte entscheidungsändernde Fragen statt offenem Interview."
+  - id: socratic-questioning-positive-02
+    kind: positive
+    prompt: "Helfen Sie Annahmen meiner Behauptung prüfen; höchstens drei Fragen mit jeweiliger Bedeutung."
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "Kleine folgenbezogene Fragenmenge zur Urteilsklärung ausdrücklich nötig."
+  - id: socratic-questioning-positive-03
+    kind: positive
+    prompt: "Was „gute Evidenz“ hier bedeutet, ist unklar; stellen Sie wenige Fragen, die den Prüfmaßstab ändern."
+    expected_route: socratic-questioning
+    expected_behavior: route
+    decisive_features: [decisive_input_missing, ambiguous_terms]
+    rationale: "Fehlende Antworten verändern den Maßstab; ohne Fragenüberlastung sichtbar machen."
+  - id: socratic-questioning-negative-01
+    kind: negative
+    prompt: "Prüfen Sie anhand vorgegebener Anforderungen vollständige Implementierung und listen Sie fehlende Felder."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [review_completion, explicit_rules]
+    rationale: "Feste Regel und direkte Abschlussprüfung statt klärungsgeführtem Urteil."
+  - id: socratic-questioning-negative-02
+    kind: negative
+    prompt: "Definieren Sie den strittigen Begriff durch positive, negative und Grenzfälle."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [ambiguous_terms]
+    rationale: "Begriffliche Analyse selbst statt begrenzter Fragenfolge verlangt."
+  - id: socratic-questioning-mechanical-01
+    kind: mechanical
+    prompt: "Machen Sie aus diesen fünf Fragen eine nummerierte Markdown-Liste."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Mechanische Fragenformatierung darf keine weitere Befragung auslösen."
+  - id: socratic-questioning-explicit-01
+    kind: explicit
+    prompt: "Rufen Sie ausdrücklich socratic-questioning auf, um verborgene Entscheidungsprämissen zu prüfen."
+    expected_route: socratic-questioning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions]
+    rationale: "Methode und Prämissenfragen ausdrücklich benannt."
+  - id: socratic-questioning-insufficiency-01
+    kind: insufficiency
+    prompt: "Stellen Sie entscheidende Fragen, verraten Sie aber nicht Entscheidung, Behauptung, Reichweite oder betroffene Folge."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing]
+    rationale: "Ohne Ziel oder Folge keine Begrenzung oder Bestimmung entscheidender Fragen."

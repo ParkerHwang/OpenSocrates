@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: jobs-to-be-done-positive-01
+    kind: positive
+    prompt: "Pequenas empresas contratam contador após prazo fiscal estressante; descubra progresso, tranquilidade emocional, sinal social e alternativas envolvidos."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Momento específico de dificuldade e várias dimensões explicam contratação melhor que funcionalidades ou demografia."
+  - id: jobs-to-be-done-positive-02
+    kind: positive
+    prompt: "Usuários mantêm planilha lenta em vez de adotar nova ferramenta; mapeie pressão, atração, hábito, ansiedade e progresso desejado."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "A questão se centra em forças de troca, não consumo e progresso buscado."
+  - id: jobs-to-be-done-positive-03
+    kind: positive
+    prompt: "Um serviço de transporte quer saber o que passageiros pretendem realizar ao usá-lo numa viagem tarde da noite e como observar sucesso."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Exige progresso funcional, emocional e social específico da situação e medida de sucesso."
+  - id: jobs-to-be-done-negative-01
+    kind: negative
+    prompt: "Frustração observada deve gerar três conceitos de protótipo e teste seguro antes de compromisso de produto."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "A necessidade principal é gerar conceitos e protótipos com observação, não só analisar tarefa e forças."
+  - id: jobs-to-be-done-negative-02
+    kind: negative
+    prompt: "Uma equipe precisa comparar duas opções de integração pelas consequências mensuráveis em piloto reversível."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "O gargalo decisório é comparar opções práticas, não descobrir tarefa subjacente."
+  - id: jobs-to-be-done-mechanical-01
+    kind: mechanical
+    prompt: "Coloque transcrições de entrevistas em arquivos separados e não infira tarefa ou motivo."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Organizar arquivos é mecânico mesmo com entrevistas de usuários como entrada."
+  - id: jobs-to-be-done-explicit-01
+    kind: explicit
+    prompt: "Use jobs-to-be-done para explicar por que trabalhadores trocam ônibus por scooters durante turno tardio."
+    expected_route: jobs-to-be-done
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, user_progress]
+    rationale: "O usuário pede explicitamente análise de situação e forças de troca."
+  - id: jobs-to-be-done-insufficiency-01
+    kind: insufficiency
+    prompt: "Só há lista de funcionalidades; declare tarefa universal de todo cliente e estabeleça taxa de sucesso de mercado inteiro."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [user_progress, decisive_input_missing]
+    rationale: "Lista de funcionalidades não estabelece tarefa específica de situação nem taxa de todo o mercado."

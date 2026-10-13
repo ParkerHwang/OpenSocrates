@@ -1,0 +1,103 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "evidence-hierarchy-positive-01",
+      "kind": "positive",
+      "prompt": "การศึกษาใดในกลุ่มนี้รองรับข้ออ้างผลกระทบโดยตรง และถ้อยคำเราควรมีน้ำหนักเพียงใด?",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence",
+        "conflicting_sources"
+      ],
+      "rationale": "งานต้องเชื่อมข้ออ้างกับแหล่ง ระบุข้อจำกัดคุณภาพ และปรับน้ำหนักหลักฐาน"
+    },
+    {
+      "id": "evidence-hierarchy-positive-02",
+      "kind": "positive",
+      "prompt": "เปรียบเทียบความเห็นผู้เชี่ยวชาญ แบบสำรวจผู้ใช้ และการทดลองควบคุม ว่าใช้กับการตัดสินนโยบายนี้ได้เพียงใด",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "ต้องชั่งรูปแบบหลักฐานต่างกันด้วยความตรง อคติ และความเหมาะกับบริบท"
+    },
+    {
+      "id": "evidence-hierarchy-positive-03",
+      "kind": "positive",
+      "prompt": "แหล่งข้อมูลเห็นต่างเรื่องกลไก ระบุข้อจำกัดคุณภาพและว่าควรพักข้ออ้างหรือไม่",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "source_quality",
+        "conflicting_sources",
+        "reconcile_evidence"
+      ],
+      "rationale": "ความขัดแย้งแหล่งที่สำคัญต้องปรับสถานะหลักฐาน ไม่ใช่โหวตง่ายๆ"
+    },
+    {
+      "id": "evidence-hierarchy-negative-01",
+      "kind": "negative",
+      "prompt": "ใช้ข้อมูลและวิธีอิสระเพื่อตรวจว่าแหล่งที่ขัดกันบรรจบข้ออ้างเดียวกันหรือไม่",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "reconcile_evidence",
+        "conflicting_sources",
+        "source_quality"
+      ],
+      "rationale": "งานหลักคือความเป็นอิสระและการบรรจบระหว่างสายหลักฐาน ซึ่งเป็น triangulation"
+    },
+    {
+      "id": "evidence-hierarchy-negative-02",
+      "kind": "negative",
+      "prompt": "เลือกระหว่างทางเลือกเหล่านี้ตามว่าผลใดตรงกับคุณค่าที่เราระบุที่สุด",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "value_conflict",
+        "choose"
+      ],
+      "rationale": "ความชอบด้านคุณค่าไม่ได้เป็นปัญหาลำดับชั้นหลักฐานเพียงเพราะมีแหล่งข้อมูล"
+    },
+    {
+      "id": "evidence-hierarchy-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "เรียงรายการอ้างอิงที่ให้ตามวันเผยแพร่และคงชื่อเรื่อง",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การเรียงอ้างอิงเป็นงานเชิงกล ไม่ประเมินคุณภาพหรือความเกี่ยวข้อง"
+    },
+    {
+      "id": "evidence-hierarchy-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ evidence-hierarchy อย่างชัดเจนเพื่อปรับน้ำหนักข้ออ้างลักษณะทางการแพทย์นี้ให้ตรงรูปแบบการศึกษาที่มี",
+      "expected_route": "evidence-hierarchy",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "source_quality"
+      ],
+      "rationale": "ผู้ใช้เรียกการปรับน้ำหนักหลักฐานสำหรับแหล่งผสมชัดเจน"
+    },
+    {
+      "id": "evidence-hierarchy-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "บอกว่าข้ออ้างมีหลักฐานรองรับหนักแน่นหรือไม่ แต่ไม่ให้ขอบเขตข้ออ้าง แหล่ง รูปแบบ หรือบริบทเป้าหมาย",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "เมื่อไม่มีข้อมูลเชื่อมข้ออ้างกับแหล่งและบริบทความเกี่ยวข้อง ป้ายน้ำหนักย่อมไม่มีฐาน"
+    }
+  ]
+}

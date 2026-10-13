@@ -1,0 +1,58 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "game-theory-positive-1"
+    kind: positive
+    prompt: "Senken wir Abopreis, kann Wettbewerber mitziehen oder Preis halten; Reaktion ändert Bindung und Marge. Vergleiche glaubwürdige Antworten vor Zugempfehlung."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "Wechselabhängige Preishandlungen und Reaktionsanalyse benannt. Margen-/Bindungsbelege offenlegen statt Auszahlungstabellen oder Wahrscheinlichkeiten erfinden."
+  - id: "game-theory-positive-2"
+    kind: positive
+    prompt: "Wir verhandeln mehrjährigen Liefervertrag. Mengenbindung könnte Lieferkosten senken, aber schwache Prognose lässt Anbieter andere Käufer bevorzugen. Kartiere Anreize, Information und Bindungen."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "Beide passen sich an; Auszahlungen hängen gegenseitig von Bindung ab. Strukturhypothese statt geprüfter Kosten verlangt Annahmen und Unsicherheit."
+  - id: "game-theory-positive-3"
+    kind: positive
+    prompt: "Zwei Plattformen erwägen Interoperabilitätsstandard. Beide gewinnen, aber könnten warten, bis die andere Integration bezahlt. Analysiere Antworten und glaubwürdig kooperationsfördernden Entwurf."
+    expected_route: "game-theory"
+    expected_behavior: route
+    decisive_features: [interacting_actors, choose]
+    rationale: "Gegenseitige Annahme und Erstzugskosten entscheiden. Bedingte Stabilität möglich, kein unbelegtes Anreizgleichgewicht."
+  - id: "game-theory-negative-1"
+    kind: negative
+    prompt: "Wähle interne Datenbank nach Latenz, Speicherpreis und Technikfähigkeit. Kein anderer Akteur ändert Ergebnis."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [no_meaningful_interdependence]
+    rationale: "Feste Umwelt ohne Spielerreaktion; keine strategische Wechselabhängigkeit und kein Routing."
+  - id: "game-theory-negative-2"
+    kind: negative
+    prompt: "Bewerte politische, wirtschaftliche, soziale, technologische, ökologische und rechtliche Kräfte unseres Markteintritts."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features: [macro_environment, forecast]
+    rationale: "Strategierelevant, aber externe Faktoren statt Spielerreaktionen/Anreize. Familienverwechslung; kein erfundenes Gleichgewicht."
+  - id: "game-theory-mechanical-1"
+    kind: mechanical
+    prompt: "Berechne gewichteten Mittelwert dieser vier Vertragspreise mit vorgegebenen Mengen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Mechanische Rechnung mit Eingaben ohne Modellierung anderer Akteurreaktion."
+  - id: "game-theory-explicit-1"
+    kind: explicit
+    prompt: "Nutze Spieltheorie für Beschaffungsauktion. Zeige Spieler, Handlungen, Information, Timing und bedingte stabile Ergebnisse; keine fehlenden Auszahlungen erfinden."
+    expected_route: "game-theory"
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, interacting_actors]
+    rationale: "Nutzer fordert Verfahren und Struktur; primär mit fehlenden Auszahlungen und ohne Fantasiewahrscheinlichkeiten."
+  - id: "game-theory-insufficiency-1"
+    kind: insufficiency
+    prompt: "Sollten wir Wettbewerber mit Preisreaktion bedrohen? Seine Optionen, unsere Folgen, beider Informationen und Wiederholung sind nicht identifiziert."
+    expected_route: "game-theory"
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, interacting_actors]
+    rationale: "Strategisch abhängig, aber fehlende Struktur bestimmt Drohglaubwürdigkeit. Aussetzen und nur entscheidende Fakten statt Reaktionsprognose anfordern."

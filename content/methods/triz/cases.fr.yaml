@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "triz-positive-01",
+      "kind": "positive",
+      "prompt": "Un drone de livraison nécessite plus de batterie, mais le poids ajouté réduit l’autonomie ; trouvez un concept séparant ou supprimant la contradiction.",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "L’amélioration technique dégrade un paramètre et appelle idéal, séparation et démarches inventives."
+    },
+    {
+      "id": "triz-positive-02",
+      "kind": "positive",
+      "prompt": "Une chambre d’hôpital exige simultanément plus d’intimité et une observation facilitée ; explorez les séparations de temps, espace, condition et interface.",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "Le problème décrit une contradiction physique ou technique avec conditions séparables et contraintes de sécurité."
+    },
+    {
+      "id": "triz-positive-03",
+      "kind": "positive",
+      "prompt": "Une chaîne d’emballage doit accélérer sans accroître les dégâts ; cherchez dans le temps, l’espace, l’information et les matériaux existants une conception sans compromis.",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "L’utilisateur veut des concepts inventifs supprimant un compromis de conception plutôt qu’optimiser un paramètre."
+    },
+    {
+      "id": "triz-negative-01",
+      "kind": "negative",
+      "prompt": "La décision oppose deux valeurs publiques et porte sur les droits ou devoirs prioritaires, pas sur une contradiction technique de conception.",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "duties_rights"
+      ],
+      "rationale": "Autorité normative et droits, pas démarches inventives, déterminent l’orientation."
+    },
+    {
+      "id": "triz-negative-02",
+      "kind": "negative",
+      "prompt": "Un système a des boucles interactives et effets secondaires retardés ; cartographiez structure et levier avant de choisir un concept local.",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "Le besoin dominant est la dynamique systémique et le levier, pas la résolution locale de contradiction."
+    },
+    {
+      "id": "triz-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Listez les paramètres existants du produit dans l’ordre demandé sans identifier de contradictions ni proposer de concepts.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "La liste est mécanique et ne demande pas de résolution inventive."
+    },
+    {
+      "id": "triz-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez triz pour la contradiction entre emballage plus léger et protection renforcée contre les chocs, puis proposez un test réversible.",
+      "expected_route": "triz",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "technical_contradiction"
+      ],
+      "rationale": "L’utilisateur invoque explicitement la méthode pour une contradiction technique et un test."
+    },
+    {
+      "id": "triz-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Les propriétés améliorée et dégradée sont inconnues ; déclarez la conception idéale atteinte et un gain de performance garanti.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "technical_contradiction",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans contradiction ni test définis, idéalité et amélioration ne peuvent être établies honnêtement."
+    }
+  ]
+}

@@ -7,13 +7,14 @@
 **理解し、評価し、使える結果を得るための思考支援。**
 
 OpenSocrates は、資料の統合、関係者の視点の理解、選択肢の比較、メッセージの
-作成を支える 48 種類の思考法を提供します。v1.5.1 では簡体字中国語（`zh`）と
-日本語（`ja`）を追加し、既存の英語・韓国語の方法本文を維持します。4 言語で
-完全な手順ファイルは 192 個、各方法・言語にエージェント向けの問いが 3 個ずつ、
-合計 576 個あります。コンテンツリビジョンは 4 です。プログラミング専用の
-方法は今回の更新には含みません。
+作成を支える 48 種類の思考法を提供します。v1.5.2 は既存の英語・韓国語・簡体字
+中国語・日本語に、フランス語・ドイツ語・イタリア語・スペイン語・ポルトガル語・
+タイ語を追加します。10 言語で完全な手順ファイルは 480 個、正典の事例は 3,840 個、
+各方法・言語に 3 個ずつの問いがあり、合計 1,440 個です。コンテンツリビジョンは
+5 です。既存 4 言語の本文と値は維持し、各方法のリビジョン識別は 4 から 5 に
+更新します。プログラミング専用の方法は今回の更新には含みません。
 
-[English](README.md) | [한국어](README.ko.md) | [简体中文](README.zh.md) | **日本語**
+[English](README.md) | [한국어](README.ko.md) | [简体中文](README.zh.md) | **日本語** | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | [ไทย](README.th.md)
 
 **ツールを探すエージェントへ：**[課題への適合性、リリースパッケージの選択、設定確認（英語ガイド）](docs/agent-discovery.md)。
 
@@ -34,14 +35,14 @@ OpenSocrates は、資料の統合、関係者の視点の理解、選択肢の�
 
 Node.js 20 以降を用意し、利用するアプリをインストールしてログインします。
 ネイティブランタイムは同梱されており、Python の追加インストールは不要です。
-[v1.5.1 リリース](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.1)から
+[v1.5.2 リリース](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)から
 アーカイブと SHA-256 ファイルを取得するか、次のバージョン固定コマンドを使います。
 
 ```sh
-npx --yes opensocrates@1.5.1 install --host codex
-npx --yes opensocrates@1.5.1 status --host codex
+npx --yes opensocrates@1.5.2 install --host codex
+npx --yes opensocrates@1.5.2 status --host codex
 # 既存の Codex インストールを更新：
-npx --yes opensocrates@1.5.1 update --host codex
+npx --yes opensocrates@1.5.2 update --host codex
 ```
 
 対話型 Codex で `/hooks` を入力し、OpenSocrates の 7 個のフックを確認して、
@@ -52,8 +53,8 @@ npx --yes opensocrates@1.5.1 update --host codex
 Apple Silicon Mac で Claude Code 連携を導入する場合：
 
 ```sh
-npx --yes opensocrates@1.5.1 install --host claude
-npx --yes opensocrates@1.5.1 status --host claude
+npx --yes opensocrates@1.5.2 install --host claude
+npx --yes opensocrates@1.5.2 status --host claude
 ```
 
 Antigravity のワークスペースには、既存ディレクトリの絶対パスを指定します。
@@ -61,7 +62,7 @@ Antigravity のワークスペースには、既存ディレクトリの絶対�
 重複して適用しないようにします。
 
 ```sh
-npx --yes opensocrates@1.5.1 install --host antigravity --workspace /absolute/path/to/workspace
+npx --yes opensocrates@1.5.2 install --host antigravity --workspace /absolute/path/to/workspace
 ```
 
 Windows では `"C:\Work\Reading Workshop"` のようなローカルドライブの絶対パスを
@@ -69,7 +70,7 @@ Windows では `"C:\Work\Reading Workshop"` のようなローカルドライブ
 パスにエクスポートします。
 
 ```sh
-npx --yes opensocrates@1.5.1 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.1-account.zip
+npx --yes opensocrates@1.5.2 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.2-account.zip
 ```
 
 その後 Claude の **Customize → Skills** でアップロードして有効化します。
@@ -94,20 +95,24 @@ instructions** を使います。Web と Desktop のアカウントが異なる�
 自動更新の機能はありません。
 [設定ガイド（英語）](docs/setup-guide.md)で画面上の手順を確認できます。
 [Mac ガイド](docs/macos-v1.5.md)と [Windows ガイド](docs/windows-v1.5.md)は
-v1.5.0 の導入・復旧の基準を保持しています。現在のコマンドには上記の 1.5.1 を使います。
+v1.5.0 の導入・復旧の基準を保持しています。現在のコマンドには上記の 1.5.2 を使います。
 
 ## 指示の言語
 
 明示的に指定した言語、保存した言語設定、現在の入力の文字判定の順に選びます。
-ひらがな・カタカナが含まれる場合は日本語を選びます。それ以外はハングルが
+ひらがな・カタカナが含まれる場合は日本語を選びます。それ以外はタイ文字が優勢ならタイ語、ハングルが
 優勢なら韓国語、漢字が優勢なら中国語です。漢字だけの入力では中国語と日本語を
 確実に区別できず、中国語が既定になります。日本語が必要な場合は明示的に指定
-してください。空の入力、ラテン文字だけの入力、判定が同数の場合は英語になります。
+してください。フランス語・ドイツ語・イタリア語・スペイン語・ポルトガル語はラテン文字を
+共有するため、明示的な指定または保存した設定が必要です。文字からこれらの言語を
+確実に推定することはしません。空の入力、未知の文字、同数の場合は英語です。
+ポルトガル語は汎用の `pt` コードでブラジル式の綴りを使い、地域別の対応は主張しません。
 
 思考指示の言語は、npm インストーラーのコマンド出力やアプリの表示言語とは
 別です。今回の更新はすべてのインストーラーメッセージの翻訳を約束するものでは
 ありません。ランタイムの `locale` 設定コマンドと明示的な JSON リクエストは
-[言語と対応範囲のガイド（英語）](docs/v1.5.1.md)を参照してください。
+[言語と対応範囲のガイド（英語）](docs/v1.5.2.md)と
+[言語設定（英語）](docs/settings.md)を参照してください。
 
 ## 出典表示とプライバシー
 

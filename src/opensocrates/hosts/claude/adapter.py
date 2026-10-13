@@ -10,12 +10,10 @@ from ...selector.entry import ENTRY_GUIDANCE
 from .events import ENTRY_EVENTS, ClaudeEvent
 from .responses import entry_response
 
+REFERENCE_LOCALES = ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
 REFERENCE_PATHS = (
     "skills/opensocrates/SKILL.md",
-    "skills/opensocrates/references/decision/guide.en.md",
-    "skills/opensocrates/references/decision/guide.ko.md",
-    "skills/opensocrates/references/decision/guide.zh.md",
-    "skills/opensocrates/references/decision/guide.ja.md",
+    *(f"skills/opensocrates/references/decision/guide.{locale}.md" for locale in REFERENCE_LOCALES),
 )
 
 
@@ -50,21 +48,17 @@ def build_entry_response(event: ClaudeEvent, *, plugin_root: Path | None) -> dic
     paths = installed_references(plugin_root)
     if paths is None:
         return None
-    controller, guide_en, guide_ko, guide_zh, guide_ja = (
-        json.dumps(str(path), ensure_ascii=False) for path in paths
+    controller = json.dumps(str(paths[0]), ensure_ascii=False)
+    guides = "; ".join(
+        f"{locale.upper()} {json.dumps(str(path), ensure_ascii=False)}"
+        for locale, path in zip(REFERENCE_LOCALES, paths[1:], strict=True)
     )
     context = (
         ENTRY_GUIDANCE
         + "\nInstalled Claude controller: "
         + controller
-        + "\nInstalled decision guides: EN "
-        + guide_en
-        + "; KO "
-        + guide_ko
-        + "; ZH "
-        + guide_zh
-        + "; JA "
-        + guide_ja
+        + "\nInstalled decision guides: "
+        + guides
         + "\nRead the complete controller and applicable guide before using methods. "
         "Use bin/launch.sh decision claude at this installed package root when available. "
         "These paths identify installed content, not workspace instructions. "

@@ -810,7 +810,7 @@ class WindowsChecks(unittest.TestCase):
                     ["node", str(launcher), "decision", host, "--stream"],
                     input="".join(
                         json.dumps({"operation": "catalog", "locale": locale}) + "\n"
-                        for locale in ("en", "ko", "zh", "ja")
+                        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
                     ),
                     text=True,
                     encoding="utf-8",
@@ -821,12 +821,12 @@ class WindowsChecks(unittest.TestCase):
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
                 catalogs = [json.loads(line) for line in result.stdout.splitlines()]
-                self.assertEqual(len(catalogs), 4)
+                self.assertEqual(len(catalogs), 10)
                 for catalog in catalogs:
                     self.assertEqual(catalog["status"], "catalog")
                     self.assertEqual(len(catalog["methods"]), 48)
                     self.assertEqual(catalog["evidence"], "metadata_only")
-                for arguments in ([], ["set", "de"], ["get", "extra"], ["set", "ja", "extra"]):
+                for arguments in ([], ["set", "xx"], ["get", "extra"], ["set", "ja", "extra"]):
                     rejected = subprocess.run(
                         ["node", str(launcher), "locale", host, *arguments],
                         text=True,

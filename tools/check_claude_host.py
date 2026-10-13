@@ -194,7 +194,7 @@ class ClaudeContractTests(unittest.TestCase):
         self.assertEqual(self.call(_payload()), "")
 
     def test_each_locale_guide_is_required_for_native_entry(self) -> None:
-        for locale in ("en", "ko", "zh", "ja"):
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"):
             with self.subTest(locale=locale):
                 guide = self.root / f"skills/opensocrates/references/decision/guide.{locale}.md"
                 contents = guide.read_bytes()
@@ -342,7 +342,7 @@ class ClaudeLauncherTests(unittest.TestCase):
             result = self.invoke("locale", "claude", action)
             self.assertEqual(result.stdout, f"argv:locale {action}\nsynthetic-stdin\n")
             self.assertEqual((result.returncode, result.stderr), (0, ""))
-        for locale in ("en", "ko", "zh", "ja", "follow"):
+        for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th", "follow"):
             result = self.invoke("locale", "claude", "set", locale)
             self.assertEqual(result.stdout, f"argv:locale set {locale}\nsynthetic-stdin\n")
             self.assertEqual((result.returncode, result.stderr), (0, ""))

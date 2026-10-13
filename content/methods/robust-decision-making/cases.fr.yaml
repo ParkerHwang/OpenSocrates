@@ -1,0 +1,109 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "robust-decision-making-positive-1",
+      "kind": "positive",
+      "prompt": "Nous devons choisir une protection contre les inondations pour une infrastructure fonctionnant pendant des décennies. Précipitations, usage des sols et financement sont profondément incertains ; il faut une option dépassant le plancher de sécurité publié dans les mondes plausibles plutôt qu’une gagnante sous une seule prévision.",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "irreversible_choice",
+        "choose",
+        "failure_risk"
+      ],
+      "rationale": "La décision est importante et difficile à inverser, les incertitudes interagissent et l’utilisateur demande une action acceptable dans les mondes plausibles. Aucun optimum pondéré par probabilité n’est requis."
+    },
+    {
+      "id": "robust-decision-making-positive-2",
+      "kind": "positive",
+      "prompt": "Notre chaîne d’approvisionnement doit résister à des droits de douane, une demande et une fiabilité fournisseurs incertains durant les huit prochaines années. Comparez les stratégies faisables selon critères d’échec et de regret, montrez les compromis et ajoutez des déclencheurs adaptatifs.",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "irreversible_choice",
+        "failure_risk",
+        "feedback_delay"
+      ],
+      "rationale": "La consigne demande des tests de résistance stratégie-scénario, critères d’échec explicites et déclencheurs adaptatifs. Ce sont les résultats publics de la décision robuste sous incertitude profonde."
+    },
+    {
+      "id": "robust-decision-making-positive-3",
+      "kind": "positive",
+      "prompt": "Nous avons trois options d’investissement régional dans les transports, mais télétravail, prix du carburant et financement public ne se prêtent pas à une prévision unique crédible. Identifiez une première action acceptable, ses faiblesses résiduelles et les preuves qui la changeraient.",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "multiple_options",
+        "choose",
+        "new_evidence"
+      ],
+      "rationale": "L’utilisateur a un vrai choix, une incertitude profonde et demande une stratégie acceptable plutôt que la plus probable. Faiblesse résiduelle et condition de basculement empêchent d’exagérer la robustesse."
+    },
+    {
+      "id": "robust-decision-making-negative-1",
+      "kind": "negative",
+      "prompt": "La prévision centrale de demande est bien validée, le pilote peut être inversé le mois prochain à coût négligeable et la direction veut seulement le meilleur rendement attendu dans ce cas.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "sequential_choice",
+        "choose"
+      ],
+      "rationale": "Un seul cas attendu est fiable et le retour arrière trivial : condition explicite d’évitement. Des tests robustes n’apporteraient ici aucune valeur décisionnelle nécessaire."
+    },
+    {
+      "id": "robust-decision-making-negative-2",
+      "kind": "negative",
+      "prompt": "Créez quatre futurs externes nommés sur le marché de l’énergie, décrivez leur émergence et leurs signaux précoces. Ne comparez pas une action actuelle selon critères d’échec ou de regret.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "plan"
+      ],
+      "rationale": "Confusion probable avec scenario-planning : la demande construit des futurs et signaux en omettant délibérément les tests de stratégies et critères d’acceptation."
+    },
+    {
+      "id": "robust-decision-making-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Calculez le rendement annualisé de ces flux de trésorerie vérifiés selon la formule indiquée et montrez l’arithmétique. Ne choisissez pas de stratégie.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "C’est un calcul délimité avec formule fournie et sans ensemble de décisions incertaines. La méthode ne doit pas transformer l’arithmétique en jugement de robustesse."
+    },
+    {
+      "id": "robust-decision-making-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez robust-decision-making comme méthode principale pour notre adaptation côtière. Testez les options selon des mondes climatiques et budgétaires plausibles, utilisez notre niveau minimal de service comme seuil d’échec et suspendez si mondes ou seuil manquent.",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "deep_uncertainty",
+        "irreversible_choice",
+        "failure_risk"
+      ],
+      "rationale": "L’utilisateur invoque explicitement méthode, cadre décisionnel, tests des mondes, plancher et règle de suspension. Cela ne supprime pas les contraintes probantes et d’incertitude."
+    },
+    {
+      "id": "robust-decision-making-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Dites quelle stratégie à long terme est robuste. Je n’ai indiqué ni actions faisables, ni définition de l’échec, ni horizon, ni incertitudes à tester.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "Actions, plancher, horizon et registre d’incertitudes sont des entrées décisives. Une recommandation robuste ne peut être étayée ; il faut suspendre et ne demander que les entrées manquantes."
+    }
+  ]
+}

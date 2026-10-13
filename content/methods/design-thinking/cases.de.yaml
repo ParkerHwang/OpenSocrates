@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: design-thinking-positive-01
+    kind: positive
+    prompt: "Eltern verpassen Schulnachrichten, beobachtete Behelfe unterscheiden sich; entdecke Bedürfnis, rahme Standpunkt und teste drei Dienstkonzepte."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "Menschlicher Kontext und offene Konzepte zentral; Prototyptest vor Festlegung."
+  - id: design-thinking-positive-02
+    kind: positive
+    prompt: "Klinik will Check-in-Verwirrung senken; Interviews und Beobachtungen sollen risikoarmen Prototyp und Widerlegungsregel informieren."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "Nutzerbezogene Dienstgestaltung mit beobachteter Reibung und prüfbarem Prototyp."
+  - id: design-thinking-positive-03
+    kind: positive
+    prompt: "Team wünscht Dashboardfunktion, weiß aber nicht, welches Scheitern sie verhindern würde; kläre Situation und Fortschritt zuerst."
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "Funktionswunsch vor Konzeptwahl vom Bedürfnis trennen."
+  - id: design-thinking-negative-01
+    kind: negative
+    prompt: "Nutzer wechseln im konkreten Problemmoment; Entscheidung hängt von funktionalen, emotionalen, sozialen Aufgaben und Gewohnheitskräften ab."
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "Hauptausgabe ist Aufgaben-/Wechselkräftebild statt Ideen-/Prototypzyklus."
+  - id: design-thinking-negative-02
+    kind: negative
+    prompt: "Lösungsmenge ist veraltet; Team will Provokationen für drei radikal andere Optionen vor Prüfung."
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "Hauptbedarf ist Rahmenbruch statt beobachtungsgeleitetem Nutzerdesign."
+  - id: design-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Übertrage Interviewzitate in nummeriertes Dokument ohne Bedürfnisdeutung oder Konzepte."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Abschrift und Formatierung sind mechanisch."
+  - id: design-thinking-explicit-01
+    kind: explicit
+    prompt: "Nutze design-thinking für ehrenamtliche Anmeldung aus beobachteter Nutzerreibung und teste kleinen Prototyp."
+    expected_route: design-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, human_need]
+    rationale: "Nutzer fordert Bedürfnisentdeckung und Prototypverfahren ausdrücklich."
+  - id: design-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "Keine Nutzer oder Beobachtungen verfügbar; erkläre universelles Bedürfnis und starte erste Funktion ohne Test."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [human_need, decisive_input_missing]
+    rationale: "Ohne Nutzerbelege fehlen Bedürfnis-/Testunterstützung; Konzept bleibt ausgesetzt."

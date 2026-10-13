@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "abduction-positive-01",
+      "kind": "positive",
+      "prompt": "หลายสาเหตุอาจอธิบายอัตราเปลี่ยนเป็นลูกค้าที่ลดลงกะทันหัน คำอธิบายใดสอดคล้องกับข้อเท็จจริงที่สังเกตมากที่สุด?",
+      "expected_route": "abduction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "หลายคำอธิบายสอดคล้องกับความผิดปกติและต้องมีหลักฐานแยกตัวเลือกก่อนเลือกคำอธิบายชั่วคราวที่ดีที่สุด"
+    },
+    {
+      "id": "abduction-positive-02",
+      "kind": "positive",
+      "prompt": "บริการล้มเหลวเฉพาะบางภูมิภาค เปรียบเทียบคำอธิบายที่เป็นไปได้และเสนอข้อสังเกตถัดไปที่แยกมันออกจากกัน",
+      "expected_route": "abduction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "เป็นการวินิจฉัยภายใต้ข้อมูลไม่ครบ โดยขอการตรวจที่แยกคำอธิบายได้"
+    },
+    {
+      "id": "abduction-positive-03",
+      "kind": "positive",
+      "prompt": "คำอธิบายที่ดีที่สุดในขณะนี้ของผลห้องปฏิบัติการที่ผิดคาดนี้คืออะไร และอะไรจะเปลี่ยนใจคุณ?",
+      "expected_route": "abduction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "คำตอบต้องเปรียบเทียบตัวเลือกคำอธิบายและแสดงความเป็นชั่วคราวชัดเจน"
+    },
+    {
+      "id": "abduction-negative-01",
+      "kind": "negative",
+      "prompt": "เมื่อให้ข้อเสนอและกฎที่ชัดเจนเหล่านี้ ข้อสรุปตามมาอย่างจำเป็นหรือไม่?",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules",
+        "explain"
+      ],
+      "rationale": "ข้อเสนอที่ยอมรับแล้วและกฎต้องใช้การนิรนัย ไม่ใช่ค้นหาคำอธิบายที่ดีที่สุด"
+    },
+    {
+      "id": "abduction-negative-02",
+      "kind": "negative",
+      "prompt": "ใช้ข้อสังเกตจากตัวอย่างที่เกิดซ้ำเพื่อประมาณว่ารูปแบบนี้เกิดในประชากรบ่อยเพียงใด",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "งานขยายข้อสรุปจากตัวอย่าง แทนเปรียบเทียบคำอธิบายแข่งขันกัน"
+    },
+    {
+      "id": "abduction-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "คัดลอกสมมติฐานสามข้อที่ให้มาใส่แบบสืบสวน",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การคัดลอกสมมติฐานเป็นงานเชิงกลและไม่ควรเรียกการวินิจฉัย"
+    },
+    {
+      "id": "abduction-explicit-01",
+      "kind": "explicit",
+      "prompt": "เรียกใช้ abduction โดยชัดแจ้งเพื่อวินิจฉัยว่าทำไมการนำระบบขึ้นใช้งานจึงล้มเหลวหลังเปลี่ยนการตั้งค่า",
+      "expected_route": "abduction",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "competing_explanations"
+      ],
+      "rationale": "ผู้ใช้ระบุวิธีสำหรับผลผิดปกติและการวินิจฉัยโดยตรง"
+    },
+    {
+      "id": "abduction-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "เลือกคำอธิบายที่ดีที่สุด แต่ให้เฉพาะข้อสรุปโดยไม่ให้ข้อสังเกต ทางเลือก หรือหลักฐานที่ทดสอบได้",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "competing_explanations",
+        "decisive_input_missing"
+      ],
+      "rationale": "หากไม่มีข้อสังเกตและตัวเลือกแข่งขัน การเลือกคำอธิบายจะเป็นเรื่องราวแทนข้ออนุมาน"
+    }
+  ]
+}

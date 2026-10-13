@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "conceptual-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "ทีมเราควรหมายถึงอะไรเมื่อพูดว่าการปล่อยรุ่นปลอดภัย ในเมื่อวิศวกรกับฝ่ายปฏิบัติตามกฎใช้คำต่างกัน?",
+      "expected_route": "conceptual-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "ambiguous_terms",
+        "argument_dispute"
+      ],
+      "rationale": "ต้องทดสอบความหมายแข่งขันและกรณีชายขอบก่อนเกณฑ์ปล่อยรุ่นจะกำกับการกระทำ"
+    },
+    {
+      "id": "conceptual-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "นโยบายนี้เป็นธรรมหรือไม่ หากพนักงานไม่เห็นตรงกันว่าความเป็นธรรมหมายถึงปฏิบัติเท่ากันหรือโอกาสเท่ากัน?",
+      "expected_route": "conceptual-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "ambiguous_terms",
+        "argument_dispute"
+      ],
+      "rationale": "การตัดสินพึ่งความหมายเชิงปฏิบัติแข่งขันและผลต่อกรณี"
+    },
+    {
+      "id": "conceptual-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "นิยาม “พร้อมเปิดตัว” เพื่อให้ทีมผลิตภัณฑ์และสนับสนุนจัดกรณีชายขอบตรงกัน",
+      "expected_route": "conceptual-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "ambiguous_terms"
+      ],
+      "rationale": "คำนิยามใช้ได้ต้องมีเงื่อนไขจำเป็นและเพียงพอ รวมการทดสอบกรณีชายขอบ"
+    },
+    {
+      "id": "conceptual-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "ใช้ข้อกำหนด API ที่เผยแพร่ตรวจว่าคำขอนี้ตรงฟิลด์บังคับที่บันทึกหรือไม่",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules"
+      ],
+      "rationale": "คำนิยามเชิงปฏิบัติมีอำนาจแล้ว งานเป็นการใช้กฎโดยตรง"
+    },
+    {
+      "id": "conceptual-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "จัดอันดับการศึกษาสามชิ้นตามคุณภาพแบบศึกษาและอธิบายว่าชิ้นใดรองรับข้ออ้างผลโดยตรง",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "reconcile_evidence"
+      ],
+      "rationale": "ข้อจำกัดคือคุณภาพหลักฐานและการนำมาใช้ ไม่ใช่ความหมายคำที่โต้แย้ง"
+    },
+    {
+      "id": "conceptual-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "แทนที่ “launch-ready” ทุกแห่งด้วย “ready for launch” ในไฟล์นี้",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การแทนข้อความตรงตัวเป็นเชิงกลและไม่ต้องวิเคราะห์แนวคิด"
+    },
+    {
+      "id": "conceptual-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ conceptual-analysis โดยชัดแจ้งเพื่อนิยามว่า “น่าเชื่อถือ” หมายถึงอะไรสำหรับรายงานลูกค้านี้",
+      "expected_route": "conceptual-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "ambiguous_terms"
+      ],
+      "rationale": "ผู้ใช้เรียกวิธีโดยตรงสำหรับคำคลุมเครือที่มีผลต่อรายงาน"
+    },
+    {
+      "id": "conceptual-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "ตัดสินว่าแนวคิดที่โต้แย้งเป็นจริงตามเงื่อนไขหรือไม่ แต่ไม่ให้บริบท กรณี หรือการตัดสินใจที่มันกำกับ",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "ambiguous_terms",
+        "decisive_input_missing"
+      ],
+      "rationale": "เมื่อไม่มีบริบทและกรณี ความหมายเชิงปฏิบัติจะตามอำเภอใจและกำกับการตัดสินอย่างปลอดภัยไม่ได้"
+    }
+  ]
+}

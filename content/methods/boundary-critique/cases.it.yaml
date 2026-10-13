@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: boundary-critique-positive-01
+    kind: positive
+    prompt: "La nostra città dovrebbe giudicare una riprogettazione degli autobus soltanto dal tempo medio di viaggio degli utenti attuali?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "La conclusione cambia se non utenti, accessibilità, quartieri o orizzonte temporale entrano nel confine."
+  - id: boundary-critique-positive-02
+    kind: positive
+    prompt: "Chi dovrebbe contare quando decidiamo se il progetto pilota di sorveglianza sul lavoro ha avuto successo?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "Il giudizio di successo dipende da lavoratori inclusi, collaboratori esclusi, responsabilità e risultati misurati."
+  - id: boundary-critique-positive-03
+    kind: positive
+    prompt: "Il piano contro le inondazioni costiere ha ancora senso includendo inquilini e i prossimi trent’anni di costi di trasferimento?"
+    expected_route: boundary-critique
+    expected_behavior: route
+    decisive_features: [boundary_sensitive, stakeholder_conflict]
+    rationale: "Cambiare attori interessati e orizzonte può invertire chi beneficia, chi paga e quale opzione è preferita."
+  - id: boundary-critique-negative-01
+    kind: negative
+    prompt: "Confronta i due fornitori con ambito esplicito rispetto ai tre criteri fissi di prezzo e latenza."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [multiple_options, choose]
+    rationale: "Confine, titolare, orizzonte e criteri sono già espliciti; resta il confronto delle opzioni."
+  - id: boundary-critique-negative-02
+    kind: negative
+    prompt: "Quale paragrafo ha la citazione più forte a sostegno dell’affermazione dichiarata?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "È una domanda sul sostegno delle fonti, non su chi o che cosa appartiene al confine del sistema."
+  - id: boundary-critique-mechanical-01
+    kind: mechanical
+    prompt: "Sposta le parti interessate elencate in un CSV con colonne per nome e ruolo."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Formattare un elenco fornito è meccanico e non deve attivare un metodo di giudizio."
+  - id: boundary-critique-explicit-01
+    kind: explicit
+    prompt: "Usa boundary-critique per esaminare se il nostro impegno climatico esclude i lavoratori della catena di fornitura."
+    expected_route: boundary-critique
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, boundary_sensitive]
+    rationale: "L’utente invoca esplicitamente il metodo per una domanda su attori interessati e ambito."
+  - id: boundary-critique-insufficiency-01
+    kind: insufficiency
+    prompt: "Dimmi se la raccomandazione cambia includendo chiunque sia interessato, ma senza fornire decisione, popolazione o orizzonte temporale."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [boundary_sensitive, decisive_input_missing]
+    rationale: "Gli input che definiscono il confine sono decisivi e assenti: il metodo deve sospendere, non inventare gli interessati."

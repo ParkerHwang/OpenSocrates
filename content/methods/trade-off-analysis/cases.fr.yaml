@@ -1,0 +1,117 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "trade-off-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Choisissez entre trois fournisseurs selon rapidité, fiabilité, accessibilité et coût total. Le groupe d’achats a documenté le veto et chaque partie a fourni une préférence datée pour les autres critères.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Plusieurs options rivalisent selon des critères explicites, avec contrainte séparée et provenance des poids. La comparaison montre les concessions sans prétendre que toutes les valeurs sont interchangeables."
+    },
+    {
+      "id": "trade-off-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "Une équipe produit choisit une conception équilibrant performance, maintenabilité, confidentialité et effort utilisateur. Les tests soutiennent certaines notes, les entretiens d’autres ; la confidentialité est une condition minimale, pas un score.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "source_quality"
+      ],
+      "rationale": "Il faut une comparaison attentive à la provenance et une contrainte de confidentialité non compensable. Les preuves mixtes peuvent être étiquetées plutôt qu’aplaties."
+    },
+    {
+      "id": "trade-off-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Deux plans d’effectifs diffèrent en couverture, continuité, coûts et charge. L’équipe a convenu d’un ordre ordinal, pas d’une échelle numérique précise ; montrez le gagnant sous cet ordre et ce qui l’inverserait.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "sensitive_inputs"
+      ],
+      "rationale": "Un compromis ordinal et une condition de basculement sont explicitement demandés. La méthode évite la fausse précision tout en rendant le choix visible."
+    },
+    {
+      "id": "trade-off-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Un code du bâtiment impose un standard incendie. Une seule conception conforme reste ; le demandeur veut préférer une conception moins chère non conforme mieux notée en commodité.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "single_feasible_option",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "Une exigence contraignante est traitée comme compensable. La famille probable est deontic-reasoning ou examen de conformité qualifié, pas analyse des compromis."
+    },
+    {
+      "id": "trade-off-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Nous hésitons à conduire une étude client avant de choisir une conception. La question est de savoir combien l’étude changerait la décision et si son délai en vaut la peine, pas comment comparer les conceptions aujourd’hui.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "new_evidence",
+        "sensitive_inputs"
+      ],
+      "rationale": "Confusion probable avec value-of-information : la tâche immédiate valorise l’information supplémentaire plutôt que pondérer les options actuelles."
+    },
+    {
+      "id": "trade-off-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Triez ces dossiers déjà vérifiés selon le score fourni d’une seule colonne et renvoyez la liste. Aucun choix de critères, conflit de préférences ou explication de recommandation n’est demandé.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Un tri fixe est mécanique et n’a pas de compromis discrétionnaire."
+    },
+    {
+      "id": "trade-off-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez trade-off-analysis pour ce choix d’emplacement. Séparez vétos et préférences, préservez la source de chaque note et montrez les renoncements de la recommandation.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "choose",
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "L’utilisateur nomme explicitement méthode et contrat public de comparaison. Les notes non étayées restent supposées ou non vérifiées."
+    },
+    {
+      "id": "trade-off-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Choisissez la meilleure parmi ces alternatives non nommées. Nous n’avons convenu ni critères, ni minima acceptables, ni priorités à prendre en compte.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "decisive_input_missing"
+      ],
+      "rationale": "Ensemble faisable, critères décisifs et provenance des préférences manquent. Une recommandation serait une notation a posteriori ; la comparaison doit être suspendue."
+    }
+  ]
+}

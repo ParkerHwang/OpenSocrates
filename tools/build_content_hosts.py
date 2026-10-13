@@ -14,7 +14,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-LOCALES = ("en", "ko", "zh", "ja")
+LOCALES = ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th")
 HOSTS = ("claude-chat", "antigravity")
 LAYOUTS = {
     "claude-chat": ("opensocrates", "opensocrates/release-manifest.json"),
@@ -120,9 +120,10 @@ def _files(root: Path, host: str) -> tuple[dict[str, bytes], dict[str, Any]]:
         entries = []
         for method in bundle["methods"]:
             method_id = method["id"]
-            instructions = assembler.assemble(
-                (method_id,), requested_locale=locale
-            ).instructions.encode("utf-8")
+            assembled = assembler.assemble((method_id,), requested_locale=locale)
+            if assembled.locale != locale:
+                raise ContentHostError("canonical locale unavailable; refusing mislabeled fallback")
+            instructions = assembled.instructions.encode("utf-8")
             relative = f"methods/{locale}/{method_id}.md"
             path = f"{skill}/references/decision/{relative}"
             files[path] = instructions
@@ -244,11 +245,14 @@ def _verify_metadata(manifest: dict[str, Any], host: str) -> None:
 
 
 def _manifest_locales(manifest: dict[str, Any]) -> tuple[str, ...]:
-    """Retain verified EN/KO v1.5.0 outputs for safe replacement and rollback."""
+    """Retain each published locale inventory for safe replacement and rollback."""
     version = manifest.get("product_version")
     if not isinstance(version, str) or not re.fullmatch(r"\d+\.\d+\.\d+", version):
         raise ContentHostError("invalid content product version")
-    return LOCALES if tuple(map(int, version.split("."))) >= (1, 5, 1) else ("en", "ko")
+    parsed = tuple(map(int, version.split(".")))
+    if parsed >= (1, 5, 2):
+        return LOCALES
+    return LOCALES[:4] if parsed >= (1, 5, 1) else LOCALES[:2]
 
 
 def _verify_canonical_pairs(manifest: dict[str, Any], host: str) -> None:

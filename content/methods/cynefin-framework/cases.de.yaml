@@ -1,0 +1,58 @@
+schema: "opensocrates.method-cases/1.0.0"
+cases:
+  - id: "cynefin-framework-positive-1"
+    kind: positive
+    prompt: "Unser Rechnungssupport nutzt dokumentierten Entscheidungsbaum; gleiche Eingabe liefert zuverlässig gleiche Lösung. Sollten wir standardisieren und Ausnahmen beobachten?"
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, diagnose]
+    rationale: "Stabile Beziehung mit Reaktionsmodusfrage. Nutzerbeobachtungen erlauben Klassifikation, keine Behauptung klarer sämtlicher Zukunftsfälle."
+  - id: "cynefin-framework-positive-2"
+    kind: positive
+    prompt: "Teams senken Erschöpfung, aber Eingriffe ändern Last, Vertrauen und Verhalten unerwartet. Wähle kleine Erprobungen, Beobachtung und nächste Versuche."
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, deep_uncertainty]
+    rationale: "Adaptives Muster statt fester Prozedur. Komplexer Kontext und Lernsignale müssen sichtbar sein; keine erfundenen Erfolgswahrscheinlichkeiten."
+  - id: "cynefin-framework-positive-3"
+    kind: positive
+    prompt: "Produktionsdienst fällt regional aus, Kunden verlieren jetzt Zugang. Wir brauchen sofortige Eindämmung und beobachtungsgeleitete Erholung."
+    expected_route: "cynefin-framework"
+    expected_behavior: route
+    decisive_features: [context_disorder, diagnose]
+    rationale: "Dringender Modus und spätere Neueinschätzung entscheiden. Vorfalldaten sind hier nicht unabhängig geprüft; Unsicherheit bleibt neben Eindämmungsunterstützung."
+  - id: "cynefin-framework-negative-1"
+    kind: negative
+    prompt: "Wandle genehmigte Betriebsschritte in nummerierte Checkliste um und bewahre Wortlaut exakt."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Formatierung fester Anweisung, kein Klassifikationsurteil. Kein Routing oder zusätzlicher Beleganspruch."
+  - id: "cynefin-framework-negative-2"
+    kind: negative
+    prompt: "Untersuche politische, wirtschaftliche, soziale, technologische, ökologische und rechtliche Änderungen für unsere Expansion."
+    expected_route: "pestel-analysis"
+    expected_behavior: route
+    decisive_features: [macro_environment, forecast]
+    rationale: "Nahe strategische Unsicherheit, aber maßgebliche Ausgabe ist externes Faktorenregister statt Domäne/Modus; mögliche Familienverwechslung."
+  - id: "cynefin-framework-mechanical-1"
+    kind: mechanical
+    prompt: "Sortiere Vorfallzeitstempel chronologisch und gib CSV aus."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Mechanische Ausgabe ohne Kontext- oder Handlungsentscheidung; Verfahren bleibt inaktiv."
+  - id: "cynefin-framework-explicit-1"
+    kind: explicit
+    prompt: "Nutze Cynefin, um sofortige Handlung, Fachanalyse oder sichere Experimente bei Dienstausfall zu wählen. Zeige Belege und klassifikationsänderndes Signal."
+    expected_route: "cynefin-framework"
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, context_disorder]
+    rationale: "Nutzer benennt Verfahren und Ausgaben; primär. Nutzerbeobachtungen bleiben markiert, Klassifikation keine Gewissheit."
+  - id: "cynefin-framework-insufficiency-1"
+    kind: insufficiency
+    prompt: "Sollten wir standardisieren oder experimentieren? Problem, Ursachen, Zeitdruck und Belege sind nicht beschrieben."
+    expected_route: "cynefin-framework"
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, context_disorder]
+    rationale: "Echte Modusfrage ohne entscheidende Beobachtungen. Aussetzen und kleinste fehlende Fakten fragen; keine erfundene Domäne oder Wahrscheinlichkeit."

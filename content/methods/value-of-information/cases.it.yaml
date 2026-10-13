@@ -1,0 +1,110 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "value-of-information-positive-1",
+      "kind": "positive",
+      "prompt": "Possiamo lanciare subito o svolgere prima uno studio sugli utenti. Un risultato sull’adozione attiverebbe azioni di lancio diverse, metodo e costo diretto dello studio sono noti e il gruppo ha una data fissa oltre la quale il ritardo non è accettabile.",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "new_evidence",
+        "sensitive_inputs"
+      ],
+      "rationale": "L’informazione ha un percorso dichiarato capace di cambiare l’azione e un onere di raccolta circoscritto. Il caso non richiede probabilità di successo o valori monetari inventati."
+    },
+    {
+      "id": "value-of-information-positive-2",
+      "kind": "positive",
+      "prompt": "Prima di firmare un contratto di fornitura, possiamo ispezionare una variabile di rischio di guasto che potrebbe cambiare il fornitore scelto. Fonte, costo, ritardo e soglia decisionale sono documentati; decidi se l’ispezione vale la pena.",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "irreversible_choice",
+        "sensitive_inputs"
+      ],
+      "rationale": "L’informazione arriva prima di una decisione irreversibile e conduce a un’azione diversa. Provenienza e ritardo possono essere mostrati senza inventare probabilità a posteriori."
+    },
+    {
+      "id": "value-of-information-positive-3",
+      "kind": "positive",
+      "prompt": "Un gruppo di politica pubblica deve decidere se ampliare un programma o sospenderlo per una valutazione mirata. La valutazione distingue un risultato che porterebbe all’ampliamento da uno che fermerebbe il programma; esposizione e scadenza sono dichiarate.",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "testable_hypothesis",
+        "feedback_delay"
+      ],
+      "rationale": "La domanda è se un test fattibile possa cambiare l’azione prima di una scadenza dichiarata. Non è una richiesta aperta di ulteriori ricerche."
+    },
+    {
+      "id": "value-of-information-negative-1",
+      "kind": "negative",
+      "prompt": "Trova tutto ciò che è interessante sul lavoro da remoto e fornisci una sintesi della letteratura. Non sono specificati decisione, soglia d’azione, variabile incerta o scadenza.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explain",
+        "source_quality"
+      ],
+      "rationale": "È una ricerca aperta senza una decisione capace di cambiare l’azione. Il valore dell’informazione non è valutabile finché non vengono forniti decisione e soglia."
+    },
+    {
+      "id": "value-of-information-negative-2",
+      "kind": "negative",
+      "prompt": "Una regola di sicurezza richiede dispositivi di protezione approvati. Decidi se ulteriori ricerche possano giustificare dispositivi non approvati perché più economici; la regola non lascia discrezionalità.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "binding_rule_without_discretion",
+        "single_feasible_option"
+      ],
+      "rationale": "La probabile confusione di famiglia è con deontic-reasoning o una revisione qualificata di sicurezza: nuove informazioni non possono autorizzare la rinuncia a una regola vincolante."
+    },
+    {
+      "id": "value-of-information-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Usa l’equazione fornita e input verificati per restituire la dimensione campionaria richiesta. Non scegliere se svolgere lo studio né interpretarne il valore decisionale.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "È un calcolo fisso, non un giudizio sulla capacità dell’informazione di cambiare un’azione."
+    },
+    {
+      "id": "value-of-information-explicit-1",
+      "kind": "explicit",
+      "prompt": "Usa value-of-information per decidere se questa ispezione valga costo e ritardo. Indica quale esito cambierebbe la decisione sul fornitore e dove si ferma l’ispezione.",
+      "expected_route": "value-of-information",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "information_purchase",
+        "irreversible_choice"
+      ],
+      "rationale": "L’utente invoca esplicitamente il metodo e richiede soglia, cambiamento d’azione, costo, ritardo e contratto d’arresto."
+    },
+    {
+      "id": "value-of-information-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Dovremmo indagare ancora prima di agire? Non sono state dichiarate azione attuale, alternativa, variabile incerta, possibile test o ritardo tollerabile.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "decisive_input_missing"
+      ],
+      "rationale": "Senza soglia d’azione e percorso informativo fattibile non si può stabilire un valore capace di cambiare l’azione. Il metodo deve sospendere e chiedere il minimo chiarimento sicuro."
+    }
+  ]
+}

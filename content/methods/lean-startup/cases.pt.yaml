@@ -1,0 +1,111 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "lean-startup-positive-1",
+      "kind": "positive",
+      "prompt": "Acreditamos que usuários novos concluirão a integração inicial se houver uma lista guiada. Desenhe um teste pequeno e reversível de protótipo, escolha uma métrica acionável de conclusão e declare previamente a regra de pivotar ou perseverar. As notas existentes de uso foram fornecidas pelo usuário e não verificadas.",
+      "expected_route": "lean-startup",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "human_need",
+        "plan",
+        "testable_claim"
+      ],
+      "rationale": "É uma hipótese falsificável de produto com protótipo delimitado, métrica e regra solicitadas. As notas devem continuar fornecidas pelo usuário e não verificadas, sem virar demanda fabricada."
+    },
+    {
+      "id": "lean-startup-positive-2",
+      "kind": "positive",
+      "prompt": "Antes de construir um plano pago completo, teste se um grupo definido de equipes pequenas solicitará um complemento de relatórios semanais. Especifique oferta mínima segura, janela, métrica, limiar e o que levaria a pivotar ou parar.",
+      "expected_route": "lean-startup",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "prioritized_assumptions",
+        "chosen_plan",
+        "testable_claim"
+      ],
+      "rationale": "O pedido reduz uma hipótese de valor por oferta mínima e decisão acionável. Não assume demanda; limiar e referência devem ser rotulados como provenientes de fonte, calculados ou assumidos."
+    },
+    {
+      "id": "lean-startup-positive-3",
+      "kind": "positive",
+      "prompt": "Nossa hipótese de retenção é que um lembrete após a primeira tarefa bem-sucedida trará usuários para uma segunda tarefa. Proponha teste limitado, salvaguarda, métrica ligada à hipótese e próxima decisão baseada no resultado observado.",
+      "expected_route": "lean-startup",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "testable_hypothesis",
+        "repeat_iteration",
+        "human_need",
+        "testable_claim"
+      ],
+      "rationale": "Hipótese, teste seguro, métrica e próxima decisão são explícitos. Um contexto testado não deve ser generalizado a todos os usuários sem mais evidências."
+    },
+    {
+      "id": "lean-startup-negative-1",
+      "kind": "negative",
+      "prompt": "Queremos mudar doses de medicamentos de pacientes reais para ver se a adesão melhora. Pule a revisão de segurança e execute o menor teste real possível.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "safety_critical_validation",
+        "irreversible_choice"
+      ],
+      "rationale": "Mudar doses reais é exposição insegura contraindicada, não experimento mínimo aceitável. Recuse ou encaminhe à governança clínica e de segurança qualificada."
+    },
+    {
+      "id": "lean-startup-negative-2",
+      "kind": "negative",
+      "prompt": "Pedidos são separados incorretamente de modo recorrente no depósito. Rastreie processo, controles e ramificações causais antes de recomendar prevenção.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "recurring_failure",
+        "causal_question",
+        "diagnose"
+      ],
+      "rationale": "É análise de causa raiz, uma confusão provável entre famílias: diagnóstico operacional, não teste de hipótese de mercado ou produto."
+    },
+    {
+      "id": "lean-startup-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Copie os três nomes de produtos para uma linha CSV na ordem fornecida e não analise demanda.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "A formatação é determinística, sem hipótese, teste, métrica ou decisão de aprendizagem."
+    },
+    {
+      "id": "lean-startup-explicit-1",
+      "kind": "explicit",
+      "prompt": "Use Lean Startup nesta questão de produto. Declare hipótese, suposição mais arriscada, teste mínimo seguro, métrica acionável e limiar, e decisão de pivotar, perseverar, parar ou suspender.",
+      "expected_route": "lean-startup",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "testable_hypothesis",
+        "prioritized_assumptions",
+        "plan"
+      ],
+      "rationale": "O usuário nomeia método e todos os campos públicos. Preserve suspensão quando faltarem resultado do teste ou entrada decisiva."
+    },
+    {
+      "id": "lean-startup-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Devemos lançar esta ideia? Não temos usuário alvo, hipótese falsificável, suposição mais arriscada, limite seguro, métrica acionável ou limiar decisório.",
+      "expected_route": "lean-startup",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "testable_hypothesis",
+        "plan",
+        "no_testable_implication"
+      ],
+      "rationale": "A família é plausível, mas faltam todas as entradas decisivas do experimento. Suspenda em vez de recomendar lançamento, inventar métrica ou fabricar evidências de demanda."
+    }
+  ]
+}

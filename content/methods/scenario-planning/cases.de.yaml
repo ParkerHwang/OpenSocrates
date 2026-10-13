@@ -1,0 +1,76 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: scenario-planning-positive-1
+    kind: positive
+    prompt: "Unsere Stadt plant zehnjährige Wohnungspolitik, während Migration und Bautechnologie unabhängig laufen könnten. Definieren Sie zwei Unsicherheiten, vier kohärente Welten ohne Wahrscheinlichkeiten, robuste und bedingte Aktionen sowie Indikatoren."
+    expected_route: scenario-planning
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - forecast
+    rationale: "Langfristige externe Treiber verlangen Verzweigung statt Einzelprognose. Unabhängige Achsen, vier Szenarien, Aktionen und Indikatoren ohne Wahrscheinlichkeiten sind ausdrücklich verlangt."
+  - id: scenario-planning-positive-2
+    kind: positive
+    prompt: "Ein fünfjähriges Gesundheitsprogramm könnte verschiedenes Institutionenvertrauen und Pathogenmobilität erleben. Erstellen Sie eine 2×2-Matrix, Entstehungspfade, Plantest und beobachtbare Neubewertungssignale."
+    expected_route: scenario-planning
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - new_evidence
+    rationale: "Kohärente externe Welten, Matrix, Planbelastung und Indikatoren statt wahrscheinlichkeitsgeordnetem Forecast."
+  - id: scenario-planning-positive-3
+    kind: positive
+    prompt: "Wir bereiten eine jahrzehntelange Bildungsplattforminvestition vor. Regulierung und Lernverhalten wirken stark, sind schwer vorherzusagen. Gemeinsame Prämissen erhalten, unabhängige Achsen wählen und robuste Vorbereitung von Signalauslösung trennen."
+    expected_route: scenario-planning
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - irreversible_choice
+      - plan
+    rationale: "Langfristvorbereitung bei hoher externer Unsicherheit und getrennten allgemeinen/bedingten Aktionen. Keine Wahrscheinlichkeiten vergeben."
+  - id: scenario-planning-negative-1
+    kind: negative
+    prompt: "Unser Quartalsumsatzmodell hat eine Basisformel. Variieren Sie Konversion und Preis in belastbaren Bereichen, zeigen Sie Wechselgrenze und Recherchepriorität."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - sensitive_inputs
+    rationale: "Sensitivitätsanalyse mit Modell, Bereichen und Schwellen statt externen Achsen und kohärenten Welten."
+  - id: scenario-planning-negative-2
+    kind: negative
+    prompt: "Schätzen Sie mit klarer Klasse abgeschlossener Produkteinführungen nächste Lieferbandbreite und vergleichen Sie Eigenzeitplan."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - forecast
+      - reference_cases
+    rationale: "Außenprognose aus Referenzfällen gehört zur Referenzklassenprognose statt Szenarien."
+  - id: scenario-planning-mechanical-1
+    kind: mechanical
+    prompt: "Sortieren Sie zwölf datierte Meilensteine chronologisch. Keine Zukunftsunsicherheit oder Vorbereitungsentscheidung."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "Deterministische Ordnung ohne externe Unsicherheit oder Strategiewahl."
+  - id: scenario-planning-explicit-1
+    kind: explicit
+    prompt: "Nutzen Sie scenario-planning primär für zehnjährige Energiewende. Ohne Wahrscheinlichkeiten zwei unabhängige Unsicherheiten, vier benannte Welten, robuste Maßnahmen und Indikatoren angeben."
+    expected_route: scenario-planning
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - deep_uncertainty
+      - macro_environment
+    rationale: "Methode und nicht probabilistische Ergebnisse ausdrücklich vorgegeben. Evidenz-, Reichweiten- und Zurückstellungsregeln gelten."
+  - id: scenario-planning-insufficiency-1
+    kind: insufficiency
+    prompt: "Geben Sie vier Zukunftsszenarien. Entscheidung, Horizont, Systemgrenze und relevante externe Unsicherheiten fehlen."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - decisive_input_missing
+    rationale: "Ohne Rahmen wären vier Erzählungen dekorativ und ungebunden. Zurückstellen und nur fehlenden Rahmen erfragen."

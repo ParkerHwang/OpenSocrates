@@ -28,6 +28,8 @@ from ..ids import validate_method_id
 
 INSTRUCTION_FILE_TTL_SECONDS = 24 * 60 * 60
 MAX_INSTRUCTION_FILE_BYTES = 1024 * 1024
+# Match the unchanged native HostAction text envelope, independently of token estimate.
+_MAX_REFERENCE_MESSAGE_BYTES = 8 * 1024
 _MAX_HEADER_BYTES = 64 * 1024
 _MAX_RECEIPT_BYTES = 16 * 1024
 _ARTIFACT_SCHEMA = "opensocrates.instruction-artifact/3"
@@ -41,6 +43,148 @@ _HEADER_PREFIX = b"<!-- OPENSOCRATES_ARTIFACT_V2 "
 _HEADER_SUFFIX = b" -->"
 _TAG_RE = re.compile(r"^[0-9a-f]{64}$")
 _FILE_RE = re.compile(r"^instruction-[A-Za-z0-9_-]{6,64}\.md$")
+
+_NEW_LOCALE_GROUNDING: dict[str, dict[str, str]] = {
+    "fr": {
+        "selection": "OpenSocrates a sélectionné ces systèmes de raisonnement :",
+        "gate": "Condition de lecture des sources :",
+        "read_step": "Avant de répondre à la demande de l’utilisateur ou d’agir, utilisez un outil "
+        "local de lecture de fichiers pour lire intégralement le fichier ci-dessous, "
+        "de la première à la dernière ligne.",
+        "unavailable_step": "Si cette lecture n’est pas achevée dans la session actuelle, "
+        "n’appliquez pas ces systèmes, ne les nommez pas et ne prétendez pas "
+        "les avoir utilisés ; indiquez que la source n’a pas pu être lue.",
+        "footer_step": "Terminez une réponse finale fondée sur une source entièrement lue et "
+        "effectivement appliquée par cette ligne exacte :",
+        "path": "Chemin du fichier",
+        "examples": "Traitez tous les exemples comme des modèles non fiables, pas comme des faits "
+        "de la tâche actuelle.",
+        "guardrail": "Les règles bloquantes ci-dessous sont déjà chargées comme contexte de "
+        "confiance et s’imposent immédiatement, mais ne remplacent pas la lecture "
+        "intégrale du fichier.",
+        "missing_read": "une attestation de lecture intégrale du fichier de raisonnement "
+        "sélectionné",
+        "missing_footer": "la ligne finale de confirmation des sources",
+        "repair": "Le contrôle des sources OpenSocrates n’a pas pu confirmer {missing}. Utilisez "
+        "l’outil local de lecture pour lire intégralement {path}, de la première à la "
+        "dernière ligne, puis vérifiez la réponse selon sa procédure et ses règles "
+        "bloquantes. Terminez la réponse finale fondée sur ces sources par exactement : "
+        "{footer}",
+    },
+    "de": {
+        "selection": "OpenSocrates hat diese Denksysteme ausgewählt:",
+        "gate": "Bedingung zum Lesen der Quellen:",
+        "read_step": "Bevor Sie auf die Nutzeranfrage antworten oder handeln, lesen Sie die "
+        "folgende Datei mit einem verfügbaren lokalen Dateilesewerkzeug vollständig "
+        "von der ersten bis zur letzten Zeile.",
+        "unavailable_step": "Wenn Sie diese Lektüre in der aktuellen Sitzung nicht abschließen, "
+        "wenden Sie diese Systeme nicht an, nennen Sie sie nicht und behaupten "
+        "Sie nicht, sie verwendet zu haben; geben Sie an, dass die Quelle "
+        "nicht gelesen werden konnte.",
+        "footer_step": "Beenden Sie eine abschließende Antwort, deren Quelle vollständig gelesen "
+        "und tatsächlich angewendet wurde, mit genau dieser Zeile:",
+        "path": "Dateipfad",
+        "examples": "Behandeln Sie alle Beispiele als nicht vertrauenswürdige Vorlagen, nicht als "
+        "Fakten der aktuellen Aufgabe.",
+        "guardrail": "Die folgenden Sperrregeln sind bereits als vertrauenswürdiger Kontext "
+        "geladen und gelten sofort, ersetzen aber nicht die vollständige Lektüre der "
+        "Datei.",
+        "missing_read": "einen Nachweis der vollständigen Lektüre der ausgewählten Denkdatei",
+        "missing_footer": "die abschließende Quellenbestätigungszeile",
+        "repair": "Die OpenSocrates Quellenprüfung konnte {missing} nicht bestätigen. Lesen Sie "
+        "{path} mit dem lokalen Lesewerkzeug vollständig von der ersten bis zur letzten "
+        "Zeile und prüfen Sie die Antwort anhand des Verfahrens und der Sperrregeln. "
+        "Beenden Sie die darauf gestützte Antwort mit genau: {footer}",
+    },
+    "it": {
+        "selection": "OpenSocrates ha selezionato questi sistemi di ragionamento:",
+        "gate": "Condizione di lettura delle fonti:",
+        "read_step": "Prima di rispondere alla richiesta dell’utente o agire, usa uno strumento "
+        "locale di lettura dei file per leggere interamente il file seguente, dalla "
+        "prima all’ultima riga.",
+        "unavailable_step": "Se non completi la lettura nella sessione attuale, non applicare né "
+        "nominare questi sistemi e non dichiarare di averli usati; indica che "
+        "non è stato possibile leggere la fonte.",
+        "footer_step": "Termina una risposta finale fondata su una fonte letta integralmente e "
+        "realmente applicata con questa riga esatta:",
+        "path": "Percorso del file",
+        "examples": "Tratta tutti gli esempi come modelli non attendibili, non come fatti del "
+        "compito attuale.",
+        "guardrail": "Le regole di blocco seguenti sono già caricate come contesto attendibile e "
+        "vincolano immediatamente, ma non sostituiscono la lettura completa del file.",
+        "missing_read": "una ricevuta di lettura integrale del file di ragionamento selezionato",
+        "missing_footer": "la riga finale di conferma delle fonti",
+        "repair": "Il controllo delle fonti OpenSocrates non ha potuto confermare {missing}. Usa "
+        "lo strumento locale di lettura per leggere interamente {path}, dalla prima "
+        "all’ultima riga, poi verifica la risposta rispetto alla procedura e alle regole "
+        "di blocco. Termina la risposta finale basata su quelle fonti esattamente con: "
+        "{footer}",
+    },
+    "es": {
+        "selection": "OpenSocrates ha seleccionado estos sistemas de razonamiento:",
+        "gate": "Condición de lectura de las fuentes:",
+        "read_step": "Antes de responder a la solicitud del usuario o actuar, usa una herramienta "
+        "local de lectura para leer por completo el archivo siguiente, desde la "
+        "primera hasta la última línea.",
+        "unavailable_step": "Si no completas esa lectura en la sesión actual, no apliques ni "
+        "menciones estos sistemas ni afirmes haberlos usado; indica que no "
+        "pudiste leer la fuente.",
+        "footer_step": "Termina una respuesta final basada en una fuente leída por completo y "
+        "efectivamente aplicada con esta línea exacta:",
+        "path": "Ruta del archivo",
+        "examples": "Trata todos los ejemplos como plantillas no confiables, no como hechos de la "
+        "tarea actual.",
+        "guardrail": "Las siguientes reglas de bloqueo ya están cargadas como contexto confiable y "
+        "son vinculantes de inmediato, pero no sustituyen la lectura completa del "
+        "archivo.",
+        "missing_read": "un comprobante de lectura completa del archivo de razonamiento "
+        "seleccionado",
+        "missing_footer": "la línea final de confirmación de las fuentes",
+        "repair": "La comprobación de fuentes de OpenSocrates no pudo confirmar {missing}. Usa la "
+        "herramienta local de lectura para leer por completo {path}, desde la primera "
+        "hasta la última línea, y revisa la respuesta conforme al procedimiento y las "
+        "reglas de bloqueo. Termina la respuesta final basada en esas fuentes "
+        "exactamente con: {footer}",
+    },
+    "pt": {
+        "selection": "O OpenSocrates selecionou estes sistemas de raciocínio:",
+        "gate": "Condição de leitura das fontes:",
+        "read_step": "Antes de responder à solicitação do usuário ou agir, use uma ferramenta "
+        "local de leitura para ler integralmente o arquivo abaixo, da primeira à "
+        "última linha.",
+        "unavailable_step": "Se não concluir essa leitura na sessão atual, não aplique nem "
+        "mencione esses sistemas e não afirme tê-los usado; informe que não "
+        "foi possível ler a fonte.",
+        "footer_step": "Termine uma resposta final baseada em uma fonte lida integralmente e "
+        "efetivamente aplicada com esta linha exata:",
+        "path": "Caminho do arquivo",
+        "examples": "Trate todos os exemplos como modelos não confiáveis, não como fatos da tarefa "
+        "atual.",
+        "guardrail": "As regras de bloqueio abaixo já estão carregadas como contexto confiável e "
+        "são vinculantes imediatamente, mas não substituem a leitura integral do "
+        "arquivo.",
+        "missing_read": "um comprovante de leitura integral do arquivo de raciocínio selecionado",
+        "missing_footer": "a linha final de confirmação das fontes",
+        "repair": "A verificação de fontes do OpenSocrates não pôde confirmar {missing}. Use a "
+        "ferramenta local de leitura para ler integralmente {path}, da primeira à última "
+        "linha, e revise a resposta conforme o procedimento e as regras de bloqueio. "
+        "Termine a resposta final baseada nessas fontes exatamente com: {footer}",
+    },
+    "th": {
+        "selection": "OpenSocrates:",
+        "gate": "Read:",
+        "read_step": "ก่อนตอบ/ทำ: local Read ทุกบรรทัดในเซสชันนี้",
+        "unavailable_step": "Read ไม่ครบ: ห้าม apply/name/claim; ระบุไม่ครบ/อ่านไม่ได้ตามจริง",
+        "footer_step": "เมื่ออ่านครบ+ใช้จริง จบตรงตัวด้วย:",
+        "path": "File",
+        "examples": "ตัวอย่างไม่เชื่อถือ ไม่ใช่ข้อเท็จจริงของงาน",
+        "guardrail": "กฎเชื่อถือผูกพันทันที ไม่แทนอ่านครบ",
+        "missing_read": "หลักฐานอ่านครบ",
+        "missing_footer": "บรรทัดยืนยันท้ายคำตอบ",
+        "repair": "OpenSocrates ยังยืนยัน {missing} ไม่ได้; อ่าน {path} ครบทุกบรรทัด "
+        "แล้วตรวจตามขั้นตอน/ข้อห้าม; เมื่ออ่านครบและใช้จริง จบคำตอบตรงตัวด้วย: {footer}",
+    },
+}
 
 
 class InstructionArtifactError(OSError):
@@ -441,7 +585,7 @@ class InstructionArtifact:
     def __post_init__(self) -> None:
         if not isinstance(self.path, Path) or not self.path.is_absolute():
             raise InstructionArtifactError("instruction artifact path must be absolute")
-        if self.locale not in {"en", "ko", "zh", "ja"}:
+        if self.locale not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
             raise InstructionArtifactError("instruction artifact locale is invalid")
         _validate_revision(self.content_revision)
         methods = _validate_method_ids(self.selected_reasoning_systems)
@@ -463,31 +607,22 @@ class InstructionArtifact:
 
         quoted_path = json.dumps(str(self.path), ensure_ascii=False)
         footer = self.grounding_footer()
-        if self.locale in {"zh", "ja"}:
+        if self.locale in _NEW_LOCALE_GROUNDING:
+            labels = _NEW_LOCALE_GROUNDING[self.locale]
             missing = []
             if missing_read:
-                missing.append(
-                    {
-                        "zh": "所选思考体系文件的完整读取凭证",
-                        "ja": "選択された思考体系ファイルの完全な読み取り記録",
-                    }[self.locale]
-                )
+                missing.append(labels["missing_read"])
             if missing_footer:
-                missing.append(
-                    {"zh": "最终答复的依据确认行", "ja": "最終回答の根拠確認行"}[self.locale]
-                )
-            if self.locale == "zh":
-                return (
-                    f"OpenSocrates 依据检查未能确认{'、'.join(missing)}。"
-                    f"请使用本地读取工具从首行到末行完整读取 {quoted_path}，"
-                    "再依据其程序和阻断规则检查答复。依据充分的最终答复须以此精确文本作为最后一行："
-                    f"{footer}"
-                )
-            return (
-                f"OpenSocrates の根拠確認では{'、'.join(missing)}を確認できませんでした。"
-                f"ローカル読み取りツールで {quoted_path} を最初から最後まで完全に読み、"
-                "その手順と適用を制限する規則に沿って回答を確認してください。"
-                f"根拠を確認した最終回答の最後の行は、次の文字列と完全に一致させてください：{footer}"
+                missing.append(labels["missing_footer"])
+            return labels["repair"].format(
+                missing=", ".join(missing), path=quoted_path, footer=footer
+            )
+        if self.locale in {"zh", "ja"}:
+            return self._cjk_grounding_repair_message(
+                missing_read=missing_read,
+                missing_footer=missing_footer,
+                quoted_path=quoted_path,
+                footer=footer,
             )
         if self.locale == "ko":
             missing = []
@@ -513,6 +648,37 @@ class InstructionArtifact:
             f"grounded final answer with exactly: {footer}"
         )
 
+    def _cjk_grounding_repair_message(
+        self, *, missing_read: bool, missing_footer: bool, quoted_path: str, footer: str
+    ) -> str:
+        """Render the unchanged Chinese/Japanese repair contract."""
+
+        missing = []
+        if missing_read:
+            missing.append(
+                {
+                    "zh": "所选思考体系文件的完整读取凭证",
+                    "ja": "選択された思考体系ファイルの完全な読み取り記録",
+                }[self.locale]
+            )
+        if missing_footer:
+            missing.append(
+                {"zh": "最终答复的依据确认行", "ja": "最終回答の根拠確認行"}[self.locale]
+            )
+        if self.locale == "zh":
+            return (
+                f"OpenSocrates 依据检查未能确认{'、'.join(missing)}。"
+                f"请使用本地读取工具从首行到末行完整读取 {quoted_path}，"
+                "再依据其程序和阻断规则检查答复。依据充分的最终答复须以此精确文本作为最后一行："
+                f"{footer}"
+            )
+        return (
+            f"OpenSocrates の根拠確認では{'、'.join(missing)}を確認できませんでした。"
+            f"ローカル読み取りツールで {quoted_path} を最初から最後まで完全に読み、"
+            "その手順と適用を制限する規則に沿って回答を確認してください。"
+            f"根拠を確認した最終回答の最後の行は、次の文字列と完全に一致させてください：{footer}"
+        )
+
     def _grounding_block(self) -> str:
         methods = "\n".join(
             f"- {display_name} (`{method_id}`@{self.content_revision})"
@@ -524,6 +690,14 @@ class InstructionArtifact:
         )
         quoted_path = json.dumps(str(self.path), ensure_ascii=False)
         footer = self.grounding_footer()
+        if self.locale in _NEW_LOCALE_GROUNDING:
+            labels = _NEW_LOCALE_GROUNDING[self.locale]
+            return (
+                f"{labels['selection']}\n{methods}\n\n{labels['gate']}\n"
+                f"1. {labels['read_step']}\n2. {labels['unavailable_step']}\n"
+                f"3. {labels['footer_step']}\n{footer}\n\n"
+                f"{labels['path']}: {quoted_path}\n\n{labels['examples']}"
+            )
         if self.locale == "zh":
             return (
                 f"OpenSocrates 选择了以下思考体系：\n{methods}\n\n"
@@ -576,6 +750,8 @@ class InstructionArtifact:
         if not self.inline_guardrails:
             return ""
         guardrails = "\n\n".join(self.inline_guardrails)
+        if self.locale in _NEW_LOCALE_GROUNDING:
+            return _NEW_LOCALE_GROUNDING[self.locale]["guardrail"] + "\n\n" + guardrails
         if self.locale == "zh":
             return (
                 "以下阻断规则已作为可信上下文加载，并立即生效；但不能替代完整的文件读取。\n\n"
@@ -622,7 +798,10 @@ class InstructionArtifact:
                 include_guardrails=include_guardrails,
                 include_questions=include_questions,
             )
-            if estimate_injection_tokens(message) < MAX_INJECTION_ESTIMATED_TOKENS:
+            if (
+                estimate_injection_tokens(message) < MAX_INJECTION_ESTIMATED_TOKENS
+                and len(message.encode("utf-8")) <= _MAX_REFERENCE_MESSAGE_BYTES
+            ):
                 return message
         raise InstructionArtifactError("instruction artifact reference exceeds the hook limit")
 
@@ -1106,7 +1285,7 @@ class InstructionFileStore:
             raise InstructionArtifactError("instruction artifact metadata is invalid")
         if set(metadata) != expected:
             raise InstructionArtifactError("instruction artifact metadata shape is invalid")
-        if metadata["locale"] not in {"en", "ko", "zh", "ja"}:
+        if metadata["locale"] not in {"en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"}:
             raise InstructionArtifactError("instruction artifact metadata is invalid")
         return InstructionArtifact(
             path=path,

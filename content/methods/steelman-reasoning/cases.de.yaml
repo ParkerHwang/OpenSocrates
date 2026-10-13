@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: steelman-reasoning-positive-01
+    kind: positive
+    prompt: "Ein Vorstand verwirft einen Datenschutzeinwand als Panikmache; rekonstruieren Sie stärkste faire Form und Einfluss auf Einführung."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute, critique]
+    rationale: "Verworfene Sorge könnte wesentliches prüfenswertes Risiko enthalten."
+  - id: steelman-reasoning-positive-02
+    kind: positive
+    prompt: "Zwei Teams streiten über Fernarbeit; beide haben kohärentes Ziel und Evidenz. Stärkste Gegenform vor der Antwort identifizieren."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute]
+    rationale: "Echte Gegenposition braucht Wohlwollen, Unterstützungsbedarf und faire Antwort."
+  - id: steelman-reasoning-positive-03
+    kind: positive
+    prompt: "Ein Richtlinienkritiker wird nur feindlich etikettiert; gewinnen Sie tatsächliche Aussage, beste Prämissen und nötige Vorschlagsänderung zurück."
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, critique]
+    rationale: "Öffentliche Aussage ausdrücklich von schwacher Darstellung trennen und Folgen prüfen."
+  - id: steelman-reasoning-negative-01
+    kind: negative
+    prompt: "Ein Prinzip widerspricht mehreren überlegten schwierigen Fällen; Gruppe muss Prinzip oder Urteile kohärenter revidieren."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "Gegenseitige Prinzipien-/Fallrevision statt Gegnerrekonstruktion ist Hauptausgabe."
+  - id: steelman-reasoning-negative-02
+    kind: negative
+    prompt: "Ein Bericht enthält Aussagen, Gründe, Einwände und Antworten; neutrale Karte ist vor Gegenbewertung nötig."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "Strukturelle Aussagenkarte vor Auswahl einer Steelman-Position herstellen."
+  - id: steelman-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Übersetzen Sie die zitierte Gegenposition ins Koreanische bei gleichem Ton, ohne Bewertung oder Stärkung."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Mechanische Übersetzung darf keine Argumentrekonstruktion auslösen."
+  - id: steelman-reasoning-explicit-01
+    kind: explicit
+    prompt: "Nutzen Sie steelman-reasoning gegen unsere Fusion und nennen Sie kursändernde Evidenz."
+    expected_route: steelman-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, dismissed_opposition, argument_dispute]
+    rationale: "Ausdrücklich faire Gegenposition für folgenreiche Entscheidung."
+  - id: steelman-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "Es gibt keine Gegenaussage; erfinden Sie einen anspruchsvollen Gegner und schreiben Sie ihn der Gemeinschaft zum Besiegen zu."
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [dismissed_opposition, decisive_input_missing]
+    rationale: "Keine echte öffentliche Position; Erfindung würde Menschen falsch darstellen."

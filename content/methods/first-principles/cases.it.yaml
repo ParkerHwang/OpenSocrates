@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: first-principles-positive-01
+    kind: positive
+    prompt: "Quali parti del nostro prezzo per utente sono realmente necessarie e quali derivano dal vecchio processo di vendita?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "La riprogettazione dipende dalla separazione fra requisiti irriducibili, convenzioni e assunzioni ereditate."
+  - id: first-principles-positive-02
+    kind: positive
+    prompt: "Possiamo riprogettare questo flusso di approvazione a partire dai suoi effettivi vincoli di sicurezza invece di copiare la sequenza attuale?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "La richiesta chiede di scomporre il flusso, verificare le necessità e ricostruirlo."
+  - id: first-principles-positive-03
+    kind: positive
+    prompt: "Che cosa deve restare vero se ricostruiamo questa pipeline di dati senza assumere l'architettura del fornitore esistente?"
+    expected_route: first-principles
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, stale_options]
+    rationale: "La domanda centrale riguarda quali vincoli restano dopo aver messo in discussione l'architettura ereditata."
+  - id: first-principles-negative-01
+    kind: negative
+    prompt: "Applica la regola obbligatoria di conservazione a ogni record e segnala le violazioni."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "Si sta applicando una regola vincolante, non la si sta riconsiderando o ricostruendo."
+  - id: first-principles-negative-02
+    kind: negative
+    prompt: "Genera cinque combinazioni dei parametri fissi e controllane la fattibilità."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [combinable_dimensions, stale_options]
+    rationale: "I requisiti sono già fissati e il compito è esplorare le combinazioni."
+  - id: first-principles-mechanical-01
+    kind: mechanical
+    prompt: "Copia la lista di controllo esistente per la distribuzione nel nuovo modello senza modificarne il contenuto."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copiare una lista di controllo fornita è meccanico e non deve attivare ragionamenti di riprogettazione."
+  - id: first-principles-explicit-01
+    kind: explicit
+    prompt: "Usa first-principles per mettere in discussione l'assunzione che ogni richiesta di assistenza necessiti di una revisione umana."
+    expected_route: first-principles
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions]
+    rationale: "L'utente richiama esplicitamente il metodo per scomporre e verificare un'assunzione convenzionale."
+  - id: first-principles-insufficiency-01
+    kind: insufficiency
+    prompt: "Ricostruisci il sistema dai primi principi, ma non dichiarare il risultato desiderato, i vincoli inderogabili o le regole di sicurezza applicabili."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [hidden_assumptions, decisive_input_missing]
+    rationale: "Senza obiettivo e confini inderogabili, la ricostruzione confonderebbe la possibilità con un progetto praticabile e sicuro."

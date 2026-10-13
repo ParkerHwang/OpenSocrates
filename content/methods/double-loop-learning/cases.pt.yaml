@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: double-loop-learning-positive-1
+    kind: positive
+    prompt: "Nossa equipe reduziu tempo de resposta com nova lista, mas escalonamentos voltaram após dois meses. Compare esperado e real, examine objetivo e regra que moldaram a lista e projete teste seguro para regra revisada."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [recurring_failure, governing_rule, repeat_iteration, testable_claim]
+    rationale: "A correção não impediu recorrência; a tarefa pergunta se objetivo ou regra deve mudar. Separe ação da lista de hipótese sobre regra e rotule registros pela proveniência."
+  - id: double-loop-learning-positive-2
+    kind: positive
+    prompt: "Uma política premia entregar na data planejada e equipes repetidamente adiam confiabilidade para cumpri-la. Examine objetivo, incentivo, autoridade e pressuposto; proponha teste delimitado de mudança de regra."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [governing_rule, feedback_delay, recurring_failure, chosen_plan]
+    rationale: "O comportamento recorrente pode vir de política orientadora, não um erro de execução. Compare regras candidatas mantendo explicação causal inferida ou não verificada até testar."
+  - id: double-loop-learning-positive-3
+    kind: positive
+    prompt: "Após duas revisões de treinamento, a mesma omissão de transferência aparece em várias equipes. Registre diferença de resultados, distinga correção de treinamento de ciclo simples de mudança na regra e especifique evidência de cada uma."
+    expected_route: double-loop-learning
+    expected_behavior: route
+    decisive_features: [recurring_failure, governing_rule, repeat_iteration, testable_claim]
+    rationale: "Várias recorrências e correções anteriores justificam revisar a regra. Exige diferença, regra, evidência e teste de aprendizagem, não culpa ou probabilidade de recorrência."
+  - id: double-loop-learning-negative-1
+    kind: negative
+    prompt: "Uma implantação contém erro de digitação imediatamente detectado pelo controle existente. Identifique e corrija o defeito exato sem mudar a política de lançamento."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical, explicit_rules]
+    rationale: "Um defeito delimitado já é explicado pela evidência; o usuário exclui mudança de política. Ciclo duplo seria excessivo; cabe resposta focada ao defeito."
+  - id: double-loop-learning-negative-2
+    kind: negative
+    prompt: "Temos usuário-alvo e hipótese de preços. Projete teste reversível de página de apresentação, escolha métrica acionável e defina regra de mudar direção ou perseverar."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, plan, human_need]
+    rationale: "É projeto de experimento lean-startup, provável confusão de família. Não relata diferença recorrente nem pede revisar regra orientadora."
+  - id: double-loop-learning-mechanical-1
+    kind: mechanical
+    prompt: "Converta as três durações de incidentes de minutos para horas e retorne na mesma ordem."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Conversão de unidades é determinística, sem julgamento de diferença recorrente, variável orientadora ou teste de aprendizagem."
+  - id: double-loop-learning-explicit-1
+    kind: explicit
+    prompt: "Use aprendizagem de ciclo duplo. Mostre diferença de resultados, pressuposto ou regra orientadora, estado da evidência, candidata revisada e teste seguro; não atribua culpa pessoal."
+    expected_route: double-loop-learning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, recurring_failure, governing_rule, testable_claim]
+    rationale: "O usuário invoca método e contrato público. Não culpar corresponde a examinar regras, autoridade, incentivos e evidências, sem inferir intenção."
+  - id: double-loop-learning-insufficiency-1
+    kind: insufficiency
+    prompt: "Nossa equipe continua falhando. Diga qual crença ou política mudar e qual experimento executar. Não há resultado esperado, registro observado, limites de recorrência nem regra atual."
+    expected_route: double-loop-learning
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, recurring_failure, governing_rule]
+    rationale: "O método pode caber, mas faltam diferença decisiva e regra. Deve suspender, sem inventar explicação profunda nem atribuir o problema à mentalidade."

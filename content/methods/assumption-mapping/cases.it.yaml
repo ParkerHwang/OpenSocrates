@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: assumption-mapping-positive-1
+    kind: positive
+    prompt: "Stiamo considerando un servizio condiviso di pianificazione dei pasti. Elenca le ipotesi che devono essere vere, separa importanza e prove e identifica la prima verifica sicura. Le note delle interviste sono fornite dall’utente e non sono state controllate indipendentemente."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, testable_claim, plan]
+    rationale: "La richiesta necessita esplicitamente di registro delle ipotesi, assi importanza/prove, insieme più rischioso e prossima verifica. Le note sono fornite dall’utente, non verificate: il percorso deve esporre questa incertezza senza assegnare probabilità."
+  - id: assumption-mapping-positive-2
+    kind: positive
+    prompt: "Un gruppo vuole automatizzare il controllo delle fatture, ma non è chiaro se il limite sia desiderabilità per i clienti, fattibilità dei dati o sostenibilità della conformità. Mappa le ipotesi e scegli una verifica a bassa esposizione prima dell’acquisto."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, irreversible_choice, testable_claim]
+    rationale: "Sono presenti più ambiti di ipotesi e una decisione prima dell’impegno. La verifica richiesta resta un problema di priorità; il risultato deve etichettare fatti sostenuti da fonti, ipotesi ed eventuali prove di conformità mancanti."
+  - id: assumption-mapping-positive-3
+    kind: positive
+    prompt: "Abbiamo cinque esperimenti proposti per cambiare la programmazione dei volontari. Ordina le ipotesi per importanza decisionale e forza delle prove, poi associa un’osservazione sicura e una regola per ciò che cambierebbe il piano."
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [prioritized_assumptions, testable_claim, chosen_plan]
+    rationale: "L’utente richiede la base centrale di priorità del metodo, non un esperimento concluso. Il risultato può usare etichette ordinali e prove verificate, non verificate, assunte o conflittuali senza punteggi inventati."
+  - id: assumption-mapping-negative-1
+    kind: negative
+    prompt: "Il nostro servizio di pagamento è fallito tre volte questa settimana. Traccia la catena causale, identifica debolezze dei controlli e assegna un responsabile della prevenzione; non proporre una mappa di ipotesi di prodotto."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "È una richiesta di root-cause-analysis, facilmente confondibile con la famiglia della mappatura delle ipotesi. Il risultato richiesto è diagnosi causale e azione di controllo, non un insieme prioritario di convinzioni verificabili."
+  - id: assumption-mapping-negative-2
+    kind: negative
+    prompt: "Abbiamo già scelto un cliente bersaglio e un esperimento con pagina di destinazione. Definisci metrica operativa, finestra d’osservazione e regola per cambiare direzione o perseverare."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, chosen_plan, plan]
+    rationale: "L’ipotesi è già scelta e l’utente vuole rendere operativo un esperimento di mercato. È lavoro di lean-startup; questo percorso ripeterebbe la mappatura invece di definire verifica e metrica."
+  - id: assumption-mapping-mechanical-1
+    kind: mechanical
+    prompt: "Ordina alfabeticamente queste sei etichette di ipotesi e restituiscile come elenco numerato."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Ordinare etichette non richiede giudizio, incertezza o priorità degli esperimenti. Deve ricevere una risposta meccanica diretta."
+  - id: assumption-mapping-explicit-1
+    kind: explicit
+    prompt: "Usa la mappatura delle ipotesi per questa idea. Mostra ipotesi, assi importanza/prove, insieme più rischioso e prossima verifica sicura; mantieni visibilmente non verificate le affermazioni prive di sostegno."
+    expected_route: assumption-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions, prioritized_assumptions, testable_claim]
+    rationale: "L’utente nomina esplicitamente metodo e risultati pubblici. L’invocazione esplicita è primaria e le etichette richieste preservano il confine di provenienza."
+  - id: assumption-mapping-insufficiency-1
+    kind: insufficiency
+    prompt: "Dai priorità alle ipotesi della proposta e indica quale verificare per prima. Non sono ancora disponibili domanda decisionale, risultato desiderato, ipotesi candidate o vincoli di verifica."
+    expected_route: assumption-mapping
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, hidden_assumptions, prioritized_assumptions, no_testable_implication]
+    rationale: "Il metodo è adatto, ma mancano input decisivi. Deve sospendere, non inventare ipotesi o verifiche; la prossima richiesta deve stabilire decisione e confine sicuro autorizzato."

@@ -39,7 +39,7 @@ case "$mode" in
             set)
                 [ "$#" -eq 4 ] || unavailable "$mode"
                 case "$locale_value" in
-                    en|ko|zh|ja|follow) ;;
+                    en|ko|zh|ja|fr|de|it|es|pt|th|follow) ;;
                     *) unavailable "$mode" ;;
                 esac
                 ;;

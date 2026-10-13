@@ -1,0 +1,79 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: reference-class-forecasting-positive-1
+    kind: positive
+    prompt: "Wir schätzen den Liefertermin eines regionalen Bahnprojekts. Quellenverknüpfte abgeschlossene Projekte mit vergleichbarem Umfang, Beschaffung und Gelände liegen vor. Vergleichen Sie Eigenplan und Abschlussverteilung und erklären Sie Anpassungen ohne erfundene Wahrscheinlichkeit."
+    expected_route: reference-class-forecasting
+    expected_behavior: route
+    decisive_features:
+      - forecast
+      - reference_cases
+      - source_quality
+    rationale: "Ziel, Einheit und belastbare Klasse ermöglichen Außenbandbreite. Quellen stützen beobachtete Ergebnisse, keine erfundenen Wahrscheinlichkeiten."
+  - id: reference-class-forecasting-positive-2
+    kind: positive
+    prompt: "Unser Team schätzt Zeit und Kosten einer Kundenmigration optimistisch. Vergleichbare abgeschlossene Migrationen anderer Teams und tatsächliche Ergebnisse sind verfügbar. Prüfen Sie die Eigenperspektive und nennen Sie bandbreitenändernde Evidenz."
+    expected_route: reference-class-forecasting
+    expected_behavior: route
+    decisive_features:
+      - forecast
+      - reference_cases
+      - hidden_assumptions
+    rationale: "Kalibrierung gegen abgeschlossene Fälle statt Ursachendiagnose oder bevorzugtem Szenario. Anpassungen mit Herkunft und Umkehrbedingung statt erfundener Basisrate."
+  - id: reference-class-forecasting-positive-3
+    kind: positive
+    prompt: "Eine gemeinnützige Organisation prognostiziert Erstjahresanmeldungen. Frühere Einführungen dokumentieren Anmeldungen, Zielgruppen und Bedingungen, aber Abdeckung ist ungleichmäßig. Erstellen Sie Außenbandbreite mit Grenze und Planvergleich."
+    expected_route: reference-class-forecasting
+    expected_behavior: route
+    decisive_features:
+      - forecast
+      - reference_cases
+      - weak_sample
+    rationale: "Ziel und abgeschlossene Fälle vorhanden; ungleiche Abdeckung erhalten. Beobachtete Verteilung nutzen, bei entscheidender Lücke zurückstellen oder abschwächen."
+  - id: reference-class-forecasting-negative-1
+    kind: negative
+    prompt: "Für dieses einzigartige wissenschaftliche Instrument fehlen abgeschlossene Vergleichsfälle. Welche Ingenieurswahl verursachte Verzögerung, und welches Korrekturexperiment passt?"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - no_defensible_reference_class
+      - diagnose
+    rationale: "Referenzklasse fehlt ausdrücklich; verlangt wird Kausalerklärung. Diese Methode würde nur Innenperspektive ohne Außenverteilung wiederholen."
+  - id: reference-class-forecasting-negative-2
+    kind: negative
+    prompt: "Erstellen Sie vier externe Zukunftsbilder unserer Fünfjahresstrategie mit Namen, Signalen und Aktionen. Keine Liefer- oder Kostenschätzung aus Vergangenheit."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - plan
+    rationale: "Mögliche Verwechslung mit Szenarioplanung: Zukunftszweige statt Referenzverteilung."
+  - id: reference-class-forecasting-mechanical-1
+    kind: mechanical
+    prompt: "Addieren Sie fünf verifizierte Rechnungsbeträge in genannter Währung. Prognose, Klasse und Entscheidung sind unnötig."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "Begrenzte Berechnung ohne Prognoseunsicherheit oder Klassenurteil; Methode inaktiv halten."
+  - id: reference-class-forecasting-explicit-1
+    kind: explicit
+    prompt: "Nutzen Sie reference-class forecasting als Hauptmethode für unseren Softwaretermin. Vergleichbare quellenverknüpfte Einführungen liegen vor; vergleichen Sie Verteilung und Plan und stellen Sie bei unhaltbarer Klasse zurück."
+    expected_route: reference-class-forecasting
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - forecast
+      - reference_cases
+    rationale: "Ausdrückliche Methode mit Ziel, Ergebnissen und Zurückstellungsregel. Evidenzkennzeichnung bleibt nötig; keine erfundenen Wahrscheinlichkeiten."
+  - id: reference-class-forecasting-insufficiency-1
+    kind: insufficiency
+    prompt: "Wann endet dieses Projekt? Es gibt nur internen Zieltermin, keine Vergleichsfälle, vereinbarte Ergebnisdefinition oder genannte Terminentscheidung."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - no_defensible_reference_class
+      - boundary_sensitive
+      - decisive_input_missing
+    rationale: "Entscheidende Klasse, Zieldefinition und Grenze fehlen. Ehrliche Zurückstellung mit begrenzter Nachfrage statt erfundener Verteilung."

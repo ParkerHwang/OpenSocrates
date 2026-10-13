@@ -1,0 +1,87 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: cost-benefit-analysis-positive-1
+    kind: positive
+    prompt: "Wir müssen neuen Dienst oder bisherigen Zustand wählen. Finanzbuch gibt Einführungs-/Betriebskosten, Pilotbericht gemessene Nutzung; rechtfertigt Nutzen die Kosten im genannten Horizont?"
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "Ausgangszustand und mehrere Optionen sind ausdrücklich; wesentliche Nutzen/Kosten haben Herkunft. Nichtmonetäres kann getrennt bleiben, der Vergleich ist entscheidungsrelevant."
+  - id: cost-benefit-analysis-positive-2
+    kind: positive
+    prompt: "Vergleiche zwei Gesundheitsprogramme gegenüber Nichtstun. Verwaltungsunterlagen zeigen Kosten, Evaluation Ergebnisse; zeige Zahlende, Begünstigte und nicht monetarisierbare Sicherheits-/Gerechtigkeitswirkungen."
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - practical_consequence
+    rationale: "Gefragt ist wirtschaftlicher Vergleich mit Verteilung und nicht kompensierbaren Werten. Ergebnisbelege tragen Quellenstatus statt Garantie."
+  - id: cost-benefit-analysis-positive-3
+    kind: positive
+    prompt: "Ein Ersatzprojekt hat Vorabkosten und zeitverschiedene Nutzen. Nutze genehmigten Horizont und dokumentierte Diskontierung; zeige Folgen von Annahmenänderung innerhalb gestützter Bereiche."
+    expected_route: cost-benefit-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - sensitive_inputs
+    rationale: "Timing, echte Rechengrenze und quellenbasierte Sensitivität machen Kosten-Nutzen-Vergleich aus. Herkunft ist vorgegeben statt Standardrate oder erfundener Gewissheit."
+  - id: cost-benefit-analysis-negative-1
+    kind: negative
+    prompt: "Sicherheitsrecht verlangt einen Prüfschritt je Anlage; darf das Team ihn auslassen? Kein Ermessen bleibt, maßgeblicher Text entscheidet."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "Pflicht-/Regelfrage ohne echte Wahl. Nettorechnung darf bindende Anforderungen nicht eintauschen."
+  - id: cost-benefit-analysis-negative-2
+    kind: negative
+    prompt: "Wähle beste von drei Designs nach Zuverlässigkeit, Zugänglichkeit, Ökologie und Würde. Würdemonetarisierung wird abgelehnt, andere Preise fehlen; gewünscht ist transparenter Kriterienvergleich."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+      - no_coherent_dimensions
+    rationale: "Wahrscheinliche Verwechslung mit trade-off-analysis: ausdrückliche Kriterien und nicht kompensierbare Grenzen statt erzwungenem Geldgesamtwert."
+  - id: cost-benefit-analysis-mechanical-1
+    kind: mechanical
+    prompt: "Wende vorgegebene Tabellenformel auf geprüfte Kosten/Nutzen an und liefere Summe. Keine Option, Ausgangsbewertung, Unsicherheit oder Empfehlung gefragt."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "Feste Rechnung ohne diskretionären Vergleich; Verfahren bleibt inaktiv, mechanischer Rechenpfad übernimmt."
+  - id: cost-benefit-analysis-explicit-1
+    kind: explicit
+    prompt: "Nutze cost-benefit-analysis für diese Förderentscheidung. Vergleiche Förderung mit dokumentiertem Ausgangszustand; halte Verteilung sichtbar und setze unbelegte Bewertung aus statt Ergänzung."
+    expected_route: cost-benefit-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - choose
+      - multiple_options
+    rationale: "Nutzer fordert Verfahren und Vergleich ausdrücklich. Es bleibt primär, während unbelegte Werte angenommen oder ungeprüft bleiben."
+  - id: cost-benefit-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "Welches von zwei Projekten ist besser? Kein vereinbarter Ausgangszustand, Horizont oder Kostenunterlagen, nur werbliche Nutzenbehauptungen."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - decisive_input_missing
+    rationale: "Entscheidungsändernde Basis und Eingaben fehlen, Nutzenbehauptungen ohne Herkunft. Aussetzen und nur kleinste entscheidende Reparatur anfordern."

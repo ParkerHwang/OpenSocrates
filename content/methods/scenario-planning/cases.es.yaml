@@ -1,0 +1,76 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: scenario-planning-positive-1
+    kind: positive
+    prompt: "La ciudad prepara vivienda a diez años mientras migración y tecnología constructiva pueden variar independientemente. Define dos incertidumbres críticas, cuatro futuros sin probabilidades y acciones comunes útiles, contingentes y señales."
+    expected_route: scenario-planning
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - forecast
+    rationale: "Horizonte largo e impulsores externos requieren ramificación, no un pronóstico. Se piden ejes independientes, cuatro escenarios, acciones y señales sin probabilidades."
+  - id: scenario-planning-positive-2
+    kind: positive
+    prompt: "Un programa de salud pública a cinco años afronta combinaciones de confianza institucional y movilidad de patógenos. Construye matriz 2×2, vías de aparición, prueba del plan y señales para revisarlo."
+    expected_route: scenario-planning
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - new_evidence
+    rationale: "Se solicitan futuros coherentes externos, matriz, prueba del plan y señales, no pronóstico ordenado por probabilidad."
+  - id: scenario-planning-positive-3
+    kind: positive
+    prompt: "Preparamos una inversión educativa de una década. Regulación y conducta estudiantil son importantes e imprevisibles. Conserva premisas comunes, elige ejes independientes y separa preparaciones robustas de acciones disparadas por señales."
+    expected_route: scenario-planning
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - irreversible_choice
+      - plan
+    rationale: "Es preparación a largo plazo con incertidumbres externas importantes y separación entre acciones comunes y contingentes. Evita probabilidades."
+  - id: scenario-planning-negative-1
+    kind: negative
+    prompt: "El modelo trimestral de ingresos tiene fórmula base. Varía conversión y precios en intervalos defendibles, muestra umbral de cambio y prioriza qué investigar."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - sensitive_inputs
+    rationale: "Posible confusión con sensitivity-analysis: modelo, intervalos y umbrales, no ejes externos independientes ni futuros coherentes."
+  - id: scenario-planning-negative-2
+    kind: negative
+    prompt: "Con una clase de referencia definida de lanzamientos terminados, estima intervalo probable de entrega y compáralo con la fecha interna."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - forecast
+      - reference_cases
+    rationale: "Es pronóstico externo desde casos terminados, propio de reference-class-forecasting, no escenarios ramificados."
+  - id: scenario-planning-mechanical-1
+    kind: mechanical
+    prompt: "Ordena cronológicamente estos doce hitos fechados. No hay incertidumbre futura ni decisión de preparación."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "Es ordenación determinista sin incertidumbre externa ni elección estratégica."
+  - id: scenario-planning-explicit-1
+    kind: explicit
+    prompt: "Usa scenario-planning como principal para transición energética a diez años. Sin probabilidades, usa dos incertidumbres críticas independientes, cuatro futuros nombrados y acciones comunes y señales."
+    expected_route: scenario-planning
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - deep_uncertainty
+      - macro_environment
+    rationale: "Se nombra el método y los resultados sin probabilidades. Se conservan reglas de evidencia, alcance y suspensión."
+  - id: scenario-planning-insufficiency-1
+    kind: insufficiency
+    prompt: "Dame cuatro escenarios del futuro. No he indicado decisión, horizonte, límites ni incertidumbres externas relevantes."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - decisive_input_missing
+    rationale: "Sin marco, los relatos serían decorativos y sin límites. Debe suspenderse y pedirse solo el marco ausente."

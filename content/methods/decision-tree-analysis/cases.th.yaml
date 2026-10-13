@@ -1,0 +1,113 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "decision-tree-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "เราเปิดนำร่องตอนนี้หรือรอได้ ผลนำร่องที่วัดกำหนดว่าจะขยาย ปรับ หรือหยุด บันทึกโครงการย้อนหลังจำกัดผลกิ่ง และเจ้าของตัดสินทำได้ ณ จุดทบทวนที่ระบุ",
+      "expected_route": "decision-tree-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "sequential_choice",
+        "unknown_probability"
+      ],
+      "rationale": "ลำดับกับการกระทำถัดไปตามเงื่อนไขสำคัญ บันทึกย้อนหลังให้ที่มาความน่าจะเป็นและผลที่ตรวจได้"
+    },
+    {
+      "id": "decision-tree-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "ในการเปิดใช้งานเป็นขั้น เลือกระหว่างขยายทันทีและเก็บผลทดสอบก่อน ทุกผลมีช่วงผลลัพธ์ที่บันทึกและการกระทำภายหลังต่างตามข้อสังเกต แสดงจุดย้อนคืนและแหล่งทุกกิ่ง",
+      "expected_route": "decision-tree-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "sequential_choice",
+        "multiple_options",
+        "sensitive_inputs"
+      ],
+      "rationale": "เป็นการเลือกตามลำดับมีผลโอกาสและจุดย้อนคืนมีความหมาย ขอที่มาและช่วงแทนความแม่นยำไร้ฐาน"
+    },
+    {
+      "id": "decision-tree-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "ตัดสินผู้ขายได้ตอนนี้ หรือทำการตรวจที่บันทึกก่อนล็อกสัญญา ผลตรวจนำไปผู้ขายต่างกันหรือหยุด เจ้าของสัญญาระบุค่าผลและวันทบทวนแล้ว",
+      "expected_route": "decision-tree-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "sequential_choice",
+        "irreversible_choice",
+        "information_purchase"
+      ],
+      "rationale": "การตรวจเปลี่ยนทางเลือกภายหลังก่อนผูกมัดย้อนกลับไม่ได้ ต้นไม้แสดงการกระทำตามเงื่อนไขและจุดย้อนคืนได้โดยไม่แต่งความน่าจะเป็นกิ่ง"
+    },
+    {
+      "id": "decision-tree-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "จัดอันดับซอฟต์แวร์สามผลิตภัณฑ์ตามราคา การเข้าถึง สนับสนุน และความเชื่อถือได้ ไม่มีข้อสังเกตภายหลังหรือการกระทำตามเงื่อนไข ผู้ขอต้องการเปรียบเทียบเกณฑ์ชัดพร้อมน้ำหนักผู้มีส่วนได้เสีย",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "อาจสับสนกับ trade-off-analysis เป็นเปรียบเทียบหลายเกณฑ์คงที่ ไม่ใช่ต้นไม้ตามลำดับ"
+    },
+    {
+      "id": "decision-tree-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "นโยบายกำหนดว่าต้องอนุมัติทุกคำขอเข้าเกณฑ์เมื่อเงื่อนไขที่บันทึกครบ ตัดสินว่าทีมเลือกทางถูกกว่าแทนได้หรือไม่ ไม่มีดุลยพินิจเมื่อกฎใช้",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "single_feasible_option",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "กฎผูกพันตัดสินการกระทำ ไม่มีโหนดตัดสินใจจริง ห้ามใช้ต้นไม้หลบกฎ"
+    },
+    {
+      "id": "decision-tree-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "ตามผัง if-then ตายตัวนี้ด้วยข้อมูลตรวจแล้วและส่งป้ายปลายทาง ไม่มีโหนดโอกาส ผลไม่แน่นอน หรือทางเลือกใช้ดุลยพินิจ",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "เป็นดำเนินขั้นตอนที่ให้แบบกำหนดแน่นอน ไม่ใช่ตัดสินความไม่แน่นอนตามลำดับ"
+    },
+    {
+      "id": "decision-tree-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "ใช้ decision-tree-analysis สำหรับการเปิดใช้เป็นขั้น แสดงโหนดตัดสินใจและโอกาส ใช้เฉพาะช่วงกิ่งที่บันทึก และระบุจุดที่ย้อนคืนได้",
+      "expected_route": "decision-tree-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "sequential_choice",
+        "multiple_options"
+      ],
+      "rationale": "ผู้ใช้เรียกวิธีตรงและให้ผลสาธารณะที่ต้องการ ค่ากิ่งไร้ฐานต้องยังไม่ตรวจแทนเติม"
+    },
+    {
+      "id": "decision-tree-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "ควรเปิดตอนนี้หรือรอ? การกระทำภายหลังไม่ชัด ไม่มีแหล่งจำกัดผลที่เป็นไปได้ และไม่มีใครระบุข้อสังเกตที่อนุญาตย้อนคืน",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "sequential_choice",
+        "unknown_probability",
+        "decisive_input_missing"
+      ],
+      "rationale": "ลำดับ ฐานกิ่ง และเงื่อนไขย้อนคืนล้วนเป็นช่องว่างเปลี่ยนการตัดสินใจ ต้องพักแทนแต่งความน่าจะเป็นหรือกลยุทธ์"
+    }
+  ]
+}

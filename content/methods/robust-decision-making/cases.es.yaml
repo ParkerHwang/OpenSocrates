@@ -1,0 +1,82 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: robust-decision-making-positive-1
+    kind: positive
+    prompt: "Debemos elegir protección contra inundaciones para infraestructura de décadas. Lluvia, uso del suelo y financiación son profundamente inciertos; buscamos superar un mínimo de seguridad publicado en mundos plausibles, no ganar bajo un pronóstico."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - irreversible_choice
+      - choose
+      - failure_risk
+    rationale: "La decisión es importante y difícil de revertir, interactúan incertidumbres y se pide aceptabilidad entre mundos, no óptimo ponderado por probabilidades."
+  - id: robust-decision-making-positive-2
+    kind: positive
+    prompt: "La estrategia de suministro debe resistir aranceles, demanda y fiabilidad inciertos durante ocho años. Compara estrategias viables según fracaso y arrepentimiento, muestra compensaciones y añade desencadenantes adaptativos."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - irreversible_choice
+      - failure_risk
+      - feedback_delay
+    rationale: "Se solicita tensionar estrategias por escenarios, criterios explícitos de fracaso y adaptación: resultados públicos de decisiones robustas bajo incertidumbre profunda."
+  - id: robust-decision-making-positive-3
+    kind: positive
+    prompt: "Tenemos tres opciones de transporte regional, pero trabajo remoto, combustible y financiación no permiten un pronóstico creíble. Identifica primer paso aceptable, debilidades residuales y evidencia que lo cambiaría."
+    expected_route: robust-decision-making
+    expected_behavior: route
+    decisive_features:
+      - deep_uncertainty
+      - multiple_options
+      - choose
+      - new_evidence
+    rationale: "Hay elección real e incertidumbre profunda; se pide aceptabilidad, no estrategia más probable. Debilidades y cambio evitan exagerar robustez."
+  - id: robust-decision-making-negative-1
+    kind: negative
+    prompt: "El pronóstico base de demanda está bien validado, el piloto puede revertirse el mes próximo a coste insignificante y solo queremos máximo rendimiento esperado en ese caso."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - source_quality
+      - sequential_choice
+      - choose
+    rationale: "Un caso fiable y reversión trivial son condiciones explícitas para evitar el método; tensionar mundos no añade valor necesario."
+  - id: robust-decision-making-negative-2
+    kind: negative
+    prompt: "Crea cuatro futuros externos del mercado energético, explica cómo surgirían y señales tempranas. No compares una acción actual según fracaso o arrepentimiento."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - deep_uncertainty
+      - macro_environment
+      - plan
+    rationale: "Posible confusión con scenario-planning: construye futuros y señales, omitiendo deliberadamente tensión estratégica y criterios de aceptación."
+  - id: robust-decision-making-mechanical-1
+    kind: mechanical
+    prompt: "Calcula rendimiento anualizado con estos flujos verificados y la fórmula indicada; muestra aritmética sin elegir estrategias."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "Es cálculo acotado con fórmula y sin opciones inciertas; no conviertas aritmética en juicio de robustez."
+  - id: robust-decision-making-explicit-1
+    kind: explicit
+    prompt: "Usa robust-decision-making como método principal para adaptación costera. Prueba opciones en mundos climáticos y presupuestarios plausibles, usa nuestro servicio mínimo como umbral y suspende si faltan mundos o umbral."
+    expected_route: robust-decision-making
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - deep_uncertainty
+      - irreversible_choice
+      - failure_risk
+    rationale: "Se invoca método y marco, pruebas, mínimo y suspensión. La invocación no elimina restricciones de evidencia e incertidumbre."
+  - id: robust-decision-making-insufficiency-1
+    kind: insufficiency
+    prompt: "Dime qué estrategia duradera es robusta. No he enumerado acciones viables, significado del fracaso, horizonte ni incertidumbres."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - decisive_input_missing
+    rationale: "Acciones, mínimo, horizonte y registro son decisivos. Debe suspenderse y pedirse solo la información decisoria ausente."

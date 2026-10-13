@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "socratic-questioning-positive-01",
+      "kind": "positive",
+      "prompt": "Ponimi soltanto le domande che cambierebbero la decisione di lanciare questo servizio nel trimestre corrente.",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "L’utente richiede un insieme circoscritto di domande capaci di cambiare la decisione, non un’intervista aperta."
+    },
+    {
+      "id": "socratic-questioning-positive-02",
+      "kind": "positive",
+      "prompt": "Aiutami a esaminare gli assunti dietro la mia affermazione, ma poni non più di tre domande e spiega perché ciascuna conta.",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "Il compito richiede esplicitamente poche domande collegate alle conseguenze, per chiarire un giudizio."
+    },
+    {
+      "id": "socratic-questioning-positive-03",
+      "kind": "positive",
+      "prompt": "Non sono sicuro di cosa significhi qui «buone evidenze»; poni le poche domande che cambierebbero lo standard di revisione.",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "Le risposte mancanti possono cambiare lo standard delle evidenze e devono emergere senza sovraccarico di domande."
+    },
+    {
+      "id": "socratic-questioning-negative-01",
+      "kind": "negative",
+      "prompt": "Usa i requisiti forniti per verificare se l’implementazione è completa ed elenca gli eventuali campi mancanti.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "review_completion",
+        "explicit_rules"
+      ],
+      "rationale": "Il compito ha una regola fissa e richiede una verifica diretta del completamento, non un giudizio guidato dai chiarimenti."
+    },
+    {
+      "id": "socratic-questioning-negative-02",
+      "kind": "negative",
+      "prompt": "Definisci il termine contestato confrontando casi positivi, negativi e di confine.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "ambiguous_terms"
+      ],
+      "rationale": "L’utente richiede l’analisi concettuale stessa, non una sequenza circoscritta di domande."
+    },
+    {
+      "id": "socratic-questioning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Trasforma queste cinque domande in un elenco numerato Markdown.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Formattare domande fornite è meccanico e non deve attivare ulteriori domande."
+    },
+    {
+      "id": "socratic-questioning-explicit-01",
+      "kind": "explicit",
+      "prompt": "Invoca esplicitamente socratic-questioning per verificare se la mia decisione poggia su una premessa nascosta.",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "hidden_assumptions"
+      ],
+      "rationale": "L’utente nomina esplicitamente il metodo e richiede domande per verificare le premesse."
+    },
+    {
+      "id": "socratic-questioning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Poni le domande decisive, ma non rivelare la decisione, l’affermazione, l’ambito o la conseguenza su cui dovrebbero influire.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "Senza una decisione o conseguenza obiettivo, il metodo non può circoscrivere le domande o sapere cosa è decisivo."
+    }
+  ]
+}

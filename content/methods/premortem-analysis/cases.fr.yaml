@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "premortem-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "L’équipe va migrer les données clients et veut imaginer que la migration a échoué, recueillir des raisons indépendantes et fixer des avertissements précoces.",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "Un plan concret choisi exige un récit d’échec, des signaux précurseurs, des atténuations et des conditions d’arrêt."
+    },
+    {
+      "id": "premortem-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "Avant d’ouvrir une clinique, identifiez comment le plan pourrait échouer concernant personnel, demande, exploitation et réglementation, sans attribuer de fausses probabilités.",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "L’exercice contrefactuel d’échec du plan est explicite et doit rester ordinal et attentif aux preuves."
+    },
+    {
+      "id": "premortem-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "Une équipe de lancement unanime veut une remise en cause structurée pour révéler hypothèses tacites, indicateurs précurseurs et conditions de pause avant l’engagement.",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "chosen_plan",
+        "hidden_assumptions",
+        "failure_risk"
+      ],
+      "rationale": "La demande vise conformisme et planification optimiste autour d’une action sélectionnée."
+    },
+    {
+      "id": "premortem-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "Pour chaque étape du flux de travail, recensez modes de défaillance, effets, causes, contrôles et responsables dans un registre prospectif.",
+      "expected_route": "failure-mode-effects-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "failure_risk",
+        "plan",
+        "review_completion"
+      ],
+      "rationale": "Un inventaire des défaillances et contrôles de processus est plus précis qu’une rétrospective imaginée du plan."
+    },
+    {
+      "id": "premortem-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "Un défaut se répète depuis des mois et l’équipe doit trouver la condition systémique contrôlable empêchant la récidive.",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "Une récurrence existante appelle un diagnostic causal plutôt qu’un exercice avant engagement."
+    },
+    {
+      "id": "premortem-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Copiez le plan de lancement approuvé dans le modèle de risques sans ajouter de scénarios d’échec ni de recommandations.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "La copie est mécanique et ne demande pas de jugement sur le plan choisi."
+    },
+    {
+      "id": "premortem-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "Conduisez une analyse prémortem du recrutement et recensez les premiers signaux qui nous feraient suspendre.",
+      "expected_route": "premortem-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "chosen_plan",
+        "failure_risk"
+      ],
+      "rationale": "L’utilisateur nomme explicitement la méthode pour un plan concret avant engagement."
+    },
+    {
+      "id": "premortem-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Il n’existe aucun plan choisi, mais inventez une rétrospective d’échec et affirmez quelle option échouera avec une certitude de 90%.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "chosen_plan",
+        "decisive_input_missing"
+      ],
+      "rationale": "Sans plan ni classe de référence défendable, l’exercice ne peut soutenir une probabilité ou recommandation."
+    }
+  ]
+}

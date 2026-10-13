@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deduction-positive-01
+    kind: positive
+    prompt: "Folgt der Schluss notwendig aus diesen Richtlinienprämissen und der genannten Ausnahmeregel?"
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Nutzer fragt nach formaler Folge ausdrücklicher Prämissen und Regeln."
+  - id: deduction-positive-02
+    kind: positive
+    prompt: "Prüfe Gültigkeit dieses Vertragsarguments und tatsächliche Unterstützung der Prämissen."
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Gültigkeit und Schlüssigkeit sind bei ausdrücklichem Regelargument zu trennen."
+  - id: deduction-positive-03
+    kind: positive
+    prompt: "Finde die verborgene Prämisse, die diesen Konformitätsschluss folgend erscheinen lässt."
+    expected_route: deduction
+    expected_behavior: route
+    decisive_features: [explicit_rules, explain]
+    rationale: "Gefragt sind Standardisierung, verborgene Prämissen und formale Gültigkeit."
+  - id: deduction-negative-01
+    kind: negative
+    prompt: "Mehrere Erklärungen passen zum Ausfall; wähle beste und nächsten unterscheidenden Test."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Konkurrierende Ursachen und unterscheidende Belege verlangen abduction, keine logische Folgerung."
+  - id: deduction-negative-02
+    kind: negative
+    prompt: "Schätze, wie weit diese Beobachtungen allgemeine Aussagen über zukünftige Nutzer stützen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "Induktive Erweiterung hängt von Repräsentativität ab."
+  - id: deduction-mechanical-01
+    kind: mechanical
+    prompt: "Nummeriere die vorgegebenen Prämissen mit unverändertem Wortlaut."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Nummerieren ist mechanisch."
+  - id: deduction-explicit-01
+    kind: explicit
+    prompt: "Nutze ausdrücklich Deduktion zur Prüfung, ob die genannte Berechtigungsregel dieses Fallergebnis impliziert."
+    expected_route: deduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, explicit_rules]
+    rationale: "Nutzer fordert formale Regelanwendung und Folgerungsprüfung ausdrücklich."
+  - id: deduction-insufficiency-01
+    kind: insufficiency
+    prompt: "Beurteile Gültigkeit ohne Prämissen, Regel, Umfang oder Schlusstext."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [explicit_rules, decisive_input_missing]
+    rationale: "Gültigkeit braucht Argumentform und wesentliche Prämissen."

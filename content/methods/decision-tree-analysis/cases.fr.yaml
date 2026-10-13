@@ -1,0 +1,113 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "decision-tree-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Nous pouvons lancer un pilote maintenant ou attendre ; son résultat mesuré détermine extension, révision ou arrêt. L'historique du programme borne les résultats des branches et le responsable peut agir à la revue indiquée.",
+      "expected_route": "decision-tree-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "sequential_choice",
+        "unknown_probability"
+      ],
+      "rationale": "La séquence et les actions suivantes conditionnelles sont importantes ; l'historique fournit une provenance vérifiable des probabilités et résultats."
+    },
+    {
+      "id": "decision-tree-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "Pour un déploiement progressif, choisissez entre extension immédiate et collecte préalable d'un résultat de test. Chaque résultat a un intervalle documenté ; les actions ultérieures dépendent de l'observation. Montrez le point de retour arrière et la source de chaque branche.",
+      "expected_route": "decision-tree-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "sequential_choice",
+        "multiple_options",
+        "sensitive_inputs"
+      ],
+      "rationale": "C'est un choix séquentiel avec résultats aléatoires et un point de retour arrière significatif. La demande exige provenance et intervalles plutôt qu'une précision sans soutien."
+    },
+    {
+      "id": "decision-tree-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Un fournisseur peut être choisi maintenant, ou une inspection documentée peut précéder le verrouillage du contrat. Ses résultats conduisent à différents fournisseurs ou à un arrêt ; le responsable contractuel a indiqué valeurs finales et date de revue.",
+      "expected_route": "decision-tree-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "sequential_choice",
+        "irreversible_choice",
+        "information_purchase"
+      ],
+      "rationale": "L'inspection change les options ultérieures avant un engagement irréversible. L'arbre peut montrer actions conditionnelles et retour arrière sans inventer de probabilités."
+    },
+    {
+      "id": "decision-tree-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Classez trois logiciels selon prix, accessibilité, support et fiabilité. Il n'y a ni observation ultérieure ni action conditionnelle ; le demandeur souhaite une comparaison explicite des critères avec les poids des parties prenantes.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "La confusion probable est avec trade-off-analysis : c'est une comparaison statique multicritère, pas un arbre séquentiel."
+    },
+    {
+      "id": "decision-tree-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Une politique exige d'approuver toute demande admissible remplissant ses conditions documentées. Décidez si l'équipe peut choisir une alternative moins chère ; aucune latitude n'existe une fois la règle applicable.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "single_feasible_option",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "Une règle obligatoire décide l'action, sans véritable nœud de décision. Un arbre ne doit pas servir à contourner la règle."
+    },
+    {
+      "id": "decision-tree-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Suivez cet organigramme fixe si-alors avec des entrées vérifiées et renvoyez l'étiquette terminale. Aucun nœud aléatoire, résultat incertain ou choix discrétionnaire n'existe.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "C'est une exécution déterministe d'une procédure fournie, pas un jugement sur l'incertitude séquentielle."
+    },
+    {
+      "id": "decision-tree-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Utilisez decision-tree-analysis pour le déploiement progressif. Montrez nœuds de décision et d'aléa, utilisez uniquement les intervalles documentés des branches et identifiez le point de retour arrière.",
+      "expected_route": "decision-tree-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "sequential_choice",
+        "multiple_options"
+      ],
+      "rationale": "L'utilisateur invoque explicitement cette méthode et ses résultats publics. Les valeurs non étayées doivent rester non vérifiées, sans être complétées."
+    },
+    {
+      "id": "decision-tree-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Devons-nous lancer maintenant ou attendre ? Les actions ultérieures sont floues, aucune source ne borne les résultats possibles et personne n'a indiqué l'observation permettant un retour arrière.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "sequential_choice",
+        "unknown_probability",
+        "decisive_input_missing"
+      ],
+      "rationale": "La séquence, le fondement des branches et le retour arrière sont des lacunes susceptibles de changer la décision. La méthode doit suspendre au lieu d'inventer probabilités ou stratégie."
+    }
+  ]
+}

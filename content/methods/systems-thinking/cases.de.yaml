@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: systems-thinking-positive-01
+    kind: positive
+    prompt: "Moderationsrückstand wächst: Verzögerung frustriert Nutzer und erzeugt mehr Doppelmeldungen. Gesucht ist Struktur des Musters."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question, deep_uncertainty]
+    rationale: "Wiederkehrende Wechselwirkung von Flüssen, Rückkopplung und Verzögerung statt Einzelursache."
+  - id: systems-thinking-positive-02
+    kind: positive
+    prompt: "Naturschutzsubvention erhöht zunächst Pflanzung; Wasserknappheit und Durchsetzung erzeugen saisonal schwankende Ergebnisse."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "Saisonalität und Maßnahmenwiderstand brauchen Bestände, Flüsse, Balance und Verzögerung."
+  - id: systems-thinking-positive-03
+    kind: positive
+    prompt: "Kundenvertrauen wächst langsam, Empfehlungen verstärken Wachstum, Supportkürzung erzeugt verzögerten Rückgang; finden Sie Hebel."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Akkumulation, Verstärkung, Verzögerung und Eingriffshebel ausdrücklich verlangt."
+  - id: systems-thinking-negative-01
+    kind: negative
+    prompt: "Zwei vergleichbare Gruppen erhielten verschiedene Schulung; änderte dies Testergebnisse nach einem Monat?"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "Begrenzter Interventionsvergleich genügt ohne vollständiges dynamisches System."
+  - id: systems-thinking-negative-02
+    kind: negative
+    prompt: "Ein Datenbankausfall hat klaren zeitgestempelten Auslöser; gesucht sind nahe und kontrollierbare Grundbedingung."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [diagnose, recurring_failure]
+    rationale: "Begrenzte Vorfalldiagnose zuerst, sofern später kein Rückkopplungsmuster belegt wird."
+  - id: systems-thinking-mechanical-01
+    kind: mechanical
+    prompt: "Machen Sie Bestands-/Flussnotizen zu Markdown-Punkten ohne Systemerklärung."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Mechanische Formatierung ohne Struktururteil."
+  - id: systems-thinking-explicit-01
+    kind: explicit
+    prompt: "Nutzen Sie systems-thinking: Warum gleicht langfristiges Rückstandswachstum unsere lokale Personaländerung wiederholt aus?"
+    expected_route: systems-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay, causal_question]
+    rationale: "Ausdrückliche Methode für verzögertes wiederkehrendes Muster."
+  - id: systems-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "Gestern gab es eine einzelne Beschwerde; zeichnen Sie ohne Zeitmuster eine Verstärkungsschleife und empfehlen Sie Systemeingriff."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "Einmalige Beobachtung belegt weder Dynamik noch Schleifenrichtung."

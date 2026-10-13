@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: bayesian-updating-positive-01
+    kind: positive
+    prompt: "Come dovrebbe questo test positivo cambiare le odds delle diagnosi concorrenti, considerate le diverse frequenze di base?"
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "Il compito richiede base a priori, direzione delle prove, variazione a posteriori e sensibilità alle frequenze di base."
+  - id: bayesian-updating-positive-02
+    kind: positive
+    prompt: "Aggiorna la nostra fiducia nelle due ipotesi di lancio mentre questi segnali arrivano in sequenza."
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "Le prove sequenziali devono aggiornare ipotesi concorrenti senza contare due volte i segnali."
+  - id: bayesian-updating-positive-03
+    kind: positive
+    prompt: "Mostra se la raccomandazione si inverte quando la frequenza a priori e le ipotesi di verosimiglianza variano entro intervalli credibili."
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability]
+    rationale: "Il giudizio probatorio richiesto riguarda sensibilità del valore a posteriori e della soglia d’azione."
+  - id: bayesian-updating-negative-01
+    kind: negative
+    prompt: "Ordina queste fonti per immediatezza e qualità dello studio prima di decidere quanto forte possa essere l’affermazione."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Il compito calibra la qualità delle fonti, non aggiorna un insieme definito di ipotesi."
+  - id: bayesian-updating-negative-02
+    kind: negative
+    prompt: "Elenca le spiegazioni concorrenti di questa anomalia e proponi una verifica che le distingua."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "Generare spiegazioni e verifiche discriminanti appartiene all’abduzione quando non è richiesto aggiornamento a priori."
+  - id: bayesian-updating-mechanical-01
+    kind: mechanical
+    prompt: "Copia i valori a priori forniti nel foglio d’analisi."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Copiare valori è meccanico e non deve attivare ragionamento probabilistico."
+  - id: bayesian-updating-explicit-01
+    kind: explicit
+    prompt: "Usa esplicitamente bayesian-updating per rivedere la fiducia dopo questo nuovo segnale di frode."
+    expected_route: bayesian-updating
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, new_evidence]
+    rationale: "L’utente sceglie esplicitamente un aggiornamento della fiducia basato sulle prove."
+  - id: bayesian-updating-insufficiency-01
+    kind: insufficiency
+    prompt: "Fornisci la probabilità a posteriori, ma senza ipotesi concorrenti, base a priori o informazioni sulla verosimiglianza."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [new_evidence, unknown_probability, decisive_input_missing]
+    rationale: "Un valore a posteriori numerico senza ipotesi e provenienza degli input sarebbe precisione inventata."

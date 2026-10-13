@@ -1,0 +1,99 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "first-principles-positive-01",
+      "kind": "positive",
+      "prompt": "ส่วนใดของราคาต่อผู้ใช้ของเราจำเป็นจริง และส่วนใดสืบทอดมาจากขั้นตอนขายเก่า?",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "stale_options"
+      ],
+      "rationale": "การออกแบบใหม่ต้องแยกข้อกำหนดลดทอนไม่ได้จากธรรมเนียมและสมมติฐานสืบทอด"
+    },
+    {
+      "id": "first-principles-positive-02",
+      "kind": "positive",
+      "prompt": "เราออกแบบขั้นตอนอนุมัตินี้ใหม่จากข้อจำกัดความปลอดภัยจริงแทนคัดลอกลำดับปัจจุบันได้หรือไม่?",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "stale_options"
+      ],
+      "rationale": "คำขอให้แยกขั้นตอน ตรวจความจำเป็น และสร้างใหม่"
+    },
+    {
+      "id": "first-principles-positive-03",
+      "kind": "positive",
+      "prompt": "อะไรต้องยังเป็นจริงหากเราสร้างไปป์ไลน์ข้อมูลนี้ใหม่โดยไม่สมมติสถาปัตยกรรมผู้ขายเดิม?",
+      "expected_route": "first-principles",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "hidden_assumptions",
+        "stale_options"
+      ],
+      "rationale": "คำถามหลักคือข้อจำกัดใดยังอยู่หลังท้าทายสถาปัตยกรรมสืบทอด"
+    },
+    {
+      "id": "first-principles-negative-01",
+      "kind": "negative",
+      "prompt": "ใช้กฎเก็บข้อมูลที่บังคับกับแต่ละบันทึกและรายงานการละเมิด",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explicit_rules"
+      ],
+      "rationale": "กำลังใช้กฎผูกพัน ไม่ใช่พิจารณาหรือสร้างใหม่"
+    },
+    {
+      "id": "first-principles-negative-02",
+      "kind": "negative",
+      "prompt": "สร้างชุดผสมห้าแบบจากพารามิเตอร์ที่ตายตัว แล้วคัดกรองความเป็นไปได้",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "combinable_dimensions",
+        "stale_options"
+      ],
+      "rationale": "ข้อกำหนดตายตัวแล้ว งานคือสำรวจชุดผสม"
+    },
+    {
+      "id": "first-principles-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "คัดลอกรายการตรวจนำขึ้นระบบเดิมลงแม่แบบใหม่โดยไม่เปลี่ยนเนื้อหา",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "การคัดลอกรายการตรวจที่ให้เป็นงานเชิงกล ไม่ควรกระตุ้นการคิดออกแบบใหม่"
+    },
+    {
+      "id": "first-principles-explicit-01",
+      "kind": "explicit",
+      "prompt": "ใช้ first-principles เพื่อท้าทายสมมติฐานว่าทุกตั๋วสนับสนุนต้องมีคนตรวจ",
+      "expected_route": "first-principles",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "hidden_assumptions"
+      ],
+      "rationale": "ผู้ใช้เรียกวิธีชัดเพื่อแยกและตรวจสมมติฐานตามธรรมเนียม"
+    },
+    {
+      "id": "first-principles-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "สร้างระบบใหม่จากหลักการแรก แต่ไม่ระบุผลเป้าหมาย ข้อจำกัดที่ต่อรองไม่ได้ หรือกฎความปลอดภัยกำกับ",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "hidden_assumptions",
+        "decisive_input_missing"
+      ],
+      "rationale": "เมื่อไม่มีเป้าหมายและขอบเขตตายตัว การสร้างใหม่จะสับสนความเป็นไปได้กับแบบที่ปลอดภัยและใช้ได้จริง"
+    }
+  ]
+}

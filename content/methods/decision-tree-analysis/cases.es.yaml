@@ -1,0 +1,86 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: decision-tree-analysis-positive-1
+    kind: positive
+    prompt: "Podemos lanzar un piloto ahora o esperar, y su resultado medido determina ampliar, revisar o detener. El registro histórico del programa acota resultados de ramas y el responsable puede actuar en la revisión indicada."
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - choose
+      - sequential_choice
+      - unknown_probability
+    rationale: "La secuencia y próximas acciones condicionales importan; el registro histórico aporta procedencia comprobable de probabilidades y resultados."
+  - id: decision-tree-analysis-positive-2
+    kind: positive
+    prompt: "Para un despliegue por etapas, elige ampliar de inmediato o recoger primero una prueba. Cada resultado tiene un intervalo documentado y las acciones posteriores difieren según la observación; muestra reversión y fuente de cada rama."
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - multiple_options
+      - sensitive_inputs
+    rationale: "Es una elección secuencial con azar y reversión significativa. Se solicita procedencia e intervalos, no precisión sin apoyo."
+  - id: decision-tree-analysis-positive-3
+    kind: positive
+    prompt: "Puede elegirse proveedor ahora o hacer una inspección documentada antes de cerrar el contrato. Los hallazgos llevan a otros proveedores o detenerse, y el responsable ha indicado valores finales y fecha de revisión."
+    expected_route: decision-tree-analysis
+    expected_behavior: route
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - irreversible_choice
+      - information_purchase
+    rationale: "La inspección modifica opciones antes de un compromiso irreversible. El árbol muestra acciones condicionales y reversión sin inventar probabilidades."
+  - id: decision-tree-analysis-negative-1
+    kind: negative
+    prompt: "Clasifica tres productos de software por precio, accesibilidad, soporte y fiabilidad. No hay observación posterior ni acción condicional; se quiere comparar criterios explícitos con ponderaciones de actores."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - choose
+      - multiple_options
+      - multiple_objectives
+    rationale: "La posible confusión es trade-off-analysis: comparación multicriterio estática, no árbol secuencial."
+  - id: decision-tree-analysis-negative-2
+    kind: negative
+    prompt: "Una política exige aprobar toda solicitud elegible que cumpla condiciones documentadas. Decide si puede elegirse una alternativa más barata; no hay discreción al aplicarse la regla."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - judgment
+      - explicit_rules
+      - single_feasible_option
+      - binding_rule_without_discretion
+    rationale: "Una norma vinculante decide la acción sin nodo decisorio real. No debe usarse un árbol para evadirla."
+  - id: decision-tree-analysis-mechanical-1
+    kind: mechanical
+    prompt: "Sigue este diagrama fijo si-entonces con datos verificados y devuelve la etiqueta final. No hay nodos de azar, resultados inciertos ni elecciones discrecionales."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features:
+      - mechanical
+    rationale: "Es ejecución determinista de un procedimiento aportado, no juicio de incertidumbre secuencial."
+  - id: decision-tree-analysis-explicit-1
+    kind: explicit
+    prompt: "Usa decision-tree-analysis para el despliegue por etapas. Muestra nodos de decisión y azar, usa solo intervalos de ramas documentados e identifica el punto de reversión."
+    expected_route: decision-tree-analysis
+    expected_behavior: explicit_primary
+    decisive_features:
+      - explicit_method
+      - sequential_choice
+      - multiple_options
+    rationale: "El usuario invoca el método y sus resultados públicos. Los valores sin apoyo deben quedar no verificados, sin rellenarse."
+  - id: decision-tree-analysis-insufficiency-1
+    kind: insufficiency
+    prompt: "¿Lanzamos ahora o esperamos? Las acciones posteriores no están claras, ninguna fuente acota resultados y nadie ha indicado qué observación permitiría revertir."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features:
+      - judgment
+      - sequential_choice
+      - unknown_probability
+      - decisive_input_missing
+    rationale: "Secuencia, fundamento de ramas y reversión son carencias decisivas. Debe suspenderse el juicio sin inventar probabilidades ni estrategia."

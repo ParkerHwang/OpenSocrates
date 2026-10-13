@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-loop-diagramming-positive-01
+    kind: positive
+    prompt: "Uma fila aumenta a espera, a espera aumenta o abandono e o abandono muda a demanda futura por pessoal; mapeie o ciclo com sinais e o atraso."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "A tarefa pede variáveis nomeadas, vínculos com sinais, tipo de ciclo e o efeito atrasado que molda o padrão."
+  - id: causal-loop-diagramming-positive-02
+    kind: positive
+    prompt: "O crescimento de usuários aumenta avaliações, que atraem mais usuários, enquanto limites de capacidade geram uma resposta de equilíbrio; identifique os dois ciclos."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Vários ciclos direcionais e uma restrição de equilíbrio precisam ser representados explicitamente."
+  - id: causal-loop-diagramming-positive-03
+    kind: positive
+    prompt: "Uma política traz alívio rápido, mas depois o problema retorna porque a fiscalização muda comportamentos com longo atraso; desenhe a explicação de retroalimentação."
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "O resultado pedido é uma análise de ciclos com sinais da resistência atrasada à política, não uma única estimativa de efeito."
+  - id: causal-loop-diagramming-negative-01
+    kind: negative
+    prompt: "Uma organização ampla tem muitos atores, estoques e efeitos colaterais; decida o melhor ponto de alavancagem antes de escolher um diagrama compacto de ciclos."
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "É preciso estabelecer os limites mais amplos e a questão de alavancagem antes de um diagrama focado."
+  - id: causal-loop-diagramming-negative-02
+    kind: negative
+    prompt: "Um estudo pergunta se um medicamento causou um resultado medido comparado a um controle, sem padrão dinâmico recorrente."
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "Uma questão delimitada de efeito contrafactual não precisa de um ciclo de retroalimentação."
+  - id: causal-loop-diagramming-mechanical-01
+    kind: mechanical
+    prompt: "Copie os rótulos existentes de ciclos para uma apresentação e preserve a ordem sem avaliar qualquer relação."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copiar e formatar não exigem julgamento causal."
+  - id: causal-loop-diagramming-explicit-01
+    kind: explicit
+    prompt: "Aplique causal-loop-diagramming para mostrar por que descontos aumentam a demanda, mas depois criam falta de estoque e perda de confiança."
+    expected_route: causal-loop-diagramming
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay]
+    rationale: "O usuário nomeia o método e fornece um padrão recorrente de reforço e equilíbrio."
+  - id: causal-loop-diagramming-insufficiency-01
+    kind: insufficiency
+    prompt: "Duas variáveis se moveram juntas uma vez, mas direção, temporalidade e recorrência são desconhecidas; desenhe um ciclo de reforço verificado."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "Um único movimento conjunto sem direção ou temporalidade não sustenta um ciclo com sinais."

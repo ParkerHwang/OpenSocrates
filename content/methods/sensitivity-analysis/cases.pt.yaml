@@ -1,0 +1,106 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "sensitivity-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Nossa justificativa compara dois depósitos por demanda, mão de obra e energia. Fórmula inicial e limiar estão documentados, com intervalos defensáveis das entradas. Teste-os, mostre valores de troca e robustez ou fragilidade da escolha.",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "multiple_objectives",
+        "choose"
+      ],
+      "rationale": "Há modelo, comparação, referência, intervalos e limiar. Pede perturbação e mudança decisória, não probabilidades inventadas."
+    },
+    {
+      "id": "sensitivity-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "Temos modelo de pessoal de central de serviços com meta publicada de resposta. Teste volume, duração de atendimento e pessoal em intervalos apoiados por fontes, respeitando dependência, e priorize pesquisa que mudaria decisão.",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "unknown_probability",
+        "choose",
+        "information_purchase"
+      ],
+      "rationale": "Há modelo, limiar e entradas incertas; preserve dependência e prioridade da informação. Mudanças calculadas ou ordinais não exigem probabilidades fabricadas."
+    },
+    {
+      "id": "sensitivity-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Um comitê avalia três projetos por custo, impacto e risco. Pesos documentados são disputados e a recomendação pode mudar. Varie pesos e notas em intervalos justificados, registre valores de troca e suposições frágeis.",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "multiple_objectives",
+        "choose"
+      ],
+      "rationale": "É comparação estruturada com pesos incertos e troca possível. Exponha sensibilidade antes de tratar pesos como resolvidos."
+    },
+    {
+      "id": "sensitivity-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Não temos modelo ou limiar. Revise estudos conflitantes, julgue fontes e concilie evidências de segurança.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "conflicting_sources",
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "É confusão provável com hierarquia ou conciliação de evidências. Sem modelo, regra ou limiar, não há relação a perturbar."
+    },
+    {
+      "id": "sensitivity-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Explore quatro futuros externos distintos de dez anos e preparações para cada. Não há modelo quantitativo, nota de opção ou relação a variar.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "decisive_input_missing"
+      ],
+      "rationale": "É construção de cenários sob incerteza profunda, explicitamente sem modelo. Sensibilidade fabricaria referência impossível de testar."
+    },
+    {
+      "id": "sensitivity-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Multiplique cada quantidade verificada pelo fator de conversão fornecido e retorne a lista. Não há modelo, comparação ou limiar decisório.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "É conversão determinística sem intervalo incerto ou fragilidade decisória."
+    },
+    {
+      "id": "sensitivity-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Use sensitivity-analysis para a decisão de preços. Modelo de contribuição, intervalos disputados de volume e margem e margem mínima estão documentados; encontre valores de troca e suspenda se faltar proveniência de intervalo.",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "sensitive_inputs",
+        "choose"
+      ],
+      "rationale": "Nomeia método, referência, intervalos, limiar e suspensão. Saída deve ser calculada ou rotulada, não probabilística."
+    },
+    {
+      "id": "sensitivity-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Diga se a recomendação é sensível. Não forneci modelo inicial, entradas, intervalos, limiar ou fórmula.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "Todas são entradas decisivas. Suspenda e peça-as de modo delimitado em vez de alegação genérica."
+    }
+  ]
+}

@@ -8,7 +8,7 @@ import { runManagedHost, ManagedHostError } from "./managed-hosts.mjs";
 
 const VERSION = "1.5.0";
 const IDS = Array.from({ length: 48 }, (_, i) => `method-${i + 1}`);
-const LOCALES = ["en", "ko", "zh", "ja"];
+const LOCALES = ["en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th"];
 const HASH = `sha256:${"a".repeat(64)}`;
 const digest = (value) => createHash("sha256").update(value).digest("hex");
 const jsonBytes = (value) => `${JSON.stringify(value, null, 2)}\n`;
@@ -30,7 +30,7 @@ async function snapshot(root) {
   await visit(root); return output;
 }
 
-async function fixture(base, host, { version = VERSION, variant = "original", locales = version === "1.5.0" ? ["en", "ko"] : LOCALES } = {}) {
+async function fixture(base, host, { version = VERSION, variant = "original", locales = version === "1.5.0" ? LOCALES.slice(0, 2) : version === "1.5.1" ? LOCALES.slice(0, 4) : LOCALES } = {}) {
   const root = join(base, `package-${host}-${variant}`);
   const skill = host === "claude-chat" ? "opensocrates" : host === "antigravity" ? ".agents/skills/opensocrates" : "skills/opensocrates";
   const payload = {};
@@ -145,9 +145,37 @@ test("v1.5.1 requires all four locales while legacy v1.5.0 packages remain valid
     const complete = await fixture(b.base, host, { version: "1.5.1", variant: "multilingual" });
     assert.equal((await runManagedHost(b.options(host, "verify"), b.helpers(complete, "1.5.1"))).installation, "verified-package");
     for (const missing of ["zh", "ja"]) {
-      const incomplete = await fixture(b.base, host, { version: "1.5.1", variant: `missing-${missing}`, locales: LOCALES.filter((locale) => locale !== missing) });
+      const incomplete = await fixture(b.base, host, { version: "1.5.1", variant: `missing-${missing}`, locales: LOCALES.slice(0, 4).filter((locale) => locale !== missing) });
       await assert.rejects(runManagedHost(b.options(host, "verify"), b.helpers(incomplete, "1.5.1")), { code: "invalid_canonical_content" });
     }
+  }
+});
+
+test("v1.5.2 requires all ten locales and preserves v1.5.1's four-locale inventory", async (t) => {
+  const b = await box(t);
+  for (const host of ["claude", "claude-chat", "antigravity"]) {
+    const previous = await fixture(b.base, host, { version: "1.5.1", variant: "previous" });
+    assert.equal((await runManagedHost(b.options(host, "verify"), b.helpers(previous, "1.5.1"))).installation, "verified-package");
+    const complete = await fixture(b.base, host, { version: "1.5.2", variant: "ten-locales" });
+    assert.equal((await runManagedHost(b.options(host, "verify"), b.helpers(complete, "1.5.2"))).installation, "verified-package");
+    for (const missing of LOCALES.slice(4)) {
+      const incomplete = await fixture(b.base, host, { version: "1.5.2", variant: `missing-${missing}`, locales: LOCALES.filter((locale) => locale !== missing) });
+      await assert.rejects(runManagedHost(b.options(host, "verify"), b.helpers(incomplete, "1.5.2")), { code: "invalid_canonical_content" });
+    }
+  }
+});
+
+test("prior-version packages reject inventoried procedures from later locale inventories", async (t) => {
+  const b = await box(t);
+  for (const host of ["claude", "claude-chat", "antigravity"]) {
+    const pkg = await fixture(b.base, host, { version: "1.5.1", variant: "foreign-procedure" });
+    const skill = host === "claude-chat" ? "opensocrates" : host === "antigravity" ? ".agents/skills/opensocrates" : "skills/opensocrates";
+    const path = `${skill}/references/decision/methods/fr/method-1.md`;
+    const bytes = "Synthetic later-version procedure\n";
+    await write(join(pkg.root, path), bytes);
+    pkg.manifest.files.push({ path, sha256: `sha256:${digest(bytes)}` });
+    await write(join(pkg.root, pkg.manifestPath), jsonBytes(pkg.manifest));
+    await assert.rejects(runManagedHost(b.options(host, "verify"), b.helpers(pkg, "1.5.1")), { code: "invalid_canonical_content" });
   }
 });
 
@@ -172,6 +200,31 @@ test("Antigravity global install, disable, update, enable and exact remove prese
   assert.equal(await fs.readFile(join(process.env.ANTIGRAVITY_CONFIG_DIR, "GEMINI.md"), "utf8"), "untouched GEMINI");
   assert.equal(await fs.readFile(join(process.env.ANTIGRAVITY_CONFIG_DIR, "skills/unrelated/SKILL.md"), "utf8"), "untouched skill");
   assert.equal((await b.state()).calls.length, 0, "Content-only lifecycle invoked a host CLI");
+});
+
+test("Antigravity updates a four-locale installation to ten locales and rolls back a failed replacement", async (t) => {
+  const b = await box(t);
+  const previous = await fixture(b.base, "antigravity", { version: "1.5.1", variant: "four-installed" });
+  await runManagedHost(b.options("antigravity", "install"), b.helpers(previous, "1.5.1"));
+  await runManagedHost(b.options("antigravity", "disable"), b.helpers(previous, "1.5.1"));
+  const current = await fixture(b.base, "antigravity", { version: "1.5.2", variant: "ten-installed" });
+  const updated = await runManagedHost(b.options("antigravity", "update"), b.helpers(current, "1.5.2"));
+  assert.equal(updated.enabled, false);
+  await runManagedHost(b.options("antigravity", "enable"), b.helpers(current, "1.5.2"));
+  for (const locale of LOCALES) assert.equal(await exists(join(b.globalSkill, `references/decision/methods/${locale}/method-48.md`)), true);
+  const before = await snapshot(process.env.ANTIGRAVITY_CONFIG_DIR);
+  const failed = await fixture(b.base, "antigravity", { version: "1.5.2", variant: "ten-rollback" });
+  const original = fs.rename;
+  let injected = false;
+  fs.rename = async (source, destination) => {
+    if (!injected && destination === b.globalSkill && source.endsWith("/skill")) { injected = true; throw new Error("synthetic ten-locale rename failure"); }
+    return original(source, destination);
+  };
+  try { await assert.rejects(runManagedHost(b.options("antigravity", "update"), b.helpers(failed, "1.5.2")), /synthetic ten-locale rename failure/u); }
+  finally { fs.rename = original; }
+  assert.equal(injected, true);
+  assert.deepEqual(await snapshot(process.env.ANTIGRAVITY_CONFIG_DIR), before);
+  await runManagedHost(b.options("antigravity", "remove"), b.helpers(current, "1.5.2"));
 });
 
 test("Antigravity workspace targets only the explicit workspace and preserves AGENTS", async (t) => {

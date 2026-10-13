@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: logic-tree-positive-01
+    kind: positive
+    prompt: "Warum stieg Kundenabwanderung, und wie zerlegen wir Ursachen in überschneidungsfreie testbare Zweige?"
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, diagnose, plan]
+    rationale: "Eine breite Diagnose benötigt einen Warum-Baum mit ausdrücklicher Achse, MECE-Prüfungen und Blatttests."
+  - id: logic-tree-positive-02
+    kind: positive
+    prompt: "Erstellen Sie einen vollständigen Problembaum zur Verringerung von Onboarding-Fehlern mit Verifikationsschritt an jedem Blatt."
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, plan]
+    rationale: "Abdeckung und handlungsfähige Zerlegung sind das verlangte Ergebnis."
+  - id: logic-tree-positive-03
+    kind: positive
+    prompt: "Zerlegen Sie diese breite Risikofrage in überschneidungsfreie Zweige, die ein Betriebsteam zuordnen und testen kann."
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "Hierarchische Zweige, Abdeckungsprüfungen und ausführbare Blätter sind erforderlich."
+  - id: logic-tree-negative-01
+    kind: negative
+    prompt: "Prüfen Sie, ob bestehende Kategorien sich überschneiden und Fälle fehlen."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "Die enge Klassifikationsprüfung ist MECE, keine rekursive Baumkonstruktion."
+  - id: logic-tree-negative-02
+    kind: negative
+    prompt: "Zeichnen Sie Rückkopplungen zwischen diesen Variablen und identifizieren Sie verstärkende und ausgleichende Dynamiken."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "Abhängige Rückkopplungen passen schlecht zu Hierarchien und brauchen eine Systemmethode."
+  - id: logic-tree-mechanical-01
+    kind: mechanical
+    prompt: "Rücken Sie die vorgegebenen Überschriften nach derselben Baumstruktur wie im Beispiel ein."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Vorgegebenes Einrücken ist mechanische Formatierung."
+  - id: logic-tree-explicit-01
+    kind: explicit
+    prompt: "Nutzen Sie ausdrücklich logic-tree zur Strukturierung der Ursachen unserer verzögerten Veröffentlichung."
+    expected_route: logic-tree
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, tangled_hierarchy]
+    rationale: "Der Nutzer wählt ausdrücklich eine hierarchische Diagnosestruktur."
+  - id: logic-tree-insufficiency-01
+    kind: insufficiency
+    prompt: "Erstellen Sie den vollständigen Problembaum, nennen Sie aber weder Wurzelfrage noch Reichweite oder Erfolgsmaß."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [tangled_hierarchy, decisive_input_missing]
+    rationale: "Ohne begrenzte Wurzel sind Abdeckung und Handlungsfähigkeit der Blätter nicht sicher beurteilbar."

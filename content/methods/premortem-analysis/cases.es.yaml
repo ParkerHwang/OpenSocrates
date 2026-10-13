@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: premortem-analysis-positive-01
+    kind: positive
+    prompt: "El equipo está por migrar datos de clientes y quiere imaginar un fracaso, reunir razones independientes y fijar alertas tempranas."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "Un plan elegido concreto necesita relato de fracaso, señales, mitigaciones y condiciones de detención."
+  - id: premortem-analysis-positive-02
+    kind: positive
+    prompt: "Antes de abrir una clínica, identifica cómo fracasaría el plan por personal, demanda, operaciones y regulación sin probabilidades falsas."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, failure_risk]
+    rationale: "El ejercicio contrafactual de fracaso está explícito y debe mantener ordinalidad y estados de evidencia."
+  - id: premortem-analysis-positive-03
+    kind: positive
+    prompt: "Un equipo unánime quiere cuestionar estructuradamente el lanzamiento para revelar supuestos silenciosos, indicadores tempranos y pausas antes del compromiso."
+    expected_route: premortem-analysis
+    expected_behavior: route
+    decisive_features: [chosen_plan, hidden_assumptions, failure_risk]
+    rationale: "La petición aborda conformidad y optimismo alrededor de una acción elegida."
+  - id: premortem-analysis-negative-01
+    kind: negative
+    prompt: "Enumera para cada paso modos de fallo, efectos, causas, controles y responsables en un registro prospectivo."
+    expected_route: failure-mode-effects-analysis
+    expected_behavior: route
+    decisive_features: [failure_risk, plan, review_completion]
+    rationale: "El inventario de proceso y controles es más específico que una retrospectiva imaginada del plan."
+  - id: premortem-analysis-negative-02
+    kind: negative
+    prompt: "Un defecto se repite desde hace meses y el equipo necesita identificar la condición sistémica controlable que evite repetición."
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [recurring_failure, diagnose]
+    rationale: "Una recurrencia existente necesita diagnóstico causal, no ejercicio previo al compromiso."
+  - id: premortem-analysis-mechanical-01
+    kind: mechanical
+    prompt: "Copia el plan aprobado a la plantilla de riesgos sin añadir escenarios de fracaso ni recomendaciones."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copiar es mecánico y no solicita juicio sobre el plan."
+  - id: premortem-analysis-explicit-01
+    kind: explicit
+    prompt: "Haz un premortem del plan de contratación y enumera las primeras señales que nos harían pausar."
+    expected_route: premortem-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, chosen_plan, failure_risk]
+    rationale: "Se solicita explícitamente el método para un plan concreto antes del compromiso."
+  - id: premortem-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "No hay plan elegido, pero inventa una retrospectiva y declara qué opción fracasará con 90% de certeza."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [chosen_plan, decisive_input_missing]
+    rationale: "Sin plan ni clase de referencia defendible, no puede respaldarse probabilidad ni recomendación."

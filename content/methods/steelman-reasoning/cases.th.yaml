@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: steelman-reasoning-positive-01
+    kind: positive
+    prompt: "คณะกรรมการปัดข้อคัดค้านความเป็นส่วนตัวว่าเป็นการปลุกความกลัว สร้างฉบับหนักแน่นที่สุดอย่างเป็นธรรมและบอกว่าเปลี่ยนการตัดสินใจเปิดตัวหรือไม่"
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute, critique]
+    rationale: "ความกังวลฝ่ายคัดค้านถูกปัดตกและอาจมีความเสี่ยงสำคัญซึ่งควรพิจารณาในฉบับหนักแน่นที่เป็นธรรมที่สุด"
+  - id: steelman-reasoning-positive-02
+    kind: positive
+    prompt: "สองทีมเห็นต่างเรื่องทำงานทางไกล แต่ละฝ่ายมีเป้าหมายสอดคล้องและหลักฐาน ระบุฉบับหนักแน่นที่สุดของอีกฝ่ายก่อนตอบ"
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, argument_dispute]
+    rationale: "จุดยืนคัดค้านจริงต้องสร้างใหม่อย่างเป็นธรรม ระบุสิ่งรองรับที่ต้องมี และตอบอย่างเป็นธรรม"
+  - id: steelman-reasoning-positive-03
+    kind: positive
+    prompt: "ผู้วิจารณ์นโยบายถูกอ้างถึงเพียงด้วยป้ายชื่อที่เป็นปฏิปักษ์ กู้คืนข้ออ้างจริง ข้อสมมติที่ดีที่สุด และส่วนที่ข้อเสนอควรเปลี่ยน"
+    expected_route: steelman-reasoning
+    expected_behavior: route
+    decisive_features: [dismissed_opposition, critique]
+    rationale: "งานแยกข้ออ้างสาธารณะจากการบรรยายที่อ่อนอย่างชัด และทดสอบผลตามมา"
+  - id: steelman-reasoning-negative-01
+    kind: negative
+    prompt: "หลักการขัดกับกรณียากหลายกรณีที่พิจารณาแล้ว กลุ่มต้องปรับหลักการหรือการตัดสินให้สอดคล้องกว่า"
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "ผลหลักคือปรับหลักการกับกรณีเข้าหากัน ไม่ใช่สร้างข้อคัดค้านขึ้นใหม่"
+  - id: steelman-reasoning-negative-02
+    kind: negative
+    prompt: "รายงานมีข้ออ้าง เหตุผล ข้อคัดค้าน และคำตอบที่ต้องทำแผนที่เป็นกลางก่อนประเมินฝ่ายคัดค้าน"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "ควรกำหนดแผนที่โครงสร้างข้ออ้างก่อนเลือกการสร้างข้อคัดค้านฉบับหนักแน่น"
+  - id: steelman-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "แปลข้อความคัดค้านที่อ้างเป็นภาษาเกาหลีและรักษาน้ำเสียง โดยไม่ประเมินหรือเสริมจุดยืน"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "การแปลเป็นงานเชิงกลและต้องไม่กระตุ้นการสร้างข้อโต้แย้งใหม่"
+  - id: steelman-reasoning-explicit-01
+    kind: explicit
+    prompt: "ใช้ steelman-reasoning กับข้อคัดค้านการควบรวมของเราที่หนักแน่นที่สุด และบอกว่าหลักฐานใดจะทำให้เราเปลี่ยนทิศทาง"
+    expected_route: steelman-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, dismissed_opposition, argument_dispute]
+    rationale: "ผู้ใช้ขอข้อคัดค้านที่เป็นธรรมต่อการตัดสินใจมีผลสำคัญอย่างชัดเจน"
+  - id: steelman-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "ไม่มีคำกล่าวคัดค้านจริง สร้างฝ่ายตรงข้ามที่ซับซ้อนแล้วอ้างว่าเป็นชุมชนเพื่อให้เราเอาชนะได้"
+    expected_route: null
+    expected_behavior: refuse
+    decisive_features: [dismissed_opposition, decisive_input_missing]
+    rationale: "ไม่มีจุดยืนสาธารณะจริง การสร้างขึ้นจะบิดเบือนคน ไม่ใช่ทำข้อคัดค้านให้หนักแน่นอย่างเป็นธรรม"

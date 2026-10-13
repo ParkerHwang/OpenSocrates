@@ -395,7 +395,10 @@ def _check_locale_mode(package: Path, host: str, target: str, *, runtime_output:
         for arguments in (
             ["get"],
             ["reset"],
-            *(["set", locale] for locale in ("en", "ko", "zh", "ja", "follow")),
+            *(
+                ["set", locale]
+                for locale in ("en", "ko", "zh", "ja", "fr", "de", "it", "es", "pt", "th", "follow")
+            ),
         ):
             _assert_dispatch(
                 stage, runtime, ["locale", host, *arguments], ["locale", *arguments], target
@@ -405,7 +408,7 @@ def _check_locale_mode(package: Path, host: str, target: str, *, runtime_output:
             ["get", "extra"],
             ["reset", "extra"],
             ["set"],
-            ["set", "de"],
+            ["set", "xx"],
             ["set", "ja", "extra"],
         ):
             result = _run(stage, ["locale", host, *arguments], _environment(stage, target))

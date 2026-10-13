@@ -14,7 +14,7 @@ function unavailable(code) {
 const events = new Set(['session_started','user_prompt_submitted','skill_invoked','tool_succeeded','tool_failed','tool_batch_completed','completion_candidate','pre_compaction','post_compaction','session_ended']);
 const localeCommand = mode === 'locale' && (
   ['get','reset'].includes(event) && argv.length === 3 ||
-  event === 'set' && argv.length === 4 && ['en','ko','zh','ja','follow'].includes(value)
+  event === 'set' && argv.length === 4 && ['en','ko','zh','ja','fr','de','it','es','pt','th','follow'].includes(value)
 );
 if (!['codex'].includes(host) || extra.length || (mode !== 'locale' && argv.length > 3) ||
     !(hook ? events.has(event) : mode === 'decision' ? !event || event === '--stream' : localeCommand || mode === 'control' && !event)) unavailable('invalid_arguments');

@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "pragmatism-positive-01",
+      "kind": "positive",
+      "prompt": "Deux cadres de gestion de projet entraînent différents choix de réunions, de priorités et de retours ; comparez leurs conséquences observables avant d’en choisir un.",
+      "expected_route": "pragmatism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "practical_consequence",
+        "choose"
+      ],
+      "rationale": "Les interprétations diffèrent dans l’action et peuvent être jugées selon des conséquences pratiques délimitées."
+    },
+    {
+      "id": "pragmatism-positive-02",
+      "kind": "positive",
+      "prompt": "Une ville doit choisir entre deux politiques de sensibilisation et peut conduire un pilote réversible avec une fenêtre d’observation convenue et des contraintes de sécurité.",
+      "expected_route": "pragmatism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "practical_consequence",
+        "choose",
+        "value_conflict"
+      ],
+      "rationale": "Le besoin central est un choix pratique de politique avec un test d’apprentissage sûr."
+    },
+    {
+      "id": "pragmatism-positive-03",
+      "kind": "positive",
+      "prompt": "Un long débat entre deux étiquettes ne change aucune décision ni prévision ; déterminez si les étiquettes sont pratiquement équivalentes dans ce contexte.",
+      "expected_route": "pragmatism",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "practical_consequence",
+        "choose"
+      ],
+      "rationale": "La méthode doit tester si le désaccord présente une différence pratique observable."
+    },
+    {
+      "id": "pragmatism-negative-01",
+      "kind": "negative",
+      "prompt": "Une source de politique impose un devoir de signalement et interdit la divulgation ; comparez uniquement les actions encore permises.",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "duties_rights",
+        "explicit_rules"
+      ],
+      "rationale": "Les devoirs et interdictions contraignants limitent les actions avant la comparaison des conséquences pratiques."
+    },
+    {
+      "id": "pragmatism-negative-02",
+      "kind": "negative",
+      "prompt": "Une équipe produit doit identifier le moment où l’utilisateur peine, son besoin fonctionnel, émotionnel et social et les forces de changement avant de choisir une solution.",
+      "expected_route": "jobs-to-be-done",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "user_progress",
+        "human_need"
+      ],
+      "rationale": "Le goulet d’étranglement est la découverte du progrès utilisateur plutôt que la comparaison des conséquences d’interprétations connues."
+    },
+    {
+      "id": "pragmatism-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Placez les deux descriptions de politique dans des colonnes adjacentes sans comparer les conséquences ni recommander l’une d’elles.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "La mise en colonnes est mécanique."
+    },
+    {
+      "id": "pragmatism-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez pragmatism pour comparer ces deux procédures d’intervention selon leurs changements pratiques, avec un exercice sur table réversible.",
+      "expected_route": "pragmatism",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "practical_consequence",
+        "choose"
+      ],
+      "rationale": "L’utilisateur demande explicitement une comparaison des conséquences et un test liés au contexte."
+    },
+    {
+      "id": "pragmatism-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Options et critère de réussite ne sont pas définis ; déclarez vraie l’interprétation réconfortante parce qu’elle semble utile.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "practical_consequence",
+        "decisive_input_missing"
+      ],
+      "rationale": "L’utilité ne peut être évaluée sans options, critère ou conséquences observables."
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: argument-mapping-positive-01
+    kind: positive
+    prompt: "Kartiere Behauptung, Gründe, Einwände und Entkräftungen dieses Richtlinienarguments, damit unbelegte Verbindungen sichtbar werden."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique, tangled_hierarchy]
+    rationale: "Die Aufgabe verlangt ausdrücklich Behauptungs-Grund-Einwand-Struktur und Erkennung unbelegter Verbindungen."
+  - id: argument-mapping-positive-02
+    kind: positive
+    prompt: "Welche Prämisse stützt die Empfehlung tatsächlich, und welche Gegenargumente bleiben unbeantwortet?"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "Mehrere Unterstützungs- und Angriffsbeziehungen müssen vor der Empfehlungsbewertung getrennt werden."
+  - id: argument-mapping-positive-03
+    kind: positive
+    prompt: "Erstelle eine Argumentkarte zur Vertragsposition einschließlich gemeinsamer Annahmen und stärkster Entkräftung."
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, tangled_hierarchy]
+    rationale: "Gefordert ist eine strukturierte öffentliche Karte von Behauptungen, gemeinsamen Prämissen und Einwänden."
+  - id: argument-mapping-negative-01
+    kind: negative
+    prompt: "Vergleiche Belegqualität dieser beiden Studien und sage, welche auf unsere Population anwendbar ist."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "Hauptengpass sind Studiendesign und Anwendbarkeit; sie gehören zur Belegprüfung."
+  - id: argument-mapping-negative-02
+    kind: negative
+    prompt: "Schreibe zuerst die Entscheidungsempfehlung, danach drei gruppierte Gründe und stützende Details."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "Gefragt ist Kommunikation von oben nach unten statt Prüfung von Unterstützungsverbindungen."
+  - id: argument-mapping-mechanical-01
+    kind: mechanical
+    prompt: "Wandle diese vorgegebene Prämissenliste in Markdown-Aufzählungen um."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "Formatierung einer Liste braucht keine Argumentanalyse."
+  - id: argument-mapping-explicit-01
+    kind: explicit
+    prompt: "Nutze ausdrücklich argument-mapping zur Prüfung des stärksten Einwands gegen dieses Investitionsmemo."
+    expected_route: argument-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, argument_dispute]
+    rationale: "Der Nutzer fordert das Verfahren für Einwands- und Unterstützungsstrukturprüfung ausdrücklich an."
+  - id: argument-mapping-insufficiency-01
+    kind: insufficiency
+    prompt: "Kartiere das Argument und beurteile seine schwächste Verbindung, aber ohne Schluss, Prämissen oder Quellentext."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [argument_dispute, decisive_input_missing]
+    rationale: "Ohne kartierbares Argumentmaterial muss das Verfahren aussetzen statt Prämissen erfinden."

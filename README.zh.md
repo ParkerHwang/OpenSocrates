@@ -7,11 +7,13 @@
 **帮助你得到能够理解、评估并使用的推理结果。**
 
 OpenSocrates 为资料综合、观点理解、方案比较和消息撰写提供 48 种完整的推理
-方法。v1.5.1 新增简体中文（`zh`）和日语（`ja`），并保留原有英文、韩文方法
-正文。四种语言共有 192 份完整步骤文件；每种方法每种语言有 3 个面向代理的
-教师问题，共 576 个。内容修订号为 4。此版本不新增编程专用方法。
+方法。v1.5.2 在英文、韩文、简体中文和日语之外新增法语、德语、意大利语、
+西班牙语、葡萄牙语和泰语。十种语言共有 480 份完整步骤文件、3,840 个正典
+案例，以及每种方法每种语言 3 个教师问题，共 1,440 个。内容修订号为 5；
+原有四种语言的正文和值保持不变，各方法的修订标识从 4 更新为 5。
+此版本不新增编程专用方法。
 
-[English](README.md) | [한국어](README.ko.md) | **简体中文** | [日本語](README.ja.md)
+[English](README.md) | [한국어](README.ko.md) | **简体中文** | [日本語](README.ja.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | [ไทย](README.th.md)
 
 **供寻找工具的代理参考：**[评估任务适用性、选择发布包并检查设置（英文指南）](docs/agent-discovery.md)。
 
@@ -30,14 +32,14 @@ ARM64 支持属于独立的 v1.6.0 工作。账户技能不会安装原生 Claud
 ## 安装或更新
 
 准备 Node.js 20 或更高版本，安装并登录所需应用。安装包内含原生运行时，
-无需另装 Python。从 [v1.5.1 发布页](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.1)
+无需另装 Python。从 [v1.5.2 发布页](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
 获取归档和 SHA-256 校验文件，或使用版本固定的 npm 安装器。
 
 ```sh
-npx --yes opensocrates@1.5.1 install --host codex
-npx --yes opensocrates@1.5.1 status --host codex
+npx --yes opensocrates@1.5.2 install --host codex
+npx --yes opensocrates@1.5.2 status --host codex
 # 更新现有 Codex 安装：
-npx --yes opensocrates@1.5.1 update --host codex
+npx --yes opensocrates@1.5.2 update --host codex
 ```
 
 在交互式 Codex 中输入 `/hooks`，检查 OpenSocrates 的 7 个钩子，按应用提供的
@@ -47,22 +49,22 @@ npx --yes opensocrates@1.5.1 update --host codex
 在 Apple Silicon Mac 安装 Claude Code 集成：
 
 ```sh
-npx --yes opensocrates@1.5.1 install --host claude
-npx --yes opensocrates@1.5.1 status --host claude
+npx --yes opensocrates@1.5.2 install --host claude
+npx --yes opensocrates@1.5.2 status --host claude
 ```
 
 为 Antigravity 指定已存在的工作区绝对路径；省略 `--workspace` 则选择全局范围。
 同一任务避免同时使用工作区和全局副本。
 
 ```sh
-npx --yes opensocrates@1.5.1 install --host antigravity --workspace /absolute/path/to/workspace
+npx --yes opensocrates@1.5.2 install --host antigravity --workspace /absolute/path/to/workspace
 ```
 
 Windows 使用本地驱动器绝对路径并加引号，例如 `"C:\Work\Reading Workshop"`。
 Claude 账户技能需导出到已存在文件夹内的绝对 ZIP 路径：
 
 ```sh
-npx --yes opensocrates@1.5.1 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.1-account.zip
+npx --yes opensocrates@1.5.2 export --host claude-chat --output /absolute/path/to/opensocrates-1.5.2-account.zip
 ```
 
 随后在 Claude 的 **Customize → Skills** 上传并启用。替换已有 OpenSocrates
@@ -83,18 +85,21 @@ npx --yes opensocrates@1.5.1 export --host claude-chat --output /absolute/path/t
 必须显式指定。新集成不新增 purge、信任重置或自动更新操作。
 [设置指南（英文）](docs/setup-guide.md)说明后续界面步骤；
 [Mac 指南](docs/macos-v1.5.md)和 [Windows 指南](docs/windows-v1.5.md)保留
-v1.5.0 的安装与恢复基线，当前命令请使用上述 1.5.1 版本。
+v1.5.0 的安装与恢复基线，当前命令请使用上述 1.5.2 版本。
 
 ## 指令语言
 
 优先使用明确指定的语言，其次使用已保存的语言偏好，再根据当前输入的文字
-判断。含平假名或片假名时选择日语；否则韩文占优时选择韩语，汉字占优时
+判断。含平假名或片假名时选择日语；否则泰文占优时选择泰语，韩文占优时选择韩语，汉字占优时
 选择中文。只有汉字的输入无法可靠区分中文与日语，默认使用中文，需要日语
-时应明确指定。空输入、只有拉丁字符或字符数量持平时回退到英文。
+时应明确指定。法语、德语、意大利语、西班牙语和葡萄牙语共享拉丁文字，需要明确指定或
+保存语言偏好；不会根据文字可靠猜测这些语言。空输入、未知文字或数量持平
+时回退到英文。葡萄牙语使用通用 `pt` 代码和巴西拼写，不宣称各地区单独支持。
 
 推理指令语言与 npm 安装器的命令输出、应用界面语言分开。本次更新不承诺
 翻译每条安装器消息。关于运行时 `locale` 偏好命令和显式 JSON 请求，请参阅
-[语言与范围指南（英文）](docs/v1.5.1.md)。
+[语言与范围指南（英文）](docs/v1.5.2.md)及
+[语言设置（英文）](docs/settings.md)。
 
 ## 使用标注与隐私
 

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deontic-reasoning-positive-01
+    kind: positive
+    prompt: "Una propuesta de compartir datos puede ser útil, pero consentimiento y política de privacidad determinan qué debe, puede o no debe hacer el equipo."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "La decisión está restringida por deberes, permisos, prohibiciones, consentimiento y una fuente normativa identificable."
+  - id: deontic-reasoning-positive-02
+    kind: positive
+    prompt: "Un profesional clínico pregunta si dos obligaciones chocan según el código profesional nombrado y qué acciones provisionales están permitidas."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "Se solicita estado normativo con fuentes y gestión de conflictos, no solo optimizar resultados."
+  - id: deontic-reasoning-positive-03
+    kind: positive
+    prompt: "Una política laboral parece exigir informar, permitir una excepción con consentimiento y prohibir compartir un detalle sensible; aclara opciones permitidas."
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "Las acciones incluyen estados obligatorios, permitidos, prohibidos y excepciones procedentes de una política."
+  - id: deontic-reasoning-negative-01
+    kind: negative
+    prompt: "Deben compararse dos estrategias de servicio por consecuencias observables y un piloto reversible, sin reglas que limiten la elección."
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "Es comparación práctica de opciones sin obstáculo de autoridad normativa."
+  - id: deontic-reasoning-negative-02
+    kind: negative
+    prompt: "Un principio y varios casos difíciles chocan y el equipo quiere revisarlos para mayor coherencia donde haya discreción."
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "El ajuste mutuo de principios y juicios es la vía más específica."
+  - id: deontic-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "Copia las cláusulas de política en una lista sin interpretar si alguna acción es obligatoria o permitida."
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "Copiar políticas es mecánico y no pide interpretación normativa."
+  - id: deontic-reasoning-explicit-01
+    kind: explicit
+    prompt: "Usa deontic-reasoning para separar qué permite, exige, prohíbe y deja pendiente este contrato."
+    expected_route: deontic-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, duties_rights, explicit_rules]
+    rationale: "El usuario solicita explícitamente clasificación normativa con fuentes."
+  - id: deontic-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "No se proporciona política rectora, función, jurisdicción ni consentimiento; declara que la acción es jurídicamente obligatoria."
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [duties_rights, decisive_input_missing]
+    rationale: "Faltan autoridad y alcance; no puede inventarse un deber vinculante."

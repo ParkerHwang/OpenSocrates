@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: systems-thinking-positive-01
+    kind: positive
+    prompt: "งานตรวจเนื้อหาค้างเพิ่มเมื่อความล่าช้าทำผู้ใช้หงุดหงิดและส่งรายงานซ้ำมากขึ้น ทีมต้องการโครงสร้างเบื้องหลังแบบแผน"
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question, deep_uncertainty]
+    rationale: "แบบแผนซ้ำมีการไหล ป้อนกลับ และความล่าช้าที่ปฏิสัมพันธ์ ไม่ใช่สาเหตุเดี่ยว"
+  - id: systems-thinking-positive-02
+    kind: positive
+    prompt: "เงินอุดหนุนการอนุรักษ์เพิ่มการปลูกช่วงแรก แล้วการขาดน้ำกับปฏิกิริยาบังคับใช้ทำให้ผลแกว่งตามฤดูกาล"
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "พฤติกรรมตามฤดูและแรงต้านนโยบายต้องดูปริมาณคงค้าง การไหล วงจรถ่วงดุล และความล่าช้า"
+  - id: systems-thinking-positive-03
+    kind: positive
+    prompt: "ความไว้ใจลูกค้าสะสมช้า การแนะนำต่อเสริมการเติบโต และการลดงานสนับสนุนทำให้ลดลงหลังความล่าช้า หาจุดแทรกแซง"
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "คำขอมุ่งการสะสม ผลเสริมแรง ผลล่าช้า และจุดแทรกแซงอย่างชัด"
+  - id: systems-thinking-negative-01
+    kind: negative
+    prompt: "สองกลุ่มจับคู่ได้รับการฝึกต่างกัน ผู้ใช้ถามว่าการฝึกเปลี่ยนคะแนนสอบหลังหนึ่งเดือนหรือไม่"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "การเทียบมาตรการที่มีขอบเขตพอแล้ว ไม่ต้องใช้ระบบพลวัตเต็ม"
+  - id: systems-thinking-negative-02
+    kind: negative
+    prompt: "ฐานข้อมูลล่มครั้งเดียว มีตัวกระตุ้นชัดพร้อมเวลา ทีมต้องการเงื่อนไขรากใกล้เหตุและควบคุมได้"
+    expected_route: root-cause-analysis
+    expected_behavior: route
+    decisive_features: [diagnose, recurring_failure]
+    rationale: "การวินิจฉัยเหตุมีขอบเขตควรนำ เว้นแต่หลักฐานภายหลังเผยแบบแผนป้อนกลับซ้ำ"
+  - id: systems-thinking-mechanical-01
+    kind: mechanical
+    prompt: "แปลงบันทึกปริมาณคงค้างและการไหลเป็นรายการ Markdown โดยไม่อธิบายระบบ"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "จัดรูปแบบใหม่เป็นงานเชิงกล ไม่ได้ขอตัดสินโครงสร้างระบบ"
+  - id: systems-thinking-explicit-01
+    kind: explicit
+    prompt: "ใช้ systems-thinking อธิบายว่าเหตุใดการแก้บุคลากรเฉพาะจุดของเราถูกหักล้างซ้ำด้วยงานค้างที่โตระยะยาว"
+    expected_route: systems-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay, causal_question]
+    rationale: "ผู้ใช้เรียกวิธีนี้ชัดสำหรับแบบแผนระบบล่าช้าและซ้ำ"
+  - id: systems-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "มีข้อร้องเรียนเดียวเมื่อวาน วาดวงจรเสริมแรงและเสนอมาตรการทั้งระบบโดยไม่มีแบบแผนเวลา"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "การสังเกตครั้งเดียวระบุพฤติกรรมพลวัตหรือทิศวงจรไม่ได้"

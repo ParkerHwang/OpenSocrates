@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "deduction-positive-01",
+      "kind": "positive",
+      "prompt": "La conclusion découle-t-elle nécessairement de ces prémisses de politique et de la règle d'exception donnée ?",
+      "expected_route": "deduction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "explicit_rules",
+        "explain"
+      ],
+      "rationale": "L'utilisateur demande une conséquence formelle de prémisses et règles explicites."
+    },
+    {
+      "id": "deduction-positive-02",
+      "kind": "positive",
+      "prompt": "Vérifiez si cet argument contractuel est valide et si ses prémisses sont réellement étayées.",
+      "expected_route": "deduction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "explicit_rules",
+        "explain"
+      ],
+      "rationale": "Il faut séparer validité et caractère fondé d'un argument explicitement basé sur des règles."
+    },
+    {
+      "id": "deduction-positive-03",
+      "kind": "positive",
+      "prompt": "Trouvez la prémisse cachée qui donne l'impression que cette conclusion de conformité découle de l'argument.",
+      "expected_route": "deduction",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "explicit_rules",
+        "explain"
+      ],
+      "rationale": "La tâche exige normalisation, exposition de prémisse cachée et vérification formelle de validité."
+    },
+    {
+      "id": "deduction-negative-01",
+      "kind": "negative",
+      "prompt": "Plusieurs explications correspondent à la panne ; choisissez la meilleure et nommez le prochain test discriminant.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "competing_explanations",
+        "diagnose"
+      ],
+      "rationale": "Des causes concurrentes et éléments discriminants appellent l'abduction, pas l'implication nécessaire."
+    },
+    {
+      "id": "deduction-negative-02",
+      "kind": "negative",
+      "prompt": "Estimez dans quelle mesure ces observations soutiennent une affirmation générale sur les futurs utilisateurs.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "repeated_observations",
+        "weak_sample"
+      ],
+      "rationale": "L'extension demandée est inductive et dépend de la représentativité de l'échantillon."
+    },
+    {
+      "id": "deduction-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "Numérotez les prémisses fournies et conservez leur formulation.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Numéroter une liste fournie est mécanique."
+    },
+    {
+      "id": "deduction-explicit-01",
+      "kind": "explicit",
+      "prompt": "Utilisez explicitement deduction pour vérifier si la règle d'admissibilité donnée implique le résultat de ce cas.",
+      "expected_route": "deduction",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "explicit_rules"
+      ],
+      "rationale": "L'utilisateur invoque explicitement l'application formelle d'une règle et la vérification de son implication."
+    },
+    {
+      "id": "deduction-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "Dites si la conclusion est valide, mais sans prémisses, règle, périmètre ni texte de conclusion.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "explicit_rules",
+        "decisive_input_missing"
+      ],
+      "rationale": "La validité ne peut être évaluée sans forme argumentative et prémisses importantes."
+    }
+  ]
+}
