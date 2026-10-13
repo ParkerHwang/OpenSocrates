@@ -8,7 +8,7 @@ Bei konkretem Plan, Einführung, Migration, Einstellung, Richtlinie oder Aktion,
 
 ## Do not use when
 
-Nicht ohne Plan oder vorgeschlagene Aktion, bei einem Vorfall, der eine sofortige Reaktion statt Spekulation erfordert oder als Ersatz vorgeschriebener Sicherheits-, Rechts- oder Technikprüfung. Lebhafte Geschichten sind nicht automatisch wahrscheinlichste Fehler. Angst einer Gruppe rechtfertigt keine Wahrscheinlichkeit ohne Referenzklasse. Ist der Plan bereits unveränderlich bindend, Risiko- oder Vorfallsverfahren nutzen und Einschränkung nennen.
+Nicht ohne Plan oder vorgeschlagene Aktion, bei einem Vorfall, der eine sofortige Reaktion statt Spekulation erfordert, oder als Ersatz vorgeschriebener Sicherheits-, Rechts- oder Technikprüfung. Lebhafte Geschichten sind nicht automatisch wahrscheinlichste Fehler. Angst einer Gruppe rechtfertigt keine Wahrscheinlichkeit ohne Referenzklasse. Ist der Plan bereits unveränderlich bindend, Risiko- oder Vorfallsverfahren nutzen und Einschränkung nennen.
 
 ## Inputs to establish
 

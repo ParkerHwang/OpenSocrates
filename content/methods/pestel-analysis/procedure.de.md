@@ -22,7 +22,7 @@ Klären Sie Entscheidungsfrage, Organisation oder Produkt, Geografie und Rechtsr
 4. Ordinale Sicht auf Richtung, Geschwindigkeit, Exposition und Unsicherheit mit kurzer Begründung veröffentlichen. Niedrig, mittel oder hoch nur transparente Vergleiche, keine unbelegten Prozente oder Prognosen. **Sichtbares Ergebnis/Zustandsänderung:** Ordinale Bewertung.
 5. Chancen-, Bedrohungs- oder Beobachtungsstatus je wesentlichem Faktor veröffentlichen; wenige entscheidungswirksame Faktoren priorisieren. Status als verifiziert, abgeleitet, angenommen, ungeprüft oder widersprüchlich nennen. **Sichtbares Ergebnis/Zustandsänderung:** Wesentlichkeit.
 6. Ein bis drei strategische Folgerungen veröffentlichen, gegebenenfalls robuste Maßnahme, bedingte Aktion oder gezielte Recherche. Wechselwirkungen samt Evidenz benennen; Korrelation ist kein Beweis. **Sichtbares Ergebnis/Zustandsänderung:** Folgerungen.
-7. Aktuelles Urteil, entscheidende Gründe, Restunsicherheit und beobachtbare Signal für eine Urteilsänderunge veröffentlichen. Entscheidungsrelevant fehlender Faktor, Quelle, Rechtsraum oder Horizont führt zu Zurückstellung und kleinster notwendiger Prüfung. **Sichtbares Ergebnis/Zustandsänderung:** Urteil.
+7. Aktuelles Urteil, entscheidende Gründe, Restunsicherheit und beobachtbare Signale für eine Urteilsänderung veröffentlichen. Entscheidungsrelevant fehlender Faktor, Quelle, Rechtsraum oder Horizont führt zu Zurückstellung und kleinster notwendiger Prüfung. **Sichtbares Ergebnis/Zustandsänderung:** Urteil.
 
 ## Public output contract
 

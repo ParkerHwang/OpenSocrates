@@ -25,7 +25,7 @@ Enumera juicios, principios candidatos, teoría o valores de fondo, afectados, a
 
 ## Public output contract
 
-Devuelve juicios iniciales, principios, casos difíciles, conflictos, revisión elegida, encaje revisado, tensión restante y posición. Separa hechos y valores, marcando supuestos. La Conclusion Card debe mostrar posición, alcance, tensión y condición observable o derivada de una autoridad competente de cambio; el registro puede mostrar revisiones sin afirmar acceso a razonamiento privado.
+Devuelve juicios iniciales, principios, casos difíciles, conflictos, revisión elegida, encaje revisado, tensión restante y posición. Separa hechos y valores, marcando supuestos. La Conclusion Card debe mostrar posición, alcance, tensión y una condición observable o derivada de una autoridad competente que cambiaría esa posición; el registro puede mostrar revisiones sin afirmar acceso a razonamiento privado.
 
 ## Evidence and uncertainty rules
 
