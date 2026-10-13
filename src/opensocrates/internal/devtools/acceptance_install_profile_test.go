@@ -147,3 +147,46 @@ func TestInstallProfileCleanupDeletesOnlyItsOwnedFixture(t *testing.T) {
 		t.Fatal("foreign fixture modified")
 	}
 }
+
+func TestInstallProfileDispatcherSavesPrivateRelativeAndAbsoluteUnavailableReports(t *testing.T) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Create a new private same-volume fixture so the relative form works on
+	// Windows too. The report writer does not normalize existing directory ACLs.
+	root, err := platform.MkdirTemp(cwd, ".opensocrates-install-profile-output-test-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { os.RemoveAll(root) })
+	for _, mode := range []string{"relative", "absolute"} {
+		t.Run(mode, func(t *testing.T) {
+			absolute := filepath.Join(root, mode, "diagnostic.json")
+			argument := absolute
+			if mode == "relative" {
+				argument, err = filepath.Rel(cwd, absolute)
+				if err != nil || filepath.IsAbs(argument) {
+					t.Fatal("relative report fixture unavailable")
+				}
+			}
+			var out, errout bytes.Buffer
+			result := RunAcceptance([]string{"install-profile", "--codex-home", "PRIVATE-AUTH-HOME", "--report", argument}, &out, &errout)
+			if result != 2 || errout.Len() != 0 || !strings.Contains(out.String(), "install-profile: UNAVAILABLE diagnostic-only") {
+				t.Fatal("unavailable diagnostic report was not saved")
+			}
+			raw, readError := platform.ReadFile(absolute, 8<<20)
+			if readError != nil {
+				t.Fatal("private unavailable report missing")
+			}
+			var report map[string]any
+			if json.Unmarshal(raw, &report) != nil || report["schema"] != "opensocrates.native-install-profile/1.0.0" || report["status"] != "unavailable" || report["install_attempt_count"] != float64(0) || report["qualification_claimed"] != false {
+				t.Fatal("saved diagnostic claimed install qualification")
+			}
+			encodedRoot, _ := json.Marshal(root)
+			if bytes.Contains(raw, encodedRoot) || bytes.Contains(raw, []byte("PRIVATE-AUTH-HOME")) || bytes.Contains(out.Bytes(), []byte(root)) || bytes.Contains(errout.Bytes(), []byte(root)) {
+				t.Fatal("private output path or authentication argument disclosed")
+			}
+		})
+	}
+}

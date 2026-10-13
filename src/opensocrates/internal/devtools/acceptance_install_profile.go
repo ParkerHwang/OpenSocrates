@@ -203,8 +203,9 @@ func runInstallProfile(o acceptanceOptions, out, errout io.Writer) int {
 	status := str(report["diagnostic_status"])
 	report["status"] = status
 	if o.report != "" {
+		reportPath, pathError := filepath.Abs(o.report)
 		data, writeError := json.MarshalIndent(report, "", "  ")
-		if writeError != nil || platform.Mkdir(filepath.Dir(o.report)) != nil || platform.AtomicWrite(o.report, append(data, '\n'), 0600) != nil {
+		if pathError != nil || writeError != nil || platform.Mkdir(filepath.Dir(reportPath)) != nil || platform.AtomicWrite(reportPath, append(data, '\n'), 0600) != nil {
 			fmt.Fprintln(errout, "install-profile: evidence unavailable")
 			return 2
 		}
