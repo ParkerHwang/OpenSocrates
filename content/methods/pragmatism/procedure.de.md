@@ -21,7 +21,7 @@ Benennen Sie Deutungen oder Optionen, Gegenstandstyp, Entscheidung, Betroffene, 
 3. **Wesentliche Unterschiede prüfen.** Führen Optionen im Kontext zu verschiedenen beobachtbaren Folgen? Sonst praktische Gleichwertigkeit erfassen statt Streit verlängern. **Sichtbares Ergebnis/Zustandsänderung:** Unterschied oder Gleichwertigkeit mit Evidenzlücke.
 4. **Leistung und Verteilung bewerten.** Nach Kriterium, Horizont, Gruppen, Umkehrbarkeit und Nebenfolgen vergleichen. Kurzfristiger Nutzen überschreibt Rechte oder Sicherheit nicht stillschweigend. **Sichtbares Ergebnis/Zustandsänderung:** Begrenzter Vergleich, Evidenzstatus und offene Zielkonflikte.
 5. **Umkehrbaren Test wählen.** Wenn praktikabel, kleinen Test, Fenster, verständliche Schwelle und Regel definieren; andernfalls fehlende sichere Testbarkeit begründen. **Sichtbares Ergebnis/Zustandsänderung:** Test oder Grund des zurückgestellten konzeptionellen Urteils.
-6. **Kontextgebundenen Schluss setzen.** Option wählen, Gleichwertigkeit erklären oder bei entscheidenden ungeprüften Folgen zurückstellen. Neubewertungsrelevante Kontextänderung nennen. **Sichtbares Ergebnis/Zustandsänderung:** Wahl, Grenzen, Verantwortlicher und Umkehrbedingung.
+6. **Kontextgebundenen Schluss setzen.** Option wählen, Gleichwertigkeit erklären oder bei entscheidenden ungeprüften Folgen zurückstellen. Neubewertungsrelevante Kontextänderung nennen. **Sichtbares Ergebnis/Zustandsänderung:** Wahl, Grenzen, Verantwortlicher und Bedingung für eine Urteilsänderung.
 
 ## Public output contract
 

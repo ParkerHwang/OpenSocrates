@@ -30,7 +30,7 @@ Renvoyez `claim`, `claim_type`, `claim_to_source_table`, `quality_limits`, `qual
 
 ## Evidence and uncertainty rules
 
-La hiérarchie des plans est un guide, pas un substitut à leur adéquation à la question. Vérifiez caractère direct, population, résultat, temps, mesure, sélection, attrition et biais de publication. Un avis expert peut identifier un mécanisme sans estimer une taille d'effet ; une déclaration utilisateur peut révéler une expérience sans établir sa prévalence. Si les sources divergent sensiblement ou si la meilleure est indirecte, affaiblissez ou suspendez le résultat et nommez la limite.
+La hiérarchie des plans est un guide, pas un substitut à leur adéquation à la question. Vérifiez caractère direct, population, résultat, temps, mesure, sélection, attrition et biais de compte rendu des résultats. Un avis expert peut identifier un mécanisme sans estimer une taille d'effet ; une déclaration utilisateur peut révéler une expérience sans établir sa prévalence. Si les sources divergent sensiblement ou si la meilleure est indirecte, affaiblissez ou suspendez le résultat et nommez la limite.
 
 ## Stop conditions
 

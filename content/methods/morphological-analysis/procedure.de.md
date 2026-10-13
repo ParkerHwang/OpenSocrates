@@ -25,7 +25,7 @@ Benennen Sie Entwurfsfrage, Ziel, Nutzer oder Betroffene, harte Einschränkungen
 
 ## Public output contract
 
-Liefern Sie Entwurfsfrage, Parametermatrix, Kombinationsregel, Kohärenzausschlüsse, repräsentative Konzepte, Machbarkeitsprüfung und nächsten Test. Evidenzgestützte und angenommene Dimensionen unterscheiden. Die Conclusion Card zeigt testwürdigen Kandidaten, entscheidenden Zielkonflikt oder Einschränkung und beobachtbare Umkehrbedingung. Vollständigen Kombinationsraum im Trace oder erstellten Artefakt behalten.
+Liefern Sie Entwurfsfrage, Parametermatrix, Kombinationsregel, Kohärenzausschlüsse, repräsentative Konzepte, Machbarkeitsprüfung und nächsten Test. Evidenzgestützte und angenommene Dimensionen unterscheiden. Die Conclusion Card zeigt testwürdigen Kandidaten, entscheidenden Zielkonflikt oder Einschränkung und beobachtbare Bedingung für eine Urteilsänderung. Vollständigen Kombinationsraum im Trace oder erstellten Artefakt behalten.
 
 ## Evidence and uncertainty rules
 

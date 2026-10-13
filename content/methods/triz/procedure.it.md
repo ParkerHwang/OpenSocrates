@@ -8,7 +8,7 @@ Usala nella progettazione di prodotti, processi, servizi o sistemi quando «migl
 
 ## Do not use when
 
-Non usarla per questioni principalmente morali, probanti o di consenso, o se il vero ostacolo è l’accordo delle parti interessate. Non citare il nome di un principio senza applicarlo alla contraddizione effettiva. Non raccomandare candidati che violino vincoli di sicurezza, legge, accessibilità, riservatezza o fisici solo perché appaiono ideali. Se la contraddizione è solo un compromesso tra preferenze senza meccanismo tecnico, usa un metodo decisionale o sui valori.
+Non usarla per questioni principalmente morali, relative alle evidenze o di consenso, o se il vero ostacolo è l’accordo delle parti interessate. Non citare il nome di un principio senza applicarlo alla contraddizione effettiva. Non raccomandare candidati che violino vincoli di sicurezza, legge, accessibilità, riservatezza o fisici solo perché appaiono ideali. Se la contraddizione è solo un compromesso tra preferenze senza meccanismo tecnico, usa un metodo decisionale o sui valori.
 
 ## Inputs to establish
 

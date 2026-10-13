@@ -72,6 +72,45 @@ def _executable_stat(target: Path) -> Callable[..., os.stat_result]:
     return stat
 
 
+def _check_locale_fallback_rejection(root: Path, temporary: Path) -> None:
+    from tools.build_content_hosts import HOSTS, build_content_host
+    from tools.build_plugins import generate_plugin
+
+    from opensocrates.content.injection import ProjectionInstructionAssembler
+
+    original_assemble = ProjectionInstructionAssembler.assemble
+
+    def fallback_assemble(self: Any, method_ids: Any, *, requested_locale: Any) -> Any:
+        return original_assemble(
+            self,
+            method_ids,
+            requested_locale="en" if requested_locale == "fr" else requested_locale,
+        )
+
+    with patch.object(ProjectionInstructionAssembler, "assemble", fallback_assemble):
+        for host in ("codex", "claude"):
+            _reject(
+                partial(
+                    generate_plugin,
+                    root=root,
+                    host=host,
+                    output=temporary / f"fallback-{host}",
+                    runtime_root=temporary / "absent-runtime",
+                ),
+                "native generator accepted mislabeled locale fallback",
+            )
+        for host in HOSTS:
+            _reject(
+                partial(
+                    build_content_host,
+                    root=root,
+                    host=host,
+                    output=temporary / f"fallback-{host}",
+                ),
+                "content generator accepted mislabeled locale fallback",
+            )
+
+
 def check(root: Path) -> int:
     global _CHECK_COUNT
     _CHECK_COUNT = 0
@@ -87,7 +126,6 @@ def check(root: Path) -> int:
     from tools.release_check import _write_deterministic_zip
 
     from opensocrates.constants import PUBLIC_ATTRIBUTION_FOOTER
-    from opensocrates.content.injection import ProjectionInstructionAssembler
     from opensocrates.selector.entry import ENTRY_GUIDANCE
 
     _require(len(ENTRY_GUIDANCE.encode("utf-8")) <= 1400, "discovery entry exceeds byte budget")
@@ -290,37 +328,7 @@ def check(root: Path) -> int:
                 result.returncode == 0 and _tree(temporary / f"cli-{host}") == first,
                 "explicit-root CLI depends on working directory",
             )
-        original_assemble = ProjectionInstructionAssembler.assemble
-
-        def fallback_assemble(self: Any, method_ids: Any, *, requested_locale: Any) -> Any:
-            return original_assemble(
-                self,
-                method_ids,
-                requested_locale="en" if requested_locale == "fr" else requested_locale,
-            )
-
-        with patch.object(ProjectionInstructionAssembler, "assemble", fallback_assemble):
-            for host in ("codex", "claude"):
-                _reject(
-                    partial(
-                        generate_plugin,
-                        root=root,
-                        host=host,
-                        output=temporary / f"fallback-{host}",
-                        runtime_root=temporary / "absent-runtime",
-                    ),
-                    "native generator accepted mislabeled locale fallback",
-                )
-            for host in HOSTS:
-                _reject(
-                    partial(
-                        build_content_host,
-                        root=root,
-                        host=host,
-                        output=temporary / f"fallback-{host}",
-                    ),
-                    "content generator accepted mislabeled locale fallback",
-                )
+        _check_locale_fallback_rejection(root, temporary)
         _reject(
             lambda: build_content_host(root=root, host="gemini", output=temporary / "unsupported"),
             "unsupported host accepted",

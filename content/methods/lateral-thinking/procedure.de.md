@@ -21,7 +21,7 @@ Benennen Sie Problem, aktuellen Rahmen, unverhandelbare Einschränkungen, option
 3. **Provokationen anwenden.** Kehren Sie ausgewählte optionale Annahmen um, entfernen, übertreiben, verlagern, teilen oder kombinieren Sie sie oder nutzen Sie einen begrenzten Zufallsreiz. Sicherheits- und Rechtsvorgaben bleiben bestehen. **Sichtbares Ergebnis/Zustandsänderung:** Geänderte Annahme und neuer Rahmen je Provokation.
 4. **Unterschiedliche Konzepte erzeugen.** Entwickeln Sie mehrere Ansätze vor der Machbarkeitsbewertung. Jeder nennt Änderung, Begünstigte und gewahrte ursprüngliche Einschränkung. **Sichtbares Ergebnis/Zustandsänderung:** Mindestens drei wirklich unterschiedliche Konzepte mit Ausgangsrahmen.
 5. **Prüfen und vergleichen.** Prüfen Sie transparent Sicherheit, Machbarkeit, Nutzer, Kosten und Evidenz; verwerfen Sie bloße Umbenennungen. **Sichtbares Ergebnis/Zustandsänderung:** Auswahlliste, begründet verworfene Konzepte und offene Prüfungen ohne vorgetäuschte präzise Bewertungen.
-6. **Test wählen oder übergeben.** Wählen Sie ein umkehrbares Experiment oder übergeben Sie die Liste einer Vergleichsmethode. Nennen Sie widerlegende Beobachtung und Risikogrenze. **Sichtbares Ergebnis/Zustandsänderung:** Konzept, Test, Verantwortlicher, Zurückstellungsbedingung und Umkehrbedingung.
+6. **Test wählen oder übergeben.** Wählen Sie ein umkehrbares Experiment oder übergeben Sie die Liste einer Vergleichsmethode. Nennen Sie widerlegende Beobachtung und Risikogrenze. **Sichtbares Ergebnis/Zustandsänderung:** Konzept, Test, Verantwortlicher, Zurückstellungsbedingung und Bedingung für eine Urteilsänderung.
 
 ## Public output contract
 

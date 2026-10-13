@@ -12,7 +12,7 @@ Non usarla se le parti interessate sono già allineate, non subiscono effetti ri
 
 ## Inputs to establish
 
-Stabilisci domanda decisionale, risultato voluto, responsabile della decisione, confine attuativo, orizzonte temporale, gruppi interessati dagli effetti, autorità formale, vincoli ed evidenze disponibili su interessi o effetti probabili. Separa gli attori coinvolti dai gruppi interessati ma non coinvolti. Poni al massimo due domande concise, solo se responsabile, popolazione interessata o percorso di autorità potrebbero cambiare la raccomandazione sul coinvolgimento. Se un attore è solo ipotizzato, segnalo come ipotesi.
+Stabilisci domanda decisionale, risultato voluto, responsabile della decisione, confine attuativo, orizzonte temporale, gruppi interessati dagli effetti, autorità formale, vincoli ed evidenze disponibili su interessi o effetti probabili. Separa gli attori coinvolti dai gruppi interessati ma non coinvolti. Poni al massimo due domande concise, solo se responsabile, popolazione interessata o percorso di autorità potrebbero cambiare la raccomandazione sul coinvolgimento. Se un attore è solo ipotizzato, segnalalo come ipotesi.
 
 ## Procedure
 

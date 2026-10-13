@@ -21,7 +21,7 @@ Benenne Person oder Akteur, Auslösesituation, Fortschritt, bisherigen Behelf od
 3. **Trenne Aufgabendimensionen.** Beschreibe funktionale Arbeit, emotionale Erfahrung, soziale oder Identitätssignale und unterstützende Grenzen. **Sichtbare Ausgabe/Zustandsänderung:** dreidimensionales Profil mit verified, inferred, assumed oder unverified veröffentlichen.
 4. **Kartiere Wechselkräfte.** Erfasse Druck des jetzigen Problems, Anziehung der Alternative, Verhaltensgewohnheit und Wechselangst; Nichtkonsum zählt als echte Alternative. **Sichtbare Ausgabe/Zustandsänderung:** Kräftekarte und Belege zur Trennung von Präferenzäußerung und Verhalten veröffentlichen.
 5. **Definiere Erfolg und Alternativen.** Benenne beobachtbaren Fortschritt, Zeitraum, Betroffene und Erfüllung durch Produkte, Behelfe oder Nichtkauf. **Sichtbare Ausgabe/Zustandsänderung:** Erfolgsmaß und Vergleich ohne erfundene Marktanteile oder Konversionsraten veröffentlichen.
-6. **Wähle Konsequenz und Prüfung.** Wähle aufgabengerechtes Produktversprechen, Einstieg, Funktionsfokus oder Forschungstest und widerlegende Beobachtung. **Sichtbare Ausgabe/Zustandsänderung:** vorläufige Folge, Verantwortlichen, nächsten Test und Umkehrbedingung veröffentlichen.
+6. **Wähle Konsequenz und Prüfung.** Wähle aufgabengerechtes Produktversprechen, Einstieg, Funktionsfokus oder Forschungstest und widerlegende Beobachtung. **Sichtbare Ausgabe/Zustandsänderung:** vorläufige Folge, Verantwortlichen, nächsten Test und Bedingung für eine Urteilsänderung veröffentlichen.
 
 ## Public output contract
 

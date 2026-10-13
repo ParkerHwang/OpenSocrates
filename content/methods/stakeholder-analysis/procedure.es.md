@@ -8,7 +8,7 @@ Usa este procedimiento para hacer visibles personas y organizaciones que afectan
 
 ## Do not use when
 
-No lo uses si los actores están alineados, no se afectan materialmente y solo queda comparar opciones o verificar evidencia. No sustituye exploración macroeconómica, diagnóstico local ni formato de contactos. No equipares autoridad con legitimidad, interés con poder ni volumen de voz con impacto. No infieras oposición o apoyo sin base.
+No lo uses si los actores están alineados, no se afectan materialmente y solo queda comparar opciones o verificar evidencia. No sustituye exploración del macroentorno, diagnóstico local ni formato de contactos. No equipares autoridad con legitimidad, interés con poder ni volumen de voz con impacto. No infieras oposición o apoyo sin base.
 
 ## Inputs to establish
 

@@ -22,7 +22,7 @@ Klären Sie Wurzelfrage, Baumtyp (`why`, `how` oder `what`), Erfolgsmaß, Reichw
 4. Veröffentlichen Sie zu jedem Blatt eine Verifikationsmethode, Datenanfrage, Verantwortlichkeit oder nächste Handlung. Abstrakte Blätter sind nicht abschließend: Baum offenhalten oder Wurzel eingrenzen.
 5. Veröffentlichen Sie entfernte Zweige samt Grund, etwa Gegenbeleg, außerhalb der Reichweite oder doppelte Abdeckung. Unbequeme Zweige nicht allein deshalb löschen.
 6. Veröffentlichen Sie Priorität nach Wesentlichkeit, Evidenz und Handlungsfähigkeit statt erfundener Zahlenpräzision. Markieren Sie Zweige für separate Kausal- oder Evidenzmethoden.
-7. Veröffentlichen Sie fertigen Baum, Abdeckungslücken und beobachtbare Umkehrbedingung. Ist ein kritischer Zweig weder testbar noch begrenzt, Urteil zurückstellen oder eine blockierende Frage stellen.
+7. Veröffentlichen Sie fertigen Baum, Abdeckungslücken und beobachtbare Bedingung für eine Urteilsänderung. Ist ein kritischer Zweig weder testbar noch begrenzt, Urteil zurückstellen oder eine blockierende Frage stellen.
 
 ## Public output contract
 

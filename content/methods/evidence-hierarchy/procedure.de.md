@@ -20,9 +20,9 @@ Kläre Behauptung, Zielpopulation oder Kontext, Typ (Wirkung, Prognose, Mechanis
 2. Veröffentliche Behauptungs-Quellen-Tabelle mit Quellentyp, Design, Stichprobe oder Grundlage, Unmittelbarkeit und Umfang. Kennzeichne geprüft, nutzerseitig angegeben, erschlossen oder unverfügbar.
 3. Veröffentliche Qualitätsdimensionen – Designstrenge, Verzerrungsrisiko, Messgültigkeit, Vollständigkeit und Anwendbarkeit – qualitativ oder ordinal mit Herkunft. Erfinde keinen präzisen Gesamtscore.
 4. Veröffentliche Hierarchiestufe und Grenzen je Quelle. Begründe Stärke oder Schwäche für diese Behauptung statt universeller Stufenautorität.
-5. Veröffentliche Quellenübereinstimmung, Inkonsistenz und fehlende Belege. Halte glaubwürdigen Konflikt sichtbar; mittlere keine unvereinbaren Ergebnisse ohne gerechtfertigte Syntheseregel.
+5. Veröffentliche Quellenübereinstimmung, Inkonsistenz und fehlende Belege. Halte glaubwürdigen Konflikt sichtbar; Bilde keine Mittelwerte aus unvereinbaren Ergebnissen ohne gerechtfertigte Syntheseregel.
 6. Veröffentliche Belegstatus und angepassten Schluss: stark gestützt, gestützt, vorläufig, ungeprüft, widersprüchlich oder ausgesetzt. Benenne kleinste quellen- oder anwendungsbezogene Sprachgrenze.
-7. Veröffentliche nächste Verifizierung und beobachtbare Umkehrbedingung. Ohne entscheidende Unterstützung setze aus oder schwäche ab, statt folgenschwere Behauptungen als festgestellt darzustellen.
+7. Veröffentliche nächste Verifizierung und beobachtbare Bedingung für eine Urteilsänderung. Ohne entscheidende Unterstützung setze aus oder schwäche ab, statt folgenschwere Behauptungen als festgestellt darzustellen.
 
 ## Public output contract
 

@@ -22,7 +22,7 @@ Kläre Entscheidungsfrage, verantwortlichen Entscheider, beabsichtigte Begünsti
 4. Veröffentliche eine Tatsachen-/Werttrennung: beschreibende Beobachtungen getrennt von Urteilen darüber, wessen Nutzen, Kosten, Stimme oder Rechte zählen sollten. So tarnt sich keine Wertwahl als neutraler Systemrand.
 5. Veröffentliche Nutzen- und Kostenvergleich eingeschlossener und ausgelassener Gruppen mit ausschließlich wesentlichen Wirkungen. Kennzeichne jede Wirkung nach Belegstatus; ungeprüfte Wirkungen bleiben ungeklärt.
 6. Veröffentliche eine oder mehrere Grenzvarianten, etwa längeren Zeithorizont, anderen Rechtsraum oder zusätzliche Betroffene. Benenne je Variante Änderungen an Schluss, Optionenrangfolge, Risiko oder Abschlusskriterium.
-7. Veröffentliche aktuelle Grenze, Konsequenz der entscheidungsrelevantesten Änderung und beobachtbare Umkehrbedingung. Fehlt eine entscheidende Grenztatsache, wird der Schluss vorläufig oder ausgesetzt statt spekulativ ergänzt.
+7. Veröffentliche aktuelle Grenze, Konsequenz der entscheidungsrelevantesten Änderung und beobachtbare Bedingung für eine Urteilsänderung. Fehlt eine entscheidende Grenztatsache, wird der Schluss vorläufig oder ausgesetzt statt spekulativ ergänzt.
 
 ## Public output contract
 

@@ -21,7 +21,7 @@ Klären Sie Behauptung oder Entscheidung, klärungsbedürftige Begriffe, Reichwe
 3. Antworten als nutzerbereitgestellt, unbeantwortet oder mehrdeutig erfassen und unmittelbare Änderung von Reichweite, Begriffen, Evidenz oder Alternativen veröffentlichen. Urteilsänderung wird sichtbar.
 4. Stärksten stützenden Grund und ein glaubwürdiges Gegenbeispiel oder eine aus Antworten hervorgehende Alternative veröffentlichen. Antwort von Weltevidenz unterscheiden.
 5. Vorläufigen Schluss oder nächste begrenzte Handlung veröffentlichen, einschließlich ohne weitere Frage möglicher Arbeit. Ändert Antwort die Route, Änderung verständlich offenlegen.
-6. Restunsicherheit und beobachtbare Umkehrbedingung veröffentlichen. Unbeantwortete Fragen nur bei sicherer umkehrbarer Annahme entsprechend markieren.
+6. Restunsicherheit und beobachtbare Bedingung für eine Urteilsänderung veröffentlichen. Unbeantwortete Fragen nur bei sicherer umkehrbarer Annahme entsprechend markieren.
 7. Aktuelle Antwort, Herleitung aus beantworteten Eingaben und vollständigen, vorläufigen oder zurückgestellten Status veröffentlichen. Fehlende entscheidende Antwort erlaubt keine erfundene Gewissheit.
 
 ## Public output contract
@@ -38,4 +38,4 @@ Ausgewählte Fragen stellen und stoppen, wenn Weiterarbeiten ohne Antworten die 
 
 ## Complement handoff
 
-Nur an `assumption-mapping` übergeben, wenn Antworten mehrere wesentliche zu priorisierende und prüfende Annahmen zeigen. Beantwortete/offene Fragen, Annahmenstatus und Umkehrbedingung weitergeben. Sokratische Fragen nicht wiederholen oder unbegrenztes Interview erzeugen.
+Nur an `assumption-mapping` übergeben, wenn Antworten mehrere wesentliche zu priorisierende und prüfende Annahmen zeigen. Beantwortete/offene Fragen, Annahmenstatus und Bedingung für eine Urteilsänderung weitergeben. Sokratische Fragen nicht wiederholen oder unbegrenztes Interview erzeugen.

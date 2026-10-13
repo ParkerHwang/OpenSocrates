@@ -22,7 +22,7 @@ Kläre die überraschende Beobachtung, den erwarteten Ausgangszustand, die betro
 4. Veröffentliche unterscheidende Belege: die Beobachtung, das Experiment oder die Quelle, die führende Kandidaten auseinanderhalten würden. Gib an, welches Ergebnis jeden Kandidaten stärkt, schwächt oder unverändert lässt.
 5. Veröffentliche die derzeit beste Erklärung, ihren Vorsprung und ihren vorläufigen Status. Halte Alternativen sichtbar und kennzeichne das Ergebnis als Diagnose, Arbeitshypothese oder ungeklärte Kandidatenmenge.
 6. Veröffentliche die nächste Prüfhandlung und den wesentlichen Fehlermodus, einschließlich dessen, was die Erklärung widerlegen oder eine unzuverlässige Belegverknüpfung zeigen würde.
-7. Veröffentliche aktuellen Schluss, Kandidatenmenge und beobachtbare Umkehrbedingung. Fehlt unterscheidende Unterstützung für alle Kandidaten oder eine entscheidende Beobachtung, setze das Ergebnis aus, statt die anschaulichste Geschichte auszuwählen.
+7. Veröffentliche aktuellen Schluss, Kandidatenmenge und beobachtbare Bedingung für eine Urteilsänderung. Fehlt unterscheidende Unterstützung für alle Kandidaten oder eine entscheidende Beobachtung, setze das Ergebnis aus, statt die anschaulichste Geschichte auszuwählen.
 
 ## Public output contract
 

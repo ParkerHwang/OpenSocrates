@@ -1,6 +1,6 @@
 ## Purpose
 
-Utiliza este procedimiento para convertir afirmaciones, explicaciones o planes preferidos en predicciones arriesgadas comprobables y especificar qué contaría en su contra. Separa afirmación objetivo, supuestos auxiliares y fallos de medición, y declara qué puede o no establecer la prueba observada. Una predicción fallida evidencia contra la configuración probada, pero no refuta automáticamente toda idea relacionada.
+Utiliza este procedimiento para convertir afirmaciones, explicaciones o planes preferidos en predicciones arriesgadas comprobables y especificar qué contaría en su contra. Separa afirmación objetivo, supuestos auxiliares y fallos de medición, y declara qué puede o no establecer la prueba observada. Una predicción fallida es evidencia contra la configuración probada, pero no refuta automáticamente toda idea relacionada.
 
 ## Use when
 

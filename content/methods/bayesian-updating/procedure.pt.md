@@ -8,7 +8,7 @@ Use-o para sinais diagnósticos, interpretação de testes, evidências sequenci
 
 ## Do not use when
 
-Não o use quando não houver base a priori defensável nem sequer uma direção ordinal da diferença das evidências entre hipóteses, ou quando a tarefa for aplicar uma regra estrita. Não confunda `P(E|H)` com `P(H|E)`, não reutilize a mesma evidência como atualizações independentes nem invente percentuais exatos para criar falsa certeza.
+Não o use quando faltar uma base a priori defensável ou faltar sequer uma direção ordinal da diferença das evidências entre hipóteses, ou quando a tarefa for aplicar uma regra estrita. Não confunda `P(E|H)` com `P(H|E)`, não reutilize a mesma evidência como atualizações independentes nem invente percentuais exatos para criar falsa certeza.
 
 ## Inputs to establish
 
@@ -34,7 +34,7 @@ A base a priori deve vir de uma taxa de base defensável, estimativa especializa
 
 ## Stop conditions
 
-Pare e faça uma pergunta bloqueante quando faltar o conjunto de hipóteses ou a definição da evidência e escolhas diferentes inverteriam a ação. Suspenda quando não existir base a priori defensável nem direção da verossimilhança, ou quando dependências impedirem uma atualização confiável. Pare quando a tarefa real for uma regra estrita, busca de explicações ou classificação da qualidade das fontes.
+Pare e faça uma pergunta bloqueante quando faltar o conjunto de hipóteses ou a definição da evidência e escolhas diferentes inverteriam a ação. Suspenda quando faltar uma base a priori defensável ou a direção da verossimilhança, ou quando dependências impedirem uma atualização confiável. Pare quando a tarefa real for uma regra estrita, busca de explicações ou classificação da qualidade das fontes.
 
 ## Complement handoff
 

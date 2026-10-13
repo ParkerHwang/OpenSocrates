@@ -17,6 +17,6 @@ ENTRY_GUIDANCE = (
     "actual required checks and do not repeat unchanged checks. No initial method is "
     "selected by this entry."
     " For synthesis, decisions and stakeholder messages, use the installed controller's "
-    "references/reader/guide.en.md, guide.ko.md, guide.zh.md, guide.ja.md, guide.fr.md, guide.de.md, guide.it.md, guide.es.md, guide.pt.md or guide.th.md to make the result understandable "
+    "references/reader/guide.en.md or guide.<task-locale>.md to make the result understandable "
     "and useful to its intended reader."
 )

@@ -22,7 +22,7 @@ Klären Sie Behauptung, Entscheidung, Evidenzarten, Stränge, gemeinsame Ursprü
 4. Jeden Strang gegen dieselbe Aussage als übereinstimmend, widersprechend oder nicht einschlägig veröffentlichen. Richtung und Wesentlichkeit statt Stimmenzahl nennen.
 5. Lücken und plausible Konflikterklärungen veröffentlichen, etwa Reichweite, Zeitpunkt, Messung, Auswahl und Analyse. Konkurrenzerklärungen bis auflösender Prüfung sichtbar lassen.
 6. Kombinierten Evidenzstatus und kalibrierten Schluss veröffentlichen. Einigkeit kann gestütztes Ergebnis stärken; wesentlicher Konflikt schwächt oder stellt zurück, sofern keine begründete Vorrang- oder Reichweitenregel löst.
-7. Nächste unabhängige Prüfung und beobachtbare Umkehrbedingung veröffentlichen. Bei abhängigen oder verschieden antwortenden Strängen unzureichende Triangulation statt falscher Bestätigung angeben.
+7. Nächste unabhängige Prüfung und beobachtbare Bedingung für eine Urteilsänderung veröffentlichen. Bei abhängigen oder verschieden antwortenden Strängen unzureichende Triangulation statt falscher Bestätigung angeben.
 
 ## Public output contract
 

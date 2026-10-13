@@ -22,7 +22,7 @@ Kläre Zielschluss, Entscheidung oder Frage, relevanten Geltungsbereich, unmitte
 4. Veröffentliche Einwände als eigene Angriffsäste. Ergänze Entkräftungen nur, wenn sie auf die tatsächliche Aussage des Einwands antworten. Bleiben dessen Belege und Geltungsbereich unverändert, gilt der Einwand als ungeklärt.
 5. Veröffentliche verborgene oder gemeinsame Prämissen und prüfe, ob ihre jeweilige Entfernung den Schluss ändert. Dieser Zustandswechsel identifiziert die kleinste wesentliche Schwäche, statt jeden Satz gleich zu zählen.
 6. Veröffentliche ein Kartenurteil: stärkste gestützte Verbindung, schwächste Verbindung, ungeklärter Einwand sowie redundante oder irrelevante Äste. Unterscheide Kartenvollständigkeit von Prämissenwahrheit und Schlussgültigkeit.
-7. Veröffentliche aktuellen Belegstatus des Schlusses und eine beobachtbare Umkehrbedingung. Fehlt eine wesentliche Prämisse oder bleibt ein entscheidender Einwand ungeklärt, schwäche den Schluss ab oder setze ihn aus, statt das Argument stillschweigend zu reparieren.
+7. Veröffentliche aktuellen Belegstatus des Schlusses und eine beobachtbare Bedingung für eine Urteilsänderung. Fehlt eine wesentliche Prämisse oder bleibt ein entscheidender Einwand ungeklärt, schwäche den Schluss ab oder setze ihn aus, statt das Argument stillschweigend zu reparieren.
 
 ## Public output contract
 

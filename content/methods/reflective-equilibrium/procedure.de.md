@@ -21,7 +21,7 @@ Erfassen Sie überlegte Urteile, Prinzipienkandidaten, Hintergrundtheorie oder W
 3. **Schwierige Fälle und Konflikte prüfen.** Alle Prinzipien an schwierigen Fällen, Gegenbeispielen, Gruppen und alternativer Rahmung testen. **Sichtbares Ergebnis/Zustandsänderung:** Passung, Konflikte, Ausnahmen und unakzeptable Folgen.
 4. **Revision wählen.** Fallurteil, Prinzipienumfang, Ausnahme oder Hintergrundannahme ändern erwägen; geringere Kosten gegenüber Alternativen erklären. **Sichtbares Ergebnis/Zustandsänderung:** Revisionsvorschlag und akzeptierter Zielkonflikt.
 5. **Kohärenz und Autorität nachprüfen.** Revidierte Menge erneut auf Fälle anwenden; keine bindende Regel verdrängen. Offene Uneinigkeit sichtbar lassen. **Sichtbares Ergebnis/Zustandsänderung:** Revidierte Urteils-Prinzipien-Karte und Restspannung.
-6. **Vorläufige Position setzen.** Prinzip, Fallergebnis, Vertrauen in Passung und revisionsauslösenden Fall, Evidenz oder Autorität nennen. **Sichtbares Ergebnis/Zustandsänderung:** Gestützter, vorläufiger oder zurückgestellter Schluss mit Umkehrbedingung und Prüfverantwortlichem.
+6. **Vorläufige Position setzen.** Prinzip, Fallergebnis, Vertrauen in Passung und revisionsauslösenden Fall, Evidenz oder Autorität nennen. **Sichtbares Ergebnis/Zustandsänderung:** Gestützter, vorläufiger oder zurückgestellter Schluss mit Bedingung für eine Urteilsänderung und Prüfverantwortlichem.
 
 ## Public output contract
 

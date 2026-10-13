@@ -22,7 +22,7 @@ Kläre Standardregel, auslösende Tatsachen, Regelumfang, bekannte Ausnahmen, m�
 4. Veröffentliche konkurrierende Regeln und wende Spezifität nur bei echter Teilmengenbeziehung an. Löst sie den Konflikt nicht, markiere widersprüchlich oder ausgesetzt statt Auswahl durch Aktualität oder sicheren Ton.
 5. Veröffentliche ausdrückliche Rücknahmebedingungen: beobachtbare Tatsache, die Q zurücknimmt, Schlussberechtigung schwächt oder Neubeurteilung erfordert. Bleibe enger als „neue Informationen“.
 6. Veröffentliche Status nach bekannten Einwänden: vorläufig, gestützt, zurückgenommen, widersprüchlich oder ausgesetzt. Benenne Widerlegung, Untergrabung oder ungeklärten Konflikt als Änderungsgrund.
-7. Veröffentliche aktuellen Schluss, anwendbare Einwände und Umkehrbedingung. Fehlen entscheidende Auslösetatsache oder Ausnahme, setze aus oder bewahre Vorläufigkeit statt Gewissheit.
+7. Veröffentliche aktuellen Schluss, anwendbare Einwände und Bedingung für eine Urteilsänderung. Fehlen entscheidende Auslösetatsache oder Ausnahme, setze aus oder bewahre Vorläufigkeit statt Gewissheit.
 
 ## Public output contract
 

@@ -22,7 +22,7 @@ Kläre einander ausschließende, hinreichend abdeckende Hypothesen, aktuelle Ent
 4. Veröffentliche Posterioränderungen mit exakter Rechnung nur bei vertretbaren Eingaben; gib sonst qualitative Aktualisierung oder Bandbreite an. Zeige die Normierung konkurrierender Hypothesen und bewahre die Richtung vom Prior zum Posterior.
 5. Veröffentliche Sensitivität gegenüber Prior- und Likelihood-Annahmen. Benenne Werte oder Richtungsänderungen, die Rangfolge oder Handlungsschwelle umkehren würden.
 6. Veröffentliche derzeit führende Hypothese, Posteriorstatus und nächste entscheidungsverbessernde Belege. Halte eine niedriger eingestufte, aber plausible Hypothese sichtbar, wenn sie wesentlich bleibt.
-7. Veröffentliche aktualisierten Schluss und beobachtbare Umkehrbedingung. Fehlen Prior oder Likelihood-Richtung, setze aus oder bewahre Vorläufigkeit, statt einen erfundenen Posterior anzugeben.
+7. Veröffentliche aktualisierten Schluss und beobachtbare Bedingung für eine Urteilsänderung. Fehlen Prior oder Likelihood-Richtung, setze aus oder bewahre Vorläufigkeit, statt einen erfundenen Posterior anzugeben.
 
 ## Public output contract
 

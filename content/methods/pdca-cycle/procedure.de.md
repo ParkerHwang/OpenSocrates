@@ -21,7 +21,7 @@ Klären Sie Verbesserungsziel, beobachteten Ausgangswert oder Prozesszustand, Hy
 3. **Do-Protokoll veröffentlichen.** Nur im genehmigten kleinen Umfang ausführen; tatsächliche Änderung, Abweichungen, Ausschlüsse, Vorfälle und Beobachtungen erfassen. Rücknahme sichern; günstiges erstes Signal rechtfertigt keine Expositionsausweitung. **Sichtbares Ergebnis/Zustandsänderung:** Prüfbares Ausführungsprotokoll.
 4. **Check-Ergebnis veröffentlichen.** Erwartungen und beobachtete Werte oder Beschreibungen nach vorab festgelegter Regel vergleichen. Fehlende Daten, Störfaktoren, Quellengrenzen und Widersprüche nennen. **Sichtbares Ergebnis/Zustandsänderung:** Ergebnislücke mit Evidenzstatus.
 5. **Act-Entscheidung veröffentlichen.** Evidenz- und schutzgrenzenbasiert standardisieren, überarbeiten, aufgeben oder zurückstellen. Gemischte Ergebnisse oder fehlendes entscheidendes Maß bleiben vorläufig mit offener Bedingung. **Sichtbares Ergebnis/Zustandsänderung:** Act oder Zurückstellung.
-6. **Folgezyklus veröffentlichen.** Versionierten Standard oder revidierte Hypothese, Verantwortlichen, nächste Beobachtung und ein oder zwei beobachtbare Umkehrbedingungen erfassen. Gelerntes und Ungeprüftes weiterführen. **Sichtbares Ergebnis/Zustandsänderung:** Folgeplan oder zurückgestelltes Ergebnis.
+6. **Folgezyklus veröffentlichen.** Versionierten Standard oder revidierte Hypothese, Verantwortlichen, nächste Beobachtung und ein oder zwei beobachtbare Bedingungen für eine Urteilsänderung erfassen. Gelerntes und Ungeprüftes weiterführen. **Sichtbares Ergebnis/Zustandsänderung:** Folgeplan oder zurückgestelltes Ergebnis.
 
 ## Public output contract
 

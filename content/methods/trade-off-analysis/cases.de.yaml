@@ -1,90 +1,117 @@
-schema: opensocrates.method-cases/1.0.0
-cases:
-  - id: trade-off-analysis-positive-1
-    kind: positive
-    prompt: "Wählen Sie zwischen drei Anbietern nach Tempo, Zuverlässigkeit, Barrierefreiheit und Gesamtkosten. Beschaffungsgruppe dokumentiert Veto; Beteiligte liefern datierte Präferenzen der übrigen Kriterien."
-    expected_route: trade-off-analysis
-    expected_behavior: route
-    decisive_features:
-      - judgment
-      - choose
-      - multiple_options
-      - multiple_objectives
-      - stakeholder_conflict
-    rationale: "Mehrere Optionen mit ausdrücklichen Kriterien, getrennter Grenze und Gewichtsurspung. Zugeständnisse offenlegen ohne Austauschbarkeit aller Werte."
-  - id: trade-off-analysis-positive-2
-    kind: positive
-    prompt: "Ein Produktteam wählt zwischen Leistung, Wartbarkeit, Datenschutz und Nutzeraufwand. Manche Bewertungen stützen Tests, andere Interviews; Datenschutz ist Minimum statt Score."
-    expected_route: trade-off-analysis
-    expected_behavior: route
-    decisive_features:
-      - judgment
-      - choose
-      - multiple_options
-      - multiple_objectives
-      - source_quality
-    rationale: "Herkunftsbewusster Vergleich mit nicht kompensierbarem Datenschutz. Gemischte Evidenz kennzeichnen statt vereinheitlichen."
-  - id: trade-off-analysis-positive-3
-    kind: positive
-    prompt: "Zwei Personalpläne unterscheiden Abdeckung, Kontinuität, Kosten und Last. Team vereinbart ordinale Präferenz, keine präzisen Zahlen; zeigen Sie Gewinner und Umkehrbedingung."
-    expected_route: trade-off-analysis
-    expected_behavior: route
-    decisive_features:
-      - judgment
-      - choose
-      - multiple_options
-      - multiple_objectives
-      - sensitive_inputs
-    rationale: "Ordinaler Konfliktvergleich mit Umkehrbedingung ausdrücklich verlangt. Scheingenauigkeit vermeiden und Wahl sichtbar halten."
-  - id: trade-off-analysis-negative-1
-    kind: negative
-    prompt: "Bauvorschrift bindet Brandschutz. Nur ein regelkonformer Entwurf bleibt; darf ein billigerer regelwidriger wegen Bequemlichkeit gewinnen?"
-    expected_route: null
-    expected_behavior: no_route
-    decisive_features:
-      - judgment
-      - explicit_rules
-      - single_feasible_option
-      - binding_rule_without_discretion
-    rationale: "Bindende Forderung wird kompensierbar behandelt. Deontic-reasoning oder Fachkonformität statt Zielkonfliktanalyse."
-  - id: trade-off-analysis-negative-2
-    kind: negative
-    prompt: "Sollen wir vor Entwurfswahl Kundenstudie durchführen? Wie stark könnte sie die Entscheidung ändern, und lohnt Verzögerung, statt heutiger Entwurfsvergleich?"
-    expected_route: null
-    expected_behavior: no_route
-    decisive_features:
-      - judgment
-      - information_purchase
-      - new_evidence
-      - sensitive_inputs
-    rationale: "Value-of-information: Zusatzinformation bewerten statt bestehende Optionen gewichten."
-  - id: trade-off-analysis-mechanical-1
-    kind: mechanical
-    prompt: "Sortieren Sie verifizierte Datensätze nach vorgegebenem Einspaltenwert. Keine Kriterienwahl, Präferenzkonflikt oder Empfehlungsbegründung."
-    expected_route: null
-    expected_behavior: no_route
-    decisive_features:
-      - mechanical
-    rationale: "Feste Sortierung ohne entscheidbare Zielkonflikte."
-  - id: trade-off-analysis-explicit-1
-    kind: explicit
-    prompt: "Nutzen Sie trade-off-analysis zur Standortwahl. Veto von Präferenz trennen, Bewertungsquellen bewahren und Empfehlungsverzicht zeigen."
-    expected_route: trade-off-analysis
-    expected_behavior: explicit_primary
-    decisive_features:
-      - explicit_method
-      - choose
-      - multiple_options
-      - multiple_objectives
-    rationale: "Methode mit öffentlichem Vergleichsvertrag ausdrücklich verlangt. Unbelegtes bleibt angenommen oder ungeprüft."
-  - id: trade-off-analysis-insufficiency-1
-    kind: insufficiency
-    prompt: "Wählen Sie beste unbenannte Alternative. Kriterien, Minima und maßgebliche Prioritäten sind ungeklärt."
-    expected_route: null
-    expected_behavior: hold
-    decisive_features:
-      - judgment
-      - choose
-      - multiple_options
-      - decisive_input_missing
-    rationale: "Machbare Menge, Kriterien und Präferenzherkunft fehlen. Empfehlung wäre nachträgliche Bewertung; Vergleich zurückstellen."
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "trade-off-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "Wählen Sie zwischen drei Anbietern nach Tempo, Zuverlässigkeit, Barrierefreiheit und Gesamtkosten. Beschaffungsgruppe dokumentiert Veto; Beteiligte liefern datierte Präferenzen der übrigen Kriterien.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "stakeholder_conflict"
+      ],
+      "rationale": "Mehrere Optionen mit ausdrücklichen Kriterien, getrennter Grenze und Gewichtsursprung. Zugeständnisse offenlegen ohne Austauschbarkeit aller Werte."
+    },
+    {
+      "id": "trade-off-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "Ein Produktteam wählt zwischen Leistung, Wartbarkeit, Datenschutz und Nutzeraufwand. Manche Bewertungen stützen Tests, andere Interviews; Datenschutz ist Minimum statt Score.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "source_quality"
+      ],
+      "rationale": "Herkunftsbewusster Vergleich mit nicht kompensierbarem Datenschutz. Gemischte Evidenz kennzeichnen statt vereinheitlichen."
+    },
+    {
+      "id": "trade-off-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "Zwei Personalpläne unterscheiden Abdeckung, Kontinuität, Kosten und Last. Team vereinbart ordinale Präferenz, keine präzisen Zahlen; zeigen Sie Gewinner und Umkehrbedingung.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "multiple_objectives",
+        "sensitive_inputs"
+      ],
+      "rationale": "Ordinaler Konfliktvergleich mit Umkehrbedingung ausdrücklich verlangt. Scheingenauigkeit vermeiden und Wahl sichtbar halten."
+    },
+    {
+      "id": "trade-off-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "Bauvorschrift bindet Brandschutz. Nur ein regelkonformer Entwurf bleibt; darf ein billigerer regelwidriger wegen Bequemlichkeit gewinnen?",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "single_feasible_option",
+        "binding_rule_without_discretion"
+      ],
+      "rationale": "Bindende Forderung wird kompensierbar behandelt. Deontic-reasoning oder Fachkonformität statt Zielkonfliktanalyse."
+    },
+    {
+      "id": "trade-off-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "Sollen wir vor Entwurfswahl Kundenstudie durchführen? Wie stark könnte sie die Entscheidung ändern, und lohnt Verzögerung, statt heutiger Entwurfsvergleich?",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "new_evidence",
+        "sensitive_inputs"
+      ],
+      "rationale": "Value-of-information: Zusatzinformation bewerten statt bestehende Optionen gewichten."
+    },
+    {
+      "id": "trade-off-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "Sortieren Sie verifizierte Datensätze nach vorgegebenem Einspaltenwert. Keine Kriterienwahl, Präferenzkonflikt oder Empfehlungsbegründung.",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "Feste Sortierung ohne entscheidbare Zielkonflikte."
+    },
+    {
+      "id": "trade-off-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "Nutzen Sie trade-off-analysis zur Standortwahl. Veto von Präferenz trennen, Bewertungsquellen bewahren und zeigen, welche Zugeständnisse die Empfehlung erfordert.",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "choose",
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "Methode mit öffentlichem Vergleichsvertrag ausdrücklich verlangt. Unbelegtes bleibt angenommen oder ungeprüft."
+    },
+    {
+      "id": "trade-off-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "Wählen Sie beste unbenannte Alternative. Kriterien, Minima und maßgebliche Prioritäten sind ungeklärt.",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "choose",
+        "multiple_options",
+        "decisive_input_missing"
+      ],
+      "rationale": "Machbare Menge, Kriterien und Präferenzherkunft fehlen. Empfehlung wäre nachträgliche Bewertung; Vergleich zurückstellen."
+    }
+  ]
+}

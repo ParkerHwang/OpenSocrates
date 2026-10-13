@@ -22,7 +22,7 @@ Kläre Entscheidung, Spieler und Entscheidungsrechte, machbare Handlungen, gesch
 4. Veröffentliche Reaktionsprüfung: glaubwürdige beste Antworten bei Gleichzeitigkeit oder Rückwärtsprüfung bei Zugfolge. Begründe gestützte dominante Handlungen; zeige sonst relevante Reaktionspaare ohne allwissende Motive. Sichtbare Ausgabe/Zustandsänderung: Reaktionsprüfung veröffentlicht.
 5. Veröffentliche mögliche stabile Ergebnisse und ob eines, mehrere oder keines gestützt sind. „Gleichgewicht“ verlangt hinreichend belegte Handlung-, Anreiz-, Informations- und Timingannahmen; sonst bedingt mit Fehlendem. Sichtbare Ausgabe/Zustandsänderung: Ergebnisstatus veröffentlicht.
 6. Veröffentliche Eingriffshebel und Zugempfehlung. Erkläre Änderungen an Anreizen, Information, Timing, Handlungen oder Bindungsglaubwürdigkeit; ergänze beobachtbares Reaktionssignal. Sichtbare Ausgabe/Zustandsänderung: Zug und Signal veröffentlicht.
-7. Veröffentliche Schluss, stärkste Unsicherheit und beobachtbare Umkehrbedingung. Fehlen entscheidende Auszahlung, Spieler oder Timing, setze aus und benenne kleinste freigebende Prüfung statt erfundenem Sieger. Sichtbare Ausgabe/Zustandsänderung: Aussetzungszustand veröffentlicht.
+7. Veröffentliche Schluss, stärkste Unsicherheit und beobachtbare Bedingung für eine Urteilsänderung. Fehlen entscheidende Auszahlung, Spieler oder Timing, setze aus und benenne kleinste freigebende Prüfung statt erfundenem Sieger. Sichtbare Ausgabe/Zustandsänderung: Aussetzungszustand veröffentlicht.
 
 ## Public output contract
 
@@ -34,7 +34,7 @@ Trenne beobachtetes Verhalten von Motivtheorie. Auszahlungsbehauptungen benötig
 
 ## Stop conditions
 
-Stoppe mit einer blockierenden Frage, wenn plausible Spieler-, Handlungs- oder Timingvarianten wesentlich andere Züge ergeben und der Nutzerzweck nicht entscheidet. Setze aus ohne entscheidenden Anreiz, Information oder Folge. Stoppe ohne Routing bei fehlender strategischer Wechselabhängigkeit. Beende nach öffentlicher Struktur, bedingter Antwort, Zug, Belegstatus und Umkehrsignal; rechne nicht für falsche Präzision weiter.
+Stoppe mit einer blockierenden Frage, wenn plausible Spieler-, Handlungs- oder Timingvarianten wesentlich andere Züge ergeben und der Nutzerzweck nicht entscheidet. Setze aus ohne entscheidenden Anreiz, Information oder Folge. Stoppe ohne Routing bei fehlender strategischer Wechselabhängigkeit. Beende nach öffentlicher Struktur, bedingter Antwort, Zug, Belegstatus und Signal für eine Urteilsänderung; rechne nicht für falsche Präzision weiter.
 
 ## Complement handoff
 

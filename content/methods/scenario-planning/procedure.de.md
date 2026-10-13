@@ -21,7 +21,7 @@ Klären Sie Leitfrage, Horizont, Systemgrenze, aktuelle Entscheidung und ausreic
 3. Eine 2×2-Matrix mit vier benannten intern konsistenten Szenarien und kurzen Entstehungspfaden veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Vier plausible Testumgebungen ohne Wahrscheinlichkeits- oder Vorliebenetikett.
 4. Gültigkeit und Verletzlichkeit aktueller Entscheidung in jedem Szenario veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Belastungsprüfung trennt durchgehend sinnvolle Maßnahmen, bedingte Aktionen und überall scheiternde Entscheidungen.
 5. Indikatoren, Auslöserreaktionen und Prüftakt veröffentlichen, um Szenarien bei veränderten Bedingungen zu unterscheiden. **Sichtbares Ergebnis/Zustandsänderung:** Lebendiger Beobachtungsplan statt statischer Erzählung.
-6. Robustheitsschluss und beobachtbare Umkehrbedingung veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Unhaltbare Achsen, Prämissen oder Folgen bedeuten vorläufigen oder zurückgestellten Schluss statt verkleideter Prognose.
+6. Robustheitsschluss und beobachtbare Bedingung für eine Urteilsänderung veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Unhaltbare Achsen, Prämissen oder Folgen bedeuten vorläufigen oder zurückgestellten Schluss statt verkleideter Prognose.
 
 ## Public output contract
 

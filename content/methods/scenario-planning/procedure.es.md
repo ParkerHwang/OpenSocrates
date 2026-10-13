@@ -1,6 +1,6 @@
 ## Purpose
 
-Usa este procedimiento para estructurar varios futuros externos coherentes y preparar decisiones. No predice un futuro: revela cómo se comporta una decisión cuando divergen fuerzas importantes e inciertas. Separa acciones útiles en varios futuros de acciones contingentes y mantiene señales visibles para revisar después.
+Usa este procedimiento para estructurar varios futuros externos coherentes y preparar decisiones. No predice un futuro: revela cómo se comporta una decisión cuando divergen fuerzas importantes e inciertas. Separa acciones útiles en todos los futuros considerados de acciones contingentes y mantiene señales visibles para revisar después.
 
 ## Use when
 

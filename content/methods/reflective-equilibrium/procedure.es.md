@@ -18,14 +18,14 @@ Enumera juicios, principios candidatos, teoría o valores de fondo, afectados, a
 
 1. **Reúne juicios ponderados.** Expón juicios y casos que les dan estabilidad, no impulso; incluye al menos un caso difícil desafiante. **Resultado visible/cambio de estado:** casos y juicios con evidencia y límites de privacidad.
 2. **Expón principios candidatos.** Generaliza a principios, condiciones, excepciones y valores sin dar por justificada la generalización. **Resultado visible/cambio de estado:** principios y juicios que pretenden explicar.
-3. **Prueba casos y conflictos.** Aplica cada principio a casos difíciles, contraejemplos, grupos afectados y marcos alternativos plausibles. **Resultado visible/cambio de estado:** ajustes, conflictos, excepciones y consecuencias inaceptables.
+3. **Prueba casos y conflictos.** Aplica cada principio a casos difíciles, contraejemplos, grupos afectados y marcos alternativos plausibles. **Resultado visible/cambio de estado:** encajes, conflictos, excepciones y consecuencias inaceptables.
 4. **Elige qué revisar.** Considera juicio, alcance, excepción o supuesto de fondo; explica por qué la revisión cuesta menos que otras. **Resultado visible/cambio de estado:** propuesta y compensación aceptada.
 5. **Recomprueba coherencia y autoridad.** Aplica el conjunto revisado a los casos; confirma que ninguna regla vinculante se desplazó. No promedies desacuerdos para ocultarlos. **Resultado visible/cambio de estado:** mapa revisado y tensión restante.
 6. **Fija posición provisional.** Expón principio, resultado del caso, confianza en su encaje y caso, evidencia o autoridad que obligaría a revisar. **Resultado visible/cambio de estado:** conclusión respaldada, provisional o suspendida, condición de cambio y responsable de revisión.
 
 ## Public output contract
 
-Devuelve juicios iniciales, principios, casos difíciles, conflictos, revisión elegida, encaje revisado, tensión restante y posición. Separa hechos y valores, marcando supuestos. La Conclusion Card debe mostrar posición, alcance, tensión y condición observable o autorizada de cambio; el registro puede mostrar revisiones sin afirmar acceso a razonamiento privado.
+Devuelve juicios iniciales, principios, casos difíciles, conflictos, revisión elegida, encaje revisado, tensión restante y posición. Separa hechos y valores, marcando supuestos. La Conclusion Card debe mostrar posición, alcance, tensión y condición observable o derivada de una autoridad competente de cambio; el registro puede mostrar revisiones sin afirmar acceso a razonamiento privado.
 
 ## Evidence and uncertainty rules
 

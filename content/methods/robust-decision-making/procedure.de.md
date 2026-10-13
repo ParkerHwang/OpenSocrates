@@ -22,7 +22,7 @@ Klären Sie Entscheidung, machbare Aktionen, Horizont, Beteiligte und Mindestlei
 4. Fehlerbedingungen, Bedauernsrisiko und Weltgruppen mit gleicher Aktionsbelastung veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Schwachstellen und Zielkonflikte statt versteckter Gesamtwerte.
 5. Robuste Aktion oder kleinste Aktionsmenge veröffentlichen, die Untergrenze aller geprüften Welten erfüllt. **Sichtbares Ergebnis/Zustandsänderung:** Empfehlung getrennt von Kosten, entgangenem Nutzen und Restschwäche.
 6. Schutz, umkehrbare Erstschritte, bedingte Aktionen und Beobachtungssignale mit Reaktionen veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Anpassbare Entscheidung statt einmaliger Wette auf Lieblingswelt.
-7. Gestützten, vorläufigen oder zurückgestellten Status mit beobachtbarer Umkehrbedingung veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Fehlende entscheidende Kriterien oder Welten erzeugen Zurückstellung statt Robustheitsbehauptung.
+7. Gestützten, vorläufigen oder zurückgestellten Status mit beobachtbarer Bedingung für eine Urteilsänderung veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Fehlende entscheidende Kriterien oder Welten erzeugen Zurückstellung statt Robustheitsbehauptung.
 
 ## Public output contract
 

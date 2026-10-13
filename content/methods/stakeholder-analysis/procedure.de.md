@@ -22,7 +22,7 @@ Klären Sie Frage, Ziel, Entscheidungsverantwortlichen, Umsetzungsgrenze, Horizo
 4. Wesentliche Übereinstimmungen, Konflikte, Abhängigkeiten und fehlende Stimmen veröffentlichen. Je Konflikt Thema, Parteien, Evidenzstatus und Einfluss auf Entscheidung oder nur Umsetzung nennen. **Sichtbares Ergebnis/Zustandsänderung:** Konfliktregister.
 5. Beteiligungs- und Verantwortungsplan veröffentlichen. Je wesentlichem Akteur Verantwortlichen, Kontaktzweck, nötige Teilnahme oder Information, Entscheidungsrecht, Zeitpunkt und planändernde Antwort nennen. **Sichtbares Ergebnis/Zustandsänderung:** Beteiligungsplan.
 6. Auslassungs- und Einwilligungsprüfung für externe Betroffene veröffentlichen. Gruppen nur bei entscheidungs- oder evidenzgestützter Relevanz ergänzen; bei entscheidender Einwilligung oder Schaden Einwand-/Beschwerdeweg erfassen. **Sichtbares Ergebnis/Zustandsänderung:** Aktualisierte Akteurskarte.
-7. Empfehlung, offenen Konflikt und Umkehrbedingung veröffentlichen. Fehlender entscheidender Akteur, Wirkung oder Einwilligung bedeutet Zurückstellung oder Vorläufigkeit mit kleinster Prüfung statt Umsetzungsfreigabe. **Sichtbares Ergebnis/Zustandsänderung:** Zurückstellungszustand.
+7. Empfehlung, offenen Konflikt und Bedingung für eine Urteilsänderung veröffentlichen. Fehlender entscheidender Akteur, Wirkung oder Einwilligung bedeutet Zurückstellung oder Vorläufigkeit mit kleinster Prüfung statt Umsetzungsfreigabe. **Sichtbares Ergebnis/Zustandsänderung:** Zurückstellungszustand.
 
 ## Public output contract
 
@@ -34,7 +34,7 @@ Jede wesentliche Interessen-, Macht-, Wirkungs- oder Einwilligungsaussage brauch
 
 ## Stop conditions
 
-Eine blockierende Frage stellen, wenn Verantwortliche oder Gruppen andere Beteiligungspläne bedeuten und kein Mandat entscheidet. Bei unidentifizierbarem oder ungeprüftem entscheidendem Akteur, Schaden, Einwilligung oder Abhängigkeit zurückstellen. Unwesentliche Karte beenden und passendem Vergleich oder externer Suche übergeben. Enden mit öffentlicher Karte, Konflikt, Verantwortlichem, nächster Aktion und Umkehrbedingung.
+Eine blockierende Frage stellen, wenn Verantwortliche oder Gruppen andere Beteiligungspläne bedeuten und kein Mandat entscheidet. Bei unidentifizierbarem oder ungeprüftem entscheidendem Akteur, Schaden, Einwilligung oder Abhängigkeit zurückstellen. Unwesentliche Karte beenden und passendem Vergleich oder externer Suche übergeben. Enden mit öffentlicher Karte, Konflikt, Verantwortlichem, nächster Aktion und Bedingung für eine Urteilsänderung.
 
 ## Complement handoff
 

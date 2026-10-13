@@ -22,7 +22,7 @@ Klären Sie Grundgesamtheit, Entscheidungszweck, Kandidatenkategorien, vorgeschl
 4. Veröffentlichen Sie die Vollständigkeitsprüfung mit Randfällen und bekannten Beobachtungen. Kategorie nur bei relevantem fehlendem Fall ergänzen; andernfalls Grundgesamtheit eingrenzen und Ausschluss offenlegen.
 5. Veröffentlichen Sie eine Granularitätsprüfung: Abstraktion, Größe und Entscheidungsnutzen vergleichen. Versteckte Unterkategorien oder nicht handlungsfähige zu breite Kategorien überarbeiten.
 6. Veröffentlichen Sie Grenzfälle, endgültige Regel und absichtlich offene Überschneidungen. Kein vages „Sonstiges“ für wesentliche Anteile verwenden.
-7. Veröffentlichen Sie klassifiziertes Ergebnis, Überschneidungs-/Lückenurteil und beobachtbare Umkehrbedingung. Bei ungeeigneter Achse oder nicht klassifizierbarem wichtigem Fall zurückstellen statt Zuordnung erzwingen.
+7. Veröffentlichen Sie klassifiziertes Ergebnis, Überschneidungs-/Lückenurteil und beobachtbare Bedingung für eine Urteilsänderung. Bei ungeeigneter Achse oder nicht klassifizierbarem wichtigem Fall zurückstellen statt Zuordnung erzwingen.
 
 ## Public output contract
 

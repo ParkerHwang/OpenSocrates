@@ -21,7 +21,7 @@ Benenne Entscheidung, Akteure, Handlungen, Rollen und Befugnisse, relevante Quel
 3. **Prüfe Hierarchie und Bedingungen.** Vergleiche Quellen, Ausnahmen, Zustimmung, Rollengrenzen und Vorrangregeln; trenne Empfehlung von Pflicht. **Sichtbare Ausgabe/Zustandsänderung:** aktive Regel, Bedingungen und Konflikte veröffentlichen; unklare Auslegung als unverified markieren.
 4. **Löse Konflikte vorsichtig.** Nutze quellenseitig festgestellten Vorrang; sonst benenne Konflikt und wähle die schadensärmste erlaubte Zwischenhandlung nur mit qualifizierter Befugnis. **Sichtbare Ausgabe/Zustandsänderung:** Konfliktbehandlung oder Aussetzung veröffentlichen statt stiller Lieblingsregel.
 5. **Filtere erlaubte Optionen.** Entferne Verbotenes, bewahre Erforderliches und halte wirklich Erlaubtes für praktischen Vergleich offen. **Sichtbare Ausgabe/Zustandsänderung:** erlaubte, erforderliche, verbotene und ungeklärte Optionen mit Grund und Quellenstatus veröffentlichen.
-6. **Setze den nächsten Schritt.** Benenne innerhalb erlaubter Optionen Handlung, Verantwortlichen, benötigte Belege und normativ statusändernde Bedingung. **Sichtbare Ausgabe/Zustandsänderung:** Schluss, Aussetzungs- oder Eskalationsweg und Umkehrbedingung veröffentlichen.
+6. **Setze den nächsten Schritt.** Benenne innerhalb erlaubter Optionen Handlung, Verantwortlichen, benötigte Belege und normativ statusändernde Bedingung. **Sichtbare Ausgabe/Zustandsänderung:** Schluss, Aussetzungs- oder Eskalationsweg und Bedingung für eine Urteilsänderung veröffentlichen.
 
 ## Public output contract
 

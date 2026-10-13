@@ -22,7 +22,7 @@ Klären Sie Leitfrage, aktuellen Schluss, wesentliche Gründe, Alternativen, Pub
 4. Horizontale Reihenfolge gleichrangiger Gruppen veröffentlichen und durchgängig anwenden: deduktiv, zeitlich, strukturell oder nach Wichtigkeit. Materiell deutungsändernde Alternativreihenfolge erfassen.
 5. Antwort, Gründe und Details von oben nach unten veröffentlichen. Notwendige Annahmen, Konflikte und ungeprüfte Gründe sichtbar halten statt wegpolieren.
 6. Stärkste Alternative oder Gegenargument und Ablehnungsgrund veröffentlichen. Ungeklärtes Urteil führt zu vorläufigem oder zurückgestelltem statt endgültigem Führungsergebnis.
-7. Kartengeeignete Endstruktur und beobachtbare Umkehrbedingung veröffentlichen. Gefordertes Artefakt, ausdrückliche Grenzen, Evidenzprüfungen und Unsicherheitsoffenlegung bestätigen.
+7. Kartengeeignete Endstruktur und beobachtbare Bedingung für eine Urteilsänderung veröffentlichen. Gefordertes Artefakt, ausdrückliche Grenzen, Evidenzprüfungen und Unsicherheitsoffenlegung bestätigen.
 
 ## Public output contract
 

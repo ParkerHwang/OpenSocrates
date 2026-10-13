@@ -25,7 +25,7 @@ Nomeie processo, produto ou componente, limites, função pretendida, usuários,
 
 ## Public output contract
 
-Retorne limites, modos de falha, efeitos, causas, controles atuais, prioridade ordinal, responsável e sinal de verificação. Mostre cada item relevante como observado, inferido, pressuposto, não verificado ou conflitante. Nunca apresente escores inventados de gravidade/ocorrência/detectabilidade nem ordem precisa sem proveniência. O Cartão de Conclusão resume falha de maior atenção e condição que mudaria prioridade; o registro de rastreabilidade pode conter inventário completo.
+Retorne limites, modos de falha, efeitos, causas, controles atuais, prioridade ordinal, responsável e sinal de verificação. Mostre cada item relevante como observado, inferido, pressuposto, não verificado ou conflitante. Nunca apresente escores inventados de gravidade/ocorrência/detectabilidade nem ordem precisa sem proveniência. O Cartão de Conclusão pode resumir a falha de maior atenção e condição que mudaria prioridade; o registro de rastreabilidade pode conter inventário completo.
 
 ## Evidence and uncertainty rules
 

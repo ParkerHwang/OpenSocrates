@@ -22,7 +22,7 @@ Kläre Zielbegriff, gesteuerte Entscheidung oder Messung, verwendenden Sprecher 
 4. Veröffentliche vorgeschlagene notwendige und hinreichende Bedingungen getrennt. Kennzeichne jede als gestützt, vorgeschlagen oder ungeprüft; Plausibilität bedeutet nicht Feststellung.
 5. Veröffentliche Grenztests und Gegenbeispiele. Zeige den stärksten Angriff auf die gewählte Bedeutung und ob die Regel eingeengt, erweitert oder ungeklärt bleiben sollte.
 6. Veröffentliche eine operationale Bedeutung, Geltungsbereich, Ausschlüsse und Restmehrdeutigkeit. Benenne Folgen für aktuelle Entscheidung, Messung oder Anforderung und den daraus entstehenden Zustandswechsel.
-7. Veröffentliche Begriffs-Entscheidungs-Verbindung und beobachtbare Umkehrbedingung. Klassifiziert keine Definition den entscheidenden Fall zuverlässig, setze das Urteil aus, statt bequem ein Etikett zu wählen.
+7. Veröffentliche Begriffs-Entscheidungs-Verbindung und beobachtbare Bedingung für eine Urteilsänderung. Klassifiziert keine Definition den entscheidenden Fall zuverlässig, setze das Urteil aus, statt bequem ein Etikett zu wählen.
 
 ## Public output contract
 
@@ -38,4 +38,4 @@ Stoppe mit einer blockierenden Frage bei wirklich unvereinbaren plausiblen Konte
 
 ## Complement handoff
 
-Übergib an `argument-mapping`, wenn die gewählte Bedeutung konkurrierende Behauptungen, gemeinsame Prämissen oder Einwände strukturell trennt. Übermittle nur gewählte operationale Bedeutung, wesentlichen Grenzfall und ungeklärte Folge. Die Ergänzung soll nicht das vollständige Definitionsinventar wiederholen.
+Übergib an `argument-mapping`, wenn die gewählte Bedeutung konkurrierende Behauptungen, gemeinsame Prämissen oder Einwände sichtbar macht, die strukturell getrennt werden müssen. Übermittle nur gewählte operationale Bedeutung, wesentlichen Grenzfall und ungeklärte Folge. Die Ergänzung soll nicht das vollständige Definitionsinventar wiederholen.

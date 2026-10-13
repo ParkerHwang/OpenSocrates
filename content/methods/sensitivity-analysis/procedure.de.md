@@ -20,12 +20,12 @@ Klären Sie Basismodell oder Regel, Ergebnismaß, Schwelle, Eingaben oder Gewich
 2. Bereiche, Gewichte, Abhängigkeiten und Evidenz veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Grenzen als verifiziert, berechnet, abgeleitet, angenommen, ungeprüft oder widersprüchlich statt effekthaschend gewählt.
 3. Einzeltests und dann nur begründbare strukturierte Kombinationen ausführen. **Sichtbares Ergebnis/Zustandsänderung:** Protokoll je geänderter Eingabe, Ausgabe, Methode, Einheit und Rundung; korrelierte Eingaben gegebenenfalls gemeinsam bewegen.
 4. Richtung, Größenordnung oder ordinale Änderung, Interaktionen und Schwellenwechselwerte veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Einflussreich, einflussarm, robust oder fragil; Rang beweist keine Kausalität.
-5. Entscheidungsfolge und Recherchepriorität entscheidungswirksamer Variablen veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Forschung an benannte Umkehrbedingung statt größte Rohvariation binden.
+5. Entscheidungsfolge und Recherchepriorität entscheidungswirksamer Variablen veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Forschung an benannte Bedingung für eine Urteilsänderung statt größte Rohvariation binden.
 6. Robusten, fragilen, vorläufigen oder zurückgestellten Schluss samt nächster Validierung veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Fehlende Basis, Bereich oder Schwelle führt ausdrücklich zu Zurückstellung statt erfundener Sensitivität.
 
 ## Public output contract
 
-Liefern Sie `baseline`, `tested_ranges`, `perturbation_results`, `switching_values`, `robust_or_fragile_conclusion`, `research_priority`, `flip_condition` und gestützten, vorläufigen oder zurückgestellten Status. Schwelle und sie überschreitende Eingaben benennen. Kartengründe identifizieren Berechnungen samt Eingaben; Unsicherheit nennt Bereichs- oder Modellgrenzen; Umkehrbedingung ist beobachtbare Eingabe-/Schwellenänderung. Vollständige Formeln und Protokolle im Trace oder Artefakt.
+Liefern Sie `baseline`, `tested_ranges`, `perturbation_results`, `switching_values`, `robust_or_fragile_conclusion`, `research_priority`, `flip_condition` und gestützten, vorläufigen oder zurückgestellten Status. Schwelle und sie überschreitende Eingaben benennen. Kartengründe identifizieren Berechnungen samt Eingaben; Unsicherheit nennt Bereichs- oder Modellgrenzen; Bedingung für eine Urteilsänderung ist beobachtbare Eingabe-/Schwellenänderung. Vollständige Formeln und Protokolle im Trace oder Artefakt.
 
 ## Evidence and uncertainty rules
 

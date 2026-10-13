@@ -21,7 +21,7 @@ System, Nutzfunktion, Schadeffekt, verbesserte und verschlechterte Eigenschaft, 
 3. **Trennung versuchen.** Zeit, Raum, Bedingung oder Teil/Ganzes prüfen; Schnittstelle, Phase oder Ressource könnte eine Forderung tragen. **Sichtbares Ergebnis/Zustandsänderung:** Trennschritte als machbar, blockiert oder ungeprüft samt Grund.
 4. **Erfinderische Schritte anwenden.** Konkrete Konzepte durch Segmentierung, Extraktion, Asymmetrie, Vereinigung, Voraktion, Umkehrung, Selbstbedienung oder Vermittler erzeugen. Wirkliche Widerspruchsänderung statt Namen erklären. **Sichtbares Ergebnis/Zustandsänderung:** Mindestens drei Konzepte samt Zielwiderspruch.
 5. **Interne Ressourcen suchen.** Ungenutzte Zeit, Raum, Information, Energie, Material, Redundanz oder Nutzeraktion identifizieren. **Sichtbares Ergebnis/Zustandsänderung:** Ressourcen-Konzept-Verbindungen und neue Last oder Nebenfolge.
-6. **Prüfen und testen.** Widerspruchserhaltende Kompromisse verwerfen; umkehrbaren Test des besten Kandidaten wählen. **Sichtbares Ergebnis/Zustandsänderung:** Kandidat, Restkonflikt, Verantwortlicher, Sicherheit, Evidenzbedarf und Umkehrbedingung. Untestbaren Widerspruch zurückstellen.
+6. **Prüfen und testen.** Widerspruchserhaltende Kompromisse verwerfen; umkehrbaren Test des besten Kandidaten wählen. **Sichtbares Ergebnis/Zustandsänderung:** Kandidat, Restkonflikt, Verantwortlicher, Sicherheit, Evidenzbedarf und Bedingung für eine Urteilsänderung. Untestbaren Widerspruch zurückstellen.
 
 ## Public output contract
 

@@ -622,30 +622,11 @@ class InstructionArtifact:
                 missing=", ".join(missing), path=quoted_path, footer=footer
             )
         if self.locale in {"zh", "ja"}:
-            missing = []
-            if missing_read:
-                missing.append(
-                    {
-                        "zh": "所选思考体系文件的完整读取凭证",
-                        "ja": "選択された思考体系ファイルの完全な読み取り記録",
-                    }[self.locale]
-                )
-            if missing_footer:
-                missing.append(
-                    {"zh": "最终答复的依据确认行", "ja": "最終回答の根拠確認行"}[self.locale]
-                )
-            if self.locale == "zh":
-                return (
-                    f"OpenSocrates 依据检查未能确认{'、'.join(missing)}。"
-                    f"请使用本地读取工具从首行到末行完整读取 {quoted_path}，"
-                    "再依据其程序和阻断规则检查答复。依据充分的最终答复须以此精确文本作为最后一行："
-                    f"{footer}"
-                )
-            return (
-                f"OpenSocrates の根拠確認では{'、'.join(missing)}を確認できませんでした。"
-                f"ローカル読み取りツールで {quoted_path} を最初から最後まで完全に読み、"
-                "その手順と適用を制限する規則に沿って回答を確認してください。"
-                f"根拠を確認した最終回答の最後の行は、次の文字列と完全に一致させてください：{footer}"
+            return self._cjk_grounding_repair_message(
+                missing_read=missing_read,
+                missing_footer=missing_footer,
+                quoted_path=quoted_path,
+                footer=footer,
             )
         if self.locale == "ko":
             missing = []
@@ -669,6 +650,37 @@ class InstructionArtifact:
             f"Use the local Read tool to read {quoted_path} completely from its first through "
             "last line, then revise the answer against its procedure and blocking rules. End the "
             f"grounded final answer with exactly: {footer}"
+        )
+
+    def _cjk_grounding_repair_message(
+        self, *, missing_read: bool, missing_footer: bool, quoted_path: str, footer: str
+    ) -> str:
+        """Render the unchanged Chinese/Japanese repair contract."""
+
+        missing = []
+        if missing_read:
+            missing.append(
+                {
+                    "zh": "所选思考体系文件的完整读取凭证",
+                    "ja": "選択された思考体系ファイルの完全な読み取り記録",
+                }[self.locale]
+            )
+        if missing_footer:
+            missing.append(
+                {"zh": "最终答复的依据确认行", "ja": "最終回答の根拠確認行"}[self.locale]
+            )
+        if self.locale == "zh":
+            return (
+                f"OpenSocrates 依据检查未能确认{'、'.join(missing)}。"
+                f"请使用本地读取工具从首行到末行完整读取 {quoted_path}，"
+                "再依据其程序和阻断规则检查答复。依据充分的最终答复须以此精确文本作为最后一行："
+                f"{footer}"
+            )
+        return (
+            f"OpenSocrates の根拠確認では{'、'.join(missing)}を確認できませんでした。"
+            f"ローカル読み取りツールで {quoted_path} を最初から最後まで完全に読み、"
+            "その手順と適用を制限する規則に沿って回答を確認してください。"
+            f"根拠を確認した最終回答の最後の行は、次の文字列と完全に一致させてください：{footer}"
         )
 
     def _grounding_block(self) -> str:

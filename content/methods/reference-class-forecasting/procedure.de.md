@@ -22,11 +22,11 @@ Klären Sie Zielergebnis, Einheit, Horizont, Stichtag und akzeptable Grenze. Ein
 4. Außenbasis neben Eigenplan veröffentlichen und Differenzrichtung erklären. **Sichtbares Ergebnis/Zustandsänderung:** Plan innerhalb, oberhalb oder unterhalb beobachteter Verteilung; Position ist keine Wahrscheinlichkeit.
 5. Anpassungen für wesentliche aktuelle Unterschiede einzeln veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Richtung, Grund und Evidenzstatus je Anpassung; Zahl nur bei begründbarer Größenordnung.
 6. Begrenzte Bandbreite samt Bedingungen plausibler Ränder veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Bei schwacher Abdeckung, Auswahl- oder Randevidenz verbreitern oder zurückstellen; keine erfundene Basisrate.
-7. Status gestützt, vorläufig oder zurückgestellt mit Umkehrbedingung und nächster Prüfung veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Fehlende entscheidende Klassen- oder Ergebnisangabe bedeutet ausdrückliche Zurückstellung statt willkürlicher Empfehlung.
+7. Status gestützt, vorläufig oder zurückgestellt mit Bedingung für eine Urteilsänderung und nächster Prüfung veröffentlichen. **Sichtbares Ergebnis/Zustandsänderung:** Fehlende entscheidende Klassen- oder Ergebnisangabe bedeutet ausdrückliche Zurückstellung statt willkürlicher Empfehlung.
 
 ## Public output contract
 
-Liefern Sie `target`, `reference_class`, `base_distribution`, `adjustments`, `range`, `inside_view_comparison`, `flip_condition` und Status gestützt, vorläufig oder zurückgestellt. Schluss benennt Unterstützung durch beobachtete Klasse, keine sichere Übereinstimmung des aktuellen Falls. Gründe als **verified**, **computed**, **inferred**, **assumed**, **unverified** oder **conflicted** markieren. Fehlende Abdeckung oder Auswahlrisiko nennen; Umkehrbedingung muss beobachtbar sein statt bloß „bei neuen Informationen“.
+Liefern Sie `target`, `reference_class`, `base_distribution`, `adjustments`, `range`, `inside_view_comparison`, `flip_condition` und Status gestützt, vorläufig oder zurückgestellt. Schluss benennt Unterstützung durch beobachtete Klasse, keine sichere Übereinstimmung des aktuellen Falls. Gründe als **verified**, **computed**, **inferred**, **assumed**, **unverified** oder **conflicted** markieren. Fehlende Abdeckung oder Auswahlrisiko nennen; Bedingung für eine Urteilsänderung muss beobachtbar sein statt bloß „bei neuen Informationen“.
 
 ## Evidence and uncertainty rules
 

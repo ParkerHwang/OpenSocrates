@@ -25,7 +25,7 @@ Zitiere oder paraphrasiere nur die öffentliche zu prüfende Behauptung und bene
 
 ## Public output contract
 
-Liefere stärkste Behauptung, Quellenbewertung, wesentliche Rahmung oder Auslassung, Schlusslücke, stärkstes Gegenargument und Urteil. Nutze Belegstatusangaben; Rufurteile sind keine faktische Unterstützung. „Unverified“ bedeutet fehlende oder nicht verfügbare erforderliche Prüfung; „zurückgewiesen“ verlangt wesentlichen Widerspruch oder entscheidenden Mangel. Ergänze Umkehrbedingung der Conclusion Card; detaillierte Behauptungs-Grund-Verbindungen in die Ablaufspur.
+Liefere stärkste Behauptung, Quellenbewertung, wesentliche Rahmung oder Auslassung, Schlusslücke, stärkstes Gegenargument und Urteil. Nutze Belegstatusangaben; Rufurteile sind keine faktische Unterstützung. „Unverified“ bedeutet fehlende oder nicht verfügbare erforderliche Prüfung; „zurückgewiesen“ verlangt wesentlichen Widerspruch oder entscheidenden Mangel. Ergänze Bedingung für eine Urteilsänderung der Conclusion Card; detaillierte Behauptungs-Grund-Verbindungen in die Ablaufspur.
 
 ## Evidence and uncertainty rules
 

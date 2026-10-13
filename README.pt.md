@@ -50,6 +50,10 @@ aprovações necessárias pelo mecanismo de confiança do aplicativo. Depois, in
 uma conversa nova. `status` informa instalação e integridade; não comprova
 aprovação de hooks ou aplicação efetiva.
 
+Instalações antigas com vários hosts não são adotadas nem apagadas silenciosamente.
+Antes de instalar um novo perfil, confirme a origem exata e a titularidade da
+instalação existente.
+
 No Mac Apple Silicon, use `install --host claude` para Claude Code.
 No Antigravity, escolha uma pasta de trabalho existente com caminho absoluto;
 sem `--workspace`, o escopo é global. Evite cópias ativas duplicadas para o mesmo

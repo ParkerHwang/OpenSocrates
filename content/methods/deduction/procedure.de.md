@@ -22,7 +22,7 @@ Kläre vorgeschlagenen Schluss, Prämissen, maßgebliche Regel oder Implikation,
 4. Veröffentliche Prämissenstatustabelle mit Quelle, Umfang und Belegstatus jeder Prämisse und Regel. Trenne gültige Form von schlüssigem Argument; das aktualisiert das Urteil sichtbar.
 5. Veröffentliche entkräftende Prämisse oder Regelbedingung. Benenne exakt, was die Folgerung brechen würde, und trenne Regelausnahme von falscher Prämisse.
 6. Veröffentliche Schluss als schlüssig, gültig-aber-nicht-schlüssig, ungültig oder bedingt samt kleinster fehlender Prüfung. Plausibilität rechtfertigt keine Hochstufung.
-7. Veröffentliche aktuellen Schluss und beobachtbare Umkehrbedingung. Fehlen entscheidende Prämisse oder Regel, setze die reale Behauptung aus und bewahre die bedingte Implikation.
+7. Veröffentliche aktuellen Schluss und beobachtbare Bedingung für eine Urteilsänderung. Fehlen entscheidende Prämisse oder Regel, setze die reale Behauptung aus und bewahre die bedingte Implikation.
 
 ## Public output contract
 

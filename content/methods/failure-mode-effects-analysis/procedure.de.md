@@ -21,7 +21,7 @@ Benenne Prozess, Produkt oder Komponente, Grenzen, Sollfunktion, Nutzer, Betrieb
 3. **Verfolge Ursachen und Kontrollen.** Erfasse plausible Ursachen, Vorbeugung, Erkennung und tatsächliche Kontrollbetriebsbelege. Trenne beobachtete Fehler von hypothetischen Möglichkeiten. **Sichtbare Ausgabe/Zustandsänderung:** Ursache-/Kontrollfelder mit verified, inferred, assumed oder unverified ergänzen.
 4. **Setze ordinale Priorität.** Wende vorab benannte qualitative Regel nach Folge, plausibler Exposition und Kontrollschwäche an. Ohne vertretbare quantitative Eingaben berechne kein Produkt oder Risikoprioritätszahl; begründe sprachlich. **Sichtbare Ausgabe/Zustandsänderung:** geordnete Kurzliste mit Gründen für dringend, wesentlich, beobachten oder geringe Aufmerksamkeit veröffentlichen.
 5. **Verantworte Kontrollmaßnahmen.** Bevorzuge Ursachenentfernung, dann Erkennung vor Schaden, dann Wirkungsbegrenzung. Benenne Verantwortlichen, Auslöser, Abschlussbeleg und Restunsicherheit. **Sichtbare Ausgabe/Zustandsänderung:** modusgebundenen Kontrollplan veröffentlichen.
-6. **Bewerte nach Änderung neu.** Benenne beobachtbare Verringerung der Exposition oder bessere Erkennung sowie Wiederöffnungsbedingungen. **Sichtbare Ausgabe/Zustandsänderung:** gestützte, vorläufige oder ausgesetzte Priorität und Umkehrbedingung veröffentlichen; bloße Planung schließt keinen Modus.
+6. **Bewerte nach Änderung neu.** Benenne beobachtbare Verringerung der Exposition oder bessere Erkennung sowie Wiederöffnungsbedingungen. **Sichtbare Ausgabe/Zustandsänderung:** gestützte, vorläufige oder ausgesetzte Priorität und Bedingung für eine Urteilsänderung veröffentlichen; bloße Planung schließt keinen Modus.
 
 ## Public output contract
 

@@ -21,7 +21,7 @@ Kläre Entscheidungsfrage, Situationsgrenze, Zeithorizont, beobachtetes Muster u
 3. Veröffentliche eine vorläufige Klassifikation – klar, kompliziert, komplex, chaotisch oder verwirrt – mit zwei oder drei stützenden Beobachtungen. Bei unterschiedlichen Teilklassifikationen zerlege die Situation und veröffentliche eigene Grenzen statt Mittelwert. Sichtbare Ausgabe/Zustandsänderung: Klassifikation veröffentlicht.
 4. Veröffentliche passenden Modus: wahrnehmen–einordnen–reagieren bei Wiederholbarkeit, wahrnehmen–analysieren–reagieren bei Fachabhängigkeit, erproben–wahrnehmen–reagieren bei Anpassung oder handeln–wahrnehmen–reagieren bei Dringlichkeit. Bei Verwirrung benenne kleinste klärende Rahmungs- oder Beobachtungsaufgabe. Sichtbare Ausgabe/Zustandsänderung: Handlungsmodus veröffentlicht.
 5. Veröffentliche eine sichere nächste Handlung und Lern- oder Übergangssignale. Benenne Beobachtung, Beobachter und Zeitpunkt; das Signal muss beobachtbar sein statt allgemeiner Verbesserungshoffnung. Sichtbare Ausgabe/Zustandsänderung: Signalregister veröffentlicht.
-6. Veröffentliche Schlussstatus, Belege, eine wesentliche Unsicherheit und Umkehrbedingung für Klassifikation oder Modus. Die Etikettenwahl allein schafft keine Gewissheit. Sichtbare Ausgabe/Zustandsänderung: Schlussstatus veröffentlicht.
+6. Veröffentliche Schlussstatus, Belege, eine wesentliche Unsicherheit und Bedingung für eine Urteilsänderung für Klassifikation oder Modus. Die Etikettenwahl allein schafft keine Gewissheit. Sichtbare Ausgabe/Zustandsänderung: Schlussstatus veröffentlicht.
 7. Könnten fehlende Grenze, Beobachtung oder Einschränkung den Modus ändern, veröffentliche ausgesetztes oder vorläufiges Ergebnis samt blockierender Frage oder Prüfung. Erfinde keine Tatsache zur Lückenfüllung. Sichtbare Ausgabe/Zustandsänderung: Aussetzungszustand veröffentlicht.
 
 ## Public output contract
@@ -34,7 +34,7 @@ Direkte Beobachtungen, identifizierte Quellen, Nutzerunterlagen und reproduzierb
 
 ## Stop conditions
 
-Stoppe mit einer blockierenden Frage, wenn zwei plausible Grenzen oder Beobachtungen wesentlich andere Handlungen verlangen und weder Nutzerzweck noch maßgebliche Einschränkung wählen lassen. Setze aus ohne entscheidende Beziehung, unmittelbare Grenze oder Übergangssignal. Beende nach einem handlungsfähigen Modus, beobachtbarem Signal und Umkehrbedingung. Warte bei Dringlichkeit nicht auf Vollanalyse; erfasse Eindämmung und prüfe Klassifikation nach neuen Beobachtungen erneut.
+Stoppe mit einer blockierenden Frage, wenn zwei plausible Grenzen oder Beobachtungen wesentlich andere Handlungen verlangen und weder Nutzerzweck noch maßgebliche Einschränkung wählen lassen. Setze aus ohne entscheidende Beziehung, unmittelbare Grenze oder Übergangssignal. Beende nach einem handlungsfähigen Modus, beobachtbarem Signal und Bedingung für eine Urteilsänderung. Warte bei Dringlichkeit nicht auf Vollanalyse; erfasse Eindämmung und prüfe Klassifikation nach neuen Beobachtungen erneut.
 
 ## Complement handoff
 

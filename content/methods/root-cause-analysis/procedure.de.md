@@ -25,7 +25,7 @@ Problemaussage mit beobachtbarem Fehler, Betroffenen, Fenster, Wirkung und Wiede
 
 ## Public output contract
 
-Liefern Sie begrenztes Problem, Kette, kontrollierbare Grundbedingung sowie getrennte Eindämmung, Prävention und Erkennung. Jede wesentliche Verbindung zeigt Evidenzstatus, Verantwortlichen, Signal und Restrisiko. Eine Conclusion Card kann Diagnose und Umkehrbedingung zusammenfassen; Zweige im Trace. Ungeklärte Grundbedingung als „führende Erklärung“ vorläufig darstellen, nicht einzelnen Schuldigen als Fakt.
+Liefern Sie begrenztes Problem, Kette, kontrollierbare Grundbedingung sowie getrennte Eindämmung, Prävention und Erkennung. Jede wesentliche Verbindung zeigt Evidenzstatus, Verantwortlichen, Signal und Restrisiko. Eine Conclusion Card kann Diagnose und Bedingung für eine Urteilsänderung zusammenfassen; Zweige im Trace. Ungeklärte Grundbedingung als „führende Erklärung“ vorläufig darstellen, nicht einzelnen Schuldigen als Fakt.
 
 ## Evidence and uncertainty rules
 

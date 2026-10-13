@@ -17,7 +17,7 @@ Establece término objetivo, decisión o medición que controla, hablante o docu
 ## Procedure
 
 1. Publica en una frase el concepto, contexto y decisión controlada. Marca si el contexto procede del usuario, documento rector o supuesto; así queda visible el análisis.
-2. Publica entre dos y cuatro significados rivales, cada uno con fuente o hablante y resultado permitido. No fusionas usos distintos solo por compartir palabra.
+2. Publica entre dos y cuatro significados rivales, cada uno con fuente o hablante y resultado permitido. No fusiones usos distintos solo por compartir palabra.
 3. Publica casos positivos y negativos claros y muestra cómo clasifica cada significado cada caso. Esto revela si el desacuerdo es semántico, factual o ambos.
 4. Publica por separado condiciones necesarias y suficientes candidatas. Declara cada condición respaldada, propuesta o no verificada; nunca trates una condición plausible como establecida.
 5. Publica pruebas de límite y contraejemplos. Muestra el caso que más amenaza el significado elegido y si debe estrecharse la regla, ampliarse o dejarse sin resolver.

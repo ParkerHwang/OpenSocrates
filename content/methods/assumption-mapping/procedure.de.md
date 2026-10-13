@@ -21,7 +21,7 @@ Kläre Entscheidungsfrage, gewünschtes Ergebnis, vorgeschlagene Handlung und we
 3. **Veröffentliche die beiden Achsen.** Ordne jede Annahme einer ordinalen Wichtigkeitsachse und einer Belegstatusachse zu. Verwende hoch, mittel oder niedrig nur begründet sowie `verified`, `computed`, `inferred`, `assumed`, `unverified` oder `conflicted` für Unterstützung. **Sichtbare Ausgabe/Zustandsänderung:** Wichtigkeits-/Belegkarte.
 4. **Veröffentliche die riskanteste Menge.** Wähle Annahmen, deren Scheitern das Ergebnis wesentlich ändern würde und deren Unterstützung am schwächsten oder widersprüchlich ist. Begründe jede Auswahl, bewahre ununterscheidbare Gleichstände und erfasse offene Unsicherheit. **Sichtbare Ausgabe/Zustandsänderung:** Risikomenge und Unsicherheit.
 5. **Veröffentliche eine sichere Testkarte.** Benenne für jede ausgewählte Annahme den günstigsten umkehrbaren Test, beobachtbares Signal, Beobachtungszeitraum, Verantwortlichen und Entscheidungsregel. Ergänze eine Stopp- oder Rückabwicklungsgrenze. **Sichtbare Ausgabe/Zustandsänderung:** sichere Testkarte oder Aussetzung.
-6. **Veröffentliche die Entscheidungskarte.** Gib an, was stützende, schwächende, widersprüchliche oder fehlende Signale ändern würden: fortfahren, überarbeiten, Belege suchen oder aussetzen. **Sichtbare Ausgabe/Zustandsänderung:** vorläufiger Schluss und Umkehrbedingungen.
+6. **Veröffentliche die Entscheidungskarte.** Gib an, was stützende, schwächende, widersprüchliche oder fehlende Signale ändern würden: fortfahren, überarbeiten, Belege suchen oder aussetzen. **Sichtbare Ausgabe/Zustandsänderung:** vorläufiger Schluss und Bedingungen für eine Urteilsänderung.
 
 ## Public output contract
 

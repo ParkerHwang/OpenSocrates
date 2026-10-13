@@ -21,8 +21,8 @@ Klären Sie Entscheidungsfrage, Organisation oder Produkt, Geografie und Rechtsr
 3. Mechanismus und Richtung jedes beibehaltenen Faktors veröffentlichen: Auswirkungen auf Nachfrage, Kosten, Zugang, Regelkonformität, Fähigkeit, Zeitpunkt oder Legitimität erklären. Allgemein „positiv“ oder „negativ“ durch prüfbaren Kausalbezug ersetzen. **Sichtbares Ergebnis/Zustandsänderung:** Mechanismen.
 4. Ordinale Sicht auf Richtung, Geschwindigkeit, Exposition und Unsicherheit mit kurzer Begründung veröffentlichen. Niedrig, mittel oder hoch nur transparente Vergleiche, keine unbelegten Prozente oder Prognosen. **Sichtbares Ergebnis/Zustandsänderung:** Ordinale Bewertung.
 5. Chancen-, Bedrohungs- oder Beobachtungsstatus je wesentlichem Faktor veröffentlichen; wenige entscheidungswirksame Faktoren priorisieren. Status als verifiziert, abgeleitet, angenommen, ungeprüft oder widersprüchlich nennen. **Sichtbares Ergebnis/Zustandsänderung:** Wesentlichkeit.
-6. Ein bis drei strategische Folgerungen veröffentlichen, gegebenenfalls robuste Sofortmaßnahme, bedingte Aktion oder gezielte Recherche. Wechselwirkungen samt Evidenz benennen; Korrelation ist kein Beweis. **Sichtbares Ergebnis/Zustandsänderung:** Folgerungen.
-7. Aktuelles Urteil, entscheidende Gründe, Restunsicherheit und beobachtbare Umkehrsignale veröffentlichen. Entscheidungsrelevant fehlender Faktor, Quelle, Rechtsraum oder Horizont führt zu Zurückstellung und kleinster notwendiger Prüfung. **Sichtbares Ergebnis/Zustandsänderung:** Urteil.
+6. Ein bis drei strategische Folgerungen veröffentlichen, gegebenenfalls robuste Maßnahme, bedingte Aktion oder gezielte Recherche. Wechselwirkungen samt Evidenz benennen; Korrelation ist kein Beweis. **Sichtbares Ergebnis/Zustandsänderung:** Folgerungen.
+7. Aktuelles Urteil, entscheidende Gründe, Restunsicherheit und beobachtbare Signal für eine Urteilsänderunge veröffentlichen. Entscheidungsrelevant fehlender Faktor, Quelle, Rechtsraum oder Horizont führt zu Zurückstellung und kleinster notwendiger Prüfung. **Sichtbares Ergebnis/Zustandsänderung:** Urteil.
 
 ## Public output contract
 
@@ -34,7 +34,7 @@ Aktuelle identifizierbare Quellen samt Datum und Rechtsraum nutzen. Trendbeschre
 
 ## Stop conditions
 
-Eine blockierende Frage stellen, wenn zwei plausible Geografien, Rechtsräume oder Horizonte materiell andere Folgerungen bedeuten und der Nutzerzweck nicht entscheidet. Bei entscheidender ungeprüfter Regel, Abhängigkeit oder Faktor zurückstellen. Lokale Diagnose oder internen Vergleich einer geeigneteren Methode zuführen. Enden, sobald Faktoren, Mechanismen, Folgerungen, Signale und Umkehrbedingung öffentlich sind.
+Eine blockierende Frage stellen, wenn zwei plausible Geografien, Rechtsräume oder Horizonte materiell andere Folgerungen bedeuten und der Nutzerzweck nicht entscheidet. Bei entscheidender ungeprüfter Regel, Abhängigkeit oder Faktor zurückstellen. Lokale Diagnose oder internen Vergleich einer geeigneteren Methode zuführen. Enden, sobald Faktoren, Mechanismen, Folgerungen, Signale und Bedingung für eine Urteilsänderung öffentlich sind.
 
 ## Complement handoff
 

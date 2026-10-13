@@ -4,7 +4,7 @@ Nutze dieses Verfahren, um beobachtete menschliche Bedürfnisse vor großer Fest
 
 ## Use when
 
-Nutze es für Produkte, Dienstleistungen, Abläufe oder Erlebnisse, deren Erfolg von Situation, Emotion, Zugang, Vertrauen oder sozialem Kontext abhängt. Es hilft bei Funktionswünschen, Streit über das echte Problem oder offenem Lösungsraum mit kleinem bedürfnisprüfendem Experiment. Nutze Beobachtungen, Interviews, Supportunterlagen, Reiseausschnitte und direktes Feedback; kennzeichne Deutung getrennt.
+Nutze es für Produkte, Dienstleistungen, Abläufe oder Erlebnisse, deren Erfolg von Situation, Emotion, Zugang, Vertrauen oder sozialem Kontext abhängt. Es hilft bei Funktionswünschen, Streit über das echte Problem oder offenem Lösungsraum mit kleinem bedürfnisprüfendem Experiment. Nutze Beobachtungen, Interviews, Supportunterlagen, Ausschnitte aus Nutzerabläufen und direktes Feedback; kennzeichne Deutung getrennt.
 
 ## Do not use when
 
@@ -21,7 +21,7 @@ Benenne Zielnutzer oder Betroffene, Situation, Verhalten, Reibung, gewünschten 
 3. **Erzeuge unterschiedliche Konzepte.** Entwickle mehrere Bedürfniswege, gegebenenfalls einfache Technik, Dienstleistung, Richtlinie und Produkt. Wähle erst bei sinnvoll unterschiedlicher Menge. **Sichtbare Ausgabe/Zustandsänderung:** mindestens drei Kandidaten mit bedientem Bedürfnis veröffentlichen.
 4. **Wähle minimalen Prototyp.** Wähle kleinstes umkehrbares Artefakt oder Erprobung zur unsichersten Standpunktkomponente. Benenne Frage, Zielteilnehmer, Expositionsgrenze und widerlegendes Feedback. **Sichtbare Ausgabe/Zustandsänderung:** Prototypauftrag und Sicherheits-/Zustimmungsschutz veröffentlichen.
 5. **Teste und deute.** Beobachte Verhalten und berichtete Erfahrung anhand vorab benannter Frage. Begeisterung, Höflichkeit oder Abschluss allein beweisen keinen dauerhaften Wert. **Sichtbare Ausgabe/Zustandsänderung:** Testbeobachtungen, Belegstatus und gestützten, revidierten oder verworfenen Standpunkt veröffentlichen.
-6. **Entscheide die nächste Iteration.** Wähle Verfeinerung, Ausweitung, Pause oder Verwerfung und erforderliche neue Belege vor größerer Festlegung. **Sichtbare Ausgabe/Zustandsänderung:** Konzept, Lernergebnis, Verantwortlichen, nächste Prüfung und Umkehrbedingung veröffentlichen.
+6. **Entscheide die nächste Iteration.** Wähle Verfeinerung, Ausweitung, Pause oder Verwerfung und erforderliche neue Belege vor größerer Festlegung. **Sichtbare Ausgabe/Zustandsänderung:** Konzept, Lernergebnis, Verantwortlichen, nächste Prüfung und Bedingung für eine Urteilsänderung veröffentlichen.
 
 ## Public output contract
 

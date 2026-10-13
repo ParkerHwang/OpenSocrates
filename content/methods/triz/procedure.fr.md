@@ -25,7 +25,7 @@ Décrivez système, fonction utile, effet nuisible, propriété améliorée et d
 
 ## Public output contract
 
-Renvoyez fonction utile, idéal, contradiction technique ou physique, séparations, concepts inventifs, ressources internes, examen de faisabilité et test. Dites si le candidat supprime, déplace ou ne fait que compromettre la contradiction. La Conclusion Card nomme le concept à tester et sa condition observable de changement ; la trace peut garder les démarches rejetées. Ne revendiquez nouveauté, brevetabilité ou amélioration garantie sans soutien externe.
+Renvoyez fonction utile, idéal, contradiction technique ou physique, séparations, concepts inventifs, ressources internes, examen de faisabilité et test. Dites si le candidat supprime ou déplace la contradiction, ou se contente d’un compromis entre les exigences contradictoires. La Conclusion Card nomme le concept à tester et sa condition observable de changement ; la trace peut garder les démarches rejetées. Ne revendiquez nouveauté, brevetabilité ou amélioration garantie sans soutien externe.
 
 ## Evidence and uncertainty rules
 

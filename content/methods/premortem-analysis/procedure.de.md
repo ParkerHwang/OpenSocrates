@@ -8,7 +8,7 @@ Bei konkretem Plan, Einführung, Migration, Einstellung, Richtlinie oder Aktion,
 
 ## Do not use when
 
-Nicht ohne Plan oder vorgeschlagene Aktion, bei sofort reagierbarem Vorfall oder als Ersatz vorgeschriebener Sicherheits-, Rechts- oder Technikprüfung. Lebhafte Geschichten sind nicht automatisch wahrscheinlichste Fehler. Angst einer Gruppe rechtfertigt keine Wahrscheinlichkeit ohne Referenzklasse. Ist der Plan bereits unveränderlich bindend, Risiko- oder Vorfallsverfahren nutzen und Einschränkung nennen.
+Nicht ohne Plan oder vorgeschlagene Aktion, bei einem Vorfall, der eine sofortige Reaktion statt Spekulation erfordert oder als Ersatz vorgeschriebener Sicherheits-, Rechts- oder Technikprüfung. Lebhafte Geschichten sind nicht automatisch wahrscheinlichste Fehler. Angst einer Gruppe rechtfertigt keine Wahrscheinlichkeit ohne Referenzklasse. Ist der Plan bereits unveränderlich bindend, Risiko- oder Vorfallsverfahren nutzen und Einschränkung nennen.
 
 ## Inputs to establish
 
@@ -21,7 +21,7 @@ Benennen Sie Plan, gewünschtes Ergebnis, Festlegungsdatum, Betroffene und Schei
 3. **Kausalpfade gruppieren.** Duplikate zusammenführen, Ursachen von Wirkungen trennen, wesentliche Pfade mit verletzter Annahme oder Abhängigkeit verknüpfen. Verschiedene Risiken nicht wegen gleicher Verantwortlichkeit verschmelzen. **Sichtbares Ergebnis/Zustandsänderung:** Gruppierte Pfade, verletzte Annahmen und Evidenzstatus.
 4. **Wesentliche Pfade auswählen.** Folgen, Umkehrbarkeit, Erkennungsdauer und Kontrollierbarkeit anhand lokal definierter ordinaler Begriffe vergleichen. Verschiedene Reaktionen erfordern gegebenenfalls mehrere Pfade. **Sichtbares Ergebnis/Zustandsänderung:** Kurze Aufmerksamkeitsliste mit Bedeutung ohne erfundene Wahrscheinlichkeit oder Schwerewerte.
 5. **Signale und Maßnahmen ergänzen.** Je Pfad frühestes beobachtbares Signal, Prävention oder Minderung, Verantwortlichen und Auslöser für Pause, Änderung oder Stopp benennen. **Sichtbares Ergebnis/Zustandsänderung:** Verknüpftes Aktions- und Signalregister.
-6. **Entscheidung nachprüfen.** Ändern Maßnahmen Plan, Reihenfolge, Umfang oder Freigabe? Wichtigste Unbekannte und wahländernde Evidenz erfassen. **Sichtbares Ergebnis/Zustandsänderung:** Gestützte, vorläufige oder zurückgestellte Empfehlung mit Restrisiken und Umkehrbedingung.
+6. **Entscheidung nachprüfen.** Ändern Maßnahmen Plan, Reihenfolge, Umfang oder Freigabe? Wichtigste Unbekannte und wahländernde Evidenz erfassen. **Sichtbares Ergebnis/Zustandsänderung:** Gestützte, vorläufige oder zurückgestellte Empfehlung mit Restrisiken und Bedingung für eine Urteilsänderung.
 
 ## Public output contract
 

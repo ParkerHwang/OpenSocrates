@@ -22,7 +22,7 @@ Kläre Beobachtungen, Zielpopulation oder Zukunftsumfang, Auswahlprozess, Messde
 4. Veröffentliche stärkste Gegenbeispielsuche und Ergebnis. Ergänze verfügbare ausgeschlossene Fälle, Negativergebnisse, Untergruppenunterschiede und mögliche Zukunftsausnahmen.
 5. Veröffentliche begrenzte Verallgemeinerung mit Reichweite und qualitativer Stärke wie stark, mittel oder schwach. Ersetze universelle Aussagen nur bei vertretbarer Herkunft durch Populations- oder Anteilsbereiche.
 6. Veröffentliche Entscheidungsfolge und nächste stärkende oder herausfordernde Beobachtung. Benenne Unterstützung für Handlung, Überwachung oder weitere Stichproben.
-7. Veröffentliche aktuellen Schluss und beobachtbare Umkehrbedingung. Bei wesentlich verzerrter, dünner oder unpassender Stichprobe setze aus oder bewahre Vorläufigkeit statt Extrapolation.
+7. Veröffentliche aktuellen Schluss und beobachtbare Bedingung für eine Urteilsänderung. Bei wesentlich verzerrter, dünner oder unpassender Stichprobe setze aus oder bewahre Vorläufigkeit statt Extrapolation.
 
 ## Public output contract
 

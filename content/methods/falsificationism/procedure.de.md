@@ -22,7 +22,7 @@ Kläre Zielbehauptung, Umfang, riskante Vorhersage, Beobachtungsfenster, Messung
 4. Veröffentliche geplanten oder beobachteten Test, Herkunft und Ergebnis. Bei Unverfügbarkeit benenne benötigte Beobachtung und bewahre unverified.
 5. Veröffentliche Deutung: für diesen Test gestützt, geschwächt, noch ungeprüft oder unentschieden. Nicht widerlegte Ergebnisse bedeuten keine starke Bestätigung.
 6. Veröffentliche Reparaturvorschläge und prüfe, ob vorab festgelegt oder nachträglich ergänzt. Immunisierende Reparaturen ohne unabhängige Unterstützung bleiben Schwächen.
-7. Veröffentliche aktuellen Status, nächsten Test und beobachtbare Umkehrbedingung. Ohne benennbares Widerlegungskriterium setze aus oder lehne das Verfahren ab statt wissenschaftlich wirkender Erfindung.
+7. Veröffentliche aktuellen Status, nächsten Test und beobachtbare Bedingung für eine Urteilsänderung. Ohne benennbares Widerlegungskriterium setze aus oder lehne das Verfahren ab statt wissenschaftlich wirkender Erfindung.
 
 ## Public output contract
 

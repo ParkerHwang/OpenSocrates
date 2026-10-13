@@ -16,7 +16,7 @@ Indica problema, quadro attuale, vincoli non negoziabili, presupposti facoltativ
 
 ## Procedure
 
-1. **Descrivi il quadro attuale.** Scrivi il problema come viene inteso e lo schema delle opzioni che continua a produrre. **Risultato visibile/cambiamento di stato:** pubblica quadro, risultato desiderato e vincoli non negoziabili; distingue i vincoli non verificati.
+1. **Descrivi il quadro attuale.** Scrivi il problema come viene inteso e lo schema delle opzioni che continua a produrre. **Risultato visibile/cambiamento di stato:** pubblica quadro, risultato desiderato e vincoli non negoziabili; distingui i vincoli non verificati.
 2. **Estrai i presupposti.** Elenca le poche regole che fanno sembrare inevitabile il quadro e classificane ciascuna come necessaria, sostenuta da prove, assunta o facoltativa. **Risultato visibile/cambiamento di stato:** pubblica un registro dei presupposti con stato e conseguenze della rimozione.
 3. **Applica provocazioni.** Rovescia, rimuovi, esaspera, sposta, separa o combina i presupposti facoltativi selezionati, oppure applica uno stimolo casuale delimitato. Mantieni i vincoli di sicurezza e legali. **Risultato visibile/cambiamento di stato:** pubblica presupposto modificato e nuovo quadro per ogni provocazione.
 4. **Genera concetti distinti.** Costruisci diversi approcci dai nuovi quadri prima di valutarne la fattibilità. Ogni candidato deve indicare cosa cambia, chi beneficia e quale vincolo originario preserva. **Risultato visibile/cambiamento di stato:** pubblica almeno tre concetti realmente diversi con il quadro da cui derivano.

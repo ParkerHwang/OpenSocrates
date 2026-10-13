@@ -22,7 +22,7 @@ Kläre Ziel, bisheriges Vorgehen, Anforderungen, Grenzen, Ressourcen, Abhängigk
 4. Veröffentliche verbleibende Grenzen; entferne nur bei Prüfung gescheiterte Annahmen. Wesentlich sicherheits-, rechts- oder machbarkeitsrelevante Streitpunkte bleiben ausdrückliche offene Grenzen statt stiller Entfernung.
 5. Veröffentliche Rekonstruktion aus verbleibenden Grenzen. Benenne Ressourcen-, Zeit-, Abhängigkeits- und Koordinationsfolgen für mehr als physische Vorstellbarkeit.
 6. Veröffentliche Unterschied zum üblichen Vorgehen: Änderung, ermöglichende Annahme und neue Risiken oder Zielkonflikte. Ergänze kleine Validierung je ungeprüfter Anforderung.
-7. Veröffentliche abgeleitete Anforderungen, rekonstruierte Option und beobachtbare Umkehrbedingung. Ohne unreduzierbare Grenze oder entscheidende Eingabe bleibt der Schluss vorläufig oder ausgesetzt statt „Durchbruch“.
+7. Veröffentliche abgeleitete Anforderungen, rekonstruierte Option und beobachtbare Bedingung für eine Urteilsänderung. Ohne unreduzierbare Grenze oder entscheidende Eingabe bleibt der Schluss vorläufig oder ausgesetzt statt „Durchbruch“.
 
 ## Public output contract
 

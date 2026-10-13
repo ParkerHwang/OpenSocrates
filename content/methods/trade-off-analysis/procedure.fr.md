@@ -33,7 +33,7 @@ Vérifié signifie qu’une source identifiable soutient directement la performa
 
 ## Stop conditions
 
-Suspendez sans ensemble faisable, contrainte impérative, critère décisif ou source d’une note changeant la décision. Suspendez si les parties n’ont pas fourni une préférence substantielle sans défaut légitime. Arrêtez si une condition contraignante est négociée contre un avantage ou si une option faisable unique rend la comparaison inutile.
+Suspendez sans ensemble faisable, contrainte impérative, critère décisif ou source d’une note changeant la décision. Suspendez si les parties prenantes n’ont pas fourni une préférence substantielle et qu’aucune valeur par défaut légitime n’existe. Arrêtez si une condition contraignante est négociée contre un avantage ou si une option faisable unique rend la comparaison inutile.
 
 ## Complement handoff
 

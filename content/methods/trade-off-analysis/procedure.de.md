@@ -18,14 +18,14 @@ Entscheidung, Optionen, Beteiligte, Kriterien, harte Grenzen, Mindestniveaus, Ho
 
 1. **Wahl rahmen.** Entscheidung, machbare Optionen, Zeitgrenze und erforderliches Ergebnis definieren. **Sichtbares Ergebnis/Zustandsänderung:** Wahlrahmen; unbekannte Option oder Grenze ungeprüft.
 2. **Grenzen und Kriterien trennen.** Vetos, Minima, Präferenzen und handelbare Ergebnisse listen. Harte Grenzen verletzende Optionen entfernen oder fehlende Bindung erklären. **Sichtbares Ergebnis/Zustandsänderung:** Getrennte Grenzen-/Kriterienregister mit Status.
-3. **Herkunft klären.** Kriterienbedeutung und Richtung, Bewertungsmaßstab, Leistungsquellen und Gewichtsurspung definieren. Ordinale Begriffe ohne begründbare Zahlen nutzen. **Sichtbares Ergebnis/Zustandsänderung:** Herkunftskarte; strittige Eingaben widersprüchlich oder angenommen.
+3. **Herkunft klären.** Kriterienbedeutung und Richtung, Bewertungsmaßstab, Leistungsquellen und Gewichtsursprung definieren. Ordinale Begriffe ohne begründbare Zahlen nutzen. **Sichtbares Ergebnis/Zustandsänderung:** Herkunftskarte; strittige Eingaben widersprüchlich oder angenommen.
 4. **Optionen vergleichen.** Jede nach allen wesentlichen Kriterien samt Evidenzlücken, Verteilung und Abhängigkeiten zeigen. Dominanz nur bei gleichen Kriterien und Grenzen feststellen. **Sichtbares Ergebnis/Zustandsänderung:** Gestützter Vergleich und dominierte oder unvergleichbare Zielkonflikte.
 5. **Empfehlung testen.** Vereinbarte Gewichte oder transparenten qualitativen Vergleich anwenden; strittige Gewichte und Bewertungen in begründbaren Grenzen variieren. Nicht kompensierbare Kriterien aus Summe halten; vertretene Präferenz je Szenario nennen. **Sichtbares Ergebnis/Zustandsänderung:** Auswahl, Alternativablehnung, Zugeständnisse und Wechselbedingungen.
-6. **Schluss setzen.** Abhängigkeit, akzeptiertes Risiko und Umkehrbeobachtung nennen. Fehlende Optionen, Kriterien oder entscheidungsändernde Präferenzen führen zu Zurückstellung mit kleinster Klärung. **Sichtbares Ergebnis/Zustandsänderung:** Herkunft, Vergleich, dominierte Konflikte, Empfehlung, Unsicherheiten und Conclusion-Card-Umkehrbedingung.
+6. **Schluss setzen.** Abhängigkeit, akzeptiertes Risiko und Umkehrbeobachtung nennen. Fehlende Optionen, Kriterien oder entscheidungsändernde Präferenzen führen zu Zurückstellung mit kleinster Klärung. **Sichtbares Ergebnis/Zustandsänderung:** Herkunft, Vergleich, dominierte Konflikte, Empfehlung, Unsicherheiten und Conclusion-Card-Bedingung für eine Urteilsänderung.
 
 ## Public output contract
 
-Liefern Sie Kriterien, Grenzen, Vergleich, Herkunft der Werte und Gewichte, dominierte oder unvergleichbare Konflikte, Option, Zugeständnisse, Risiken und Umkehrbedingung. Berechneter Score zeigt Maßstab, Gewichte, Operanden und Einheiten; ordinale Urteile kennzeichnen. Karte enthält knappe Empfehlung, evidenzmarkierte Gründe, Unsicherheit, beobachtbare Umkehr und Alternativen. Matrizen und Beteiligtenstreit im Trace.
+Liefern Sie Kriterien, Grenzen, Vergleich, Herkunft der Werte und Gewichte, dominierte oder unvergleichbare Konflikte, Option, Zugeständnisse, Risiken und Bedingung für eine Urteilsänderung. Berechneter Score zeigt Maßstab, Gewichte, Operanden und Einheiten; ordinale Urteile kennzeichnen. Karte enthält knappe Empfehlung, evidenzmarkierte Gründe, Unsicherheit, beobachtbare Umkehr und Alternativen. Matrizen und Beteiligtenstreit im Trace.
 
 ## Evidence and uncertainty rules
 

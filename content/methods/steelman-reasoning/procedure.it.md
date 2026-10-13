@@ -37,4 +37,4 @@ Fermati se non è identificabile la posizione effettiva, se la ricostruzione agg
 
 ## Complement handoff
 
-Passa a reflective-equilibrium quando l’obiezione rafforzata espone un conflitto tra principi e casi difficili che richiede revisione reciproca. Trasmetti ricostruzione pubblica, lacune probanti, valori in tensione e giudizio modificato; il complemento non deve riformulare la tesi contraria come un fatto nuovo.
+Passa a reflective-equilibrium quando l’obiezione rafforzata espone un conflitto tra principi e casi difficili che richiede revisione reciproca. Trasmetti ricostruzione pubblica, lacune nelle evidenze, valori in tensione e giudizio modificato; il complemento non deve riformulare la tesi contraria come un fatto nuovo.

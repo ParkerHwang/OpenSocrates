@@ -20,12 +20,12 @@ Zeitverhaltensmuster, Horizont und Frage definieren. Grenze, Akteure, Bestände,
 2. **Bestände und Flüsse identifizieren.** Akkumulation und Zu-/Abflüsse listen; Niveau von Änderungsrate trennen. **Sichtbares Ergebnis/Zustandsänderung:** Inventar mit Einheiten oder qualitativer Richtung; Ungemessenes ungeprüft.
 3. **Wechselwirkung und Rückkopplung kartieren.** Benannte Variablen gerichtet verbinden; verstärkende und ausgleichende Schleifen verfolgen. **Sichtbares Ergebnis/Zustandsänderung:** Schleifenbeschreibungen mit Vorzeichen und Evidenz oder Annahme je Verbindung.
 4. **Verzögerungen und Nebenfolgen lokalisieren.** Verspätete Information, Entscheidungen, Ressourcen oder Folgen markieren. Überschießen verzögerter Balance oder Bestandserschöpfung durch Verstärkung prüfen. **Sichtbares Ergebnis/Zustandsänderung:** Verzögerungen, Nebenfolgen und Kurz-/Langfristkonflikte.
-5. **Hebel wählen.** Parameteränderung mit Änderungen an Rückkopplungsregel, Information, Grenze oder Ziel vergleichen. Mechanismus und Verantwortlicher benennen; präzise Wirkung nur mit belastbarem Modell. **Sichtbares Ergebnis/Zustandsänderung:** Eingriff, Zielschleife, Richtung und möglicher politischer Widerstand.
-6. **Erklärung prüfen und gegebenenfalls zurückstellen.** Stützende oder widersprechende Beobachtung und möglichst sichere umkehrbare Folgeprüfung definieren. **Sichtbares Ergebnis/Zustandsänderung:** Gestützter, vorläufiger oder zurückgestellter Strukturschluss, Umkehrbedingung und wichtigster unmodellierter Faktor.
+5. **Hebel wählen.** Parameteränderung mit Änderungen an Rückkopplungsregel, Information, Grenze oder Ziel vergleichen. Mechanismus und Verantwortlicher benennen; präzise Wirkung nur mit belastbarem Modell. **Sichtbares Ergebnis/Zustandsänderung:** Eingriff, Zielschleife, Richtung und mögliche Gegenreaktionen des Systems auf die Maßnahme.
+6. **Erklärung prüfen und gegebenenfalls zurückstellen.** Stützende oder widersprechende Beobachtung und möglichst sichere umkehrbare Folgeprüfung definieren. **Sichtbares Ergebnis/Zustandsänderung:** Gestützter, vorläufiger oder zurückgestellter Strukturschluss, Bedingung für eine Urteilsänderung und wichtigster unmodellierter Faktor.
 
 ## Public output contract
 
-Liefern Sie Muster, Grenze, Akteure oder Komponenten, Bestände und Flüsse, Rückkopplungen, Verzögerungen, Hebel und Nebenfolgen. Verifizierte Beobachtung von Ableitung und Annahme trennen. Verstärkung und Balance verständlich gerichtet beschreiben; Parameter-, Regel-, Informations-, Ziel- oder Grenzeingriff benennen. Die Conclusion Card trägt Strukturschluss und beobachtbare Umkehrbedingung; vollständige Karte im Trace.
+Liefern Sie Muster, Grenze, Akteure oder Komponenten, Bestände und Flüsse, Rückkopplungen, Verzögerungen, Hebel und Nebenfolgen. Verifizierte Beobachtung von Ableitung und Annahme trennen. Verstärkung und Balance verständlich gerichtet beschreiben; Parameter-, Regel-, Informations-, Ziel- oder Grenzeingriff benennen. Die Conclusion Card trägt Strukturschluss und beobachtbare Bedingung für eine Urteilsänderung; vollständige Karte im Trace.
 
 ## Evidence and uncertainty rules
 

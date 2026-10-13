@@ -21,7 +21,7 @@ Tatsächliche Aussage, erklärtes Sprecherziel, Kontext, Publikum und Entscheidu
 3. **Nötige Unterstützung zuordnen.** Fakten, Werte, Zielkonflikte oder Prognosen listen; direkte Unterstützung von noch zu prüfender trennen. **Sichtbares Ergebnis/Zustandsänderung:** Evidenz-/Annahmenregister, etwa verifiziert, angenommen, ungeprüft oder widersprüchlich.
 4. **Übereinstimmung und Spannung finden.** Vertretbare oder gemeinsame Teile und stärksten offenen Einwand, Betroffenen oder Gegenfall bestimmen. **Sichtbares Ergebnis/Zustandsänderung:** Akzeptierte Elemente, Reststreit und Sicherheitsgrenze.
 5. **Gestärkte Position prüfen.** Nach gleichen Kriterien mit aktuellem Schluss vergleichen; Empfehlung, Schutz oder Wortlautänderung prüfen. **Sichtbares Ergebnis/Zustandsänderung:** Antwort, Schlussänderung, unveränderten Schluss begründende Aussage oder offener Konflikt.
-6. **Faires Urteil setzen.** Gegenposition gestützt, bedingt gestützt, geschwächt oder ungeprüft nennen samt statusändernder Evidenz. **Sichtbares Ergebnis/Zustandsänderung:** Aktualisierter Schluss und beobachtbare Umkehrbedingung; Wohlwollen beweist keine Wahrheit.
+6. **Faires Urteil setzen.** Gegenposition gestützt, bedingt gestützt, geschwächt oder ungeprüft nennen samt statusändernder Evidenz. **Sichtbares Ergebnis/Zustandsänderung:** Aktualisierter Schluss und beobachtbare Bedingung für eine Urteilsänderung; Wohlwollen beweist keine Wahrheit.
 
 ## Public output contract
 

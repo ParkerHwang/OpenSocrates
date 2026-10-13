@@ -8,7 +8,7 @@ Usa este procedimiento para comparar líneas independientes de evidencia y evita
 
 ## Do not use when
 
-No lo uses si todas las fuentes repiten datos únicos, se trata de preferencias de valor o decide una regla formal directa. No cuentes copias de un informe como independientes, promedies conflictos para borrarlos ni recojas líneas sobre afirmaciones distintas sin declarar la discrepancia.
+No lo uses si todas las fuentes repiten el mismo conjunto de datos subyacente, se trata de preferencias de valor o decide una regla formal directa. No cuentes copias de un informe como independientes, promedies conflictos para borrarlos ni recojas líneas sobre afirmaciones distintas sin declarar la discrepancia.
 
 ## Inputs to establish
 

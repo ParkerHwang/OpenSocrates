@@ -29,7 +29,7 @@ Restituisci interpretazioni o opzioni, criterio pratico, conseguenze osservabili
 
 ## Evidence and uncertainty rules
 
-Le conseguenze pratiche provano utilità o azione, non automaticamente verità. Soddisfazione riportata, una prova riuscita o risultati a breve termine possono essere incompleti. Non inventare risultati, costi, orizzonti o effetti causali. Mantieni diritti, sicurezza, consenso e doveri vincolanti come vincoli, non variabili da eliminare ottimizzando. Conseguenze previste ma non testate sono inferite o non verificate; se le opzioni differiscono solo retoricamente, dichiaralo senza fingere di decidere una disputa fattuale.
+Le conseguenze pratiche sono elementi di prova sull’utilità o sull’azione, non una prova automatica di verità. Soddisfazione riportata, una prova riuscita o risultati a breve termine possono essere incompleti. Non inventare risultati, costi, orizzonti o effetti causali. Mantieni diritti, sicurezza, consenso e doveri vincolanti come vincoli, non variabili da eliminare ottimizzando. Conseguenze previste ma non testate sono inferite o non verificate; se le opzioni differiscono solo retoricamente, dichiaralo senza fingere di decidere una disputa fattuale.
 
 ## Stop conditions
 
@@ -37,4 +37,4 @@ Fermati se opzioni o standard non sono formulabili, nessuna differenza pratica �
 
 ## Complement handoff
 
-Passa a lean-startup quando un'ipotesi di mercato o prodotto può essere ridotta a un test minimo sicuro con soglia di apprendimento. Trasmetti opzioni pratiche, mappa delle conseguenze, domanda del test e vincoli; il complemento non deve considerare l'utilità breve una verità universale.
+Passa a lean-startup quando un'ipotesi di mercato o prodotto può essere ridotta a un test minimo sicuro con soglia di apprendimento. Trasmetti opzioni pratiche, mappa delle conseguenze, domanda del test e vincoli; il complemento non deve considerare l'utilità a breve termine una verità universale.
