@@ -7,12 +7,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/domain"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/lifecycle"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/management"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/update"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -93,6 +95,9 @@ func nativeLifecycleAcceptance(o acceptanceOptions) (map[string]any, error) {
 		}
 		if !passed {
 			result["diagnostic"] = acceptanceLifecycleCommandDiagnostic(child, e, time.Since(started), deadlineExceeded, name)
+			if name == "native_install" {
+				result["owned_fixture_observation"] = acceptanceInstallFailureObservation(tmp)
+			}
 		}
 		cases[name] = result
 		allPass = allPass && passed
@@ -160,6 +165,191 @@ func acceptanceLifecycleCommandDiagnostic(child platform.Result, err error, elap
 	}
 	return report
 }
+
+// acceptanceInstallFailureObservation observes only the already-created synthetic
+// fixture after the failed child exits. It never retries or changes acceptance.
+// Presence separates pre-journal preparation from persisted apply/registration;
+// missing state is not evidence of a particular cause. All exported values are
+// closed enums, booleans or bounded counts. Names and journal contents stay local.
+func acceptanceInstallFailureObservation(root string) map[string]any {
+	report := map[string]any{
+		"fixture_scope_status": "unavailable", "state_dir_status": "unavailable",
+		"management_preparation_status": "unavailable", "management_preparation_count": -1,
+		"management_host_status": "unavailable", "management_payload_status": "unavailable",
+		"native_state_status": "unavailable", "active_state_status": "unavailable",
+		"transaction_dir_status": "unavailable", "journal_count": -1,
+		"journal_status": "unavailable", "last_transaction_stage": "unavailable",
+		"registration_started_status": "unavailable", "registration_started": false,
+		"synthetic_registration_status": "unavailable", "synthetic_installed": false,
+		"synthetic_enabled": false, "synthetic_marketplace_nonempty": false,
+	}
+	name := filepath.Base(filepath.Clean(root))
+	if !filepath.IsAbs(root) || !strings.HasPrefix(name, "opensocrates-native-acceptance-") || len(name) == len("opensocrates-native-acceptance-") || acceptanceObserverPresence(root, true) != "present" {
+		return report
+	}
+	report["fixture_scope_status"] = "available"
+	state := filepath.Join(root, "home/.opensocrates")
+	report["state_dir_status"] = acceptanceObserverPresence(state, true)
+	report["native_state_status"] = acceptanceObserverPresence(filepath.Join(state, "native-state.json"), false)
+	report["active_state_status"] = acceptanceObserverPresence(filepath.Join(state, "active.json"), false)
+	entries, status := acceptanceObserverEntries(state)
+	if status == "absent" {
+		report["management_preparation_status"], report["management_preparation_count"] = "absent", 0
+		report["management_host_status"], report["management_payload_status"] = "absent", "absent"
+	} else if status == "available" {
+		count := 0
+		scratch := ""
+		for _, entry := range entries {
+			if strings.HasPrefix(entry.Name(), ".management-") {
+				count++
+				scratch = filepath.Join(state, entry.Name())
+			}
+		}
+		report["management_preparation_count"] = count
+		if count == 0 {
+			report["management_preparation_status"] = "absent"
+			report["management_host_status"], report["management_payload_status"] = "absent", "absent"
+		} else if count == 1 {
+			report["management_preparation_status"] = acceptanceObserverPresence(scratch, true)
+			report["management_host_status"] = acceptanceObserverPresence(filepath.Join(scratch, "host"), true)
+			report["management_payload_status"] = acceptanceObserverPresence(filepath.Join(scratch, "host/build/generated/plugins/codex"), true)
+		} else {
+			report["management_preparation_status"] = "unknown"
+			report["management_host_status"], report["management_payload_status"] = "unknown", "unknown"
+		}
+	} else {
+		report["management_preparation_status"] = status
+		report["management_host_status"], report["management_payload_status"] = status, status
+	}
+	transactions := filepath.Join(state, "transactions")
+	report["transaction_dir_status"] = acceptanceObserverPresence(transactions, true)
+	entries, status = acceptanceObserverEntries(transactions)
+	if status == "absent" {
+		report["journal_count"], report["journal_status"], report["last_transaction_stage"] = 0, "absent", "none"
+	} else if status == "available" {
+		report["journal_count"] = len(entries)
+		if len(entries) == 0 {
+			report["journal_status"], report["last_transaction_stage"] = "absent", "none"
+		} else if len(entries) > 1 {
+			// Enumeration order and private timestamps cannot identify a latest journal.
+			report["journal_status"], report["last_transaction_stage"] = "unknown", "unknown"
+		} else if acceptanceObserverJournalName(entries[0].Name()) {
+			data, err := platform.ReadFile(filepath.Join(transactions, entries[0].Name()), 8<<20)
+			if err == nil {
+				value, err := contracts.Decode(data)
+				journal := obj(value)
+				if err == nil && journal["schema"] == lifecycle.JournalSchema {
+					report["journal_status"] = "available"
+					report["last_transaction_stage"] = "unknown"
+					for _, stage := range strings.Fields("preparing prepared applying verifying committed rolling-back rolled-back cleaning finalized") {
+						if journal["stage"] == stage {
+							report["last_transaction_stage"] = stage
+						}
+					}
+					if started, ok := journal["registration_started"].(bool); ok {
+						report["registration_started_status"], report["registration_started"] = "available", started
+					}
+				}
+			}
+		}
+	} else {
+		report["journal_status"], report["last_transaction_stage"] = status, status
+	}
+	registration := filepath.Join(root, "codex/host-fixture.json")
+	status = acceptanceObserverPresence(registration, false)
+	report["synthetic_registration_status"] = status
+	if status == "present" {
+		report["synthetic_registration_status"] = "unavailable"
+		data, err := platform.ReadFile(registration, 64<<10)
+		if err == nil {
+			value, err := contracts.Decode(data)
+			state := obj(value)
+			installed, installedOK := state["installed"].(bool)
+			enabled, enabledOK := state["enabled"].(bool)
+			marketplace, marketplaceOK := state["marketplace"].(string)
+			if err == nil && installedOK && enabledOK && marketplaceOK {
+				report["synthetic_registration_status"] = "available"
+				report["synthetic_installed"], report["synthetic_enabled"], report["synthetic_marketplace_nonempty"] = installed, enabled, marketplace != ""
+			}
+		}
+	}
+	return report
+}
+
+func acceptanceObserverJournalName(name string) bool {
+	if len(name) != 37 || !strings.HasSuffix(name, ".json") {
+		return false
+	}
+	for _, r := range name[:32] {
+		if !(r >= '0' && r <= '9') && !(r >= 'a' && r <= 'f') {
+			return false
+		}
+	}
+	return true
+}
+
+// Guard and the held parent lease reject foreign ownership, nonprivate files,
+// symlinks and Windows reparse points. Missing parents are categorical absence.
+func acceptanceObserverPresence(path string, directory bool) string {
+	if err := platform.Guard(path); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return "absent"
+		}
+		return "unavailable"
+	}
+	lease, err := platform.Lease(path)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return "absent"
+		}
+		return "unavailable"
+	}
+	defer lease.Close()
+	info, err := os.Lstat(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return "absent"
+	}
+	if err != nil || (directory && !info.IsDir()) || (!directory && !info.Mode().IsRegular()) {
+		return "unavailable"
+	}
+	return "present"
+}
+
+func acceptanceObserverEntries(path string) ([]os.DirEntry, string) {
+	status := acceptanceObserverPresence(path, true)
+	if status != "present" {
+		return nil, status
+	}
+	// Lease opens the directory itself as a no-follow parent and holds it while
+	// enumeration is bounded. Compare the opened identity with the guarded leaf.
+	lease, err := platform.Lease(filepath.Join(path, ".acceptance-observer"))
+	if err != nil {
+		return nil, "unavailable"
+	}
+	defer lease.Close()
+	before, err := os.Lstat(path)
+	if err != nil {
+		return nil, "unavailable"
+	}
+	dir, err := os.Open(path)
+	if err != nil {
+		return nil, "unavailable"
+	}
+	defer dir.Close()
+	opened, err := dir.Stat()
+	if err != nil || !opened.IsDir() || !os.SameFile(before, opened) {
+		return nil, "unavailable"
+	}
+	entries, err := dir.ReadDir(17)
+	if err != nil && err != io.EOF {
+		return nil, "unavailable"
+	}
+	if len(entries) > 16 {
+		return nil, "unknown"
+	}
+	return entries, "available"
+}
+
 func mustAcceptanceRead(p string) []byte { b, _ := os.ReadFile(p); return b }
 func acceptanceStateDisabled(state map[string]any) bool {
 	installations, ok := state["installations"].(map[string]any)
