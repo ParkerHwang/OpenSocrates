@@ -3,6 +3,7 @@ package decision
 import (
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/content"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
+	"strings"
 	"testing"
 )
 
@@ -85,5 +86,38 @@ func TestDecisionContractsAreClosed(t *testing.T) {
 	response := New(b).Handle(r)
 	if response["status"] != "no_intervention" || response["presentation"] != nil || len(response["methods"].([]any)) != 0 {
 		t.Fatal(response)
+	}
+}
+
+func TestDecisionCatalogAndDeliveryAllReleasedLocales(t *testing.T) {
+	b, e := content.Load()
+	if e != nil {
+		t.Fatal(e)
+	}
+	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+		s := New(b)
+		catalog := s.Handle(map[string]any{"operation": "catalog", "locale": locale})
+		if catalog["status"] != "catalog" || len(catalog["methods"].([]any)) != 48 {
+			t.Fatal(locale, catalog)
+		}
+		for _, raw := range catalog["methods"].([]any) {
+			if strings.TrimSpace(raw.(map[string]any)["use_for"].(string)) == "" {
+				t.Fatal("missing localized catalog entry", locale)
+			}
+		}
+		response := s.Handle(request(locale))
+		if response["status"] != "selected" || response["selector_model_calls"] != 0 {
+			t.Fatal(locale, response)
+		}
+		method := response["methods"].([]any)[0].(map[string]any)
+		expected, e := b.Assemble([]string{"critical-thinking"}, locale)
+		if e != nil || method["locale"] != locale || method["instructions"] != expected {
+			t.Fatal("localized instructions mismatch", locale, e)
+		}
+	}
+	for _, locale := range []string{"follow", "zh-CN", "JA", "fr", ""} {
+		if got := New(b).Handle(request(locale)); got["status"] != "unavailable" {
+			t.Fatal("decision accepted unsupported locale", locale)
+		}
 	}
 }

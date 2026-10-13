@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "socratic-questioning-positive-01",
+      "kind": "positive",
+      "prompt": "只问我会改变本季度是否应推出这项服务的那些问题。",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "用户要求一组有界、会改变决定的问题，而非开放式访谈。"
+    },
+    {
+      "id": "socratic-questioning-positive-02",
+      "kind": "positive",
+      "prompt": "帮我审视主张背后的假设，但最多问三个问题，并解释每个问题为何重要。",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "任务明确需要一小组与后果相连的问题来澄清判断。"
+    },
+    {
+      "id": "socratic-questioning-positive-03",
+      "kind": "positive",
+      "prompt": "我不确定这里“好的证据”指什么；请问少数几个会改变评审标准的问题。",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "缺失的回答能改变证据标准，应提出这些问题而不造成提问过载。"
+    },
+    {
+      "id": "socratic-questioning-negative-01",
+      "kind": "negative",
+      "prompt": "根据所给要求检查实现是否完整，并列出缺失字段。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "review_completion",
+        "explicit_rules"
+      ],
+      "rationale": "任务有固定规则，要求直接检查完成情况，而非通过澄清引导判断。"
+    },
+    {
+      "id": "socratic-questioning-negative-02",
+      "kind": "negative",
+      "prompt": "通过比较正例、反例和边界案例，定义这个有争议的用语。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "ambiguous_terms"
+      ],
+      "rationale": "用户要的是概念分析本身，而非有界的提问序列。"
+    },
+    {
+      "id": "socratic-questioning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "将这五个问题转成 Markdown 编号列表。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "对已有问题排版是机械操作，不应触发更多提问。"
+    },
+    {
+      "id": "socratic-questioning-explicit-01",
+      "kind": "explicit",
+      "prompt": "明确调用 socratic-questioning，检验我的决定是否依赖隐藏前提。",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "hidden_assumptions"
+      ],
+      "rationale": "用户明确指定该方法，要求用问题检验前提。"
+    },
+    {
+      "id": "socratic-questioning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "问决定性问题，但不要披露这些问题应影响的决定、主张、范围或后果。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "没有目标决定或后果，方法无法限定问题，也无法知道什么具有决定性。"
+    }
+  ]
+}

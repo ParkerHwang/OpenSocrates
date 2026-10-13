@@ -382,7 +382,7 @@ func (a *ControlApplication) begin(state map[string]any, c domain.Control, resul
 }
 func (a *ControlApplication) event(state map[string]any, request ControlRequest, seq int, kind string, payload map[string]any) map[string]any {
 	locale := a.Locale
-	if locale != "ko" {
+	if !domain.SupportedLocale(locale) {
 		locale = "en"
 	}
 	occurred := a.now().Format(domain.TimestampFormat)
@@ -405,7 +405,7 @@ func (a *ControlApplication) event(state map[string]any, request ControlRequest,
 			adapter = s
 		}
 		payload, _ := request.CurrentEvent["payload"].(map[string]any)
-		if contracts.Is(payload["locale"], "en", "ko") {
+		if contracts.Is(payload["locale"], "en", "ko", "zh", "ja") {
 			locale = payload["locale"].(string)
 		}
 	}

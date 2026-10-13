@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 func validateSourceSchema(root, name string, v any) error {
@@ -21,7 +22,9 @@ func validateSourceSchema(root, name string, v any) error {
 
 var procedureHeadings = []string{"Purpose", "Use when", "Do not use when", "Inputs to establish", "Procedure", "Public output contract", "Evidence and uncertainty rules", "Stop conditions", "Complement handoff"}
 
-func validateProcedure(text string) error {
+func validateProcedure(text string) error { return validateProcedureLocale(text, "en") }
+
+func validateProcedureLocale(text, locale string) error {
 	headings := []string{}
 	for _, line := range strings.Split(text, "\n") {
 		if strings.HasPrefix(line, "## ") {
@@ -31,9 +34,21 @@ func validateProcedure(text string) error {
 	if strings.Join(headings, "\x00") != strings.Join(procedureHeadings, "\x00") {
 		return fmt.Errorf("expected exact nine procedure headings")
 	}
-	words := len(strings.Fields(text))
-	if words < 350 || words > 900 {
-		return fmt.Errorf("expected 350-900 words")
+	if locale == "zh" || locale == "ja" {
+		characters := 0
+		for _, r := range text {
+			if !unicode.IsSpace(r) {
+				characters++
+			}
+		}
+		if characters < 700 || characters > 6000 {
+			return fmt.Errorf("expected 700-6000 nonspace characters")
+		}
+	} else {
+		words := len(strings.Fields(text))
+		if words < 350 || words > 900 {
+			return fmt.Errorf("expected 350-900 words")
+		}
 	}
 	start := strings.Index(text, "## Procedure\n")
 	end := strings.Index(text, "## Public output contract\n")

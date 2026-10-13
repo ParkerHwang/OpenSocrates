@@ -71,3 +71,15 @@ func clone(v map[string]any) map[string]any {
 	return r
 }
 func schema(name string) string { return "opensocrates." + name + "/1.0.0" }
+
+// releasedLocales is the exact v1.5.1 content contract inherited by v1.6.0.
+var releasedLocales = []string{"en", "ko", "zh", "ja"}
+
+func releasedLocale(value string) bool {
+	for _, locale := range releasedLocales {
+		if value == locale {
+			return true
+		}
+	}
+	return false
+}

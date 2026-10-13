@@ -139,9 +139,12 @@ func GenerateContent(root, productVersion string) error {
 	if err != nil {
 		return err
 	}
+	if err = validateReleasedLocaleSources(root, catalog, teachers); err != nil {
+		return err
+	}
 	revision := catalog["content_revision"]
-	if jsonToken(revision) != "3" || jsonToken(teachers["content_revision"]) != "3" {
-		return fmt.Errorf("v1.6.0 requires released content revision 3")
+	if jsonToken(revision) != "4" || jsonToken(teachers["content_revision"]) != "4" {
+		return fmt.Errorf("v1.6.0 requires released content revision 4")
 	}
 	ids := []any{}
 	for _, f := range arr(catalog["families"]) {
@@ -176,13 +179,13 @@ func GenerateContent(root, productVersion string) error {
 		procedure := map[string]any{}
 		complement := map[string]any{}
 		var englishCases []any
-		for _, locale := range []string{"en", "ko"} {
+		for _, locale := range releasedLocales {
 			p, e := os.ReadFile(filepath.Join(dir, "procedure."+locale+".md"))
 			if e != nil {
 				return e
 			}
 			text := markdown(string(p))
-			if e = validateProcedure(text); e != nil {
+			if e = validateProcedureLocale(text, locale); e != nil {
 				return fmt.Errorf("%s.%s: %w", id, locale, e)
 			}
 			questions := arr(obj(obj(teachers["methods"])[id])[locale])
@@ -262,7 +265,7 @@ func GenerateContent(root, productVersion string) error {
 	}
 	messages := map[string]any{}
 	fragments := map[string]any{}
-	for _, locale := range []string{"en", "ko"} {
+	for _, locale := range releasedLocales {
 		v, e := ReadObject(filepath.Join(base, "locales", locale+".yaml"))
 		if e != nil {
 			return e
@@ -273,12 +276,14 @@ func GenerateContent(root, productVersion string) error {
 		}
 		messages[locale] = flat
 	}
-	if jsonToken(orderedKeys(obj(messages["en"]))) != jsonToken(orderedKeys(obj(messages["ko"]))) {
-		return fmt.Errorf("locale keys differ")
+	for _, locale := range releasedLocales {
+		if jsonToken(orderedKeys(obj(messages["en"]))) != jsonToken(orderedKeys(obj(messages[locale]))) {
+			return fmt.Errorf("locale keys differ: %s", locale)
+		}
 	}
 	for _, key := range []string{"controller", "participation_rigor", "routing_classifier", "framing", "evidence_card_completion", "cross_exam", "strict_second_pass", "capability_notice"} {
 		pair := map[string]any{}
-		for _, locale := range []string{"en", "ko"} {
+		for _, locale := range releasedLocales {
 			v := obj(messages[locale])["prompt."+key]
 			if str(v) == "" {
 				return fmt.Errorf("missing prompt fragment %s", key)
@@ -303,13 +308,16 @@ func GenerateContent(root, productVersion string) error {
 	if e != nil {
 		return e
 	}
-	if tree != "sha256:b8824656fc53d588cc6a570de102531266ef2a7b39f04694d058c8da5c2418a6" {
-		return fmt.Errorf("revision 3 source differs from released v1.5.0 baseline; a separate content revision is required")
+	if tree != "sha256:993c30191b0d2b67af88a25c2631d9e8fddeeaf9dadfd0ff4fb07dd62539dcab" {
+		return fmt.Errorf("revision 4 source differs from released v1.5.1 baseline; a separate content revision is required")
 	}
 	bundle := map[string]any{"schema": schema("compiled-content-bundle"), "product_version": productVersion, "content_revision": revision, "method_ids": sortedIDs, "methods": methods, "locale_messages": messages, "prompt_fragments": fragments, "policy_versions": policies, "source_tree_hash": tree}
 	semantic, e := SemanticHash(bundle)
 	if e != nil {
 		return e
+	}
+	if semantic != "sha256:835a1e32695e863b3696c3bf5dcf1acb7faa580d889129e617524fbc0d9908e6" {
+		return fmt.Errorf("released v1.5.1 semantic identity changed")
 	}
 	bundle["normalized_semantic_hash"] = semantic
 	projections := map[string]any{"schema": schema("reasoning-content-projections"), "content_revision": revision, "selection_catalog": map[string]any{"schema": schema("selection-catalog"), "content_revision": revision, "entries": entries}, "injectable_content": injectable}
@@ -318,7 +326,7 @@ func GenerateContent(root, productVersion string) error {
 		return e
 	}
 	locales := map[string]any{}
-	for _, locale := range []string{"en", "ko"} {
+	for _, locale := range releasedLocales {
 		v, e := ReadObject(filepath.Join(base, "response-policy", locale+".yaml"))
 		if e != nil {
 			return e

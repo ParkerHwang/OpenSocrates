@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/domain"
 	"io"
 	"strings"
 	"time"
@@ -38,6 +39,10 @@ type Request struct {
 	Context         Handles
 	Deadline        time.Duration
 	ReasoningEffort string
+	// TrustedExplicitLocale is supplied by a trusted caller, never by prompt text.
+	// Nil means absent; a non-nil unsupported value rejects the request.
+	TrustedExplicitLocale *string
+	StoredPreference      *string
 }
 
 func (Request) String() string { return "SelectorRequest(<transient-redacted>)" }
@@ -156,19 +161,6 @@ func ValidateCandidate(c *Candidate, knownIDs []string) error {
 	return nil
 }
 
-// Locale preserves the old current-prompt character-count policy; ties and
-// scripts other than Hangul syllables and Latin letters resolve to English.
-func Locale(prompt string) string {
-	ko, en := 0, 0
-	for _, r := range prompt {
-		if r >= 0xac00 && r <= 0xd7a3 {
-			ko++
-		} else if r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z' {
-			en++
-		}
-	}
-	if ko > en {
-		return "ko"
-	}
-	return "en"
-}
+// Locale preserves the released selector's current-prompt script policy,
+// including ASCII letters without digits and English for ties.
+func Locale(prompt string) string { return domain.DetectLocale(prompt, false) }

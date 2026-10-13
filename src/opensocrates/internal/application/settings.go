@@ -60,3 +60,37 @@ func RigorReset(store SettingsRepository) map[string]any {
 	result["scope"] = "default"
 	return result
 }
+
+func localeProjection(s domain.UserSettings) map[string]any {
+	locale := "follow"
+	if preference := s.LocalePreference(); preference != nil {
+		locale = *preference
+	}
+	return map[string]any{"status": "ok", "locale": locale, "revision": s.Value["revision"]}
+}
+func LocaleGet(store SettingsRepository) map[string]any {
+	if store == nil {
+		return unavailable("settings_store_unavailable")
+	}
+	return localeProjection(store.Load())
+}
+func LocaleSet(store SettingsRepository, locale string) map[string]any {
+	if locale != "follow" && !domain.SupportedLocale(locale) {
+		return map[string]any{"status": "rejected", "error_code": "invalid_locale"}
+	}
+	if store == nil {
+		return unavailable("settings_store_unavailable")
+	}
+	var preference *string
+	if locale != "follow" {
+		preference = &locale
+	}
+	s, e := store.Mutate(func(current domain.UserSettings) (domain.UserSettings, error) {
+		return domain.SetLocale(current, preference)
+	})
+	if e != nil {
+		return unavailable("settings_write_unavailable")
+	}
+	return localeProjection(s)
+}
+func LocaleReset(store SettingsRepository) map[string]any { return LocaleSet(store, "follow") }

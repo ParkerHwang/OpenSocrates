@@ -259,13 +259,8 @@ func Verify(root, host, version, target string) (Package, error) {
 		if json.Unmarshal(b, &plugin) != nil || plugin.Name != "opensocrates" || plugin.Version != m.ProductVersion {
 			return Package{}, invalid("plugin")
 		}
-		for _, locale := range []string{"en", "ko"} {
-			for id := range seen {
-				p := "skills/opensocrates/references/decision/methods/" + locale + "/" + id + ".md"
-				if hashes[p] == "" {
-					return Package{}, invalid("methods")
-				}
-			}
+		if !completeMethods("skills/opensocrates", methodLocales(m.ProductVersion), seen, hashes) {
+			return Package{}, invalid("methods")
 		}
 	case "antigravity", "claude-chat":
 		if m.Schema != "opensocrates.content-host-manifest/1.0.0" || m.RuntimeTargets == nil || m.Launchers == nil || len(m.RuntimeTargets) != 0 || len(m.Launchers) != 0 || len(m.PublicSkills) != 1 || m.PublicSkills[0] != "opensocrates" {
@@ -281,7 +276,8 @@ func Verify(root, host, version, target string) (Package, error) {
 		if _, e := Digest(m.SourceIdentity["templates"]); e != nil {
 			return Package{}, e
 		}
-		if hashes[skill+"/SKILL.md"] == "" || len(m.CanonicalMethods) != 96 {
+		locales := methodLocales(m.ProductVersion)
+		if hashes[skill+"/SKILL.md"] == "" || len(m.CanonicalMethods) != len(locales)*m.MethodCount || !completeMethods(skill, locales, seen, hashes) {
 			return Package{}, invalid("methods")
 		}
 		canonicalSeen := map[string]bool{}
@@ -289,7 +285,7 @@ func Verify(root, host, version, target string) (Package, error) {
 			p := skill + "/references/decision/methods/" + row.Locale + "/" + row.MethodID + ".md"
 			h, e := Digest(row.SHA256)
 			key := row.Locale + ":" + row.MethodID
-			if e != nil || !seen[row.MethodID] || (row.Locale != "en" && row.Locale != "ko") || canonicalSeen[key] || row.Path != p || hashes[p] != h {
+			if e != nil || !seen[row.MethodID] || !contains(locales, row.Locale) || canonicalSeen[key] || row.Path != p || hashes[p] != h {
 				return Package{}, invalid("methods")
 			}
 			canonicalSeen[key] = true
@@ -333,6 +329,49 @@ func Verify(root, host, version, target string) (Package, error) {
 	}
 	return Package{Root: root, Manifest: m, ManifestPath: path, Hashes: hashes}, nil
 }
+
+// The released v1.5.1 adds Chinese and Japanese references. Older owned
+// installations retain their exact two-language layout during adoption/removal.
+func methodLocales(version string) []string {
+	parts := strings.Split(version, ".")
+	baseline := []string{"1", "5", "1"}
+	for i, part := range parts {
+		part = strings.TrimLeft(part, "0")
+		if part == "" {
+			part = "0"
+		}
+		if len(part) < len(baseline[i]) || len(part) == len(baseline[i]) && part < baseline[i] {
+			return []string{"en", "ko"}
+		}
+		if len(part) > len(baseline[i]) || part > baseline[i] {
+			return []string{"en", "ko", "zh", "ja"}
+		}
+	}
+	return []string{"en", "ko", "zh", "ja"}
+}
+
+// Inventory integrity alone cannot establish locale/method completeness: an
+// internally consistent manifest could omit a language or substitute a method.
+func completeMethods(skill string, locales []string, methods map[string]bool, hashes map[string]string) bool {
+	prefix := skill + "/references/decision/methods/"
+	expected := map[string]bool{}
+	for _, locale := range locales {
+		for id := range methods {
+			path := prefix + locale + "/" + id + ".md"
+			if hashes[path] == "" {
+				return false
+			}
+			expected[path] = true
+		}
+	}
+	for path := range hashes {
+		if strings.HasPrefix(path, prefix) && !expected[path] {
+			return false
+		}
+	}
+	return true
+}
+
 func contains(a []string, s string) bool {
 	for _, v := range a {
 		if v == s {

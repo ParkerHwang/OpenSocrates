@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: mece-positive-01
+    kind: positive
+    prompt: "对于这一次购买决策，这些客户分组是否相互独立且完全穷尽？"
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "用户要求在一个分类轴下分别检查重叠与覆盖。"
+  - id: mece-positive-02
+    kind: positive
+    prompt: "重新设计这些风险类别，使任何案例都不同时属于两类，且不遗漏任何重要案例。"
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "要求输出分类规则，并进行重叠、缺口与粒度检查。"
+  - id: mece-positive-03
+    kind: positive
+    prompt: "检查我们的问题树分支是否使用单一轴、粒度一致，并覆盖所声明全集。"
+    expected_route: mece
+    expected_behavior: route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "这是集中 ME／CE 审查，不是宽泛递归诊断。"
+  - id: mece-negative-01
+    kind: negative
+    prompt: "递归分解停机原因，为每个末端分支附上测试。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "任务需要完整逻辑树，不仅是分类质量检查。"
+  - id: mece-negative-02
+    kind: negative
+    prompt: "保留这些重叠标签，因为重叠本身表示有意义的客户身份。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [ambiguous_terms, human_need]
+    rationale: "自然重叠是有意的，强制互斥会扭曲现象。"
+  - id: mece-mechanical-01
+    kind: mechanical
+    prompt: "按字母顺序排列给定类别，保留描述。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "字母排序是机械操作，不评估分类逻辑。"
+  - id: mece-explicit-01
+    kind: explicit
+    prompt: "明确使用 mece 审查此运营模式中的责任分组。"
+    expected_route: mece
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, category_overlap]
+    rationale: "用户明确指定单一轴的重叠与覆盖审查。"
+  - id: mece-insufficiency-01
+    kind: insufficiency
+    prompt: "告诉我这些类别是否 MECE，但不要说明全集、分类目的或类别规则。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [category_overlap, decisive_input_missing]
+    rationale: "没有有边界的全集、目的与归属规则，就无法评估 ME 与 CE。"

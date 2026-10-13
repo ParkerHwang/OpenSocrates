@@ -8,12 +8,14 @@
 
 OpenSocrates brings 48 authored reasoning methods into the task you are already
 doing: synthesize evidence, understand stakeholder perspectives, compare choices,
-and write useful messages. English/Korean procedures, teacher questions,
-response policies and shared reader guides retain the released v1.5.0 baseline.
+and write useful messages. English, Korean, Simplified Chinese (`zh`) and Japanese (`ja`) procedures,
+teacher questions, response policies and shared reader guides retain the released
+v1.5.1 baseline: content revision 4, 192 complete procedures and 576 teacher
+questions. The original English/Korean method bodies remain unchanged.
 The separate method-body upgrades are excluded from v1.6.0 and belong to v1.6.1
 or later. Dedicated coding-specialist features remain outside this scope.
 
-**English** | [한국어](README.ko.md)
+**English** | [한국어](README.ko.md) | [简体中文](README.zh.md) | [日本語](README.ja.md)
 
 [![CI](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml/badge.svg)](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -25,10 +27,13 @@ management CLI, installer, updater and development tools replace the active
 Python/JavaScript/npm path. End users do not install Go, Python, Node.js or npm.
 Native release assets come from
 [GitHub Releases](https://github.com/ParkerHwang/OpenSocrates/releases).
-Production signing/trusted-root setup and native release qualification must be
+Remaining production signing/trusted-root and native release conditions must be
 completed before publishing or recommending this candidate as a stable release.
 The current released baseline remains
-[v1.5.0](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.0).
+[v1.5.1](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.1).
+The separate v1.5.2 language expansion is in progress; its proposed French,
+German, Italian, Spanish, Portuguese and Thai additions are not this candidate
+'s current baseline. Reconcile that work before the v1.6.0 release.
 
 | Host | Delivery | Platform and activation |
 | --- | --- | --- |
@@ -39,8 +44,9 @@ The current released baseline remains
 
 Windows ARM64 was added by explicit user direction during implementation. It
 uses its own native `.exe`/bundle/helper and the same per-user update policy.
-Native ARM64 runtime, install/recovery/scheduler and live host evidence remain
-pending; x64 execution under emulation is supplementary evidence only.
+Exact native ARM64 runtime/install/recovery/scheduler results belong in the
+implementation handoff. Production and actual host activation evidence remain
+separate gates; x64 execution under emulation is supplementary evidence only.
 
 The default and `--host all` select **Codex only**. Other profiles require an
 explicit host. Windows native Claude Code, Linux, macOS Intel,
@@ -82,8 +88,9 @@ updater. It does not broadly uninstall npm packages or erase user data.
 ```
 
 Use `update` with a local verified bundle for subsequent manual installation
-updates. `verify`, `manage diagnose`, `enable`, `disable` and `remove` select the same
-explicit host/scope. Unknown or modified files are preserved and reported.
+updates. `verify`, `manage diagnose` and `remove` select the same explicit
+host/scope. Claude and Antigravity support `enable`/`disable`; Codex enabled state
+belongs to the host controls. Unknown or modified files are preserved and reported.
 Native Claude uses `--host claude` on Mac; Antigravity uses `--host antigravity`
 and optional `--workspace /absolute/path/to/existing/workspace`. Omit workspace
 for global scope. Account content uses:
@@ -139,6 +146,33 @@ Save once and start a fresh conversation. This guides model-selected skill use;
 it does not add native hooks or guaranteed every-turn enforcement. Follow the
 [setup guide](docs/setup-guide.md#claude-standing-instructions) for the separate
 upload, capability and enabled-state checks.
+
+## Reasoning instruction language
+
+The current content supports `en`, `ko`, `zh` and `ja`. The optional legacy
+selector resolves explicit preference, stored preference, then current-input
+script detection. Kana chooses Japanese; otherwise dominant Hangul chooses
+Korean and dominant Han chooses Chinese. Han-only Japanese needs an explicit
+Japanese preference. Empty, Latin-only and tied inputs fall back to English.
+
+```text
+./opensocrates locale get
+./opensocrates locale set en
+./opensocrates locale set ko
+./opensocrates locale set zh
+./opensocrates locale set ja
+./opensocrates locale set follow
+./opensocrates locale reset
+```
+
+These commands have no host argument. On Windows use `.\opensocrates.exe`.
+`follow` and `reset` clear only this preference. It affects the optional legacy
+selector, not stateless decision requests or account skills. Stateless decision
+JSON requires an explicit `locale`; native Claude entry reads no stored
+preference. Account skills and Antigravity use their language guides and complete
+references. Instruction language is separate from answer language, host UI and
+management CLI output; not every CLI message is translated. Method IDs, JSON
+keys and the attribution line stay unchanged across all four languages.
 
 ## Attribution, privacy and development
 

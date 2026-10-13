@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/domain"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"os"
 	"os/exec"
@@ -51,7 +52,7 @@ func (s *Selector) Select(parent context.Context, r Request) (*Candidate, error)
 	if !contextAvailable() {
 		return nil, outcomeFailure(diagnostics.Unsupported, "request_rejected")
 	}
-	if !validText(r.Prompt, MaxPromptBytes, true) || !validText(r.Catalog, MaxCatalogBytes, true) || r.Deadline < time.Second || r.Deadline > 30*time.Second || r.ReasoningEffort != "medium" {
+	if domain.ResolveLocale(r.TrustedExplicitLocale, r.StoredPreference, r.Prompt, false) == "" || !validText(r.Prompt, MaxPromptBytes, true) || !validText(r.Catalog, MaxCatalogBytes, true) || r.Deadline < time.Second || r.Deadline > 30*time.Second || r.ReasoningEffort != "medium" {
 		return nil, outcomeFailure(diagnostics.Verification, "request_rejected")
 	}
 	catalog, err := contracts.Decode([]byte(r.Catalog))

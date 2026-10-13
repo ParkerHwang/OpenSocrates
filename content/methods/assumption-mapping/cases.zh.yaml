@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: assumption-mapping-positive-1
+    kind: positive
+    prompt: "我们正在考虑共享膳食规划服务。列出必须成立的假设，将重要程度与证据分开，并找出第一个安全检验。访谈笔记由用户提供，尚未经独立核查。"
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, testable_claim, plan]
+    rationale: "请求明确需要假设清单、重要程度／证据轴、最高风险集合及下一次检验。访谈笔记是用户提供而非已核验的资料，因此路由必须展示不确定性，不能赋予概率。"
+  - id: assumption-mapping-positive-2
+    kind: positive
+    prompt: "团队希望自动化发票审核，但不清楚瓶颈在客户需求吸引力、数据技术可行性还是合规经营可持续性。绘制假设，并在采购之前选择风险暴露低的验证步骤。"
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [hidden_assumptions, prioritized_assumptions, irreversible_choice, testable_claim]
+    rationale: "存在多个假设领域和作出承诺前的决策。要求的验证仍是优先级问题；结果应标记有来源支持的事实、假设及任何缺失的合规证据。"
+  - id: assumption-mapping-positive-3
+    kind: positive
+    prompt: "我们有五个志愿者排班变更实验提案。按对决策的重要程度和证据强度排列假设，再附上安全观察及会改变计划的规则。"
+    expected_route: assumption-mapping
+    expected_behavior: route
+    decisive_features: [prioritized_assumptions, testable_claim, chosen_plan]
+    rationale: "用户要求方法的核心优先级整理，而非已完成的实验。输出可使用有序标签，将证据标为 verified、unverified、assumed 或 conflicted，不得编造分数。"
+  - id: assumption-mapping-negative-1
+    kind: negative
+    prompt: "我们的结账服务本周失败了三次。追踪因果链，识别控制弱点并指定预防负责人；不要提出产品假设图。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [recurring_failure, causal_question, diagnose]
+    rationale: "这是根本原因分析请求，容易与假设映射的类别混淆。所需结果是因果诊断及控制行动，而非按优先级排列的可检验信念。"
+  - id: assumption-mapping-negative-2
+    kind: negative
+    prompt: "我们已选定目标客户和落地页实验。定义可指导行动的指标、观察期，以及转向或坚持的检验规则。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [testable_hypothesis, chosen_plan, plan]
+    rationale: "假设已选定，用户要求把市场实验具体化。这属于 lean-startup；路由到此方法会重复映射，而不是定义检验和指标。"
+  - id: assumption-mapping-mechanical-1
+    kind: mechanical
+    prompt: "将这六个假设标签按字母顺序排列，并以编号列表返回。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "排序标签不涉及判断、不确定性或实验优先级，应直接给出机械性结果。"
+  - id: assumption-mapping-explicit-1
+    kind: explicit
+    prompt: "为这个想法使用 assumption-mapping。展示假设、重要程度／证据轴、最高风险集合及下一次安全检验；让无支持的主张明确保持未核验。"
+    expected_route: assumption-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, hidden_assumptions, prioritized_assumptions, testable_claim]
+    rationale: "用户明确指定方法和公开结果。显式调用为主要方法，而所需证据标签保留来源边界。"
+  - id: assumption-mapping-insufficiency-1
+    kind: insufficiency
+    prompt: "排列提案背后假设的优先级，并告诉我们先检验哪项。目前尚无决策问题、期望结果、候选假设或检验约束。"
+    expected_route: assumption-mapping
+    expected_behavior: hold
+    decisive_features: [decisive_input_missing, hidden_assumptions, prioritized_assumptions, no_testable_implication]
+    rationale: "方法适用，但决定性输入缺失。必须保留判断，不要编造假设或检验；下一步请求应明确决策及获授权的安全边界。"

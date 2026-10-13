@@ -3,6 +3,7 @@ package domain
 import (
 	"encoding/json"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
+	"reflect"
 	"testing"
 )
 
@@ -61,6 +62,46 @@ func TestSettingsPresenceAndUnknownContracts(t *testing.T) {
 		mutate(s.Value)
 		if _, e := ParseSettings(s.Value); e == nil {
 			t.Fatal("invalid settings accepted", s)
+		}
+	}
+}
+
+func TestLocaleMutationsPreserveReleasedSettingsAndRevision(t *testing.T) {
+	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+		s := DefaultSettings()
+		s.Value["revision"] = json.Number("123456789012345678901234567890")
+		s.Value["recording_mode"] = "local_public_artifacts"
+		s.Value["onboarding_version_seen"] = "1.0.0"
+		s.Value["record_retention_days"] = contracts.Number(365)
+		s.Value["metrics_consent"] = "none"
+		s.Value["locale_preference"] = locale
+		if _, e := ParseSettings(s.Value); e != nil {
+			t.Fatal(locale, e)
+		}
+		updated, e := SetRigor(s, "strict")
+		if e != nil {
+			t.Fatal(e)
+		}
+		expected := s.Clone()
+		expected.Value["default_rigor"], expected.Value["revision"] = "strict", s.NextRevision()
+		if !reflect.DeepEqual(updated.Value, expected.Value) {
+			t.Fatal("rigor mutation lost released settings", locale)
+		}
+		unchanged, e := SetLocale(updated, &locale)
+		if e != nil || !reflect.DeepEqual(unchanged.Value, updated.Value) {
+			t.Fatal("locale no-op changed state", e)
+		}
+		reset, e := SetLocale(updated, nil)
+		if e != nil || reset.LocalePreference() != nil || reset.Value["revision"] != updated.NextRevision() {
+			t.Fatal("reset failed", e)
+		}
+		again, e := SetLocale(reset, nil)
+		if e != nil || !reflect.DeepEqual(again.Value, reset.Value) {
+			t.Fatal("reset no-op changed state", e)
+		}
+		bad := "follow"
+		if _, e := SetLocale(updated, &bad); e == nil {
+			t.Fatal("wire alias accepted")
 		}
 	}
 }

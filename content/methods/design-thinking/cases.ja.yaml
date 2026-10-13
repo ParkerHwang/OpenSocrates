@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: design-thinking-positive-01
+    kind: positive
+    prompt: "保護者は学校の連絡を見落とすと報告しますが、観察された対処法は異なります。ニーズを発見し、視点を定め、三つのサービス案を試してください。"
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "観察された人の文脈と自由な案の生成が中心で、投資前に試作の試験が必要です。"
+  - id: design-thinking-positive-02
+    kind: positive
+    prompt: "診療所は受付時の患者の混乱を減らしたいと考えています。面接と観察を低リスクの試作と反証規則に反映してください。"
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "観察された障害と試験可能な試作を持つ、ユーザー中心のサービス設計です。"
+  - id: design-thinking-positive-03
+    kind: positive
+    prompt: "チームはダッシュボード機能を求めますが、防ぐべき失敗を誰も知りません。先に状況と望む前進を明らかにしてください。"
+    expected_route: design-thinking
+    expected_behavior: route
+    decisive_features: [human_need, user_progress]
+    rationale: "案を選ぶ前に、要望された機能と背後のニーズを分ける必要があります。"
+  - id: design-thinking-negative-01
+    kind: negative
+    prompt: "ユーザーは特定の困難な時点でツールを乗り換え、判断は機能的、感情的、社会的な用事と習慣の力に依存します。"
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "主な出力は用事と乗り換えの力の説明で、発想と試作のサイクルではありません。"
+  - id: design-thinking-negative-02
+    kind: negative
+    prompt: "明らかな案は陳腐化しており、チームは選別前に大きく異なる三案を生む発想の刺激を求めています。"
+    expected_route: lateral-thinking
+    expected_behavior: route
+    decisive_features: [stale_options, choose]
+    rationale: "主な必要は枠組みの転換であり、ユーザー観察に基づく設計ではありません。"
+  - id: design-thinking-mechanical-01
+    kind: mechanical
+    prompt: "ニーズを解釈したり案を提案したりせず、面接の引用を番号付き文書に入れてください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "転記と書式整理は機械的です。"
+  - id: design-thinking-explicit-01
+    kind: explicit
+    prompt: "design-thinking を使い、観察されたユーザーの障害からボランティア登録の流れを再設計し、小さな試作を試してください。"
+    expected_route: design-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, human_need]
+    rationale: "人のニーズの発見と試作の過程を明示的に求めています。"
+  - id: design-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "ユーザーも観察もないまま、普遍的なニーズを断定し、最初の機能を試験なしで公開してください。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [human_need, decisive_input_missing]
+    rationale: "ユーザーの証拠がなければニーズと試験を裏付けられず、案を保留する必要があります。"

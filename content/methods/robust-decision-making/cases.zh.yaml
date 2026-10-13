@@ -1,0 +1,109 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "robust-decision-making-positive-1",
+      "kind": "positive",
+      "prompt": "我们必须为运营数十年的基础设施选择防洪设计。降雨、土地使用和资金条件有深度不确定性，需要在多个合理世界中均高于公开安全底线的选项，而非仅在单一预测下胜出的选项。",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "irreversible_choice",
+        "choose",
+        "failure_risk"
+      ],
+      "rationale": "决定影响重大且难逆转，多种不确定性相互作用，用户要求跨合理世界可接受的行动。无需概率加权最优解。"
+    },
+    {
+      "id": "robust-decision-making-positive-2",
+      "kind": "positive",
+      "prompt": "我们的供应链战略必须在未来八年适应不确定的关税、需求及供应商可靠性。用失败与后悔标准比较可行策略，展示取舍，并加入用于适应性行动的监测触发条件。",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "irreversible_choice",
+        "failure_risk",
+        "feedback_delay"
+      ],
+      "rationale": "请求按情景和策略压力测试、明确失败标准及适应性触发条件。这些是深度不确定性下稳健决策的公开输出。"
+    },
+    {
+      "id": "robust-decision-making-positive-3",
+      "kind": "positive",
+      "prompt": "区域交通投资有三个选项，但远程办公、燃料价格及公共资金的未来组合尚不足以支持单一预测。找出仍可接受的第一步，说明剩余弱点及什么证据会改变它。",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "multiple_options",
+        "choose",
+        "new_evidence"
+      ],
+      "rationale": "用户有实际选择、深度不确定性，并要求可接受而非最可能获胜的策略。要求剩余弱点和结论转变条件，可防止夸大稳健性。"
+    },
+    {
+      "id": "robust-decision-making-negative-1",
+      "kind": "negative",
+      "prompt": "基准需求预测已充分验证，试点下月可撤回且成本几乎为零，管理层只想要在该情形下预期收益最高的行动。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "source_quality",
+        "sequential_choice",
+        "choose"
+      ],
+      "rationale": "明确指出单一预期情形可靠、撤回轻易，符合禁用条件。稳健性压力测试在这里不增加必需的决策价值。"
+    },
+    {
+      "id": "robust-decision-making-negative-2",
+      "kind": "negative",
+      "prompt": "为能源市场创建四个具名称的外部未来，描述各自如何形成并列早期信号。不要依据失败或后悔标准比较当前行动。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "plan"
+      ],
+      "rationale": "容易与情景规划的同族方法混淆。请求未来构建和信号指标，却明确省略策略压力测试及可接受标准。"
+    },
+    {
+      "id": "robust-decision-making-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "用给定公式根据这些已核实现金流计算年化收益率，并展示算术过程。不选择策略。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "这是公式已给定的有界计算，没有不确定决策集合。本方法不得把算术变成稳健性判断。"
+    },
+    {
+      "id": "robust-decision-making-explicit-1",
+      "kind": "explicit",
+      "prompt": "将 robust-decision-making 作为海岸适应选择的主要方法。在合理气候和预算世界中测试选项，以最低服务水平作失败阈值，世界或阈值缺失时保留结论。",
+      "expected_route": "robust-decision-making",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "deep_uncertainty",
+        "irreversible_choice",
+        "failure_risk"
+      ],
+      "rationale": "用户明确调用方法并给出核心决策框架、世界测试、可接受底线及保留规则。明确调用不取消证据和不确定性限制。"
+    },
+    {
+      "id": "robust-decision-making-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "告诉我哪种长期战略稳健。我没有列出可行行动、失败的含义、时间跨度或应测试的不确定性。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "行动集合、可接受底线、时限和不确定性登记表是决定性输入。无法支持稳健建议，应保留并仅请求缺失的决策输入。"
+    }
+  ]
+}

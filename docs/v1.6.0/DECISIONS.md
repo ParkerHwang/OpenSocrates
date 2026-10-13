@@ -7,20 +7,30 @@ belong in the exact-commit implementation handoff. / 아래는 미출시 Go 후�
 
 ## Baseline / 기준
 
-The preparation main was `9572db2c71a455d4ada24c78402d0f874002cec9`; the released
-v1.5.0 content tag is `cf6634310afcf5d5ce58484e67a73151bb4c5999`, revision `3`.
-V0 records canonical baseline inputs and hashes:
+The original preparation main was `9572db2c71a455d4ada24c78402d0f874002cec9`.
+After v1.5.1 shipped, the Go branch reconciles released tag/current main
+`5a6a7fa2897dd42772c4503a1301770e48bd1f29`, content revision `4`, all 48 methods
+and EN/KO/ZH/JA. V0 records canonical baseline inputs and hashes:
 
-- `source_tree_hash`: `sha256:b8824656fc53d588cc6a570de102531266ef2a7b39f04694d058c8da5c2418a6`
-- `normalized_semantic_hash`: `sha256:e50af8296165a7c8e8a9a6e27d4881bbc816b7efe9e1c84ea798c80fb54efa48`
+- `source_tree_hash`: `sha256:993c30191b0d2b67af88a25c2631d9e8fddeeaf9dadfd0ff4fb07dd62539dcab`
+- `normalized_semantic_hash`: `sha256:835a1e32695e863b3696c3bf5dcf1acb7faa580d889129e617524fbc0d9908e6`
 
-All 48 method bodies, bilingual semantics, teacher questions, response policies
+All 48 method bodies, four-language semantics, teacher questions, response policies
 and shared guides are frozen. Separate method-body upgrades belong to v1.6.1 or
 later. Source baseline selection is reconciled against current GitHub state,
 not inferred from the planning checkout. PR #110 is the planning reference;
-issue #109 tracks preparation only. / 48개 본문·양언어 의미·교사 질문·응답 정책·
-공통 안내를 고정합니다. 본문 개선은 후속 릴리스이며 최신 GitHub와 기준을 조정해
+issue #109 tracks preparation only. Original v1.5.0 EN/KO procedures and cases
+are byte-identical in v1.5.1; the language release is separate from the deferred
+body rewrite. / 초기 준비 SHA와 별도로 출시된 v1.5.1의 리비전 4·48개 방법·
+네 언어·교사 질문·응답 정책·공통 안내를 고정합니다. 기존 EN/KO 절차·사례는
+태그 간 동일하며 본문 개선은 후속 릴리스입니다. 최신 GitHub와 기준을 조정해
 구현합니다. 준비 issue를 구현 추적으로 재사용하지 않습니다.
+
+v1.5.2 is independently adding FR/DE/IT/ES/PT/TH. Its draft inputs are not this
+baseline. Recheck published tags before final v1.6.0 qualification/publication,
+then reconcile the new release without regrading historical receipts. /
+v1.5.2의 6개 추가 언어는 별도 진행 중이며 미검증 초안을 섞지 않습니다. 최종
+검증·게시 전에 실제 출시 여부를 재확인하고 새 릴리스 기준을 조정합니다.
 
 ## Go boundaries and toolchain / Go 경계와 도구체인
 
@@ -236,7 +246,7 @@ The user explicitly added Windows ARM64 after implementation started, overriding
 the original x64-only preparation scope. Include native ARM64 Codex CLI/Desktop
 and Antigravity global/workspace lifecycle, installation/adoption/removal,
 helper self-replacement and per-user opt-in stable updates. Preserve the same
-frozen v1.5.0 48-method/content revision-3 baseline. Native Windows Claude Code
+reconciled v1.5.1 48-method/content revision-4 four-language baseline. Native Windows Claude Code
 and account upload remain excluded; `--host all` remains Codex. / 구현 중 사용자의
 명시적 요청으로 ARM64를 추가했으며 본문·프로필 의미·계정 경계는 유지합니다.
 

@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "root-cause-analysis-positive-01",
+      "kind": "positive",
+      "prompt": "仓库采用新的拣货流程后，每隔几周就发错货，团队需要预防措施而非又一次道歉。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "重复的运营失败需要区分症状、原因、控制及复发核实。"
+    },
+    {
+      "id": "root-cause-analysis-positive-02",
+      "kind": "positive",
+      "prompt": "本地重启后服务中断仍反复出现；有日志、交接记录和告警负责人信息，可据此构建因果链。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose",
+        "failure_risk"
+      ],
+      "rationale": "请求寻找可控的系统条件及预防负责人，不仅是直接触发因素。"
+    },
+    {
+      "id": "root-cause-analysis-positive-03",
+      "kind": "positive",
+      "prompt": "多个班次反复出现质量漏检，管理者希望区分操作者行动与界面、工作量及缺失控制条件。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "重复复发及区分层次的请求，直接指向根因分析。"
+    },
+    {
+      "id": "root-cause-analysis-negative-01",
+      "kind": "negative",
+      "prompt": "新的定价邮件后注册增加，问题是与对照组相比，是否由邮件导致增加。",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "目标是干预效果和反事实比较，而非反复失败的因果链。"
+    },
+    {
+      "id": "root-cause-analysis-negative-02",
+      "kind": "negative",
+      "prompt": "客户投诉、人员配置与积压在一年中相互强化；用户需要找到动态模式中的杠杆点。",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "带延迟的反馈结构，比具体事件诊断更广泛。"
+    },
+    {
+      "id": "root-cause-analysis-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "把事件时间线排成两列表格，不诊断失败原因。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "即使原文描述反复事件，排版仍是机械任务。"
+    },
+    {
+      "id": "root-cause-analysis-explicit-01",
+      "kind": "explicit",
+      "prompt": "对反复失败的交接使用 root-cause-analysis，识别预防负责人，不归咎个人。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "recurring_failure",
+        "diagnose"
+      ],
+      "rationale": "用户明确对反复的运营失败调用本方法。"
+    },
+    {
+      "id": "root-cause-analysis-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "单份匿名报告称发布因某位工程师而失败；不要日志，直接将此人指认为根因。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "recurring_failure",
+        "decisive_input_missing"
+      ],
+      "rationale": "事件边界和证据不足，归责主张既不安全也无依据。"
+    }
+  ]
+}

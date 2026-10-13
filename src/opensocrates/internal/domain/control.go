@@ -720,7 +720,7 @@ func ValidateRecord(event map[string]any) error {
 		return e
 	}
 	seq, ok := contracts.Int(event["sequence"])
-	if !ok || seq < 1 || !contracts.Is(event["locale"], "en", "ko") {
+	if !ok || seq < 1 || !contracts.Is(event["locale"], "en", "ko", "zh", "ja") {
 		return ErrControl
 	}
 	t, ok := event["occurred_at"].(string)

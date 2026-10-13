@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "systems-thinking-positive-01",
+      "kind": "positive",
+      "prompt": "審査の遅れがユーザーの不満を増やし、重複通報が増えて審査待ちが積み上がります。チームは背後の構造を知りたいと考えています。",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question",
+        "deep_uncertainty"
+      ],
+      "rationale": "反復パターンに流れ、フィードバック、遅れの相互作用があり、孤立した原因ではありません。"
+    },
+    {
+      "id": "systems-thinking-positive-02",
+      "kind": "positive",
+      "prompt": "保全補助金は当初植え付けを増やしますが、水不足と取締りの反応によって季節ごとの結果が振動します。",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "deep_uncertainty",
+        "causal_question"
+      ],
+      "rationale": "季節的な挙動と政策への抵抗にはストック、フロー、均衡ループ、遅れの検討が必要です。"
+    },
+    {
+      "id": "systems-thinking-positive-03",
+      "kind": "positive",
+      "prompt": "顧客の信頼はゆっくり蓄積し、紹介が成長を強化し、サポート削減が遅れて衰退を招きます。介入点を探してください。",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "蓄積、強化作用、遅れた結果、介入点を明示的に対象としています。"
+    },
+    {
+      "id": "systems-thinking-negative-01",
+      "kind": "negative",
+      "prompt": "対応させた二群が異なる研修を受け、ユーザーは一か月後の得点が研修で変わったか尋ねています。",
+      "expected_route": "causal-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "causal_question",
+        "confounding"
+      ],
+      "rationale": "限定的な介入比較で足り、全体の動的システムは不要です。"
+    },
+    {
+      "id": "systems-thinking-negative-02",
+      "kind": "negative",
+      "prompt": "単一のデータベース障害に時刻付きの明確な引き金があり、チームは直接原因と制御可能な根本条件を必要としています。",
+      "expected_route": "root-cause-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "diagnose",
+        "recurring_failure"
+      ],
+      "rationale": "後で反復するフィードバックの証拠が出ない限り、限定的な事故診断を主にすべきです。"
+    },
+    {
+      "id": "systems-thinking-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "ストックとフローのメモを、システムを説明せず Markdown の箇条書きにしてください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "整形は機械的で、システム構造の判断を求めていません。"
+    },
+    {
+      "id": "systems-thinking-explicit-01",
+      "kind": "explicit",
+      "prompt": "systems-thinking で、局所的な人員修正が長期的な滞留増加で繰り返し相殺される理由を説明してください。",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "遅れと反復のあるシステム挙動にユーザーが手法を明示しています。"
+    },
+    {
+      "id": "systems-thinking-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "昨日一件の苦情がありました。時間パターンなしに強化ループを描き、システム全体の介入を勧めてください。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "feedback_delay",
+        "decisive_input_missing"
+      ],
+      "rationale": "一回の観察では動的挙動やループの方向を確立できません。"
+    }
+  ]
+}

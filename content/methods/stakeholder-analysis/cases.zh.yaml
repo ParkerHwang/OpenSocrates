@@ -1,0 +1,101 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "stakeholder-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "我们要实施排班调整，影响一线员工、经理、客户及劳工代表。描绘各方利益、决策权、可能忧虑、同意需求及参与负责人。",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "请求需要与实施相连的行动者图谱，不是普通联系人名单。在有记录或对话支持前，忧虑与影响是待证假设，所选路径应揭示其不确定性。"
+    },
+    {
+      "id": "stakeholder-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "一项公共政策将影响未加入正式决策群体的居民。识别决策者、受影响但未获代表的群体、权力与影响、冲突点及可问责的参与计划。",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "提示明确使代表性和实施成为重要事项。图谱应区分正式权限与影响力，不应无证据推定伤害或同意。"
+    },
+    {
+      "id": "stakeholder-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "几个组织必须采用共享的数据标准。分析谁能批准、阻止、受益或承担成本，再指定参与负责人及会改变推广计划的反应。",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "interacting_actors",
+        "stakeholder_conflict"
+      ],
+      "rationale": "采用依赖分散的权限与实施支持。所选路径应公开利益和影响的证据状态，不能把组织角色当成达成共识的证明。"
+    },
+    {
+      "id": "stakeholder-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "所有决策参与者已对目标一致，受影响群体并不重要。按成本、可靠性及交付时间比较两家可行供应商。",
+      "expected_route": "trade-off-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "multiple_options",
+        "multiple_objectives"
+      ],
+      "rationale": "人员问题已解决；剩下的是权衡比较。相关方分析只会添加装饰性图谱，不能解决选择。"
+    },
+    {
+      "id": "stakeholder-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "扫描可能影响产品策略的政治、经济、社会、技术、环境及法律变化。",
+      "expected_route": "pestel-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "macro_environment",
+        "forecast"
+      ],
+      "rationale": "请求可能涉及策略，但决定性输出是外部因素清单。这容易与 PESTEL 分析混淆，而非相关方图谱。"
+    },
+    {
+      "id": "stakeholder-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "删除联系人名单中的重复姓名，并按字母顺序排序剩余姓名。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical",
+        "mechanical"
+      ],
+      "rationale": "任务仅转换给定文本，不要求评估利益、权力、同意或实施。"
+    },
+    {
+      "id": "stakeholder-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "对这项医院工作流程调整使用利益相关方分析。展示决策权、受影响群体、权力与影响证据、冲突、参与负责人及反转条件。",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "stakeholder_conflict"
+      ],
+      "rationale": "用户直接指定方法及公开字段，因此它仍是主方法。回应仍须标明推断忧虑与未核实影响，不得将其视为已确定事实。"
+    },
+    {
+      "id": "stakeholder-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "我们应推进新的出勤政策吗？我尚未识别决策负责人、受影响群体、权限路径、时间范围或政策影响的证据。",
+      "expected_route": "stakeholder-analysis",
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing",
+        "interacting_actors"
+      ],
+      "rationale": "实施支持可能具有决定性，但行动者边界与权限缺失。方法应暂缓并请求最少的缺失事实，不得宣称同意或反对。"
+    }
+  ]
+}

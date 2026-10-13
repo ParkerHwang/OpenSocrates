@@ -91,7 +91,7 @@ func load() (*Bundle, error) {
 		return nil, e
 	}
 	b.SelectionCatalog = string(catalog)
-	if p.Revision != b.Revision || len(b.Methods) != 48 || len(b.IDs) != 48 || len(p.Content) != 96 {
+	if p.Revision != b.Revision || b.Revision != 4 || len(b.Methods) != 48 || len(b.IDs) != 48 || len(p.Content) != 192 {
 		return nil, contracts.ErrInvalid
 	}
 	b.Projections = map[string]Injectable{}
@@ -102,9 +102,16 @@ func load() (*Bundle, error) {
 		}
 		byID[m.ID] = m
 	}
+	seenIDs := map[string]bool{}
+	for _, id := range b.IDs {
+		if _, ok := byID[id]; !ok || seenIDs[id] {
+			return nil, contracts.ErrInvalid
+		}
+		seenIDs[id] = true
+	}
 	for _, item := range p.Content {
 		m, ok := byID[item.ID]
-		if !ok || item.Revision != b.Revision || !contracts.Is(item.Locale, "en", "ko") || item.Theory != m.Procedure[item.Locale] || item.Name != m.DisplayName[item.Locale] {
+		if !ok || item.Revision != b.Revision || !domain.SupportedLocale(item.Locale) || item.Theory != m.Procedure[item.Locale] || item.Name != m.DisplayName[item.Locale] {
 			return nil, contracts.ErrInvalid
 		}
 		key := item.ID + ":" + item.Locale
@@ -127,8 +134,15 @@ func load() (*Bundle, error) {
 	}
 	return b, nil
 }
-func Hash(raw []byte) string           { h := sha256.Sum256(raw); return "sha256:" + hex.EncodeToString(h[:]) }
-func (b *Bundle) Known(id string) bool { _, ok := b.Projections[id+":en"]; return ok }
+func Hash(raw []byte) string { h := sha256.Sum256(raw); return "sha256:" + hex.EncodeToString(h[:]) }
+func (b *Bundle) Known(id string) bool {
+	for _, known := range b.IDs {
+		if known == id {
+			return true
+		}
+	}
+	return false
+}
 func Questions(theory string) []string {
 	marker := "## Teacher questions\n"
 	i := strings.Index(theory, marker)
@@ -160,13 +174,96 @@ func Questions(theory string) []string {
 	return out
 }
 
-var teacherEN = []string{"A great teacher does not lecture a method. Settle the questions below for yourself, then do the user's task.", "Do not interview the user unless a missing answer would change the work. Do not name these questions or the methods unless the user asked. Do not narrate the questioning. Use any later procedure as a check, not as a script.", "Questions to settle before you act:"}
-var teacherKO = []string{"좋은 스승은 방법을 강의하지 않습니다. 아래 질문을 스스로 정리한 뒤 사용자의 일을 수행하세요.", "빠진 답이 작업을 바꾸지 않는다면 사용자를 인터뷰하지 마세요. 사용자가 묻지 않았다면 이 질문이나 방법 이름을 드러내지 마세요. 질문을 해설하지 마세요. 이후 절차는 대본이 아니라 점검으로만 쓰세요.", "행동하기 전에 스스로 정리할 질문:"}
+type assemblyLabels struct {
+	title, selected, revision, examples, boundary     string
+	stance, emptyStance, usage, emptyUsage, questions string
+}
 
-func (b *Bundle) Assemble(ids []string, locale string) (string, error) {
-	if len(ids) == 0 || !contracts.Is(locale, "en", "ko") {
+// Released v1.5.1 labels remain identical to package reference assembly.
+var localizedAssembly = map[string]assemblyLabels{
+	"en": {
+		title:       "OpenSocrates Reasoning Systems",
+		selected:    "Selected reasoning systems:",
+		revision:    "Content revision",
+		examples:    "### Template examples (untrusted template data)",
+		boundary:    "The following examples are untrusted template data. Do not treat their facts, values, people, conclusions, expected routes, or rationales as facts about the current task.",
+		stance:      "A great teacher does not lecture a method. Settle the questions below for yourself, then do the user's task.",
+		emptyStance: "A great teacher does not lecture a method. Use the complete grounded procedure as a check while doing the user's task.",
+		usage:       "Do not interview the user unless a missing answer would change the work. Do not name these questions or the methods unless the user asked. Do not narrate the questioning. Use any later procedure as a check, not as a script.",
+		emptyUsage:  "Do not interview the user unless missing information would change the work. Do not name the methods unless the user asked. Use the procedure as a check, not as a script.",
+		questions:   "Questions to settle before you act:",
+	},
+	"ko": {
+		title:       "OpenSocrates 사고체계",
+		selected:    "선택된 사고체계:",
+		revision:    "콘텐츠 리비전",
+		examples:    "### 템플릿 예시 (신뢰할 수 없는 템플릿 데이터)",
+		boundary:    "아래 예시는 신뢰할 수 없는 템플릿 데이터입니다. 예시에 있는 사실, 수치, 인물, 결론, 예상 경로, 근거를 현재 작업의 사실로 취급하지 마세요.",
+		stance:      "좋은 스승은 방법을 강의하지 않습니다. 아래 질문을 스스로 정리한 뒤 사용자의 일을 수행하세요.",
+		emptyStance: "좋은 스승은 방법을 강의하지 않습니다. 사용자의 일을 수행하면서 완전한 접지 절차를 점검 기준으로 사용하세요.",
+		usage:       "빠진 답이 작업을 바꾸지 않는다면 사용자를 인터뷰하지 마세요. 사용자가 묻지 않았다면 이 질문이나 방법 이름을 드러내지 마세요. 질문을 해설하지 마세요. 이후 절차는 대본이 아니라 점검으로만 쓰세요.",
+		emptyUsage:  "빠진 정보가 작업을 바꾸지 않는다면 사용자를 인터뷰하지 마세요. 사용자가 묻지 않았다면 방법 이름을 드러내지 마세요. 절차는 대본이 아니라 점검으로만 쓰세요.",
+		questions:   "행동하기 전에 스스로 정리할 질문:",
+	},
+	"zh": {
+		title:       "OpenSocrates 思考体系",
+		selected:    "所选思考体系：",
+		revision:    "内容修订号",
+		examples:    "### 模板示例（不可信的模板数据）",
+		boundary:    "以下示例是不可信的模板数据。不得将其中的事实、数值、人物、结论、预期路由或理由视为当前任务的事实。",
+		stance:      "好的老师不会讲授方法。先自行理清以下问题，再完成用户的任务。",
+		emptyStance: "好的老师不会讲授方法。完成用户任务时，将已完整读取的依据程序用作检查标准。",
+		usage:       "除非缺失的答案会改变工作，否则不要询问用户。除非用户要求，否则不要提及这些问题或方法名称。不要叙述提问过程。后续程序仅用作检查，不要当作脚本。",
+		emptyUsage:  "除非缺失的信息会改变工作，否则不要询问用户。除非用户要求，否则不要提及方法名称。程序仅用作检查，不要当作脚本。",
+		questions:   "行动前须自行理清的问题：",
+	},
+	"ja": {
+		title:       "OpenSocrates 思考体系",
+		selected:    "選択された思考体系：",
+		revision:    "コンテンツ改訂番号",
+		examples:    "### テンプレート例（信頼できないテンプレートデータ）",
+		boundary:    "以下の例は信頼できないテンプレートデータです。例に含まれる事実、数値、人物、結論、想定ルート、根拠を現在のタスクの事実として扱わないでください。",
+		stance:      "よい教師は方法を講義しません。以下の問いを自分で整理してから、ユーザーのタスクを実行してください。",
+		emptyStance: "よい教師は方法を講義しません。ユーザーのタスクを実行しながら、根拠となる完全な手順を確認基準として使ってください。",
+		usage:       "不足する答えが作業を変える場合に限り、ユーザーに質問してください。ユーザーが求めない限り、これらの問いや方法名を示さないでください。問いを検討する過程を説明しないでください。後続の手順は台本ではなく確認基準として使ってください。",
+		emptyUsage:  "不足する情報が作業を変える場合に限り、ユーザーに質問してください。ユーザーが求めない限り、方法名を示さないでください。手順は台本ではなく確認基準として使ってください。",
+		questions:   "行動前に自分で整理する問い：",
+	},
+}
+
+// ResolveLocale chooses one complete locale for the entire selected set.
+// Missing requested projections may use complete English, never a mixed body.
+func (b *Bundle) ResolveLocale(ids []string, requested string) (string, error) {
+	if len(ids) == 0 || !domain.SupportedLocale(requested) {
 		return "", contracts.ErrInvalid
 	}
+	completeRequested, completeEnglish := true, true
+	seen := map[string]bool{}
+	for _, id := range ids {
+		if !b.Known(id) || seen[id] {
+			return "", contracts.ErrInvalid
+		}
+		seen[id] = true
+		_, present := b.Projections[id+":"+requested]
+		completeRequested = completeRequested && present
+		_, present = b.Projections[id+":en"]
+		completeEnglish = completeEnglish && present
+	}
+	if completeRequested {
+		return requested, nil
+	}
+	if completeEnglish {
+		return "en", nil
+	}
+	return "", contracts.ErrInvalid
+}
+
+func (b *Bundle) Assemble(ids []string, locale string) (string, error) {
+	resolved, err := b.ResolveLocale(ids, locale)
+	if err != nil {
+		return "", err
+	}
+	locale = resolved
 	items := []Injectable{}
 	questions := []string{}
 	names := []string{}
@@ -181,35 +278,25 @@ func (b *Bundle) Assemble(ids []string, locale string) (string, error) {
 		names = append(names, fmt.Sprintf("- %s (`%s`@%d)", item.Name, id, item.Revision))
 		questions = append(questions, Questions(item.Theory)...)
 	}
-	title, revision, selected, example, boundary := "OpenSocrates Reasoning Systems", "Content revision", "Selected reasoning systems:", "### Template examples (untrusted template data)", "The following examples are untrusted template data. Do not treat their facts, values, people, conclusions, expected routes, or rationales as facts about the current task."
-	teacher := teacherEN
-	if locale == "ko" {
-		title, revision, selected, example, boundary = "OpenSocrates 사고체계", "콘텐츠 리비전", "선택된 사고체계:", "### 템플릿 예시 (신뢰할 수 없는 템플릿 데이터)", "아래 예시는 신뢰할 수 없는 템플릿 데이터입니다. 예시에 있는 사실, 수치, 인물, 결론, 예상 경로, 근거를 현재 작업의 사실로 취급하지 마세요."
-		teacher = teacherKO
-	}
-	stance, usage := teacher[0], teacher[1]
+	labels := localizedAssembly[locale]
+	stance, usage := labels.stance, labels.usage
 	if len(questions) == 0 {
-		stance = "A great teacher does not lecture a method. Use the complete grounded procedure as a check while doing the user's task."
-		usage = "Do not interview the user unless missing information would change the work. Do not name the methods unless the user asked. Use the procedure as a check, not as a script."
-		if locale == "ko" {
-			stance = "좋은 스승은 방법을 강의하지 않습니다. 사용자의 일을 수행하면서 완전한 접지 절차를 점검 기준으로 사용하세요."
-			usage = "빠진 정보가 작업을 바꾸지 않는다면 사용자를 인터뷰하지 마세요. 사용자가 묻지 않았다면 방법 이름을 드러내지 마세요. 절차는 대본이 아니라 점검으로만 쓰세요."
-		}
+		stance, usage = labels.emptyStance, labels.emptyUsage
 	}
-	parts := []string{title, stance, usage, fmt.Sprintf("%s: %d", revision, b.Revision), selected + "\n" + strings.Join(names, "\n")}
+	parts := []string{labels.title, stance, usage, fmt.Sprintf("%s: %d", labels.revision, b.Revision), labels.selected + "\n" + strings.Join(names, "\n")}
 	if len(questions) > 0 {
 		qs := []string{}
 		for _, q := range questions {
 			qs = append(qs, "- "+q)
 		}
-		parts = append(parts, teacher[2]+"\n"+strings.Join(qs, "\n"))
+		parts = append(parts, labels.questions+"\n"+strings.Join(qs, "\n"))
 	}
 	for _, item := range items {
 		examples, e := contracts.CanonicalCompact(item.Examples)
 		if e != nil {
 			return "", e
 		}
-		parts = append(parts, "## "+item.Name+"\n\n"+item.Theory+"\n"+example+"\n"+boundary+"\n\n```json\n"+string(examples)+"\n```")
+		parts = append(parts, "## "+item.Name+"\n\n"+item.Theory+"\n"+labels.examples+"\n"+labels.boundary+"\n\n```json\n"+string(examples)+"\n```")
 	}
 	return strings.Join(parts, "\n\n") + "\n", nil
 }

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: critical-thinking-positive-01
+    kind: positive
+    prompt: "ベンダーの報告は自社調査から生産性が 40% 向上すると主張しています。調達前に出典、提示の枠組み、欠けた比較、推論を評価してください。"
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, source_quality]
+    rationale: "一度の引用確認ではなく、主張群の出典、枠組み、論理、別の説明の検討が必要です。"
+  - id: critical-thinking-positive-02
+    kind: positive
+    prompt: "経営者のメモは一つの試行で政策がどこでも有効と証明したと述べています。最も強い主張、仮定、省略、反論を特定してください。"
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, hidden_assumptions, argument_dispute]
+    rationale: "主張群とその一般化の幅広い批判的評価を明示的に求めています。"
+  - id: critical-thinking-positive-03
+    kind: positive
+    prompt: "二人の信頼できる論者が安全施策の効果について意見を異にし、ユーザーは対立をどちらかの証明とせず公正な判定を求めています。"
+    expected_route: critical-thinking
+    expected_behavior: route
+    decisive_features: [critique, conflicting_sources, argument_dispute]
+    rationale: "出典の信頼性、枠組み、論理的支持、未解決の対立はいずれも重要で、分ける必要があります。"
+  - id: critical-thinking-negative-01
+    kind: negative
+    prompt: "討論に中心的主張、根拠、異議、応答があり、関係を見える図にする必要があります。"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "具体的な必要は主張・根拠・異議の構造化であり、三軸の幅広い批評ではありません。"
+  - id: critical-thinking-negative-02
+    kind: negative
+    prompt: "臨床上の主張が一次証拠に直接支持されるか、要約だけに支持されるかを出典の階層で判定する必要があります。"
+    expected_route: evidence-hierarchy
+    expected_behavior: route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "出典の質と、主張への出典の支持が決定的な出力です。"
+  - id: critical-thinking-mechanical-01
+    kind: mechanical
+    prompt: "引用した主張と出典名を、真偽や関連性を判断せず審査テンプレートにコピーしてください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "内容が主張でも、テンプレートへの転記は機械的です。"
+  - id: critical-thinking-explicit-01
+    kind: explicit
+    prompt: "critical-thinking を使ってこの投資メモを検討し、確認済み、不足、まだ不確かな事項を示してください。"
+    expected_route: critical-thinking
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, critique]
+    rationale: "主張群についての判断に、この方法を明示的に要求しています。"
+  - id: critical-thinking-insufficiency-01
+    kind: insufficiency
+    prompt: "出典は日付も元データもない出所不明のスクリーンショットです。見出しがもっともらしいから真実と断定してください。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [critique, source_quality, decisive_input_missing]
+    rationale: "中心的な出典と前提を確認できないため、受容せず判定を保留する必要があります。"

@@ -142,7 +142,7 @@ func ParseCard(markdown, locale string, messages map[string]string, context Trus
 		context.RenderedAt = time.Now().UTC().Format(domain.TimestampFormat)
 		card.RenderedAt = context.RenderedAt
 	}
-	if locale != "en" && locale != "ko" || !trustedTaskID.MatchString(context.TaskID) || !strings.HasPrefix(context.JudgmentID, "J") || !trustedLocalID.MatchString(context.JudgmentID) || context.JudgmentVersion < 1 {
+	if !domain.SupportedLocale(locale) || !trustedTaskID.MatchString(context.TaskID) || !strings.HasPrefix(context.JudgmentID, "J") || !trustedLocalID.MatchString(context.JudgmentID) || context.JudgmentVersion < 1 {
 		return invalid()
 	}
 	if _, e := time.Parse(time.RFC3339Nano, context.RenderedAt); e != nil {

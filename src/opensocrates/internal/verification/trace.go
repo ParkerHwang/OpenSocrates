@@ -232,7 +232,7 @@ func RenderTrace(v TraceView, messages map[string]string, privateRequested bool)
 	if e = RejectPublic(wire); e != nil {
 		return "", e
 	}
-	if v.Locale != "en" && v.Locale != "ko" {
+	if !domain.SupportedLocale(v.Locale) {
 		return "", contracts.ErrInvalid
 	}
 	for _, k := range TraceLocaleKeys {

@@ -106,6 +106,22 @@ func Run(args []string, in io.Reader, out, stderr io.Writer) int {
 			emit(out, result)
 			return 0
 		}
+	case "locale":
+		store := persistence.SettingsStore{Root: persistence.Root()}
+		var result any
+		if len(args) == 2 && args[1] == "get" {
+			result = application.LocaleGet(store)
+		}
+		if len(args) == 2 && args[1] == "reset" {
+			result = application.LocaleReset(store)
+		}
+		if len(args) == 3 && args[1] == "set" && (args[2] == "follow" || domain.SupportedLocale(args[2])) {
+			result = application.LocaleSet(store, args[2])
+		}
+		if result != nil {
+			emit(out, result)
+			return 0
+		}
 	case "metrics":
 		return runMetrics(args[1:], out, stderr)
 	case "capabilities":

@@ -84,7 +84,7 @@ func CardViolations(card domain.ConclusionCard, markdown *string) []Violation {
 			add("OSV-VOCAB-001", "vocabulary.internal_term", field)
 		}
 	}
-	if card.Locale != "en" && card.Locale != "ko" {
+	if !domain.SupportedLocale(card.Locale) {
 		add("OSV-LOCALE-001", "locale.unsupported", "locale")
 	}
 	if len(card.Grounds) < 1 || len(card.Grounds) > 5 {

@@ -14,6 +14,18 @@ the observations below retain their initial source/date. / 이후 사용자 승�
 
 ## Observed configuration / 확인한 설정
 
+After the v1.5.1 maintenance release, a fresh readback of active ruleset
+`20467374` requires the six legacy checks: Python quality, Product contracts,
+GitHub and npx installer, Native package (darwin-arm64), Native Windows x64 /
+windows, and Repository governance. The earlier approved five-Go-check change
+below is historical. The independent v1.5.2 maintenance work still uses that
+legacy pipeline; this reconciliation does not change shared protection policy.
+The final Go transition must align required checks with its verified workflow
+while preserving every other guard. / v1.5.1 출시 후 실제 필수 검사는 Python 기준
+6개로 돌아온 것을 확인했습니다. 아래 Go 검사 변경은 당시 기록입니다. 진행 중인
+v1.5.2의 보호 절차를 방해하지 않도록 공용 정책은 바꾸지 않았으며, 최종 Go 전환
+시 검증한 검사 목록과 다른 보호 조건을 함께 유지해야 합니다.
+
 At source c9da20d, GitHub lists zero release environments, zero self-hosted
 runners, and no repository Actions variables/secrets. Immutable releases are
 enabled. The Pages API returned 404. No `v1.6.0` remote tag exists, and the
@@ -28,11 +40,13 @@ Main is protected by active repository ruleset `20467374`, despite the classic
 branch-protection API returning 404. Effective rules require a PR, current-main
 checks, resolved review threads, and prohibit deletion/force pushes with no
 bypass actors. Required check names referred to the previous Python/npm
-implementation at that observation; the approved Go replacement is now applied.
+implementation at that observation; the approved Go replacement was applied
+then, and maintenance releases subsequently restored their legacy check list.
 / main은 활성 ruleset으로 보호됩니다. 고전 branch-protection
 API의 404를 보호 없음으로 해석하지 않습니다. PR 경유·최신 main 기준 검사·리뷰
 대화 해결·삭제/강제 푸시 차단·우회 불가 조건을 유지합니다. 필수 검사 이름은
-최초 관찰 당시에는 이전 Python/npm 기준이었고 이후 승인한 Go 목록으로 교체했습니다.
+최초 관찰 당시 Python/npm 기준을 승인한 Go 목록으로 교체했으며, 이후 유지보수
+릴리스에서 기존 검사 목록이 복원됐습니다.
 
 ## Required-check proposal / 필수 검사 수정안
 

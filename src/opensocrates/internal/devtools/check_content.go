@@ -60,6 +60,17 @@ func checkContent(root string) ([]string, error) {
 	if bundle["normalized_semantic_hash"] != semantic {
 		codes = append(codes, "semantic_hash_mismatch")
 	}
+	catalog, e := ReadObject(filepath.Join(root, "content/catalog.yaml"))
+	if e != nil {
+		return codes, e
+	}
+	teachers, e := ReadObject(filepath.Join(root, "content/teacher-questions.yaml"))
+	if e != nil {
+		return codes, e
+	}
+	if e = validateReleasedLocaleSources(root, catalog, teachers); e != nil {
+		return codes, e
+	}
 	methods, ok := bundle["methods"].([]any)
 	if !ok || len(methods) != 48 {
 		codes = append(codes, "method_count_invalid")
@@ -85,7 +96,7 @@ func checkContent(root string) ([]string, error) {
 				codes = append(codes, "locale_surface_missing:"+id+":"+key)
 				continue
 			}
-			for _, lang := range []string{"en", "ko"} {
+			for _, lang := range releasedLocales {
 				s, ok := locales[lang].(string)
 				if !ok || strings.TrimSpace(s) == "" {
 					codes = append(codes, "locale_content_missing:"+id+":"+key+":"+lang)
@@ -100,6 +111,49 @@ func checkContent(root string) ([]string, error) {
 		s, ok := id.(string)
 		if !ok || !seen[s] {
 			codes = append(codes, "method_ids_mismatch")
+		}
+	}
+	projections, e := ReadObject(filepath.Join(root, "content/compiled-reasoning-content.bundle.json"))
+	if e != nil {
+		return codes, e
+	}
+	projectionSeen := map[string]bool{}
+	for _, raw := range arr(projections["injectable_content"]) {
+		entry := obj(raw)
+		id, locale := str(entry["method_id"]), str(entry["locale"])
+		key := id + ":" + locale
+		if !seen[id] || !releasedLocale(locale) || projectionSeen[key] || !schemaEqual(entry["content_revision"], bundle["content_revision"]) {
+			codes = append(codes, "locale_projection_identity_invalid")
+		}
+		projectionSeen[key] = true
+	}
+	if len(arr(projections["injectable_content"])) != 48*len(releasedLocales) {
+		codes = append(codes, "locale_projection_count_invalid")
+	}
+	for id := range seen {
+		for _, locale := range releasedLocales {
+			if !projectionSeen[id+":"+locale] {
+				codes = append(codes, "locale_projection_missing:"+id+":"+locale)
+			}
+		}
+	}
+	for _, key := range []string{"locale_messages", "prompt_fragments"} {
+		fields := obj(bundle[key])
+		if key == "locale_messages" {
+			if len(fields) != 4 {
+				codes = append(codes, "locale_message_coverage_invalid")
+			}
+			for _, locale := range releasedLocales {
+				if !schemaEqual(orderedKeys(obj(fields["en"])), orderedKeys(obj(fields[locale]))) {
+					codes = append(codes, "locale_message_keys_mismatch:"+locale)
+				}
+			}
+		} else {
+			for _, raw := range fields {
+				if !exactReleasedLocales(raw) {
+					codes = append(codes, "prompt_locale_coverage_invalid")
+				}
+			}
 		}
 	}
 	// Verify the released baseline receipt when present. It is a frozen inventory,

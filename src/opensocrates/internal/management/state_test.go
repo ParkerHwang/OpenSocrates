@@ -78,3 +78,54 @@ func TestRetireLegacyUpdateOwnerPreservesOpaqueNumbers(t *testing.T) {
 		t.Fatal("owner not retired or future precision lost")
 	}
 }
+
+func TestReleased151LegacyStatePreservesLocaleAndUnrelatedMetadata(t *testing.T) {
+	for _, locale := range []string{"zh", "ja"} {
+		t.Run(locale, func(t *testing.T) {
+			dir := t.TempDir()
+			raw := []byte(`{"schema":"opensocrates.desired-state/1.0.0","channel":"stable","installedHosts":["codex"],"activeVersion":"1.5.1","contentRevision":4,"updatePolicy":{"intervalHours":24,"allowMajor":false},"autoUpdate":{"enabled":false,"hosts":[],"nextCheckAt":null},"future":{"locale_preference":"` + locale + `","large":9007199254740993,"unicode":"中文 日本語 한글😀","npm":{"unrelated":"keep"},"integrations":{"claude":false}}}`)
+			if e := platform.AtomicWrite(filepath.Join(dir, "desired-state.json"), raw, 0600); e != nil {
+				t.Fatal(e)
+			}
+			state, preserved, e := ReadLegacy(dir)
+			if e != nil || state.ActiveVersion == nil || *state.ActiveVersion != "1.5.1" || !bytes.Equal(raw, preserved) {
+				t.Fatalf("released v1.5.1 state changed: %v", e)
+			}
+			retired, e := RetireLegacyUpdater(preserved)
+			if e != nil {
+				t.Fatal(e)
+			}
+			var before, after map[string]json.RawMessage
+			if json.Unmarshal(raw, &before) != nil || json.Unmarshal(retired, &after) != nil {
+				t.Fatal("invalid state")
+			}
+			for _, key := range []string{"activeVersion", "contentRevision", "future", "installedHosts", "updatePolicy"} {
+				if !bytes.Equal(before[key], after[key]) {
+					// Marshaling may change formatting, but must preserve every value
+					// and arbitrary-precision number in opaque legacy fields.
+					var a, z any
+					d1 := json.NewDecoder(bytes.NewReader(before[key]))
+					d2 := json.NewDecoder(bytes.NewReader(after[key]))
+					d1.UseNumber()
+					d2.UseNumber()
+					if d1.Decode(&a) != nil || d2.Decode(&z) != nil || !reflect.DeepEqual(a, z) {
+						t.Fatalf("unrelated v1.5.1 field changed: %s", key)
+					}
+				}
+			}
+			persisted, e := StateBytes(State{Schema: StateSchema, Installations: map[string]Installation{}, UpdateOwner: "native", LegacyDesiredState: retired})
+			if e != nil {
+				t.Fatal(e)
+			}
+			var native map[string]json.RawMessage
+			var opaque map[string]json.RawMessage
+			if json.Unmarshal(persisted, &native) != nil || json.Unmarshal(native["legacy_desired_state"], &opaque) != nil {
+				t.Fatal("native migration state invalid")
+			}
+			var future map[string]json.RawMessage
+			if json.Unmarshal(opaque["future"], &future) != nil || string(future["locale_preference"]) != `"`+locale+`"` || string(future["large"]) != "9007199254740993" {
+				t.Fatal("locale/opaque precision lost in native migration state")
+			}
+		})
+	}
+}

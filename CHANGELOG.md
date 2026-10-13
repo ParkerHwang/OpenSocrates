@@ -4,8 +4,9 @@
 
 - Migrate active first-party runtime, CLI, lifecycle, updater, generation,
   validation, governance and release tooling to Go; native users require no
-  Python, Node.js, npm or Go toolchain. Preserve the v1.5.0 revision-3 content
-  baseline and all 48 methods, EN/KO semantics, teacher questions and guides.
+  Python, Node.js, npm or Go toolchain. Preserve the released v1.5.1 revision-4 content
+  baseline: 48 methods, 192 complete procedures and 576 teacher questions across
+  English, Korean, Simplified Chinese and Japanese, retaining original EN/KO bodies.
   Separate method-body upgrades are excluded and belong to v1.6.1 or later.
 - Refactor typed services/contracts, distribution profiles versus runtime
   adapters, package transport, shared transaction/recovery, host registration
@@ -15,7 +16,7 @@
   durable recovery and versioned bundles separated from user state. Preserve
   owned settings, registrations, hook trust and disabled integrations; maintain
   one update owner and do not broadly uninstall npm packages/user data.
-- Add opt-in stable Codex scheduled updates for macOS ARM64 and Windows x64,
+- Add opt-in stable Codex scheduled updates for macOS ARM64 and Windows x64/ARM64,
   signed metadata verification, expiry/rollback/compatibility guards and Go
   helper support for executable self-replacement. Major/breaking-schema updates
   are not automatic; reload/fresh-session and account-upload boundaries remain.
@@ -30,16 +31,41 @@
   platform signatures and published asset verification remain release gates.
   No merge, tag, publication or active-installation replacement is implied.
 - 활성 실행·설치·갱신·생성·검증·릴리스 도구를 Go로 전환합니다. 사용자는
-  Python·Node.js·npm·Go를 설치하지 않습니다. v1.5.0 콘텐츠 리비전 3과 48개
-  방법·영어/한국어 의미를 유지하고 본문 개선은 후속 릴리스로 분리합니다.
+  Python·Node.js·npm·Go를 설치하지 않습니다. 출시된 v1.5.1 콘텐츠 리비전 4와 방법
+  48개·네 언어의 전체 절차 192개·교사 질문 576개, 원래 영어/한국어 본문을
+  유지하고 본문 개선은 후속 릴리스로 분리합니다.
 - 공통 작업·복구와 명확한 서비스·프로필·OS 보호를 정리하고 네이티브 배포·
-  일회성 npm 인수·Codex 두 플랫폼의 선택적 서명 안정 갱신을 추가합니다.
+  일회성 npm 인수·Mac ARM64·Windows x64/ARM64의 선택적 Codex 서명 안정 갱신을 추가합니다.
   기존 설정·신뢰·비활성 상태와 단일 업데이트 소유자를 보존합니다.
 - 중복 JSON 키·짝 없는 surrogate와 잘못된 판단 요청을 문맥·scope 변경 전에
   거부하고 안전하지 않거나 새 설정은 덮어쓰지 않습니다. purge는 모든 제거
   대상을 먼저 확인하며 신뢰 초기화는 정확한 항목 7개만 다룹니다. --host all은 Codex만
   선택하며 계정 업로드·진행 중 대화 적용·새 플랫폼을 자동 지원하지 않습니다.
   운영 서명·네이티브·새 기기·실제 호스트 증거가 필요한 미출시 후보입니다.
+
+## [1.5.1] - 2026-10-13
+
+- Add Simplified Chinese (`zh`) and Japanese (`ja`) alongside English and Korean
+  across the 48 authored reasoning methods, canonical examples, teacher-question
+  overlay, locale messages and four host instruction packages. Ship 192 complete
+  procedure files and 576 teacher questions; content revision 4 preserves the
+  original English/Korean authored method text.
+- Resolve reasoning locale through explicit preference, stored preference and
+  current-input script detection. Kana identifies Japanese; Han-only text
+  defaults to Chinese and needs an explicit Japanese preference when ambiguous.
+  Empty, Latin-only and tied inputs fall back to English.
+- Add Chinese/Japanese READMEs and version-pinned installation commands. Preserve
+  v1.5.0 host/platform boundaries, conditional attribution, privacy, fail-open
+  behavior and lifecycle ownership. Windows ARM64 remains separate v1.6.0 work.
+- 사고 방법 48개, 정본 사례·교사 질문·언어 메시지·네 호스트 지시문에 간체
+  중국어(`zh`)와 일본어(`ja`)를 추가합니다. 전체 절차 192개와 교사 질문
+  576개를 제공하며 콘텐츠 리비전 4에서 기존 영어·한국어 방법 본문을 유지합니다.
+- 명시적 선호 → 저장된 선호 → 현재 입력의 문자 순으로 언어를 선택합니다.
+  가나가 있으면 일본어, 한자만 있으면 기본 중국어이며 일본어를 명시할 수
+  있습니다. 빈 입력·라틴 문자만 있는 입력·동률은 영어로 돌아갑니다.
+- 중국어·일본어 README와 버전 고정 설치 안내를 추가합니다. v1.5.0의 호스트·
+  플랫폼·조건부 사용 표기·개인정보·fail-open·설치 소유권 경계를 유지합니다.
+  Windows ARM64는 별도 v1.6.0 범위입니다.
 
 ## [1.5.0] - 2026-10-10
 

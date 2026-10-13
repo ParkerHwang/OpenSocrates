@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: defeasible-reasoning-positive-01
+    kind: positive
+    prompt: "通常这项政策适用，但哪些例外或新事实会导致撤回当前建议？"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "判断使用默认规则，需要明确击败理由与撤回条件。"
+  - id: defeasible-reasoning-positive-02
+    kind: positive
+    prompt: "将直接反驳结论的证据，与削弱支持结论的规则的证据分开。"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "用户要求在可修正判断中区分反驳型与削弱依据型击败理由。"
+  - id: defeasible-reasoning-positive-03
+    kind: positive
+    prompt: "一般规则和更具体例外同时适用；当前暂定状态是什么？"
+    expected_route: defeasible-reasoning
+    expected_behavior: route
+    decisive_features: [exception_prone_rule, explicit_rules]
+    rationale: "须处理特定性与未解决例外，不假装结果无条件成立。"
+  - id: defeasible-reasoning-negative-01
+    kind: negative
+    prompt: "将严格的保留规则应用于每条记录，并报告确定性结果。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "无例外规则属于演绎或机械应用任务。"
+  - id: defeasible-reasoning-negative-02
+    kind: negative
+    prompt: "按设计质量为这些来源排序，并将主张强度调整到最强适用来源所支持的程度。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "任务是证据层级，不是默认规则的击败管理。"
+  - id: defeasible-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "将默认规则和例外列表复制到政策模板。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "复制提供的政策文本是机械任务。"
+  - id: defeasible-reasoning-explicit-01
+    kind: explicit
+    prompt: "明确使用 defeasible-reasoning 评估这项通常有效的批准规则及其例外。"
+    expected_route: defeasible-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, exception_prone_rule]
+    rationale: "用户明确请求默认规则、击败理由和撤回条件分析。"
+  - id: defeasible-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "应用默认规则，但不提供规则来源、触发事实、范围或可能例外。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [exception_prone_rule, decisive_input_missing]
+    rationale: "没有默认规则和触发事实，暂定结论会是任意的。"

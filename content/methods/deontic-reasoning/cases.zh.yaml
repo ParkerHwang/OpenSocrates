@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: deontic-reasoning-positive-01
+    kind: positive
+    prompt: "数据共享提案可能有用，但同意条款和隐私政策决定团队必须、可以或不得做什么。"
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "决策受义务、许可、禁止、同意及可识别的政策来源约束。"
+  - id: deontic-reasoning-positive-02
+    kind: positive
+    prompt: "临床人员询问，指定专业守则下两项义务是否冲突，以及允许哪些临时行动。"
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "所需输出是有来源的规范状态和冲突处理，而非仅优化结果。"
+  - id: deontic-reasoning-positive-03
+    kind: positive
+    prompt: "工作场所政策似乎要求报告、允许经同意的例外，并禁止分享敏感细节；澄清获准选项。"
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "行动集合包括来自政策的必需、获准、禁止和例外状态。"
+  - id: deontic-reasoning-negative-01
+    kind: negative
+    prompt: "应根据可观察后果和可逆试点比较两种服务策略，没有规则约束选择。"
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "问题是没有规范权威瓶颈的实际方案比较。"
+  - id: deontic-reasoning-negative-02
+    kind: negative
+    prompt: "一个原则与几项困难案例冲突，团队希望在有裁量空间时修订它们，以获得更大的一致性。"
+    expected_route: reflective-equilibrium
+    expected_behavior: route
+    decisive_features: [value_conflict, argument_dispute]
+    rationale: "原则和判断的相互调整是更具体的路由。"
+  - id: deontic-reasoning-mechanical-01
+    kind: mechanical
+    prompt: "将政策条款复制为检查表，不解释任何行动是否必需或获准。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "复制政策文本是机械任务，不要求规范解释。"
+  - id: deontic-reasoning-explicit-01
+    kind: explicit
+    prompt: "使用 deontic-reasoning，区分本合同允许、要求、禁止及留下未解决的事项。"
+    expected_route: deontic-reasoning
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, duties_rights, explicit_rules]
+    rationale: "用户明确要求有来源的规范分类。"
+  - id: deontic-reasoning-insufficiency-01
+    kind: insufficiency
+    prompt: "未提供适用政策、角色、管辖区或同意条件；宣布该行动是法律要求。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [duties_rights, decisive_input_missing]
+    rationale: "权限与范围缺失，不能编造有约束力的义务。"

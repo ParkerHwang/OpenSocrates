@@ -16,6 +16,9 @@ import (
 type HookServices struct {
 	Application             Application
 	TranscriptAccessEnabled bool
+	// SettingsRoot is read only on the explicitly enabled legacy selector path.
+	SettingsRoot          string
+	TrustedExplicitLocale *string
 }
 
 // CleanupExistingArtifacts is safe on the default decision path: no content,
@@ -50,7 +53,7 @@ func NewHookServices(root string) (*HookServices, error) {
 		return nil, err
 	}
 	record := func(label string) { _, _ = persistence.IncrementOutcomes(root, map[string]int64{label: 1}) }
-	return &HookServices{Application: Application{Selector: &Selector{Binary: os.Getenv("OPENSOCRATES_CODEX_BINARY")}, Bundle: b, Artifacts: artifacts, OnOutcome: record}, TranscriptAccessEnabled: os.Getenv("OPENSOCRATES_SELECTOR_TRANSCRIPT_ACCESS") != "off"}, nil
+	return &HookServices{Application: Application{Selector: &Selector{Binary: os.Getenv("OPENSOCRATES_CODEX_BINARY")}, Bundle: b, Artifacts: artifacts, OnOutcome: record}, TranscriptAccessEnabled: os.Getenv("OPENSOCRATES_SELECTOR_TRANSCRIPT_ACCESS") != "off", SettingsRoot: root}, nil
 }
 func (h *HookServices) CleanupExisting(session string) error {
 	if h.Application.Artifacts != nil {
@@ -173,7 +176,12 @@ func (h *HookServices) HandleLegacy(raw []byte, event string) (map[string]any, e
 		}
 		store.SweepExpired()
 		store.DeleteSupersededTurns(session, turn)
-		decision := application.Select(context.Background(), Request{Prompt: prompt, Catalog: application.Bundle.SelectionCatalog, Context: handles, Deadline: 30 * time.Second, ReasoningEffort: "medium"}, session, turn)
+		var preference *string
+		if h.SettingsRoot != "" {
+			settings := (persistence.SettingsStore{Root: h.SettingsRoot}).Load()
+			preference = settings.LocalePreference()
+		}
+		decision := application.Select(context.Background(), Request{TrustedExplicitLocale: h.TrustedExplicitLocale, StoredPreference: preference, Prompt: prompt, Catalog: application.Bundle.SelectionCatalog, Context: handles, Deadline: 30 * time.Second, ReasoningEffort: "medium"}, session, turn)
 		if decision == nil {
 			store.DeleteTurn(session, turn)
 			return nil, nil

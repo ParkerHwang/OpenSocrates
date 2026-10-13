@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "triz-positive-01",
+      "kind": "positive",
+      "prompt": "配送无人机需要更大电池容量，但新增重量降低航程；寻找能分离或消除这一矛盾的概念。",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "一项技术改善使另一参数恶化，适合运用理想结果、分离及发明性变换。"
+    },
+    {
+      "id": "triz-positive-02",
+      "kind": "positive",
+      "prompt": "病房同时需要更强隐私保护和更易观察；探索时间、空间、条件及接口的分离。",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "问题描述了可分离条件和安全约束下的物理或技术矛盾。"
+    },
+    {
+      "id": "triz-positive-03",
+      "kind": "positive",
+      "prompt": "包装线必须加快而不增加损坏；从已有时间、空间、信息和材料资源中寻找不靠妥协的设计。",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "用户要消除设计权衡的发明性概念，而非优化单一参数。"
+    },
+    {
+      "id": "triz-negative-01",
+      "kind": "negative",
+      "prompt": "决定涉及两种公共价值，问题是谁的权利或义务优先，而非技术设计矛盾。",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "duties_rights"
+      ],
+      "rationale": "规范性权威与权利决定路径，不是发明性变换。"
+    },
+    {
+      "id": "triz-negative-02",
+      "kind": "negative",
+      "prompt": "系统有相互作用的反馈回路和延迟副作用；选择局部概念前，先描绘更广结构及杠杆点。",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "主要需求是系统动态与杠杆，而非局部矛盾解决。"
+    },
+    {
+      "id": "triz-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "按所要求顺序列出现有产品参数，不识别矛盾或提出概念。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "列举是机械任务，不要求发明性问题解决。"
+    },
+    {
+      "id": "triz-explicit-01",
+      "kind": "explicit",
+      "prompt": "使用 triz 处理轻量包装与更强抗冲击保护的矛盾，再提出可逆测试。",
+      "expected_route": "triz",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "technical_contradiction"
+      ],
+      "rationale": "用户明确对技术矛盾及测试调用该方法。"
+    },
+    {
+      "id": "triz-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "改善与恶化的属性未知；宣称理想设计已达成，并声称性能增益有保证。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "technical_contradiction",
+        "decisive_input_missing"
+      ],
+      "rationale": "未定义矛盾或测试，就无法诚实确定理想性及改善。"
+    }
+  ]
+}

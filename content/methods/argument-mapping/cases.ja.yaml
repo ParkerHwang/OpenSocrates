@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: argument-mapping-positive-01
+    kind: positive
+    prompt: "この政策の論証にある主張、根拠、反論、再反論を図にして、支持されていないつながりを見えるようにしてください。"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique, tangled_hierarchy]
+    rationale: "主張・根拠・反論の構造と、支持のないつながりの特定が明示的に必要です。"
+  - id: argument-mapping-positive-02
+    kind: positive
+    prompt: "どの前提が実際に推奨を支え、どの反論がまだ答えられていませんか。"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, critique]
+    rationale: "推奨を判断する前に、複数の支持と攻撃の関係を整理する必要があります。"
+  - id: argument-mapping-positive-03
+    kind: positive
+    prompt: "契約上の立場を論証図にし、共通の仮定と最も強い再反論を含めてください。"
+    expected_route: argument-mapping
+    expected_behavior: route
+    decisive_features: [argument_dispute, tangled_hierarchy]
+    rationale: "求められる公開結果は、主張、共通の前提、反論の構造化された図です。"
+  - id: argument-mapping-negative-01
+    kind: negative
+    prompt: "二つの研究の証拠の質を比較し、どちらが私たちの集団に適用できるかを示してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "中心的な障害は情報源の研究設計と適用可能性で、証拠の確認に属します。"
+  - id: argument-mapping-negative-02
+    kind: negative
+    prompt: "経営陣向けの推奨を先に書き、続いて三組の理由と支持する詳細を示してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explain, tangled_hierarchy]
+    rationale: "支持のつながりの検討ではなく、結論から伝える構造を求めています。"
+  - id: argument-mapping-mechanical-01
+    kind: mechanical
+    prompt: "提供された前提の一覧を Markdown の箇条書きに変換してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "提供された一覧の整形に論証分析は不要です。"
+  - id: argument-mapping-explicit-01
+    kind: explicit
+    prompt: "argument-mapping を明示的に使い、この投資メモへの最も強い反論を検討してください。"
+    expected_route: argument-mapping
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, argument_dispute]
+    rationale: "反論と支持構造の検討に使う手法をユーザーが明示しています。"
+  - id: argument-mapping-insufficiency-01
+    kind: insufficiency
+    prompt: "論証を図にして最も弱いつながりを判断してください。ただし結論、前提、情報源の本文は提供しません。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [argument_dispute, decisive_input_missing]
+    rationale: "図にする論証材料がないため、前提を作り上げず保留する必要があります。"

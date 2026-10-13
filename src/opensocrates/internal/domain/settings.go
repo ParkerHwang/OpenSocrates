@@ -173,3 +173,27 @@ func ApplyFeedback(current UserSettings, class, outcome, day string) (UserSettin
 	candidate.Value["revision"] = current.NextRevision()
 	return candidate, nil
 }
+
+// LocalePreference preserves null as follow instead of inventing a locale alias.
+func (s UserSettings) LocalePreference() *string {
+	locale, ok := s.Value["locale_preference"].(string)
+	if !ok {
+		return nil
+	}
+	return &locale
+}
+func SetLocale(current UserSettings, locale *string) (UserSettings, error) {
+	if locale != nil && !SupportedLocale(*locale) {
+		return current, contracts.ErrInvalid
+	}
+	candidate := current.Normalize()
+	candidate.Value["locale_preference"] = nil
+	if locale != nil {
+		candidate.Value["locale_preference"] = *locale
+	}
+	if reflect.DeepEqual(candidate.Value, current.Value) {
+		return current, nil
+	}
+	candidate.Value["revision"] = current.NextRevision()
+	return candidate, nil
+}

@@ -25,8 +25,8 @@ func TestContentPackagesAndPortableExport(t *testing.T) {
 			if _, e = VerifyPackage(output, relative); e != nil {
 				t.Fatal(e)
 			}
-			if len(arr(manifest["canonical_methods"])) != 96 {
-				t.Fatal("missing bilingual methods")
+			if len(arr(manifest["canonical_methods"])) != 48*len(releasedLocales) {
+				t.Fatal("missing four-locale methods")
 			}
 			archive := filepath.Join(t.TempDir(), "skill.zip")
 			if e = WritePortableZIP(output, archive); e != nil {
@@ -95,13 +95,13 @@ func TestNativeDecisionReferenceTransport(t *testing.T) {
 		if _, e := GeneratePlugin(root, "codex", target, "", output); e != nil {
 			t.Fatal(e)
 		}
-		for _, locale := range []string{"en", "ko"} {
+		for _, locale := range releasedLocales {
 			b, e := os.ReadFile(filepath.Join(output, "skills/opensocrates/references/decision/guide."+locale+".md"))
 			if e != nil {
 				t.Fatal(e)
 			}
 			text := string(b)
-			for _, unsupported := range []string{"python -m", "launch.sh", "launch.mjs", "decision codex", "decision claude", "decision <host>"} {
+			for _, unsupported := range []string{"python -m", "launch.sh", "launch.mjs", "decision codex", "decision claude", "decision <host>", "locale codex", "locale claude", "locale <host>"} {
 				if strings.Contains(text, unsupported) {
 					t.Errorf("generated reference requires old transport: %s", unsupported)
 				}

@@ -118,7 +118,7 @@ func BuildLocalMetric(event, host, locale string, rigor Rigor, a MetricAttribute
 	if scoped && !recordingEnabled {
 		return nil, nil
 	}
-	if !Has([]string{"codex_cli", "codex_desktop"}, host) || !Has([]string{"en", "ko"}, locale) {
+	if !Has([]string{"codex_cli", "codex_desktop"}, host) || !SupportedLocale(locale) {
 		return nil, contracts.ErrInvalid
 	}
 	if _, e := RigorOrdinal(rigor); e != nil {
@@ -134,7 +134,7 @@ func BuildLocalMetric(event, host, locale string, rigor Rigor, a MetricAttribute
 	return &LocalMetric{"opensocrates.local-metric/1.0.0", event, day, version, host, locale, rigor, bucket, a}, nil
 }
 func ValidateLocalMetric(m LocalMetric) error {
-	if m.Schema != "opensocrates.local-metric/1.0.0" || !Has([]string{"codex_cli", "codex_desktop"}, m.Host) || !Has([]string{"en", "ko"}, m.Locale) {
+	if m.Schema != "opensocrates.local-metric/1.0.0" || !Has([]string{"codex_cli", "codex_desktop"}, m.Host) || !SupportedLocale(m.Locale) {
 		return contracts.ErrInvalid
 	}
 	if _, e := RigorOrdinal(m.Rigor); e != nil {
@@ -163,7 +163,7 @@ func ValidateLocalMetricWire(value any) error {
 	if _, e := time.Parse("2006-01-02", day); e != nil {
 		return contracts.ErrInvalid
 	}
-	if !contracts.Is(m["locale"], "en", "ko") {
+	if !contracts.Is(m["locale"], "en", "ko", "zh", "ja") {
 		return contracts.ErrInvalid
 	}
 	attrs, ok := m["attributes"].(map[string]any)

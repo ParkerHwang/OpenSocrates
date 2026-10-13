@@ -1,0 +1,106 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "sensitivity-analysis-positive-1",
+      "kind": "positive",
+      "prompt": "商业论证根据需求、人工成本及能源假设比较两个仓库设计。基准公式和决策阈值已有记录，但输入有可辩护范围。测试范围，展示切换值，并判断选择是稳健还是脆弱。",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "multiple_objectives",
+        "choose"
+      ],
+      "rationale": "具备模型、比较、书面基线、输入范围和选择阈值。明确请求扰动输入以揭示决定转变，不是编造概率。"
+    },
+    {
+      "id": "sensitivity-analysis-positive-2",
+      "kind": "positive",
+      "prompt": "服务中心有人力配置模型，响应时间目标已公开。在有来源支持的范围内测试到达量、处理时间及人员假设的影响，尊重依赖关系，并优先安排可能改变人力决定的研究。",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "unknown_probability",
+        "choose",
+        "information_purchase"
+      ],
+      "rationale": "有模型、阈值、不确定输入，明确需要保留依赖及确定信息优先级。敏感性分析可报告计算或有序变化，不编造概率。"
+    },
+    {
+      "id": "sensitivity-analysis-positive-3",
+      "kind": "positive",
+      "prompt": "投资委员会按成本、影响及执行风险为三个项目评分。权重有记录但存在争议，建议可能转变。在有依据范围内改变权重和输入评分，记录切换值并说明脆弱假设。",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "sensitive_inputs",
+        "multiple_objectives",
+        "choose"
+      ],
+      "rationale": "这是带有不确定权重、可能转变建议的结构化比较。应先展示模型敏感性，避免取舍建议把权重当作已定。"
+    },
+    {
+      "id": "sensitivity-analysis-negative-1",
+      "kind": "negative",
+      "prompt": "没有模型或决策阈值。审查相互冲突的研究，判断哪个来源可信，并协调它们关于安全主张的证据。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "conflicting_sources",
+        "source_quality",
+        "decisive_input_missing"
+      ],
+      "rationale": "容易与证据层级或证据协调混淆。没有模型、规则或阈值，就没有可扰动的输入关系。"
+    },
+    {
+      "id": "sensitivity-analysis-negative-2",
+      "kind": "negative",
+      "prompt": "探索组织十年后四个不同的外部未来，描述各自的准备。没有可变的定量模型、选项分数或变量关系。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "decisive_input_missing"
+      ],
+      "rationale": "请求深度不确定性下的情景构建，明确缺少模型或关系。敏感性分析将制造无法测试的基线。"
+    },
+    {
+      "id": "sensitivity-analysis-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "每个已核实数量乘以指定单位换算因子，返回换算列表。不涉及模型、比较或决策阈值。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "这是确定性的单位换算。没有不确定输入范围或可分析其脆弱性的决策结果。"
+    },
+    {
+      "id": "sensitivity-analysis-explicit-1",
+      "kind": "explicit",
+      "prompt": "将 sensitivity-analysis 作为定价决定的主要方法。基准贡献模型、有争议的数量和利润率范围及最低可接受利润率均有记录；找出切换值，任何范围缺少来源时保留结论。",
+      "expected_route": "sensitivity-analysis",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "sensitive_inputs",
+        "choose"
+      ],
+      "rationale": "用户明确调用方法，并提供基线、不确定范围、阈值及来源不足时保留规则。输出须保持为计算结果或带状态标签，不作概率表述。"
+    },
+    {
+      "id": "sensitivity-analysis-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "告诉我建议是否敏感。我没有提供基准模型、输入、范围、决策阈值或形成建议的公式。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "基线、可扰动输入、范围和阈值都是决定性输入。方法须保留并请求这些有界输入，不生成泛泛的敏感性主张。"
+    }
+  ]
+}

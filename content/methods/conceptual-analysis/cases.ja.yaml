@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: conceptual-analysis-positive-01
+    kind: positive
+    prompt: "技術者と法令順守の担当者が「安全なリリース」を異なる意味で使う場合、チームではどう定義すべきですか。"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms, argument_dispute]
+    rationale: "リリース基準が行動を導く前に、競合する意味と境界事例を検討する必要があります。"
+  - id: conceptual-analysis-positive-02
+    kind: positive
+    prompt: "公平が同じ扱いなのか同じ機会なのかで従業員の意見が割れる場合、この方針は公平ですか。"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms, argument_dispute]
+    rationale: "決定は競合する操作的な意味と、事例に対するその影響に依存します。"
+  - id: conceptual-analysis-positive-03
+    kind: positive
+    prompt: "製品チームとサポートチームが境界事例を一貫して分類できるよう、「発売準備完了」を定義してください。"
+    expected_route: conceptual-analysis
+    expected_behavior: route
+    decisive_features: [ambiguous_terms]
+    rationale: "使える定義には必要条件、十分条件、境界事例での検討が必要です。"
+  - id: conceptual-analysis-negative-01
+    kind: negative
+    prompt: "公開された API 仕様を使い、このリクエストが文書化された必須フィールドを満たすか確認してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules]
+    rationale: "操作的定義はすでに権威あるものであり、課題は規則の直接適用です。"
+  - id: conceptual-analysis-negative-02
+    kind: negative
+    prompt: "三つの研究を設計の質で順位付けし、効果の主張を直接支持するものを説明してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "障害は証拠の質と適用可能性であり、争われる語の意味ではありません。"
+  - id: conceptual-analysis-mechanical-01
+    kind: mechanical
+    prompt: "このファイルにある「launch-ready」をすべて「ready for launch」に置換してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "文字どおりの置換は機械的な作業で、概念分析は不要です。"
+  - id: conceptual-analysis-explicit-01
+    kind: explicit
+    prompt: "conceptual-analysis を明示的に使い、この顧客報告で「信頼できる」が何を意味するか定義してください。"
+    expected_route: conceptual-analysis
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, ambiguous_terms]
+    rationale: "報告に影響する曖昧な語について、ユーザーが手法を明示しています。"
+  - id: conceptual-analysis-insufficiency-01
+    kind: insufficiency
+    prompt: "争われる概念が満たされるか判断してください。ただし文脈、事例、左右される決定は提供しません。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [ambiguous_terms, decisive_input_missing]
+    rationale: "文脈と事例がない場合、操作的な意味は恣意的になり、安全に決定を導けません。"

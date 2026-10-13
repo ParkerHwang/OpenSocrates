@@ -155,7 +155,7 @@ func TestPackageIntegrityAndClosedInventory(t *testing.T) {
 		t.Fatal(e)
 	}
 	for _, method := range fixed.Methods {
-		for _, locale := range []string{"en", "ko"} {
+		for _, locale := range releasedLocales {
 			id := method.ID
 			name := "references/" + locale + "/" + id + ".md"
 			expected, e := fixed.Assemble([]string{id}, locale)
@@ -178,7 +178,7 @@ func TestPackageIntegrityAndClosedInventory(t *testing.T) {
 		}
 		inventory = append(inventory, map[string]any{"path": name, "sha256": digest(b), "size": len(b)})
 	}
-	m := map[string]any{"host": "codex", "product_version": "1.6.0", "release_targets": []string{"darwin-arm64"}, "shell_requirement": "posix", "files": inventory, "canonical_methods": canonical, "source_tree_hash": "sha256:b8824656fc53d588cc6a570de102531266ef2a7b39f04694d058c8da5c2418a6", "normalized_semantic_hash": "sha256:e50af8296165a7c8e8a9a6e27d4881bbc816b7efe9e1c84ea798c80fb54efa48"}
+	m := map[string]any{"host": "codex", "product_version": "1.6.0", "release_targets": []string{"darwin-arm64"}, "shell_requirement": "posix", "files": inventory, "canonical_methods": canonical, "source_tree_hash": "sha256:993c30191b0d2b67af88a25c2631d9e8fddeeaf9dadfd0ff4fb07dd62539dcab", "normalized_semantic_hash": "sha256:835a1e32695e863b3696c3bf5dcf1acb7faa580d889129e617524fbc0d9908e6"}
 	raw, _ := json.Marshal(m)
 	if e := os.WriteFile(filepath.Join(root, "release-manifest.json"), raw, 0600); e != nil {
 		t.Fatal(e)

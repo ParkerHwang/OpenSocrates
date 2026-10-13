@@ -1,0 +1,100 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "steelman-reasoning-positive-01",
+      "kind": "positive",
+      "prompt": "理事会がプライバシーの異議を恐怖の扇動と退けています。最も強い公正な形に再構成し、サービス開始の決定を変えるか示してください。",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "退けられた懸念には重要なリスクがありえ、最も強い公正な形で扱う価値があります。"
+    },
+    {
+      "id": "steelman-reasoning-positive-02",
+      "kind": "positive",
+      "prompt": "二つのチームが遠隔勤務で対立し、双方に一貫した目的と証拠があります。応答前に相手側の最も強い形を示してください。",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "実際の反対立場について、好意的な再構成、支持の要件、公正な応答が必要です。"
+    },
+    {
+      "id": "steelman-reasoning-positive-03",
+      "kind": "positive",
+      "prompt": "政策の批判者が敵対的なレッテルだけで引用されています。実際の主張、最良の前提、提案を変えるべき部分を取り戻してください。",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "dismissed_opposition",
+        "critique"
+      ],
+      "rationale": "公開主張を弱い描写から明示的に分離し、その結果を検討する作業です。"
+    },
+    {
+      "id": "steelman-reasoning-negative-01",
+      "kind": "negative",
+      "prompt": "原則が検討済みの難しい事例と衝突し、集団は整合性を高めるため原則か判断を修正する必要があります。",
+      "expected_route": "reflective-equilibrium",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "argument_dispute"
+      ],
+      "rationale": "主な出力は原則と事例の相互修正であり、反対者の再構成ではありません。"
+    },
+    {
+      "id": "steelman-reasoning-negative-02",
+      "kind": "negative",
+      "prompt": "報告に主張、根拠、異議、応答があり、相手を評価する前に中立的な図が必要です。",
+      "expected_route": "argument-mapping",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "argument_dispute",
+        "critique"
+      ],
+      "rationale": "スティールマンを選ぶ前に、主張の構造図を確立すべきです。"
+    },
+    {
+      "id": "steelman-reasoning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "引用した反対意見を韓国語に翻訳し、立場を評価・強化せずに語調を保ってください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "翻訳は機械的で、論の再構成を引き起こすべきではありません。"
+    },
+    {
+      "id": "steelman-reasoning-explicit-01",
+      "kind": "explicit",
+      "prompt": "steelman-reasoning で合併への最強の反対論を検討し、何の証拠で方針を変えるべきか示してください。",
+      "expected_route": "steelman-reasoning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "dismissed_opposition",
+        "argument_dispute"
+      ],
+      "rationale": "重大な決定の公正な反対論をユーザーが明示的に求めています。"
+    },
+    {
+      "id": "steelman-reasoning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "反対声明はありません。巧妙な反対者を作り、打ち負かせるようその共同体の主張としてください。",
+      "expected_route": null,
+      "expected_behavior": "refuse",
+      "decisive_features": [
+        "dismissed_opposition",
+        "decisive_input_missing"
+      ],
+      "rationale": "本当の公開立場がなく、創作は公正な再構成ではなく人々の立場の歪曲になります。"
+    }
+  ]
+}

@@ -97,12 +97,12 @@ func TestStoredAdmissionPreservesLegacyGrammar(t *testing.T) {
 func validCard(locale string) domain.ConclusionCard {
 	return domain.ConclusionCard{Schema: "opensocrates.conclusion-card/1.0.0", Locale: locale, TaskID: "01JA12E00FCB7B218EB17A1C56", JudgmentID: "J000001", JudgmentVersion: 1, Conclusion: "Choose the lower cost option.", Strength: domain.Supported, Grounds: []domain.ConclusionGround{{ClaimID: "C000001", Text: "The quote is lower", State: domain.Verified, SourceRefs: []domain.CardSourceReference{{DisplayName: "Supplier quote", URI: pointer("https://example.com/quote")}}}}, Uncertainties: []string{}, FlipConditions: []domain.FlipCondition{{Schema: "opensocrates.flip-condition/1.0.0", Condition: "If cost exceeds 20 USD", Direction: "reverse", Check: "Obtain the supplier quote"}}, AlternativesSummary: "The other offer was rejected because its price is higher.", RenderedAt: "2026-10-12T00:00:00.000Z"}
 }
-func TestCardsRoundTripBothLocalesAndTrustedIdentity(t *testing.T) {
+func TestCardsRoundTripAllReleasedLocalesAndTrustedIdentity(t *testing.T) {
 	bundle, e := content.Load()
 	if e != nil {
 		t.Fatal(e)
 	}
-	for _, locale := range []string{"en", "ko"} {
+	for _, locale := range []string{"en", "ko", "zh", "ja"} {
 		card := validCard(locale)
 		rendered, e := RenderCard(card, bundle.Messages[locale], 2)
 		if e != nil {
@@ -171,5 +171,51 @@ func TestTraceProjectionPreservesPrimaryActivationAndVersionHistory(t *testing.T
 	events[1]["sequence"] = contracts.Number(4)
 	if _, e := ProjectTrace(events, "recorded", nil); e == nil {
 		t.Fatal("noncontiguous events projected")
+	}
+}
+
+func TestTraceAndMetricClosedLocalesAcrossReleasedLanguages(t *testing.T) {
+	bundle, e := content.Load()
+	if e != nil {
+		t.Fatal(e)
+	}
+	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+		task := domain.NewTaskID()
+		event := map[string]any{"schema": "opensocrates.judgment-event/1.0.0", "event_id": domain.NewMessageID(), "task_id": task, "sequence": contracts.Number(1), "event_type": "task_started", "occurred_at": "2026-10-12T00:00:00.000Z", "host": "codex_cli", "host_version": "1.0.0", "adapter_version": "1.6.0", "locale": locale, "payload": map[string]any{"requested_rigor": "quiet", "effective_rigor": "together", "capability_gaps": []any{}, "participation_reason": "judgment_choice", "host_session_key": "sha256:" + strings.Repeat("0", 64)}}
+		if e := domain.ValidateRecord(event); e != nil {
+			t.Fatal("record locale rejected", locale, e)
+		}
+		view, e := ProjectTrace([]map[string]any{event}, "recorded", nil)
+		if e != nil || view.Locale != locale {
+			t.Fatal("trace locale changed", locale, e)
+		}
+		text, e := RenderTrace(view, bundle.Messages[locale], false)
+		if e != nil || !strings.Contains(text, bundle.Messages[locale]["trace.title"]) {
+			t.Fatal("localized trace failed", locale, e)
+		}
+		metric, e := domain.BuildLocalMetric("card_rendered", "codex_cli", locale, domain.Together, domain.MetricAttributes{}, "2026-10-12", "1.6.0", nil, true, nil)
+		if e != nil || metric == nil || domain.ValidateLocalMetric(*metric) != nil {
+			t.Fatal("metric locale rejected", locale, e)
+		}
+		raw, e := contracts.CanonicalCompact(metric)
+		if e != nil {
+			t.Fatal(e)
+		}
+		wire, e := contracts.Decode(raw)
+		if e != nil || domain.ValidateLocalMetricWire(wire) != nil {
+			t.Fatal("wire metric rejected", locale, e)
+		}
+		event["locale"] = "zh-CN"
+		if domain.ValidateRecord(event) == nil {
+			t.Fatal("record locale alias admitted")
+		}
+		view.Locale = "ja-JP"
+		if _, e := RenderTrace(view, bundle.Messages[locale], false); e == nil {
+			t.Fatal("trace locale alias admitted")
+		}
+	}
+	card := validCard("fr")
+	if len(CardViolations(card, nil)) == 0 {
+		t.Fatal("unsupported card locale admitted")
 	}
 }

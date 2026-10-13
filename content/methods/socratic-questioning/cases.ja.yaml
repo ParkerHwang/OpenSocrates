@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "socratic-questioning-positive-01",
+      "kind": "positive",
+      "prompt": "今四半期にこのサービスを開始すべきかを変える質問だけをしてください。",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "ユーザーは自由な聞き取りではなく、決定を変える限定的な質問群を求めています。"
+    },
+    {
+      "id": "socratic-questioning-positive-02",
+      "kind": "positive",
+      "prompt": "私の主張の前提を検討してください。ただし質問は三つ以内にし、それぞれが重要な理由を説明してください。",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "判断を明確にするため、結果に結び付く少数の質問が明示的に必要です。"
+    },
+    {
+      "id": "socratic-questioning-positive-03",
+      "kind": "positive",
+      "prompt": "ここで「良い証拠」が何を意味するか分かりません。審査基準を変える少数の質問をしてください。",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "decisive_input_missing",
+        "ambiguous_terms"
+      ],
+      "rationale": "欠けた回答で証拠基準が変わりえます。質問過多にせず、その回答を確認すべきです。"
+    },
+    {
+      "id": "socratic-questioning-negative-01",
+      "kind": "negative",
+      "prompt": "提示した要件で実装の完了を確認し、不足する項目を列挙してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "review_completion",
+        "explicit_rules"
+      ],
+      "rationale": "固定した規則による直接の完了確認であり、質問から進める判断ではありません。"
+    },
+    {
+      "id": "socratic-questioning-negative-02",
+      "kind": "negative",
+      "prompt": "肯定例、否定例、境界事例を比較して、議論のある用語を定義してください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "ambiguous_terms"
+      ],
+      "rationale": "求めるのは概念分析自体であり、限定的な質問の系列ではありません。"
+    },
+    {
+      "id": "socratic-questioning-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "この五つの質問を Markdown の番号付きリストにしてください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "既存質問の整形は機械的で、追加の質問を発生させるべきではありません。"
+    },
+    {
+      "id": "socratic-questioning-explicit-01",
+      "kind": "explicit",
+      "prompt": "socratic-questioning を明示的に使い、私の決定が隠れた前提に依存するか調べてください。",
+      "expected_route": "socratic-questioning",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "hidden_assumptions"
+      ],
+      "rationale": "ユーザーが手法を明示し、前提を検討する質問を求めています。"
+    },
+    {
+      "id": "socratic-questioning-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "決定的な質問をしてください。ただし対象の決定、主張、範囲、結果は示さないでください。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "decisive_input_missing"
+      ],
+      "rationale": "対象の決定や結果がなければ、質問の範囲や決定的な点を定められません。"
+    }
+  ]
+}

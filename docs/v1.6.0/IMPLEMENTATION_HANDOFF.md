@@ -6,7 +6,7 @@ Tracking: [implementation issue #111](https://github.com/ParkerHwang/OpenSocrate
 
 | Package | Completed scope |
 | --- | --- |
-| V0 | Frozen released v1.5.0 baseline, 48 methods, EN/KO, revision 3 |
+| V0 | Reconciled released v1.5.1 baseline, 48 methods, EN/KO/ZH/JA, revision 4 |
 | V1–V2 | Typed Go contracts, services, content, domain, decision, runtime CLI and persistence |
 | V3 | Native OS protection and pinned external Codex app-server compatibility |
 | V4–V5 | Shared lifecycle journals, transport, host registration, native management and npm adoption |
@@ -16,9 +16,41 @@ Tracking: [implementation issue #111](https://github.com/ParkerHwang/OpenSocrate
 
 The user subsequently added **Windows ARM64** to v1.6.0. It has separate native binaries, PE/build checks, signed target selection, helper/installer paths, publication assets and native CI. This is a material user-directed adjustment to the original two-platform plan. Codex and Antigravity retain their profile boundaries; native Windows Claude Code is excluded and --host all still means Codex. Claude account upload/activation remains separate.
 
-Methods, teacher questions, response policies and shared guides remain frozen at tag source cf6634310afcf5d5ce58484e67a73151bb4c5999. Only compiled release metadata changes to 1.6.0; revision remains 3. The separate method-body session was not modified. See [baseline](CONTENT_BASELINE.json) and [intentional changes](DECISIONS.md).
+Methods, teacher questions, response policies and shared guides now freeze released v1.5.1 tag source 5a6a7fa2897dd42772c4503a1301770e48bd1f29, revision 4 and EN/KO/ZH/JA. Original v1.5.0 EN/KO procedures and cases remain byte-identical. Compiled product metadata becomes 1.6.0. The separate method-body session and unreviewed v1.5.2 inputs were not modified or imported. Historical revision-3 evidence below retains its original source and does not qualify new revision-4 files. See [baseline](CONTENT_BASELINE.json) and [intentional changes](DECISIONS.md).
 
 ## Exact evidence
+
+## Released v1.5.1 reconciliation
+
+The original Go preparation and all revision-3 receipts retain their historical
+source identity. After release v1.5.1, merge current main
+`5a6a7fa2897dd42772c4503a1301770e48bd1f29` into the existing PR branch, retain
+the native Go tooling/workflows and VERSION 1.6.0, and port released four-locale
+runtime behavior. Canonical/schema generation now targets revision 4,
+EN/KO/ZH/JA, 192 complete references and 576 teacher questions. Exact baseline
+hashes are in [CONTENT_BASELINE.json](CONTENT_BASELINE.json). / 초기 준비와
+리비전 3 기록은 그대로 보존하고 출시된 v1.5.1을 병합·포팅했습니다. Go 실행·개발
+경로와 1.6.0 버전은 유지하며 네 언어의 전체 참조와 질문을 생성합니다.
+
+Native locale get/set/reset, explicit/stored/text selector precedence,
+four-language complete references and strict versioned package verification
+address observed regressions. Legacy v1.5.0/96-reference and v1.5.1/192-reference
+fixtures preserve preferences, disabled state, foreign data and rollback.
+Default decision and Claude entry remain stateless. / 언어 명령·이전 선택기 우선순위·
+완전한 참조·버전별 패키지 검사와 설정·꺼진 상태·다른 파일·복구 보존을 반영했으며
+기본 판단과 Claude 진입에 설정·대화 읽기를 추가하지 않았습니다.
+
+Source and platform qualification for this new merge must be recorded at its
+own commit. Prior 9be0e5e hosted Mac notarization does not qualify these new
+revision-4 bytes. Current main requires the maintenance pipeline's six legacy
+checks; preserve that shared policy while the separate v1.5.2 work is active,
+then coordinate the final Go check transition. v1.5.2's FR/DE/IT/ES/PT/TH are
+pending, not this baseline; recheck publication before final v1.6.0 release.
+/ 새 소스의 검증은 새 SHA에 기록하고 과거 공증을 재사용해 새 파일이 통과했다고
+주장하지 않습니다. v1.5.2 진행 중 공용 보호 정책은 보존하고 최종 Go 전환을
+조정합니다. 미출시 6개 언어는 포함했다고 주장하지 않습니다.
+
+## Historical exact evidence
 
 Historical native evidence for the resumed large-payload fix: **bc151afdb9a9d6845906b05ec2efb022961fd45f**. [CI 38239135183](https://github.com/ParkerHwang/OpenSocrates/actions/runs/38239135183) passed source and actual macOS ARM64, Windows x64 and Windows ARM64 execution after the resumed large-payload fix. Git tree `29d6306880d0e09f42b59bdbc78cfbe816ad02c4` matches all three native provenance receipts. The documentation/evidence follow-up does not relabel these observations as a new execution.
 

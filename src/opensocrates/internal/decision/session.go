@@ -53,7 +53,7 @@ func (s *Session) Handle(value any) map[string]any {
 		s.reset()
 		return map[string]any{"status": "reset", "context_eviction": false}
 	case "catalog":
-		if _, e := contracts.Object(value, "operation", "locale"); e != nil || !contracts.Is(m["locale"], "en", "ko") {
+		if _, e := contracts.Object(value, "operation", "locale"); e != nil || !contracts.Is(m["locale"], "en", "ko", "zh", "ja") {
 			return Failure("invalid_decision_request")
 		}
 		locale := m["locale"].(string)
@@ -104,7 +104,7 @@ func (s *Session) selectMethods(m map[string]any) map[string]any {
 	context, ok := m["context"].(string)
 	epoch, integer := contracts.Integer(m["epoch"])
 	id, text := m["decision"].(string)
-	if !ok || !contextRE.MatchString(context) || !integer || epoch.Sign() < 0 || !text || !decisionRE.MatchString(id) || !contracts.Nonnegative(m["revision"]) || !contracts.Is(m["locale"], "en", "ko") || !contracts.Is(m["participation"], "mechanical", "judgment", "mixed") {
+	if !ok || !contextRE.MatchString(context) || !integer || epoch.Sign() < 0 || !text || !decisionRE.MatchString(id) || !contracts.Nonnegative(m["revision"]) || !contracts.Is(m["locale"], "en", "ko", "zh", "ja") || !contracts.Is(m["participation"], "mechanical", "judgment", "mixed") {
 		return Failure("invalid_decision_request")
 	}
 	features, e := domain.ParseRouting(m["routing"])

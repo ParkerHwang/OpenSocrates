@@ -45,7 +45,8 @@ Do not start implementation from an unverified local branch, stale transcript, o
   Windows host qualification remains a separate stage. v1.6.0 ports the active
   first-party runtime, lifecycle, generation, validation and release tooling to
   Go. Supported end-user paths must not require Python, Node.js, npm or Go.
-  Preserve the v1.5.0 content baseline: all 48 methods, EN/KO semantics,
+  Preserve the latest reconciled released content baseline, currently v1.5.1:
+  all 48 methods and EN/KO/ZH/JA semantics at content revision 4,
   teacher questions, response policies and shared guides. Method-body upgrades
   belong to v1.6.1 or later and must not be mixed into this migration.
 - Do not hand-edit generated files in `schemas/v1/`, `content/compiled-*.json`, `build/`, or `dist/`.
@@ -103,7 +104,11 @@ For v1.6.0, read the [preparation](docs/v1.6.0/README.md), implementation plan,
 distribution/update contract and preparation handoff first. Reconcile current
 GitHub state before selecting a base. PR #110 is planning reference; issue #109
 tracks preparation only. Use separate implementation tracking and the frozen
-v1.5.0 content baseline. Keep an exact-commit implementation handoff.
+released content baseline recorded in `docs/v1.6.0/CONTENT_BASELINE.json`.
+The original v1.5.0/revision-3 preparation is historical; v1.5.1/revision-4
+language support must not regress during the Go migration. Reconcile later
+maintenance releases before final publication without importing unreviewed
+draft content. Keep an exact-commit implementation handoff.
 Use [the native guide](docs/native-v1.6.md) for commands and qualification
 boundaries. Signed-update trust, production signing, platform-native lifecycle,
 clean-machine and actual host evidence are separate release gates. Keep one

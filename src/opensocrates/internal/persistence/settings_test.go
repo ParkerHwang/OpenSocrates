@@ -6,6 +6,7 @@ import (
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
@@ -86,5 +87,59 @@ func TestSettingsRefuseLinkedStateAndExport(t *testing.T) {
 	traversal := root + string(os.PathSeparator) + ".." + string(os.PathSeparator) + "escape"
 	if e := SafeExport(traversal, []byte("no"), false); e == nil {
 		t.Fatal("lexical traversal accepted")
+	}
+}
+
+func TestV151LocaleSettingsRoundTripAndUnrelatedRigorWrite(t *testing.T) {
+	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+		t.Run(locale, func(t *testing.T) {
+			root := privateSettingsTestRoot(t)
+			original := domain.DefaultSettings()
+			original.Value["locale_preference"] = locale
+			original.Value["revision"] = contracts.Number(42)
+			original.Value["recording_mode"] = "local_public_artifacts"
+			original.Value["onboarding_version_seen"] = "1.0.0"
+			original.Value["record_retention_days"] = contracts.Number(730)
+			original.Value["record_size_limit_bytes"] = contracts.Number(250 * 1024 * 1024)
+			original.Value["metrics_consent"] = "none"
+			raw, e := contracts.CanonicalJSON(original.Value)
+			if e != nil {
+				t.Fatal(e)
+			}
+			path := filepath.Join(root, "settings.json")
+			if e := platform.AtomicWrite(path, raw, 0600); e != nil {
+				t.Fatal(e)
+			}
+			store := SettingsStore{Root: root}
+			if got := store.Load(); !reflect.DeepEqual(got.Value, original.Value) {
+				t.Fatal("released settings became fallback")
+			}
+			updated, e := store.Mutate(func(s domain.UserSettings) (domain.UserSettings, error) { return domain.SetRigor(s, "strict") })
+			if e != nil {
+				t.Fatal(e)
+			}
+			expected := original.Clone()
+			expected.Value["revision"], expected.Value["default_rigor"] = contracts.Number(43), "strict"
+			if !reflect.DeepEqual(updated.Value, expected.Value) {
+				t.Fatal("unrelated settings changed")
+			}
+			before, e := platform.ReadFile(path, 128*1024)
+			if e != nil {
+				t.Fatal(e)
+			}
+			if _, e := store.Mutate(func(s domain.UserSettings) (domain.UserSettings, error) { return domain.SetLocale(s, &locale) }); e != nil {
+				t.Fatal(e)
+			}
+			after, e := platform.ReadFile(path, 128*1024)
+			if e != nil || string(before) != string(after) {
+				t.Fatal("locale no-op rewrote settings")
+			}
+			if _, e := store.Mutate(func(s domain.UserSettings) (domain.UserSettings, error) { return domain.SetLocale(s, nil) }); e != nil {
+				t.Fatal(e)
+			}
+			if got := store.Load(); got.LocalePreference() != nil || got.Revision() != 44 {
+				t.Fatal("reset did not persist null")
+			}
+		})
 	}
 }

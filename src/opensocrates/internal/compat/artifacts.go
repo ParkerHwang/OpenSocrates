@@ -13,6 +13,7 @@ import (
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/content"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/domain"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
 	"os"
 	"path/filepath"
@@ -128,7 +129,7 @@ func (s *ArtifactStore) ensureRoot(root string) error {
 	return platform.Guard(root)
 }
 func artifactValid(a Artifact) bool {
-	if !filepath.IsAbs(a.Path) || a.Revision < 1 || a.Locale != "en" && a.Locale != "ko" || len(a.IDs) == 0 || len(a.Names) != len(a.IDs) || len(a.Guardrails) > 0 && len(a.Guardrails) != len(a.IDs) {
+	if !filepath.IsAbs(a.Path) || a.Revision < 1 || !domain.SupportedLocale(a.Locale) || len(a.IDs) == 0 || len(a.Names) != len(a.IDs) || len(a.Guardrails) > 0 && len(a.Guardrails) != len(a.IDs) {
 		return false
 	}
 	seen := map[string]bool{}
@@ -166,14 +167,9 @@ func section(theory, title string) string {
 }
 func estimated(s string) int { return (len(s) + 3) / 4 }
 func assembledArtifact(b *content.Bundle, ids []string, locale string) (Artifact, string, error) {
-	if locale != "en" && locale != "ko" {
+	locale, err := b.ResolveLocale(ids, locale)
+	if err != nil {
 		return Artifact{}, "", failure(diagnostics.Verification)
-	}
-	for _, id := range ids {
-		if _, ok := b.Projections[id+":"+locale]; !ok {
-			locale = "en"
-			break
-		}
 	}
 	text, err := b.Assemble(ids, locale)
 	if err != nil {
@@ -195,8 +191,13 @@ func assembledArtifact(b *content.Bundle, ids []string, locale string) (Artifact
 			continue
 		}
 		title, noTitle, stopTitle := "Blocking rules", "Do not use when", "Stop conditions"
-		if locale == "ko" {
+		switch locale {
+		case "ko":
 			title, noTitle, stopTitle = "차단 규칙", "사용하지 않는 조건", "중단 조건"
+		case "zh":
+			title, noTitle, stopTitle = "阻断规则", "不适用条件", "停止条件"
+		case "ja":
+			title, noTitle, stopTitle = "適用を制限する規則", "使用しない条件", "停止条件"
 		}
 		a.Guardrails = append(a.Guardrails, fmt.Sprintf("### %s: %s (`%s`@%d)\n\n**%s**\n\n%s\n\n**%s**\n\n%s", title, p.Name, id, b.Revision, noTitle, no, stopTitle, stop))
 	}

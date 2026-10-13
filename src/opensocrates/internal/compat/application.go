@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/content"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/domain"
 )
 
 type ReasoningSelector interface {
@@ -36,6 +37,11 @@ func (a Application) Select(ctx context.Context, r Request, session, turn string
 		record("request_rejected")
 		return nil
 	}
+	locale := domain.ResolveLocale(r.TrustedExplicitLocale, r.StoredPreference, r.Prompt, false)
+	if locale == "" {
+		record("request_rejected")
+		return nil
+	}
 	candidate, err := a.Selector.Select(ctx, r)
 	if err != nil {
 		label := "spawn_failed"
@@ -62,7 +68,7 @@ func (a Application) Select(ctx context.Context, r Request, session, turn string
 		record("no_intervention")
 		return nil
 	}
-	artifact, err := a.Artifacts.Create(session, turn, candidate.SelectedReasoningSystems, Locale(r.Prompt), a.Bundle)
+	artifact, err := a.Artifacts.Create(session, turn, candidate.SelectedReasoningSystems, locale, a.Bundle)
 	if err != nil {
 		record("invalid_output")
 		return nil

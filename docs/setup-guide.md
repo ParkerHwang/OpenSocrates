@@ -29,6 +29,25 @@ Menu names may vary by app version, language and account policy.
 **`--host all` means Codex only.** Specify each other app separately. Claude on
 Windows uses the account skill. Native Windows Claude Code remains outside scope.
 
+## Current content and instruction language
+
+The candidate preserves released v1.5.1 content revision 4: 48 methods,
+192 complete procedures and 576 teacher questions in English, Korean,
+Simplified Chinese (`zh`) and Japanese (`ja`). Original English/Korean method
+bodies remain unchanged. Pending v1.5.2 proposes six more languages; it is not
+this candidate's current baseline and must be reconciled before release.
+
+The native commands `./opensocrates locale get`, `locale set en|ko|zh|ja|follow`
+and `locale reset` have no host argument; choose one value after `set`.
+On Windows use `.\opensocrates.exe`. Stored preference affects only the optional
+legacy selector; `follow`/`reset` clear that preference without unrelated changes.
+Stateless decision JSON requires explicit `locale`; native Claude entry reads
+no stored preference. Account skills and Antigravity use the relevant language
+guides/references. Instruction language does not set answer language or host UI,
+and management CLI output is not fully translated. Review changed hooks and
+start a fresh session after updating; upload account content separately.
+Historical screenshots and notarization receipts retain their original scope.
+
 ## Ask an agent to finish setup
 
 Paste the following request into an agent that can access your computer and

@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: logic-tree-positive-01
+    kind: positive
+    prompt: "なぜ顧客離脱が増えたのでしょうか。原因を重複のない試験可能な分岐へどう分解できますか。"
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, diagnose, plan]
+    rationale: "広い診断には明示した軸、MECE 確認、末端試験を伴うなぜのツリーが必要です。"
+  - id: logic-tree-positive-02
+    kind: positive
+    prompt: "導入時の失敗を減らす完全な問題ツリーを作り、すべての末端に検証手順を付けてください。"
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, plan]
+    rationale: "網羅性と行動に結びつく分解が要求されています。"
+  - id: logic-tree-positive-03
+    kind: positive
+    prompt: "この広いリスクの問いを、運用チームが割り当てて試せる重複のない分岐へ分けてください。"
+    expected_route: logic-tree
+    expected_behavior: route
+    decisive_features: [tangled_hierarchy, diagnose]
+    rationale: "階層的な分岐、網羅性確認、実行可能な末端が必要です。"
+  - id: logic-tree-negative-01
+    kind: negative
+    prompt: "既存の分類が重なっていないか、欠けた事例がないか確認してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [category_overlap, tangled_hierarchy]
+    rationale: "限定的な分類の監査は MECE の課題であり、再帰的なツリー作成ではありません。"
+  - id: logic-tree-negative-02
+    kind: negative
+    prompt: "これらの変数の間のフィードバックループを描き、強化と均衡の動きを特定してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "相互依存するフィードバックループは階層に適さず、システムの方法が必要です。"
+  - id: logic-tree-mechanical-01
+    kind: mechanical
+    prompt: "与えられた見出しを、例と同じツリー構造になるよう字下げしてください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "指定された字下げの適用は機械的な整形です。"
+  - id: logic-tree-explicit-01
+    kind: explicit
+    prompt: "logic-tree を明示的に使い、公開の遅れの原因を構造化してください。"
+    expected_route: logic-tree
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, tangled_hierarchy]
+    rationale: "利用者は階層的な診断構造を明示的に選んでいます。"
+  - id: logic-tree-insufficiency-01
+    kind: insufficiency
+    prompt: "完全な問題ツリーを作ってください。ただし根の問い、範囲、成功の指標は示さないでください。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [tangled_hierarchy, decisive_input_missing]
+    rationale: "根の問いを限定しなければ、網羅性と末端の実行可能性を安全に判断できません。"

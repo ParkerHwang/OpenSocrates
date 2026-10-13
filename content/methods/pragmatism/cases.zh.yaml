@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: pragmatism-positive-01
+    kind: positive
+    prompt: "两种项目管理框架在会议、优先级与反馈方面做出不同选择；请先比较可观察后果，再选择一种。"
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "解释在行动上不同，可依据有边界的实践后果判断。"
+  - id: pragmatism-positive-02
+    kind: positive
+    prompt: "城市须从两种外展政策中选择，并可在约定观察窗口与安全约束下开展可逆试点。"
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose, value_conflict]
+    rationale: "核心需求是实践政策选择与安全学习测试。"
+  - id: pragmatism-positive-03
+    kind: positive
+    prompt: "对两个标签的长时间争论不改变任何决策或预测；请判断这些标签在此情境中是否实践等价。"
+    expected_route: pragmatism
+    expected_behavior: route
+    decisive_features: [practical_consequence, choose]
+    rationale: "方法应检查分歧是否存在任何可观察的实践差异。"
+  - id: pragmatism-negative-01
+    kind: negative
+    prompt: "政策来源规定了报告义务并禁止披露；仅比较仍获允许的行动。"
+    expected_route: deontic-reasoning
+    expected_behavior: route
+    decisive_features: [duties_rights, explicit_rules]
+    rationale: "约束性义务与禁令在比较实践后果前就限制行动集合。"
+  - id: pragmatism-negative-02
+    kind: negative
+    prompt: "产品团队在选择方案前，需要识别用户遇到困难的时刻、功能／情感／社会任务与转换力量。"
+    expected_route: jobs-to-be-done
+    expected_behavior: route
+    decisive_features: [user_progress, human_need]
+    rationale: "瓶颈是发现用户进展，而非比较已知解释的后果。"
+  - id: pragmatism-mechanical-01
+    kind: mechanical
+    prompt: "将两项政策描述放到相邻列，不比较后果或推荐任何一项。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "分列格式化是机械任务。"
+  - id: pragmatism-explicit-01
+    kind: explicit
+    prompt: "使用实用主义，依据实际改变比较这两套事件响应手册，并采用可逆桌面推演测试。"
+    expected_route: pragmatism
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, practical_consequence, choose]
+    rationale: "用户明确要求情境限定的后果比较与测试。"
+  - id: pragmatism-insufficiency-01
+    kind: insufficiency
+    prompt: "选项与成功标准未明确；请因为令人安心的解释感觉有用，就宣布它为真。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [practical_consequence, decisive_input_missing]
+    rationale: "没有选项、标准或可观察后果，无法评估有用性。"

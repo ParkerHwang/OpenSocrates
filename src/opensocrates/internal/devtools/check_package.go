@@ -250,7 +250,7 @@ func checkPackageTree(p string) ([]string, error) {
 		return codes, e
 	}
 	canonical, ok := m["canonical_methods"].([]any)
-	if !ok || len(canonical) != 96 {
+	if !ok || len(canonical) != 48*len(releasedLocales) {
 		codes = append(codes, "canonical_method_count_invalid")
 	}
 	methodLocales := map[string]bool{}
@@ -259,7 +259,7 @@ func checkPackageTree(p string) ([]string, error) {
 		id := str(entry["method_id"])
 		locale := str(entry["locale"])
 		key := id + ":" + locale
-		if id == "" || (locale != "en" && locale != "ko") || methodLocales[key] {
+		if id == "" || !releasedLocale(locale) || methodLocales[key] {
 			codes = append(codes, "canonical_method_identity_invalid")
 		}
 		methodLocales[key] = true
@@ -282,7 +282,7 @@ func checkPackageTree(p string) ([]string, error) {
 			codes = append(codes, "canonical_method_content_mismatch")
 		}
 	}
-	if m["source_tree_hash"] != "sha256:b8824656fc53d588cc6a570de102531266ef2a7b39f04694d058c8da5c2418a6" || m["normalized_semantic_hash"] != "sha256:e50af8296165a7c8e8a9a6e27d4881bbc816b7efe9e1c84ea798c80fb54efa48" {
+	if m["source_tree_hash"] != "sha256:993c30191b0d2b67af88a25c2631d9e8fddeeaf9dadfd0ff4fb07dd62539dcab" || m["normalized_semantic_hash"] != "sha256:835a1e32695e863b3696c3bf5dcf1acb7faa580d889129e617524fbc0d9908e6" {
 		codes = append(codes, "package_released_content_identity_changed")
 	}
 	return codes, nil

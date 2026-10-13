@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: bayesian-updating-positive-01
+    kind: positive
+    prompt: "考虑竞争诊断各自不同的基础率，这个阳性检验应如何改变它们的几率（odds）？"
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "任务需要先验、证据方向、后验变化及对基础率的敏感性。"
+  - id: bayesian-updating-positive-02
+    kind: positive
+    prompt: "随着这些信号依次到达，更新我们对两个发布假设的置信程度。"
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability, competing_explanations]
+    rationale: "顺序证据应更新竞争假设，不要重复计算信号。"
+  - id: bayesian-updating-positive-03
+    kind: positive
+    prompt: "在可信范围内改变先验发生率和似然假设时，展示建议是否会逆转。"
+    expected_route: bayesian-updating
+    expected_behavior: route
+    decisive_features: [new_evidence, unknown_probability]
+    rationale: "请求的证据判断是后验与行动阈值的敏感性。"
+  - id: bayesian-updating-negative-01
+    kind: negative
+    prompt: "先按直接性和研究质量排列来源，再决定主张可以表述得多强。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [source_quality, reconcile_evidence]
+    rationale: "任务是校准来源质量，而不是更新已定义的假设集合。"
+  - id: bayesian-updating-negative-02
+    kind: negative
+    prompt: "列出这个异常的竞争解释，并提出区分它们的检验。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "未要求先验更新时，生成解释和区分性检验属于 abduction。"
+  - id: bayesian-updating-mechanical-01
+    kind: mechanical
+    prompt: "将提供的先验值复制到分析工作表中。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "复制数值是机械性任务，不得触发概率推理。"
+  - id: bayesian-updating-explicit-01
+    kind: explicit
+    prompt: "明确使用 bayesian-updating，在这个新欺诈信号出现后调整置信程度。"
+    expected_route: bayesian-updating
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, new_evidence]
+    rationale: "用户明确选择基于证据的置信程度更新。"
+  - id: bayesian-updating-insufficiency-01
+    kind: insufficiency
+    prompt: "给出后验概率，但不提供竞争假设、先验依据或似然信息。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [new_evidence, unknown_probability, decisive_input_missing]
+    rationale: "没有假设与输入来源的数值后验会是编造的精度。"

@@ -102,7 +102,7 @@ func TestCodexNativeHooksFailOpenAndNeverPersistPrompt(t *testing.T) {
 }
 func TestClaudeNativeEntryUsesCompleteInstalledReferences(t *testing.T) {
 	root := t.TempDir()
-	for _, relative := range []string{"skills/opensocrates/SKILL.md", "skills/opensocrates/references/decision/guide.en.md", "skills/opensocrates/references/decision/guide.ko.md"} {
+	for _, relative := range []string{"skills/opensocrates/SKILL.md", "skills/opensocrates/references/decision/guide.en.md", "skills/opensocrates/references/decision/guide.ko.md", "skills/opensocrates/references/decision/guide.zh.md", "skills/opensocrates/references/decision/guide.ja.md"} {
 		path := filepath.Join(root, filepath.FromSlash(relative))
 		if e := os.MkdirAll(filepath.Dir(path), 0700); e != nil {
 			t.Fatal(e)
@@ -174,5 +174,63 @@ func TestVersionIdentityTracksImmutableContent(t *testing.T) {
 	unavailable := versionInfoForBundle(nil)
 	if unavailable["content_revision"] != nil || unavailable["content_status"] != "unavailable" {
 		t.Fatalf("unavailable content reported a confirmed revision: %v", unavailable)
+	}
+}
+
+func TestLocaleCLIChoicesResetAndClosedArguments(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("LOCALAPPDATA", home)
+	t.Setenv("XDG_DATA_HOME", home)
+	for _, args := range [][]string{{"locale", "get"}, {"locale", "set", "zh"}, {"locale", "get"}, {"locale", "set", "ja"}, {"locale", "reset"}, {"locale", "get"}} {
+		code, out, err := invoke(args, "")
+		if code != 0 || err != "" {
+			t.Fatal(args, code, err)
+		}
+		value, e := contracts.Decode([]byte(out))
+		if e != nil || value.(map[string]any)["status"] != "ok" {
+			t.Fatal(args, out, e)
+		}
+		m := value.(map[string]any)
+		if len(args) == 3 && m["locale"] != args[2] {
+			t.Fatal("set response mismatch", m)
+		}
+		if args[1] == "reset" && m["locale"] != "follow" {
+			t.Fatal("reset response mismatch", m)
+		}
+		if _, present := m["rigor"]; present {
+			t.Fatal("locale leaked unrelated settings")
+		}
+	}
+	for _, args := range [][]string{{"locale"}, {"locale", "codex", "get"}, {"locale", "get", "extra"}, {"locale", "reset", "extra"}, {"locale", "set"}, {"locale", "set", "zh", "extra"}} {
+		if code, _, _ := invoke(args, ""); code != 2 {
+			t.Fatal("invalid CLI shape accepted", args)
+		}
+	}
+	for _, locale := range []string{"zh-CN", "jp", "JA", ""} {
+		code, out, _ := invoke([]string{"locale", "set", locale}, "")
+		if code != 2 || out != "" {
+			t.Fatal("invalid choice not rejected", locale, out)
+		}
+	}
+}
+
+func TestDecisionCatalogAllLocalesRemainsStateless(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("LOCALAPPDATA", home)
+	t.Setenv("XDG_DATA_HOME", home)
+	for _, locale := range []string{"en", "ko", "zh", "ja"} {
+		code, out, stderr := invoke([]string{"decision"}, `{"operation":"catalog","locale":"`+locale+`"}`)
+		value, e := contracts.Decode([]byte(out))
+		if code != 0 || stderr != "" || e != nil || value.(map[string]any)["status"] != "catalog" {
+			t.Fatal(locale, out, stderr, e)
+		}
+	}
+	entries, e := os.ReadDir(home)
+	if e != nil || len(entries) != 0 {
+		t.Fatal("locale decision created storage", entries, e)
 	}
 }

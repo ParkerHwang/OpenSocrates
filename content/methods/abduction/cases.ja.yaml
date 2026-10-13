@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: abduction-positive-01
+    kind: positive
+    prompt: "急な転換率の低下を複数の原因で説明できる場合、観察された事実に最も合う説明はどれですか。"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "異常に複数の説明が合うため、暫定の最善説明を選ぶ前に候補を見分ける証拠が必要です。"
+  - id: abduction-positive-02
+    kind: positive
+    prompt: "サービスが一部の地域でだけ失敗しています。妥当な説明を比較し、候補を見分ける次の観察を提案してください。"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "不完全な情報での診断と、候補を見分ける確認を求める課題です。"
+  - id: abduction-positive-03
+    kind: positive
+    prompt: "この予想外の実験結果について現時点で最善の説明は何ですか。何があれば判断が変わりますか。"
+    expected_route: abduction
+    expected_behavior: route
+    decisive_features: [competing_explanations, diagnose]
+    rationale: "候補説明を比較し、結論が暫定であることを明示する必要があります。"
+  - id: abduction-negative-01
+    kind: negative
+    prompt: "この明示された前提と規則から、結論は必然的に導かれますか。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [explicit_rules, explain]
+    rationale: "確定した前提と規則には、最善説明の探索ではなく演繹が適しています。"
+  - id: abduction-negative-02
+    kind: negative
+    prompt: "反復した標本の観察を使い、母集団でこのパターンが起きる頻度を推定してください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [repeated_observations, weak_sample]
+    rationale: "競合する説明の比較ではなく、標本からの一般化が課題です。"
+  - id: abduction-mechanical-01
+    kind: mechanical
+    prompt: "提供された三つの仮説を調査テンプレートにコピーしてください。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: [mechanical]
+    rationale: "仮説のコピーは機械的な作業であり、診断を起動すべきではありません。"
+  - id: abduction-explicit-01
+    kind: explicit
+    prompt: "abduction を明示的に呼び出し、設定変更後にデプロイが失敗する理由を診断してください。"
+    expected_route: abduction
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, competing_explanations]
+    rationale: "異常な結果の診断に使う手法をユーザーが明示しています。"
+  - id: abduction-insufficiency-01
+    kind: insufficiency
+    prompt: "最善の説明を選んでください。ただし結論だけを示し、観察、代替説明、検証可能な証拠は提供しません。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [competing_explanations, decisive_input_missing]
+    rationale: "観察と競合候補がない場合、最善説明の選択は推論ではなく筋書きになります。"

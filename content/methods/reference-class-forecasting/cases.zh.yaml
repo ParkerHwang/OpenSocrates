@@ -1,0 +1,106 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "reference-class-forecasting-positive-1",
+      "kind": "positive",
+      "prompt": "我们正在估计区域铁路项目的交付日期。我们有许多范围、采购方式和地形可比的已完成项目记录，并附来源链接。请将内部工期与观察到的完工分布比较，解释调整，不编造概率。",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "source_quality"
+      ],
+      "rationale": "预测目标和单位已说明，有可辩护的参照类别，请求外部视角范围。来源记录支持观察结果，不允许编造概率。"
+    },
+    {
+      "id": "reference-class-forecasting-positive-2",
+      "kind": "positive",
+      "prompt": "产品团队对客户迁移到新平台所需的时间和成本估计较乐观。我们能找到其他团队已完成的可比迁移，并有实际结果。用这些案例检验内部视角是否可信，说明哪些证据会改变范围。",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "hidden_assumptions"
+      ],
+      "rationale": "任务是依据已完成的可比案例校准，不是因果诊断或偏好情景。请求注意来源的调整及结论转变条件，不是编造基准率。"
+    },
+    {
+      "id": "reference-class-forecasting-positive-3",
+      "kind": "positive",
+      "prompt": "一家非营利机构正在预测项目第一年参与人数。几个既往启动项目记录了参与结果、目标人群和启动条件，但覆盖不均。建立外部视角范围，显示覆盖限制，并与我们的计划比较。",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "forecast",
+        "reference_cases",
+        "weak_sample"
+      ],
+      "rationale": "有目标和已完成案例，覆盖不均是应保留的明确不确定性。方法应使用观察分布；缺失情况决定结果时，保留或降低结论强度。"
+    },
+    {
+      "id": "reference-class-forecasting-negative-1",
+      "kind": "negative",
+      "prompt": "这台独一无二的科学仪器没有已完成的可比案例。请解释哪个工程选择导致延期，并提出纠正实验。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "no_defensible_reference_class",
+        "diagnose"
+      ],
+      "rationale": "明确缺少可辩护的参照类别，且请求因果解释。此处路由将只是重复内部视角，没有外部分布。"
+    },
+    {
+      "id": "reference-class-forecasting-negative-2",
+      "kind": "negative",
+      "prompt": "请为我们的五年战略构建四个不同的外部未来，分别命名并识别早期信号及行动。不要用历史案例估计交付或成本目标。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "deep_uncertainty",
+        "macro_environment",
+        "plan"
+      ],
+      "rationale": "容易与情景规划的同族方法混淆：任务要分支未来和信号指标，而非预测的参照分布。"
+    },
+    {
+      "id": "reference-class-forecasting-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "将这五笔已核实的发票金额相加，以指定币种返回总额。无需预测、比较类别或决策。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "任务是有界计算。没有不确定预测目标或参照类别判断，方法必须保持不参与。"
+    },
+    {
+      "id": "reference-class-forecasting-explicit-1",
+      "kind": "explicit",
+      "prompt": "将参照类别预测作为软件发布日期的主要方法。我们有附来源链接的可比发布结果；将其分布与内部计划比较，类别无依据时保留结论。",
+      "expected_route": "reference-class-forecasting",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "forecast",
+        "reference_cases"
+      ],
+      "rationale": "用户明确命名方法，并提供方法所需的目标、可比结果及保留规则。明确调用仍需证据标签，不允许编造概率。"
+    },
+    {
+      "id": "reference-class-forecasting-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "告诉我项目何时完成。我只有内部目标日期，没有已完成的可比案例、约定的结果定义或明确的截止日期决策。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "no_defensible_reference_class",
+        "boundary_sensitive",
+        "decisive_input_missing"
+      ],
+      "rationale": "决定性的参照类别、目标定义及决策边界缺失。诚实的结果是保留结论并有限地请求缺失输入，不是编造分布。"
+    }
+  ]
+}

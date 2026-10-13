@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/domain"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/lifecycle"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/management"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
@@ -364,18 +365,35 @@ func (r acceptanceRegistrationRunner) Run(_ context.Context, binary string, args
 	return out, e
 }
 func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]any) bool {
+	passed := true
+	for _, version := range []string{"1.5.0", "1.5.1"} {
+		preferences := []string{"en", "ko"}
+		if version == "1.5.1" {
+			preferences = releasedLocales
+		}
+		for _, locale := range preferences {
+			if !acceptanceMigrationVersionCase(tmp, packageRoot, fixture, version, locale, cases) {
+				passed = false
+			}
+		}
+	}
+	cases["npm_owned_state_adoption_fixture"] = map[string]any{"pass": passed, "evidence_scope": "synthetic_legacy_1.5.0_and_1.5.1_marker_state_locale_registration_and_rollback; native_scheduler_commands_mocked; not_real_npm_release", "legacy_runtime_execution_claimed": false}
+	return passed
+}
+
+func acceptanceMigrationVersionCase(tmp, packageRoot, fixture, legacyVersion, preference string, cases map[string]any) bool {
 	stage := "prepare_environment"
 	failureCode := diagnostics.Verification
 	record := func(passed bool) bool {
-		result := map[string]any{"pass": passed, "evidence_scope": "synthetic_legacy_marker_state_and_registration; native_scheduler_commands_mocked; not_real_npm_release", "legacy_runtime_execution_claimed": false}
+		result := map[string]any{"pass": passed, "evidence_scope": "synthetic_legacy_marker_state_and_registration; native_scheduler_commands_mocked; not_real_npm_release", "legacy_runtime_execution_claimed": false, "legacy_version": legacyVersion, "locale_preference": preference}
 		if !passed {
 			result["failure_stage"] = stage
 			result["error_code"] = failureCode
 		}
-		cases["npm_owned_state_adoption_fixture"] = result
+		cases["npm_owned_state_adoption_fixture_"+legacyVersion+"_"+preference] = result
 		return passed
 	}
-	root := filepath.Join(tmp, "migration")
+	root := filepath.Join(tmp, "migration-"+legacyVersion+"-"+preference)
 	env, work, e := isolatedAcceptanceEnvironment(root)
 	if e != nil {
 		return record(false)
@@ -396,7 +414,7 @@ func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]
 	if e != nil {
 		return record(false)
 	}
-	plugin["version"] = "1.5.0"
+	plugin["version"] = legacyVersion
 	pluginBytes, e := Canonical(plugin)
 	if e != nil || platform.AtomicWrite(pluginPath, pluginBytes, 0644) != nil {
 		return record(false)
@@ -407,13 +425,58 @@ func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]
 	if e != nil {
 		return record(false)
 	}
-	manifest["product_version"] = "1.5.0"
+	manifest["product_version"] = legacyVersion
+	if legacyVersion == "1.5.0" {
+		manifest["content_revision"] = 3
+		retained := []any{}
+		for _, raw := range arr(manifest["canonical_methods"]) {
+			entry := obj(raw)
+			locale := str(entry["locale"])
+			if locale == "en" || locale == "ko" {
+				path := filepath.Join(legacyPackage, filepath.FromSlash(str(entry["path"])))
+				body, readError := platform.ReadFile(path, lifecycle.MaxFileBytes)
+				if readError != nil {
+					return record(false)
+				}
+				text := strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(string(body), "Content revision: 4", "Content revision: 3"), "콘텐츠 리비전: 4", "콘텐츠 리비전: 3"), "`@4)", "`@3)")
+				if e = platform.AtomicWrite(path, []byte(text), 0644); e != nil {
+					return record(false)
+				}
+				entry["sha256"] = digest([]byte(text))
+				retained = append(retained, raw)
+			}
+		}
+		manifest["canonical_methods"] = retained
+		inventory := []any{}
+		for _, raw := range arr(manifest["files"]) {
+			entry := obj(raw)
+			path := str(entry["path"])
+			remove := strings.HasPrefix(path, "skills/opensocrates/references/decision/methods/zh/") || strings.HasPrefix(path, "skills/opensocrates/references/decision/methods/ja/")
+			if remove {
+				if e = platform.Remove(filepath.Join(legacyPackage, filepath.FromSlash(path))); e != nil {
+					return record(false)
+				}
+				continue
+			}
+			inventory = append(inventory, raw)
+		}
+		manifest["files"] = inventory
+		for _, locale := range []string{"zh", "ja"} {
+			if e = platform.RemoveTree(filepath.Join(legacyPackage, "skills/opensocrates/references/decision/methods", locale)); e != nil {
+				return record(false)
+			}
+		}
+	}
+
 	for _, raw := range arr(manifest["files"]) {
 		entry := obj(raw)
-		if entry["path"] == ".codex-plugin/plugin.json" {
-			entry["sha256"] = digest(pluginBytes)
-			entry["size"] = len(pluginBytes)
+		path := filepath.Join(legacyPackage, filepath.FromSlash(str(entry["path"])))
+		body, readError := platform.ReadFile(path, lifecycle.MaxFileBytes)
+		if readError != nil {
+			return record(false)
 		}
+		entry["sha256"] = digest(body)
+		entry["size"] = len(body)
 	}
 	data, e := Canonical(manifest)
 	if e != nil || platform.AtomicWrite(manifestPath, data, 0600) != nil {
@@ -451,9 +514,17 @@ func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]
 	}
 	// Unknown fields and disabled integrations belong to the user. Adoption keeps
 	// the full prior JSON in the new state and never deletes an npm package.
-	desired := []byte(`{"schema":"opensocrates.desired-state/1.0.0","channel":"stable","installedHosts":["codex"],"activeVersion":"1.5.0","updatePolicy":{"intervalHours":24,"allowMajor":false},"autoUpdate":{"enabled":false,"hosts":[],"nextCheckAt":null},"future_user_owned_field":{"unicode":"한국","exact_integer":9007199254740993}}` + "\n")
+	desired := []byte(`{"schema":"opensocrates.desired-state/1.0.0","channel":"stable","installedHosts":["codex"],"activeVersion":"` + legacyVersion + `","updatePolicy":{"intervalHours":24,"allowMajor":false},"autoUpdate":{"enabled":false,"hosts":[],"nextCheckAt":null},"future_user_owned_field":{"unicode":"한국","exact_integer":9007199254740993}}` + "\n")
 	stage = "prepare_legacy_desired_state"
 	if platform.AtomicWrite(filepath.Join(stateDir, "desired-state.json"), desired, 0600) != nil {
+		return record(false)
+	}
+	settingsValue := domain.DefaultSettings()
+	settingsValue.Value["locale_preference"] = preference
+	settingsBytes, e := Canonical(settingsValue.Value)
+	settingsPath := filepath.Join(stateDir, "settings.json")
+	stage = "prepare_user_locale_preference"
+	if e != nil || platform.AtomicWrite(settingsPath, settingsBytes, 0600) != nil {
 		return record(false)
 	}
 	npmSentinel := filepath.Join(root, "npm-user-owned.json")
@@ -468,8 +539,18 @@ func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]
 			return record(false)
 		}
 	}
+	stage = "snapshot_legacy_owned_payload"
+	beforeAdoption, e := lifecycle.Inspect(hostRoot)
+	if e != nil {
+		return record(false)
+	}
+	beforeRegistration, e := platform.ReadFile(filepath.Join(root, "codex", "host-fixture.json"), 8<<20)
+	if e != nil {
+		return record(false)
+	}
 	stage = "adopt_actual_native_candidate"
-	if _, e := manager.Handle(context.Background(), management.Request{Action: "adopt", Host: "codex", Package: packageRoot}); e != nil {
+	adopted, e := manager.Handle(context.Background(), management.Request{Action: "adopt", Host: "codex", Package: packageRoot})
+	if e != nil {
 		failureCode = diagnostics.CodeOf(e)
 		return record(false)
 	}
@@ -493,6 +574,33 @@ func acceptanceMigrationCase(tmp, packageRoot, fixture string, cases map[string]
 	policy, e := checkObject(filepath.Join(stateDir, "update-policy.json"))
 	stage = "verify_disabled_update_policy"
 	if e != nil || policy["enabled"] != false {
+		return record(false)
+	}
+	stage = "verify_preserved_user_locale"
+	settingsAfter, e := platform.ReadFile(settingsPath, 8<<20)
+	if e != nil || !bytes.Equal(settingsBytes, settingsAfter) {
+		return record(false)
+	}
+	stage = "rollback_adopted_native_candidate"
+	if adopted.Transaction == "" {
+		return record(false)
+	}
+	if _, e = manager.Handle(context.Background(), management.Request{Action: "recover", Transaction: adopted.Transaction}); e != nil {
+		failureCode = diagnostics.CodeOf(e)
+		return record(false)
+	}
+	afterRollback, e := lifecycle.Inspect(hostRoot)
+	if e != nil || !lifecycle.Equal(beforeAdoption, afterRollback) {
+		return record(false)
+	}
+	afterRegistration, e := platform.ReadFile(filepath.Join(root, "codex", "host-fixture.json"), 8<<20)
+	if e != nil || !bytes.Equal(beforeRegistration, afterRegistration) {
+		return record(false)
+	}
+	settingsAfter, e = platform.ReadFile(settingsPath, 8<<20)
+	desiredAfter, desiredError := platform.ReadFile(filepath.Join(stateDir, "desired-state.json"), 8<<20)
+	npmAfter, npmError := platform.ReadFile(npmSentinel, 8<<20)
+	if e != nil || desiredError != nil || npmError != nil || !bytes.Equal(settingsBytes, settingsAfter) || !bytes.Equal(desired, desiredAfter) || !bytes.Equal(npmBytes, npmAfter) {
 		return record(false)
 	}
 	return record(true)

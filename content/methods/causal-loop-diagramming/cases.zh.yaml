@@ -1,0 +1,58 @@
+schema: opensocrates.method-cases/1.0.0
+cases:
+  - id: causal-loop-diagramming-positive-01
+    kind: positive
+    prompt: "排队使等待变长，等待变长导致放弃，放弃又改变未来的人员需求；绘制带正负号的回路与延迟。"
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "任务要求命名变量、带正负号的连接、回路类型及塑造模式的延迟效应。"
+  - id: causal-loop-diagramming-positive-02
+    kind: positive
+    prompt: "用户增长增加评论，评论吸引更多用户，而容量限制产生平衡反应；识别两个回路。"
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, causal_question]
+    rationale: "需要明确表示多个有向回路及平衡约束。"
+  - id: causal-loop-diagramming-positive-03
+    kind: positive
+    prompt: "政策带来快速缓解，但执行需要很长延迟才改变行为，因此后来反弹；绘制反馈解释。"
+    expected_route: causal-loop-diagramming
+    expected_behavior: route
+    decisive_features: [feedback_delay, recurring_failure]
+    rationale: "要求的结果是关于延迟政策阻力的带正负号回路解释，而非单一效应估计。"
+  - id: causal-loop-diagramming-negative-01
+    kind: negative
+    prompt: "大型组织涉及许多行动者、存量和副作用；在选择简洁回路图前，确定最佳杠杆点。"
+    expected_route: systems-thinking
+    expected_behavior: route
+    decisive_features: [feedback_delay, deep_uncertainty, causal_question]
+    rationale: "应先明确更广的系统边界及杠杆问题，再绘制聚焦的回路图。"
+  - id: causal-loop-diagramming-negative-02
+    kind: negative
+    prompt: "一项试验询问某药物是否造成相对对照的测量结果，没有重复的动态模式。"
+    expected_route: causal-reasoning
+    expected_behavior: route
+    decisive_features: [causal_question, confounding]
+    rationale: "范围有限的反事实效应问题不需要反馈回路。"
+  - id: causal-loop-diagramming-mechanical-01
+    kind: mechanical
+    prompt: "将现有回路标签复制到演示文稿中，保留顺序，不评估任何关系。"
+    expected_route: null
+    expected_behavior: no_route
+    decisive_features: []
+    rationale: "复制和调整格式不需要因果判断。"
+  - id: causal-loop-diagramming-explicit-01
+    kind: explicit
+    prompt: "应用 causal-loop-diagramming，说明为何折扣增加需求，却后来导致缺货和信任下降。"
+    expected_route: causal-loop-diagramming
+    expected_behavior: explicit_primary
+    decisive_features: [explicit_method, feedback_delay]
+    rationale: "用户指定方法，并提供了重复的增强与平衡模式。"
+  - id: causal-loop-diagramming-insufficiency-01
+    kind: insufficiency
+    prompt: "两个变量只共同变动过一次，但方向、时序和重复模式未知；绘制已核验的增强回路。"
+    expected_route: null
+    expected_behavior: hold
+    decisive_features: [feedback_delay, decisive_input_missing]
+    rationale: "没有方向或时序的一次共同变动，不能支持带正负号的回路。"

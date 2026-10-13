@@ -50,6 +50,7 @@ func specializeNativeCommands(text, host, target string) string {
 	text = strings.ReplaceAll(text, "python -m opensocrates decision", "\"./"+binary+"\" decision")
 	for _, wrapperHost := range []string{"codex", "claude", "<host>"} {
 		text = strings.ReplaceAll(text, "\" decision "+wrapperHost, "\" decision")
+		text = strings.ReplaceAll(text, "\" locale "+wrapperHost, "\" locale")
 	}
 	text = strings.ReplaceAll(text, "source CLI is", "native CLI is")
 	text = strings.ReplaceAll(text, "The source\nCLI is", "The native\nCLI is")
@@ -80,7 +81,7 @@ func packageSourceInventory(root, host string) ([]any, error) {
 			return nil, e
 		}
 	}
-	for _, name := range []string{"generation.go", "content.go", "content_validation.go", "content_yaml.go", "schema.go", "package.go", "package_reference.go"} {
+	for _, name := range []string{"generation.go", "content.go", "content_validation.go", "content_locales.go", "content_yaml.go", "schema.go", "package.go", "package_reference.go"} {
 		paths["src/opensocrates/internal/devtools/"+name] = true
 	}
 	keys := []string{}
@@ -179,6 +180,13 @@ func responseText(policy map[string]any, locale string) string {
 		heading = "작성 단계의 표현 안내"
 		boundary = "작성 안내만 제공합니다. 자동 재작성·검증된 준수·길이 상한·필수 내용 삭제를 뜻하지 않습니다."
 	}
+	if locale == "zh" {
+		heading = "写作表达指导"
+		boundary = "仅提供指导：不自动改写，不表示已验证合规，不设长度上限，也不删除必需内容。"
+	} else if locale == "ja" {
+		heading = "表現の作成ガイド"
+		boundary = "作成の指針のみです。自動書き換え、遵守の検証、長さの上限、必須内容の削除を意味しません。"
+	}
 	identity := digest([]byte(jsonToken(policy)))
 	lines := []string{"### " + heading, fmt.Sprintf("Profile: %s; revision %s; %s", str(entry["profile_id"]), jsonToken(policy["revision"]), identity), boundary, str(entry["protected_rule"])}
 	for _, r := range arr(entry["rules"]) {
@@ -203,7 +211,7 @@ func commonValues(bundle, policy map[string]any, host, target string) (map[strin
 		values[strings.ToUpper(key)+"_JSON"] = jsonToken(bundle[key])
 	}
 	for k, v := range obj(bundle["prompt_fragments"]) {
-		for _, locale := range []string{"en", "ko"} {
+		for _, locale := range releasedLocales {
 			text := str(obj(v)[locale])
 			values["FRAGMENT_"+strings.ToUpper(k)+"_"+strings.ToUpper(locale)] = text
 			if k == "controller" || k == "capability_notice" {
@@ -212,7 +220,7 @@ func commonValues(bundle, policy map[string]any, host, target string) (map[strin
 			}
 		}
 	}
-	for _, locale := range []string{"en", "ko"} {
+	for _, locale := range releasedLocales {
 		values["RESPONSE_POLICY_"+strings.ToUpper(locale)] = responseText(policy, locale)
 		values["LOCALE_MESSAGES_"+strings.ToUpper(locale)+"_JSON"] = jsonToken(obj(bundle["locale_messages"])[locale])
 	}
@@ -229,7 +237,7 @@ func methodIndex(methods []any) string {
 	for _, raw := range methods {
 		m := obj(raw)
 		id := str(m["id"])
-		sections = append(sections, fmt.Sprintf("## `%s` — %s\n\n- Korean name: %s\n- Family: `%s`\n- Use for: %s\n- 한국어: %s\n- Routing metadata: `%s`\n- Procedure: [methods/%s.md](methods/%s.md)\n", id, str(obj(m["display_name"])["en"]), str(obj(m["display_name"])["ko"]), str(m["family"]), str(obj(m["plain_action"])["en"]), str(obj(m["plain_action"])["ko"]), jsonToken(m["routing"]), id, id))
+		sections = append(sections, fmt.Sprintf("## `%s` — %s\n\n- Korean name: %s\n- 中文名称: %s\n- 日本語名: %s\n- Family: `%s`\n- Use for: %s\n- 한국어: %s\n- 简体中文: %s\n- 日本語: %s\n- Routing metadata: `%s`\n- Procedure: [methods/%s.md](methods/%s.md)\n", id, str(obj(m["display_name"])["en"]), str(obj(m["display_name"])["ko"]), str(obj(m["display_name"])["zh"]), str(obj(m["display_name"])["ja"]), str(m["family"]), str(obj(m["plain_action"])["en"]), str(obj(m["plain_action"])["ko"]), str(obj(m["plain_action"])["zh"]), str(obj(m["plain_action"])["ja"]), jsonToken(m["routing"]), id, id))
 	}
 	return strings.TrimRight(strings.Join(sections, "\n"), "\n")
 }
@@ -241,7 +249,7 @@ func methodValues(method map[string]any, common map[string]string) map[string]st
 	v["METHOD_ID"] = str(method["id"])
 	v["METHOD_FAMILY"] = str(method["family"])
 	for key, token := range map[string]string{"display_name": "DISPLAY_NAME", "plain_action": "PLAIN_ACTION", "procedure": "PROCEDURE", "complement_fragment": "COMPLEMENT"} {
-		for _, locale := range []string{"en", "ko"} {
+		for _, locale := range releasedLocales {
 			v["METHOD_"+token+"_"+strings.ToUpper(locale)] = str(obj(method[key])[locale])
 		}
 	}
@@ -345,7 +353,7 @@ func GeneratePlugin(root, host, target, runtimeRoot, output string) (map[string]
 			}
 			files[skill+"/"+dest] = b
 		}
-		for _, locale := range []string{"en", "ko"} {
+		for _, locale := range releasedLocales {
 			for dest, source := range map[string]string{"reader": "plugin-src/shared/reader/guide.", "decision": "plugin-src/claude-chat/guide."} {
 				b, e := regularRead(root, source+locale+".md")
 				if e != nil {
@@ -371,7 +379,7 @@ func GeneratePlugin(root, host, target, runtimeRoot, output string) (map[string]
 		}
 		values["HOOKS_JSON"] = jsonToken(nativeHooks(host, target))
 		// Preserve the existing shared activation guidance without changing sources.
-		for _, locale := range []string{"en", "ko"} {
+		for _, locale := range releasedLocales {
 			guard, e := regularRead(root, "plugin-src/shared/rigor/activation."+locale+".md")
 			if e != nil {
 				return nil, e
@@ -456,7 +464,7 @@ func GeneratePlugin(root, host, target, runtimeRoot, output string) (map[string]
 		}
 	}
 	canonical := []any{}
-	for _, locale := range []string{"en", "ko"} {
+	for _, locale := range releasedLocales {
 		catalogEntries := []any{}
 		for _, raw := range arr(bundle["methods"]) {
 			method := obj(raw)

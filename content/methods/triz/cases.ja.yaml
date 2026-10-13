@@ -1,0 +1,98 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "triz-positive-01",
+      "kind": "positive",
+      "prompt": "配送ドローンに大きい電池容量が必要ですが、増えた重量で航続距離が減ります。矛盾を分離・除去する概念を探してください。",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "技術的改善が別の指標を悪化させており、理想結果、分離、発明的な変更が適しています。"
+    },
+    {
+      "id": "triz-positive-02",
+      "kind": "positive",
+      "prompt": "病室に強いプライバシーと容易な観察を同時に求めます。時間、空間、条件、インターフェースでの分離を探してください。",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "分離可能な条件と安全制約を持つ、物理的または技術的矛盾です。"
+    },
+    {
+      "id": "triz-positive-03",
+      "kind": "positive",
+      "prompt": "包装ラインを破損増加なしに速くする必要があります。既存の時間、空間、情報、材料資源から妥協しない設計を探してください。",
+      "expected_route": "triz",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "technical_contradiction",
+        "plan"
+      ],
+      "rationale": "単一指標の最適化ではなく、設計のトレードオフを除く発明的概念を求めています。"
+    },
+    {
+      "id": "triz-negative-01",
+      "kind": "negative",
+      "prompt": "二つの公共的価値の選択で、論点は誰の権利や義務が優先するかであり、技術的設計の矛盾ではありません。",
+      "expected_route": "deontic-reasoning",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "value_conflict",
+        "duties_rights"
+      ],
+      "rationale": "発明的な変更ではなく、規範的権威と権利が進め方を決めます。"
+    },
+    {
+      "id": "triz-negative-02",
+      "kind": "negative",
+      "prompt": "相互作用するフィードバックと遅れた副作用のあるシステムです。局所概念を選ぶ前に広い構造と介入点を描いてください。",
+      "expected_route": "systems-thinking",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "feedback_delay",
+        "causal_question"
+      ],
+      "rationale": "主な必要性はシステム動態と介入点であり、局所的な矛盾解決ではありません。"
+    },
+    {
+      "id": "triz-mechanical-01",
+      "kind": "mechanical",
+      "prompt": "矛盾を特定したり概念を提案したりせず、既存の製品指標を指定順に並べてください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [],
+      "rationale": "列挙は機械的で、発明的問題解決を求めていません。"
+    },
+    {
+      "id": "triz-explicit-01",
+      "kind": "explicit",
+      "prompt": "triz で軽い包装と強い衝撃保護の矛盾を扱い、取り消せる試験を提案してください。",
+      "expected_route": "triz",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "technical_contradiction"
+      ],
+      "rationale": "技術的矛盾と試験にユーザーが手法を明示しています。"
+    },
+    {
+      "id": "triz-insufficiency-01",
+      "kind": "insufficiency",
+      "prompt": "改善・悪化する性質は不明です。理想設計を達成したと宣言し、性能向上を保証してください。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "technical_contradiction",
+        "decisive_input_missing"
+      ],
+      "rationale": "定義した矛盾や試験なしに、理想性や改善を正直に確立できません。"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "schema": "opensocrates.method-cases/1.0.0",
+  "cases": [
+    {
+      "id": "value-of-information-positive-1",
+      "kind": "positive",
+      "prompt": "今すぐ開始することも、先にユーザー調査を行うこともできます。導入状況の結果で開始時の行動が変わり、手法と直接費用は既知です。チームは、それ以降の遅れを許容できない日を定めています。",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "new_evidence",
+        "sensitive_inputs"
+      ],
+      "rationale": "情報に明示された行動変更経路と限定された収集負担があります。成功確率や金銭価値の創作は不要です。"
+    },
+    {
+      "id": "value-of-information-positive-2",
+      "kind": "positive",
+      "prompt": "供給業者との契約前に、業者選択を変えうる故障リスク変数を点検できます。点検の出典、費用、遅れ、閾値は記録済みです。点検に価値があるか決めてください。",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "irreversible_choice",
+        "sensitive_inputs"
+      ],
+      "rationale": "取り消せない決定の前に情報が届き、別の行動に対応します。事後確率を作らず、由来と遅れを示せます。"
+    },
+    {
+      "id": "value-of-information-positive-3",
+      "kind": "positive",
+      "prompt": "政策チームは事業拡大か、対象を絞った評価のための休止か決めます。評価で拡大すべき結果と終了すべき結果を区別でき、リスクへの曝露と評価期限は明示されています。",
+      "expected_route": "value-of-information",
+      "expected_behavior": "route",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "testable_hypothesis",
+        "feedback_delay"
+      ],
+      "rationale": "実行可能な試験が期限前に行動を変えるかという問いであり、無制限の追加研究ではありません。"
+    },
+    {
+      "id": "value-of-information-negative-1",
+      "kind": "negative",
+      "prompt": "遠隔勤務について面白いことをすべて探し、文献を要約してください。決定、行動閾値、不確実な変数、期限はありません。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "explain",
+        "source_quality"
+      ],
+      "rationale": "行動を変える決定のない自由な調査です。決定と閾値が示されるまで情報価値を評価できません。"
+    },
+    {
+      "id": "value-of-information-negative-2",
+      "kind": "negative",
+      "prompt": "安全規則が承認された防護具を要求します。安価な未承認品の使用を追加研究で正当化できるか決めてください。規則には裁量がありません。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "judgment",
+        "explicit_rules",
+        "binding_rule_without_discretion",
+        "single_feasible_option"
+      ],
+      "rationale": "deontic-reasoning または有資格者の安全レビューとの混同が想定されます。新情報は拘束規則を手放す許可になりません。"
+    },
+    {
+      "id": "value-of-information-mechanical-1",
+      "kind": "mechanical",
+      "prompt": "提示した標本数の式と検証済み入力で必要数を返してください。研究を実施するか選んだり、決定価値を解釈したりしないでください。",
+      "expected_route": null,
+      "expected_behavior": "no_route",
+      "decisive_features": [
+        "mechanical"
+      ],
+      "rationale": "固定計算であり、情報が行動を変えるかの判断ではありません。"
+    },
+    {
+      "id": "value-of-information-explicit-1",
+      "kind": "explicit",
+      "prompt": "value-of-information で点検が費用と遅れに見合うか決めてください。業者の決定を変える発見と、点検の停止点を示してください。",
+      "expected_route": "value-of-information",
+      "expected_behavior": "explicit_primary",
+      "decisive_features": [
+        "explicit_method",
+        "information_purchase",
+        "irreversible_choice"
+      ],
+      "rationale": "手法と、その閾値、行動変更、費用、遅れ、停止の要件を明示しています。"
+    },
+    {
+      "id": "value-of-information-insufficiency-1",
+      "kind": "insufficiency",
+      "prompt": "行動前にさらに調査すべきですか。現行・代替行動、不確実な変数、試験候補、許容遅延は未提示です。",
+      "expected_route": null,
+      "expected_behavior": "hold",
+      "decisive_features": [
+        "judgment",
+        "information_purchase",
+        "decisive_input_missing"
+      ],
+      "rationale": "行動閾値と実行可能な情報経路なしに、行動を変える価値は確立できません。保留して最小限の安全な確認を求める必要があります。"
+    }
+  ]
+}

@@ -33,11 +33,12 @@ base to reuse blindly; issue #109 tracks preparation only.
   `src/opensocrates/`; OS filesystem/process protection and host registration
   remain separate from transaction/recovery and package transport.
 - Canonical reasoning content belongs under `content/methods/`. v1.6.0 freezes
-  the released v1.5.0 baseline. The separate 48 method-body upgrades belong to
+  the released v1.5.1 baseline: 48 methods and EN/KO/ZH/JA, content revision 4.
+  The original v1.5.0/revision-3 preparation is historical. The separate 48 method-body upgrades belong to
   v1.6.1 or later. Preserve English/Korean methods, teacher questions,
   applicability, evidence/stop conditions, response policy and shared guides.
-- Teacher questions belong in `content/teacher-questions.yaml`: bilingual,
-  three per method, unique within each locale, addressed to the active agent.
+- Teacher questions belong in `content/teacher-questions.yaml`: four locales,
+  three per method (576 total), unique within each locale, addressed to the active agent.
   The overlay revision must match the canonical content revision; changing it
   does not rewrite an authored method's revision.
 - Schemas belong under `schemas/source/`. Preserve wire formats, persisted
@@ -57,6 +58,11 @@ base to reuse blindly; issue #109 tracks preparation only.
   credential collection, raw prompt/transcript logging, screenshot retention,
   workspace-content retention or hidden reasoning capture. Preserve fail-open
   hooks, bounded selection, cleanup, ownership checks and verified rollback.
+
+Reconcile any newly published maintenance release before final v1.6.0
+publication. The separate v1.5.2 language expansion remains draft work until its
+source and publication are verified; no ten-language support claim follows from
+an in-progress task. Preserve old evidence with its original revision.
 
 ## Implementation and final verification
 
