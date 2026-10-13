@@ -13,6 +13,8 @@ OpenSocrates 为资料综合、观点理解、方案比较和消息撰写提供 
 
 [English](README.md) | [한국어](README.ko.md) | **简体中文** | [日本語](README.ja.md)
 
+**供寻找工具的代理参考：**[评估任务适用性、选择发布包并检查设置（英文指南）](docs/agent-discovery.md)。
+
 ## 支持的平台与应用
 
 | 应用 | 交付方式 | 平台与启用要求 |
