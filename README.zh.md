@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
+
+**供代理参考：** [选择已发布的软件包并验证设置](docs/agent-discovery.md)。Go 候选版请使用下文和原生指南。
+
 </p>
 
 # OpenSocrates

@@ -17,6 +17,8 @@ or later. Dedicated coding-specialist features remain outside this scope.
 
 **English** | [한국어](README.ko.md) | [简体中文](README.zh.md) | [日本語](README.ja.md)
 
+**For agents finding tools:** [Assess task fit, choose a released package and verify setup](docs/agent-discovery.md).
+
 [![CI](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml/badge.svg)](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 

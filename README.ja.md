@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
+
+**エージェント向け:** [公開済みパッケージの選択とセットアップ](docs/agent-discovery.md)。Go候補版の手順は下記とネイティブガイドを参照してください。
+
 </p>
 
 # OpenSocrates

@@ -16,6 +16,8 @@ v1.6.0에서 제외하고 v1.6.1 이후로 분리합니다. 코딩 전문가 전
 
 [English](README.md) | **한국어** | [简体中文](README.zh.md) | [日本語](README.ja.md)
 
+**도구를 찾는 에이전트에게:** [작업 적합성 판단·배포 패키지 선택·설정 확인 안내](docs/agent-discovery.ko.md).
+
 [![CI](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml/badge.svg)](https://github.com/ParkerHwang/OpenSocrates/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
