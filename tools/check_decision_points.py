@@ -289,11 +289,10 @@ class DecisionChecks(unittest.TestCase):
             entry = next(m for m in catalog["methods"] if m["id"] == "bayesian-updating")
             self.assertIn("no_defensible_prior_basis", entry["routing"]["contraindications"])
             self.assertIn("no_likelihood_direction", entry["routing"]["contraindications"])
+            method = self.bundle.methods[self.bundle.method_ids.index("bayesian-updating")]
+            self.assertEqual(entry["use_for"], method.plain_action[locale])
             self.assertIn(
-                entry["use_for"],
-                self.bundle.methods[self.bundle.method_ids.index("bayesian-updating")].procedure[
-                    locale
-                ],
+                method.procedure[locale].rstrip("\n"), result["methods"][0]["instructions"]
             )
 
     def test_bayesian_compiled_projection_retains_prerequisite_exclusions(self):
