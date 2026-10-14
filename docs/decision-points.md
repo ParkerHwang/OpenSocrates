@@ -98,6 +98,21 @@ complete JSON object per line, retains the same per-line limit, and may return
 multiple responses from one volatile session. Multiple JSON documents supplied
 to one-shot mode are malformed rather than silently treated as a stream.
 
+A rejected request returns `invalid_decision_request` with a closed `field` path
+(for example `context` or `routing.features[0].key`), a predefined `error` code
+(`invalid_json`, `invalid_type`, `missing_field`, `unknown_field`,
+`unknown_operation`, `invalid_format`, `invalid_value`, `stale_epoch`,
+`unknown_feature`, `duplicate_feature` or `too_many_features`), a fixed
+`expected` description where one exists, and `repair: correct_field_once`.
+Submitted values, unknown key names and prose are never echoed, logged or
+retained, and a rejected request does not change session state. Malformed JSON
+is this repairable input error rather than `decision_unavailable`, which is
+reserved for runtime or packaged-content faults after acceptance. Invalid input,
+`no_intervention`, `unknown_method` and runtime unavailability remain distinct;
+none of them is an applied method. The packaged `features.json` `envelope` lists
+every field format, and [the #124 fixture](../evals/issue-124/README.md) holds
+synthetic rejection cases.
+
 ## Host evidence and compatibility
 
 | Host | New in-turn delivery | Evidence level |

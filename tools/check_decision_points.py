@@ -12,10 +12,24 @@ from opensocrates.cli.decision import run_decision
 from opensocrates.constants import PUBLIC_ATTRIBUTION_FOOTER
 from opensocrates.content.injection import ProjectionInstructionAssembler
 from opensocrates.content.loader import load_compiled_bundle, load_reasoning_content_projections
-from opensocrates.selector.decision import DecisionSession
+from opensocrates.selector.decision import FAULT_CODES, DecisionSession, RequestFault
 from opensocrates.selector.entry import ENTRY_GUIDANCE, ENTRY_GUIDANCE_MAX_BYTES
 
 ROOT = Path(__file__).resolve().parents[1]
+SELECT_FAULTS = ROOT / "evals" / "issue-124" / "select-faults.json"
+
+
+def mutate(value, action, path, replacement):
+    target = value
+    parts = path.split(".")
+    for part in parts[:-1]:
+        target = target[int(part)] if part.isdigit() else target[part]
+    last = int(parts[-1]) if parts[-1].isdigit() else parts[-1]
+    if action == "drop":
+        del target[last]
+    else:
+        target[last] = replacement
+    return value
 
 
 def request(method=None, features=None, **overrides):
@@ -363,6 +377,125 @@ class DecisionChecks(unittest.TestCase):
             run_decision(io.StringIO(json.dumps(request("deduction"))), out)
             self.assertEqual(json.loads(out.getvalue())["reason"], "canonical_content_unavailable")
 
+    def test_select_faults_name_closed_location_without_values(self):
+        """#124: every rejection is locatable, never echoes input, never looks empty."""
+
+        fixture = json.loads(SELECT_FAULTS.read_text(encoding="utf-8"))
+        self.assertEqual(self.session.handle(fixture["valid"])["status"], "selected")
+        for case in fixture["cases"]:
+            with self.subTest(case=case["id"]):
+                self.session.handle({"operation": "reset"})
+                value = mutate(
+                    json.loads(json.dumps(fixture["valid"])),
+                    case["action"],
+                    case["path"],
+                    case["value"],
+                )
+                result = self.session.handle(value)
+                self.assertEqual(result["status"], "unavailable")
+                self.assertEqual(result["reason"], "invalid_decision_request")
+                self.assertEqual((result["field"], result["error"]), (case["field"], case["error"]))
+                self.assertIn(result["error"], FAULT_CODES)
+                self.assertEqual(result["repair"], "correct_field_once")
+                self.assertTrue(result["continue_ordinary_work"])
+                self.assertTrue(result["constraints_remain_binding"])
+                self.assertNotIn("selected", result)
+                self.assertNotIn("methods", result)
+                if isinstance(case["value"], str) and len(case["value"]) >= 4:
+                    self.assertNotIn(case["value"], json.dumps(result, ensure_ascii=False))
+        with self.assertRaises(AssertionError):
+            RequestFault("context", "free_form_detail")
+
+    def test_repaired_request_takes_valid_selection_path(self):
+        fixture = json.loads(SELECT_FAULTS.read_text(encoding="utf-8"))
+        broken = json.loads(json.dumps(fixture["valid"]))
+        broken["context"] = "3F2B8C1E-7D4A-4E9B-A6C2-1F0E9D8B7A6C"
+        broken["decision"] = "tessellate-priority"
+        first = self.session.handle(broken)
+        self.assertEqual(first["field"], "context")
+        broken["context"] = "3f2b8c1e7d4a4e9ba6c21f0e9d8b7a6c"
+        second = self.session.handle(broken)
+        self.assertEqual(second["field"], "decision")
+        broken["decision"] = "tessellatepriority"
+        repaired = self.session.handle(broken)
+        self.assertEqual(repaired["status"], "selected")
+        self.assertTrue(repaired["selected"])
+        method = repaired["methods"][0]
+        self.assertEqual(method["locale"], "ko")
+        self.assertEqual(
+            method["instructions"],
+            self.assembler.assemble((method["id"],), requested_locale="ko").instructions,
+        )
+        self.assertEqual(repaired["applied"], "unverified")
+
+    def test_failure_states_remain_distinct(self):
+        from unittest.mock import patch
+
+        empty = self.session.handle(request(participation="mechanical"))
+        self.assertEqual((empty["status"], empty["selected"]), ("no_intervention", []))
+        self.assertNotIn("field", empty)
+
+        invalid = self.session.handle(request(context="not-a-handle"))
+        self.assertEqual(
+            (invalid["status"], invalid["reason"]), ("unavailable", "invalid_decision_request")
+        )
+        self.assertEqual(invalid["field"], "context")
+
+        unknown = self.session.handle(request("not-a-method"))
+        self.assertEqual(unknown["reason"], "unknown_method")
+        self.assertNotIn("field", unknown)
+
+        # A packaged-content fault after acceptance is not mislabelled as repairable input.
+        with patch.object(type(self.assembler), "assemble", side_effect=ValueError):
+            runtime = self.session.handle(request("deduction", decision="d9"))
+        self.assertEqual(runtime["reason"], "decision_unavailable")
+        self.assertNotIn("field", runtime)
+        for result in (invalid, unknown, runtime):
+            self.assertTrue(result["continue_ordinary_work"])
+            self.assertTrue(result["constraints_remain_binding"])
+
+    def test_other_operations_report_closed_locations(self):
+        catalog = self.session.handle({"operation": "catalog"})
+        self.assertEqual((catalog["field"], catalog["error"]), ("locale", "missing_field"))
+        catalog = self.session.handle({"operation": "catalog", "locale": ["ko"]})
+        self.assertEqual((catalog["field"], catalog["error"]), ("locale", "invalid_value"))
+        unknown = self.session.handle({"operation": "choose"})
+        self.assertEqual((unknown["field"], unknown["error"]), ("operation", "unknown_operation"))
+        missing = self.session.handle({"context": "a" * 32})
+        self.assertEqual((missing["field"], missing["error"]), ("operation", "missing_field"))
+        self.session.handle(request(epoch=2))
+        stale = self.session.handle(request(epoch=1))
+        self.assertEqual((stale["field"], stale["error"]), ("epoch", "stale_epoch"))
+
+    def test_packaged_envelope_contract_matches_runtime_validation(self):
+        from opensocrates.domain.enums import ClassificationConfidence, Participation
+        from opensocrates.domain.models import RoutingFeatures
+        from opensocrates.selector.decision import LOCALES, SELECT_KEYS
+
+        envelope = json.loads(
+            (ROOT / "plugin-src/shared/decision/features.json").read_text(encoding="utf-8")
+        )["envelope"]
+        packaged = json.loads(
+            (ROOT / "plugin-src/shared/decision/request.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(tuple(envelope["required_keys"]), SELECT_KEYS)
+        self.assertEqual(set(envelope["required_keys"]), set(packaged))
+        self.assertEqual(set(envelope["routing_required_keys"]), set(packaged["routing"]))
+        self.assertEqual(set(envelope["locale"]), LOCALES)
+        self.assertEqual(set(envelope["participation"]), {p.value for p in Participation})
+        self.assertEqual(
+            envelope["classification_confidence"], [c.value for c in ClassificationConfidence]
+        )
+        self.assertEqual(envelope["routing_schema"], RoutingFeatures.__schema_id__)
+        self.assertEqual((envelope["strength"], envelope["max_features"]), ([1, 2, 3], 16))
+        self.assertEqual(set(envelope["feature_entry_keys"]), {"key", "strength", "basis"})
+        for guide in ("en", "ko"):
+            text = (ROOT / f"plugin-src/shared/decision/guide.{guide}.md").read_text(
+                encoding="utf-8"
+            )
+            self.assertIn("invalid_decision_request", text)
+            self.assertIn("envelope", text)
+
     def test_single_document_cli_reads_packaged_pretty_request_once(self):
         from unittest.mock import patch
 
@@ -392,7 +525,11 @@ class DecisionChecks(unittest.TestCase):
             json.dumps(request("deduction")) + "\n" + json.dumps(request("trade-off-analysis"))
         )
         self.assertEqual(run_decision(source, output), 0)
-        self.assertEqual(json.loads(output.getvalue())["reason"], "decision_unavailable")
+        result = json.loads(output.getvalue())
+        # Malformed JSON is repairable input, not runtime unavailability (#124).
+        self.assertEqual(result["reason"], "invalid_decision_request")
+        self.assertEqual((result["field"], result["error"]), ("request", "invalid_json"))
+        self.assertTrue(result["continue_ordinary_work"])
 
     def test_review_cases_share_one_source_session_without_cross_question_leakage(self):
         mechanical = self.session.handle(request(participation="mechanical", decision="mechanical"))

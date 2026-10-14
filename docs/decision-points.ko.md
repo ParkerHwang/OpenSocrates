@@ -91,6 +91,20 @@ EOF까지 읽습니다. 문서 전체에 16,384자 제한이 그대로 적용됩
 하나의 임시 세션에서 여러 응답을 낼 수 있습니다. 단발 모드에 JSON 문서를 여러 개
 넣으면 stream으로 암묵 변환하지 않고 잘못된 입력으로 처리합니다.
 
+거부된 요청은 `invalid_decision_request`와 함께 닫힌 집합의 `field` 경로(예:
+`context`, `routing.features[0].key`), 미리 정한 `error` 코드(`invalid_json`,
+`invalid_type`, `missing_field`, `unknown_field`, `unknown_operation`,
+`invalid_format`, `invalid_value`, `stale_epoch`, `unknown_feature`,
+`duplicate_feature`, `too_many_features`), 해당하는 경우 고정된 `expected` 설명,
+`repair: correct_field_once`를 반환합니다. 제출한 값, 알 수 없는 키 이름과 문장은
+되풀이하거나 기록하거나 보관하지 않으며, 거부된 요청은 세션 상태를 바꾸지 않습니다.
+잘못된 JSON도 고칠 수 있는 이 입력 오류이며 `decision_unavailable`이 아닙니다.
+`decision_unavailable`은 요청을 받아들인 뒤의 런타임이나 패키지 콘텐츠 오류에만
+씁니다. 잘못된 입력, `no_intervention`, `unknown_method`, 런타임 사용 불가는 서로
+구분하며 어느 것도 방법을 적용했다는 뜻이 아닙니다. 패키지의 `features.json`
+`envelope`에 모든 필드 형식이 있고, [#124 예제](../evals/issue-124/README.md)에
+합성 거부 사례가 있습니다.
+
 ## 호스트별 증거와 호환성
 
 | 호스트 | 새 같은 턴 조회 경로 | 증거 수준 |

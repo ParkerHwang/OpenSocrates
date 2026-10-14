@@ -125,6 +125,9 @@ class RoutingPayloadValidation:
     features: RoutingFeatures | None
     structurally_valid: bool
     invalid_feature_list: bool
+    # First rejected location relative to the routing object, as a closed
+    # (field path, error code) pair. It never carries submitted values.
+    fault: tuple[str, str] | None = None
 
 
 def _shape_values(*values: str) -> frozenset[AnswerShape]:
@@ -794,7 +797,7 @@ def validate_routing_payload(payload: Mapping[str, Any]) -> RoutingPayloadValida
     """
 
     if not isinstance(payload, Mapping):
-        return RoutingPayloadValidation(None, False, False)
+        return RoutingPayloadValidation(None, False, False, ("", "invalid_type"))
     expected_keys = {
         "schema",
         "answer_shape",
@@ -803,40 +806,60 @@ def validate_routing_payload(payload: Mapping[str, Any]) -> RoutingPayloadValida
         "explicit_method",
     }
     if set(payload) != expected_keys:
-        return RoutingPayloadValidation(None, False, False)
+        missing = sorted(expected_keys - set(payload))
+        fault = (missing[0], "missing_field") if missing else ("", "unknown_field")
+        return RoutingPayloadValidation(None, False, False, fault)
+    if payload["schema"] != RoutingFeatures.__schema_id__:
+        return RoutingPayloadValidation(None, False, False, ("schema", "invalid_value"))
     try:
-        if payload.get("schema") != RoutingFeatures.__schema_id__:
-            return RoutingPayloadValidation(None, False, False)
         answer_shape = AnswerShape(payload["answer_shape"])
+    except (ValueError, TypeError):
+        return RoutingPayloadValidation(None, False, False, ("answer_shape", "invalid_value"))
+    try:
         confidence = ClassificationConfidence(payload["classification_confidence"])
-    except (KeyError, ValueError, TypeError):
-        return RoutingPayloadValidation(None, False, False)
+    except (ValueError, TypeError):
+        return RoutingPayloadValidation(
+            None, False, False, ("classification_confidence", "invalid_value")
+        )
     explicit_method = payload["explicit_method"]
     if explicit_method is not None and not isinstance(explicit_method, str):
-        return RoutingPayloadValidation(None, False, False)
+        return RoutingPayloadValidation(None, False, False, ("explicit_method", "invalid_type"))
     raw_features = payload["features"]
-    if not isinstance(raw_features, list) or len(raw_features) > 16:
-        return RoutingPayloadValidation(None, False, False)
+    if not isinstance(raw_features, list):
+        return RoutingPayloadValidation(None, False, False, ("features", "invalid_type"))
+    if len(raw_features) > 16:
+        return RoutingPayloadValidation(None, False, False, ("features", "too_many_features"))
     parsed: list[RoutingFeature] = []
     seen: set[FeatureKey] = set()
     invalid_list = False
-    for raw in raw_features:
-        if not isinstance(raw, Mapping) or set(raw) != {"key", "strength", "basis"}:
-            return RoutingPayloadValidation(None, False, False)
+    list_fault: tuple[str, str] | None = None
+    entry_keys = {"key", "strength", "basis"}
+    for index, raw in enumerate(raw_features):
+        at = f"features[{index}]"
+        if not isinstance(raw, Mapping):
+            return RoutingPayloadValidation(None, False, False, (at, "invalid_type"))
+        if set(raw) != entry_keys:
+            missing = sorted(entry_keys - set(raw))
+            fault = (f"{at}.{missing[0]}", "missing_field") if missing else (at, "unknown_field")
+            return RoutingPayloadValidation(None, False, False, fault)
         try:
             key = FeatureKey(raw["key"])
         except (ValueError, TypeError):
             invalid_list = True
+            list_fault = list_fault or (f"{at}.key", "unknown_feature")
             continue
         try:
             basis = FeatureBasis(raw["basis"])
         except (ValueError, TypeError):
-            return RoutingPayloadValidation(None, False, False)
+            return RoutingPayloadValidation(None, False, False, (f"{at}.basis", "invalid_value"))
         strength = raw["strength"]
-        if not isinstance(strength, int) or isinstance(strength, bool) or not 1 <= strength <= 3:
-            return RoutingPayloadValidation(None, False, False)
+        if not isinstance(strength, int) or isinstance(strength, bool):
+            return RoutingPayloadValidation(None, False, False, (f"{at}.strength", "invalid_type"))
+        if not 1 <= strength <= 3:
+            return RoutingPayloadValidation(None, False, False, (f"{at}.strength", "invalid_value"))
         if key in seen:
             invalid_list = True
+            list_fault = list_fault or (f"{at}.key", "duplicate_feature")
             continue
         seen.add(key)
         parsed.append(RoutingFeature(key=key, strength=strength, basis=basis))
@@ -850,8 +873,14 @@ def validate_routing_payload(payload: Mapping[str, Any]) -> RoutingPayloadValida
             explicit_method=explicit_method,
         )
     except Exception:
-        return RoutingPayloadValidation(None, False, False)
-    return RoutingPayloadValidation(normalized, True, invalid_list)
+        # Remaining model-level checks constrain only the explicit method identity.
+        fault = (
+            ("explicit_method", "invalid_format")
+            if explicit_method is not None
+            else ("", "invalid_value")
+        )
+        return RoutingPayloadValidation(None, False, False, fault)
+    return RoutingPayloadValidation(normalized, True, invalid_list, list_fault)
 
 
 def _coerce_features(features: RoutingFeatures | Mapping[str, Any]) -> RoutingPayloadValidation:
