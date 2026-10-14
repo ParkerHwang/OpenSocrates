@@ -26,7 +26,12 @@ from .capability import (
     default_capability_profile,
 )
 from .events import normalize_codex_event, project_codex_payload
-from .native import CodexNativeEvent, NativeParseResult, try_parse_codex_event
+from .native import (
+    CodexNativeEvent,
+    NativeParseResult,
+    try_parse_codex_entry_event,
+    try_parse_codex_event,
+)
 from .responses import (
     NativeResponseError,
     response_object,
@@ -786,7 +791,12 @@ class CodexAdapter:
     ) -> CodexHandleResult:
         """Process one Codex callback and return a safe legal response."""
 
-        parsed = try_parse_codex_event(
+        parser = (
+            try_parse_codex_entry_event
+            if self.config.decision_point_mode
+            else try_parse_codex_event
+        )
+        parsed = parser(
             native_input,
             event_name=event_name,
             host=self.config.host,

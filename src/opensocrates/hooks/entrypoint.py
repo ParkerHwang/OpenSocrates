@@ -14,9 +14,9 @@ import sys
 from collections.abc import Mapping, Sequence
 from typing import Any, BinaryIO, TextIO
 
+from ..constants import MAX_HOOK_INPUT_BYTES
 from ..hosts.codex.commands import NATIVE_TO_NORMALIZED as CODEX_EVENTS
 
-MAX_HOOK_INPUT_BYTES = 4 * 1024 * 1024
 _HOSTS = frozenset({"codex"})
 _NORMALIZED_EVENTS = frozenset(
     {
