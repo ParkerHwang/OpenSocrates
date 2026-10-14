@@ -1768,7 +1768,9 @@ test("isolated app-server timeout closes stdin and kills an uncooperative child 
         codexBin,
         hooks: {
           validationTimeoutMilliseconds: 1_500,
-          validationTerminationMilliseconds: 50,
+          // Match the adjacent EOF-trace fixture's grace on busy CI runners.
+          // The dead-child assertion and five-second bound below still apply.
+          validationTerminationMilliseconds: 500,
         },
       }),
       (error) =>
