@@ -1,6 +1,6 @@
 # Scopo del lettore e giudizio utilizzabile
 
-Usa questa guida quando sintetizzi materiali fonte, spieghi una decisione o prepari un messaggio per una persona che deve capire e agire. Tralasciala per il lavoro meccanico. È un controllo di presentazione, non un altro metodo di ragionamento.
+Usa questa guida quando sintetizzi materiali fonte, spieghi un'idea o una decisione, organizzi un documento o prepari un messaggio per una persona che deve capire e agire. Può bastare senza applicare un metodo canonico; l'idoneità del metodo dipende dal lavoro di pensiero necessario, non dal nome del prodotto finale. Tralasciala per i passaggi meccanici prestabiliti. È un controllo di presentazione, non un altro metodo di ragionamento.
 
 Chiarisci chi userà il risultato, che cosa sa già e quale giudizio o prossima azione gli serve. Usa il contesto effettivo del compito; non inventare le motivazioni di un interessato e non chiedere all'utente di ripetere informazioni già stabilite. Chiedi soltanto quando una risposta mancante cambierebbe il lavoro in modo rilevante.
 

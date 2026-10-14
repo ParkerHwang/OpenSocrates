@@ -126,9 +126,12 @@ def check(root: Path) -> int:
     from tools.release_check import _write_deterministic_zip
 
     from opensocrates.constants import PUBLIC_ATTRIBUTION_FOOTER
-    from opensocrates.selector.entry import ENTRY_GUIDANCE
+    from opensocrates.selector.entry import ENTRY_GUIDANCE, ENTRY_GUIDANCE_MAX_BYTES
 
-    _require(len(ENTRY_GUIDANCE.encode("utf-8")) <= 1400, "discovery entry exceeds byte budget")
+    _require(
+        len(ENTRY_GUIDANCE.encode("utf-8")) <= ENTRY_GUIDANCE_MAX_BYTES,
+        "discovery entry exceeds byte budget",
+    )
     _require(
         "references/reader/guide.en.md" in ENTRY_GUIDANCE, "discovery entry has no reader pointer"
     )

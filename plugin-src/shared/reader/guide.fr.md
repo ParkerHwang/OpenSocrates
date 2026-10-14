@@ -1,6 +1,6 @@
 # Objectif du lecteur et jugement utilisable
 
-Utilisez ce guide pour synthétiser des documents sources, expliquer une décision ou préparer un message à une personne qui doit comprendre et agir. Omettez-le pour les tâches mécaniques. Il s’agit d’une vérification de la présentation, pas d’une autre méthode de raisonnement.
+Utilisez ce guide pour synthétiser des documents sources, expliquer une idée ou une décision, organiser un document ou préparer un message à une personne qui doit comprendre et agir. Il peut suffire sans application d’une méthode canonique ; l’adéquation d’une méthode dépend de la réflexion nécessaire, pas du nom du livrable. Omettez-le pour les étapes mécaniques prescrites. Il s’agit d’une vérification de la présentation, pas d’une autre méthode de raisonnement.
 
 Déterminez qui utilisera le résultat, ce que cette personne sait déjà et le jugement ou la prochaine action dont elle a besoin. Utilisez le contexte réel de la tâche ; n’inventez pas les motivations d’une partie prenante et ne demandez pas à l’utilisateur de répéter des informations établies. Posez une question uniquement lorsqu’une réponse manquante changerait sensiblement le travail.
 

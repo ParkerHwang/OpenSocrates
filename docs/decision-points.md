@@ -24,16 +24,25 @@ Codex Stop gate still checks a complete authenticated read and the exact footer.
 ## Use in the current turn
 
 Keep task goals, permissions, constraints and completion conditions available.
-Activate the controller when a materially changed judgment needs help; do not
-wait for another user message. It links locale-specific decision guides, compact
-routing metadata and exact complete canonical instructions. Do not load a method
-for mechanical steps. Upstream constraints must be read before they affect a choice.
+Consider support at the first need for substantive framing, interpretation,
+exploration, learning, research design, reasoning checks, approach choice or
+explanation, and when its context materially changes within the same turn. A
+prescribed procedure without substantive inference or problem solving can stay
+mechanical; a fixed answer alone does not make a task mechanical. Reader guidance
+or ordinary work may suffice. Consult methods when they fit the thinking needed,
+not only when a consequential decision is unresolved. Preserve constraints and
+required stops before they affect a choice. The [scope and diagnostic guide](thinking-support-scope.md)
+records the source change, preservation matrix and separate delivery/use checks;
+it does not establish a cause or fix for incident #124.
 
 When the packaged runtime and shell are available, Codex use native
 `catalog` and `select` first. Include known missing prerequisites in the closed
 features, use a separate decision identity for a distinct question, and leave
 `explicit_method` null unless the user explicitly requested a method. An empty
 eligible set is valid, not a reason to bypass eligibility with file lookup.
+Below-threshold scoring may return an answer-shape fallback; that is a candidate,
+not proof of applicability. Retire an inapplicable candidate after its complete
+read, without bypassing required holds/stops or relabeling thinking as mechanical.
 Runtime/shell unavailability or failure permits the existing complete-reference
 fallback with the same contraindications and global constraints. This is guided host behavior; the selector does not
 verify feature classification, freeform semantics or actual method application.

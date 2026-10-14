@@ -1,8 +1,11 @@
 # Reader purpose and usable judgment
 
-Use this guidance when synthesizing source material, explaining a decision, or
-preparing a message for someone who needs to understand and act. Skip it for
-mechanical work. This is a presentation check, not another reasoning method.
+Use this guidance when synthesizing source material, explaining an idea or a
+decision, organizing a document, or preparing a message for someone who needs to
+understand and act. It can be sufficient without applying a canonical method;
+method fit depends on the thinking needed, not the deliverable's name. Skip it
+for prescribed mechanical steps. This is a presentation check, not another
+reasoning method.
 
 Settle who will use the result, what they already know, and the judgment or next
 action they need. Use the task's actual context; do not invent a stakeholder's
