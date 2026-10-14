@@ -13,6 +13,7 @@ from opensocrates.constants import PUBLIC_ATTRIBUTION_FOOTER
 from opensocrates.content.injection import ProjectionInstructionAssembler
 from opensocrates.content.loader import load_compiled_bundle, load_reasoning_content_projections
 from opensocrates.selector.decision import DecisionSession
+from opensocrates.selector.entry import ENTRY_GUIDANCE, ENTRY_GUIDANCE_MAX_BYTES
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -83,6 +84,20 @@ class DecisionChecks(unittest.TestCase):
         self.assertEqual(result["methods"], [])
         self.assertIsNone(result["audit_if_applied"])
         self.assertEqual(result["applied"], "unverified")
+
+    def test_prescribed_step_does_not_bypass_later_reasoning(self):
+        prescribed = self.session.handle(request(participation="mechanical"))
+        self.assertEqual(prescribed["methods"], [])
+
+        # Given rules can still require inference. A mechanical first segment
+        # must not make the next substantive segment terminally bypassed.
+        reasoning = self.session.handle(
+            request(features=["explicit_rules", "explain"], decision="d2")
+        )
+        self.assertEqual(reasoning["selected"], ["deduction"])
+        self.assertEqual(reasoning["methods"][0]["locale"], "en")
+        self.assertEqual(reasoning["methods"][0]["read"], "unverified")
+        self.assertEqual(reasoning["applied"], "unverified")
 
     def test_later_decision_reopen_and_reuse(self):
         first = self.session.handle(request("assumption-mapping"))
@@ -463,7 +478,8 @@ class DecisionChecks(unittest.TestCase):
             result = adapter.handle(payload)
             self.assertEqual(result.status, "decision_point_entry")
             text = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
-            self.assertLess(len(text.encode()), 1400)
+            self.assertEqual(text, ENTRY_GUIDANCE)
+            self.assertLessEqual(len(text.encode()), ENTRY_GUIDANCE_MAX_BYTES)
             self.assertNotIn("## Procedure", text)
             selector.select_for_user_prompt_submit.assert_not_called()
             stopped = adapter.handle(

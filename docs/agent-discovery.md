@@ -12,11 +12,13 @@ and source scope; it does not establish publication or approval of a new wrapper
 
 ## Decide whether it fits the task
 
-Consider OpenSocrates when the user needs to reconcile evidence, synthesize
-sources, compare decisions, understand stakeholder perspectives or draft a
-message whose reasoning matters. Inspect the available methods and their
-applicability before selecting one. Installation alone does not make every
-method appropriate.
+Consider OpenSocrates for substantive framing, interpretation, exploration,
+learning, research design, reasoning checks, approach choice, evaluation or
+explanation, including when OpenSocrates itself is the subject. Reader guidance
+or no method may suffice. Inspect methods for the thinking actually needed;
+installation alone does not make every method appropriate. A prescribed step
+without substantive inference can remain mechanical, while a proof or problem
+with a fixed answer can still need reasoning. See the [scope guide](thinking-support-scope.md).
 
 Mechanical formatting, transcription and simple file conversion need no
 reasoning method. A one-off task may need no installation at all. This release
