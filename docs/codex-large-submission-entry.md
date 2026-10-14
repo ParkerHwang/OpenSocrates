@@ -67,10 +67,25 @@ entry. It does not start method selection, retain callback content, change hook
 trust, modify an active installation, or add logging/telemetry. It is not a
 blanket increase to every native-event limit.
 
-Implementation intent and the baseline reproduction are distinct from candidate
-verification. The linked change's final handoff must record its exact commit,
-commands and results; this note alone claims no candidate test, packaged-host,
-live-delivery or answer-quality pass.
+Baseline reproduction and candidate verification are recorded separately. The
+linked change's final handoff records exact commits, commands and results;
+source checks alone establish neither live delivery nor answer quality.
+
+## Recorded source verification
+
+At `01d363def89cf456faeee6bec49daf67c645fa7f`, on Apple-silicon macOS with
+Python 3.12, the following integrated command passed with exit zero:
+
+```sh
+make bootstrap format-check lint generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check
+```
+
+This includes the 12 normal-hook composition/entry checks (including the new
+large-submission cases), 35 decision-point checks and 26 selector-contract cases.
+Code and security review found no actionable defects. The active installation
+was not changed; these source checks do not establish live delivery or
+spontaneous application. Final PR metadata and CI results remain in the linked
+change's handoff.
 
 ## Minimal next checks
 
