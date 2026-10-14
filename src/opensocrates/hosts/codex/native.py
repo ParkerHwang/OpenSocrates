@@ -17,7 +17,7 @@ from itertools import islice
 from pathlib import Path
 from typing import Any
 
-from ...constants import INSTRUCTION_ARTIFACT_END_MARKER, MAX_CONTROL_DEPTH
+from ...constants import INSTRUCTION_ARTIFACT_END_MARKER, MAX_CONTROL_DEPTH, MAX_HOOK_INPUT_BYTES
 from ...domain.enums import HostId
 
 # Native hook envelopes are deliberately kept below the host-control limit.
@@ -677,6 +677,55 @@ def try_parse_codex_event(
         )
 
 
+def try_parse_codex_entry_event(
+    value: Mapping[str, Any] | str | bytes | bytearray,
+    *,
+    event_name: str | None = None,
+    host: HostId = HostId.CODEX_CLI,
+) -> NativeParseResult:
+    """Project submission discovery metadata without retaining the user prompt.
+
+    Default submission discovery uses no task content. Its envelope may reach
+    the existing hook ingress bound, independently of the smaller legacy
+    selector/control bound. Every other event keeps the strict native parser.
+    """
+
+    if event_name not in (None, "UserPromptSubmit", "user_prompt_submitted"):
+        return try_parse_codex_event(value, event_name=event_name, host=host)
+    try:
+        raw = _json_bytes(value)
+        if len(raw) > MAX_HOOK_INPUT_BYTES:
+            raise NativeInputTooLarge("submission entry exceeds the hook ingress bound")
+        try:
+            document = json.loads(raw.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError, RecursionError) as exc:
+            raise NativeParseError("native input is not strict UTF-8 JSON") from exc
+        if not isinstance(document, Mapping):
+            raise NativeInputNotObject("native input must be an object")
+        native_name = document.get("hook_event_name", event_name)
+        if native_name != "UserPromptSubmit":
+            return try_parse_codex_event(value, event_name=event_name, host=host)
+        _depth_and_shape(document)
+        # Validate the documented prompt type, then discard it. Neither it nor
+        # unrelated paths, tool data, model markers or unknown field names may
+        # survive in the metadata projection, diagnostics or cleanup request.
+        _text(document, "prompt", required=True, max_bytes=MAX_HOOK_INPUT_BYTES)
+        session_id = _text(document, "session_id", max_bytes=256)
+        event = CodexNativeEvent(
+            native_event="UserPromptSubmit",
+            host=host if isinstance(host, HostId) else HostId(host),
+            native_version="unknown",
+            session_id=session_id,
+        )
+        return NativeParseResult(event=event)
+    except NativeParseError as exc:
+        return NativeParseResult(event=None, diagnostics=(exc.code,), error_code=exc.code)
+    except (TypeError, ValueError, OverflowError, UnicodeError):
+        return NativeParseResult(
+            event=None, diagnostics=("native_invalid",), error_code="native_invalid"
+        )
+
+
 def parse_codex_event(
     value: Mapping[str, Any] | str | bytes | bytearray,
     *,
@@ -741,5 +790,6 @@ __all__ = [
     "parse_fixture",
     "parse_native_event",
     "try_parse_codex_event",
+    "try_parse_codex_entry_event",
     "try_parse_native_event",
 ]

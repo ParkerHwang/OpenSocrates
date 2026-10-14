@@ -13,17 +13,163 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from types import SimpleNamespace
+from unittest.mock import Mock, call, patch
 
 from opensocrates.cli.runtime import build_runtime_services
+from opensocrates.constants import MAX_CONTROL_DEPTH, MAX_HOOK_INPUT_BYTES
 from opensocrates.content.injection import ProjectionInstructionAssembler
 from opensocrates.content.loader import load_reasoning_content_projections
 from opensocrates.hooks.entrypoint import run_hook
+from opensocrates.hosts.codex.adapter import CodexAdapter, CodexAdapterConfig
+from opensocrates.hosts.codex.native import (
+    MAX_NATIVE_BYTES,
+    try_parse_codex_entry_event,
+    try_parse_codex_event,
+)
 from opensocrates.persistence.paths import DataRoot, DataRootLayout
 from opensocrates.persistence.permissions import secure_mode
 from opensocrates.selector.artifacts import InstructionFileStore
+from opensocrates.selector.entry import ENTRY_GUIDANCE
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+class SubmissionEntryChecks(unittest.TestCase):
+    def setUp(self):
+        self.store, self.selector = Mock(), Mock()
+        self.adapter = CodexAdapter(
+            CodexAdapterConfig(
+                decision_point_mode=True,
+                selector_mode=True,
+                selector_application=self.selector,
+                instruction_file_store=self.store,
+            )
+        )
+        self.services = SimpleNamespace(adapter_for=Mock(return_value=self.adapter))
+
+    @staticmethod
+    def envelope(prompt="synthetic", **overrides):
+        return dict(
+            hook_event_name="UserPromptSubmit", session_id="fixture", prompt=prompt, **overrides
+        )
+
+    @classmethod
+    def raw_size(cls, size):
+        empty = json.dumps(cls.envelope(""), separators=(",", ":")).encode()
+        return json.dumps(cls.envelope("x" * (size - len(empty))), separators=(",", ":")).encode()
+
+    def invoke(self, raw, *, lane="user_prompt_submitted"):
+        if isinstance(raw, dict):
+            raw = json.dumps(raw, ensure_ascii=False).encode()
+        output = io.StringIO()
+        self.assertEqual(
+            run_hook(("codex", lane), stdin=io.BytesIO(raw), stdout=output, services=self.services),
+            0,
+        )
+        return output.getvalue()
+
+    def test_large_submission_delivers_same_entry_without_selector(self):
+        expected = self.invoke(self.envelope())
+        self.assertEqual(
+            json.loads(expected)["hookSpecificOutput"]["additionalContext"], ENTRY_GUIDANCE
+        )
+        for size in (MAX_NATIVE_BYTES, MAX_NATIVE_BYTES + 1, 96_822):
+            with self.subTest(envelope_bytes=size):
+                raw = self.raw_size(size)
+                self.assertEqual(len(raw), size)
+                self.assertEqual(self.invoke(raw), expected)
+        for prompt in ("x" * 96_732, "한" * 32_244, '\\"' * 24_000):
+            with self.subTest(prompt_bytes=len(prompt.encode())):
+                self.assertEqual(self.invoke(self.envelope(prompt)), expected)
+        self.selector.select_for_user_prompt_submit.assert_not_called()
+        self.assertEqual(self.store.method_calls, [call.delete_session("fixture")] * 7)
+
+    def test_ingress_bound_is_shared_and_inclusive(self):
+        at_limit = self.raw_size(MAX_HOOK_INPUT_BYTES)
+        self.assertEqual(len(at_limit), MAX_HOOK_INPUT_BYTES)
+        self.assertTrue(self.invoke(at_limit))
+        self.services.adapter_for.reset_mock()
+        self.assertEqual(self.invoke(self.raw_size(MAX_HOOK_INPUT_BYTES + 1)), "")
+        self.services.adapter_for.assert_not_called()
+        self.assertEqual(
+            try_parse_codex_entry_event(self.raw_size(MAX_HOOK_INPUT_BYTES + 1)).error_code,
+            "input_too_large",
+        )
+
+    def test_projection_drops_task_content_and_unneeded_metadata(self):
+        payload = self.envelope(
+            "PRIVATE_SENTINEL" * 8000,
+            turn_id="PRIVATE_SENTINEL",
+            cwd="/PRIVATE_SENTINEL",
+            transcript_path="/PRIVATE_SENTINEL",
+            model="PRIVATE_SENTINEL",
+            PRIVATE_SENTINEL={"tool_response": "PRIVATE_SENTINEL"},
+        )
+        parsed = try_parse_codex_entry_event(payload)
+        self.assertTrue(parsed.accepted)
+        event = parsed.event
+        self.assertIsNotNone(event)
+        for field in ("prompt", "turn_id", "cwd", "transcript_path", "model", "final_message"):
+            self.assertIsNone(getattr(event, field))
+        self.assertEqual(event.ignored_fields, ())
+        self.assertEqual(parsed.diagnostics, ())
+        result = self.adapter.handle(payload)
+        self.assertEqual(result.projection, {})
+        self.assertIsNone(result.normalized_event)
+        self.assertNotIn("PRIVATE_SENTINEL", repr(parsed) + repr(result) + result.stdout)
+        self.store.delete_session.assert_called_once_with("fixture")
+
+    def test_legacy_selector_and_other_event_bounds_are_unchanged(self):
+        raw = self.raw_size(MAX_NATIVE_BYTES + 1)
+        self.assertEqual(try_parse_codex_event(raw).error_code, "input_too_large")
+        legacy = CodexAdapter(
+            CodexAdapterConfig(selector_mode=True, selector_application=self.selector)
+        )
+        self.assertEqual(legacy.handle(raw).stdout, "")
+        self.selector.select_for_user_prompt_submit.assert_not_called()
+        for native_name, lane in (
+            ("Stop", "completion_candidate"),
+            ("PostToolUse", "tool_succeeded"),
+        ):
+            payload = dict(hook_event_name=native_name, extra="x" * 96_732)
+            self.assertEqual(self.invoke(payload, lane=lane), "")
+            self.assertEqual(
+                try_parse_codex_entry_event(payload, event_name=native_name).error_code,
+                "input_too_large",
+            )
+
+    def test_malformed_or_mismatched_envelopes_fail_open_without_cleanup(self):
+        nested = None
+        for _ in range(MAX_CONTROL_DEPTH + 1):
+            nested = [nested]
+        invalid = [
+            b"{",
+            b"[]",
+            b"\xff",
+            self.envelope(None),
+            self.envelope(1),
+            self.envelope(["text"]),
+            dict(hook_event_name="UserPromptSubmit", session_id="fixture"),
+            dict(hook_event_name="Stop", prompt="synthetic"),
+            dict(hook_event_name="user_prompt_submitted", prompt="synthetic"),
+            dict(hook_event_name="UserPromptSubmit", prompt="synthetic", session_id=1),
+            dict(hook_event_name="UserPromptSubmit", prompt="synthetic", session_id="x" * 257),
+            dict(hook_event_name="UserPromptSubmit", prompt="synthetic", session_id="bad\x00id"),
+            self.envelope("bad\x00prompt"),
+            self.envelope("synthetic", extra=nested),
+            self.envelope("synthetic", extra=[None] * 257),
+            self.envelope("synthetic", extra={str(n): None for n in range(129)}),
+        ]
+        for payload in invalid:
+            with self.subTest(payload_type=type(payload).__name__):
+                self.assertEqual(self.invoke(payload), "")
+        self.assertEqual(self.invoke(self.envelope(), lane="completion_candidate"), "")
+        self.store.delete_session.assert_not_called()
+        self.selector.select_for_user_prompt_submit.assert_not_called()
+        raw_surrogate = b'{"hook_event_name":"UserPromptSubmit","prompt":"\\ud800"}'
+        self.assertFalse(try_parse_codex_entry_event(raw_surrogate).accepted)
+        self.assertFalse(try_parse_codex_entry_event(self.envelope(), event_name="Stop").accepted)
 
 
 class HookCompositionChecks(unittest.TestCase):
