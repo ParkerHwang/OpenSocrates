@@ -1,0 +1,202 @@
+{
+  "purpose": "Public synthetic fixture for issue #124. Plausible agent-built select envelopes for a fictional strategy-comparison task. Contains no user conversation, credential or host data.",
+  "valid": {
+    "operation": "select",
+    "context": "0f3c9a2b7d4e4f1a8b6c5d2e1f0a9b8c",
+    "epoch": 0,
+    "decision": "d1",
+    "revision": 0,
+    "locale": "ko",
+    "participation": "judgment",
+    "routing": {
+      "schema": "opensocrates.routing-features/1.0.0",
+      "answer_shape": "decision_memo",
+      "classification_confidence": "high",
+      "explicit_method": null,
+      "features": [
+        {
+          "key": "choose",
+          "strength": 3,
+          "basis": "decision_need"
+        },
+        {
+          "key": "multiple_options",
+          "strength": 3,
+          "basis": "decision_need"
+        },
+        {
+          "key": "critique",
+          "strength": 2,
+          "basis": "challenge_need"
+        },
+        {
+          "key": "weak_sample",
+          "strength": 2,
+          "basis": "evidence_need"
+        }
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "context_uuid_lower_hyphen",
+      "action": "set",
+      "path": "context",
+      "value": "3f2b8c1e-7d4a-4e9b-a6c2-1f0e9d8b7a6c",
+      "field": "context",
+      "error": "invalid_format"
+    },
+    {
+      "id": "context_uuidgen_upper_hyphen",
+      "action": "set",
+      "path": "context",
+      "value": "3F2B8C1E-7D4A-4E9B-A6C2-1F0E9D8B7A6C",
+      "field": "context",
+      "error": "invalid_format"
+    },
+    {
+      "id": "context_uppercase_hex",
+      "action": "set",
+      "path": "context",
+      "value": "3F2B8C1E7D4A4E9BA6C21F0E9D8B7A6C",
+      "field": "context",
+      "error": "invalid_format"
+    },
+    {
+      "id": "context_semantic_label",
+      "action": "set",
+      "path": "context",
+      "value": "tessellate-strategy",
+      "field": "context",
+      "error": "invalid_format"
+    },
+    {
+      "id": "decision_hyphen",
+      "action": "set",
+      "path": "decision",
+      "value": "tessellate-priority",
+      "field": "decision",
+      "error": "invalid_format"
+    },
+    {
+      "id": "decision_underscore",
+      "action": "set",
+      "path": "decision",
+      "value": "next_priorities",
+      "field": "decision",
+      "error": "invalid_format"
+    },
+    {
+      "id": "decision_non_ascii",
+      "action": "set",
+      "path": "decision",
+      "value": "우선순위",
+      "field": "decision",
+      "error": "invalid_format"
+    },
+    {
+      "id": "epoch_string",
+      "action": "set",
+      "path": "epoch",
+      "value": "0",
+      "field": "epoch",
+      "error": "invalid_type"
+    },
+    {
+      "id": "revision_missing",
+      "action": "drop",
+      "path": "revision",
+      "value": null,
+      "field": "revision",
+      "error": "missing_field"
+    },
+    {
+      "id": "locale_region_tag",
+      "action": "set",
+      "path": "locale",
+      "value": "ko-KR",
+      "field": "locale",
+      "error": "invalid_value"
+    },
+    {
+      "id": "participation_variant_spelling",
+      "action": "set",
+      "path": "participation",
+      "value": "judgement",
+      "field": "participation",
+      "error": "invalid_value"
+    },
+    {
+      "id": "envelope_extra_key",
+      "action": "set",
+      "path": "task",
+      "value": "compare",
+      "field": "request",
+      "error": "unknown_field"
+    },
+    {
+      "id": "confidence_numeric",
+      "action": "set",
+      "path": "routing.classification_confidence",
+      "value": 0.8,
+      "field": "routing.classification_confidence",
+      "error": "invalid_value"
+    },
+    {
+      "id": "explicit_method_missing",
+      "action": "drop",
+      "path": "routing.explicit_method",
+      "value": null,
+      "field": "routing.explicit_method",
+      "error": "missing_field"
+    },
+    {
+      "id": "feature_key_unknown",
+      "action": "set",
+      "path": "routing.features.0.key",
+      "value": "prioritize",
+      "field": "routing.features[0].key",
+      "error": "unknown_feature"
+    },
+    {
+      "id": "feature_key_duplicate",
+      "action": "set",
+      "path": "routing.features.1.key",
+      "value": "choose",
+      "field": "routing.features[1].key",
+      "error": "duplicate_feature"
+    },
+    {
+      "id": "feature_strength_zero",
+      "action": "set",
+      "path": "routing.features.0.strength",
+      "value": 0,
+      "field": "routing.features[0].strength",
+      "error": "invalid_value"
+    },
+    {
+      "id": "feature_strength_catalog_weight",
+      "action": "set",
+      "path": "routing.features.0.strength",
+      "value": 5,
+      "field": "routing.features[0].strength",
+      "error": "invalid_value"
+    },
+    {
+      "id": "feature_basis_unknown",
+      "action": "set",
+      "path": "routing.features.0.basis",
+      "value": "user_request",
+      "field": "routing.features[0].basis",
+      "error": "invalid_value"
+    },
+    {
+      "id": "routing_schema_wrong",
+      "action": "set",
+      "path": "routing.schema",
+      "value": "opensocrates.routing-features/2.0.0",
+      "field": "routing.schema",
+      "error": "invalid_value"
+    }
+  ]
+}

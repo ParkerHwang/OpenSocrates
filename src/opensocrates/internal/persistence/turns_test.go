@@ -1,0 +1,179 @@
+package persistence
+
+import (
+	"bytes"
+	"errors"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/contracts"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/diagnostics"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/domain"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
+	"testing"
+)
+
+func testTurn(t *testing.T, store *TurnStore, token string) map[string]any {
+	t.Helper()
+	tag, e := store.TokenTag(token)
+	if e != nil {
+		t.Fatal(e)
+	}
+	return map[string]any{"schema": "opensocrates.ephemeral-turn-state/1.0.0", "token_tag": tag, "host_session_key": "sha256:" + strings.Repeat("1", 64), "host_turn_key": nil, "host": "codex_cli", "issued_at": "2026-10-12T00:00:00.000Z", "expires_at": "2026-10-12T06:00:00.000Z", "recording_eligible": false, "onboarding_disclosure_turn": false, "task_id": nil, "judgment_id": nil, "task_state": "new", "participation": nil, "effective_rigor": "together", "primary_method": nil, "secondary_method": nil, "repair_count": contracts.Number(0), "accepted_controls": []any{}, "observation_tags": []any{}}
+}
+func TestTurnStoreContentFreeAndCAS(t *testing.T) {
+	root := ownedTurnFixtureRoot(t)
+	store, e := NewTurnStore(root)
+	if e != nil {
+		t.Fatal(e)
+	}
+	token := strings.Repeat("A", 43)
+	state := testTurn(t, store, token)
+	if e = store.Issue(state); e != nil {
+		t.Fatal(e)
+	}
+	next, _ := domain.Normalize(state)
+	next["task_state"] = "framing"
+	if e = store.CompareAndSwap(state, next); e != nil {
+		t.Fatal(e)
+	}
+	if e = store.CompareAndSwap(state, next); e == nil {
+		t.Fatal("stale compare-and-swap accepted")
+	}
+	loaded, e := store.Load(token)
+	if e != nil || loaded["task_state"] != "framing" {
+		t.Fatal(e)
+	}
+	if bad, _ := store.Load(strings.Repeat("B", 43)); bad != nil {
+		t.Fatal("foreign token accepted")
+	}
+	_ = filepath.Walk(root, func(path string, info os.FileInfo, e error) error {
+		if e == nil && !info.IsDir() {
+			raw, _ := os.ReadFile(path)
+			if bytes.Contains(raw, []byte(token)) {
+				t.Fatal("raw token reached disk")
+			}
+		}
+		return nil
+	})
+	if e = store.Delete(next); e != nil {
+		t.Fatal(e)
+	}
+}
+func TestTurnStoreConcurrentMutation(t *testing.T) {
+	store, e := NewTurnStore(ownedTurnFixtureRoot(t))
+	if e != nil {
+		t.Fatal(e)
+	}
+	token := strings.Repeat("A", 43)
+	if e = store.Issue(testTurn(t, store, token)); e != nil {
+		t.Fatal(e)
+	}
+	var wg sync.WaitGroup
+	var ready sync.WaitGroup
+	start := make(chan struct{})
+	type mutationResult struct {
+		err       error
+		callbacks int
+	}
+	results := make(chan mutationResult, 4)
+	mutate := func() mutationResult {
+		result := mutationResult{}
+		result.err = store.WithTurn(token, func(state map[string]any) (map[string]any, bool, error) {
+			result.callbacks++
+			n, _ := contracts.Int(state["repair_count"])
+			state["repair_count"] = contracts.Number(n)
+			observations := state["observation_tags"].([]any)
+			tag := "sha256:" + strings.Repeat(string(rune('a'+len(observations))), 64)
+			return state, false, domain.AppendObservationTag(state, tag)
+		})
+		return result
+	}
+	for i := 0; i < 4; i++ {
+		wg.Add(1)
+		ready.Add(1)
+		go func() {
+			defer wg.Done()
+			ready.Done()
+			<-start
+			results <- mutate()
+		}()
+	}
+	ready.Wait()
+	close(start)
+	wg.Wait()
+	close(results)
+	accepted, rejected := 0, 0
+	for result := range results {
+		if result.err == nil && result.callbacks == 1 {
+			accepted++
+			continue
+		}
+		var locked *diagnostics.Error
+		if !errors.As(result.err, &locked) || locked.Code != diagnostics.Locked || locked.Stage != "lock" || result.callbacks != 0 {
+			t.Fatal("concurrent mutation failed outside the bounded lock contract", result.err)
+		}
+		rejected++
+	}
+	state, e := store.Load(token)
+	if accepted == 0 || e != nil || len(state["observation_tags"].([]any)) != accepted {
+		t.Fatal("accepted concurrent mutation lost or rejected mutation applied", e)
+	}
+	// Production locks deliberately stop waiting after 500ms. After all first
+	// contenders join, finish each rejected operation once, sequentially in this
+	// test only; no production retry or longer lock deadline is introduced.
+	for i := 0; i < rejected; i++ {
+		result := mutate()
+		if result.err != nil || result.callbacks != 1 {
+			t.Fatal("uncontended mutation failed after bounded contention", result.err)
+		}
+	}
+	state, e = store.Load(token)
+	if e != nil || len(state["observation_tags"].([]any)) != 4 {
+		t.Fatal("lost concurrent mutation", e)
+	}
+	for i, tag := range state["observation_tags"].([]any) {
+		if tag != "sha256:"+strings.Repeat(string(rune('a'+i)), 64) {
+			t.Fatal("concurrent mutation duplicated or reordered a stored tag")
+		}
+	}
+}
+func TestTurnStatePrivacyAndUnknownFields(t *testing.T) {
+	store, e := NewTurnStore(ownedTurnFixtureRoot(t))
+	if e != nil {
+		t.Fatal(e)
+	}
+	state := testTurn(t, store, strings.Repeat("A", 43))
+	state["transcript"] = "private"
+	if e = store.Issue(state); e == nil {
+		t.Fatal("unknown content accepted")
+	}
+	delete(state, "transcript")
+	state["expires_at"] = "2026-10-12T06:00:00.001Z"
+	if e = store.Issue(state); e == nil {
+		t.Fatal("overlong lifetime accepted")
+	}
+}
+func TestExistingTurnStoreDoesNotInitialize(t *testing.T) {
+	root := ownedTurnFixtureRoot(t)
+	if _, e := ExistingTurnStore(root); e == nil {
+		t.Fatal("missing existing key accepted")
+	}
+	entries, _ := os.ReadDir(root)
+	if len(entries) != 0 {
+		t.Fatal("reader initialized installation")
+	}
+}
+
+// Elevated Windows runners can create t.TempDir with an Administrators owner.
+// Exercise the real owner-only store boundary against a child created through
+// the platform adapter, rather than weakening that production ownership check.
+func ownedTurnFixtureRoot(t *testing.T) string {
+	t.Helper()
+	root := filepath.Join(t.TempDir(), "owned-turns")
+	if e := platform.Mkdir(root); e != nil {
+		t.Fatal(e)
+	}
+	return root
+}

@@ -15,10 +15,10 @@
     "darwin-arm64",
     "windows-x64"
   ],
-  "release_claim_status": "windows-x64_candidate_live_gates_pending",
+  "release_claim_status": "v1.6.0_unreleased_native_and_live_evidence_required",
   "shipped_launchers": {
-    "darwin-arm64": "bin/launch.sh",
-    "windows-x64": "bin/launch.mjs"
+    "darwin-arm64": "runtime/darwin-arm64/opensocrates",
+    "windows-x64": "runtime/windows-x64/opensocrates.exe"
   },
   "unvalidated_platforms": [
     "darwin-x64",
@@ -37,5 +37,5 @@
     }
   },
   "signing_status": "unvalidated",
-  "notes": "Windows x64 is built with tools/build_windows.py and requires native package and live host evidence. macOS release gates remain unchanged. Neither offline CI nor a configured plugin proves live delivery."
+  "notes": "Go builds both release targets. Native Windows x64 and macOS ARM64 execution, platform signing and separate host activation evidence remain required. Neither cross-compilation nor a configured plugin proves live delivery."
 }

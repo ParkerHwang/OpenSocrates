@@ -1,6 +1,16 @@
 # Decision-point retrieval and migration
 
-Status: v1.5.0 Codex, Claude and Antigravity release; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
+v1.6.0 preserves v1.5.2 method content revision 5 and ten-language semantics;
+selected maintenance controller/request guidance is recorded separately in
+[the content baseline](v1.6.0/CONTENT_BASELINE.json). Historical evidence
+below applies only to its stated version. Go qualification belongs in
+[the native guide](native-v1.6.md) and implementation handoff. Invalid requests
+are rejected before scope mutation; preserving earlier availability on malformed
+requests is the intentional validate-before-scope change. Duplicate JSON keys
+and unpaired Unicode surrogates are rejected; complete request validation
+precedes context/scope mutation.
+
+Status: unreleased v1.6.0 Go candidate with 48 methods, ten locales and content revision 5; router 1.1.0. Canonical method bodies remain at the released v1.5.2 baseline.
 Experimental content revision 2, method variants, language rewrites and Compact
 policies have not been promoted. Method IDs remain unchanged.
 
@@ -53,20 +63,23 @@ shared only when an explicit dependency justifies sharing them. Reading a method
 to establish that it cannot apply does not activate its output requirements for
 another question or justify citing it as applied.
 
-The installed Codex package exposes:
+On macOS ARM64, the installed Codex package exposes:
 
 ```sh
-cat skills/opensocrates/references/decision/request.json | ./bin/launch.sh decision codex
+cat skills/opensocrates/references/decision/request.json | ./runtime/darwin-arm64/opensocrates decision codex
 ```
+
+On Windows, use the corresponding `runtime/windows-x64/opensocrates.exe`.
+The executable reads the request from standard input.
 
 Replace the example's closed features and opaque context handle with the current
 judgment; do not insert prose, paths or instructions into routing fields. The source checkout supports:
 
 ```sh
-PYTHONPATH=src .venv/bin/python -m opensocrates decision --stream
+go run ./src/opensocrates/cmd/opensocrates decision codex --stream
 ```
 
-The installed launcher also supports `./bin/launch.sh decision codex --stream`
+The installed launcher also supports `./runtime/darwin-arm64/opensocrates decision codex --stream`
 Keep that one process open for acknowledgments; repeated one-shot
 launcher calls cannot share availability state. The stream accepts one JSON object per line. `select` uses the existing routing
 feature schema; one judgment uses its established primary/optional-complement
@@ -97,6 +110,21 @@ still applies to the complete document. `--stream` is different: it accepts one
 complete JSON object per line, retains the same per-line limit, and may return
 multiple responses from one volatile session. Multiple JSON documents supplied
 to one-shot mode are malformed rather than silently treated as a stream.
+
+A rejected request returns `invalid_decision_request` with a closed `field` path
+(for example `context` or `routing.features[0].key`), a predefined `error` code
+(`invalid_json`, `invalid_type`, `missing_field`, `unknown_field`,
+`unknown_operation`, `invalid_format`, `invalid_value`, `stale_epoch`,
+`unknown_feature`, `duplicate_feature` or `too_many_features`), a fixed
+`expected` description where one exists, and `repair: correct_field_once`.
+Submitted values, unknown key names and prose are never echoed, logged or
+retained, and a rejected request does not change session state. Malformed JSON
+is this repairable input error rather than `decision_unavailable`, which is
+reserved for runtime or packaged-content faults after acceptance. Invalid input,
+`no_intervention`, `unknown_method` and runtime unavailability remain distinct;
+none of them is an applied method. The packaged `features.json` `envelope` lists
+every field format, and [the #124 fixture](../evals/issue-124/README.md) holds
+synthetic rejection cases.
 
 ## Host evidence and compatibility
 
@@ -158,7 +186,7 @@ rollback evidence.
 
 ## Launcher sessions and hook cleanup
 
-The installed launcher also accepts `./bin/launch.sh decision codex --stream`.
+The installed launcher also accepts `./runtime/darwin-arm64/opensocrates decision codex --stream`.
 Keep the same process to reuse an availability declaration; separate invocations
 start with empty state.
 

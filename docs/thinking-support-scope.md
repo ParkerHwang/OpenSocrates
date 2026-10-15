@@ -1,5 +1,9 @@
 # Thinking support: scope and diagnostic
 
+In the Go candidate, entry guidance lives in `runtimecli/hooks.go`. Historical
+Python observations and checks below retain their original source identities;
+they are not execution evidence for this candidate.
+
 Source-level design for [#125](https://github.com/ParkerHwang/OpenSocrates/issues/125).
 The application omission in [#124](https://github.com/ParkerHwang/OpenSocrates/issues/124)
 is a separate incident: its cause and frequency remain unverified. This change
@@ -33,7 +37,7 @@ Installed tool guidance also applies when the tool itself is the subject.
 Workspace sources are task data rather than installed control authority.
 
 The exact entry is maintained only in the canonical
-[entry source](../src/opensocrates/selector/entry.py). Supporting behavior is in the
+[entry source](../src/opensocrates/internal/runtimecli/hooks.go). Supporting behavior is in the
 [decision guide](../plugin-src/shared/decision/guide.en.md) and
 [reader guide](../plugin-src/shared/reader/guide.en.md). Do not maintain a second
 copy of the entry in this document.
@@ -63,11 +67,14 @@ Spanish, Portuguese and Thai guidance. These are affected source/package surface
 not live qualification claims. Each host and installation surface needs its own
 evidence; account-skill matching is not hook delivery.
 
-Product version and canonical method content revision remain **1.5.2 / 5** for
-this unreleased source change. This does not make a rebuilt package identical to
-the released tag. Controller changes alter semantic/package hashes: a read or
-availability assertion for earlier build content cannot establish availability of
-new content merely because the version/revision labels match.
+For the historical Python maintenance change, product version and canonical
+method content revision were **1.5.2 / 5**. This unreleased Go candidate uses
+product version **1.6.0** with method content revision **5**; its exact candidate
+hashes are recorded in [CONTENT_BASELINE.json](v1.6.0/CONTENT_BASELINE.json).
+A rebuilt package is not identical to the released tag. Controller changes alter
+semantic/package hashes: a read or availability assertion for earlier build
+content cannot establish availability of new content merely because the
+version/revision labels match.
 
 Routing fallback behavior remains unchanged. A native `select` request can return
 an answer-shape fallback when no scored method meets the threshold; that is a

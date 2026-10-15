@@ -1,70 +1,53 @@
-# Codex on Windows — OpenSocrates 1.4.0
+# Windows x64 native support — v1.6.0 candidate
 
-See the [unpublished v1.5 Windows continuation](windows-v1.5.md) for Claude account
-content and Antigravity. The complete v1.4 baseline below is retained.
+[한국어](windows-support.ko.md) · [Native guide](native-v1.6.md)
 
-OpenSocrates 1.4.0 supports **Codex on Windows x64**, using native Windows
-processes. Other host integrations are removed. Windows ARM64, Windows 10,
-signing, SmartScreen reputation, and a separate clean PC remain unvalidated.
+The candidate migrates the supported Codex CLI/Desktop and Antigravity
+workspace/global paths to Go and retains Claude account verification/export.
+Native Windows Claude Code is excluded. Windows ARM64, WSL, network shares and
+additional platforms are not qualified. End users need the native `.exe` and
+Windows x64 bundle, without Python, Node.js, npm or Go.
 
-## Installation and updates
-
-Install Node.js 20 or later and the Codex CLI, then sign in to Codex. Python,
-WSL, and a Unix shell are not required for the distributed package.
-
-```powershell
-npx --yes opensocrates@1.4.0 install --host codex
-npx --yes opensocrates@1.4.0 status --host codex
-npx --yes opensocrates@1.4.0 update --host codex
+```text
+.\opensocrates.exe verify --host codex --package "C:\Downloads\opensocrates-v1.6.0-windows-x64.zip"
+.\opensocrates.exe install --host codex --package "C:\Downloads\opensocrates-v1.6.0-windows-x64.zip"
+.\opensocrates.exe status --host codex
 ```
 
-If Codex is not on PATH, set `CODEX_BIN` to its executable. The installer chooses
-`opensocrates-1.4.0-codex-plugin-windows-x64.zip` automatically. For a verified
-local candidate, supply `--asset <ZIP>` and `--checksum <SHA256-file>` together.
-Review the seven OpenSocrates hooks in an interactive Codex session.
+Use `adopt` instead of `install` to explicitly migrate a verified owned v1.5 npm
+installation. Preserve settings, registrations, trust, disabled state and one
+update owner. `--host all` means Codex only. Quote absolute local-drive workspace
+and output paths. Do not use shell or PowerShell wrappers as the first-party
+runtime/install implementation; the commands above invoke the native Go binary.
 
-Scheduled updates are unavailable on Windows. `auto-update status` reports that
-boundary; `enable` and `run` require manual updates instead. No Windows scheduled
-task is installed. To remove the integration:
+Codex opt-in stable scheduling uses the per-user Task Scheduler task outside
+hooks, with 24-hour checks and delayed login. Signed metadata verification and
+compatibility/expiry/rollback guards apply. Major/breaking schema updates are
+not automatic. Production root/signing and actual native scheduler evidence are
+release gates. Manual lifecycle for Antigravity remains separate; exporting an
+account ZIP does not upload or activate it.
 
-```powershell
-npx --yes opensocrates@1.4.0 remove --host codex --purge
-```
+Actual Windows validation must exercise protected DACL/current owner checks,
+held parent handles, reparse/junction refusal, exclusive locks, long Unicode
+paths, binary I/O, archive aliases/streams/case collisions, modified foreign
+files, concurrent operations and Go helper replacement of in-use executables.
+Cross-compilation cannot establish those behaviors. Legacy credential-copy and
+POSIX context access remain unavailable. Hooks fail open; host trust requires
+interactive review and a fresh session.
 
-Purge preserves conversation history and hook trust. Add `--reset-trust` only
-when you also intend to reset the seven OpenSocrates hook approvals. Unknown,
-unsafe, or in-use data is preserved and reported as pending.
+Contributors use pinned Go 1.27.2 and the Go-native source/package/lifecycle
+checks in [CONTRIBUTING.md](../CONTRIBUTING.md) on Windows x64. Native Mac gates
+remain required separately. A native fixture pass, authenticated CLI delivery,
+Desktop GUI loading, clean-machine install and platform signing/SmartScreen
+are distinct evidence cells. Record exact commit/commands/results and missing
+cells in the implementation handoff.
 
-## Runtime and evidence
+The [v1.5 guide](windows-v1.5.md) and [v1.4 worklog](windows-v1.4.0-worklog.md)
+are historical release evidence, not validation of this Go candidate.
 
-The archive contains `bin/launch.mjs` and the native Windows `.exe` payload.
-Decision-point retrieval is the supported runtime path. Legacy SDK
-credential-copy and POSIX context access are unavailable on Windows. Real
-owner/DACL checks, binary I/O, locks, and archive-path validation protect local
-artifacts. Hooks fail open when their runtime is unavailable.
-
-The embedded SDK and CLI stay version-matched at 0.144.4; this binary does not
-replace the user's host CLI. Native package fixtures are distinct from
-interactive hook approval, authenticated delivery, and Desktop GUI evidence.
-The current exact-commit results belong in [PR #93](https://github.com/ParkerHwang/OpenSocrates/pull/93).
-Earlier Windows evidence remains [historical](windows-v1.4.0-worklog.md).
-
-## Native build and verification
-
-Use Windows x64, Python 3.12, Node.js 20+, and uv:
-
-```powershell
-$env:PYTHONUTF8 = '1'
-uv sync --locked --all-groups
-uv run --locked python tools/build_windows.py
-uv run --locked python tools/check_windows.py --packages
-uv run --locked ruff check src tools
-uv run --locked ruff format --check src tools
-uv run --locked mypy src
-npm run test:windows
-npm pack --dry-run
-```
-
-Windows Actions builds on `windows-2025`. Publication also requires the macOS
-release gate and verifies the Windows transport checksums and package source
-identity before merging the release inventories.
+Codex CLI/Desktop hook command execution is qualified only with the normal
+inherited default PowerShell context. The configured native command is
+`& "$env:PLUGIN_ROOT\runtime\windows-x64\opensocrates.exe"`; it is OS/host
+configuration, not a first-party PowerShell wrapper. Custom/cmd fallback shells
+are unsupported and fail open explicitly. Installation diagnostics use
+`opensocrates.exe manage diagnose --host HOST`, separate from runtime diagnostics.

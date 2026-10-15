@@ -1,6 +1,10 @@
-# OpenSocrates 1.5 설치 후 설정 가이드
+# OpenSocrates 1.6 설치 후 설정 가이드
 
-[English](setup-guide.md) · [설치 명령과 지원 환경](../README.ko.md) · [v1.5.2 다운로드](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
+이 문서는 네이티브 v1.6.0 후보의 설치 후 호스트 설정 안내입니다. 아직 출시하지
+않았으며 현재 후보 설치·인수 명령과 릴리스 조건은 [네이티브 안내](native-v1.6.ko.md)를
+따릅니다. 기존 v1.5 화면은 당시 UI 관찰이며 Go 설치 검증 증거가 아닙니다.
+
+[English](setup-guide.md) · [설치 명령과 지원 환경](../README.ko.md) · [네이티브 후보 안내](native-v1.6.ko.md)
 
 설치가 끝났다면 **사용하는 앱의 항목만** 확인하세요. Codex는 훅 신뢰 승인이
 필요합니다. Claude 계정 스킬은 기능과 스킬을 켜고 이름을 언급하지 않고 쓸
@@ -12,13 +16,6 @@ Claude Desktop 2.31226.1과 Antigravity 2.22.0에서 가져왔습니다. Codex C
 공식 훅 안내를 확인했습니다. Windows 화면 캡처는 포함하지 않았으며, 메뉴 이름은
 앱 버전·언어·계정 정책에 따라 달라질 수 있습니다.
 
-현재 설치 명령은 v1.5.2용입니다. 아래 화면은 v1.5.0 당시 캡처를 유지하므로
-화면의 제품 번호는 1.5.0으로 보입니다. 실제 설치 버전은 1.5.2을 확인하세요.
-열 언어의 지시문 선택은 [v1.5.2 안내](v1.5.2.ko.md)와
-[언어 선호 설정](settings.ko.md)을 참고하세요. 프랑스어·독일어·이탈리아어·
-스페인어·포르투갈어는 라틴 문자를 공유하므로 명시적 또는 저장된 선택이
-필요합니다. 설치기에는 `--locale` 옵션이 없습니다.
-
 ## 어디까지 자동으로 되나요?
 
 | 사용하는 곳 | 설치 프로그램이 처리하는 일 | 설치 뒤 확인할 일 |
@@ -29,23 +26,41 @@ Claude Desktop 2.31226.1과 Antigravity 2.22.0에서 가져왔습니다. Codex C
 | Antigravity | 선택한 전역 또는 작업 공간에 규칙·스킬 배치 | 해당 범위의 규칙·스킬이 앱에 보이는지 확인, 새 대화 |
 
 **`--host all`은 Codex만 뜻합니다.** 다른 앱은 각각 지정해야 합니다.
-Windows의 Claude는 계정 스킬을 사용합니다. v1.5.2에는 Windows 네이티브
-Claude Code 패키지가 없습니다.
+Windows의 Claude는 계정 스킬을 사용합니다. Windows 네이티브 Claude Code는
+이번 범위에 없습니다.
+
+## 현재 콘텐츠와 지시문 언어
+
+후보는 출시된 v1.5.2 콘텐츠 리비전 5를 유지합니다. 열 언어의 방법 48개·
+전체 절차 480개·정본 사례 3,840개·교사 질문 1,440개입니다. 기존 네 언어의
+절차·사례 본문과 메타데이터·질문 값은 그대로이며 방법 리비전만 4에서 5로
+올라갑니다. 별도 방법 본문 업그레이드는 포팅 범위 밖입니다.
+
+네이티브 `./opensocrates locale get`, `locale set en|ko|zh|ja|fr|de|it|es|pt|th|follow`,
+`locale reset`에는 호스트 인수를 붙이지 않고 `set` 뒤에는 값 하나를 선택합니다.
+Windows는 `.\opensocrates.exe`를 사용합니다. 저장된 선호는 선택적 이전 선택기에만
+적용하며 `follow`·`reset`은 관련 없는 설정을 건드리지 않고 이 선호만 지웁니다.
+상태 없는 판단 JSON에는 `locale`을 명시해야 하며 네이티브 Claude 진입은 저장된
+선호를 읽지 않습니다. 계정 스킬과 Antigravity는 해당 언어 안내·참조를 사용합니다.
+지시문 언어는 답변 언어나 호스트 UI를 설정하지 않으며 관리 CLI 전체 번역을
+약속하지 않습니다. 갱신 뒤 바뀐 훅을 검토하고 새 세션을 시작하며 계정 콘텐츠는
+별도로 업로드하세요. 과거 화면·공증 기록은 원래 관찰 범위를 유지합니다.
 
 ## 에이전트에게 맡기기
 
 컴퓨터와 파일에 접근할 수 있는 에이전트에 아래 요청을 붙여 넣으세요. 대상 앱은
-필요에 맞게 바꾸면 됩니다. 이 요청문은 v1.5.2 설치 명령과 호스트 화면을
+필요에 맞게 바꾸면 됩니다. 이 요청문은 네이티브 관리 명령과 호스트 화면을
 사용하며, 별도의 `setup` 명령을 설치하는 기능은 아닙니다.
 
 ```text
-이 컴퓨터에서 OpenSocrates 1.5.2 설치와 설치 후 설정을 마무리해줘.
+승인된 OpenSocrates 네이티브 릴리스의 설치 후 설정을 마무리해줘.
+별도 승인 없이 미출시 후보를 설치하거나 활성 설치를 교체하지 마.
 대상은 현재 설치되어 있는 Codex, Claude, Antigravity야.
 공식 설치 안내:
 https://github.com/ParkerHwang/OpenSocrates/blob/main/docs/setup-guide.ko.md
 
-운영체제, 필요한 실행 환경, 현재 버전과 활성 상태를 먼저 확인하고,
-없는 설치는 설치하고 기존 설치는 공식 1.5.2 패키지로 업데이트해줘.
+운영체제, 네이티브 대상, 현재 버전과 활성 상태를 먼저 확인하고,
+없는 설치는 설치하고 기존 설치는 승인된 네이티브 릴리스 패키지로 업데이트해줘.
 이미 올바르게 설정된 항목은 다시 바꾸지 마.
 
 Codex, Claude 계정 스킬, Mac 로컬 Claude Code, Antigravity를 구분해줘.
@@ -56,9 +71,6 @@ Claude 계정 스킬을 교체할 때는 기존 파일과 켜짐 상태를 먼�
 계정 스킬 이름을 언급하지 않고 쓰도록 2-4의 상시 지침을 Instructions for
 Claude(이전 Cowork: Global instructions)에 추가해줘. 기존 지침을 보존하고
 내가 사용하는 각 계정에 설정해줘.
-사고 지시문은 내가 원하는 언어를 명시해줘. locale 설정은 유지되는 네이티브
-선택기용이며 계정 스킬 활성화나 상태 없는 판단 JSON의 locale과 구분해줘.
-설치기에 지원하지 않는 --locale 옵션을 추가하지 마.
 
 설치, 파일 검증, 플러그인 등록, 허용된 일반 설정과 완료 확인은 진행해줘.
 로그인, 조직 관리자 권한, 실제 호스트의 훅 신뢰 승인처럼 내가 해야 하는
@@ -84,7 +96,7 @@ Claude(이전 Cowork: Global instructions)에 추가해줘. 기존 지침을 보
 1. 먼저 설치 상태를 확인합니다.
 
    ```sh
-   npx --yes opensocrates@1.5.2 status --host codex
+   ./opensocrates status --host codex
    ```
 
 2. 평소 작업할 폴더의 터미널에서 **대화형 Codex**를 실행합니다.
@@ -108,7 +120,8 @@ Claude(이전 Cowork: Global instructions)에 추가해줘. 기존 지침을 보
 **완료 기준:** 플러그인이 켜져 있고, 현재 정의의 OpenSocrates 훅이 신뢰된 상태이며,
 새 대화를 시작할 수 있습니다. `status`의 “installed”만으로 켜짐이나 훅 승인이
 확인되는 것은 아닙니다. `codex hooks`라는 별도 셸 명령이나
-`opensocrates diagnose --host codex`는 이 버전의 확인 경로가 아닙니다.
+네이티브 `./opensocrates manage diagnose --host codex`는 로컬 무결성만 확인하며
+대화형 훅 검토를 대신하지 않습니다. `/hooks`는 Codex 안에 입력합니다.
 
 Codex는 공식 CLI 절차로 안내합니다. 실제 화면 캡처는 아래 Claude와
 Antigravity 항목에 있으며, [캡처 범위](assets/setup-v1.5/README.md)를 별도로 기록했습니다.
@@ -137,14 +150,14 @@ Team·Enterprise에서 설정이 잠겨 있으면 조직 관리자에게 Skills�
 
 처음 설치한다면 `Customize → Skills → + → Create skill → Upload a skill`로
 이동합니다. 메뉴 이름이 바뀐 버전에서는 Skills의 만들기 메뉴에서 업로드를
-찾으세요. `opensocrates-1.5.2-claude-chat-skills.zip` 파일을 사용합니다.
+찾으세요. `opensocrates-account.zip` 파일을 사용합니다.
 네이티브 Code용 `claude-plugin.zip`과 구분하세요.
 
-계정용 파일은 [릴리스 페이지](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)에서
+계정용 파일은 [릴리스 페이지](https://github.com/ParkerHwang/OpenSocrates/releases)에서
 받거나, 기존 폴더 안의 새 절대 경로로 내보낼 수 있습니다.
 
 ```sh
-npx --yes opensocrates@1.5.2 export --host claude-chat --output /absolute/path/opensocrates-1.5.2-account.zip
+./opensocrates export --host claude-chat --package /absolute/path/to/account.zip --output /absolute/path/opensocrates-account.zip
 ```
 
 이미 OpenSocrates가 있다면 해당 스킬의 `… → Download`로 먼저 백업하고
@@ -167,8 +180,8 @@ npx --yes opensocrates@1.5.2 export --host claude-chat --output /absolute/path/o
 ![Claude 계정 OpenSocrates 스킬이 켜진 실제 화면](assets/setup-v1.5/claude-skill-enabled.jpg)
 
 그림 4. 오른쪽 스위치가 켜져 있습니다. 이름 아래의 `v4`는 Claude 계정에서 이
-스킬을 수정한 회차입니다. **OpenSocrates 제품 버전 1.5.0과 다른 번호**입니다.
-현재 제품 버전은 `Contents → SKILL.md`의 `OpenSocrates 1.5.2` 표기를 확인하세요.
+스킬을 수정한 회차입니다. **설치된 OpenSocrates 제품 버전과 다른 번호**입니다.
+제품 버전은 `Contents → SKILL.md`의 `OpenSocrates v1.6.0 후보` 표기를 확인하세요.
 
 <a id="claude-standing-instructions"></a>
 
@@ -213,12 +226,12 @@ npx --yes opensocrates@1.5.2 export --host claude-chat --output /absolute/path/o
 Cloud·SSH·WSL이나 Windows 네이티브 Code 설치 완료를 뜻하지 않습니다.
 
 ```sh
-npx --yes opensocrates@1.5.2 diagnose --host claude
+./opensocrates manage diagnose --host claude
 ```
 
-`version: 1.5.2`, `enabled: true`, `integrity: verified`, `registration: confirmed`를
+승인한 제품 버전, `enabled: true`, `integrity: verified`, `registration: confirmed`를
 확인합니다. 설치된 항목이 의도와 다르게 꺼져 있다면
-`npx --yes opensocrates@1.5.2 enable --host claude`로 켤 수 있습니다.
+`./opensocrates enable --host claude`로 켤 수 있습니다.
 
 Desktop에서는 **Code → Local → 입력칸의 + → Plugins → Manage plugins**로
 이동해 OpenSocrates를 엽니다. 표시가 바뀐 앱에서는 Settings의 Plugins에서도
@@ -227,7 +240,7 @@ Desktop에서는 **Code → Local → 입력칸의 + → Plugins → Manage plug
 
 ![Claude Code의 opensocrates-macos 1.5.0 플러그인이 켜진 실제 화면](assets/setup-v1.5/claude-code-plugin.jpg)
 
-그림 5. **`opensocrates-macos · 1.5.0`과 켜짐 스위치**를 확인합니다.
+그림 5. 과거 v1.5 화면입니다. 현재 승인된 제품 버전과 켜짐 스위치를 확인합니다.
 `Hooks · 4`는 이 플러그인의 구성 목록입니다. 계정 스킬 화면과 구별하세요.
 
 터미널 Claude Code에서는 `/plugin`으로 플러그인을, `/hooks`로 훅 출처와 내용을
@@ -249,10 +262,10 @@ Desktop에서는 **Code → Local → 입력칸의 + → Plugins → Manage plug
 절대 경로의 `--workspace`를 확인 명령에도 붙입니다.
 
 ```sh
-npx --yes opensocrates@1.5.2 diagnose --host antigravity
+./opensocrates manage diagnose --host antigravity
 ```
 
-`version: 1.5.2`, `enabled: true`, `integrity: verified`와 원하는 `scope`를
+승인한 제품 버전, `enabled: true`, `integrity: verified`와 원하는 `scope`를
 확인합니다. **같은 작업에 전역·작업 공간 설치를 중복 적용하지 마세요.**
 
 Antigravity 2.22.0에서는 **Customizations → Installed**를 열고

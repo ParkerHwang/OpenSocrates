@@ -1,158 +1,170 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="320">
+  <img src="https://raw.githubusercontent.com/ParkerHwang/OpenSocrates/main/docs/assets/opensocrates-banner.jpg" alt="OpenSocrates" width="820">
 </p>
+
+**エージェント向け:** [公開済みパッケージの選択とセットアップ](docs/agent-discovery.md)。Go候補版の手順は下記とネイティブガイドを参照してください。
 
 # OpenSocrates
 
-**AI との会話に、48 種類の思考法を。**
+**理解し、評価し、使える結果を得るための思考支援。**
 
-OpenSocrates は、**Claude、Codex、Antigravity** で繰り返し使える思考の手順を
-提供します。選択肢を比較し、食い違う情報を整理し、計画を別の角度から
-見直してみましょう。課題は普段の言葉で説明してください。各方法には、
-活用できる問い、確認項目、段階ごとの手順が用意されています。
+資料の統合、関係者の視点の理解、選択肢の比較、メッセージ作成を支える
+48 種類の思考法を提供します。現在の基準は公開済み v1.5.2 です。英語、韓国語、
+簡体字中国語、日本語、フランス語、ドイツ語、イタリア語、スペイン語、ポルトガル語、
+タイ語の10言語で、完全な手順480個、標準事例3,840個、教師向けの問い1,440個を
+提供します。コンテンツリビジョンは5です。ポルトガル語は一般コード `pt` と
+ブラジル式綴りを使います。既存4言語の手順・事例本文、メタデータ・問いの値は
+維持し、方法のリビジョン識別を4から5に進めます。本文改善は v1.6.1 以降の
+別作業で、プログラミング専用機能は対象外です。
 
-[使うアプリから始める](#start-with-your-app) · [使用例を見る](#see-it-in-a-task) · [思考法を探す](#a-method-for-the-question)
+[English](README.md) | [한국어](README.ko.md) | [简体中文](README.zh.md) | **日本語** | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Español](README.es.md) | [Português](README.pt.md) | [ไทย](README.th.md)
 
-**48 種類の思考法 · 10 言語の指示文 · MIT ライセンス**
+## v1.6.0 ネイティブ移行候補
 
-[English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh.md) · **日本語** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [ไทย](README.th.md)
+このブランチは**未公開の v1.6.0 実装候補**です。Go ランタイム、管理ツール、
+インストーラー、更新ツール、開発ツールが Python・JavaScript・npm の既存経路を
+置き換えます。利用者は Go、Python、Node.js、npm をインストールする必要は
+ありません。正式な配布先は [GitHub Releases](https://github.com/ParkerHwang/OpenSocrates/releases)
+です。本番署名、更新の信頼ルート、ネイティブリリース検証の条件を満たしてから
+公開します。現在の公開版は [v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
+です。この候補に10言語の内容と言語設定の契約を反映します。npm コマンドは
+別の保守チャネルの案内です。
 
-## 今取り組んでいる課題に使える思考の道具
+| アプリ | 提供方式 | 環境と有効化 |
+| --- | --- | --- |
+| Codex CLI / Desktop | ネイティブフック、コントローラー、Go 判断ランタイム | macOS ARM64、Windows x64/ARM64（既定 PowerShell）。7 個のフックを確認後、新しいセッション |
+| Claude Code CLI / Desktop のローカル Code | 状態を保持しない入口と完全なローカル参照 | macOS ARM64。Claude CLI、ログイン、プラグインとフックの権限が必要 |
+| Claude Web / Desktop Chat / Cowork | 実行コードを含まないアカウント用 ZIP | 全対応対象で検証・エクスポート後、別途アップロードして有効化 |
+| Antigravity 会話アプリ | 所有範囲が明確なルールとスキル | macOS ARM64、Windows x64/ARM64。ワークスペースまたはグローバルを明示 |
 
-- **まず、課題を説明しましょう。** 各方法には問いと確認項目があらかじめ書かれており、さまざまな会話で再利用できます。
-- **役立つ切り口を見つけましょう。** 選択肢の比較、根拠の評価、仮定の検討、今後の計画に合った方法を活用できます。
-- **自分の仕事に合わせて使いましょう。** すべての手順と事例を読み、公開されたオープンソースの内容を自分の課題に合わせて応用できます。
+既定値と `--host all` は Codex だけを選択します。他のアプリは明示的に指定します。
+Windows ネイティブ Claude Code、Linux、macOS Intel、WSL、リモート環境の検証は
+対象外です。Windows ARM64 は独自の実行ファイル、アーカイブ、更新補助プログラムを
+使用します。x64 エミュレーションでの実行は ARM64 ネイティブの証拠に代えられません。
+ネイティブ CI、実際のアプリへの読み込み、クリーン環境での検証は別の証拠です。
 
-<a id="see-it-in-a-task"></a>
+## インストール、既存導入の引き継ぎ、更新
 
-## こんな課題で使ってみる
+承認済みリリースから実行ファイルと対応するアーカイブを取得し、実行前に
+配布元と署名の説明を確認します。公開前の候補アーカイブはローカルビルドの成果物です。
 
-設定を終えたら、たとえば次のように依頼してみてください。
-
-> クラウドのツールを購入するつもりでしたが、今度は作業をオフラインで行う必要があります。
-> 購入するか、自分たちで作るか、当面は手作業で対応するか、一緒に検討してください。
-
-このような判断に使える
-[トレードオフ分析](content/methods/trade-off-analysis/procedure.ja.md)には、
-必要な条件を特定し、実行可能な選択肢を比較し、既知の事実と仮定を分け、
-何が変われば推奨を見直すかを説明する手順が用意されています。
-いつもの依頼とともに使える思考の枠組みです。
-
-<a id="start-with-your-app"></a>
-
-## 使うアプリから始める
-
-OpenSocrates を使いたいアプリを選んでください。
-[v1.5.2 を入手する](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
-
-<details>
-<summary><strong>Claude Chat・Cowork</strong> — スキルをアップロードして会話を始める</summary>
-
-Claude Web、Desktop Chat、Cowork での設定：
-
-1. **Settings → Capabilities** で **Code execution and file creation** を有効にします。組織で管理されているアカウントの場合は、組織のポリシーで Skills とコード実行が許可されていることを確認してください。
-2. [アカウント用スキル ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip) と [SHA-256 ファイル](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256) をダウンロードします。
-3. **Customize → Skills → + → Create skill → Upload a skill** を開き、ZIP をアップロードして有効にします。既存の OpenSocrates スキルを置き換える場合は、先にバックアップしてください。
-4. 使う Claude アカウントごとに、既存の指示を維持しながら[アカウント用の指示を一度追加](docs/setup-guide.md#claude-standing-instructions)します。新しい会話を開き、課題を説明してください。
-
-持ち運べるスキル ZIP に、すべての方法と事例が含まれています。
-[画面で見る設定ガイド](docs/setup-guide.md#2-claude-account-skill-enable-it-and-add-account-instructions) · [Claude 公式 Skills ガイド](https://support.claude.com/en/articles/12512180-use-skills-in-claude)
-
-</details>
-
-<details>
-<summary><strong>Claude Code</strong> — Apple Silicon Mac</summary>
-
-[Node.js 20 以降](https://nodejs.org/en/download)、Claude CLI、ログイン済みの
-Claude アカウントが必要です。ターミナルの Claude Code と Claude Desktop の
-ローカル Code で使えます。**ターミナル**で実行してください。
-
-```sh
-npx --yes opensocrates@1.5.2 install --host claude
-npx --yes opensocrates@1.5.2 diagnose --host claude
+```text
+./opensocrates install --host codex --package /absolute/path/to/bundle.zip
+./opensocrates status --host codex
+./opensocrates update --host codex --package /absolute/path/to/new-bundle.zip
 ```
 
-`enabled: true`、`integrity: verified`、`registration: confirmed` を確認してください。
-プロジェクトの信頼確認が表示された場合は内容を確認し、新しいローカルセッションを始めます。
-[画面で見る設定ガイド](docs/setup-guide.md#3-claude-code-check-the-local-mac-plugin)
+Windows ではネイティブ `opensocrates.exe` と引用符で囲んだローカルドライブの
+絶対パスを使用します。
 
-</details>
-
-<details>
-<summary><strong>Codex</strong> — Apple Silicon Mac または Windows x64</summary>
-
-[Node.js 20 以降](https://nodejs.org/en/download) と Codex が必要です。
-ネイティブランタイムはパッケージに含まれています。
-**Mac のターミナル**または **Windows の PowerShell** で実行してください。
-
-```sh
-npx --yes opensocrates@1.5.2 install --host codex
-npx --yes opensocrates@1.5.2 status --host codex
+```text
+.\opensocrates.exe install --host codex --package "C:\Downloads\bundle.zip"
+.\opensocrates.exe status --host codex
 ```
 
-対話型 Codex の入力欄に `/hooks` を入力します。OpenSocrates の 7 個のフック定義を
-確認し、信頼できるものを承認してから、新しい会話を始めてください。
-[画面で見る設定ガイド](docs/setup-guide.md#1-codex-review-and-approve-opensocrates-hooks)
+ARM64 では `opensocrates-v1.6.0-windows-arm64.exe` と対応する
+`opensocrates-v1.6.0-windows-arm64.zip` を選びます。例の実行ファイル名は実際の
+ダウンロード名に置き換えるか、アーカイブの `bin/` から展開したものを使用します。
 
-既存の Codex インストールを更新する場合：
+所有権を確認済みの v1.5 npm 導入は、次の明示的な操作で一度だけ引き継げます。
 
-```sh
-npx --yes opensocrates@1.5.2 update --host codex
+```text
+./opensocrates adopt --host codex --package /absolute/path/to/bundle.zip
 ```
 
-</details>
+旧更新ツールと調整し、設定、登録、信頼、無効状態を維持します。npm パッケージを
+広範囲に削除したり、利用者データを消したりしません。不明なファイルや変更済みの
+ファイルは競合として維持します。`verify`、`manage diagnose`、`remove` は同じ
+アプリと範囲を指定します。Claude と Antigravity の `enable`、`disable` も同様です。
+Codex の有効状態はアプリ自身で管理します。
 
-<details>
-<summary><strong>Antigravity</strong> — Apple Silicon Mac または Windows x64</summary>
+Mac Claude は `--host claude`、Antigravity は `--host antigravity` を指定します。
+`--workspace /absolute/path/to/existing/workspace` は任意で、省略するとグローバルです。
+アカウント用スキルは別途エクスポートします。
 
-[Node.js 20 以降](https://nodejs.org/en/download) が必要です。ワークスペースを選び、
-例のパスを既存フォルダーの絶対パスに置き換えてください。
-**Mac のターミナル**または **Windows の PowerShell** で実行します。
-
-```sh
-npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
+```text
+./opensocrates export --host claude-chat --package /absolute/path/to/account.zip --output /absolute/path/to/opensocrates-account.zip
 ```
 
-Windows では `"C:\Work\Reading Workshop"` のように引用符で囲んだローカルドライブの
-パスを使います。グローバルに設定する場合は `--workspace` を省略してください。
-同じプロジェクトではグローバルかワークスペースのどちらかを選び、新しい会話を始めます。
-[スキルとルールを確認する](docs/setup-guide.md#4-antigravity-check-both-the-skill-and-rule)
+既存スキルの置換前にファイルと有効状態をバックアップし、正しい Claude アカウントの
+**Customize → Skills** でアップロードして有効化します。必要なアカウント機能、
+アップロード、有効化をそれぞれ確認します。**Settings → General → Instructions for Claude** に
+次の指示を追加し、既存の指示を維持します。旧 Cowork は **Settings → Cowork → Global
+instructions** です。アカウントが異なる場合はそれぞれ設定します。
 
-</details>
+```text
+資料の統合、選択肢の比較、判断、メッセージの作成など、解釈や判断が必要な
+依頼では、私が名前を挙げなくても有効な OpenSocrates スキルを読み込み、
+その指示に従ってください。思考法を適用する前に手順全体を読み、適用条件を
+確認してください。書式変換などの機械的な作業に不要な手順を追加しないでください。
+```
 
-**エージェントに設定を依頼する場合は、**[設定用の依頼文](docs/setup-guide.md#ask-an-agent-to-finish-setup)
-または[現行版のインストールガイド](docs/agent-discovery.md)を使ってください。
-各アプリは名前付きの `--host` オプションで選びます。既定値と `--host all` は Codex を選択します。
+保存後に新しい会話を始めます。スキルはモデルが選択し、毎メッセージの呼び出しは
+保証しません。Codex は対話セッションで 7 個のフックを信頼手順に沿って確認します。
+未承認フックは実行されない場合があります。引き継ぎや更新は無効状態を維持します。
+`status` はローカル導入と整合性を示し、進行中の会話への読み込みや適用を証明しません。
 
-<a id="a-method-for-the-question"></a>
+## 自動更新
 
-## 問いに合った思考法
+Codex の管理ツールは `auto-update enable`、`status`、`run`、`disable` を提供します。
+選択して有効化するとフックの外で `stable` を 24 時間ごとに確認し、ログイン時の
+確認には遅延を設けます。Mac は利用者 LaunchAgent、Windows はタスクスケジューラを
+使用します。署名メタデータ、期限、巻き戻し防止、プラットフォーム整合性、互換性を
+適用前に確認します。メジャー版や互換性を壊すスキーマ変更は自動適用しません。
+オフラインでは現行版を維持し、開始済みのプロセスは元のアーカイブを保持します。
+必要に応じてアプリの再読み込みや新しい会話を開始します。アカウントは手動アップロード、
+他の連携は現時点で予約更新の対象外です。本番更新の信頼ルートと署名サービスは
+未整備で、条件を満たすまでは利用不可と報告します。
 
-| 今取り組んでいること | 検討できる思考法 |
-| --- | --- |
-| 競合する優先事項のもとで選択肢を比較する | [トレードオフ分析](content/methods/trade-off-analysis/procedure.ja.md) |
-| 計画が当然としている仮定を理解する | [仮定マッピング](content/methods/assumption-mapping/procedure.ja.md) |
-| 主張を支える根拠を評価する | [批判的思考](content/methods/critical-thinking/procedure.ja.md) |
-| 計画で起こり得る問題に備える | [プレモーテム分析](content/methods/premortem-analysis/procedure.ja.md) |
+## 思考指示の言語
 
-各方法には目的、適用条件、完全な手順、事例、AI が確認する問いが含まれています。
-本文を読み、思考の流れをたどり、さまざまな課題に再利用できます。
+現在の対応言語は `en`、`ko`、`zh`、`ja`、`fr`、`de`、`it`、`es`、`pt`、`th` です。
+任意の旧セレクターは明示設定、保存設定、文字判定の順に選びます。仮名は日本語を
+優先し、その他はタイ文字・ハングル・漢字の多数でタイ語・韓国語・中国語を選びます。
+ラテン文字のヨーロッパ言語には明示設定か保存設定が必要です。漢字だけの日本語は
+`ja` を指定し、空入力・同数・未知の文字は英語に戻ります。
 
-[48 種類の思考法をすべて見る](content/methods/)
+```text
+./opensocrates locale get
+./opensocrates locale set en
+./opensocrates locale set ko
+./opensocrates locale set zh
+./opensocrates locale set ja
+./opensocrates locale set fr
+./opensocrates locale set de
+./opensocrates locale set it
+./opensocrates locale set es
+./opensocrates locale set pt
+./opensocrates locale set th
+./opensocrates locale set follow
+./opensocrates locale reset
+```
 
-## 思考法の全文を 10 言語で
+ホスト引数は不要です。Windows は `.\opensocrates.exe` を使用します。`follow` と
+`reset` はこの設定だけを解除します。設定は任意の旧セレクターに作用し、状態を
+保持しない判断要求やアカウント用スキルを設定しません。判断 JSON には明示的な
+`locale` が必要です。ネイティブ Claude 入口は保存した設定を読みません。
+アカウントスキルと Antigravity は各言語のガイドと完全な参照を使用します。
+指示の言語、回答の言語、アプリ UI、管理ツール出力は別です。全メッセージの翻訳は
+約束せず、方法 ID、JSON キー、出典行は変更しません。
 
-英語、韓国語、簡体字中国語、日本語、フランス語、ドイツ語、イタリア語、
-スペイン語、ポルトガル語、タイ語に対応しています。すべての言語に、
-48 種類の方法の完全な手順と事例が含まれています。
+## 出典、プライバシー、証拠
 
-これらは、AI が読む思考法の本文の言語です。
-[言語ガイド](docs/v1.5.2.md) · [Codex の指示言語設定](docs/settings.md)
+適切な正典方法を完全に読み、実際に適用した回答だけが、正確に同じ最終行
+`Powered by OpenSocrates` を使います。読者ガイドだけの利用や機械的な作業は
+該当せず、この行だけでは適用や品質改善の証明になりません。通常の判断経路は
+追加の選択モデルや認証呼び出しを行わず、生のプロンプト、会話、スクリーンショット、
+隠れた推論を保存しません。Claude ネイティブ入口は会話を読まず DB を初期化しません。
+アカウント用スキルに実行コードはありません。アプリ自身の認証、権限、保管方針は
+通常の会話に引き続き適用されます。
 
-## 読み、使い、応用できるオープンソース
+導入、読み込み、完全な読解、実際の適用、結果の有用性は別の証拠です。旧候補の
+署名・公証記録は v1.5.2 統合後の新しいファイルを検証しません。公開済みや全アプリ
+有効化済みとも主張しません。一般的な品質、費用、速度の改善は保証しません。
 
-すべての方法とソースを読み、自分の仕事に合わせて応用したり、新しい事例を
-追加したりできます。OpenSocrates は [MIT ライセンス](LICENSE)で公開された
-独立したプロジェクトです。
+- [ネイティブ導入・移行と証拠の説明（英語）](docs/native-v1.6.md)
+- [導入後の設定（英語）](docs/setup-guide.md) · [セキュリティ](SECURITY.md)
+- [方法本文](content/methods/) · [変更履歴](CHANGELOG.md) · [貢献ガイド](CONTRIBUTING.md)
 
-[リリース](https://github.com/ParkerHwang/OpenSocrates/releases) · [設定ガイド](docs/setup-guide.md) · [プライバシーとセキュリティ](SECURITY.md) · [貢献ガイド](CONTRIBUTING.md) · [問題を報告する](https://github.com/ParkerHwang/OpenSocrates/issues/new/choose) · [変更履歴](CHANGELOG.md)
+OpenSocrates は [MIT ライセンス](LICENSE) の独立プロジェクトで、OpenAI、
+Anthropic、Google の公式製品ではなく、各社からの承認も受けていません。

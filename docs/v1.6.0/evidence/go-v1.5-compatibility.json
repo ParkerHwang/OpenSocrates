@@ -1,0 +1,136 @@
+{
+  "authentication_used": false,
+  "baseline_commit": "9572db2c71a455d4ada24c78402d0f874002cec9",
+  "case_counts": {
+    "all_methods_locales_routing": 866,
+    "control_root_affected_recheck": 10,
+    "control_wire_cases": 21,
+    "default_decision_store_entries": 0,
+    "delivery_repeat_ack_epoch": 12,
+    "fallback_participation_confidence_contraindications": 155,
+    "intentional_changes": 4,
+    "rigor_commands": 9,
+    "validation_numeric_unicode_absence": 34
+  },
+  "command": "<isolated-baseline-python> <one-off-v1.5-compatibility-script>",
+  "command_paths_redacted": true,
+  "content_reference_commit": "cf6634310afcf5d5ce58484e67a73151bb4c5999",
+  "control_root_affected_recheck": [
+    {
+      "case": "array",
+      "error_code": "invalid_json",
+      "result": "PASS"
+    },
+    {
+      "case": "null",
+      "error_code": "invalid_json",
+      "result": "PASS"
+    },
+    {
+      "case": "string",
+      "error_code": "invalid_json",
+      "result": "PASS"
+    },
+    {
+      "case": "boolean",
+      "error_code": "invalid_json",
+      "result": "PASS"
+    },
+    {
+      "case": "number",
+      "error_code": "invalid_json",
+      "result": "PASS"
+    },
+    {
+      "case": "empty_object",
+      "error_code": "invalid_payload",
+      "result": "PASS"
+    },
+    {
+      "case": "one_field",
+      "error_code": "invalid_payload",
+      "result": "PASS"
+    },
+    {
+      "case": "unknown_object",
+      "error_code": "invalid_payload",
+      "result": "PASS"
+    },
+    {
+      "case": "array_in_object",
+      "error_code": "invalid_payload",
+      "result": "PASS"
+    },
+    {
+      "case": "null_in_object",
+      "error_code": "invalid_payload",
+      "result": "PASS"
+    }
+  ],
+  "environment": {
+    "architecture": "arm64",
+    "baseline_python": "3.12.15",
+    "binary_vcs_modified": false,
+    "binary_vcs_revision": "c5a822c6d97779d507f38d8344ec82ebe591bd8e",
+    "native_binary_sha256": "08ece103469a81dc07e3fd60222595b1ae2023cd39fbef393a756564eea6907b",
+    "os": "Darwin"
+  },
+  "intentional_changes": [
+    {
+      "baseline_reason": "explicit_method",
+      "baseline_status": "selected",
+      "case": "duplicate_decision_key",
+      "go_reason": "decision_unavailable",
+      "go_status": "unavailable"
+    },
+    {
+      "baseline_reason": "invalid_decision_request",
+      "baseline_status": "unavailable",
+      "case": "unpaired_surrogate",
+      "go_reason": "decision_unavailable",
+      "go_status": "unavailable"
+    },
+    {
+      "baseline_final_reason": "invalid_decision_request",
+      "baseline_final_status": "unavailable",
+      "case": "invalid_new_scope_retains_delivery",
+      "go_final_delivery": "reused_agent_reported_available",
+      "go_final_status": "selected"
+    },
+    {
+      "baseline_error": "invalid_payload",
+      "case": "surrogate",
+      "fields": [
+        "/error_code"
+      ],
+      "go_error": "invalid_json",
+      "group": "control"
+    }
+  ],
+  "isolated_temporary_home": true,
+  "limitations": [
+    "No authenticated host or live answer-quality evidence",
+    "No Windows runtime evidence",
+    "No production signing verification",
+    "Control cases with missing token establish wire validation only, not accepted state transitions"
+  ],
+  "locales": [
+    "en",
+    "ko"
+  ],
+  "methods_observed": 48,
+  "model_calls": 0,
+  "provenance": {
+    "affected_recheck_command": "<isolated-baseline-python> <one-off-v1.5-control-root-recheck-script>",
+    "affected_recheck_script_sha256": "1ad5f3bef3befb7bba0bef304fb2ada6207fc62e692a8c856c124a75146bca63",
+    "full_differential_execution": "Parent reran the exact recorded script against the binary hash recorded here; unchanged groups reused from that completed PASS run",
+    "reported_revision_source": "observed binary embedded vcs.revision, not current working HEAD",
+    "revision_verification_command": "go version -m dist/runtime/darwin-arm64/opensocrates"
+  },
+  "runtime_commit": "c5a822c6d97779d507f38d8344ec82ebe591bd8e",
+  "schema": "opensocrates.synthetic-compatibility-evidence/1",
+  "script_sha256": "ae70080f338f1e4c3a6112fa5d83fb1dd19dfb325a7d8bce27b82bc53a7f03b3",
+  "synthetic_inputs_only": true,
+  "unexpected_differences": [],
+  "verdict": "PASS"
+}

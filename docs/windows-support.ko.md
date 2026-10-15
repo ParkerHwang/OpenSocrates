@@ -1,68 +1,48 @@
-# Windows의 Codex — OpenSocrates 1.4.0
+# Windows x64 네이티브 지원 — v1.6.0 후보
 
-미공개 v1.5의 Claude 계정 스킬·Antigravity 후속 구현은
-[Windows v1.5 안내](windows-v1.5.ko.md)를 참고하세요. 아래는 기존 v1.4 기준선입니다.
+[English](windows-support.md) · [네이티브 안내](native-v1.6.ko.md)
 
-OpenSocrates 1.4.0은 네이티브 Windows 프로세스로 **Windows x64의 Codex**를
-지원합니다. 다른 호스트 연동은 제거했습니다. Windows ARM64, Windows 10,
-서명, SmartScreen 평판, 별도의 깨끗한 PC는 미검증입니다.
+후보는 Codex CLI/Desktop과 Antigravity 작업공간·전역 경로를 Go로 전환하고
+Claude 계정 검증·내보내기를 유지합니다. Windows 네이티브 Claude Code,
+Windows ARM64, WSL, 네트워크 공유와 추가 플랫폼은 지원 범위 밖입니다.
+사용자는 네이티브 `.exe`와 x64 묶음만 필요하며 Python·Node.js·npm·Go가
+필요하지 않습니다.
 
-## 설치와 업데이트
-
-Node.js 20 이상과 Codex CLI를 설치하고 Codex에 로그인하세요. 배포 패키지를
-사용하는 데 Python, WSL, Unix 셸은 필요하지 않습니다.
-
-```powershell
-npx --yes opensocrates@1.4.0 install --host codex
-npx --yes opensocrates@1.4.0 status --host codex
-npx --yes opensocrates@1.4.0 update --host codex
+```text
+.\opensocrates.exe verify --host codex --package "C:\Downloads\opensocrates-v1.6.0-windows-x64.zip"
+.\opensocrates.exe install --host codex --package "C:\Downloads\opensocrates-v1.6.0-windows-x64.zip"
+.\opensocrates.exe status --host codex
 ```
 
-Codex가 PATH에 없으면 `CODEX_BIN`을 실행 파일 경로로 설정하세요. 설치기는
-`opensocrates-1.4.0-codex-plugin-windows-x64.zip`을 자동 선택합니다. 검증된
-로컬 후보에는 `--asset <ZIP>`과 `--checksum <SHA256-파일>`을 함께 지정하세요.
-대화형 Codex 세션에서 OpenSocrates 훅 7개를 검토해야 합니다.
+검증한 v1.5 npm 소유 설치를 인수할 때는 `install` 대신 명시적 `adopt`를
+사용합니다. 설정·등록·신뢰·비활성·단일 업데이트 소유자를 보존합니다.
+`--host all`은 Codex만 선택합니다. 작업공간·출력은 따옴표로 감싼 로컬 드라이브
+절대 경로를 사용하세요. 위 명령은 Go 바이너리를 직접 실행하며 자체 셸·
+PowerShell 런타임·설치 래퍼를 사용하지 않습니다.
 
-Windows 예약 업데이트는 지원하지 않습니다. `auto-update status`는 이 한계를
-표시하며 `enable`과 `run`은 수동 업데이트를 안내합니다. Windows 예약 작업은
-설치하지 않습니다. 연동을 제거하려면 다음 명령을 사용하세요.
+Codex는 사용자 opt-in 후 훅 밖의 작업 스케줄러에서 안정 버전을 24시간마다
+확인하고 로그인 후 지연 확인합니다. 서명·호환성·만료·롤백 방지를 검증합니다.
+메이저·비호환 스키마는 자동 적용하지 않습니다. 운영 루트·서명과 실제 예약
+검증은 남은 릴리스 조건입니다. Antigravity는 별도 수동 관리하며 계정 ZIP
+내보내기는 계정 업로드·활성화가 아닙니다.
 
-```powershell
-npx --yes opensocrates@1.4.0 remove --host codex --purge
-```
+실제 Windows 검증은 보호된 DACL·현재 소유자, 열린 부모 핸들, reparse/junction
+거부, 배타 잠금, 긴 Unicode 경로, 바이너리 입출력, 압축 alias/stream/대소문자
+충돌, 수정된 다른 소유 파일, 동시 작업, Go 보조 프로그램의 사용 중 실행파일
+교체를 확인해야 합니다. 크로스 컴파일로 증명할 수 없습니다. 이전 인증 복사·
+POSIX 문맥은 사용 불가를 유지합니다. 훅은 안전하게 통과하며 신뢰는 대화형
+검토와 새 세션이 필요합니다.
 
-Purge는 대화 기록과 훅 신뢰를 보존합니다. OpenSocrates 훅 승인 7개도 초기화할
-때만 `--reset-trust`를 추가하세요. 알 수 없거나 안전하지 않거나 사용 중인
-데이터는 보존하며 정리 보류로 보고합니다.
+개발자는 고정된 Go 1.27.2와 [기여 안내](../CONTRIBUTING.md)의 Go 소스·패키지·
+lifecycle 검사를 실제 Windows x64에서 실행합니다. 별도 Mac 검사도 필요합니다.
+네이티브 fixture·인증된 CLI·Desktop GUI·새 기기·플랫폼 서명·SmartScreen은 다른
+증거이며 정확한 커밋·명령·결과·누락 항목을 구현 인계에 기록합니다.
 
-## 런타임과 증거
+[v1.5 안내](windows-v1.5.ko.md)와 [v1.4 작업 기록](windows-v1.4.0-worklog.md)은
+과거 증거이며 Go 후보 검증이 아닙니다.
 
-배포 파일에는 `bin/launch.mjs`와 Windows 네이티브 `.exe`가 들어 있습니다.
-지원 런타임 경로는 판단 지점별 조회입니다. 기존 SDK의 자격 증명 복사와 POSIX
-문맥 접근은 Windows에서 사용할 수 없습니다. 실제 소유자·DACL 검사, 바이너리
-입출력, 잠금, 압축 경로 검증으로 로컬 산출물을 보호합니다. 런타임을 사용할
-수 없어도 훅은 일반 작업을 막지 않습니다.
-
-내장 SDK와 CLI는 0.144.4로 일치시키며 사용자의 Codex CLI를 대체하지 않습니다.
-네이티브 패키지 테스트는 대화형 훅 승인·인증된 전달·Desktop GUI 증거와
-구분합니다. 현재 커밋의 결과는 [PR #93](https://github.com/ParkerHwang/OpenSocrates/pull/93)에
-기록합니다. 이전 Windows 결과는 [과거 기록](windows-v1.4.0-worklog.md)입니다.
-
-## 네이티브 빌드와 검증
-
-Windows x64, Python 3.12, Node.js 20 이상, uv를 사용하세요.
-
-```powershell
-$env:PYTHONUTF8 = '1'
-uv sync --locked --all-groups
-uv run --locked python tools/build_windows.py
-uv run --locked python tools/check_windows.py --packages
-uv run --locked ruff check src tools
-uv run --locked ruff format --check src tools
-uv run --locked mypy src
-npm run test:windows
-npm pack --dry-run
-```
-
-Windows Actions는 `windows-2025`에서 빌드합니다. 배포에는 macOS 릴리스 검사도
-필요하며, Windows 전송 체크섬과 패키지 소스 신원을 검증한 뒤 배포 목록을 합칩니다.
+Codex CLI/Desktop 훅은 정상 상속한 기본 PowerShell 문맥만 검증 대상입니다.
+설정 명령 `& "$env:PLUGIN_ROOT\runtime\windows-x64\opensocrates.exe"`는
+OS·호스트 설정이며 자체 PowerShell 래퍼가 아닙니다. 사용자 지정·cmd fallback
+셸은 지원하지 않고 명시적으로 안전하게 통과합니다. 설치 진단은
+`opensocrates.exe manage diagnose --host HOST`이며 런타임 진단과 구분합니다.

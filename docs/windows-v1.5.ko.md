@@ -1,5 +1,10 @@
 # Windows에서 OpenSocrates v1.5.0 사용하기
 
+이 문서는 출시된 v1.5.0의 **과거 안내**입니다. 아래 npm 명령과 관찰을
+v1.6.0 Go 후보의 활성 설치·검증 경로로 사용하지 마세요. 현재 경로는
+[네이티브 v1.6 안내](native-v1.6.ko.md), 고정된 원본은
+[v1.5.0 문서](https://github.com/ParkerHwang/OpenSocrates/blob/v1.5.0/docs/windows-v1.5.ko.md)입니다.
+
 [English](windows-v1.5.md) · [README](../README.ko.md)
 
 설치 후에는 [설정 가이드](setup-guide.ko.md)를 참고하세요. 캡처는 Mac 화면이며, 본문에서 Windows 지원 범위와 계정·로컬 설치를 구분합니다.

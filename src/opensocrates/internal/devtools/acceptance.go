@@ -1,0 +1,293 @@
+package devtools
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"flag"
+	"fmt"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/platform"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/runtimecli"
+	"io"
+	"os"
+	"path/filepath"
+	"runtime"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+)
+
+// The native runtime owns discovery wording. Keep acceptance's exact-payload
+// comparison tied to that source rather than a separately maintained copy.
+const timingEntryGuidance = runtimecli.EntryGuidance
+
+type acceptanceOptions struct {
+	packagePath, binary, hostBinary, report, fixtureID, codexHome string
+	runs                                                          int
+}
+
+func RunAcceptance(args []string, out, errout io.Writer) int {
+	name := "lifecycle"
+	if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
+		name = args[0]
+		args = args[1:]
+	}
+	o := acceptanceOptions{}
+	f := flag.NewFlagSet("acceptance", flag.ContinueOnError)
+	f.SetOutput(errout)
+	f.StringVar(&o.packagePath, "package", "dist/codex", "native package directory")
+	f.StringVar(&o.binary, "binary", "", "native management CLI")
+	f.StringVar(&o.hostBinary, "host-binary", "", "explicit external Codex binary or native isolated fixture")
+	f.StringVar(&o.codexHome, "codex-home", "", "existing authenticated Codex home for explicit legacy qualification")
+	f.StringVar(&o.fixtureID, "fixture-id", "", "exact prior isolated scheduler fixture ID")
+	f.StringVar(&o.report, "report", "", "content-free evidence JSON")
+	f.IntVar(&o.runs, "runs", 20, "fresh process timing sample count per source")
+	if e := f.Parse(args); e != nil {
+		return 2
+	}
+	if len(f.Args()) != 0 {
+		return 2
+	}
+	if name == "install-profile" {
+		return runInstallProfile(o, out, errout)
+	}
+	var report map[string]any
+	var e error
+	switch name {
+	case "legacy-selector":
+		report, e = legacySelectorAcceptance(o.hostBinary, o.codexHome)
+	case "network-update":
+		report, e = networkUpdateAcceptance()
+	case "scheduler-cleanup":
+		report, e = nativeSchedulerFixtureCleanup(o.fixtureID)
+	case "scheduler":
+		report, e = nativeSchedulerAcceptance(o)
+	case "timing":
+		report, e = measureNativeHook(o.packagePath, o.runs)
+	case "lifecycle", "native":
+		report, e = nativeLifecycleAcceptance(o)
+	default:
+		fmt.Fprintln(errout, "acceptance: unknown gate")
+		return 2
+	}
+	if report == nil {
+		report = map[string]any{}
+	}
+	report["schema"] = "opensocrates.native-acceptance/1.0.0"
+	report["generated_at"] = time.Now().UTC().Format(time.RFC3339)
+	report["privacy"] = map[string]bool{"environment_recorded": false, "absolute_paths_recorded": false, "process_output_recorded": false, "prompt_recorded": false}
+	status := "pass"
+	if e != nil {
+		status = "unavailable"
+	}
+	if passed, ok := report["pass"].(bool); ok && !passed {
+		status = "fail"
+	}
+	report["status"] = status
+	if o.report != "" {
+		if e := os.MkdirAll(filepath.Dir(o.report), 0700); e != nil {
+			return 2
+		}
+		b, e := json.MarshalIndent(report, "", "  ")
+		if e != nil {
+			return 2
+		}
+		if e := os.WriteFile(o.report, append(b, '\n'), 0600); e != nil {
+			return 2
+		}
+	}
+	fmt.Fprintf(out, "%s-acceptance: %s target=%s\n", name, strings.ToUpper(status), nativeAcceptanceTarget())
+	if status == "unavailable" {
+		return 2
+	}
+	if status == "fail" {
+		return 1
+	}
+	return 0
+}
+func nativeAcceptanceTarget() string {
+	return nativeAcceptanceTargetFor(runtime.GOOS, runtime.GOARCH)
+}
+func nativeAcceptanceTargetFor(goos, goarch string) string {
+	if goos == "darwin" && goarch == "arm64" {
+		return "darwin-arm64"
+	}
+	if goos == "windows" && goarch == "amd64" {
+		return "windows-x64"
+	}
+	if goos == "windows" && goarch == "arm64" {
+		return "windows-arm64"
+	}
+	return "unsupported"
+}
+func windowsAcceptanceTarget(target string) bool {
+	return target == "windows-x64" || target == "windows-arm64"
+}
+func isolatedAcceptanceEnvironment(root string) ([]string, string, error) {
+	home := filepath.Join(root, "home")
+	codex := filepath.Join(root, "codex")
+	tmp := filepath.Join(root, "tmp")
+	work := filepath.Join(root, "workspace")
+	for _, p := range []string{home, codex, tmp, work} {
+		if e := platform.Mkdir(p); e != nil {
+			return nil, "", e
+		}
+	}
+	env := []string{"HOME=" + home, "USERPROFILE=" + home, "CODEX_HOME=" + codex, "TMPDIR=" + tmp, "TMP=" + tmp, "TEMP=" + tmp, "OPENSOCRATES_STATE_DIR=" + filepath.Join(home, ".opensocrates"), "LANG=C", "LC_ALL=C"}
+	if runtime.GOOS == "windows" {
+		// A real Windows shell requires OS/.NET discovery variables as well as
+		// its executable path. Keep a closed OS allowlist; model/account secrets,
+		// caller overrides and user module/search paths are never inherited.
+		for _, key := range []string{"SystemRoot", "WINDIR", "ComSpec", "SystemDrive", "ProgramFiles", "ProgramFiles(x86)", "ProgramW6432", "CommonProgramFiles", "CommonProgramFiles(x86)", "CommonProgramW6432", "ProgramData", "ALLUSERSPROFILE", "PROCESSOR_ARCHITECTURE", "PROCESSOR_ARCHITEW6432", "PROCESSOR_IDENTIFIER", "PROCESSOR_LEVEL", "PROCESSOR_REVISION", "NUMBER_OF_PROCESSORS", "OS", "USERNAME", "USERDOMAIN", "COMPUTERNAME"} {
+			if value := os.Getenv(key); value != "" {
+				env = append(env, key+"="+value)
+			}
+		}
+		appData := filepath.Join(home, "AppData", "Roaming")
+		localAppData := filepath.Join(home, "AppData", "Local")
+		modules := filepath.Join(home, "Documents", "WindowsPowerShell", "Modules")
+		cache := filepath.Join(localAppData, "Microsoft", "Windows", "PowerShell")
+		for _, directory := range []string{appData, localAppData, modules, cache} {
+			if e := platform.Mkdir(directory); e != nil {
+				return nil, "", e
+			}
+		}
+		shell, e := platform.SystemExecutable("powershell.exe")
+		if e != nil {
+			return nil, "", e
+		}
+		psHome := filepath.Dir(shell)
+		systemDirectory := filepath.Dir(filepath.Dir(psHome))
+		env = append(env, "APPDATA="+appData, "LOCALAPPDATA="+localAppData, "HOMEDRIVE="+filepath.VolumeName(home), "HOMEPATH="+strings.TrimPrefix(home, filepath.VolumeName(home)), "PATHEXT=.COM;.EXE;.BAT;.CMD", "PSModulePath="+filepath.Join(psHome, "Modules")+";"+modules, "PSModuleAnalysisCachePath="+filepath.Join(cache, "ModuleAnalysisCache"), "PSDisableModuleAnalysisCacheCleanup=1", "PATH="+systemDirectory+";"+psHome+";"+filepath.Join(systemDirectory, "Wbem"))
+	} else {
+		env = append(env, "PATH=/usr/bin:/bin:/usr/sbin:/sbin")
+	}
+	return env, work, nil
+}
+func runAcceptanceProcess(binary string, args []string, input []byte, env []string, cwd string, deadline time.Duration) ([]byte, []byte, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), deadline)
+	defer cancel()
+	result, e := platform.Run(ctx, binary, args, platform.RunOptions{Env: env, Dir: cwd, Stdin: bytes.NewReader(input), OutputLimit: 8 << 20})
+	return result.Stdout, result.Stderr, e
+}
+func hookTimingResponse(source string, b []byte) bool {
+	if len(b) > 8192 {
+		return false
+	}
+	if source == "startup" {
+		return len(b) == 0
+	}
+	d := json.NewDecoder(bytes.NewReader(b))
+	var v map[string]any
+	if d.Decode(&v) != nil {
+		return false
+	}
+	var extra any
+	if d.Decode(&extra) != io.EOF {
+		return false
+	}
+	expected := map[string]any{"hookSpecificOutput": map[string]any{"hookEventName": "SessionStart", "additionalContext": timingEntryGuidance}}
+	x, _ := json.Marshal(v)
+	y, _ := json.Marshal(expected)
+	return bytes.Equal(x, y)
+}
+func timingPercentile(v []float64, p int) float64 {
+	x := append([]float64(nil), v...)
+	sort.Float64s(x)
+	i := (len(x)*p+99)/100 - 1
+	if i < 0 {
+		i = 0
+	}
+	return x[i]
+}
+func measureNativeHook(packageRoot string, runs int) (map[string]any, error) {
+	target := nativeAcceptanceTarget()
+	report := map[string]any{"target": target, "configured_timeout_ms": 2000, "process_model": "new_host_shell_process_per_sample; exact_generated_SessionStart_command; isolated_environment_and_native_bundle; decision_point_response_v1", "live_host_delivery_claimed": false, "custom_shells": "unqualified_fail_open_boundary"}
+	if target == "unsupported" || runs < 20 || runs > 100 {
+		return report, errors.New("native target and bounded samples required")
+	}
+	root, e := filepath.Abs(packageRoot)
+	if e != nil {
+		return report, e
+	}
+	m, e := checkObject(filepath.Join(root, "release-manifest.json"))
+	if e != nil {
+		return report, e
+	}
+	if m["host"] != "codex" || strings.Join(manifestStrings(m["release_targets"]), ",") != target {
+		return report, errors.New("package target mismatch")
+	}
+	codes, e := checkPackageTree(root)
+	if e != nil || len(codes) > 0 {
+		return report, errors.New("package integrity invalid")
+	}
+	hooks, e := checkObject(filepath.Join(root, "hooks/hooks.json"))
+	if e != nil {
+		return report, e
+	}
+	events := obj(hooks["hooks"])
+	handlers := arr(events["SessionStart"])
+	if len(handlers) == 0 {
+		return report, errors.New("session hook missing")
+	}
+	commands := arr(obj(handlers[0])["hooks"])
+	if len(commands) != 1 {
+		return report, errors.New("session command missing")
+	}
+	command := obj(commands[0])
+	if !schemaEqual(command["timeout"], json.Number("2")) {
+		return report, errors.New("host timeout changed")
+	}
+	configured := str(command["command"])
+	shell, args, e := configuredHookInvocation(configured, "codex", target)
+	if e != nil {
+		return report, e
+	}
+	manifestBytes, e := os.ReadFile(filepath.Join(root, "release-manifest.json"))
+	if e != nil {
+		return report, e
+	}
+	report["artifact_identity"] = digest(manifestBytes)
+	report["qualified_shell"] = qualifiedHookShell(target)
+	tmp, e := platform.MkdirTemp("", "opensocrates-timing-")
+	if e != nil {
+		return report, e
+	}
+	defer os.RemoveAll(tmp)
+	// Environment expansion, never textual root replacement, must preserve these
+	// characters as path data. The receipt records only the scenario name.
+	measuredRoot := filepath.Join(tmp, "한국 $ dollar ` tick and spaces")
+	if e = copyAcceptanceTree(root, measuredRoot); e != nil {
+		return report, e
+	}
+	sources := map[string]any{}
+	allPass := true
+	for _, source := range []string{"startup", "compact"} {
+		values := []float64{}
+		passed := true
+		for i := 0; i < runs; i++ {
+			env, work, e := isolatedAcceptanceEnvironment(filepath.Join(tmp, source, strconv.Itoa(i)))
+			if e != nil {
+				return report, e
+			}
+			env = append(env, "PLUGIN_ROOT="+measuredRoot, "CLAUDE_PLUGIN_ROOT="+measuredRoot)
+			input, _ := json.Marshal(map[string]any{"hook_event_name": "SessionStart", "session_id": "synthetic-session-" + strconv.Itoa(i), "turn_id": "synthetic-turn-" + strconv.Itoa(i), "cwd": work, "source": source, "version": "synthetic-version"})
+			started := time.Now()
+			stdout, stderr, e := runAcceptanceProcess(shell, args, input, env, work, 2*time.Second)
+			ms := float64(time.Since(started).Microseconds()) / 1000
+			values = append(values, ms)
+			passed = passed && e == nil && len(stderr) == 0 && hookTimingResponse(source, stdout)
+		}
+		p95 := timingPercentile(values, 95)
+		max := timingPercentile(values, 100)
+		passed = passed && p95 <= 1000 && max < 2000
+		allPass = allPass && passed
+		sources[source] = map[string]any{"sample_count": runs, "latency_ms": map[string]any{"first": values[0], "p50": timingPercentile(values, 50), "p95": p95, "max": max}, "pass": passed}
+	}
+	report["sources"] = sources
+	report["path_cases"] = []string{"unicode_spaces_dollar_backtick"}
+	report["pass"] = allPass
+	return report, nil
+}

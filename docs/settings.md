@@ -20,31 +20,27 @@ language setting, host UI setting or guarantee of automatic skill use.
 | `th` | Thai |
 | `follow` | Clear the stored preference and follow current-input detection |
 
-From the installed Codex package root on Mac:
+With the installed native executable on Mac:
 
 ```sh
-bin/launch.sh locale codex get
-bin/launch.sh locale codex set fr
-bin/launch.sh locale codex set th
-bin/launch.sh locale codex set follow
-bin/launch.sh locale codex reset
+./opensocrates locale get
+./opensocrates locale set fr
+./opensocrates locale set th
+./opensocrates locale set follow
+./opensocrates locale reset
 ```
 
-From the Windows x64 Codex package root:
+With the native Windows x64 or ARM64 executable:
 
 ```powershell
-node bin/launch.mjs locale codex get
-node bin/launch.mjs locale codex set pt
-node bin/launch.mjs locale codex reset
+.\opensocrates.exe locale get
+.\opensocrates.exe locale set pt
+.\opensocrates.exe locale reset
 ```
 
-The corresponding source-development entry in the locked repository environment:
-
-```sh
-uv run --locked python -m opensocrates locale get
-uv run --locked python -m opensocrates locale set de
-uv run --locked python -m opensocrates locale reset
-```
+For source development, use the Go runtime command below `src/opensocrates/`.
+End users require no Go, Python, Node.js or npm. The native `locale` command
+has no host argument; [maintenance v1.5.2 commands](v1.5.2.md) remain historical.
 
 `set` takes exactly one of `en|ko|zh|ja|fr|de|it|es|pt|th|follow`. `get` and `reset`
 take no language argument. Unsupported choices and extra arguments are rejected;
@@ -63,8 +59,8 @@ for every multilingual input.
 
 Stateless `decision` requests require explicit JSON `locale` from the ten authored
 language codes, never `follow`, and read no stored settings. Use
-`bin/launch.sh decision codex` on Mac, `node bin/launch.mjs decision codex` on
-Windows, or `bin/launch.sh decision claude` in the Mac Claude package. Follow the
+`./opensocrates decision` on Mac, `.\opensocrates.exe decision` on
+Windows. Native `decision` has no host argument. Follow the
 installed `skills/opensocrates/references/decision/request.json` envelope and
 routing contract; do not pass an invented `--locale` flag.
 

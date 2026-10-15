@@ -1,5 +1,7 @@
 # Find and assess OpenSocrates as an agent
 
+This guide is pinned to the already released v1.5.2 npm channel. The current repository branch also prepares an unreleased Go v1.6.0 candidate; its native installation/adoption commands and Windows ARM64 scope are in [the native candidate guide](native-v1.6.md). Do not apply these npm commands to the Go candidate or infer that its assets have been published.
+
 [한국어](agent-discovery.ko.md) · [README](../README.md) · [Setup guide](setup-guide.md) · [Content-only privacy notice](content-privacy.md)
 
 OpenSocrates is an MIT-licensed set of 48 authored reasoning methods delivered

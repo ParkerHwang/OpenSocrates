@@ -1,75 +1,83 @@
 # Contributing to OpenSocrates
 
-Thank you for helping improve OpenSocrates. Bug reports, documentation fixes,
-new tests, implementation improvements, and carefully sourced reasoning-system
-changes are welcome.
-
-Humans and automated agents must also follow [AGENTS.md](AGENTS.md), the shared
-cross-machine operating contract. GitHub issues, pull requests, commit SHAs, and
-Actions are durable shared state; local chat history and unpushed branches are
-not a substitute for a GitHub handoff.
-
-## Before opening an issue
-
-- Search existing issues and pull requests.
-- Use the security process in [SECURITY.md](SECURITY.md) for vulnerabilities.
-- Remove prompts, transcripts, OAuth data, local paths, and other sensitive
-  material from examples and logs.
-- Describe the observed behavior separately from the behavior you expected.
+Read [AGENTS.md](AGENTS.md), the shared operating contract, and
+[SECURITY.md](SECURITY.md) before changing the project. GitHub issues, pull
+requests, exact commit SHAs and Actions are durable shared state. Search open
+and closed issues/PRs first; report vulnerabilities privately and remove private
+prompts, transcripts, credentials and user paths from reproductions.
 
 ## Development setup
 
-OpenSocrates uses Python 3.12 and a locked `uv` environment.
+Active first-party implementation uses Go. The module pins Go 1.27.2 through
+`go.mod`; contributors need that toolchain, Git, and the documented external
+host tools for host-specific work. End users need only the native release assets
+and their host application: Python, Node.js, npm and Go are not installation or
+runtime requirements. Make is an optional task runner; its recipes delegate to
+Go commands.
 
-```bash
+```text
 git clone https://github.com/ParkerHwang/OpenSocrates.git
 cd OpenSocrates
-uv python install 3.12
-uv sync --locked --all-groups
+go mod download
 make bootstrap
 ```
 
-Node.js 20 or later is also required when changing the GitHub/npx installer.
+Work on a focused branch from reconciled current `main`. Never push directly to
+protected `main`. Read the [v1.6.0 preparation](docs/v1.6.0/README.md) and current
+implementation handoff. PR #110 is planning reference, not an implementation
+base to reuse blindly; issue #109 tracks preparation only.
 
-## Make changes
+## Canonical sources and compatibility
 
-- Runtime code belongs under `src/opensocrates/`.
-- Canonical reasoning content belongs under `content/methods/` and must keep
-  theory, public-output, evidence, stop-condition, and example boundaries
-  explicit. Teacher questions for the injection voice belong in
-  `content/teacher-questions.yaml` and must stay bilingual, three per method,
-  unique within each locale, and addressed to the active agent rather than the
-  user. Its overlay `content_revision` must match the canonical content
-  revision; changing the overlay does not by itself rewrite an authored
-  method's `content_revision`. Generated procedures plus `source_tree_hash` and
-  `normalized_semantic_hash` bind the overlay into package identity.
-- Canonical schemas belong under `schemas/source/`.
-- Distribution templates belong under `plugin-src/<host>/`. The Mac stage adds
-  native Claude entry, a portable content-only Claude account skill, and modular
-  Antigravity rules/skills; preserve existing Codex behavior. Shared reader and
-  decision guidance belongs under `plugin-src/shared/`. Review controller,
-  teacher-question, procedure, grounding, and wording changes across all affected
-  English/Korean packages. Distribution profiles are separate from the retained
-  legacy Codex selector runtime; native Claude must not invoke it.
-  Hooks require host trust, and account matching requires its own live evidence.
-- Do not edit generated files in `schemas/v1/`,
-  `content/compiled-*.json`, `build/`, or `dist/` by hand.
-- Keep English and Korean user-facing documentation semantically aligned.
-- Do not add telemetry, credential collection, raw prompt or transcript logging,
-  screenshot retention, or hidden reasoning capture.
+- Runtime, CLI, lifecycle and active development tools belong under
+  `src/opensocrates/`; OS filesystem/process protection and host registration
+  remain separate from transaction/recovery and package transport.
+- Canonical reasoning content belongs under `content/methods/`. v1.6.0 freezes
+  the released v1.5.2 baseline: 48 methods and ten languages, content revision 5.
+  The original v1.5.0/revision-3 preparation is historical. The separate 48 method-body upgrades belong to
+  v1.6.1 or later. Preserve English/Korean methods, teacher questions,
+  applicability, evidence/stop conditions, response policy and shared guides.
+- Teacher questions belong in `content/teacher-questions.yaml`: ten locales,
+  three per method (1,440 total), unique within each locale, addressed to the active agent.
+  The overlay revision must match the canonical content revision; changing it
+  does not rewrite an authored method's revision.
+- Schemas belong under `schemas/source/`. Preserve wire formats, persisted
+  state, unknown-field policy, Unicode, numeric precision, omitted/null/empty
+  distinctions and canonical serialization. Document intentional changes
+  separately from refactoring.
+- Distribution templates belong under `plugin-src/<host>/`; shared reader and
+  decision guidance belongs under `plugin-src/shared/`. Distribution profiles
+  and runtime adapters have separate capability lists. `--host all` means
+  Codex only. The supported native targets are macOS ARM64 and Windows x64/ARM64.
+  Windows ARM64 is an explicit user-directed expansion; native Windows Claude
+  Code and other additional platforms remain excluded.
+- Do not hand-edit generated files in `schemas/v1/`,
+  `content/compiled-*.json`, `build/`, or `dist/`. Commit canonical and generated
+  changes together. Regenerate with `make generate`.
+- Keep EN/KO user-facing documents semantically aligned. Add no telemetry,
+  credential collection, raw prompt/transcript logging, screenshot retention,
+  workspace-content retention or hidden reasoning capture. Preserve fail-open
+  hooks, bounded selection, cleanup, ownership checks and verified rollback.
 
-Regenerate canonical outputs when their sources change:
+The released v1.5.2 baseline is source
+`9838db16910c5f22d9dcc3c7180350cb406fd236`, not its annotated tag object
+`4c27d59da54eb1591ba24c0ebae62d6ab3168b60`. Current main merge
+`8f08b9a90d711fa3fc60cc7db6f962e3dda43c42` has the same release tree, but remains a distinct commit identity.
+Reconcile any later maintenance release before final v1.6.0 publication.
+Preserve old evidence with its original revision and source; revision-4 receipts
+do not qualify revision-5 files even when original body text is unchanged.
 
-```bash
-make generate
-```
+## Implementation and final verification
 
-## Validate
+Understand contracts, implement the full scope, integrate delegated changes,
+then verify stable files. During ordinary implementation, defer tests, lint,
+validation builds and code/security reviews. Reading/writing tests and generating
+outputs may happen earlier. A concrete blocking error permits the smallest
+relevant diagnostic. Do not test after every edit by default.
 
-Run the checks relevant to your change. Before requesting review, the complete
-source-level suite should pass:
+Once integration is complete, run the complete source-level suite:
 
-```bash
+```text
 make bootstrap
 make format-check
 make lint
@@ -84,80 +92,55 @@ make smoke
 make installer-check
 ```
 
-Native release work additionally requires Apple-silicon macOS:
+Native distribution work additionally runs `make release-check` on the required
+native platforms. Use [the native guide](docs/native-v1.6.md) for supported
+profiles, installation/adoption, scheduler, recovery and release gates. Exact
+commands, results, environment and the verified commit belong in the PR and
+handoff. Run Windows x64 and ARM64 gates on their respective native targets.
+The user's existing Windows VM is ARM64: previous x64-emulated observations are
+supplementary, not native ARM64 qualification. Missing evidence remains missing;
+cross-compilation does not validate
+Windows ACLs, reparse points, Task Scheduler, running executable replacement or
+native host registration. Existing v1.5 evidence is historical and does not
+qualify the Go release.
 
-```bash
-make release-check
+Final verification must cover native install/adoption/remove, offline behavior,
+interrupted transactions, rollback, updater/management executable replacement,
+signed metadata, expiry/rollback rejection, disabled state, modified foreign
+files, host reload boundaries and deterministic generated outputs. Mac
+LaunchAgent and Windows Task Scheduler evidence must come from their respective
+OS and executable architecture. Windows ARM64 requires its own native binaries,
+helper/self-replacement, ACL/reparse, adoption, removal, interrupted recovery and
+signed-update checks. Native CLI/Desktop/Antigravity observations are separate. Separate fresh-machine acceptance from reinstalling on a used machine.
+Signing credentials, trusted production root, notarization/Authenticode and
+public transport verification are release gates, not consequences of a local
+build. Do not replace an active installation to gather evidence without the
+user's authorization.
+
+Review stable integrated changes with bounded code/security/verifier specialists
+where useful. Serialize tests sharing mutable resources. Fix found defects and
+rerun affected checks; reuse successful unchanged evidence.
+
+## Pull requests and handoff
+
+Open incomplete work as a Draft PR and complete every template section. Include
+the problem/result, compatibility and intentional behavior changes, issue link,
+exact verification, evidence level, missing native/live/signing evidence,
+privacy/ownership/generated-output effects and remaining limitations. Keep the
+PR description current. Do not mark ready until checks pass or unavailable
+checks are explicitly documented. Repository automation can add the item to the
+OpenSocrates Development project when direct Project access is unavailable.
+
+```text
+Current commit: <sha>
+Completed: <bounded list>
+Verified: <exact commands and results with environment>
+Not verified: <commands/evidence and reasons>
+Next: <ordered next actions>
+Known limitations: <explicit boundaries>
 ```
 
-This retains the Codex native gate and then assembles the Claude Mac companion,
-Claude account ZIP, and Antigravity content package. It does not publish them.
-Use [the Mac guide](docs/macos-v1.5.md) for local archive installation and current
-qualification. Focused new-profile checks are:
-
-```bash
-uv run --locked python tools/check_claude_host.py
-uv run --locked python tools/check_content_hosts.py
-node --test installer/managed-hosts.test.mjs
-```
-
-Record each claimed CLI, Desktop, account, workspace, and global cell separately.
-Native entry emission is not a complete read, application, or useful-result
-receipt. Do not turn a missing application receipt into an extra completion gate.
-A practical result defect reopens the affected guide/case and needs a retest.
-
-For Codex, this native check measures the generated package's configured
-`SessionStart` command before the runtime version smoke. The exact process model,
-one-second p95 margin inside the two-second host timeout, and privacy-safe evidence
-contract are documented in [docs/codex-session-start-timing.md](docs/codex-session-start-timing.md).
-
-Release candidates that change installation or host packaging should also use
-the [clean-machine acceptance procedure](docs/clean-machine-acceptance.md) on a
-separate Mac and attach its privacy-safe result bundle to the pull request.
-For a previously used Mac that begins with the exact supported Codex
-installation, use the separate
-[purge and reinstall acceptance procedure](docs/reinstall-cycle-acceptance.md).
-Its result is `purged_same_machine`, never clean-machine evidence.
-
-If a platform-dependent check cannot be run, state that clearly in the pull
-request instead of claiming it passed.
-
-## Pull requests
-
-Keep each pull request focused and include:
-
-- what changed and why;
-- user or developer impact;
-- a linked issue or a specific explanation for why no issue exists;
-- validation commands and results;
-- the supported evidence level and missing evidence;
-- privacy, security, compatibility, or generated-output effects;
-- remaining limitations or follow-up work;
-- a current-commit handoff that another contributor can resume on another
-  machine.
-
-Open incomplete work as Draft. Do not mark it ready for review until the stated
-checks pass or every unavailable check is documented. Repository automation adds
-open issues and pull requests to the OpenSocrates Development project; Project
-edit access is not required to contribute.
-
-By submitting a contribution, you agree that it is licensed under the
+Do not merge with pending/failing required checks, missing required live
+qualification or a Draft PR. Merge/tag/publication require separate release
+approval. Stable behavior begins with the tagged release. Contributions use the
 repository's [MIT License](LICENSE).
-
-## Native Windows development
-
-Use the PowerShell commands and exact evidence boundaries in [Windows support](docs/windows-support.md). Run `uv run --locked python tools/check_windows.py --packages` after `tools/build_windows.py`; keep the existing macOS release gate. LF checkout is required for pinned evidence hashes.
-
-That guide records the existing Codex Windows baseline. Use the
-[v1.5 Windows guide](docs/windows-v1.5.md) and current
-[implementation handoff](docs/v1.5.0/WINDOWS_IMPLEMENTATION_HANDOFF.md) for the
-account-only Claude scope and Antigravity lifecycle. Build first, then run
-`npm run test:windows` (Codex and managed addon native tests),
-`uv run --locked python tools/check_content_hosts.py` and
-`uv run --locked python tools/check_claude_host.py`. The older POSIX fixture
-installer suite runs on Linux/Mac CI; do not report it as a native Windows pass.
-Portable content ZIP modes are fixed at 0644 on both build platforms. Keep the
-Mac runtime, hook and full release gates in Mac CI. Live Web, Desktop Chat,
-Cowork, Antigravity workspace and global cells remain distinct, including when
-Web and Desktop use different accounts. Native Windows Claude Code is excluded
-by the current user scope, not a missing Windows deliverable.

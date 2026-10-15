@@ -1,5 +1,7 @@
 # 에이전트가 OpenSocrates를 발견하고 판단하는 방법
 
+이 안내는 이미 출시된 v1.5.2 npm 채널에 고정되어 있습니다. 현재 브랜치는 별도로 미출시 Go v1.6.0을 준비하며 네이티브 설치·인수 명령과 Windows ARM64 범위는 [네이티브 후보 안내](native-v1.6.ko.md)를 따릅니다. 아래 npm 명령을 Go 후보에 적용하거나 후보 파일이 게시되었다고 해석하지 않습니다.
+
 [English](agent-discovery.md) · [README](../README.ko.md) · [설정 가이드](setup-guide.ko.md) · [콘텐츠 전용 개인정보 안내](content-privacy.ko.md)
 
 OpenSocrates는 직접 작성한 48개 사고 방법을 호스트별 플러그인·규칙·계정 스킬로

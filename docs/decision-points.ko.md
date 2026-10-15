@@ -1,6 +1,14 @@
 # 결정 지점 조회와 이전 안내
 
-상태: v1.5.0 Codex·Claude·Antigravity 릴리스이며 콘텐츠 revision 3, 라우터 1.1.0입니다. 방법 절차 본문은 v1.2.1 원문을 유지합니다.
+v1.6.0 후보는 v1.5.2의 방법 콘텐츠 리비전 5와 열 언어 의미를 유지합니다.
+선택된 컨트롤러·요청 안내 유지보수는 [콘텐츠 기준](v1.6.0/CONTENT_BASELINE.json)에
+별도로 기록합니다. 아래 과거 증거표는
+당시 버전에 한정됩니다. Go 후보의 실제 검증은 [네이티브 안내](native-v1.6.ko.md)와
+구현 인계에서 확인합니다. 잘못된 요청은 scope 변경 전에 거부하며 이전
+가용 상태를 지우지 않는 것이 의도한 변경입니다. 중복 JSON 키와 짝 없는 Unicode
+surrogate도 거부하며 전체 요청은 문맥·scope 변경 전에 검증합니다.
+
+상태: 미출시 v1.6.0 Go 후보이며 48개 방법·열 언어·콘텐츠 revision 5, 라우터 1.1.0입니다. 방법 절차 본문은 출시된 v1.5.2 기준을 유지합니다.
 실험용 콘텐츠 revision 2, 방법 변형, 언어 수정안과 Compact 정책을 승격하지
 않았습니다. Method ID는 바뀌지 않습니다.
 
@@ -51,10 +59,10 @@ v1.5의 Codex, 네이티브 Claude, Claude 계정과 Antigravity 패키지는 �
 공유합니다. 적용 불가를 확인하기 위해 읽은 방법의 출력 요건을 다른 질문으로
 옮기거나 그 방법을 적용했다고 인용하지 않습니다.
 
-설치된 Codex 패키지에서는 다음 명령을 사용할 수 있습니다.
+macOS ARM64에 설치된 Codex 패키지에서는 다음 명령을 사용할 수 있습니다.
 
 ```sh
-cat skills/opensocrates/references/decision/request.json | ./bin/launch.sh decision codex
+cat skills/opensocrates/references/decision/request.json | ./runtime/darwin-arm64/opensocrates decision codex
 ```
 
 예제의 닫힌 feature와 context 값을 현재 판단에 맞게 바꿉니다. 라우팅 필드에
@@ -62,7 +70,7 @@ cat skills/opensocrates/references/decision/request.json | ./bin/launch.sh decis
 소스 체크아웃에서는 다음과 같이 임시 세션을 유지할 수 있습니다.
 
 ```sh
-PYTHONPATH=src .venv/bin/python -m opensocrates decision --stream
+go run ./src/opensocrates/cmd/opensocrates decision codex --stream
 ```
 
 입력은 줄마다 JSON 객체 하나입니다. `select`는 기존 routing feature 스키마와
@@ -90,6 +98,20 @@ EOF까지 읽습니다. 문서 전체에 16,384자 제한이 그대로 적용됩
 계약이 다릅니다. 줄마다 완결된 JSON 객체 하나를 받고 같은 줄별 제한을 유지하며,
 하나의 임시 세션에서 여러 응답을 낼 수 있습니다. 단발 모드에 JSON 문서를 여러 개
 넣으면 stream으로 암묵 변환하지 않고 잘못된 입력으로 처리합니다.
+
+거부된 요청은 `invalid_decision_request`와 함께 닫힌 집합의 `field` 경로(예:
+`context`, `routing.features[0].key`), 미리 정한 `error` 코드(`invalid_json`,
+`invalid_type`, `missing_field`, `unknown_field`, `unknown_operation`,
+`invalid_format`, `invalid_value`, `stale_epoch`, `unknown_feature`,
+`duplicate_feature`, `too_many_features`), 해당하는 경우 고정된 `expected` 설명,
+`repair: correct_field_once`를 반환합니다. 제출한 값, 알 수 없는 키 이름과 문장은
+되풀이하거나 기록하거나 보관하지 않으며, 거부된 요청은 세션 상태를 바꾸지 않습니다.
+잘못된 JSON도 고칠 수 있는 이 입력 오류이며 `decision_unavailable`이 아닙니다.
+`decision_unavailable`은 요청을 받아들인 뒤의 런타임이나 패키지 콘텐츠 오류에만
+씁니다. 잘못된 입력, `no_intervention`, `unknown_method`, 런타임 사용 불가는 서로
+구분하며 어느 것도 방법을 적용했다는 뜻이 아닙니다. 패키지의 `features.json`
+`envelope`에 모든 필드 형식이 있고, [#124 예제](../evals/issue-124/README.md)에
+합성 거부 사례가 있습니다.
 
 ## 호스트별 증거와 호환성
 
@@ -136,7 +158,7 @@ decision 명령을 사용하세요. 이전 경로의 대응 참조는
 
 ## 설치 런처의 세션과 훅 정리 범위
 
-설치된 런처는 `./bin/launch.sh decision codex --stream`도 지원합니다.
+설치된 런처는 `./runtime/darwin-arm64/opensocrates decision codex --stream`도 지원합니다.
 같은 프로세스를 유지해야 가용성 신고를 재사용할
 수 있습니다. 단발 호출을 반복하면 매번 상태가 초기화됩니다.
 

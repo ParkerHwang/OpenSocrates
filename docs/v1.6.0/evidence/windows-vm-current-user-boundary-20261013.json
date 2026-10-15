@@ -1,0 +1,40 @@
+{
+  "schema": "opensocrates.windows-vm-readonly-observation/1.0.0",
+  "purpose": "current-user boundary diagnosis for original-v1.5-installer qualification",
+  "system_queries": {
+    "schema": "opensocrates.readonly-vm-boundary/1.0.0",
+    "diagnosticId": "vm-readonly-20261013-1f33bf49",
+    "generatedAt": "2026-10-13T01:38:06.2197510Z",
+    "readOnlySystemQueries": true,
+    "accountOrPolicyModified": false,
+    "status": "observed",
+    "osArchitecture": "Arm64",
+    "processArchitecture": "Arm64",
+    "isSystem": false,
+    "administratorEffective": true,
+    "tokenOwnerMatchesUser": false,
+    "powershellVersion": "5.1.26100.9457",
+    "qemuGuestAgentPresent": true,
+    "qemuGuestAgentStatus": "Running",
+    "failedQueries": []
+  },
+  "product_commands_executed": false,
+  "guest_agent_rpc": {
+    "powershell_query": "OSStatus -2700 guest-agent RPC timeout",
+    "minimal_cmd_ver": "OSStatus -2700 guest-agent RPC timeout",
+    "internal_cause": "unmeasured"
+  },
+  "execution": {
+    "transport": "UTM Win+R input and existing shared test directory",
+    "command_template": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File <owned-disposable-diagnostic>",
+    "process_execution_policy": "Bypass for this diagnostic process only",
+    "persistent_policy_changed": false,
+    "account_uac_service_settings_changed": false
+  },
+  "qualification": {
+    "native_arm64_environment": true,
+    "ordinary_user_environment": false,
+    "original_installer_success": false,
+    "production_release_validation": false
+  }
+}

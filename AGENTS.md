@@ -42,7 +42,13 @@ Do not start implementation from an unverified local branch, stale transcript, o
   Distinguish distribution profiles from the retained legacy Codex selector
   runtime. Native Claude entry does not invoke that selector or read transcripts.
   Hooks require the host trust flow; account matching is model-selected. New
-  Windows host qualification remains a separate stage.
+  Windows host qualification remains a separate stage. v1.6.0 ports the active
+  first-party runtime, lifecycle, generation, validation and release tooling to
+  Go. Supported end-user paths must not require Python, Node.js, npm or Go.
+  Preserve the latest reconciled released content baseline, currently v1.5.2:
+  all 48 methods and ten-language semantics at content revision 5,
+  teacher questions, response policies and shared guides. Method-body upgrades
+  belong to v1.6.1 or later and must not be mixed into this migration.
 - Do not hand-edit generated files in `schemas/v1/`, `content/compiled-*.json`, `build/`, or `dist/`.
 - Run `make generate` after changing canonical generated inputs and commit canonical and generated changes together.
 - Keep English and Korean user-facing content semantically aligned.
@@ -53,7 +59,12 @@ Do not start implementation from an unverified local branch, stale transcript, o
 
 ## Validation
 
-Run focused tests while iterating. Before requesting review, run the complete source-level suite described in `CONTRIBUTING.md` when the environment permits it.
+Understand the contracts, implement the complete scope, integrate delegated
+changes, then verify stable integrated files. During ordinary implementation,
+defer tests, lint, validation builds and code/security reviews. A concrete
+blocking error permits the smallest relevant diagnostic. Before requesting
+review, run the complete source-level suite described in `CONTRIBUTING.md` when
+the environment permits it. Fix defects and repeat only affected checks.
 
 Never claim a command passed unless you ran that exact command against the reported commit. Record:
 
@@ -62,7 +73,10 @@ Never claim a command passed unless you ran that exact command against the repor
 - checks not run and why;
 - required authenticated or clean-machine evidence still missing.
 
-Platform-dependent work must state its environment. Native release and packaging claims require the documented Apple-silicon macOS gates. A green offline suite does not prove live host delivery or answer-quality improvement.
+Platform-dependent work must state its environment. Native release and packaging
+claims require the documented Apple-silicon macOS gates and native Windows x64/ARM64
+evidence for Windows claims. Cross-compilation is not Windows runtime evidence.
+A green offline suite does not prove live host delivery or answer-quality improvement.
 
 ## Pull requests and handoff
 
@@ -86,7 +100,23 @@ Known limitations: <explicit boundaries>
 
 ## Completion
 
-For the revised v1.5.0 work, read the
+For v1.6.0, read the [preparation](docs/v1.6.0/README.md), implementation plan,
+distribution/update contract and preparation handoff first. Reconcile current
+GitHub state before selecting a base. PR #110 is planning reference; issue #109
+tracks preparation only. Use separate implementation tracking and the frozen
+released content baseline recorded in `docs/v1.6.0/CONTENT_BASELINE.json`.
+The original v1.5.0/revision-3 preparation and v1.5.1/revision-4
+reconciliation are historical; released v1.5.2/revision-5 ten-language support
+must not regress during the Go migration. Reconcile later
+maintenance releases before final publication without importing unreviewed
+draft content. Keep an exact-commit implementation handoff.
+Use [the native guide](docs/native-v1.6.md) for commands and qualification
+boundaries. Signed-update trust, production signing, platform-native lifecycle,
+clean-machine and actual host evidence are separate release gates. Keep one
+update owner per installation and preserve disabled integrations, host trust
+and unrelated npm packages/user data during adoption.
+
+For the historical revised v1.5.0 work, read the
 [implementation preparation](docs/v1.5.0/README.md) and its current handoff first.
 It records scope and work packages; use [the Mac implementation guide](docs/macos-v1.5.md)
 for implemented profiles and current qualification boundaries. The v1.5 release
@@ -95,5 +125,6 @@ candidate PR #95 is historical reference, not the new
 implementation baseline. It is closed and withdrawn in full. Preserve its frozen
 evidence; do not merge, cherry-pick, or copy its code/guides. Develop the revised
 release from v1.4 rather than its coding, memory, or orchestration candidate.
+This historical direction does not replace the v1.6.0 base reconciliation above.
 
 Work is complete only when requested behavior is implemented, canonical and generated outputs agree, required checks pass, documentation and claim boundaries are accurate, privacy and rollback properties are preserved, and GitHub contains a durable handoff. Merge through the protected branch workflow. Closed or merged items move to `Done`; stable behavior begins with the corresponding tagged release, not merely a Project card or Draft PR.

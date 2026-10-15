@@ -1,5 +1,10 @@
 # Mac에서 OpenSocrates v1.5.0 사용하기
 
+이 문서는 출시된 v1.5.0의 **과거 안내**입니다. 아래 npm 명령과 관찰을
+v1.6.0 Go 후보의 활성 설치·검증 경로로 사용하지 마세요. 현재 경로는
+[네이티브 v1.6 안내](native-v1.6.ko.md), 고정된 원본은
+[v1.5.0 문서](https://github.com/ParkerHwang/OpenSocrates/blob/v1.5.0/docs/macos-v1.5.ko.md)입니다.
+
 [English](macos-v1.5.md) · [README](../README.ko.md)
 
 설치가 끝나면 [화면으로 보는 설정 가이드](setup-guide.ko.md)에서 앱별 후속 설정과 에이전트에게 맡기는 요청문을 확인하세요.

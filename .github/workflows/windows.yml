@@ -1,54 +1,65 @@
-name: Native Windows x64
+name: Native Windows x64 and ARM64
 on:
   workflow_call:
 permissions:
   contents: read
 jobs:
   windows:
-    runs-on: windows-2025
+    name: Native ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: windows-x64
+            runner: windows-2025
+          # Official standard native ARM64 runner; no x64 emulation or
+          # cross-compilation result is substituted for ARM64 execution.
+          - target: windows-arm64
+            runner: windows-11-arm
+    runs-on: ${{ matrix.runner }}
     env:
-      PYTHONUTF8: "1"
+      GOTOOLCHAIN: go1.27.2
+      CGO_ENABLED: "0"
     steps:
-      - name: Preserve LF checkout
+      - name: Preserve canonical LF checkout
         run: git config --global core.autocrlf false
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-go@v6
         with:
-          node-version: "24"
-      - uses: astral-sh/setup-uv@v9.0.0
-      - run: uv sync --locked --all-groups
-      - run: uv run --locked ruff check src tools
-      - run: uv run --locked ruff format --check src tools
-      - run: uv run --locked mypy src
-      - run: uv run --locked python tools/check_windows.py
-      - run: uv run --locked python tools/build_windows.py
-      - run: uv run --locked python tools/check_windows.py --packages
-      - run: uv run --locked python tools/check_content_hosts.py
-      - run: uv run --locked python tools/check_claude_host.py
-      - run: npm run test:windows
-      - run: npm pack --dry-run
-      - name: Write exact Windows package source provenance
+          go-version: "1.27.2"
+          cache: true
+      - name: Exact native source provenance
         env:
           OPENSOCRATES_EXPECTED_SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-        run: node tools/write_package_provenance.mjs --output build/evidence/windows-package-source-provenance.json
-      - uses: actions/upload-artifact@v7
-        with:
-          name: windows-packages-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-          path: |
-            dist/*-windows-x64.zip
-            dist/*-windows-x64.zip.sha256
-      - uses: actions/upload-artifact@v7
-        with:
-          name: windows-content-packages-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-          path: |
-            dist/*-claude-chat-skills.zip
-            dist/*-claude-chat-skills.zip.sha256
-            dist/*-antigravity-plugin.zip
-            dist/*-antigravity-plugin.zip.sha256
-      - uses: actions/upload-artifact@v7
+        run: go run ./src/opensocrates/cmd/opensocrates-dev release-provenance --output build/evidence/package-source-provenance-${{ matrix.target }}.json
+      - name: Execute Windows ACL, reparse, locking, recovery and helper tests
+        run: go test ./src/opensocrates/...
+      - name: Build native Windows binaries
+        run: go run ./src/opensocrates/cmd/opensocrates-dev build --target ${{ matrix.target }} --output dist/runtime
+      - name: Assemble native bundle
+        run: go run ./src/opensocrates/cmd/opensocrates-dev package --target ${{ matrix.target }} --runtime-root dist/runtime --output dist/native/${{ matrix.target }}
+      - name: Verify native Windows package
+        run: go run ./src/opensocrates/cmd/opensocrates-dev check package --package dist/native/${{ matrix.target }}/packages/codex --report build/evidence/native-package-${{ matrix.target }}.json
+      - name: Build isolated host registration fixture
+        run: go build -o build/opensocrates-host-fixture.exe ./src/opensocrates/cmd/opensocrates-host-fixture
+      - name: Native install, status and removal acceptance
+        id: native_lifecycle
+        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance lifecycle --binary dist/runtime/${{ matrix.target }}/opensocrates.exe --package dist/native/${{ matrix.target }} --host-binary build/opensocrates-host-fixture.exe --report build/evidence/native-lifecycle-${{ matrix.target }}.json
+      - name: Bounded initial-install diagnostic after acceptance failure
+        if: failure() && steps.native_lifecycle.outcome == 'failure'
+        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance install-profile --binary dist/runtime/${{ matrix.target }}/opensocrates.exe --package dist/native/${{ matrix.target }} --host-binary build/opensocrates-host-fixture.exe --report build/evidence/install-profile-private/native-install-profile-${{ matrix.target }}.json
+      - name: Native hook startup timing
+        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance timing --binary dist/runtime/${{ matrix.target }}/opensocrates.exe --package dist/native/${{ matrix.target }}/packages/codex --report build/evidence/codex-hook-timing-${{ matrix.target }}.json
+      - name: Isolated native OS scheduler acceptance
+        run: go run ./src/opensocrates/cmd/opensocrates-dev acceptance scheduler --host-binary build/opensocrates-host-fixture.exe --report build/evidence/native-scheduler-${{ matrix.target }}.json
+      - name: Upload native Windows evidence
         if: always()
+        uses: actions/upload-artifact@v7
         with:
-          name: windows-evidence-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-          path: build/evidence/
+          name: native-${{ matrix.target }}-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          path: |
+            dist/
+            build/evidence/
+          if-no-files-found: warn

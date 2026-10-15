@@ -1,6 +1,10 @@
-# OpenSocrates 1.5 post-installation setup guide
+# OpenSocrates 1.6 post-installation setup guide
 
-[한국어](setup-guide.ko.md) · [Install commands and supported platforms](../README.md) · [v1.5.2 downloads](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
+This is post-installation host setup for the unreleased native v1.6.0 candidate.
+Use [the native guide](native-v1.6.md) for installation/adoption commands and release
+gates. Retained v1.5 screenshots are dated UI observations, not Go release evidence.
+
+[한국어](setup-guide.ko.md) · [Install commands and supported platforms](../README.md) · [Native candidate guide](native-v1.6.md)
 
 After installation, check **only the apps you use**. Codex requires hook trust
 approval. Claude account skills need the required capability and the skill to
@@ -13,13 +17,6 @@ come from Claude Desktop 2.31226.1 and Antigravity 2.22.0 on macOS. Codex CLI 0.
 the official hook guide were inspected. No Windows screenshots are included.
 Menu names may vary by app version, language and account policy.
 
-Current installation commands target v1.5.2. The screenshots retain the dated
-v1.5.0 interface and product labels; check that your actual installed version is
-1.5.2. See the [v1.5.2 language guide](v1.5.2.md) and
-[locale settings](settings.md) for ten-language instruction selection. French,
-German, Italian, Spanish and Portuguese share Latin script and need an explicit
-or saved choice. The npm installer has no `--locale` option.
-
 ## What is automatic?
 
 | Where you use it | What the installer handles | What to check afterward |
@@ -30,24 +27,45 @@ or saved choice. The npm installer has no `--locale` option.
 | Antigravity | Rule and skill files in the selected global or workspace scope | Rule and skill visible in that scope in the app, then a fresh conversation |
 
 **`--host all` means Codex only.** Specify each other app separately. Claude on
-Windows uses the account skill. v1.5.2 has no native Windows Claude Code package.
+Windows uses the account skill. Native Windows Claude Code remains outside scope.
+
+## Current content and instruction language
+
+The candidate preserves released v1.5.2 content revision 5: 48 methods,
+480 procedures, 3,840 canonical cases and 1,440 teacher questions across
+`en`, `ko`, `zh`, `ja`, `fr`, `de`, `it`, `es`, `pt`, `th`. The existing four
+languages' authored procedure/case bytes and metadata/question values remain
+unchanged; method revision identity advances from 4 to 5. Separate method-body
+upgrades remain outside the migration.
+
+The native commands `./opensocrates locale get`, `locale set en|ko|zh|ja|fr|de|it|es|pt|th|follow`
+and `locale reset` have no host argument; choose one value after `set`.
+On Windows use `.\opensocrates.exe`. Stored preference affects only the optional
+legacy selector; `follow`/`reset` clear that preference without unrelated changes.
+Stateless decision JSON requires explicit `locale`; native Claude entry reads
+no stored preference. Account skills and Antigravity use the relevant language
+guides/references. Instruction language does not set answer language or host UI,
+and management CLI output is not fully translated. Review changed hooks and
+start a fresh session after updating; upload account content separately.
+Historical screenshots and notarization receipts retain their original scope.
 
 ## Ask an agent to finish setup
 
 Paste the following request into an agent that can access your computer and
-files. Adjust the target apps as needed. This request uses the v1.5.2
-installer commands and host interfaces; it does not add a separate `setup`
+files. Adjust the target apps as needed. This request uses the native management
+commands and host interfaces; it does not add a separate `setup`
 command.
 
 ```text
-Finish installing and setting up OpenSocrates 1.5.2 on this computer.
+Finish setting up the approved native OpenSocrates release on this computer.
+Do not install an unpublished candidate or replace an active installation without authorization.
 The targets are Codex, Claude and Antigravity that are currently installed here.
 Official setup guide:
 https://github.com/ParkerHwang/OpenSocrates/blob/main/docs/setup-guide.md
 
-First check the operating system, required runtimes, current versions and
+First check the operating system, native platform, current versions and
 enabled states. Install any missing integration and update existing ones
-with the official 1.5.2 package. Leave correctly configured items alone.
+with the approved native release package. Leave correctly configured items alone.
 
 Distinguish Codex, the Claude account skill, local Mac Claude Code and Antigravity.
 Respect that --host all handles Codex only.
@@ -57,10 +75,6 @@ Before replacing a Claude account skill, back up its files and enabled state.
 For use without naming the account skill, append the standing instruction in
 section 2-4 to the account's Instructions for Claude (older Cowork: Global
 instructions). Preserve existing instructions; configure each account I use.
-Explicitly choose my desired reasoning instruction language. Distinguish the
-native retained selector locale setting from account activation and the explicit
-locale field in stateless decision JSON. Do not add an unsupported --locale
-option to the installer.
 
 Proceed with installation, file verification, plugin registration, permitted
 ordinary settings and completion checks. If a step requires my login,
@@ -88,7 +102,7 @@ until reviewed and approved. [Official OpenAI hook guide](https://learn.chatgpt.
 1. Check the installation state first.
 
    ```sh
-   npx --yes opensocrates@1.5.2 status --host codex
+   ./opensocrates status --host codex
    ```
 
 2. Start **interactive Codex** in a terminal in your usual project folder.
@@ -113,8 +127,8 @@ until reviewed and approved. [Official OpenAI hook guide](https://learn.chatgpt.
 **Complete when:** the plugin is enabled, the current OpenSocrates hook
 definitions are trusted and you can start a fresh conversation. An “installed”
 result from `status` alone does not verify activation or hook approval.
-A separate `codex hooks` shell command and `opensocrates diagnose --host codex`
-are not supported verification paths in this version.
+Use the native `./opensocrates manage diagnose --host codex` for local integrity; it
+does not replace interactive hook review. `/hooks` is entered inside Codex.
 
 The Codex section follows the official CLI procedure. Actual screenshots are
 in the Claude and Antigravity sections below; the [capture scope](assets/setup-v1.5/README.md)
@@ -146,15 +160,15 @@ the screenshot.
 For a first installation, go to
 `Customize → Skills → + → Create skill → Upload a skill`. If the menu names
 have changed, find upload in the Skills creation menu. Use
-**`opensocrates-1.5.2-claude-chat-skills.zip`**, not the native Code
+**`opensocrates-account.zip`**, not the native Code
 `claude-plugin.zip`.
 
 Download the account file from the
-[release page](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2),
+[release page](https://github.com/ParkerHwang/OpenSocrates/releases),
 or export it to a new absolute filename in an existing directory:
 
 ```sh
-npx --yes opensocrates@1.5.2 export --host claude-chat --output /absolute/path/opensocrates-1.5.2-account.zip
+./opensocrates export --host claude-chat --package /absolute/path/to/account.zip --output /absolute/path/opensocrates-account.zip
 ```
 
 If OpenSocrates is already present, use that skill's `… → Download` to back it
@@ -180,8 +194,8 @@ start a fresh conversation.
 
 Figure 4. The toggle on the right is enabled. The `v4` beneath the name is the
 revision number for this skill in the Claude account. **It is separate from the
-OpenSocrates product version, 1.5.0 in this historical screenshot.** To check
-the current product version, look for `OpenSocrates 1.5.2` in `Contents → SKILL.md`.
+the installed OpenSocrates product version.** To check the product version, look for
+`OpenSocrates v1.6.0 후보` in `Contents → SKILL.md`.
 
 <a id="claude-standing-instructions"></a>
 
@@ -228,12 +242,12 @@ Apple-silicon Mac. It does not verify Cloud, SSH, WSL or native Windows Code
 installation.
 
 ```sh
-npx --yes opensocrates@1.5.2 diagnose --host claude
+./opensocrates manage diagnose --host claude
 ```
 
-Check `version: 1.5.2`, `enabled: true`, `integrity: verified` and
+Check the approved installed product version, `enabled: true`, `integrity: verified` and
 `registration: confirmed`. If the installed plugin is unintentionally disabled,
-you can enable it with `npx --yes opensocrates@1.5.2 enable --host claude`.
+you can enable it with `./opensocrates enable --host claude`.
 
 In Desktop, go to **Code → Local → + in the input field → Plugins → Manage
 plugins**, then open OpenSocrates. If the interface has changed, you can also
@@ -242,7 +256,8 @@ check the installed list under Plugins in Settings.
 
 ![Actual Claude Code opensocrates-macos 1.5.0 plugin with its toggle enabled](assets/setup-v1.5/claude-code-plugin.jpg)
 
-Figure 5. Check **`opensocrates-macos · 1.5.0` and the enabled toggle**.
+Figure 5. Historical v1.5 screenshot. Check your approved installed product
+version and the enabled toggle.
 `Hooks · 4` lists this plugin's configuration. This is separate from the account
 skill screen.
 
@@ -266,10 +281,10 @@ For a global installation, use the command below. For a workspace installation,
 add `--workspace` with the same absolute directory used during installation.
 
 ```sh
-npx --yes opensocrates@1.5.2 diagnose --host antigravity
+./opensocrates manage diagnose --host antigravity
 ```
 
-Check `version: 1.5.2`, `enabled: true`, `integrity: verified` and the intended
+Check the approved installed product version, `enabled: true`, `integrity: verified` and the intended
 `scope`. **Avoid applying both global and workspace installations to the same
 work.**
 

@@ -19,31 +19,27 @@
 | `th` | 태국어 |
 | `follow` | 저장한 선호를 지우고 현재 입력 문자 판별 따르기 |
 
-Mac의 설치된 Codex 패키지 루트에서 실행합니다.
+Mac의 설치된 네이티브 실행파일을 사용합니다.
 
 ```sh
-bin/launch.sh locale codex get
-bin/launch.sh locale codex set fr
-bin/launch.sh locale codex set th
-bin/launch.sh locale codex set follow
-bin/launch.sh locale codex reset
+./opensocrates locale get
+./opensocrates locale set fr
+./opensocrates locale set th
+./opensocrates locale set follow
+./opensocrates locale reset
 ```
 
-Windows x64의 Codex 패키지 루트에서는 다음을 사용합니다.
+Windows x64 또는 ARM64의 네이티브 실행파일을 사용합니다.
 
 ```powershell
-node bin/launch.mjs locale codex get
-node bin/launch.mjs locale codex set pt
-node bin/launch.mjs locale codex reset
+.\opensocrates.exe locale get
+.\opensocrates.exe locale set pt
+.\opensocrates.exe locale reset
 ```
 
-저장소의 고정된 소스 개발 환경에서는 다음 진입을 사용합니다.
-
-```sh
-uv run --locked python -m opensocrates locale get
-uv run --locked python -m opensocrates locale set de
-uv run --locked python -m opensocrates locale reset
-```
+개발 시 `src/opensocrates/`의 Go 런타임 명령을 사용합니다. 사용자는 Go·Python·
+Node.js·npm을 설치하지 않습니다. 네이티브 `locale` 명령에는 호스트 인수가 없으며
+[유지보수 v1.5.2 명령](v1.5.2.ko.md)은 별도 안내입니다.
 
 `set`은 `en|ko|zh|ja|fr|de|it|es|pt|th|follow` 중 정확히 한 값을 받습니다.
 `get`·`reset`은 언어 인자를 받지 않습니다. 지원하지 않는 값과 추가 인자는
@@ -61,8 +57,8 @@ uv run --locked python -m opensocrates locale reset
 
 상태 없는 `decision` 요청은 정본 열 언어 코드 중 하나를 JSON `locale`에
 명시해야 하며 `follow`를 받거나 저장 설정을 읽지 않습니다. Mac은
-`bin/launch.sh decision codex`, Windows는 `node bin/launch.mjs decision codex`,
-Mac Claude 패키지는 `bin/launch.sh decision claude`를 사용합니다. 설치된
+`./opensocrates decision`, Windows는 `.\opensocrates.exe decision`,
+네이티브 `decision`에도 호스트 인수가 없습니다. 설치된
 `skills/opensocrates/references/decision/request.json`의 요청 형식과 라우팅 계약을
 따르고 임의의 `--locale` 옵션을 전달하지 마세요.
 
