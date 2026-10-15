@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/content"
+	"github.com/ParkerHwang/OpenSocrates/src/opensocrates/internal/runtimecli"
 	"os"
 	"path/filepath"
 	"strings"
@@ -219,10 +220,32 @@ func TestTimingExactSourceContract(t *testing.T) {
 	if !hookTimingResponse("startup", nil) || hookTimingResponse("startup", []byte("{}")) {
 		t.Fatal("startup contract")
 	}
-	v := map[string]any{"hookSpecificOutput": map[string]any{"hookEventName": "SessionStart", "additionalContext": timingEntryGuidance}}
-	b, _ := json.Marshal(v)
-	if !hookTimingResponse("compact", b) || hookTimingResponse("compact", append(b, []byte(" {}")...)) || hookTimingResponse("compact", bytes.ReplaceAll(b, []byte("No initial method"), []byte("A method"))) {
-		t.Fatal("compact contract")
+	// Exercise the real native producer before the acceptance consumer. Building
+	// both fixture and expected payload from the timing constant hid stale text.
+	t.Setenv("OPENSOCRATES_SELECTOR_ACTIVE", "")
+	t.Setenv("OPENSOCRATES_SELECTOR_MODE", "")
+	var startup, startupErr bytes.Buffer
+	code := runtimecli.Run([]string{"hook", "codex", "session_started"}, strings.NewReader(`{"hook_event_name":"SessionStart","source":"startup"}`), &startup, &startupErr)
+	if code != 0 || startupErr.Len() != 0 || !hookTimingResponse("startup", startup.Bytes()) {
+		t.Fatal("actual native startup contract")
+	}
+	var compact, compactErr bytes.Buffer
+	code = runtimecli.Run([]string{"hook", "codex", "session_started"}, strings.NewReader(`{"hook_event_name":"SessionStart","source":"compact"}`), &compact, &compactErr)
+	b := compact.Bytes()
+	if code != 0 || compactErr.Len() != 0 || len(b) == 0 || !hookTimingResponse("compact", b) {
+		t.Fatal("actual native compact payload differs from acceptance contract")
+	}
+	if hookTimingResponse("compact", append(append([]byte(nil), b...), []byte(" {}")...)) || hookTimingResponse("compact", bytes.ReplaceAll(b, []byte("No initial method"), []byte("A method"))) || hookTimingResponse("compact", append(append([]byte(nil), b...), bytes.Repeat([]byte(" "), 8193)...)) {
+		t.Fatal("compact exact-payload or output-size contract widened")
+	}
+	var v map[string]any
+	if err := json.Unmarshal(b, &v); err != nil {
+		t.Fatal("native output is not JSON")
+	}
+	v["unexpected"] = true
+	extra, _ := json.Marshal(v)
+	if hookTimingResponse("compact", extra) {
+		t.Fatal("extra native response field admitted")
 	}
 	values := make([]float64, 20)
 	for i := range values {
