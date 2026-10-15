@@ -725,6 +725,42 @@ class DecisionChecks(unittest.TestCase):
         rows = [json.loads(line) for line in output.getvalue().splitlines()]
         self.assertEqual([r["selected"] for r in rows], [[], ["deduction"], ["trade-off-analysis"]])
 
+    def test_deep_unclosed_json_is_repairable_without_ending_the_cli(self):
+        import subprocess
+        import sys
+
+        from opensocrates.cli.decision import MAX_REQUEST_CHARS
+
+        malformed = "[" * (MAX_REQUEST_CHARS - 1)
+        catalog = json.dumps({"operation": "catalog", "locale": "en"}) + "\n"
+        for stream in (False, True):
+            with self.subTest(stream=stream):
+                command = [sys.executable, "-m", "opensocrates", "decision"]
+                if stream:
+                    command.append("--stream")
+                result = subprocess.run(
+                    command,
+                    cwd=ROOT,
+                    input=catalog + malformed + "\n" + catalog if stream else malformed,
+                    capture_output=True,
+                    encoding="utf-8",
+                    timeout=30,
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0)
+                self.assertEqual(result.stderr, "")
+                rows = [json.loads(line) for line in result.stdout.splitlines()]
+                self.assertEqual(len(rows), 3 if stream else 1)
+                fault = rows[1] if stream else rows[0]
+                self.assertEqual(fault["reason"], "invalid_decision_request")
+                self.assertEqual((fault["field"], fault["error"]), ("request", "invalid_json"))
+                self.assertEqual(fault["repair"], "correct_field_once")
+                self.assertTrue(fault["continue_ordinary_work"])
+                self.assertNotIn(malformed, result.stdout)
+                if stream:
+                    self.assertEqual(len(rows[0]["methods"]), 48)
+                    self.assertEqual(len(rows[2]["methods"]), 48)
+
 
 class LocaleCompatibilityChecks(unittest.TestCase):
     def test_exported_participation_api_preserves_typed_gate_in_all_locales(self):
