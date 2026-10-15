@@ -2,6 +2,73 @@
 
 Tracking: [implementation issue #111](https://github.com/ParkerHwang/OpenSocrates/issues/111) and [Draft PR #112](https://github.com/ParkerHwang/OpenSocrates/pull/112). Preparation PR #110 and issue #109 remain separate. Reconciled main base: 9572db2c71a455d4ada24c78402d0f874002cec9. Branch: codex/v1.6-go-native.
 
+## 2026-10-15 selected maintenance integration / 선택된 유지보수 통합
+
+Current implementation commit: `534401210f12f7b18b220fe3593d6f20e29c75a6`.
+This handoff-only follow-up records that generated implementation checkpoint;
+its own Git commit is a distinct identity. Branch: `codex/swarm100-20261015-s092`.
+
+Completed:
+- Reconciled main `227a528996d93c423851db1d663f9572be534e59` and selected open Draft
+  PR130 `197b317b4aeca4928fabe515dbfef6a98803e568` contracts into Go base
+  `1dbccad464c83b21704416937d1b5ccc187522fe`.
+- Integrated complete selected writer deltas: S051 `00f21966b944b8738d204c69625459373dc91d68`,
+  S052 `eed3f741c1c598248251c33eb103f3e6ed23fd02`,
+  S060 `a405213d8ec3c0ea9c76c107ac3eefdadcc18d78`, and
+  S070 `080e16d7266ce2e4fefdbd51ac875ef0d63f0ad5`.
+- Consumed only selected S021 native Claude request guides from committed S091
+  snapshot `7dd6f852c3a4357f30cfd84791f0344f09e60282`; excluded its Python
+  runtime/tooling, evaluation orchestration and generated outputs.
+- Ported field-level request recovery and bounded default discovery; added Go
+  CLI malformed-JSON recovery. Shared/host guidance and ten controller messages
+  follow the selected maintenance sources. Methods/cases, questions, policies,
+  schemas and evidence remain at their original content/source identities.
+- Regenerated outputs canonically. [CONTENT_BASELINE.json](CONTENT_BASELINE.json)
+  preserves original tagged release identity and separately records the generated
+  maintenance identity; strict generation/package pins move together.
+
+Verified:
+- `git ls-remote origin refs/heads/main refs/heads/codex/v1.6-go-native refs/pull/112/head refs/pull/130/head`
+  exited 0; assigned heads matched at initial reconciliation.
+- `GOMAXPROCS=2 GOFLAGS='-p=2' make generate` exited 0 (`generate: OK`) on
+  macOS ARM64 at exact pre-generation input
+  `f7f1f9fcf26c1174bcf441e9ee2f0c7445a4cce8`, under a named generation lease.
+- Local patch application/commits and authoring `gofmt -w` exited 0. These are
+  implementation operations, not final product-validation results.
+
+Not verified:
+- Final source suite and code/security/docs reviews are **NOT_RUN** for this
+  integrated source; they require the coordinator's immutable candidate freeze.
+- No new-byte signing/notarization, production trust/public update, native
+  Windows x64/ARM64, authentic original-installer ordinary-user/clean-machine
+  migration, or live CLI/Desktop/account/workspace/global delivery was run here.
+- Prior CI `38416526030` qualifies only `1dbccad`; hosted signing at `9be0e5e`
+  qualifies only its exact bytes. Neither is promoted to this new candidate.
+
+Next: freeze an exact clean candidate SHA; run assigned final source/review and
+available native gates in disposable checkouts; record failures and unavailable
+evidence. Any fixes create a new candidate identity. Keep PR112 Draft and use
+protected review for any later integration; no merge/release is performed here.
+
+Known limitations: installation, entry delivery, complete reading, application
+and usefulness remain distinct. No native application receipt is created.
+Method-body upgrades remain v1.6.1+; supported host/platform exclusions remain.
+The issue-124 fixture/diagnostic documents preserve their PR130/Python historical
+context and do not claim Go replay or live execution. Per-request service tier
+is unknown despite requested priority.
+
+/ 정확한 main·미병합 #130 계약과 선정된 네 Go 작성 변경을 통합하고 공식 생성만
+완료했습니다. 아래 기존 결과는 원래 SHA의 이력입니다. 이번 통합의 최종 검사·
+새 바이트 서명·이전·네이티브/실호스트 증거는 아직 없으며 동결 뒤 각 담당자가
+확인합니다. 본문 업그레이드·호스트/플랫폼 확대·활성 설치 변경·병합·출시는 하지
+않았습니다.
+
+## Historical implementation record / 과거 구현 기록
+
+The remaining sections retain their original source-specific claims. They do
+not qualify the selected maintenance integration above. / 아래는 원래 SHA에
+한정된 이력이며 위 새 후보의 검증 결과가 아닙니다.
+
 ## Completed implementation
 
 | Package | Completed scope |
