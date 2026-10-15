@@ -13,11 +13,11 @@ The current reconciled release is v1.5.2 source
 and ten languages (`en`, `ko`, `zh`, `ja`, `fr`, `de`, `it`, `es`, `pt`, `th`).
 The annotated tag object `4c27d59da54eb1591ba24c0ebae62d6ab3168b60` is distinct
 from its source commit. Main merge `8f08b9a90d711fa3fc60cc7db6f962e3dda43c42` has the same tree as the tagged
-source, but its commit identity is not the release source. Current source and
+source, but its commit identity is not the release source. Released source and
 normalized semantic hashes and full inputs belong to [CONTENT_BASELINE.json](CONTENT_BASELINE.json).
 
-- Current `source_tree_hash`: `sha256:e1e11f7a772cb2a3f6c8dc0e3b22b0787cdc903de69842de957577a177cee7be`
-- Current `normalized_semantic_hash`: `sha256:b5fc82f5ce8725bd23b7d270014f90853e39474e7b00ae4f20553a484524c659`
+- Released `source_tree_hash`: `sha256:e1e11f7a772cb2a3f6c8dc0e3b22b0787cdc903de69842de957577a177cee7be`
+- Released `normalized_semantic_hash`: `sha256:b5fc82f5ce8725bd23b7d270014f90853e39474e7b00ae4f20553a484524c659`
 
 V1.5.2 provides 480 procedures, 3,840 canonical cases and 1,440 teacher questions.
 The previous four languages' procedure/case body bytes and metadata/question
@@ -41,6 +41,69 @@ The original v1.5.0 preparation/source and revision-3 evidence remain unchanged.
 PR #110 is the planning reference; issue #109 tracks preparation only. Reconcile
 any later published maintenance release before final v1.6.0 qualification and
 publication, without importing unverified drafts or regrading old receipts.
+
+## Maintenance reconciliation proposal / 유지보수 재통합 제안
+
+The following sources define a proposed maintenance delta from Go candidate
+`1dbccad464c83b21704416937d1b5ccc187522fe`. This record does not assert that the
+delta is integrated, generated or verified. Main was
+`227a528996d93c423851db1d663f9572be534e59` when the sources were reconciled.
+
+| Source | Exact source identity | Proposed Go boundary |
+| --- | --- | --- |
+| [#126](https://github.com/ParkerHwang/OpenSocrates/pull/126), merged | `62e499475cc90483d7c87364e0a0142526775e26` (merge) | Substantive-thinking controller wording and host/shared reader and decision guidance; ordinary work or reader guidance can suffice. |
+| [#128](https://github.com/ParkerHwang/OpenSocrates/pull/128), merged | `227a528996d93c423851db1d663f9572be534e59` (merge) | Bounded Codex discovery delivery for large submissions; no method-body change. |
+| [#130](https://github.com/ParkerHwang/OpenSocrates/pull/130), open/unmerged at reconciliation | `197b317b4aeca4928fabe515dbfef6a98803e568` (head) | Repairable closed request diagnostics, distinct failure/empty/retired outcomes, and matching request guidance if selected for integration. |
+
+Keep v1.5.2/revision 5, 48 methods and ten locales as the method-content
+contract. Preserve authored methods/cases, teacher questions, response policies,
+eligibility/scoring and required outputs/dependencies/stops. Controller and
+reader/request guidance are explicitly recorded maintenance differences, not a
+48-method rewrite or a new release. Port runtime behavior to Go without
+restoring the Python runtime/tooling. Native entry delivery, complete reading,
+application and usefulness remain distinct evidence levels.
+/ 위 표는 정확한 출처에 따른 재통합 제안이며 적용·생성·검증 완료를 뜻하지
+않습니다. #130은 조회 시 미병합인 별도 후보입니다. 출시된 리비전 5·48개 방법·
+열 언어와 방법 본문·사례·교사 질문·응답 정책·적합성/점수·필수 출력·의존·중단
+조건은 유지합니다. 컨트롤러와 독자/요청 안내의 유지보수 차이만 별도로 기록하고
+Python 실행·개발 경로를 되살리지 않습니다. 진입 전달·전체 읽기·적용·유용성을
+같은 증거로 취급하지 않습니다.
+
+Method-body parity does not establish unchanged artifact hashes. #126 changes
+`content/locales/*.yaml` controller text as well as templates and guides.
+`SourceTreeHash(content)` includes those YAML sources; `SemanticHash` includes
+both `locale_messages` and `prompt_fragments`. Its full semantic hash therefore
+cannot be declared unchanged merely because method bodies are preserved.
+Shared guide/request files under `plugin-src/shared/` are separate package
+inputs, not part of this content-only source-tree hash. #128 runtime changes
+and #130 shared request guidance do not by themselves require a method revision
+or a replacement content hash; their package/source identities still need the
+actual integrated inputs.
+/ 방법 본문이 같아도 산출물 해시가 같다는 뜻은 아닙니다. #126의 로케일
+컨트롤러는 콘텐츠 소스 해시와 의미 투영에 포함됩니다. 반면 shared 안내·요청
+파일은 별도 패키지 입력이며 콘텐츠 전용 소스 해시에는 포함되지 않습니다.
+#128의 실행 경로와 #130의 shared 안내만으로 방법 리비전이나 콘텐츠 해시를
+바꾸지 말고, 실제 통합 입력에 따른 파일·패키지 식별을 따로 계산합니다.
+
+`CONTENT_BASELINE.json` is deliberately unchanged by this proposal. Its existing
+release identities, hashes and superseded baselines remain the pre-maintenance
+record; no pending value replaces a machine-consumed hash. The integrated
+candidate commit, content source hash, normalized semantic hash and generated
+package identities are **pending integration**, not copied from either main or
+the released bundle. Before admitting a maintenance candidate, the integration
+owner must preserve the original release record, reconcile the exact allowed
+canonical delta, and update the baseline and every affected generation/package
+identity guard together with the actually computed candidate values. Do not
+remove a guard, narrow its hash projection or reclassify old evidence to make
+the new candidate pass. Regenerate canonical outputs through the Go tooling;
+never hand-edit compiled bundles, embedded assets, schemas or package manifests.
+/ 이 제안에서는 baseline JSON을 변경하지 않습니다. 기존 출시·과거 기준의
+식별과 해시는 보존하며 기계가 읽는 해시 자리에 pending을 넣지 않습니다.
+통합 커밋·콘텐츠 소스/의미 해시·생성 패키지 식별은 통합 후 실제 계산 전까지
+미확정입니다. 통합 담당자는 원래 출시 기록을 보존하고 허용한 정본 차이만
+확인한 뒤 실제 값으로 기준과 관련 생성·패키지 검사 고정값을 함께 갱신합니다.
+검사를 없애거나 해시 범위를 줄이거나 과거 증거를 새 후보로 바꾸지 않습니다.
+컴파일 묶음·내장 자산·스키마·패키지 명세는 Go 생성 경로로 갱신합니다.
 
 ## Go boundaries and toolchain / Go 경계와 도구체인
 
@@ -197,10 +260,14 @@ improvement follows from this migration. / 구현·통합 후 최종 검사하�
 
 Intentional input hardening rejects duplicate JSON keys/unpaired Unicode
 surrogates and validates complete requests before context/scope reset. Unsafe or
-newer settings never receive destructive fallback defaults. The compiled bundle
-changes only release metadata `product_version` to `1.6.0`; method/projection/
-policy identity remains revision `3`. / 입력 보강과 릴리스 메타데이터 변경을 본문
-포팅과 구분하며 이전 상태·설정을 파괴하지 않습니다.
+newer settings never receive destructive fallback defaults. Before the proposed
+maintenance reconciliation above, the released v1.5.2 compiled bundle changes
+only release metadata `product_version` to `1.6.0`; method/projection/policy
+identity remains revision `5`. The proposal's controller/guidance differences
+must be recorded separately from that release-metadata-only comparison.
+/ 입력 보강과 릴리스 메타데이터 변경을 본문 포팅과 구분하며 이전 상태·설정을
+파괴하지 않습니다. 위 유지보수 제안 전의 출시 기준 비교는 제품 버전만 1.6.0으로
+바꾸고 리비전 5를 유지합니다. 제안의 컨트롤러·안내 차이는 별도로 기록합니다.
 
 Legacy selector use is opt-in through external Codex app-server pinned to
 `0.144.4`; protocol availability is not authenticated proof. Installation
