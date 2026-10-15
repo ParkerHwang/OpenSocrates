@@ -44,6 +44,21 @@
   선택하며 계정 업로드·진행 중 대화 적용·새 플랫폼을 자동 지원하지 않습니다.
   운영 서명·네이티브·새 기기·실제 호스트 증거가 필요한 미출시 후보입니다.
 
+- Clarify substantive-thinking support at the first need and later material
+  changes across the four host profiles and ten instruction locales. Distinguish
+  prescribed mechanical execution from reasoning with a fixed answer, and
+  consideration/reader guidance from eligible canonical-method application.
+  Preserve the 48 authored procedures, method revision 5, routing contracts,
+  privacy, required stops and fail-open ordinary work. Controller edits change
+  bundle/package hashes; no published release, incident #124 fix, live application
+  or quality improvement is established by this source change.
+- 네 호스트 프로필과 열 언어에서 실질적인 사고가 처음 필요할 때와 이후 중요한
+  변화가 있을 때의 지원 범위를 명료하게 합니다. 정해진 수행 절차와 정답이 있는
+  추론을 구분하고, 지원 검토·독자 안내·적격한 정본 방법 적용을 나눕니다. 사고 방법
+  48개의 본문과 리비전 5, 라우팅 계약, 개인정보 보호, 필수 중단 조건과 일반 작업의
+  fail-open 처리는 유지합니다. 컨트롤러 변경으로 번들·패키지 해시는 달라지며,
+  이 소스 변경만으로 출시, #124 해결, 실사용 적용이나 품질 향상을 주장하지 않습니다.
+
 ## [1.5.2] - 2026-10-13
 
 - Add French (`fr`), German (`de`), Italian (`it`), Spanish (`es`), Portuguese

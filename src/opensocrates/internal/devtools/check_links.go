@@ -83,7 +83,7 @@ func checkLinks(root string, selected []string) ([]string, any, error) {
 		return nil, nil, e
 	}
 	if len(selected) == 0 {
-		selected = []string{"README.md", "README.ko.md", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md", "CODE_OF_CONDUCT.md", "AGENTS.md", "CLAUDE.md", ".github/copilot-instructions.md", ".github/pull_request_template.md", ".github/release-notes", "docs/v1.6.0"}
+		selected = []string{"README.md", "README.ko.md", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md", "CODE_OF_CONDUCT.md", "AGENTS.md", "CLAUDE.md", ".github/copilot-instructions.md", ".github/pull_request_template.md", ".github/release-notes", "docs/v1.6.0", "docs/thinking-support-scope.md", "docs/thinking-support-scope.ko.md"}
 	}
 	files := map[string]bool{}
 	for _, r := range selected {
