@@ -126,6 +126,32 @@ class LabBehavior(unittest.TestCase):
         self.assertEqual(self.lab.snapshot()["started_count"], 1)
         self.assert_code("budget_exhausted", "retry", {"run_id": run["id"]})
 
+    def test_clarification_card_survives_prepared_and_running_resume(self) -> None:
+        run = next(item for item in self.create()["runs"] if item["arm"] == "A")
+        prepared = self.prepare(run)
+        expected = prepared["clarification_reply"]
+        self.assertTrue(expected)
+        source = self.pack / "pack.json"
+        manifest = json.loads(source.read_text())
+        for case in manifest["cases"]:
+            if case["id"] == run["case_id"]:
+                case["clarification_reply"] = "Changed source must not replace the frozen card."
+        source.write_text(json.dumps(manifest))
+        self.lab = Lab(self.base / "study", self.pack)
+        resumed = next(item for item in self.lab.snapshot()["runs"] if item["id"] == run["id"])
+        self.assertEqual(resumed["clarification_reply"], expected)
+        repeated = self.lab.action("prepare", {"run_id": run["id"]})
+        self.assertEqual(repeated["run"]["clarification_reply"], expected)
+        self.assertEqual(repeated["clarification_reply"], expected)
+        self.assertNotIn("evaluator_checks", resumed)
+        self.preflight(run)
+        self.lab.action("start", {"run_id": run["id"]})
+        resumed_lab = Lab(self.base / "study", self.pack)
+        running = next(item for item in resumed_lab.snapshot()["runs"] if item["id"] == run["id"])
+        self.assertEqual(running["status"], "running")
+        self.assertEqual(running["clarification_reply"], expected)
+        self.assertNotIn("evaluator_checks", running)
+
     def test_exact_preview_and_rejected_content_not_retained(self) -> None:
         run = next(item for item in self.create()["runs"] if item["arm"] == "A")
         actor = Path(self.prepare(run)["actor_path"])

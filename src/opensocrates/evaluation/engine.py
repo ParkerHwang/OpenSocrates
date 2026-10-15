@@ -87,12 +87,13 @@ class Lab:
     def _approved_path(self, run_id: Any) -> Path:
         return self.store.root / "approved" / f"{identifier(run_id)}.md"
 
-    def _public_run(self, run: dict[str, Any]) -> dict[str, Any]:
+    def _public_run(self, state: dict[str, Any], run: dict[str, Any]) -> dict[str, Any]:
         result = deepcopy(run)
         if "setup" in run:
             actor = self._actor(run)
             result["actor_path"] = str(actor)
             result["prompt"] = read_bytes(actor / "TASK.md", FINAL_LIMIT).decode("utf-8")
+            result["clarification_reply"] = self._case(state, run["case_id"])["clarification_reply"]
         return result
 
     def _snapshot(self, state: dict[str, Any]) -> dict[str, Any]:
@@ -117,7 +118,7 @@ class Lab:
             "phase": state["phase"],
             "budget": state["budget"],
             "started_count": state["started_count"],
-            "runs": [self._public_run(run) for run in state["runs"]],
+            "runs": [self._public_run(state, run) for run in state["runs"]],
             "controller_environment": deepcopy(state["controller_environment"]),
             "groups": [
                 {
@@ -320,7 +321,7 @@ class Lab:
         case = self._case(state, run["case_id"])
         actor = self._actor(run)
         return {
-            "run": self._public_run(run),
+            "run": self._public_run(state, run),
             "actor_path": str(actor),
             "prompt": read_bytes(actor / "TASK.md", FINAL_LIMIT).decode("utf-8"),
             "setup": deepcopy(run["setup"]),
@@ -349,7 +350,7 @@ class Lab:
         run["preflight"] = record
         blockers, warnings = self._blockers(state, run)
         return {
-            "run": self._public_run(run),
+            "run": self._public_run(state, run),
             "can_start": not blockers,
             "blockers": blockers,
             "warnings": warnings,
@@ -448,7 +449,7 @@ class Lab:
         state["started_count"] += 1
         run["status"] = "running"
         run["started_at"] = _now()
-        return {"run": self._public_run(run)}
+        return {"run": self._public_run(state, run)}
 
     def _monitor(self, state: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
         fields(data, {"run_id"}, {"run_id"})
@@ -560,7 +561,7 @@ class Lab:
         run["finished_at"] = _now()
         self._approvals.pop(run["id"], None)
         self._update_group(state, run["group_id"])
-        return {"run": self._public_run(run)}
+        return {"run": self._public_run(state, run)}
 
     def _update_group(self, state: dict[str, Any], group_id: str) -> None:
         group = self._find(state["groups"], group_id)
@@ -588,7 +589,7 @@ class Lab:
         group = self._find(state["groups"], run["group_id"])
         retry = self._new_run(group, run["arm"], max(item["attempt"] for item in related) + 1)
         state["runs"].append(retry)
-        return {"run": self._public_run(retry)}
+        return {"run": self._public_run(state, retry)}
 
     def _packet(self, state: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
         fields(data, {"group_id"}, {"group_id"})

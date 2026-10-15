@@ -28,6 +28,21 @@ const statuses = {
   blocked: ["진행 불가", "Blocked"], timed_out: ["시간 초과", "Timed out"],
 };
 const statusLabel = value => statuses[value] ? tr(...statuses[value]) : String(value || "—");
+const osLabel = value => ({macos: "macOS", windows: "Windows", unsupported: tr("지원하지 않는 OS", "Unsupported OS")})[value] || tr("확인되지 않은 OS", "Unknown OS");
+const hostLabel = value => ({desktop_work: "Codex Work", claude_cowork: "Claude Cowork", antigravity: "Google Antigravity"})[value] || tr("확인되지 않은 앱", "Unknown app");
+const phaseLabel = value => ({calibration: tr("절차 확인", "Calibration"), discovery: tr("차이 발견", "Discovery"), confirmation: tr("고정한 기준으로 확인", "Confirmation")})[value] || tr("단계 미확인", "Unknown phase");
+const armLabel = value => ({A: tr("A · 일반 작업", "A · Normal task"), B: tr("B · 짧은 점검 지시", "B · Fixed short instruction"), C: tr("C · OpenSocrates 사용", "C · OpenSocrates")})[value] || String(value);
+
+function cellLabel(id) {
+  const cell = snapshot?.cells?.find(item => item.id === id);
+  return cell ? `${osLabel(cell.os)} · ${hostLabel(cell.host)}` : tr("환경 미확인", "Unknown environment");
+}
+
+function previousPreflight(run) {
+  const candidates = snapshot.runs.filter(item => item.id !== run.id && item.cell_id === run.cell_id && item.preflight);
+  candidates.sort((a, b) => (a.finished_at || a.started_at || "").localeCompare(b.finished_at || b.started_at || ""));
+  return candidates.at(-1)?.preflight || null;
+}
 
 function element(tag, text, className) {
   const node = document.createElement(tag);
@@ -273,7 +288,7 @@ function renderCreate() {
   cells.append(element("legend", tr("환경 선택 · 각각 별도로 보고", "Environments · reported separately")));
   const currentOS = snapshot.controller_environment?.os || (navigator.platform.toLowerCase().includes("win") ? "windows" : "macos");
   const selectors = snapshot.cells.map(cell => ({cell, input: check(cells,
-    `${cell.os} · ${cell.host} · ${cell.requested_model}`, cell.id === `${currentOS}-work`)}));
+    `${osLabel(cell.os)} · ${hostLabel(cell.host)} · ${cell.requested_model}`, cell.id === `${currentOS}-work`)}));
   section.append(cells);
   const budget = field(section, tr("전체 실행 한도 · 실패한 실행과 재시도도 포함", "Total attempt cap · includes failed starts and retries"), "number", "6");
   budget.min = "1"; budget.max = "180";
@@ -303,15 +318,15 @@ function renderStudySummary() {
   const stats = element("div", undefined, "grid");
   const completed = snapshot.runs.filter(run => run.status === "completed").length;
   for (const [value, label] of [
-    [snapshot.phase, tr("단계", "Phase")],
+    [phaseLabel(snapshot.phase), tr("단계", "Phase")],
     [`${snapshot.started_count} / ${snapshot.budget}`, tr("시작한 횟수 / 한도", "Started / attempt cap")],
     [completed, tr("승인한 최종 답변", "Approved final answers")],
   ]) add(stats, add(element("div", undefined, "stat"), document.createTextNode(String(value)), element("small", label)));
   section.append(stats);
   section.append(element("p", `${snapshot.pack.id} · ${snapshot.pack.version} · ${snapshot.pack.sha256}`, "mono muted"));
   if (snapshot.controller_environment) section.append(element("p", tr(
-    `이 도구가 실행 중인 환경: ${snapshot.controller_environment.os} · ${snapshot.controller_environment.arch}. 앱의 실제 작업 실행 위치와는 별도입니다.`,
-    `Lab controller: ${snapshot.controller_environment.os} · ${snapshot.controller_environment.arch}. This is separate from the app's actual execution mode.`
+    `이 도구가 실행 중인 환경: ${osLabel(snapshot.controller_environment.os)} · ${snapshot.controller_environment.arch}. 앱의 실제 작업 실행 위치와는 별도입니다.`,
+    `Lab controller: ${osLabel(snapshot.controller_environment.os)} · ${snapshot.controller_environment.arch}. This is separate from the app's actual execution mode.`
   ), "help"));
   const approval = snapshot.pack.approval;
   if (approval) {
@@ -323,7 +338,7 @@ function renderStudySummary() {
 function renderRunList() {
   const section = panel(tr("실행할 과제", "Select an attempt"));
   const options = [["", tr("과제를 선택하세요", "Select an attempt")], ...snapshot.runs.map(run => [run.id,
-    `${run.case_id} · ${run.cell_id} · ${run.arm} · #${run.attempt} · ${statusLabel(run.status)}`])];
+    `${run.case_id} · ${cellLabel(run.cell_id)} · ${armLabel(run.arm)} · #${run.attempt} · ${statusLabel(run.status)}`])];
   const select = choice(section, tr("표시된 순서대로 진행하면 됩니다", "Follow the displayed assignment order"), options, selectedRun);
   select.addEventListener("change", () => { selectedRun = select.value; prepared = null; renderOperator(); });
   section.append(element("p", tr("재시도는 진단용입니다. 비교에는 처음 배정된 답변만 사용하며 실패를 지우지 않습니다.", "Retries are diagnostic. Primary review uses original assignments; failures remain recorded."), "help"));
@@ -331,7 +346,7 @@ function renderRunList() {
 
 function renderRun(run) {
   const section = panel(`${run.case_id} · ${statusLabel(run.status)}`);
-  section.append(element("p", `${run.cell_id} · ${run.arm} · #${run.attempt}`, "muted"));
+  section.append(element("p", `${cellLabel(run.cell_id)} · ${armLabel(run.arm)} · #${run.attempt}`, "muted"));
   if (run.status === "planned") {
     section.append(button(tr("전용 작업 폴더와 프롬프트 준비", "Prepare the dedicated folder and prompt"), async () => {
       prepared = await api("prepare", {run_id: run.id});
@@ -363,7 +378,11 @@ function renderPrepared(section, info) {
   if (info.setup) {
     const guide = info.setup;
     section.append(element("h3", tr("해당 앱 설정", "Set up the actual app")));
-    section.append(element("p", `${guide.profile || ""} · ${guide.status || "unknown"}`, "mono"));
+    const setupStatus = {
+      manual_required: tr("앱에서 직접 설치·설정을 확인해야 합니다", "Complete and verify setup manually in the app"),
+      unavailable: tr("필요한 설치 자료를 사용할 수 없습니다 · 실행 전 해결 필요", "Required setup content is unavailable · resolve before running"),
+    }[guide.status] || tr("설정 상태를 확인할 수 없습니다", "Setup status is unknown");
+    section.append(element("p", setupStatus, guide.status === "unavailable" ? "callout warning" : "help"));
     const list = element("ol");
     for (const step of guide.steps || []) list.append(element("li", step));
     section.append(list);
@@ -387,26 +406,31 @@ function renderPreflight(section, run) {
   form.append(element("p", tr("새 폴더만으로 깨끗한 환경이 되지는 않습니다. 계정 플러그인·지침·메모리·연결 도구·상위 폴더 규칙을 직접 확인하세요. 확인값은 사용자 진술로 기록됩니다.", "A new folder is not a clean environment. Check account plugins, instructions, memory, connectors and parent rules. These checks are operator attestations."), "help"));
   const cell = snapshot.cells.find(item => item.id === run.cell_id);
   const old = run.preflight || {};
+  const previous = run.preflight ? null : previousPreflight(run);
+  const suggested = previous ? Object.fromEntries(["observed_model", "observed_effort", "host_version", "execution_mode", "environment"].map(key => [key, previous[key]])) : {};
+  const defaults = run.preflight || suggested;
+  if (previous) form.append(element("p", tr("같은 앱·OS에서 전에 확인한 모델, 추론 수준, 버전, 실행 위치와 환경 준비 방식만 미리 채웠습니다. 현재 화면에서 다시 확인하세요. 격리 여부와 OpenSocrates 상태는 이번 조건에 맞춰 새로 선택해야 합니다.", "Only model, effort, version, execution mode and environment preparation from an earlier attempt in this same app/OS are suggested. Reconfirm them in the current UI. Isolation and OpenSocrates state must be checked afresh for this condition."), "callout"));
   form.append(element("p", tr(`요청 모델: ${cell.requested_model}`, `Requested model: ${cell.requested_model}`), "callout"));
   const grid = element("div", undefined, "grid"); form.append(grid);
-  const model = choice(grid, tr("화면에서 확인한 모델", "Model observed in UI"), [["unknown", tr("아직 확인하지 않음", "Not yet observed")], [cell.expected_model, cell.expected_model]], old.observed_model);
-  const effort = choice(grid, tr("화면에서 확인한 추론 수준", "Effort observed in UI"), [["unknown", tr("아직 확인하지 않음", "Not yet observed")], [cell.expected_effort, cell.expected_effort]], old.observed_effort);
-  const version = field(grid, tr("앱 버전 · 모르면 unknown", "App version · unknown if unavailable"), "text", old.host_version || "unknown");
+  const model = choice(grid, tr("화면에서 확인한 모델", "Model observed in UI"), [["unknown", tr("아직 확인하지 않음", "Not yet observed")], [cell.expected_model, cell.expected_model]], defaults.observed_model);
+  const effort = choice(grid, tr("화면에서 확인한 추론 수준", "Effort observed in UI"), [["unknown", tr("아직 확인하지 않음", "Not yet observed")], [cell.expected_effort, cell.expected_effort]], defaults.observed_effort);
+  const version = field(grid, tr("앱 버전 · 모르면 unknown", "App version · unknown if unavailable"), "text", defaults.host_version || "unknown");
   version.maxLength = 64;
-  const mode = choice(grid, tr("실제 작업 실행 위치", "Execution mode"), optionPairs([["unknown", "모름", "Unknown"], ["local", "로컬", "Local"], ["cloud", "클라우드", "Cloud"], ["sync", "동기화", "Sync"]]), old.execution_mode);
+  const mode = choice(grid, tr("실제 작업 실행 위치", "Execution mode"), optionPairs([["unknown", "모름", "Unknown"], ["local", "로컬", "Local"], ["cloud", "클라우드", "Cloud"], ["sync", "동기화", "Sync"]]), defaults.execution_mode);
   const isolation = choice(grid, tr("계정·전역·작업 폴더 영향 확인", "Account / global / workspace influences"), optionPairs([["unknown", "아직 모름", "Unknown"], ["clear", "직접 확인: 혼입 없음", "Attested clear"], ["contaminated", "다른 지침/조건이 섞임", "Contaminated"]]), old.isolation);
-  const environment = choice(grid, tr("환경 준비 방식", "Environment preparation"), optionPairs([["unknown", "모름", "Unknown"], ["fresh_os", "새로 설치한 OS", "Fresh OS"], ["clean_snapshot", "깨끗한 스냅샷 복원", "Clean snapshot"], ["new_user", "새 OS 사용자", "New OS user"], ["new_folder", "새 폴더만", "New folder only"]]), old.environment);
+  const environment = choice(grid, tr("환경 준비 방식", "Environment preparation"), optionPairs([["unknown", "모름", "Unknown"], ["fresh_os", "새로 설치한 OS", "Fresh OS"], ["clean_snapshot", "깨끗한 스냅샷 복원", "Clean snapshot"], ["new_user", "새 OS 사용자", "New OS user"], ["new_folder", "새 폴더만", "New folder only"]]), defaults.environment);
   const osState = choice(grid, tr("이 세션의 OpenSocrates 상태", "OpenSocrates in this session"), optionPairs([["unknown", "모름", "Unknown"], ["absent", "없음 · A/B 조건", "Absent · A/B"], ["enabled", "활성화됨 · C 조건", "Enabled · C"]]), old.opensocrates);
-  const mapping = check(form, tr("Antigravity 요청 문자열을 UI의 Gemini 3.8 Flash Medium으로 대응하는 것을 직접 확인했습니다.", "I explicitly verified the Antigravity requested string maps to Gemini 3.8 Flash Medium in the UI."), old.model_mapping_confirmed || false);
-  if (cell.host !== "antigravity") mapping.parentElement.classList.add("hide");
+  const mapping = cell.host === "antigravity" ? check(form, tr("Antigravity 요청 문자열을 UI의 Gemini 3.8 Flash Medium으로 대응하는 것을 직접 확인했습니다.", "I explicitly verified the Antigravity requested string maps to Gemini 3.8 Flash Medium in the UI."), old.model_mapping_confirmed || false) : null;
+  const reconfirmed = previous ? check(form, tr("미리 채워진 값을 현재 앱 화면에서 다시 확인했습니다.", "I reconfirmed the suggested values in the current app UI.")) : null;
   const approved = check(form, tr("이 가상 업무 자료, 공통 산출물 범위와 고정 B 지시를 적절한 비교 표본으로 확인했습니다.", "I approve these fictional cases, common deliverable boundaries and fixed B instruction as a plausible comparison."), old.pack_approved || false);
   const exploratory = check(form, tr("격리를 확정할 수 없으면 탐색용으로만 실행합니다. 깨끗한 비교라고 보고하지 않습니다.", "If isolation is unknown, explicitly allow exploratory evidence only, never a clean comparison."), old.exploratory || false);
   const result = element("div");
   form.append(button(tr("확인 내용을 저장", "Save preflight"), async () => {
+    if (reconfirmed && !reconfirmed.checked) throw new Error(tr("미리 채운 값이 지금도 맞는지 직접 확인하고 체크하세요.", "Reconfirm the suggested values and check the confirmation box."));
     const response = await api("preflight", {run_id: run.id, observed_model: model.value,
       observed_effort: effort.value, host_version: version.value, execution_mode: mode.value,
       isolation: isolation.value, environment: environment.value, opensocrates: osState.value,
-      model_mapping_confirmed: mapping.checked, exploratory: exploratory.checked, pack_approved: approved.checked});
+      model_mapping_confirmed: mapping ? mapping.checked : Boolean(old.model_mapping_confirmed), exploratory: exploratory.checked, pack_approved: approved.checked});
     await refresh();
     if (!response.can_start) message(tr("아직 시작할 수 없습니다: ", "Start is blocked: ") + (response.blockers || []).map(blockerLabel).join(" · "), true);
     else message(tr("확인 내용을 저장했습니다. 아래 버튼으로 기록을 시작한 다음 앱에서 실행하세요.", "Preflight saved. Start recording below, then run the task in the app."));
@@ -497,7 +521,7 @@ function renderGroups() {
   const rows = element("div", undefined, "stack");
   for (const group of snapshot.groups) {
     const row = element("div", undefined, "row");
-    row.append(element("span", `${group.case_id} · ${group.cell_id}`));
+    row.append(element("span", `${group.case_id} · ${cellLabel(group.cell_id)}`));
     row.append(button(group.judged ? tr("저장한 평가 보기", "View locked review") : tr("전체 답변 비교하기", "Compare whole answers"), async () => {
       const url = `/review?group=${encodeURIComponent(group.id)}#token=${encodeURIComponent(token)}`;
       window.open(url, "_blank", "noopener");
