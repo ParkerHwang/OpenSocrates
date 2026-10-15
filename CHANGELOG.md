@@ -4,6 +4,8 @@
 
 ## [1.5.3] - 2026-10-15
 
+- Keep deeply nested malformed JSON fail-open: decoder recursion failures return the same closed repair metadata and do not terminate a decision stream.
+
 - Clarify substantive-thinking support at the first need and later material
   changes across the four host profiles and ten instruction locales. Distinguish
   prescribed mechanical execution from reasoning with a fixed answer, and
