@@ -67,11 +67,14 @@ Spanish, Portuguese and Thai guidance. These are affected source/package surface
 not live qualification claims. Each host and installation surface needs its own
 evidence; account-skill matching is not hook delivery.
 
-Product version and canonical method content revision remain **1.5.2 / 5** for
-this unreleased source change. This does not make a rebuilt package identical to
-the released tag. Controller changes alter semantic/package hashes: a read or
-availability assertion for earlier build content cannot establish availability of
-new content merely because the version/revision labels match.
+For the historical Python maintenance change, product version and canonical
+method content revision were **1.5.2 / 5**. This unreleased Go candidate uses
+product version **1.6.0** with method content revision **5**; its exact candidate
+hashes are recorded in [CONTENT_BASELINE.json](v1.6.0/CONTENT_BASELINE.json).
+A rebuilt package is not identical to the released tag. Controller changes alter
+semantic/package hashes: a read or availability assertion for earlier build
+content cannot establish availability of new content merely because the
+version/revision labels match.
 
 Routing fallback behavior remains unchanged. A native `select` request can return
 an answer-shape fallback when no scored method meets the threshold; that is a
