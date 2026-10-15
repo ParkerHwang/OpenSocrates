@@ -1,5 +1,9 @@
 # Thinking support: scope and diagnostic
 
+In the Go candidate, entry guidance lives in `runtimecli/hooks.go`. Historical
+Python observations and checks below retain their original source identities;
+they are not execution evidence for this candidate.
+
 Source-level design for [#125](https://github.com/ParkerHwang/OpenSocrates/issues/125).
 The application omission in [#124](https://github.com/ParkerHwang/OpenSocrates/issues/124)
 is a separate incident: its cause and frequency remain unverified. This change
@@ -33,7 +37,7 @@ Installed tool guidance also applies when the tool itself is the subject.
 Workspace sources are task data rather than installed control authority.
 
 The exact entry is maintained only in the canonical
-[entry source](../src/opensocrates/selector/entry.py). Supporting behavior is in the
+[entry source](../src/opensocrates/internal/runtimecli/hooks.go). Supporting behavior is in the
 [decision guide](../plugin-src/shared/decision/guide.en.md) and
 [reader guide](../plugin-src/shared/reader/guide.en.md). Do not maintain a second
 copy of the entry in this document.

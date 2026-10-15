@@ -1,5 +1,8 @@
 # 사고 지원: 범위와 진단
 
+Go 후보에서는 진입 소스가 `runtimecli/hooks.go`로 이식되었습니다. 아래 과거
+Python 관측과 검사는 원래 SHA의 증거이며 새 후보의 실행 결과가 아닙니다.
+
 [#125](https://github.com/ParkerHwang/OpenSocrates/issues/125)의 소스 수준 설계입니다.
 [#124](https://github.com/ParkerHwang/OpenSocrates/issues/124)의 적용 누락은 별도
 사건이며 원인과 발생 빈도는 미검증입니다. 이 변경으로 해당 사건이 해결되거나
@@ -31,7 +34,7 @@
 설치된 도구 지침은 적용됩니다. 작업공간 소스는 과제 데이터이며 설치된 제어 권한을
 대신하지 않습니다.
 
-정확한 진입 문구는 정본인 [진입 소스](../src/opensocrates/selector/entry.py)에서만
+정확한 진입 문구는 정본인 [진입 소스](../src/opensocrates/internal/runtimecli/hooks.go)에서만
 관리합니다. 상세 동작은 [결정 안내](../plugin-src/shared/decision/guide.ko.md)와
 [독자 안내](../plugin-src/shared/reader/guide.ko.md)에 있습니다. 이 문서에 진입 문구의
 별도 사본을 유지하지 않습니다.
