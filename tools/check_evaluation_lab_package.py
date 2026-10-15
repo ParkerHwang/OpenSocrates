@@ -45,6 +45,9 @@ def _zip(entries: list[tuple[str, bytes, int]]) -> bytes:
     with zipfile.ZipFile(stream, "w", zipfile.ZIP_DEFLATED) as archive:
         for name, raw, mode in entries:
             item = zipfile.ZipInfo(name)
+            # Preserve hostile wire names even when Windows ZipInfo normalizes them.
+            item.filename = name
+            item.orig_filename = name
             item.create_system = 3
             item.external_attr = mode << 16
             item.compress_type = zipfile.ZIP_DEFLATED
@@ -145,10 +148,12 @@ def _check_archives(folder: Path, hosts: Any) -> None:
         "unrelated/private.md",
         ".agents/rules/CON.md",
         ".agents/rules/trailing.md.",
+        ".agents/rules/hidden.md\x00ignored",
     )
     for name in bad_names:
         raw = _zip([(name, b"untrusted", stat.S_IFREG | 0o644)])
         with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+            _require(archive.infolist()[0].orig_filename == name, "hostile wire name changed")
             _reject(lambda: hosts._entries(archive, "antigravity"), "unsafe archive path accepted")
     for mode in (stat.S_IFLNK | 0o777, stat.S_IFIFO | 0o644, stat.S_IFDIR | 0o755):
         raw = _zip([(".agents/rules/unsafe.md", b"target", mode)])

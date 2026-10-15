@@ -83,7 +83,8 @@ def _member_target(member: zipfile.ZipInfo, host: str) -> PurePosixPath:
     path = PurePosixPath(member.filename)
     mode = member.external_attr >> 16
     if (
-        not path.parts
+        member.orig_filename != member.filename
+        or not path.parts
         or path.is_absolute()
         or any(_unsafe_part(part) for part in path.parts)
         or "\\" in member.filename
