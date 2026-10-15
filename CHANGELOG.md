@@ -2,20 +2,45 @@
 
 ## Unreleased
 
+## [1.5.3] - 2026-10-15
+
 - Clarify substantive-thinking support at the first need and later material
   changes across the four host profiles and ten instruction locales. Distinguish
   prescribed mechanical execution from reasoning with a fixed answer, and
   consideration/reader guidance from eligible canonical-method application.
-  Preserve the 48 authored procedures, method revision 5, routing contracts,
-  privacy, required stops and fail-open ordinary work. Controller edits change
-  bundle/package hashes; no published release, incident #124 fix, live application
-  or quality improvement is established by this source change.
+- Preserve Codex submission discovery above the legacy 32,768-byte envelope
+  limit, within the existing 4 MiB hook ingress bound. Validate then discard the
+  prompt; keep the stricter legacy selector/control parser unchanged.
+- Make malformed decision requests repairable with closed `field` and `error`
+  values, predefined `expected` guidance where available and
+  `repair: correct_field_once`, without reflecting submitted values or unknown
+  keys. Distinguish rejected input, valid empty selection and runtime/content
+  unavailability; rejected requests no longer reset session state.
+- Align all ten native Claude decision guides with the shared envelope and
+  one-correction recovery contract. Preserve routing eligibility, contraindications,
+  required stops, fail-open ordinary work, 48 authored methods, ten locales and
+  content revision 5. Bundle/package hashes change without rewriting method bodies.
+- Document this maintenance candidate separately from publication and live-host
+  evidence. No general delivery, application, answer-quality, token-cost or latency
+  improvement is established; incident #124 is not closed by this release record.
+  Go migration, Windows ARM64, effect studies and growth work remain outside scope.
 - 네 호스트 프로필과 열 언어에서 실질적인 사고가 처음 필요할 때와 이후 중요한
   변화가 있을 때의 지원 범위를 명료하게 합니다. 정해진 수행 절차와 정답이 있는
-  추론을 구분하고, 지원 검토·독자 안내·적격한 정본 방법 적용을 나눕니다. 사고 방법
-  48개의 본문과 리비전 5, 라우팅 계약, 개인정보 보호, 필수 중단 조건과 일반 작업의
-  fail-open 처리는 유지합니다. 컨트롤러 변경으로 번들·패키지 해시는 달라지며,
-  이 소스 변경만으로 출시, #124 해결, 실사용 적용이나 품질 향상을 주장하지 않습니다.
+  추론을 구분하고 지원 검토·독자 안내·적격한 정본 방법 적용을 나눕니다.
+- 기존 4 MiB 훅 입력 상한 안에서 과거 32,768바이트 봉투 제한을 넘는 Codex 제출의
+  탐색 안내가 누락되지 않도록 합니다. 프롬프트는 검증 후 버리며 과거 선택기·제어
+  파서의 더 엄격한 제한은 유지합니다.
+- 잘못된 판단 요청에 폐쇄된 `field`·`error`, 가능한 경우 미리 정한 `expected`,
+  `repair: correct_field_once`를 반환해 제출 값이나 알 수 없는 키를 반영하지 않고
+  수정할 수 있게 합니다. 입력 거부·정상 빈 선택·런타임 및 콘텐츠 사용 불가를
+  구분하고 거부된 요청이 세션 상태를 초기화하지 않게 합니다.
+- 열 언어 네이티브 Claude 판단 안내를 공유 봉투와 한 번 수정 후 재전송하는
+  복구 계약에 맞춥니다. 라우팅 적격성·금기·필수 중단·일반 작업의 fail-open,
+  사고 방법 48개·열 언어·콘텐츠 리비전 5는 유지합니다. 방법 본문을 다시 쓰지
+  않아도 번들·패키지 해시는 바뀝니다.
+- 유지보수 후보와 출시·실제 호스트 증거를 구분합니다. 보편적인 전달·적용·답변
+  품질·토큰 비용·지연 개선이나 #124 해결을 주장하지 않습니다. Go 전환·Windows
+  ARM64·효과 연구·성장 활동은 범위 밖입니다.
 
 ## [1.5.2] - 2026-10-13
 
