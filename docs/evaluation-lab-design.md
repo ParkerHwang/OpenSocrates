@@ -57,7 +57,8 @@ copy login state, disable unrelated plugins or remove user files automatically.
 
 ## Architecture and contracts
 
-Python 3.12 standard library only; reusable runtime under
+Python 3.12 or newer, standard library only; repository development stays on the
+locked Python 3.12 toolchain. Reusable runtime under
 `src/opensocrates/evaluation/`, portable launch/build tools under
 `tools/evaluation-lab/`, pack under `evals/office-work-v1/`, EN/KO user guides.
 No runtime dependency on uv, npm, API keys or provider command-line clients.

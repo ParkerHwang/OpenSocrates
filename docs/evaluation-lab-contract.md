@@ -1,7 +1,8 @@
 # Lab v1 implementation contract
 
 Read with [design](evaluation-lab-design.md). Frozen before implementation.
-Python 3.12, standard library. Public `LabError(code)` has `.code`; never expose
+Python 3.12 or newer, standard library; source development is locked to 3.12.
+Public `LabError(code)` has `.code`; never expose
 raw exceptions. `Lab(root, pack, payloads=None)` accepts Paths; `pack` is the pack
 directory. `snapshot()` and `action(name, data)` return JSON objects.
 
@@ -48,6 +49,10 @@ Operator responses may contain the known actor path for opening the actual app.
 `snapshot`: `{schema, initialized, pack:{id,version,sha256}, cells:[...], phase,
 budget, started_count, runs:[...], groups:[...], judgments:[...], warnings:[...]}`.
 Before create, runs/groups empty and cells lists all six supported combinations.
+The snapshot and export also include `controller_environment` with observed local
+controller OS/architecture, separately from cloud/local host execution mode.
+Starting a cell for another OS is blocked. Synthetic tests may mock this local
+platform observation but do not thereby qualify a Windows or Mac host.
 Cell object `{id,os,host,requested_model,expected_model,expected_effort}`.
 IDs: `macos-work`, `windows-work`, `macos-cowork`, `windows-cowork`,
 `macos-antigravity`, `windows-antigravity`. Host values `desktop_work`,
