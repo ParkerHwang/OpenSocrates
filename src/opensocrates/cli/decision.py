@@ -10,7 +10,7 @@ from typing import TextIO
 from ..content.injection import ProjectionInstructionAssembler
 from ..content.loader import load_compiled_bundle, load_reasoning_content_projections
 from ..rendering.response_policy import load_compiled_response_policy
-from ..selector.decision import DecisionSession
+from ..selector.decision import DecisionSession, fault_response
 
 # Closed feature envelopes are small; this is an input memory bound, not a reasoning budget.
 MAX_REQUEST_CHARS = 16384
@@ -49,9 +49,15 @@ def run_decision(stdin: TextIO, stdout: TextIO, *, stream: bool = False) -> int:
             return 0
         try:
             request = json.loads(payload)
-            response = session.handle(request)
-        except Exception:
-            response = session._failure("decision_unavailable")
+        except (ValueError, RecursionError):
+            # Malformed input (often shell quoting) is repairable; it is not runtime unavailability.
+            # Unclosed nesting can exhaust the decoder before it reports a syntax error.
+            response = fault_response("request", "invalid_json")
+        else:
+            try:
+                response = session.handle(request)
+            except Exception:
+                response = session._failure("decision_unavailable")
         stdout.write(json.dumps(response, ensure_ascii=False, sort_keys=True) + "\n")
         stdout.flush()
         if not stream:
