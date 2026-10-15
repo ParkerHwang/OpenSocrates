@@ -178,7 +178,7 @@ func TestPackageIntegrityAndClosedInventory(t *testing.T) {
 		}
 		inventory = append(inventory, map[string]any{"path": name, "sha256": digest(b), "size": len(b)})
 	}
-	m := map[string]any{"host": "codex", "product_version": "1.6.0", "release_targets": []string{"darwin-arm64"}, "shell_requirement": "posix", "files": inventory, "canonical_methods": canonical, "source_tree_hash": "sha256:e1e11f7a772cb2a3f6c8dc0e3b22b0787cdc903de69842de957577a177cee7be", "normalized_semantic_hash": "sha256:b5fc82f5ce8725bd23b7d270014f90853e39474e7b00ae4f20553a484524c659"}
+	m := map[string]any{"host": "codex", "product_version": "1.6.0", "release_targets": []string{"darwin-arm64"}, "shell_requirement": "posix", "files": inventory, "canonical_methods": canonical, "source_tree_hash": maintainedContentSourceHash, "normalized_semantic_hash": maintainedContentSemanticHash}
 	raw, _ := json.Marshal(m)
 	if e := os.WriteFile(filepath.Join(root, "release-manifest.json"), raw, 0600); e != nil {
 		t.Fatal(e)

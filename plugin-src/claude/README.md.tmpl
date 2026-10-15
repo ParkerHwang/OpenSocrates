@@ -10,7 +10,8 @@ memory enrollment, private transcript reader, or Claude credential copy is used.
 
 This profile targets Apple-silicon macOS only. Its manifest is
 `.claude-plugin/plugin.json`, hooks are in `hooks/hooks.json`, and the fixed
-executable is `runtime/darwin-arm64/opensocrates`. It never resolves from the current
+launcher is `bin/launch.sh`. The runtime is under
+`runtime/darwin-arm64/opensocrates-runtime/`. It never resolves from the current
 working directory. Windows native Claude delivery is unavailable in this profile;
 existing Codex Windows support has a separate package.
 
@@ -22,9 +23,11 @@ Stop and SessionEnd are literal no-ops: there is no read-repair gate, stored
 task record, or false application receipt. Malformed, excessive, unknown-event,
 or unavailable-runtime input fails open with empty hook output.
 
-The active agent reads complete canonical procedures at materially changed
-judgments, using `bin/launch.sh decision claude` or its volatile `--stream`
-variant. Full reads, applicability, dependencies, contraindications, stops, and
+The active agent considers support when substantive thinking first arises or
+materially changes. Reader guidance or no method may suffice. When a method fits
+the thinking needed, it reads complete canonical procedures using
+`bin/launch.sh decision claude` or its volatile `--stream` variant.
+Full reads, applicability, dependencies, contraindications, stops, and
 the grounding audit remain required. Emitted instructions and read assertions
 do not prove application or improved outcomes.
 

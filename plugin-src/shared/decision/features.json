@@ -90,5 +90,64 @@
     "evidence_reconciliation",
     "structured_plan",
     "completion_review"
-  ]
+  ],
+  "envelope": {
+    "required_keys": [
+      "operation",
+      "context",
+      "epoch",
+      "decision",
+      "revision",
+      "locale",
+      "participation",
+      "routing"
+    ],
+    "context": "32 lowercase hexadecimal characters [0-9a-f], new and random for each agent or handoff; not a UUID with hyphens or uppercase letters (for example: openssl rand -hex 16)",
+    "epoch": "integer >= 0; increment after compaction, never decrease for the same context",
+    "decision": "1-64 ASCII letters or digits naming the current question, such as d1 or priorities2; no hyphen, underscore, space or non-ASCII text",
+    "revision": "integer >= 0; increment when the same decision materially changes",
+    "locale": [
+      "en",
+      "ko",
+      "zh",
+      "ja",
+      "fr",
+      "de",
+      "it",
+      "es",
+      "pt",
+      "th"
+    ],
+    "participation": [
+      "judgment",
+      "mixed",
+      "mechanical"
+    ],
+    "routing_required_keys": [
+      "schema",
+      "answer_shape",
+      "classification_confidence",
+      "explicit_method",
+      "features"
+    ],
+    "routing_schema": "opensocrates.routing-features/1.0.0",
+    "classification_confidence": [
+      "high",
+      "medium",
+      "low"
+    ],
+    "explicit_method": "null unless the user requested a catalog method ID",
+    "max_features": 16,
+    "feature_entry_keys": [
+      "key",
+      "strength",
+      "basis"
+    ],
+    "strength": [
+      1,
+      2,
+      3
+    ],
+    "rejection": "invalid_decision_request names a closed field path and error code without echoing values; correct that field and resend once"
+  }
 }

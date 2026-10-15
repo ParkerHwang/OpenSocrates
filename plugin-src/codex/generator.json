@@ -3,21 +3,14 @@
   "template_revision": "1",
   "launcher_host": "codex",
   "release_targets": [
-    "darwin-arm64",
-    "windows-x64",
-    "windows-arm64"
+    "darwin-arm64"
   ],
   "launchers": [
-    "runtime/{target}/opensocrates{exe}"
+    "bin/launch.sh"
   ],
   "manifest_template": ".codex-plugin/plugin.json.tmpl",
   "manifest_output": ".codex-plugin/plugin.json",
-  "hooks_builder": "go-native-codex",
-  "shell_requirements": {
-    "darwin-arm64": "posix",
-    "windows-x64": "powershell",
-    "windows-arm64": "powershell"
-  },
+  "hooks_builder": "opensocrates.hosts.codex.commands:build_hooks",
   "hooks_template": "hooks/hooks.json.tmpl",
   "hooks_output": "hooks/hooks.json",
   "shared_templates": [
@@ -67,6 +60,10 @@
     }
   ],
   "copy_files": [
+    {
+      "source": "packaging/launchers/launch.sh",
+      "output": "bin/launch.sh"
+    },
     {
       "source": "schemas/v1",
       "output": "schemas/v1"

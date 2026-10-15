@@ -1,6 +1,6 @@
 # Leserzweck und nutzbares Urteil
 
-Nutzen Sie diese Hinweise, wenn Sie Quellenmaterial zusammenführen, eine Entscheidung erläutern oder eine Nachricht für jemanden vorbereiten, der verstehen und handeln muss. Lassen Sie sie bei mechanischer Arbeit aus. Dies ist eine Darstellungsprüfung, keine weitere Denkmethode.
+Nutzen Sie diese Hinweise, wenn Sie Quellenmaterial zusammenführen, eine Idee oder Entscheidung erläutern, ein Dokument strukturieren oder eine Nachricht für jemanden vorbereiten, der verstehen und handeln muss. Sie können ohne Anwendung einer kanonischen Methode ausreichen; die Eignung einer Methode richtet sich nach dem erforderlichen Denken, nicht nach dem Namen des Arbeitsergebnisses. Lassen Sie sie bei vorgegebenen mechanischen Schritten aus. Dies ist eine Darstellungsprüfung, keine weitere Denkmethode.
 
 Klären Sie, wer das Ergebnis nutzt, was diese Person bereits weiß und welches Urteil oder welche nächste Handlung sie braucht. Nutzen Sie den tatsächlichen Aufgabenkontext; erfinden Sie keine Motive eines Beteiligten und bitten Sie den Nutzer nicht, geklärte Informationen zu wiederholen. Fragen Sie nur, wenn eine fehlende Antwort die Arbeit wesentlich verändern würde.
 

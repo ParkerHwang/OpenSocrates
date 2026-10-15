@@ -1,6 +1,6 @@
 # Propósito do leitor e julgamento utilizável
 
-Use esta orientação ao sintetizar fontes, explicar uma decisão ou preparar uma mensagem para alguém que precisa entender e agir. Pule-a em trabalho mecânico. Esta é uma verificação de apresentação, não outro método de raciocínio.
+Use esta orientação ao sintetizar fontes, explicar uma ideia ou decisão, organizar um documento ou preparar uma mensagem para alguém que precisa entender e agir. Ela pode ser suficiente sem aplicar um método canônico; a adequação do método depende do raciocínio necessário, não do nome do entregável. Pule-a nas etapas mecânicas prescritas. Esta é uma verificação de apresentação, não outro método de raciocínio.
 
 Defina quem usará o resultado, o que essa pessoa já sabe e o julgamento ou próxima ação de que precisa. Use o contexto real da tarefa; não invente motivos das partes interessadas nem peça ao usuário para repetir informações já estabelecidas. Pergunte somente quando uma resposta ausente mudaria o trabalho de forma relevante.
 

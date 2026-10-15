@@ -1,6 +1,8 @@
 # Decision-point retrieval and migration
 
-v1.6.0 preserves v1.5.0 content revision 3 and semantics. Historical evidence
+v1.6.0 preserves v1.5.2 method content revision 5 and ten-language semantics;
+selected maintenance controller/request guidance is recorded separately in
+[the content baseline](v1.6.0/CONTENT_BASELINE.json). Historical evidence
 below applies only to its stated version. Go qualification belongs in
 [the native guide](native-v1.6.md) and implementation handoff. Invalid requests
 are rejected before scope mutation; preserving earlier availability on malformed
@@ -8,7 +10,7 @@ requests is the intentional validate-before-scope change. Duplicate JSON keys
 and unpaired Unicode surrogates are rejected; complete request validation
 precedes context/scope mutation.
 
-Status: unreleased v1.6.0 Go candidate with the frozen v1.5.0 content baseline; content revision 3, router 1.1.0. Canonical method bodies retain the v1.2.1 wording.
+Status: unreleased v1.6.0 Go candidate with 48 methods, ten locales and content revision 5; router 1.1.0. Canonical method bodies remain at the released v1.5.2 baseline.
 Experimental content revision 2, method variants, language rewrites and Compact
 policies have not been promoted. Method IDs remain unchanged.
 
@@ -32,16 +34,25 @@ Codex Stop gate still checks a complete authenticated read and the exact footer.
 ## Use in the current turn
 
 Keep task goals, permissions, constraints and completion conditions available.
-Activate the controller when a materially changed judgment needs help; do not
-wait for another user message. It links locale-specific decision guides, compact
-routing metadata and exact complete canonical instructions. Do not load a method
-for mechanical steps. Upstream constraints must be read before they affect a choice.
+Consider support at the first need for substantive framing, interpretation,
+exploration, learning, research design, reasoning checks, approach choice or
+explanation, and when its context materially changes within the same turn. A
+prescribed procedure without substantive inference or problem solving can stay
+mechanical; a fixed answer alone does not make a task mechanical. Reader guidance
+or ordinary work may suffice. Consult methods when they fit the thinking needed,
+not only when a consequential decision is unresolved. Preserve constraints and
+required stops before they affect a choice. The [scope and diagnostic guide](thinking-support-scope.md)
+records the source change, preservation matrix and separate delivery/use checks;
+it does not establish a cause or fix for incident #124.
 
 When the packaged runtime and shell are available, Codex use native
 `catalog` and `select` first. Include known missing prerequisites in the closed
 features, use a separate decision identity for a distinct question, and leave
 `explicit_method` null unless the user explicitly requested a method. An empty
 eligible set is valid, not a reason to bypass eligibility with file lookup.
+Below-threshold scoring may return an answer-shape fallback; that is a candidate,
+not proof of applicability. Retire an inapplicable candidate after its complete
+read, without bypassing required holds/stops or relabeling thinking as mechanical.
 Runtime/shell unavailability or failure permits the existing complete-reference
 fallback with the same contraindications and global constraints. This is guided host behavior; the selector does not
 verify feature classification, freeform semantics or actual method application.
@@ -99,6 +110,21 @@ still applies to the complete document. `--stream` is different: it accepts one
 complete JSON object per line, retains the same per-line limit, and may return
 multiple responses from one volatile session. Multiple JSON documents supplied
 to one-shot mode are malformed rather than silently treated as a stream.
+
+A rejected request returns `invalid_decision_request` with a closed `field` path
+(for example `context` or `routing.features[0].key`), a predefined `error` code
+(`invalid_json`, `invalid_type`, `missing_field`, `unknown_field`,
+`unknown_operation`, `invalid_format`, `invalid_value`, `stale_epoch`,
+`unknown_feature`, `duplicate_feature` or `too_many_features`), a fixed
+`expected` description where one exists, and `repair: correct_field_once`.
+Submitted values, unknown key names and prose are never echoed, logged or
+retained, and a rejected request does not change session state. Malformed JSON
+is this repairable input error rather than `decision_unavailable`, which is
+reserved for runtime or packaged-content faults after acceptance. Invalid input,
+`no_intervention`, `unknown_method` and runtime unavailability remain distinct;
+none of them is an applied method. The packaged `features.json` `envelope` lists
+every field format, and [the #124 fixture](../evals/issue-124/README.md) holds
+synthetic rejection cases.
 
 ## Host evidence and compatibility
 

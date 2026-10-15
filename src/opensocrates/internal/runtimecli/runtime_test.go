@@ -239,3 +239,36 @@ func TestDecisionCatalogAllLocalesRemainsStateless(t *testing.T) {
 		t.Fatal("locale decision created storage", entries, e)
 	}
 }
+
+func TestMalformedDecisionJSONHasClosedRepairAndStreamContinues(t *testing.T) {
+	for _, input := range []string{`{"PRIVATE_SYNTHETIC_VALUE":`, `{"operation":"reset","operation":"reset"}`, `{"operation":"catalog"}{"operation":"reset"}`} {
+		for _, stream := range []bool{false, true} {
+			args := []string{"decision"}
+			if stream {
+				args = append(args, "--stream")
+				input += "\n" + `{"operation":"catalog","locale":"ko"}` + "\n"
+			}
+			code, output, stderr := invoke(args, input)
+			if code != 0 || stderr != "" || strings.Contains(output, "PRIVATE_SYNTHETIC_VALUE") {
+				t.Fatal("malformed input leaked or failed closed")
+			}
+			lines := strings.Split(strings.TrimSpace(output), "\n")
+			v, err := contracts.Decode([]byte(lines[0]))
+			if err != nil {
+				t.Fatal(err)
+			}
+			m := v.(map[string]any)
+			if m["reason"] != "invalid_decision_request" || m["field"] != "request" || m["error"] != "invalid_json" || m["repair"] != "correct_field_once" || m["applied"] != "unverified" {
+				t.Fatal("malformed input lacks closed repair")
+			}
+			if stream && (len(lines) != 2 || !strings.Contains(lines[1], `"status":"catalog"`)) {
+				t.Fatal("stream did not continue after malformed input")
+			}
+		}
+	}
+	var out bytes.Buffer
+	runDecision(unreadable{}, &out, false)
+	if !strings.Contains(out.String(), `"reason":"decision_unavailable"`) || strings.Contains(out.String(), "correct_field_once") {
+		t.Fatal("reader failure was mislabeled as repairable JSON")
+	}
+}

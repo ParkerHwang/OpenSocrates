@@ -51,7 +51,7 @@ func TestReleasedContentGenerationEquivalence(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if generated["source_tree_hash"] != "sha256:e1e11f7a772cb2a3f6c8dc0e3b22b0787cdc903de69842de957577a177cee7be" || generated["normalized_semantic_hash"] != "sha256:b5fc82f5ce8725bd23b7d270014f90853e39474e7b00ae4f20553a484524c659" {
+	if generated["source_tree_hash"] != maintainedContentSourceHash || generated["normalized_semantic_hash"] != maintainedContentSemanticHash {
 		t.Fatal("frozen source or semantic identity changed")
 	}
 }

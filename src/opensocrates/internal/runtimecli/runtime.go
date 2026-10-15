@@ -211,7 +211,7 @@ func runDecision(in io.Reader, out io.Writer, stream bool) int {
 		}
 		v, e := contracts.Decode(raw)
 		if e != nil {
-			emit(out, decision.Failure("decision_unavailable"))
+			emit(out, decision.InvalidJSONRequest())
 		} else {
 			emit(out, session.Handle(v))
 		}
@@ -227,7 +227,7 @@ func runDecision(in io.Reader, out io.Writer, stream bool) int {
 		if len(raw) > 0 {
 			v, decodeErr := contracts.Decode(raw)
 			if decodeErr != nil {
-				emit(out, decision.Failure("decision_unavailable"))
+				emit(out, decision.InvalidJSONRequest())
 			} else {
 				emit(out, session.Handle(v))
 			}

@@ -15,8 +15,10 @@ build time; they are not host or manifest claims.
 
 - Manifest: `.codex-plugin/plugin.json`
 - Hook definition: `hooks/hooks.json`
-- Native executable: `{{PACKAGE_LAUNCHER_PATH}}`, resolved from the plugin root.
-- Hooks invoke the bundled Go executable directly.
+- Fixed launcher: `{{PACKAGE_LAUNCHER_PATH}}`; this exact `bin/` placement is required and
+  no root-level or PowerShell launcher is shipped.
+- Native runtime: `runtime/<target>/opensocrates-runtime/`, resolved by
+  the launcher relative to the plugin root
 - Writable product data, when enabled by the host, is owned by the host's
   `PLUGIN_DATA` location; this package does not request a remote service.
 - Complete selected reasoning content is written only to an owner-only OS
@@ -33,17 +35,19 @@ method activation, or public-artifact confirmation.
 After installation, open one interactive Codex session and complete the
 one-time interactive hook approval before relying on automatic selection.
 Until then, non-interactive `codex exec` silently skips untrusted hooks. The
-package has no live Codex hook-delivery receipt solely from generation.
+package and launcher are release-validated, but there is no live Codex
+hook-delivery receipt for this release.
 
 ## Default decision-point entry
 
 The default runtime emits only bounded discovery guidance on user submission and
 compact restoration. It selects no initial method, calls no selector model for
 this entry, and does not create a method artifact that Stop would force an agent
-to read after abandonment. The agent reads the installed controller and performs
-in-turn decision lookup before each materially changed judgment. Used methods
-still require complete canonical reads and their public grounding audit. The
-new lookup has agent-reported availability, not native grounding receipts.
+to read after abandonment. The agent considers support at the first substantive
+thinking need and later material changes within the turn. Reader guidance or no
+method may suffice; method lookup depends on fit to the thinking needed. Used
+methods still require complete canonical reads and their public grounding audit.
+The new lookup has agent-reported availability, not native grounding receipts.
 
 ## Retained legacy selector lifecycle (not the default)
 
@@ -60,8 +64,8 @@ Other session-start, tool, compaction, Stop, and SessionEnd paths finish with
 literal empty stdout.
 
 For each `UserPromptSubmit`, the package starts one fresh ephemeral
-external Codex app-server through the isolated Go compatibility adapter and the user's
-existing Codex session. It evaluates the current prompt
+`openai-codex` selector using the pinned local SDK/runtime and the user's
+existing Codex OAuth/app-server session. It evaluates the current prompt
 first, then may read transcript, workspace, transcript-referenced files, or
 tool data only on demand and read-only as untrusted data. Set
 `OPENSOCRATES_SELECTOR_TRANSCRIPT_ACCESS=0` to disable transcript access.
@@ -108,12 +112,12 @@ Generated source identity: `{{SOURCE_TREE_HASH}}`.
 
 ## Decision-point retrieval (v{{PRODUCT_VERSION}})
 
-The controller links the language-specific
-`skills/opensocrates/references/decision/guide.<locale>.md` guides for all ten
-locales listed below.
-Read routing metadata and complete selected locale-specific canonical references
-at a materially changed judgment within the same request. Mechanical steps need
-none. This is agent-directed in-turn lookup, not automatic observation of every
+The controller links `skills/opensocrates/references/decision/guide.en.md` and `skills/opensocrates/references/decision/guide.ko.md`.
+Consider support for framing, exploration, learning, reasoning checks and
+explanation as well as decisions. Prescribed steps without substantive inference
+need no method; a fixed answer alone does not make reasoning mechanical. Read
+routing metadata and complete selected locale-specific canonical references when
+a method fits the thinking needed. This is agent-directed in-turn lookup, not automatic observation of every
 reasoning transition. A delivered reference or agent read assertion is not proof
 of application or better output. No prompt, transcript or reasoning state is
 persisted by this path. Existing native hook/fallback boundaries remain in force.
@@ -123,17 +127,10 @@ request on stdin. This is separate from host-only `control`; see
 `skills/opensocrates/references/decision/request.json`. The standalone runtime also accepts `decision --stream`
 for a volatile NDJSON session. No active host installation is needed for file lookup.
 
-## Windows native profiles
+## Windows x64
 
-Windows x64 and ARM64 archives invoke their respective native Go `.exe` directly. Installation and
-execution require no Python, Node.js, npm or Go toolchain. Native Windows execution
-and signed release qualification are separate gates. Stable updates are opt-in,
-run outside hooks, and may await a fresh host session before activation.
-This native Windows profile requires Codex's inherited default PowerShell
-executor. Its hook configuration invokes the Go executable through an expanded
-environment variable. Cmd and custom Windows shells are outside this package's
-qualification; an unavailable or disabled hook keeps the ordinary host task
-running and does not establish a delivery receipt.
+The Windows x64 archive uses `node bin/launch.mjs` and a bundled `.exe`. Node.js 20+ is required; Python and a Unix shell are not required for method retrieval. See the repository Windows support guide for the current validation boundary. Legacy SDK context/credential-copy selection is unavailable on Windows; decision-point retrieval is the supported path. Scheduled updates are unavailable; use a manual installer update.
+
 
 Canonical procedures, decision catalogs, reader guides, controllers and presentation
 guidance are available in English (`en`), Korean (`ko`), Simplified Chinese (`zh`),
@@ -150,3 +147,7 @@ are also accepted. `bin/launch.sh locale codex reset` restores the follow prefer
 This setting applies to the retained selector path. Decision requests use their
 explicit JSON `locale`, and content-only account/workspace packages use the
 matching guide and catalog without a local runtime setting.
+
+On Windows, use `node bin/launch.mjs locale codex get`,
+`node bin/launch.mjs locale codex set zh` (or another supported preference),
+and `node bin/launch.mjs locale codex reset`.

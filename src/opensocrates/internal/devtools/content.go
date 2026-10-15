@@ -10,6 +10,12 @@ import (
 	"strings"
 )
 
+// Exact reviewed maintenance identity from main 227a528996d93c423851db1d663f9572be534e59.
+// Only locale controller wording changes the content projection. The tagged
+// v1.5.2 identities remain separately preserved in CONTENT_BASELINE.json.
+const maintainedContentSourceHash = "sha256:a4d9f4b70f653dee12a3ea758ef10dc391443a19536c7e7f22082962fd252e0f"
+const maintainedContentSemanticHash = "sha256:2c85b27d1586f97ec743e7d3f0a56f02a71a41913589e25a08c4a5ab309df0ab"
+
 // SourceTreeHash matches the released length-framed source hash, including its
 // historic final hash-of-digest step. No Unicode normalization is performed.
 func SourceTreeHash(root string) (string, error) {
@@ -308,16 +314,16 @@ func GenerateContent(root, productVersion string) error {
 	if e != nil {
 		return e
 	}
-	if tree != "sha256:e1e11f7a772cb2a3f6c8dc0e3b22b0787cdc903de69842de957577a177cee7be" {
-		return fmt.Errorf("revision 5 source differs from released v1.5.2 baseline; a separate content revision is required")
+	if tree != maintainedContentSourceHash {
+		return fmt.Errorf("revision 5 source differs from the exact selected maintenance baseline; a separate reviewed change is required")
 	}
 	bundle := map[string]any{"schema": schema("compiled-content-bundle"), "product_version": productVersion, "content_revision": revision, "method_ids": sortedIDs, "methods": methods, "locale_messages": messages, "prompt_fragments": fragments, "policy_versions": policies, "source_tree_hash": tree}
 	semantic, e := SemanticHash(bundle)
 	if e != nil {
 		return e
 	}
-	if semantic != "sha256:b5fc82f5ce8725bd23b7d270014f90853e39474e7b00ae4f20553a484524c659" {
-		return fmt.Errorf("released v1.5.2 semantic identity changed")
+	if semantic != maintainedContentSemanticHash {
+		return fmt.Errorf("selected maintenance semantic identity changed")
 	}
 	bundle["normalized_semantic_hash"] = semantic
 	projections := map[string]any{"schema": schema("reasoning-content-projections"), "content_revision": revision, "selection_catalog": map[string]any{"schema": schema("selection-catalog"), "content_revision": revision, "entries": entries}, "injectable_content": injectable}

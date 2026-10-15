@@ -59,6 +59,10 @@ var requestExpected = map[string]string{
 	"basis":                             "a value from features.json basis",
 }
 
+// InvalidJSONRequest reports only a closed category. Decoder error strings and
+// submitted bytes must never enter the public response.
+func InvalidJSONRequest() map[string]any { return requestFault("request", "invalid_json") }
+
 func requestFault(field, code string) map[string]any {
 	result := Failure("invalid_decision_request")
 	result["field"], result["error"], result["repair"] = field, code, "correct_field_once"

@@ -1,6 +1,6 @@
 # Propósito del lector y juicio utilizable
 
-Utiliza esta guía al sintetizar materiales fuente, explicar una decisión o preparar un mensaje para alguien que necesita comprender y actuar. Omítela para el trabajo mecánico. Es una comprobación de presentación, no otro método de razonamiento.
+Utiliza esta guía al sintetizar materiales fuente, explicar una idea o una decisión, organizar un documento o preparar un mensaje para alguien que necesita comprender y actuar. Puede bastar sin aplicar un método canónico; la idoneidad del método depende del razonamiento necesario, no del nombre del entregable. Omítela para los pasos mecánicos prescritos. Es una comprobación de presentación, no otro método de razonamiento.
 
 Determina quién utilizará el resultado, qué sabe ya y qué juicio o siguiente acción necesita. Utiliza el contexto real de la tarea; no inventes los motivos de una parte interesada ni pidas al usuario que repita información ya establecida. Pregunta solo cuando una respuesta que falta cambiaría el trabajo de forma relevante.
 
