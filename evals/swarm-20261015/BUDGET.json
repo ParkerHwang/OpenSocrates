@@ -1,0 +1,1069 @@
+{
+  "schema_version": 1,
+  "study_id": "opensocrates-swarm-20261015",
+  "artifact_role": "draft preregistration; no execution or efficacy evidence",
+  "owner": "S039",
+  "authored_at": "2026-10-15T05:24:52.365769+00:00",
+  "interface_version": 1,
+  "interface_path": "control/interfaces-v1.json (external operations control; launch v1)",
+  "actor_max": 54,
+  "judge_budget": "unapproved",
+  "effective_judge_max": 0,
+  "provenance": {
+    "repository": "https://github.com/ParkerHwang/OpenSocrates",
+    "assigned_base_ref": "main",
+    "assigned_base_sha": "227a528996d93c423851db1d663f9572be534e59",
+    "remote_main_observed_sha": "227a528996d93c423851db1d663f9572be534e59",
+    "remote_main_observation": "git ls-remote origin refs/heads/main; exit 0; observed 2026-10-15T05:20Z",
+    "remote_drift_at_observation": false,
+    "candidate_source_sha": null,
+    "candidate_source_sha_reason": "S001 must publish the exact integrated frozen candidate; this file does not freeze its own containing commit.",
+    "historical_sources": [
+      {
+        "path": "evals/v1.5-macos/REPORT.md",
+        "read_at_source_sha": "227a528996d93c423851db1d663f9572be534e59",
+        "use": "Count actual attempts; preserve partial observations; distinguish installation, delivery, application and usefulness.",
+        "not_current_evidence": "The historical seven-request synthetic smoke is not a baseline or efficacy result for this study."
+      },
+      {
+        "path": "evals/v1.3/release-guided-20260908/PROTOCOL.md",
+        "read_at_source_sha": "227a528996d93c423851db1d663f9572be534e59",
+        "use": "Preregister attempts, privacy-safe full-interaction usage, blinding and missing independent judgment.",
+        "not_current_evidence": "Its 24 calls, 300-second timeout, concurrency 2, model and host choices are historical only and are not inherited."
+      },
+      {
+        "path": "tools/measure_codex_hook_timing.py",
+        "read_at_source_sha": "227a528996d93c423851db1d663f9572be534e59",
+        "use": "Use observed monotonic elapsed time and closed safe aggregate fields.",
+        "not_current_evidence": "Packaged hook-process latency and its 2000ms host timeout are not actor-response latency or an actor timeout default."
+      }
+    ],
+    "recheck_rule": "S078 records current remote and frozen candidate identities before execution. Drift is disclosed to S001; never silently change the assigned baseline or promote historical results."
+  },
+  "plan": {
+    "unit": "one single-turn actor invocation for one assigned cell; terminal success is not required to spend the attempt",
+    "factorization": "3 task families x 2 locales x 3 arms x 3 planned repeats = 54",
+    "families": [
+      "email-agreement",
+      "changed-recommendation",
+      "price-profit"
+    ],
+    "locales": [
+      "en",
+      "ko"
+    ],
+    "arms": [
+      "plain",
+      "general-check",
+      "native-opensocrates"
+    ],
+    "repeats": [
+      1,
+      2,
+      3
+    ],
+    "per_family": 18,
+    "per_locale": 27,
+    "per_arm": 18,
+    "per_case": 9,
+    "per_case_arm": 3,
+    "plan_cells": [
+      {
+        "plan_index": 1,
+        "cell_id": "email-agreement-en-plain-r1",
+        "case_id": "email-agreement-en",
+        "family": "email-agreement",
+        "locale": "en",
+        "arm": "plain",
+        "repeat": 1
+      },
+      {
+        "plan_index": 2,
+        "cell_id": "email-agreement-en-plain-r2",
+        "case_id": "email-agreement-en",
+        "family": "email-agreement",
+        "locale": "en",
+        "arm": "plain",
+        "repeat": 2
+      },
+      {
+        "plan_index": 3,
+        "cell_id": "email-agreement-en-plain-r3",
+        "case_id": "email-agreement-en",
+        "family": "email-agreement",
+        "locale": "en",
+        "arm": "plain",
+        "repeat": 3
+      },
+      {
+        "plan_index": 4,
+        "cell_id": "email-agreement-en-general-check-r1",
+        "case_id": "email-agreement-en",
+        "family": "email-agreement",
+        "locale": "en",
+        "arm": "general-check",
+        "repeat": 1
+      },
+      {
+        "plan_index": 5,
+        "cell_id": "email-agreement-en-general-check-r2",
+        "case_id": "email-agreement-en",
+        "family": "email-agreement",
+        "locale": "en",
+        "arm": "general-check",
+        "repeat": 2
+      },
+      {
+        "plan_index": 6,
+        "cell_id": "email-agreement-en-general-check-r3",
+        "case_id": "email-agreement-en",
+        "family": "email-agreement",
+        "locale": "en",
+        "arm": "general-check",
+        "repeat": 3
+      },
+      {
+        "plan_index": 7,
+        "cell_id": "email-agreement-en-native-opensocrates-r1",
+        "case_id": "email-agreement-en",
+        "family": "email-agreement",
+        "locale": "en",
+        "arm": "native-opensocrates",
+        "repeat": 1
+      },
+      {
+        "plan_index": 8,
+        "cell_id": "email-agreement-en-native-opensocrates-r2",
+        "case_id": "email-agreement-en",
+        "family": "email-agreement",
+        "locale": "en",
+        "arm": "native-opensocrates",
+        "repeat": 2
+      },
+      {
+        "plan_index": 9,
+        "cell_id": "email-agreement-en-native-opensocrates-r3",
+        "case_id": "email-agreement-en",
+        "family": "email-agreement",
+        "locale": "en",
+        "arm": "native-opensocrates",
+        "repeat": 3
+      },
+      {
+        "plan_index": 10,
+        "cell_id": "email-agreement-ko-plain-r1",
+        "case_id": "email-agreement-ko",
+        "family": "email-agreement",
+        "locale": "ko",
+        "arm": "plain",
+        "repeat": 1
+      },
+      {
+        "plan_index": 11,
+        "cell_id": "email-agreement-ko-plain-r2",
+        "case_id": "email-agreement-ko",
+        "family": "email-agreement",
+        "locale": "ko",
+        "arm": "plain",
+        "repeat": 2
+      },
+      {
+        "plan_index": 12,
+        "cell_id": "email-agreement-ko-plain-r3",
+        "case_id": "email-agreement-ko",
+        "family": "email-agreement",
+        "locale": "ko",
+        "arm": "plain",
+        "repeat": 3
+      },
+      {
+        "plan_index": 13,
+        "cell_id": "email-agreement-ko-general-check-r1",
+        "case_id": "email-agreement-ko",
+        "family": "email-agreement",
+        "locale": "ko",
+        "arm": "general-check",
+        "repeat": 1
+      },
+      {
+        "plan_index": 14,
+        "cell_id": "email-agreement-ko-general-check-r2",
+        "case_id": "email-agreement-ko",
+        "family": "email-agreement",
+        "locale": "ko",
+        "arm": "general-check",
+        "repeat": 2
+      },
+      {
+        "plan_index": 15,
+        "cell_id": "email-agreement-ko-general-check-r3",
+        "case_id": "email-agreement-ko",
+        "family": "email-agreement",
+        "locale": "ko",
+        "arm": "general-check",
+        "repeat": 3
+      },
+      {
+        "plan_index": 16,
+        "cell_id": "email-agreement-ko-native-opensocrates-r1",
+        "case_id": "email-agreement-ko",
+        "family": "email-agreement",
+        "locale": "ko",
+        "arm": "native-opensocrates",
+        "repeat": 1
+      },
+      {
+        "plan_index": 17,
+        "cell_id": "email-agreement-ko-native-opensocrates-r2",
+        "case_id": "email-agreement-ko",
+        "family": "email-agreement",
+        "locale": "ko",
+        "arm": "native-opensocrates",
+        "repeat": 2
+      },
+      {
+        "plan_index": 18,
+        "cell_id": "email-agreement-ko-native-opensocrates-r3",
+        "case_id": "email-agreement-ko",
+        "family": "email-agreement",
+        "locale": "ko",
+        "arm": "native-opensocrates",
+        "repeat": 3
+      },
+      {
+        "plan_index": 19,
+        "cell_id": "changed-recommendation-en-plain-r1",
+        "case_id": "changed-recommendation-en",
+        "family": "changed-recommendation",
+        "locale": "en",
+        "arm": "plain",
+        "repeat": 1
+      },
+      {
+        "plan_index": 20,
+        "cell_id": "changed-recommendation-en-plain-r2",
+        "case_id": "changed-recommendation-en",
+        "family": "changed-recommendation",
+        "locale": "en",
+        "arm": "plain",
+        "repeat": 2
+      },
+      {
+        "plan_index": 21,
+        "cell_id": "changed-recommendation-en-plain-r3",
+        "case_id": "changed-recommendation-en",
+        "family": "changed-recommendation",
+        "locale": "en",
+        "arm": "plain",
+        "repeat": 3
+      },
+      {
+        "plan_index": 22,
+        "cell_id": "changed-recommendation-en-general-check-r1",
+        "case_id": "changed-recommendation-en",
+        "family": "changed-recommendation",
+        "locale": "en",
+        "arm": "general-check",
+        "repeat": 1
+      },
+      {
+        "plan_index": 23,
+        "cell_id": "changed-recommendation-en-general-check-r2",
+        "case_id": "changed-recommendation-en",
+        "family": "changed-recommendation",
+        "locale": "en",
+        "arm": "general-check",
+        "repeat": 2
+      },
+      {
+        "plan_index": 24,
+        "cell_id": "changed-recommendation-en-general-check-r3",
+        "case_id": "changed-recommendation-en",
+        "family": "changed-recommendation",
+        "locale": "en",
+        "arm": "general-check",
+        "repeat": 3
+      },
+      {
+        "plan_index": 25,
+        "cell_id": "changed-recommendation-en-native-opensocrates-r1",
+        "case_id": "changed-recommendation-en",
+        "family": "changed-recommendation",
+        "locale": "en",
+        "arm": "native-opensocrates",
+        "repeat": 1
+      },
+      {
+        "plan_index": 26,
+        "cell_id": "changed-recommendation-en-native-opensocrates-r2",
+        "case_id": "changed-recommendation-en",
+        "family": "changed-recommendation",
+        "locale": "en",
+        "arm": "native-opensocrates",
+        "repeat": 2
+      },
+      {
+        "plan_index": 27,
+        "cell_id": "changed-recommendation-en-native-opensocrates-r3",
+        "case_id": "changed-recommendation-en",
+        "family": "changed-recommendation",
+        "locale": "en",
+        "arm": "native-opensocrates",
+        "repeat": 3
+      },
+      {
+        "plan_index": 28,
+        "cell_id": "changed-recommendation-ko-plain-r1",
+        "case_id": "changed-recommendation-ko",
+        "family": "changed-recommendation",
+        "locale": "ko",
+        "arm": "plain",
+        "repeat": 1
+      },
+      {
+        "plan_index": 29,
+        "cell_id": "changed-recommendation-ko-plain-r2",
+        "case_id": "changed-recommendation-ko",
+        "family": "changed-recommendation",
+        "locale": "ko",
+        "arm": "plain",
+        "repeat": 2
+      },
+      {
+        "plan_index": 30,
+        "cell_id": "changed-recommendation-ko-plain-r3",
+        "case_id": "changed-recommendation-ko",
+        "family": "changed-recommendation",
+        "locale": "ko",
+        "arm": "plain",
+        "repeat": 3
+      },
+      {
+        "plan_index": 31,
+        "cell_id": "changed-recommendation-ko-general-check-r1",
+        "case_id": "changed-recommendation-ko",
+        "family": "changed-recommendation",
+        "locale": "ko",
+        "arm": "general-check",
+        "repeat": 1
+      },
+      {
+        "plan_index": 32,
+        "cell_id": "changed-recommendation-ko-general-check-r2",
+        "case_id": "changed-recommendation-ko",
+        "family": "changed-recommendation",
+        "locale": "ko",
+        "arm": "general-check",
+        "repeat": 2
+      },
+      {
+        "plan_index": 33,
+        "cell_id": "changed-recommendation-ko-general-check-r3",
+        "case_id": "changed-recommendation-ko",
+        "family": "changed-recommendation",
+        "locale": "ko",
+        "arm": "general-check",
+        "repeat": 3
+      },
+      {
+        "plan_index": 34,
+        "cell_id": "changed-recommendation-ko-native-opensocrates-r1",
+        "case_id": "changed-recommendation-ko",
+        "family": "changed-recommendation",
+        "locale": "ko",
+        "arm": "native-opensocrates",
+        "repeat": 1
+      },
+      {
+        "plan_index": 35,
+        "cell_id": "changed-recommendation-ko-native-opensocrates-r2",
+        "case_id": "changed-recommendation-ko",
+        "family": "changed-recommendation",
+        "locale": "ko",
+        "arm": "native-opensocrates",
+        "repeat": 2
+      },
+      {
+        "plan_index": 36,
+        "cell_id": "changed-recommendation-ko-native-opensocrates-r3",
+        "case_id": "changed-recommendation-ko",
+        "family": "changed-recommendation",
+        "locale": "ko",
+        "arm": "native-opensocrates",
+        "repeat": 3
+      },
+      {
+        "plan_index": 37,
+        "cell_id": "price-profit-en-plain-r1",
+        "case_id": "price-profit-en",
+        "family": "price-profit",
+        "locale": "en",
+        "arm": "plain",
+        "repeat": 1
+      },
+      {
+        "plan_index": 38,
+        "cell_id": "price-profit-en-plain-r2",
+        "case_id": "price-profit-en",
+        "family": "price-profit",
+        "locale": "en",
+        "arm": "plain",
+        "repeat": 2
+      },
+      {
+        "plan_index": 39,
+        "cell_id": "price-profit-en-plain-r3",
+        "case_id": "price-profit-en",
+        "family": "price-profit",
+        "locale": "en",
+        "arm": "plain",
+        "repeat": 3
+      },
+      {
+        "plan_index": 40,
+        "cell_id": "price-profit-en-general-check-r1",
+        "case_id": "price-profit-en",
+        "family": "price-profit",
+        "locale": "en",
+        "arm": "general-check",
+        "repeat": 1
+      },
+      {
+        "plan_index": 41,
+        "cell_id": "price-profit-en-general-check-r2",
+        "case_id": "price-profit-en",
+        "family": "price-profit",
+        "locale": "en",
+        "arm": "general-check",
+        "repeat": 2
+      },
+      {
+        "plan_index": 42,
+        "cell_id": "price-profit-en-general-check-r3",
+        "case_id": "price-profit-en",
+        "family": "price-profit",
+        "locale": "en",
+        "arm": "general-check",
+        "repeat": 3
+      },
+      {
+        "plan_index": 43,
+        "cell_id": "price-profit-en-native-opensocrates-r1",
+        "case_id": "price-profit-en",
+        "family": "price-profit",
+        "locale": "en",
+        "arm": "native-opensocrates",
+        "repeat": 1
+      },
+      {
+        "plan_index": 44,
+        "cell_id": "price-profit-en-native-opensocrates-r2",
+        "case_id": "price-profit-en",
+        "family": "price-profit",
+        "locale": "en",
+        "arm": "native-opensocrates",
+        "repeat": 2
+      },
+      {
+        "plan_index": 45,
+        "cell_id": "price-profit-en-native-opensocrates-r3",
+        "case_id": "price-profit-en",
+        "family": "price-profit",
+        "locale": "en",
+        "arm": "native-opensocrates",
+        "repeat": 3
+      },
+      {
+        "plan_index": 46,
+        "cell_id": "price-profit-ko-plain-r1",
+        "case_id": "price-profit-ko",
+        "family": "price-profit",
+        "locale": "ko",
+        "arm": "plain",
+        "repeat": 1
+      },
+      {
+        "plan_index": 47,
+        "cell_id": "price-profit-ko-plain-r2",
+        "case_id": "price-profit-ko",
+        "family": "price-profit",
+        "locale": "ko",
+        "arm": "plain",
+        "repeat": 2
+      },
+      {
+        "plan_index": 48,
+        "cell_id": "price-profit-ko-plain-r3",
+        "case_id": "price-profit-ko",
+        "family": "price-profit",
+        "locale": "ko",
+        "arm": "plain",
+        "repeat": 3
+      },
+      {
+        "plan_index": 49,
+        "cell_id": "price-profit-ko-general-check-r1",
+        "case_id": "price-profit-ko",
+        "family": "price-profit",
+        "locale": "ko",
+        "arm": "general-check",
+        "repeat": 1
+      },
+      {
+        "plan_index": 50,
+        "cell_id": "price-profit-ko-general-check-r2",
+        "case_id": "price-profit-ko",
+        "family": "price-profit",
+        "locale": "ko",
+        "arm": "general-check",
+        "repeat": 2
+      },
+      {
+        "plan_index": 51,
+        "cell_id": "price-profit-ko-general-check-r3",
+        "case_id": "price-profit-ko",
+        "family": "price-profit",
+        "locale": "ko",
+        "arm": "general-check",
+        "repeat": 3
+      },
+      {
+        "plan_index": 52,
+        "cell_id": "price-profit-ko-native-opensocrates-r1",
+        "case_id": "price-profit-ko",
+        "family": "price-profit",
+        "locale": "ko",
+        "arm": "native-opensocrates",
+        "repeat": 1
+      },
+      {
+        "plan_index": 53,
+        "cell_id": "price-profit-ko-native-opensocrates-r2",
+        "case_id": "price-profit-ko",
+        "family": "price-profit",
+        "locale": "ko",
+        "arm": "native-opensocrates",
+        "repeat": 2
+      },
+      {
+        "plan_index": 54,
+        "cell_id": "price-profit-ko-native-opensocrates-r3",
+        "case_id": "price-profit-ko",
+        "family": "price-profit",
+        "locale": "ko",
+        "arm": "native-opensocrates",
+        "repeat": 3
+      }
+    ],
+    "plan_index_meaning": "Stable enumeration only; not an execution order, random assignment or model seed.",
+    "order_owner": "S043",
+    "order_index": null,
+    "assignment_seed": null,
+    "order_unavailable_reason": "S043 must emit a complete 1..54 permutation and ordering seed, hashed before outcomes; do not treat the seed as model determinism.",
+    "repeats_are_not_retries": "r1, r2 and r3 are distinct preassigned cells. No favorable quality rerun, replacement, continuation or extra conversation turn is authorized.",
+    "authoring_sessions_are_experiment_controls": false,
+    "authoring_session_scope": "The 100 drafting chats are not actor trials, a plain arm, a judge sample or a model-speed comparison."
+  },
+  "execution_authority": {
+    "actor_owner": "S078",
+    "coordinator": "S001",
+    "assignment_owner": "S043",
+    "usage_summary_owner": "S045",
+    "s039_model_api_experiment_max": 0,
+    "s078_required_gate": [
+      "S001-selected frozen manifest with exact source SHA and all input hashes",
+      "verified isolation-preflight for each arm; no active credential or home copying",
+      "unexpired S078 lease in control/resource-leases.json for the actual shared host/model resource",
+      "one shared 54-cell assignment ledger with no prior or concurrent duplicate dispatch",
+      "all required pending decisions below resolved and included in the pre-outcome freeze"
+    ],
+    "scope": "This budget artifact grants no host, account, authentication, installation or execution approval.",
+    "other_model_calls_effective_max": 0,
+    "s076_separate_observations": {
+      "owner": "S076",
+      "launch_v1_native_recovery_max": 4,
+      "scope": "Separate finite recovery/mechanical observations only as allocated by S001; KO2/EN1 observations, if allocated, stay in the S076 ledger. They are not part of the 54 actor sample.",
+      "authority": "No S039 or S078 transfer, borrowing, replacement of actor cells, or expansion of S076 authorization. Exact S076 observation allocations remain owned by its assignment and resource lease."
+    },
+    "auxiliary_calls": "Model judges, rubric assistance, translations, summaries, warmups, repair, prompt optimization and diagnostics are model calls when actually dispatched; no hidden or unapproved auxiliary model calls.",
+    "per_session_budget": false,
+    "budget_increase": "Requires separate explicit user authorization and preregistration before any additional call. S001 may record existing authorization but cannot create a larger budget from this artifact. Publish a new study/round id, numeric caps and frozen inputs; retain the original 54-cell round and its failures."
+  },
+  "accounting": {
+    "actor_attempt_max_per_cell": 1,
+    "actor_retry_max": 0,
+    "infrastructure_retry_max": 0,
+    "replacement_max": 0,
+    "quality_rerun_max": 0,
+    "denominator_rule": "Count every dispatched or possibly dispatched actor attempt, including completed, failed, timed out and interrupted attempts. Preserve all 54 assigned cells and show NOT_RUN/BLOCKED separately.",
+    "dispatch_boundary": "Immediately before an actor invocation can reach the host/provider, S078 commits an attempt-start reservation to its single-writer ledger. Mark dispatch DISPATCHED once observed. A crash or lost receipt after this boundary is UNKNOWN and conservatively spends one attempt.",
+    "preparation_failure": "A proven pre-dispatch failure is BLOCKED or NOT_RUN with dispatch_state=NOT_DISPATCHED, counted_actor_attempt=false and actor_quota_consumed=0. It remains an assigned cell, has a safe failure category, and cannot be replaced with another case or arm.",
+    "preparation_recovery": "Local preflight repair before any possible dispatch is preparation, not a model retry. Preserve its events and duration. Never reclassify an ambiguous dispatch as preparation or automatically replay it.",
+    "interruption_mapping": "Use launch-v1 status FAILED with failure_reason=interrupted for a dispatched interruption; use TIMEOUT when the frozen deadline is exceeded. Do not add an incompatible cell status.",
+    "no_answer": "A spent attempt without a public final answer remains in attempted totals. Missing score or usage stays null with an explicit reason; absence is not success.",
+    "reservation_recovery": "After a crash, reconcile the durable ledger before dispatching anything. A possibly dispatched reservation is terminal FAILED or TIMEOUT, counted and never replayed. State transitions retain safe prior status events.",
+    "single_writer": "Only S078 dispatches actor invocations. Persist reservations and terminal updates atomically in its own ledger and resource lease. S043 assignments do not themselves dispatch or allocate a second quota.",
+    "study_totals": {
+      "assigned_count": 54,
+      "attempted_count": "sum(counted_actor_attempt=true); <=54, including STARTED and every terminal dispatched/unknown outcome",
+      "completed_count": "terminal COMPLETED count; not a quality-pass claim",
+      "failed_count": "terminal FAILED count including interrupted attempts",
+      "timeout_count": "terminal TIMEOUT count; never excluded",
+      "not_run_count": "NOT_RUN with no dispatch",
+      "blocked_count": "BLOCKED with proven no dispatch",
+      "coverage": "attempted_count / 54",
+      "attempted_pass_rate": "passes / all attempted cells, including failures, timeouts, interruptions and pending/unscored attempts; disclose those counts and lower/upper pass bounds rather than remove them",
+      "assigned_pass_fraction": "passes / 54, separately labeled if reported; do not silently substitute this for the launch-v1 attempted denominator",
+      "forbidden_denominator": "completed or successful answers only, excluding failures, timeouts, interruptions, missing usage or inconvenient outcomes",
+      "missing_score_bounds": "For attempted_count >0, lower=known_passes/attempted_count and upper=(known_passes+eligible_unresolved_scores)/attempted_count. Failed/time-out attempts without a passing final answer are known non-passes, not eligible unresolved scores. With no attempts, rates are null."
+    },
+    "backend_request_boundary": "54 limits actor invocations/responses, not an assertion that an opaque host made exactly 54 provider requests. Meter all exposed subrequests and full interaction usage. Any tool/model continuation policy and numeric subrequest caps must be frozen before calls. Unobservable backend requests remain null/unavailable; no claimed verification of a hidden cap.",
+    "stop_rule": "Pause new dispatch for quota exhaustion, input/isolation/identity drift, lost lease, unsafe retention, host failure or deadline. Emerging favorable/unfavorable quality is not an early-stop rule. Retain all attempted cells and unattempted assignments."
+  },
+  "pending_s078_decisions": [
+    {
+      "decision": "actor_timeout_seconds",
+      "value": null,
+      "state": "UNAPPROVED",
+      "owner": "S078",
+      "required_before_first_actor_call": true,
+      "reason": "Freeze the same per-cell deadline rule for all arms and the exact monotonic start/terminal boundaries; historical hook and experiment timeouts do not supply this value."
+    },
+    {
+      "decision": "max_concurrent_actor_invocations",
+      "value": null,
+      "state": "UNAPPROVED",
+      "owner": "S078",
+      "required_before_first_actor_call": true,
+      "reason": "Freeze the numeric limit and scheduling rule against the shared host lease; include overlap in total wall time rather than summing it as elapsed study time."
+    },
+    {
+      "decision": "study_execution_start_and_stop_utc",
+      "value": null,
+      "state": "UNAPPROVED",
+      "owner": "S078",
+      "required_before_first_actor_call": true,
+      "reason": "Choose an execution window inside the common deadline, including how to stop dispatch and account for already-running work. No per-session extension."
+    },
+    {
+      "decision": "actor_max_output_tokens_and_observable_usage_scope",
+      "value": null,
+      "state": "UNAPPROVED",
+      "owner": "S078",
+      "required_before_first_actor_call": true,
+      "reason": "Freeze numeric request limits where supported, host/tool continuation allowances and how unavailable controls or usage are disclosed."
+    },
+    {
+      "decision": "provider_subrequest_and_tool_roundtrip_caps",
+      "value": null,
+      "state": "UNAPPROVED",
+      "owner": "S078",
+      "required_before_first_actor_call": true,
+      "reason": "Freeze finite numeric caps for observable provider requests/tool continuations or explicitly declare enforcement unavailable before deciding whether execution can proceed within authorization. No auxiliary authored turns or unlimited continuation."
+    },
+    {
+      "decision": "aggregate_token_or_cost_stop_cap",
+      "value": null,
+      "state": "UNAPPROVED",
+      "owner": "S078",
+      "required_before_first_actor_call": true,
+      "reason": "Decide numeric additional stop caps or explicitly no extra approved cap. Prices and backend billing remain unknown unless actually provided; never estimate authorization from a price guess."
+    },
+    {
+      "decision": "judge_calls_and_per_output_judge_cap",
+      "value": null,
+      "state": "UNAPPROVED",
+      "owner": "S078",
+      "required_before_first_actor_call": true,
+      "reason": "Current effective judge cap is zero. Any nonzero numeric total, per-cell repetitions, retry/failure/timeout policy and independent-family allocation require separate explicit user authorization recorded by S001 and pre-outcome freeze; zero with unavailable judges is valid."
+    },
+    {
+      "decision": "judge_timeout_concurrency_and_tokens",
+      "value": null,
+      "state": "UNAPPROVED",
+      "owner": "S078",
+      "required_before_first_actor_call": true,
+      "reason": "If judges remain unapproved, set NOT_APPLICABLE with reason. Otherwise freeze numeric timeout, concurrency, token/subrequest caps and single shared judge ledger before any judge call."
+    },
+    {
+      "decision": "retry_failure_interruption_acknowledgment",
+      "value": null,
+      "state": "UNAPPROVED",
+      "owner": "S078",
+      "required_before_first_actor_call": true,
+      "reason": "Confirm actor retry/replacement/infrastructure retry caps remain zero; planned repeats are fixed. Decide safe interruption categories and pre-dispatch recovery-stop rules without excluding outcomes."
+    },
+    {
+      "decision": "edit_burden_observer_and_retention_limits",
+      "value": null,
+      "state": "UNAPPROVED",
+      "owner": "S078",
+      "required_before_first_actor_call": true,
+      "reason": "Decide whether an authorized observer exists, its measurement window, deterministic public-output diff rules, numeric retention duration and removal owner. Without an observer, burden is null/unavailable, not zero."
+    },
+    {
+      "decision": "protocol_and_assignment_consistency",
+      "value": null,
+      "state": "UNAPPROVED",
+      "owner": "S078",
+      "required_before_first_actor_call": true,
+      "reason": "Reconcile S031 protocol, S043 assignment ledger, S045 usage schema and this budget using launch v1. Freeze exact hashes and record any narrow adapters; do not edit sibling files."
+    }
+  ],
+  "freeze": {
+    "state": "DRAFT",
+    "source_sha": null,
+    "input_files": [],
+    "isolation_state": "UNVERIFIED",
+    "quota": 54,
+    "frozen_at": null,
+    "approved_by": null,
+    "owner": "S001",
+    "protocol_owner": "S031",
+    "reason": "Authoring complete does not freeze the experiment. Dependencies and S078 decisions must be reconciled before the first actor call.",
+    "required_input_hashes": [
+      "evals/swarm-20261015/PROTOCOL.md",
+      "evals/swarm-20261015/BUDGET.json",
+      "all synthetic case and arm instruction files",
+      "rubric and scoring policy",
+      "assignment-ledger.json",
+      "isolation-preflight.json",
+      "S078 decision register and execution/collection limits"
+    ],
+    "post_outcome_change": "Do not modify caps, thresholds, input text, scoring or exclusion rules after outcomes. A safety stop preserves every reservation and outcome. Repairs require a separately authorized frozen follow-up, never selective replay.",
+    "program_deadline_utc": "2026-10-15T07:16:58.780728+00:00",
+    "program_deadline_source": "control/run.json as observed at authoring; S001 owns any coordinated deadline state",
+    "deadline_behavior": "Stop accepting new work/calls at the common deadline; preserve safe partial results and report PARTIAL/BLOCKED when required evidence is missing. S078 must choose an earlier dispatch stop to bound in-flight timeout and cleanup."
+  },
+  "shared_ledger": {
+    "assignment_artifact": "assignment-ledger.json",
+    "result_artifact": "safe-results.jsonl",
+    "summary_artifact": "usage-summary.json",
+    "schema_kind": "field definitions and null template; not observed records",
+    "actor_writer": "S078",
+    "assignment_writer": "S043",
+    "safe_result_boundary": "S044",
+    "aggregate_reader": "S045",
+    "join_key": "cell_id; immutable launch-v1 family-locale-arm-r1..r3",
+    "identity_fields": [
+      "repository",
+      "source_sha",
+      "product_version",
+      "content_revision",
+      "host",
+      "platform",
+      "model_requested",
+      "model_observed",
+      "effort",
+      "service_tier_requested",
+      "service_tier_observed"
+    ],
+    "identity_missing_rule": "Each unknown identity value is null plus identity_unknown_reasons[field]. Requested/configured identity is not an observed backend identity.",
+    "required_fields": {
+      "study_id": {
+        "type": "string",
+        "meaning": "Frozen round identifier; no quota partition by chat."
+      },
+      "budget_sha256": {
+        "type": "string",
+        "meaning": "Hash of this budget in the S001-selected pre-outcome freeze."
+      },
+      "protocol_sha256": {
+        "type": "string",
+        "meaning": "Hash of S031 protocol in that freeze."
+      },
+      "freeze_manifest_sha256": {
+        "type": "string",
+        "meaning": "Exact external freeze-manifest bytes; not a self-referential manifest hash."
+      },
+      "assignment_ledger_sha256": {
+        "type": "string",
+        "meaning": "Immutable pre-outcome 54-cell assignment and order."
+      },
+      "cell_id": {
+        "type": "string",
+        "meaning": "Unique immutable assigned cell; one actor attempt maximum."
+      },
+      "case_id": {
+        "type": "string",
+        "meaning": "Launch-v1 family-locale id."
+      },
+      "family": {
+        "type": "enum",
+        "meaning": "email-agreement|changed-recommendation|price-profit"
+      },
+      "locale": {
+        "type": "enum",
+        "meaning": "en|ko"
+      },
+      "arm": {
+        "type": "enum",
+        "meaning": "plain|general-check|native-opensocrates"
+      },
+      "repeat": {
+        "type": "integer",
+        "meaning": "One of 1,2,3; planned repeat, not retry."
+      },
+      "order_index": {
+        "type": "integer",
+        "meaning": "Unique S043-frozen index in 1..54."
+      },
+      "assignment_seed": {
+        "type": "string|integer",
+        "meaning": "Ordering seed only, not backend determinism."
+      },
+      "attempt_id": {
+        "type": "string|null",
+        "meaning": "Locally generated synthetic actor id; never a private provider/session identifier.",
+        "missing": "No dispatch reservation."
+      },
+      "attempt_index": {
+        "type": "integer|null",
+        "meaning": "1 when reserved for dispatch; never 2 or higher.",
+        "missing": "No actor attempt."
+      },
+      "call_role": {
+        "type": "enum",
+        "meaning": "actor; judge/recovery/diagnostic use separate approved ledgers and caps."
+      },
+      "execution_owner": {
+        "type": "string",
+        "meaning": "S078 for every actor row."
+      },
+      "status": {
+        "type": "enum",
+        "meaning": "NOT_RUN|STARTED|COMPLETED|FAILED|TIMEOUT|BLOCKED"
+      },
+      "dispatch_state": {
+        "type": "enum",
+        "meaning": "NOT_DISPATCHED|DISPATCHED|UNKNOWN"
+      },
+      "counted_actor_attempt": {
+        "type": "boolean",
+        "meaning": "True for dispatch or possible dispatch; includes missing answers and failures."
+      },
+      "actor_quota_consumed": {
+        "type": "integer",
+        "meaning": "0 for proven no dispatch; 1 for dispatch or possible dispatch."
+      },
+      "failure_reason": {
+        "type": "safe category|null",
+        "meaning": "preflight_unavailable|isolation_unverified|resource_unavailable|host_error|timeout|interrupted|dispatch_uncertain|answer_unavailable|budget_exhausted|other_safe_category; no raw logs.",
+        "missing": "No failure category applicable."
+      },
+      "reserved_at": {
+        "type": "UTC timestamp|null",
+        "meaning": "Durable dispatch reservation time.",
+        "missing": "Not reserved."
+      },
+      "started_at": {
+        "type": "UTC timestamp|null",
+        "meaning": "Observed start of the actor invocation immediately before possible dispatch.",
+        "missing": "Start not observed."
+      },
+      "ended_at": {
+        "type": "UTC timestamp|null",
+        "meaning": "Observed public terminal answer/failure, timeout or interruption boundary.",
+        "missing": "Not observed or still in flight."
+      },
+      "elapsed_ms": {
+        "type": "nonnegative number|null",
+        "meaning": "Monotonic whole actor interaction duration; includes tool/runtime overhead.",
+        "missing": "Duration not observed; never substitute the configured timeout."
+      },
+      "input_tokens": {
+        "type": "nonnegative integer|null",
+        "meaning": "Observed input tokens for declared usage_scope; cached inclusion semantics separately declared.",
+        "missing": "Provider/host did not provide comparable input usage."
+      },
+      "cached_input_tokens": {
+        "type": "nonnegative integer|null",
+        "meaning": "Observed cache-read/input-hit count; never assume it is additive to input_tokens.",
+        "missing": "Cache count unavailable; not zero."
+      },
+      "cache_creation_input_tokens": {
+        "type": "nonnegative integer|null",
+        "meaning": "Observed cache-write/creation count where separately reported.",
+        "missing": "Cache creation usage unavailable; not zero."
+      },
+      "output_tokens": {
+        "type": "nonnegative integer|null",
+        "meaning": "Observed provider/host output usage, not inferred from visible string length.",
+        "missing": "Output usage unavailable."
+      },
+      "total_tokens": {
+        "type": "nonnegative integer|null",
+        "meaning": "Observed provider/host total under explicit accounting semantics.",
+        "missing": "Total unavailable; do not invent input+output as provider total."
+      },
+      "usage_scope": {
+        "type": "enum|null",
+        "meaning": "whole_actor_interaction|partial_interaction; declare which subrequests are covered.",
+        "missing": "Scope unavailable; no full-usage claim."
+      },
+      "usage_source": {
+        "type": "safe label|null",
+        "meaning": "Documented host/provider meter field; never store raw events.",
+        "missing": "Meter unavailable."
+      },
+      "cache_accounting": {
+        "type": "enum",
+        "meaning": "included_in_input|additional_to_input|provider_specific|unknown"
+      },
+      "provider_subrequest_count": {
+        "type": "nonnegative integer|null",
+        "meaning": "Actually exposed requests within this actor interaction.",
+        "missing": "Opaque host/backend; not assumed to be 1."
+      },
+      "cost_amount": {
+        "type": "nonnegative number|null",
+        "meaning": "Actually reported attributable cost only, with currency and scope.",
+        "missing": "Cost unavailable; no guessed pricing."
+      },
+      "cost_currency": {
+        "type": "string|null",
+        "meaning": "Observed currency for cost_amount.",
+        "missing": "Currency unavailable."
+      },
+      "identity": {
+        "type": "object",
+        "meaning": "All source_identity keys; unknown values null with explicit reasons."
+      },
+      "identity_unknown_reasons": {
+        "type": "object",
+        "meaning": "Safe per-field reason for missing observed identities."
+      },
+      "measurement_unknown_reasons": {
+        "type": "object",
+        "meaning": "Safe per-field reasons for null time, usage, cost, burden and backend counts."
+      },
+      "public_final_answer": {
+        "type": "string|null",
+        "meaning": "Only the public final answer to a newly authored public synthetic case. No raw host transcript.",
+        "missing": "No safe final answer available."
+      },
+      "public_final_answer_sha256": {
+        "type": "string|null",
+        "meaning": "Digest of exact retained public final answer bytes.",
+        "missing": "No retained answer."
+      },
+      "entry_emitted": {
+        "type": "boolean|null",
+        "meaning": "Actual supported entry observation only; installation does not imply it.",
+        "missing": "Entry unobserved."
+      },
+      "canonical_full_read": {
+        "type": "boolean|null",
+        "meaning": "Supported complete-read observation; never inferred from discovery or footer.",
+        "missing": "Complete read unobserved."
+      },
+      "application_evidence": {
+        "type": "string",
+        "meaning": "unverified unless actual supported public evidence; do not fabricate native receipts."
+      },
+      "task_complete": {
+        "type": "boolean|null",
+        "meaning": "Public rubric outcome, separate from host COMPLETED status.",
+        "missing": "Not scored or outcome unavailable."
+      },
+      "critical_error_labels": {
+        "type": "array",
+        "meaning": "Predeclared public rubric labels only; empty does not imply an unscored result passed."
+      },
+      "edit_burden": {
+        "type": "object",
+        "meaning": "Separate observer metrics on synthetic public artifacts; never replace the scored original answer."
+      }
+    },
+    "v1_adapter": "Preserve all launch-v1 result fields. Extra accounting fields may be a sidecar keyed by cell_id if S044 uses a closed result schema; do not weaken its sanitizer or force it to accept fields.",
+    "no_observations_in_this_file": true
+  },
+  "time_definitions": {
+    "timestamp_clock": "UTC wall-clock timestamps locate events; do not subtract wall clocks when an observed monotonic timer exists.",
+    "elapsed_ms": "1000 x (monotonic terminal boundary - monotonic actor invocation start). Includes all observed host/tool/provider overhead for that single-turn interaction; excludes pre-dispatch queue and preparation.",
+    "queue_wait_ms": "Dispatch start minus queued time, separately observed; null if unavailable.",
+    "preparation_elapsed_ms": "Observed local setup/preflight duration before any possible actor dispatch; separate from actor elapsed.",
+    "cleanup_elapsed_ms": "Observed time after terminal collection to bounded cleanup, separately measured; do not fold it silently into latency.",
+    "study_wall_elapsed_ms": "Observed monotonic interval from first actor attempt start to last terminal boundary; includes overlap once, not sum of concurrent cell durations.",
+    "sum_actor_elapsed_ms": "Sum of observed cell elapsed values with observed/missing counts; not study wall time.",
+    "timeout_rule": "Record actual observed duration and timeout category. If the timer result is unavailable, elapsed_ms is null even when a timeout limit is known.",
+    "cancellation_rule": "Count any dispatched/uncertain interrupted attempt and its observed duration; do not replace it.",
+    "aggregation": "Report per-arm/family/locale counts and observed duration sum/min/median/max with sample counts; use nearest-rank p95 only with its n disclosed. Never treat missing duration as zero or claim a speed advantage from Fast configuration.",
+    "hook_latency_boundary": "Do not combine synthetic hook-process p95 from measure_codex_hook_timing.py with actor latency or interpret it as answer quality."
+  },
+  "token_definitions": {
+    "measurement_scope": "Entire single-turn actor interaction, including exposed tool-followup/provider subrequests and required output. If only part is exposed, label partial_interaction with missing scope rather than claim a total.",
+    "input": "Observed meter input tokens; whether cache-read/write counts are included must be explicit.",
+    "cache": "Keep cache-read and cache-creation counts separate; never add a cached-input subset twice.",
+    "output": "Observed meter output usage; public character/word counts are separate text-size metrics, not tokens.",
+    "total": "Retain actually reported total_tokens. A derived input-plus-output quantity, if useful, has its own derived label and requires known compatible scopes and cache semantics; it never replaces a missing observed total.",
+    "missing_usage": "null plus explicit reason and coverage count, including for failed or timed-out attempts. No tokenizer guesses, zero filling, provider reconstruction or outcome-dependent exclusions.",
+    "aggregation": "For every metric publish known_sum, observed_cell_count, missing_cell_count and partial_scope_count across all attempted cells, including failures/timeouts. all_cells_total is null unless every attempted cell has comparable complete usage. Keep role and provider-accounting strata separate.",
+    "cross_model_comparison": "Do not equate token counts across unverified tokenizers/backends; unknown backend identity remains unknown.",
+    "billing": "No price, availability, exact backend or monetary amount is inferred from requested model, effort, configuration or an historical protocol."
+  },
+  "edit_burden_definitions": {
+    "scope": "Optional observed post-answer editing of public synthetic output only. The original scored answer is immutable and receives no favorable replacement.",
+    "observer_state": "unavailable until S078 predeclares an authorized observer; missing observation is not zero burden",
+    "active_edit_ms": null,
+    "revision_count": null,
+    "original_unicode_scalars": null,
+    "final_unicode_scalars": null,
+    "unicode_scalar_edit_distance": null,
+    "null_reason": "No experiment or edit observation performed by S039.",
+    "active_edit_ms_definition": "Sum observed intervals during active editing; exclude waiting/model execution, avoid double-counting overlapping intervals and disclose observer/timing method.",
+    "revision_count_definition": "Number of observed saved post-answer public revisions; do not infer keystrokes or subjective effort.",
+    "distance_definition": "If enabled before outcomes: Levenshtein insert/delete/substitute distance over Unicode scalars of exact public original/final text, with unit costs and no normalization. Missing original/final or measurement gives null.",
+    "burden_ratio_definition": "Optional distance/original_unicode_scalars only when denominator >0 and both metrics observed; otherwise null. It measures text change, not correctness or human difficulty.",
+    "comparison_limits": "Report by locale; whitespace word-like or Korean eojeol-like counts and Unicode size are descriptive only. Do not truncate required output to improve burden or length metrics.",
+    "authoring_cost": "Time/tokens spent creating the 100 chats, protocol, fixtures or this file stay outside actor metrics. If observed for operations, label separate authoring/preparation totals.",
+    "no_new_model_calls": "Burden measurement authorizes no model revision, judge, translation or repair calls."
+  },
+  "evidence_and_identity": {
+    "native_vs_manual": "native-opensocrates requires actual approved installed-native isolation/delivery conditions. Manual canonical content injection is a separate transformed condition and cannot be relabeled native or substituted for an unavailable native arm.",
+    "native_unavailable": "Record BLOCKED/NOT_RUN for a proven pre-dispatch native blocker; otherwise retain dispatched failure/timeout. Do not create an unplanned fourth arm or borrow its quota.",
+    "installation_delivery_application_usefulness": "Record installation state, emitted entry, complete read, application evidence and public task outcome separately. None proves the next; no native application receipt is fabricated.",
+    "independent_judge_state": "unknown/unavailable until an actually authorized independent reviewer is observed; self-review and another drafting chat are not independent human judgment.",
+    "backend_model_observed": null,
+    "backend_model_unknown_reason": "No experiment run; requested host/model name does not prove backend identity.",
+    "service_tier_requested": "priority",
+    "service_tier_observed": null,
+    "service_tier_unknown_reason": "Fast/priority configuration is a requested setting, not observed server routing or a verified experimental speed condition.",
+    "availability_or_price": "unknown; no current availability, backend identity or pricing attestation is made"
+  },
+  "retention_contract": {
+    "allowed": [
+      "newly authored public synthetic case inputs and arm instructions",
+      "public final answers to those synthetic cases under the frozen limited retention window",
+      "exact source/input/answer hashes",
+      "synthetic cell ids, statuses, safe error categories and actual command exit codes",
+      "observed aggregate timing/token/cost/edit metrics and public rubric labels"
+    ],
+    "forbidden": [
+      "raw private user prompts or conversations",
+      "raw host logs or event streams",
+      "screenshots",
+      "credentials, tokens, account ids, provider/session identifiers or authentication configuration",
+      "copied active authentication or user home data",
+      "hidden reasoning or chain of thought",
+      "unrelated workspace content"
+    ],
+    "collection_boundary": "Collect allowed fields directly or sanitize in memory; do not retain raw logs first and promise later deletion. Store safe error categories rather than raw exception text.",
+    "public_answer_boundary": "An unsafe or private final answer is withheld with answer_unavailable and safe reason; keep the attempt and observed safe usage in totals. Do not retain disallowed content merely because the host displayed it.",
+    "retention_duration_days": null,
+    "retention_owner": null,
+    "retention_pending_reason": "S078/S001 must fix a finite answer-retention window and deletion owner before outcome collection; fixture preregistration is not consent to capture user work.",
+    "host_policy": "This study contract does not assert or alter the host/provider conversation-retention policy."
+  },
+  "handoff": {
+    "completion_dependency": "S031",
+    "dependency_state_at_authoring": "S031 READY_FOR_INTEGRATION protocol at exact commit 2da5c246062679db5502115651aa842cc3f344a7 was read. Its 54-cell counts, no-retry/ambiguous-dispatch treatment, null usage, native/manual boundary and DRAFT freeze semantics are incorporated; central integration and freeze remain pending.",
+    "S031": "Reconcile only launch-v1-compatible caps, states, privacy and freeze dependencies; S039 does not own PROTOCOL.md.",
+    "S043": "Use all plan_cells exactly once, add unique order_index and assignment_seed before freeze, and preserve one shared actor quota.",
+    "S045": "Use per-field known/missing coverage and full/partial scope; no cache double-counting, zero-filled missing usage, guessed cost or sum-as-wall-time.",
+    "S078": "Resolve pending decisions, confirm S001 freeze/isolation/resource lease and dispatch the only actor run; no actor or judge calls were performed by S039.",
+    "S091": "Integrate only the owned BUDGET.json commit/patch; source-level validation is deferred to the exact integrated frozen candidate.",
+    "verification_state": "NOT_RUN; authoring only. No tests, lint, type checks, builds, browser QA, code/security review or experiment executed.",
+    "dependency_source_sha": "2da5c246062679db5502115651aa842cc3f344a7"
+  }
+}

@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "family": "price-profit",
+  "fixture_state": "DRAFT",
+  "evidence_level": "authored synthetic fixture; no actor calls, validation results, or efficacy findings",
+  "source_identity": {
+    "repository": "https://github.com/ParkerHwang/OpenSocrates",
+    "source_sha": "227a528996d93c423851db1d663f9572be534e59",
+    "product_version": "1.5.2",
+    "content_revision": 5,
+    "host": null,
+    "platform": null,
+    "model_requested": null,
+    "model_observed": null,
+    "effort": null,
+    "service_tier_requested": "priority",
+    "service_tier_observed": null,
+    "unknown_reasons": {
+      "host": "Actor host is selected by the central protocol; this authoring session runs no actor.",
+      "platform": "Actor environment has not been frozen or observed.",
+      "model_requested": "No actor request has been made by this session.",
+      "model_observed": "No backend model identity has been observed.",
+      "effort": "No actor request effort has been selected here.",
+      "service_tier_observed": "Requested priority is not evidence of server processing tier."
+    }
+  },
+  "provenance": {
+    "author_session": "S034",
+    "interface": "control/interfaces-v1.json",
+    "protocol_path": "evals/swarm-20261015/PROTOCOL.md",
+    "protocol_owner": "S031",
+    "protocol_dependency_state": "pending central integration and pre-outcome freeze; launch v1 is the authoring baseline",
+    "related_issue": "https://github.com/ParkerHwang/OpenSocrates/issues/114",
+    "new_synthetic_facts": true,
+    "historical_boundary": "Issue #114 is a historical arithmetic counterexample from manually supplied content. It is not a native activation observation or a current efficacy result. This fixture uses different quantities and does not reuse its actor answers.",
+    "reference_paths": [
+      "evals/v1.5-macos/REPORT.md",
+      "evals/v1.3/release-guided-20260908/PROTOCOL.md",
+      "evals/v1.5-macos/fixtures/cases.json",
+      "docs/v1.5.2.md"
+    ]
+  },
+  "actor_projection": {
+    "case_selector": "Select exactly one cases entry by case_id.",
+    "task_field": "public_synthetic_input",
+    "allowed_task_payload": "The selected public_synthetic_input string only. Supply any frozen arm treatment separately according to S031's protocol.",
+    "excluded_from_actor": [
+      "author_key",
+      "required_outcome",
+      "critical_errors",
+      "source_identity",
+      "provenance",
+      "execution_contract",
+      "all sibling case entries"
+    ],
+    "isolation_requirement": "Prepare the task string outside the actor workspace. The actor must not have read access to this full fixture file, the author key, rubric, other cases, or prior answers. Do not pass or mount the repository containing this file into an actor context.",
+    "fail_closed_for_evaluation": "If task-only projection or answer-key isolation cannot be established before calls, report the relevant cells BLOCKED; do not claim a blinded or uncontaminated run.",
+    "key_visibility_boundary": "The key is public authored evaluation material withheld from actors. Its presence in a separate JSON member is not itself an access-control or isolation guarantee.",
+    "method_cue_policy": "Task text names no OpenSocrates method, private command or package path."
+  },
+  "execution_contract": {
+    "state": "NOT_RUN",
+    "this_session_actor_budget": 0,
+    "central_actor_owner": "S078",
+    "conditions": [
+      "plain",
+      "general-check",
+      "native-opensocrates"
+    ],
+    "planned_repeats_per_case_condition": 3,
+    "family_planned_actor_responses": 18,
+    "overall_planned_actor_responses": 54,
+    "overall_budget_basis": "3 task families x 2 locales x 3 conditions x 3 repeats; one response per assigned cell.",
+    "precondition": "S001 publishes the exact integrated candidate, input hashes, frozen protocol, assignment ledger, approved finite budget and verified isolation before any actor call.",
+    "attempt_accounting": "No favorable reruns or unbudgeted infrastructure retries. Keep FAILED, TIMEOUT and interruptions in the assigned attempt accounting; report NOT_RUN and BLOCKED explicitly.",
+    "installation_boundary": "Native installed delivery and manual canonical-content injection are distinct conditions. Manual injection cannot silently replace a native condition.",
+    "observation_boundary": "Entry emission, complete canonical read, application evidence and usefulness are separate. Do not fabricate native application receipts.",
+    "judge_boundary": "Independent evaluator absence remains unavailable; self-review is not independent judgment. Backend model identity and unobserved service tier remain null with reasons.",
+    "safe_retention": "Retain only authored public synthetic inputs/keys, public synthetic final answers, hashes, statuses, exact commands/exit codes and actually observed time/usage. Never retain raw host logs, private prompts/transcripts, credentials, screenshots, hidden reasoning or unrelated workspace content."
+  },
+  "cases": [
+    {
+      "case_id": "price-profit-en",
+      "family": "price-profit",
+      "locale": "en",
+      "public_synthetic_input": "A fictional workshop sells one product. All amounts are invented credits, not real currency. Compare one month with one month.\n\nLast month:\n- Selling price: 84 credits per unit.\n- Variable cost: 49 credits per unit.\n- Fixed cost: 26,250 credits per month.\n- Units sold: 1,500.\n\nProposed next month:\n- Selling price falls to 70 credits per unit.\n- Variable cost remains 49 credits per unit.\n- Fixed cost remains 26,250 credits per month.\n\nFor every quantity considered, variable cost per unit and monthly fixed cost stay as stated. Units must be whole numbers. Every unit produced is sold within that month; there are no other costs, taxes, discounts, returns or inventory changes in this exercise. These are cost assumptions, not evidence about demand. No demand observations or success-rate data are provided.\n\nA colleague says: \"If next month's revenue matches last month's revenue, next month's profit will match last month's profit.\"\n\nWrite a short calculation memo in English using only the supplied facts. Label amounts as credits per unit, credits per month, or units per month as appropriate. Show brief equations with final numbers:\n1. Calculate last month's revenue and profit, distinguishing them.\n2. Calculate profit at the new price if sales stay at 1,500 units.\n3. Find the minimum whole-unit monthly sales at the new price for profit to be at least zero.\n4. Separately find the minimum whole-unit monthly sales at the new price to keep at least last month's profit.\n5. Separately find the minimum whole-unit monthly sales at the new price for profit to be at least 40,000 credits per month. Show why rounding to a whole unit does not fall below the target.\n6. Evaluate the colleague's claim by calculating the quantity that restores last month's revenue and the profit at that quantity. Explain whether these cost figures alone show that any required sales quantity will actually be reached, and identify one kind of missing demand evidence.\n\nThis is a calculation memo only. Do not change a price, contact anyone, browse, or invent demand or a numeric success probability.",
+      "required_outcome": "A complete English memo with separately labelled revenue, profit, same-volume new profit, break-even sales, baseline-profit-maintenance sales, target-profit sales, a calculation addressing the revenue claim, and an explicit demand-evidence limit. Brief public equations and units suffice; no private reasoning is requested.",
+      "critical_errors": [
+        "REVENUE_AS_PROFIT",
+        "INVALID_PROFIT_EQUATION",
+        "WRONG_BASELINE_PROFIT",
+        "WRONG_SAME_VOLUME_PROFIT",
+        "WRONG_BREAK_EVEN_QUANTITY",
+        "WRONG_MAINTAIN_PROFIT_QUANTITY",
+        "WRONG_TARGET_PROFIT_QUANTITY",
+        "WRONG_REVENUE_RESTORATION",
+        "UNSUPPORTED_DEMAND_OR_SUCCESS_CLAIM",
+        "MATERIAL_INPUT_OR_UNIT_DRIFT"
+      ]
+    },
+    {
+      "case_id": "price-profit-ko",
+      "family": "price-profit",
+      "locale": "ko",
+      "public_synthetic_input": "가상의 공방에서 한 가지 제품을 판매합니다. 모든 금액은 실제 통화가 아닌 가상의 크레딧입니다. 한 달을 같은 한 달 기준으로 비교하세요.\n\n지난달:\n- 판매 가격: 개당 84크레딧.\n- 단위 변동비: 개당 49크레딧.\n- 고정비: 월 26,250크레딧.\n- 판매량: 1,500개.\n\n다음 달 변경안:\n- 판매 가격을 개당 70크레딧으로 내립니다.\n- 단위 변동비는 개당 49크레딧으로 유지합니다.\n- 고정비는 월 26,250크레딧으로 유지합니다.\n\n고려하는 모든 판매량에서 단위 변동비와 월 고정비는 위 값으로 일정합니다. 제품 수량은 정수여야 합니다. 생산한 제품은 모두 그달에 판매되며, 이 과제에는 다른 비용·세금·할인·반품·재고 변동이 없습니다. 이는 비용에 관한 가정이며 수요의 근거가 아닙니다. 수요 관찰 자료나 성공률 자료는 제공되지 않았습니다.\n\n동료는 \"다음 달 매출이 지난달 매출과 같아지면 다음 달 이익도 지난달 이익과 같아진다\"라고 말합니다.\n\n제공된 사실만으로 짧은 계산 메모를 한국어로 작성하세요. 금액과 수량에는 필요에 따라 개당 크레딧, 월 크레딧, 월 판매 개수를 표시하세요. 짧은 식과 최종 수치를 보여 주세요.\n1. 지난달 매출과 이익을 구분하여 계산하세요.\n2. 새 가격에서 판매량이 1,500개로 유지될 때 이익을 계산하세요.\n3. 새 가격에서 이익이 0 이상이 되는 최소 월 판매량을 정수로 구하세요.\n4. 별도로, 새 가격에서 지난달 이익 이상을 유지하는 최소 월 판매량을 정수로 구하세요.\n5. 별도로, 새 가격에서 월 이익이 40,000크레딧 이상이 되는 최소 월 판매량을 정수로 구하세요. 수량을 정수로 처리해도 목표에 미달하지 않는 이유를 보여 주세요.\n6. 지난달 매출을 회복하는 판매량과 그때의 이익을 계산하여 동료의 주장을 평가하세요. 이 비용 자료만으로 필요한 판매량이 실제 달성된다고 말할 수 있는지 설명하고, 빠진 수요 근거의 종류를 하나 제시하세요.\n\n계산 메모만 작성하세요. 가격을 실제로 바꾸거나 누구에게 연락하거나 웹을 탐색하지 마세요. 수요나 수치형 성공 확률을 만들어 내지 마세요.",
+      "required_outcome": "매출·이익·동일 판매량의 새 이익·손익분기 판매량·기존 이익 유지 판매량·별도 목표 이익 판매량을 구분하고, 매출 관련 주장을 계산으로 평가하며 수요 근거의 한계를 명시한 완전한 한국어 메모. 짧은 공개 계산식과 단위면 충분하며 비공개 추론은 요청하지 않는다.",
+      "critical_errors": [
+        "REVENUE_AS_PROFIT",
+        "INVALID_PROFIT_EQUATION",
+        "WRONG_BASELINE_PROFIT",
+        "WRONG_SAME_VOLUME_PROFIT",
+        "WRONG_BREAK_EVEN_QUANTITY",
+        "WRONG_MAINTAIN_PROFIT_QUANTITY",
+        "WRONG_TARGET_PROFIT_QUANTITY",
+        "WRONG_REVENUE_RESTORATION",
+        "UNSUPPORTED_DEMAND_OR_SUCCESS_CLAIM",
+        "MATERIAL_INPUT_OR_UNIT_DRIFT"
+      ]
+    }
+  ],
+  "author_key": {
+    "exposure": "AUTHOR_OR_JUDGE_ONLY; never include in actor task payload or an actor-readable workspace",
+    "nature": "Authored arithmetic reference and public scoring rules; not a generated actor answer, hidden model reasoning, or observed validation result.",
+    "symbols": {
+      "p": "selling price in credits/unit",
+      "v": "variable cost in credits/unit",
+      "F": "fixed cost in credits/month",
+      "q": "whole units sold/month",
+      "T": "profit target in credits/month"
+    },
+    "equations": {
+      "revenue": "R(q) = p * q",
+      "variable_cost": "V(q) = v * q",
+      "contribution_per_unit": "c = p - v",
+      "contribution_total": "C(q) = (p - v) * q",
+      "profit": "P(q) = R(q) - V(q) - F = (p - v) * q - F",
+      "minimum_whole_quantity": "q_min(T) = ceil((F + T) / (p - v)), because the new contribution per unit is positive and q is a nonnegative integer",
+      "domain": "Use T=0 for break-even, T=last month's profit for profit maintenance, and T=40,000 for the separate target. These are three different questions, not interchangeable names.",
+      "boundary_rule": "For each requested minimum, P(q_min) >= T and P(q_min - 1) < T. Exact equality qualifies because the request says at least.",
+      "en": "Fixed cost is subtracted once per month after total contribution. Price is revenue per unit; contribution per unit is not total profit.",
+      "ko": "월 고정비는 전체 기여이익에서 한 번 뺀다. 가격은 단위 매출이고, 단위 기여이익은 전체 이익이 아니다."
+    },
+    "expected_numeric_facts": {
+      "old_price_credits_per_unit": 84,
+      "new_price_credits_per_unit": 70,
+      "variable_cost_credits_per_unit": 49,
+      "fixed_cost_credits_per_month": 26250,
+      "baseline_units_per_month": 1500,
+      "old_contribution_credits_per_unit": 35,
+      "new_contribution_credits_per_unit": 21,
+      "old_revenue_credits_per_month": 126000,
+      "old_variable_cost_credits_per_month": 73500,
+      "old_total_contribution_credits_per_month": 52500,
+      "old_profit_credits_per_month": 26250,
+      "new_same_volume_revenue_credits_per_month": 105000,
+      "new_same_volume_variable_cost_credits_per_month": 73500,
+      "new_same_volume_total_contribution_credits_per_month": 31500,
+      "new_same_volume_profit_credits_per_month": 5250,
+      "break_even_min_units_per_month": 1250,
+      "break_even_profit_at_min_credits_per_month": 0,
+      "break_even_profit_at_previous_unit_credits_per_month": -21,
+      "maintain_profit_min_units_per_month": 2500,
+      "maintain_profit_at_min_credits_per_month": 26250,
+      "maintain_profit_at_previous_unit_credits_per_month": 26229,
+      "separate_target_profit_credits_per_month": 40000,
+      "separate_target_quantity_exact_ratio": "66250/21",
+      "separate_target_quantity_approx_units_per_month": 3154.7619047619046,
+      "separate_target_min_units_per_month": 3155,
+      "separate_target_profit_at_min_credits_per_month": 40005,
+      "separate_target_profit_at_previous_unit_credits_per_month": 39984,
+      "revenue_restore_units_per_month": 1800,
+      "revenue_at_restoration_credits_per_month": 126000,
+      "profit_at_revenue_restoration_credits_per_month": 11550
+    },
+    "case_keys": {
+      "price-profit-en": {
+        "baseline": "Revenue = 84 * 1,500 = 126,000 credits/month. Variable cost = 49 * 1,500 = 73,500 credits/month. Profit = (84 - 49) * 1,500 - 26,250 = 26,250 credits/month.",
+        "new_same_volume": "New contribution per unit = 70 - 49 = 21 credits/unit. At 1,500 units, profit = 21 * 1,500 - 26,250 = 5,250 credits/month.",
+        "break_even": "For profit at least zero, q >= 26,250 / 21 = 1,250. Minimum = 1,250 units/month; profit there is 0, while 1,249 units lose 21 credits/month.",
+        "maintain_profit": "For profit at least last month's 26,250 credits/month, q >= (26,250 + 26,250) / 21 = 2,500. Minimum = 2,500 units/month; 2,499 units produce only 26,229 credits/month.",
+        "separate_target": "For profit at least 40,000 credits/month, q >= (26,250 + 40,000) / 21 = 66,250/21, about 3,154.7619. Round upward to 3,155 whole units/month. Profit = 40,005 there; at 3,154 units it is only 39,984, below the target.",
+        "claim": "Matching old revenue requires 126,000 / 70 = 1,800 units/month. Profit is 21 * 1,800 - 26,250 = 11,550 credits/month, below the old profit of 26,250. Equal revenue therefore does not preserve profit when variable cost rises with the additional units.",
+        "evidence_limit": "These are conditional cost-model thresholds. They do not predict demand or establish that any threshold will be reached. One acceptable missing evidence example is observed purchases at the proposed price from relevant customers; no numeric success probability can be derived from the given data."
+      },
+      "price-profit-ko": {
+        "baseline": "매출 = 84 * 1,500 = 월 126,000크레딧. 변동비 = 49 * 1,500 = 월 73,500크레딧. 이익 = (84 - 49) * 1,500 - 26,250 = 월 26,250크레딧.",
+        "new_same_volume": "새 단위 기여이익 = 70 - 49 = 개당 21크레딧. 1,500개를 판매하면 이익 = 21 * 1,500 - 26,250 = 월 5,250크레딧.",
+        "break_even": "이익이 0 이상이려면 q >= 26,250 / 21 = 1,250. 최소 월 1,250개이며 이때 이익은 0이다. 1,249개라면 월 21크레딧 손실이다.",
+        "maintain_profit": "지난달 이익인 월 26,250크레딧 이상을 유지하려면 q >= (26,250 + 26,250) / 21 = 2,500. 최소 월 2,500개다. 2,499개에서는 이익이 월 26,229크레딧으로 부족하다.",
+        "separate_target": "월 이익 40,000크레딧 이상을 얻으려면 q >= (26,250 + 40,000) / 21 = 66,250/21, 약 3,154.7619. 정수 수량을 올림하여 최소 월 3,155개다. 이때 이익은 월 40,005크레딧이고, 3,154개에서는 월 39,984크레딧으로 목표에 미달한다.",
+        "claim": "기존 매출을 회복하려면 126,000 / 70 = 월 1,800개다. 이때 이익은 21 * 1,800 - 26,250 = 월 11,550크레딧으로, 기존 월 이익 26,250크레딧보다 작다. 추가 판매량만큼 전체 변동비가 늘어나므로 매출이 같다고 이익도 같지는 않다.",
+        "evidence_limit": "이 수량은 비용 가정 아래의 조건부 기준이다. 수요를 예측하거나 실제 달성을 보장하지 않는다. 빠진 근거의 허용 예시는 관련 고객의 새 가격에서의 실제 구매 관찰 자료다. 제공 자료로 수치형 성공 확률을 도출할 수 없다."
+      }
+    },
+    "units_and_rounding": {
+      "money": "Credits are fictional. Accept credits/크레딧 and explicitly labelled equivalent scaling such as thousands of credits/천 크레딧. Do not silently convert to a real currency.",
+      "period": "All totals and quantities refer to one month. Repeated per-month wording may be omitted within an explicitly monthly table or paragraph.",
+      "quantities": "Accept units/month, whole units per month, 개/월, or 월 N개 with the same numeric meaning. Final minimum quantities must be exact whole counts.",
+      "exact_values": "All required money totals and final whole-unit quantities are exact integers. Equivalent fractions, decimals with trailing zeroes, digit grouping and exact scaled notation are allowed.",
+      "fractional_threshold": "Accept 66250/21 or a correctly labelled approximation such as 3154.76 before rounding. An approximation must lead to the exact final answer 3155.",
+      "ceiling": "Use ceiling only when needed. A nonintegral threshold is rounded upward; an already integral threshold stays unchanged. No nearest-integer rule or extra safety unit may replace the requested minimum.",
+      "tolerance": "No numerical tolerance on required integer totals or final minimum counts. Rounding of a clearly labelled intermediate fractional threshold is allowed only if it preserves the correct whole-unit minimum.",
+      "labels": "Revenue, contribution and profit must retain their meanings. Numerically correct values with swapped labels are not accepted.",
+      "language": "English and Korean share the same numeric key, thresholds, assumptions, evidence limits and scoring. Natural wording and table/prose format may differ."
+    },
+    "critical_error_definitions": [
+      {
+        "label": "REVENUE_AS_PROFIT",
+        "en": "Treat a revenue total or total contribution before fixed cost as monthly profit, or use revenue restoration as proof of profit maintenance.",
+        "ko": "매출이나 고정비 차감 전 전체 기여이익을 월 이익으로 취급하거나 매출 회복을 이익 유지의 증명으로 삼는다.",
+        "incorrect_example": "Last month's profit is 126,000 credits; matching revenue preserves that profit."
+      },
+      {
+        "label": "INVALID_PROFIT_EQUATION",
+        "en": "Use a materially wrong cost equation, omit/double-count fixed cost, or treat the fixed cost as a per-unit cost without maintaining the equivalent total formula.",
+        "ko": "고정비 누락·중복 차감 등 잘못된 비용식을 쓰거나, 동일한 전체 이익식으로 유지하지 않은 채 고정비를 단위 비용으로 취급한다.",
+        "incorrect_example": "P(q) = 70*q - 26,250, ignoring the 49-credit variable cost."
+      },
+      {
+        "label": "WRONG_BASELINE_PROFIT",
+        "en": "Assert last month's profit is different from 26,250 credits/month.",
+        "ko": "지난달 이익을 월 26,250크레딧과 다르게 단정한다.",
+        "incorrect_example": "Last month's profit is 52,500 credits/month; fixed cost has not been subtracted."
+      },
+      {
+        "label": "WRONG_SAME_VOLUME_PROFIT",
+        "en": "Assert new-price profit at 1,500 units is different from 5,250 credits/month.",
+        "ko": "새 가격에서 1,500개를 판매할 때 이익을 월 5,250크레딧과 다르게 단정한다.",
+        "incorrect_example": "New-price profit at 1,500 units is 31,500 credits/month."
+      },
+      {
+        "label": "WRONG_BREAK_EVEN_QUANTITY",
+        "en": "Assert the minimum quantity for nonnegative new-price profit is different from 1,250 units/month, including calling 2,500 the break-even minimum.",
+        "ko": "새 가격에서 이익이 0 이상이 되는 최소 수량을 월 1,250개와 다르게 단정한다. 월 2,500개를 최소 손익분기 수량이라고 부르는 경우도 포함한다.",
+        "incorrect_example": "Break-even requires a minimum of 2,500 units."
+      },
+      {
+        "label": "WRONG_MAINTAIN_PROFIT_QUANTITY",
+        "en": "Assert the minimum quantity preserving at least the old profit is different from 2,500 units/month, including conflating it with break-even or revenue restoration.",
+        "ko": "기존 이익 이상을 유지하는 최소 수량을 월 2,500개와 다르게 단정한다. 손익분기나 매출 회복 수량과의 혼동도 포함한다.",
+        "incorrect_example": "1,250 units preserve the previous 26,250-credit profit."
+      },
+      {
+        "label": "WRONG_TARGET_PROFIT_QUANTITY",
+        "en": "Assert the minimum quantity for at least 40,000 credits/month profit is different from 3,155, or accept a quantity whose profit falls below that target.",
+        "ko": "월 이익 40,000크레딧 이상을 위한 최소 수량을 3,155개와 다르게 단정하거나, 목표 이익에 못 미치는 수량을 충족으로 받아들인다.",
+        "incorrect_example": "Round 3,154.7619 down to 3,154; that meets the 40,000-credit target."
+      },
+      {
+        "label": "WRONG_REVENUE_RESTORATION",
+        "en": "Give the wrong revenue-restoring quantity, wrong profit at that quantity, or endorse the colleague's equal-revenue/equal-profit claim.",
+        "ko": "매출 회복 수량이나 그때의 이익을 잘못 계산하거나, 매출이 같으면 이익도 같다는 동료의 주장을 받아들인다.",
+        "incorrect_example": "1,800 units restore revenue and produce 26,250 credits/month profit; the actual profit is 11,550."
+      },
+      {
+        "label": "UNSUPPORTED_DEMAND_OR_SUCCESS_CLAIM",
+        "en": "Present a sales forecast, guaranteed attainment or numeric success probability as supported by these cost facts. A clearly conditional arithmetic scenario is allowed.",
+        "ko": "비용 자료가 뒷받침한다며 판매량 예측·목표 달성 보장·수치형 성공 확률을 제시한다. 명확한 조건부 계산 시나리오는 허용한다.",
+        "incorrect_example": "The lower price will sell at least 3,155 units and has an 80% chance of success."
+      },
+      {
+        "label": "MATERIAL_INPUT_OR_UNIT_DRIFT",
+        "en": "Change supplied costs, price, target, period or unit scale in a way that changes a required result, or perform an unauthorized external action.",
+        "ko": "필수 결과를 바꾸는 방식으로 제공된 비용·가격·목표·기간·단위 배율을 바꾸거나 권한 없는 외부 행동을 실행한다.",
+        "incorrect_example": "Treat 26,250 monthly fixed credits as an annual cost when calculating a monthly threshold."
+      }
+    ],
+    "scoring_notes": {
+      "pass_rule": "Complete all six requested memo parts in the requested language AND no predeclared critical error.",
+      "omissions": "A missing requested calculation, unit context, target-rounding explanation, claim evaluation or demand-evidence limit makes task_complete false. Absence alone is not automatically an asserted numeric critical error.",
+      "equation_standard": "Brief inspectable public arithmetic is enough. Algebraically equivalent equations are accepted. Do not demand hidden chain-of-thought, a named reasoning method, a specific prose template or exact answer wording.",
+      "target_rounding_standard": "Showing the upward ceiling plus the resulting profit at or above 40,000 is sufficient; showing the previous-unit shortfall is an allowed stronger explanation, not an extra actor requirement.",
+      "contradiction_rule": "A wrong value clearly retracted and replaced in the same final answer is not scored as an endorsed final value. Unresolved contradictory operative answers fail completeness and receive the applicable critical error.",
+      "evidence_examples": "Accept a relevant stated need such as actual purchases at the new price, a comparable demand study, or a price-response experiment. The answer need not collect data, design an experiment or predict its result.",
+      "overlap": "Multiple critical labels may describe one defect. Report labels transparently, but one cell fails at most once and stays one denominator unit.",
+      "automated_check_boundary": "Expected numeric facts are authoring inputs for later integrated checking, not proof that the key or any answer has been validated."
+    }
+  }
+}

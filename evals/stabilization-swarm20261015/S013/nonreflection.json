@@ -1,0 +1,682 @@
+{
+  "fixture_schema": "opensocrates.synthetic-nonreflection-spec/1",
+  "session_id": "S013",
+  "purpose": "Supplement PR #130 with nested-value, unknown-key, control-character and exception-message negative specifications. Expected values are source-derived, never observed execution results.",
+  "source_identity": {
+    "repository": "https://github.com/ParkerHwang/OpenSocrates",
+    "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+    "product_version": "1.5.2",
+    "content_revision": null,
+    "host": null,
+    "platform": null,
+    "model_requested": null,
+    "model_observed": null,
+    "effort": null,
+    "service_tier_requested": "priority",
+    "service_tier_observed": null
+  },
+  "unknown_reasons": {
+    "content_revision": "Not measured; these error expectations do not depend on delivered content.",
+    "host": "No installed host is invoked.",
+    "platform": "Fixture has not executed on any platform.",
+    "model_requested": "No actor/model experiment.",
+    "model_observed": "No actor/model experiment.",
+    "effort": "No actor/model experiment.",
+    "service_tier_observed": "Server processing tier is not observable."
+  },
+  "execution_status": "NOT_RUN",
+  "runtime_change": "NO_CHANGE: no newly reproduced defect; no production source or existing #130 implementation rewritten.",
+  "privacy": {
+    "origin": "Authored public synthetic data only.",
+    "real_credentials": false,
+    "real_user_prompts_or_transcripts": false,
+    "real_workspace_paths": false,
+    "filesystem_instruction": "Path-shaped strings are inert data; never open them.",
+    "host_calls": 0,
+    "model_calls": 0
+  },
+  "baseline_request": {
+    "operation": "select",
+    "context": "0123456789abcdef0123456789abcdef",
+    "epoch": 0,
+    "decision": "S013Fixture",
+    "revision": 0,
+    "locale": "en",
+    "participation": "judgment",
+    "routing": {
+      "schema": "opensocrates.routing-features/1.0.0",
+      "answer_shape": "direct_judgment",
+      "classification_confidence": "high",
+      "explicit_method": "deduction",
+      "features": [
+        {
+          "key": "judgment",
+          "strength": 3,
+          "basis": "task_shape"
+        }
+      ]
+    }
+  },
+  "construction": {
+    "fresh_session_per_case": true,
+    "edits": "Deep-copy baseline_request; apply edits in order. Each path is an array of literal dictionary keys or integer list indexes, never dot parsing or path traversal. set assigns one item; drop deletes one item.",
+    "cli_input": "For run_decision use raw_input exactly when present; otherwise json.dumps of the edited baseline. Use StringIO, stream=False.",
+    "failure_injection": "In-memory unittest.mock only, using the fixed trusted target/type mapping in README.md. Never eval/import arbitrary fixture strings. Remove each patch after its case.",
+    "canonical_setup": "Use only compiled bundles from the exact frozen disposable checkout, following existing DecisionChecks.setUpClass. Do not fall back to CWD or an active installation."
+  },
+  "oracle": {
+    "equality": "Actual response must equal expected_response with exact keys, values and JSON types; no extra fields, nested objects or lists.",
+    "forbidden_marker_prefix": "S013_SYNTHETIC_ONLY_",
+    "recursive_scan": "Scan all response keys and string leaves, captured stdout and stderr for the marker prefix and per-case forbidden_substrings. Parse the complete CLI stdout as exactly one JSON object plus its single terminal newline.",
+    "forbidden_control_codepoints": [
+      0,
+      27
+    ],
+    "control_scope": "No NUL or ESC in response keys/string leaves or captured stdout/stderr. The single CLI record terminator LF is permitted.",
+    "cli_stderr": "Must be empty.",
+    "session_stdout_stderr": "Both must be empty; only the returned dictionary is expected.",
+    "scope_limit": "Only rejected-input and injected-failure responses. Valid selected responses legitimately include scope/context and canonical content, so this closed error oracle does not apply to success responses."
+  },
+  "cases": [
+    {
+      "id": "S013-NF01",
+      "title": "Nested object in scalar strength",
+      "entrypoint": "DecisionSession.handle",
+      "edits": [
+        {
+          "op": "set",
+          "path": [
+            "routing",
+            "features",
+            0,
+            "strength"
+          ],
+          "value": {
+            "secret": "S013_SYNTHETIC_ONLY_NF01_NO_CREDENTIAL",
+            "nested": {
+              "path": "/synthetic-only/S013/S013_SYNTHETIC_ONLY_NF01_NO_CREDENTIAL/private-value.txt"
+            }
+          }
+        }
+      ],
+      "failure_injection": null,
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF01_NO_CREDENTIAL",
+        "/synthetic-only/S013/S013_SYNTHETIC_ONLY_NF01_NO_CREDENTIAL/private-value.txt"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true,
+        "field": "routing.features[0].strength",
+        "error": "invalid_type",
+        "repair": "correct_field_once",
+        "expected": "integer 1, 2 or 3"
+      },
+      "expected_exit_code": null,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Existing check skips no-echo assertions for non-string replacement values; scan nested keys and values."
+    },
+    {
+      "id": "S013-NF02",
+      "title": "Unknown routing key containing a marker and schema-like suffix",
+      "entrypoint": "DecisionSession.handle",
+      "edits": [
+        {
+          "op": "set",
+          "path": [
+            "routing",
+            "S013_unknown/S013_SYNTHETIC_ONLY_NF02_NO_CREDENTIAL[0].secret"
+          ],
+          "value": {
+            "nested": {
+              "secret": "S013_SYNTHETIC_ONLY_NF02_NO_CREDENTIAL"
+            }
+          }
+        }
+      ],
+      "failure_injection": null,
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF02_NO_CREDENTIAL",
+        "S013_unknown/S013_SYNTHETIC_ONLY_NF02_NO_CREDENTIAL[0].secret"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true,
+        "field": "routing",
+        "error": "unknown_field",
+        "repair": "correct_field_once"
+      },
+      "expected_exit_code": null,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Unknown nested key names must collapse to the enclosing schema path."
+    },
+    {
+      "id": "S013-NF03",
+      "title": "Unknown feature-entry key impersonating a schema path",
+      "entrypoint": "DecisionSession.handle",
+      "edits": [
+        {
+          "op": "set",
+          "path": [
+            "routing",
+            "features",
+            0,
+            "routing.features[0].key.S013_SYNTHETIC_ONLY_NF03_NO_CREDENTIAL"
+          ],
+          "value": {
+            "secret": "S013_SYNTHETIC_ONLY_NF03_NO_CREDENTIAL"
+          }
+        }
+      ],
+      "failure_injection": null,
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF03_NO_CREDENTIAL",
+        "routing.features[0].key.S013_SYNTHETIC_ONLY_NF03_NO_CREDENTIAL"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true,
+        "field": "routing.features[0]",
+        "error": "unknown_field",
+        "repair": "correct_field_once"
+      },
+      "expected_exit_code": null,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Reject a supplied schema-like key without including it in field or expected."
+    },
+    {
+      "id": "S013-NF04",
+      "title": "Object-valued feature key with nested marker",
+      "entrypoint": "DecisionSession.handle",
+      "edits": [
+        {
+          "op": "set",
+          "path": [
+            "routing",
+            "features",
+            0,
+            "key"
+          ],
+          "value": {
+            "claimed_key": "judgment",
+            "secret": "S013_SYNTHETIC_ONLY_NF04_NO_CREDENTIAL"
+          }
+        }
+      ],
+      "failure_injection": null,
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF04_NO_CREDENTIAL"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true,
+        "field": "routing.features[0].key",
+        "error": "unknown_feature",
+        "repair": "correct_field_once",
+        "expected": "a value from features.json features, used once"
+      },
+      "expected_exit_code": null,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Exercise the enum exception path with a non-scalar value, not the existing unknown-feature string."
+    },
+    {
+      "id": "S013-NF05",
+      "title": "List-valued basis containing control characters",
+      "entrypoint": "DecisionSession.handle",
+      "edits": [
+        {
+          "op": "set",
+          "path": [
+            "routing",
+            "features",
+            0,
+            "basis"
+          ],
+          "value": [
+            "S013_SYNTHETIC_ONLY_NF05_NO_CREDENTIAL\u0000\r\n\t\u001b[31m",
+            {
+              "secret": "S013_SYNTHETIC_ONLY_NF05_NO_CREDENTIAL"
+            }
+          ]
+        }
+      ],
+      "failure_injection": null,
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF05_NO_CREDENTIAL"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true,
+        "field": "routing.features[0].basis",
+        "error": "invalid_value",
+        "repair": "correct_field_once",
+        "expected": "a value from features.json basis"
+      },
+      "expected_exit_code": null,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Control bytes and a nested list/object are outside the existing direct-string no-echo guard."
+    },
+    {
+      "id": "S013-NF06",
+      "title": "Object-valued answer shape",
+      "entrypoint": "DecisionSession.handle",
+      "edits": [
+        {
+          "op": "set",
+          "path": [
+            "routing",
+            "answer_shape"
+          ],
+          "value": {
+            "name": "direct_judgment",
+            "nested": {
+              "secret": "S013_SYNTHETIC_ONLY_NF06_NO_CREDENTIAL"
+            }
+          }
+        }
+      ],
+      "failure_injection": null,
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF06_NO_CREDENTIAL"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true,
+        "field": "routing.answer_shape",
+        "error": "invalid_value",
+        "repair": "correct_field_once",
+        "expected": "a value from features.json answer_shapes"
+      },
+      "expected_exit_code": null,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Enum conversion failure must not serialize nested values or its exception text."
+    },
+    {
+      "id": "S013-NF07",
+      "title": "Object-valued explicit method with a synthetic Windows path",
+      "entrypoint": "DecisionSession.handle",
+      "edits": [
+        {
+          "op": "set",
+          "path": [
+            "routing",
+            "explicit_method"
+          ],
+          "value": {
+            "method": "deduction",
+            "path": "Z:\\synthetic-only\\S013\\S013_SYNTHETIC_ONLY_NF07_NO_CREDENTIAL\\secret.json"
+          }
+        }
+      ],
+      "failure_injection": null,
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF07_NO_CREDENTIAL",
+        "Z:\\synthetic-only\\S013\\S013_SYNTHETIC_ONLY_NF07_NO_CREDENTIAL\\secret.json"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true,
+        "field": "routing.explicit_method",
+        "error": "invalid_type",
+        "repair": "correct_field_once",
+        "expected": "null, or a catalog method ID the user requested"
+      },
+      "expected_exit_code": null,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Non-string method identity and path-shaped nested content."
+    },
+    {
+      "id": "S013-NF08",
+      "title": "Missing required routing field alongside an unknown nested key",
+      "entrypoint": "DecisionSession.handle",
+      "edits": [
+        {
+          "op": "drop",
+          "path": [
+            "routing",
+            "classification_confidence"
+          ]
+        },
+        {
+          "op": "set",
+          "path": [
+            "routing",
+            "S013_unknown_nested_S013_SYNTHETIC_ONLY_NF08_NO_CREDENTIAL"
+          ],
+          "value": {
+            "secret": "S013_SYNTHETIC_ONLY_NF08_NO_CREDENTIAL"
+          }
+        }
+      ],
+      "failure_injection": null,
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF08_NO_CREDENTIAL",
+        "S013_unknown_nested_S013_SYNTHETIC_ONLY_NF08_NO_CREDENTIAL"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true,
+        "field": "routing.classification_confidence",
+        "error": "missing_field",
+        "repair": "correct_field_once",
+        "expected": "one of high, medium, low"
+      },
+      "expected_exit_code": null,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Known missing-field precedence must remain constant even when unknown key names carry markers."
+    },
+    {
+      "id": "S013-NF09",
+      "title": "Last allowed feature index with a nested unknown key value",
+      "entrypoint": "DecisionSession.handle",
+      "edits": [
+        {
+          "op": "set",
+          "path": [
+            "routing",
+            "features"
+          ],
+          "value": [
+            {
+              "key": "choose",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "multiple_options",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "critique",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "weak_sample",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "source_quality",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "reconcile_evidence",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "conflicting_sources",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "hidden_assumptions",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "argument_dispute",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "explain",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "tangled_hierarchy",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "diagnose",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "plan",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "failure_risk",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": "chosen_plan",
+              "strength": 1,
+              "basis": "task_shape"
+            },
+            {
+              "key": {
+                "secret": "S013_SYNTHETIC_ONLY_NF09_NO_CREDENTIAL"
+              },
+              "strength": 1,
+              "basis": "task_shape"
+            }
+          ]
+        }
+      ],
+      "failure_injection": null,
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF09_NO_CREDENTIAL"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true,
+        "field": "routing.features[15].key",
+        "error": "unknown_feature",
+        "repair": "correct_field_once",
+        "expected": "a value from features.json features, used once"
+      },
+      "expected_exit_code": null,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Pin the upper in-range numeric schema index; no supplied property name may become the index or suffix."
+    },
+    {
+      "id": "S013-NF10",
+      "title": "Malformed JSON containing literal control characters",
+      "entrypoint": "run_decision",
+      "raw_input": "{\"operation\":\"select\",\"S013_data\":\"S013_SYNTHETIC_ONLY_NF10_NO_CREDENTIAL\u0000\n\u001b[31m\"}",
+      "edits": [],
+      "failure_injection": null,
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF10_NO_CREDENTIAL"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true,
+        "field": "request",
+        "error": "invalid_json",
+        "repair": "correct_field_once",
+        "expected": "one JSON object with exactly the documented keys for its operation"
+      },
+      "expected_exit_code": 0,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Malformed-JSON classification is already tested; additionally exclude the decoder message, raw body and control characters."
+    },
+    {
+      "id": "S013-NF11",
+      "title": "Accepted request followed by ValueError with a marked message",
+      "entrypoint": "DecisionSession.handle",
+      "edits": [],
+      "failure_injection": {
+        "target": "assembler.assemble",
+        "exception_type": "ValueError",
+        "message": "ValueError: S013_SYNTHETIC_ONLY_NF11_NO_CREDENTIAL /synthetic-only/S013/S013_SYNTHETIC_ONLY_NF11_NO_CREDENTIAL/content.json\n\u001b[31m"
+      },
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF11_NO_CREDENTIAL",
+        "ValueError: S013_SYNTHETIC_ONLY_NF11_NO_CREDENTIAL /synthetic-only/S013/S013_SYNTHETIC_ONLY_NF11_NO_CREDENTIAL/content.json\n\u001b[31m"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "decision_unavailable",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true
+      },
+      "expected_exit_code": null,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Existing assembly-failure check uses a bare exception class; this case supplies message/path/control data and requires the entire closed response."
+    },
+    {
+      "id": "S013-NF12",
+      "title": "Accepted request followed by TypeError with a marked message",
+      "entrypoint": "DecisionSession.handle",
+      "edits": [],
+      "failure_injection": {
+        "target": "assembler.assemble",
+        "exception_type": "TypeError",
+        "message": "TypeError: S013_SYNTHETIC_ONLY_NF12_NO_CREDENTIAL /synthetic-only/S013/S013_SYNTHETIC_ONLY_NF12_NO_CREDENTIAL/content.json\n\u001b[31m"
+      },
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF12_NO_CREDENTIAL",
+        "TypeError: S013_SYNTHETIC_ONLY_NF12_NO_CREDENTIAL /synthetic-only/S013/S013_SYNTHETIC_ONLY_NF12_NO_CREDENTIAL/content.json\n\u001b[31m"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "decision_unavailable",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true
+      },
+      "expected_exit_code": null,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Existing assembly-failure check uses a bare exception class; this case supplies message/path/control data and requires the entire closed response."
+    },
+    {
+      "id": "S013-NF13",
+      "title": "Accepted request followed by KeyError with a marked message",
+      "entrypoint": "DecisionSession.handle",
+      "edits": [],
+      "failure_injection": {
+        "target": "assembler.assemble",
+        "exception_type": "KeyError",
+        "message": "KeyError: S013_SYNTHETIC_ONLY_NF13_NO_CREDENTIAL /synthetic-only/S013/S013_SYNTHETIC_ONLY_NF13_NO_CREDENTIAL/content.json\n\u001b[31m"
+      },
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF13_NO_CREDENTIAL",
+        "KeyError: S013_SYNTHETIC_ONLY_NF13_NO_CREDENTIAL /synthetic-only/S013/S013_SYNTHETIC_ONLY_NF13_NO_CREDENTIAL/content.json\n\u001b[31m"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "decision_unavailable",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true
+      },
+      "expected_exit_code": null,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "Existing assembly-failure check uses a bare exception class; this case supplies message/path/control data and requires the entire closed response."
+    },
+    {
+      "id": "S013-NF14",
+      "title": "CLI runtime exception boundary",
+      "entrypoint": "run_decision",
+      "edits": [],
+      "failure_injection": {
+        "target": "cli.DecisionSession.handle",
+        "exception_type": "RuntimeError",
+        "message": "S013_SYNTHETIC_ONLY_NF14_NO_CREDENTIAL at /synthetic-only/S013/S013_SYNTHETIC_ONLY_NF14_NO_CREDENTIAL/artifact.json\u0000\u001b[31m"
+      },
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF14_NO_CREDENTIAL",
+        "S013_SYNTHETIC_ONLY_NF14_NO_CREDENTIAL at /synthetic-only/S013/S013_SYNTHETIC_ONLY_NF14_NO_CREDENTIAL/artifact.json\u0000\u001b[31m"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "decision_unavailable",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true
+      },
+      "expected_exit_code": 0,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "In-memory injected error details must stay absent from stdout and stderr at the outer CLI boundary; no real file or host failure is induced."
+    },
+    {
+      "id": "S013-NF15",
+      "title": "CLI content-loader exception boundary",
+      "entrypoint": "run_decision",
+      "edits": [],
+      "failure_injection": {
+        "target": "cli.load_compiled_bundle",
+        "exception_type": "OSError",
+        "message": "S013_SYNTHETIC_ONLY_NF15_NO_CREDENTIAL at /synthetic-only/S013/S013_SYNTHETIC_ONLY_NF15_NO_CREDENTIAL/artifact.json\u0000\u001b[31m"
+      },
+      "forbidden_substrings": [
+        "S013_SYNTHETIC_ONLY_NF15_NO_CREDENTIAL",
+        "S013_SYNTHETIC_ONLY_NF15_NO_CREDENTIAL at /synthetic-only/S013/S013_SYNTHETIC_ONLY_NF15_NO_CREDENTIAL/artifact.json\u0000\u001b[31m"
+      ],
+      "expected_response": {
+        "status": "unavailable",
+        "reason": "canonical_content_unavailable",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true
+      },
+      "expected_exit_code": 0,
+      "execution_status": "NOT_RUN",
+      "increment_over_existing_check": "In-memory injected error details must stay absent from stdout and stderr at the outer CLI boundary; no real file or host failure is induced."
+    }
+  ],
+  "source_evidence": [
+    {
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": "28-83,125-164,233-267",
+      "supports": "Closed repair codes/expected strings, fixed failure keys, static request guards and routing prefix."
+    },
+    {
+      "path": "src/opensocrates/domain/routing.py",
+      "lines": "791-883",
+      "supports": "Known missing-key paths, enclosing unknown-key locations and bounded numeric feature indexes; catches do not return exception messages."
+    },
+    {
+      "path": "src/opensocrates/cli/decision.py",
+      "lines": "19-62",
+      "supports": "Fixed loader/runtime failures and invalid_json response; no exception details emitted."
+    },
+    {
+      "path": "tools/check_decision_points.py",
+      "lines": "380-407,431-455,522-531",
+      "supports": "Existing string-only no-echo guard, bare assembly exception and malformed-JSON classification; this fixture supplies additional shapes and messages."
+    }
+  ],
+  "integration_gate": "Do not execute until S001 publishes the exact integrated FROZEN candidate SHA. The existing checker does not consume this file; a verifier must implement/adapt the documented oracle in its disposable checkout and report that runner provenance."
+}
