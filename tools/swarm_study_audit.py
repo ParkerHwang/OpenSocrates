@@ -113,6 +113,7 @@ MAX_RECORD_BYTES = 1024 * 1024
 MAX_HASH_BYTES = 256 * 1024 * 1024
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 COMMIT = re.compile(r"^[0-9a-f]{40}$")
+CELL_UTC_TIMESTAMP = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|\+00:00)")
 IDENTITY_FIELDS = {
     "repository",
     "source_sha",
@@ -531,6 +532,8 @@ def validate_cells_role(cells: Any) -> None:
         "status",
         "order_index",
         "failure_reason",
+        "started_at",
+        "ended_at",
     }
     required = {"cell_id", "case_id", "arm", "repeat", "status", "order_index"}
     if not isinstance(cells, list) or len(cells) > 10000:
@@ -547,6 +550,36 @@ def validate_cells_role(cells: Any) -> None:
                 raise InputError("wrong_cells_role_schema")
         if data.get("failure_reason") is not None and not safe_failure(data["failure_reason"]):
             raise InputError("wrong_cells_role_schema")
+        validate_cell_timestamps(data)
+
+
+def validate_cell_timestamps(cell: dict[str, Any]) -> None:
+    """Keep S043's observed event times; do not strip dynamic ledger fields.
+
+    NOT_RUN has neither time; STARTED has only a start; terminal attempts have
+    both; pre-dispatch BLOCKED has only an end. Missing/null times are equivalent
+    only where that state has no such event. Attempted times cannot be omitted.
+    """
+    status = status_of(cell)
+    start = cell_timestamp(cell.get("started_at"))
+    end = cell_timestamp(cell.get("ended_at"))
+    if (start is not None) != (status in ATTEMPTED):
+        raise InputError("cell_timestamp_status_conflict")
+    if (end is not None) != (status in TERMINAL_ATTEMPTED | {"BLOCKED"}):
+        raise InputError("cell_timestamp_status_conflict")
+    if start is not None and end is not None and end < start:
+        raise InputError("cell_timestamp_order_invalid")
+
+
+def cell_timestamp(value: Any) -> datetime | None:
+    if value is None:
+        return None
+    if not isinstance(value, str) or CELL_UTC_TIMESTAMP.fullmatch(value) is None:
+        raise InputError("cell_timestamp_invalid")
+    parsed = timestamp(value)
+    if parsed is None:
+        raise InputError("cell_timestamp_invalid")
+    return parsed
 
 
 def validate_ledger_role(value: Any) -> None:

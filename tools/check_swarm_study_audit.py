@@ -15,10 +15,12 @@ import os
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
+from copy import deepcopy
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+import swarm_plan_ledger as producer
 import swarm_study_audit as subject
 
 SHA = "a" * 40
@@ -392,6 +394,182 @@ class AuditBoundaryChecks(unittest.TestCase):
         audit = subject.Audit()
         subject.check_isolation(audit, freeze, self.isolation())
         self.assertEqual(audit.report()["reportability"], "HOLD")
+
+    def dynamic_ledger(self) -> dict:
+        """Use the frozen producer's pure plan/transitions, never dispatch calls."""
+        config = {"study_id": "s049-public-lifecycle", "source_sha": SHA, "assignment_seed": 98}
+        plan = {
+            "schema_version": 1,
+            "kind": "assignment-plan",
+            "config": config,
+            "ordering_algorithm": "sha256-seed-cell-v1",
+            "actor_budget": 54,
+            "owner": "S078",
+            "execution_allowed": False,
+            "cells": producer.assignment_cells(config),
+        }
+        cells = deepcopy(plan["cells"])
+        by_id = {cell["cell_id"]: cell for cell in cells}
+        gates = {"freeze_sha256": "1" * 64, "isolation_sha256": "2" * 64}
+        events = []
+        for index, terminal in enumerate(("FAILED", "TIMEOUT")):
+            cell = cells[index]
+            for phase, status in enumerate(("STARTED", terminal)):
+                event = {
+                    "cell_id": cell["cell_id"],
+                    "attempt_id": cell["attempt_id"],
+                    "status": status,
+                    "revision": len(events) + 1,
+                    "recorded_at": f"2020-01-01T00:00:0{index * 2 + phase + 1}Z",
+                }
+                if status == "STARTED":
+                    event["gate_evidence"] = dict(gates)
+                else:
+                    event["failure_reason"] = (
+                        "call_failed" if status == "FAILED" else "deadline_exceeded"
+                    )
+                producer.apply_event(by_id, event)
+                events.append(event)
+        encoded_plan = (
+            json.dumps(plan, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+        ).encode()
+        return {
+            "schema_version": 1,
+            "kind": "assignment-ledger",
+            "ledger_path": str(self.public / "assignment-ledger.json"),
+            "plan": plan,
+            "plan_sha256": hashlib.sha256(encoded_plan).hexdigest(),
+            "owner": "S078",
+            "revision": len(events),
+            "initialized_at": "2020-01-01T00:00:00Z",
+            "gate_evidence": gates,
+            "events": events,
+            "cells": cells,
+        }
+
+    def test_actual_producer_dynamic_ledger_preserves_54_and_two_attempts(self) -> None:
+        ledger = self.dynamic_ledger()
+        self.put_json("assignment-ledger.json", ledger)
+        audit = subject.Audit()
+        loaded = subject.load_artifact(
+            audit, self.request(), self.public, "assignment_ledger", context=self.context
+        )
+        self.assertIsNotNone(loaded)
+        self.assertEqual(loaded["cells"], ledger["cells"])
+        self.assertIn("started_at", loaded["cells"][0])
+        self.assertIn("ended_at", loaded["cells"][0])
+        by_id = subject.check_ledger(audit, subject.ledger_cells(audit, loaded))
+        plan_cells = subject.check_ledger(audit, loaded["plan"]["cells"])
+        audit.input_digests.update(
+            assignment_plan=loaded["plan_sha256"],
+            freeze_manifest="1" * 64,
+            isolation_preflight="2" * 64,
+        )
+        subject.bind_plan(audit, loaded, by_id, plan_cells)
+        starts = subject.check_event_history(
+            audit,
+            loaded,
+            by_id,
+            plan_cells,
+            self.freeze(),
+            subject.timestamp("2020-01-01T00:00:00Z"),
+        )
+        rows = []
+        for cell in loaded["cells"][:2]:
+            row = {field: None for field in subject.CORE_RESULT_FIELDS}
+            row.update(
+                cell_id=cell["cell_id"],
+                status=cell["status"],
+                started_at=cell["started_at"],
+                ended_at=cell["ended_at"],
+                failure_reason=cell["failure_reason"],
+                critical_error_labels=[],
+                application_evidence="unverified",
+                identity={field: None for field in subject.IDENTITY_FIELDS},
+            )
+            subject.validate_result_role(row, "safe_results")
+            rows.append(row)
+        subject.summarize_results(audit, by_id, rows, starts)
+        report = audit.report()
+        self.assertEqual(report["summary"]["denominators"]["assigned_cells"], 54)
+        self.assertEqual(report["summary"]["denominators"]["attempted_records"], 2)
+        self.assertEqual(report["summary"]["result_status_counts"]["FAILED"], 1)
+        self.assertEqual(report["summary"]["result_status_counts"]["TIMEOUT"], 1)
+        self.assertEqual(report["summary"]["ledger_status_counts"]["NOT_RUN"], 52)
+        self.assertEqual(report["reportability"], "UNKNOWN")
+        self.assertFalse(any(finding["severity"] == "blocker" for finding in report["findings"]))
+
+    def test_producer_lifecycle_timestamp_shapes_are_accepted(self) -> None:
+        base = self.dynamic_ledger()["plan"]["cells"][0]
+        shapes = (
+            ("NOT_RUN", {}),
+            ("NOT_RUN", {"started_at": None, "ended_at": None}),
+            ("STARTED", {"started_at": "2020-01-01T00:00:01Z"}),
+            ("BLOCKED", {"ended_at": "2020-01-01T00:00:01Z"}),
+            (
+                "COMPLETED",
+                {"started_at": "2020-01-01T00:00:01Z", "ended_at": "2020-01-01T00:00:02Z"},
+            ),
+            (
+                "FAILED",
+                {
+                    "started_at": "2020-01-01T00:00:01+00:00",
+                    "ended_at": "2020-01-01T00:00:02.123456Z",
+                },
+            ),
+            (
+                "TIMEOUT",
+                {"started_at": "2020-01-01T00:00:01Z", "ended_at": "2020-01-01T00:00:01Z"},
+            ),
+        )
+        for status, times in shapes:
+            with self.subTest(status=status, fields=sorted(times)):
+                cell = {**base, "status": status, **times}
+                original = deepcopy(cell)
+                subject.validate_cells_role([cell])
+                self.assertEqual(cell, original)
+
+    def test_stripped_or_conflicting_cell_times_are_rejected_without_digest(self) -> None:
+        changes = (
+            {"started_at": None},
+            {"ended_at": None},
+            {"started_at": None, "ended_at": None},
+            {"ended_at": "2019-12-31T23:59:59Z"},
+            {"started_at": "2020-01-01T00:00:01"},
+            {"started_at": "2020-01-01T00:00:01+09:00"},
+            {"started_at": "2020-99-01T00:00:01Z"},
+            {"started_at": {"unapproved": SENTINEL}},
+            {"status": "NOT_RUN"},
+            {"status": "BLOCKED"},
+            {"status": "STARTED"},
+            {"unapproved_field": SENTINEL},
+        )
+        for change in changes:
+            with self.subTest(fields=sorted(change)):
+                ledger = self.dynamic_ledger()
+                ledger["cells"][0].update(change)
+                self.put_json("assignment-ledger.json", ledger)
+                audit = subject.Audit()
+                with patch.object(subject, "digest") as digest:
+                    loaded = subject.load_artifact(
+                        audit,
+                        self.request(),
+                        self.public,
+                        "assignment_ledger",
+                        context=self.context,
+                    )
+                self.assertIsNone(loaded)
+                digest.assert_not_called()
+                self.assertEqual(audit.report()["reportability"], "HOLD")
+                self.assertEqual(audit.report()["input_digests"], {})
+                self.assertNotIn(SENTINEL, json.dumps(audit.report()))
+
+    def test_deleted_terminal_timestamp_keys_are_not_an_admission_workaround(self) -> None:
+        ledger = self.dynamic_ledger()
+        for field in ("started_at", "ended_at"):
+            del ledger["cells"][0][field]
+        with self.assertRaises(subject.InputError):
+            subject.validate_ledger_role(ledger)
 
     def test_cli_rejection_returns_only_safe_category(self) -> None:
         path = self.public / "request.json"

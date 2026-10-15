@@ -76,9 +76,7 @@ def synthetic_report(outcome: str = "PASS") -> dict[str, Any]:
                 "arm": name,
                 "scope_id": f"synthetic-scope-{index}",
                 "os_profile_id": f"synthetic-profile-{index}",
-                "paths": {
-                    key: f"/synthetic-scope-map/arm{index}/{key}" for key in preflight.PATH_FIELDS
-                },
+                "paths": {key: f"/scope-map/arm{index}/{key}" for key in preflight.PATH_FIELDS},
                 "runtime_sha256": "a" * 64,
             }
         )
