@@ -19,8 +19,8 @@
     "pt",
     "th"
   ],
-  "source_tree_hash": "sha256:e1e11f7a772cb2a3f6c8dc0e3b22b0787cdc903de69842de957577a177cee7be",
-  "normalized_semantic_hash": "sha256:b5fc82f5ce8725bd23b7d270014f90853e39474e7b00ae4f20553a484524c659",
+  "source_tree_hash": "sha256:a4d9f4b70f653dee12a3ea758ef10dc391443a19536c7e7f22082962fd252e0f",
+  "normalized_semantic_hash": "sha256:2c85b27d1586f97ec743e7d3f0a56f02a71a41913589e25a08c4a5ab309df0ab",
   "canonical_inputs": [
     "content/",
     "plugin-src/shared/",
@@ -32,8 +32,8 @@
     "content/compiled-response-policy.json",
     "schemas/v1/"
   ],
-  "release_metadata_difference": "compiled-content.bundle.json product_version becomes 1.6.0; canonical methods, projections, response policy, schemas and content identity stay at the released baseline",
-  "excluded": "The separate 48 method-body upgrade is v1.6.1 or later. No semantic content changes are authorized here.",
+  "release_metadata_difference": "Product version 1.6.0 plus exact selected maintenance controller wording from main 227a528; method bodies/cases/teacher questions/response policy/schema semantics remain at released v1.5.2 revision 5. Shared request/reader/host guides change separate package inventories.",
+  "excluded": "The separate 48 method-body upgrade remains v1.6.1 or later. No changes to method bodies/cases, teacher questions, response policies, eligibility/scoring, required outputs/dependencies/stops, host/platform scope or historical evidence.",
   "superseded_content_baselines": [
     {
       "release_tag": "v1.5.1",
@@ -60,5 +60,29 @@
       "source_tree_hash": "sha256:b8824656fc53d588cc6a570de102531266ef2a7b39f04694d058c8da5c2418a6",
       "normalized_semantic_hash": "sha256:e50af8296165a7c8e8a9a6e27d4881bbc816b7efe9e1c84ea798c80fb54efa48"
     }
-  ]
+  ],
+  "released_content_identity": {
+    "release_tag": "v1.5.2",
+    "release_commit": "9838db16910c5f22d9dcc3c7180350cb406fd236",
+    "release_tag_object": "4c27d59da54eb1591ba24c0ebae62d6ab3168b60",
+    "content_revision": 5,
+    "source_tree_hash": "sha256:e1e11f7a772cb2a3f6c8dc0e3b22b0787cdc903de69842de957577a177cee7be",
+    "normalized_semantic_hash": "sha256:b5fc82f5ce8725bd23b7d270014f90853e39474e7b00ae4f20553a484524c659",
+    "release_metadata_difference": "compiled-content.bundle.json product_version becomes 1.6.0; canonical methods, projections, response policy, schemas and content identity stay at the released baseline"
+  },
+  "identity_role": "integrated-maintenance-candidate; tagged release identity is preserved in released_content_identity",
+  "maintenance_reconciliation": {
+    "base_go_sha": "1dbccad464c83b21704416937d1b5ccc187522fe",
+    "main_sha": "227a528996d93c423851db1d663f9572be534e59",
+    "pr130_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+    "main_guide_snapshot_sha": "7dd6f852c3a4357f30cfd84791f0344f09e60282",
+    "pre_generation_input_sha": "f7f1f9fcf26c1174bcf441e9ee2f0c7445a4cce8",
+    "generation_command": "GOMAXPROCS=2 GOFLAGS='-p=2' make generate",
+    "generation_exit_code": 0,
+    "content_delta": "Exactly messages.prompt.controller in content/locales/{en,ko,zh,ja,fr,de,it,es,pt,th}.yaml; no other canonical content source changes.",
+    "package_delta": "Selected substantive-thinking/reader/request repair guidance under plugin-src; PR130 features envelope; selected S021 native Claude recovery guides.",
+    "implementation_state": "IMPLEMENTED_AND_GENERATED_NOT_FINAL_VERIFIED",
+    "release_validation": false,
+    "live_host_evidence": false
+  }
 }

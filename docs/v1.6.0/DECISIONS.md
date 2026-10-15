@@ -105,6 +105,43 @@ never hand-edit compiled bundles, embedded assets, schemas or package manifests.
 검사를 없애거나 해시 범위를 줄이거나 과거 증거를 새 후보로 바꾸지 않습니다.
 컴파일 묶음·내장 자산·스키마·패키지 명세는 Go 생성 경로로 갱신합니다.
 
+## Integrated maintenance identity / 통합 유지보수 식별
+
+S092 integrated the selected full deltas S051, S052, S060 and S070 with the
+exact main/PR130 sources above. The generator input checkpoint is
+`f7f1f9fcf26c1174bcf441e9ee2f0c7445a4cce8`; `GOMAXPROCS=2 GOFLAGS='-p=2' make generate`
+completed with exit 0 (`generate: OK`) on macOS ARM64. This is generation,
+not a final source-suite, package, platform or live-host pass. The earlier
+proposal records the pre-integration state; this section records its selected
+implementation. / 위 제안의 선택된 변경을 Go 후보에 통합하고 macOS ARM64에서
+정식 생성 명령을 exit 0으로 완료했습니다. 생성 완료와 최종 검증을 구분합니다.
+
+[CONTENT_BASELINE.json](CONTENT_BASELINE.json) now records the generated candidate
+identity at its machine-consumed top level and preserves the exact tagged
+v1.5.2 identity separately under `released_content_identity`:
+
+- candidate `source_tree_hash`: `sha256:a4d9f4b70f653dee12a3ea758ef10dc391443a19536c7e7f22082962fd252e0f`
+- candidate `normalized_semantic_hash`: `sha256:2c85b27d1586f97ec743e7d3f0a56f02a71a41913589e25a08c4a5ab309df0ab`
+
+Strict generation and package identity guards move together to these exact
+selected values; the hash algorithms/projections and failure guards remain.
+Only the ten `messages.prompt.controller` values change canonical content.
+Methods/cases, teacher questions, response policies, schemas, revision 5 and
+ten locales remain. Shared guides/features have separate package inventories.
+/ 출시 해시를 보존하고 후보 해시와 고정 검사값을 함께 갱신합니다. 해시 투영과
+거부 조건을 줄이지 않으며 방법 본문·사례·교사 질문·응답 정책·스키마·리비전 5와
+열 언어를 유지합니다. shared 안내는 별도 패키지 입력으로 식별합니다.
+
+PR130 remains an open Draft source; it is not represented as merged into main.
+The Go CLI also maps malformed JSON to closed `request / invalid_json` repair
+without echoing decoder text; I/O/runtime failures remain unavailable. Prior
+CI, signing, installer and host receipts keep their original source identities.
+No native application receipt, release/platform capability, original-installer
+migration or live usefulness claim follows from this integration.
+/ #130을 main에 병합된 것으로 표시하지 않습니다. JSON 입력 오류만 닫힌 복구
+응답으로 구분하며 I/O·런타임 실패는 unavailable을 유지합니다. 과거 CI·서명·이전·
+호스트 증거를 새 바이트의 결과로 바꾸지 않습니다.
+
 ## Go boundaries and toolchain / Go 경계와 도구체인
 
 Use one Go module, runtime/application/domain/persistence boundaries and active
