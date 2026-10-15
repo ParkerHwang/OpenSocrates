@@ -41,7 +41,7 @@ Antigravity** เปรียบเทียบทางเลือก ทำ�
 ## เริ่มจากแอปที่คุณใช้
 
 เลือกแอปที่คุณต้องการใช้ OpenSocrates
-[ดาวน์โหลด v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
+[ดาวน์โหลด v1.5.3](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.3)
 
 <details>
 <summary><strong>Claude Chat และ Cowork</strong> — อัปโหลดสกิลแล้วเริ่มสนทนา</summary>
@@ -49,7 +49,7 @@ Antigravity** เปรียบเทียบทางเลือก ทำ�
 สำหรับ Claude บนเว็บ, Desktop Chat และ Cowork:
 
 1. เปิด **Code execution and file creation** ใน **Settings → Capabilities** หากองค์กรดูแลบัญชีของคุณ ให้ยืนยันว่านโยบายองค์กรอนุญาตให้ใช้ Skills และเรียกใช้โค้ด
-2. ดาวน์โหลด [ZIP สกิลบัญชี](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip) และ [ไฟล์ SHA-256](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256)
+2. ดาวน์โหลด [ZIP สกิลบัญชี](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip) และ [ไฟล์ SHA-256](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip.sha256)
 3. เปิด **Customize → Skills → + → Create skill → Upload a skill** อัปโหลด ZIP และเปิดใช้สกิล สำรองสกิล OpenSocrates เดิมก่อนแทนที่
 4. เพิ่ม [คำแนะนำบัญชีหนึ่งครั้ง](docs/setup-guide.md#claude-standing-instructions) ในแต่ละบัญชี Claude ที่คุณใช้ โดยคงคำแนะนำเดิมไว้ เริ่มบทสนทนาใหม่และเล่างานที่ต้องการทำ
 
@@ -66,8 +66,8 @@ ZIP สกิลแบบพกพามีวิธีคิดและตั�
 Claude Desktop เรียกคำสั่งใน **Terminal**:
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host claude
-npx --yes opensocrates@1.5.2 diagnose --host claude
+npx --yes opensocrates@1.5.3 install --host claude
+npx --yes opensocrates@1.5.3 diagnose --host claude
 ```
 
 ยืนยัน `enabled: true`, `integrity: verified` และ `registration: confirmed`
@@ -83,8 +83,8 @@ npx --yes opensocrates@1.5.2 diagnose --host claude
 รวมอยู่ในแพ็กเกจแล้ว เรียกคำสั่งใน **Terminal บน Mac** หรือ **PowerShell บน Windows**:
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host codex
-npx --yes opensocrates@1.5.2 status --host codex
+npx --yes opensocrates@1.5.3 install --host codex
+npx --yes opensocrates@1.5.3 status --host codex
 ```
 
 เปิด Codex แบบโต้ตอบและพิมพ์ `/hooks` ในช่องรับข้อความ ตรวจและอนุมัติข้อกำหนด
@@ -94,7 +94,7 @@ npx --yes opensocrates@1.5.2 status --host codex
 หากต้องการอัปเดตการติดตั้ง Codex ที่มีอยู่:
 
 ```sh
-npx --yes opensocrates@1.5.2 update --host codex
+npx --yes opensocrates@1.5.3 update --host codex
 ```
 
 </details>
@@ -107,7 +107,7 @@ npx --yes opensocrates@1.5.2 update --host codex
 หรือ **PowerShell บน Windows**:
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
+npx --yes opensocrates@1.5.3 install --host antigravity --workspace "/absolute/path/to/workspace"
 ```
 
 บน Windows ใช้พาธไดรฟ์ในเครื่องที่ครอบด้วยเครื่องหมายคำพูด เช่น

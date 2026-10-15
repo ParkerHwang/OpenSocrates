@@ -43,7 +43,7 @@ OpenSocrates는 **Claude, Codex, Antigravity**에서 활용할 수 있는 사고
 ## 사용하는 앱에서 시작하기
 
 OpenSocrates를 사용할 앱을 선택하세요.
-[v1.5.2 다운로드](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
+[v1.5.3 다운로드](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.3)
 
 <details>
 <summary><strong>Claude Chat · Cowork</strong> — 스킬을 올리고 대화 시작하기</summary>
@@ -51,7 +51,7 @@ OpenSocrates를 사용할 앱을 선택하세요.
 Claude 웹·Desktop Chat·Cowork에서:
 
 1. **Settings → Capabilities**에서 **Code execution and file creation**을 켭니다. 조직에서 관리하는 계정이라면 Skills와 코드 실행이 조직 정책상 허용되는지 확인하세요.
-2. [계정 스킬 ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip)과 [SHA-256 파일](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256)을 내려받습니다.
+2. [계정 스킬 ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip)과 [SHA-256 파일](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip.sha256)을 내려받습니다.
 3. **Customize → Skills → + → Create skill → Upload a skill**에서 ZIP을 업로드하고 켭니다. 기존 OpenSocrates 스킬을 교체한다면 먼저 백업하세요.
 4. 사용하는 Claude 계정마다 기존 지침을 유지하며 [계정 지침을 한 번 추가](docs/setup-guide.ko.md#claude-standing-instructions)합니다. 새 대화를 열고 하려는 일을 설명하세요.
 
@@ -68,8 +68,8 @@ Claude 웹·Desktop Chat·Cowork에서:
 **터미널**에서 실행하세요.
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host claude
-npx --yes opensocrates@1.5.2 diagnose --host claude
+npx --yes opensocrates@1.5.3 install --host claude
+npx --yes opensocrates@1.5.3 diagnose --host claude
 ```
 
 `enabled: true`, `integrity: verified`, `registration: confirmed`를 확인하세요.
@@ -86,8 +86,8 @@ npx --yes opensocrates@1.5.2 diagnose --host claude
 **Mac은 터미널**, **Windows는 PowerShell**에서 실행하세요.
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host codex
-npx --yes opensocrates@1.5.2 status --host codex
+npx --yes opensocrates@1.5.3 install --host codex
+npx --yes opensocrates@1.5.3 status --host codex
 ```
 
 대화형 Codex의 입력창에 `/hooks`를 입력하세요. OpenSocrates 훅 7개의 내용을
@@ -97,7 +97,7 @@ npx --yes opensocrates@1.5.2 status --host codex
 기존 Codex 설치를 업데이트하려면:
 
 ```sh
-npx --yes opensocrates@1.5.2 update --host codex
+npx --yes opensocrates@1.5.3 update --host codex
 ```
 
 </details>
@@ -110,7 +110,7 @@ npx --yes opensocrates@1.5.2 update --host codex
 **Mac은 터미널**, **Windows는 PowerShell**에서 실행합니다.
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
+npx --yes opensocrates@1.5.3 install --host antigravity --workspace "/absolute/path/to/workspace"
 ```
 
 Windows에서는 `"C:\Work\Reading Workshop"`처럼 따옴표로 감싼 로컬 드라이브

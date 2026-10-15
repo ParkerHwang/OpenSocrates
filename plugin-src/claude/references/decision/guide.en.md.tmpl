@@ -28,6 +28,10 @@ contraindications. Set `explicit_method` only for a user-requested method.
 Selection uses no model, network, authentication, or persistence. An empty
 eligible selection is valid; do not bypass it with direct file selection.
 
+Keep every `request.json` key; `features.json` `envelope` gives each
+field's format, including a fresh 32-character lowercase hexadecimal `context`
+(not a UUID) and a `decision` of ASCII letters or digits.
+
 For native selection, requesting `select` seeks method candidates; it does not
 prove that a method is needed or applicable. If no method meets its scoring
 threshold, the router may return an answer-shape fallback instead of an empty
@@ -43,11 +47,22 @@ before application. The selector validates declared features, not semantic
 classification or actual application. Its `applied: unverified` and conditional
 audit template are measurement boundaries. Emitted content alone proves no read.
 
-If the runtime is unavailable or fails, use `catalog.en.json` or `catalog.ko.json`
-and the complete `methods/<locale>/<method-id>.md` files. Apply the same
-eligibility and contraindication checks. Do not invent substitute procedures,
-retry unchanged failures, or treat empty selection as runtime failure. Retire
-ineligible/abandoned candidates without claiming they were applied.
+Keep native results distinct. `invalid_decision_request` is an input error, not
+an empty selection; it names a closed `field` and `error` without echoing values.
+Correct that field and resend once. If the corrected request is rejected again,
+or the result is `decision_unavailable`, `canonical_content_unavailable` or a
+launcher failure, the native path is unavailable for this decision. `no_intervention`
+or an empty `selected` list is a valid result, not a failure. A delivered candidate
+that fails its use conditions, contraindications, dependencies or stops is retired,
+not applied. When reader guidance suffices, finish without forcing a method.
+
+When the native path is unavailable for this decision, file fallback is optional:
+start with `catalog.en.json` or `catalog.ko.json`, then read the complete
+`methods/<locale>/<method-id>.md` procedure for the exact locale and content
+revision. Ordinary work may continue instead, with all constraints intact.
+Apply the same eligibility and contraindication checks. Do not invent substitute
+procedures, retry unchanged failures, or treat empty selection as runtime failure.
+Retire ineligible/abandoned candidates without claiming they were applied.
 
 The optional `bin/launch.sh decision claude --stream` uses volatile NDJSON.
 Reuse complete content only while its exact identity remains available to this

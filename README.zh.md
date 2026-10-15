@@ -40,7 +40,7 @@ OpenSocrates 为 **Claude、Codex 和 Antigravity** 提供可重复使用的推�
 ## 从你使用的应用开始
 
 选择你想使用 OpenSocrates 的应用。
-[获取 v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)。
+[获取 v1.5.3](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.3)。
 
 <details>
 <summary><strong>Claude Chat 和 Cowork</strong> — 上传技能并开始对话</summary>
@@ -48,7 +48,7 @@ OpenSocrates 为 **Claude、Codex 和 Antigravity** 提供可重复使用的推�
 适用于 Claude 网页版、Desktop Chat 和 Cowork：
 
 1. 在 **Settings → Capabilities** 中启用 **Code execution and file creation**。如果账户由组织管理，请确认组织政策允许 Skills 和代码执行。
-2. 下载[账户技能 ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip)及其 [SHA-256 文件](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256)。
+2. 下载[账户技能 ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip)及其 [SHA-256 文件](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip.sha256)。
 3. 打开 **Customize → Skills → + → Create skill → Upload a skill**，上传 ZIP 并启用。在替换已有的 OpenSocrates 技能前，先进行备份。
 4. 保留已有指令，在你使用的每个 Claude 账户中添加[一次性账户指令](docs/setup-guide.md#claude-standing-instructions)。开始新对话并描述你的任务。
 
@@ -65,8 +65,8 @@ OpenSocrates 为 **Claude、Codex 和 Antigravity** 提供可重复使用的推�
 在**终端**中运行：
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host claude
-npx --yes opensocrates@1.5.2 diagnose --host claude
+npx --yes opensocrates@1.5.3 install --host claude
+npx --yes opensocrates@1.5.3 diagnose --host claude
 ```
 
 确认 `enabled: true`、`integrity: verified` 和 `registration: confirmed`。
@@ -82,8 +82,8 @@ npx --yes opensocrates@1.5.2 diagnose --host claude
 原生运行时已包含在包中。在 **Mac 的终端**或 **Windows 的 PowerShell** 中运行：
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host codex
-npx --yes opensocrates@1.5.2 status --host codex
+npx --yes opensocrates@1.5.3 install --host codex
+npx --yes opensocrates@1.5.3 status --host codex
 ```
 
 打开交互式 Codex，在输入框中输入 `/hooks`。检查 OpenSocrates 的七个钩子定义，
@@ -93,7 +93,7 @@ npx --yes opensocrates@1.5.2 status --host codex
 更新已有的 Codex 安装：
 
 ```sh
-npx --yes opensocrates@1.5.2 update --host codex
+npx --yes opensocrates@1.5.3 update --host codex
 ```
 
 </details>
@@ -106,7 +106,7 @@ npx --yes opensocrates@1.5.2 update --host codex
 在 **Mac 的终端**或 **Windows 的 PowerShell** 中运行：
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
+npx --yes opensocrates@1.5.3 install --host antigravity --workspace "/absolute/path/to/workspace"
 ```
 
 在 Windows 中，使用带引号的本地驱动器路径，例如 `"C:\Work\Reading Workshop"`。
