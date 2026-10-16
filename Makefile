@@ -144,6 +144,9 @@ smoke:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_release_identity.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_decision_hook_runtime.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_decision_points.py
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_swarm_plan_ledger.py
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_swarm_blind_packets.py
+	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_swarm_study_audit.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/smoke_product.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_selector.py
 

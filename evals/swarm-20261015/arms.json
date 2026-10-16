@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "owner": "S035",
+  "state": "DRAFT",
+  "purpose": {
+    "en": "Preregister three input and installation conditions before any actor response. This file defines conditions; it does not execute or certify an experiment.",
+    "ko": "actor 답변을 받기 전에 세 입력·설치 조건을 사전등록한다. 이 파일은 조건 정의이며 실험 실행이나 검증 증거가 아니다."
+  },
+  "interface": {
+    "version": 1,
+    "source": "control/interfaces-v1.json",
+    "protocol_path": "evals/swarm-20261015/PROTOCOL.md",
+    "protocol_owner": "S031",
+    "protocol_draft_sha256_at_alignment": "f265fedf0ee969db5f96d184d80952064eecaae31ed807ae3cafce792c213849",
+    "protocol_alignment_limit": "This digest identifies the authoring draft read for alignment, not a frozen protocol. The integrator must reconcile any later protocol changes before freeze.",
+    "integration_state": "ALIGNED_WITH_S031_AUTHORING_DRAFT"
+  },
+  "source_basis": {
+    "assigned_branch": "main",
+    "assigned_sha": "227a528996d93c423851db1d663f9572be534e59",
+    "remote_main_observed_sha": "227a528996d93c423851db1d663f9572be534e59",
+    "remote_main_observed_date": "2026-10-15",
+    "reconciliation": "MATCHED_AT_AUTHORING_READ",
+    "source_product_version": "1.5.2",
+    "frozen_candidate_sha": null,
+    "frozen_candidate_sha_reason": "S001 selects the exact integrated candidate before freeze; the assigned base is not automatically the experimental treatment."
+  },
+  "matrix": {
+    "families": ["email-agreement", "changed-recommendation", "price-profit"],
+    "locales": ["en", "ko"],
+    "arms": ["plain", "general-check", "native-opensocrates"],
+    "repeats": [1, 2, 3],
+    "actor_responses_total": 54,
+    "actor_response_unit": "single-turn actor response",
+    "actor_execution_owner": "S078",
+    "authoring_session_actor_budget": 0,
+    "authoring_chats_are_control_observations": false,
+    "recovery_observations": "S076 has a separate finite allocation; those observations cannot replace any of these 54 cells."
+  },
+  "input_assembly": {
+    "input_field": "case.public_synthetic_input",
+    "placeholder": "{{public_synthetic_input}}",
+    "encoding": "UTF-8",
+    "rule": "Insert the frozen authored synthetic input literally once into the selected locale template. Do not trim, normalize, translate, summarize, escape, interpolate its contents, or append metadata. Templates are text, not executable formatting instructions.",
+    "plain_native_equality": "For the same case, plain and native-opensocrates actor user-message bytes are identical. Only general-check adds its frozen locale suffix.",
+    "case_facts": "Use identical frozen case facts and public supporting fixture bytes across arms and repeats. A changed-recommendation case must package its changed facts within this one authored input; do not introduce extra actor turns.",
+    "conversation_boundary": "Start a fresh approved conversation for every assigned cell with the same base host instructions and tool permissions. Do not carry previous answers, scores, task history, experiment instructions, or authoring-chat context into the actor conversation.",
+    "actor_visible_payload": "Only the assembled ordinary user request and normal host-provided context for the selected installation state. Arm labels, rubric, expected answers and experiment coordination are not actor instructions."
+  },
+  "shared_runtime": {
+    "host": null,
+    "host_reason": "S031 specifies a single Codex host. S042/S078 must freeze one actual supported Codex surface and version for all arms; CLI and Desktop cannot be substituted for one another.",
+    "platform": null,
+    "platform_reason": "Actual isolated execution platform is not observed by this authoring session.",
+    "model_requested": null,
+    "model_requested_reason": "Freeze the same authorized requested model for every arm before dispatch; this file does not select a different model.",
+    "model_observed": null,
+    "model_observed_reason": "Backend identity has not been observed. A requested model or UI label does not establish exact backend identity.",
+    "effort": null,
+    "effort_reason": "Freeze the same existing authorized effort setting for every arm; do not lower or vary it by arm.",
+    "service_tier_requested": "priority",
+    "service_tier_observed": null,
+    "service_tier_observed_reason": "Requested Fast/priority configuration does not establish server processing tier.",
+    "tool_policy": {
+      "id": "common-actor-tools-v1",
+      "exact_host_tool_ids": null,
+      "exact_host_tool_ids_reason": "S042/S078 must map these common classes to the actual host allowlist and freeze that identical allowlist for all arms.",
+      "allowed_classes": [
+        "Read the approved public synthetic task fixtures in the isolated actor workspace.",
+        "Perform local deterministic calculations using the same permitted host tools and sandbox limits.",
+        "Use normal host file-reading or fixed local retrieval facilities for resources actually exposed by the preregistered installation state."
+      ],
+      "installation_availability_rule": "Host tool permission settings are identical across arms. Native package resources are available only because of the installed product, not because the runner grants extra host tools or inserts method content. Normal fixed native retrieval must not create an extra selector-model request.",
+      "denied_classes": [
+        "Network, web search, external connectors, delegated actors and additional model/API requests.",
+        "Installer, account, authentication, trust-policy or global environment mutation from an actor.",
+        "Reading experiment rubrics, answer keys, judge packets, sibling results, private data or unrelated workspaces.",
+        "Runner-written product discovery hints, method injection, hand-built host control payloads or simulated native receipts."
+      ]
+    },
+    "per_cell_budget": {
+      "attempts": 1,
+      "max_output_tokens": null,
+      "max_tool_steps": null,
+      "deadline_seconds": null,
+      "concurrency": null,
+      "study_deadline_at": "2026-10-15T07:16:58.780728+00:00",
+      "unset_reason": "S031/S078 must freeze actual supported numeric limits, identically across all arms, before the first actor request.",
+      "accounting": "Include normal native retrieval overhead in actual total usage and elapsed time. Do not compensate by granting native additional actor calls or a larger output/time budget."
+    },
+    "immutable_across_arms": [
+      "host, surface, platform and host version",
+      "requested model, effort and requested service tier",
+      "base host instructions, permissions, tool allowlist and sandbox",
+      "synthetic case and supporting fixture bytes",
+      "per-cell output limit, tool/step limit, deadline, concurrency policy and attempt count",
+      "sampling parameters and seed settings where the host supports them"
+    ],
+    "intended_differences": [
+      "general-check appends only its published generic checking sentence",
+      "native-opensocrates exposes the frozen installed native product through the normal supported host path"
+    ]
+  },
+  "arms": [
+    {
+      "id": "plain",
+      "label": {"en": "Original request", "ko": "원래 요청"},
+      "prompt_wrapper": {
+        "en": "{{public_synthetic_input}}",
+        "ko": "{{public_synthetic_input}}"
+      },
+      "installation_expectation": {
+        "product_discoverable": false,
+        "native_entry_enabled": false,
+        "account_skill_or_standing_instruction_visible": false,
+        "manual_canonical_content_visible": false,
+        "rule": "An approved product-free isolated context has no effective OpenSocrates discovery, hooks, account skill, standing instruction, cached controller, method content or inherited product context. An installed-but-disabled package is insufficient if its content remains discoverable."
+      },
+      "allowed_tools_ref": "#/shared_runtime/tool_policy",
+      "runtime_and_budget_ref": "#/shared_runtime",
+      "forbidden_leakage_ref": "#/forbidden_actor_leakage"
+    },
+    {
+      "id": "general-check",
+      "label": {"en": "Original request with a general check", "ko": "일반 점검을 덧붙인 원래 요청"},
+      "prompt_wrapper": {
+        "en": "{{public_synthetic_input}}\n\nBefore finalizing, check the facts, calculations, and stated constraints.",
+        "ko": "{{public_synthetic_input}}\n\n답변을 마무리하기 전에 사실, 계산, 명시된 제약을 확인하세요."
+      },
+      "wrapper_scope": "The suffix is identical for every case in its locale. It contains no answer, task-specific hint, method identifier, product name, router command, package path or request for hidden reasoning.",
+      "installation_expectation_ref": "#/arms/0/installation_expectation",
+      "allowed_tools_ref": "#/shared_runtime/tool_policy",
+      "runtime_and_budget_ref": "#/shared_runtime",
+      "forbidden_leakage_ref": "#/forbidden_actor_leakage"
+    },
+    {
+      "id": "native-opensocrates",
+      "label": {"en": "Original request with the installed native product", "ko": "네이티브 제품이 설치된 원래 요청"},
+      "prompt_wrapper": {
+        "en": "{{public_synthetic_input}}",
+        "ko": "{{public_synthetic_input}}"
+      },
+      "installation_expectation": {
+        "product_discoverable": true,
+        "native_entry_enabled": true,
+        "host_trust_preapproved": true,
+        "package_integrity_matches_frozen_identity": true,
+        "exactly_one_controller_origin": true,
+        "account_skill_or_standing_instruction_visible": false,
+        "manual_canonical_content_visible": false,
+        "profile_class": "native-host-plugin",
+        "profile_selection": null,
+        "profile_selection_reason": "Freeze the supported native Codex profile on the same one Codex surface as the other arms. Native Claude Code is a distinct profile outside this single-host matrix.",
+        "rule": "Install only the exact frozen candidate product using an approved isolated supported host path. Preserve normal product entry, controller, reader guidance and eligible full-procedure retrieval; the runner adds no discovery cue, slash invocation, method set or canonical content to the user request.",
+        "actual_read_or_application_required_for_preflight": false
+      },
+      "allowed_tools_ref": "#/shared_runtime/tool_policy",
+      "runtime_and_budget_ref": "#/shared_runtime",
+      "forbidden_leakage_ref": "#/forbidden_actor_leakage"
+    }
+  ],
+  "excluded_conditions": {
+    "manual-content": {
+      "included_in_matrix": false,
+      "en": "Manually pasting or preloading canonical procedures is a separate condition outside this experiment. It cannot stand in for native installation or consume replacement cells in this 54-response matrix.",
+      "ko": "정본 절차를 수동으로 붙이거나 미리 제공하는 manual-content는 이번 실험 밖의 별도 조건이다. 네이티브 설치를 대신하거나 이 54개 답변의 대체 셀로 사용할 수 없다."
+    },
+    "account-content": "Claude account skills are content-only, model-selected account delivery; upload/export acceptance is not native hook activation. Web Chat, Desktop Chat and Cowork require their own separate condition and evidence.",
+    "modular-content": "Antigravity workspace/global rules and skills are modular content delivery, with separate origins and loading evidence; do not relabel them as native hooks in this matrix.",
+    "historical_runs": "The v1.3 upfront U/G/J controls and the v1.5 Mac seven-request smoke are historical records with different designs and source identities; they supply no new cells, baseline or efficacy evidence here."
+  },
+  "forbidden_actor_leakage": [
+    "Expected answers, hidden scoring criteria, deterministic answer facts, judge decisions or score feedback beyond the authored task facts.",
+    "Arm identifiers, experiment hypotheses, run order, repeat labels, comparison targets or instructions to improve a particular condition.",
+    "Method IDs, canonical bodies, package paths, router commands or product-use reminders added by the runner to task prompts or common instructions.",
+    "Existing authoring chats, source-repository agent instructions, sibling task outputs, previous actor answers or cached product context in control arms.",
+    "Private prompts, raw host transcripts, credentials, authentication data, unrelated workspace content, hidden reasoning or screenshots."
+  ],
+  "isolation_and_freeze": {
+    "state": "UNVERIFIED",
+    "preflight_owner": "S042",
+    "freeze_owner": "S001",
+    "actor_owner": "S078",
+    "required_before_any_dispatch": [
+      "S031 protocol alignment and exact source/input/wrapper/tool-policy hashes frozen before outcomes.",
+      "One fixed supported host/surface and common model, effort, tool allowlist and numeric per-cell budgets recorded.",
+      "S042 actual isolation preflight confirms every arm's effective installed/discovery state and fresh context boundary.",
+      "An unexpired S001 lease authorizes S078's actual host/resource use and the fixed 54-response allocation."
+    ],
+    "not_authorized_by_this_file": [
+      "Copying authentication files, an active profile or a user home to create isolation.",
+      "Changing global environment, account settings, trust policy, active installation or host login state.",
+      "Executing an actor request, diagnostic model call, build, browser probe or validation command from S035."
+    ],
+    "before_dispatch_failure_rule": "If isolation, integrity, effective control absence, required native trust, common settings or the frozen manifest cannot be established, do not dispatch that cell. Record BLOCKED with a safe reason; do not claim success from a mock and do not substitute a different arm or surface.",
+    "after_dispatch_failure_rule": "Keep every dispatched attempt in the ledger and denominator. Record failure or timeout with its safe category; never erase or replace it because native entry, full read, application or answer quality was absent or unknown. A discovered freeze/isolation violation stops further dispatch until S001 resolves it; it does not delete existing attempts.",
+    "no_application_receipt_gate": "Installation and trust are preconditions; successful entry, complete read, application and usefulness are separate observations. Missing application evidence stays unknown and is not an invented native completion gate. Product fail-open behavior is preserved."
+  },
+  "measurement_and_retention": {
+    "allowed_records": [
+      "Newly authored public synthetic inputs, the exact public wrapper text and approved public synthetic supporting fixtures.",
+      "Limited public final answers to those synthetic tasks, immutable cell IDs and predeclared public rubric outcomes.",
+      "Actual timestamps, elapsed time, observed token/cost totals, command/exit categories, source/package/input hashes and explicit unavailable values."
+    ],
+    "forbidden_records": [
+      "Raw host event logs or conversation transcripts, private user prompts or unrelated workspace files.",
+      "Credentials, copied authentication settings, account identifiers, screenshots, hidden reasoning or native application receipts fabricated by the runner."
+    ],
+    "evidence_fields": {
+      "entry_emitted": null,
+      "canonical_full_read": null,
+      "application_evidence": "unverified",
+      "reason": "S035 performs no live observation. Later records may use only actually supported bounded evidence, without raw host-log retention or a receipt invented from a footer."
+    },
+    "denominator": "Preserve all 54 planned assignments. Include every dispatched cell, including FAILED and TIMEOUT, in attempted-cell reporting; report NOT_RUN and BLOCKED separately and account for all assignments. No favorable retries, failure exclusions or timeout exclusions.",
+    "judge_independence": null,
+    "judge_independence_reason": "No independent evaluator is established. Self-review and AI agreement are not independent human validation.",
+    "backend_model_identity": null,
+    "backend_model_identity_reason": "Exact backend identity is unavailable unless the actual supported host response exposes it; never infer it from the requested model.",
+    "claims": "Separate installed, delivered, read, applied and useful. A footer or file read does not prove application or improvement. No result, comparative advantage or general reliability is claimed by this draft."
+  },
+  "source_references": [
+    "AGENTS.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "evals/v1.5-macos/REPORT.md",
+    "evals/v1.3/release-guided-20260908/PROTOCOL.md",
+    "docs/macos-v1.5.md",
+    "plugin-src/codex/hooks/hooks.json.tmpl",
+    "plugin-src/codex/generator.json",
+    "plugin-src/claude-chat/generator.json",
+    "tools/build_plugins.py"
+  ]
+}

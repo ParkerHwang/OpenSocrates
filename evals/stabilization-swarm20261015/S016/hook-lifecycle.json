@@ -1,0 +1,1196 @@
+{
+  "schema_version": 1,
+  "fixture_id": "S016-hook-lifecycle",
+  "artifact_kind": "synthetic_contract_specification",
+  "execution_status": "NOT_RUN",
+  "base_sha": "227a528996d93c423851db1d663f9572be534e59",
+  "runtime_change": "NO_CHANGE",
+  "defect_status": "No new runtime defect established by source inspection; expected values are unexecuted source-derived contracts.",
+  "target": "src/opensocrates/hooks/entrypoint.py:run_hook",
+  "scope": "Only entrypoint dispatch and lifecycle ownership, using inert synthetic seams; no native host, global hook, real runtime, artifact store or model call.",
+  "source_references": [
+    {
+      "path": "src/opensocrates/hooks/entrypoint.py",
+      "lines": "141-174",
+      "purpose": "Pre-composition early returns and compact special case."
+    },
+    {
+      "path": "src/opensocrates/hooks/entrypoint.py",
+      "lines": "175-212",
+      "purpose": "Ownership, adapter dispatch, exception boundary, flush-before-close."
+    },
+    {
+      "path": "src/opensocrates/hooks/codex_session_start.py",
+      "lines": "42-67",
+      "purpose": "Real helper is excluded; existing parser/storage checks retain authority."
+    },
+    {
+      "path": "tools/check_selector.py",
+      "lines": "1600-1818",
+      "purpose": "Existing VSC-10/VSC-10A baseline, retained rather than rewritten."
+    },
+    {
+      "path": "tools/check_decision_hook_runtime.py",
+      "lines": "38-172",
+      "purpose": "Existing ingress bounds, projection privacy and malformed-input baseline."
+    },
+    {
+      "path": "tools/check_decision_points.py",
+      "lines": "497-512",
+      "purpose": "Existing decision-point compact discovery baseline."
+    }
+  ],
+  "existing_coverage_not_readopted": [
+    {
+      "behavior": "selector marker blocks production runtime construction",
+      "owner": "tools/check_selector.py:VSC-10",
+      "new_delta": "E02 adds never-read input and injected flush/close exclusion, including nonempty string zero."
+    },
+    {
+      "behavior": "startup/resume/clear/future-source literal no-op without construction",
+      "owner": "tools/check_selector.py:VSC-10",
+      "new_delta": "S01 adds absent/non-string source forms; S02 adds injected-service ownership assertions."
+    },
+    {
+      "behavior": "compact discovery, legacy expiry sweep and unavailable storage",
+      "owner": "tools/check_selector.py:VSC-10A; tools/check_decision_points.py:test_compact_default_restores_discovery_not_an_abandoned_method",
+      "new_delta": "S02/S03 observe dispatch seam selection and cleanup exclusion only; no new helper storage scenarios."
+    },
+    {
+      "behavior": "malformed, oversized and native/lane mismatched input fail open",
+      "owner": "tools/check_decision_hook_runtime.py:SubmissionEntryChecks",
+      "new_delta": "E01/E03 observe pre-finally injected-service cleanup exclusion only; do not expand parser checks."
+    },
+    {
+      "behavior": "runtime factory receives host=codex, hook_only=True, workspace=None",
+      "owner": "tools/check_selector.py:VSC-10",
+      "new_delta": "Factory arguments remain an inherited precondition; new assertions concern ownership cleanup."
+    }
+  ],
+  "future_executor_contract": {
+    "dependencies": "Python 3.12 standard library only; executor is not included or run by S016.",
+    "module_loading": "Load the exact source entrypoint under a disposable fixture-only package namespace with importlib. Use empty namespace parents instead of production __init__.py. Load only constants.py and hosts/codex/commands.py as leaf modules; substitute inert cli.runtime and hooks.codex_session_start modules before invoking run_hook.",
+    "side_effect_boundary": "Do not import production cli.runtime, codex_session_start, adapters, persistence, selectors, SDKs, package initialization or global hooks. All service/seam objects are in-memory fakes.",
+    "stream": "Truthful in-memory streams; stdin.read appends a label and returns UTF-8 JSON bytes. stdout.write appends its label even for an empty string. stderr must stay empty.",
+    "environment": "In the disposable executor process, restore the environment after each case. Remove OPENSOCRATES_SELECTOR_ACTIVE when selector_active=null; otherwise set it to the case value. No persistent environment/configuration edits.",
+    "services_values": {
+      "injected": "Pass an inert fake as services. Never call factory or compact helper.",
+      "factory": "Pass services=None and make the inert factory return the fake, unless raises contains build.",
+      "none": "Pass services=None; both factory and fake runtime must remain untouched. Compact helper may run only when compact_restore permits it."
+    },
+    "fake_protocol": {
+      "adapter_for": "adapter returns inert adapter; none returns None. Append runtime.adapter_for before returning or raising.",
+      "handle": "Append adapter.handle; return SimpleNamespace(stdout=synthetic_adapter_response), or raise at the declared point. Check event_name equals synthetic_envelope.hook_event_name and raw equals the generated input bytes.",
+      "flush_selector_outcomes_and_close": "callable appends the matching trace label before returning/raising; absent omits the attribute; noncallable sets it to None.",
+      "raises": "Names in the closed list build, adapter_for, handle, flush_selector_outcomes, close raise RuntimeError with fixed synthetic text after appending their trace label.",
+      "factory": "Append runtime.build. The fixed inherited kwargs are host=codex, hook_only=True, workspace=None.",
+      "compact_restore": "forbidden must remain uncalled; none returns None; response returns synthetic_compact_response. Append compact.restore and check raw identity plus decision_point_mode=True."
+    },
+    "synthetic_adapter_response": {
+      "synthetic_lifecycle": "ok"
+    },
+    "synthetic_compact_response": {
+      "hookSpecificOutput": {
+        "hookEventName": "SessionStart",
+        "additionalContext": "Synthetic compact guidance."
+      }
+    },
+    "variant_expansion": "A row with variants describes one separate case per variant_id and replaces the template selector_active or source presence/value. Do not also execute the unmodified template row.",
+    "oracle": "Compare each expanded row with its exact expected trace, streams, return code and exception flag. Trace equality excludes all extra lifecycle calls and pins order. Expected stdout is literal JSON serialization, not a delivery receipt.",
+    "forbidden": "No telemetry/logger, disk state, raw host callback capture, credentials, screenshots, transcripts, native host command, live installation or model call.",
+    "excluded_faults": "Descriptors raising during getattr, BaseException subclasses, broken stdout/stderr, false-valued stream/service objects, import failures and a substituted compact helper that itself raises are outside these fixtures. No broader fail-open guarantee is asserted."
+  },
+  "cases": [
+    {
+      "case_id": "S016-E01-invalid-argv-injected",
+      "new_assertion": "Invalid arguments return before reading input or touching even an injected service.",
+      "argv": [
+        "codex",
+        "not_a_lane"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "injected",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "not_entered",
+        "trace": [
+          "stdout.write"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-E02-selector-active-injected",
+      "new_assertion": "Every nonempty recursion marker suppresses input reads and all injected-service lifecycle calls; string zero is nonempty.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": "1",
+      "services": "injected",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "not_entered",
+        "trace": []
+      },
+      "variants": [
+        {
+          "variant_id": "one",
+          "selector_active": "1"
+        },
+        {
+          "variant_id": "zero-string",
+          "selector_active": "0"
+        }
+      ]
+    },
+    {
+      "case_id": "S016-E03-native-lane-mismatch-injected",
+      "new_assertion": "A valid launcher lane paired with another native event returns before the cleanup phase, so injected flush and close remain untouched.",
+      "argv": [
+        "codex",
+        "completion_candidate"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "injected",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "not_entered",
+        "trace": [
+          "stdin.read",
+          "stdout.write"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-S01-malformed-noncompact-default",
+      "new_assertion": "Absent or non-string SessionStart source values take the literal-empty no-runtime path rather than the cleanup phase.",
+      "argv": [
+        "codex",
+        "session_started"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "SessionStart",
+        "session_id": "synthetic-s016",
+        "source": "startup"
+      },
+      "selector_active": null,
+      "services": "none",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "not_entered",
+        "trace": [
+          "stdin.read",
+          "stdout.write"
+        ]
+      },
+      "variants": [
+        {
+          "variant_id": "missing",
+          "source_present": false
+        },
+        {
+          "variant_id": "null",
+          "source_present": true,
+          "source": null
+        },
+        {
+          "variant_id": "number",
+          "source_present": true,
+          "source": 7
+        },
+        {
+          "variant_id": "boolean",
+          "source_present": true,
+          "source": false
+        },
+        {
+          "variant_id": "array",
+          "source_present": true,
+          "source": []
+        },
+        {
+          "variant_id": "object",
+          "source_present": true,
+          "source": {}
+        }
+      ]
+    },
+    {
+      "case_id": "S016-S02-injected-startup",
+      "new_assertion": "Injected SessionStart bypasses the production fast path; dispatch precedes flush and caller-owned close is never invoked.",
+      "argv": [
+        "codex",
+        "session_started"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "SessionStart",
+        "session_id": "synthetic-s016",
+        "source": "startup"
+      },
+      "selector_active": null,
+      "services": "injected",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.flush_selector_outcomes"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-S02-injected-compact",
+      "new_assertion": "Injected SessionStart bypasses the production fast path; dispatch precedes flush and caller-owned close is never invoked.",
+      "argv": [
+        "codex",
+        "session_started"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "SessionStart",
+        "session_id": "synthetic-s016",
+        "source": "compact"
+      },
+      "selector_active": null,
+      "services": "injected",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.flush_selector_outcomes"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-S03-default-compact-none",
+      "new_assertion": "The minimal compact seam receives decision_point_mode=True exactly once and returns before generic flush/close, including on unavailable restoration.",
+      "argv": [
+        "codex",
+        "session_started"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "SessionStart",
+        "session_id": "synthetic-s016",
+        "source": "compact"
+      },
+      "selector_active": null,
+      "services": "none",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "none",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "not_entered",
+        "trace": [
+          "stdin.read",
+          "compact.restore",
+          "stdout.write"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-S03-default-compact-response",
+      "new_assertion": "The minimal compact seam receives decision_point_mode=True exactly once and returns before generic flush/close, including on unavailable restoration.",
+      "argv": [
+        "codex",
+        "session_started"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "SessionStart",
+        "session_id": "synthetic-s016",
+        "source": "compact"
+      },
+      "selector_active": null,
+      "services": "none",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "response",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"Synthetic compact guidance.\",\"hookEventName\":\"SessionStart\"}}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "not_entered",
+        "trace": [
+          "stdin.read",
+          "compact.restore",
+          "stdout.write"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R01-success-injected",
+      "new_assertion": "Successful dispatch flushes exactly once; only a factory-created runtime closes, after flush.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "injected",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.flush_selector_outcomes"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R02-no-adapter-injected",
+      "new_assertion": "The adapter-unavailable return is inside try/finally: it still flushes, and only the owned runtime closes.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "injected",
+      "fake": {
+        "adapter_for": "none",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.adapter_for",
+          "stdout.write",
+          "runtime.flush_selector_outcomes"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R03-adapter-for-raises-injected",
+      "new_assertion": "Adapter lookup failure still reaches flush and owned close without an error payload.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "injected",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": [
+          "adapter_for"
+        ]
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.adapter_for",
+          "stdout.write",
+          "runtime.flush_selector_outcomes"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R04-handle-raises-injected",
+      "new_assertion": "Adapter invocation failure emits empty output and still reaches flush and owned close in order.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "injected",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": [
+          "handle"
+        ]
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.flush_selector_outcomes"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R05-flush-raises-injected",
+      "new_assertion": "A callable flusher raising an ordinary exception cannot suppress successful output or prevent owned close.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "injected",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": [
+          "flush_selector_outcomes"
+        ]
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.flush_selector_outcomes"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R06-optional-members-absent-injected",
+      "new_assertion": "Optional lifecycle members are called only when callable; missing/noncallable members cause no fallback or persistence.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "injected",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "absent",
+        "close": "absent",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R06-optional-members-noncallable-injected",
+      "new_assertion": "Optional lifecycle members are called only when callable; missing/noncallable members cause no fallback or persistence.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "injected",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "noncallable",
+        "close": "noncallable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R01-success-factory",
+      "new_assertion": "Successful dispatch flushes exactly once; only a factory-created runtime closes, after flush.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.flush_selector_outcomes",
+          "runtime.close"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R02-no-adapter-factory",
+      "new_assertion": "The adapter-unavailable return is inside try/finally: it still flushes, and only the owned runtime closes.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "none",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "runtime.adapter_for",
+          "stdout.write",
+          "runtime.flush_selector_outcomes",
+          "runtime.close"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R03-adapter-for-raises-factory",
+      "new_assertion": "Adapter lookup failure still reaches flush and owned close without an error payload.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": [
+          "adapter_for"
+        ]
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "runtime.adapter_for",
+          "stdout.write",
+          "runtime.flush_selector_outcomes",
+          "runtime.close"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R04-handle-raises-factory",
+      "new_assertion": "Adapter invocation failure emits empty output and still reaches flush and owned close in order.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": [
+          "handle"
+        ]
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.flush_selector_outcomes",
+          "runtime.close"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R05-flush-raises-factory",
+      "new_assertion": "A callable flusher raising an ordinary exception cannot suppress successful output or prevent owned close.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": [
+          "flush_selector_outcomes"
+        ]
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.flush_selector_outcomes",
+          "runtime.close"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R06-optional-members-absent-factory",
+      "new_assertion": "Optional lifecycle members are called only when callable; missing/noncallable members cause no fallback or persistence.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "absent",
+        "close": "absent",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R06-optional-members-noncallable-factory",
+      "new_assertion": "Optional lifecycle members are called only when callable; missing/noncallable members cause no fallback or persistence.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "noncallable",
+        "close": "noncallable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R07-factory-raises",
+      "new_assertion": "A factory exception leaves runtime=None, so there is no returned object to flush or close.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": [
+          "build"
+        ]
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "stdout.write"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R08-close-raises-owned",
+      "new_assertion": "A callable owned closer raising an ordinary exception does not alter already emitted output or the return code.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": [
+          "close"
+        ]
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.flush_selector_outcomes",
+          "runtime.close"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R09-flush-and-close-raise-owned",
+      "new_assertion": "Flush failure and close failure are swallowed independently; close is attempted once after failed flush.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": [
+          "flush_selector_outcomes",
+          "close"
+        ]
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.flush_selector_outcomes",
+          "runtime.close"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R10-handle-and-cleanup-raise-owned",
+      "new_assertion": "An adapter failure followed by both cleanup failures stays empty and nonblocking; no failure removes later cleanup attempts.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "callable",
+        "raises": [
+          "handle",
+          "flush_selector_outcomes",
+          "close"
+        ]
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.flush_selector_outcomes",
+          "runtime.close"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R11-missing-flusher-owned",
+      "new_assertion": "A missing optional flusher does not skip a present owned closer.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "absent",
+        "close": "callable",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.close"
+        ]
+      }
+    },
+    {
+      "case_id": "S016-R12-missing-closer-owned",
+      "new_assertion": "A missing optional closer does not skip an available flusher.",
+      "argv": [
+        "codex",
+        "user_prompt_submitted"
+      ],
+      "synthetic_envelope": {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "synthetic-s016",
+        "prompt": "Synthetic lifecycle fixture."
+      },
+      "selector_active": null,
+      "services": "factory",
+      "fake": {
+        "adapter_for": "adapter",
+        "handle": "response",
+        "flush_selector_outcomes": "callable",
+        "close": "absent",
+        "raises": []
+      },
+      "compact_restore": "forbidden",
+      "expected": {
+        "return_code": 0,
+        "stdout": "{\"synthetic_lifecycle\":\"ok\"}\n",
+        "stderr": "",
+        "ordinary_exception_escapes": false,
+        "cleanup_phase": "entered",
+        "trace": [
+          "stdin.read",
+          "runtime.build",
+          "runtime.adapter_for",
+          "adapter.handle",
+          "stdout.write",
+          "runtime.flush_selector_outcomes"
+        ]
+      }
+    }
+  ],
+  "evidence_limit": "This JSON is authored expectation data only. No case has been invoked or passed. A future source-level fake-seam run cannot establish native delivery, method reading/application or useful answers."
+}
