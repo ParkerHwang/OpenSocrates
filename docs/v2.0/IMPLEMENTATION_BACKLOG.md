@@ -2,6 +2,8 @@
 
 This backlog is a proposed sequence of implementable work, not a record that any feature is complete. Read [the master plan](MASTER_PLAN.md), [product cases](PRODUCT_AND_EVALUATION.md), [host research](HOSTS_AND_BOTS.md), and [architecture](ARCHITECTURE_AND_MIGRATION.md). Each item should become a focused issue or PR when its prerequisite contracts and current-main source are reconciled; do not start implementation from historical branches blindly.
 
+The parent tracker is [2.0 preparation and implementation](https://github.com/ParkerHwang/OpenSocrates/issues/136). Initial workstreams: [baseline and evaluation](https://github.com/ParkerHwang/OpenSocrates/issues/138), [task and reader contracts](https://github.com/ParkerHwang/OpenSocrates/issues/139), [multilingual delivery](https://github.com/ParkerHwang/OpenSocrates/issues/140), [history and working memory](https://github.com/ParkerHwang/OpenSocrates/issues/141), [mandatory Cursor and host adapters](https://github.com/ParkerHwang/OpenSocrates/issues/142), [installation and migration](https://github.com/ParkerHwang/OpenSocrates/issues/143), [Bot profiles](https://github.com/ParkerHwang/OpenSocrates/issues/144), and [independent review and latency](https://github.com/ParkerHwang/OpenSocrates/issues/145). Split these further as scope and dependencies are validated.
+
 | ID | Work | Deliverable and acceptance | Dependencies |
 | --- | --- | --- | --- |
 | B01 | Freeze actual release baseline | Inventory v1.5.3 host packages and ten language content; inspect initial guidance and actual delivered tokens per accessible host; retain unknowns and exact versions. | None |
