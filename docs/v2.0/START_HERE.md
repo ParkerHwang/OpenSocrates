@@ -6,7 +6,7 @@ This packet prepares development. No runtime behavior is changed by the packet. 
 
 1. Read repository `AGENTS.md`, `CONTRIBUTING.md`, `SECURITY.md`, this packet and the 2.0 tracking issue. Reconcile the current `main` and any newer release with the pinned v1.5.3 baseline, and search the current issue/PR state before changing files.
 2. Inventory relevant current source and the preserved 1.6 heads in the master plan. Prior 1.6 evidence is revision-specific, and the older withdrawn v1.5 candidate must not be merged, cherry-picked or copied. Separate independently reusable 1.6 work from unverified behavior.
-3. Create a focused branch or isolated worktree from current main. Preserve other work and installations. Work through WP0: capture the v1.5.3 baseline and freeze synthetic cases and evaluation protocol; record access limits instead of silently substituting hosts.
+3. Create a focused branch or isolated worktree from current main. Preserve other work and installations. Work through WP0: capture the v1.5.3 baseline and freeze the [initial synthetic cases](EVALUATION_CASES.md) and evaluation protocol; record access limits instead of silently substituting hosts.
 4. Implement the shared task/reader contract and locale separation against the product cases, followed by host adapters and lifecycle, memory, review and bot experiments according to dependencies in the master plan. Use the referenced acceptance documents as tests, not as authorization to act beyond user requests.
 5. Open small linked draft PRs with concrete changes, exact validation and unresolved evidence. Do not merge, release, change active installations or broaden permissions simply because development was requested. Use the normal repository workflow and existing user authorization.
 

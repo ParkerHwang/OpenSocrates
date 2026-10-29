@@ -6,6 +6,7 @@
 - [마스터 플랜과 작업 분해](MASTER_PLAN.md)
 - [구현 작업 목록](IMPLEMENTATION_BACKLOG.md)
 - [제품 요구사항과 평가](PRODUCT_AND_EVALUATION.md)
+- [초기 가상 평가 사례](EVALUATION_CASES.md)
 - [호스트 및 Bot 조사](HOSTS_AND_BOTS.md)
 - [아키텍처와 이전](ARCHITECTURE_AND_MIGRATION.md)
 - [개발 착수와 인계](START_HERE.md)

@@ -6,6 +6,7 @@ This is the development-start packet for OpenSocrates 2.0. It records the produc
 - [Master plan and work packages](MASTER_PLAN.md)
 - [Implementation backlog](IMPLEMENTATION_BACKLOG.md)
 - [Product requirements and evaluation](PRODUCT_AND_EVALUATION.md)
+- [Initial synthetic evaluation cases](EVALUATION_CASES.md)
 - [Host and bot research](HOSTS_AND_BOTS.md)
 - [Architecture and migration](ARCHITECTURE_AND_MIGRATION.md)
 - [Development start and handoff](START_HERE.md)
