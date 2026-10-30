@@ -2,6 +2,8 @@
 
 **상태:** 제품 기획 및 개발 준비. 구현·호스트 지원·사용자 효과·릴리스는 확인되지 않았다. 기준 main: `d6b8ff1dc0dc7a51ebd5896a395ac39236e77d1c`. 사용자 지정 첫 실제 사용 검증은 Claude이며, 일반 Chat·Cowork·Code를 별도 표면으로 기록한다.
 
+진행 기록: [기획 이슈 #146](https://github.com/ParkerHwang/OpenSocrates/issues/146) · [초안 PR #147](https://github.com/ParkerHwang/OpenSocrates/pull/147). 이 패키지와 실제 구현·호스트 시험은 별도 작업이다.
+
 1. [제품 명세와 인수 조건](PRODUCT.md)
 2. [사용자 경험과 화면 흐름](USER_EXPERIENCE.md)
 3. [기술 설계와 데이터 계약](TECHNICAL_DESIGN.md)
