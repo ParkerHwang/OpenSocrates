@@ -1,6 +1,13 @@
-# 업무 사실 라이브러리: 개발 착수 패키지
+# 일반 사무 업무를 돕는 AI 플러그인: 개발 착수 패키지
 
 **상태:** 제품 기획 및 개발 준비. 구현·호스트 지원·사용자 효과·릴리스는 확인되지 않았다. 기준 main: `d6b8ff1dc0dc7a51ebd5896a395ac39236e77d1c`. 사용자 지정 첫 실제 사용 검증은 Claude이며, 일반 Chat·Cowork·Code를 별도 표면으로 기록한다.
+
+목표 사용자는 **비개발직군의 일반 사무직 전반**이다. 업무 사실 라이브러리는
+업무에 필요한 맥락을 사전에 전달하고 새로 확인된 내용을 자동 저장하기 위한
+핵심 구성요소다. 제품은 회의, 문서, 조사, 분석, 기획, 운영, 소통 등 서로 다른
+일을 돕는다. 이 예시 목록은 직군·업무의 허용 목록이 아니며, 모든 직군에서
+이미 기능이나 효용이 검증됐다는 주장이 아니다. 새 업무로 관련 기록이 없거나
+남길 내용이 없어도 가능한 작업과 필요한 사고 지원을 계속한다.
 
 진행 기록: [기획 이슈 #146](https://github.com/ParkerHwang/OpenSocrates/issues/146) · [초안 PR #147](https://github.com/ParkerHwang/OpenSocrates/pull/147). 이 패키지와 실제 구현·호스트 시험은 별도 작업이다.
 
@@ -17,4 +24,4 @@
 
 ## English orientation
 
-This preparation packet specifies a proposed work-fact library for nontechnical office work: deliver relevant, source- and time-qualified context before a task, then classify and save newly established facts after work without per-save approval. Users can inspect, correct and delete records. The first live evaluation is Claude, with Chat, Cowork and Code treated as distinct surfaces. Host support, usefulness, identity, storage location and personal-versus-team scope remain unverified or undecided. The current no-workspace-content-retention contract is not changed by this packet. The detailed planning documents are in Korean.
+This preparation packet proposes an AI work assistant for nontechnical office roles across a broad range of work, including one-off and continuing tasks. A work-fact library is a core component: deliver relevant, source- and time-qualified context before a task, then classify and save newly established facts after work without per-save approval. The assistant continues useful work and appropriate thinking support when no relevant record or saveable fact exists. Users can inspect, correct and delete records. The first live evaluation is Claude, with Chat, Cowork and Code treated as distinct surfaces. Host support, usefulness across roles, identity, storage location and personal-versus-team scope remain unverified or undecided. The current no-workspace-content-retention contract is not changed by this packet. The detailed planning documents are in Korean.
