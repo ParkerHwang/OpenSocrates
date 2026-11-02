@@ -22,6 +22,7 @@ Attach only the evidence state actually obtained to each claim. States do not pr
 | Offline validated | Observed using synthetic inputs and isolated fixtures |
 | Observed on a real host | Directly observed on the stated app, surface, OS and account |
 | Comparatively evaluated | Relative outcomes assessed under a frozen protocol |
+| Operator policy blocked | The operating tool policy blocks that attempt. Distinguish this from the host's own support, and do not circumvent the same action. |
 | Unavailable/unknown | Access, permission, capability or measurement limits are explicit |
 
 | Required app/OS | Surfaces to distinguish | Current 2.0 qualification state |
@@ -33,7 +34,19 @@ Attach only the evidence state actually obtained to each claim. States do not pr
 
 Capabilities can differ by installed app, plan, region, rollout and administrator policy. Documentation is not account-specific availability. If surfaces have no meaningful distinction, record that observation and combine duplicate cells; do not hide an unobserved surface inside a passing cell. Set exact OS-version and CPU-architecture support after actual tests.
 
+In this meeting, a public synthetic `claude://` deep-link probe was blocked before execution by the in-app browser's URL policy. This is a tool-route restriction, not a success or failure of the Claude app itself. HOST-09 remains unexecuted in that attempt; the blocked action was not circumvented through another route.
+
 For each capability, distinguish registration/enabling, session creation, identification of delivered prompt/guide/context, agent receipt or reading, and task outcome. Agent self-report alone is not independent verification of reading or application. If the host provides no privacy-compatible receipt identity, leave that stage unknown and report observed outcomes separately. Do not make the search for an unavailable receipt an additional product-completion requirement.
+
+### Host observations to distinguish first
+
+In an authorized test environment for each app, OS and mode, examine these three independently with public synthetic material. Distinguish permissions required by the host during initial installation from confirmations required during ordinary work.
+
+1. **New execution conversation:** Can the product actually open a new conversation, send the first request and retrieve the result through the layer? Observation establishes each completed step only; if any step fails, that automatic route remains incomplete. An open screen or prefilled composer is not completion.
+2. **Recipient and authority:** Observe whether two conversations share connections or processes; whether the host supplies conversation identity and authority information the model cannot arbitrarily alter; and what happens after restart or misdelivery. A single observation of process separation or a matching identifier is not a guarantee of isolation or authentication. Without verified binding, hold only the affected sensitive delivery and attribution while independent work continues.
+3. **In-flight exchange:** Observe whether an execution conversation can be informed of, retrieve and apply changed conditions and return its result, including user intervention and delay. Record delivery, reading, application and output separately; assess alternatives independently when a route is unsupported.
+
+These are planned design probes, not results. Do not retry or bypass an action blocked by the operator tool's policy through another route. Even partial success does not establish support for all four combinations, security, output quality or the effect of personalization.
 
 ## 3. Preparation and data boundaries
 
@@ -89,6 +102,10 @@ These cases are to be run after implementation. Their expectations apply to each
 | HOST-06 | Worker created but follow-up or reread unavailable | Leave application of a new choice pending/unknown and do not report an old result as incorporating it. If a required worker cannot be created, do not produce the artifact in intake instead. |
 | HOST-07 | Intake, reassembly and learning conversations need guidance | Observe applicable guides/context reaching intake interpretation and consultation and the full common generation instructions, or a complete module with required dependencies/safeguards, and input versions reaching generation conversations. Identify module IDs/revisions and check that even a complete module contains safeguards against prohibited raw-conversation/workspace copying and for settled choices and valid authority. Test that a result produced with known missing mandatory safeguards is not persisted or applied as a personal guide. Do not infer missing content merely from unavailable receipt/read proof; record that stage as unknown. |
 | HOST-08 | Use 2.0 personal guidance on a host with 1.x installed | Validate coexistence/migration and the 2.0 trust boundary on that host while respecting user settings. Do not mislabel personal guidance as a 1.x canonical method or promote tool output to user authority. |
+| HOST-09 | Prefill a public synthetic request using a Claude deep link | Distinguish opening a screen, composer prefill, actual send, durable conversation creation, guide delivery and result return. Test the documented roughly 14,000-character truncation and folder confirmation on the actual app/version; separately assess exposure of raw URL arguments. |
+| HOST-10 | Local app connection drops while host cloud work continues | Separate cloud inference status from local DB/file access. Do not assume inference stopped solely because the app closed; distinguish returned results, local application and unknown external effects. |
+| HOST-11 | Computer use on macOS and Windows | Verify the documented macOS background and Windows foreground behavior separately for the actual app/version/authority. Do not bypass user-input conflicts or host confirmation. |
+| HOST-12 | Earlier and latest MCP specifications versus actual host support | Check each host's transport version, state handles, calls, subscriptions, update paths and recipient authentication separately. Do not treat an MCP session ID or clientInfo as actual conversation identity or invent unavailable receipts. |
 | GUIDE-01 | A new user has no generated guides | Use an applicable guide from the initial 48. Missing personal guidance does not block ordinary work. |
 | GUIDE-02 | Relevant and unrelated personal guides exist | Prefer suitable personal guidance without importing an unrelated project's guide. The mere existence of any personal guide must not disable baseline fallback. |
 | GUIDE-03 | No suitable personal guide exists | Use an applicable baseline path. Inspect public suitability/selection grounds without requesting private reasoning. |
@@ -138,8 +155,8 @@ This mapping aids traceability; a documented case is not an executed or passing 
 | --- | --- |
 | REQ-01–02 interpretation, consultation, format | USER-01, USER-03 |
 | REQ-03–04 intake and real execution conversations | HOST-01, HOST-06 |
-| REQ-05–07 layer mediation, dynamic delegation, selection | HOST-02, HOST-03, HOST-05, GUIDE-04 |
-| REQ-08 guidance and context for each judging conversation | HOST-07, HOST-08, GUIDE-07 |
+| REQ-05–07 layer mediation, dynamic delegation, selection | HOST-02, HOST-03, HOST-05, HOST-12, GUIDE-04 |
+| REQ-08 guidance and context for each judging conversation | HOST-07, HOST-08, HOST-12, GUIDE-07 |
 | REQ-09 personal-guide preference and baseline fallback | GUIDE-01–03, GUIDE-08–09 |
 | REQ-10 context selection and branching | CONTEXT-01–04 |
 | REQ-11 important decisions and authority | USER-02–03, TRUST-01–04 |
