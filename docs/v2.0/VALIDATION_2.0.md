@@ -135,7 +135,19 @@ References and identifiers can themselves be sensitive; minimize and protect acc
 
 Document completion and product validation are separate. The final handoff states the actual verified commit, exact commands/results, omitted checks/reasons, unobserved app/OS evidence and next actions. If all planned cases are unexecuted, say so.
 
-## 8. Source checks and release judgment
+## First demonstration and falsification experiments from the meeting
+
+This is a **planning scenario**, not a completed demo or evaluation. A fictional user loosely requests investor-facing churn analysis and chooses Word. The intake conversation settles purpose, format and decisions. OpenSocrates prepares applicable initial guides and context and delivers them to a real execution conversation. If that conversation needs a chart, it delegates to another real session through the layer. The user changes the report to lead with the decision and next actions; a scoped, uncertain candidate guide is quietly generated and the system attempts suitable in-flight application. A later similar task and an unrelated task test appropriate transfer. Do not fabricate inputs or results as a successful run.
+
+These experiments can begin independently before implementation is complete:
+
+1. **Interruption and lost input:** Interrupt interpretation with synthetic input and a host double. Test readable/unreadable sources and interruption before/after delivery separately; distinguish recovery, `input_unavailable`, `payload_unrecoverable`, `effect_unknown` and deduplication. A host double cannot establish actual app reread capability.
+2. **One real host cell round trip:** In one available app/OS cell, observe creation of a new conversation, task identification, guide/context delivery and layer-mediated results using public synthetic material. Record unavailable and unknown stages accurately. One successful cell does not establish support for all four.
+3. **Contribution of personalization:** Where feasible, compare baseline guidance, a same-information fact memo and personal guidance under matched conditions. Use held-out later work, unrelated work and changed preferences. Separate blinded and actual-user ratings where possible; preserve failures, ties, costs and delays. Failure to beat a fact memo does not automatically disprove the value of team communication or context management.
+
+Model self-report, delivery of a guide ID and the presence of a file are different observations. None alone proves changed reasoning or improved quality. The aim is an experience where a user can explain less and still obtain useful results and retain control, not merely an impressive demo; do not claim that outcome before evaluation.
+
+## 9. Source checks and release judgment
 
 After integrating the full implementation and stabilizing files under review, run the full source suite in [CONTRIBUTING.md](../../CONTRIBUTING.md) against the reported commit.
 
