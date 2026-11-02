@@ -104,6 +104,8 @@ After both models reread the four `e21b396` sources, they identified missing del
 
 Both models then reviewed `73e5b20`. This revision keeps the applicable portion of a partly fitting personal guide as an option, distinguishes unverified model reports from task judgment inside existing authority, and clarifies learning-stop state, actual application holds for affected derived guides, and pending file-write conflicts. It also addresses partial delivery of the common generator instructions and resending results whose retention is prohibited. This review remains adversarial examination of a plan, not evidence of product completion.
 
+A further review of `fd8ee36` revisited an old three-page decision overriding a provisional four-page worker change, indistinguishable first-install and fully lost stop settings, missing generation-module lineage and positive controls for leak checks, propagation of verified user changes, and required safeguards for complete instruction modules. Automatic startup after all settings disappear remains a tradeoff and experiment because a new user's experience and an earlier user's pause may conflict.
+
 See the [system design §§12–14](SYSTEM_2.0.md) for draft instructions and state contracts, and the [validation plan](VALIDATION_2.0.md) for the synthetic demonstration and comparison experiments. Claude's and Grok's differing proposals are design input, not evidence of real-world effectiveness.
 
 ## Handoff and completion
