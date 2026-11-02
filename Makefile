@@ -127,6 +127,12 @@ docs-check:
 		--path evals/v1.2/ADJUDICATION_GUIDE.md \
 		--path evals/v1.2/ADJUDICATION_AI_AMENDMENT.md \
 		--path .github/release-notes \
+		--path docs/v2.0/README.md \
+		--path docs/v2.0/README.ko.md \
+		--path docs/v2.0/RELEASE_BASELINE_1.5.3.md \
+		--path docs/v2.0/IMPLEMENTATION_BACKLOG.md \
+		--path docs/v2.0/MASTER_PLAN.md \
+		--path docs/v2.0/START_HERE.md \
 		--report build/evidence/links.json
 
 governance-check:

@@ -5,6 +5,7 @@ This is the development-start packet for OpenSocrates 2.0. It records the produc
 - [한국어 시작 안내](README.ko.md)
 - [Master plan and work packages](MASTER_PLAN.md)
 - [Implementation backlog](IMPLEMENTATION_BACKLOG.md)
+- [v1.5.3 release baseline inventory](RELEASE_BASELINE_1.5.3.md)
 - [Product requirements and evaluation](PRODUCT_AND_EVALUATION.md)
 - [Initial synthetic evaluation cases](EVALUATION_CASES.md)
 - [Host and bot research](HOSTS_AND_BOTS.md)
