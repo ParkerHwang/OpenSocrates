@@ -13,7 +13,7 @@ First-version targets are **the ChatGPT desktop app's Chat, Work, and Codex expe
 3. [Development roadmap and handoff](ROADMAP_2.0.md): work breakdown, dependencies, open decisions and first scenario.
 4. [Validation and evaluation](VALIDATION_2.0.md): each host and OS, continuity, security, quality and real-use evaluation.
 5. [한국어 문서](README.ko.md).
-6. [Standalone Korean HTML plan](PLAN_2.0.ko.html).
+6. [Standalone Korean HTML plan](PLAN_2.0.ko.html). This is a snapshot of the four Korean planning documents. Refresh it separately after source changes and recheck its content and links.
 
 The packet records proposed behavior and unresolved decisions. Internal model alignment, improved personalized quality, and automatic host-to-host delivery have not been established. The user's request session handles consultation and coordination; new sessions perform actual deliverable work. All inter-agent communications pass through the OpenSocrates layer.
 
