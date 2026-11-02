@@ -167,6 +167,8 @@ These cases are to be run after implementation. Their expectations apply to each
 | STORE-03 | Deleted guide contributed to a reassembled guide already sent to another active app | Reconsider affected candidates and pending work where permitted lineage exists. Distinguish incomplete provenance, already-delivered context, host memory and old backups as separate unknowns. Do not conceal the tension between total forgetting and blocking semantically similar future learning. |
 | STORE-04 | A learning result arrives after the user forbids retention | First validate a positive control for a synthetic sentinel; inspect DB, WAL, index, logs, queues and product backups. Non-detection is evidence only within that detection method, not proof of complete erasure from host memory, OS backups or physical media. |
 | STORE-05 | Interruption between an external file write and DB state recording, or a file changes and later returns to the same bytes | Distinguish current fingerprint, host history and observed effects. Do not establish authorship or past writes from a matching hash or blindly retry while overwrite risk remains. Do not assume an unauthorized raw-content backup for recovery. |
+| INSTALL-01 | Install and run 2.0 when 1.x is already installed or the user has disabled it | Preserve actual installed assets and prior enabled/disabled choices, and test duplicate injection and conflicts for the same input. Do not impose one fixed controller-activation solution on every host. Leave unsupported coexistence paths unknown or limited. |
+| INSTALL-02 | A 2.0 migration or update partially fails before disablement, rollback or removal | Inspect each host's installed assets, settings, data-migration state and recovery result. Do not equate turning off an adapter with full rollback. Distinguish cleanup of program data from user-owned outputs, respecting separate explicit file requests and authority. |
 
 ### Product requirement to representative validation mapping
 
@@ -185,6 +187,8 @@ This mapping aids traceability; a documented case is not an executed or passing 
 | REQ-13 interruption and resumption of learning | LEARN-05–06, LEARN-09–11, LEARN-14–16, STORE-04 |
 | REQ-14–15 files, folders and external change | FILE-01–07, STORE-05 |
 | REQ-16 a team that does not make the user relay messages | HOST-02, HOST-06–07, HOST-13–16 and user-burden measurement |
+
+Roadmap P14 installation, migration and operations maps to representative cases `INSTALL-01–02`, `HOST-08` and `STORE-01–02`. Actual host recovery and distribution evidence must be obtained separately.
 
 ## 6. Quality, learning and burden measures
 
