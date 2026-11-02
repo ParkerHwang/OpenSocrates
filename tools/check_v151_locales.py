@@ -106,6 +106,21 @@ class LocalizationContracts(unittest.TestCase):
                         seen.add(question)
             self.assertEqual(len(seen), 144)
 
+    def test_readme_translations_keep_the_same_link_targets(self) -> None:
+        # Each translation may point at its own localized file (for example
+        # ``procedure.ja.md``), so compare targets with the locale suffix removed.
+        locale_suffix = re.compile(r"\.(?:" + "|".join(LOCALES) + r")\.md$")
+        link = re.compile(r"\]\(\s*<?([^\s)>#]+)")
+
+        def targets(path: Path) -> set[str]:
+            text = path.read_text(encoding="utf-8")
+            return {locale_suffix.sub(".md", target) for target in link.findall(text)}
+
+        expected = targets(ROOT / "README.md")
+        for locale in LOCALES[1:]:
+            with self.subTest(readme=f"README.{locale}.md"):
+                self.assertEqual(targets(ROOT / f"README.{locale}.md"), expected)
+
 
 if __name__ == "__main__":
     unittest.main()

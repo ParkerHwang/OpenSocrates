@@ -158,6 +158,13 @@ Ce sont les langues du texte des méthodes que lit votre assistant.
 
 ## Un projet open source à explorer
 
+Pour comparer soi-même des réponses à des tâches de bureau, le [laboratoire
+d'évaluation local](docs/evaluation-lab.md) prépare des tâches fictives pour
+Work (version de bureau), Claude Cowork et Antigravity sur Mac et Windows. Il
+enregistre les préférences pratiques avant de révéler les conditions ; la mise
+en œuvre du laboratoire reste distincte de la qualification sur les hôtes réels
+et des preuves d'efficacité.
+
 Lisez les méthodes et le code source complets, adaptez-les à votre travail ou
 contribuez avec un nouvel exemple. OpenSocrates est un projet indépendant,
 disponible sous [licence MIT](LICENSE).
