@@ -197,23 +197,56 @@ When sessions share screen-control resources, design app/screen coordination and
 ```mermaid
 flowchart TD
     signal["Permitted choices, edits, collaboration and change observations"]
+    eligibility["Check current learning scope and settings"]
     assess["Interpret with provenance and relevant context"]
     issue["Personal learning problem"]
     propose["Generate, revise or reassemble personal guides<br/>using common generation instructions"]
     apply["Try in relevant actual work<br/>including ongoing work"]
     observe["Observe later outcomes and counterexamples"]
-    checkpoint["Save public progress and version references"]
-    resume["Recheck inputs, authority and versions on resume"]
+    checkpoint["Permitted public progress and version references"]
+    resume["Recheck stage, inputs, authority and effects on resume"]
+    waiting["Hold affected stage or leave it unknown"]
 
-    signal --> assess --> issue --> propose --> apply --> observe
-    observe --> assess
+    signal --> eligibility
+    eligibility -->|"When allowed"| assess
+    assess --> issue --> propose --> apply --> observe
+    observe --> eligibility
+    eligibility -->|"Stopped or necessary condition missing"| waiting
     assess -.-> checkpoint
+    issue -.-> checkpoint
     propose -.-> checkpoint
     apply -.-> checkpoint
-    checkpoint --> resume --> assess
+    observe -.-> checkpoint
+    checkpoint --> resume
+    resume -.->|"Interpretation when conditions allow"| assess
+    resume -.->|"Problem formulation when conditions allow"| issue
+    resume -.->|"Generation when conditions allow"| propose
+    resume -.->|"Delivery/application when conditions allow"| apply
+    resume -.->|"Outcome observation when conditions allow"| observe
+    resume -->|"Required inputs, authority or effects unknown"| waiting
+    waiting -.->|"On resumption or improved conditions"| resume
 ```
 
+Recheck current settings and authority for the relevant stage before each transition as well. Distinguish cancellation and deletion from waiting to resume, and handle their scope according to the actual instruction.
+
 Example learning states are `observed → interpreting → candidate → pending_application → observing_outcome → revised/retained/retired`. Interruption and cancellation are separate states; resume restores the last confirmed stage and unresolved effects. This is not a selected RL algorithm or a validated adoption rule. Absence of edits, silence, or agreement among agents does not by itself establish success.
+
+### Continuing from an interrupted stage
+
+Resumption is not an instruction to return to interpretation every time. If permitted state remains, reconsider the last confirmed stage, current learning settings and scope of the user's instruction, whether inputs can now be recovered, guide/common-instruction versions and effects that may already have occurred in an external app. Choose where to continue accordingly. Each state field, identifier and version reference must itself be permitted for retention; do not invent missing records or vanished raw inputs. These state names and transitions are implementation candidates, not an existing contract.
+
+| Interrupted stage | What to recheck | When a necessary condition is missing |
+| --- | --- | --- |
+| Interpret a signal or formulate a learning problem | Permitted signal and relevant context, provenance/authorship, and the learning setting for that scope | If neither the source nor sufficient permitted evidence is available, mark only that dependent judgment `input_unavailable`; do not invent its contents. |
+| Generate or reassemble a guide | Status of any result, common-instruction and input-guide versions, current setting and authority | If inputs cannot be recovered or a late result cannot be handled under current authority, hold only the affected candidate. Do not retain a body prohibited by the user's stop/deletion scope. |
+| Deliver or try application | Current candidate state and fit, an entry point in the ongoing conversation, cancellation and duplication status | Distinguish `payload_unrecoverable` when unsent content is lost from `effect_unknown` when an already-sent effect is uncertain. Do not blindly redeliver. |
+| Observe outcomes or reconsider | Actually observable later signals, provenance/exposure and the user's current choices | Do not infer reading, use or satisfaction; continue only within observable bounds. Hold the affected stage if the route is unavailable. |
+
+For example, suppose the user stops learning while G1 is being generated, the result arrives late and the user later enables learning again. Resumption does not automatically mean an earlier work result is immediately adopted or an already-sent G0 was successfully canceled. If G1's permitted inputs have disappeared and no sufficient alternative evidence remains, that candidate's judgment remains incomplete. Do not therefore block a new signal from an independent task when the user's stop scope and current settings permit it. A pause, cancellation of one job, prohibition on using a guide and deletion are different; interpret the actual instruction. Whether an older result can later be reconsidered depends on the then-current instruction, permitted evidence and authority, without inventing blanket new approval for every legitimate review.
+
+**Synthetic DB observation of stop and resume:** On 2026-11-03, the chair ran `python3 docs/v2.0/examples/learning_epoch_probe.py` on macOS with Python 3.14.8 and SQLite 3.53.4. In one process, the script closed and reopened a temporary DB connection and recorded a simulated stop and resume in sequence. The conditional update with the pre-stop version affected zero rows both while stopped and after resume; the first update using the new version affected one row and the duplicate with the same revision affected zero. This observation distinguishes local DB updates under these synthetic conditions; it does not validate an actual forced process crash, concurrent execution, permission to retain personal data or 2.0 learning. Version numbers and conditional updates are one design candidate, and a number does not itself authorize retention.
+
+A conditional DB check and an external app send cannot be assumed to be one atomic effect. Recheck current settings and authority immediately before sending when feasible, without promising to eliminate every race between those operations. When a send has happened and its effect cannot be observed, leave that effect unknown rather than recasting it as successful cancellation or non-delivery.
 
 Applying learning to related ongoing work remains a product goal. Writing a new local database version is different from changing an already running model's context. Use actual adapter-supported entry points such as a subsequent message, tool call or session continuation, and track the version received when receipt can be observed. Leave receipt or use unknown when it cannot be observed. If no entry point is available, retain `pending_application` and do not claim live application. Do not remove the in-flight requirement merely by freezing versions.
 
@@ -222,6 +255,8 @@ Avoid a feedback loop that treats guide generation, delivery or repeated model s
 Judge compatibility with the work's audience, purpose and current user choices before applying a change. Distinguish general preferences from project-specific edits, external changes, another author's changes, expression changes and actual error corrections. An ambiguous signal may remain a scoped, unverified hypothesis rather than a strong personal preference. Reward, adoption/retirement, regression detection and compute budgets are decisions to investigate through the validation experiments.
 
 Consistent with the product direction of personalization without an explicit learning command, consider an initial configuration that runs learning automatically when a genuine first install is established. The user can pause or change it; retain only permitted minimal settings. Test how first install is distinguished from loss or corruption of an existing setting. Separate the state of user-disabled or paused learning from the work itself. Whether the user's instruction pauses only new learning or also use of existing personal guides depends on the actual words and context. Do not automatically re-enable explicitly paused learning on restart or login. Attempt to cancel in-flight learning where the host supports it and prevent already-sent inputs or late results from silently reactivating it; leave cancellation and delivery unknown when unobservable. If the user has said not to retain late learning results, do not store the result body in the DB, logs, retry queue, index or backups. When authority or policy does not permit retention, do not assume a pending body is stored by default. Do not send that result again to a learning conversation if resending it or host-side retention would violate the user's prohibition or policy. Use only permitted minimal state for cancellation and deduplication. Separately assess whether transient processing is allowed and what the host retains independently. Pausing is not automatic deletion. If the user later enables learning, recheck permitted input, current authority and guide versions. The precise scope of the user's choice and actual host behavior require implementation and testing. One candidate is to associate the learning-setting revision with each request and revalidate late results, so re-enabling learning does not automatically treat an earlier paused request as newly authorized. Permission to retain state records and result bodies is assessed separately. A minimal setting needed to honor the user's instruction to turn learning off may be retained without learning content if the actual scope of the prohibition permits it. If the user forbids or deletes even that setting, do not assume the state is retained. Do not silently reactivate learning based only on a guess when a prior pause or corrupt settings are established on restart. A technical path to distinguish first launch from prior disabling when no persistent cue exists still requires separate design and validation. Stop affected learning when necessary deduplication/resumption control becomes impossible, and check whether any permitted setting can preserve the prohibition across restart. Do not stop all unrelated user work.
+
+Deleting the local DB and settings does not necessarily remove requests already sent to another app, guidance in its session, or late results. If an external result arrives in what looks like a new installation and its relationship to an earlier request cannot be established, leave its provenance, authority and effect unknown rather than automatically adopting it as an authorized result of new work. Do not assume a send ledger is the only possible evidence: distinguish a current direct user instruction and a correction observed at a permitted time from an agent result of unknown origin. A shared session, timing or a newly generated identifier alone does not authenticate an external reply, establish uniqueness or prove deduplication. Separately assess permission to retain content and metadata such as identifiers, times and counts. What connections and evidence the actual hosts offer remains unverified.
 
 The choice when install, prior pause and recovery state genuinely cannot be distinguished remains open. Automatically starting learning by default helps a new user but cannot recover an earlier user's choice to stop. Holding only learning reduces the chance of violating a prior pause but may delay a new user's automatic learning. Starting and displaying a notice still does not technically restore a previous stop. First test whether permitted minimal settings or installation evidence can distinguish the cases; explain the limitation only when outcomes materially differ, such as a user requesting complete removal of every setting while also expecting the old pause to persist. Do not present any of these alternatives as an already-settled user decision or verified behavior.
 
