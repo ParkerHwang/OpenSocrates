@@ -174,6 +174,7 @@ document = """<!doctype html>
 </style></head><body><div id="top" class="layout"><aside class="sidebar"><div class="brand"><b>OpenSocrates</b>Development · 2.0</div><div class="side-label">CONTENTS</div><nav class="nav" aria-label="문서 목차">__NAV__</nav><div class="side-foot">개발 계획 문서<br>2026.11.03 · 한국어</div></aside><main class="main"><header class="hero"><div class="eyebrow">PRODUCT · SYSTEM · DELIVERY</div><h1>OpenSocrates 2.0<br>개발계획서</h1><p>사용자를 중심으로 함께 일하고, 실제 업무 경험에서 발전하는 에이전트 팀을 위한 계획입니다.</p><div class="meta"><span class="pill">개발 계획</span><span class="pill">macOS + Windows</span><span class="pill">ChatGPT + Claude 데스크톱</span></div></header><div class="content"><div class="intro"><p><strong>이 문서의 상태</strong> · 대화에서 정한 제품 방향과 구현·검증 계획입니다. 아직 제품 구현, 효과 또는 각 환경의 연결 성공을 뜻하지 않습니다.</p><div class="flow" role="group" aria-label="업무 흐름"><span class="step">사용자의 요청</span> <span class="arrow" aria-hidden="true">→</span> <span class="step">상담과 작업 준비</span> <span class="arrow" aria-hidden="true">→</span> <span class="step">별도 작업 대화</span> <span class="arrow" aria-hidden="true">→</span> <span class="step">결과 전달</span></div></div>__SECTIONS__<div class="footer">이 문서는 계획 문서의 한국어 내용을 하나로 모은 스냅샷입니다. 최신 개발과 변경 이력은 저장소 원본 문서를 확인하세요. <a class="toplink" href="#top">맨 위로 ↑</a></div></div></main></div></body></html>"""
 diagram_style = """
 .sidebar{overflow-y:auto}
+.side-label,.nav span,.arrow{color:#526c67}
 .intro p+p{margin-top:10px}
 .intro .flow+p{margin-top:14px}
 .skip-link{position:absolute;left:16px;top:-80px;z-index:10;background:#fff;color:#075d53;padding:8px 12px}
@@ -194,7 +195,7 @@ diagram_style = """
 .flow-overview figcaption{font-size:13px;color:#526b64;padding:8px 6px 2px}
 @media(max-width:820px){.nav{display:block;overflow:visible}.nav-group>a{white-space:normal}.nav-group li a{white-space:normal}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-@media print{.diagram-viewport{overflow:visible}.diagram-viewport svg{min-width:0}.flow-overview{break-inside:avoid}}
+@media print{.diagram-viewport{overflow:visible}.diagram-viewport svg{min-width:0}.flow-overview{break-inside:avoid}.chapter pre{color:#17242d;background:#fff;border:1px solid #96a9a2;overflow:visible;white-space:pre-wrap;overflow-wrap:anywhere}}
 """
 document = document.replace("</style>", diagram_style + "</style>", 1)
 document = document.replace(
