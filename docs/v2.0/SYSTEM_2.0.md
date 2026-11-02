@@ -139,7 +139,7 @@ This synthetic scenario starts with a user requesting a **Word report containing
 
 | Step | Who sends or does what | What to establish and what can continue on failure |
 | --- | --- | --- |
-| 1. Prepare | The intake conversation sends the settled Word and editable-chart choices, task and authority to the layer; the layer prepares guidance and context for consultation. | Distinguish the model's restatement from the user's actual choice. Continue necessary consultation where a consequential choice remains open. |
+| 1. Prepare | The intake conversation sends the settled Word and editable-chart choices, task and authority to the layer; the layer prepares guidance and context for consultation. | Distinguish the model's restatement from the user's actual choice. Separately examine delivery to intake of applicable guidance and context whose use is permitted. Distinguish no applicable guide or disabled use from unknown receipt or reading. Continue necessary consultation where a consequential choice remains open. |
 | 2. Delegate to A | The layer requests creation of A as a real new conversation and delivers the task, expected output, relevant materials, guidance and context through supported paths. | Observe creation of the new conversation, correct destination, send, receipt and reading separately. If A cannot be created, the intake conversation does not produce the artifact in its place. |
 | 3. Delegate to B | If A determines a chart is needed, A → layer → B carries the chart purpose, numbers, format, guidance and material authority. | If B cannot be opened, A continues analysis that does not depend on B while the chart-dependent part waits. B's model name or creation alone is not evidence of quality. |
 | 4. Revision round trip | Carry A's chart revision request → layer → B, then B's revised result reference and sources or limitations → layer → A. | Distinguish request send, B's receipt, result return and A's receipt. Non-receipt and unknown receipt differ; do not turn the latter into either success or failure by assumption. |
@@ -180,7 +180,7 @@ A design may explore placing a short reference or one-time value in a start mess
 
 | Kind | Who changes it | Lifetime and use |
 | --- | --- | --- |
-| Baseline 48 reasoning guides | OpenSocrates canonical content and release management | Used at initial installation and when no appropriate personal guide exists for the task. |
+| Baseline 48 reasoning guides | OpenSocrates canonical content and release management | Used initially and when no appropriate personal guide exists; they may also complement or be recomposed with a partially applicable personal guide. |
 | Common guide-generation instructions | OpenSocrates version updates | Shared foundation for all users; personal learning does not rewrite it. |
 | Personal generated guides | That user's learning logic | Develop from actual experience. No fixed guide-count limit; relevant portions are selected per job. |
 
@@ -191,7 +191,7 @@ A personal guide version links the generator version, input guide versions, scop
 1. Find personal guides applicable to the current request's purpose, project, work type, audience, time and authority.
 2. Prefer applicable personal guides. Select, combine or reassemble several when useful; mere concatenation is not required.
 3. When no appropriate personal guide exists, use applicable guides from the baseline 48. If none fits, continue ordinary work without forcing an inapplicable method.
-4. When a personal guide fits only partly, judge whether to use its applicable part, combine/reassemble it with baseline guidance, or use baseline fallback because suitability is insufficient, according to context and required conditions. Do not always choose the baseline for implementation convenience when a personal thinking direction actually fits. Evaluate the selection policy without presenting one route as an already-settled owner decision.
+4. When a personal guide fits only partly, judge whether to use its applicable part, combine/reassemble it with baseline guidance, or use baseline fallback because suitability is insufficient, according to context and required conditions. Combining or recomposing personal and baseline guidance is a direction the user has allowed. Do not always choose the baseline for implementation convenience when a personal thinking direction actually fits. Evaluate which route to choose in which situation without presenting a specific selection policy as an already-settled owner decision.
 5. Learning logic judges whether a reconstructed guide is task-local or worth retaining as a reusable personal guide. Storage does not establish effectiveness or permanent adoption.
 
 When applying an existing canonical procedure from the baseline 48 unchanged, preserve its full procedure in the task locale, required dependencies, contraindications, stops and public outputs. Do not represent an excerpt or a reassembled result as a complete read and application of the canonical procedure. A newly reassembled personal guide is a distinct artifact whose provenance and required conditions need review; changes to canonical methods require separate product review and versioning. This preserves the current contract for existing procedures, not a commitment to freeze the 48 forever.
@@ -443,6 +443,8 @@ Investigate and record each item by app, OS, surface, account and version. All r
 Do not silently substitute private app database modification, unauthorized access expansion or model-API execution when a surface lacks a capability. Continue possible preparation and accurately report unavailable delivery, pending application or unknown support. A successful app/OS cell does not pass the other cells.
 
 ### Connection candidates and the excluded alternative
+
+The [development roadmap's official coordination candidates](ROADMAP_2.0.md) also covers ChatGPT Work task coordination, the conversation tools available in this meeting, and distinctions between app-server paths and a specific OAuth configuration. A documented candidate is not evidence that any path has successfully integrated 2.0.
 
 | Route | Observation and current judgment | What remains unproven |
 | --- | --- | --- |
