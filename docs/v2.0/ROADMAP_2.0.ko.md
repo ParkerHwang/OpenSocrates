@@ -87,6 +87,7 @@ P01–P04의 문서화·합성 실험과 P07의 저장소 설계처럼 독립된
 
 - 현재 [패키지 설정](https://github.com/ParkerHwang/OpenSocrates/blob/c0f9390/pyproject.toml)은 v1.5.3의 Python 3.12 런타임과 기존 Codex selector 의존성을 정의한다. 기존 코드를 검토할 수 있지만, 이 의존성을 모든 앱의 2.0 에이전트 실행 API로 일반화하지 않는다. 2.0의 언어·런타임은 아직 선택하지 않았다.
 - 현재 [호스트 어댑터 계약](https://github.com/ParkerHwang/OpenSocrates/blob/c0f9390/src/opensocrates/hosts/base.py)은 호스트 이벤트 처리와 능력 프로필을 위한 것이다. 새 실제 대화 생성, 쌍방향 메시지, 작업·결과 연결, 진행 중 갱신과 자율 협업 계약이 이미 구현됐다는 뜻이 아니다. 필요한 2.0 연결 계약은 별도로 설계하고 기존 호스트 동작을 보존해야 한다.
+- v1.5.3의 [정본 결정 세션](https://github.com/ParkerHwang/OpenSocrates/blob/d6b8ff1dc0dc7a51ebd5896a395ac39236e77d1c/src/opensocrates/selector/decision.py)은 기본 가이드 선택에 검토할 수 있는 레거시 경로다. 수신 대화별 상태 혼동과 범위 전환·늦은 확인의 반례는 [시스템 설계](SYSTEM_2.0.ko.md)의 공존 절과 `GUIDE-16`을 따른다. 개인 가이드를 정본으로 끼우거나 이 경로를 모든 호스트의 필수 조건으로 정하지 않는다.
 - 현재 [Claude 입력 정규화](https://github.com/ParkerHwang/OpenSocrates/blob/c0f9390/src/opensocrates/hosts/claude/native.py)는 제한된 이벤트를 처리하며 개인 호스트 필드를 반환하지 않는 경계다. 이를 대화 기록 수집기라고 부르거나, 해당 표면에서 2.0의 신호 수집·전달이 가능하다는 증거로 쓰지 않는다.
 - 기존 [평가 랩 서버](https://github.com/ParkerHwang/OpenSocrates/blob/c0f9390/src/opensocrates/evaluation/server.py)는 루프백·인증·요청 로그 비활성화 등을 가진 별도 평가용 인터페이스다. 보안 검토의 참고점은 되지만, 그대로 2.0 통신 서버이거나 모든 앱에서 호출 가능하다는 근거는 아니다. 새로운 로컬 채널이 생기면 접근 권한·출처·동시성·취소와 데이터 경계를 그 채널에 맞게 별도 설계한다.
 
