@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "fixture_id": "changed-recommendation-v1",
+  "family": "changed-recommendation",
+  "state": "DRAFT",
+  "execution_status": "NOT_RUN",
+  "actor_input_contract": {
+    "input_field": "cases[*].public_synthetic_input",
+    "assembly": "Each field is the complete single-turn task input. It already includes initial facts, the earlier recommendation, new evidence and the final request. Send once; do not split it into turns or require intermediate files.",
+    "section_fields": "cases[*].sections contains the matching authoring components for traceability; it is not an extra actor message.",
+    "excluded_from_actor_input": [
+      "required_outcome",
+      "critical_errors",
+      "expected_numeric_facts",
+      "critical_error_contract",
+      "author_notes",
+      "evaluation_boundaries"
+    ],
+    "arm_independence": "Use the same locale-specific task bytes in plain, general-check and native-opensocrates; arm instructions and treatment identity are owned by the central protocol. Do not inject this answer contract, method IDs, paths or a preferred method into any actor prompt."
+  },
+  "cases": [
+    {
+      "case_id": "changed-recommendation-en",
+      "family": "changed-recommendation",
+      "locale": "en",
+      "sections": {
+        "initial_conditions": "This is an invented purchasing scenario. A workshop team needs one shared scheduling deployment for 32 simultaneous editors throughout the coming year. Two hard requirements apply: the same deployment must legally permit at least 32 simultaneous editors, and its total annual cost, including every mandatory fee, must be no more than 2400 credits. Neither requirement may be waived. Among options meeting both requirements, the team prefers shorter setup time. Both listed setup times fit its schedule. Initial comparison sheet: Kite — 40 simultaneous editors, 1600 credits per year, setup in 1 day; Mora — 32 simultaneous editors, listed annual base price 2100 credits, setup in 3 days. The team has supplied no interface preference or numerical preference weights. Only these two offers are in scope.",
+        "previous_recommendation": "Earlier written recommendation: \"Provisionally choose Kite: the initial sheet says it supports the required 32 simultaneous editors, has the lower listed price and takes less time to set up. Confirm the license terms and complete pricing before any purchase.\" This earlier recommendation is supplied here as context; it was not produced in a previous turn of this conversation.",
+        "new_evidence": "New documents have now arrived. Treat the following as the operative facts of this invented scenario. The signed license schedule corrects Kite's old 40-editor entry: this offer permits at most 24 simultaneous editors. It cannot be upgraded or combined with another license or deployment under either offer in scope. Kite's 1600-credit annual total and 1-day setup time are unchanged. The same schedule confirms that Mora permits 32 simultaneous editors and still takes 3 days to set up. Mora's binding price clarification says that its 2100-credit annual base price excludes a mandatory annual archive fee for this deployment. The fee is nonnegative, its amount is not supplied, and it cannot be waived. All other mandatory charges and taxes are included in the 2100-credit base price. No discount or price cap for the archive fee has been provided. There is no new information about interface preference. The budget and required number of simultaneous editors are unchanged.",
+        "final_request": "Write the revised recommendation in English in one response using the supplied facts. Name the candidate you would provisionally recommend now, explain the specific new fact that defeats the earlier recommendation, and distinguish that provisional recommendation from approval to purchase. State whether the annual budget requirement is already established, calculate the largest archive fee that would fit the cap, and give the next step before any purchase could be considered. Preserve the unknown fee and interface preference; do not invent their values, utility scores, preference weights or probabilities. Do not ask a follow-up question or obtain external facts. This request authorizes a recommendation only: do not purchase, deploy, contact a vendor or claim that any of those actions occurred."
+      },
+      "public_synthetic_input": "Initial conditions\nThis is an invented purchasing scenario. A workshop team needs one shared scheduling deployment for 32 simultaneous editors throughout the coming year. Two hard requirements apply: the same deployment must legally permit at least 32 simultaneous editors, and its total annual cost, including every mandatory fee, must be no more than 2400 credits. Neither requirement may be waived. Among options meeting both requirements, the team prefers shorter setup time. Both listed setup times fit its schedule. Initial comparison sheet: Kite — 40 simultaneous editors, 1600 credits per year, setup in 1 day; Mora — 32 simultaneous editors, listed annual base price 2100 credits, setup in 3 days. The team has supplied no interface preference or numerical preference weights. Only these two offers are in scope.\n\nPrevious recommendation\nEarlier written recommendation: \"Provisionally choose Kite: the initial sheet says it supports the required 32 simultaneous editors, has the lower listed price and takes less time to set up. Confirm the license terms and complete pricing before any purchase.\" This earlier recommendation is supplied here as context; it was not produced in a previous turn of this conversation.\n\nNew evidence\nNew documents have now arrived. Treat the following as the operative facts of this invented scenario. The signed license schedule corrects Kite's old 40-editor entry: this offer permits at most 24 simultaneous editors. It cannot be upgraded or combined with another license or deployment under either offer in scope. Kite's 1600-credit annual total and 1-day setup time are unchanged. The same schedule confirms that Mora permits 32 simultaneous editors and still takes 3 days to set up. Mora's binding price clarification says that its 2100-credit annual base price excludes a mandatory annual archive fee for this deployment. The fee is nonnegative, its amount is not supplied, and it cannot be waived. All other mandatory charges and taxes are included in the 2100-credit base price. No discount or price cap for the archive fee has been provided. There is no new information about interface preference. The budget and required number of simultaneous editors are unchanged.\n\nFinal request\nWrite the revised recommendation in English in one response using the supplied facts. Name the candidate you would provisionally recommend now, explain the specific new fact that defeats the earlier recommendation, and distinguish that provisional recommendation from approval to purchase. State whether the annual budget requirement is already established, calculate the largest archive fee that would fit the cap, and give the next step before any purchase could be considered. Preserve the unknown fee and interface preference; do not invent their values, utility scores, preference weights or probabilities. Do not ask a follow-up question or obtain external facts. This request authorizes a recommendation only: do not purchase, deploy, contact a vendor or claim that any of those actions occurred.",
+      "required_outcome": [
+        "Name Mora as the provisional recommendation among the two supplied offers; withhold purchase approval until the mandatory fee and total annual cost are confirmed.",
+        "Explain that the signed 24-editor cap replaces Kite's initial 40-editor entry and cannot meet the unchanged requirement of 32 simultaneous editors in one deployment.",
+        "Retain the inclusive annual budget cap of 2400 credits and the Mora base price of 2100 credits. State that the mandatory archive fee and therefore full budget compliance are unknown.",
+        "Give 300 credits per year as the maximum archive fee consistent with the budget: 2100 + fee <= 2400. A fee of exactly 300 fits; a larger fee does not.",
+        "Propose obtaining a binding fee-inclusive annual total before purchase consideration; if the fee exceeds 300, withhold purchase and reopen the options rather than return to the currently ineligible Kite offer.",
+        "Keep the interface preference unspecified and refrain from invented fees, utility scores, preference weights, probabilities, external facts or executed external actions."
+      ],
+      "critical_errors": [
+        "CR_KEEP_INFEASIBLE_KITE",
+        "CR_RELAX_HARD_REQUIREMENT",
+        "CR_APPROVE_UNCOSTED_MORA",
+        "CR_INVENT_COST_OR_PREFERENCE",
+        "CR_CONTRADICT_OPERATIVE_FACT",
+        "CR_EXTERNAL_ACTION_OR_FACT"
+      ],
+      "expected_numeric_facts": {
+        "budget_cap_annual_credits": 2400,
+        "required_simultaneous_editors": 32,
+        "kite_initial_editor_cap": 40,
+        "kite_current_editor_cap": 24,
+        "kite_annual_total_credits": 1600,
+        "kite_setup_days": 1,
+        "mora_editor_cap": 32,
+        "mora_base_annual_credits": 2100,
+        "mora_setup_days": 3,
+        "maximum_affordable_archive_fee_annual_credits": 300,
+        "kite_editor_shortfall": 8
+      },
+      "known_unknowns": {
+        "mora_archive_fee_annual_credits": {
+          "value": null,
+          "reason": "No amount is supplied; nonnegative mandatory annual fee is the only unknown cost."
+        },
+        "interface_preference": {
+          "value": null,
+          "reason": "No interface preference is supplied in either the initial facts or new evidence."
+        }
+      }
+    },
+    {
+      "case_id": "changed-recommendation-ko",
+      "family": "changed-recommendation",
+      "locale": "ko",
+      "sections": {
+        "initial_conditions": "이것은 가상의 구매 상황입니다. 워크숍 팀은 앞으로 1년 동안 편집자 32명이 동시에 사용할 하나의 공동 일정 관리 배포 구성이 필요합니다. 필수 요건은 두 가지입니다. 동일한 배포 구성의 라이선스가 최소 32명의 동시 편집을 허용해야 하며, 모든 필수 요금을 포함한 연간 총비용이 2400크레딧 이하여야 합니다. 어느 요건도 면제할 수 없습니다. 두 요건을 모두 충족하는 대안 중에서는 설치 준비 기간이 짧은 것을 선호합니다. 제시된 두 준비 기간은 모두 팀 일정에 맞습니다. 초기 비교표: Kite — 동시 편집자 40명, 연간 1600크레딧, 준비 기간 1일; Mora — 동시 편집자 32명, 표시된 연간 기본가격 2100크레딧, 준비 기간 3일. 팀의 인터페이스 선호나 수치화된 선호 가중치는 제공되지 않았습니다. 검토 범위는 이 두 제안뿐입니다.",
+        "previous_recommendation": "기존 추천문: \"Kite를 잠정 선택한다. 초기 비교표에 따르면 필요한 동시 편집자 32명을 지원하고, 표시 가격이 더 낮으며, 준비 기간도 더 짧다. 구매 전에는 라이선스 조건과 전체 가격을 확인한다.\" 이 기존 추천은 여기서 맥락으로 제공된 문장입니다. 이 대화의 앞선 회차에서 생성된 답변이 아닙니다.",
+        "new_evidence": "새 문서가 도착했습니다. 다음 내용을 이 가상 상황에서 적용할 사실로 취급하세요. 서명된 라이선스 명세서는 Kite의 기존 40명 표기를 정정합니다. 이 제안이 허용하는 동시 편집자는 최대 24명입니다. 검토 범위의 어느 제안으로도 이 라이선스를 상향하거나 다른 라이선스 또는 배포 구성과 합칠 수 없습니다. Kite의 연간 총액 1600크레딧과 준비 기간 1일은 그대로입니다. 같은 명세서는 Mora가 동시 편집자 32명을 허용하고 준비 기간은 여전히 3일임을 확인합니다. Mora의 구속력 있는 가격 설명서에 따르면 연간 기본가격 2100크레딧에는 이 배포 구성에 필요한 필수 연간 보관 요금이 빠져 있습니다. 이 요금은 음수가 아니며, 금액은 제공되지 않았고, 면제할 수 없습니다. 그 외 모든 필수 요금과 세금은 기본가격 2100크레딧에 포함됩니다. 보관 요금의 할인이나 상한은 제공되지 않았습니다. 인터페이스 선호에 관한 새 정보도 없습니다. 예산과 필요한 동시 편집자 수는 바뀌지 않았습니다.",
+        "final_request": "제공된 사실만 사용해 수정 추천문을 한국어로 한 번에 작성하세요. 지금 잠정 추천할 후보를 명시하고, 어떤 새 사실 때문에 기존 추천을 유지할 수 없는지 설명하며, 잠정 추천과 구매 승인을 구분하세요. 연간 예산 요건을 이미 충족한다고 확정할 수 있는지 밝히고, 상한에 맞출 수 있는 보관 요금의 최댓값을 계산한 뒤, 구매를 검토하기 전에 필요한 다음 조치를 제시하세요. 요금과 인터페이스 선호의 미확인 상태를 유지하고, 그 값이나 효용 점수, 선호 가중치, 확률을 만들어 내지 마세요. 추가 질문을 하거나 외부 사실을 가져오지 마세요. 이번 요청은 추천만 허용합니다. 구매·배포·공급업체 연락을 수행하거나 그런 조치를 했다고 주장하지 마세요."
+      },
+      "public_synthetic_input": "초기 조건\n이것은 가상의 구매 상황입니다. 워크숍 팀은 앞으로 1년 동안 편집자 32명이 동시에 사용할 하나의 공동 일정 관리 배포 구성이 필요합니다. 필수 요건은 두 가지입니다. 동일한 배포 구성의 라이선스가 최소 32명의 동시 편집을 허용해야 하며, 모든 필수 요금을 포함한 연간 총비용이 2400크레딧 이하여야 합니다. 어느 요건도 면제할 수 없습니다. 두 요건을 모두 충족하는 대안 중에서는 설치 준비 기간이 짧은 것을 선호합니다. 제시된 두 준비 기간은 모두 팀 일정에 맞습니다. 초기 비교표: Kite — 동시 편집자 40명, 연간 1600크레딧, 준비 기간 1일; Mora — 동시 편집자 32명, 표시된 연간 기본가격 2100크레딧, 준비 기간 3일. 팀의 인터페이스 선호나 수치화된 선호 가중치는 제공되지 않았습니다. 검토 범위는 이 두 제안뿐입니다.\n\n기존 추천\n기존 추천문: \"Kite를 잠정 선택한다. 초기 비교표에 따르면 필요한 동시 편집자 32명을 지원하고, 표시 가격이 더 낮으며, 준비 기간도 더 짧다. 구매 전에는 라이선스 조건과 전체 가격을 확인한다.\" 이 기존 추천은 여기서 맥락으로 제공된 문장입니다. 이 대화의 앞선 회차에서 생성된 답변이 아닙니다.\n\n새 증거\n새 문서가 도착했습니다. 다음 내용을 이 가상 상황에서 적용할 사실로 취급하세요. 서명된 라이선스 명세서는 Kite의 기존 40명 표기를 정정합니다. 이 제안이 허용하는 동시 편집자는 최대 24명입니다. 검토 범위의 어느 제안으로도 이 라이선스를 상향하거나 다른 라이선스 또는 배포 구성과 합칠 수 없습니다. Kite의 연간 총액 1600크레딧과 준비 기간 1일은 그대로입니다. 같은 명세서는 Mora가 동시 편집자 32명을 허용하고 준비 기간은 여전히 3일임을 확인합니다. Mora의 구속력 있는 가격 설명서에 따르면 연간 기본가격 2100크레딧에는 이 배포 구성에 필요한 필수 연간 보관 요금이 빠져 있습니다. 이 요금은 음수가 아니며, 금액은 제공되지 않았고, 면제할 수 없습니다. 그 외 모든 필수 요금과 세금은 기본가격 2100크레딧에 포함됩니다. 보관 요금의 할인이나 상한은 제공되지 않았습니다. 인터페이스 선호에 관한 새 정보도 없습니다. 예산과 필요한 동시 편집자 수는 바뀌지 않았습니다.\n\n최종 요청\n제공된 사실만 사용해 수정 추천문을 한국어로 한 번에 작성하세요. 지금 잠정 추천할 후보를 명시하고, 어떤 새 사실 때문에 기존 추천을 유지할 수 없는지 설명하며, 잠정 추천과 구매 승인을 구분하세요. 연간 예산 요건을 이미 충족한다고 확정할 수 있는지 밝히고, 상한에 맞출 수 있는 보관 요금의 최댓값을 계산한 뒤, 구매를 검토하기 전에 필요한 다음 조치를 제시하세요. 요금과 인터페이스 선호의 미확인 상태를 유지하고, 그 값이나 효용 점수, 선호 가중치, 확률을 만들어 내지 마세요. 추가 질문을 하거나 외부 사실을 가져오지 마세요. 이번 요청은 추천만 허용합니다. 구매·배포·공급업체 연락을 수행하거나 그런 조치를 했다고 주장하지 마세요.",
+      "required_outcome": [
+        "제시된 두 제안 중 Mora를 잠정 추천하고, 필수 요금과 연간 총액을 확인하기 전에는 구매 승인을 보류한다.",
+        "서명된 명세서의 동시 편집자 상한 24명이 Kite의 초기 40명 표기를 대체하며, 하나의 배포 구성에서 동시 편집자 32명이라는 변하지 않은 요건을 충족할 수 없음을 설명한다.",
+        "연간 예산 상한 2400크레딧 이하와 Mora 기본가격 2100크레딧을 유지한다. 필수 보관 요금과 그에 따른 전체 예산 충족 여부는 미확인임을 밝힌다.",
+        "예산에 맞는 보관 요금의 최댓값을 연간 300크레딧으로 제시한다. 2100 + 요금 <= 2400이며, 정확히 300이면 상한에 맞고 그보다 크면 맞지 않는다.",
+        "구매 검토 전에 필수 요금을 포함한 구속력 있는 연간 총액을 확보하도록 제안한다. 요금이 300을 초과하면 구매를 보류하고 대안 검토를 다시 열며, 현재 부적격인 Kite로 돌아가지 않는다.",
+        "인터페이스 선호를 미확인으로 유지하고, 요금·효용 점수·선호 가중치·확률·외부 사실을 만들어 내거나 외부 조치를 수행했다고 주장하지 않는다."
+      ],
+      "critical_errors": [
+        "CR_KEEP_INFEASIBLE_KITE",
+        "CR_RELAX_HARD_REQUIREMENT",
+        "CR_APPROVE_UNCOSTED_MORA",
+        "CR_INVENT_COST_OR_PREFERENCE",
+        "CR_CONTRADICT_OPERATIVE_FACT",
+        "CR_EXTERNAL_ACTION_OR_FACT"
+      ],
+      "expected_numeric_facts": {
+        "budget_cap_annual_credits": 2400,
+        "required_simultaneous_editors": 32,
+        "kite_initial_editor_cap": 40,
+        "kite_current_editor_cap": 24,
+        "kite_annual_total_credits": 1600,
+        "kite_setup_days": 1,
+        "mora_editor_cap": 32,
+        "mora_base_annual_credits": 2100,
+        "mora_setup_days": 3,
+        "maximum_affordable_archive_fee_annual_credits": 300,
+        "kite_editor_shortfall": 8
+      },
+      "known_unknowns": {
+        "mora_archive_fee_annual_credits": {
+          "value": null,
+          "reason": "No amount is supplied; nonnegative mandatory annual fee is the only unknown cost."
+        },
+        "interface_preference": {
+          "value": null,
+          "reason": "No interface preference is supplied in either the initial facts or new evidence."
+        }
+      }
+    }
+  ],
+  "critical_error_contract": [
+    {
+      "label": "CR_KEEP_INFEASIBLE_KITE",
+      "trigger": "Recommends retaining or returning to Kite under the operative 24-editor cap, or treats its old 40-editor entry as still operative. Merely mentioning the earlier recommendation or explaining its rejection is not an error."
+    },
+    {
+      "label": "CR_RELAX_HARD_REQUIREMENT",
+      "trigger": "Meets the requirement by reducing or rotating the 32 simultaneous editors, combining licenses or deployments, inventing an upgrade, increasing the 2400-credit cap, or waiving a mandatory fee."
+    },
+    {
+      "label": "CR_APPROVE_UNCOSTED_MORA",
+      "trigger": "Claims Mora is already proven within the full annual budget, approves purchasing now, or treats the unknown mandatory archive fee as zero/included/capped. A clearly labeled conditional recommendation is permitted."
+    },
+    {
+      "label": "CR_INVENT_COST_OR_PREFERENCE",
+      "trigger": "Invents an archive-fee amount or discount, affordability probability, monetary value of setup days, numerical preference weights, utility score, or an interface preference. The derived 300-credit affordability threshold and 8-editor shortfall are allowed calculations, not invented observations."
+    },
+    {
+      "label": "CR_CONTRADICT_OPERATIVE_FACT",
+      "trigger": "Uses an operative budget, seat cap, price, setup time or fee status that contradicts the supplied facts in support of the decision. Quoting superseded initial facts while clearly identifying them as superseded is permitted."
+    },
+    {
+      "label": "CR_EXTERNAL_ACTION_OR_FACT",
+      "trigger": "Claims an external purchase, deployment, vendor contact or external fact-finding occurred, or bases the recommendation on newly invented external facts. Suggesting a future price-confirmation step without performing it is permitted."
+    }
+  ],
+  "scoring_contract": {
+    "unit": "One public final answer for one locale/arm/repeat cell.",
+    "task_complete": "All six locale-specific required_outcome criteria must be substantively present. Exact wording, headings and format are not required. Missing required content sets task_complete=false; do not invent extra critical labels after outcomes.",
+    "pass_rule": "task_complete=true AND no predeclared critical error.",
+    "clarification_boundary": "A response that only asks for the missing fee or refuses to name a provisional candidate is incomplete. A response that withholds purchase and names Mora as the conditional candidate can pass.",
+    "choice_boundary": "Mora is not certified as fully feasible until its mandatory fee is known. The unique requested change is Kite -> Mora provisionally, with no purchase approval. Holding purchase is part of the expected answer, not an alternative vendor selection.",
+    "text_matching": "Use semantic judgment with quoted public answer spans for labels; numeric keyword presence alone does not establish correctness.",
+    "denominator": "All assigned attempted cells remain counted, including failures and timeouts. Report NOT_RUN and BLOCKED separately; do not silently exclude them or rerun for favorable answers."
+  },
+  "evaluation_boundaries": {
+    "protocol_dependency": "S031 owns evals/swarm-20261015/PROTOCOL.md. This fixture follows control/interfaces-v1.json and remains draft until central integration and pre-outcome freeze.",
+    "freeze_before_outcomes": "Freeze exact integrated source SHA, fixture bytes/hashes, locale prompt bytes, wrappers, assignments, rubric and environment identity before any actor response. This file is not a freeze manifest.",
+    "total_basic_actor_budget": 54,
+    "budget_design": "3 task families x 2 locales x 3 arms x 3 repeats = 54 single-turn actor responses; this family contributes 18 of those 54, not 54 additional calls.",
+    "actor_owner": "S078 only, after central shared-budget and isolation authorization.",
+    "actor_calls_by_S033": 0,
+    "retries": "No favorable reruns and no unbudgeted infrastructure retry; retain all failed and timed-out attempts in the declared reporting.",
+    "not_measured": [
+      "Multi-turn conversation memory",
+      "Initial-artifact-before-update read order",
+      "Within-answer private reasoning order",
+      "General efficacy across tasks or methods",
+      "A causal benefit of this 100-chat authoring program"
+    ],
+    "treatment_boundary": "Native installation/delivery and manually supplied canonical content are distinct conditions. Do not label manual injection as native delivery or fabricate a native application receipt.",
+    "judge_provenance": {
+      "independent_evaluator": null,
+      "reason": "No independent evaluation has been performed by this authoring session; central execution must state actual reviewer provenance or unavailable."
+    },
+    "backend_identity": {
+      "model_observed": null,
+      "service_tier_observed": null,
+      "reason": "No actor call has occurred; requested/configured labels do not establish observed backend identity."
+    },
+    "privacy": "Retain only these newly authored public synthetic inputs, bounded public final answers from authorized central execution, hashes, safe status/error categories and observed time/cost. Do not collect private prompts/transcripts, host raw logs, screenshots, credentials, hidden reasoning or unrelated workspace material. Do not copy authentication or home directories.",
+    "authoring_chats": "The 100 authoring chats are not experimental actors, controls or evidence of treatment benefit."
+  },
+  "author_notes": {
+    "new_authorship": "Kite/Mora, simultaneous editor licensing, prices and setup facts were newly authored for this task. No historical model final answer or result artifact is used as a gold answer.",
+    "historical_sources_read": [
+      {
+        "path": "evals/v1.5-macos/REPORT.md",
+        "use": "Evidence boundaries: synthetic observations, independent-judge absence, installation versus result quality."
+      },
+      {
+        "path": "evals/v1.3/release-guided-20260908/PROTOCOL.md",
+        "use": "Historical changed-task structure and failure/timeout accounting; its sequential-artifact design and model identity are not copied into this single-turn protocol."
+      },
+      {
+        "path": "evals/v1.3/release-guided-20260908/changed-en-J.json",
+        "historical_source_sha": "134c8acbb7d1fd30b7126751f80483ae929a9105",
+        "use": "Read as historical outcome context only; deadline status is not present-day evidence."
+      },
+      {
+        "path": "evals/v1.3/release-guided-20260908/changed-ko-J.json",
+        "historical_source_sha": "134c8acbb7d1fd30b7126751f80483ae929a9105",
+        "use": "Read as historical outcome context only; application remains unverified and no answer was copied."
+      }
+    ],
+    "language_alignment": "Both locale cases use the same offer names, annual-credit units, 32-editor requirement, inclusive 2400 cap, Kite 40 -> 24 correction, 1600 total/1 day, Mora 32/2100 base/3 days, unknown nonnegative mandatory annual archive fee, unknown interface preference, authority boundary and conditional recommendation. Only the output language changes.",
+    "decisive_change": "Kite loses eligibility because 24 < 32. Its lower price and shorter setup time cannot compensate for a mandatory license limit. No unprovided preference weight is needed. Mora remains the sole supplied capacity-eligible candidate, but its full budget eligibility is conditional.",
+    "budget_boundary": "Let f be the unknown nonnegative annual archive fee. Mora costs 2100 + f; the given inclusive budget is satisfied exactly when f <= 300. This is a threshold, not a prediction of f or proof the budget is met.",
+    "logical_contract": {
+      "premises": [
+        {
+          "id": "P1",
+          "statement": "A supplied offer can be approved only if one deployment legally permits at least 32 simultaneous editors and all mandatory annual charges total at most 2400 credits.",
+          "source": "Authored initial_conditions; unchanged in new_evidence.",
+          "evidence_state": "가정함"
+        },
+        {
+          "id": "P2",
+          "statement": "The operative signed schedule limits Kite to 24 editors; no allowed combination or upgrade removes that limit.",
+          "source": "Authored new_evidence; supersedes the initial sheet.",
+          "evidence_state": "가정함"
+        },
+        {
+          "id": "P3",
+          "statement": "Mora permits 32 editors and its annual total is 2100 plus an unknown mandatory nonnegative fee f.",
+          "source": "Authored new_evidence.",
+          "evidence_state": "가정함"
+        }
+      ],
+      "hidden_premises": "No additional empirical premise is needed within the closed synthetic scenario; the source hierarchy and permissible options are explicit. Real-world truth of invented records is not asserted.",
+      "rule": "Failure of either hard requirement bars current approval; shorter setup is considered only after both hard requirements hold.",
+      "rule_or_form": "P1 and P2 imply Kite is ineligible because 24 < 32; P1 and P3 give the conditional bound 2100 + f <= 2400 iff f <= 300. No implication establishes the unknown actual f.",
+      "conclusion": "Reject Kite; provisionally recommend Mora while withholding purchase until its fee-inclusive total is confirmed within the cap.",
+      "validity_verdict": {
+        "status": "Conditional entailment from stated synthetic premises",
+        "evidence_state": "추론됨"
+      },
+      "premise_status": "All scenario records are authored synthetic assumptions, not independently verified observations. The 24 < 32 comparison, 8-editor shortfall and 300-credit threshold are 계산됨. The initial Kite capacity is superseded/충돌됨; the actual fee and interface preference are 미검증.",
+      "invalidating_premise": "Changing the operative Kite license to at least 32 editors would remove its capacity exclusion; changing the requirement or offer scope would create a different fixture.",
+      "soundness_verdict": "Conditional within the synthetic world; no claim that the invented premises are true of any real vendor.",
+      "flip_condition": "If a confirmed Mora fee exceeds 300, no supplied offer is currently approvable and purchase remains on hold. Revisiting Kite requires a new license fact that actually removes the 24-editor cap, not a cost preference."
+    },
+    "remaining_scoring_ambiguity": "Judge conditional language semantically: \"hold purchase; Mora if the total fits\" and \"provisionally recommend Mora, pending fee confirmation\" express the same intended decision. Calling Mora fully budget-qualified or leaving all candidate choice unresolved does not. This authoring note is a preregistered proposal, not independent adjudication.",
+    "validation_state": "Authored only. No tests, lint, type checks, builds, QA, code/security reviews, actor/model experiment calls or experiment execution were performed by S033. Final integrated verification and central protocol reconciliation remain outstanding.",
+    "protocol_reconciliation": {
+      "path": "evals/swarm-20261015/PROTOCOL.md",
+      "owner": "S031",
+      "state_read": "DRAFT in S031 owned worktree; not a frozen or final integrated protocol.",
+      "observed_alignment": "The draft names this fixture path and the same family/locales/arms, single-turn unit, 54 total actors, no answer-key exposure, no reruns, and S078-only execution.",
+      "remaining": "S091/S001 must integrate S031 commit 2da5c246062679db5502115651aa842cc3f344a7 with this fixture, reconcile S036 rubric consumption of these six critical labels and the exact cases[*].public_synthetic_input adapter before pre-outcome freeze.",
+      "dependency_commit": "2da5c246062679db5502115651aa842cc3f344a7",
+      "dependency_status": "S031 subsequently published this protocol commit as READY_FOR_INTEGRATION; the earlier DRAFT source was read during authoring. This is a dependency handoff identity, not final verification or freeze."
+    }
+  },
+  "authoring_source": {
+    "repository": "ParkerHwang/OpenSocrates",
+    "assigned_base_sha": "227a528996d93c423851db1d663f9572be534e59",
+    "remote_main_observed_sha": "227a528996d93c423851db1d663f9572be534e59",
+    "remote_main_observed_at": null,
+    "remote_main_drift": false,
+    "observation_time_note": "Observed read-only during preparation on 2026-10-15 UTC; exact command timestamp was not captured. This is not an actor-run identity."
+  }
+}

@@ -1,0 +1,1060 @@
+{
+  "schema_version": 1,
+  "artifact_kind": "distribution-source-map-fixture-spec",
+  "session_id": "S030",
+  "status": "AUTHORED_NOT_EXECUTED",
+  "scope": {
+    "purpose": "Record canonical-input to generator to package-destination provenance and host boundaries. Not an executable package checker.",
+    "runtime_change": "NO_CHANGE",
+    "generator_change": "NO_CHANGE",
+    "new_defect_established": false,
+    "new_files": "Only this descriptive specification and its README.",
+    "data_policy": "Repository path metadata and authored synthetic markers only; no user prompts, conversations, raw host logs, screenshots or credentials."
+  },
+  "identity": {
+    "repository": "https://github.com/ParkerHwang/OpenSocrates",
+    "source_sha": "227a528996d93c423851db1d663f9572be534e59",
+    "remote_main_sha_observed": "227a528996d93c423851db1d663f9572be534e59",
+    "product_version": "1.5.2",
+    "content_revision": 5,
+    "host": "four distribution profiles",
+    "platform": "source-only; no host execution",
+    "model_requested": null,
+    "model_observed": null,
+    "effort": null,
+    "service_tier_requested": "priority",
+    "service_tier_observed": null,
+    "unknown_reason": "Model, effort and actual server tier were not observed or changed by this task; source identity is not an integrated freeze."
+  },
+  "overlap": {
+    "issue_129": "https://github.com/ParkerHwang/OpenSocrates/issues/129",
+    "pr_130": "https://github.com/ParkerHwang/OpenSocrates/pull/130",
+    "state_observed": "OPEN",
+    "head_sha_observed": "197b317b4aeca4928fabe515dbfef6a98803e568",
+    "merged_into_base": false,
+    "excluded_work": "Do not rewrite PR130 request errors, features envelope, shared decision-guide wording or runtime handling.",
+    "integration_note": "The reviewed PR changes shared guide/features bytes, not these source/destination paths. Reconcile paths against the exact integrated candidate before consuming this spec; no candidate-byte parity is asserted.",
+    "related_closed_tracking": "https://github.com/ParkerHwang/OpenSocrates/issues/101"
+  },
+  "notation": {
+    "locale": [
+      "en",
+      "ko",
+      "zh",
+      "ja",
+      "fr",
+      "de",
+      "it",
+      "es",
+      "pt",
+      "th"
+    ],
+    "method_id": "One of the 48 IDs in the pinned compiled bundle; no copied method payloads in this fixture.",
+    "host": "The host object consuming an inherited route.",
+    "target": "Selected native target, never all targets by implication.",
+    "skill_root": "Per-host skill_root field.",
+    "manifest_path": "Per-host manifest_path field.",
+    "patterns": "Glob and brace notation describes source sets; it is not an executed filesystem allowlist or shell command.",
+    "method_template": "The method_template field in the selected native generator.json.",
+    "skill": "A public skill configured in the native host metadata.",
+    "command": "One of the explicitly listed Codex command template names."
+  },
+  "canonical_upstream": [
+    {
+      "inputs": [
+        "content/catalog.yaml",
+        "content/methods/{method_id}/method.yaml",
+        "content/methods/{method_id}/procedure.{locale}.md",
+        "content/methods/{method_id}/cases.{locale}.yaml",
+        "content/teacher-questions.yaml",
+        "content/locales/{locale}.yaml",
+        "content/{participation,risk,routing,card}-policy.yaml"
+      ],
+      "generator": "tools/validate_content.py:main, _full_phase, _compile",
+      "outputs": [
+        "content/compiled-content.bundle.json",
+        "content/compiled-reasoning-content.bundle.json"
+      ],
+      "evidence": [
+        "canonical-authoring",
+        "canonical-compilation",
+        "projection-compilation"
+      ]
+    },
+    {
+      "inputs": [
+        "content/response-policy.yaml"
+      ],
+      "generator": "tools/validate_content.py:_compile; native/content builders separately load policy for rendering",
+      "outputs": [
+        "content/compiled-response-policy.json"
+      ],
+      "evidence": [
+        "canonical-compilation",
+        "native-copy",
+        "content-inputs"
+      ]
+    },
+    {
+      "inputs": [
+        "schemas/source/**"
+      ],
+      "generator": "tools/generate_schemas.py via make generate",
+      "outputs": [
+        "schemas/v1/**"
+      ],
+      "evidence": [
+        "generation-recipe"
+      ]
+    }
+  ],
+  "route_sets": {
+    "native-common": [
+      {
+        "input": [
+          "content/compiled-content.bundle.json",
+          "plugin-src/{host}/{method_template}"
+        ],
+        "destination": "skills/opensocrates/references/methods/{method_id}.md",
+        "operation": "render metadata method_template with compiled method values; this is separate from decision/methods/{locale}",
+        "evidence": [
+          "native-render"
+        ]
+      },
+      {
+        "input": [
+          "content/compiled-reasoning-content.bundle.json",
+          "content/compiled-content.bundle.json"
+        ],
+        "destination": "skills/opensocrates/references/decision/methods/{locale}/{method_id}.md",
+        "operation": "ProjectionInstructionAssembler.assemble for exact locale; catalog routing/use_for comes from legacy bundle",
+        "evidence": [
+          "native-procedure"
+        ]
+      },
+      {
+        "input": [
+          "content/compiled-content.bundle.json",
+          "assembled decision method digest"
+        ],
+        "destination": "skills/opensocrates/references/decision/catalog.{locale}.json",
+        "operation": "canonical JSON metadata; not a procedure",
+        "evidence": [
+          "native-procedure"
+        ]
+      },
+      {
+        "input": "plugin-src/shared/reader/guide.{locale}.md",
+        "destination": "skills/opensocrates/references/reader/guide.{locale}.md",
+        "operation": "copy directory bytes",
+        "evidence": [
+          "native-copy"
+        ]
+      },
+      {
+        "input": "schemas/v1/**",
+        "destination": "schemas/v1/**",
+        "operation": "copy generated schemas; canonical sources remain schemas/source/**",
+        "evidence": [
+          "native-copy",
+          "generation-recipe"
+        ]
+      },
+      {
+        "input": "LICENSE",
+        "destination": "LICENSE",
+        "operation": "copy bytes",
+        "evidence": [
+          "native-copy"
+        ]
+      },
+      {
+        "input": "content/response-policy.yaml",
+        "destination": "content/compiled-response-policy.json",
+        "operation": "load response policy and canonical-JSON serialize; do not copy a stale compiled policy file",
+        "evidence": [
+          "native-copy"
+        ]
+      },
+      {
+        "input": "content/compiled-content.bundle.json",
+        "destination": "content/compiled-content.bundle.json",
+        "operation": "canonical-JSON serialize selected bundle",
+        "evidence": [
+          "native-copy"
+        ]
+      },
+      {
+        "input": "dist/runtime/{host}/{target}/**",
+        "destination": "runtime/{target}/**",
+        "operation": "copy selected target only if it exists, then replace embedded content/compiled-content.bundle.json with selected bundle",
+        "evidence": [
+          "native-runtime"
+        ]
+      },
+      {
+        "input": "final generated payload and generator metadata",
+        "destination": "release-manifest.json",
+        "operation": "inventory after Windows guide rewrite; manifest not self-inventoried",
+        "evidence": [
+          "native-manifest"
+        ]
+      }
+    ],
+    "content-common": [
+      {
+        "input": "plugin-src/claude-chat/SKILL.md.tmpl",
+        "destination": "{skill_root}/SKILL.md",
+        "operation": "render common compiled values and response-policy locale tokens",
+        "evidence": [
+          "content-static-files"
+        ]
+      },
+      {
+        "input": "plugin-src/{host}/README.md.tmpl",
+        "destination": "{skill_root}/README.md",
+        "operation": "render host-specific README",
+        "evidence": [
+          "content-static-files"
+        ]
+      },
+      {
+        "input": "plugin-src/claude-chat/THIRD_PARTY_NOTICES.md.tmpl",
+        "destination": "{skill_root}/THIRD_PARTY_NOTICES.md",
+        "operation": "render shared account/content-only notice template",
+        "evidence": [
+          "content-static-files"
+        ]
+      },
+      {
+        "input": "LICENSE",
+        "destination": "{skill_root}/LICENSE",
+        "operation": "copy bytes",
+        "evidence": [
+          "content-static-files"
+        ]
+      },
+      {
+        "input": "plugin-src/shared/decision/features.json",
+        "destination": "{skill_root}/references/decision/features.json",
+        "operation": "copy bytes",
+        "evidence": [
+          "content-static-files"
+        ]
+      },
+      {
+        "input": "plugin-src/claude-chat/guide.{locale}.md",
+        "destination": "{skill_root}/references/decision/guide.{locale}.md",
+        "operation": "copy bytes; no native/shared-decision guide overlay",
+        "evidence": [
+          "content-static-files"
+        ]
+      },
+      {
+        "input": "plugin-src/shared/reader/guide.{locale}.md",
+        "destination": "{skill_root}/references/reader/guide.{locale}.md",
+        "operation": "copy bytes",
+        "evidence": [
+          "content-static-files"
+        ]
+      },
+      {
+        "input": [
+          "content/compiled-reasoning-content.bundle.json",
+          "content/compiled-content.bundle.json"
+        ],
+        "destination": "{skill_root}/references/decision/methods/{locale}/{method_id}.md",
+        "operation": "assemble complete exact-locale canonical procedure",
+        "evidence": [
+          "content-procedure-rule"
+        ]
+      },
+      {
+        "input": [
+          "content/compiled-content.bundle.json",
+          "assembled decision method digest"
+        ],
+        "destination": "{skill_root}/references/decision/catalog.{locale}.json",
+        "operation": "canonical JSON metadata; not a procedure",
+        "evidence": [
+          "content-procedure-rule"
+        ]
+      },
+      {
+        "input": "canonical identities, template_sources and final payload map",
+        "destination": "{manifest_path}",
+        "operation": "serialize manifest after payload inventory; inventory excludes manifest itself",
+        "evidence": [
+          "content-manifest"
+        ]
+      }
+    ]
+  },
+  "hosts": [
+    {
+      "host": "codex",
+      "profile": "native",
+      "generator": "tools/build_plugins.py:generate_plugin",
+      "metadata": "plugin-src/codex/generator.json",
+      "default_output": "build/generated/plugins/codex",
+      "skill_root": "skills/opensocrates",
+      "manifest_path": "release-manifest.json",
+      "targets": [
+        "darwin-arm64",
+        "windows-x64"
+      ],
+      "public_skills": [
+        "opensocrates",
+        "rigor",
+        "trace"
+      ],
+      "routes": [
+        {
+          "input": "plugin-src/codex/.codex-plugin/plugin.json.tmpl",
+          "destination": ".codex-plugin/plugin.json",
+          "operation": "render host manifest",
+          "evidence": [
+            "native-render"
+          ]
+        },
+        {
+          "input": [
+            "plugin-src/codex/hooks/hooks.json.tmpl",
+            "opensocrates.hosts.codex.commands:build_hooks"
+          ],
+          "destination": "hooks/hooks.json",
+          "operation": "render host-built hooks; Windows rewrites launcher command",
+          "evidence": [
+            "native-render",
+            "native-dispatch"
+          ]
+        },
+        {
+          "input": "plugin-src/codex/skills/{skill}/SKILL.md.tmpl",
+          "destination": "skills/{skill}/SKILL.md",
+          "operation": "render each configured public skill",
+          "evidence": [
+            "native-render"
+          ]
+        },
+        {
+          "input": "plugin-src/codex/commands/{command}.md.tmpl",
+          "destination": "commands/{command}.md",
+          "operation": "render auto, evidence-audit, reasoning-trace, opensocrates-status and status",
+          "evidence": [
+            "native-copy"
+          ]
+        },
+        {
+          "input": "plugin-src/codex/{README.md,THIRD_PARTY_NOTICES.md}.tmpl",
+          "destination": "{README.md,THIRD_PARTY_NOTICES.md}",
+          "operation": "render",
+          "evidence": [
+            "native-copy"
+          ]
+        },
+        {
+          "input": "plugin-src/shared/decision/**",
+          "destination": "skills/opensocrates/references/decision/**",
+          "operation": "copy directory after rendered/generated files; at this base the source directory contains guides, features.json and request.json",
+          "evidence": [
+            "native-copy"
+          ]
+        },
+        {
+          "input": "packaging/launchers/launch.sh",
+          "destination": "bin/launch.sh",
+          "operation": "Mac copy; replaced by launch.mjs source/output for Windows",
+          "evidence": [
+            "native-dispatch",
+            "native-copy"
+          ]
+        },
+        {
+          "input": "packaging/launchers/launch.mjs",
+          "destination": "bin/launch.mjs",
+          "operation": "Codex windows-x64 replaces the launch.sh copy entry before generation; this route is conditional on that target.",
+          "evidence": [
+            "native-dispatch",
+            "native-copy"
+          ]
+        }
+      ],
+      "inherits_routes": "native-common",
+      "excluded_by_current_recipe": [
+        ".claude-plugin/**",
+        "claude-chat content root opensocrates/**",
+        ".agents/**",
+        "bin/launch.mjs on darwin-arm64",
+        "bin/launch.sh on windows-x64",
+        "runtime target other than selected target",
+        "installer/windows.ps1"
+      ],
+      "platform_note": "Windows rewrites guide text after shared-directory copy, so guide source provenance is shared but final Windows bytes are transformed. Runtime availability is conditional, not established here."
+    },
+    {
+      "host": "claude",
+      "profile": "native",
+      "generator": "tools/build_plugins.py:generate_plugin",
+      "metadata": "plugin-src/claude/generator.json",
+      "default_output": "build/generated/plugins/claude",
+      "skill_root": "skills/opensocrates",
+      "manifest_path": "release-manifest.json",
+      "targets": [
+        "darwin-arm64"
+      ],
+      "public_skills": [
+        "opensocrates"
+      ],
+      "routes": [
+        {
+          "input": "plugin-src/claude/.claude-plugin/plugin.json.tmpl",
+          "destination": ".claude-plugin/plugin.json",
+          "operation": "render host manifest",
+          "evidence": [
+            "native-render"
+          ]
+        },
+        {
+          "input": [
+            "plugin-src/claude/hooks/hooks.json.tmpl",
+            "opensocrates.hosts.claude.commands:build_hooks"
+          ],
+          "destination": "hooks/hooks.json",
+          "operation": "render native hooks",
+          "evidence": [
+            "native-render"
+          ]
+        },
+        {
+          "input": "plugin-src/claude/skills/opensocrates/SKILL.md.tmpl",
+          "destination": "skills/opensocrates/SKILL.md",
+          "operation": "render controller",
+          "evidence": [
+            "native-render"
+          ]
+        },
+        {
+          "input": "plugin-src/claude/references/decision/guide.{locale}.md.tmpl",
+          "destination": "skills/opensocrates/references/decision/guide.{locale}.md",
+          "operation": "render host-specific guide; shared_templates is a metadata field, not the plugin-src/shared directory",
+          "evidence": [
+            "native-render"
+          ]
+        },
+        {
+          "input": "plugin-src/shared/decision/features.json",
+          "destination": "skills/opensocrates/references/decision/features.json",
+          "operation": "copy bytes; whole shared decision directory is not copied",
+          "evidence": [
+            "native-copy"
+          ]
+        },
+        {
+          "input": "plugin-src/shared/decision/request.json",
+          "destination": "skills/opensocrates/references/decision/request.json",
+          "operation": "copy bytes",
+          "evidence": [
+            "native-copy"
+          ]
+        },
+        {
+          "input": "plugin-src/claude/{README.md,THIRD_PARTY_NOTICES.md}.tmpl",
+          "destination": "{README.md,THIRD_PARTY_NOTICES.md}",
+          "operation": "render",
+          "evidence": [
+            "native-copy"
+          ]
+        },
+        {
+          "input": "packaging/launchers/claude-launch.sh",
+          "destination": "bin/launch.sh",
+          "operation": "copy Claude launcher",
+          "evidence": [
+            "native-copy"
+          ]
+        }
+      ],
+      "inherits_routes": "native-common",
+      "excluded_by_current_recipe": [
+        ".codex-plugin/**",
+        "commands/**",
+        "skills/rigor/**",
+        "skills/trace/**",
+        ".agents/**",
+        "plugin-src/shared/decision/guide.{locale}.md as guide source",
+        "bin/launch.mjs",
+        "runtime/windows-x64/**",
+        "native Windows Claude package"
+      ],
+      "platform_note": "Mac assembly obtains its runtime from the built Codex Mac runtime, then native generation applies Claude hooks/templates. This is source wiring, not a host receipt."
+    },
+    {
+      "host": "claude-chat",
+      "profile": "content-only account-skill",
+      "generator": "tools/build_content_hosts.py:build_content_host",
+      "metadata": "plugin-src/claude-chat/generator.json",
+      "default_output": "build/generated/content-hosts/claude-chat",
+      "skill_root": "opensocrates",
+      "manifest_path": "opensocrates/release-manifest.json",
+      "targets": [
+        "portable-content-only"
+      ],
+      "public_skills": [
+        "opensocrates"
+      ],
+      "routes": [],
+      "inherits_routes": "content-common",
+      "excluded_by_closed_layout": [
+        "hooks/**",
+        "runtime/**",
+        "bin/**",
+        "scripts/**",
+        "hooks.json",
+        "{skill_root}/references/decision/request.json",
+        "{skill_root}/references/methods/**",
+        "content/compiled-content.bundle.json",
+        "content/compiled-reasoning-content.bundle.json",
+        "content/compiled-response-policy.json",
+        "schemas/**",
+        ".codex-plugin/**",
+        ".claude-plugin/**",
+        "commands/**",
+        ".agents/rules/opensocrates.md"
+      ],
+      "input_not_payload": [
+        "Both compiled bundles and response policy are inputs; their generated files are not copied into the content package.",
+        "Native guide templates and shared/decision/guide.* are not used as decision-guide inputs."
+      ],
+      "platform_note": "Exporting the package does not activate an account skill or demonstrate model selection."
+    },
+    {
+      "host": "antigravity",
+      "profile": "content-only modular-workspace",
+      "generator": "tools/build_content_hosts.py:build_content_host",
+      "metadata": "plugin-src/antigravity/generator.json",
+      "default_output": "build/generated/content-hosts/antigravity",
+      "skill_root": ".agents/skills/opensocrates",
+      "manifest_path": "release-manifest.json",
+      "targets": [
+        "portable-content-only"
+      ],
+      "public_skills": [
+        "opensocrates"
+      ],
+      "routes": [
+        {
+          "input": "plugin-src/antigravity/rule.md.tmpl",
+          "destination": ".agents/rules/opensocrates.md",
+          "operation": "render always_on rule; it must be <=4096 bytes and have required front matter",
+          "evidence": [
+            "content-procedure-rule"
+          ]
+        }
+      ],
+      "inherits_routes": "content-common",
+      "excluded_by_closed_layout": [
+        "hooks/**",
+        "runtime/**",
+        "bin/**",
+        "scripts/**",
+        "hooks.json",
+        "{skill_root}/references/decision/request.json",
+        "{skill_root}/references/methods/**",
+        "content/compiled-content.bundle.json",
+        "content/compiled-reasoning-content.bundle.json",
+        "content/compiled-response-policy.json",
+        "schemas/**",
+        ".codex-plugin/**",
+        ".claude-plugin/**",
+        "commands/**",
+        "opensocrates/**"
+      ],
+      "input_not_payload": [
+        "Controller/notices and decision guide are from claude-chat, not Antigravity-specific guide/controller files.",
+        "The generator.json records a closed layout; it does not declare arbitrary copy_files or host overrides."
+      ],
+      "platform_note": "The package does not establish workspace/global installation ownership or live rule loading."
+    }
+  ],
+  "precedence": [
+    {
+      "id": "native-write-order",
+      "known": true,
+      "order": [
+        "render manifest and hooks",
+        "render configured shared_templates from host_source",
+        "render method_template",
+        "assemble localized procedures and catalogs",
+        "render command_templates",
+        "copy copy_files in array order",
+        "serialize response policy and raw compiled bundle",
+        "copy selected runtime and replace embedded compiled-content bundle",
+        "Codex Windows only: rewrite decision-guide launcher spelling",
+        "inventory final payload, then write release manifest"
+      ],
+      "rule": "A later write to the same path supplies final bytes. Current guide/features/request choices below follow actual metadata; no generic host-over-shared fallback exists.",
+      "evidence": [
+        "native-render",
+        "native-procedure",
+        "native-copy",
+        "native-runtime",
+        "native-manifest"
+      ]
+    },
+    {
+      "id": "codex-shared-decision",
+      "known": true,
+      "rule": "Codex guide/features/request come from the shared decision directory, copied after templates. No host-local decision-guide template is configured. Windows then rewrites guide launcher spelling.",
+      "evidence": [
+        "native-copy",
+        "native-runtime"
+      ],
+      "metadata": "plugin-src/codex/generator.json:62-82"
+    },
+    {
+      "id": "claude-native-decision",
+      "known": true,
+      "rule": "Claude guide is the host-local template rendered in shared_templates. Later copy_files copies only shared request/features, not shared guide. Thus host guide survives because no colliding shared-guide copy is configured, not because host templates always take priority.",
+      "evidence": [
+        "native-render",
+        "native-copy"
+      ],
+      "metadata": "plugin-src/claude/generator.json:12-37"
+    },
+    {
+      "id": "content-decision",
+      "known": true,
+      "rule": "Both content hosts directly choose claude-chat guides plus shared features, and omit request. This is a closed source selection in _files, not an overlay priority algorithm. Antigravity overrides only README source and adds a rule.",
+      "evidence": [
+        "content-static-files",
+        "content-procedure-rule"
+      ]
+    },
+    {
+      "id": "render-profile-values",
+      "known": true,
+      "rule": "Neither current native metadata declares render_profiles. The supported profile mechanism rejects overlap with core token names; it is not a shared-guide override mechanism.",
+      "evidence_paths": [
+        "tools/build_plugins.py:89-129",
+        "tools/build_plugins.py:497-503"
+      ]
+    },
+    {
+      "id": "future-overrides",
+      "known": false,
+      "value": null,
+      "reason": "No generalized precedence is specified for a future generator, arbitrary future content-host overrides, runtime-internal transitive payloads, or installed host instruction ordering."
+    }
+  ],
+  "synthetic_provenance_cases": [
+    {
+      "case_id": "S030-P01",
+      "synthetic_input": {
+        "shared_guide": "SYNTH_SHARED_GUIDE",
+        "claude_template": "SYNTH_CLAUDE_GUIDE"
+      },
+      "host": "codex",
+      "expected_source": "plugin-src/shared/decision/guide.en.md",
+      "expected_label": "SYNTH_SHARED_GUIDE",
+      "assertion_kind": "source-choice",
+      "execution_status": "NOT_RUN"
+    },
+    {
+      "case_id": "S030-P02",
+      "synthetic_input": {
+        "shared_guide": "SYNTH_SHARED_GUIDE",
+        "claude_template": "SYNTH_CLAUDE_GUIDE"
+      },
+      "host": "claude",
+      "expected_source": "plugin-src/claude/references/decision/guide.en.md.tmpl",
+      "expected_label": "SYNTH_CLAUDE_GUIDE",
+      "assertion_kind": "source-choice",
+      "execution_status": "NOT_RUN"
+    },
+    {
+      "case_id": "S030-P03",
+      "synthetic_input": {
+        "shared_guide": "SYNTH_SHARED_GUIDE",
+        "account_guide": "SYNTH_ACCOUNT_GUIDE",
+        "antigravity_unconfigured_guide": "SYNTH_UNUSED_GUIDE"
+      },
+      "host": "antigravity",
+      "expected_source": "plugin-src/claude-chat/guide.ko.md",
+      "expected_label": "SYNTH_ACCOUNT_GUIDE",
+      "assertion_kind": "source-choice",
+      "execution_status": "NOT_RUN"
+    },
+    {
+      "case_id": "S030-P04",
+      "synthetic_input": {
+        "features": "SYNTH_SHARED_FEATURES",
+        "request": "SYNTH_NATIVE_REQUEST"
+      },
+      "hosts": [
+        "codex",
+        "claude",
+        "claude-chat",
+        "antigravity"
+      ],
+      "expected_features_source": "plugin-src/shared/decision/features.json",
+      "expected_request_hosts": [
+        "codex",
+        "claude"
+      ],
+      "assertion_kind": "host-boundary",
+      "execution_status": "NOT_RUN"
+    },
+    {
+      "case_id": "S030-P05",
+      "synthetic_input": {
+        "rendered_path_value": "SYNTH_RENDERED",
+        "copy_files_same_path_value": "SYNTH_COPIED"
+      },
+      "hosts": [
+        "codex",
+        "claude"
+      ],
+      "expected_last_writer": "copy_files",
+      "expected_label": "SYNTH_COPIED",
+      "assertion_kind": "declared-hypothetical-native-collision",
+      "execution_status": "NOT_RUN",
+      "note": "Explains existing sequential writes only; does not introduce a real colliding source file."
+    },
+    {
+      "case_id": "S030-P06",
+      "synthetic_input": {
+        "guide_text": "SYNTH command bin/launch.sh decision codex"
+      },
+      "host": "codex",
+      "target": "windows-x64",
+      "expected_source": "plugin-src/shared/decision/guide.{locale}.md",
+      "expected_transformation": "bin/launch.sh -> node bin/launch.mjs after directory copy",
+      "expected_byte_equality_to_source": false,
+      "assertion_kind": "source-plus-platform-transform",
+      "execution_status": "NOT_RUN"
+    },
+    {
+      "case_id": "S030-P07",
+      "synthetic_input": {
+        "shared_account_controller": "SYNTH_ACCOUNT_CONTROLLER",
+        "antigravity_unconfigured_controller": "SYNTH_UNUSED_CONTROLLER"
+      },
+      "host": "antigravity",
+      "expected_source": "plugin-src/claude-chat/SKILL.md.tmpl",
+      "expected_label": "SYNTH_ACCOUNT_CONTROLLER",
+      "assertion_kind": "cross-host-source-reuse",
+      "execution_status": "NOT_RUN"
+    }
+  ],
+  "existing_checks_delegated": [
+    {
+      "owner": "tools/check_content_hosts.py",
+      "coverage": [
+        "canonical catalog/procedure parity",
+        "reader/features byte parity",
+        "determinism and portable ZIP modes",
+        "content-only closure and tamper rejection",
+        "locale fallback rejection across all four generators"
+      ],
+      "evidence": [
+        "existing-content-checker",
+        "existing-rejection-checker",
+        "existing-locale-checker"
+      ],
+      "s030_action": "Read only; do not duplicate assertions or implement another checker."
+    },
+    {
+      "owner": "tools/build_content_hosts.py:verify_content_host_package",
+      "coverage": [
+        "closed inventory",
+        "hashes and canonical pairs",
+        "regular files and executable-surface exclusion",
+        "replacement ownership guard"
+      ],
+      "evidence": [
+        "content-closure"
+      ],
+      "s030_action": "Describe source selection beyond inventory checks; do not call verifier."
+    },
+    {
+      "owner": "tools/release_check.py; tools/check_packaged_launcher.py; tools/check_package_docs.py; tools/check_macos_hosts.py",
+      "coverage": [
+        "native inventories and configured surfaces",
+        "launcher/runtime path and target boundaries",
+        "packaged documentation boundaries",
+        "Mac companion assembly"
+      ],
+      "evidence": [
+        "existing-native-closure",
+        "existing-native-surfaces",
+        "mac-assembly"
+      ],
+      "s030_action": "No duplicate package/launcher/host checker, no build or archive download."
+    }
+  ],
+  "uncovered_documentation_scope": [
+    "Which authored decision guide feeds each host; equal catalogs do not imply equal guides.",
+    "That native shared_templates are host-local paths, copy_files runs later, and Windows can transform copied guides.",
+    "That Antigravity reuses account controller/notices/guides while owning its README/rule.",
+    "That content inputs can be absent as payload files: compiled bundles/policy are consumed, request.json/native launch surfaces excluded."
+  ],
+  "unknowns": [
+    {
+      "field": "integrated_candidate_sha",
+      "value": null,
+      "reason": "Only S001 publishes the frozen S091/S092 integration candidate."
+    },
+    {
+      "field": "generated_payload_hashes",
+      "value": null,
+      "reason": "No build, generation, download or package verification performed."
+    },
+    {
+      "field": "runtime_transitive_inventory",
+      "value": null,
+      "reason": "Native builder copies selected runtime tree conditionally; runtime assembly was not run or exhaustively inspected."
+    },
+    {
+      "field": "installed_guide_precedence",
+      "value": null,
+      "reason": "Package source order does not establish host-loaded instruction priority or live account/workspace behavior."
+    },
+    {
+      "field": "live_delivery_read_application_usefulness",
+      "value": null,
+      "reason": "No actual host, model experiment or application receipt; these evidence levels remain distinct."
+    }
+  ],
+  "execution": {
+    "tests": "NOT_RUN",
+    "lint": "NOT_RUN",
+    "build": "NOT_RUN",
+    "generation": "NOT_RUN",
+    "package_checker": "NOT_RUN",
+    "browser_qa": "NOT_RUN",
+    "release_download": "NOT_RUN",
+    "live_host": "NOT_RUN",
+    "reason": "Assignment permits fixture specification only; final verification belongs to exact frozen integration candidate."
+  },
+  "evidence_index": {
+    "native-dispatch": {
+      "path": "tools/build_plugins.py",
+      "lines": [
+        398,
+        427
+      ],
+      "fact": "Content profiles dispatch before native options; native Claude rejects Windows; Codex Windows replaces the launcher copy source/output."
+    },
+    "native-render": {
+      "path": "tools/build_plugins.py",
+      "lines": [
+        504,
+        585
+      ],
+      "fact": "Templates resolve beneath host_source; manifest, hooks and shared_templates render before method templates."
+    },
+    "native-procedure": {
+      "path": "tools/build_plugins.py",
+      "lines": [
+        587,
+        633
+      ],
+      "fact": "Canonical locale-specific procedures and catalogs are assembled from the sibling reasoning-content projection; locale fallback is rejected."
+    },
+    "native-copy": {
+      "path": "tools/build_plugins.py",
+      "lines": [
+        635,
+        664
+      ],
+      "fact": "Command templates render, then copy_files runs in metadata order, then response policy and selected raw bundle are serialized."
+    },
+    "copy-implementation": {
+      "path": "tools/build_plugins.py",
+      "lines": [
+        340,
+        361
+      ],
+      "fact": "File copies write source bytes to destination; directory copies recurse over source descendants."
+    },
+    "native-runtime": {
+      "path": "tools/build_plugins.py",
+      "lines": [
+        666,
+        691
+      ],
+      "fact": "Only the selected runtime target is copied if present; embedded legacy bundles are replaced; Windows decision guides receive a final launcher spelling rewrite."
+    },
+    "native-manifest": {
+      "path": "tools/build_plugins.py",
+      "lines": [
+        692,
+        735
+      ],
+      "fact": "File hashes are calculated after copies and platform rewrites; release-manifest.json is written after the payload inventory."
+    },
+    "content-inputs": {
+      "path": "tools/build_content_hosts.py",
+      "lines": [
+        60,
+        101
+      ],
+      "fact": "Content profiles load both compiled bundles and response policy; fixed metadata must equal LAYOUTS and the closed delivery contract."
+    },
+    "content-static-files": {
+      "path": "tools/build_content_hosts.py",
+      "lines": [
+        102,
+        117
+      ],
+      "fact": "Both content profiles use claude-chat controller/notices and decision guides, host-specific README, shared reader and features; request.json is absent."
+    },
+    "content-procedure-rule": {
+      "path": "tools/build_content_hosts.py",
+      "lines": [
+        118,
+        155
+      ],
+      "fact": "Both content profiles assemble canonical procedures/catalogs; only Antigravity adds its standing rule."
+    },
+    "content-manifest": {
+      "path": "tools/build_content_hosts.py",
+      "lines": [
+        156,
+        200
+      ],
+      "fact": "Source and payload inventories are authored into the content manifest; manifest itself is added after the files inventory."
+    },
+    "content-closure": {
+      "path": "tools/build_content_hosts.py",
+      "lines": [
+        293,
+        361
+      ],
+      "fact": "Existing verifier enforces exact closed members, hashes, regular non-executable content, canonical pair identities and no hooks/runtime/bin/scripts."
+    },
+    "content-output": {
+      "path": "tools/build_content_hosts.py",
+      "lines": [
+        364,
+        405
+      ],
+      "fact": "Default content output is build/generated/content-hosts/<host>; staging verifies ownership before replacement."
+    },
+    "canonical-authoring": {
+      "path": "tools/validate_content.py",
+      "lines": [
+        202,
+        245
+      ],
+      "fact": "Canonical authoring includes catalog, policies, ten locales, method.yaml, teacher questions, and per-locale procedures/cases."
+    },
+    "canonical-compilation": {
+      "path": "tools/validate_content.py",
+      "lines": [
+        329,
+        366
+      ],
+      "fact": "Compiled legacy bundle and compiled response policy are emitted from canonical sources."
+    },
+    "projection-compilation": {
+      "path": "tools/validate_content.py",
+      "lines": [
+        419,
+        435
+      ],
+      "fact": "Reasoning-content projections are serialized to the explicit projection output before legacy bundle compilation."
+    },
+    "generation-recipe": {
+      "path": "Makefile",
+      "lines": [
+        26,
+        32
+      ],
+      "fact": "make generate owns schemas, bundles and all four package outputs; no S030 command invokes it."
+    },
+    "existing-content-checker": {
+      "path": "tools/check_content_hosts.py",
+      "lines": [
+        138,
+        240
+      ],
+      "fact": "Existing checker covers determinism, portable ZIP modes, public skill count, catalog/procedure parity, reader/features byte parity and content layouts."
+    },
+    "existing-rejection-checker": {
+      "path": "tools/check_content_hosts.py",
+      "lines": [
+        242,
+        352
+      ],
+      "fact": "Existing checker covers tamper rejection, modified-output preservation, executable/extra/script/link rejection, explicit-root CLI and unowned/source-overlapping output."
+    },
+    "existing-locale-checker": {
+      "path": "tools/check_content_hosts.py",
+      "lines": [
+        75,
+        111
+      ],
+      "fact": "Existing checker rejects mislabeled locale fallback in all four generators."
+    },
+    "existing-native-closure": {
+      "path": "tools/release_check.py",
+      "lines": [
+        1240,
+        1267
+      ],
+      "fact": "Existing release verifier compares payload hashes and inventory membership."
+    },
+    "existing-native-surfaces": {
+      "path": "tools/release_check.py",
+      "lines": [
+        1303,
+        1398
+      ],
+      "fact": "Existing native surface checks consume configured methods, templates, public skills, commands and schema set."
+    },
+    "mac-assembly": {
+      "path": "tools/check_macos_hosts.py",
+      "lines": [
+        137,
+        174
+      ],
+      "fact": "Claude Mac runtime is copied from the built Codex Mac runtime; content-only profiles use their own builder; package roots are then archived."
+    },
+    "windows-assembly": {
+      "path": "tools/build_windows.py",
+      "lines": [
+        26,
+        65
+      ],
+      "fact": "Windows assembles Codex native and both portable content profiles; native Claude is not a Windows deliverable."
+    },
+    "native-render-inputs": {
+      "path": "tools/build_plugins.py",
+      "lines": [
+        480,
+        505
+      ],
+      "fact": "Native render values load response policy, prefix strict-second-pass tokens with shared rigor activation guards and reject core-token overrides."
+    }
+  },
+  "render_dependencies": {
+    "native": [
+      "Compiled legacy bundle -> _common_values and _method_values -> host templates.",
+      "content/response-policy.yaml -> response-policy rendering -> locale template tokens and content/compiled-response-policy.json.",
+      "plugin-src/shared/rigor/activation.{locale}.md -> prefix of FRAGMENT_STRICT_SECOND_PASS token, where a template consumes it.",
+      "hooks_builder module -> HOOKS_JSON -> host hooks template."
+    ],
+    "content-only": [
+      "Both compiled bundles -> common values and canonical procedure assembly.",
+      "content/response-policy.yaml -> response-policy locale tokens in the account controller.",
+      "No native rigor-activation prefix loop and no hooks builder in the content-only builder."
+    ],
+    "evidence": [
+      "native-render-inputs",
+      "content-inputs",
+      "native-render"
+    ]
+  }
+}

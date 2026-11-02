@@ -1,0 +1,159 @@
+{
+  "schema": "opensocrates.large-input-recipes/1.0.0",
+  "session_id": "S014",
+  "state": "AUTHORED_NOT_RUN",
+  "source_identity": {
+    "repository": "ParkerHwang/OpenSocrates",
+    "source_sha": "227a528996d93c423851db1d663f9572be534e59",
+    "product_version": "1.5.2",
+    "content_revision": 5,
+    "host": "codex",
+    "platform": null,
+    "model_requested": null,
+    "model_observed": null,
+    "effort": null,
+    "service_tier_requested": "priority",
+    "service_tier_observed": null,
+    "unknown_reason": "No fixture execution or actor call. The host label names the source adapter only; configured tier is not observed server tier."
+  },
+  "scope": {
+    "event": "UserPromptSubmit",
+    "lane": "user_prompt_submitted",
+    "adapter_profile": "decision_point_mode=True, selector_mode=True",
+    "runtime_change": "NO_CHANGE",
+    "new_defect_evidence": null,
+    "execution_results": null,
+    "overlap": "PR #128 is merged at source_sha. PR #130 concerns decision-request repair and is not reimplemented here.",
+    "evidence_ceiling": "A later in-memory run can establish parser acceptance and hook entry emission only. Live invocation, delivery into model context, complete reading, application and usefulness remain unverified."
+  },
+  "limits_at_source": {
+    "legacy_native_bytes": 32768,
+    "legacy_source": "src/opensocrates/hosts/codex/native.py:27",
+    "hook_input_bytes": 4194304,
+    "hook_source": "src/opensocrates/constants.py:6",
+    "meaning": "Inclusive raw UTF-8 JSON envelope limits, not prompt-character or prompt-only byte limits.",
+    "drift_rule": "If either source constant changes on the frozen integration SHA, stop and reconcile this spec before generating cases; do not silently relabel a boundary."
+  },
+  "generation": {
+    "recipe_id": "compact-ascii-prompt-v1",
+    "wire_encoding": "UTF-8 without BOM or trailing newline",
+    "empty_envelope_utf8": "{\"hook_event_name\":\"UserPromptSubmit\",\"session_id\":\"fixture\",\"prompt\":\"\"}",
+    "empty_envelope_bytes": 73,
+    "prefix_utf8": "{\"hook_event_name\":\"UserPromptSubmit\",\"session_id\":\"fixture\",\"prompt\":\"",
+    "suffix_utf8": "\"}",
+    "fill_utf8": "x",
+    "fill_unit_bytes": 1,
+    "repeat_count_formula": "target_envelope_bytes - empty_envelope_bytes",
+    "wire_formula": "prefix_utf8.encode('utf-8') + b'x' * repeat_count + suffix_utf8.encode('utf-8')",
+    "length_formula": "len(prefix_utf8.encode('utf-8')) + repeat_count + len(suffix_utf8.encode('utf-8')) == target_envelope_bytes",
+    "json_equivalent": "json.dumps({'hook_event_name':'UserPromptSubmit','session_id':'fixture','prompt':'x' * repeat_count}, ensure_ascii=False, separators=(',', ':')).encode('utf-8')",
+    "constraints": [
+      "Use bytes/BytesIO at run_hook, not a Mapping or a text-mode pipe that may reserialize the envelope.",
+      "The fixed field order, compact separators, no BOM and no trailing newline are part of this recipe.",
+      "Do not generate any omitted boundary row as a new case; those rows refer to existing tests.",
+      "Generate one case at a time in memory in the final verifier's disposable checkout; discard each buffer after use.",
+      "Never materialize or check in expanded payloads, raw hook input, host logs or transcripts. No 100 MB case is needed."
+    ]
+  },
+  "harness_contract": {
+    "reuse_reference": "tools/check_decision_hook_runtime.py:SubmissionEntryChecks.setUp/invoke",
+    "invocation": "run_hook(('codex', 'user_prompt_submitted'), stdin=io.BytesIO(raw), stdout=io.StringIO(), services=memory_only_services)",
+    "services": "CodexAdapter(CodexAdapterConfig(decision_point_mode=True, selector_mode=True, selector_application=Mock(), instruction_file_store=Mock())); services.adapter_for returns that adapter.",
+    "precondition": "No inherited OPENSOCRATES_SELECTOR_ACTIVE marker in the test process. Do not change global configuration or invoke the installed host.",
+    "response_kinds": {
+      "discovery_entry": {
+        "exit_code": 0,
+        "stdout": "One JSON object followed by one LF; hookSpecificOutput.additionalContext equals ENTRY_GUIDANCE from the frozen source.",
+        "comparison": "Exact stdout equality to the small synthetic control produced by the same harness and frozen source, rather than an old documentation byte count.",
+        "cleanup": "Exactly one store.delete_session('fixture') call per hook invocation.",
+        "selector": "selector.select_for_user_prompt_submit is not called; no method artifact is created."
+      },
+      "empty_fail_open": {
+        "exit_code": 0,
+        "stdout": "Empty string, not '{}', an error object, or a traceback.",
+        "hook_ingress": "For hook input above the cap, services.adapter_for is not called.",
+        "direct_parser": "A separate try_parse_codex_entry_event(raw) call reports input_too_large; that diagnostic is not the hook stdout."
+      }
+    },
+    "accepted_projection": "If separately inspected via try_parse_codex_entry_event(raw), accepted=True, event.session_id='fixture', prompt/path/model/turn fields=None, diagnostics=(); adapter result normalized_event=None and projection={}.",
+    "retention": "Only synthetic recipe IDs, byte counts, source SHA, public response category and actual exit code may be retained in a later result; do not retain expanded inputs."
+  },
+  "boundary_coverage": [
+    {
+      "target_envelope_bytes": 32767,
+      "boundary": "MAX_NATIVE_BYTES - 1",
+      "disposition": "NEW_RECIPE",
+      "case_id": "S014-legacy-minus-one",
+      "expected_response_kind": "discovery_entry",
+      "reason": "The existing exact-size loop starts at MAX_NATIVE_BYTES; its small control is not an exact 32767-byte envelope."
+    },
+    {
+      "target_envelope_bytes": 32768,
+      "boundary": "MAX_NATIVE_BYTES",
+      "disposition": "EXISTING_TEST_OMITTED",
+      "existing_test": "tools/check_decision_hook_runtime.py:SubmissionEntryChecks.test_large_submission_delivers_same_entry_without_selector",
+      "source_lines": "72-86",
+      "expected_response_kind": "discovery_entry",
+      "existing_assertion": "Exact stdout equality to the small control and exact raw envelope length."
+    },
+    {
+      "target_envelope_bytes": 32769,
+      "boundary": "MAX_NATIVE_BYTES + 1",
+      "disposition": "EXISTING_TEST_OMITTED",
+      "existing_test": "tools/check_decision_hook_runtime.py:SubmissionEntryChecks.test_large_submission_delivers_same_entry_without_selector",
+      "source_lines": "72-86; strict legacy rejection at 123-140",
+      "expected_response_kind": "discovery_entry",
+      "existing_assertion": "Default discovery emits the exact entry; a separate strict legacy parser still reports input_too_large."
+    },
+    {
+      "target_envelope_bytes": 4194303,
+      "boundary": "MAX_HOOK_INPUT_BYTES - 1",
+      "disposition": "NEW_RECIPE",
+      "case_id": "S014-ingress-minus-one",
+      "expected_response_kind": "discovery_entry",
+      "reason": "The existing ingress test covers the inclusive cap and cap+1, not the immediately preceding byte count."
+    },
+    {
+      "target_envelope_bytes": 4194304,
+      "boundary": "MAX_HOOK_INPUT_BYTES",
+      "disposition": "EXISTING_TEST_OMITTED",
+      "existing_test": "tools/check_decision_hook_runtime.py:SubmissionEntryChecks.test_ingress_bound_is_shared_and_inclusive",
+      "source_lines": "88-98",
+      "expected_response_kind": "discovery_entry",
+      "existing_assertion": "Exact raw envelope length and nonempty hook output. This test does not assert exact entry equality at this size."
+    },
+    {
+      "target_envelope_bytes": 4194305,
+      "boundary": "MAX_HOOK_INPUT_BYTES + 1",
+      "disposition": "EXISTING_TEST_OMITTED",
+      "existing_test": "tools/check_decision_hook_runtime.py:SubmissionEntryChecks.test_ingress_bound_is_shared_and_inclusive",
+      "source_lines": "88-98",
+      "expected_response_kind": "empty_fail_open",
+      "existing_assertion": "Empty hook output, no adapter dispatch, direct entry parser input_too_large."
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "S014-legacy-minus-one",
+      "recipe_id": "compact-ascii-prompt-v1",
+      "target_envelope_bytes": 32767,
+      "repeat_count": 32694,
+      "length_calculation": "73 + 32694 * 1 = 32767",
+      "expected_response_kind": "discovery_entry",
+      "status": "NOT_RUN",
+      "observed_response_kind": null,
+      "observed_exit_code": null
+    },
+    {
+      "case_id": "S014-ingress-minus-one",
+      "recipe_id": "compact-ascii-prompt-v1",
+      "target_envelope_bytes": 4194303,
+      "repeat_count": 4194230,
+      "length_calculation": "73 + 4194230 * 1 = 4194303",
+      "expected_response_kind": "discovery_entry",
+      "status": "NOT_RUN",
+      "observed_response_kind": null,
+      "observed_exit_code": null
+    }
+  ]
+}
