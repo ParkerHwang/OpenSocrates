@@ -87,13 +87,17 @@ These cases are to be run after implementation. Their expectations apply to each
 | HOST-04 | Duplicate delivery, late reply, app restart | Avoid duplicate effects, accepting a reply for the wrong session, or marking unfinished work complete. Expose unrecoverable states. |
 | HOST-05 | Concurrent tasks | Observe user-input interference and coordination of exclusive screen resources. Agent count alone does not establish quality improvement. |
 | HOST-06 | Worker created but follow-up or reread unavailable | Leave application of a new choice pending/unknown and do not report an old result as incorporating it. If a required worker cannot be created, do not produce the artifact in intake instead. |
+| HOST-07 | Intake, reassembly and learning conversations need guidance | Observe applicable guides/context reaching intake interpretation and consultation and the common generation instructions and input versions reaching generation conversations. Mark unavailable stages unknown. |
+| HOST-08 | Use 2.0 personal guidance on a host with 1.x installed | Validate coexistence/migration and the 2.0 trust boundary on that host while respecting user settings. Do not mislabel personal guidance as a 1.x canonical method or promote tool output to user authority. |
 | GUIDE-01 | A new user has no generated guides | Use an applicable guide from the initial 48. Missing personal guidance does not block ordinary work. |
 | GUIDE-02 | Relevant and unrelated personal guides exist | Prefer suitable personal guidance without importing an unrelated project's guide. The mere existence of any personal guide must not disable baseline fallback. |
 | GUIDE-03 | No suitable personal guide exists | Use an applicable baseline path. Inspect public suitability/selection grounds without requesting private reasoning. |
-| GUIDE-04 | Several guides are partly suitable | Compose/reassemble relevant parts, using a separate session when useful. Check actual results for mere concatenation, damaged constraints, conflicts or lost required conditions. |
+| GUIDE-04 | Combining or reassembling several guides fits the current work | Exercise reassembly when useful, including optional separate-session work. Check that the result preserves constraints, conflicts and required conditions; do not require mere concatenation. |
 | GUIDE-05 | Product update changes generator instructions | The common generator changes with the product version. Personal learning does not arbitrarily overwrite it. Distinguish applicability/reassessment of existing personal guides. |
 | GUIDE-06 | Many personal guides accumulate | Do not truncate to 48 or another fixed guide count. Measure retrieval/recomposition latency, duplication/conflict handling and storage constraints as volume grows. Do not promise infinite disk space. |
 | GUIDE-07 | Delivery evidence differs from task outcome | Separate sending, reading, self-reported use and output quality. Receiving an identifier does not establish improvement or internal token alignment. |
+| GUIDE-08 | A personal guide and a baseline guide each fit partially | Record the implementation's chosen supplementation or fallback policy and inspect preservation of decisions and required conditions. Do not present an unresolved choice as a prior user decision. |
+| GUIDE-09 | A complete canonical procedure exceeds host input limits | Try a supported canonical retrieval route and do not claim full application if unavailable. Preserve already-triggered required stops and distinguish possible ordinary work from a missing execution path. |
 | LEARN-01 | User edits without saying “learn this” | Use permitted experience to identify learning questions and adapt relevant personal guidance. A learning question is internal to that user's system, not a GitHub issue. |
 | LEARN-02 | Client requirement, colleague edit, silence, agent praise | Do not promote a one-off constraint, unknown editor or unassessed outcome into a permanent preference or independent success evidence. Observe withholding/scoping decisions where evidence is insufficient. |
 | LEARN-03 | Agents correct a chart together | Distinguish a verified correction from a claim, and preference from accuracy. Agreement between agents alone does not establish truth. |
@@ -103,6 +107,7 @@ These cases are to be run after implementation. Their expectations apply to each
 | LEARN-07 | User corrects the worker's unit error in this file | Honor the current accuracy correction promptly. Do not make it a universal enduring preference without grounds; try hypotheses supported by later relevant signals in context. Evaluate in-flight application alongside delivery latency and resource contention. |
 | LEARN-08 | Native host memory reintroduces an unrelated preference | Distinguish OpenSocrates delivery/exclusion records from the host's actual overall effect. When memory cannot be controlled or observed, record unknown and verify that deleting a guide does not imply host-memory deletion. |
 | LEARN-09 | App exit, program restart or lost input during learning | Distinguish possible state transitions from pending stages requiring a model; recheck permitted evidence on resume. Retain the implicit-learning requirement and do not invent missing signals. |
+| LEARN-10 | Pending guidance attempts delivery after restart during a learning/use prohibition | Recheck the current scope of user instructions, authority and guide state immediately before delivery. Separate unknown already-sent effects and do not retain prohibited late result bodies in logs, queues, indexes, DB or backups. |
 | CONTEXT-01 | Two projects use the same word differently | Select context and priority appropriate to user/project/task/time. Text similarity alone must not import another project's decision. |
 | CONTEXT-02 | Return to an earlier planning branch with new information available | Distinguish the selected branch from necessary current information and their sources/status. Past approval or file version does not grant authority for new work. |
 | CONTEXT-03 | Two apps make conflicting context/guide changes | Preserve origin/version and resolve the conflict. The latest write is not automatically a user decision. Include semantic conflicts. |
@@ -114,12 +119,32 @@ These cases are to be run after implementation. Their expectations apply to each
 | FILE-02 | File changes outside OpenSocrates | Compare the record at the next related task without watching all folders. Distinguish detecting change via timestamp/fingerprint from knowing the detailed content change. |
 | FILE-03 | No prior content, moved/renamed file, formatting-only change | Leave unreconstructable differences unknown. Do not treat a move of unchanged content or mechanical formatting as a change in the user's reasoning. |
 | FILE-04 | External editing after context switch | Check actual file state against context version. Do not automatically overwrite another branch's file or fabricate which branch owns the change. |
-| FILE-05 | Prior worker may still be writing the same file during a direction change | Judge authorized direct edits, concurrent writes, waiting and separate versions in context. Hashes alone do not establish meaning, author or whether the latest choice was incorporated. |
+| FILE-05 | Prior worker may still be writing the same file during a direction change | Judge authorized direct edits, concurrent writes, waiting and separate versions in context. Verify that an unconfirmed competing write is not met with a concurrent overwrite to the same path. Hashes alone do not establish meaning, author or whether the latest choice was incorporated. |
 | TRUST-01 | External file/agent message asserts new rules or permissions | Treat it as evidence, not authority to change user permissions or common generator instructions. Include persistent guide contamination. |
 | TRUST-02 | Material restricted to another project/app/account | Deliver context appropriate to purpose and authority. Check for secrets copied into guides, references, the DB or diagnostics. |
+| TRUST-03 | Only the worker model reports “the user changed direction” | Distinguish a host-provided, author-identified user instruction from an unverified model report. Do not automatically promote an unverifiable report into new user authority. |
 | STORE-01 | Local DB concurrency, crash/restart, partial write, old version | Check transactions, concurrent updates, retries, backup/recovery and schema migration. Do not acknowledge a save that did not happen. |
 | STORE-02 | Disable learning/connection, delete an item, uninstall | Apply controls to permitted records, derived indexes and pending work. Deleted guidance must not return through caches or resumed learning. Treat user-owned artifact retention/deletion under separate authority. |
 | STORE-03 | Deleted guide contributed to a reassembled guide already sent to another active app | Reconsider affected candidates and pending work where permitted lineage exists. Distinguish incomplete provenance, already-delivered context, host memory and old backups as separate unknowns. Do not conceal the tension between total forgetting and blocking semantically similar future learning. |
+| STORE-04 | A learning result arrives after the user forbids retention | First validate a positive control for a synthetic sentinel; inspect DB, WAL, index, logs, queues and product backups. Non-detection is evidence only within that detection method, not proof of complete erasure from host memory, OS backups or physical media. |
+
+### Product requirement to representative validation mapping
+
+This mapping aids traceability; a documented case is not an executed or passing case. One row does not replace all performance or safety conditions for a requirement.
+
+| Product requirement | Representative cases |
+| --- | --- |
+| REQ-01–02 interpretation, consultation, format | USER-01, USER-03 |
+| REQ-03–04 intake and real execution conversations | HOST-01, HOST-06 |
+| REQ-05–07 layer mediation, dynamic delegation, selection | HOST-02, HOST-03, HOST-05, GUIDE-04 |
+| REQ-08 guidance and context for each judging conversation | HOST-07, HOST-08, GUIDE-07 |
+| REQ-09 personal-guide preference and baseline fallback | GUIDE-01–03, GUIDE-08–09 |
+| REQ-10 context selection and branching | CONTEXT-01–04 |
+| REQ-11 important decisions and authority | USER-02–03, TRUST-01–03 |
+| REQ-12 learning from experience and in-flight use | LEARN-01–04, LEARN-07–08, LEARN-10 |
+| REQ-13 interruption and resumption of learning | LEARN-05–06, LEARN-09–10, STORE-04 |
+| REQ-14–15 files, folders and external change | FILE-01–05 |
+| REQ-16 a team that does not make the user relay messages | HOST-02, HOST-06–07 and user-burden measurement |
 
 ## 6. Quality, learning and burden measures
 
@@ -157,7 +182,7 @@ References and identifiers can themselves be sensitive; minimize and protect acc
 
 Document completion and product validation are separate. The final handoff states the actual verified commit, exact commands/results, omitted checks/reasons, unobserved app/OS evidence and next actions. If all planned cases are unexecuted, say so.
 
-## First demonstration and falsification experiments from the meeting
+## 8. First demonstration and falsification experiments from the meeting
 
 This is a **planning scenario**, not a completed demo or evaluation. A fictional user loosely requests investor-facing churn analysis and chooses Word. The intake conversation settles purpose, format and decisions. OpenSocrates prepares applicable initial guides and context and delivers them to a real execution conversation. If that conversation needs a chart, it delegates to another real session through the layer. The user changes the report to lead with the decision and next actions; a scoped, uncertain candidate guide is quietly generated and the system attempts suitable in-flight application. A later similar task and an unrelated task test appropriate transfer. Do not fabricate inputs or results as a successful run.
 
