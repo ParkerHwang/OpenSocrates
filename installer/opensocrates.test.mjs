@@ -10,6 +10,7 @@ import {
   assetNameFor,
   createPurgeResult,
   errorCategory,
+  isExplicitAbsoluteCliPath,
   isSafeArchivePath,
   markerMatches,
   parseChecksumText,
@@ -362,4 +363,57 @@ test("parses opt-in automatic update policy", () => {
     () => parseCli(["auto-update", "run", "--host", "claude"]),
     (error) => error instanceof InstallerError,
   );
+});
+
+test("enforces explicit absolute --workspace and --output CLI paths and flag bounds", () => {
+  assert.equal(isExplicitAbsoluteCliPath("/tmp/workspace", "darwin"), true);
+  assert.equal(isExplicitAbsoluteCliPath(".", "darwin"), false);
+  assert.equal(isExplicitAbsoluteCliPath("relative/workspace", "linux"), false);
+  assert.equal(isExplicitAbsoluteCliPath("C:\\Work\\Project", "win32"), true);
+  assert.equal(isExplicitAbsoluteCliPath("D:/Work/Project", "win32"), true);
+  assert.equal(isExplicitAbsoluteCliPath("\\drive-relative", "win32"), false);
+  assert.equal(isExplicitAbsoluteCliPath("C:drive-relative", "win32"), false);
+  assert.equal(isExplicitAbsoluteCliPath("\\\\server\\share\\workspace", "win32"), false);
+  assert.equal(isExplicitAbsoluteCliPath("/tmp/bad\0path", "darwin"), false);
+
+  const absWorkspace = process.platform === "win32" ? "C:\\Work\\Project" : "/tmp/opensocrates-ws";
+  const absOutput =
+    process.platform === "win32" ? "C:\\Work\\claude-skill.zip" : "/tmp/claude-skill.zip";
+
+  const workspaceParsed = parseCli([
+    "install",
+    "--host",
+    "antigravity",
+    "--workspace",
+    absWorkspace,
+  ]);
+  assert.equal(workspaceParsed.host, "antigravity");
+  assert.equal(workspaceParsed.workspace, absWorkspace);
+
+  const exportParsed = parseCli(["export", "--host", "claude-chat", "--output", absOutput]);
+  assert.equal(exportParsed.action, "export");
+  assert.equal(exportParsed.output, absOutput);
+
+  for (const invalid of [
+    ["install", "--host", "antigravity", "--workspace", "."],
+    ["install", "--host", "antigravity", "--workspace", "relative/folder"],
+    ["install", "--host", "antigravity", "--workspace", absWorkspace, "--workspace", absWorkspace],
+    ["verify", "--host", "antigravity", "--workspace", absWorkspace],
+    ["export", "--host", "claude-chat"],
+    ["export", "--host", "claude-chat", "--output", "relative.zip"],
+    [
+      "export",
+      "--host",
+      "claude-chat",
+      "--output",
+      process.platform === "win32" ? "C:\\Work\\out.tar" : "/tmp/out.tar",
+    ],
+    ["export", "--host", "claude-chat", "--output", absOutput, "--output", absOutput],
+  ]) {
+    assert.throws(
+      () => parseCli(invalid),
+      (error) => error instanceof InstallerError,
+      `expected parseCli(${JSON.stringify(invalid)}) to fail`,
+    );
+  }
 });

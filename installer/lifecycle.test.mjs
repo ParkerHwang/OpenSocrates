@@ -2809,9 +2809,36 @@ test("verify rejects an archive containing a symbolic link", async () => {
     assert.match(
       result.error.message,
       process.platform === "win32"
-        ? /Windows entries failed: ZIP symlink refused/
+        ? /Windows entries failed: ZIP (?:symlink|non-regular entry) refused/
         : /package contains a symbolic link: leak$/,
     );
+  } finally {
+    box.cleanup();
+  }
+});
+
+test("verify rejects an archive containing a directory symbolic link before extraction", async () => {
+  const box = makeSandbox("codex");
+  try {
+    const pkg = buildPackage(box.root, "codex", { target: nativeTarget });
+    if (process.platform === "win32") {
+      return;
+    }
+    const link = spawnSync(
+      "sh",
+      [
+        "-c",
+        `cd ${JSON.stringify(pkg.tree)} && ln -s /tmp linked-dir && zip -q -y ${JSON.stringify(pkg.asset)} linked-dir`,
+      ],
+      { encoding: "utf8" },
+    );
+    assert.equal(link.status, 0, `fixture setup failed: ${link.stderr}`);
+    writeFileSync(pkg.checksum, `${sha256(readFileSync(pkg.asset))}  ${basename(pkg.asset)}\n`);
+    const result = await quiet(() =>
+      main(["verify", "--host", "codex", "--asset", pkg.asset, "--checksum", pkg.checksum]),
+    );
+    assert.notEqual(result.error, undefined, "archive with a directory symlink passed verification");
+    assert.match(result.error.message, /package contains a symbolic link: linked-dir/);
   } finally {
     box.cleanup();
   }
