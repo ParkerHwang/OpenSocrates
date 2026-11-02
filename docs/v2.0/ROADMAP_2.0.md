@@ -106,6 +106,8 @@ Both models then reviewed `73e5b20`. This revision keeps the applicable portion 
 
 A further review of `fd8ee36` revisited an old three-page decision overriding a provisional four-page worker change, indistinguishable first-install and fully lost stop settings, missing generation-module lineage and positive controls for leak checks, propagation of verified user changes, and required safeguards for complete instruction modules. Automatic startup after all settings disappear remains a tradeoff and experiment because a new user's experience and an earlier user's pause may conflict.
 
+Further cross-review of the `4ec1b76` revision addressed provenance of the pre-storage checker revision/result, the difference between known missing generation safeguards and merely unavailable read receipts, and an unverified model report causing a consequential omission. The chair narrowed the response to affected candidates or changes while continuing unrelated work. Actual checking and delivery still require implementation and separate experiments.
+
 See the [system design §§12–14](SYSTEM_2.0.md) for draft instructions and state contracts, and the [validation plan](VALIDATION_2.0.md) for the synthetic demonstration and comparison experiments. Claude's and Grok's differing proposals are design input, not evidence of real-world effectiveness.
 
 ## Handoff and completion
