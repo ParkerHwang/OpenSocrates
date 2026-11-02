@@ -3,11 +3,15 @@
 import { spawn, spawnSync } from "node:child_process";
 import { createHash, randomInt, randomUUID } from "node:crypto";
 import {
+  closeSync,
   constants as fsConstants,
   createReadStream,
   createWriteStream,
   existsSync,
+  fstatSync,
+  openSync,
   readFileSync,
+  readSync,
   realpathSync,
 } from "node:fs";
 import {
@@ -30,7 +34,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { homedir, tmpdir } from "node:os";
-import { basename, dirname, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
@@ -1661,9 +1665,17 @@ export function parseCli(argv) {
       continue;
     }
     if (flag === "--workspace" || flag === "--output") {
+      const key = flag.slice(2);
+      if (seenOptions.has(key)) {
+        fail(`${flag} cannot be specified more than once`);
+      }
+      seenOptions.add(key);
       const value = args.shift();
       if (!value || value.startsWith("-")) fail(`${flag} requires a path`);
-      options[flag === "--workspace" ? "workspace" : "output"] = resolve(value);
+      if (!isExplicitAbsoluteCliPath(value)) {
+        fail(`${flag} requires an explicit absolute path`);
+      }
+      options[key] = resolve(value);
       continue;
     }
     if (flag === "--allow-major") {
@@ -1802,8 +1814,19 @@ export function parseCli(argv) {
   if (options.workspace !== null && options.host !== "antigravity") {
     fail("--workspace is only valid for Antigravity");
   }
+  if (options.workspace !== null && options.action === "verify") {
+    fail("verify does not accept --workspace");
+  }
   if (options.output !== null && !(options.host === "claude-chat" && options.action === "export")) {
     fail("--output is only valid for the Claude account export");
+  }
+  if (options.host === "claude-chat" && options.action === "export") {
+    if (options.output === null) {
+      fail("export requires --output with an explicit absolute .zip path");
+    }
+    if (!options.output.endsWith(".zip")) {
+      fail("--output must end with .zip");
+    }
   }
   if (options.host === "claude-chat" && !["export", "verify", "help"].includes(options.action)) {
     fail("Claude account delivery uses export/verify; account activation is a separate UI action");
@@ -1845,10 +1868,6 @@ async function prepareProfilePackage(host, options) {
     if (await sha256File(captured) !== expected) fail("profile archive changed during preparation");
     asset = captured;
     archiveEntries(asset);
-    if (process.platform !== "win32") {
-      const zipinfo = run("/usr/bin/zipinfo", ["-l", asset]);
-      if (/^[lbcps][-rwx]/mu.test(zipinfo.stdout)) fail("profile archive contains non-regular entries");
-    }
     const root = join(scratch, "package");
     await extractArchive(asset, root);
     await walkFiles(root);
@@ -2200,12 +2219,173 @@ async function verifyOuterChecksum(asset, checksum, host) {
   }
 }
 
+export function isExplicitAbsoluteCliPath(value, platform = process.platform) {
+  if (typeof value !== "string" || value.length === 0 || value.includes("\0")) {
+    return false;
+  }
+  if (platform === "win32") {
+    return /^[a-zA-Z]:[\\/]/u.test(value);
+  }
+  return isAbsolute(value);
+}
+
+const MAX_ZIP_CENTRAL_DIRECTORY_BYTES = 32 * 1024 * 1024;
+
+function readExactBytesSync(descriptor, length, position) {
+  const buffer = Buffer.alloc(length);
+  let offset = 0;
+  while (offset < length) {
+    const count = readSync(descriptor, buffer, offset, length - offset, position + offset);
+    if (count <= 0) {
+      fail("archive is truncated or unreadable");
+    }
+    offset += count;
+  }
+  return buffer;
+}
+
+function inspectPosixArchiveEntries(asset) {
+  let descriptor;
+  try {
+    descriptor = openSync(asset, fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0));
+  } catch (error) {
+    fail(`cannot open archive for verification: ${error.message}`);
+  }
+  try {
+    const info = fstatSync(descriptor);
+    if (
+      !info.isFile() ||
+      !Number.isSafeInteger(info.size) ||
+      info.size < 22 ||
+      info.size > MAX_DOWNLOAD_BYTES
+    ) {
+      fail("archive has an invalid container size");
+    }
+    const tailLength = Math.min(info.size, 65_557);
+    const tail = readExactBytesSync(descriptor, tailLength, info.size - tailLength);
+    let endOffset = -1;
+    for (let index = tail.length - 22; index >= 0; index -= 1) {
+      if (
+        tail.readUInt32LE(index) === 0x06054b50 &&
+        index + 22 + tail.readUInt16LE(index + 20) === tail.length
+      ) {
+        endOffset = index;
+        break;
+      }
+    }
+    if (endOffset < 0) {
+      fail("archive is missing a valid ZIP end-of-central-directory record");
+    }
+    const disk = tail.readUInt16LE(endOffset + 4);
+    const centralDisk = tail.readUInt16LE(endOffset + 6);
+    const diskEntries = tail.readUInt16LE(endOffset + 8);
+    const entryCount = tail.readUInt16LE(endOffset + 10);
+    const centralSize = tail.readUInt32LE(endOffset + 12);
+    const centralOffset = tail.readUInt32LE(endOffset + 16);
+    const absoluteEndOffset = info.size - tailLength + endOffset;
+    if (
+      disk !== 0 ||
+      centralDisk !== 0 ||
+      diskEntries !== entryCount ||
+      entryCount === 0 ||
+      entryCount > MAX_ARCHIVE_ENTRIES ||
+      centralSize === 0 ||
+      centralSize > MAX_ZIP_CENTRAL_DIRECTORY_BYTES ||
+      centralOffset + centralSize !== absoluteEndOffset
+    ) {
+      fail("archive has unsupported multi-disk, ZIP64, or out-of-bounds central directory metadata");
+    }
+    const central = readExactBytesSync(descriptor, centralSize, centralOffset);
+    const entries = [];
+    const normalizedNames = new Set();
+    const directories = new Set();
+    let cursor = 0;
+    let totalUncompressed = 0;
+    for (let index = 0; index < entryCount; index += 1) {
+      if (cursor + 46 > central.length || central.readUInt32LE(cursor) !== 0x02014b50) {
+        fail("archive central directory is truncated or malformed");
+      }
+      const uncompressedSize = central.readUInt32LE(cursor + 24);
+      const nameLength = central.readUInt16LE(cursor + 28);
+      const extraLength = central.readUInt16LE(cursor + 30);
+      const commentLength = central.readUInt16LE(cursor + 32);
+      const entryDisk = central.readUInt16LE(cursor + 34);
+      const externalAttributes = central.readUInt32LE(cursor + 38);
+      const next = cursor + 46 + nameLength + extraLength + commentLength;
+      if (
+        nameLength === 0 ||
+        next > central.length ||
+        entryDisk !== 0 ||
+        uncompressedSize === 0xffffffff
+      ) {
+        fail("archive entry has invalid or ZIP64 central directory metadata");
+      }
+      const nameBytes = central.subarray(cursor + 46, cursor + 46 + nameLength);
+      const name = nameBytes.toString("utf8");
+      if (name.includes("\uFFFD") || name.includes("\0")) {
+        fail("archive entry contains invalid UTF-8");
+      }
+      if (!isSafeArchivePath(name)) {
+        fail(`archive contains an unsafe path: ${JSON.stringify(name)}`);
+      }
+      const fileType = (externalAttributes >>> 16) & 0o170000;
+      if (fileType === 0o120000 || (externalAttributes & 0x400) !== 0) {
+        fail(`package contains a symbolic link: ${name}`);
+      }
+      if (fileType !== 0 && fileType !== 0o100000 && fileType !== 0o040000) {
+        fail(`package archive contains an unsupported filesystem entry: ${name}`);
+      }
+      if (fileType === 0o040000 && !name.endsWith("/")) {
+        fail(`archive directory entry is missing trailing slash: ${name}`);
+      }
+      totalUncompressed += uncompressedSize;
+      if (totalUncompressed > MAX_DOWNLOAD_BYTES) {
+        fail("archive exceeds the maximum uncompressed byte limit");
+      }
+      const trimmed = name.replace(/\/$/u, "");
+      if (name.endsWith("/")) {
+        directories.add(trimmed);
+      }
+      if (normalizedNames.has(trimmed)) {
+        fail(`archive contains a duplicate path: ${name}`);
+      }
+      normalizedNames.add(trimmed);
+      entries.push(name);
+      cursor = next;
+    }
+    if (cursor !== central.length) {
+      fail("archive central directory has trailing unread bytes");
+    }
+    for (const name of entries) {
+      let parent = name.replace(/\/$/u, "");
+      while (parent.includes("/")) {
+        parent = parent.slice(0, parent.lastIndexOf("/"));
+        if (normalizedNames.has(parent) && !directories.has(parent)) {
+          fail(`archive contains a file-directory path collision: ${name}`);
+        }
+      }
+    }
+    return entries;
+  } finally {
+    closeSync(descriptor);
+  }
+}
+
 function archiveEntries(asset) {
   const unzip = process.platform === "darwin" ? "/usr/bin/unzip" : "unzip";
-  const entries =
-    process.platform === "win32"
-      ? JSON.parse(windowsAction("entries", asset))
-      : run(unzip, ["-Z1", asset]).stdout.split(/\r?\n/u).filter(Boolean);
+  let entries;
+  if (process.platform === "win32") {
+    entries = JSON.parse(windowsAction("entries", asset));
+  } else {
+    const centralEntries = inspectPosixArchiveEntries(asset);
+    entries = run(unzip, ["-Z1", asset]).stdout.split(/\r?\n/u).filter(Boolean);
+    if (
+      entries.length !== centralEntries.length ||
+      entries.some((item, index) => item !== centralEntries[index])
+    ) {
+      fail("archive central directory does not match unzip entry list");
+    }
+  }
   if (entries.length === 0 || entries.length > MAX_ARCHIVE_ENTRIES) {
     fail(`archive contains an invalid number of entries: ${entries.length}`);
   }
