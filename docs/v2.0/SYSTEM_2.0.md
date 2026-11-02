@@ -33,31 +33,46 @@ Do not create a fixed role inventory or role-specific `AGENTS.md` files. Each ta
 flowchart TD
     user["User"]
     intake["Intake conversation"]
-    worker["New execution conversation"]
+    worker["Real execution conversation A"]
+    worker2["Real execution conversation B"]
     artifact["Artifacts and permitted files"]
 
     subgraph os["Personal OpenSocrates program"]
         channel["Communication and task coordination"]
         select["Prepare task guides and context"]
-        guide["Personal guides and baseline 48"]
-        context["Relevant context, versions and authority"]
+        base["Baseline 48 guides"]
+        personal["Personal guides"]
+        context["Relevant context, branches and authority"]
         adapter["App and surface adapter"]
-        state["Personal database"]
+        state["Personal DB, task and learning state"]
+        signal["Observable experience"]
+        compare["File comparison at next related task"]
+        learn["Personal learning state and guide generation"]
 
-        channel -->|"Purpose and expected result"| select
-        guide -->|"Applicable guides"| select
+        channel -->|"Task and expected result"| select
+        base -->|"When no personal guide fits"| select
+        personal -->|"Prefer applicable personal guides"| select
         context -->|"Relevant context and priority"| select
         select -->|"Task prompt, guides and context"| adapter
         channel <--> state
+        channel -->|"Only observable and deliverable signals"| signal
+        compare --> signal
+        signal --> learn
+        learn -->|"Generate or revise personal guides"| personal
+        learn <--> state
+        learn -.->|"Request a reasoning session if needed"| channel
     end
 
-    user -->|"Request, choice and confirmation"| intake
-    intake -->|"Consultation, artifact preview and important questions"| user
-    intake <-->|"Task request, progress and result references"| channel
-    adapter -->|"Create session and deliver"| worker
-    worker -->|"Results, questions and further delegation requests"| channel
-    worker <-->|"Permitted actual work"| artifact
-    channel -->|"Further work uses the same preparation path"| select
+    user -->|"Request, choice and correction"| intake
+    intake -->|"Consultation, format and important questions"| user
+    intake <-->|"Request, status and results"| channel
+    adapter -->|"Create real session and deliver"| worker
+    adapter -->|"Same preparation for additional delegation"| worker2
+    worker -->|"Results, questions and requests"| channel
+    worker2 -->|"Results, questions and requests"| channel
+    worker <-->|"Permitted work"| artifact
+    worker2 <-->|"Permitted work"| artifact
+    artifact -->|"Only at related work"| compare
 ```
 
 1. The user makes an ordinary, potentially incomplete request in the intake conversation. That conversation works with OpenSocrates to establish purpose, audience and format and discusses choices only when needed. It does not redirect a settled user choice.
@@ -67,6 +82,35 @@ flowchart TD
 5. Only permitted information from user choices and observable work experience becomes learning input. Do not retain the communication transcript as a learning log.
 
 A message in transit does not prove a new guide entered the model context. Distinguish host receipt, actual guide delivery, evidence of reading/application and artifact quality to the extent each can be observed.
+
+### Dynamic delegation and integration: one user-centered team
+
+MoE is a **product analogy** for selecting and composing useful capabilities for a task. It does not assert that a model's expert router or weights are involved, or that quality is established. Do not create fixed personas, role-specific `AGENTS.md` files or the same standing team for every job.
+
+For a report, analysis and writing may be tightly coupled enough for one execution conversation. If chart creation requires different tools or independent review of a particular part is useful, another real conversation may be requested dynamically. Each additional session receives **this assignment, the expected result, necessary material and scope, applicable reasoning guides, and current user choices and authority**. Communication and further delegation flow through OpenSocrates. Guide reassembly or final integration may also become a separate execution task when useful.
+
+Assess available apps, models, tools and authority together with task coupling, suitability of transferring materials, observed quality, expected latency and usage, and user burden. Do not infer that a model is good at a task from its name alone. If discovery in one task changes the question in another, naive parallelization can produce the wrong result; consider sequencing or re-coordination. Parallel execution is not guaranteed to be faster or cheaper. Measure host limits, latency and retries.
+
+Integration examines claims, sources, access to original evidence and current task scope; a reviewer session's confidence, model name or simple majority alone does not justify changing a result. Another session may incorrectly “correct” a valid number or object without access to source data. Check accessible evidence and otherwise preserve disagreement and limits. Respect the user's settled format/direction and valid authority. Session IDs and file IDs differ, as do evidence of guide delivery, artifact existence and work quality.
+
+Evaluate value against one execution conversation and native host features under comparable material, tools, time and usage budgets. If adding sessions does not reduce errors and increases delay, usage or intervention, that task lacks evidence for extra delegation. This is an evaluation hypothesis, not evidence of implementation or quality improvement.
+
+**Synthetic delegation example.** Suppose the report's execution conversation judges a separate chart assignment worthwhile. The single task request OpenSocrates sends to a new session might say: “Plot monthly retention from the supplied synthetic cohort data. Return an editable chart and an image with axes, units and source marked. Do not invent missing periods; report insufficient data.” It concretely states the work and expected result. Deliver **guidance appropriate to that session and permitted material/context** alongside it. Preserve Word as the final report format without requiring an intermediate chart image to be a Word file.
+
+The chart session then returns artifact references, observable sources/limits and any further requests through the layer. The execution session responsible for integration checks items such as units and consistency with source data and routes disagreements back when needed. This is an experimental illustration, not a fixed job title, evidence that a particular model is superior, successful automatic delivery or actual chart quality.
+
+### Data contract for one job: synthetic illustration
+
+These IDs and contents are fictional, not evidence of actual delivery or implementation. Decide final storage fields and current-policy compatibility during implementation.
+
+| Flow | Inputs and associations | State and evidence distinctions |
+| --- | --- | --- |
+| Intake preparation | `task=t1`, purpose=investment decision material, user choice=Word, context branch=`b1`, valid authority reference | Separate explicit user choices, agent hypotheses about audience/outline and third-party claims. `t1` is not a conversation ID. |
+| Guide preparation | Applicable personal-guide versions and scope for `t1`, or an applicable choice from the baseline 48; optional separate reassembly reference | A selected ID does not establish guide delivery, reading or use. Applying a canonical procedure unchanged retains its complete conditions. |
+| Delegate to a real session | `message=m1`, `task=t1`, target app and real session `s1`, one task request, expected result, relevant guides/context/decisions/authority | Handle raw message text only for permitted real-time delivery. Do not assume the program stores it in the DB. Keep host creation/delivery stages unknown if unobservable. |
+| Delegate a chart | `s1` requests via the layer → child task `t2`, message `m2`, real session `s2`; `t2` is chart work | Word is the final report choice, not a requirement that an intermediate chart image be Word. `s2` and the chart file have different identifiers. |
+| Result and integration | File reference `a2` for `t2` and verifiable source/status return via the layer to the `t1` execution conversation | File existence, guide receipt, numerical accuracy and final usefulness are separate observations. Do not invent completion if there is no return path. |
+| Correction and learning | If the user changes structure during work, deliver the updated valid decision where applicable and consider the experience as a personal-learning candidate | Leave in-flight application pending when delivery is unavailable. A settled instruction for this job is not automatically a global preference; guide generation and effect also differ. |
 
 ## 4. Guide generation, selection and reassembly
 
@@ -88,6 +132,8 @@ A personal guide version links the generator version, input guide versions, scop
 4. Whether partially applicable personal guides may be supplemented with baseline content, or should trigger baseline fallback, remains a selection-policy decision. Do not present either option as an owner decision already made.
 5. Learning logic judges whether a reconstructed guide is task-local or worth retaining as a reusable personal guide. Storage does not establish effectiveness or permanent adoption.
 
+When applying an existing canonical procedure from the baseline 48 unchanged, preserve its full procedure in the task locale, required dependencies, contraindications, stops and public outputs. Do not represent an excerpt or a reassembled result as a complete read and application of the canonical procedure. A newly reassembled personal guide is a distinct artifact whose provenance and required conditions need review; changes to canonical methods require separate product review and versioning. This preserves the current contract for existing procedures, not a commitment to freeze the 48 forever.
+
 Growing the guide collection does not mean injecting the whole collection. Separate relevance retrieval, scope and delivery budgets. Instead of imposing an arbitrary fixed guide-count ceiling, measure and disclose storage, retrieval latency, duplication and retirement constraints. Do not assume retrieval requires an external embedding API.
 
 ## 5. Proposed personal-data and communication contracts
@@ -100,7 +146,7 @@ Implement canonical schemas under `schemas/source/`, runtime code under `src/ope
 | `TaskRecord` | task ID, project/branch IDs, intake session ref, execution session refs, goal summary, artifact refs, authorized scope ref, status, revision | Identify work separately from conversations; a task may span several sessions. |
 | `DispatchEnvelope` | message ID, task ID, sender/destination, parent message ID, retry identity, guide/context version refs, authority ref, expiry | Associate task prompts, guides, context and results. Handle sensitive payload only as needed for permitted host delivery. |
 | `ContextRecord` | context ID, scope, branch/version/parent refs, source ref, timestamp, freshness, accepted/proposed/observed status, authority | Recency alone does not change user intent or authority. Changed sources reopen affected facts only. |
-| `GuideVersion` | guide ID/version, baseline/personal kind, scope, generator version, input guide refs, permitted evidence refs, hypothesis/active/retired status | Separate ownership of personal guides and common instructions; track the version actually applied to work. |
+| `GuideVersion` | guide ID/version, baseline/personal kind, scope, generator version, input guide refs, permitted evidence refs, hypothesis/active/retired status | Separate ownership of personal guides and common instructions; distinguish the version delivered from the observed status of actual use. |
 | `LearningCheckpoint` | learning ID, question summary, input event IDs, public progress state, pending application refs, versions, revalidation need, revision | Track learning interruption/resumption without retaining private reasoning or raw conversation. |
 | `ArtifactRecord` | artifact ID, permitted location ref, type, project/branch/task refs, fingerprint, observed timestamp, existing version ref | Distinguish what is known about moves/new files; metadata does not prove intent. |
 | `AuthorityRecord` | authority ID, user/host origin, scope, allowed effects, limits, expiry/revocation, pending-confirmation state | Agent outputs and prior records do not create new user authority. |
@@ -140,9 +186,23 @@ flowchart TD
 
 Example learning states are `observed → interpreting → candidate → pending_application → observing_outcome → revised/retained/retired`. Interruption and cancellation are separate states; resume restores the last confirmed stage and unresolved effects. This is not a selected RL algorithm or a validated adoption rule. Absence of edits, silence, or agreement among agents does not by itself establish success.
 
-Applying learning to related ongoing work remains a product goal. Writing a new local database version is different from changing an already running model's context. Use actual adapter-supported entry points such as a subsequent message, tool call or session continuation, and track the version received by that work. If no entry point is available, retain `pending_application` and do not claim live application. Do not remove the in-flight requirement merely by freezing versions.
+Applying learning to related ongoing work remains a product goal. Writing a new local database version is different from changing an already running model's context. Use actual adapter-supported entry points such as a subsequent message, tool call or session continuation, and track the version received when receipt can be observed. Leave receipt or use unknown when it cannot be observed. If no entry point is available, retain `pending_application` and do not claim live application. Do not remove the in-flight requirement merely by freezing versions.
 
 Judge compatibility with the work's audience, purpose and current user choices before applying a change. Distinguish general preferences from project-specific edits, external changes, another author's changes, expression changes and actual error corrections. An ambiguous signal may remain a scoped, unverified hypothesis rather than a strong personal preference. Reward, adoption/retirement, regression detection and compute budgets are decisions to investigate through the validation experiments.
+
+Separate the state of user-disabled or paused learning from the work itself. Whether the user's instruction pauses only new learning or also use of existing personal guides depends on the actual words and context. Do not automatically re-enable explicitly paused learning on restart or login. Attempt to cancel in-flight learning where the host supports it and prevent already-sent inputs or late results from silently reactivating it; leave cancellation and delivery unknown when unobservable. Pausing is not automatic deletion. If the user later enables learning, recheck permitted input, current authority and guide versions. The precise scope of the user's choice and actual host behavior require implementation and testing.
+
+### Candidates for background execution
+
+“Background” is the product goal of learning from available experience without a separate learning instruction and resuming after interruption. It does not require watching every folder or imply that a model always runs when the host app is closed. These are alternatives to compare, not mutually exclusive user decisions.
+
+| Candidate | Possible responsibility | What still needs verification |
+| --- | --- | --- |
+| Attach to an active app conversation | Interpret observable corrections and collaboration signals from current work and attempt application to relevant work | Whether that surface allows program calls and in-flight redelivery; contention with foreground work |
+| Per-user local process | Queue, schedule, restart and recover permitted work/learning state and possible state transitions | Process lifetime, stop/restart, OS authority and resource use. Do not assume the process itself contains a model or can access a closed app |
+| Resume on the next related task | Compare permitted fingerprints/history of related files and resume incomplete learning | Whether previous grounds can be reread and how to report changes whose contents and author are unknown |
+
+Starting points for OS investigation include [macOS `SMAppService`](https://developer.apple.com/documentation/servicemanagement/smappservice) and [Windows Task Scheduler](https://learn.microsoft.com/en-us/windows/win32/taskschd/about-the-task-scheduler). Documentation that an OS can launch a process is not evidence that an existing AI app can create a new conversation or run inference. Test startup/shutdown settings, host authority, closed app, logout/sleep and resumption of interrupted learning on each actual OS/app. None assumes continuous monitoring of every folder. Measure scheduling frequency and power/battery impact; do not default to unconditional short-interval polling.
 
 ## 8. Context branches and file management
 
@@ -154,6 +214,18 @@ Associate execution-session file work with project/context/version references. J
 
 Compare recorded state with actual files at the next related task. Modification time is a signal, not proof of content change; different fingerprints computed with the same hash method establish byte differences. Exact comparison needs a readable prior version or equivalent history. Without one, retain the observed change and do not invent the difference, author or reason. Evaluate moves, renames, automated formatting and substantive edits separately.
 
+### Worked scenario: an in-flight file and a return to earlier context
+
+This is a design to test, not a record of observed behavior. On the current branch, execution conversation A is writing a report while the user revisits an earlier direction.
+
+1. **Inspect versus switch:** Merely viewing an old context does not automatically change current decisions or files. If the user's words and actions sufficiently express an intent to continue work in that direction, select it without requiring a magic phrase. Ask concretely only if inspection versus switching materially changes the result and context does not resolve it.
+2. **Choices and authority:** Distinguish the selected branch's goals and decisions from current facts by provenance and time. Selecting an old branch does not restore expired authority or automatically restore an old file. Carry the user's current format choice and valid authority into new work.
+3. **A file in flight:** If A's write completion is observable, inspect that state and the actual file first. Otherwise do not guess completion or cancellation. Choose among editing the existing path, creating an authorized separate version, coordinating the write or waiting, according to current instructions, authority and file state. Do not repeatedly seek approval for an ordinary explicitly assigned edit, or require a new file for every direction change. Do not assume the program can control a concurrent host write.
+4. **Result attribution:** Link task ID, session ID, file ID and the relevant decision/context versions separately. If an earlier-direction result arrives late, do not confuse it with the current result; retain its potentially stale status. Whether a usable file exists and whether it reflects the new decision are separate checks. Do not say a new choice was applied when that is unconfirmed.
+5. **External changes:** At the next related task, compare permitted previous and current fingerprints. Different hashes from the same method establish different bytes; equal hashes are evidence consistent with equal bytes but cannot absolutely prove it due to possible collisions. Neither establishes author, intention or fitness for the task. Without previous content or permitted history, do not invent the actual change.
+
+Evaluate usefulness and burden after switching, preservation of existing files, and accuracy of pending/stale indications together. File names or the number of new versions do not alone establish success.
+
 ## 9. Retention, authority and trust boundaries
 
 Follow current `AGENTS.md`, `CONTRIBUTING.md` and `SECURITY.md`. This plan does not authorize collection/retention of raw prompts/conversations, screenshots, workspace content, credentials, private reasoning or telemetry. Debug logs, retry queues, database backups and derived indexes must not become retention workarounds.
@@ -163,6 +235,26 @@ Separate reading content for permitted real-time work or delivering a task promp
 If full file snapshots or permanent conversation copies are needed, propose a separate policy decision describing exact data, purpose, lifetime, deletion and consent. Until then, refer to accessible version history already managed by the user/host or provide change detection only. Define inspection, correction, pause, deletion and rollback so quiet learning is not inaccessible or uncontrollable learning. Retention defaults and initial enrollment remain undecided.
 
 Preserve the provenance of user instructions, host policy, agent requests and external documents. Instructions in files or peer messages are not user authority. Discovering a learning problem does not authorize changing common generator instructions or security boundaries. Distinguish the goal of routing all managed communication through the program from a claim of controlling every host-internal action. Do not label an unobservable or uncontrollable surface fully supported.
+
+### Local storage and retrieval candidates, and boundaries to verify
+
+[SQLite](https://www.sqlite.org/about.html) is an embedded transactional store that does not require a separate database server, making it a **candidate for comparison** on one computer. Versioning guide bodies and metadata together in one database reduces separate file/DB commits. Making separate guide files canonical can support direct inspection and editing, but requires recovery from file/DB conflicts and interruptions. Separate files are retention too: review each guide, metadata item and reference against current policy in either option. Calling text a “personal guide” or “abstraction” does not eliminate raw-source reproduction or sensitive-data risk. The canonical location and database engine are not decided.
+
+SQLite's [WAL documentation](https://sqlite.org/wal.html) explains that reads and writes can overlap but there is only one writer at a time. Candidates include coordinating short state writes in the local program and detecting concurrent updates with version preconditions, without holding a write transaction while waiting for a model or external app. Measure latency, starvation, conflicts and recovery under actual load. Atomic database updates do not make external session creation, message delivery or file writes atomic.
+
+The [WAL and temporary-file documentation](https://www.sqlite.org/tempfiles.html) says `-wal` can remain after an unclean shutdown. The [SQLite `secure_delete` documentation](https://www.sqlite.org/pragma.html#pragma_secure_delete) does not guarantee that the ordinary-table setting removes FTS5 index traces. [FTS5's separate `secure-delete`](https://www.sqlite.org/fts5.html#the_secure_delete_configuration_option) has version-compatibility implications. Design the data boundary so prohibited raw material is never written to the DB, error strings, indexes, temporary files or backups. Separately test deletion of permitted personal data across DB, WAL, indexes, product backups and OS backup/sync boundaries. A setting, checkpoint or single-string scan does not guarantee complete physical-media erasure. Recovery, deletion and native host memory are separate boundaries.
+
+A provisional deletion sequence **separates logical removal from residual cleanup**. Commit DB changes that remove or deactivate product-managed entries and prevent pending work from reviving them; if needed, subsequently attempt checkpointing and cleanup of indexes and product backups as separate stages. With an open transaction on the same connection, [checkpointing may return locked without being attempted](https://www3.sqlite.org/matrix/ev/src/main.html). If other readers, interruption or failure prevent cleanup, do not promote it to completed; keep pending, failed and retry states. This is a candidate before validation, not a promise that OS backups, synchronization, storage media or native host memory were erased. In a temporary synthetic DB using Python SQLite 3.53.4 on macOS on 2026-11-03, `wal_checkpoint(TRUNCATE)` returned `database table is locked` during an open write transaction and a successful status after rollback. This narrow local observation does not validate product deletion or recovery.
+
+An old read snapshot can continue to see a deleted guide or delay residual cleanup while waiting for an external app. Consider avoiding long read and write transactions across external waits, and recheck current guide versions and deletion/withdrawal status immediately before committing or delivering results. That recheck alone cannot guarantee deletion for derived candidates without traceable provenance, content already sent to a host, restoration from an old backup, or independent native host memory. Define observable cancellation, recovery and unknown states separately and test whether older pending work or backups revive deleted content. Distinguishing a deleted guide from a similar candidate produced later by independent new experience needs further design. In a temporary synthetic DB on the same macOS/SQLite 3.53.4 environment, a read transaction begun before a deletion continued to see the old row after another connection committed it; `TRUNCATE` checkpoint returned busy until the reader ended, then returned success. This is a limited SQLite observation, not evidence that 2.0 recovery works.
+
+“Do not use this in this task,” “disable this guide,” “delete it,” and “never learn or apply similar approaches again” are not the same request. Interpret intention and scope in context, explaining the distinction and asking only when materially different outcomes remain unresolved. Blocking an existing guide ID differs from preventing a similar idea from being generated in different words. Preventing semantically similar future candidates may require retaining and comparing some representation of the prohibited scope; review whether that representation is itself information the user wanted deleted or otherwise forbidden, and whether the function and authority permit it. Do not promise a hash blocks all semantic equivalents or deletes native host memory. If complete forgetting conflicts with preventing similar future relearning, respect the user's choice without concealing the unresolved boundary.
+
+For example, if a user deletes `g1` and asks that its approach not be applied again, but `g1` contributed to `g3` reassembled with two other guides, removing only `g1` from a list may not suffice. If permitted lineage remains, consider finding affected `g3` and pending work, then removing/reassembling the relevant portion or holding it. If provenance is incomplete, do not automatically delete legitimate unrelated portions or assert that prohibited content is gone. Attempt to revise or cancel already-delivered content only where the host supports it, preserving unknown states. This is a case to validate, not current behavior or a guarantee against every semantic reappearance.
+
+Separate exclusions imposed by authority and explicit scope from relevance judgment inside that boundary. Do not categorically exclude an allowed general-purpose personal guide just because it came from another project. Compare structured scope filters, lexical retrieval over permitted data and semantic judgment in existing app conversations with inspecting all candidates at small scale. Design a re-query path when filtering misses relevant candidates. [FTS5](https://www.sqlite.org/fts5.html) trigram substring matching has limitations for queries shorter than three characters, and lexical search alone does not guarantee synonym, Korean morphology or semantic relevance. An index is another data-retention surface requiring policy review.
+
+On 2026-11-03, a small local **in-memory DB** probe using Python's SQLite 3.53.4 on macOS found trigram `MATCH` returned 0 for `형식` and 1 each for `보고서` and `한국어`; unicode61 `MATCH` did not match `외부` to `외부의`. This small investigation does not establish retrieval accuracy on other versions, Windows or a large personal-guide collection, or product behavior. Evaluate recall of relevant guides, false candidates, latency and retention/deletion together on synthetic cases by scale and language.
 
 ## 10. Required host investigation before implementation
 
@@ -180,6 +272,16 @@ Investigate and record each item by app, OS, surface, account and version. All r
 | Authority/cancellation/failure | Are host approvals, limits, errors, account expiry, retries and interruption observable? |
 
 Do not silently substitute private app database modification, unauthorized access expansion or model-API execution when a surface lacks a capability. Continue possible preparation and accurately report unavailable delivery, pending application or unknown support. A successful app/OS cell does not pass the other cells.
+
+### Connection candidates and the excluded alternative
+
+| Route | Observation and current judgment | What remains unproven |
+| --- | --- | --- |
+| Tools exposed by a host | [ChatGPT MCP guidance](https://learn.chatgpt.com/docs/extend/mcp) distinguishes local MCP on the same Codex host from hosted Work, and [Claude connector guidance](https://support.claude.com/en/articles/11725091-when-to-use-desktop-and-web-connectors) distinguishes local extensions, remote connections and surfaces. Check actual authority and exposure. | A program call alone does not establish creation of another real conversation, messaging, result receipt or in-flight update. Observe each account/version/OS. |
+| Existing computer use and reviewed open source | The user has identified this as a candidate. Design observation of the target app and current user input, with conflict and interruption handling. | Screen identification, actual interaction, concurrency, accessibility, user interruption and result attribution by surface. A click is not a receipt or quality proof. |
+| SDK/server executing a model in a separate app | The [Codex platform guide](https://developers.openai.com/blog/codex-as-a-platform) describes SDK/server paths by which an application can start and maintain its own tasks. This is relevant technical information, but do not silently adopt a separate agent application or model execution that the user has excluded from current scope. | The assumption that it is identical to a real user-visible conversation in an existing desktop app, or that the user has approved a scope change. |
+
+Where an authorized path is unavailable, surface that path's limits and unknown status. Do not categorically prohibit computer use or use it to bypass host approval/access controls. Do not generalize one surface's connectivity to all four combinations.
 
 ## 11. Installation, updates and migration
 
@@ -200,6 +302,21 @@ This is a **development draft** from the meeting, not a shipped prompt or canoni
 
 **Synthetic illustration:** A user asks that a report for an external decision-maker lead with the decision. A candidate might say: “For an external decision report, first identify the reader's decision, then organize the evidence needed for it.” Try it in the relevant work and assess relevance elsewhere. Preserve the user's Word choice for this task. Do not transfer it unchanged to an audit procedure where process itself matters. This is a design illustration, not evidence of benefit.
 
+### Distinctions needed for learning: draft data contract
+
+These candidate fields explain the design; they are not a canonical schema or a determination that actual storage is permitted under current policy. Review the need and permission to retain each field, reference and guide body before implementation.
+
+| Stage | Distinction needed | Example of an invalid promotion |
+| --- | --- | --- |
+| Observation | Signal type, known origin, task and time, current authority, accessible grounds and uncertainty | Record a change potentially made by another person as the user's personal preference |
+| Interpretation | Distinguish this task's instruction, work fact, external condition and candidate reusable approach; retain plausible attribution alternatives | Treat one investor's request as an established preference of all investors and all work |
+| Generation | Associate applicable situation, thinking direction and purpose, known exceptions, draft version, grounds and confidence limits | A non-actionable “do better” instruction or a guide reproducing raw source text |
+| Selection and reassembly | Current work and user choices/authority, personal-guide relevance, baseline-48 fallback, conflicts and delivery scope | An old personal guide changes the output format the user has just chosen |
+| Application and experience | Separate candidate creation, selection, delivery, reading, actual use and result evaluation; mark unobserved stages unknown | Treat ID delivery or model self-praise as actual use and success |
+| Reconsideration | Examine later corrections, quality signals, conflicting interpretations and related/unrelated work; retain, revise, rescope or retire | Count the same self-report repeatedly as independent evidence or silence as success |
+
+Do not establish one of several conflicting interpretations solely because it is newer or more agents agree. Honor choices confirmed for the current work immediately, while judging longer-term personal-guide scope in proportion to remaining evidence and context. Distinguish important decisions requiring user confirmation from quiet trials in the actual situation. Cost and routes for model judgments, cross-host interpretation differences, and detection and recovery of negative transfer remain experiments.
+
 ## 13. Explicit unknowns in delivery and resumption
 
 - **Who makes semantic judgments:** A design candidate has the local program manage state, authority and delivery, while existing app conversations interpret meaning, relevance, importance and reassembly. The bootstrap conversation, minimum inputs, when to open another session, and retrieval latency and usage with many guides require host-specific experiments and design. One bootstrap candidate has the already-open intake conversation judge the task while the program supplies an index of possible guides. This does not ban a separate session when it is useful. Measure index size and quality and actual session connectivity. No fixed-role agents are assumed.
@@ -209,6 +326,17 @@ This is a **development draft** from the meeting, not a shipped prompt or canoni
 - **In-flight changes:** Separate DB version creation, message delivery, session receipt/read, actual use in work and output quality. Verify follow-up message or pull capabilities per host. If a path is unavailable or unconfirmed, leave that application `pending_application` without stopping independent learning. Distinguish checking with no change from not checking. If a pull cannot be required or observed, whether it was skipped is unknown too. A matching hash alone does not prove semantic compatibility.
 - **User intervention:** Coordinate screen actions that conflict with the user's current input. This is not a blanket rule to pause independent work that does not use that screen. Distinguish already-authorized actions from new important decisions in their actual context and authority.
 
-## 14. Completion criteria for this design
+## 14. Product behavior when host constraints combine
+
+These are design candidates preserving the requirements, not observations of the four app/OS cells.
+
+1. **A new execution conversation can be created and given input:** The intake conversation consults and prepares; the new execution conversation produces the deliverable. If separate reassembly is unavailable but an existing guide fits, use it; if none fits, the execution conversation can continue ordinary work without forcing a method.
+2. **A conversation exists but cannot receive an in-flight change:** Distinguish the old assignment already delivered from application of a new user choice. Do not report an output as reflecting a new choice that did not reach the worker. Keep additional delivery/delegation pending and report ongoing work and file effects only to the extent observed. Whether a subsequent session or route can carry the new choice depends on actual capability and authority.
+3. **A required new execution conversation cannot be created:** The intake conversation can continue consultation and preparation but must not report that production started. Do not use repository fail-open as a pretext to silently create the deliverable in intake or call an unsupported internal branch a real app conversation. Investigate and test permitted existing computer-use or open-source options separately. If the user later changes the work mode, distinguish that choice and its result.
+4. **A direction change occurs only in a worker conversation and the program cannot read the signal:** OpenSocrates does not know the change or author. A changed fingerprint or an earlier Word choice cannot establish a new preference. Do not erase the requirement to learn from nonverbal experience: investigate each host's observable events, reread paths and permitted file history for useful signals. Mark learning unsupported or unknown where there is no path.
+5. **Native host memory conflicts:** Even if the program excludes a particular personal guide, the app may independently use its own memory. When it cannot be controlled or observed, do not guarantee that the preference was absent from the model's entire context. Investigate each app's memory settings, authority and retention separately, and distinguish program storage policy from data independently retained by the host. Do not assume host features can be forcibly changed.
+6. **Background learning cannot execute:** Identifying pending work in the local program is different from invoking a model to make semantic judgments. When learning through an existing app conversation is unavailable or the app is closed, keep that stage pending/incomplete and recheck when possible. Do not assume a provider API is substituted; test actual entry points and scheduling by surface.
+
+## 15. Completion criteria for this design
 
 Documented contracts alone do not establish working behavior. Claim a feature only after the [validation plan](VALIDATION_2.0.md) supplies actual host/OS evidence for delivery, separate execution conversations, guide selection/reassembly, in-flight application, learning resume, file comparison, authority, deletion and failure cases. Evaluate work-quality improvement separately from delivery. Attach unresolved policy, host and learning-signal questions to their dependent features rather than turning them into global conditions blocking unrelated research or documentation.
