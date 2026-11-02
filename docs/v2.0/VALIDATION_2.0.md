@@ -110,6 +110,8 @@ These cases are to be run after implementation. Their expectations apply to each
 | HOST-10 | Local app connection drops while host cloud work continues | Separate cloud inference status from local DB/file access. Do not assume inference stopped solely because the app closed; distinguish returned results, local application and unknown external effects. |
 | HOST-11 | Computer use on macOS and Windows | Verify the documented macOS background and Windows foreground behavior separately for the actual app/version/authority. Do not bypass user-input conflicts or host confirmation. |
 | HOST-12 | Earlier and latest MCP specifications versus actual host support | Check each host's transport version, state handles, calls, subscriptions, update paths and recipient authentication separately. Do not treat an MCP session ID or clientInfo as actual conversation identity or invent unavailable receipts. |
+| DELEGATE-01 | The chart assignment and two conversations share the same mistaken metric assumption | Distinguish count ratios supported by monthly totals from same-person retention requiring overlap. Do not establish meaning by arithmetic or majority alone; when needed for the decision, inspect authorized sources and definitions or ask a concrete question. Guide/context delivery and return pass through the layer. |
+| DELEGATE-02 | A chart opens but source access, editability or current version is partly unknown | Check opening, source and calculations, actual chart editing, Word figures/captions and application of delayed older results separately. Distinguish unknown checks from independent work that can proceed and appropriately communicate limitations material to interpreting a shared Word document. Specific needed checks may be delegated through the layer to an authorized tool or real conversation. |
 | GUIDE-01 | A new user has no generated guides | Use an applicable guide from the initial 48. Missing personal guidance does not block ordinary work. |
 | GUIDE-02 | Relevant and unrelated personal guides exist | Prefer suitable personal guidance without importing an unrelated project's guide. The mere existence of any personal guide must not disable baseline fallback. |
 | GUIDE-03 | No suitable personal guide exists | Use an applicable baseline path. Inspect public suitability/selection grounds without requesting private reasoning. |
@@ -161,7 +163,7 @@ This mapping aids traceability; a documented case is not an executed or passing 
 | --- | --- |
 | REQ-01–02 interpretation, consultation, format | USER-01, USER-03 |
 | REQ-03–04 intake and real execution conversations | HOST-01, HOST-06 |
-| REQ-05–07 layer mediation, dynamic delegation, selection | HOST-02, HOST-03, HOST-05, HOST-12, GUIDE-04 |
+| REQ-05–07 layer mediation, dynamic delegation, selection | HOST-02, HOST-03, HOST-05, HOST-12, DELEGATE-01–02, GUIDE-04 |
 | REQ-08 guidance and context for each judging conversation | HOST-07, HOST-08, HOST-12, GUIDE-07 |
 | REQ-09 personal-guide preference and baseline fallback | GUIDE-01–03, GUIDE-08–09 |
 | REQ-10 context selection and branching | CONTEXT-01–04 |
@@ -218,6 +220,12 @@ These experiments can begin independently before implementation is complete:
 3. **Contribution of personalization:** Where feasible, compare baseline guidance, a same-information fact memo and personal guidance under matched conditions. Use held-out later work, unrelated work and changed preferences. Separate blinded and actual-user ratings where possible; preserve failures, ties, costs and delays. Failure to beat a fact memo does not automatically disprove the value of team communication or context management.
 
 Model self-report, delivery of a guide ID and the presence of a file are different observations. None alone proves changed reasoning or improved quality. The aim is an experience where a user can explain less and still obtain useful results and retain control, not merely an impressive demo; do not claim that outcome before evaluation.
+
+### Observation from this meeting about delegated review
+
+At the 2026-11-03 meeting, the chair incorrectly described `78/89` as same-person retention from the prior month while presenting the synthetic cohort case in the system design. Claude and Grok initially accepted that meaning, and Claude reported recalculating the arithmetic. When the chair presented a counterexample with a different possible overlap, both corrected their interpretations. Because both received the same mistaken explanation, this is not an independent model-accuracy evaluation. It is an **observation from this meeting** that agreement and arithmetic checking did not establish the meaning of a shared assumption.
+
+The chair constructed two public synthetic ID sets and ran `python3 docs/v2.0/examples/cohort_overlap.py` using Python 3.14.8 on macOS. Both scenarios had 110 initial people, 89 observed in month one and 78 in month two; the overlaps were 78 and 57, respectively. The output showed same-person retention of 87.64% and 64.04%, while the ratio of monthly counts was 87.64% in both. This is an arithmetic observation on synthetic sets, not evidence of real user data, 2.0 automatic delegation or review, or improved quality. The reproducible code contains public synthetic inputs and observations, not actual prompts, screenshots or work files.
 
 ### Evidence for a credible public demonstration
 
