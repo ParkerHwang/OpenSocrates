@@ -353,6 +353,8 @@ The context tree is a concept for returning to an earlier direction or switching
 
 Preserve the current request and valid authority while selecting context by work/project/audience/time/relevance. Returning to a past perspective does not restore revoked authority or make stale facts current. Conflicting prices, dates and goals are not resolved by successful text merging. Specify priority policy and its learnable scope in the canonical contracts.
 
+An **optional resumption cue** is a design candidate. From permitted sources, the system may prepare only what the work needs, such as the current purpose, selected direction and as-of time, provenance and verification status of relevant decisions, next action and file reference. Do not promote stale or unverified items to established facts or present authority; omit a cue when it is unhelpful. This does not require a summary screen on every switch or user-written notes. Do not copy prohibited raw content to construct the cue; assess retention of references and metadata separately. Evaluate its actual effect and burden against conditions including no added cue.
+
 Associate execution-session file work with project/context/version references. Judge in-place edits, new versions and existing-folder organization in the work's context. Do not add an owner decision that every change requires a new file or every overwrite requires confirmation. Important decisions retain the user-confirmation boundary.
 
 Compare recorded state with actual files at the next related task. Modification time is a signal, not proof of content change; different fingerprints computed with the same hash method establish byte differences. Exact comparison needs a readable prior version or equivalent history. Without one, retain the observed change and do not invent the difference, author or reason. Evaluate moves, renames, automated formatting and substantive edits separately.
@@ -368,6 +370,8 @@ This is a design to test, not a record of observed behavior. On the current bran
 5. **External changes:** At the next related task, compare permitted previous and current fingerprints. Different hashes from the same method establish different bytes; equal hashes are evidence consistent with equal bytes but cannot absolutely prove it due to possible collisions. Neither establishes author, intention or fitness for the task. Without previous content or permitted history, do not invent the actual change.
 
 In this case, do not automatically replace β's historical deadline and prices with current values. If the user wants a **report about the historical situation**, the period's data may be correct; a current operational decision may require newer evidence. Distinguish source and as-of time in either case. Choosing a current direction does not revive past authority or automatically copy all facts from another branch. Whether α's work remains useful and whether it should be canceled depend on the actual instruction and observed state.
+
+Resuming an old direction within project A also differs from applying that direction to current work in project B. Interpret the conversation and its referent, asking specifically only when the distinction remains unresolved and materially changes the outcome. Bringing a direction to B does not automatically import all of A's material, authority or decisions.
 
 ### A race between fingerprint checking and writing
 
