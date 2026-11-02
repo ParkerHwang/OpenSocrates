@@ -127,6 +127,7 @@ These cases are to be run after implementation. Their expectations apply to each
 | HOST-14 | The user changes windows or types during screen automation while another session's interaction waits | Test short interaction units, release of the screen while waiting for the model, and destination and input revalidation before resumption on each OS and host. Hold only the affected action on unsafe target ambiguity and measure user intervention and latency. Do not assume collisions are automatically prevented. |
 | HOST-15 | A non-retaining relay loses a payload or is interrupted just after sending | Distinguish permitted reacquisition of an existing source, an unrecoverable body and an unknown external effect that may already have occurred. User permission or encryption alone does not allow storage prohibited by current policy; assess memory, host, OS and metadata boundaries separately. |
 | HOST-16 | A and B can access the same folder and B reads A’s file without a layer handoff | Distinguish a layer-mediated request or result reference from bypassed file reading. Check permission to disclose the path separately from permission to access content. Do not assume every file access is monitored or blocked, or infer no bypass from lack of observation; if bypass is observed, do not count that round trip as successful mediation. |
+| HOST-17 | A real session must start or resume after the intake turn, with a filled composer, wrong destination or absent return path | Observe new-conversation opening, sending, execution of the model turn, destination binding, layer-mediated round trip and user receipt separately. Do not count a filled composer as sent. Do not send sensitive content to an uncertain destination; continue evaluating other permitted routes. |
 | DELEGATE-01 | The chart assignment and two conversations share the same mistaken metric assumption | Distinguish count ratios supported by monthly totals from same-person retention requiring overlap. Do not establish meaning by arithmetic or majority alone; when needed for the decision, inspect authorized sources and definitions or ask a concrete question. Guide/context delivery and return pass through the layer. |
 | DELEGATE-02 | A chart opens but source access, editability or current version is partly unknown | Check opening, source and calculations, actual chart editing, Word figures/captions and application of delayed older results separately. Distinguish unknown checks from independent work that can proceed and appropriately communicate limitations material to interpreting a shared Word document. Specific needed checks may be delegated through the layer to an authorized tool or real conversation. |
 | GUIDE-01 | A new user has no generated guides | Use an applicable guide from the initial 48. Missing personal guidance does not block ordinary work. |
@@ -198,7 +199,7 @@ This mapping aids traceability; a documented case is not an executed or passing 
 | --- | --- |
 | REQ-01–02 interpretation, consultation, format | USER-01, USER-03 |
 | REQ-03–04 intake and real execution conversations | HOST-01, HOST-06 |
-| REQ-05–07 layer mediation, dynamic delegation, selection | HOST-02, HOST-03, HOST-05, HOST-12–16, DELEGATE-01–02, GUIDE-04 |
+| REQ-05–07 layer mediation, dynamic delegation, selection | HOST-02, HOST-03, HOST-05, HOST-12–17, DELEGATE-01–02, GUIDE-04 |
 | REQ-08 guidance and context for each judging conversation | HOST-07, HOST-08, HOST-12, GUIDE-07 |
 | REQ-09 personal-guide preference and baseline fallback | GUIDE-01–03, GUIDE-08–14 |
 | REQ-10 context selection and branching | CONTEXT-01–05 |
@@ -206,7 +207,7 @@ This mapping aids traceability; a documented case is not an executed or passing 
 | REQ-12 learning from experience and in-flight use | LEARN-01–04, LEARN-07–08, LEARN-10, LEARN-12–20 |
 | REQ-13 interruption and resumption of learning | LEARN-05–06, LEARN-09–11, LEARN-14–16, STORE-04 |
 | REQ-14–15 files, folders and external change | FILE-01–07, STORE-05 |
-| REQ-16 a team that does not make the user relay messages | HOST-02, HOST-06–07, HOST-13–16 and user-burden measurement |
+| REQ-16 a team that does not make the user relay messages | HOST-02, HOST-06–07, HOST-13–17 and user-burden measurement |
 
 Roadmap P14 installation, migration and operations maps to representative cases `INSTALL-01–02`, `HOST-08` and `STORE-01–02`. Actual host recovery and distribution evidence must be obtained separately.
 
@@ -257,6 +258,14 @@ These experiments can begin independently before implementation is complete:
 3. **Contribution of personalization:** Where feasible, compare baseline guidance, a same-information fact memo and personal guidance under matched conditions. Use held-out later work, unrelated work and changed preferences. Separate blinded and actual-user ratings where possible; preserve failures, ties, costs and delays. Failure to beat a fact memo does not automatically disprove the value of team communication or context management.
 
 Model self-report, delivery of a guide ID and the presence of a file are different observations. None alone proves changed reasoning or improved quality. The aim is an experience where a user can explain less and still obtain useful results and retain control, not merely an impressive demo; do not claim that outcome before evaluation.
+
+### First real connection round trip: observations to distinguish
+
+This experiment is an **unexecuted plan**. First establish support and authority for the particular host and use a public synthetic task. The target is to create actual execution conversations A and B, without the intake conversation producing the artifact, and exchange a synthetic question and answer A → layer → B → layer → A before returning the result to the user through the layer. Record app, mode, OS, account and entry point, and separately establish whether each actual conversation started a model turn and the grounds for attribution. User copy-and-paste or this meeting's chair moving material without the layer are controls, not successes for automatic communication. Conversely, **if the layer actually invokes a permitted host agent's screen interaction and requests and results pass through the layer**, the operator being an agent does not by itself make it manual relay. Each path's availability and permission still need evidence.
+
+Place separate public synthetic markers in the body in each direction and establish the route through which the counterpart received them. An echoed marker, timing or shared connection alone does not establish recipient identity, authority to receive private data or full guide use. Test a filled-but-unsent composer, unknown receipt after sending, no resume path after a turn, the wrong window, and restart when an external effect may already have occurred. Do not treat mere possession of an open connection or one-time value as sufficient authorization to access bodies. Feasibility with non-sensitive synthetic input is separate from authority to transmit actual work.
+
+Check device lock, app closure, user input and resumption in each surface, following actual host and user instructions for any new approval. Do not turn unknown send or effect into success or confirmed non-send, or blindly retry the same external action. If a needed body cannot be reacquired under current policy, distinguish lost payload from unknown external effect. The first observation is evidence for one cell, not support for other apps, modes or operating systems or evidence of user benefit.
 
 ### A comparative design for delegation and personalization
 
