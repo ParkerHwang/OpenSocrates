@@ -66,6 +66,10 @@ make generate
 
 ## Validate
 
+The reusable [office evaluation lab](docs/evaluation-lab.md) has a standard-library
+portable test target, `make evaluation-lab-check`. Its authored synthetic fixtures
+and offline checks do not establish authenticated host delivery or answer quality.
+
 Run the checks relevant to your change. Before requesting review, the complete
 source-level suite should pass:
 
