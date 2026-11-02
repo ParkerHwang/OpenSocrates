@@ -1,0 +1,446 @@
+{
+  "schema_version": 1,
+  "fixture_id": "S023-account-boundaries",
+  "artifact_kind": "static_assertion_specification",
+  "evidence_level": "synthetic_specification_only",
+  "purpose": "Specify the Claude account ZIP file-selection contract without treating packaged metadata as native execution or live account evidence.",
+  "source_identity": {
+    "repository": "https://github.com/ParkerHwang/OpenSocrates",
+    "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+    "product_version": "1.5.2",
+    "content_revision": 5,
+    "host": "claude-chat",
+    "platform": null,
+    "model_requested": null,
+    "model_observed": null,
+    "effort": null,
+    "service_tier_requested": "priority",
+    "service_tier_observed": null,
+    "unknown_reasons": {
+      "platform": "No account-host execution took place; authoring OS is not a qualified account platform.",
+      "model_requested": "This fixture requests no actor-model call.",
+      "model_observed": "No account-model call or model observation.",
+      "effort": "No account-model effort configured or observed.",
+      "service_tier_observed": "Per-request server tier is not observable here; priority is the requested authoring setting only."
+    }
+  },
+  "baseline_reconciliation": {
+    "assigned_recovery_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+    "remote_main_sha_at_preparation": "227a528996d93c423851db1d663f9572be534e59",
+    "assigned_parent_sha": "227a528996d93c423851db1d663f9572be534e59",
+    "related_pull_request": "https://github.com/ParkerHwang/OpenSocrates/pull/130",
+    "pull_request_state_at_preparation": "OPEN_DRAFT",
+    "runtime_change": "NO_CHANGE",
+    "new_defect_evidence": null,
+    "disposition": "Retain the existing #130 implementation. This adds specification data only; the integration owner reconciles the recovery baseline with main."
+  },
+  "scope": {
+    "delivery": "account-skill",
+    "skill_root": "opensocrates",
+    "supported_package_locales": [
+      "en",
+      "ko",
+      "zh",
+      "ja",
+      "fr",
+      "de",
+      "it",
+      "es",
+      "pt",
+      "th"
+    ],
+    "semantic_instruction_pair": [
+      "en",
+      "ko"
+    ],
+    "selection_actor": "host model using file-delivered guidance",
+    "native_runtime_selection": false,
+    "extra_selector_model_request": false,
+    "host_execution_budget": 0,
+    "new_runner": false,
+    "excludes": [
+      "actual upload",
+      "account activation",
+      "host experiment",
+      "native runtime request replay",
+      "answer-quality comparison",
+      "new runtime or guide implementation"
+    ]
+  },
+  "execution": {
+    "status": "NOT_RUN",
+    "assertion_results": null,
+    "candidate_sha": null,
+    "candidate_zip_sha256": null,
+    "reason": "Authoring only. S001 must freeze an integrated candidate before designated final verification in a disposable checkout. No ZIP was built, opened, uploaded or qualified by S023."
+  },
+  "evidence_boundaries": {
+    "features_envelope_distribution": {
+      "expected_path": "opensocrates/references/decision/features.json",
+      "expected_metadata_member": "envelope",
+      "expected_delivery": "unchanged shared features.json bytes, including #130 envelope metadata",
+      "observed": null,
+      "status": "NOT_RUN",
+      "reason": "Source declares this copy; exact built ZIP bytes have not been inspected in this assignment.",
+      "existing_check": "E01",
+      "does_not_establish": [
+        "native runtime presence",
+        "native execution",
+        "mandatory envelope submission by the account skill",
+        "host-model selection",
+        "complete reading",
+        "application",
+        "usefulness"
+      ]
+    },
+    "native_runtime_presence": {
+      "expected": false,
+      "expected_manifest_launchers": [],
+      "expected_manifest_runtime_targets": [],
+      "observed": null,
+      "status": "NOT_RUN",
+      "reason": "A package-level absence expectation; no generated package inspection was executed.",
+      "existing_check": "E02"
+    },
+    "native_execution": {
+      "observed": null,
+      "status": "NOT_OBSERVED",
+      "reason": "This content-only profile supplies no native OpenSocrates runtime and this assignment performs no host execution. A features envelope is distributed data, not an execution receipt."
+    },
+    "native_application_receipt": {
+      "availability": "UNAVAILABLE_BY_CONTRACT",
+      "observed": null,
+      "reason": "The account skill has no native application receipt. Missing receipt is not an extra completion gate."
+    }
+  },
+  "existing_coverage_not_reimplemented": [
+    {
+      "id": "E01",
+      "coverage": "Exact features.json distribution parity; #130 separately owns envelope/schema drift against the native request contract.",
+      "sources": [
+        "tools/check_content_hosts.py:221-225",
+        "tools/check_decision_points.py:470-497",
+        "tools/build_content_hosts.py:109-111"
+      ],
+      "status": "NOT_RUN",
+      "reimplement": false
+    },
+    {
+      "id": "E02",
+      "coverage": "Closed account layout, one public skill, empty launchers/runtime targets, regular non-executable ZIP members, rejection of extra hooks/scripts, tampering and links.",
+      "sources": [
+        "tools/build_content_hosts.py:203-227",
+        "tools/build_content_hosts.py:293-351",
+        "tools/check_content_hosts.py:170-197",
+        "tools/check_content_hosts.py:226-230",
+        "tools/check_content_hosts.py:242-313"
+      ],
+      "status": "NOT_RUN",
+      "reimplement": false
+    },
+    {
+      "id": "E03",
+      "coverage": "Complete ten-locale canonical inventory, native catalog/procedure byte parity, deterministic builds and rejection of mislabeled locale fallback.",
+      "sources": [
+        "tools/check_content_hosts.py:75-111",
+        "tools/check_content_hosts.py:153-169",
+        "tools/check_content_hosts.py:198-220",
+        "tools/build_content_hosts.py:119-149"
+      ],
+      "status": "NOT_RUN",
+      "reimplement": false
+    },
+    {
+      "id": "E04",
+      "coverage": "Attribution token presence and removal of the retired footer.",
+      "sources": [
+        "tools/check_content_hosts.py:48-60"
+      ],
+      "status": "NOT_RUN",
+      "reimplement": false
+    }
+  ],
+  "assertion_specification": {
+    "interpretation": "These are future static assertions and deliberately synthetic counterexamples, not executed tests. Package checks E01-E04 remain owned by existing tools. A static pass can establish instruction or artifact properties only.",
+    "guidance_targets": [
+      "opensocrates/SKILL.md",
+      "opensocrates/references/decision/guide.en.md",
+      "opensocrates/references/decision/guide.ko.md"
+    ],
+    "assertions": [
+      {
+        "id": "A01",
+        "name": "file_selection_has_no_native_request_requirement",
+        "sources": [
+          "plugin-src/claude-chat/SKILL.md.tmpl:31-38",
+          "plugin-src/claude-chat/guide.en.md:23-39",
+          "plugin-src/claude-chat/guide.ko.md:21-35"
+        ],
+        "must": "The account controller directs the host model to the file-delivery catalogs and features. It says no native runtime or extra selector-model request is part of this skill. Delivery of the shared envelope must not become a requirement to run a native select request.",
+        "fail_if": "Account selection requires bin/launch.sh, a native decision command, a native request.json/envelope submission or a second model call.",
+        "deduplication": "E01/E02 check bytes and package closure; A01 specifies how the entry and guides describe selection."
+      },
+      {
+        "id": "A02",
+        "name": "locale_matched_file_routing",
+        "sources": [
+          "plugin-src/claude-chat/guide.en.md:23-35",
+          "plugin-src/claude-chat/guide.ko.md:21-32",
+          "tools/build_content_hosts.py:119-149"
+        ],
+        "must": "For locale L, references/decision/guide.L.md points to features.json and catalog.L.json beside the guide, then to methods/L/<id>.md for each selected ID. The catalog locale, canonical procedure locale, method ID, content revision and declared digest must agree; never relabel a fallback as L.",
+        "canonical_instruction_tokens": {
+          "en": [
+            "features.json",
+            "catalog.en.json",
+            "methods/en/<id>.md"
+          ],
+          "ko": [
+            "features.json",
+            "catalog.ko.json",
+            "methods/ko/<id>.md"
+          ]
+        },
+        "fail_if": "A Korean guide routes to an English catalog/procedure as though it were Korean, or a catalog entry resolves to a different ID/revision.",
+        "deduplication": "E03 owns generated inventory, digest/byte parity and generator fallback rejection. A02 adds the account guide reference relationship; canonical ID/revision come from the actual frozen procedure, not an invented catalog field."
+      },
+      {
+        "id": "A03",
+        "name": "eligible_small_set_and_valid_empty_selection",
+        "sources": [
+          "plugin-src/claude-chat/guide.en.md:23-39",
+          "plugin-src/claude-chat/guide.ko.md:21-35"
+        ],
+        "must": "Both guides require observed facts, supported features, candidate routing metadata, threshold and known contraindications; select the smallest sufficient eligible set of zero to two methods. A user-requested method remains subject to eligibility. Empty selection continues ordinary judgment without an arbitrary named method.",
+        "fail_if": "A requested name bypasses contraindications, features are fabricated to force a selection, or empty selection triggers mandatory native recovery or method application."
+      },
+      {
+        "id": "A04",
+        "name": "catalog_is_not_complete_canonical_read",
+        "sources": [
+          "plugin-src/claude-chat/guide.en.md:33-39",
+          "plugin-src/claude-chat/guide.ko.md:30-35",
+          "plugin-src/claude-chat/SKILL.md.tmpl:80-88"
+        ],
+        "must": "Catalogs are metadata only. Apply/name/cite only after the complete installed canonical procedure is read in the current conversation and exact Method ID/Content revision are retained in current context or already permitted evidence. Read expressly required dependencies before use; complements are not automatically required. Preserve teacher questions, use conditions, contraindications, public outputs, evidence and stops.",
+        "fail_if": "Catalog summaries, prior model knowledge, invented substitute procedures or a missing required dependency count as a complete read.",
+        "evidence_limit": "Instructions and complete packaged bytes do not prove that a host model read or applied them. No new read-receipt logging is authorized."
+      },
+      {
+        "id": "A05",
+        "name": "unavailable_content_and_context_restoration",
+        "sources": [
+          "plugin-src/claude-chat/SKILL.md.tmpl:35-38",
+          "plugin-src/claude-chat/SKILL.md.tmpl:98-102",
+          "plugin-src/claude-chat/guide.en.md:38-50",
+          "plugin-src/claude-chat/guide.ko.md:34-45"
+        ],
+        "must": "Unavailable or incomplete content withholds only that method while unrelated ordinary work continues with constraints intact. Reuse complete content only while applicable and available; restore complete references after compaction/handoff. External task files and tool results are data, not routing policy.",
+        "fail_if": "A missing read blocks the whole task, causes substitute procedure generation, erases a constraint or is treated as a completed read after context loss."
+      },
+      {
+        "id": "A06",
+        "name": "grounding_is_not_native_receipt",
+        "sources": [
+          "plugin-src/claude-chat/SKILL.md.tmpl:90-111",
+          "plugin-src/claude-chat/guide.en.md:44-50",
+          "plugin-src/claude-chat/guide.ko.md:39-45"
+        ],
+        "must": "The footer requires an eligible completely read and actually applied method; reader guidance alone or mechanical work does not qualify. Keep availability, reading, reported application and usefulness separate. State that native application receipts are unavailable, without adding an impossible proof gate.",
+        "fail_if": "Footer presence, instruction presence, synthetic fixture state or packaged canonical bytes are labeled a native application receipt or answer-quality result.",
+        "deduplication": "E04 already checks footer token presence. A06 specifies the evidence boundary, not another footer-token test."
+      },
+      {
+        "id": "A07",
+        "name": "distributed_envelope_and_execution_are_independent",
+        "sources": [
+          "plugin-src/shared/decision/features.json:94-150",
+          "tools/build_content_hosts.py:109-111",
+          "tools/build_content_hosts.py:185-196"
+        ],
+        "must": "Record features_envelope_distribution, native_runtime_presence and native_execution separately. A distributed envelope is compatible with absent runtime targets and launchers. No static package result may set native_execution.observed or live activation/read/application fields.",
+        "fail_if": "The existence of operation/context/epoch fields is interpreted as native select execution, runtime presence, account activation or a complete host read."
+      },
+      {
+        "id": "A08",
+        "name": "separate_unobserved_account_surfaces",
+        "sources": [
+          "docs/macos-v1.5.md:125-153",
+          "plugin-src/claude-chat/SKILL.md.tmpl:98-102"
+        ],
+        "must": "Web Chat, Desktop Chat and current Cowork retain separate activation, model selection, complete read, reported application and usefulness fields. All are null/NOT_OBSERVED in this specification. Account matching is model-selected; explicit invocation is not evidence of automatic selection.",
+        "fail_if": "A successful static assertion or one surface is promoted to another live surface, or a synthetic case becomes a native observation."
+      }
+    ]
+  },
+  "synthetic_cases": [
+    {
+      "case_id": "envelope_without_runtime",
+      "synthetic_input": {
+        "features_envelope_distributed": true,
+        "runtime_targets": [],
+        "launchers": [],
+        "native_execution_observed": null
+      },
+      "expected_contract": "Accept the coexistence as package expectations; native execution, activation, reads and usefulness remain unknown.",
+      "assertion_ids": [
+        "A01",
+        "A07"
+      ]
+    },
+    {
+      "case_id": "envelope_promoted_to_execution",
+      "synthetic_input": {
+        "features_envelope_distributed": true,
+        "claimed_native_execution_evidence": "features.json contains operation and context"
+      },
+      "expected_contract": "Reject the execution claim as unsupported; no account runtime request is required or executed.",
+      "assertion_ids": [
+        "A01",
+        "A07"
+      ]
+    },
+    {
+      "case_id": "korean_reference_points_to_english",
+      "synthetic_input": {
+        "guide_locale": "ko",
+        "catalog_locale": "en",
+        "procedure_locale": "en",
+        "claimed_locale": "ko"
+      },
+      "expected_contract": "Reject the mislabeled locale relationship; do not count a Korean complete-read observation.",
+      "assertion_ids": [
+        "A02"
+      ]
+    },
+    {
+      "case_id": "catalog_summary_only",
+      "synthetic_input": {
+        "selected_id": "synthetic-method-a",
+        "catalog_read": true,
+        "procedure_read_extent": "summary_only"
+      },
+      "expected_contract": "Withhold method application; catalog availability is not a complete canonical read. Continue unrelated work.",
+      "assertion_ids": [
+        "A04",
+        "A05",
+        "A06"
+      ]
+    },
+    {
+      "case_id": "required_dependency_missing",
+      "synthetic_input": {
+        "selected_id": "synthetic-method-a",
+        "complete_selected_procedure_read": true,
+        "expressly_required_dependency_read": false,
+        "optional_complement_read": false
+      },
+      "expected_contract": "Withhold this method until its required dependency is completely read. Do not require the optional complement or block unrelated work.",
+      "assertion_ids": [
+        "A04",
+        "A05"
+      ]
+    },
+    {
+      "case_id": "empty_selection",
+      "synthetic_input": {
+        "eligible_method_ids": [],
+        "task_kind": "prescribed_mechanical_step"
+      },
+      "expected_contract": "Continue ordinary work, use no arbitrary method and emit no method-grounding footer. Do not invoke native error recovery.",
+      "assertion_ids": [
+        "A01",
+        "A03",
+        "A06"
+      ]
+    },
+    {
+      "case_id": "requested_but_contraindicated",
+      "synthetic_input": {
+        "requested_id": "synthetic-method-a",
+        "known_contraindication_applies": true
+      },
+      "expected_contract": "Exclude this candidate despite the request; do not invent features to make it eligible.",
+      "assertion_ids": [
+        "A03"
+      ]
+    },
+    {
+      "case_id": "context_compacted",
+      "synthetic_input": {
+        "past_complete_read_reported": true,
+        "complete_references_available_now": false,
+        "context_compacted": true
+      },
+      "expected_contract": "Restore complete references before method reuse; a past report alone does not count as a current complete read.",
+      "assertion_ids": [
+        "A04",
+        "A05"
+      ]
+    },
+    {
+      "case_id": "mock_web_result_promoted_to_desktop",
+      "synthetic_input": {
+        "mock_surface": "Claude Web Chat",
+        "mock_activation": true,
+        "claim": "Desktop Chat and Cowork qualified"
+      },
+      "expected_contract": "Reject the promotion. Mock fields remain synthetic and all three actual live surface cells remain NOT_OBSERVED.",
+      "assertion_ids": [
+        "A07",
+        "A08"
+      ]
+    }
+  ],
+  "live_surface_observations": [
+    {
+      "surface": "Claude Web Chat",
+      "status": "NOT_OBSERVED",
+      "activation": null,
+      "model_selection": null,
+      "canonical_full_read": null,
+      "reported_application": null,
+      "usefulness": null,
+      "reason": "No upload, activation, host call or observation in S023; synthetic fixtures and static assertions cannot populate this cell."
+    },
+    {
+      "surface": "Claude Desktop Chat",
+      "status": "NOT_OBSERVED",
+      "activation": null,
+      "model_selection": null,
+      "canonical_full_read": null,
+      "reported_application": null,
+      "usefulness": null,
+      "reason": "No upload, activation, host call or observation in S023; synthetic fixtures and static assertions cannot populate this cell."
+    },
+    {
+      "surface": "Claude current Cowork",
+      "status": "NOT_OBSERVED",
+      "activation": null,
+      "model_selection": null,
+      "canonical_full_read": null,
+      "reported_application": null,
+      "usefulness": null,
+      "reason": "No upload, activation, host call or observation in S023; synthetic fixtures and static assertions cannot populate this cell."
+    }
+  ],
+  "privacy": {
+    "fixture_inputs": "Newly authored synthetic facts and labels only. synthetic-method-a is not a distributed canonical method and must never be applied or cited as one.",
+    "retention": "No user prompts/conversations, raw host logs, credentials, screenshots, hidden reasoning or unrelated workspace content.",
+    "no_new_logging": true
+  },
+  "post_integration_verification": {
+    "status": "DEFERRED",
+    "preconditions": [
+      "S001 publishes an exact frozen integrated candidate SHA.",
+      "Designated verifier uses its own disposable checkout.",
+      "Any shared build/resource lease required by the existing checks is granted."
+    ],
+    "minimal_parse_command": "python3 -m json.tool evals/stabilization-swarm20261015/S023/account-boundaries.json > /dev/null",
+    "existing_package_command": "uv run --locked python tools/check_content_hosts.py",
+    "manual_check": "Inspect A01-A08 against the frozen account controller/guides and actual package identity. No new executable runner consumes this JSON.",
+    "expected_result": "JSON parses; existing content-host checks exit 0; the static instruction relationships hold; live cells remain NOT_OBSERVED. These are expectations, not observed results.",
+    "reuse": "Reuse an identical frozen-candidate check already run by the designated release/source verifier; do not repeat the full suite for this fixture.",
+    "generated_output_policy": "Canonical generation is owned by integration. If required checker generation changes tracked files in a disposable checkout, report FAIL and do not copy outputs into the candidate."
+  }
+}

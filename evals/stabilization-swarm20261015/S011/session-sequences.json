@@ -1,0 +1,3408 @@
+{
+  "format": "opensocrates.s011.session-sequences/1-draft",
+  "purpose": "Public synthetic state-transition fixtures extending the rejected-input preservation contract at PR #130; no runtime, host, model or validation execution results.",
+  "status": "AUTHORED_NOT_RUN",
+  "runtime_change": "NO_CHANGE",
+  "source_identity": {
+    "repository": "https://github.com/ParkerHwang/OpenSocrates",
+    "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+    "product_version": "1.5.2",
+    "content_revision": 5,
+    "host": null,
+    "platform": null,
+    "model_requested": null,
+    "model_observed": null,
+    "effort": null,
+    "service_tier_requested": "priority",
+    "service_tier_observed": null
+  },
+  "identity_unknown_reason": "No host/model experiment is part of S011. Requested authoring-chat speed does not establish the server tier; host, platform and model observations are unavailable.",
+  "scope": "One fresh in-memory DecisionSession per sequence with fixed canonical bundle/projections at source_sha; response_policy=None as in DecisionChecks.setUp. All steps within a sequence share that instance. Native hooks, active installs, legacy selector and actual application are outside this fixture.",
+  "synthetic_input_rule": "All contexts, decision IDs, feature envelopes and fault values are authored synthetic values. Explicit method requests are stipulated fixture inputs, not inferred user preferences. No prompt/transcript/host-log data is included.",
+  "notation": {
+    "request": "A literal JSON request. Only a one-key $response object is substituted before handle; booleans remain booleans. No implicit merge or repair.",
+    "states": "Named full snapshots of scope,last_key,last_selection,last_reason,delivered,available,busy. scope/last_selection are JSON-array encodings of Python tuples. available is an unordered set of [identity,digest] pairs.",
+    "pre_state": "Assert the named snapshot immediately before the step; no direct state seeding. Reach it only by running prior steps in order.",
+    "response_subset": "Assert every supplied leaf and exact array lengths; unspecified object keys are unconstrained. Resolve expectation operators before comparison.",
+    "$response": "Step ID plus # plus RFC 6901 JSON Pointer into its actual response, sequence-local only. Requests may reference only prior responses; post-state assertions may also reference the response just returned. A null/missing digest or reason capture, or a failed referenced step, is a failure, never a guessed value.",
+    "$request_sha256": "sha256(json.dumps(resolved_request, sort_keys=True).encode()).hexdigest(), exactly matching decision.py; use Python default separators and ensure_ascii=True. This is an expectation formula, not a captured hash.",
+    "$canonical_instructions": "Complete ProjectionInstructionAssembler instructions for the stated method/locale/revision from the fixed canonical source pair. No instruction content is stored as an observed result.",
+    "$canonical_sha256": "sha256: prefix plus SHA-256 of UTF-8 canonical instructions for the specified method/locale/revision.",
+    "post_state": "Assert the named snapshot after handle has returned, including busy=False. Exact membership of delivered/available is required, not only counts.",
+    "scope_assertion": "For every valid select response, also require response.scope to equal that step request context/epoch; selected methods must retain applied=unverified.",
+    "not_a_runner": "This is an S011-local draft fixture notation. No tool currently consumes this file. Mapping it to a runner requires integration-owner approval and implementation outside S011 ownership."
+  },
+  "source_references": {
+    "fault_preserves_state": {
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        125,
+        154
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "RequestFault returns a repairable response without calling _reset; finally releases busy."
+    },
+    "fault_response": {
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        77,
+        83
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Closed field/error/repair metadata extends the fail-open failure response."
+    },
+    "initial_and_reset_state": {
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        95,
+        105
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Initial volatile fields; busy starts false."
+    },
+    "reset_state": {
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        166,
+        172
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Reset clears scope, last selection key/reason, delivered and available."
+    },
+    "catalog_metadata": {
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        174,
+        187
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Catalog validates locale and returns metadata without mutating volatile state."
+    },
+    "acknowledge": {
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        189,
+        209
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Acknowledgment adds only previously delivered digests in the exact current scope; read/availability are agent assertions."
+    },
+    "scope_validation": {
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        211,
+        230
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Scope checks precede mutation; only a fully valid new context/epoch invokes reset."
+    },
+    "select_validation": {
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        240,
+        268
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Envelope, scope, decision, revision, locale, participation and routing validation all precede _scope."
+    },
+    "selection_cache": {
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        269,
+        303
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Exact sorted-JSON request hash reuses the last selection; new accepted requests replace the last cache even for no_intervention."
+    },
+    "delivery_inventory": {
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        305,
+        329
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Delivery identity binds method, locale and content revision; only acknowledged exact identity/digest pairs suppress instructions."
+    },
+    "routing_shape": {
+      "path": "src/opensocrates/domain/routing.py",
+      "lines": [
+        812,
+        817
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Unsupported answer shape rejects before selection."
+    },
+    "routing_features_shape": {
+      "path": "src/opensocrates/domain/routing.py",
+      "lines": [
+        799,
+        831
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Missing routing keys and non-list features are input faults."
+    },
+    "explicit_and_mechanical": {
+      "path": "src/opensocrates/domain/routing.py",
+      "lines": [
+        1047,
+        1102
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Mechanical participation returns no route; eligible explicit methods select their exact identity."
+    },
+    "documented_contract": {
+      "path": "docs/decision-points.md",
+      "lines": [
+        69,
+        114
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "One process retains volatile state; rejected requests do not change session state; availability assertions do not prove application."
+    },
+    "cli_stream_lifetime": {
+      "path": "src/opensocrates/cli/decision.py",
+      "lines": [
+        19,
+        63
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "One run_decision stream owns one session; one-shot calls create separate sessions."
+    },
+    "routing_reason_values": {
+      "path": "src/opensocrates/domain/enums.py",
+      "lines": [
+        218,
+        225
+      ],
+      "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "claim": "Router reason values are explicit_method and no_eligible_method for these stipulated explicit and mechanical inputs."
+    }
+  },
+  "duplicate_exclusions": [
+    {
+      "source": "evals/issue-124/select-faults.json",
+      "exclusion": "Do not copy its 20 standalone mutation cases, IDs or historical fictional task. Six different fault shapes here are only triggers for new multi-step state assertions."
+    },
+    {
+      "source": "tools/check_decision_points.py:116-155",
+      "exclusion": "Do not add independent happy-path reuse, revision reopen, repeat-without-ack, compaction or process-freshness cases."
+    },
+    {
+      "source": "tools/check_decision_points.py:177-238",
+      "exclusion": "Do not add independent locale, reset, compound selection or multi-method inventory cases."
+    },
+    {
+      "source": "tools/check_decision_points.py:350-468",
+      "exclusion": "Do not reproduce stale-epoch/recursion, one-error repair, fault-matrix or state-label-only tests."
+    },
+    {
+      "source": "tools/check_decision_points.py:534-572,711-726",
+      "exclusion": "Do not reproduce changed recommendations, cross-question examples or the error-free stream boundary."
+    }
+  ],
+  "unresolved": [
+    {
+      "topic": "Runtime or packaged-content failure after request acceptance",
+      "expected_state": null,
+      "status": "unresolved",
+      "reason": "RequestFault preservation does not establish transactional rollback for _scope/_deliver failures after acceptance; not exercised or asserted here."
+    },
+    {
+      "topic": "Malformed JSON stream, oversized input, EOF or process restart",
+      "expected_state": null,
+      "status": "unresolved",
+      "reason": "These are CLI/process boundary behaviors outside the direct handle sequences. No additional CLI guarantee is inferred from the six sequences."
+    },
+    {
+      "topic": "Host read, semantic application and utility",
+      "expected_state": null,
+      "status": "unresolved",
+      "reason": "Acknowledged is an agent assertion; fixture authorship/execution cannot authenticate host receipt, complete agent read, reasoning application or better answers."
+    },
+    {
+      "topic": "Integration candidate and executable consumer",
+      "expected_state": null,
+      "status": "unresolved",
+      "reason": "S001 has not frozen the integrated SHA for this fixture. No executable adapter or candidate validation is owned or run by S011."
+    }
+  ],
+  "sequences": [
+    {
+      "id": "S011-01",
+      "title": "동일 요청 정정 후 선택 캐시와 acknowledge 보존 / Preserve cached selection and acknowledgment after same-request repair",
+      "status": "AUTHORED_NOT_RUN",
+      "synthetic_context": "00000000000000000000000000000001",
+      "initial_state": "fresh",
+      "novel_assertion": "After a revision-type rejection, the corrected original request must reuse both the last routing selection and the acknowledged digest. A metadata query between correction and requery must preserve both.",
+      "overlap_exclusion": "Excludes standalone revision-type validation. Existing repair test starts with no acknowledged success; reuse/catalog tests have no intervening rejected select.",
+      "states": {
+        "fresh": {
+          "scope": null,
+          "last_key": null,
+          "last_selection": [],
+          "last_reason": "no_eligible_method",
+          "delivered": {},
+          "available": [],
+          "busy": false
+        },
+        "selected_en": {
+          "scope": [
+            "00000000000000000000000000000001",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_initial"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [],
+          "busy": false
+        },
+        "acknowledged": {
+          "scope": [
+            "00000000000000000000000000000001",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_initial"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        }
+      },
+      "steps": [
+        {
+          "id": "catalog",
+          "pre_state": "fresh",
+          "request": {
+            "operation": "catalog",
+            "locale": "en"
+          },
+          "expected": {
+            "response_subset": {
+              "status": "catalog",
+              "content_revision": 5,
+              "evidence": "metadata_only"
+            },
+            "post_state": "fresh"
+          },
+          "basis": [
+            "catalog_metadata"
+          ]
+        },
+        {
+          "id": "select_initial",
+          "pre_state": "fresh",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000001",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "emitted",
+                  "read": "unverified",
+                  "instructions": {
+                    "$canonical_instructions": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  }
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "selected_en"
+          },
+          "basis": [
+            "scope_validation",
+            "selection_cache",
+            "delivery_inventory",
+            "explicit_and_mechanical",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "ack_initial",
+          "pre_state": "selected_en",
+          "request": {
+            "operation": "acknowledge",
+            "context": "00000000000000000000000000000001",
+            "epoch": 0,
+            "digests": [
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          },
+          "expected": {
+            "response_subset": {
+              "status": "acknowledged",
+              "available": "agent_reported",
+              "read": "agent_reported",
+              "applied": "unverified"
+            },
+            "post_state": "acknowledged"
+          },
+          "basis": [
+            "acknowledge"
+          ]
+        },
+        {
+          "id": "reject_boolean_revision",
+          "pre_state": "acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000001",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": true,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "unavailable",
+              "reason": "invalid_decision_request",
+              "field": "revision",
+              "error": "invalid_type",
+              "repair": "correct_field_once",
+              "applied": "unverified",
+              "continue_ordinary_work": true,
+              "constraints_remain_binding": true
+            },
+            "post_state": "acknowledged",
+            "response_absent_keys": [
+              "selected",
+              "methods"
+            ]
+          },
+          "basis": [
+            "fault_response",
+            "fault_preserves_state",
+            "select_validation"
+          ]
+        },
+        {
+          "id": "correct_original",
+          "pre_state": "acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000001",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": true,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "reused_agent_reported_available",
+                  "read": "agent_reported",
+                  "instructions": null
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "acknowledged"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "catalog_other_locale",
+          "pre_state": "acknowledged",
+          "request": {
+            "operation": "catalog",
+            "locale": "ko"
+          },
+          "expected": {
+            "response_subset": {
+              "status": "catalog",
+              "content_revision": 5,
+              "evidence": "metadata_only"
+            },
+            "post_state": "acknowledged"
+          },
+          "basis": [
+            "catalog_metadata"
+          ]
+        },
+        {
+          "id": "requery_original",
+          "pre_state": "acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000001",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": true,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "reused_agent_reported_available",
+                  "read": "agent_reported",
+                  "instructions": null
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "acknowledged"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        }
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "S011-02",
+      "title": "거부된 다음 epoch와 승인된 다음 epoch / Rejected versus accepted next epoch",
+      "status": "AUTHORED_NOT_RUN",
+      "synthetic_context": "00000000000000000000000000000002",
+      "initial_state": "fresh",
+      "novel_assertion": "A valid higher epoch with a later routing error must leave old availability intact. Only its corrected accepted form retires the old assertions; unacknowledged repeats must keep emitting.",
+      "overlap_exclusion": "Excludes the existing successful compaction and stale-epoch assertions. The new assertion is the unchanged complete snapshot before a later-field invalid epoch advance is repaired.",
+      "states": {
+        "fresh": {
+          "scope": null,
+          "last_key": null,
+          "last_selection": [],
+          "last_reason": "no_eligible_method",
+          "delivered": {},
+          "available": [],
+          "busy": false
+        },
+        "selected_en": {
+          "scope": [
+            "00000000000000000000000000000002",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_initial"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [],
+          "busy": false
+        },
+        "acknowledged": {
+          "scope": [
+            "00000000000000000000000000000002",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_initial"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        },
+        "new_epoch_unacknowledged": {
+          "scope": [
+            "00000000000000000000000000000002",
+            1
+          ],
+          "last_key": {
+            "$request_sha256": "correct_epoch"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "correct_epoch#/methods/0/sha256"
+            }
+          },
+          "available": [],
+          "busy": false
+        },
+        "new_epoch_acknowledged": {
+          "scope": [
+            "00000000000000000000000000000002",
+            1
+          ],
+          "last_key": {
+            "$request_sha256": "correct_epoch"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "correct_epoch#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "correct_epoch#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        }
+      },
+      "steps": [
+        {
+          "id": "catalog",
+          "pre_state": "fresh",
+          "request": {
+            "operation": "catalog",
+            "locale": "en"
+          },
+          "expected": {
+            "response_subset": {
+              "status": "catalog",
+              "content_revision": 5,
+              "evidence": "metadata_only"
+            },
+            "post_state": "fresh"
+          },
+          "basis": [
+            "catalog_metadata"
+          ]
+        },
+        {
+          "id": "select_initial",
+          "pre_state": "fresh",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000002",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "emitted",
+                  "read": "unverified",
+                  "instructions": {
+                    "$canonical_instructions": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  }
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "selected_en"
+          },
+          "basis": [
+            "scope_validation",
+            "selection_cache",
+            "delivery_inventory",
+            "explicit_and_mechanical",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "ack_initial",
+          "pre_state": "selected_en",
+          "request": {
+            "operation": "acknowledge",
+            "context": "00000000000000000000000000000002",
+            "epoch": 0,
+            "digests": [
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          },
+          "expected": {
+            "response_subset": {
+              "status": "acknowledged",
+              "available": "agent_reported",
+              "read": "agent_reported",
+              "applied": "unverified"
+            },
+            "post_state": "acknowledged"
+          },
+          "basis": [
+            "acknowledge"
+          ]
+        },
+        {
+          "id": "reject_future_epoch",
+          "pre_state": "acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000002",
+            "epoch": 1,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "synthetic_invalid_shape",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "unavailable",
+              "reason": "invalid_decision_request",
+              "field": "routing.answer_shape",
+              "error": "invalid_value",
+              "repair": "correct_field_once",
+              "applied": "unverified",
+              "continue_ordinary_work": true,
+              "constraints_remain_binding": true
+            },
+            "post_state": "acknowledged",
+            "response_absent_keys": [
+              "selected",
+              "methods"
+            ]
+          },
+          "basis": [
+            "fault_response",
+            "fault_preserves_state",
+            "select_validation",
+            "routing_shape",
+            "scope_validation"
+          ]
+        },
+        {
+          "id": "correct_epoch",
+          "pre_state": "acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000002",
+            "epoch": 1,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "emitted",
+                  "read": "unverified",
+                  "instructions": {
+                    "$canonical_instructions": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  }
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "new_epoch_unacknowledged"
+          },
+          "basis": [
+            "scope_validation",
+            "reset_state",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "requery_before_ack",
+          "pre_state": "new_epoch_unacknowledged",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000002",
+            "epoch": 1,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": true,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "emitted",
+                  "read": "unverified",
+                  "instructions": {
+                    "$canonical_instructions": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  }
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "new_epoch_unacknowledged"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "ack_new_epoch",
+          "pre_state": "new_epoch_unacknowledged",
+          "request": {
+            "operation": "acknowledge",
+            "context": "00000000000000000000000000000002",
+            "epoch": 1,
+            "digests": [
+              {
+                "$response": "correct_epoch#/methods/0/sha256"
+              }
+            ]
+          },
+          "expected": {
+            "response_subset": {
+              "status": "acknowledged",
+              "available": "agent_reported",
+              "read": "agent_reported",
+              "applied": "unverified"
+            },
+            "post_state": "new_epoch_acknowledged"
+          },
+          "basis": [
+            "acknowledge"
+          ]
+        },
+        {
+          "id": "requery_after_ack",
+          "pre_state": "new_epoch_acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000002",
+            "epoch": 1,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": true,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "reused_agent_reported_available",
+                  "read": "agent_reported",
+                  "instructions": null
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "new_epoch_acknowledged"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        }
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "S011-03",
+      "title": "거부된 새 context와 정정 후 인계 / Rejected new context followed by corrected handoff",
+      "status": "AUTHORED_NOT_RUN",
+      "synthetic_context": "00000000000000000000000000000003",
+      "initial_state": "fresh",
+      "novel_assertion": "A syntactically valid different context with negative revision must not retire the acknowledged Korean inventory until the request is fully repaired; the accepted handoff must emit afresh.",
+      "overlap_exclusion": "Excludes the existing error-free context-change test. This sequence checks both sides of the validity boundary using a Korean acknowledged state.",
+      "states": {
+        "fresh": {
+          "scope": null,
+          "last_key": null,
+          "last_selection": [],
+          "last_reason": "no_eligible_method",
+          "delivered": {},
+          "available": [],
+          "busy": false
+        },
+        "selected_ko": {
+          "scope": [
+            "00000000000000000000000000000003",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_initial"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:ko:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [],
+          "busy": false
+        },
+        "acknowledged": {
+          "scope": [
+            "00000000000000000000000000000003",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_initial"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:ko:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:ko:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        },
+        "new_context_unacknowledged": {
+          "scope": [
+            "10000000000000000000000000000003",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "correct_context"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:ko:5": {
+              "$response": "correct_context#/methods/0/sha256"
+            }
+          },
+          "available": [],
+          "busy": false
+        },
+        "new_context_acknowledged": {
+          "scope": [
+            "10000000000000000000000000000003",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "correct_context"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:ko:5": {
+              "$response": "correct_context#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:ko:5",
+              {
+                "$response": "correct_context#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        }
+      },
+      "steps": [
+        {
+          "id": "catalog",
+          "pre_state": "fresh",
+          "request": {
+            "operation": "catalog",
+            "locale": "ko"
+          },
+          "expected": {
+            "response_subset": {
+              "status": "catalog",
+              "content_revision": 5,
+              "evidence": "metadata_only"
+            },
+            "post_state": "fresh"
+          },
+          "basis": [
+            "catalog_metadata"
+          ]
+        },
+        {
+          "id": "select_initial",
+          "pre_state": "fresh",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000003",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "ko",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "ko",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "ko",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "emitted",
+                  "read": "unverified",
+                  "instructions": {
+                    "$canonical_instructions": {
+                      "method": "deduction",
+                      "locale": "ko",
+                      "content_revision": 5
+                    }
+                  }
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "selected_ko"
+          },
+          "basis": [
+            "scope_validation",
+            "selection_cache",
+            "delivery_inventory",
+            "explicit_and_mechanical",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "ack_initial",
+          "pre_state": "selected_ko",
+          "request": {
+            "operation": "acknowledge",
+            "context": "00000000000000000000000000000003",
+            "epoch": 0,
+            "digests": [
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          },
+          "expected": {
+            "response_subset": {
+              "status": "acknowledged",
+              "available": "agent_reported",
+              "read": "agent_reported",
+              "applied": "unverified"
+            },
+            "post_state": "acknowledged"
+          },
+          "basis": [
+            "acknowledge"
+          ]
+        },
+        {
+          "id": "reject_foreign_context",
+          "pre_state": "acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "10000000000000000000000000000003",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": -1,
+            "locale": "ko",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "unavailable",
+              "reason": "invalid_decision_request",
+              "field": "revision",
+              "error": "invalid_value",
+              "repair": "correct_field_once",
+              "applied": "unverified",
+              "continue_ordinary_work": true,
+              "constraints_remain_binding": true
+            },
+            "post_state": "acknowledged",
+            "response_absent_keys": [
+              "selected",
+              "methods"
+            ]
+          },
+          "basis": [
+            "fault_response",
+            "fault_preserves_state",
+            "select_validation",
+            "scope_validation"
+          ]
+        },
+        {
+          "id": "correct_context",
+          "pre_state": "acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "10000000000000000000000000000003",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "ko",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "ko",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "ko",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "emitted",
+                  "read": "unverified",
+                  "instructions": {
+                    "$canonical_instructions": {
+                      "method": "deduction",
+                      "locale": "ko",
+                      "content_revision": 5
+                    }
+                  }
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "new_context_unacknowledged"
+          },
+          "basis": [
+            "scope_validation",
+            "reset_state",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "requery_before_ack",
+          "pre_state": "new_context_unacknowledged",
+          "request": {
+            "operation": "select",
+            "context": "10000000000000000000000000000003",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "ko",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": true,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "ko",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "ko",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "emitted",
+                  "read": "unverified",
+                  "instructions": {
+                    "$canonical_instructions": {
+                      "method": "deduction",
+                      "locale": "ko",
+                      "content_revision": 5
+                    }
+                  }
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "new_context_unacknowledged"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "ack_new_context",
+          "pre_state": "new_context_unacknowledged",
+          "request": {
+            "operation": "acknowledge",
+            "context": "10000000000000000000000000000003",
+            "epoch": 0,
+            "digests": [
+              {
+                "$response": "correct_context#/methods/0/sha256"
+              }
+            ]
+          },
+          "expected": {
+            "response_subset": {
+              "status": "acknowledged",
+              "available": "agent_reported",
+              "read": "agent_reported",
+              "applied": "unverified"
+            },
+            "post_state": "new_context_acknowledged"
+          },
+          "basis": [
+            "acknowledge"
+          ]
+        },
+        {
+          "id": "requery_after_ack",
+          "pre_state": "new_context_acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "10000000000000000000000000000003",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "ko",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": true,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "ko",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "ko",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "reused_agent_reported_available",
+                  "read": "agent_reported",
+                  "instructions": null
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "new_context_acknowledged"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        }
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "S011-04",
+      "title": "오류와 정정을 거친 EN/KO 전달 재조회 / EN and KO availability across rejection and repair",
+      "status": "AUTHORED_NOT_RUN",
+      "synthetic_context": "00000000000000000000000000000004",
+      "initial_state": "fresh",
+      "novel_assertion": "A rejected Korean request leaves the acknowledged English identity untouched; corrected Korean delivery needs its own acknowledgment. Returning to English retains its bytes despite a different last routing key.",
+      "overlap_exclusion": "Excludes the existing locale-digest distinction test and ordinary reuse test; neither asserts an acknowledged locale inventory through a rejected cross-locale select.",
+      "states": {
+        "fresh": {
+          "scope": null,
+          "last_key": null,
+          "last_selection": [],
+          "last_reason": "no_eligible_method",
+          "delivered": {},
+          "available": [],
+          "busy": false
+        },
+        "selected_en": {
+          "scope": [
+            "00000000000000000000000000000004",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_initial"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [],
+          "busy": false
+        },
+        "acknowledged": {
+          "scope": [
+            "00000000000000000000000000000004",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_initial"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        },
+        "ko_delivered_en_available": {
+          "scope": [
+            "00000000000000000000000000000004",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "correct_ko"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            },
+            "deduction:ko:5": {
+              "$response": "correct_ko#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        },
+        "both_locales_available": {
+          "scope": [
+            "00000000000000000000000000000004",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "correct_ko"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            },
+            "deduction:ko:5": {
+              "$response": "correct_ko#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ],
+            [
+              "deduction:ko:5",
+              {
+                "$response": "correct_ko#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        },
+        "en_cache_both_available": {
+          "scope": [
+            "00000000000000000000000000000004",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "requery_en"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "requery_en#/methods/0/sha256"
+            },
+            "deduction:ko:5": {
+              "$response": "correct_ko#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ],
+            [
+              "deduction:ko:5",
+              {
+                "$response": "correct_ko#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        }
+      },
+      "steps": [
+        {
+          "id": "catalog",
+          "pre_state": "fresh",
+          "request": {
+            "operation": "catalog",
+            "locale": "en"
+          },
+          "expected": {
+            "response_subset": {
+              "status": "catalog",
+              "content_revision": 5,
+              "evidence": "metadata_only"
+            },
+            "post_state": "fresh"
+          },
+          "basis": [
+            "catalog_metadata"
+          ]
+        },
+        {
+          "id": "select_initial",
+          "pre_state": "fresh",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000004",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "emitted",
+                  "read": "unverified",
+                  "instructions": {
+                    "$canonical_instructions": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  }
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "selected_en"
+          },
+          "basis": [
+            "scope_validation",
+            "selection_cache",
+            "delivery_inventory",
+            "explicit_and_mechanical",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "ack_initial",
+          "pre_state": "selected_en",
+          "request": {
+            "operation": "acknowledge",
+            "context": "00000000000000000000000000000004",
+            "epoch": 0,
+            "digests": [
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          },
+          "expected": {
+            "response_subset": {
+              "status": "acknowledged",
+              "available": "agent_reported",
+              "read": "agent_reported",
+              "applied": "unverified"
+            },
+            "post_state": "acknowledged"
+          },
+          "basis": [
+            "acknowledge"
+          ]
+        },
+        {
+          "id": "reject_ko_features_object",
+          "pre_state": "acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000004",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "ko",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": {}
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "unavailable",
+              "reason": "invalid_decision_request",
+              "field": "routing.features",
+              "error": "invalid_type",
+              "repair": "correct_field_once",
+              "applied": "unverified",
+              "continue_ordinary_work": true,
+              "constraints_remain_binding": true
+            },
+            "post_state": "acknowledged",
+            "response_absent_keys": [
+              "selected",
+              "methods"
+            ]
+          },
+          "basis": [
+            "fault_response",
+            "fault_preserves_state",
+            "select_validation",
+            "routing_features_shape"
+          ]
+        },
+        {
+          "id": "correct_ko",
+          "pre_state": "acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000004",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "ko",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "ko",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "ko",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "emitted",
+                  "read": "unverified",
+                  "instructions": {
+                    "$canonical_instructions": {
+                      "method": "deduction",
+                      "locale": "ko",
+                      "content_revision": 5
+                    }
+                  }
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "ko_delivered_en_available"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "ack_ko",
+          "pre_state": "ko_delivered_en_available",
+          "request": {
+            "operation": "acknowledge",
+            "context": "00000000000000000000000000000004",
+            "epoch": 0,
+            "digests": [
+              {
+                "$response": "correct_ko#/methods/0/sha256"
+              }
+            ]
+          },
+          "expected": {
+            "response_subset": {
+              "status": "acknowledged",
+              "available": "agent_reported",
+              "read": "agent_reported",
+              "applied": "unverified"
+            },
+            "post_state": "both_locales_available"
+          },
+          "basis": [
+            "acknowledge"
+          ]
+        },
+        {
+          "id": "requery_en",
+          "pre_state": "both_locales_available",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000004",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "reused_agent_reported_available",
+                  "read": "agent_reported",
+                  "instructions": null
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "en_cache_both_available"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "repeat_en",
+          "pre_state": "en_cache_both_available",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000004",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": true,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "reused_agent_reported_available",
+                  "read": "agent_reported",
+                  "instructions": null
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "en_cache_both_available"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        }
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "S011-05",
+      "title": "여러 선택의 availability와 마지막 캐시 분리 / Separate accumulated availability from the last selection cache",
+      "status": "AUTHORED_NOT_RUN",
+      "synthetic_context": "00000000000000000000000000000005",
+      "initial_state": "fresh",
+      "novel_assertion": "A routing-key rejection after two acknowledged distinct decisions must preserve the complete two-method inventory and the last request key; revisiting either decision changes only the last cache.",
+      "overlap_exclusion": "Excludes standalone missing-key checks and successful multi-method inventory checks. The new assertion is both identities and the exact last cache surviving an intervening malformed select.",
+      "states": {
+        "fresh": {
+          "scope": null,
+          "last_key": null,
+          "last_selection": [],
+          "last_reason": "no_eligible_method",
+          "delivered": {},
+          "available": [],
+          "busy": false
+        },
+        "selected_en": {
+          "scope": [
+            "00000000000000000000000000000005",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_initial"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [],
+          "busy": false
+        },
+        "acknowledged": {
+          "scope": [
+            "00000000000000000000000000000005",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_initial"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        },
+        "trade_delivered": {
+          "scope": [
+            "00000000000000000000000000000005",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_trade"
+          },
+          "last_selection": [
+            "trade-off-analysis"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            },
+            "trade-off-analysis:en:5": {
+              "$response": "select_trade#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        },
+        "both_methods_available": {
+          "scope": [
+            "00000000000000000000000000000005",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_trade"
+          },
+          "last_selection": [
+            "trade-off-analysis"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            },
+            "trade-off-analysis:en:5": {
+              "$response": "select_trade#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ],
+            [
+              "trade-off-analysis:en:5",
+              {
+                "$response": "select_trade#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        },
+        "deduction_cache_both_available": {
+          "scope": [
+            "00000000000000000000000000000005",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "requery_deduction"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "requery_deduction#/methods/0/sha256"
+            },
+            "trade-off-analysis:en:5": {
+              "$response": "select_trade#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ],
+            [
+              "trade-off-analysis:en:5",
+              {
+                "$response": "select_trade#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        },
+        "trade_cache_both_available": {
+          "scope": [
+            "00000000000000000000000000000005",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "requery_trade"
+          },
+          "last_selection": [
+            "trade-off-analysis"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "requery_deduction#/methods/0/sha256"
+            },
+            "trade-off-analysis:en:5": {
+              "$response": "requery_trade#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ],
+            [
+              "trade-off-analysis:en:5",
+              {
+                "$response": "select_trade#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        }
+      },
+      "steps": [
+        {
+          "id": "catalog",
+          "pre_state": "fresh",
+          "request": {
+            "operation": "catalog",
+            "locale": "en"
+          },
+          "expected": {
+            "response_subset": {
+              "status": "catalog",
+              "content_revision": 5,
+              "evidence": "metadata_only"
+            },
+            "post_state": "fresh"
+          },
+          "basis": [
+            "catalog_metadata"
+          ]
+        },
+        {
+          "id": "select_initial",
+          "pre_state": "fresh",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000005",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "emitted",
+                  "read": "unverified",
+                  "instructions": {
+                    "$canonical_instructions": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  }
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "selected_en"
+          },
+          "basis": [
+            "scope_validation",
+            "selection_cache",
+            "delivery_inventory",
+            "explicit_and_mechanical",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "ack_initial",
+          "pre_state": "selected_en",
+          "request": {
+            "operation": "acknowledge",
+            "context": "00000000000000000000000000000005",
+            "epoch": 0,
+            "digests": [
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          },
+          "expected": {
+            "response_subset": {
+              "status": "acknowledged",
+              "available": "agent_reported",
+              "read": "agent_reported",
+              "applied": "unverified"
+            },
+            "post_state": "acknowledged"
+          },
+          "basis": [
+            "acknowledge"
+          ]
+        },
+        {
+          "id": "select_trade",
+          "pre_state": "acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000005",
+            "epoch": 0,
+            "decision": "dCompare",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "trade-off-analysis",
+              "features": [
+                {
+                  "key": "choose",
+                  "strength": 3,
+                  "basis": "task_shape"
+                },
+                {
+                  "key": "multiple_options",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "trade-off-analysis"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "trade-off-analysis",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "trade-off-analysis",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "emitted",
+                  "read": "unverified",
+                  "instructions": {
+                    "$canonical_instructions": {
+                      "method": "trade-off-analysis",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  }
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "trade_delivered"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "explicit_and_mechanical",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "ack_trade",
+          "pre_state": "trade_delivered",
+          "request": {
+            "operation": "acknowledge",
+            "context": "00000000000000000000000000000005",
+            "epoch": 0,
+            "digests": [
+              {
+                "$response": "select_trade#/methods/0/sha256"
+              }
+            ]
+          },
+          "expected": {
+            "response_subset": {
+              "status": "acknowledged",
+              "available": "agent_reported",
+              "read": "agent_reported",
+              "applied": "unverified"
+            },
+            "post_state": "both_methods_available"
+          },
+          "basis": [
+            "acknowledge"
+          ]
+        },
+        {
+          "id": "reject_missing_features",
+          "pre_state": "both_methods_available",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000005",
+            "epoch": 0,
+            "decision": "dCompare",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "trade-off-analysis"
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "unavailable",
+              "reason": "invalid_decision_request",
+              "field": "routing.features",
+              "error": "missing_field",
+              "repair": "correct_field_once",
+              "applied": "unverified",
+              "continue_ordinary_work": true,
+              "constraints_remain_binding": true
+            },
+            "post_state": "both_methods_available",
+            "response_absent_keys": [
+              "selected",
+              "methods"
+            ]
+          },
+          "basis": [
+            "fault_response",
+            "fault_preserves_state",
+            "select_validation",
+            "routing_features_shape"
+          ]
+        },
+        {
+          "id": "correct_trade",
+          "pre_state": "both_methods_available",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000005",
+            "epoch": 0,
+            "decision": "dCompare",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "trade-off-analysis",
+              "features": [
+                {
+                  "key": "choose",
+                  "strength": 3,
+                  "basis": "task_shape"
+                },
+                {
+                  "key": "multiple_options",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "trade-off-analysis"
+              ],
+              "content_revision": 5,
+              "selection_reused": true,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "trade-off-analysis",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "trade-off-analysis",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "reused_agent_reported_available",
+                  "read": "agent_reported",
+                  "instructions": null
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "both_methods_available"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "requery_deduction",
+          "pre_state": "both_methods_available",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000005",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "reused_agent_reported_available",
+                  "read": "agent_reported",
+                  "instructions": null
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "deduction_cache_both_available"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "requery_trade",
+          "pre_state": "deduction_cache_both_available",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000005",
+            "epoch": 0,
+            "decision": "dCompare",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "trade-off-analysis",
+              "features": [
+                {
+                  "key": "choose",
+                  "strength": 3,
+                  "basis": "task_shape"
+                },
+                {
+                  "key": "multiple_options",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "trade-off-analysis"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "trade-off-analysis",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "trade-off-analysis",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "reused_agent_reported_available",
+                  "read": "agent_reported",
+                  "instructions": null
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "trade_cache_both_available"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        }
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "S011-06",
+      "title": "유효한 빈 선택과 이후 오류가 기존 availability에 미치는 영향 / Empty selection and later rejection preserve prior availability",
+      "status": "AUTHORED_NOT_RUN",
+      "synthetic_context": "00000000000000000000000000000006",
+      "initial_state": "fresh",
+      "novel_assertion": "After acknowledgment, a valid mechanical no_intervention replaces the last cache without clearing delivered/available identities. A rejected negative epoch must preserve that empty cache; correction and later substantive requery retain their distinct outcomes.",
+      "overlap_exclusion": "Excludes the existing isolated mechanical gate and mechanical-to-reasoning tests. This sequence binds a prior acknowledged identity, an empty success, a rejected select, repaired empty reuse and later retained substantive delivery.",
+      "states": {
+        "fresh": {
+          "scope": null,
+          "last_key": null,
+          "last_selection": [],
+          "last_reason": "no_eligible_method",
+          "delivered": {},
+          "available": [],
+          "busy": false
+        },
+        "selected_en": {
+          "scope": [
+            "00000000000000000000000000000006",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_initial"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [],
+          "busy": false
+        },
+        "acknowledged": {
+          "scope": [
+            "00000000000000000000000000000006",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_initial"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        },
+        "empty_cache_prior_available": {
+          "scope": [
+            "00000000000000000000000000000006",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "select_empty"
+          },
+          "last_selection": [],
+          "last_reason": "no_eligible_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "select_initial#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        },
+        "reasoning_cache_retained": {
+          "scope": [
+            "00000000000000000000000000000006",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "requery_reasoning"
+          },
+          "last_selection": [
+            "deduction"
+          ],
+          "last_reason": "explicit_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "requery_reasoning#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        },
+        "empty_cache_restored": {
+          "scope": [
+            "00000000000000000000000000000006",
+            0
+          ],
+          "last_key": {
+            "$request_sha256": "requery_empty"
+          },
+          "last_selection": [],
+          "last_reason": "no_eligible_method",
+          "delivered": {
+            "deduction:en:5": {
+              "$response": "requery_reasoning#/methods/0/sha256"
+            }
+          },
+          "available": [
+            [
+              "deduction:en:5",
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          ],
+          "busy": false
+        }
+      },
+      "steps": [
+        {
+          "id": "catalog",
+          "pre_state": "fresh",
+          "request": {
+            "operation": "catalog",
+            "locale": "en"
+          },
+          "expected": {
+            "response_subset": {
+              "status": "catalog",
+              "content_revision": 5,
+              "evidence": "metadata_only"
+            },
+            "post_state": "fresh"
+          },
+          "basis": [
+            "catalog_metadata"
+          ]
+        },
+        {
+          "id": "select_initial",
+          "pre_state": "fresh",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000006",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "emitted",
+                  "read": "unverified",
+                  "instructions": {
+                    "$canonical_instructions": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  }
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "selected_en"
+          },
+          "basis": [
+            "scope_validation",
+            "selection_cache",
+            "delivery_inventory",
+            "explicit_and_mechanical",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "ack_initial",
+          "pre_state": "selected_en",
+          "request": {
+            "operation": "acknowledge",
+            "context": "00000000000000000000000000000006",
+            "epoch": 0,
+            "digests": [
+              {
+                "$response": "select_initial#/methods/0/sha256"
+              }
+            ]
+          },
+          "expected": {
+            "response_subset": {
+              "status": "acknowledged",
+              "available": "agent_reported",
+              "read": "agent_reported",
+              "applied": "unverified"
+            },
+            "post_state": "acknowledged"
+          },
+          "basis": [
+            "acknowledge"
+          ]
+        },
+        {
+          "id": "select_empty",
+          "pre_state": "acknowledged",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000006",
+            "epoch": 0,
+            "decision": "dCopy",
+            "revision": 0,
+            "locale": "en",
+            "participation": "mechanical",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": null,
+              "features": [
+                {
+                  "key": "mechanical",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "no_intervention",
+              "selected": [],
+              "methods": [],
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "audit_if_applied": null,
+              "context_eviction": false,
+              "reason": "no_eligible_method"
+            },
+            "post_state": "empty_cache_prior_available"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "explicit_and_mechanical",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "reject_negative_epoch",
+          "pre_state": "empty_cache_prior_available",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000006",
+            "epoch": -1,
+            "decision": "dCopy",
+            "revision": 0,
+            "locale": "en",
+            "participation": "mechanical",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": null,
+              "features": [
+                {
+                  "key": "mechanical",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "unavailable",
+              "reason": "invalid_decision_request",
+              "field": "epoch",
+              "error": "invalid_value",
+              "repair": "correct_field_once",
+              "applied": "unverified",
+              "continue_ordinary_work": true,
+              "constraints_remain_binding": true
+            },
+            "post_state": "empty_cache_prior_available",
+            "response_absent_keys": [
+              "selected",
+              "methods"
+            ]
+          },
+          "basis": [
+            "fault_response",
+            "fault_preserves_state",
+            "select_validation",
+            "scope_validation"
+          ]
+        },
+        {
+          "id": "correct_empty",
+          "pre_state": "empty_cache_prior_available",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000006",
+            "epoch": 0,
+            "decision": "dCopy",
+            "revision": 0,
+            "locale": "en",
+            "participation": "mechanical",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": null,
+              "features": [
+                {
+                  "key": "mechanical",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "no_intervention",
+              "selected": [],
+              "methods": [],
+              "selection_reused": true,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "audit_if_applied": null,
+              "context_eviction": false,
+              "reason": "no_eligible_method"
+            },
+            "post_state": "empty_cache_prior_available"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "explicit_and_mechanical",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "requery_reasoning",
+          "pre_state": "empty_cache_prior_available",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000006",
+            "epoch": 0,
+            "decision": "dReason",
+            "revision": 0,
+            "locale": "en",
+            "participation": "judgment",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": "deduction",
+              "features": [
+                {
+                  "key": "judgment",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "selected",
+              "selected": [
+                "deduction"
+              ],
+              "content_revision": 5,
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "context_eviction": false,
+              "methods": [
+                {
+                  "id": "deduction",
+                  "locale": "en",
+                  "content_revision": 5,
+                  "sha256": {
+                    "$canonical_sha256": {
+                      "method": "deduction",
+                      "locale": "en",
+                      "content_revision": 5
+                    }
+                  },
+                  "delivery": "reused_agent_reported_available",
+                  "read": "agent_reported",
+                  "instructions": null
+                }
+              ],
+              "reason": "explicit_method"
+            },
+            "post_state": "reasoning_cache_retained"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "requery_empty",
+          "pre_state": "reasoning_cache_retained",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000006",
+            "epoch": 0,
+            "decision": "dCopy",
+            "revision": 0,
+            "locale": "en",
+            "participation": "mechanical",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": null,
+              "features": [
+                {
+                  "key": "mechanical",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "no_intervention",
+              "selected": [],
+              "methods": [],
+              "selection_reused": false,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "audit_if_applied": null,
+              "context_eviction": false,
+              "reason": "no_eligible_method"
+            },
+            "post_state": "empty_cache_restored"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "explicit_and_mechanical",
+            "routing_reason_values"
+          ]
+        },
+        {
+          "id": "repeat_empty",
+          "pre_state": "empty_cache_restored",
+          "request": {
+            "operation": "select",
+            "context": "00000000000000000000000000000006",
+            "epoch": 0,
+            "decision": "dCopy",
+            "revision": 0,
+            "locale": "en",
+            "participation": "mechanical",
+            "routing": {
+              "schema": "opensocrates.routing-features/1.0.0",
+              "answer_shape": "direct_judgment",
+              "classification_confidence": "high",
+              "explicit_method": null,
+              "features": [
+                {
+                  "key": "mechanical",
+                  "strength": 3,
+                  "basis": "task_shape"
+                }
+              ]
+            }
+          },
+          "expected": {
+            "response_subset": {
+              "status": "no_intervention",
+              "selected": [],
+              "methods": [],
+              "selection_reused": true,
+              "selector_model_calls": 0,
+              "applied": "unverified",
+              "audit_if_applied": null,
+              "context_eviction": false,
+              "reason": "no_eligible_method"
+            },
+            "post_state": "empty_cache_restored"
+          },
+          "basis": [
+            "selection_cache",
+            "delivery_inventory",
+            "explicit_and_mechanical",
+            "routing_reason_values"
+          ]
+        }
+      ],
+      "unresolved": []
+    }
+  ]
+}
