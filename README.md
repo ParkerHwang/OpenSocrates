@@ -144,6 +144,11 @@ These are the languages of the method text your assistant reads.
 
 ## Open source, ready to explore
 
+For a human comparison of office-work answers, the [local evaluation lab](docs/evaluation-lab.md)
+prepares fictional tasks for desktop Work, Claude Cowork and Antigravity on Mac
+and Windows. It records practical preferences before revealing conditions;
+the lab's implementation is separate from live host qualification and effect evidence.
+
 Read the complete methods and source, adapt them to your work, or contribute a
 new example. OpenSocrates is an independent project, available under the
 [MIT license](LICENSE).
