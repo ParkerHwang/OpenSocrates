@@ -37,8 +37,10 @@ def read_bytes(path: Path, limit: int) -> bytes:
         descriptor = os.open(path, flags)
         with os.fdopen(descriptor, "rb") as stream:
             info = os.fstat(stream.fileno())
-            if not stat.S_ISREG(info.st_mode) or info.st_size > limit or info.st_nlink != 1:
+            if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
                 raise LabError("unsafe_file")
+            if info.st_size > limit:
+                raise LabError("too_large")
             result = stream.read(limit + 1)
         if len(result) > limit:
             raise LabError("too_large")

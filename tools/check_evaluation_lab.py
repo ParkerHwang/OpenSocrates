@@ -3,8 +3,11 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -12,7 +15,8 @@ from typing import Any
 from unittest.mock import patch
 
 from opensocrates.evaluation import Lab, LabError
-from opensocrates.evaluation.report import validate_export
+from opensocrates.evaluation.report import report, validate_export
+from opensocrates.evaluation.storage import read_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 ENV = {"os": "macos", "arch": "arm64", "source": "local_platform"}
@@ -292,6 +296,171 @@ class LabBehavior(unittest.TestCase):
         state_path.write_text(json.dumps(state))
         self.assert_code("invalid_id", "prepare", {"run_id": unsafe_id})
         self.assertFalse((self.base / "outside").exists())
+
+    def _assert_invalid_export(self, payload: Any) -> None:
+        with self.assertRaises(LabError) as caught:
+            validate_export(payload)
+        self.assertEqual(caught.exception.code, "invalid_export")
+
+    def test_read_bytes_too_large_and_export_cross_field_validation(self) -> None:
+        oversized = self.base / "oversized.txt"
+        oversized.write_bytes(b"abcdef")
+        with self.assertRaises(LabError) as caught:
+            read_bytes(oversized, 3)
+        self.assertEqual(caught.exception.code, "too_large")
+
+        for non_object in ([], "not-an-object", 7, None):
+            self._assert_invalid_export(non_object)
+
+        snapshot = self.create()
+        first_group = snapshot["groups"][0]
+        second_group = snapshot["groups"][1]
+        for run in snapshot["runs"]:
+            if run["group_id"] == first_group["id"]:
+                self.complete(run)
+        second_runs = [run for run in snapshot["runs"] if run["group_id"] == second_group["id"]]
+        self.lab.action("finish", {"run_id": second_runs[0]["id"], "status": "failed"})
+        self.lab.action("retry", {"run_id": second_runs[0]["id"]})
+        baseline = self.lab.action("export", {})["export"]
+        self.assertEqual(validate_export(baseline), baseline)
+
+        completed_missing_preflight = copy.deepcopy(baseline)
+        target_run = next(
+            item for item in completed_missing_preflight["runs"] if item["status"] == "completed"
+        )
+        target_run["preflight"] = None
+        completed_missing_preflight["report"] = report(completed_missing_preflight)
+        self._assert_invalid_export(completed_missing_preflight)
+
+        planned_with_finish = copy.deepcopy(baseline)
+        planned_run = next(
+            item for item in planned_with_finish["runs"] if item["status"] == "planned"
+        )
+        planned_run["finished_at"] = "2026-04-01T00:00:00+00:00"
+        planned_with_finish["report"] = report(planned_with_finish)
+        self._assert_invalid_export(planned_with_finish)
+
+        failed_start_without_preflight = copy.deepcopy(baseline)
+        failed_run = next(
+            item for item in failed_start_without_preflight["runs"] if item["status"] == "failed"
+        )
+        failed_run["started_at"] = "2026-04-01T00:00:00+00:00"
+        failed_run["preflight"] = None
+        failed_start_without_preflight["report"] = report(failed_start_without_preflight)
+        self._assert_invalid_export(failed_start_without_preflight)
+
+        false_complete_group = copy.deepcopy(baseline)
+        incomplete_group = next(
+            item for item in false_complete_group["groups"] if item["id"] == second_group["id"]
+        )
+        incomplete_group["status"] = "complete"
+        false_complete_group["report"] = report(false_complete_group)
+        self._assert_invalid_export(false_complete_group)
+
+        false_incomplete_group = copy.deepcopy(baseline)
+        complete_group = next(
+            item for item in false_incomplete_group["groups"] if item["id"] == first_group["id"]
+        )
+        complete_group["status"] = "incomplete"
+        false_incomplete_group["report"] = report(false_incomplete_group)
+        self._assert_invalid_export(false_incomplete_group)
+
+        mismatched_retry = copy.deepcopy(baseline)
+        retry_run = next(item for item in mismatched_retry["runs"] if item["attempt"] == 2)
+        retry_run["case_id"] = first_group["case_id"]
+        mismatched_retry["report"] = report(mismatched_retry)
+        self._assert_invalid_export(mismatched_retry)
+
+        duplicate_pair = copy.deepcopy(baseline)
+        for item in duplicate_pair["groups"]:
+            if item["id"] == second_group["id"]:
+                item["case_id"] = first_group["case_id"]
+        for item in duplicate_pair["runs"]:
+            if item["group_id"] == second_group["id"]:
+                item["case_id"] = first_group["case_id"]
+        duplicate_pair["report"] = report(duplicate_pair)
+        self._assert_invalid_export(duplicate_pair)
+
+    def test_merge_exports_deduplicates_and_rejects_symlinks(self) -> None:
+        self.create()
+        first_export = self.lab.action("export", {})["export"]
+        other_lab = Lab(self.base / "study-two", self.pack)
+        other_lab.action(
+            "create", {"phase": "calibration", "cells": ["windows-cowork"], "budget": 6, "seed": 23}
+        )
+        second_export = other_lab.action("export", {})["export"]
+
+        first_path = self.base / "first.json"
+        duplicate_path = self.base / "first-copy.json"
+        second_path = self.base / "second.json"
+        first_path.write_text(json.dumps(first_export), encoding="utf-8")
+        duplicate_path.write_text(json.dumps(first_export), encoding="utf-8")
+        second_path.write_text(json.dumps(second_export), encoding="utf-8")
+
+        merger = ROOT / "tools/evaluation-lab/merge-exports.py"
+        merged_path = self.base / "merged.json"
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(merger),
+                str(first_path),
+                str(duplicate_path),
+                str(second_path),
+                "--output",
+                str(merged_path),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        merged = json.loads(merged_path.read_text(encoding="utf-8"))
+        self.assertEqual(len(merged["source_study_ids"]), 2)
+        existing_bytes = merged_path.read_bytes()
+
+        overwrite = subprocess.run(
+            [sys.executable, str(merger), str(first_path), "--output", str(merged_path)],
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+        self.assertNotEqual(overwrite.returncode, 0)
+        self.assertEqual(merged_path.read_bytes(), existing_bytes)
+
+        linked_input = self.base / "linked-input.json"
+        linked_output = self.base / "linked-output.json"
+        outside_target = self.base / "outside-target.json"
+        try:
+            linked_input.symlink_to(first_path)
+            linked_output.symlink_to(outside_target)
+        except OSError:
+            return
+        bad_in = subprocess.run(
+            [
+                sys.executable,
+                str(merger),
+                str(linked_input),
+                "--output",
+                str(self.base / "unused.json"),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+        self.assertNotEqual(bad_in.returncode, 0)
+        self.assertFalse((self.base / "unused.json").exists())
+        bad_out = subprocess.run(
+            [sys.executable, str(merger), str(first_path), "--output", str(linked_output)],
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+        self.assertNotEqual(bad_out.returncode, 0)
+        self.assertFalse(outside_target.exists())
 
 
 if __name__ == "__main__":
