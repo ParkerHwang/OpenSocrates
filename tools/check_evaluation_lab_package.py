@@ -8,6 +8,7 @@ import hashlib
 import importlib
 import io
 import json
+import os
 import shutil
 import stat
 import subprocess
@@ -369,6 +370,33 @@ def _check_unpacked(output: Path, folder: Path) -> None:
         process.returncode == 0 and process.stdout.strip() == "stdlib-import-ok",
         "unpacked lab requires non-stdlib dependencies or source checkout",
     )
+    if os.name != "nt":
+        stub_bin = folder / "stub-bin"
+        stub_bin.mkdir()
+        old_python = stub_bin / "python3"
+        old_python.write_text("#!/bin/sh\nexit 1\n", encoding="utf-8")
+        old_python.chmod(0o755)
+        modern_python = stub_bin / "python3.14"
+        escaped_exe = sys.executable.replace("'", "'\\''")
+        modern_python.write_text(
+            f"#!/bin/sh\nexec '{escaped_exe}' \"$@\"\n",
+            encoding="utf-8",
+        )
+        modern_python.chmod(0o755)
+        env = dict(os.environ, PATH=f"{stub_bin}:/usr/bin:/bin")
+        launcher = subprocess.run(
+            ["/bin/sh", str(kit / "Start Lab.command"), "--help"],
+            cwd=folder,
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+        _require(
+            launcher.returncode == 0 and "--data" in launcher.stdout,
+            "macOS launcher failed to fall back past pre-3.12 python3",
+        )
 
 
 def _check_build(root: Path, temporary: Path, payloads: Path, builder: Any) -> None:
