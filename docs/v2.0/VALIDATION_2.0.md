@@ -110,6 +110,10 @@ These cases are to be run after implementation. Their expectations apply to each
 | HOST-10 | Local app connection drops while host cloud work continues | Separate cloud inference status from local DB/file access. Do not assume inference stopped solely because the app closed; distinguish returned results, local application and unknown external effects. |
 | HOST-11 | Computer use on macOS and Windows | Verify the documented macOS background and Windows foreground behavior separately for the actual app/version/authority. Do not bypass user-input conflicts or host confirmation. |
 | HOST-12 | Earlier and latest MCP specifications versus actual host support | Check each host's transport version, state handles, calls, subscriptions, update paths and recipient authentication separately. Do not treat an MCP session ID or clientInfo as actual conversation identity or invent unavailable receipts. |
+| HOST-13 | Analysis session A and chart session B exchange a revision and result through the layer | Observe creation of both real conversations, destination binding, the A→layer→B request, B→layer→A return and final file integration separately. Sending, receiving and applying each message are distinct. Do not claim conversation authentication from a shared connection or matching ID; distinguish unreceived from receipt unknown. |
+| HOST-14 | The user changes windows or types during screen automation while another session's interaction waits | Test short interaction units, release of the screen while waiting for the model, and destination and input revalidation before resumption on each OS and host. Hold only the affected action on unsafe target ambiguity and measure user intervention and latency. Do not assume collisions are automatically prevented. |
+| HOST-15 | A non-retaining relay loses a payload or is interrupted just after sending | Distinguish permitted reacquisition of an existing source, an unrecoverable body and an unknown external effect that may already have occurred. User permission or encryption alone does not allow storage prohibited by current policy; assess memory, host, OS and metadata boundaries separately. |
+| HOST-16 | A and B can access the same folder and B reads A’s file without a layer handoff | Distinguish a layer-mediated request or result reference from bypassed file reading. Check permission to disclose the path separately from permission to access content. Do not assume every file access is monitored or blocked, or infer no bypass from lack of observation; if bypass is observed, do not count that round trip as successful mediation. |
 | DELEGATE-01 | The chart assignment and two conversations share the same mistaken metric assumption | Distinguish count ratios supported by monthly totals from same-person retention requiring overlap. Do not establish meaning by arithmetic or majority alone; when needed for the decision, inspect authorized sources and definitions or ask a concrete question. Guide/context delivery and return pass through the layer. |
 | DELEGATE-02 | A chart opens but source access, editability or current version is partly unknown | Check opening, source and calculations, actual chart editing, Word figures/captions and application of delayed older results separately. Distinguish unknown checks from independent work that can proceed and appropriately communicate limitations material to interpreting a shared Word document. Specific needed checks may be delegated through the layer to an authorized tool or real conversation. |
 | GUIDE-01 | A new user has no generated guides | Use an applicable guide from the initial 48. Missing personal guidance does not block ordinary work. |
@@ -172,7 +176,7 @@ This mapping aids traceability; a documented case is not an executed or passing 
 | --- | --- |
 | REQ-01–02 interpretation, consultation, format | USER-01, USER-03 |
 | REQ-03–04 intake and real execution conversations | HOST-01, HOST-06 |
-| REQ-05–07 layer mediation, dynamic delegation, selection | HOST-02, HOST-03, HOST-05, HOST-12, DELEGATE-01–02, GUIDE-04 |
+| REQ-05–07 layer mediation, dynamic delegation, selection | HOST-02, HOST-03, HOST-05, HOST-12–16, DELEGATE-01–02, GUIDE-04 |
 | REQ-08 guidance and context for each judging conversation | HOST-07, HOST-08, HOST-12, GUIDE-07 |
 | REQ-09 personal-guide preference and baseline fallback | GUIDE-01–03, GUIDE-08–11 |
 | REQ-10 context selection and branching | CONTEXT-01–05 |
@@ -180,7 +184,7 @@ This mapping aids traceability; a documented case is not an executed or passing 
 | REQ-12 learning from experience and in-flight use | LEARN-01–04, LEARN-07–08, LEARN-10, LEARN-12–16 |
 | REQ-13 interruption and resumption of learning | LEARN-05–06, LEARN-09–11, LEARN-14–16, STORE-04 |
 | REQ-14–15 files, folders and external change | FILE-01–07, STORE-05 |
-| REQ-16 a team that does not make the user relay messages | HOST-02, HOST-06–07 and user-burden measurement |
+| REQ-16 a team that does not make the user relay messages | HOST-02, HOST-06–07, HOST-13–16 and user-burden measurement |
 
 ## 6. Quality, learning and burden measures
 
