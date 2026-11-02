@@ -22,6 +22,14 @@ Rebuild the HTML snapshot from the four Korean source documents at the repositor
 uv run --no-project --with 'markdown-it-py==4.2.0' python tools/render_v2_plan.py
 ```
 
+Run the heading, link and duplicate-handling checks without opening a browser using the command below. Actual layout and keyboard/screen-reader interaction still require separate verification.
+
+```sh
+uv run --no-project --with 'markdown-it-py==4.2.0' python -m unittest tools/test_render_v2_plan.py
+```
+
+The HTML's expandable chapter navigation is generated from the four sources' second- and third-level headings. Links for unchanged headings remain stable when unrelated headings are added or a leading number changes, but editing a heading's words or reordering repeated identical headings can change a previous section link.
+
 If the first Mermaid flow in the system plan changes, the renderer stops when it differs from the SVG's source fingerprint. Update the drawing and its text alternative, manually review the relationships, then set `data-mermaid-sha256` in the SVG to the fingerprint reported by the renderer and rebuild. A matching fingerprint is not automatic proof that the diagram's meaning is correct.
 
 The packet records proposed behavior and unresolved decisions. Internal model alignment, improved personalized quality, and automatic host-to-host delivery have not been established. The user's request session handles consultation and coordination; new sessions perform actual deliverable work. All inter-agent communications pass through the OpenSocrates layer.
