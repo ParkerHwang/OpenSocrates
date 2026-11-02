@@ -99,5 +99,5 @@ Define pass thresholds and non-regression gates against the measured baseline be
 ## Existing source references
 
 - [Reader guidance](../../plugin-src/shared/reader/guide.ko.md) and [practical acceptance seeds](../v1.5.0/PRACTICAL_ACCEPTANCE.md) are existing context, not proof that 2.0 requirements are met.
-- [Codex delivery omission](https://github.com/ParkerHwang/OpenSocrates/issues/124) is an observed symptom with unverified cause and frequency.
+- The previously reported Codex delivery omission (former issue #124, now deleted) has an unverified cause and frequency.
 - [Prior Go migration draft](https://github.com/ParkerHwang/OpenSocrates/pull/112) is historical implementation and evidence; do not assume its tests qualify changed 2.0 bytes or its earlier release scope.

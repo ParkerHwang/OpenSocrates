@@ -2,7 +2,7 @@
 
 This backlog is a proposed sequence of implementable work, not a record that any feature is complete. Read [the master plan](MASTER_PLAN.md), [product cases](PRODUCT_AND_EVALUATION.md), [host research](HOSTS_AND_BOTS.md), and [architecture](ARCHITECTURE_AND_MIGRATION.md). Each item should become a focused issue or PR when its prerequisite contracts and current-main source are reconciled; do not start implementation from historical branches blindly.
 
-The parent tracker is [2.0 preparation and implementation](https://github.com/ParkerHwang/OpenSocrates/issues/136). Initial workstreams: [baseline and evaluation](https://github.com/ParkerHwang/OpenSocrates/issues/138), [task and reader contracts](https://github.com/ParkerHwang/OpenSocrates/issues/139), [multilingual delivery](https://github.com/ParkerHwang/OpenSocrates/issues/140), [history and working memory](https://github.com/ParkerHwang/OpenSocrates/issues/141), [mandatory Cursor and host adapters](https://github.com/ParkerHwang/OpenSocrates/issues/142), [installation and migration](https://github.com/ParkerHwang/OpenSocrates/issues/143), [Bot profiles](https://github.com/ParkerHwang/OpenSocrates/issues/144), and [independent review and latency](https://github.com/ParkerHwang/OpenSocrates/issues/145). Split these further as scope and dependencies are validated.
+Use the work items below as the current planning backlog. The former parent issue #136 and workstream issues #138–#145 were deleted; they are historical identifiers, not active trackers. Create focused issues or PRs as scope and dependencies are validated.
 
 | ID | Work | Deliverable and acceptance | Dependencies |
 | --- | --- | --- | --- |
@@ -14,7 +14,7 @@ The parent tracker is [2.0 preparation and implementation](https://github.com/Pa
 | B06 | Language policy | Separate conversation, source, output and instruction language; explicit user scope wins. Test ambiguous, mixed, unsupported and changing language; preserve quotations and identifiers. | B03 |
 | B07 | Localized delivery | Keep 48 methods in ten locales; load relevant complete methods and instruction locale on demand where host allows. Verify source/package inventory, correctness and actual context, not only templates. | B01, B06 |
 | B08 | Host capability contract | Map logical lifecycle to actual host event inputs, allowed outputs and timing. No inferred pre-answer hook; measure registration, emission and application separately. | B04 |
-| B09 | Codex adapter | Preserve current profiles and trust behavior, handle prompt, compaction and completion with real supported receipts. Reproduce or characterize issue 124 without presuming cause. | B04, B07, B08 |
+| B09 | Codex adapter | Preserve current profiles and trust behavior, handle prompt, compaction and completion with real supported receipts. Investigate the previously reported delivery omission (former issue #124, now deleted) without presuming cause. | B04, B07, B08 |
 | B10 | Claude adapter | Qualify Code and account Chat/Cowork independently. Respect host-selected skills and account upload boundary; verify locale and ordinary requests. | B04, B07, B08 |
 | B11 | Antigravity adapter | Preserve scoped rules/skills; consider documented hooks only after local tests. Avoid per-invocation duplication and respect host permissions. | B04, B07, B08 |
 | B12 | Cursor adapter — mandatory | Build supported Cursor package, rules, localized skill and event adapter. Test local and cloud separately, prompt and no-tool flows, disable/remove and ordinary user installation. | B04, B07, B08 |

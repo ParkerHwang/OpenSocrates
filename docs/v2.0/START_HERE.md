@@ -33,5 +33,5 @@ The 2.0 milestone is ready for review only when all chosen mandatory host/OS cel
 - Released v1.5.3: `d6b8ff1dc0dc7a51ebd5896a395ac39236e77d1c`.
 - Superseded 1.6 implementation PR: [Go runtime and lifecycle](https://github.com/ParkerHwang/OpenSocrates/pull/112), `8c49b2debbc622d58a928204a9a4ddb3118f5a08`.
 - Superseded 1.6 planning PR: [Go preparation](https://github.com/ParkerHwang/OpenSocrates/pull/110), `2893da99980538408ac004d03f23a43de4eab92d`.
-- Existing unresolved substantive-task delivery issue: [application coverage](https://github.com/ParkerHwang/OpenSocrates/issues/124).
-- Existing [office-work evaluation lab](https://github.com/ParkerHwang/OpenSocrates/issues/134) is independent and may provide related evidence when its own conditions are met.
+- Previously reported substantive-task delivery omission: former issue #124 was deleted; its cause and frequency remain unresolved.
+- The [office-work evaluation lab PR](https://github.com/ParkerHwang/OpenSocrates/pull/135) is independent and may provide related evidence when its own conditions are met; its former issue #134 was deleted.
