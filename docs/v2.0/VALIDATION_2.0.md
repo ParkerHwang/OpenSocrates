@@ -178,6 +178,7 @@ These cases are to be run after implementation. Their expectations apply to each
 | USER-01 | Incomplete request for an artifact whose format matters | Explain purpose, format and use in understandable terms; ask decisive questions only. Do not replace chosen Word output with HTML because the agent prefers it or consult on every minor task. |
 | USER-02 | Important decision or accumulated small decisions | Observe contextual importance judgment and user confirmation. Include aggregate effects across agents, user absence and pending approval. |
 | USER-03 | Experienced user settled format and length but persuasion versus balanced decision remains unclear | Explain and ask when the difference materially affects the result and available context cannot resolve it. Do not force a false choice between compatible metric-focused and decision-focused approaches. |
+| USER-04 | Query unknown chart receipt/Word integration, a completed report with pending learning, a lost connection and unavailable status separately | Distinguish report, delivery, actual receipt, completion and learning status according to observed evidence. Do not require raw-content retention or notifications for every change; deliver material results and decisions according to the user's request and supported paths. Do not turn a notification attempt into user acknowledgment or approval. |
 | FILE-01 | Update an existing file or create a version | Decide for that project's/file's state and preserve path/version relationships. Do not convert mandatory copies or blanket approval on every edit into a product-wide requirement. |
 | FILE-02 | File changes outside OpenSocrates | Compare the record at the next related task without watching all folders. Distinguish detecting change via timestamp/fingerprint from knowing the detailed content change. |
 | FILE-03 | No prior content, moved/renamed file, formatting-only change | Leave unreconstructable differences unknown. Do not treat a move of unchanged content or mechanical formatting as a change in the user's reasoning. |
@@ -213,7 +214,7 @@ This mapping aids traceability; a documented case is not an executed or passing 
 | REQ-12 learning from experience and in-flight use | LEARN-01–04, LEARN-07–08, LEARN-10, LEARN-12–21 |
 | REQ-13 interruption and resumption of learning | LEARN-05–06, LEARN-09–11, LEARN-14–16, STORE-04 |
 | REQ-14–15 files, folders and external change | HOST-20, FILE-01–07, STORE-05 |
-| REQ-16 a team that does not make the user relay messages | HOST-02, HOST-06–07, HOST-13–19 and user-burden measurement |
+| REQ-16 a team that does not make the user relay messages | HOST-02, HOST-06–07, HOST-13–19, USER-04 and user-burden measurement |
 
 Roadmap P14 installation, migration and operations maps to representative cases `INSTALL-01–02`, `HOST-08` and `STORE-01–02`. Actual host recovery and distribution evidence must be obtained separately.
 

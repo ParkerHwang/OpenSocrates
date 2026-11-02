@@ -183,6 +183,8 @@ The next meeting compared a direct user correction, a report of another customer
 
 The team later reviewed the developer's reading path and file handoff across execution surfaces. Claude withdrew its recommendation to use historical planning documents with the earlier scope as current startup instructions; Grok corrected its assumption that the program not retaining a body necessarily makes recovery from a permitted source impossible. The two models and chair distinguished receiving a path from actual file access and authority across file spaces such as local and cloud environments. This is a synthetic design discussion, not evidence of actual host connection.
 
+The team then examined how to explain a completed user task alongside separately pending learning, a session's own report versus actual receipt, and a lost connection versus unknown remote work. Grok withdrew an initial proposal to restrict status to three categories and communicate results only when asked. Claude also corrected wording that guaranteed learning would resume on reopening the app or inferred actual sending from send intent alone. The status messages are synthetic design examples, not evidence of implemented behavior or user benefit.
+
 ## Handoff and completion
 
 Begin implementation from current main after inspecting its real source and tests and using a focused branch. Do not copy, port, or merge code/guides from withdrawn v1.5 candidate PR #95. Do not elevate prior 1.6 draft evidence without separate review. Distinguish host delivery, full guide reading, application, and useful outcome.

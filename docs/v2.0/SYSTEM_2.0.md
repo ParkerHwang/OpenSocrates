@@ -594,6 +594,21 @@ A shared vocabulary may help compare learning signals, but a closed list must no
 - **In-flight changes:** Separate DB version creation, message delivery, session receipt/read, actual use in work and output quality. Verify follow-up message or pull capabilities per host. If a path is unavailable or unconfirmed, leave that application `pending_application` without stopping independent learning. Distinguish checking with no change from not checking. If a pull cannot be required or observed, whether it was skipped is unknown too. A matching hash alone does not prove semantic compatibility.
 - **User intervention:** Coordinate screen actions that conflict with the user's current input. This is not a blanket rule to pause independent work that does not use that screen. Distinguish already-authorized actions from new important decisions in their actual context and authority.
 
+### Explaining work and learning status to the user: synthetic case
+
+Work results, inter-session send/receipt, learning/resumption, a pending consequential user decision and host connection are distinct states. Do not collapse them into one percentage or “complete.” When asked or delivering results, explain observations, unknowns and remaining work as needed for the user's next decision. Distinguish progress, failure and pause according to actual evidence; give a last-observed time only if known. Do not require a fixed screen or a notification for every internal change.
+
+| Synthetic situation and observation | Example explanation to the user |
+| --- | --- |
+| The chart session reports producing a result, but the writing session's receipt and integration in Word are unknown | “The chart session reported making it. I haven't yet confirmed whether it was incorporated into the report.” Do not turn a report into observed receipt or completion. |
+| Requested content, format, access and actual editing in Word have been checked, but a separate learning task awaits resumption | “I checked that the report can be opened and its chart edited.” If asked about learning, explain its pending state and any verifiable next step separately. Do not make a finished report incomplete solely because learning is waiting. |
+| The local connection drops before final verification and the execution session's later state is unknown | “The connection to the work conversation was lost, so I can't confirm its current progress or the final report.” An app closing alone does not establish that work on another surface stopped or finished. |
+| After restart, required input cannot be read or an external send's effect is unknown | Explain the affected judgment or delivery, its verification state and any available recheck path. Re-reading an allowed source and identifying an external effect are separate; do not blindly create duplicate effects. |
+
+These statements are not records of actual execution. File opening alone does not establish the entire task is complete if content, the latest choice or necessary quality checks remain unconfirmed. When status cannot be retrieved for lack of authority or information, say **unable to verify**, not “nothing happened.” Distinguish the user pausing learning from disabling existing guides. Continue independent permitted work where possible; current instructions and consequential user decisions do not depend on learning restarting.
+
+Communicate finished results and material delays or decisions according to the user's request and delivery preferences and the paths actually supported. Require neither a notification for every internal change nor a rule that nothing is delivered until the user asks. An attempted notification or message, delivery and the user's actual acknowledgment or response are distinct. Do not retain prohibited raw conversations, workspace content, screenshots or hidden reasoning to explain status; separately assess permission to retain references, times and state.
+
 ## 14. Product behavior when host constraints combine
 
 These are design candidates preserving the requirements, not observations of the four app/OS cells.
