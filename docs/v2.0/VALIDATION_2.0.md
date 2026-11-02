@@ -22,8 +22,6 @@ Attach only the evidence state actually obtained to each claim. States do not pr
 | Offline validated | Observed using synthetic inputs and isolated fixtures |
 | Observed on a real host | Directly observed on the stated app, surface, OS and account |
 | Comparatively evaluated | Relative outcomes assessed under a frozen protocol |
-| Operator policy blocked | The operating tool policy blocks that attempt. Distinguish this from the host's own support, and do not circumvent the same action. |
-| Unavailable/unknown | Access, permission, capability or measurement limits are explicit |
 
 | Required app/OS | Surfaces to distinguish | Current 2.0 qualification state |
 | --- | --- | --- |
@@ -40,13 +38,18 @@ For each capability, distinguish registration/enabling, session creation, identi
 
 ### Host observations to distinguish first
 
-In an authorized test environment for each app, OS and mode, examine these three independently with public synthetic material. Distinguish permissions required by the host during initial installation from confirmations required during ordinary work.
+This is an **execution plan** for starting the first investigation in each app, OS and mode. A team can investigate the host itself in steps 1–2 independently even before a 2.0 layer or integration exists. Steps 3–4 test the mediated route only once the actual layer or a suitable 2.0 prototype is available. A fake host or human relay is a separate comparison, not successful real automatic mediation. Distinguish initial installation permissions from confirmation during ordinary work.
 
-1. **New execution conversation:** Can the product actually open a new conversation, send the first request and retrieve the result through the layer? Observation establishes each completed step only; if any step fails, that automatic route remains incomplete. An open screen or prefilled composer is not completion.
-2. **Recipient and authority:** Observe whether two conversations share connections or processes; whether the host supplies conversation identity and authority information the model cannot arbitrarily alter; and what happens after restart or misdelivery. A single observation of process separation or a matching identifier is not a guarantee of isolation or authentication. Without verified binding, hold only the affected sensitive delivery and attribution while independent work continues.
-3. **In-flight exchange:** Observe whether an execution conversation can be informed of, retrieve and apply changed conditions and return its result, including user intervention and delay. Record delivery, reading, application and output separately; assess alternatives independently when a route is unsupported.
+| Step | Action and observation | What this step cannot establish |
+| --- | --- | --- |
+| 1. Prepare | Identify a publishable synthetic task, app/mode/OS/version/account conditions, the candidate route and existing user authority. Separate official documentation from observation. Ask for additional permission at that step only when the applicable tool conditions require it and authority is not already present. | A missing menu or a capability not mentioned in documentation does not establish that the whole capability is unsupported. |
+| 2. Host alone | Via an allowed route, separately observe opening a distinct conversation, actual sending, starting a model turn and whether the result can be checked. A filled composer is not a send. | These are observations of particular host stages. They do not establish OpenSocrates-layer delivery or support on another app or OS. |
+| 3. Mediated round trip | When the layer is available, separately test intake → A, A → layer → B, B → layer → A and delivery of the result to the user. Distinguish actual destination binding, preparation and delivery of the request and context and any applicable guide whose use is permitted, receipt/read and outcome. When identity or authority is uncertain, hold only affected sensitive delivery and attribution. | A synthetic marker echo, shared connection or matching output alone does not prove layer mediation or conversation identity. Making a result available to the user is separate from actual receipt. |
+| 4. In-flight change and resume | Within allowed scope, change a current choice and deliver it or let the session retrieve it through a supported route; separately examine session response, task outcome and observable use. After interruption distinguish loss of an unsent payload from an external effect that may already have occurred. | Delivery or similar output alone does not establish actual guide use or improved quality. Do not make a host receipt that is unavailable into an extra gate. |
 
-These are planned design probes, not results. Do not retry or bypass an action blocked by the operator tool's policy through another route. Even partial success does not establish support for all four combinations, security, output quality or the effect of personalization.
+Record each step’s **attempt outcome** separately from the evidence level above. Do not confuse a confirmed step, not attempted, confirmed failure, unknown outcome, an unsupported specific route, an operator-policy block and user refusal. Stopping before a send may mean not attempted; an unknown effect after a send remains unknown. Do not blindly repeat an uncertain external effect or bypass the same action through another route after a tool blocks it. If one route is blocked, hold only affected claims and continue permitted independent research and other candidates. Do not promote unobserved stages to success.
+
+Use the §7 format for each stage's observation, limitation and next action, assessing permission to retain each identifier and reference separately. Do not merge host-only observations, a layer prototype and actual integration into a single success. These probes are unexecuted plans; partial success in one cell does not establish support, security, work quality or personalization effectiveness across all four combinations. Preserve the detailed demonstration and comparative experiments in §8 separately.
 
 ## 3. Preparation and data boundaries
 

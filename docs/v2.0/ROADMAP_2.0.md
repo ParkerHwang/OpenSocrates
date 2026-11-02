@@ -17,7 +17,7 @@ Each completion condition applies only to its work. IDs are planning references;
 
 | ID | Work and deliverable | Evidence of completion | Dependencies |
 | --- | --- | --- | --- |
-| P01 | Current version and host capability research | Record current main, v1.5.3 identity, and evidence/unknowns for each app, mode, OS, and account: session creation, reception, injection, result delivery, and computer use | None |
+| P01 | Current version and host capability research | Record current main, v1.5.3 identity, and evidence/unknowns for each app, mode, OS, and account: session creation, reception, injection, result delivery, and computer use. See “Host observations to distinguish first” in the [validation plan](VALIDATION_2.0.md) for the initial sequence | None |
 | P02 | Scope and user experience | Specify observable scenarios for the request conversation, consultation, artifact format, consequential-decision confirmation, actual work sessions, file handling, and team communication | None |
 | P03 | Policy and data design | Define source, purpose, consent, location, retention, and deletion for each data category. Do not implement candidates that conflict with existing bans on raw prompts/transcripts, workspace-content retention, hidden reasoning, or telemetry before a separate policy decision | P02 |
 | P04 | Guide-generation instructions | Design versioned common instructions and the personal-guide representation, grounding, applicability, uncertainty, correction, and version compatibility. User-specific learning does not edit common instructions | P02, P03 |
