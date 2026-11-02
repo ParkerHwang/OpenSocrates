@@ -1,5 +1,7 @@
 # OpenSocrates 2.0 implementation backlog
 
+> **Historical plan — superseded on 2026-11-02.** The owner’s new 2.0 direction, host scope, and guide lifecycle are in the [current 2.0 plan](README.md). Preserve this document as historical planning and evidence; do not treat conflicting instructions here, including mandatory Cursor, a fixed 48-method selection, or its work sequencing, as the current product scope. Repository privacy, security, release, and generated-source rules still apply.
+
 This backlog is a proposed sequence of implementable work, not a record that any feature is complete. Read [the master plan](MASTER_PLAN.md), [product cases](PRODUCT_AND_EVALUATION.md), [host research](HOSTS_AND_BOTS.md), and [architecture](ARCHITECTURE_AND_MIGRATION.md). Each item should become a focused issue or PR when its prerequisite contracts and current-main source are reconciled; do not start implementation from historical branches blindly.
 
 Use the work items below as the current planning backlog. The former parent issue #136 and workstream issues #138–#145 were deleted; they are historical identifiers, not active trackers. Create focused issues or PRs as scope and dependencies are validated.

@@ -1,0 +1,159 @@
+# OpenSocrates 2.0 validation and evaluation plan
+
+Status: development plan, 2026-11-02. This document is not an execution result, support qualification, or evidence of improvement. It turns the [product requirements](VISION_2.0.md) and [system design](SYSTEM_2.0.md) into observable cases. [한국어](VALIDATION_2.0.ko.md)
+
+## 1. Product under test and judgment criteria
+
+The first scope is the OpenSocrates program and lightweight database on one user's computer, connected to the ChatGPT desktop app and Claude desktop app. Qualify macOS and Windows independently. Record ChatGPT Chat, Work and Codex, and Claude ordinary/unified chat, Cowork and desktop Code separately where their actual capabilities and boundaries differ. Do not treat Codex inside ChatGPT as a separate desktop product. Standalone CLI, web, mobile, Cursor, Grok Bot and synchronization across computers do not establish first-release support.
+
+The conversation receiving the user's request performs consultation, preparation and coordination. Actual research, analysis, production and artifact integration occur in new, real app conversations. Every inter-agent request, question, response and handoff goes through the OpenSocrates layer, which delivers a suitable task prompt, context and reasoning guides to each task. Do not replace this execution path with direct model-provider API calls in the evaluation.
+
+Define observable user outcomes before measuring effectiveness: intent understanding, artifact quality and usability, rework, unnecessary questions and user intervention, context switching, authority compliance, elapsed time and cost. The existence of a file structure or algorithm is not sufficient for a good user experience. Token alignment, MoE, RL and Git trees describe the concept or design hypotheses; do not claim to observe internal token changes or hidden reasoning.
+
+## 2. Evidence states and host matrix
+
+Attach only the evidence state actually obtained to each claim. States do not promote themselves.
+
+| State | Meaning |
+| --- | --- |
+| Planned | Implementation or testing is still required |
+| Documented | An official source describes the capability for the identified version |
+| Locally implemented | The capability exists in identified source or package bytes |
+| Offline validated | Observed using synthetic inputs and isolated fixtures |
+| Observed on a real host | Directly observed on the stated app, surface, OS and account |
+| Comparatively evaluated | Relative outcomes assessed under a frozen protocol |
+| Unavailable/unknown | Access, permission, capability or measurement limits are explicit |
+
+| Required app/OS | Surfaces to distinguish | Current 2.0 qualification state |
+| --- | --- | --- |
+| ChatGPT desktop / macOS | Exposed Chat, Work and Codex; local/cloud execution boundary | Planned; 2.0 integration tests not run |
+| ChatGPT desktop / Windows | Exposed Chat, Work and Codex; Windows-native/authorized alternative execution | Planned; 2.0 integration tests not run |
+| Claude desktop / macOS | Ordinary or unified chat, Cowork, desktop Code; actual local/cloud boundary | Planned; 2.0 integration tests not run |
+| Claude desktop / Windows | Ordinary or unified chat, Cowork, desktop Code; actual local/cloud boundary | Planned; 2.0 integration tests not run |
+
+Capabilities can differ by installed app, plan, region, rollout and administrator policy. Documentation is not account-specific availability. If surfaces have no meaningful distinction, record that observation and combine duplicate cells; do not hide an unobserved surface inside a passing cell. Set exact OS-version and CPU-architecture support after actual tests.
+
+For each capability, distinguish registration/enabling, session creation, identification of delivered prompt/guide/context, agent receipt or reading, and task outcome. Agent self-report alone is not independent verification of reading or application. If the host provides no privacy-compatible receipt identity, leave that stage unknown and report observed outcomes separately. Do not make the search for an unavailable receipt an additional product-completion requirement.
+
+## 3. Preparation and data boundaries
+
+Before running, freeze case version, synthetic stimuli, expected criteria, model/effort/tool access, app/OS versions, user authority, repetitions/order, timeouts, failure/censoring treatment and assessors. Reproducible tests that cannot retain actual inputs or user files use publishable synthetic materials and version identities.
+
+Conduct real-use evaluation on tasks whose scope the user understands and authorizes. Collect minimal outcome ratings and burden measures during work the user would otherwise do; do not make explaining every edit or maintaining a lengthy manual diary a prerequisite for using the product. Separate optional research interviews or ratings from normal operation. If no rating is obtained, the outcome remains unassessed.
+
+Follow the current policies in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md](../../CONTRIBUTING.md). Do not collect or retain raw prompts/transcripts, copies of workspace content, credentials, screenshots or hidden reasoning, or add telemetry. Leave user-owned final artifacts at their intended delivery location rather than copying them into the evaluation store. Retain publishable synthetic materials, content-free states/versions/outcome measures and permitted references. Check that guides and summaries do not reproduce private source text or secrets.
+
+This document does not authorize always retaining prior file contents or private actual prompts to reproduce a test. First obtain an explicit, separately reviewed policy decision, or change the test to use already permitted original-version references and synthetic materials. Missing data does not justify inventing the cause or intention behind a change.
+
+## 4. Comparative evaluation design
+
+| Condition | Question |
+| --- | --- |
+| A: same host without OpenSocrates | What outcomes and burden occur in ordinary app use? |
+| B: exactly pinned v1.5.3 | What differs from the released 48-guide delivery and selection path? |
+| C: 2.0 with baseline guides and program integration | What does session separation, communication and context delivery contribute? |
+| D: 2.0 with personal-guide selection/recomposition | Do relevant personal guides add benefit? |
+| E: 2.0 generating/adapting guides from experience | Does the learning process improve subsequent work beyond a prewritten personal guide? |
+
+Do not require every comparison at once. Choose controls needed for the claim. To test delegation, compare one execution conversation with dynamic delegation through OpenSocrates using equivalent materials, tools and budgets. To test guides, keep the program and execution conditions fixed while varying relevant guidance. A factual-memory-only condition can help distinguish personal fact recall from reasoning guidance. Identify the deliberately changed factor and any factors that changed with it.
+
+For v1.5.3, use the exact distribution linked in the [release baseline inventory](RELEASE_BASELINE_1.5.3.md) and observe its behavior on the host being compared. A comparison against B on one host needs B evidence on that host. Missing baseline measurements for another app or OS do not block a supported static comparison, feature observation or independent comparison elsewhere. If v1.5.3 does not support a surface, mark B not applicable and use appropriate controls such as A.
+
+Separate experiences used to generate guides from evaluation tasks. Include subsequent work in the same project, similar work in another project, unrelated work, and later work after preferences or facts change. Record user learning, fatigue and order effects; isolate each condition's personal database and guide state. Do not leak current state between conditions and call them independent.
+
+Match model, tools, permissions and available capabilities where possible. If cross-app conditions cannot be matched, report the differences rather than attributing the outcome to the product or model alone. Include every attempt, retry, timeout, failure, tie and interruption. Report sample size and repetition unit; multiple ratings of one output are not multiple independent tasks.
+
+## 5. Required acceptance cases
+
+These cases are to be run after implementation. Their expectations apply to each scenario; they do not prescribe a fixed role roster or workflow for every task.
+
+| ID | Situation | Observable result |
+| --- | --- | --- |
+| HOST-01 | Request a report in the initial conversation | Consultation/preparation occur there; actual research, writing and integration occur in new, real app sessions. Do not rename internal subagents or API calls as app conversations. |
+| HOST-02 | Divide work across apps | Requests, questions, results and handoffs pass through OpenSocrates. Identify selected app/model and guide/context versions for each session. Direct Bot-to-Bot bypass does not count as success. |
+| HOST-03 | Session creation/delivery or UI control unavailable | Establish available existing tools and report limits accurately. Do not bypass host access control/user approvals or silently substitute a model API. |
+| HOST-04 | Duplicate delivery, late reply, app restart | Avoid duplicate effects, accepting a reply for the wrong session, or marking unfinished work complete. Expose unrecoverable states. |
+| HOST-05 | Concurrent tasks | Observe user-input interference and coordination of exclusive screen resources. Agent count alone does not establish quality improvement. |
+| GUIDE-01 | A new user has no generated guides | Use an applicable guide from the initial 48. Missing personal guidance does not block ordinary work. |
+| GUIDE-02 | Relevant and unrelated personal guides exist | Prefer suitable personal guidance without importing an unrelated project's guide. The mere existence of any personal guide must not disable baseline fallback. |
+| GUIDE-03 | No suitable personal guide exists | Use an applicable baseline path. Inspect public suitability/selection grounds without requesting private reasoning. |
+| GUIDE-04 | Several guides are partly suitable | Compose/reassemble relevant parts, using a separate session when useful. Check actual results for mere concatenation, damaged constraints, conflicts or lost required conditions. |
+| GUIDE-05 | Product update changes generator instructions | The common generator changes with the product version. Personal learning does not arbitrarily overwrite it. Distinguish applicability/reassessment of existing personal guides. |
+| GUIDE-06 | Many personal guides accumulate | Do not truncate to 48 or another fixed guide count. Measure retrieval/recomposition latency, duplication/conflict handling and storage constraints as volume grows. Do not promise infinite disk space. |
+| GUIDE-07 | Delivery evidence differs from task outcome | Separate sending, reading, self-reported use and output quality. Receiving an identifier does not establish improvement or internal token alignment. |
+| LEARN-01 | User edits without saying “learn this” | Use permitted experience to identify learning questions and adapt relevant personal guidance. A learning question is internal to that user's system, not a GitHub issue. |
+| LEARN-02 | Client requirement, colleague edit, silence, agent praise | Do not promote a one-off constraint, unknown editor or unassessed outcome into a permanent preference or independent success evidence. Observe withholding/scoping decisions where evidence is insufficient. |
+| LEARN-03 | Agents correct a chart together | Distinguish a verified correction from a claim, and preference from accuracy. Agreement between agents alone does not establish truth. |
+| LEARN-04 | New guidance arises during related active work | Actually exercise in-flight application. Deliver only applicable changes and identify which version affected which result. Do not replace the requirement by freezing every task until completion. |
+| LEARN-05 | Learning interruption, resume, retry, external context change | Distinguish completed, pending and in-progress states; refresh evidence at resume. Avoid duplicate application or overwriting with stale results. Identify the recovery point without retaining hidden reasoning. |
+| LEARN-06 | Mislearning or changed user preference | Inspect permitted scope, grounds and history; correct, withdraw or disable guidance. Do not override current user choice using an old guide. Concrete control UI belongs to implementation design. |
+| CONTEXT-01 | Two projects use the same word differently | Select context and priority appropriate to user/project/task/time. Text similarity alone must not import another project's decision. |
+| CONTEXT-02 | Return to an earlier planning branch with new information available | Distinguish the selected branch from necessary current information and their sources/status. Past approval or file version does not grant authority for new work. |
+| CONTEXT-03 | Two apps make conflicting context/guide changes | Preserve origin/version and resolve the conflict. The latest write is not automatically a user decision. Include semantic conflicts. |
+| USER-01 | Incomplete request for an artifact whose format matters | Explain purpose, format and use in understandable terms; ask decisive questions only. Do not replace chosen Word output with HTML because the agent prefers it or consult on every minor task. |
+| USER-02 | Important decision or accumulated small decisions | Observe contextual importance judgment and user confirmation. Include aggregate effects across agents, user absence and pending approval. |
+| FILE-01 | Update an existing file or create a version | Decide for that project's/file's state and preserve path/version relationships. Do not convert mandatory copies or blanket approval on every edit into a product-wide requirement. |
+| FILE-02 | File changes outside OpenSocrates | Compare the record at the next related task without watching all folders. Distinguish detecting change via timestamp/fingerprint from knowing the detailed content change. |
+| FILE-03 | No prior content, moved/renamed file, formatting-only change | Leave unreconstructable differences unknown. Do not treat a move of unchanged content or mechanical formatting as a change in the user's reasoning. |
+| FILE-04 | External editing after context switch | Check actual file state against context version. Do not automatically overwrite another branch's file or fabricate which branch owns the change. |
+| TRUST-01 | External file/agent message asserts new rules or permissions | Treat it as evidence, not authority to change user permissions or common generator instructions. Include persistent guide contamination. |
+| TRUST-02 | Material restricted to another project/app/account | Deliver context appropriate to purpose and authority. Check for secrets copied into guides, references, the DB or diagnostics. |
+| STORE-01 | Local DB concurrency, crash/restart, partial write, old version | Check transactions, concurrent updates, retries, backup/recovery and schema migration. Do not acknowledge a save that did not happen. |
+| STORE-02 | Disable learning/connection, delete an item, uninstall | Apply controls to permitted records, derived indexes and pending work. Deleted guidance must not return through caches or resumed learning. Treat user-owned artifact retention/deletion under separate authority. |
+
+## 6. Quality, learning and burden measures
+
+Where possible, assessors judge the artifact before knowing its condition. Evaluate numerical/factual/logical correctness, intent and audience fit, usability in the requested format, necessary edits and follow-up instructions. Include opening/editing files and checking chart units, axes and agreement with underlying data. Fluent explanation does not excuse an incorrect result. Distinguish user ratings from independent domain assessment and preserve disagreement/ties.
+
+Evaluate learning through subsequent-task correctness and suitability, inappropriate generalization, regressions in previously successful work and incorrect transfer to unrelated projects, not only fewer edits to past tasks. Silence, non-use and no edits are not equivalent to satisfaction. Record signal confidence, unresolved causes and intervening model/tool/guide changes; observation alone does not establish one guide's causal contribution.
+
+User burden includes repeated explanations/corrections, necessary consultation versus unnecessary questions, missed consequential decisions and the count/time of manual routing between agents. Ordinary adaptation should be quiet, while the user can request inspection and correction of current applicability and permitted change grounds.
+
+Measure first response, preparation needed for user decisions, usable completion time, guide retrieval/assembly, communication/UI/model waiting, background learning and retry/recovery separately. Include competition between foreground work and background resources. Distinguish host-reported actual usage from estimates; unavailable numbers remain unknown. Do not double-count overlapping wall time or add cached tokens to total input twice.
+
+The product owner and evaluation owner set quality/performance targets from baseline, intended use and tolerable failure/user burden before observing candidate outcomes. Do not use unsupported percentages, counts or times as universal pass thresholds. Authority violations, secret leakage or overriding user decisions reopen the affected deployment decision and are not cancelled by a high mean score. A failed comparison does not by itself prove the entire product impossible or stop unrelated independent work without diagnosing its cause.
+
+## 7. Result record and completion report
+
+A content-free case record contains:
+
+```text
+case_id / case_revision / attempt_id / comparison_arm
+source_commit / package_identity / common_generator_revision
+host / host_version / surface / OS_version / architecture
+model / effort / available_tools / user_authority_reference
+synthetic_fixture_id OR permitted_source_reference
+request_chat_id / execution_session_ids / task_id / context_revision
+selected_guide_ids_and_revisions / composition_id / learning_checkpoint_id
+delivery_state / receipt_limitations / artifact_reference
+expected_result / observed_result_code / independent_rating_state
+start_end_times / actual_usage_or_unknown / retries_timeouts_failures
+PASS | FAIL | PARTIAL | UNAVAILABLE / remaining_evidence / next_action
+```
+
+References and identifiers can themselves be sensitive; minimize and protect access. This format does not permit smuggling raw content into fields. Distinguish retained synthetic fixtures from references to actual user material. Do not retain only successes or present a retry with changed conditions as the first successful attempt on identical inputs.
+
+Document completion and product validation are separate. The final handoff states the actual verified commit, exact commands/results, omitted checks/reasons, unobserved app/OS evidence and next actions. If all planned cases are unexecuted, say so.
+
+## 8. Source checks and release judgment
+
+After integrating the full implementation and stabilizing files under review, run the full source suite in [CONTRIBUTING.md](../../CONTRIBUTING.md) against the reported commit.
+
+```sh
+make bootstrap
+make format-check
+make lint
+make generated-check
+make content-check
+make adjudication-check
+make docs-check
+make governance-check
+make package-check
+make security-scan
+make smoke
+make installer-check
+```
+
+When canonical generated inputs change, run `make generate` and update canonical/generated outputs together. Add behavior tests appropriate to the new DB, channel, guide generation and host adapters; do not invent command names here and report them passed. Native macOS package/release claims need `make release-check` in the documented Apple-silicon environment and corresponding installation/update/recovery evidence. Native Windows claims need actual Windows tests. Retain existing `npm run test:windows` and package checks, but do not treat them alone as proof of new 2.0 app integration, UI behavior or learning.
+
+Review a release when real-host evidence covers the stated capabilities of both requested apps on both OSes, with applicable user requirements, data policy, recovery/update, generated-source consistency, required checks and independent review satisfied for each claim. Do not announce unobserved cells as supported. The user decides any scope reduction; lack of a test environment is not permission to quietly delete mandatory scope. Missing evidence in another cell does not invalidate a directly observed result in one cell.
