@@ -9,7 +9,9 @@ import http.client
 import io
 import json
 import re
+import shutil
 import sys
+import tempfile
 import threading
 from collections.abc import Iterator
 from pathlib import Path
@@ -248,6 +250,75 @@ def _check_body_limits(server: Any) -> None:
         )
 
 
+def _check_concurrent_study(root: Path) -> None:
+    from opensocrates.evaluation.engine import Lab
+    from opensocrates.evaluation.server import _Server
+
+    with tempfile.TemporaryDirectory(prefix="office-lab-http-") as folder:
+        base = Path(folder).resolve()
+        pack = base / "pack"
+        shutil.copytree(root / "evals/office-work-v1", pack)
+        lab = Lab(base / "study", pack)
+        created = lab.action(
+            "create",
+            {"phase": "calibration", "cells": ["macos-work"], "budget": 6, "seed": 11},
+        )
+        run = next(item for item in created["runs"] if item["arm"] == "A")
+        lab.action("prepare", {"run_id": run["id"]})
+        with _Server(lab, 0) as server:
+            server_thread = threading.Thread(target=server.serve_forever, daemon=True)
+            server_thread.start()
+            try:
+                workers = 8
+                barrier = threading.Barrier(workers)
+                results: list[tuple[int, dict[str, Any]]] = []
+                errors: list[str] = []
+                results_lock = threading.Lock()
+
+                def worker(index: int) -> None:
+                    payload = (
+                        {"action": "snapshot", "data": {}}
+                        if index % 2 == 0
+                        else {"action": "monitor", "data": {"run_id": run["id"]}}
+                    )
+                    try:
+                        barrier.wait(timeout=5)
+                        for _ in range(3):
+                            status, _, raw = _api(server, payload)
+                            with results_lock:
+                                results.append((status, json.loads(raw)))
+                    except Exception as exc:
+                        with results_lock:
+                            errors.append(type(exc).__name__)
+
+                threads = [threading.Thread(target=worker, args=(i,)) for i in range(workers)]
+                for item in threads:
+                    item.start()
+                for item in threads:
+                    item.join(timeout=10)
+                    _require(not item.is_alive(), "concurrent HTTP worker hung")
+                _require(not errors, f"concurrent HTTP worker raised: {errors}")
+                _require(len(results) == workers * 3, "concurrent HTTP responses missing")
+                _require(
+                    all(status == 200 and "result" in payload for status, payload in results),
+                    "concurrent in-process HTTP requests failed with study_locked",
+                )
+                lock_file = base / "study/.lock"
+                lock_file.write_text("external-process", encoding="utf-8")
+                try:
+                    status, _, raw = _api(server, {"action": "snapshot", "data": {}})
+                    _require(
+                        status == 400 and json.loads(raw) == {"error": "study_locked"},
+                        "external .lock did not report study_locked",
+                    )
+                finally:
+                    lock_file.unlink(missing_ok=True)
+            finally:
+                server.shutdown()
+                server_thread.join(timeout=5)
+                _require(not server_thread.is_alive(), "concurrent HTTP server did not stop")
+
+
 def check(root: Path) -> int:
     global _CHECKS
     _CHECKS = 0
@@ -263,6 +334,8 @@ def check(root: Path) -> int:
         _check_site_boundary(server)
         _check_actions(server, fixture)
         _check_body_limits(server)
+    with contextlib.redirect_stdout(logs), contextlib.redirect_stderr(logs):
+        _check_concurrent_study(root)
     _require(not logs.getvalue(), "server writes request/exception logs")
     print(f"Office lab HTTP: {_CHECKS} checks passed (synthetic transport; no host/model calls).")
     return _CHECKS

@@ -29,14 +29,28 @@ def _json_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     return output
 
 
-def _load(path: Path) -> dict[str, Any]:
+def _load(path: Path) -> tuple[dict[str, Any], int]:
     from opensocrates.evaluation.storage import read_bytes
 
     raw = read_bytes(path, MAX_EXPORT_BYTES)
     data: Any = json.loads(raw.decode("utf-8"), object_pairs_hook=_json_object)
     from opensocrates.evaluation.report import validate_export
 
-    return validate_export(data)
+    return validate_export(data), len(raw)
+
+
+def _write_exclusive(output: Path, encoded: bytes) -> None:
+    from opensocrates.evaluation.storage import ensure_plain
+
+    ensure_plain(output)
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+    descriptor = os.open(output, flags, 0o600)
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(encoded)
+    except BaseException:
+        output.unlink(missing_ok=True)
+        raise
 
 
 def merge(paths: list[Path]) -> dict[str, Any]:
@@ -46,10 +60,10 @@ def merge(paths: list[Path]) -> dict[str, Any]:
     identity: tuple[Any, ...] | None = None
     total = 0
     for path in paths:
-        total += path.stat().st_size
+        data, size = _load(path)
+        total += size
         if total > MAX_TOTAL_BYTES:
             raise ValueError("total_export_size")
-        data = _load(path)
         observed = (
             data["pack"]["id"],
             data["pack"]["version"],
@@ -92,10 +106,8 @@ def main() -> int:
     args = parser.parse_args()
     try:
         result = merge(args.exports)
-        raw = (json.dumps(result, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
-        descriptor = os.open(args.output, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-        with os.fdopen(descriptor, "wb") as stream:
-            stream.write(raw)
+        encoded = (json.dumps(result, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+        _write_exclusive(args.output, encoded)
     except Exception:
         print(
             "Merge rejected: invalid/conflicting exports or output already exists. No source was modified."
