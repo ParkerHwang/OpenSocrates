@@ -9,6 +9,7 @@ import re
 import secrets
 import shutil
 import stat
+import threading
 from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
@@ -50,6 +51,7 @@ class Lab:
         self.pack_source = pack
         self.payloads = payloads
         self._approvals: dict[str, tuple[str, str]] = {}
+        self._mutex = threading.Lock()
 
     def _pack(self, state: dict[str, Any]) -> dict[str, Any]:
         manifest, _, digest = load_pack(self.store.root / "inputs")
@@ -138,30 +140,31 @@ class Lab:
         }
 
     def snapshot(self) -> dict[str, Any]:
-        try:
-            if not self.store.owned():
-                return {
-                    "schema": "opensocrates.office-snapshot/1",
-                    "initialized": False,
-                    "study_id": None,
-                    "criteria_frozen": False,
-                    "pack": None,
-                    "cells": cells(),
-                    "phase": None,
-                    "budget": 0,
-                    "started_count": 0,
-                    "runs": [],
-                    "groups": [],
-                    "judgments": [],
-                    "warnings": [],
-                    "controller_environment": controller_environment(),
-                }
-            with self.store.locked():
-                state = self.store.load()
-                self._pack(state)
-                return self._snapshot(state)
-        except (OSError, ValueError, UnicodeError) as exc:
-            raise LabError("storage_unavailable") from exc
+        with self._mutex:
+            try:
+                if not self.store.owned():
+                    return {
+                        "schema": "opensocrates.office-snapshot/1",
+                        "initialized": False,
+                        "study_id": None,
+                        "criteria_frozen": False,
+                        "pack": None,
+                        "cells": cells(),
+                        "phase": None,
+                        "budget": 0,
+                        "started_count": 0,
+                        "runs": [],
+                        "groups": [],
+                        "judgments": [],
+                        "warnings": [],
+                        "controller_environment": controller_environment(),
+                    }
+                with self.store.locked():
+                    state = self.store.load()
+                    self._pack(state)
+                    return self._snapshot(state)
+            except (OSError, ValueError, UnicodeError) as exc:
+                raise LabError("storage_unavailable") from exc
 
     def action(self, name: str, data: dict[str, Any]) -> dict[str, Any]:
         handlers = {
@@ -178,20 +181,21 @@ class Lab:
             "freeze": self._freeze,
             "export": self._export,
         }
-        try:
-            if name == "create":
-                return self._create(data)
-            if name not in handlers:
-                raise LabError("unknown_action")
-            with self.store.locked():
-                state = self.store.load()
-                self._pack(state)
-                result = handlers[name](state, data)
-                if name not in ("monitor", "preview", "packet", "reveal"):
-                    self.store.save(state)
-                return result
-        except (OSError, ValueError, UnicodeError) as exc:
-            raise LabError("storage_unavailable") from exc
+        with self._mutex:
+            try:
+                if name == "create":
+                    return self._create(data)
+                if name not in handlers:
+                    raise LabError("unknown_action")
+                with self.store.locked():
+                    state = self.store.load()
+                    self._pack(state)
+                    result = handlers[name](state, data)
+                    if name not in ("monitor", "preview", "packet", "reveal"):
+                        self.store.save(state)
+                    return result
+            except (OSError, ValueError, UnicodeError) as exc:
+                raise LabError("storage_unavailable") from exc
 
     def _create(self, data: dict[str, Any]) -> dict[str, Any]:
         fields(data, {"phase", "cells", "budget", "seed"}, {"phase", "cells", "budget"})

@@ -215,6 +215,25 @@ def _export_metrics(value: Any) -> None:
             integer(value[key], 0, 10**9)
 
 
+def _validate_run_state(run: dict[str, Any]) -> None:
+    has_preflight = run["preflight"] is not None
+    has_start = run["started_at"] is not None
+    has_finish = run["finished_at"] is not None
+    has_metrics = run["metrics"] != {}
+    if has_start and not has_preflight:
+        raise LabError("invalid_export")
+    expected: dict[str, tuple[bool | None, bool | None, bool, bool]] = {
+        "planned": (False, False, False, False),
+        "prepared": (None, False, False, False),
+        "running": (True, True, False, False),
+        "completed": (True, True, True, True),
+    }
+    rule = expected.get(run["status"], (None, None, True, True))
+    observed = (has_preflight, has_start, has_finish, has_metrics)
+    if any(want is not None and got != want for want, got in zip(rule, observed, strict=True)):
+        raise LabError("invalid_export")
+
+
 def _export_runs(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
     keys = {
         "id",
@@ -255,8 +274,23 @@ def _export_runs(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
         _export_metrics(run["metrics"])
         _timestamp(run["started_at"])
         _timestamp(run["finished_at"])
+        _validate_run_state(run)
         result[run_id] = run
     return result
+
+
+def _validate_group_runs(group: dict[str, Any], group_runs: list[dict[str, Any]]) -> None:
+    for run in group_runs:
+        if run["cell_id"] != group["cell_id"] or run["case_id"] != group["case_id"]:
+            raise LabError("invalid_export")
+    primary = [run for run in group_runs if run["attempt"] == 1]
+    if len(primary) != 3:
+        raise LabError("invalid_export")
+    completed_count = sum(run["status"] == "completed" for run in primary)
+    if (group["status"] == "complete") != (completed_count == 3):
+        raise LabError("invalid_export")
+    if group["judged"] and group["status"] != "complete":
+        raise LabError("invalid_export")
 
 
 def _export_groups(
@@ -264,23 +298,20 @@ def _export_groups(
 ) -> dict[str, dict[str, Any]]:
     keys = {"id", "cell_id", "case_id", "status", "judged"}
     groups: dict[str, dict[str, Any]] = {}
+    pairs: set[tuple[str, str]] = set()
     for group in data["groups"]:
         fields(group, keys | {"mapping"}, keys)
         identifier = _opaque(group["id"])
-        if identifier in groups:
-            raise LabError("invalid_export")
         enum(group["status"], ("complete", "incomplete"))
         boolean(group["judged"])
-        primary = [
-            run for run in runs.values() if run["group_id"] == identifier and run["attempt"] == 1
-        ]
-        if len(primary) != 3 or any(
-            run["cell_id"] != group["cell_id"] or run["case_id"] != group["case_id"]
-            for run in primary
-        ):
+        group_runs = [run for run in runs.values() if run["group_id"] == identifier]
+        _validate_group_runs(group, group_runs)
+        pair = (group["cell_id"], group["case_id"])
+        if identifier in groups or pair in pairs:
             raise LabError("invalid_export")
         _export_mapping(group)
         groups[identifier] = group
+        pairs.add(pair)
     if any(run["group_id"] not in groups for run in runs.values()):
         raise LabError("invalid_export")
     return groups
@@ -388,11 +419,13 @@ def _export_collections(data: dict[str, Any]) -> None:
         _timestamp(data["criteria"]["created_at"])
 
 
-def validate_export(data: dict[str, Any]) -> dict[str, Any]:
+def validate_export(data: Any) -> dict[str, Any]:
     """Validate untrusted exported JSON, preserving only the exact closed schema."""
     try:
         if len(json.dumps(data, ensure_ascii=False).encode("utf-8")) > EXPORT_LIMIT:
             raise LabError("export_too_large")
+        if not isinstance(data, dict):
+            raise LabError("invalid_export")
         _export_header(data)
         _export_collections(data)
         runs = _export_runs(data)
