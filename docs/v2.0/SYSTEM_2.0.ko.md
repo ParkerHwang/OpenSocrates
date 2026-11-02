@@ -35,6 +35,7 @@ flowchart TD
     intake["의뢰 대화 세션"]
     worker["실제 작업 세션 A"]
     worker2["실제 작업 세션 B"]
+    learning_worker["필요 시 학습·재조립 세션"]
     artifact["작업물과 허용된 파일"]
 
     subgraph os["개인의 OpenSocrates 프로그램"]
@@ -58,6 +59,7 @@ flowchart TD
         select -->|"업무 프롬프트·가이드·맥락"| adapter
         channel <--> state
         channel -->|"관찰·전달 가능한 신호만"| signal
+        channel -->|"가이드 생성·재조립 결과"| learn
         compare --> signal
         signal --> learn
         learn -->|"개인 가이드 생성·수정"| personal
@@ -66,13 +68,15 @@ flowchart TD
     end
 
     user -->|"요청·선택·수정"| intake
-    intake -->|"상담·형식·중요한 질문"| user
+    intake -->|"상담·형식·중요한 질문·결과"| user
     intake <-->|"의뢰·상태·결과"| channel
     adapter -->|"의뢰 해석·상담에 적합한 가이드와 맥락"| intake
     adapter -->|"실제 세션 생성·전달"| worker
     adapter -->|"추가 위임 시 같은 준비 경로"| worker2
+    adapter -->|"필요 시 생성 업무·가이드·맥락 전달"| learning_worker
     worker -->|"결과·질문·추가 의뢰"| channel
     worker2 -->|"결과·질문·추가 의뢰"| channel
+    learning_worker -->|"생성·재조립 결과"| channel
     worker <-->|"허용된 작업"| artifact
     worker2 <-->|"허용된 작업"| artifact
     artifact -->|"관련 작업 시에만"| compare

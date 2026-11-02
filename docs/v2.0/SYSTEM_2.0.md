@@ -35,6 +35,7 @@ flowchart TD
     intake["Intake conversation"]
     worker["Real execution conversation A"]
     worker2["Real execution conversation B"]
+    learning_worker["Learning/reassembly conversation when needed"]
     artifact["Artifacts and permitted files"]
 
     subgraph os["Personal OpenSocrates program"]
@@ -58,6 +59,7 @@ flowchart TD
         select -->|"Task prompt, guides and context"| adapter
         channel <--> state
         channel -->|"Only observable and deliverable signals"| signal
+        channel -->|"Guide generation and reassembly results"| learn
         compare --> signal
         signal --> learn
         learn -->|"Generate or revise personal guides"| personal
@@ -66,13 +68,15 @@ flowchart TD
     end
 
     user -->|"Request, choice and correction"| intake
-    intake -->|"Consultation, format and important questions"| user
+    intake -->|"Consultation, format, important questions and results"| user
     intake <-->|"Request, status and results"| channel
     adapter -->|"Guides and context for intake interpretation"| intake
     adapter -->|"Create real session and deliver"| worker
     adapter -->|"Same preparation for additional delegation"| worker2
+    adapter -->|"Generation task, guidance and context when needed"| learning_worker
     worker -->|"Results, questions and requests"| channel
     worker2 -->|"Results, questions and requests"| channel
+    learning_worker -->|"Generation and reassembly results"| channel
     worker <-->|"Permitted work"| artifact
     worker2 <-->|"Permitted work"| artifact
     artifact -->|"Only at related work"| compare

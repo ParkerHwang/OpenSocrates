@@ -14,12 +14,15 @@ First-version targets are **the ChatGPT desktop app's Chat, Work, and Codex expe
 4. [Validation and evaluation](VALIDATION_2.0.md): each host and OS, continuity, security, quality and real-use evaluation.
 5. [한국어 문서](README.ko.md).
 6. [Standalone Korean HTML plan](PLAN_2.0.ko.html). This is a snapshot of the four Korean planning documents. Refresh it separately after source changes and recheck its content and links.
+7. [Korean data-flow SVG](FLOW_2.0.ko.svg): the static overview embedded in the HTML. The system plan's Mermaid source and explanation retain the detailed flow.
 
 Rebuild the HTML snapshot from the four Korean source documents at the repository root with the pinned renderer, then inspect the regenerated content and links:
 
 ```sh
 uv run --no-project --with 'markdown-it-py==4.2.0' python tools/render_v2_plan.py
 ```
+
+If the first Mermaid flow in the system plan changes, the renderer stops when it differs from the SVG's source fingerprint. Update the drawing and its text alternative, manually review the relationships, then set `data-mermaid-sha256` in the SVG to the fingerprint reported by the renderer and rebuild. A matching fingerprint is not automatic proof that the diagram's meaning is correct.
 
 The packet records proposed behavior and unresolved decisions. Internal model alignment, improved personalized quality, and automatic host-to-host delivery have not been established. The user's request session handles consultation and coordination; new sessions perform actual deliverable work. All inter-agent communications pass through the OpenSocrates layer.
 
