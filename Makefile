@@ -133,6 +133,10 @@ docs-check:
 		--path docs/v2.0/IMPLEMENTATION_BACKLOG.md \
 		--path docs/v2.0/MASTER_PLAN.md \
 		--path docs/v2.0/START_HERE.md \
+		--path docs/v2.0/ARCHITECTURE_AND_MIGRATION.md \
+		--path docs/v2.0/EVALUATION_CASES.md \
+		--path docs/v2.0/HOSTS_AND_BOTS.md \
+		--path docs/v2.0/PRODUCT_AND_EVALUATION.md \
 		--report build/evidence/links.json
 
 governance-check:

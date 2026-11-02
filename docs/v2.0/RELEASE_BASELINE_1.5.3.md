@@ -251,6 +251,8 @@ The string tells the agent to keep goals, permissions, constraints, and completi
 | Stop | none | 3 | `completion_candidate` |
 | SessionEnd | `other` | 3 | `session_ended` |
 
+Two rows need a note. `UserPromptSubmit` has no `timeout` key on purpose: a comment in `src/opensocrates/hosts/codex/commands.py` says the selector call is bounded internally at thirty seconds and the host timeout is left out so Codex applies its documented 600-second maximum. That maximum comes from the source comment; this inspection did not observe it in Codex. `PreToolUse` maps to no event of its own (`NATIVE_TO_NORMALIZED` gives `None`). The launcher still receives `tool_succeeded` because it only accepts the normalized names, but a `PreToolUse` call is metadata-only and produces no domain event. The table's last column is the launcher argument, not a claim that a tool succeeded.
+
 With `decision_point_mode` (the default in `src/opensocrates/cli/runtime.py`), `UserPromptSubmit` and `SessionStart` whose `source` is `compact` return `additionalContext` set to `ENTRY_GUIDANCE` alone. Startup, resume, and clear `SessionStart` take the empty selector result, so they do not attach that string. The other registered events do not attach it either. Whether a trusted host actually ran the hook, and whether Codex also placed a skill body in the same context, was not observed.
 
 The release manifest records a darwin-arm64 release-build timing for the generated SessionStart hook: configured timeout 2000 ms, 20 samples, startup p95 18.708 ms, compact p95 134.015 ms. That block is latency of the hook process during release assembly. This inspection did not re-run it, and it is not a token count.
@@ -322,7 +324,7 @@ The same zip is the Mac and Windows content archive named by the release. The li
 - The Node.js version that published the npm package.
 - A line-by-line audit of `opensocrates-1.5.3-checksums.sha256`.
 - Translation quality. File counts and hashes do not establish it.
-- Former issue #124, now deleted. This inventory does not explain omitted application.
+- Why an application was omitted despite installed and approved hooks, as reported in former issue #124 (now deleted). This inventory records what each package is built to supply; it does not explain that report or estimate how often it happens.
 - B02 and later backlog items. Synthetic evaluation cases, task contracts, and new host adapters are not part of this record.
 
 ## Reproduce
