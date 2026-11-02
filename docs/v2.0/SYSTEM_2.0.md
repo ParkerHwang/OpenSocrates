@@ -217,22 +217,43 @@ When sessions share screen-control resources, design app/screen coordination and
 
 ```mermaid
 flowchart TD
-    signal["Permitted choices, edits, collaboration and change observations"]
+    signal["Observable choices, edits, collaboration and changes"]
+    current["Handle in current work according to provenance, scope and certainty<br/>mediate inter-session delivery where needed"]
+    current_pending["Hold affected current application or leave effect unknown"]
+    current_result["Distinguish observed results from unknowns in current work"]
     eligibility["Check current learning scope and settings"]
+    revisit["Guide reselection, relevant product/setting changes or user adjustment"]
     assess["Interpret with provenance and relevant context"]
+    decide{"Is there a learning matter to address"}
     issue["Personal learning problem"]
     propose["Generate, revise or reassemble personal guides<br/>using common generation instructions"]
+    review{"Assess retention and application<br/>for candidate or existing guide separately"}
     apply["Try in relevant actual work<br/>including ongoing work"]
     observe["Observe later outcomes and counterexamples"]
+    nochange["Retain, select nothing or wait for a later signal"]
     checkpoint["Permitted public progress and version references"]
     resume["Recheck stage, inputs, authority and effects on resume"]
     waiting["Hold affected stage or leave it unknown"]
 
+    signal -->|"Instructions, evidence or reports relevant to current work"| current
+    current -->|"Observable result"| current_result
+    current -->|"No delivery path or effect unknown"| current_pending
     signal --> eligibility
-    eligibility -->|"When allowed"| assess
-    assess --> issue --> propose --> apply --> observe
-    observe --> eligibility
-    eligibility -->|"Stopped or necessary condition missing"| waiting
+    revisit -->|"Assess relevance of a guide allowed for use"| review
+    revisit -->|"When related learning review is needed"| eligibility
+    eligibility -->|"When learning is allowed"| assess
+    assess --> decide
+    decide -->|"Consider a guide change"| issue
+    decide -->|"Retain or select nothing"| nochange
+    decide -->|"Necessary evidence or authority missing"| waiting
+    issue --> propose --> review
+    review -->|"Relevant and application is allowed"| apply
+    review -->|"Candidate does not fit this work"| nochange
+    review -->|"Hold the affected operation"| waiting
+    apply --> observe
+    observe -->|"When a permitted later signal exists"| eligibility
+    observe -->|"Wait for a later signal"| nochange
+    eligibility -->|"Learning stopped or necessary condition missing"| waiting
     assess -.-> checkpoint
     issue -.-> checkpoint
     propose -.-> checkpoint
@@ -242,15 +263,30 @@ flowchart TD
     resume -.->|"Interpretation when conditions allow"| assess
     resume -.->|"Problem formulation when conditions allow"| issue
     resume -.->|"Generation when conditions allow"| propose
-    resume -.->|"Delivery/application when conditions allow"| apply
+    resume -.->|"Review delivery/application when conditions allow"| review
     resume -.->|"Outcome observation when conditions allow"| observe
     resume -->|"Required inputs, authority or effects unknown"| waiting
     waiting -.->|"On resumption or improved conditions"| resume
 ```
 
+Handling a current user instruction, relevant third-party requirement or tentative report does not require learning to be enabled. Follow confirmed instructions and validated corrections within their valid scope; address third-party requirements and unverified reports according to the task’s authority, provenance and certainty without promoting them to user approval or confirmed facts. Mediate any necessary delivery to other sessions through the layer, and leave actual receipt or effect unknown when it cannot be observed. On the learning side, do not create or apply a new guide for every observation. Retaining or selecting nothing and holding only the affected judgment are valid outcomes. Assess retention and application to current work separately. Even without a later user signal, relevance when a guide is selected again, relevant product or setting changes, and user adjustments can trigger review. Checking relevance at use is separate from collecting learning data or changing a guide; respect the actual scope of the user’s learning pause and permission to use existing guides separately. Do not turn silence into success or repeatedly create learning sessions without grounds.
+
 Recheck current settings and authority for the relevant stage before each transition as well. Distinguish cancellation and deletion from waiting to resume, and handle their scope according to the actual instruction.
 
 Example learning states are `observed → interpreting → candidate → pending_application → observing_outcome → revised/retained/retired`. Interruption and cancellation are separate states; resume restores the last confirmed stage and unresolved effects. This is not a selected RL algorithm or a validated adoption rule. Absence of edits, silence, or agreement among agents does not by itself establish success.
+
+### Separating current work from learning: example
+
+This public synthetic scenario is for design review, not a real user preference or implemented learning result. While report A and related work are in progress, a user corrects A to lead with the decision; another customer's B requirement and a possible numerical error in A arrive separately. The same user requests the verification process first in a different audit.
+
+| Signal | What to do in current work | Separate learning judgment |
+| --- | --- | --- |
+| Direct user correction to A | Follow the valid current instruction in A. Determine its actual scope for related work and deliver what is needed through the layer. | A direction useful for decision-maker reports can become a scoped candidate. Do not establish whether it reflects this reader's need or the user's general preference. |
+| Agent's report of customer B's requirement | If relevant and authorized within B's task, examine provenance and certainty and address it there. Do not turn the report itself into new user approval. | Do not attribute B's demand or task condition as this user's general preference. Separate experience of how the user handles such a demand may be considered within its own scope. |
+| Possible numerical error in A | If permitted sources and calculation can verify it, correct it and deliver necessary corrections to affected ongoing work. Otherwise preserve uncertainty about that figure. | A candidate approach may be considered from quality or collaboration experience, but an agent's report alone does not establish the cause or a user preference. |
+| Direct request in a different audit | Follow the current purpose and instruction for that audit. Do not change A into an audit format. | The two requests may not conflict if they suit different readers or purposes. Separate candidates, scoped alternatives or a recomposed direction are possible. Do not categorically exclude a guide based only on the task name. |
+
+An actual user correction after guide exposure is a current instruction and new experience, but not independent proof of the original guide's causal effect. Treat several agents' relay of one correction as one event; leave their relationship unknown when it cannot be established. If false generalization later appears, respect current instructions first and, according to permitted evidence, revise, rescope or retire the candidate, or hold that judgment. Decide whether to change an earlier output using the current request, authority and importance of the error; do not invariably freeze it before completion or demand renewed approval for every edit.
 
 ### Continuing from an interrupted stage
 
