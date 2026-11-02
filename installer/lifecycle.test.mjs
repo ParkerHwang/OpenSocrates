@@ -2782,7 +2782,7 @@ test("verify rejects an archive containing a symbolic link", async () => {
                 "$entry.ExternalAttributes=[BitConverter]::ToInt32(" +
                 "[BitConverter]::GetBytes([uint32]2717843456),0); " +
                 "$writer=[IO.StreamWriter]::new($entry.Open(),[Text.UTF8Encoding]::new($false)); " +
-                "try { $writer.Write('/etc/passwd') } finally { $writer.Dispose() } " +
+                "try { $writer.Write('release-manifest.json') } finally { $writer.Dispose() } " +
                 "} finally { $zip.Dispose() }",
             ],
             {
@@ -2790,14 +2790,16 @@ test("verify rejects an archive containing a symbolic link", async () => {
               env: { ...process.env, OPENSOCRATES_FIXTURE_ASSET: pkg.asset },
             },
           )
-        : spawnSync(
-            "sh",
-            [
-              "-c",
-              `cd ${JSON.stringify(pkg.tree)} && ln -s /etc/passwd leak && zip -q -y ${JSON.stringify(pkg.asset)} leak`,
-            ],
-            { encoding: "utf8" },
-          );
+        : (() => {
+            // Keep the target inside the archive so macOS unzip can extract it.
+            // An absolute target can be refused by unzip before the installer's
+            // own symbolic-link guard is reached.
+            symlinkSync("release-manifest.json", join(pkg.tree, "leak"));
+            return spawnSync("zip", ["-q", "-y", pkg.asset, "leak"], {
+              cwd: pkg.tree,
+              encoding: "utf8",
+            });
+          })();
     assert.equal(link.status, 0, `fixture setup failed: ${link.stderr}`);
     writeFileSync(pkg.checksum, `${sha256(readFileSync(pkg.asset))}  ${basename(pkg.asset)}\n`);
     const result = await quiet(() =>
@@ -2808,7 +2810,7 @@ test("verify rejects an archive containing a symbolic link", async () => {
       result.error.message,
       process.platform === "win32"
         ? /Windows entries failed: ZIP symlink refused/
-        : /package contains a symbolic link/,
+        : /package contains a symbolic link: leak$/,
     );
   } finally {
     box.cleanup();
