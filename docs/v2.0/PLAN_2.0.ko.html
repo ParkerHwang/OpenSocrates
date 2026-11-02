@@ -1137,6 +1137,10 @@
 <p>MCP를 후보 경로로 검토할 때 규격 버전과 실제 호스트 지원을 구분한다. <a href="https://blog.modelcontextprotocol.io/posts/2026-07-28/">MCP 2026-07-28 규격 안내</a>는 기존 <code>initialize</code> 교환과 <code>Mcp-Session-Id</code> 헤더를 제거한 무상태 코어와 별도 상태 핸들을 설명하며, <a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/transports">전송 규격</a>은 이전 버전과의 호환을 별도로 다룬다. 따라서 OpenSocrates의 업무·실제 앱 대화·권한 관계를 MCP 전송 세션 ID 하나에 의존해 설계하지 않는다. <a href="https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices">MCP 보안 지침</a>은 상태 핸들의 소유만으로 인증하지 말고 요청의 권한을 검증하도록 명시한다. <a href="https://ts.sdk.modelcontextprotocol.io/v2/migration/support-2026-07-28">MCP TypeScript SDK의 전환 안내</a>는 <code>clientInfo</code>와 <code>serverInfo</code>가 스스로 보고하는 정보이며 보안 판단에 쓰지 말라고 설명한다. 이전 <a href="https://modelcontextprotocol.io/specification/2025-11-25/basic/transports">2025-11-25 전송 규격</a>에서 HTTP 세션 ID와 서버 전송 스트림은 선택 가능한 기능이다. 그 ID도 사용자에게 보이는 앱 대화의 신원과 같은 것으로 가정하지 않는다. 최신 코어의 요청과 선택적 구독, 이전 규격의 스트림 중 무엇을 각 호스트가 실제 제공하는지 확인해 진행 중 갱신의 push·pull·대기 경로를 설계한다. 각 앱이 어떤 MCP 버전과 호출·구독·갱신 경로를 실제로 제공하는지는 미확인이며, 규격 출판이 각 호스트의 구현이나 진행 중 가이드 주입을 증명하지 않는다.</p>
 <p><a href="https://support.claude.com/en/articles/13345190-get-started-with-claude-cowork">Claude Cowork 안내</a>는 일부 클라우드 세션이 데스크톱 앱을 닫아도 계속되지만 로컬 파일·앱 접근에는 연결된 데스크톱 앱이 필요하다고 설명한다. <a href="https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp">Claude 원격 MCP 안내</a>는 원격 연결 요청이 사용자 기기가 아닌 제공자 클라우드에서 출발한다고 밝힌다. 어느 설명도 로컬 DB에 대한 자동 연결을 보장하지 않으며, 이를 이유로 로컬 서비스를 임의로 공개하지 않는다. <a href="https://learn.chatgpt.com/use-cases/use-your-computer-with-codex">ChatGPT computer use 안내</a>는 macOS의 백그라운드 화면 조작과 Windows의 전면 데스크톱 조작을 구분한다. 이는 문서상 출발점이며 이 제품·계정에서의 성공과는 별개다.</p>
 <h3 id="system-section-8060e4493f968418">Claude의 실제 작업 세션과 로컬 프로그램의 경계</h3>
+<p><a href="https://code.claude.com/docs/en/cross-session-messaging">Claude Code의 세션 간 메시지 안내</a>는 실행 중인 별도 Code 세션에 텍스트를 전달하는 경로를 설명한다. 수신 세션이 작업 중이면 도구 호출 사이에 읽고, 대기 중이면 새 턴을 시작할 수 있다. 같은 기기의 전달은 macOS·Linux의 소켓 또는 Windows의 named pipe를 사용한다. 기본 최소 버전은 macOS·Linux·WSL 2의 Code v2.1.224, 네이티브 Windows의 v2.1.234이며, 제공자·설정에 따라 더 높은 버전이 필요하다. 이것은 <strong>기존 실행 중인 Code 세션의 호스트 직접 전달</strong>에 관한 문서다. 새 사용자 대화 생성, 종료된 세션 깨우기, OpenSocrates 중개, Claude의 일반 대화·Cowork 또는 ChatGPT의 지원을 증명하지 않는다. 각 앱·모드·계정에서 별도로 확인한다.</p>
+<p>직접 메시지는 OpenSocrates를 거치지 않을 수 있다. 제품이 요구하는 A→계층→B와 B→계층→A는 허용된 연결이 실제로 계층을 거치고 올바른 세션에 귀속되는지 따로 검증해야 한다. 계층 전송, 호스트 수신, 모델의 읽기·적용은 서로 다른 관찰이다. 중계 기록이 없다는 이유만으로 관찰하지 못한 우회를 확정하지 않고, 직접 우회가 관찰된 교환을 계층 중개 성공으로 세지 않는다. 같은 OS 사용자, 세션 이름, 소켓 접근 또는 토큰 보유만으로 의도한 사용자 대화와 업무 권한의 결속을 증명하지 않는다. 호스트의 직접 경로를 제품이 모두 차단하거나 관찰할 수 있다고 가정하지 않으며, 기존 설정이나 권한을 조용히 낮추지 않는다.</p>
+<p>같은 안내에 따르면 수신 규칙은 메시지를 전달·보류·거절할 수 있다. 기본 규칙으로 보류된 메시지는 조건에 따라 기한이 적용되며 기본 기한은 5분이다. Desktop과 VS Code 확장에서는 해당 승인 대화상자를 표시할 수 없다고 설명한다. 명시적 보류 등은 기한 처리 방식이 다르므로 모든 메시지가 5분 뒤 만료된다고 가정하지 않는다. 전달 실패·보류·만료·수신 미확인을 구분하고 불필요한 중복 발송을 피한다. 수신된 메시지의 한 줄 미리보기는 호스트 대화에 남고 전문은 호스트 대화록 보기에서 확인할 수 있다고 문서는 설명한다. 같은 기기의 메시지 전송이 제공자 서버를 거치지 않는다는 설명은 모델 추론·호스트 대화 기록까지 로컬이라는 뜻이 아니다. 파일 경로는 파일 첨부나 접근 권한이 아니다. 프로그램의 원문 보관 금지와 호스트의 별도 보관·처리를 각각 평가한다.</p>
+<p><a href="https://code.claude.com/docs/en/channels">Claude Code Channels</a>는 이 직접 메시징과 다른 연구 미리보기다. 실행 중인 Code 세션에 MCP 이벤트를 전달하고 회신 도구를 둘 수 있지만, 사용자 지정 채널의 허용 조건과 계정·조직 정책이 있다. <a href="https://code.claude.com/docs/en/channels-reference">채널 참조</a>에 따르면 전송 완료는 호스트의 처리 확인이 아니며 등록되지 않은 이벤트가 조용히 버려질 수 있다. 또한 채널 안내는 v2 MCP 클라이언트 런타임에서 규약 <code>2026-07-28</code>을 협상하는 채널 서버가 등록되지 않는 경우를 명시한다. 최신 규격 지원만으로 이 채널의 호환성을 가정하지 않고 호스트의 실제 협상·등록·수신을 확인한다. 채널을 OpenSocrates의 중개 후보로 조사하되 대상 대화 결속·회신·직접 경로 통제와 Desktop 지원은 미확인이다. 이 기능의 존재나 문서 조사는 2.0 연결 시험의 성공이 아니다.</p>
 <p>2026-11-03 확인한 <a href="https://support.claude.com/en/articles/13947068-assign-tasks-from-anywhere-in-claude-cowork">Dispatch 안내</a>는 하나의 지속 대화에서 요청을 받고 Code 또는 Cowork 작업 세션을 열어 사이드바에 표시하고 결과를 돌려주는 경험을 설명한다. 이는 사용자가 구상한 상담 대화와 별도 실제 작업 대화의 <strong>유사 사례</strong>다. 그러나 문서는 Dispatch가 일부 기존 사용자를 위한 제한 베타이며 신규 사용자는 이용할 수 없고, 데스크톱·모바일 앱과 깨어 있는 컴퓨터가 필요하다고 설명한다. 같은 문서의 단일 지속 스레드 제한과 작업 세션의 실제 관계, 이 계정에서의 가용성, OpenSocrates가 요청·가이드·결과를 중개할 수 있는지는 미확인이다. 화면에 버튼이 보이는 것만으로 사용 가능이나 2.0 통합을 주장하지 않는다.</p>
 <p><a href="https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile">Claude의 클라우드 세션 안내</a>와 <a href="https://support.claude.com/en/articles/14479288-claude-cowork-architecture-overview">아키텍처 설명</a>은 세션과 파일이 Claude 계정에 저장되고, 클라우드에서 로컬 접근은 실행 중인 데스크톱과 허용된 연결을 경유하며 필요한 파일 사본이 서버에서 처리될 수 있다고 설명한다. 해당 아키텍처는 클라우드 샌드박스가 기본적으로 사설·link-local 주소에 직접 접근하지 못한다고도 밝힌다. 따라서 <strong>OpenSocrates DB가 로컬인 것과 호스트 모델·대화·파일 처리까지 로컬인 것은 다르다.</strong> 원문·가이드·작업 파일의 프로그램 보관, 일시 전달과 호스트의 별도 보관·처리를 구분하고 현재 정책과 사용자 권한에 맞는지를 각각 확인한다. 클라우드 기능을 배제하거나 로컬 서비스를 인터넷에 노출해야 한다고 단정하지 않는다.</p>
 <p>로컬 연결도 등록 방식별로 살펴야 한다. <a href="https://support.claude.com/en/articles/11725091-when-to-use-desktop-and-web-connectors">Claude의 연결 안내</a>는 로컬 MCP를 포함한 플러그인과 데스크톱 확장의 지원 표면을 구분하고, <a href="https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp">원격 MCP 안내</a>는 데스크톱 설정 파일에 직접 구성한 로컬 서버를 별도로 설명한다. 클라우드 세션 안에서 서버가 실행되지 않는다는 <a href="https://support.claude.com/en/articles/14479288-claude-cowork-architecture-overview">아키텍처 설명</a>과 데스크톱 앱을 통한 로컬 플러그인 접근은 서로 다른 위치의 동작일 수 있다. 이 자료만으로 모든 등록 방식이 동일하게 지원되거나 서로 모순된다고 단정하지 않는다. 설정·플러그인·확장과 데스크톱 연결, 계정·관리자 정책 및 실제 호출을 각각 확인한다. 원격 MCP 서비스의 네트워크 접근 요건이 로컬 DB 자체를 공개 인터넷에 열라는 지시는 아니다.</p>
@@ -1978,6 +1982,11 @@
 <td>인증 이름이나 <code>app-server</code>라는 명칭만이 아니라 실제 모델 실행 주체·전송 경로·사용자에게 보이는 대화·권한을 구분한다. 후자의 명시적 API 기반 독자 앱을 현 범위의 대체 실행으로 채택하지 않으며, 한 경로의 제외로 다른 경로 전체를 미지원이라고 단정하지 않는다.</td>
 </tr>
 <tr>
+<td>HOST-22</td>
+<td>Claude Code의 실행 중인 별도 세션 간 직접 메시지와 계층 중개 후보를 공개 합성 자료로 비교</td>
+<td>앱·모드·OS·Code 버전·계정·권한별로 활성/대기 세션, 직접 전달과 A→계층→B→계층→A, 보류·거절·만료, 출처 표시 및 호스트 기록을 각각 관찰한다. Desktop의 기본 보류 승인창 제약과 채널의 등록·전송 확인 범위를 별도 확인한다. 중계 기록 부재로 우회를 확정하거나 직접 전달을 계층 성공으로 세지 않으며, 전송·수신·적용 및 사용자에게 보이는 대화의 귀속을 구분한다. 없는 영수증이나 원문 영구 저장을 요구하지 않는다. 미확인 경로만 보류하고 독립 업무는 계속한다. 이는 미실행 계획이다.</td>
+</tr>
+<tr>
 <td>DELEGATE-01</td>
 <td>그래프 의뢰의 작업 명세와 두 세션이 같은 잘못된 지표 가정을 공유</td>
 <td>월별 합계로 확인 가능한 인원비와 동일인 교집합이 필요한 유지율을 구분한다. 재계산·다수결만으로 의미를 확정하지 않고, 목적에 필요한 경우 허용된 원자료·정의를 확인하거나 구체적으로 묻는다. 가이드와 맥락 전달 및 결과 반환은 레이어를 거친다.</td>
@@ -2354,7 +2363,7 @@
 </tr>
 <tr>
 <td>REQ-05–07 계층 경유·동적 위임·선택</td>
-<td>HOST-02, HOST-03, HOST-05, HOST-12–21, DELEGATE-01–03, GUIDE-04</td>
+<td>HOST-02, HOST-03, HOST-05, HOST-12–22, DELEGATE-01–03, GUIDE-04</td>
 </tr>
 <tr>
 <td>REQ-08 각 판단 세션의 가이드·맥락</td>
@@ -2386,7 +2395,7 @@
 </tr>
 <tr>
 <td>REQ-16 사용자가 중간 전달자가 되지 않는 팀</td>
-<td>HOST-02, HOST-06–07, HOST-13–19, USER-04 및 사용자 부담 측정</td>
+<td>HOST-02, HOST-06–07, HOST-13–19, HOST-22, USER-04 및 사용자 부담 측정</td>
 </tr>
 </tbody>
 </table></div>
