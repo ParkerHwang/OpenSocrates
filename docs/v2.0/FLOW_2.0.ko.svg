@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="data-flow-overview" font-family="-apple-system,BlinkMacSystemFont,Apple SD Gothic Neo,Malgun Gothic,sans-serif" fill="#193a38" viewBox="0 0 1080 1140" role="img" aria-labelledby="flowTitle flowDesc" data-mermaid-sha256="b095f0976c6630a7c2aecd228d4e654fa4bcd6c76ce88d0b84a828b4dc8929be">
+  <title id="flowTitle">OpenSocrates 2.0 데이터 흐름 요약</title>
+  <desc id="flowDesc">계획 단계의 흐름도다. 사용자는 의뢰 세션에서 요청·선택·수정을 전하고 상담과 결과를 받는다. 의뢰 세션은 OpenSocrates 통신·작업 조정과 요청과 결과를 주고받는다. 기본 48개 가이드, 적합한 개인 가이드, 생성 업무에 필요한 공통 생성 지침, 관련 맥락과 권한은 업무별 준비로 들어간다. 앱 어댑터는 각 업무에 맞게 의뢰, 실제 작업, 필요한 학습·재조립 세션에 가이드와 맥락을 전달한다. 실제 작업 세션 A와 B의 질문과 결과는 통신·작업 조정으로 돌아오며, 새 의뢰는 업무별 준비와 앱 어댑터를 거쳐 전달한다. 작업 세션은 허용된 파일을 읽고 쓴다. 관련 작업에서만 파일 변화를 비교하고, 관찰 가능하고 허용된 경험은 프로그램 내 개인별 학습으로 간다. 생성·재조립 결과는 경험 신호와 별도로 통신 계층을 거쳐 학습으로 돌아와 검토된다. 학습은 필요한 경우 개인 가이드를 갱신하거나 관련 업무에서 시험한다. 적합성 판단에는 진행 중인 작업과 이후 작업이 포함된다. 학습은 필요할 때 통신 계층을 통해 추론 세션을 의뢰한다. 개인 DB는 작업·학습 상태와 허용된 참조를 관리한다. 작업물은 사용자가 접근할 수 있는 앱과 파일에 있다. 원문 대화와 작업공간 내용의 복제 보관은 금지된다. 동일한 이름의 상자는 같은 요소를 반복해서 표현한 것이다. 화살표는 설계한 경로이며 실제 전달, 사용 또는 효과가 검증됐다는 뜻이 아니다.</desc>
+  <rect width="1080" height="1140" rx="18" fill="#fff"/>
+  <text style="font-size:21px;font-weight:750;fill:#123c37" x="35" y="38">요청에서 협업, 경험을 통한 가이드 발전까지</text>
+  <text style="font-size:14px;fill:#536e68" x="35" y="63">제품 설계도 · 화살표는 계획된 경로이며 실제 전달·사용의 증거가 아닙니다</text>
+
+  <rect style="fill:#f7faf7;stroke:#d7e5de;stroke-width:1.5" x="20" y="82" width="1040" height="153" rx="16"/>
+  <text style="font-size:15px;font-weight:750;fill:#147260" x="40" y="109">01  요청을 정리하고 결과를 돌려줍니다</text>
+  <rect style="fill:#fff;stroke:#b9d2c5;stroke-width:1.5" x="45" y="139" width="135" height="65" rx="11"/>
+  <text style="font-size:17px;font-weight:750" x="112" y="178" text-anchor="middle">사용자</text>
+  <rect style="fill:#f1f5fc;stroke:#b9cce5;stroke-width:1.5" x="270" y="132" width="200" height="78" rx="11"/>
+  <text style="font-size:17px;font-weight:750" x="370" y="164" text-anchor="middle">의뢰 세션</text>
+  <text style="font-size:13px;fill:#4e6863" x="370" y="187" text-anchor="middle">상담 · 준비 · 결과 안내</text>
+  <rect style="fill:#e2f2ec;stroke:#438d79;stroke-width:1.8" x="570" y="132" width="210" height="78" rx="11"/>
+  <text style="font-size:17px;font-weight:750" x="675" y="164" text-anchor="middle">통신 · 작업 조정</text>
+  <text style="font-size:13px;fill:#4e6863" x="675" y="187" text-anchor="middle">OpenSocrates 프로그램</text>
+  <rect style="fill:#fff;stroke:#b9d2c5;stroke-width:1.5" x="875" y="132" width="150" height="78" rx="11"/>
+  <text style="font-size:17px;font-weight:750" x="950" y="161" text-anchor="middle">개인 DB</text>
+  <text style="font-size:13px;fill:#4e6863" x="950" y="184" text-anchor="middle">상태 · 허용 참조</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M180 171 H270"/>
+  <path style="fill:#4b746f" d="M180 171 l8 -5 v10 z M270 171 l-8 -5 v10 z"/>
+  <text style="font-size:12px;fill:#456962" x="225" y="155" text-anchor="middle">요청 · 선택 · 수정</text>
+  <text style="font-size:12px;fill:#456962" x="225" y="190" text-anchor="middle">상담 · 결과</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M470 171 H570"/>
+  <path style="fill:#4b746f" d="M470 171 l8 -5 v10 z M570 171 l-8 -5 v10 z"/>
+  <text style="font-size:12px;fill:#456962" x="520" y="158" text-anchor="middle">의뢰 · 결과</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M780 171 H875"/>
+  <path style="fill:#4b746f" d="M780 171 l8 -5 v10 z M875 171 l-8 -5 v10 z"/>
+  <text style="font-size:12px;fill:#456962" x="827" y="158" text-anchor="middle">상태</text>
+
+  <rect style="fill:#f7faf7;stroke:#d7e5de;stroke-width:1.5" x="20" y="253" width="1040" height="287" rx="16"/>
+  <text style="font-size:15px;font-weight:750;fill:#147260" x="40" y="281">02  업무에 맞는 가이드와 맥락을 각 세션에 전달합니다</text>
+  <rect style="fill:#fff8ed;stroke:#e3c99b;stroke-width:1.4" x="40" y="302" width="225" height="71" rx="10"/>
+  <text style="font-size:17px;font-weight:750" x="152" y="330" text-anchor="middle">기본 48개 가이드</text>
+  <text style="font-size:13px;fill:#4e6863" x="152" y="352" text-anchor="middle">초기 · 적합한 개인 가이드가 없을 때</text>
+  <rect style="fill:#fff8ed;stroke:#e3c99b;stroke-width:1.4" x="298" y="302" width="225" height="71" rx="10"/>
+  <text style="font-size:17px;font-weight:750" x="410" y="330" text-anchor="middle">개인 가이드</text>
+  <text style="font-size:13px;fill:#4e6863" x="410" y="352" text-anchor="middle">적합하면 우선 · 개수 제한 없음</text>
+  <rect style="fill:#fff8ed;stroke:#e3c99b;stroke-width:1.4" x="556" y="302" width="225" height="71" rx="10"/>
+  <text style="font-size:17px;font-weight:750" x="668" y="330" text-anchor="middle">공통 생성 지침</text>
+  <text style="font-size:13px;fill:#4e6863" x="668" y="352" text-anchor="middle">제품 버전별 · 생성 업무에 필요할 때</text>
+  <rect style="fill:#fff8ed;stroke:#e3c99b;stroke-width:1.4" x="814" y="302" width="225" height="71" rx="10"/>
+  <text style="font-size:17px;font-weight:750" x="926" y="330" text-anchor="middle">관련 맥락 · 권한</text>
+  <text style="font-size:13px;fill:#4e6863" x="926" y="352" text-anchor="middle">업무 · 분기 · 우선순위</text>
+  <path d="M152 373 V395 H926 V373 M410 373 V395 M668 373 V395" fill="none" stroke="#8eaaa2" stroke-width="1.8"/>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M385 395 V435"/>
+  <path style="fill:#4b746f" d="M385 435 l-5 -8 h10 z"/>
+  <rect style="fill:#e2f2ec;stroke:#438d79;stroke-width:1.8" x="45" y="435" width="165" height="72" rx="11"/>
+  <text style="font-size:17px;font-weight:750" x="127" y="465" text-anchor="middle">통신 · 작업 조정</text>
+  <text style="font-size:13px;fill:#4e6863" x="127" y="487" text-anchor="middle">업무 · 기대 결과</text>
+  <rect style="fill:#e2f2ec;stroke:#438d79;stroke-width:1.8" x="275" y="435" width="220" height="72" rx="11"/>
+  <text style="font-size:17px;font-weight:750" x="385" y="465" text-anchor="middle">업무별 준비</text>
+  <text style="font-size:13px;fill:#4e6863" x="385" y="487" text-anchor="middle">선택 · 조합 · 필요시 재조립</text>
+  <rect style="fill:#e2f2ec;stroke:#438d79;stroke-width:1.8" x="565" y="435" width="175" height="72" rx="11"/>
+  <text style="font-size:17px;font-weight:750" x="652" y="465" text-anchor="middle">앱 어댑터</text>
+  <text style="font-size:13px;fill:#4e6863" x="652" y="487" text-anchor="middle">표면별 전달</text>
+  <rect style="fill:#f1f5fc;stroke:#b9cce5;stroke-width:1.5" x="815" y="425" width="225" height="92" rx="11"/>
+  <text style="font-size:17px;font-weight:750" x="927" y="452" text-anchor="middle">각각의 실제 앱 세션</text>
+  <text style="font-size:13px;fill:#4e6863" x="927" y="475" text-anchor="middle">의뢰 · 작업 A/B</text>
+  <text style="font-size:13px;fill:#4e6863" x="927" y="495" text-anchor="middle">학습 · 재조립은 필요할 때</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M210 471 H275"/>
+  <path style="fill:#4b746f" d="M275 471 l-8 -5 v10 z"/>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M495 471 H565"/>
+  <path style="fill:#4b746f" d="M565 471 l-8 -5 v10 z"/>
+  <text style="font-size:12px;fill:#456962" x="530" y="423" text-anchor="middle">업무 프롬프트</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M740 471 H815"/>
+  <path style="fill:#4b746f" d="M815 471 l-8 -5 v10 z"/>
+  <text style="font-size:12px;fill:#456962" x="777" y="458" text-anchor="middle">가이드 · 맥락</text>
+
+  <rect style="fill:#f7faf7;stroke:#d7e5de;stroke-width:1.5" x="20" y="558" width="1040" height="168" rx="16"/>
+  <text style="font-size:15px;font-weight:750;fill:#147260" x="40" y="586">03  에이전트의 질문과 결과는 프로그램을 거칩니다</text>
+  <rect style="fill:#f1f5fc;stroke:#b9cce5;stroke-width:1.5" x="50" y="619" width="220" height="72" rx="11"/>
+  <text style="font-size:17px;font-weight:750" x="160" y="649" text-anchor="middle">실제 작업 세션 A</text>
+  <text style="font-size:13px;fill:#4e6863" x="160" y="672" text-anchor="middle">조사 · 제작 · 통합 등</text>
+  <rect style="fill:#e2f2ec;stroke:#438d79;stroke-width:1.8" x="405" y="619" width="250" height="72" rx="11"/>
+  <text style="font-size:17px;font-weight:750" x="530" y="649" text-anchor="middle">통신 · 작업 조정</text>
+  <text style="font-size:13px;fill:#4e6863" x="530" y="672" text-anchor="middle">모든 에이전트 간 소통 경유</text>
+  <rect style="fill:#f1f5fc;stroke:#b9cce5;stroke-width:1.5" x="800" y="619" width="220" height="72" rx="11"/>
+  <text style="font-size:17px;font-weight:750" x="910" y="649" text-anchor="middle">실제 작업 세션 B</text>
+  <text style="font-size:13px;fill:#4e6863" x="910" y="672" text-anchor="middle">필요할 때 추가 위임</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M270 655 H405"/>
+  <path style="fill:#4b746f" d="M405 655 l-8 -5 v10 z"/>
+  <text style="font-size:12px;fill:#456962" x="337" y="643" text-anchor="middle">질문 · 결과</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M655 655 H800"/>
+  <path style="fill:#4b746f" d="M655 655 l8 -5 v10 z"/>
+  <text style="font-size:12px;fill:#456962" x="727" y="643" text-anchor="middle">질문 · 결과</text>
+  <text style="font-size:13px;fill:#4e6863" x="530" y="712" text-anchor="middle">새 의뢰는 ②의 업무별 준비와 앱 어댑터를 거쳐 전달</text>
+
+  <rect style="fill:#f7faf7;stroke:#d7e5de;stroke-width:1.5" x="20" y="744" width="1040" height="334" rx="16"/>
+  <text style="font-size:15px;font-weight:750;fill:#147260" x="40" y="772">04  허용된 경험에서 배우고 관련 작업에 다시 활용합니다</text>
+  <rect style="fill:#f1f5fc;stroke:#b9cce5;stroke-width:1.5" x="40" y="789" width="150" height="48" rx="9"/>
+  <text style="font-size:13px;fill:#4e6863" x="115" y="819" text-anchor="middle">실제 작업 A/B</text>
+  <rect style="fill:#e2f2ec;stroke:#438d79;stroke-width:1.8" x="408" y="789" width="154" height="48" rx="9"/>
+  <text style="font-size:13px;fill:#4e6863" x="485" y="819" text-anchor="middle">통신 · 작업 조정</text>
+  <rect style="fill:#f1f5fc;stroke:#b9cce5;stroke-width:1.5" x="650" y="789" width="210" height="48" rx="9"/>
+  <text style="font-size:13px;fill:#4e6863" x="755" y="819" text-anchor="middle">필요 시 학습 · 재조립 세션</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M650 813 H562"/>
+  <path style="fill:#4b746f" d="M562 813 l8 -5 v10 z"/>
+  <text style="font-size:12px;fill:#456962" x="606" y="803" text-anchor="middle">결과</text>
+  <rect style="fill:#fff;stroke:#b9d2c5;stroke-width:1.5" x="40" y="870" width="150" height="70" rx="10"/>
+  <text style="font-size:17px;font-weight:750" x="115" y="900" text-anchor="middle">작업물 · 파일</text>
+  <text style="font-size:13px;fill:#4e6863" x="115" y="922" text-anchor="middle">실행 세션의 작업</text>
+  <rect style="fill:#fff;stroke:#b9d2c5;stroke-width:1.5" x="230" y="870" width="155" height="70" rx="10"/>
+  <text style="font-size:17px;font-weight:750" x="307" y="900" text-anchor="middle">파일 비교</text>
+  <text style="font-size:13px;fill:#4e6863" x="307" y="922" text-anchor="middle">관련 작업에서만</text>
+  <rect style="fill:#fff;stroke:#b9d2c5;stroke-width:1.5" x="415" y="870" width="145" height="70" rx="10"/>
+  <text style="font-size:17px;font-weight:750" x="487" y="900" text-anchor="middle">경험 신호</text>
+  <text style="font-size:13px;fill:#4e6863" x="487" y="922" text-anchor="middle">관찰 · 허용 범위</text>
+  <rect style="fill:#e2f2ec;stroke:#438d79;stroke-width:1.8" x="590" y="870" width="165" height="70" rx="10"/>
+  <text style="font-size:17px;font-weight:750" x="672" y="900" text-anchor="middle">개인별 학습</text>
+  <text style="font-size:13px;fill:#4e6863" x="672" y="922" text-anchor="middle">프로그램의 생성 · 재검토</text>
+  <rect style="fill:#fff8ed;stroke:#e3c99b;stroke-width:1.4" x="800" y="870" width="235" height="70" rx="10"/>
+  <text style="font-size:17px;font-weight:750" x="917" y="900" text-anchor="middle">개인 가이드</text>
+  <text style="font-size:13px;fill:#4e6863" x="917" y="922" text-anchor="middle">적합한 업무에 필요 시 시험</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M190 905 H230"/>
+  <path style="fill:#4b746f" d="M230 905 l-8 -5 v10 z"/>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M385 905 H415"/>
+  <path style="fill:#4b746f" d="M415 905 l-8 -5 v10 z"/>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M560 905 H590"/>
+  <path style="fill:#4b746f" d="M590 905 l-8 -5 v10 z"/>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M755 905 H800"/>
+  <path style="fill:#4b746f" d="M800 905 l-8 -5 v10 z"/>
+  <text style="font-size:12px;fill:#456962" x="777" y="893" text-anchor="middle">검토 후</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M115 837 V870"/>
+  <path style="fill:#4b746f" d="M115 837 l-5 8 h10 z M115 870 l-5 -8 h10 z"/>
+  <text style="font-size:12px;fill:#456962" x="124" y="858">읽기 · 쓰기</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M485 837 V870"/>
+  <path style="fill:#4b746f" d="M485 870 l-5 -8 h10 z"/>
+  <text style="font-size:12px;fill:#456962" x="500" y="858">허용된 신호</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M562 837 V850 H672 V870"/>
+  <path style="fill:#4b746f" d="M672 870 l-5 -8 h10 z"/>
+  <text style="font-size:12px;fill:#456962" x="617" y="846" text-anchor="middle">생성 · 재조립 결과</text>
+  <rect style="fill:#fff;stroke:#b9d2c5;stroke-width:1.5" x="40" y="979" width="150" height="56" rx="9"/>
+  <text style="font-size:13px;fill:#4e6863" x="115" y="1013" text-anchor="middle">개인 DB</text>
+  <rect style="fill:#e2f2ec;stroke:#438d79;stroke-width:1.8" x="270" y="979" width="165" height="56" rx="9"/>
+  <text style="font-size:13px;fill:#4e6863" x="352" y="1013" text-anchor="middle">개인별 학습</text>
+  <rect style="fill:#e2f2ec;stroke:#438d79;stroke-width:1.8" x="515" y="979" width="190" height="56" rx="9"/>
+  <text style="font-size:13px;fill:#4e6863" x="610" y="1013" text-anchor="middle">통신 · 작업 조정</text>
+  <rect style="fill:#e2f2ec;stroke:#438d79;stroke-width:1.8" x="800" y="979" width="235" height="56" rx="9"/>
+  <text style="font-size:13px;fill:#4e6863" x="917" y="1013" text-anchor="middle">업무별 준비</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M190 1007 H270"/>
+  <path style="fill:#4b746f" d="M190 1007 l8 -5 v10 z M270 1007 l-8 -5 v10 z"/>
+  <text style="font-size:12px;fill:#456962" x="230" y="996" text-anchor="middle">학습 상태</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2;stroke-dasharray:6 5" d="M435 999 H515"/>
+  <path style="fill:#4b746f" d="M515 999 l-8 -5 v10 z"/>
+  <text style="font-size:12px;fill:#456962" x="475" y="989" text-anchor="middle">필요 시 의뢰</text>
+  <path style="fill:none;stroke:#4b746f;stroke-width:2.2" d="M917 940 V979"/>
+  <path style="fill:#4b746f" d="M917 979 l-5 -8 h10 z"/>
+  <text style="font-size:12px;fill:#456962" x="930" y="965">재선택</text>
+  <text style="font-size:13px;fill:#4e6863" x="40" y="1060">전체 폴더 상시 감시 없이, 원문 대화·작업공간 내용 복제는 보관하지 않습니다.</text>
+  <text style="font-size:13px;fill:#4e6863" x="790" y="1060">진행 중인 관련 작업 포함</text>
+
+  <text style="font-size:14px;fill:#536e68" x="35" y="1094">작업물은 사용자가 접근할 수 있는 앱과 파일에 있습니다.</text>
+  <text style="font-size:14px;fill:#536e68" x="35" y="1118">같은 이름의 상자는 같은 요소를 반복 표시합니다. 점선은 필요한 경우의 의뢰입니다.</text>
+</svg>

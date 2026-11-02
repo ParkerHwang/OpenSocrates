@@ -1,5 +1,7 @@
 # Development start and handoff
 
+> **Historical plan — superseded on 2026-11-02.** The owner’s new 2.0 direction, host scope, and guide lifecycle are in the [current 2.0 plan](README.md). Preserve this document as historical planning and evidence; do not treat conflicting instructions here, including mandatory Cursor, a fixed 48-method selection, or its work sequencing, as the current product scope. Repository privacy, security, release, and generated-source rules still apply.
+
 This packet prepares development. No runtime behavior is changed by the packet. The owner requested the 2.0 target, mandated Cursor support, requested easy installation and automatic updates, and withdrew the standalone 1.6 track. The work may start without restarting discovery from this conversation.
 
 ## First session

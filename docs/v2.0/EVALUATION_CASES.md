@@ -1,5 +1,7 @@
 # Initial synthetic evaluation cases
 
+> **Historical plan — superseded on 2026-11-02.** The owner’s new 2.0 direction, host scope, and guide lifecycle are in the [current 2.0 plan](README.md). Preserve this document as historical planning and evidence; do not treat conflicting instructions here, including mandatory Cursor, a fixed 48-method selection, or its work sequencing, as the current product scope. Repository privacy, security, release, and generated-source rules still apply.
+
 These cases are authored preparation inputs, not executed outcomes. Before collecting results, freeze task wording, expected criteria, host/version/model/effort, runner permissions and data, comparison arms, sample size, order, timeout/censoring and human review procedure. Do not use these fixtures to infer a product-wide improvement from a single run. Materials are synthetic; no external messages or bookings are authorized.
 
 ## E01: Reader context and separate user note

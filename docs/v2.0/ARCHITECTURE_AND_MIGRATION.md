@@ -1,5 +1,7 @@
 # OpenSocrates 2.0 architecture and migration plan
 
+> **Historical plan — superseded on 2026-11-02.** The owner’s new 2.0 direction, host scope, and guide lifecycle are in the [current 2.0 plan](README.md). Preserve this document as historical planning and evidence; do not treat conflicting instructions here, including mandatory Cursor, a fixed 48-method selection, or its work sequencing, as the current product scope. Repository privacy, security, release, and generated-source rules still apply.
+
 Status: implementation design, not a claim of shipped behavior. Start from the
 released 1.5.3 product and its documented contracts. The user has withdrawn the
 separate 1.6 release work; its PRs, branches, and evidence are historical inputs

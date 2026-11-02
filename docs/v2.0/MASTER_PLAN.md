@@ -1,5 +1,7 @@
 # OpenSocrates 2.0 master plan
 
+> **Historical plan — superseded on 2026-11-02.** The owner’s new 2.0 direction, host scope, and guide lifecycle are in the [current 2.0 plan](README.md). Preserve this document as historical planning and evidence; do not treat conflicting instructions here, including mandatory Cursor, a fixed 48-method selection, or its work sequencing, as the current product scope. Repository privacy, security, release, and generated-source rules still apply.
+
 Status: preparation and proposed execution architecture, 29 October 2026. The owner selected 2.0 as the target and explicitly withdrew the standalone 1.6 track. This document is an implementation handoff, not proof of delivered behavior or release qualification.
 
 ## Product outcome
