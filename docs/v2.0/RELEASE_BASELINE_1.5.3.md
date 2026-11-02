@@ -13,9 +13,13 @@ Backlog item B01 has two parts. This document completes only the first.
 | Inventory v1.5.3 host packages and ten-language content; retain unknowns and exact versions | Recorded here, from published release assets, the npm package, the SBOM and tag-identical source |
 | Inspect initial guidance and actual delivered tokens per accessible host | **Not done.** No Codex, Claude, or Antigravity process ran during this inspection, so nothing here was observed in a model context |
 
-B01 stays open until the second part is measured on each accessible host, with inaccessible hosts recorded as such. That measurement is required before any comparison against v1.5.3 (including B02 evaluation runs).
+B01 stays open until the second part is measured on each accessible host, with inaccessible hosts recorded as such.
 
-A claim about one host does not wait for B01. It needs direct evidence of the stage it describes, on the host and surface it names. Hook output, context actually delivered to the model, a full method read, a reported application, and the result are separate stages, and evidence for one does not establish another. Delivery observed on one host is not blocked by other hosts being unmeasured, and it says nothing about those other hosts. The package sizes and estimated tokens in this document are evidence for none of these stages.
+Three kinds of statement rest on different evidence:
+
+- **B02 host evaluation comparisons.** A planned B02 run that compares v1.5.3 with another arm on a host needs that host's v1.5.3 delivered-context measurement first. The requirement applies per host: the comparison on one host does not wait for another host's measurement.
+- **Static package and source comparisons.** Comparing v1.5.3 archives, files or source with each other or with later versions, as this document does with hashes, sizes and `git diff v1.5.3`, rests on the packages and source themselves. It needs no host measurement and says nothing about what a host delivers.
+- **Host claims.** A claim about one host does not wait for B01. It needs direct evidence of the stage it describes, on the host and surface it names. Hook output, context actually delivered to the model, a full method read, a reported application, and the result are separate stages, and evidence for one does not establish another. Delivery observed on one host is not blocked by other hosts being unmeasured, and it says nothing about those other hosts. The package sizes and estimated tokens in this document are evidence for none of these stages.
 
 Live measurement is not required to accept this document because the document makes no host-behavior claim. Every value comes from a published artifact or from source identical to tag `v1.5.3`, and every statement about host behavior is marked not observed. The sizes and estimated tokens below describe text present in a package or returned by tag-identical code; they are not delivered context. If a later edit adds a claim about host behavior, that claim needs direct evidence of its own stage on its own host.
 
